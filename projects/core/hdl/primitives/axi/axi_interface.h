@@ -35,6 +35,12 @@
 #ifndef USER_WIDTH_R
 #define USER_WIDTH_R USER_WIDTH
 #endif
+#ifndef AXI4
+#define AXI4 0
+#endif
+#ifndef AXI4_LITE
+#define AXI4_LITE 0
+#endif
 #if AXI4
 #define LEN_WIDTH 8
 #else
@@ -45,11 +51,14 @@
 #define CONTROL_NAME CPP_CAT(axi2cp_,NAME)
 #define SDP_NAME CPP_CAT(sdp2axi_,NAME)
 #define NULL_NAME CPP_CAT(axinull_,NAME)
+#define RAW_NAME CPP_CAT(raw2axi_,NAME)
 
 library IEEE; use IEEE.std_logic_1164.all, ieee.numeric_std.all;
 library sdp, platform, ocpi; use ocpi.types.all;
 package NAME is
+#if !AXI4_LITE
   subtype axi_id_t is std_logic_vector(ID_WIDTH-1 downto 0);
+#endif
   ------------------------------------------------------------
   -- The global signals, which from a prefix point of view is called the A channel
   -- Which of CLK and RESETn is driven by which side varies
@@ -76,21 +85,25 @@ package NAME is
   ------------------------------------------------------------
   -- The write address channel, a.k.a. the AW channel
   type aw_m2s_t is record
-    ID     : axi_id_t;
     ADDR   : std_logic_vector(ADDR_WIDTH-1 downto 0);
+    VALID  : std_logic;
+    PROT   : std_logic_vector(2 downto 0);
+    #if !AXI4_LITE
+    ID     : axi_id_t;
     LEN    : std_logic_vector((LEN_WIDTH)-1 downto 0);
-    SIZE   : std_logic_vector(2 downto 0);
     BURST  : std_logic_vector(1 downto 0);
     LOCK   : std_logic_vector(1 downto 0);
     CACHE  : std_logic_vector(3 downto 0);
-    PROT   : std_logic_vector(2 downto 0);
-    VALID  : std_logic;
+    SIZE   : std_logic_vector(2 downto 0);
     #if AXI4
     QOS    : std_logic_vector(3 downto 0);
     REGION : std_logic_vector(3 downto 0);
     #if USER_WIDTH_AW
     USER   : std_logic_vector(USER_WIDTH_AW-1 downto 0);
     #endif
+// clang bug needs this line
+    #endif
+// clang bug needs this line
     #endif
   end record aw_m2s_t;
   type aw_s2m_t is record
@@ -99,15 +112,17 @@ package NAME is
 
   -- The write data channel, a.k.a. the W channel
   type w_m2s_t is record
-#if !AXI4
-    ID     : axi_id_t;
-#endif
     DATA   : std_logic_vector(DATA_WIDTH-1 downto 0);
     STRB   : std_logic_vector((DATA_WIDTH/8)-1 downto 0);
-    LAST   : std_logic;
     VALID  : std_logic;
+    #if !AXI4_LITE
+    #if !AXI4
+    ID     : axi_id_t;
+    #endif
+    LAST   : std_logic;
     #if AXI4 && USER_WIDTH_W
     USER   : std_logic_vector(USER_WIDTH_W-1 downto 0);
+    #endif
     #endif
   end record w_m2s_t;
   type w_s2m_t is record
@@ -119,7 +134,9 @@ package NAME is
     READY : std_logic;
   end record b_m2s_t;
   type b_s2m_t is record
+    #if !AXI4_LITE
     ID     : axi_id_t;
+    #endif
     RESP   : std_logic_vector(1 downto 0);
     VALID  : std_logic;
     #if AXI4 && USER_WIDTH_B
@@ -130,21 +147,25 @@ package NAME is
   ------------------------------------------------------------
   -- The read address channel, a.k.a. the AR channel
   type ar_m2s_t is record
-    ID     : axi_id_t;
     ADDR   : std_logic_vector(ADDR_WIDTH-1 downto 0);
+    VALID  : std_logic;
+    PROT   : std_logic_vector(2 downto 0);
+    #if !AXI4_LITE
+    ID     : axi_id_t;
     LEN    : std_logic_vector((LEN_WIDTH)-1 downto 0);
     SIZE   : std_logic_vector(2 downto 0);
     BURST  : std_logic_vector(1 downto 0);
     LOCK   : std_logic_vector(1 downto 0);
     CACHE  : std_logic_vector(3 downto 0);
-    PROT   : std_logic_vector(2 downto 0);
-    VALID  : std_logic;
     #if AXI4
     QOS    : std_logic_vector(3 downto 0);
     REGION : std_logic_vector(3 downto 0);
     #if USER_WIDTH_AR
     USER   : std_logic_vector(USER_WIDTH_AR-1 downto 0);
     #endif
+// clang 12.0 bug needs this line
+    #endif
+// clang 12.0 bug needs this line
     #endif
   end record ar_m2s_t;
   type ar_s2m_t is record
@@ -156,14 +177,18 @@ package NAME is
     READY : std_logic;
   end record r_m2s_t;
   type r_s2m_t is record
-    ID     : axi_id_t;
     DATA   : std_logic_vector(DATA_WIDTH-1 downto 0);
     RESP   : std_logic_vector(1 downto 0);
-    LAST   : std_logic;
     VALID  : std_logic;
+    #if !AXI4_LITE
+    ID     : axi_id_t;
+    LAST   : std_logic;
     #if AXI4 && USER_WIDTH_R
     USER   : std_logic_vector(USER_WIDTH_R-1 downto 0);
     #endif
+// clang bug needs this line
+#endif
+
   end record r_s2m_t;
 
   -- The bundles of signals m2s, and s2m
@@ -232,5 +257,13 @@ package NAME is
          axi_in       : in  axi_s2m_t;
          axi_out      : out axi_m2s_t);
   end component NULL_NAME;
+  component RAW_NAME is
+    port(clk     : in std_logic;
+         reset   : in bool_t;
+         raw_in  : in ocpi.wci.raw_in_t;
+         raw_out : in ocpi.wci.raw_out_t;
+         axi_in  : in  axi_m2s_t;
+         axi_out : out axi_s2m_t);
+  end component RAW_NAME;
 end package NAME;
 

@@ -144,7 +144,11 @@
 	  volatile uint32_t *reg;
 	  if (!(reg = (volatile uint32_t *)m_driver.map(sizeof(uint32_t), OM::FPD_SLCR_AFI_FS_ADDR, err)))
 	    return true;
+#if 0
+	  *reg = (1<<8) | (1 << 10);  // set gp0/1 to 64bit mode
+#else
 	  *reg = 0;  // set gp0/1 to 32bit mode
+#endif
 	  if (m_driver.unmap((uint8_t *)reg, sizeof(*reg), err))
 	    return true;
 	  volatile OM::ALL_AFIFMS *axi_hp;

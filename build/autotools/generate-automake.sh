@@ -195,7 +195,7 @@ function do_library {
     printf "${7}_LTLIBRARIES += \$(ocpi_build_dir)/_$2.la\n"
     printf "${amname}_CPPFLAGS+=\$(PYTHON$8_INCLUDES)\\n"
     printf "\$(ocpi_build_dir)/$3: $swig\\n"
-    printf "\\t\$(AT)@OcpiSWIG@ -c++ -python -classic -outdir \$(@D) -o \$@ "
+    printf "\\t\$(AT)@OcpiSWIG@ -c++ -python -outdir \$(@D) -o \$@ "
     printf "\$(${amname}_CPPFLAGS) \$<\\n"
     [[ $2 != *2 ]] && printf "python_PYTHON+=$(dirname $swig)/$2.py\\n"
   else
@@ -370,8 +370,6 @@ while read path opts; do
 	ldadd="libocpi_${lname} $ldadd"
 	echo "if !ocpi_is_cross"
 	do_library "swig" $base $wrap "-prefer-pic" "$ldflags" "$ldadd" $dest
-	command -v python2-config > /dev/null && [[ $(python -c "import sys;print(sys.version)") == 2* ]] && 
-          do_library "swig" ${base}2 $wrap "-prefer-pic" "$ldflags" "$ldadd" $dest 2
 	echo endif
     fi
   }

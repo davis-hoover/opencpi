@@ -62,6 +62,7 @@ run/
 exports/
 imports
 *.pyc
+simulations/
 \n\n"""
 
 PROJ_GIT_ATTR = """
@@ -135,6 +136,19 @@ $(if $(realpath $(OCPI_CDK_DIR)),,\\
 include $(OCPI_CDK_DIR)/include/project.mk
 \n""")
 
+LIB_DIR_MAKEFILE= ("""# This is the {{name}} library
+
+# All workers created here in *.<model> will be built automatically
+# All tests created here in *.test directories will be built/run automatically
+# To limit the workers that actually get built, set the Workers= variable
+# To limit the tests that actually get built/run, set the Tests= variable
+
+# Any variable definitions that should apply for each individual worker/test
+# in this library belong in Library.xml
+
+include $(OCPI_CDK_DIR)/include/library.mk
+\n""")
+
 PROJ_GUI_PROJECT = ("""<?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
   <name>{{determined_package_id}}</name>
@@ -143,4 +157,155 @@ PROJ_GUI_PROJECT = ("""<?xml version="1.0" encoding="UTF-8"?>
   <buildSpec></buildSpec>
   <natures></natures>
 </projectDescription>
+\n""")
+
+PROJ_PROJECT_XML_LEGACY = ("""<project
+{%if package_name: %}
+       PackageName='{{package_name}}'
+{% endif %}
+{%if package_prefix: %}
+       PackagePrefix='{{package_prefix}}'
+{% endif %}
+{%if package_id: %}
+       Package='{{package_id}}'
+{% endif %}
+{%if depend: %}
+       ProjectDependencies='{{depend}}'
+{% endif %}
+{%if prim_lib: %}
+       Libraries='{{prim_lib}}'
+{% endif %}
+{%if include_dir: %}
+       IncludeDirs='{{include_dir}}'
+{% endif %}
+{%if xml_include: %}
+       XmlIncludeDirs='{{xml_include}}'
+{% endif %}
+{%if comp_lib: %}
+       ComponentLibraries='{{comp_lib}}'
+{% endif %}
+/>
+\n""")
+
+PROJ_PROJECT_XML = ("""<project>
+{%if package_name: %}
+       <OcpiProperty>
+               <name>PackageName</name>
+               <value>{{package_name}}</value>
+       </OcpiProperty>
+{% endif %}
+{%if package_prefix: %}
+       <OcpiProperty>
+               <name>PackagePrefix</name>
+               <value>{{package_prefix}}</value>
+       </OcpiProperty>
+{% endif %}
+{%if package_id: %}
+       <OcpiProperty>
+               <name>Package</name>
+               <value>{{package_id}}</value>
+       </OcpiProperty>
+{% endif %}
+{%if depend: %}
+       <OcpiProperty>
+               <name>ProjectDependencies</name>
+               <value>{{depend}}</value>
+       </OcpiProperty>
+{% endif %}
+{%if prim_lib: %}
+       <OcpiProperty>
+               <name>Libraries</name>
+               <value>{{prim_lib}}</value>
+       </OcpiProperty>
+{% endif %}
+{%if include_dir: %}
+       <OcpiProperty>
+               <name>IncludeDirs</name>
+               <value>{{include_dir}}</value>
+       </OcpiProperty>
+{% endif %}
+{%if xml_include: %}
+       <OcpiProperty>
+               <name>XmlIncludeDirs</name>
+               <value>{{xml_include}}</value>
+       </OcpiProperty>
+{% endif %}
+{%if comp_lib: %}
+       <OcpiProperty>
+               <name>ComponentLibraries</name>
+               <value>{{comp_lib}}</value>
+       </OcpiProperty>
+{% endif %}
+</project>
+\n""")
+
+LIB_DIR_XML = ("""<library
+{%if package_name: %}
+       PackageName='{{package_name}}'
+{% endif %}
+{%if package_prefix: %}
+       PackagePrefix='{{package_prefix}}'
+{% endif %}
+{%if package_id: %}
+       Package='{{package_id}}'
+{% endif %}
+{%if prim_lib: %}
+       Libraries='{{prim_lib}}'
+{% endif %}
+{%if include_dir: %}
+       IncludeDirs='{{include_dir}}'
+{% endif %}
+{%if xml_include: %}
+       XmlIncludeDirs='{{xml_include}}'
+{% endif %}
+{%if comp_lib: %}
+       ComponentLibraries='{{comp_lib}}'
+{% endif %}
+/>
+\n""")
+
+APP_APPLICATION_XML = ("""<applications>
+    <!-- To restrict the applications that are built or run, you can set the Applications
+    attribute to the specific list of which ones you want to build and run, e.g.:
+    <libraries Applications='app1 app3'/>
+    Otherwise all applications will be built and run -->
+</applications>
+\n""")
+
+APP_APPLICATION_APP_CC = ("""#include <iostream>
+#include <string>
+#include "OcpiApi.hh"
+
+namespace OA = OCPI::API;
+
+int main(/*int argc, char **argv*/) {
+  // For an explanation of the ACI, see:
+  // https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Application_Development_Guide.pdf
+
+  try {
+    OA::Application app("{{app}}.xml");
+    app.initialize(); // all resources have been allocated
+    app.start();      // execution is started
+
+    // Do work here.
+
+    // Must use either wait()/finish() or stop(). The finish() method must
+    // always be called after wait(). The start() method can be called
+    // again after stop().
+    app.wait();       // wait until app is "done"
+    app.finish();     // do end-of-run processing like dump properties
+    // app.stop();
+
+  } catch (std::string &e) {
+    std::cerr << "app failed: " << e << std::endl;
+    return 1;
+  }
+  return 0;
+}
+\n""")
+
+APP_APPLICATION_APP_XML = ("""<!-- The {{app}} application xml file -->
+<Application>
+  <Instance Component='ocpi.core.nothing' Name='nothing'/>
+</Application>
 \n""")

@@ -49,11 +49,11 @@ entity generic_pcie is
     msi_out     : out msi_out_t;
 
     -- Master (x1)
-    h2f_axi_in  : in  axi.pcie_h2f.axi_s2m_t;
-    h2f_axi_out : out axi.pcie_h2f.axi_m2s_t;
+    m_axi_in  : in  axi.pcie_m.axi_s2m_t;
+    m_axi_out : out axi.pcie_m.axi_m2s_t;
     -- Slave (x1)
-    f2h_axi_in  : in  axi.pcie_f2h.axi_m2s_t;
-    f2h_axi_out : out axi.pcie_f2h.axi_s2m_t
+    s_axi_in  : in  axi.pcie_s.axi_m2s_t;
+    s_axi_out : out axi.pcie_s.axi_s2m_t
   );
 end entity generic_pcie;
 
@@ -190,88 +190,88 @@ begin
     MSI_Vector_Width  => msi_out.MSI_Vector_Width,
     --
     -- AXI Slave Write Address Channel
-    s_axi_awid        => f2h_axi_in.AW.ID,
-    s_axi_awaddr      => f2h_axi_in.AW.ADDR,
-    s_axi_awregion    => (others => '0'), --f2h_axi_in.AW.REGION,
-    s_axi_awlen       => f2h_axi_in.AW.LEN,
-    s_axi_awsize      => f2h_axi_in.AW.SIZE,
-    s_axi_awburst     => f2h_axi_in.AW.BURST,
-    s_axi_awvalid     => f2h_axi_in.AW.VALID,
-    s_axi_awready     => f2h_axi_out.AW.READY,
+    s_axi_awid        => s_axi_in.AW.ID,
+    s_axi_awaddr      => s_axi_in.AW.ADDR,
+    s_axi_awregion    => (others => '0'), --s_axi_in.AW.REGION,
+    s_axi_awlen       => s_axi_in.AW.LEN,
+    s_axi_awsize      => s_axi_in.AW.SIZE,
+    s_axi_awburst     => s_axi_in.AW.BURST,
+    s_axi_awvalid     => s_axi_in.AW.VALID,
+    s_axi_awready     => s_axi_out.AW.READY,
     --
     -- AXI Slave Write Data Channel
-    s_axi_wdata       => f2h_axi_in.W.DATA,
-    s_axi_wstrb       => f2h_axi_in.W.STRB,
-    s_axi_wlast       => f2h_axi_in.W.LAST,
-    s_axi_wvalid      => f2h_axi_in.W.VALID,
-    s_axi_wready      => f2h_axi_out.W.READY,
+    s_axi_wdata       => s_axi_in.W.DATA,
+    s_axi_wstrb       => s_axi_in.W.STRB,
+    s_axi_wlast       => s_axi_in.W.LAST,
+    s_axi_wvalid      => s_axi_in.W.VALID,
+    s_axi_wready      => s_axi_out.W.READY,
     --
     -- AXI Slave Write Response Channel
-    s_axi_bid         => f2h_axi_out.B.ID,
-    s_axi_bresp       => f2h_axi_out.B.RESP,
-    s_axi_bvalid      => f2h_axi_out.B.VALID,
-    s_axi_bready      => f2h_axi_in.B.READY,
+    s_axi_bid         => s_axi_out.B.ID,
+    s_axi_bresp       => s_axi_out.B.RESP,
+    s_axi_bvalid      => s_axi_out.B.VALID,
+    s_axi_bready      => s_axi_in.B.READY,
     --
     -- AXI Slave Read Address Channel
-    s_axi_arid        => f2h_axi_in.AR.ID,
-    s_axi_araddr      => f2h_axi_in.AR.ADDR,
-    s_axi_arregion    => (others => '0'), --f2h_axi_in.AR.REGION,
-    s_axi_arlen       => f2h_axi_in.AR.LEN,
-    s_axi_arsize      => f2h_axi_in.AR.SIZE,
-    s_axi_arburst     => f2h_axi_in.AR.BURST,
-    s_axi_arvalid     => f2h_axi_in.AR.VALID,
-    s_axi_arready     => f2h_axi_out.AR.READY,
+    s_axi_arid        => s_axi_in.AR.ID,
+    s_axi_araddr      => s_axi_in.AR.ADDR,
+    s_axi_arregion    => (others => '0'), --s_axi_in.AR.REGION,
+    s_axi_arlen       => s_axi_in.AR.LEN,
+    s_axi_arsize      => s_axi_in.AR.SIZE,
+    s_axi_arburst     => s_axi_in.AR.BURST,
+    s_axi_arvalid     => s_axi_in.AR.VALID,
+    s_axi_arready     => s_axi_out.AR.READY,
     --
     -- AXI Slave Read Data Channel
-    s_axi_rid         => f2h_axi_out.R.ID,
-    s_axi_rdata       => f2h_axi_out.R.DATA,
-    s_axi_rresp       => f2h_axi_out.R.RESP,
-    s_axi_rlast       => f2h_axi_out.R.LAST,
-    s_axi_rvalid      => f2h_axi_out.R.VALID,
-    s_axi_rready      => f2h_axi_in.R.READY,
+    s_axi_rid         => s_axi_out.R.ID,
+    s_axi_rdata       => s_axi_out.R.DATA,
+    s_axi_rresp       => s_axi_out.R.RESP,
+    s_axi_rlast       => s_axi_out.R.LAST,
+    s_axi_rvalid      => s_axi_out.R.VALID,
+    s_axi_rready      => s_axi_in.R.READY,
     --
     -- AXI Master Write Address Channel
-    m_axi_awaddr      => h2f_axi_out.AW.ADDR,
-    m_axi_awlen       => h2f_axi_out.AW.LEN,
-    m_axi_awsize      => h2f_axi_out.AW.SIZE,
-    m_axi_awburst     => h2f_axi_out.AW.BURST,
-    m_axi_awprot      => h2f_axi_out.AW.PROT,
-    m_axi_awvalid     => h2f_axi_out.AW.VALID,
-    m_axi_awready     => h2f_axi_in.AW.READY,
+    m_axi_awaddr      => m_axi_out.AW.ADDR,
+    m_axi_awlen       => m_axi_out.AW.LEN,
+    m_axi_awsize      => m_axi_out.AW.SIZE,
+    m_axi_awburst     => m_axi_out.AW.BURST,
+    m_axi_awprot      => m_axi_out.AW.PROT,
+    m_axi_awvalid     => m_axi_out.AW.VALID,
+    m_axi_awready     => m_axi_in.AW.READY,
     --m_axi_awid              : out std_logic_vector(C_M_AXI_THREAD_ID_WIDTH-1 downto 0);
-    --m_axi_awlock      => h2f_axi_out.AW.LOCK,  -- not listed in pg055-axi-bridge-pcie_v1.06.a.pdf    
-    --m_axi_awcache     => h2f_axi_out.AW.CACHE,  -- not listed in pg055-axi-bridge-pcie_v1.06.a.pdf    
+    --m_axi_awlock      => m_axi_out.AW.LOCK,  -- not listed in pg055-axi-bridge-pcie_v1.06.a.pdf    
+    --m_axi_awcache     => m_axi_out.AW.CACHE,  -- not listed in pg055-axi-bridge-pcie_v1.06.a.pdf    
     --
     -- AXI Master Write Data Channel
-    m_axi_wdata       => h2f_axi_out.W.DATA,
-    m_axi_wstrb       => h2f_axi_out.W.STRB,
-    m_axi_wlast       => h2f_axi_out.W.LAST,
-    m_axi_wvalid      => h2f_axi_out.W.VALID,
-    m_axi_wready      => h2f_axi_in.W.READY,
+    m_axi_wdata       => m_axi_out.W.DATA,
+    m_axi_wstrb       => m_axi_out.W.STRB,
+    m_axi_wlast       => m_axi_out.W.LAST,
+    m_axi_wvalid      => m_axi_out.W.VALID,
+    m_axi_wready      => m_axi_in.W.READY,
     --
     -- AXI Master Write Response Channel
-    m_axi_bresp       => h2f_axi_in.B.RESP,
-    m_axi_bvalid      => h2f_axi_in.B.VALID,
-    m_axi_bready      => h2f_axi_out.B.READY,
+    m_axi_bresp       => m_axi_in.B.RESP,
+    m_axi_bvalid      => m_axi_in.B.VALID,
+    m_axi_bready      => m_axi_out.B.READY,
     --
     -- AXI Master Read Address Channel
     --m_axi_arid              : out std_logic_vector(C_M_AXI_THREAD_ID_WIDTH-1 downto 0);
-    m_axi_araddr      => h2f_axi_out.AR.ADDR,
-    m_axi_arlen       => h2f_axi_out.AR.LEN,
-    m_axi_arsize      => h2f_axi_out.AR.SIZE,
-    m_axi_arburst     => h2f_axi_out.AR.BURST,
-    m_axi_arprot      => h2f_axi_out.AR.PROT,
-    m_axi_arvalid     => h2f_axi_out.AR.VALID,
-    m_axi_arready     => h2f_axi_in.AR.READY,
-    --m_axi_arlock      => h2f_axi_out.AR.LOCK,  -- not listed in pg055-axi-bridge-pcie_v1.06.a.pdf
-    --m_axi_arcache     => h2f_axi_out.AR.CACHE,  -- not listed in pg055-axi-bridge-pcie_v1.06.a.pdf
+    m_axi_araddr      => m_axi_out.AR.ADDR,
+    m_axi_arlen       => m_axi_out.AR.LEN,
+    m_axi_arsize      => m_axi_out.AR.SIZE,
+    m_axi_arburst     => m_axi_out.AR.BURST,
+    m_axi_arprot      => m_axi_out.AR.PROT,
+    m_axi_arvalid     => m_axi_out.AR.VALID,
+    m_axi_arready     => m_axi_in.AR.READY,
+    --m_axi_arlock      => m_axi_out.AR.LOCK,  -- not listed in pg055-axi-bridge-pcie_v1.06.a.pdf
+    --m_axi_arcache     => m_axi_out.AR.CACHE,  -- not listed in pg055-axi-bridge-pcie_v1.06.a.pdf
     --
     -- AXI Master Read Data Channel
-    m_axi_rdata       => h2f_axi_in.R.DATA,
-    m_axi_rresp       => h2f_axi_in.R.RESP,
-    m_axi_rlast       => h2f_axi_in.R.LAST,
-    m_axi_rvalid      => h2f_axi_in.R.VALID,
-    m_axi_rready      => h2f_axi_out.R.READY,
+    m_axi_rdata       => m_axi_in.R.DATA,
+    m_axi_rresp       => m_axi_in.R.RESP,
+    m_axi_rlast       => m_axi_in.R.LAST,
+    m_axi_rvalid      => m_axi_in.R.VALID,
+    m_axi_rready      => m_axi_out.R.READY,
     --
     --
     -- AXI -Lite Interface - CFG Block

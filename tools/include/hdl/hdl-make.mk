@@ -94,28 +94,87 @@ HdlFindCores=$(infox HFC:$1)\
       $(call HdlSearchPrimitivePath,$c,,HPLx)))
 
 HdlBuiltinWorkers=ocscp ocscp_rv metadata metadata_rv time_client time_client_rv unoc_node unoc_node_rv
-define HdlSetWorkers
-  HdlInstances:=$$(and $$(AssyWorkersFile),$$(strip $$(foreach i,$$(shell grep -h -v '\\\#' $$(AssyWorkersFile)),\
-	               $$(if $$(filter $$(call HdlInstanceWkr,$$i),$$(HdlPlatformWorkers)),,$$i))))
-  HdlWorkers:=$$(call Unique,$$(foreach i,$$(HdlInstances),$$(call HdlInstanceWkrCfg,$$i)))
-  $$(infox HdlSetWorkers:Cores:'$$(Cores)':'$$(HdlWorkers)':'$$(HdlInstances)':'$$(HdlTarget)')
-  SubCores_$$(HdlTarget):=$$(call Unique,\
+
+HdlSourceLibPath=$(strip $(infox HSLP:$1)\
+  $(foreach r,\
+    $(if $(findstring /exports/lib/,$1),\
+      $(foreach l,$(lastword $(subst /, ,$1)),$(infox HSLP0:$l)\
+        $(foreach d,$(if $(filter components,$l),/,\
+                      $(if $(filter devices cards adapters,$l),/hdl/,/components/)),$(infox HSLP1:$d)\
+          $(subst /exports/lib/,$d,$1))),\
+      $1),$(infox HSLPr:$r)$r))
+
+################################################################################
+# Genearate a rule to build the worker configuration
+# $(call HdlAutoWorkerRule,<lib>,<target>,<worker>,<config>)
+# 1: rawlib 2: top lib 3: target 4: worker 5: worker-core 6: config
+define HdlAutoWorkerRule
+$$(infox HAUTO:$1:$2:$3:$4:$5:$6)
+$$(infox TARGET:$1/hdl/$3/$5$$(HdlBin))
+# Note unsetting the project variables in the environment and not on the command line
+# We are trying to run a "clean" make unrelated to this parent make.
+# Since we don't have a good pattern for all potential exported variables, we just
+# have to unset the ones we know, which is not really robust.
+$1/hdl/$3/$5$$(HdlBin):
+	$(AT)echo Building HDL worker $4 configuration $6 target $3 in library $2 now...
+	$(AT)unset OCPI_PROJECT_REL_DIR OCPI_PROJECT_PACKAGE OCPI_PROJECT_DIR \
+                   OCPI_PROJECT_COMPONENT_LIBRARIES OCPI_PROJECT_DEPENDENCIES MAKEFLAGS MFLAGS \
+                   OCPI_COMPONENT_LIBRARIES ComponentLibrariesInternal ComponentLibraries \
+	           LibDir LibrariesInternal GenDir ExcludePlatforms Cases IncludeDirsInternal \
+                   KeepSimulations OnlyPlatforms TestIncludeDirsInternal TestLibrariesInternal \
+	           TestTimeout XmlIncludeDirsInternal && \
+             make $$(foreach d,$(call HdlSourceLibPath,$2)/$4.hdl,\
+                        -C $$d $$(if $$(wildcard $$d/Makefile),,-f $(OCPI_CDK_DIR)/include/worker.mk)) \
+                     --no-print-directory HdlTarget=$3 ParamConfigurations=$6 AT=$(AT)
+
+endef
+
+# Search for the actual built core in any of the libraries, but if not found,
+# report whether the worker is not there at all, or is simply not yet built
+# $(call HdlFindWorkerCore,<target>,<worker>,<worker+rv+cfg>,<cfg>)
+HdlFindWorkerCore=$(strip \
+  $(eval HdlFoundInLib:=)\
+  $(eval HdlFoundCore:=)\
+  $(foreach l,$(call OcpiComponentLibraries),$(infox CORELIB:$l:$l/hdl/$1/$3$(HdlBin))\
+    $(if $(HdlFoundCore),,\
+      $(if $(call HdlExists,$l/hdl/$1/$3$(HdlBin)),\
+         $(eval HdlFoundCore:=$l/hdl/$1/$3$(HdlBin)),\
+         $(if $(HdlFoundInLib),,\
+           $(if $(call HdlExists,$l/hdl/$2.xml),\
+             $(eval HdlFoundInLib:=$l))))))\
+  $(or $(HdlFoundCore),\
+    $(if $(HdlFoundInLib),\
+      $(foreach l,$(HdlFoundInLib:%/lib=%),\
+	$(if $(OCPI_AUTO_BUILD_WORKERS),\
+          $(info Warning:  HDL worker "$2" found in component library "$l" $(strip\
+               ($(realpath $l)), but build config "$4" not built for target "$1")),\
+          $(info Error:  HDL worker "$2" found in component library "$l" $(strip\
+               ($(realpath $l)), but build config "$4" not built for target "$1"))$(error ))\
+        $(eval $(call HdlAutoWorkerRule,$(HdlFoundInLib),$l,$1,$2,$3,$4))\
+	$(eval HdlAutoCores+=$(HdlFoundInLib)/hdl/$1/$3$(HdlBin))\
+        $(HdlFoundInLib)/hdl/$1/$3$(HdlBin)),\
+      $(if $(filter-out $(HdlBuiltinWorkers),$2),\
+        $(info Error:  Worker "$2" was not found built for target "$1" in any of the component libraries)\
+        $(error )))))
+
+################################################################################
+# This is called with a target argument in the context of generating recipes
+# and dependencies.  It assigns the SubCores_<target> variable and as a side
+# effect, generates rules and recipes for auto-building dynamic worker
+# configurations
+define HdlSetWorkerCores
+
+  $$(eval HdlAutoCores:=)
+  SubCores_$1:=$$(call Unique,\
     $(- Process explicit Cores) \
     $$(call HdlFindCores,$(Cores))\
     $(- Find worker cores)\
-    $$(foreach f,$$(call HdlGetFamily,$$(HdlTarget)),\
-       $$(foreach w,$$(HdlWorkers),\
-          $$(or $$(strip\
-             $$(firstword \
-                $$(foreach l,$$(call OcpiComponentLibraries),$$(infox CORELIB:$$l:$$l/hdl/$$f/$$w$$(HdlBin))\
-                   $$(or $$(call HdlExists,$$l/hdl/$$f/$$w$$(HdlBin)),\
-                         $$(if $$(call HdlExists,$$l/hdl/$$w.xml),\
-                             $$(foreach lib,$$(l:%/lib=%),\
-                                $$(error HDL worker "$$w" found in component library "$$(lib)" $$(strip\
-                                   ($$(realpath $$(lib)))), but not built for $$f))))))),\
-             $$(if $$(filter-out $$(HdlBuiltinWorkers),$$w),\
-                $$(warning Warning: Worker $$w was not found in any of the component libraries))))))
-   $$(infox Cores SubCores_$$(HdlTarget) is $$(origin SubCores_$$(HdlTarget)) $$(flavor SubCores_$$(HdlTarget)):$$(SubCores_$$(HdlTarget)))
+    $$(foreach f,$$(call HdlGetFamily,$1),\
+       $$(foreach i,$$(HdlInstances),\
+          $$(foreach n,$$(call HdlInstanceWkr,$$i),\
+             $$(foreach w,$$(call HdlInstanceWkrCfg,$$i),$$(infox HSWC:$1:$$f:$$i:$$n:$$w)\
+                $$(call HdlFindWorkerCore,$$f,$$n,$$w,$$(call HdlInstanceCfg,$$i)))))))
+  $$(infox Cores SubCores_$1 is $$(origin SubCores_$1) $$(flavor SubCores_$1):$$(SubCores_$1))
 
 endef
 
@@ -421,7 +480,7 @@ HdlGetSubCoresFromFile=$(infox GetSubCoresFrom:$(call HdlRmRv,$(basename $1)).co
 HdlCollectCores=$(infox CollectCore:$(SubCores_$(HdlTarget)):$(HdlTarget))$(strip \
   $(foreach subcore,$(SubCores_$(HdlTarget)),$(infox subcore=$(subcore))\
     $(foreach corename,$(firstword $(subst :, ,$(subcore))),$(infox corename=$(corename))\
-      $(foreach corepath,$(call HdlCoreRefMaybeTargetSpecificFile,$(corename),$(HdlTarget)),$(infox CorePath:$(corepath))\
+      $(foreach corepath,$(or $(filter $(corename),$(HdlAutoCores)),$(call HdlCoreRefMaybeTargetSpecificFile,$(corename),$(HdlTarget))),$(infox CorePath:$(corepath))\
         $(if $(or $(filter $1,noinstances),$(if $(HdlToolRequiresInstanceMap_$(HdlToolSet)),,noinstances)),\
           $(corename):$(corepath) $(if $(HdlToolRequiresFullCoreHierarchy_$(HdlToolSet)),$(call HdlGetSubCoresFromFile,$(corepath),,$1)),\
           $(if $(HdlToolRequiresInstanceMap_$(HdlToolSet)),\
@@ -432,7 +491,7 @@ HdlCollectCores=$(infox CollectCore:$(SubCores_$(HdlTarget)):$(HdlTarget))$(stri
               $(if $(HdlToolRequiresFullCoreHierarchy_$(HdlToolSet)),$(call HdlGetSubCoresFromFile,$(corepath),$(subcoreinst),$1)))))))))
 
 # Collect all cores of interest, but just return the list of paths (do no care about core names or instances here)
-# This is an simpler list of cores used by certain tools and in HdlPreCore (in HdlPrepareAssembly)
+# This is a simple list of cores used by certain tools and in HdlCoreDependencies (in HdlPrepareAssembly)
 HdlCollectCorePaths=$(strip \
   $(foreach c,$(call HdlCollectCores,noinstances),$(infox COLLECTED CORE:$c)\
     $(word 2,$(subst :, ,$c))))
@@ -481,7 +540,7 @@ HdlRecordLibraries=\
                      $(OCPI_PROJECT_PACKAGE)),$(infox RRR:$r:$(patsubst %/imports/,,$p))\
          $(foreach x,$r:$(notdir $p):$(lastword $(subst :, ,$l)),\
            $(infox RECORDING LIB=$x)echo $x;))))\
-  ) > $(GeneratedDir)/$(LibName).libs;
+  ) > $(GeneratedDir)/$(or $(Worker),$(LibName)).libs;
 
 # Extract the list of libraries required by an asset/library $2 for target $1
 HdlExtractLibrariesFromFile=$(infox Extract:$2:$1)$(call Unique,\
@@ -699,16 +758,22 @@ define HdlPrepareAssembly
   # 3. Generated the assembly source file
   ImplFile:=$$(GeneratedDir)/$$(Worker)-assy$$(HdlSourceSuffix)
   $$(ImplFile): $$$$(ImplXmlFile) | $$$$(GeneratedDir)
-	$(AT)echo Generating the $$(HdlMode) source file: $@ from $$<
+	$(AT)echo Generating the $$(HdlMode) source file: $$@ from $$<
 	$(AT)$$(call OcpiGen, -D $$(GeneratedDir) \
                          $(and $(Assembly),-S $(Assembly)) $(and $(Platform),-P $(Platform)) \
 			 $(and $(PlatformDir),-F $(PlatformDir)) \
                          -a $$<)
   # 4. Make the generated assembly source file one of the files to compile
   WorkerSourceFiles=$$(ImplFile)
-  # 5. Define the variable used for dependencies when the worker is actually built
-  HdlPreCore=$$(eval $$(HdlSetWorkers))$$(call HdlCollectCorePaths)
+  # 5. Set the workers-required variables from the generated AssyWorkersFile, target independent
+  HdlInstances:=$$(and $$(AssyWorkersFile),$$(strip\
+                   $$(foreach i,$$(shell grep -h -v '\\\#' $$(AssyWorkersFile)),\
+	              $$(if $$(filter $$(call HdlInstanceWkr,$$i),$$(HdlPlatformWorkers)),,$$i))))
+  HdlWorkers:=$$(call Unique,$$(foreach i,$$(HdlInstances),$$(call HdlInstanceWkrCfg,$$i)))
+
+  generate: $$(ImplFile)
 endef
+
 #ifndef OCPI_HDL_PLATFORM
 #OCPI_HDL_PLATFORM=zed
 #endif

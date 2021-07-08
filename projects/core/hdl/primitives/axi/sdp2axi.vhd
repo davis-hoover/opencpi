@@ -17,40 +17,51 @@
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 ----------------------------------------------------------------------------------------------------
--- This module adapts between the SDP and an AXI slave interface
--- The initial target AXI configuration is a 64 bit version of the AXI_HP ports on zynq,
----- This AXI is a hardware interface on Zynq
--- Another target is the AXI PCIE bridge, 
----- This AXI is a VHDL bridge to the underlying PCIE AXI4-lite TLP interface (mostly HW)
----- The tax (performace and gates) for using this IP core is unknown
----- Can be wide and can have long bursts
----- But this "AXI-master-only" mode does not work well for peer-to-peer,
----- So a different module that is both master and slave is necessary for good peer to peer.
--- This module is parameterized (CPP-style) by the AXI interface parameters (see README).
--- This adapter is between the connected SDP acting as sdp "slave" and this adapter
----- Note that the SDP "slave" can still issue read/write requests, which it does in this case.
--- This module is acting as SDP master and an axi master.
--- For the purposes of the OpenCPI data plane, this adapter will only support the
--- "active-message" mode since it does not have a slave to receive data written
--- by the "other side" (yet, if ever).  This keeps this adapter smaller.
--- In order to fully implement the passive mode, or the active flow control mode,
--- we would have to also enable am AXI master interface (like the zynq the M_AXI_GP1) and use it to allow
--- software to write into the BRAMs.  There would be a small latency benefit
--- for PS->PL data transfers, but everything else would suffer (throughput, gates, etc.)
+-- This module in inserted between an SDP slave and an AXI slave and thus itself acts as
+-- an SDP master and AXI master.
+--   Note:  In AXI terminology, master is who issues reads and writes.
+--          In SDP terminology, master is who asserts clock/reset, and either side can read or write.
+--   The AXI side, as a master, can issue AXI read and write requests.
+--   It supports the OpenCPI data plane when the SDP is reading and writing to the interconnect
+--   as a "DMA master".
+--   So this adapter receives read/write requests as an SDP master and issues read/write request
+--   as an AXI master.
+--   This module will not issue any read or write requests to SDP as an SDP master
+--   because it does not act as an AXI slave and so has no reason to issue reads or writes to SDP.
+--   When a read request comes from SDP, the response (when it comes back from AXI)
+--   will be returned to the SDP slave that initiated the read request.
+-- It is parameterized (CPP-style) by the AXI interface parameters (see README).
 
--- The clock and reset are driven to the AXI interface based on the AXI interface parameters
+-- Clocking - determined by the AXI interface parameters
+
+-- The SDP interface is driving the SDP clock so this module has two clock modes:
+-- 1. The axi master is driving the clock and that clock will drive the SDP clock (as SDP master)
+--    and thus the clk input port is *ignored*.
+-- 2. The axi slave is supposed to drive the clock so the clk port is an input
+--    that will drive BOTH the AXI clock (from the slave side) and the SDP master's clock
+-- So we'll use SDPCLK as the process clock for this adapter, which is either the input
+-- port clk or the AXI master's clock.
+-- We use the CPP to do this (not VHDL), which avoids clock assignments and delta cycles
+-- and also keeps all the interface attributes in one place (in the interface header file)
+-- We will do the same for reset.
+
+-- The user of this module must be aware of the fact that if the AXI master
+-- drives the clock and the AXI slave drives the reset, that the slave (and SDP) reset
+-- will be the input port "reset", and that reset must be synchronized to the
+-- AXI master's clock (i.e. that is not done here).
 
 -- OPTIMIZING FOR FMAX:  when going to 100MHZ on zynq, we introduced a pipeline
 -- to compute all the values derived from incoming SDP headers.
 -- The variables with the _p suffix are those that were promoted from combinatorial
 -- values on a (slower) functional version to be registered for pipeline purposes.
--- combinatorial values used in the first pipeline stage (to capture in the _p), have _0 suffix
+-- Combinatorial values used in the first pipeline stage (to capture in the _p), have _0 suffix
 
 library IEEE; use IEEE.std_logic_1164.all, ieee.numeric_std.all;
 library platform; use platform.platform_pkg.all;
 library ocpi; use ocpi.types.all, ocpi.util.all;
 library axi; use axi.axi_pkg.all;
 library sdp; use sdp.sdp.all;
+library util;
 library work; use work.axi_pkg.all, work.AXI_INTERFACE.all;
 
 entity sdp2axi_AXI_INTERFACE is
@@ -58,8 +69,8 @@ entity sdp2axi_AXI_INTERFACE is
     ocpi_debug   : boolean;
     sdp_width    : natural);
   port(
-    clk          : in  std_logic;
-    reset        : in  bool_t;
+    clk          : in  std_logic;   -- not used if interface says AXI slave drives the clock
+    reset        : in  bool_t;      -- not used if interface says AXI master drives reset
     sdp_in       : in  s2m_t;
     sdp_in_data  : in  dword_array_t(0 to sdp_width-1);
     sdp_out      : out m2s_t;
@@ -123,7 +134,30 @@ architecture rtl of sdp2axi_AXI_INTERFACE is
   signal pkt_writing_p         : bool_t;
   signal pkt_naxf_p            : pkt_naxf_t;
   signal pkt_dw_addr_p         : whole_addr_t;
+  signal sdp_reset             : bool_t;
 begin
+  --============================================================================================
+  -- Clock and reset handling given that clock and reset may be (independently) from either side
+  -- We are the AXI master
+  #if CLOCK_FROM_MASTER
+    #define SDPCLK clk
+    -- delta cycle alert in some tools even though this is a verilog module
+    in2out_axi_clk: util.util.in2out port map(in_port => clk, out_port => axi_out.a.clk);
+  #else
+    #define SDPCLK axi_in.a.clk
+  #endif
+// clang 12.0 bug needs this line
+  #if RESET_FROM_MASTER
+    sdp_reset <= reset;
+    axi_out.a.resetn <= not reset;
+  #else
+    sdp_reset <= not axi_in.a.resetn;
+  #endif
+  -- delta cycle alert in some tools even though this is a verilog module
+  in2out_cp_clk: util.util.in2out port map(in_port => SDPCLK, out_port => sdp_out.clk);
+  sdp_out.reset <= sdp_reset;
+  --============================================================================================
+
   pkt_dw_addr_0         <= sdp_in.sdp.header.extaddr & sdp_in.sdp.header.addr;
   pkt_ndws_0            <= count_in_dws(sdp_in.sdp.header);
   pkt_naxf_0            <= resize((pkt_ndws_0 + axf_initial_dw_offset_0 + axi_width - 1) /
@@ -164,10 +198,10 @@ begin
   --   in_pkt_e   : working on bursts for a pkt
   --   waiting_e  : waiting for EOP after all bursts done.
   --------------------------------------------------------------------------------
-  doclk : process(clk)
+  doclk : process(SDPCLK)
   begin
-    if rising_edge(clk) then
-      if its(reset) then
+    if rising_edge(SDPCLK) then
+      if its(sdp_reset) then
         addr_state_r <= sop_next_e;  -- we are initially waiting for SOP
         axi_error_r  <= bfalse;
       else
@@ -215,10 +249,10 @@ begin
   -- Process added for pipelining/fmax
   -----------------------------------------------------------------
   pipeline <= sdp_in.sdp.valid and (not sdp_p.valid or sdp_take);
-  dopipe : process(clk)
+  dopipe : process(SDPCLK)
   begin
-    if rising_edge(clk) then
-      if its(reset) then
+    if rising_edge(SDPCLK) then
+      if its(sdp_reset) then
         sdp_p.valid   <= bfalse;
         pkt_writing_p <= bfalse;
         pkt_naxf_p    <= (others => '0');
@@ -237,16 +271,10 @@ begin
   ----------------------------------------------
   -- Interface outputs to the S_AXI_HP interface
   ----------------------------------------------
-  -- axi_hp outputs
-#if CLOCK_FROM_MASTER
-  axi_out.A.CLK                <= clk;
-#endif
-#if RESET_FROM_MASTER
-  axi_out.A.RESETN             <= not reset;
-#endif
 #if AXI4
   axi_out.AW.REGION            <= (others => '0');
   axi_out.AW.QOS               <= (others => '0');
+  axi_out.AR.REGION            <= (others => '0');
   axi_out.AR.QOS               <= (others => '0');
 #endif  
   -- Write address channel
@@ -312,8 +340,8 @@ begin
     generic map (ocpi_debug      => ocpi_debug,
                  axi_width       => axi_width,
                  sdp_width       => sdp_width)
-    port map (   clk             => clk,
-                 reset           => reset,
+    port map (   clk             => SDPCLK,
+                 reset           => sdp_reset,
                  addressing_done => addressing_done,
                  pipeline        => pipeline,
                  sdp             => sdp_in.sdp,  -- not pipelined
@@ -331,8 +359,8 @@ begin
     generic map (ocpi_debug   => ocpi_debug,
                  axi_width    => axi_width,
                  sdp_width    => sdp_width)
-    port map (   clk          => clk,
-                 reset        => reset,
+    port map (   clk          => SDPCLK,
+                 reset        => sdp_reset,
                  sdp_take     => pipeline,
                  sdp_in       => sdp_in,
                  sdp_out      => sdp_out,

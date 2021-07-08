@@ -29,7 +29,7 @@ HdlToolName_isim=ISE
 ifndef __ONLY_TOOL_VARS__
 
 include $(OCPI_CDK_DIR)/include/xilinx/xilinx.mk
-toolsDir:=$(call OcpiXilinxIseDir,$(and $(filter clean%,$(MAKECMDGOALS)),warning))
+toolsDir:=$(call OcpiXilinxIseDir,$(and $(filter declare clean%,$(MAKECMDGOALS)),warning))
 ################################################################################
 # $(call HdlToolLibraryFile,target,libname)
 # Function required by toolset: return the file to use as the file that gets

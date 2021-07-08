@@ -76,6 +76,8 @@ PKGS_D+=(hardlink)
 PKGS_D+=(bash-completion=/etc/profile.d/bash_completion.sh)
 #    Needed to build gdb
 PKGS_D+=(bison flex)
+#    for asciidoc3 man page generation (asciidoc3 is a prereq)
+PKGS_D+=(docbook-style-xsl)
 
 ##########################################################################################
 # S. yum-installed and but not rpm-required - conveniences or required for source environment

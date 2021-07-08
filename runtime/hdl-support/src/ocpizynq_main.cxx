@@ -258,6 +258,8 @@ mymain(const char **argv) {
     }
   } else if (cmd == "axi_hp") {
 #if defined(OCPI_ARCH_aarch64)
+    volatile uint32_t *reg = (volatile uint32_t *)map(OM::FPD_SLCR_AFI_FS_ADDR, sizeof(uint32_t));
+    printf("SLCR: 0x%x\n", *reg);
     volatile OM::ALL_AFIFMS *axi_hp =
       (volatile OM::ALL_AFIFMS *)map(OM::S_AXI_HPX_FPD_ADDR, sizeof(OM::ALL_AFIFMS));
     volatile OM::AFIFM *afifm = axi_hp->afifm;

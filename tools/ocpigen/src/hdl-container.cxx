@@ -431,18 +431,11 @@ HdlContainer(HdlConfig &config, HdlAssembly &appAssembly, ezxml_t xml, const cha
 	  break;
 	}
       // Instance the device and connect its wci
-      // FIXME this is copied from hdl-config - consolidate
-      OU::formatAdd(assy, "  <instance name='%s' worker='%s'%s>\n",
-		    di.cname(), dt.cname(), emulator ? " emulated='1'" : "");
-      if (di.m_instancePVs.size()) {
-	const OU::Assembly::Property *ap = &di.m_instancePVs[0];
-	for (size_t n = di.m_instancePVs.size(); n; n--, ap++)
-	  OU::formatAdd(assy, "    <property name='%s' value='%s'/>\n",
-			ap->m_name.c_str(), ap->m_value.c_str());
-      }
-      if (!emulator && !dt.m_emulate)
+      di.emit(assy, emulator != NULL, !emulator && !dt.m_emulate);
+      if (!emulator && !dt.m_emulate) {
 	mapDevSignals(assy, di, true);
-      assy += "  </instance>\n";
+	assy += "  </instance>\n";
+      }
       if (!dt.m_noControl) {
 	OU::formatAdd(assy,
 		      "  <connection>\n"
@@ -1026,6 +1019,7 @@ emitUuid(const OU::Uuid &uuid) {
   const char *comment = hdlComment(Verilog);
   printgen(f, comment, m_file.c_str(), true);
   OCPI::HDL::HdlUUID uuidRegs;
+  memset(&uuidRegs, 0, sizeof(uuidRegs)); // valgrind
   memcpy(uuidRegs.uuid, uuid.uuid, sizeof(uuidRegs.uuid));
   uuidRegs.birthday = (uint32_t)time(0);
   strncpy(uuidRegs.platform, g_platform, sizeof(uuidRegs.platform));
@@ -1224,6 +1218,10 @@ parsePlatform(ezxml_t xml, std::string &config, std::string &constraints,
   if (only) {
     if ((err = getPlatforms(only, platforms, HdlModel, onlyValidPlatforms)))
       return err;
+    // If we aren't validating and the platform is not valid, just return it
+    // So it can be properly excluded or checked later
+    if (platforms.empty() && !onlyValidPlatforms)
+      platforms.push_back(only);
   } else if (exclude) {
     OrderedStringSet excludedPlatforms, allPlatforms;
     const StringSet *hdlPlatforms;

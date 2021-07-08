@@ -1,0 +1,30 @@
+<HdlDevice Language="vhdl" Version='2' libraries='util'>
+  <ComponentSpec>
+
+    <Property Name="MAX_NUM_TIME_TAGS_TO_COLLECT"
+	      Type="UShort"
+	      Parameter="true"
+	      Default="128"
+	      Description="Maximum number of time tags which can be collected by worker"/>
+    <Property Name="num_time_tags_to_collect" 
+	      Type="UShort" 
+	      Initial="true"
+	      Default="1"
+	      Description="Number of time tags to collect during an application. Must be less than or equal to MAX_NUM_TIME_TAGS_TO_COLLECT"/>
+    <Property Name="collected_time_tags"
+	      Type="Ulonglong"
+	      Volatile="true"
+	      ArrayLength="MAX_NUM_TIME_TAGS_TO_COLLECT"
+	      Description="Storage for collected time tags"/>
+    <Property Name="calibration_value"
+	      Type="Longlong"
+	      Initial="true"
+	      Description="Value is subtracted from all collected time tags before storing"/>
+  </ComponentSpec>
+
+  <TimeInterface Name="time" 
+		 SecondsWidth="32"
+                 FractionWidth="32"
+                 ClockDirection="in"/>
+  <Signal Input="signal_to_time_tag"/>
+</HdlDevice>

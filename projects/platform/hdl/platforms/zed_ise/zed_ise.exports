@@ -16,8 +16,11 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
++<platform-dir>/zed_ise.ucf
++<platform-dir>/zed_ise.ut
+
 # Udev rules
-=<platform_dir>/98-zedboard.rules <platform>/udev-rules/98-zedboard.rules
+=<platform_dir>/98-zedboard.rules udev-rules/98-zedboard.rules
 
 @<platform_dir>/sd_card/system.xml opencpi/
 

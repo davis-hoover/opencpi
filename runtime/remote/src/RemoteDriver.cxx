@@ -567,10 +567,10 @@ probeServer(const char *a_server, bool verbose, const char **exclude, char *cont
       taken = true;
     }
     if (verbose || discovery)
-      printf("%-35s  platform %s, model %s, os %s, version %s, arch %s, build %s\n",
+      printf("  %-35s  platform %s, model %s, os %s, version %s, arch %s, build %s\n",
 	     cname.c_str(), args[5], args[1], args[2], args[3], args[4], args[6]);
     if (verbose)
-      printf("  Transports: %s\n", cp);
+      printf("    Transports: %s\n", cp);
     ocpiDebug("Creating remote container: \"%s\", model %s, os %s, version %s, arch %s, "
 	      "platform %s build %s",
 	      cname.c_str(), args[1], args[2], args[3], args[4], args[5], args[6]);

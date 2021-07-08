@@ -18,7 +18,7 @@
 
 ##########################################################################################
 # Get the project registry directory. This is OCPI_PROJECT_REGISTRY_DIR,
-# or OCPI_CDK_DIR/../project-registry, or /opt/opencpi/cdk.
+# or OCPI_ROOT_DIR/project-registry, or /opt/opencpi/cdk.
 # If in a development environment, use the fully functional python function
 # for determining the registry location.
 #   The python function is used because if currently in a project, it uses
@@ -34,7 +34,7 @@ import ocpiassets; print(ocpiassets.Registry.get_registry_dir());"
     echo $OCPI_PROJECT_REGISTRY_DIR
   elif [ -n "$OCPI_CDK_DIR" ]; then
     # Return default registry relative to CDK
-    echo $OCPI_CDK_DIR/../project-registry
+    echo $OCPI_ROOT_DIR/project-registry
   else
     # Return default global registry installation location
     echo /opt/opencpi/project-registry
@@ -201,12 +201,9 @@ function ocpiReadLinkE {
 }
 
 function ocpiDirType {
-  [ -d $1 -a -f $1/Makefile ] && {
-      local type=`sed -n 's=^[ 	]*include[ 	]*.*OCPI_CDK_DIR.*/include/\(.*\)\.mk.*=\1=p' $1/Makefile | tail -1 2>/dev/null`
-      local rc=$?
-      # echo ocpiDirType of $1: rc: $rc type: $type > /dev/tty
-      [ $rc = 0 ] && echo $type
-  }
+  local type=$(python3 -c "import _opencpi.util as ou; print(ou.get_dirtype(\"$1\"))")
+  rc=$?
+  [ $rc = 0 ] && echo $type
 }
 
 OcpiEcho=/bin/echo

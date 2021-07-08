@@ -23,7 +23,7 @@ set -e
 
 # Arg 1 is the directory under tests/ to go
 function framework_test {
-  local dir=$OCPI_CDK_DIR/../tests/$1
+  local dir=$OCPI_ROOT_DIR/tests/$1
   [ -d $dir ] || {
     dir=tests/$1
     [ -d tests/$1 ] || {
@@ -42,7 +42,7 @@ function framework_test {
 # 3. Tests using the built-in projects
 minimal_tests="driver os datatype load-drivers container"
 network_tests="assets"
-dev_tests="swig python av ocpidev core inactive"
+dev_tests="swig python project ocpidev core inactive"
 alltests="$minimal_tests $network_tests $dev_tests"
 tests="$minimal_tests"
 # runtime/standalone tests we can run
@@ -74,12 +74,12 @@ done
 [ -z "$OCPI_CDK_DIR" ] && echo No OpenCPI CDK available && exit 1
 
 runtime=1
-command -v make > /dev/null && [ -d $OCPI_CDK_DIR/../project-registry ] && runtime=
+command -v make > /dev/null && [ -d $OCPI_ROOT_DIR/project-registry ] && runtime=
 
 if [ -n "$the_tests" ]; then
   tests="$the_tests"
 else
-  if [ -d $OCPI_CDK_DIR/../project-registry/ocpi.assets/exports ]; then
+  if [ -d $OCPI_ROOT_DIR/project-registry/ocpi.assets/exports ]; then
     echo ========= Running project-based tests since the ocpi.assets project is available
     tests="$tests $network_tests"
   fi
@@ -141,38 +141,38 @@ for t in $tests; do
       OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/$OCPI_TARGET_DIR/artifacts \
 		       python3 <<-EOF
 	import opencpi.aci as OA
-	app=OA.Application(b"$OCPI_CDK_DIR/../projects/assets/applications/bias.xml")
+	app=OA.Application("$OCPI_ROOT_DIR/projects/assets/applications/bias.xml")
 	EOF
       [ -f $OCPI_CDK_DIR/$OCPI_TARGET_DIR/lib/opencpi2/_aci.so ] &&
       command -v python2-config > /dev/null && [[ $(python2 -c "import sys;print(sys.version)") == 2* ]] &&
 	  OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/$OCPI_TARGET_DIR/artifacts \
 		       python2 <<-EOF
 	import opencpi2.aci as OA
-	app=OA.Application(b"$OCPI_CDK_DIR/../projects/assets/applications/bias.xml")
+	app=OA.Application(b"$OCPI_ROOT_DIR/projects/assets/applications/bias.xml")
 	EOF
       set +vx
       ;;
     core)
       echo ======================= Running unit tests in project/core
-      make -C $OCPI_CDK_DIR/../project-registry/ocpi.core runtest;;
+      ocpidev run -d $OCPI_ROOT_DIR/project-registry/ocpi.core;;
     ##########################################################################################
     # After this we are depending on the other projects being built for the targeted platform
     assets)
       echo ======================= Running Application tests in project/assets
       if [ -z "$runtime" ] ; then
-        make -C $OCPI_CDK_DIR/../project-registry/ocpi.assets/applications run
+        make -C $OCPI_ROOT_DIR/project-registry/ocpi.assets/applications run
       else
-        (cd $OCPI_CDK_DIR/../projects/assets/applications; ./run.sh)
+        (cd $OCPI_ROOT_DIR/projects/assets/applications; ./run.sh)
       fi;;
     inactive)
       echo ======================= Running Application tests in project/inactive
-      make -C $OCPI_CDK_DIR/../projects/inactive/applications run;;
+      make -C $OCPI_ROOT_DIR/projects/inactive/applications run;;
     python)
       echo ======================= Running Python utility tests in tests/pytests
       (framework_test pytests && ./run_pytests.sh);;
-    av)
-      echo ======================= Running av_tests
-      (framework_test av-test && ./run_avtests.sh);;
+    av|project)
+      echo ======================= Running project tests '(in projects/test)'
+      (cd projects/test && ./run_tests.sh);;
     ocpidev)
       # These tests might do HDL building
       hplats=($HdlPlatform $HdlPlatforms)

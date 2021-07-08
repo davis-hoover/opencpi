@@ -24,6 +24,8 @@ import sys
 import json
 from glob import glob
 import logging
+import shutil
+from pathlib import Path
 import _opencpi.util as ocpiutil
 from .abstract import ShowableAsset
 from .factory import AssetFactory
@@ -38,17 +40,21 @@ class Registry(ShowableAsset):
     """
 
     def __init__(self, directory, name=None, **kwargs):
+        if not name:
+            name = str(Path(directory).name)
         super().__init__(directory, name, **kwargs)
-
+        
         # Each registry instance has a list of projects registered within it.
         # Initialize this list by probing the file-system for links that exist
         # in the registry directory.
         # __projects maps package-ID --> project instance
         self.__projects = {}
-        for proj in glob(self.directory + '/*'):
-            pid = os.path.basename(proj)
-            if os.path.exists(proj):
-                self.__projects[pid] = AssetFactory.factory("project", proj, **kwargs)
+        for path in Path(directory).glob('*'):
+            if not path.exists():
+                continue
+            pid = path.name
+            project_dir = str(path.resolve())
+            self.__projects[pid] = AssetFactory.factory("project", project_dir, **kwargs)
 
     def contains(self, package_id=None, directory=None):
         """
@@ -92,7 +98,6 @@ class Registry(ShowableAsset):
             raise ocpiutil.OCPIException("Failure to register project.  Project \"" + directory +
                                          "\" in location: " + os.getcwd() + " is not in a " +
                                          "project or does not exist.")
-
         project = AssetFactory.factory("project", directory)
         pid = project.package_id
 
@@ -254,7 +259,7 @@ class Registry(ShowableAsset):
     def get_default_registry_dir():
         """
         Get the default registry from the environment setup. Check in the following order:
-        OCPI_PROJECT_REGISTRY_DIR, OCPI_CDK_DIR/../project-registry or /opt/opencpi/project-registry
+        OCPI_PROJECT_REGISTRY_DIR, OCPI_ROOT_DIR/project-registry or /opt/opencpi/project-registry
         """
         project_registry_dir = os.environ.get('OCPI_PROJECT_REGISTRY_DIR')
         if project_registry_dir is None:
@@ -271,7 +276,7 @@ class Registry(ShowableAsset):
         """
         Determine the project registry directory. If in a project, check for the imports link.
         Otherwise, get the default registry from the environment setup:
-            OCPI_PROJECT_REGISTRY_DIR, OCPI_CDK_DIR/../project-registry or
+            OCPI_PROJECT_REGISTRY_DIR, OCPI_ROOT_DIR/project-registry or
             /opt/opencpi/project-registry
 
         Determine whether the resulting path exists.
@@ -468,3 +473,26 @@ class Registry(ShowableAsset):
         elif details == "json":
             json.dump(reg_dict, sys.stdout)
             print()
+
+    def delete(self, force=False):
+        """
+        Deletes the registry. Prompts the user to confirm if args.force
+        is not True. Refuses to delete the default registry or registry
+        set to OCPI_PROJECT_REGISTRY_DIR.
+        """
+        root_dir = os.getenv('OCPI_ROOT_DIR', '')
+        default_registry_dir = str(Path(root_dir, 'project-registry'))
+        err_msg = None
+        registry_dir = str(Path(os.getenv('OCPI_PROJECT_REGISTRY_DIR', '')).resolve())
+        if default_registry_dir == self.directory:
+            err_msg = 'Cannot delete the default project registry'
+        elif registry_dir == self.directory:
+            if force: 
+                os.environ.pop('OCPI_PROJECT_REGISTRY_DIR')
+            else:
+                err_msg = ' '.join([
+                    'Cannot delete registry set in OCPI_PROJECT_REGISTRY_DIR',
+                    'environment variable. Unset variable before attempting to delete'])
+        if err_msg:
+            raise ocpiutil.OCPIException(err_msg)
+        super().delete('project registry', force=force)

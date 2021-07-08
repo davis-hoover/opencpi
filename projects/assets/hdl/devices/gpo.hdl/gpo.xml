@@ -1,4 +1,4 @@
-<HdlDevice Language="vhdl" Spec="gp_out-spec.xml" Version="2">
+<HdlDevice Language="vhdl" Spec="gp_out-spec.xml" Version="2" Libraries='util'>
 
   <Property Name="NUM_OUTPUTS" Type="uChar" Parameter="true" Default="1" Description="Number of GP Outputs. The max number of GP Outputs supported is 16."/>
 

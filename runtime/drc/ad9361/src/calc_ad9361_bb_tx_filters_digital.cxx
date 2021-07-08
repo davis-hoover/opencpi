@@ -59,8 +59,11 @@
 
 #include <cstdint>         // uint8_t type
 #include <sstream>         // std::ostringstream
+#include "OcpiUtilMisc.h"  // esprintf
 #include "ad9361_platform.h" // BITMASK_D... macros
 #include "calc_ad9361_bb_tx_filters_digital.h"
+
+namespace OU = OCPI::Util;
 
 void get_min_AD9361_THB3_interpolation_factor(
     calc_AD9361_THB3_interpolation_factor_t& calc_obj) {
@@ -89,10 +92,8 @@ const char* calc_AD9361_THB3_interpolation_factor(
     case 0x01: calc_obj.THB3_interpolation_factor = 2; break;
     case 0x02: calc_obj.THB3_interpolation_factor = 3; break;
     default:
-      std::ostringstream oss;
-      oss << "could not calculate AD9361 THB3 interpolation factor due to ";
-      oss << "invalid value of " << reg << "for register 0x002";
-      return oss.str().c_str();
+      return OU::esprintf("could not calculate AD9361 THB3 interpolation factor due to invalid "
+			  "value of 0x%x for register 0x002", reg);
   }
   return 0;
 }

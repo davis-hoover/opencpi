@@ -64,7 +64,7 @@
 # 3. adding the binaries directory for the running platform to the PATH environment variable
 # 4. adding the lib directory for the running platform to the PYTHONPATH environment variable
 # 5. setting the OCPI_PREREQUISITES_DIR environment variable
-#    either $OCPI_CDK_DIR/../prerequisites if present or /opt/opencpi/prerequisites
+#    either $OCPI_ROOT_DIR/prerequisites if present or /opt/opencpi/prerequisites
 # 6. enable bash command line completion for OpenCPI commands with completion
 #
 # It internally sets shell variables starting with "ocpi_"
@@ -205,7 +205,7 @@ unset ocpi_bootstrap
   return 0
 }
 
-[ -n "$OCPI_CDK_DIR" ] && {
+[ -n "$OCPI_CDK_DIR" -a -n "$OCPI_ROOT_DIR" ] && {
   [ -n "$ocpi_ensure" ] && {
     # The environment appears already setup so we can leave things as they are, but check for
     # a half-baked setup and complain

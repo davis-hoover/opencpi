@@ -42,16 +42,39 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <errno.h>
+#include <pthread.h>
 #include <iostream>
 #include <cinttypes> // PRI... macros
 #include <limits>    // std::numeric_limits
 extern "C" {
 #include "ad9361.h"
 #include "ad9361_api.h"
-#include "parameters.h"
-#include "ad9361_platform.h"
+#include "ad9361_platform.h" // ours
 }
 #include "OcpiOsDebugApi.h" // OCPI::OS::logPrint(), OCPI_LOG_DEBUG
+
+// get the thread key for different callers to share this library
+// if ad9361_get_opencpi_key() has been called, use that callback
+namespace {
+  static pthread_once_t once = PTHREAD_ONCE_INIT;
+  static pthread_key_t thread_key;
+  void make_key() {
+    pthread_key_create(&thread_key, NULL);
+  }
+}
+namespace OCPI {
+namespace AD9361 {
+// Return the thread key for the callbacks
+pthread_key_t
+get_opencpi_key() {
+  pthread_once(&once, make_key);
+  return thread_key;
+}
+}
+}
+
+#define CALLBACK(...) \
+  thread_key ? static_cast<OCPI::AD9361::CallBack*>(pthread_getspecific(thread_key))->__VA_ARGS__ : ad9361_opencpi.__VA_ARGS__
 
 extern "C" {
 Ad9361Opencpi ad9361_opencpi;
@@ -75,7 +98,7 @@ void do_slave_get_raw_property_byte(uint8_t id_no, uint16_t AD9361_register_addr
 
   uint16_t& a = AD9361_register_addr;
 
-  ad9361_opencpi.get_byte(id_no, a, buf);
+  CALLBACK(get_byte(id_no, a, buf));
   // logging
   const char* pre = "AD9361 SPI read: address=";
   ocpiDebug("%sd%" PRIu16" (0x%.4x), value=d% " PRIu8 " (0x%.2x)", pre, a, a, *buf, *buf);
@@ -85,7 +108,7 @@ void do_slave_set_raw_property_byte(uint8_t id_no, uint16_t AD9361_register_addr
 
   uint16_t& a = AD9361_register_addr;
 
-  ad9361_opencpi.set_byte(id_no, a, buf);
+  CALLBACK(set_byte(id_no, a, buf));
 
   // logging
   const char* pre = "AD9361 SPI write: address=";
@@ -128,14 +151,13 @@ spi_write_then_read(struct spi_device *spi, const unsigned char *txbuf, unsigned
   assert(n_rx == 0 || n_rx == count);
   assert(n_tx == 2 || n_tx-2 == count);
 
-  if(ad9361_opencpi.get_byte)
-  {
+  if (ad9361_opencpi.get_byte || thread_key) {
     for(uint16_t i=0; i<count; i++)
     {
       // we decrement address because it is an implicit assumption (which ADI
       // fails to document!!) of the No-OS library ad9361_spi_writem(),
       // ad9361_spi_readm() function calls
-      uint16_t requested_addr = addr-i;
+      uint16_t requested_addr = (uint16_t)addr-i;
 
       if(address_request_will_underflow(requested_addr, i))
       {
@@ -211,7 +233,7 @@ gpio_is_valid(int number) {
 void
 gpio_set_value(unsigned gpio, int value) {
   if ((gpio & 0xff) == GPIO_RESET_PIN)
-    ad9361_opencpi.set_reset((uint8_t)(gpio >> 8), value ? false : true);
+    CALLBACK(set_reset((uint8_t)(gpio >> 8), value ? false : true));
 }
 
 // From ADI linux platform code
@@ -227,4 +249,3 @@ mdelay(unsigned long msecs) {
 }
 
 }
-

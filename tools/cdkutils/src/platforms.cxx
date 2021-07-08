@@ -172,7 +172,8 @@ addLibs(const char *libs, OrderedStringSet &dirs, OrderedStringSet &nonSlashes) 
   return NULL;
 }
 static const char
-  PROJECT_ROOT[] = "Project.mk",
+  PROJECT_MK[] = "Project.mk",
+  PROJECT_XML[] = "Project.xml",
   PROJECT_REL_DIR_ENV[] = "OCPI_PROJECT_REL_DIR";
 static const char *
 getProjectRelDir(std::string &dir) {
@@ -182,12 +183,13 @@ getProjectRelDir(std::string &dir) {
   else {
     OF::FileId dot, dotdot;
     std::string up;
-    for (up = "./"; !OF::exists(up + PROJECT_ROOT); up += "../")
+    for (up = "./"; !OF::exists(up + PROJECT_MK) && !OF::exists(up + PROJECT_XML); up += "../")
       if (!OF::exists(up + ".", NULL, NULL, NULL, &dot) ||
 	  !OF::exists(up + "..", NULL, NULL, NULL, &dotdot) ||
-	  dot == dotdot)
+	  dot == dotdot) {
 	return OU::esprintf("Could not find containing project directory (i.e. count not find \"%s\""
-			    " in any parent directory", PROJECT_ROOT);
+			    " nor \"%s\" in any parent directory", PROJECT_MK, PROJECT_XML);
+      }
     env = up == "./" ? up.c_str() : up.c_str() + 2;
     ocpiCheck(setenv(PROJECT_REL_DIR_ENV, env, 1) == 0);
     dir = env;
@@ -217,7 +219,7 @@ getComponentLibraries(const char *libs, const char *model, bool topSpecs, Ordere
   }
   StringSet found;
   for (auto pit = projectPath.begin(); pit != projectPath.end(); ++pit) {
-    ocpiInfo("For component library search, considering project dir: %s", pit->c_str());
+    ocpiDebug("For component library search, considering project dir: %s", pit->c_str());
     std::string pDir(*pit);
     if (pit != projectPath.begin() && OF::exists(pDir + "/exports"))
       pDir += "/exports";

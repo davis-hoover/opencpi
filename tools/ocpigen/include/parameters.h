@@ -70,6 +70,7 @@ struct Param {
   void setProperty(const OCPI::Util::Property *prop, const Worker *w);
   const char 
     // only one of w and wkrs should be set
+    *parseValue(const OCPI::Util::Property &prop, const char *value),
     *parse(ezxml_t px, const OCPI::Util::Property *prop, const Worker *w = NULL, bool global = false),
     *excludeValue(std::string &uValue, Attributes *&attrs, const char *platform),
     *addValue(std::string &uValue, Attributes *&attrs, const char *platform),
@@ -120,9 +121,14 @@ struct Build {
   OrderedStringSet    m_componentLibraries;
   // HDL-specific
   OrderedStringSet    m_cores;
+  OrderedStringSet    m_configurations; // for platform configurations
   // RCC-specific
   OrderedStringSet    m_staticPrereqLibs;
   OrderedStringSet    m_dynamicPrereqLibs;
+  OrderedStringSet    m_exactParts;  // list of <family>:<part> pairs
+  OrderedStringSet    m_containers;
+  OrderedStringSet    m_defaultContainers;
+  bool                m_anyDefaultContainers;
   Build(Worker &w);
   const char *parse(ezxml_t x, const char *buildFile = NULL);
   void writeMakeVars(FILE *mkFile);

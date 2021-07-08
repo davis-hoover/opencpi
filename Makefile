@@ -18,7 +18,7 @@
 
 ##########################################################################################
 .NOTPARALLEL:
-ifneq ($(filter-out cleandriver,$(filter exports show help clean% distclean%,$(MAKECMDGOALS))),)
+ifneq ($(filter-out cleandriver,$(filter doc exports show help clean% distclean%,$(MAKECMDGOALS))),)
   $(if $(and $(OCPI_CDK_DIR),$(realpath $(OCPI_CDK_DIR))),,\
     $(if $(OCPI_CDK_DIR),\
       $(foreach p,$(realpath $(CURDIR)),\
@@ -26,9 +26,11 @@ ifneq ($(filter-out cleandriver,$(filter exports show help clean% distclean%,$(M
            $(warning Missing exports link when performing: $(MAKECMDGOALS).)\
 	   $(warning Setting OCPI_CDK_DIR temporarily to $(CURDIR)/bootstrap.))))\
     $(eval export OCPI_CDK_DIR:=$(CURDIR)/bootstrap))
+    $(eval export OCPI_ROOT_DIR:=$(CURDIR))
 else
   ifndef OCPI_CDK_DIR
     export OCPI_CDK_DIR:=$(CURDIR)/cdk
+    export OCPI_ROOT_DIR:=$(CURDIR)
   endif
   # Note that if we are running this makefile, we are in a source tree, thus we force a local
   # prerequisites dir if it is not set.
@@ -45,7 +47,7 @@ include $(OCPI_CDK_DIR)/include/util.mk
 ##########################################################################################
 # Process all platform info specified (and default RccPlatforms if not set at all).
 # FIXME someday: we need to treat models more uniformly so we can more easily add them
-ifeq ($(filter show help clean% distclean%,$(MAKECMDGOALS)),)
+ifeq ($(filter doc show help clean% distclean%,$(MAKECMDGOALS)),)
   $(eval $(OcpiEnsureToolPlatform))
 endif
 override Platforms:=$(call Unique,$(strip $(Platforms) $(Platform)))
@@ -58,9 +60,11 @@ ifdef Platforms
     RccPlatforms:=
   endif
 endif
-ifeq ($(filter-out cleandriver,$(filter show help clean% distclean%,$(MAKECMDGOALS))),)
+ifeq ($(filter-out cleandriver,$(filter doc show help clean% distclean%,$(MAKECMDGOALS))),)
   include $(OCPI_CDK_DIR)/include/rcc/rcc-make.mk
-  include $(OCPI_CDK_DIR)/include/hdl/hdl-targets.mk
+  ifdef MAKECMDGOALS
+    include $(OCPI_CDK_DIR)/include/hdl/hdl-targets.mk
+  endif
 endif
 # Now check all platforms for validity, even the hdl:rcc pairs
 $(foreach p,$(subst :, ,$(Platform)),$(if $(filter $(call RccRealPlatforms,$p),$(RccAllPlatforms) $(HdlAllPlatforms)),,\
@@ -190,7 +194,7 @@ cleaneverything distclean: clean cleandriver cleanpackaging
 # The "pages" target creates the HTML index files for the generated documentation.
 # "make pages" must happen before "make rpm Package=doc" is attempted if you want
 # the optional HTML index pages to be included as part of the doc RPM.
-.PHONY: doc pages
+.PHONY: doc pages man
 .SILENT: doc pages
 doc:
 	$(AT)rm -rf doc/{pdfs,html}
@@ -199,7 +203,11 @@ doc:
 pages:
 	$(AT)doc/build-pages.py HEAD
 
+man:
+	$(AT)make -C doc/man
 
+cleanman:
+	$(AT)make -C doc/man clean
 ##########################################################################################
 # Goals, variables and macros that are about packaging the CDK, whether tarball, rpm, etc.
 ##### Set variables that affect the naming of the release packages
@@ -361,9 +369,13 @@ Projects=core platform assets inactive assets_ts tutorial
 ProjectGoals=cleanhdl cleanrcc cleanocl rcc ocl hdl applications run runtest hdlprimitives \
              hdlportable components cleancomponents test
 # These are not done in parallel since we do not know the dependencies
-DoProjects=set -e; . $(OCPI_CDK_DIR)/opencpi-setup.sh -r -b; $(foreach p,$(Projects),\
+DoProjects=set -e; . $(OCPI_CDK_DIR)/opencpi-setup.sh -r -b; \
+                     $(foreach p,$(Projects),\
+                       if [ ! -f projects/$p/Makefile ]; then \
+                         mf="-f $(OCPI_CDK_DIR)/include/project.mk";\
+                       fi && \
                      echo Performing $1 on project $p && \
-                     $(MAKE) -C projects/$p $(if $(filter build,$1),,$1) &&) :
+                     $(MAKE) $$mf -C projects/$p $(if $(filter build,$1),,$1) &&) :
 .PHONY: $(ProjectGoals) testprojects
 $(ProjectGoals):
 	$(AT)$(call DoProjects,$@)

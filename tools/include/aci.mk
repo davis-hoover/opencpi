@@ -28,9 +28,7 @@
 # -- When a unit test dir needs to build C++ apps for generator/verifier/view scripts
 # !!!!!!!!!!!!!! It is not yet considered "external" to be used in user Makefiles
 
-ifndef OcpiApps
-  $(error The aci.mk file included without OcpiApps being set)
-endif
+ifdef OcpiApps
 OcpiAppsCC:=$(foreach a,$(OcpiApps),\
               $(or $(foreach s,cc cxx cpp,$(wildcard $a.$s)), \
                    $(error No C++ file for application $a)))
@@ -65,9 +63,9 @@ endef
 # This is for dependencies of the executable on libraries
 AciLib=$(foreach l,\
          $(if $(filter 1,$(call OcpiIsDynamic,$2)),$(strip\
-           $(wildcard $1$(SOEXT_$(call RccOs,$2)))),$(strip\
-           $(or $(wildcard $1$(AREXT_$(call RccOs,$2))),$(strip\
-             $(wildcard $1$(SOEXT_$(call RccOs,$2))))))),$(infox ALr:$1:$2:$l)$l)
+           $(wildcard $1$(OcpiDynamicLibrarySuffix_$2))),$(strip\
+           $(or $(wildcard $1$(OcpiStaticLibrarySuffix_$2)),$(strip\
+             $(wildcard $1$(OcpiDynamicLibrarySuffix_$2)))))),$(infox ALr:$1:$2:$l)$l)
 
 AciLibs=$(foreach l,$(RccLibrariesInternal) $(Libraries),\
          $(if $(findstring /,$l),\
@@ -75,8 +73,8 @@ AciLibs=$(foreach l,$(RccLibrariesInternal) $(Libraries),\
              $(or $(call AciLib,$p,$1),\
                $(error No ACI library found for $l, tried $(strip\
                  $(if $(filter 1,$(call OcpiIsDynamic,$1))),\
-                    $p$(SOEXT_$(call RccOs,$1)),\
-                    $p$(AREXT_$(call RccOs,$1)) and $p$(SOEXT_$(call RccOs,$1)))))),\
+                    $p$(OcpiDynamicLibrarySuffix_$1),\
+                    $p$(OcpiStaticLibrarySuffix_$1) and $p$(OcpiDynamicLibrarySuffix_$1))))),\
 	   $(or $(call AciLib,$(OCPI_CDK_DIR)/$1/lib/libocpi_$l,$1))))
 
 # Build the executables
@@ -102,5 +100,9 @@ $(foreach p,$(RccPlatforms),$(foreach a,$(OcpiAppsCC),$(infox App=$a Platform=$p
 endif
 aciapps:
 	$(AT)touch aciapps
+
+# This endif is for OcpiApps
+endif
+
 clean::
 	$(AT)rm -r -f target-* *~ aciapps

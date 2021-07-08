@@ -1,15 +1,32 @@
 # Whitelist of host platforms and platforms to cross-build
 centos7:
-  - xilinx13_3
-  - xilinx13_4
-  - isim
-  - modelsim
-  - xsim
-  - matchstiq_z1
-  - zcu104
-  - zed
-  - zed_ise
-  - plutosdr
-  - e31x
-  - adi_plutosdr0_32
-  - adrv9361
+  # rcc
+  adi_plutosdr0_32:
+  ettus_n310_v4:
+  xilinx13_3:
+  xilinx13_4:
+  xilinx19_2_aarch32:
+  xilinx19_2_aarch64:
+  # sim
+  isim:
+  modelsim:
+  xsim:
+  x4sim:
+  # hdl
+  adrv9361:
+    - xilinx19_2_aarch32
+  e31x:
+    - xilinx13_4
+  matchstiq_z1:
+    - xilinx13_3
+  picoevb:
+    - xilinx19_2_aarch32
+  plutosdr:
+    - adi_plutosdr0_32
+  zcu104:
+    - xilinx19_2_aarch64
+  zcu106:
+    - xilinx19_2_aarch64
+  zed:
+    - xilinx19_2_aarch32
+  zed_ise:

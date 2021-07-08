@@ -49,16 +49,6 @@ namespace OS=OCPI::OS;
 
 class Port;
 
-#if 0 // this is handled differently now in data.cxx
-// We derive a class to implement xi:include parsing, file names, etc.
-class Protocol : public OU::Protocol {
-public:
-  Protocol(Port &port);
-  Port &m_port;
-  const char *parse(const char *file, ezxml_t prot = NULL);
-  const char *parseOperation(ezxml_t op);
-};
-#endif
 class Worker;
 
 class WciPort : public OcpPort {
@@ -193,6 +183,9 @@ class SdpPort : public Port {
   void emitPortSignal(FILE *f, bool any, const char *indent, const std::string &fName,
 		      const std::string &aname, const std::string &index, bool output,
 		      const Port *signalPort, bool external);
+  void emitExtAssignment(FILE *f, bool int2ext, const std::string &extName,
+			 const std::string &intName, const Attachment &extAt,
+			 const Attachment &intAt, size_t count) const;
 };
 class MetaDataPort : public Port {
   MetaDataPort(const MetaDataPort &other, Worker &w , std::string &name, size_t count,
@@ -503,7 +496,7 @@ class Worker : public OU::Worker {
     *emitToolParameters(),
     *emitMakefile(FILE *xmlFile = NULL),
     *emitHDLConstants(size_t config, bool other),
-    *setParamConfig(OU::Assembly::Properties *instancePVs, size_t paramConfig,
+    *setParamConfig(const OU::Assembly::Properties *instancePVs, size_t paramConfig,
 		    const std::string &parent),
     *finalizeProperties(),
     *finalizeHDL(),
@@ -522,6 +515,8 @@ class Worker : public OU::Worker {
     *emitImplOCL(),
     *emitEntryPointOCL(),
     *paramValue(const OU::Member &param, OU::Value &v, std::string &value),
+    *findParamConfig(size_t low, size_t high, const OCPI::Util::Assembly::Properties &ipvs,
+		     ParamConfig *&pc),
     *rccBaseValue(OU::Value &v, std::string &value, const OU::Member *param = NULL),
     *rccValue(OU::Value &v, std::string &value, const OU::Member &param),
     *rccPropValue(OU::Property &p, std::string &value),
@@ -597,15 +592,15 @@ class Worker : public OU::Worker {
 // Attributes common to both OWD and build xml
 #define PLATFORM_ATTRS "onlyPlatforms", "excludePlatforms"
 #define BUILD_ATTRS PLATFORM_ATTRS, "onlytargets", "excludeTargets"
-// Attributes common to all models
-#define IMPL_ATTRS BUILD_ATTRS, \
-  "name", "spec", "paramconfig", "reentrant", "scaling", "scalable", "controlOperations", "xmlincludedirs", \
-    "componentlibraries", "version", "libraries", "includedirs", "sourcefiles"
-
-#define IMPL_ELEMS "componentspec", "properties", "property", "specproperty", "propertysummary", "slave", "xi:include", "controlinterface",  "timeservice", "unoc", "timebase", "sdp"
+// Attributes common to all models, note "raw" may actually apply to all models
 #define GENERIC_IMPL_CONTROL_ATTRS \
   "name", "SizeOfConfigSpace", "ControlOperations", "Sub32BitConfigProperties"
-#define ASSY_ELEMS "instance", "connection", "external"
+#define IMPL_ATTRS PARSED_ATTRS, GENERIC_IMPL_CONTROL_ATTRS, BUILD_ATTRS, \
+    "spec", "paramconfig", "reentrant", "scaling", "scalable", "controlOperations", "xmlincludedirs", \
+    "componentlibraries", "version", "libraries", "includedirs", "sourcefiles", "language",  \
+    "RawProperties", "FirstRawProperty", "language"
+#define IMPL_ELEMS "componentspec", "properties", "property", "specproperty", "propertysummary",\
+    "slave", "xi:include", "controlinterface"
 extern const char
   *checkSuffix(const char *str, const char *suff, const char *last),
   *createTests(const char *file, const char *package, const char *outDir, bool verbose),
@@ -630,7 +625,7 @@ extern const char
 		      ezxml_t *parsed, std::string &childFile, bool optional),
   *emitContainerHDL(Worker*, const char *);
 
-extern bool g_dynamic, g_optimized, g_multipleWorkers;
+extern bool g_dynamic, g_optimized, g_multipleWorkers, g_autoAddParamConfig;
 extern void
   doPrev(FILE *f, std::string &last, std::string &comment, const char *myComment),
   vhdlType(const OU::Property &dt, std::string &typeDecl, std::string &type,

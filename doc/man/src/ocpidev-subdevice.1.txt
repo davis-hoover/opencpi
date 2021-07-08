@@ -63,8 +63,7 @@ XXXXX TBD - UPDATE ALL BELOW FOR HDL SUBDEVICE WORKER - XXXXXX
 *`utilization`*::
     Display information about FPGA resource use by an HDL worker.
 
-Within the worker's directory are the worker's "make" file (named Makefile),
-its OWD (named '<name>'*`.xml`*) and its primary source code file (named
+Within the worker's directory are the OWD (named '<name>'*`.xml`*) and its primary source code file (named
 '<name>'*`.`*'<auth-model-language-suffix>', for example, *`.c`*, *`.cc`*
 or *`vhd`*). The *`ocpidev create`* operation produces initial versions
 of these files that can then be edited as necessary to produce the worker

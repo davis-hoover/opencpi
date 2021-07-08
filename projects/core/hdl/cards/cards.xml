@@ -1,0 +1,2 @@
+<library componentlibraries='devices'
+	 xmlincludedirs='../../components/specs ../devices/lib/hdl ../devices/specs'/>

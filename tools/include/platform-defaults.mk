@@ -83,7 +83,7 @@ OcpiAllPlatformVars:=\
   OcpiDebugOffFlags OcpiDebugOnFlags OcpiDependencyFlags \
   OcpiDynamicCompilerFlags OcpiDynamicLibraryFlags OcpiDynamicLibrarySuffix \
   OcpiDynamicProgramFlags OcpiDynamicSwigFlags \
-  OcpiExtraLibs OcpiGetTimeClockId OcpiKernelDir OcpiLD \
+  OcpiExtraLibs OcpiGetTimeClockId OcpiKernelDir OcpiKernelEnv OcpiKernelCrossCompile OcpiLD \
   OcpiLibraryPathEnv OcpiOclLibs OcpiOptionalCWarnings OcpiOptionalCXXWarnings \
   OcpiPlatform OcpiPlatformArch OcpiPlatformDir OcpiPlatformOs OcpiPlatformOsVersion \
   OcpiPlatformPrerequisites OcpiPluginFlags \
@@ -159,6 +159,10 @@ OcpiSTRIP:=strip
 # When not set, it is found in the default/standard place for a development system
 # Either relative to where the platform is defined in its directory, or absolute
 OcpiKernelDir:=
+# Environment variables that need to be sourced prior to building OpenCPI kernel driver
+OcpiKernelEnv:=
+# Building out-of-tree OpenCPI kernel driver CROSS_COMPILE differs 
+OcpiKernelCrossCompile:=
 # These flags are followed directly by the name of the dependency file, roughly like -o
 # MMD is for user headers, not ones included with <>.
 # MP is to create phone targets for each such file so that it is not an error if it is deleted.

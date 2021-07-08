@@ -1,3 +1,0 @@
-<Application>
-    <Instance component="av.test.test_worker" name="test_worker"></Instance>
-</Application>

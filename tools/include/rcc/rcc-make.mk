@@ -38,7 +38,7 @@ $(eval $(OcpiEnsureToolPlatform))
 ifdef RccHdlPlatform
   override RccHdlPlatforms+= $(RccHdlPlatform)
 endif
-ifdef RccHdlPlatforms
+ifneq ($(and $(RccHdlPlatforms),$(if $(filter clean%,$(MAKECMDGOALS)),,x)),)
   include $(OCPI_CDK_DIR)/include/hdl/hdl-targets.mk
   $(foreach p,$(RccHdlPlatforms),\
      $(if $(filter $p,$(HdlAllPlatforms)),\
@@ -66,7 +66,7 @@ else ifeq ($(origin RccPlatforms),undefined)
   else ifdef OCPI_TOOL_PLATFORM
     # If no target platform was specified, and we are not cleaning, set to the running one
     ifeq ($(filter clean%,$(MAKECMDGOALS)),)
-      RccPlatforms:=$(OCPI_TOOL_PLATFORM)
+      RccPlatforms:=$(OCPI_TOOL_DIR)
     endif
   else
     $(error Unexpected failure to figure out which RCC compiler to use.)

@@ -23,7 +23,7 @@
 include $(OCPI_CDK_DIR)/include/util.mk
 
 ifeq ($(filter speclinks workersfile,$(MAKECMDGOALS)),)
-$(OcpiIncludeProject)
+$(OcpiIncludeAssetAndParent)
 # If library path is unset, provide a default
 ifeq ($(filter clean%,$(MAKECMDGOALS)),)
   $(eval $(OcpiEnsureToolPlatform))
@@ -46,12 +46,14 @@ endif
 # The existence of a C++ app file determines if this is an ACI app
 OcpiAppCC:=$(strip\
   $(foreach s,cc cxx cpp,$(wildcard $(addsuffix .$s,$(call Unique,$(OcpiApp) $(OcpiApps))))))
+OcpiApps:=$(call Unique,$(OcpiApp) $(OcpiApps))
+# We include the aci.mk file even though we might only have XML files because we need its "clean"
+# to be reliably present with partially built trees etc.
+include $(OCPI_CDK_DIR)/include/aci.mk
 ifdef OcpiAppCC
-  OcpiApps:=$(call Unique,$(OcpiApp) $(OcpiApps))
-  include $(OCPI_CDK_DIR)/include/aci.mk
   # If we are running in this Makefile, then we are running the TOOL_PLATFORM
   ifndef OcpiRunCC
-    OcpiRunCC=$(OcpiRunBefore) $(OCPI_VALGRIND) $(call AciExe,$(OCPI_TOOL_PLATFORM),$(OcpiApp)) $(OcpiRunArgs) \
+    OcpiRunCC=$(OcpiRunBefore) $(OCPI_VALGRIND) $(call AciExe,$(OCPI_TOOL_DIR),$(OcpiApp)) $(OcpiRunArgs) \
               $(OcpiRunAfter)
   endif
   all: aciapps
@@ -76,7 +78,27 @@ else
     run:
   endif
 endif
+ifeq ($(filter clean%,$(MAKECMDGOALS)),)
+  ifneq ($(wildcard components),)
+    ifeq ($(call OcpiGetDirType,components),library)
+        export OCPI_PROJECT_DIR
+        export OCPI_PROJECT_REL_DIR
+        export OCPI_PROJECT_PACKAGE
+        export OCPI_PROJECT_DEPENDENCIES
+        export OCPI_PROJECT_COMPONENT_LIBRARIES
+        export OCPI_PROJECT_DIR
+all:
+	$(AT)OCPI_PROJECT_REL_DIR=$(OCPI_PROJECT_REL_DIR)/.. MAKEFLAGS= \
+	     ocpidev -d components build
+clean::
+	$(AT)ocpidev -d components clean
+    endif
+  endif
+endif
 
 clean::
-	$(AT)rm -r -f *~ timeData.raw
+	$(AT)[ ! -d components ] || \
+             $(MAKE) clean -C components \
+               $(if $(wildcard components/Makefile),,-f $(OCPI_CDK_DIR)/include/library.mk)
+	$(AT)rm -r -f *~ timeData.raw simulations lib gen $(CleanFiles)
 endif # avoid speclinks and workersfile

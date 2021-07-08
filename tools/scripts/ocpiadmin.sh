@@ -40,7 +40,7 @@ fi
 # Must be in the OpenCPI base directory, at least until a
 # clean way of dealing with relative paths can be implemented.
 #
-cd $OCPI_CDK_DIR/..
+cd $OCPI_ROOT_DIR
 
 # Provides `setVarsFromMake`
 source $OCPI_CDK_DIR/scripts/util.sh
@@ -178,6 +178,10 @@ while (( "$#" )); do
       ;;
     --dynamic)
       dynamic=1
+      shift
+      ;;
+    --minimal)
+      minimal=1 # use ${minimal:+whatever}
       shift
       ;;
     # Unsupported flags
@@ -364,26 +368,48 @@ if [ "$model" = RCC ]; then
 	[ -n "$dynamic" ] && platform_target_dir+=d
 	[ -n "$optimize" ] && platform_target_dir+=o
     fi
-    ./scripts/install-opencpi.sh $platform_target_dir || exit 1
+    ./scripts/install-opencpi.sh ${minimal:+--minimal} $platform_target_dir || exit 1
 else
-    ocpidev -d projects/core build --hdl --hdl-platform=$platform
-    ocpidev -d projects/platform build --hdl --hdl-platform=$platform --no-assemblies
-    ocpidev -d projects/assets build --hdl --hdl-platform=$platform --no-assemblies
-    ocpidev -d projects/assets_ts build --hdl --hdl-platform=$platform --no-assemblies
-    ocpidev -d projects/tutorial build --hdl --hdl-platform=$platform --no-assemblies
+    # Since the build-opencpi.sh does an "rcc" build per project, and that implicitly
+    # does "declarehdl" on projects, that is sufficient for on-demand hdl worker builds
+    if [ -n "$minimal" ]; then
+      ocpidev -d projects/core build hdl primitives library --hdl-platform=$platform
+      ocpidev -d projects/platform build hdl primitives library --hdl-platform=$platform
+      # REMOVE THIS WHEN THE ASSETS PROJECT IS CLEANED UP
+      # But ultimately we need to get the platform's project's dependencies from the platform's project
+      # and build primitives for all of them
+      ocpidev -d projects/assets build hdl primitives library --hdl-platform=$platform
+      ocpidev -d projects/assets_ts build hdl primitives library --hdl-platform=$platform
+    else
+      ocpidev -d projects/core build --hdl --hdl-platform=$platform
+      ocpidev -d projects/platform build --hdl --hdl-platform=$platform --no-assemblies
+      ocpidev -d projects/assets build --hdl --hdl-platform=$platform --no-assemblies
+      ocpidev -d projects/assets_ts build --hdl --hdl-platform=$platform --no-assemblies
+      ocpidev -d projects/tutorial build --hdl --hdl-platform=$platform --no-assemblies
 
-    # Make sure that tutorials can run after installation, note will do rcc too.
-    [ "$platform" = xsim ] && ocpidev -d projects/tutorial build --hdl-platform=$platform
-
+      # Make sure that tutorials can run after installation, note will do rcc too.
+      [ "$platform" = xsim ] && ocpidev -d projects/tutorial build --hdl-platform=$platform
+    fi
     # If project dir is not one of the core projects, build the platform
     if [[ -n "$platform_dir" && "$platform_dir" != *"/projects/core/"* \
           && "$platform_dir" != *"/projects/platform/"* \
           && "$platform_dir" != *"/projects/assets/"* ]]
     then
-	ocpidev -d $project_dir build --hdl --hdl-platform=$platform --no-assemblies
-	echo "HDL platform \"$platform\" built for OSP in $project_dir, including assemblies."
+        if [ -n "$minimal" ]; then
+          ocpidev -d $project_dir build hdl primitives library --hdl-platform=$platform
+          # the rcc build ensures all workers are visible to build the platform
+          # we don't have a verb to do that.
+          ocpidev -d $project_dir build --rcc
+          ocpidev -d $project_dir build hdl --workers-as-needed platform $platform
+        else
+          ocpidev -d $project_dir build --hdl --hdl-platform=$platform --no-assemblies
+        fi
+        echo "HDL platform \"$platform\" built for OSP in $project_dir."
+    elif [ -n "$minimal" ]; then
+      # Build the platform in its project
+      ocpidev -d $project_dir build hdl --workers-as-needed platform $platform
     fi
-    ocpidev -d projects/assets build --hdl-platform=$platform hdl assembly testbias
+    ocpidev -d projects/assets build --hdl-platform=$platform hdl ${minimal:+--workers-as-needed} assembly testbias
     echo "HDL platform \"$platform\" built, with one HDL assembly (testbias) built for testing."
     echo "Preparing exported files for using this platform."
     #

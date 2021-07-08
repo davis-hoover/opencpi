@@ -19,9 +19,10 @@ generate-children:
   image: centos:7
   before_script:
     - yum install git -y
-    - if [ -z "$CI_UPSTREAM_ID" ]; then export CI_UPSTREAM_REF="develop"; fi
-    - git clone --depth 1 --single-branch --branch "$CI_UPSTREAM_REF" "https://gitlab.com/opencpi/opencpi.git" opencpi
-    - git clone --depth 1 --single-branch --branch "$CI_COMMIT_REF_NAME" "$CI_REPOSITORY_URL" "opencpi/projects/ext/${CI_PROJECT_NAME}"
+    - if [ -z "$CI_UPSTREAM_ID" ]; then export CI_OCPI_REF="develop"; fi
+    - git clone --depth 1 --single-branch --branch "$CI_OCPI_REF" "https://gitlab.com/opencpi/opencpi.git" opencpi
+    - GROUP=$(echo "$CI_PROJECT_NAMESPACE" | grep -Eo '[^\/]*$')
+    - git clone --depth 1 --single-branch --branch "$CI_COMMIT_REF_NAME" "$CI_REPOSITORY_URL" "opencpi/projects/${GROUP}/${CI_PROJECT_NAME}"
     - cd opencpi
   script:
     - yum install epel-release -y
@@ -32,6 +33,9 @@ generate-children:
     - docker
   variables:
     GIT_STRATEGY: none
+
+include: 
+- .gitlab-ci/yaml/verify-pipeline.yml
 
 stages:
 - .pre

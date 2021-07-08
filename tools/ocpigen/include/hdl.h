@@ -68,15 +68,28 @@ static inline const char *hdlComment(Language lang) { return lang == VHDL ? "--"
 extern const char *endians[];
 
 // These are for all implementaitons whether assembly or written
-#define HDL_TOP_ATTRS "Pattern", "PortPattern", "DataWidth", "Language", "library"
-// These are for implementaitons that you write (e.g. not generated assemblies)
-#define HDL_IMPL_ATTRS GENERIC_IMPL_CONTROL_ATTRS, "RawProperties", "FirstRawProperty", "outer",\
-    "endian","emulate"
-#define HDL_IMPL_ELEMS "timeinterface", "memoryinterface", "streaminterface", \
-  "messageinterface", "signal", "cpmaster", "time_service", "control", "metadata", \
-  "devsignal", "rawprop", "supports", "clock", "timebase", "devsignals"
-#define HDL_ASSEMBLY_ATTRS "platform", "config", "configuration"
-#define HDL_ASSEMBLY_ELEMS "connection"
+#define HDL_TOP_ATTRS "Pattern", "PortPattern", "DataWidth", "library", "ExactParts"
+// These are for implementaitons that you write (e.g. not generated assemblies), not devices
+#define HDL_WORKER_ATTRS  IMPL_ATTRS, HDL_TOP_ATTRS, "outer", "endian", "Pattern", "PortPattern", \
+                          "DataWidth", "library"
+#define HDL_WORKER_ELEMS IMPL_ELEMS, "timeinterface", "memoryinterface", "streaminterface", "clock", \
+    "messageinterface"
+
+// All types of assemblies currently do not introduce any special elements
+// so there is no "extra" elements for any of them, only top attrs, and instance attrs
+
+// XML for HDL assemblies, that are not configurations or containers
+#define HDL_ASSEMBLY_EXTRA_TOP_ATTRS HDL_TOP_ATTRS, "language",
+#define HDL_ASSEMBLY_EXTRA_INST_ATTRS "paramconfig",
+
+// XML for HDL platform configuration assemblies (not the config xml files)
+#define HDL_CONFIG_ASSEMBLY_EXTRA_TOP_ATTRS HDL_ASSEMBLY_EXTRA_TOP_ATTRS
+#define HDL_CONFIG_ASSEMBLY_EXTRA_INST_ATTRS HDL_ASSEMBLY_EXTRA_INST_ATTRS "device",
+
+// XML for HDL platform configuration assemblies (not the config xml files)
+#define HDL_CONTAINER_ASSEMBLY_EXTRA_TOP_ATTRS HDL_CONFIG_ASSEMBLY_EXTRA_TOP_ATTRS
+#define HDL_CONTAINER_ASSEMBLY_EXTRA_INST_ATTRS HDL_CONFIG_ASSEMBLY_EXTRA_INST_ATTRS "adapter", "interconnect", "configure",
+
 class HdlAssembly : public Worker {
 public:
   static HdlAssembly *

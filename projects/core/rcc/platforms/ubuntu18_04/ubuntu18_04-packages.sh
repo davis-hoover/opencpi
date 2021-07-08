@@ -94,6 +94,8 @@ PKGS_D+=(libxml2-utils)
 #    Needed for processing Xilinx release tarball(s).  Originally
 #    thought this was a dependency of "lsb" on *ubuntu.
 PKGS_D+=(fakeroot)
+#    for asciidoc3 man page generation (asciidoc3 is a prereq)
+PKGS_D+=(xsltproc docbook-xml docbook-xsl)
 
 ##########################################################################################
 # S. conveniences or required for source environment
@@ -144,6 +146,15 @@ PKGS_E+=(ocl-icd-libopencl1)
 PKGS_E+=(scons)
 #    Needed to build plutosdr osp
 PKGS_E+=(libssl-dev device-tree-compiler)
+#    Needed to build ettus_n310 osp 
+PKGS_E+=(chrpath diffstat texinfo)
+#    For ocpidoc documentation builder
+#
+#    Distro-provided "python3-sphinx", "python3-sphinx-rtd-theme",
+#    and "python3-sphinxcontrib.spelling" packages are too old, so
+#    will handle installation via "pip3" inside a python3 virtual
+#    environment as part of the "ocpidoc" installation.
+PKGS_E+=(python3-venv)
 
 #
 # Comments around/within the next two functions are for my own

@@ -96,7 +96,7 @@ begin
   zynq_ultra_out_data          <= my_sdp_out_data;
   props_out.sdpDropCount <= zynq_ultra_in(0).dropCount;
   -- We use one sdp2axi adapter foreach of the processor's S_AXI_HP channels
-  g : for i in 0 to C_M_AXI_HP_COUNT-1 generate
+  g : for i in 0 to C_S_AXI_HP_COUNT-1 generate
     dp : axi.zynq_ultra_s_hp.sdp2axi_zynq_ultra_s_hp
       generic map(ocpi_debug => true,
                   sdp_width  => to_integer(sdp_width))

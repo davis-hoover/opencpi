@@ -65,8 +65,8 @@
   CMD_OPTION(processors, n, ULong,  0, "Number of RCC containers to create") \
   CMD_OPTION_S(file,     f, String, 0, "<external-name>=<file-name>\n" \
 	                               "connect external port to a specific file") \
-  CMD_OPTION_S(device,   D, String, 0, "<external-name>=[container/][slot/]<device-name>\n" \
-	                               "connect external port to a specific device") \
+  CMD_OPTION_S(device,   D, String, 0, "<instance-name>=<device-name>\n" \
+	                               "assign instance to a specific device") \
   CMD_OPTION_S(url,      u, String, 0, "<external-name>=<URL>\n" \
 	                               "connect external port to a URL")\
   CMD_OPTION(log_level,  l, ULong,  0, "<log-level>\n" \
@@ -100,6 +100,7 @@
   CMD_OPTION(no_execute, ,  Bool,   0, "Suppress execution, just determine deployment") \
   CMD_OPTION(library_path,, String, 0, "Search path for executable artifacts, overriding\n" \
 	                               "the OCPI_LIBRARY_PATH environment variable") \
+  CMD_OPTION(default_package,, String, 0, "The package used for components without package prefixes") \
   CMD_OPTION(sim_dir,    ,  String, "simulations", "Directory in which simulations are run\n")\
   CMD_OPTION(dump_platforms,M,Bool, 0, "dump platform and device worker properties") \
   CMD_OPTION(sim_ticks,  ,  ULong,  0, "simulator clock cycles to allow") \
@@ -289,6 +290,11 @@ static int mymain(const char **ap) {
   if (options.library_path()) {
     std::string env("OCPI_LIBRARY_PATH=");
     env += options.library_path();
+    putenv(strdup(env.c_str()));
+  }
+  if (options.default_package()) {
+    std::string env("OCPI_DEFAULT_PACKAGE=");
+    env += options.default_package();
     putenv(strdup(env.c_str()));
   }
   signal(SIGPIPE, SIG_IGN);

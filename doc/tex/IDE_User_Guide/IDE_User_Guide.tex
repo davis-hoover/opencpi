@@ -885,86 +885,9 @@ If the development machine has access to the internet or a mirrored Eclipse Mark
 \subsection{TM Terminal 4.0}
 Search for Terminal in the Marketplace to see a number of available terminal packages. The TM Terminal 4 has been used successfully by the AV team. Click the install button to install the product. Typically, an agreement must be accepted to continue.\\
 \newpage
-\section{Build The IDE}
+\section{Install The IDE}
 \newcommand{\cmd}[1]{\subitem \textbf{cmd:} \code{#1}}
-\subsection{Introduction}
-The OpenCPI IDE Plugin can be built from source with the following instructions. These commands assume they are performed by the ``root'' user, while normally discouraged, is usually performed within a Docker container running a Fedora OS.
-\subsection{Instructions}
-Follow the steps below, in the directory of your choice ``\path{$DIR}''. %$
-\begin{enumerate}
-\item Install Sapphire Dependency
-\cmd{mkdir \$DIR/temp \&\& cd \$DIR/temp}
-\cmd{wget --output-document=tempo.zip}
-\url{"http://www.eclipse.org/downloads/download.php?file=/sapphire/9.1/sapphire-repository-9.1.zip&r=1"}
-\cmd{unzip -q tempo.zip}
-\cmd{mkdir -p /usr/share/java/sapphire/}
-\cmd{mv plugins/*jar /usr/share/java/sapphire/}
-\cmd{rm -rf *}
-
-\item Install Web Tools Platform (WTP) Dependency
-\cmd{mkdir \$DIR/temp \&\& cd \$DIR/temp}
-\cmd{wget --output-document=tempo.zip}
-\url{"https://www.eclipse.org/downloads/download.php?file=/webtools/downloads/drops/R3.9.5/R-3.9.5-20180409100740/wtp-repo-R-3.9.5-20180409100740.zip&r=1"}
-\cmd{unzip -q tempo.zip}
-\cmd{mkdir -p /usr/share/java/wtp/}
-\cmd{mv plugins/*jar /usr/share/java/wtp/}
-\cmd{rm -rf *}
-
-\item Install Eclipse Dependencies
-\cmd{dnf install eclipse-gef-sdk tycho tycho-extras}
-
-\item Download Eclipse Neon
-\cmd{cd \$DIR}
-\cmd{wget --output-document=eclipse.tar.gz}
-\url{"https://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/neon/3/eclipse-cpp-neon-3-linux-gtk-x86_64.tar.gz&r=1"}
-\cmd{tar xf eclipse-cpp-neon-3-linux-gtk-x86\_64.tar.gz}
-
-\item Use Eclipse Command-Line To Download Prerequisites
-\cmd{cd \$DIR}
-\bgroup\obeylines
-\cmd{./eclipse/eclipse \textbackslash
--clean -purgeHistory -noSplash -destination ./temp \textbackslash
--application org.eclipse.equinox.p2.director \textbackslash
--repository \textbackslash
-"http://download.eclipse.org/tools/gef/updates/legacy/releases/, \textbackslash
-http://download.eclipse.org/releases/neon" \textbackslash
--installIUs "\textbackslash
-org.eclipse.gef.sdk.feature.group, \textbackslash
-org.eclipse.jdt.feature.group, \textbackslash
-org.eclipse.sapphire.feature.group, \textbackslash
-org.eclipse.sapphire.ui.feature.group, \textbackslash
-org.eclipse.sapphire.platform.feature.group, \textbackslash
-org.eclipse.sapphire.java.jdt.feature.group, \textbackslash
-org.eclipse.sapphire.java.feature.group, \textbackslash
-org.eclipse.sapphire.osgi.feature.group, \textbackslash
-org.eclipse.sapphire.sdk.feature.group, \textbackslash
-org.eclipse.sapphire.ui.swt.gef.feature.group, \textbackslash
-org.eclipse.sapphire.ui.swt.xml.editor.feature.group, \textbackslash
-org.eclipse.sapphire.modeling.xml.feature.group"}
-\egroup
-\cmd{mkdir -p \$DIR/eclipse/av\_prereqs/plugins}
-\cmd{cp -r \$DIR/temp/plugins/. \$DIR/eclipse/av\_prereqs/plugins}
-\cmd{cd \$DIR/eclipse/av\_prereqs/plugins }
-\cmd{ls -1 \$DIR/eclipse/plugins/ | xargs -r rm -rf}
-
-\item Clone OpenCPI IDE repository
-\cmd{cd \$DIR}
-\cmd{git clone}
-\url{https://gitlab.com/opencpi/av-gui.git}
-\cmd{} $<$\code{git checkout} appropriate branch$>$
-\item Build OpenCPI Plugin
-\cmd{cd av-gui/av.proj.ide.tycho}
-\cmd{xmvn -o clean verify}
-\item Combine Prerequisites + OpenCPI Plugin + Eclipse
-\cmd{mdkir -p \$DIR/eclipse/dropins/angryviper/plugins}
-\cmd{mv \$DIR/eclipse/av\_prereqs/plugins/* \$DIR/eclipse/dropins/angryviper/plugins/}
-\cmd{rm -rf \$DIR/eclipse/av\_prereqs}
-\cmd{mv \\
-\$DIR/av-gui/av.proj.ide.tycho/releng/av.proj.ide.update/target/repository/plugins/*.jar \\
-\$DIR/eclipse/dropins/angryviper/plugins/}
-\item Start Eclipse With IDE Plugin
-\cmd{\$DIR/eclipse/eclipse \&}
-\end{enumerate}
+The OpenCPI IDE is installed using the instructions in the \href{https://opencpi.gitlab.io/releases/latest/docs/OpenCPI\_Installation\_Guide.pdf}{OpenCPI Installation Guide}, in the section entitled Installing AV, the Optional Eclipse-based GUI.
 
 \end{appendices}
 \end{document}

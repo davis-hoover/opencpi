@@ -17,21 +17,32 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # This file is the make file for a project
+PMF := -f $(lastword $(MAKEFILE_LIST))
 include $(OCPI_CDK_DIR)/include/util.mk
 
 # This is mandatory since it signifies that this directory is a project
-ifeq ($(wildcard Project.mk),)
-  $(error A project directory must contain a "Project.mk" file.)
+ifeq ($(wildcard Project.mk)$(wildcard Project.xml),)
+  $(error This project directory "$(CURDIR)" is corrupted since neither Project.xml(expected) nor Project.mk(backward compatibility) is present.)
 endif
+
+ifneq ($(wildcard Project.xml),)
+  PROJ_FILE=Project.xml
+else
+  PROJ_FILE=Project.mk
+endif
+
+# Do the OcpiIncludeProject unless we are only importing or exporting or cleaning
+ifneq ($(if $(MAKECMDGOALS),$(filter-out imports exports clean%,$(MAKECMDGOALS)),1),)
 $(OcpiIncludeProject)
+endif
 # FIXME: can we test for licensing?
 # FIXME: Error message makes no sense if give hdltargets but not platforms
-doimports=$(shell $(OcpiExportVars) $(MAKE) imports NoExports=1)
+doimports=$(shell $(OcpiExportVars) $(MAKE) $(PMF) imports NoExports=1)
 ifeq ($(HdlPlatform)$(HdlPlatforms),)
   ifeq ($(filter clean%,$(MAKECMDGOALS))$(filter imports projectpackage,$(MAKECMDGOALS)),)
     $(infox $(doimports))
-    include $(OCPI_CDK_DIR)/include/hdl/hdl-targets.mk
     ifeq ($(findstring export,$(MAKECMDGOALS))$(findstring import,$(MAKECMDGOALS)),)
+      include $(OCPI_CDK_DIR)/include/hdl/hdl-targets.mk
       $(info No HDL platforms specified.  No HDL assets will be targeted.)
       $(info Possible HdlPlatforms are: $(sort $(HdlAllPlatforms)).)
     endif
@@ -39,7 +50,7 @@ ifeq ($(HdlPlatform)$(HdlPlatforms),)
 endif
 
 # imports need to be created before exports etc.
-ifeq ($(filter imports projectpackage,$(MAKECMDGOALS)),)
+ifeq ($(filter imports projectpackage clean%,$(MAKECMDGOALS)),)
   ifeq ($(wildcard imports),)
     $(info Setting up imports)
     $(infox $(doimports))
@@ -50,8 +61,8 @@ ifeq ($(filter imports projectpackage,$(MAKECMDGOALS)),)
 endif
 
 ifeq ($(NoExports)$(wildcard exports)$(filter projectpackage,$(MAKECMDGOALS)),)
-  doexports=$(shell $(OcpiExportVars) $(OCPI_CDK_DIR)/scripts/export-project.sh - $(OCPI_PROJECT_PACKAGE) xxx)
-  ifeq ($(filter clean%,$(MAKECMDGOALS)),)
+  doexports=$(shell $(OcpiExportVars) $(OCPI_CDK_DIR)/scripts/export-project.sh -)
+  ifeq ($(filter clean% imports,$(MAKECMDGOALS)),)
     $(info Setting up exports)
     $(infox $(doexports))
   else
@@ -68,8 +79,12 @@ ifeq (@,$(AT))
 endif
 
 OcpiToProject=$(subst $(Space),/,$(patsubst %,..,$(subst /, ,$1)))
-MaybeMake=\
-  if [ -d $1 ] ; then $(MAKE) --no-print-directory -C $1 OCPI_PROJECT_REL_DIR=$(call OcpiToProject,$1) $2; fi
+MaybeMake=$(infox MAYBE:$1:$2)\
+  $(foreach f,$(if $(wildcard $1/Makefile),Makefile,\
+                $(foreach t,$(call OcpiGetDirType,$1),$(infox DT:$1:$t)\
+                  $$OCPI_CDK_DIR/include/$(and $(filter hdl-%,$t),hdl/)$t.mk)),\
+     if [ -d $1 ] ; then \
+       $(MAKE) -f $f --no-print-directory -r -C $1 OCPI_PROJECT_REL_DIR=$(call OcpiToProject,$1) $2; fi)
 
 # Three parameters - $1 is before platform, $2 is after platform, $3 is call to $(MAKE)
 MaybeMakePlatforms=\
@@ -89,11 +104,15 @@ ifneq ($(wildcard specs),)
     # package-id needs to be created early on by any non-clean make command.
     # This can be accomplished by having imports depend on it.
     imports: specs/package-id
-    # If Project.mk changes, recreate specs/package-id file unless the package-id file contents
+    # If Project.<mk|xml> changes, recreate specs/package-id file unless the package-id file contents
     # exactly match OCPI_PROJECT_PACKAGE.
-    specs/package-id: Project.mk
-	$(AT)if [ ! -e specs/package-id ] || [ "$$(cat specs/package-id)" != "$(OCPI_PROJECT_PACKAGE)" ]; then \
-	      echo HIHI; echo "$(OCPI_PROJECT_PACKAGE)" > specs/package-id; \
+    specs/package-id: $(PROJ_FILE)
+	$(AT)if [ -n "$(OCPI_PROJECT_PACKAGE)" ]; then \
+               if [ ! -e specs/package-id ] || \
+                  [ "$$(cat specs/package-id)" != "$(OCPI_PROJECT_PACKAGE)" ]; then \
+	         echo Recording the PackageID for this project as: $(OCPI_PROJECT_PACKAGE) >&2; \
+	         echo "$(OCPI_PROJECT_PACKAGE)" > specs/package-id; \
+	       fi; \
 	     fi
   endif
 endif
@@ -147,70 +166,73 @@ imports:
 	fi
 
 exports:
-	$(OCPI_CDK_DIR)/scripts/export-project.sh "$(OCPI_TARGET_DIR)" $(OCPI_PROJECT_PACKAGE)
+	$(OCPI_CDK_DIR)/scripts/export-project.sh "$(or $(OCPI_TARGET_DIR),-)"
 
 components: hdlprimitives
-	$(MAKE) imports
+	$(MAKE) $(PMF) imports
 	$(call MaybeMake,components,rcc hdl)
-	$(MAKE) exports
+	$(MAKE) $(PMF) exports
 
 hdlprimitives: imports
-	$(MAKE) imports
+	$(MAKE) $(PMF) imports
 	$(call MaybeMake,hdl/primitives)
-	$(MAKE) exports
+	$(MAKE) $(PMF) exports
 
 hdlcomponents: hdlprimitives
-	$(MAKE) imports
+	$(MAKE) $(PMF) imports
 	$(call MaybeMake,components,hdl)
-	$(MAKE) exports
+	$(MAKE) $(PMF) exports
 
 hdldevices: hdlprimitives
-	$(MAKE) imports
+	$(MAKE) $(PMF) imports
 	$(call MaybeMake,hdl/devices)
-	$(MAKE) exports
+	$(MAKE) $(PMF) exports
 
 hdladapters: hdlprimitives
-	$(MAKE) imports
+	$(MAKE) $(PMF) imports
 	$(call MaybeMake,hdl/adapters)
-	$(MAKE) exports
+	$(MAKE) $(PMF) exports
 
 hdlcards: hdlprimitives
-	$(MAKE) imports
+	$(MAKE) $(PMF) imports
 	$(call MaybeMake,hdl/cards)
-	$(MAKE) exports
+	$(MAKE) $(PMF) exports
 
 hdlplatforms: hdldevices hdlcards hdladapters
-	$(MAKE) imports
+	$(MAKE) $(PMF) imports
 	$(call MaybeMake,hdl/platforms)
-	$(MAKE) exports
+	$(MAKE) $(PMF) exports
 
 hdlassemblies: hdlcomponents hdlplatforms hdlcards hdladapters
-	$(MAKE) imports
+	$(MAKE) $(PMF) imports
 	$(call MaybeMake,hdl/assemblies)
-	$(MAKE) exports
+	$(MAKE) $(PMF) exports
 
 # Everything that does not need platforms
 hdlportable: hdlcomponents hdladapters hdldevices hdlcards
 
 hdl: hdlassemblies
 
+# FIXME: cleaning should not depend on imports.  Fix *that* - see below
 cleanhdl cleanrcc cleanocl cleancomponents cleanapplications: imports
 
 cleanhdl:
 	$(call MaybeMake,components,cleanhdl)
-	for d in primitives devices adapters cards platforms assemblies; do \
-	  [ ! -d hdl/$$d ] || $(MAKE) -C hdl/$$d clean; \
-	done
+	$(foreach d,primitives devices adapters cards platforms assemblies,\
+	  $(call MaybeMake,hdl/$d,clean) &&): \
 
 rcc ocl hdl: imports exports
 
 # hdl stuff is because rcc proxies may need to see hdl slaves
 rcc:
-	$(call MaybeMake,components,hdl HdlPlatforms= HdlPlatform=)
-	$(call MaybeMake,hdl/devices,hdl HdlPlatforms= HdlPlatform=)
-	$(call MaybeMake,hdl/cards,hdl HdlPlatforms= HdlPlatform=)
+	$(call MaybeMake,components,declarehdl)
+	$(call MaybeMake,hdl/devices,declarehdl)
+	$(call MaybeMake,hdl/cards,declarehdl)
+	$(call MaybeMake,hdl/adapters,declarehdl)
+	$(call MaybeMake,hdl/platforms,declarehdl)
 	$(call MaybeMake,components,rcc)
 	$(call MaybeMake,hdl/devices,rcc)
+	$(call MaybeMake,hdl/cards,rcc)
 	$(call MaybeMakePlatforms,hdl/platforms,devices,rcc)
 
 cleanrcc:
@@ -247,14 +269,12 @@ cleanapplications:
 
 # Note that imports must be cleaned last because the host rcc platform directory
 # needs to be accessible via imports for projects other than core
-# (e.g. for cleaning rcc)
-clean: cleancomponents cleanapplications cleanrcc cleanhdl cleanexports cleanimports
+# (e.g. for cleaning rcc) FIXME: cleaning should not depend on imports.  Fix *that*
+clean: cleanapplications cleanrcc cleanhdl cleanocl cleanexports cleanimports
+	$(call MaybeMake,components,clean)
 	rm -r -f artifacts project-metadata.xml
 
-# Iterate through symlinks in imports. If the link points to the project registry dir,
-# it is the CDK, or is a broken link, it can be cleaned/removed. If the imports directory
-# is empty after clean, the whole directory can be removed.
-# use $(realpath) rather than $(readlink -e) for portability (vs BSD/Darwin) and speed
+# Remove the imports link only if it is the default or it is broken
 cleanimports:
 	if [ \( -L imports -a "$(realpath imports)" == "$(realpath $(OcpiGlobalDefaultProjectRegistryDir))" \) \
 	     -o \( -L imports -a ! -e imports \) ]; then \

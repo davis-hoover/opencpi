@@ -22,6 +22,10 @@ Definition of Library and Library collection classes
 import os
 import logging
 import _opencpi.util as ocpiutil
+import jinja2
+from pathlib import Path
+import _opencpi.assets.template as ocpitemplate
+import subprocess
 from .abstract import RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAsset, Asset
 from .factory import AssetFactory
 from .worker import Worker, HdlWorker
@@ -42,7 +46,8 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
             init_workers (T/F) - Instructs the method whether to construct all worker objects
                                  contained in the library
         """
-        self.check_dirtype("library", directory)
+        if not name:
+            name = str(Path(directory).name)
         super().__init__(directory, name, **kwargs)
         self.test_list = None
         self.tests_names = None
@@ -86,7 +91,7 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         return the package id of the library.  This information is determined from the make build
         system in order to be accurate.
         """
-        lib_vars = ocpiutil.set_vars_from_make(mk_file=directory + "/Makefile",
+        lib_vars = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(directory, "library"),
                                                mk_arg="ShellLibraryVars=1 showlib",
                                                verbose=True)
         return "".join(lib_vars['Package'])
@@ -95,7 +100,7 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         """
         Return the package id of the Library from the make variable that is returned
         """
-        lib_vars = ocpiutil.set_vars_from_make(mk_file=directory + "/Makefile",
+        lib_vars = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(directory, "library"),
                                                mk_arg="ShellLibraryVars=1 showlib",
                                                verbose=True)
         ret_package = "".join(lib_vars['Package'])
@@ -120,8 +125,9 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
             return (self.tests_names, self.wkr_names)
         ret_tests = []
         ret_wkrs = []
-        ocpiutil.logging.debug("Getting valid tests from: " + self.directory + "/Makefile")
-        make_dict = ocpiutil.set_vars_from_make(mk_file=self.directory + "/Makefile",
+        mkf=ocpiutil.get_makefile(self.directory,"library")
+        ocpiutil.logging.debug("Getting valid tests from: " + mkf)
+        make_dict = ocpiutil.set_vars_from_make(mkf,
                                                 mk_arg="ShellLibraryVars=1 showlib",
                                                 verbose=True)
         make_tests = make_dict["Tests"]
@@ -167,28 +173,95 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         raise NotImplementedError("Library.build() is not implemented")
 
     @staticmethod
-    def get_working_dir(name, library, hdl_library, hdl_platform):
+    def get_working_dir(name, ensure_exists=True, **kwargs):
         """
         return the directory of a Library given the name (name) and
         library specifiers (library, hdl_library, hdl_platform)
         """
         # if more then one of the library location variables are not None it is an error.
         # a length of 0 means that a name is required and a default location of components/
-        if len(list(filter(None, [library, hdl_library, hdl_platform]))) > 1:
+        library = kwargs.get('library', '')
+        hdl_library = kwargs.get('hdl_library', '')
+        platform = kwargs.get('platform', '')
+        if len(list(filter(None, [library, hdl_library, platform]))) > 1:
             ocpiutil.throw_invalid_libs_e()
-        if name: ocpiutil.check_no_libs("library", library, hdl_library, hdl_platform)
-        if library:
-            return "components/" + library
-        elif hdl_library:
-            return "hdl/" + hdl_library
-        elif hdl_platform:
-            return "hdl/platforms/" + hdl_platform + "/devices"
-        elif name:
-            if name != "components" and ocpiutil.get_dirtype() != "libraries":
-                name = "components/" + name
-            return name
+        ocpiutil.check_no_libs('library', library, hdl_library, platform)
+        if not name:
+            ocpiutil.throw_not_blank_e("library", "name", True)
+
+        working_path = Path(ocpiutil.get_path_to_project_top())
+        comp_path = Path(working_path, 'components')
+        if name != 'components':
+            if not comp_path.exists() and not ensure_exists:
+                comp_path.mkdir()
+            working_path = Path(comp_path, name)
         else:
-            ocpiutil.throw_specify_lib_e()
+            working_path = comp_path
+
+        return str(working_path)
+
+    def _get_template_dict(name, directory, **kwargs):
+        """
+        used by the create function/verb to generate the dictionary of viabales to send to the
+        jinja2 template.
+        valid kwargs handled at this level are:
+            package_id     (string)      - Package for a project  (used instead of package_prefix
+                                           and package_name usually)
+            package_prefix (string)      - Package prefix for a project (used instead of package_id
+                                           usually)
+            package_name   (string)      - Package name for a project  (used instead of package_id
+                                           usually)
+            comp_lib       (list of str) - Specify ComponentLibraries in Makefile
+            xml_include    (list of str) - Specify XmlIncludeDirs in Makefile
+            include_dir    (list of str) - Specify IncludeDirs in Makefile
+            prim_lib       (list of str) - Specify Libraries in Makefile
+        """
+        package_id = kwargs.get("package_id", None)
+        package_prefix =kwargs.get("package_prefix", None)
+        package_name =  kwargs.get("package_name", None)
+        comp_lib = kwargs.get("comp_lib", None)
+        if comp_lib:
+            comp_lib = " ".join(comp_lib)
+        xml_include = kwargs.get("xml_include", None)
+        if xml_include:
+            xml_include = " ".join(xml_include)
+        include_dir = kwargs.get("include_dir", None)
+        if include_dir:
+            include_dir = " ".join(include_dir)
+        prim_lib = kwargs.get("prim_lib", None)
+        if prim_lib:
+            prim_lib = " ".join(prim_lib)
+        template_dict = {
+                        "name" : name,
+                        "comp_lib" : comp_lib,
+                        "xml_include" :xml_include,
+                        "include_dir" : include_dir,
+                        "prim_lib" : prim_lib,
+                        "package_id" : package_id,
+                        "package_name" : package_name,
+                        "package_prefix" : package_prefix,
+                        "determined_package_id" : ocpiutil.get_package_id_from_vars(package_id,
+                                                                                    package_prefix,
+                                                                                    package_name, directory)
+                        }
+        return template_dict
+
+    @staticmethod
+    def create(name, directory, **kwargs):
+        """
+        Create library asset
+        """
+        lib_path = Path(directory, name)
+        if lib_path.exists():
+            err_msg = 'library "{}" already exists at "{}"'.format(name, str(lib_path))
+            raise ocpiutil.OCPIException(err_msg)
+
+        lib_path.mkdir()
+        os.chdir(str(lib_path))
+        template_dict = Library._get_template_dict(name, directory, **kwargs)
+        template = jinja2.Template(ocpitemplate.LIB_DIR_XML, trim_blocks=True)
+        ocpiutil.write_file_from_string(name + ".xml", template.render(**template_dict))
+
 
 class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAsset):
     """

@@ -84,7 +84,8 @@ ifneq ($(MAKECMDGOALS),clean)
          ComponentLibrariesInternal="$(call OcpiAdjustLibraries,$(ComponentLibraries))" \
          XmlIncludeDirsInternal="$(call AdjustRelative,$(XmlIncludeDirsInternal))" \
          HdlPlatforms="$(HdlPlatforms)" HdlPlatform="$(HdlPlatform)" \
-         HdlTargets="$(HdlTargets)" HdlTarget="$(HdlTarget)" $(MAKECMDGOALS) 1>&2 && \
+         HdlTargets="$(HdlTargets)" HdlTarget="$(HdlTarget)" \
+           $(if $(filter declare,$(MAKECMDGOALS)),declarehdl,$(MAKECMDGOALS)) 1>&2 && \
          mkdir -p lib 1>&2 && rm -f lib/devices && ln -s ../devices/lib lib/devices 1>&2 || \
 	 RET=1; \
        echo ======= Exiting the \"devices\" library for the \"$(Worker)\" platform. 1>&2; \
@@ -96,9 +97,18 @@ endif
 # But from here, if we are building this platform, we must force it
 # When the mode is platform and config, the underlying scripts depend
 # on HdlPlatform being the currrent platform.
-ifeq ($(filter $(Worker),$(HdlPlatforms))$(filter clean,$(MAKECMDGOALS)),)
-  HdlSkip := 1
-  $(info Skipping this platform ($(Worker)).  It is not in HdlPlatforms ($(HdlPlatforms)))
+
+# if no platforms are specified EXPLICITLY or our platform is not in the list...
+ifeq ($(if $(HdlPlatforms),,$(filter undefined,$(origin HdlPlatforms)))$(filter $(Worker),$(HdlPlatforms))$(filter clean,$(MAKECMDGOALS)),)
+  HdlSkip:=1
+  ifdef HdlPlatforms
+    $(info Skipping this HDL platform ($(Worker)).  It is not in HdlPlatforms ($(HdlPlatforms)))
+  else ifneq ($(filter declare,$(MAKECMDGOALS)),)
+    $(info Declaring this HDL platform ($(Worker)) in case it is needed by a proxy)
+    HdlSkip:=2
+  else
+    $(info Skipping this HDL platform ($(Worker)) since no HDL platforms were specified.)
+  endif
 else ifneq ($(filter clean%,$(MAKECMDGOALS)),)
   HdlSkip:=1
 else
@@ -119,7 +129,7 @@ else
 endif
 # the target preprocessing may tell us there is nothing to do
 # some platforms may have been used for the devices subdir (tests, sims, .etc.)
-ifndef HdlSkip
+ifneq ($(HdlSkip),1)
   $(call OcpiDbgVar,HdlPlatforms)
   ################################################################################
   # We are like a worker (and thus a core)
@@ -129,9 +139,13 @@ ifndef HdlSkip
   #Tops:=$(Worker)_rv
   ifndef ShellHdlPlatformVars
     $(eval $(OcpiProcessBuildFiles))
+    # This is redundant with what is in worker.mk, when that file is included, but sometimes it isn't
+    override HdlExplicitLibraries:=$(call Unique,$(HdlLibraries) $(Libraries) $(HdlExplicitLibraries))
     $(eval $(HdlSearchComponentLibraries))
     include $(OCPI_CDK_DIR)/include/hdl/hdl-worker.mk
   endif
+endif
+ifndef HdlSkip
   ifdef HdlSkip
     $(error unexpected target/platform skip)
   endif

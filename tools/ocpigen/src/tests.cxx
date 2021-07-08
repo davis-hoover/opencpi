@@ -658,12 +658,14 @@ namespace {
       else
         OU::format(m_name, "case%02zu", ordinal);
       if ((err = OE::checkAttrs(x, "duration", "timeout", "onlyplatforms", "excludeplatforms",
-                                "onlyworkers", "excludeworkers", "doneWorkerIsUUT", NULL)) ||
+                                "onlyworkers", "excludeworkers", "doneWorkerIsUUT",
+                                "finishedWorkerIsUUT")) ||
           (err = OE::checkElements(x, "property", "input", "output", NULL)) ||
           (err = OE::getNumber(x, "duration", &m_duration, NULL, duration)) ||
           // (err = OE::getNumber(x, "timeout", &m_timeout, NULL, timeout)) ||
           (err = OE::getNumber(x, "timeout", &m_timeout)) ||
-          (err = OE::getBoolean(x, "doneWorkerIsUUT", &m_doneWorkerIsUUT, false, false)))
+          (err = OE::getBoolean(x, "doneWorkerIsUUT", &m_doneWorkerIsUUT, false, false)) ||
+          (err = OE::getBoolean(x, "finishedWorkerIsUUT", &m_doneWorkerIsUUT, false, false)))
         return err;
       if (!m_duration) {
         if (!m_timeout)

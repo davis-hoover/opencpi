@@ -69,7 +69,7 @@ if [ "$hdl_rcc_platform" != "no_sw" ]; then
     fi
   done
 fi
-file_list=($($OCPI_CDK_DIR/../packaging/prepare-package-list.sh deploy $hdl_platform))
+file_list=($($OCPI_ROOT_DIR/packaging/prepare-package-list.sh deploy $hdl_platform))
 for file in ${file_list[@]}; do
   edited_file=${file#"cdk/"}
   edited_file=${edited_file#"runtime/"}
@@ -100,7 +100,7 @@ mkdir -p $output_path/$hdl_platform/host-udev-rules
 exit 0
 # TODO Build pdfs for current platform AV-4538 AV-4817
 #[ -e $output_path/$hdl_platform/pdfs ] && rm -rf $output_path/$hdl_platform/pdfs
-#$OCPI_CDK_DIR/../doc/generator/genDocumentation.sh --repopath $OCPI_CDK_DIR/../ --outputpath $output_path/$hdl_platform/pdfs --dirsearch "$hdl_platform_dir"
+#$OCPI_ROOT_DIR/doc/generator/genDocumentation.sh --repopath $OCPI_ROOT_DIR/ --outputpath $output_path/$hdl_platform/pdfs --dirsearch "$hdl_platform_dir"
 ## Removing unnecessary files
 #find $output_path/$hdl_platform/pdfs/ ! -name "*.pdf" -type f -delete
 ## Removing empty directories caused by above

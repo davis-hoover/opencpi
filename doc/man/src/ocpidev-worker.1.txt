@@ -92,8 +92,7 @@ Verbs that can operate on a worker are:
 *`utilization`*::
     Display information about FPGA resource use by an HDL worker.
 
-Within the worker's directory are the worker's "make" file (named Makefile),
-its OWD (named '<name>'*`.xml`*) and its primary source code file (named
+Within the worker's directory are its OWD (named '<name>'*`.xml`*) and its primary source code file (named
 '<name>'*`.`*'<auth-model-language-suffix>', for example, *`.c`*, *`.cc`*
 or *`vhd`*). The *`ocpidev create`* operation produces initial versions
 of these files that can then be edited as necessary to produce the worker
@@ -288,6 +287,12 @@ Options When Building RCC Workers
     option is not used (and *`--hdl-rcc-platform`* '<platform>'
     is also not used), the current development software platform
     is used as the single RCC platform used for building.
+
+*`--optimimize`*::
+    Build RCC/ACI assets with compiler optimization enabled.  This
+    results in a separate set of build outputs that do not conflict
+    with non-optimized (debug) build outputs, since they are placed
+    in a target directory whose name has a "-o" suffix.
 
 Options When Building HDL Workers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

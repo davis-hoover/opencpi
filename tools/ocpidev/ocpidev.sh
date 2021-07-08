@@ -90,31 +90,47 @@ function needname {
   [ "$1" == '*' ] && bad you can not use \* as a name
   return 0
 }
-# Look in a directory and determine the type of the Makefile, set dirtype
-# If there is no Makefile or no appropriate line in the Makefile, dirtype is ""
+# Look in a directory and determine the type of asset, with caching
 function get_dirtype {
-  [ ! -e "$1" ] && bad $1 should exist and does not
-  [ ! -d "$1" ] && bad $1 should be a directory and is not
-  if [ -f "$1"/Makefile ]; then
-    dirtype=$(sed -n 's=^[ 	]*include[ 	]*.*OCPI_CDK_DIR.*/include/\(.*\)\.mk.*=\1=p' $1/Makefile | tail -1)
-    dirtype=${dirtype##hdl\/}
-    dirtype=${dirtype##rcc\/}
+  if [ "$1" == "$last_dirtype_request" ]; then
+    dirtype=$last_dirtype
   else
-    dirtype=
-  fi
-  if [ -z "$dirtype" ]; then
-    if [ -e "$1/project-package-id" ]; then
-      dirtype=project
-    fi
+    dirtype=$(ocpiDirType $1)
+    last_dirtype=$dirtype
+    last_dirtype_request=$1
   fi
 }
 
-# Look in a directory and determine the type of the Makefile, set dirtype
-function check_dirtype {
-  get_dirtype $1
-  [ -z "$dirtype" ] && bad $1/Makefile is not correctly formatted.  No \"include *.mk\" lines.
-  [ "$dirtype" != "$2" ] && bad $1/Makefile has unexpected type \"$dirtype\", expected \"$2\".
+# Figure out the makefile to use, and use nothing if there is $1/Makefile
+# Deal with verbosity too
+# Argument 1 is directory
+# Argument 2 is type if known, like "project", or "hdl-library"
+function domake {
+  local A=("$@")
+  local cmd="make -r -C $1 --no-print-directory"
+  [ -f $1/Makefile ] || {
+    local type=$2
+    if [ -z "$type" ]; then
+      local dt=$dirtype
+      type=$(get_dirtype $1)
+      dirtype=$dt
+    fi
+    [[ $type == hdl* ]] && type=hdl/$type
+    cmd+=" -f $OCPI_CDK_DIR/include/$type.mk"
+  }
+  cmd+=" ${verbose:+AT=}"
+  shift
+  shift
+  [ -n "$verbose" ] && echo Executing command:  $cmd "$@"
+  $cmd "$@"
 }
+
+# Look in a directory and determine the type of the Makefile, set dirtype
+# function check_dirtype {
+#   get_dirtype $1
+#   [ -z "$dirtype" ] && bad $1/Makefile is not correctly formatted.  No \"include *.mk\" lines.
+#   [ "$dirtype" != "$2" ] && bad $1/Makefile has unexpected type \"$dirtype\", expected \"$2\".
+# }
 # Determine the path to the current project's top level
 function get_project_top {
   # TODO get project, project.dir
@@ -123,15 +139,6 @@ import sys; sys.path.append(\"$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/lib/\");
 import _opencpi.util as ocpiutil; print(ocpiutil.get_path_to_project_top());"`
   [ "$project_top" != None ] || bad failure to find project containing path \"`pwd`\"
   echo $project_top
-}
-# Determine the package-id of the current project
-function get_project_package {
-  # TODO get project, project.package_id
-  project_pkg=`python3 -c "\
-import sys; sys.path.append(\"$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/lib/\");
-import Asset; print(Asset.Project(directory=\".\").package);"`
-  [ "$project_pkg" != None ] || bad failure to find project package for path \"`pwd`\"
-  echo $project_pkg
 }
 # Create the link to a project in the installation registry (OCPI_PROJECT_REGISTRY_DIR)
 # based on the project's package name
@@ -171,7 +178,8 @@ function register_project {
 import sys; sys.path.append(\"$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/lib/\");
 import _opencpi.util as ocpiutil; print(ocpiutil.is_path_in_exported_project(\"$project\"));"`
   if [ "$is_exported" == "False" ]; then
-    make -C $project ${verbose:+AT=} exports 1>&2 || echo Could not export project \"$project\". You may not have write permissions on this project. Proceeding...
+      domake $project project exports 1>&2 || \
+	  echo Could not export project \"$project\". You may not have write permissions on this project. Proceeding...
   else
      [ -z "$verbose" ] || echo Skipped making exports because this is an exported standalone project. 1>&2
   fi
@@ -393,7 +401,7 @@ function do_registry {
       registry_to_delete=$1
     fi
     if [ -e "$registry_to_delete" ]; then
-      if [ "$(ocpiReadLinkE $registry_to_delete)" == "$(ocpiReadLinkE $OCPI_CDK_DIR/../project-registry)" \
+      if [ "$(ocpiReadLinkE $registry_to_delete)" == "$(ocpiReadLinkE $OCPI_ROOT_DIR/project-registry)" \
            -o "$(ocpiReadLinkE $registry_to_delete)" == "/opt/opencpi/project-registry" ] ; then
         bad cannot delete the default project registry \"$registry_to_delete\"
       fi
@@ -462,148 +470,18 @@ function do_project {
     # Normally we build imports outside of any do_* function because
     # we always want to build imports when building. For project, we
     # do this here because
-    make -C $subdir/$1 ${verbose:+AT=} imports
-    make -C $subdir/$1 ${verbose:+AT=} ${cleanTarget:+$cleanTarget} ${buildRcc:+rcc} ${buildHdl:+hdl} \
+    [ -n "$buildClean" ] || domake $subdir/$1 project imports
+    eval domake $subdir/$1 project ${cleanTarget:+$cleanTarget} ${buildRcc:+rcc} ${buildHdl:+hdl} \
             ${buildNoAssemblies:+Assemblies=} \
-            ${assys:+Assemblies=" ${assys[@]}"} \
-            ${hdlplats:+HdlPlatforms=" ${hdlplats[@]}"} \
-            ${hdltargets:+HdlTargets=" ${hdltargets[@]}"} \
-            ${swplats:+RccPlatforms=" ${swplats[@]}"} \
-            ${hwswplats:+RccHdlPlatforms="${hwswplats[@]}"} \
+            "$(dovars Assemblies HdlPlatforms HdlTargets RccPlatforms RccHdlPlatforms)" \
             $OCPI_MAKE_OPTS
-    if [ -n buildClean -a -z "$hardClean" ] ; then
-      make -C $subdir/$1 ${verbose:+AT=} imports
-      make -C $subdir/$1 ${verbose:+AT=} exports
+    if [ -n "$buildClean" -a -z "$hardClean" ] ; then
+      domake $subdir/$1 project imports
+      domake $subdir/$1 project exports
     fi
     return 0
   fi
-  [ -n "$dirtype" ] &&
-     bad the directory \"$directory\" where the project directory would be created is inside an OpenCPI project
-  [ -n "$top" -o -n "$platform" -o -n "$prebuilt" -o -n "$library" ] &&
-    bad illegal options present for creating project
-  noslash $1
-  noexist $1
-  mkdir $1
-  cd $1
-  if [ -z "$packagename" ]; then
-    packagename=$1
-  fi
-  cat <<EOF > Project.exports
-# This file specifies aspects of this project that are made available to users,
-# by adding or subtracting from what is automatically exported based on the
-# documented rules.
-# Lines starting with + add to the exports
-# Lines starting with - subtract from the exports
-all
-EOF
-  cat <<EOF > Project.mk
-# This Makefile fragment is for the "$1" project
-
-# Package identifier is used in a hierarchical fashion from Project to Libraries....
-# The PackageName, PackagePrefix and Package variables can optionally be set here:
-# PackageName defaults to the name of the directory
-# PackagePrefix defaults to local
-# Package defaults to PackagePrefix.PackageName
-#
-# ***************** WARNING ********************
-# When changing the PackageName or PackagePrefix of an existing project the
-# project needs to be both unregistered and re-registered then cleaned and
-# rebuilt. This also includes cleaning and rebuilding any projects that
-# depend on this project.
-# ***************** WARNING ********************
-#
-${packagename:+PackageName=$packagename}
-${packageprefix:+PackagePrefix=$packageprefix}
-${package:+Package=$package}
-ProjectDependencies=${dependencies[@]}
-${liblibs:+Libraries=${liblibs[@]}}
-${includes:+IncludeDirs=${includes[@]}}
-${xmlincludes:+XmlIncludeDirs=${xmlincludes[@]}}
-${complibs:+ComponentLibraries=${complibs[@]}}
-EOF
-  cat <<EOF > Makefile
-$CheckCDK
-# This is the Makefile for the "$1" project.
-include \$(OCPI_CDK_DIR)/include/project.mk
-EOF
-
-package_id=`python3 -c "\
-import sys; sys.path.append(\"$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/lib/\");
-import _opencpi.util as ocpiutil; print(ocpiutil.get_project_package());"`
-
-# Create IDE .project file (AV-1247)
-  cat << EOF > .project
-<?xml version="1.0" encoding="UTF-8"?>
-<projectDescription>
-  <name>$package_id</name>
-  <comment></comment>
-  <projects></projects>
-  <buildSpec></buildSpec>
-  <natures></natures>
-</projectDescription>
-EOF
-
-cat <<EOF > .gitignore
-# Lines starting with '#' are considered comments.
-# Ignore (generated) html files,
-#*.html
-# except foo.html which is maintained by hand.
-#!foo.html
-# Ignore objects and archives.
-*.rpm
-*.obj
-*.so
-*~
-*.o
-target-*/
-*.deps
-gen/
-*.old
-*.hold
-*.orig
-*.log
-lib/
-#Texmaker artifacts
-*.aux
-*.synctex.gz
-*.out
-**/doc*/*.pdf
-**/doc*/*.toc
-**/doc*/*.lof
-**/doc*/*.lot
-run/
-exports/
-imports
-*.pyc
-EOF
-
-cat <<EOF > .gitattributes
-*.ngc -diff
-*.edf -diff
-*.bit -diff
-EOF
-
-  if [ -n "$register_enable" ]; then
-    # Register a link to the project in the project registry
-    if [ $(register_project 1> /dev/null; echo $?) -eq 1 ]; then
-      if [ -n "$keep" ]; then
-        echo The project directory has been created, but not registered \(which may be fine\).
-        echo If the project must be registered, resolve the conflict and run:
-        echo ocpidev register project $1
-      else
-        echo Removing the project directory \"$1\" due to errors.
-        cd ..
-        rm -r -f $1
-      fi
-      # Error message printed from python
-      exit 1
-    fi
-  fi
-  # Generate exports and imports
-  make exports
-  make imports
-
-  [ -z "$verbose" ] || echo A new project named \"$1\" has been created in `pwd`.
+  bad Unexpected project verb: $verb
 }
 
 function do_applications {
@@ -613,9 +491,8 @@ function do_applications {
     (*) bad this command can only be issued in a project directory or an applications directory;;
   esac
   if [ "$verb" == build ]; then
-    make -C $subdir ${verbose:+AT=} ${buildClean:+clean} ${swplats:+RccPlatforms=" ${swplats[@]}"} \
-      ${hwswplats:+RccHdlPlatforms=" ${hwswplats[@]}"} \
-      $OCPI_MAKE_OPTS
+      eval domake $subdir applications ${buildClean:+clean} "$(dovars RccPlatforms RccHdlPlatforms)" \
+             $OCPI_MAKE_OPTS
     return 0
   fi
 }
@@ -637,9 +514,8 @@ function do_application {
   esac
   adir=$subdir$1
   if [ "$verb" == build ]; then
-    make -C $subdir$1 ${verbose:+AT=} ${buildClean:+clean} ${swplats:+RccPlatforms=" ${swplats[@]}"} \
-      ${hwswplats:+RccHdlPlatforms=" ${hwswplats[@]}"} \
-      $OCPI_MAKE_OPTS
+      eval domake $subdir$1 application ${buildClean:+clean} "$(dovars RccPlatforms RccHdlPlatforms)" \
+             $OCPI_MAKE_OPTS
     return 0
   fi
   if [ "$verb" == delete ]; then
@@ -655,7 +531,7 @@ function do_application {
     [ -e "$adir" ] || bad the application at \"$adir\" does not exist
     get_dirtype $adir
     [ "$dirtype" == application ] || bad the directory at $adir does not appear to be an application
-    ask delete the application project in the \"$adir\" directory
+    ask delete the application in the \"$adir\" directory
     rm -r -f $adir
     [ -z "$verbose" ] || echo The application \"$1\" in the directory \"$adir\" has been deleted.
     return 0
@@ -671,13 +547,12 @@ function do_application {
 
   if [ "$dirtype" == project -a ! -e applications ]; then
     mkdir applications
-    cat <<EOF > applications/Makefile
-$CheckCDK
-# To restrict the applications that are built or run, you can set the Applications
-# variable to the specific list of which ones you want to build and run, e.g.:
-# Applications=app1 app3
-# Otherwise all applications will be built and run
-include \$(OCPI_CDK_DIR)/include/applications.mk
+    cat <<EOF > applications/applications.xml
+<!-- To restrict the applications that are built or run, you can set the Applications
+     attribute to the specific list of which ones you want to build and run, e.g.:
+     <libraries Applications='app1 app3'/>
+     Otherwise all applications will be built and run -->
+<applications/>
 EOF
     [ -z "$verbose" ] || echo This is the first application in this project.  The \"applications\" directory has been created.
   fi
@@ -686,13 +561,12 @@ EOF
   if [ -z "$xmlapp" ] ; then
     appdir=$1
     mkdir $subdir$1
-    cat <<EOF > $subdir$1/Makefile
-$CheckCDK
-# This is the application Makefile for the "$1" application
-# If there is a $1.cc (or $1.cxx) file, it will be assumed to be a C++ main program to build and run
-# If there is a $1.xml file, it will be assumed to be an XML app that can be run with ocpirun.
-# The RunArgs variable can be set to a standard set of arguments to use when executing either.
-include \$(OCPI_CDK_DIR)/include/application.mk
+    cat <<EOF > $subdir$1/$1-app.xml
+<!-- This is the application XML build file (not the app XML itself) for the "$1" application
+     If there is a $1.cc (or $1.cxx) file, it will be assumed to be a C++ main program to build and run
+     If there is a $1.xml file, it will be assumed to be an XML app that can be run with ocpirun.
+     The RunArgs attribute can be set to a standard set of arguments to use when executing either. -->
+<application/>
 EOF
     [ -z "$verbose" ] || {
       echo Application \"$1\" created in the directory \"$topdir$subdir$1\"
@@ -800,7 +674,9 @@ function do_protocol_or_spec {
   # Make sure we record the package's prefix in the specs directory so that spec files used
   # by other projects (or this one) know what the package should be.
   if [ "$subdir" == specs -a ! -e specs/package-id ] ; then
-    make specs/package-id
+    [ $dirtype = project ] ||
+      bad this command can only be executed in a project, libraries, or library directory
+    domake . project specs/package-id
   fi
   case "$noun" in
     (protocol)
@@ -868,7 +744,7 @@ EOF
   # If the parent directory is a library, update its links to specs to include this new one
   get_dirtype $subdir/..
   if [ "$dirtype" == library ]; then
-    make speclinks -C $subdir/..
+    domake $subdir/.. library speclinks
   fi
   if [ -n "$verbose" ]; then
     if [ "$dirtype" == library ]; then
@@ -890,46 +766,57 @@ function make_hdl_dir {
   fi
 }
 
+# emit an attribute if it is set
+function doattr {
+  local a
+  eval a="\$$1"
+  [ -z "$a" ] || printf "\n    $1='${a[@]}'"
+}
+# Command line variable assignment
+function dovar {
+  local a
+  eval a=\(\${$1[@]}\)
+  [ -z "$a" ] || printf "$1=${a[*]}"
+}
+function dovars {
+  local -a vars
+  for v in $*; do
+    local V=$(dovar $v)
+    [ -z "$V" ] || vars+=("\"$V\"")
+  done
+  echo "${vars[@]}"
+}
+function doattrs {
+  for a in $*; do
+    doattr $a
+  done
+}
+function doelem {
+  local e
+  eval e="\$$1"
+  [ -z "$e" ] || printf "  $e\n"
+}
+
 # make a library named $1, in the directory $2
 function make_library {
   mkdir -p $2
-  cat <<EOF > $2/Makefile
-# This is the $1 library
+  (
+    cat <<-EOF
+	<!-- This is the XML file for the $1 library
+	     All workers created here in *.<model> directories will be built automatically
+	     All tests created here in *.test directories will be built/run automatically
+	     To limit the workers that actually get built, set the Workers= attribute
+	     To limit the tests that actually get built/run, set the Tests= attribute
 
-# All workers created here in *.<model> will be built automatically
-# All tests created here in *.test directories will be built/run automatically
-# To limit the workers that actually get built, set the Workers= variable
-# To limit the tests that actually get built/run, set the Tests= variable
-
-# Any variable definitions that should apply for each individual worker/test
-# in this library belong in Library.mk
-
-include \$(OCPI_CDK_DIR)/include/library.mk
-EOF
-
-  cat <<EOF > $2/Library.mk
-# This is the $1 library
-
-# This makefile contains variable definitions that will apply when building each
-# individual worker and test in the library
-
-# Package identifier is used in a hierarchical fashion from Project to Libraries....
-# The PackageName, PackagePrefix and Package variables can optionally be set here:
-# PackageName defaults to the name of the directory
-# PackagePrefix defaults to package of parent (project)
-# Package defaults to PackagePrefix.PackageName
-${packagename:+PackageName=$packagename}
-${packageprefix:+PackagePrefix=$packageprefix}
-${package:+Package=$package}
-${liblibs:+Libraries=${liblibs[@]}}
-${complibs:+ComponentLibraries=${complibs[@]}}
-${includes:+IncludeDirs=${includes[@]}}
-${xmlincludes:+XmlIncludeDirs=${xmlincludes[@]}}
-EOF
-  make --no-print-directory -C $2 ||
-    bad library creation failed, you may want to do: ocpidev delete library $1
+	     Any attribute definitions that should apply to all individual worker/test
+	     in this library belong in this xml file-->
+	<library
+	EOF
+    doattrs PackageName PackagePrefix PackageID Libraries ComponentLibraries IncludeDirs XmlIncludeDirs
+    printf ">\n</library>\n"
+  ) > $2/`basename $2`.xml
+  domake $2 library || bad library creation failed, you may want to do: ocpidev delete library $1
   [ -z "$verbose" ] || echo A new library named \"$1\" \(in directory \"$2/\"\) has been created.
-
 }
 
 function do_library {
@@ -937,7 +824,7 @@ function do_library {
   if [ "$libbase" == "hdl" -a -n "$library" ]; then
     one=$(basename $library)
   else
-    one=$1
+    one=${1:-.}
   fi
   [ -z "$library" -o "$verb" != "delete" ] || bad The -l and --hdl_library options are invalid when deleting a library
   subdir=$one
@@ -1005,13 +892,9 @@ function do_library {
       buildHdl=""
       cleanTarget+=" cleanhdl"
     fi
-    make -C $subdir ${verbose:+AT=} ${cleanTarget:+$cleanTarget} ${verbose:+AT=} ${buildRcc:+rcc} ${buildHdl:+hdl}\
-            ${hdlplats:+HdlPlatforms=" ${hdlplats[@]}"}\
-            ${hdltargets:+HdlTargets=" ${hdltargets[@]}"}\
-            ${swplats:+RccPlatforms=" ${swplats[@]}"}\
-            ${workerList:+Workers=" ${workerList[@]}"}\
-            ${hwswplats:+RccHdlPlatforms=" ${hwswplats[@]}"}\
-            $OCPI_MAKE_OPTS
+    eval domake $subdir library ${cleanTarget:+$cleanTarget} ${buildRcc:+rcc} ${buildHdl:+hdl}\
+           "$(dovars HdlPlatforms HdlTargets RccPlatforms RccHdlPlatforms Workers)" \
+           $OCPI_MAKE_OPTS
     return 0
   fi
   [ -e "$subdir" ] && bad the library \"$one\" \(directory $subdir/\) already exists
@@ -1041,11 +924,10 @@ function do_library {
   if [ "$subdir" != "$libbase" -a ! -d "$libbase"  -a "$libbase" != "hdl" ] ; then
     if [ "$libbase" != "components" -o "$(basename $(pwd))" != "components" ] ; then
       mkdir -p $libbase
-      cat <<EOF > $libbase/Makefile
-$CheckCDK
-# This is the Makefile for the $libbase directory when there are multiple
-# libraries in their own directories underneath this $libbase directory
-include \$(OCPI_CDK_DIR)/include/libraries.mk
+      cat <<EOF > $libbase/$(basename "$libbase").xml
+<!-- This is the XML file for the $libbase directory when there are multiple
+     libraries in their own sub directories underneath this $libbase directory -->
+<libraries/>
 EOF
     fi
   fi
@@ -1070,7 +952,7 @@ function get_spec {
       elif [ -e $subdir/specs/${1}_spec.xml -o \
              "$odirtype" == project -a -e specs/${1}_spec.xml ]; then
 	s=${1}_spec
-      elif [ -n "$emulates" ] ; then
+      elif [ -n "$Emulate" ] ; then
         s=emulator-spec
       elif [ "$odirtype" == project ]; then
         bad spec file not specified and ${1}'[-_]spec.xml' does not exist in library or project \"specs\" directory \($subdir/specs\)
@@ -1111,6 +993,10 @@ $specopt  <!-- If this subdevice is sharing raw properties, include the followin
   [ -z "$3" ] || nameattr=" name='$3'"
 }
 
+function checkspec {
+  echo Checking spec $1 for worker
+}
+
 # callers can preset libdir to bypass the location heuristics
 function do_worker {
   odirtype=$dirtype
@@ -1132,12 +1018,9 @@ function do_worker {
     return 0
   fi
   if [ "$verb" == build ]; then
-    make -C $subdir/$1 ${verbose:+AT=} ${buildClean:+clean} \
-            ${hdlplats:+HdlPlatforms=" ${hdlplats[@]}"} \
-            ${hdltargets:+HdlTargets=" ${hdltargets[@]}"} \
-            ${swplats:+RccPlatforms=" ${swplats[@]}"} \
-            ${hwswplats:+RccHdlPlatforms=" ${hwswplats[@]}"} \
-            $OCPI_MAKE_OPTS
+    eval domake $subdir/$1 worker ${buildClean:+clean} \
+	   "$(dovars HdlPlatforms HdlTargets RccPlatforms RccHdlPlatforms)" \
+           $OCPI_MAKE_OPTS
     return 0
   fi
   words=(${1//./ })
@@ -1147,35 +1030,26 @@ function do_worker {
   [ "$model" != "${words[1]}" ] && bad the authoring model part of the name \"$1\" must be lower case
   [ -d $OCPI_CDK_DIR/include/$model ] || bad the authoring model \"$model\" is not valid
   [ -n "$2" ] && {
-     [ -n "$language" ] && bad language option specified \"$2\" when language argument after name is specified.
-     language=$2
+     [ -n "$Language" ] && bad language option specified \"$2\" when language argument after name is specified.
+     Language=$2
   }
   noexist $libdir/$1
-  if [ -z "$language" ] ; then
-    language=$(eval echo \${Language_$model})
-    [ -z "$verbose" ] || echo Choosing default language \"$language\" for worker $1
-    langattr=" language='$language'"
+  if [ -z "$Language" ] ; then
+    Language=$(eval echo \${Language_$model})
+    [ -z "$verbose" ] || echo Choosing default language \"$Language\" for worker $1
   else
-    language=$(echo $language | tr A-Z a-z)
+    Language=$(echo $Language | tr A-Z a-z)
     for l in $(eval echo \${Languages_$model[*]}); do
       valid_languages+="\"${l/:*/}\" "
-      [ "$language" = ${l/:*/} ] && suff=${l/*:/} langattr=" language='${l/:*/}'"
+      [ "$Language" = ${l/:*/} ] && suff=${l/*:/}
     done
-    [ -z "$langattr" ] && bad Invalid language \"$language\" for model \"$model\". Available: ${valid_languages}
+    [ -z "$langattr" ] && bad Invalid language \"$Language\" for model \"$model\". Available: ${valid_languages}
   fi
-  [ -n "$emulates" ] && emuattr=" emulate='$emulates'"
-  [ -n "$slave" ] && slaveattr=" slave='$slave'"
-  if [ -n "$version" ]; then
-     versionattr=" version='$version'"
-  else
+  if [ -z "$Version" ]; then
      echo Without the worker version specified, it is set to 2 in this new worker.
-     versionattr=" version='2'"
+     Version=2
   fi
-  if [ "$OCPI_CREATE_BUILD_FILES" = 1 ]; then
-    [ -n "${xmlincludes[*]}" ] && xmlincattr=" XmlIncludeDirs='${xmlincludes[@]}'"
-    [ -n "${complibs[*]}" ] && complibattr=" ComponentLibraries='${complibs[@]}'"
-  fi
-  if [ \( -n "$rccstatprereqs" -o -n "$rccdynprereqs" \) -a "$model" != "rcc" ] ; then
+  if [ \( -n "$StaticPrereqLibs" -o -n "$DynamicPrereqLibs" \) -a "$model" != "rcc" ] ; then
     bad RccStatic/DynamicPrereqLibs is only valid for rcc workers
   fi
   elem=$(echo ${model:0:1} | tr a-z A-Z)${model:1}
@@ -1185,10 +1059,10 @@ function do_worker {
      # for devices
      elem=${elem}Device
   fi
-  if [ -n "$workers" ] ; then
-    for w in "${!workers[@]}"; do
+  if [ -n "$multiworkers" ] ; then
+    for w in "${!multiworkers[@]}"; do
       OFS="$IFS"
-      IFS=: x=(${workers[$w]})
+      IFS=: x=(${multiworkers[$w]})
       IFS="$OFS"
       get_spec ${x[0]} ${x[1]} ${x[2]}
       wnames[$w]=${x[0]}
@@ -1202,83 +1076,46 @@ function do_worker {
 #    done
     wvar="Workers=${wnames[@]}"
   else
-    get_spec "$name" "$spec" "$wname"
+    get_spec "$name" "$spec" "$packagename"
     wnames=($name)
     specattrs=("$specattr")
     specelems=("$specelem")
     nameattrs=("$nameattr")
     specs=($spec)
   fi
+  # This is quite unlikely to be really useful at creation time, but
+  for s in "${supported[@]}" ; do
+    s=${s/%.hdl/}
+    supportselem=(${supportselem[@]} "
+    <Supports Worker=\"$s\" >
+       <!-- <Connect Port=\"rawprops\" To=\"rprops\" Index='0'/> -->
+    </Supports>
+    ")
+  done
   mkdir $libdir/$1
-  if [ "$OCPI_CREATE_BUILD_FILES" = 1 ]; then
-    [ -n "${xmlincludes[*]}" ] &&
-      echo WARNING: $libdir/$1 needs XmlIncludeDirs attr in OWD for: ${xmlincludes[@]}
-    [ -n "${complibs[*]}" ] &&
-      echo WARNING: $libdir/$1 needs ComponentLibraries attr in OWD for: X${complibs[@]}X${#complibs[@]}
-    cat <<-EOF >  $libdir/$1/Makefile
-	# This is the Makefile for worker $1.
-	# Unless you are doing something custom or unusual, you should not edit it.
-	$CheckCDK
-	$wvar
-	include \$(OCPI_CDK_DIR)/include/worker.mk
-	EOF
-    if [ -n "${includes}${others}${cores}${rccstatprereqs}${rccdynprereqs}${targets}${extargets}${onlyplats}${explats}${liblibs}" ]; then
-      cat <<-EOF  | sed '/^ *$/d' > $libdir/$1/${name}-build.xml
-	<!-- The build file for worker $1, specifying how to build it -->
-	<Build
-	${includes:+  IncludeDirs='${includes[@]}'}
-	${others:+  SourceFiles='${others[@]}'}
-	${cores:+  Cores='${cores[@]}'}
-	${rccstatprereqs:+  StaticPrereqLibs='${rccstatprereqs[@]}'}
-	${rccdynprereqs:+  DynamicPrereqLibs='${rccdynprereqs[@]}'}
-	${targets:+  OnlyTargets='${targets[@]}'}
-	${extargets:+  ExcludeTargets='${extargets[@]}'}
-	${onlyplats:+  OnlyPlatforms='${onlyplats[@]}'}
-	${explats:+  ExcludePlatforms='${explats[@]}'}
-	${liblibs:+  Libraries='${liblibs[@]}'}
-	  >
-	  <!-- Add any specific parameter settings using <parameter> elements -->
-	  <!-- Add any specific build configurations using <configuration> elements -->
-	</Build>
-	EOF
-    fi
-  else
-# Make one Makefile, even if multi-worker
-  cat <<EOF | sed '/^ *$/d' >  $libdir/$1/Makefile
-# This is the Makefile for worker $1
-$wvar
-${includes:+IncludeDirs=${includes[@]}}
-${others:+SourceFiles=${others[@]}}
-${cores:+Cores=${cores[@]}}
-${rccstatprereqs:+RccStaticPrereqLibs=${rccstatprereqs[@]}}
-${rccdynprereqs:+RccDynamicPrereqLibs=${rccdynprereqs[@]}}
-${targets:+OnlyTargets=${targets[@]}}
-${extargets:+ExcludeTargets=${extargets[@]}}
-${onlyplats:+OnlyPlatforms=${onlyplats[@]}}
-${explats:+ExcludePlatforms=${explats[@]}}
-${liblibs:+Libraries=${liblibs[@]}}
-${xmlincludes:+XmlIncludeDirs=${xmlincludes[@]}}
-${complibs:+ComponentLibraries=${complibs[@]}}
-include \$(OCPI_CDK_DIR)/include/worker.mk
-EOF
-fi
-for s in "${supported[@]}" ; do
-  s=${s/%.hdl/}
-  supportselem=(${supportselem[@]} "
-  <Supports Worker=\"$s\" >
-     <!-- <Connect Port=\"rawprops\" To=\"rprops\" Index='0'/> -->
-  </Supports>
-")
-done
-
   for w in "${!wnames[@]}"; do
+    checkspec ${specs[$w]}
+    elems="${specelems[$w]}${supportselem[@]}"
+    myspec="${specelems[$w]}"
     # Make one OWD file per worker
-    cat <<EOF > $libdir/$1/${wnames[$w]}.xml
-<$elem${nameattrs[$w]}${langattr}${specattrs[$w]}${emuattr}${slaveattr}${xmlincattr}${complibattr}${versionattr}>
-${specelems[$w]}
-${supportselem[@]}
-</$elem>
-EOF
+    (
+      cat <<-EOF
+	<$elem${nameattrs[$w]}${specattrs[$w]}
+	EOF
+      # Now we add optional attributes, one per line
+      doattrs Language Version Slave Emulate XmlIncludeDirs ComponentLibraries IncludeDirs \
+              Libraries Cores SourceFiles StaticPrereqLibs DynamicPrereqLibs OnlyTargets \
+	      ExcludeTargets OnlyPlatforms ExcludePlatforms
+      if [ -z "$elems" ]; then
+	printf "/>\n"
+      else
+        printf ">\n"
+        # Now we add optional elements
+        doelem myspec
+        doelem supportselem
+        printf "</$elem>\n"
+      fi
+    ) > $libdir/$1/${wnames[$w]}.xml
     # The following check cannot be done since we are not looking at the right place for the file.
     if false; then
     specfile=${specs[$w]}
@@ -1299,8 +1136,7 @@ EOF
   done
   [ -z "$verbose" ] || echo Running \"make skeleton\" to make initial skeleton for worker $1
   # FIXME: how do we get the project's or library's xmlincludepath etc.
-  [ -z "$verbose" ] || echo "Command is: make --no-print-directory -C $libdir/$1 skeleton LibDir=../lib/$model genlinks"
-  make --no-print-directory -C $libdir/$1 skeleton LibDir=../lib/$model genlinks || {
+  domake $libdir/$1 worker skeleton LibDir=../lib/$model genlinks || {
     if [ -n "$keep" ]; then
       echo The worker directory, Makefile and xml file have been created.
       get_deletecmd
@@ -1363,11 +1199,8 @@ function do_test {
   #   if it does, delete it and its contents
   #     warn first/ask for confirmation
   if [ "$verb" == build ] ; then
-    make -C $testdir  ${verbose:+AT=} ${buildClean:+clean}\
-         ${hdlplats:+HdlPlatforms=" ${hdlplats[@]}"} \
-         ${swplats:+RccPlatforms=" ${swplats[@]}"} \
-         ${hwswplats:+RccHdlPlatforms=" ${hwswplats[@]}"} \
-         $OCPI_MAKE_OPTS
+    eval domake $testdir test ${buildClean:+clean} "$(dovars HdlPlatforms RccPlatforms RccHdlPlatforms)" \
+           $OCPI_MAKE_OPTS
 
   elif [ "$verb" == delete ] ; then
     echo "Deleting test dir: $testdir"
@@ -1389,11 +1222,6 @@ function do_test {
     get_spec $testname $spec
     #   create dir
     mkdir -p $testdir
-    #   create Makefile: include $(OCPI_CDK_DIR)/include/test.mk
-    cat <<EOF > $testdir/Makefile
-# This is the Makefile for the test directory which tests component "$testname"
-include \$(OCPI_CDK_DIR)/include/test.mk
-EOF
     #   create <comp>-test.xml:
     cat <<EOF > $testdir/$testname-test.xml
 <!-- This is the test xml for testing component "$testname" -->
@@ -1442,16 +1270,12 @@ function do_hdl_platforms {
   if [ "$verb" ==  build ]; then
     cd $(get_project_top)
     if [ -n "$buildClean" ]; then
-      make_target=clean
+      domake . project clean
     else
-      make_target=hdlplatforms
+      # Note: If this implementation changes in the future, be sure to add logic to respect
+      # missingOK; "make hdlprimitives" returns success even if no hdl/primitives present.
+      eval domake . project hdlplatforms "$(dovars HdlPlatforms HdlTargets)" $OCPI_MAKE_OPTS
     fi
-    # Note: If this implementation changes in the future, be sure to add logic to respect
-    # missingOK; "make hdlprimitives" returns success even if no hdl/primitives present.
-    make $make_target ${buildClean:+-C hdl/platforms} \
-         ${hdlplats:+HdlPlatforms=" ${hdlplats[@]}"} \
-         ${hdltargets:+HdlTargets=" ${hdltargets[@]}"} \
-         $OCPI_MAKE_OPTS
     return 0;
   fi
   bad The only verb available for platforms is build. Did you mean platform
@@ -1469,8 +1293,7 @@ function do_hdl_platform {
   esac
   pdir=$subdir$1
   if [ "$verb" ==  build ]; then
-    make -C $pdir ${verbose:+AT=} ${buildClean:+clean} \
-      $OCPI_MAKE_OPTS
+    domake $pdir hdl-platform ${buildClean:+clean} $OCPI_MAKE_OPTS
     return 0;
   fi
   if [ "$verb" == delete ]; then
@@ -1486,43 +1309,20 @@ function do_hdl_platform {
   libbase=hdl
   if [ "$dirtype" == project -a ! -e "$subdir" ]; then
     mkdir -p $subdir
-    cat <<EOF > $subdir/Makefile
-$CheckCDK
-# To restrict the HDL platforms that are built, you can set the Platforms
-# variable to the specific list of which ones you want to build, e.g.:
-# Platforms=pf1 pf3
-# Otherwise all platforms will be built
-# Alternatively, you can set ExcludePlatforms to list the ones you want to exclude
-include \$(OCPI_CDK_DIR)/include/hdl/hdl-platforms.mk
-EOF
+    cat <<-EOF > $subdir/platforms.xml
+	<!-- To restrict the HDL platforms that are built, you can set the Platforms
+	     attribute to the specific list of which ones you want to build, e.g.:
+	     Platforms='pf1 pf3'
+	     Otherwise all platforms will be built
+	     Alternatively, set the ExcludePlatforms attribute to the ones you want to exclude-->
+	<hdlplatforms/>
+	EOF
     [ -z "$verbose" ] || echo This is the first HDL platform in this project.  The \"hdl/platforms\" directory has been created.
   fi
   mkdir $subdir$1
-  cat <<EOF > $subdir$1/Makefile
-$CheckCDK
-# This is an HDL platform Makefile for the "$1" platform
-${includes:+IncludeDirs=${includes[@]}}
-${xmlincludes:+XmlIncludeDirs=${xmlincludes[@]}}
-${liblibs:+Libraries=${liblibs[@]}}
-${others:+SourceFiles=${others[@]}}
-${cores:+Cores=${cores[@]}}
-${complibs:+ComponentLibraries=${complibs[@]}}
-include \$(OCPI_CDK_DIR)/include/hdl/hdl-platform.mk
-EOF
-  if [ -z "$hdlpart" ] ; then
-    hdlpart="xc7z020-1-clg484"
+  if [ -z "$Part" ] ; then
+    Part="xc7z020-1-clg484"
   fi
-  cat<<EOF > $subdir/$1/$1.mk
-# SET THIS VARIABLE to the part (die-speed-package, e.g. xc7z020-1-clg484) for the platform!
-HdlPart_$1=$hdlpart
-# Set this variable to the names of any other component libraries with devices defined in this
-# platform. Do not use slashes.  If there is an hdl/devices library in this project, it will be
-# searched automatically, as will "devices" in any projects this project depends on.
-# An example might be something like "our_special_devices", which would exist in this or
-# other projects.
-# ComponentLibraries_$1=
-${complibs:+ComponentLibraries_$1=${complibs[@]}}
-EOF
   if [ -z "$timefreq" ] ; then
     timefreq=100e6
   fi
@@ -1531,31 +1331,45 @@ EOF
   else
     sdpxml=
   fi
-  cat<<EOF > $subdir/$1/$1.xml
-<!-- This file defines the $1 HDL platform -->
-<HdlPlatform Language="VHDL" Spec="platform-spec">
-  <SpecProperty Name='platform' Value='$1'/>
-  <!-- These next two lines must be present in all platforms -->
-  <MetaData Master="true"/>
-  <TimeBase Master="true"/>
-  $sdpxml
-  <!-- Set your time server frequency -->
-  <Device Worker='time_server'>
-    <Property Name='frequency' Value='$timefreq'/>
-  </Device>
-  <!-- Put any additional platform-specific properties here using <Property> -->
-  <!-- Put any built-in (always present) devices here using <device> -->
-  <!-- Put any card slots here using <slot> -->
-  <!-- Put ad hoc signals here using <signal> -->
-</HdlPlatform>
-EOF
+  (
+    cat<<-EOF
+	<!-- This file defines the $1 HDL platform 
+	     Set the "part" attribute to the part (die-speed-package, e.g. xc7z020-1-clg484) for the platform
+	     Set this variable to the names of any other component libraries with devices required by this
+	     platform. Do not use slashes.  If there is an hdl/devices library in this project, it will be
+	     searched automatically, as will "devices" in any projects this project depends on.
+	     An example might be something like "our_special_devices", which would exist in this or
+	     other projects.-->
+	<HdlPlatform Spec="platform-spec"
+	EOF
+    # Now we add optional attributes, one per line
+    doattrs Language Version Part XmlIncludeDirs ComponentLibraries IncludeDirs \
+            Libraries Cores SourceFiles
+    printf ">\n"
+    cat<<-EOF
+	  <SpecProperty Name='platform' Value='$1'/>
+	  <!-- These next two lines must be present in all platforms -->
+	  <MetaData Master="true"/>
+	  <TimeBase Master="true"/>
+	  $sdpxml
+	  <!-- Set your time server frequency -->
+	  <Device Worker='time_server'>
+	    <Property Name='frequency' Value='$timefreq'/>
+	  </Device>
+	  <!-- Put any additional platform-specific properties here using <Property> -->
+	  <!-- Put any built-in (physically present) devices here using <device> -->
+	  <!-- Put any card slots here using <slot> -->
+	  <!-- Put ad hoc signals here using <signal> -->
+	</HdlPlatform>
+	EOF
+  ) > $subdir/$1/$1.xml
   [ -z "$verbose" ] || echo The HDL platform \"$1\" has been created in ${topdir}$subdir/$1
 }
 
 function do_rcc_platform {
   case "$dirtype" in
     (project)subdir=rcc/platforms/;;
-    (hdl-platforms)subdir=./;;
+    (rcc-platforms)subdir=./;;
     (*) bad this command can only be issued in a project directory or an rcc/platforms directory;;
   esac
   pdir=$subdir$1
@@ -1618,24 +1432,18 @@ EOF
 
 function do_primitives {
   if [ "$verb" == build ]; then
-    pjtop=$(get_project_top)
-    if [ -n "$pjtop" ]; then
-      [ -z "$verbose" ] || echo "Building from: $pj_top"
-      cd $pjtop
-    fi
-    # echo $hdlplats
-    # echo $hdltargets
-    if [ -n "$buildClean" ]; then
-      make_target=clean
-    else
-      make_target=hdlprimitives
-    fi
+    cd $(get_project_top)
     # Note: If this implementation changes in the future, be sure to add logic to respect
     # missingOK; "make hdlprimitives" returns success even if no hdl/primitives present.
-    make $make_target ${buildClean:+-C hdl/primitives} \
-                 ${hdlplats:+HdlPlatforms=" ${hdlplats[@]}"} \
-                 ${hdltargets:+HdlTargets=" ${hdltargets[@]}"} \
-                 $OCPI_MAKE_OPTS
+    [ -d hdl/primitives ] || {
+      echo There are no HDL primitives in this project.
+      return 0
+    }
+    if [ -n "$buildClean" ]; then
+      domake hdl/primitives hdl-primitives clean
+    else
+      eval domake . project hdlprimitives "$(dovars HdlPlatforms HdlTargets)" $OCPI_MAKE_OPTS
+    fi
     return 0
   fi
   bad The only verb available for primitives is build. Did you mean primitive
@@ -1655,10 +1463,7 @@ function do_primitive {
     (*) bad this command can only be executed in a project or hdl/primitives directory;;
   esac
   if [ "$verb" == build ]; then
-    make -C $dir ${verbose:+AT=} ${buildClean:+clean} \
-            ${hdlplats:+HdlPlatforms=" ${hdlplats[@]}"} \
-            ${hdltargets:+HdlTargets=" ${hdltargets[@]}"} \
-            $OCPI_MAKE_OPTS
+    eval domake $dir hdl-$1 ${buildClean:+clean} "$(dovars HdlPlatforms HdlTargets)" $OCPI_MAKE_OPTS
     return 0
   fi
   if [ "$verb" == delete ]; then
@@ -1684,108 +1489,58 @@ function do_primitive {
     bad The primitive $2 already exists at $dir.
   if [ "$dirtype" == project -a ! -e hdl/primitives ]; then
     mkdir -p hdl/primitives
-    cat <<EOF > hdl/primitives/Makefile
-$CheckCDK
-# To restrict the primitives that are built or run, you can set the Libraries or Cores
-# variables to the specific list of which ones you want to build and run, e.g.:
-# PrimitiveLibraries=lib1 lib2
-# PrimitiveCores=core1 core2
-# Otherwise all primitives will be built
-include \$(OCPI_CDK_DIR)/include/hdl/hdl-primitives.mk
-EOF
-    [ -z "$verbose" ] || echo This is the first HDL primitive in this project.  The \"hdl/primitives\" directory has been created.
+    cat <<-EOF > hdl/primitives/primitives.xml
+	<!-- The XML file for the hdl/primitives directory:
+	     To restrict the primitives that are built or run, you can set the Libraries or Cores
+	     attributes to the specific list of which ones you want to build and run, e.g.:
+	     Libraries='lib1 lib2'
+	     Cores=core1 core2
+	     Otherwise all primitives will be built-->
+	<hdlprimitives/>
+	EOF
+    [ -z "$verbose" ] ||
+	echo This is the first HDL primitive in this project.  The \"hdl/primitives\" directory has been created.
   fi
   mkdir -p $dir
   if [ "$1" = "library" ] ; then
-    cat <<EOF > $dir/Makefile
-# This Makefile is for the primitive library: $2
-
-# Set this variable to any other primitive libraries that this $1 depends on.
-# If they are remote from this project, use slashes in the name (relative or absolute)
-# If they are in this project, they must be compiled first, and this requires that the
-# PrimitiveLibraries variable be set in the hdl/primitives/Makefile such that the
-# libraries are in dependency order.
-#Libraries=
-${liblibs:+Libraries=${liblibs[@]}}
-${hdlnolib:+HdlNoLibraries=yes}
-${hdlnoelab:+HdlNoElaboration=yes}
-# Set this variable to the list of source files in dependency order
-# If it is not set, all .vhd and .v files will be compiled in wildcard/random order,
-# except that any *_pkg.vhd files will be compiled first
-#SourceFiles=
-${others:+SourceFiles=${others[@]}}
-
-# Remember two rules for OpenCPI primitive libraries, in order to be usable with all tools:
-# 1. Any entity (VHDL) or module (verilog) must have a VHDL component declaration in ${2}_pkg.vhd
-# 2. Entities or modules to be used from outside the library must have the file name
-#    be the same as the entity/module name, and one entity/module per file.
-
-
-${cores:+Cores=${cores[@]}}
-${targets:+OnlyTargets=${targets[@]}}
-${extargets:+ExcludeTargets=${extargets[@]}}
-${onlyplats:+OnlyPlatforms=${onlyplats[@]}}
-${explats:+ExcludePlatforms=${explats[@]}}
-include \$(OCPI_CDK_DIR)/include/hdl/hdl-library.mk
-EOF
-    cat <<EOF > $dir/$2_pkg.vhd
--- This package enables VHDL code to instantiate all entities and modules in this library
-library ieee; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
-package $2 is
--- put component declarations along with any related type definitions here
-end package $2;
-EOF
+    (
+      cat <<-EOF
+	<!-- This is the XML file for the primitive library: $2 -->
+	<HdlLibrary
+	EOF
+      doattrs Libraries SourceFiles Cores OnlyTargets ExcludeTargets OnlyPlatforms \
+	      ExcludePlatforms HdlNoLibraries HdlNoElaboration
+      printf "/>\n"
+    ) > $dir/$2.xml
+    cat <<-EOF > $dir/$2_pkg.vhd
+	-- This package enables VHDL code to instantiate all entities and modules in this library
+	library ieee; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
+	package $2 is
+	  -- put component declarations along with any related type definitions here
+	end package $2;
+	EOF
   else
-    cat <<EOF > $dir/Makefile
-# This Makefile is for the primitive core: $2
+    (
+      cat <<-EOF
+	<!-- This is the XML file for the primitive core: $2 -->
+	<HdlCore
+	EOF
+      doattrs Libraries PreBuiltCore Top SourceFiles Cores OnlyTargets ExcludeTargets OnlyPlatforms \
+	      ExcludePlatforms HdlNoLibraries HdlNoElaboration
+      printf "/>\n"
+    ) > $dir/$2.xml
 
-# Set this variable to any other primitive libraries that this core depends on.
-# If they are remote from this project, use slashes in the name (relative or absolute)
-#Libraries=
-${liblibs:+Libraries=${liblibs[@]}}
-# Set this variable to the list of source files in dependency order
-# If it is not set, all .vhd and .v files will be compiled in wildcard/random order,
-# except that any *_pkg.vhd will be compiled first, if present.
-#SourceFiles=
-
-# Set this variable if the top level module name for this core is different from the
-# core name: $2
-#Top=
-${module:+Top=${module[@]}}
-
-# Set this variable if this core is in fact a presynthesized/prebuilt core
-# and thus does not have source files except perhaps for simulation
-# The suffix is added for you (as appropriate for Xilinx or Altera etc.)
-#PreBuiltCore=
-${prebuilt:+PreBuiltCore=${prebuilt[@]}}
-
-# Remember that verilog cores must have a black box empty module definition
-# in a file named <top>_bb.v (where <top> is the of the core or the value of the Top
-# variable).
-${others:+SourceFiles=${others[@]}}
-${cores:+Cores=${cores[@]}}
-${targets:+OnlyTargets=${targets[@]}}
-${extargets:+ExcludeTargets=${extargets[@]}}
-${onlyplats:+OnlyPlatforms=${onlyplats[@]}}
-${explats:+ExcludePlatforms=${explats[@]}}
-include \$(OCPI_CDK_DIR)/include/hdl/hdl-core.mk
-EOF
   fi
 }
 
 function do_assemblies {
   if [ "$verb" == build ]; then
-    pjtop=$(get_project_top)
-    if [ -n "$pjtop" ]; then
-      cd $pjtop
-    fi
+    cd $(get_project_top)
     if [ -n "$buildClean" ]; then
-      make_target=clean
+      domake hdl/assemblies hdl-assemblies clean
     else
-      make_target=hdlassemblies
+      eval domake . project hdlassemblies "$(dovars HdlPlatforms)" $OCPI_MAKE_OPTS
     fi
-    make $make_target ${buildClean:+-C hdl/assemblies} ${hdlplats:+HdlPlatforms=" ${hdlplats[@]}"} \
-      $OCPI_MAKE_OPTS
     return 0
   fi
   bad The only verb available for primitives is build. Did you mean assembly
@@ -1794,12 +1549,21 @@ function do_assemblies {
 function do_build_here {
     buildTest="$1"
     get_dirtype .
+    if [ -n "$generate" -a \( "$1" = test -o $dirtype = test \) ]; then
+	buildTest=generate
+    fi
     if [ -z "$buildRcc" -a -z "$buildHdl" -a -n "$buildClean" -a "$1" != "test" ]; then
       cleanTarget="clean"
     fi
-    if [ -n "$buildClean" -a "$1" == "test" ]; then
+    if [ -n "$buildClean" -a \( "$1" == "test" -o $dirtype = test \) ]; then
       buildTest=""
-      cleanTarget="cleantest"
+      if [ -n "$simulation" ]; then
+	cleanTarget=cleansim
+      elif [ -n "$execute" ]; then
+	cleanTarget=cleanrun
+      else
+	cleanTarget=cleantest
+      fi
     fi
     if [ -n "$buildRcc" -a -n "$buildClean" ]; then
       buildRcc=""
@@ -1809,18 +1573,19 @@ function do_build_here {
       buildHdl=""
       cleanTarget+=" cleanhdl"
     fi
-  make ${cleanTarget:+$cleanTarget} ${verbose:+AT=} ${buildRcc:+rcc} ${buildHdl:+hdl} ${buildTest} \
+  set -e
+  eval domake . $dirtype \
+       ${cleanTarget:+$cleanTarget} ${buildRcc:+rcc} ${buildHdl:+hdl} ${buildTest} \
        ${buildNoAssemblies:+Assemblies=} \
-       ${assys:+Assemblies=" ${assys[@]}"} \
-       ${hdlplats:+HdlPlatforms=" ${hdlplats[@]}"} \
-       ${hdltargets:+HdlTargets=" ${hdltargets[@]}"} \
-       ${swplats:+RccPlatforms=" ${swplats[@]}"} \
-       ${hwswplats:+RccHdlPlatforms=" ${hwswplats[@]}"} \
-       ${workerList:+Workers=" ${workerList[@]}"}\
+       "$(dovars Assemblies HdlPlatforms HdlTargets RccPlatforms RccHdlPlatforms Workers)" \
        $OCPI_MAKE_OPTS
   if [ "$dirtype" == "project" -a -z "$hardClean" ] ; then
-    make ${verbose:+AT=} imports
-    make ${verbose:+AT=} exports
+    domake . project exports      # export a cleaned project, perhaps for platform bootstrapping
+    if [ -n "$cleanTarget" ]; then
+      domake . project cleanimports # will remove the default registry, but not a different one
+    else
+      domake . project imports
+    fi
   fi
 }
 
@@ -1839,8 +1604,7 @@ function do_assembly {
   esac
   adir=$subdir$1
   if [ "$verb" == build ]; then
-    make -C $subdir/$1 ${verbose:+AT=} ${buildClean:+clean} ${hdlplats:+HdlPlatforms=" ${hdlplats[@]}"} \
-      $OCPI_MAKE_OPTS
+    eval domake $subdir/$1 hdl-assembly ${buildClean:+clean} "$(dovars HdlPlatforms)" $OCPI_MAKE_OPTS
     return 0
   fi
   if [ "$verb" == delete ]; then
@@ -1855,48 +1619,36 @@ function do_assembly {
   [ -e "$subdir$1" ] && bad the HDL assembly \"$1\" in directory \"$topdir$subdir$1\" already exists
   if [ "$dirtype" == project -a ! -e hdl/assemblies ]; then
     mkdir -p hdl/assemblies
-    cat <<EOF > hdl/assemblies/Makefile
-$CheckCDK
-# To restrict the HDL assemblies that are built, you can set the Assemblies
-# variable to the specific list of which ones you want to build, e.g.:
-# Assemblies=assy1 assy3
-# Otherwise all assemblies will be built
-# Alternatively, you can set ExcludeAssemblies to list the ones you want to exclude
-include \$(OCPI_CDK_DIR)/include/hdl/hdl-assemblies.mk
-EOF
-    [ -z "$verbose" ] || echo This is the first HDL assembly in this project.  The \"hdl/assemblies\" directory has been created.
+    cat <<-EOF > hdl/assemblies/assemblies.xml
+	<!-- This is the XML file for the hdl/assemblies directory
+	     To restrict the HDL assemblies that are built, you can set the Assemblies
+	     attribute to the specific list of which ones you want to build, e.g.:
+	       Assemblies='assy1 assy3'
+	     Otherwise all assemblies will be built
+	     Alternatively, you can set ExcludeAssemblies to list the ones you want to exclude -->
+	<assemblies/>
+	EOF
+    [ -z "$verbose" ] ||
+	echo This is the first HDL assembly in this project.  The \"hdl/assemblies\" directory has been created.
   fi
   mkdir $subdir$1
-  cat <<EOF > $subdir$1/Makefile
-$CheckCDK
-# This is the HDL assembly Makefile for the "$1" assembly
-# The file "$1.xml" defines the assembly.
-# The default container for all assemblies is one that connects all external ports to
-# the devices interconnect to communicate with software workers or other FPGAs.
-#
-# Limit this assembly to certain platforms or targets with Exclude/Only and Targets/Platforms ie:
-# ExcludePlatforms=
-${targets:+OnlyTargets=${targets[@]}}
-${extargets:+ExcludeTargets=${extargets[@]}}
-${onlyplats:+OnlyPlatforms=${onlyplats[@]}}
-${explats:+ExcludePlatforms=${explats[@]}}
-#1752:
-# If you want to modify the default MAP options for Xilinx bitstream builds, export
-# the "OcpiXstMapOptions" variable here (the default options are shown below) e.g:
-# export OcpiXstMapOptions=-detail -w -logic_opt on -xe c -mt 4 -register_duplication on -global_opt off -ir off -pr off -lc off -power off
-# Note that the -t option should not be added in OcpiXstMapOptions as it is
-# already handled by a different mechanism.
-#
-# If you want to modify the default PAR options for Xilinx bitstream builds, export
-# the "OcpiXstParOptions" variable here (the default options are shown below) e.g:
-# export OcpiXstParOptions=-mt 4 -w -xe n
-#
-# If you want to connect external ports of the assembly to local devices on the platform,
-# you must define container XML files, and mention them in a "Containers" variable here, e.g.:
-# Containers=take_input_from_local_ADC
+  (
+    cat <<-EOF
+	<!-- This is the HDL XML Makefile for the "$1" assembly
+	     The file "$1.xml" defines the assembly.
+	     The default container for all assemblies is one that connects all external ports to
+	     the devices interconnect to communicate with software workers or other FPGAs.
+	     Limit this assembly to certain platforms or targets with
+	     Exclude/Only and Targets/Platforms ie: -->
 
-include \$(OCPI_CDK_DIR)/include/hdl/hdl-assembly.mk
-EOF
+	     If you want to connect external ports of the assembly to local devices on the platform,
+	     you must define container XML files, and mention them in a "Containers" variable here, e.g.:
+	     Containers='take_input_from_local_ADC' -->
+	<assembly
+	EOF
+    doattrs OnlyTargets ExcludeTargets OnlyPlatforms ExcludePlatforms Containers
+    printf ">\n</assembly>\n"
+  ) > $subdir$1/$1.xml
   [ -z "$verbose" ] || {
     echo HDL assembly \"$1\" created in the directory \"$topdir$subdir$1\"
     echo For non-default containers, an xml file is required and must be mentioned in the Makefile
@@ -1909,7 +1661,8 @@ EOF
   <Instance Worker='nothing' name='nothing'/>
 </HdlAssembly>
 EOF
-  [ -z "$verbose" ] || echo The HDL assembly \"$assy\" has been created in ${topdir}hdl/assemblies/$assy/$assy.xml
+  [ -z "$verbose" ] || \
+      echo The HDL assembly \"$assy\" has been created in ${topdir}hdl/assemblies/$assy/$assy.xml
 }
 
 function help_create {
@@ -1931,7 +1684,7 @@ Choices:
 Options for the create|delete verbs:
  == create project ==
   -D <project>       *Another project that this project depends on (use package-ID, e.g. ocpi.core)
-                      (adds to "ProjectDependencies" in Project.mk)
+                      (adds to "ProjectDependencies" in XML file)
   --register         Register the project in the project registry
                       (for other projects to optionally depend on)
 
@@ -1969,44 +1722,44 @@ Options for the create|delete verbs:
   -P <platform>      Create this worker in the devices library underneath the specified platform
   --worker-version   Specify the worker API version
      <version>
-  -W <worker>        *A worker to include (adds to "Workers" variable in worker Makefile)
+  -W <worker>        *A worker to include (adds to "Workers" variable in worker XML file)
                       Use <worker>:<spec> if spec name is different from worker name
   -R <rcc-static>    *Add an RCC static prerequisite library dependency to an RCC worker
-                      (adds to "RccStaticPrereqLibs" in Makefile)
+                      (adds to "RccStaticPrereqLibs" in XML file)
   -r <rcc-dynamic>   *Add an RCC dynamic prerequisite library dependency to an RCC worker
-                      (adds to "RccDynamicPrereqLibs" in Makefile)
+                      (adds to "RccDynamicPrereqLibs" in XML file)
 
  == create worker|{hdl device|primitive|platform} ==
-  -O <other>         *Other source files to include (adds to "SourceFiles" in Makefile)
-  -C <core>          *Core to be included by this asset (adds to "Cores" in Makefile)
+  -O <other>         *Other source files to include (adds to "SourceFiles" in XML file)
+  -C <core>          *Core to be included by this asset (adds to "Cores" in XML file)
 
  == create project|library|worker|{hdl device|platform} ==
-  -A <xml-include>   *A directory to search for XML files (adds to "XmlIncludeDirs" in Makefile)
+  -A <xml-include>   *A directory to search for XML files (adds to "XmlIncludeDirs" in XML file)
   -I <include>       *A directory to search for language include files (e.g. C/C++ or Verilog)
-                      (Adds to "IncludeDirs" in Makefile)
+                      (Adds to "IncludeDirs" in XML file)
   -y <comp-library>  *Specify a component library to search for workers/devices/specs that this
-                      asset references (adds to "ComponentLibraries" in Makefile)
+                      asset references (adds to "ComponentLibraries" in XML file)
   -Y <library>       *Specify a primitive library that this asset depends on
-                      (adds to "Libraries" in Makefile)
+                      (adds to "Libraries" in XML file)
 
  == create worker|{hdl device|primitive|platform|assemblies} ==
   -T <target>        *Specify one of the build-targets to limit this asset to
-                      (adds to "OnlyTargets" in Makefile)
-  -Z <target>        *Exclude a build-target for this asset (add to "ExcludeTargets" in Makefile)
+                      (adds to "OnlyTargets" in XML file)
+  -Z <target>        *Exclude a build-target for this asset (add to "ExcludeTargets" in XML file)
   -G <platform>      *Specify one of the build-platforms to limit this asset to
-                      (adds to "OnlyPlatforms" in Makefile)
+                      (adds to "OnlyPlatforms" in XML file)
   -Q <platform>      *Exclude a build-platform for this asset
-                      (adds to "ExcludePlatforms" in Makefile)
+                      (adds to "ExcludePlatforms" in XML file)
   -U <supports>      *A device (worker) supported by the subdevice being created
 
  == create hdl primitive core ==
-  -M <top-module>    Top level module name (default is name of the core) (sets "Top" in Makefile)
+  -M <top-module>    Top level module name (default is name of the core) (sets "Top" in XML file)
   -B <core>          Specify a prebuilt (not source) core (ie. *.ngc or *.edf file)
-                     (sets "PreBuiltCore" in Makefile)
+                     (sets "PreBuiltCore" in XML file)
 
  == create hdl primitive library ==
-  -H                 Primitive does not depend on any libraries (sets "HdlNoLibraries" in Makefile)
-  -J                 Do not elaborate this HDL library (sets "HdlNoElaboration" in Makefile)
+  -H                 Primitive does not depend on any libraries (sets "HdlNoLibraries" in XML File)
+  -J                 Do not elaborate this HDL library (sets "HdlNoElaboration" in XML File)
                      (limited tool support)
 
  == create hdl platform ==
@@ -2188,7 +1941,7 @@ be assumed as determined from the environment.
 Defaults:
   The default registry is determined as follows:
     OCPI_PROJECT_REGISTRY_DIR environment variable if set
-    Otherwise: OCPI_CDK_DIR/../project-registry
+    Otherwise: OCPI_ROOT_DIR/project-registry
 
   To change your environment's default project-registry, set the OCPI_PROJECT_REGISTRY_DIR
   environment variable.
@@ -2309,12 +2062,20 @@ function myshift {
   unset argv[0]
   argv=(${argv[@]})
 }
+# Take the next arg and put it into a variable
 function takeval {
   [ -z "${argv[1]}" ] && bad missing value after ${argv[0]} option for $1
   [[ "${argv[1]}" == -* ]] && bad value after ${argv[0]} option: ${argv[1]}
   eval $1=\'${argv[1]}\'
   # eval echo ARGV:$1:\$\{$1\}
   myshift
+}
+# Take the next arg and add it to an array variable
+function takelist {
+  local value
+  takeval value
+  eval "$1+=($value)"
+  # eval echo ARGVLIST:$1:\$\{$1[*]\}
 }
 
 set -e
@@ -2418,46 +2179,41 @@ while [[ "${argv[0]}" != "" ]] ; do
         ;;
       (-s) standalone=1;;
       # project options
-      (-N) takeval packagename; wname=$packagename ;; #internally defaults to dirname (except components)
+      (-N) takeval packagename;; #internally defaults to dirname (except components)
       (-F) takeval packageprefix ;; #default is 'local' for projects (internally defaults to package-id of parent for libraries)
-      (-K) takeval package ;; #default is empty. internally, this defaults to prefix.name
+      (-K) takeval packageid ;; #default is empty. internally, this defaults to prefix.name
       (--register) register_enable=1 ;;
       (-D) takeval dependency; dependencies=(${dependencies[@]} ${dependency//:/ }) ;;
       # worker options
       (-S) takeval spec ;; # default for worker is <worker-name>-spec.xml
       (-P) takeval platform ;;
-      (-L) takeval language ;;
-      (-V) takeval slave ;;
-      (-E) takeval emulates ;;
-      (-W) takeval worker; workers=(${workers[@]} $worker) ;;
-      (-I) takeval include; includes=(${includes[@]} $include) ;;
-      (-A) takeval xmlinclude; xmlincludes=(${xmlincludes[@]} $xmlinclude) ;;
-      (-Y) takeval liblib; liblibs=(${liblibs[@]} $liblib) ;;
-      (-y) takeval complib; complibs=(${complibs[@]} $complib) ;;
-
-      (-R) takeval rccstatprereq; rccstatprereqs=(${rccstatprereqs[@]} $rccstatprereq) ;;
-      (-r) takeval rccdynprereq; rccdynprereqs=(${rccdynprereqs[@]} $rccdynprereq) ;;
-
-      (-g) takeval hdlpart ;;
+      (-L) takeval Language ;;
+      (-V) takeval Slave ;;
+      (-E) takeval Emulate ;;
+      (-W) takelist multiworkers;; # this is for multi-worker worker dirs, unrelated to --worker
+      (-I) takelist IncludeDirs;;
+      (-A) takelist XmlIncludeDirs;;
+      (-Y) takelist Libraries;;
+      (-y) takelist ComponentLibraries;;
+      (-R) takelist StaticPrereqLibs;;
+      (-r) takelist DynamicPrereqLibs;;
+      (-g) takeval Part ;;
       (-q) takeval timefreq ;;
       (-u) nosdp=1 ;;
       (--log-level) takeval loglevel; export OCPI_LOG_LEVEL=$loglevel;;
-      (-O) takeval other; others=(${others[@]} $other) ;;
-      (-C) takeval core; cores=(${cores[@]} $core) ;;
-
-      (-T) takeval target; targets=(${targets[@]} $target) ;;
-      (-Z) takeval extarget; extargets=(${extargets[@]} $extarget) ;;
-
-      (-G) takeval onlyplat; onlyplats=(${onlyplats[@]} $onlyplat) ;;
-      (-Q) takeval explat; explats=(${explats[@]} $explat) ;;
-
-      (-U) takeval supports; supported=(${supported[@]} $supports) ;;
+      (-O) takelist SourceFiles;;
+      (-C) takelist Cores;;
+      (-T) takelist OnlyTargets;;
+      (-Z) takelist ExcludeTargets;;
+      (-G) takelist OnlyPlatforms;;
+      (-Q) takelist ExcludePlatforms;;
+      (-U) takelist supported;;
       # hdl primitive options
-      (-M) takeval module ;;
-      (-B) takeval prebuilt ;;
+      (-M) takeval Top ;;
+      (-B) takeval PreBuiltCore ;;
       # hdl primitive libraries
-      (-H) hdlnolib=1 ;;
-      (-J) hdlnoelab=1 ;;
+      (-H) HdlNoLibraries=1 ;;
+      (-J) HdlNoElaboration=1 ;;
       # for apps
       (-X) xmlapp=1;;
       (-x) xmldirapp=1;;
@@ -2466,21 +2222,27 @@ while [[ "${argv[0]}" != "" ]] ; do
       (--clean-all) hardClean=1;;
       (--build-rcc|--rcc) buildRcc=1;;
       (--build-hdl|--hdl) buildHdl=1;;
-      (--worker) takeval curWorker; workerList="${workerList[@]} $curWorker";;
+      (--worker) takelist Workers;;
+      (--workers-as-needed) export OCPI_AUTO_BUILD_WORKERS=1;;   # A big hammer for now
       (--build-no-assemblies|--no-assemblies) buildNoAssemblies=1;;
-      (--build-hdl-assembly|--build--assembly|--hdl-assembly) takeval assy; assys="${assys[@]} $assy";;
-      (--build-hdl-target|--hdl-target) takeval hdltarget; hdltargets="${hdltargets[@]} $hdltarget";;
-      (--build-hdl-platform|--hdl-platform) takeval hdlplat; hdlplats="${hdlplats[@]} $hdlplat";;
-      (--build-rcc-platform|--rcc-platform) takeval swplat; swplats="${swplats[@]} $swplat";;
-      (--build-rcc-hdl-platform|--rcc-hdl-platform) takeval hwswplat; hwswplats="${hwswplats[@]} $hwswplat";;
+      (--build-hdl-assembly|--build--assembly|--hdl-assembly) takelist Assemblies;;
+      (--build-hdl-target|--hdl-target) takelist HdlTargets;;
+      (--build-hdl-platform|--hdl-platform) takelist HdlPlatforms;;
+      (--build-rcc-platform|--rcc-platform) takelist RccPlatforms;;
+      (--build-rcc-hdl-platform|--rcc-hdl-platform) takelist RccHdlPlatforms;;
       # OCPI_API_DEPRECATED 2.0 (AV-3457, specific search string)
-      (--build-hdl-rcc-platform|--hdl-rcc-platform) warn "${argv[0]} is deprecated: use --rcc-hdl-platform to specify RCC platform using HDL name"; takeval hwswplat; hwswplats="${hwswplats[@]} $hwswplat";;
+      (--build-hdl-rcc-platform|--hdl-rcc-platform) warn "${argv[0]} is deprecated: use --rcc-hdl-platform to specify RCC platform using HDL name"; takelist RccHdlPlatforms;;
       (--create-build-files) OCPI_CREATE_BUILD_FILES=1;;
       (--version) ocpirun --version; exit 0;;
-      (--worker-version) takeval version;;
+      (--worker-version) takeval Version;;
       (--run_arg) takeval run_arg;;
       (--optimize) optimize=1;;
       (--dynamic) dynamic=1;;
+      (--container) takelist Containers;;
+      (--configuration) takelist Configurations;;
+      (--generate) generate=1;;     # for building tests, do the "generate" subset of build
+      (--simulation) simulation=1;; # for cleaning tests, clean the simulation directories
+      (--execute) execute=1;;       # for cleaning tests, clean the execution/run directories
       (*)
         error_msg="unknown option: ${argv[0]}"
         if [ -n "$verb" ]; then
@@ -2559,7 +2321,7 @@ done
 #todo move this up where the other ones are when its not just project creation
 if [ "$verb" == "create" -a "$noun" == "project" ]; then
   ocpidev_create_options=`sed -E 's/(^| )create( |$)/ /' <<< "${original_argv[@]}"`
-  $OCPI_CDK_DIR/scripts/ocpicreate.py $ocpidev_create_options
+  ocpidev create $ocpidev_create_options
   exit $?
 fi
 if [ -n "$help_screen" ]; then
@@ -2618,8 +2380,8 @@ fi
 [ -n "$packageprefix" -a \( "$verb" != create -o "$noun" != project -a "$noun" != library \) ] &&
   bad the -F '(packageprefix)' option is only valid when creating a project or library
 # package
-[ -n "$package" -a \( "$verb" != create -o \( "$noun" != project -a "$noun" != library \) \) ] &&
-  bad the -K '(package)' option is only valid when creating a project or library
+[ -n "$packageid" -a \( "$verb" != create -o \( "$noun" != project -a "$noun" != library \) \) ] &&
+  bad the -K '(PackageID)' option is only valid when creating a project or library
 # dependencies
 [ -n "$dependencies" -a \( "$verb" != create -o "$noun" != project \) ] &&
   bad the -D '(dependencies)' option is only valid when creating a project
@@ -2630,48 +2392,48 @@ fi
 [ -n "$platform" -a \( "$noun" != spec -a "$noun" != device -a "$noun" != worker -a "$noun" != test -a "$noun" != library \) ] &&
   bad the -P '(platform)' option is only valid when creating an HDL device worker, worker, test, or a platform\'s devices library
 # language
-[ -n "$language" -a \( "$verb" != create -o \( "$noun" != device -a "$noun" != worker \) \) ] &&
+[ -n "$Language" -a \( "$verb" != create -o \( "$noun" != device -a "$noun" != worker \) \) ] &&
   bad the -L '(language)' option is only valid when creating a worker
 # slave
-[ -n "$slave" -a \( "$verb" != create -o "$noun" != worker \) ] &&
+[ -n "$Slave" -a \( "$verb" != create -o "$noun" != worker \) ] &&
   bad the -V '(slave worker)' option is only valid when creating a worker
 # workers
-[ -n "$workers" -a \( "$verb" != create -o \( "$noun" != worker \) \) ] &&
+[ -n "$multiworkers" -a \( "$verb" != create -o \( "$noun" != worker \) \) ] &&
   bad the -W '(one of multiple workers)' option is only valid when creating a worker
 # emulate
-[ -n "$emulates" -a \( "$verb" != create -o "$noun" != device \) ] &&
+[ -n "$Emulate" -a \( "$verb" != create -o "$noun" != device \) ] &&
   bad the -E '(emulates)' option is only valid when creating an HDL device worker
 [ -n "$supported" -a "$noun" != device ] &&
   bad the -U '(supports)' option is only valid when creating an HDL device worker
 # module
-[ -n "$module" -a \( "$verb" != create -o "$noun" != primitive -a "${args[0]}" != core \) ] &&
+[ -n "$Top" -a \( "$verb" != create -o "$noun" != primitive -a "${args[0]}" != core \) ] &&
   bad the -M '(module)' option is only valid when creating an HDL primitive core
 # prebuilt
-[ -n "$prebuilt" -a \( "$verb" != create -o \( "$noun" != primitive -o "${args[0]}" != core \) \) ] &&
+[ -n "$PreBuiltCore" -a \( "$verb" != create -o \( "$noun" != primitive -o "${args[0]}" != core \) \) ] &&
   bad the -B '(prebuilt)' option is only valid when creating an HDL primitive core
 # targets/platforms limiting
-[ \( -n "$targets" -o -n "$extargets" -o -n "$onlyplats" -o -n "$explats" \) -a \( "$verb" != create -o \( "$noun" != worker -a "$noun" != device -a "$noun" != primitive -a "$noun" != assembly \) \) ] &&
+[ \( -n "$OnlyTargets" -o -n "$ExcludeTargets" -o -n "$OnlyPlatforms" -o -n "$ExcludePlatforms" \) -a \( "$verb" != create -o \( "$noun" != worker -a "$noun" != device -a "$noun" != primitive -a "$noun" != assembly \) \) ] &&
   bad the -T, -Z, -G or -Q, '(only/exclude targets/platforms)' options are only valid when creating a worker, device, primitive, or assembly
 # platform options
 [ \( -n "$hdlpart" -o -n "$timefreq" -o -n "$nosdp" \) -a \( "$verb" != create -o "$noun" != "platform" \) ] &&
   bad the -g, -q, or -u '(hdl-part, time-freq, no-sdp)' are only valid when creating an hdl platform.
 # includes
-[ \( -n "$includes" \) -a \( "$verb" != create -o \( "$noun" != "worker" -a "$noun" != "device" -a "$noun" != "platform" -a "$noun" != "library" -a "$noun" != "project" \) \) ] &&
-  bad the -I '(includes)' option is only valid when creating a worker, device, platform, library, or project
+[ \( -n "$IncludeDirs" \) -a \( "$verb" != create -o \( "$noun" != "worker" -a "$noun" != "device" -a "$noun" != "platform" -a "$noun" != "library" -a "$noun" != "project" \) \) ] &&
+  bad the -I '(IncludeDirs)' option is only valid when creating a worker, device, platform, library, or project
 # xml includes
-[ \( -n "$xmlincludes" \) -a \( "$verb" != create -o \( "$noun" != "worker" -a "$noun" != "device" -a "$noun" != "platform" -a "$noun" != "library" -a "$noun" != "project" \) \) ] &&
+[ \( -n "$XmlIncludeDirs" \) -a \( "$verb" != create -o \( "$noun" != "worker" -a "$noun" != "device" -a "$noun" != "platform" -a "$noun" != "library" -a "$noun" != "project" \) \) ] &&
   bad the -A '(xmlincludes)' option is only valid when creating a worker, device, platform, library, or project
 # primitive library options
 [ \( -n "$hdlnoelab" -o -n "$hdlnolib" \) -a \( "$verb" != create -o \( "$noun" != "primitive" -o  "${args[0]}" != library \) \) ] &&
   bad the -H or -J '(hdlnolib, hdlnoelab)' options are only valid when creating an hdl primitive library.
 # rccprereqs FIXME: Should limit this makevariable to rcc workers only
-[ \( -n "$rccstatprereqs" -o -n "$rccdynprereqs" \) -a \( "$verb" != create -o \( "$noun" != "worker" \) \) ] &&
+[ \( -n "$StaticPrereqLibs" -o -n "$DynamicPrereqLibs" \) -a \( "$verb" != create -o \( "$noun" != "worker" \) \) ] &&
   bad the -R or -r '(rcc static/dynamic prereq)' option is only valid when creating a proxy worker
 # libraries include
-[ \( -n "$liblibs" \) -a \( "$verb" != create -o \( "$noun" != "worker" -a "$noun" != "device" -a "$noun" != "platform" -a "$noun" != "primitive" -a "$noun" != "library" -a "$noun" != "project" \) \) ] &&
+[ \( -n "$Libraries" \) -a \( "$verb" != create -o \( "$noun" != "worker" -a "$noun" != "device" -a "$noun" != "platform" -a "$noun" != "primitive" -a "$noun" != "library" -a "$noun" != "project" \) \) ] &&
   bad the -Y, '(libraries)' option is only valid when creating a worker, device, platform, primitive, library, or project
 # componentlibraries reference
-[ \( -n "$complibs" \) -a \( "$verb" != create -o \( \( "$noun" != "worker" -o -z "$slave" \) -a \( \( "$noun" != "device" \) -o \( -z "$emulates" -a -z "$supported" \) \) -a "$noun" != "platform" -a "$noun" != "library" -a "$noun" != "project" \) \) ] &&
+[ \( -n "$ComponentLibraries" \) -a \( "$verb" != create -o \( \( "$noun" != "worker" -o -z "$Slave" \) -a \( \( "$noun" != "device" \) -o \( -z "$Emulate" -a -z "$supported" \) \) -a "$noun" != "platform" -a "$noun" != "library" -a "$noun" != "project" \) \) ] &&
   bad the -y, '(component-libraries)' option is only valid when creating a proxy worker, device emulator, subdevice, platform, library, or project
 # xml app
 [ \( -n "$xmlapp" -o -n "$xmldirapp" \) -a \( \( "$verb" != create -a "$verb" != delete \) -o "$noun" != "application" \) ] &&
@@ -2682,18 +2444,18 @@ fi
     build_suffix=-
     [ -n "$dynamic" ] && build_suffix+=d
     [ -n "$optimize" ] && build_suffix+=o
-    if [ -z "$swplats" ]; then
+    if [ -z "$RccPlatforms" ]; then
 	# If we did not mention an rcc platform, we meant the host we are running on
 	# But to supply options you need to specify it in any case
-	swplats=$OCPI_TOOL_PLATFORM$build_suffix
+	RccPlatforms=$OCPI_TOOL_PLATFORM$build_suffix
     else
 	# add the suffix to all platforms and check that we are not already using suffixes
-	for $p in ${swplats[@]}; do
+	for p in ${RccPlatforms[@]}; do
 	    [[ $p == *-* ]] &&
 		bad "You cannot use the --dynamic or --optimize build options and also specify build options in a platform name (in this case: $p)"
-	    newplats="${newplats[@]} $p$build_suffix"
+	    newplats+=($p$build_suffix)
         done
-	swplats=newplats
+	RccPlatforms=(${newplats[@]})
     fi
 }
 # For future support of rcc platforms, primitives, and in general the rcc subtree
@@ -2714,10 +2476,13 @@ fi
 if [ "$verb" == "build" -a -z "$buildClean" ]; then
   pjtop=$(if [ "$noun" == "project" ]; then cd $subdir/${args[0]}; fi; get_project_top)
   if [ -n "$pjtop" ]; then
-    (cd $pjtop && make imports)
+    domake $pjtop project imports
   fi
 fi
-[ -z "$verbose" ] || echo Executing the \"$verb $hdl$noun\" command in a ${dirtype:-unknown type of} directory: $directory.
+get_dirtype .
+showverb=$verb
+[ -n "$buildClean" ] && showverb=clean
+[ -z "$verbose" ] || echo Executing the \"$showverb${noun:+ $hdl$noun}\" command in a ${dirtype:-unknown type of} directory: $directory.
 case $noun in
   (project)      do_project ${args[@]} ;;
   (registry)     do_registry ${args[@]} ;;
@@ -2748,6 +2513,11 @@ case $noun in
   (*)
     if [ "$verb" == "build" ] ; then
       do_build_here ${args[@]}
+      # If we are being asked to really clean, nuke the metadata
+      if [ -n "$buildClean" -a -n "$hardClean" ]; then
+	  rm -f project-metadata.xml
+	  exit 0
+      fi
     else
       bad the noun \"$noun\" is invalid after the verb \"$verb\"
     fi ;;

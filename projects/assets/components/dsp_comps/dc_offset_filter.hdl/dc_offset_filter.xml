@@ -1,4 +1,8 @@
-<HdlWorker Language="vhdl" Spec="dc_offset_filter-spec.xml" Version="2" DataWidth="32">
+<HdlWorker Language="vhdl" Spec="dc_offset_filter-spec.xml" Version="2" DataWidth="32"
+	   ExactParts='zynq:xc7z020-1-clg484
+		       zynq_ise:xc7z020_ise_alias-1-clg484
+		       virtex6:xc6vlx240t-1-ff1156
+		       stratix4:ep4sgx230k-c2-f40'>
 
   <Property Name="LATENCY_p" Type="uchar" Parameter="true" Default="1"
 	    Description='Number of clock cycles between a valid input and a valid output'/>

@@ -83,11 +83,20 @@
 +tools/ocpidev/assets/worker.py <target>/lib/_opencpi/assets/
 +tools/ocpidev/assets/template.py <target>/lib/_opencpi/assets/
 +tools/ocpidev/assets/component.py <target>/lib/_opencpi/assets/
-+tools/ocpidev/ocpidev.sh <target>/bin/ocpidev
++tools/ocpidev/ocpidev.py <target>/bin/ocpidev
++tools/ocpidev/ocpidev_args.py scripts/
++tools/ocpidev/ocpiargparse.py scripts/
++tools/ocpidev/ocpidev.sh scripts/
 +tools/ocpidev/ocpidev_run.py scripts/
 +tools/ocpidev/ocpishow.py scripts/
 +tools/ocpidev/ocpidev_utilization.py scripts/
-+tools/ocpidev/ocpicreate.py scripts/
++tools/ocpidoc/doc <target>/lib/ocpidoc/
++tools/ocpidoc/ocpidoc.py <target>/lib/ocpidoc/
++tools/ocpidoc/ocpi_documentation <target>/lib/ocpidoc/
++tools/ocpidoc/test <target>/lib/ocpidoc/
++tools/ocpidoc/xml_tools <target>/lib/ocpidoc/
++tools/ocpidoc/ocpidoc.sh <target>/bin/ocpidoc
++tools/ocpi_protocol_view/ocpi_protocol_view.py <target>/bin/ocpi_protocol_view
 # generic make scripts
 +tools/include/show.mk include/
 +tools/include/lib.mk include/
@@ -121,6 +130,7 @@
 +tools/scripts/export-platform.sh scripts/
 +tools/scripts/export-utils.sh scripts/
 +tools/scripts/export-platform-to-framework.sh scripts/
++tools/scripts/enable-rcc-platform.sh scripts/
 # Put this script where the executables are exported to run there - needed?
 =runtime/ctests/src/run_tests.sh <target>/bin/ctests/
 #+runtime/ctests/src/run_tests.sh scripts/
@@ -191,8 +201,11 @@
 # Utilities for unit test scripts
 +tools/python/opencpi/unit_test_utils.py <target>/lib/opencpi/
 +tools/python/opencpi/complexshortwithmetadata_utils.py <target>/lib/opencpi/
++tools/python/opencpi/complexshorttimedsample_utils.py <target>/lib/opencpi/
 +tools/python/opencpi/iqstream_utils.py <target>/lib/opencpi/
 +tools/python/opencpi/dsp_utils.py <target>/lib/opencpi/
++tools/python/opencpi/ocpi_testing <target>/lib/opencpi/
++tools/python/opencpi/ocpi_protocols <target>/lib/opencpi/
 ################################################################################
 # RCC related exclusions and additions
 # We don't want everything so we are selective here.  was: +tools/include/rcc include/rcc
@@ -304,8 +317,8 @@
 +runtime/remote-support/scripts/ocpiremote.py <target>/bin/ocpiremote
 ################################################################################
 # Man pages (initially premade)
-+doc/man/man1 doc/man/
-+doc/man/html doc/man/
++doc/man/gen/man1 doc/man/
++doc/man/gen/html doc/man/
 # PDFs and HTML (aka gitlab.io)
 +.public/releases/* doc/pdfs/
 

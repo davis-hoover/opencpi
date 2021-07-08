@@ -102,7 +102,7 @@ namespace OCPI {
       : Protocol(other)
     {
       err = NULL;
-      if (w.findMetaPort(a_name)) {
+      if (w.findMetaPort(a_name, this)) {
 	err = esprintf("Can't create port named \"%s\" since it already exists", a_name);
 	return;
       }

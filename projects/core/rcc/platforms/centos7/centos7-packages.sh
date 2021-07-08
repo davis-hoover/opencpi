@@ -81,8 +81,8 @@ PKGS_D+=(flex)
 PKGS_D+=(libSM libXi libXrandr)
 #    for the new "xilinx19_2_aarch*" platforms
 PKGS_D+=(openssl-devel)
-
-
+#    for asciidoc3 man page generation (asciidoc3 is a prereq)
+PKGS_D+=(docbook-style-xsl)
 
 ##########################################################################################
 # S. yum-installed and but not rpm-required - conveniences or required for source environment
@@ -126,8 +126,10 @@ PKGS_E+=(ocl-icd)
 PKGS_E+=(${python3_ver}-scons)
 #    Needed to build certain linux kernels or u-boot, at least Xilinx 2015.4
 PKGS_E+=(dtc openssl-devel)
-#    Need to build plutosdr osp 
+#    Needed to build plutosdr osp 
 PKGS_E+=(perl-ExtUtils-MakeMaker)
+#    Needed to build ettus_n310 osp
+PKGS_E+=(chrpath diffstat texinfo)
 #    Needed to generate gitlab-ci yaml
 PKGS_E+=(python36-PyYAML)
 
@@ -140,6 +142,9 @@ PKGS_E+=(python36-PyYAML)
 #    now, assume the justification for a package in this category is the same
 #    as for its python2 counterpart as given above.
 PKGS_P+=(matplotlib)
+#    These next packages will be installed in a python36
+#    virtual environment for "ocpidoc" vs. "system-wide".
+#PKGS_P+=(sphinx sphinx_rtd_theme sphinxcontrib_spelling)
 
 #
 # Because long option strings impair readability.

@@ -100,8 +100,7 @@ namespace OCPI {
       bool maxProcs = false, minProcs = false, roundRobin = false;
       // FIXME: move app-specific parsing up into library assy
       if ((err = OE::checkAttrsVV(ax, baseAttrs, extraTopAttrs, NULL)) ||
-          (err = OE::checkElements(ax, "instance", "connection", "policy", "property",
-                                   "external", NULL)) ||
+          (err = OE::checkElements(ax, OCPI_ASSY_ELEMENTS, NULL)) ||
           (err = OE::getNumber(ax, "maxprocessors", &m_processors, &maxProcs)) ||
           (err = OE::getNumber(ax, "minprocessors", &m_processors, &minProcs)) ||
           (err = OE::getBoolean(ax, "roundrobin", &roundRobin)) ||
@@ -137,6 +136,8 @@ namespace OCPI {
       OE::getOptionalString(ax, m_package, "package");
       if (m_package.empty() || m_package[0] == '.') {
 	const char *env = getenv("OCPI_PROJECT_PACKAGE");
+	if (!env)
+	  env = getenv("OCPI_DEFAULT_PACKAGE");
 	std::string prefix = env ? env : "local";
        if (m_package[0] == '.')
 	 prefix += m_package;
@@ -145,10 +146,12 @@ namespace OCPI {
       for (ezxml_t ix = ezxml_cchild(ax, "Instance"); ix; ix = ezxml_cnext(ix))
         if ((err = addInstance(ix, extraInstAttrs, params)))
           return err;
-      const char *done = ezxml_cattr(ax, "done");
+      const char *finished = ezxml_cattr(ax, "finished");
+      if (!finished) // remove in 3.0
+        finished = ezxml_cattr(ax, "done"); // remove in 3.0
       unsigned n;
-      if (done) {
-        if ((err = getInstance(done, n)))
+      if (finished) {
+        if ((err = getInstance(finished, n)))
           return err;
         m_doneInstance = n;
       }
@@ -288,8 +291,6 @@ namespace OCPI {
           (err = c->addPort(*this, to, toPort, true, false, true, 0, params, toP)) ||
           (err = c->addPort(*this, from, fromPort, false, false, true, 0, params, fromP)))
         return err;
-      toP->m_connectedPort = fromP;
-      fromP->m_connectedPort = toP;
       return NULL;
     }
     // This is called to create an external connection either from the very short shortcut
@@ -618,7 +619,8 @@ namespace OCPI {
     }
     // There is no non-default constructor so initialize here...
     const char *Assembly::Instance::
-    parse(ezxml_t ix, Assembly &a, unsigned ordinal, const char **extraInstAttrs, const PValue *params) {
+    parse(ezxml_t ix, Assembly &a, unsigned ordinal, const char **extraInstAttrs,
+	  const PValue *params) {
       m_ordinal = ordinal;
       m_hasMaster = false;
       const char *err;
@@ -669,6 +671,8 @@ namespace OCPI {
             baseName(w, base); // strip off the authoring model suffix
           else if (!a.isImpl() && c)
 	    base = c;
+	  else
+	    continue; // ignore bad other instances here, errors will be caught later
 	  assert(!base.empty());
 	  const char *dot = strrchr(base.c_str(), '.');
           if (!strcasecmp(dot ? dot + 1 : base.c_str(), myBase.c_str())) {
@@ -717,9 +721,43 @@ namespace OCPI {
                                 "connectInput", NULL);
     }
 
+    // Get the port from the instance, creating it if needed.
+    // The instance owns the port, and we need to deal with cases when the port is
+    // mentioned more than once (like for multiple connections with different indices)
+    // The port may be named or unnamed.
+    const char *Assembly::Instance::
+    getPort(const char *name, bool isInput, bool isBidi, bool isKnown, Port *&port) {
+      assert(name || isKnown); // if not named, must at least know the role
+      for (auto it = m_ports.begin(); it != m_ports.end(); ++it) {
+	port = &*it;
+	if (!name) {
+	  if (it->m_name.empty() && it->m_role.m_provider == isInput &&
+	      it->m_role.m_bidirectional)
+	    return NULL;
+	} else if (!strcasecmp(name, it->m_name.c_str())) {
+	  if (isKnown && it->m_role.m_knownRole &&
+	      (isInput != it->m_role.m_provider || isBidi != it->m_role.m_bidirectional))
+	    return esprintf("Inconsistent use of port \"%s\" of instance \"%s\" as input "
+			    "or output or bidirectional", name, m_name.c_str());
+	  else
+	    return NULL;
+	}
+      }
+      m_ports.push_back(Port()); // emplace...
+      port = &m_ports.back();
+      if (name)
+        port->m_name = name;
+      port->m_role.m_provider = isInput;
+      port->m_role.m_bidirectional = isBidi;
+      port->m_role.m_knownRole = isKnown;
+      port->m_instance = m_ordinal;
+      return NULL;
+    }
+
     Assembly::Connection::
     Connection() : m_count(0) {}
 
+#if 0
     Assembly::Connection::
     Connection(const Connection &other)
       : m_name(other.m_name), m_externals(other.m_externals), m_ports(other.m_ports),
@@ -727,16 +765,16 @@ namespace OCPI {
     {
       Port *p0 = NULL, *p1 = NULL;
       for (auto it = m_ports.begin(); it != m_ports.end(); ++it) {
-	(*it).m_connection = this;
+	//	(*it).m_connection = this;
 	assert(!(p0 && p1));
-	(p0 ? p1 : p0) = &*it;
+	(p0 ? p1 : p0) = (*it).first;
       }
       if (p0 && p1) {
 	p0->m_connectedPort = p1;
 	p1->m_connectedPort = p0;
       }
     }
-
+#endif
     const char *Assembly::Connection::
     parse(ezxml_t cx, Assembly &a, unsigned &n, const PValue *params) {
       const char *err;
@@ -757,33 +795,20 @@ namespace OCPI {
 	return err;
       if (OE::countChildren(cx, "port") < 1)
         return "no ports found under connection";
-      Port *other = NULL;
-      for (ezxml_t x = ezxml_cchild(cx, "port"); x; x = ezxml_cnext(x)) {
-        Port tmp;
-        m_ports.push_back(tmp);
-        Port &p = m_ports.back();
-        if ((err = p.parse(x, a, *this, m_parameters, params)))
+      for (ezxml_t x = ezxml_cchild(cx, "port"); x; x = ezxml_cnext(x))
+        if ((err = parsePort(x, a)))
           return err;
-        if (other) {
-          ocpiAssert(!p.m_connectedPort && !other->m_connectedPort);
-          p.m_connectedPort = other;
-          other->m_connectedPort = &p;
-        } else
-          other = &p;
-      }
       return NULL;
     }
 
     const char *Assembly::Connection::
     addPort(Assembly &a, size_t instance, const char *portName, bool isInput, bool bidi,
-            bool known, size_t index, const PValue *params, Assembly::Port *&port) {
+            bool known, size_t index, const PValue */*params*/, Assembly::Port *&port) {
       const char *err;
-      Port tmp;
-      m_ports.push_back(tmp);
-      Port &p = m_ports.back();
-      if ((err = p.init(a, *this, portName, instance, isInput, bidi, known, index, params)))
-        return err;
-      port = &p;
+      if ((err = a.m_instances[instance]->getPort(portName, isInput, bidi, known, port)))
+	return err;
+      m_ports.emplace_back(port, index);
+      port->m_connections.push_front(this);
       return NULL;
     }
 
@@ -807,34 +832,19 @@ namespace OCPI {
       return NULL;
     }
 
-    const char *Assembly::Port::
-    init(Assembly &a, Connection &c, const char *name, size_t instance, bool isInput, bool bidir,
-         bool isKnown, size_t index, const PValue */*params*/) {
-      if (name)
-        m_name = name;
-      m_role.m_provider = isInput;
-      m_role.m_bidirectional = bidir;
-      m_role.m_knownRole = isKnown;
-      m_instance = instance;
-      m_role.m_provider = isInput;
-      m_connectedPort = NULL;
-      m_index = index;
-      m_connection = &c;
-      a.m_instances[instance]->m_ports.push_back(this);
-      return NULL;
-    }
+    Assembly::Port::
+    Port() : m_instance(SIZE_MAX) {}
 
     // Set parameters for the port, during and after XML parsing
     const char *Assembly::Port::
-    setParam(const char *name, const char *value) {
-      assert(m_connection);
+    setParam(Connection &c, const char *name, const char *value) {
       if (!strcasecmp(name, "buffersize") || !strcasecmp(name, "transport"))
-	return m_connection->m_parameters.add(name, value, true);
+	return c.m_parameters.add(name, value, true);
       return m_parameters.add(name, value, true);
     }
 
-    const char *Assembly::Port::
-    parse(ezxml_t x, Assembly &a, Connection &c, const PValue *pvl, const PValue *params) {
+    const char *Assembly::Connection::
+    parsePort(ezxml_t x, Assembly &a) {
       const char *err;
       std::string iName;
       unsigned instance;
@@ -864,9 +874,10 @@ namespace OCPI {
       } else
         return "One of 'name', 'from', or 'to' attribute must be present in 'port' element";
       // We don't know the role at all at this point
-      if ((err = init(a, c, name.c_str(), instance, isInput, false, isKnown, index, params)))
+      Port *p;
+      if ((err = addPort(a, instance, name.c_str(), isInput, false, isKnown, index, NULL, p)))
         return err;
-      return m_parameters.parse(pvl, x, "name", "instance", "from", "to", NULL);
+      return p->m_parameters.parse(NULL, x, "name", "instance", "from", "to", NULL);
     }
 
     Assembly::External::

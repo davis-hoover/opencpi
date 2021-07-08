@@ -50,47 +50,52 @@ set_property -dict [list CONFIG.DEVICE_ID {0x4243} \
 			CONFIG.BAR0_SIZE {1} \
 			CONFIG.BAR1_SIZE {1}] \
 			[get_ips axi_pcie_0]
+
+
+# ##
+# - NOTE Vivado 2020 has a different resulting directory structure when generating the IP
+#   * 2020.2 - The files are split between managed_ip_project.srcs, and manageded_ip_project.gen
+#   * 2019.2 - All files are under managed_ip_project.srcs
+#   * This will need to be reconsiled. 
+#   --> Using 2019.2 directory structure only.
+# ##
+
 # With IP properties, generate the IP:
 generate_target all [get_files $ip_dir/$ip_module.xci] 
 
-puts "After generate_target all, the current working directory is:"
-
-## Generate the IP
+# ##
+# Uncomment below to run synthesis step during IP generation 
 # create_ip_run [get_files -of_objects [get_fileset sources_1] $ip_dir/$ip_module.xci]
 # launch_runs ${ip_module}_synth_1
 # wait_on_run ${ip_module}_synth_1
-
-# ###
-# Copy the generated files to the appropriate directory location.  
-# ###
-
-# # Copy generated directory
-# file copy -force $gen_dir/ ../
-
-# ## 
-#  NOTE Vivado 2020 has a different resulting directory structure when generating the IP
-#  2020.2 - The files are split between managed_ip_project.srcs, and manageded_ip_project.gen
-#  2019.2 - All files are under managed_ip_project.srcs
-#  This will need to be reconsiled. 
-#  --> Using 2019.2 directory structure only.
 # ##
-# Copy source.xdc file
-file copy -force $ip_dir/${ip_module}/source ../
 
-# Copy hdl directory
-file copy -force $ip_dir/hdl/ ../hdl
-
-# Copy sim directory
-file copy -force $ip_dir/sim/ ../sim
-
-# Copy simulation directory
-file copy -force $ip_dir/simulation/ ../simulation
-
-# Copy synth ip variation top level file
-file copy -force $ip_dir/synth/ ../synth
-
-# Update IP variation file
-file copy -force $ip_dir/${ip_module}.xci ../
-
-
+# Vivado 2020.2 has a different resulting directory structure when generating the IP
+if {[version -short] >= "2020.2"} {
+  # Copy source.xdc file
+  file copy -force $gen_dir/${ip_module}/source ../
+  # Copy hdl directory
+  file copy -force $gen_dir/hdl/ ../hdl
+  # Copy sim directory
+  file copy -force $gen_dir/sim/ ../sim
+  # Copy simulation directory
+  file copy -force $gen_dir/simulation/ ../simulation
+  # Copy synth ip variation top level file
+  file copy -force $gen_dir/synth/ ../synth
+  # Update IP variation file
+  file copy -force $ip_dir/${ip_module}.xci ../
+} else {
+  # Copy source.xdc file
+  file copy -force $ip_dir/${ip_module}/source ../
+  # Copy hdl directory
+  file copy -force $ip_dir/hdl/ ../hdl
+  # Copy sim directory
+  file copy -force $ip_dir/sim/ ../sim
+  # Copy simulation directory
+  file copy -force $ip_dir/simulation/ ../simulation
+  # Copy synth ip variation top level file
+  file copy -force $ip_dir/synth/ ../synth
+  # Update IP variation file
+  file copy -force $ip_dir/${ip_module}.xci ../
+}
 puts "Successfully generated and copied files!"

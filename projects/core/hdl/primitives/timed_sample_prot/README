@@ -1,0 +1,10 @@
+This library provides the VHDL packages and modules for the timed-sample protocol. 
+The complex_short package aids in handling OpenCPI port protocols and their 
+messages. As they are created, this library will include each datatype for the 
+timed_sample protocol. These datatypes do not need to be in the same package.
+However, can be if deemed appropriate.
+
+The complex_short_timed_sample package provides marshalling functionality for
+ports using the OpenCPI timed_sample protocol. TO-DO/Fix-Me: Optimize by
+improving data width robustness. This should look different between having
+a 16 bit vs. a 32 bit data width.

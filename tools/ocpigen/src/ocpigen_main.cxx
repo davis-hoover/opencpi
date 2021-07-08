@@ -73,7 +73,7 @@ add to tree.
   CMD_OPTION  (skel,      s,    Bool,   NULL, "Generate the implementation skeleton file (modified part)") \
   CMD_OPTION  (assy,      a,    Bool,   NULL, "Generate the assembly implementation file (readonly)") \
   CMD_OPTION  (parameters,r,    Bool,   NULL, "Process raw parameters on stdin") \
-  CMD_OPTION  (build,     b,    Bool,   NULL, "Generate gen/Makefile from <worker.build>") \
+  CMD_OPTION  (build,     b,    Bool,   NULL, "Generate gen/<worker>.mk from <worker>-build.xml") \
   CMD_OPTION  (xml,       A,    Bool,   NULL, "Generate the artifact XML file for embedding") \
   CMD_OPTION  (workers,   W,    Bool,   NULL, "Generate the makefile fragment for workers in the assembly") \
   CMD_OPTION  (generics,  g,    Short,  "-1", "Generate the generics file a worker configuration") \
@@ -100,6 +100,8 @@ add to tree.
   CMD_OPTION  (nworkers,  N,    Bool,   NULL, "Multiple workers are actually implemented here (rcc)") \
   CMD_OPTION  (comp,      G,    Bool,   NULL, "Generate component output for use with ocpidev") \
   CMD_OPTION  (rxml,      R,    Bool,   NULL, "Parse project level properties from XML properties") \
+  CMD_OPTION  (optimized, Q,    Bool,   NULL, "Specify that compilation is optimized, for artifacts") \
+  CMD_OPTION  (auto_build,U,    Bool,   NULL, "Auto build workers found in assembly") \
 
 #define OCPI_OPTION
 #define OCPI_OPTIONS_NO_MAIN
@@ -116,7 +118,7 @@ main(int argc, const char **argv) {
   bool
     doDefs = false, doEnts = false, doImpl = false, doSkel = false, doAssy = false, doWrap = false,
     doArt = false, doTopContainer = false, doTest = false, doCases = false, verbose = false,
-    doTopConfig = false, doCompArt = false, doProjectXml = false;
+    doTopConfig = false, doCompArt = false, doAssetXml = false;
   int doGenerics = -1;
   if (argc <= 1) {
     fprintf(stderr,
@@ -267,7 +269,10 @@ main(int argc, const char **argv) {
         doCompArt = true;
         break;
       case 'R':
-        doProjectXml = true;
+        doAssetXml = true;
+        break;
+      case 'U':
+        g_autoAddParamConfig = true;
         break;
       default:
 	err = OU::esprintf("Unknown flag: %s\n", *ap);
@@ -316,40 +321,9 @@ main(int argc, const char **argv) {
             break;
           return 0;
         }
-        if (doProjectXml) {
-          std::string config, constraints;
-          OrderedStringSet platforms;
-          ezxml_t prop, name;
-          if ((err = parseFile(*ap, parent, "project", &xml, file, false, false))) {
-            err = OU::esprintf("For project XML file '%s':  %s", *ap, err);
-            break;
-          }
-          if (!(prop = ezxml_cchild(xml, "OcpiProperty"))) {
-            // Legacy syntax with property='value'
-            const char* const property[] = {"PackageName", "PackagePrefix", "Package",
-             "ProjectDependencies", "Libraries", "IncludeDirs", "XmlIncludeDirs",
-             "ComponentLibraries"};
-            int last = sizeof(property)/sizeof(property[0]);
-            char *value;
-            for (int idx = 0; idx < last; ++idx) {
-              value = (char *)ezxml_cattr(xml, property[idx]);
-              if (value)
-                printf("%s=%s\n", property[idx], value);
-            }
-          } else {
-            // Verbose syntax with OcpiPreoperty name and value
-            ezxml_t value;
-            do {
-              if ((name = ezxml_cchild(prop, "name"))) {
-                printf("%s=", name->txt);
-                value = ezxml_cchild(prop, "value");
-                if (value)
-                  printf("%s\n", value->txt);
-                else
-                  fputs("\n", stdout);
-              }
-            } while ((prop = ezxml_cnext(prop)));
-          }
+        if (doAssetXml) {
+	  if ((err = parseAsset(*ap, attribute)))
+	    break;
           return 0;
         }
 	// The parent file being empty is for code generation, and thus library dependency parsing

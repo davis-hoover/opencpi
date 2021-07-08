@@ -42,8 +42,11 @@ initHDL(::Assembly &assy) {
     if ((err = OE::getBoolean(m_xml, "emulated", &m_emulated)))
       return err;
     const char
+      // This says the instance implements a connection to an interconnect on the platform
       *ic = ezxml_cattr(m_xml, "interconnect"), // which interconnect
+      // This says it is inserted and thus should be transparent/ignored sometimes
       *ad = ezxml_cattr(m_xml, "adapter"),      // adapter to which interconnect or io
+      // This indicates a worker that is a device on a platform or card
       *io = ezxml_cattr(m_xml, "device");       // which device
     if ((err = OE::getNumber(m_xml, "configure", &m_config, &m_hasConfig, 0)))
       return OU::esprintf("Invalid configuration value for adapter: %s", err);
@@ -291,16 +294,24 @@ parseHdlAssy() {
   ::Assembly *a = m_assembly = new ::Assembly(*this);
 
   static const char
-    *topAttrs[] = {IMPL_ATTRS, HDL_TOP_ATTRS, HDL_IMPL_ATTRS, NULL},
-    // FIXME: reduce to those that are hdl specific
-    *instAttrs[] =  { INST_ATTRS },
-    *contInstAttrs[] = { "Index", "interconnect", "io", "adapter", "configure", "emulated", NULL},
-    *platInstAttrs[] = { "Index", "interconnect", "io", "adapter", "configure", NULL};
-  // Do the generic assembly parsing, then to more specific to HDL
-  if ((err = a->parseAssy(m_xml, topAttrs,
-			  m_type == Container ? contInstAttrs :
-			  (m_type == Configuration ? platInstAttrs : instAttrs))) ||
-      (err = parseClocks()))
+    *assyExtraTopAttrs[]  = { HDL_ASSEMBLY_EXTRA_TOP_ATTRS  NULL },
+    *assyExtraInstAttrs[] = { HDL_ASSEMBLY_EXTRA_INST_ATTRS  NULL },
+    *configExtraTopAttrs[]  = { HDL_CONFIG_ASSEMBLY_EXTRA_TOP_ATTRS  NULL },
+    *configExtraInstAttrs[] = { HDL_CONFIG_ASSEMBLY_EXTRA_INST_ATTRS  NULL },
+    *containerExtraTopAttrs[]  = { HDL_CONTAINER_ASSEMBLY_EXTRA_TOP_ATTRS  NULL },
+    *containerExtraInstAttrs[] = { HDL_CONTAINER_ASSEMBLY_EXTRA_INST_ATTRS  NULL };
+
+  switch (m_type) {
+  case Container:
+    err = a->parseAssy(m_xml, containerExtraTopAttrs, containerExtraInstAttrs);
+    break;
+  case Configuration:
+    err = a->parseAssy(m_xml, configExtraTopAttrs, configExtraInstAttrs);
+    break;
+  default:
+    err = a->parseAssy(m_xml, assyExtraTopAttrs, assyExtraInstAttrs);
+  }
+  if (err || (err = parseClocks()))
     return err;
   // Do the HDL-specific parsing and initializations for the instances in the assembly
   Instance *i = &a->m_instances[0];
@@ -718,7 +729,7 @@ createConnectionSignals(FILE *f, Language lang) {
   if (m_attachments.size() &&
       !(m_attachments.size() == 1 &&
 	m_attachments.front()->m_connection.m_attachments.size() == 2 &&
-	m_attachments.front()->m_connection.m_external) &&
+	m_attachments.front()->m_connection.m_external && m_port->m_type != SDPPort) &&
       maxCount <= m_port->count() && (m_port->isArray() || !otherIsArray) &&
       (m_port->m_type != TimePort || m_port->m_master)) {
     emitConnectionSignal(f, true, lang);
@@ -1252,10 +1263,10 @@ emitAssyHDL() {
       assert(internal);
       Port &p = *c.m_external->m_instPort.m_port;
       std::string &nameExt2In = p.m_master ? c.m_slaveName : c.m_masterName;
-      if (internal->m_signalOut.size() && nameExt2In.size() && p.haveInputs())
+      if (internal->m_signalIn.size() && nameExt2In.size() && p.haveInputs())
 	assignExt(f, c, nameExt2In, false);
       std::string &nameIn2Ext = p.m_master ? c.m_masterName : c.m_slaveName;
-      if (internal->m_signalIn.size() && nameIn2Ext.size() && p.haveOutputs())
+      if (internal->m_signalOut.size() && nameIn2Ext.size() && p.haveOutputs())
 	assignExt(f, c, nameIn2Ext, true);
     }
   }
@@ -1329,6 +1340,8 @@ emitHdl(FILE *f, const char *prefix, size_t &index)
     fprintf(f, " configure=\"%#lx\"", (unsigned long)m_config);
   if (m_inserted)
     fprintf(f, " inserted=\"1\"");
+  if (m_device.size())
+    fprintf(f, " device=\"%s\"", m_device.c_str());
   fprintf(f, "/>\n");
 }
 
@@ -1532,9 +1545,8 @@ create(ezxml_t xml, const char *xfile, const std::string &parentFile, Worker *pa
 HdlAssembly::
 HdlAssembly(ezxml_t xml, const char *xfile, const std::string &parentFile, Worker *parent, const char *&err)
   : Worker(xml, xfile, parentFile, Worker::Assembly, parent, NULL, err) {
-  if (!err && !(err = OE::checkAttrs(xml, IMPL_ATTRS, HDL_TOP_ATTRS, (void*)0)) &&
-      !(err = OE::checkElements(xml, IMPL_ELEMS, HDL_IMPL_ELEMS, ASSY_ELEMS, (void*)0)))
-    err = parseHdl();
+  if (!err)
+    err = parseHdl(); // attrs and elems checked here
 }
 
 HdlAssembly::

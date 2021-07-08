@@ -46,6 +46,7 @@ ifeq ($(origin SkelFiles),undefined)
   SkelFiles=$(foreach w,$(Workers),$(GeneratedDir)/$w$(SkelSuffix))
 endif
 
+OcpiLibraryMakefile=$(if $(wildcard $(DirContainingLib)/Makefile),,-f $(OCPI_CDK_DIR)/include/library.mk)
 # Making the skeleton may also make a default OWD
 # The "generate" goal is the generic one for workers, tests, etc.
 .PHONY: skeleton generate
@@ -56,10 +57,12 @@ generate: skeleton
 skeleton:  $(ImplHeaderFiles) $(SkelFiles)
 	$(AT):
 	$(AT)$(and $(filter $(call OcpiGetDirType,$(DirContainingLib)),library),\
-	      make -r --no-print-directory -C $(DirContainingLib) workersfile speclinks)
+	      make -r --no-print-directory $(OcpiLibraryMakefile) -C $(DirContainingLib) workersfile speclinks)
 
 ifeq ($(filter rcc,$(Model))$(filter clean%,$(MAKECMDGOALS))$(HdlActualTargets),)
-  $(info This $(UCModel) worker $(Worker) not built since no $(UCModel) targets or platforms specified)
+  ifneq ($(MAKECMDGOALS),declare)
+    $(info This $(UCModel) worker $(Worker) not built since no $(UCModel) targets or platforms specified)
+  endif
   all: liblinks
 else
   all: skeleton links
@@ -281,7 +284,7 @@ define DoLink
 
   #TODO move below to the "ifndef HdlSkip" so this does repeat for every configuration of a worker
   ifneq ($$(filter $$(call OcpiGetDirType,$$(DirContainingLib)),library),)
-    $$(if $$(call DoShell,make -C $$(DirContainingLib) workersfile speclinks,Value),$$(warning $$(Value)))
+    $$(if $$(call DoShell,make -C $$(DirContainingLib) $$(OcpiLibraryMakefile) workersfile speclinks,Value),$$(warning $$(Value)))
   endif
 endef
 
@@ -354,7 +357,7 @@ $(call OcpiDbgVar,BinLibLinks,Before all:)
 .PHONY: links binlinks genlinks $(Model)links liblinks
 # These are the lightest weight export links which do not involve code generation
 liblinks: $$(LibLinks)
-genlinks: liblinks
+declare genlinks: liblinks
 # <model>-worker.mk may define its own rules for more links
 $(Model)links:
 binlinks: $$(BinLibLinks) $(Model)links

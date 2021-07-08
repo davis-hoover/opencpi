@@ -6,6 +6,7 @@ from collections import namedtuple
 from json import load
 from pathlib import Path
 from urllib.request import urlopen
+from . import ci_gitlab
 
         
 _Job = namedtuple('job', 'name stage script before_script after_script'
@@ -13,9 +14,10 @@ _Job = namedtuple('job', 'name stage script before_script after_script'
                          ' variables dependencies image trigger')
 
 
-def Job(name, stage=None, script=None, before_script=None, after_script=None,
-        artifacts=None, tags=None, resource_group=None, variables=None, 
-        dependencies=None, image=None, trigger=None, overrides=None):
+def Job(name, stage=None, script=None, before_script=None, 
+        after_script=None, artifacts=None, tags=None, resource_group=None, 
+        variables=None, dependencies=None, image=None, trigger=None,
+        overrides=None):
     """Constructs a Job
 
         Will use values in overrides to replace values of other args in
@@ -40,9 +42,8 @@ def Job(name, stage=None, script=None, before_script=None, after_script=None,
         dependencies:   List of job names a job should download gitlab
                         artifacts from (NOT AWS)
         image:          Docker image for job to run in
-        trigger:        The child pipeline to trigger
-        overrides:      Dictionary to override standard values of above
-                        args
+        trigger:        Child pipeline to trigger
+        overrides:      Dictionary of overrides for the job
 
     Returns:
         Job: namedtuple containing data necessary to create a job in a
@@ -61,14 +62,17 @@ def Job(name, stage=None, script=None, before_script=None, after_script=None,
 
     # Collect overrides
     for key,value in args.items():
-        if overrides and key in overrides:
+        if overrides and key in overrides and key != 'variables':
             job_args[key] = overrides[key]
         elif key != 'overrides':
             job_args[key] = value
 
     if overrides and 'variables' in overrides:
-        if variables and 'GIT_STRATEGY' in variables:
-            job_args['variables']['GIT_STRATEGY'] = 'none'
+        if 'variables' in job_args and job_args['variables']:
+            for key,val in overrides['variables'].items():
+                job_args['variables'][key] = val
+        else:
+            job_args['variables'] = overrides['variables']
 
     return _Job(**job_args)
 
@@ -90,22 +94,20 @@ def to_dict(job):
     return job_dict
 
 
-def make_jobs(stages, platform, projects=None, host_platform=None, 
-              overrides=None, is_downstream=False):
+def make_jobs(stages, platform, projects, pipeline, host_platform=None):
     """Creates Job(s) for project/platform combinations
 
     Calls either make_hdl_jobs() or make_rcc_jobs() based on model
     of platform.
 
     Args:
-        stages:           List of pipeline stages
-        platform:         Platform to make jobs for
-        projects:         List of projects to make jobs for
-        host_platform:    Host platform to create jobs for
-        overrides:        Dictionary to override standard job values
-        is_downstream:    Whether job is for a downstream pipeline
+        stages:        List of pipeline stages
+        platform:      Platform to make jobs for
+        projects:      List of projects to make jobs for
+        pipeline:      Pipeline to create jobs for
+        host_platform: Host platform to create jobs for
 
-    Returns:
+    Returns:ocpiremote
         Jobs: collection containing data necessary to create jobs in a
               pipeline
 
@@ -113,19 +115,16 @@ def make_jobs(stages, platform, projects=None, host_platform=None,
         ValueError: if platform model is neither 'rcc' nor 'hdl'
     """
     if platform.model == 'hdl':
-        return make_hdl_jobs(stages, platform, projects, 
-                             host_platform=host_platform, overrides=overrides, 
-                             is_downstream=is_downstream)
+        return make_hdl_jobs(stages, platform, projects, pipeline, 
+                             host_platform=host_platform)
     elif platform.model == 'rcc':
-        return make_rcc_jobs(stages, platform, projects, 
-                             host_platform=host_platform, overrides=overrides, 
-                             is_downstream=is_downstream)
+        return make_rcc_jobs(stages, platform, projects, pipeline,
+                             host_platform=host_platform)
     else:
         raise ValueError('Unknown model: {}'.format(platform.model))
 
 
-def make_rcc_jobs(stages, platform, projects, host_platform=None,
-                  overrides=None, is_downstream=False):
+def make_rcc_jobs(stages, platform, projects, pipeline, host_platform=None):
     """Creates Job(s) for project/platform combinations of model 'rcc'
 
     Determines arguments to pass to make_job().
@@ -134,9 +133,8 @@ def make_rcc_jobs(stages, platform, projects, host_platform=None,
         stages:        List of pipeline stages
         platform:      Platform to make jobs for
         projects:      List of projects to make jobs for
+        pipeline:      Pipeline to create jobs for
         host_platform: Host platform to create jobs for
-        overrides:     Dictionary to override standard job values
-        is_downstream:    Whether job is for a downstream pipeline
 
     Returns:
         Jobs: collection containing data necessary to create jobs in a
@@ -144,91 +142,100 @@ def make_rcc_jobs(stages, platform, projects, host_platform=None,
     """
     jobs = []
 
-    for stage in ['prereqs', 'prereqs-rcc', 'build-rcc', 'build', 'test']:
-        if stage in ['prereqs-rcc', 'build-rcc'] and platform.is_host:
+    for stage in stages:
+        if stage in ['generate-children', 'trigger-platforms', 
+                     'trigger-projects', 'deploy']:
             continue
-        if stage in ['prereqs', 'build'] and not platform.is_host:
-            continue
-
-        if stage == 'test' and not platform.is_host:
+        
+        if stage in ['build-assets', 'build-assets-comp', 'build-assemblies']:
             for project in projects:
                 for asset in project.assets:
-                    if asset.is_testable:
-                        job = make_job(stage, stages, platform,
-                                       project=project, asset=asset,
-                                       host_platform=host_platform,
-                                       overrides=overrides,
-                                       is_downstream=is_downstream)
+                    if stage == 'build-assemblies':
+                        if asset.is_testable:
+                            name = make_name(platform, project=project, 
+                                            stage='build-tests',
+                                            host_platform=host_platform, 
+                                            asset=asset)
+                            build_test_job = make_job(
+                                pipeline, stage, stages, platform, name=name, 
+                                project=project, host_platform=host_platform,
+                                asset=asset)
+                            if build_test_job:
+                                jobs.append(build_test_job)
+                    elif stage in ['build-assets', 'build-assets-comp']:
+                        if asset.path.parent.stem != 'components':
+                            continue
+                        job = make_job(pipeline, stage, stages, platform, 
+                                       project=project, 
+                                       host_platform=host_platform, 
+                                       asset=asset)
                         if job:
                             jobs.append(job)
         else:
-            job = make_job(stage, stages, platform,
-                           host_platform=host_platform, overrides=overrides,
-                           is_downstream=is_downstream)
+            job = make_job(pipeline, stage, stages, platform,
+                           host_platform=host_platform)
             if job:
                 jobs.append(job)
 
-        if stage == 'prereqs' and not is_downstream:
+        if stage == 'prereqs' and not pipeline.is_downstream:
             name = make_name(platform, stage='packages')
-            job = make_job(stage, stages, platform, name=name,
-                           overrides=overrides, is_downstream=is_downstream)
+            job = make_job(pipeline, stage, stages, platform, name=name)
             if job:
                 jobs.append(job)
 
     return jobs
 
 
-def make_hdl_jobs(stages, platform, projects, host_platform=None, 
-                  overrides=None, is_downstream=False):
+def make_hdl_jobs(stages, platform, projects, pipeline, host_platform=None):
     """Creates Job(s) for project/platform combinations of model 'hdl'
 
     Determines arguments to pass to make_job().
 
     Args:
-        stages:           List of pipeline stages
-        platform:         Platform to make jobs for
-        projects:         List of projects to make jobs for
-        host_platform:    Host platform to create jobs for
-        overrides:        Dictionary to override standard job values
-        is_downstream:    Whether job is for a downstream pipeline
+        stages:        List of pipeline stages
+        platform:      Platform to make jobs for
+        projects:      List of projects to make jobs for
+        pipeline:      Pipeline to create jobs for
+        host_platform: Host platform to create jobs for
 
     Jobs: collection containing data necessary to create jobs in a
           pipeline
     """
     jobs = []
-
+    
     for project in projects:
-        if not project.is_builtin and platform.project.name != project.name:
-            continue
-            
-        for asset in project.assets:
+        if project.name == platform.project.name:
+            assets = project.assets + platform.assets
+        else:
+            assets = project.assets
 
+        for asset in assets:
             if asset.is_buildable:
-                stage = stage_from_asset(asset)
-                job = make_job(stage, stages, platform, project=project,
-                               host_platform=host_platform, asset=asset,
-                               overrides=overrides, 
-                               is_downstream=is_downstream)
+                stage = get_asset_stage(asset, project)
+                if stage not in stages:
+                    continue
+
+                job = make_job(pipeline, stage, stages, platform, 
+                               project=project, host_platform=host_platform, 
+                               asset=asset)
                 if job:
                     jobs.append(job)
 
             if asset.is_testable:
-                name = make_name(platform,project=project, stage='build-tests',
+                name = make_name(platform, project=project, 
+                                 stage='build-tests',
                                  host_platform=host_platform, asset=asset)
-                build_test_job = make_job('build-assemblies', stages, platform,
-                                          name=name, project=project,
-                                          host_platform=host_platform,
-                                          asset=asset, overrides=overrides,
-                                          is_downstream=is_downstream)
+                build_test_job = make_job(pipeline, 'build-assemblies', stages, 
+                                          platform, name=name, project=project,
+                                          asset=asset, 
+                                          host_platform=host_platform)
                 if build_test_job:
                     jobs.append(build_test_job)
 
                 if platform.is_sim:
-                    run_test_job = make_job('test', stages, platform,
+                    run_test_job = make_job(pipeline, 'test', stages, platform,
                                             project=project, asset=asset,
-                                            host_platform=host_platform,
-                                            overrides=overrides,
-                                            is_downstream=is_downstream)
+                                            host_platform=host_platform)
                     if run_test_job:
                         jobs.append(run_test_job)
 
@@ -236,148 +243,25 @@ def make_hdl_jobs(stages, platform, projects, host_platform=None,
                     continue
 
                 for linked_platform in platform.linked_platforms:
-                    run_test_job = make_job('test', stages, platform,
-                                            project=project,
-                                            asset=asset,
+                    run_test_job = make_job(pipeline, 'test', stages, platform,
+                                            project=project, asset=asset,
                                             host_platform=host_platform,
                                             linked_platform=linked_platform,
-                                            overrides=overrides,
-                                            do_ocpiremote=True,
-                                            is_downstream=is_downstream)
+                                            do_ocpiremote=True)
                     if run_test_job:
                         jobs.append(run_test_job)
 
     for linked_platform in platform.linked_platforms:
-        job = make_job('build-sdcards', stages, platform,
+        job = make_job(pipeline, 'build-sdcards', stages, platform,
                        host_platform=host_platform,
-                       linked_platform=linked_platform, overrides=overrides,
-                       is_downstream=is_downstream)
+                       linked_platform=linked_platform)
         if job:
             jobs.append(job)
 
     return jobs
 
 
-def make_trigger(host_platform, cross_platform, pipeline, generate_job=None, 
-                 overrides=None):
-    """Creates a trigger job to launch a child pipeline
-
-    Calls make_name() to get name for Job. Calls get_downstream_branch
-    to find matching downstream branch name to trigger.
-
-    Args:
-        host_platform:  Host platform of child pipeline to be triggered
-        cross_platform: Platform to be built/tested in child pipeline
-        pipeline:       Pipeline to make job for        
-        generate_job:   The job that generates the yaml to be used by
-                        the trigger
-        overrides:      Dictionary to override standard job values
-
-    Returns:
-        Job
-    """
-    stage = 'trigger-children'
-    variables = {}
-
-    trigger = {
-        'strategy': 'depend'
-    }
-
-    if cross_platform.project.path:
-    # Platform is local; make job to trigger child pipeline
-        if not generate_job:
-            raise Exception(
-                'A generate job must be passed for triggering child pipelines')
-
-        name = make_name(cross_platform, host_platform=host_platform)
-        artifacts = generate_job.artifacts['paths']
-        include = []
-
-        for artifact in artifacts:
-            include.append({
-                'artifact': str(artifact),
-                'job': generate_job.name
-            })
-
-        trigger['include'] = include
-    else:
-    # Platform is remote; make job to trigger downstream pipeline
-        name = make_name(cross_platform.project, host_platform=host_platform)
-        project = cross_platform.project.url.replace('.git', '').replace(
-            'https://gitlab.com/', '')
-        project_id = cross_platform.project.id
-        trigger['project'] = project
-        trigger['branch'] = get_downstream_branch(project_id, pipeline.ci_env)
-        variables['CI_UPSTREAM_REF'] = pipeline.ci_env.commit_ref_name
-        variables['CI_DIRECTIVE'] = pipeline.directive.str
-
-        try:
-            variables['CI_UPSTREAM_ID'] = pipeline.ci_env.root_id
-        except:
-            variables['CI_UPSTREAM_ID'] = pipeline.ci_env.pipeline_id
-
-    job = Job(name, stage=stage, trigger=trigger, overrides=overrides,
-              variables=variables)
-
-    return job
-
-
-def get_downstream_branch(project_id, ci_env):
-    """Gets matchings downstream branch
-
-    If a downstream branch matches ci_env.commit_ref_name branch,
-    return that branch name. A downstream branch is considered a match
-    if the name is identical with addition of 'opencpi-' prefix.
-
-    Args:
-        project_id: ID of opencpi project to find matching downstream 
-                    branch for
-        ci_env:     Object with CI environment variables as attributes
-    Returns:
-        name of matching downstream branch if found; 'develop' otherwise
-    """
-    project_id = str(project_id)
-    downstream_ref = '-'.join([ci_env.project_name, 
-                               ci_env.commit_ref_name])
-    url =  '/'.join(['https://gitlab.com', 'api', 'v4', 'projects', 
-                     project_id, 'repository', 'branches', downstream_ref])
-
-    try:
-        with urlopen(url):
-            return downstream_ref
-    except: 
-        return 'develop'
-
-
-def get_upstream_branch():
-    """Gets matchings downstream branch
-
-    If an upstream branch matches current branch, return that branch 
-    name. An upstream branch is considered a match if the name is 
-    identical minus the 'opencpi-' prefix. If the current branch does
-    not contain an 'opencpi-' prefix, do not search for a match.
-
-    Returns:
-        name of matching upstream branch if found; 'develop' otherwise
-    """
-    commit_ref_name = os.getenv('CI_COMMIT_REF_NAME')
-
-    if not commit_ref_name.startswith('opencpi-'):
-        return 'develop'
-
-    upstream_ref = commit_ref_name[8:]
-    project_id = '12747880'
-    url =  '/'.join(['https://gitlab.com', 'api', 'v4', 'projects', 
-                     project_id, 'repository', 'branches', upstream_ref])
-    
-    try:
-        with urlopen(url):
-            return upstream_ref
-    except:   
-        return 'develop'
-
-
-def make_generate(host_platform, cross_platform, pipeline, overrides=None):
+def make_generate(host_platform, cross_platform, pipeline):
     """Creates a job to generate a yaml fie for a child pipeline
 
     Calls make_name() and make_before_script() to get attributes to pass
@@ -387,7 +271,6 @@ def make_generate(host_platform, cross_platform, pipeline, overrides=None):
         host_platform:  Host platform of child pipeline to be triggered
         cross_platform: Platform to be built/tested in child pipeline
         pipeline:       Pipeline to make job for
-        overrides:      Dictionary to override standard job values
 
     Returns:
         Job
@@ -403,7 +286,7 @@ def make_generate(host_platform, cross_platform, pipeline, overrides=None):
         'yum install python36-PyYAML -y',
         'yum install git -y'
     ]
-    before_script += make_before_script(stage, [], host_platform)
+    before_script += make_before_script(pipeline, stage, [], cross_platform)
     variables = {}
     variables['CI_DIRECTIVE'] = pipeline.directive.str
     variables['CI_PLATFORM'] = cross_platform.name
@@ -413,43 +296,53 @@ def make_generate(host_platform, cross_platform, pipeline, overrides=None):
         variables['CI_ROOT_ID'] = pipeline.ci_env.root_id
     except:
         variables['CI_ROOT_ID'] = pipeline.ci_env.pipeline_id
-
+    
     try:
         variables['CI_UPSTREAM_ID'] = pipeline.ci_env.upstream_id
-        variables['CI_UPSTREAM_REF'] = pipeline.ci_env.upstream_ref
+    except:
+        pass
+    try:
+        variables['CI_OCPI_REF'] = pipeline.ci_env.ocpi_ref
+    except:
+        pass
+    try:
+        variables['CI_OSP_REF'] = pipeline.ci_env.osp_ref
     except:
         pass
     
     if pipeline.ci_env.project_name != 'opencpi':
         variables['GIT_STRATEGY'] = 'none'
-        
-    job = Job(name, stage=stage, script=script, tags=tags, image=image, 
-        variables=variables, before_script=before_script, artifacts=artifacts)
+    
+    overrides = pipeline.get_platform_overrides(cross_platform)
+    job = Job(name, stage=stage, script=script, tags=tags, 
+              image=image, variables=variables, before_script=before_script, 
+              artifacts=artifacts, overrides=overrides)
 
     return job
 
 
-def make_job(stage, stages, platform, project=None, name=None,
+def make_job(pipeline, stage, stages, platform, project=None, name=None,
              host_platform=None, asset=None, linked_platform=None,
-             overrides=None, do_ocpiremote=False, is_downstream=False):
+             overrides=None, config=None, do_ocpiremote=False):
     """Creates Job for project/platform combinations
 
     Calls before_script(), after_script(), script(), and if
     necessary, make_name() to get arguments for construction of a Job.
 
     Args:
+        pipeline:        Pipeline to create jobs for
         stage:           Stage of pipeline for job to execute in
         stages:          List of pipeline stages
         platform:        Platform to make jobs for
         project:         Project to make jobs for
         name:            Name of job
         host_platform:   Host platform to create jobs for
-        asset:         asset to make job for
+        asset:           Asset to make job for
         linked_platform: List of platforms needed for making jobs
                          requiring an associated rcc platform
         overrides:       Dictionary to override standard job values
+        config:          Dictionary of configs
         do_ocpiremote:   Whether jobs should run ocpiremote commands
-        is_downstream:   Whether job is for a downstream pipeline
 
     Returns:
         Job: contains data necessary to create a job in a pipeline
@@ -459,15 +352,14 @@ def make_job(stage, stages, platform, project=None, name=None,
                          host_platform=host_platform,
                          linked_platform=linked_platform, asset=asset)
 
-    before_script = make_before_script(stage, stages, platform,
+    before_script = make_before_script(pipeline, stage, stages, platform,
                                        host_platform=host_platform,
                                        linked_platform=linked_platform,
-                                       do_ocpiremote=do_ocpiremote,
-                                       is_downstream=is_downstream)
+                                       do_ocpiremote=do_ocpiremote)
     script = make_script(stage, platform, project=project, asset=asset,
                          linked_platform=linked_platform, name=name)
-    after_script = make_after_script(platform, do_ocpiremote=do_ocpiremote,
-                                     is_downstream=is_downstream)
+    after_script = make_after_script(pipeline, platform, 
+                                     do_ocpiremote=do_ocpiremote)
     dependencies = []
 
     if platform.is_host:
@@ -482,15 +374,16 @@ def make_job(stage, stages, platform, project=None, name=None,
     else:
         resource_group = None
 
-    if os.getenv('CI_UPSTREAM_ID') or is_downstream:
+    if pipeline.project_name != 'opencpi':
         variables = {'GIT_STRATEGY': 'none'}
     else:
         variables = None
 
-    job = Job(name, stage, script, tags=tags, before_script=before_script,
-              after_script=after_script, overrides=overrides,
-              resource_group=resource_group, dependencies=dependencies,
-              variables=variables)
+    overrides = pipeline.get_platform_overrides(platform)
+    job = Job(name, stage, script, tags=tags, before_script=before_script, 
+              after_script=after_script, resource_group=resource_group, 
+              dependencies=dependencies, variables=variables, 
+              overrides=overrides)
 
     return job
 
@@ -519,25 +412,24 @@ def make_name(platform, stage=None, project=None, host_platform=None,
     return ':'.join(name_elems)
 
 
-def make_before_script(stage, stages, platform, host_platform=None,
-                       linked_platform=None, do_ocpiremote=False,
-                       is_downstream=False):
+def make_before_script(pipeline, stage, stages, platform, host_platform=None,
+                       linked_platform=None, do_ocpiremote=False):
     """Creates list of commands to run in job's before_script step
 
         Constructs commands for downloading AWS artifacts, creating
         timestamp, and sourcing opencpi.
 
     Args:
-        stage:             Stage of pipeline for job to execute in.
-                           Used to exclude artifacts in same and later
-                           stages
-        stages:            List of all pipeline stages
-        platform:          Platform to download artifacts for
-        host_platform:     Host_platform to download artifacts for
-        linked_platform:   Associated platform to downloaded artifacts 
-                           for
-        do_ocpiremote:     Whether job should run ocpiremote commands
-        is_downstream:     Whether job is for a downstream pipeline
+        pipeline:        Pipeline to make job for
+        stage:           Stage of pipeline for job to execute in.
+                         Used to exclude artifacts in same and later
+                         stages
+        stages:          List of all pipeline stages
+        platform:        Platform to download artifacts for
+        host_platform:   Host_platform to download artifacts for
+        linked_platform: Associated platform to download artifacts 
+                         for
+        do_ocpiremote:   Whether job should run ocpiremote commands
 
     Returns:
         list of command strings
@@ -545,13 +437,11 @@ def make_before_script(stage, stages, platform, host_platform=None,
     cmds = []
 
     pipeline_id = os.getenv("CI_UPSTREAM_ID")
-    project_name = os.getenv("CI_PROJECT_NAME")
     clean_cmd = 'rm -rf * .* 2>/dev/null || true'
     
     if pipeline_id:
     # In triggered pipeline
-        upstream_ref = os.getenv("CI_UPSTREAM_REF")
-        ref = os.getenv("CI_COMMIT_REF_NAME")
+        ocpi_ref = pipeline.ci_env.ocpi_ref
         do_clone = True
         do_register = True
         cmds.append(clean_cmd)
@@ -562,34 +452,67 @@ def make_before_script(stage, stages, platform, host_platform=None,
         if not pipeline_id:
             pipeline_id = os.getenv("CI_PIPELINE_ID")
 
-        if project_name == 'opencpi':
+        if pipeline.project_name == 'opencpi':
         # In opencpi project
             do_clone = False
             do_register = False
         else:
-        # In osp project
-            upstream_ref = get_upstream_branch()
-            ref = os.getenv("CI_COMMIT_REF_NAME")
+        # In downstream project
+            ocpi_ref = ci_gitlab.get_upstream_branch()
             do_clone = True
             cmds.append(clean_cmd)
 
-            if not platform.is_host:
-                do_register = True
-            else:
+            if platform.is_host:
                 do_register = False
+            else:
+                do_register = True
 
     if do_clone:
-        cmds += [
-            ' '.join(['git clone --depth 1 --single-branch --branch',
-                      upstream_ref,
-                      '"https://gitlab.com/opencpi/opencpi.git"', 
-                      'opencpi']),
-            ' '.join(['git clone --depth 1 --single-branch --branch', 
-                      ref, 
-                      '"$CI_REPOSITORY_URL"',
-                      '"opencpi/projects/ext/${CI_PROJECT_NAME}"']),
-            'cd opencpi'
-        ]
+        # Clone opencpi repo
+        cmd = ' '.join(['git clone --depth 1 --single-branch --branch',
+                        ocpi_ref,
+                        '"https://gitlab.com/opencpi/opencpi.git"', 
+                        'opencpi'])
+        cmds.append(cmd)
+
+        if (platform.project.group == 'osp' 
+            and (pipeline.group_name != 'comp' 
+                 or stage != 'generate-children')):
+            # If the platform is an osp, clone the osp's repo
+                
+            path = '/'.join(['opencpi', 'projects', 'osps',
+                            platform.project.name])
+            path = '"{}"'.format(path)
+
+            if pipeline.project_name == platform.project.name:
+            # Platform belongs to this project, so clone this project
+                url = pipeline.ci_env.repository_url
+                osp_ref = pipeline.ci_env.commit_ref_name
+            else:
+            # Platform is remote, so clone its project
+                url = platform.project.url
+                try:
+                    osp_ref = pipeline.ci_env.osp_ref
+                except:
+                    osp_ref = 'develop'
+
+            cmd = ' '.join(['git clone --depth 1 --single-branch --branch', 
+                            osp_ref, url, path])
+            cmds.append(cmd)
+
+        if pipeline.group_name == 'comp':
+        # If pipeline is in a comp project also clone its repo
+            path = '/'.join(['opencpi', 'projects', pipeline.group_name,
+                            pipeline.project_name])
+            path = '"{}"'.format(path)
+            cmd = ' '.join(['git clone --depth 1 --single-branch --branch', 
+                            pipeline.ci_env.commit_ref_name, 
+                            pipeline.ci_env.repository_url,
+                            path])
+
+            cmds.append(cmd)
+        
+        cmds.append('cd opencpi')
 
     timestamp_cmd = 'touch .timestamp'
     cmds.append(timestamp_cmd)
@@ -618,20 +541,53 @@ def make_before_script(stage, stages, platform, host_platform=None,
     cmds.append(source_cmd)
 
     if do_register:
-        register_cmd = make_ocpidev_cmd(
-            'register', path='projects/ext/${CI_PROJECT_NAME}', 
-            noun='project')
-        cmds.append(register_cmd)
+        if platform.project.group == 'osp':
+        # Platform is an osp, register its project
+            path = '/'.join(['projects', 'osps', 
+                             platform.project.name])
+            path = '"{}"'.format(path)
+            register_cmd = make_ocpidev_cmd(
+                'register', path=path, noun='project')
+            cmds.append(register_cmd)
+
+        if pipeline.group_name == 'comp':
+        # Pipeline is in comp project, register comp project
+            path = '/'.join(['projects', pipeline.group_name, 
+                             pipeline.project_name])
+            path = '"{}"'.format(path)
+            register_cmd = make_ocpidev_cmd(
+                'register', path=path, noun='project')
+            cmds.append(register_cmd)
     
     if do_ocpiremote:
+        # Set up hash to look up interface for runner from within job
+        runners = pipeline.config['ci']['runners']
+        interfaces_cmd = ' && '.join(['declare -A interfaces',
+                                      'interfaces=('])
+        for runner_id,runner_configs in runners.items():
+            interfaces_cmd += ' ["{}"]="{}"'.format(
+                runner_id, runner_configs['socket_interface'])
+        interfaces_cmd += ')'
+        
+        if platform.do_deploy:
+            cmds +=[
+                make_ocpiremote_cmd('deploy', platform,
+                                    linked_platform=linked_platform),
+                'sleep 60'
+            ]
+
         cmds += [
-            make_ocpiremote_cmd('deploy', platform,
-                                linked_platform=linked_platform),
-            'sleep 5',
             make_ocpiremote_cmd('load', platform,
                                 linked_platform=linked_platform),
             make_ocpiremote_cmd('start', platform,
                                 linked_platform=linked_platform),
+            # temporarily disable log retrieval here until the
+            # log command can be executed in the background.
+            # make_ocpiremote_cmd('log', platform,
+            #                     linked_platform=linked_platform),
+            interfaces_cmd,
+            'export OCPI_SOCKET_INTERFACE="${interfaces[$CI_RUNNER_ID]}"',
+            'echo "${OCPI_SOCKET_INTERFACE}"',
             'export OCPI_SERVER_ADDRESSES={}:{}'.format(platform.ip,
                                                         platform.port)
         ]
@@ -639,16 +595,16 @@ def make_before_script(stage, stages, platform, host_platform=None,
     return cmds
 
 
-def make_after_script(platform, do_ocpiremote=False, is_downstream=False):
+def make_after_script(pipeline, platform, do_ocpiremote=False):
     """Creates list of commands to run in job's after_script step
 
         Constructs command for uploading opencpi tree to AWS if job
         failed, and cleans entire project directory as final cmd.
 
     Args:
+        pipeline:      Pipeline to make job for
         platform:      Platform of job
         do_ocpiremote: Whether jobs should run ocpiremote commands
-        is_downstream: Whether job is for a downstream pipeline
 
     Returns:
         list of command strings
@@ -665,7 +621,7 @@ def make_after_script(platform, do_ocpiremote=False, is_downstream=False):
 
     cmds.append('date')
 
-    if is_downstream:
+    if pipeline.is_downstream:
         cmds.append('cd opencpi')
 
     job_name = '"$CI_JOB_NAME"'
@@ -676,6 +632,10 @@ def make_after_script(platform, do_ocpiremote=False, is_downstream=False):
     cmds.append(upload_cmd)
 
     if do_ocpiremote:
+        cmds.append('source cdk/opencpi-setup.sh -e')
+        cmds.append(make_ocpiremote_cmd('stop', platform) + " || true")
+        # temporarily retrieve log here
+        cmds.append(make_ocpiremote_cmd('log', platform))
         cmds.append(make_ocpiremote_cmd('unload', platform))
 
     clean_cmd = 'rm -rf * .* 2>/dev/null || true'
@@ -697,7 +657,7 @@ def make_script(stage, platform, project=None, linked_platform=None,
         project:         Project of job
         linked_platform: Associated platform for jobs requiring both an
                          'hdl' and an 'rcc' platform
-        asset:         asset for jobs that build/test for a specific
+        asset:           asset for jobs that build/test for a specific
                          asset
         name:            Name of job in pipeline
 
@@ -715,6 +675,7 @@ def make_script(stage, platform, project=None, linked_platform=None,
                            pipeline_id, job_name,
                            '-s .timestamp -t "successful-job"'])
     success_cmd = 'touch .success'
+    cmds = []
 
     if stage == 'test':
         if platform.is_host:
@@ -722,21 +683,27 @@ def make_script(stage, platform, project=None, linked_platform=None,
         else:
             cmd = make_ocpidev_cmd('run', platform, asset.path,
                                    noun='tests')
+    elif stage == 'build-assemblies' and asset.name != 'assemblies':
+        cmd = make_ocpidev_cmd('build', platform, asset.path, noun='test')
+    elif stage in ['build-assets', 'build-assets-comp']:
+        cmd = make_ocpidev_cmd('build', platform, asset.path)
     elif platform.model == 'hdl':
         if stage == 'build-platforms':
             cmd = make_ocpidev_cmd('build', platform, project.path,
                                    'hdl platforms')
-        elif stage == 'build-assemblies' and asset.name != 'assemblies':
-            cmd = make_ocpidev_cmd('build', platform, asset.path,
-                                   noun='test')
         elif stage == 'build-sdcards':
+            cmd = ('cdk/scripts/export-platform-to-framework.sh' 
+                   ' -v hdl {} {}/lib'.format(platform.name, platform.path))
+            cmds.append(cmd)
             cmd = make_ocpiadmin_cmd('deploy', platform, linked_platform)
         else:
             cmd = make_ocpidev_cmd('build', platform, asset.path)
     else:
         cmd = make_scripts_cmd(stage, platform, name=name)
 
-    return [cmd, upload_cmd, success_cmd]
+    cmds += [cmd, upload_cmd, success_cmd]
+
+    return cmds
 
 
 def make_scripts_cmd(stage, platform, name=None):
@@ -824,7 +791,7 @@ def make_ocpidev_cmd(verb, platform=None, path=None, noun=''):
             'ocpidev build',
             noun,
             '-d {}'.format(path),
-            '--hdl-platform {}'.format(platform.name)
+            '--{}-platform {}'.format(platform.model, platform.name)
         ])
 
     if verb == 'run':
@@ -855,13 +822,13 @@ def make_ocpiremote_cmd(verb, platform, linked_platform=None):
         linked_platform: Associated platform to pass to ocpiremote
 
     Returns:
-        ocpiadmin command string
+        ocpiremote command string
 
     Raises:
         ValueError: if unrecognized verb provided
     """
     if verb == 'deploy':
-        return ' '.join([
+        cmd = ' '.join([
             'ocpiremote deploy',
             '-i {}'.format(platform.ip),
             '-w {}'.format(platform.name),
@@ -869,7 +836,7 @@ def make_ocpiremote_cmd(verb, platform, linked_platform=None):
         ])
 
     if verb == 'load':
-        return ' '.join([
+        cmd = ' '.join([
             'ocpiremote load',
             '-i {}'.format(platform.ip),
             '-r {}'.format(platform.port),
@@ -877,20 +844,34 @@ def make_ocpiremote_cmd(verb, platform, linked_platform=None):
             '-s {}'.format(linked_platform.name)
         ])
 
-    if verb in ['start', 'unload']:
-        return ' '.join([
+    if verb in ['start', 'unload', 'stop', 'log']:
+        cmd = ' '.join([
             'ocpiremote {}'.format(verb),
             '-i {}'.format(platform.ip),
         ])
 
-    raise ValueError('Unknown verb: {}'.format(verb))
+        if verb == 'start':
+            cmd += (' -b')
+            cmd += ' -l 10'
+
+    if platform.password:
+        cmd += (' -p {}'.format(platform.password))
+
+    if platform.user:
+        cmd += (' -u {}'.format(platform.user))
+
+    if verb not in ['deploy', 'load', 'start', 'unload', 'stop', 'log']:
+        raise ValueError('Unknown verb: {}'.format(verb))
+ 
+    return cmd
 
 
-def stage_from_asset(asset):
-    """Gets the stage of job based on its asset
+def get_asset_stage(asset, project):
+    """Gets the stage of job based on its Asset and Project
 
     Args:
-        asset: asset of job
+        asset:   Asset of job
+        project: Project of job
 
     Returns:
         stage string of job
@@ -898,17 +879,22 @@ def stage_from_asset(asset):
     Raises:
         ValueError: if unrecognized asset passed
     """
-    if asset.name in ['platforms', 'assemblies']:
-        return 'build-{}'.format(asset.name)
+    asset_name = asset.name.split(':')[-1]
 
-    if (asset.name in ['components', 'adapters', 'cards', 'devices']
+    if asset_name in ['platforms', 'assemblies']:
+        return 'build-{}'.format(asset_name)
+
+    if (asset_name in ['components', 'adapters', 'cards', 'devices']
             or asset.path.parent.stem == 'components'):
-        if not asset.project.is_builtin:
-            return 'build-assets-{}'.format(asset.project.name)
-        return 'build-assets'
-
-    if asset.name == 'primitives':
-        if asset.project.name == 'core':
+        if project.group == 'opencpi':
+            return 'build-assets'
+        elif project.group == 'osp':
+            return 'build-assets-{}'.format(project.name)
+        elif project.group == 'comp':
+            return 'build-assets-comp'
+        
+    if asset_name == 'primitives':
+        if project.name == 'core':
             return 'build-primitives-core'
         else:
             return 'build-primitives'

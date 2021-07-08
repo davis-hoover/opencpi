@@ -21,11 +21,3 @@ OcpiApp=appHello
 override OcpiRunAfter+= > /dev/null
 
 include $(OCPI_CDK_DIR)/include/application.mk
-
-# Set package to local for the hello.rcc worker
-Package=local
-export OCPI_LIBRARY_PATH=lib/rcc
-
-# These make the worker library for this application
-Implementations=hello.rcc
-include $(OCPI_CDK_DIR)/include/lib.mk

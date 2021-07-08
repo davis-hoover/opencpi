@@ -78,20 +78,12 @@ static int mymain(const char **argv) {
   valid_verbs["check"]=1;
   valid_verbs["parse"]=1;
 
-  if (not valid_verbs.count(argv[0])) {
-    std::string e = "Invalid verb '";
-    e.append(argv[0]);
-    e.append("'");
-    options.usage();
-    throw std::invalid_argument(e);
-  }
-  if (options.argvCount()-1 != valid_verbs[argv[0]]) {
-    std::string e = "Incorrect number of parameters for '";
-    e.append(argv[0]);
-    e.append("'");
-    options.usage();
-    throw std::invalid_argument(e);
-  }
+  if (!argv[0])
+    throw std::invalid_argument("missing verb");
+  if (not valid_verbs.count(argv[0]))
+    throw std::invalid_argument(OU::esprintf("Invalid verb: %s", argv[0]));
+  if (options.argvCount()-1 != valid_verbs[argv[0]])
+    throw std::invalid_argument(OU::esprintf("Incorrect number of parameters for '%s'", argv[0]));
 
   // Start "real" work
   std::string xml;
@@ -154,7 +146,7 @@ static int mymain(const char **argv) {
     if (options.attribute(n)) {
       const char *attr;
       std::string out;
-      for (const char **attrs = options.attribute(n); *attrs; ++attrs, --n) {
+      for (const char **attrs = options.attribute(n); attrs && *attrs; ++attrs, --n) {
 	const char *aname = *attrs;
 	if (aname[0] == '?')
 	  aname++;

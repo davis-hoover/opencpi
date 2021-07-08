@@ -33,15 +33,14 @@ ACI applications always reside in their own directory within the
 Verbs that can operate on an application are:
 
 *`build`*::
-    Build the application, including any custom building
-    specified by a customized Makefile. The build operation
+    Build the application. The build operation
     applies only to an ACI application: it builds the C++
     files into an executable.
 
 *`clean`*::
     Remove all the generated and compiled files for the
     application, including any cleaning specfied by
-    a customized application Makefile.
+    the *`cleanFiles`* attribute in the XML file.
 
 *`create`*::
     Create the named application in the *`applications/`* directory of
@@ -147,6 +146,12 @@ Options When Building ACI Applications
     option is not used (and *`--hdl-rcc-platform`* '<platform>'
     is also not used), the current development software platform
     is used as the single RCC platform used for building.
+
+*`--optimimize`*::
+    Build RCC/ACI assets with compiler optimization enabled.  This
+    results in a separate set of build outputs that do not conflict
+    with non-optimized (debug) build outputs, since they are placed
+    in a target directory whose name has a "-o" suffix.
 
 Options When Running ACI Applications
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   

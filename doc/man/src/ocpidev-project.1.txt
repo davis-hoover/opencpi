@@ -37,11 +37,8 @@ A project has:
 - A defined directory structure for storing assets
 in both source and built forms
 
-- A project "make" file (named *`Makefile`*) that
-builds all the buildable assets that the project contains
-
-- A project "make" file fragment (named *`Project.mk`*)
-that defines make variables and options to be applied to all
+- A project XML file (named *`Project.xml`*)
+that defines attributes for the project and some others to be applied to all
 assets in the project
 
 - An optional export file (named *`Project.exports`*)
@@ -220,6 +217,12 @@ Options When Building Projects
     option is not used (and *`--hdl-rcc-platform`* '<platform>'
     is also not used), the current development software platform
     is used as the single RCC platform used for building.
+
+*`--optimimize`*::
+    Build RCC/ACI assets with compiler optimization enabled.  This
+    results in a separate set of build outputs that do not conflict
+    with non-optimized (debug) build outputs, since they are placed
+    in a target directory whose name has a "-o" suffix.
 
 *`--worker=`*'<worker>'+::
     Limits the assets being built to the specified worker.

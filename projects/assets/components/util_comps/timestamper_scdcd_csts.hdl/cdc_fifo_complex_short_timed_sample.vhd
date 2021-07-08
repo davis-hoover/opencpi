@@ -1,0 +1,79 @@
+-- This file is protected by Copyright. Please refer to the COPYRIGHT file
+-- distributed with this source distribution.
+--
+-- This file is part of OpenCPI <http://www.opencpi.org>
+--
+-- OpenCPI is free software: you can redistribute it and/or modify it under the
+-- terms of the GNU Lesser General Public License as published by the Free
+-- Software Foundation, either version 3 of the License, or (at your option) any
+-- later version.
+--
+-- OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
+-- WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+-- A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+-- details.
+--
+-- You should have received a copy of the GNU Lesser General Public License
+-- along with this program. If not, see <http://www.gnu.org/licenses/>.
+library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
+library misc_prims; use misc_prims.misc_prims.all;
+library cdc;
+library timed_sample_prot;
+
+entity fifo_complex_short_timed_sample is
+  generic(
+    DEPTH : natural := 2);
+  port(
+    -- INPUT
+    iclk     : in  std_logic;
+    irst     : in  std_logic;
+    ienq     : in  std_logic;
+    iprotocol: in  timed_sample_prot.complex_short_timed_sample.protocol_t;
+    ieof     : in  std_logic;
+    ifull_n  : out std_logic;
+    -- OUTPUT
+    oclk     : in  std_logic;
+    odeq     : in  std_logic;
+    oprotocol: out timed_sample_prot.complex_short_timed_sample.protocol_t;
+    oeof     : out std_logic;
+    oempty_n : out std_logic);
+end entity;
+architecture rtl of fifo_complex_short_timed_sample is
+  signal src_in           : std_logic_vector(
+      timed_sample_prot.complex_short_timed_sample.PROTOCOL_BIT_WIDTH downto 0) :=
+      (others => '0');
+  signal dst_out          : std_logic_vector(
+      timed_sample_prot.complex_short_timed_sample.PROTOCOL_BIT_WIDTH downto 0) :=
+      (others => '0');
+  signal dst_out_protocol : std_logic_vector(
+      timed_sample_prot.complex_short_timed_sample.PROTOCOL_BIT_WIDTH-1 downto 0) :=
+      (others => '0');
+  signal fifo_dst_empty_n : std_logic := '0';
+  signal protocol_s       : timed_sample_prot.complex_short_timed_sample.protocol_t :=
+                            timed_sample_prot.complex_short_timed_sample.PROTOCOL_ZERO;
+begin
+
+  src_in <= timed_sample_prot.complex_short_timed_sample.to_slv(iprotocol) & ieof;
+
+  fifo : cdc.cdc.fifo
+    generic map(
+      WIDTH       => timed_sample_prot.complex_short_timed_sample.PROTOCOL_BIT_WIDTH+1,
+      DEPTH       => DEPTH)
+    port map(
+      src_CLK     => iclk,
+      src_RST     => irst,
+      src_ENQ     => ienq,
+      src_in      => src_in,
+      src_FULL_N  => ifull_n,
+      dst_CLK     => oclk,
+      dst_DEQ     => odeq,
+      dst_out     => dst_out,
+      dst_EMPTY_N => fifo_dst_empty_n);
+
+  oempty_n <= fifo_dst_empty_n;
+
+  dst_out_protocol <= dst_out(
+      timed_sample_prot.complex_short_timed_sample.PROTOCOL_BIT_WIDTH downto 1);
+  oprotocol  <= timed_sample_prot.complex_short_timed_sample.from_slv(dst_out_protocol);
+
+end rtl;

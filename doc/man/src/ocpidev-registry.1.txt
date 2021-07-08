@@ -25,9 +25,9 @@ Projects are not initially registered; the *`ocpidev register`* operation
 for a project can be used to register them.
 
 The OpenCPI installation provides a default project registry at
-$OCPI_CDK_DIR/../project-registry. However, in some project development
-environments, it can be useful to have an additional "sandbox" project
-registry for use as an alternative to the OpenCPI default.
+$OCPI_ROOT_DIR/project-registry. However, in some project development
+environments, it can be useful to have additional separate project
+registries for use as an alternative to the OpenCPI default.
 
 The OpenCPI environment variable *`OCPI_PROJECT_REGISTRY_DIR`* can
 be set to point to an alternative project registry; setting this

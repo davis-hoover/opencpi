@@ -1,0 +1,7 @@
+<hdllibrary SourceFiles='sync_pkg.vhd sync_body.vhd sync_bit.vhd sync_bit_ack.vhd sync_pulse.vhd
+                         sync_pulse_handshake.vhd sync_bits_feedback.vhd sync_fifo_1xn.vhd
+                         sync_fifo_1x0.vhd sync_fifo_2xn.vhd sync_fifo_2x0.vhd sync_sync_rst.vhd
+                         sync_async_rst.vhd sync_srl_fifo.vhd sync_fifo_gray.vhd'
+	    />
+
+

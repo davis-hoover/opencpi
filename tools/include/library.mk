@@ -24,15 +24,12 @@ include $(OCPI_CDK_DIR)/include/lib.mk
 .PHONY: generate run $(OcpiTestGoals) showincludes showpackage showworkers showtests
 .SILENT: showincludes showpackage showworkers showtests
 run: runtest # generic "run" runs test
-OldTests=$(foreach i,$(TestImplementations),\
-           $(shell [ -f $i/Makefile ] && grep -q '(OCPI_CDK_DIR)/include/test.mk' $i/Makefile || echo $i))
 $(filter-out test cleantest,$(OcpiTestGoals)):
-	$(AT)set -e; for i in $(filter-out $(OldTests),$(TestImplementations)); do \
+	$(AT)set -e; $(foreach i,$(TestImplementations), \
 	  echo ==============================================================================;\
-	  echo ==== Performing goal \"$@\" for unit tests in $$i;\
+	  echo ==== Performing goal \"$@\" for unit tests in $i;\
 	  $(MAKE) $(and $(OCPI_PROJECT_REL_DIR),OCPI_PROJECT_REL_DIR=../$(OCPI_PROJECT_REL_DIR)) \
-                  --no-print-directory -C $$i $@ ; \
-	done
+                  --no-print-directory $(call GoWorker,$i) $@ ;) \
 
 # The ordering here assumes HDL cannot depend on RCC.
 generate:
@@ -40,6 +37,18 @@ generate:
 	$(call BuildModel,ocl,generate)
 	$(call BuildModel,rcc,generate)
 	$(call BuildModel,test,generate)
+
+# declare all HDL workers in the library
+# suppress all targets, mostly for printing what is going on
+ifneq ($(filter declarehdl,$(MAKECMDGOALS)),)
+  MAKEOVERRIDES+=HdlPlatforms= HdlPlatform= HdlTargets= HdlTarget=
+  override HdlPlatforms=
+  override HdlPlatform=
+  override HdlTargets=
+  override HdlTarget=
+endif
+declarehdl:
+	$(call BuildModel,hdl,declare)
 
 ifdef ShellLibraryVars
 showlib:

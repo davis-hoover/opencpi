@@ -22,6 +22,7 @@ Defining rcc/hdl platform related classes
 import os
 import sys
 import logging
+from pathlib import Path
 import json
 import _opencpi.util as ocpiutil
 import _opencpi.hdltargets as hdltargets
@@ -39,7 +40,6 @@ class RccPlatformsCollection(ShowableAsset):
     def __init__(self, directory, name=None, **kwargs):
         self.check_dirtype("rcc-platforms", directory)
         super().__init__(directory, name, **kwargs)
-
         self.platform_list = []
         if kwargs.get("init_hdlplats", False):
             logging.debug("Project constructor creating HdlPlatformWorker Objects")
@@ -76,6 +76,8 @@ class HdlPlatformsCollection(HDLBuildableAsset, ReportableAsset):
                                      objects contained in the project (at least those with a
                                      corresponding build platform listed in self.hdl_platforms)
         """
+        if not name:
+            name = str(Path(directory).name)
         self.check_dirtype("hdl-platforms", directory)
         super().__init__(directory, name, **kwargs)
         self.hdl_plat_strs = kwargs.get("hdl_plats", None)
@@ -96,8 +98,9 @@ class HdlPlatformsCollection(HDLBuildableAsset, ReportableAsset):
         platforms collection
         """
         platform_list = []
-        logging.debug("Getting valid platforms from: " + self.directory + "/Makefile")
-        make_platforms = ocpiutil.set_vars_from_make(mk_file=self.directory + "/Makefile",
+        mkf=ocpiutil.get_makefile(self.directory)
+        logging.debug("Getting valid platforms from: " + mkf[0])
+        make_platforms = ocpiutil.set_vars_from_make(mkf,
                                                      mk_arg="ShellPlatformsVars=1 showplatforms",
                                                      verbose=True)["HdlPlatforms"]
 
@@ -120,16 +123,21 @@ class HdlPlatformsCollection(HDLBuildableAsset, ReportableAsset):
         raise NotImplementedError("HdlPlatformsCollection.build() is not implemented")
 
     @staticmethod
-    def get_working_dir(name, library, hdl_library, hdl_platform):
+    def get_working_dir(name, ensure_exists=True, **kwargs):
         """
         return the directory of an HDL Platform Collection given the name (name) and
         library specifiers (library, hdl_library, hdl_platform)
         """
-        ocpiutil.check_no_libs("hdl-platforms", library, hdl_library, hdl_platform)
-        if name: ocpiutil.throw_not_blank_e("hdl-platforms", "name", False)
+        library = kwargs.get('library', '')
+        hdl_library = kwargs.get('hdl_library', '')
+        platform = kwargs.get('platform', '')
+        ocpiutil.check_no_libs("hdl-platform", library, hdl_library, platform)
+        if not name: 
+            ocpiutil.throw_not_blank_e("hdl-platforms", "name", False)
         if ocpiutil.get_dirtype() not in ["project", "hdl-platforms"]:
             ocpiutil.throw_not_valid_dirtype_e(["project", "hdl-platforms"])
         return ocpiutil.get_path_to_project_top() + "/hdl/platforms"
+
 
 # pylint:disable=too-many-ancestors
 class HdlPlatformWorker(HdlWorker, ReportableAsset):
@@ -154,8 +162,6 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
             None
         """
         self.check_dirtype("hdl-platform", directory)
-        if name is None:
-            name = os.path.basename(directory)
         super().__init__(directory, name, **kwargs)
         self.configs = {}
         self.package_id = None
@@ -177,8 +183,9 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
         """
         # Get the list of Configurations from make
         logging.debug("Get the list of platform Configurations from make")
+        mkf=ocpiutil.get_makefile(self.directory, "hdl/hdl-platform")
         try:
-            plat_vars = ocpiutil.set_vars_from_make(mk_file=self.directory + "/Makefile",
+            plat_vars = ocpiutil.set_vars_from_make(mkf,
                                                     mk_arg="ShellHdlPlatformVars=1 showinfo",
                                                     verbose=False)
         except ocpiutil.OCPIException:
@@ -186,7 +193,7 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
             plat_vars = {"Configurations" : "", "Package":"N/A"}
         if "Configurations" not in plat_vars:
             raise ocpiutil.OCPIException("Could not get list of HDL Platform Configurations " +
-                                         "from \"" + self.directory + "/Makefile\"")
+                                         "from \"" + mkf[1])
         self.package_id = plat_vars["Package"]
         # This should be a list of Configuration NAMES
         config_list = plat_vars["Configurations"]
@@ -232,16 +239,22 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
         return util_report
 
     @staticmethod
-    def get_working_dir(name, library, hdl_library, hdl_platform):
+    def get_working_dir(name, ensure_exists=True, **kwargs):
         """
         return the directory of a HDL Platform given the name (name) and
         library specifiers (library, hdl_library, hdl_platform)
         """
-        ocpiutil.check_no_libs("hdl-platform", library, hdl_library, hdl_platform)
-        if not name: ocpiutil.throw_not_blank_e("hdl-platform", "name", True)
-        if ocpiutil.get_dirtype() not in ["project", "hdl-platforms", "hdl-platform"]:
-            ocpiutil.throw_not_valid_dirtype_e(["project", "hdl-platforms", "hdl-platform"])
-        return ocpiutil.get_path_to_project_top() + "/hdl/platforms/" + name
+        if not name: 
+            ocpiutil.throw_not_blank_e("hdl-platforms", "name", False)
+        if ocpiutil.get_dirtype() not in ["project", "hdl-platforms"]:
+            ocpiutil.throw_not_valid_dirtype_e(["project", "hdl-platforms"])
+        project_path = Path(ocpiutil.get_path_to_project_top())
+        hdl_path = Path(project_path, 'hdl')
+        if not hdl_path.exists() and not ensure_exists:
+            hdl_path.mkdir()
+        working_path = Path(hdl_path, 'platforms', name)
+        return str(working_path)
+
 # pylint:enable=too-many-ancestors
 
 class HdlPlatformWorkerConfig(HdlAssembly):
@@ -369,6 +382,8 @@ class RccPlatform(Platform):
         Constructor for RccPlatform no extra values from kwargs processed in this constructor
         """
         self.check_dirtype("rcc-platform", directory)
+        if not name:
+            name = str(Path(directory).name)
         super().__init__(directory, name, **kwargs)
 
     def __str__(self):
@@ -509,7 +524,7 @@ class HdlPlatform(Platform):
         self.built = built
         self.dir = ocpiutil.rchop(directory, "/lib")
         if self.dir and not package_id and os.path.exists(self.dir):
-            self.package_id = ocpiutil.set_vars_from_make(self.dir + "/Makefile",
+            self.package_id = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(self.dir, "hdl/hdl-platform"),
                                                           "ShellHdlPlatformVars=1 showpackage",
                                                           "verbose")["Package"][0]
         else:
@@ -588,6 +603,7 @@ class HdlPlatform(Platform):
         elif details == "json":
             json.dump(plat_dict, sys.stdout)
             print()
+
 
 class HdlTarget(object):
     """

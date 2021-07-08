@@ -22,6 +22,7 @@ Main program that processes the run verb for ocpidev
 import argparse
 import os
 import sys
+from pathlib import Path
 import pydoc
 import types
 import _opencpi.assets.factory as ocpifactory
@@ -31,7 +32,7 @@ NOUNS = ["test", "tests", "library", "application", "applications", "project", "
 NOUNS_NO_LIBS = ["test", "tests", "library", "application", "applications", "project"]
 MODES = ["all", "gen", "gen_build", "prep_run_verify", "prep", "run", "prep_run", "verify", "view",
          "clean_all", "clean_run", "clean_sim"]
-
+PHASES=["prepare", "run", "verify", "view"]
 def parse_cl_vars():
     """
     Construct the argparse object and parse all the command line arguments into a dictionary to
@@ -81,6 +82,8 @@ def parse_cl_vars():
     parser.add_argument("name", default=None, type=str, action="store", nargs='?',
                         help="The name of the test or application to run.  Positional run options can follow the name after --.")
     parser.add_argument("-v", "--verbose", action="store_true", help="Be verbose with output.")
+    parser.add_argument("--phase", action="append", dest="phases", metavar="PHASE", default=[],
+                        choices=PHASES, help="Specific phase of test execution")
     parser.add_argument("--keep-simulations", dest="keep_sims", action="store_true",
                         help="Keep HDL simulation files regardless of verification results.  " +
                         "By default, simulation files are removed if the verification is " +
@@ -130,8 +133,7 @@ def parse_cl_vars():
     parser.add_argument("--run-arg", dest="run_arg", action="append",
                         help="Argument(s) to insert immediately after the ACI executable or " +
                         "ocpirun.  Not valid for Test.")
-    parser.add_argument("run_arg", nargs="*", 
-                        help=argparse.SUPPRESS)
+    parser.add_argument("run_arg", nargs="*", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
     parser.add_argument("--mode", dest="mode", default="all", choices=MODES,
                         help="Specify which phase(s) of the unit test to execute.  Not valid " +
                         "for Application.")
@@ -141,7 +143,16 @@ def parse_cl_vars():
                         "Development Guide (section 13.8) for more information on the "
                         "OCPI_REMOTE_TEST_SYSTEMS  variable.  Not valid for Application.")
 
-    cmd_args, args_value = parser.parse_known_args()
+    runargs=False
+    args=[]
+    for a in sys.argv[1:]:
+        if runargs:
+            args.append("--run-arg="+a)
+        elif a == "--":
+            runargs=True
+        else:
+            args.append(a)
+    cmd_args, args_value = parser.parse_known_args(args)
 
     if args_value:
         ocpiutil.logging.error("invalid options were used: " + " ".join(args_value))
@@ -211,11 +222,18 @@ def main():
             dir_type = ocpiutil.get_dirtype()
             # args['name'] could be None if no name is provided at the command line
             name = args['name']
-            directory = ocpiutil.get_ocpidev_working_dir(noun=args.get("noun", ""),
-                                                         name=name,
-                                                         library=args['library'],
-                                                         hdl_library=args['hdl_library'],
-                                                         hdl_platform=args['hdl_plat_dir'])
+            if not name and dir_type == "test":
+                directory = str(Path.cwd())
+                name = Path(directory).name
+            else:
+                directory = ocpiutil.get_ocpidev_working_dir(noun=args.get("noun", ""),
+                                                             name=name,
+                                                             library=args['library'],
+                                                             hdl_library=args['hdl_library'],
+                                                             platform=args['hdl_plat_dir'])
+            if args['noun'] not in ['project', 'registry', 'library']:
+                name = Path(directory).name
+                directory = str(Path(directory).parent)
             if (name is None) and (dir_type in [n for n in NOUNS if n != "tests"]):
                 name = os.path.basename(os.path.realpath('.'))
             del args['name']

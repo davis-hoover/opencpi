@@ -24,13 +24,15 @@
 #define CommandOption_H
 
 #include <assert.h>
+#include <vector>
 #include "OcpiUtilDataTypes.h"
 #include "OcpiUtilValue.h"
 
 namespace OCPI {
   namespace Util {
     class BaseCommandOptions {
-      const char **m_beforeArgv, **m_argv; // what is left after options
+      const char **m_beforeArgv;
+      std::vector<const char *> m_argv;
     protected:
       size_t m_argvCount;
       Member *m_options;
@@ -47,7 +49,7 @@ namespace OCPI {
     public:
       int usage(); // will return 1 so caller can return usage()
       const char *setArgv(const char **argv);
-      const char **argv() const { return m_argv; }
+      const char **argv() { return &m_argv[0]; }
       size_t argvCount() const { return m_argvCount; }
       std::string &error() { return m_error; }
       int main(const char **argv, int (*main)(const char **argv));
