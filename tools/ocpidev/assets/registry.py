@@ -40,17 +40,21 @@ class Registry(ShowableAsset):
     """
 
     def __init__(self, directory, name=None, **kwargs):
+        if not name:
+            name = str(Path(directory).name)
         super().__init__(directory, name, **kwargs)
-
+        
         # Each registry instance has a list of projects registered within it.
         # Initialize this list by probing the file-system for links that exist
         # in the registry directory.
         # __projects maps package-ID --> project instance
         self.__projects = {}
-        for proj in glob(self.directory + '/*'):
-            pid = os.path.basename(proj)
-            if os.path.exists(proj):
-                self.__projects[pid] = AssetFactory.factory("project", proj, **kwargs)
+        for path in Path(directory).glob('*'):
+            if not path.exists():
+                continue
+            pid = path.name
+            project_dir = str(path.resolve())
+            self.__projects[pid] = AssetFactory.factory("project", project_dir, **kwargs)
 
     def contains(self, package_id=None, directory=None):
         """
@@ -94,7 +98,6 @@ class Registry(ShowableAsset):
             raise ocpiutil.OCPIException("Failure to register project.  Project \"" + directory +
                                          "\" in location: " + os.getcwd() + " is not in a " +
                                          "project or does not exist.")
-
         project = AssetFactory.factory("project", directory)
         pid = project.package_id
 
@@ -492,8 +495,4 @@ class Registry(ShowableAsset):
                     'environment variable. Unset variable before attempting to delete'])
         if err_msg:
             raise ocpiutil.OCPIException(err_msg)
-        if not force:
-            prompt = "Delete the project registry at".format(self.directory)
-            force = ocpiutil.get_ok(prompt=prompt)
-        if force:
-            shutil.rmtree(self.directory)
+        super().delete('project registry', force=force)

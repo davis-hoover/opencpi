@@ -22,6 +22,7 @@ Show HDL utilization for an OpenCPI HDL Asset
 import argparse
 import os
 import sys
+from pathlib import Path
 import pydoc
 import types
 import _opencpi.util as ocpiutil
@@ -229,8 +230,9 @@ def main():
                                                          name=name,
                                                          library=args['library'],
                                                          hdl_library=args['hdl_library'],
-                                                         hdl_platform=args['hdl_plat_dir'])
+                                                         platform=args['hdl_plat_dir'])
 
+            directory = str(Path(directory).resolve())
             ocpiutil.logging.debug('Choose directory "' + directory + '" to operate in')
 
             dir_type = ocpiutil.get_dirtype(directory)

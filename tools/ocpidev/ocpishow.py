@@ -23,6 +23,7 @@ import argparse
 import os
 import sys
 import types
+from pathlib import Path
 import pydoc
 import _opencpi.util as ocpiutil
 import _opencpi.assets.factory as ocpifactory
@@ -256,7 +257,7 @@ def get_dir_from_noun(noun, name, args):
                                                      name=name,
                                                      library=args['library'],
                                                      hdl_library=args['hdl_library'],
-                                                     hdl_platform=args['hdl_plat_dir'])
+                                                     platform=args['hdl_plat_dir'])
     elif noun in ["libraries", "tests", "workers", "components"]:
         if args.get("scope", None) == "local":
             directory = ocpiutil.get_path_to_project_top()
@@ -302,6 +303,7 @@ def main():
             check_scope_options(args.get("scope", None), noun)
 
             directory = get_dir_from_noun(noun, name, args)
+            directory = str(Path(directory).resolve())
 
             ocpiutil.logging.debug('Choose directory "' + str(directory) + '" to operate in')
             # if noun is None:

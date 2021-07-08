@@ -19,6 +19,7 @@
 Definition of Test class
 """
 
+from pathlib import Path
 import _opencpi.util as ocpiutil
 from .abstract import RunnableAsset, HDLBuildableAsset, RCCBuildableAsset
 
@@ -39,11 +40,24 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
             mode (list) - Specify which phases of the unit test to run
             remote_test_sys (list) - Specify remote systems to run the test(s)
         """
-        if not directory.endswith(".test") and not directory.endswith(".test/"):
-            directory = directory + ".test"
-        self.check_dirtype("test", directory)
+        if not name:
+            name = Path(directory).name
+            directory = str(Path(directory).parent)
+        elif Path(name).suffix != '.test':
+            name += '.test'
+        path = Path(directory, name)
+        if path.suffix == '.test':
+            self.check_dirtype("test", str(path))
+        else:
+            dir_type = ocpiutil.get_dirtype(str(path))
+            if dir_type is None:
+                err_msg = ' '.join([
+                    'cannot operate within directory of type "None".',
+                    'Try returning to the top level of your project.'
+                ])
+                raise ocpiutil.OCPIException(err_msg)
         super().__init__(directory, name, **kwargs)
-
+        
         self.keep_sims = kwargs.get("keep_sims", False)
         self.view = kwargs.get("view", False)
         self.acc_errors = kwargs.get("acc_errors", False)
@@ -105,10 +119,13 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         goal=self.mode_dict[self.mode]
         if self.mode != "view" and (self.view or "view" in self.phases):
             goal.append("view")
+        directory = str(Path(self.directory, self.name))
+        make_file = ocpiutil.get_makefile(directory, "test")[0]
+        make_file = str(Path(directory, make_file).resolve())
         return ocpiutil.execute_cmd(self.get_settings(),
-                                    self.directory,
+                                    directory,
                                     goal,
-                                    file=ocpiutil.get_makefile(self.directory, "test")[0])
+                                    file=make_file)
 
     def build(self):
         """
@@ -117,36 +134,40 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         raise NotImplementedError("Test.build() is not implemented")
 
     @staticmethod
-    def get_working_dir(name, library, hdl_library, hdl_platform):
+    def get_working_dir(name, ensure_exists=True, **kwargs):
         """
         return the directory of a Test given the name (name) and
         library specifiers (library, hdl_library, hdl_platform)
         """
         # if more then one of the library location variable are not None it is an error
-        if len(list(filter(None, [library, hdl_library, hdl_platform]))) > 1:
-            ocpiutil.throw_invalid_libs_e()
         cur_dirtype = ocpiutil.get_dirtype()
         valid_dirtypes = ["project", "libraries", "library", "test"]
+        library = kwargs.get('library', '')
+        hdl_library = kwargs.get('hdl_library', '')
+        platform = kwargs.get('platform', '')
+        working_path = Path.cwd()
+        name = name if name else ''
+        if len(list(filter(None, [library, hdl_library, platform]))) > 1:
+            ocpiutil.throw_invalid_libs_e()
         if cur_dirtype not in valid_dirtypes:
             ocpiutil.throw_not_valid_dirtype_e(valid_dirtypes)
+
         #add on the .test to the test name if its not already there
-        name = name if name.endswith((".test", ".test/")) else name + ".test"
+        if name and not Path(name).suffix == '.test':
+            name += '.test'
+        project_path = Path(ocpiutil.get_path_to_project_top())
         if library:
             if not library.startswith("components"):
                 library = "components/" + library
-            return ocpiutil.get_path_to_project_top() + "/" + library + "/" + name
+            working_path = Path(project_path, library)
         elif hdl_library:
-            return ocpiutil.get_path_to_project_top() + "/hdl/" + hdl_library + "/" + name
-        elif hdl_platform:
-            return (ocpiutil.get_path_to_project_top() + "/hdl/platforms/" + hdl_platform +
-                    "/devices/" + name)
-        elif name:
-            if cur_dirtype == "hdl-platform":
-                return "devices/" + name
-            elif cur_dirtype == "project":
-                if ocpiutil.get_dirtype("components") == "libraries":
-                    ocpiutil.throw_specify_lib_e()
-                return "components/" + name
-            else:
-                return name
-        else: ocpiutil.throw_not_blank_e("test", "name", True)
+            working_path = Path(project_path, hdl_library)
+        elif platform:
+            working_path = Path(
+                project_path, 'hdl', 'platforms', platform, 'devices')
+        elif cur_dirtype == "hdl-platform":
+            working_path = Path(working_path, 'devices')
+
+        working_path = Path(working_path, name)
+
+        return str(working_path)
