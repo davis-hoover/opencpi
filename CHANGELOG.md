@@ -140,6 +140,7 @@ Changes/additions since [OpenCPI Release v2.1.1](https://gitlab.com/opencpi/open
 ### Miscellaneous
 - **doc**: remove LaTeX versions of data sheets that have been converted to Sphinx reST format. (!602)(c00bd01a)
 - **tools**: remove dependency of OpenCPI root dir on cdk dir in scripts. (!488)(2eacf67e)
+
 # [v2.1.1](https://gitlab.com/opencpi/opencpi/-/compare/v2.1.0...v2.1.1) (2021-05-19)
 
 Changes/additions since [OpenCPI Release v2.1.0](https://gitlab.com/opencpi/opencpi/-/releases/v2.1.0)
