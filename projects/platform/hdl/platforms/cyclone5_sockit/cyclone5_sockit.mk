@@ -17,7 +17,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # SET THIS VARIABLE to the part (die-speed-package, e.g. xc7z020-1-clg484) for the platform!
-HdlPart_cyclone5_sockit=5CSXFC6D6F31C8ES
+HdlPart_cyclone5_sockit=5CSXFC6D6-C8ES-F31
 # Set this variable to the names of any other component libraries with devices defined in this
 # platform. Do not use slashes.  If there is an hdl/devices library in this project, it will be
 # searched automatically, as will "devices" in any projects this project depends on.
