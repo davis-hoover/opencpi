@@ -131,8 +131,8 @@ Note that the *`utilization`* verb can be used with the *`worker`* noun to displ
 an HDL device worker's FPGA usage statistics. See link:ocpidev-worker.1.html[ocpidev-worker(1)]
 for more information.
 
-Within the HDL device worker's directory are the worker's "make" file (named Makefile),
-its OWD (named '<name>'*`.xml`*) and its primary source code file (named
+Within the HDL device worker's directory are the
+OWD (named '<name>'*`.xml`*) and its primary source code file (named
 '<name>'*`.vhd`*. The *`ocpidev create`* operation produces initial versions
 of these files that can then be edited as necessary to produce the HDL device
 worker implementation.

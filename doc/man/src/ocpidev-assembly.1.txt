@@ -31,7 +31,7 @@ Development Guide'
 In a project, an HDL assembly resides in its own directory '<name>'
 under an *`assemblies/`* subdirectory in the project's *`hdl/`* directory.
 An HDL assembly directory contains the assembly's OHAD XML file
-(named '<name>'*`.xml`*) and its "make" file (named *`Makefile`*).
+(named '<name>'*`.xml`*).
 The *`ocpidev create`* operation produces initial versions of these
 files that can then be edited as necessary.
 
