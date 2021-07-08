@@ -20,8 +20,7 @@ workers and tests that can be built, exported and installed to support
 applications.
 
 A component library is described by its directory structure
-and Makefile and has source and binary forms,
-but does not have an XML definition.
+and an options '<name>'.*`.xml`* file.
 
 In a project, a component library resides in its own directory.
 The default configuration is a single component library named
@@ -47,8 +46,8 @@ their own directories named '<component-name>'*`.test/`*; for example,
 required to use the components in the library from outside the library exist
 in the *`lib/`* directory.
 
-For more information on component library directory structure,
-its Makefile and forms, see the chapter "Component Libraries"
+For more information on component library directory structure and
+its XML file, see the chapter "Component Libraries"
 in the 'OpenCPI Component Development Guide'.
 
 Verbs that can operate on a component library are:
