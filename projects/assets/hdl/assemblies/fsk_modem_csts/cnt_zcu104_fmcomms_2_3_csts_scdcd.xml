@@ -20,7 +20,7 @@
   <Device name='data_src_qadc_csts0' card='fmcomms_2_3_csts_lpc_scdcd'>
     <Property name='ADC_INPUT_IS_LSB_OF_OUT_PORT' value='true'/>
   </Device>
-  <Device name='data_sink_qdac_csts0' card='fmcomms_2_3_cstslpc_scdcd'>
+  <Device name='data_sink_qdac_csts0' card='fmcomms_2_3_csts_lpc_scdcd'>
     <Property name='DAC_OUTPUT_IS_LSB_OF_IN_PORT' value='false'/>
   </Device>
   <Connection external='in_to_asm_rx_path_from_adc'
