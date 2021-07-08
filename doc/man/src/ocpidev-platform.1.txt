@@ -33,8 +33,8 @@ In a project, an HDL platform resides in its own directory '<name>' (which is
 usually the lowercase version of the name used by the platform's vendor)
 under a *`platforms/`* subdirectory in the project's *`hdl/`* directory.
 
-An HDL platform directory contains the platform's OHPD (named '<name>'*`.xml`*),
-its "make" file (named *`Makefile`*) and the VHDL source code skeleton file
+An HDL platform directory contains the platform's OHPD (named '<name>'*`.xml`*)
+and the VHDL source code skeleton file
 '<name>'*`.vhd`* for the HDL platform worker.
 The *`ocpidev create`* operation for an HDL platform produces
 initial versions of these files that can then be edited as necessary.
