@@ -22,6 +22,7 @@ Defining rcc/hdl platform related classes
 import os
 import sys
 import logging
+from pathlib import Path
 import json
 import _opencpi.util as ocpiutil
 import _opencpi.hdltargets as hdltargets
@@ -39,7 +40,6 @@ class RccPlatformsCollection(ShowableAsset):
     def __init__(self, directory, name=None, **kwargs):
         self.check_dirtype("rcc-platforms", directory)
         super().__init__(directory, name, **kwargs)
-
         self.platform_list = []
         if kwargs.get("init_hdlplats", False):
             logging.debug("Project constructor creating HdlPlatformWorker Objects")
@@ -76,6 +76,8 @@ class HdlPlatformsCollection(HDLBuildableAsset, ReportableAsset):
                                      objects contained in the project (at least those with a
                                      corresponding build platform listed in self.hdl_platforms)
         """
+        if not name:
+            name = str(Path(directory).name)
         self.check_dirtype("hdl-platforms", directory)
         super().__init__(directory, name, **kwargs)
         self.hdl_plat_strs = kwargs.get("hdl_plats", None)
@@ -121,16 +123,21 @@ class HdlPlatformsCollection(HDLBuildableAsset, ReportableAsset):
         raise NotImplementedError("HdlPlatformsCollection.build() is not implemented")
 
     @staticmethod
-    def get_working_dir(name, library, hdl_library, hdl_platform):
+    def get_working_dir(name, ensure_exists=True, **kwargs):
         """
         return the directory of an HDL Platform Collection given the name (name) and
         library specifiers (library, hdl_library, hdl_platform)
         """
-        ocpiutil.check_no_libs("hdl-platforms", library, hdl_library, hdl_platform)
-        if name: ocpiutil.throw_not_blank_e("hdl-platforms", "name", False)
+        library = kwargs.get('library', '')
+        hdl_library = kwargs.get('hdl_library', '')
+        platform = kwargs.get('platform', '')
+        ocpiutil.check_no_libs("hdl-platform", library, hdl_library, platform)
+        if not name: 
+            ocpiutil.throw_not_blank_e("hdl-platforms", "name", False)
         if ocpiutil.get_dirtype() not in ["project", "hdl-platforms"]:
             ocpiutil.throw_not_valid_dirtype_e(["project", "hdl-platforms"])
         return ocpiutil.get_path_to_project_top() + "/hdl/platforms"
+
 
 # pylint:disable=too-many-ancestors
 class HdlPlatformWorker(HdlWorker, ReportableAsset):
@@ -155,8 +162,6 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
             None
         """
         self.check_dirtype("hdl-platform", directory)
-        if name is None:
-            name = os.path.basename(directory)
         super().__init__(directory, name, **kwargs)
         self.configs = {}
         self.package_id = None
@@ -234,16 +239,22 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
         return util_report
 
     @staticmethod
-    def get_working_dir(name, library, hdl_library, hdl_platform):
+    def get_working_dir(name, ensure_exists=True, **kwargs):
         """
         return the directory of a HDL Platform given the name (name) and
         library specifiers (library, hdl_library, hdl_platform)
         """
-        ocpiutil.check_no_libs("hdl-platform", library, hdl_library, hdl_platform)
-        if not name: ocpiutil.throw_not_blank_e("hdl-platform", "name", True)
-        if ocpiutil.get_dirtype() not in ["project", "hdl-platforms", "hdl-platform"]:
-            ocpiutil.throw_not_valid_dirtype_e(["project", "hdl-platforms", "hdl-platform"])
-        return ocpiutil.get_path_to_project_top() + "/hdl/platforms/" + name
+        if not name: 
+            ocpiutil.throw_not_blank_e("hdl-platforms", "name", False)
+        if ocpiutil.get_dirtype() not in ["project", "hdl-platforms"]:
+            ocpiutil.throw_not_valid_dirtype_e(["project", "hdl-platforms"])
+        project_path = Path(ocpiutil.get_path_to_project_top())
+        hdl_path = Path(project_path, 'hdl')
+        if not hdl_path.exists() and not ensure_exists:
+            hdl_path.mkdir()
+        working_path = Path(hdl_path, 'platforms', name)
+        return str(working_path)
+
 # pylint:enable=too-many-ancestors
 
 class HdlPlatformWorkerConfig(HdlAssembly):
@@ -371,6 +382,8 @@ class RccPlatform(Platform):
         Constructor for RccPlatform no extra values from kwargs processed in this constructor
         """
         self.check_dirtype("rcc-platform", directory)
+        if not name:
+            name = str(Path(directory).name)
         super().__init__(directory, name, **kwargs)
 
     def __str__(self):
@@ -590,6 +603,7 @@ class HdlPlatform(Platform):
         elif details == "json":
             json.dump(plat_dict, sys.stdout)
             print()
+
 
 class HdlTarget(object):
     """

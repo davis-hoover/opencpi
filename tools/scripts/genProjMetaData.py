@@ -214,8 +214,9 @@ def indent(elem, level=0):
         if level and (not elem.tail or not elem.tail.strip()):
             elem.tail = i
 
-def main():
-    if len(sys.argv) < 2 :
+def main(project_dir=None):
+    
+    if not project_dir and len(sys.argv) < 2 :
         print("ERROR: need to specify the path to the project")
         sys.exit(1)
 
@@ -224,7 +225,7 @@ def main():
     else:
         force = False
 
-    mydir = sys.argv[1]
+    mydir = project_dir if project_dir else sys.argv[1]
     mydir = ocpiutil.get_path_to_project_top(mydir)
 
     if (isStale(mydir, force)):
