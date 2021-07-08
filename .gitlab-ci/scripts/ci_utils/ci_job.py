@@ -427,7 +427,7 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
         stages:          List of all pipeline stages
         platform:        Platform to download artifacts for
         host_platform:   Host_platform to download artifacts for
-        linked_platform: Associated platform to downloaded artifacts 
+        linked_platform: Associated platform to download artifacts 
                          for
         do_ocpiremote:   Whether job should run ocpiremote commands
 
@@ -581,8 +581,10 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
                                 linked_platform=linked_platform),
             make_ocpiremote_cmd('start', platform,
                                 linked_platform=linked_platform),
-            make_ocpiremote_cmd('log', platform,
-                                linked_platform=linked_platform),
+            # temporarily disable log retrieval here until the
+            # log command can be executed in the background.
+            # make_ocpiremote_cmd('log', platform,
+            #                     linked_platform=linked_platform),
             interfaces_cmd,
             'export OCPI_SOCKET_INTERFACE="${interfaces[$CI_RUNNER_ID]}"',
             'echo "${OCPI_SOCKET_INTERFACE}"',
@@ -632,6 +634,8 @@ def make_after_script(pipeline, platform, do_ocpiremote=False):
     if do_ocpiremote:
         cmds.append('source cdk/opencpi-setup.sh -e')
         cmds.append(make_ocpiremote_cmd('stop', platform) + " || true")
+        # temporarily retrieve log here
+        cmds.append(make_ocpiremote_cmd('log', platform))
         cmds.append(make_ocpiremote_cmd('unload', platform))
 
     clean_cmd = 'rm -rf * .* 2>/dev/null || true'
