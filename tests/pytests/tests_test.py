@@ -51,9 +51,11 @@ class TestsTest(unittest.TestCase):
         create a Test in the default way
         """
         my_asset = AssetFactory.factory(self.asset_type,
-                                        "../av-test/components/test_worker.test",
-                                        "prop_mem_align_info")
+                                        "../av-test/components/",
+                                        "test_worker")
+
         assert my_asset.run() == 0
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -23,6 +23,7 @@ import os
 import logging
 import _opencpi.util as ocpiutil
 import jinja2
+from pathlib import Path
 import _opencpi.assets.template as ocpitemplate
 import subprocess
 from .abstract import RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAsset, Asset
@@ -45,7 +46,8 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
             init_workers (T/F) - Instructs the method whether to construct all worker objects
                                  contained in the library
         """
-        self.check_dirtype("library", directory)
+        if not name:
+            name = str(Path(directory).name)
         super().__init__(directory, name, **kwargs)
         self.test_list = None
         self.tests_names = None
@@ -171,28 +173,32 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         raise NotImplementedError("Library.build() is not implemented")
 
     @staticmethod
-    def get_working_dir(name, library, hdl_library, hdl_platform):
+    def get_working_dir(name, ensure_exists=True, **kwargs):
         """
         return the directory of a Library given the name (name) and
         library specifiers (library, hdl_library, hdl_platform)
         """
         # if more then one of the library location variables are not None it is an error.
         # a length of 0 means that a name is required and a default location of components/
-        if len(list(filter(None, [library, hdl_library, hdl_platform]))) > 1:
+        library = kwargs.get('library', '')
+        hdl_library = kwargs.get('hdl_library', '')
+        platform = kwargs.get('platform', '')
+        if len(list(filter(None, [library, hdl_library, platform]))) > 1:
             ocpiutil.throw_invalid_libs_e()
-        if name: ocpiutil.check_no_libs("library", library, hdl_library, hdl_platform)
-        if library:
-            return "components/" + library
-        elif hdl_library:
-            return "hdl/" + hdl_library
-        elif hdl_platform:
-            return "hdl/platforms/" + hdl_platform + "/devices"
-        elif name:
-            if name != "components" and ocpiutil.get_dirtype() != "libraries":
-                name = "components/" + name
-            return name
+        ocpiutil.check_no_libs('library', library, hdl_library, platform)
+        if not name:
+            ocpiutil.throw_not_blank_e("library", "name", True)
+
+        working_path = Path(ocpiutil.get_path_to_project_top())
+        comp_path = Path(working_path, 'components')
+        if name != 'components':
+            if not comp_path.exists() and not ensure_exists:
+                comp_path.mkdir()
+            working_path = Path(comp_path, name)
         else:
-            ocpiutil.throw_specify_lib_e()
+            working_path = comp_path
+
+        return str(working_path)
 
     def _get_template_dict(name, directory, **kwargs):
         """
@@ -243,41 +249,18 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
     @staticmethod
     def create(name, directory, **kwargs):
         """
-        Create library assets
+        Create library asset
         """
-        if not name:
-           raise ocpiutil.OCPIException("Creating a library asset requires a name")
-        dirtype = ocpiutil.get_dirtype(directory)
-        if dirtype != "project" and dirtype != "libraries":
-           raise ocpiutil.OCPIException(directory + " must be a project or components directory")
+        lib_path = Path(directory, name)
+        if lib_path.exists():
+            err_msg = 'library "{}" already exists at "{}"'.format(name, str(lib_path))
+            raise ocpiutil.OCPIException(err_msg)
 
-        if dirtype == "project":
-            compdir = directory + "/components/"
-            if not os.path.isdir(compdir):
-                os.mkdir(compdir) 
-            os.chdir(compdir)
-
-        currdir = os.getcwd()
-        currtype = ocpiutil.get_dirtype(currdir)
-        if not currtype == "libraries":
-            raise ocpiutil.OCPIException(currdir + " must be of type libraries")
-        compdir = currdir
-        libdir = currdir + "/" + name
-        if os.path.exists(libdir):
-            raise ocpiutil.OCPIException(libdir + " already exists.")
-
-        os.mkdir(libdir) 
-        os.chdir(libdir)
-        template_dict = Library._get_template_dict(name, compdir, **kwargs)
+        lib_path.mkdir()
+        os.chdir(str(lib_path))
+        template_dict = Library._get_template_dict(name, directory, **kwargs)
         template = jinja2.Template(ocpitemplate.LIB_DIR_XML, trim_blocks=True)
         ocpiutil.write_file_from_string(name + ".xml", template.render(**template_dict))
-        template = jinja2.Template(ocpitemplate.LIB_DIR_MAKEFILE, trim_blocks=True)
-        ocpiutil.write_file_from_string("Makefile", template.render(**template_dict))
-        subprocess.check_call('make')
-        os.remove("Makefile")
-        cdkdir = os.environ.get('OCPI_CDK_DIR')
-        metacmd = cdkdir + "/scripts/genProjMetaData.py "
-        os.system(metacmd + compdir)
 
 
 class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAsset):

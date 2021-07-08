@@ -1,0 +1,55 @@
+<ComponentSpec>
+
+  <Property name='bypass'
+            type='bool'
+            writable='true'
+            default='false'
+            description='Forces in port messages to be sent directly to out
+            port, bypassing the timestamping functionality.'/>
+  <Property name='time_correction_seconds'
+            type='long'
+            writable='true'
+            default='0'
+            description='Q32.0 time correction value which is subtracted from
+            the applied time (note Qm.n implies existence of a sign bit).'/>
+  <Property name='time_correction_fraction'
+            type='longlong'
+            writable='true'
+            default='0'
+            description='Q0.64 time correction value which is subtracted from
+            the applied time (note Qm.n implies existence of a sign bit).'/>
+
+  <Property name='correction_overflow_sticky'
+            type='bool'
+            volatile='true'
+            description='Sticky bit overflow indication of correction
+            calculation.'/>
+  <Property name='clr_correction_overflow_sticky'
+            type='bool'
+            writable='true'
+            default='false'
+            description='Writing a value of true clears
+            correction_overflow_sticky.'/>
+  <Property name='force_error_on_invalid_time_at_start'
+            type='bool'
+            initial='true'
+            default='false'
+            description='Forces worker into the unusable state if the time
+            invalid signal is low during the worker initialized state.'/>
+  <Property name='samples_per_timestamp'
+            description='After each timestamp, this number of samples is passed before the next one.
+                         If zero, a timestamp precedes each sample output message (not recommended).'
+            type='ulong'
+            writable='true'
+            default='1m'/>
+  <Property name='sampling_interval_fraction' type='ulonglong' writable='true' default='0'
+	    description='The fraction of a second between samples, in Q0.64 fixed point format.
+                         Send in the stream if non-zero, upon start or when written'/>
+  <Property name='sampling_interval_seconds' type='ulong' writable='true' default='0'
+	    description='The fraction of a second between samples, in Q0.32 fixed point format.
+                         Send in the stream if non-zero, upon start or when written'/>
+  <Port name='in' producer='false' protocol='complex_short_timed_sample-prot'/>
+  <Port name='out' producer='true' protocol='complex_short_timed_sample-prot'/>
+
+
+</ComponentSpec>

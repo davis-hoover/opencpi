@@ -37,22 +37,47 @@ The file write component writes application data to a file. To use it, specify
 an instance of it and connect its input port to an output port of the component
 that produces the data. Use the ``fileName property`` to specify the name of the file
 to be written.
+
 This component has one input port whose name is ``in``, which carries the
 messages to be written to the file. There is no protocol associated
 with the port, enabling it to be agnostic as to the protocol
-of the component connected to the input port.
+of the file data and the connected output port.
 
 Operating Modes
 ~~~~~~~~~~~~~~~
-The file read component supports data-streaming mode and messaging mode.
+The file read component has two modes of operation: data-streaming mode and messaging mode.
+These modes are similar, but not identical to the :ref:`file_read` component modes.
 
 Data-Streaming Mode
 ^^^^^^^^^^^^^^^^^^^
-In data-streaming mode, the file contents become the payloads of the stream
+In data-streaming mode, the contents of the file become the payloads of the stream
 of messages arriving at the input port. No message lengths or opcodes are
 recorded in the output file.
 
-.. include:: ../file_read.test/doc/snippets/messaging_snippet.rst
+Messaging Mode
+^^^^^^^^^^^^^^
+
+In messaging mode, the contents of the output file are written as a sequence of defined
+messages, with an 8-byte header in the file itself preceding the data for each message
+written to the file. This header contains the length and opcode of the message, with the
+data contents of the message following the header. The length can be zero, meaning
+that a header will be written but no data will follow the header in the file.
+
+The first 32-bit word of the header is written as the message length in bytes, little-endian.
+The next 8-bit byte is the opcode of the message, followed by three padding bytes.
+For example, in the C language (on a little-endian processor):
+
+.. code-block:: C
+		
+   struct {
+   uint32_t messageLength;
+   uint8_t opcode;
+   uint8_t padding[3];
+   };
+
+This format of messages in a file is the format consumed by the :ref:`file_read` component
+when in messaging mode.
+
 
 Implications for No Protocol on Port
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -62,18 +87,20 @@ formatted to match the protocol of the output port of the connected component.
 
 End-of-File Handling
 ~~~~~~~~~~~~~~~~~~~~
-When the file write component receives an end-of-file notification, it
-interprets this as the end of data, declares itself "done" and does
-not write any further messages to the file.
+If the file write component receives an EOF indication, it will interpret it as the end
+of data and will close the output file and declare itself “finished”, entering the
+*finished* state. This is useful when this component is specified as the “finished”
+component instance for applications, which is indicated by setting the ``finished``
+top-level attribute in the application (OAS) to the instance name of a file write
+component. Thus, when the file write component writes out all its data and
+receives the EOF, the application is considered finished.
+
+Nothing is written to the output file for the EOF indication.
 
 Interface
 ---------
 .. literalinclude:: ../specs/file_write_spec.xml
    :language: xml
-
-Opcode Handling
-~~~~~~~~~~~~~~~
-To be supplied: Description of how the non-stream opcodes are handled.
 
 Properties
 ~~~~~~~~~~
@@ -119,4 +146,5 @@ Limitations of ``file_write`` are:
 Testing
 -------
 All test benches use the worker implementation as part of the verification process. This component does not have a unit test suite.
+
 .. ocpi_documentation_test_result_summary::

@@ -37,7 +37,7 @@ name as a worker. The directory contains the HDL primitive's XML file, '<primiti
 its source code (Verilog or VHDL, with possible pre-built files
 for HDL primitive cores). The *`ocpidev create`* operation for an HDL primitive
 creates an initial version of the '<primitive-name>'*`.xml`* file and, for primitive libraries, an initial '<name>'*`_pkg.vhd`* file.  These can then be edited as
-necessary to for the HDL primitive.
+necessary for the HDL primitive.
 
 For details on how to develop an HDL primitive, see the chapter
 "HDL Primitives" in the 'OpenCPI HDL Development Guide'.

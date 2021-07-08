@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <office:document xmlns:officeooo="http://openoffice.org/2009/office" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:drawooo="http://openoffice.org/2010/draw" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:css3t="http://www.w3.org/TR/css3-text/" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:rpt="http://openoffice.org/2005/report" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0" xmlns:ooo="http://openoffice.org/2004/office" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.text">
- <office:meta><dc:title>OCPI_ODT</dc:title><meta:editing-cycles>1073</meta:editing-cycles><meta:creation-date>2014-12-13T12:37:04.602691000</meta:creation-date><meta:editing-duration>P69DT10H45M37S</meta:editing-duration><meta:generator>LibreOffice/6.4.7.2$MacOSX_X86_64 LibreOffice_project/639b8ac485750d5696d7590a72ef1b496725cfb5</meta:generator><meta:initial-creator>James Kulp</meta:initial-creator><dc:date>2021-07-08T09:07:20.347684743</dc:date><dc:creator>James Kulp</dc:creator><meta:document-statistic meta:table-count="13" meta:image-count="11" meta:object-count="0" meta:page-count="114" meta:paragraph-count="1800" meta:word-count="38304" meta:character-count="250565" meta:non-whitespace-character-count="212298"/><meta:user-defined meta:name="AppVersion">14.0000</meta:user-defined><meta:user-defined meta:name="Company">Parera Information Services, Inc.</meta:user-defined><meta:user-defined meta:name="DocSecurity" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="HyperlinksChanged" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="LinksUpToDate" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ScaleCrop" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ShareDoc" meta:value-type="boolean">false</meta:user-defined><meta:template xlink:type="simple" xlink:actuate="onRequest" xlink:title="OCPI_ODT" xlink:href="shared/OCPI_ODT.ott" meta:date="2020-01-20T15:05:49.796497046"/></office:meta>
+ <office:meta><dc:title>OCPI_ODT</dc:title><meta:editing-cycles>1074</meta:editing-cycles><meta:creation-date>2014-12-13T12:37:04.602691000</meta:creation-date><meta:editing-duration>P69DT12H6M34S</meta:editing-duration><meta:generator>LibreOffice/6.4.7.2$MacOSX_X86_64 LibreOffice_project/639b8ac485750d5696d7590a72ef1b496725cfb5</meta:generator><meta:initial-creator>James Kulp</meta:initial-creator><dc:date>2021-07-08T10:28:17.896758712</dc:date><dc:creator>James Kulp</dc:creator><meta:document-statistic meta:table-count="13" meta:image-count="11" meta:object-count="0" meta:page-count="114" meta:paragraph-count="1800" meta:word-count="38304" meta:character-count="250565" meta:non-whitespace-character-count="212298"/><meta:user-defined meta:name="AppVersion">14.0000</meta:user-defined><meta:user-defined meta:name="Company">Parera Information Services, Inc.</meta:user-defined><meta:user-defined meta:name="DocSecurity" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="HyperlinksChanged" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="LinksUpToDate" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ScaleCrop" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ShareDoc" meta:value-type="boolean">false</meta:user-defined><meta:template xlink:type="simple" xlink:actuate="onRequest" xlink:title="OCPI_ODT" xlink:href="shared/OCPI_ODT.ott" meta:date="2020-01-20T15:05:49.796497046"/></office:meta>
  <office:settings>
   <config:config-item-set config:name="ooo:view-settings">
    <config:config-item config:name="ViewAreaTop" config:type="long">498501</config:config-item>
    <config:config-item config:name="ViewAreaLeft" config:type="long">312</config:config-item>
    <config:config-item config:name="ViewAreaWidth" config:type="long">19879</config:config-item>
-   <config:config-item config:name="ViewAreaHeight" config:type="long">14203</config:config-item>
+   <config:config-item config:name="ViewAreaHeight" config:type="long">14877</config:config-item>
    <config:config-item config:name="ShowRedlineChanges" config:type="boolean">true</config:config-item>
    <config:config-item config:name="InBrowseMode" config:type="boolean">false</config:config-item>
    <config:config-item-map-indexed config:name="Views">
     <config:config-item-map-entry>
      <config:config-item config:name="ViewId" config:type="string">view2</config:config-item>
-     <config:config-item config:name="ViewLeft" config:type="long">5537</config:config-item>
-     <config:config-item config:name="ViewTop" config:type="long">502885</config:config-item>
+     <config:config-item config:name="ViewLeft" config:type="long">3041</config:config-item>
+     <config:config-item config:name="ViewTop" config:type="long">500763</config:config-item>
      <config:config-item config:name="VisibleLeft" config:type="long">312</config:config-item>
      <config:config-item config:name="VisibleTop" config:type="long">498501</config:config-item>
      <config:config-item config:name="VisibleRight" config:type="long">20189</config:config-item>
-     <config:config-item config:name="VisibleBottom" config:type="long">512703</config:config-item>
+     <config:config-item config:name="VisibleBottom" config:type="long">513376</config:config-item>
      <config:config-item config:name="ZoomType" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutColumns" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutBookMode" config:type="boolean">false</config:config-item>
@@ -10496,7 +10496,7 @@
    <text:p text:style-name="P412">An example <text:span text:style-name="FirstEmphasis">system</text:span> is the ZedBoard, which has a Xilinx Zynq SoC part on its motherboard that has a dual-core ARM processor as well as an FPGA inside. <text:s/>This board thus has two platforms, <text:span text:style-name="T1037">1) </text:span>an ARM-<text:span text:style-name="T1037">CPU-</text:span>based <text:span text:style-name="FirstEmphasis">platform</text:span> attached to a variety of external peripherals (Ethernet, USB, etc.) as well as <text:span text:style-name="T1037">2) </text:span>an FPGA-based <text:span text:style-name="FirstEmphasis">platform</text:span> attached to some external peripherals (devices) as well as an attached external FMC <text:span text:style-name="FirstEmphasis">slot</text:span> into which different <text:span text:style-name="FirstEmphasis">cards</text:span> may be plugged.</text:p>
    <text:p text:style-name="P364">Thus the devices available on a platform are either a permanent part of the platform, or are available on defined cards <text:span text:style-name="T609">when they</text:span> are plugged into one of the platform&apos;s slots.</text:p>
    <text:p text:style-name="P365">Platforms can have any number of devices, and may have multiple devices of the same type. <text:s/>When cards are plugged into a platform&apos;s slots, they make additional devices available <text:span text:style-name="T734">to</text:span> the platform.</text:p>
-   <text:list xml:id="list90736012218874" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102824414472150" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Systems have platforms and interconnects.</text:p>
     </text:list-item>
@@ -10509,7 +10509,7 @@
    </text:list>
    <text:h text:style-name="P351" text:outline-level="2"><text:bookmark-start text:name="__RefHeading__1021_1060509377"/><text:span text:style-name="T926">Enabling </text:span>Development <text:span text:style-name="T1037">for, </text:span>and Execution <text:span text:style-name="T1037">on, an OpenCPI Platform</text:span><text:bookmark-end text:name="__RefHeading__1021_1060509377"/></text:h>
    <text:p text:style-name="P238"><text:span text:style-name="T926">To make a platform usable for OpenCPI </text:span><text:span text:style-name="T93">one</text:span><text:span text:style-name="T927"> must </text:span><text:span text:style-name="T78">enable</text:span><text:span text:style-name="T927">:</text:span></text:p>
-   <text:list xml:id="list90736393699373" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102825604554579" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:span text:style-name="FirstEmphasis">development</text:span> –<text:span text:style-name="T928"> installing and configuring tools to create executables </text:span><text:span text:style-name="T78">targeting</text:span><text:span text:style-name="T928"> it, on some development host.</text:span></text:p>
     </text:list-item>
@@ -10527,7 +10527,7 @@
    <text:p text:style-name="P367">Enabling systems for OpenCPI implies enabling the platforms and interconnects in the system for OpenCPI, <text:span text:style-name="T928">and thus</text:span> enabling the processors and devices on the platforms and the devices on any cards used in the system. <text:s/>The first step in the enabling process is to establish the inventory of these elements in the system.</text:p>
    <text:p text:style-name="P585"><text:span text:style-name="T1039">Since </text:span><text:span text:style-name="T694">specific </text:span><text:span text:style-name="T1039">interconnects, processors, and devices are frequently found in many different systems, it is </text:span><text:span text:style-name="T79">likely</text:span><text:span text:style-name="T1039"> that support is already in OpenCPI. <text:s/>So the enabling process is </text:span><text:span text:style-name="T79">really for</text:span><text:span text:style-name="T1039"> the elements </text:span><text:span text:style-name="T79">without</text:span><text:span text:style-name="T1039"> OpenCPI support. <text:s/>Furthermore, there may be devices in the system that do not require OpenCPI </text:span><text:span text:style-name="T694">support, </text:span><text:span text:style-name="T1039">either because they are not going to be used, or </text:span><text:span text:style-name="T695">there is no benefit given</text:span><text:span text:style-name="T1039"> the scope of what OpenCPI does.</text:span></text:p>
    <text:p text:style-name="P367">The system inventory for OpenCPI <text:span text:style-name="T614">consists of</text:span>:</text:p>
-   <text:list xml:id="list90734932874373" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102824556086609" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P13">Processors <text:span text:style-name="T696">(attached to interconnects and devices)</text:span></text:p>
     </text:list-item>
@@ -10553,7 +10553,7 @@
    <text:p text:style-name="P82"><text:span text:style-name="T1038">For each, e</text:span>valuate the state of support <text:span text:style-name="T699">currently with</text:span>in OpenCPI and <text:span text:style-name="T275">identify</text:span> additional technical efforts likely to be required. <text:s/>These assessments establish a rough level of effort, without necessarily establishing feasibility. <text:s/>A ROM <text:span text:style-name="T279">(rough order or magnitude) </text:span>LOE <text:span text:style-name="T279">(level of effort) </text:span>can be establishe<text:span text:style-name="T279">d</text:span>.</text:p>
    <text:p text:style-name="P163">This effort requires matching technical support requirements with the current state of support in OpenCPI, and thus would require either gaining some familiarity with the OpenCPI supported hardware universe, or engaging with a group that is already familiar with it.</text:p>
    <text:h text:style-name="P793" text:outline-level="4">For each processor, determine <text:span text:style-name="T273">the level of support within OpenCPI:</text:span></text:h>
-   <text:list xml:id="list90736505677710" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102825667740605" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:span text:style-name="T275">Currently</text:span> supported (e.g. Zynq ARM processor, Intel AMD x86 processor)</text:p>
     </text:list-item>
@@ -10568,7 +10568,7 @@
     </text:list-item>
    </text:list>
    <text:h text:style-name="P793" text:outline-level="4">For each processor, <text:s/><text:span text:style-name="T274">determine the level of tool chain support within OpenCPI:</text:span></text:h>
-   <text:list xml:id="list90734893611126" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102826328067583" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:span text:style-name="T275">Currently</text:span> supported by OpenCPI</text:p>
     </text:list-item>
@@ -10580,7 +10580,7 @@
     </text:list-item>
    </text:list>
    <text:h text:style-name="Heading_20_4" text:outline-level="4"><text:soft-page-break/>For each interconnect, determine level of support required for each processor type <text:span text:style-name="T276">that is attached to it</text:span>:</text:h>
-   <text:list xml:id="list90736692528521" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102824550478191" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:span text:style-name="T275">Currently</text:span> supported</text:p>
     </text:list-item>
@@ -10592,7 +10592,7 @@
     </text:list-item>
    </text:list>
    <text:h text:style-name="Heading_20_4" text:outline-level="4"><text:span text:style-name="T277">For each device attached to a</text:span><text:span text:style-name="T1038">n</text:span><text:span text:style-name="T277"> </text:span><text:span text:style-name="T99">FPGA</text:span><text:span text:style-name="T277"> or on a required card, determine the level</text:span> of support <text:span text:style-name="T278">within</text:span> OpenCPI and <text:span text:style-name="T278">identify the</text:span> additional technical efforts likely to be required the each device.</text:h>
-   <text:list xml:id="list90736135424237" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102825800042573" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:span text:style-name="T278">Currently</text:span> supported</text:p>
     </text:list-item>
@@ -10610,7 +10610,7 @@
    <text:p text:style-name="P370">For all elements requiring updated <text:span text:style-name="T928">code </text:span>or new support, collect information necessary to perform the enabling technical development, and to establish more detailed work estimates. <text:s/><text:span text:style-name="T700">The information required here is more comprehensive than the basic information required above: <text:s/>it must be sufficient to perform the needed development. <text:s/></text:span>This effort will establish the availability of appropriate information to perform the technical development. <text:s/>It will also find any roadblocks to obtaining the information (vendor unwillingness, legacy unavailability<text:span text:style-name="T279">)</text:span>.</text:p>
    <text:p text:style-name="P372">In the particular case of device support, some vendors <text:span text:style-name="T700">may</text:span> not expose sufficient information to support their devices in the absence of their own “drivers” that embed their ICD <text:span text:style-name="T279">(interface control document), </text:span>information they consider a trade secret. <text:s/>Such positioning by vendors <text:span text:style-name="T700">may make optimal support for OpenCPI challenging or impossible.</text:span></text:p>
    <text:p text:style-name="Body">Required information for processors/<text:span text:style-name="T557">FPGAs include:</text:span></text:p>
-   <text:list xml:id="list90736284537107" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102825779180087" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Tool requirements (which tools <text:span text:style-name="T928">and versions</text:span>, which settings, <text:span text:style-name="T557">cost</text:span>)</text:p>
     </text:list-item>
@@ -10619,7 +10619,7 @@
     </text:list-item>
    </text:list>
    <text:p text:style-name="Body">Require<text:span text:style-name="T928">d</text:span> information for devices <text:span text:style-name="T277">include:</text:span></text:p>
-   <text:list xml:id="list90735154643307" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102825032118101" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P14">Device data sheets <text:span text:style-name="T558">or equivalent functional and interface documentation</text:span></text:p>
     </text:list-item>
@@ -10636,7 +10636,7 @@
    <text:p text:style-name="P516"><text:span text:style-name="T277">As part of this effort, any additional required feasibility experiments, reverse engineering or other design/analysis </text:span><text:span text:style-name="T14">t</text:span><text:span text:style-name="T13">asks</text:span><text:span text:style-name="T277">, are identified. <text:s/>These are tasks to fill in the information gaps in order to have high confidence work estimates and plans.</text:span></text:p>
    <text:h text:style-name="P605" text:outline-level="3"><text:bookmark-start text:name="__RefHeading___Toc4331_234407367"/><text:soft-page-break/>Experiments to <text:span text:style-name="T286">E</text:span>stablish <text:span text:style-name="T286">F</text:span>eas<text:span text:style-name="T607">i</text:span>bility <text:span text:style-name="T280">and Missing Information</text:span><text:bookmark-end text:name="__RefHeading___Toc4331_234407367"/></text:h>
    <text:p text:style-name="P83">There are <text:span text:style-name="T701">typically</text:span> uncertainties and gaps in technical documentation, and in some cases the information is unavailable due to proprietary restrictions. <text:s/>In any case, as a final step to enable accurate work breakdowns and time/cost estimates, there are usually a set of tasks involving hands-on experience with the target system prior to the actual technical development. <text:s/>Such <text:span text:style-name="T701">experiments</text:span> are derived from the <text:span text:style-name="T280">process</text:span> of the above tasks <text:span text:style-name="T280">(i.e. discovering knowledge gaps)</text:span>, and may include:</text:p>
-   <text:list xml:id="list90736875628022" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102824607030158" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P54">Identify, install, and configure vendor-provided tools and hardware.</text:p>
     </text:list-item>
@@ -10655,7 +10655,7 @@
    <text:p text:style-name="P244"><text:span text:style-name="T559">The tasks defined here will be of types described more fully in other sections of this document, where the various </text:span><text:span text:style-name="T22">a</text:span><text:span text:style-name="T13">spects</text:span><text:span text:style-name="T559"> of platform development are described in detail.</text:span></text:p>
    <text:h text:style-name="P606" text:outline-level="3"><text:bookmark-start text:name="__RefHeading___Toc4335_234407367"/>Technical Development<text:bookmark-end text:name="__RefHeading___Toc4335_234407367"/></text:h>
    <text:p text:style-name="P164">The various technical development tasks are of the types corresponding to specific sections of this document. <text:s/><text:span text:style-name="T560">Each type in the following list may or may not be required to enable a given system. <text:s/>Small updates or enhancements to existing modules are common.</text:span></text:p>
-   <text:list xml:id="list90734941862213" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102824686083498" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Enabling a new development system <text:span text:style-name="T560">(including native development and execution)</text:span></text:p>
     </text:list-item>
@@ -10694,7 +10694,7 @@
    <text:p text:style-name="P246"><text:span text:style-name="T933">Before any </text:span><text:span text:style-name="T23">r</text:span><text:span text:style-name="T24">equired</text:span><text:span text:style-name="T933"> tools are installed on the development host, the basic development configuration for the host must be established for OpenCPI. <text:s/>This process starts with the same </text:span><text:span text:style-name="T23">i</text:span><text:span text:style-name="T25">nitial</text:span><text:span text:style-name="T933"> steps as outlined in the </text:span><text:a xlink:type="simple" xlink:href="http://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Installation_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="FirstEmphasis">OpenCPI Installation Guide</text:span></text:a><text:span text:style-name="T933">: <text:s/>installing the </text:span><text:span text:style-name="Code">git</text:span><text:span text:style-name="T933"> package, enabling your user for </text:span><text:span text:style-name="Code">sudo</text:span><text:span text:style-name="T933">, and downloading the OpenCPI source tree using the </text:span><text:span text:style-name="Code">git clone</text:span><text:span text:style-name="T933"> command.</text:span></text:p>
    <text:p text:style-name="P246"><text:span text:style-name="T933">A binary/packaged </text:span><text:span text:style-name="T1040">distribution of OpenCPI such as </text:span><text:span text:style-name="T933">RPM is not appropriate for enabling a new development host: <text:s/></text:span><text:span text:style-name="T80">a</text:span><text:span text:style-name="T1040"> source installation is required.</text:span></text:p>
    <text:p text:style-name="P247">The steps required for any software platform (development host or embedded GPP), is described in the next section, <text:a xlink:type="simple" xlink:href="#4.Enabling GPP Platforms|outline" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link">Enabling GPP Platforms</text:a>. <text:s/>The primary aspects that are different with the <text:span text:style-name="T171">development host</text:span> are:</text:p>
-   <text:list xml:id="list90736098023309" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102824917531465" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">The OpenCPI source tree lives on the development host (or is accessible to it).</text:p>
     </text:list-item>
@@ -10712,7 +10712,7 @@
    <text:p text:style-name="P243">If a new development host is a variant or new version of an existing supported one, the task is usually modest. <text:s/>However, a develop<text:span text:style-name="T965">ment</text:span> host actually “hosts” other development tools for other platforms (e.g. FPGA tools), and OpenCPI requires certain other tools to be installed (e.g. python3). <text:s/>Thus testing and specifying how all the required packages are installed, and whether various FPGA tools can be installed and run, can be time consuming. <text:s/>OpenCPI already has support for various versions of CentOS, Ubuntu, and MacOS (MacOS without FPGA tools).</text:p>
    <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading__1025_1060509377"/><text:span text:style-name="T479">Enabling </text:span>GPP Platforms<text:bookmark-end text:name="__RefHeading__1025_1060509377"/></text:h>
    <text:p text:style-name="Standard">To execute on <text:span text:style-name="T263">GPP</text:span> platforms, new additions or modifications to the OpenCPI <text:span text:style-name="T265">framework</text:span> software may be required. <text:s/>The <text:span text:style-name="T265">framework</text:span> software is highly portable and <text:span text:style-name="T281">is</text:span> supported on a number of platforms and environments. <text:s/>However, it is <text:span text:style-name="T782">possible</text:span> for a new compiler, toolchain, or system libraries to require adjustments to the OpenCPI <text:span text:style-name="T782">framework</text:span> software. <text:s/>Here are <text:span text:style-name="T281">a few</text:span> reasons that <text:span text:style-name="T795">may </text:span>require modifications to <text:span text:style-name="T782">framework</text:span> software:</text:p>
-   <text:list xml:id="list90735426106450" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102824334296804" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">New compilers have new correct warnings that should be addressed.</text:p>
     </text:list-item>
@@ -10748,7 +10748,7 @@
    <text:p text:style-name="P524"><text:span text:style-name="T783">The second category is essentially ad hoc extra required software that must be installed using specific scripts unique to that software. <text:s/>We use the term </text:span><text:span text:style-name="FirstEmphasis">prerequisites</text:span><text:span text:style-name="T783"> for such software, and expect individual scripts to be written to download/build/install </text:span><text:span text:style-name="T825">them</text:span><text:span text:style-name="T783">. <text:s/></text:span><text:span text:style-name="T796">Software packages required by OpenCPI at runtime are normally prerequisites since they must be cross-compiled for all embedded platforms, whereas those required only for development may be supplied in either </text:span><text:span text:style-name="T1040">o</text:span><text:span text:style-name="T93">f</text:span><text:span text:style-name="T1040"> the two </text:span><text:span text:style-name="T796">categor</text:span><text:span text:style-name="T1040">ies</text:span><text:span text:style-name="T796">.</text:span></text:p>
    <text:p text:style-name="P524"><text:soft-page-break/><text:span text:style-name="T783">So for any given platform, OpenCPI </text:span><text:span text:style-name="T28">r</text:span><text:span text:style-name="T27">equires</text:span><text:span text:style-name="T783"> a combination of standard packaged software and prerequisite software.</text:span></text:p>
    <text:p text:style-name="Body">OpenCPI uses <text:span text:style-name="T755">the following</text:span> process <text:span text:style-name="T798">steps </text:span>when building <text:span text:style-name="T755">itself</text:span> for a software platform, <text:span text:style-name="T798">based on the open source tree from </text:span><text:span text:style-name="Code">git</text:span><text:span text:style-name="Code"><text:span text:style-name="T934">lab</text:span></text:span><text:span text:style-name="Code">.com</text:span>. <text:span text:style-name="T798"><text:s/>Enabling all these steps is described below</text:span>.</text:p>
-   <text:list xml:id="list90735355156047" text:continue-list="list3566722177" text:style-name="Numbering_20_1">
+   <text:list xml:id="list102825291983719" text:continue-list="list3566722177" text:style-name="Numbering_20_1">
     <text:list-item text:start-value="1">
      <text:p text:style-name="List_20_Number">Install the <text:span text:style-name="T797">standard </text:span>software packages <text:span text:style-name="T755">required for OpenCPI </text:span>from the <text:span text:style-name="T755">appropriate </text:span>network software package repository <text:span text:style-name="T757">(usually associated with the Linux distribution)</text:span>, <text:span text:style-name="T755">e.g. development tools for the development host.</text:span><text:span text:style-name="T755"><text:note text:id="ftn1" text:note-class="footnote"><text:note-citation>1</text:note-citation><text:note-body>
          <text:p text:style-name="P3"><text:s text:c="2"/>Software package repositories are sometimes captured locally when internet access is not always available. <text:s/>Some standard software packages are individually captured/downloaded so they can be (re)installed offline.</text:p></text:note-body></text:note></text:span></text:p>
@@ -10776,7 +10776,7 @@
    <text:p text:style-name="Code"><text:span text:style-name="T966">ocpiadmin </text:span>install platform <text:span text:style-name="T171">&lt;platform&gt;</text:span></text:p>
    <text:p text:style-name="P526">Testing embedded platforms is not part of the installation since it usually requires additional hardware setup and configuration.</text:p>
    <text:p text:style-name="Body">These <text:span text:style-name="T1040">above </text:span>steps, and how to enable them for a software platform, <text:span text:style-name="T967">are</text:span> described in detail in the following sections. <text:s/><text:span text:style-name="T885">A</text:span> summary of the files required <text:span text:style-name="T798">in a platform&apos;s directory </text:span>to enable <text:span text:style-name="T758">the above steps</text:span> is:</text:p>
-   <text:list xml:id="list90736290000103" text:continue-list="list90735355156047" text:style-name="Numbering_20_1">
+   <text:list xml:id="list102824406503392" text:continue-list="list102825291983719" text:style-name="Numbering_20_1">
     <text:list-item text:start-value="1">
      <text:p text:style-name="List_20_Number">A software platform definition file, named <text:span text:style-name="Code"><text:span text:style-name="T171">&lt;platform&gt;</text:span></text:span><text:span text:style-name="Code">.mk</text:span>, which sets variables that describe the platform. <text:s/><text:span text:style-name="T756">Between 3 and 20 variables might be required.</text:span></text:p>
     </text:list-item>
@@ -10792,7 +10792,7 @@
    </text:list>
    <text:h text:style-name="Heading_20_3" text:outline-level="3"><text:bookmark-start text:name="__RefHeading___Toc290926_943807761"/>The OpenCPI <text:span text:style-name="T759">B</text:span>uild <text:span text:style-name="T759">P</text:span>rocess for <text:span text:style-name="T759">S</text:span>oftware <text:span text:style-name="T759">P</text:span>latforms<text:bookmark-end text:name="__RefHeading___Toc290926_943807761"/></text:h>
    <text:p text:style-name="Body">The OpenCPI build process is designed to support a variety of platforms all built in the same source tree. <text:s/>I.e. all the built results for all platforms coexist in a directory structure, <text:span text:style-name="T799">in per-platform directories</text:span>. <text:s/>This allows:</text:p>
-   <text:list xml:id="list90736213353644" text:continue-list="list90735426106450" text:style-name="WWNum32">
+   <text:list xml:id="list102825434386977" text:continue-list="list102824334296804" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Multiple development hosts to share the same file system and same copy of the source tree</text:p>
     </text:list-item>
@@ -10807,7 +10807,7 @@
    <text:h text:style-name="P822" text:outline-level="4">Self-identif<text:span text:style-name="T960">y</text:span> <text:span text:style-name="T960">the </text:span>Development Platforms</text:h>
    <text:p text:style-name="Body"><text:span text:style-name="T760">When building for </text:span>development platforms, the first step in the build process is to decide which platform we are actually running on <text:span text:style-name="T799">and</text:span> <text:span text:style-name="T760">where its directory of platform-specific files is. <text:s/>After this,</text:span> the various scripts and tools associated with that platform <text:span text:style-name="T799">are used.</text:span></text:p>
    <text:p text:style-name="Body">Typing <text:span text:style-name="Code">./scripts/install-opencpi.sh</text:span> <text:span text:style-name="T799">(or individual scripts called by that </text:span><text:span text:style-name="T967">script</text:span><text:span text:style-name="T799">) </text:span>at the top level of the <text:span text:style-name="T761">OpenCPI </text:span>source tree does this self-identification step almost immediately. <text:s/>The algorithm for this is:</text:p>
-   <text:list xml:id="list90734856135191" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102825175990023" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">For each project indicated in the project registry and each project indicated in the <text:span text:style-name="Code">OCPI_PROJECT_PATH</text:span> environment variable, look for software platforms defined in the <text:span text:style-name="Code">rcc/platforms</text:span> directory, and invoke the <text:span text:style-name="Code">&lt;platform&gt;-check.sh</text:span> script found there. <text:s/>If <text:span text:style-name="T761">that script</text:span> succeeds, that platform and its directory are now used as <text:span text:style-name="T171">the</text:span> <text:span text:style-name="T171">platform we are running on</text:span>.</text:p>
     </text:list-item>
@@ -10817,7 +10817,7 @@
    <text:p text:style-name="Body">The tools required to support OpenCPI development <text:span text:style-name="T800">on</text:span> a development host are usually obtained <text:span text:style-name="T13">using</text:span> <text:span text:style-name="T800">standard </text:span><text:span text:style-name="T17">p</text:span><text:span text:style-name="T13">ackage management</text:span><text:span text:style-name="T800"> </text:span>software <text:span text:style-name="T928">(e.g. </text:span><text:span text:style-name="Code">yum</text:span><text:span text:style-name="T928"> </text:span><text:span text:style-name="T1041">or </text:span><text:span text:style-name="Code">dnf</text:span><text:span text:style-name="T1041"> </text:span><text:span text:style-name="T928">on CentOS)</text:span> <text:span text:style-name="T928">and</text:span> <text:span text:style-name="T1066">the </text:span><text:span text:style-name="T1042">OS&apos;s </text:span>repositories accessible on the internet. <text:s/>Different Linux distributions use different repositories, and different commands, to retrieve and install software packages from those repositories. <text:s/><text:span text:style-name="T762">If a platform requires any such packages to be installed, there must be a script file </text:span><text:span text:style-name="Code"><text:span text:style-name="T171">&lt;platform&gt;-</text:span></text:span><text:span text:style-name="Code">packages.sh</text:span><text:span text:style-name="T762"> in the platform&apos;s directory.</text:span></text:p>
    <text:p text:style-name="P721"><text:span text:style-name="T762"><text:tab/>Note that when installing a prepackaged OpenCPI binary distribution (e.g. from RPMs using the </text:span><text:span text:style-name="Code">yum</text:span><text:span text:style-name="T762"> command on CentOS platforms), the required packages are usually installed automatically as part of installing that OpenCPI package. <text:s/>Such an OpenCPI installation is not </text:span><text:span text:style-name="T105">u</text:span><text:span text:style-name="T106">sed</text:span><text:span text:style-name="T762"> when enabling new software platforms.</text:span></text:p>
    <text:p text:style-name="P600">This <text:span text:style-name="Code"><text:span text:style-name="T171">&lt;platform&gt;-</text:span></text:span><text:span text:style-name="Code">packages.sh</text:span> script is run after self-identification to install <text:span text:style-name="T81">any standard packaged</text:span> <text:span text:style-name="T800">software</text:span> <text:span text:style-name="T93">needed to</text:span> build <text:span text:style-name="T81">the </text:span><text:span text:style-name="T1042">OpenCPI </text:span><text:span text:style-name="T1066">software</text:span>:</text:p>
-   <text:list xml:id="list90736108411133" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102825627416495" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">prerequisite <text:span text:style-name="T1066">packages</text:span></text:p>
     </text:list-item>
@@ -10836,7 +10836,7 @@
    <text:p text:style-name="Body">After the installation of pre-built <text:span text:style-name="T801">standard packaged </text:span>software from <text:span text:style-name="T1042">OS </text:span>repositories is done (if there are any), the next step is to build and install prerequisite software packages in a directory solely used by OpenCPI (and thus not seen or used by other users or software). <text:s/>Each prerequisite software package has its own installation script, as defined in the <text:a xlink:type="simple" xlink:href="#4.1.2.4.Prerequisite Installation Script|outline" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link">Prerequisite Installation Scripts</text:a> section.</text:p>
    <text:p text:style-name="Body">The term <text:span text:style-name="FirstEmphasis">prerequisite</text:span> <text:span text:style-name="T828">here</text:span> implies <text:span text:style-name="T935">a software package that is</text:span> independently downloaded, <text:span text:style-name="T81">usually</text:span> built-from-source, <text:span text:style-name="T828">and </text:span>installed in the OpenCPI sand box <text:span text:style-name="T935">(in the source tree)</text:span>. <text:s/>This is in contrast to the previously discussed packages, installed prebuilt from software package repositories and installed globally, visible <text:span text:style-name="T828">and</text:span> us<text:span text:style-name="T801">able </text:span>by all users and <text:span text:style-name="T801">unrelated </text:span>software.</text:p>
    <text:p text:style-name="Body"><text:soft-page-break/>There are two types of prerequisites, <text:span text:style-name="T801">each installed using the same type of script</text:span>:</text:p>
-   <text:list xml:id="list90736207906387" text:continue-list="list90736290000103" text:style-name="Numbering_20_1">
+   <text:list xml:id="list102825489057233" text:continue-list="list102824406503392" text:style-name="Numbering_20_1">
     <text:list-item text:start-value="1">
      <text:p text:style-name="List_20_Number">Platform-specific scripts that support the development requirements of OpenCPI (e.g. compilers, or other required utilities) <text:span text:style-name="T209">for a particular platform</text:span><text:span text:style-name="T801">.</text:span></text:p>
     </text:list-item>
@@ -10862,7 +10862,7 @@
    <text:p text:style-name="Body">For embedded platforms, the analogous test function is executed on the embedded platform after it has been prepared for OpenCPI (using <text:span text:style-name="Code">ocpitest</text:span>), which normally occurs after preparing a bootable media (e.g. SD card) for the platform. <text:s/><text:span text:style-name="T831">The</text:span><text:span text:style-name="Code"> </text:span><text:span text:style-name="Code"><text:span text:style-name="T967">ocpiadmin </text:span></text:span><text:span text:style-name="Code">install </text:span><text:span text:style-name="Code"><text:span text:style-name="T313">p</text:span></text:span><text:span text:style-name="Code"><text:span text:style-name="T314">latform</text:span></text:span><text:span text:style-name="Code"> </text:span><text:span text:style-name="Code"><text:span text:style-name="T218">&lt;platform&gt;</text:span></text:span><text:span text:style-name="T831"> </text:span><text:span text:style-name="T967">operation </text:span><text:span text:style-name="T831">skips the testing phase.</text:span></text:p>
    <text:h text:style-name="P607" text:outline-level="3"><text:bookmark-start text:name="__RefHeading___Toc290928_943807761"/>Software Platform Files <text:span text:style-name="T768">in the Platform&apos;s Directory</text:span><text:bookmark-end text:name="__RefHeading___Toc290928_943807761"/></text:h>
    <text:p text:style-name="Body">Defining a software platform for OpenCPI involves 4 types of files in its directory, <text:span text:style-name="Code">rcc/platforms/</text:span><text:span text:style-name="Code"><text:span text:style-name="T171">&lt;platform</text:span></text:span><text:span text:style-name="Code"><text:span text:style-name="T172">&gt;</text:span></text:span>, in <text:span text:style-name="T832">some</text:span> project:</text:p>
-   <text:list xml:id="list90734812577714" text:continue-list="list90736108411133" text:style-name="WWNum32">
+   <text:list xml:id="list102824479228942" text:continue-list="list102825627416495" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">The platform definition file <text:span text:style-name="Code"><text:span text:style-name="T171">&lt;platform</text:span></text:span><text:span text:style-name="Code"><text:span text:style-name="T203">&gt;</text:span></text:span><text:span text:style-name="Code">.mk</text:span></text:p>
     </text:list-item>
@@ -10916,7 +10916,7 @@
    <text:p text:style-name="P467">Since all scripts are invoked explicitly using the <text:span text:style-name="Code">bash</text:span> shell, no execute permission or initial <text:span text:style-name="Code">#!/bin/bash</text:span> line is necessary. <text:s/><text:span text:style-name="T776">OpenCPI has an explicit requirement for the </text:span><text:span text:style-name="Code">bash</text:span><text:span text:style-name="T776"> shell on all development platforms.</text:span></text:p>
    <text:h text:style-name="P800" text:outline-level="4">Platform Package Installation Script</text:h>
    <text:p text:style-name="P219">The <text:span text:style-name="Code"><text:span text:style-name="T171">&lt;platform&gt;</text:span></text:span><text:span text:style-name="Code">-packages.sh</text:span> script, invoked using <text:span text:style-name="Code">bash</text:span>, is required for platforms that use or require <text:span text:style-name="T784">standard packaged software, prebuilt and </text:span>globally installed from a (usually network-based) software package repository. <text:s/>It has two functions:</text:p>
-   <text:list xml:id="list90736341795707" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102825493330682" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">install the required software packages from the repository<text:line-break/><text:span text:style-name="T171">—</text:span><text:span text:style-name="T207">or—</text:span></text:p>
     </text:list-item>
@@ -10926,7 +10926,7 @@
    </text:list>
    <text:p text:style-name="P225"><text:soft-page-break/>When this script is called with no arguments, it simply uses the appropriate commands to install the required software. <text:s/><text:span text:style-name="T778">Since these packages are installed globally, the installation commands usually require administrative permissions (e.g. using </text:span><text:span text:style-name="Code">sudo</text:span> in the script<text:span text:style-name="T778">).</text:span></text:p>
    <text:p text:style-name="P221">If the single argument to this script is <text:span text:style-name="Code">list</text:span>, then the second, listing function is requested. <text:s/><text:span text:style-name="T835">In the </text:span><text:span text:style-name="Code">list</text:span><text:span text:style-name="T835"> mode</text:span>, it <text:span text:style-name="T835">must list on stdout</text:span> the names of required packages on 4 lines:</text:p>
-   <text:list xml:id="list90736593118996" text:continue-list="list90736207906387" text:style-name="Numbering_20_1">
+   <text:list xml:id="list102825124031843" text:continue-list="list102825489057233" text:style-name="Numbering_20_1">
     <text:list-item text:start-value="1">
      <text:p text:style-name="List_20_Number">The packages necessary for <text:span text:style-name="T1042">OpenCPI </text:span>runtime packages/RPMs</text:p>
     </text:list-item>
@@ -10971,7 +10971,7 @@
    <text:p text:style-name="Code"><text:soft-page-break/>install-preqx.sh install-preqy.sh install-preqz.sh</text:p>
    <text:p text:style-name="P223">must all be present.</text:p>
    <text:p text:style-name="P224">Prerequisites are installed in an OpenCPI <text:span text:style-name="T1042">installation </text:span>directory so that they do not interfere with other global software installations and are thus considered part of the OpenCPI installation (or “sand box”). <text:s/>Both runtime library prerequisites (for any platform) and tool prerequisites (for executing on development platforms) are installed there.</text:p>
-   <text:list xml:id="list90736190151671" text:continue-list="list90736341795707" text:style-name="WWNum32">
+   <text:list xml:id="list102826278977666" text:continue-list="list102825493330682" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P17">This directory&apos;s default location in the <text:span text:style-name="Code">prerequisites/</text:span> subdirectory of the source tree. <text:s/>This may be overridden by setting the <text:span text:style-name="Code">OCPI_PREREQUISITES_INSTALL_DIR</text:span> if the default is unacceptable.</text:p>
     </text:list-item>
@@ -10982,7 +10982,7 @@
    <text:p text:style-name="P68"><text:span text:style-name="T785">In a source code installation, prerequisites are built and installed in the source tree itself, in the respective </text:span><text:span text:style-name="Code">prerequisites-build/</text:span><text:span text:style-name="T785"> and </text:span><text:span text:style-name="Code">prerequisites/</text:span><text:span text:style-name="T538"> subdirectories. <text:s/>Thus these packages do not interfere with other global software installations or other OpenCPI installations/versions. <text:s/>Both runtime library prerequisites and tool prerequisites are typically installed here.</text:span></text:p>
    <text:p text:style-name="P226">When a prerequisite has libraries, the libraries are <text:span text:style-name="T1042">automatically </text:span>installed in the directory for framework libraries, e.g. <text:span text:style-name="Code">exports/</text:span><text:span text:style-name="Code"><text:span text:style-name="T171">&lt;platform&gt;</text:span></text:span><text:span text:style-name="Code">/lib</text:span> in a source build or <text:span text:style-name="Code">/opt/opencpi/cdk/</text:span><text:span text:style-name="Code"><text:span text:style-name="T171">&lt;platform&gt;</text:span></text:span><text:span text:style-name="Code">/lib</text:span> in an RPM installation.</text:p>
    <text:p text:style-name="P473">This script should<text:span text:style-name="T787"> </text:span>follow the pattern of other install scripts in the <text:span text:style-name="Code"><text:span text:style-name="T839">build/prerequisites/</text:span></text:span> directory <text:span text:style-name="T787">of the OpenCPI framework (e.g. </text:span><text:span text:style-name="Code">install-gmp.sh</text:span><text:span text:style-name="T787">)</text:span>, in particular:</text:p>
-   <text:list xml:id="list90736576947108" text:continue-list="list90736190151671" text:style-name="WWNum32">
+   <text:list xml:id="list102824721439382" text:continue-list="list102826278977666" text:style-name="WWNum32">
     <text:list-item text:start-value="1">
      <text:p text:style-name="P18">Ensure that the <text:span text:style-name="Code">OCPI_CDK_DIR</text:span> environment variable is set.</text:p>
     </text:list-item>
@@ -11003,7 +11003,7 @@
     </text:list-item>
    </text:list>
    <text:p text:style-name="P301">The <text:span text:style-name="Code">$OCPI_CDK_DIR/</text:span><text:span text:style-name="Code"><text:span text:style-name="T840">scripts/</text:span></text:span><text:span text:style-name="Code">setup-</text:span><text:span text:style-name="Code"><text:span text:style-name="T814">prerequisite</text:span></text:span><text:span text:style-name="Code">.sh</text:span> script, <text:span text:style-name="T809">supplied by OpenCPI, </text:span>which is <text:span text:style-name="T171">sourced,</text:span> takes these arguments:</text:p>
-   <text:list xml:id="list90736490326142" text:continue-list="list90736593118996" text:style-name="Numbering_20_1">
+   <text:list xml:id="list102824729459190" text:continue-list="list102825124031843" text:style-name="Numbering_20_1">
     <text:list-item text:start-value="1">
      <text:p text:style-name="P1038">The target platform (the platform on which execution takes place). <text:s/>This is passed in from the first argument of the install script, e.g. <text:span text:style-name="T668">&quot;</text:span><text:span text:style-name="Code">$1</text:span><text:span text:style-name="Code"><text:span text:style-name="T791">&quot;</text:span></text:span> (quoted <text:span text:style-name="T814">to allow empty</text:span>).</text:p>
     </text:list-item>
@@ -11028,7 +11028,7 @@
    </text:list>
    <text:p text:style-name="P475">This <text:span text:style-name="T817">setup </text:span>script performs downloading (or git cloning), caching downloads, creating the necessary directories, accessing the tool chain for the platform, and defining convenience function<text:span text:style-name="T818">s and variables</text:span> for use later in the script.</text:p>
    <text:p text:style-name="P474">After th<text:span text:style-name="T816">e</text:span> setup script is sourced, <text:span text:style-name="T818">the environment is </text:span><text:span text:style-name="T1042">setup as follows</text:span><text:span text:style-name="T818">:</text:span></text:p>
-   <text:list xml:id="list90735049981540" text:continue-list="list90736576947108" text:style-name="WWNum32">
+   <text:list xml:id="list102825769397345" text:continue-list="list102824721439382" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:span text:style-name="T818">t</text:span>he current working directory is a <text:span text:style-name="T959">newly created </text:span>platform-specific build <text:span text:style-name="T815">sub</text:span>directory created <text:span text:style-name="T820">under</text:span> the <text:span text:style-name="T815">directory created by the download/unpack, or git clone</text:span></text:p>
     </text:list-item>
@@ -11071,7 +11071,7 @@
    <text:p text:style-name="P534">A software platform may have a Makefile in its directory if it needs to perform any processing steps to create the necessary files <text:span text:style-name="T941">prior </text:span>to build<text:span text:style-name="T941">ing</text:span> OpenCPI. <text:s/>This Makefile is automatically used (with the default make goal/target), prior to building OpenCPI itself with the <text:span text:style-name="Code">build-opencpi.sh</text:span> script that is used by the <text:span text:style-name="Code">install-opencpi.sh</text:span> or <text:span text:style-name="Code"><text:span text:style-name="T969">ocpiadmin install p</text:span></text:span><text:span text:style-name="Code">latform </text:span><text:span text:style-name="Code"><text:span text:style-name="T219">&lt;platform&gt;</text:span></text:span><text:span text:style-name="Code">.</text:span></text:p>
    <text:p text:style-name="P536">This Makefile is use<text:span text:style-name="T969">d</text:span> when files need to be brought into the directory from external sources or downloads. <text:s/>An example is when the files needed have license constraints or are based on installing licensed software and can thus not simply be copied into the public repository.</text:p>
    <text:h text:style-name="P608" text:outline-level="3"><text:bookmark-start text:name="__RefHeading__17656_2116501284"/>Summary for Enabling Development for a <text:span text:style-name="T286">N</text:span>ew GPP <text:span text:style-name="T286">P</text:span>latform<text:bookmark-end text:name="__RefHeading__17656_2116501284"/></text:h>
-   <text:list xml:id="list90735598419722" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102825625133817" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P47">Create the platform&apos;s directory in a project<text:span text:style-name="T940">&apos;s </text:span><text:span text:style-name="Code">rcc/platforms/</text:span><text:span text:style-name="T940"> directory.</text:span></text:p>
     </text:list-item>
@@ -11116,7 +11116,7 @@
    <text:p text:style-name="P227">A “runtime” package for an embedded platform is a set of files <text:span text:style-name="T942">which can be </text:span>installed on a network file server (usually the development host), which can be accessed with the embedded system acting as a file client. <text:s/>The next step to achieving runtime is to install some appropriate files on the embedded system itself. <text:s/>We call this set of files a “deployment package”.</text:p>
    <text:p text:style-name="P250">A deployment package is created for either an embedded software platform by itself, or a combination of an embedded software platform and an HDL platform. <text:s/>This combination is common on SoCs like Zynq and CycloneV.</text:p>
    <text:p text:style-name="P251">The exports file defined above in the <text:a xlink:type="simple" xlink:href="#4.1.2.4.Platform Exports File|outline" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link">platform export file</text:a> section above specifies the files that will be placed on the SD card for this software platform. <text:s/>When the <text:span text:style-name="T962">standard operation </text:span>to create SD cards is run according to the installation guide (using the <text:span text:style-name="Code"><text:span text:style-name="T962">ocpiadmin </text:span></text:span><text:span text:style-name="Code">deploy platform</text:span><text:span text:style-name="T963"> </text:span><text:span text:style-name="T969">operation</text:span><text:span text:style-name="T963">), </text:span><text:span text:style-name="T960">the </text:span><text:span text:style-name="T942">following steps are taken:</text:span></text:p>
-   <text:list xml:id="list90736001042062" text:continue-list="list90736490326142" text:style-name="Numbering_20_1">
+   <text:list xml:id="list102824536991442" text:continue-list="list102824729459190" text:style-name="Numbering_20_1">
     <text:list-item text:start-value="1">
      <text:p text:style-name="P845">Copy the standard OpenCPI runtime files for the platform to the SD Card</text:p>
     </text:list-item>
@@ -11130,7 +11130,7 @@
    <text:p text:style-name="P251"><text:soft-page-break/>This combination of exports from the two platforms creates the content of the <text:span text:style-name="T942">bootable </text:span>SD card. <text:s/><text:span text:style-name="T942">Notice that the HDL platform is exported last, and thus can specify files that override files copied by the software platform.</text:span></text:p>
    <text:p text:style-name="P252"><text:span text:style-name="T943">Deployment packages are thus created by </text:span><text:span text:style-name="T36">c</text:span><text:span text:style-name="T37">ombining the appropriate exports from the software and</text:span><text:span text:style-name="T943"> HDL platforms to create the necessary files for the “system” that combines that software platform with the HDL platform.</text:span></text:p>
    <text:p text:style-name="P252"><text:span text:style-name="T847">The files on the bootable image </text:span><text:span text:style-name="T38">c</text:span><text:span text:style-name="T37">an</text:span><text:span text:style-name="T847"> fall into two categories:</text:span></text:p>
-   <text:list xml:id="list90735256497406" text:continue-list="list90735598419722" text:style-name="WWNum32">
+   <text:list xml:id="list102825370833005" text:continue-list="list102825625133817" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">The minimum set of files necessary to run OpenCPI assuming it has access to a runtime package on a network server.</text:p>
     </text:list-item>
@@ -11155,7 +11155,7 @@
    <text:p text:style-name="P444">When an SoC, like the Xilinx Zynq-<text:span text:style-name="T885">7000</text:span> chip, contains a section of FPGA logic as well as processor cores, the FPGA part is an FPGA platform and the GPP processor core(s) are a GPP software platform. <text:s/>Thus the SoC is indeed a “system on chip”: <text:s/>a system with two platforms and an interconnect between them.</text:p>
    <text:p text:style-name="P408">Analogous to preparing the support for a GPP platform, enabling an FPGA platform involves steps <text:span text:style-name="T283">to enable the development environment, and steps to enable the run-time/execution environment.</text:span></text:p>
    <text:p text:style-name="P518"><text:span text:style-name="T283">Enabling development </text:span><text:span text:style-name="T81">targeting</text:span><text:span text:style-name="T283"> a platform involves</text:span><text:span text:style-name="T541">:</text:span></text:p>
-   <text:list xml:id="list90735277022208" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102826241429149" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P28">Installing and integrating a development tool chain that can target the FPGA <text:span text:style-name="T578">device </text:span>on the platform <text:span text:style-name="T615">(when one is not already installed that </text:span><text:span text:style-name="T1042">also supports</text:span><text:span text:style-name="T615"> the new platform).</text:span></text:p>
     </text:list-item>
@@ -11164,7 +11164,7 @@
     </text:list-item>
    </text:list>
    <text:p text:style-name="P270"><text:span text:style-name="T283">Enabling runtime execution </text:span><text:span text:style-name="T81">on</text:span><text:span text:style-name="T283"> a </text:span><text:span text:style-name="T707">non-simulation </text:span><text:span text:style-name="T283">platform involves:</text:span></text:p>
-   <text:list xml:id="list90734992037713" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102824344180103" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P28">Writing specific new VHDL code that supports the particulars of the hardware attached to the FPGA on the platform.</text:p>
     </text:list-item>
@@ -11177,7 +11177,7 @@
    </text:list>
    <text:h text:style-name="P353" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc17468_1235158909"/>Physical FPGA Platforms<text:bookmark-end text:name="__RefHeading___Toc17468_1235158909"/></text:h>
    <text:p text:style-name="P379">Platforms are specific FPGAs <text:span text:style-name="T284">on a board </text:span>connected locally to:</text:p>
-   <text:list xml:id="list90735248998708" text:continue-list="list90734992037713" text:style-name="WWNum32">
+   <text:list xml:id="list102825518262413" text:continue-list="list102824344180103" text:style-name="WWNum32">
     <text:list-item text:start-value="1">
      <text:p text:style-name="List_20_Bullet">Local I/O devices: ADC, DAC, DRAM, Flash, G<text:span text:style-name="T504">b</text:span>E, etc. </text:p>
     </text:list-item>
@@ -11275,7 +11275,7 @@
    <text:p text:style-name="P518"><text:span text:style-name="T931">OpenCPI provides a software runtime infrastructure to make execution on simulators as similar as possible to execution on physical FPGAs, without simulating any external device-related logic. <text:s/>The simulation execution environment makes execution on different simulators also similar to each other. <text:s/>Multiple simulator instances may execute simultaneously subject to any license restrictions </text:span><text:span text:style-name="T18">t</text:span><text:span text:style-name="T13">hat would allow</text:span><text:span text:style-name="T931"> only a certain number of simulator instances to run at the same time.</text:span></text:p>
    <text:p text:style-name="P587"><text:span text:style-name="T81">O</text:span><text:span text:style-name="T285">nly mixed-language simulators (VHDL and Verilog) may be enabled and used with OpenCPI. <text:s/></text:span><text:span text:style-name="T944">These are simulators that support mixing VHDL and Verilog modules in the same design.</text:span></text:p>
    <text:p text:style-name="P409">Examples of supported FPGA simulators include:</text:p>
-   <text:list xml:id="list90735403444424" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102825087332284" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Xilinx Isim <text:span text:style-name="T709">from ISE 14.7</text:span></text:p>
     </text:list-item>
@@ -11287,7 +11287,7 @@
     </text:list-item>
    </text:list>
    <text:p text:style-name="P632"><text:span text:style-name="T945">Other simulators that </text:span><text:span text:style-name="T41">c</text:span><text:span text:style-name="T39">ould</text:span><text:span text:style-name="T945"> be supported in the future include:</text:span></text:p>
-   <text:list xml:id="list90736511548091" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102825157174119" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P32">Aldec</text:p>
     </text:list-item>
@@ -11306,7 +11306,7 @@
    <text:p text:style-name="P548">For a completely new FPGA tool chain, the integration is somewhat difficult and not well documented. <text:s/>It relies on internal knowledge of the OpenCPI build system.</text:p>
    <text:p text:style-name="P380">This process includes enabling the OpenCPI FPGA build process to use the right tools to target the “part family” of the FPGA device on the platform. <text:s/>For example, on the “<text:span text:style-name="T710">z</text:span>ed” platform, the family of the FPGA part is “zynq”. <text:s/>On the “<text:span text:style-name="T710">ml</text:span>605” platform, the family of the FPGA part is “virtex6”. <text:s/>The required tools for a platform&apos;s FPGA may already be installed and integrated, and may already support the particular part family of the platform&apos;s FPGA. <text:s/>If not, that support must be added to the integration of those tools.</text:p>
    <text:p text:style-name="P380">So the integration process is:</text:p>
-   <text:list xml:id="list90735712504434" text:continue-list="list90736001042062" text:style-name="Numbering_20_1">
+   <text:list xml:id="list102824558018578" text:continue-list="list102824536991442" text:style-name="Numbering_20_1">
     <text:list-item text:start-value="1">
      <text:p text:style-name="List_20_Number">If the required tools are not <text:span text:style-name="T710">currently</text:span> integrated with OpenCPI, they must be <text:span text:style-name="T582">integrated (not a small job)</text:span>.</text:p>
     </text:list-item>
@@ -11327,7 +11327,7 @@
    <text:p text:style-name="P381">Some of the code built using the above command is explicitly labeled to <text:span text:style-name="T245">only build</text:span> for certain targets or to <text:span text:style-name="T245">not build</text:span> for some targets, but most is truly portable and will build for all targets. <text:s/>Once this build command succeeds for the target (part family) <text:span text:style-name="T711">of</text:span> the <text:span text:style-name="T1042">new </text:span>platform, you can proceed with the steps below to write the HDL code necessary to enable execution on the platform.</text:p>
    <text:h text:style-name="Heading_20_3" text:outline-level="3"><text:bookmark-start text:name="__RefHeading___Toc22146_1235158909"/>Scripts for HDL Platforms<text:bookmark-end text:name="__RefHeading___Toc22146_1235158909"/></text:h>
    <text:p text:style-name="P540"><text:span text:style-name="T354">For physical platforms (not simulation) </text:span><text:span text:style-name="T1085">which require bitstream loading via JTAG</text:span><text:span text:style-name="T354">, </text:span><text:span text:style-name="T1085">or power-up flash, </text:span><text:span text:style-name="T354">there are two scripts that must be </text:span><text:span text:style-name="T42">w</text:span><text:span text:style-name="T43">ritten and </text:span><text:span text:style-name="T354">placed in the platform&apos;s directory, </text:span><text:span text:style-name="T193">if they apply to the platform</text:span><text:span text:style-name="T354">:</text:span></text:p>
-   <text:list xml:id="list90736395730932" text:continue-list="list90736511548091" text:style-name="WWNum32">
+   <text:list xml:id="list102825348873604" text:continue-list="list102825157174119" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">A JTAG support script to enable JTAG-based bitstream loading, <text:span text:style-name="T354">whose name is:<text:line-break/></text:span><text:span text:style-name="Code">jtagSupport_</text:span><text:span text:style-name="Code"><text:span text:style-name="T171">&lt;platform&gt;</text:span></text:span> <text:s/><text:span text:style-name="T617">(only for platforms with JTAG bitstream loading)</text:span></text:p>
     </text:list-item>
@@ -11360,7 +11360,7 @@
    <text:p text:style-name="IndentHang">h<text:span text:style-name="Code">dl/platforms/</text:span><text:span text:style-name="Code"><text:span text:style-name="T171">&lt;platform&gt;</text:span></text:span><text:span text:style-name="Code">/devices</text:span> — a component library for platform-specific device workers and proxies for <text:span text:style-name="Code"><text:span text:style-name="T171">&lt;platform&gt;</text:span></text:span>, <text:span text:style-name="T881">which are generally not visible outside the project or from other libraries (including specs)</text:span></text:p>
    <text:p text:style-name="P87">HDL <text:span text:style-name="T623">p</text:span>latform support starts with deciding on a name for the platform (usually a lower-cased version of the name used by the vendor of the platform), and <text:span text:style-name="T626">using </text:span><text:span text:style-name="Code">ocpidev create </text:span><text:span text:style-name="Code"><text:span text:style-name="T735">hdl </text:span></text:span><text:span text:style-name="Code">platform</text:span><text:span text:style-name="T626"> to </text:span>creat<text:span text:style-name="T626">e</text:span> a directory <text:span text:style-name="T626">and associated files using the </text:span><text:span text:style-name="Code">ocpidev</text:span><text:span text:style-name="T626"> tool</text:span>. <text:s/>In that directory there <text:span text:style-name="T626">will</text:span> be<text:span text:style-name="T626"> an initial platform description XML file and an initial source code skeleton for the platform worker.</text:span></text:p>
    <text:p text:style-name="P89">In summary, the steps to enabling an HDL platform for execution are, (assuming the development tools are enabled):</text:p>
-   <text:list xml:id="list90735686807520" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102826297672693" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P33">Take inventory of the platform by identifying its interconnects, method of reprogramming, device<text:span text:style-name="T126">s</text:span>, and slots</text:p>
     </text:list-item>
@@ -11470,7 +11470,7 @@
    <text:p text:style-name="P190">The name of a slot type is used in the XML description files of platforms <text:span text:style-name="T1046">and cards.</text:span></text:p>
    <text:h text:style-name="P627" text:outline-level="3"><text:bookmark-start text:name="__RefHeading__17664_2116501284"/><text:span text:style-name="T1049">Creating the </text:span><text:span text:style-name="T101">HDL</text:span><text:span text:style-name="T1049"> </text:span><text:span text:style-name="T356">P</text:span><text:span text:style-name="T1049">latform</text:span><text:bookmark-end text:name="__RefHeading__17664_2116501284"/></text:h>
    <text:p text:style-name="P271"><text:span text:style-name="T1045">A</text:span><text:span text:style-name="T1046">n HDL</text:span><text:span text:style-name="T1045"> platform is created using the </text:span><text:span text:style-name="Code">ocpidev create </text:span><text:span text:style-name="Code"><text:span text:style-name="T1042">hdl </text:span></text:span><text:span text:style-name="Code">platform</text:span><text:span text:style-name="T1045"> command, which establishes the platform&apos;s directory </text:span><text:span text:style-name="T82">as</text:span><text:span text:style-name="T1045"> </text:span><text:span text:style-name="Code">hdl/platforms/</text:span><text:span text:style-name="Code"><text:span text:style-name="T229">&lt;platform&gt;</text:span></text:span><text:span text:style-name="T1045"> </text:span><text:span text:style-name="T1042">in a project </text:span><text:span text:style-name="T1045">and creates </text:span><text:span text:style-name="T1046">these files</text:span><text:span text:style-name="T1045">:</text:span></text:p>
-   <text:list xml:id="list90736706182285" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102824646117896" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">the <text:span text:style-name="Code"><text:span text:style-name="T171">&lt;platform&gt;</text:span></text:span><text:span text:style-name="Code">.xml</text:span> <text:span text:style-name="T1042">describing the platform, </text:span><text:span text:style-name="T1046">called the </text:span><text:span text:style-name="T970">OpenCPI HDL Platform Description (OHPD) </text:span>XML file</text:p>
     </text:list-item>
@@ -11479,7 +11479,7 @@
     </text:list-item>
    </text:list>
    <text:p text:style-name="P273"><text:span text:style-name="T1046">There are several other types of files that may be manually </text:span><text:span text:style-name="T83">added</text:span><text:span text:style-name="T1046"> in this directory, which include:</text:span></text:p>
-   <text:list xml:id="list90736900175537" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102824796762137" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:soft-page-break/><text:span text:style-name="T1046">the </text:span><text:span text:style-name="Code">&lt;platform&gt;.exports</text:span><text:span text:style-name="T1046"> file, which identifies </text:span><text:span text:style-name="T83">the</text:span><text:span text:style-name="T1046"> files that are needed to </text:span><text:span text:style-name="T229">use</text:span><text:span text:style-name="T1046"> the platform.</text:span></text:p>
     </text:list-item>
@@ -11496,7 +11496,7 @@
    <text:p text:style-name="P589">The <text:span text:style-name="T970">OHPD</text:span> file that defines an HDL platform <text:span text:style-name="T584">is named the same as the platform name with an “</text:span><text:span text:style-name="Code">.xml</text:span><text:span text:style-name="T584">” suffix. <text:s/>It </text:span><text:span text:style-name="T1047">does double duty as both a normal HDL device worker&apos;s </text:span><text:span text:style-name="T928">OpenCPI Worker Description (</text:span><text:span text:style-name="T1047">OWD</text:span><text:span text:style-name="T928">) </text:span><text:span text:style-name="T1047">file, but also containing additional information that </text:span><text:span text:style-name="T1052">i</text:span><text:span text:style-name="T1047">s unique to its role in describing the </text:span><text:span text:style-name="T1052">actual </text:span><text:span text:style-name="T1047">HDL platform. <text:s/>The HDL device worker aspects are fully described below in </text:span><text:a xlink:type="simple" xlink:href="#5.5.7.XML Metadata for Device Workers/Subdevices/DeviceProxies/EndpointProxies|outline" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T1047">XML Metadata for Device Workers</text:span></text:a><text:span text:style-name="T1047">. <text:s/>This section describes the extra XML elements for HDL platform workers.</text:span></text:p>
    <text:p text:style-name="P589">Thus the <text:span text:style-name="T970">OHPD</text:span> is an OWD for the platform worker, <text:span text:style-name="T171">with additional information.</text:span></text:p>
    <text:p text:style-name="P274"><text:span text:style-name="T291">The </text:span><text:span text:style-name="T970">OHPD</text:span><text:span text:style-name="T291"> </text:span><text:span text:style-name="T83">has</text:span><text:span text:style-name="T291"> these special aspects, </text:span><text:span text:style-name="T1050">beyond an HDL device worker&apos;s OWD</text:span><text:span text:style-name="T291">, </text:span><text:span text:style-name="T715">all described in detail below</text:span><text:span text:style-name="T291">:</text:span></text:p>
-   <text:list xml:id="list90736290131711" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102825783029205" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P40">The top level XML element is “<text:span text:style-name="Code">HdlPlatform”</text:span></text:p>
     </text:list-item>
@@ -11583,7 +11583,7 @@
    <text:h text:style-name="P804" text:outline-level="4">Device Elements in a Platform XML File</text:h>
    <text:p text:style-name="P385">Device elements <text:span text:style-name="T1050">(</text:span><text:span text:style-name="Code">&lt;device&gt;</text:span><text:span text:style-name="T1050">)</text:span> <text:span text:style-name="T1050">in the OHPD </text:span><text:span text:style-name="T733"><text:s/></text:span>indicate devices that are part of the platform and are directly attached to the platform FPGA&apos;s pins. <text:s/><text:span text:style-name="T720">These device elements </text:span><text:span text:style-name="T194">declare</text:span><text:span text:style-name="T720"> which devices are </text:span><text:span text:style-name="T194">physically present</text:span><text:span text:style-name="T720"> and </text:span><text:span text:style-name="T194">may</text:span><text:span text:style-name="T720"> be used (and thus </text:span><text:span text:style-name="T1050">may be </text:span><text:span text:style-name="T720">instanced) in platform configurations and containers. <text:s/>These declarations here, by themselves, </text:span><text:span text:style-name="T194">do not</text:span><text:span text:style-name="T720"> cause the device workers to be instanced in any </text:span><text:span text:style-name="T1050">containers or </text:span><text:span text:style-name="T720">bitstreams. <text:s/>Devices are used and instanced by being referenced in platform configurations and containers.</text:span></text:p>
    <text:p text:style-name="P384">Device elements indicate:</text:p>
-   <text:list xml:id="list90735332370447" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102825371512164" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:span text:style-name="T294">The</text:span> HDL device worker <text:span text:style-name="T85">managing</text:span> this device (like a device driver) <text:span text:style-name="T194">(required </text:span><text:span text:style-name="Code"><text:span text:style-name="T411">worker</text:span></text:span><text:span text:style-name="T195"> attribute</text:span><text:span text:style-name="T194">)</text:span></text:p>
     </text:list-item>
@@ -11625,7 +11625,7 @@
    <text:p text:style-name="P452"><text:soft-page-break/>The slot names are <text:span text:style-name="Code">fmc_lpc</text:span> and <text:span text:style-name="Code">fmc_hpc</text:span>, and the standard name for this signal is <text:span text:style-name="Code">prsnt_m2c_l</text:span>. <text:s/><text:span text:style-name="T737">When the signal is an output (from the FPGA to the slot), the signal must not be used as an output by any device worker for a device on a plugged-in card. </text:span></text:p>
    <text:h text:style-name="P806" text:outline-level="4">Slot Element<text:span text:style-name="T361">s</text:span> <text:span text:style-name="T361">in</text:span> a Platform XML <text:span text:style-name="T361">Fi</text:span>le</text:h>
    <text:p text:style-name="Body"><text:span text:style-name="T358">When a platform has slots, it includes a </text:span><text:span text:style-name="Code">slot</text:span> element <text:span text:style-name="T358">to</text:span> declare the existence of a slot. <text:s/>The required <text:span text:style-name="Code">type</text:span> attribute must match the name of a defined slot type. <text:s/>The slot type <text:span text:style-name="T588">definition files</text:span> are normally in the <text:span text:style-name="Code">hdl/cards/specs</text:span> directory in the <text:span text:style-name="Code">ocpi.core</text:span><text:span text:style-name="T854"> project</text:span>, which is automatically searched whenever <text:span text:style-name="T588">a platform XML</text:span> file is processed. <text:s/>Examples of slot types are:</text:p>
-   <text:list xml:id="list90734941626072" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102826483153305" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:span text:style-name="Code"><text:span text:style-name="T585">fmc_lpc</text:span></text:span>: <text:s/>“low pin count” variant of the “FPGA Mezzanine Card” <text:span text:style-name="T1052">(FMC) </text:span>from VITA57</text:p>
     </text:list-item>
@@ -11637,7 +11637,7 @@
     </text:list-item>
    </text:list>
    <text:p text:style-name="Body">The optional <text:span text:style-name="Code">name</text:span> attribute of the slot element may assign a name to the slot. <text:s/>If it is not present, the slot&apos;s <text:span text:style-name="T85">type</text:span> becomes the slot <text:span text:style-name="T85">name</text:span>. <text:s/><text:span text:style-name="T359">If </text:span><text:span text:style-name="Code">name</text:span><text:span text:style-name="T359"> is </text:span><text:span text:style-name="T182">unspecified</text:span><text:span text:style-name="T359"> and i</text:span>f more than one slot of the same type is present, a zero-origin ordinal is appended to the slot-type as the name. <text:s/><text:span text:style-name="T359">E</text:span>.g. if there were two slots of type <text:span text:style-name="Code">hsmc</text:span> and the<text:span text:style-name="T359">y</text:span> were not given names, their names would be <text:span text:style-name="Code">hsmc0</text:span> and <text:span text:style-name="Code">hsmc1</text:span>. <text:s/><text:span text:style-name="T297">Slot names are needed for two purposes:</text:span></text:p>
-   <text:list xml:id="list90735045755444" text:continue-list="list90735712504434" text:style-name="Numbering_20_1">
+   <text:list xml:id="list102825441729419" text:continue-list="list102824558018578" text:style-name="Numbering_20_1">
     <text:list-item text:start-value="1">
      <text:p text:style-name="List_20_Number">When a card is plugged into a slot, that slot is identified by its name. <text:s/><text:span text:style-name="T297">Slot names are case </text:span><text:span text:style-name="T179">insensitive</text:span><text:span text:style-name="T297"> for this purpose (when mentioning slot names in HDL container XML).</text:span></text:p>
     </text:list-item>
@@ -11895,7 +11895,7 @@
    <text:h text:style-name="Heading_20_3" text:outline-level="3"><text:bookmark-start text:name="__RefHeading___Toc38643_1517956095"/>Specifying Platform Configurations in XML <text:span text:style-name="T286">F</text:span>iles.<text:bookmark-end text:name="__RefHeading___Toc38643_1517956095"/></text:h>
    <text:p text:style-name="P254">HDL platform configurations are described in the <text:span text:style-name="FirstEmphasis">HDL Build Hierarchy</text:span> section of the <text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_HDL_Development_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="Internet_20_link">OpenCPI HDL Development Guide</text:span></text:a>.</text:p>
    <text:p text:style-name="P288"><text:span text:style-name="T686">For each platform configuration mentioned in the </text:span><text:span text:style-name="Code">Configurations</text:span><text:span text:style-name="T686"> </text:span><text:span text:style-name="T94">attribute</text:span><text:span text:style-name="T686"> in the platform worker</text:span><text:span text:style-name="T1083">&apos;s XML file</text:span><text:span text:style-name="T686">, there must be a corresponding </text:span><text:span text:style-name="T311">XML file</text:span><text:span text:style-name="T686">. <text:s/>This XML file has these </text:span><text:span text:style-name="T311">aspects</text:span><text:span text:style-name="T686">:</text:span></text:p>
-   <text:list xml:id="list90735191196394" text:continue-list="list90734941626072" text:style-name="WWNum32">
+   <text:list xml:id="list102825681599604" text:continue-list="list102826483153305" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">The top level element <text:span text:style-name="T311">is</text:span> <text:span text:style-name="T1052">&lt;</text:span><text:span text:style-name="Code">HdlConfig</text:span><text:span text:style-name="Code"><text:span text:style-name="T1052">&gt;</text:span></text:span>.</text:p>
     </text:list-item>
@@ -11915,7 +11915,7 @@
    <text:h text:style-name="P613" text:outline-level="3"><text:bookmark-start text:name="__RefHeading___Toc18281_4003722483"/>Control Plane Master <text:span text:style-name="T881">Interface</text:span><text:bookmark-end text:name="__RefHeading___Toc18281_4003722483"/></text:h>
    <text:p text:style-name="P438">T<text:span text:style-name="T1052">his interface is defined in the HDL primitive library whose name is </text:span><text:span text:style-name="Code">platform</text:span><text:span text:style-name="T1052">, found in the </text:span><text:span text:style-name="Code">ocpi.core</text:span><text:span text:style-name="T1052"> built-in project. <text:s/>The input and output signal records for the interface are thus: <text:s/></text:span><text:span text:style-name="Code">platform.platform_pkg.occp_in_t</text:span><text:span text:style-name="T1052"> for signals going </text:span><text:span text:style-name="T232">from</text:span><text:span text:style-name="T1052"> the master (i.e. the platform worker), </text:span><text:span text:style-name="T232">into</text:span><text:span text:style-name="T1052"> the control plane, and </text:span><text:span text:style-name="Code">platform.platform_pkg.occp_out_t</text:span><text:span text:style-name="T1052"> for signals going from (out of) the control plane </text:span><text:span text:style-name="T232">to</text:span><text:span text:style-name="T1052"> the platform worker. <text:s/>I.e. in this case the “in” and “out” are relative to the control plane slave, which is part of the generic OpenCPI HDL infrastructure.</text:span></text:p>
    <text:p text:style-name="P594"><text:span text:style-name="T1052">This control plane interface is a simple 32 bit data bus with t</text:span><text:span text:style-name="T86">hese</text:span><text:span text:style-name="T1052"> features:</text:span></text:p>
-   <text:list xml:id="list90736568539407" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102826562205847" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">There are byte enable bits allowing the master to read or write individual bytes (or <text:span text:style-name="T1055">aligned </text:span>shorts) within a 32 bit location.</text:p>
     </text:list-item>
@@ -11945,7 +11945,7 @@
    <text:p text:style-name="P438"><text:span text:style-name="T887">With</text:span>in the OpenCPI data plane stack, <text:span text:style-name="T887">t</text:span>he data plane is organized in two layers, the “<text:span text:style-name="T946">message </text:span>transport” and the “data transfer” layers. <text:s/><text:span text:style-name="T946">[diagram from briefings]</text:span></text:p>
    <text:p text:style-name="P515"><text:span text:style-name="T925">The </text:span><text:span text:style-name="FirstEmphasis">transport</text:span><text:span text:style-name="T925"> layer is </text:span><text:span text:style-name="T9">i</text:span><text:span text:style-name="T2">nterconnect</text:span><text:span text:style-name="T925"> agnostic and provides buffer and </text:span><text:span text:style-name="T9">m</text:span><text:span text:style-name="T43">essage</text:span><text:span text:style-name="T925"> management. <text:s/>The data </text:span><text:span text:style-name="FirstEmphasis">transfer</text:span><text:span text:style-name="T925"> layer is defined by OpenCPI </text:span><text:span text:style-name="T9">w</text:span><text:span text:style-name="T2">ith</text:span><text:span text:style-name="T925"> a protocol specification for Remote DMA (RDMA) which provides data transfer interoperability between heterogeneous components executing within FPGAs, DSPs, and GPPs that all have access to each other’s addressable space. <text:s/>The RDMA software module allows new </text:span><text:span text:style-name="T1056">software </text:span><text:span text:style-name="T925">drivers to be plugged into OpenCPI, enabling data exchange over a </text:span><text:soft-page-break/><text:span text:style-name="T925">variety of </text:span><text:span text:style-name="T9">i</text:span><text:span text:style-name="T2">nterconnects</text:span><text:span text:style-name="T925">. <text:s/>OpenCPI provides several intrinsic drivers with the standard distribution including Host Memory, network sockets and </text:span><text:span text:style-name="T87">DMA</text:span><text:span text:style-name="T925"> bus/fabric.</text:span></text:p>
    <text:p text:style-name="P438">SDP was designed to process the OpenCPI RDMA protocol inside of FPGA containers. Other requirements and/or design goals of SDP were:</text:p>
-   <text:list xml:id="list90736137917570" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102825865752204" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Minimize differences between SDP and common FPGA interconnects (AXI, PCIe)</text:p>
     </text:list-item>
@@ -11957,7 +11957,7 @@
     </text:list-item>
    </text:list>
    <text:p text:style-name="P297">The SDP interface has the following attributes:</text:p>
-   <text:list xml:id="list90736232625790" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102824964118416" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Bidirectional: <text:s/>either side of a connection can be master </text:p>
     </text:list-item>
@@ -15142,7 +15142,7 @@
    </table:table>
    <text:p text:style-name="Body">Packets are transferred using a sequence of transfers controlled by <text:span text:style-name="Code">valid</text:span> and <text:span text:style-name="Code">ready</text:span>. In FIFO-speak, <text:span text:style-name="Code">valid</text:span> is analogous to “FIFO not empty”, and <text:span text:style-name="Code">ready</text:span> is analogous to “dequeue”. <text:s/>The <text:span text:style-name="Code">valid</text:span> signal in one direction is acknowledged by the <text:span text:style-name="Code">ready</text:span> signal in the other direction. <text:s/>When they are both asserted (from opposite directions) at a rising edge, the transfer is complete. <text:s/><text:span text:style-name="T856">The</text:span> <text:span text:style-name="Code">valid</text:span> <text:span text:style-name="T856">signal </text:span>can lead <text:span text:style-name="Code">ready</text:span> or vice versa. <text:s/>This terminology is similar to AXI.</text:p>
    <text:p text:style-name="P765">The following diagram shows three SDP transfers: </text:p>
-   <text:list xml:id="list90736328027458" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102825423454437" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">ready trailing valid</text:p>
     </text:list-item>
@@ -16691,7 +16691,7 @@
     </draw:frame></text:p>
    <text:p text:style-name="P850">Figure <text:sequence text:ref-name="refFigure4" text:name="Figure" text:formula="ooow:Figure+1" style:num-format="1">5</text:sequence>: <text:s/>SDP Packet Transfer Showing Header</text:p>
    <text:p text:style-name="Body">SDP is split transaction, like PCIe and AXI. <text:s/>Read request packets elicit read response packets (with data). <text:s/>Write request packets (with data) are posted, with no response. <text:s/>The first transfer of a packet transfers data (unless <text:span text:style-name="T881">it is </text:span>a read request). <text:s/>The header defines what the packet is for (its operation or op):</text:p>
-   <text:list xml:id="list90737039421230" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102825292292974" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">A read request (with address and no data)</text:p>
     </text:list-item>
@@ -19957,7 +19957,7 @@
    <text:p text:style-name="Code"><text:span text:style-name="T854">dataclk <text:s text:c="4"/>&lt;= ctl_in.clk; <text:s/>-- </text:span><text:span text:style-name="T1056">use the control clock as output clk</text:span><text:span text:style-name="T854"><text:line-break/>data <text:s text:c="7"/>&lt;= in_in.data; <text:s/>-- </text:span><text:span text:style-name="T1056">drive data output from input</text:span><text:span text:style-name="T854"><text:line-break/>valid <text:s text:c="6"/>&lt;= in_in.valid; -- </text:span><text:span text:style-name="T1056">drive output valid from input valid</text:span><text:line-break/>in_out.take &lt;= <text:span text:style-name="T854">ready</text:span>; <text:s text:c="6"/>-- <text:span text:style-name="T1056">accept input when output is ready</text:span></text:p>
    <text:h text:style-name="P614" text:outline-level="3"><text:bookmark-start text:name="__RefHeading___Toc38645_1517956095"/><text:soft-page-break/>A Device Worker Implements the Data Sheet<text:bookmark-end text:name="__RefHeading___Toc38645_1517956095"/></text:h>
    <text:p text:style-name="P257"><text:span text:style-name="T346">It is recommended to use the device manufacturer&apos;s data sheet&apos;s signal and register names in the device worker code (and its OWD) so they are easily correlated to the names in the data sheet. <text:s/>This </text:span><text:span text:style-name="T50">p</text:span><text:span text:style-name="T43">rovides</text:span><text:span text:style-name="T346"> easier code maintenance and system-level debugging. <text:s/>E.g., a system engineer may find it valuable to probe and examine device-level settings when referring to the data sheet, even though they might not be HDL coders. <text:s/>When the naming conventions in the data sheet are at odds with “better” naming conventions, it may still be preferable to use them for the above reasons.</text:span></text:p>
-   <text:list xml:id="list90735898432892" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102825999839519" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:span text:style-name="T174">Implementing all the functionality in a device may not be desirable when </text:span><text:span text:style-name="T97">t</text:span><text:span text:style-name="T98">he device worker</text:span><text:span text:style-name="T174"> initially written for a platform, since that platform may not use all the device&apos;s capabilities. <text:s/>W</text:span><text:span text:style-name="T171">hen a device worker</text:span><text:span text:style-name="T174"> </text:span><text:span text:style-name="T171">is insufficient </text:span><text:span text:style-name="T174">in this way for a new platform or project</text:span><text:span text:style-name="T171">, it should be enhanced in such a way that any existing uses of it will still work (backward compatibility) so that the community in fact gets the benefit of a newer more complete device worker implementation.</text:span></text:p>
     </text:list-item>
@@ -19968,7 +19968,7 @@
    <text:p text:style-name="P109"><text:span text:style-name="T343">In order to ensure that similar devices have common application-visible behavior, OpenCPI has </text:span><text:span text:style-name="T175">device </text:span><text:span text:style-name="T181">class</text:span><text:span text:style-name="T175"> specs</text:span><text:span text:style-name="T343"> that represent commonly used classes of devices. <text:s/>This is a special case of the component specification (OCS) being the basis of multiple implementations (workers) of the same functionality. <text:s/>In this device case, the “multiple implementations” are for different devices of the same class. <text:s/>Device workers for devices in the same class implement the same OCS; a device class is represented by this device class OCS. <text:s/>Current classes include </text:span><text:span text:style-name="Code">clock_gen</text:span><text:span text:style-name="T343">, </text:span><text:span text:style-name="Code">qdac</text:span><text:span text:style-name="T343">, and </text:span><text:span text:style-name="Code">qadc</text:span><text:span text:style-name="T343">.</text:span></text:p>
    <text:p text:style-name="P113">As the integration of functionality on single chips increases, it is common for a “<text:span text:style-name="T946">device </text:span>chip” to implement multiple functions of different classes <text:span text:style-name="T590">of device (e.g. an ADC and a DAC)</text:span>. <text:s/><text:span text:style-name="T590">Generally</text:span>, this should <text:span text:style-name="T171">not</text:span> result in a single device worker for the multi-function <text:span text:style-name="T590">chip. <text:s/>Creating such a single device worker would result in </text:span>the <text:span text:style-name="T590">functions</text:span> not <text:span text:style-name="T590">being </text:span>represented to the system or to users the same as <text:span text:style-name="T590">a similar function from a </text:span>non-integrated single-purpose <text:span text:style-name="T590">chip</text:span>. <text:s/><text:span text:style-name="T590">Thus, a device worker should be developed for each class that is present on the multifunction chip.</text:span></text:p>
    <text:p text:style-name="P111">This avoids exposing the multi-function integration of a single chip <text:span text:style-name="T591">to applications </text:span>and <text:span text:style-name="T605">thus enhances</text:span> the re-use of applications. <text:s/>Furthermore, when only one function is <text:soft-page-break/>needed, a multi-function device worker <text:span text:style-name="T605">would</text:span> <text:span text:style-name="T1051">not </text:span>use FPGA resources for functions that <text:span text:style-name="T591">are</text:span> not being used. <text:s/><text:span text:style-name="T344">While it is possible to develop “swiss-army-knife” device workers for multifunction chips that intend to avoid using resources for parts that are unused, OpenCPI recommends designs that are more modular, namely:</text:span></text:p>
-   <text:list xml:id="list90735456190002" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102825120636402" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:span text:style-name="T344">Chips</text:span> that contain multiple functions should generally be treated as multiple devices using multiple device workers <text:span text:style-name="T344">of the appropriate classes</text:span>.</text:p>
     </text:list-item>
@@ -19976,7 +19976,7 @@
    <text:p text:style-name="P111">When a multi-function device has pins or hardware that must be shared among the functional device worker<text:span text:style-name="T564">s</text:span> (e.g. <text:span text:style-name="T344">a </text:span>common reset or SPI or clocks), a “subdevice” module can be used <text:span text:style-name="T344">for such shared logic</text:span>. <text:s/>This is discussed <text:span text:style-name="T1056">below in </text:span><text:a xlink:type="simple" xlink:href="#5.5.4.Subdevice Workers|outline" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T1056">Subdevice Workers</text:span></text:a>.</text:p>
    <text:p text:style-name="P112"><text:span text:style-name="T592">T</text:span>he first step in developing support for a new device is to identify the device <text:span text:style-name="T592">class</text:span> specs that are relevant, and determine the list of device workers that must be created. <text:s/><text:span text:style-name="T592">Each device class spec defines common properties, data ports, and implied functionality that all device workers of the class should try to implement.</text:span></text:p>
    <text:p text:style-name="P166">Some examples of classes of devices currently defined are:</text:p>
-   <text:list xml:id="list90735985793574" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102825617097013" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">ADC and DACs which convert between isochronous <text:span text:style-name="T605">data and</text:span> flow-controlled data and may have scheduling and time-stamping functionality.</text:p>
     </text:list-item>
@@ -19995,7 +19995,7 @@
    <text:p text:style-name="P177">The requirements for a class of devices may in fact be split into a low level part that HDL device workers typically implement, and a high level part that would usually be implemented in a proxy. <text:s/>An example might be where an ADC device worker had a low-latency gain adjustment input port that could probably not be implemented in software, as well as a high level sample rate setting that would be better implemented in a proxy.</text:p>
    <text:p text:style-name="P167">Device proxies are simple C++ <text:span text:style-name="T593">(</text:span><text:span text:style-name="T183">not C</text:span><text:span text:style-name="T593">)</text:span> RCC workers where the XML (OWD) specifies a <text:span text:style-name="Code">slave</text:span> attribute, indicating which worker is the slave for that proxy. <text:s/>That attribute <text:span text:style-name="T606">enables</text:span> convenient access to all the <text:span text:style-name="T593">slave</text:span> worker&apos;s properties from the proxy<text:span text:style-name="T606">&apos;s</text:span> code. <text:s/><text:span text:style-name="T1051">A more powerful mode is where the proxy specifies a </text:span><text:span text:style-name="FirstEmphasis">slave assembly</text:span><text:span text:style-name="T1051"> – a group of slaves with interconnections, all controlled by the proxy. [ more explanation of slave assemblies, typically used by DRCs, should be included here].</text:span></text:p>
    <text:p text:style-name="P167"><text:soft-page-break/>Thus there are two patterns for <text:span text:style-name="T566">implementing HDL device support in OpenCPI</text:span>:</text:p>
-   <text:list xml:id="list90737117885182" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102825598558331" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:span text:style-name="T171">Device-worker-only</text:span>, where the device worker implements both the device <text:span text:style-name="T946">class </text:span>component spec as well as any required higher level properties.</text:p>
     </text:list-item>
@@ -20007,7 +20007,7 @@
    <text:h text:style-name="P617" text:outline-level="3"><text:bookmark-start text:name="__RefHeading___Toc4832_234407367"/>Subdevice Workers<text:bookmark-end text:name="__RefHeading___Toc4832_234407367"/></text:h>
    <text:p text:style-name="P276"><text:span text:style-name="T347">[Diagrams here, based on existing </text:span><text:span text:style-name="T84">briefing</text:span><text:span text:style-name="T347">s etc.]</text:span></text:p>
    <text:p text:style-name="P168">Writing <text:span text:style-name="T594">a </text:span>device worker to be reusable across many embedded systems is made more difficult by two facts:</text:p>
-   <text:list xml:id="list90736214492473" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102826564843508" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Multifunction devices have aspects that are shared between functions <text:span text:style-name="T594">(e.g. common reset)</text:span></text:p>
     </text:list-item>
@@ -20023,7 +20023,7 @@
    <text:p text:style-name="P264"><text:soft-page-break/>So a given device worker may have a number of different subdevices that support it, but <text:span text:style-name="T1056">the choice of </text:span>which subdevice to use is always unambiguous since for a given platform or card, only one subdevice is appropriate.</text:p>
    <text:p text:style-name="P126">Subdevice workers <text:span text:style-name="T595">typically </text:span>have no control <text:span text:style-name="T595">interface</text:span>. <text:s/>Like device workers, they have signals that are attached to FPGA pins. <text:s/><text:span text:style-name="T367">These pins are usually what is “shared” between the device workers that the subdevice supports. <text:s/>It is possible that subdevices have no external signals and only exist to coordinate between several optionally present device workers.</text:span></text:p>
    <text:p text:style-name="P284"><text:span text:style-name="T367">Subdevice workers </text:span><text:span text:style-name="T92">usually</text:span><text:span text:style-name="T367"> have connections to the device workers they support. <text:s/>The XML </text:span><text:span text:style-name="T595">(a minimal OWD) </text:span><text:span text:style-name="T367">for a subdevice defines:</text:span></text:p>
-   <text:list xml:id="list90736658436857" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102826882830099" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">The hardware FPGA pins i<text:span text:style-name="T595">t is</text:span> attached to <text:span text:style-name="T568">(via the “signals” element like all device workers)</text:span></text:p>
     </text:list-item>
@@ -20060,7 +20060,7 @@
    <text:p text:style-name="P539">The OpenCPI unit test framework described in the <text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Component_Development_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="Internet_20_link">OpenCPI Component Development Guide</text:span></text:a> can be used to test device workers, using a special type of device worker called an <text:span text:style-name="FirstEmphasis">emulator</text:span>.</text:p>
    <text:p text:style-name="P544"><text:span text:style-name="T1057">A</text:span><text:span text:style-name="T946">n emulator </text:span><text:span text:style-name="T1057">device worker is </text:span><text:span text:style-name="T744">actually </text:span><text:span text:style-name="T1057">a device </text:span><text:span text:style-name="T235">emulator</text:span><text:span text:style-name="T1057"> that emulates </text:span><text:span text:style-name="T744">a</text:span><text:span text:style-name="T1057"> device for test purposes. <text:s/></text:span><text:span text:style-name="T744">Thus while a normal device worker </text:span><text:span text:style-name="T87">manages</text:span><text:span text:style-name="T744"> and controls a device by driving and receiving signals from the device (via FPGA pins), the emulator </text:span><text:span text:style-name="T261">acts like the device</text:span><text:span text:style-name="T744">. <text:s/>So if the device has a reset input pin, the normal device worker will drive that reset signal as an output of the device worker, into the actual device. <text:s/>The emulator for the device will have that reset signal as an </text:span><text:span text:style-name="T200">input</text:span><text:span text:style-name="T744"> signal.</text:span></text:p>
    <text:p text:style-name="P454">We discuss this relationship such that:</text:p>
-   <text:list xml:id="list90735702412694" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102826206481034" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P44"><text:soft-page-break/>We use “emulator” to mean “emulator worker”, which is a special type of device worker (much like a platform worker is a special type of device worker).</text:p>
     </text:list-item>
@@ -20087,7 +20087,7 @@
    <text:p text:style-name="P456"><text:span text:style-name="T750">The </text:span><text:span text:style-name="Code">streaminterface</text:span><text:span text:style-name="T749"> element is directly introducing a data output port even though there is no such port in the OCS, since emulators are not required to have such ports. <text:s/></text:span></text:p>
    <text:p text:style-name="P459"><text:span text:style-name="T751">T</text:span>he “results” of running the emulator <text:span text:style-name="T751">would be</text:span> the <text:span text:style-name="Code">errorcount</text:span> property<text:span text:style-name="T751">&apos;s value</text:span> and the data produced at its <text:span text:style-name="Code">tracedata</text:span> output port.</text:p>
    <text:p text:style-name="P460">An emulator OWD has these restrictions when compared to a normal device worker:</text:p>
-   <text:list xml:id="list90736399686553" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102826121626737" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P45">It must implement/reference the <text:span text:style-name="Code">emulator-spec</text:span> (via <text:span text:style-name="Code">spec</text:span> attribute)</text:p>
     </text:list-item>
@@ -20107,7 +20107,7 @@
    <text:h text:style-name="P810" text:outline-level="4">Using an Emulator for Device Worker Unit Testing</text:h>
    <text:p text:style-name="P460">When a <text:span text:style-name="Code">.test</text:span> directory is defined for a device worker (using the <text:span text:style-name="Code">ocpidev create test</text:span> command), OpenCPI expects to find an emulator worker in the same component library and will instan<text:span text:style-name="T752">tiate</text:span> <text:span text:style-name="T752">and connect </text:span>it next to the device worker in all test assemblies.</text:p>
    <text:p text:style-name="P461">All the testing then proceeds the same as testing application workers with these additions:</text:p>
-   <text:list xml:id="list90736679043833" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102824891535696" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">The final values for the emulator&apos;s own properties is also available to verification scripts.</text:p>
     </text:list-item>
@@ -20139,7 +20139,7 @@
    <text:p text:style-name="P258"><text:span text:style-name="T571">Applications use </text:span><text:span text:style-name="T53">t</text:span><text:span text:style-name="T43">hese</text:span><text:span text:style-name="T571"> </text:span><text:span text:style-name="T1059">higher-level </text:span><text:span text:style-name="T571">proxies by instantiating a component of a higher level proxy spec. <text:s/></text:span><text:span text:style-name="T1056">These</text:span><text:span text:style-name="T571"> prox</text:span><text:span text:style-name="T1056">ies</text:span><text:span text:style-name="T571"> can represent any application-level subsystem or source or sink of data, </text:span><text:span text:style-name="T1056">and they can delegate connections to their IO ports to connect to the ports of their slaves.</text:span></text:p>
    <text:h text:style-name="P619" text:outline-level="3"><text:bookmark-start text:name="__RefHeading__17670_2116501284"/>XML Metadata for Device Workers/Subdevices/DeviceProxies<text:bookmark-end text:name="__RefHeading__17670_2116501284"/></text:h>
    <text:p text:style-name="P261"><text:span text:style-name="T950">The </text:span><text:span text:style-name="T55">f</text:span><text:span text:style-name="T43">our</text:span><text:span text:style-name="T950"> types of workers that relate to device support in OpenCPI are:</text:span></text:p>
-   <text:list xml:id="list90736635982652" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102825573261881" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Device Workers</text:p>
     </text:list-item>
@@ -20191,7 +20191,7 @@
    <text:h text:style-name="P950" text:outline-level="3"><text:bookmark-start text:name="__RefHeading___Toc19390_1396388842"/>Design Pattern for ADC and DAC Device Workers<text:bookmark-end text:name="__RefHeading___Toc19390_1396388842"/></text:h>
    <text:p text:style-name="P504">When <text:span text:style-name="T946">supporting </text:span>ADC and DAC devices with device workers in OpenCPI (for use on platforms or cards that have them), OpenCPI specifie<text:span text:style-name="T946">s</text:span> interfaces to be used for the digital data input and output. <text:s/>These interfaces are then connected to OpenCPI-provided “helper” workers that perform a number of related functions generically. <text:s/>This simplifies the device-specific ADC and DAC device workers.</text:p>
    <text:p text:style-name="P504">For <text:span text:style-name="T903">Quadrature </text:span>ADC devices:</text:p>
-   <text:list xml:id="list90735373894789" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102824996313695" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P49">the generic helper worker is called <text:span text:style-name="Code">data_src_</text:span><text:span text:style-name="Code"><text:span text:style-name="T952">q</text:span></text:span><text:span text:style-name="Code">adc</text:span></text:p>
     </text:list-item>
@@ -20200,7 +20200,7 @@
     </text:list-item>
    </text:list>
    <text:p text:style-name="P504">For <text:span text:style-name="T903">Quadrature </text:span>DAC devices</text:p>
-   <text:list xml:id="list90735478822996" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102824864168690" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P49">the <text:span text:style-name="T888">generic </text:span>helper worker is called <text:span text:style-name="Code">data_sink_</text:span><text:span text:style-name="Code"><text:span text:style-name="T954">q</text:span></text:span><text:span text:style-name="Code">dac</text:span></text:p>
     </text:list-item>
@@ -20211,7 +20211,7 @@
    <text:p text:style-name="P503">T<text:span text:style-name="T889">his section describes the ADC/DAC interfaces and the provided helper workers.</text:span></text:p>
    <text:h text:style-name="P814" text:outline-level="4">ADC <text:span text:style-name="T905">Device Workers</text:span></text:h>
    <text:p text:style-name="P236"><text:span text:style-name="T890">The following are requirements for a</text:span><text:span text:style-name="T1060">n</text:span><text:span text:style-name="T890"> </text:span>ADC device <text:span text:style-name="T891">worker:</text:span></text:p>
-   <text:list xml:id="list90736940130167" text:continue-list="list90735045755444" text:style-name="Numbering_20_1">
+   <text:list xml:id="list102825539547787" text:continue-list="list102825441729419" text:style-name="Numbering_20_1">
     <text:list-item text:start-value="1">
      <text:p text:style-name="P841">Su<text:span text:style-name="T891">pply the sample clock of the ADC device as an output.</text:span></text:p>
     </text:list-item>
@@ -22941,7 +22941,7 @@
     </draw:frame></text:p>
    <text:p text:style-name="P854">Figure <text:sequence text:ref-name="refFigure9" text:name="Figure" text:formula="ooow:Figure+1" style:num-format="1">10</text:sequence>: <text:s/>ADC Device Support Model</text:p>
    <text:p text:style-name="P505"><text:soft-page-break/>The <text:span text:style-name="Code">data_src_</text:span><text:span text:style-name="Code"><text:span text:style-name="T952">q</text:span></text:span><text:span text:style-name="Code">adc</text:span> helper performs the <text:span text:style-name="T903">following</text:span> functions, <text:span text:style-name="T899">so the hardware device worker should not</text:span>:</text:p>
-   <text:list xml:id="list90735842901524" text:continue-list="list90736940130167" text:style-name="Numbering_20_1">
+   <text:list xml:id="list102825456677891" text:continue-list="list102825539547787" text:style-name="Numbering_20_1">
     <text:list-item text:start-value="1">
      <text:p text:style-name="P846">Detect overrun and record it in a volatile property</text:p>
     </text:list-item>
@@ -23032,7 +23032,7 @@
    <text:p text:style-name="P507"><text:span text:style-name="T58">P</text:span><text:span text:style-name="T954">latform configurations or containers can specify a </text:span><text:span text:style-name="Code">data_src_</text:span><text:span text:style-name="Code"><text:span text:style-name="T952">q</text:span></text:span><text:span text:style-name="Code">adc</text:span><text:span text:style-name="T903">, causing the </text:span><text:span text:style-name="T58">A</text:span><text:span text:style-name="T59">DC</text:span><text:span text:style-name="T903"> worker to be included automatically (due to the </text:span><text:span text:style-name="Code">supports</text:span><text:span text:style-name="T903"> relationship). <text:s/>Such assemblies can be used by applications </text:span><text:span text:style-name="T58">b</text:span><text:span text:style-name="T56">y</text:span><text:span text:style-name="T903"> simply </text:span><text:span text:style-name="T58">i</text:span><text:span text:style-name="T56">nstantiating</text:span><text:span text:style-name="T903"> the </text:span><text:span text:style-name="Code">data_src_</text:span><text:span text:style-name="Code"><text:span text:style-name="T952">q</text:span></text:span><text:span text:style-name="Code">adc</text:span><text:span text:style-name="T903"> component</text:span><text:span text:style-name="T484"> </text:span><text:span text:style-name="T503">in the application.</text:span></text:p>
    <text:h text:style-name="P814" text:outline-level="4">DAC <text:span text:style-name="T905">Device Workers</text:span></text:h>
    <text:p text:style-name="P237"><text:span text:style-name="T890">The following are requirements for DA</text:span>C device <text:span text:style-name="T891">workers:</text:span></text:p>
-   <text:list xml:id="list90736328476866" text:continue-list="list90735842901524" text:style-name="Numbering_20_1">
+   <text:list xml:id="list102824917549717" text:continue-list="list102825456677891" text:style-name="Numbering_20_1">
     <text:list-item text:start-value="1">
      <text:p text:style-name="P844">Su<text:span text:style-name="T891">pply the sample clock of the DAC device as an output</text:span></text:p>
     </text:list-item>
@@ -23044,7 +23044,7 @@
     </text:list-item>
    </text:list>
    <text:p text:style-name="P508"><text:span text:style-name="T898">The </text:span><text:span text:style-name="Code">data_</text:span><text:span text:style-name="Code"><text:span text:style-name="T313">s</text:span></text:span><text:span text:style-name="Code"><text:span text:style-name="T316">ink</text:span></text:span><text:span text:style-name="Code"><text:span text:style-name="T952">_qda</text:span></text:span>c<text:span text:style-name="T898"> helper performs the following functions, so the hardware device worker should not:</text:span></text:p>
-   <text:list xml:id="list90736673571602" text:continue-list="list90736328476866" text:style-name="Numbering_20_1">
+   <text:list xml:id="list102826436091871" text:continue-list="list102824917549717" text:style-name="Numbering_20_1">
     <text:list-item text:start-value="1">
      <text:p text:style-name="P844"><text:span text:style-name="T904">Interpret</text:span> <text:span text:style-name="T898">protocol </text:span>messages indicating <text:span text:style-name="T904">EOF or lack of valid data.</text:span></text:p>
     </text:list-item>
@@ -23150,7 +23150,7 @@
    <text:p text:style-name="P513">[Preliminary feature <text:span text:style-name="T954">documentation</text:span>]</text:p>
    <text:p text:style-name="P513">When enabling an FPGA platform, characteristics of the timekeeping clock of the system <text:span text:style-name="T89">should</text:span><text:span text:style-name="T907"> </text:span>be reported as part of platform documentation.</text:p>
    <text:p text:style-name="P513"><text:span text:style-name="T908">T</text:span>he following characteristics of the timekeeping clock <text:span text:style-name="T907">must</text:span> be reported:</text:p>
-   <text:list xml:id="list90736561641113" text:continue-list="list90735478822996" text:style-name="WWNum32">
+   <text:list xml:id="list102825573732006" text:continue-list="list102824864168690" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P52">Frequency Error <text:span text:style-name="T908">(Hz)</text:span></text:p>
     </text:list-item>
@@ -23166,7 +23166,7 @@
    </text:list>
    <text:p text:style-name="P510">In addition to these characteristics, the ability to accurately <text:span text:style-name="T909">provide </text:span>time <text:span text:style-name="T909">to HDL workers must</text:span> be measured and reported.</text:p>
    <text:p text:style-name="P510">The following characteristics <text:span text:style-name="T910">regarding </text:span>time<text:span text:style-name="T911">stamping accuracy must</text:span> be reported:</text:p>
-   <text:list xml:id="list90736771650910" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102826519955105" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P51">Timestamp resolution (s)</text:p>
     </text:list-item>
@@ -35842,7 +35842,7 @@
    <text:p text:style-name="P672">drc_<text:span text:style-name="T171">&lt;hdl_card&gt;</text:span>.rcc</text:p>
    <text:h text:style-name="P625" text:outline-level="3"><text:bookmark-start text:name="__RefHeading___Toc92119_843008147"/>Preparing the Worker Descriptor XML (OWD) for a DRC Proxy Worker<text:bookmark-end text:name="__RefHeading___Toc92119_843008147"/></text:h>
    <text:p text:style-name="P268"><text:span text:style-name="T977">There are </text:span><text:span text:style-name="T66">s</text:span><text:span text:style-name="T67">everal</text:span><text:span text:style-name="T977"> aspects to preparing a DRC worker&apos;s OWD XML file:</text:span></text:p>
-   <text:list xml:id="list90735641995425" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list102826307328551" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P57"><text:span text:style-name="T978">Specifying </text:span><text:span text:style-name="T67">w</text:span><text:span text:style-name="T68">hich</text:span><text:span text:style-name="T978"> properties for controlling DRC configurations notify the </text:span><text:span text:style-name="T67">worker</text:span><text:span text:style-name="T978"> code when they are written</text:span></text:p>
     </text:list-item>
@@ -35860,13 +35860,13 @@
    <text:p text:style-name="P266">These <text:span text:style-name="Code">writesync</text:span> attributes indicate that the worker will be notified when these properties are written. <text:s/>In the case of the last one, the status property, the <text:span text:style-name="Code">readsync</text:span> attribute indicates that the proxy should be notified just prior to the status being queried. <text:s/>This allows the proxy to refresh the status, perhaps based on querying <text:span text:style-name="T1062">the </text:span>hardware <text:span text:style-name="T1062">(i.e. the underlying slave device workers).</text:span></text:p>
    <text:h text:style-name="P824" text:outline-level="4">Constant Values in <text:span text:style-name="T979">the</text:span> OWD <text:span text:style-name="T980">for a DRC Proxy Worker</text:span></text:h>
    <text:p text:style-name="P267">The DRC spec defines a number of properties that are considered constant values for a given DRC proxy worker. <text:s/><text:span text:style-name="T980">These properties are defined in the OCS in one of two ways:</text:span></text:p>
-   <text:list xml:id="list90735643699258" text:continue-list="list90736673571602" text:style-name="Numbering_20_1">
+   <text:list xml:id="list102826893216628" text:continue-list="list102826436091871" text:style-name="Numbering_20_1">
     <text:list-item text:start-value="1">
      <text:p text:style-name="P848"><text:span text:style-name="T980">As an explicitly constant parameter property, </text:span><text:span text:style-name="T71">d</text:span><text:span text:style-name="T72">efined</text:span><text:span text:style-name="T980"> in the OCS with </text:span><text:span text:style-name="Code">parameter=&apos;</text:span><text:span text:style-name="T980">true&apos; and providing a default value that can be overridden in the DRC proxy&apos;s OWD using, e.g.:</text:span></text:p>
     </text:list-item>
    </text:list>
    <text:p text:style-name="P672"><text:tab/><text:span text:style-name="T980">&lt;specproperty name=</text:span><text:span text:style-name="T430">&apos;</text:span><text:span text:style-name="T336">M</text:span><text:span text:style-name="T337">AX_CHANNELS</text:span><text:span text:style-name="T430">&apos;</text:span><text:span text:style-name="T980"> value=&apos;2&apos;/&gt;</text:span></text:p>
-   <text:list xml:id="list90736429216742" text:continue-numbering="true" text:style-name="Numbering_20_1">
+   <text:list xml:id="list102825178223970" text:continue-numbering="true" text:style-name="Numbering_20_1">
     <text:list-item>
      <text:p text:style-name="P332">As a readable property set in the OCS <text:span text:style-name="T171">without</text:span> <text:span text:style-name="Code">parameter=&apos;true&apos;</text:span>, which may be resolved in the worker OWD either by:</text:p>
     </text:list-item>

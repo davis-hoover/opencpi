@@ -99,13 +99,13 @@ end to_slv;
 function from_slv(slv : in std_logic_vector) return protocol_t is
   variable ret : protocol_t;
 begin
-  ret.sample.data.real             := slv(325 downto 310); --16
-  ret.sample.data.imaginary        := slv(309 downto 294); --16
-  ret.sample_vld                   := slv(293);
-  ret.time.fraction                := slv(292 downto 229); --64
-  ret.time.seconds                 := slv(228 downto 197); --32
-  ret.time_vld                     := slv(196);
-  ret.sample_interval.fraction     := slv(195 downto 132); --64
+  ret.sample.data.real             := slv(277 downto 262); --16
+  ret.sample.data.imaginary        := slv(261 downto 246); --16
+  ret.sample_vld                   := slv(245);
+  ret.time.fraction                := slv(244 downto 205); --40
+  ret.time.seconds                 := slv(204 downto 173); --32
+  ret.time_vld                     := slv(172);
+  ret.sample_interval.fraction     := slv(171 downto 132); --40
   ret.sample_interval.seconds      := slv(131 downto 100); --32
   ret.sample_interval_vld          := slv(99);
   ret.flush                        := slv(98);

@@ -25,7 +25,6 @@ import os.path
 import logging
 from glob import glob
 from pathlib import Path
-import subprocess
 import re
 import xml.etree.ElementTree as xt
 from _opencpi.util import cd, set_vars_from_make, OCPIException
@@ -549,7 +548,7 @@ def get_all_projects():
 ###############################################################################
 
 VALID_PLURAL_NOUNS = ["tests", "libraries", "workers"]
-def get_ocpidev_working_dir(noun, name, library=None, hdl_library=None, hdl_platform=None):
+def get_ocpidev_working_dir(noun, name, ensure_exists=True, **kwargs):
     """
     TODO
     notes:
@@ -563,15 +562,19 @@ def get_ocpidev_working_dir(noun, name, library=None, hdl_library=None, hdl_plat
     """
     # what about showing of global things is this function even called in that case? isnt the object
     # that is created always the current registry?
-    if not is_path_in_project(".") and not is_path_in_project(name):
+    if not is_path_in_project(".") and not (name and is_path_in_project(name)):
+        if noun == 'project':
+        # Check if project ID passed as a name
+            project_registry = get_project_registry_dir()[1]
+            project_path = Path(project_registry, name).resolve()
+            if is_path_in_project(str(project_path)):
+                return str(project_path)
         raise OCPIException("Path \"" + os.path.realpath(".") + "\" is not in a project, " +
                             "so this command is invalid.")
     cur_dirtype = get_dirtype() if get_dirtype() != "libraries" else "library"
     name = "" if name == os.path.basename(os.path.realpath(".")) else name
-
     cur_dir_not_name = noun == cur_dirtype and not name
     noun_valid_not_name = noun in VALID_PLURAL_NOUNS and not name
-
     if (not noun and not name) or cur_dir_not_name or noun_valid_not_name:
         return "."
 
@@ -607,19 +610,20 @@ def get_ocpidev_working_dir(noun, name, library=None, hdl_library=None, hdl_plat
     # pylint:enable=no-member
 
     if noun in working_dir_dict:
-        asset_dir = working_dir_dict[noun](name, library, hdl_library, hdl_platform)
+        asset_dir = working_dir_dict[noun](name, ensure_exists=ensure_exists, **kwargs)
     else:
         raise OCPIException("Invalid noun \"" + noun + "\" .  Valid nouns are: " +
                             ' '.join(working_dir_dict.keys()))
 
     # ensure existence and return
-    if os.path.exists(asset_dir):
-        return os.path.realpath(asset_dir)
-    else:
+    if ensure_exists and not os.path.exists(asset_dir):
         # pylint:disable=undefined-variable
-        raise OCPIException("Determined working directory of \"" + asset_dir + "\" that does " +
-                            "not exist.")
+        err_msg = ' '.join(['Determined working directory of "{}"'.format(asset_dir),
+                            'that does not exist'])
+        raise OCPIException(err_msg)
         # pylint:enable=undefined-variable
+
+    return str(Path(asset_dir).resolve())
 
 def throw_not_valid_dirtype_e(valid_loc):
     """
@@ -697,6 +701,41 @@ def get_package_id_from_vars(package_id, package_prefix, package_name, directory
         package_name = os.path.basename(os.path.realpath(directory))
     return package_prefix + "." + package_name
 
+
+def get_cdk_dir():
+    """
+    Gets the OCPI_CDK_DIR environment variable and verifies that it has
+    been set correctly.
+    """
+    err_msg = None
+    if 'OCPI_CDK_DIR' not in os.environ:
+        err_msg = 'OCPI_CDK_DIR environment setting not found'
+    cdk_path = Path(os.environ['OCPI_CDK_DIR'])
+    if not cdk_path.is_dir():
+        err_msg = 'OCPI_CDK_DIR environment setting invalid'
+    if err_msg:
+        raise OCPIException(err_msg)
+
+    return str(cdk_path)
+
+
+def change_dir(directory):
+    """
+    Change to specified directory. Raises OCPIException if file not
+    found or not a directory
+    """
+    err_msg = ''
+    try:
+        directory = Path(directory).resolve()
+        os.chdir(directory)
+    except FileNotFoundError:
+        err_msg = 'directory {} does not exist'.format(directory)
+    except NotADirectoryError:
+        err_msg = '{} is not a directory'.format(directory)
+    if err_msg:
+        raise OCPIException(err_msg)
+
+
 if __name__ == "__main__":
     import doctest
     import sys
@@ -710,21 +749,3 @@ if __name__ == "__main__":
             pass
     doctest.testmod(verbose=__VERBOSITY, optionflags=doctest.ELLIPSIS)
     sys.exit(doctest.testmod()[0])
-
-
-def get_cdk_path():
-    """
-    Gets the OCPI_CDK_DIR environment variable and verifies that it has
-    been set correctly.
-    """
-    err_msg = None
-    if 'OCPI_CDK_DIR' not in os.environ:
-        err_msg = 'Error: OCPI_CDK_DIR environment setting not found'
-    cdk_path = Path(os.environ['OCPI_CDK_DIR'])
-    if not cdk_path.is_dir():
-        err_msg = 'Error: OCPI_CDK_DIR environment setting invalid'
-    if err_msg:
-        logging.error(err_msg)
-        sys.exit(1)
-
-    return cdk_path
