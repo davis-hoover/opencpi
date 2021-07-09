@@ -59,8 +59,6 @@ In a project, a component unit test suite resides in its own
 directory named '<component-name>'*`.test`* within a component library.
 Within the test suite directory are:
 
-- The test suite's "make" file (named *`Makefile`*)
-
 - The Test Suite Description file (named '<component-name>'*`-test.xml`*)
 
 - A generator script to create input data files for ports or property value files (one generator script for each port) (initially named *`generator.py`*)

@@ -23,8 +23,6 @@ Asset types to be specified in the '<noun>' argument are:
 
 *`application`*(*`s`*)::
     Build all (*`applications`*) or a specific ACI application.
-    This includes any custom bilding specified by a customized
-    application *Makefile*.
 
 *`hdl`*::
     A prefix to indicate an HDL asset in the *hdl* subdirectory of a project.
@@ -144,6 +142,11 @@ Options When Building Workers, Tests and other Assets in Libraries
     from the *`-l`* option in that the *`library`* noun is used when
     building the library itself, while the *`-l`* option is used when
     building an asset inside a library.
+
+Options When Building Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--generate`*::
+    Only perform the *generate* phase of unit tests, not the *build* phase.
 
 EXAMPLES
 --------

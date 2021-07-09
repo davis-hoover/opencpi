@@ -107,7 +107,7 @@ def make_jobs(stages, platform, projects, pipeline, host_platform=None):
         pipeline:      Pipeline to create jobs for
         host_platform: Host platform to create jobs for
 
-    Returns:
+    Returns:ocpiremote
         Jobs: collection containing data necessary to create jobs in a
               pipeline
 
@@ -427,7 +427,7 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
         stages:          List of all pipeline stages
         platform:        Platform to download artifacts for
         host_platform:   Host_platform to download artifacts for
-        linked_platform: Associated platform to downloaded artifacts 
+        linked_platform: Associated platform to download artifacts 
                          for
         do_ocpiremote:   Whether job should run ocpiremote commands
 
@@ -480,7 +480,7 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
                  or stage != 'generate-children')):
             # If the platform is an osp, clone the osp's repo
                 
-            path = '/'.join(['opencpi', 'projects', platform.project.group,
+            path = '/'.join(['opencpi', 'projects', 'osps',
                             platform.project.name])
             path = '"{}"'.format(path)
 
@@ -543,7 +543,7 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
     if do_register:
         if platform.project.group == 'osp':
         # Platform is an osp, register its project
-            path = '/'.join(['projects', platform.project.group, 
+            path = '/'.join(['projects', 'osps', 
                              platform.project.name])
             path = '"{}"'.format(path)
             register_cmd = make_ocpidev_cmd(
@@ -581,6 +581,10 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
                                 linked_platform=linked_platform),
             make_ocpiremote_cmd('start', platform,
                                 linked_platform=linked_platform),
+            # temporarily disable log retrieval here until the
+            # log command can be executed in the background.
+            # make_ocpiremote_cmd('log', platform,
+            #                     linked_platform=linked_platform),
             interfaces_cmd,
             'export OCPI_SOCKET_INTERFACE="${interfaces[$CI_RUNNER_ID]}"',
             'echo "${OCPI_SOCKET_INTERFACE}"',
@@ -629,6 +633,9 @@ def make_after_script(pipeline, platform, do_ocpiremote=False):
 
     if do_ocpiremote:
         cmds.append('source cdk/opencpi-setup.sh -e')
+        cmds.append(make_ocpiremote_cmd('stop', platform) + " || true")
+        # temporarily retrieve log here
+        cmds.append(make_ocpiremote_cmd('log', platform))
         cmds.append(make_ocpiremote_cmd('unload', platform))
 
     clean_cmd = 'rm -rf * .* 2>/dev/null || true'
@@ -815,7 +822,7 @@ def make_ocpiremote_cmd(verb, platform, linked_platform=None):
         linked_platform: Associated platform to pass to ocpiremote
 
     Returns:
-        ocpiadmin command string
+        ocpiremote command string
 
     Raises:
         ValueError: if unrecognized verb provided
@@ -837,7 +844,7 @@ def make_ocpiremote_cmd(verb, platform, linked_platform=None):
             '-s {}'.format(linked_platform.name)
         ])
 
-    if verb in ['start', 'unload']:
+    if verb in ['start', 'unload', 'stop', 'log']:
         cmd = ' '.join([
             'ocpiremote {}'.format(verb),
             '-i {}'.format(platform.ip),
@@ -845,6 +852,7 @@ def make_ocpiremote_cmd(verb, platform, linked_platform=None):
 
         if verb == 'start':
             cmd += (' -b')
+            cmd += ' -l 10'
 
     if platform.password:
         cmd += (' -p {}'.format(platform.password))
@@ -852,9 +860,9 @@ def make_ocpiremote_cmd(verb, platform, linked_platform=None):
     if platform.user:
         cmd += (' -u {}'.format(platform.user))
 
-    if verb not in ['deploy', 'load', 'start', 'unload']:
+    if verb not in ['deploy', 'load', 'start', 'unload', 'stop', 'log']:
         raise ValueError('Unknown verb: {}'.format(verb))
-
+ 
     return cmd
 
 

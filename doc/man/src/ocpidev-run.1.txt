@@ -14,33 +14,30 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-The *`run`* verb invokes the OpenCPI tool for running component unit tests
-and applications. Applications that are simply an application XML
-are not yet implemented using *`ocpidev(1)`*.
+The *`run`* verb is the OpenCPI command for running applications and component unit tests
+in the development (project) environment.
 
-Component unit tests have five phases:
+When running applications (all in the *`applications/`* subdirectory of the project), this command runs them
+based their XML file and any run-related attributes/options found there. Applications may be
+simple XML-based applications without their own directories, XML-based applications with their own
+directories or ACI-based (C++/Python) applications in their own directories.
 
-- Generate: generate testing artifacts after finding the
-component spec and the workers.
+When running component unit tests with default options, all unit tests are run, with any
+required preparation done before the tests are run.  Running component unit tests normally
+proceeds in three phases:
 
-- Build: build HDL bitstream/executable artifacts for testing.
+- *Prepare*: discover available built workers, HDL assemblies and available platforms,
+creating execution scripts to execute all feasible tests.
 
-- Prepare: examine available built workers and available platforms,
-creating execution scripts to use them all for executing feasible tests.
+- *Execute*: execute (prepared) tests for all workers, configurations, test cases and platforms.
 
-- Run: execute tests for all workers, configurations, test cases and platforms.
+- *Verify*: verify results from the execution of tests on workers and platforms.
 
-- Verify: verify results from the execution of tests on workers and platforms.
+Normally all three are run, but they can be individually run or two out of three can be run
+using the *`--phase`* option to this *`run`* verb.
 
-One or more "modes" based on these phases can be specified
-with the *`--mode`* option to the *run* verb.
-	
-There are two types of options for setting platforms.
-The first type (*`--rcc-platform`* and *`--hdl-platform`*) cause
-the tool to build (run generate and build phases) for the
-specified platforms. The second type (*`--only-platform`*,
-*`--exclude-platform`*) are used to limit the runtime available
-platform (prepare, run, and verify phases) where the command is executed.
+The *`--only-platform`* and *`--exclude-platform`* options are used to limit the runtime
+platforms used during the phases of unit testing.
 
 Asset types to be specified in the '<noun>' argument are:
 
@@ -52,7 +49,7 @@ Asset types to be specified in the '<noun>' argument are:
 
 *`library`*::
     Run all the unit tests in the specified component library.
-    
+
 *`project`*::
     Run all applications and component unit tests in
     the specified project.
@@ -64,6 +61,9 @@ Asset types to be specified in the '<noun>' argument are:
     Run all the component unit tests in a
     project or library.
 
+When running applications or unit tests from within their directories,
+no noun or name arguments are required.
+
 OPTIONS
 -------
 In the option descriptions below, a plus sign (+) indicates that
@@ -71,19 +71,19 @@ the option can be specified more than once on the command line.
 
 Options That Apply to Applications and Unit Tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*`--rcc-platform=`*'<platform>'+:: 
+*`--rcc-platform=`*'<platform>'+::
     Specify the RCC platform to use to generate and build the unit tests
     and build the ACI application.
 
 Options That Apply to Applications Only
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*`--before`* '<args>'+:: 
+*`--before`* '<args>'+::
     Specify the argument(s) to insert before the ACI executable or
     the *`ocpirun`* command; for example, environment settings or prefix commands.
-    
+
 *`--after`* '<args>'+::
     Specify the argument(s) to insert at the end of the execution command line.
-	
+
 *`--run-arg`* '<args>'+::
     Specify the argument(s) to insert immediately after the ACI executable or
     the *`ocpirun`* command.
@@ -97,9 +97,9 @@ number of *`run-arg`* arguments, you can use any of the following
 syntaxes:
 
    ocpidev run application myapp -- -v -d -Pxsim
-   
+
    ocpidev run application myapp --run-arg=-v --run-arg=-d --run-arg=-Pxsim
-   
+
    ocpidev run application myapp --run-arg=”-v -d -Pxsim”
 
 For an XML application, these command lines perform the command:
@@ -113,53 +113,44 @@ Options That Apply to Unit Tests Only
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`-l`* '<library>'::
     Run the unit test in the specified library.
-    
+
 *`--case=`*'<case-name>'[*,*'<case-name>'[*,*'<case-name>'...]]::
-    Specify the test case(s) to be run/verified. If this option is not used,
-    the default case run/verified is *`case00`*. You can specify wildcards
+    Specify the test case(s) to be executed/verified. If this option is not used,
+    all feasible cases are executed/verified. You can specify wildcards
     in '<case-name>'. To specify a subcase, use the notation
     '<case-name>'*.*'<subcase-number>'. Examples: case*., case0.0*, case00.01
-    
-*`--accumulate-errors`*:: 
+
+*`--accumulate-errors`*::
     Report execution or verification errors as they occur rather
     than ending the test on the first failure detected.
-    
+
 *`--exclude-platform=`*'<platform>', *-Q* '<platform>'+::
     Specify the runtime platform to omit from a unit test.
-    
+
 *`--hdl-platform=`*'<platform>'+::
     Specify the HDL platform to use with the unit test. This option is only
     valid in generate and build phases.
-    
-*`--keep-simulations`*:: 
+
+*`--keep-simulations`*::
     Keep HDL simulation files regardless of verification results.
     By default, simulation files are removed if the verification
     is successful. Warning: Simulation files can become large!
-    
-*`--mode=`*'<mode>'[,'<mode>'[,'<mode>'...]]::
-    Specify which phase(s) of the unit test to execute.
-    Valid modes are:
-    - *`all`*:  execute all five phases (the default if the *`--mode`* option is not used)
-    - *`gen`*: execute generate phase
-    - *`gen_build`*: execute generate and build phases
-    - *`prep_run_verify`*: execute prepare, run, and verify phases
-    - *`prep`*: execute prepare phase
-    - *`run`*: execute run phase
-    - *`prep_run`*: execute prepare and run phases
-    - *`verify`*: execute verify phase 
-    - *`view`*: execute the view script (view.sh) on an already executed run  
-    - *`clean_all`*: clean all generated files
-    - *`clean_run`*: clean all files generated during the run phase
-    
+
+*`--phase=`*'<phase>'+::
+    Specify which non-building phase(s) of unit testing to run.
+    Valid phases here are: *`prepare`*, *`execute`*, *`verify`*, and *`view`*.
+    The *`view`* 'phase' is used to run 'only' the view scripts for the unit test,
+    without other phases.  The *`--view`* 'option' can be used to add viewing along with other phases.
+
 *`--only-platform=`*'<platform>', *-G* '<platform>'+::
     Specify the runtime platform to use with a unit test.
-    
+
 *`--remotes=`*'<system>'::
     Specify the remote system to run the test(s) by setting the
     *`OCPI_REMOTE_TEST_SYS`* variable. See the section
     "Defining Remote Systems for Executing Tests"
     in the 'OpenCPI Component Development Guide' for more information.
-    
+
 *`--view`*::
     Run the view script (view.sh) for the test at the conclusion of the
     test's execution.
@@ -172,7 +163,7 @@ The following environment variables affect *`ocpidev run`* operation:
     A list of directories, separated by colons, to be searched for runtime artifacts.
     This variable is set automatically (if not already set) when running component
     unit tests or applications in projects with *`ocpidev run`*.
-   
+
 
 EXAMPLES
 --------
@@ -194,7 +185,7 @@ in the *`dsp_comps`* library located at *`components/dsp_comps`*:
 ----------------------------------------------
 ocpidev run -l dsp_comps test fir_real_sse
 ----------------------------------------------
-+			 
++
 . Inside the *`assets`* project, run all tests in the *`dsp_comps`* library
 located at *`components/dsp_comps`*:
 +

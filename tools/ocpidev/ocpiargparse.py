@@ -50,7 +50,7 @@ class _HelpAction(argparse.Action):
         page for the key. Will fall back to the parser's help page if
         one is not found.
         """
-        cdk_path = ocpiutil.get_cdk_path()
+        cdk_path = ocpiutil.get_cdk_dir()
         man_dir = Path(cdk_path, 'doc', 'man', 'man1')
         prog = Path(parser.prog.split()[0]).stem
         keys = self.keys[:3]

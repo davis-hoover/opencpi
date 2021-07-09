@@ -123,7 +123,7 @@ namespace OCPI {
 	     const std::string &vendor, bool verbose, bool print);
       ~Device();
       cl_platform_id id() const { return m_pid; }
-      cl_command_queue &cmdq(int idx ) { return m_cmdq[idx]; }
+      cl_command_queue &cmdq(unsigned idx ) { return m_cmdq[idx]; }
       size_t bufferAlignment() const { return m_bufferAlignment; }
       const OclVendor *vendor() const { return m_vendor; }
       const OclFamily *family() const { return m_family; }

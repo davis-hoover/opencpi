@@ -125,6 +125,10 @@ struct Build {
   // RCC-specific
   OrderedStringSet    m_staticPrereqLibs;
   OrderedStringSet    m_dynamicPrereqLibs;
+  OrderedStringSet    m_exactParts;  // list of <family>:<part> pairs
+  OrderedStringSet    m_containers;
+  OrderedStringSet    m_defaultContainers;
+  bool                m_anyDefaultContainers;
   Build(Worker &w);
   const char *parse(ezxml_t x, const char *buildFile = NULL);
   void writeMakeVars(FILE *mkFile);

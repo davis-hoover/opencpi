@@ -801,22 +801,24 @@ namespace OCPI {
       if (valuep)
 	ocpiCheck(value = m_default);
       for (const OA::Access *a = list.begin(); a != list.end(); ++a) {
+	if (!a->m_number && !a->m_u.m_member)
+	  break; // help python/swig with initializer lists
 	dimension = 0;
 	if (m->m_isSequence) {
 	  if (!a->m_number)
 	    return "sequence property not indexed with a number";
-	  if (a->m_index >= m->m_sequenceLength)
+	  if (a->m_u.m_index >= m->m_sequenceLength)
 	    return esprintf("sequence index (%zu) >= than maximum sequence length (%zu)",
-			    a->m_index, m->m_sequenceLength);
+			    a->m_u.m_index, m->m_sequenceLength);
 	  if (value) {
-	    if (a->m_index >= value->m_nElements)
+	    if (a->m_u.m_index >= value->m_nElements)
 	      return esprintf("sequence index (%zu) >= than current sequence length (%zu)",
-			      a->m_index, value->m_nElements);
-	    l_offset += a->m_index * m->m_nItems;
+			      a->m_u.m_index, value->m_nElements);
+	    l_offset += a->m_u.m_index * m->m_nItems;
 	  } else
 	    l_offset +=
 	      std::max(m->m_dataAlign, sizeof(uint32_t)) +
-	      a->m_index * m->m_elementBytes * m->m_nItems;
+	      a->m_u.m_index * m->m_elementBytes * m->m_nItems;
 	  dimension = 1; // indicate we have indexed one time
 	  if (++a == list.end())
 	    break;
@@ -826,11 +828,11 @@ namespace OCPI {
 	  for (unsigned n = 0; n < m->m_arrayRank && a != list.end(); ++a, ++dimension) {
 	    if (!a->m_number)
 	      return "array not indexed with a number";
-	    if (a->m_index >= m->m_arrayDimensions[n])
+	    if (a->m_u.m_index >= m->m_arrayDimensions[n])
 	      return "array index out of range";
 	    nItems /= m->m_arrayDimensions[n];
 	    ++n;
-	    l_offset += a->m_index  * nItems * (value ? 1 : m->m_elementBytes);
+	    l_offset += a->m_u.m_index  * nItems * (value ? 1 : m->m_elementBytes);
 	  }
 	  if (a == list.end())
 	    break;
@@ -841,12 +843,12 @@ namespace OCPI {
 	  Member *mm = NULL;
 	  unsigned n;
 	  for (n = 0; n < m->m_nMembers; n++)
-	    if (!strcasecmp(a->m_member, m->m_members[n].m_name.c_str())) {
+	    if (!strcasecmp(a->m_u.m_member, m->m_members[n].m_name.c_str())) {
 	      mm = &m->m_members[n];
 	      break;
 	    }
 	  if (n >= m->m_nMembers)
-	    return esprintf("member name \"%s\" not found in structure", a->m_member);
+	    return esprintf("member name \"%s\" not found in structure", a->m_u.m_member);
 	  if (value) {
 	    value = m->m_isSequence || m->m_arrayRank ?
 	      value->m_pStruct[l_offset][n] : value->m_Struct[n];

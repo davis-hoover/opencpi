@@ -1496,7 +1496,7 @@ function do_primitive {
 	     Libraries='lib1 lib2'
 	     Cores=core1 core2
 	     Otherwise all primitives will be built-->
-	<primitives/>
+	<hdlprimitives/>
 	EOF
     [ -z "$verbose" ] ||
 	echo This is the first HDL primitive in this project.  The \"hdl/primitives\" directory has been created.
@@ -1549,12 +1549,21 @@ function do_assemblies {
 function do_build_here {
     buildTest="$1"
     get_dirtype .
+    if [ -n "$generate" -a \( "$1" = test -o $dirtype = test \) ]; then
+	buildTest=generate
+    fi
     if [ -z "$buildRcc" -a -z "$buildHdl" -a -n "$buildClean" -a "$1" != "test" ]; then
       cleanTarget="clean"
     fi
-    if [ -n "$buildClean" -a "$1" == "test" ]; then
+    if [ -n "$buildClean" -a \( "$1" == "test" -o $dirtype = test \) ]; then
       buildTest=""
-      cleanTarget="cleantest"
+      if [ -n "$simulation" ]; then
+	cleanTarget=cleansim
+      elif [ -n "$execute" ]; then
+	cleanTarget=cleanrun
+      else
+	cleanTarget=cleantest
+      fi
     fi
     if [ -n "$buildRcc" -a -n "$buildClean" ]; then
       buildRcc=""
@@ -2231,6 +2240,9 @@ while [[ "${argv[0]}" != "" ]] ; do
       (--dynamic) dynamic=1;;
       (--container) takelist Containers;;
       (--configuration) takelist Configurations;;
+      (--generate) generate=1;;     # for building tests, do the "generate" subset of build
+      (--simulation) simulation=1;; # for cleaning tests, clean the simulation directories
+      (--execute) execute=1;;       # for cleaning tests, clean the execution/run directories
       (*)
         error_msg="unknown option: ${argv[0]}"
         if [ -n "$verb" ]; then
@@ -2438,7 +2450,7 @@ fi
 	RccPlatforms=$OCPI_TOOL_PLATFORM$build_suffix
     else
 	# add the suffix to all platforms and check that we are not already using suffixes
-	for $p in ${RccPlatforms[@]}; do
+	for p in ${RccPlatforms[@]}; do
 	    [[ $p == *-* ]] &&
 		bad "You cannot use the --dynamic or --optimize build options and also specify build options in a platform name (in this case: $p)"
 	    newplats+=($p$build_suffix)

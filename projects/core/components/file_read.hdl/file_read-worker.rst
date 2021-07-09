@@ -23,7 +23,7 @@
 .. _file_read-HDL-worker:
 
 
-``file_read`` HDL worker
+``file_read`` HDL Worker
 ========================
 Application HDL worker that only runs on FPGA simulator platforms. This worker
 will not run or be built for any FPGA hardware platforms because it contains
@@ -40,6 +40,3 @@ Detail
 
   out: Data streamed from file.
 
-Utilization
------------
-.. ocpi_documentation_utilization::

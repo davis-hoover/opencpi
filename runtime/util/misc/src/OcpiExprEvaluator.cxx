@@ -289,7 +289,7 @@ public:
 	  if (errno)
 	    return OU::esprintf("invalid numeric (double) constant: '%s'", mpf.c_str());
 	  m_number = d;
-	} else if (m_number.set_str(mpf, -mbase))
+	} else if (m_number.set_str(mpf, -(int)mbase))
 	  return OU::esprintf("invalid numeric constant: '%s'", mpf.c_str());
 	m_number *= mmult;
 	op = OpConstant;

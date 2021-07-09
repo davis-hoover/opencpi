@@ -87,7 +87,7 @@ begin
         end if;
     end process discontinuity_ready_reg;
 
-    odata        <= iprotocol.sample.data.real & iprotocol.sample.data.imaginary;
+    odata        <= iprotocol.sample.data.imaginary & iprotocol.sample.data.real;
     ovalid       <= out_valid;
     ogive        <= out_give;
     osom         <= out_som;

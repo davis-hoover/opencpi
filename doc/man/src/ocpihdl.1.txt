@@ -157,7 +157,7 @@ in that operation's description in OPERATIONS.
     The OCPI_HDL_DEVICE environment variable can
     be used to set a default value for this option.
 
-*`i`* '<network-interface>'::
+*`-i`* '<network-interface>'::
     Specify the name of the network interface on which to operate.
     Examples: *`en0`*, *`eth0`*.
 

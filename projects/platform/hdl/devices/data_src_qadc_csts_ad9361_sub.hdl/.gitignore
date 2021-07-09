@@ -1,5 +1,0 @@
-# Ignore symbolic links created when built
-clock_divider.vhd
-clock_manager.vhd
-clock_selector_with_async_select.vhd
-data_src_qadc_csts_ad9361_sub-build.xml
