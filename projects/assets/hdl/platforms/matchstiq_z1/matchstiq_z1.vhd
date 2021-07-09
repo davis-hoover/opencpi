@@ -39,6 +39,7 @@ begin
   -- Drive timekeepping interface - depends on which clock, and whether there is a PPS input
   timebase_out.clk     <= clk;
   timebase_out.pps     <= GPS_1PPS_IN;
+  timebase_out.usingPPS <= '1';
   EXT_1PPS_OUT         <= timebase_in.pps;
   -- convert between 2d array and array of arrays (VHDL does not allow 1d slices of 2d)
    sd0 : for i in 0 to sdp_count_c-1 generate

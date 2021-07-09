@@ -5,7 +5,8 @@
   <!-- All platform workers must provide these two ports -->
   <metadata master='true'/> <!-- access to container metadata via the platform worker -->
   <timebase master='true'/> <!-- providing a timebase for the time service -->
-  <sdp name='sdp' master='true'/>
+  <!-- Use explicit count of 1 to force testing of this case (modelsim does not do this) -->
+  <sdp name='sdp' master='true' count='1'/>
   <!-- Declare and parameterize the time_server device worker for this platform -->
   <device worker='time_server'/>
 </HdlPlatform>
