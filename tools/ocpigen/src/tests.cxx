@@ -20,10 +20,12 @@
 
 // Process the tests.xml file.
 #include <strings.h>
+#include <string>
 #include <sstream>
 #include <set>
 #include <limits>
 #include <algorithm>
+#include <unordered_set>
 #include "OcpiOsDebugApi.h"
 #include "OcpiOsFileSystem.h"
 #include "OcpiUtilMisc.h"
@@ -110,7 +112,6 @@ namespace {
   std::string specName, specPackage;
   bool verbose;
   Strings excludeWorkers, excludeWorkersTmp;
-  bool testingOptionalPorts;
   // If the spec in/out arg may be set in advance if it is inline or xi:included
   // FIXME: share this with the one in parse.cxx
   const char *
@@ -397,7 +398,6 @@ namespace {
         }
         m_port = static_cast<DataPort *>(p);
         if (testOptional) {
-          testingOptionalPorts = true;
           optionals.resize(optionals.size() + 1);
           optionals.push_back(static_cast<DataPort *>(p));
         }
@@ -420,7 +420,7 @@ namespace {
   InputOutputs inputs, outputs; // global ones that may be applied to any case
   static InputOutput *findIO(Port &p, InputOutputs &ios) {
     for (unsigned n = 0; n < ios.size(); n++)
-      if (ios[n].m_port == &p)
+      if (!strcasecmp(ios[n].m_port->pname(), p.pname()))
         return &ios[n];
     return NULL;
   }
@@ -1630,11 +1630,13 @@ namespace {
   void connectHdlFileIO(const Worker &w, std::string &assy, InputOutputs &ports) {
     for (PortsIter pi = w.m_ports.begin(); pi != w.m_ports.end(); ++pi) {
       Port &p = **pi;
+      if (!p.isData())
+        continue;
       bool optional = false;
       InputOutput *ios = findIO(p, ports);
       if (ios)
         optional = ios->m_testOptional;
-      if (p.isData() && !optional) {
+      if (!optional) {
           OU::formatAdd(assy,
                         "  <Instance name='%s_%s' Worker='file_%s'/>\n"
                         "  <Connection>\n"
@@ -1653,11 +1655,13 @@ namespace {
   void connectHdlStressWorkers(const Worker &w, std::string &assy, bool hdlFileIO, InputOutputs &ports) {
     for (PortsIter pi = w.m_ports.begin(); pi != w.m_ports.end(); ++pi) {
       Port &p = **pi;
+      if (!p.isData())
+        continue;
       bool optional = false;
       InputOutput *ios = findIO(p, ports);
       if (ios)
         optional = ios->m_testOptional;
-      if (p.isData() && !optional) {
+      if (!optional) {
         if (p.isDataProducer()) {
           OU::formatAdd(assy,
                         "  <Instance Name='%s_backpressure_%s' Worker='backpressure'/>\n",
@@ -1693,7 +1697,7 @@ namespace {
     }
   }
 
-  const char *generateHdlAssembly(const Worker &w, unsigned c, const std::string &dir, const
+  const char *generateHdlAssemblies(const Worker &w, unsigned c, const std::string &dir, const
                                     std::string &name, bool hdlFileIO, Strings &assyDirs, InputOutputs &ports) {
     OS::FileSystem::mkdir(dir, true);
     assyDirs.insert(name);
@@ -2195,27 +2199,33 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
         OU::formatAdd(name, "_%u", c);
         std::string dir(assemblies + "/" + name);
         ocpiInfo("Generating assembly: %s", dir.c_str());
-        //there's always at least one case if there's a -test.xml
-        if ((err = generateHdlAssembly(w, c, dir, name, false, assyDirs, cases[0]->m_ports)))
-          return err;
-        if (testingOptionalPorts) {
-          for (unsigned n = 0; n < cases.size(); n++) {
-            std::ostringstream temp; //can't use to_string
-            temp << n;
-            if ((err = generateHdlAssembly(w, c, dir + "_op_" + temp.str(), name + "_op_" + temp.str(), false, assyDirs, cases[n]->m_ports)))
-              return err;
+        std::unordered_set <uint32_t> bitmap_processed;
+        for (unsigned n = 0; n < cases.size(); n++) {
+          std::ostringstream temp; //can't use to_string
+          temp << n;
+          std::string unconnected = "_";
+          std::string ucPortNames = "";
+          uint32_t bitmask = 0;
+          unsigned ucp = 0;
+          for (uint32_t nn = 0; nn < cases[n]->m_ports.size(); nn++) {
+            if (cases[n]->m_ports[nn].m_testOptional == true){
+              bitmask = bitmask|(1 << nn);
+              ucPortNames += cases[n]->m_ports[nn].m_port->pname() + std::string("_");
+              unconnected = "_op_" + ucPortNames;
+              ucp++;
+            }
           }
-        }
-        if (hdlFileIO) {
-          name += "_frw";
-          dir += "_frw";
-          if ((err = generateHdlAssembly(w, c, dir, name, true, assyDirs, cases[0]->m_ports)))
-            return err;
-          if (testingOptionalPorts) {
-            for (unsigned n = 0; n < cases.size(); n++) {
-              std::ostringstream temp; //can't use to_string
-              temp << n;
-              if ((err = generateHdlAssembly(w, c, dir + "_op_" + temp.str(), name + "_op_" + temp.str(), true, assyDirs, cases[n]->m_ports)))
+          if (ucp > 1)
+            unconnected += "ports_unconnected_";
+          else if (ucp == 1)
+            unconnected += "port_unconnected_";
+          if (bitmap_processed.insert(bitmask).second) {
+            if ((err = generateHdlAssemblies(w, c, dir + unconnected + temp.str(),
+            name + unconnected + temp.str(), false, assyDirs, cases[n]->m_ports)))
+              return err;
+            if (hdlFileIO) {
+              if ((err = generateHdlAssemblies(w, c, dir + "_frw" + unconnected + temp.str(),
+              name + "_frw" + unconnected + temp.str(), true, assyDirs, cases[n]->m_ports)))
                 return err;
             }
           }
