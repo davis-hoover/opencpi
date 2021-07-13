@@ -50,6 +50,7 @@ begin
   timebase_out.usingPPS <= '0'; -- When not using PPS, drive usingPPS low
   
   -- Use a global clock buffer for this clock used for both control and data
+  -- h2f_user0_clk is 100 MHz
   clkbuf : global   port map(a_in  => h2f_user0_clk,
                              a_out => clk);
 

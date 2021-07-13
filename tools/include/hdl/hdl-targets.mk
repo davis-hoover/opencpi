@@ -113,7 +113,7 @@ HdlDefaultTarget_arria10soc:=10AS066N3F40E2SG
 HdlTargets_arria10soc_std:=10AS066N3F40E2SG_std_alias
 HdlDefaultTarget_arria10soc_std:=10AS066N3F40E2SG_std_alias
 
-HdlTargets_cyclone5:=5CSXFC6D6-C8ES-F31
+HdlTargets_cyclone5:=5CSXFC6D6
 HdlDefaultTarget_cyclone5:=AUTO
 
 

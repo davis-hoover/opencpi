@@ -53,12 +53,12 @@ sed -i 's/^.*soc_system_hps_0_fpga_interfaces.sv.*$/set_global_assignment \-libr
 # Edit soc_system.qsf
 sed -i 's/^.*5CSXFC6D6F31C6.*$/set_global_assignment \-name DEVICE 5CSXFC6D6F31C8ES/' soc_system.qsf
 sed -i 's/^.*TOP_LEVEL_ENTITY ghrd_top.*$/#set_global_assignment \-name TOP_LEVEL_ENTITY ghrd_top/' soc_system.qsf
-sed -i 's/^.*soc_system.qip.*$/#set_global_assignment \-name QIP_FILE soc_system\/synthesis\/soc_system.qip/' soc_system.qsf
+sed -i 's/^.*soc_system.qip.*$/set_global_assignment \-name QIP_FILE soc_system.qip/' soc_system.qsf
 sed -i 's/^.*hps_reset.qip.*$/#set_global_assignment \-name QIP_FILE ip\/altsource_probe\/hps_reset.qip/' soc_system.qsf
 sed -i 's/^.*altera_edge_detector.v.*$/#set_global_assignment \-name VERILOG_FILE ip\/edge_detect\/altera_edge_detector.v/' soc_system.qsf
 sed -i 's/^.*debounce.v.*$/#set_global_assignment \-name VERILOG_FILE ip\/edge_detect\/altera_edge_detector.v/' soc_system.qsf
 sed -i 's/^.*ghrd_top.v.*$/#set_global_assignment \-name VERILOG_FILE ip\/edge_detect\/altera_edge_detector.v/' soc_system.qsf
-sed -i 's/^.*soc_system_timing.sdc.*$/#set_global_assignment \-name SDC_FILE soc_system_timing.sdc/' soc_system.qsf
+sed -i 's/^.*soc_system_timing.sdc.*$/set_global_assignment \-name SDC_FILE ..\/cyclone5_sockit.sdc/' soc_system.qsf
 sed -i 's/^.*USE_SIGNALTAP_FILE cti_tapping.stp.*$/#set_global_assignment \-name USE_SIGNALTAP_FILE cti_tapping.stp/' soc_system.qsf
 sed -i 's/^.*SIGNALTAP_FILE cti_tapping.stp.*$/#set_global_assignment \-name SIGNALTAP_FILE cti_tapping.stp/' soc_system.qsf
 

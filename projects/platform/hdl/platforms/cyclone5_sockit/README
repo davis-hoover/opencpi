@@ -4,3 +4,6 @@ This is the initial work for the Cyclone V SOC Kit HDL platform.
 Note that the files copied over from the platform/hdl/primitives/cyclone5 library were modified/patching
 so to make sure certain things like device part number and speed grade apply to the Cyclone V SOC Kit.
 Other platforms that use cyclone5 would have to do something like this too.
+
+Also note the clock frequency used for the h2f_user0_clk is 100 MHz. This is the clock used in the platform 
+worker.

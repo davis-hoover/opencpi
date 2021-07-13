@@ -33,5 +33,6 @@ ifeq ($(filter clean%,$(MAKECMDGOALS)),)   # if not cleaning
 endif
 
 SourceFiles=cyclone5_pkg.vhd $(wildcard gen/*.sv) $(wildcard gen/*.v) $(wildcard gen/*.hex) cyclone5_hps.vhd
+ExportFiles=$(wildcard gen/*.sdc)
 
 include $(OCPI_CDK_DIR)/include/hdl/hdl-library.mk

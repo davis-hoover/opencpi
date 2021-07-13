@@ -17,4 +17,5 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # Development files for building for this platform
++<platform_dir>/cyclone5_sockit.sdc
 +<platform_dir>/gen/cyclone5_sockit.qsf
