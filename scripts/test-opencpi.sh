@@ -61,6 +61,8 @@ while [ -n "$1" ]; do
       platform=$2; shift; shift;;
     --no-hdl)
       no_hdl=1; shift ;;
+    --no-kernel)
+      no_kernel=1; shift ;;
     -*)
       echo Unknown option: $1
       exit 1;;
@@ -189,6 +191,8 @@ for t in $tests; do
         echo ======================= Skipping loading the OpenCPI kernel driver:  not supported.
       elif [ -e /.dockerenv ] || [ -e /run/.containerenv ] ; then
         echo ======================= Skipping loading the OpenCPI kernel driver:  running in a docker container.
+      elif [ -n "$no-kernel" ] ; then
+        echo ======================= Skipping testing the OpenCPI kernel driver:  --no-kernel option was set.
       else
         echo ======================= Loading the OpenCPI Linux Kernel driver. &&
             $OCPI_CDK_DIR/scripts/ocpidriver status
