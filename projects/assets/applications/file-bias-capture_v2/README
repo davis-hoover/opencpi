@@ -8,6 +8,9 @@ embedded platform and you have your projects mounted at /mnt/ocpi_core and /mnt/
 export OCPI_LIBRARY_PATH=/mnt/ocpi_assets/artifacts:/mnt/ocpi_core/artifacts
 ocpirun -d -v -x file-bias-capture_v2
 
+Note: The assets/scripts/format_capture_v2_property_dump.py script can be used to view capture_v2's properties in a 
+more readable format.
+
 The input file to be read by file_read contains the data values 0 to 999. So file_read will read 4000 bytes of data.
 
 Since the messageSize property for file_read is set to 2048, file_read will send the data in 2 messages; a 2048 byte message and a 1952 byte message.
