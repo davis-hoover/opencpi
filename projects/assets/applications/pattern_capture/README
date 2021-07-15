@@ -8,6 +8,9 @@ embedded platform and you have your projects mounted at /mnt/ocpi_core and /mnt/
 export OCPI_LIBRARY_PATH=/mnt/ocpi_assets/artifacts:/mnt/ocpi_core/artifacts
 ocpirun -d -v -x pattern_capture
 
+Note: The assets/scripts/format_capture_v2_property_dump.py script can be used to view capture_v2's properties in a 
+more readable format.
+
 The pattern_v2 component sends the following messages:
 
 msg1 = {0x00000000} with opcode 251, msg2 = {0x00000000,0x00000001} with opcode 252, msg3 = {0x00000000,0x00000001,0x00000002} with opcode 253,
