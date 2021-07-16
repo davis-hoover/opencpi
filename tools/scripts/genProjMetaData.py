@@ -227,6 +227,8 @@ def main(project_dir=None):
 
     mydir = project_dir if project_dir else sys.argv[1]
     mydir = ocpiutil.get_path_to_project_top(mydir)
+    if not mydir:
+        return
 
     if (isStale(mydir, force)):
         # Get the project name, add it as an attribute in the project element.
