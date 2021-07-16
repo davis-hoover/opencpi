@@ -22,6 +22,7 @@ definitions for utility functions that have to do with the filesystem
 import subprocess
 import os
 import os.path
+from pathlib import Path
 from contextlib import contextmanager
 import logging
 import re
@@ -424,6 +425,7 @@ def name_of_dir(directory="."):
 @contextmanager
 def cd(target):
     """
+    Use change_dir() function for error handling.
     Change directory to 'target'. To be used with 'with' so that origin directory
     is automatically returned to on completion of 'with' block
     """
@@ -434,6 +436,26 @@ def cd(target):
     finally:
         os.chdir(origin)
 # pylint:enable=invalid-name
+
+
+def change_dir(directory):
+    """
+    Change to specified directory. Raises OCPIException if file not
+    found or not a directory.
+    """
+    orig_dir = str(Path.cwd())
+    err_msg = ''
+    if directory != orig_dir:
+        try:
+            directory = Path(directory).resolve()
+            os.chdir(directory)
+        except FileNotFoundError:
+            err_msg = 'directory {} does not exist'.format(directory)
+        except NotADirectoryError:
+            err_msg = '{} is not a directory'.format(directory)
+        if err_msg:
+            raise OCPIException(err_msg)
+
 
 ###############################################################################
 # Functions for prompting the user for input
