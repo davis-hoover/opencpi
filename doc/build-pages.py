@@ -242,7 +242,7 @@ def copy_man(src_dir: Path, dst_dir: Path):
 scripts/install-packages.sh ; \
 scripts/install-prerequisites.sh ; \
 source cdk/opencpi-setup.sh -s ; \
-sed "s/’/\'/g" doc/man/src/ocpirun.1.txt > doc/man/src/ocpirun.1.txt.new ; \
+sed "s/\xe2\x80\x99/\'/g" doc/man/src/ocpirun.1.txt > doc/man/src/ocpirun.1.txt.new ; \
 mv doc/man/src/ocpirun.1.txt.new doc/man/src/ocpirun.1.txt ; \
 make -C doc/man']
             logging.debug(f'Executing "{cmd}" in directory "{src_dir}"')
