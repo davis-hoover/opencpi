@@ -17,7 +17,7 @@ from typing import Dict, List, Union
 from jinja2 import Environment, FileSystemLoader
 
 # Supported OSPs
-OSPS = ["ocpi.osp.e3xx", "ocpi.osp.plutosdr"]
+OSPS = ["ocpi.osp.e3xx", "ocpi.osp.plutosdr", "ocpi.osp.ettus"]
 OSP_TAGS = dict()  # Will be filled in later
 
 
@@ -398,6 +398,8 @@ def gen_release_index(tag: str, is_latest=False):
                     section_title = "E3xx OSP Documentation"
                 elif section_name == "plutosdr":
                     section_title = "PlutoSDR OSP Documentation"
+                elif section_name == "ettus":
+                    section_title = "Ettus OSP Documentation"
                 else:
                     section_title = section_title[4:] + " OSP Documentation"
             elif section_title not in ["Tutorials", "Briefings"]:
