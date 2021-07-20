@@ -309,3 +309,34 @@ APP_APPLICATION_APP_XML = ("""<!-- The {{app}} application xml file -->
   <Instance Component='ocpi.core.nothing' Name='nothing'/>
 </Application>
 \n""")
+
+COMPONENT_SPEC_XML = (""" <!-- This is the spec file (OCS) for: {{component}}
+     Add component spec attributes, like "protocol".
+     Add property elements for spec properties.
+     Add port elements for i/o ports -->
+<ComponentSpec>
+  <!-- Add property and port elements here -->
+</ComponentSpec>
+\n""")
+
+COMPONENT_SPEC_NO_CTRL_XML = (""" <!-- This is the spec file (OCS) for: {{component}}
+     Add component spec attributes, like "protocol".
+     Add property elements for spec properties.
+     Add port elements for i/o ports -->
+<ComponentSpec NoControl='true'>
+  <!-- Add property and port elements here -->
+</ComponentSpec>
+\n""")
+
+COMPONENT_HDL_LIB_XML = ("""<!-- This is the XML file for the hdl/{{hdl_lib}} library
+     All workers created here in *.<model> directories will be built automatically
+     All tests created here in *.test directories will be built/run automatically
+     To limit the workers that actually get built, set the Workers= attribute
+     To limit the tests that actually get built/run, set the Tests= attribute
+
+     Any attribute definitions that should apply to all individual worker/test
+     in this library belong in this xml file-->
+<library>
+  <!-- Add items here -->
+</library>
+\n""")

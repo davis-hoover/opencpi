@@ -112,7 +112,7 @@ class Application(RunnableAsset, RCCBuildableAsset):
         used by the create function/verb to generate the dictionary of viabales to send to the
         jinja2 template.
         valid kwargs handled at this level are:
-            app            (string)      - Applicatin name
+            app            (string)      - Application name
         """
         template_dict = {
                         "app" : name,
