@@ -51,7 +51,7 @@ class ApplicationsTest(unittest.TestCase):
         create a Application in the default way
         """
         my_asset = factory.AssetFactory.factory(self.asset_type,
-                                                  "../av-test/applications/aci_property_test_app",
+                                                  "../av-test/applications",
                                                   "aci_property_test_app")
         assert my_asset.run() == 0
 
