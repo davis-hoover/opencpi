@@ -1,0 +1,35 @@
+<HdlAssembly>
+  <Connection name='in_to_asm_rx_path_from_adc' external='consumer'>
+    <Port instance='csts_to_iqstream' name='in'/>
+  </Connection>
+  <Instance worker='csts_to_iqstream' connect='iqstream_max_calculator_adc'/>
+  <Instance worker='iqstream_max_calculator'
+            name='iqstream_max_calculator_adc'
+            connect='fifo'/>
+  <Instance worker='fifo'>
+    <Property name='FIFO_DEPTH_p' value='8192'/>
+    <Property name='ZLM_WHEN_ONESHOT_DONE_p' value='false'/>
+  </Instance>
+  <Connection name='out_from_asm_rx_path' external='producer'>
+    <Port instance='fifo' name='out'/>
+  </Connection>
+  <Instance worker='data_src'>
+    <Property name='DATA_BIT_WIDTH_p' value='12'/>
+
+    <!-- x^12 + x^11 + x^10 + x^4 + 1(implied) -->
+    <Property name='LFSR_POLYNOMIAL_p' value='1,1,1,0,0,0,0,0,1,0,0,0'/>
+
+    <Property name='LFSR_SEED_p' value='1,1,1,1,1,1,1,1,1,1,1,1'/>
+  </Instance>
+  <Connection>
+    <Port instance='data_src' name='out'/>
+    <Port instance='iqstream_max_calculator_dac' name='in'/>
+  </Connection>
+  <Instance worker='iqstream_max_calculator'
+            name='iqstream_max_calculator_dac'
+            connect='iqstream_to_csts'/>
+  <Instance worker='iqstream_to_csts'/>
+  <Connection name='out_from_asm_tx_path_to_dac' external='producer'>
+    <Port instance='iqstream_to_csts' name='out'/>
+  </Connection>
+</HdlAssembly>

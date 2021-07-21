@@ -1,0 +1,40 @@
+<HdlContainer config='base'
+              only='zcu104'
+              constraints='cnt_zcu104_fmcomms_2_3_scdcd_csts.xdc'>
+  <Device name='platform_ad9361_spi_csts' card='fmcomms_2_3_csts_lpc_scdcd'>
+    <!-- MUST provide to this worker the zcu104's control plane clock freq value -->
+    <Property name='CP_CLK_FREQ_HZ_p' value='100e6'/>
+  </Device>
+  <Device name='platform_csts_ad9361_data_sub' card='fmcomms_2_3_csts_lpc_scdcd'>
+    <Property name='lvds_p' value='true'/>
+    <Property name='DATA_CLK_Delay' value='4'/>
+    <Property name='RX_Data_Delay'  value='0'/>
+    <Property name='FB_CLK_Delay'   value='7'/>
+    <Property name='TX_Data_Delay'  value='0'/>
+  </Device>
+  <Device name='platform_ad9361_config_csts' card='fmcomms_2_3_csts_lpc_scdcd'>
+    <Property name='pin_control_p' value='true'/>
+  </Device>
+  <Device name='data_src_qadc_csts_ad9361_sub' card='fmcomms_2_3_csts_lpc_scdcd'/>
+  <Device name='data_sink_qdac_csts_ad9361_sub' card='fmcomms_2_3_csts_lpc_scdcd'/>
+  <Device name='data_src_qadc_csts0' card='fmcomms_2_3_csts_lpc_scdcd'>
+    <Property name='ADC_INPUT_IS_LSB_OF_OUT_PORT' value='true'/>
+  </Device>
+  <Device name='data_sink_qdac_csts0' card='fmcomms_2_3_csts_lpc_scdcd'>
+    <Property name='DAC_OUTPUT_IS_LSB_OF_IN_PORT' value='false'/>
+  </Device>
+  <Connection device='data_sink_qdac_csts0'
+              port='on_off'
+              card='fmcomms_2_3_csts_lpc_scdcd'
+              otherdevice='data_sink_qdac_csts_ad9361_sub'
+              otherport='on_off0'/>
+  <Connection external='in_to_asm_rx_path_from_adc'
+              port='out'
+              device='data_src_qadc_csts0'
+              card='fmcomms_2_3_csts_lpc_scdcd'/>
+  <Connection external='out_from_asm_tx_path_to_dac'
+              port='in'
+              device='data_sink_qdac_csts0'
+              card='fmcomms_2_3_csts_lpc_scdcd'/>
+  <Connection external='out_from_asm_rx_path' interconnect='zynq_ultra'/>
+</HdlContainer>
