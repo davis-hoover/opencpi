@@ -18,9 +18,9 @@
   <slaves>
     <External name='rx' count='2'/>
     <External name='tx' count='2'/>
-    <Instance worker='ocpi.platform.devices.platform_ad9361_config.hdl'
+    <Instance worker='ocpi.platform.devices.platform_ad9361_config_csts.hdl'
 	  name='config'/>
-    <Instance worker='ocpi.platform.devices.platform_ad9361_data_sub.hdl' name='data_sub'>
+    <Instance worker='ocpi.platform.devices.platform_csts_ad9361_data_sub.hdl' name='data_sub'>
       <Property name='lvds_p' value='true'/>
       <Property name='DATA_CLK_Delay' value='4'/>
       <Property name='RX_Data_Delay' value='0'/>
@@ -121,6 +121,6 @@
     <!--==========================================================================-->
     <!-- This must be instanced here in app XML as a workaround for #827/AV-3799 -->
     <!-- It is not really needed as a slave -->
-    <Instance worker="ocpi.platform.devices.platform_ad9361_spi.hdl" name='ad9361_spi'/>
+    <Instance worker="ocpi.platform.devices.platform_ad9361_spi_csts.hdl" name='ad9361_spi'/>
   </slaves>
 </RccWorker>
