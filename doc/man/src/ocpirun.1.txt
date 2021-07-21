@@ -409,7 +409,7 @@ The following environment variables affect *`ocpirun`* operation:
 *`OCPI_LIBRARY_PATH`*::
     A list of directories, separated by colons, to be searched for runtime artifacts.
     When referencing the artifacts exported by a project with sources, be sure
-    to reference the project’s *`exports/`* subdirectory, not its source location.
+    to reference the project's *`exports/`* subdirectory, not its source location.
     This variable is set automatically (if not already set) when running component
     unit tests or applications in projects with *`ocpidev run`*.
     In pure runtime environments, it may need
