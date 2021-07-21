@@ -47,7 +47,7 @@ VERBS
 The verbs for general operations supported by *`ocpihdl`* are:
 
 *`admin`*::
-    Display an HDL device’s administrative information.
+    Display an HDL device's administrative information.
 
 *`bram`*::
     Create a configuration Block Random Access Memory (BRAM) file from an artifact description XML file.
@@ -71,7 +71,7 @@ The verbs for general operations supported by *`ocpihdl`* are:
    Test the existence and availability of an HDL device.
    
 *`radmin`*::
-    Read a specific address in an HDL device’s admin space.
+    Read a specific address in an HDL device's admin space.
 
 *`reset`*::
     Perform a soft reset on an HDL device.
@@ -83,13 +83,13 @@ The verbs for general operations supported by *`ocpihdl`* are:
     Search for and list all available (discovered and responding) HDL devices.
     
 *`settime`*::
-    Set an HDL device’s GPS time to the system time.
+    Set an HDL device's GPS time to the system time.
 
 *`unbram`*::
     Create an artifact description XML file from a configuration BRAM file.
 
 *`wadmin`*::
-    Write specific addresses in an HDL device’s admin space.
+    Write specific addresses in an HDL device's admin space.
 
 The verbs for higher-level operations (operations that rely on
 embedded metadata) on individual HDL workers
@@ -396,7 +396,7 @@ have unpredictable or erroneous results when requested for workers that don't im
     by the instance index(es) on the specified HDL device to the specified value, which
     sets the high order 12 address bits (31:20) of the effective address when the
     *`ocpihdl wread`* and *`ocpihdl wwrite`* operations are issued. The offset in
-    those operations supplies bits (19:0) of the effective address. An HDL worker’s property
+    those operations supplies bits (19:0) of the effective address. An HDL worker's property
     space can be a full-32 bit space (4 GBytes). Use this operation
     to access more than the first 1MByte (2^20 bytes).
 
