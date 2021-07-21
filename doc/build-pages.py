@@ -238,7 +238,7 @@ def copy_man(src_dir: Path, dst_dir: Path):
             # overhead of checking to see if the patch is required for a
             # particular version exceeds simply attempting the patch.
             #   v2.2.0: "ocpirun.1.txt"
-            cmd = ["bash", "-c", f'cd {src_dir} ; \
+            cmd = ["bash", "-c", fr'cd {src_dir} ; \
 scripts/install-packages.sh ; \
 scripts/install-prerequisites.sh ; \
 source cdk/opencpi-setup.sh -s ; \
