@@ -237,11 +237,13 @@ def copy_man(src_dir: Path, dst_dir: Path):
             # version.  As long as the list of patches remains small, the
             # overhead of checking to see if the patch is required for a
             # particular version exceeds simply attempting the patch.
-            #   v2.2.0: "ocpirun.1.txt"
+            #   v2.2.0: "ocpihdl.1.txt", "ocpirun.1.txt"
             cmd = ["bash", "-c", fr'cd {src_dir} ; \
 scripts/install-packages.sh ; \
 scripts/install-prerequisites.sh ; \
 source cdk/opencpi-setup.sh -s ; \
+sed "s/\xe2\x80\x99/\'/g" doc/man/src/ocpihdl.1.txt > doc/man/src/ocpihdl.1.txt.new ; \
+mv doc/man/src/ocpihdl.1.txt.new doc/man/src/ocpihdl.1.txt ; \
 sed "s/\xe2\x80\x99/\'/g" doc/man/src/ocpirun.1.txt > doc/man/src/ocpirun.1.txt.new ; \
 mv doc/man/src/ocpirun.1.txt.new doc/man/src/ocpirun.1.txt ; \
 make -C doc/man']
