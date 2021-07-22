@@ -268,11 +268,11 @@ verbs = {
         'options': {
             'name': {
                 'nargs': '?',
-                'default': Path.cwd().name
+                'default': lambda: Path.cwd().name
             }
         },
         'nouns': {
-            'default': ocpiutil.get_dirtype,
+            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
             'application': {
                 'options': {
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
@@ -356,11 +356,11 @@ verbs = {
         'options': {
             'name': {
                 'nargs': '?',
-                'default': Path.cwd().name
+                'default': lambda: Path.cwd().name
             }
         },
         'nouns': {
-            'default': ocpiutil.get_dirtype,
+            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
             'application': {
                 'options': {
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
@@ -445,7 +445,7 @@ verbs = {
             'keep': options['keep'],
         },
         'nouns': {
-            'default': ocpiutil.get_dirtype,
+            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
             'application': {
                 'options': {
                     'xml_app': options['xml_app'],
@@ -606,11 +606,11 @@ verbs = {
         'options': {
             'name': {
                 'nargs': '?',
-                'default': Path.cwd().name
+                'default': lambda: Path.cwd().name
             }
         },
         'nouns': {
-            'default': ocpiutil.get_dirtype,
+            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
             'application': None,
             'component': {
                 'project': options['project'],
@@ -676,11 +676,11 @@ verbs = {
         'options': {
             'name': {
                 'nargs': '?',
-                'default': Path.cwd().name
+                'default': lambda: Path.cwd().name
             }
         },
         'nouns': {
-            'default': ocpiutil.get_dirtype,
+            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
             'project': None
         }
     },
@@ -688,11 +688,11 @@ verbs = {
         'options': {
             'name': {
                 'nargs': '?',
-                'default': Path.cwd().name
+                'default': lambda: Path.cwd().name
             }
         },
         'nouns': {
-            'default': ocpiutil.get_dirtype,
+            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
             'project': None
         }
     },
@@ -707,7 +707,7 @@ verbs = {
             }
         },
         'nouns': {
-            'default': ocpiutil.get_dirtype,
+            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
             'registry': None
         }
     },
@@ -718,17 +718,17 @@ verbs = {
         'options': {
             'name': {
                 'nargs': '?',
-                'default': Path.cwd().name
+                'default': lambda: Path.cwd().name
             }
         },
         'nouns': {
-            'default': ocpiutil.get_dirtype,
+            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
             'project': None
         }
     },
     'unset': {
         'nouns': {
-            'default': ocpiutil.get_dirtype,
+            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
             'registry': None
         }
     },

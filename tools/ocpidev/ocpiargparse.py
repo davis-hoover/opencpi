@@ -277,11 +277,9 @@ def _preprocess_args(args_dict, args=None):
         add_help=False, argument_default=argparse.SUPPRESS)
     options_dict = args_dict['options']
     options_dict.update(COMMON_OPTIONS)
+    options_dict.pop('help', None)
     parser = _make_options(parser, options_dict)
     args,extra = parser.parse_known_args(args)
-
-    verb = extra[0] if len(extra) > 0 else None
-    noun = extra[1] if len(extra) > 1 else None
 
     try:
         ocpiutil.change_dir(args.directory)
@@ -289,18 +287,22 @@ def _preprocess_args(args_dict, args=None):
         ocpiutil.logging.error(e)
         sys.exit(1)
 
-    if 'verbs' in args_dict and verb in args_dict['verbs']:
-        verb_dict = args_dict['verbs'][verb]
-        if not noun and 'nouns' in verb_dict:
-        # noun not set, so set default
-            nouns_dict = verb_dict['nouns']
-            if nouns_dict and 'default' in nouns_dict:
-                noun = nouns_dict['default']
-                if hasattr(noun, '__call__'):
-                    noun = noun()
-                if noun:
-                    noun = noun.split('-')
-                    extra += noun
+    verb = extra[0] if len(extra) > 0 else None
+    noun = extra[1] if len(extra) > 1 else None
+
+    if not noun:
+    # Noun not supplied, so try to get default
+        try: 
+            noun = args_dict['verbs'][verb]['nouns']['default']
+        except (TypeError, KeyError):
+            pass
+        if noun and hasattr(noun, '__call__'):
+            noun = noun()
+        if noun:
+            if isinstance(noun, list):
+                extra += noun
+            else:
+                extra.append(noun)
 
     args_dict = vars(args).items()
     args = []
@@ -319,6 +321,7 @@ def _postprocess_args(args):
     """
     Post-processes args after they have been parsed.
     """
+
     if hasattr(args, 'noun'):
         subnoun_key = '{}_noun'.format(args.noun)
         if hasattr(args, subnoun_key):
@@ -327,10 +330,13 @@ def _postprocess_args(args):
             args.noun = '{}-{}'.format(args.noun, subnoun)
 
     for arg,val in vars(args).items():
-    # Format lists
+        if hasattr(val, '__call__'):
+        # If value is a function, call it
+            val = val()
         if isinstance(val, list):
-            clean_arg = [re.sub('[\[\]\s\'\']', '', sub) for elem in val 
-                         for sub in elem.split(',')]
-            vars(args)[arg] = clean_arg
+        # Format lists
+            val = [re.sub('[\[\]\s\'\']', '', sub) for elem in val 
+                   for sub in elem.split(',')]
+        setattr(args, arg, val)
 
     return args

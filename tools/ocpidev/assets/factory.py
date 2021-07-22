@@ -85,7 +85,7 @@ class AssetFactory():
                    "multi-lib":     _opencpi.assets.library.LibraryCollection,
                    "project":       partial(cls.__get_or_create, _opencpi.assets.project.Project),
                    "registry":      partial(cls.__get_or_create, _opencpi.assets.registry.Registry)}
-
+        
         if asset_type not in actions.keys():
             if not asset_type:
                 asset_type = "unknown"
@@ -102,7 +102,7 @@ class AssetFactory():
         """
         import _opencpi.assets.worker
         model = Path(directory).suffix
-        if model and model not in ['.rcc', '.hdl'] and name:
+        if model is not None and model not in ['.rcc', '.hdl'] and name:
             model = Path(name).suffix
         if model == '.hdl':
             return _opencpi.assets.worker.HdlLibraryWorker(directory, name, **kwargs)
