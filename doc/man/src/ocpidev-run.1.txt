@@ -100,7 +100,7 @@ syntaxes:
 
    ocpidev run application myapp --run-arg=-v --run-arg=-d --run-arg=-Pxsim
 
-   ocpidev run application myapp --run-arg=”-v -d -Pxsim”
+   ocpidev run application myapp --run-arg="-v -d -Pxsim"
 
 For an XML application, these command lines perform the command:
 
