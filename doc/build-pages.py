@@ -237,12 +237,14 @@ def copy_man(src_dir: Path, dst_dir: Path):
             # version.  As long as the list of patches remains small, the
             # overhead of checking to see if the patch is required for a
             # particular version exceeds simply attempting the patch.
-            #   v2.2.0: "ocpidev-run.1.txt", "ocpihdl.1.txt",
-            #           "ocpirun.1.txt"
+            #   v2.2.0: "ocpidev-application.1.txt", "ocpidev-run.1.txt",
+            #           "ocpihdl.1.txt", "ocpirun.1.txt"
             cmd = ["bash", "-c", fr'cd {src_dir} ; \
 scripts/install-packages.sh ; \
 scripts/install-prerequisites.sh ; \
 source cdk/opencpi-setup.sh -s ; \
+sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpidev-application.1.txt > doc/man/src/ocpidev-application.1.txt.new ; \
+mv doc/man/src/ocpidev-application.1.txt.new doc/man/src/ocpidev-application.1.txt ; \
 sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpidev-run.1.txt > doc/man/src/ocpidev-run.1.txt.new ; \
 mv doc/man/src/ocpidev-run.1.txt.new doc/man/src/ocpidev-run.1.txt ; \
 sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpihdl.1.txt > doc/man/src/ocpihdl.1.txt.new ; \
