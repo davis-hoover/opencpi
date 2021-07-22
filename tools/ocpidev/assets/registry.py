@@ -483,10 +483,12 @@ class Registry(ShowableAsset):
         root_dir = os.getenv('OCPI_ROOT_DIR', '')
         default_registry_dir = str(Path(root_dir, 'project-registry'))
         err_msg = None
-        registry_dir = str(Path(os.getenv('OCPI_PROJECT_REGISTRY_DIR', '')).resolve())
+        registry_dir = os.getenv('OCPI_PROJECT_REGISTRY_DIR', None)
+        if registry_dir:
+            registry_dir = str(Path(registry_dir).resolve())
         if default_registry_dir == self.directory:
             err_msg = 'Cannot delete the default project registry'
-        elif registry_dir == self.directory:
+        elif registry_dir and registry_dir == self.directory:
             if force: 
                 os.environ.pop('OCPI_PROJECT_REGISTRY_DIR')
             else:
