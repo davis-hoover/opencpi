@@ -238,18 +238,23 @@ def copy_man(src_dir: Path, dst_dir: Path):
             # overhead of checking to see if the patch is required for a
             # particular version exceeds simply attempting the patch.
             #   v2.2.0: "ocpidev-application.1.txt", "ocpidev-run.1.txt",
-            #           "ocpihdl.1.txt", "ocpirun.1.txt"
+            #           "ocpiav.1.txt", "ocpigr.1.txt", "ocpihdl.1.txt",
+            #           "ocpirun.1.txt"
             cmd = ["bash", "-c", fr'cd {src_dir} ; \
 scripts/install-packages.sh ; \
 scripts/install-prerequisites.sh ; \
 source cdk/opencpi-setup.sh -s ; \
-sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpidev-application.1.txt > doc/man/src/ocpidev-application.1.txt.new ; \
+sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9c/\"/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpidev-application.1.txt > doc/man/src/ocpidev-application.1.txt.new ; \
 mv doc/man/src/ocpidev-application.1.txt.new doc/man/src/ocpidev-application.1.txt ; \
-sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpidev-run.1.txt > doc/man/src/ocpidev-run.1.txt.new ; \
+sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9c/\"/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpidev-run.1.txt > doc/man/src/ocpidev-run.1.txt.new ; \
 mv doc/man/src/ocpidev-run.1.txt.new doc/man/src/ocpidev-run.1.txt ; \
-sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpihdl.1.txt > doc/man/src/ocpihdl.1.txt.new ; \
+sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9c/\"/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpiav.1.txt > doc/man/src/ocpiav.1.txt.new ; \
+mv doc/man/src/ocpiav.1.txt.new doc/man/src/ocpiav.1.txt ; \
+sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9c/\"/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpigr.1.txt > doc/man/src/ocpigr.1.txt.new ; \
+mv doc/man/src/ocpigr.1.txt.new doc/man/src/ocpigr.1.txt ; \
+sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9c/\"/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpihdl.1.txt > doc/man/src/ocpihdl.1.txt.new ; \
 mv doc/man/src/ocpihdl.1.txt.new doc/man/src/ocpihdl.1.txt ; \
-sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpirun.1.txt > doc/man/src/ocpirun.1.txt.new ; \
+sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9c/\"/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpirun.1.txt > doc/man/src/ocpirun.1.txt.new ; \
 mv doc/man/src/ocpirun.1.txt.new doc/man/src/ocpirun.1.txt ; \
 make -C doc/man']
             logging.debug(f'Executing "{cmd}" in directory "{src_dir}"')
