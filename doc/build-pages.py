@@ -256,6 +256,7 @@ sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9c/\"/g" -
 mv doc/man/src/ocpihdl.1.txt.new doc/man/src/ocpihdl.1.txt ; \
 sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9c/\"/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpirun.1.txt > doc/man/src/ocpirun.1.txt.new ; \
 mv doc/man/src/ocpirun.1.txt.new doc/man/src/ocpirun.1.txt ; \
+export LANG=en_US.utf8 ; \
 make -C doc/man']
             logging.debug(f'Executing "{cmd}" in directory "{src_dir}"')
             subprocess.check_call(cmd)
