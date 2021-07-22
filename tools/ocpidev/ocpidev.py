@@ -70,10 +70,6 @@ def main():
             ocpi_set_unset(args)
 
         directory,name = get_working_dir(args)
-        if args.noun in ['project', 'library', 'registry']:
-        # Libraries, projects, and registries want the full path 
-        # as the directory
-            directory = str(Path(directory, name))
 
         # Try to instantiate the appropriate asset from noun
         asset_factory = ocpiassets.factory.AssetFactory()
@@ -87,17 +83,12 @@ def main():
             method_args = {}
             for param in sig.parameters:
                 method_args[param] = getattr(args, param, '')
-            if getattr(args, 'verbose', False):
-                msg = ' '.join([
-                    'Executing the "{} {}"'.format(args.verb, args.noun), 
-                    'command in directory: {}'.format(asset.directory)
-                ])
-                print(msg)
+            print_cmd(args, asset.directory)
             asset_method(**method_args)
         except ocpiutil.OCPIException as e:
         # Verb failed in an expected way; don't fall back to ocpidev.sh
             do_ocpidev_sh = False
-            raise ocpiutil.OCPIException()
+            raise ocpiutil.OCPIException(e)
         except Exception as e:
         # Verb not implemented fully/at all; fall back to ocpidev.sh
             raise ocpiutil.OCPIException(e)
@@ -112,9 +103,14 @@ def postprocess_args(args):
     """
     Post-processes user arguments
     """
-    if not 'noun' in args:
-        noun = ocpiutil.get_dirtype(str(Path.cwd()))
-        args.noun = noun if noun else ''
+    if not 'noun' in args or not args.noun:
+        err_msg = ' '.join([
+            'Unable to determine asset type from directory',
+            '"{}"'.format(str(Path().cwd())),
+            '\nPlease provide asset type as "noun" argument'
+        ])
+        ocpiutil.logging.error(err_msg)
+        sys.exit(1)
     if args.noun== 'spec':
         args.noun = 'component'
     elif args.noun == 'hdl-slot':
@@ -131,7 +127,8 @@ def postprocess_args(args):
                 'Unsupported authoring model "{}"'.format(args.model), 
                 'for worker located at "{}"'.format(args.directory)
             ])
-            raise ocpiutil.OCPIException(err_msg)
+            ocpiutil.logging.error(err_msg)
+            sys.exit(1)
     else:
         args.model = 'hdl'
 
@@ -148,6 +145,7 @@ def ocpi_set_unset(args):
     name = getattr(args, 'name', '')
     name = name if name else ''
     directory = str(Path.cwd())
+    print_cmd(args, directory)
 
     try:
         asset_factory = ocpiassets.factory.AssetFactory()
@@ -181,6 +179,7 @@ def ocpicreate(args):
     # Noun not implemented by this function; fall back to ocpidev.sh
         raise ocpiutil.OCPIException('noun not implemented for create verb')
     directory,name = get_working_dir(args, ensure_exists=False)
+    print_cmd(args, directory)
     delattr(args, 'name')
     args = vars(args)
     noun = args.pop('noun', '')
@@ -202,16 +201,34 @@ def get_working_dir(args, ensure_exists=True):
     name = kwargs.pop('name', '')
     name = name if name else ''
     noun = kwargs.pop('noun', '')
-    
-    if noun == 'registry' or (noun == 'project' and args.verb == 'create'):
-        working_path = Path(Path.cwd(), name)
+
+    if noun == 'registry':
+        working_path = Path.cwd()
+        if working_path.name != name:
+            working_path = Path(working_path, name)
+    elif noun == 'project' and args.verb == 'create':
+        working_path = Path(Path.cwd(), name).resolve()
     else:
         working_path = Path(ocpiutil.get_ocpidev_working_dir(
-            noun, name, ensure_exists=ensure_exists, **kwargs))
-    name = str(working_path.name)
-    working_dir = str(working_path.parent)
+            noun, name, ensure_exists=ensure_exists, **kwargs)).resolve()
+    if noun not in ['registry', 'library', 'project'] or args.verb == 'create':
+    # Libraries, projects, and registries want the full path as the directory
+        name = working_path.name
+        working_path = str(working_path.parent)
     
-    return working_dir,name
+    return str(working_path),name
+
+
+def print_cmd(args, directory):
+    """
+    If verbose, print message detailing command to be executed
+    """
+    if getattr(args, 'verbose', False):
+        msg = ' '.join([
+            'Executing command "{} {}"'.format(args.verb, args.noun), 
+            'in directory: {}'.format(directory)
+        ])
+        print(msg)
 
 
 def ocpidev_sh(cdk_dir=None, orig_dir=None):
