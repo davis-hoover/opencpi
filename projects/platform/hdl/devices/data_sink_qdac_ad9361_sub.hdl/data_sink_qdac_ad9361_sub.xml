@@ -1,7 +1,15 @@
 <HdlDevice language='vhdl' version='2' libraries='dac protocol cdc'
      sourcefiles='clock_selector_with_async_select.vhd ad936x_tx_data_cmos_single_port_fdd_ddr.vhd ad9361_dac_sub_cmos_single_port_fdd_ddr.vhd
 	clock_divider.vhd clock_manager.vhd one_wsi_clock_per_dac_sample_generator.vhd'
+     ExactParts='zynq_ise:xc7z020_ise_alias-1-clg484
+        zynq:xc7z020-1-clg484), 
+        zynq_ultra:xczu7ev-2-ffvc1156e))'
      onlytargets='zynq zynq_ise zynq_ultra isim xsim'> <!-- cause of BUFR primitive --> 
+     <!-- Reasononing for ExactParts taken from origional Makefile: 
+          During the build process, swap HdlTarget with 'actual' target part of the target platform We do this to build for a 
+          part with the correct number of resources, such as hardware multipliers, rather than the default smallest part in the family 
+          zynq => xc7z020 (ZedBoard, Matchstiq-Z1, Picoflexor-T6A) -->
+
 
   <!-- By design, this worker provides control and/or data plane functionality
        that is never intended to be exposed by any other worker. Accordingly,

@@ -1,6 +1,14 @@
 <!-- platform_ad9361_config_csts.hdl is a device worker containing all functionality necessary
      for AD9361 hardware configuration (register access and pin control). -->
-<HdlDevice language="vhdl" FirstRawproperty='general_spi_conf'>
+<HdlDevice language="vhdl" FirstRawproperty='general_spi_conf'
+           ExactParts='zynq_ise:xc7z020_ise_alias-1-clg484
+                         zynq:xc7z020-1-clg484
+                         zynq_ultra:xczu7ev-2-ffvc1156e
+                         virtex6:xc6vlx240t-1-ff1156
+                         stratix4:ep4sgx230k-c2-f40'
+           SourceFiles='signals.vhd'
+           libraries='platform'
+           ExcludeTargets='modelsim altera'>
   <ControlInterface Timeout="1024"/>
 
   <!-- By design, this worker provides control and/or data plane functionality

@@ -1,4 +1,6 @@
-<HdlDevice language='vhdl' Emulate='data_src_qadc_csts.hdl' Version='2' libraries='platform timed_sample_prot'>
+<HdlDevice language='vhdl' Emulate='data_src_qadc_csts.hdl' Version='2' 
+  OnlyTargets='isim modelsim xsim'
+  libraries='platform timed_sample_prot'>
 
   <ComponentSpec>
     <Port name='in' producer='false' protocol="complex_short_timed_sample-prot"/>

@@ -1,4 +1,6 @@
-<HdlDevice language='vhdl' Emulate='data_src_qadc.hdl' Version='2'>
+<HdlDevice language='vhdl' Emulate='data_src_qadc.hdl' Version='2'
+  libraries='platform protocol'
+  OnlyTargets='isim modelsim xsim' >
 
   <ComponentSpec>
     <Port name='in' producer='false' protocol='ComplexShortWithMetadata-prot'/>

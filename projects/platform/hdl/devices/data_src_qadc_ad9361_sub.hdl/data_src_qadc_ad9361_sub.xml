@@ -1,5 +1,10 @@
 <HdlDevice language='vhdl' Version='2' libraries='util cdc adc' 
       sourcefiles='clock_selector_with_async_select.vhd clock_divider.vhd clock_manager.vhd one_sample_clock_per_adc_sample_generator.vhd'
+      ExactParts='zynq_ise:xc7z020_ise_alias-1-clg484
+        zynq:xc7z020-1-clg484
+        zynq_ultra:xczu7ev-2-ffvc1156e
+        virtex6:xc6vlx240t-1-ff1156
+        stratix4:ep4sgx230k-c2-f40'
       onlytargets='zynq zynq_ise zynq_ultra virtex6 isim xsim'> <!-- Only tested targets cause of BUFR primitive -->
 
   <!-- By design, this worker provides control and/or data plane functionality
