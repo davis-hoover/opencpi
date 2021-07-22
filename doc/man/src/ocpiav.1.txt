@@ -37,7 +37,7 @@ tasks.
 Working with OpenCPI Projects in AV
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 AV is an Eclipse-based tool and thus operates
-in a “workspace”. The default workspace for the AV tool is
+in a "workspace". The default workspace for the AV tool is
 located in the *`av/workspace/`* subdirectory of the OpenCPI installation.
 Do not create OpenCPI projects inside the AV tool
 because they will be created in the default AV workspace and will
@@ -48,7 +48,7 @@ to create a project outside of the AV tool and
 then use the AV tool to import
 it (do not copy it) into the AV workspace
 (File > Import > General > Import Existing Project
-dialog with the “copy” option NOT checked.)
+dialog with the "copy" option NOT checked.)
 The 'OpenCPI User Guide' provides more information
 about this procedure, as do the OpenCPI tutorials.
 
