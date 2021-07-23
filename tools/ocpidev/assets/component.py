@@ -377,7 +377,6 @@ class Component(ShowableComponent):
             ocpiutil.throw_not_valid_dirtype_e(valid_dirtypes)
         if not name:
             ocpiutil.throw_not_blank_e("component", "name", True)
-        print('platform:', platform)
         project_path = Path(ocpiutil.get_path_to_project_top())
         if library:
             if not library == 'components':
@@ -403,7 +402,7 @@ class Component(ShowableComponent):
             specs_path.mkdir()
         working_dir = Component.get_filename(
             str(specs_path), name, ensure_exists)
-        print(working_dir)
+
         return working_dir
 
     @staticmethod

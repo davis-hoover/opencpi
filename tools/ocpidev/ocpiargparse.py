@@ -23,6 +23,7 @@ from the command line
 
 import argparse
 import os
+import re
 import sys
 from pathlib import Path
 import _opencpi.util as ocpiutil
@@ -94,6 +95,37 @@ class _VersionAction(argparse.Action):
         parser.exit(rc)
 
 
+# Options common to opencpi commands
+COMMON_OPTIONS = {
+    'help': {
+        'long': '--help',
+        'action': _HelpAction
+    },
+    'version': {
+        'long': '--version',
+        'action': _VersionAction
+    },
+    'log_level': {
+        'long': '--log-level'
+    },
+    'verbose': {
+        'long': '--verbose',
+        'short': '-v',
+        'action': 'store_true'
+    },
+    'directory': {
+        'long': '--directory',
+        'short': '-d',
+        'default': str(Path.cwd())
+    },
+    'force': {
+        'long': '--force',
+        'short': '-f',
+        'action': 'store_true'
+    }
+}
+
+
 def parse_args(args_dict, prog=None):
     """
     Takes a dictionary of arguments and an optional program name. 
@@ -126,38 +158,17 @@ def _make_parser(args_dict, prog=None):
     make subparsers for each verb. If the key contains 'options', they 
     are collected to pass to the call to make_subparsers.
     """
-    # Options common to all opencpi commands
-    options_dict = {
-        'help': {
-            'long': '--help',
-            'action': _HelpAction
-        },
-        'version': {
-            'long': '--version',
-            'action': _VersionAction
-        },
-        'log_level': {
-            'long': '--log-level'
-        },
-        'verbose': {
-            'long': '--verbose',
-            'short': '-v',
-            'action': 'store_true'
-        }
-    }
-    if 'common_options' in args_dict:
-    # Options common to all subcommands for this particular command
-        options_dict.update(args_dict['common_options'])
     parser = argparse.ArgumentParser(add_help=False)
     parser.prog = prog
-    parser = _make_options(parser, options_dict)
+    parser = _make_options(parser, COMMON_OPTIONS)
     if 'verbs' in args_dict:
     # Make subparsers for verbs
         verbs_dict = args_dict['verbs']
         if not verbs_dict or not isinstance(verbs_dict, dict):
         # Empty verbs or not a dict, so return parser
             return parser
-        parser = _make_subparsers(parser, verbs_dict, {}, options_dict, 'verb')
+        parser = _make_subparsers(
+            parser, verbs_dict, {}, COMMON_OPTIONS, 'verb')
 
     return parser
 
@@ -173,12 +184,8 @@ def _make_subparsers(parser, subparser_dict, parent_options_dict,
     _make_options() once no more subnouns are left to add.
     """
     subparsers = parser.add_subparsers(dest=dest)
-    subparsers.required = subparser_dict.pop('required', True)
-    if not subparsers.required:
-    # Because the subparser is not required, this may be the end of the
-    # parser, so add options
-        parser = _make_options(parser, parent_options_dict)
-    
+    subparser_dict.pop('default', None)
+
     for key,val in subparser_dict.items():
     # Iterate through dict, making subparser for each key,val pair
         keys = list(parent_keys) # copy parent_keys so to not affect original
@@ -260,6 +267,7 @@ def _preprocess_args(args_dict, args=None):
     Creates and runs a pre-processing parser to collect optional 
     arguments so that they can be moved to the end of arguments to 
     enable the full parser to detect them wherever they appear.
+    Attempts to determine noun and name if not provided.
     """
     if not args:
         args = sys.argv[1:]
@@ -268,9 +276,34 @@ def _preprocess_args(args_dict, args=None):
     parser = argparse.ArgumentParser(
         add_help=False, argument_default=argparse.SUPPRESS)
     options_dict = args_dict['options']
-    options_dict.update(args_dict['common_options'])
+    options_dict.update(COMMON_OPTIONS)
+    options_dict.pop('help', None)
     parser = _make_options(parser, options_dict)
     args,extra = parser.parse_known_args(args)
+
+    try:
+        ocpiutil.change_dir(args.directory)
+    except ocpiutil.OCPIException as e:
+        ocpiutil.logging.error(e)
+        sys.exit(1)
+
+    verb = extra[0] if len(extra) > 0 else None
+    noun = extra[1] if len(extra) > 1 else None
+
+    if not noun:
+    # Noun not supplied, so try to get default
+        try: 
+            noun = args_dict['verbs'][verb]['nouns']['default']
+        except (TypeError, KeyError):
+            pass
+        if noun and hasattr(noun, '__call__'):
+            noun = noun()
+        if noun:
+            if isinstance(noun, list):
+                extra += noun
+            else:
+                extra.append(noun)
+
     args_dict = vars(args).items()
     args = []
     for arg,val in args_dict:
@@ -280,7 +313,7 @@ def _preprocess_args(args_dict, args=None):
         else:
             arg = '--{}={}'.format(arg,val)
         args.append(arg)
-    
+
     return extra+args
 
 
@@ -288,17 +321,22 @@ def _postprocess_args(args):
     """
     Post-processes args after they have been parsed.
     """
-    if hasattr(args, "noun"):
-    # If the parser works with "nouns", post-process noun attribute by
-    # getting noun from its dir type when noun not provided and by q
-    # setting noun to <noun>-<subnoun> if subnoun provided
-        if not args.noun:
-        # Get noun by the dirtype
-            args.noun = ocpiutil.get_dirtype(args.directory)
+
+    if hasattr(args, 'noun'):
         subnoun_key = '{}_noun'.format(args.noun)
         if hasattr(args, subnoun_key):
         # Get subnoun if one exists
             subnoun = getattr(args, subnoun_key)
             args.noun = '{}-{}'.format(args.noun, subnoun)
+
+    for arg,val in vars(args).items():
+        if hasattr(val, '__call__'):
+        # If value is a function, call it
+            val = val()
+        if isinstance(val, list):
+        # Format lists
+            val = [re.sub('[\[\]\s\'\']', '', sub) for elem in val 
+                   for sub in elem.split(',')]
+        setattr(args, arg, val)
 
     return args

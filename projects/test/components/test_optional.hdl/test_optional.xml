@@ -1,0 +1,6 @@
+<HdlWorker spec='test_optional-spec' Language='vhdl' DataWidth='16' Version='2'>
+  <StreamInterface Name='samples_in'/>
+  <StreamInterface Name='samples_out' InsertEOM='true'/>
+  <StreamInterface Name='timestamps_in'/>
+  <StreamInterface Name='timestamps_out' InsertEOM='true'/>
+</HdlWorker>

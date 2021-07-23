@@ -17,7 +17,7 @@ from typing import Dict, List, Union
 from jinja2 import Environment, FileSystemLoader
 
 # Supported OSPs
-OSPS = ["ocpi.osp.e3xx", "ocpi.osp.plutosdr"]
+OSPS = ["ocpi.osp.e3xx", "ocpi.osp.plutosdr", "ocpi.osp.ettus"]
 OSP_TAGS = dict()  # Will be filled in later
 
 
@@ -93,13 +93,13 @@ def main():
     logging.debug(f"Releases: {releases}")
     logging.debug(f"Latest release: {latest_release}")
 
-    # Download supported OSP's
+    # Download supported OSPs
     for osp in OSPS:
         download_osp(osp)
         OSP_TAGS[osp] = get_tags(OCPI_OSPDIR / osp / ".git")
         OSP_TAGS[osp].append("develop")  # develop will always be a valid git revision
 
-    # Build each release and it's OSPs
+    # Build each release and its OSPs
     for release in releases:
         is_latest = True if latest_release == release else False
         build(release)
@@ -232,10 +232,31 @@ def copy_man(src_dir: Path, dst_dir: Path):
         if man_mk.exists():
             # post-v2.1.1: build the man pages.
             logging.info(f'"{man_mk}" found: building man pages')
-            cmd = ["bash", "-c", f'cd {src_dir} ; \
+            # Unfortunately, any man page source patching for a particular
+            # version must happen here rather than in the context of that
+            # version.  As long as the list of patches remains small, the
+            # overhead of checking to see if the patch is required for a
+            # particular version exceeds simply attempting the patch.
+            #   v2.2.0: "ocpidev-application.1.txt", "ocpidev-run.1.txt",
+            #           "ocpiav.1.txt", "ocpigr.1.txt", "ocpihdl.1.txt",
+            #           "ocpirun.1.txt"
+            cmd = ["bash", "-c", fr'cd {src_dir} ; \
 scripts/install-packages.sh ; \
 scripts/install-prerequisites.sh ; \
 source cdk/opencpi-setup.sh -s ; \
+sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9c/\"/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpidev-application.1.txt > doc/man/src/ocpidev-application.1.txt.new ; \
+mv doc/man/src/ocpidev-application.1.txt.new doc/man/src/ocpidev-application.1.txt ; \
+sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9c/\"/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpidev-run.1.txt > doc/man/src/ocpidev-run.1.txt.new ; \
+mv doc/man/src/ocpidev-run.1.txt.new doc/man/src/ocpidev-run.1.txt ; \
+sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9c/\"/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpiav.1.txt > doc/man/src/ocpiav.1.txt.new ; \
+mv doc/man/src/ocpiav.1.txt.new doc/man/src/ocpiav.1.txt ; \
+sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9c/\"/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpigr.1.txt > doc/man/src/ocpigr.1.txt.new ; \
+mv doc/man/src/ocpigr.1.txt.new doc/man/src/ocpigr.1.txt ; \
+sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9c/\"/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpihdl.1.txt > doc/man/src/ocpihdl.1.txt.new ; \
+mv doc/man/src/ocpihdl.1.txt.new doc/man/src/ocpihdl.1.txt ; \
+sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9c/\"/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpirun.1.txt > doc/man/src/ocpirun.1.txt.new ; \
+mv doc/man/src/ocpirun.1.txt.new doc/man/src/ocpirun.1.txt ; \
+export LANG=en_US.utf8 ; \
 make -C doc/man']
             logging.debug(f'Executing "{cmd}" in directory "{src_dir}"')
             subprocess.check_call(cmd)
@@ -398,6 +419,8 @@ def gen_release_index(tag: str, is_latest=False):
                     section_title = "E3xx OSP Documentation"
                 elif section_name == "plutosdr":
                     section_title = "PlutoSDR OSP Documentation"
+                elif section_name == "ettus":
+                    section_title = "Ettus OSP Documentation"
                 else:
                     section_title = section_title[4:] + " OSP Documentation"
             elif section_title not in ["Tutorials", "Briefings"]:
