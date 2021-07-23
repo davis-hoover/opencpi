@@ -14,10 +14,20 @@
 <rccworker language="c++" slave='platform_ad9361_config.hdl' spec='ad9361_config_proxy-spec'
 	   controloperations='initialize'
            componentlibraries='devices'
-           includedirs='../../../../../runtime/drc/ad9361/include'
+           includedirs='../../../../../runtime/drc/ad9361/include
+           ./supporting/include/OCPIProjects/
+           ./supporting/src/OCPIProjects/'
 	   staticprereqlibs='ad9361'
 	   sourcefiles='ad9361_platform.cc'
 	   >
+
+<!--                                                                         -->
+<!--                                 comments form old Makefile              -->
+<!-- RccStaticPrereqLibs=ad9361                                              -->
+<!--                                                                         -->
+<!--# Our "platform" functions that the ADI library calls                    -->
+<!--#SourceFiles=ad9361_platform.cc                                          -->
+<!--                                                                         -->
 
   <!--**** PROPERTIES CORRESPONDING TO libad9361 "STANDARD" API (ad9361_api.h)****-->
   <specproperty name='ad9361_init'                           writesync='true'/>
