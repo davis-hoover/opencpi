@@ -1,6 +1,4 @@
-<Tests UseHdlFileIo='true' Spec='data_sink_qdac_csts'
-  libraries='dac_csts'
-  OnlyPlatforms='isim modelsim xsim' >
+<Tests UseHdlFileIo='true' Spec='data_sink_qdac_csts' onlyPlatforms='isim modelsim xsim'>
   <property name='num_input_samples' value='4096'/>
   <Input  port='in'  Script='generate.py' MessageSize='16384'/>
   <Output port='out' Script='verify.py' DisableBackpressure='true'/>
