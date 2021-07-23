@@ -75,7 +75,7 @@ The following environment variables affect *`ocpigr`* operation:
 *`OCPI_LIBRARY_PATH`*::
     A list of directories, separated by colons, to be searched for artifacts.
     When referencing the artifacts exported by a project with sources, be sure
-    to reference the project’s *`exports/`* subdirectory, not its source location.
+    to reference the project's *`exports/`* subdirectory, not its source location.
     
 EXAMPLES
 --------
