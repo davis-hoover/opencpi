@@ -3,7 +3,7 @@
   <instance component="ocpi.core.file_read" connect="complex_mixer">
     <property name="filename" value="input.bin"/>
   </instance>
-  <instance component="ocpi.=assets.dsp_comps.complex_mixer" connect="file_write">
+  <instance component="ocpi.assets.dsp_comps.complex_mixer" connect="file_write">
   </instance>
   <instance component="ocpi.core.file_write">
     <property name="filename" value="output.bin"/>
