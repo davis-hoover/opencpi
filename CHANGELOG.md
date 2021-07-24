@@ -1,3 +1,22 @@
+# [v2.2.1](https://gitlab.com/opencpi/opencpi/-/compare/v2.2.0...v2.2.1) (2021-07-22)
+
+Changes/additions since [OpenCPI Release v2.2.0](https://gitlab.com/opencpi/opencpi/-/releases/v2.2.0)
+
+### Enhancements
+- **devops**: implement on-the-fly patching of man page sources. (!638)(3855456a)
+
+### Bug Fixes
+- **app,protocols,tests**: remove superfluous code and empty lines and include data_sink_qdac_test_app_csts. (!641)(34d9cc98)
+- **doc**: fix typos in `ocpirun.1.txt` and `ocpihdl.1.txt`. (!638)(3855456a)
+- **tools**: fix generation of unit test assembly xml for optional output ports. (!611)(ad3a06af)
+- **tools**: fix tar prereq build as root user. (!636)(e17d3a33)
+- **tools**: restore ocpidev ability to automatically determine noun and name when not provided. (!637)(35c74d8c)
+- **tools**: fix issue with running applications with ocpidev. (!637)(35c74d8c)
+- **tools**: improve ability of ocpidev to automatically determine noun and name when not provided. (!639)(948fda06)
+
+### Miscellaneous
+- **devops,doc**: modify web site scripts to handle "ettus" OSP. (!634)(5c7107ba)
+
 # [v2.2.0](https://gitlab.com/opencpi/opencpi/-/compare/v2.1.1...v2.2.0) (2021-07-08)
 
 Changes/additions since [OpenCPI Release v2.1.1](https://gitlab.com/opencpi/opencpi/-/releases/v2.1.1)
