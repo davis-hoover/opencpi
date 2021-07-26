@@ -17,17 +17,7 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-"""
-Aids in viewing of file saved by file_write
-"""
-import sys
-import os.path
-import numpy as np
-import opencpi.unit_test_utils as utu
-import opencpi.complexshortwithmetadata_utils as iqm
+OnlyPlatforms=isim xsim modelsim
+Libraries=adc_csts
+include $(OCPI_CDK_DIR)/include/test.mk
 
-num_expected_diffs = 0
-
-msgs = iqm.parse_msgs_from_msgs_in_file('case00.00.out')
-for msg in msgs:
-    print(msg)

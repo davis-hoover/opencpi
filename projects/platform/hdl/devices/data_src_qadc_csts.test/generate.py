@@ -33,13 +33,7 @@ if len(sys.argv) != 2:
     print("Invalid arguments:  usage is: generate.py <output-file>")
     sys.exit(1)
 
-# from arguments to generate.py (-test.xml)
-max_bytes_in = int(os.environ.get("OCPI_TEST_ocpi_max_bytes_in"))
-
-# Generate enough samples to generate number_of_samples_messages max_bytes_in sized input messages
-number_of_samples_messages = 10
-bytes_per_sample = 4
-num_samples_to_generate = number_of_samples_messages * max_bytes_in // bytes_per_sample
+num_samples_to_generate = int(os.environ.get("OCPI_TEST_num_samples_before_eof"))
 
 # Create ramp from 0 to num-samples-1
 ramp = np.arange(num_samples_to_generate)
@@ -49,8 +43,9 @@ out_data = np.array(np.zeros(len(ramp)), dtype=utu.dt_iq_pair)
 
 # Put ramp in generated output, left shift because dev signal port is
 # MSB-justified
-out_data['real_idx'] = np.left_shift(np.int16(ramp), 4)
-out_data['imag_idx'] = np.left_shift(np.int16(ramp), 4)
+out_data['real_idx'] = np.int16(ramp)
+out_data['imag_idx'] = -np.int16(ramp)+(num_samples_to_generate-1) # +(num_samples_to_generate-1) is a hack to make verify work correctly 
+                                                                   # (verify gives false negative when the generated data has negative numbers)
 
 # Write to file
 with open(sys.argv[1], 'wb') as f:
