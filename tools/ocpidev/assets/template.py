@@ -340,3 +340,12 @@ COMPONENT_HDL_LIB_XML = ("""<!-- This is the XML file for the hdl/{{hdl_lib}} li
   <!-- Add items here -->
 </library>
 \n""")
+
+PROTOCOL_SPEC_XML = (""" <!-- This is the spec file (OPS) for protocol: {{protocol}}
+     Add <operation> elements for message types.
+     Add protocol summary attributes if necessary to override attributes
+     inferred from operations/messages -->
+<Protocol> <!-- add protocol summary attributes here if necessary -->
+  <!-- Add operation elements here -->
+</Protocol>
+\n""")
