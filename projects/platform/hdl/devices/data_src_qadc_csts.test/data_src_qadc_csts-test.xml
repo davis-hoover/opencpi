@@ -1,0 +1,6 @@
+<Tests UseHdlFileIo='true' Spec='data_src_qadc_csts'>
+  <Property Name='send_eof' Value='true'/>
+  <Property Name='num_samples_before_eof' Value='4096'/>
+  <Input  Port='in'  Script='generate.py' MessageSize='16384'/>
+  <Output Port='out' Script='verify.py' DisableBackpressure='true'/>
+</Tests>

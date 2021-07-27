@@ -3,7 +3,7 @@ library ocpi, platform; use ocpi.types.all; -- remove this to avoid all ocpi nam
 library util;
 architecture rtl of worker is
   signal   dac_clk    : std_logic;
-  signal   eof : bool_t;
+  signal   eof_r : bool_t;
   signal sample_counter_en : std_logic;
   signal sample_counter_cnt : unsigned(props_in.num_input_samples'length-1 downto 0);
 begin
@@ -41,13 +41,13 @@ begin
   begin
     if rising_edge(dac_clk) then
       if its(out_in.reset) then
-        eof   <= bfalse;
+        eof_r   <= bfalse;
       elsif (its(out_in.ready) and sample_counter_cnt = props_in.num_input_samples-1) then
-        eof <= btrue;
+        eof_r <= btrue;
       end if;
     end if;
   end process;
 
-  out_out.eof <= eof;
+  out_out.eof <= eof_r;
 end rtl;
 
