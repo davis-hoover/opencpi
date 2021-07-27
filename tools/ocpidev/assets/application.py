@@ -58,13 +58,17 @@ class Application(RunnableAsset, RCCBuildableAsset):
         """
         Runs the Application with the settings specified in the object
         """
-        args=["run"]
-        type="application"
+        args=["run", "Applications="+self.name]
         if self.name.endswith(".xml"):
-            args.append("Applications="+self.name)
+            directory = self.directory
             type="applications"
-        return ocpiutil.execute_cmd(self.get_settings(), self.directory, args,
-                                    ocpiutil.get_makefile(self.directory, type)[0])
+        else:
+            directory = str(Path(self.directory, self.name))
+            type="application"
+        makefile = ocpiutil.get_makefile(directory, type)[0]
+        return ocpiutil.execute_cmd(self.get_settings(), directory, 
+                                    args, makefile)
+
     def build(self):
         """
         This is a placeholder function will be the function that builds this Asset
@@ -108,7 +112,7 @@ class Application(RunnableAsset, RCCBuildableAsset):
         used by the create function/verb to generate the dictionary of viabales to send to the
         jinja2 template.
         valid kwargs handled at this level are:
-            app            (string)      - Applicatin name
+            app            (string)      - Application name
         """
         template_dict = {
                         "app" : name,

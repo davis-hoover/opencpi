@@ -218,7 +218,7 @@ void throw_if_num_bit_errors_not_zero(OA::Application& app) {
   else {
     std::ostringstream oss;
     oss << "num_bit_errors was " << num_bit_errors \
-        <<  "instead of the expected 0";
+        <<  " instead of the expected 0";
     throw oss.str();
   }
 }

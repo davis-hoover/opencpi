@@ -15,21 +15,11 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-
-# usage: view.sh <app_output_filename>
-
-if [ -z "$1" ]; then
-  echo "ERROR: must specify output file, usage: view.sh <app_output_filename>"
-  exit 1
-fi
-
-CMD=eog
-command -v $CMD > /dev/null
-if [ "$?" != "0" ]; then
-  echo "ERROR: this script requires the $CMD command, which was not found, exiting now"
-  exit 1
-fi
-
-$CMD $1
-
-exit 0
+$(if $(realpath $(OCPI_CDK_DIR)),,\
+  $(error The OCPI_CDK_DIR environment variable is not set correctly.))
+Containers=cnt_zed_fmcomms_2_3_scdcd_csts \
+           cnt_zcu104_fmcomms_2_3_scdcd_csts
+DefaultContainers=
+ComponentLibraries=util_comps base_comps misc_comps dsp_comps comms_comps devices
+ProjectDependencies=ocpi.platform
+include $(OCPI_CDK_DIR)/include/hdl/hdl-assembly.mk

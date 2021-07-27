@@ -364,11 +364,19 @@ def make_job(pipeline, stage, stages, platform, project=None, name=None,
 
     if platform.is_host:
         tags = [platform.name, 'shell', 'opencpi']
-    elif platform.is_sim or (stage == 'test' and platform.model == 'hdl'):
+        if platform.name == 'centos7':
+            tags.append('aws')
+    elif stage == 'test' and platform.model == 'hdl' and not platform.is_sim:
+    # HWIL Job
         tags = [host_platform.name, platform.name, 'shell', 'opencpi']
     else:
-        tags = [host_platform.name, 'shell', 'opencpi']
-
+        if platform.is_sim:
+            tags = [host_platform.name, platform.name, 'shell', 'opencpi']
+        else:
+            tags = [host_platform.name, 'shell', 'opencpi']
+        if host_platform.name == 'centos7':
+            tags.append('aws')
+            
     if do_ocpiremote:
         resource_group = platform.name
     else:

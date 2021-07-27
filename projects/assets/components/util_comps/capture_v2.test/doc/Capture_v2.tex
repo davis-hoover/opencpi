@@ -279,7 +279,10 @@ The tests are verified by \path{verify.py} script. It checks that the \texttt{to
 For an example of the {\comp} component used in an application, please reference the
 tb\_bias\_v2 application located in \path{assets/applications/tb_bias_v2}. \newline
 
-Something to note is that for the hdl worker, the BRAM2 module that is used to store the data and metadata initializes the BRAM to an initial value of 0xAAAAAAAA (2863311530 in base 10) in simulation. This means at the start of an application, in simulation, the \texttt{data} and \texttt{metadata} properties will have an initial value of 0xAAAAAAAA.
+Something to note is that for the hdl worker, the BRAM2 module that is used to store the data and metadata initializes the BRAM to an initial value of 0xAAAAAAAA (2863311530 in base 10) in simulation. This means at the start of an application, in simulation, the \texttt{data} and \texttt{metadata} properties will have an initial value of 0xAAAAAAAA. \newline
+
+There is also a script that outputs the {\comp} properties in a more readable format, to a file. This is primarily formatting the metadata property. This can script can be used when trying to interpret the {\comp} properties when running an app. It requires the user to use the dumpFile option when running an app and the provide that dump file to the script. A {\comp} unit test .log file can also be used as an 
+input to the script. The script is located in \path{assets/scripts/format_capture_v2_property_dump.py}.
 
 \end{flushleft}
 

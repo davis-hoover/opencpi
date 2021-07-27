@@ -24,6 +24,9 @@ import re
 import sys
 import subprocess
 import json
+import jinja2
+import _opencpi.assets.template as ocpitemplate
+from os.path import dirname
 from pathlib import Path
 from xml.etree import ElementTree as ET
 import _opencpi.util as ocpiutil
@@ -124,23 +127,22 @@ class ShowableComponent(ShowableAsset):
         Determine the Package id based on the library or project that the Worker resides in.  only
         a component will reside at the top level of a project.
         """
-        parent_dir = str(Path(self.directory).parent)
-        # if ocpiutil.get_dirtype(parent_dir) not in ['library', 'project', 'hdl-platforms']:
-        #     parent_dir = str(Path(parent_dir).parent)  
-        if ocpiutil.get_dirtype(parent_dir) == "library":
+        dir = self.directory if os.path.isdir(self.directory) else dirname(self.directory)
+        parent_dir = str(Path(dir).parent)
+        dirtype = str(ocpiutil.get_dirtype(parent_dir))
+        if dirtype == "library":
             ret_val = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(parent_dir, "library"),
                                                   mk_arg="showpackage ShellLibraryVars=1",
                                                   verbose=True)["Package"][0]
-        elif ocpiutil.get_dirtype(parent_dir) == "project":
+        elif dirtype == "project":
             ret_val = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(parent_dir, "project"),
                                                   mk_arg="projectpackage ShellProjectVars=1",
                                                   verbose=True)["ProjectPackage"][0]
-        elif ocpiutil.get_dirtype(parent_dir) == "hdl-platforms":
+        elif dirtype == "hdl-platforms":
             ret_val = "N/A"
         else:
             raise ocpiutil.OCPIException("Could not determine Package-ID of component dirtype of " +
-                                         "parent directory: " + parent_dir + " dirtype: " +
-                                         str(ocpiutil.get_dirtype(parent_dir)))
+                                         "parent directory: " + parent_dir + " dirtype: " + dirtype)
         return ret_val
 
     def __show_table_ports_props(self, json_dict, verbose, is_worker):
@@ -217,7 +219,6 @@ class ShowableComponent(ShowableAsset):
             self.__show_simple_ports_props(json_dict)
         elif details == "table":
             self.__show_table_ports_props(json_dict, verbose, is_worker)
-
 
     def get_struct_dict_from_xml(self, struct):
         """
@@ -377,7 +378,6 @@ class Component(ShowableComponent):
             ocpiutil.throw_not_valid_dirtype_e(valid_dirtypes)
         if not name:
             ocpiutil.throw_not_blank_e("component", "name", True)
-        print('platform:', platform)
         project_path = Path(ocpiutil.get_path_to_project_top())
         if library:
             if not library == 'components':
@@ -400,10 +400,10 @@ class Component(ShowableComponent):
         
         specs_path = Path(working_path, 'specs')
         if not specs_path.exists() and not ensure_exists:
-            specs_path.mkdir()
+            os.makedirs(specs_path)
         working_dir = Component.get_filename(
             str(specs_path), name, ensure_exists)
-        print(working_dir)
+
         return working_dir
 
     @staticmethod
@@ -427,3 +427,52 @@ class Component(ShowableComponent):
         path = Path(directory, path_stem)
 
         return str(path)
+
+    def _get_template_dict(name, directory, **kwargs):
+        """
+        used by the create function/verb to generate the dictionary of viabales to send to the
+        jinja2 template.
+        valid kwargs handled at this level are:
+            comp            (string)      - Component name
+        """
+        template_dict = {
+                        "component" : name,
+                        "hdl_lib" : kwargs.get("hdl_library", None)
+                        }
+        return template_dict
+
+    @staticmethod
+    def create(name, directory, **kwargs):
+        """
+        Static method to create a new Application
+        """
+        verbose = kwargs.get("verbose", True)
+        sub_lib = kwargs.get("library", None)
+        hdl_lib = kwargs.get("hdl_library", None)
+        dirtype = ocpiutil.get_dirtype(directory)
+       
+        if verbose:
+            projdir = ocpiutil.get_path_to_project_top()
+            print("Executing the 'create component' method for project " + projdir)
+        if not os.path.exists(directory):
+            os.mkdir(directory)
+        os.chdir(directory)
+        specfile = os.getcwd() + "/" + name
+        if os.path.isfile(specfile):
+            raise ocpiutil.OCPIException(specfile + " already exists")
+        template_dict = Component._get_template_dict(name, directory, **kwargs)
+        if kwargs.get("no_control", None) == True:
+            template = jinja2.Template(ocpitemplate.COMPONENT_SPEC_NO_CTRL_XML, trim_blocks=True)
+            ocpiutil.write_file_from_string(specfile, template.render(**template_dict))
+        else:
+            template = jinja2.Template(ocpitemplate.COMPONENT_SPEC_XML, trim_blocks=True)
+            ocpiutil.write_file_from_string(specfile, template.render(**template_dict))
+
+        if dirtype == "library" or hdl_lib and not kwargs.get("project", True):
+            if not os.path.isdir("../lib"):
+                os.mkdir("../lib")
+            lnkfile = "../lib/" + name
+            if not os.path.isfile(lnkfile):
+                os.symlink("../specs/" + os.path.basename(specfile), lnkfile)
+        if verbose:
+            print("Component '" + name + "' was created at " + specfile)

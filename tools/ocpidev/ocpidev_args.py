@@ -1,20 +1,7 @@
 from pathlib import Path
+import _opencpi.util as ocpiutil
 
 """Dicts of args to be used by ocpidev.py"""
-
-# Options common to all verbs
-common_options = {
-    'directory': {
-        'long': '--directory',
-        'short': '-d',
-        'default': str(Path.cwd())
-    },
-    'force': {
-        'long': '--force',
-        'short': '-f',
-        'action': 'store_true'
-    }
-}
 
 # Options to be used for pre-processing user args and to reference
 # in verb-specific options
@@ -68,7 +55,7 @@ options = {
     'no_control': {
         'long': '--no-control',
         'short': '-n',
-        'action': 'store_false'
+        'action': 'store_true'
     },
     'create_test': {
         'long': '--create-test',
@@ -78,20 +65,19 @@ options = {
     'project': {
         'long': '--project',
         'short': '-p',
-        'action': 'store_true'
+        'action': 'store_true',
+        'mut_exc_group': 'project'
     },
     'library': {
         'long': '--library',
-        'short': '-l'
+        'short': '-l',
+        'mut_exc_group': 'project'
     },
     'hdl_library': {
         'long': '--hdl-library',
         'short': '-h',
-        'choices': [
-            'devices',
-            'cards',
-            'adapters'
-        ]
+        'choices': [ 'devices', 'cards', 'adapters' ],
+        'mut_exc_group': 'project'
     },
     'standalone': {
         'long': '--standalone',
@@ -278,11 +264,16 @@ options = {
 # Verbs with nouns and options, including options referencing those above
 verbs = {
     'build': {
+        'options': {
+            'name': {
+                'nargs': '?',
+                'default': lambda: Path.cwd().name
+            }
+        },
         'nouns': {
-            'required': False,
+            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
             'application': {
                 'options': {
-                    'name': None,
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform']
                 }
@@ -301,26 +292,12 @@ verbs = {
                 },
                 'nouns': {
                     'assembly': {
-                        'options': {
-                            'name': None
-                        }
                     },
                     'assemblies': None,
-                    'device': {
-                        'options': {
-                            'name': None
-                        }
-                    },
-                    'platform': {
-                        'options': {
-                            'name': None
-                        }
-                    },
+                    'device': None,
+                    'platform': None,
                     'platforms': None,
                     'primitive': {
-                        'options': {
-                            'name': None
-                        },
                         'nouns': {
                             'core': None,
                             'library': None
@@ -331,7 +308,6 @@ verbs = {
             },
             'library': {
                 'options': {
-                    'name': {'nargs': '?'},
                     'hdl': options['hdl'],
                     'rcc': options['rcc'],
                     'worker': options['worker'],
@@ -343,7 +319,6 @@ verbs = {
             },
             'project': {
                 'options': {
-                    'name': {'nargs': '?'},
                     'hdl_assembly': options['hdl_assembly'],
                     'no_assemblies': options['no_assemblies'],
                     'hdl': options['hdl'],
@@ -358,7 +333,6 @@ verbs = {
             },
             'test': {
                 'options': {
-                    'name': {'nargs': '?'},
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
                     'hdl_target': options['hdl_target'],
@@ -368,7 +342,6 @@ verbs = {
             },
             'worker': {
                 'options': {
-                    'name': None,
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
                     'hdl_target': options['hdl_target'],
@@ -379,11 +352,16 @@ verbs = {
         }
     },
     'clean': {
+        'options': {
+            'name': {
+                'nargs': '?',
+                'default': lambda: Path.cwd().name
+            }
+        },
         'nouns': {
-            'required': False,
+            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
             'application': {
                 'options': {
-                    'name': None,
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform']
                 }
@@ -401,27 +379,12 @@ verbs = {
                     'hdl_platform': options['hdl_platform']
                 },
                 'nouns': {
-                    'assembly': {
-                        'options': {
-                            'name': None
-                        }
-                    },
+                    'assembly': None,
                     'assemblies': None,
-                    'device': {
-                        'options': {
-                            'name': None
-                        }
-                    },
-                    'platform': {
-                        'options': {
-                            'name': None
-                        }
-                    },
+                    'device': None,
+                    'platform': None,
                     'platforms': None,
                     'primitive': {
-                        'options': {
-                            'name': None
-                        },
                         'nouns': {
                             'core': None,
                             'library': None
@@ -432,7 +395,6 @@ verbs = {
             },
             'library': {
                 'options': {
-                    'name': {'nargs': '?'},
                     'hdl': options['hdl'],
                     'rcc': options['rcc'],
                     'worker': options['worker'],
@@ -444,7 +406,6 @@ verbs = {
             },
             'project': {
                 'options': {
-                    'name': {'nargs': '?'},
                     'hdl_assembly': options['hdl_assembly'],
                     'no_assemblies': options['no_assemblies'],
                     'hdl': options['hdl'],
@@ -459,7 +420,6 @@ verbs = {
             },
             'test': {
                 'options': {
-                    'name': {'nargs': '?'},
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
                     'hdl_target': options['hdl_target'],
@@ -469,7 +429,6 @@ verbs = {
             },
             'worker': {
                 'options': {
-                    'name': None,
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
                     'hdl_target': options['hdl_target'],
@@ -485,6 +444,7 @@ verbs = {
             'keep': options['keep'],
         },
         'nouns': {
+            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
             'application': {
                 'options': {
                     'xml_app': options['xml_app'],
@@ -493,8 +453,8 @@ verbs = {
             },
             'component': {
                 'options': {
+                    'name': None,
                     'no_control': options['no_control'],
-                    'create_test': options['create_test'],
                     'platform': options['platform'],
                     'hdl_library': options['hdl_library'],
                     'library': options['library'],
@@ -503,7 +463,6 @@ verbs = {
             },
             'library': {
                 'options': {
-                    'name': None,
                     'pkg_prefix': options['pkg_prefix'],
                     'pkg_id': options['pkg_id'],
                     'pkg_name': options['pkg_name'],
@@ -644,9 +603,13 @@ verbs = {
     },
     'delete': {
         'options': {
-            'name': {'nargs': '?'}
+            'name': {
+                'nargs': '?',
+                'default': lambda: Path.cwd().name
+            }
         },
         'nouns': {
+            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
             'application': None,
             'component': {
                 'project': options['project'],
@@ -710,17 +673,25 @@ verbs = {
     },
     'refresh': {
         'options': {
-            'name': {'nargs': '?'}
+            'name': {
+                'nargs': '?',
+                'default': lambda: Path.cwd().name
+            }
         },
         'nouns': {
+            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
             'project': None
         }
     },
     'register': {
         'options': {
-            'name': {'nargs': '?'}
+            'name': {
+                'nargs': '?',
+                'default': lambda: Path.cwd().name
+            }
         },
         'nouns': {
+            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
             'project': None
         }
     },
@@ -735,6 +706,7 @@ verbs = {
             }
         },
         'nouns': {
+            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
             'registry': None
         }
     },
@@ -743,14 +715,19 @@ verbs = {
     },
     'unregister': {
         'options': {
-            'name': {'nargs': '?'}
+            'name': {
+                'nargs': '?',
+                'default': lambda: Path.cwd().name
+            }
         },
         'nouns': {
+            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
             'project': None
         }
     },
     'unset': {
         'nouns': {
+            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
             'registry': None
         }
     },
@@ -761,7 +738,6 @@ verbs = {
 
 # Collection of options, common options, and verbs to be imported by ocpidev
 args_dict = {
-    'common_options': common_options,
     'options': options,
     'verbs': verbs
 }

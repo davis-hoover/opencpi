@@ -105,5 +105,5 @@ There is the samp\_count\_before\_first\_underrun property that gives the number
 
 \section*{Test and Verification}
 \begin{flushleft}
-For verification, the OpenCPI unit test framework which utilizes an emulator worker. The emulator worker produces clocks of varying frequency from 1e6 to 200e6 Hz which are forwarded to the \textbf{dev} port of the UUT. The unit test checks that the input file and output file match and that no expected underruns occurred during the test.
+For verification, the OpenCPI unit test framework utilizes an emulator worker. The emulator worker produces clocks of varying frequency from 1e6 to 200e6 Hz which are forwarded to the \textbf{dev} port of the UUT. The unit test checks that the input file and output file match and that no expected underruns occurred during the test.
 \end{flushleft}

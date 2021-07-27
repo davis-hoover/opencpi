@@ -1,8 +1,10 @@
 # Additional data for a platform at discovery as well as overrides of 
 # job values. Overrides apply to all jobs for a platform by default,
 # To apply overrides to only a specific job, nest the values under the
-# job name like done for 'centos7' below. A platform or a specific job
-# can be skipped by setting its value to 'skip'
+# job name like done for 'centos7' below. Overrides provided for a 
+# specific job will nullify any overrides supplied for the platform for 
+# that job. A platform or a specific job can be skipped by setting its 
+# value to 'skip'
 
 # ci
 ci:
@@ -32,12 +34,6 @@ modelsim:
     variables:
       OCPI_MODELSIM_DIR: '/opt/Mentor/modelsim_dlx'
       OCPI_MODELSIM_LICENSE_FILE: '2103@sembach.opencpi.net'
-isim:
-  overrides:
-
-xsim:
-  overrides:
-
 
 # hdl
 e31x:
