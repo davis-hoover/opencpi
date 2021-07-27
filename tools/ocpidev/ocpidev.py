@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import os
 from copy import copy
 from inspect import signature
 from pathlib import Path
@@ -30,6 +31,8 @@ from _opencpi.assets import application
 import ocpidev_utilization
 import ocpishow 
 import ocpidev_run
+sys.path.append(os.getenv('OCPI_CDK_DIR') + '/scripts/')
+import genProjMetaData
 
 def main():
     """
@@ -61,6 +64,8 @@ def main():
             rc = ocpidev_run.main()
 
     args = postprocess_args(args)
+    verb = args.verb
+    noun = args.noun
 
     do_ocpidev_sh = True
     try:
@@ -85,6 +90,7 @@ def main():
                 method_args[param] = getattr(args, param, '')
             print_cmd(args, asset.directory)
             asset_method(**method_args)
+            metadata(verb, noun)
         except ocpiutil.OCPIException as e:
         # Verb failed in an expected way; don't fall back to ocpidev.sh
             do_ocpidev_sh = False
@@ -98,6 +104,15 @@ def main():
         ocpiutil.logging.error(e)
         sys.exit(1)
 
+
+def metadata(verb=None, noun=None):
+    if not verb in ["create", "delete"]:
+       return
+    if verb == "delete" and noun in ["project", "registry"]:
+       return
+    projdir = ocpiutil.get_path_to_project_top()
+    if ocpiutil.get_dirtype(projdir) == "project":
+        genProjMetaData.main(projdir)
 
 def postprocess_args(args):
     """
@@ -181,6 +196,7 @@ def ocpicreate(args):
     directory,name = get_working_dir(args, ensure_exists=False)
     print_cmd(args, directory)
     delattr(args, 'name')
+    verb = args.verb
     args = vars(args)
     noun = args.pop('noun', '')
     try:
@@ -188,6 +204,7 @@ def ocpicreate(args):
     except ocpiutil.OCPIException as e:
         ocpiutil.logging.error(e)
         sys.exit(1)
+    metadata(verb, None)
     sys.exit()
 
 
