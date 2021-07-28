@@ -18,13 +18,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 #include "cases.h"
-struct Case;
 
-Case(ParamConfig &globals) : m_settings(globals), m_results(*wFirst), m_timeout(timeout), m_duration(duration),
+Case::Case(ParamConfig &globals) : 
+    m_settings(globals), m_results(*wFirst), m_timeout(timeout), m_duration(duration),
     m_doneWorkerIsUUT(doneWorkerIsUUT)
 {}
 
-const char *doExcludePlatform(const char *a_platform, void *arg) {
+const char *Case::
+doExcludePlatform(const char *a_platform, void *arg) {
   Case &c = *(Case *)arg;
   OrderedStringSet platforms;
   const char *err;
@@ -49,7 +50,8 @@ const char *doExcludePlatform(const char *a_platform, void *arg) {
   return NULL;
 }
 
-const char *doOnlyPlatform(const char *a_platform, void *arg) {
+const char *Case::
+doOnlyPlatform(const char *a_platform, void *arg) {
   Case &c = *(Case *)arg;
   OrderedStringSet platforms;
   const char *err;
@@ -69,7 +71,8 @@ const char *doOnlyPlatform(const char *a_platform, void *arg) {
   return NULL;
 }
 
-const char *doOnlyWorker(const char *worker, void *arg) {
+const char *Case::
+doOnlyWorker(const char *worker, void *arg) {
   Case &c = *(Case *)arg;
   if (excludeWorkers.find(worker) != excludeWorkers.end())
     return
@@ -82,7 +85,8 @@ const char *doOnlyWorker(const char *worker, void *arg) {
   return doWorker(*wi, &c.m_workers);
 }
 
-const char *doExcludeWorker(const char *worker, void *arg) {
+const char *Case::
+doExcludeWorker(const char *worker, void *arg) {
   Case &c = *(Case *)arg;
   if (excludeWorkers.find(worker) != excludeWorkers.end())
     return OU::esprintf("excluded worker \"%s\" is already globally excluded", worker);
@@ -96,7 +100,8 @@ const char *doExcludeWorker(const char *worker, void *arg) {
   return NULL;
 }
 
-const char *doCase(ezxml_t cx, void *globals) {
+const char *Case::
+doCase(ezxml_t cx, void *globals) {
   Case *c = new Case(*(ParamConfig *)globals);
   const char *err;
   if ((err = c->parse(cx, cases.size()))) {
@@ -107,7 +112,8 @@ const char *doCase(ezxml_t cx, void *globals) {
   return NULL;
 }
 
-const char *doPorts(Worker &w, ezxml_t x) {
+const char *Case::
+doPorts(Worker &w, ezxml_t x) {
   for (unsigned n = 0; n < w.m_ports.size(); n++)
     if (w.m_ports[n]->isData()) {
       Port &p = *w.m_ports[n];
@@ -151,7 +157,8 @@ const char *doPorts(Worker &w, ezxml_t x) {
 }
 
 // FIXME: this code is redundant with the OcpiUtilAssembly.cxx
-const char *parseDelay(ezxml_t sx, const OU::Property &p) {
+const char *Case::
+parseDelay(ezxml_t sx, const OU::Property &p) {
   const char *err;
   if ((err = OE::checkAttrs(sx, "delay", "value", NULL)) ||
       (err = OE::checkElements(sx, NULL)))
@@ -185,7 +192,8 @@ const char *parseDelay(ezxml_t sx, const OU::Property &p) {
 }
 
 // Parse a case
-const char *parse(ezxml_t x, size_t ordinal) {
+const char *Case::
+parse(ezxml_t x, size_t ordinal) {
   const char *err, *a;
   if ((a = ezxml_cattr(x, "name")))
     m_name = a;
@@ -290,7 +298,7 @@ return err;
   return NULL;
 }
 
-void
+void Case::
 doProp(unsigned n) {
   ParamConfig &c = *m_subCases.back();
   while (n < c.params.size() && (!c.params[n].m_param || !c.params[n].m_generate.empty() ||
@@ -307,7 +315,7 @@ doProp(unsigned n) {
   }
 }
 
-const char *
+const char *Case::
 pruneSubCases() {
   ocpiDebug("Pruning subcases for case %s starting with %zu subcases",
             m_name.c_str(), m_subCases.size());
@@ -384,7 +392,7 @@ pruneSubCases() {
                   m_name.c_str()) : NULL;
 }
 
-void
+void Case::
 print(FILE *out) {
   fprintf(out, "Case %s:\n", m_name.c_str());
   table(out);
@@ -404,7 +412,7 @@ print(FILE *out) {
   }
 }
 
-void
+void Case::
 table(FILE *out) {
   std::vector<size_t> sizes(m_settings.params.size(), 0);
   std::vector<const char *> last(m_settings.params.size(), NULL);
@@ -452,7 +460,7 @@ table(FILE *out) {
   fprintf(out, "\n");
 }
 
-const char *
+const char *Case::
 generateFile(bool &first, const char *dir, const char *type, unsigned s,
               const std::string &name, const std::string &generate, const std::string &env,
               std::string &file) {
@@ -495,7 +503,7 @@ type, name.c_str(), file.c_str(), cmd.c_str() + prefix);
 }
 
 // Generate inputs: input files
-const char *
+const char *Case::
 generateInputs() {
   const char *err;
   for (unsigned s = 0; s < m_subCases.size(); s++) {
@@ -550,7 +558,7 @@ generateInputs() {
   return NULL;
 }
 
-void
+void Case::
 generateAppInstance(Worker &w, ParamConfig &pc, unsigned nOut, unsigned nOutputs, unsigned s,
                     const DataPort *first, bool a_emulator, std::string &app, const char *dut, bool testingOptional) {
   OU::formatAdd(app, "  <instance component='%s' name='%s'", w.m_specName, dut);
@@ -600,7 +608,8 @@ generateAppInstance(Worker &w, ParamConfig &pc, unsigned nOut, unsigned nOutputs
 
 // Generate application xml files, being careful not to write files that are
 // not changing
-const char *generateApplications(const std::string &dir, Strings &files) {
+const char *Case::
+generateApplications(const std::string &dir, Strings &files) {
   const char *err;
   const char *dut = strrchr(wFirst->m_specName, '.');
   bool isOptional = false; // for compiler warning
@@ -785,7 +794,7 @@ const char *generateApplications(const std::string &dir, Strings &files) {
 }
 
 // Generate the verification script for this case
-const char *
+const char *Case::
 generateVerification(const std::string &dir, Strings &files) {
   std::string name;
   OU::format(name, "verify_%s.sh", m_name.c_str());
@@ -927,7 +936,7 @@ else
   return OU::string2File(verify.c_str(), file.c_str(), false, true, true);
 }
 
-const char *
+const char *Case::
 generateCaseXml(FILE *out) {
   fprintf(out, "  <case name='%s'>\n", m_name.c_str());
   for (unsigned s = 0; s < m_subCases.size(); s++) {
@@ -1101,203 +1110,3 @@ fprintf(out, "    </subcase>\n");
   return NULL;
 }
 // Explicitly included workers
-
-const char *addWorker(const char *name, void *) {
-  const char *dot = strrchr(name, '.'); // checked earlier
-  // FIXME: support finding other workers in the project path
-  std::string wdir;
-  const char *slash = strrchr(name, '/');
-  if (slash)
-    wdir = name;
-  else {
-    wdir = "../";
-    wdir += name;
-  }
-  bool isDir;
-  if (!OS::FileSystem::exists(wdir, &isDir) || !isDir)
-    return OU::esprintf("Worker \"%s\" doesn't exist or is not a directory", name);
-  const char *wname = slash ? slash + 1 : name;
-  std::string
-    wkrName(wname, OCPI_SIZE_T_DIFF(dot, wname)),
-    wOWD = wdir + "/" + wkrName + ".xml";
-  if (!OS::FileSystem::exists(wOWD, &isDir) || isDir)
-    return OU::esprintf("For worker \"%s\", \"%s\" doesn't exist or is a directory",
-                        name, wOWD.c_str());
-  return tryWorker(name, specName, true, true);
-}
-
-const char *excludeWorker(const char *name, void *) {
-  const char *dot = strrchr(name, '.');
-  if (!dot)
-    return OU::esprintf("For worker name \"%s\": missing model suffix (e.g. \".rcc\")", name);
-  std::string file("../");
-  file += name;
-  bool isDir;
-  if (!OS::FileSystem::exists(file, &isDir) || !isDir)
-    return OU::esprintf("Excluded worker \"%s\" does not exist in this library.", name);
-  if (!excludeWorkers.insert(name).second)
-    return OU::esprintf("Duplicate worker \"%s\" in excludeWorkers attribute.", name);
-  excludeWorkersTmp.insert(name);
-  return NULL;
-}
-const char *findWorkers() {
-  if (verbose) {
-    fprintf(stderr, "Looking for workers with the same spec: \"%s\"\n", specName.c_str());
-    if (excludeWorkers.size())
-      fprintf(stderr, "Skipping workers specifically mentioned for exclusion\n");
-  }
-  std::string workerNames;
-  const char *err;
-  if ((err = OU::file2String(workerNames, "../lib/workers", ' ')))
-    return err;
-  addDep("../lib/workers", false); // if we add or remove a worker from the library...
-  for (OU::TokenIter ti(workerNames.c_str()); ti.token(); ti.next())
-    if ((err = tryWorker(ti.token(), specName, true, false)))
-      return err;
-  return NULL;
-}
-
-void connectHdlFileIO(const Worker &w, std::string &assy, InputOutputs &ports) {
-//Case cases;
-for (PortsIter pi = w.m_ports.begin(); pi != w.m_ports.end(); ++pi) {
-  Port &p = **pi;
-  bool optional = false;
-  InputOutput *ios = findIO(p, ports);
-  if (ios)
-    optional = ios->m_testOptional;
-  if (p.isData() && !optional) {
-      OU::formatAdd(assy,
-                    "  <Instance name='%s_%s' Worker='file_%s'/>\n"
-                    "  <Connection>\n"
-                    "    <port instance='%s_%s' %s='%s'/>\n"
-                    "    <port instance='%s%s%s' %s='%s'/>\n"
-                    "  </Connection>\n",
-                    w.m_implName, p.pname(), p.isDataProducer() ? "write" : "read",
-                    w.m_implName, p.pname(), p.isDataProducer() ? "to" : "from",
-                    p.isDataProducer() ? "in" : "out", w.m_implName,
-                    p.isDataProducer() ? "_backpressure_" : "_ms_", p.pname(),
-        p.isDataProducer() ? "from" : "to", p.isDataProducer() ? "out" : "in");
-  }
-}
-}
-
-void connectHdlStressWorkers(const Worker &w, std::string &assy, bool hdlFileIO, InputOutputs &ports) {
-for (PortsIter pi = w.m_ports.begin(); pi != w.m_ports.end(); ++pi) {
-  Port &p = **pi;
-  bool optional = false;
-  InputOutput *ios = findIO(p, ports);
-  if (ios)
-    optional = ios->m_testOptional;
-  if (p.isData() && !optional) {
-    if (p.isDataProducer()) {
-      OU::formatAdd(assy,
-                    "  <Instance Name='%s_backpressure_%s' Worker='backpressure'/>\n",
-                    w.m_implName, p.pname());
-      OU::formatAdd(assy,
-                    "  <Connection>\n"
-                    "    <port instance='uut_%s' name='%s'/>\n"
-                    "    <port instance='%s_backpressure_%s' name='in'/>\n"
-                    "  </Connection>\n", w.m_implName, p.pname(), w.m_implName, p.pname());
-      if (!hdlFileIO) {
-        OU::formatAdd(assy,
-                      "  <Connection Name='%s_backpressure_%s' External='producer'>\n"
-                      "    <port Instance='%s_backpressure_%s' Name='out'/>\n"
-                      "  </Connection>\n", p.pname(), w.m_implName, w.m_implName, p.pname());
-      }
-    } else {
-      OU::formatAdd(assy,
-                    "  <Instance Name='%s_ms_%s' Worker='metadata_stressor'/>\n",
-                    w.m_implName, p.pname());
-      OU::formatAdd(assy,
-                    "  <Connection>\n"
-                    "    <port instance='%s_ms_%s' name='out'/>\n"
-                    "    <port instance='uut_%s' name='%s'/>\n"
-                    "  </Connection>\n", w.m_implName, p.pname(), w.m_implName, p.pname());
-      if (!hdlFileIO) {
-        OU::formatAdd(assy,
-                      "  <Connection Name='%s_ms_%s' External='consumer'>\n"
-                      "    <port Instance='%s_ms_%s' Name='in'/>\n"
-                      "  </Connection>\n",  p.pname(),  w.m_implName, w.m_implName, p.pname());
-      }
-    }
-  }
-}
-}
-
-const char *generateHdlAssembly(const Worker &w, unsigned c, const std::string &dir, const
-                                std::string &name, bool hdlFileIO, Strings &assyDirs, InputOutputs &ports) {
-OS::FileSystem::mkdir(dir, true);
-assyDirs.insert(name);
-const char *err;
-ocpiInfo("Generating assembly for worker: %s in file %s filename %s spec %s",
-    w.cname(), w.m_file.c_str(), w.m_fileName.c_str(), w.m_specFile.c_str());
-std::string makeFile;
-// Only build for sim targets if using vhdlfileio
-if (hdlFileIO)
-  makeFile +=
-"override HdlPlatform:=$(filter %sim,$(HdlPlatform))\n"
-"override HdlPlatforms:=$(filter %sim,$(HdlPlatforms))\n";
-// Only build the assembly for targets that are built
-std::string targets;
-// Only build for targets for which the worker is built
-// Note the worker may have been build for "no targets", and thus exist in the "lib" directory
-// of the library, without having been built for.
-for (OS::FileIterator iter("../lib/hdl", "*"); !iter.end(); iter.next()) {
-  std::string
-target = iter.relativeName(),
-targetDir = "../lib/hdl/" + target;
-  bool isDir;
-  if (OS::FileSystem::exists(targetDir, &isDir) && isDir) {
-if (OS::FileSystem::exists(targetDir + "/" + w.m_implName + ".vhd")) {
-ocpiInfo("Found that worker was built for target: %s", target.c_str());
-targets += " " + target;
-}
-  }
-}
-if (targets.empty()) // don't build for anything since worker was not built for anything
-  makeFile += "override HdlPlatforms:=\noverride HdlPlatform:=\n";
-else
-  makeFile += "OnlyTargets=" + targets + "\n";
-makeFile += "\ninclude $(OCPI_CDK_DIR)/include/hdl/hdl-assembly.mk\n";
-#if 1
-if ((err = OU::string2File(makeFile, dir + "/Makefile", false, true)))
-  return err;
-#else
-if ((err = OU::string2File(hdlFileIO ?
-                  "override HdlPlatform:=$(filter %sim,$(HdlPlatform))\n"
-                  "override HdlPlatforms:=$(filter %sim,$(HdlPlatforms))\n"
-                  "include $(OCPI_CDK_DIR)/include/hdl/hdl-assembly.mk\n" :
-                  "include $(OCPI_CDK_DIR)/include/hdl/hdl-assembly.mk\n",
-                  dir + "/Makefile", false, true)))
-    return err;
-#endif
-std::string assy;
-OU::format(assy,
-            "<HdlAssembly%s>\n"
-            "  <Instance Worker='%s' Name='uut_%s' ParamConfig='%u'/>\n",
-            emulator ? " language='vhdl'" : "", w.m_implName, w.m_implName, c);
-  if (emulator) {
-    OU::formatAdd(assy, "  <Instance Worker='%s' Name='uut_%s' ParamConfig='%u'/>\n",
-                emulator->m_implName, emulator->m_implName, c);
-    for (unsigned n = 0; n < w.m_ports.size(); n++) {
-      Port &p = *w.m_ports[n];
-      if (p.m_type == DevSigPort || p.m_type == PropPort)
-        OU::formatAdd(assy,
-                    "  <Connection>\n"
-                    "    <port instance='uut_%s' name='%s'/>\n"
-                    "    <port instance='uut_%s' name='%s'/>\n"
-                    "  </Connection>\n",
-                    w.m_implName, p.pname(), emulator->m_implName, p.pname());
-    }
-}
-  connectHdlStressWorkers(w, assy, hdlFileIO, ports);
-  if(emulator)
-    connectHdlStressWorkers(*emulator, assy, hdlFileIO, ports);
-  if (hdlFileIO) {
-    connectHdlFileIO(w, assy, ports);
-    if (emulator)
-      connectHdlFileIO(*emulator, assy, ports);
-  }
-  assy += "</HdlAssembly>\n";
-  return OU::string2File(assy, dir + "/" + name + ".xml", false, true);
-} 

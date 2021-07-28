@@ -19,27 +19,481 @@
  */
 
 // Process the tests.xml file.
-#include <strings.h>
-#include <sstream>
-#include <set>
-#include <limits>
-#include <algorithm>
-#include "OcpiOsDebugApi.h"
-#include "OcpiOsFileSystem.h"
-#include "OcpiUtilMisc.h"
-#include "OcpiUtilEzxml.h"
-#include "OcpiLibraryManager.h"
-#include "wip.h"
-#include "data.h"
-#include "hdl-device.h"
-#include "comp.h"
-#include "input-output.h"
-#include "cases.h"
+
+#include "tests.h"
 
 #define TESTS "-tests.xml"
 #define MS_CONFIG "bypass", "metadata", "throttle", "full"
-
 namespace OL = OCPI::Library;
+
+unsigned matchedWorkers = 0; // count them even if they are not built or usable
+
+const char *
+findPackage(ezxml_t spec, const char *package, const char *specName,
+            const std::string &parent, const std::string &specFile, std::string &package_out) {
+  if (!package)
+    package = ezxml_cattr(spec, "package");
+  if (package)
+    package_out = package;
+  else {
+    std::string packageFileDir;
+    // If the spec name already has a package, we don't use the package file name
+    // to determine the package.
+    const char *base =
+      !strchr(specName, '.') && !specFile.empty() ? specFile.c_str() : parent.c_str();
+    const char *cp = strrchr(base, '/');
+    const char *err;
+    // If the specfile (first) or the implfile (second) has a dir,
+    // look there for package name file.  If not, look in the CWD (the worker dir).
+    if (cp)
+      packageFileDir.assign(base, OCPI_SIZE_T_DIFF(cp + 1, base));
+
+    // FIXME: Fix this using the include path maybe?
+    std::string packageFileName = packageFileDir + "package-id";
+    if ((err = OU::file2String(package_out, packageFileName.c_str()))) {
+      // If that fails, try going up a level (e.g. the top level of a library)
+      packageFileName = packageFileDir + "../package-id";
+      if ((err = OU::file2String(package_out, packageFileName.c_str()))) {
+        // If that fails, try going up a level and into "lib" where it may be generated
+        packageFileName = packageFileDir + "../lib/package-id";
+        if ((err = OU::file2String(package_out, packageFileName.c_str())))
+          return OU::esprintf("Missing package-id file: %s", err);
+      }
+    }
+    for (cp = package_out.c_str(); *cp && isspace(*cp); cp++)
+      ;
+    package_out.erase(0, OCPI_SIZE_T_DIFF(cp, package_out.c_str()));
+    for (cp = package_out.c_str(); *cp && !isspace(*cp); cp++)
+      ;
+    package_out.resize(OCPI_SIZE_T_DIFF(cp, package_out.c_str()));
+  }
+  return NULL;
+}
+
+const char *
+remove(const std::string &name) {
+  ocpiInfo("Trying to remove %s", name.c_str());
+  int rv = ::system(std::string("rm -r -f " + name).c_str());
+  return rv ?
+    OU::esprintf("Error removing \"%s\" directory: %d", name.c_str(), rv) :
+    NULL;
+}
+WorkersIter findWorker(const char *name, Workers &ws) {
+  for (auto wi = ws.begin(); wi != ws.end(); ++wi) {
+      std::string workername; //need the worker name and the model in order to make comparison
+      OU::formatAdd(workername, "%s.%s",(*wi)->cname(), (*wi)->m_modelString);
+if (!strcasecmp(name, workername.c_str()))
+        return wi;
+  }
+  return ws.end();
+}
+// If the spec in/out arg may be set in advance if it is inline or xi:included
+// FIXME: share this with the one in parse.cxx
+const char *getSpec(ezxml_t xml, const std::string &parent, const char *a_package, ezxml_t &spec,
+        std::string &specFile, std::string &a_specName) {
+  // xi:includes at this level are component specs, nothing else can be included
+  spec = NULL;
+  std::string name, file;
+  const char *err;
+  if ((err = tryOneChildInclude(xml, parent, "ComponentSpec", &spec, specFile, true)))
+    return err;
+  const char *specAttr = ezxml_cattr(xml, "spec");
+  if (specAttr) {
+    if (spec)
+      return "Can't have both ComponentSpec element (maybe xi:included) and a 'spec' attribute";
+    size_t len = strlen(specAttr);
+    file = specAttr;
+    // If the file is suffixed, try it as is.
+    if (!strcasecmp(specAttr + len - 4, ".xml") ||
+        !strcasecmp(specAttr + len - 5, "-spec") ||
+        !strcasecmp(specAttr + len - 5, "_spec"))
+      err = parseFile(specAttr, parent, "ComponentSpec", &spec, specFile, false);
+    else {
+      // If not suffixed, try it, and then with suffixes.
+      if ((err = parseFile(specAttr, parent, "ComponentSpec", &spec, specFile, false))) {
+        file = specAttr;
+        // Try the two suffixes
+        file += "-spec";
+        if ((err = parseFile(file.c_str(), parent, "ComponentSpec", &spec, specFile, false))) {
+          file = specAttr;
+          file += "_spec";
+          if ((err = parseFile(file.c_str(), parent, "ComponentSpec", &spec, specFile, false)))
+            return OU::esprintf("After trying \"-spec\" and \"_spec\" suffixes: %s", err);
+        }
+      }
+    }
+  } else {
+    if (parent.size()) {
+      // No spec mentioned at all, try using the name of the parent file with suffixes
+      OU::baseName(parent.c_str(), name);
+      const char *dash = strrchr(name.c_str(), '-');
+      if (dash)
+        name.resize(OCPI_SIZE_T_DIFF(dash, name.c_str()));
+    } else {
+      OU::baseName(OS::FileSystem::cwd().c_str(), name);
+      const char *dot = strrchr(name.c_str(), '.');
+      if (dot)
+        name.resize(OCPI_SIZE_T_DIFF(dot, name.c_str()));
+    }
+    // Try the two suffixes
+    file = name + "-spec";
+    if ((err = parseFile(file.c_str(), parent, "ComponentSpec", &spec, specFile, false))) {
+      file =  name + "_spec";
+      const char *err1 = parseFile(file.c_str(), parent, "ComponentSpec", &spec, specFile, false);
+      if (err1) {
+        // No spec files are found, how about a worker with the same name?
+        // (if no spec, must be a single worker with embedded spec?)
+        bool found = false;
+        for (OS::FileIterator iter("../", name + ".*"); !iter.end(); iter.next()) {
+          std::string wname;
+          const char *suffix = strrchr(iter.relativeName(wname), '.') + 1;
+          if (strcmp(suffix, "test")) {
+            OU::format(file, "../%s/%s.xml", wname.c_str(), name.c_str());
+            if ((err1 =
+                  parseFile(file.c_str(), parent, NULL, &spec, specFile, false, false, false))) {
+              ocpiInfo("When trying to open and parse \"%s\":  %s", file.c_str(), err1);
+              continue;
+            }
+            if (!ezxml_cchild(spec, "componentspec")) {
+              ocpiInfo("When trying to parse \"%s\":  no embedded ComponentSpec element found",
+                        file.c_str());
+              continue;
+            }
+            if (found)
+              return OU::esprintf("When looking for workers matching \"%s\" with embedded "
+                                  "specs, found more than one", name.c_str());
+            found = true;
+            specName = name; // package?
+          }
+        }
+        if (!found)
+          return OU::esprintf("After trying \"-spec\" and \"_spec\" suffixes, no spec found");
+      }
+    }
+  }
+  std::string fileName;
+  // This is a component spec file or a worker OWD that contains a componentspec element
+  if ((err = getNames(spec, specFile.c_str(), NULL, name, fileName)))
+    return err;
+  // If name is file name, strip suffixes for name.
+  if (name == fileName) {
+    size_t len = name.length();
+    if (len > 5 && (!strcasecmp(name.c_str() + len - 5, "-spec") ||
+                    !strcasecmp(name.c_str() + len - 5, "_spec")))
+      name.resize(len - 5);
+  }
+  // Find the package even though the spec package might be specified already
+  argPackage = a_package;
+  if (strchr(name.c_str(), '.'))
+    a_specName = name;
+  else {
+    if ((err = findPackage(spec, a_package, a_specName.c_str(), parent, specFile, specPackage)))
+      return err;
+    a_specName = specPackage + "." + name;
+  }
+  if (verbose)
+    fprintf(stderr, "Spec is \"%s\" in file \"%s\"\n",
+            a_specName.c_str(), specFile.c_str());
+  return NULL;
+}
+
+static const char *s_stressorMode[] = { MS_CONFIG, NULL };
+
+const char *
+tryWorker(const char *wname, const std::string &matchName, bool matchSpec, bool specific) {
+  ocpiInfo("Considering worker \"%s\"", wname);
+  const char *dot = strrchr(wname, '.');
+  std::string
+    name(wname, OCPI_SIZE_T_DIFF(dot, wname)),
+    file,
+    empty;
+  if (excludeWorkers.find(wname) != excludeWorkers.end()) {
+    if (verbose)
+      fprintf(stderr, "Skipping worker \"%s\" since it was specifically excluded.\n", wname);
+    ocpiCheck(excludeWorkersTmp.erase(wname) == 1);
+    return NULL;
+  }
+  //OU::format(file, "../%s/%s.xml", wname, name.c_str());
+  // Find the worker under lib, so we are looking at things that are built and also so that
+  // the actual platform-specific build is easily relative to the OWD here
+  OU::format(file, "../lib/%s/%s.xml", dot+1, name.c_str());
+  if (!OS::FileSystem::exists(file)) {
+    if (matchSpec && specific)
+      return OU::esprintf("For worker \"%s\", cannot open file \"%s\"", wname, file.c_str());
+    if (verbose)
+      fprintf(stderr, "Skipping worker \"%s\" since \"%s\" not found.\n", wname, file.c_str());
+    return NULL;
+  }
+  const char *err;
+  Worker *w = Worker::create(file.c_str(), testFile, argPackage, NULL, NULL, NULL, 0, err);
+  bool missing;
+  if (!err && (matchSpec ? w->m_specName == matchName :
+                w->m_emulate && w->m_emulate->m_implName == matchName) &&
+      !(err = w->parseBuildFile(true, &missing, testFile))) {
+    if (verbose)
+      fprintf(stderr,
+              "Found worker for %s:  %s\n", matchSpec ? "this spec" : "emulating this worker",
+              wname);
+    matchedWorkers++;
+    if (missing) {
+      if (verbose)
+        fprintf(stderr, "Skipping worker \"%s\" since it isn't built for any target\n", wname);
+      return NULL;
+    }
+    if (matchSpec) {
+      if (w->m_isDevice) {
+        if (verbose)
+          fprintf(stderr, "Worker has device signals.  Looking for emulator worker.\n");
+        std::string workerNames;
+        if ((err = OU::file2String(workerNames, "../lib/workers", ' ')))
+          return err;
+  addDep("../lib/workers", false); // if we add or remove a worker from the library...
+        for (OU::TokenIter ti(workerNames.c_str()); ti.token(); ti.next()) {
+          if ((err = tryWorker(ti.token(), w->m_implName, false, false)))
+            return err;
+        }
+      }
+      workers.push_back(w);
+    } else {
+      // Found an emulator
+      if (emulator)
+        return OU::esprintf("Multiple emulators found for %s", matchName.c_str());
+      emulator = w;
+    }
+    return NULL;
+  }
+  delete w;
+  return err;
+}
+
+const char *doInputOutput(ezxml_t x, void *) {
+  std::vector<InputOutput> &inouts = !strcasecmp(OE::ezxml_tag(x), "input") ? inputs : outputs;
+  inouts.resize(inouts.size() + 1);
+  return inouts.back().parse(x, &inouts);
+}
+OrderedStringSet onlyPlatforms, excludePlatforms;
+const char *doPlatform(const char *platform, Strings &platforms) {
+  platforms.insert(platform); // allow duplicates
+  return NULL;
+}
+const char *doWorker(Worker *w, void *arg) {
+  Workers &set = *(Workers *)arg;
+  for (WorkersIter wi = set.begin(); wi != set.end(); ++wi)
+    if (w == *wi)
+      OU::esprintf("worker \"%s\" is already in the list", w->cname());
+  set.push_back(w);
+  return NULL;
+}
+const char *
+emulatorName() {
+  const char *em =  emulator ? strrchr(emulator->m_specName, '.') : NULL;
+  if (em)
+    em++;
+  else if (emulator)
+    em = emulator->m_specName;
+  return em;
+}
+
+const char *addWorker(const char *name, void *) {
+  const char *dot = strrchr(name, '.'); // checked earlier
+  // FIXME: support finding other workers in the project path
+  std::string wdir;
+  const char *slash = strrchr(name, '/');
+  if (slash)
+    wdir = name;
+  else {
+    wdir = "../";
+    wdir += name;
+  }
+  bool isDir;
+  if (!OS::FileSystem::exists(wdir, &isDir) || !isDir)
+    return OU::esprintf("Worker \"%s\" doesn't exist or is not a directory", name);
+  const char *wname = slash ? slash + 1 : name;
+  std::string
+    wkrName(wname, OCPI_SIZE_T_DIFF(dot, wname)),
+    wOWD = wdir + "/" + wkrName + ".xml";
+  if (!OS::FileSystem::exists(wOWD, &isDir) || isDir)
+    return OU::esprintf("For worker \"%s\", \"%s\" doesn't exist or is a directory",
+                        name, wOWD.c_str());
+  return tryWorker(name, specName, true, true);
+}
+
+const char *excludeWorker(const char *name, void *) {
+  const char *dot = strrchr(name, '.');
+  if (!dot)
+    return OU::esprintf("For worker name \"%s\": missing model suffix (e.g. \".rcc\")", name);
+  std::string file("../");
+  file += name;
+  bool isDir;
+  if (!OS::FileSystem::exists(file, &isDir) || !isDir)
+    return OU::esprintf("Excluded worker \"%s\" does not exist in this library.", name);
+  if (!excludeWorkers.insert(name).second)
+    return OU::esprintf("Duplicate worker \"%s\" in excludeWorkers attribute.", name);
+  excludeWorkersTmp.insert(name);
+  return NULL;
+}
+const char *findWorkers() {
+  if (verbose) {
+    fprintf(stderr, "Looking for workers with the same spec: \"%s\"\n", specName.c_str());
+    if (excludeWorkers.size())
+      fprintf(stderr, "Skipping workers specifically mentioned for exclusion\n");
+  }
+  std::string workerNames;
+  const char *err;
+  if ((err = OU::file2String(workerNames, "../lib/workers", ' ')))
+    return err;
+  addDep("../lib/workers", false); // if we add or remove a worker from the library...
+  for (OU::TokenIter ti(workerNames.c_str()); ti.token(); ti.next())
+    if ((err = tryWorker(ti.token(), specName, true, false)))
+      return err;
+  return NULL;
+}
+
+void connectHdlFileIO(const Worker &w, std::string &assy, InputOutputs &ports) {
+//Case cases;
+for (PortsIter pi = w.m_ports.begin(); pi != w.m_ports.end(); ++pi) {
+  Port &p = **pi;
+  bool optional = false;
+  InputOutput *ios = findIO(p, ports);
+  if (ios)
+    optional = ios->m_testOptional;
+  if (p.isData() && !optional) {
+      OU::formatAdd(assy,
+                    "  <Instance name='%s_%s' Worker='file_%s'/>\n"
+                    "  <Connection>\n"
+                    "    <port instance='%s_%s' %s='%s'/>\n"
+                    "    <port instance='%s%s%s' %s='%s'/>\n"
+                    "  </Connection>\n",
+                    w.m_implName, p.pname(), p.isDataProducer() ? "write" : "read",
+                    w.m_implName, p.pname(), p.isDataProducer() ? "to" : "from",
+                    p.isDataProducer() ? "in" : "out", w.m_implName,
+                    p.isDataProducer() ? "_backpressure_" : "_ms_", p.pname(),
+        p.isDataProducer() ? "from" : "to", p.isDataProducer() ? "out" : "in");
+  }
+}
+}
+
+void connectHdlStressWorkers(const Worker &w, std::string &assy, bool hdlFileIO, InputOutputs &ports) {
+for (PortsIter pi = w.m_ports.begin(); pi != w.m_ports.end(); ++pi) {
+  Port &p = **pi;
+  bool optional = false;
+  InputOutput *ios = findIO(p, ports);
+  if (ios) 
+    optional = ios->m_testOptional;
+  if (p.isData() && !optional) {
+    if (p.isDataProducer()) {
+      OU::formatAdd(assy,
+                    "  <Instance Name='%s_backpressure_%s' Worker='backpressure'/>\n",
+                    w.m_implName, p.pname());
+      OU::formatAdd(assy,
+                    "  <Connection>\n"
+                    "    <port instance='uut_%s' name='%s'/>\n"
+                    "    <port instance='%s_backpressure_%s' name='in'/>\n"
+                    "  </Connection>\n", w.m_implName, p.pname(), w.m_implName, p.pname());
+      if (!hdlFileIO) {
+        OU::formatAdd(assy,
+                      "  <Connection Name='%s_backpressure_%s' External='producer'>\n"
+                      "    <port Instance='%s_backpressure_%s' Name='out'/>\n"
+                      "  </Connection>\n", p.pname(), w.m_implName, w.m_implName, p.pname());
+      }
+    } else {
+      OU::formatAdd(assy,
+                    "  <Instance Name='%s_ms_%s' Worker='metadata_stressor'/>\n",
+                    w.m_implName, p.pname());
+      OU::formatAdd(assy,
+                    "  <Connection>\n"
+                    "    <port instance='%s_ms_%s' name='out'/>\n"
+                    "    <port instance='uut_%s' name='%s'/>\n"
+                    "  </Connection>\n", w.m_implName, p.pname(), w.m_implName, p.pname());
+      if (!hdlFileIO) {
+        OU::formatAdd(assy,
+                      "  <Connection Name='%s_ms_%s' External='consumer'>\n"
+                      "    <port Instance='%s_ms_%s' Name='in'/>\n"
+                      "  </Connection>\n",  p.pname(),  w.m_implName, w.m_implName, p.pname());
+      }
+    }
+  }
+}
+}
+
+const char *generateHdlAssembly(const Worker &w, unsigned c, const std::string &dir, const
+                                std::string &name, bool hdlFileIO, Strings &assyDirs, InputOutputs &ports) {
+OS::FileSystem::mkdir(dir, true);
+assyDirs.insert(name);
+const char *err;
+ocpiInfo("Generating assembly for worker: %s in file %s filename %s spec %s",
+    w.cname(), w.m_file.c_str(), w.m_fileName.c_str(), w.m_specFile.c_str());
+std::string makeFile;
+// Only build for sim targets if using vhdlfileio
+if (hdlFileIO)
+  makeFile +=
+"override HdlPlatform:=$(filter %sim,$(HdlPlatform))\n"
+"override HdlPlatforms:=$(filter %sim,$(HdlPlatforms))\n";
+// Only build the assembly for targets that are built
+std::string targets;
+// Only build for targets for which the worker is built
+// Note the worker may have been build for "no targets", and thus exist in the "lib" directory
+// of the library, without having been built for.
+for (OS::FileIterator iter("../lib/hdl", "*"); !iter.end(); iter.next()) {
+  std::string
+target = iter.relativeName(),
+targetDir = "../lib/hdl/" + target;
+  bool isDir;
+  if (OS::FileSystem::exists(targetDir, &isDir) && isDir) {
+if (OS::FileSystem::exists(targetDir + "/" + w.m_implName + ".vhd")) {
+ocpiInfo("Found that worker was built for target: %s", target.c_str());
+targets += " " + target;
+}
+  }
+}
+if (targets.empty()) // don't build for anything since worker was not built for anything
+  makeFile += "override HdlPlatforms:=\noverride HdlPlatform:=\n";
+else
+  makeFile += "OnlyTargets=" + targets + "\n";
+makeFile += "\ninclude $(OCPI_CDK_DIR)/include/hdl/hdl-assembly.mk\n";
+#if 1
+if ((err = OU::string2File(makeFile, dir + "/Makefile", false, true)))
+  return err;
+#else
+if ((err = OU::string2File(hdlFileIO ?
+                  "override HdlPlatform:=$(filter %sim,$(HdlPlatform))\n"
+                  "override HdlPlatforms:=$(filter %sim,$(HdlPlatforms))\n"
+                  "include $(OCPI_CDK_DIR)/include/hdl/hdl-assembly.mk\n" :
+                  "include $(OCPI_CDK_DIR)/include/hdl/hdl-assembly.mk\n",
+                  dir + "/Makefile", false, true)))
+    return err;
+#endif
+std::string assy;
+OU::format(assy,
+            "<HdlAssembly%s>\n"
+            "  <Instance Worker='%s' Name='uut_%s' ParamConfig='%u'/>\n",
+            emulator ? " language='vhdl'" : "", w.m_implName, w.m_implName, c);
+  if (emulator) {
+    OU::formatAdd(assy, "  <Instance Worker='%s' Name='uut_%s' ParamConfig='%u'/>\n",
+                emulator->m_implName, emulator->m_implName, c);
+    for (unsigned n = 0; n < w.m_ports.size(); n++) {
+      Port &p = *w.m_ports[n];
+      if (p.m_type == DevSigPort || p.m_type == PropPort)
+        OU::formatAdd(assy,
+                    "  <Connection>\n"
+                    "    <port instance='uut_%s' name='%s'/>\n"
+                    "    <port instance='uut_%s' name='%s'/>\n"
+                    "  </Connection>\n",
+                    w.m_implName, p.pname(), emulator->m_implName, p.pname());
+    }
+}
+  connectHdlStressWorkers(w, assy, hdlFileIO, ports);
+  if(emulator)
+    connectHdlStressWorkers(*emulator, assy, hdlFileIO, ports);
+  if (hdlFileIO) {
+    connectHdlFileIO(w, assy, ports);
+    if (emulator)
+      connectHdlFileIO(*emulator, assy, ports);
+  }
+  assy += "</HdlAssembly>\n";
+  return OU::string2File(assy, dir + "/" + name + ".xml", false, true);
+} 
+
 
 // Called for all workers globally acceptable workers and the one emulator if present
 static void

@@ -22,31 +22,7 @@
 #ifndef OCPI_INPUTOUTPUT_H_
 #define OCPI_INPUTOUTPUT_H_
 
-#include "comp.h"
-
-
-#define TESTS "-tests.xml"
-#define MS_CONFIG "bypass", "metadata", "throttle", "full"
-
-namespace OCPI {
-  namespace Test {
-    const char *
-tryWorker(const char *wname, const std::string &matchName, bool matchSpec, bool specific); 
-
-  }
-}
-
-typedef std::vector<DataPort *> DataPorts;
-typedef WorkerConfigs::const_iterator WorkerConfigsIter;
-//struct InputOutput;
-
-Worker *emulator;
-WorkerConfigs configs;
-DataPorts optionals;
-Worker *wFirst;
 enum MsConfig {bypass, metadata, throttle, full};
-extern char *s_stressorMode[];
-
 struct InputOutput {
   // this is a singleton in this context
   // Given a worker, see if it is what we want, either matching a spec, or emulating a device
@@ -60,12 +36,4 @@ struct InputOutput {
 };  
 typedef std::vector<InputOutput> InputOutputs;
 
-InputOutputs inputs, outputs; // global ones that may be applied to any case
-static InputOutput *findIO(Port &p, InputOutputs &ios);
-static InputOutput *findIO(const char *name, InputOutputs &ios);
-const char *doInputOutput(ezxml_t x, void *); 
-OrderedStringSet onlyPlatforms, excludePlatforms;
-const char *doPlatform(const char *platform, Strings &platforms); 
-const char *doWorker(Worker *w, void *arg); 
-const char *emulatorName();
 #endif

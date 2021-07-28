@@ -19,23 +19,13 @@
  */
 #ifndef _OCPI_CASES_H
 #define _OCPI_CASES_H
-
-#include <cstddef>
-#include <string>
-#include <strings.h>
-#include <cassert>
-#include <vector>
-#include "comp.h"
-#include "input-output.h"
-
-#define TESTS "-tests.xml"
-#define MS_CONFIG "bypass", "metadata", "throttle", "full"
-
-namespace OL = OCPI::Library;
+#include "wip.h"
+#include "data.h"
+#include "tests.h"
 struct Case;
 typedef std::vector<Case *> Cases;
 Cases cases;
-OrderedStringSet allPlatforms;
+
 // A test case, which may apply against multiple configurations
 // Default is:
 //   cases generated from configurations and defined property values
@@ -57,7 +47,7 @@ struct Case {
     size_t m_timeout, m_duration;
     bool m_doneWorkerIsUUT;
     std::string m_delays;
-    Case ();
+    Case (ParamConfig &globals);
     static const char *doExcludePlatform(const char *a_platform, void *arg);
     static const char *doOnlyPlatform(const char *a_platform, void *arg);
     static const char *doOnlyWorker(const char *worker, void *arg);
@@ -80,15 +70,6 @@ struct Case {
                       const DataPort *first, bool a_emulator, std::string &app, const char *dut, bool testingOptional); 
     const char *generateApplications(const std::string &dir, Strings &files);
     const char *generateVerification(const std::string &dir, Strings &files);
-    const char *generateCaseXml(FILE *out);
-
-    
+    const char *generateCaseXml(FILE *out);    
 };    
-static const char *addWorker(const char *name, void *);
-static const char *excludeWorker(const char *name, void *);
-static const char *findWorkers();
-void *connectHdlFileIO(const Worker &w, std::string &assy, InputOutputs &ports);
-void *connectHdlStressWorkers(const Worker &w, std::string &assy, bool hdlFileIO, InputOutputs &ports);
-const char *generateHdlAssembly(const Worker &w, unsigned c, const std::string &dir, const
-                                      std::string &name, bool hdlFileIO, Strings &assyDirs, InputOutputs &ports);
 #endif
