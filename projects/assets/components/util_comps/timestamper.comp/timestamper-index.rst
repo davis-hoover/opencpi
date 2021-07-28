@@ -25,7 +25,7 @@ A block diagram representation of the implementation is given in :numref:`timest
    :alt: Timestamper Implementation Block Diagram
    :align: center
 
-   Block diagram of timestamper implementation.
+   Timestamper Block Diagram
 
 Timestamps are provided as an input to the component on the time interface.
 The timestamp is a 64-bit number with the first 32 bits corresponding to seconds
@@ -50,16 +50,12 @@ is given in :numref:`timestamper-timing-diagram`
    :alt: Timestamper Output Timing Diagram
    :align: center
 
-   Timestamper output timing diagram.
+   Timestamper Output Timing Diagram
 
 Interface
 ---------
 .. literalinclude:: ../specs/timestamper-spec.xml
    :language: xml
-
-Opcode Handling
-~~~~~~~~~~~~~~~
-To be supplied (if required): Description of how the non-stream opcodes are handled.
 
 Properties
 ~~~~~~~~~~
@@ -86,14 +82,6 @@ Dependencies
 The dependencies to other elements in OpenCPI are:
 
  * None.
-
-There is also a dependency on:
-
- * ``ieee.std_logic_1164``
-
- * ``ieee.numeric_std``
-
- * Skeleton outline: Any other standard C++ or HDL packages.
 
 Limitations
 -----------
