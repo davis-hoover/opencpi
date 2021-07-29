@@ -15,8 +15,8 @@
 	   controloperations='initialize'
            componentlibraries='devices'
            includedirs='../../../../../runtime/drc/ad9361/include
-           ./supporting/include/OCPIProjects/
-           ./supporting/src/OCPIProjects/'
+           ../platform_ad9361_config_proxy_csts.rcc/supporting/include/OCPIProjects/
+           ../platform_ad9361_config_proxy_csts.rcc/supporting/src/OCPIProjects/'
            staticprereqlibs='ad9361'
            sourcefiles='ad9361_platform.cc'
            >
