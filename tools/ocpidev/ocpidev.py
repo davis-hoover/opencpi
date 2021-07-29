@@ -27,6 +27,7 @@ import _opencpi.util as ocpiutil
 import ocpiargparse
 from ocpidev_args import args_dict
 from _opencpi.assets import application
+from _opencpi.assets import test
 import ocpidev_utilization
 import ocpishow 
 import ocpidev_run
@@ -175,6 +176,7 @@ def ocpicreate(args):
         "application": ocpiassets.application.Application,
         "component": ocpiassets.component.Component,
         "protocol": ocpiassets.component.Protocol,
+        "test": ocpiassets.test.Test,
     }
     if args.noun not in class_dict:
     # Noun not implemented by this function; fall back to ocpidev.sh
