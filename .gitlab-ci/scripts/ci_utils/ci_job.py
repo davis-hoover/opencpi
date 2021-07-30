@@ -366,9 +366,11 @@ def make_job(pipeline, stage, stages, platform, project=None, name=None,
         tags = [platform.name, 'shell', 'opencpi']
         if platform.name == 'centos7':
             tags.append('aws')
-    elif stage == 'test' and platform.model == 'hdl' and not platform.is_sim:
+    elif (stage == 'test' 
+          and platform.model == 'hdl' 
+          and (not platform.is_sim or platform.name == 'modelsim')):
     # HWIL Job
-        tags = [host_platform.name, platform.name, 'shell', 'opencpi']
+        tags = [host_platform.name, platform.name, 'shell', 'opencpi', 'local']
     else:
         if platform.is_sim:
             tags = [host_platform.name, platform.name, 'shell', 'opencpi']
