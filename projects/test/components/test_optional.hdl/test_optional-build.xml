@@ -1,0 +1,42 @@
+<build>
+  <configuration id='0'>
+    <parameter name='samples' value='256'/>
+    <parameter name='timestamps' value='1024'/>
+  </configuration>
+  <configuration id='1'>
+    <parameter name='samples' value='256'/>
+    <parameter name='timestamps' value='8192'/>
+  </configuration>
+  <configuration id='2'>
+    <parameter name='samples' value='256'/>
+    <parameter name='timestamps' value='1024'/>
+    <parameter name='samples_b' value='false'/>
+  </configuration>
+  <configuration id='3'>  
+    <parameter name='samples' value='256'/>
+    <parameter name='timestamps' value='1024'/>
+    <parameter name='timestamps_b' value='false'/>
+  </configuration>   
+  <configuration id='4'>
+    <parameter name='samples' value='256'/>
+    <parameter name='timestamps' value='8192'/>
+    <parameter name='samples_b' value='false'/>
+  </configuration>
+  <configuration id='5'>
+    <parameter name='samples' value='256'/>
+    <parameter name='timestamps' value='8192'/>
+    <parameter name='timestamps_b' value='false'/>
+  </configuration>
+  <configuration id='6'>
+    <parameter name='samples' value='256'/>
+    <parameter name='timestamps' value='1024'/>
+    <parameter name='samples_b' value='false'/>
+    <parameter name='timestamps_b' value='false'/>
+  </configuration>
+  <configuration id='7'>
+    <parameter name='samples' value='256'/>
+    <parameter name='timestamps' value='8192'/>
+    <parameter name='samples_b' value='false'/>
+    <parameter name='timestamps_b' value='false'/>
+  </configuration>
+</build>
