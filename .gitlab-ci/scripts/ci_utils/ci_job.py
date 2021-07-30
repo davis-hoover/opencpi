@@ -363,21 +363,26 @@ def make_job(pipeline, stage, stages, platform, project=None, name=None,
     dependencies = []
 
     if platform.is_host:
+    # Host-platform job
         tags = [platform.name, 'shell', 'opencpi']
         if platform.name == 'centos7':
+        # Run only on local runners
             tags.append('aws')
-    elif (stage == 'test' 
-          and platform.model == 'hdl' 
-          and (not platform.is_sim or platform.name == 'modelsim')):
-    # HWIL Job
+    elif stage == 'test' and platform.model == 'hdl' and not platform.is_sim:
+    # HWIL job
         tags = [host_platform.name, platform.name, 'shell', 'opencpi', 'local']
     else:
+    # Non-HWIL cross-platform job
         if platform.is_sim:
             tags = [host_platform.name, platform.name, 'shell', 'opencpi']
         else:
             tags = [host_platform.name, 'shell', 'opencpi']
-        if host_platform.name == 'centos7':
+        if host_platform.name == 'centos7' and platform.name != 'modelsim':
+        # Run only on aws runners
             tags.append('aws')
+        else:
+        # Run only on local runners
+            tags.append('local')
             
     if do_ocpiremote:
         resource_group = platform.name
