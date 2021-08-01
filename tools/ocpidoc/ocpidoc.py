@@ -65,7 +65,7 @@ if __name__ == "__main__":
     clean_parser.add_argument("-r", "--recursive", action="store_true",
                               help="Remove built documentation from all "
                                     + "subfolders")
-    # For consistency vs. all other ocpi* commands
+    # For consistency with all other ocpi* commands
     # force non-zero exit code if argparse exits, even for help etc.
     # force help if no arguments
     try:

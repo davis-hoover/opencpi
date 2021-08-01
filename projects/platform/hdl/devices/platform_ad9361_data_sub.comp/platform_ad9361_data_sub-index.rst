@@ -58,7 +58,7 @@ A block diagram representation of the implementation is given in :numref:`platfo
    :alt: AD9361 Data Sub HDL Subdevice Worker Implementation Block Diagram
    :align: center
 
-   Block diagram of AD9361 data sub HDL subdevice worker implementation.
+   AD9361 Data Sub HDL Subdevice Worker Block Diagram
 
 Interface
 ---------
@@ -66,10 +66,6 @@ This component's specification is contained in the OpenCPI Worker Description (O
 
 .. literalinclude:: ../platform_ad9361_data_sub.hdl/platform_ad9361_data_sub.xml
    :language: xml
-
-Opcode Handling
-~~~~~~~~~~~~~~~
-To be supplied: Description of how the non-stream opcodes are handled (if relevant).
 
 Properties
 ~~~~~~~~~~
