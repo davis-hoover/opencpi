@@ -28,6 +28,7 @@
 #include <list>
 #include <set>
 #include <sys/wait.h>
+#include <sys/syscall.h>
 #include "OcpiOsFileSystem.h"
 #include "OcpiOsSemaphore.h"
 #include "OcpiOsMisc.h"
@@ -360,7 +361,24 @@ protected:
       fprintf(stderr, "Starting execution of simulator for HDL assembly: %s "
 	      "(executable \"%s\", dir \"%s\" pwd \"%s\").\n", m_app.c_str(), m_exec.c_str(),
 	      m_dir.c_str(), getenv("PWD"));
+    //
+    // 29 Jul 2021:
+    //   In the Linux 2.6.X timeframe, the glibc implementation of fork() became a
+    //   wrapper around clone().  It was recently discovered that, on some systems,
+    //   the child process hangs in futex() immediately after creation, i.e., this
+    //   points to a probable issue with the wrapper.  Since fork() remains a valid
+    //   system call, we'll use that here.  We can revisit this if/when glibc gets
+    //   updated (fixed?).
+    //
+    //   The above not withstanding, some platforms (xilinx19_2_aarch64 <cough!>)
+    //   do not define "SYS_fork", so attempt to fall back and use whatever fork()
+    //   function exists in the system libraries.
+    //
+#ifdef SYS_fork
+    switch ((m_pid = (pid_t)syscall(SYS_fork))) {
+#else
     switch ((m_pid = fork())) {
+#endif
     case 0:
       setpgid(0, 0);
       if (chdir(m_dir.c_str()) != 0) {
