@@ -1561,6 +1561,8 @@ function do_build_here {
 	cleanTarget=cleansim
       elif [ -n "$execute" ]; then
 	cleanTarget=cleanrun
+      elif [ $dirtype = test ]; then
+	cleanTarget=clean
       else
 	cleanTarget=cleantest
       fi

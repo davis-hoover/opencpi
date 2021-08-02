@@ -136,8 +136,8 @@ def get_dir_info(directory=".", careful=False):
             make_type = 'libraries'
             # does not work with python3 < 3.6.0
             # with os.scandir(directory) as it:
-            it = os.scandir(directory)
-            for entry in it:
+            # it = os.scandir(directory)
+            for entry in os.scandir(directory):
                 if entry.is_dir():
                     dparts = entry.name.split('.')
                     if name == "specs" or (len(dparts) > 1 and dparts[-1] in in_lib):
@@ -703,21 +703,285 @@ def get_package_id_from_vars(package_id, package_prefix, package_name, directory
     return package_prefix + "." + package_name
 
 
+def get_env_dir(env):
+    """
+    Gets the given environment variable and verifies that it has
+    been set correctly to a path
+    """
+    err_msg = None
+    if env not in os.environ:
+        err_msg = env + ' environment setting not found'
+    path = Path(os.environ[env])
+    if not path.is_dir():
+        err_msg = env + ' environment setting invalid'
+    if err_msg:
+        raise OCPIException(err_msg)
+    return str(path)
+
 def get_cdk_dir():
     """
     Gets the OCPI_CDK_DIR environment variable and verifies that it has
     been set correctly.
     """
-    err_msg = None
-    if 'OCPI_CDK_DIR' not in os.environ:
-        err_msg = 'OCPI_CDK_DIR environment setting not found'
-    cdk_path = Path(os.environ['OCPI_CDK_DIR'])
-    if not cdk_path.is_dir():
-        err_msg = 'OCPI_CDK_DIR environment setting invalid'
-    if err_msg:
-        raise OCPIException(err_msg)
+    return get_env_dir('OCPI_CDK_DIR')
 
-    return str(cdk_path)
+def get_root_dir():
+    """
+    Gets the OCPI_ROOT_DIR environment variable and verifies that it has
+    been set correctly.
+    """
+    return get_env_dir('OCPI_ROOT_DIR')
+
+def get_project_package_id(realpath, dict):
+    """
+    Returns the full package id based on variables or attributes
+    """
+    package_id = dict.get('package')
+    if package_id:
+        return package_id
+    package_id = dict.get('packageid')
+    if package_id:
+        return package_id
+    package_name = dict.get('packagename')
+    if not package_name:
+        package_name = os.path.basename(realpath)
+    package_prefix = dict.get('packageprefix')
+    if package_prefix:
+        package_prefix.rstrip('.')
+    else:
+        package_prefix = 'local'
+    return package_prefix + "." + package_name
+
+def get_project_attributes(directory, xml_file = None, mk_file = None):
+    """
+    Return a dictionary of a project's attributes
+    """
+    if not xml_file and not mk_file:
+        xml_file = directory + "/Project.xml"
+        if not os.path.exists(xml_file):
+            xml_file = None
+            mk_file = directory + "/Project.mk"
+            if not os.path.exists(mk_file):
+                mk_file = None
+    attrs={}
+    if xml_file:
+        root = xt.parse(xml_file).getroot()
+        assert root.tag.lower() == "project"
+        for key,value in root.attrib.items():
+            attrs[key.lower()] = value
+    elif mk_file:
+        with open(mk_file) as mk:
+            prog = re.compile('^\s*(\w+):?=\s*([^#\n]*).*$', re.ASCII)
+            for line in mk:
+                match = prog.match(line)
+                if match:
+                    attrs[match.group(1).lower()] = match.group(2)
+    else:
+        raise OCPIException('The project in directory "' + directory +
+                            '" has no Project.xml (or old Project.mk) file')
+    print("ATTRS:"+directory+":"+repr(attrs)+":"+mk_file)
+    return attrs
+
+def get_platform_attributes(project_package_id, directory, name, model):
+    """
+    Return a dictionary of a platforms's attributes
+    Prefer a "lib" (exported) subdirectory of the platform's directory if present
+    """
+    print("get_platform_attrs"+":" + project_package_id + ":" + directory + ":" + name + ":" + model)
+    attrs={}
+    if model == "hdl":
+        try:
+            root = xt.parse(directory + "/" + name + "/" + name + ".xml").getroot()
+            assert root.tag.lower() == "hdlplatform"
+        except:
+            return None
+        for key,value in root.attrib.items():
+            attrs[key.lower()] = value
+        if not attrs.get("part"):
+            with open(directory + "/" + name + "/" + name + ".mk") as mk:
+                prog = re.compile('^\s*(\w+):?=\s*([^#\n]*).*$', re.ASCII)
+                for line in mk:
+                    match = prog.match(line)
+                    if match and match.group(1) == "HdlPart_" + name:
+                        attrs["part"] = match.group(2)
+        if not attrs.get("part"):
+            return None
+        if attrs.get('family'):
+            attrs['target'] = attrs['family']
+    elif model == "rcc":
+        try:
+            with open(directory + "/" + name + "/" + name + ".mk") as mk:
+                prog = re.compile('^\s*(\w+):?=\s*([^#\n]*).*$', re.ASCII)
+                for line in mk:
+                    match = prog.match(line)
+                    if match:
+                        var = match.group(1).lower()
+                        if var.startswith("ocpiplatform"):
+                            var = var[len("ocpiplatform"):]
+                            if var in [ 'os', 'osversion', 'arch']:
+                                attrs[var] = match.group(2)
+            attrs['target'] = attrs['os'] + '-' + attrs['osversion'] + '-' + attrs['arch']
+        except:
+            return None
+        if len(attrs) == 0:
+            return None
+    else:
+        return None
+    attrs['model'] = model
+    directory += "/" + name
+    attrs['directory'] = directory
+    directory += "/lib"
+    if os.path.isdir(directory):
+        attrs['directory'] = directory
+    attrs['packageid'] = project_package_id + "." + name
+    print("Platform attrs:" + repr(attrs))
+    return attrs
+
+def find_all_projects(directory = None):
+    """
+    Find all projects (packageids and realpaths), returning an ORDERED dict of package-id->realpath.
+    This function does not navigate into the exports subdir of a project
+    Optional argument is simply a directory that we think might be *in* a project and thus should be
+    used to find the registry.  If no directory is supplied, OCPI_PROJECT_DIR will be used if set,
+    which indicates that this function is being executed in a "make" context inside a project.
+    It is an error to provide this directory argument if OCPI_PROJECT_DIR is already set.
+    OCPI_PROJECT_PATH is also used as a source of projects.
+    The ordered dict returned is suitable for project searching: *this* project, projectpath, registry
+    Note a small amount of extra effort is done to always have the package_id even though
+    in some contexts it is not needed.
+    Minimize file system touches
+    """
+    project_package_id = None
+    xml_file = None
+    mk_file = None
+    project_dir = os.getenv('OCPI_PROJECT_DIR')
+    if project_dir:
+        if dictionary:
+            raise OCPIException('cannot call find_all_projects with a directory if OCPI_PROJECT_DIR is set')
+        project_package_id = os.getenv('OCPI_PROJECT_PACKAGE')
+    elif directory:
+        while not project_dir:
+            # We just test for existence (as opposed to opening the file)
+            # Since if it is registered we won't need it, and it probably is registered
+            xml_file = directory + "/Project.xml"
+            mk_file = directory + "/Project.mk"
+            if os.path.exists(xml_file):
+                project_dir = directory
+                mk_file = None
+            elif os.path.exists(mk_file):
+                project_dir = directory
+                xml_file = None
+            else:
+                parent = ".." if directory == '.' or directory == "./" else directory + "/.."
+                if os.path.samefile(directory, parent): # root
+                    break
+                directory = parent
+    if project_dir and os.path.isdir(project_dir + "/imports"):
+        registry_dir = project_dir + "/imports"
+    else:
+        # either no OCPI_PROJECT_DIR, or directory arg not in a project or project_dir has no imports
+        registry_dir = os.getenv('OCPI_PROJECT_REGISTRY_DIR')
+        if not registry_dir:
+            registry_dir = get_root_dir() + "/project-registry"
+    projects=collections.OrderedDict()
+    # check for the directory we are in, that might *not* be registered
+    if project_dir: # from environment or from cwd: add it if not there already
+        if project_package_id:
+            print("GET:"+repr(projects.get(project_package_id)))
+            projects[project_package_id] = os.path.realpath(project_dir)
+        else:
+            # no project ID handy, so use realpath
+            realpath = os.path.realpath(project_dir)
+            if realpath not in projects.values():
+                attrs = get_project_attributes(realpath, xml_file, mk_file)
+                project_package_id = get_project_package_id(realpath, attrs)
+            print("PROJ1:"+repr(project_dir) + ":" + repr(project_package_id))
+            projects[project_package_id] = realpath
+            print("ATTRS:+", repr(attrs))
+    path = os.getenv('OCPI_PROJECT_PATH')
+    for dir in path.split(':') if path else []:
+        realpath = os.path.realpath(dir)
+        if realpath not in projects.values():
+            attrs = get_project_attributes(realpath)
+            if realpath not in projects.values():
+                projects[get_project_package_id(realpath, get_project_attributes(realpath))] = realpath
+
+    # Now process the registry
+    print("REGISTRY_DIR:"+registry_dir)
+    # This os.open is to enable dir_fd since the scandir iterator provide an fd until python 3.7
+    fd = os.open(registry_dir, os.O_RDONLY)
+    with os.scandir(registry_dir) as it:
+        for entry in it:
+            if entry.is_symlink():
+                # Since there is no way to get a directory descriptor from a scandir iterator
+                if not projects.get(entry.name):
+                    dir = os.readlink(entry.name, dir_fd = fd);
+                    projects[entry.name] = os.path.realpath(dir if dir.startswith("/")
+                                                            else registry_dir + "/" + dir)
+    os.close(fd)
+    for package_id, directory in projects.items():
+        if not directory.endswith("/exports"):
+            directory += "/exports"
+            if os.path.isdir(directory):
+                projects[package_id] = directory
+
+    print("projects:"+repr(projects))
+    return projects
+
+def find_platforms():
+    """
+    Find platforms in this environment, based on find_all_projects.
+    return a dictionary of all platforms, with the key being its name, and the
+    value being its attributes including model and packageid
+    """
+    projects = find_all_projects()
+    platforms={}
+    for package_id, realpath in find_all_projects().items():
+        for model in [ 'rcc', 'hdl' ]:
+            for dir in [ realpath + "/exports/" + model + "/platforms",
+                         realpath + "/" + model + "/platforms"]:
+                if os.path.exists(dir):
+                    with os.scandir(dir) as it:
+                        for entry in it:
+                            if platforms.get(entry.name):
+                                continue # already defined earlier
+                            if entry.is_dir():
+                                platform_dir = dir + "/" + entry.name
+                                attrs = get_platform_attributes(package_id, dir, entry.name, model)
+                                if attrs:
+                                    platforms[entry.name] = attrs
+    return platforms
+
+# Exceptions to the simply mapping of attributes to variables
+# And empty string means do not include them in the output for make
+makeVariables={ "directory": "Dir",
+                "osversion":"OsVersion",
+                "packageid":"PackageID",
+                "family":"Target",
+                "model":"", "spec":"", "libraries":"","language":"", "version":"",
+                "configurations":""}
+
+def platform_variables_for_make():
+    """
+    Output on standard output the information about platforms in the format and variable names
+    that the current make code wants.
+    """
+    model_platforms={}
+    for name, dict in find_platforms().items():
+        model = dict['model']
+        if not model_platforms.get(model):
+            model_platforms[model] = [ name ]
+        else:
+            model_platforms[model].append(name)
+        for attribute, value in dict.items():
+            var = makeVariables.get(attribute)
+            if var != "":
+                print(model.capitalize() + "Platform" +
+                      (var if var else attribute.capitalize()) + "_" + name + ":=" + value)
+    print("PLATS:"+repr(model_platforms))
+    for model, platforms in model_platforms.items():
+        print("PLATS0:"+repr(' '.join(platforms)))
+        print(model.capitalize() + "AllPlatforms:=" + ' '.join(platforms))
 
 
 if __name__ == "__main__":

@@ -242,7 +242,7 @@ class HdlToolFactory(object):
                              exactpart=cls.__plat_dict[name]["exactpart"],
                              directory=cls.__plat_dict[name]["directory"],
                              built=cls.__plat_dict[name]["built"],
-                             package_id=package_id)
+                             package_id=package_id if package_id else cls.__plat_dict[name]["packageid"])
 
         asset_cls_name = "None" if asset_cls is None else asset_cls.__name__
         raise ocpiutil.OCPIException("Bad initializion. Asset Class \"" + asset_cls_name +
@@ -317,6 +317,7 @@ class HdlToolFactory(object):
                 cls.__plat_dict[platname]['targetname'] = cls.__mk_dict['HdlFamily_' + exactpart][0]
 
                 cls.__plat_dict[platname]['built'] = platname in cls.__mk_dict['HdlBuiltPlatforms']
+                cls.__plat_dict[platname]['packageid'] = cls.__mk_dict['HdlPlatformPackageID_' + platname]
 
 # pylint:disable=too-few-public-methods
 class HdlToolSet(object):
