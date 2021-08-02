@@ -90,6 +90,7 @@ namespace OCPI {
       bool isNumber() const;
       bool isVariable() const;
       int64_t getNumber() const;
+      bool getBool() const;
       const char *getString(std::string &) const;
     };
     // The class provideed by the caller that can provide the value of identifiers
@@ -98,7 +99,7 @@ namespace OCPI {
       virtual ~IdentResolver();
       virtual const char *getValue(const char *sym, ExprValue &val) const = 0;
     };
-    
+
     const char
       // The core function that evaluates expressions
       *evalExpression(const char *string, ExprValue &val, const IdentResolver *resolve = NULL,
@@ -110,6 +111,8 @@ namespace OCPI {
 		       const IdentResolver *resolver),
       *parseExprString(const char *a, std::string &s, std::string *expr,
 		       const IdentResolver *resolver),
+      *parseExprBool(const char *a, bool &b, std::string *expr,
+		     const IdentResolver *resolver),
       // Convert an expression to C/C++
       *makeCexpression(const char *expr, const char *prefix, const char *suffix,
 		       bool toUpper, std::string &out);

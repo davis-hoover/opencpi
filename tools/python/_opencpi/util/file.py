@@ -116,12 +116,15 @@ def set_vars_from_make(mk_file_and_dir, mk_arg="", verbose=None):
                        print both stdout and stderr for user to see
     """
     with open(os.devnull, 'w') as fnull:
-        make_exists = subprocess.Popen(["which", "make"],
-                      stdout=subprocess.PIPE, stderr=fnull).communicate()[0]
-        if make_exists is None or make_exists == "":
-            if verbose != None and verbose != "":
-                logging.error("The '\"make\"' command is not available.")
-            return 1
+        # This check is not worth the overhead, vs a "make not found" error.
+        # FIXME: put this check in some more universal place done once,
+        # e.g. at installation time, but inside this function.
+        # make_exists = subprocess.Popen(["which", "make"],
+        #               stdout=subprocess.PIPE, stderr=fnull).communicate()[0]
+        # if make_exists is None or make_exists == "":
+        #     if verbose != None and verbose != "":
+        #         logging.error("The '\"make\"' command is not available.")
+        #     return 1
 
         # If log level >= 10 set OCPI_DEBUG_MAKE=1 (max debug level)
         ocpi_log_level = int(os.environ.get('OCPI_LOG_LEVEL', 0))
