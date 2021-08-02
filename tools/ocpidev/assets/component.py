@@ -331,7 +331,7 @@ class Component(ShowableComponent):
         super().__init__(directory, name, **kwargs)
 
     @staticmethod
-    def get_package_id(directory):
+    def get_package_id(directory="."):
         """
         Determine the Package id based on the library or project that the Worker resides in.  only
         a component will reside at the top level of a project.
@@ -420,11 +420,13 @@ class Component(ShowableComponent):
                 working_path = Path(project_path, 'components', library)
             else:
                 working_path = Path(project_path, library)
+            if not os.path.exists(working_path):
+                print("Error: Library '" + library + "' does not exist")
+                exit(1)
         elif hdl_library:
             working_path = Path(project_path, 'hdl', hdl_library)
         elif platform:
-            working_path = Path(
-                project_path, 'hdl', 'platforms', platform, 'devices')
+            working_path = Path(project_path, 'hdl', 'platforms', platform, 'devices')
         elif project:
             working_path = project_path
         elif cur_dirtype == "hdl-platform":
@@ -433,7 +435,7 @@ class Component(ShowableComponent):
             if ocpiutil.get_dirtype("components") == "libraries":
                 ocpiutil.throw_specify_lib_e()
             working_path = Path(working_path, 'components')
-        
+ 
         specs_path = Path(working_path, 'specs')
         if not specs_path.exists() and not ensure_exists:
             os.makedirs(specs_path)
@@ -452,7 +454,11 @@ class Component(ShowableComponent):
                     return str(path)
             err_msg = 'Unable to find component "{}" in directory {}'.format(
                 name, directory)
-            raise ocpiutil.OCPIException(err_msg)
+            print(err_msg)
+            exit(1)
+            # An exception now will just call the bash code
+            # TODO: replace print/exit with OCPIException
+            #raise ocpiutil.OCPIException(err_msg)
 
         path = Path(directory, name)
         path_stem = path.stem
@@ -482,9 +488,6 @@ class Component(ShowableComponent):
         Static method to create a new Component, aka spec
         """
         verbose = kwargs.get("verbose", True)
-        if verbose:
-            projdir = ocpiutil.get_path_to_project_top()
-            print("Executing the 'create component' method for project " + projdir)
         sub_lib = kwargs.get("library", None)
         hdl_lib = kwargs.get("hdl_library", None)
         proj = kwargs.get("project", True)
