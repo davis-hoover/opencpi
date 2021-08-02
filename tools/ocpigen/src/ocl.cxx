@@ -511,7 +511,7 @@ parseOcl() {
       (err = OE::getNumber(m_xml, "requiredWorkGroupSize", &m_requiredWorkGroupSize)))
     return err;
   const char *lang = ezxml_cattr(m_xml, "Language");
-  if (lang && strcasecmp(lang, "cl"))
+  if (lang && strcasecmp(lang, "ocl"))
     return OU::esprintf("For an OCL worker, language \"%s\" is invalid", lang);
   ezxml_t xctl;
   if ((err = parseSpec()) ||
