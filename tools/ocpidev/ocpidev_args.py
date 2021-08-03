@@ -139,8 +139,8 @@ options = {
         'long': '--time-freq',
         'short': '-q'
     },
-    'no_dsp': {
-        'long': '--no-dsp',
+    'no_sdp': {
+        'long': '--no-sdp',
         'short': '-u',
         'action': 'store_true'
     },
@@ -526,7 +526,7 @@ verbs = {
                             'core': options['core'],
                             'hdl_part': options['hdl_part'],
                             'time_freq': options['time_freq'],
-                            'no_dsp': options['no_dsp']
+                            'no_sdp': options['no_sdp']
                         }
                     },
                     'primitive': {
