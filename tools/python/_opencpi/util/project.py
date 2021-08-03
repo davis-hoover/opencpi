@@ -566,7 +566,7 @@ def get_ocpidev_working_dir(noun, name, ensure_exists=True, **kwargs):
         if noun == 'project':
         # Check if project ID passed as a name
             project_registry = get_project_registry_dir()[1]
-            project_path = Path(project_registry, name).resolve()
+            project_path = Path(project_registry, name).absolute()
             if is_path_in_project(str(project_path)):
                 return str(project_path)
         raise OCPIException("Path \"" + os.path.realpath(".") + "\" is not in a project, " +
@@ -624,7 +624,7 @@ def get_ocpidev_working_dir(noun, name, ensure_exists=True, **kwargs):
         raise OCPIException(err_msg)
         # pylint:enable=undefined-variable
 
-    return str(Path(asset_dir).resolve())
+    return str(Path(asset_dir).absolute())
 
 def throw_not_valid_dirtype_e(valid_loc):
     """

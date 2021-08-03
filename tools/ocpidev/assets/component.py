@@ -438,7 +438,7 @@ class Component(ShowableComponent):
  
         specs_path = Path(working_path, 'specs')
         if not specs_path.exists() and not ensure_exists:
-            os.makedirs(specs_path)
+            os.makedirs(str(specs_path))
         working_dir = Component.get_filename(
             str(specs_path), name, ensure_exists)
         return working_dir

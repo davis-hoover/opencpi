@@ -457,7 +457,7 @@ def change_dir(directory):
     if directory != orig_dir:
         try:
             directory = Path(directory).resolve()
-            os.chdir(directory)
+            os.chdir(str(directory))
         except FileNotFoundError:
             err_msg = 'directory {} does not exist'.format(directory)
         except NotADirectoryError:
