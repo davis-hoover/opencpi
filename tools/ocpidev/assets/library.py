@@ -143,6 +143,18 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         self.wkr_names = ret_wkrs
         return (ret_tests, ret_wkrs)
 
+    @staticmethod
+    def get_workers(directory="."):
+        workers = []
+        mkf=ocpiutil.get_makefile(directory,"library")
+        make_dict = ocpiutil.set_vars_from_make(mkf,
+          mk_arg="ShellLibraryVars=1 showlib", verbose=True)
+        wkrs = make_dict["Workers"]
+        for name in wkrs:
+            if name.endswith((".rcc", ".rcc/", ".hdl", ".hdl/")):
+                workers.append(name + " ")
+        return (workers)
+
     def run(self):
         """
         Runs the Library with the settings specified in the object.  Throws an exception if the
@@ -251,6 +263,7 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         """
         Create library asset
         """
+        verbose = kwargs.get("verbose", None)
         lib_path = Path(directory, name)
         if lib_path.exists():
             err_msg = 'library "{}" already exists at "{}"'.format(name, str(lib_path))
@@ -261,7 +274,12 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         template_dict = Library._get_template_dict(name, directory, **kwargs)
         template = jinja2.Template(ocpitemplate.LIB_DIR_XML, trim_blocks=True)
         ocpiutil.write_file_from_string(name + ".xml", template.render(**template_dict))
-
+        workers = str(Library.get_workers())[1:-1] + "\n"
+        package_id = Library.get_package_id() + "." + name
+        logging.debug("Workers: " + workers + "Package_ID: " + package_id)
+        if verbose:
+            print("Created library '" + name + "' at " + str(lib_path))
+        
 
 class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAsset):
     """

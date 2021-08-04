@@ -328,6 +328,15 @@ public:
       mpfString(m_number, s);
     return s.c_str();
   }
+  int64_t getNumber() const {
+    assert(!m_isString);
+    mpz_class z;
+    ocpiCheck(mpf2mpz(m_number, z) == NULL);
+    return z.get_si();
+  }
+  bool getBool() const {
+    return m_isString ? !m_string.empty() : getNumber() != 0;
+  }
   const char
   *reduce(ExprToken *start, ExprToken *&end, bool parens = false),
     *parse(const char *buf, const char *end, ExprToken *&tokens, const IdentResolver *resolve);
@@ -655,6 +664,26 @@ parseExprNumber(const char *a, size_t &np, std::string *expr, const IdentResolve
   }
   return err;
 }
+
+// Evaluate the expression, using the resolver, and if the expression was variable,
+// save the expression so it can be reevaluated again later when the values of
+// variables are different.  Check the expression as a boolean, which means if a string,
+// empty is false, non-empty is true, and if a number, 0 is false, non-zero is true.
+const char *
+parseExprBool(const char *a, bool &b, std::string *expr, const IdentResolver *resolver) {
+  ExprValue v;
+  const char *err = evalExpression(a, v, resolver);
+  if (!err) {
+    b = v.getBool();
+    if (expr) {
+      expr->clear();
+      if (v.isVariable())
+	*expr = a; // provide the expression to the caller in a string
+    }
+  }
+  return err;
+}
+
 // Evaluate the expression, using the resolver, and if the expression was variable,
 // save the expression so it can be reevaluated again later when the values of
 // variables are different.
@@ -855,13 +884,14 @@ bool ExprValue::isVariable() const {
 
 int64_t ExprValue::getNumber() const {
   if (!m_numberSet) {
-    assert(!m_internal->m_isString);
-    mpz_class z;
-    ocpiCheck(mpf2mpz(m_internal->m_number, z) == NULL);
+    m_number = m_internal->getNumber();
     m_numberSet = true;
-    m_number = z.get_si();
   }
   return m_number;
+}
+
+bool ExprValue::getBool() const {
+  return m_internal && m_internal->getBool();
 }
 
 const char *ExprValue::getString(std::string &s) const {

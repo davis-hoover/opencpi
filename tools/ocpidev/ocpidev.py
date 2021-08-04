@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import os
 from copy import copy
 from inspect import signature
 from pathlib import Path
@@ -27,9 +28,12 @@ import _opencpi.util as ocpiutil
 import ocpiargparse
 from ocpidev_args import args_dict
 from _opencpi.assets import application
+from _opencpi.assets import test
 import ocpidev_utilization
 import ocpishow 
 import ocpidev_run
+sys.path.append(os.getenv('OCPI_CDK_DIR') + '/scripts/')
+import genProjMetaData
 
 def main():
     """
@@ -61,6 +65,8 @@ def main():
             rc = ocpidev_run.main()
 
     args = postprocess_args(args)
+    verb = args.verb
+    noun = args.noun
 
     do_ocpidev_sh = True
     try:
@@ -85,6 +91,7 @@ def main():
                 method_args[param] = getattr(args, param, '')
             print_cmd(args, asset.directory)
             asset_method(**method_args)
+            metadata(verb, noun)
         except ocpiutil.OCPIException as e:
         # Verb failed in an expected way; don't fall back to ocpidev.sh
             do_ocpidev_sh = False
@@ -98,6 +105,15 @@ def main():
         ocpiutil.logging.error(e)
         sys.exit(1)
 
+
+def metadata(verb=None, noun=None):
+    if not verb in ["create", "delete"]:
+       return
+    if verb == "delete" and noun in ["project", "registry"]:
+       return
+    projdir = ocpiutil.get_path_to_project_top()
+    if ocpiutil.get_dirtype(projdir) == "project":
+        genProjMetaData.main(projdir)
 
 def postprocess_args(args):
     """
@@ -174,6 +190,8 @@ def ocpicreate(args):
         "library": ocpiassets.library.Library,
         "application": ocpiassets.application.Application,
         "component": ocpiassets.component.Component,
+        "protocol": ocpiassets.component.Protocol,
+        "test": ocpiassets.test.Test,
     }
     if args.noun not in class_dict:
     # Noun not implemented by this function; fall back to ocpidev.sh
@@ -181,6 +199,7 @@ def ocpicreate(args):
     directory,name = get_working_dir(args, ensure_exists=False)
     print_cmd(args, directory)
     delattr(args, 'name')
+    verb = args.verb
     args = vars(args)
     noun = args.pop('noun', '')
     try:
@@ -188,6 +207,7 @@ def ocpicreate(args):
     except ocpiutil.OCPIException as e:
         ocpiutil.logging.error(e)
         sys.exit(1)
+    metadata(verb, None)
     sys.exit()
 
 
@@ -207,10 +227,10 @@ def get_working_dir(args, ensure_exists=True):
         if working_path.name != name:
             working_path = Path(working_path, name)
     elif noun == 'project' and args.verb == 'create':
-        working_path = Path(Path.cwd(), name).resolve()
+        working_path = Path(Path.cwd(), name).absolute()
     else:
         working_path = Path(ocpiutil.get_ocpidev_working_dir(
-            noun, name, ensure_exists=ensure_exists, **kwargs)).resolve()
+            noun, name, ensure_exists=ensure_exists, **kwargs)).absolute()
     if noun not in ['registry', 'library', 'project'] or args.verb == 'create':
     # Libraries, projects, and registries want the full path as the directory
         name = working_path.name

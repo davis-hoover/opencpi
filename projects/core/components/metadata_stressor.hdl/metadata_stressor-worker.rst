@@ -73,7 +73,7 @@ The following figure shows a block diagram representation of the HDL implementat
    :alt: Metadata Stressor Block Diagram
    :align: center
 
-   Metadata Stressor HDL Worker Block Digram
+   Metadata Stressor HDL Worker Block Diagram
 
 .. ocpi_documentation_worker::
 

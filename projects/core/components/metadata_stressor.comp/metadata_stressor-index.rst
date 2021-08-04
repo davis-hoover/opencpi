@@ -47,7 +47,7 @@ A block diagram representation of the implementation is given in :numref:`metada
    :alt: Metadata Stressor Component Block Diagram
    :align: center
 
-   Metadata Stressor Component Block diagram
+   Metadata Stressor Component Block Diagram
 
 Interface
 ---------

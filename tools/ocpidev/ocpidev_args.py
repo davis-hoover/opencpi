@@ -208,6 +208,10 @@ options = {
         ],
         'action': 'store_true'
     },
+    'clean_all':{
+        'long': '--clean-all',
+        'action': 'store_true'
+    },
     'hdl': {
         'long': [
             '--hdl',
@@ -222,6 +226,14 @@ options = {
         ],
         'action': 'store_true'
     },
+    'optimize': {
+        'long': '--optimize',
+        'action': 'store_true'
+    },
+    'dynamic': {
+        'long': '--dynamic',
+        'action': 'store_true'
+    },
     'worker': {
         'long': '--worker',
         'short': '-W',
@@ -229,6 +241,8 @@ options = {
     },
     'hdl_rcc_platform': {
         'long': [
+            '--rcc-hdl-platform',
+            '--build-rcc-hdl-platform',
             '--hdl-rcc-platform',
             '--build-hdl-rcc-platform'
         ],
@@ -324,6 +338,8 @@ verbs = {
                     'hdl': options['hdl'],
                     'rcc': options['rcc'],
                     'worker': options['worker'],
+                    'optimize': options['optimize'],
+                    'dynamic': options['dynamic'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
                     'workers_as_needed' : options['workers_as_needed'],
@@ -410,6 +426,7 @@ verbs = {
                     'no_assemblies': options['no_assemblies'],
                     'hdl': options['hdl'],
                     'rcc': options['rcc'],
+                    'clean_all': options['clean_all'],
                     'worker': options['worker'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
@@ -573,6 +590,7 @@ verbs = {
                 'options': {
                     'spec': options['spec'],
                     'library': options['library'],
+                    'hdl_library': options['hdl_library'],
                     'platform': options['platform']
                 }
             },

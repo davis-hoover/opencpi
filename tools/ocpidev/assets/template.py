@@ -340,3 +340,46 @@ COMPONENT_HDL_LIB_XML = ("""<!-- This is the XML file for the hdl/{{hdl_lib}} li
   <!-- Add items here -->
 </library>
 \n""")
+
+PROTOCOL_SPEC_XML = (""" <!-- This is the spec file (OPS) for protocol: {{protocol}}
+     Add <operation> elements for message types.
+     Add protocol summary attributes if necessary to override attributes
+     inferred from operations/messages -->
+<Protocol> <!-- add protocol summary attributes here if necessary -->
+  <!-- Add operation elements here -->
+</Protocol>
+\n""")
+
+TEST_GENERATE_PY = ("""#!/usr/bin/env python3
+
+\"\"\"
+Use this file to generate your input data.
+Args: <list-of-user-defined-args> <input-file>
+\"\"\"
+\n""")
+
+TEST_VERIFY_PY = ("""#!/usr/bin/env python3
+
+\"\"\"
+Use this script to validate your output data against your input data.
+Args: <list-of-user-defined-args> <output-file> <input-files>
+\"\"\"
+\n""")
+
+TEST_VIEW_SH = ("""#!/bin/bash --noprofile
+
+# Use this script to view your input and output data.
+# Args: <list-of-user-defined-args> <output-file> <input-files>
+\n""")
+
+TEST_NAME_TEST_XML = ("""<!-- This is the test xml for testing component "{{test}}" -->
+<Tests UseHDLFileIo='true'>
+  <!-- Here are typical examples of generating for an input port and verifying results
+       at an output port
+  <Input Port='in' Script='generate.py'/>
+  <Output Port='out' Script='verify.py' View='view.sh'/>
+  -->
+  <!-- Set properties here.
+       Use Test='true' to create a test-exclusive property. -->
+</Tests>
+\n""")

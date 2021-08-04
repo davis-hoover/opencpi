@@ -83,9 +83,10 @@ class AssetFactory():
                    "library":       _opencpi.assets.library.Library,
                    "libraries":     _opencpi.assets.library.LibraryCollection,
                    "multi-lib":     _opencpi.assets.library.LibraryCollection,
+                   "protocol":      _opencpi.assets.component.Protocol,
                    "project":       partial(cls.__get_or_create, _opencpi.assets.project.Project),
                    "registry":      partial(cls.__get_or_create, _opencpi.assets.registry.Registry)}
-        
+
         if asset_type not in actions.keys():
             if not asset_type:
                 asset_type = "unknown"
