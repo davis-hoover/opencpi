@@ -178,7 +178,10 @@ def addPrimitives (root, primitives, dirName):
         if a == "lib":
             continue
         built = checkBuilt(dirName + '/' + a)
-        prim = ET.SubElement(root, "primitive")
+        dirtype = ocpiutil.get_dirtype(os.path.join(dirName, a))
+        if dirtype:
+            dirtype = dirtype.split("-")[1]
+            prim = ET.SubElement(root, f"primitive-{dirtype}")
         prim.set('name', a)
         for targetStr in built:
                 target = ET.SubElement(prim, "built")
