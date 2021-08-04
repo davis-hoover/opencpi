@@ -23,6 +23,8 @@ import os
 import sys
 import logging
 from pathlib import Path
+import jinja2
+import _opencpi.assets.template as ocpitemplate
 import json
 import _opencpi.util as ocpiutil
 import _opencpi.hdltargets as hdltargets
@@ -254,6 +256,74 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
             hdl_path.mkdir()
         working_path = Path(hdl_path, 'platforms', name)
         return str(working_path)
+
+    def _get_template_dict(name, directory, **kwargs):
+        """
+        used by the create function/verb to generate the dictionary of viabales to send to the
+        jinja2 template.
+        valid kwargs handled at this level are:
+            platform       (string)      - Platform name
+            comp_lib       (list of str) - Specify ComponentLibraries in Makefile
+            xml_include    (list of str) - Specify XmlIncludeDirs in Makefile
+            include_dir    (list of str) - Specify IncludeDirs in Makefile
+            prim_lib       (list of str) - Specify Libraries in Makefile
+            hdl_part       (string)      - Part name, defalt=xc7z020-1-clg484
+            time_freq      (string)      - Time frequency, default=100e6
+            no_sdp         (bool)        - No SDP (legacy usage)
+        """
+        hdl_part = kwargs.get("hdl_part", None)
+        time_freq = kwargs.get("time_freq", None)
+        no_sdp = kwargs.get("no_sdp", False)
+        use_sdp = True if no_sdp == False else False
+        comp_lib = kwargs.get("comp_lib", None)
+        if comp_lib:
+            comp_lib = " ".join(comp_lib)
+        xml_include = kwargs.get("xml_include", None)
+        if xml_include:
+            xml_include = " ".join(xml_include)
+        include_dir = kwargs.get("include_dir", None)
+        if include_dir:
+            include_dir = " ".join(include_dir)
+        prim_lib = kwargs.get("prim_lib", None)
+        if prim_lib:
+            prim_lib = " ".join(prim_lib)
+        template_dict = {
+                        "platform" : name,
+                        "comp_lib" : comp_lib,
+                        "xml_include" :xml_include,
+                        "include_dir" : include_dir,
+                        "prim_lib" : prim_lib,
+                        "hdl_part": hdl_part,
+                        "time_freq": time_freq,
+                        "use_sdp": use_sdp,
+                        }
+        return template_dict
+
+    @staticmethod
+    def create(name, directory, **kwargs):
+        """
+        Create hdl platform assets
+        """
+        verbose = kwargs.get("verbose", None)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        os.chdir(directory)
+        if os.path.exists(directory+name):
+            err_msg = 'platform "{}" already exists at "{}"'.format(name, str(directory))
+            raise ocpiutil.OCPIException(err_msg)
+
+        template_dict = HdlPlatformWorker._get_template_dict(name, directory, **kwargs)
+        if not os.path.exists("platforms.xml"):
+            template = jinja2.Template(ocpitemplate.HDLPLATFORM_PLATFORMS_XML, trim_blocks=True)
+            ocpiutil.write_file_from_string("platforms.xml", template.render(**template_dict))
+        if not os.path.exists(name):
+            os.mkdir(name)
+        os.chdir(name)
+        template = jinja2.Template(ocpitemplate.HDLPLATFORM_PLATFORM_XML, trim_blocks=True)
+        ocpiutil.write_file_from_string(name + ".xml", template.render(**template_dict))
+        if verbose:
+            print("HDL Platform '" + name + "' was created at", directory)
+
 
 # pylint:enable=too-many-ancestors
 

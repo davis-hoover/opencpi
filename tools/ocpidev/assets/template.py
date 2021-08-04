@@ -310,7 +310,7 @@ APP_APPLICATION_APP_XML = ("""<!-- The {{app}} application xml file -->
 </Application>
 \n""")
 
-COMPONENT_SPEC_XML = (""" <!-- This is the spec file (OCS) for: {{component}}
+COMPONENT_SPEC_XML = ("""<!-- This is the spec file (OCS) for: {{component}}
      Add component spec attributes, like "protocol".
      Add property elements for spec properties.
      Add port elements for i/o ports -->
@@ -319,7 +319,7 @@ COMPONENT_SPEC_XML = (""" <!-- This is the spec file (OCS) for: {{component}}
 </ComponentSpec>
 \n""")
 
-COMPONENT_SPEC_NO_CTRL_XML = (""" <!-- This is the spec file (OCS) for: {{component}}
+COMPONENT_SPEC_NO_CTRL_XML = ("""<!-- This is the spec file (OCS) for: {{component}}
      Add component spec attributes, like "protocol".
      Add property elements for spec properties.
      Add port elements for i/o ports -->
@@ -341,7 +341,7 @@ COMPONENT_HDL_LIB_XML = ("""<!-- This is the XML file for the hdl/{{hdl_lib}} li
 </library>
 \n""")
 
-PROTOCOL_SPEC_XML = (""" <!-- This is the spec file (OPS) for protocol: {{protocol}}
+PROTOCOL_SPEC_XML = ("""<!-- This is the spec file (OPS) for protocol: {{protocol}}
      Add <operation> elements for message types.
      Add protocol summary attributes if necessary to override attributes
      inferred from operations/messages -->
@@ -382,4 +382,47 @@ TEST_NAME_TEST_XML = ("""<!-- This is the test xml for testing component "{{test
   <!-- Set properties here.
        Use Test='true' to create a test-exclusive property. -->
 </Tests>
+\n""")
+
+HDLPLATFORM_PLATFORMS_XML = ("""<!-- To restrict the HDL platforms that are built, you can set the Platforms
+     attribute to the specific list of which ones you want to build, e.g.:
+     Platforms='pf1 pf3'
+     Otherwise all platforms will be built
+     Alternatively, set the ExcludePlatforms attribute to the ones you want to exclude-->
+<hdlplatforms/>
+\n""")
+
+HDLPLATFORM_PLATFORM_XML = ("""<!-- This file defines the {{platform}} HDL platform 
+    Set the "part" attribute to the part (die-speed-package, e.g. xc7z020-1-clg484) for the platform
+    Set this variable to the names of any other component libraries with devices required by this
+    platform. Do not use slashes.  If there is an hdl/devices library in this project, it will be
+    searched automatically, as will "devices" in any projects this project depends on.
+    An example might be something like "our_special_devices", which would exist in this or
+    other projects.-->
+<HdlPlatform Spec="platform-spec"
+{%if hdl_part: %}
+    Part='{{hdl_part}}'>
+{% else %}
+    Part='xc7z020-1-clg484'>
+{% endif %}
+    <SpecProperty Name='platform' Value='{{platform}}'/>
+    <!-- These next two lines must be present in all platforms -->
+    <MetaData Master="true"/>
+    <TimeBase Master="true"/>
+{%if use_sdp: %}
+    <SDP Name='sdp' Master='true'/>
+{% endif %}
+    <!-- Set your time server frequency -->
+    <Device Worker='time_server'>
+{%if time_freq: %}
+        <Property Name='frequency' Value='{{time_freq}}'/>
+{% else %}
+        <Property Name='frequency' Value='100e6'/>
+{% endif %}
+    </Device>
+    <!-- Put any additional platform-specific properties here using <Property> -->
+    <!-- Put any built-in (physically present) devices here using <device> -->
+    <!-- Put any card slots here using <slot> -->
+    <!-- Put ad hoc signals here using <signal> -->
+</HdlPlatform>
 \n""")

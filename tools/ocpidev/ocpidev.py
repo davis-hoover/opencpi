@@ -192,6 +192,7 @@ def ocpicreate(args):
         "component": ocpiassets.component.Component,
         "protocol": ocpiassets.component.Protocol,
         "test": ocpiassets.test.Test,
+        "hdl-platform": ocpiassets.platform.HdlPlatformWorker,
     }
     if args.noun not in class_dict:
     # Noun not implemented by this function; fall back to ocpidev.sh
