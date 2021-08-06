@@ -457,8 +457,7 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
     Returns:
         list of command strings
     """
-    clean_cmd = 'rm -rf * .* 2>/dev/null || true'
-    cmds = [clean_cmd]
+    cmds = []
     try:
         pipeline_id = pipeline.ci_env.root_id
     except:
