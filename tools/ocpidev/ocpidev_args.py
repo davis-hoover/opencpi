@@ -325,8 +325,11 @@ verbs = {
                     'hdl': options['hdl'],
                     'rcc': options['rcc'],
                     'worker': options['worker'],
+                    'optimize': options['optimize'],
+                    'dynamic': options['dynamic'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
+                    'workers_as_needed' : options['workers_as_needed'],
                     'hdl_target': options['hdl_target'],
                     'hdl_platform': options['hdl_platform']
                 }
@@ -414,8 +417,6 @@ verbs = {
                     'hdl': options['hdl'],
                     'rcc': options['rcc'],
                     'worker': options['worker'],
-                    'hdl_rcc_platform': options['hdl_rcc_platform'],
-                    'rcc_platform': options['rcc_platform'],
                     'hdl_target': options['hdl_target'],
                     'hdl_platform': options['hdl_platform']
                 }
