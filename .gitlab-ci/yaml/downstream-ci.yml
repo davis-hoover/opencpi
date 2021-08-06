@@ -5,12 +5,14 @@ workflow:
 trigger-opencpi:
   stage: trigger-opencpi
   trigger:
-    branch: 2402-ci-pipeline-reorg
+    branch: "$CI_OCPI_REF_NAME"
     project: opencpi/opencpi
   variables:
     CI_SOURCE_REPOSITORY_URL: "$CI_REPOSITORY_URL"
     CI_SOURCE_COMMIT_REF_NAME: "$CI_COMMIT_REF_NAME"
     CI_SOURCE_PROJECT_NAME: "$CI_PROJECT_NAME"
-
+    CI_PLATFORMS: "$CI_PLATFORMS"
+    CI_MR_PLATFORMS: "$CI_MR_PLATFORMS"
+#TODO: need to pass platforms/MR_platforms
 stages:
 - trigger-opencpi

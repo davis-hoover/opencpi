@@ -116,7 +116,7 @@ def discover_remote_projects(group_id, group_name='opencpi', whitelist=None,
     with urlopen(projects_url) as response:
         project_dicts = load(response)
     for project_dict in project_dicts:
-        project_name = project_dict['path'].lower().split('.')[-1]
+        project_name = project_dict['path']
         project_id = str(project_dict['id'])
         if blacklist:
             if project_name in blacklist or project_id in blacklist:

@@ -464,21 +464,23 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
     except:
         pipeline_id = pipeline.ci_env.pipeline_id
 
-    if pipeline.ci_env.pipeline_root_source == 'pipeline':
-    # Pipeline triggered by another project pipeline; clone and register
-        source_url = pipeline.ci_env.source_repository_url
-        source_ref = pipeline.ci_env.source_commit_ref_name
-        source_name = pipeline.ci_env.source_project_name
-        if '.osp.' in source_name:
-            destination = str(Path('projects', 'osps', source_name))
-        elif '.comp.' in source_name:
-            destination = str(Path('projects', 'comp', source_name)) 
+    if platform.project.url:
+        commit_ref = None
+        try:
+            if pipeline.ci_env.source_project_name == platform.project.name:
+            # If this platform belongs to the project that triggered pipeline,
+            # use the ref from that project
+                commit_ref = pipeline.ci_env.source_commit_ref_name
+        except AttributeError:
+            commit_ref = 'develop'
+        if platform.project.group == 'osp':
+            destination = str(Path('projects', 'osps', platform.project.name))
         else:
-            destination = str(Path('projects', source_name))
+            destination = str(Path('projects', platform.name))
         cmd = ' '.join([
             'git clone --depth 1 --single-branch --branch',
-            f'"{source_ref}"',
-            f'"{source_url}"', 
+            f'"{commit_ref}"',
+            f'"{platform.project.url}"', 
             f'"{destination}"'
         ])
         cmds.append(cmd)
