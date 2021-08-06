@@ -31,7 +31,9 @@ def main():
     # Get projects
     project_blacklist = [ci_env.project_id]
     project_whitelist = ['core', 'assets', 'assets_ts', 'inactive', 'platform',
-                         'plutosdr', 'e3xx', 'sockit cv', 'adrv936x', 'sdr', 'ettus']
+                         'ocpi.osp.plutosdr', 'ocpi.osp.e3xx', 
+                         'ocpi.osp.sockit cv', 'ocpi.osp.adrv936x', 
+                         'ocpi.comp.sdr', 'ocpi.osp.ettus']
     projects_path = Path('projects')
     ocpi_group_id = 5378285
     projects = ci_project.discover_projects(projects_paths=projects_path,
@@ -46,6 +48,7 @@ def main():
     platforms = directive.apply_platforms(platforms)
     projects = directive.apply_projects(projects) 
 
+    print('\nPlatforms:')
     for platform in platforms:
         print(platform.name)
         for cross_platform in platform.cross_platforms:
@@ -53,10 +56,15 @@ def main():
             for linked_platform in cross_platform.linked_platforms:
                 print('\t\t', linked_platform.name)
 
+    print('\nProjects:')
+    for project in projects:
+        print(project.name)
+
     # Make pipeline
     pipeline = Pipeline(pipeline_path, ci_env, directive, config=config)
     pipeline.generate(projects, platforms, config=config)
 
+    print('\nJobs:')
     for job in sorted(pipeline._jobs):
         print(job.name)
 
@@ -104,10 +112,10 @@ def set_ci_env():
     Simulates a pipeline environment by setting environment variables.
     This function should not be called except for testing.
     """
-    environ['CI_COMMIT_MESSAGE'] = '[ci centos7]'
+    environ['CI_COMMIT_MESSAGE'] = '[ci adi_plutosdr0_32]'
     environ['CI_PIPELINE_SOURCE'] = 'push'
     environ['CI_ROOT_ID'] = '1'
-    environ['CI_PLATFORM'] = ''
+    environ['CI_PLATFORM'] = 'plutosdr'
     environ['CI_HOST_PLATFORM'] = 'centos7'
     environ['CI_DEFAULT_HOSTS'] = 'centos7'
     environ['CI_PLATFORMS'] = ''
@@ -119,12 +127,16 @@ def set_ci_env():
     environ['CI_COMMIT_REF_NAME'] = 'develop'
     environ['CI_PROJECT_TITLE'] = 'opencpi'
     environ['CI_PROJECT_ID'] = '12747880'
-    environ['CI_RUNNER_ID'] = '1274481'
-    environ['CI_DIRECTIVE'] = 'centos7'
-    environ['CI_OCPI_REF'] = 'develop'
+    # environ['CI_RUNNER_ID'] = '1274481'
+    # environ['CI_DIRECTIVE'] = 'centos7 adi_plutosdr0_32'
+    # environ['CI_OCPI_REF'] = 'develop'
     # environ['CI_OSP_REF'] = 'develop'
-    environ['CI_UPSTREAM_ID'] = '2'
-    environ['CI_REPOSITORY_URL'] = 'https://gitlab.com/opencpi/opencpi.git'
+    # environ['CI_UPSTREAM_ID'] = '2'
+    # environ['CI_REPOSITORY_URL'] = 'https://gitlab.com/opencpi/opencpi.git'
+    # environ['CI_SOURCE_REPOSITORY_URL'] = 'www.pluto.com'
+    # environ['CI_SOURCE_COMMIT_REF_NAME'] = '666-branch-of-the-beast'
+    # environ['CI_SOURCE_PROJECT_NAME'] = 'ocpi.osp.plutosdr'
+    # environ['CI_PIPELINE_ROOT_SOURCE'] = 'pipeline'
 
 
 if __name__ == '__main__':
