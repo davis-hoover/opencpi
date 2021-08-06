@@ -63,8 +63,7 @@ def trigger_project(project, pipeline, stage='trigger-projects',
     return job
 
 
-def trigger_platform(host_platform, cross_platform, pipeline, 
-                     generate_job=None):
+def trigger_platform(host_platform, cross_platform, pipeline, generate_job):
     """Creates a trigger job to launch a pipeline for a platform
 
     Creates a trigger for a child pipeline if platform is local or calls
@@ -84,33 +83,32 @@ def trigger_platform(host_platform, cross_platform, pipeline,
     stage = 'trigger-platforms'
     overrides = pipeline.get_platform_overrides(cross_platform)
 
-    if cross_platform.project.path or pipeline.group_name == 'comp':
+    # if cross_platform.project.path or pipeline.group_name == 'comp':
     # Platform is local; make job to trigger child pipeline
-        if not generate_job:
-            raise Exception(
-                'A generate job must be passed for triggering child pipelines')
+        # if not generate_job:
+        #     raise Exception(
+        #         'A generate job must be passed for triggering child pipelines')
 
-        name = ci_job.make_name(cross_platform, host_platform=host_platform)
+    name = ci_job.make_name(cross_platform, host_platform=host_platform)
 
-        # Set include
-        artifacts = generate_job.artifacts['paths']
-        include = []
-        for artifact in artifacts:
-            include.append({
-                'artifact': str(artifact),
-                'job': generate_job.name
-            })
+    # Set include
+    artifacts = generate_job.artifacts['paths']
+    include = []
+    for artifact in artifacts:
+        include.append({
+            'artifact': str(artifact),
+            'job': generate_job.name
+        })
 
-        # Set trigger
-        trigger = {}
-        trigger['include'] = include
-        trigger['strategy'] = 'depend'
+    # Set trigger
+    trigger = {}
+    trigger['include'] = include
+    trigger['strategy'] = 'depend'
 
-        job = ci_job.Job(name, stage=stage, trigger=trigger, 
-                         overrides=overrides)
-    else:
-    # Platform is remote; make job to trigger downstream pipeline
-        job = trigger_project(cross_platform.project, pipeline, 
-                              stage=stage, overrides=overrides)
+    job = ci_job.Job(name, stage=stage, trigger=trigger, overrides=overrides)
+    # else:
+    # # Platform is remote; make job to trigger downstream pipeline
+    #     job = trigger_project(cross_platform.project, pipeline, 
+    #                           stage=stage, overrides=overrides)
 
     return job
