@@ -251,8 +251,8 @@ HdlAddPlatform=\
       $(foreach r,$(patsubst %/exports,%,$(patsubst %/hdl/platforms,%,$(patsubst %/,%,$(dir $1)))),\
         $(eval HdlPlatformPackageID_$2:=$(call OcpiGetProjectPackageID,$r).$2)) \
       $(if $(or \
-             $(call OcpiExists,$3/lib/hdl/$(HdlFamily_$(HdlPart_$2))),\
-             $(call OcpiExists,$3/hdl/$(HdlFamily_$(HdlPart_$2)))),\
+             $(call OcpiExists,$3/lib/hdl/$(call HdlGetFamily,$(HdlPart_$2))),\
+             $(call OcpiExists,$3/hdl/$(call HdlGetFamily,$(HdlPart_$2)))),\
         $(eval HdlBuiltPlatforms+=$2)),\
       $(call $(if $(filter $2,$(HdlPlatforms) $(HdlPlatform) $(OCPI_HDL_PLATFORM)),$(HdlError),warning),$(strip \
         HDL Platform '$2' was specified by user, but an appropriate HDL family cannot be \
