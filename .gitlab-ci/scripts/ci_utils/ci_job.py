@@ -483,10 +483,9 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
             f'"{destination}"'
         ])
         cmds.append(cmd)
-
-        register_cmd = make_ocpidev_cmd(
-            'register', path=destination, noun='project')
-        cmds.append(register_cmd)
+        do_register = True
+    else:
+        do_register = False
     
     # if pipeline_id:
     # # In triggered pipeline
@@ -588,6 +587,10 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
 
     source_cmd = 'source cdk/opencpi-setup.sh -e'
     cmds.append(source_cmd)
+    if do_register:
+        register_cmd = make_ocpidev_cmd(
+            'register', path=destination, noun='project')
+        cmds.append(register_cmd)
 
     # if do_register:
     #     if platform.project.group == 'osp':
