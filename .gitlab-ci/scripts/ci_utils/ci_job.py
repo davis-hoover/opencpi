@@ -463,7 +463,7 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
     except:
         pipeline_id = pipeline.ci_env.pipeline_id
 
-    if platform.project.url:
+    if platform.project.url and stage != 'generate-children':
         commit_ref = None
         try:
             if pipeline.ci_env.source_project_name == platform.project.name:
@@ -484,10 +484,9 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
         ])
         cmds.append(cmd)
 
-        if stage != 'generate-children':
-            register_cmd = make_ocpidev_cmd(
-                'register', path=destination, noun='project')
-            cmds.append(register_cmd)
+        register_cmd = make_ocpidev_cmd(
+            'register', path=destination, noun='project')
+        cmds.append(register_cmd)
     
     # if pipeline_id:
     # # In triggered pipeline

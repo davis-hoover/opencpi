@@ -1,118 +1,35 @@
-build:centos7:
-  after_script:
-  - date
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload 1 "$CI_JOB_NAME" -t "failed-job"; fi
-  - rm -rf * .* 2>/dev/null || true
-  before_script:
-  - touch .timestamp
-  - .gitlab-ci/scripts/ci_artifacts.py download 1 -i "*centos7.tar.gz" -e "build:*" "test:*" "generate-children:*" "trigger-platforms:*" "trigger-projects:*" "deploy:*"
-  - sleep 2
-  - touch .timestamp
-  dependencies: []
-  retry:
-    max: '1'
-  script:
-  - scripts/build-opencpi.sh centos7
-  - .gitlab-ci/scripts/ci_artifacts.py upload 1 "$CI_JOB_NAME" -s .timestamp -t "successful-job"
-  - touch .success
-  stage: build
-  tags:
-  - centos7
-  - shell
-  - opencpi
-  - aws
-centos7:adi_plutosdr0_32:
-  stage: trigger-platforms
+workflow:
+  rules:
+    - when: always
+
+trigger-children:
+  stage: trigger-children
   trigger:
     include:
     - artifact: .gitlab-ci.yml
-      job: generate-children:centos7:adi_plutosdr0_32
+      job: generate-children
     strategy: depend
-generate-children:centos7:adi_plutosdr0_32:
+  variables:
+    CI_ROOT_SOURCE: "$CI_PIPELINE_SOURCE"
+    CI_ROOT_ID: "$CI_PIPELINE_ID"
+generate-children:
   artifacts:
     paths:
     - .gitlab-ci.yml
-  before_script:
-  - yum install epel-release -y
-  - yum install python36-PyYAML -y
-  - yum install git -y
-  - git clone --depth 1 --single-branch --branch "develop" "https://gitlab.com/opencpi/osp/ocpi.osp.plutosdr.git" "projects/osps/ocpi.osp.plutosdr"
-  - ocpidev register project "projects/osps/ocpi.osp.plutosdr"
-  - touch .timestamp
   image: centos:7
   script:
+  - yum install epel-release -y
+  - yum install python36-PyYAML -y
   - .gitlab-ci/scripts/ci_yaml_generator.py
   stage: generate-children
   tags:
   - docker
-  variables:
-    CI_DIRECTIVE: adi_plutosdr0_32
-    CI_HOST_PLATFORM: centos7
-    CI_PLATFORM: adi_plutosdr0_32
-    CI_ROOT_ID: '1'
-packages:centos7:
-  after_script: []
-  before_script: []
-  dependencies: []
-  image: centos:7
-  retry:
-    max: '1'
-  script: scripts/install-packages.sh centos7
-  stage: prereqs
-  tags:
-  - docker
-prereqs:centos7:
-  after_script:
-  - date
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload 1 "$CI_JOB_NAME" -t "failed-job"; fi
-  - rm -rf * .* 2>/dev/null || true
-  before_script:
-  - touch .timestamp
-  dependencies: []
-  retry:
-    max: '1'
-  script:
-  - scripts/install-prerequisites.sh centos7
-  - .gitlab-ci/scripts/ci_artifacts.py upload 1 "$CI_JOB_NAME" -s .timestamp -t "successful-job"
-  - touch .success
-  stage: prereqs
-  tags:
-  - centos7
-  - shell
-  - opencpi
-  - aws
 stages:
-- prereqs
-- build
-- test
+- .pre
 - generate-children
-- trigger-platforms
-- trigger-projects
+- trigger-children
+- build
 - deploy
-test:centos7:
-  after_script:
-  - date
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload 1 "$CI_JOB_NAME" -t "failed-job"; fi
-  - rm -rf * .* 2>/dev/null || true
-  before_script:
-  - touch .timestamp
-  - .gitlab-ci/scripts/ci_artifacts.py download 1 -i "*centos7.tar.gz" -e "test:*" "generate-children:*" "trigger-platforms:*" "trigger-projects:*" "deploy:*"
-  - sleep 2
-  - touch .timestamp
-  - source cdk/opencpi-setup.sh -e
-  dependencies: []
-  retry:
-    max: '1'
-  script:
-  - scripts/test-opencpi.sh --no-hdl
-  - .gitlab-ci/scripts/ci_artifacts.py upload 1 "$CI_JOB_NAME" -s .timestamp -t "successful-job"
-  - touch .success
-  stage: test
-  tags:
-  - centos7
-  - shell
-  - opencpi
-  - aws
-workflow:
-  rules:
-  - when: always
+include: 
+- .gitlab-ci/yaml/verify-pipeline.yml
+- .gitlab-ci/yaml/docs.yml
