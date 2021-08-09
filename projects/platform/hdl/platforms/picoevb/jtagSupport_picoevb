@@ -1,0 +1,174 @@
+#!/bin/bash --noprofile
+
+# This file is protected by Copyright. Please refer to the COPYRIGHT file
+# distributed with this source distribution.
+#
+# This file is part of OpenCPI <http://www.opencpi.org>
+#
+# OpenCPI is free software: you can redistribute it and/or modify it under the
+# terms of the GNU Lesser General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Lesser General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
+################################################################################
+# jtag support functions for picoevb:
+# Be sure to write error messages to stderr since some funtions return
+# data on stdout
+################################################################################
+source $OCPI_CDK_DIR/scripts/util.sh
+func=$1
+temp=$2
+dir=`dirname $0`
+#echo bitfile=$1 device=$2 part=$3 esn=$4 position=$5 temp=$6
+
+setVarsFromMake $OCPI_CDK_DIR/include/hdl/xilinx.mk ShellIseVars=1 $verbose
+# Xilinx lab tools are not required for now.
+# # [ -z "$OcpiXilinxLabToolsDir" ] && {
+# #   echo "Error: Could not find the directory for XILINX LabTools or ISE."
+# #   exit 1
+# # }
+openocd="$OCPI_ROOT_DIR/runtime/hdl-support/xilinx/cfgFiles_openocd/openocd"
+if test ! -x $openocd; then
+  echo Error: OpenOCD executable not found at $openocd 1>&2
+  exit 1
+fi
+fpgaCFG="$OCPI_ROOT_DIR/runtime/hdl-support/xilinx/cfgFiles_openocd/fpga.cfg"
+if test ! -r $fpgaCFG; then
+  echo Error: OpenOCD FPGA config files not found at $fpgaCFG 1>&2
+  exit 1
+fi
+bitFileLOC="$OCPI_ROOT_DIR/runtime/hdl-support/xilinx/cfgFiles_openocd"
+if test ! -w $bitFileLOC; then
+  echo Error: Unable to create temp bitfile at $bitFileLOC 1>&2
+  exit 1
+fi
+
+function good {
+  rm -f $temps $temp.log
+  exit 0
+}
+function bad {
+  rm -f $temps
+  if test -f $temp.log; then
+     echo Dump of $temp.log:
+     echo "*******************************************************************************"
+     cat $temp.log
+     echo "*******************************************************************************"
+  fi
+  exit 1
+}
+
+################################################################################
+# Now we do individual functions
+################################################################################
+case $func in
+  (cables)
+################ 
+# BYPASS 
+################ 
+#     TEST_FILE=/etc/udev/rules.d/xusbdfwu.rules
+#     if test ! -f $TEST_FILE; then
+#       echo Could not find UDEV rules file necessary for ML605 JTAG-over-USB usage: $TEST_FILE. Please rerun the Xilinx ISE cable driver setup process described in FPGA_Vendor_Tools_Installation_Guide.pdf 1>&2
+#       exit 1 # don't use bad because we don't want to dump the log
+#     fi
+#     $imp -batch > $temp.log <<EOF
+# listusbcables
+# EOF
+#     # impact doesn't have reliable exit codes
+#     CABLES=`grep '^port=' < $temp.log | \
+#         sed 's/port= *\([^ ]*\) *, *esn= *\([^ ]*\) *$/\1=\2~/'`
+#     if test $? != 0 -o "$CABLES" = ""; then
+#       echo No Xilinx USB JTAG cables found using the Xilinx \"impact\" tool. 1>&2
+#       bad
+#     fi
+#     echo $CABLES
+    echo "Cables okay"
+    good
+   ;;
+  (unlock)
+#     echo "Telling iMPACT to clear all locks. If you are using a cable in another application, things may fail!" 1>&2
+#     $imp >> $temp.unlock.log <<EOF
+# cleancablelock
+# exit
+# EOF
+    echo "Unlock okay"
+    good
+   ;;
+  (part)
+#     port=$3
+#     part=$4
+#     echo Finding cable position of part \"$part\" on cable at port \"$port\" 1>&2
+#     temps=$temp.part
+#     for pp in 1 2 3 4 5 6 7 8 9; do
+#       [ -n "OCPI_DEBUG_JTAG" ] && echo "Checking part #${pp}..." 1>&2
+#       $imp -batch <<EOF 2> $temp.log 1>&2
+# setMode -bs
+# setCable -p $port
+# identify
+# readidcode -p $pp
+# EOF
+#       if test $? = 0; then
+#          [ -n "OCPI_DEBUG_JTAG" ] && echo "Device found: See $temp.log.${pp}" 1>&2 && cp $temp.log{,.${pp}}
+#          ed $temp.log <<EOF > /dev/null 2>&1
+#            $
+#            ?IDCODE?+
+#            s/^.*Xilinx \([^,]*\),.*\$/\1/p
+#            1,-d
+#            2,\$d
+#            w $temp.part
+# EOF
+#          if test $? = 0 -a "`cat $temp.part`" == $part; then
+#            echo $pp
+#            good
+#          fi
+#        else
+#          [ -n "OCPI_DEBUG_JTAG" ] && echo "Bad return. $temp.log.${pp} MIGHT exist." 1>&2 && cp $temp.log{,.${pp}} || :
+#          break
+#        fi
+#     done
+#     echo Error: did not find part $part in the jtag chain for cable $port. 1>&2
+#     bad
+    echo "Part okay"
+    good
+    ;;
+  (load)
+#     port=$3
+#     pos=$4
+    bitfile=$5
+    case $bitfile in
+     (*.bit) ;;
+     (*)
+#        tempfile=$temp.bit
+#        temps+=$tempfile
+#        echo Creating link with the ISE impact command\'s expected suffix '".bit"': $tempfile '->' $bitfile
+#        ln -s $bitfile $tempfile
+#        if test $? != 0; then
+#          bad
+#        fi
+#        bitfile=$tempfile
+       echo "Error - expecting bit file"
+       bad
+       ;;
+    esac
+    cp $bitfile -f $bitFileLOC/fpgaBitFile.bit
+    $openocd -f $fpgaCFG -d3 --search $bitFileLOC
+
+    if test $? != 0; then
+      echo "-n Error: OpenOCD FPGA programming failed!"
+      bad
+    else
+      echo "-n Error: OpenOCD FPGA programming succeeded!"
+    fi
+    good
+    ;;
+esac
+echo Unknown JTAG function $func 1>&2
+exit 1

@@ -16,4 +16,4 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-HdlPart_picoevb=xc7a50t-3-cpg236
+HdlPart_picoevb=xc7a50t-2-csg325
