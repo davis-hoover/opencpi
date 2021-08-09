@@ -484,9 +484,10 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
         ])
         cmds.append(cmd)
 
-        register_cmd = make_ocpidev_cmd(
-            'register', path=destination, noun='project')
-        cmds.append(register_cmd)
+        if stage != 'generate-children':
+            register_cmd = make_ocpidev_cmd(
+                'register', path=destination, noun='project')
+            cmds.append(register_cmd)
     
     # if pipeline_id:
     # # In triggered pipeline
