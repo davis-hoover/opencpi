@@ -297,12 +297,12 @@ def make_generate(host_platform, cross_platform, pipeline):
     except:
         variables['CI_ROOT_ID'] = pipeline.ci_env.pipeline_id
     try:
-        keys = ['CI_SOURCE_REPOSITORY_URL',
+        keys = [#'CI_SOURCE_REPOSITORY_URL',
                 'CI_SOURCE_COMMIT_REF_NAME',
                 'CI_SOURCE_PROJECT_NAME']
-        values = [pipeline.ci_env.repository_url,
-                  pipeline.ci_env.commit_ref_name,
-                  pipeline.ci_env.project_name]
+        values = [#pipeline.ci_env.source_repository_url,
+                  pipeline.ci_env.source_commit_ref_name,
+                  pipeline.ci_env.source_project_name]
         for key,value in zip(keys,values):
             variables[key] = value
     except AttributeError:
