@@ -440,11 +440,11 @@ OCPI_DATA_TYPES
 	  m_sdp = true;
 	  // almost none of these apply when the SDP is active.
 	  m_memorySize =
-	    m_properties.get32Register(memory_bytes, SDP::Properties);
+	    getProperty32Register(memory_bytes, SDP::Properties);
 	  myDataOffset =
-	    m_properties.get8Register(sdp_id, SDP::Properties) *
-	    (1u << m_properties.get8Register(window_log2, SDP::Properties));
-	  ocpiDebug("SDP ID: %u:0x%zx", m_properties.get8Register(sdp_id, SDP::Properties), myDataOffset);
+	    getProperty8Register(sdp_id, SDP::Properties) *
+	    (1u << getProperty8Register(window_log2, SDP::Properties));
+	  ocpiDebug("SDP ID: %u:0x%zx", getProperty8Register(sdp_id, SDP::Properties), myDataOffset);
 	  myDesc.metaDataPitch      = 0;
 	  myDesc.metaDataBaseAddr   = 0; //m_properties.physOffset(offsetof(SDP::Properties,
 	                                 //       metadata));
@@ -452,12 +452,9 @@ OCPI_DATA_TYPES
 	    myDesc.fullFlagBaseAddr =
 	      m_properties.physOffset(offsetof(SDP::Properties, remote_doorbell));
 	    ocpiInfo("Input remote doorbell is %zu", offsetof(SDP::Properties, remote_doorbell));
-	    //	      device.dAccess().physOffset(myDataOffset) + SDP::Propertiesc_flag_offset;
 	    myDesc.metaDataBaseAddr =
 	      m_properties.physOffset(offsetof(SDP::Properties, remote_doorbell));
-	    //	      device.dAccess().physOffset(myDataOffset) + SDP::c_metadata_offset;
 	    myDesc.emptyFlagBaseAddr = 0;
-	    //	      m_properties.physOffset(offsetof(SDP::Properties, available_count));
 	  } else {
 	    // sdp sender.
 	    // ActiveMessage:     empty flag from other side says other side's buffer is empty
@@ -565,11 +562,11 @@ OCPI_DATA_TYPES
 	  myDesc.dataBufferPitch =
 	    OCPI_UTRUNCATE(uint32_t,
 			   OU::roundUp(myDesc.dataBufferSize,
-				       m_properties.get8Register(sdp_width, SDP::Properties) *
+				       getProperty8Register(sdp_width, SDP::Properties) *
 				       SDP::BYTES_PER_DWORD));
 	  required = myDesc.nBuffers * myDesc.dataBufferPitch;
 	  unsigned
-	    maxBuffers = m_properties.get8Register(max_buffers, SDP::Properties),
+	    maxBuffers = getProperty8Register(max_buffers, SDP::Properties),
 	    limit = std::min(maxBuffers, SDP::MAX_READS_OUTSTANDING);
 	  if (myDesc.nBuffers > limit)
 	    throw OU::Error("Requested buffer count(%u) on port '%s' of worker '%s' "
@@ -676,7 +673,7 @@ OCPI_DATA_TYPES
 	    m_properties.set32Register(remote_flag_value, SDP::Properties, 
 				       isProvider() ?
 				       other.desc.emptyFlagValue : other.desc.fullFlagValue);
-	    unsigned maxBuffers = m_properties.get8Register(max_buffers, SDP::Properties);
+	    unsigned maxBuffers = getProperty8Register(max_buffers, SDP::Properties);
 	    if (other.desc.nBuffers > maxBuffers)
 	      throw OU::Error("Requested buffer count(%u) for the other end of connection from "
 			      "port '%s' of worker '%s' exceeds the SDP implementation limit of %u",

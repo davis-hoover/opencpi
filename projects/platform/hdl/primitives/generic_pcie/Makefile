@@ -21,17 +21,15 @@
 
 include $(OCPI_CDK_DIR)/include/hdl/xilinx.mk
 
-ExcludeTargets=zynq zynq_ise zynq_ultra isim xsim virtex5 virtex6 modelsim stratix4 stratix5 cyclone arria10soc arria10soc_std
+OnlyTargets=artix7
 
-# HdlLibraries= ocpi axi sdp platform
-HdlLibraries= ocpi axi sdp platform
+HdlLibraries= ocpi axi sdp platform cdc
 
-VivadoPcieTargets= artix7 
+VivadoPcieTargets= artix7
 OnlyTargets=$(VivadoPcieTargets)
 
 # We need to include this file before hdl-library.mk to preprocess the platforms and targets (at least)
 include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk
-# $(eval $(HdlPreprocessTargets))
 
 XilinxCoreName=axi_pcie
 ################################################################################
@@ -39,19 +37,15 @@ XilinxCoreName=axi_pcie
 ISEWrapperModule=$(XilinxCoreName)
 
 ################################################################################
-# Vivado method of getting the IP core.  We let tcl determine the version and get the wrapper
 VivadoIpDir=$(call OcpiXilinxVivadoDir,infox)/data/ip/xilinx
-# Core name is derived from the wrapper name returned by tcl
-# ## VivadoPcieCore=$(VivadoWrapperModule:%_processing_system7=%)
-VivadoPcieCore="$(VivadoWrapperModule)"
-# VivadoPcieSources=$(foreach f,atc aw_atc b_atc trace_buffer w_atc,\
+VivadoPcieCore=axi_pcie_v2_9
 
-VivadoPcieSources=$(foreach f,stub,\
+VivadoPcieSources=$(foreach f,rfs,\
                     $(VivadoIpDir)/$(VivadoPcieCore)/hdl/$(VivadoPcieCore)_$f.vhd) \
                   $(VivadoWrapperFile)
 
-ifeq ($(filter clean%,$(MAKECMDGOALS))$(if $(HdlTargets),,z),)  # if not cleaning and building hdl target
-  ifndef UseISE                            			# if non-ISE targets
+ifeq ($(filter clean%,$(MAKECMDGOALS)),)   # if not cleaning and building hdl target
+  ifndef UseISE                            # if non-ISE targets
     VivadoWrapperFile=$(wildcard gen/synth/$(XilinxCoreName)*.v)
     ifeq ($(VivadoWrapperFile),) # if wrapper-module not determined yet
       $(if $(call DoShell,\
@@ -59,23 +53,18 @@ ifeq ($(filter clean%,$(MAKECMDGOALS))$(if $(HdlTargets),,z),)  # if not cleanin
               (cd tmp && \
                            $(call OcpiXilinxVivadoInit) && \
                            vivado -mode batch -source ../../gen_ip.tcl \
-                                  -tclargs $(XilinxCoreName) xc7a50tcpg236-3 \
-                          ) > gen-pcie.log && \
-                           rm -r -f tmp,MyError),\
-           $(error $(MyError)))
+                                  -tclargs $(XilinxCoreName) xc7a50tcsg325-2 \
+                          ) > gen-pcie.log, MyError), $(error $(MyError))) 
+                          #) > gen-pcie.log && rm -r -f tmp,MyError), $(error $(MyError))) 
     endif # if need to get the wrapper
   endif # if non-ISE targets
   VivadoWrapperModule:=$(basename $(notdir $(VivadoWrapperFile)))
   WrapperModule=$(if $(UseISE),$(ISEWrapperModule),$(VivadoWrapperModule))
   $(info The IP wrapper module name is: $(WrapperModule))
-endif # if not cleaning
+endif # if not cleaning 
 
 # ################################################################################
-# # Generic, VIVADO or ISE
-GenPcieSources=$(wildcard gen/hdl/lib_*) $(wildcard gen/hdl/axi_*)  
-#$(info GenPcieSources: $(GenPcieSources))
-SourceFiles=generic_pcie_pkg.vhd
-# ##### SourceFiles=generic_pcie_pkg.vhd $(GenPcieSources) $(VivadoWrapperFile) generic_pcie.vhd
-# OcpiCPPDefines=$(and $(UseISE),XILINX_ISE=1) PS7_WRAPPER_MODULE=$(WrapperModule)
-#
+GenPcieSources=$(wildcard gen/*_stub.vhdl) $(wildcard gen/*.edf) $(wildcard gen/*.xdc) 
+SourceFiles=generic_pcie_pkg.vhd generic_pcie.vhd $(GenPcieSources)
+
 include $(OCPI_CDK_DIR)/include/hdl/hdl-library.mk

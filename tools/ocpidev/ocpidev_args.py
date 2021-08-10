@@ -139,8 +139,8 @@ options = {
         'long': '--time-freq',
         'short': '-q'
     },
-    'no_dsp': {
-        'long': '--no-dsp',
+    'no_sdp': {
+        'long': '--no-sdp',
         'short': '-u',
         'action': 'store_true'
     },
@@ -150,7 +150,7 @@ options = {
         'action': 'append'
     },
     'exclude_target': {
-        'long': '--exclude_target',
+        'long': '--exclude-target',
         'short': '-Z',
         'action': 'append'
     },
@@ -288,14 +288,20 @@ verbs = {
             'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
             'application': {
                 'options': {
+                    'optimize': options['optimize'],
+                    'dynamic': options['dynamic'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
-                    'rcc_platform': options['rcc_platform']
+                    'rcc_platform': options['rcc_platform'],
+                    'workers_as_needed' : options['workers_as_needed']
                 }
             },
             'applications': {
                 'options': {
+                    'optimize': options['optimize'],
+                    'dynamic': options['dynamic'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
-                    'rcc_platform': options['rcc_platform']
+                    'rcc_platform': options['rcc_platform'],
+                    'workers_as_needed' : options['workers_as_needed']
                 }
             },
             'hdl': {
@@ -377,16 +383,10 @@ verbs = {
         'nouns': {
             'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
             'application': {
-                'options': {
-                    'hdl_rcc_platform': options['hdl_rcc_platform'],
-                    'rcc_platform': options['rcc_platform']
-                }
+                'options': {}
             },
             'applications': {
-                'options': {
-                    'hdl_rcc_platform': options['hdl_rcc_platform'],
-                    'rcc_platform': options['rcc_platform']
-                }
+                'options': {}
             },
             'hdl': {
                 'options': {
@@ -426,11 +426,9 @@ verbs = {
                     'no_assemblies': options['no_assemblies'],
                     'hdl': options['hdl'],
                     'rcc': options['rcc'],
-                    'clean_all': options['clean_all'],
                     'worker': options['worker'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
-                    'workers_as_needed' : options['workers_as_needed'],
                     'hdl_target': options['hdl_target'],
                     'hdl_platform': options['hdl_platform']
                 }
@@ -526,7 +524,7 @@ verbs = {
                             'core': options['core'],
                             'hdl_part': options['hdl_part'],
                             'time_freq': options['time_freq'],
-                            'no_dsp': options['no_dsp']
+                            'no_sdp': options['no_sdp']
                         }
                     },
                     'primitive': {

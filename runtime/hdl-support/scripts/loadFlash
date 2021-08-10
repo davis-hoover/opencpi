@@ -39,7 +39,7 @@ fi
     exit 1
 }
 source $OCPI_CDK_DIR/scripts/util.sh
-if findInProjectPath loadFlash_$1 lib/platforms/$1 pfscript ; then
+if findInProjectPath loadFlash_$1 hdl/platforms/$1 pfscript ; then
   echo Loading the flash memory on the $1 platform attached to the JTAG pod with ESN $3
   echo Loading from file: $2
   # do not require execute permission on the file

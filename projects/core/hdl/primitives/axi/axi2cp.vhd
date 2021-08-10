@@ -57,20 +57,26 @@ architecture rtl of axi2cp_AXI_INTERFACE is
   function read_byte_en(low2addr   : std_logic_vector(1 downto 0);
                         log2nbytes : std_logic_vector(2 downto 0))
     return std_logic_vector is
-    variable mask : std_logic_vector(4 downto 0) := log2nbytes & low2addr;
   begin
-    if unsigned(log2nbytes) >= 2 then
-      return "1111";
+    if low2addr = "00" then
+      if log2nbytes = "000" then
+        return "0001";
+      elsif log2nbytes = "001" then
+        return "0011";
+      else
+        return "1111";
+      end if;
+    elsif low2addr = "01" then
+      return "0010";
+    elsif low2addr = "10" then
+      if log2nbytes = "000" then
+        return "0100";
+      else
+        return "1100";
+      end if;
+    else
+      return "1000";
     end if;
-    case mask is -- log2nbytes & low2addr is
-      when "00000" => return "0001";
-      when "00001" => return "0010";
-      when "00010" => return "0100";
-      when "00011" => return "1000";
-      when "00100" => return "0011";
-      when "00110" => return "1100";
-      when others  => return "0000";
-    end case;
   end read_byte_en;
   type address_state_t is (a_idle_e,   -- nothing is happening
                            a_first_e,  -- first address (or two) is being offered to cp
