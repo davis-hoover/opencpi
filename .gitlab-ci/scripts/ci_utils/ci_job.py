@@ -395,12 +395,10 @@ def make_job(pipeline, stage, stages, platform, project=None, name=None,
     else:
         resource_group = None
     retry = {'max': '1'}
-
     overrides = pipeline.get_platform_overrides(platform)
     job = Job(name, stage, script, tags=tags, before_script=before_script, 
               after_script=after_script, resource_group=resource_group, 
-              dependencies=dependencies, variables=variables, retry=retry,
-              overrides=overrides)
+              dependencies=dependencies, retry=retry, overrides=overrides)
 
     return job
 
