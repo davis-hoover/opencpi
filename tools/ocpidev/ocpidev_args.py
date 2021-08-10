@@ -1,6 +1,21 @@
 from pathlib import Path
 import _opencpi.util as ocpiutil
 
+def get_noun():
+    """
+    Get noun from call to opencpi utility function get_dirtype().
+    Format returned dirtype as needed.
+    """
+    dirtype = ocpiutil.get_dirtype()
+    if dirtype:
+        if dirtype in ['hdl-core', 'hdl-library']:
+        # Command line expects 'hdl-primitive-core' or 'hdl-primitive-library'
+            index = dirtype.find('-')
+            dirtype = dirtype[:index] + '-primitive' + dirtype[index:]
+        dirtype = dirtype.split('-')
+    
+    return dirtype
+
 """Dicts of args to be used by ocpidev.py"""
 
 # Options to be used for pre-processing user args and to reference
@@ -285,7 +300,7 @@ verbs = {
             }
         },
         'nouns': {
-            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
+            'default': get_noun,
             'application': {
                 'options': {
                     'optimize': options['optimize'],
@@ -381,7 +396,7 @@ verbs = {
             }
         },
         'nouns': {
-            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
+            'default': get_noun,
             'application': {
                 'options': {}
             },
@@ -459,7 +474,7 @@ verbs = {
             'keep': options['keep'],
         },
         'nouns': {
-            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
+            'default': get_noun,
             'application': {
                 'options': {
                     'xml_app': options['xml_app'],
@@ -625,7 +640,7 @@ verbs = {
             }
         },
         'nouns': {
-            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
+            'default': get_noun,
             'application': None,
             'component': {
                 'project': options['project'],
@@ -695,7 +710,7 @@ verbs = {
             }
         },
         'nouns': {
-            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
+            'default': get_noun,
             'project': None
         }
     },
@@ -707,7 +722,7 @@ verbs = {
             }
         },
         'nouns': {
-            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
+            'default': get_noun,
             'project': None
         }
     },
@@ -722,7 +737,7 @@ verbs = {
             }
         },
         'nouns': {
-            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
+            'default': get_noun,
             'registry': None
         }
     },
@@ -737,13 +752,13 @@ verbs = {
             }
         },
         'nouns': {
-            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
+            'default': get_noun,
             'project': None
         }
     },
     'unset': {
         'nouns': {
-            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
+            'default': get_noun,
             'registry': None
         }
     },
