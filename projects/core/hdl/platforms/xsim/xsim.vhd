@@ -41,10 +41,10 @@ begin
                 sdp_width  => sdp_width)
     port map(clk => ctl_clk,
              reset => ctl_reset,
-             sdp_in => sdp_in(0),
-             sdp_out => sdp_out(0),
-             sdp_in_data => sdp_in_data(0),
-             sdp_out_data => sdp_out_data(0));
+             sdp_in => sdp_in,
+             sdp_out => sdp_out,
+             sdp_in_data => sdp_in_data,
+             sdp_out_data => sdp_out_data);
 
   props_out.dna               <= (others => '0');
   props_out.nSwitches         <= (others => '0');
