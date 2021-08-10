@@ -94,7 +94,7 @@ class PropertiesDirectiveHandler(docutils.parsers.rst.Directive):
 
         # Property type (e.g. char, short)
         data_type_item = docutils_helpers.list_item_name_code_value(
-            "Variable type", detail["type"]["data_type"])
+            "Type", detail["type"]["data_type"])
         data_type_detail_list = docutils.nodes.bullet_list()
         if "arraydimensions" in detail["type"]:
             array_details = docutils_helpers.list_item_name_code_value(
@@ -136,14 +136,6 @@ class PropertiesDirectiveHandler(docutils.parsers.rst.Directive):
             volatile_details = docutils_helpers.list_item_name_code_value(
                 "Volatile", detail["access"]["volatile"])
             access_details_list.append(volatile_details)
-        if "readsync" in detail["access"]:
-            readsync_details = docutils_helpers.list_item_name_code_value(
-                "Read synchronization", detail["access"]["readsync"])
-            access_details_list.append(readsync_details)
-        if "writesync" in detail["access"]:
-            writesync_details = docutils_helpers.list_item_name_code_value(
-                "Write synchronization", detail["access"]["writesync"])
-            access_details_list.append(writesync_details)
         if "readback" in detail["access"]:
             readback_details = docutils_helpers.list_item_name_code_value(
                 "Read back", detail["access"]["readback"])
