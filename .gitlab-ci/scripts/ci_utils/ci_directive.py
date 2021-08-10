@@ -48,7 +48,7 @@ class Directive():
                             platforms[r_comma].add(l_comma)
                     else:
                         platforms[l_comma] = {}
-        
+
         return platforms
 
     def apply_projects(self, projects):
@@ -143,7 +143,7 @@ class Directive():
             platforms = env.directive
         except:
             # Get platform names from appropriate env var
-            if env.pipeline_source in ['schedule', 'web']:
+            if env.pipeline_source in ['schedule', 'web', 'pipeline']:
                 platforms = env.platforms
             elif env.pipeline_source == 'merge_request_event':
                 platforms = env.mr_platforms

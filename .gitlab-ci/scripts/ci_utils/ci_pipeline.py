@@ -108,14 +108,14 @@ class Pipeline():
                                                      platforms)
             platform = ci_platform.get_platform(self.ci_env.platform, 
                                                 host_platform.cross_platforms)
-            if self.group_name == 'comp':
-            # In comp project pipeline
-                if platform.model == 'rcc':
-                    stages = ['build-assets-comp', 'build-assemblies']
-                else:
-                    stages = ['build-primitives', 'build-assets-comp', 
-                              'build-assemblies', 'build-sdcards', 'test']
-            elif platform.model == 'rcc':
+            # if self.group_name == 'comp':
+            # # In comp project pipeline
+            #     if platform.model == 'rcc':
+            #         stages = ['build-assets-comp', 'build-assemblies']
+            #     else:
+            #         stages = ['build-primitives', 'build-assets-comp', 
+            #                   'build-assemblies', 'build-sdcards', 'test']
+            if platform.model == 'rcc':
             # platform is rcc
                 stages = ['prereqs-rcc', 'build-rcc', 'build-assemblies']
             else:
@@ -133,18 +133,18 @@ class Pipeline():
             platforms = [platform]
 
         # If a comp project, remove all projects except that project
-        if self.group_name == 'comp':
-            projects = [project for project in projects 
-                        if project.name == self.project_name]
+        # if self.group_name == 'comp':
+        #     projects = [project for project in projects 
+        #                 if project.name == self.project_name]
 
         jobs = []
         for platform in platforms:
             # If triggered by upstream pipeline, do not generate jobs
             # to build host platforms. Assume this was done in the
             # upstream pipeline
-            if self.ci_env.pipeline_source != 'pipeline':
-                jobs += ci_job.make_jobs(stages, platform, projects, self,
-                                         host_platform=host_platform)
+            # if self.ci_env.pipeline_source != 'pipeline':
+            jobs += ci_job.make_jobs(stages, platform, projects, self,
+                                        host_platform=host_platform)
 
             for cross_platform in platform.cross_platforms:
                 # If platform is local or project is in COMP group, 
