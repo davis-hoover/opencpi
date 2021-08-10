@@ -7,6 +7,7 @@ trigger-opencpi:
   trigger:
     branch: '2402-ci-pipeline-reorg'
     project: opencpi/opencpi
+    strategy: depend
   variables:
     # CI_SOURCE_REPOSITORY_URL: "$CI_REPOSITORY_URL"
     CI_SOURCE_COMMIT_REF_NAME: "$CI_COMMIT_REF_NAME"
