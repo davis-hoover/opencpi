@@ -177,7 +177,7 @@ def make_rcc_jobs(stages, platform, projects, pipeline, host_platform=None):
             if job:
                 jobs.append(job)
 
-        if stage == 'prereqs' and pipeline.ci_env.project_name == 'opencpi':
+        if stage == 'prereqs':
             name = make_name(platform, stage='packages')
             job = make_job(pipeline, stage, stages, platform, name=name)
             if job:
@@ -389,14 +389,11 @@ def make_job(pipeline, stage, stages, platform, project=None, name=None,
             tags = [host_platform.name, 'shell', 'opencpi']
         if host_platform.name == 'centos7':
             tags.append('aws')
+            
     if do_ocpiremote:
         resource_group = platform.name
     else:
         resource_group = None
-    if stage != 'prereqs' or not name.startswith('packages'):
-        variables = {'GIT_STRATEGY': 'none'}
-    else:
-        variables = None
     retry = {'max': '1'}
 
     overrides = pipeline.get_platform_overrides(platform)
@@ -460,19 +457,6 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
     except:
         pipeline_id = pipeline.ci_env.pipeline_id
 
-    try:
-        ocpi_ref = pipeline.ci_env.ocpi_ref_name
-    except AttributeError:
-        ocpi_ref = pipeline.ci_env.commit_ref_name
-    cmd = ' '.join([
-        'git clone --depth 1 --single-branch --branch',
-        f'"{ocpi_ref}"',
-        f'"{pipeline.ci_env.repository_url}"',
-        f'"{pipeline.ci_env.project_name}"'
-    ])
-    cmds.append(cmd)
-    cmds.append('cd opencpi')
-    
     if platform.project.url and stage != 'generate-children':
         commit_ref = None
         try:
@@ -670,8 +654,7 @@ def make_after_script(pipeline, platform, do_ocpiremote=False):
     Returns:
         list of command strings
     """
-    cd_cmd = f'cd {pipeline.ci_env.project_name}'
-    cmds = [cd_cmd]
+    cmds = []
     script_path = '.gitlab-ci/scripts/ci_artifacts.py'
     success_path = Path('.success')
 
