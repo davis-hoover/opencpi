@@ -5,7 +5,7 @@ workflow:
 trigger-opencpi:
   stage: trigger-opencpi
   trigger:
-    branch: "$CI_OCPI_REF_NAME"
+    branch: '2402-ci-pipeline-reorg'
     project: opencpi/opencpi
   variables:
     # CI_SOURCE_REPOSITORY_URL: "$CI_REPOSITORY_URL"
