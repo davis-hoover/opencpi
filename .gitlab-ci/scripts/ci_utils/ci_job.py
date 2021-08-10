@@ -389,13 +389,14 @@ def make_job(pipeline, stage, stages, platform, project=None, name=None,
             tags = [host_platform.name, 'shell', 'opencpi']
         if host_platform.name == 'centos7':
             tags.append('aws')
-            
     if do_ocpiremote:
         resource_group = platform.name
     else:
         resource_group = None
-
-    variables = {'GIT_STRATEGY': 'none'}
+    if stage != 'prereqs' or not name.startswith('packages'):
+        variables = {'GIT_STRATEGY': 'none'}
+    else:
+        variables = None
     retry = {'max': '1'}
 
     overrides = pipeline.get_platform_overrides(platform)
@@ -466,7 +467,7 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
     cmd = ' '.join([
         'git clone --depth 1 --single-branch --branch',
         f'"{ocpi_ref}"',
-        f'"{pipeline.ci_env.project_url}"',
+        f'"{pipeline.ci_env.repository_url}"',
         f'"{pipeline.ci_env.project_name}"'
     ])
     cmds.append(cmd)
