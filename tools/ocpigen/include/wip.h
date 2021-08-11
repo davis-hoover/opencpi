@@ -180,9 +180,10 @@ class SdpPort : public Port {
 			bool inPackage, bool inWorker, const char *defaultIn,
 			const char *defaultOut);
   void emitVHDLShellPortMap(FILE *f, std::string &last);
-  void emitPortSignal(FILE *f, bool any, const char *indent, const std::string &fName,
-		      const std::string &aname, const std::string &index, bool output,
-		      const Port *signalPort, bool external);
+  void emitPortSignal(std::string *pmaps, bool any, const char *indent, const std::string &fName,
+		      const std::string &aname, const std::string &fIndex,
+		      const std::string &aIndex, size_t count, bool output, const Port *signalPort,
+		      bool external);
   void emitExtAssignment(FILE *f, bool int2ext, const std::string &extName,
 			 const std::string &intName, const Attachment &extAt,
 			 const Attachment &intAt, size_t count) const;

@@ -184,7 +184,7 @@ void DevSignalsPort::
 emitPortSignals(FILE *f, const InstancePort &ip, Language /*lang*/, const char *indent,
 		bool &any, std::string &comment, std::string &last, const char */*myComment*/,
 		std::string &/*exprs*/) {
-  Attachment *at = ip.m_attachments.front();
+  Attachment *at = ip.m_attachments.empty() ? NULL : ip.m_attachments.front();
   Attachment *otherAt = NULL;
   if (at) {
     Connection &c = at->m_connection;
