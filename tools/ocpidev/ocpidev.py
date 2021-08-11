@@ -237,7 +237,7 @@ def get_working_dir(args, ensure_exists=True):
     else:
         working_path = Path(ocpiutil.get_ocpidev_working_dir(
             noun, name, ensure_exists=ensure_exists, **kwargs)).resolve()
-    if noun not in ['registry', 'library', 'project'] or args.verb == 'create':
+    if noun not in ['registry', 'library', 'libraries', 'project'] or args.verb == 'create':
     # Libraries, projects, and registries want the full path as the directory
         name = working_path.name
         working_path = str(working_path.parent)

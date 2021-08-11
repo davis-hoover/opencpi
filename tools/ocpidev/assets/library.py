@@ -366,6 +366,34 @@ class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, Rep
                 lib_directory = directory + "/" + lib
                 self.library_list.append(AssetFactory.factory("library", lib_directory, **kwargs))
 
+    @staticmethod
+    def get_working_dir(name, ensure_exists=True, **kwargs):
+        """
+        return the directory of the Libraries given the name (name) and
+        libraries specifiers (library, hdl_library, hdl_platform)
+        """
+        # if more then one of the library location variables are not None it is an error.
+        # a length of 0 means that a name is required and a default location of components/
+        libraries = kwargs.get('library', '')
+        hdl_library = kwargs.get('hdl_library', '')
+        platform = kwargs.get('platform', '')
+        if len(list(filter(None, [libraries, hdl_library, platform]))) > 1:
+            ocpiutil.throw_invalid_libs_e()
+        ocpiutil.check_no_libs('libraries', libraries, hdl_library, platform)
+        if not name:
+            ocpiutil.throw_not_blank_e('libraries', 'name', True)
+
+        working_path = Path(ocpiutil.get_path_to_project_top())
+        comp_path = Path(working_path, 'components')
+        if name != 'components':
+            if not comp_path.exists() and not ensure_exists:
+                comp_path.mkdir()
+            working_path = Path(comp_path, name)
+        else:
+            working_path = comp_path
+
+        return str(working_path)
+
     def run(self):
         """
         Runs the Library with the settings specified in the object.  Throws an exception if the

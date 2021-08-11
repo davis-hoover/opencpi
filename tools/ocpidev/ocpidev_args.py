@@ -334,6 +334,20 @@ verbs = {
                     'hdl_platform': options['hdl_platform']
                 }
             },
+            'libraries': {
+                'options': {
+                    'hdl': options['hdl'],
+                    'rcc': options['rcc'],
+                    'worker': options['worker'],
+                    'optimize': options['optimize'],
+                    'dynamic': options['dynamic'],
+                    'hdl_rcc_platform': options['hdl_rcc_platform'],
+                    'rcc_platform': options['rcc_platform'],
+                    'workers_as_needed' : options['workers_as_needed'],
+                    'hdl_target': options['hdl_target'],
+                    'hdl_platform': options['hdl_platform']
+                }
+            },
             'project': {
                 'options': {
                     'hdl_assembly': options['hdl_assembly'],
@@ -413,6 +427,15 @@ verbs = {
                 }
             },
             'library': {
+                'options': {
+                    'hdl': options['hdl'],
+                    'rcc': options['rcc'],
+                    'worker': options['worker'],
+                    'hdl_target': options['hdl_target'],
+                    'hdl_platform': options['hdl_platform']
+                }
+            },
+            'libraries': {
                 'options': {
                     'hdl': options['hdl'],
                     'rcc': options['rcc'],
@@ -657,6 +680,7 @@ verbs = {
                 }
             },
             'library': None,
+            'libraries': None,
             'project': None,
             'protocol': {
                 'options': {
