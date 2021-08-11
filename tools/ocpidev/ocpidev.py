@@ -198,6 +198,8 @@ def ocpicreate(args):
         "component": ocpiassets.component.Component,
         "protocol": ocpiassets.component.Protocol,
         "test": ocpiassets.test.Test,
+        "hdl-platform": ocpiassets.platform.HdlPlatformWorker,
+        "hdl-assembly": ocpiassets.assembly.HdlApplicationAssembly,
     }
     if args.noun not in class_dict:
     # Noun not implemented by this function; fall back to ocpidev.sh
@@ -233,11 +235,16 @@ def get_working_dir(args, ensure_exists=True):
         if working_path.name != name:
             working_path = Path(working_path, name)
     elif noun == 'project' and args.verb == 'create':
-        working_path = Path(Path.cwd(), name).resolve()
+        working_path = Path(Path.cwd(), name).absolute()
     else:
         working_path = Path(ocpiutil.get_ocpidev_working_dir(
+<<<<<<< HEAD
             noun, name, ensure_exists=ensure_exists, **kwargs)).resolve()
     if noun not in ['registry', 'library', 'libraries', 'project'] or args.verb == 'create':
+=======
+            noun, name, ensure_exists=ensure_exists, **kwargs)).absolute()
+    if noun not in ['registry', 'library', 'project'] or args.verb == 'create':
+>>>>>>> f43d32bad770b78b72c6c5ba4f9590b9caf10892
     # Libraries, projects, and registries want the full path as the directory
         name = working_path.name
         working_path = str(working_path.parent)

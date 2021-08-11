@@ -69,6 +69,8 @@ def execute_cmd(settings, directory, action=None, file=None, verbose=False):
     if action is not None:
         make_list.extend(action)
         debug_string += " AT= " + ' '.join(action) + " "
+    else:
+        debug_string += " AT= "
 
     logging.debug("settings for make command: " + str(settings.items()))
     for setting, value in settings.items():
@@ -457,7 +459,7 @@ def change_dir(directory):
     if directory != orig_dir:
         try:
             directory = Path(directory).resolve()
-            os.chdir(directory)
+            os.chdir(str(directory))
         except FileNotFoundError:
             err_msg = 'directory {} does not exist'.format(directory)
         except NotADirectoryError:

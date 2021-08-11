@@ -42,7 +42,7 @@ class ComponentTest(unittest.TestCase):
         create a Component and use the default name
         """
         my_asset = factory.AssetFactory.factory(self.asset_type,
-                                                "../av-test/components/test_worker-spec.xml")
+                                                "../av-test/components/specs/test_worker-spec.xml")
 
     def test_component_good(self):
         """

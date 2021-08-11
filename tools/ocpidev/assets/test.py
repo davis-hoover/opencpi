@@ -200,15 +200,15 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         hdl_lib = kwargs.get("hdl_library", None)
         platform = kwargs.get("platform", None)
         testname = name.replace(".test", "")
-        testdir = Path(directory, name)
+        test_path = Path(directory, name)
         projdir = ocpiutil.get_path_to_project_top()
         projname = os.path.basename(projdir)
  
-        if projdir == os.path.dirname(testdir) and \
+        if projdir == test_path.parent and \
           not library and not hdl_lib and not platform:
             raise ocpiutil.OCPIException("Must specify library (not components)," +
                                              " HDL library, or HDL platform" )
-        if testdir.is_dir():
+        if test_path.is_dir():
             raise ocpiutil.OCPIException(name + " already exists at " + directory)
         if platform:
             platdir = os.path.dirname(directory)
@@ -220,9 +220,9 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
             missing = " library " if library else "HDL library "
             raise ocpiutil.OCPIException("Cannot find " + missing + directory)
 
-        testdir.mkdir()
-        os.chdir(testdir)
-        template_dict = Test._get_template_dict(testname, testdir, **kwargs)
+        test_path.mkdir()
+        os.chdir(str(test_path))
+        template_dict = Test._get_template_dict(testname, test_path, **kwargs)
         template = jinja2.Template(ocpitemplate.TEST_GENERATE_PY, trim_blocks=True)
         ocpiutil.write_file_from_string("generate.py", template.render(**template_dict))
         template = jinja2.Template(ocpitemplate.TEST_VERIFY_PY, trim_blocks=True)
@@ -233,4 +233,4 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         ocpiutil.write_file_from_string(testname + "-test.xml", template.render(**template_dict))
         Library.get_package_id(directory)
         if verbose == True:
-            print("Created test '" + name + "' at " + str(testdir))
+            print("Created test '" + name + "' at " + str(test_path))

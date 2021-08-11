@@ -54,11 +54,20 @@ type global_out_t is record
   axi_ctl_aclk_out        : std_logic;
   mmcm_lock               : std_logic;
   interrupt_out           : std_logic;
+  user_link_up            : std_logic;                    -- Indicates PCIe link is in L0 state 
 end record global_out_t;
 
--- generic_pcie component wraps the underlying axi_pcie core.
-component generic_pcie is 
+component generic_pcie is
+  generic (
+    VENDOR_ID   : natural;
+    DEVICE_ID   : natural;
+    CLASS_CODE  : natural
+    );
   port (
+    axi_clk     : out std_logic;
+    axi_resetn  : out std_logic;
+    axi_reset   : out std_logic;
+
     pcie_in     : in  pcie_in_t;
     pcie_out    : out pcie_out_t;
 

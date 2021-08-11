@@ -97,6 +97,9 @@ The following options can be specified for the *`install`* verb only:
     For example, if '<package-id>' is *`ocpi.osp.e3xx`*, the URL is
     *`https://gitlab.com/opencpi/osps/ocpi.osps.e3xx.git`*.
 
+*`--minimal=`*::
+    Specifies a minimized installation process that does not pre-build HDL workers, not run
+    any installation tests.
 
 OPERATIONS
 ----------
