@@ -297,35 +297,15 @@ def make_generate(host_platform, cross_platform, pipeline):
     except:
         variables['CI_ROOT_ID'] = pipeline.ci_env.pipeline_id
     try:
-        keys = [#'CI_SOURCE_REPOSITORY_URL',
-                'CI_SOURCE_COMMIT_REF_NAME',
+        keys = ['CI_SOURCE_COMMIT_REF_NAME',
                 'CI_SOURCE_PROJECT_NAME']
-        values = [#pipeline.ci_env.source_repository_url,
-                  pipeline.ci_env.source_commit_ref_name,
+        values = [pipeline.ci_env.source_commit_ref_name,
                   pipeline.ci_env.source_project_name]
         for key,value in zip(keys,values):
             variables[key] = value
     except AttributeError:
         pass
-    
-    # try:
-    #     variables['CI_UPSTREAM_ID'] = pipeline.ci_env.upstream_id
-    # except:
-    #     pass
-    # try:
-    #     variables['CI_OCPI_REF'] = pipeline.ci_env.ocpi_ref
-    # except:
-    #     pass
-    # try:
-    #     variables['CI_OSP_REF'] = pipeline.ci_env.osp_ref
-    # except:
-    #     pass
-    
-    # if pipeline.ci_env.project_name != 'opencpi':
-    #     variables['GIT_STRATEGY'] = 'none'
 
-
-    
     overrides = pipeline.get_platform_overrides(cross_platform)
     job = Job(name, stage=stage, script=script, tags=tags, 
               image=image, variables=variables, before_script=before_script, 
@@ -478,81 +458,6 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
         do_register = True
     else:
         do_register = False
-    
-    # if pipeline_id:
-    # # In triggered pipeline
-    #     ocpi_ref = pipeline.ci_env.ocpi_ref
-    #     do_clone = True
-    #     do_register = True
-    #     cmds.append(clean_cmd)
-    # else:
-    # # In non-triggered pipeline
-    #     pipeline_id = os.getenv("CI_ROOT_ID")
-
-    #     if not pipeline_id:
-    #         pipeline_id = os.getenv("CI_PIPELINE_ID")
-
-    #     if pipeline.project_name == 'opencpi':
-    #     # In opencpi project
-    #         do_clone = False
-    #         do_register = False
-    #     else:
-    #     # In downstream project
-    #         ocpi_ref = ci_gitlab.get_upstream_branch()
-    #         do_clone = True
-    #         cmds.append(clean_cmd)
-
-    #         if platform.is_host:
-    #             do_register = False
-    #         else:
-    #             do_register = True
-
-    # if do_clone:
-    #     # Clone opencpi repo
-    #     cmd = ' '.join(['git clone --depth 1 --single-branch --branch',
-    #                     ocpi_ref,
-    #                     '"https://gitlab.com/opencpi/opencpi.git"', 
-    #                     'opencpi'])
-    #     cmds.append(cmd)
-
-    #     if (platform.project.group == 'osp' 
-    #         and (pipeline.group_name != 'comp' 
-    #              or stage != 'generate-children')):
-    #         # If the platform is an osp, clone the osp's repo
-                
-    #         path = '/'.join(['opencpi', 'projects', 'osps',
-    #                         platform.project.name])
-    #         path = '"{}"'.format(path)
-
-    #         if pipeline.project_name == platform.project.name:
-    #         # Platform belongs to this project, so clone this project
-    #             url = pipeline.ci_env.repository_url
-    #             osp_ref = pipeline.ci_env.commit_ref_name
-    #         else:
-    #         # Platform is remote, so clone its project
-    #             url = platform.project.url
-    #             try:
-    #                 osp_ref = pipeline.ci_env.osp_ref
-    #             except:
-    #                 osp_ref = 'develop'
-
-    #         cmd = ' '.join(['git clone --depth 1 --single-branch --branch', 
-    #                         osp_ref, url, path])
-    #         cmds.append(cmd)
-
-    #     if pipeline.group_name == 'comp':
-    #     # If pipeline is in a comp project also clone its repo
-    #         path = '/'.join(['opencpi', 'projects', pipeline.group_name,
-    #                         pipeline.project_name])
-    #         path = '"{}"'.format(path)
-    #         cmd = ' '.join(['git clone --depth 1 --single-branch --branch', 
-    #                         pipeline.ci_env.commit_ref_name, 
-    #                         pipeline.ci_env.repository_url,
-    #                         path])
-
-    #         cmds.append(cmd)
-        
-    #     cmds.append('cd opencpi')
 
     timestamp_cmd = 'touch .timestamp'
     cmds.append(timestamp_cmd)
@@ -583,25 +488,6 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
         register_cmd = make_ocpidev_cmd(
             'register', path=destination, noun='project')
         cmds.append(register_cmd)
-
-    # if do_register:
-    #     if platform.project.group == 'osp':
-    #     # Platform is an osp, register its project
-    #         path = '/'.join(['projects', 'osps', 
-    #                          platform.project.name])
-    #         path = '"{}"'.format(path)
-    #         register_cmd = make_ocpidev_cmd(
-    #             'register', path=path, noun='project')
-    #         cmds.append(register_cmd)
-
-    #     if pipeline.group_name == 'comp':
-    #     # Pipeline is in comp project, register comp project
-    #         path = '/'.join(['projects', pipeline.group_name, 
-    #                          pipeline.project_name])
-    #         path = '"{}"'.format(path)
-    #         register_cmd = make_ocpidev_cmd(
-    #             'register', path=path, noun='project')
-    #         cmds.append(register_cmd)
     
     if do_ocpiremote:
         # Set up hash to look up interface for runner from within job
