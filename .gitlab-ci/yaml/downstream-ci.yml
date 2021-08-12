@@ -8,7 +8,7 @@ stages:
 trigger-opencpi:
   stage: trigger-opencpi
   trigger:
-    branch: "$CI_OCPI_REF_NAME"
+    branch: ${CI_COMMIT_TAG:-${CI_OCPI_REF_NAME:-develop}}
     project: opencpi/opencpi
     strategy: depend
   variables:

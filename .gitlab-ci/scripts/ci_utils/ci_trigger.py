@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 
-from . import ci_job, ci_gitlab
+from . import ci_job
 
 def trigger_platform(host_platform, cross_platform, pipeline, generate_job):
     """Creates a trigger job to launch a pipeline for a platform
 
-    Creates a trigger for a child pipeline if platform is local or calls
-    trigger_project() if platform is remote. Calls make_name() to get 
+    Creates a trigger for a child pipeline. Calls make_name() to get 
     name for Job. 
 
     Args:
@@ -38,5 +37,5 @@ def trigger_platform(host_platform, cross_platform, pipeline, generate_job):
     trigger['strategy'] = 'depend'
 
     job = ci_job.Job(name, stage=stage, trigger=trigger, overrides=overrides)
-    
+
     return job
