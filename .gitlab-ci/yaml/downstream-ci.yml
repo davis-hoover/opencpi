@@ -1,36 +1,23 @@
+workflow:
+  rules:
+    - when: always
+
 stages:
   - trigger-opencpi
 
-.bridge:
-  stage: trigger-opencpi
-  variables:
-    CI_SOURCE_COMMIT_REF_NAME: "$CI_COMMIT_REF_NAME"
-    CI_SOURCE_PROJECT_NAME: "$CI_PROJECT_NAME"
-
-# Note: The only difference in the two jobs below is the branch to trigger.
-# Gitlab will expand the variables used, but does not allow variable
-# substitution here, so rules must be used. 
-
-# When pipeline is not for a release tag
 trigger-opencpi:
-  extends: .bridge
+  stage: trigger-opencpi
   trigger:
     project: opencpi/opencpi
     branch: '$CI_OCPI_REF_NAME'
     strategy: depend
+  variables:
+    CI_SOURCE_COMMIT_REF_NAME: "$CI_COMMIT_REF_NAME"
+    CI_SOURCE_PROJECT_NAME: "$CI_PROJECT_NAME"
   rules:
     - if: '$CI_COMMIT_TAG'
-      when: never
-    - when: always
-
-# When pipeline is for a release tag
-trigger-opencpi-tag:
-  extends: .bridge
-  trigger:
-    project: opencpi/opencpi
-    branch: '$CI_COMMIT_TAG'
-    strategy: depend
-  rules:
-    - if: '$CI_COMMIT_TAG'
-      when: always
-    when: never
+      variables: 
+          CI_OCPI_REF_NAME: '$CI_COMMIT_TAG'
+    - if: ('$CI_OCPI_REF_NAME' == null || '$CI_OCPI_REF_NAME' == '')
+      variables:
+          CI_OCPI_REF_NAME: develop
