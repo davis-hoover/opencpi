@@ -2,19 +2,15 @@ workflow:
   rules:
     - when: always
 
+stages:
+  - trigger-opencpi
+
 trigger-opencpi:
   stage: trigger-opencpi
-  script:
-    - > 
-      curl --request POST 
-      --form "token=$CI_JOB_TOKEN" 
-      --form "ref=${CI_OCPI_REF_NAME:-develop}"
-      --form "strategy=depend" 
-      --form "variables[CI_SOURCE_COMMIT_REF_NAME]=$CI_COMMIT_REF_NAME"
-      --form "variables[CI_SOURCE_PROJECT_NAME]=$CI_PROJECT_NAME"
-      --form "variables[CI_PLATFORMS]=$CI_PLATFORMS"
-      --form "variables[CI_MR_PLATFORMS]=$CI_MR_PLATFORMS" 
-      "https://gitlab.com/api/v4/projects/12747880/trigger/pipeline"
-
-stages:
-- trigger-opencpi
+  trigger:
+    branch: "$CI_OCPI_REF_NAME"
+    project: opencpi/opencpi
+    strategy: depend
+  variables:
+    CI_SOURCE_COMMIT_REF_NAME: "$CI_COMMIT_REF_NAME"
+    CI_SOURCE_PROJECT_NAME: "$CI_PROJECT_NAME"
