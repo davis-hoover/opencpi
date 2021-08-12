@@ -10,6 +10,8 @@ stages:
   variables:
     CI_SOURCE_COMMIT_REF_NAME: "$CI_COMMIT_REF_NAME"
     CI_SOURCE_PROJECT_NAME: "$CI_PROJECT_NAME"
+    CI_PLATFORMS: "$CI_PLATFORMS"
+    CI_MR_PLATFORMS: "$CI_MR_PLATFORMS"
 
 # non-tag pipeline
 trigger-opencpi:
