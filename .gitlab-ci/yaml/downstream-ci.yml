@@ -1,8 +1,6 @@
 workflow:
   rules:
     - when: always
-stages:
-- trigger-opencpi
 
 trigger-opencpi:
   stage: trigger-opencpi
