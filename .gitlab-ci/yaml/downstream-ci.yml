@@ -5,12 +5,30 @@ workflow:
 stages:
   - trigger-opencpi
 
-trigger-opencpi:
+.bridge:
   stage: trigger-opencpi
-  trigger:
-    branch: ${CI_COMMIT_TAG:-${CI_OCPI_REF_NAME:-develop}}
-    project: opencpi/opencpi
-    strategy: depend
   variables:
     CI_SOURCE_COMMIT_REF_NAME: "$CI_COMMIT_REF_NAME"
     CI_SOURCE_PROJECT_NAME: "$CI_PROJECT_NAME"
+
+# When pipeline is not for a release tag
+trigger-opencpi:
+  extends: .bridge
+  trigger:
+    project: opencpi/opencpi
+    branch: '$CI_OCPI_REF_NAME'
+    strategy: depend
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      when: never
+
+# When pipeline is for a release tag
+trigger-opencpi-tag:
+  extends: .bridge
+  trigger:
+    project: opencpi/opencpi
+    branch: '$CI_COMMIT_TAG'
+    strategy: depend
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      when: always

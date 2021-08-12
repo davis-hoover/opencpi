@@ -1,13 +1,8 @@
 #!/usr/bin/env python3
 
 import os
-import yaml
 from collections import namedtuple
-from json import load
 from pathlib import Path
-from urllib.request import urlopen
-from . import ci_gitlab
-
         
 _Job = namedtuple('job', 'name stage script before_script after_script'
                          ' artifacts tags resource_group retry'
