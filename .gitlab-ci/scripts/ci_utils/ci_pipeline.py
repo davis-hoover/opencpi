@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 
 import yaml
-from collections import namedtuple
-from os import getenv
 from pathlib import Path
-from sys import argv
-from . import ci_job, ci_platform, ci_gitlab, ci_trigger
+from . import ci_job, ci_platform, ci_trigger
 
 class Pipeline():
 

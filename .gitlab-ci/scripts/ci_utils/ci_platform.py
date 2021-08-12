@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import json
-import os
 from pathlib import Path
 from urllib.request import urlopen
 from . import ci_asset
