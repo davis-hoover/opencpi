@@ -1,7 +1,3 @@
-workflow:
-  rules:
-    - when: always
-
 stages:
   - trigger-opencpi
 
@@ -10,6 +6,10 @@ stages:
   variables:
     CI_SOURCE_COMMIT_REF_NAME: "$CI_COMMIT_REF_NAME"
     CI_SOURCE_PROJECT_NAME: "$CI_PROJECT_NAME"
+
+# Note: The only difference in the two jobs below is the branch to trigger.
+# Gitlab will expand the variables used, but does not allow variable
+# substitution here, so rules must be used. 
 
 # When pipeline is not for a release tag
 trigger-opencpi:
@@ -21,6 +21,7 @@ trigger-opencpi:
   rules:
     - if: '$CI_COMMIT_TAG'
       when: never
+    - when: always
 
 # When pipeline is for a release tag
 trigger-opencpi-tag:
@@ -32,3 +33,4 @@ trigger-opencpi-tag:
   rules:
     - if: '$CI_COMMIT_TAG'
       when: always
+    when: never
