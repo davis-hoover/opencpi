@@ -602,6 +602,8 @@ def get_ocpidev_working_dir(noun, name, ensure_exists=True, **kwargs):
         "test"           : _opencpi.assets.test.Test.get_working_dir,
         "component"      : _opencpi.assets.component.Component.get_working_dir,
         "protocol"       : _opencpi.assets.component.Protocol.get_working_dir,
+        "hdl-slot"       : _opencpi.assets.component.Slot.get_working_dir,
+        "hdl-card"       : _opencpi.assets.component.Slot.get_working_dir,
         "worker"         : _opencpi.assets.worker.Worker.get_working_dir,
         "hdl-platform"   : _opencpi.assets.platform.HdlPlatformWorker.get_working_dir,
         "hdl-platforms"  : _opencpi.assets.platform.HdlPlatformsCollection.get_working_dir,

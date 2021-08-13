@@ -239,6 +239,11 @@ PROJ_PROJECT_XML = ("""<project>
 </project>
 \n""")
 
+LIBRARIES_XML = ("""<!-- This is the XML file for the components directory when there are multiple
+     libraries in their own sub directories underneath this components directory -->
+<libraries/>
+\n""")
+
 LIB_DIR_XML = ("""<library
 {%if package_name: %}
        PackageName='{{package_name}}'
@@ -464,4 +469,31 @@ HDL_ASSEMBLY_XML = ("""<!-- This is the HDL XML Makefile for assembly: {{assembl
      ExcludePlatforms='{{exclude_platform}}'
 {% endif %}
 </HdlAssembly>
+\n""")
+
+HDL_CARDS_XML = ("""<!-- This is the XML file for the hdl/cards library
+     All workers created here in *.<model> directories will be built automatically
+     All tests created here in *.test directories will be built/run automatically
+     To limit the workers that actually get built, set the Workers= attribute
+     To limit the tests that actually get built/run, set the Tests= attribute
+
+     Any attribute definitions that should apply to all individual worker/test
+     in this library belong in this xml file-->
+<library
+>
+</library>
+\n""")
+
+HDL_SLOT_XML = ("""<!-- This is the slot definition file for slots of type: {{hdl_slot}}
+     Add <signal> elements for each signal in the slot -->
+<SlotType>
+  <!-- Add signal elements here -->
+</SlotType>
+\n""")
+
+HDL_CARD_XML = ("""<!-- This is the card definition file for cards of type: {{hdl_card}}
+     Add <signal> elements for each signal in the card -->
+<Card>
+  <!-- Add device elements here, with signal mappings to card signals -->
+</Card>
 \n""")
