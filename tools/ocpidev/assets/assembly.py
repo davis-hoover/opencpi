@@ -20,7 +20,10 @@
 Defintion of HDL assembly and related classes
 """
 
+import os
 import logging
+import jinja2
+import _opencpi.assets.template as ocpitemplate
 from pathlib import Path
 import _opencpi.util as ocpiutil
 import _opencpi.hdltargets as hdltargets
@@ -206,6 +209,61 @@ class HdlApplicationAssembly(HdlAssembly, ReportableAsset):
         working_path = Path(hdl_path, 'assemblies', name)
         
         return str(working_path)
+
+    def _get_template_dict(name, directory, **kwargs):
+        """
+        used by the create function/verb to generate the dictionary of viabales to send to the
+        jinja2 template.
+        valid kwargs handled at this level are:
+            assembly         (string)    - HDL Assembly name
+            only_target      (string)    - Only build for the specified HDL arch
+            exclude_target   (string)    - Do not build for the specified HDL arch
+            only_platform    (string)    - Only build for the specified HDL platform
+            exclude_platform (string)    - Do not build for the specified HDL platform
+        """
+        only_target = kwargs.get("only_target", None)
+        if only_target:
+            only_target = " ".join(only_target)
+        exclude_target = kwargs.get("exclude_target", None)
+        if exclude_target:
+            exclude_target = " ".join(exclude_target)
+        only_platform = kwargs.get("only_platform", None)
+        if only_platform:
+            only_platform = " ".join(only_platform)
+        exclude_platform = kwargs.get("exclude_platform", None)
+        if exclude_platform:
+            exclude_platform = " ".join(exclude_platform)
+        template_dict = {
+                        "assembly" : name,
+                        "only_target" : only_target,
+                        "exclude_target" : exclude_target,
+                        "only_platform" : only_platform,
+                        "exclude_platform" : exclude_platform,
+                        }
+        return template_dict
+
+    @staticmethod
+    def create(name, directory, **kwargs):
+        """
+        Create an HDL assembly asset
+        """
+        verbose = kwargs.get("verbose", None)
+        assembly_path = Path(directory, name)
+        assembly_file = str(assembly_path) + "/" + name + ".xml"
+        if not os.path.exists(str(assembly_path)):
+            os.makedirs(str(assembly_path))
+        os.chdir(directory)
+        if os.path.exists(assembly_file):
+            err = "HdlAssembly '{}' already exists at {}".format(name, assembly_file)
+            raise ocpiutil.OCPIException(err)
+        template_dict = HdlApplicationAssembly._get_template_dict(name, directory, **kwargs)
+        template = jinja2.Template(ocpitemplate.HDL_ASSEMBLIES_XML, trim_blocks=True)
+        ocpiutil.write_file_from_string("assemblies.xml", template.render(**template_dict))
+        template = jinja2.Template(ocpitemplate.HDL_ASSEMBLY_XML, trim_blocks=True)
+        ocpiutil.write_file_from_string(assembly_file, template.render(**template_dict))
+        if verbose:
+            print("HDL Assembly '" + name + ".xml' was created at", assembly_path)
+
 
 class HdlAssembliesCollection(HDLBuildableAsset, ReportableAsset):
     """

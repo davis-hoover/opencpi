@@ -122,8 +122,10 @@ class Asset(metaclass=ABCMeta):
                     shutil.rmtree(str(path))
                 else:
                     path.unlink()
-                msg = 'Successfully deleted {}'.format(
-                    noun if noun else str(path))
+                simple_noun = noun.replace("-", " ")
+                basic_name = self.name.split(".")[0]
+                msg = "Successfully deleted {} '{}'".format(
+                    simple_noun if simple_noun else str(path), basic_name)
                 print(msg)
             except Exception as e:
                 err_msg = 'Failed to delete {}\n{}'.format(

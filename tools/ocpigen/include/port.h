@@ -58,7 +58,8 @@ class Worker;
 struct Connection;
 struct Attachment;
 // Bad that these are here, but it allows this file to be leaf, which is good
-typedef std::list<Attachment*> Attachments;
+// We use a vector because we need to sort attachments by index.
+typedef std::vector<Attachment*> Attachments;
 typedef Attachments::const_iterator AttachmentsIter;
 
 struct InstancePort;
@@ -156,19 +157,15 @@ public:
   virtual void emitVHDLRecordWrapperPortMap(FILE *f, std::string &last);
   virtual void emitConnectionSignal(FILE *f, bool output, Language lang, bool clock, std::string &signal);
   virtual void getClockSignal(const InstancePort &ip, Language lang, std::string &s);
-#if 1
-  virtual void emitPortSignals(FILE *f, const InstancePort &ip, Language lang, const char *indent, bool &any,
-			       std::string &comment, std::string &last, const char *myComment,
-			       std::string &exprs);
-#else
-  virtual void emitPortSignals(FILE *f, Attachments &atts, Language lang,
-			       const char *indent, bool &any, std::string &comment,
-			       std::string &last, const char *myComment, OcpAdapt *adapt,
-			       std::string *signalIn, std::string &clockSignal, std::string &exprs);
-#endif
-  virtual void emitPortSignal(FILE *f, bool any, const char *indent, const std::string &fName,
-			      const std::string &aName, const std::string &index, bool output,
-			      const Port *signalPort, bool external);
+  void emitPortAttachment(std::string *pmaps, bool any, const char *indent, Attachment *at,
+			  Attachment *otherAt, const std::string &mName, const std::string &sName,
+			  size_t count, bool &inputDone, bool &outputDone);
+  virtual void emitPortSignals(FILE *f, const InstancePort &ip, Language lang, const char *indent,
+			       bool &any, std::string &comment, std::string &last,
+			       const char *myComment, std::string &exprs);
+  virtual void emitPortSignal(std::string *pmaps, bool any, const char *indent, const std::string &fName,
+			      const std::string &aName, const std::string &fIndex, const std::string &aIndex,
+			      size_t count, bool output, const Port *signalPort, bool external);
   virtual const char *fixDataConnectionRole(OCPI::Util::Assembly::Role &role);
   virtual const char *doPatterns(unsigned nWip, size_t &maxPortTypeName);
   virtual void emitXML(std::string &out);

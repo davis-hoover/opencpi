@@ -248,9 +248,11 @@ HdlAddPlatform=\
     $(if $(call HdlGetFamily,$(HdlPart_$2)),\
       $(eval HdlAllPlatforms:=$(strip $(HdlAllPlatforms) $2))\
       $(eval HdlPlatformDir_$2:=$3)\
+      $(foreach r,$(patsubst %/exports,%,$(patsubst %/hdl/platforms,%,$(patsubst %/,%,$(dir $1)))),\
+        $(eval HdlPlatformPackageID_$2:=$(call OcpiGetProjectPackageID,$r).$2)) \
       $(if $(or \
-             $(call OcpiExists,$3/lib/hdl/$(HdlFamily_$(HdlPart_$2))),\
-             $(call OcpiExists,$3/hdl/$(HdlFamily_$(HdlPart_$2)))),\
+             $(call OcpiExists,$3/lib/hdl/$(call HdlGetFamily,$(HdlPart_$2))),\
+             $(call OcpiExists,$3/hdl/$(call HdlGetFamily,$(HdlPart_$2)))),\
         $(eval HdlBuiltPlatforms+=$2)),\
       $(call $(if $(filter $2,$(HdlPlatforms) $(HdlPlatform) $(OCPI_HDL_PLATFORM)),$(HdlError),warning),$(strip \
         HDL Platform '$2' was specified by user, but an appropriate HDL family cannot be \
@@ -369,7 +371,10 @@ $(info HdlTopTargets="$(HdlTopTargets)";\
        HdlBuiltPlatforms="$(HdlBuiltPlatforms)";\
        HdlAllTargets="$(HdlAllTargets)";\
        HdlTargets="$(foreach t,$(HdlTopTargets),$(or $(HdlTargets_$t),$t))";\
-       $(foreach p,$(HdlAllPlatforms),HdlPart_$p=$(HdlPart_$p); HdlPlatformDir_$p=$(HdlPlatformDir_$p);)\
+       $(foreach p,$(HdlAllPlatforms),\
+         HdlPart_$p=$(HdlPart_$p); \
+         HdlPlatformDir_$p=$(HdlPlatformDir_$p);\
+         HdlPlatformPackageID_$p=$(HdlPlatformPackageID_$p);)\
        $(foreach p,$(HdlAllPlatforms),HdlAllRccPlatforms_$p="$(HdlAllRccPlatforms_$p)"; )\
        $(foreach f,$(HdlAllTargets),\
          $(if $(HdlTargets_$f),HdlTargets_$f="$(HdlTargets_$f)";)\

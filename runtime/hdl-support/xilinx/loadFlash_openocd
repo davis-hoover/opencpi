@@ -1,0 +1,39 @@
+#!/bin/sh
+# This file is protected by Copyright. Please refer to the COPYRIGHT file
+# distributed with this source distribution.
+#
+# This file is part of OpenCPI <http://www.opencpi.org>
+#
+# OpenCPI is free software: you can redistribute it and/or modify it under the
+# terms of the GNU Lesser General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Lesser General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
+if [ $# -eq 1 ] 
+then
+    echo "Input bit file : $1"
+else
+    echo "Invalid input parameters.  Found $# expected 1"
+    echo "Usage : loadFlash_picoevb [input-bit-file]"
+    exit 1
+fi
+
+openocdLocation="$OCPI_ROOT_DIR/runtime/hdl-support/xilinx/cfgFiles_openocd/openocd"
+if test ! -x $openocdLocation; then
+  echo Error: OpenOCD not found at $openocdLocation
+  exit 1
+fi
+
+# Create the bin file required for flash programming based on the input bit file
+make -f $OCPI_ROOT_DIR/runtime/hdl-support/xilinx/convertBitToBin_openocd FlashBitFileInput=$1 
+
+# Program flash binary file
+source $OCPI_ROOT_DIR/runtime/hdl-support/xilinx/writeFlash_openocd.sh

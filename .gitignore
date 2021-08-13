@@ -54,6 +54,10 @@ vendor/
 doc/pdfs/
 **/doc/*.inc
 !**/doc/developer_doc.inc
+projects/inactive/applications/test.output
+projects/test/components/atest.rcc/atest.cc
+projects/test/hdl/devices/test_worker2.rcc/test_worker2.cc
+projects/test/hdl/platforms/dummy/devices/test_worker3.rcc/test_worker3.cc
 
 # OSP's
 project-registry/ocpi.osp.*

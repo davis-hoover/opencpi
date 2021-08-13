@@ -236,12 +236,98 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
                 ret_val = ret_val + run_val
         return ret_val
 
-    #placeholder function
-    def build(self):
+    def clean(self, verbose=False, hdl=False, rcc=False, clean_all=False,
+        worker=None, no_assemblies=False, hdl_assembly=None, hdl_platform=None,
+        hdl_target=None, rcc_platform=None, hdl_rcc_platform=None):
         """
-        This is a placeholder function will be the function that builds this Asset
+        Cleans the project by handing over the user specifications
+        to execute command.
         """
-        raise NotImplementedError("Project.build() is not implemented")
+        #Specify what to clean
+        action=[]
+        if not rcc and not hdl:
+            action.append('clean')
+        else:
+            if rcc:
+                action.append('cleanrcc')
+            if hdl:
+                action.append('cleanhdl')
+        if no_assemblies:
+            action.append('Assemblies=')
+        settings = {}
+        if hdl_assembly:
+            settings['hdl_assembly'] = hdl_assembly
+        if hdl_platform:
+            settings['hdl_plat_strs'] = hdl_platform
+        if hdl_target:
+            settings['hdl_target'] = hdl_target
+        if rcc_platform:
+            settings['rcc_platform'] = rcc_platform
+        if hdl_rcc_platform:
+            settings['hdl_rcc_platform'] = hdl_rcc_platform
+        if worker:
+            settings['worker'] = worker
+        make_file = ocpiutil.get_makefile(self.directory, "project")[0]
+        #Clean
+        ocpiutil.file.execute_cmd(
+            settings, self.directory, action=action, file=make_file, verbose=verbose)
+        if not clean_all:
+            ocpiutil.file.execute_cmd(
+                {}, self.directory, action=['imports'], file=make_file, verbose=verbose)
+            ocpiutil.file.execute_cmd(
+                {}, self.directory, action=['exports'], file=make_file, verbose=verbose)
+
+    def build(self, verbose=False, rcc=False, hdl=False, optimize=False, dynamic=False,
+        worker=None, no_assemblies=None, hdl_assembly=None, hdl_platform=None,
+        workers_as_needed=False, hdl_target=None, rcc_platform=None, hdl_rcc_platform=None):
+        """
+        Builds the project by handing over the user specifications to execute command 
+        """
+        #Specify what to build
+        action = []
+        if rcc:
+            action.append('rcc')
+        if hdl:
+            action.append('hdl')
+        if no_assemblies:
+            action.append('Assemblies=')
+        if workers_as_needed:
+            os.environ['OCPI_AUTO_BUILD_WORKERS'] = '1'
+        build_suffix = '-'
+        if dynamic:
+            build_suffix += 'd'
+        if optimize:
+            build_suffix += 'o'
+        if optimize or dynamic:
+            if rcc_platform:
+                if any("-" in s for s in rcc_platform):
+                    raise ocpiutil.OCPIException("You cannot use the --optimize build option and " +
+                    "also specify build options in a platform name (in this case: ", rcc_platform, ")")
+                else:
+                    new_list = [s + build_suffix for s in rcc_platform]
+                    rcc_platform = new_list
+            else:
+                rcc_platform = [os.environ['OCPI_TOOL_PLATFORM'] + build_suffix]
+        #Pass settings
+        settings = {}
+        if hdl_assembly:
+            settings['hdl_assembly'] = hdl_assembly
+        if hdl_platform:
+            settings['hdl_plat_strs'] = hdl_platform
+        if hdl_target:
+            settings['hdl_target'] = hdl_target
+        if rcc_platform:
+            settings['rcc_platform'] = rcc_platform
+        if hdl_rcc_platform:
+            settings['hdl_rcc_platform'] = hdl_rcc_platform
+        if worker:
+            settings['worker'] = worker
+        make_file = ocpiutil.get_makefile(self.directory, "project")[0]
+        #Build
+        ocpiutil.file.execute_cmd(
+                {}, self.directory, action=['imports'], file=make_file, verbose=verbose)
+        ocpiutil.file.execute_cmd(
+                settings, self.directory, action=action, file=make_file, verbose=verbose)
 
     def get_show_test_dict(self):
         """

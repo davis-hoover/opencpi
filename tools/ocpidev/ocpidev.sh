@@ -474,7 +474,7 @@ function do_project {
     [ -n "$buildClean" ] || domake $subdir/$1 project imports
     eval domake $subdir/$1 project ${cleanTarget:+$cleanTarget} ${buildRcc:+rcc} ${buildHdl:+hdl} \
             ${buildNoAssemblies:+Assemblies=} \
-            "$(dovars Assemblies HdlPlatforms HdlTargets RccPlatforms RccHdlPlatforms)" \
+            "$(dovars Assemblies HdlPlatforms HdlTargets RccPlatforms RccHdlPlatforms Workers)" \
             $OCPI_MAKE_OPTS
     if [ -n "$buildClean" -a -z "$hardClean" ] ; then
       domake $subdir/$1 project imports
@@ -1562,6 +1562,8 @@ function do_build_here {
 	cleanTarget=cleansim
       elif [ -n "$execute" ]; then
 	cleanTarget=cleanrun
+      elif [ $dirtype = test ]; then
+	cleanTarget=clean
       else
 	cleanTarget=cleantest
       fi
