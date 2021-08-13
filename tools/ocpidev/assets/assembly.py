@@ -251,7 +251,7 @@ class HdlApplicationAssembly(HdlAssembly, ReportableAsset):
         assembly_path = Path(directory, name)
         assembly_file = str(assembly_path) + "/" + name + ".xml"
         if not os.path.exists(str(assembly_path)):
-            os.makedirs(assembly_path)
+            os.makedirs(str(assembly_path))
         os.chdir(directory)
         if os.path.exists(assembly_file):
             err = "HdlAssembly '{}' already exists at {}".format(name, assembly_file)
