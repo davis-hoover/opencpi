@@ -154,7 +154,7 @@ def make_rcc_jobs(stages, platform, projects, pipeline, host_platform=None):
                             build_test_job = make_job(
                                 pipeline, stage, stages, platform, name=name, 
                                 project=project, host_platform=host_platform,
-                                asset=asset)
+                                asset=asset, projects=projects)
                             if build_test_job:
                                 jobs.append(build_test_job)
                     elif stage in ['build-assets', 'build-assets-comp']:
@@ -163,18 +163,19 @@ def make_rcc_jobs(stages, platform, projects, pipeline, host_platform=None):
                         job = make_job(pipeline, stage, stages, platform, 
                                        project=project, 
                                        host_platform=host_platform, 
-                                       asset=asset)
+                                       asset=asset, projects=projects)
                         if job:
                             jobs.append(job)
         else:
             job = make_job(pipeline, stage, stages, platform,
-                           host_platform=host_platform)
+                           host_platform=host_platform, projects=projects)
             if job:
                 jobs.append(job)
 
         if stage == 'prereqs':
             name = make_name(platform, stage='packages')
-            job = make_job(pipeline, stage, stages, platform, name=name)
+            job = make_job(
+                pipeline, stage, stages, platform, name=name, projects=projects)
             if job:
                 jobs.append(job)
 
@@ -212,7 +213,7 @@ def make_hdl_jobs(stages, platform, projects, pipeline, host_platform=None):
 
                 job = make_job(pipeline, stage, stages, platform, 
                                project=project, host_platform=host_platform, 
-                               asset=asset)
+                               asset=asset, projects=projects)
                 if job:
                     jobs.append(job)
 
@@ -222,7 +223,7 @@ def make_hdl_jobs(stages, platform, projects, pipeline, host_platform=None):
                                  host_platform=host_platform, asset=asset)
                 build_test_job = make_job(pipeline, 'build-assemblies', stages, 
                                           platform, name=name, project=project,
-                                          asset=asset, 
+                                          asset=asset, projects=projects,
                                           host_platform=host_platform)
                 if build_test_job:
                     jobs.append(build_test_job)
@@ -230,6 +231,7 @@ def make_hdl_jobs(stages, platform, projects, pipeline, host_platform=None):
                 if platform.is_sim:
                     run_test_job = make_job(pipeline, 'test', stages, platform,
                                             project=project, asset=asset,
+                                            projects=projects,
                                             host_platform=host_platform)
                     if run_test_job:
                         jobs.append(run_test_job)
@@ -240,6 +242,7 @@ def make_hdl_jobs(stages, platform, projects, pipeline, host_platform=None):
                 for linked_platform in platform.linked_platforms:
                     run_test_job = make_job(pipeline, 'test', stages, platform,
                                             project=project, asset=asset,
+                                            projects=projects,
                                             host_platform=host_platform,
                                             linked_platform=linked_platform,
                                             do_ocpiremote=True)
@@ -248,7 +251,7 @@ def make_hdl_jobs(stages, platform, projects, pipeline, host_platform=None):
 
     for linked_platform in platform.linked_platforms:
         job = make_job(pipeline, 'build-sdcards', stages, platform,
-                       host_platform=host_platform,
+                       host_platform=host_platform, projects=projects,
                        linked_platform=linked_platform)
         if job:
             jobs.append(job)
@@ -256,7 +259,7 @@ def make_hdl_jobs(stages, platform, projects, pipeline, host_platform=None):
     return jobs
 
 
-def make_generate(host_platform, cross_platform, pipeline):
+def make_generate(host_platform, cross_platform, pipeline, projects=None):
     """Creates a job to generate a yaml fie for a child pipeline
 
     Calls make_name() and make_before_script() to get attributes to pass
@@ -266,6 +269,7 @@ def make_generate(host_platform, cross_platform, pipeline):
         host_platform:  Host platform of child pipeline to be triggered
         cross_platform: Platform to be built/tested in child pipeline
         pipeline:       Pipeline to make job for
+        projects:       Projects that may need to get cloned
 
     Returns:
         Job
@@ -281,7 +285,8 @@ def make_generate(host_platform, cross_platform, pipeline):
         'yum install python36-PyYAML -y',
         'yum install git -y'
     ]
-    before_script += make_before_script(pipeline, stage, [], cross_platform)
+    before_script += make_before_script(
+        pipeline, stage, [], cross_platform, projects=projects)
     variables = {}
     variables['CI_DIRECTIVE'] = pipeline.directive.str
     variables['CI_PLATFORM'] = cross_platform.name
@@ -309,8 +314,8 @@ def make_generate(host_platform, cross_platform, pipeline):
     return job
 
 
-def make_job(pipeline, stage, stages, platform, project=None, name=None,
-             host_platform=None, asset=None, linked_platform=None,
+def make_job(pipeline, stage, stages, platform, project=None, projects=None,
+             name=None, host_platform=None, asset=None, linked_platform=None,
              overrides=None, config=None, do_ocpiremote=False):
     """Creates Job for project/platform combinations
 
@@ -323,6 +328,7 @@ def make_job(pipeline, stage, stages, platform, project=None, name=None,
         stages:          List of pipeline stages
         platform:        Platform to make jobs for
         project:         Project to make jobs for
+        projects:        Projects that may need to be cloned
         name:            Name of job
         host_platform:   Host platform to create jobs for
         asset:           Asset to make job for
@@ -342,6 +348,7 @@ def make_job(pipeline, stage, stages, platform, project=None, name=None,
 
     before_script = make_before_script(pipeline, stage, stages, platform,
                                        host_platform=host_platform,
+                                       projects=projects, asset=asset,
                                        linked_platform=linked_platform,
                                        do_ocpiremote=do_ocpiremote)
     script = make_script(stage, platform, project=project, asset=asset,
@@ -403,7 +410,8 @@ def make_name(platform, stage=None, project=None, host_platform=None,
 
 
 def make_before_script(pipeline, stage, stages, platform, host_platform=None,
-                       linked_platform=None, do_ocpiremote=False):
+                       projects=None, asset=None, linked_platform=None, 
+                       do_ocpiremote=False):
     """Creates list of commands to run in job's before_script step
 
         Constructs commands for downloading AWS artifacts, creating
@@ -417,9 +425,11 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
         stages:          List of all pipeline stages
         platform:        Platform to download artifacts for
         host_platform:   Host_platform to download artifacts for
+        project:         Project of job
         linked_platform: Associated platform to download artifacts 
                          for
         do_ocpiremote:   Whether job should run ocpiremote commands
+        projects:        Projects that may need to get cloned
 
     Returns:
         list of command strings
@@ -430,29 +440,38 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
     except:
         pipeline_id = pipeline.ci_env.pipeline_id
 
-    if platform.project.url and stage != 'generate-children':
-        commit_ref = None
+    register_destinations = []
+    for project in projects:
+        if not project.url:
+            continue
+        if project.group in ['osp', 'osps']:
+            if project.name != platform.project.name:
+                continue
+        elif project.group == 'comp':
+            if asset and asset.project.name != project.name:
+                continue
+        commit_ref = 'develop'
         try:
-            if pipeline.ci_env.source_project_name == platform.project.name:
-            # If this platform belongs to the project that triggered pipeline,
-            # use the ref from that project
+            if pipeline.ci_env.source_project_name == project.name:
+            # If this project triggered pipeline, use the ref from that project
                 commit_ref = pipeline.ci_env.source_commit_ref_name
         except AttributeError:
             commit_ref = 'develop'
-        if platform.project.group == 'osp':
-            destination = str(Path('projects', 'osps', platform.project.name))
+        
+        if project.group == 'comp':
+            destination = str(Path('projects', 'comp', project.name))
+        elif project.group in ['osp', 'osps']:
+            destination = str(Path('projects', 'osps', project.name))
         else:
-            destination = str(Path('projects', platform.name))
+            destination = str(Path('projects', project.name))
         cmd = ' '.join([
             'git clone --depth 1 --single-branch --branch',
             f'"{commit_ref}"',
-            f'"{platform.project.url}"', 
+            f'"{project.url}"', 
             f'"{destination}"'
         ])
         cmds.append(cmd)
-        do_register = True
-    else:
-        do_register = False
+        register_destinations.append(destination)
 
     timestamp_cmd = 'touch .timestamp'
     cmds.append(timestamp_cmd)
@@ -479,7 +498,7 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
 
     source_cmd = 'source cdk/opencpi-setup.sh -e'
     cmds.append(source_cmd)
-    if do_register:
+    for destination in register_destinations:
         register_cmd = make_ocpidev_cmd(
             'register', path=destination, noun='project')
         cmds.append(register_cmd)
@@ -497,7 +516,7 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
             cmds +=[
                 make_ocpiremote_cmd('deploy', platform,
                                     linked_platform=linked_platform),
-                'sleep 60'
+                                    'sleep 60'
             ]
 
         cmds += [

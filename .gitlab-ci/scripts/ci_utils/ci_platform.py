@@ -19,7 +19,7 @@ class Platform():
         self.linked_platforms = linked_platforms or []
         self.cross_platforms = cross_platforms or []
         self.assets = assets or ci_asset.discover_assets(
-            self.path, whitelist=['devices'])
+            self.path, project, whitelist=['devices'])
         self.ip = None
         self.user = None
         self.password = None 
