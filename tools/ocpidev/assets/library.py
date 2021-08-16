@@ -338,9 +338,17 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
             err_msg = 'library "{}" already exists at "{}"'.format(name, str(lib_path))
             raise ocpiutil.OCPIException(err_msg)
 
-        lib_path.mkdir()
-        os.chdir(str(lib_path))
         template_dict = Library._get_template_dict(name, directory, **kwargs)
+        compdir = Path(ocpiutil.get_path_to_project_top(), "components")
+        if not compdir.exists():
+            compdir.mkdir()
+        os.chdir(str(compdir))
+        template = jinja2.Template(ocpitemplate.LIBRARIES_XML, trim_blocks=True)
+        ocpiutil.write_file_from_string("components.xml", template.render(**template_dict))
+
+        if not lib_path.exists():
+            lib_path.mkdir()
+        os.chdir(str(lib_path))
         template = jinja2.Template(ocpitemplate.LIB_DIR_XML, trim_blocks=True)
         ocpiutil.write_file_from_string(name + ".xml", template.render(**template_dict))
         workers = str(Library.get_workers())[1:-1] + "\n"
