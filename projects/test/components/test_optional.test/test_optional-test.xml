@@ -1,0 +1,84 @@
+<Tests UseHDLFileIo='true'>
+  <case>
+    <Input Port='samples_in' Script='generate_samples.py'/>
+    <Input Port='timestamps_in' Script='generate_timestamps.py'/>
+    <Property name='samples' value='256'/>
+    <Property name='timestamps' value='1024'/>
+    <Output Port='samples_out' Script='verify.py'/>
+    <Output Port='timestamps_out' Script='verify.py'/>
+  </case>
+  <!--Previous case repeated to ensure the same combination of unconnected ports isn't generated-->
+  <case>
+    <Input Port='samples_in' Script='generate_samples.py'/>
+    <Input Port='timestamps_in' Script='generate_timestamps.py'/>
+    <Property name='samples' value='256'/>
+    <Property name='timestamps' value='8192'/>
+    <Output Port='samples_out' Script='verify.py'/>
+    <Output Port='timestamps_out' Script='verify.py'/>
+  </case>
+  <!--Each case cascades to display the individual port that is left unconnected-->
+  <case>
+    <Input Port='samples_in' testOptional='true' Script='generate_samples.py'/>
+    <Input Port='timestamps_in' Script='generate_timestamps.py'/>
+    <Property name='samples' value='256'/>
+    <Property name='timestamps' value='1024'/>
+    <Property name='samples_b' value='false'/>
+    <Output Port='samples_out' Script='verify.py'/>
+    <Output Port='timestamps_out' Script='verify.py'/>
+  </case>
+  <case>
+    <Input Port='samples_in' Script='generate_samples.py'/>
+    <Input Port='timestamps_in' testOptional='true' Script='generate_timestamps.py'/>
+    <Property name='samples' value='256'/>
+    <Property name='timestamps' value='1024'/>
+    <Property name='timestamps_b' value='false'/>
+    <Output Port='samples_out' Script='verify.py'/>
+    <Output Port='timestamps_out' Script='verify.py'/>
+  </case>
+  <case>
+    <Input Port='samples_in' Script='generate_samples.py'/>
+    <Input Port='timestamps_in' Script='generate_timestamps.py'/>
+    <Property name='samples' value='256'/>
+    <Property name='timestamps' value='1024'/>
+    <Property name='timestamps_b' value='false'/>
+    <Output Port='samples_out' testOptional='true' Script='verify.py'/>
+    <Output Port='timestamps_out' Script='verify.py'/>
+  </case>
+  <case>
+    <Input Port='samples_in' Script='generate_samples.py'/>
+    <Input Port='timestamps_in' Script='generate_timestamps.py'/>
+    <Property name='samples' value='256'/>
+    <Property name='timestamps' value='8192'/>
+    <Property name='samples_b' value='false'/>
+    <Output Port='samples_out' Script='verify.py'/>
+    <Output Port='timestamps_out' testOptional='true' Script='verify.py'/>
+  </case>
+  <!--Cases display combinations of unconnected ports to display on the assembly name-->
+  <case>
+    <Input Port='samples_in' testOptional='true' Script='generate_samples.py'/>
+    <Input Port='timestamps_in' testOptional='true' Script='generate_timestamps.py'/>
+    <Property name='samples' value='256'/>
+    <Property name='timestamps' value='8192'/>
+    <Property name='timestamps_b' value='false'/>
+    <Output Port='samples_out' Script='verify.py'/>
+    <Output Port='timestamps_out' Script='verify.py'/>
+  </case>
+  <case>
+    <Input Port='samples_in' testOptional='true' Script='generate_samples.py'/>
+    <Input Port='timestamps_in' testOptional='true' Script='generate_timestamps.py'/>
+    <Property name='samples' value='256'/>
+    <Property name='timestamps' value='1024'/>
+    <Property name='samples_b' value='false'/>
+    <Property name='timestamps_b' value='false'/>
+    <Output Port='samples_out' testOptional='true' Script='verify.py'/>
+    <Output Port='timestamps_out' Script='verify.py'/>
+  </case>
+  <case>
+    <Input Port='samples_in' testOptional='true' Script='generate_samples.py'/>
+    <Input Port='timestamps_in' testOptional='true' Script='generate_timestamps.py'/>
+    <Property name='samples' value='256'/>
+    <Property name='timestamps' value='1024'/>
+    <Output Port='samples_out' testOptional='true' Script='verify.py'/>
+    <Output Port='timestamps_out' testOptional='true' Script='verify.py'/>
+  </case>
+</Tests>

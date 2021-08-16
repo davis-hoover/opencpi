@@ -126,8 +126,10 @@ PKGS_E+=(ocl-icd)
 PKGS_E+=(${python3_ver}-scons)
 #    Needed to build certain linux kernels or u-boot, at least Xilinx 2015.4
 PKGS_E+=(dtc openssl-devel)
-#    Need to build plutosdr osp 
+#    Needed to build plutosdr osp 
 PKGS_E+=(perl-ExtUtils-MakeMaker)
+#    Needed to build ettus_n310 osp
+PKGS_E+=(chrpath diffstat texinfo)
 #    Needed to generate gitlab-ci yaml
 PKGS_E+=(python36-PyYAML)
 

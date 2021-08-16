@@ -43,16 +43,12 @@ A block diagram representation of the implementation is given in :numref:`data_s
    :alt: Data Source QADC Block Diagram
    :align: center
 
-   Block diagram of data source QADC implementation.
+   Data Source QADC Block Diagram
 
 Interface
 ---------
 .. literalinclude:: ../specs/data_src_qadc-spec.xml
    :language: xml
-
-Opcode Handling
-~~~~~~~~~~~~~~~
-To be supplied: Description of how the non-stream opcodes are handled.
 
 Properties
 ~~~~~~~~~~

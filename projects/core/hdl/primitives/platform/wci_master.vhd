@@ -43,7 +43,7 @@ architecture rtl of wci_master is
   signal response             : worker_response_t;               -- our response when active
   -- Our state - minimized for scalability
   signal reset_n_r            : std_logic := '0';              -- are we reset? (_n)
-  signal window_r             : std_logic_vector(11 downto 0); -- high address bits
+  signal window_r             : std_logic_vector(13 downto 0); -- high address bits
   signal attention_r          : std_logic;                     -- sticky version of SFlag(0)
   signal timeout_r            : worker_timeout_t;              -- our log2 of timeout ticks
   signal ready_r              : bool_t;                        -- WCI slave !busy (pipelined)
@@ -66,6 +66,20 @@ architecture rtl of wci_master is
   signal barrier_r            : std_logic;                     -- barrier in progress or next
   signal crew_r               : std_logic_vector(7 downto 0);
   signal rank_r               : std_logic_vector(7 downto 0);
+  impure function read_byte_en return std_logic_vector is
+    variable mask : std_logic_vector(3 downto 0)
+      := worker_in.address(19 downto 18) & worker_in.address(1 downto 0);
+  begin
+    case mask is -- log2nbytes & low2addr is
+      when "0000" => return "0001";
+      when "0001" => return "0010";
+      when "0010" => return "0100";
+      when "0011" => return "1000";
+      when "0100" => return "0011";
+      when "0110" => return "1100";
+      when others  => return "1111";
+    end case;
+  end read_byte_en;
 begin
   -- worker is only asserted with a valid worker value when there is
   -- a valid operation
@@ -83,9 +97,10 @@ begin
   wci_out.Clk        <= worker_in.clk;
   wci_out.MReset_n   <= reset_n_r;
   wci_out.MCmd       <= worker_in.cmd when its(cmd_asserted_r) else ocpi.ocp.MCmd_IDLE;
-  wci_out.MAddr      <= window_r & worker_in.address;
+  wci_out.MAddr      <= window_r & worker_in.address(worker_in.address'left - worker_readsize_bits downto 0);
   wci_out.MAddrSpace(0) <= worker_in.is_config;
-  wci_out.MByteEn    <= worker_in.byte_en;
+  wci_out.MByteEn    <= read_byte_en when worker_in.is_config and worker_in.cmd = ocp.MCmd_READ
+                        else worker_in.byte_en;
   wci_out.MData      <= worker_in.data;
   wci_out.MFlag(0)   <= abort_r;
   wci_out.MFlag(1)   <= worker_in.is_big_endian;

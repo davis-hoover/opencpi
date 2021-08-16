@@ -61,6 +61,8 @@ while [ -n "$1" ]; do
       platform=$2; shift; shift;;
     --no-hdl)
       no_hdl=1; shift ;;
+    --no-kernel)
+      nokernel=1; shift ;;  # use ${nokernel:+whatever}
     -*)
       echo Unknown option: $1
       exit 1;;
@@ -141,7 +143,7 @@ for t in $tests; do
       OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/$OCPI_TARGET_DIR/artifacts \
 		       python3 <<-EOF
 	import opencpi.aci as OA
-	app=OA.Application(b"$OCPI_ROOT_DIR/projects/assets/applications/bias.xml")
+	app=OA.Application("$OCPI_ROOT_DIR/projects/assets/applications/bias.xml")
 	EOF
       [ -f $OCPI_CDK_DIR/$OCPI_TARGET_DIR/lib/opencpi2/_aci.so ] &&
       command -v python2-config > /dev/null && [[ $(python2 -c "import sys;print(sys.version)") == 2* ]] &&
@@ -188,7 +190,9 @@ for t in $tests; do
       if [ ! -e $OCPI_CDK_DIR/scripts/ocpi_${OCPI_TOOL_OS}_driver ]; then
         echo ======================= Skipping loading the OpenCPI kernel driver:  not supported.
       elif [ -e /.dockerenv ] || [ -e /run/.containerenv ] ; then
-        echo ======================= Skipping loading the OpenCPI kernel driver:  running in a docker container.
+          echo ======================= Skipping loading the OpenCPI kernel driver:  running in a docker container.
+      elif [ -n "$nokernel" ]; then
+        echo ======================= Skipping loading the OpenCPI kernel driver:  test disabled by -no-kernel option.
       else
         echo ======================= Loading the OpenCPI Linux Kernel driver. &&
             $OCPI_CDK_DIR/scripts/ocpidriver status

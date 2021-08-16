@@ -146,6 +146,8 @@ PKGS_E+=(ocl-icd-libopencl1)
 PKGS_E+=(scons)
 #    Needed to build plutosdr osp
 PKGS_E+=(libssl-dev device-tree-compiler)
+#    Needed to build ettus_n310 osp 
+PKGS_E+=(chrpath diffstat texinfo)
 #    For ocpidoc documentation builder
 #
 #    Distro-provided "python3-sphinx", "python3-sphinx-rtd-theme",

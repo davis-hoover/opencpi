@@ -48,7 +48,7 @@
 
   $PYCMD -m venv $OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/venv
   source $OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/venv/bin/activate
-  pip3 install sphinx sphinx_rtd_theme sphinxcontrib_spelling
+  pip3 install docutils==0.16 sphinx sphinx_rtd_theme sphinxcontrib_spelling
   deactivate ;
 }
 

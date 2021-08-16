@@ -31,7 +31,8 @@ Language_rcc=c++
 Languages_rcc=(c:c c++:cc)
 Language_hdl=vhdl
 Languages_hdl=(vhdl:vhd)
-Language_ocl=cl
+Language_ocl=ocl
+Languages_ocl=(ocl:cl)
 
 CheckCDK='$(if $(realpath $(OCPI_CDK_DIR)),,\
   $(error The OCPI_CDK_DIR environment variable is not set correctly.))'
@@ -473,7 +474,7 @@ function do_project {
     [ -n "$buildClean" ] || domake $subdir/$1 project imports
     eval domake $subdir/$1 project ${cleanTarget:+$cleanTarget} ${buildRcc:+rcc} ${buildHdl:+hdl} \
             ${buildNoAssemblies:+Assemblies=} \
-            "$(dovars Assemblies HdlPlatforms HdlTargets RccPlatforms RccHdlPlatforms)" \
+            "$(dovars Assemblies HdlPlatforms HdlTargets RccPlatforms RccHdlPlatforms Workers)" \
             $OCPI_MAKE_OPTS
     if [ -n "$buildClean" -a -z "$hardClean" ] ; then
       domake $subdir/$1 project imports
@@ -1043,7 +1044,7 @@ function do_worker {
       valid_languages+="\"${l/:*/}\" "
       [ "$Language" = ${l/:*/} ] && suff=${l/*:/}
     done
-    [ -z "$langattr" ] && bad Invalid language \"$Language\" for model \"$model\". Available: ${valid_languages}
+    [ -z "$suff" ] && bad Invalid language \"$Language\" for model \"$model\". Available: ${valid_languages}
   fi
   if [ -z "$Version" ]; then
      echo Without the worker version specified, it is set to 2 in this new worker.
@@ -1496,7 +1497,7 @@ function do_primitive {
 	     Libraries='lib1 lib2'
 	     Cores=core1 core2
 	     Otherwise all primitives will be built-->
-	<primitives/>
+	<hdlprimitives/>
 	EOF
     [ -z "$verbose" ] ||
 	echo This is the first HDL primitive in this project.  The \"hdl/primitives\" directory has been created.
@@ -1549,12 +1550,23 @@ function do_assemblies {
 function do_build_here {
     buildTest="$1"
     get_dirtype .
+    if [ -n "$generate" -a \( "$1" = test -o $dirtype = test \) ]; then
+	buildTest=generate
+    fi
     if [ -z "$buildRcc" -a -z "$buildHdl" -a -n "$buildClean" -a "$1" != "test" ]; then
       cleanTarget="clean"
     fi
-    if [ -n "$buildClean" -a "$1" == "test" ]; then
+    if [ -n "$buildClean" -a \( "$1" == "test" -o $dirtype = test \) ]; then
       buildTest=""
-      cleanTarget="cleantest"
+      if [ -n "$simulation" ]; then
+	cleanTarget=cleansim
+      elif [ -n "$execute" ]; then
+	cleanTarget=cleanrun
+      elif [ $dirtype = test ]; then
+	cleanTarget=clean
+      else
+	cleanTarget=cleantest
+      fi
     fi
     if [ -n "$buildRcc" -a -n "$buildClean" ]; then
       buildRcc=""
@@ -2231,6 +2243,9 @@ while [[ "${argv[0]}" != "" ]] ; do
       (--dynamic) dynamic=1;;
       (--container) takelist Containers;;
       (--configuration) takelist Configurations;;
+      (--generate) generate=1;;     # for building tests, do the "generate" subset of build
+      (--simulation) simulation=1;; # for cleaning tests, clean the simulation directories
+      (--execute) execute=1;;       # for cleaning tests, clean the execution/run directories
       (*)
         error_msg="unknown option: ${argv[0]}"
         if [ -n "$verb" ]; then
@@ -2438,7 +2453,7 @@ fi
 	RccPlatforms=$OCPI_TOOL_PLATFORM$build_suffix
     else
 	# add the suffix to all platforms and check that we are not already using suffixes
-	for $p in ${RccPlatforms[@]}; do
+	for p in ${RccPlatforms[@]}; do
 	    [[ $p == *-* ]] &&
 		bad "You cannot use the --dynamic or --optimize build options and also specify build options in a platform name (in this case: $p)"
 	    newplats+=($p$build_suffix)

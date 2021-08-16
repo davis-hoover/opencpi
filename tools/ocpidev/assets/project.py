@@ -25,7 +25,6 @@ import logging
 import json
 import jinja2
 from pathlib import Path
-import subprocess
 import _opencpi.util as ocpiutil
 import _opencpi.assets.template as ocpitemplate
 from .abstract import (RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset,
@@ -59,18 +58,9 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
             init_hdlassembs (T/F) - Instructs the method whether to construct all
                                     HdlApplicationAssembly objects contained in the project
         """
-        try:
-            self.check_dirtype("project", directory)
-        except ocpiutil.OCPIException as e:
-        # If directory is not a project, assume name is a package_id and get directory
-        # from registry
-            registry_dir = Registry.get_registry_dir()
-            if name:
-                directory = str(Path(registry_dir, name))
-            else:
-                raise ocpiutil.OCPIException(e)
-            self.check_dirtype("project", directory)
-
+        self.check_dirtype("project", directory)
+        if not name:
+            name = str(Path(directory).name)
         super().__init__(directory, name, **kwargs)
         self.lib_list = None
         self.apps_col_list = None
@@ -172,7 +162,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         except ocpiutil.OCPIException:
             # do nothing it's ok if the unregistering fails
             pass
-        super().delete(force)
+        super().delete('project', force)
 
     def __init_package_id(self):
         """
@@ -246,12 +236,98 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
                 ret_val = ret_val + run_val
         return ret_val
 
-    #placeholder function
-    def build(self):
+    def clean(self, verbose=False, hdl=False, rcc=False, clean_all=False,
+        worker=None, no_assemblies=False, hdl_assembly=None, hdl_platform=None,
+        hdl_target=None, rcc_platform=None, hdl_rcc_platform=None):
         """
-        This is a placeholder function will be the function that builds this Asset
+        Cleans the project by handing over the user specifications
+        to execute command.
         """
-        raise NotImplementedError("Project.build() is not implemented")
+        #Specify what to clean
+        action=[]
+        if not rcc and not hdl:
+            action.append('clean')
+        else:
+            if rcc:
+                action.append('cleanrcc')
+            if hdl:
+                action.append('cleanhdl')
+        if no_assemblies:
+            action.append('Assemblies=')
+        settings = {}
+        if hdl_assembly:
+            settings['hdl_assembly'] = hdl_assembly
+        if hdl_platform:
+            settings['hdl_plat_strs'] = hdl_platform
+        if hdl_target:
+            settings['hdl_target'] = hdl_target
+        if rcc_platform:
+            settings['rcc_platform'] = rcc_platform
+        if hdl_rcc_platform:
+            settings['hdl_rcc_platform'] = hdl_rcc_platform
+        if worker:
+            settings['worker'] = worker
+        make_file = ocpiutil.get_makefile(self.directory, "project")[0]
+        #Clean
+        ocpiutil.file.execute_cmd(
+            settings, self.directory, action=action, file=make_file, verbose=verbose)
+        if not clean_all:
+            ocpiutil.file.execute_cmd(
+                {}, self.directory, action=['imports'], file=make_file, verbose=verbose)
+            ocpiutil.file.execute_cmd(
+                {}, self.directory, action=['exports'], file=make_file, verbose=verbose)
+
+    def build(self, verbose=False, rcc=False, hdl=False, optimize=False, dynamic=False,
+        worker=None, no_assemblies=None, hdl_assembly=None, hdl_platform=None,
+        workers_as_needed=False, hdl_target=None, rcc_platform=None, hdl_rcc_platform=None):
+        """
+        Builds the project by handing over the user specifications to execute command 
+        """
+        #Specify what to build
+        action = []
+        if rcc:
+            action.append('rcc')
+        if hdl:
+            action.append('hdl')
+        if no_assemblies:
+            action.append('Assemblies=')
+        if workers_as_needed:
+            os.environ['OCPI_AUTO_BUILD_WORKERS'] = '1'
+        build_suffix = '-'
+        if dynamic:
+            build_suffix += 'd'
+        if optimize:
+            build_suffix += 'o'
+        if optimize or dynamic:
+            if rcc_platform:
+                if any("-" in s for s in rcc_platform):
+                    raise ocpiutil.OCPIException("You cannot use the --optimize build option and " +
+                    "also specify build options in a platform name (in this case: ", rcc_platform, ")")
+                else:
+                    new_list = [s + build_suffix for s in rcc_platform]
+                    rcc_platform = new_list
+            else:
+                rcc_platform = [os.environ['OCPI_TOOL_PLATFORM'] + build_suffix]
+        #Pass settings
+        settings = {}
+        if hdl_assembly:
+            settings['hdl_assembly'] = hdl_assembly
+        if hdl_platform:
+            settings['hdl_plat_strs'] = hdl_platform
+        if hdl_target:
+            settings['hdl_target'] = hdl_target
+        if rcc_platform:
+            settings['rcc_platform'] = rcc_platform
+        if hdl_rcc_platform:
+            settings['hdl_rcc_platform'] = hdl_rcc_platform
+        if worker:
+            settings['worker'] = worker
+        make_file = ocpiutil.get_makefile(self.directory, "project")[0]
+        #Build
+        ocpiutil.file.execute_cmd(
+                {}, self.directory, action=['imports'], file=make_file, verbose=verbose)
+        ocpiutil.file.execute_cmd(
+                settings, self.directory, action=action, file=make_file, verbose=verbose)
 
     def get_show_test_dict(self):
         """
@@ -993,14 +1069,14 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
               "\nFrom the registry: " + os.path.realpath(reg.directory))
 
     def refresh(self):
-         """
-         Generate a new copy of project metadata
-         """
-         directory = self.directory
-         assert ocpiutil.get_dirtype(directory) == "project"
-         cdkdir = os.environ.get('OCPI_CDK_DIR')
-         metacmd = cdkdir + "/scripts/genProjMetaData.py "
-         os.system(metacmd + directory)
+        """
+        Generate a new copy of project metadata
+        """
+        self.check_dirtype("project", self.directory)
+        sys.path.append(os.getenv('OCPI_CDK_DIR') + '/scripts/')
+        import genProjMetaData
+
+        genProjMetaData.main(self.directory)
 
     def registry(self):
         """
@@ -1065,17 +1141,21 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
             print()
 
     @staticmethod
-    def get_working_dir(name, library, hdl_library, hdl_platform):
+    def get_working_dir(name, ensure_exists=True, **kwargs):
         """
         return the directory of a Project given the name (name) and
         library specifiers (library, hdl_library, hdl_platform)
         """
         cur_dirtype = ocpiutil.get_dirtype()
-        ocpiutil.check_no_libs("project", library, hdl_library, hdl_platform)
+        working_path = Path.cwd()
+        if cur_dirtype and cur_dirtype != "project":
+            working_path = Path(ocpiutil.get_path_to_project_top())
+        cur_dirtype = ocpiutil.get_dirtype(str(working_path))
+
         if cur_dirtype not in [None, "project"]:
             ocpiutil.throw_not_valid_dirtype_e(["project"])
         if cur_dirtype == "project":
-            return "."
+            return str(working_path)
         else:
             return name
 
@@ -1116,19 +1196,18 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
             depend = " ".join(depend)
 
         template_dict = {
-                        "name" : name,
-                        "comp_lib" : comp_lib,
-                        "xml_include" :xml_include,
-                        "include_dir" : include_dir,
-                        "prim_lib" : prim_lib,
-                        "package_id" : package_id,
-                        "package_name" : package_name,
-                        "package_prefix" : package_prefix,
-                        "depend" : depend,
-                        "determined_package_id" : ocpiutil.get_package_id_from_vars(package_id,
-                                                                                    package_prefix,
-                                                                                    package_name, directory)
-                        }
+            "name" : name,
+            "comp_lib" : comp_lib,
+            "xml_include" :xml_include,
+            "include_dir" : include_dir,
+            "prim_lib" : prim_lib,
+            "package_id" : package_id,
+            "package_name" : package_name,
+            "package_prefix" : package_prefix,
+            "depend" : depend,
+            "determined_package_id" : ocpiutil.get_package_id_from_vars(
+                package_id, package_prefix, package_name, directory)
+        }
         return template_dict
 
     @staticmethod
@@ -1138,45 +1217,45 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         handled at this level:
             register (T/F) - if set to true this project is also registered after it is created
         """
-        proj_dir = directory + "/" + name
-        if os.path.isdir(proj_dir):
-            raise ocpiutil.OCPIException("Cannot create this project: " + proj_dir + ", because the " +
+        path = Path(directory, name)
+        if path.is_dir():
+            raise ocpiutil.OCPIException("Cannot create this project: " + str(path) + ", because the " +
                                          "directory already exists.")
-        os.chdir(directory)
-        os.mkdir(name)
-        template_dict = Project._get_template_dict(name, proj_dir, **kwargs)
-
+        path.mkdir()
+        os.chdir(str(path))
+        template_dict = Project._get_template_dict(name, directory, **kwargs)
         # Generate all the project files using templates
-        ocpiutil.write_file_from_string( name + "/Project.exports", ocpitemplate.PROJ_EXPORTS)
-        ocpiutil.write_file_from_string( name + "/.gitignore", ocpitemplate.PROJ_GIT_IGNORE)
-        ocpiutil.write_file_from_string( name + "/.gitattributes", ocpitemplate.PROJ_GIT_ATTR)
+        ocpiutil.write_file_from_string("Project.exports", ocpitemplate.PROJ_EXPORTS)
+        ocpiutil.write_file_from_string(".gitignore", ocpitemplate.PROJ_GIT_IGNORE)
+        ocpiutil.write_file_from_string(".gitattributes", ocpitemplate.PROJ_GIT_ATTR)
         #template = jinja2.Template(ocpitemplate.PROJ_MAKEFILE, trim_blocks=True)
-        #ocpiutil.write_file_from_string( proj_dir + "/Makefile", template.render(**template_dict))
+        #ocpiutil.write_file_from_string( directory + "/Makefile", template.render(**template_dict))
         # TODO: For traditional XML, replace PROJ_PROJECT_XML_LEGACY with PROJ_PROJECT_XML
         template = jinja2.Template(ocpitemplate.PROJ_PROJECT_XML_LEGACY, trim_blocks=True)
-        ocpiutil.write_file_from_string( name + "/Project.xml", template.render(**template_dict))
+        ocpiutil.write_file_from_string("Project.xml", template.render(**template_dict))
         template = jinja2.Template(ocpitemplate.PROJ_GUI_PROJECT, trim_blocks=True)
-        ocpiutil.write_file_from_string( name + "/.project", template.render(**template_dict))
+        ocpiutil.write_file_from_string(".project", template.render(**template_dict))
 
         if kwargs.get("register", None):
             AssetFactory.factory(
                 "registry",
-                Registry.get_registry_dir(name)).add(name, True)
+                Registry.get_registry_dir()).add(str(path), True)
 
-        rc = ocpiutil.execute_cmd({}, name, action=[ "imports" ],
+        rc = ocpiutil.execute_cmd({}, str(path), action=[ "imports" ],
                                   file=os.environ["OCPI_CDK_DIR"] + "/include/project.mk")
         if rc != 0:
-            logging.warning("Failed to import project at " + proj_dir)
-        rc = ocpiutil.execute_cmd({}, name, action=[ "exports" ],
+            logging.warning("Failed to import project at " + str(path))
+        rc = ocpiutil.execute_cmd({}, str(path), action=[ "exports" ],
                                   file=os.environ["OCPI_CDK_DIR"] + "/include/project.mk")
         if rc != 0:
-            logging.warning("Failed to export project at " + proj_dir)
+            logging.warning("Failed to export project at " + str(path))
 
     def register(self, force=False, verbose=False):
         """
         Register project to registry. Export project if possible.
         """
-        registry = self.registry()
+        registry_dir = Registry.get_default_registry_dir()
+        registry = Registry(registry_dir)
         registry.add(self.directory, force=force)
 
         # Attempt to export project
@@ -1207,7 +1286,6 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
             registry_dir = Registry.get_registry_dir()
             registry = Registry(registry_dir)
             registry.remove(directory=self.directory)
-
 
 # pylint:enable=too-many-instance-attributes
 # pylint:enable=too-many-ancestors

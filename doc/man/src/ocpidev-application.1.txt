@@ -33,15 +33,14 @@ ACI applications always reside in their own directory within the
 Verbs that can operate on an application are:
 
 *`build`*::
-    Build the application, including any custom building
-    specified by a customized Makefile. The build operation
+    Build the application. The build operation
     applies only to an ACI application: it builds the C++
     files into an executable.
 
 *`clean`*::
     Remove all the generated and compiled files for the
     application, including any cleaning specfied by
-    a customized application Makefile.
+    the *`cleanFiles`* attribute in the XML file.
 
 *`create`*::
     Create the named application in the *`applications/`* directory of
@@ -183,7 +182,7 @@ syntaxes:
    
    ocpidev run application myapp --run-arg=-v --run-arg=-d --run-arg=-Pxsim
    
-   ocpidev run application myapp --run-arg=”-v -d -Pxsim”
+   ocpidev run application myapp --run-arg="-v -d -Pxsim"
 
 For an XML application, these command lines perform the command:
 

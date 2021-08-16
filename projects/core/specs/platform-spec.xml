@@ -16,7 +16,7 @@
   <property name='sdp_length' type='ushort' parameter='1' default='32'
 	    description='length of maximum segment in DWORDS, may be a hardware limitation of interconnect'/>
   <property name='pci_device_id' parameter='1' default='unknown'
-	    type='enum' enums='unknown,ml605,alst4,alst4x'>
+	    type='enum' enums='unknown,ml605,alst4,alst4x,picoevb'>
     <description>
       PCI Device ID for PCI devices, as registered at http://pci-ids.ucw.cz/read/PC/1df7
       New platforms shoud use "unknown" before they are registered.

@@ -151,13 +151,16 @@ HdlToolSet_cyclone5:=quartus
 # In other stages, use the HdlExactPart if set, or the Default part if set,
 # or the first part for this target
 # Note that the return part is still in the opencpi canonical form
-HdlChoosePart=$(strip \
-  $(if $(findstring $(HdlMode),platform config container),\
+HdlChoosePart=$(foreach c,\
+  $(if $(filter $(HdlMode),platform config container),\
     $(HdlPart_$(HdlPlatform)),\
     $(or \
+      $(foreach p,$(HdlExactParts),$(strip\
+        $(foreach f,$(word 1,$(subst :, ,$p)),\
+          $(and $(filter $f,$(HdlTarget)),$(word 2,$(subst :, ,$p)))))),\
       $(HdlExactPart),\
       $(HdlDefaultTarget_$(HdlTarget)),\
-      $(firstword $(HdlTargets_$(HdlTarget))))))
+      $(firstword $(HdlTargets_$(HdlTarget))))),$(infox CHOOSEPART:$c)$c)
 
 # Make the initial definition as a simply-expanded variable
 HdlAllPlatforms:=
@@ -223,7 +226,7 @@ HdlDoXmlPlatform=\
               $(eval HdlFamily_$t:=$f)))))))
 
 # Add a platform to the database.
-# Arg 1: The directory where the *.mk file is
+# Arg 1: The directory where the *.xml file is
 # Arg 2: The name of the platform
 # Arg 3: The actual platform directory for using the platform (which may not exist).
 #
@@ -245,9 +248,11 @@ HdlAddPlatform=\
     $(if $(call HdlGetFamily,$(HdlPart_$2)),\
       $(eval HdlAllPlatforms:=$(strip $(HdlAllPlatforms) $2))\
       $(eval HdlPlatformDir_$2:=$3)\
+      $(foreach r,$(patsubst %/exports,%,$(patsubst %/hdl/platforms,%,$(patsubst %/,%,$(dir $1)))),\
+        $(eval HdlPlatformPackageID_$2:=$(call OcpiGetProjectPackageID,$r).$2)) \
       $(if $(or \
-             $(call OcpiExists,$3/lib/hdl/$(HdlFamily_$(HdlPart_$2))),\
-             $(call OcpiExists,$3/hdl/$(HdlFamily_$(HdlPart_$2)))),\
+             $(call OcpiExists,$3/lib/hdl/$(call HdlGetFamily,$(HdlPart_$2))),\
+             $(call OcpiExists,$3/hdl/$(call HdlGetFamily,$(HdlPart_$2)))),\
         $(eval HdlBuiltPlatforms+=$2)),\
       $(call $(if $(filter $2,$(HdlPlatforms) $(HdlPlatform) $(OCPI_HDL_PLATFORM)),$(HdlError),warning),$(strip \
         HDL Platform '$2' was specified by user, but an appropriate HDL family cannot be \
@@ -366,7 +371,10 @@ $(info HdlTopTargets="$(HdlTopTargets)";\
        HdlBuiltPlatforms="$(HdlBuiltPlatforms)";\
        HdlAllTargets="$(HdlAllTargets)";\
        HdlTargets="$(foreach t,$(HdlTopTargets),$(or $(HdlTargets_$t),$t))";\
-       $(foreach p,$(HdlAllPlatforms),HdlPart_$p=$(HdlPart_$p); HdlPlatformDir_$p=$(HdlPlatformDir_$p);)\
+       $(foreach p,$(HdlAllPlatforms),\
+         HdlPart_$p=$(HdlPart_$p); \
+         HdlPlatformDir_$p=$(HdlPlatformDir_$p);\
+         HdlPlatformPackageID_$p=$(HdlPlatformPackageID_$p);)\
        $(foreach p,$(HdlAllPlatforms),HdlAllRccPlatforms_$p="$(HdlAllRccPlatforms_$p)"; )\
        $(foreach f,$(HdlAllTargets),\
          $(if $(HdlTargets_$f),HdlTargets_$f="$(HdlTargets_$f)";)\

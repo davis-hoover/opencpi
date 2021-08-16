@@ -73,7 +73,7 @@ The following figure shows a block diagram representation of the HDL implementat
    :alt: Metadata Stressor Block Diagram
    :align: center
 
-   Block diagram of metadata stressor HDL implementation.
+   Metadata Stressor HDL Worker Block Diagram
 
 .. ocpi_documentation_worker::
 
@@ -96,7 +96,3 @@ Control Timing and Signals
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 The metadata stressor HDL worker implementation uses the clock from
 the control plane and standard control plane signals.
-
-Utilization
------------
-.. ocpi_documentation_utilization::

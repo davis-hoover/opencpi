@@ -22,6 +22,9 @@ Defining rcc/hdl platform related classes
 import os
 import sys
 import logging
+from pathlib import Path
+import jinja2
+import _opencpi.assets.template as ocpitemplate
 import json
 import _opencpi.util as ocpiutil
 import _opencpi.hdltargets as hdltargets
@@ -39,7 +42,6 @@ class RccPlatformsCollection(ShowableAsset):
     def __init__(self, directory, name=None, **kwargs):
         self.check_dirtype("rcc-platforms", directory)
         super().__init__(directory, name, **kwargs)
-
         self.platform_list = []
         if kwargs.get("init_hdlplats", False):
             logging.debug("Project constructor creating HdlPlatformWorker Objects")
@@ -76,6 +78,8 @@ class HdlPlatformsCollection(HDLBuildableAsset, ReportableAsset):
                                      objects contained in the project (at least those with a
                                      corresponding build platform listed in self.hdl_platforms)
         """
+        if not name:
+            name = str(Path(directory).name)
         self.check_dirtype("hdl-platforms", directory)
         super().__init__(directory, name, **kwargs)
         self.hdl_plat_strs = kwargs.get("hdl_plats", None)
@@ -121,16 +125,21 @@ class HdlPlatformsCollection(HDLBuildableAsset, ReportableAsset):
         raise NotImplementedError("HdlPlatformsCollection.build() is not implemented")
 
     @staticmethod
-    def get_working_dir(name, library, hdl_library, hdl_platform):
+    def get_working_dir(name, ensure_exists=True, **kwargs):
         """
         return the directory of an HDL Platform Collection given the name (name) and
         library specifiers (library, hdl_library, hdl_platform)
         """
-        ocpiutil.check_no_libs("hdl-platforms", library, hdl_library, hdl_platform)
-        if name: ocpiutil.throw_not_blank_e("hdl-platforms", "name", False)
+        library = kwargs.get('library', '')
+        hdl_library = kwargs.get('hdl_library', '')
+        platform = kwargs.get('platform', '')
+        ocpiutil.check_no_libs("hdl-platform", library, hdl_library, platform)
+        if not name: 
+            ocpiutil.throw_not_blank_e("hdl-platforms", "name", False)
         if ocpiutil.get_dirtype() not in ["project", "hdl-platforms"]:
             ocpiutil.throw_not_valid_dirtype_e(["project", "hdl-platforms"])
         return ocpiutil.get_path_to_project_top() + "/hdl/platforms"
+
 
 # pylint:disable=too-many-ancestors
 class HdlPlatformWorker(HdlWorker, ReportableAsset):
@@ -155,8 +164,6 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
             None
         """
         self.check_dirtype("hdl-platform", directory)
-        if name is None:
-            name = os.path.basename(directory)
         super().__init__(directory, name, **kwargs)
         self.configs = {}
         self.package_id = None
@@ -234,16 +241,90 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
         return util_report
 
     @staticmethod
-    def get_working_dir(name, library, hdl_library, hdl_platform):
+    def get_working_dir(name, ensure_exists=True, **kwargs):
         """
         return the directory of a HDL Platform given the name (name) and
         library specifiers (library, hdl_library, hdl_platform)
         """
-        ocpiutil.check_no_libs("hdl-platform", library, hdl_library, hdl_platform)
-        if not name: ocpiutil.throw_not_blank_e("hdl-platform", "name", True)
-        if ocpiutil.get_dirtype() not in ["project", "hdl-platforms", "hdl-platform"]:
-            ocpiutil.throw_not_valid_dirtype_e(["project", "hdl-platforms", "hdl-platform"])
-        return ocpiutil.get_path_to_project_top() + "/hdl/platforms/" + name
+        if not name: 
+            ocpiutil.throw_not_blank_e("hdl-platforms", "name", False)
+        if ocpiutil.get_dirtype() not in ["project", "hdl-platforms"]:
+            ocpiutil.throw_not_valid_dirtype_e(["project", "hdl-platforms"])
+        project_path = Path(ocpiutil.get_path_to_project_top())
+        hdl_path = Path(project_path, 'hdl')
+        if not hdl_path.exists() and not ensure_exists:
+            hdl_path.mkdir()
+        working_path = Path(hdl_path, 'platforms', name)
+        return str(working_path)
+
+    def _get_template_dict(name, directory, **kwargs):
+        """
+        used by the create function/verb to generate the dictionary of viabales to send to the
+        jinja2 template.
+        valid kwargs handled at this level are:
+            platform       (string)      - Platform name
+            comp_lib       (list of str) - Specify ComponentLibraries in Makefile
+            xml_include    (list of str) - Specify XmlIncludeDirs in Makefile
+            include_dir    (list of str) - Specify IncludeDirs in Makefile
+            prim_lib       (list of str) - Specify Libraries in Makefile
+            hdl_part       (string)      - Part name, defalt=xc7z020-1-clg484
+            time_freq      (string)      - Time frequency, default=100e6
+            no_sdp         (bool)        - No SDP (legacy usage)
+        """
+        hdl_part = kwargs.get("hdl_part", None)
+        time_freq = kwargs.get("time_freq", None)
+        no_sdp = kwargs.get("no_sdp", False)
+        use_sdp = True if no_sdp == False else False
+        comp_lib = kwargs.get("comp_lib", None)
+        if comp_lib:
+            comp_lib = " ".join(comp_lib)
+        xml_include = kwargs.get("xml_include", None)
+        if xml_include:
+            xml_include = " ".join(xml_include)
+        include_dir = kwargs.get("include_dir", None)
+        if include_dir:
+            include_dir = " ".join(include_dir)
+        prim_lib = kwargs.get("prim_lib", None)
+        if prim_lib:
+            prim_lib = " ".join(prim_lib)
+        template_dict = {
+                        "platform" : name,
+                        "comp_lib" : comp_lib,
+                        "xml_include" :xml_include,
+                        "include_dir" : include_dir,
+                        "prim_lib" : prim_lib,
+                        "hdl_part": hdl_part,
+                        "time_freq": time_freq,
+                        "use_sdp": use_sdp,
+                        }
+        return template_dict
+
+    @staticmethod
+    def create(name, directory, **kwargs):
+        """
+        Create hdl platform assets
+        """
+        verbose = kwargs.get("verbose", None)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        os.chdir(directory)
+        if os.path.exists(directory+name):
+            err_msg = 'platform "{}" already exists at "{}"'.format(name, str(directory))
+            raise ocpiutil.OCPIException(err_msg)
+
+        template_dict = HdlPlatformWorker._get_template_dict(name, directory, **kwargs)
+        if not os.path.exists("platforms.xml"):
+            template = jinja2.Template(ocpitemplate.HDLPLATFORM_PLATFORMS_XML, trim_blocks=True)
+            ocpiutil.write_file_from_string("platforms.xml", template.render(**template_dict))
+        if not os.path.exists(name):
+            os.mkdir(name)
+        os.chdir(name)
+        template = jinja2.Template(ocpitemplate.HDLPLATFORM_PLATFORM_XML, trim_blocks=True)
+        ocpiutil.write_file_from_string(name + ".xml", template.render(**template_dict))
+        if verbose:
+            print("HDL Platform '" + name + "' was created at", directory)
+
+
 # pylint:enable=too-many-ancestors
 
 class HdlPlatformWorkerConfig(HdlAssembly):
@@ -371,6 +452,8 @@ class RccPlatform(Platform):
         Constructor for RccPlatform no extra values from kwargs processed in this constructor
         """
         self.check_dirtype("rcc-platform", directory)
+        if not name:
+            name = str(Path(directory).name)
         super().__init__(directory, name, **kwargs)
 
     def __str__(self):
@@ -391,9 +474,10 @@ class RccPlatform(Platform):
         for plat in rcc_plats:
             plat_dict[plat] = {}
             plat_dict[plat]["target"] = rcc_dict["RccTarget_" + plat][0]
-            proj_top = ocpiutil.get_project_package(rcc_dict["RccPlatDir_" + plat][0])
-            plat_dict[plat]["package_id"] = proj_top + ".platforms." + plat
-            plat_dict[plat]["directory"] = rcc_dict["RccPlatDir_" + plat][0]
+            #proj_top = ocpiutil.get_project_package(rcc_dict["RccPlatformDir_" + plat][0])
+            #plat_dict[plat]["package_id"] = proj_top + ".platforms." + plat
+            plat_dict[plat]["package_id"] = rcc_dict["RccPlatformPackageID_" + plat][0]
+            plat_dict[plat]["directory"] = rcc_dict["RccPlatformDir_" + plat][0]
         return plat_dict
 
     @classmethod
@@ -590,6 +674,7 @@ class HdlPlatform(Platform):
         elif details == "json":
             json.dump(plat_dict, sys.stdout)
             print()
+
 
 class HdlTarget(object):
     """

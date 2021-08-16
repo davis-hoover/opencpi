@@ -20,7 +20,11 @@
 Defintion of HDL assembly and related classes
 """
 
+import os
 import logging
+import jinja2
+import _opencpi.assets.template as ocpitemplate
+from pathlib import Path
 import _opencpi.util as ocpiutil
 import _opencpi.hdltargets as hdltargets
 from .factory import AssetFactory
@@ -36,6 +40,8 @@ class HdlAssembly(HdlCore):
                      HdlContainer[Implementation]
     """
     def __init__(self, directory, name=None, **kwargs):
+        if not name:
+            name = str(Path(directory).name)
         super().__init__(directory, name, **kwargs)
         # TODO Collect list of included HdlCores
 
@@ -182,17 +188,82 @@ class HdlApplicationAssembly(HdlAssembly, ReportableAsset):
         return util_report
 
     @staticmethod
-    def get_working_dir(name, library, hdl_library, hdl_platform):
+    def get_working_dir(name, ensure_exists=True, **kwargs):
         """
         return the directory of a HDL Assembly given the name (name) and
         library specifiers (library, hdl_library, hdl_platform)
         """
-        ocpiutil.check_no_libs("hdl-assembly", library, hdl_library, hdl_platform)
-        if not name: ocpiutil.throw_not_blank_e("hdl-assembly", "name", True)
+        library = kwargs.get('library', '')
+        hdl_library = kwargs.get('hdl_library', '')
+        platform = kwargs.get('platform', '')
+        ocpiutil.check_no_libs("hdl-assembly", library, hdl_library, platform)
+        if not name: 
+            ocpiutil.throw_not_blank_e("hdl-assembly", "name", True)
         if ocpiutil.get_dirtype() not in ["project", "hdl-assemblies", "hdl-assembly"]:
             ocpiutil.throw_not_valid_dirtype_e(["project", "hdl-assemblies", "hdl-assembly"])
-        if not name: ocpiutil.throw_not_blank_e("hdl-assembly", "name", True)
-        return ocpiutil.get_path_to_project_top() + "/hdl/assemblies/" + name
+
+        working_path = Path(ocpiutil.get_path_to_project_top())
+        hdl_path = Path(working_path, 'hdl')
+        if not hdl_path.exists() and not ensure_exists:
+            hdl_path.mkdir()
+        working_path = Path(hdl_path, 'assemblies', name)
+        
+        return str(working_path)
+
+    def _get_template_dict(name, directory, **kwargs):
+        """
+        used by the create function/verb to generate the dictionary of viabales to send to the
+        jinja2 template.
+        valid kwargs handled at this level are:
+            assembly         (string)    - HDL Assembly name
+            only_target      (string)    - Only build for the specified HDL arch
+            exclude_target   (string)    - Do not build for the specified HDL arch
+            only_platform    (string)    - Only build for the specified HDL platform
+            exclude_platform (string)    - Do not build for the specified HDL platform
+        """
+        only_target = kwargs.get("only_target", None)
+        if only_target:
+            only_target = " ".join(only_target)
+        exclude_target = kwargs.get("exclude_target", None)
+        if exclude_target:
+            exclude_target = " ".join(exclude_target)
+        only_platform = kwargs.get("only_platform", None)
+        if only_platform:
+            only_platform = " ".join(only_platform)
+        exclude_platform = kwargs.get("exclude_platform", None)
+        if exclude_platform:
+            exclude_platform = " ".join(exclude_platform)
+        template_dict = {
+                        "assembly" : name,
+                        "only_target" : only_target,
+                        "exclude_target" : exclude_target,
+                        "only_platform" : only_platform,
+                        "exclude_platform" : exclude_platform,
+                        }
+        return template_dict
+
+    @staticmethod
+    def create(name, directory, **kwargs):
+        """
+        Create an HDL assembly asset
+        """
+        verbose = kwargs.get("verbose", None)
+        assembly_path = Path(directory, name)
+        assembly_file = str(assembly_path) + "/" + name + ".xml"
+        if not os.path.exists(str(assembly_path)):
+            os.makedirs(str(assembly_path))
+        os.chdir(directory)
+        if os.path.exists(assembly_file):
+            err = "HdlAssembly '{}' already exists at {}".format(name, assembly_file)
+            raise ocpiutil.OCPIException(err)
+        template_dict = HdlApplicationAssembly._get_template_dict(name, directory, **kwargs)
+        template = jinja2.Template(ocpitemplate.HDL_ASSEMBLIES_XML, trim_blocks=True)
+        ocpiutil.write_file_from_string("assemblies.xml", template.render(**template_dict))
+        template = jinja2.Template(ocpitemplate.HDL_ASSEMBLY_XML, trim_blocks=True)
+        ocpiutil.write_file_from_string(assembly_file, template.render(**template_dict))
+        if verbose:
+            print("HDL Assembly '" + name + ".xml' was created at", assembly_path)
+
 
 class HdlAssembliesCollection(HDLBuildableAsset, ReportableAsset):
     """
@@ -252,12 +323,15 @@ class HdlAssembliesCollection(HDLBuildableAsset, ReportableAsset):
         raise NotImplementedError("HdlAssembliesCollection.build() is not implemented")
 
     @staticmethod
-    def get_working_dir(name, library, hdl_library, hdl_platform):
+    def get_working_dir(name, ensure_exists=True, **kwargs):
         """
         return the directory of a HDL Assembly Collection given the name (name) and
         library specifiers (library, hdl_library, hdl_platform)
         """
-        ocpiutil.check_no_libs("hdl-assembly", library, hdl_library, hdl_platform)
+        library = kwargs.get('library', '')
+        hdl_library = kwargs.get('hdl_library', '')
+        platform = kwargs.get('platform', '')
+        ocpiutil.check_no_libs("hdl-assembly", library, hdl_library, platform)
         if name: ocpiutil.throw_not_blank_e("applications", "name", False)
         if ocpiutil.get_dirtype() not in ["project", "hdl-assemblies"]:
             ocpiutil.throw_not_valid_dirtype_e(["project", "hdl-assemblies"])

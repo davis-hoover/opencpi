@@ -1,0 +1,14 @@
+<!-- This is the spec file (OCS) for: test_optional
+     Add component spec attributes, like "protocol".
+     Add property elements for spec properties.
+     Add port elements for i/o ports -->
+<ComponentSpec>
+   <Port Name="samples_in" Producer="false" optional="true"/>
+   <Port Name="timestamps_in" Producer="false" optional="true"/>
+   <Port Name="samples_out" Producer="true" optional="true"/>
+   <Port Name="timestamps_out" Producer="true" optional="true"/>
+   <Property Name="samples" Type="uLong" Parameter="true" Default="1024" Description="Dummy property 1"/>
+   <Property Name="timestamps"  Type="uLong" Parameter="true" Default="1024" Description="Dummy property 2"/>
+   <Property Name="samples_b" Type="bool" Parameter="true" Default="true" Description="Dummy property 3"/>
+   <Property Name="timestamps_b" Type="bool" Parameter="true" Default="true" Description="Dummy property 4"/>
+</ComponentSpec>

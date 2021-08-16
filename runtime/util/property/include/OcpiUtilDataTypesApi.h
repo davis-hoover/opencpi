@@ -115,17 +115,35 @@ namespace OCPI {
 #endif
     // Structure to capture indexing arrays and sequences and navigating to struct members
     // The only intended usage is in the initializer_list below
+    // The members are mutable so that a compile-time initializer list can be patched with SWIG
+#if 0
     struct Access {
       union {
-	size_t m_index;
-	const char *m_member;
+	mutable size_t m_index;
+	mutable const char *m_member;
       };
-      bool m_number;
+      mutable bool m_number;
       Access(size_t subscript)   : m_index(subscript), m_number(true) {} // get element
       // Allow (signed) ints for convenience, including 0, which should not end up being NULL for const char*
       Access(int subscript)      : m_index((assert(subscript >= 0), (size_t)subscript)), m_number(true) {}
       Access(const char *member) : m_member(member), m_number(false) {}; // get member
     };
+#else
+    union AccessUnion {
+      mutable size_t m_index;
+      mutable const char *m_member;
+      AccessUnion(size_t n) : m_index(n) {};
+      AccessUnion(const char *n) : m_member(n) {};
+    };
+    struct Access {
+      AccessUnion m_u;
+      mutable bool m_number;
+      Access(size_t subscript)   : m_u(subscript), m_number(true) {} // get element
+      // Allow (signed) ints for convenience, including 0, which should not end up being NULL for const char*
+      Access(int subscript)      : m_u((assert(subscript >= 0), (size_t)subscript)), m_number(true) {}
+      Access(const char *member) : m_u(member), m_number(false) {}; // get member
+    };
+#endif
     typedef const std::initializer_list<Access> AccessList;
     const AccessList emptyList; // because GCC 4.4 doesn't completely support init lists
   } // API

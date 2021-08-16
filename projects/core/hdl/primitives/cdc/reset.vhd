@@ -61,7 +61,7 @@ end entity reset;
 
 architecture rtl of reset is
 
-  signal s_reset_hold : std_logic_vector(RST_DELAY-1 downto 0) := (others => '0');
+  signal s_reset_hold : std_logic_vector(RST_DELAY-1 downto 0) := (others => '1');
 
 begin
 

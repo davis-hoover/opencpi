@@ -92,13 +92,37 @@ CwdDirName:=$(subst $(Invalid),$(Space),$(notdir $(subst $(Space),$(Invalid),$(C
 CwdName:=$(basename $(CwdDirName))
 $(call OcpiDbgVar,CwdName)
 
+# Avoid calling the shell to execute the TR command for this purpose (save two process/shell invocations)
+OcpiUpper:=A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+OcpiLower:=a b c d e f g h i j k l m n o p q r s t u v w x y z
+OcpiNumber:=0 1 2 3 4 5 6 7 8 9
+OcpiSpecial:=! " \# $$ % & ' ( ) * + , - . / : ; < = > ? ` { | } ~
+OcpiPrint:=$(OcpiUpper) $(OcpiLower) $(OcpiNumber) $(OcpiSpecial)
+OcpiTranslate=$(strip\
+                $(eval OcpiTranslate_:=$1)\
+                $(foreach x,$(join $(2:%=%:),$3),\
+                  $(eval OcpiTranslate_:=$(strip\
+                    $(subst $(firstword $(subst :, ,$x)),$(word 2,$(subst :, ,$x)),$(OcpiTranslate_)))))\
+                $(OcpiTranslate_))
+OcpiToUpper=$(call OcpiTranslate,$1,$(OcpiLower),$(OcpiUpper))
+OcpiToLower=$(call OcpiTranslate,$1,$(OcpiUpper),$(OcpiLower))
+OcpiCapitalize=$(or $(strip $(foreach l,$(OcpiLower),\
+	              $(if $(filter $l%,$1),$(call OcpiToUpper,$l)$(patsubst $l%,%,$1)))),$1)
+
+# $(foreach s,abc =-09 AbC,$(info CAP:$s:$(call OcpiCapitalize,$s)))
+# $(info ZU:$(call OcpiToUpper,abcd):$(call OcpiToUpper,Abce):$(call OcpiToUpper,ABCf):$(call OcpiToUpper,1abCg:3))
+# $(info ZL:$(call OcpiToLower,abcd):$(call OcpiToLower,Abce):$(call OcpiToLower,ABCf):$(call OcpiToLower,1abCg:3))
+
 # These need to be early since some immediate assignments use them below
 #Capitalize=$(shell csh -f -c 'echo $${1:u}' $(1))
 #UnCapitalize=$(shell csh -f -c 'echo $${1:l}' $(1))
-Capitalize=$(shell awk -v x=$(1) 'BEGIN {print toupper(substr(x,1,1)) substr(x,2,length(x)-1) }')
-UnCapitalize=$(shell awk -v x=$(1) 'BEGIN {print tolower(substr(x,1,1)) tolower(x,2,length(x)-1) }')
-ToUpper=$(shell echo $(1)|tr a-z A-Z)
-ToLower=$(shell echo $(1)|tr A-Z a-z)
+#Capitalize=$shell awk -v x=$(1) 'BEGIN {print toupper(substr(x,1,1)) substr(x,2,length(x)-1) }')
+#UnCapitalize=$(shell awk -v x=$(1) 'BEGIN {print tolower(substr(x,1,1)) tolower(x,2,length(x)-1) }')
+#Capitalize=$shell awk -v x=$(1) 'BEGIN {print toupper(substr(x,1,1)) substr(x,2,length(x)-1) }')
+UnCapitalize=$(error UnCapitalize no implementation)
+Capitalize=$(call OcpiCapitalize,$1)
+ToUpper=$(call OcpiToUpper,$1)
+ToLower=$(call OcpiToLower,$1)
 
 ifndef Model
 Model:=$(strip $(subst ., ,$(suffix $(CwdDirName))))
@@ -115,8 +139,8 @@ Suffix_hdl_vhdl:=vhd
 Language_hdl:=vhdl
 Languages_hdl:=vhdl verilog
 
-Language_ocl:=cl
-Suffix_ocl_cl:=cl
+Language_ocl:=ocl
+Suffix_ocl_ocl:=cl
 Suffix_xm:=xm
 # Assign here for caching
 CapModels:=$(foreach m,$(Models),$(call Capitalize,$m))
@@ -141,7 +165,7 @@ AdjustRelative2=$(foreach i,$(1),$(if $(filter /%,$(i)),$(i),../../$(patsubst ./
 AdjustRelative=$(foreach i,$(1),$(if $(filter /%,$(i)),$(i),..$(patsubst %,/%,$(patsubst ./%,%,$(filter-out .,$(i))))))
 
 # Physical and realpath are broken on some NFS mounts..
-OcpiAbsDir=$(foreach d,$(shell cd $1; pwd -L),$d)
+OcpiAbsDir=$(realpath $1)#$(foreach d,$(shell cd $1; pwd -L),$d)
 OcpiAbsPath=$(strip \
   $(call OcpiCacheFunctionOnPath,OcpiAbsPathX,$(or $1,.)))
 OcpiAbsPathX=$(strip \
@@ -152,10 +176,11 @@ OcpiAbsPathX=$(strip \
           $(call OcpiAbsDir,.)/$1)))),$(abspath $p)))
 
 define OcpiParseXml
-  $$(if $$(call DoShell,set -o pipefail && $$(ToolsDir)/ocpigen -R $1/$2.xml|tr "\n" ";"|tr " " "&",OcpiProps),\
+  $$(infox PARSE:$1:$2)
+  $$(if $$(call DoShell,set -o pipefail && $$(ToolsDir)/ocpigen -R $1/$2.xml|tr "\n" "@"|tr " " "~",OcpiProps),\
     $$(error ocpigen failed),\
-    $$(foreach var,$$(subst ;, ,$$(OcpiProps)),$$(eval $$(subst &, ,$$(var)))))
-  $$(infox $0: OcpiProps is $$(OcpiProps))
+    $$(foreach var,$$(subst @, ,$$(OcpiProps)),$$(eval $$(subst ~, ,$$(var)))))
+  $$(infox $0: OcpiProps is $$(subst @, ,$$(OcpiProps)))
 endef
 
 # Call a function ($1) with a single path argument ($2).
@@ -609,11 +634,11 @@ OcpiProjectDependenciesInternal=$(call Unique,$(ProjectDependencies)\
 OcpiGetProjectDependencies=$(strip \
   $(foreach r,$(or $(wildcard $(OCPI_PROJECT_REL_DIR)/imports),\
               $(OcpiGlobalDefaultProjectRegistryDir)),\
-    $(foreach d,$(OCPI_PROJECT_DEPENDENCIES),$(infox DEP:$d)\
+    $(foreach d,$(OCPI_PROJECT_DEPENDENCIES),$(infox DEP:$d:$(OCPI_PROJECT_PACKAGE):$(OCPI_PROJECT_PACKAGE_ID))\
       $(if $(findstring /,$d),\
         $d,\
 	$(or $(wildcard $r/$d),\
-          $(error For project at $(realpath $(OCPI_PROJECT_REL_DIR)), dependency $d is not registered at $i))))))
+          $(error In $(CWD), for project at $(realpath $(OCPI_PROJECT_REL_DIR)), dependency $d is not registered at $r))))))
 
 #      $(call OcpiGetProjectInImports,.,$d)) ))
 # These are the leftover imports that are not listed in the ProjectDependencies
@@ -716,7 +741,7 @@ OcpiRelPathToContainingProjectX=$(infox ORPTCPX:$1:$2)$(strip \
 OcpiAbsPathToContainingProject=$(strip $(infox OAPTCP:$1)\
   $(call OcpiCacheFunctionOnPath,OcpiAbsPathToContainingProjectX,$(call OcpiAbsPath,$(or $1,.))))
 OcpiAbsPathToContainingProjectX=$(strip \
-  $(if $(filter project,$(call OcpiGetDirType,$1)),\
+  $(if $(wildcard $1/Project.mk $1/Project.xml),\
     $1,\
     $(if $(call OcpiExists,$1),\
       $(if $(filter $(dir $1),"/"),\
@@ -739,7 +764,7 @@ OcpiArePathsInSameProject=$(strip $(infox OAPISP:$1:$2)\
 OcpiPathFromProjectTop=$(strip $(infox OPFPT:$1)\
   $(patsubst %/,%,$(call OcpiCacheFunctionOnPath,OcpiPathFromProjectTopX,$(call OcpiAbsPath,$1))))
 OcpiPathFromProjectTopX=$(strip \
-  $(if $(filter project,$(call OcpiGetDirType,$1)),\
+  $(if $(wildcard $1/Project.xml $1/Project.mk),\
     ,\
     $(if $(call OcpiExists,$1),\
       $(if $(filter $(dir $1),$1),\
@@ -816,6 +841,91 @@ OcpiPrependEnvPath=\
 
 ############ Project related functions
 
+define OcpiParseProjectPackageID
+  # Save the Package, PackagePrefix, and PackageName variables
+  # so that they can be used as is later on (if set at the command
+  # or in a 'Makefile' file), but so they do not interfere with
+  # ProjectPackage results
+  PackageSaved:=$$(Package)
+  Package:=
+  PackagePrefixSaved:=$$(PackagePrefix)
+  PackagePrefix:=
+  PackageNameSaved:=$$(PackageName)
+  PackageName:=
+  ComponentLibrariesSaved:=$$(ComponentLibraries)
+  ComponentLibraries:=
+  ProjectDependenciesSaved:=$$(ProjectDependencies)
+  ProjectDependencies:=
+  # Include Project.<mk|xml> to determine ProjectPackage
+  $$(infox PR0:$1:$$(Package):$$(PackagePrefix):$$(PackageName):$$(ProjectPackage):$$(ParentPackage))
+  ifneq ($(wildcard $1/Project.xml),)
+    # Handle XML, aka make-less, properties for project assets
+    ifneq ($(wildcard $1/Project.mk),)
+      $$(warning Found both Project.mk and Project.xml, using Project.xml)
+    endif
+    # The following would be useful, but fails for bootstrapping
+    #(call OcpiParseXml,$1,Project)
+    # This just uses bash
+    $$(if $$(call DoShell,cd $1 && \
+                          source $$(OCPI_CDK_DIR)/scripts/util.sh && \
+                          getproject && \
+                          echo $$$$packageid,Package),\
+          $$(error Failed to get project packageID at $1))
+  else
+    # Legacy support for project assets
+    $(infox $0: Could not find Project.xml, using Project.mk)
+    include $1/Project.mk
+  endif
+  $$(infox PR1:$$(Package):$$(PackagePrefix):$$(PackageName):$$(ProjectPackage):$$(ParentPackage))
+
+  # Determine ProjectPackage as follows:
+  # If it is already set, use it as-is
+  # If ProjectPackage or Package is set, use that as-is
+  # Otherwise, use PackagePrefix.PackageName
+  # PackagePrefix defaults to 'local'
+  # PackageName defaults to directory name
+  # PackageID is the documented, preferred user-specified value.
+  # FIXME: All this code could be changed to use PackageID rather than Package someday
+  ifndef Package
+    ifdef PackageID
+      Package:=$$(PackageID)
+    else
+      ifndef PackagePrefix
+        PackagePrefix:=local
+      endif
+      ifndef PackageName
+        PackageName:=$$(notdir $$(call OcpiAbsDir,$1))
+      endif
+      Package:=$$(if $$(PackagePrefix),$$(patsubst %.,%,$$(PackagePrefix)).)$$(PackageName)
+    endif
+  endif
+  $2:=$$(Package)
+  Package:=$$(PackageSaved)
+  PackagePrefix:=$$(PackagePrefixSaved)
+  PackageName:=$$(PackageNameSaved)
+  ComponentLibraries:=$$(ComponentLibrariesSaved)
+  ProjectDependencies:=$$(ProjectDependenciesSaved)
+endef
+
+# Given a project's directory return its package id
+# First try to get it via exports (without creating a subshell process)
+
+
+OcpiGetProjectPackageIDX=$(shell echo OGPPIX:$1 > /dev/tty)$(strip\
+  $(foreach i,\
+    $(or $(foreach p,$(wildcard $1/project-package-id:* $1/exports/project-package-id:*),\
+           $(patsubst project-package-id:%,%,$(notdir $p))),$(strip\
+      $(eval $(call OcpiParseProjectPackageID,$1)))),$(shell echo OGPPIXr:$i>/dev/tty)$i
+
+# Assign the packageID of the given project to the given variable
+OcpiGetProjectPackageID=$(strip\
+  $(or $(foreach i,$(filter $1:%,$(OcpiProjectPackageIDs)),\
+	 $(patsubst $1:%,%,$i)),\
+       $(eval $(call OcpiParseProjectPackageID,$1,OcpiTmpGetProjectPackageID))\
+       $(eval OcpiProjectPackageIDs+=$1:$(OcpiTmpGetProjectPackageID))\
+       $(infox OcpiProjectPackageIDs is now:$(OcpiProjectPackageIDs))\
+       $(OcpiTmpGetProjectPackageID)))
+
 # Set the given directory as the project directory, include the Project.mk file that is there
 # and setting an environment variable OCPI_PROJECT_DIR to that place.
 # This allows any path-related settings to be relative to the project dir
@@ -873,16 +983,18 @@ define OcpiSetProjectX
   # Otherwise, use PackagePrefix.PackageName
   # PackagePrefix defaults to 'local'
   # PackageName defaults to directory name
+  # PackageID is the documented, preferred user-specified value.
+  # FIXME: All this code could be changed to use PackageID rather than Package someday
   ifndef ProjectPackage
-    ifneq ($$(Package),)
+    ifdef Package
       ProjectPackage:=$$(Package)
-    else ifneq ($$(PackageID),)
+    else ifdef PackageID
       ProjectPackage:=$$(PackageID)
     else
-      ifeq ($$(PackagePrefix),)
+      ifndef PackagePrefix
         PackagePrefix:=local
       endif
-      ifeq ($$(PackageName),)
+      ifndef PackageName
         PackageName:=$$(notdir $$(call OcpiAbsDir,$1))
       endif
       ProjectPackage:=$$(if $$(PackagePrefix),$$(patsubst %.,%,$$(PackagePrefix)).)$$(PackageName)
@@ -954,10 +1066,8 @@ OcpiGetShortenedDirType=$(infox OGSDT:$1)$(strip \
 # Recursive
 OcpiIncludeProjectX=$(infox OIPX:$1:$2:$3)\
   $(if $(wildcard $1/Project.mk)$(wildcard $1/Project.xml),\
-    $(if $(filter project,$(call OcpiGetDirType,$1)),\
-      $(eval $(call OcpiSetProject,$1))\
-      $(infox PROJECT:$(OCPI_PROJECT_PACKAGE):$(PackagePrefix):$(ProjectPackage)=$(Package)),\
-      $(error no proper Makefile found in the directory where Project.<mk|xml> was found ($1))),\
+    $(eval $(call OcpiSetProject,$1))\
+    $(infox PROJECT:$(OCPI_PROJECT_PACKAGE):$(PackagePrefix):$(ProjectPackage)=$(Package)),\
     $(if $(foreach r,$(realpath $1/..),$(filter-out /,$r)),\
       $(call OcpiIncludeProjectX,$(and $(filter-out .,$1),$1/)..,$2,$3),\
       $(call $2,$2: no Project.<mk|xml> was found here ($3) or in any parent directory)))
@@ -1053,8 +1163,8 @@ define OcpiSetAsset
   else ifneq ($(filter-out Platforms Primitive Primitives Applications Application,$2),)
     $$(error Unexpected asset type: $2)
   else ifeq ($2,Application)
-    ifneq ($$(wildcard $1/$$(OcpiAssetName)-app.xml),)
-      $$(eval $$(call OcpiParseXml,$1,$$(OcpiAssetName)-app))
+    ifneq ($$(wildcard $1/$$(OcpiAssetName).xml),)
+      $$(eval $$(call OcpiParseXml,$1,$$(OcpiAssetName)))
     endif
   else ifeq ($2,Primitives)
     # We are overloading the Libraries and Cores variables.
@@ -1146,7 +1256,14 @@ OcpiIncludeAssetAndParentX=$(infox OIAAPX:$1:$2:$3:$(realpath $1))$(strip \
 #   Arg2 = authoring model prefix for package-ID (optional) - <parent>.<auth>.<package-name>
 #   Arg3 = error/warning/info mode (optional)
 OcpiIncludeAssetAndParent=\
-  $(if $(and $(MAKECMDGOALS),$(if $(filter-out clean%,$(MAKECMDGOALS)),,x)),,\
+  $(if $(filter clean%,$(MAKECMDGOALS)),\
+    $(- here is when we are cleaning - just look for cleanfiles attribute by itself)\
+    $(foreach d,$(or $1,.),\
+      $(foreach x,$(wildcard $d/$(CwdName).xml $d/$(CwdName).*.xml $d/$(CwdName)-test.xml $d/$(CwdName)-app.xml),\
+	$(infox FOUND XML:$x)\
+        $(eval CleanFiles:=$(shell $(ToolsDir)/ocpixml -a '?cleanfiles' parse $x))\
+	$(infox FOUND CLEANFILES:$(CleanFiles)))),\
+    $(- here is when we are not cleaning)\
     $(eval ParentPackage:=)\
     $(eval Package:=)\
     $(eval PackageID:=)\

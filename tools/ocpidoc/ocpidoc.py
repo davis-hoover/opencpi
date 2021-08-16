@@ -65,7 +65,7 @@ if __name__ == "__main__":
     clean_parser.add_argument("-r", "--recursive", action="store_true",
                               help="Remove built documentation from all "
                                     + "subfolders")
-    # For consistency vs. all other ocpi* commands
+    # For consistency with all other ocpi* commands
     # force non-zero exit code if argparse exits, even for help etc.
     # force help if no arguments
     try:
@@ -74,9 +74,11 @@ if __name__ == "__main__":
         sys.exit(1)
 
     # Run only when the directory is in a project
-    if ocpiutil.get_dirtype(str(arguments.directory)):
+    project_path = ocpiutil.get_path_to_project_top(str(arguments.directory))
+    if project_path is not None:
         sys.exit(arguments.func(**vars(arguments)))
     else:
-        print("Error: the directory " + str(arguments.directory) + " is not an OpenCPI asset directory",
+        print("Error: the directory " + str(arguments.directory) +
+              " is not inside a OpenCPI project directory",
               file=sys.stderr)
         sys.exit(1)

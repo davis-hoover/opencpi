@@ -1,20 +1,22 @@
 from pathlib import Path
+import _opencpi.util as ocpiutil
+
+def get_noun():
+    """
+    Get noun from call to opencpi utility function get_dirtype().
+    Format returned dirtype as needed.
+    """
+    dirtype = ocpiutil.get_dirtype()
+    if dirtype:
+        if dirtype in ['hdl-core', 'hdl-library']:
+        # Command line expects 'hdl-primitive-core' or 'hdl-primitive-library'
+            index = dirtype.find('-')
+            dirtype = dirtype[:index] + '-primitive' + dirtype[index:]
+        dirtype = dirtype.split('-')
+    
+    return dirtype
 
 """Dicts of args to be used by ocpidev.py"""
-
-# Options common to all verbs
-common_options = {
-    'directory': {
-        'long': '--directory',
-        'short': '-d',
-        'default': str(Path.cwd())
-    },
-    'force': {
-        'long': '--force',
-        'short': '-f',
-        'action': 'store_true'
-    }
-}
 
 # Options to be used for pre-processing user args and to reference
 # in verb-specific options
@@ -68,7 +70,7 @@ options = {
     'no_control': {
         'long': '--no-control',
         'short': '-n',
-        'action': 'store_false'
+        'action': 'store_true'
     },
     'create_test': {
         'long': '--create-test',
@@ -78,20 +80,19 @@ options = {
     'project': {
         'long': '--project',
         'short': '-p',
-        'action': 'store_true'
+        'action': 'store_true',
+        'mut_exc_group': 'project'
     },
     'library': {
         'long': '--library',
-        'short': '-l'
+        'short': '-l',
+        'mut_exc_group': 'project'
     },
     'hdl_library': {
         'long': '--hdl-library',
         'short': '-h',
-        'choices': [
-            'devices',
-            'cards',
-            'adapters'
-        ]
+        'choices': [ 'devices', 'cards', 'adapters' ],
+        'mut_exc_group': 'project'
     },
     'standalone': {
         'long': '--standalone',
@@ -153,8 +154,8 @@ options = {
         'long': '--time-freq',
         'short': '-q'
     },
-    'no_dsp': {
-        'long': '--no-dsp',
+    'no_sdp': {
+        'long': '--no-sdp',
         'short': '-u',
         'action': 'store_true'
     },
@@ -164,7 +165,7 @@ options = {
         'action': 'append'
     },
     'exclude_target': {
-        'long': '--exclude_target',
+        'long': '--exclude-target',
         'short': '-Z',
         'action': 'append'
     },
@@ -222,6 +223,10 @@ options = {
         ],
         'action': 'store_true'
     },
+    'clean_all':{
+        'long': '--clean-all',
+        'action': 'store_true'
+    },
     'hdl': {
         'long': [
             '--hdl',
@@ -236,6 +241,14 @@ options = {
         ],
         'action': 'store_true'
     },
+    'optimize': {
+        'long': '--optimize',
+        'action': 'store_true'
+    },
+    'dynamic': {
+        'long': '--dynamic',
+        'action': 'store_true'
+    },
     'worker': {
         'long': '--worker',
         'short': '-W',
@@ -243,6 +256,8 @@ options = {
     },
     'hdl_rcc_platform': {
         'long': [
+            '--rcc-hdl-platform',
+            '--build-rcc-hdl-platform',
             '--hdl-rcc-platform',
             '--build-hdl-rcc-platform'
         ],
@@ -278,19 +293,30 @@ options = {
 # Verbs with nouns and options, including options referencing those above
 verbs = {
     'build': {
+        'options': {
+            'name': {
+                'nargs': '?',
+                'default': lambda: Path.cwd().name
+            }
+        },
         'nouns': {
-            'required': False,
+            'default': get_noun,
             'application': {
                 'options': {
-                    'name': None,
+                    'optimize': options['optimize'],
+                    'dynamic': options['dynamic'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
-                    'rcc_platform': options['rcc_platform']
+                    'rcc_platform': options['rcc_platform'],
+                    'workers_as_needed' : options['workers_as_needed']
                 }
             },
             'applications': {
                 'options': {
+                    'optimize': options['optimize'],
+                    'dynamic': options['dynamic'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
-                    'rcc_platform': options['rcc_platform']
+                    'rcc_platform': options['rcc_platform'],
+                    'workers_as_needed' : options['workers_as_needed']
                 }
             },
             'hdl': {
@@ -301,26 +327,12 @@ verbs = {
                 },
                 'nouns': {
                     'assembly': {
-                        'options': {
-                            'name': None
-                        }
                     },
                     'assemblies': None,
-                    'device': {
-                        'options': {
-                            'name': None
-                        }
-                    },
-                    'platform': {
-                        'options': {
-                            'name': None
-                        }
-                    },
+                    'device': None,
+                    'platform': None,
                     'platforms': None,
                     'primitive': {
-                        'options': {
-                            'name': None
-                        },
                         'nouns': {
                             'core': None,
                             'library': None
@@ -331,7 +343,6 @@ verbs = {
             },
             'library': {
                 'options': {
-                    'name': {'nargs': '?'},
                     'hdl': options['hdl'],
                     'rcc': options['rcc'],
                     'worker': options['worker'],
@@ -343,12 +354,13 @@ verbs = {
             },
             'project': {
                 'options': {
-                    'name': {'nargs': '?'},
                     'hdl_assembly': options['hdl_assembly'],
                     'no_assemblies': options['no_assemblies'],
                     'hdl': options['hdl'],
                     'rcc': options['rcc'],
                     'worker': options['worker'],
+                    'optimize': options['optimize'],
+                    'dynamic': options['dynamic'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
                     'workers_as_needed' : options['workers_as_needed'],
@@ -358,7 +370,6 @@ verbs = {
             },
             'test': {
                 'options': {
-                    'name': {'nargs': '?'},
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
                     'hdl_target': options['hdl_target'],
@@ -368,7 +379,6 @@ verbs = {
             },
             'worker': {
                 'options': {
-                    'name': None,
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
                     'hdl_target': options['hdl_target'],
@@ -379,71 +389,81 @@ verbs = {
         }
     },
     'clean': {
+        'options': {
+            'name': {
+                'nargs': '?',
+                'default': lambda: Path.cwd().name
+            }
+        },
         'nouns': {
-            'required': False,
+            'default': get_noun,
             'application': {
-                'options': {
-                    'name': None
-                }
+                'options': {}
             },
-            'applications': None,
+            'applications': {
+                'options': {}
+            },
             'hdl': {
+                'options': {
+                    'workers_as_needed' : options['workers_as_needed'],
+                    'hdl_target': options['hdl_target'],
+                    'hdl_platform': options['hdl_platform']
+                },
                 'nouns': {
-                    'assembly': {
-                        'options': {
-                            'name': None
-                        }
-                    },
+                    'assembly': None,
                     'assemblies': None,
-                    'device': {
-                        'options': {
-                            'name': None
-                        }
-                    },
-                    'platform': {
-                        'options': {
-                            'name': None
-                        }
-                    },
+                    'device': None,
+                    'platform': None,
                     'platforms': None,
                     'primitive': {
-                        'options': {
-                            'name': None
-                        },
                         'nouns': {
                             'core': None,
                             'library': None
                         }
                     },
-                    'primitives': {
-                        'nouns': {
-                            'core': None,
-                            'library': None
-                        }
-                    }
+                    'primitives': None
                 }
             },
             'library': {
                 'options': {
-                    'name': None
+                    'hdl': options['hdl'],
+                    'rcc': options['rcc'],
+                    'worker': options['worker'],
+                    'hdl_rcc_platform': options['hdl_rcc_platform'],
+                    'rcc_platform': options['rcc_platform'],
+                    'hdl_target': options['hdl_target'],
+                    'hdl_platform': options['hdl_platform']
                 }
             },
             'project': {
                 'options': {
-                    'name': None
+                    'hdl_assembly': options['hdl_assembly'],
+                    'no_assemblies': options['no_assemblies'],
+                    'hdl': options['hdl'],
+                    'rcc': options['rcc'],
+                    'worker': options['worker'],
+                    'hdl_rcc_platform': options['hdl_rcc_platform'],
+                    'rcc_platform': options['rcc_platform'],
+                    'hdl_target': options['hdl_target'],
+                    'hdl_platform': options['hdl_platform']
                 }
             },
             'test': {
                 'options': {
-                    'name': {
-                        'nargs': '?'
-                    }
+                    'hdl_rcc_platform': options['hdl_rcc_platform'],
+                    'rcc_platform': options['rcc_platform'],
+                    'hdl_target': options['hdl_target'],
+                    'hdl_platform': options['hdl_platform'],
+                    'library': options['library']
                 }
             },
             'worker': {
                 'options': {
-                    'library': options['library'],
-                    'name': None
+                    'hdl_rcc_platform': options['hdl_rcc_platform'],
+                    'rcc_platform': options['rcc_platform'],
+                    'hdl_target': options['hdl_target'],
+                    'hdl_platform': options['hdl_platform'],
+                    'library': options['library']
                 }
             }
         }
@@ -454,16 +474,25 @@ verbs = {
             'keep': options['keep'],
         },
         'nouns': {
+            'default': get_noun,
             'application': {
                 'options': {
                     'xml_app': options['xml_app'],
                     'xml_dir_app': options['xml_dir_app']
                 }
             },
-            'component': None,
-            'library': {
+            'component': {
                 'options': {
                     'name': None,
+                    'no_control': options['no_control'],
+                    'platform': options['platform'],
+                    'hdl_library': options['hdl_library'],
+                    'library': options['library'],
+                    'project': options['project']
+                }
+            },
+            'library': {
+                'options': {
                     'pkg_prefix': options['pkg_prefix'],
                     'pkg_id': options['pkg_id'],
                     'pkg_name': options['pkg_name'],
@@ -510,7 +539,7 @@ verbs = {
                             'core': options['core'],
                             'hdl_part': options['hdl_part'],
                             'time_freq': options['time_freq'],
-                            'no_dsp': options['no_dsp']
+                            'no_sdp': options['no_sdp']
                         }
                     },
                     'primitive': {
@@ -556,6 +585,7 @@ verbs = {
                     'platform': options['platform'],
                     'hdl_library': options['hdl_library'],
                     'library': options['library'],
+                    'project': options['project']
                 }
             },
             'registry': None,
@@ -566,11 +596,15 @@ verbs = {
                     'platform': options['platform'],
                     'hdl_library': options['hdl_library'],
                     'library': options['library'],
+                    'project': options['project']
                 }
             },
             'test': {
                 'options': {
-                    'spec': options['spec']
+                    'spec': options['spec'],
+                    'library': options['library'],
+                    'hdl_library': options['hdl_library'],
+                    'platform': options['platform']
                 }
             },
             'worker': {
@@ -600,10 +634,20 @@ verbs = {
     },
     'delete': {
         'options': {
-            'name': None
+            'name': {
+                'nargs': '?',
+                'default': lambda: Path.cwd().name
+            }
         },
         'nouns': {
+            'default': get_noun,
             'application': None,
+            'component': {
+                'project': options['project'],
+                'hdl_library': options['hdl_library'],
+                'library': options['library'],
+                'platform': options['platform']
+            },
             'hdl': {
                 'nouns': {
                     'assembly': None,
@@ -638,10 +682,15 @@ verbs = {
                 'options': {
                     'project': options['project'],
                     'hdl_library': options['hdl_library'],
+                    'library': options['library'],
+                    'platform': options['platform']
+                }
+            },
+            'test': {
+                'options': {
                     'library': options['library']
                 }
             },
-            'test': None,
             'worker': {
                 'options': {
                     'hdl_library': options['hdl_library'],
@@ -654,15 +703,26 @@ verbs = {
         }
     },
     'refresh': {
+        'options': {
+            'name': {
+                'nargs': '?',
+                'default': lambda: Path.cwd().name
+            }
+        },
         'nouns': {
+            'default': get_noun,
             'project': None
         }
     },
     'register': {
         'options': {
-            'name': {'nargs': '?'}
+            'name': {
+                'nargs': '?',
+                'default': lambda: Path.cwd().name
+            }
         },
         'nouns': {
+            'default': get_noun,
             'project': None
         }
     },
@@ -677,6 +737,7 @@ verbs = {
             }
         },
         'nouns': {
+            'default': get_noun,
             'registry': None
         }
     },
@@ -685,14 +746,19 @@ verbs = {
     },
     'unregister': {
         'options': {
-            'name': {'nargs': '?'}
+            'name': {
+                'nargs': '?',
+                'default': lambda: Path.cwd().name
+            }
         },
         'nouns': {
+            'default': get_noun,
             'project': None
         }
     },
     'unset': {
         'nouns': {
+            'default': get_noun,
             'registry': None
         }
     },
@@ -703,7 +769,6 @@ verbs = {
 
 # Collection of options, common options, and verbs to be imported by ocpidev
 args_dict = {
-    'common_options': common_options,
     'options': options,
     'verbs': verbs
 }

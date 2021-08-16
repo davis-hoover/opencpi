@@ -22,6 +22,7 @@ Abstract classes that are used in other places within the assets module are defi
 from abc import ABCMeta, abstractmethod
 import os
 import logging
+from pathlib import Path
 import copy
 import shutil
 import _opencpi.hdltargets as hdltargets
@@ -47,6 +48,7 @@ class Asset(metaclass=ABCMeta):
         """
         if not name:
             self.name = os.path.basename(directory)
+            directory = os.path.dirname(directory)
         else:
             self.name = name
         self.directory = os.path.realpath(directory)
@@ -91,27 +93,44 @@ class Asset(metaclass=ABCMeta):
         thrown
         """
         if not os.path.isdir(directory):
-            raise ocpiutil.OCPIException("Expected directory of type \"" + dirtype + "\" for a " +
-                                         "directory that does not exist \"" + directory + "\"")
+            err_msg = 'location does not exist at: {}'.format(directory)
+            raise ocpiutil.OCPIException(err_msg)
 
-        if ocpiutil.get_dirtype(directory) != dirtype:
-            raise ocpiutil.OCPIException("Expected directory of type \"" + dirtype + "\", but " +
-                                         "found type \"" + str(ocpiutil.get_dirtype(directory)) +
-                                         "\" for directory \"" + directory + "\"")
-    def delete(self, force=False):
+        true_dirtype = ocpiutil.get_dirtype(directory)
+        if not true_dirtype:
+            true_dirtype = 'unknown'
+        if true_dirtype != dirtype:
+            err_msg = ' '.join(['Expected directory of type "{}"'.format(dirtype), 
+                                'but found type "{}"'.format(true_dirtype), 
+                                'for directory {}'.format(directory)])
+            raise ocpiutil.OCPIException(err_msg)
+
+    def delete(self, noun='asset', force=False):
         """
         Remove the Asset from disk.  Any additional cleanup on a per asset basis can be done in
         the child implementations of this function
         """
+        path = Path(self.directory)
+        if path.name != self.name:
+            path = Path(path, self.name)
         if not force:
-            dir_type = ocpiutil.get_dirtype(self.directory)
-            if not dir_type:
-                prompt = 'unable to determine directory asset type. Are you sure you want to delete?'
-            else:
-                prompt = 'removing {} at directory: {}'.format(dir_type, self.directory)
+            prompt = 'Delete {} at: {}'.format(noun, str(path))
             force = ocpiutil.get_ok(prompt=prompt)
         if force:
-            shutil.rmtree(self.directory)
+            try:
+                if path.is_dir():
+                    shutil.rmtree(str(path))
+                else:
+                    path.unlink()
+                simple_noun = noun.replace("-", " ")
+                basic_name = self.name.split(".")[0]
+                msg = "Successfully deleted {} '{}'".format(
+                    simple_noun if simple_noun else str(path), basic_name)
+                print(msg)
+            except Exception as e:
+                err_msg = 'Failed to delete {}\n{}'.format(
+                    noun if noun else str(path), e)
+                logging.error(err_msg)
 
     def get_valid_components(self):
         """
@@ -128,6 +147,7 @@ class Asset(metaclass=ABCMeta):
                 if Component.is_component_spec_file(self.directory + "/specs/" + comp):
                     ret_val.append(self.directory + "/specs/" + comp)
         return ret_val
+
 
 class BuildableAsset(Asset):
     """

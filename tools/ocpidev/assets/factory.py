@@ -22,6 +22,7 @@ Defines the AssetFactory class
 
 from functools import partial
 import os
+from pathlib import Path
 import _opencpi.util as ocpiutil
 
 class AssetFactory():
@@ -54,6 +55,7 @@ class AssetFactory():
         if not directory:
             raise ocpiutil.OCPIException("directory passed to  AssetFactory is None.  Pass a " +
                                          "valid directory to the factory")
+        directory = str(Path(directory).resolve())
         # actions maps asset_type string to the function that creates objects of that type
         # Some types will use plain constructors,
         # and some will use __get_or_create with asset_cls set accordingly
@@ -81,10 +83,15 @@ class AssetFactory():
                    "library":       _opencpi.assets.library.Library,
                    "libraries":     _opencpi.assets.library.LibraryCollection,
                    "multi-lib":     _opencpi.assets.library.LibraryCollection,
+                   "protocol":      _opencpi.assets.component.Protocol,
+                   "hdl-slot":      _opencpi.assets.component.Slot,
+                   "hdl-card":      _opencpi.assets.component.Card,
                    "project":       partial(cls.__get_or_create, _opencpi.assets.project.Project),
                    "registry":      partial(cls.__get_or_create, _opencpi.assets.registry.Registry)}
 
         if asset_type not in actions.keys():
+            if not asset_type:
+                asset_type = "unknown"
             raise ocpiutil.OCPIException("Bad asset creation, \"" + asset_type + "\" not supported")
 
         # Call the action for this type and hand it the arguments provided
@@ -97,13 +104,18 @@ class AssetFactory():
         (e.g. RccWorker or HdlLibraryWorker)
         """
         import _opencpi.assets.worker
-        if os.path.basename(os.path.realpath(ocpiutil.rchop(directory, '/'))).endswith(".hdl"):
+        model = Path(directory).suffix
+        if model is not None and model not in ['.rcc', '.hdl'] and name:
+            model = Path(name).suffix
+        if model == '.hdl':
             return _opencpi.assets.worker.HdlLibraryWorker(directory, name, **kwargs)
-        elif os.path.basename(os.path.realpath(ocpiutil.rchop(directory, '/'))).endswith(".rcc"):
+        elif model == '.rcc':
             return _opencpi.assets.worker.RccWorker(directory, name, **kwargs)
         else:
-            raise ocpiutil.OCPIException("Unsupported authoring model for worker located at '" +
-                                         directory + "'")
+            err_msg = 'Unsupported authoring model "{}" for worker located at "{}"'.format(
+                model, directory)
+            raise ocpiutil.OCPIException(err_msg)
+
     @classmethod
     def remove_all(cls):
         """

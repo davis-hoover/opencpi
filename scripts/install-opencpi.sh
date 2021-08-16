@@ -118,5 +118,5 @@ elif [ -n "$minimal" ]; then
   echo "Avoiding installation tests since the --minimal option was given."
   echo 'Installation tests may be run at any time using the "ocpitest --nohdl" command.'
 else
-  eval $* ./scripts/test-opencpi.sh --no-hdl
+  eval $* ./scripts/test-opencpi.sh --no-hdl ${nokernel:+--no-kernel}
 fi

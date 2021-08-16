@@ -20,9 +20,15 @@ Definition of Componnet and ShowableComponent classes
 """
 
 import os
+import re
 import sys
 import subprocess
+import logging
 import json
+import jinja2
+import _opencpi.assets.template as ocpitemplate
+from os.path import dirname
+from pathlib import Path
 from xml.etree import ElementTree as ET
 import _opencpi.util as ocpiutil
 from .abstract import ShowableAsset
@@ -30,8 +36,8 @@ from .abstract import ShowableAsset
 class ShowableComponent(ShowableAsset):
     """
     Any OpenCPI Worker or Component.  Intended to hold all the common functionality of workers and
-    components.  Expected to be a virtual class an no real objects will get created of this class
-    but nothing prevents it.
+    components.  Expected to be a virtual class and no real objects will get created of this class
+    even though nothing prevents it.
     """
     def __init__(self, directory, name=None, **kwargs):
         super().__init__(directory, name, **kwargs)
@@ -63,12 +69,15 @@ class ShowableComponent(ShowableAsset):
           xml_file - the file to have ocpigen parse
         """
         #get list of locations to look for include xml files from make
-        if ocpiutil.get_dirtype(self.directory + "/../") == "library":
-            xml_dirs = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(self.directory + "/../", "library"),
+        parent_dir = str(Path(self.directory))
+        if ocpiutil.get_dirtype(parent_dir) not in ['library', 'project']:
+            parent_dir = str(Path(parent_dir).parent)
+        if ocpiutil.get_dirtype(parent_dir) == "library":
+            xml_dirs = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(parent_dir, "library"),
                                                    mk_arg="showincludes ShellLibraryVars=1",
                                                    verbose=True)["XmlIncludeDirsInternal"]
-        elif ocpiutil.get_dirtype(self.directory + "/../") == "project":
-            xml_dirs = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(self.directory + "/../", "project"),
+        elif ocpiutil.get_dirtype(parent_dir) == "project":
+            xml_dirs = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(parent_dir, "project"),
                                                    mk_arg="projectincludes ShellProjectVars=1",
                                                    verbose=True)["XmlIncludeDirsInternal"]
         #call ocpigen -G
@@ -76,7 +85,6 @@ class ShowableComponent(ShowableAsset):
         for inc_dir in xml_dirs:
             ocpigen_cmd.append("-I")
             ocpigen_cmd.append(inc_dir)
-
         ocpigen_cmd.append(os.path.basename(xml_file))
         ocpiutil.logging.debug("running ocpigen cmd: " + str(ocpigen_cmd))
         old_log_level = os.environ.get("OCPI_LOG_LEVEL", "0")
@@ -120,21 +128,22 @@ class ShowableComponent(ShowableAsset):
         Determine the Package id based on the library or project that the Worker resides in.  only
         a component will reside at the top level of a project.
         """
-        parent_dir = self.directory + "/../"
-        if ocpiutil.get_dirtype(parent_dir) == "library":
+        dir = self.directory if os.path.isdir(self.directory) else dirname(self.directory)
+        parent_dir = str(Path(dir).parent)
+        dirtype = str(ocpiutil.get_dirtype(parent_dir))
+        if dirtype == "library":
             ret_val = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(parent_dir, "library"),
                                                   mk_arg="showpackage ShellLibraryVars=1",
                                                   verbose=True)["Package"][0]
-        elif ocpiutil.get_dirtype(parent_dir) == "project":
+        elif dirtype == "project":
             ret_val = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(parent_dir, "project"),
                                                   mk_arg="projectpackage ShellProjectVars=1",
                                                   verbose=True)["ProjectPackage"][0]
-        elif ocpiutil.get_dirtype(parent_dir) == "hdl-platforms":
+        elif dirtype == "hdl-platforms":
             ret_val = "N/A"
         else:
             raise ocpiutil.OCPIException("Could not determine Package-ID of component dirtype of " +
-                                         "parent directory: " + parent_dir + " dirtype: " +
-                                         str(ocpiutil.get_dirtype(parent_dir)))
+                                         "parent directory: " + parent_dir + " dirtype: " + dirtype)
         return ret_val
 
     def __show_table_ports_props(self, json_dict, verbose, is_worker):
@@ -211,7 +220,6 @@ class ShowableComponent(ShowableAsset):
             self.__show_simple_ports_props(json_dict)
         elif details == "table":
             self.__show_table_ports_props(json_dict, verbose, is_worker)
-
 
     def get_struct_dict_from_xml(self, struct):
         """
@@ -317,10 +325,38 @@ class Component(ShowableComponent):
     """
     def __init__(self, directory, name=None, **kwargs):
         if not name:
-            name = os.path.basename(directory)
-        directory = os.path.dirname(directory)
-        self.ocpigen_xml = directory + "/" + name
+            name = str(Path(directory).name)
+            directory = str(Path(directory).parent)
+        name_stem = Path(name).stem
+        self.ocpigen_xml = str(Path(directory, name_stem)) + '.xml'
         super().__init__(directory, name, **kwargs)
+
+    @staticmethod
+    def get_package_id(directory="."):
+        """
+        Determine the Package id based on the library or project that the Worker resides in.  only
+        a component will reside at the top level of a project.
+        """
+        dir = directory if os.path.isdir(directory) else dirname(directory)
+        parent_dir = str(Path(dir).parent)
+        dirtype = str(ocpiutil.get_dirtype(parent_dir))
+        if dirtype == "library":
+            ret_val = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(parent_dir, "library"),
+                                                  mk_arg="showpackage ShellLibraryVars=1",
+                                                  verbose=True)["Package"][0]
+        elif dirtype == "project":
+            ret_val = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(parent_dir, "project"),
+                                                  mk_arg="projectpackage ShellProjectVars=1",
+                                                  verbose=True)["ProjectPackage"][0]
+        elif dirtype == "hdl-platforms":
+            ret_val = "N/A"
+        elif dirtype == "libraries":
+            raise ocpiutil.OCPIException("Specify a library or create a flattened 'components' directory.")
+        else:
+            raise ocpiutil.OCPIException("Could not determine Package-ID for " +
+                                         "parent directory: " + parent_dir +
+                                         " and directory type: " + dirtype)
+        return ret_val
 
     @classmethod
     def is_component_spec_file(cls, file):
@@ -330,7 +366,6 @@ class Component(ShowableComponent):
         TODO do we actually want to open files to make sure and not just rely on the naming
              convention???
         """
-
         return file.endswith(("_spec.xml", "-spec.xml"))
 
     def show(self, details, verbose, **kwargs):
@@ -355,34 +390,416 @@ class Component(ShowableComponent):
             json.dump(json_dict, sys.stdout)
             print()
 
+    def add_link(filename, directory="."):
+        libdir = Path(directory, "lib")
+        if not libdir.exists():
+            os.mkdir(libdir)
+        specdir = Path(directory, "specs")
+        if not specdir.exists():
+            os.mkdir(specdir)
+        # Symlinks must have relative paths
+        savepath = os.getcwd()
+        os.chdir(directory)
+        lnkfile = "lib/" + filename
+        if not os.path.exists(lnkfile):
+            specfile = "../specs/" + filename
+            os.symlink(specfile, lnkfile)
+        os.chdir(savepath)
+        
     @staticmethod
-    def get_working_dir(name, library, hdl_library, hdl_platform):
-        """
-        return the directory of a Component given the name (name) and
-        library specifiers (library, hdl_library, hdl_platform)
-        """
-        # if more then one of the library location variable are not None it is an error.
-        # a length of 0 assumes default location of <project>/specs
+    def get_workers(directory="."):
+        workers = []
+        mkf=ocpiutil.get_makefile(directory,"library")
+        make_dict = ocpiutil.set_vars_from_make(mkf,
+          mk_arg="ShellLibraryVars=1 showlib", verbose=True)
+        wkrs = make_dict["Workers"]
+        for name in wkrs:
+            if name.endswith((".rcc", ".rcc/", ".hdl", ".hdl/")):
+                workers.append(name + " ")
+        return (workers)
 
-        if len(list(filter(None, [library, hdl_library, hdl_platform]))) > 1:
-            ocpiutil.throw_invalid_libs_e()
+    @staticmethod
+    def get_working_dir(name, ensure_exists=True, **kwargs):
         cur_dirtype = ocpiutil.get_dirtype()
         valid_dirtypes = ["project", "libraries", "library", "hdl-platform"]
+        verb = kwargs.get('verb', '')
+        library = kwargs.get('library', '')
+        hdl_library = kwargs.get('hdl_library', '')
+        platform = kwargs.get('platform', '')
+        project = kwargs.get('project', '')
+        working_path = Path.cwd()
+        if len(list(filter(None, [library, hdl_library, platform]))) > 1:
+            ocpiutil.throw_invalid_libs_e()
         if cur_dirtype not in valid_dirtypes:
             ocpiutil.throw_not_valid_dirtype_e(valid_dirtypes)
+        if not name:
+            ocpiutil.throw_not_blank_e("component", "name", True)
+        project_path = Path(ocpiutil.get_path_to_project_top())
         if library:
-            if not library.startswith("components"):
-                library = "components/" + library
-            specs_loc = ocpiutil.get_path_to_project_top() + "/" + library + "/specs/"
-        elif hdl_library:
-            specs_loc = ocpiutil.get_path_to_project_top() + "/hdl/" + hdl_library + "/specs/"
-        elif hdl_platform:
-            specs_loc = (ocpiutil.get_path_to_project_top() + "/hdl/platforms/" + hdl_platform +
-                         "/devices/specs/")
-        elif name:
-            if cur_dirtype == "hdl-platform":
-                specs_loc = "devices/specs/"
+            if not library == 'components':
+                working_path = Path(project_path, 'components', library)
             else:
-                specs_loc = "specs/"
-        else: ocpiutil.throw_not_blank_e("component", "name", True)
-        return ocpiutil.get_component_filename(specs_loc, name)
+                working_path = Path(project_path, library)
+            if not working_path.exists():
+                print("Error: Library '" + library + "' does not exist")
+                exit(1)
+        elif hdl_library:
+            working_path = Path(project_path, 'hdl', hdl_library)
+        elif platform:
+            working_path = Path(project_path, 'hdl', 'platforms', platform, 'devices')
+        elif project:
+            working_path = project_path
+        elif cur_dirtype == "hdl-platform":
+            working_path = Path(working_path, 'devices')
+        elif cur_dirtype == 'libraries':
+            if ocpiutil.get_dirtype("components") == "libraries":
+                ocpiutil.throw_specify_lib_e()
+            working_path = Path(working_path, 'components')
+        # Legacy: create defaults to 'components' without the -p option,
+        # but others like show and run default to the project level
+        elif cur_dirtype == 'project' and verb == "create":
+            working_path = Path(project_path, 'components')
+            if not working_path.exists():
+                print("OCPI:ERROR: The 'components' library does not exist")
+                exit(1)
+ 
+        specs_path = Path(working_path, 'specs')
+        if not specs_path.exists() and not ensure_exists:
+            os.makedirs(str(specs_path))
+        working_dir = Component.get_filename(
+            str(specs_path), name, project, ensure_exists)
+        return working_dir
+
+    @staticmethod
+    def get_filename(directory, name, project, ensure_exists=True):
+        """Gets the appropriate file name of a component asset"""
+        if ensure_exists:
+            end_list = ["", ".xml", "_spec.xml", "-spec.xml"]
+            for ending in end_list:
+                path = Path(directory, name+ending)
+                if path.exists():
+                    return str(path)
+                elif project:
+                    project_path = Path(ocpiutil.get_path_to_project_top())
+                    path = Path(project_path, name+ending)
+                    if path.exists():
+                        return str(path)
+            err_msg = 'Unable to find component "{}" in directory {}'.format(
+                name, directory)
+            print(err_msg)
+            exit(1)
+            # An exception now will just call the bash code
+            # TODO: replace print/exit with OCPIException
+            #raise ocpiutil.OCPIException(err_msg)
+
+        path = Path(directory, name)
+        path_stem = path.stem
+        if not re.search('_spec$|-spec$', path_stem):
+            path_stem += '-spec'
+        path_stem += '.xml'
+        path = Path(directory, path_stem)
+        return str(path)
+
+    def _get_template_dict(name, directory, **kwargs):
+        """
+        used by the create function/verb to generate the dictionary of viabales to send to the
+        jinja2 template.
+        valid kwargs handled at this level are:
+            comp            (string)      - Component name
+        """
+        compname = name.split("-")[0] if name.find("-") else name
+        template_dict = {
+                        "component" : compname,
+                        "hdl_lib" : kwargs.get("hdl_library", None)
+                        }
+        return template_dict
+
+    @staticmethod
+    def create(name, directory, **kwargs):
+        """
+        Static method to create a new Component, aka spec
+        """
+        verbose = kwargs.get("verbose", True)
+        sub_lib = kwargs.get("library", None)
+        hdl_lib = kwargs.get("hdl_library", None)
+        proj = kwargs.get("project", True)
+        dirtype = ocpiutil.get_dirtype(directory)
+        pkg_id = Component.get_package_id(directory)
+        logging.debug("Package_ID: " + pkg_id)
+        if not (proj or dirtype == "project"):
+            parent_dir = str(Path(directory).parent)
+            workers = str(Component.get_workers(parent_dir))[1:-1] + "\n"
+            logging.debug("Workers: " + workers)
+
+        template_dict = Component._get_template_dict(name, directory, **kwargs)
+        if not os.path.exists(directory):
+            os.mkdir(directory)
+        if hdl_lib:
+            os.chdir("hdl/" + hdl_lib)
+            hdlfile = os.getcwd() + "/" + hdl_lib + ".xml"
+            template = jinja2.Template(ocpitemplate.COMPONENT_HDL_LIB_XML, trim_blocks=True)
+            ocpiutil.write_file_from_string(hdlfile, template.render(**template_dict))
+        os.chdir(directory)
+        specfile = os.getcwd() + "/" + name
+        if os.path.isfile(specfile):
+            raise ocpiutil.OCPIException(specfile + " already exists")
+        if kwargs.get("no_control", None) == True:
+            template = jinja2.Template(ocpitemplate.COMPONENT_SPEC_NO_CTRL_XML, trim_blocks=True)
+            ocpiutil.write_file_from_string(specfile, template.render(**template_dict))
+        else:
+            template = jinja2.Template(ocpitemplate.COMPONENT_SPEC_XML, trim_blocks=True)
+            ocpiutil.write_file_from_string(specfile, template.render(**template_dict))
+
+        if (proj or dirtype == "project"):
+            if not os.path.isfile("package-id"):
+                ocpiutil.write_file_from_string("package-id", pkg_id + "\n")
+        else:
+            Component.add_link(name, str(Path(directory).parent))
+            workers = str(Component.get_workers(parent_dir))[1:-1]
+            logging.debug("Workers: " + workers)
+        if verbose:
+            print("Component '" + name + "' was created at " + specfile)
+
+
+class Protocol(Component):
+    """
+    Any OpenCPI Protocol.
+    """
+    @classmethod
+    def is_component_prot_file(cls, file):
+        """
+        Determines if a provided xml file contains a component spec.
+
+        TODO do we actually want to open files to make sure and not just rely on the naming
+             convention???
+        """
+        return file.endswith(("_prot.xml", "-prot.xml"))
+
+    @staticmethod
+    def get_working_dir(name, ensure_exists=True, **kwargs):
+        cur_dirtype = ocpiutil.get_dirtype()
+        valid_dirtypes = ["project", "libraries", "library", "hdl-platform"]
+        library = kwargs.get('library', '')
+        hdl_library = kwargs.get('hdl_library', '')
+        platform = kwargs.get('platform', '')
+        project = kwargs.get('project', '')
+        working_path = Path.cwd()
+        if len(list(filter(None, [library, hdl_library, platform]))) > 1:
+            ocpiutil.throw_invalid_libs_e()
+        if cur_dirtype not in valid_dirtypes:
+            ocpiutil.throw_not_valid_dirtype_e(valid_dirtypes)
+        if not name:
+            ocpiutil.throw_not_blank_e("component", "name", True)
+        project_path = Path(ocpiutil.get_path_to_project_top())
+        if library:
+            if not library == 'components':
+                working_path = Path(project_path, 'components', library)
+            else:
+                working_path = Path(project_path, library)
+        elif hdl_library:
+            working_path = Path(project_path, 'hdl', hdl_library)
+        elif platform:
+            working_path = Path(
+                project_path, 'hdl', 'platforms', platform, 'devices')
+        elif project:
+            working_path = project_path
+        elif cur_dirtype == "hdl-platform":
+            working_path = Path(working_path, 'devices')
+        elif cur_dirtype == 'libraries':
+            if ocpiutil.get_dirtype("components") == "libraries":
+                ocpiutil.throw_specify_lib_e()
+            working_path = Path(working_path, 'components')
+        elif cur_dirtype == 'project':
+            working_path = Path(project_path, 'components')
+            if not working_path.exists():
+                print("OCPI:ERROR: The 'components' library does not exist")
+                exit(1)
+        
+        specs_path = Path(working_path, 'specs')
+        if not specs_path.exists() and not ensure_exists:
+            os.makedirs(specs_path)
+        working_dir = Protocol.get_filename(
+            str(specs_path), name, project, ensure_exists)
+        return working_dir
+
+    @staticmethod
+    def get_filename(directory, name, project, ensure_exists=True):
+        """Gets the appropriate file name of a protocol asset"""
+        if ensure_exists:
+            end_list = ["", ".xml", "_prot.xml", "-prot.xml"]
+            for ending in end_list:
+                path = Path(directory, name+ending)
+                if path.exists():
+                    return str(path)
+                elif project:
+                    project_path = Path(ocpiutil.get_path_to_project_top())
+                    path = Path(project_path, name+ending)
+                    if path.exists():
+                        return str(path)
+            err_msg = 'Unable to find protocol "{}" in directory {}'.format(
+                name, directory)
+            raise ocpiutil.OCPIException(err_msg)
+
+        path = Path(directory, name)
+        path_stem = path.stem
+        if not re.search('_prot$|-prot$', path_stem):
+            path_stem += '-prot'
+        path_stem += '.xml'
+        path = Path(directory, path_stem)
+        return str(path)
+
+    def _get_template_dict(name, directory, **kwargs):
+        """
+        used by the create function/verb to generate the dictionary of viabales to send to the
+        jinja2 template.
+        valid kwargs handled at this level are:
+            protocol           (string)      - Protocol name
+            hdl_lib            (string)      - HDL library name
+        """
+        protname = name.split("-")[0] if name.find("-") else name
+        template_dict = {
+                        "protocol" : protname,
+                        "hdl_lib" : kwargs.get("hdl_library", None)
+                        }
+        return template_dict
+
+    @staticmethod
+    def create(name, directory, **kwargs):
+        """
+        Static method to create a new Protocol
+        """
+        verbose = kwargs.get("verbose", True)
+        sub_lib = kwargs.get("library", None)
+        hdl_lib = kwargs.get("hdl_library", None)
+        proj = kwargs.get("project", True)
+        dirtype = ocpiutil.get_dirtype(directory + "/..")
+        pkg_id = Component.get_package_id(directory)
+        logging.debug("Package_ID: " + pkg_id)
+        if not (proj or dirtype == "project"):
+            parent_dir = str(Path(directory).parent)
+            workers = str(Component.get_workers(parent_dir))[1:-1] + "\n"
+            logging.debug("Workers: " + workers)
+
+        template_dict = Protocol._get_template_dict(name, directory, **kwargs)
+        if not os.path.exists(directory):
+            os.mkdir(directory)
+        if hdl_lib:
+            os.chdir("hdl/" + hdl_lib)
+            hdlfile = os.getcwd() + "/" + hdl_lib + ".xml"
+            template = jinja2.Template(ocpitemplate.COMPONENT_HDL_LIB_XML, trim_blocks=True)
+            ocpiutil.write_file_from_string(hdlfile, template.render(**template_dict))
+        os.chdir(directory)
+        protfile = os.getcwd() + "/" + name
+        if os.path.isfile(protfile):
+            raise ocpiutil.OCPIException(protfile + " already exists")
+        template = jinja2.Template(ocpitemplate.PROTOCOL_SPEC_XML, trim_blocks=True)
+        ocpiutil.write_file_from_string(protfile, template.render(**template_dict))
+        if (proj or dirtype == "project"):
+            if not os.path.isfile("package-id"):
+                ocpiutil.write_file_from_string("package-id", pkg_id + "\n")
+        else:
+            Component.add_link(name, str(Path(directory).parent))
+            workers = str(Component.get_workers(parent_dir))[1:-1] + "\n"
+            logging.debug("Workers: " + workers)
+        if verbose:
+            print("Protocol '" + name + "' was created at " + protfile)
+
+
+class Slot(Component):
+    """
+    Any OpenCPI HDL Slot
+    """
+    @staticmethod
+    def get_working_dir(name, ensure_exists=True, **kwargs):
+        cur_dirtype = ocpiutil.get_dirtype()
+        valid_dirtypes = [ "project", "library" ]
+        if cur_dirtype not in valid_dirtypes:
+            ocpiutil.throw_not_valid_dirtype_e(valid_dirtypes)
+        project_path = Path(ocpiutil.get_path_to_project_top())
+        working_path = Path(project_path, 'hdl', 'cards', 'specs')
+        if not working_path.exists():
+            os.makedirs(str(working_path))
+        working_path = Path(working_path, name + '.xml')
+        return working_path
+
+    def gen_cards_xml(template_dict, libdir="."):
+        libfile = str(Path(libdir, "cards.xml"))
+        if not os.path.isfile(libfile):
+            template = jinja2.Template(ocpitemplate.HDL_CARDS_XML, trim_blocks=True)
+            ocpiutil.write_file_from_string(libfile, template.render(**template_dict))
+
+    def _get_template_dict(name, directory, **kwargs):
+        """
+        used by the create function/verb to generate the dictionary of viabales to send to the
+        jinja2 template.
+        valid kwargs handled at this level are:
+            hdl_slot            (string)      - HDL slot name
+        """
+        slotname = name.split(".")[0] if name.find(".") else name
+        template_dict = {
+                        "hdl_slot" : slotname,
+                        }
+        return template_dict
+
+    @staticmethod
+    def create(name, directory, **kwargs):
+        """
+        Static method to create a new HDL slot
+        """
+        slotfile = str(Path(directory, name))
+        if os.path.isfile(slotfile):
+            raise ocpiutil.OCPIException(slotfile + " already exists")
+
+        template_dict = Slot._get_template_dict(name, directory, **kwargs)
+        verbose = kwargs.get("verbose", True)
+        dirtype = ocpiutil.get_dirtype(directory + "/..")
+        parent_dir = str(Path(directory).parent)
+        Slot.gen_cards_xml(template_dict, parent_dir)
+        pkg_id = Component.get_package_id(directory)
+        workers = str(Component.get_workers(parent_dir))[1:-1] + "\n"
+        logging.debug("Workers: " + workers + "Package_ID: " + pkg_id)
+        template = jinja2.Template(ocpitemplate.HDL_SLOT_XML, trim_blocks=True)
+        ocpiutil.write_file_from_string(slotfile, template.render(**template_dict))
+        Component.add_link(name, parent_dir)
+        if verbose:
+            print("HDL slot '" + name + "' was created at " + slotfile)
+
+class Card(Slot):
+    """
+    Any OpenCPI HDL Card
+    """
+    def _get_template_dict(name, directory, **kwargs):
+        """
+        used by the create function/verb to generate the dictionary of viabales to send to the
+        jinja2 template.
+        valid kwargs handled at this level are:
+            hdl_card            (string)      - HDL card name
+        """
+        cardname = name.split(".")[0] if name.find(".") else name
+        template_dict = {
+                        "hdl_card" : cardname,
+                        }
+        return template_dict
+
+    @staticmethod
+    def create(name, directory, **kwargs):
+        """
+        Static method to create a new HDL card
+        """
+        cardfile = str(Path(directory, name))
+        if os.path.isfile(cardfile):
+            raise ocpiutil.OCPIException(cardfile + " already exists")
+
+        template_dict = Card._get_template_dict(name, directory, **kwargs)
+        verbose = kwargs.get("verbose", True)
+        dirtype = ocpiutil.get_dirtype(directory + "/..")
+        parent_dir = str(Path(directory).parent)
+        Slot.gen_cards_xml(template_dict, parent_dir)
+        pkg_id = Component.get_package_id(directory)
+        workers = str(Component.get_workers(parent_dir))[1:-1] + "\n"
+        logging.debug("Workers: " + workers + "Package_ID: " + pkg_id)
+        template = jinja2.Template(ocpitemplate.HDL_CARD_XML, trim_blocks=True)
+        ocpiutil.write_file_from_string(cardfile, template.render(**template_dict))
+        Component.add_link(name, parent_dir)
+        if verbose:
+            print("HDL card '" + name + "' was created at " + cardfile)

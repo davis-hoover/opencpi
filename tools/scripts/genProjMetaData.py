@@ -20,6 +20,7 @@
 # TODO: integrate more inline with ocpirun -A to get information instead of metadata file
 
 from xml.etree import ElementTree as ET
+import fnmatch
 import os
 import sys
 import subprocess
@@ -150,6 +151,13 @@ def addApplications (root, apps, dirName):
                 target = ET.SubElement(app, "built")
                 target.set('target', targetStr)
 
+def addXmlApplications (root, apps, dirName):
+    for a in apps:
+        if a == "application.xml":
+            continue
+        app = ET.SubElement(root, "application")
+        app.set('name', a)
+
 def addPlatforms (root, plats, dirName):
     for a in plats:
         if(a not in ["lib"]):
@@ -170,7 +178,11 @@ def addPrimitives (root, primitives, dirName):
         if a == "lib":
             continue
         built = checkBuilt(dirName + '/' + a)
-        prim = ET.SubElement(root, "primitive")
+        dirtype = ocpiutil.get_dirtype(os.path.join(dirName, a))
+        if dirtype:
+            dirtype = dirtype.split("-")[1]
+            # prim = ET.SubElement(root, f"primitive-{dirtype}")
+            prim = ET.SubElement(root, "primitive-{}".format(dirtype))
         prim.set('name', a)
         for targetStr in built:
                 target = ET.SubElement(prim, "built")
@@ -214,8 +226,9 @@ def indent(elem, level=0):
         if level and (not elem.tail or not elem.tail.strip()):
             elem.tail = i
 
-def main():
-    if len(sys.argv) < 2 :
+def main(project_dir=None):
+    
+    if not project_dir and len(sys.argv) < 2 :
         print("ERROR: need to specify the path to the project")
         sys.exit(1)
 
@@ -224,8 +237,10 @@ def main():
     else:
         force = False
 
-    mydir = sys.argv[1]
+    mydir = project_dir if project_dir else sys.argv[1]
     mydir = ocpiutil.get_path_to_project_top(mydir)
+    if not mydir:
+        return
 
     if (isStale(mydir, force)):
         # Get the project name, add it as an attribute in the project element.
@@ -253,9 +268,12 @@ def main():
 
         if os.path.isdir(mydir + "/applications"):
             apps = ET.SubElement(root, "applications")
-            sub_dirs = onlyfiles = [dir for dir in os.listdir(mydir + "/applications")
+            sub_dirs = [dir for dir in os.listdir(mydir + "/applications")
                                     if not os.path.isfile(os.path.join(mydir + "/applications", dir))]
+            only_files = [dir for dir in os.listdir(mydir + "/applications")
+                                      if os.path.isfile(os.path.join(mydir, "applications", dir)) and fnmatch.fnmatch(dir, '*.xml')]
             addApplications(apps, sub_dirs, mydir + "/applications")
+            addXmlApplications(apps, only_files, mydir + "/applications")
 
         for dirName, subdirList, fileList in os.walk(mydir):
             if "exports" in dirName or "imports" in dirName:

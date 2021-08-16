@@ -22,6 +22,7 @@ definitions for utility functions that have to do with the filesystem
 import subprocess
 import os
 import os.path
+from pathlib import Path
 from contextlib import contextmanager
 import logging
 import re
@@ -41,6 +42,12 @@ def execute_cmd(settings, directory, action=None, file=None, verbose=False):
     settings_dict = {'rcc_plats'       : "RccPlatforms",
                      'hdl_plat_strs'   : "HdlPlatforms",
                      'hdl_tgt_strs'    : "HdlTargets",
+                     'rcc_platform'    : "RccPlatforms",
+                     'hdl_platform'    : "HdlPlatforms",
+                     'hdl_target'      : "HdlTargets",
+                     'hdl_assembly'    : "Assemblies",
+                     'hdl_rcc_platform': "RccHdlPlatforms",
+                     'worker'          : "Workers",
                      'only_plats'      : "OnlyPlatforms",
                      'ex_plats'        : "ExcludePlatforms",
                      'keep_sims'       : "KeepSimulations",
@@ -52,7 +59,7 @@ def execute_cmd(settings, directory, action=None, file=None, verbose=False):
                      'run_arg'         : "OcpiRunArgs",
                      'remote_test_sys' : "OCPI_REMOTE_TEST_SYSTEMS",
                      'verbose'         : "TestVerbose"}
-    make_list = ["make", "-r", "--no-print-directory", "-C", directory]
+    make_list = ["make", "-r", "-C", directory, "--no-print-directory"]
     debug_string = " ".join(make_list)
     if file:
         make_list.append("-f")
@@ -61,7 +68,9 @@ def execute_cmd(settings, directory, action=None, file=None, verbose=False):
 
     if action is not None:
         make_list.extend(action)
-        debug_string += " " + ' '.join(action) + " "
+        debug_string += " AT= " + ' '.join(action) + " "
+    else:
+        debug_string += " AT= "
 
     logging.debug("settings for make command: " + str(settings.items()))
     for setting, value in settings.items():
@@ -76,8 +85,8 @@ def execute_cmd(settings, directory, action=None, file=None, verbose=False):
                 debug_string += " " + settings_dict[setting] + '='  + ' '.join(value)
         else:
             # pylint:disable=undefined-variable
-            raise OCPIException("Invalid setting data-type passed to execute_cmd().  Valid data-" +
-                                "types are bool and list")
+            raise OCPIException("Invalid settings data-type passed to execute_cmd().  settings is " +
+                                "expected to be a dictionary with values of type: bool, list or set.")
             # pylint:enable=undefined-variable
     logging.debug("running make command: " + debug_string)
     if verbose:
@@ -115,12 +124,15 @@ def set_vars_from_make(mk_file_and_dir, mk_arg="", verbose=None):
                        print both stdout and stderr for user to see
     """
     with open(os.devnull, 'w') as fnull:
-        make_exists = subprocess.Popen(["which", "make"],
-                      stdout=subprocess.PIPE, stderr=fnull).communicate()[0]
-        if make_exists is None or make_exists == "":
-            if verbose != None and verbose != "":
-                logging.error("The '\"make\"' command is not available.")
-            return 1
+        # This check is not worth the overhead, vs a "make not found" error.
+        # FIXME: put this check in some more universal place done once,
+        # e.g. at installation time, but inside this function.
+        # make_exists = subprocess.Popen(["which", "make"],
+        #               stdout=subprocess.PIPE, stderr=fnull).communicate()[0]
+        # if make_exists is None or make_exists == "":
+        #     if verbose != None and verbose != "":
+        #         logging.error("The '\"make\"' command is not available.")
+        #     return 1
 
         # If log level >= 10 set OCPI_DEBUG_MAKE=1 (max debug level)
         ocpi_log_level = int(os.environ.get('OCPI_LOG_LEVEL', 0))
@@ -424,6 +436,7 @@ def name_of_dir(directory="."):
 @contextmanager
 def cd(target):
     """
+    Use change_dir() function for error handling.
     Change directory to 'target'. To be used with 'with' so that origin directory
     is automatically returned to on completion of 'with' block
     """
@@ -434,6 +447,26 @@ def cd(target):
     finally:
         os.chdir(origin)
 # pylint:enable=invalid-name
+
+
+def change_dir(directory):
+    """
+    Change to specified directory. Raises OCPIException if file not
+    found or not a directory.
+    """
+    orig_dir = str(Path.cwd())
+    err_msg = ''
+    if directory != orig_dir:
+        try:
+            directory = Path(directory).resolve()
+            os.chdir(str(directory))
+        except FileNotFoundError:
+            err_msg = 'directory {} does not exist'.format(directory)
+        except NotADirectoryError:
+            err_msg = '{} is not a directory'.format(directory)
+        if err_msg:
+            raise OCPIException(err_msg)
+
 
 ###############################################################################
 # Functions for prompting the user for input

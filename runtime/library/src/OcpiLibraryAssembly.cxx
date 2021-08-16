@@ -31,25 +31,12 @@ namespace OCPI {
     namespace OE = OCPI::Util::EzXml;
 
     // Attributes specific to an application assembly
-    static const char *assyAttrs[] = { COLLOCATION_POLICY_ATTRS,
-				       "maxprocessors", "minprocessors", "roundrobin", "done", "finished",
-				       NULL};// FIXME: done will be deprecated in 3.0
+    static const char *assyAttrs[] = { OCPI_APP_DEV_ATTRS, OCPI_APP_RUN_ATTRS, NULL};
 
     // The instance attributes relevant to app assemblies - we don't really deal with "container" here
     // FIXME: It should be in the upper level
     static const char *instAttrs[] = { COLLOCATION_POLICY_ATTRS,
 				       "model", "platform", "container", NULL};
-#if 0
-    Assembly::Assembly(const char *file, const OCPI::Util::PValue *params)
-      : OU::Assembly(file, assyAttrs, instAttrs, params), m_refCount(1) {
-      findImplementations(params);
-    }
-
-    Assembly::Assembly(const std::string &string, const OCPI::Util::PValue *params)
-      : OU::Assembly(string, assyAttrs, instAttrs, params), m_refCount(1) {
-      findImplementations(params);
-    }
-#endif
 
     Assembly::Assembly(ezxml_t a_xml, const char *a_name, const OCPI::Util::PValue *params)
       : OU::Assembly(a_xml, a_name, false, assyAttrs, instAttrs, params), m_refCount(1) {
@@ -378,6 +365,9 @@ namespace OCPI {
 		continue;
 	      auto &other = conn.m_ports.front().first == ap ?
 		*conn.m_ports.back().first : *conn.m_ports.front().first;
+// this check cannot be made this early since it can be invalidated by slave assembly port delegation
+// but this error will simply be caught later.
+#if 0
 	      // Now check that the port connected in the assembly has the same
 	      // name as the port connected in the artifact for a later instance,
 	      // since null-named ports are resolved as each instance is processed
@@ -392,6 +382,7 @@ namespace OCPI {
 			 assy.utilInstance(other.m_instance).m_specName.c_str());
 		return reject(*this, i, "incompatible connection on port \"%s\"", p->m_name.c_str());
 	      }
+#endif
 	      bump = 1;; // An implementation with hardwired connections gets a score bump
 	    }
 	  }

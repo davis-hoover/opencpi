@@ -1224,7 +1224,7 @@ emitAssyHDL() {
     fprintf(f, "begin\n");
 
   // For (assembly) worker clock outputs, when an internal connection has a driven clock
-  // that is used for an external port) we need to drive the assembly output signal
+  // (that may be used for an external port), we need to drive the assembly output signal
   // from the internal signal, which may be port-related or not.
   for (auto ci = m_clocks.begin(); ci != m_clocks.end(); ++ci) {
     Clock &c = **ci;
@@ -1242,8 +1242,8 @@ emitAssyHDL() {
 		"  assign_%s_i : ocpi.util.in2out port map (in_port => %s, out_port => %s);\n",
 		c.signal(), c.signal(), outer.c_str());
       }	else {
-	if (c.m_port) // driving the output signal of an external assembly port, in record
-	  OU::format(outer, "%s_out_Clk", c.m_port->pname());
+	if (c.m_port) // driving the output signal of an external assembly port, in verilog
+	  OU::format(outer, "%s_Clk", c.m_port->pname());
 	else
 	  OU::format(outer, "%.*s_Clk", (int)(c.m_name.length() - 2), c.m_name.c_str());
 	fprintf(f, "  assign %s = %s;\n", outer.c_str(), c.signal());

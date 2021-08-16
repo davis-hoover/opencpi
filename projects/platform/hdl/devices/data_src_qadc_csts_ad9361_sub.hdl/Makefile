@@ -23,15 +23,6 @@
 # virtex6 => xc6vlx240t (ml605 development board)
 # alst4 => ep4sgx230k (Stratix4 development board)
 
-ifeq ($(filter clean%,$(MAKECMDGOALS)),)
-  $(shell \
-    ln -s ../data_sink_qdac_ad9361_sub.hdl/clock_divider.vhd clock_divider.vhd; \
-    ln -s ../data_sink_qdac_ad9361_sub.hdl/clock_manager.vhd clock_manager.vhd; \
-    ln -s ../data_sink_qdac_ad9361_sub.hdl/clock_selector_with_async_select.vhd clock_selector_with_async_select.vhd; \
-    ln -s ../../../../assets/hdl/devices/ad9361_adc_sub.hdl/ad9361_adc_sub-build.xml data_src_qadc_csts_ad9361_sub-build.xml;)
-endif
-
-
 
 HdlExactPart=\
 	$(or $(and $(filter zynq_ise,$(HdlTarget)),xc7z020_ise_alias-1-clg484), \
@@ -41,11 +32,4 @@ HdlExactPart=\
 	$(and $(filter stratix4,$(HdlTarget)),ep4sgx230k-c2-f40))
 
 include $(OCPI_CDK_DIR)/include/worker.mk
-
-
-clean::
-	rm -f clock_divider.vhd # -> ../data_sink_qdac_ad9361_sub.hdl/clock_divider.vhd
-	rm -f clock_manager.vhd # -> ../data_sink_qdac_ad9361_sub.hdl/clock_manager.vhd
-	rm -f clock_selector_with_async_select.vhd # -> ../data_sink_qdac_ad9361_sub.hdl/clock_selector_with_async_select.vhd
-	rm -f data_src_qadc_csts_ad9361_sub-build.xml # -> ../../../../assets/hdl/devices/ad9361_adc_sub.hdl/ad9361_adc_sub-build.xml
 

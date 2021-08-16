@@ -55,16 +55,12 @@ A block diagram representation of the implementation is given in :numref:`data_s
    :alt: Data Sink QDAC Block Diagram
    :align: center
 
-   Block diagram of data sink QDAC implementation.
+   Data Sink QDAC Block Diagram
 
 Interface
 ---------
 .. literalinclude:: ../specs/data_sink_qdac-spec.xml
    :language: xml
-
-Opcode Handling
-~~~~~~~~~~~~~~~
-To be supplied: Description of how the non-stream opcodes are handled.
 
 Properties
 ~~~~~~~~~~

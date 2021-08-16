@@ -146,7 +146,7 @@ static int mymain(const char **argv) {
     if (options.attribute(n)) {
       const char *attr;
       std::string out;
-      for (const char **attrs = options.attribute(n); *attrs; ++attrs, --n) {
+      for (const char **attrs = options.attribute(n); attrs && *attrs; ++attrs, --n) {
 	const char *aname = *attrs;
 	if (aname[0] == '?')
 	  aname++;
