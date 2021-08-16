@@ -447,7 +447,7 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
         if project.group in ['osp', 'osps']:
             if project.name != platform.project.name:
                 continue
-        elif project.group == 'comp':
+        elif project.group == 'comp' and stage != 'generate-children':
             if asset and asset.project.name != project.name:
                 continue
         commit_ref = 'develop'
@@ -481,8 +481,8 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
 
     # Download artifacts for platform, host_platform, and linked_platform
     includes = ['"*{}.tar.gz"'.format(platform.name)
-                    for platform in [platform, host_platform, linked_platform]
-                    if platform]
+                for platform in [platform, host_platform, linked_platform]
+                if platform]
     # Don't download artifacts in current or later stages
     stage_idx = stages.index(stage)
     excludes = ['"{}:*"'.format(stage) for stage in stages[stage_idx:]]
