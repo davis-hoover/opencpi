@@ -33,7 +33,7 @@ from _opencpi.util import OCPIException
 # Makefiles
 ###############################################################################
 
-def execute_cmd(settings, directory, action=None, file=None, verbose=False):
+def execute_cmd(settings, directory, action=None, file=None, verbose=False, ignore_error=False):
     """
     This command is a wrapper around any calls to make in order to encapsulate the use of make to a
     minimal number of places.  The function contains a hard-coded dictionary of generic settings to
@@ -103,6 +103,9 @@ def execute_cmd(settings, directory, action=None, file=None, verbose=False):
         # pylint:disable=undefined-variable
         raise OCPIException("Received Keyboard Interrupt - Exiting")
         # pylint:enable=undefined-variable
+    if not ignore_error:
+        if child.returncode != 0:
+            sys.exit(1)
     return child.returncode
 
 #TODO fix these problems with the function instead of just disabling them
