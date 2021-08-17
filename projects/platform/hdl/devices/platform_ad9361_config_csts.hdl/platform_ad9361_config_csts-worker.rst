@@ -38,186 +38,27 @@ The AD9361 config HDL subdevice worker also operates itself as a subdevice that 
 * Build-time information from the ``ad9361_adc_sub.hdl`` and ``ad9361_dac_sub.hdl`` HDL subdevice workers (see ``ocpi.assets.devices``) up to the processor via properties
 
 * Processor-known assumptions about the AD9361 multichannel configuration to the ``ad9361_adc_sub.hdl`` and ``ad9361_dac_sub.hdl`` HDL subdevice workers.
-  
-.. comment out ocpi_documentation_worker directive for now. It doesn't work with HdlDevice yet.
 
-Worker Ports
-~~~~~~~~~~~~
-
-.. this is hand-entered for now to suggest a format that the XML parser might use to automatically generate it.
-
-Outputs:
-
-* ``rawprops``: Communicates the AD9361 register map to AD9361 SPI subdevice worker.
-
-  * Type: ``RawProp``
-
-  * Master: ``true``
-
-* ``dev_force_spi_reset``: Forces the RESETB pin, which is active low, to logic 0.
-
-  * Type: ``DevSignal``
-
-  * Count: 1
-
-  * Optional: ``false``
-
-  * Master: ``true``
-
-  * Signal: ``force_reset``
-
-* ``dev_cfg_data``:
-
-  * Type: ``DevSignal``
-
-  * Count: 1
-
-  * Optional: ``true``
-
-  * Master: ``false``
-
-  * Signals (expected to be hard-coded at build time):
-
-    * ``ch0_handler_is_present``: Set to ``1`` if the ``dev_data_ch0`` signal is connected to a worker that handles the data; set to ``0`` otherwise.
-
-    * ``ch1_handler_is_present``: Set to ``1`` if the ``dev_data_ch1`` signal is connected to a worker that handles the data; set to ``0`` otherwise.
-
-    * ``data_bus_index_direction``: Set to ``1`` if the bus indexing the P0_D and P1_D was reversed before processing.
-
-    * ``data_clock_is_inverted``: Set to ``1`` if the clock in via ``dev_data_clk`` was inverted inside the worker before used as an active-edge rising clock.
-
-    * ``islvds``: Set to ``1`` if the ``DIFFERENTIAL_p`` parameter is ``true`` and to ``0`` if the ``PORT_CONFIG_p`` parameter is ``single``.
-
-    * ``isdualport``: Set to ``1`` if the ``PORT_CONFIG_p`` parameter is ``dual`` and to ``0`` if it is ``single``.
-
-    * ``isfullduplex``: Set to ``1`` if the ``DIFFERENTIAL_p`` parameter is ``true`` and to ``0`` if the ``PORT_CONFIG_p`` parameter is ``single``.
-
-    * ``isDDR``: Set to ``1`` if the ``DATA_RATE_CONFIG_p`` parameter is ``DDR`` and to ``0`` if it is ``SDR``.
-
-    * ``present``: Set to ``1`` to indicate that this worker should validate the ``islvds``, ``isdualport``, ``isfullduplex`` and ``isddr`` signals against similar signals in the AD9361 ADC sub and AD9361 data sub HDL subdevice workers if they are present in the FPGA bitstream.
-
-* ``dev_cfg_data_rx``:
-
-  * Type: ``DevSignal``
-
-  * Count: 1
-
-  * Optional: ``true``
-
-  * Master: ``false``
-
-  * Signals (expected to be hard-coded at build time):
-
-    * ``rx_frame_usage``: Set to ``1`` to indicate that this worker was built with the assumption that the RX frame operates in its toggle setting and set to ``0`` if this worker was built with the assumption that the RX frame has a rising edge on the first sample and then stays high.  The value is intended to match the AD9361 register 0x010 BIT D3.
-
-    * ``rx_frame_is_inverted``: RX path-specific data port configuration.  Used to tell other workers about the configuration that was enforced when this worker was compiled.
-
-Inputs:
-
-* ``dev_cfg_data_port``: 
-
-  * Type: ``DevSignal``
-
-  * Count: ``1``
-
-  * Optional: ``false``
-
-  * Master: ``true``
-
-  * Signals (expected to be hard-coded at build time):
-
-    * ``ios_standard_is_lvds``: Set to ``1`` if the build-time configuration was for LVDS mode; set to ``0`` otherwise.
-
-    * ``p0_p1_are_swapped``: Set to ``1`` if the build-time configuration inverted the P0 and P1 data port roles; set to ``0`` otherwise.
-
-* ``dev_cfg_data``: Some data port configurations, like LVDS, require the TX bus to use 2R2T timing if either 2 TX or 2 RX channels are used.  For example, if using LVDS and this has a value of 1, 2R2T timing will be forced.
-
-  * Type: ``DevSignal``
-
-  * Count: ``1``
-
-  * Optional: ``true``
-
-  * Master: ``false``
-
-  * Signal: ``config_is_two_r``
-
-* ``dev_cfg_data_tx``: 
-
-  * Type: ``DevSignal``
-
-  * Count: ``1``
-
-  * Optional: ``true``
-
-  * Master: ``false``
-
-  * Signals:
-
-    * ``config_is_two_t``: Some data port configurations, like LVDS, require the TX bus to use 2R2T timing if either 2 TX or 2 RX channels are used.  For example, if using LVDS and this has a value of 1, 2R2T timing will be forced.
-
-    * ``force_two_r_two_t_timing``: Expected to match AD9361 register 0x010 bit D2.
-
-* ``dev_rxen_data_sub``:
-
-  * Type: ``DevSignal``
-
-  * Count: 1
-
-  * Optional: ``false``
-
-  * Master: ``true``
-
-  * Signal: ``rxen``
-
-* ``dev_txen_data_sub``:
-
-  * Type: ``DevSignal``
-
-  * Count: 1
-
-  * Optional: ``false``
-
-  * Master: ``true``
-
-  * Signal: ``txen``
-
-
-SubDevice Connections
-~~~~~~~~~~~~~~~~~~~~~
-
-* Worker port ``dev_cfg_data``:
-
-  * Port index: 0
-
-  * Worker supported: ``ad9361_adc_sub``
-
-  * Worker port supported: ``dev_cfg_data``
-
-* Worker port ``dev_cfg_data_rx``:
-
-  * Port index: 0
-
-  * Worker supported: ``ad9361_adc_sub``
-
-  * Worker port supported: ``dev_cfg_data_rx``
-
-* Worker port ``dev_cfg_data``:
-
-  * Port index: 1
-
-  * Worker supported: ``ad9361_dac_sub``
-
-  * Worker port supported: ``dev_cfg_data``
-
-* Worker port ``dev_cfg_data_tx``:
-
-  * Port index: 0
-
-  * Worker supported: ``ad9361_dac_sub``
-
-    Worker port supported: ``dev_cfg_data_tx``
-
+.. ocpi_documentation_worker::
+
+   rawprops: Communicates the AD9361 register map to AD9361 SPI subdevice worker.
+   dev_force_spi_reset: Forces the RESETB pin, which is active low, to logic 0.
+   ch0_handler_is_present: Set to ``1`` if the ``dev_data_ch0`` signal is connected to a worker that handles the data; set to ``0`` otherwise.
+   ch1_handler_is_present: Set to ``1`` if the ``dev_data_ch1`` signal is connected to a worker that handles the data; set to ``0`` otherwise.
+   data_bus_index_direction: Set to ``1`` if the bus indexing the P0_D and P1_D was reversed before processing.
+   data_clock_is_inverted: Set to ``1`` if the clock in via ``dev_data_clk`` was inverted inside the worker before used as an active-edge rising clock.
+   islvds: Set to ``1`` if the ``DIFFERENTIAL_p`` parameter is ``true`` and to ``0`` if the ``PORT_CONFIG_p`` parameter is ``single``.
+   isdualport: Set to ``1`` if the ``PORT_CONFIG_p`` parameter is ``dual`` and to ``0`` if it is ``single``.
+   isfullduplex: Set to ``1`` if the ``DIFFERENTIAL_p`` parameter is ``true`` and to ``0`` if the ``PORT_CONFIG_p`` parameter is ``single``.
+   isDDR: Set to ``1`` if the ``DATA_RATE_CONFIG_p`` parameter is ``DDR`` and to ``0`` if it is ``SDR``.
+   present: Set to ``1`` to indicate that this worker should validate the ``islvds``, ``isdualport``, ``isfullduplex`` and ``isddr`` signals against similar signals in the AD9361 ADC sub and AD9361 data sub HDL subdevice workers if they are present in the FPGA bitstream.
+   rx_frame_usage: Set to ``1`` to indicate that this worker was built with the assumption that the RX frame operates in its toggle setting and set to ``0`` if this worker was built with the assumption that the RX frame has a rising edge on the first sample and then stays high.  The value is intended to match the AD9361 register 0x010 BIT D3.
+   rx_frame_is_inverted: RX path-specific data port configuration.  Used to tell other workers about the configuration that was enforced when this worker was compiled.
+   ios_standard_is_lvds: Set to ``1`` if the build-time configuration was for LVDS mode; set to ``0`` otherwise.
+   p0_p1_are_swapped: Set to ``1`` if the build-time configuration inverted the P0 and P1 data port roles; set to ``0`` otherwise.
+   dev_cfg_data: Some data port configurations, like LVDS, require the TX bus to use 2R2T timing if either 2 TX or 2 RX channels are used.  For example, if using LVDS and this has a value of 1, 2R2T timing will be forced.
+   config_is_two_t: Some data port configurations, like LVDS, require the TX bus to use 2R2T timing if either 2 TX or 2 RX channels are used.  For example, if using LVDS and this has a value of 1, 2R2T timing will be forced.
+   force_two_r_two_t_timing: Expected to match AD9361 register 0x010 bit D2.
 
 Worker Configuration Parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -43,7 +43,7 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
                 file paths to search for a file specified in an XML include
                 statement.
         Returns:
-            An initialized ComponentSpecParser instance.
+            An initialized WorkerSpecParser instance.
         """
         super().__init__(filename=filename,
                          include_filepaths=include_filepaths)
@@ -53,7 +53,7 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
         file_root_tag = self._get_root_tag()
         if file_root_tag == "rccworker":
             self.authoring_model = "rcc"
-        elif file_root_tag == "hdlworker":
+        elif file_root_tag == "hdlworker" or file_root_tag == "hdldevice":
             self.authoring_model = "hdl"
         elif file_root_tag == "oclworker":
             self.authoring_model = "ocl"
@@ -156,7 +156,11 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
 
         if self.authoring_model == "hdl":
             dictionary["ports"] = self.get_ports(
-                port_type=["streaminterface", "timeinterface"])
+                port_type=["streaminterface",
+                           "timeinterface",
+                           "rawprop",
+                           "signal",
+                           "devsignal"])
         else:
             dictionary["ports"] = self.get_ports()
 
@@ -188,17 +192,23 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
                {"name": "<worker_name>",
                "authoring_model": "hdl",
                "inputs": {"<input_name>": {
-                            "protocol": "<protocol_name>",
-                            "optional": False},
+                             "protocol": "<protocol_name>",
+                             "optional": False},
                           "<input_name2>": {
-                            "protocol": "<protocol_name>",
-                            "optional": False}},
+                             "protocol": "<protocol_name>",
+                             "optional": False}},
                "outputs": {"<output_name>": {
                              "protocol": "<protocol_name>",
                              "optional": False}},
-               "other_interfaces": {"<interface_name>": {
+               "time": {"<time_name>": {
                              "type": "timeinterface",
                              "fractionwidth": "16"}},
+               "interfaces": {"<interface_name>": {
+                             "type": "devsignal",
+                             "master": True}},
+               "other_interfaces": {"<interface_name>": {
+                             "type": "otherinterface",
+                             "default": True}},
                "properties": {"<property_name>": {
                                "type": {"data_type": "ulong"}
                                "access": {
@@ -272,6 +282,8 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
 
         # Copy the component dict as a starting point for the combined dict.
         combined_dictionary = copy.deepcopy(component)
+        combined_dictionary["time"] = {}
+        combined_dictionary["interfaces"] = {}
         combined_dictionary["other_interfaces"] = {}
         # Copy all basic attributes from worker into combined dict
         for name, property_ in worker.items():
@@ -317,7 +329,14 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
             else:
                 # Store other interfaces like the time interface that are not
                 # specified in the OCS file.
-                combined_dictionary["other_interfaces"][name] = property_
+                if property_["type"] == "timeinterface":
+                    combined_dictionary["time"][name] = property_
+                elif property_["type"] == "rawprop" or \
+                        property_["type"] == "signal" or \
+                        property_["type"] == "devsignal":
+                    combined_dictionary["interfaces"][name] = property_
+                else:
+                    combined_dictionary["other_interfaces"][name] = property_
 
         return combined_dictionary
 
@@ -326,10 +345,7 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
 
         If a component specification file is specified then it is parsed
         using ComponentSpecParser. If a component specification is not
-        specified then the worker description is parsed to find the name of the
-        OCS. Each directory in ``self._include_filepaths`` is then searched for
-        the OCS file. If it is found it is then it is parsed using the
-        ComponentSpecParser, otherwise an exception is raised.
+        specified then an empty OCS dictionary is returned.
 
         Args:
             component_spec_file (``string``): File path and name of the OCS
@@ -344,29 +360,13 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
             component = component_spec_parser.ComponentSpecParser(
                 filename=component_spec_file,
                 include_filepaths=self._include_filepaths)
+            return component.get_dictionary()
         else:
-            worker = self.get_dictionary()
-            if "spec" in worker.keys():
-                filename = worker["spec"]
-            else:
-                raise ValueError(
-                    "Component specification file was not specified")
-            # Otherwise if the component spec filename is specified in the
-            # worker, then try and open the component spec in
-            # _include_filepaths search path.
-            for file_path in self._include_filepaths:
-                full_path = os.path.join(file_path, filename)
-                # Open the file and store the contents
-                if os.path.isfile(full_path):
-                    component = component_spec_parser.ComponentSpecParser(
-                        filename=full_path,
-                        include_filepaths=self._include_filepaths)
-                    break
-            else:
-                raise ValueError(
-                    "Component specification file was not found")
-
-        return component.get_dictionary()
+            print("WARNING: Worker component specification file was not found")
+            empty_spec = {"properties": {},
+                          "inputs": {},
+                          "outputs": {}}
+            return empty_spec
 
     def get_ports(self, port_type=["port"]):
         """ Gets a dictionary of all ports and associated arguments.
@@ -389,6 +389,18 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
                 name = self._get_attribute(
                     element=port, attribute="name", optional=False).strip()
                 port_list[name] = {"type": tag}
+
+                # Add attributes and their default values here to ensure
+                # they are displayed in the generated documentation if
+                # they are left unspecified
+                if port.tag == "rawprop":
+                    port_list[name].update({"master": "false"})
+                if port.tag == "devsignal":
+                    port_list[name].update({"count": "1",
+                                            "optional": "false",
+                                            "master": "false",
+                                            "signals": "unspecified"})
+
                 # Get all port attributes
                 for key, value in port.items():
                     if key == "name":

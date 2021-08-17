@@ -12,4 +12,3 @@ Protocol
 --------
 .. literalinclude:: %%NAME-CODE%%-prot.xml
    :language: xml
-

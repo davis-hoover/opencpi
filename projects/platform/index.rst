@@ -57,10 +57,11 @@ Criteria for content to exist in this OpenCPI project is as follows:
 
 .. toctree::
    :maxdepth: 2
+   :glob:
 
-   hdl/devices/index.rst
-   specs/index.rst
-   hdl/platforms/zed/doc/index.rst
+   hdl/devices/devices
+   specs/specs
+   hdl/platforms/zed/doc/zed-gsg
 ..    components/components
 ..    hdl/primitives/primitives
 ..    specs/specs
