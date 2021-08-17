@@ -203,8 +203,10 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
             settings['worker'] = worker
         make_file = ocpiutil.get_makefile(self.directory, "library")[0]
         #Clean
-        ocpiutil.file.execute_cmd(
+        status = ocpiutil.file.execute_cmd(
             settings, self.directory, action=action, file=make_file, verbose=verbose)
+        if status != 0:
+            ocpiutil.logging.error('bad make command, failed to clean')
 
     def build(self, verbose=False, rcc=False, hdl=False, optimize=False,
         dynamic=False, worker=None, hdl_platform=None, workers_as_needed=False, 
@@ -250,8 +252,10 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
             settings['worker'] = worker
         make_file = ocpiutil.get_makefile(self.directory, "library")[0]
         #Build
-        ocpiutil.file.execute_cmd(
+        status = ocpiutil.file.execute_cmd(
                 settings, self.directory, action=action, file=make_file, verbose=verbose)
+        if status != 0:
+            ocpiutil.logging.error('bad make command, failed to build')
 
     @staticmethod
     def get_working_dir(name, ensure_exists=True, **kwargs):
@@ -445,8 +449,10 @@ class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, Rep
             settings['worker'] = worker
         make_file = ocpiutil.get_makefile(self.directory, "libraries")[0]
         #Clean
-        ocpiutil.file.execute_cmd(
+        status = ocpiutil.file.execute_cmd(
             settings, self.directory, action=action, file=make_file, verbose=verbose)
+        if status != 0:
+            ocpiutil.logging.error('bad make command, failed to clean')
 
     def build(self, verbose=False, rcc=False, hdl=False, optimize=False,
         dynamic=False, worker=None, hdl_platform=None, workers_as_needed=False, 
@@ -492,5 +498,7 @@ class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, Rep
             settings['worker'] = worker
         make_file = ocpiutil.get_makefile(self.directory, "libraries")[0]
         #Build
-        ocpiutil.file.execute_cmd(
+        status = ocpiutil.file.execute_cmd(
                 settings, self.directory, action=action, file=make_file, verbose=verbose)
+        if status != 0:
+            ocpiutil.logging.error('bad make command, failed to build')
