@@ -832,13 +832,15 @@ def get_asset_stage(asset, project):
         if project.group == 'opencpi':
             return 'build-assets'
         elif project.group == 'osp':
-            return 'build-assets-{}'.format(project.name)
+            return 'build-assets-osp'
         elif project.group == 'comp':
             return 'build-assets-comp'
         
     if asset_name == 'primitives':
         if project.name == 'core':
             return 'build-primitives-core'
+        elif project.group == 'comp':
+            return 'build-primitives-comp'
         else:
             return 'build-primitives'
 

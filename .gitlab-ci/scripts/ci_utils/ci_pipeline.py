@@ -111,15 +111,10 @@ class Pipeline():
             else:
             # platform is hdl
                 stages = ['build-primitives-core', 'build-primitives',
-                          'build-assets', 'build-assets-comp', 
-                          'build-platforms', 'build-assemblies', 
+                          'build-assets', 'build-assets-osp', 
+                          'build-platforms', 'build-primitives-comp', 
+                          'build-assets-comp', 'build-assemblies', 
                           'build-sdcards', 'test']
-                if platform.project.group != 'opencpi':
-                # not built-in platform, so add stage to create assets after
-                # built-in assets
-                    project_stage = 'build-assets-{}'.format(
-                        platform.project.name)
-                    stages.insert(3, project_stage)
 
             platforms = [platform]
 
