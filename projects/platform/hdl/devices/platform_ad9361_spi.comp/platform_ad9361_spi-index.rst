@@ -60,11 +60,11 @@ This component's specification is contained in the OpenCPI Worker Description (O
 
 Properties
 ~~~~~~~~~~
-.. comment out ocpi_documentation_properties for now. It doesn't work.
+.. ocpi_documentation_properties::
 
 Ports
 ~~~~~
-.. comment out ocpi_documentation_ports directive for now. It doesn't work.
+.. ocpi_documentation_ports::
 
 Implementations
 ---------------

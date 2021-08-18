@@ -58,17 +58,17 @@ A block diagram representation of the implementation is given in :numref:`platfo
 Interface
 ---------
 .. The spec referenced below is a link to the spec in the assets project and the tool can't presently follow the link. The tool search paths need to be updated to look in that location.
-   
+
 .. literalinclude:: ../specs/ad9361_config_proxy-spec.xml
    :language: xml
 
 Properties
 ~~~~~~~~~~
-.. comment out ocpi_documentation_properties for now. The parser crashes with an error about member child elements in structs.
+.. ocpi_documentation_properties::
 
 Ports
 ~~~~~
-.. comment out ocpi_documentation_ports for now. It doesn't work.
+.. ocpi_documentation_ports::
 
 Implementations
 ---------------

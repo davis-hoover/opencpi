@@ -1,8 +1,6 @@
 .. %%NAME-CODE%% %%AUTHORING_MODEL%% worker
 
 
-:orphan:
-
 .. _%%NAME-CODE%%-%%AUTHORING_MODEL%%-worker:
 
 

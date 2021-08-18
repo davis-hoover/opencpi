@@ -71,15 +71,15 @@ numfig = True
 
 # This code changes numbering format to what's used in OpenCPI docs
 numfig_format = {
-    'figure': 'Figure %s:',
-    'table': 'Table %s:',
-    'code-block': 'Listing %s',
-    'section': 'Section %s'
+    "figure": "Figure %s:",
+    "table": "Table %s:",
+    "code-block": "Listing %s",
+    "section": "Section %s"
 }
 
 html_theme = "sphinx_rtd_theme"
 html_theme_options = {
-    'logo_only': True,
+    "logo_only": True,
 }
 html_static_path = ["static"]
 # OpenCPI logo from briefings
@@ -107,6 +107,7 @@ spelling_word_list_filename = str(pathlib.Path(__file__).parent.joinpath(
 spelling_show_suggestions = True
 
 # Defines a tight table style to override the RTD theme's wide table format
-def setup(app):
-    app.add_css_file ('css/ocpidocument-style.css')
 
+
+def setup(app):
+    app.add_css_file("css/ocpidocument-style.css")

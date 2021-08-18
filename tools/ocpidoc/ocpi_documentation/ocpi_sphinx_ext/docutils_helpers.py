@@ -70,3 +70,36 @@ def list_item_name_code_value(name, value):
     item.append(item_text)
 
     return item
+
+
+def list_members(name, members):
+    """ Prepare a docutils list item using a dictonary of members
+
+    Args:
+        name (str): The name (first part of the list item text) to be included
+            on the list item, in standard font and before a ":".
+        members (dir): a hierarcical dictionary of members.
+    Returns:
+        docutils item.
+    """
+    member_item = docutils.nodes.list_item()
+    member_item.append(docutils.nodes.paragraph(text=name + ":"))
+    member_details_list = docutils.nodes.bullet_list()
+    for item, value in members.items():
+        if value["type"]["data_type"] == "struct":
+            member_details_list.append(
+                list_members(item, value["type"]["members"]))
+        else:
+            member_item_title = docutils.nodes.list_item()
+            member_item_title.append(docutils.nodes.paragraph(text=item + ":"))
+            member_sub_item_list = docutils.nodes.bullet_list()
+            for member_name, member_value in value["type"].items():
+                member_sub_item_list.append(
+                    list_item_name_code_value(member_name, member_value))
+            member_item_title.append(member_sub_item_list)
+            member_details_list.append(member_item_title)
+
+    if len(member_details_list) > 0:
+        member_item.append(member_details_list)
+
+    return member_item
