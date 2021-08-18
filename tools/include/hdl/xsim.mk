@@ -111,7 +111,7 @@ XsimArgs= -v 2 -work $(call ToLower,$(WorkLib))=$(WorkLib) $(XsimExtraArgs)
 # XsimExtraArgs=-initfile $(call OcpiXilinxVivadoDir,infox)/data/xsim/ip/xsim_ip.ini
 #XsimExtraArgs=
 
-XsimXelabArgs= -O3 $(XsimXelabExtraArgs)
+XsimXelabArgs= -O3 --rangecheck $(XsimXelabExtraArgs)
 # Set this option to pass additional arguments to xelab
 #XsimXelabExtraArgs=
 # -noieeewarnings
