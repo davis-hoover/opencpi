@@ -112,9 +112,8 @@ class Pipeline():
             # platform is hdl
                 stages = ['build-primitives-core', 'build-primitives',
                           'build-assets', 'build-assets-osp', 
-                          'build-platforms', 'build-primitives-comp', 
-                          'build-assets-comp', 'build-assemblies', 
-                          'build-sdcards', 'test']
+                          'build-assets-comp', 'build-platforms', 
+                          'build-assemblies', 'build-sdcards', 'test']
 
             platforms = [platform]
 

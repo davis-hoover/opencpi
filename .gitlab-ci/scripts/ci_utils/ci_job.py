@@ -448,7 +448,7 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
             if project.name != platform.project.name:
                 continue
         elif project.group == 'comp' and stage != 'generate-children':
-            if asset and asset.project.name != project.name:
+            if not asset:
                 continue
         commit_ref = 'develop'
         try:
@@ -824,8 +824,10 @@ def get_asset_stage(asset, project):
     """
     asset_name = asset.name.split(':')[-1]
 
-    if asset_name in ['platforms', 'assemblies']:
-        return 'build-{}'.format(asset_name)
+    if asset_name == 'platforms':
+        return 'build-platforms'
+    if asset_name == 'assemblies':
+        return 'build-assemblies'
 
     if (asset_name in ['components', 'adapters', 'cards', 'devices']
             or asset.path.parent.stem == 'components'):
@@ -839,8 +841,6 @@ def get_asset_stage(asset, project):
     if asset_name == 'primitives':
         if project.name == 'core':
             return 'build-primitives-core'
-        elif project.group == 'comp':
-            return 'build-primitives-comp'
         else:
             return 'build-primitives'
 
