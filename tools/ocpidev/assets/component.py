@@ -455,9 +455,8 @@ class Component(ShowableComponent):
             if ocpiutil.get_dirtype("components") == "libraries":
                 ocpiutil.throw_specify_lib_e()
             working_path = Path(working_path, 'components')
-        # Legacy: create defaults to 'components' without the -p option,
-        # but others like show and run default to the project level
-        elif cur_dirtype == 'project' and verb == "create":
+        # Legacy: ocipidev defaults to 'components' without the -p option
+        elif cur_dirtype == 'project' and verb in ["create","delete"]:
             working_path = Path(project_path, 'components')
             if not working_path.exists():
                 print("OCPI:ERROR: The 'components' library does not exist")
