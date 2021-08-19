@@ -229,8 +229,9 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         if optimize or dynamic:
             if rcc_platform:
                 if any("-" in s for s in rcc_platform):
-                    raise ocpiutil.OCPIException("You cannot use the --optimize build option and " +
-                    "also specify build options in a platform name (in this case: ", rcc_platform, ")")
+                    raise ocpiutil.OCPIException("You cannot use the --optimize build option and "
+                    + "also specify build options in a platform name (in this case: ",
+                    rcc_platform, ")")
                 else:
                     new_list = [s + build_suffix for s in rcc_platform]
                     rcc_platform = new_list
@@ -471,8 +472,9 @@ class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, Rep
         if optimize or dynamic:
             if rcc_platform:
                 if any("-" in s for s in rcc_platform):
-                    raise ocpiutil.OCPIException("You cannot use the --optimize build option and " +
-                    "also specify build options in a platform name (in this case: ", rcc_platform, ")")
+                    raise ocpiutil.OCPIException("You cannot use the --optimize build option and "
+                    + "also specify build options in a platform name (in this case: ",
+                    rcc_platform, ")")
                 else:
                     new_list = [s + build_suffix for s in rcc_platform]
                     rcc_platform = new_list
