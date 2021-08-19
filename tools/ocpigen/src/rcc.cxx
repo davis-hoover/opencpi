@@ -91,7 +91,7 @@ rccEmitDimension(size_t numeric, const std::string &expr, const char *surround,
                  std::string &out) {
   if (surround)
     out += surround[0];
-  if (expr.length()) {
+  if (expr.length() && !m_isSlave) {
     std::string prefix, cexpr;
     if (m_language == CC)
       upperconstant(prefix, m_implName, "");
