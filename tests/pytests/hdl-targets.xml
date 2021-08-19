@@ -1,0 +1,62 @@
+<!-- database of FPGA/HDL vendors, parts, tools etc. generally ordered alphabetically for humans
+     dropped on conversion from hdl-target.mk: HdlSimTools -->
+
+<hdltargets>
+  <vendor name='altera'>
+    <!-- The "k", when present in part numbers indicates the transceiver count (k = 36)
+	 # But in many places it is left off.. -->
+    <!-- <family name='arria10soc' toolset='quartus_pro' default='10AS066N3F40E2SG' parts='10AS066N3F40E2SG'/> -->
+    <!-- <family name='arria10soc_std' toolset='quartus' default='10AS066N3F40E2SG_std_alias' -->
+    <!-- 	    parts='10AS066N3F40E2SG_std_alias'/> -->
+    <!-- <family name='cyclone5' toolset='quartus' default='AUTO' parts='5CSXFC6D6F31C8ES'/> -->
+    <family name='stratix4' toolset='quartus' default='AUTO' parts='ep4sgx230k ep4sgx530k ep4sgx360'/>
+    <family name='stratix5' toolset='quartus' default='AUTO' parts='ep5sgsmd8k2'/>
+  </vendor>
+  <vendor name='modelsim'>
+    <family name='modelsim' toolset='modelsim'/>
+  </vendor>
+  <vendor name='xilinx'>
+    <family name='isim' toolset='isim'/>
+    <family name='spartan3adsp' toolset='xst' parts='xc3sd3400a'/>
+    <family name='spartan6' toolset='xst' parts='xc6slx45'/>
+    <family name='virtex5' toolset='xst' parts='xc5vtx240t xc5vlx50t xc5vsx95t xc5vlx330t xc5vlx110t'/>
+    <family name='virtex6' toolset='xst' parts='xc6vlx240t'/>
+    <family name='xsim' toolset='xsim'/>
+    <family name='zynq' toolset='vivado' default='xc7z020' parts='xc7z020'/>
+	    <!-- parts='xc7z007s xc7z012s xc7z014s xc7z010 xc7z015 xc7z020 xc7z030 xc7z035 xc7z045 xc7z100 xc7z035i'/> -->
+    <family name='zynq_ise' toolset='xst' parts='xc7z020_ise_alias'/>
+    <!-- parts='xc7z007s_ise_alias xc7z012s_ise_alias xc7z014s_ise_alias xc7z010_ise_alias xc7z015_ise_alias -->
+    <!-- 	   xc7z020_ise_alias xc7z030_ise_alias xc7z035_ise_alias xc7z045_ise_alias xc7z100_ise_alias -->
+    <!-- 	   xc7z035i_ise_alias'/> -->
+    <!-- <family name='artix7' toolset='vivado' parts='xc7a50t'/> -->
+    <!-- <family name='zynq_ultra' toolset='vivado' default='xczu3cg-2-sbva484e' -->
+    <!-- 	    parts='xczu28dr xczu9eg xczu7ev xczu3cg'/> -->
+  </vendor>
+  <!-- currently the only attribute per tool set is whether it is a simulator -->
+  <toolset name='isim' tool='ISE' simulator='true'/>
+  <toolset name='modelsim' tool='Modelsim' simulator='true'/>
+  <toolset name='xsim' tool='Vivado' simulator='true'/>
+  <toolset name='quartus' tool='Quartus'/>
+  <toolset name='quartus_pro' tool='QuartusPro'/>
+  <toolset name='vivado' tool='Vivado'/>
+  <toolset name='xst' tool='ISE'/>
+  <!-- These platforms are used only for test purposes in tests/python/hdltargets_test.py -->
+  <platform name='zed' model='hdl' part='xc7z020-1-clg484' family='zynq'
+	    directory='fake_plat' packageid='fake_plat'/>
+  <platform name='zed_zipper' model='hdl' part='xc7z020-1-clg484' family='zynq'
+	    directory='fake_plat' packageid='fake_plat'/>
+  <platform name='alst4' model='hdl' part='ep4sgx230k-c2-f40' family='stratix4'
+	    directory='fake_plat' packageid='fake_plat'/>
+  <platform name='alst4x' model='hdl'  part='ep4sgx530k-c2-h40' family='stratix4'
+	    directory='fake_plat' packageid='fake_plat'/>
+  <platform name='modelsim' model='hdl' part='modelsim' family='modelsim'
+	    directory='fake_plat' packageid='fake_plat'/>
+  <platform name='isim' model='hdl' part='isim' family='isim'
+	    directory='fake_plat' packageid='fake_plat'/>
+  <platform name='xsim' model='hdl' part='xsim' family='xsim'
+	    directory='fake_plat' packageid='fake_plat'/>
+  <platform name='zed_ise' model='hdl' part='xc7z020_ise_alias-1-clg484' family='zynq_ise'
+	    directory='fake_plat' packageid='fake_plat'/>
+  <platform name='ml605' model='hdl' part='xc6vlx240t-1-ff1156' family='virtex6'
+	    directory='fake_plat' packageid='fake_plat'/>
+</hdltargets>

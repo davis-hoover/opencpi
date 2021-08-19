@@ -100,15 +100,20 @@ class HdlPlatformsCollection(HDLBuildableAsset, ReportableAsset):
         platforms collection
         """
         platform_list = []
-        mkf=ocpiutil.get_makefile(self.directory)
-        logging.debug("Getting valid platforms from: " + mkf[0])
-        make_platforms = ocpiutil.set_vars_from_make(mkf,
-                                                     mk_arg="ShellPlatformsVars=1 showplatforms",
-                                                     verbose=True)["HdlPlatforms"]
-
-        # Collect list of platform directories
-        for name in make_platforms:
-            platform_list.append(self.directory + "/" + name)
+        # Collect the already known platforms that are in this directory.
+        real_dir = os.path.realpath(self.directory)
+        for name,attrs in ocpiutil.get_platforms().items():
+            plat_dir = attrs['directory']
+            if attrs['model'] == 'hdl' and os.path.realpath(plat_dir).startswith(real_dir):
+                platform_list.append(plat_dir)
+        # mkf=ocpiutil.get_makefile(self.directory)
+        # logging.debug("Getting valid platforms from: " + mkf[0])
+        # make_platforms = ocpiutil.set_vars_from_make(mkf,
+        #                                              mk_arg="ShellPlatformsVars=1 showplatforms",
+        #                                              verbose=True)["HdlPlatforms"]
+        # # Collect list of platform directories
+        # for name in make_platforms:
+        #     platform_list.append(self.directory + "/" + name)
         return platform_list
 
     def show_utilization(self):
@@ -167,7 +172,14 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
         super().__init__(directory, name, **kwargs)
         self.configs = {}
         self.package_id = None
-        config_list = self.get_make_vars()
+        attrs = ocpiutil.get_platforms().get(self.name)
+        if not attrs:
+            raise ocpiutil.OCPIException("Could not find HDL Platform for its worker:  " + self.name)
+        self.package_id = attrs['packageid']
+        config_list = attrs.get('configurations')
+        if not config_list:
+            raise ocpiutil.OCPIException("Could not get list of HDL Platform Configurations for:" +
+                                         name)
         self.platform = hdltargets.HdlToolFactory.factory("hdlplatform", self.name, self.package_id)
         #TODO this should be guarded by a init kwarg variable, not always needed i.e. show project
         self.init_configs(config_list)
@@ -179,27 +191,27 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
         """
         raise NotImplementedError("build() is not implemented")
 
-    def get_make_vars(self):
-        """
-        Collect the list of build configurations and package id for this Platform Worker.
-        """
-        # Get the list of Configurations from make
-        logging.debug("Get the list of platform Configurations from make")
-        mkf=ocpiutil.get_makefile(self.directory, "hdl/hdl-platform")
-        try:
-            plat_vars = ocpiutil.set_vars_from_make(mkf,
-                                                    mk_arg="ShellHdlPlatformVars=1 showinfo",
-                                                    verbose=False)
-        except ocpiutil.OCPIException:
-            # if the make call causes and error assume configs are blank
-            plat_vars = {"Configurations" : "", "Package":"N/A"}
-        if "Configurations" not in plat_vars:
-            raise ocpiutil.OCPIException("Could not get list of HDL Platform Configurations " +
-                                         "from \"" + mkf[1])
-        self.package_id = plat_vars["Package"]
-        # This should be a list of Configuration NAMES
-        config_list = plat_vars["Configurations"]
-        return config_list
+    # def get_make_vars(self):
+    #     """
+    #     Collect the list of build configurations and package id for this Platform Worker.
+    #     """
+    #     # Get the list of Configurations from make
+    #     logging.debug("Get the list of platform Configurations from make")
+    #     mkf=ocpiutil.get_makefile(self.directory, "hdl/hdl-platform")
+    #     try:
+    #         plat_vars = ocpiutil.set_vars_from_make(mkf,
+    #                                                 mk_arg="ShellHdlPlatformVars=1 showinfo",
+    #                                                 verbose=False)
+    #     except ocpiutil.OCPIException:
+    #         # if the make call causes and error assume configs are blank
+    #         plat_vars = {"Configurations" : "", "Package":"N/A"}
+    #     if "Configurations" not in plat_vars:
+    #         raise ocpiutil.OCPIException("Could not get list of HDL Platform Configurations " +
+    #                                      "from \"" + mkf[1])
+    #     self.package_id = plat_vars["Package"]
+    #     # This should be a list of Configuration NAMES
+    #     config_list = plat_vars["Configurations"]
+    #     return config_list
 
     def init_configs(self, config_list):
         """
@@ -595,9 +607,10 @@ class HdlPlatform(Platform):
         self.built = built
         self.dir = ocpiutil.rchop(directory, "/lib")
         if self.dir and not package_id and os.path.exists(self.dir):
-            self.package_id = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(self.dir, "hdl/hdl-platform"),
-                                                          "ShellHdlPlatformVars=1 showpackage",
-                                                          "verbose")["Package"][0]
+            self.package_id = ocpiutil.get_platforms[name]['packageid']
+            #self.package_id = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(self.dir, "hdl/hdl-platform"),
+            #                                              "ShellHdlPlatformVars=1 showpackage",
+            #                                              "verbose")["Package"][0]
         else:
             self.package_id = ""
 
