@@ -1558,4 +1558,32 @@ OcpiCPPSources=$(strip $(foreach f,$1,$(and $(filter .cpp_%,$(suffix $f)),$f)))
 
 OcpiSpecLinks=mkdir -p $2;$(foreach f,$(wildcard $1/specs/*.xml),$(call MakeSymLink,$f,$2);)
 
+# Return the list of project dependencies given the project dir
+# Deal with old Project.mk vs newer Project.xml vs. exported project
+OcpiProjectDependencies=$(infox HPD:$1)$(strip\
+  $(if $(wildcard $1/project-dependencies),$(- are we an exported project?)\
+    $(shell cat $1/project-dependencies),\
+    $(if $(wildcard $1/Project.xml),\
+      $(if $(call DoShell,\
+             $(ToolsDir)/ocpixml  -t project -a '?ProjectDependencies' parse $1/Project.xml,\
+             OcpiDeps),\
+        $(error Failed to parse $1/Project.xml),\
+        $(OcpiDeps)),\
+      $(if $(wildcard $1/Project.mk),\
+        $(shell sed -n 's/^ *ProjectDependencies:*= *\([^\#]*\)/\1/p' $1/Project.mk),\
+        $(error Project directory $1 has no Project.xml or Project.mk file)))))
+
+# Deal with source vs. exported directories.
+# <projdir>/hdl/platforms/<plat> (not exported at all)
+# <projdir>/hdl/platforms/<plat>/lib (exported locally)
+# <projdir>/exports/hdl/platform/<plat> (exported by project)
+# Arg 1 is platform dir, Arg 2 is model (lower case)
+OcpiProjectFromPlatformDir=$(infox OPFPD:$1:$2)$(strip\
+  $(or $(strip \
+    $(foreach r,$(realpath $1),$(infox R:$r)\
+      $(foreach path,$(if $(filter lib,$(notdir $r)),$(patsubst %/,%,$(dir $r)),$r),\
+        $(foreach proj,$(patsubst %/$2/platforms/$(notdir $(path)),%,$(path)),\
+          $(infox OPFPDr:$(proj))$(proj))))),\
+    $(error Platform directory $1 does not exist)))
+
 endif # ifndef __UTIL_MK__

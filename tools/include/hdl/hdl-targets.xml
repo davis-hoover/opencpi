@@ -1,0 +1,79 @@
+<!-- database of FPGA/HDL vendors, parts, tools etc. generally ordered alphabetically for humans
+     dropped on conversion from hdl-target.mk: HdlSimTools
+
+Notes regarding HdlTargets:
+
+The *default* attribute for a family is the one used for core building (primitives, workers...).
+If the default is unset, the first part in a family is the one used for core building.
+Usually the default should be the smallest so that you ensure each worker will fit
+on the smaller parts. If you want to ensure that worker-synthesis uses as many
+resources as necessary, you can set it to a larger part or set HdlExactPart
+for a worker or library.
+
+The *part* attribute in the <platform>.xml file will define a full part. That part
+can be mapped to a part here and therefore a family as well.
+E.g. in zed.xml, part='xc7z020-1-clg484', which maps to xc7z020, which
+maps to the 'zynq' family with a default target of xc7z020 for building pre-platform cores.
+In OpenCPI parts are always three hypen-separated fields roughly meaning:
+<die>-<speed_grade>-<package>
+Since vendors name parts in a variety of ways, and change their minds about
+part ordering formats, and use different formats between data sheets and tools,
+there is a tool-specific make function, HdlFullPart_<tool> to translate between
+our canonical form, and the format that the tools like, which is *not*
+necessarily the "part ordering number" in data sheets etc.
+-->
+<hdltargets>
+  <vendor name='altera'>
+    <!-- The "k", when present in part numbers indicates the transceiver count (k = 36)
+	 # But in many places it is left off..
+	 Quartus Pro (and maybe newer versions of standard) does not
+	 support the 'AUTO' part for arria10 because you cannot reuse
+	 synthesized partitions from different devices.
+	 We must enforce one exact part per target for Quartus Pro
+	 (and maybe newer/17+ versions of standard). -->
+    <family name='arria10soc' toolset='quartus_pro' default='10AS066N3F40E2SG' parts='10AS066N3F40E2SG'/>
+    <family name='arria10soc_std' toolset='quartus' default='10AS066N3F40E2SG_std_alias'
+	    parts='10AS066N3F40E2SG_std_alias'/>
+    <family name='stratix4' toolset='quartus' default='AUTO' parts='ep4sgx230k ep4sgx530k ep4sgx360'/>
+    <family name='stratix5' toolset='quartus' default='AUTO' parts='ep5sgsmd8k2'/>
+    <family name='cyclone5' toolset='quartus' default='AUTO' parts='5CSXFC6D6F31C8ES'/>
+  </vendor>
+  <vendor name='modelsim'>
+    <family name='modelsim' toolset='modelsim'/>
+  </vendor>
+  <vendor name='xilinx'>
+    <family name='artix7' toolset='vivado' parts='xc7a50t'/>
+    <family name='isim' toolset='isim'/>
+    <family name='spartan3adsp' toolset='xst' parts='xc3sd3400a'/>
+    <family name='spartan6' toolset='xst' parts='xc6slx45'/>
+    <family name='virtex5' toolset='xst' parts='xc5vtx240t xc5vlx50t xc5vsx95t xc5vlx330t xc5vlx110t'/>
+    <family name='virtex6' toolset='xst' parts='xc6vlx240t'/>
+    <family name='xsim' toolset='xsim'/>
+    <!-- keep this in sync with the zynq_ise family below -->
+    <family name='zynq' toolset='vivado' default='xc7z020'
+	    parts='xc7z007s xc7z012s xc7z014s xc7z010 xc7z015 xc7z020 xc7z030 xc7z035 xc7z045 xc7z100 xc7z035i'/>
+    <!-- keep this in sync with the zynq family above -->
+    <family name='zynq_ise' toolset='xst'
+	    parts='xc7z007s_ise_alias xc7z012s_ise_alias xc7z014s_ise_alias xc7z010_ise_alias xc7z015_ise_alias
+		   xc7z020_ise_alias xc7z030_ise_alias xc7z035_ise_alias xc7z045_ise_alias xc7z100_ise_alias
+		   xc7z035i_ise_alias'/>
+    <!-- Zynq UltraScale+ parts
+	 The last two letters mean: (ds891)
+	 ev: quad core, mali gpu, H.264
+	 eg: quad core, mali gpu
+	 cg: dual core
+	 Zynq UltraScale+ chips require full part to be specified
+	 The default is based on the zcu104 dev board, which is the cheapest, and supported by webpack. -->
+    <family name='zynq_ultra' toolset='vivado' default='xczu3cg-2-sbva484e'
+	    parts='xczu28dr xczu9eg xczu7ev xczu3cg'/>
+  </vendor>
+  <!-- currently the only attribute per tool set is whether it is a simulator -->
+  <toolset name='isim' tool='ISE' simulator='true'/>
+  <toolset name='modelsim' tool='Modelsim' simulator='true'/>
+  <toolset name='xsim' tool='Vivado' simulator='true'/>
+  <toolset name='quartus' tool='Quartus'/>
+  <toolset name='quartus_pro' tool='QuartusPro'/>
+  <toolset name='vivado' tool='Vivado'/>
+  <toolset name='xst' tool='ISE'/>
+
+</hdltargets>

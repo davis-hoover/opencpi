@@ -257,9 +257,10 @@ class HdlToolFactory(object):
         """
         if cls.__mk_dict == {}:
             # Ask make for tool/tgt/plat info which will be reorganized/parsed below
-            cls.__mk_dict = ocpiutil.set_vars_from_make(os.environ["OCPI_CDK_DIR"] +
-                                                        "/include/hdl/hdl-targets.mk",
-                                                        "ShellHdlTargetsVars=1")
+            #cls.__mk_dict = ocpiutil.set_vars_from_make(os.environ["OCPI_CDK_DIR"] +
+            #                                            "/include/hdl/hdl-targets.mk",
+            #                                            "ShellHdlTargetsVars=1")
+            cls.__mk_dict = ocpiutil.get_platform_make_dictionary()
         # Top targets are general groups that likely contain multiple child targets/families
         if 'HdlTopTargets' in cls.__mk_dict:
             # we call TopTargets "vendors" because that is a more readable term
@@ -314,7 +315,7 @@ class HdlToolFactory(object):
                 dir_list = cls.__mk_dict['HdlPlatformDir_' + platname]
                 cls.__plat_dict[platname]['directory'] = dir_list[0] if dir_list else ""
                 cls.__plat_dict[platname]['exactpart'] = exactpart
-                cls.__plat_dict[platname]['targetname'] = cls.__mk_dict['HdlFamily_' + exactpart][0]
+                cls.__plat_dict[platname]['targetname'] = cls.__mk_dict['HdlTarget_' + platname][0]
 
                 cls.__plat_dict[platname]['built'] = platname in cls.__mk_dict['HdlBuiltPlatforms']
                 cls.__plat_dict[platname]['packageid'] = cls.__mk_dict['HdlPlatformPackageID_' + platname]

@@ -280,8 +280,7 @@ class HdlAssembliesCollection(HDLBuildableAsset, ReportableAsset):
                                      HdlApplicationAssembly objects contained in the project
         """
         self.check_dirtype("hdl-assemblies", directory)
-        super().__init__(directory, name, **kwargs)
-
+        super().__init__(directory, name if name else "hdlassemblies", **kwargs)
         self.assembly_list = []
         if kwargs.get("init_hdlassembs", False):
             logging.debug("HdlAssembliesCollection constructor creating HdlApplicationAssembly " +

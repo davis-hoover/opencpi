@@ -44,4 +44,4 @@ include $(OCPI_CDK_DIR)/include/hdl/hdl-platform.mk
 alst4x.xml: ../alst4/alst4.xml; sed "s/'alst4'/'alst4x'/" $< > $@
 
 clean::
-	rm -f alst4x.{xml,vhd,sdc,qsf} jtagSupport_alst4x
+	rm -f alst4x.{vhd,sdc,qsf} jtagSupport_alst4x
