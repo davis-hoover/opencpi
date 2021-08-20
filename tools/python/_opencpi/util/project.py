@@ -609,6 +609,7 @@ def get_ocpidev_working_dir(noun, name, ensure_exists=True, **kwargs):
         "applications"   : _opencpi.assets.application.ApplicationsCollection.get_working_dir,
         "project"        : _opencpi.assets.project.Project.get_working_dir,
         "library"        : _opencpi.assets.library.Library.get_working_dir,
+        "libraries"      : _opencpi.assets.library.LibraryCollection.get_working_dir,
         "test"           : _opencpi.assets.test.Test.get_working_dir,
         "component"      : _opencpi.assets.component.Component.get_working_dir,
         "protocol"       : _opencpi.assets.component.Protocol.get_working_dir,

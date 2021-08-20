@@ -76,6 +76,12 @@ def main():
             ocpi_set_unset(args)
 
         directory,name = get_working_dir(args)
+        dirtype = ocpiutil.get_dirtype(directory)
+
+        if noun != dirtype:
+            if noun == 'library' and dirtype == 'libraries':
+                args.noun = dirtype
+                noun = args.noun
 
         # Try to instantiate the appropriate asset from noun
         asset_factory = ocpiassets.factory.AssetFactory()
@@ -233,11 +239,11 @@ def get_working_dir(args, ensure_exists=True):
     else:
         working_path = Path(ocpiutil.get_ocpidev_working_dir(
             noun, name, ensure_exists=ensure_exists, **kwargs)).absolute()
-    if noun not in ['registry', 'library', 'project'] or args.verb == 'create':
+    if noun not in ['registry', 'library', 'libraries', 'project'] or args.verb == 'create':
     # Libraries, projects, and registries want the full path as the directory
         name = working_path.name
         working_path = str(working_path.parent)
-    
+
     return str(working_path),name
 
 
