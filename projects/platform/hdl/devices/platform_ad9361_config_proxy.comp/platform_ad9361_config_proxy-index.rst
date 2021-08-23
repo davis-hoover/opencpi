@@ -57,8 +57,6 @@ A block diagram representation of the implementation is given in :numref:`platfo
 
 Interface
 ---------
-.. The spec referenced below is a link to the spec in the assets project and the tool can't presently follow the link. The tool search paths need to be updated to look in that location.
-
 .. literalinclude:: ../specs/ad9361_config_proxy-spec.xml
    :language: xml
 

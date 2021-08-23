@@ -1,16 +1,16 @@
-.. %%NAME-PROPER%% Getting Started Guide Documentation
+.. %%NAME-CODE%% Getting Started Guide Documentation
 
 
-.. _%%NAME-PROPER%%-gsg:
+.. _%%NAME-CODE%%-gsg:
 
-%%NAME-PROPER%% Getting Started Guide
-=====================================
+``%%NAME-CODE%%`` Getting Started Guide
+=======================================
 Skeleton outline: Provide a brief overview of the platform and how to use this guide.
 
 Revision History
 ----------------
 
-.. csv-table:: %%NAME-PROPER%% Getting Started Guide: Revision History
+.. csv-table:: %%NAME-CODE%% Getting Started Guide: Revision History
    :header: "Revision", "Description of Change", "Date"
    :widths: 10,30,10
    :class: tight-table

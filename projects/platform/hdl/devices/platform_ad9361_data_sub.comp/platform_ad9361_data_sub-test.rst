@@ -24,7 +24,6 @@
 
 ``platform_ad9361_data_sub`` Test Detail
 ========================================
-
 The test outlined in the AD9361 DAC component description (see the ``assets`` project) includes validation of this worker’s functionality (for LVDS mode and CMOS Single Port Full Duplex DDR mode).
 
 .. ocpi_documentation_test_detail::
