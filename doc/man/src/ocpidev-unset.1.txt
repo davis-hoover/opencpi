@@ -4,7 +4,7 @@ OCPIDEV-UNSET(1)
 
 NAME
 ----
-ocpidev-unset - manually disassociate the current project from a registry.
+ocpidev-unset - manually disassociate a project from a registry.
 
 
 SYNOPSIS
@@ -18,32 +18,39 @@ Projects are automatically associated with the current
 registry when they are created or used. A project can
 be manually associated with or disassociated
 from a particular registry. Use the *ocpidev unset registry*
-command to remove an association between the current project
-and a particular registry.
+command to remove an association between a project
+and a registry.
 
 You must run this command from within a project.
 
 Asset types to be specified in the '<noun>' argument are:
 
 *registry*::
-    Unset the registry for the current project.
+    Unset the registry for the project.
 
 OPTIONS
 -------
 You can use the general-purpose options *`-v`* and *`-d`* '<directory>'
 with this command. In particular, you can use the *`-d`* '<directory>'
-option to specify the pathname of the registry being unset.
+option to specify the pathname of the project whose registry should
+be unset. If this option is not specified, the current project is used.
 
 There are no verb-specific options.
 
 EXAMPLES
 --------
-. Unset the current project's registry. The next time the project
+. Unset the registry associated with the current project. The next time the project
 is built, the default registry will be used.
 +
 ----------------------
 ocpidev unset registry
 ----------------------
+. Unset the registry associated with the project *`~/MyProject`*.
+The next time the project is built, the default registry will be used.
++
+-------------------------------------
+ocpidev -d ~/MyProject unset registry
+-------------------------------------
 
 BUGS
 ----
@@ -70,7 +77,7 @@ link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
 
 COPYING
 -------
-Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2021 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your

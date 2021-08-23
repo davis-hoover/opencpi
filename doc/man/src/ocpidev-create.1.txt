@@ -68,7 +68,7 @@ Asset types to be specified in the '<noun>' argument are:
     Create a registry that enables projects to depend on each other.
 
 *`spec`*::
-    Create a component specification in a library or project.
+    Create a component specification in a library or project ("spec" is shorthand notation for a component specification).
 
 *`test`*::
     Create a component unit test in a library.
@@ -138,30 +138,31 @@ Options When Creating Projects, Libraries, Workers, HDL Devices or HDL Platforms
    Specify a primitive library on which the asset (or assets
    it contains) depends.
    
-Options When Creating Specs
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Options When Creating Components
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *-n*::
-   Add the attribute to the component spec that indicates there will be no control interface.  This
+   Add the attribute to the component specification that
+   indicates there will be no control interface.  This
    option is rarely used or recommended. It is required
    for certain infrastructure specs and only applies to
-   specs with only HDL implementations.
+   component specs with only HDL implementations.
 
 *-t*::
-   Create the unit test for the spec as part of creating the
-   spec.
+   Create the unit test for the component as part of creating the
+   component specification.
    
-Option When Creating or Specs or Protocols
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Option When Creating Components ("Specs") or Protocols
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *-p*::
-   Create the spec or protocol in the *specs*
+   Create the component specification or protocol in the *specs/*
    directory of the project, not in a library's
-   *specs* directory.
+   *specs/* directory.
    
 Options When Creating Specs, Protocols, Workers or HDL Devices
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *--hdl-library=*'<hdl-library>'::
    Create the asset in the library under the
-   *hdl* directory of the project. Valid values are only
+   *hdl/* directory of the project. Valid values are only
    one of *devices*, *cards* or *adapters*.
 
 *-l* '<library>'::
@@ -298,9 +299,9 @@ EXAMPLES
 . Create a project with the name *my-project*. This project's
 package-ID will be *local.my-project*:
 +
--------------------------------
+---------------------------------
 ocpidev create project my-project
---------------------------------
+---------------------------------
 +
 . Create a project with the package-prefix *org.my_organization* and
 name *my_project*. This project's package-ID will be
@@ -318,49 +319,49 @@ to tell that project to use the new registry. None of this is
 necessary if you are using the default project registry in the
 OpenCPI installation.
 +
------------------
+------------------------------------------------------
 ocpidev -d /home/workspace create registry my-registry
------------------
+------------------------------------------------------
 +
 . Create the default *components* library for a project. If you
 provide a name other than *components*, *ocpidev* creates it
 underneath the *components* directory.
 +
-------------------
+---------------------------------
 ocpidev create library components
-------------------
+---------------------------------
 +
-. Create a component spec with the name *mycomp*. It will be
+. Create a component specification with the name *mycomp*. It will be
 placed in the default location, which is *components/specs*.
 Use the *-l* '<library-name>' option if there are sub-libraries
 underneath *components*.
 +
------------------------
+--------------------------
 ocpidev create spec mycomp
------------------------
+--------------------------
 +
 . Create an HDL worker named *myworker* that implements the
 *mycomp* spec. If the worker is named *mycomp.hdl*, you can omit
 the *-S mycomp-spec* option because the default spec is
 '<worker-name>'*-spec.xml*.
 +
---------------------
+-------------------------------------------------
 ocpidev create worker myworker.hdl -S mycomp-spec
---------------------
+-------------------------------------------------
 +
 . Create a C++ RCC worker named *mycomp* that implements the
 *mycomp* spec.
 +
---------------------
+-----------------------------------------
 ocpidev create worker myworker.rcc -L c++
---------------------
+-----------------------------------------
 +
 . Create an HDL assembly named *myassy* that will only be
 used on the *isim* platform.
 +
-----------------------
+------------------------------------------
 ocpidev create hdl assembly myassy -G isim
-----------------------
+------------------------------------------
 
 
 BUGS
@@ -391,7 +392,7 @@ link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
 
 COPYING
 -------
-Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2021 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your
