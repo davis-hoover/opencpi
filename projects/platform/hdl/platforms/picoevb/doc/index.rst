@@ -37,7 +37,7 @@ OpenCPI RHS Research PicoEVB Getting Started Guide
    :widths: 10,30,10
    :class: tight-table
 
-   "v2.x.x", "Initial PicoEVB release", "x/2021"
+   "v2.3.0", "Initial PicoEVB release", "8/2021"
 
 
 
