@@ -63,12 +63,17 @@ Asset types to be specified in the '<noun>' argument are:
 Use the keywords *`rcc`* and *`hdl`* to scope what is displayed
 for the *platforms* and *targets* nouns. For example, the command:
 
--------------------------
-ocpidev show rcc platforms
+--------------------------
+ocpidev show hdl platforms
 --------------------------
 
-only shows the available RCC platforms.
+only shows the available HDL platforms.
 
+For HDL platforms shown in the default display format
+(see the *`--table`* option below), an asterisk after the platform
+name indicates that the platform is registered but has not yet
+been built. Note that assemblies and tests cannot be built until
+the platform is built.
 
 OPTIONS
 -------
@@ -116,7 +121,7 @@ EXAMPLES
 --------
 . List all RCC and HDL platforms that assets can be built for:
 +
----------------------
+----------------------
 ocpidev show platforms
 ----------------------
 +
@@ -164,7 +169,7 @@ link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
 
 COPYING
 -------
-Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2021 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your
