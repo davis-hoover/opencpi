@@ -42,6 +42,12 @@ def execute_cmd(settings, directory, action=None, file=None, verbose=False):
     settings_dict = {'rcc_plats'       : "RccPlatforms",
                      'hdl_plat_strs'   : "HdlPlatforms",
                      'hdl_tgt_strs'    : "HdlTargets",
+                     'rcc_platform'    : "RccPlatforms",
+                     'hdl_platform'    : "HdlPlatforms",
+                     'hdl_target'      : "HdlTargets",
+                     'hdl_assembly'    : "Assemblies",
+                     'hdl_rcc_platform': "RccHdlPlatforms",
+                     'worker'          : "Workers",
                      'only_plats'      : "OnlyPlatforms",
                      'ex_plats'        : "ExcludePlatforms",
                      'keep_sims'       : "KeepSimulations",
@@ -53,7 +59,7 @@ def execute_cmd(settings, directory, action=None, file=None, verbose=False):
                      'run_arg'         : "OcpiRunArgs",
                      'remote_test_sys' : "OCPI_REMOTE_TEST_SYSTEMS",
                      'verbose'         : "TestVerbose"}
-    make_list = ["make", "-r", "--no-print-directory", "-C", directory]
+    make_list = ["make", "-r", "-C", directory, "--no-print-directory"]
     debug_string = " ".join(make_list)
     if file:
         make_list.append("-f")
@@ -62,7 +68,7 @@ def execute_cmd(settings, directory, action=None, file=None, verbose=False):
 
     if action is not None:
         make_list.extend(action)
-        debug_string += " " + ' '.join(action) + " "
+        debug_string += " AT= " + ' '.join(action) + " "
 
     logging.debug("settings for make command: " + str(settings.items()))
     for setting, value in settings.items():
@@ -77,8 +83,8 @@ def execute_cmd(settings, directory, action=None, file=None, verbose=False):
                 debug_string += " " + settings_dict[setting] + '='  + ' '.join(value)
         else:
             # pylint:disable=undefined-variable
-            raise OCPIException("Invalid setting data-type passed to execute_cmd().  Valid data-" +
-                                "types are bool and list")
+            raise OCPIException("Invalid settings data-type passed to execute_cmd().  settings is " +
+                                "expected to be a dictionary with values of type: bool, list or set.")
             # pylint:enable=undefined-variable
     logging.debug("running make command: " + debug_string)
     if verbose:
