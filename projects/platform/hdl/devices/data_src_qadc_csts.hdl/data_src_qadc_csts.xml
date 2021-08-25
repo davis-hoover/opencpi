@@ -1,4 +1,15 @@
 <HdlDevice language='vhdl' spec='data_src_qadc_csts-spec' version='2' libraries='util ocpi.core.bsv timed_sample_prot adc_csts'>
+  
+  <Property Name='send_eof' type='bool'
+                            initial='true'
+                            Default='false'
+                            Description='Allows the worker to send an eof after num_samples_before_eof samples have been sent.'/>
+
+  <Property Name='num_samples_before_eof' Type='ulong'
+                                          initial='true'
+                                          Default='4096'
+                                          Description='If send_eof is set to true, the worker will issue an eof after num_samples_before_eof 
+                                                       samples have been sent.'/>
 
   <Property name='DATA_PIPE_LATENCY_CYCLES'
             parameter='true'
@@ -11,7 +22,8 @@
                    producer='true'
                    clockdirection='out'
                    datawidth='OUT_PORT_DATA_WIDTH'
-                   insertEom='true'/>
+                   insertEom='true'
+                   workerEof='true'/>
   <DevSignal name='dev'
              signals='qadc-16-signals.xml'
              master='true'/>

@@ -32,6 +32,12 @@ architecture rtl of worker is
 
   signal ctl_suppress_discontinuity_opcode  : bool_t;
   signal adc_suppress_discontinuity_opcode  : bool_t;
+  signal out_give          : std_logic;
+  signal out_valid          : std_logic;
+  signal sample_counter_en  : std_logic;
+  signal sample_counter_cnt : unsigned(props_in.num_samples_before_eof'length-1 downto 0);
+  signal eof   : bool_t;
+  signal eof_r : bool_t;
 
 begin
   ------------------------------------------------------------------------------
@@ -160,9 +166,9 @@ begin
         isuppress_discontinuity_op => adc_suppress_discontinuity_opcode,
         -- OUTPUT
         odata             => adc_data,
-        ovalid            => out_out.valid,
+        ovalid            => out_valid,
         obyte_enable      => out_out.byte_enable,
-        ogive             => out_out.give,
+        ogive             => out_give,
         osom              => out_out.som,
         oeom              => out_out.eom,
         oopcode           => adc_opcode);
@@ -173,6 +179,29 @@ begin
         out_port => out_out.clk);
 
   end generate;
+ 
+  sample_counter_en <= out_give and props_in.send_eof when (sample_counter_cnt < props_in.num_samples_before_eof) else '0';
+
+  sample_counter : util.util.counter
+    generic map(
+      BIT_WIDTH => props_in.num_samples_before_eof'length)
+    port map(
+      clk => dev_in.clk,
+      rst => adc_rst,
+      en  => sample_counter_en,
+      cnt => sample_counter_cnt);
+  
+  eof <= out_in.ready when (props_in.num_samples_before_eof = 0) else '0';
+  process(dev_in.clk)
+  begin
+    if rising_edge(dev_in.clk) then
+      if its(adc_rst) then
+        eof_r <= bfalse;
+      elsif (((out_give and sample_counter_cnt = props_in.num_samples_before_eof-1) or its(eof)) and its(props_in.send_eof)) then
+        eof_r <= btrue;
+      end if;
+    end if;
+  end process;
 
   ------------------------------------------------------------------------------
   -- dev port
@@ -185,7 +214,8 @@ begin
   -- this only needed to avoid build bug for xsim:
   -- ERROR: [XSIM 43-3316] Signal SIGSEGV received.
   out_out.data <= adc_data;
-
+  out_out.give <= out_give or eof_r;
+  out_out.valid <= out_valid and not (eof or eof_r);
   out_out.opcode <=
       complex_short_timed_sample_sample_op_e          when adc_opcode = SAMPLE          else
       complex_short_timed_sample_time_op_e            when adc_opcode = TIME_TIME       else
@@ -194,5 +224,6 @@ begin
       complex_short_timed_sample_discontinuity_op_e   when adc_opcode = DISCONTINUITY   else
       complex_short_timed_sample_metadata_op_e        when adc_opcode = METADATA        else
       complex_short_timed_sample_sample_op_e;
-
+  
+  out_out.eof <= eof_r;
 end rtl;
