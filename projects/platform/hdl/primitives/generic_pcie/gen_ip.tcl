@@ -92,12 +92,12 @@ set_property -dict [list CONFIG.DEVICE_ID {0x7021} \
                         CONFIG.AXIBAR_NUM {2} \
                         CONFIG.AXIBAR_AS_0 {false} \
                         CONFIG.AXIBAR_0 {0x0} \
-                        CONFIG.AXIBAR2PCIEBAR_0 {0xF0000000} \
-                        CONFIG.AXIBAR_HIGHADDR_0 {0xF3FFFFFF} \
+                        CONFIG.AXIBAR2PCIEBAR_0 {0x0} \
+                        CONFIG.AXIBAR_HIGHADDR_0 {0xFFFFFFFF} \
                         CONFIG.AXIBAR_AS_1 {false} \
                         CONFIG.AXIBAR_1 {0x0} \
-                        CONFIG.AXIBAR2PCIEBAR_1 {0xF4000000} \
-                        CONFIG.AXIBAR_HIGHADDR_1 {0xF403FFFF}] \
+                        CONFIG.AXIBAR2PCIEBAR_1 {0x0} \
+                        CONFIG.AXIBAR_HIGHADDR_1 {0xFFFFFFFF}] \
                         [get_ips $ip_module]
 
 set_property -dict [list CONFIG.SI_DATA_WIDTH {64} \
