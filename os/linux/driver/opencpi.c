@@ -24,6 +24,16 @@
  * of the kernel, and does *not* fall under the heading of "derived work".
  * Other OpenCPI user code is covered by an LGPL license.
  */
+
+/*
+*  HAVE_UNLOCKED_IOCTL is no longer defined since kernel 5.9.0.
+*
+*  On 2020-06-20 00:16, Christoph Hellwig wrote:
+*  > These (HAVE_COMPAT_IOCTL and HAVE_UNLOCKED_IOCTL) are not defined
+*  > anywhere, and contrary to the comments we really do not care about
+*  > out of tree code at all.
+*/
+
 #include <net/sock.h>
 #include <linux/version.h>
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 33)
@@ -682,7 +692,7 @@ request_memory(struct file *file, ocpi_request_t *request) {
     }
     // trying allocation from DMA API first
     // Centos doesn't support contiguous memory allocation as of Centos 7
-    // AV-1645 - in centos 8 revist using the DMA API instead of memmap
+    // AV-1645 - in centos 8 revisit using the DMA API instead of memmap
     if ((err = get_dma_memory(request, minor)) != 0) {
       log_err("get_dma_memory in request_memory failed, trying fallback\n");
       log_err("if allocation failure occurs, see README for memmap configuration\n");
@@ -878,7 +888,7 @@ static int get_pci(unsigned minor, ocpi_pci_t *pci);
 // ioctl for getting memory status and requesting memory allocations
 // FIXME: do copy_to/from_user return the right error codes anyway?
 static
-#ifdef HAVE_UNLOCKED_IOCTL
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 9, 0)) || defined(HAVE_UNLOCKED_IOCTL)
 long
 opencpi_io_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
   unsigned minor = GET_MINOR(file);
@@ -1138,7 +1148,7 @@ static struct file_operations opencpi_file_operations = {
 	.release = opencpi_io_release,
 //	.read = opencpi_io_read,
 //	.write = opencpi_io_write,
-#ifdef HAVE_UNLOCKED_IOCTL
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 9, 0)) || defined(HAVE_UNLOCKED_IOCTL)
         .unlocked_ioctl
 #else
 	.ioctl
@@ -1778,8 +1788,17 @@ static const struct proto_ops opencpi_socket = {
   .ioctl =	sock_no_ioctl, // net_ioctl,
   .listen =	sock_no_listen,
   .shutdown =	sock_no_shutdown,
+/*
+*  Newer kernels simply check for a NULL method instead of
+*  wiring up sock_no_{get,set}sockopt.  No idea what kernel
+*  version these changes went into, but the date of the patch
+*  set is 17 Jul 2020.  Since 5.8.X kernels still supported
+*  the stub functions, assume 5.9.0 is the cutoff.
+*/
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 9, 0)
   .setsockopt =	sock_no_setsockopt,
   .getsockopt =	sock_no_getsockopt,
+#endif
   .sendmsg =	net_sendmsg,
   .recvmsg =	net_recvmsg,
   .mmap =       sock_no_mmap,
