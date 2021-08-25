@@ -174,6 +174,7 @@ def ocpicreate(args):
         "library": ocpiassets.library.Library,
         "application": ocpiassets.application.Application,
         "component": ocpiassets.component.Component,
+        "protocol": ocpiassets.component.Protocol,
     }
     if args.noun not in class_dict:
     # Noun not implemented by this function; fall back to ocpidev.sh
