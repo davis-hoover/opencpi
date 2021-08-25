@@ -184,6 +184,10 @@ while (( "$#" )); do
       minimal=1 # use ${minimal:+whatever}
       shift
       ;;
+   --no-kernel)
+      nokernel=1 # use ${nokernel:+whatever}
+      shift
+      ;;
     # Unsupported flags
     -*)
       HELP=1  # can't print usage yet as usage message is based on other args
@@ -368,7 +372,7 @@ if [ "$model" = RCC ]; then
 	[ -n "$dynamic" ] && platform_target_dir+=d
 	[ -n "$optimize" ] && platform_target_dir+=o
     fi
-    ./scripts/install-opencpi.sh ${minimal:+--minimal} $platform_target_dir || exit 1
+    ./scripts/install-opencpi.sh ${minimal:+--minimal} ${nokernel:+--no-kernel} $platform_target_dir || exit 1
 else
     # Since the build-opencpi.sh does an "rcc" build per project, and that implicitly
     # does "declarehdl" on projects, that is sufficient for on-demand hdl worker builds
