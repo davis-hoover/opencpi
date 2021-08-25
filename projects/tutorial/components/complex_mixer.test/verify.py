@@ -1,37 +1,18 @@
 #!/usr/bin/env python3
-# This file is protected by Copyright. Please refer to the COPYRIGHT file
-# distributed with this source distribution.
-#
-# This file is part of OpenCPI <http://www.opencpi.org>
-#
-# OpenCPI is free software: you can redistribute it and/or modify it under the
-# terms of the GNU Lesser General Public License as published by the Free
-# Software Foundation, either version 3 of the License, or (at your option) any
-# later version.
-#
-# OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Lesser General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
-
 """
 Complex Mixer: Verify Validate output data
-
 Verify args:
 1. sample frequency of output data file
 2. number of samples used in validation
 3. output data file used for validation
 4. input data file used for comparison
-
-To test the Complex Mixer, a binary data file is generated containing complex
-signed 16-bit samples with a tone at a configurable center frequency and sample
-frequency.
-The Application XML sets the phase increment of the Mixer/NCO to output a 1 Hz tone,
-sampled at 16 Hz. The output waveform's frequency is expected to +1 Hz greater than
-the input waveform frequency. The validation of the test involves performing an FFT
+To test the Complex Mixer, a binary data file is generated
+containing complex signed 16-bit samples with a tone at a
+configurable center frequency and sample frequency.
+The Application XML sets the phase increment of the Mixer/NCO
+to output a 1 Hz tone, sampled at 16 Hz. The output waveform's
+frequency is expected to +1 Hz greater than the input waveform
+frequency. The validation of the test involves performing an FFT
 of the output file to ensure the max tone is located at DC or 0 Hz.
 """
 import struct
@@ -40,7 +21,8 @@ import sys
 import os.path
 
 """
-Ex: ./verify.py {sample-freq} {number_of_samples} {ofilename} {ifilename}
+Ex: python verify.py {sample-freq} {number_of_samples}
+          {ofilename} {ifilename}
 Validate:
 TEST #1: Verify I & Q values are not all zeros
 TEST #2: Output file matches expected size
@@ -50,7 +32,8 @@ TEST #3: Two possibilities: 1) NORMAL MODE - Target tone tuned to DC, 2) BYPASS 
 if len(sys.argv) != 5:
     print('Invalid arguments:  usage is: verify.py <sample-freq> <num-samples> <output-file> <input-file>')
     sys.exit(1)
-dt_iq_pair = np.dtype((np.uint32, {'real_idx':(np.int16,0), 'imag_idx':(np.int16,2)}))
+dt_iq_pair = np.dtype((np.uint32, {'real_idx':(np.int16,2),'imag_idx':(np.int16,0)}))
+
 # Read all input data as complex int16
 ifilename = open(sys.argv[4], 'rb')
 idata = np.fromfile(ifilename, dtype=dt_iq_pair, count=-1)
@@ -83,13 +66,13 @@ if len(odata) != len(idata):
 if(ENABLE == 'true'): # => NORMAL MODE
     complex_data = np.array(np.zeros(NUM_SAMPLES), dtype=np.complex)
     for i in range(0,NUM_SAMPLES):
-        complex_data[i] = complex(odata['real_idx'][i], odata['imag_idx'][i])
+        complex_data[i] = complex(odata['real_idx'][i],odata['imag_idx'][i])
     FFT = 1.0 / NUM_SAMPLES * abs(np.fft.fft(complex_data,NUM_SAMPLES))
     Max_FFT_freq = np.argmax(FFT) * SAMPLE_RATE / NUM_SAMPLES
     if Max_FFT_freq != 0.0:
         print('Fail: Max of FFT occurs at index: ',Max_FFT_freq, 'Hz (Should be 0)')
         sys.exit(1)
-    print('\tResults (Normal Mode): FFT occurs at expect index', Max_FFT_freq, 'Hz')
+    print('\tResults (Normal Mode): FFT occurs at expect index',Max_FFT_freq, 'Hz')
 
 else: # => BYPASS MODE
     if (DATA_SELECT == 'false'):
@@ -100,7 +83,8 @@ else: # => BYPASS MODE
         print("\tResults (Bypass Mode): Input and output file match")
 """
 TODO: TEST IS ONLY VALID FOR HDL OUTPUT!
-- NEED TO BLOCK WHEN VERIFYING RCC OUTPUT or NOT RUN CONFIGURATION AGAINST RCC.
+- NEED TO BLOCK WHEN VERIFYING RCC OUTPUT or NOT RUN CONFIGURATION
+AGAINST RCC.
     else:
         # Calculate NCO tone for mixing with input
         system_freq = SAMPLE_RATE
@@ -125,5 +109,6 @@ TODO: TEST IS ONLY VALID FOR HDL OUTPUT!
             print('Fail: Bypass Mode: NCO does not match expected freq: %.2f vs %.2f' % (nco_freq, ofreq_hz))
             sys.exit(1)
         else:
-            print('      PASS - Bypass Mode: NCO output matches expected freq')
-"""
+            print('PASS - Bypass Mode: NCO output matches expected freq')
+ """
+
