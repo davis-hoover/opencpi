@@ -590,6 +590,7 @@ verbs = {
                 'options': {
                     'spec': options['spec'],
                     'library': options['library'],
+                    'hdl_library': options['hdl_library'],
                     'platform': options['platform']
                 }
             },
