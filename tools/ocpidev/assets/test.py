@@ -145,6 +145,7 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         """
         # if more then one of the library location variable are not None it is an error
         cur_dirtype = ocpiutil.get_dirtype()
+        verb = kwargs.get('verb', '')
         valid_dirtypes = ["project", "libraries", "library", "test"]
         library = kwargs.get('library', '')
         hdl_library = kwargs.get('hdl_library', '')
@@ -172,6 +173,9 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
                 project_path, 'hdl', 'platforms', platform, 'devices')
         elif cur_dirtype == "hdl-platform":
             working_path = Path(working_path, 'devices')
+        elif cur_dirtype == "libraries" and verb in ["create","delete"]:
+            print("OCPI:ERROR: Must specify a library when operating from a libraries collection.")
+            exit(1)
 
         working_path = Path(working_path, name)
         return str(working_path)
