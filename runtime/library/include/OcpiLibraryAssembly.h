@@ -60,13 +60,11 @@ namespace OCPI {
 	OCPI::Util::Assembly::Connection *slaveConn;
 	OCPI::Util::Assembly::ConnPort   *connPort;        // where to restore the app conn
 	OCPI::Util::Assembly::ConnPort    masterConnPort;  // The port/index value to restore
-	unsigned masterOrdinal;
 	Fixup(OCPI::Util::Assembly::Connection *a_appConn,
 	      OCPI::Util::Assembly::Connection *a_slaveConn,
-	      OCPI::Util::Assembly::ConnPort *a_connPort,
-	      unsigned a_masterOrdinal)    // The master port to restore
+	      OCPI::Util::Assembly::ConnPort *a_connPort)
 	  : appConn(a_appConn), slaveConn(a_slaveConn), connPort(a_connPort),
-	    masterConnPort(*a_connPort), masterOrdinal(a_masterOrdinal) {
+	    masterConnPort(*a_connPort) {
 	}
       };
       std::forward_list<Fixup> m_portFixups;
