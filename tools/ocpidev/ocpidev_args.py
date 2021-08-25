@@ -150,7 +150,7 @@ options = {
         'action': 'append'
     },
     'exclude_target': {
-        'long': '--exclude_target',
+        'long': '--exclude-target',
         'short': '-Z',
         'action': 'append'
     },
