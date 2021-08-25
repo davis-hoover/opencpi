@@ -53,11 +53,19 @@ else
     $(eval RccAllPlatforms:=$(strip $(RccAllPlatforms) $1))\
     $(eval RccAllTargets:=$(strip $(RccAllTargets) $2))\
     $(eval RccTarget_$1:=$2)\
-    $(eval RccPlatformDir_$1:=$3)
+    $(eval RccPlatformDir_$1:=$3)\
+    $(foreach r,$(patsubst %/exports,%,$(patsubst %/rcc/platforms,%,$(patsubst %/,%,$(dir $3)))),\
+      $(eval RccPlatformPackageID_$1:=$(call OcpiGetProjectPackageID,$r).$1))
+
   # roughly for backward compatibility, same as getPlatform.sh
+  #  $(eval vars:=$(shell egrep '^ *OcpiPlatform(Os|Arch|OsVersion) *:*= *' $1/$(notdir $1).mk |\
+  #                   sed 's/OcpiPlatform\([^ :=]*\) *:*= *\([^a-zA-Z0-9_]*\)/\1 \2/'|sort))\
+
   RccGetPlatformTarget=$(strip\
-    $(eval vars:=$(shell egrep '^ *OcpiPlatform(Os|Arch|OsVersion) *:*= *' $1/$(notdir $1).mk |\
-                   sed 's/OcpiPlatform\([^ :=]*\) *:*= *\([^a-zA-Z0-9_]*\)/\1 \2/'|sort))\
+    $(eval vars:=$(subst =, ,$(sort \
+                              $(shell sed -n -e /OcpiPlatformPrereq/d -e \
+                                's/^ *OcpiPlatform\([^ :=]*\) *:*= *\([^a-zA-Z0-9_]*\)/\1=\2/p'\
+                                 $1/$(notdir $1).mk))))\
     $(infox VARS:$(words $(vars)):$(vars))\
     $(if $(filter 6,$(words $(vars))),,$(error Invalid platform file $1/$(notdir $1).mk))\
     $(word 4,$(vars))-$(word 6,$(vars))-$(word 2,$(vars)))
@@ -81,7 +89,8 @@ $(info RccAllPlatforms="$(sort $(RccAllPlatforms))";\
        RccAllTargets="$(sort $(RccAllTargets))";\
        RccTargets="$(sort $(RccTargets))";\
        $(foreach p,$(sort $(RccAllPlatforms)),\
-         $(if $(RccTarget_$p),RccTarget_$p="$(RccTarget_$p)";\
-		 RccPlatDir_$p="$(realpath $(call OcpiGetRccPlatformDir,$p))";)))
+         $(if $(RccTarget_$p),RccTarget_$p="$(RccTarget_$p)";)\
+	  RccPlatformDir_$p="$(realpath $(RccPlatformDir_$p))";\
+	  RccPlatformPackageID_$p="$(RccPlatformPackageID_$p)";))
 endif
 endif # end of the info not being set

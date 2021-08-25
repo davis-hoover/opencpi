@@ -404,9 +404,10 @@ class RccPlatform(Platform):
         for plat in rcc_plats:
             plat_dict[plat] = {}
             plat_dict[plat]["target"] = rcc_dict["RccTarget_" + plat][0]
-            proj_top = ocpiutil.get_project_package(rcc_dict["RccPlatDir_" + plat][0])
-            plat_dict[plat]["package_id"] = proj_top + ".platforms." + plat
-            plat_dict[plat]["directory"] = rcc_dict["RccPlatDir_" + plat][0]
+            #proj_top = ocpiutil.get_project_package(rcc_dict["RccPlatformDir_" + plat][0])
+            #plat_dict[plat]["package_id"] = proj_top + ".platforms." + plat
+            plat_dict[plat]["package_id"] = rcc_dict["RccPlatformPackageID_" + plat][0]
+            plat_dict[plat]["directory"] = rcc_dict["RccPlatformDir_" + plat][0]
         return plat_dict
 
     @classmethod
