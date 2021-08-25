@@ -4,7 +4,7 @@ OCPIDEV-SET(1)
 
 NAME
 ----
-ocpidev-set - manually associate the current project with a registry.
+ocpidev-set - manually associate a project with a registry.
 
 
 SYNOPSIS
@@ -16,22 +16,23 @@ DESCRIPTION
 -----------
 Projects are automatically associated with the current registry
 when they are created or used. Use the *ocpidev set registry* command
-to manually associate the current project with a particular registry.
+to manually associate a project with a particular registry.
 You must run this command from within a project. The optional '<directory>'
 argument specifies the registry's directory path. When used without
-the '<directory>' argument, the command sets the current project's
+the '<directory>' argument, the command sets the project's
 registry to the default registry.
 
 Asset types to be specified in the '<noun>' argument are:
 
 *registry*::
-    Set the registry for the current project.
+    Set the registry for the project.
 
 OPTIONS
 -------
 You can use the general-purpose options *`-v`* and *`-d`* '<directory>'
 with this command. In particular, you can use the *`-d`* '<directory>'
-option to specify the pathname of the registry being set.
+option to specify the pathname of the project whose registry should be set.
+If this option is not specified, the current project is used.
 
 There are no verb-specific options.
 
@@ -39,16 +40,16 @@ EXAMPLES
 --------
 . Set the current project's registry to the default:
 +
-----------------------
+---------------------
 ocpidev set registry
-----------------------
+---------------------
 +
-. Set the current project's registry to the directory
-named *`-my-registry`* located at *`~/workspace/`*:
+. Set the registry for the project *`~/myproject`* to the registry
+*`~/my-registry2`*:
 +
-----------------------------------------------
-ocpidev -d ~/workspace set registry my-registry
-----------------------------------------------
+--------------------------------------------------
+ocpidev -d ~/myproject set registry ~/my-registry2
+--------------------------------------------------
 
 BUGS
 ----
@@ -75,7 +76,7 @@ link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
 
 COPYING
 -------
-Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2021 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your
