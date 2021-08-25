@@ -16,7 +16,7 @@ centos7:
   adrv9361:
     - xilinx19_2_aarch32
   e31x:
-    - xilinx13_4
+    - xilinx19_2_aarch32
   matchstiq_z1:
     - xilinx13_3
   picoevb:

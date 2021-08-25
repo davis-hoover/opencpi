@@ -37,7 +37,7 @@ modelsim:
 
 # hdl
 e31x:
-  ip: 10.1.0.248
+  ip: 10.1.0.42
   port: 1000
 matchstiq_z1:
   ip: 10.1.0.203
