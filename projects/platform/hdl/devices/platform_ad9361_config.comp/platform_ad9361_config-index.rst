@@ -75,6 +75,12 @@ Properties
 ~~~~~~~~~~
 .. ocpi_documentation_properties::
 
+   data_bus_index_direction: Set to ``1`` if the bus indexing the P0_D and P1_D was reversed before processing.
+   rx_frame_usage: Set to ``1`` to indicate that this worker was built with the assumption that the RX frame operates in its toggle setting and set to ``0`` if this worker was built with the assumption that the RX frame has a rising edge on the first sample and then stays high.  The value is intended to match the AD9361 register 0x010 BIT D3.
+   rx_frame_is_inverted: RX path-specific data port configuration.  Used to tell other workers about the configuration that was enforced when this worker was compiled.
+   config_is_two_t: Some data port configurations, like LVDS, require the TX bus to use 2R2T timing if either 2 TX or 2 RX channels are used.  For example, if using LVDS and this has a value of 1, 2R2T timing will be forced.
+   force_two_r_two_t_timing: Expected to match AD9361 register 0x010 bit D2.
+
 Ports
 ~~~~~
 .. ocpi_documentation_ports::

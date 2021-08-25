@@ -147,28 +147,44 @@ class OcpiDocumentationWorker(PropertiesDirectiveHandler):
 
         self._parse_context_to_addition_text()
 
+        for name in self.additional_text:
+            if name not in itertools.chain(
+                    worker_description["properties"],
+                    worker_description["inputs"],
+                    worker_description["outputs"],
+                    worker_description["time"],
+                    worker_description["signals"],
+                    worker_description["interfaces"],
+                    worker_description["other_interfaces"]):
+                self.state_machine.reporter.warning(
+                    f"No property or port called {name} defined in worker "
+                    + f"description, {worker_description_path}",
+                    line=self.lineno)
+                continue
+
         # Add property detail from the worker description
         property_list = docutils.nodes.bullet_list()
         for name, detail in worker_description["properties"].items():
-            list_item = self._property_summary(name, detail)
-            property_list.append(list_item)
+            if detail["worker_property"] is True:
+                list_item = self._property_summary(name, detail)
+                property_list.append(list_item)
 
         if len(property_list) > 0:
             property_section = docutils.nodes.section(
                 ids=["worker-properties"], names=["worker properties"])
             property_section.append(
-                docutils.nodes.title(text="Worker properties"))
+                docutils.nodes.title(text="Worker Properties"))
             property_section.append(property_list)
             content.append(property_section)
 
         # Add port detail from the worker description
         port_list = docutils.nodes.bullet_list()
 
-        # Port options include "inputs", "outputs", "time", "interfaces"
-        # and "other_interfaces"
+        # Port options
         port_options = [("inputs", "Inputs:"),
                         ("outputs", "Outputs:"),
                         ("time", "Time:"),
+                        ("signals", "Signals:"),
                         ("interfaces", "Interfaces:"),
                         ("other_interfaces", "Other interfaces:")]
 
@@ -226,7 +242,7 @@ class OcpiDocumentationWorker(PropertiesDirectiveHandler):
             port_section = docutils.nodes.section(
                 ids=["worker-ports"], names=["worker ports"])
             port_section.append(
-                docutils.nodes.title(text="Worker ports"))
+                docutils.nodes.title(text="Worker Ports"))
             port_section.append(port_list)
             content.append(port_section)
 
@@ -259,7 +275,7 @@ class OcpiDocumentationWorker(PropertiesDirectiveHandler):
                     ids=["build-configurations"],
                     names=["build configurations"])
                 build_configuration_section.append(
-                    docutils.nodes.title(text="Build configurations"))
+                    docutils.nodes.title(text="Build Configurations"))
                 parameter_build_list = docutils.nodes.bullet_list()
                 for configuration in build_configurations:
                     build_list_item = docutils.nodes.list_item()
@@ -336,7 +352,9 @@ class OcpiDocumentationWorker(PropertiesDirectiveHandler):
                            ("master", "Master"),
                            ("count", "Count"),
                            ("optional", "Optional"),
-                           ("signals", "Signals")]
+                           ("signals", "Signals"),
+                           ("input", "Input"),
+                           ("output", "Output")]
 
         for attribute, text in port_attributes:
             if attribute in detail:

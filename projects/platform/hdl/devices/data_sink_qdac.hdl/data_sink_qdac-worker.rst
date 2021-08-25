@@ -18,7 +18,6 @@
    You should have received a copy of the GNU Lesser General Public License
    along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-:orphan:
 
 .. _data_sink_qdac-HDL-worker:
 
@@ -36,43 +35,10 @@ for these properties because it takes
 advantage of the fact that they will have a stable value by the time the OpenCPI control
 plane reads them at the end of an application run.
 
-.. Comment out ocpi_documentation_worker:: for now. It doesn't work with HdlDevice XML.
+.. ocpi_documentation_worker::
 
-Worker Ports
-~~~~~~~~~~~~
-
-Inputs:
-
-* ``in``: Size defined by ``IN_PORT_DATA_WIDTH``.
-  
-  * Type: ``StreamInterface``
-
-  * Protocol: ``ComplexShortWithMetadata-prot``
-
-  * Worker EOF: ``False``
-
-  * InsertEOM: ``False``
-
-  * ClockDirection: ``out``
-    
-  * Data width: ``IN_PORT_DATA_WIDTH``
-
-Outputs:
-
-* ``on_off``: See the *OpenCPI HDL Development Guide* for instructions on calculating the default value.
-  
-  * Type: ``StreamInterface``
-
-  * Protocol: ``tx-event-prot``
-
-  * Worker EOF: ``False``
-
-  * InsertEOM: ``False``
-
-  * Clock: ``in``
-    
-  * Data width: See the *OpenCPI HDL Development Guide* for instructions on calculating the default value.
-
+   in: Size defined by ``IN_PORT_DATA_WIDTH``.
+   on_off: See the *OpenCPI HDL Development Guide* for instructions on calculating the default value.
 
 Utilization
 -----------

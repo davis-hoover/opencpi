@@ -64,4 +64,3 @@ Criteria for content to exist in this OpenCPI project is as follows:
    hdl/platforms/zed/doc/zed-gsg
 ..    components/components
 ..    hdl/primitives/primitives
-..    specs/specs

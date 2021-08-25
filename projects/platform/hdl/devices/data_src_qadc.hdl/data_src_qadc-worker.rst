@@ -18,7 +18,6 @@
    You should have received a copy of the GNU Lesser General Public License
    along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-:orphan:
 
 .. _data_src_qadc-HDL-worker:
 
@@ -29,7 +28,6 @@ HDL device worker implementation providing common functionality to all ADC devic
 
 Detail
 ------
-
 The data source QADC HDL device worker receives sampled data from an ADC on
 its ``dev`` devsignal port.
 The worker sign-extends and justifies the samples to 16-bit I, 16-bit Q values,
@@ -58,27 +56,9 @@ plane reads them at the end of an application run.
 When set to ``true``, the ``suppress_sync_opcode`` property prevents the HDL device worker from
 sending ``sync`` opcodes.
 
-.. Comment out ocpi_documentation_worker:: for now. It doesn't work with HdlDevice XML.
+.. ocpi_documentation_worker::
 
-Worker Ports
-~~~~~~~~~~~~
-
-Outputs:
-
-* ``out``: Sign-extended justified 16-bit IQ samples
-  
-  * Type: ``StreamInterface``
-
-  * Protocol: ``ComplexShortWithMetadata-prot``
-
-  * Worker EOF: ``False``
-
-  * InsertEOM: ``True``
-
-  * ClockDirection: ``out``
-    
-  * Data width: ``OUT_PORT_DATA_WIDTH``
-
+   out: Sign-extended justified 16-bit IQ samples
 
 Utilization
 -----------
