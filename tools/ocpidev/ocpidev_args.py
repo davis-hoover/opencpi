@@ -55,7 +55,7 @@ options = {
     'no_control': {
         'long': '--no-control',
         'short': '-n',
-        'action': 'store_false'
+        'action': 'store_true'
     },
     'create_test': {
         'long': '--create-test',
@@ -65,20 +65,19 @@ options = {
     'project': {
         'long': '--project',
         'short': '-p',
-        'action': 'store_true'
+        'action': 'store_true',
+        'mut_exc_group': 'project'
     },
     'library': {
         'long': '--library',
-        'short': '-l'
+        'short': '-l',
+        'mut_exc_group': 'project'
     },
     'hdl_library': {
         'long': '--hdl-library',
         'short': '-h',
-        'choices': [
-            'devices',
-            'cards',
-            'adapters'
-        ]
+        'choices': [ 'devices', 'cards', 'adapters' ],
+        'mut_exc_group': 'project'
     },
     'standalone': {
         'long': '--standalone',
@@ -471,8 +470,8 @@ verbs = {
             },
             'component': {
                 'options': {
+                    'name': None,
                     'no_control': options['no_control'],
-                    'create_test': options['create_test'],
                     'platform': options['platform'],
                     'hdl_library': options['hdl_library'],
                     'library': options['library'],
