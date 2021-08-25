@@ -294,8 +294,11 @@ verbs = {
             },
             'applications': {
                 'options': {
+                    'optimize': options['optimize'],
+                    'dynamic': options['dynamic'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
-                    'rcc_platform': options['rcc_platform']
+                    'rcc_platform': options['rcc_platform'],
+                    'workers_as_needed' : options['workers_as_needed']
                 }
             },
             'hdl': {
@@ -383,10 +386,7 @@ verbs = {
                 }
             },
             'applications': {
-                'options': {
-                    'hdl_rcc_platform': options['hdl_rcc_platform'],
-                    'rcc_platform': options['rcc_platform']
-                }
+                'options': {}
             },
             'hdl': {
                 'options': {
