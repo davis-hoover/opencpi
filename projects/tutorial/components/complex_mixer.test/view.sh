@@ -18,5 +18,5 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-$OCPI_PROJECT_DIR/scripts/plotAndFft.py $2 complex 16384 100&
-$OCPI_PROJECT_DIR/scripts/plotAndFft.py $1 complex 16384 100&
+$OCPI_ROOT_DIR/projects/tutorial/scripts/plotAndFft.py $2 complex 16384 100&
+$OCPI_ROOT_DIR/projects/tutorial/scripts/plotAndFft.py $1 complex 16384 100&
