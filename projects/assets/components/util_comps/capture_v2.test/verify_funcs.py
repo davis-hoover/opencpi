@@ -47,7 +47,7 @@ def verify_metadataCount2(metadataCount, numRecords):
 def verify_metadataCount3(metadataCount):
     # metadataCount should be 3 because 3 messages are sent in this scenario
     if metadataCount != 3:
-        print ("    metadataCount is", metadataCount,  "while expected value is 2")
+        print ("    metadataCount is", metadataCount,  "while expected value is 3")
         sys.exit(1)
     else:
         print ("    metadataCount is correct")
@@ -91,8 +91,8 @@ def verify_dataCount2(dataCount, numDataWords, stopOnFull):
 # For testScenario 4
 def verify_dataCount3(dataCount, numDataWords, metadataCount, numRecords,stopOnFull):
     if stopOnFull == "false":
-        # In this scenario, numDataWords amount of data is sent and then numRecords-5 amount of data is sent.
-        # So when stopOnFull is true, dataCount should be numDataWords+numRecords-5
+        # In this scenario, numDataWords amount of data is sent and then numRecords-6 amount of data is sent.
+        # So when stopOnFull is true, dataCount should be numDataWords+numRecords-6
         if dataCount != numDataWords+numRecords-6:
             print ("    dataCount is", dataCount,  "while expected value is", numDataWords+numRecords-6)
             sys.exit(1)
@@ -140,9 +140,6 @@ def verify_status(metaFull, dataFull, dataCount, numDataWords,metadataCount, num
 
 # For testScenario 2
 def verify_metadata1(metadata, metadataCount):
-    eom_frac_prev = 0
-    som_frac_prev = 0
-    som_seconds_prev = 0
     # Multiplying metadataCount by 4 because there are 4 metadata words
     stop = 4*metadataCount
     for x in range(0, stop, 4):
@@ -168,33 +165,10 @@ def verify_metadata1(metadata, metadataCount):
             print ("    message size is not correct")
             print ("    For metadata record " + str((x//4)+1) +  ", message size is", messageSize, "while expected value is 0")
             sys.exit(1)
-        if x > 0:
-            # If seconds time stamp incremented, check for roll over
-            if som_seconds > som_seconds_prev:
-                if eom_frac_prev <= eom_fraction:
-                    print ("    For metadata record " + str((x//4)+1) + ", eom fraction time stamp did not roll over")
-                    sys.exit(1)
-                elif som_frac_prev <= som_fraction:
-                    print ("    For metadata record " + str((x//4)+1) + ", som fraction time stamp did not roll over")
-                    sys.exit(1)
-            # Check that eom fraction and som fraction timestamps are incrementing
-            else:
-                if eom_fraction <= eom_frac_prev:
-                    print ("    For metadata record " + str((x//4)+1) + ", eom fraction time stamp is not incrementing")
-                    sys.exit(1)
-                elif som_fraction <= som_frac_prev:
-                    print ("    For metadata record " + str((x//4)+1) + ", som fraction time stamp is not incrementing")
-                    sys.exit(1)
-        eom_frac_prev = eom_fraction
-        som_frac_prev = som_fraction
-        som_seconds_prev = som_seconds
     print ("    metadata is correct")
 
 # For testScenario 3
 def verify_metadata2(metadata, max_bytes):
-    eom_frac_prev = 0
-    som_frac_prev = 0
-    som_seconds_prev = 0
     # Only sending 3 messages so check only 3 of the records
     stop = 4*3
     for x in range(0, stop, 4):
@@ -230,34 +204,11 @@ def verify_metadata2(metadata, max_bytes):
                 print ("    message size is not correct")
                 print ("    For metadata record " + str((x//4)+1) +  ", message size is", messageSize, "while expected value is 4")
                 sys.exit(1)
-        if (x == 4 or x == 8):
-            # If seconds time stamp incremented, check for roll over
-            if som_seconds > som_seconds_prev:
-                if eom_frac_prev <= eom_fraction:
-                    print ("    For metadata record " + str((x//4)+1) + ", eom fraction time stamp did not roll over")
-                    sys.exit(1)
-                elif som_frac_prev <= som_fraction:
-                    print ("    For metadata record " + str((x//4)+1) + ", som fraction time stamp did not roll over")
-                    sys.exit(1)
-            # Check that eom fraction and som fraction timestamps are incrementing
-            else:
-                if eom_fraction <= eom_frac_prev:
-                    print ("    For metadata record " + str((x//4)+1) + ", eom fraction time stamp is not incrementing")
-                    sys.exit(1)
-                elif som_fraction <= som_frac_prev:
-                    print ("    For metadata record " + str((x//4)+1) + ", som fraction time stamp is not incrementing")
-                    sys.exit(1)
-        eom_frac_prev = eom_fraction
-        som_frac_prev = som_fraction
-        som_seconds_prev = som_seconds
     print ("    metadata is correct")
 
 # For testScenario 4
 def verify_metadata3(metadata, metadataCount, max_bytes):
-    eom_frac_prev = 0
-    som_frac_prev = 0
-    som_seconds_prev = 0
-    stop = 4*(metadataCount-1)
+    stop = 4*(metadataCount)
     for x in range(0, stop, 4):
         opcode = (metadata[x] & 0xFF000000) >> 24
         messageSize = (metadata[x] & 0x00FFFFFF)
@@ -342,26 +293,6 @@ def verify_metadata3(metadata, metadataCount, max_bytes):
                 print ("    message size is not correct")
                 print ("    For metadata record " + str((x//4)+1) +  ", message size is", messageSize, "while expected value is 4")
                 sys.exit(1)
-        if x > 0:
-            # If seconds time stamp incremented, check for roll over
-            if som_seconds > som_seconds_prev:
-                if eom_frac_prev <= eom_fraction:
-                    print ("    For metadata record " + str((x//4)+1) + ", eom fraction time stamp did not roll over")
-                    sys.exit(1)
-                elif som_frac_prev <= som_fraction:
-                    print ("    For metadata record " + str((x//4)+1) + ", som fraction time stamp did not roll over")
-                    sys.exit(1)
-            # Check that eom fraction and som fraction timestamps are incrementing
-            else:
-                if eom_fraction <= eom_frac_prev:
-                    print ("    For metadata record " + str((x//4)+1) + ", eom fraction time stamp is not incrementing")
-                    sys.exit(1)
-                elif som_fraction <= som_frac_prev:
-                    print ("    For metadata record " + str((x//4)+1) + ", som fraction time stamp is not incrementing")
-                    sys.exit(1)
-        eom_frac_prev = eom_fraction
-        som_frac_prev = som_fraction
-        som_seconds_prev = som_seconds
     print ("    metadata is correct")
 
 # For testScenario 5
