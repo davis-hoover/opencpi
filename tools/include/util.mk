@@ -139,8 +139,8 @@ Suffix_hdl_vhdl:=vhd
 Language_hdl:=vhdl
 Languages_hdl:=vhdl verilog
 
-Language_ocl:=cl
-Suffix_ocl_cl:=cl
+Language_ocl:=ocl
+Suffix_ocl_ocl:=cl
 Suffix_xm:=xm
 # Assign here for caching
 CapModels:=$(foreach m,$(Models),$(call Capitalize,$m))
