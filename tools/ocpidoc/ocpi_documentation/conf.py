@@ -90,7 +90,7 @@ html_title = "OpenCPI assets"
 html_short_title = "OCPI assets"
 html_favicon = "static/favicon.ico"
 html_last_updated_fmt = "%d %B %Y"
-html_add_permalinks = ""
+html_permalinks = False
 html_sidebars = {
     "**": ["localtoc.html",
            "searchbox.html"]
