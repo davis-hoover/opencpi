@@ -2,14 +2,16 @@ from pathlib import Path
 
 class Asset():
 
-    def __init__(self, name, path, is_buildable=False, is_testable=False):
+    def __init__(self, name, path, project, is_buildable=False, 
+                 is_testable=False):
         self.name = name
         self.path = path
+        self.project = project
         self.is_buildable = is_buildable
         self.is_testable = is_testable
 
 
-def discover_assets(path, blacklist=None, whitelist=None):
+def discover_assets(path, project, blacklist=None, whitelist=None):
     """Discovers local assets in a provided Path
 
     Args:
@@ -25,7 +27,6 @@ def discover_assets(path, blacklist=None, whitelist=None):
     # Don't discover remote project assets
     if not path:
         return []
-
     assets = []
     components_path = Path(path, 'components')
     hdl_path = Path(path, 'hdl')
@@ -35,7 +36,6 @@ def discover_assets(path, blacklist=None, whitelist=None):
                    if asset_path.stem != 'components']
 
     for asset_path in asset_paths:
-
         asset_name = asset_path.stem
 
         if whitelist and asset_name not in whitelist:
@@ -50,13 +50,13 @@ def discover_assets(path, blacklist=None, whitelist=None):
 
         if asset_path.parent.stem != 'hdl':
             asset_name = ':'.join([asset_path.parent.stem, asset_name])
-        asset = Asset(asset_name, asset_path, 
+        asset = Asset(asset_name, asset_path, project,
                       is_buildable=True, is_testable=is_testable)
         assets.append(asset)
 
     if Path(components_path, 'specs').is_dir():
         asset_name = components_path.stem
-        asset = Asset(asset_name, components_path, 
+        asset = Asset(asset_name, components_path, project,
                       is_buildable=True, is_testable=True)
         assets.append(asset)
     else:
@@ -65,7 +65,7 @@ def discover_assets(path, blacklist=None, whitelist=None):
                 continue
 
             asset_name = asset_path.stem
-            asset = Asset(name=asset_name, path=asset_path, 
+            asset = Asset(asset_name, asset_path, project,
                           is_buildable=True, is_testable=True)
             assets.append(asset)
 

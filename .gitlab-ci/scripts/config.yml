@@ -50,13 +50,13 @@ plutosdr:
   overrides:
     build-assemblies:centos7:assets_ts:assemblies:plutosdr:
       variables:
-        OCPI_PROJECT_PATH: '$CI_PROJECT_DIR/opencpi/projects/assets:$CI_PROJECT_DIR/opencpi/projects/platform'
+        OCPI_PROJECT_PATH: '$CI_PROJECT_DIR/projects/assets:$CI_PROJECT_DIR/projects/platform'
     build-tests:centos7:core:components:plutosdr:
       variables:
-        OCPI_PROJECT_PATH: '$CI_PROJECT_DIR/opencpi/projects/assets:$CI_PROJECT_DIR/opencpi/projects/platform'
+        OCPI_PROJECT_PATH: '$CI_PROJECT_DIR/projects/assets:$CI_PROJECT_DIR/projects/platform'
     build-tests:centos7:assets_ts:components:plutosdr:
       variables:
-        OCPI_PROJECT_PATH: '$CI_PROJECT_DIR/opencpi/projects/assets:$CI_PROJECT_DIR/opencpi/projects/platform'
+        OCPI_PROJECT_PATH: '$CI_PROJECT_DIR/projects/assets:$CI_PROJECT_DIR/projects/platform'
 zcu104:
   ip: 10.1.0.208
   port: 1000

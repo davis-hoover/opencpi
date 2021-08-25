@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 
 import yaml
-from collections import namedtuple
-from os import getenv
 from pathlib import Path
-from sys import argv
-from . import ci_job, ci_platform, ci_gitlab, ci_trigger
+from . import ci_job, ci_platform, ci_trigger
 
 class Pipeline():
 
@@ -108,56 +105,26 @@ class Pipeline():
                                                      platforms)
             platform = ci_platform.get_platform(self.ci_env.platform, 
                                                 host_platform.cross_platforms)
-            if self.group_name == 'comp':
-            # In comp project pipeline
-                if platform.model == 'rcc':
-                    stages = ['build-assets-comp', 'build-assemblies']
-                else:
-                    stages = ['build-primitives', 'build-assets-comp', 
-                              'build-assemblies', 'build-sdcards', 'test']
-            elif platform.model == 'rcc':
+            if platform.model == 'rcc':
             # platform is rcc
                 stages = ['prereqs-rcc', 'build-rcc', 'build-assemblies']
             else:
             # platform is hdl
                 stages = ['build-primitives-core', 'build-primitives',
-                          'build-assets', 'build-platforms', 
+                          'build-assets', 'build-assets-osp', 
+                          'build-assets-comp', 'build-platforms', 
                           'build-assemblies', 'build-sdcards', 'test']
-                if platform.project.group != 'opencpi':
-                # not built-in platform, so add stage to create assets after
-                # built-in assets
-                    project_stage = 'build-assets-{}'.format(
-                        platform.project.name)
-                    stages.insert(3, project_stage)
 
             platforms = [platform]
 
-        # If a comp project, remove all projects except that project
-        if self.group_name == 'comp':
-            projects = [project for project in projects 
-                        if project.name == self.project_name]
-
         jobs = []
         for platform in platforms:
-            # If triggered by upstream pipeline, do not generate jobs
-            # to build host platforms. Assume this was done in the
-            # upstream pipeline
-            if self.ci_env.pipeline_source != 'pipeline':
-                jobs += ci_job.make_jobs(stages, platform, projects, self,
-                                         host_platform=host_platform)
+            jobs += ci_job.make_jobs(stages, platform, projects, self,
+                                     host_platform=host_platform)
 
             for cross_platform in platform.cross_platforms:
-                # If platform is local or project is in COMP group, 
-                # make job to generate child yaml file
-                if cross_platform.project.path or self.group_name == 'comp':
-                    # If platform does not belong to same group as pipeline
-                    # and pipeline is not in the 'comp' group, don't make jobs
-                    if (cross_platform.project.group != self.group_name
-                        and self.group_name != 'comp'):
-                            continue
-
                     generate_job = ci_job.make_generate(
-                        platform, cross_platform, self)
+                        platform, cross_platform, self, projects=projects)
                     jobs.append(generate_job)
 
                     # Make trigger job for child pipeline
@@ -165,26 +132,6 @@ class Pipeline():
                         platform, cross_platform, self, 
                         generate_job=generate_job)
                     jobs.append(trigger)
-
-                elif self.ci_env.project_name == 'opencpi':
-                    # Make trigger job for downstream pipeline
-                    trigger = ci_trigger.trigger_platform(
-                        platform, cross_platform, self)
-                    jobs.append(trigger)
-
-            # Create triggers for COMP projects
-            if platform.is_host:
-                # Don't make trigger if pipeline launched by upstream 
-                # pipeline
-                if self.ci_env.pipeline_source == 'pipeline':
-                    continue
-                # Don't make trigger if pipeline not in opencpi or osp project
-                if self.project_name != 'opencpi' and self.group_name != 'osp':
-                        continue
-                for project in projects:
-                    if project.group == 'comp':
-                        trigger = ci_trigger.trigger_project(project, self)
-                        jobs.append(trigger)
         
         self._stages = stages
         self._jobs = jobs
