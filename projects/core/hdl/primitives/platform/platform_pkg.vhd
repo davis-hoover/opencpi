@@ -58,7 +58,8 @@ end record occp_out_t;
 
 -- These are the number of bits of the DW address
 constant worker_control_bits : natural := 12; -- 16KB control space per worker
-constant worker_config_bits  : natural := 18; -- 1MB config space per worker
+constant worker_config_bits  : natural := 18; -- 1MB config space per worker, BUT still top 2 addrs
+constant worker_readsize_bits  : natural := 2;  -- these are the MSBs of the address used for readsize
 constant worker_control_size : natural := 2**worker_control_bits;
 constant worker_config_size  : natural := 2**worker_config_bits;
 constant worker_max_nworkers : natural := 63; -- for a 64 bit array of worker-present bits

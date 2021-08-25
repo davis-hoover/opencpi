@@ -1,6 +1,11 @@
 <!-- PicoEVB Platform Worker -->
-<HdlPlatform Language="VHDL" spec='platform-spec' version='2' libraries='sdp generic_pcie'>
+<HdlPlatform Language="VHDL" spec='platform-spec' version='2' libraries='axi sdp generic_pcie'>
   <specproperty name='platform' value='picoevb'/>
+  <specproperty name="pci_device_id" value='picoevb'/>
+  <specproperty name="nSlots" value='0'/>
+  <specproperty name="nLEDs" parameter='1' value='0'/>
+  <!-- 0 dip switches and 0 push button switches -->
+  <specproperty name="nSwitches" parameter='1' value='0'/>
   <!-- All platform workers must provide these two ports -->
   <metadata master='true'/> <!-- access to container metadata via the platform worker -->
   <timebase master='true'/> <!-- providing a timebase for the time service -->
@@ -8,20 +13,24 @@
   <cpmaster master='true'/>
   <!-- Declare and parameterize the time_server device worker for this platform -->
   <device worker='time_server'>
-    <property name='frequency' value='100e6'/>
+    <property name='frequency' value='125e6'/>
   </device>
-  <sdp name="picoevb" master='true' count='1'/>
-
+  <sdp name="interconnect" master='true' count='1'/>
+  <Property name='axi_error' type='bool' arraylength='1' volatile='true'/>
   <property name="sdpDropCount" type='uchar' volatile='true'/>
 
   <!-- General IOs -->
   <signal  output='leds' width='3'/>
+  <signal name='leds(0)' platform="GPIO_LED_0_LS"/>
+  <signal name='leds(1)' platform="GPIO_LED_1_LS"/>
+  <signal name='leds(2)' platform="GPIO_LED_2_LS"/>
 
-  <!-- PCIe IO Pins -->.
-  <signal input='perst_n'/>
+  <!-- PCIe IO Pins -->
+  <signal output='clkreq_n'/>
+  <signal input='sys_rst_n'/>
   <signal input='sys_clk' differential='true'/>
-  <signal input='pcie_rx' differential='true' width='1'/> 
-  <signal output='pcie_tx' differential='true' width='1'/>
+  <signal input='pcie_rx' differential='true'/> 
+  <signal output='pcie_tx' differential='true'/> 
   
   <!-- SPI IOs
   -->
@@ -37,7 +46,5 @@
 
   <!-- di_edge and do_edge
   -->
-
-
 
 </HdlPlatform>

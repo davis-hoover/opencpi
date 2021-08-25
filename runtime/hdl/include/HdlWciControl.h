@@ -74,16 +74,16 @@ namespace OCPI {
       void controlOperation(OCPI::Util::Worker::ControlOperation op);
       bool controlOperation(OCPI::Util::Worker::ControlOperation op, std::string &err);
       inline uint32_t checkWindow(size_t offset, size_t nBytes) const {
-	(void)nBytes;
 	ocpiAssert(m_hasControl);
-	size_t window = offset & ~(OCCP_WORKER_CONFIG_SIZE-1);
-        ocpiAssert(window == ((offset+nBytes)&~(OCCP_WORKER_CONFIG_SIZE-1)));
+	unsigned windowBits = OCCP_WORKER_CONFIG_WINDOW_BITS - OCCP_WORKER_CONFIG_READSIZE_BITS;
+	size_t window = offset & (~0u << windowBits);
+	ocpiAssert(window == ((offset + nBytes) & (~0u << windowBits)));
 	if (window != m_window) {
-	  set32Register(window, OccpWorkerRegisters,
-			(uint32_t)(window >> OCCP_WORKER_CONFIG_WINDOW_BITS));
+	  set32Register(window, OccpWorkerRegisters, (uint32_t)(window >> windowBits));
 	  m_window = window;
 	}
-	return offset & (OCCP_WORKER_CONFIG_SIZE - 1);
+	unsigned arsize = nBytes == 1 ? 0 : nBytes == 2 ? 1 : 2; // log2(nbytes)
+	return (uint32_t)((offset & ~(~0u << windowBits)) | (arsize << windowBits));
       }
       void throwPropertyReadError(uint32_t status, size_t offset, size_t n, uint64_t val) const;
       void throwPropertyWriteError(uint32_t status) const;
@@ -95,12 +95,16 @@ namespace OCPI {
 		     unsigned idx) const;				          \
       inline uint##n##_t						          \
       getProperty##n(const OCPI::API::PropertyInfo &info, size_t off, unsigned idx) const { \
-        uint32_t offset = checkWindow(info.m_offset + off + idx * (n/8), n/8); \
+        return getPropertyOffset##n(info.m_offset, info.m_readError, off, idx);   \
+      }                                                                           \
+      inline uint##n##_t						          \
+      getPropertyOffset##n(size_t a_base, bool readError, size_t off, unsigned idx) const { \
+        uint32_t offset = checkWindow(a_base + off + idx * (n/8), n/8); \
 	uint32_t status = 0;                                                      \
         uint##wb##_t val##wb;							  \
 	uint##n##_t val;						          \
 	if (m_properties.registers()) {					          \
-	  if (!info.m_readError ||					          \
+	  if (!readError ||					                          \
 	      !(status =						          \
 		get32Register(status, OccpWorkerRegisters) &		          \
 		OCCP_STATUS_READ_ERRORS)) {                                       \
@@ -121,7 +125,7 @@ namespace OCPI {
             }								          \
 	  } else                                                                  \
             val = 0;                                                              \
-	  if (!status && info.m_readError)				          \
+	  if (!status && readError)				          \
 	    status =							          \
 	      get32Register(status, OccpWorkerRegisters) &		          \
 	      OCCP_STATUS_READ_ERRORS;					          \
@@ -140,6 +144,13 @@ namespace OCPI {
       PUT_GET_PROPERTY(32,32)
       PUT_GET_PROPERTY(64,64)
 #undef PUT_GET_PROPERTY
+
+// Convenience macros to directly access scalar properties, with windowing
+#define getProperty8Register(m, type) getPropertyOffset8(offsetof(type,m), false, 0, 0)
+#define getProperty16Register(m, type) getPropertyOffset16(offsetof(type,m), false, 0, 0)
+#define getProperty32Register(m, type) getPropertyOffset32(offsetof(type,m), false, 0, 0)
+#define getProperty64Register(m, type) getPropertyOffset64(offsetof(type,m), false, 0, 0)
+
       void setPropertyBytes(const OCPI::API::PropertyInfo &info, size_t offset,
 			    const uint8_t *data, size_t nBytes, unsigned idx) const;
 
