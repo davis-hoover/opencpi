@@ -84,6 +84,8 @@ class AssetFactory():
                    "libraries":     _opencpi.assets.library.LibraryCollection,
                    "multi-lib":     _opencpi.assets.library.LibraryCollection,
                    "protocol":      _opencpi.assets.component.Protocol,
+                   "hdl-slot":      _opencpi.assets.component.Slot,
+                   "hdl-card":      _opencpi.assets.component.Card,
                    "project":       partial(cls.__get_or_create, _opencpi.assets.project.Project),
                    "registry":      partial(cls.__get_or_create, _opencpi.assets.registry.Registry)}
 
