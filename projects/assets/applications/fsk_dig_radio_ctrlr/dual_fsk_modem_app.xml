@@ -18,12 +18,17 @@
                                                            Connect="phase_to_amp_cordic0">
     <Property Name="taps" ValueFile="idata/tx_rrcos_taps.dat"/>
   </Instance>
-  <Instance Component="ocpi.assets.dsp_comps.phase_to_amp_cordic" Name="phase_to_amp_cordic0" Connect="drc" from='out' to='tx' index='0'>
+  <Instance Component="ocpi.assets.dsp_comps.phase_to_amp_cordic" Name="phase_to_amp_cordic0" >
     <Property Name="magnitude"  Value="20000"/>
     <Property Name="DATA_WIDTH" Value="16"/>
     <Property Name="DATA_EXT"   Value="6"/>
     <Property Name="STAGES"     Value="16"/>
   </Instance>
+
+  <Connection>
+	  <Port Instance="phase_to_amp_cordic0" Name="out"/>
+	  <Port Instance="drc" Name="tx" index="0"/>
+  </Connection>
 
 <!-- FSK modulation/TX algorithm workers (will connect to DRC TX index 1) -->
 
@@ -43,13 +48,17 @@
                                                            Connect="phase_to_amp_cordic1">
     <Property Name="taps" ValueFile="idata/tx_rrcos_taps.dat"/>
   </Instance>
-  <Instance Component="ocpi.assets.dsp_comps.phase_to_amp_cordic" Name="phase_to_amp_cordic1"
-	    Connect='drc' to='tx' index='1'>
+  <Instance Component="ocpi.assets.dsp_comps.phase_to_amp_cordic" Name="phase_to_amp_cordic1">
     <Property Name="magnitude"  Value="20000"/>
     <Property Name="DATA_WIDTH" Value="16"/>
     <Property Name="DATA_EXT"   Value="6"/>
     <Property Name="STAGES"     Value="16"/>
   </Instance>
+
+  <Connection>
+	  <Port Instance="phase_to_amp_cordic1" Name="out"/>
+	  <Port Instance="drc" Name="tx" index="1"/>
+  </Connection>
 
   <!-- FSK demodulation/RX algorithm workers (will connect to DRC RX 0) -->
 

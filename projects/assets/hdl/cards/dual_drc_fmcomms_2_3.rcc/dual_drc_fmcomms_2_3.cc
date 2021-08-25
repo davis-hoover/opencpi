@@ -29,8 +29,8 @@ class Dual_drc_fmcomms_2_3Worker : public OD::DrcProxyBase {
   class Fmcomms_2_3_Configurator: public OD::ConfiguratorAD9361, public OD::ConfiguratorTuneResamp {
   public:
     Fmcomms_2_3_Configurator()
-      : OD::ConfiguratorAD9361(DUAL_DRC_FMCOMMS_2_3_RF_PORTS_RX.data[0], NULL,
-		               DUAL_DRC_FMCOMMS_2_3_RF_PORTS_TX.data[0], NULL), 
+      : OD::ConfiguratorAD9361(DUAL_DRC_FMCOMMS_2_3_RF_PORTS_RX.data[0], DUAL_DRC_FMCOMMS_2_3_RF_PORTS_RX.data[1],
+		               DUAL_DRC_FMCOMMS_2_3_RF_PORTS_TX.data[0], DUAL_DRC_FMCOMMS_2_3_RF_PORTS_TX.data[1]), 
 	OD::ConfiguratorTuneResamp(ad9361MaxRxSampleMhz(), ad9361MaxTxSampleMhz()) { 
     }
     // All concrete Configurator classes must have this clone method for virtual copying. 
@@ -60,20 +60,53 @@ class Dual_drc_fmcomms_2_3Worker : public OD::DrcProxyBase {
       m_slaves.config.set_force_reset(on ? 1 : 0);
     }
     bool isMixerPresent(bool rx, unsigned stream) {
-      return stream == 0 && rx ? m_slaves.rx_complex_mixer0.isPresent() : false;
+      bool isPresent = false;
+      if (rx) {
+        switch (stream) {
+	    case 0: isPresent = m_slaves.rx_complex_mixer0.isPresent(); break;
+	    case 1: isPresent = m_slaves.rx_complex_mixer1.isPresent(); break;
+	    default: break;
+	}
+      }
+      return isPresent;
     }
-    OD::config_value_t getDecimation(unsigned /*stream*/) {
-      return m_slaves.rx_cic_dec0.isPresent() ? m_slaves.rx_cic_dec0.get_R() : 1;
+    OD::config_value_t getDecimation(unsigned stream) {
+      OD::config_value_t val = 1;
+      switch (stream) {
+        case 0: val = m_slaves.rx_cic_dec0.isPresent() ? m_slaves.rx_cic_dec0.get_R() : 1; break;
+	case 1: val = m_slaves.rx_cic_dec1.isPresent() ? m_slaves.rx_cic_dec1.get_R() : 1; break;
+	default: break;
+      }
+      return val;
     }
-    OD::config_value_t getInterpolation(unsigned /*stream*/) {
-      return m_slaves.tx_cic_int0.isPresent() ? m_slaves.tx_cic_int0.get_R() : 1;
+    OD::config_value_t getInterpolation(unsigned stream) {
+      OD::config_value_t val = 1;
+      switch (stream) {
+	case 0: val = m_slaves.tx_cic_int0.isPresent() ? m_slaves.tx_cic_int0.get_R() : 1; break;
+	case 1: val = m_slaves.tx_cic_int1.isPresent() ? m_slaves.tx_cic_int1.get_R() : 1; break;
+	default: break;
+      }
+      return val;
     }
-    OD::config_value_t getPhaseIncrement(bool rx, unsigned /*stream*/) {
-      return rx ? m_slaves.rx_complex_mixer0.get_phs_inc() : 0;
+    OD::config_value_t getPhaseIncrement(bool rx, unsigned stream) {
+      OD::config_value_t val = 0;
+      if (rx) {
+        switch(stream) {
+	  case 0: val = m_slaves.rx_complex_mixer0.get_phs_inc(); break;
+	  case 1: val = m_slaves.rx_complex_mixer1.get_phs_inc(); break;
+	  default: break;
+	}
+      }
+      return val;
     }
-    void setPhaseIncrement(bool rx, unsigned /*stream*/, int16_t inc) {
-      if (rx)
-        m_slaves.rx_complex_mixer0.set_phs_inc(inc);
+    void setPhaseIncrement(bool rx, unsigned stream, int16_t inc) {
+      if (rx) {
+	switch (stream) {
+	  case 0: m_slaves.rx_complex_mixer0.set_phs_inc(inc); break;
+	  case 1: m_slaves.rx_complex_mixer1.set_phs_inc(inc); break;
+	  default: break;
+	}
+      }
     }
     void initialConfig(uint8_t /*id_no*/, OD::Ad9361InitConfig &config) {
       OD::ad9361InitialConfig(m_slaves.config, m_slaves.data_sub, config);
