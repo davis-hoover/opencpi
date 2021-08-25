@@ -143,6 +143,12 @@ ifneq ($(HdlSkip),1)
     override HdlExplicitLibraries:=$(call Unique,$(HdlLibraries) $(Libraries) $(HdlExplicitLibraries))
     $(eval $(HdlSearchComponentLibraries))
     include $(OCPI_CDK_DIR)/include/hdl/hdl-worker.mk
+    # Add an early forced export of the .mk file for bootstrapping
+    ifneq ($(wildcard $(Worker).mk),)
+      LibLinks+=$(LibDir)/$(Worker).mk
+      $(LibDir)/$(Worker).mk: $(Worker).mk | $(LibDir)
+	$(AT)$(call MakeSymLink,$(Worker).mk,$(LibDir))
+    endif
   endif
 endif
 ifndef HdlSkip

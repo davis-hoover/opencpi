@@ -29,7 +29,8 @@
 #
 # This file will pull RCC platform information from the environment if is already set,
 # avoiding any file system interaction/overhead.
-# Setting ShellRccTargetsVars=1 causes it to dump the database to standard output
+# Otherwise it gets the database of rcc targets and associated tools from python
+# The database is a set of variable assignments
 
 ifndef RccAllPlatforms
 ifdef OCPI_ALL_RCC_PLATFORMS
@@ -43,54 +44,20 @@ else
   # This is a big hammer here, since all we need is the registry.
   # FIXME: have a lighter weight way to do this.
   $(OcpiIncludeProject)
-  RccAllPlatforms:=
-  RccAllTargets:=
-  # Add the platform $1 and its target $2 and directory $3 to our database
-  RccAddPlatform=\
-    $(and $(filter $2,$(RccAllTargets)),\
-      $(error Duplicate RCC target $2 for platform $1, it is already the target for $(strip\
-        $(foreach p,$(RccAllPlatforms),$(and $(filter $2,$(RccTarget_$p)),$p)))))\
-    $(eval RccAllPlatforms:=$(strip $(RccAllPlatforms) $1))\
-    $(eval RccAllTargets:=$(strip $(RccAllTargets) $2))\
-    $(eval RccTarget_$1:=$2)\
-    $(eval RccPlatformDir_$1:=$3)\
-    $(foreach r,$(patsubst %/exports,%,$(patsubst %/rcc/platforms,%,$(patsubst %/,%,$(dir $3)))),\
-      $(eval RccPlatformPackageID_$1:=$(call OcpiGetProjectPackageID,$r).$1))
 
-  # roughly for backward compatibility, same as getPlatform.sh
-  #  $(eval vars:=$(shell egrep '^ *OcpiPlatform(Os|Arch|OsVersion) *:*= *' $1/$(notdir $1).mk |\
-  #                   sed 's/OcpiPlatform\([^ :=]*\) *:*= *\([^a-zA-Z0-9_]*\)/\1 \2/'|sort))\
-
-  RccGetPlatformTarget=$(strip\
-    $(eval vars:=$(subst =, ,$(sort \
-                              $(shell sed -n -e /OcpiPlatformPrereq/d -e \
-                                's/^ *OcpiPlatform\([^ :=]*\) *:*= *\([^a-zA-Z0-9_]*\)/\1=\2/p'\
-                                 $1/$(notdir $1).mk))))\
-    $(infox VARS:$(words $(vars)):$(vars))\
-    $(if $(filter 6,$(words $(vars))),,$(error Invalid platform file $1/$(notdir $1).mk))\
-    $(word 4,$(vars))-$(word 6,$(vars))-$(word 2,$(vars)))
-  $(foreach d,$(OcpiGetRccPlatformPaths),\
-    $(foreach p,$(wildcard $d/*),\
-      $(and $(wildcard $p/$(notdir $p).mk),\
-        $(call RccAddPlatform,$(notdir $p),$(call RccGetPlatformTarget,$p),$p))))
-  RccAllTargets:=$(call Unique,$(RccAllTargets)) # this should not be an issue, but...
-  export OCPI_ALL_RCC_PLATFORMS:=$(RccAllPlatforms)
-  export OCPI_ALL_RCC_TARGETS:=$(RccAllTargets)
-  export OCPI_RCC_PLATFORM_TARGETS:=$(foreach p,$(RccAllPlatforms),$p=$(RccTarget_$p))
-  $(call OcpiDbgVar,RccAllPlatforms)
-  $(call OcpiDbgVar,RccAllTargets)
-  $(foreach p,$(RccAllPlatforms),$(call OcpiDbgVar,RccTarget_$p))
+  # Initialize the RCC database from python
+  RccTargetPython:=python3 -c "import _opencpi.util as ou; print(ou.get_platform_variables(False,\"rcc\"))"
+  ifeq ($(filter clean%,$(MAKECMDGOALS)),)
+    # take the assignments one per line, and set the variables (do the TRs in python?)
+    $(if $(call DoShell,set -o pipefail && $(RccTargetPython)|tr "\n" "@"|tr " " "~",RccTargetProps),\
+      $(error Failed to process RCC platforms and targets: $(RccTargetProps)),\
+      $(foreach var,$(subst @, ,$(RccTargetProps)),$(eval $(subst ~, ,$(var)))))
+    export OCPI_ALL_RCC_PLATFORMS:=$(RccAllPlatforms)
+    export OCPI_ALL_RCC_TARGETS:=$(RccAllTargets)
+    export OCPI_RCC_PLATFORM_TARGETS:=$(foreach p,$(RccAllPlatforms),$p=$(RccTarget_$p))
+    $(call OcpiDbgVar,RccAllPlatforms)
+    $(call OcpiDbgVar,RccAllTargets)
+    $(foreach p,$(RccAllPlatforms),$(call OcpiDbgVar,RccTarget_$p))
+  endif
 endif # end of the info not being in the environment already
-# Assignments that can be used to extract make variables into bash/python...
-ifdef ShellRccTargetsVars
-all:
-$(info RccAllPlatforms="$(sort $(RccAllPlatforms))";\
-       RccPlatforms="$(sort $(RccPlatforms))";\
-       RccAllTargets="$(sort $(RccAllTargets))";\
-       RccTargets="$(sort $(RccTargets))";\
-       $(foreach p,$(sort $(RccAllPlatforms)),\
-         $(if $(RccTarget_$p),RccTarget_$p="$(RccTarget_$p)";)\
-	  RccPlatformDir_$p="$(realpath $(RccPlatformDir_$p))";\
-	  RccPlatformPackageID_$p="$(RccPlatformPackageID_$p)";))
-endif
-endif # end of the info not being set
+endif # end of variables not being set here

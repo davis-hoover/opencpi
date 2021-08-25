@@ -2,10 +2,10 @@ In OpenCPI, the term "exports" is used in several places to indicate which files
 in order for something to be *used*.  I.e. every OpenCPI asset consists of a number of source files,
 and if/when built, results in lots of generated output files.  The "exports" of the asset is the subset
 of all these files that are needed to "use" the asset.  This concept of "usage" is a post-build usage --
-a user of an asset doesn't built it, but expects it to be built in order to be used.
+a user of an asset doesn't necessarily build it, but expects it to be built in order to be used.
 
 This is basically a typical "information hiding" or "need to know" principle: the owner/implementer of something
-decides which files to export (expose to users) and which to not expose.  Not exposing files means they can
+decides which files to export (expose to users).  Not exposing files means they can
 change without affecting how users use the asset.
 
 OpenCPI has builtin rules about what gets exported for each type of asset.  Thus there is no a burden on
@@ -23,7 +23,7 @@ of an exports tree can be used to use the asset, without the presence of the ori
 for the asset being used.  The export tree can be seen as a "view" into the built source tree which only contains
 files needed for usage, and structured for users of assets, not developers of assets.
 
-Exports trees are populated incrementally, as assets are built, and built for various targets and platforms.
+Exports trees are populated incrementally, as assets are built for various targets and platforms.
 Thus if the assets are built for one platform, the exports tree for the asset will have the files necessary
 for using the asset with that platform.  If later, more targets are built, then the exports tree is
 further populated with files for that target.  Exports trees enable use for multiple platforms simultaneously.
@@ -163,7 +163,7 @@ created when the (internal) scripts/export-framework.sh script is run with a sin
 which says "create all exports except those that are target-specific".
 
 4. Exports tree after building for software (RCC, dev hosts, cross hosts etc.) platform
---------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
 
 When building happens in the source tree (using the internal script build/build-opencpi.sh),
 there is another interesting bootstrap action due to the fact that software platforms
@@ -174,7 +174,7 @@ building/compiling the framework for that platform.  Thus when the framework is 
 for a software platform, it is using the tools indicated by the platform's exports
 from its project.
 
-When the framework is built (using the internal build/build-opencpi.sh), the framework exports
+When the framework is built (using the internal script build/build-opencpi.sh), the framework exports
 tree is finally populated with target-specific files like executables and libraries.
 These are target-specific files resulting from building framework sources (and prerequisites).
 
