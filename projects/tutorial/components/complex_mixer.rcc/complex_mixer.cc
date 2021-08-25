@@ -1,31 +1,10 @@
 /*
- * This file is protected by Copyright. Please refer to the COPYRIGHT file
- * distributed with this source distribution.
- *
- * This file is part of OpenCPI <http://www.opencpi.org>
- *
- * OpenCPI is free software: you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free
- * Software Foundation, either version 3 of the License, or (at your option) any
- * later version.
- *
- * OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
-/*
- * THIS FILE WAS ORIGINALLY GENERATED ON Wed Mar 30 09:48:42 2016 EDT
+ * THIS FILE WAS ORIGINALLY GENERATED ON Sat Aug 14 13:57:10 2021 EDT
  * BASED ON THE FILE: complex_mixer.xml
  * YOU *ARE* EXPECTED TO EDIT IT
  *
  * This file contains the implementation skeleton for the complex_mixer worker in C++
  */
-
 #include "complex_mixer-worker.hh"
 #include <liquid/liquid.h>
 #include <cmath>
@@ -60,12 +39,6 @@ class Complex_mixerWorker : public Complex_mixerWorkerBase
 
   RCCResult run(bool /*timedout*/)
   {
-	// determine if end of file
-	if (in.eof()) {
-	  out.setEOF();
-	  return RCC_DONE;
-	}
-
     const IqstreamIqData* inData = in.iq().data().data();
     IqstreamIqData* outData = out.iq().data().data();
     const size_t num_of_elements = in.iq().data().size(); // size in IqstreamIqData units
@@ -85,7 +58,6 @@ class Complex_mixerWorker : public Complex_mixerWorkerBase
       {
         in_sample.real = Uscale(inData->I);
         in_sample.imag = Uscale(inData->Q);
-
         nco_crcf_step(q);
         nco_crcf_mix_down(q, in_sample, &out_sample);
         outData->I = Scale(out_sample.real);
