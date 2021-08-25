@@ -262,19 +262,13 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
         # Get dictionary of just the information from the OWD file.
         worker = self.get_dictionary()
 
-        # Add a flag to all properties just declared in the OWD
-        for property_name, property_ in worker["properties"].items():
-            worker["properties"][property_name]["worker_property"] = True
-
         # Get dictionary of just the information from the OCS file.
         component = self.get_component_dictionary(component_spec_file)
 
-        # Add a flag to all properties declared in the OCS.
+        # Add all OWD access flags to OCS properties. This means all
+        # access attributes will always exist, stopping the user from
+        # having to test for existence first.
         for name, property_ in component["properties"].items():
-            component["properties"][name]["worker_property"] = False
-            # Add all OWD access flags to OCS properties. This means all
-            # access attributes will always exist, stopping the user from
-            # having to test for existence first.
             for attrib in self._access_values:
                 if attrib not in \
                         component["properties"][name]["access"].keys():
@@ -283,8 +277,10 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
         # Copy the component dict as a starting point for the combined dict.
         combined_dictionary = copy.deepcopy(component)
         combined_dictionary["time"] = {}
+        combined_dictionary["signals"] = {}
         combined_dictionary["interfaces"] = {}
         combined_dictionary["other_interfaces"] = {}
+
         # Copy all basic attributes from worker into combined dict
         for name, property_ in worker.items():
             if name not in ["ports", "properties", "specproperties"]:
@@ -292,6 +288,18 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
 
         # Add all worker properties into the combined dict
         combined_dictionary["properties"].update(worker["properties"])
+
+        # Add a flag to all properties unique to the OWD so that they can be
+        # differentiated from those defined in the OCS
+        for name, property_ in combined_dictionary["properties"].items():
+            if name in worker["specproperties"].keys() or \
+                (name in worker["properties"].keys() and
+                 name not in component["properties"].keys()):
+                combined_dictionary[
+                    "properties"][name]["worker_property"] = True
+            else:
+                combined_dictionary[
+                    "properties"][name]["worker_property"] = False
 
         # Apply specproperties to properties
         for name, property_ in worker["specproperties"].items():
@@ -331,8 +339,9 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
                 # specified in the OCS file.
                 if property_["type"] == "timeinterface":
                     combined_dictionary["time"][name] = property_
+                elif property_["type"] == "signal":
+                    combined_dictionary["signals"][name] = property_
                 elif property_["type"] == "rawprop" or \
-                        property_["type"] == "signal" or \
                         property_["type"] == "devsignal":
                     combined_dictionary["interfaces"][name] = property_
                 else:
@@ -387,7 +396,12 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
         for tag in port_type:
             for port in self._xml_root.iter(tag):
                 name = self._get_attribute(
-                    element=port, attribute="name", optional=False).strip()
+                    element=port, attribute="name", optional=True)
+                # Signal definitions do not require a name attribute
+                if name is None:
+                    name = "None"
+                else:
+                    name.strip()
                 port_list[name] = {"type": tag}
 
                 # Add attributes and their default values here to ensure

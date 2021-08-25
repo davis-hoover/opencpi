@@ -18,7 +18,6 @@
    You should have received a copy of the GNU Lesser General Public License
    along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-:orphan:
 
 .. _platform_ad9361_config-HDL-worker:
 
@@ -43,26 +42,20 @@ The AD9361 config HDL subdevice worker also operates itself as a subdevice that 
 
    rawprops: Communicates the AD9361 register map to AD9361 SPI subdevice worker.
    dev_force_spi_reset: Forces the RESETB pin, which is active low, to logic 0.
-   ch0_handler_is_present: Set to ``1`` if the ``dev_data_ch0`` signal is connected to a worker that handles the data; set to ``0`` otherwise.
-   ch1_handler_is_present: Set to ``1`` if the ``dev_data_ch1`` signal is connected to a worker that handles the data; set to ``0`` otherwise.
-   data_bus_index_direction: Set to ``1`` if the bus indexing the P0_D and P1_D was reversed before processing.
-   data_clock_is_inverted: Set to ``1`` if the clock in via ``dev_data_clk`` was inverted inside the worker before used as an active-edge rising clock.
-   islvds: Set to ``1`` if the ``DIFFERENTIAL_p`` parameter is ``true`` and to ``0`` if the ``PORT_CONFIG_p`` parameter is ``single``.
-   isdualport: Set to ``1`` if the ``PORT_CONFIG_p`` parameter is ``dual`` and to ``0`` if it is ``single``.
-   isfullduplex: Set to ``1`` if the ``DIFFERENTIAL_p`` parameter is ``true`` and to ``0`` if the ``PORT_CONFIG_p`` parameter is ``single``.
-   isDDR: Set to ``1`` if the ``DATA_RATE_CONFIG_p`` parameter is ``DDR`` and to ``0`` if it is ``SDR``.
-   present: Set to ``1`` to indicate that this worker should validate the ``islvds``, ``isdualport``, ``isfullduplex`` and ``isddr`` signals against similar signals in the AD9361 ADC sub and AD9361 data sub HDL subdevice workers if they are present in the FPGA bitstream.
-   rx_frame_usage: Set to ``1`` to indicate that this worker was built with the assumption that the RX frame operates in its toggle setting and set to ``0`` if this worker was built with the assumption that the RX frame has a rising edge on the first sample and then stays high.  The value is intended to match the AD9361 register 0x010 BIT D3.
-   rx_frame_is_inverted: RX path-specific data port configuration.  Used to tell other workers about the configuration that was enforced when this worker was compiled.
-   ios_standard_is_lvds: Set to ``1`` if the build-time configuration was for LVDS mode; set to ``0`` otherwise.
-   p0_p1_are_swapped: Set to ``1`` if the build-time configuration inverted the P0 and P1 data port roles; set to ``0`` otherwise.
    dev_cfg_data: Some data port configurations, like LVDS, require the TX bus to use 2R2T timing if either 2 TX or 2 RX channels are used.  For example, if using LVDS and this has a value of 1, 2R2T timing will be forced.
-   config_is_two_t: Some data port configurations, like LVDS, require the TX bus to use 2R2T timing if either 2 TX or 2 RX channels are used.  For example, if using LVDS and this has a value of 1, 2R2T timing will be forced.
-   force_two_r_two_t_timing: Expected to match AD9361 register 0x010 bit D2.
+..   ch0_handler_is_present: Set to ``1`` if the ``dev_data_ch0`` signal is connected to a worker that handles the data; set to ``0`` otherwise.
+..   ch1_handler_is_present: Set to ``1`` if the ``dev_data_ch1`` signal is connected to a worker that handles the data; set to ``0`` otherwise.
+..   data_clock_is_inverted: Set to ``1`` if the clock in via ``dev_data_clk`` was inverted inside the worker before used as an active-edge rising clock.
+..   islvds: Set to ``1`` if the ``DIFFERENTIAL_p`` parameter is ``true`` and to ``0`` if the ``PORT_CONFIG_p`` parameter is ``single``.
+..   isdualport: Set to ``1`` if the ``PORT_CONFIG_p`` parameter is ``dual`` and to ``0`` if it is ``single``.
+..   isfullduplex: Set to ``1`` if the ``DIFFERENTIAL_p`` parameter is ``true`` and to ``0`` if the ``PORT_CONFIG_p`` parameter is ``single``.
+..   isDDR: Set to ``1`` if the ``DATA_RATE_CONFIG_p`` parameter is ``DDR`` and to ``0`` if it is ``SDR``.
+..   present: Set to ``1`` to indicate that this worker should validate the ``islvds``, ``isdualport``, ``isfullduplex`` and ``isddr`` signals against similar signals in the AD9361 ADC sub and AD9361 data sub HDL subdevice workers if they are present in the FPGA bitstream.
+..   ios_standard_is_lvds: Set to ``1`` if the build-time configuration was for LVDS mode; set to ``0`` otherwise.
+..   p0_p1_are_swapped: Set to ``1`` if the build-time configuration inverted the P0 and P1 data port roles; set to ``0`` otherwise.
 
 Worker Configuration Parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 * Resource utilization for this worker for the ``zynq`` target platform:
 
   * Configuration: 0
@@ -120,14 +113,12 @@ than the Fmax specific to this worker, even if this worker is the only one inclu
 
 Control Timing and Signals
 --------------------------
-
 The AD9361 config HDL subdevice worker operates in the
 control plane clock domain. Note that this worker is essentially
 the central worker that command/control passes through, and that no RX or TX data paths flow through this worker.
 
 Vivado Timing Analysis
 ----------------------
-
 The Vivado timing report that OpenCPI runs for HDL device workers may erroneously report
 a max delay for a clocking path which should have been ignored. Custom Vivado ``tcl`` commands
 had to be run for this HDL subdevice worker to extract pertinent information from Vivado timing analysis.

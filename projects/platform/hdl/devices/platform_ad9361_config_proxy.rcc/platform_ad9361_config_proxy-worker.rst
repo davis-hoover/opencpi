@@ -19,8 +19,6 @@
    along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-:orphan:
-
 .. _platform_ad9361_config_proxy-RCC-worker:
 
 
@@ -29,7 +27,6 @@
 
 Detail
 ------
-
 No-OS features *platform layers*, which are ``.c``/``.h`` files that implement
 hardware-specific SPI register accesses within generic API calls.
 No-OS includes several platform layers, which are all specific to
@@ -97,12 +94,10 @@ Note also that this worker’s use of No-OS not only makes
 SPI register accesses but also sets the AD9361 RESETB, ENABLE,
 and TXNRX pins via the ``platform_ad9361_config.hdl`` and ``platform_ad9361_spi.hdl`` HDL device workers.
 
-
-.. comment out ocpi_documentation_worker directive. It doesn't work right now.
+.. ocpi_documentation_worker::
 
 Troubleshooting
 ---------------
-
 The following error message, which is produced by the ADI No-OS library used by ``platform_ad9361 config proxy.rcc``,
 indicates a hardware communication error between the FPGA and the AD9361.
 This message occurs, for example, if the AD9361 resides on a card that is not plugged in to the PCB containing the FPGA.
