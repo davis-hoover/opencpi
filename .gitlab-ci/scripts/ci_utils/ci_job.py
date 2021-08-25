@@ -10,14 +10,14 @@ from . import ci_gitlab
 
         
 _Job = namedtuple('job', 'name stage script before_script after_script'
-                         ' artifacts tags resource_group'
+                         ' artifacts tags resource_group retry'
                          ' variables dependencies image trigger')
 
 
 def Job(name, stage=None, script=None, before_script=None, 
         after_script=None, artifacts=None, tags=None, resource_group=None, 
         variables=None, dependencies=None, image=None, trigger=None,
-        overrides=None):
+        retry=None, overrides=None):
     """Constructs a Job
 
         Will use values in overrides to replace values of other args in
@@ -387,10 +387,12 @@ def make_job(pipeline, stage, stages, platform, project=None, name=None,
     else:
         variables = None
 
+    retry = {'max': '1'}
+
     overrides = pipeline.get_platform_overrides(platform)
     job = Job(name, stage, script, tags=tags, before_script=before_script, 
               after_script=after_script, resource_group=resource_group, 
-              dependencies=dependencies, variables=variables, 
+              dependencies=dependencies, variables=variables, retry=retry,
               overrides=overrides)
 
     return job
