@@ -69,7 +69,8 @@ if __name__ == "__main__":
     # force non-zero exit code if argparse exits, even for help etc.
     # force help if no arguments
     try:
-        arguments = parser.parse_args(args=None if sys.argv[1:] else ['--help'])
+        arguments = parser.parse_args(
+            args=None if sys.argv[1:] else ["--help"])
     except SystemExit:
         sys.exit(1)
 

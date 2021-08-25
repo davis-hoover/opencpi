@@ -69,13 +69,11 @@ This component's specification is contained in the OpenCPI Worker Description (O
 
 Properties
 ~~~~~~~~~~
-
-.. don't use ocpi_documentation_properties right now. It doesn't work with hdldevice as the root tag.
+.. ocpi_documentation_properties::
 
 Ports
 ~~~~~
-
-.. comment out ocpi_documentation_ports directive. It doesn't accept hdldevice.
+.. ocpi_documentation_ports::
 
 Implementations
 ---------------

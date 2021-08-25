@@ -52,9 +52,10 @@ class OcpiDocumentationImplementations(docutils.parsers.rst.Directive):
 
         implementations = []
         for argument in self.arguments:
+            file_path = self.state.document.attributes["source"]
             worker_directory = pathlib.Path(
-                self.state.document.attributes["source"]).parent.joinpath(
-                argument)
+                file_path).parent.joinpath(argument)
+
             if len(list(worker_directory.glob("*-worker.rst"))) == 1:
                 implementations.append(
                     list(worker_directory.glob("*-worker.rst"))[0])
@@ -141,6 +142,24 @@ class OcpiDocumentationImplementations(docutils.parsers.rst.Directive):
                         break
 
             implementation_list.append(list_item)
+
+        # A ViewList is used to parse a ReST toctree and insert it beneath
+        # this directive. The toctree links to worker documentation files,
+        # which enables, for example, figure and equation numbering to be
+        # displayed in the generated worker documentation pages.
+        toctree_rst = docutils.statemachine.ViewList()
+        toctree_rst.append(".. toctree::", file_path, self.lineno + 1)
+        toctree_rst.append("   :hidden:", file_path, self.lineno + 2)
+        toctree_rst.append("   :glob:", file_path, self.lineno + 3)
+        toctree_rst.append("", file_path, self.lineno + 4)
+
+        line_number_rst = self.lineno + 5
+        for worker_directory in self.arguments:
+            toctree_rst.append(f"   {worker_directory}/{name}-worker",
+                               file_path, line_number_rst)
+            line_number_rst = line_number_rst + 1
+
+        self.state.nested_parse(toctree_rst, 0, implementation_list)
 
         content.append(implementation_list)
 
