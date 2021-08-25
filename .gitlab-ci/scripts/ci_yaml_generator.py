@@ -104,27 +104,27 @@ def set_ci_env():
     Simulates a pipeline environment by setting environment variables.
     This function should not be called except for testing.
     """
-    environ['CI_COMMIT_MESSAGE'] = '[ci sdr xilinx13_4 adi_plutosdr0_32]'
+    environ['CI_COMMIT_MESSAGE'] = '[ci centos7]'
     environ['CI_PIPELINE_SOURCE'] = 'push'
     environ['CI_ROOT_ID'] = '1'
-    environ['CI_PLATFORM'] = 'modelsim'
+    environ['CI_PLATFORM'] = ''
     environ['CI_HOST_PLATFORM'] = 'centos7'
     environ['CI_DEFAULT_HOSTS'] = 'centos7'
     environ['CI_PLATFORMS'] = ''
     environ['CI_PIPELINE_ID'] = '0'
-    environ['CI_PROJECT_DIR'] = '/builds/opencpi/comp/ocpi.comp.sdr'
-    environ['CI_PROJECT_NAME'] = 'ocpi.comp.sdr'
+    environ['CI_PROJECT_DIR'] = '/builds/opencpi/'
+    environ['CI_PROJECT_NAME'] = 'opencpi'
     environ['CI_PROJECT_NAMESPACE'] = 'opencpi'
-    environ['CI_PROJECT_PATH'] = 'opencpi/comp/ocpi.comp.sdr'
-    environ['CI_COMMIT_REF_NAME'] = 'opencpi-1547-ci-implement-clp'
-    environ['CI_PROJECT_TITLE'] = 'SDR'
-    environ['CI_PROJECT_ID'] = '21371505'
+    environ['CI_PROJECT_PATH'] = 'opencpi/opencpi'
+    environ['CI_COMMIT_REF_NAME'] = 'develop'
+    environ['CI_PROJECT_TITLE'] = 'opencpi'
+    environ['CI_PROJECT_ID'] = '12747880'
     environ['CI_RUNNER_ID'] = '1274481'
-    environ['CI_DIRECTIVE'] = 'centos7 modelsim'
-    environ['CI_OCPI_REF'] = '1547-ci-implement-clp'
+    environ['CI_DIRECTIVE'] = 'centos7'
+    environ['CI_OCPI_REF'] = 'develop'
     # environ['CI_OSP_REF'] = 'develop'
     environ['CI_UPSTREAM_ID'] = '2'
-    environ['CI_REPOSITORY_URL'] = 'https://gitlab.com/opencpi/comp/ocpi.comp.sdr.git'
+    environ['CI_REPOSITORY_URL'] = 'https://gitlab.com/opencpi/opencpi.git'
 
 
 if __name__ == '__main__':
