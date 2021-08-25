@@ -281,7 +281,8 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         worker=None, no_assemblies=None, hdl_assembly=None, hdl_platform=None,
         workers_as_needed=False, hdl_target=None, rcc_platform=None, hdl_rcc_platform=None):
         """
-        Builds the project by handing over the user specifications to execute command 
+        Builds the project by handing over the user specifications
+        to execute command. 
         """
         #Specify what to build
         action = []
