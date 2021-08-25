@@ -862,7 +862,7 @@ def make_ocpiremote_cmd(verb, platform, linked_platform=None):
 
         if verb == 'start':
             cmd += (' -b')
-            cmd += ' -l 10'
+            cmd += ' -l 6'
 
     if platform.password:
         cmd += (' -p {}'.format(platform.password))
