@@ -420,7 +420,7 @@ class Component(ShowableComponent):
                 working_path = Path(project_path, 'components', library)
             else:
                 working_path = Path(project_path, library)
-            if not os.path.exists(working_path):
+            if not working_path.exists():
                 print("Error: Library '" + library + "' does not exist")
                 exit(1)
         elif hdl_library:
