@@ -426,73 +426,20 @@ class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, Rep
         worker=None, hdl_platform=None, hdl_target=None):
         """
         Cleans the libraries by handing over the user specifications
-        to execute command.
+        to each library.
         """
-        #Specify what to clean
-        action=[]
-        if not rcc and not hdl:
-            action.append('clean')
-        else:
-            if rcc:
-                action.append('cleanrcc')
-            if hdl:
-                action.append('cleanhdl')
-        settings = {}
-        if hdl_platform:
-            settings['hdl_plat_strs'] = hdl_platform
-        if hdl_target:
-            settings['hdl_target'] = hdl_target
-        if worker:
-            settings['worker'] = worker
-        make_file = ocpiutil.get_makefile(self.directory, "libraries")[0]
-        #Clean
-        ocpiutil.file.execute_cmd(
-            settings, self.directory, action=action, file=make_file, verbose=verbose)
+        for lib in self.library_list:
+            lib.clean(verbose, hdl, rcc,
+                      worker, hdl_platform, hdl_target)
 
     def build(self, verbose=False, rcc=False, hdl=False, optimize=False,
         dynamic=False, worker=None, hdl_platform=None, workers_as_needed=False, 
         hdl_target=None, rcc_platform=None, hdl_rcc_platform=None):
         """
         Builds the libraries by handing over the user specifications
-        to execute command.
+        to each library.
         """
-        #Specify what to build
-        action=[]
-        if rcc:
-            action.append('rcc')
-        if hdl:
-            action.append('hdl')
-        if workers_as_needed:
-            os.environ['OCPI_AUTO_BUILD_WORKERS'] = '1'
-        build_suffix = '-'
-        if dynamic:
-            build_suffix += 'd'
-        if optimize:
-            build_suffix += 'o'
-        if optimize or dynamic:
-            if rcc_platform:
-                if any("-" in s for s in rcc_platform):
-                    raise ocpiutil.OCPIException("You cannot use the --optimize build option and "
-                    + "also specify build options in a platform name (in this case: ",
-                    rcc_platform, ")")
-                else:
-                    new_list = [s + build_suffix for s in rcc_platform]
-                    rcc_platform = new_list
-            else:
-                rcc_platform = [os.environ['OCPI_TOOL_PLATFORM'] + build_suffix]
-        #Pass settings
-        settings = {}
-        if hdl_platform:
-            settings['hdl_plat_strs'] = hdl_platform
-        if hdl_target:
-            settings['hdl_target'] = hdl_target
-        if rcc_platform:
-            settings['rcc_platform'] = rcc_platform
-        if hdl_rcc_platform:
-            settings['hdl_rcc_platform'] = hdl_rcc_platform
-        if worker:
-            settings['worker'] = worker
-        make_file = ocpiutil.get_makefile(self.directory, "libraries")[0]
-        #Build
-        ocpiutil.file.execute_cmd(
-                settings, self.directory, action=action, file=make_file, verbose=verbose)
+        for lib in self.library_list:
+            lib.build(verbose, rcc, hdl, optimize,
+                      dynamic, worker, hdl_platform, workers_as_needed, 
+                      hdl_target, rcc_platform, hdl_rcc_platform)

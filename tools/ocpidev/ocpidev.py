@@ -67,6 +67,7 @@ def main():
     args = postprocess_args(args)
     verb = args.verb
     noun = args.noun
+    kwargs = {}
 
     do_ocpidev_sh = True
     try:
@@ -82,10 +83,18 @@ def main():
             if noun == 'library' and dirtype == 'libraries':
                 args.noun = dirtype
                 noun = args.noun
+        if noun == 'libraries':
+            kwargs['init_libs_col'] = True
+            #TODO: This check will be redundant when falling back to bash is
+            # removed and this check can be removed at the same time
+            if dirtype != 'libraries':
+                print("Expected directory of type '" + noun + "' but found type '"
+                      + dirtype + "' for directory " + directory)
+                sys.exit(1)
 
         # Try to instantiate the appropriate asset from noun
         asset_factory = ocpiassets.factory.AssetFactory()
-        asset = asset_factory.factory(args.noun, directory, name)
+        asset = asset_factory.factory(args.noun, directory, name, **kwargs)
 
         try:
         # Get verb method parameters, collect them from args, and try to
@@ -121,6 +130,7 @@ def metadata(verb=None, noun=None):
     if ocpiutil.get_dirtype(projdir) == "project":
         genProjMetaData.main(projdir)
 
+
 def postprocess_args(args):
     """
     Post-processes user arguments
@@ -133,7 +143,7 @@ def postprocess_args(args):
         ])
         ocpiutil.logging.error(err_msg)
         sys.exit(1)
-    if args.noun== 'spec':
+    if args.noun == 'spec':
         args.noun = 'component'
     if hasattr(args, 'rcc-noun'):
         args.model = 'rcc'
