@@ -406,13 +406,17 @@ else
           # we don't have a verb to do that.
           ocpidev -d $project_dir build --rcc
           ocpidev -d $project_dir build hdl --workers-as-needed platform $platform
+          # Since there is no project-level build, no exports were done
+          # The best fix would be to add an --export-project option to ocpidev
+          make -C $project_dir -f $OCPI_CDK_DIR/include/project.mk exports
         else
           ocpidev -d $project_dir build --hdl --hdl-platform=$platform --no-assemblies
         fi
-        echo "HDL platform \"$platform\" built for OSP in $project_dir."
+        echo "HDL platform \"$platform\" built and exported for OSP in $project_dir."
     elif [ -n "$minimal" ]; then
-      # Build the platform in its project
-      ocpidev -d $project_dir build hdl --workers-as-needed platform $platform
+        # core project: build the platform in its project
+        ocpidev -d $project_dir build hdl --workers-as-needed platform $platform
+        echo "HDL platform \"$platform\" built in $project_dir."
     fi
     ocpidev -d projects/assets build --hdl-platform=$platform hdl ${minimal:+--workers-as-needed} assembly testbias
     echo "HDL platform \"$platform\" built, with one HDL assembly (testbias) built for testing."
