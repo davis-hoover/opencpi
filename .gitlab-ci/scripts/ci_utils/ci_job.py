@@ -6,13 +6,13 @@ from pathlib import Path
         
 _Job = namedtuple('job', 'name stage script before_script after_script'
                          ' artifacts tags resource_group retry'
-                         ' variables dependencies image trigger')
+                         ' variables dependencies image trigger needs')
 
 
 def Job(name, stage=None, script=None, before_script=None, 
         after_script=None, artifacts=None, tags=None, resource_group=None, 
         variables=None, dependencies=None, image=None, trigger=None,
-        retry=None, overrides=None):
+        retry=None, needs=None, overrides=None):
     """Constructs a Job
 
         Will use values in overrides to replace values of other args in
@@ -38,6 +38,7 @@ def Job(name, stage=None, script=None, before_script=None,
                         artifacts from (NOT AWS)
         image:          Docker image for job to run in
         trigger:        Child pipeline to trigger
+        needs:          Jobs from prior stages this job must wait for
         overrides:      Dictionary of overrides for the job
 
     Returns:
@@ -376,11 +377,26 @@ def make_job(pipeline, stage, stages, platform, project=None, projects=None,
         resource_group = platform.name
     else:
         resource_group = None
+    
+    if stage == 'test' and not platform.is_host:
+        needs = ['build-tests:{}:{}:{}:{}'.format(
+            host_platform.name, project.name, asset.name, platform.name)]
+        if linked_platform:
+            need = 'build-sdcards:{}:{}:{}'.format(
+                host_platform.name, linked_platform.name, platform.name)
+            needs.append(need)
+    elif stage == 'build-sdcards':
+        needs = ['build-assemblies:{}:assets:assemblies:{}'.format(
+            host_platform.name, platform.name)]
+    else:
+        needs = None
     retry = {'max': '1'}
     overrides = pipeline.get_platform_overrides(platform)
     job = Job(name, stage, script, tags=tags, before_script=before_script, 
               after_script=after_script, resource_group=resource_group, 
-              dependencies=dependencies, retry=retry, overrides=overrides)
+              dependencies=dependencies, retry=retry, needs=needs,
+              overrides=overrides)
+              
 
     return job
 
