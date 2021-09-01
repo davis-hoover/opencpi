@@ -26,6 +26,8 @@ import jinja2
 from pathlib import Path
 import _opencpi.assets.template as ocpitemplate
 import subprocess
+import _opencpi.util as ocpiutil
+import shutil
 from .abstract import RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAsset, Asset
 from .factory import AssetFactory
 from .worker import Worker, HdlWorker
@@ -367,6 +369,8 @@ class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, Rep
     def __init__(self, directory, name=None, **kwargs):
         self.check_dirtype("libraries", directory)
         super().__init__(directory, name, **kwargs)
+        self.verbose = kwargs.get("verbose", None)
+        self.orig_noun = kwargs.get("orig_noun", None)
         self.library_list = None
         if kwargs.get("init_libs_col", False):
             self.library_list = []
@@ -443,3 +447,33 @@ class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, Rep
             lib.build(verbose, rcc, hdl, optimize,
                       dynamic, worker, hdl_platform, workers_as_needed, 
                       hdl_target, rcc_platform, hdl_rcc_platform)
+
+    def delete_all(self):
+        projdir = Path(ocpiutil.get_path_to_project_top())
+        os.chdir(projdir)
+        shutil.rmtree(self.directory)
+        print("Successfully deleted all libraries and directory:", self.directory)
+
+    def delete(self, force=False):
+        if self.orig_noun == "libraries":
+            for lib in self.library_list:
+               lib.delete(self, force)
+            if not force:
+                prompt = 'Delete {} at: {}'.format(self.name, str(self.directory))
+                force = ocpiutil.get_ok(prompt=prompt)
+            if force:
+                LibraryCollection.delete_all(self)
+            return
+
+        libs = []
+        for lib in self.library_list:
+            libs.append(lib.name.strip())
+        tense = "library exists:" if len(libs) == 1 else "libraries exist:"
+        if self.orig_noun == "library" and self.library_list and not force:
+            print("OCPI:ERROR: cannot delete 'components' because the following ", end="")
+            print(tense, str(libs)[1:-1])
+            exit(1)
+        if not os.path.isdir(self.directory):
+            print("OCPI:ERROR: no such directory:", self.directory)
+            exit(1)
+        LibraryCollection.delete_all(self)
