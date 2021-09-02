@@ -1,4 +1,10 @@
+{% if section_name in links %}
+<h2 id="{{ section_name }}">{{ links[section_name].anchor_tag() }}</h2>
+{% else %}
 <h2 id="{{ section_name }}">{{ section_title }}</h2>
+{% endif %}
 {% for k in links.keys()|sort %}
+{% if k != section_name %}
 <div>{{ links[k].anchor_tag() }}</div>
+{% endif %}
 {% endfor %}
