@@ -36,6 +36,10 @@ modelsim:
       OCPI_MODELSIM_LICENSE_FILE: '2103@sembach.opencpi.net'
 
 # hdl
+adrv9361:
+  overrides:
+    variables:
+      OCPI_XILINX_LICENSE_FILE: '2100@sembach.opencpi.net'
 e31x:
   ip: 10.1.0.42
   port: 1000
