@@ -650,6 +650,9 @@ def make_script(stage, platform, project=None, linked_platform=None,
         if stage == 'build-platforms':
             cmd = make_ocpidev_cmd('build', platform, project.path,
                                    'hdl platforms')
+            cmds.append(cmd)
+            cmd = ' '.join(['make -C {} -f '.format(project.path),
+                            '$OCPI_CDK_DIR/include/project.mk exports'])
         elif stage == 'build-sdcards':
             cmd = ('cdk/scripts/export-platform-to-framework.sh' 
                    ' -v hdl {} {}/lib'.format(platform.name, platform.path))
@@ -847,12 +850,12 @@ def get_asset_stage(asset, project):
 
     if (asset_name in ['components', 'adapters', 'cards', 'devices']
             or asset.path.parent.stem == 'components'):
-        if project.group == 'opencpi':
+        if asset.project.group == 'opencpi':
             return 'build-assets'
-        elif project.group == 'osp':
-            return 'build-assets-osp'
-        elif project.group == 'comp':
-            return 'build-assets-comp'
+        if asset_name == 'devices':
+            return '{}-{}'.format('build-devices', asset.project.group)
+        else:
+            return '{}-{}'.format('build-assets', asset.project.group)
         
     if asset_name == 'primitives':
         if project.name == 'core':
