@@ -1,5 +1,16 @@
 #!/bin/env python3
-# This script only runs on CentOS 7 so it is safe to use python 3.6 features
+#
+# This script only runs on CentOS 7 so it is safe to use python 3.6 features.
+#
+# N.B.: This is overdue for a rewrite, but the "best time" to accomplish
+# that depends on how quickly the RST documentation replaces ".fodt" and
+# ".tex" sources.  In the meantime, this should be kept as maintainable
+# as possible, i.e., extend and/or replace functionality logically.  The
+# current strategy is to make project section headers (names) clickable
+# for each project having RST documentation available.  This should allow
+# for a more seamless transition as old documents are retired, while
+# preserving the page layout to which people have become accustomed.
+#
 
 import argparse
 import logging
@@ -17,8 +28,12 @@ from typing import Dict, List, Union
 from jinja2 import Environment, FileSystemLoader
 
 # Supported OSPs
-OSPS = ["ocpi.osp.e3xx", "ocpi.osp.plutosdr", "ocpi.osp.ettus"]
+OSPS = ["ocpi.osp.analog", "ocpi.osp.e3xx", "ocpi.osp.plutosdr", "ocpi.osp.ettus"]
 OSP_TAGS = dict()  # Will be filled in later
+
+# Supported COMPs
+COMPS = ["ocpi.comp.sdr"]
+COMP_TAGS = dict()
 
 
 class SectionData(object):
@@ -99,7 +114,13 @@ def main():
         OSP_TAGS[osp] = get_tags(OCPI_OSPDIR / osp / ".git")
         OSP_TAGS[osp].append("develop")  # develop will always be a valid git revision
 
-    # Build each release and its OSPs
+    # Download supported COMPs
+    for comp in COMPS:
+        download_comp(comp)
+        COMP_TAGS[comp] = get_tags(OCPI_COMPDIR / comp / ".git")
+        COMP_TAGS[comp].append("develop")  # develop will always be a valid git revision
+
+    # Build each release and its OSPs and COMPs
     for release in releases:
         is_latest = True if latest_release == release else False
         build(release)
@@ -158,7 +179,7 @@ def build(tag: str) -> None:
         logging.debug(f"Executing cmd: {cmd}")
         subprocess.check_call(cmd)
 
-        # Clone supported OSP's
+        # Clone supported OSPs
         for osp in OSPS:
             osp_src = OCPI_OSPDIR / osp
             if Path(tmprepo, "projects", "bsps").exists():
@@ -185,6 +206,24 @@ def build(tag: str) -> None:
                 logging.critical(f"Command failed: {e.cmd}")
                 exit(-1)
 
+        # Clone supported COMPs
+        for comp in COMPS:
+            comp_src = OCPI_COMPDIR / comp
+            comp_dst = tmprepo / "projects" / comp
+            comp_tags = COMP_TAGS[comp]
+            logging.debug(f"{comp} tags: {comp_tags}")
+            if tag not in comp_tags:
+                logging.info(f"Tag '{tag}' doesn't exist for comp '{comp}'. Skipping...")
+                continue
+            try:
+                logging.info(f"Cloning {comp_src} to {comp_dst}")
+                cmd = base_cmd + ["--branch", tag, str(comp_src), str(comp_dst)]
+                logging.debug(f"Executing cmd: {cmd}")
+                subprocess.check_call(cmd)
+            except subprocess.CalledProcessError as e:
+                logging.critical(f"Command failed: {e.cmd}")
+                exit(-1)
+
         # Builds docs for releases that require it (older releases committed pdfs to repo)
         logging.info(f"Building docs for release: {tag}")
         build_docs(tmprepo)
@@ -199,9 +238,13 @@ def build(tag: str) -> None:
             if rpm_guide is not None:
                 os.remove(str(rpm_guide))
 
-        # Copy man pages to release dir
+        # Generate (if necessary) and copy man pages to release dir
         logging.info(f"Copying man pages for release: {tag}")
-        copy_man(tmprepo, release_dir / "man")
+        gen_copy_man(tmprepo, release_dir / "man")
+
+        # Generate and copy RST docs to release dir
+        logging.info(f"Generating and copying RST docs for release: {tag}")
+        gen_copy_rst(tmprepo, release_dir / "rst")
 
 
 def build_docs(repo_dir: Path):
@@ -218,7 +261,7 @@ def build_docs(repo_dir: Path):
     subprocess.check_call(cmd)
 
 
-def copy_man(src_dir: Path, dst_dir: Path):
+def gen_copy_man(src_dir: Path, dst_dir: Path):
     """
     Copy HTML man pages if they exist.  Prior to v2.2.0, the man
     pages were supplied pre-rendered in HTML: effective with that
@@ -240,10 +283,12 @@ def copy_man(src_dir: Path, dst_dir: Path):
             #   v2.2.0: "ocpidev-application.1.txt", "ocpidev-run.1.txt",
             #           "ocpiav.1.txt", "ocpigr.1.txt", "ocpihdl.1.txt",
             #           "ocpirun.1.txt"
+            # N.B.: We do not need to do anything for the man page build
+            # except "install-packages.sh" and "install-prerequisites.sh",
+            # but "ocpidoc" (needed by gen_copy_rst() function) will not be
+            # available with anything less than a full "minimal" (oxymoron?)
+            # install of the framework.  Incur the pain once here.
             cmd = ["bash", "-c", fr'cd {src_dir} ; \
-scripts/install-packages.sh ; \
-scripts/install-prerequisites.sh ; \
-source cdk/opencpi-setup.sh -s ; \
 sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9c/\"/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpidev-application.1.txt > doc/man/src/ocpidev-application.1.txt.new ; \
 mv doc/man/src/ocpidev-application.1.txt.new doc/man/src/ocpidev-application.1.txt ; \
 sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9c/\"/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpidev-run.1.txt > doc/man/src/ocpidev-run.1.txt.new ; \
@@ -257,7 +302,7 @@ mv doc/man/src/ocpihdl.1.txt.new doc/man/src/ocpihdl.1.txt ; \
 sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9c/\"/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpirun.1.txt > doc/man/src/ocpirun.1.txt.new ; \
 mv doc/man/src/ocpirun.1.txt.new doc/man/src/ocpirun.1.txt ; \
 export LANG=en_US.utf8 ; \
-make -C doc/man']
+scripts/install-opencpi.sh --minimal --no-kernel']
             logging.debug(f'Executing "{cmd}" in directory "{src_dir}"')
             subprocess.check_call(cmd)
             html_man_dir = src_dir / "doc" / "man" / "gen" / "html"
@@ -269,6 +314,58 @@ make -C doc/man']
         dst = dst_dir / f.name
         logging.debug(f"Copying {f} -> {dst}")
         shutil.copy2(str(f), str(dst))
+
+
+def gen_copy_rst(src_dir: Path, dst_dir: Path):
+    """
+    Generate HTML renderings of RST document sources and copy
+    them to project-specific subdirectories under the specified
+    destination directory.
+    """
+    #
+    # The check for "doc/man/Makefile" does not make much sense
+    # until one realizes that RST docs were introduced about the
+    # same time as it became necessary to build the man pages.
+    #
+    man_mk = src_dir / "doc" / "man" / "Makefile"
+    if man_mk.exists():
+        # post-v2.1.1: RST document sources may exist.
+        logging.info(f'"{man_mk}" found: attempting to process RST documents')
+        #
+        # gen_copy_rst() must be called after gen_copy_man(), because we depend
+        # on the presence of the same minimal framework in "src_dir".  No idea
+        # whether setting LANG is required here, but it does not hurt to do so.
+        #
+        # Easier to comment on the bash code below here vs. in-line, so...
+        # What happens if "ocpidoc" fails is a question, which is why we look
+        # for the expected "ocpidoc" build products directory before doing
+        # anything else.  The code that generates "ddir" will convert project
+        # names like "ocpi.ptype.name" to "ptype_name", which is consistent
+        # with how OSPS are handled in "generator/genDocumentation.sh".
+        #
+        # Unless a way can be found to do a minimally-sufficient subset of
+        # "scripts/install-opencpi.sh --minimal --no-kernel", there does not
+        # seem to be a better way to make "ocpidoc" available.
+        #
+        cmd = ["bash", "-c", fr'cd {src_dir} ; \
+source cdk/opencpi-setup.sh -s ; \
+export LANG=en_US.utf8 ; \
+for pdir in projects/* projects/osps/* ; \
+do if [ -f $pdir/index.rst ] ; \
+then ocpidoc -d $pdir build -b ; \
+if [ -d $pdir/gen/doc ] ; \
+then ddir=`basename $pdir | sed -e "s/\./_/g" -e "s/ocpi_//"` ; \
+mkdir -p {dst_dir}/$ddir ; \
+( cd $pdir/gen/doc ; cp -pr . {dst_dir}/$ddir ) ; \
+fi ; \
+fi ; \
+done']
+        logging.debug(f'Executing "{cmd}" in directory "{src_dir}"')
+        subprocess.check_call(cmd)
+        html_man_dir = src_dir / "doc" / "man" / "gen" / "html"
+    else:
+        # Nothing to process for this release.
+        return
 
 
 def copy_pdfs(src_dir: Path, dst_dir: Path):
@@ -353,9 +450,17 @@ def gen_release_index(tag: str, is_latest=False):
     release_dir = args.outputdir / tag
     man_dir = release_dir / "man"
     pdf_dir = release_dir / "docs"
+    rst_dir = release_dir / "rst"
+    # At some point as old docs get retired, this check will
+    # probably need to be extended to look for rst_dir as well.
     if not pdf_dir.exists():
         return
     logging.info(f"Generating {release_dir}/index.html")
+
+    # Generate a list of projects having RST documentation.
+    rst_projects = list()
+    if rst_dir.exists():
+        rst_projects = os.listdir(rst_dir)
 
     def _fix_file_name(file_name: str):
         """Standardize file names across all the releases, sigh."""
@@ -383,17 +488,17 @@ def gen_release_index(tag: str, is_latest=False):
             return " ".join(chunks)
         return file_name
 
-    # Generate dictionary of pdf links organized based on filesystem layout
-    # Links are built relative to release_dir
+    # Generate dictionary of pdf links organized based on filesystem layout.
+    # Links are built relative to release_dir.
     section_data = dict()  # type: Dict[str, SectionData]
     project_names = list()  # type: List[str]
     for root, _, files in os.walk(str(pdf_dir)):
         rootpath = Path(root)
 
-        # Remove $(dirname pdf_dir) common prefix from rootpath
-        # Ex. pdf_dir  = /pdf/dir/
-        #     rootpath = /pdf/dir/some/path
-        #     base_url = dir/some/path
+        # Remove $(dirname pdf_dir) common prefix from rootpath:
+        #   pdf_dir  = /release_dir/docs
+        #   rootpath = /release_dir/docs/some/path
+        #   base_url = docs/some/path
         base_url = str(rootpath).replace(str(pdf_dir.parent) + "/", "")
         logging.debug(f"pdf_dir:  {pdf_dir}")
         logging.debug(f"rootpath: {rootpath}")
@@ -413,9 +518,13 @@ def gen_release_index(tag: str, is_latest=False):
             section_title = section_name.replace("_", " ").title()
             if section_name == "assets_ts":
                 section_title = "Assets TS"
+                if Path(rst_dir, section_name, "index.html").exists():
+                    file_links[section_name] = UrlLink(name=section_title, url=f"rst/{section_name}/")
             if section_name.startswith("osp_"):
                 section_name = section_name[4:]  # remove osp_
-                if section_name == "e3xx":
+                if section_name == "analog":
+                    section_title = "Analog OSP Documentation"
+                elif section_name == "e3xx":
                     section_title = "E3xx OSP Documentation"
                 elif section_name == "plutosdr":
                     section_title = "PlutoSDR OSP Documentation"
@@ -423,8 +532,20 @@ def gen_release_index(tag: str, is_latest=False):
                     section_title = "Ettus OSP Documentation"
                 else:
                     section_title = section_title[4:] + " OSP Documentation"
+                if Path(f"{rst_dir}/osp_{section_name}/index.html").exists():
+                    file_links[section_name] = UrlLink(name=section_title, url=f"rst/osp_{section_name}/")
+            elif section_name.startswith("comp_"):
+                section_name = section_name[5:]  # remove comp_
+                if section_name == "sdr":
+                    section_title = "SDR Components Documentation"
+                else:
+                    section_title = section_title[4:] + " Components Documentation"
+                if Path(f"{rst_dir}/comp_{section_name}/index.html").exists():
+                    file_links[section_name] = UrlLink(name=section_title, url=f"rst/comp_{section_name}/")
             elif section_title not in ["Tutorials", "Briefings"]:
                 section_title += " Project Documentation"
+                if Path(rst_dir, section_name, "index.html").exists():
+                    file_links[section_name] = UrlLink(name=section_title, url=f"rst/{section_name}/")
             project_names.append(section_name)
 
         for f in files:
@@ -447,7 +568,63 @@ def gen_release_index(tag: str, is_latest=False):
         section_data[section_name] = SectionData(name=section_name, title=section_title,
                                                  files=file_links)
 
+    #
+    # Now, iterate over the RST projects and add those that have
+    # not already been handled in the "Projects" section above.
+    # Much code duplication: a refactoring is probably called for.
+    #
+    # This has to be done outside the above "for" loop, because
+    # changing the value of "section_name" while in the middle of
+    # the loop is guaranteed to cause problems (duh!).  Luckily,
+    # there is no danger of overwriting previous settings of
+    # "section_data[section_name]" because, if we are adding RST
+    # URLs here, these are projects not previously seen/processed.
+    #
+    for proj in rst_projects:
+        file_links = dict()  # type: Dict[str, UrlLink]
+        section_name = proj
+        section_title = section_name.replace("_", " ").title()
+        if section_name.startswith("osp_"):
+            section_name = section_name[4:]  # remove osp_
+            if not section_name in section_data:
+                if section_name == "analog":
+                    section_title = "Analog OSP Documentation"
+                elif section_name == "e3xx":
+                    section_title = "E3xx OSP Documentation"
+                elif section_name == "plutosdr":
+                    section_title = "PlutoSDR OSP Documentation"
+                elif section_name == "ettus":
+                    section_title = "Ettus OSP Documentation"
+                else:
+                    section_title = section_title[4:] + " OSP Documentation"
+                file_links[section_name] = UrlLink(name=section_title, url=f"rst/osp_{section_name}/")
+                project_names.append(section_name)
+                section_data[section_name] = SectionData(name=section_name, title=section_title,
+                                                         files=file_links)
+        elif section_name.startswith("comp_"):
+            section_name = section_name[5:]  # remove comp_
+            if not section_name in section_data:
+                if section_name == "sdr":
+                    section_title = "SDR Components Documentation"
+                else:
+                    section_title = section_title[4:] + " Components Documentation"
+                file_links[section_name] = UrlLink(name=section_title, url=f"rst/comp_{section_name}/")
+                project_names.append(section_name)
+                section_data[section_name] = SectionData(name=section_name, title=section_title,
+                                                         files=file_links)
+        elif not section_name in section_data:
+            section_title += " Project Documentation"
+            file_links[section_name] = UrlLink(name=section_title, url=f"rst/{section_name}/")
+            project_names.append(section_name)
+            section_data[section_name] = SectionData(name=section_name, title=section_title,
+                                                     files=file_links)
+
+    # The "project-section.html" Jinja template accomplishes the magic of
+    # replacing plain section titles with URLs having the same displayed
+    # text and pointing to the RST docs for that section (if present).
+
     # Render each section (main is rendered last)
+
     project_section = jinja_env.get_template("project-section.html")
     rendered_sections = dict()
     for data in section_data.values():
@@ -496,6 +673,23 @@ def download_osp(osp: str):
         # Force local branch to be "develop", which should
         # be the default branch (pointed to by HEAD) anyway.
         cmd = ["git", "clone", "--branch", "develop", f"https://gitlab.com/opencpi/osp/{osp}.git", osp_path]
+        logging.debug(f"Executing cmd: {cmd}")
+        subprocess.check_call(cmd)
+
+
+def download_comp(comp: str):
+    comp_path = OCPI_COMPDIR / comp
+    if comp_path.exists():
+        logging.info(f"Updating existing COMP {comp} located at {comp_path}")
+        cmd = ["git", "--git-dir", str(comp_path / ".git"), "fetch"]
+        logging.debug(f"Executing cmd: {cmd}")
+        subprocess.check_call(cmd)
+    else:
+        # We want the full repo as it will be used later when building each tagged release
+        logging.info(f"Downloading COMP {comp} to {comp_path}")
+        # Force local branch to be "develop", which should
+        # be the default branch (pointed to by HEAD) anyway.
+        cmd = ["git", "clone", "--branch", "develop", f"https://gitlab.com/opencpi/comp/{comp}.git", comp_path]
         logging.debug(f"Executing cmd: {cmd}")
         subprocess.check_call(cmd)
 
@@ -690,6 +884,7 @@ if __name__ == "__main__":
     else:
         args.repodir = default_repodir
     OCPI_OSPDIR = args.repodir / "projects" / "osps"
+    OCPI_COMPDIR = args.repodir / "projects"
 
     # Get list of tags and checked out branches
     GIT_TAGS = get_tags(args.repodir / ".git")

@@ -117,6 +117,10 @@ for f in $(find doc/ -type f -name '*.fodt'); do
   sed -i 's|\(>https://opencpi.gitlab.io/releases/\)[^/]*\(/docs/[^<]*<\)|\1'"$RELEASE"'\2|g' "$f"
 done
 
+# Fix the release in "tools/ocpidoc/ocpi_documentation/conf.py" (RST docs)
+echo "Updating ocpidoc conf.py for release $RELEASE"
+sed -i "s|\(OpenCPI Release:\)[^\"]*|\1 $RELEASE|" tools/ocpidoc/ocpi_documentation/conf.py
+
 # Fix the common release subtitle for tex docs
 echo "Updating tex docs for release $RELEASE"
 sed -i "s/\(ocpiversion{\)[^}]*/\1$RELEASE/" doc/av/tex/snippets/LaTeX_Header.tex
