@@ -142,7 +142,7 @@ begin
   #if CLOCK_FROM_MASTER
     #define SDPCLK clk
     -- delta cycle alert in some tools even though this is a verilog module
-    in2out_axi_clk: util.util.in2out port map(in_port => clk, out_port => axi_out.a.clk);
+      axi_out.a.clk <= clk;
   #else
     #define SDPCLK axi_in.a.clk
   #endif
