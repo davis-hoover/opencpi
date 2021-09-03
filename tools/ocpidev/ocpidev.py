@@ -66,7 +66,7 @@ def main():
 
     args = postprocess_args(args)
     verb = args.verb
-    noun = args.noun
+    noun = args.orig_noun = args.noun
     kwargs = {}
 
     do_ocpidev_sh = True
@@ -85,6 +85,8 @@ def main():
                 noun = args.noun
         if noun == 'libraries':
             kwargs['init_libs_col'] = True
+            kwargs["verbose"] = args.verbose
+            kwargs["orig_noun"] = args.orig_noun
             #TODO: This check will be redundant when falling back to bash is
             # removed and this check can be removed at the same time
             if dirtype != 'libraries':
@@ -262,7 +264,7 @@ def print_cmd(args, directory):
     If verbose, print message detailing command to be executed
     """
     if getattr(args, 'verbose', False):
-        simple_noun = args.noun.replace("-"," ")
+        simple_noun = args.orig_noun.replace("-"," ")
         msg = ' '.join([
             'Executing command "{} {}"'.format(args.verb, simple_noun), 
             'in directory: {}'.format(directory)

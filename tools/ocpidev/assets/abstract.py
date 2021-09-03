@@ -89,8 +89,7 @@ class Asset(metaclass=ABCMeta):
     @staticmethod
     def check_dirtype(dirtype, directory):
         """
-        checks that the directory passed in is of the type passed in and if not an exception is
-        thrown
+        Validate the directory and dirtype, otherwise raise an exception
         """
         if not os.path.isdir(directory):
             err_msg = 'location does not exist at: {}'.format(directory)
@@ -113,6 +112,8 @@ class Asset(metaclass=ABCMeta):
         path = Path(self.directory)
         if path.name != self.name:
             path = Path(path, self.name)
+        if not type(noun) == str:
+            noun = self.__module__.split(".")[-1]
         if not force:
             prompt = 'Delete {} at: {}'.format(noun, str(path))
             force = ocpiutil.get_ok(prompt=prompt)
