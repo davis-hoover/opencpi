@@ -1,4 +1,4 @@
-.. platform_ad9361_spi HDL worker
+.. platform_ad9361_spi_csts HDL worker
 
 .. This file is protected by Copyright. Please refer to the COPYRIGHT file
    distributed with this source distribution.
@@ -20,11 +20,11 @@
 
 :orphan:
 
-.. _platform_ad9361_spi-HDL-worker:
+.. _platform_ad9361_spi_csts-HDL-worker:
 
 
-``platform_ad9361_spi`` HDL Worker
-==================================
+``platform_ad9361_spi_csts`` HDL Worker
+=======================================
 
 Detail
 ------

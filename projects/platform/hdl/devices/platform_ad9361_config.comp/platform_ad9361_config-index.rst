@@ -73,6 +73,10 @@ This component's specification is contained in the OpenCPI Worker Description (O
 
 Properties
 ~~~~~~~~~~
+
+.. note::
+   References to table numbers in this section correspond to table numbers in the `AD9361 Register Map Reference Manual <https://usermanual.wiki/Document/AD9361RegisterMapReferenceManualUG671.1082447504/view>`_.
+
 .. ocpi_documentation_properties::
 
    data_bus_index_direction: Set to ``1`` if the bus indexing the P0_D and P1_D was reversed before processing.

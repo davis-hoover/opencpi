@@ -1,4 +1,4 @@
-.. platform_ad9361_config_proxy RCC worker
+.. platform_ad9361_config_proxy_csts RCC worker
 
 .. This file is protected by Copyright. Please refer to the COPYRIGHT file
    distributed with this source distribution.
@@ -20,11 +20,11 @@
 
 :orphan:
 
-.. _platform_ad9361_config_proxy-RCC-worker:
+.. _platform_ad9361_config_proxy_csts-RCC-worker:
 
 
-``platform_ad9361_config_proxy`` RCC Worker
-===========================================
+``platform_ad9361_config_proxy_csts`` RCC Worker
+================================================
 
 Detail
 ------

@@ -18,7 +18,7 @@
    You should have received a copy of the GNU Lesser General Public License
    along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-OpenCPI platform project
+OpenCPI Platform Project
 ========================
 Built-in OpenCPI project that contains assets useful for OpenCPI
 platform development, including reference platforms and support for
@@ -62,5 +62,6 @@ Criteria for content to exist in this OpenCPI project is as follows:
    hdl/devices/devices
    specs/specs
    hdl/platforms/zed/doc/zed-gsg
+   hdl/platforms/picoevb/doc/picoevb-gsg
 ..    components/components
 ..    hdl/primitives/primitives
