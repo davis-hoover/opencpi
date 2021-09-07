@@ -376,7 +376,7 @@ if [ "$model" = RCC ]; then
     ./scripts/install-opencpi.sh ${minimal:+--minimal} ${nokernel:+--no-kernel} $platform_target_dir || exit 1
 else
     # Since the build-opencpi.sh does an "rcc" build per project, and that implicitly
-    # does "declarehdl" on projects, that is sufficient for on-demand hdl worker builds
+    # does "declare" on projects, that is sufficient for on-demand hdl worker builds
     if [ -n "$minimal" ]; then
       ocpidev -d projects/core build hdl primitives library --hdl-platform=$platform
       ocpidev -d projects/platform build hdl primitives library --hdl-platform=$platform

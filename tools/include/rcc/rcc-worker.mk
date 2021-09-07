@@ -143,6 +143,7 @@ $(foreach v,$(filter ExtraCompilerOptionsCC_%,$(.VARIABLES)),\
 	 $(eval RccExtraCompileOptionsCC_$p=$($v))))))
 # Prepare the parameters for compile-command-line injection into the worker compilation
 RccParams=\
+  '-DOCPI_PARAM_CONFIG()=$(ParamConfig)' \
   $(foreach n,$(WorkerParamNames),\
 	     '-DOCPI_PARAM_$n()=$(Param_$(ParamConfig)_$n)')
 

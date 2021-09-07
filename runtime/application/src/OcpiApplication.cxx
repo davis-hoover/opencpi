@@ -330,37 +330,6 @@ namespace OCPI {
       const OU::Assembly::Instance &ui = m_assembly.instance(instNum).m_utilInstance;
       if (slaves) {
 	if (!c.slaves) {
-#if 0
-	  // Find a slave assembly by selection expression
-	  // Fixme: initial properties?  else it depends on build configurations for no good reason?
-	  // finalizePropertyValues needs to be split do that the parsing can be done earlier
-	  // up to prepareinstanceproperties, stashed earlier by pointer and then moved to crew
-	  // any other need to do this early?
-	  // we already do it for choosing workers in library assembly
-	  // -- parse an initial value and compare it to a parameter value
-	  // both in selection expressions (which only accesss worker parameters)
-	  // could selection expressions for instances usefully use initial? not really
-	  // so we need to stash it in candidates, but only on demand.
-	  // when else would we need it?  We are selecting a slave assembly based on
-	  // initial properties that may not be parameters.  Could a worker have an acceptance
-	  // expression based on initial properties? another on-demand thing.
-	  do {
-	    const char *expr = ezxml_cattr(slaves, "selection");
-	    if (!expr || !expr[0])
-	      break; // no expression is acceptable
-	    OU::ExprValue val;
-	    const char *err = OU::evalExpression(expr, val, &c.impl->m_metadataImpl);
-	    if (err || !val.isNumber())
-	      ocpiBad("Error in slave assembly selection expression \"%s\": %s",
-		      expr, err ? err : "expression value is not a number");
-	    else if (val.getNumber() > 0)
-	      break;
-	  } while ((slaves = ezxml_cnext(slaves)));
-	  if (!slaves) {
-	    ocpiInfo("No slave assembly found with accepted selection expression");
-	    return false;
-	  }
-#endif
 	  // Do this work one time for this candidate of this instance, which caches this work so that it can
 	  // be applied each time this candidate is considered for deployment
 	  ocpiInfo("++++++++++++ Starting one-time processing of slave assembly for instance %u candidate %p",
@@ -533,7 +502,7 @@ namespace OCPI {
       const OU::Port *port = c.impl->m_metadataImpl.ports(nPorts);
       for (unsigned nn = 0; nn < nPorts; ++port, ++nn) { // for each candidate port
         OU::Assembly::Port *ap = m_assembly.assyPort(instNum, nn);
-	if (!ap) // port not connected in app
+	if (!ap || ap->m_connections.empty()) // port not connected in app
 	  continue;
 	// For connections to this port (presumably with different indices)
 	for (auto ci = ap->m_connections.begin(); ci != ap->m_connections.end(); ++ci) {
@@ -1293,14 +1262,14 @@ it is really per actual worker config...
                       impl.m_staticInstance ? "/" : "",
                       impl.m_staticInstance ? ezxml_cattr(impl.m_staticInstance, "name") : "",
                       impl.m_artifact.name().c_str(), tbuf);
-              const OU::Port *p;
-              for (unsigned nn = 0; (p = getMetaPort(nn)); nn++) {
-                if (nn == 0)
-                  fprintf(stderr, "External ports:\n");
-                fprintf(stderr, " %u: application port \"%s\" is %s\n", nn,
-                        p->OU::Port::m_name.c_str(), p->m_provider ? "input" : "output");
-              }
-            }
+	    }
+	  const OU::Port *p;
+	  for (unsigned nn = 0; (p = getMetaPort(nn)); nn++) {
+	    if (nn == 0)
+	      fprintf(stderr, "External ports:\n");
+	    fprintf(stderr, " %u: application port \"%s\" is %s\n", nn,
+		    p->OU::Port::m_name.c_str(), p->m_provider ? "input" : "output");
+	  }
         }
       } catch (...) {
         clear();

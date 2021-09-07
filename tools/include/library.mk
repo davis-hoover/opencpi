@@ -40,15 +40,17 @@ generate:
 
 # declare all HDL workers in the library
 # suppress all targets, mostly for printing what is going on
-ifneq ($(filter declarehdl,$(MAKECMDGOALS)),)
+ifneq ($(filter declare,$(MAKECMDGOALS)),)
   MAKEOVERRIDES+=HdlPlatforms= HdlPlatform= HdlTargets= HdlTarget=
   override HdlPlatforms=
   override HdlPlatform=
   override HdlTargets=
   override HdlTarget=
 endif
-declarehdl:
+declare:
 	$(call BuildModel,hdl,declare)
+	$(call BuildModel,ocl,declare)
+	$(call BuildModel,rcc,declare)
 
 ifdef ShellLibraryVars
 showlib:

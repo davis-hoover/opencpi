@@ -19,6 +19,7 @@
 definitions for utility functions that have to do with the filesystem
 """
 
+import sys
 import subprocess
 import os
 import os.path

@@ -574,39 +574,36 @@ emitPortSignals(FILE *f, const InstancePort &ip, Language /*lang*/, const char *
   std::string mName, sName;
   std::array<std::string,4> pmaps;
   bool inputDone = false, outputDone = false;
-  if (ip.m_attachments.size() == 0) {
-    doPrev(f, last, comment, myComment);
-    mName = sName = "open";
+  if (ip.m_attachments.size() == 0)
     emitPortAttachment(&pmaps[0], any, indent, NULL, NULL, mName, sName, 0, inputDone, outputDone);
-    any = true;
-    return;
-  }
-  // VHDL has a big problem with port maps with indexed formals.
-  // They *must* be index-contiguous according to the LRM (seems truly idiotic...)
-  // So we must sort the attachments by index, and then
-  // keep the inputs and outputs separate and not interleaved.
-  // And since SDP has separate data signals we need to de-interleave all 4 port mappings. UGH
-  struct {
-    bool operator()(Attachment *a, Attachment *b) const { return a->m_index < b->m_index; }
-  } customless;
-  std::sort(ip.m_attachments.begin(), ip.m_attachments.end(), customless);
+  else {
+    // VHDL has a big problem with port maps with indexed formals.
+    // They *must* be index-contiguous according to the LRM (seems truly idiotic...)
+    // So we must sort the attachments by index, and then
+    // keep the inputs and outputs separate and not interleaved.
+    // And since SDP has separate data signals we need to de-interleave all 4 port mappings. UGH
+    struct {
+      bool operator()(Attachment *a, Attachment *b) const { return a->m_index < b->m_index; }
+    } customless;
+    std::sort(ip.m_attachments.begin(), ip.m_attachments.end(), customless);
 
-  for (auto ait = ip.m_attachments.begin(); ait != ip.m_attachments.end(); ++ait) {
-    Attachment &at = **ait;
-    assert(at.m_instPort.m_port == this);
-    Attachment *otherAt = NULL;
-    Connection &c = at.m_connection;
-    // We need to know the indexing of the other attachment
-    for (AttachmentsIter ai = c.m_attachments.begin(); ai != c.m_attachments.end(); ai++)
-      if (*ai != &at) {
-	otherAt = *ai;
-	break;
-      }
-    assert(otherAt);
-    OU::format(mName, c.m_masterName.c_str(), "");
-    OU::format(sName, c.m_slaveName.c_str(), "");
-    emitPortAttachment(&pmaps[0], any, indent, &at, otherAt, mName, sName, c.m_count, inputDone,
-		       outputDone);
+    for (auto ait = ip.m_attachments.begin(); ait != ip.m_attachments.end(); ++ait) {
+      Attachment &at = **ait;
+      assert(at.m_instPort.m_port == this);
+      Attachment *otherAt = NULL;
+      Connection &c = at.m_connection;
+      // We need to know the indexing of the other attachment
+      for (AttachmentsIter ai = c.m_attachments.begin(); ai != c.m_attachments.end(); ai++)
+	if (*ai != &at) {
+	  otherAt = *ai;
+	  break;
+	}
+      assert(otherAt);
+      OU::format(mName, c.m_masterName.c_str(), "");
+      OU::format(sName, c.m_slaveName.c_str(), "");
+      emitPortAttachment(&pmaps[0], any, indent, &at, otherAt, mName, sName, c.m_count, inputDone,
+			 outputDone);
+    }
   }
   // close off previous port's signals
   doPrev(f, last, comment, myComment);
@@ -627,13 +624,13 @@ emitPortSignals(FILE *f, const InstancePort &ip, Language /*lang*/, const char *
 void Port::
 emitPortSignal(std::string *pmaps, bool /*any*/, const char *indent, const std::string &fName,
 	       const std::string &aName, const std::string &fIndex, const std::string &aIndex,
-	       size_t /*count*/, bool /*output*/, const Port */*signalPort*/, bool /*external*/) {
+	       size_t /*count*/, bool output, const Port */*signalPort*/, bool /*external*/) {
   if (pmaps->size())
     OU::formatAdd(*pmaps, ",\n%s", indent);  
   OU::formatAdd(*pmaps, "%s%s => ", fName.c_str(), fIndex.c_str());
   if (aName.empty()) {
-    const char *missing = m_master ? slaveMissing() : masterMissing();
-    if (isArray())
+    const char *missing = output ? "open" : m_master ? slaveMissing() : masterMissing();
+    if (isArray() && !output)
       OU::formatAdd(*pmaps, "(others => %s)", missing);
     else
       OU::formatAdd(*pmaps, "%s", missing);

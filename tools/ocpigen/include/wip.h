@@ -395,11 +395,6 @@ class Worker : public OU::Worker {
   size_t m_defaultDataWidth;        // SIZE_MAX means not set
   Language m_language;
   ::Assembly *m_assembly;
-  std::list<std::pair<std::string, ::Assembly *>> m_slaveAssemblies; // string is selection expression
-  // map of slave worker objects mapped by a string of the name of the slave either from name
-  // attribute or auto generated
-  std::list<std::pair<std::string, Worker*>> m_slaves; // maintain order
-  std::unordered_set<std::string> m_slaveNames; // for duplicate checking
   HdlDevice *m_emulate;
   Worker *m_emulator;               // for test only, the emulator of this worker
   Signals m_signals;
@@ -512,6 +507,10 @@ class Worker : public OU::Worker {
     *addParamConfigSuffix(std::string &s),
     //    *getParamConfig(const char *id, const ParamConfig *&config),
     *emitImplRCC(),
+    *emitImplSlaves(FILE *f),
+    *emitImplSlavesConfig(FILE *f, unsigned pc),
+    *emitImplSlaveTypes(FILE *f),
+    *emitImplSlaveTypesConfig(FILE *f, unsigned pc),
     *rccMethodName(const char *method, const char *&mName),
     *emitImplOCL(),
     *emitEntryPointOCL(),

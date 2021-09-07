@@ -20,13 +20,18 @@ library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.types.all;
 library util, protocol, misc_prims;
 architecture rtl of worker is
-  signal in_opcode :
+  -- these signals are fed to the demarshaller, but are modified to drop irrelevant opcodes
+  signal in_in_opcode :
       protocol.complex_short_with_metadata.opcode_t :=
       protocol.complex_short_with_metadata.SAMPLES;
+  signal in_in_ready : bool_t;
+  signal in_in_valid : bool_t;
+  signal in_out_take : bool_t;
   signal in_demarshaller_oprotocol :
       protocol.complex_short_with_metadata.protocol_t :=
       protocol.complex_short_with_metadata.PROTOCOL_ZERO;
   signal in_demarshaller_oeof : std_logic := '0';
+  signal in_demarshaller_ordy : std_logic;
   signal oprotocol : protocol.iqstream.protocol_t :=
                      protocol.iqstream.PROTOCOL_ZERO;
   signal out_marshaller_irdy  : std_logic := '0';
@@ -36,7 +41,7 @@ architecture rtl of worker is
   signal out_rst_detected : std_logic := '0';
 begin
 
-  in_opcode <=
+  in_in_opcode <=
     protocol.complex_short_with_metadata.SAMPLES        when
     in_in.opcode = ComplexShortWithMetadata_samples_op_e        else
     protocol.complex_short_with_metadata.TIME_TIME      when
@@ -51,6 +56,9 @@ begin
     in_in.opcode = ComplexShortWithMetadata_end_of_samples_op_e else
     protocol.complex_short_with_metadata.SAMPLES;
 
+  in_in_valid <= to_bool(in_in.valid and in_in.opcode = ComplexShortWithMetadata_samples_op_e);
+  in_in_ready <= to_bool(in_in.ready and in_in.opcode = ComplexShortWithMetadata_samples_op_e);
+  in_out.take <= in_in.ready when in_in.opcode /= ComplexShortWithMetadata_samples_op_e else in_out_take;
   in_demarshaller : protocol.complex_short_with_metadata.complex_short_with_metadata_demarshaller
     generic map(
       WSI_DATA_WIDTH => in_in.data'length)
@@ -59,13 +67,13 @@ begin
       rst          => in_in.reset,
       -- INPUT
       idata        => in_in.data,
-      ivalid       => in_in.valid,
-      iready       => in_in.ready,
+      ivalid       => in_in_valid,
+      iready       => in_in_ready,
       isom         => in_in.som,
       ieom         => in_in.eom,
-      iopcode      => in_opcode,
+      iopcode      => in_in_opcode,
       ieof         => in_in.eof,
-      itake        => in_out.take,
+      itake        => in_out_take,
       -- OUTPUT
       oprotocol    => in_demarshaller_oprotocol,
       oeof         => in_demarshaller_oeof,

@@ -84,8 +84,7 @@ ifneq ($(MAKECMDGOALS),clean)
          ComponentLibrariesInternal="$(call OcpiAdjustLibraries,$(ComponentLibraries))" \
          XmlIncludeDirsInternal="$(call AdjustRelative,$(XmlIncludeDirsInternal))" \
          HdlPlatforms="$(HdlPlatforms)" HdlPlatform="$(HdlPlatform)" \
-         HdlTargets="$(HdlTargets)" HdlTarget="$(HdlTarget)" \
-           $(if $(filter declare,$(MAKECMDGOALS)),declarehdl,$(MAKECMDGOALS)) 1>&2 && \
+         HdlTargets="$(HdlTargets)" HdlTarget="$(HdlTarget)" $(MAKECMDGOALS) 1>&2 && \
          mkdir -p lib 1>&2 && rm -f lib/devices && ln -s ../devices/lib lib/devices 1>&2 || \
 	 RET=1; \
        echo ======= Exiting the \"devices\" library for the \"$(Worker)\" platform. 1>&2; \

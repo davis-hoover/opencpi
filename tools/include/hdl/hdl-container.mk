@@ -130,7 +130,7 @@ override ComponentLibraries:=$(call Unique,\
        $(foreach l,$(ComponentLibraries_$(Platform)),\
          $(if $(filter /%,$l),$l,$d$l)))\
       $(foreach pp,$(call HdlProjectDepsFromPlatformDir,$p),\
-        $(foreach dd,$(realpath $(OCPI_PROJECT_REL_DIR)/imports)/$(pp),$(info HH:$(dd))\
+        $(foreach dd,$(realpath $(OCPI_PROJECT_REL_DIR)/imports)/$(pp),\
           $(wildcard $(dd)/exports/lib/devices $(dd)/exports/lib/cards))))\
    devices cards)
 override LibDir=$(HdlAssembly)/lib/hdl
