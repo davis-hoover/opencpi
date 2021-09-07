@@ -912,16 +912,30 @@ namespace OCPI {
 	  str.resize(str.size() - 1);
 	in = str;
       }
-      // Hoist children if testValue is true, return next to process
+      // Hoist children if testValue is true
       static void hoist(bool testValue, ezxml_t node, ezxml_t parent) {
+        ocpiDebug("BEFORE HOIST:\n%s", ezxml_toxml(parent));
+	ezxml_t node_next = node->ordered;
 	ezxml_cut(node); // remove the <if> in all cases
+        ocpiDebug("AFTER CUT:\n%s", ezxml_toxml(parent));
 	if (testValue) {
+	  // insert hoisted node's char content into parent's
+	  size_t node_len = strlen(node->txt);
+	  char *txt = (char*)malloc(node->off + node_len + strlen(parent->txt + node->off) + 1);
+	  strncpy(txt, parent->txt, node->off);
+	  strcpy(txt + node->off, node->txt);
+	  strcpy(txt + node->off + node_len, parent->txt + node->off);
+	  ezxml_set_txt(parent, txt);
+	  ezxml_set_flag(parent, EZXML_TXTM);
 	  ezxml_t next;
+	  for (next = node_next; next; next = next->ordered)
+	    next->off += node_len;
 	  for (ezxml_t x = node->child; x; x = next) {
 	    next = x->ordered;
 	    ezxml_cut(x);
 	    ezxml_insert(x, parent, node->off + x->off);
 	  }
+	  ocpiDebug("AFTER INSERTIONS:\n%s", ezxml_toxml(parent));
 	}
 	ezxml_free(node);
       }
@@ -944,7 +958,7 @@ namespace OCPI {
 	    // We need to look-ahead for an else.
 	    hoist(testValue, xml, parent);
 	    if (next && !strcasecmp(next->name, "else")) {
-	      if (!xml->child)
+	      if (!next->child)
 		return "empty \"else\" element with no child elements";
 	      if ((err = checkAttrs(next, NULL)))
 		return err;

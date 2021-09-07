@@ -2224,7 +2224,7 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
           unsigned ucp = 0;
           for (uint32_t nn = 0; nn < cases[n]->m_ports.size(); nn++) {
             if (cases[n]->m_ports[nn].m_testOptional == true){
-              bitmask = bitmask|(1 << nn);
+              bitmask = bitmask|(1u << nn);
               ucPortNames += cases[n]->m_ports[nn].m_port->pname() + std::string("_");
               unconnected = "_op_" + ucPortNames;
               ucp++;

@@ -363,11 +363,11 @@ namespace OCPI {
 	      auto &conn = **ci;
 	      if (!conn.m_externals.empty()) // no checking for externals
 		continue;
-	      auto &other = conn.m_ports.front().first == ap ?
-		*conn.m_ports.back().first : *conn.m_ports.front().first;
 // this check cannot be made this early since it can be invalidated by slave assembly port delegation
 // but this error will simply be caught later.
 #if 0
+	      auto &other = conn.m_ports.front().first == ap ?
+		*conn.m_ports.back().first : *conn.m_ports.front().first;
 	      // Now check that the port connected in the assembly has the same
 	      // name as the port connected in the artifact for a later instance,
 	      // since null-named ports are resolved as each instance is processed

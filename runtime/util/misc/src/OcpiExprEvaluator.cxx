@@ -382,9 +382,9 @@ reduce(ExprToken *start, ExprToken *&end, bool parens) {
       }
       break;
     case OpNot:
-      b = t->value.m_isString ? t->value.m_string.size() != 0 : t->value.m_number != 0;
+      //b = t->value.m_isString ? t->value.m_string.size() != 0 : t->value.m_number != 0;
       t[-1].op = OpConstant;
-      t[-1].value.m_number = b ? 1 : 0;
+      t[-1].value.m_number = t->value.getBool() ? 0 : 1;
       t[-1].value.m_isString = false;
       break;
     case OpUPlus: // not useful for anything
@@ -610,7 +610,8 @@ parse(const char *buf, const char *end, ExprToken *&tokens, const IdentResolver 
       if (t == tokens || t[-1].op < OpEnd)
 	return esprintf("binary operator \"%s\" with no value on left side",
 			opNames[t->op]);
-      if (t > (lpar ? lpar : tokens) + 2 && t->op <= t[-2].op)
+      // previous op might be unary
+      if (t >= (lpar ? lpar : tokens) + 2 && t->op <= t[-2].op)
 	if ((err = reduce(lpar ? lpar + 1 : tokens, t)))
 	  return err;
     }

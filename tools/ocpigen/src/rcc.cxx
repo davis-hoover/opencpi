@@ -37,6 +37,8 @@ namespace OF = OCPI::OS::FileSystem;
 #define RCC_C_IMPL "_Worker"
 #define RCC_CC_HEADER ".hh"
 #define RCC_CC_IMPL "-worker"
+#define RCC_CC_SLAVES "-slaves"
+#define RCC_CC_SLAVETYPES "-slavetypes"
 #define RCCMAP "_map"
 
 static char *
@@ -641,18 +643,278 @@ emitRccArgTypes(FILE *f, bool &first) {
 }
 
 /*
+ * Emit slave-related namespaced type definitions, *WHICH IS PARAMETER DEPENDENT*.
+ * Since this can be a large amount of generation, we put it in a separate file.
+ */
+const char *Worker::
+emitImplSlaveTypes(FILE *parent) {
+  fprintf(parent,
+          "// This worker is a proxy with slaves, so include the slave types definitions file.\n"
+          "#include \"%s%s%s\"\n\n",
+          m_implName, RCC_CC_SLAVETYPES, RCC_CC_HEADER);
+  FILE *f;
+  const char *err;
+  if (!(err = openOutput(m_fileName.c_str(), m_outDir, "", RCC_CC_SLAVETYPES, RCC_CC_HEADER, NULL, f))) {
+    for (unsigned n = 0; n < m_paramConfigs.size(); ++n)
+      if (m_paramConfigs[n]) {
+	fprintf(f, "#if OCPI_PARAM_CONFIG() == %u\n", n);
+	if ((err = emitImplSlaveTypesConfig(f, n)))
+	  break;
+	fprintf(f, "#endif\n");
+      }
+    fclose(f);
+  }
+  return err;
+}
+/*
+ * Emit slave-related definitions, *WHICH IS PARAMETER DEPENDENT*.
+ * Since this can be a large amount of generation, we put it in a separate file.
+ */
+const char *Worker::
+emitImplSlaves(FILE *parent) {
+  fprintf(parent,
+          "// This worker is a proxy with slaves, so include the slave definitions file.\n"
+          "#include \"%s%s%s\"\n\n",
+          m_implName, RCC_CC_SLAVES, RCC_CC_HEADER);
+  FILE *f;
+  const char *err;
+  if (!(err = openOutput(m_fileName.c_str(), m_outDir, "", RCC_CC_SLAVES, RCC_CC_HEADER, NULL, f))) {
+    for (unsigned n = 0; n < m_paramConfigs.size(); ++n)
+      if (m_paramConfigs[n]) {
+	fprintf(f, "#if OCPI_PARAM_CONFIG() == %u\n", n);
+	if ((err = emitImplSlavesConfig(f, n)))
+	  break;
+	fprintf(f, "#endif\n");
+      }
+    fclose(f);
+  }
+  return err;
+}
+
+const char *Worker::
+emitImplSlaveTypesConfig(FILE *f, unsigned pc) {
+  ParamConfig &paramConfig = *m_paramConfigs[pc];
+  // save each slave's original base types and replace with rcc types for code gen here
+  for (auto it = paramConfig.m_slaves.begin(); it != paramConfig.m_slaves.end(); ++it) {
+    paramConfig.m_slaveBaseTypes.push_back((*it).second->m_baseTypes); // patch basetypes
+    (*it).second->m_baseTypes = rccTypes;
+
+    std::string curSlaveTypes;
+    (*it).second->emitCppTypesNamespace(f, curSlaveTypes, (*it).first);
+    fprintf(f, "}\n");
+    paramConfig.m_slaveTypes.push_back(curSlaveTypes); // remember types namespace for slave
+  }
+  return NULL;
+}
+
+const char *Worker::
+emitImplSlavesConfig(FILE *f, unsigned pc) {
+  unsigned int index = 0;
+  ParamConfig &paramConfig = *m_paramConfigs[pc];
+  // for each slave declare the slave class which extends RCCUserSlave and is named generically
+  // Slave1, Slave2 ... etc
+  for (auto it = paramConfig.m_slaves.begin(); it != paramConfig.m_slaves.end(); ++it) {
+    const char *name = (*it).first.c_str();
+    // This worker is a proxy.  Give it access to each of its slaves
+    fprintf(f,
+	    "  /*\n"
+	    "   * This class defines the properties of a slave for convenient access.\n"
+	    "   */\n"
+	    "  class Slave%u : public OCPI::RCC::RCCUserSlave {\n"
+	    "  private:\n"
+	    "    std::string dont_care_temp;\n"
+	    "  public:\n"
+	    "    Slave%u(): RCCUserSlave(%u){/* Default constructor */}\n",
+	    index+1, index+1, index);
+    for (auto prop_it = (*it).second->m_ctl.properties.begin();
+	 prop_it != (*it).second->m_ctl.properties.end(); ++prop_it) {
+      OU::Property &p = **prop_it;
+      std::string cast, type, pretty;
+      // This is the bare minimum for enum types and base types.
+      // FIXME: more types
+      if (p.m_baseType == OA::OCPI_Enum) {
+	if (!strcasecmp(p.m_name.c_str(), "ocpi_endian")) {
+	  type = "OCPI::RCC::RCCEndian";
+	} else
+	  OU::format(type, "%s::%c%s", paramConfig.m_slaveTypes[index].c_str(), toupper(p.m_name.c_str()[0]),
+		     p.m_name.c_str() + 1);
+	pretty = "ULong";
+	OU::format(cast, "(%s)", type.c_str());
+      } else {
+	type = cctypes[p.m_baseType];
+	pretty = ccpretty[p.m_baseType];
+      }
+      std::vector<std::string> offsets(p.m_arrayRank);
+      if (p.m_arrayRank) {
+	size_t n = p.m_arrayRank - 1;
+	offsets[n] = "1";
+	while (n > 0) {
+	  std::string dimExpr;
+	  rccEmitDimension(p.m_arrayDimensions[n], p.m_arrayDimensionsExprs[n], "()", dimExpr);
+	  offsets[n-1] = offsets[n] + "*" + dimExpr;
+	  n--;
+	}
+      }
+      if (p.m_baseType == OA::OCPI_String)
+	fprintf(f, "    inline size_t getLength_%s() { return %zu; }\n", p.m_name.c_str(),
+		p.m_stringLength);
+      std::string dims, offset;
+      const char *comma = "";
+      for (unsigned n = 0; n < p.m_arrayRank; n++)
+	OU::formatAdd(dims, "%sunsigned idx%u", n ? ", " : "", n);
+      if (p.m_arrayRank) {
+	for (unsigned n = 0; n < p.m_arrayRank; n++)
+	  OU::formatAdd(offset, "%sidx%u*%s", n ? " + " : "", n, offsets[n].c_str());
+	comma = ", ";
+      } else
+	offset = ", 0";
+      if (!p.m_isPadding) {
+	// always expose the string based interface to the property
+	fprintf(f,
+		"    inline const char *getProperty_%s(std::string &val,\n"
+		"                                      OCPI::API::AccessList &list = "
+		"OCPI::API::emptyList,\n"
+		"                                      OCPI::API::PropertyOptionList &options = "
+		"OCPI::API::noPropertyOptions,\n"
+		"                                      OCPI::API::PropertyAttributes *attrs = "
+		"NULL) {\n"
+		"      checkSlave(\"%s\");\n"
+		"      // get the string value of the property based on the ordinal\n"
+		"      m_worker->getProperty(%uu, val, list, options, attrs);\n"
+		"      return val.c_str();\n"
+		"    }\n",
+		p.cname(), name, p.m_ordinal);
+	// expose the faster/typed non-string based interface if it exists
+	if (p.m_baseType == OA::OCPI_String && !p.m_isSequence)
+	  fprintf(f,
+		  "    inline char *get_%s(%s%schar *buf, size_t length) {\n"
+		  "      checkSlave(\"%s\");\n"
+		  "      m_worker->get%s%s(%uu, buf, length%s%s);\n"
+		  "      return buf;\n"
+		  "    }\n"
+		  "    std::string &get_%s(%s%sstd::string &s) {\n"
+		  "      checkSlave(\"%s\");\n"
+		  "      size_t len = getLength_%s() + 1;\n"
+		  "      char *buf = new char[len];\n"
+		  "      m_worker->get%s%s(%uu, buf, len%s%s);\n"
+		  "      s = buf;\n"
+		  "      delete [] buf;\n"
+		  "      return s;\n"
+		  "   }\n",
+		  p.m_name.c_str(), dims.c_str(), comma, name, pretty.c_str(),
+		  p.m_isParameter ? "Parameter" : "PropertyOrd", p.m_ordinal, comma,
+		  offset.c_str(), p.m_name.c_str(), dims.c_str(), comma, name, p.m_name.c_str(),
+		  pretty.c_str(), p.m_isParameter ? "Parameter" : "PropertyOrd", p.m_ordinal,
+		  comma, offset.c_str());
+	else if (p.m_baseType != OA::OCPI_Struct && !p.m_isSequence)
+	  fprintf(f,
+		  "    inline %s get_%s(%s) {\n"
+		  "      checkSlave(\"%s\");\n"
+		  "      return %sm_worker->get%s%s(%u%s%s);\n"
+		  "    }\n",
+		  type.c_str(), p.m_name.c_str(), dims.c_str(), name,
+		  cast.c_str(),  // if val needs to be cast in the case of an enum
+		  pretty.c_str(), p.m_isParameter ? "Parameter" : "PropertyOrd", p.m_ordinal,
+		  comma, offset.c_str());
+      }
+      if (p.m_isWritable) {
+	// always expose the string interface to the property
+	fprintf(f,
+		"    inline void setProperty_%s(const char* val, OCPI::API::AccessList &list "
+		"= OCPI::API::emptyList) {\n"
+		"      checkSlave(\"%s\");\n"
+		"      m_worker->setProperty(\"%s\", val, list);\n",
+		p.cname(), name, p.cname());
+	fprintf(f,
+		"#if !defined(NDEBUG)\n"
+		"      debugLog(\"Setting slave.setProperty_%s",
+		p.cname());
+	fprintf(f,
+		": %%p\", val);\n");
+	fprintf(f,
+		"#endif\n"
+		"    }\n"
+		"    inline void setProperty_%s(const std::string &val, OCPI::API::AccessList "
+		"&list  = OCPI::API::emptyList) {\n"
+		"      setProperty_%s(val.c_str(), list);\n"
+		"    }\n",
+		p.cname(), p.cname());
+	// expose the faster/typed non-string based interface to the property
+	if (p.m_baseType != OA::OCPI_Struct && !p.m_isSequence) {
+	  fprintf(f,
+		  "    inline void set_%s(%s%s%s val) {\n"
+		  "      checkSlave(\"%s\");\n",
+		  p.m_name.c_str(), dims.c_str(), comma, type.c_str(), name);
+	  if (p.m_arrayRank) {
+	    fprintf(f,
+		    "      unsigned idx = %s;\n"
+		    "      m_worker->set%sPropertyOrd(%u, %sval, idx);\n",
+		    offset.c_str(), pretty.c_str(), p.m_ordinal,
+		    cast.c_str());  // if val needs to be cast in the case of an enum
+	  } else
+	    fprintf(f,
+		    "      m_worker->set%sPropertyOrd(%u, %sval, 0);\n",
+		    pretty.c_str(), p.m_ordinal,
+		    cast.c_str());  // if val needs to be cast in the case of an enum
+	  fprintf(f,
+		  "#if !defined(NDEBUG)\n"
+		  "      debugLog(\"Setting slave.set_%s",
+		  p.m_name.c_str());
+	  if (p.m_arrayRank && p.m_baseType != OA::OCPI_Struct)
+	    fprintf(f,
+		    " at index %%u(0x%%x): 0x%%llx\", idx, idx, (unsigned long long)val);\n");
+	  else
+	    fprintf(f,
+		    ": 0x%%llx\", (unsigned long long)val);\n");
+	  fprintf(f,
+		  "#endif\n"
+		  "    }\n");
+	}
+	if (p.m_baseType == OA::OCPI_String && !p.m_isSequence)
+	  fprintf(f,
+		  "    inline void set_%s(%s%sconst std::string &val) {\n"
+		  "      checkSlave(\"%s\");\n"
+		  "      m_worker->setStringPropertyOrd(%u, val.c_str()%s%s);\n"
+		  "    }\n",
+		  p.m_name.c_str(), dims.c_str(), comma, name, p.m_ordinal, comma, offset.c_str());
+      }
+    } // for iterate over m_ctl.properties
+    fprintf(f,
+	    "  } slave%u;\n", index+1);
+    index++;
+  } // for iterate over m_slaves
+
+  // for backwards compatibility in old single slave interface
+  fprintf(f,
+	  "\n  Slave1& slave;\n"
+	  "  struct Slaves {\n");
+  index = 0;
+  // declare the slaves structure which will contain a reference to each of the proxies slaves
+  // by name.  This structure is how the Worker author will access the slaves.
+  for (auto it = paramConfig.m_slaves.begin(); it != paramConfig.m_slaves.end(); ++it, index++)
+    fprintf(f, "    Slave%u& %s;\n", index+1, (*it).first.c_str());
+  fprintf(f,
+	  "  } slaves;\n"
+	  "#define OCPI_SLAVE_MEMBER_INITIALIZERS slave(slave1), slaves({");
+  auto baseTypes_it = paramConfig.m_slaveBaseTypes.begin();
+  unsigned n = 1;
+  for (auto it = paramConfig.m_slaves.begin(); it != paramConfig.m_slaves.end();
+       ++it, ++baseTypes_it, ++n) {
+    auto &slave = *it;
+    slave.second->m_baseTypes = *baseTypes_it; // restore the original baseTypes for slaves
+    fprintf(f, "%sslave%u", n == 1 ? "" : ", ", n);
+  }
+  fprintf(f, "})\n");
+  return NULL;
+}
+
+/*
  * This Function creates the generated header file for the worker named workerName-worker.hh
  */
 const char *Worker::
 emitImplRCC() {
   const char *err;
   FILE *f;
-  std::vector<const char **> slaveBaseTypes;
-  // for each slave add its base types to the proxy's slaveBaseTypes variable
-  for (auto it = m_slaves.begin(); it != m_slaves.end(); ++it) {
-    slaveBaseTypes.push_back((*it).second->m_baseTypes);
-    (*it).second->m_baseTypes = rccTypes;
-  }
   if ((err = openOutput(m_fileName.c_str(), m_outDir, "",
                         m_language == C ? RCC_C_IMPL : RCC_CC_IMPL,
                         m_language == C ? RCC_C_HEADER : RCC_CC_HEADER, m_implName, f))) {
@@ -673,15 +935,12 @@ emitImplRCC() {
           m_implName, m_language == C ? "C" : "C++", upper, upper);
   if ( m_language == CC )
     fprintf(f, "#include <vector>\n" );
-  if (m_language == CC && !m_slaves.empty())
-    fprintf(f,
-            "#include <inttypes.h>\n"
-            "#include <OcpiApi.hh>\n"
-            "#include <OcpiOsDebugApi.hh>\n");
   const char *last;
   fprintf(f,
+          "#ifndef OCPI_WORKER_NAME\n"
 	  "#define OCPI_WORKER_NAME %s\n"
-	  "#define OCPI_WORKER_PREFIX %c%s\n",
+	  "#define OCPI_WORKER_PREFIX %c%s\n"
+	  "#endif\n",
 	  upper, toupper(m_implName[0]), m_implName+1);
   if (m_language == C) {
     unsigned in = 0, out = 0;
@@ -736,15 +995,9 @@ emitImplRCC() {
     }
   }
   if (m_language == CC) {
-    std::string myTypes, curSlaveTypes;
-    std::vector <std::string> slaveTypes;
-    // output the namespace for each of the slaves, this will include property structs and
-    // enum types
-    for (auto it = m_slaves.begin(); it != m_slaves.end(); ++it){
-      (*it).second->emitCppTypesNamespace(f, curSlaveTypes, (*it).first);
-      slaveTypes.push_back(curSlaveTypes);
-      fprintf(f, "}\n");
-    }
+    if (!m_paramConfig->m_slaves.empty() && (err = emitImplSlaveTypes(f)))
+      return err;
+    std::string myTypes;
     emitCppTypesNamespace(f, myTypes);
     std::string s;
     camel(s, m_implName, "WorkerBase", NULL);
@@ -763,213 +1016,18 @@ emitImplRCC() {
               "  unsigned getNearestNeighbor( unsigned next ) const;   // next=0 is nearest, next=1 next nearest etc.\n\n"
               );
     }
-
-    if (!m_slaves.empty()) {
-      unsigned int index = 0;
-      // for each slave declare the slave class which extends RCCUserSlave and is named generically
-      // Slave1, Slave2 ... etc
-      for (auto it = m_slaves.begin(); it != m_slaves.end(); ++it) {
-	const char *name = (*it).first.c_str();
-	// This worker is a proxy.  Give it access to each of its slaves
-        fprintf(f,
-                "  /*\n"
-                "   * This class defines the properties of a slave for convenient access.\n"
-                "   */\n"
-                "  class Slave%u : public OCPI::RCC::RCCUserSlave {\n"
-                "  private:\n"
-                "    std::string dont_care_temp;\n"
-                "  public:\n"
-                "    Slave%u(): RCCUserSlave(%u){/* Default constructor */}\n",
-                index+1, index+1, index);
-        for (auto prop_it = (*it).second->m_ctl.properties.begin();
-            prop_it != (*it).second->m_ctl.properties.end(); ++prop_it) {
-          OU::Property &p = **prop_it;
-          std::string cast, type, pretty;
-          // This is the bare minimum for enum types and base types.
-          // FIXME: more types
-          if (p.m_baseType == OA::OCPI_Enum) {
-            if (!strcasecmp(p.m_name.c_str(), "ocpi_endian")) {
-              type = "OCPI::RCC::RCCEndian";
-            } else
-              OU::format(type, "%s::%c%s", slaveTypes[index].c_str(), toupper(p.m_name.c_str()[0]),
-                         p.m_name.c_str() + 1);
-            pretty = "ULong";
-            OU::format(cast, "(%s)", type.c_str());
-          } else {
-            type = cctypes[p.m_baseType];
-            pretty = ccpretty[p.m_baseType];
-          }
-          std::vector<std::string> offsets(p.m_arrayRank);
-          if (p.m_arrayRank) {
-            size_t n = p.m_arrayRank - 1;
-            offsets[n] = "1";
-            while (n > 0) {
-              std::string dimExpr;
-              rccEmitDimension(p.m_arrayDimensions[n], p.m_arrayDimensionsExprs[n], "()", dimExpr);
-              offsets[n-1] = offsets[n] + "*" + dimExpr;
-              n--;
-            }
-          }
-          if (p.m_baseType == OA::OCPI_String)
-            fprintf(f, "    inline size_t getLength_%s() { return %zu; }\n", p.m_name.c_str(),
-                    p.m_stringLength);
-          std::string dims, offset;
-          const char *comma = "";
-          for (unsigned n = 0; n < p.m_arrayRank; n++)
-            OU::formatAdd(dims, "%sunsigned idx%u", n ? ", " : "", n);
-          if (p.m_arrayRank) {
-            for (unsigned n = 0; n < p.m_arrayRank; n++)
-              OU::formatAdd(offset, "%sidx%u*%s", n ? " + " : "", n, offsets[n].c_str());
-            comma = ", ";
-          } else
-            offset = ", 0";
-          if (!p.m_isPadding) {
-            // always expose the string based interface to the property
-            fprintf(f,
-                    "    inline const char *getProperty_%s(std::string &val,\n"
-		    "                                      OCPI::API::AccessList &list = "
-		    "OCPI::API::emptyList,\n"
-		    "                                      OCPI::API::PropertyOptionList &options = "
-		    "OCPI::API::noPropertyOptions,\n"
-		    "                                      OCPI::API::PropertyAttributes *attrs = "
-		    "NULL) {\n"
-                    "      checkSlave(\"%s\");\n"
-                    "      // get the string value of the property based on the ordinal\n"
-                    "      m_worker->getProperty(%uu, val, list, options, attrs);\n"
-                    "      return val.c_str();\n"
-                    "    }\n",
-                    p.cname(), name, p.m_ordinal);
-            // expose the faster/typed non-string based interface if it exists
-            if (p.m_baseType == OA::OCPI_String && !p.m_isSequence)
-              fprintf(f,
-                      "    inline char *get_%s(%s%schar *buf, size_t length) {\n"
-		      "      checkSlave(\"%s\");\n"
-                      "      m_worker->get%s%s(%uu, buf, length%s%s);\n"
-                      "      return buf;\n"
-                      "    }\n"
-                      "    std::string &get_%s(%s%sstd::string &s) {\n"
-                      "      checkSlave(\"%s\");\n"
-                      "      size_t len = getLength_%s() + 1;\n"
-                      "      char *buf = new char[len];\n"
-                      "      m_worker->get%s%s(%uu, buf, len%s%s);\n"
-                      "      s = buf;\n"
-                      "      delete [] buf;\n"
-                      "      return s;\n"
-                      "   }\n",
-                      p.m_name.c_str(), dims.c_str(), comma, name, pretty.c_str(),
-                      p.m_isParameter ? "Parameter" : "PropertyOrd", p.m_ordinal, comma,
-                      offset.c_str(), p.m_name.c_str(), dims.c_str(), comma, name, p.m_name.c_str(),
-                      pretty.c_str(), p.m_isParameter ? "Parameter" : "PropertyOrd", p.m_ordinal,
-                      comma, offset.c_str());
-            else if (p.m_baseType != OA::OCPI_Struct && !p.m_isSequence)
-              fprintf(f,
-                      "    inline %s get_%s(%s) {\n"
-		      "      checkSlave(\"%s\");\n"
-                      "      return %sm_worker->get%s%s(%u%s%s);\n"
-                      "    }\n",
-                      type.c_str(), p.m_name.c_str(), dims.c_str(), name,
-                      cast.c_str(),  // if val needs to be cast in the case of an enum
-                      pretty.c_str(), p.m_isParameter ? "Parameter" : "PropertyOrd", p.m_ordinal,
-                      comma, offset.c_str());
-          }
-          if (p.m_isWritable) {
-            // always expose the string interface to the property
-            fprintf(f,
-                    "    inline void setProperty_%s(const char* val, OCPI::API::AccessList &list "
-		    "= OCPI::API::emptyList) {\n"
-                    "      checkSlave(\"%s\");\n"
-                    "      m_worker->setProperty(\"%s\", val, list);\n",
-                    p.cname(), name, p.cname());
-            fprintf(f,
-                    "#if !defined(NDEBUG)\n"
-		    "      OCPI::OS::logPrint(OCPI_LOG_DEBUG, \"Setting slave.setProperty_%s",
-                    p.cname());
-            fprintf(f,
-		    ": %%p\", val);\n");
-            fprintf(f,
-                    "#endif\n"
-                    "    }\n"
-                    "    inline void setProperty_%s(const std::string &val, OCPI::API::AccessList "
-		    "&list  = OCPI::API::emptyList) {\n"
-                    "      setProperty_%s(val.c_str(), list);\n"
-                    "    }\n",
-		    p.cname(), p.cname());
-            // expose the faster/typed non-string based interface to the property
-            if (p.m_baseType != OA::OCPI_Struct && !p.m_isSequence) {
-              fprintf(f,
-                      "    inline void set_%s(%s%s%s val) {\n"
-		      "      checkSlave(\"%s\");\n",
-                      p.m_name.c_str(), dims.c_str(), comma, type.c_str(), name);
-              if (p.m_arrayRank) {
-                fprintf(f,
-                        "      unsigned idx = %s;\n"
-                        "      m_worker->set%sPropertyOrd(%u, %sval, idx);\n",
-                        offset.c_str(), pretty.c_str(), p.m_ordinal,
-                        cast.c_str());  // if val needs to be cast in the case of an enum
-              } else
-                fprintf(f,
-                        "      m_worker->set%sPropertyOrd(%u, %sval, 0);\n",
-                        pretty.c_str(), p.m_ordinal,
-                        cast.c_str());  // if val needs to be cast in the case of an enum
-              fprintf(f,
-                      "#if !defined(NDEBUG)\n"
-                      "      OCPI::OS::logPrint(OCPI_LOG_DEBUG, \"Setting slave.set_%s",
-                      p.m_name.c_str());
-              if (p.m_arrayRank && p.m_baseType != OA::OCPI_Struct)
-                fprintf(f,
-                        " at index %%u(0x%%x): 0x%%llx\", idx, idx, (unsigned long long)val);\n");
-              else
-                fprintf(f,
-                        ": 0x%%llx\", (unsigned long long)val);\n");
-              fprintf(f,
-                      "#endif\n"
-                      "    }\n");
-            }
-            if (p.m_baseType == OA::OCPI_String && !p.m_isSequence)
-              fprintf(f,
-                      "    inline void set_%s(%s%sconst std::string &val) {\n"
-		      "      checkSlave(\"%s\");\n"
-                      "      m_worker->setStringPropertyOrd(%u, val.c_str()%s%s);\n"
-                      "    }\n",
-                      p.m_name.c_str(), dims.c_str(), comma, name, p.m_ordinal, comma, offset.c_str());
-          }
-        } // for iterate over m_ctl.properties
-        fprintf(f,
-                "  } slave%u;\n", index+1);
-        index++;
-      } // for iterate over m_slaves
-
-      // for backwards compatibility in old single slave interface
-      fprintf(f,
-              "\n  Slave1& slave;\n"
-              "  struct Slaves {\n");
-      index = 0;
-      // declare the slaves structure which will contain a reference to each of the proxies slaves
-      // by name.  This structure is how the Worker author will access the slaves.
-      for(auto it = m_slaves.begin(); it != m_slaves.end(); ++it, index++)
-      {
-        fprintf(f,
-                "    Slave%u& %s;\n", index+1, (*it).first.c_str());
-      }
-      fprintf(f,
-              "  } slaves;\n");
-
-    } // if slaves are not empty
+    // Note we assume that if the first paramconfig has slaves, they all do
+    if (m_paramConfig->m_slaves.empty())
+      fprintf(f, "%s()", s.c_str());
+    else if ((err = emitImplSlaves(f)))
+      return err;
+    else
+      fprintf(f, "%s(): OCPI_SLAVE_MEMBER_INITIALIZERS", s.c_str());
 
     bool notifiers = false, writeNotifiers = false, readNotifiers = false;
 
-    // create constructor must set up slaves variable if there are any slaves and declare
     // the memory space for properties if m_ctl.nRunProperties is true
-    fprintf(f, "%s()", s.c_str());
-    if (!m_slaves.empty()) {
-      fprintf(f, ": slave(slave1), slaves({");
-      for (unsigned int i = 1; i <= m_slaves.size(); i++) {
-        fprintf(f, "slave%u",i);
-        if(i+1 <= m_slaves.size())
-          fprintf(f, ", ");
-      }
-      fprintf(f, "}) ");
-    }
+    // Output any member initializations dictated by slaves
     fprintf(f, "{");
     if (m_ctl.nRunProperties){
       fprintf(f,"memset((void*)&m_properties, 0, sizeof(m_properties));");
@@ -1176,14 +1234,6 @@ emitImplRCC() {
   fprintf(f, "#define RCC_FILE_WORKER_ENTRY_%s %s%s\n", m_fileName.c_str(),
           m_language == C ? "" : "ocpi_", m_implName);
   fclose(f);
-  // for each slave assign the baseTypes variable parsed out at the beginning of the function into
-  // slaveBaseTypes
-  auto slave_it = m_slaves.begin();
-  auto baseTypes_it = slaveBaseTypes.begin();
-  for (; slave_it != m_slaves.end(); ++slave_it, ++baseTypes_it) {
-    (*slave_it).second->m_baseTypes = *baseTypes_it;
-
-  }
   return 0;
 }
 
@@ -1308,147 +1358,25 @@ emitSkelRCC() {
   return 0;
 }
 
-const char *Worker::
-addSlave(ezxml_t slave, const std::string &workerName, const std::string &slaveName) {
-  const char *err = NULL;
-  bool optional, hasIndex;
-  size_t index;
-  const char
-    *portName = ezxml_cattr(slave, "port"),
-    *slavePortName = ezxml_cattr(slave, "slave_port");
-  if ((err = OE::getBoolean(slave, "optional", &optional)) ||
-      (err = OE::getNumber(slave, "index", &index, &hasIndex)))
-    return err;
-  Port *port = NULL;
-  if (portName) {
-    if ((err = getPort(portName, port)))
-      return err;
-    if (!port->isData())
-      return OU::esprintf("Only data ports can be mapped to slave ports: \"%s\" is not a proxy data port",
-			  portName);
-    if (hasIndex) {
-      if (!port->isArray())
-	return OU::esprintf("Port \"%s\" is not an array port, so the index attribute is invalid",
-			    portName);
-      if (index >= port->count())
-	return OU::esprintf("Port \"%s\" is an array of %zu ports, so the index %zu is invalid",
-			    portName, port->count(), index);
-    }
-  } else if (slavePortName)
-    return OU::esprintf("A \"slave_port\" attribute is not valid without a \"port\" attribute for slave element");
-  const char *dot = strrchr(workerName.c_str(), '.');
-  // Here we try a shortcut to find the slave worker's XML even when it has not been built
-  // or the library has not been "generated".
-  std::string sw;
-  OU::format(sw, "../%s/%.*s.xml", workerName.c_str(), (int)(dot - workerName.c_str()), workerName.c_str());
-  if (!OF::exists(sw)) // make it findable in any generated/built library
-    OU::format(sw, "%s/%.*s.xml", dot + 1, (int)(dot - workerName.c_str()), workerName.c_str());
-  Worker *wkr = Worker::create(sw.c_str(), m_file, NULL, m_outDir, this, NULL, 0, err);
-  if (!wkr)
-    return OU::esprintf("for slave worker %s: %s", workerName.c_str(), err);
-  if (portName && !slavePortName) {
-    for (unsigned i = 0; i < m_ports.size(); i++)
-      if (m_ports[i]->isData() && m_ports[i]->isDataProducer() == port->isDataProducer()) {
-	if (slavePortName)
-	  return OU::esprintf("Slave port mapping is ambiguous.  More than one slave port is a %s\n",
-			      port->isDataProducer() ? "producer" : "consumer");
-	slavePortName = m_ports[i]->pname();
-      }
-    if (!slavePortName)
-      return OU::esprintf("No slave port found that is a %s port\n",
-			  port->isDataProducer() ? "producer" : "consumer");
-  }
-  Port *slavePort = NULL;
-  if (slavePortName) {
-    if ((err = wkr->getPort(slavePortName, slavePort)))
-      return err;
-    if (!slavePort->isData())
-      return OU::esprintf("Only data ports can be mapped to slave ports: \"%s\" is not a slave data port",
-			  slavePortName);
-    if (slavePort->isDataProducer() != port->isDataProducer())
-      return OU::esprintf("Slave port \"%s\" mapped to proxy port \"%s\" must have same producer/consumer role",
-			  slavePortName, portName);
-    slavePortName = slavePort->pname();
-  }
-  wkr->m_isSlave = true;
-  wkr->m_isOptional = optional;
-  wkr->m_slavePort = slavePort;
-  wkr->m_proxyPort = port;
-  if (hasIndex)
-    wkr->m_proxyPortIndex = index;
-  m_slaves.emplace_back(slaveName, wkr);
-  if (!m_slaveNames.insert(slaveName).second)
-    return OU::esprintf("Duplicate slave name: %s", slaveName.c_str());
-  return err;
-}
-
-std::string Worker::
-print_map() {
-  std::string ret_val;
-  for (auto it = m_slaves.begin(); it != m_slaves.end(); ++it) {
-    ret_val = ret_val + "m[" + (*it).first + "] = POINTER \n";
-  }
-  return ret_val;
-}
-
-// Add slaves in the form of an assembly of slaves, with connections and properties,
-// where external ports of the subassembly are delegated ports of the proxy
-// This assemnbly will essentially be added to the application when the proxy is
-// deployed for the application.
-const char* Worker::
-addSlaves(ezxml_t a_slaves) {
+const char *ParamConfig::
+addSlavesConfig(ezxml_t a_slaves) {
+  m_slavesString = ezxml_toxml(a_slaves);
+  m_slavesXml = ezxml_parse_str(m_slavesString, strlen(m_slavesString));
+  assert(m_slavesXml);
   const char *err;
-  static const char *instAttrs[] = {INST_ATTRS};
-#if 0
-  for (ezxml_t slaveAssy = a_slaves; slaveAssy; slaveAssy = ezxml_cnext(slaveAssy)) {
-    const char *expr = ezxml_cattr(slaveAssy, "selection");
-    auto *assy = new ::Assembly(*this);
-    m_slaveAsseembles.emplace_back(expr ? expr : "", assy);
-    if ((err = assy->parseAssy(slaveAssy, NULL, instAttrs)))
-      return err;
-    Instance *i = &assy->m_instances[0];
-    for (unsigned n = 0; n < assy->m_instances.size(); n++, i++) {
-      unsigned np = 0;
-      Port *slavePort = NULL, *port = NULL;
-      bool hasIndex = false;
-      size_t index = 0;
-      for (InstancePort *ip = &i->m_ports[0]; !port && np < i->m_worker->m_ports.size(); np++, ip++)
-	for (auto pit = ip->m_attachments.begin(); !port && pit != ip->m_attachments.end(); ++pit)
-	  if ((*pit)->m_connection.m_external) {
-	    port = (*pit)->m_connection.m_external->m_instPort.m_port; // proxy port
-	    slavePort = ip->m_port;
-	    hasIndex = (*pit)->m_connection.m_count != 0;
-	    index = (*pit)->m_index;
-	    break;
-	  }
-    }
-  }
-  /*
-    we can do a union of instance names, but we need to error check that instance with the same
-    name is the same worker, AND the same parameter values etc. (until a fix of prop exprs)
-    selection expressions are purely a runtime thing, but perhaps we could evaluate them against
-    default values so we know they are syntactically correct.
-    but connectity is more complicated.
-    so we need to have a per-assembly map
-    worker optionality is not in the XML, but it should be to avoid runtime processing.
-    perhaps preprocessing the union set of workers is the right thing too.
-    when instantiating worker
-    OOPS: slave property types with expressions based on parameters use the proxy's parameters values?
-    OOPS: slave properties do not use expr for string lengt
-    OOPS: other expr aspects of property types that affect slave access APIs?
-    can nuke m_isOptional, m_slavePort, m_proxyPortIndex
-    runtime:
-    need to map instances in each assembly to the slave ordinal (union) in the proxy.
-    otherwise runtime just chooses which one and does the same thing.
-    
-   */
-#else
-  m_assembly = new ::Assembly(*this);
-  if ((err = m_assembly->parseAssy(a_slaves, NULL, instAttrs)))
+  ocpiInfo("For config %zu, slave before conditional is:"
+	   "\n===Original:\n%s\n===Copy:\n%s",
+	   nConfig, ezxml_toxml(a_slaves), ezxml_toxml(m_slavesXml));
+  if ((err = OE::parseConditionals(m_slavesXml, *this)))
+    return OU::esprintf("Error processing conditional slave assembly: %s", err);
+  ocpiInfo("===After processing:\n%s", ezxml_toxml(m_slavesXml));
+  //cout << ezxml_toxml(m_xml);
+  m_slavesAssembly = new ::Assembly(m_worker);
+  static const char *instAttrs[] = {INST_ATTRS, "optional"};
+  if ((err = m_slavesAssembly->parseAssy(m_slavesXml, NULL, instAttrs)))
     return err;
-
-  Instance *i = &m_assembly->m_instances[0];
-  for (unsigned n = 0; n < m_assembly->m_instances.size(); n++, i++) {
+  Instance *i = &m_slavesAssembly->m_instances[0];
+  for (unsigned n = 0; n < m_slavesAssembly->m_instances.size(); n++, i++) {
     unsigned np = 0;
     Port *slavePort = NULL, *port = NULL;
     bool hasIndex = false;
@@ -1464,7 +1392,8 @@ addSlaves(ezxml_t a_slaves) {
 	}
     Worker &wkr = *i->m_worker;
     wkr.m_isSlave = true;
-    wkr.m_isOptional = false; // these are statically defined so they *will* exist
+    if ((err = OE::getBoolean(i->m_xml, "optional", &wkr.m_isOptional)))
+      return err;
     wkr.m_slavePort = slavePort; // an external connection to this port
     wkr.m_proxyPort = port;      // the proxy port
     if (hasIndex) // from connection
@@ -1473,9 +1402,9 @@ addSlaves(ezxml_t a_slaves) {
       return OU::esprintf("Duplicate slave name: %s", i->m_name.c_str());
     m_slaves.emplace_back(i->m_name, &wkr);
   }
-#endif
   return NULL;
 }
+
 /*
  * This function parses the xml for the slaves of the RCC worker (if there are any).
  * There are 2 ways to specify slaves the legacy way as a "slave" attribute at the top level worker
@@ -1503,43 +1432,44 @@ parseSlaves() {
   default:
     return OU::esprintf("Only one of slave-attribute, slave elements, or slaves element is allowed");
   }
-  if (attr)
-    return addSlave(NULL, l_slave, l_slave.substr(0, l_slave.find(".", 0)));
-  if (l_slaves)
-    return addSlaves(l_slaves);
-  std::map<std::string, unsigned int> wkr_num_map, wkr_idx_map;
-  // count how many workers of each type are slaves and put them in wkr_num_map this is used
-  // later in auto generating the names for the workers if needed
-  for (ezxml_t slave = ezxml_cchild(m_xml, "slave"); slave; slave = ezxml_cnext(slave)) {
-    if (!l_slave.empty())
-      return OU::esprintf("It is not valid to use both a \"slave\" attribute and \"slave\" "
-                          "elements. When using multiple slaves use \"slave\" elements");
-    std::string wkr;
-    if ((err = OE::checkAttrs(slave, "worker", "name", "optional", "port", "index", "slave_port", (void*)0)) ||
-	(err = OE::getRequiredString(slave, wkr, "worker", "slave")))
-      return err;
-    // increment the unsigned int associated with the wkr and if if dosen't exist this will be
-    // constructed as 0 and incremented to 1
-    ++wkr_num_map[wkr];
-    wkr_idx_map[wkr] = 0;
-  }
-  for (ezxml_t slave = ezxml_cchild(m_xml, "slave"); slave; slave = ezxml_cnext(slave)) {
-    std::string name, wkr = ezxml_cattr(slave, "worker");
-    OE::getOptionalString(slave, name, "name");
-    size_t dot = wkr.find_last_of('.');
-    if (dot == std::string::npos)
-      return OU::esprintf("slave worker: \"%s\" has no authoring model suffix", wkr.c_str());
-    // If we need to auto generate the name
-    if (name.empty()) {
-      unsigned int idx = wkr_idx_map[wkr]++;
-      name = wkr.substr(0, dot);
-      if (wkr_num_map[wkr] > 1)
-	OU::formatAdd(name, "_%u", idx - 1);
-      if (m_slaveNames.find(name) != m_slaveNames.end())
-	return OU::esprintf("Invalid slave name specified: %s", name.c_str());
+  // Add the slaves to all parameter configurations
+  // Note that slave assemblies may actually be conditional based on parameter values
+  for (unsigned n = 0; n < m_paramConfigs.size(); ++n) {
+    if (!m_paramConfigs[n])
+      continue;
+    if (!l_slaves) {
+      // Make fake assemblies out of the non-assembly attribute or elements
+      std::string xml("<slaves>");
+      if (attr) {
+	std::string instanceName = l_slave.substr(0, l_slave.find(".", 0));
+	OU::formatAdd(xml, "<instance name='%s' worker='%s'/>",
+		      l_slave.substr(0, l_slave.find(".", 0)).c_str(), l_slave.c_str());
+      } else {
+	for (ezxml_t slave = ezxml_cchild(m_xml, "slave"); slave; slave = ezxml_cnext(slave)) {
+	  if ((err = OE::checkAttrs(slave, "name", "worker", "optional", NULL)))
+	    return err;
+	  const char
+	    *worker = ezxml_cattr(slave, "worker"),
+	    *name = ezxml_cattr(slave, "name");
+	  bool optional = false;
+	  if ((err = OE::getBoolean(slave, "optional", &optional)))
+	    return err;
+	  if (!worker)
+	    return OU::esprintf("Missing \"worker\" attribute in <slave> element");
+	  OU::formatAdd(xml, "\n  <instance worker='%s'", worker);
+	  if (name)
+	      OU::formatAdd(xml, " name='%s'", name);
+	  if (optional)
+	    OU::formatAdd(xml, " optional='true'");
+	  xml += "/>";
+	}
+	xml += "</slaves>";
+      }
+      l_slaves = ezxml_parse_str(strdup(xml.c_str()), xml.size()); // leak
+      assert(l_slaves);
     }
-    if ((err = addSlave(slave, wkr, name)))
-      return err;
+    if ((err = m_paramConfigs[n]->addSlavesConfig(l_slaves)))
+      return OU::esprintf("slave processing error: %s", err);
   }
   return NULL;
 }
@@ -1622,7 +1552,8 @@ parseRccImpl(const char *a_package) {
 // slave parsing depends on proxy port expressions
 const char *Worker::
 finalizeRCC() {
-  return parseSlaves();
+  // don't parse slaves if we are not doing codegen since it depends on other workers
+  return m_parentFile.empty() || (m_parent && m_parent->m_type == Assembly) ? parseSlaves() : NULL;
 }
 
 

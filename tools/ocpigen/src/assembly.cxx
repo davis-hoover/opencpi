@@ -206,6 +206,8 @@ getValue(const char *sym, OU::ExprValue &val) const {
 
 const char *Assembly::
 addAssemblyParameters(OU::Assembly::Properties &aiprops) {
+  if (m_assyWorker.m_model == RccModel)
+    return NULL; // proxy assemblies cannot have parameters at this point
   for (PropertiesIter api = m_assyWorker.m_ctl.properties.begin();
        api != m_assyWorker.m_ctl.properties.end(); api++)
     if ((*api)->m_isParameter) {
@@ -444,15 +446,16 @@ parseAssy(ezxml_t xml, const char **topAttrs, const char **instAttrs) {
       return err;
   // Check for unconnected non-optional data ports
   i = &m_instances[0];
-  for (unsigned n = 0; n < m_instances.size(); n++, i++)
-    if (i->m_worker && !i->m_worker->m_reusable) {
-      InstancePort *ip = &i->m_ports[0];
-      for (unsigned nn = 0; nn < i->m_worker->m_ports.size(); nn++, ip++) {
-	Port *pp = ip->m_port;
-	if (ip->m_attachments.empty() && pp->isData() && !pp->isOptional() && !ip->m_externalize)
-	  return OU::esprintf("Port %s of instance %s of worker %s"
-			      " is not connected and not optional",
-			      pp->pname(), i->cname(), i->m_worker->m_implName);
+  if (m_assyWorker.m_type != Worker::Application) // if not a slave assembly
+    for (unsigned n = 0; n < m_instances.size(); n++, i++)
+      if (i->m_worker && !i->m_worker->m_reusable) {
+	InstancePort *ip = &i->m_ports[0];
+	for (unsigned nn = 0; nn < i->m_worker->m_ports.size(); nn++, ip++) {
+	  Port *pp = ip->m_port;
+	  if (ip->m_attachments.empty() && pp->isData() && !pp->isOptional() && !ip->m_externalize)
+	    return OU::esprintf("Port %s of instance %s of worker %s"
+				" is not connected and not optional",
+				pp->pname(), i->cname(), i->m_worker->m_implName);
       }
     }
   return 0;
@@ -559,11 +562,12 @@ emitXmlWorker(std::string &out, bool verbose) {
     }
   }
   // emit slaves when they are specified as an assembly
-  if (m_slaves.size() && m_assembly) {
+  if (m_paramConfig && m_paramConfig->m_slaves.size() && m_paramConfig->m_slavesAssembly) {
+    ::Assembly &assy = *m_paramConfig->m_slavesAssembly;
     // Output the assembly again, but canonical, and without parameters.
     out += "    <slaves>\n";
-    Instance *i = &m_assembly->m_instances[0];
-    for (unsigned n = 0; n < m_assembly->m_instances.size(); ++i, ++n) {
+    Instance *i = &assy.m_instances[0];
+    for (unsigned n = 0; n < assy.m_instances.size(); ++i, ++n) {
       const char *dot = strrchr(i->m_wName.c_str(), '.');
       assert(dot);
       OU::formatAdd(out, "      <instance name='%s' component='%s' worker='%.*s",
@@ -588,13 +592,13 @@ emitXmlWorker(std::string &out, bool verbose) {
       }
       out += any ? "      </instance>\n" : "/>\n";
     }
-    auto &ua = *m_assembly->m_utilAssembly;
+    auto &ua = *assy.m_utilAssembly;
     // predefine external ports that have counts
     for (auto it = ua.externals().begin(); it != ua.externals().end(); ++it)
       if (it->second.m_count)
 	OU::formatAdd(out, "      <external name='%s' count='%zu'/>\n",
 		      it->second.cname(), it->second.m_count);
-    for (auto it = m_assembly->m_connections.begin(); it != m_assembly->m_connections.end(); ++it) {
+    for (auto it = assy.m_connections.begin(); it != assy.m_connections.end(); ++it) {
       out += "      <connection";
       if ((*it)->m_count > 1)
 	OU::formatAdd(out, " count='%zu'", (*it)->m_count);
@@ -611,17 +615,6 @@ emitXmlWorker(std::string &out, bool verbose) {
 	out += "/>\n";
       }
       out += "      </connection>\n";
-    }
-    out += "    </slaves>\n";
-  }
-  // emit slaves when they are not specified as an assembly (legacy)
-  if (m_slaves.size() && !m_assembly) {
-    out += "    <slaves>\n";
-    for (auto it = m_slaves.begin(); it != m_slaves.end(); ++it) {
-      Worker &s = *(*it).second;
-      OU::formatAdd(out, "      <instance name='%s' component='%s' worker='%s.%s.%s'/>\n",
-		    (*it).first.c_str(), s.m_specName, s.m_package.c_str(), s.m_implName,
-		    s.m_modelString);
     }
     out += "    </slaves>\n";
   }
@@ -704,9 +697,8 @@ emitXmlWorkers(FILE *f) {
   assert(m_assembly);
   // Define all workers
   std::unordered_set<std::string> workers;
-  for (WorkersIter wi = m_assembly->m_workers.begin();
-       wi != m_assembly->m_workers.end(); wi++)
-    if (!(*wi)->m_assembly || (*wi)->m_slaves.size()) {
+  for (WorkersIter wi = m_assembly->m_workers.begin(); wi != m_assembly->m_workers.end(); wi++)
+    if (!(*wi)->m_assembly || (*wi)->m_paramConfig->m_slaves.size()) {
       std::string out;
       (*wi)->emitXmlWorker(out);
       if (workers.insert(out).second)

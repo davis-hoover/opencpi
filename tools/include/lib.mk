@@ -174,9 +174,11 @@ GoWorker=$(infox GW:$1:$(wildcard $1/Makefile))-C $1 $(if $(wildcard $1/Makefile
                  -f $(OCPI_CDK_DIR)/include/$(if $(filter %.test,$(notdir $1)),test,worker).mk)
 BuildImplementation=$(infox BI:$1:$2:$(call HdlLibrariesCommand):$(call GoWorker,$2)::)\
     set -e; \
+    if [ $1 = hdl -a  -z "$3$(HdlTarget)$(HdlTargets)$(HdlPlatform)$(HdlPlatforms)" ] ; then \
+      echo "=============Skipping building $2 since no HDL targets or platforms specified."; exit 0; fi; \
     t="$(foreach t,$(or $($(call Capitalize,$1)Target),$($(call Capitalize,$1)Targets)),\
          $(call $(call Capitalize,$1)TargetDirTail,$t))";\
-    $(ECHO) =============Building $(call ToUpper,$(1)) implementation $(2) for target'(s)': $$t; \
+    $(ECHO) =============$(if $3,Performing \"$3\" for,Building) $(call ToUpper,$(1)) implementation $(2) for target'(s)': $$t; \
     $(MyMake) $(call GoWorker,$2) OCPI_CDK_DIR=$(call AdjustRelative,$(OCPI_CDK_DIR)) \
 	       LibDir=$(call AdjustRelative,$(LibDir)/$(1)) \
 	       GenDir=$(call AdjustRelative,$(GenDir)/$(1)) \
@@ -208,7 +210,7 @@ CleanModel=$(infox CLEANING MODEL $1)\
           fi;),:)\
 	  rm -r -f lib/$1 gen/$1
 
-all: workers
+all: declare workers
 workers: $(build_targets)
 
 $(OutDir)lib:

@@ -21,13 +21,15 @@
 
 include $(OCPI_CDK_DIR)/include/hdl/xilinx.mk
 
+OnlyTargets=artix7
+
 HdlLibraries= ocpi axi sdp platform cdc
 
 VivadoPcieTargets= artix7
 OnlyTargets=$(VivadoPcieTargets)
 
 # We need to include this file before hdl-library.mk to preprocess the platforms and targets (at least)
-include $(OCPI_CDK_DIR)/include/hdl/hdl-pre.mk
+include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk
 
 XilinxCoreName=axi_pcie
 ################################################################################
@@ -42,7 +44,7 @@ VivadoPcieSources=$(foreach f,rfs,\
                     $(VivadoIpDir)/$(VivadoPcieCore)/hdl/$(VivadoPcieCore)_$f.vhd) \
                   $(VivadoWrapperFile)
 
-ifeq ($(filter clean%,$(MAKECMDGOALS))$(if $(HdlTargets),,z),)
+ifeq ($(filter clean%,$(MAKECMDGOALS)),)   # if not cleaning and building hdl target
   ifndef UseISE                            # if non-ISE targets
     VivadoWrapperFile=$(wildcard gen/synth/$(XilinxCoreName)*.v)
     ifeq ($(VivadoWrapperFile),) # if wrapper-module not determined yet
