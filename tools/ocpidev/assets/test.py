@@ -152,7 +152,7 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         ocpiutil.file.execute_cmd(
             settings, location, action=action, file=make_file, verbose=verbose)
 
-    def build(self, verbose=False, no_assemblies=None,
+    def build(self, verbose=False, no_assemblies=None, workers_as_needed=False,
         optimize=False, dynamic=False, hdl_target=None, hdl_platform=None,
         rcc_platform=None, hdl_rcc_platform=None, generate=False):
         """
@@ -165,6 +165,8 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
             action.append('generate')
         if no_assemblies:
             action.append('Assemblies=')
+        if workers_as_needed:
+            os.environ['OCPI_AUTO_BUILD_WORKERS'] = '1'
         build_suffix = '-'
         if dynamic:
             build_suffix += 'd'
@@ -352,7 +354,7 @@ class TestsCollection(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         ocpiutil.file.execute_cmd(
             settings, location, action=action, file=make_file, verbose=verbose)
 
-    def build(self, verbose=False, no_assemblies=None,
+    def build(self, verbose=False, no_assemblies=None, workers_as_needed=False,
         optimize=False, dynamic=False, hdl_target=None, hdl_platform=None,
         rcc_platform=None, hdl_rcc_platform=None, generate=False):
         """
@@ -365,6 +367,8 @@ class TestsCollection(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
             action.append('generate')
         if no_assemblies:
             action.append('Assemblies=')
+        if workers_as_needed:
+            os.environ['OCPI_AUTO_BUILD_WORKERS'] = '1'
         build_suffix = '-'
         if dynamic:
             build_suffix += 'd'
