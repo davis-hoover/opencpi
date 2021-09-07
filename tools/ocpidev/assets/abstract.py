@@ -100,9 +100,9 @@ class Asset(metaclass=ABCMeta):
         if not true_dirtype:
             true_dirtype = 'unknown'
         if true_dirtype != dirtype:
-            err_msg = ' '.join(['Expected directory of type "{}"'.format(dirtype), 
-                                'but found type "{}"'.format(true_dirtype), 
-                                'for directory {}'.format(directory)])
+            err_msg = ' '.join(["Expected directory of type '{}'".format(dirtype), 
+                                "but found type '{}'".format(true_dirtype), 
+                                "for directory {}".format(directory)])
             raise ocpiutil.OCPIException(err_msg)
 
     def delete(self, noun='asset', force=False):
