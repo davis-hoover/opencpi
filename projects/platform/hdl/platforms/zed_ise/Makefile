@@ -29,6 +29,8 @@ ifeq ($(filter clean%,$(MAKECMDGOALS)),)
   $(shell \
     test -e zed_ise.vhd || ln -s ../zed/zed.vhd zed_ise.vhd; \
     for c in $$(ocpixml -t hdlplatform -a '?configurations' parse zed_ise.xml); do \
+    test -e zed_ise-build.xml || ln -s ../zed/zed-build.xml zed_ise-build.xml; \
+    test -e zed_ise.xml || sed "s/value='zed'/value='zed_ise'/" ../zed/zed.xml > zed_ise.xml;\
       [ $$c = base ] || [ -e $$c.xml ] || ln -s ../zed/$$c.xml .;\
     done)
 endif
