@@ -77,6 +77,7 @@ class AssetFactory():
                    "rcc-platforms": _opencpi.assets.platform.RccPlatformsCollection,
                    "rcc-platform":  _opencpi.assets.platform.RccPlatform,
                    "test":          _opencpi.assets.test.Test,
+                   "tests":         _opencpi.assets.test.TestsCollection,
                    "component":     _opencpi.assets.component.Component,
                    "application":   _opencpi.assets.application.Application,
                    "applications":  _opencpi.assets.application.ApplicationsCollection,
