@@ -815,6 +815,9 @@ def get_hdl_builtins():
           toolset = e.get('toolset')
           if toolset:
               dict['toolset'] = toolset
+          default_part = e.get('default')
+          if default_part:
+              dict['default'] = default_part
           hdl_families[family] = dict
           if parts:
               for part in parts.split():
@@ -1132,6 +1135,9 @@ def get_platform_variables(shell, only_model=None):
                 parts.sort()
                 out+=("HdlTargets_" + key + "=" + quote + ' '.join(parts) + end)
             out+=("HdlToolSet_" + key + "=" + quote + value.get('toolset') + end)
+            default_part = value.get('default')
+            if default_part:
+                out+=("HdlDefaultTarget_" + key + "=" + quote + default_part + end)
         for key,value in hdl_vendors.items():
             value.sort()
             out+=("HdlTargets_" + key + "=" + quote + ' '.join(value) + end)
