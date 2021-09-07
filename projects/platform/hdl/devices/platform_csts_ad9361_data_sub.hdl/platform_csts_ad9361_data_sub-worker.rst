@@ -1,4 +1,4 @@
-.. platform_ad9361_data_sub HDL worker
+.. platform_csts_ad9361_data_sub HDL worker
 
 .. This file is protected by Copyright. Please refer to the COPYRIGHT file
    distributed with this source distribution.
@@ -20,11 +20,11 @@
 
 :orphan:
 
-.. _platform_ad9361_data_sub-HDL-worker:
+.. _platform_csts_ad9361_data_sub-HDL-worker:
 
 
-``platform_ad9361_data_sub`` HDL Worker
-=======================================
+``platform_csts_ad9361_data_sub`` HDL Worker
+============================================
 
 Detail
 ------

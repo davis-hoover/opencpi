@@ -1,4 +1,4 @@
-.. zed_gsg ZedBoard Getting Started Guide documentation
+.. zed_gsg OpenCPI ZedBoard Getting Started Guide documentation
 
 .. This file is protected by Copyright. Please refer to the COPYRIGHT file
    distributed with this source distribution.
@@ -22,8 +22,8 @@
 .. _zed_gsg:
 
 
-ZedBoard Getting Started Guide
-==============================
+OpenCPI ZedBoard Getting Started Guide
+======================================
 
 This document provides installation information that is specific
 to the Avnet (Digilent) ZedBoard. It is intended to be used in tandem with the

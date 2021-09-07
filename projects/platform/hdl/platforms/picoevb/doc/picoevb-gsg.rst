@@ -76,7 +76,7 @@ OpenCPI installation and deployment.
 
 .. _picoevb-hw:
 
-.. csv-table:: Hardware Items Required for PicoEVB HDL platform
+.. csv-table:: Hardware Items Required for PicoEVB HDL Platform
    :header: "Item", "Usage"
    :widths: 40,60
    :class: tight-table
@@ -88,7 +88,7 @@ OpenCPI installation and deployment.
 
 .. _picoevb-sw:
 
-.. csv-table:: Software Items Required for PicoEVB HDL platform
+.. csv-table:: Software Items Required for PicoEVB HDL Platform
    :header: "Item", "Usage"
    :widths: 40,60
    :class: tight-table
@@ -97,8 +97,7 @@ OpenCPI installation and deployment.
    "Vivado 2019.2", "Builds FPGA artifacts for PicoEVB"
    "OpenCPI installed on Development Host system", "OpenCPI builds, development, and deployment"
 
-See the OpenCPI Installation Guide
-`OpenCPI Installation Guide <https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Installation_Guide.pdf>`_
+See the `OpenCPI Installation Guide <https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Installation_Guide.pdf>`_
 for detailed instatllation instructions for OpenCPI.
 
 Supported OpenCPI Platforms and Vendor Tools
@@ -124,24 +123,24 @@ and the third-party/vendor tools on which they depend.
    +------------------------+-------------------+---------------------------+---------------------------------------+
 
 
-The PicoEVB HDL platform does not have an embedded RCC platform.  Rather the host development controls the FPGA resources directly via the PCIe interface
+The PicoEVB HDL platform does not have an embedded RCC platform.  Rather the host development controls the FPGA resources directly via the PCIe interface.
 
 Quickstart Setup for the PicoEVB HDL Platform
-----------------------------------------------
+---------------------------------------------
 
-The following sections provide a step-by-step guide for enabling the PicoEVB including the following:
+The following sections provide a step-by-step guide for enabling the PicoEVB, including how to:
 
-#. Attaching PicoEVB to PCIe/M.2 Carrier Board (optional)
-#. Physical Installation of PicoEVB/Carrier board into PCIe Slot
-#. Connecting PicoEVB to the motherboard's internal USB port using the USB-to-JTAG cable
-#. OpenCPI installation of the PicoEVB platform
-#. Memory Reservation for OpenCPI Kernel Driver
-#. Loading the OpenCPI Driver
-#. Running reference applications
+#. Attach the PicoEVB to PCIe/M.2 Carrier Board (optional)
+#. Physically install the PicoEVB/Carrier Board into a PCIe slot
+#. Connect the PicoEVB to the motherboard's internal USB port with the USB-to-JTAG cable
+#. Install the OpenCPI PicoEVB platform
+#. Reserve memory for the OpenCPI Linux kernel device driver
+#. Load the OpenCPI Linux kernel device driver
+#. Run the reference applications
 
-Physical Installation of PicoEVB Board on Host Platform
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#. Connect PicoEVB to M.2 PCIe carrier board.  If M.2 slot is readily available on the development host, the adapter board is not required.
+Physically Installing the PicoEVB Board on the Host Platform
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#. Connect the PicoEVB to the M.2 PCIe carrier board.  If the M.2 slot is readily available on the development host, the adapter board is not required.
 
 #. Connect the 8-pin USB port to an internal USB port on the motherboard of the development host using a standard 4x2 header cable.
 
@@ -152,12 +151,12 @@ Installing and Building the OpenCPI Platforms for the PicoEVB
 Before installing and building the OpenCPI platforms for the PicoEVB, Xilinx vendor tools must be installed.  Follow the instructions in the "Installing Xilinx Tools" section 
 of the “Installing Third-party/Vendor Tools” chapter within the
 `OpenCPI Installation Guide <https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Installation_Guide.pdf>`_
-to install the Xilinx tools listed as platform dependencies in Software Requirements Table :numref:`sfw-reqs`
+to install the Xilinx tools listed as platform dependencies in :numref:`sfw-reqs`.
 
 After installing the required vendor tools, follow the instructions in the section “Installation Steps for Platforms” in the
 `OpenCPI Installation Guide <https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Installation_Guide.pdf>`_
 to install and build the ``picoevb`` 
-platforms for the PicoEVB.  In summary the platform must be installed and built with ``ocpiadmin install platform``
+platform for the PicoEVB.  In summary, the platform must be installed and built with ``ocpiadmin install platform``
 For example:
 
 .. code-block:: bash
@@ -166,27 +165,27 @@ For example:
 
 See the `ocpiadmin(1) man page <https://opencpi.gitlab.io/releases/latest/man/ocpiadmin.1.html>`_ for command usage details.
 
-Building this hdl platform will build the components necessary to build HDL assemblies, and run applications on the platform.  For the puprposes of getting started, we will focus on the running the ``test_source_sink`` and ``test_source_to_dev_null`` applications. The test_sink_application requires the ``test_internal_assy`` HDL assembly, while the ``test_source_to_dev_null`` application requires the ``test_source_assy`` HDL assembly.  Next, we will build these two FPGA assemblies:
+Building this HDL platform will build the components necessary to build HDL assemblies, and run applications on the platform.  For the puprposes of getting started, we will focus on the running the ``test_source_sink`` and ``test_source_to_dev_null`` applications. The ``test_source_sink`` application requires the ``test_internal_assy`` HDL assembly, while the ``test_source_to_dev_null`` application requires the ``test_source_assy`` HDL assembly.  Next, we will build these two FPGA assemblies:
 
-* Navigate to the test_internal_assembly directory, and build the assembly for the picoevb hdl platform:
+* Navigate to the ``test_internal_assembly`` directory, and build the assembly for the ``picoevb`` HDL platform:
 
 .. code-block:: bash
 
    cd opencpi/projects/assets/hdl/assemblies/test_internal_assy
    ocpidev build --hdl-platform picoevb
 
-* Navigate to the test_source_assy assembly directory, and build the assembly for the picoevb hdl platform:
+* Navigate to the ``test_source_assy`` assembly directory, and build the assembly for the ``picoevb`` HDL platform:
 
 .. code-block:: bash
 
    cd opencpi/projects/assets/hdl/assemblies/test_source_assy
    ocpidev build --hdl-platform picoevb
 
-Building the these assemblies will each take several minutes to complete.  The test_source_assy assembly will be utilized in the following section to program the FPGA's flash.  This is a one-time setup step that enables enumeration of the picoevb on the PCIe bus when the development host is booted.
+Building the these assemblies will each take several minutes to complete.  The ``test_source_assy`` assembly will be used in the following section to program the FPGA's flash.  This is a one-time setup step that enables enumeration of the PicoEVB on the PCIe bus when the development host is booted.
 
 Initial Preparation and Programming of the PicoEVB
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The picoevb hdl platform must initially be programmed with an OpenCPI-compliant assembly.  Therefore a precompiled version of OpenOCD \ |trade| JTAG utility is included with the OpenCPI distribution to facilitate JTAG programming of the Flash.  Perform following steps to unzip the compressed OpenOCD executable and perform initial FPGA flash programming from the development host.
+The ``picoevb`` HDL platform must initially be programmed with an OpenCPI-compliant assembly.  Therefore, a precompiled version of OpenOCD \ |trade| JTAG utility is included with the OpenCPI distribution to facilitate JTAG programming of the flash.  Perform the following steps to unzip the compressed OpenOCD executable and perform initial FPGA flash programming from the development host.
 
 * Unzip the OpenOCD executable as follows:
 
@@ -262,14 +261,14 @@ The output should look similar to the following:
    Flash write operations successful!
    Sun Aug  8 11:42:06 EDT 2021
 
-With the FPGA flash programmed, the development host must be power-cycled for the PCIe interface of the picoevb to be enumerated in the bios.
+With the FPGA flash programmed, the development host must be power-cycled for the PCIe interface of the ``picoevb`` to be enumerated in the BIOS.
 
-Memory Reservation for OpenCPI Kernel Driver
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Reserving Memory for the OpenCPI Linux Kernel Device Driver
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-When OpenCPI communicates to cards via PCI, it uses a loadable Linux kernel device driver for discovery and DMA-based communication, which requires local (reserved) DMA memory resources. DMA memory resources must be allocated or reserved on the CPU-side memory, that is accessible to both the CPU (via the local mmap system call), as well as, OpenCPI’s PCI DMA engine with the board is issuing PCI READ or WRITE TLPs. By default, Linux allocates 128 KB of memory for the OpenCPI driver. However, OpenCPI applications may have buffering requirements that necessitate additional memory resources. 
+When OpenCPI communicates to cards via PCI, it uses a loadable Linux kernel device driver for discovery and DMA-based communication, which requires local (reserved) DMA memory resources. DMA memory resources must be allocated or reserved on the CPU-side memory that is accessible to both the CPU (via the local ``mmap`` system call) and OpenCPI’s PCI DMA engine when the board is issuing PCI READ or WRITE TLPs. By default, Linux allocates 128 KB of memory for the OpenCPI driver. However, OpenCPI applications may have buffering requirements that necessitate additional memory resources. 
 
-The remainder of this section provides the method for reserving memory in the kernel where special measures ``(memmap=)`` are used to allocate 128 MB of memory. The memmap parameter is used to reserve more block memory from the Linux kernel. While this variable supports many formats, the following usage has proven to be sufficient:
+The rest of this section describes the method for reserving memory in the kernel where special measures ``(memmap=)`` are used to allocate 128 MB of memory. The ``memmap`` parameter is used to reserve more block memory from the Linux kernel. While this variable supports many formats, the following usage has proven to be sufficient:
 
 ``memmap=SIZE$START``
 
@@ -281,7 +280,7 @@ memory range and due to the manner with which Linux manages memory, it is recomm
 higher than the first 24 bits. With these requirements, the first step is to find a usable contiguous memory range by
 examining the BIOS physical RAM map as reported by dmesg.
 
-Run dmesg and filter on BIOS to review the physical RAM map:
+Run ``dmesg`` and filter on BIOS to review the physical RAM map:
 
 .. code-block:: bash
 
@@ -323,25 +322,25 @@ The starting memory address for the user-mode DMA region is calculated by subtra
 from the largest memory region available, as long as it is greater than 0x08000000 (128MB) and inside the 32-bit
 address range (address is less than 4GB). In this example, the 2nd region is the largest: 0x5FEF0000 - 0x100000 =
 0x5FDF0000 = 1,608,450,048 ( 1.6GB) and it is inside of the 32-bit address space. The starting memory address
-(0x5FEF0000 - 0x08000000) is 0x57EF0000. And this is the value that used to construct the memmap parameter, as shown below:
+(0x5FEF0000 - 0x08000000) is 0x57EF0000. And this is the value that used to construct the ``memmap`` parameter, as shown below:
 
 .. code-block:: bash
 
    memmap=128M$0x57EF0000
 
-When calculating the starting address, the user must ensure that address occurs on an even page boundary of 4
-KB. This may necessitate an additional adjustment to the starting address.  In some cases, the $dmesg | grep BIOS returns a value like 0x5FEFFFFF. It is recommended that the user simply change this address, such that, its low word is all zeros, ex. 0x5FEF0000, prior to calculating the starting address.
+When calculating the starting address, ensure that it occurs on an even page boundary of 4
+KB. This may necessitate an additional adjustment to the starting address.  In some cases, the ``$dmesg | grep BIOS`` returns a value like ``0x5FEFFFFF``. It is recommended to simply change this address so that its low word is all zeros, for example, 0x5FEF0000, prior to calculating the starting address.
 
-Once the memmap parameter as been calculated, it will need to be added to the kernel command line in the boot loader.  
-For CentOS, the  utility “grubby” can be used to add the parameter to all kernels in the start-up menu. The single quotes are REQUIRED or the shell will interpret the $0:
+Once the ``memmap`` parameter as been calculated, it will need to be added to the kernel command line in the boot loader.  
+For CentOS, the  utility ``grubby`` can be used to add the parameter to all kernels in the start-up menu. The single quotes are REQUIRED or the shell will interpret the $0:
 
-CentOS 7 uses grub2, which requires a DOUBLE backslash:
+CentOS7 uses ``grub2``, which requires a DOUBLE backslash:
 
 .. code-block:: bash
 
    sudo grubby --update-kernel=ALL --args=memmap='128M\\$0x57EF0000'
 
-To verify the current kernel has the argument set:
+To verify that the current kernel has the argument set:
 
 .. code-block:: bash
 
@@ -349,7 +348,7 @@ To verify the current kernel has the argument set:
    sudo grubby --info $(sudo grubby --default-kernel)
 
 
-CentOS 7 displays a SINGLE backslash before the $, for example:
+CentOS7 displays a SINGLE backslash before the $, for example:
 
 .. code-block:: bash
 
@@ -363,11 +362,11 @@ If no longer desired, the parameter can also be removed with the following:
    sudo grubby --update-kernel=ALL --remove-args=memmap
 
 
-More information concerning grubby can be found at:
+More information about ``grubby`` can be found at:
 `<https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/system_administrators_guide/ch-working_with_the_grub_2_boot_loader>`_
 
 
-For the memmap parameter:
+For the ``memmap`` parameter:
 `<https://www.kernel.org/doc/html/latest/admin-guide/kernel-parameters.html>`_
 
 Reboot the system to apply the the new configuration for memory reservation.  Once the system has finished booting, examine the state of the physical RAM map to confirm that the desired memory has been reserved:
@@ -408,22 +407,23 @@ Reboot the system to apply the the new configuration for memory reservation.  On
     user: 00000000fffe0000 - 0000000100000000 (reserved)
    DMI present.
 
-A new ”(reserved)” area is shown between the second ”(useable)” section and the (ACPI data) section. Now, when the ”ocpidriver load” is ran, it will detect the new reserved area, and pass that data to the OpenCPI kernel module.
+A new ”(reserved)” area is shown between the second ”(useable)” section and the (ACPI data) section. Now, when the ``ocpidriver load`` command is run, it will detect the new reserved area and pass that data to the OpenCPI kernel module.
 
 .. note::
    
-   When available, the driver will attempt to make use of the CMA region for direct memory access. In use cases where many memory allocations are made, the user may receive the following kernel message:
+   When available, the driver will attempt to make use of the CMA region for direct memory access. In use cases where many memory allocations are made, you may receive the following kernel message:
 
    .. code-block:: bash
 
       alloc_contig_range test_pages_isolated([memory start], [memory end]) failed
 
-   This is a kernel warning, but does not indicate that a memory allocation failure occurred, only that the CMA engine could not allocate memory in the first pass. Its default behavior is to make a second pass, and if that succeeded, the end user should not see any more error messages. This message cannot be suppressed, but can be safely ignored. An actual allocation failure will generate unambiguous error messages.
+   This is a kernel warning, but does not indicate that a memory allocation failure occurred, only that the CMA engine could not allocate memory in the first pass. Its default behavior is to make a second pass, and if that succeeds, you should not see any more error messages. This message cannot be suppressed, but can be safely ignored. An actual allocation failure will generate unambiguous error messages.
 
 
-Loading the OpenCPI Driver
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-When OpenCPI is installed via RPMs, the OpenCPI driver should have been installed. However, when developing with source OpenCPI, the user is required to manage the loading of the OpenCPI driver.  The following terminal outputs are intended to provide the user with expected behavior of when the driver is not and is loaded. The user should note that only when the driver is installed can the PicoEVB be discovered as a valid OpenCPI container.
+Loading the OpenCPI Linux Kernel Device Driver
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+You are required to manage OpenCPI Linux kernel device driver loading and unloading.  The following terminal outputs are intended to provide you with the expected behavior of when the driver is not and is loaded. Note that only when the driver is loaded can the PicoEVB be discovered as a valid OpenCPI container.
+See the `ocpidriver(1) man page <https://opencpi.gitlab.io/releases/latest/man/ocpidriver.1.html>`_ for command usage details.
 
 .. code-block:: bash
 
@@ -460,7 +460,7 @@ When OpenCPI is installed via RPMs, the OpenCPI driver should have been installe
 Running the Reference Applications
 ----------------------------------
 
-Before running the Reference Applicaitons, the ``OCPI_LIBRARY_PATH``
+Before running the reference applications, the ``OCPI_LIBRARY_PATH``
 variable must be set properly via the command line.  Run the following command, replacing ``sandbox`` with the path where you previously cloned, built, and installed OpenCPI:
 
 .. code-block:: bash
@@ -526,7 +526,7 @@ The output should look similar to the following:
    Property  29: file_write.bytesPerSecond = "401032579"
 
 
-Note that the picoevb platform container was selected and chosen for the test_source component, while the centos7 rcc worker was chosen for file_write component.  You will also notice that 8388608 values (each consisting of 4 bytes) were sent to the file_write component and written to the file test.output.  Next, verify that the test.output file is the correct size of (4 x 8388608) bytes, or 32MB :
+Note that the ``picoevb`` platform container was selected and chosen for the ``test_source`` component, while the ``centos7`` RCC worker was chosen for the ``file_write`` component.  Also note that 8388608 values (each consisting of 4 bytes) were sent to the ``file_write`` component and written to the file ``test.output``.  Next, verify that the ``test.output`` file is the correct size of (4 x 8388608) bytes, or 32MB :
 
 .. code-block:: bash
 
