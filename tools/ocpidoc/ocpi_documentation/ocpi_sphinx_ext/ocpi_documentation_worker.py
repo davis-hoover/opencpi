@@ -193,7 +193,7 @@ class OcpiDocumentationWorker(PropertiesDirectiveHandler):
                 port_name = list(worker_description[port_type].keys())[0]
                 port_type_rst = port_type_header
                 port_type_doc = docutils_helpers.rst_string_convert(
-                    self.state, port_type_rst)
+                    self.state, f"**{port_type_rst}**")
                 port_list.append(port_type_doc)
                 for name, detail in worker_description[port_type].items():
                     list_item = self._port_summary(name, detail)
@@ -207,34 +207,39 @@ class OcpiDocumentationWorker(PropertiesDirectiveHandler):
         ) as file_parser:
             owd_xml_root = file_parser.getroot()
             for supports in owd_xml_root.findall("supports"):
+                supported_item = docutils_helpers.list_item_name_code_value(
+                    "Supported device worker", supports.attrib["worker"])
+                supported_item.append(docutils.nodes.line())
+                supported_item.append(
+                    docutils.nodes.paragraph(text="Connections:"))
+                supported_item.append(docutils.nodes.line())
+                connection_list = docutils.nodes.bullet_list()
                 for connect in supports.findall("connect"):
-                    worker_port = connect.attrib["port"]
-                    subdevice_paragraph = \
-                        docutils_helpers.rst_string_convert(
-                            self.state, f"Worker Port ``{worker_port}``:")
-                    subdevice_item = docutils.nodes.list_item()
-                    subdevice_item.append(subdevice_paragraph)
-                    subdevice_sub_list = docutils.nodes.bullet_list()
-                    worker_port_dict = {
-                        "Port Index": "0",
-                        "Worker supported": supports.attrib["worker"],
-                        "Worker port supported": ""}
-                    for name, value in connect.attrib.items():
-                        if name == "index":
-                            worker_port_dict["Port Index"] = value
-                        if name == "to":
-                            worker_port_dict["Worker port supported"] = value
-                    for name, value in worker_port_dict.items():
-                        attribute_detail = \
-                            docutils_helpers.list_item_name_code_value(
-                                name, value)
-                        subdevice_sub_list.append(attribute_detail)
-                    subdevice_item.append(subdevice_sub_list)
-                    subdevice_list.append(subdevice_item)
+                    connection_list = docutils.nodes.bullet_list()
+                    connection_list.append(
+                        docutils_helpers.list_item_name_code_value(
+                            "Subdevice port", connect.attrib["port"]))
+                    worker_port_item = \
+                        docutils_helpers.list_item_name_code_value(
+                            "Supported worker port", connect.attrib["to"])
+                    supported_port_list = docutils.nodes.bullet_list()
+                    if "index" in connect.attrib:
+                        port_index = connect.attrib["index"]
+                    else:
+                        port_index = ""
+                    supported_port_list.append(
+                        docutils_helpers.list_item_name_code_value(
+                            "Index", port_index))
+                    worker_port_item.append(supported_port_list)
+                    connection_list.append(worker_port_item)
+                    supported_item.append(connection_list)
+                    supported_item.append(docutils.nodes.line())
+
+                subdevice_list.append(supported_item)
 
         if len(subdevice_list) > 0:
             subdevice_connections_doc = docutils_helpers.rst_string_convert(
-                self.state, "Subdevice Connections:")
+                self.state, "**Subdevice Connections:**")
             subdevice_connections_doc.append(subdevice_list)
             port_list.append(subdevice_connections_doc)
 
@@ -391,9 +396,13 @@ class OcpiDocumentationWorker(PropertiesDirectiveHandler):
                         signal_rst = f"``{signal}``"
                         if signal in self.additional_text:
                             signal_rst += \
-                                f": {self.additional_text[signal]}."
-                        item.append(docutils_helpers.rst_string_convert(
-                            self.state, signal_rst))
+                                f": {self.additional_text[signal]}"
+                            if signal_rst[-1] != ".":
+                                signal_rst = f"{signal_rst}."
+                        self.state.nested_parse(
+                            docutils.statemachine.StringList(
+                                signal_rst.split("\n")
+                            ), 0, item)
                         signals_details_list.append(item)
 
                     signals_item.append(signals_details_list)
