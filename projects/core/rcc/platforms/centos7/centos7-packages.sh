@@ -83,6 +83,8 @@ PKGS_D+=(libSM libXi libXrandr)
 PKGS_D+=(openssl-devel)
 #    for asciidoc3 man page generation (asciidoc3 is a prereq)
 PKGS_D+=(docbook-style-xsl)
+#    for sphinxcontrib.spelling extension (RST doc support)
+PKGS_D+=(enchant)
 
 ##########################################################################################
 # S. yum-installed and but not rpm-required - conveniences or required for source environment
