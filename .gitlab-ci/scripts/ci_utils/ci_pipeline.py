@@ -107,7 +107,8 @@ class Pipeline():
                                                 host_platform.cross_platforms)
             if platform.model == 'rcc':
             # platform is rcc
-                stages = ['prereqs-rcc', 'build-rcc', 'build-assemblies']
+                stages = ['prereqs-rcc', 'build-rcc', 'build-assets-comp', 
+                          'build-assemblies']
             else:
             # platform is hdl
                 stages = ['build-primitives-core', 'build-primitives',
