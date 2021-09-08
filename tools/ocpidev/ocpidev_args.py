@@ -1,6 +1,21 @@
 from pathlib import Path
 import _opencpi.util as ocpiutil
 
+def get_noun():
+    """
+    Get noun from call to opencpi utility function get_dirtype().
+    Format returned dirtype as needed.
+    """
+    dirtype = ocpiutil.get_dirtype()
+    if dirtype:
+        if dirtype in ['hdl-core', 'hdl-library']:
+        # Command line expects 'hdl-primitive-core' or 'hdl-primitive-library'
+            index = dirtype.find('-')
+            dirtype = dirtype[:index] + '-primitive' + dirtype[index:]
+        dirtype = dirtype.split('-')
+    
+    return dirtype
+
 """Dicts of args to be used by ocpidev.py"""
 
 # Options to be used for pre-processing user args and to reference
@@ -55,7 +70,7 @@ options = {
     'no_control': {
         'long': '--no-control',
         'short': '-n',
-        'action': 'store_false'
+        'action': 'store_true'
     },
     'create_test': {
         'long': '--create-test',
@@ -65,20 +80,19 @@ options = {
     'project': {
         'long': '--project',
         'short': '-p',
-        'action': 'store_true'
+        'action': 'store_true',
+        'mut_exc_group': 'project'
     },
     'library': {
         'long': '--library',
-        'short': '-l'
+        'short': '-l',
+        'mut_exc_group': 'project'
     },
     'hdl_library': {
         'long': '--hdl-library',
         'short': '-h',
-        'choices': [
-            'devices',
-            'cards',
-            'adapters'
-        ]
+        'choices': [ 'devices', 'cards', 'adapters' ],
+        'mut_exc_group': 'project'
     },
     'standalone': {
         'long': '--standalone',
@@ -140,8 +154,8 @@ options = {
         'long': '--time-freq',
         'short': '-q'
     },
-    'no_dsp': {
-        'long': '--no-dsp',
+    'no_sdp': {
+        'long': '--no-sdp',
         'short': '-u',
         'action': 'store_true'
     },
@@ -151,7 +165,7 @@ options = {
         'action': 'append'
     },
     'exclude_target': {
-        'long': '--exclude_target',
+        'long': '--exclude-target',
         'short': '-Z',
         'action': 'append'
     },
@@ -209,6 +223,10 @@ options = {
         ],
         'action': 'store_true'
     },
+    'clean_all':{
+        'long': '--clean-all',
+        'action': 'store_true'
+    },
     'hdl': {
         'long': [
             '--hdl',
@@ -223,6 +241,14 @@ options = {
         ],
         'action': 'store_true'
     },
+    'optimize': {
+        'long': '--optimize',
+        'action': 'store_true'
+    },
+    'dynamic': {
+        'long': '--dynamic',
+        'action': 'store_true'
+    },
     'worker': {
         'long': '--worker',
         'short': '-W',
@@ -230,6 +256,8 @@ options = {
     },
     'hdl_rcc_platform': {
         'long': [
+            '--rcc-hdl-platform',
+            '--build-rcc-hdl-platform',
             '--hdl-rcc-platform',
             '--build-hdl-rcc-platform'
         ],
@@ -272,17 +300,23 @@ verbs = {
             }
         },
         'nouns': {
-            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
+            'default': get_noun,
             'application': {
                 'options': {
+                    'optimize': options['optimize'],
+                    'dynamic': options['dynamic'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
-                    'rcc_platform': options['rcc_platform']
+                    'rcc_platform': options['rcc_platform'],
+                    'workers_as_needed' : options['workers_as_needed']
                 }
             },
             'applications': {
                 'options': {
+                    'optimize': options['optimize'],
+                    'dynamic': options['dynamic'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
-                    'rcc_platform': options['rcc_platform']
+                    'rcc_platform': options['rcc_platform'],
+                    'workers_as_needed' : options['workers_as_needed']
                 }
             },
             'hdl': {
@@ -312,8 +346,25 @@ verbs = {
                     'hdl': options['hdl'],
                     'rcc': options['rcc'],
                     'worker': options['worker'],
+                    'optimize': options['optimize'],
+                    'dynamic': options['dynamic'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
+                    'workers_as_needed' : options['workers_as_needed'],
+                    'hdl_target': options['hdl_target'],
+                    'hdl_platform': options['hdl_platform']
+                }
+            },
+            'libraries': {
+                'options': {
+                    'hdl': options['hdl'],
+                    'rcc': options['rcc'],
+                    'worker': options['worker'],
+                    'optimize': options['optimize'],
+                    'dynamic': options['dynamic'],
+                    'hdl_rcc_platform': options['hdl_rcc_platform'],
+                    'rcc_platform': options['rcc_platform'],
+                    'workers_as_needed' : options['workers_as_needed'],
                     'hdl_target': options['hdl_target'],
                     'hdl_platform': options['hdl_platform']
                 }
@@ -325,6 +376,8 @@ verbs = {
                     'hdl': options['hdl'],
                     'rcc': options['rcc'],
                     'worker': options['worker'],
+                    'optimize': options['optimize'],
+                    'dynamic': options['dynamic'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
                     'workers_as_needed' : options['workers_as_needed'],
@@ -360,18 +413,12 @@ verbs = {
             }
         },
         'nouns': {
-            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
+            'default': get_noun,
             'application': {
-                'options': {
-                    'hdl_rcc_platform': options['hdl_rcc_platform'],
-                    'rcc_platform': options['rcc_platform']
-                }
+                'options': {}
             },
             'applications': {
-                'options': {
-                    'hdl_rcc_platform': options['hdl_rcc_platform'],
-                    'rcc_platform': options['rcc_platform']
-                }
+                'options': {}
             },
             'hdl': {
                 'options': {
@@ -399,8 +446,15 @@ verbs = {
                     'hdl': options['hdl'],
                     'rcc': options['rcc'],
                     'worker': options['worker'],
-                    'hdl_rcc_platform': options['hdl_rcc_platform'],
-                    'rcc_platform': options['rcc_platform'],
+                    'hdl_target': options['hdl_target'],
+                    'hdl_platform': options['hdl_platform']
+                }
+            },
+            'libraries': {
+                'options': {
+                    'hdl': options['hdl'],
+                    'rcc': options['rcc'],
+                    'worker': options['worker'],
                     'hdl_target': options['hdl_target'],
                     'hdl_platform': options['hdl_platform']
                 }
@@ -414,7 +468,6 @@ verbs = {
                     'worker': options['worker'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
-                    'workers_as_needed' : options['workers_as_needed'],
                     'hdl_target': options['hdl_target'],
                     'hdl_platform': options['hdl_platform']
                 }
@@ -445,7 +498,7 @@ verbs = {
             'keep': options['keep'],
         },
         'nouns': {
-            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
+            'default': get_noun,
             'application': {
                 'options': {
                     'xml_app': options['xml_app'],
@@ -454,8 +507,8 @@ verbs = {
             },
             'component': {
                 'options': {
+                    'name': None,
                     'no_control': options['no_control'],
-                    'create_test': options['create_test'],
                     'platform': options['platform'],
                     'hdl_library': options['hdl_library'],
                     'library': options['library'],
@@ -510,7 +563,7 @@ verbs = {
                             'core': options['core'],
                             'hdl_part': options['hdl_part'],
                             'time_freq': options['time_freq'],
-                            'no_dsp': options['no_dsp']
+                            'no_sdp': options['no_sdp']
                         }
                     },
                     'primitive': {
@@ -574,6 +627,7 @@ verbs = {
                 'options': {
                     'spec': options['spec'],
                     'library': options['library'],
+                    'hdl_library': options['hdl_library'],
                     'platform': options['platform']
                 }
             },
@@ -610,7 +664,7 @@ verbs = {
             }
         },
         'nouns': {
-            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
+            'default': get_noun,
             'application': None,
             'component': {
                 'project': options['project'],
@@ -639,6 +693,7 @@ verbs = {
                 }
             },
             'library': None,
+            'libraries': None,
             'project': None,
             'protocol': {
                 'options': {
@@ -680,7 +735,7 @@ verbs = {
             }
         },
         'nouns': {
-            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
+            'default': get_noun,
             'project': None
         }
     },
@@ -692,7 +747,7 @@ verbs = {
             }
         },
         'nouns': {
-            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
+            'default': get_noun,
             'project': None
         }
     },
@@ -707,7 +762,7 @@ verbs = {
             }
         },
         'nouns': {
-            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
+            'default': get_noun,
             'registry': None
         }
     },
@@ -722,13 +777,13 @@ verbs = {
             }
         },
         'nouns': {
-            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
+            'default': get_noun,
             'project': None
         }
     },
     'unset': {
         'nouns': {
-            'default': lambda: ocpiutil.get_dirtype().split('-') if ocpiutil.get_dirtype() else None,
+            'default': get_noun,
             'registry': None
         }
     },

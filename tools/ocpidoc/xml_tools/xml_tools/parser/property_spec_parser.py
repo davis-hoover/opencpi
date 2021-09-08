@@ -207,9 +207,6 @@ class PropertySpecParser(base_parser.BaseParser):
             if not member_element:
                 type_dict["members"] = self._get_struct_property_type(
                     property_element)
-            else:
-                raise ValueError(
-                    "Member child elements cannot have type struct.")
         elif type_ == "enum":
             # "enum" attribte must be present when type is "enum".
             type_dict["enums"] = self._get_list_attribute(
@@ -276,7 +273,7 @@ class PropertySpecParser(base_parser.BaseParser):
             OpenCPI struct members cannot have type struct.
         """
         members = {}
-        for member in property_element.iter("member"):
+        for member in property_element.findall("member"):
             if "name" not in property_element.attrib.keys():
                 raise ValueError("Member value must have 'name' attribute.")
             name = member.attrib["name"]
@@ -284,6 +281,9 @@ class PropertySpecParser(base_parser.BaseParser):
 
             member_dict[name]["type"] = self._get_property_type(
                 property_element=member, member_element=True)
+            if member_dict[name]["type"]["data_type"] == "struct":
+                member_dict[name]["type"]["members"] = \
+                    self._get_struct_property_type(member)
 
             members.update(member_dict)
         return members

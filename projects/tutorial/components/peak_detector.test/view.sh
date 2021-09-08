@@ -20,5 +20,5 @@
 
 # Use this script to view your input and output data. 
 # Args: <list-of-user-defined-args> <input-file> <output-file>
-$OCPI_PROJECT_DIR/scripts/plotAndFft.py $2 complex 32768 100&
-$OCPI_PROJECT_DIR/scripts/plotAndFft.py $1 complex 32768 100&
+$OCPI_ROOT_DIR/projects/tutorial/scripts/plotAndFft.py $2 complex 32768 100&
+$OCPI_ROOT_DIR/projects/tutorial/scripts/plotAndFft.py $1 complex 32768 100&

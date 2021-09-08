@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import os
 from copy import copy
 from inspect import signature
 from pathlib import Path
@@ -27,9 +28,12 @@ import _opencpi.util as ocpiutil
 import ocpiargparse
 from ocpidev_args import args_dict
 from _opencpi.assets import application
+from _opencpi.assets import test
 import ocpidev_utilization
 import ocpishow 
 import ocpidev_run
+sys.path.append(os.getenv('OCPI_CDK_DIR') + '/scripts/')
+import genProjMetaData
 
 def main():
     """
@@ -61,6 +65,9 @@ def main():
             rc = ocpidev_run.main()
 
     args = postprocess_args(args)
+    verb = args.verb
+    noun = args.orig_noun = args.noun
+    kwargs = {}
 
     do_ocpidev_sh = True
     try:
@@ -70,10 +77,26 @@ def main():
             ocpi_set_unset(args)
 
         directory,name = get_working_dir(args)
+        dirtype = ocpiutil.get_dirtype(directory)
+
+        if noun != dirtype:
+            if noun == 'library' and dirtype == 'libraries':
+                args.noun = dirtype
+                noun = args.noun
+        if noun == 'libraries':
+            kwargs['init_libs_col'] = True
+            kwargs["verbose"] = args.verbose
+            kwargs["orig_noun"] = args.orig_noun
+            #TODO: This check will be redundant when falling back to bash is
+            # removed and this check can be removed at the same time
+            if dirtype != 'libraries':
+                print("Expected directory of type '" + noun + "' but found type '"
+                      + dirtype + "' for directory " + directory)
+                sys.exit(1)
 
         # Try to instantiate the appropriate asset from noun
         asset_factory = ocpiassets.factory.AssetFactory()
-        asset = asset_factory.factory(args.noun, directory, name)
+        asset = asset_factory.factory(args.noun, directory, name, **kwargs)
 
         try:
         # Get verb method parameters, collect them from args, and try to
@@ -85,6 +108,7 @@ def main():
                 method_args[param] = getattr(args, param, '')
             print_cmd(args, asset.directory)
             asset_method(**method_args)
+            metadata(verb, noun)
         except ocpiutil.OCPIException as e:
         # Verb failed in an expected way; don't fall back to ocpidev.sh
             do_ocpidev_sh = False
@@ -99,6 +123,16 @@ def main():
         sys.exit(1)
 
 
+def metadata(verb=None, noun=None):
+    if not verb in ["create", "delete"]:
+       return
+    if verb == "delete" and noun in ["project", "registry"]:
+       return
+    projdir = ocpiutil.get_path_to_project_top()
+    if ocpiutil.get_dirtype(projdir) == "project":
+        genProjMetaData.main(projdir)
+
+
 def postprocess_args(args):
     """
     Post-processes user arguments
@@ -111,10 +145,8 @@ def postprocess_args(args):
         ])
         ocpiutil.logging.error(err_msg)
         sys.exit(1)
-    if args.noun== 'spec':
+    if args.noun == 'spec':
         args.noun = 'component'
-    elif args.noun == 'hdl-slot':
-        args.noun = 'hdl-card'
     if hasattr(args, 'rcc-noun'):
         args.model = 'rcc'
     elif args.noun == 'worker':
@@ -173,6 +205,13 @@ def ocpicreate(args):
         "project": ocpiassets.project.Project,
         "library": ocpiassets.library.Library,
         "application": ocpiassets.application.Application,
+        "component": ocpiassets.component.Component,
+        "protocol": ocpiassets.component.Protocol,
+        "test": ocpiassets.test.Test,
+        "hdl-platform": ocpiassets.platform.HdlPlatformWorker,
+        "hdl-assembly": ocpiassets.assembly.HdlApplicationAssembly,
+        "hdl-slot": ocpiassets.component.Slot,
+        "hdl-card": ocpiassets.component.Card,
     }
     if args.noun not in class_dict:
     # Noun not implemented by this function; fall back to ocpidev.sh
@@ -180,6 +219,7 @@ def ocpicreate(args):
     directory,name = get_working_dir(args, ensure_exists=False)
     print_cmd(args, directory)
     delattr(args, 'name')
+    verb = args.verb
     args = vars(args)
     noun = args.pop('noun', '')
     try:
@@ -187,6 +227,7 @@ def ocpicreate(args):
     except ocpiutil.OCPIException as e:
         ocpiutil.logging.error(e)
         sys.exit(1)
+    metadata(verb, None)
     sys.exit()
 
 
@@ -206,15 +247,15 @@ def get_working_dir(args, ensure_exists=True):
         if working_path.name != name:
             working_path = Path(working_path, name)
     elif noun == 'project' and args.verb == 'create':
-        working_path = Path(Path.cwd(), name).resolve()
+        working_path = Path(Path.cwd(), name).absolute()
     else:
         working_path = Path(ocpiutil.get_ocpidev_working_dir(
-            noun, name, ensure_exists=ensure_exists, **kwargs)).resolve()
-    if noun not in ['registry', 'library', 'project'] or args.verb == 'create':
+            noun, name, ensure_exists=ensure_exists, **kwargs)).absolute()
+    if noun not in ['registry', 'library', 'libraries', 'project'] or args.verb == 'create':
     # Libraries, projects, and registries want the full path as the directory
         name = working_path.name
         working_path = str(working_path.parent)
-    
+
     return str(working_path),name
 
 
@@ -223,8 +264,9 @@ def print_cmd(args, directory):
     If verbose, print message detailing command to be executed
     """
     if getattr(args, 'verbose', False):
+        simple_noun = args.orig_noun.replace("-"," ")
         msg = ' '.join([
-            'Executing command "{} {}"'.format(args.verb, args.noun), 
+            'Executing command "{} {}"'.format(args.verb, simple_noun), 
             'in directory: {}'.format(directory)
         ])
         print(msg)

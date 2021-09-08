@@ -33,7 +33,7 @@ from _opencpi.util import OCPIException
 # Makefiles
 ###############################################################################
 
-def execute_cmd(settings, directory, action=None, file=None, verbose=False):
+def execute_cmd(settings, directory, action=None, file=None, verbose=False, ignore_error=False):
     """
     This command is a wrapper around any calls to make in order to encapsulate the use of make to a
     minimal number of places.  The function contains a hard-coded dictionary of generic settings to
@@ -42,6 +42,12 @@ def execute_cmd(settings, directory, action=None, file=None, verbose=False):
     settings_dict = {'rcc_plats'       : "RccPlatforms",
                      'hdl_plat_strs'   : "HdlPlatforms",
                      'hdl_tgt_strs'    : "HdlTargets",
+                     'rcc_platform'    : "RccPlatforms",
+                     'hdl_platform'    : "HdlPlatforms",
+                     'hdl_target'      : "HdlTargets",
+                     'hdl_assembly'    : "Assemblies",
+                     'hdl_rcc_platform': "RccHdlPlatforms",
+                     'worker'          : "Workers",
                      'only_plats'      : "OnlyPlatforms",
                      'ex_plats'        : "ExcludePlatforms",
                      'keep_sims'       : "KeepSimulations",
@@ -53,7 +59,7 @@ def execute_cmd(settings, directory, action=None, file=None, verbose=False):
                      'run_arg'         : "OcpiRunArgs",
                      'remote_test_sys' : "OCPI_REMOTE_TEST_SYSTEMS",
                      'verbose'         : "TestVerbose"}
-    make_list = ["make", "-r", "--no-print-directory", "-C", directory]
+    make_list = ["make", "-r", "-C", directory, "--no-print-directory"]
     debug_string = " ".join(make_list)
     if file:
         make_list.append("-f")
@@ -62,7 +68,9 @@ def execute_cmd(settings, directory, action=None, file=None, verbose=False):
 
     if action is not None:
         make_list.extend(action)
-        debug_string += " " + ' '.join(action) + " "
+        debug_string += " AT= " + ' '.join(action) + " "
+    else:
+        debug_string += " AT= "
 
     logging.debug("settings for make command: " + str(settings.items()))
     for setting, value in settings.items():
@@ -77,8 +85,8 @@ def execute_cmd(settings, directory, action=None, file=None, verbose=False):
                 debug_string += " " + settings_dict[setting] + '='  + ' '.join(value)
         else:
             # pylint:disable=undefined-variable
-            raise OCPIException("Invalid setting data-type passed to execute_cmd().  Valid data-" +
-                                "types are bool and list")
+            raise OCPIException("Invalid settings data-type passed to execute_cmd().  settings is " +
+                                "expected to be a dictionary with values of type: bool, list or set.")
             # pylint:enable=undefined-variable
     logging.debug("running make command: " + debug_string)
     if verbose:
@@ -95,6 +103,9 @@ def execute_cmd(settings, directory, action=None, file=None, verbose=False):
         # pylint:disable=undefined-variable
         raise OCPIException("Received Keyboard Interrupt - Exiting")
         # pylint:enable=undefined-variable
+    if not ignore_error:
+        if child.returncode != 0:
+            sys.exit(1)
     return child.returncode
 
 #TODO fix these problems with the function instead of just disabling them
@@ -116,12 +127,15 @@ def set_vars_from_make(mk_file_and_dir, mk_arg="", verbose=None):
                        print both stdout and stderr for user to see
     """
     with open(os.devnull, 'w') as fnull:
-        make_exists = subprocess.Popen(["which", "make"],
-                      stdout=subprocess.PIPE, stderr=fnull).communicate()[0]
-        if make_exists is None or make_exists == "":
-            if verbose != None and verbose != "":
-                logging.error("The '\"make\"' command is not available.")
-            return 1
+        # This check is not worth the overhead, vs a "make not found" error.
+        # FIXME: put this check in some more universal place done once,
+        # e.g. at installation time, but inside this function.
+        # make_exists = subprocess.Popen(["which", "make"],
+        #               stdout=subprocess.PIPE, stderr=fnull).communicate()[0]
+        # if make_exists is None or make_exists == "":
+        #     if verbose != None and verbose != "":
+        #         logging.error("The '\"make\"' command is not available.")
+        #     return 1
 
         # If log level >= 10 set OCPI_DEBUG_MAKE=1 (max debug level)
         ocpi_log_level = int(os.environ.get('OCPI_LOG_LEVEL', 0))
@@ -448,7 +462,7 @@ def change_dir(directory):
     if directory != orig_dir:
         try:
             directory = Path(directory).resolve()
-            os.chdir(directory)
+            os.chdir(str(directory))
         except FileNotFoundError:
             err_msg = 'directory {} does not exist'.format(directory)
         except NotADirectoryError:

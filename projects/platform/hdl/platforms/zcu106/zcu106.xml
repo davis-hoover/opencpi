@@ -14,7 +14,7 @@
   <Device Worker='time_server'>
     <Property Name='frequency' Value='100e6'/>
   </Device>
-
+  <specproperty name='sdp_width' value='2'/>
   <sdp name='zynq_ultra' master='true' count='4'/>
   <Property name='useGP1' type='bool' parameter='1' default='false'/>
   <Property name='axi_error' type='bool' arraylength='4' volatile='true'/>

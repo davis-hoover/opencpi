@@ -46,6 +46,7 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 \renewcommand\thesubsection{\thesection-\Roman{subsection}}
 \newpage
 \begin{appendices}
+\label{old_releases}
 The Release Notes from previous releases are included here as reference for still-existing bugs, relevant upgrading notes for users of very old versions, etc.
 }
 % end of beginoldnotes
@@ -90,6 +91,8 @@ The Release Notes from previous releases are included here as reference for stil
 			\hline
 			v2.2.0 & Updates for 2.2.0 release & 07/2021 \\
 			\hline
+			v2.3.0 & Updates for 2.3.0 release & 09/2021 \\
+			\hline
 		\end{tabularx}
 	\end{table}
 \end{center}
@@ -108,7 +111,7 @@ This document contains corrections, changes, and enhancements made to OpenCPI si
 \item Section~II (``Changes and Notes'') is ``\textit{What do I need to be aware of as a \textbf{previous} user of the Framework?}''
 \item Section~III (``Major Known Deficiencies'') is for \textit{all} users to answer ``\textit{What bugs should I be aware of?}''
 \end{itemize}
-The \href{sec:appendices}{appendices} contain the Release Notes from previously released versions of the Framework, roughly following the same format, e.g. \ref{sec:13_enhancements}, being Section~I of the v1.3~Appendix, is the ``Enhancements'' that were added to Release 1.3.
+The Appendices (beginning on page \pageref{old_releases}) contain the Release Notes from previously released versions of the Framework, roughly following the same format, e.g. \ref{sec:13_enhancements}, being Section~I of the v1.3~Appendix, is the ``Enhancements'' that were added to Release 1.3.
 
 \iffalse
 %\origsection{Release XXX}
@@ -125,7 +128,123 @@ The \href{sec:appendices}{appendices} contain the Release Notes from previously 
 \def\ocpiversion{latest}  % Need to redefine so doc links are correct
 \section{Enhancements}
 
+\subsection{PicoEVB HDL Platform}
+\label{sec:23_picoevb}
+This release adds preliminary (as in ``\textbf{beta}'' -- as in ``\textbf{not everything works}'') support for the ``\code{PicoEVB}'' HDL platform, which is a PCIe-based FPGA device.  Significantly, this is the first PCI device that OpenCPI has supported in many years, and it is the first to use the modern dataplane infrastructure (SDP) with PCI Express.  It can be used as an example for supporting future PCIe-based FPGA platforms.\\
+
+The ``\code{PicoEVB}'' is a low-cost FPGA device from RHS Research\textsuperscript{\texttrademark}.  The board is designed around the Xilinx Artix 7 (XC7A50T) FPGA with a PCIe x1 interface.  The ``\code{PicoEVB}'' will work in the following slots:
+\begin{itemize}
+\setlength\itemsep{0em} %tighten
+\item M.2 2230 Key A
+\item M.2 2230 Key E
+\item M.2 2280 Key M
+\item Full length mini PCIe (with carrier board)
+\item PCIe x1, x4, x8, or x16 slot (with carrier board)
+\end{itemize}
+More information about the ``\code{PicoEVB}'' platform can be found at the RHS Research website (\url{https://rhsresearch.com/}).  Note the OpenCPI HDL (FPGA) platform for the ``\code{PicoEVB}'' is called ``\code{picoevb}''.  Additional details may be found in the ``\code{PicoEVB Getting Started Guide}''.\\
+
+The following list highlights the features included with support of the ``\code{PicoEVB}'':
+\begin{itemize}
+\setlength\itemsep{0em} %tighten
+\item Updated interface for PCIe-based Control and Data Planes with SDP support (replaces uNOC implementation)
+\item Added method for automatic generation of Xilinx PCIe IP as part of the build process
+\item Added assembly for testing HDL platforms without embedded processors
+\end{itemize}
+
+\subsection{\code{test\_internal\_assy} Assembly}
+\label{sec:23_tia_assy}
+The new \code{test\_internal\_assy} assembly is an example of an HDL assembly that generates and receives data internally.  It may be used for testing and validating new HDL platforms.
+
+\subsection{New \code{analog} OSP}
+\label{sec:23_analog}
+The new ``\code{analog}'' OSP provides OpenCPI support for Analog Devices, Inc. products.  This release provides initial OpenCPI support of \code{ADRV9361-Z7035} attached to \code{ADRV1CRR-BOB}.  
+
+\subsection{New \code{sdr} COMP}
+\label{sec:23_sdr}
+This is the initial OpenCPI release of the contributed ``\code{ocpi.comp.sdr}'' project (used to be known as ``\code{ocpi.sdr}'').\\
+
+In the months since the project was originally created/contributed, the following enhancements, bugfixes, and features have been added and are present in this release:
+\begin{itemize}
+\setlength\itemsep{0em} %tighten
+\item Golay Encoder and Decoder components have been added that can be used for forward error correction.
+\item Convolutional interleaver and convolutional de-interleaver components have been added which can be used to reduce burst errors when transmitting bursts of data.
+\item The deprecated readable attribute has been removed from the value property for the \code{equal\_to\_ul\_b} component.
+\item A limit on the number of messages used at the verification stage of unit testing for generator components has been implemented by truncating the generated output files such that they contain no more than a set number of messages.
+\item The \code{cic\_interpolator\_xs} HDL worker has been modified to allow for the \code{up\_sample\_factor} property to be set during run time without the worker entering a broken state.
+\item All primitives and components have been updated to protocol version 2.
+\item Added more support and standardized the testing for components with multiple output ports.
+\item Improved the HDL resource efficiency of \code{fir\_filter\_scaled\_xs} and \code{fir\_filter\_scaled\_s} by using the \code{number\_of\_taps} property to set the array length of taps at build time.
+\item Improved the HDL resource efficiency of \code{symbol\_mapper\_uc\_l} by using the \code{array\_size} property to set the array length of symbols (previously named values) at build time.
+\item Improved performance of RCC worker \code{counter\_up\_down\_b\_uc} (previously \code{counter\_b\_uc}) by updating the volatile property \code{counter\_value} (previously \code{count}) after processing each message instead of each sample in the RCC worker.
+\item Added checking of description tag text for both child elements and attributes in xml files to \code{ocpi\_linter}.
+\item Renamed the project package name from \code{sdr} to \code{comp.sdr} and updated all \code{example\_app.xml} files accordingly.
+\item Renamed \code{counter\_b\_uc} to \code{counter\_up\_down\_b\_uc}.
+\item Modified HDL opcode and standard logic vector conversion functions to use \code{'pos} and \code{'val} attributes instead of case statements.
+\item Modified all HDL worker signal names to lowercase.
+\item Added \code{bias\_xs} component with RCC and HDL workers.
+\item Added \code{carrier\_generator\_s} component with RCC and HDL workers.
+\item Added \code{cic\_decimator\_xs} RCC worker.
+\item Added \code{constant\_l} component with RCC and HDL workers.
+\item Added \code{constant\_ul} component with RCC and HDL workers.
+\item Added \code{counter\_up\_down\_b\_ul} component with RCC and HDL workers.
+\item Added \code{counter\_up\_resettable\_b\_ul} component with RCC and HDL workers.
+\item Added \code{fir\_filter\_scaled\_s} RCC worker.
+\item Added \code{fir\_filter\_scaled\_xs} RCC worker.
+\item Added \code{multiplexer\_l} component with RCC and HDL workers.
+\item Added \code{multiplexer\_ul} component with RCC and HDL workers.
+\item Added \code{ramp\_generator\_l} component with RCC and HDL workers.
+\item Added \code{register\_b} component with RCC and HDL workers.
+\item Added \code{register\_l} component with HDL worker.
+\item Added \code{register\_ul} component with HDL worker.
+\end{itemize}
+
+\subsection{\code{capture\_v2} Unit Test}
+\label{sec:23_capture_v2}
+A new script has been created that generates an output file for the \code{capture\_v2} unit test's properties in a more readable format.  The input to the script is a property dump file when using the \code{dumpFile} option when running an app, or a \code{.log} file generated by a unit test. It is located in ``\code{opencpi/projects/assets/scripts/format\_capture\_v2\_property\_dump.py}''.
+
+\section{Changes and Notes}
+
+\subsection{\code{ocpidev}}
+\label{sec:23_ocpidev}
+The ``\code{-t}'' option is no longer available.  Test assets cannot be created simultaneously with component assets.
+
+\subsection{\code{ocpidoc}}
+\label{sec:23_ocpidoc}
+Although a great deal of progress has been made on finalizing the new documentation generator for OpenCPI assets, it should still be considered as ``preliminary'' in this release.
+
+\subsection{GUI Changes}
+\label{sec:23_ie_gui}
+The following changes have been made to the new GUI since the previous release:
+\begin{itemize}
+\setlength\itemsep{0em} %tighten
+\item When building OpenCPI assets or running unit tests, RCC and HDL targets can now have multiple platforms selected for a single operation.
+\item The GUI's ``\code{right click}'' menu is now context sensitive with respect to the OpenCPI asset being clicked on, and will only show options/operations relevant to that asset.
+\end{itemize}
+
+\section{Major Known Deficiencies}
+\label{sec:23_bugs}
+
+\subsection{Previously Documented Deficiencies}
+The following deficiencies are still present in 2.3:
+\begin{itemize}
+\setlength\itemsep{0em} %tighten
+\item \bugref{693}
+\item \bugref{1035}
+\item \bugref{1392}
+\item \bugref{2477}
+\item \bugref{3783}
+\item \bugref{2811}
+\end{itemize}
+
+% === End of 2.3.0
+
+\beginoldnotes
+\origsection{Release 2.2.0}
+\def\ocpiversion{v2.2.0}
+\section{Enhancements}
+
 \subsection{Xilinx Vivado 2020.2 Support}
+\label{sec:22_vivado}
 Xilinx Vivado 2020.2 is supported as of this release on all OpenCPI development platforms.
 
 \subsection{Ubuntu 20.04}
@@ -289,7 +408,6 @@ The following deficiencies are still present in 2.2:
 
 % === End of 2.2.0
 
-\beginoldnotes
 \origsection{Release 2.1.0}
 \def\ocpiversion{v2.1.0}
 \section{Enhancements}

@@ -96,6 +96,9 @@ PKGS_D+=(libxml2-utils)
 PKGS_D+=(fakeroot)
 #    for asciidoc3 man page generation (asciidoc3 is a prereq)
 PKGS_D+=(xsltproc docbook-xml docbook-xsl)
+#    for sphinxcontrib.spelling extension (RST doc support)
+PKGS_D+=(enchant-2)
+
 
 ##########################################################################################
 # S. conveniences or required for source environment

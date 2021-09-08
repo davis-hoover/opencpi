@@ -8,7 +8,7 @@
 <SlotType name='fmc_hpc'>
   <signal input='VREF_B_M2C'/>          <!-- Pin K1 -->
   <signal bidirectional='CLK2_BIDIR_P'/><!-- Pin K4 -->
-  <signal bidirectional='CLK0_BIDIR_N'/><!-- Pin K5 -->
+  <signal bidirectional='CLK2_BIDIR_N'/><!-- Pin K5 -->
   <signal bidirectional='HA02_P'/>      <!-- Pin K7 -->
   <signal bidirectional='HA02_N'/>      <!-- Pin K8 -->
   <signal bidirectional='HA06_P'/>      <!-- Pin K10 -->

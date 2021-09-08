@@ -26,16 +26,12 @@ A block diagram representation of the implementation is given in :numref:`comple
    :alt: Complex Mixer Block Diagram
    :align: center
 
-   Block diagram of complex mixer implementation.
+   Complex Mixer Block Diagram
 
 Interface
 ---------
 .. literalinclude:: ../specs/complex_mixer-spec.xml
    :language: xml
-
-Opcode Handling
-~~~~~~~~~~~~~~~
-To be supplied: Description of how the non-stream opcodes are handled.
 
 Properties
 ~~~~~~~~~~
@@ -62,14 +58,6 @@ Dependencies
 The dependencies on other elements in OpenCPI are:
 
  * None.
-
-There is also a dependency on:
-
- * ``ieee.std_logic_1164``
-
- * ``ieee.numeric_std``
-
- * Skeleton outline: Any other standard C++ or HDL packages.
 
 Limitations
 -----------

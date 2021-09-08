@@ -48,18 +48,21 @@ import _opencpi.hdltargets as hdltargets
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 
 # Dummy/static hdl-targets.mk file to mimic the real one in the CDK
-TARGETS_FILE = DIR_PATH + "/include/hdl/hdl-targets.mk"
+TARGETS_FILE_MK = DIR_PATH + "/include/hdl/hdl-targets.mk"
+TARGETS_FILE_XML = DIR_PATH + "/include/hdl/hdl-targets.xml"
 
 def setUpUnitTest():
     os.environ['OCPI_CDK_DIR'] = os.path.realpath('.')
     logging.info("CDK: " + os.environ['OCPI_CDK_DIR'])
 
     # Mimic CDK directory tree here with temporary dirs
-    os.makedirs(DIR_PATH + "/include/hdl/")
-    copyfile("hdl-targets.mk", TARGETS_FILE)
+    os.makedirs(DIR_PATH + "/include/hdl")
+    copyfile("hdl-targets.mk", TARGETS_FILE_MK)
+    copyfile("hdl-targets.xml", TARGETS_FILE_XML)
 
 def tearDownUnitTest():
-    os.remove(TARGETS_FILE)
+    os.remove(TARGETS_FILE_MK)
+    os.remove(TARGETS_FILE_XML)
     os.removedirs(DIR_PATH + "/include/hdl")
 
 # Hard-coded dictionary representation of the contents of hdl-targets.mk
@@ -76,6 +79,15 @@ TGT_DICT = {
     'HdlPlatformDir_xsim': ['fake_plat'],
     'HdlPlatformDir_zed_ise': ['fake_plat'],
     'HdlPlatformDir_ml605': ['fake_plat'],
+    'HdlPlatformPackageID_zed': ['fake_plat'],
+    'HdlPlatformPackageID_zed_zipper': ['fake_plat'],
+    'HdlPlatformPackageID_alst4x': ['fake_plat'],
+    'HdlPlatformPackageID_alst4': ['fake_plat'],
+    'HdlPlatformPackageID_modelsim': ['fake_plat'],
+    'HdlPlatformPackageID_isim': ['fake_plat'],
+    'HdlPlatformPackageID_xsim': ['fake_plat'],
+    'HdlPlatformPackageID_zed_ise': ['fake_plat'],
+    'HdlPlatformPackageID_ml605': ['fake_plat'],
     'HdlToolSet_zynq': ['vivado'],
     'HdlToolName_vivado': ['Vivado'],
     'HdlPart_zed_zipper': ['xc7z020-1-clg484'],
@@ -171,14 +183,16 @@ class TestHdlTargets(unittest.TestCase):
             # test __str__
             self.assertEqual(str(hdltargets.HdlToolFactory.factory("hdltarget", name)), name)
             logging.info("Parts list of target: " + name)
+            targetparts = hdltargets.HdlToolFactory.factory("hdltarget", name).parts
             if 'HdlTargets_' + name in TGT_DICT:
                 logging.info("Parts list should be: " + str(TGT_DICT['HdlTargets_' + name]))
-                self.assertEqual(hdltargets.HdlToolFactory.factory("hdltarget", name).parts,
-                                 TGT_DICT['HdlTargets_' + name])
+                tparts = TGT_DICT['HdlTargets_' + name]
+                targetparts.sort()
+                tparts.sort()
+                self.assertEqual(targetparts, tparts)
             else:
                 logging.info("Parts list should be: " + str([name]))
-                self.assertEqual(hdltargets.HdlToolFactory.factory("hdltarget", name).parts,
-                                 [name])
+                self.assertEqual(targetparts, [name])
             logging.info("ToolSet for should be: " + str(TGT_DICT['HdlToolSet_' + name][0]))
             self.assertEqual(hdltargets.HdlToolFactory.factory("hdltarget", name).toolset.name,
                              TGT_DICT['HdlToolSet_' + name][0])

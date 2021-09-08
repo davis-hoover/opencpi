@@ -53,26 +53,20 @@ A block diagram representation of the implementation is given in :numref:`platfo
    :alt: AD9361 Config Proxy Device Worker Implementation Block Diagram
    :align: center
 
-   Block diagram of AD9361 config proxy device worker implementation.
+   AD9361 Config Proxy HDL Device Worker Block Diagram
 
 Interface
 ---------
-.. The spec referenced below is a link to the spec in the assets project and the tool can't presently follow the link. The tool search paths need to be updated to look in that location.
-   
 .. literalinclude:: ../specs/ad9361_config_proxy-spec.xml
    :language: xml
 
-Opcode Handling
-~~~~~~~~~~~~~~~
-To be supplied: Description of how the non-stream opcodes are handled (if relevant).
-
 Properties
 ~~~~~~~~~~
-.. comment out ocpi_documentation_properties for now. The parser crashes with an error about member child elements in structs.
+.. ocpi_documentation_properties::
 
 Ports
 ~~~~~
-.. comment out ocpi_documentation_ports for now. It doesn't work.
+.. ocpi_documentation_ports::
 
 Implementations
 ---------------
@@ -102,7 +96,7 @@ Limitations
 -----------
 Limitations of ``platform_ad9361_config_proxy`` are:
 
- * Skeleton outline: List any limitations, or state "None." if there are none.
+ * None.
 
 Testing
 -------

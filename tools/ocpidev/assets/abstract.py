@@ -89,8 +89,7 @@ class Asset(metaclass=ABCMeta):
     @staticmethod
     def check_dirtype(dirtype, directory):
         """
-        checks that the directory passed in is of the type passed in and if not an exception is
-        thrown
+        Validate the directory and dirtype, otherwise raise an exception
         """
         if not os.path.isdir(directory):
             err_msg = 'location does not exist at: {}'.format(directory)
@@ -100,9 +99,9 @@ class Asset(metaclass=ABCMeta):
         if not true_dirtype:
             true_dirtype = 'unknown'
         if true_dirtype != dirtype:
-            err_msg = ' '.join(['Expected directory of type "{}"'.format(dirtype), 
-                                'but found type "{}"'.format(true_dirtype), 
-                                'for directory {}'.format(directory)])
+            err_msg = ' '.join(["Expected directory of type '{}'".format(dirtype), 
+                                "but found type '{}'".format(true_dirtype), 
+                                "for directory {}".format(directory)])
             raise ocpiutil.OCPIException(err_msg)
 
     def delete(self, noun='asset', force=False):
@@ -113,6 +112,8 @@ class Asset(metaclass=ABCMeta):
         path = Path(self.directory)
         if path.name != self.name:
             path = Path(path, self.name)
+        if not type(noun) == str:
+            noun = self.__module__.split(".")[-1]
         if not force:
             prompt = 'Delete {} at: {}'.format(noun, str(path))
             force = ocpiutil.get_ok(prompt=prompt)
@@ -122,8 +123,10 @@ class Asset(metaclass=ABCMeta):
                     shutil.rmtree(str(path))
                 else:
                     path.unlink()
-                msg = 'Successfully deleted {}'.format(
-                    noun if noun else str(path))
+                simple_noun = noun.replace("-", " ")
+                basic_name = self.name.split(".")[0]
+                msg = "Successfully deleted {} '{}'".format(
+                    simple_noun if simple_noun else str(path), basic_name)
                 print(msg)
             except Exception as e:
                 err_msg = 'Failed to delete {}\n{}'.format(

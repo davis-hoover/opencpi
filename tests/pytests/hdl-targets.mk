@@ -21,6 +21,7 @@
 
 # Include this here so that hdl-targets.mk (this file) can be included on its own when
 # things like HdlAllPlatforms is required.
+
 all:
 $(info HdlToolSet_zynq="vivado ";\
        HdlToolName_vivado="Vivado";\
@@ -32,10 +33,12 @@ $(info HdlToolSet_zynq="vivado ";\
        HdlToolSet_modelsim="modelsim ";\
        HdlToolName_modelsim="Modelsim";\
        HdlPart_zed="xc7z020-1-clg484 ";\
+       HdlTarget_zed="zynq";\
        HdlTopTargets="xilinx altera modelsim ";\
        HdlSimTools="isim icarus verilator ghdl xsim modelsim ";\
        HdlAllFamilies="isim virtex5 virtex6 spartan3adsp spartan6 zynq_ise zynq xsim stratix4 stratix5 modelsim ";\
        HdlPart_zed_ise="xc7z020_ise_alias-1-clg484 ";\
+       HdlTarget_zed_ise="zynq_ise";\
        HdlTargets_stratix5="ep5sgsmd8k2 ";\
        HdlTargets_stratix4="ep4sgx230k ep4sgx530k ep4sgx360 ";\
        HdlTargets_virtex6="xc6vlx240t ";\
@@ -43,10 +46,12 @@ $(info HdlToolSet_zynq="vivado ";\
        HdlFamily_xc7z020_ise_alias-1-clg484="zynq_ise ";\
        HdlTargets_altera="stratix4 stratix5 ";\
        HdlPart_alst4x="ep4sgx530k-c2-h40 ";\
+       HdlTarget_alst4x="stratix4";\
        HdlAllTargets="isim virtex5 virtex6 spartan3adsp spartan6 zynq_ise zynq xsim stratix4 stratix5 modelsim xilinx altera ";\
        HdlTargets_xilinx="isim virtex5 virtex6 spartan3adsp spartan6 zynq_ise zynq xsim ";\
        HdlFamily_isim="isim ";\
        HdlPart_isim="isim ";\
+       HdlTarget_isim="isim ";\
        HdlToolSet_virtex6="xst ";\
        HdlToolSet_virtex5="xst ";\
        HdlAllPlatforms="zed zed_zipper alst4x alst4 modelsim isim xsim zed_ise ml605 ";\
@@ -59,13 +64,17 @@ $(info HdlToolSet_zynq="vivado ";\
        HdlToolSet_isim="isim ";\
        HdlToolName_isim="ISE";\
        HdlPart_alst4="ep4sgx230k-c2-f40 ";\
+       HdlTarget_alst4="stratix4";\
        HdlPart_modelsim="modelsim ";\
+       HdlTarget_modelsim="modelsim";\
        HdlPart_xsim="xsim ";\
+       HdlTarget_xsim="xsim ";\
        HdlTargets_spartan3adsp="xc3sd3400a ";\
        HdlToolSet_spartan3adsp="xst ";\
        HdlToolSet_xsim="xsim ";\
        HdlToolName_xsim="Vivado";\
        HdlPart_ml605="xc6vlx240t-1-ff1156 ";\
+       HdlTarget_ml605="virtex6";\
        HdlFamily_modelsim="modelsim ";\
        HdlFamily_xc7z020-1-clg484="zynq ";\
        HdlToolSet_spartan6="xst ";\
@@ -81,4 +90,12 @@ $(info HdlToolSet_zynq="vivado ";\
        HdlPlatformDir_isim="fake_plat";\
        HdlPlatformDir_xsim="fake_plat";\
        HdlPlatformDir_zed_ise="fake_plat";\
-       HdlPlatformDir_ml605="fake_plat";)
+       HdlPlatformDir_ml605="fake_plat";\
+       HdlPlatformPackageID_zed="fake_plat";\
+       HdlPlatformPackageID_alst4x="fake_plat";\
+       HdlPlatformPackageID_alst4="fake_plat";\
+       HdlPlatformPackageID_modelsim="fake_plat";\
+       HdlPlatformPackageID_isim="fake_plat";\
+       HdlPlatformPackageID_xsim="fake_plat";\
+       HdlPlatformPackageID_zed_ise="fake_plat";\
+       HdlPlatformPackageID_ml605="fake_plat";)

@@ -1,0 +1,4 @@
+<HdlAssembly>
+  <Instance Worker="test_source" connect='test_sink'/>
+  <Instance Worker="test_sink" />
+</HdlAssembly>

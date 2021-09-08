@@ -26,6 +26,8 @@ import jinja2
 from pathlib import Path
 import _opencpi.assets.template as ocpitemplate
 import subprocess
+import _opencpi.util as ocpiutil
+import shutil
 from .abstract import RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAsset, Asset
 from .factory import AssetFactory
 from .worker import Worker, HdlWorker
@@ -46,6 +48,7 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
             init_workers (T/F) - Instructs the method whether to construct all worker objects
                                  contained in the library
         """
+        self.check_dirtype("library", directory)
         if not name:
             name = str(Path(directory).name)
         super().__init__(directory, name, **kwargs)
@@ -143,6 +146,18 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         self.wkr_names = ret_wkrs
         return (ret_tests, ret_wkrs)
 
+    @staticmethod
+    def get_workers(directory="."):
+        workers = []
+        mkf=ocpiutil.get_makefile(directory,"library")
+        make_dict = ocpiutil.set_vars_from_make(mkf,
+          mk_arg="ShellLibraryVars=1 showlib", verbose=True)
+        wkrs = make_dict["Workers"]
+        for name in wkrs:
+            if name.endswith((".rcc", ".rcc/", ".hdl", ".hdl/")):
+                workers.append(name + " ")
+        return (workers)
+
     def run(self):
         """
         Runs the Library with the settings specified in the object.  Throws an exception if the
@@ -166,11 +181,80 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
             if isinstance(worker, HdlWorker):
                 worker.show_utilization()
 
-    def build(self):
+    def clean(self, verbose=False, hdl=False, rcc=False,
+        worker=None, hdl_platform=None, hdl_target=None):
         """
-        This is a placeholder function will be the function that builds this Asset
+        Cleans the library by handing over the user specifications
+        to execute command.
         """
-        raise NotImplementedError("Library.build() is not implemented")
+        #Specify what to clean
+        action=[]
+        if not rcc and not hdl:
+            action.append('clean')
+        else:
+            if rcc:
+                action.append('cleanrcc')
+            if hdl:
+                action.append('cleanhdl')
+        settings = {}
+        if hdl_platform:
+            settings['hdl_plat_strs'] = hdl_platform
+        if hdl_target:
+            settings['hdl_target'] = hdl_target
+        if worker:
+            settings['worker'] = worker
+        make_file = ocpiutil.get_makefile(self.directory, "library")[0]
+        #Clean
+        ocpiutil.file.execute_cmd(
+            settings, self.directory, action=action, file=make_file, verbose=verbose)
+
+    def build(self, verbose=False, rcc=False, hdl=False, optimize=False,
+        dynamic=False, worker=None, hdl_platform=None, workers_as_needed=False, 
+        hdl_target=None, rcc_platform=None, hdl_rcc_platform=None):
+        """
+        Builds the library by handing over the user specifications
+        to execute command.
+        """
+        #Specify what to build
+        action=[]
+        if rcc:
+            action.append('rcc')
+        if hdl:
+            action.append('hdl')
+        if workers_as_needed:
+            os.environ['OCPI_AUTO_BUILD_WORKERS'] = '1'
+        build_suffix = '-'
+        if dynamic:
+            build_suffix += 'd'
+        if optimize:
+            build_suffix += 'o'
+        if optimize or dynamic:
+            if rcc_platform:
+                if any("-" in s for s in rcc_platform):
+                    raise ocpiutil.OCPIException("You cannot use the --optimize build option and "
+                    + "also specify build options in a platform name (in this case: ",
+                    rcc_platform, ")")
+                else:
+                    new_list = [s + build_suffix for s in rcc_platform]
+                    rcc_platform = new_list
+            else:
+                rcc_platform = [os.environ['OCPI_TOOL_PLATFORM'] + build_suffix]
+        #Pass settings
+        settings = {}
+        if hdl_platform:
+            settings['hdl_plat_strs'] = hdl_platform
+        if hdl_target:
+            settings['hdl_target'] = hdl_target
+        if rcc_platform:
+            settings['rcc_platform'] = rcc_platform
+        if hdl_rcc_platform:
+            settings['hdl_rcc_platform'] = hdl_rcc_platform
+        if worker:
+            settings['worker'] = worker
+        make_file = ocpiutil.get_makefile(self.directory, "library")[0]
+        #Build
+        ocpiutil.file.execute_cmd(
+                settings, self.directory, action=action, file=make_file, verbose=verbose)
 
     @staticmethod
     def get_working_dir(name, ensure_exists=True, **kwargs):
@@ -251,17 +335,31 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         """
         Create library asset
         """
+        verbose = kwargs.get("verbose", None)
         lib_path = Path(directory, name)
         if lib_path.exists():
             err_msg = 'library "{}" already exists at "{}"'.format(name, str(lib_path))
             raise ocpiutil.OCPIException(err_msg)
 
-        lib_path.mkdir()
-        os.chdir(str(lib_path))
         template_dict = Library._get_template_dict(name, directory, **kwargs)
+        compdir = Path(ocpiutil.get_path_to_project_top(), "components")
+        if not compdir.exists():
+            compdir.mkdir()
+        os.chdir(str(compdir))
+        template = jinja2.Template(ocpitemplate.LIBRARIES_XML, trim_blocks=True)
+        ocpiutil.write_file_from_string("components.xml", template.render(**template_dict))
+
+        if not lib_path.exists():
+            lib_path.mkdir()
+        os.chdir(str(lib_path))
         template = jinja2.Template(ocpitemplate.LIB_DIR_XML, trim_blocks=True)
         ocpiutil.write_file_from_string(name + ".xml", template.render(**template_dict))
-
+        workers = str(Library.get_workers())[1:-1] + "\n"
+        package_id = Library.get_package_id() + "." + name
+        logging.debug("Workers: " + workers + "Package_ID: " + package_id)
+        if verbose:
+            print("Created library '" + name + "' at " + str(lib_path))
+        
 
 class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAsset):
     """
@@ -271,6 +369,8 @@ class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, Rep
     def __init__(self, directory, name=None, **kwargs):
         self.check_dirtype("libraries", directory)
         super().__init__(directory, name, **kwargs)
+        self.verbose = kwargs.get("verbose", None)
+        self.orig_noun = kwargs.get("orig_noun", None)
         self.library_list = None
         if kwargs.get("init_libs_col", False):
             self.library_list = []
@@ -278,6 +378,34 @@ class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, Rep
             for lib in next(os.walk(directory))[1]:
                 lib_directory = directory + "/" + lib
                 self.library_list.append(AssetFactory.factory("library", lib_directory, **kwargs))
+
+    @staticmethod
+    def get_working_dir(name, ensure_exists=True, **kwargs):
+        """
+        return the directory of the Libraries given the name (name) and
+        libraries specifiers (library, hdl_library, hdl_platform)
+        """
+        # if more then one of the library location variables are not None it is an error.
+        # a length of 0 means that a name is required and a default location of components/
+        libraries = kwargs.get('library', '')
+        hdl_library = kwargs.get('hdl_library', '')
+        platform = kwargs.get('platform', '')
+        if len(list(filter(None, [libraries, hdl_library, platform]))) > 1:
+            ocpiutil.throw_invalid_libs_e()
+        ocpiutil.check_no_libs('libraries', libraries, hdl_library, platform)
+        if not name:
+            ocpiutil.throw_not_blank_e('libraries', 'name', True)
+
+        working_path = Path(ocpiutil.get_path_to_project_top())
+        comp_path = Path(working_path, 'components')
+        if name != 'components':
+            if not comp_path.exists() and not ensure_exists:
+                comp_path.mkdir()
+            working_path = Path(comp_path, name)
+        else:
+            working_path = comp_path
+
+        return str(working_path)
 
     def run(self):
         """
@@ -298,8 +426,54 @@ class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, Rep
         for lib in self.library_list:
             lib.show_utilization()
 
-    def build(self):
+    def clean(self, verbose=False, hdl=False, rcc=False,
+        worker=None, hdl_platform=None, hdl_target=None):
         """
-        This is a placeholder function will be the function that builds this Asset
+        Cleans the libraries by handing over the user specifications
+        to each library.
         """
-        raise NotImplementedError("LibraryCollection.build() is not implemented")
+        for lib in self.library_list:
+            lib.clean(verbose, hdl, rcc,
+                      worker, hdl_platform, hdl_target)
+
+    def build(self, verbose=False, rcc=False, hdl=False, optimize=False,
+        dynamic=False, worker=None, hdl_platform=None, workers_as_needed=False, 
+        hdl_target=None, rcc_platform=None, hdl_rcc_platform=None):
+        """
+        Builds the libraries by handing over the user specifications
+        to each library.
+        """
+        for lib in self.library_list:
+            lib.build(verbose, rcc, hdl, optimize,
+                      dynamic, worker, hdl_platform, workers_as_needed, 
+                      hdl_target, rcc_platform, hdl_rcc_platform)
+
+    def delete_all(self):
+        projdir = Path(ocpiutil.get_path_to_project_top())
+        os.chdir(projdir)
+        shutil.rmtree(self.directory)
+        print("Successfully deleted all libraries and directory:", self.directory)
+
+    def delete(self, force=False):
+        if self.orig_noun == "libraries":
+            for lib in self.library_list:
+               lib.delete(self, force)
+            if not force:
+                prompt = 'Delete {} at: {}'.format(self.name, str(self.directory))
+                force = ocpiutil.get_ok(prompt=prompt)
+            if force:
+                LibraryCollection.delete_all(self)
+            return
+
+        libs = []
+        for lib in self.library_list:
+            libs.append(lib.name.strip())
+        tense = "library exists:" if len(libs) == 1 else "libraries exist:"
+        if self.orig_noun == "library" and self.library_list and not force:
+            print("OCPI:ERROR: cannot delete 'components' because the following ", end="")
+            print(tense, str(libs)[1:-1])
+            exit(1)
+        if not os.path.isdir(self.directory):
+            print("OCPI:ERROR: no such directory:", self.directory)
+            exit(1)
+        LibraryCollection.delete_all(self)

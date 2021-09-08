@@ -465,7 +465,7 @@ namespace OCPI {
 	      for (auto cit = m_assembly.m_connections.begin();
 		   appConn == NULL && cit != m_assembly.m_connections.end(); ++cit)
 		for (auto pit = (*cit)->m_ports.begin(); pit != (*cit)->m_ports.end(); ++pit)
-		  if (pit->first == masterPort && pit->second == slaveConn.m_ports.front().second) {
+		  if (pit->first == masterPort && pit->second == slaveConn.m_externals.front().second) {
 		    appConn = *cit;
 		    assert(appConn->m_count <= 1);
 		    appConnPort = &*pit;
@@ -473,8 +473,7 @@ namespace OCPI {
 		  }
 	      if (appConn) { // there is an app connection to the master port with the same index
 		// Save info to allow us to undo the delegation
-		c.m_portFixups.emplace_front(appConn, &slaveConn, appConnPort,
-					     masterImplPort.m_ordinal);
+		c.m_portFixups.emplace_front(appConn, &slaveConn, appConnPort);
 		// Patch the app connection to point to a different port+index, delegating it.
 		// since the slaveConn has an external, the front() *is* the internal port
 		*appConnPort = slaveConn.m_ports.front(); // DELEGATE THE PORT
@@ -483,8 +482,6 @@ namespace OCPI {
 		appConnPort->first->m_connections.remove(&slaveConn);
 		// Add a new conn reference to the slave port
 		appConnPort->first->m_connections.push_front(appConn); // conn to slave port
-		// make master's port unconnected
-		m_assembly.assyPorts(instNum)[masterImplPort.m_ordinal] = NULL;
 	      }
 	    }
 	  }
@@ -508,9 +505,6 @@ namespace OCPI {
 	fixup.masterConnPort.first->m_connections.push_front(fixup.appConn);
 	// Restore app conn (slave conn was untouched)
 	*fixup.connPort = fixup.masterConnPort;
-	// restore the proxy's map from worker port ordinal to OU::Assembly::Port
-	m_assembly.assyPorts(fixup.masterConnPort.first->m_instance)[fixup.masterOrdinal] =
-	  fixup.masterConnPort.first;
       }
       m_nInstances = c.nInstances;
       m_instances.resize(m_nInstances);                // toss slaves from app assembly

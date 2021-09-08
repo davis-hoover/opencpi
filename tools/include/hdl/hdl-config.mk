@@ -46,6 +46,7 @@ override HdlPart:=$(HdlPart_$(HdlPlatforms))
 override HdlTargets:=$(call HdlGetFamily,$(HdlPart))
 override HdlTarget:=$(HdlTargets)
 override Platform:=$(HdlPlatform)
+override HdlPlatformDir_$(Platform):=$(HdlPlatformWorker)/lib
 override XmlIncludeDirsInternal+=$(HdlPlatformDir_$(Platform)) $(HdlPlatformDir_$(Platform))/hdl
 # There are two cases for component libraries relevant to platform configurations
 # 1. We are called below/in the platform's directory (and ComponentLibrariesInternal is defined)

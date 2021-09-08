@@ -49,7 +49,7 @@ A block diagram representation of the implementation is given in :numref:`platfo
    :alt: AD9361 SPI HDL Subdevice Worker Implementation Block Diagram
    :align: center
 
-   Block diagram of AD9361 SPI HDL subdevice worker implementation.
+   AD9361 SPI HDL Subdevice Worker Block Diagram
 
 Interface
 ---------
@@ -58,17 +58,13 @@ This component's specification is contained in the OpenCPI Worker Description (O
 .. literalinclude:: ../platform_ad9361_spi.hdl/platform_ad9361_spi.xml
    :language: xml
 
-Opcode Handling
-~~~~~~~~~~~~~~~
-To be supplied: Description of how the non-stream opcodes are handled (if relevant).
-
 Properties
 ~~~~~~~~~~
-.. comment out ocpi_documentation_properties for now. It doesn't work.
+.. ocpi_documentation_properties::
 
 Ports
 ~~~~~
-.. comment out ocpi_documentation_ports directive for now. It doesn't work.
+.. ocpi_documentation_ports::
 
 Implementations
 ---------------
@@ -101,7 +97,6 @@ Limitations of ``platform_ad9361_spi`` are:
 
 Testing
 -------
-
 The test outlined in the `AD9361 DAC <https://opencpi.gitlab.io/releases/develop/docs/assets/AD9361_DAC.pdf>`_ component description (see ``ocpi.assets.devices``) includes validation of a subset of this worker’s functionality.
 
 .. ocpi_documentation_test_result_summary::

@@ -62,7 +62,7 @@ A block diagram representation of the implementation is given in :numref:`platfo
    :alt: AD9361 Config HDL Subdevice Worker Implementation Block Diagram
    :align: center
 
-   Block diagram of AD9361 config HDL subdevice worker implementation.
+   AD9361 Config HDL Subdevice Worker Block Diagram
 
 Interface
 ---------
@@ -71,17 +71,23 @@ This component's specification is contained in the OpenCPI Worker Description (O
 .. literalinclude:: ../platform_ad9361_config.hdl/platform_ad9361_config.xml
    :language: xml
 
-Opcode Handling
-~~~~~~~~~~~~~~~
-To be supplied: Description of how the non-stream opcodes are handled (if relevant).
-
 Properties
 ~~~~~~~~~~
-.. comment out ocpi_documentation_properties for now. It doesn't work.
+
+.. note::
+   References to table numbers in this section correspond to table numbers in the `AD9361 Register Map Reference Manual <https://usermanual.wiki/Document/AD9361RegisterMapReferenceManualUG671.1082447504/view>`_.
+
+.. ocpi_documentation_properties::
+
+   data_bus_index_direction: Set to ``1`` if the bus indexing the P0_D and P1_D was reversed before processing.
+   rx_frame_usage: Set to ``1`` to indicate that this worker was built with the assumption that the RX frame operates in its toggle setting and set to ``0`` if this worker was built with the assumption that the RX frame has a rising edge on the first sample and then stays high.  The value is intended to match the AD9361 register 0x010 BIT D3.
+   rx_frame_is_inverted: RX path-specific data port configuration.  Used to tell other workers about the configuration that was enforced when this worker was compiled.
+   config_is_two_t: Some data port configurations, like LVDS, require the TX bus to use 2R2T timing if either 2 TX or 2 RX channels are used.  For example, if using LVDS and this has a value of 1, 2R2T timing will be forced.
+   force_two_r_two_t_timing: Expected to match AD9361 register 0x010 bit D2.
 
 Ports
 ~~~~~
-.. comment out ocpi_documentation_ports directive for now. It doesn't work and there aren't any ports for this component.
+.. ocpi_documentation_ports::
 
 Implementations
 ---------------

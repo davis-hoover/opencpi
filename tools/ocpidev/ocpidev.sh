@@ -31,7 +31,8 @@ Language_rcc=c++
 Languages_rcc=(c:c c++:cc)
 Language_hdl=vhdl
 Languages_hdl=(vhdl:vhd)
-Language_ocl=cl
+Language_ocl=ocl
+Languages_ocl=(ocl:cl)
 
 CheckCDK='$(if $(realpath $(OCPI_CDK_DIR)),,\
   $(error The OCPI_CDK_DIR environment variable is not set correctly.))'
@@ -473,7 +474,7 @@ function do_project {
     [ -n "$buildClean" ] || domake $subdir/$1 project imports
     eval domake $subdir/$1 project ${cleanTarget:+$cleanTarget} ${buildRcc:+rcc} ${buildHdl:+hdl} \
             ${buildNoAssemblies:+Assemblies=} \
-            "$(dovars Assemblies HdlPlatforms HdlTargets RccPlatforms RccHdlPlatforms)" \
+            "$(dovars Assemblies HdlPlatforms HdlTargets RccPlatforms RccHdlPlatforms Workers)" \
             $OCPI_MAKE_OPTS
     if [ -n "$buildClean" -a -z "$hardClean" ] ; then
       domake $subdir/$1 project imports
@@ -1043,7 +1044,7 @@ function do_worker {
       valid_languages+="\"${l/:*/}\" "
       [ "$Language" = ${l/:*/} ] && suff=${l/*:/}
     done
-    [ -z "$langattr" ] && bad Invalid language \"$Language\" for model \"$model\". Available: ${valid_languages}
+    [ -z "$suff" ] && bad Invalid language \"$Language\" for model \"$model\". Available: ${valid_languages}
   fi
   if [ -z "$Version" ]; then
      echo Without the worker version specified, it is set to 2 in this new worker.
@@ -1561,6 +1562,8 @@ function do_build_here {
 	cleanTarget=cleansim
       elif [ -n "$execute" ]; then
 	cleanTarget=cleanrun
+      elif [ $dirtype = test ]; then
+	cleanTarget=clean
       else
 	cleanTarget=cleantest
       fi

@@ -419,7 +419,7 @@ The following environment variables affect *`ocpirun`* operation:
     Whether (set to *`1`*) or not (set to *`0`*) multicast User Datagram
     Protocol (UDP) discovery of remote systems running *`ocpiserve`* is enabled.
 
-*`OCPI_OCPI_SOCKET_INTERFACE`*::
+*`OCPI_SOCKET_INTERFACE`*::
     The name of the network interface (from the list of network interfaces
     returned by the Linux *`ifconfig`* or *`ip addr`* command) to be used for contacting
     remote systems running *`ocpiserve`* container servers. Set this variable

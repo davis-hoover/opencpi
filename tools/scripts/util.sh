@@ -208,6 +208,49 @@ function ocpiDirType {
 
 OcpiEcho=/bin/echo
 
+# Parse project file but do not depend on any OpenCPI binaries
+# Clearly a good candidate for python
+function getattr {
+  sed s/$1/$1/i Project.xml | xmllint --xpath "string(/project/@$1)" -
+}
+
+function getvar {
+  sed -n "s/^ *$1:*= *\([^#]*\)/\1/p" Project.mk
+}
+
+function getproject {
+  if [ -f Project.xml ]; then
+    packagedeps=`getattr projectdependencies`
+    packagename=`getattr packagename`
+    packageprefix=`getattr packageprefix`
+    package=`getattr package`
+    packageid=`getattr packageid`
+  elif [ -f Project.mk ]; then
+    packagedeps=`getvar ProjectDependencies`
+    packagename=`getvar PackageName`
+    packageprefix=`getvar PackagePrefix`
+    package=`getvar Package`
+    packageid=`getvar PackageID`
+  else
+    bad Error:  Project has no Project.xml or Project.mk
+  fi
+  # echo packagedeps=$packagedeps
+  # echo packagename=$packagename
+  # echo packageprefix=$packageprefix
+  # echo package=$package
+  # echo packageid=$packageid
+
+  if [ -z "$packageid" ]; then
+    if [ -n "$package" ]; then
+      packageid=$package
+    else
+      [ -n "$packageprefix" ] || packageprefix=local
+      [ -n "$packagename" ] || packagename=$(basename $(ocpiReadLinkE .))
+      packageid=$packageprefix.$packagename
+    fi
+  fi
+}
+
 if [ "$1" = __test__ ] ; then
   if eval findInProjectPath $2 $3 result ; then
     echo good result is $result

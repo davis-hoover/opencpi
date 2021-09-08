@@ -22,7 +22,7 @@ that define the allowed/expected messages.
 A component is described by an OpenCPI Component Specification (OCS),
 which is an XML file that defines the component's properties and ports
 and usually references one or more OpenCPI Protocol Specifications (OPS)
-in the port definitions.
+in the port definitions. An OCS is also referred to as a "component spec" or "spec file".
 The OCS establishes the interface requirements for all worker implementations
 of the component in any authoring model. At present, a component consists
 of only the OCS XML file. For more information about a component's XML
@@ -31,7 +31,7 @@ structure, see the chapter "Component Specifications" in the
 
 In a project, a component resides in a *`specs/`* directory located
 either in a component library or at the top level of a project and
-is named '<component-name>'*`-spec.xml`*.
+ is named '<component-name>'*`-spec.xml`*.
 Note that components with an older naming format '<name>'*`_spec.xml`* also exist;
 for example, some of the components in the built-in OpenCPI projects *`assets`* and *`core`*.
 
@@ -112,7 +112,7 @@ Options When Creating Components
    with HDL-only implementations.
   
 Options When Deleting Components
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`-f`*::
     Force deletion: do not ask for confirmation when deleting
     a component. Normally, you are asked to confirm a deletion.
@@ -144,21 +144,21 @@ Options When Showing Components
     
 EXAMPLES
 --------
-. Create a component spec with the name *`mycomp`*. The component
-spec will be placed in the default location *`components/specs/`*:
+. Create a component with the name *`mycomp`*. The component
+specification will be placed in the default location *`components/specs/`*:
 +
--------------------------------
+--------------------------------
 ocpidev create component mycomp
 --------------------------------
 +
 . Create a component named *`mycomp`* in the library named
-*`myutilcomps`*. The component spec will be placed in
+*`myutilcomps`*. The component specification will be placed in
 the *`specs`* directory in *`myutilcomps`* sublibrary
 within the *`components`* library (*`components/myutilcomps/specs/`*):
 +
---------------------------------------------------------
+-----------------------------------------------
 ocpidev create component mycomp -l myutilcomps
---------------------------------------------------------
+-----------------------------------------------
 +
 . Delete a component named *`mydevcomp`* from the
 *`devices`* library underneath the project's *`hdl`* library
@@ -196,7 +196,7 @@ to the project *`/home/workspace/MyProject`*:
 +
 ------------------------------------------------------------------
 ocpidev show components --local-scope  -d /home/workspace/MyProject
------------------------------------------------------------------
+------------------------------------------------------------------
 
 BUGS
 ----
@@ -222,7 +222,7 @@ link:ocpidev-worker.1.html[ocpidev-worker(1)]
 
 COPYING
 -------
-Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2021 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your

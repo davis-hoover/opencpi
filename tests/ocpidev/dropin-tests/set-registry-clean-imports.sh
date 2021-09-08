@@ -40,18 +40,18 @@ ocpidev set registry ../$reg
 ocpidev clean
 test "$(readlink imports)" == "../$reg"
 
-# Test that soft cleaning *will* remove the default imports
+# Test that soft cleaning will not remove the default imports
 ocpidev set registry
 default_reg=$(getProjectRegistryDir)
 test "$(ocpiReadLinkE imports)" == "$(ocpiReadLinkE $default_reg)"
 # soft clean - should leave imports alone
 ocpidev clean
-test ! -e imports
+test -e imports
 
 # Test that soft cleaning will remove the registry even if set in the environment
 OCPI_PROJECT_REGISTRY_DIR=../$reg ocpidev set registry
 OCPI_PROJECT_REGISTRY_DIR=../$reg ocpidev clean
-test ! -e imports
+test -e imports
 
 popd
 ocpidev delete -f project $proj

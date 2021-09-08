@@ -16,8 +16,9 @@ class Project():
         self.group = group
         self.platforms = []
         self.assets = assets or ci_asset.discover_assets(
-            self.path, whitelist=['primitives', 'cards', 'devices', 'adapters', 
-                                  'assemblies', 'components', 'platforms'])
+            self.path, self, 
+            whitelist=['primitives', 'cards', 'devices', 'adapters', 
+                       'assemblies', 'components', 'platforms'])
 
 
 def discover_projects(projects_paths=None, group_ids=None, whitelist=None,
@@ -39,21 +40,32 @@ def discover_projects(projects_paths=None, group_ids=None, whitelist=None,
         raise ValueError("projects_path and/or group_id must be provided")
 
     projects = []
+    local_projects = []
+    remote_projects = []
 
     if projects_paths:
         if not isinstance(projects_paths, list):
             projects_paths = [projects_paths]
-
         for projects_path in projects_paths:
-            projects += discover_local_projects(
+            local_projects += discover_local_projects(
                 projects_path, whitelist=whitelist, blacklist=blacklist)
-
+    projects += local_projects
     if group_ids:
         if not isinstance(group_ids, list):
             group_ids = [group_ids]
         for group_id in group_ids:
-            projects += discover_remote_projects(
+            remote_projects += discover_remote_projects(
                 group_id, whitelist=whitelist, blacklist=blacklist)
+
+    for remote_project in remote_projects:
+        if remote_project.name not in [local_project.name 
+                                       for local_project 
+                                       in local_projects]:
+            projects.append(remote_project)
+        else:
+            for local_project in local_projects:
+                if remote_project.name == local_project.name:
+                    local_project.url = remote_project.url
 
     return projects
 
@@ -71,9 +83,10 @@ def discover_local_projects(projects_path, whitelist=None, blacklist=None):
     """
     projects = []
     for project_path in projects_path.glob('*'):
-        project_name = str(project_path).split('.')[-1].split('/')[-1]
+        project_name = project_path.name
 
-        if Path(project_path, "Project.xml").is_file() or Path(project_path, "Project.mk").is_file():
+        if (Path(project_path, "Project.xml").is_file() 
+                or Path(project_path, "Project.mk").is_file()):
             if blacklist and project_name in blacklist:
                 continue
             if whitelist and project_name not in whitelist:
@@ -82,7 +95,7 @@ def discover_local_projects(projects_path, whitelist=None, blacklist=None):
             group = 'opencpi' if group == 'projects' else group
             group = 'osp' if group == 'osps' else group
             project = Project(name=project_name, path=project_path, 
-                              group=group)
+                            group=group)
             projects.append(project)
         else:
             projects += discover_local_projects(project_path, 
@@ -116,7 +129,7 @@ def discover_remote_projects(group_id, group_name='opencpi', whitelist=None,
     with urlopen(projects_url) as response:
         project_dicts = load(response)
     for project_dict in project_dicts:
-        project_name = project_dict['path'].lower().split('.')[-1]
+        project_name = project_dict['path']
         project_id = str(project_dict['id'])
         if blacklist:
             if project_name in blacklist or project_id in blacklist:

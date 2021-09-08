@@ -174,7 +174,7 @@ namespace OCPI {
 	    curAlloc += blockSize;
 	  }
 
-	  std::streamsize count = in->read (ptr, blockSize).gcount ();
+	  size_t count = OCPI_UTRUNCATE(size_t, in->read (ptr, blockSize).gcount());
 	  length += count;
 	  ptr += count;
 	}
@@ -262,7 +262,8 @@ namespace OCPI {
 	}
 
 	m_doc = new char [fileSize];
-	std::streamsize count = in->read (m_doc, fileSize).gcount ();
+	size_t count = OCPI_UTRUNCATE(size_t,
+				      in->read (m_doc, OCPI_STRUNCATE(std::streamsize, fileSize)).gcount());
 
 	try {
 	  fs.close (in);
@@ -585,7 +586,7 @@ namespace OCPI {
       bool
       parseBool(const char *a, const char *end, bool *b)
       {
-	size_t n = end ? end - a : strlen(a);
+	size_t n = end ? OCPI_SIZE_T_DIFF(end, a) : strlen(a);
 	if ((n == 4 && !strncasecmp(a, "true", 4)) || (n == 1 && !strncmp(a, "1", 1)))
 	  *b = true;
 	else if ((n == 5 && !strncasecmp(a, "false", 5))  || (n == 1 && !strncmp(a, "0", 1)))
@@ -729,7 +730,7 @@ namespace OCPI {
 	}
 	for (const char **ap = enums; *ap; ap++)
 	  if (**ap && !strcasecmp(a, *ap)) { // allow ignoring of empty enum strings
-	    n = ap - enums;
+	    n = OCPI_SIZE_T_DIFF(ap, enums);
 	    return NULL;
 	  }
 	return esprintf("Unknown %s in %s attribute: \"%s\".", type, attr, a);
@@ -784,9 +785,10 @@ namespace OCPI {
 	    OU::format(error, "read error or XML message too large: %s (%zd, %zu)", strerror(errno), n, (size_t)len);
 	  return true;
 	}
-	ssize_t total = len;
+	size_t total = OCPI_UTRUNCATE(size_t, len);
 	buf.resize(total);
-	for (char *cp = &buf[0]; total && (n = ::read(fd, cp, total)) > 0; total -= n, cp += n)
+	for (char *cp = &buf[0];
+	     total && (n = ::read(fd, cp, total)) > 0; total -= (size_t)n, cp += (size_t)n)
 	  ;
 	if (n <= 0) {
 	  OU::format(error, "message read error: %s (%zu)", strerror(errno), n);
@@ -819,9 +821,10 @@ namespace OCPI {
 	iov[0].iov_len = sizeof(uint32_t);
 	iov[1].iov_base = (void*)request.c_str();
 	iov[1].iov_len = request.length()+1;
-	ssize_t n, total = iov[0].iov_len + iov[1].iov_len;
+	size_t total = iov[0].iov_len + iov[1].iov_len;
+	ssize_t n;
 	ocpiLog(9, "Sending XML===========================\n%s\nEND XML==========", request.c_str());
-	do n = ::writev(fd, iov, 2); while (n > 0 && (total -= n));
+	do n = ::writev(fd, iov, 2); while (n > 0 && (total -= (size_t)n));
 	return n > 0 ? false : OU::eformat(error, "Error writing to %s: %s", msg, strerror(errno));
       }
 
@@ -847,7 +850,7 @@ namespace OCPI {
 	const char *otxt = ezxml_txt(x);
 	const char *nl = strrchr(otxt, '\n');
 	std::string text;
-	text.assign(otxt, nl ? nl - otxt : strlen(otxt));
+	text.assign(otxt, nl ? OCPI_SIZE_T_DIFF(nl, otxt) : strlen(otxt));
 	OU::formatAdd(text, "\n%*s", level*2, "");
 	ezxml_t cx = ezxml_add_child(x, name, text.length());
 	if (txt)
@@ -908,6 +911,65 @@ namespace OCPI {
 	if (nl && (unsigned)(nl - str.c_str()) < str.length() - 1)
 	  str.resize(str.size() - 1);
 	in = str;
+      }
+      // Hoist children if testValue is true, return next to process
+      static void hoist(bool testValue, ezxml_t node, ezxml_t parent) {
+	ezxml_cut(node); // remove the <if> in all cases
+	if (testValue) {
+	  ezxml_t next;
+	  for (ezxml_t x = node->child; x; x = next) {
+	    next = x->ordered;
+	    ezxml_cut(x);
+	    ezxml_insert(x, parent, node->off + x->off);
+	  }
+	}
+	ezxml_free(node);
+      }
+      // The root node is not subject to conditionality
+      const char *parseConditionals(ezxml_t parent, const OU::IdentResolver &r) {
+	ezxml_t next; 
+	const char *err = NULL;
+	for (ezxml_t xml = parent ? parent->child : NULL; xml; xml = next) {
+	  next = xml->ordered;
+	  bool testValue;
+	  const char *expr;
+	  if (!strcasecmp(xml->name, "if")) {
+	    if (!xml->child)
+	      return "empty \"if\" element with no child elements";
+	    if (!(expr = ezxml_cattr(xml, "test")))
+	      return "missing \"test\" attribute in \"if\" element";
+	    if ((err = checkAttrs(xml, "test", NULL)) ||
+		(err = OU::parseExprBool(expr, testValue, NULL, &r)))
+	      return err;
+	    // We need to look-ahead for an else.
+	    hoist(testValue, xml, parent);
+	    if (next && !strcasecmp(next->name, "else")) {
+	      if (!xml->child)
+		return "empty \"else\" element with no child elements";
+	      if ((err = checkAttrs(next, NULL)))
+		return err;
+	      hoist(!testValue, next, parent);
+	      next = parent->child; // one of <if> or <else> was hoisted
+	    } else if (testValue)
+	      next = parent->child; // <if> or <else> was hoisted
+	    continue; // no recursion since we are restarting
+	  } else if (!strcasecmp(xml->name, "else"))
+	    return "invalid \"else\" element not after \"if\" element";
+	  else if ((expr = ezxml_cattr(xml, "if"))) {
+	    if ((err = OU::parseExprBool(expr, testValue, NULL, &r)))
+		return err;
+	    if (testValue)
+	      ezxml_set_attr(xml, "if", NULL);
+	    else {
+	      ezxml_cut(xml);
+	      ezxml_free(xml);
+	      continue; // no recursion since we're not including this
+	    }
+	  }
+	  if ((err = parseConditionals(xml, r)))
+	    return err;
+	}
+	return NULL;
       }
     }
   }

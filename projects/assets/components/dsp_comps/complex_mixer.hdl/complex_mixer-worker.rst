@@ -40,7 +40,7 @@ The following figure shows a functional representation of the HDL implementation
    :alt: Complex Mixer Functional Diagram
    :align: center
 
-   Functional diagram of complex mixer HDL implementation.
+   Complex Mixer Functional Diagram
 
 Build-time parameters can be used to control the width of the NCO data output (``NCO_DATA_WIDTH_p``),
 the width of the input data (``INPUT_DATA_WIDTH_p``), the number of stages in the
@@ -48,6 +48,9 @@ Coordinate Rotation Digital Computer (CORDIC) used to implement the NCO (``CORDI
 and the amplitude of the NCO's sine wave (``mag``).
 There are also parameters to control insertion of a peak detection circuit (``PEAK_MONITOR_p``)
 a Chipscope circuit (``CHIPSCOPE_p``, and a Vivado integrated logic analyzer (``VIVADO_ILA_p``).
+
+The peak detector has two inputs and does not compute magnitude.  The output of the
+the peak detector (``peak``) is either the peak of I or the peak of Q, whichever is greater.
 
 The ``enable`` input is available to either enable (``true``) or bypass (``false``) the circuit.
 In bypass mode, the HDL worker does not use pipe-lining registers. It uses FPGA multipliers to
@@ -84,13 +87,14 @@ The following figure shows a block diagram representation of the HDL implementat
    :alt: Complex Mixer Top-level Block Diagram
    :align: center
 
-   Block diagram of complex mixer HDL implementation.
+   Complex Mixer Block Diagram
 
    
 .. ocpi_documentation_worker::
    
    mag: Must be in the range :math:`-2^{(NCO\_DATA\_WIDTH\_p-1)} <= mag <= 2^{(NCO\_DATA\_WIDTH\_p-1)}-1` for the worker to operate properly.
    data_select: 0 = input data, 1 = output of NCO.
+   peak: Peak detector output. Either peak of I or peak of Q, whichever is greater.
 
   in: Signed complex samples.
 
@@ -107,7 +111,7 @@ in the ``dc_offset_filter`` HDL implementation.  The following figure illustrate
    :alt: Complex Mixer Finite State Machine
    :align: center
 
-   Zero-length message FSM.
+   Complex Mixer Finite State Machine
 
 Control Timing and Signals
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

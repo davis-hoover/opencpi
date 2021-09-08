@@ -19,9 +19,13 @@
 Definition of Test class
 """
 
+import os
 from pathlib import Path
 import _opencpi.util as ocpiutil
+import jinja2
+import _opencpi.assets.template as ocpitemplate
 from .abstract import RunnableAsset, HDLBuildableAsset, RCCBuildableAsset
+from .library import Library
 
 class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
     """
@@ -141,6 +145,7 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         """
         # if more then one of the library location variable are not None it is an error
         cur_dirtype = ocpiutil.get_dirtype()
+        verb = kwargs.get('verb', '')
         valid_dirtypes = ["project", "libraries", "library", "test"]
         library = kwargs.get('library', '')
         hdl_library = kwargs.get('hdl_library', '')
@@ -161,13 +166,75 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
                 library = "components/" + library
             working_path = Path(project_path, library)
         elif hdl_library:
-            working_path = Path(project_path, hdl_library)
+            hdldir = "hdl/" + hdl_library
+            working_path = Path(project_path, hdldir)
         elif platform:
             working_path = Path(
                 project_path, 'hdl', 'platforms', platform, 'devices')
         elif cur_dirtype == "hdl-platform":
             working_path = Path(working_path, 'devices')
+        elif cur_dirtype == "libraries" and verb in ["create","delete"]:
+            print("OCPI:ERROR: Must specify a library when operating from a libraries collection.")
+            exit(1)
 
         working_path = Path(working_path, name)
-
         return str(working_path)
+
+
+    def _get_template_dict(name, directory, **kwargs):
+        """
+        used by the create function/verb to generate the dictionary of viabales to send to the
+        jinja2 template.
+        valid kwargs handled at this level are:
+            test            (string)      - Test name
+        """
+        template_dict = {
+                        "test" : name,
+                        }
+        return template_dict
+
+
+    @staticmethod
+    def create(name, directory, **kwargs):
+        """
+        Create test assets
+        """
+        verbose = kwargs.get("verbose", None)
+        library = kwargs.get("library", None)
+        hdl_lib = kwargs.get("hdl_library", None)
+        platform = kwargs.get("platform", None)
+        testname = name.replace(".test", "")
+        test_path = Path(directory, name)
+        projdir = ocpiutil.get_path_to_project_top()
+        projname = os.path.basename(projdir)
+ 
+        if projdir == test_path.parent and \
+          not library and not hdl_lib and not platform:
+            raise ocpiutil.OCPIException("Must specify library (not components)," +
+                                             " HDL library, or HDL platform" )
+        if test_path.is_dir():
+            raise ocpiutil.OCPIException(name + " already exists at " + directory)
+        if platform:
+            platdir = os.path.dirname(directory)
+            if not os.path.exists(platdir):
+                raise ocpiutil.OCPIException("Cannot find platform " + platdir)
+            if not os.path.exists(directory):
+                os.mkdir(directory)
+        elif not os.path.exists(directory):
+            missing = " library " if library else "HDL library "
+            raise ocpiutil.OCPIException("Cannot find " + missing + directory)
+
+        test_path.mkdir()
+        os.chdir(str(test_path))
+        template_dict = Test._get_template_dict(testname, test_path, **kwargs)
+        template = jinja2.Template(ocpitemplate.TEST_GENERATE_PY, trim_blocks=True)
+        ocpiutil.write_file_from_string("generate.py", template.render(**template_dict))
+        template = jinja2.Template(ocpitemplate.TEST_VERIFY_PY, trim_blocks=True)
+        ocpiutil.write_file_from_string("verify.py", template.render(**template_dict))
+        template = jinja2.Template(ocpitemplate.TEST_VIEW_SH, trim_blocks=True)
+        ocpiutil.write_file_from_string("view.sh", template.render(**template_dict))
+        template = jinja2.Template(ocpitemplate.TEST_NAME_TEST_XML, trim_blocks=True)
+        ocpiutil.write_file_from_string(testname + "-test.xml", template.render(**template_dict))
+        Library.get_package_id(directory)
+        if verbose == True:
+            print("Created test '" + name + "' at " + str(test_path))

@@ -78,6 +78,9 @@ PKGS_D+=(bash-completion=/etc/profile.d/bash_completion.sh)
 PKGS_D+=(bison flex)
 #    for asciidoc3 man page generation (asciidoc3 is a prereq)
 PKGS_D+=(docbook-style-xsl)
+#    for sphinxcontrib.spelling extension (RST doc support)
+PKGS_D+=(enchant2)
+
 
 ##########################################################################################
 # S. yum-installed and but not rpm-required - conveniences or required for source environment

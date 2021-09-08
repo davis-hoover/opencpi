@@ -22,7 +22,9 @@ definitions for utility functions that have to do with opencpi project layout
 import os
 import sys
 import os.path
+import fnmatch
 import logging
+import collections
 from glob import glob
 from pathlib import Path
 import re
@@ -35,9 +37,17 @@ def get_make_vars_rcc_targets():
     Dictionary key examples are:
         RccAllPlatforms, RccPlatforms, RccAllTargets, RccTargets
     """
-    return set_vars_from_make(os.environ["OCPI_CDK_DIR"] +
-                              "/include/rcc/rcc-targets.mk",
-                              "ShellRccTargetsVars=1", "verbose")
+    if not get_make_vars_rcc_targets.dict:
+        get_make_vars_rcc_targets.dict = {}
+        for key,value in get_platform_make_dictionary().items():
+            if key.startswith("Rcc"):
+                get_make_vars_rcc_targets.dict[key] = value
+    return get_make_vars_rcc_targets.dict
+get_make_vars_rcc_targets.dict=None
+
+#    return set_vars_from_make(os.environ["OCPI_CDK_DIR"] +
+#                              "/include/rcc/rcc-targets.mk",
+#                              "ShellRccTargetsVars=1", "verbose")
 
 ###############################################################################
 # Utility functions for collecting information about the directories
@@ -136,8 +146,8 @@ def get_dir_info(directory=".", careful=False):
             make_type = 'libraries'
             # does not work with python3 < 3.6.0
             # with os.scandir(directory) as it:
-            it = os.scandir(directory)
-            for entry in it:
+            # it = os.scandir(directory)
+            for entry in os.scandir(directory):
                 if entry.is_dir():
                     dparts = entry.name.split('.')
                     if name == "specs" or (len(dparts) > 1 and dparts[-1] in in_lib):
@@ -566,7 +576,7 @@ def get_ocpidev_working_dir(noun, name, ensure_exists=True, **kwargs):
         if noun == 'project':
         # Check if project ID passed as a name
             project_registry = get_project_registry_dir()[1]
-            project_path = Path(project_registry, name).resolve()
+            project_path = Path(project_registry, name).absolute()
             if is_path_in_project(str(project_path)):
                 return str(project_path)
         raise OCPIException("Path \"" + os.path.realpath(".") + "\" is not in a project, " +
@@ -599,8 +609,12 @@ def get_ocpidev_working_dir(noun, name, ensure_exists=True, **kwargs):
         "applications"   : _opencpi.assets.application.ApplicationsCollection.get_working_dir,
         "project"        : _opencpi.assets.project.Project.get_working_dir,
         "library"        : _opencpi.assets.library.Library.get_working_dir,
+        "libraries"      : _opencpi.assets.library.LibraryCollection.get_working_dir,
         "test"           : _opencpi.assets.test.Test.get_working_dir,
         "component"      : _opencpi.assets.component.Component.get_working_dir,
+        "protocol"       : _opencpi.assets.component.Protocol.get_working_dir,
+        "hdl-slot"       : _opencpi.assets.component.Slot.get_working_dir,
+        "hdl-card"       : _opencpi.assets.component.Slot.get_working_dir,
         "worker"         : _opencpi.assets.worker.Worker.get_working_dir,
         "hdl-platform"   : _opencpi.assets.platform.HdlPlatformWorker.get_working_dir,
         "hdl-platforms"  : _opencpi.assets.platform.HdlPlatformsCollection.get_working_dir,
@@ -623,7 +637,7 @@ def get_ocpidev_working_dir(noun, name, ensure_exists=True, **kwargs):
         raise OCPIException(err_msg)
         # pylint:enable=undefined-variable
 
-    return str(Path(asset_dir).resolve())
+    return str(Path(asset_dir).absolute())
 
 def throw_not_valid_dirtype_e(valid_loc):
     """
@@ -702,22 +716,445 @@ def get_package_id_from_vars(package_id, package_prefix, package_name, directory
     return package_prefix + "." + package_name
 
 
+def get_env_dir(env):
+    """
+    Gets the given environment variable and verifies that it has
+    been set correctly to a path
+    """
+    err_msg = None
+    if env not in os.environ:
+        err_msg = env + ' environment setting not found'
+    path = Path(os.environ[env])
+    if not path.is_dir():
+        err_msg = env + ' environment setting invalid'
+    if err_msg:
+        raise OCPIException(err_msg)
+    return str(path)
+
 def get_cdk_dir():
     """
     Gets the OCPI_CDK_DIR environment variable and verifies that it has
     been set correctly.
     """
-    err_msg = None
-    if 'OCPI_CDK_DIR' not in os.environ:
-        err_msg = 'OCPI_CDK_DIR environment setting not found'
-    cdk_path = Path(os.environ['OCPI_CDK_DIR'])
-    if not cdk_path.is_dir():
-        err_msg = 'OCPI_CDK_DIR environment setting invalid'
-    if err_msg:
-        raise OCPIException(err_msg)
+    return get_env_dir('OCPI_CDK_DIR')
 
-    return str(cdk_path)
+def get_root_dir():
+    """
+    Gets the OCPI_ROOT_DIR environment variable and verifies that it has
+    been set correctly.
+    """
+    return get_env_dir('OCPI_ROOT_DIR')
 
+def get_project_package_id(realpath, dict):
+    """
+    Returns the full package id based on variables or attributes
+    """
+    package_id = dict.get('package')
+    if package_id:
+        return package_id
+    package_id = dict.get('packageid')
+    if package_id:
+        return package_id
+    package_name = dict.get('packagename')
+    if not package_name:
+        package_name = os.path.basename(realpath)
+    package_prefix = dict.get('packageprefix')
+    if package_prefix:
+        package_prefix.rstrip('.')
+    else:
+        package_prefix = 'local'
+    return package_prefix + "." + package_name
+
+def get_project_attributes(directory, xml_file = None, mk_file = None):
+    """
+    Return a dictionary of a project's attributes
+    """
+    if not xml_file and not mk_file:
+        xml_file = directory + "/Project.xml"
+        if not os.path.exists(xml_file):
+            xml_file = None
+            mk_file = directory + "/Project.mk"
+            if not os.path.exists(mk_file):
+                mk_file = None
+    attrs={}
+    if xml_file:
+        root = xt.parse(xml_file).getroot()
+        assert root.tag.lower() == "project"
+        for key,value in root.attrib.items():
+            attrs[key.lower()] = value
+    elif mk_file:
+        with open(mk_file) as mk:
+            prog = re.compile('^\s*(\w+):?=\s*([^#\n]*).*$', re.ASCII)
+            for line in mk:
+                match = prog.match(line)
+                if match:
+                    attrs[match.group(1).lower()] = match.group(2)
+    else:
+        raise OCPIException('The project in directory "' + directory +
+                            '" has no Project.xml (or old Project.mk) file')
+    return attrs
+
+hdl_builtins=None
+hdl_families={} # map from family to dict for family
+hdl_parts={} # map from part to family
+hdl_vendors={}
+hdl_tools={}
+hdl_fake_platforms={} # for test purposes only since it violates dropin
+def get_hdl_builtins():
+  """
+  Return an XML root for the builtin HDL targets database
+   """
+  if not hdl_builtins:
+      builtins = xt.parse(get_cdk_dir() + "/include/hdl/hdl-targets.xml").getroot()
+      # Some families are not used by any platform so we get them here
+      for e in builtins.iter('family'):
+          family = e.get('name')
+          dict={}
+          parts = e.get('parts')
+          dict['parts'] = set(parts.split()) if parts else set()
+          toolset = e.get('toolset')
+          if toolset:
+              dict['toolset'] = toolset
+          default_part = e.get('default')
+          if default_part:
+              dict['default'] = default_part
+          hdl_families[family] = dict
+          if parts:
+              for part in parts.split():
+                  hdl_parts[part] = family
+          else:
+              hdl_parts[family] = family
+      for v in builtins.iter('vendor'):
+          families=[]
+          for f in v.iter('family'):
+              families.append(f.get('name'))
+          hdl_vendors[v.get('name')] = families
+      for t in builtins.iter('toolset'):
+          hdl_tools[t.get('name')] = { 'simulator': t.get('simulator') == 'true',
+                                       'tool' : t.get('tool') }
+      for p in builtins.iter('platform'):
+          hdl_fake_platforms[p.get('name')] = p.attrib
+  return hdl_builtins
+
+def get_platform_attributes(project_package_id, directory, name, model):
+    """
+    Return a dictionary of a platforms's attributes
+    Prefer a "lib" (exported) subdirectory of the platform's directory if present
+    The directory argument may be the xml exports directory
+    """
+    get_hdl_builtins()
+    attrs={}
+    if model == "hdl":
+        xml_file = directory + "/hdl/" + name + ".xml" # try for a built or declared file
+        if not os.path.exists(xml_file):
+            xml_file = directory + "/" + name + ".xml" # try the source file
+        try:
+            root = xt.parse(xml_file).getroot()
+            assert root.tag.lower() == "hdlplatform"
+        except:
+            print("Error parsing XML file:  " + xml_file, file=sys.stderr)
+            return None
+        for key,value in root.attrib.items():
+            attrs[key.lower()] = value
+            attrs["rccplatforms"] = ""
+        part = attrs.get('part')
+        # Backward compatibility:  if there is no part attribute look in <plat>.mk
+        if not part:
+            prog = re.compile('^\s*(\w+):?=\s*([^#\n]*).*$', re.ASCII)
+            for mkfile in [directory + "/" + name + ".mk", directory + "/hdl/" + name + ".mk"]:
+                if os.path.exists(mkfile):
+                    with open(mkfile) as mk:
+                        for line in mk:
+                            match = prog.match(line)
+                            if match:
+                                if match.group(1) == "HdlPart_" + name:
+                                    part = attrs["part"] = match.group(2)
+                                elif match.group(1) == "HdlRccPlatforms_" + name:
+                                    attrs["rccplatforms"] = match.group(2).split()
+                    break
+            mkfile = directory + "/" + "Makefile"
+            if os.path.exists(mkfile):
+                with open(mkfile) as mk:
+                    for line in mk:
+                        match = prog.match(line)
+                        if match:
+                            if match.group(1) == "Configurations":
+                                attrs['configurations'] = match.group(2).split()
+        if attrs.get('configurations') == None: # not empty string is ok
+            attrs['configurations'] = ['base']
+        if not part:
+            print("Error: no part variable or attribute when parsing platform:  ", name, file=sys.stderr)
+            return None
+        family = attrs.get('family')
+        if not family:
+            family = hdl_parts.get(part.split('-')[0])
+            if not family:
+                family = name;
+            attrs['family'] = family
+        # attrs['target'] = family
+        # Update global database from this platform
+        family_dict = hdl_families.get(family)
+        if not family_dict:
+            family_dict = {}
+            family_dict['parts'] = set()
+            hdl_families[family] = family_dict
+        family_dict['parts'].add(part.split('-')[0])
+        if directory.endswith("/xml"):
+            directory = os.path.normpath(directory + "/../" + name) # may not exist
+        attrs['built'] = os.path.isdir(directory + "/hdl/" + family)
+    elif model == "rcc":
+        file = directory + "/" + name + ".mk"
+        try:
+            with open(file) as mk:
+                prog = re.compile('^\s*(\w+):?=\s*([^#\n]*).*$', re.ASCII)
+                for line in mk:
+                    match = prog.match(line)
+                    if match:
+                        var = match.group(1).lower()
+                        if var.startswith("ocpiplatform"):
+                            var = var[len("ocpiplatform"):]
+                            if var in [ 'os', 'osversion', 'arch']:
+                                attrs[var] = match.group(2)
+            attrs['target'] = attrs['os'] + '-' + attrs['osversion'] + '-' + attrs['arch']
+        except:
+            print("Failed to process RCC file: " + file, file=sys.stderr)
+            return None
+        if len(attrs) == 0:
+            print("No attributes found in RCC file: " + file, file=sys.stderr)
+            return None
+    else:
+        print("Invalid model: " + model, file=sys.stderr)
+        return None
+    attrs['model'] = model
+    attrs['directory'] = directory
+    attrs['packageid'] = project_package_id + "." + name
+    return attrs
+
+def find_all_projects(directory = None, project_package_id = None):
+    """
+    Find all projects (packageids and realpaths), returning an ORDERED dict of package-id->realpath.
+    This function does not navigate into the exports subdir of a project
+    Optional argument is simply a directory that we think might be *in* a project and thus should be
+    used to find the registry.
+    If the package_id argument is supplied it means we know the directory is a project and we know
+    its package_id
+    OCPI_PROJECT_PATH is also used as a source of projects.
+    The ordered dict returned is suitable for project searching: *this* project, projectpath, registry
+    Note a small amount of extra effort is done to always have the package_id even though
+    in some contexts it is not needed.
+    Minimize file system touches
+    """
+    xml_file = None
+    mk_file = None
+    project_dir = os.getenv('OCPI_PROJECT_DIR')
+    if project_package_id:
+        project_dir = directory
+    elif directory:
+        while not project_dir:
+            # We just test for existence (as opposed to opening the file)
+            # Since if it is registered we won't need it, and it probably is registered
+            xml_file = directory + "/Project.xml"
+            mk_file = directory + "/Project.mk"
+            if os.path.exists(xml_file):
+                project_dir = directory
+                mk_file = None
+            elif os.path.exists(mk_file):
+                project_dir = directory
+                xml_file = None
+            else:
+                parent = ".." if directory == '.' or directory == "./" else directory + "/.."
+                if os.path.samefile(directory, parent): # root
+                    break
+                directory = parent
+    if project_dir and os.path.isdir(project_dir + "/imports"):
+        registry_dir = project_dir + "/imports"
+    else:
+        # either no OCPI_PROJECT_DIR, or directory arg not in a project or project_dir has no imports
+        registry_dir = os.getenv('OCPI_PROJECT_REGISTRY_DIR')
+        if not registry_dir:
+            registry_dir = get_root_dir() + "/project-registry"
+    projects=collections.OrderedDict()
+    # check for the directory we are in, that might *not* be registered
+    if project_dir: # from environment or from cwd: add it if not there already
+        if project_package_id:
+            projects[project_package_id] = os.path.realpath(project_dir)
+        else:
+            # no project ID handy, so use realpath
+            realpath = os.path.realpath(project_dir)
+            if realpath not in projects.values():
+                attrs = get_project_attributes(realpath, xml_file, mk_file)
+                project_package_id = get_project_package_id(realpath, attrs)
+            projects[project_package_id] = realpath
+    path = os.getenv('OCPI_PROJECT_PATH')
+    for dir in path.split(':') if path else []:
+        realpath = os.path.realpath(dir)
+        if realpath not in projects.values():
+            attrs = get_project_attributes(realpath)
+            if realpath not in projects.values():
+                projects[get_project_package_id(realpath, get_project_attributes(realpath))] = realpath
+
+    # Now process the registry
+    # This os.open is to enable dir_fd since the scandir iterator provide an fd until python 3.7
+    fd = os.open(registry_dir, os.O_RDONLY)
+    with os.scandir(registry_dir) as it:
+        for entry in it:
+            if entry.is_symlink():
+                # Since there is no way to get a directory descriptor from a scandir iterator
+                if not projects.get(entry.name):
+                    projects[entry.name] = registry_dir + "/" + entry.name
+                    #dir = os.readlink(entry.name, dir_fd = fd);
+                    #projects[entry.name] = os.path.realpath(dir if dir.startswith("/")
+                    #                                        else registry_dir + "/" + dir)
+    os.close(fd)
+    return projects
+
+def get_platforms():
+    """
+    Find platforms in this environment, based on find_all_projects.
+    return a dictionary of all platforms, with the key being its name, and the
+    value being its attributes including model and packageid
+    """
+    if get_platforms.dict:
+        return get_platforms.dict
+    get_hdl_builtins()
+    if len(hdl_fake_platforms) > 0:
+        return hdl_fake_platforms
+    get_platforms.dict={}
+    dir = os.getenv("OCPI_PROJECT_DIR")
+    if dir:
+        package_id = os.getenv('OCPI_PROJECT_PACKAGE')
+    else:
+        dir = os.getcwd()
+        package_id = None
+    for package_id, realpath in find_all_projects(dir, package_id).items():
+        for model in [ 'rcc', 'hdl' ]:
+            for dir in [ realpath + "/exports/" + model + "/platforms",
+                         realpath + "/" + model + "/platforms"]:
+                if os.path.exists(dir):
+                    platforms_dir = dir + "/xml"
+                    if os.path.isdir(platforms_dir):
+                        # Use <platforms>/xml/*.{xml,mk}
+                        with os.scandir(platforms_dir) as it:
+                            for entry in it:
+                                if fnmatch.fnmatch(entry.name, '*.xml'):
+                                    name = entry.name[0:-4]
+                                    if get_platforms.dict.get(name):
+                                        continue # already defined earlier
+                                    attrs = get_platform_attributes(package_id, platforms_dir, name,
+                                                                    model)
+                                    if attrs:
+                                        get_platforms.dict[name] = attrs
+                    else:
+                        with os.scandir(dir) as it:
+                            for entry in it:
+                                if entry.name == 'lib' or get_platforms.dict.get(entry.name):
+                                    continue # already defined earlier
+                                if entry.is_dir():
+                                    platform_dir = dir + "/" + entry.name
+                                    if ('/exports/' not in dir and os.path.isdir(platform_dir + "/lib") and
+                                        os.path.exists(platform_dir + "/lib/" + entry.name + ".xml")):
+                                        platform_dir += "/lib"
+                                    attrs = get_platform_attributes(package_id, platform_dir, entry.name, model)
+                                    if attrs:
+                                        get_platforms.dict[entry.name] = attrs
+    return get_platforms.dict
+get_platforms.dict=None
+
+# Exceptions to the simply mapping of attributes to variables (capitalized)
+# And empty string means do not include them in the output for make
+makeVariables={ "directory": "PlatformDir",
+                "osversion" : "",
+                "packageid" : "PlatformPackageID",
+                "rccplatforms" : "AllRccPlatforms",
+                "part" : "Part",
+                "family":"Target",
+                "model":"", "spec":"", "libraries":"","language":"", "version":"",
+                "configurations":""}
+
+def get_platform_variables(shell, only_model=None):
+    """
+    Output on standard output the information about platforms in the format and variable names
+    that the current make code wants.
+    """
+    model_platforms={}
+    quote='"' if shell else ''
+    end=quote + ('\n')
+    blist={}
+    rcctlist=[]
+    out=""
+    for name, dict in get_platforms().items():
+        model = dict['model']
+        if only_model and model != only_model:
+            continue
+        if not blist.get(model):
+            blist[model]=[]
+        if not model_platforms.get(model):
+            model_platforms[model] = [ name ]
+        else:
+            model_platforms[model].append(name)
+        for attribute, value in dict.items():
+            var = makeVariables.get(attribute)
+            if var and var != "":
+                out+=(model.capitalize() + 
+                      (var if var else "Platform" + attribute.capitalize()) + "_" + name + "=" +
+                      quote + value + end)
+            if attribute == 'built' and value:
+                blist[model].append(name)
+        if model == 'rcc':
+            target = dict['target']
+            out+=("RccTarget_" + name + "=" + quote + target + end)
+            rcctlist.append(target)
+    for model, platforms in model_platforms.items():
+        platforms.sort()
+        blist[model].sort()
+        out+=(model.capitalize() + "AllPlatforms=" + quote + ' '.join(platforms) + end)
+        out+=(model.capitalize() + "BuiltPlatforms=" + quote + ' '.join(blist[model]) + end)
+    if not only_model or only_model == 'rcc':
+        rcctlist.sort()
+        out+=("RccAllTargets=" + quote + ' '.join(rcctlist) + end)
+    if not only_model or only_model == 'hdl':
+        families=set(hdl_families.keys())
+        flist=list(families)
+        flist.sort()
+        out+=("HdlAllFamilies=" + quote + ' '.join(flist) + end)
+        families |= hdl_vendors.keys()
+        flist=list(families)
+        flist.sort()
+        out+=("HdlAllTargets=" + quote + ' '.join(flist) + end)
+        simlist=[]
+        for key,value in hdl_tools.items():
+            if value.get('simulator'):
+                simlist.append(key)
+            out+=("HdlToolName_" + key + "=" + quote + value.get('tool') + end)
+        simlist.sort()
+        out+=("HdlSimTools=" + quote + ' '.join(simlist) + end)
+        for key,value in hdl_families.items():
+            parts=value.get('parts')
+            if parts:
+                parts=list(parts)
+                parts.sort()
+                out+=("HdlTargets_" + key + "=" + quote + ' '.join(parts) + end)
+            out+=("HdlToolSet_" + key + "=" + quote + value.get('toolset') + end)
+            default_part = value.get('default')
+            if default_part:
+                out+=("HdlDefaultTarget_" + key + "=" + quote + default_part + end)
+        for key,value in hdl_vendors.items():
+            value.sort()
+            out+=("HdlTargets_" + key + "=" + quote + ' '.join(value) + end)
+        out+=("HdlTopTargets=" + quote + ' '.join(hdl_vendors.keys()) + end)
+    return out.strip()
+
+def get_platform_make_dictionary():
+   """
+   Return a dictionary of make  variable settings compatible withe set_vars_from_make
+   """
+   if not get_platform_make_dictionary.dict:
+       get_platform_make_dictionary.dict={}
+       for assignment in get_platform_variables(False).strip().split('\n'):
+           var,value = assignment.split('=')
+           get_platform_make_dictionary.dict[var] = value.split(' ')
+   return get_platform_make_dictionary.dict
+get_platform_make_dictionary.dict=None
 
 if __name__ == "__main__":
     import doctest

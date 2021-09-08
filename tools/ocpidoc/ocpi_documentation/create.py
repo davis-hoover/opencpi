@@ -23,6 +23,11 @@
 
 import datetime
 import pathlib
+import re
+
+import _opencpi.util as ocpiutil
+
+import xml_tools
 
 
 AUTHORING_MODELS = [".rcc", ".hdl", ".ocl"]
@@ -71,6 +76,16 @@ def _template_to_specific(template, name, authoring_model=None,
     if library is not None:
         template = template.replace("%%LIBRARY%%", library.lower())
 
+    # Regex finds all underlined titles and replaces underline to allign
+    # the number of characters to the title
+    regex = ".+\n(=+|-+|~+)\n"
+    for match in re.finditer(regex, template):
+        titles = match.group().split("\n")
+        if len(titles[0]) != len(titles[1]):
+            template = template.replace(match.group(), titles[0] + "\n"
+                                        + titles[1][0] * len(titles[0])
+                                        + "\n")
+
     return template
 
 
@@ -104,26 +119,32 @@ def create(directory, documentation_type, name=None, **kwargs):
         authoring_model = None
 
     # Determine if within an OpenCPI project and if so get the project name and
-    # prefix so can be used to replace placeholder in template. For loop
-    # limited to 5 to allow documentation directory in a primitive's directory
-    # to still reach project directory - likely maximum path depth
-    project_search_directory = directory
+    # prefix so can be used to replace placeholder in template.
     project = None
     project_prefix = None
-    for _ in range(5):
-        if project_search_directory.joinpath("Project.mk").is_file():
-            with open(project_search_directory.joinpath("Project.mk"),
-                      "r") as project_file:
-                for line in project_file:
-                    if line.startswith("PackagePrefix="):
-                        project_prefix = line[14:].strip()
-                    if line.startswith("PackageName="):
-                        project = line[12:].strip()
-            break
-        else:
-            project_search_directory = project_search_directory.parent
-        if project_search_directory == pathlib.Path("/"):
-            break
+    project_path = ocpiutil.get_path_to_project_top(str(directory))
+    if project_path is not None:
+        project_path = pathlib.Path(project_path).resolve()
+        # Check for Project.mk
+        if project_path.joinpath("Project.mk").is_file():
+                with open(project_path.joinpath("Project.mk"),
+                          "r") as project_file:
+                    for line in project_file:
+                        if line.startswith("PackagePrefix="):
+                            project_prefix = line[14:].strip()
+                        if line.startswith("PackageName="):
+                            project = line[12:].strip()
+        # Check for Project.xml
+        if project_path.joinpath("Project.xml").is_file():
+            with xml_tools.parser.BaseParser(
+                    project_path.joinpath("Project.xml")
+            ) as file_parser:
+                owd_xml_root = file_parser.getroot()
+                if owd_xml_root.tag == "project":
+                    if "packageprefix" in owd_xml_root.attrib:
+                        project_prefix = owd_xml_root.attrib["packageprefix"]
+                    if "packagename" in owd_xml_root.attrib:
+                        project = owd_xml_root.attrib["packagename"]
 
     # Determine if within a library and if so get the library name so can be
     # used to replace placeholder in template. For loop limited to 2 to allow

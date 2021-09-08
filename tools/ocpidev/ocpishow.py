@@ -304,7 +304,8 @@ def main():
 
             directory = get_dir_from_noun(noun, name, args)
             directory = str(Path(directory).resolve())
-
+            if os.path.isdir(directory): # problem with specs where the dir is wrong
+                os.chdir(directory)
             ocpiutil.logging.debug('Choose directory "' + str(directory) + '" to operate in')
             # if noun is None:
                 # noun = dir_type
@@ -325,7 +326,7 @@ def main():
                             "platforms", "targets", "projects"]:
                 # pylint:disable=unused-variable
                 ocpiutil.logging.debug("constructing asset noun: " + noun + " directory: " +
-                                       str(directory) + "args : " + str(args))
+                                       str(directory) + " args : " + str(args))
                 my_asset = ocpifactory.AssetFactory.factory(noun, directory, "", **args)
                 action = ("my_asset." + action + '("' + args["details"] + '", ' +
                           str(args["verbose"]) + ')')
