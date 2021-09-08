@@ -241,18 +241,6 @@ options = {
         ],
         'action': 'store_true'
     },
-    'generate': {
-        'long': '--generate',
-        'action': 'store_true'
-    },
-    'simulation': {
-        'long': '--simulation',
-        'action': 'store_true'
-    },
-    'execute': {
-        'long': '--execute',
-        'action': 'store_true'
-    },
     'optimize': {
         'long': '--optimize',
         'action': 'store_true'
@@ -399,21 +387,6 @@ verbs = {
             },
             'test': {
                 'options': {
-                    'optimize': options['optimize'],
-                    'dynamic': options['dynamic'],
-                    'generate': options['generate'],
-                    'hdl_rcc_platform': options['hdl_rcc_platform'],
-                    'rcc_platform': options['rcc_platform'],
-                    'hdl_target': options['hdl_target'],
-                    'hdl_platform': options['hdl_platform'],
-                    'library': options['library']
-                }
-            },
-            'tests': {
-                'options': {
-                    'optimize': options['optimize'],
-                    'dynamic': options['dynamic'],
-                    'generate': options['generate'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
                     'hdl_target': options['hdl_target'],
@@ -501,15 +474,10 @@ verbs = {
             },
             'test': {
                 'options': {
-                    'simulation': options['simulation'],
-                    'execute': options['execute'],
-                    'library': options['library']
-                }
-            },
-            'tests': {
-                'options': {
-                    'simulation': options['simulation'],
-                    'execute': options['execute'],
+                    'hdl_rcc_platform': options['hdl_rcc_platform'],
+                    'rcc_platform': options['rcc_platform'],
+                    'hdl_target': options['hdl_target'],
+                    'hdl_platform': options['hdl_platform'],
                     'library': options['library']
                 }
             },

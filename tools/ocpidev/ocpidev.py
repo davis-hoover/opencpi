@@ -77,26 +77,21 @@ def main():
             ocpi_set_unset(args)
 
         directory,name = get_working_dir(args)
+        dirtype = ocpiutil.get_dirtype(directory)
 
-        #TODO: This check will be redundant when falling back to bash is
-        # removed and this check can be removed at the same time
-        if noun == 'test':
-            dirtype = ocpiutil.get_dirtype(directory + '/' + name)
-            if dirtype != 'test':
-                print("Expected directory of type '" + noun + "' but found type '"
-                      + dirtype + "' at " + directory + '/' + name)
-                sys.exit(1)
-
-        elif noun in ['libraries', 'library']:
+        if noun != dirtype:
+            if noun == 'library' and dirtype == 'libraries':
+                args.noun = dirtype
+                noun = args.noun
+        if noun == 'libraries':
             kwargs['init_libs_col'] = True
             kwargs["verbose"] = args.verbose
             kwargs["orig_noun"] = args.orig_noun
             #TODO: This check will be redundant when falling back to bash is
             # removed and this check can be removed at the same time
-            dirtype = ocpiutil.get_dirtype(directory)
-            if noun != dirtype:
+            if dirtype != 'libraries':
                 print("Expected directory of type '" + noun + "' but found type '"
-                      + dirtype + "' at " + directory)
+                      + dirtype + "' for directory " + directory)
                 sys.exit(1)
 
         # Try to instantiate the appropriate asset from noun
@@ -106,8 +101,7 @@ def main():
         try:
         # Get verb method parameters, collect them from args, and try to
         # call verb method with collected args
-            asset_method = getattr(asset, args.verb)
-            do_ocpidev_sh = False
+            asset_method = getattr(asset, args.verb) 
             sig = signature(asset_method)
             method_args = {}
             for param in sig.parameters:
@@ -119,12 +113,8 @@ def main():
         # Verb failed in an expected way; don't fall back to ocpidev.sh
             do_ocpidev_sh = False
             raise ocpiutil.OCPIException(e)
-        except NotImplementedError as e:
-        # Verb exists but is not implemented; fall back to ocpidev.sh
-            do_ocpidev_sh = True
-            raise ocpiutil.OCPIException(e)
         except Exception as e:
-        # Verb failed in an unexpected way;
+        # Verb not implemented fully/at all; fall back to ocpidev.sh
             raise ocpiutil.OCPIException(e)
     except ocpiutil.OCPIException as e:
         if do_ocpidev_sh:

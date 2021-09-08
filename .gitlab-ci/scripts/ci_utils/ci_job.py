@@ -643,7 +643,7 @@ def make_script(stage, platform, project=None, linked_platform=None,
             cmd = make_ocpidev_cmd('run', platform, asset.path,
                                    noun='tests')
     elif stage == 'build-assemblies' and asset.name != 'assemblies':
-        cmd = make_ocpidev_cmd('build', platform, asset.path, noun='tests')
+        cmd = make_ocpidev_cmd('build', platform, asset.path, noun='test')
     elif stage in ['build-assets', 'build-assets-comp']:
         cmd = make_ocpidev_cmd('build', platform, asset.path)
     elif platform.model == 'hdl':

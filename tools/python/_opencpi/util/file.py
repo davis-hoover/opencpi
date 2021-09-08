@@ -24,7 +24,6 @@ import os
 import os.path
 from pathlib import Path
 from contextlib import contextmanager
-import sys
 import logging
 import re
 from _opencpi.util import OCPIException
