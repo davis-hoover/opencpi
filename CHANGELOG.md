@@ -1,3 +1,38 @@
+# [v2.3.0](https://gitlab.com/opencpi/opencpi/-/compare/v2.3.0-rc.1...v2.3.0) (2021-09-08)
+
+Changes/additions since [OpenCPI Release v2.3.0-rc.1](https://gitlab.com/opencpi/opencpi/-/releases/v2.3.0-rc.1)
+
+### Enhancements
+- **devops**: make jobs in CI pipelines that run unit tests only require the necessary unit test to be built. (!707)(78f0f675)
+- **devops,doc**: add initial support for publishing HTML-rendered RST documents. (!704)(e2e3bebd)
+- **devops,tests**: enable ocpi.osp.analog project pipelines. (!703)(df9f947b)
+- **tools**: fix ocpidev to correctly iterate over all libraries in a collection. (!696)(b4bd6966)
+- **tools**: replace bash with python for ocpidev build test command. (!705)(795d4e03)
+- **tools**: add Library and LibraryCollection delete method. (!711)(a0b2aef5)
+
+### Bug Fixes
+- **devops**: fix ocpi.comp.sdr components not being built in CI pipelines for rcc platforms. (!707)(78f0f675)
+- **devops**: build devices before other assets in OSP CI pipelines. (!712)(5e08aec9)
+- **doc**: update top-level platform project doc index to include PicoEVB Getting Started Guide. (!708)(ffdb81e4)
+- **doc**: update platform_ad9361_config_proxy-spec.xml to remove a following underscore in a property description. (!708)(ffdb81e4)
+- **doc**: fix and add doc links, fix typos and inconsistencies in PicoEVB Getting Started Guide. (!708)(ffdb81e4)
+- **doc**: add "OpenCPI" to Zedboard Getting Started Guide title. (!708)(ffdb81e4)
+- **doc**: rename PicoEVB Getting Started Guide to "picoevb-gsg.rst", delete old "index.rst". (!708)(ffdb81e4)
+- **doc**: fix duplicate labels in platform_ad9361_config_proxy_csts-worker.rst, platform_ad9361_spi_csts-worker.rst, platform_csts_ad9361_data_sub-worker.rst, platform_ad9361_config_csts-worker.rst. (!708)(ffdb81e4)
+- **doc**: add link to AD9361 Register Ref doc to Properties section in platform_ad9361_config-index.rst. (!708)(ffdb81e4)
+- **doc,tools**: fix presentation of subdevice connections by `ocpidoc` for HDL device workers. (!710)(9e17b416)
+- **hdl base**: fix sdp2axi clock definition so ise doesn't get confused and run forever. (!706)(84a6d83c)
+- **hdl base**: fix broken primitive generation logic. (!714)(ba2af617)
+- **hdl base,tools**: fix broken zcu104 install and Pin typo. (!709)(8493fcb9)
+- **tools**: fix zed_ise platform so it uses the correct tool. (!701)(4881426c)
+- **tools**: fix minimal OSP installation/build error. (!702)(1fdef398)
+- **tools**: add `enchant` to CentOS and Ubuntu package lists. (!713)(666ab5b8)
+
+### Miscellaneous
+- **devops,doc**: add `analog` and `sdr` projects to doc generation scripts. (!704)(e2e3bebd)
+- **doc**: change release version field in conf.py to 2.3.0. (!708)(ffdb81e4)
+- **tools**: add better script description. (!709)(8493fcb9)
+
 # [v2.3.0-rc.1](https://gitlab.com/opencpi/opencpi/-/compare/v2.2.1...v2.3.0-rc.1) (2021-08-25)
 
 Changes/additions since [OpenCPI Release v2.2.1](https://gitlab.com/opencpi/opencpi/-/releases/v2.2.1)
