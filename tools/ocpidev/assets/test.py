@@ -233,9 +233,14 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
                 project_path, 'hdl', 'platforms', platform, 'devices')
         elif cur_dirtype == "hdl-platform":
             working_path = Path(working_path, 'devices')
-        elif cur_dirtype == "libraries" and verb in ["create","delete"]:
-            print("OCPI:ERROR: Must specify a library when operating from a libraries collection.")
-            exit(1)
+        elif verb in ["create", "delete"]:
+            if cur_dirtype == "libraries":
+                print("OCPI:ERROR: Must specify a library when operating from a libraries collection.")
+                exit(1)
+            if cur_dirtype == "project":
+                working_path = Path(project_path, "components")
+                if not os.path.exists(working_path):
+                    working_path = project_path
 
         working_path = Path(working_path, name)
         return str(working_path)
@@ -281,7 +286,11 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
             if not os.path.exists(directory):
                 os.mkdir(directory)
         elif not os.path.exists(directory):
-            missing = " library " if library else "HDL library "
+            missing = ""
+            if hdl_lib:
+               missing = "HDL library "
+            elif library:
+               missing = "library "
             raise ocpiutil.OCPIException("Cannot find " + missing + directory)
 
         test_path.mkdir()
