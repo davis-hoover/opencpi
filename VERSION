@@ -22,8 +22,8 @@
 # needed by "sourcing" it. Non-bash scripts should be able to easily parse
 # this file.
 
-OCPI_VERSION_MAJOR=2
-OCPI_VERSION_MINOR=3
+OCPI_VERSION_MAJOR=3
+OCPI_VERSION_MINOR=0
 OCPI_VERSION_PATCH=0
 
 # Will always be special value of 'develop' for the develop branch
