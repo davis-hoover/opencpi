@@ -27,11 +27,11 @@ dnl ============================================================================
 dnl 0. Set constants for the software, and autoconf (not auto-discovered values)
 dnl ================================================================================
 dnl If changing version number here, also get minor/patchlevel below:
-AC_INIT([opencpi],[3.0.0-develop],[discuss@lists.opencpi.org])
+AC_INIT([opencpi],[2.4.0-develop],[discuss@lists.opencpi.org])
 dnl This version is what comes with ubuntu16_04, which is as far back as we want to go.
 AC_PREREQ([2.69])
-AC_DEFINE([VERSION_MAJOR],3,[Major version])
-AC_DEFINE([VERSION_MINOR],0,[Minor version])
+AC_DEFINE([VERSION_MAJOR],2,[Major version])
+AC_DEFINE([VERSION_MINOR],4,[Minor version])
 AC_DEFINE([VERSION_PATCHLEVEL],0,[Patchlevel version])
 AC_DEFINE([VERSION_EXTRA],develop,[Extra version])
 dnl Note that this is renamed by AX_PREFIX_CONFIG below
