@@ -77,7 +77,7 @@ PKGS_D+=(bash-completion=/etc/profile.d/bash_completion.sh)
 #    Needed to build gdb
 PKGS_D+=(bison flex)
 #    for asciidoc3 man page generation (asciidoc3 is a prereq)
-PKGS_D+=(docbook-style-xsl)
+PKGS_D+=(docbook-style-xsl libxslt)
 #    for sphinxcontrib.spelling extension (RST doc support)
 PKGS_D+=(enchant2)
 
@@ -99,15 +99,16 @@ PKGS_S+=(nfs-utils)
 #    for the inode64 prerequisite build (from source)
 PKGS_S+=(glibc-devel.i686)
 #    for the AV GUI installation and tutorials
-PKGS_S+=(oxygen-icon-theme jre tree)
-#    for serial console terminal emulation
-PKGS_S+=(screen)
+PKGS_S+=(jre tree)
 
 ##########################################################################################
 # E. installations that have to happen after we run yum-install once, and also rpm-required
 #    for devel.  For RPM installations we somehow rely on the user pre-installing epel.
-#    N.B.: for CentOS 8, none of the PKGS_E packages currently come from the EPEL repo.
 #
+#    for serial console terminal emulation
+PKGS_E+=(screen)
+#    for the AV GUI installation and tutorials
+PKGS_E+=(oxygen-icon-theme)
 #    for creating swig
 PKGS_E+=(swig)
 #    for ocpidev
@@ -157,8 +158,10 @@ permissions."
 fi
 
 # Install required packages, packages needed for development, and packages
-# needed for building from source
-$SUDO dnf -y install $(ypkgs PKGS_R) $(ypkgs PKGS_D) $(ypkgs PKGS_S)
+# needed for building from source.  The "--allowerasing" is needed for
+# container environments where "coreutils-single" is installed and we
+# want "coreutils".
+$SUDO dnf --allowerasing -y install $(ypkgs PKGS_R) $(ypkgs PKGS_D) $(ypkgs PKGS_S)
 [ $? -ne 0 ] && bad "Installing required packages failed"
 
 # Now those that depend on epel
