@@ -1,4 +1,4 @@
-.. platform_ad9361_config_proxy documentation
+.. platform_ad9361_config_proxy_csts documentation
 
 .. This file is protected by Copyright. Please refer to the COPYRIGHT file
    distributed with this source distribution.
@@ -18,25 +18,27 @@
    You should have received a copy of the GNU Lesser General Public License
    along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+.. _platform_ad9361_config_proxy_csts:
 
-.. _platform_ad9361_config_proxy:
 
-
-AD9361 Config Proxy (``platform_ad9361_config_proxy``)
-======================================================
+AD9361 Config Proxy CSTS (``platform_ad9361_config_proxy_csts``)
+================================================================
 Defines properties that map to functions in the Analog Devices No-OS software library
 used by the proxy device worker implementation for AD9361 device control.
-``platform_ad9361_config_proxy`` is an asset in the ``ocpi.platform.devices`` component library
+``platform_ad9361_config_proxy_csts`` is an asset in the ``ocpi.platform.devices`` component library
 Implementations include the
-:ref:`platform_ad9361_config_proxy-RCC-worker` (``platform_ad9361_config_proxy.rcc``).
+:ref:`platform_ad9361_config_proxy_csts-RCC-worker` (``platform_ad9361_config_proxy_csts.rcc``).
 Tested platforms include Agilent Zedboard/Analog Devices FMCOMMS2 (xilinx13 3 RCC platform only),
 Agilent Zedboard/Analog Devices FMCOMMS3 (``xilinx13_3`` RCC platform only), x86/Xilinx ML605/Analog Devices
 FMCOMMS2 (``centos7`` RCC platform only), x86/Xilinx ML605/Analog Devices FMCOMMS3 (``centos7`` RCC platform only),
 Ettus E310 (``xilinx13_4`` RCC platform only).
 
-
 Design
 ------
+
+.. note::
+   This component is functionally equivalent to the AD9361 Config Proxy component except that it specifies the Complex Short Timed Sample (CSTS) protocol in component port definitions instead of the Complex Short With Metadata (CSWM) protocol. The CSTS version of this component will replace the CSWM version in a future release.
+
 This component defines the properties used by the AD9361 config proxy device worker, which is
 a software wrapper for
 `No-OS software library <https://wiki.analog.com/resources/eval/user-guides/ad-fmcomms2-ebz/software/no-os-functions>`_
@@ -45,15 +47,14 @@ No-OS provides command and control of the `AD9361 integrated circuit (IC) <https
 via a high-level API that ultimately controls Serial Peripheral Interface (SPI) writes to the AD9361 register set.
 The component properties used by the device proxy worker implementation map one-to-one with No-OS API functions.
 
-A block diagram representation of the implementation is given in :numref:`platform_ad9361_config_proxy-diagram`.
+A block diagram representation of the implementation is given in :numref:`platform_ad9361_config_proxy_csts-diagram`
 
-.. _platform_ad9361_config_proxy-diagram:
+.. _platform_ad9361_config_proxy_csts-diagram:
 
-.. figure:: ad9361_config_proxy_block_diagram.png
-   :alt: AD9361 Config Proxy Device Worker Implementation Block Diagram
+.. figure:: platform_ad9361_config_proxy_csts_block.svg
    :align: center
 
-   AD9361 Config Proxy HDL Device Proxy Worker Block Diagram
+   AD9361 Config Proxy CSTS HDL Device Proxy Worker Block Diagram
 
 Interface
 ---------
@@ -70,7 +71,7 @@ Ports
 
 Implementations
 ---------------
-.. ocpi_documentation_implementations:: ../platform_ad9361_config_proxy.rcc
+.. ocpi_documentation_implementations:: ../platform_ad9361_config_proxy_csts.rcc
 
 Example Application
 -------------------
@@ -81,6 +82,7 @@ To be supplied: a meaningful example, if relevant to this type of worker.
 
 Dependencies
 ------------
+
 The dependencies on other elements in OpenCPI are:
 
  *  ``libad9361.a`` (no-OS static library installed with OpenCPI)
@@ -91,10 +93,9 @@ There is also a dependency on:
 
  *  `No-OS GitHub commit 8c52aa42e74841e3975a6f33cc5303ed2a67012 <https://github.com/analogdevicesinc/no-OS/commit/8c52aa42e74841e3975a6f33cc5303ed2a670124>`_ (the latest commit in the Analog Devices-recommended latest 2018 R2 release branch at the time of development.)
 
-
 Limitations
 -----------
-Limitations of ``platform_ad9361_config_proxy`` are:
+Limitations of ``platform_ad9361_config_proxy_csts`` are:
 
  * None.
 

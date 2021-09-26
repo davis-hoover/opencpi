@@ -1,4 +1,4 @@
-.. platform_ad9361_data_sub documentation
+.. platform_csts_ad9361_data_sub documentation
 
 .. This file is protected by Copyright. Please refer to the COPYRIGHT file
    distributed with this source distribution.
@@ -19,28 +19,31 @@
    along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 .. meta::
-   :keywords: ad9361 data sub
+   :keywords: ad9361 csts data sub
+
+.. _platform_csts_ad9361_data_sub:
 
 
-.. _platform_ad9361_data_sub:
-
-
-AD9361 Data Sub (``platform_ad9361_data_sub``)
-==============================================
+AD9361 CSTS Data Sub (``platform_csts_ad9361_data_sub``)
+========================================================
 Defines the build configuration parameters
 for the AD9361 data pin interface configurations.
-``platform_ad9361_data_sub`` is an asset in the ``ocpi.platform.devices`` component library.
+``platform_csts_ad9361_data_sub`` is an asset in the ``ocpi.platform.devices`` component library.
 Implementations include the
-:ref:`platform_ad9361_data_sub-HDL-worker` (``platform_ad9361_data_sub.hdl``).
+:ref:`platform_csts_ad9361_data_sub-HDL-worker` (``platform_csts_ad9361_data_sub.hdl``).
 Tested platforms include Agilent Zedboard/Analog Devices FMCOMMS2,
 Agilent Zedboard/Analog Devices FMCOMMS3, x86/Xilinx ML605/Analog Devices
 FMCOMMS2, x86/Xilinx ML605/Analog Devices FMCOMMS3,
 Ettus E310 (Vivado only).
 
+
 Design
 ------
+.. note::
+   This component is functionally equivalent to the AD9361 Data Sub component except that it specifies the Complex Short Timed Sample (CSTS) protocol in component port definitions instead of the Complex Short With Metadata (CSWM) protocol. The CSTS version of this component will replace the CSWM version in a future release.
+
 This component defines the build-time configuration parameter
-properties used by the :ref:`platform_ad9361_data_sub-HDL-worker` HDL subdevice worker,
+properties used by the :ref:`platform_csts_ad9361_data_sub-HDL-worker` HDL subdevice worker,
 which interfaces with the AD9361 device's ``DATA_CLK_P``/ ``DATA_CLK_N``, ``P0_D[11:0]``,
 ``P1_D[11:0]``, ``RX_FRAME_P``, ``RX_FRAME_N``, ``TX_FRAME_P``,
 ``TX_FRAME_N``, ``TXNRX``, and ``ENABLE`` pins.
@@ -50,21 +53,20 @@ that is appropriate for the given AD9361 data pin interface configuration
 (``ad9361_adc_sub.hdl`` or ``ad9361_dac_sub.hdl``; see ``../projects/assets/hdl/devices/``).
 
 
-A block diagram representation of the implementation is given in :numref:`platform_ad9361_data_sub-diagram`
+A block diagram representation of the implementation is given in :numref:`platform_csts_ad9361_data_sub-diagram`
 
-.. _platform_ad9361_data_sub-diagram:
+.. _platform_csts_ad9361_data_sub-diagram:
 
-.. figure:: ad9361_data_sub_block_diagram.png
-   :alt: AD9361 Data Sub HDL Subdevice Worker Implementation Block Diagram
+.. figure:: platform_csts_ad9361_data_sub_block.svg
    :align: center
 
-   AD9361 Data Sub HDL Subdevice Worker Block Diagram
+   AD9361 CSTS Data Sub HDL Subdevice Worker Block Diagram
 
 Interface
 ---------
 This component's specification is contained in the OpenCPI Worker Description (OWD) for the HDL subdevice worker.
 
-.. literalinclude:: ../platform_ad9361_data_sub.hdl/platform_ad9361_data_sub.xml
+.. literalinclude:: ../platform_csts_ad9361_data_sub.hdl/platform_csts_ad9361_data_sub.xml
    :language: xml
 
 Properties
@@ -77,7 +79,7 @@ Ports
 
 Implementations
 ---------------
-.. ocpi_documentation_implementations:: ../platform_ad9361_data_sub.hdl
+.. ocpi_documentation_implementations:: ../platform_csts_ad9361_data_sub.hdl
 
 Example Application
 -------------------
@@ -88,20 +90,19 @@ To be supplied: a meaningful example, if relevant to this type of worker.
 
 Dependencies
 ------------
-.. not sure I should be listing these assets here.
-   
 The dependencies on other elements in OpenCPI are:
 
- * :ref:`platform_ad9361_config_proxy`
+.. not sure I should be listing these assets here.
+   
+ * :ref:`platform_ad9361_config_proxy_csts`
 
- * :ref:`platform_ad9361_config`
+ * :ref:`platform_ad9361_config_csts`
 
- * :ref:`platform_ad9361_spi`
-
+ * :ref:`platform_ad9361_spi_csts`
 
 Limitations
 -----------
-Limitations of ``platform_ad9361_data_sub`` are:
+Limitations of ``platform_csts_ad9361_data_sub`` are:
 
  * None.
 
