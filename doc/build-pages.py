@@ -640,7 +640,7 @@ def gen_release_index(tag: str, is_latest=False):
         rendered_sections[data.name] = old_main_section.render(section_title=data.title,
                                                                links=data.files)
     else:
-        # Main section needs some files from assets, briefings, and tutorials
+        # Main section needs some files from assets, briefings, tutorials, and videos
         assets = section_data.get("assets")
         briefings = section_data.get("briefings")
         tutorials = section_data.get("tutorials")
