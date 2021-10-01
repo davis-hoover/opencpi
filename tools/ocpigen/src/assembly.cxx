@@ -354,7 +354,7 @@ init(::Assembly &assy, const char *iName, const char *wName, ezxml_t ix,
     assert("Invalid worker type as instance" == 0);
   }
   // Parse property values now that we know the actual workers.
-  m_properties.resize(w->m_ctl.nParameters);
+  m_properties.resize(w->m_ctl.properties.size());
   InstanceProperty *ipv = &m_properties[0];
   // Even though we used the ipv's to select a worker and paramconfig,
   // we queue them up here to actually apply to the instance in the generated code.
