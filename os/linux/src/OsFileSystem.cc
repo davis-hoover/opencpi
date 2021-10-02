@@ -445,7 +445,7 @@ exists(const char *name, bool * isDir, uint64_t *size, std::time_t *mtime, FileI
     if (isDir)
       *isDir = false;
     if (size)
-      *size = info.st_size;
+      *size = (uint64_t)info.st_size;
   } else
     return false;
   if (mtime)
@@ -479,7 +479,7 @@ size (const std::string & name)
     throw std::string ("not a regular file");
   }
 
-  return info.st_size;
+  return (unsigned long long)info.st_size;
 }
 
 std::time_t

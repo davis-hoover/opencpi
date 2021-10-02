@@ -142,12 +142,12 @@ OCPI::OS::Event::wait (unsigned int timeout)
   TIMEVAL_TO_TIMESPEC(&tv, &absTimeout);
 #endif
 
-  if ((absTimeout.tv_nsec += ((timeout % 1000) * 1000000)) >= 1000000000) {
-    absTimeout.tv_sec += (timeout / 1000) + 1;
+  if ((absTimeout.tv_nsec += (long)((timeout % 1000) * 1000000)) >= 1000000000) {
+    absTimeout.tv_sec += (time_t)((timeout / 1000) + 1u);
     absTimeout.tv_nsec -= 1000000000;
   }
   else {
-    absTimeout.tv_sec += (timeout / 1000);
+    absTimeout.tv_sec += (time_t)(timeout / 1000);
   }
 
   if ((res = pthread_mutex_lock (&ed.mutex))) {

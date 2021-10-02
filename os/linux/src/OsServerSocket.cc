@@ -259,8 +259,8 @@ recvfrom(char  *buf, size_t amount, int flags,
 	 char * src_addr, size_t * addrlen, unsigned timeoutms){
   if (timeoutms != m_timeoutms) {
     struct timeval tv;
-    tv.tv_sec = timeoutms/1000;
-    tv.tv_usec = (timeoutms % 1000) * 1000;
+    tv.tv_sec = (time_t)(timeoutms/1000);
+    tv.tv_usec = (suseconds_t)(timeoutms % 1000) * 1000;
     ocpiDebug("[ServerSocket::recvfrom] Setting socket timeout to %u ms", timeoutms);
     if (setsockopt(o2fd (m_osOpaque), SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) != 0)
       throw Posix::getErrorMessage (errno, "setsockopt/recvfrom");

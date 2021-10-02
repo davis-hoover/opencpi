@@ -302,7 +302,7 @@ OCPI::OS::FileIterator::size ()
     throw std::string ("not a regular file");
   }
 
-  return data.fileInfo.st_size;
+  return (unsigned long long)data.fileInfo.st_size;
 }
 
 std::time_t
