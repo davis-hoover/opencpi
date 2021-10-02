@@ -29,10 +29,10 @@
 
 #include "gtest/gtest.h"
 
-#include "OcpiOsProcessManager.h"
-#include "OcpiOsMisc.h"
-#include "OcpiOsDebug.h"
-#include "OcpiOsFileSystem.h"
+#include "OsProcessManager.hh"
+#include "OsMisc.hh"
+#include "OsDebug.hh"
+#include "OsFileSystem.hh"
 
 namespace
 {

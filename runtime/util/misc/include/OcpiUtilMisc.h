@@ -44,8 +44,8 @@
 #include <functional>
 #include <vector>
 
-#include "OcpiOsAssert.h"
-#include "OcpiOsEther.h"
+#include "OsAssert.hh"
+#include "OsEther.hh"
 
 #ifndef NDEBUG
   class Trace {

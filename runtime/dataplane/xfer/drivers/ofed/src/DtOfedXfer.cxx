@@ -38,9 +38,9 @@
 #include <ezxml.h>
 
 #include "ocpi-config.h"
-#include "OcpiOsDataTypes.h"
-#include "OcpiOsMisc.h"
-#include "OcpiOsAssert.h"
+#include "OsDataTypes.hh"
+#include "OsMisc.hh"
+#include "OsAssert.hh"
 #include "OcpiUtilAutoMutex.h"
 #include "OcpiUtilEzxml.h"
 #include "OcpiUtilMisc.h"

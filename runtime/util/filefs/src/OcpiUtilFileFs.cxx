@@ -23,11 +23,11 @@
 #include <OcpiUtilVfsIterator.h>
 #include <OcpiUtilUri.h>
 #include <OcpiUtilAutoMutex.h>
-#include <OcpiOsAssert.h>
-#include <OcpiOsFileSystem.h>
-#include <OcpiOsFileIterator.h>
-#include <OcpiOsMutex.h>
-#include <OcpiOsMisc.h>
+#include "OsAssert.hh"
+#include "OsFileSystem.hh"
+#include "OsFileIterator.hh"
+#include "OsMutex.hh"
+#include "OsMisc.hh"
 #include <iostream>
 #include <fstream>
 #include <string>

@@ -29,7 +29,7 @@
 #include "lzma.h"
 #include "zlib.h"
 #include "ocpi-config.h"
-#include "OcpiOsMisc.h"
+#include "OsMisc.hh"
 #include "OcpiUuid.h"
 #include "OcpiUtilMisc.h"
 #include "OcpiUtilEzxml.h"

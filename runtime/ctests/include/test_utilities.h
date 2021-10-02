@@ -31,8 +31,8 @@
 #include <signal.h>
 #include <sstream>
 #include <list>
-#include "OcpiOsMisc.h"
-#include "OcpiOsAssert.h"
+#include "OsMisc.hh"
+#include "OsAssert.hh"
 #include "OcpiTimeEmit.h"
 #include "OcpiRDTInterface.h"
 #include "OcpiThread.h"

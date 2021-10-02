@@ -20,7 +20,7 @@
 
 #include "gtest/gtest.h"
 
-#include "OcpiOsDebug.h"
+#include "OsDebug.hh"
 #include "OcpiLoggerTee.h"
 
 #include "MessageKeeper.h"

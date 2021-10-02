@@ -22,8 +22,8 @@
 #include <inttypes.h>
 #include <list>
 #include <cstdio>
-#include "OcpiOsDataTypes.h"
-#include "OcpiOsAssert.h"
+#include "OsDataTypes.hh"
+#include "OsAssert.hh"
 #include "OcpiUtilMisc.h"
 #include "OcpiRes.h"
 

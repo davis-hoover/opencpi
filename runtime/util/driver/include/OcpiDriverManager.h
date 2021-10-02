@@ -40,10 +40,10 @@
  */
 #ifndef OCPI_DRIVER_MANAGER_H
 #define OCPI_DRIVER_MANAGER_H
-#include "OcpiOsMutex.h"
+#include "OsMutex.hh"
 #include "OcpiParentChild.h"
 #include "OcpiPValue.h"
-#include "OcpiOsAssert.h"
+#include "OsAssert.hh"
 #include "OcpiUtilMisc.h" // Singleton
 #include "ezxml.h"
 

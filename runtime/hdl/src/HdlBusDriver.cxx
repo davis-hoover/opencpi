@@ -32,7 +32,7 @@
 #include <sys/stat.h>
 #include "zlib.h"
 #include "ocpi-config.h"
-#include "OcpiOsFileSystem.h"
+#include "OsFileSystem.hh"
 #include "HdlZynq.h"
 #include "HdlBusDriver.h"
 #ifdef OCPI_OS_macos

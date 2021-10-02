@@ -32,8 +32,8 @@
 
 #include "fasttime.h"
 
-#include "KernelDriver.h"
-#include "OcpiOsFileSystem.h"
+#include "OsKernelDriver.h"
+#include "OsFileSystem.hh"
 #include "HdlPciDriver.h"
 
 // This should be in OCPIOS.

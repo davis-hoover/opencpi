@@ -36,10 +36,10 @@
 
 #include <OcpiDDSTransport.h>
 #include <ezxml.h>
-#include <OcpiOsDataTypes.h>
-#include <OcpiOsMutex.h>
-#include <OcpiOsMisc.h>
-#include <OcpiOsAssert.h>
+#include "OsDataTypes.hh"
+#include "OsMutex.hh"
+#include "OsMisc.hh"
+#include "OsAssert.hh"
 #include <OcpiUtilAutoMutex.h>
 #include <OcpiUtilEzxml.h>
 #include <OcpiPValue.h>

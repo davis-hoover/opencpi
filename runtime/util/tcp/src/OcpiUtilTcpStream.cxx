@@ -32,8 +32,8 @@
  */
 
 #include <OcpiUtilTcpStream.h>
-#include <OcpiOsAssert.h>
-#include <OcpiOsSocket.h>
+#include "OsAssert.hh"
+#include "OsSocket.hh"
 #include <streambuf>
 #include <iostream>
 #include <string>

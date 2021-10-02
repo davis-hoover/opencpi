@@ -28,7 +28,7 @@
 #include <string>
 #include <map>
 
-#include "OcpiOsEther.h"
+#include "OsEther.hh"
 #include "OcpiPValue.h"
 #include "HdlDevice.h"
 #include "HdlNetDefs.h"

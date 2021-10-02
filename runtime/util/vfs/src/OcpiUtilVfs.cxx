@@ -20,7 +20,7 @@
 
 #include <OcpiUtilVfs.h>
 #include <OcpiUtilVfsIterator.h>
-#include <OcpiOsFileSystem.h>
+#include "OsFileSystem.hh"
 #include <iostream>
 #include <string>
 

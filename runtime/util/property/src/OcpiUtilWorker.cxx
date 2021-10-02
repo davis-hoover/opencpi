@@ -23,7 +23,7 @@
 #include <strings.h>
 #include "ocpi-config.h"
 #include "OcpiUtilCppMacros.h"
-#include "OcpiOsAssert.h"
+#include "OsAssert.hh"
 #include "OcpiUtilMisc.h"
 #include "OcpiUtilEzxml.h"
 #include "OcpiUtilValue.h"

@@ -24,7 +24,7 @@
 #include <unistd.h>
 #include "ocpirh_proxy_base.h"
 #include "OcpiApi.hh"
-#include "OcpiOsFileSystem.h"
+#include "OsFileSystem.hh"
 #include "ContainerPort.h"
 #include "OcpiApplication.h"
 

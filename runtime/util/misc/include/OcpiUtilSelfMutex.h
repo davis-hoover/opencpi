@@ -26,7 +26,7 @@
 #ifndef OCPIUTILSELFMUTEX_H__
 #define OCPIUTILSELFMUTEX_H__
 
-#include "OcpiOsMutex.h"
+#include "OsMutex.hh"
 
 namespace OCPI {
   namespace Util {

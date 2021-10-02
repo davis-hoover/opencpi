@@ -26,9 +26,9 @@
 #include <OcpiUtilAutoWRLock.h>
 #include <OcpiUtilUri.h>
 #include <OcpiUtilMisc.h>
-#include <OcpiOsAssert.h>
-#include <OcpiOsRWLock.h>
-#include <OcpiOsSizeCheck.h>
+#include "OsAssert.hh"
+#include "OsRWLock.hh"
+#include "OsSizeCheck.hh"
 #include <iostream>
 #include <string>
 #include <ctime>

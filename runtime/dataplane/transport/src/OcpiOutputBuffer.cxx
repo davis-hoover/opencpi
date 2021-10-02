@@ -35,7 +35,7 @@
 #include <OcpiPort.h>
 #include "TransportTransfer.hh"
 #include <OcpiCircuit.h>
-#include <OcpiOsAssert.h>
+#include "OsAssert.hh"
 #include <OcpiUtilAutoMutex.h>
 #include <OcpiTimeEmitCategories.h>
 

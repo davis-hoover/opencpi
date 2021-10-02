@@ -41,8 +41,8 @@
 // OCPI headers
 #include "OcpiDriverManager.h" // OCPI::Driver::ManagerManager::suppressDiscovery
 #include "OcpiLibraryManager.h"  // OL::* stuff
-#include "OcpiOsAssert.h"  // ocpiLog macros
-#include "OcpiOsFileSystem.h"  // Filesystem ops like mkdir etc.
+#include "OsAssert.hh"  // ocpiLog macros
+#include "OsFileSystem.hh"  // Filesystem ops like mkdir etc.
 #include "OcpiUtilDataTypesApi.h"  // OA::OCPI_* types
 #include "OcpiUtilException.h"  // OU::Error
 #include "OcpiUtilMisc.h"  // OU::format, getProjectRegistry, string2File

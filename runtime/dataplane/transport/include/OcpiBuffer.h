@@ -33,12 +33,12 @@
 #ifndef OCPI_DataTransport_Buffer_H_
 #define OCPI_DataTransport_Buffer_H_
 
-#include <OcpiOsDataTypes.h>
+#include "OsDataTypes.hh"
 #include <OcpiList.h>
 #include <OcpiTransportConstants.h>
 #include <OcpiPortMetaData.h>
 #include <DtHandshakeControl.h>
-#include <OcpiOsMutex.h>
+#include "OsMutex.hh"
 #include <OcpiTimeEmit.h>
 
 

@@ -20,7 +20,7 @@
 
 #include "gtest/gtest.h"
 
-#include "OcpiOsThreadManager.h"
+#include "OsThreadManager.hh"
 
 namespace
 {

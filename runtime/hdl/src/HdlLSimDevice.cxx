@@ -29,9 +29,9 @@
 #include <set>
 #include <sys/wait.h>
 #include <sys/syscall.h>
-#include "OcpiOsFileSystem.h"
-#include "OcpiOsSemaphore.h"
-#include "OcpiOsMisc.h"
+#include "OsFileSystem.hh"
+#include "OsSemaphore.hh"
+#include "OsMisc.hh"
 #include "OcpiUtilAutoMutex.h"
 #include "XferManager.h"
 #include "OcpiTransport.h"

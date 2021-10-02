@@ -27,8 +27,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <utime.h>
-#include "OcpiOsFileSystem.h"
-#include "OcpiOsAssert.h"
+#include "OsFileSystem.hh"
+#include "OsAssert.hh"
 #include "OcpiUtilMisc.h"
 #include "OcpiServer.h"
 

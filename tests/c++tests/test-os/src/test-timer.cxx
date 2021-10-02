@@ -22,9 +22,9 @@
 
 #include "gtest/gtest.h"
 
-#include "OcpiOsTimer.h"
-#include "OcpiOsMisc.h"
-#include "OcpiOsDebug.h"
+#include "OsTimer.hh"
+#include "OsMisc.hh"
+#include "OsDebug.hh"
 
 namespace OS = OCPI::OS;
 

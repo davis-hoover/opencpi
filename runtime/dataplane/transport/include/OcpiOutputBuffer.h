@@ -34,8 +34,8 @@
 #define OCPI_DataTransport_OutputBuffer_H_
 
 #include <OcpiBuffer.h>
-#include <OcpiOsMutex.h>
-#include <OcpiOsAssert.h>
+#include "OsMutex.hh"
+#include "OsAssert.hh"
 #include <OcpiPort.h>
 #include <OcpiTimeEmitCategories.h>
 

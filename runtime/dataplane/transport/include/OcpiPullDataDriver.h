@@ -21,7 +21,7 @@
 #ifndef OCPI_PULL_DATA_DRIVER_H_
 #define OCPI_PULL_DATA_DRIVER_H_
 
-#include <OcpiOsDataTypes.h>
+#include "OsDataTypes.hh"
 
 namespace OCPI {
   namespace DataTransport {

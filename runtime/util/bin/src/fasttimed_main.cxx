@@ -43,7 +43,7 @@
 
 #include "fasttime_private.h"
 #include "calibration.h"
-#include "OcpiOsAssert.h"
+#include "OsAssert.hh"
 
 static fasttime_buffers_t *ft_storage;
 static volatile int shutdown_flag;

@@ -25,8 +25,8 @@
 #include <utime.h>
 #include <unistd.h>
 #include <cerrno>
-#include "OcpiOsFileSystem.h"
-#include "OcpiOsEther.h"
+#include "OsFileSystem.hh"
+#include "OsEther.hh"
 #include "Container.h"
 #include "ContainerManager.h"
 #include "ContainerLauncher.h"

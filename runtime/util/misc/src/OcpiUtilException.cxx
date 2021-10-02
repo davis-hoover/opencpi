@@ -22,7 +22,7 @@
 #include <unistd.h>
 #include <cstdio>
 
-#include "OcpiOsAssert.h"
+#include "OsAssert.hh"
 #include "OcpiDriverManager.h"
 #include "OcpiUtilException.h"
 

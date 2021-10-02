@@ -34,7 +34,7 @@
  *
  */
 
-#include <OcpiOsDataTypes.h>
+#include "OsDataTypes.hh"
 #include <string>
 
 namespace OCPI {

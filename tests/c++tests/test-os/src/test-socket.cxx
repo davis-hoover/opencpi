@@ -23,11 +23,11 @@
 
 #include "gtest/gtest.h"
 
-#include "OcpiOsSocket.h"
-#include "OcpiOsMisc.h"
-#include "OcpiOsDebug.h"
-#include "OcpiOsServerSocket.h"
-#include "OcpiOsThreadManager.h"
+#include "OsSocket.hh"
+#include "OsMisc.hh"
+#include "OsDebug.hh"
+#include "OsServerSocket.hh"
+#include "OsThreadManager.hh"
 
 namespace
 {

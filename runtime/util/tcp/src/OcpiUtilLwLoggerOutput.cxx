@@ -20,9 +20,9 @@
 
 #include <string>
 #include <cstring>
-#include <OcpiOsAssert.h>
-#include <OcpiOsDataTypes.h>
-#include <OcpiOsMutex.h>
+#include "OsAssert.hh"
+#include "OsDataTypes.hh"
+#include "OsMutex.hh"
 #include <OcpiUtilCDR.h>
 #include <OcpiUtilIOP.h>
 #include <OcpiLoggerLogger.h>

@@ -20,9 +20,9 @@
 
 #include <unistd.h>
 #include <climits>
-#include "OcpiOsFileSystem.h"
+#include "OsFileSystem.hh"
 #include "OcpiContainerApi.h"
-#include "OcpiOsMisc.h"
+#include "OsMisc.hh"
 #include "OcpiUtilValue.h"
 #include "OcpiPValue.h"
 #include "OcpiTimeEmit.h"

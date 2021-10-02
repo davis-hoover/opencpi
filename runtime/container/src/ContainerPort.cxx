@@ -18,7 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "OcpiOsAssert.h"
+#include "OsAssert.hh"
 #include "OcpiUtilCDR.h"
 #include "Container.h"
 #include "ContainerWorker.h"

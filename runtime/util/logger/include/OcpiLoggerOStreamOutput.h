@@ -29,7 +29,7 @@
 #ifndef OCPILOGGEROSTREAMOUTPUT_H__
 #define OCPILOGGEROSTREAMOUTPUT_H__
 
-#include <OcpiOsMutex.h>
+#include "OsMutex.hh"
 #include <OcpiLoggerLogger.h>
 
 namespace OCPI {

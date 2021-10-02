@@ -19,7 +19,7 @@
  */
 
 #include <cstring>
-#include "OcpiOsMisc.h"
+#include "OsMisc.hh"
 #include "OcpiUtilValue.h"
 #include "OcpiUtilMisc.h"
 #define OCPI_OPTIONS_NO_MAIN 1

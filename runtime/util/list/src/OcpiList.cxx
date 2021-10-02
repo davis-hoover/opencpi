@@ -42,7 +42,7 @@
 
 /* Facility Interface Includes */
 #include <OcpiList.h>
-#include <OcpiOsAssert.h>
+#include "OsAssert.hh"
 
 
 

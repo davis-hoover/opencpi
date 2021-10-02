@@ -33,7 +33,7 @@
 #ifndef OCPI_Transport_Message_Circuit_H_
 #define OCPI_Transport_Message_Circuit_H_
 
-#include <OcpiOsTimer.h>
+#include "OsTimer.hh"
 #include <OcpiUtilProtocol.h>
 #include <OcpiTransport.h>
 

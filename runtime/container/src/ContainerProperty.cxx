@@ -19,7 +19,7 @@
  */
 
 #include <limits>
-#include "OcpiOsAssert.h"
+#include "OsAssert.hh"
 #include "OcpiUtilProperty.h"
 #include "OcpiUtilException.h"
 #include "OcpiUtilValue.h"

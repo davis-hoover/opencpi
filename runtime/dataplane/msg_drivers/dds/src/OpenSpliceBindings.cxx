@@ -14,7 +14,7 @@
 #ifdef OPENSPLICE_MSG_SUPPORT
 
 #include <OpenSpliceBindings.h>
-#include <OcpiOsAssert.h>
+#include "OsAssert.hh"
 
 using namespace DDS;
 namespace OpenSpliceBindings {

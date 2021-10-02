@@ -30,8 +30,8 @@
 #include <cctype>
 #include <list>
 #include <glob.h>
-#include "OcpiOsEther.h"
-#include "OcpiOsFileSystem.h"
+#include "OsEther.hh"
+#include "OsFileSystem.hh"
 #include "OcpiUtilValue.h"
 #include "OcpiUtilException.h"
 #include "OcpiUtilUUID.h"
