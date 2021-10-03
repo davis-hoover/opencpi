@@ -87,7 +87,6 @@ Vfs::Vfs ()
 }
 
 Vfs::~Vfs ()
-  throw ()
 {
 }
 
@@ -291,7 +290,7 @@ Iterator * Vfs::list (const std::string & dir,
 Dir::Dir(Vfs &fs, const std::string &name)
   : m_parent(NULL), m_fs(fs), m_name(name) {
 }
-Dir::~Dir() throw() {
+Dir::~Dir() {
 }
 Dir *Dir::pushDir(const std::string &s) throw(std::string) {
   Dir &child = m_fs.openDir(joinNames(m_name, s));

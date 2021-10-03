@@ -49,7 +49,7 @@ oincs="application library container util/misc util/property util/parentChild ut
        util/driver util/assembly util/list util/timeEmit"
 OCPI_INCS="-I$OCPI_CDK_DIR/include/aci \
            $(for i in $oincs; do echo -n ' '-I$OCPI_ROOT_DIR/runtime/$i/include; done) \
-           -I$OCPI_ROOT_DIR/os/interfaces/include"
+           -I$OCPI_ROOT_DIR/os/include"
 pdir=${OCPI_PREREQUISITES_DIR:-/opt/opencpi/prerequisites}
 olibs="application container library transport rdma_driver_interface rdma_utils rdma_smb \
        msg_driver_interface util os"
