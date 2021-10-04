@@ -1,0 +1,16 @@
+<!-- This is the HDL XML Makefile for assembly: raw2axi_lite32_test_asm
+     The file 'axi_test.xml' defines the assembly.
+     The default container for all assemblies is one that connects all external ports to
+     the devices interconnect to communicate with software workers or other FPGAs.
+     Limit this assembly to certain platforms or targets with
+     Exclude/Only and Targets/Platforms ie:
+        OnlyTargets=
+        ExcludeTargets=
+        OnlyPlatforms=
+        ExcludePlatforms=
+     If you want to connect external ports of the assembly to local devices on the platform,
+     you must define container XML files, and mention them in a "Containers" variable here, e.g.:
+     Containers='take_input_from_local_ADC' -->
+<HdlAssembly>
+	<instance worker='raw2axi_lite32_tester'/>
+</HdlAssembly>
