@@ -30,7 +30,7 @@
 #include "OcpiLibraryManager.h"
 #include "LibrarySimple.h"
 #include "OcpiComponentLibrary.h"
-#include "OcpiOsAssert.h"
+#include "OsAssert.hh"
 
 // This file contains code common to all library drivers
 

@@ -34,8 +34,8 @@
 #include <unistd.h>
 #include <sys/mman.h> // FIXME: use OS services?
 #include "ocpi-config.h"
-#include "KernelDriver.h"
-#include "OcpiOsDebug.h"
+#include "OsKernelDriver.h"
+#include "OsDebug.hh"
 #include "OcpiUtilMisc.h"
 #include "XferDriver.h"
 #include "XferEndPoint.h"

@@ -26,8 +26,8 @@
 
 #include "gtest/gtest.h"
 
-#include "OcpiOsFileSystem.h"
-#include "OcpiOsDebug.h"
+#include "OsFileSystem.hh"
+#include "OsDebug.hh"
 
 namespace
 {

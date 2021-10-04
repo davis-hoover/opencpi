@@ -19,8 +19,8 @@
  */
 
 #include <OcpiUtilAutoMutex.h>
-#include <OcpiOsAssert.h>
-#include <OcpiOsMutex.h>
+#include "OsAssert.hh"
+#include "OsMutex.hh"
 
 OCPI::Util::AutoMutex::AutoMutex (OCPI::OS::Mutex & mutex, bool locked)
   throw (std::string)

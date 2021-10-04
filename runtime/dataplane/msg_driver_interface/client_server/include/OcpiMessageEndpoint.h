@@ -31,7 +31,7 @@
 #include <set>
 #include <string>
 #include <queue>
-#include <OcpiOsTimer.h>
+#include "OsTimer.hh"
 #include <OcpiUtilSelfMutex.h>
 #include <OcpiTransport.h>
 #include <OcpiMessageCircuit.h>

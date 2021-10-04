@@ -21,7 +21,7 @@
 #include <string>
 #include <cstring>
 #include <vector>
-#include "OcpiOsAssert.h"
+#include "OsAssert.hh"
 #include "OcpiUtilMisc.h"
 #include "OcpiUtilCDR.h"
 #include "OcpiUtilIOP.h"

@@ -75,14 +75,14 @@
 #ifndef OCPI_TIME_ANALYZER_H_
 #define OCPI_TIME_ANALYZER_H_
 
-#include <OcpiOsDataTypes.h>
+#include "OsDataTypes.hh"
 #include <sys/time.h>
 #include <string>
 #include <vector>
 #include <map>
 #include <ostream>
 #include <OcpiPValue.h>
-#include <OcpiOsMutex.h>
+#include "OsMutex.hh"
 #include <OcpiUtilAutoMutex.h>
 #include <OcpiUtilException.h>
 

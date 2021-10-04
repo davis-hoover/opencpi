@@ -18,7 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "OcpiOsThreadManager.h"
+#include "OsThreadManager.hh"
 #include "OcpiThread.h"
 namespace OCPI {
 namespace Util {

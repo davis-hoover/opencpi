@@ -28,8 +28,8 @@
  *
  */
 
-#include "OcpiOsMisc.h"
-#include "OcpiOsAssert.h"
+#include "OsMisc.hh"
+#include "OsAssert.hh"
 #include "OcpiUtilMisc.h"
 #include "DtDataGramXfer.h"
 

@@ -21,7 +21,7 @@
 #include <vector>
 #include <string>
 
-#include "OcpiOsServerSocket.h"
+#include "OsServerSocket.hh"
 #include "OcpiServer.h"
 #include "OcpiLibraryManager.h"
 #include "ContainerLauncher.h"

@@ -24,8 +24,8 @@
 #include <cstdlib>
 #include <fnmatch.h>
 #include "ocpi-config.h"
-#include "OcpiOsFileIterator.h"
-#include "OcpiOsFileSystem.h"
+#include "OsFileIterator.hh"
+#include "OsFileSystem.hh"
 #include "OcpiUtilCppMacros.h"
 #include "OcpiUtilMisc.h"
 #include "cdkutils.h"

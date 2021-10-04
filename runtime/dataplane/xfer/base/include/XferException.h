@@ -33,7 +33,7 @@
 #ifndef OCPI_DATATRANSFER_EXCEPTIONS_H_
 #define OCPI_DATATRANSFER_EXCEPTIONS_H_
 
-#include <OcpiOsDataTypes.h>
+#include "OsDataTypes.hh"
 #include <OcpiUtilException.h>
 
 namespace DataTransfer {

@@ -35,7 +35,7 @@
 
 #include "OcpiContainerApi.h"
 
-#include "OcpiOsTimer.h"
+#include "OsTimer.hh"
 #include "OcpiPValue.h"
 #include "OcpiLibraryManager.h"
 #include "OcpiParentChild.h"

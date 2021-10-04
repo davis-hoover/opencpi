@@ -161,8 +161,7 @@ namespace OCPI {
          * Destructor.
          */
 
-        virtual ~Vfs ()
-          throw ();
+        virtual ~Vfs ();
 
         /**
          * \name File Name URI Mapping
@@ -573,7 +572,7 @@ namespace OCPI {
 	virtual bool next(std::string &name, bool &isDir) throw (std::string) = 0;
 	Dir *popDir();
       public:
-	virtual ~Dir() throw();
+	virtual ~Dir();
       };
 
     }

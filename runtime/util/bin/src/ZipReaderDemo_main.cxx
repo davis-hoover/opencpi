@@ -21,7 +21,7 @@
 #include <OcpiUtilVfsIterator.h>
 #include <OcpiUtilZipFs.h>
 #include <OcpiUtilFileFs.h>
-#include <OcpiOsFileSystem.h>
+#include "OsFileSystem.hh"
 #include <iostream>
 #include <iomanip>
 #include <string>

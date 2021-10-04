@@ -31,7 +31,7 @@
  */
 #include <inttypes.h>
 #include <ctype.h>
-#include "OcpiOsAssert.h"
+#include "OsAssert.hh"
 #include "OcpiUtilPort.h"
 #include "DtHandshakeControl.h"
 #include "XferManager.h"

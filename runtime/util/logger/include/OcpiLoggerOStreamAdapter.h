@@ -29,7 +29,7 @@
 #ifndef OCPILOGGEROSTREAMADAPTER_H__
 #define OCPILOGGEROSTREAMADAPTER_H__
 
-#include <OcpiOsMutex.h>
+#include "OsMutex.hh"
 #include <OcpiLoggerLogger.h>
 #include <streambuf>
 #include <iostream>

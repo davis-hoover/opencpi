@@ -31,7 +31,7 @@
 #ifndef OcpiNT_FILE_MAPPING_SERVICES_H_
 #define OcpiNT_FILE_MAPPING_SERVICES_H_
 
-#include <OcpiOsDataTypes.h>
+#include "OsDataTypes.hh"
 
 namespace DataTransfer {
 

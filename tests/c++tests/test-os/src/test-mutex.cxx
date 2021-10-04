@@ -20,10 +20,10 @@
 
 #include "gtest/gtest.h"
 
-#include "OcpiOsMutex.h"
-#include "OcpiOsMisc.h"
-#include "OcpiOsDebug.h"
-#include "OcpiOsThreadManager.h"
+#include "OsMutex.hh"
+#include "OsMisc.hh"
+#include "OsDebug.hh"
+#include "OsThreadManager.hh"
 
 namespace
 {

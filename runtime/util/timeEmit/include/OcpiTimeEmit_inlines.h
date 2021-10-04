@@ -31,7 +31,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
-#include <OcpiOsAssert.h>
+#include "OsAssert.hh"
 #include <OcpiUtilDataTypesApi.h>
 
 #ifndef OCPI_TIME_ANALYZER_INLINE_VALID_USE__

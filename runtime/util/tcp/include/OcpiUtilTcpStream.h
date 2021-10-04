@@ -34,7 +34,7 @@
  *
  */
 
-#include <OcpiOsSocket.h>
+#include "OsSocket.hh"
 #include <streambuf>
 #include <iostream>
 #include <string>

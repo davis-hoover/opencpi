@@ -95,7 +95,7 @@
 #include "HdlOCCP.h"
 #include "HdlPciDriver.h"
 #include "HdlNetDefs.h"
-#include "KernelDriver.h"                    // includes shared with user mode
+#include "OsKernelDriver.h"                    // includes shared with user mode
 
 //#define _SCIF_ 1
 #ifdef _SCIF_

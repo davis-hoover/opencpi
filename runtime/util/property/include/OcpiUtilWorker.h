@@ -42,7 +42,7 @@
 
 #include <map>
 #include "ezxml.h"
-#include "OcpiOsAssert.h"
+#include "OsAssert.hh"
 #include "OcpiUtilException.h"
 #include "OcpiUtilProperty.h"
 #include "OcpiUtilProtocol.h"

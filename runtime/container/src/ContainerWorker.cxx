@@ -19,7 +19,7 @@
  */
 
 #include <climits> // CHAR_BIT
-#include "OcpiOsMisc.h"
+#include "OsMisc.hh"
 #include "OcpiUtilValue.h"
 #include "ValueReader.h"
 #include "ValueWriter.h"

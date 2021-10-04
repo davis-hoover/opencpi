@@ -35,7 +35,7 @@
 
 #include <OcpiBuffer.h>
 #include <OcpiRDTInterface.h>
-#include <OcpiOsMutex.h>
+#include "OsMutex.hh"
 
 namespace OCPI {
   namespace DataTransport {

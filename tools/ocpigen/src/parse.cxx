@@ -28,7 +28,7 @@
 #include <strings.h>
 #include <ctype.h>
 #include "ocpi-config.h"
-#include "OcpiOsFileSystem.h"
+#include "OsFileSystem.hh"
 #include "OcpiUtilMisc.h"
 #include "OcpiUtilEzxml.h"
 #include "OcpiUtilAssembly.h"

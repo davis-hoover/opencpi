@@ -35,7 +35,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <string>
-#include "OcpiOsDataTypes.h"
+#include "OsDataTypes.hh"
 #include "OcpiUtilExceptionApi.h"
 
 namespace OCPI {

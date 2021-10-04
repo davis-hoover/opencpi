@@ -31,7 +31,7 @@
 #ifndef OCPI_Transport_Client_H_
 #define OCPI_Transport_Client_H_
 
-#include <OcpiOsTimer.h>
+#include "OsTimer.hh"
 #include <OcpiMessageCircuit.h>
 #include <OcpiThreadHook.h>
 #include <OcpiList.h>

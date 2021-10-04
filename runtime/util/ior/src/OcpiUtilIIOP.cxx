@@ -22,7 +22,7 @@
 #include <cstring>
 #include <vector>
 
-#include "OcpiOsAssert.h"
+#include "OsAssert.hh"
 #include "OcpiUtilCDR.h"
 #include "OcpiUtilIOP.h"
 #include "OcpiUtilIIOP.h"

@@ -26,8 +26,8 @@
 #include <limits>
 #include <algorithm>
 #include <unordered_set>
-#include "OcpiOsDebugApi.h"
-#include "OcpiOsFileSystem.h"
+#include "OcpiOsDebugApi.hh"
+#include "OsFileSystem.hh"
 #include "OcpiUtilMisc.h"
 #include "OcpiUtilEzxml.h"
 #include "OcpiLibraryManager.h"

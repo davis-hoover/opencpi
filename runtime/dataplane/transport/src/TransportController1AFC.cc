@@ -19,7 +19,7 @@
  */
 
 #include "OcpiList.h"
-#include "OcpiOsAssert.h"
+#include "OsAssert.hh"
 #include "OcpiCircuit.h"
 #include "TransportPortSet.hh"
 #include "OcpiBuffer.h"

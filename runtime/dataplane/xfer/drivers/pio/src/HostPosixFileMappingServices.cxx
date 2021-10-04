@@ -41,7 +41,7 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include "ocpi-config.h"
-#include "OcpiOsAssert.h"
+#include "OsAssert.hh"
 #include "HostFileMappingServices.h"
 #include "OcpiUtilMisc.h"
 

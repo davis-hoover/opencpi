@@ -21,8 +21,8 @@
 #include <stdio.h>
 #include <sstream>
 #include <memory>
-#include <OcpiOsMisc.h>
-#include <OcpiOsAssert.h>
+#include "OsMisc.hh"
+#include "OsAssert.hh"
 #include <OcpiTransportServer.h>
 #include <OcpiMessageEndpoint.h>
 #include <OcpiRDTInterface.h>

@@ -23,7 +23,7 @@
 #include <stdint.h>
 #include <climits>
 #include <cassert>
-#include "OcpiOsSocket.h"
+#include "OsSocket.hh"
 // These definitions must match the VHDL
 // constant max_reads_outstanding  : natural := 8;
 // constant max_message_kbytes     : natural := 16; -- jumbo frames +

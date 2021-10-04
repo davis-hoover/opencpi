@@ -20,8 +20,8 @@
 
 #include <OcpiUtilTcpServer.h>
 #include <OcpiUtilTcpStream.h>
-#include <OcpiOsServerSocket.h>
-#include <OcpiOsSocket.h>
+#include "OsServerSocket.hh"
+#include "OsSocket.hh"
 #include <string>
 
 /*

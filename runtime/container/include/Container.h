@@ -41,7 +41,7 @@
 
 #include "OcpiContainerApi.h"
 
-#include "OcpiOsThreadManager.h"
+#include "OsThreadManager.hh"
 #include "OcpiUtilSelfMutex.h"
 #include "OcpiTransport.h"
 #include "OcpiLibraryManager.h"

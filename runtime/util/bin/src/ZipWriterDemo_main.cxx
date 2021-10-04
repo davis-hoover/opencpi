@@ -26,7 +26,7 @@
 #include "OcpiUtilVfsIterator.h"
 #include "OcpiUtilZipFs.h"
 #include "OcpiUtilFileFs.h"
-#include "OcpiOsFileSystem.h"
+#include "OsFileSystem.hh"
 
 #if defined(OCPI_OS_VERSION_r5)
   #define unique_ptr auto_ptr

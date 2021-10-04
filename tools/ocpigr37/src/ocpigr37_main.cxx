@@ -22,7 +22,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cctype>
-#include "OcpiOsFileSystem.h"
+#include "OsFileSystem.hh"
 #include "OcpiUtilMisc.h"
 #include "OcpiUtilException.h"
 #include "OcpiLibraryManager.h"

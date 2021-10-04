@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <fasttime.h>
-#include <OcpiOsMisc.h>
+#include "OsMisc.hh"
 
 #define RUNS 1000000
 

@@ -52,8 +52,8 @@
 #include <OcpiInputBuffer.h>
 #include "TransportController.hh"
 #include <OcpiList.h>
-#include <OcpiOsMisc.h>
-#include <OcpiOsAssert.h>
+#include "OsMisc.hh"
+#include "OsAssert.hh"
 #include <OcpiRDTInterface.h>
 #include <OcpiTimeEmit.h>
 #include <OcpiPullDataDriver.h>

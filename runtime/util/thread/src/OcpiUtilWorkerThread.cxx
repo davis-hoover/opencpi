@@ -19,10 +19,10 @@
  */
 
 #include <string>
-#include <OcpiOsAssert.h>
-#include <OcpiOsMutex.h>
-#include <OcpiOsSemaphore.h>
-#include <OcpiOsThreadManager.h>
+#include "OsAssert.hh"
+#include "OsMutex.hh"
+#include "OsSemaphore.hh"
+#include "OsThreadManager.hh"
 #include "OcpiUtilWorkerThread.h"
 
 OCPI::Util::WorkerThread::ThreadData::

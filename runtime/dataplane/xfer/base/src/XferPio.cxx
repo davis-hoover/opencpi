@@ -21,7 +21,7 @@
 /* Facility Interface Includes */
 #include <stdio.h>
 #include <stdlib.h>
-#include "OcpiOsAssert.h"
+#include "OsAssert.hh"
 #include "XferPioInternal.h"
 
 long

@@ -25,9 +25,9 @@
 #include <algorithm>
 #include <fasttime.h>
 #include <OcpiTimeEmit.h>
-#include <OcpiOsAssert.h>
-#include <OcpiOsMisc.h>
-#include "OcpiOsDataTypes.h"
+#include "OsAssert.hh"
+#include "OsMisc.hh"
+#include "OsDataTypes.hh"
 #include "OcpiUtilDataTypes.h"
 #include <iostream>
 
