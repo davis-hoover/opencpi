@@ -36,8 +36,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <ezxml.h>
-#include <OcpiOsAssert.h>
-#include <OcpiOsMisc.h>
+#include "OsAssert.hh"
+#include "OsMisc.hh"
 #include <OcpiUtilAutoMutex.h>
 #include <OcpiUtilEzxml.h>
 #include <OcpiPValue.h>

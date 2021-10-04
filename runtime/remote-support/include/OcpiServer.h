@@ -23,9 +23,9 @@
 #include <string>
 #include <list>
 #include <vector>
-#include "OcpiOsMisc.h"
-#include "OcpiOsEther.h"
-#include "OcpiOsServerSocket.h"
+#include "OsMisc.hh"
+#include "OsEther.hh"
+#include "OsServerSocket.hh"
 //#include "OcpiLibraryManager.h"
 //#include "RemoteServer.h"
 

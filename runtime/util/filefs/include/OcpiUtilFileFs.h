@@ -38,7 +38,7 @@
 #include <string>
 #include <ctime>
 
-#include "OcpiOsMutex.h"
+#include "OsMutex.hh"
 
 #include "OcpiUtilVfs.h"
 

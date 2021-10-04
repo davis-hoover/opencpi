@@ -19,7 +19,7 @@
  */
 
 #include <OcpiUtilTcpClient.h>
-#include <OcpiOsSocket.h>
+#include "OsSocket.hh"
 #include <string>
 
 /*

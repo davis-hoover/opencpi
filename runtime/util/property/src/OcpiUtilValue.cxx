@@ -27,7 +27,7 @@
 #include <cfloat>
 #include <string.h>
 #include <pthread.h>
-#include "OcpiOsAssert.h"
+#include "OsAssert.hh"
 #include "OcpiExprEvaluator.h"
 #include "OcpiUtilEzxml.h"
 #include "OcpiUtilMisc.h"

@@ -24,7 +24,7 @@
 #include <pthread.h>
 #include <string>
 #include <vector>
-#include "OcpiOsMutex.h"
+#include "OsMutex.hh"
 #include "OcpiDriverManager.h"
 #include "XferException.h"
 #include "XferFactory.h"

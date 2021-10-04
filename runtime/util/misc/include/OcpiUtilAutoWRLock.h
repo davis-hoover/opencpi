@@ -33,7 +33,7 @@
  *                  Initial version.
  */
 
-#include <OcpiOsRWLock.h>
+#include "OsRWLock.hh"
 #include <string>
 
 namespace OCPI {

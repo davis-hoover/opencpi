@@ -23,8 +23,8 @@
 #include <OcpiUtilHttpClient.h>
 #include <OcpiUtilMisc.h>
 #include <OcpiUtilAutoMutex.h>
-#include <OcpiOsFileSystem.h>
-#include <OcpiOsMutex.h>
+#include "OsFileSystem.hh"
+#include "OsMutex.hh"
 #include <iostream>
 #include <string>
 #include <ctime>

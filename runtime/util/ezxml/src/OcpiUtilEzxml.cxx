@@ -27,7 +27,7 @@
 #include <cassert>
 
 #include "ezxml.h"
-#include "OcpiOsAssert.h"
+#include "OsAssert.hh"
 #include "OcpiUtilVfs.h"
 #include "OcpiUtilEzxml.h"
 #include "OcpiUtilMisc.h"

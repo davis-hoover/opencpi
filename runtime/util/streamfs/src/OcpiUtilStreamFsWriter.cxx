@@ -37,8 +37,8 @@
 #include <ctime>
 #include <cstring>
 #include <cstdlib>
-#include <OcpiOsAssert.h>
-#include <OcpiOsMutex.h>
+#include "OsAssert.hh"
+#include "OsMutex.hh"
 #include <OcpiUtilUri.h>
 #include <OcpiUtilMisc.h>
 #include <OcpiUtilAutoMutex.h>

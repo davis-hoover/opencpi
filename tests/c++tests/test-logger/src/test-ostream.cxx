@@ -24,10 +24,10 @@
 
 #include "gtest/gtest.h"
 
-#include "OcpiOsDebug.h"
+#include "OsDebug.hh"
 #include "OcpiLoggerOStreamOutput.h"
-#include "OcpiOsThreadManager.h"
-#include "OcpiOsMisc.h"
+#include "OsThreadManager.hh"
+#include "OsMisc.hh"
 
 
 namespace

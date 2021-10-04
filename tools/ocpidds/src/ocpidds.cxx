@@ -45,7 +45,7 @@
 #include <list>
 
 #include "ocpi-config.h"
-#include "OcpiOsFileSystem.h"
+#include "OsFileSystem.hh"
 #include "OcpiUtilDataTypes.h"
 #include "OcpiUtilProtocol.h"
 #include "OcpiUtilMisc.h"

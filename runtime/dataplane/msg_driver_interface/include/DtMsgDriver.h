@@ -31,7 +31,7 @@
 #include <vector>
 #include <string.h>
 #include "ezxml.h"
-#include <OcpiOsDataTypes.h>
+#include "OsDataTypes.hh"
 #include <OcpiList.h>
 #include <OcpiDriverManager.h>
 #include <OcpiUtilProtocol.h>

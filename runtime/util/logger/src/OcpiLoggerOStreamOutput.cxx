@@ -18,8 +18,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <OcpiOsAssert.h>
-#include <OcpiOsMutex.h>
+#include "OsAssert.hh"
+#include "OsMutex.hh"
 #include <OcpiLoggerLogger.h>
 #include <OcpiLoggerOStreamOutput.h>
 #include <iostream>

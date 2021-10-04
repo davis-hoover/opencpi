@@ -25,7 +25,7 @@
 #include <assert.h>
 #include <arpa/inet.h>
 #include <set>
-#include "OcpiOsMisc.h"
+#include "OsMisc.hh"
 #include "HdlNetDriver.h"
 
 namespace OCPI {

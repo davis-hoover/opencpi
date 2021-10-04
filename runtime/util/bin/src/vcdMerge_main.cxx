@@ -29,7 +29,7 @@
 #include <vector>
 #include <stdint.h>
 #include <OcpiUtilCommandLineConfiguration.h>
-#include <OcpiOsAssert.h>
+#include "OsAssert.hh"
 
 class OcpiRccBinderConfigurator
   : public OCPI::Util::CommandLineConfiguration

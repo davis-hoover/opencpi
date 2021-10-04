@@ -19,8 +19,8 @@
  */
 
 #include <inttypes.h>
-#include "OcpiOsAssert.h"
-#include "OcpiOsMisc.h"
+#include "OsAssert.hh"
+#include "OsMisc.hh"
 #include "OcpiUtilMisc.h"
 #include "XferAccess.h"
 

@@ -20,7 +20,7 @@
 
 #include <ctime>
 #include <cstdlib>
-#include <OcpiOsMisc.h>
+#include "OsMisc.hh"
 #include <OcpiUtilUUID.h>
 
 OCPI::Util::UUID::BinaryUUID

@@ -25,8 +25,8 @@
 
 #include "OcpiContainerApi.h"
 
-#include "OcpiOsMutex.h"
-#include "OcpiOsTimer.h"
+#include "OsMutex.hh"
+#include "OsTimer.hh"
 #include "OcpiUtilProperty.h"
 #include "OcpiUtilWorker.h"
 #include "OcpiPValue.h"

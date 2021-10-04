@@ -21,7 +21,7 @@
 #include <inttypes.h>
 #include <unistd.h>
 #include <errno.h>
-#include "OcpiOsDebug.h"
+#include "OsDebug.hh"
 #include "OcpiUtilMisc.h"
 #include "OcpiUtilException.h"
 #include "HdlSdp.h"

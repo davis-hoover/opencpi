@@ -23,7 +23,7 @@
 #include <OcpiUtilTcpConnector.h>
 #include <OcpiUtilFileFs.h>
 #include <OcpiUtilUriFs.h>
-#include <OcpiOsFileSystem.h>
+#include "OsFileSystem.hh"
 #include <iostream>
 #include <string>
 

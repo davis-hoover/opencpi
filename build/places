@@ -70,7 +70,7 @@ host-only-prerequisites yaml-cpp
 # There is lots of leftover/unbuilt stuff in the foreign directories
 runtime/foreign -f -x .*/pwq/kern/.* -x .*/pwq/src/.*/.* -x .*/uuid/src/.*/.*
 # From old Makefiles:c and c++: for linux: -D_XOPEN_SOURCE=600 -D_FILE_OFFSET_BITS=64
-os -x .*/driver/.* -x .*/winnt/.*
+os -I os/include -x .*/driver/.* -x .*/winnt/.*
 runtime/util -d internal -T ocpixml
 end-of-runtime-for-tools
 

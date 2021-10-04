@@ -34,9 +34,9 @@
  */
 
 #include <string>
-#include <OcpiOsMutex.h>
-#include <OcpiOsSemaphore.h>
-#include <OcpiOsThreadManager.h>
+#include "OsMutex.hh"
+#include "OsSemaphore.hh"
+#include "OsThreadManager.hh"
 
 namespace OCPI {
   namespace Util {

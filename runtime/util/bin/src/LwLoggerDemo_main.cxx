@@ -27,7 +27,7 @@
 #include <OcpiUtilLwLoggerOutput.h>
 
 #if !defined (NDEBUG)
-#include <OcpiOsDebug.h>
+#include "OsDebug.hh"
 #endif
 
 void

@@ -23,7 +23,7 @@
 #include <cassert>
 #include <strings.h>
 #include <fnmatch.h>
-#include "OcpiOsFileSystem.h"
+#include "OsFileSystem.hh"
 #include "parameters.h"
 #include "wip.h"
 #include "hdl.h"

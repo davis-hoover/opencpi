@@ -18,7 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "OcpiOsFileSystem.h"
+#include "OsFileSystem.hh"
 #include "OcpiDriverManager.h"
 #include "OcpiUtilEzxml.h"
 #include "OcpiApplication.h"

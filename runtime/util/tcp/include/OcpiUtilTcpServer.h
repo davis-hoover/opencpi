@@ -35,7 +35,7 @@
  */
 
 #include <OcpiUtilTcpStream.h>
-#include <OcpiOsServerSocket.h>
+#include "OsServerSocket.hh"
 
 namespace OCPI {
   namespace Util {

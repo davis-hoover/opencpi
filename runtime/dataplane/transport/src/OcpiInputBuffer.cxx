@@ -34,7 +34,7 @@
 #include <OcpiPort.h>
 #include <OcpiCircuit.h>
 #include <OcpiOutputBuffer.h>
-#include <OcpiOsAssert.h>
+#include "OsAssert.hh"
 #include <OcpiUtilAutoMutex.h>
 #include "TransportController.hh"
 #include <OcpiPullDataDriver.h>

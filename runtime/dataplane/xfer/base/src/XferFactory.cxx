@@ -23,8 +23,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <ezxml.h>
-#include <OcpiOsAssert.h>
-#include <OcpiOsMisc.h>
+#include "OsAssert.hh"
+#include "OsMisc.hh"
 #include <OcpiUtilHash.h>
 #include <OcpiUtilAutoMutex.h>
 #include <OcpiUtilEzxml.h>

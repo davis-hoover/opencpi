@@ -21,8 +21,8 @@
 #include <OcpiUtilUriFs.h>
 #include <OcpiUtilVfs.h>
 #include <OcpiUtilUri.h>
-#include <OcpiOsAssert.h>
-#include <OcpiOsRWLock.h>
+#include "OsAssert.hh"
+#include "OsRWLock.hh"
 #include <OcpiUtilAutoRDLock.h>
 #include <OcpiUtilAutoWRLock.h>
 #include <iostream>

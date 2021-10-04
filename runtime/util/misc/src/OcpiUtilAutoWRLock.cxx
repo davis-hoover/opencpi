@@ -19,8 +19,8 @@
  */
 
 #include <OcpiUtilAutoWRLock.h>
-#include <OcpiOsAssert.h>
-#include <OcpiOsRWLock.h>
+#include "OsAssert.hh"
+#include "OsRWLock.hh"
 
 OCPI::Util::AutoWRLock::AutoWRLock (OCPI::OS::RWLock & rwlock, bool locked)
   throw (std::string)

@@ -29,8 +29,8 @@
 #include <stdio.h>
 #include <sstream>
 #include <stdlib.h>
-#include <OcpiOsMisc.h>
-#include <OcpiOsAssert.h>
+#include "OsMisc.hh"
+#include "OsAssert.hh"
 #include "XferManager.h"
 #include <OcpiRDTInterface.h>
 #include <test_utilities.h>

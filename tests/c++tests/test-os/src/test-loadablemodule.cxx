@@ -20,7 +20,7 @@
 
 #include "gtest/gtest.h"
 #include "ocpi-config.h" // for OCPI_OS_linux
-#include "OcpiOsLoadableModule.h"
+#include "OsLoadableModule.hh"
 
 // TODO: Non-Linux versions?
 

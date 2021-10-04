@@ -19,8 +19,8 @@
  */
 
 #include <cstring>
-#include "OcpiOsMisc.h"
-#include "OcpiOsEther.h"
+#include "OsMisc.hh"
+#include "OsEther.hh"
 #include "OcpiUtilValue.h"
 #include "OcpiDriverManager.h"
 #include "ContainerManager.h"

@@ -20,8 +20,8 @@
 #include "cl.h"
 #include "cl_ext.h"
 #include "ocpi-config.h"
-#include "OcpiOsDebugApi.h"
-#include "OcpiOsLoadableModule.h"
+#include "OcpiOsDebugApi.hh"
+#include "OsLoadableModule.hh"
 #include "OcpiDriverManager.h"
 
 namespace OS = OCPI::OS;

@@ -28,7 +28,7 @@
 #define OCPIUTILLWLOGGEROUTPUT_H__
 
 #include <string>
-#include <OcpiOsMutex.h>
+#include "OsMutex.hh"
 #include <OcpiUtilIOP.h>
 #include <OcpiUtilIIOP.h>
 #include <OcpiLoggerLogger.h>

@@ -30,7 +30,7 @@
  *
  */
 
-#include "OcpiOsAssert.h"
+#include "OsAssert.hh"
 #include "XferEndPoint.h"
 #include "XferManager.h"
 #include "OcpiUtilMisc.h"

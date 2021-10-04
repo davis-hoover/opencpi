@@ -22,7 +22,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "OcpiOsFileSystem.h"
+#include "OsFileSystem.hh"
 
 #include "assembly.h"
 #include "data.h"

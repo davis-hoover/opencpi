@@ -20,7 +20,7 @@
 
 #include <algorithm>
 #include "farmhash.h"
-#include "OcpiOsAssert.h"
+#include "OsAssert.hh"
 #include "OcpiUtilCDR.h"
 #include "Container.h"
 #include "ContainerPort.h"

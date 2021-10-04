@@ -24,9 +24,9 @@
 #include <sys/stat.h>
 #include <set>
 #include "ocpi-config.h"
-#include "OcpiOsAssert.h"
-#include "OcpiOsFileIterator.h"
-#include "OcpiOsFileSystem.h"
+#include "OsAssert.hh"
+#include "OsFileIterator.hh"
+#include "OsFileSystem.hh"
 #include "OcpiUtilException.h"
 #include "OcpiUtilEzxml.h"
 #include "OcpiLibraryManager.h"

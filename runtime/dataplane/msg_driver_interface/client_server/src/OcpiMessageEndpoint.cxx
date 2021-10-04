@@ -25,7 +25,7 @@
 // remote endpoint your are connecting to.
 // The "accept" static method accepts a connection from all available protocols.
 
-#include "OcpiOsMisc.h"
+#include "OsMisc.hh"
 #include "OcpiMessageEndpoint.h"
 #include "XferEndPoint.h"
 

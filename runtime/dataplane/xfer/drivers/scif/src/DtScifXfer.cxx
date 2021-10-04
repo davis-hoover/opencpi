@@ -31,10 +31,10 @@
 #include <inttypes.h>
 #include <unistd.h>
 #include <sys/mman.h>
-#include "OcpiOsDebug.h"
+#include "OsDebug.hh"
 #include "OcpiThread.h"
 #include "OcpiRes.h"
-#include "KernelDriver.h"
+#include "OsKernelDriver.h"
 #include "OcpiUtilMisc.h"
 // We build this transfer driver using the PIO::XferServices
 #include "DtPioXfer.h"

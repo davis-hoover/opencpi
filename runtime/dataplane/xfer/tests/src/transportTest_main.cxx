@@ -41,8 +41,8 @@
 #include <vector>
 #include <cstddef>
 
-#include "OcpiOsAssert.h"
-#include "OcpiOsMisc.h"
+#include "OsAssert.hh"
+#include "OsMisc.hh"
 #include "OcpiUtilMisc.h"
 #include "OcpiUtilEzxml.h"
 #include "XferEndPoint.h"
