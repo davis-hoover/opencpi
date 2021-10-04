@@ -1,0 +1,7 @@
+<HdlWorker spec='raw2axi_lite32_tester-spec'
+    language='vhdl'
+    libraries='axi'
+    sourcefiles='regmap/opencpi_test_regs_pkg.vhd regmap/opencpi_test_regs.vhd'
+    firstRawProperty='id'
+    version='2'>
+ </HdlWorker> 

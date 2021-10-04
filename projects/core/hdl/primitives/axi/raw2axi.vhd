@@ -81,4 +81,5 @@ begin
   -- Combined handshaking to produce the raw_out.done signal.
   -- We will be driven by the responses being valid.
   raw_out.done     <= axi_in.b.valid or axi_in.r.valid;
+  raw_out.error    <='0';
 end rtl;
