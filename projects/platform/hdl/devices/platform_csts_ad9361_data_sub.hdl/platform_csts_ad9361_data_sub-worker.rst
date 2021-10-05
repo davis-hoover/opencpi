@@ -28,6 +28,9 @@
 
 Detail
 ------
+.. note::
+   This HDL subdevice worker is functionally equivalent to the AD9361 Data Sub HDL subdevice worker except that it specifies the Complex Short Timed Sample (CSTS) protocol in port definitions instead of the Complex Short With Metadata (CSWM) protocol. The CSTS version of this worker will replace the CSWM version in a future release.
+
 This worker’s ``LVDS_p``, ``HALF_DUPLEX_p``, ``SINGLE_PORT_p``, and ``SWAP_PORTS_p`` build-time
 configuration parameter properties
 enforce build-time configuration for all of the following AD9361 data pin interface configurations
@@ -62,14 +65,14 @@ Note that the half duplex data interface formats allow for AD9361 P0/P1 port rou
 Worker Configuration Parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Because every possible build-time configuration parameter combination of
-the AD9361 data sub HDL subdevice worker
+the AD9361 CSTS Data Sub HDL subdevice worker
 has no control plane and no registered data paths, no registers or LUTS
 are used and the ``Fmax`` measurement does not exist.
 
 
 Control Timing and Signals
 --------------------------
-Because AD9361 data sub HDl subdevice worker does not include a control plane and serves purely as an IC pin
+Because the AD9361 CSTS Data Sub HDL subdevice worker does not include a control plane and serves purely as an IC pin
 buffering and routing mechanism, there are no latency or clock domain considerations.
 For considerations specific to the RX/TX data paths, see the supports-connected
 `AD9361 ADC sub <https://opencpi.gitlab.io/releases/develop/docs/assets/AD9361_ADC_Sub.pdf>`_
