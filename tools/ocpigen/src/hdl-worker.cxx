@@ -1903,7 +1903,7 @@ emitImplHDL(bool wrap) {
 	      "                                                -- worker uses 'done' to delay it\n",
 	      m_implName, m_implName, m_implName, m_implName,
 	      maxPropName, "inputs", m_wci->typeNameIn.c_str(),
-	      maxPropName, "done",
+	      maxPropName, "done", // DEPRECATION NOTICE: This attribute is deprecated and will be replaced with finished in OpenCPI 3.0.
 	      maxPropName, "error",
 	      maxPropName, "finished",
 	      maxPropName, "attention",
