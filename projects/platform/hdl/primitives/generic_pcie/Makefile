@@ -28,6 +28,7 @@ OnlyTargets=$(VivadoPcieTargets)
 
 # We need to include this file before hdl-library.mk to preprocess the platforms and targets (at least)
 include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk
+$(eval $(HdlPreprocessTargets))
 
 ifneq ($(filter $(OnlyTargets),$(HdlTargets) $(foreach p,$(HdlPlatforms),$(HdlTarget_$p))),)
 
@@ -59,8 +60,6 @@ ifneq ($(filter $(OnlyTargets),$(HdlTargets) $(foreach p,$(HdlPlatforms),$(HdlTa
        endif # if need to get the wrapper
      endif # if non-ISE targets
      VivadoWrapperModule:=$(basename $(notdir $(VivadoWrapperFile)))
-     $(info The VivadoWrapperModule name is: $(VivadoWrapperModule))
-     $(info The UseISE name is: $(UseISE))
      WrapperModule=$(if $(UseISE),$(ISEWrapperModule),$(VivadoWrapperModule))
    endif # if not cleaning 
 
