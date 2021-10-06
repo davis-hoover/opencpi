@@ -1,4 +1,4 @@
-<Application package='ocpi.assets.util_comps' done='capture_v2'>
+<Application package='ocpi.assets.util_comps' finished='capture_v2'>
   <Instance component='test_source' connect='timegate_csts'>
     <property name='timed' value='true'/>
     <property name='fraction' value='.0001*2**32' delay='1'/> <!-- delay is in 1*2^-32 -->
