@@ -28,7 +28,7 @@ HDL device worker implementation providing common functionality to all DAC devic
 
 Detail
 ------
-Be sure to check the ``samp_count_before_first_underrun`` and ``num_underruns`` properties
+Be sure to check the ``samp_count_before_first_underrun`` and ``num_underruns`` component properties
 at the end of an application run because they are not stable until then.  The worker does not use
 clock domain crossing (cdc) HDL primitive library circuits
 for these properties because it takes

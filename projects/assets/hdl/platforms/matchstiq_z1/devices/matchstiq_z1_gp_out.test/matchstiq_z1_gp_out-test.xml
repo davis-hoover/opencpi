@@ -3,7 +3,7 @@
   <!-- The Matchstiq GP Out device worker is tested by controlling the GPIO pins via the mask_data property, data port, and the devsignal.
   They are all tested invidually in their own test case and the data port is the only test case that has input data generated.
 
-  For the mask_data property and the data port, the tests that are done are: setting data bits high but not setting masks,
+  For the mask_data property and the data port, the tests that are finished are: setting data bits high but not setting masks,
   setting data bits high and setting the appropriate mask bits high, clear data by setting data to 0x0000 and mask to 0x0007,
   and then set data bits high but only set some of the appropriate masks high.
 

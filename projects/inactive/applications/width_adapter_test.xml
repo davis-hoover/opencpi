@@ -1,4 +1,4 @@
-<application package='ocpi' done='file_write'>
+<application package='ocpi' finished='file_write'>
   <instance component='file_read' connect='wsi_width_adapter0'>
     <property name='filename' value='test.input.width_adapter_test'/>
     <property name='messagesInFile' value='true'/>

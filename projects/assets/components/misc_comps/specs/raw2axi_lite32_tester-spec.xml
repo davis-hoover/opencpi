@@ -1,0 +1,10 @@
+<!-- This is the spec file (OCS) for: axi_register
+     Add component spec attributes, like "protocol".
+     Add property elements for spec properties.
+     Add port elements for i/o ports -->
+<ComponentSpec>
+  <property name='scratch_readback' type='ulong' volatile='true'/>  <!-- workaround to force read raw props to instantiate --> 
+  <property name='is_working' type='bool' writable='true'/>         <!-- workaround to force write raw props to instantiate --> 
+  <property name ='id' type='ulong' volatile='true' />
+  <property name='scratch' type='ulong' writable='true'/>
+</ComponentSpec>
