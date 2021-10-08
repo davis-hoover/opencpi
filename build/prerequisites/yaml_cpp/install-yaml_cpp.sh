@@ -21,6 +21,7 @@
 
 target_platform="$1"
 name=yaml-cpp
+prereq_name=yaml_cpp  # enforce asset naming rules: no hyphens allowed
 version=0.6.3  # latest as of 09/02/2020
 pkg_name="$name-$version"
 description='YAML parsing and emitting library for C++'
@@ -31,18 +32,18 @@ cross_build=0  # disabled until needed. Update `build/places` when enabled.
 # Download and extract source
 source "$OCPI_CDK_DIR/scripts/setup-prerequisite.sh" \
        "$target_platform" \
-       "$name" \
+       "$prereq_name" \
        "$description" \
        "${dl_url%/*}" \
        "${dl_url##*/}" \
        "$extracted_dir" \
        "$cross_build"
 
-# CentOS 7 needs to use `cmake3` as `cmake` is cmake 2. All other OS's have
-# `cmake` as cmake 3.
+# CentOS 7 needs to use `cmake3` as `cmake` is cmake 2.
+# All other OSs have `cmake` as cmake 3.
 CMAKE="$(command -v cmake3 || command -v cmake)"
 if [ -z "$CMAKE" ]; then
-  echo "Error: cannot find cmake or cmake3 which are required to build $name"
+  echo "Error: cannot find cmake or cmake3 which are required to build $prereq_name"
   exit 1
 fi
 
@@ -62,3 +63,30 @@ make clean
   -DYAML_CPP_BUILD_TESTS=OFF -DYAML_BUILD_SHARED_LIBS=ON ..
 make -j4
 make install
+
+# Rename the native name to the prereq name in file names,
+# symlinks, and sonames.  Note: we depend on the patchelf
+# prereq to be built before this one.  Only the library
+# files/links are needed, so remove everything else.  Do
+# all this in a subshell to preserve CWD.
+(
+  cd $OcpiInstallExecDir/lib
+  PATH=$OcpiInstallExecDir/../../patchelf/$OcpiPlatform/bin:$PATH
+  old=$name
+  new=$prereq_name
+  for i in *; do
+    case $i in
+      lib${old}*)
+        if [[ -L $i ]]; then
+          link=$(readlink $i)
+          ln -fs ${link/$old/$new} $i
+        elif [[ -x $i ]]; then
+          soname=$(patchelf --print-soname $i)
+          patchelf --set-soname ${soname/$old/$new} $i
+        fi
+        mv $i ${i/$old/$new}
+        ;;
+      *) rm -rf $i ;;
+    esac
+  done
+)

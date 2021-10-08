@@ -159,10 +159,6 @@ function make_filtered_link {
   make_relative_link $1 $2
 }
 
-function bad {
-    echo Error: $* 1>&2
-    exit 1
-}
 function needsnoun {
     echo Error: $* 1>&2
     exit 1
