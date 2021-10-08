@@ -25,7 +25,7 @@ me=rsync-3.1.1
 [ -z "$OCPI_CDK_DIR" ] && echo Environment variable OCPI_CDK_DIR not set && exit 1
 source $OCPI_CDK_DIR/scripts/setup-prerequisite.sh \
        "$1" \
-       $me \
+       rsync \
        "remote sync" \
        https://download.samba.org/pub/rsync/src \
        ${me}.tar.gz \
