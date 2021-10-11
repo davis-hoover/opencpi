@@ -90,6 +90,7 @@ caller_dir=$(dirname ${BASH_SOURCE[${#BASH_SOURCE[*]}-1]})
 # echo Caller of setup-prerequisite.sh is $caller_dir
 set -e
 source $OCPI_CDK_DIR/scripts/ocpitarget.sh "$platform"
+checkAssetName "$package"   # Enforce asset naming rules.
 platform=$OCPI_TARGET_PLATFORM
 if test "$OCPI_TARGET_PLATFORM" != "$OCPI_TOOL_PLATFORM" -a "$cross" != "1"; then
  echo ====== We will not crossbuild $package for non-development environments thus are skipping it.
