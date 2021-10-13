@@ -17,10 +17,10 @@
      You should have received a copy of the GNU Lesser General Public License
      along with this program. If not, see <http://www.gnu.org/licenses/>. -->
 <application done="file_write">
-  <instance component="ocpi.core.file_read" connect="data_sink_qdac">
+  <instance component="ocpi.core.file_read" connect="data_sink_qdac_csts">
     <property name="filename" value="input.bin"/>
   </instance>
-  <instance component="ocpi.platform.devices.data_sink_qdac" connect="file_write">
+  <instance component="ocpi.platform.devices.data_sink_qdac_csts" connect="file_write">
     <!-- Skeleton application outline, set properties here. Or change this
          example application to do something more real-world appropriate if
          file-read, then component, then file-write is too artifical to be a
