@@ -82,12 +82,14 @@ for msg in msgs:
         first=False
     if(msg[utu.MESSAGE_OPCODE] == iqm.SAMPLES_OPCODE):
         num_samples_msgs += 1
+        if not msg[utu.MESSAGE_LENGTH] > 0:
+            do_fail("Empty message: Invalid message length: SAMPLES msg[%d]" \
+              % (num_samples_msgs - 1))
         for sample in msg[utu.MESSAGE_DATA]:
             ii = int((sample & 0xffff))
             qq = int((sample & 0xffff0000) >> 16)
             if(qq > 32767):
                 qq = qq - 65536
-    
             test_expected(ii, expected_i, "I")
             test_expected(qq, expected_q, "Q")
             expected_i += 1 # positive ramp

@@ -23,6 +23,9 @@
   exit 1
 }
 set -e
+for envar in $(env | egrep ^OCPI | sort | cut -f1 -d=); do
+  unset $envar
+done
 
 #
 # Quick and dirty argument parsing:

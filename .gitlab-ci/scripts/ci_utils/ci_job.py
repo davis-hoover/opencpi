@@ -463,9 +463,10 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
         if project.group in ['osp', 'osps']:
             if project.name != platform.project.name:
                 continue
-        elif project.group == 'comp' and stage != 'generate-children':
-            if not asset:
-                continue
+        elif project.group == 'comp':
+            if stage not in ['generate-children', 'build-sdcards']:
+                if not asset:
+                    continue
         commit_ref = 'develop'
         try:
             if pipeline.ci_env.source_project_name == project.name:

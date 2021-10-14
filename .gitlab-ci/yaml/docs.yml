@@ -8,10 +8,23 @@ build:pages:
   dependencies: []
   before_script: []
   script:
-    - make doc
+    # This was originally intended to be a quick sanity-check to
+    # make sure the docs for REF_NAME would build.  Now have to
+    # ensure *all* the docs for REF_NAME *and* develop get built
+    # so the runner caches will not contain corrupted content for
+    # the develop branch.
     - REF_NAME=${CI_COMMIT_REF_NAME//\//-}  # Convert '/' to '-'
-    - mkdir -p .public/releases/$REF_NAME/docs/
-    - mv doc/pdfs/* .public/releases/$REF_NAME/docs/
+    # Convert shallow clone to a regular one: needed by build-pages.py.
+    # This also does what fetch normally does: separate fetch not needed.
+    - git fetch --unshallow
+    - git checkout develop  # Needed by build-pages.py
+    - |-
+      if [[ "$REF_NAME" == "$CI_COMMIT_REF_NAME" && "$REF_NAME" != 'develop' ]]; then
+        git checkout "$REF_NAME"
+        python3 doc/build-pages.py HEAD --clean develop
+      else
+        python3 doc/build-pages.py --clean develop
+      fi
       # These are used in trigger-downstream
     - echo "JOB_ID=$CI_JOB_ID"   > build-pages.vars
     - echo "REF_NAME=$REF_NAME" >> build-pages.vars

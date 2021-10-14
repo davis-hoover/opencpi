@@ -53,7 +53,7 @@ A block diagram representation of the implementation is given in :numref:`platfo
    :alt: AD9361 Config Proxy Device Worker Implementation Block Diagram
    :align: center
 
-   AD9361 Config Proxy HDL Device Worker Block Diagram
+   AD9361 Config Proxy HDL Device Proxy Worker Block Diagram
 
 Interface
 ---------

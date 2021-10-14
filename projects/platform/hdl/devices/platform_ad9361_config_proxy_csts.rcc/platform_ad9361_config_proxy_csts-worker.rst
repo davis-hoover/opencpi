@@ -28,12 +28,17 @@
 
 Detail
 ------
+.. note::
+   
+   This device proxy worker is functionally equivalent to the AD9361 Config Proxy device proxy worker except that it specifies the Complex Short Timed Sample (CSTS) protocol in port definitions instead of the Complex Short With Metadata (CSWM) protocol. The CSTS version of this worker will replace the CSWM version in a future release.
+
+
 No-OS features *platform layers*, which are ``.c``/``.h`` files that implement
 hardware-specific SPI register accesses within generic API calls.
 No-OS includes several platform layers, which are all specific to
 the `Analog Devices HDL design <https://github.com/analogdevicesinc/hdl>`_.
 To facilitate the use of No-OS with OpenCPI,
-the ``platform_ad9361_config_proxy.rcc`` code
+the ``platform_ad9361_config_proxy_csts.rcc`` code
 implements a new platform layer (via the files
 ``ad9361_platform.cc``, ``ad9361_platform.h``, and ``parameter.h``) that
 provides OpenCPI-specific functionality for SPI access via slave device property
@@ -41,7 +46,7 @@ reads/writes.
 
 This worker implements every No-OS API call as a property, with
 the matching ``ad9361 get...()`` / ``ad9361 set...()`` API calls collapsed
-into a single volatile and writable ``platform_ad9361_config_proxy.rcc`` property.
+into a single volatile and writable ``platform_ad9361_config_proxy_csts.rcc`` property.
 Each property’s type(s)/data structure(s) maps directly to the
 type(s)/data structure(s) passed as argument(s) to that property’s
 analogous No-OS function. The only exceptions to this methodology are:
@@ -72,7 +77,7 @@ that its value should be one of the ENABLE or DISABLE ``ad9361_api.h`` integer m
    int32_t ad9361_set_rx_fir_en_dis (struct ad9361_rf_phy *phy, uint8_t_en_dis)
 
 Because there is a strict one-to-one mapping
-between No-OS API calls and ``platform_ad9361_config_proxy.rcc`` properties by design, and
+between No-OS API calls and ``platform_ad9361_config_proxy_csts.rcc`` properties by design, and
 because No-OS passes integers as arguments instead of forcing strictly-enumerated types,
 this worker likewise uses integer types for properties instead of enumerated ones.
 To help alleviate confusion when using this worker’s properties, many
@@ -93,13 +98,13 @@ and the ``DATA_CLK_P_rate_Hz``.
 
 Note also that this worker’s use of No-OS not only makes
 SPI register accesses but also sets the AD9361 RESETB, ENABLE,
-and TXNRX pins via the ``platform_ad9361_config.hdl`` and ``platform_ad9361_spi.hdl`` HDL device workers.
+and TXNRX pins via the ``platform_ad9361_config_csts.hdl`` and ``platform_ad9361_spi_csts.hdl`` HDL device workers.
 
 .. ocpi_documentation_worker::
 
 Troubleshooting
 ---------------
-The following error message, which is produced by the ADI No-OS library used by ``platform_ad9361 config proxy.rcc``,
+The following error message, which is produced by the ADI No-OS library used by ``platform_ad9361_config_proxy_csts.rcc``,
 indicates a hardware communication error between the FPGA and the AD9361.
 This message occurs, for example, if the AD9361 resides on a card that is not plugged in to the PCB containing the FPGA.
 

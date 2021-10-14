@@ -28,12 +28,17 @@
 
 Detail
 ------
-The AD9361 config HDL subdevice worker's OpenCPI Worker Description (OWD) defines the
+.. note::
+   
+   This HDL subdevice worker is functionally equivalent to the AD9361 Config HDL subdevice worker except that it specifies the Complex Short Timed Sample (CSTS) protocol in port definitions instead of the Complex Short With Metadata (CSWM) protocol. The CSTS version of this worker will replace the CSWM version in a future release.
+
+
+The AD9361 Config CSTS HDL subdevice worker's OpenCPI Worker Description (OWD) defines the
 `AD9361 device registers <https://usermanual.wiki/Document/AD9361RegisterMapReferenceManualUG671.1082447504/view>`_
 as properties.  The ``rawprops`` worker port accesses the device registers
-and forwards them to the AD9361 SPI HDL subdevice worker.
+and forwards them to the AD9361 SPI CSTS HDL subdevice worker.
 
-The AD9361 config HDL subdevice worker also operates itself as a subdevice that conveys:
+The AD9361 Config CSTS HDL subdevice worker also operates itself as a subdevice that conveys:
 
 * Build-time information from the ``ad9361_adc_sub.hdl`` and ``ad9361_dac_sub.hdl`` HDL subdevice workers (see ``ocpi.assets.devices``) up to the processor via properties
 
@@ -41,7 +46,7 @@ The AD9361 config HDL subdevice worker also operates itself as a subdevice that 
 
 .. ocpi_documentation_worker::
 
-   rawprops: Communicates the AD9361 register map to AD9361 SPI subdevice worker.
+   rawprops: Communicates the AD9361 register map to AD9361 SPI CSTS subdevice worker.
    dev_force_spi_reset: Forces the RESETB pin, which is active low, to logic 0.
    dev_cfg_data: Some data port configurations, like LVDS, require the TX bus to use 2R2T timing if either 2 TX or 2 RX channels are used.  For example, if using LVDS and this has a value of 1, 2R2T timing will be forced.
 ..   ch0_handler_is_present: Set to ``1`` if the ``dev_data_ch0`` signal is connected to a worker that handles the data; set to ``0`` otherwise.
@@ -114,7 +119,7 @@ than the Fmax specific to this worker, even if this worker is the only one inclu
 
 Control Timing and Signals
 --------------------------
-The AD9361 config HDL subdevice worker operates in the
+The AD9361 Config CSTS HDL subdevice worker operates in the
 control plane clock domain. Note that this worker is essentially
 the central worker that command/control passes through, and that no RX or TX data paths flow through this worker.
 
