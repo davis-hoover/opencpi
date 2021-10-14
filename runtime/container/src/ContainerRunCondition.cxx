@@ -19,8 +19,8 @@
  */
 
 #include <cstring> // std::memcpy
-#include "OcpiOsAssert.h"
-#include "OcpiOsTimer.h"
+#include "OsAssert.hh"
+#include "OsTimer.hh"
 #include "OcpiContainerRunConditionApi.h"
 namespace OCPI { namespace API {
 

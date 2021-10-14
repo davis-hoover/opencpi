@@ -30,7 +30,7 @@
 #define OCPILOGGERFALLBACK_H__
 
 #include <OcpiLoggerLogger.h>
-#include <OcpiOsMutex.h>
+#include "OsMutex.hh"
 #include <string>
 #include <vector>
 

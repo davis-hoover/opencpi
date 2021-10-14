@@ -123,8 +123,8 @@
 #ifndef OCPILOGGERDEBUGLOGGER_H__
 #define OCPILOGGERDEBUGLOGGER_H__
 
-#include <OcpiOsAssert.h>
-#include <OcpiOsMutex.h>
+#include "OsAssert.hh"
+#include "OsMutex.hh"
 #include <OcpiLoggerLogger.h>
 #include <streambuf>
 #include <iostream>

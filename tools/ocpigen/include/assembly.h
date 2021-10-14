@@ -115,7 +115,7 @@ struct Attachment {
 // Indexed: different indices connected to different places.
 struct InstancePort {
   Instance *m_instance;                // what instance does this belong to
-  Attachments m_attachments;           // what connections are attached to this port?
+  mutable Attachments m_attachments;   // what connections are attached to this port? mutable for sorting
   OU::Assembly::External *m_external;  // corresponding external of assy, for externals
   std::vector<bool> m_connected;       // to ensure indices are connected once
   Port *m_port;                        // The actual port of the instance's or assembly's worker

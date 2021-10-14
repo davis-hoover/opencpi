@@ -516,6 +516,7 @@ typedef struct {
    inline void setRawPropertyBytes(size_t offset, const uint8_t *buf, size_t count) {
      m_worker->setRawPropertyBytes(offset, buf, count);
    }
+   static void debugLog(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
  };
 }} // end of namespace OCPI::RCC
 #endif

@@ -33,7 +33,7 @@
  ************************************************************************/
 
 #include "ocpi-config.h"
-#include "OcpiOsMisc.h"
+#include "OsMisc.hh"
 #include "RccContainer.h"
 #include "RCC_Worker.h"
 

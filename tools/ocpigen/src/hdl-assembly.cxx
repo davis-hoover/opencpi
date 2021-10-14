@@ -726,12 +726,14 @@ createConnectionSignals(FILE *f, Language lang) {
   }
   // Output side: generate signal except when external or connected only to external
   // Or when connected to a wider one
-  if (m_attachments.size() &&
-      !(m_attachments.size() == 1 &&
-	m_attachments.front()->m_connection.m_attachments.size() == 2 &&
-	m_attachments.front()->m_connection.m_external && m_port->m_type != SDPPort) &&
-      maxCount <= m_port->count() && (m_port->isArray() || !otherIsArray) &&
-      (m_port->m_type != TimePort || m_port->m_master)) {
+  // FIXME: name this determination a separate port type method needsOutputConnectionSignal
+  if (m_port->m_type == SDPPort ||
+      (m_attachments.size() &&
+       !(m_attachments.size() == 1 &&
+	 m_attachments.front()->m_connection.m_attachments.size() == 2 &&
+	 m_attachments.front()->m_connection.m_external) &&
+       maxCount <= m_port->count() && (m_port->isArray() || !otherIsArray) &&
+       (m_port->m_type != TimePort || m_port->m_master))) {
     emitConnectionSignal(f, true, lang);
     // All connections should use this as their signal
     for (AttachmentsIter ai = m_attachments.begin(); ai != m_attachments.end(); ai++) {
@@ -744,7 +746,7 @@ createConnectionSignals(FILE *f, Language lang) {
 
   // Input side: rare - generate signal when it aggregates members from others,
   // Like a WCI slave port array
-  if (m_port->isArray() &&
+  if (m_port->isArray() && m_port->m_type != SDPPort &&
       ((maxCount && maxCount < m_port->count()) || !otherIsArray || m_attachments.size() > 1)) {
     emitConnectionSignal(f, false, lang);
     for (AttachmentsIter ai = m_attachments.begin(); ai != m_attachments.end(); ai++) {
@@ -1222,7 +1224,7 @@ emitAssyHDL() {
     fprintf(f, "begin\n");
 
   // For (assembly) worker clock outputs, when an internal connection has a driven clock
-  // that is used for an external port) we need to drive the assembly output signal
+  // (that may be used for an external port), we need to drive the assembly output signal
   // from the internal signal, which may be port-related or not.
   for (auto ci = m_clocks.begin(); ci != m_clocks.end(); ++ci) {
     Clock &c = **ci;
@@ -1240,8 +1242,8 @@ emitAssyHDL() {
 		"  assign_%s_i : ocpi.util.in2out port map (in_port => %s, out_port => %s);\n",
 		c.signal(), c.signal(), outer.c_str());
       }	else {
-	if (c.m_port) // driving the output signal of an external assembly port, in record
-	  OU::format(outer, "%s_out_Clk", c.m_port->pname());
+	if (c.m_port) // driving the output signal of an external assembly port, in verilog
+	  OU::format(outer, "%s_Clk", c.m_port->pname());
 	else
 	  OU::format(outer, "%.*s_Clk", (int)(c.m_name.length() - 2), c.m_name.c_str());
 	fprintf(f, "  assign %s = %s;\n", outer.c_str(), c.signal());
@@ -1440,8 +1442,14 @@ detach(Connection &c) {
     if (&(*ai)->m_connection == &c) {
       m_connected[(*ai)->m_index] = false;
       Attachment *a = *ai;
-      m_attachments.erase(ai);
-      c.m_attachments.remove(a);
+      m_attachments.erase(ai); // remove attachment from InstancePort
+      // Attachments is sortable, which means it doesn't have remove (by value).
+      for (auto ci = c.m_attachments.begin(); ci != c.m_attachments.end(); ++ci)
+	if (*ci == a) {
+	  c.m_attachments.erase(ci); // remove attachment from connection
+	  break;
+	}
+      // c.m_attachments.remove(a);
       delete a;
       break;
     }

@@ -19,7 +19,7 @@
  */
 
 #include <OcpiUtilRefCounter.h>
-#include <OcpiOsAssert.h>
+#include "OsAssert.hh"
 
 OCPI::Util::Misc::RefCounter::RefCounter()
 :refCount(1)

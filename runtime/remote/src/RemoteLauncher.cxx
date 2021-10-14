@@ -25,7 +25,7 @@
 #include <sys/stat.h>
 #include <cstring>
 #include <set>
-#include "OcpiOsSocket.h"
+#include "OsSocket.hh"
 #include "OcpiUtilValue.h"
 #include "OcpiUtilMisc.h"
 #include "Container.h"

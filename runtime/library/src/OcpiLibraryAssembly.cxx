@@ -363,6 +363,9 @@ namespace OCPI {
 	      auto &conn = **ci;
 	      if (!conn.m_externals.empty()) // no checking for externals
 		continue;
+// this check cannot be made this early since it can be invalidated by slave assembly port delegation
+// but this error will simply be caught later.
+#if 0
 	      auto &other = conn.m_ports.front().first == ap ?
 		*conn.m_ports.back().first : *conn.m_ports.front().first;
 	      // Now check that the port connected in the assembly has the same
@@ -379,6 +382,7 @@ namespace OCPI {
 			 assy.utilInstance(other.m_instance).m_specName.c_str());
 		return reject(*this, i, "incompatible connection on port \"%s\"", p->m_name.c_str());
 	      }
+#endif
 	      bump = 1;; // An implementation with hardwired connections gets a score bump
 	    }
 	  }

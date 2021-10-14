@@ -20,7 +20,7 @@
 
 #include <iostream>
 #include <cstring>
-#include <OcpiOsDebug.h>
+#include "OsDebug.hh"
 #include "OcpiUtilUUID.h"
 
 static

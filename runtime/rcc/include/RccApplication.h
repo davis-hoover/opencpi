@@ -38,7 +38,7 @@
 #endif
 #include "RCC_Worker.h"
 
-#include "OcpiOsLoadableModule.h"
+#include "OsLoadableModule.hh"
 
 #include "ContainerManager.h"
 

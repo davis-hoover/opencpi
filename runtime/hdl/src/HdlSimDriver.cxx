@@ -21,8 +21,8 @@
 #include <inttypes.h>
 #include <unistd.h>
 #include <assert.h>
-#include "OcpiOsFileSystem.h"
-#include "OcpiOsSocket.h"
+#include "OsFileSystem.hh"
+#include "OsSocket.hh"
 #include "HdlSdp.h"
 #include "HdlSimDriver.h"
 

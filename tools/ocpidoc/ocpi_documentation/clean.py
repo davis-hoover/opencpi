@@ -49,7 +49,7 @@ def clean(directory, recursive=False, _startdir=None, **kwargs):
             if path != current_directory.joinpath("gen/"+BUILD_FOLDER):
                 clean(path, _startdir=_startdir)
 
-    directory = current_directory;
+    directory = current_directory
     if current_directory == _startdir:
         directory = directory.joinpath("gen/"+BUILD_FOLDER)
 
@@ -57,6 +57,6 @@ def clean(directory, recursive=False, _startdir=None, **kwargs):
         shutil.rmtree(directory)
         print(f"Deleted built documentation directory: {directory}")
         if directory.parent.name == "gen" and \
-            any(directory.parent.iterdir()) is False:
-                shutil.rmtree(directory.parent)
-                print(f"Deleted empty gen folder: {directory.parent}")
+                any(directory.parent.iterdir()) is False:
+            shutil.rmtree(directory.parent)
+            print(f"Deleted empty gen folder: {directory.parent}")

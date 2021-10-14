@@ -99,6 +99,10 @@ namespace OCPI {
 #define OCCP_ADMIN_SIZE OCCP_WORKER_CONTROL_SIZE
 #define OCCP_ADMIN_CONFIG_OFFSET 4096
 #define OCCP_ADMIN_CONFIG_SIZE 4096
+// Note this CONFIG_WINDOW is actually further chunked to 4 pieces so that the 2 MSB address
+// bits can be used to indicate read size to accomodate the broken Xilinx PCIE2AXI bridge
+// The readsize bits are encoded per AXI ARSIZE, namely log2(nbytes)
+#define OCCP_WORKER_CONFIG_READSIZE_BITS 2
 #define OCCP_WORKER_CONFIG_WINDOW_BITS 20
 #define OCCP_WORKER_CONFIG_SIZE (1u << OCCP_WORKER_CONFIG_WINDOW_BITS)
 #define OCCP_WORKER_CONTROL_BASE(i) ((i) * OCCP_BYTES_PER_WORKER)

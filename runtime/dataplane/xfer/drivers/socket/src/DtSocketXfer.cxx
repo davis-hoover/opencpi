@@ -21,11 +21,11 @@
 #include <inttypes.h>
 #include <unistd.h>  // FIXME for gethostname - use OS::
 #include <deque>
-#include "OcpiOsSocket.h"
-#include "OcpiOsMisc.h"
-#include "OcpiOsAssert.h"
-#include "OcpiOsServerSocket.h"
-#include "OcpiOsEther.h"
+#include "OsSocket.hh"
+#include "OsMisc.hh"
+#include "OsAssert.hh"
+#include "OsServerSocket.hh"
+#include "OsEther.hh"
 #include "OcpiUtilMisc.h"
 #include "OcpiThread.h"
 #include "XferDriver.h"

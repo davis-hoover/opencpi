@@ -24,7 +24,7 @@
 #include <strings.h>
 #include <map>
 #include <string>
-#include "OcpiOsDebug.h"
+#include "OsDebug.hh"
 #include "OcpiExprEvaluator.h"
 #include "OcpiUtilValue.h"
 #include "OcpiUtilMisc.h"

@@ -27,7 +27,7 @@ source $OCPI_CDK_DIR/scripts/setup-prerequisite.sh \
        $me \
        "Busy box used in embedded platforms" \
        https://git.busybox.net/busybox/snapshot/ \
-       $dir.tar.gz \
+       $dir.tar.bz2 \
        $dir \
        1
 cd ..

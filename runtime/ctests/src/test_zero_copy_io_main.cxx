@@ -31,8 +31,8 @@
 #include <stdio.h>
 #include <sstream>
 #include <stdlib.h>
-#include <OcpiOsMisc.h>
-#include <OcpiOsAssert.h>
+#include "OsMisc.hh"
+#include "OsAssert.hh"
 #include <OcpiRDTInterface.h>
 #include <test_utilities.h>
 

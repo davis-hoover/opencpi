@@ -24,8 +24,8 @@
 
 #include <deque>
 #include <vector>
-#include "OcpiOsIovec.h"
-#include "OcpiOsTimer.h"
+#include "OsIovec.hh"
+#include "OsTimer.hh"
 #include "OcpiThread.h"
 #include "OcpiUtilSelfMutex.h"
 #include "XferDriver.h"

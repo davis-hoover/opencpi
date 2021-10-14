@@ -28,7 +28,7 @@
  *
  */
 #include <inttypes.h>
-#include "OcpiOsEther.h"
+#include "OsEther.hh"
 #include "OcpiUtilException.h"
 #include "OcpiUtilMisc.h"
 #include "XferException.h"

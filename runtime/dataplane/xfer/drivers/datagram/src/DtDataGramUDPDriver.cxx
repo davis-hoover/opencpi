@@ -32,10 +32,10 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "OcpiOsSocket.h"
-#include "OcpiOsServerSocket.h"
-#include "OcpiOsAssert.h"
-#include "OcpiOsEther.h"
+#include "OsSocket.hh"
+#include "OsServerSocket.hh"
+#include "OsAssert.hh"
+#include "OsEther.hh"
 #include "OcpiUtilMisc.h"
 #include "OcpiUtilEzxml.h"
 #include "XferException.h"

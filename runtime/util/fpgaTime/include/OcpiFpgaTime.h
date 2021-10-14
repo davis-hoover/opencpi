@@ -21,7 +21,7 @@
 #ifndef OCPIFPGATIME_INCLUDE__
 #define OCPIFPGATIME_INCLUDE__
 
-#include <OcpiOsDataTypes.h>
+#include "OsDataTypes.hh"
 
 #define RPLTIME_R32( off ) *((OCPI::OS::uint32_t*)(m_adminBaseAdr+off))
 #define RPLTIME_R64( off ) *((OCPI::OS::uint64_t*)(m_adminBaseAdr+off))

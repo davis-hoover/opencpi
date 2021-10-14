@@ -18,8 +18,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <OcpiOsAssert.h>
-#include <OcpiOsDataTypes.h>
+#include "OsAssert.hh"
+#include "OsDataTypes.hh"
 #include <string>
 #include <cstring>
 #include "OcpiUtilCDR.h"

@@ -33,7 +33,7 @@
  *                  Initial version.
  */
 
-#include <OcpiOsMutex.h>
+#include "OsMutex.hh"
 #include <string>
 
 namespace OCPI {

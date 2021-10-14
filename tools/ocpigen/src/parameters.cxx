@@ -23,11 +23,12 @@
 #include <cassert>
 #include <strings.h>
 #include <fnmatch.h>
-#include "OcpiOsFileSystem.h"
+#include "OsFileSystem.hh"
 #include "parameters.h"
 #include "wip.h"
 #include "hdl.h"
 #include "hdl-device.h"
+#include "assembly.h"
 namespace OU=OCPI::Util;
 namespace OF=OCPI::OS::FileSystem;
 
@@ -306,7 +307,8 @@ parse(ezxml_t px, const OU::Property *p, const Worker *worker, bool global) {
 }
 
 ParamConfig::
-ParamConfig(Worker &w) : m_worker(w), nConfig(0), used(false) {
+ParamConfig(Worker &w) : m_worker(w), m_slavesString(NULL), m_slavesXml(NULL), m_slavesAssembly(NULL),
+			 nConfig(0), used(false) {
   params.resize(w.m_ctl.properties.size());
 }
 
@@ -322,6 +324,12 @@ ParamConfig::
 ParamConfig(const ParamConfig &other)
   : m_worker(other.m_worker) {
   clone(other);
+}
+ParamConfig::
+~ParamConfig() {
+  delete m_slavesAssembly;
+  ezxml_free(m_slavesXml);
+  free(m_slavesString);
 }
 
 // Fill in unspecified parameters with their single default value
@@ -733,6 +741,10 @@ addConfig(ParamConfig &info, bool fromXml) {
   ParamConfig *newpc = new ParamConfig(info); // copy to new one
   newpc->used = true;
   assert(m_paramConfigs.size() <= info.nConfig);
+  // Clear all multi-valued params since this is a concrete config
+  // Perhaps this should be done all the time in the clone method?
+  for (unsigned n = 0; n < newpc->params.size(); n++)
+    newpc->params[n].m_uValues.clear();
   m_paramConfigs.resize(info.nConfig + 1);
   m_paramConfigs[info.nConfig] = newpc;
   return NULL;

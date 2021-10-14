@@ -22,7 +22,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cctype>
-#include <OcpiOsAssert.h>
+#include "OsAssert.hh"
 #include "OcpiUtilMisc.h"
 #include "OcpiUtilCommandLineConfiguration.h"
 

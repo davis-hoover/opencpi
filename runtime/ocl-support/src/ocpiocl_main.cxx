@@ -26,7 +26,7 @@
 #include <cstring>
 #include "ocpi-config.h"
 #include "OcpiUtilCppMacros.h"
-#include "OcpiOsLoadableModule.h"
+#include "OsLoadableModule.hh"
 #include "OcpiDriverManager.h"
 #include "OclContainer.h"
 

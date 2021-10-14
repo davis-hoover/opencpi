@@ -1470,5 +1470,14 @@ RCCResult RCCUserWorker::run(bool /*timeout*/) {
        throw OU::Error("proxy worker accessed an optional slave \"%s\" which is not present",
 		       name);
   }
+  void RCCUserSlave::
+  debugLog(const char *fmt, ...) {
+    if (OS::logWillLog(OCPI_LOG_DEBUG)) {
+       va_list ap;
+       va_start(ap, fmt);
+       ((Worker *)pthread_getspecific(Driver::s_threadKey))->log(OCPI_LOG_DEBUG, fmt, ap);
+       va_end(ap);
+    }
   }
+}
 }

@@ -28,7 +28,7 @@
 #include <map>
 #include <stdexcept>
 #include "OcpiXmlEmbedded.h"
-#include "OcpiOsFileSystem.h" // This is NOT fully OCPI::OS-enabled, e.g. path names, etc.
+#include "OsFileSystem.hh" // This is NOT fully OCPI::OS-enabled, e.g. path names, etc.
 #include "OcpiUtilEzxml.h"
 #include "OcpiUtilMisc.h"
 

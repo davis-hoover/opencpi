@@ -26,8 +26,8 @@
 #include <limits>
 #include <algorithm>
 #include <unordered_set>
-#include "OcpiOsDebugApi.h"
-#include "OcpiOsFileSystem.h"
+#include "OcpiOsDebugApi.hh"
+#include "OsFileSystem.hh"
 #include "OcpiUtilMisc.h"
 #include "OcpiUtilEzxml.h"
 #include "OcpiLibraryManager.h"
@@ -2170,25 +2170,40 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
       for (unsigned c = 0; c < w.m_paramConfigs.size(); ++c) {
         ParamConfig &pc = *w.m_paramConfigs[c];
         // Make sure the configuration is in the test matrix (e.g. globals)
-        bool allOk = true;
-        for (unsigned n = 0; allOk && n < pc.params.size(); n++) {
-          Param &p = pc.params[n];
-          bool isOk = false;
-          if (p.m_param)
-            for (unsigned nn = 0; nn < globals.params.size(); nn++) {
-              Param &gp = globals.params[nn];
-              if (gp.m_param && !strcasecmp(p.m_param->cname(), gp.m_param->cname()))
-                for (unsigned v = 0; v < gp.m_uValues.size(); v++)
-                  if (p.m_uValue == gp.m_uValues[v]) {
-                    isOk = true;
-                    break;
-                  }
+        std::unordered_set <uint32_t> case_match;
+        for (unsigned j = 0; j < cases.size(); j++) {
+          bool allOk = true;
+          for (unsigned q = 0; q < cases[j]->m_settings.params.size(); q++) {
+            for (unsigned n = 0; n < pc.params.size(); n++) {
+              Param &p = pc.params[n];
+              Param &cp = cases[j]->m_settings.params[q];
+              if ((p.m_name == cp.m_name) && p.m_param) {
+                bool gIsOk = false;
+                bool cIsOk = false;
+                for (unsigned nn = 0; nn < globals.params.size(); nn++) { // check if this is in the global matrix (is this still necessary?)
+                  Param &gp = globals.params[nn];
+                  if (gp.m_param && !strcasecmp(p.m_param->cname(), gp.m_param->cname()))
+                    for (unsigned v = 0; v < gp.m_uValues.size(); v++)
+                      if (p.m_uValue == gp.m_uValues[v]) {
+                        gIsOk = true;
+                        break;                     
+                      }
+                }
+                if (!gIsOk)
+                  goto NO_MATCH; // if not in globals
+                if (p.m_uValue == cp.m_uValue)
+                  cIsOk = true;
+                if (!cIsOk) {
+                  allOk = false;
+                  goto NO_MATCH;
+                }
+              }
             }
-          if (!isOk)
-            allOk = false;
+          }
+          if (allOk)
+            case_match.insert(j);
+          NO_MATCH:continue;
         }
-        if (!allOk)
-          continue; // skip this config - it is not in the test matrix
         if (!seenHDL) {
           OS::FileSystem::mkdir(assemblies, true);
           OU::string2File("include $(OCPI_CDK_DIR)/include/hdl/hdl-assemblies.mk\n",
@@ -2209,7 +2224,7 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
           unsigned ucp = 0;
           for (uint32_t nn = 0; nn < cases[n]->m_ports.size(); nn++) {
             if (cases[n]->m_ports[nn].m_testOptional == true){
-              bitmask = bitmask|(1 << nn);
+              bitmask = bitmask|(1u << nn);
               ucPortNames += cases[n]->m_ports[nn].m_port->pname() + std::string("_");
               unconnected = "_op_" + ucPortNames;
               ucp++;
@@ -2219,16 +2234,16 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
             unconnected += "ports_unconnected_";
           else if (ucp == 1)
             unconnected += "port_unconnected_";
-          if (bitmap_processed.insert(bitmask).second) {
-            if ((err = generateHdlAssemblies(w, c, dir + unconnected + temp.str(),
-            name + unconnected + temp.str(), false, assyDirs, cases[n]->m_ports)))
-              return err;
-            if (hdlFileIO) {
-              if ((err = generateHdlAssemblies(w, c, dir + "_frw" + unconnected + temp.str(),
-              name + "_frw" + unconnected + temp.str(), true, assyDirs, cases[n]->m_ports)))
+          if (case_match.find(n) != case_match.end())
+            if (bitmap_processed.insert(bitmask).second) {
+              if ((err = generateHdlAssemblies(w, c, dir + unconnected + temp.str(),
+              name + unconnected + temp.str(), false, assyDirs, cases[n]->m_ports)))
                 return err;
+              if (hdlFileIO)
+                if ((err = generateHdlAssemblies(w, c, dir + "_frw" + unconnected + temp.str(),
+                name + "_frw" + unconnected + temp.str(), true, assyDirs, cases[n]->m_ports)))
+                  return err;
             }
-          }
         }
       }
     }
@@ -2448,3 +2463,4 @@ createCases(const char **platforms, const char */*package*/, const char */*outDi
   }
   return NULL;
 }
+

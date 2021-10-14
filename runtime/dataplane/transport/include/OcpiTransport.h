@@ -35,8 +35,8 @@
 
 #include <vector>
 #include <list>
-#include <OcpiOsTimer.h>
-#include <OcpiOsMutex.h>
+#include "OsTimer.hh"
+#include "OsMutex.hh"
 #include <OcpiParentChild.h>
 #include <OcpiTimeEmit.h>
 #include "XferException.h"

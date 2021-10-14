@@ -24,7 +24,7 @@
 #ifdef __APPLE__
 #include "../../../foreign/pwq/src/platform.c"
 #endif
-#include "OcpiOsAssert.h"
+#include "OsAssert.hh"
 #include "OcpiUtilCDR.h"
 #include "Container.h"
 #include "ContainerPort.h"

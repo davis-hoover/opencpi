@@ -36,7 +36,7 @@
 #include <DtHandshakeControl.h>
 #include <OcpiBuffer.h>
 #include <OcpiPort.h>
-#include <OcpiOsAssert.h>
+#include "OsAssert.hh"
 #include <OcpiCircuit.h>
 #include <OcpiTimeEmitCategories.h>
 

@@ -26,8 +26,8 @@
 #include <OcpiUtilVfsIterator.h>
 #include <OcpiUtilUri.h>
 #include <OcpiUtilMisc.h>
-#include <OcpiOsAssert.h>
-#include <OcpiOsRWLock.h>
+#include "OsAssert.hh"
+#include "OsRWLock.hh"
 #include <iostream>
 #include <map>
 #include <set>

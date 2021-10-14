@@ -35,7 +35,7 @@
 
 #include <string>
 #include <stdio.h>
-#include <OcpiOsDataTypes.h>
+#include "OsDataTypes.hh"
 #include <OcpiList.h>
 #include <OcpiPortMetaData.h>
 #include <OcpiParentChild.h>

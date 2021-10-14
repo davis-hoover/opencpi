@@ -30,8 +30,8 @@
  */
 #include <stdio.h>
 #include <sstream>
-#include "OcpiOsMisc.h"
-#include "OcpiOsAssert.h"
+#include "OsMisc.hh"
+#include "OsAssert.hh"
 #include "OcpiUtilMisc.h"
 #include "OcpiRDTInterface.h"
 #include "OcpiPValue.h"

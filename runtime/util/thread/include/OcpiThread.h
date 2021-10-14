@@ -35,7 +35,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <OcpiOsThreadManager.h>
+#include "OsThreadManager.hh"
 
 namespace OCPI {
   namespace Util {

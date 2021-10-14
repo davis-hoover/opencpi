@@ -18,8 +18,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "OcpiOsMisc.h"
-#include "OcpiOsAssert.h"
+#include "OsMisc.hh"
+#include "OsAssert.hh"
 #include "OcpiMessageCircuit.h"
 #include "XferEndPoint.h"
 

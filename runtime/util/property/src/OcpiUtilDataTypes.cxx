@@ -23,7 +23,7 @@
 #include <climits>
 #include <set>
 
-#include "OcpiOsAssert.h"
+#include "OsAssert.hh"
 #include "OcpiUtilEzxml.h"
 #include "OcpiUtilMisc.h"
 #include "OcpiUtilException.h"

@@ -30,7 +30,7 @@
 #define RCC_WORKER_H_
 
 #include <cstdarg>
-#include "OcpiOsSemaphore.h"
+#include "OsSemaphore.hh"
 
 #ifndef WORKER_INTERNAL
 #define WORKER_INTERNAL

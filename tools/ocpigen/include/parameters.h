@@ -23,6 +23,7 @@
 #include <vector>
 #include <set>
 #include <string>
+#include <unordered_set>
 #include "OcpiUtilValue.h"
 #include "OcpiUtilProperty.h"
 #include "cdkutils.h"
@@ -39,7 +40,7 @@ typedef std::vector<std::string> Values;
 typedef std::set<std::string> Strings;
 typedef Strings::const_iterator StringsIter;
 
-class Worker;
+class Assembly;
 #define PARAM_ATTRS "name", "value", "values", "valueFile", "valuesFile"
 struct Param {
   std::string                 m_name;       // if spec, same as m_param->m_name, if impl worker.model.property
@@ -85,6 +86,15 @@ typedef std::vector<ParamConfig*> ParamConfigs;
 class ParamConfig : public OCPI::Util::IdentResolver {
   Worker &m_worker;
  public:
+  char *m_slavesString;
+  ezxml_t m_slavesXml;
+  Assembly *m_slavesAssembly; // per-config slave assembly if worker is a proxy with a slave assembly
+  // map of slave worker objects mapped by a string of the name of the slave either from name
+  // attribute or auto generated
+  std::list<std::pair<std::string, Worker*>> m_slaves; // maintain order
+  std::unordered_set<std::string> m_slaveNames; // for duplicate checking
+  std::vector<std::string> m_slaveTypes; // type namespace per slave
+  std::vector<const char **> m_slaveBaseTypes; // saved temporarily
   std::vector<Param> params;
   std::string id;
   size_t nConfig; // ordinal
@@ -93,6 +103,8 @@ class ParamConfig : public OCPI::Util::IdentResolver {
   ParamConfig(const ParamConfig &);
   ParamConfig &operator=(const ParamConfig * p);
   void clone(const ParamConfig &other);
+  ~ParamConfig();
+  const char *addSlavesConfig(ezxml_t slaves);
   const char *parse(ezxml_t cx, const ParamConfigs &configs);
   const char *doDefaults(bool missingOK);
   void write(FILE *xf, FILE *mf);

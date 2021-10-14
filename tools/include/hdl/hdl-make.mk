@@ -72,6 +72,46 @@ $(call OcpiDbgVar,HdlAllParts)
 HdlAllPlatformParts:=$(call Unique,$(foreach pl,$(HdlAllPlatforms),$(firstword $(subst -, ,$(HdlPart_$(pl))))))
 $(call OcpiDbgVar,HdlAllPlatformParts)
 
+################################################################################
+# $(call HdlGetTargetFromPart,hdl-part)
+# Return the target name from a hyphenated partname
+HdlGetTargetFromPart=$(firstword $(subst -, ,$1))
+
+################################################################################
+# $(call HdlGetFamily,hdl-target,[multi-ok?])
+# Return the family name associated with the target(usually a part)
+# If the target IS a family, just return it.
+# If it is a top level target with no family, return itself
+# If it is a top level target with one family, return that family
+# Otherwise return the family of the supplied part
+# If the second argument is present, it is ok to return multiple families
+# (The second argument should not contain spaces)
+# If no appropriate family is found, warn
+# StringEq=$(if $(subst x$1,,x$2)$(subst x$2,,x$1),,x)
+HdlGetFamily=$(eval m1=$(subst $(Space),___,$1))$(strip \
+  $(if $(HdlGetFamily_cached<$(m1)__$2>),,\
+    $(call OcpiDbg,HdlGetFamily($1,$2) cache miss)$(eval export HdlGetFamily_cached<$(m1)__$2>=$(call HdlGetFamily_core,$1,$2)))\
+  $(infox HdlGetFamily($1,$2)->$(HdlGetFamily_cached<$(m1)__$2>))$(HdlGetFamily_cached<$(m1)__$2>))
+
+HdlGetFamily_core=$(call OcpiDbg,Entering HdlGetFamily_core($1,$2))$(strip \
+  $(foreach gf,\
+     $(or $(findstring $(1),$(HdlAllFamilies)),$(strip \
+          $(if $(findstring $(1),all), \
+	      $(if $(2),$(HdlAllFamilies),\
+		   $(call $(HdlError),$(strip \
+	                  HdlFamily is ambiguous for '$(1)'))))),$(strip \
+          $(and $(findstring $(1),$(HdlTopTargets)),$(strip \
+	        $(if $(and $(if $(2),,x),$(word 2,$(HdlTargets_$(1)))),\
+                   $(call $(HdlError),$(strip \
+	             HdlFamily is ambiguous for '$(1)'. Choices are '$(HdlTargets_$(1))')),\
+	           $(or $(HdlTargets_$(1)),$(1)))))),$(strip \
+	  $(foreach f,$(HdlAllFamilies),\
+	     $(and $(filter $(call HdlGetTargetFromPart,$1),$(HdlTargets_$f)),$f))),$(strip \
+	  $(and $(filter $1,$(HdlAllPlatforms)), \
+	        $(call HdlGetFamily_core,$(call HdlGetTargetFromPart,$(HdlPart_$1))))),\
+	  $(warning The build target '$1' is not a family or a part in any family)),\
+     $(gf)))
+
 # Read the workers file and set things accordingly
 # 1. Set the instance list, which is a list of <worker-name>:<instance-name>
 # 2. The workers list, which is a list of worker names
@@ -311,6 +351,24 @@ HdlGetConstraintsSuffix=$(strip \
 HdlGetConstraintsFile=$(strip $(and $1,\
   $(foreach s,$(call HdlGetConstraintsSuffix,$2),\
     $1$(if $(filter %$s,$1),,$s))))
+
+# In the platform and post-platform stages, get the part from the <platform>.mk
+# In other stages, use the HdlExactPart if set, or the Default part if set,
+# or the first part for this target
+# Note that the return part is still in the opencpi canonical form
+HdlChoosePart=$(foreach c,\
+  $(if $(filter $(HdlMode),platform config container),\
+    $(HdlPart_$(HdlPlatform)),\
+    $(or \
+      $(foreach p,$(HdlExactParts),$(strip\
+        $(foreach f,$(word 1,$(subst :, ,$p)),\
+          $(and $(filter $f,$(HdlTarget)),$(word 2,$(subst :, ,$p)))))),\
+      $(HdlExactPart),\
+      $(HdlDefaultTarget_$(HdlTarget)),\
+      $(firstword $(HdlTargets_$(HdlTarget))))),$(infox CHOOSEPART:$c)$c)
+
+HdlProjectDepsFromPlatformDir=$(strip\
+  $(call OcpiProjectDependencies,$(call OcpiProjectFromPlatformDir,$1,hdl)))
 
 $(call OcpiDbgVar,HdlPlatform)
 $(call OcpiDbgVar,HdlPlatforms)

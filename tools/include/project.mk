@@ -223,13 +223,13 @@ cleanhdl:
 
 rcc ocl hdl: imports exports
 
-# hdl stuff is because rcc proxies may need to see hdl slaves
+# rcc proxies may need to see rcc or hdl slaves
 rcc:
-	$(call MaybeMake,components,declarehdl)
-	$(call MaybeMake,hdl/devices,declarehdl)
-	$(call MaybeMake,hdl/cards,declarehdl)
-	$(call MaybeMake,hdl/adapters,declarehdl)
-	$(call MaybeMake,hdl/platforms,declarehdl)
+	$(call MaybeMake,components,declare)
+	$(call MaybeMake,hdl/devices,declare)
+	$(call MaybeMake,hdl/cards,declare)
+	$(call MaybeMake,hdl/adapters,declare)
+	$(call MaybeMake,hdl/platforms,declare)
 	$(call MaybeMake,components,rcc)
 	$(call MaybeMake,hdl/devices,rcc)
 	$(call MaybeMake,hdl/cards,rcc)

@@ -77,15 +77,19 @@ class AssetFactory():
                    "rcc-platforms": _opencpi.assets.platform.RccPlatformsCollection,
                    "rcc-platform":  _opencpi.assets.platform.RccPlatform,
                    "test":          _opencpi.assets.test.Test,
+                   "tests":         _opencpi.assets.test.TestsCollection,
                    "component":     _opencpi.assets.component.Component,
                    "application":   _opencpi.assets.application.Application,
                    "applications":  _opencpi.assets.application.ApplicationsCollection,
                    "library":       _opencpi.assets.library.Library,
                    "libraries":     _opencpi.assets.library.LibraryCollection,
                    "multi-lib":     _opencpi.assets.library.LibraryCollection,
+                   "protocol":      _opencpi.assets.component.Protocol,
+                   "hdl-slot":      _opencpi.assets.component.Slot,
+                   "hdl-card":      _opencpi.assets.component.Card,
                    "project":       partial(cls.__get_or_create, _opencpi.assets.project.Project),
                    "registry":      partial(cls.__get_or_create, _opencpi.assets.registry.Registry)}
-        
+
         if asset_type not in actions.keys():
             if not asset_type:
                 asset_type = "unknown"

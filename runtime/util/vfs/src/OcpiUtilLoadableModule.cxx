@@ -31,11 +31,11 @@
  *                    dependencies between shared libraries don't work.
  */
 
-#include <OcpiOsAssert.h>
-#include <OcpiOsMutex.h>
-#include <OcpiOsMisc.h>
-#include <OcpiOsLoadableModule.h>
-#include <OcpiOsFileSystem.h>
+#include "OsAssert.hh"
+#include "OsMutex.hh"
+#include "OsMisc.hh"
+#include "OsLoadableModule.hh"
+#include "OsFileSystem.hh"
 #include <OcpiUtilAutoMutex.h>
 #include <OcpiUtilMisc.h>
 #include <OcpiUtilVfs.h>

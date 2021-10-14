@@ -31,7 +31,7 @@ DoLibGoal=$(AT)\
     $(MAKE) -C $l $(if $(wildcard $l/Makefile),,-f $(OCPI_CDK_DIR)/include/library.mk) \
             OCPI_PROJECT_REL_DIR=../$(OCPI_PROJECT_REL_DIR) $@ &&):
 
-Goals=run all declarehdl clean $(Models) $(Models:%=clean%) $(OcpiTestGoals)
+Goals=run all declare clean $(Models) $(Models:%=clean%) $(OcpiTestGoals)
 
 .PHONY: $(Goals)
 

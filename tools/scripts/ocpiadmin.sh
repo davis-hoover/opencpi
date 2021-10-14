@@ -103,8 +103,9 @@ EOF
 }
 
 function getvars {
-  setVarsFromMake $OCPI_CDK_DIR/include/hdl/hdl-targets.mk ShellHdlTargetsVars=1
-  setVarsFromMake $OCPI_CDK_DIR/include/rcc/rcc-targets.mk ShellRccTargetsVars=1
+  # setVarsFromMake $OCPI_CDK_DIR/include/hdl/hdl-targets.mk ShellHdlTargetsVars=1
+  # setVarsFromMake $OCPI_CDK_DIR/include/rcc/rcc-targets.mk ShellRccTargetsVars=1
+  eval $(python3 -c "import _opencpi.util as ou; print(ou.get_platform_variables(True))")
   if [ "$action" = deploy ]
   then
     export OCPI_ALL_RCC_PLATFORMS="$RccAllPlatforms" OCPI_ALL_HDL_PLATFORMS="$HdlAllPlatforms"
@@ -182,6 +183,10 @@ while (( "$#" )); do
       ;;
     --minimal)
       minimal=1 # use ${minimal:+whatever}
+      shift
+      ;;
+   --no-kernel)
+      nokernel=1 # use ${nokernel:+whatever}
       shift
       ;;
     # Unsupported flags
@@ -368,10 +373,10 @@ if [ "$model" = RCC ]; then
 	[ -n "$dynamic" ] && platform_target_dir+=d
 	[ -n "$optimize" ] && platform_target_dir+=o
     fi
-    ./scripts/install-opencpi.sh ${minimal:+--minimal} $platform_target_dir || exit 1
+    ./scripts/install-opencpi.sh ${minimal:+--minimal} ${nokernel:+--no-kernel} $platform_target_dir || exit 1
 else
     # Since the build-opencpi.sh does an "rcc" build per project, and that implicitly
-    # does "declarehdl" on projects, that is sufficient for on-demand hdl worker builds
+    # does "declare" on projects, that is sufficient for on-demand hdl worker builds
     if [ -n "$minimal" ]; then
       ocpidev -d projects/core build hdl primitives library --hdl-platform=$platform
       ocpidev -d projects/platform build hdl primitives library --hdl-platform=$platform
@@ -401,13 +406,17 @@ else
           # we don't have a verb to do that.
           ocpidev -d $project_dir build --rcc
           ocpidev -d $project_dir build hdl --workers-as-needed platform $platform
+          # Since there is no project-level build, no exports were done
+          # The best fix would be to add an --export-project option to ocpidev
+          make -C $project_dir -f $OCPI_CDK_DIR/include/project.mk exports
         else
           ocpidev -d $project_dir build --hdl --hdl-platform=$platform --no-assemblies
         fi
-        echo "HDL platform \"$platform\" built for OSP in $project_dir."
+        echo "HDL platform \"$platform\" built and exported for OSP in $project_dir."
     elif [ -n "$minimal" ]; then
-      # Build the platform in its project
-      ocpidev -d $project_dir build hdl --workers-as-needed platform $platform
+        # core project: build the platform in its project
+        ocpidev -d $project_dir build hdl --workers-as-needed platform $platform
+        echo "HDL platform \"$platform\" built in $project_dir."
     fi
     ocpidev -d projects/assets build --hdl-platform=$platform hdl ${minimal:+--workers-as-needed} assembly testbias
     echo "HDL platform \"$platform\" built, with one HDL assembly (testbias) built for testing."

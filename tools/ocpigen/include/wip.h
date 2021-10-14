@@ -180,9 +180,10 @@ class SdpPort : public Port {
 			bool inPackage, bool inWorker, const char *defaultIn,
 			const char *defaultOut);
   void emitVHDLShellPortMap(FILE *f, std::string &last);
-  void emitPortSignal(FILE *f, bool any, const char *indent, const std::string &fName,
-		      const std::string &aname, const std::string &index, bool output,
-		      const Port *signalPort, bool external);
+  void emitPortSignal(std::string *pmaps, bool any, const char *indent, const std::string &fName,
+		      const std::string &aname, const std::string &fIndex,
+		      const std::string &aIndex, size_t count, bool output, const Port *signalPort,
+		      bool external);
   void emitExtAssignment(FILE *f, bool int2ext, const std::string &extName,
 			 const std::string &intName, const Attachment &extAt,
 			 const Attachment &intAt, size_t count) const;
@@ -394,11 +395,6 @@ class Worker : public OU::Worker {
   size_t m_defaultDataWidth;        // SIZE_MAX means not set
   Language m_language;
   ::Assembly *m_assembly;
-  std::list<std::pair<std::string, ::Assembly *>> m_slaveAssemblies; // string is selection expression
-  // map of slave worker objects mapped by a string of the name of the slave either from name
-  // attribute or auto generated
-  std::list<std::pair<std::string, Worker*>> m_slaves; // maintain order
-  std::unordered_set<std::string> m_slaveNames; // for duplicate checking
   HdlDevice *m_emulate;
   Worker *m_emulator;               // for test only, the emulator of this worker
   Signals m_signals;
@@ -511,6 +507,10 @@ class Worker : public OU::Worker {
     *addParamConfigSuffix(std::string &s),
     //    *getParamConfig(const char *id, const ParamConfig *&config),
     *emitImplRCC(),
+    *emitImplSlaves(FILE *f),
+    *emitImplSlavesConfig(FILE *f, unsigned pc),
+    *emitImplSlaveTypes(FILE *f),
+    *emitImplSlaveTypesConfig(FILE *f, unsigned pc),
     *rccMethodName(const char *method, const char *&mName),
     *emitImplOCL(),
     *emitEntryPointOCL(),

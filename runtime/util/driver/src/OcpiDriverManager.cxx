@@ -20,8 +20,8 @@
 
 #include <unistd.h>
 #include "ocpi-config.h"
-#include "OcpiOsFileSystem.h"
-#include "OcpiOsLoadableModule.h"
+#include "OsFileSystem.hh"
+#include "OsLoadableModule.hh"
 #include "OcpiUtilCppMacros.h"
 #include "OcpiUtilEzxml.h"
 #include "OcpiUtilAutoMutex.h"

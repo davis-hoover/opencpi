@@ -28,7 +28,7 @@
 #include "OcpiUtilMisc.h"
 
 #if !defined (NDEBUG)
-#include <OcpiOsDebug.h>
+#include "OsDebug.hh"
 #endif
 
 const char i2hc[16] = {

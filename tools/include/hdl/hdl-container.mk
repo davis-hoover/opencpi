@@ -112,7 +112,7 @@ override XmlIncludeDirsInternal:=\
                  $(XmlIncludeDirsInternal) \
                  $(HdlAssembly) \
                  $(foreach p,$(call HdlProjectDepsFromPlatformDir,$(HdlPlatformDir_$(HdlPlatform))),\
-                   $(foreach d,$(realpath $(OCPI_PROJECT_REL_DIR)/imports)/$p,$(info HH:$d)\
+                   $(foreach d,$(realpath $(OCPI_PROJECT_REL_DIR)/imports)/$p,\
                      $d/exports/lib/devices $d/exports/lib/devices/hdl \
                      $d/exports/lib/cards $d/exports/lib/cards/hdl)))
 
@@ -130,7 +130,7 @@ override ComponentLibraries:=$(call Unique,\
        $(foreach l,$(ComponentLibraries_$(Platform)),\
          $(if $(filter /%,$l),$l,$d$l)))\
       $(foreach pp,$(call HdlProjectDepsFromPlatformDir,$p),\
-        $(foreach dd,$(realpath $(OCPI_PROJECT_REL_DIR)/imports)/$(pp),$(info HH:$(dd))\
+        $(foreach dd,$(realpath $(OCPI_PROJECT_REL_DIR)/imports)/$(pp),\
           $(wildcard $(dd)/exports/lib/devices $(dd)/exports/lib/cards))))\
    devices cards)
 override LibDir=$(HdlAssembly)/lib/hdl

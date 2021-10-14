@@ -29,7 +29,7 @@
 #include <vector>
 #include <string>
 
-#include "OcpiOsSocket.h"
+#include "OsSocket.hh"
 #include "ContainerLauncher.h"
 namespace OCPI {
   namespace Remote {

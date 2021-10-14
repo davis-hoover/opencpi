@@ -35,7 +35,7 @@
  */
 
 #include <OcpiUtilVfs.h>
-#include <OcpiOsRWLock.h>
+#include "OsRWLock.hh"
 #include <iostream>
 #include <string>
 #include <ctime>

@@ -1,4 +1,4 @@
-.. platform_ad9361_spi HDL worker
+.. platform_ad9361_spi_csts HDL worker
 
 .. This file is protected by Copyright. Please refer to the COPYRIGHT file
    distributed with this source distribution.
@@ -18,57 +18,31 @@
    You should have received a copy of the GNU Lesser General Public License
    along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-
 :orphan:
 
-.. _platform_ad9361_spi-HDL-worker:
+.. _platform_ad9361_spi_csts-HDL-worker:
 
 
-``platform_ad9361_spi`` HDL Worker
-==================================
+``platform_ad9361_spi_csts`` HDL Worker
+=======================================
 
 Detail
 ------
-The AD9361 SPI HDL subdevice worker is intended for use in platforms and cards
+.. note::
+   This HDL subdevice worker is functionally equivalent to the AD9361 SPI HDL subdevice worker except that it specifies the Complex Short Timed Sample (CSTS) protocol in port definitions instead of the Complex Short With Metadata (CSWM) protocol. The CSTS version of this worker will replace the CSWM version in a future release.
+
+The AD9361 SPI CSTS HDL subdevice worker is intended for use in platforms and cards
 with an SPI bus that addresses only the AD9361. SPI read/writes are
-actuated by the ``rprops`` RawProperty port. A DevSignal is also sent which
+actuated by the ``rprops`` RawProperty port. A ``devsignal`` is also sent which
 can force the AD9361 RESETB pin, which is active-low, to logic 0.
 
-.. comment out ocpi_documentation_worker directive for now. It doesn't work with HdlDevice yet.
+.. ocpi_documentation_worker::
 
-Worker Ports
-~~~~~~~~~~~~
-
-.. This is hand-entered for now to suggest a format that the XML parser might use to automatically generate it.
-
-Inputs/Outputs:
-
-* ``rprops``: Actuates SPI reads and writes to the AD9361 device.
-
-  * Type: ``RawProp``
-
-  * Optional: ``true``
-
-Outputs:
-
-* ``dev_force_spi_reset``: Forces the ``RESETB`` pin, which is active low, to logic 0.
-
-  * Type: ``DevSignal``
-
-  * Count: ``1``
-
-  * Optional: ``false``
-
-  * Master: ``false``
-
-  * Signal: ``force_reset``
-
-  * Width: ``1``
-
+   rprops: Actuates SPI reads and writes to the AD9361 device.
+   dev_force_reset: Forces the ``RESETB`` pin, which is active low, to logic 0.
 
 Worker Configuration Parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 * Resource utilization for this worker for the ``zynq`` target platform, configuration 0:
 
   * Configuration: 0
@@ -178,15 +152,13 @@ the section "Vivado timing analysis" for details.
 
 Control Timing and Signals
 --------------------------
-
-The AD9361 SPI HDL subdevice worker operates entirely in
+The AD9361 SPI CSTS HDL subdevice worker operates entirely in
 the control plane clock domain. All SPI data and SPI
 clock signals are generated in the control plane clock domain.
 Note that SPI clock can only be a divided version of the control plane clock.
 
 Vivado Timing Analysis
 ----------------------
-
 The Vivado timing report that OpenCPI runs for HDL device workers may erroneously report
 a max delay for a clocking path which should have been ignored. Custom Vivado ``tcl`` commands
 had to be run for this HDL subdevice worker to extract pertinent information from Vivado timing analysis.

@@ -35,7 +35,7 @@
 
 #include <OcpiUtilVfs.h>
 #include <OcpiUtilStaticMemFile.h>
-#include <OcpiOsRWLock.h>
+#include "OsRWLock.hh"
 #include <iostream>
 #include <map>
 

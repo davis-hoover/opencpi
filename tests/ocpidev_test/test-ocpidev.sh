@@ -378,11 +378,11 @@ if [ -z "$NO_BUILD" ] ; then
   echo "============OCPIDEVTEST:Building tests rcc"
   do_ocpidev build project . $RCC --build-rcc-platform $RCC_PLATFORM --build-hdl-platform $HDL_PLATFORM
   do_ocpidev build project . $RCC --rcc-platform $RCC_PLATFORM --hdl-platform $HDL_PLATFORM
-  do_ocpidev build test --build-rcc-platform $RCC_PLATFORM
-  do_ocpidev build test --rcc-platform $RCC_PLATFORM
+  do_ocpidev build tests --build-rcc-platform $RCC_PLATFORM
+  do_ocpidev build tests --rcc-platform $RCC_PLATFORM
   echo "============OCPIDEVTEST:Building tests rcc clean"
-  do_ocpidev clean test --build-rcc-platform $RCC_PLATFORM
-  do_ocpidev clean test --rcc-platform $RCC_PLATFORM
+  do_ocpidev clean tests --build-rcc-platform $RCC_PLATFORM
+  do_ocpidev clean tests --rcc-platform $RCC_PLATFORM
   # in this test project building platforms is not relevenat beacuse they are fake platforms
 if [ -z "$HDL_NO_BUILD" ]; then
   echo "============OCPIDEVTEST:Building primitive "
@@ -404,10 +404,10 @@ if [ -z "$HDL_NO_BUILD" ]; then
   do_ocpidev clean test comp1.test -l dsp_comps --build-hdl-platform $HDL_PLATFORM
   do_ocpidev clean test comp1.test -l dsp_comps --hdl-platform $HDL_PLATFORM
   echo "============OCPIDEVTEST:Building tests hdl"
-  do_ocpidev build test --build-hdl-platform $HDL_PLATFORM
-  do_ocpidev build test --hdl-platform $HDL_PLATFORM
-  do_ocpidev clean test --build-hdl-platform $HDL_PLATFORM
-  do_ocpidev clean test --hdl-platform $HDL_PLATFORM
+  do_ocpidev build tests --build-hdl-platform $HDL_PLATFORM
+  do_ocpidev build tests --hdl-platform $HDL_PLATFORM
+  do_ocpidev clean tests --build-hdl-platform $HDL_PLATFORM
+  do_ocpidev clean tests --hdl-platform $HDL_PLATFORM
   echo "============OCPIDEVTEST:Building assys "
   do_ocpidev build hdl assemblies --build-hdl-platform $HDL_PLATFORM
   do_ocpidev build hdl assemblies --hdl-platform $HDL_PLATFORM

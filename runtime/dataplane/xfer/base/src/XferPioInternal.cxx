@@ -20,8 +20,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "OcpiOsDataTypes.h"
-#include "OcpiOsMisc.h"
+#include "OsDataTypes.hh"
+#include "OsMisc.hh"
 #include "XferEndPoint.h"
 #include "XferPioInternal.h"
 

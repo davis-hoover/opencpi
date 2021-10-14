@@ -159,10 +159,6 @@ function make_filtered_link {
   make_relative_link $1 $2
 }
 
-function bad {
-    echo Error: $* 1>&2
-    exit 1
-}
 function needsnoun {
     echo Error: $* 1>&2
     exit 1
@@ -388,44 +384,12 @@ done
 # we do this the ugly way (not in ocpigen/assets.cxx) for bootstrapping reasons
 mkdir -p exports
 
-function getattr {
-  sed s/$1/$1/i Project.xml | xmllint --xpath "string(/project/@$1)" -
-}
-function getvar {
-  sed -n "s/^ *$1:*= *\([^#]*\)/\1/p" Project.mk
-}
-if [ -f Project.xml ]; then
-  packagedeps=`getattr projectdependencies`
-  packagename=`getattr packagename`
-  packageprefix=`getattr packageprefix`
-  package=`getattr package`
-  packageid=`getattr packageid`
-elif [ -f Project.mk ]; then
-  packagedeps=`getvar ProjectDependencies`
-  packagename=`getvar PackageName`
-  packageprefix=`getvar PackagePrefix`
-  package=`getvar Package`
-  packageid=`getvar PackageID`
-else
-  bad Error:  Project has no Project.xml or Project.mk
-fi
-# echo packagedeps=$packagedeps
-# echo packagename=$packagename
-# echo packageprefix=$packageprefix
-# echo package=$package
-# echo packageid=$packageid
+getproject
 
-if [ -z "$packageid" ]; then
-  if [ -n "$package" ]; then
-    packageid=$package
-  else
-    [ -n "$packageprefix" ] || packageprefix=local
-    [ -n "$packagename" ] || packagename=$(basename $(ocpiReadLinkE .))
-    packageid=$packageprefix.$packagename
-  fi
-fi
 if [[ "$packageid" != `cat exports/project-package-id 2>/dev/null` ]]; then
   echo "$packageid" > exports/project-package-id
+  rm -f exports/project-package-id:*
+  touch exports/project-package-id:$packageid
 fi
 echo "$packagedeps" > exports/project-dependencies
 

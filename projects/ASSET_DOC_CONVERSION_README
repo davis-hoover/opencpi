@@ -3,22 +3,25 @@ Applying OpenCPI Data Sheet Content to ocpidoc Templates
 
 Audience: someone who needs to convert an OpenCPI asset data sheet
 in LaTeX format to the “ocpidoc” Sphinx/RST templates
-so that "ocpidoc build" can build it into HTML format.
+so that the "ocpidoc build" command can build it into HTML format.
 
-These asset documentation tools reference is currently
-part of MR!381 in tools/ocpidoc/doc/index.rst. Use the ocpidoc
-command "ocpidoc create --help" to list the available templates.
+The "ocpidoc" tool is part of the OpenCPI tools/ directory.
+There is an RST-formatted reference document for the tool,
+its templates, and its custom Sphinx directives in
+tools/ocpidoc/doc/index.rst.
+Use the ocpidoc command "ocpidoc create --help" to list the
+available templates.
 
 The procedure to convert a data sheet is:
 
 * Create the templates for the assets that the data sheet
 describes (typically a component and an HDL and/or RCC worker)
-with the ocpidoc create command.  You create the template
+with the "ocpidoc create" command.  You create the template
 in the same directory as the asset. For example, create
-the backpressure component in core/components, create the
-backpressure HDL worker in core/components/backpressure.hdl,
-and create the backpressure RCC worker in core/components/backpressure.rcc.
-Use the ocpidoc create --help command to see the types of
+the backpressure component in core/components/, create the
+backpressure HDL worker in core/components/backpressure.hdl/,
+and create the backpressure RCC worker in core/components/backpressure.rcc/.
+Use the "ocpidoc create --help" command to see the types of
 asset templates you can create.  Each template contains some
 skeleton instructions on how to fill them out.  
 
@@ -29,31 +32,34 @@ document about what parts of the data sheet go where.
 You can either copy and paste the data sheet’s LaTeX source
 into the template, removing the LaTeX markup and adding
 Sphinx/RST markup, or you can copy and paste from the PDF
-on opencpi.gitlab.io (develop) and then format it with Sphinx/RST markup.
+on opencpi.gitlab.io (develop) and then format it with
+Sphinx/RST markup.
 
 This procedure assumes that you are converting an asset
 that already has the directory file hierarchy in place
 (top-level project directory, component libraries directory,
-components directory, etc.).  The core and platform projects
-provide examples of this hierarchy, which varies depending on
-the project that contains the assets.  Look for the “index.rst”
-file at the top level of the project. This is the main directory
-file that points to all the asset subdirectories. There are
-subdirectory files (named components.rst for component libraries,
-and protocols.rst for protocols, for example) that exist in
-the target subdirectory.
+components directory, etc.) that the "ocpidoc" tool requires.
 
-Note that the currently converted core and platform assets follow
-the “sentence case” way to write headings (e.g., “OpenCPI core project,”
-“Data sink QADC”) rather than the title case that
-OpenCPI data sheets (mostly) use, for compatibility
-with the “SDR” asset docs.
+The hierarchy varies depending on the project that contains
+the assets. The core and platform projects provide examples.
+Look for the “index.rst” file at the top level of the project.
+This is the main document directory file that points to all
+the asset subdirectories. Each asset subdirectory has its
+own doc directory index file (named "components.rst" for component
+libraries and "protocols.rst" for protocols, for example)
+that points to asset documents that exist in the target subdirectory.
+
+The "OpenCPI User Guide" describes how to document an OpenCPI
+asset from scratch and provides general information about
+using the templates and "ocpidoc" that may also be useful
+when converting an existing document to use the "ocpidoc" tool.
+
 
 How to Map Data Sheet Content to a Component Template
 -----------------------------------------------------
 
-The component template is created in the <component-name>.comp
-directory and is named <component>-index.rst.  Here is an outline
+The component template is created in the "<component-name>.comp"
+directory and is named "<component>-index.rst".  Here is an outline
 of the component template and an explanation of how to map pieces
 of the data sheet to headings in this outline. In this list, (h1)
 indicates a first-level heading, (h2) indicates a second-level heading...
@@ -80,42 +86,39 @@ In this section:
   
 * Move the figure from the “Block Diagram” data sheet
   section here unless it shows worker parameters.
-  However, it’s possible that a block diagram with the
-  worker parameters is also appropriate for this section, since the title 
+  However, it's possible that an existing block diagram
+  with worker parameters could be appropriate for this
+  section with some editing to remove the
+  worker-specific information.
 
 (h1) Interface
-The component spec XML automatically pulled into this section when
-you run ocpidoc to create the template. You don’t need to do
+The component spec XML is automatically pulled into this section when
+you run "ocpidoc create" to create the template. You don’t need to do
 anything here unless the component spec is in a non-standard location.
 
-(h2) Ports
-The “port” directive (ocpi_documentation_ports) automatically
-generates bulleted lists of port information under the
-headings “Inputs:” and “Outputs:”. If the data sheet has
-additional information in the “Component Ports” table, add it here by hand.
-
-(h2) Opcode handling
+(h2) Opcode Handling
 This information is not supplied in the OpenCPI data sheets,
-so there’s nothing to do here. I added the placeholder text
-“To be supplied” into this section. Note that if you
-do have opcode handling information, you must add it by hand (it’s not automated). 
+so there’s nothing to do here. You can delete the section heading.
+Note that if you do have opcode handling information, you must
+add it by hand ("ocpidoc" doesn't provide any automation for
+generating it). 
 
 (h2) Properties
-The “properties” directive (ocpi_documentation_properties)
-automatically generates bulleted lists of property information
-from the component spec XML. If the data sheet’s
-“Component Spec Properties” table has additional information,
+The “properties” directive ("ocpi_documentation_properties", which is
+a custom Sphinx directive provided by ocpidoc) automatically generates
+bulleted lists of property information from the component spec XML. If
+the data sheet’s “Component Spec Properties” table has additional
+information, add it here by hand.
+
+(h2) Ports
+The “port” directive ("ocpi_documentation_ports", which is a custom Sphinx
+directive provided by ocpidoc) automatically generates bulleted
+lists of port information under the headings “Inputs:” and “Outputs:”.
+If the data sheet has additional information in the “Component Ports” table,
 add it here by hand.
 
-(h2) Parameters
-The “properties” directive used with the “parameters” option
-creates bulleted lists of property information from the
-component spec XML. If the data sheet’s “Component Spec Properties”
-table (it mixes properties and parameters) contains
-additional information, add it by hand.
-
 (h1) Implementations
-The “implementation” directive (ocpi_documentation_implementation)
+The “implementation” directive ("ocpi_documentation_implementation")
 generates a bulleted list of the implemented workers and links to
 the worker pages. If you’ve added any descriptive information about
 the worker to the top of the worker template, it is also included here.
@@ -124,10 +127,10 @@ Note about the auto-generated links to the workers: the generated
 this is because Sphinx/RST syntax for creating a link
 doesn’t let you put it on the inline-coded worker name.
 
-(h1) Example application
+(h1) Example Application
 This XML file (example_app.xml) is automatically created
-when you use ocpidoc create <component>. It exists
-in the <component-name>.comp directory created by ocpidoc.
+when you use "ocpidoc create <component>". It exists
+in the "<component-name>.comp" directory created by ocpidoc.
 It contains instructions on what to do with it. The data
 sheets don’t provide example applications. Edit
 this file with a meaningful example if you have one. 
@@ -152,19 +155,18 @@ list and you either fill it in by hand or enter “None”.
 (h1) Testing
 Move the descriptive information in the data sheet’s
 “Test and Verification” section here. The 
-“test summary” directive (ocpi_documentation_test_result_summary)
+“test summary” directive ("ocpi_documentation_test_result_summary")
 generates a “testing table summary” here but it doesn’t currently work.
-Have asked maintainers for help. The information will link
-to information that is automatically generated
-by the “testing detail” directive that’s used
-in the <component-name>-test.rst file (ocpi_documentation_test_detail).
+The information will link to information that is automatically generated
+by the “testing detail” directive that’s used in the
+"<component-name>-test.rst" file ("ocpi_documentation_test_detail").
 
 Worker Template Outline
 -----------------------
 
-The worker template <worker_name>-worker.rst is created in
+The worker template "<worker_name>-worker.rst" is created in
 the same RCC or HDL subdirectory as the worker OWD and code files.
-The ocpidoc create command knows from your location whether
+The "ocpidoc create" command knows from your location whether
 the worker is HDL or RCC.
 
 (Title) <component-code-name> HDL | RCC worker
@@ -191,18 +193,16 @@ section here if it shows worker parameters.
 * If the data sheet contains finite state machine,
 control timing and signals sections, add these as
 separate h1 sections after the “Detail” section
-and before the “Utilisation” section.
+and before the “Utilization” section.
 	
-* For HDL workers: the “worker” directive automatically creates
-two sub-section heads: “Worker Properties” and “Worker Parameters”
-underneath the manually added information and fills them
-with bulleted lists of information taken from the worker XML.
+* For HDL workers: the “worker” ("ocpi_documentation_worker")
+directive automatically creates the sub-section heading
+“Worker Properties” underneath the manually-added information
+and fills them with bulleted lists of information taken from
+the worker XML.
 
 Note: the “worker” directive does not currently pull the following
 information from the worker XML:
-
-* SpecProperty elements (so worker parameters defined
-this way are not automatically generated)
 
 * Worker ports information. This means that the information
 in the “Worker Interfaces” section of the data sheet is not
@@ -210,25 +210,24 @@ automatically generated and needs to be added by hand. See
 the converted HDL workers in the core and platform projects
 for examples of how to format this information.
 
-(h1) Utilisation
-This is currently an empty template heading. The new tools
-haven’t implemented the directive that autogenerates
-the information for it yet.
+(h1) Utilization
+This is currently an empty template heading. The 
+the directive that autogenerates the information
+for it is not currently implemented.
 
 Test Template Outline
 ---------------------
 
 This template is automatically created when you use
-ocpidoc create <component>. It exists in the <component-name>.comp
-directory created by ocpidoc and is named <component>-test.rst.
-The only thing it contains is the “testing details” directive.
+"ocpidoc create <component>". It exists in the
+"<component-name>.comp" directory created by ocpidoc
+and is named "<component>-test.rst". The only thing it
+contains is the “testing details” directive.
 I haven’t been able to get that to work so I don’t know
-what the output looks like. 
+what the HTML output generated by the directive looks like. 
 
 Primitive Template Outline
 --------------------------
-
-All the SDR primitives are organized into libraries. 
 
 The template has the following outline:
 
@@ -270,6 +269,18 @@ in the right place (the /specs directory) automatically includes
 the protocol spec XML. The protocol pages also include
 the metadata XML that the protocol spec XML references in
 the “Protocol” section. That was done manually.
+
+Application Template Outline
+----------------------------
+The application template generated by the command
+"ocpidoc create application <application-name>"
+is based on the outlines used in most of the existing
+OpenCPI application data sheets. Consequently, the
+section headings used in the template correspond one-to-one
+with the section headings used in the existing data sheets.
+Just copy the information from the old existing section
+to the corresponding section in the template and apply
+the appropriate RST/Sphinx syntax.
 
 Converting Figures
 ------------------

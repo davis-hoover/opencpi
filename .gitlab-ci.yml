@@ -1,17 +1,30 @@
 workflow:
   rules:
-    - when: always
+    - if: '$CI_COMMIT_TAG' 
+    # Always run pipelines for tags
+      when: always
+    - if: '$CI_COMMIT_REF_NAME == "develop"' 
+    # Always run pipelines for develop
+      when: always
+    - if: '$CI_PIPELINE_SOURCE == "push"' 
+    # Never run pipelines for pushes (except for develop and tags)
+      when: never
+    - when: always # Run for all other conditions
 
-trigger-children:
-  stage: trigger-children
-  trigger:
-    include:
-    - artifact: .gitlab-ci.yml
-      job: generate-children
-    strategy: depend
-  variables:
-    CI_ROOT_SOURCE: "$CI_PIPELINE_SOURCE"
-    CI_ROOT_ID: "$CI_PIPELINE_ID"
+include: 
+- .gitlab-ci/yaml/verify-pipeline.yml
+- .gitlab-ci/yaml/docs.yml
+
+stages:
+- .pre
+- generate-children
+- generate
+- trigger-children
+- trigger
+- build
+- deploy
+
+# Old pipeline. Runs when the env var 'CI_OCPI_PIPELINE' is not set to "new"
 generate-children:
   artifacts:
     paths:
@@ -24,12 +37,52 @@ generate-children:
   stage: generate-children
   tags:
   - docker
-stages:
-- .pre
-- generate-children
-- trigger-children
-- build
-- deploy
-include: 
-- .gitlab-ci/yaml/verify-pipeline.yml
-- .gitlab-ci/yaml/docs.yml
+  rules:
+    - if: "$CI_OCPI_PIPELINE != 'new'"
+      when: always
+    - when: never
+trigger-children:
+  stage: trigger-children
+  trigger:
+    include:
+    - artifact: .gitlab-ci.yml
+      job: generate-children
+    strategy: depend
+  variables:
+    CI_ROOT_SOURCE: "$CI_PIPELINE_SOURCE"
+    CI_ROOT_ID: "$CI_PIPELINE_ID"
+  rules:
+    - if: "$CI_OCPI_PIPELINE != 'new'"
+      when: on_success
+    - when: never
+
+# New pipeline. env var CI_OCPI_PIPELINE must be set to 'new' to run
+generate:
+  artifacts:
+    paths:
+    - .gitlab-ci.yml
+  image: centos:7
+  script:
+  - yum install epel-release -y
+  - yum install python36-PyYAML -y
+  - .gitlab-ci/scripts/ci_generate_pipeline.py host
+  stage: generate
+  tags:
+  - docker
+  rules:
+    - if: "$CI_OCPI_PIPELINE == 'new'"
+      when: always
+    - when: never
+trigger:
+  stage: trigger
+  trigger:
+    include:
+    - artifact: .gitlab-ci.yml
+      job: generate
+    strategy: depend
+  variables:
+    CI_OCPI_ROOT_ID: "$CI_PIPELINE_ID"
+  rules:
+    - if: "$CI_OCPI_PIPELINE == 'new'"
+      when: on_success
+    - when: never

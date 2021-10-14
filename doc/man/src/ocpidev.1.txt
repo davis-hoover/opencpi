@@ -25,6 +25,9 @@ Options can occur anywhere in the command for the user's convenience.
 The general usage concept is: perform the '<verb>' operation on the
 '<noun>' asset type whose name is '<name>'.
 
+Man pages are available for *`ocpidev`* verbs and nouns by typing
+the command *`man ocpidev-`*'<verb>' or *`man ocpidev-`*'<noun>'.
+
 
 VERBS
 -----
@@ -58,7 +61,7 @@ The verbs supported by *`ocpidev`* are:
     Register/unregister a project in its registry.
 
 *`set`*, *`unset`*::
-    Set/unset the registry used by the current project.
+    Set/unset the registry used by the project.
 
 *`utilization`*::
     Display or record FPGA resource use for HDL OpenCPI assets.
@@ -193,23 +196,36 @@ See the main web site: https://www.opencpi.org
 
 SEE ALSO
 --------
+link:ocpidev-application.1.html[ocpidev-application(1)]
+link:ocpidev-assembly.1.html[ocpidev-assembly(1)]
 link:ocpidev-build.1.html[ocpidev-build(1)]
+link:ocpidev-card.1.html[ocpidev-card(1)]
 link:ocpidev-clean.1.html[ocpidev-clean(1)]
+link:ocpidev-component.1.html[ocpidev-component(1)]
 link:ocpidev-create.1.html[ocpidev-create(1)]
 link:ocpidev-delete.1.html[ocpidev-delete(1)]
+link:ocpidev-device.1.html[ocpidev-device(1)]
+link:ocpidev-library.1.html[ocpidev-library(1)]
+link:ocpidev-platform.1.html[ocpidev-platform(1)]
+link:ocpidev-primitive.1.html[ocpidev-primitive(1)]
+link:ocpidev-project.1.html[ocpidev-project(1)]
+link:ocpidev-protocol.1.html[ocpidev-protocol(1)]
 link:ocpidev-refresh.1.html[ocpidev-refresh(1)]
 link:ocpidev-register.1.html[ocpidev-register(1)]
+link:ocpidev-registry.1.html[ocpidev-registry(1)]
 link:ocpidev-run.1.html[ocpidev-run(1)]
 link:ocpidev-set.1.html[ocpidev-set(1)]
 link:ocpidev-show.1.html[ocpidev-show(1)]
+link:ocpidev-slot.1.html[ocpidev-slot(1)]
+link:ocpidev-test.1.html[ocpidev-test(1)]
 link:ocpidev-unregister.1.html[ocpidev-unregister(1)]
 link:ocpidev-unset.1.html[ocpidev-unset(1)]
 link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
-
+link:ocpidev-worker.1.html[ocpidev-worker(1)]
 
 COPYING
 -------
-Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2021 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your

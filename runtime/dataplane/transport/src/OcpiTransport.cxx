@@ -32,9 +32,9 @@
 
 #include <unistd.h>
 #include <algorithm>
-#include "OcpiOsMutex.h"
-#include "OcpiOsMisc.h"
-#include "OcpiOsAssert.h"
+#include "OsMutex.hh"
+#include "OsMisc.hh"
+#include "OsAssert.hh"
 #include "OcpiList.h"
 #include "OcpiUtilHash.h"
 #include "OcpiUtilAutoMutex.h"

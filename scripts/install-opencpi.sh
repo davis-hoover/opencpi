@@ -23,6 +23,9 @@
   exit 1
 }
 set -e
+for envar in $(env | egrep ^OCPI | sort | cut -f1 -d=); do
+  unset $envar
+done
 
 #
 # Quick and dirty argument parsing:
@@ -118,5 +121,5 @@ elif [ -n "$minimal" ]; then
   echo "Avoiding installation tests since the --minimal option was given."
   echo 'Installation tests may be run at any time using the "ocpitest --nohdl" command.'
 else
-  eval $* ./scripts/test-opencpi.sh --no-hdl
+  eval $* ./scripts/test-opencpi.sh --no-hdl ${nokernel:+--no-kernel}
 fi

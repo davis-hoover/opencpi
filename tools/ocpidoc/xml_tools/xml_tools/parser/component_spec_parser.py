@@ -50,8 +50,9 @@ class ComponentSpecParser(property_spec_parser.PropertySpecParser):
         root_tag = "componentspec"
         file_root_tag = self._get_root_tag()
         if not file_root_tag == root_tag:
-            raise ValueError(
-                f"Root XML tag must be {root_tag}, not {file_root_tag}")
+            # This allows an OWD file to be parsed as an OCS should it contain
+            # a "componentspec" element
+            self._xml_root = self._xml_root.find(".//componentspec")
 
     def get_dictionary(self):
         """ Gets a dictionary containing OpenCPI component information.

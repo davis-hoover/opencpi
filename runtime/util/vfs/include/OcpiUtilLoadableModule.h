@@ -38,7 +38,7 @@
  *
  */
 
-#include <OcpiOsLoadableModule.h>
+#include "OsLoadableModule.hh"
 #include <OcpiUtilVfs.h>
 #include <string>
 

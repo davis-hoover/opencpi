@@ -20,6 +20,8 @@
 
 #include <cassert>
 #include <climits>
+#include <array>
+#include <algorithm>
 #include "hdl.h"
 #include "assembly.h"
 
@@ -495,75 +497,145 @@ emitConnectionSignal(FILE */*f*/, bool /*output*/, Language /*lang*/, bool /*clo
 }
 
 void Port::
-emitPortSignals(FILE *f, const InstancePort &ip, Language /*lang*/, const char *indent,
-		bool &any, std::string &comment, std::string &last, const char *myComment,
-		std::string &/*exprs*/) {
-  const Attachments &atts = ip.m_attachments;
-  doPrev(f, last, comment, myComment);
-  std::string in, out, index, empty;
+emitPortAttachment(std::string *pmaps, bool any, const char *indent, Attachment *at, Attachment *otherAt,
+		   const std::string &mName, const std::string &sName, size_t a_count,
+		   bool &inputDone, bool &outputDone) {
+  std::string in, out, empty;
   OU::format(in, typeNameIn.c_str(), "");
   OU::format(out, typeNameOut.c_str(), "");
-  Attachment *at = atts.size() ? atts.front() : NULL;
-  assert(!at || at->m_instPort.m_port == this);
-  std::string mName, sName;
-  Attachment *otherAt = NULL;
-  if (atts.size()) {
-    Connection &c = at->m_connection;
-    // We need to know the indexing of the other attachment
-    for (AttachmentsIter ai = c.m_attachments.begin(); ai != c.m_attachments.end(); ai++)
-      if (*ai != at) {
-	otherAt = *ai;
-	break;
-      }
-    assert(otherAt);
-    // Indexing is necessary only when we are smaller than the other
-    if (m_arrayCount < otherAt->m_instPort.m_port->m_arrayCount) {
-      if (c.m_count > 1 || isArray())
-	OU::format(index, "(%zu to %zu)", otherAt->m_index, otherAt->m_index + c.m_count - 1);
-      else
-	OU::format(index, "(%zu)", otherAt->m_index);
-    }
-    OU::format(mName, c.m_masterName.c_str(), "");
-    OU::format(sName, c.m_slaveName.c_str(), "");
-#if 0 // busted until m_count=0 indicates non-array ports properly
-    // If the instance port is an array but the other is not, index the instance port
-    if ((m_arrayCount || !m_countExpr.empty()) && otherAt->m_instPort.m_port->m_arrayCount <= 1) {
-      in += "(0)";
-      out += "(0)";
-    }
-#endif
-  } else
-    mName = sName = "open";
-  InstancePort *other;
-  // input, then output
-  if (haveInputs()) {
-    other = at && at->m_instPort.m_signalIn.empty() ? &otherAt->m_instPort : NULL;
-    emitPortSignal(f, any, indent, in, m_master ? (at ? sName : empty) : (at ? mName : empty),
-		   index, false, other ? other->m_port : NULL, other && other->m_external);
-    any = true;
+
+  // Indexing is necessary only when we are smaller than the other OR
+  // the other is not an array but we are
+  std::string fIndex;
+  if (at && isArray() &&
+      (a_count < m_arrayCount || !otherAt->m_instPort.m_port->isArray())) {
+    if (a_count > 1)
+      OU::format(fIndex, "(%zu to %zu)", at->m_index, at->m_index + a_count - 1);
+    else
+      OU::format(fIndex, "(%zu)", at->m_index);
   }
-  if (haveOutputs()) {
-    if (haveInputs())
-      fprintf(f, ",\n");
-    other = at && at->m_instPort.m_signalOut.empty() ? &otherAt->m_instPort : NULL;
-    emitPortSignal(f, any, indent, out, m_master ? mName : sName, index, true,
+  // input, then output
+  if (haveInputs() && !inputDone) {
+    std::string aIndex;
+    InstancePort *other = NULL;
+    if (at) {
+      if (at->m_instPort.m_signalIn.empty()) { // no signal for this port, use other's
+	other = &otherAt->m_instPort;
+	if (otherAt->m_instPort.m_port->isArray() &&
+	    (!isArray() || a_count < otherAt->m_instPort.m_port->m_arrayCount)) {
+	  if (a_count > 1 || (isArray() && a_count == m_arrayCount))
+	    OU::format(aIndex, "(%zu to %zu)", otherAt->m_index, otherAt->m_index + a_count - 1);
+	  else
+	    OU::format(aIndex, "(%zu)", otherAt->m_index);
+	}
+      } else { // connection signal is for this port, one and done
+	inputDone = true;
+	fIndex.clear(); // no index required after all
+	// if (isArray() && a_count < m_arrayCount) // a subset of the array is being connected
+	// aIndex = fIndex;
+      }
+    }
+    emitPortSignal(&pmaps[0], any, indent, in, m_master ? (at ? sName : empty) : (at ? mName : empty),
+		   fIndex, aIndex, a_count, false, other ? other->m_port : NULL, other && other->m_external);
+  }
+  if (haveOutputs() && !outputDone) {
+    std::string aIndex;
+    InstancePort *other = NULL;
+    if (at) {
+      if (at->m_instPort.m_signalOut.empty()) {
+	other = &otherAt->m_instPort;
+	if (otherAt->m_instPort.m_port->isArray() &&
+	    a_count < otherAt->m_instPort.m_port->m_arrayCount) { // a subset of the array is being connected
+	  if (a_count > 1 || (isArray() && a_count == m_arrayCount))
+	    OU::format(aIndex, "(%zu to %zu)", otherAt->m_index, otherAt->m_index + a_count - 1);
+	  else
+	    OU::format(aIndex, "(%zu)", otherAt->m_index);
+	}
+      } else { // connection signal is for this port
+	// if (isArray() && a_count < m_arrayCount) // a subset of the array is being connected
+	// aIndex = fIndex;
+	// else
+	outputDone = true;
+	fIndex.clear(); // no index required after all
+      }
+    }
+    emitPortSignal(&pmaps[2], any, indent, out, m_master ? mName : sName, fIndex, aIndex, a_count, true,
 		   other ? other->m_port : NULL, other && other->m_external);
   }
 }
 
 void Port::
-emitPortSignal(FILE *f, bool any, const char *indent, const std::string &fName,
-	       const std::string &aName, const std::string &index, bool /*output*/,
-	       const Port */*signalPort*/, bool /*external*/) {
-  fprintf(f, "%s%s => ", any ? indent : "", fName.c_str());
+emitPortSignals(FILE *f, const InstancePort &ip, Language /*lang*/, const char *indent,
+		bool &any, std::string &comment, std::string &last, const char *myComment,
+		std::string &/*exprs*/) {
+  std::string in, out, index, empty;
+  OU::format(in, typeNameIn.c_str(), "");
+  OU::format(out, typeNameOut.c_str(), "");
+  std::string mName, sName;
+  std::array<std::string,4> pmaps;
+  bool inputDone = false, outputDone = false;
+  if (ip.m_attachments.size() == 0)
+    emitPortAttachment(&pmaps[0], any, indent, NULL, NULL, mName, sName, 0, inputDone, outputDone);
+  else {
+    // VHDL has a big problem with port maps with indexed formals.
+    // They *must* be index-contiguous according to the LRM (seems truly idiotic...)
+    // So we must sort the attachments by index, and then
+    // keep the inputs and outputs separate and not interleaved.
+    // And since SDP has separate data signals we need to de-interleave all 4 port mappings. UGH
+    struct {
+      bool operator()(Attachment *a, Attachment *b) const { return a->m_index < b->m_index; }
+    } customless;
+    std::sort(ip.m_attachments.begin(), ip.m_attachments.end(), customless);
+
+    for (auto ait = ip.m_attachments.begin(); ait != ip.m_attachments.end(); ++ait) {
+      Attachment &at = **ait;
+      assert(at.m_instPort.m_port == this);
+      Attachment *otherAt = NULL;
+      Connection &c = at.m_connection;
+      // We need to know the indexing of the other attachment
+      for (AttachmentsIter ai = c.m_attachments.begin(); ai != c.m_attachments.end(); ai++)
+	if (*ai != &at) {
+	  otherAt = *ai;
+	  break;
+	}
+      assert(otherAt);
+      OU::format(mName, c.m_masterName.c_str(), "");
+      OU::format(sName, c.m_slaveName.c_str(), "");
+      emitPortAttachment(&pmaps[0], any, indent, &at, otherAt, mName, sName, c.m_count, inputDone,
+			 outputDone);
+    }
+  }
+  // close off previous port's signals
+  doPrev(f, last, comment, myComment);
+  bool first = true;
+  for (auto it = pmaps.begin(); it != pmaps.end(); ++it)
+    if (it->length()) {
+      if (first) {
+	if (any)
+	  fputs(indent, f);
+      } else
+	fprintf(f, ",\n%s", indent);
+      first = false;
+      any = true;
+      fputs(it->c_str(), f);
+    }
+}
+
+void Port::
+emitPortSignal(std::string *pmaps, bool /*any*/, const char *indent, const std::string &fName,
+	       const std::string &aName, const std::string &fIndex, const std::string &aIndex,
+	       size_t /*count*/, bool output, const Port */*signalPort*/, bool /*external*/) {
+  if (pmaps->size())
+    OU::formatAdd(*pmaps, ",\n%s", indent);  
+  OU::formatAdd(*pmaps, "%s%s => ", fName.c_str(), fIndex.c_str());
   if (aName.empty()) {
-    const char *missing = m_master ? slaveMissing() : masterMissing();
-    if (isArray())
-      fprintf(f, "(others => %s)", missing);
+    const char *missing = output ? "open" : m_master ? slaveMissing() : masterMissing();
+    if (isArray() && !output)
+      OU::formatAdd(*pmaps, "(others => %s)", missing);
     else
-      fprintf(f, "%s", missing);
+      OU::formatAdd(*pmaps, "%s", missing);
   } else
-    fprintf(f, "%s%s", aName.c_str(), index.c_str());
+    OU::formatAdd(*pmaps, "%s%s", aName.c_str(), aIndex.c_str());
 }
 
 void Port::
@@ -851,7 +923,7 @@ emitPortSignals(FILE *f, const InstancePort &ip, Language /*lang*/, const char *
 	  any ? indent : "",
 	  m_master ? out.c_str() : in.c_str());
   //	fputs(p.master ? c.m_masterName.c_str() : c.m_slaveName.c_str(), f);
-  const Attachment *at = atts.front();
+  const Attachment *at = atts.size() ? atts.front() : NULL;
   const Connection *c = at ? &at->m_connection : NULL;
   fputs(at ? c->m_masterName.c_str() : "open", f);
 }
@@ -941,26 +1013,6 @@ void TimeBasePort::
 emitVHDLSignalWrapperPortMap(FILE *f, std::string &last) {
   emitVHDLShellPortMap(f, last);
 }
-
-#if 0
-void TimeBasePort::
-emitPortSignals(FILE *f, Attachments &atts, Language /*lang*/, const char *indent,
-		bool &any, std::string &comment, std::string &last, const char *myComment,
-		OcpAdapt */*adapt*/) {
-  doPrev(f, last, comment, myComment);
-  std::string in, out;
-  OU::format(in, typeNameIn.c_str(), "");
-  OU::format(out, typeNameOut.c_str(), "");
-  // Only one direction - master outputs to slave
-  fprintf(f, "%s%s => ",
-	  any ? indent : "",
-	  m_master ? out.c_str() : in.c_str());
-  //	fputs(p.master ? c.m_masterName.c_str() : c.m_slaveName.c_str(), f);
-  Attachment *at = atts.front();
-  Connection *c = at ? &at->m_connection : NULL;
-  fputs(at ? c->m_masterName.c_str() : "open", f);
-}
-#endif
 
 void TimeBasePort::
 emitConnectionSignal(FILE *f, bool output, Language /*lang*/, bool /*clock*/, std::string &signal) {

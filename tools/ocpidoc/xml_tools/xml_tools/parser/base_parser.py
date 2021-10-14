@@ -23,6 +23,7 @@
 import re
 import xml.etree.ElementTree as ET
 import os.path
+import textwrap
 
 
 class BaseParser():
@@ -77,6 +78,14 @@ class BaseParser():
                 not used here so just interface formatting.
         """
         pass
+
+    def getroot(self):
+        """ Gets the root element in the parsed XML file.
+
+        Returns:
+            Root element of the parsed XML file.
+        """
+        return self._xml_root
 
     def _load_xml_file(self, force_lowercase):
         """ Load XML file.
@@ -361,7 +370,7 @@ class BaseParser():
             String containing data in XML format where all xi:include elements
             have been either resolved or removed.
         """
-        # Loop through of all xi:include elements in the XML string
+        # Loop through all xi:include elements in the XML string
         for include in self._get_xml_includes(xml_string):
             # Extract the filename specified by the XML include statement
             filename = self._get_xml_include_filename(include)
@@ -387,6 +396,8 @@ class BaseParser():
                 version_pattern, "", xml_include_string)
             # Use a regex to repace the full xi:include element with the
             # contents of the specified file (minus the XML version tag).
+            indent = include.split("<xi")[0]
+            xml_include_string = textwrap.indent(xml_include_string, indent)
             xml_string = re.sub(include, xml_include_string, xml_string)
             # If no file could be found in the search path, then just remove
             # the XML include statement and show a warning.
@@ -409,11 +420,11 @@ class BaseParser():
 
         Returns:
             List containing a string for all xi:include elements found within
-            the input XML data.
+            the input XML data, including indentation.
         """
-        # NB. only matches when there are no arguments other than href.
+        # NB. includes arguments other than just href.
         include_files = re.findall(
-            r"<xi:include +href *= *[\"'][^>]*[\"'] */>", xml_string)
+            r".*<xi:include +href *= *[\"'][^>]*[\"'] */>", xml_string)
         return include_files
 
     def _get_xml_include_filename(self, xi_include_string):
@@ -428,11 +439,14 @@ class BaseParser():
             element.
         """
         # Use a regex group to extract just the filename
-        # NB. only matches when there are no arguments other than href.
         result = re.findall(
-            r"^<xi:include +href *= *[\"']([^>]*)[\"'] */>$",
+            r"<xi:include +href *= *[\"']([^>]*)[\"'] */>$",
             xi_include_string)
         if result:
-            return result[0]
+            # Remove other arguments if they exist
+            include_file = result[0].replace("'", "\"").split("\"")[0]
+            if not include_file.endswith(".xml"):
+                include_file += ".xml"
+            return include_file
         else:
             return None

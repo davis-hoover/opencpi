@@ -22,7 +22,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <memory>
-#include "OcpiOsFileSystem.h"
+#include "OsFileSystem.hh"
 #include "OcpiDriverManager.h"
 #include "OcpiLibraryManager.h"
 #include "wip.h"

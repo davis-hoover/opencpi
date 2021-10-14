@@ -20,7 +20,7 @@
 
 #ifndef OCPI_RES_H
 #define OCPI_RES_H
-#include <OcpiOsDataTypes.h>
+#include "OsDataTypes.hh"
 #include <cstdlib>
 #include <memory>
 

@@ -36,7 +36,7 @@
 #define RCC_CONTAINER_H_
 
 #include "pthread_workqueue.h"
-#include "OcpiOsSemaphore.h"
+#include "OsSemaphore.hh"
 #include "RccApplication.h"
 #include "RccDriver.h"
 

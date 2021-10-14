@@ -37,9 +37,9 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "OcpiOsAssert.h"
-#include "OcpiOsSizeCheck.h"
-#include "OcpiOsMisc.h"
+#include "OsAssert.hh"
+#include "OsSizeCheck.hh"
+#include "OsMisc.hh"
 #include "OcpiUtilHash.h"
 #include "OcpiUtilMisc.h"
 #include "OcpiRes.h"

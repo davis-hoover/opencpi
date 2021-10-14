@@ -16,6 +16,11 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+# A utility function that should have been here all along.
+function bad {
+    echo Error: $* 1>&2
+    exit 1
+}
 ##########################################################################################
 # Get the project registry directory. This is OCPI_PROJECT_REGISTRY_DIR,
 # or OCPI_ROOT_DIR/project-registry, or /opt/opencpi/cdk.
@@ -207,6 +212,61 @@ function ocpiDirType {
 }
 
 OcpiEcho=/bin/echo
+
+# Parse project file but do not depend on any OpenCPI binaries
+# Clearly a good candidate for python
+function getattr {
+  sed s/$1/$1/i Project.xml | xmllint --xpath "string(/project/@$1)" -
+}
+
+function getvar {
+  sed -n "s/^ *$1:*= *\([^#]*\)/\1/p" Project.mk
+}
+
+function getproject {
+  if [ -f Project.xml ]; then
+    packagedeps=`getattr projectdependencies`
+    packagename=`getattr packagename`
+    packageprefix=`getattr packageprefix`
+    package=`getattr package`
+    packageid=`getattr packageid`
+  elif [ -f Project.mk ]; then
+    packagedeps=`getvar ProjectDependencies`
+    packagename=`getvar PackageName`
+    packageprefix=`getvar PackagePrefix`
+    package=`getvar Package`
+    packageid=`getvar PackageID`
+  else
+    bad Error: Project has no Project.xml or Project.mk
+  fi
+  # echo packagedeps=$packagedeps
+  # echo packagename=$packagename
+  # echo packageprefix=$packageprefix
+  # echo package=$package
+  # echo packageid=$packageid
+
+  if [ -z "$packageid" ]; then
+    if [ -n "$package" ]; then
+      packageid=$package
+    else
+      [ -n "$packageprefix" ] || packageprefix=local
+      [ -n "$packagename" ] || packagename=$(basename $(ocpiReadLinkE .))
+      packageid=$packageprefix.$packagename
+    fi
+  fi
+}
+
+function checkAssetName {
+  # If the asset name contains anything other than letters,
+  # digits, and underscores, there is a problem.  Likewise,
+  # asset names cannot begin with an underscore or a digit.
+  aname=$1
+  if [[ ! "$aname" =~ ^[A-Za-z0-9_]+$ ]]; then
+    bad asset name \"$aname\" contains an illegal character
+  elif [[ "$aname" =~ ^_ || "$aname" =~ ^[0-9] ]]; then
+    bad asset name \"$aname\" begins with an illegal character
+  fi
+}
 
 if [ "$1" = __test__ ] ; then
   if eval findInProjectPath $2 $3 result ; then
