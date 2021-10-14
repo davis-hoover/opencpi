@@ -64,10 +64,33 @@ def list_item_name_code_value(name, value):
     if name[-2] != ":":
         name = name[:-1] + ": "
 
+    value = str(value)
+
     item = docutils.nodes.list_item()
     item_text = docutils.nodes.paragraph(text=name)
-    item_text.append(docutils.nodes.literal(text=value))
-    item.append(item_text)
+
+    # 'value' can be a large array, so limit the number of characters per line
+    # by inserting a line break after the commas that occur before the
+    # character limit
+    character_limit = 80
+    while True:
+        value_limited = ""
+        while value != "":
+            comma_index = value.find(",")
+            if comma_index == -1:
+                comma_index = len(value) - 1
+            new_line_length = len(value_limited) + comma_index + 1
+            if value_limited == "" or new_line_length <= character_limit:
+                value_limited += value[:comma_index + 1]
+                value = value[comma_index + 1:]
+            else:
+                break
+        item_text.append(docutils.nodes.literal(text=value_limited))
+        if value != "":
+            item_text.append(docutils.nodes.paragraph("\n"))
+        else:
+            item.append(item_text)
+            break
 
     return item
 
