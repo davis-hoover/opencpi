@@ -26,9 +26,9 @@
 #include <cstring>
 #include "OcpiUtilEzxml.h"
 #include "OcpiUtilMisc.h"
-#include "OcpiUtilDataTypes.h"
-#include "OcpiUtilValue.h"
-#include "OcpiPValue.h"
+#include "UtilDataTypes.hh"
+#include "UtilValue.hh"
+#include "UtilPValue.hh"
 
 namespace OU = OCPI::Util;
 namespace OE = OCPI::Util::EzXml;

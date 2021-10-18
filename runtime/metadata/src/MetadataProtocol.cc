@@ -23,14 +23,15 @@
 #include <strings.h>
 #include <climits>
 #include "OcpiUtilException.h"
-#include "OcpiUtilProtocol.h"
-#include "OcpiUtilValue.h"
+#include "MetadataProtocol.hh"
+#include "UtilValue.hh"
 #include "OcpiUtilMisc.h"
 
 namespace OCPI {
   namespace OA = OCPI::API;
+  namespace OU = OCPI::Util;
   namespace OE = OCPI::Util::EzXml;
-  namespace Util {
+  namespace Metadata {
 
     Operation::Operation()
       : m_isTwoWay(false), m_nArgs(0), m_args(NULL), m_nExceptions(0), m_exceptions(NULL),
@@ -56,7 +57,7 @@ namespace OCPI {
       m_qualifiedName = p->m_qualifiedName;
       m_isTwoWay = p->m_isTwoWay;
       m_nArgs = p->m_nArgs;
-      m_args = m_nArgs ? new Member[ m_nArgs ] : NULL;
+      m_args = m_nArgs ? new OU::Member[ m_nArgs ] : NULL;
       for (unsigned n = 0; n < m_nArgs; n++)
 	m_args[n] = p->m_args[n];
       m_nExceptions = p->m_nExceptions;
@@ -76,8 +77,8 @@ namespace OCPI {
 	return "Missing \"Name\" attribute for operation";
       for (Operation *o = p.m_operations; o < this; o++)
 	if (!strcasecmp(name, o->m_name.c_str()))
-	  return esprintf("Duplicate operation name \"%s\" in protocol \"%s\"",
-			  name, p.m_name.c_str());
+	  return OU::esprintf("Duplicate operation name \"%s\" in protocol \"%s\"",
+			      name, p.m_name.c_str());
       m_name = name;
       name = ezxml_cattr(op, "qualifiedname");
       if (name)
@@ -88,20 +89,20 @@ namespace OCPI {
 	return err;
       if (m_isTwoWay)
 	p.m_isTwoWay = true;
-      if (!(err = Member::parseMembers(op, m_nArgs, m_args, false, "argument", NULL))) {
+      if (!(err = OU::Member::parseMembers(op, m_nArgs, m_args, false, "argument", NULL))) {
 	if (m_nArgs == 1 &&
 	    ((m_args[0].isSequence() && m_args[0].isFixed()) ||
 	     (!m_args[0].isSequence() && m_args[0].m_baseType == OA::OCPI_String)))
 	  m_topFixedSequence = true;
-	err = Member::alignMembers(m_args, m_nArgs, maxAlignDummy, m_myOffset,
-				   p.m_dataValueWidth, p.m_diverseDataSizes,
-				   sub32dummy, p.m_isUnbounded, p.m_variableMessageLength,
-				   m_topFixedSequence);
+	err = OU::Member::alignMembers(m_args, m_nArgs, maxAlignDummy, m_myOffset,
+				       p.m_dataValueWidth, p.m_diverseDataSizes,
+				       sub32dummy, p.m_isUnbounded, p.m_variableMessageLength,
+				       m_topFixedSequence);
       }
       return err;
     }
-    Member *Operation::findArg(const char *name) const {
-      Member *a = m_args;
+    OU::Member *Operation::findArg(const char *name) const {
+      OU::Member *a = m_args;
       for (unsigned n = 0; n < m_nArgs; n++, a++)
 	if (!strcasecmp(name, a->m_name.c_str()))
 	  return a;
@@ -112,7 +113,7 @@ namespace OCPI {
     defaultLength() const {
       size_t length = m_myOffset;
       if (args()) {
-	Member &m = args()[nArgs()-1];
+	OU::Member &m = args()[nArgs()-1];
 	if (m.m_isSequence)
 	  if (nArgs() == 1)
 	    length = 0;
@@ -132,26 +133,26 @@ namespace OCPI {
     }
 
     void Operation::printXML(std::string &out, unsigned indent) const {
-      formatAdd(out, "%*s<operation", indent * 2, "");
+      OU::formatAdd(out, "%*s<operation", indent * 2, "");
       if (!m_name.empty())
-	formatAdd(out, " name=\"%s\"", m_name.c_str());
+	OU::formatAdd(out, " name=\"%s\"", m_name.c_str());
       if (!m_qualifiedName.empty())
-	formatAdd(out, " qualifiedName=\"%s\"", m_qualifiedName.c_str());
+	OU::formatAdd(out, " qualifiedName=\"%s\"", m_qualifiedName.c_str());
       if (m_nArgs) {
-	formatAdd(out, ">\n");
-	Member *a = m_args;
+	OU::formatAdd(out, ">\n");
+	OU::Member *a = m_args;
 	for (unsigned n = 0; n < m_nArgs; n++, a++)
 	  a->printXML(out, "argument", indent + 1);
-	formatAdd(out, "%*s</operation>\n", indent * 2, "");
+	OU::formatAdd(out, "%*s</operation>\n", indent * 2, "");
       } else
-	formatAdd(out, "/>\n");
+	OU::formatAdd(out, "/>\n");
     }
-    void Operation::write(Writer &writer, const uint8_t *data, size_t length) {
+    void Operation::write(OU::Writer &writer, const uint8_t *data, size_t length) {
       for (size_t n = 0; n < m_nArgs; n++)
 	m_args[n].write(writer, data, length, isTopFixedSequence());
     }
 
-    size_t Operation::read(Reader &reader, uint8_t *data, size_t maxLength) {
+    size_t Operation::read(OU::Reader &reader, uint8_t *data, size_t maxLength) {
       size_t max = maxLength;
       bool fake = data == NULL;
       for (unsigned n = 0; n < m_nArgs; n++)
@@ -162,7 +163,7 @@ namespace OCPI {
     void Operation::generate(const char *name, Protocol &p) {
       m_name = name;
       m_nArgs = (unsigned long)random() % 10u;
-      Member *m = m_args = m_nArgs ? new Member[m_nArgs] : NULL;
+      OU::Member *m = m_args = m_nArgs ? new OU::Member[m_nArgs] : NULL;
       for (unsigned n = 0; n < m_nArgs; n++, m++) {
 	char *aname;
 	ocpiCheck(asprintf(&aname, "arg%d", n) > 0);
@@ -172,21 +173,21 @@ namespace OCPI {
       const char *err;
       bool sub32dummy = false;
       size_t maxAlignDummy = 1;
-      if ((err = Member::alignMembers(m_args, m_nArgs, maxAlignDummy, m_myOffset,
-				      p.m_dataValueWidth, p.m_diverseDataSizes,
-				      sub32dummy, p.m_isUnbounded, p.m_variableMessageLength,
-				      m_topFixedSequence)))
+      if ((err = OU::Member::alignMembers(m_args, m_nArgs, maxAlignDummy, m_myOffset,
+					  p.m_dataValueWidth, p.m_diverseDataSizes,
+					  sub32dummy, p.m_isUnbounded, p.m_variableMessageLength,
+					  m_topFixedSequence)))
 	throw std::string(err);
 
     }
-    void Operation::generateArgs(Value **&v) {
-      v = m_nArgs ? new Value *[m_nArgs] : 0;
+    void Operation::generateArgs(OU::Value **&v) {
+      v = m_nArgs ? new OU::Value *[m_nArgs] : 0;
       for (unsigned n = 0; n < m_nArgs; n++) {
-	v[n] = new Value(m_args[n], NULL);
+	v[n] = new OU::Value(m_args[n], NULL);
 	v[n]->generate();
       }
     }
-    void Operation::print(FILE *f, Value **v) const {
+    void Operation::print(FILE *f, OU::Value **v) const {
       fprintf(f, "%s\n", m_name.c_str());
       for (unsigned n = 0; n < m_nArgs; n++) {
 	std::string s;
@@ -194,12 +195,12 @@ namespace OCPI {
 	fprintf(f, "  %u: %s\n", n, s.c_str());
       }
     }
-    void Operation::testPrintParse(FILE *f, Value **v, bool hex) {
+    void Operation::testPrintParse(FILE *f, OU::Value **v, bool hex) {
       for (unsigned n = 0; n < m_nArgs; n++) {
 	std::string s;
 	fprintf(f, "%s: ", m_args[n].m_name.c_str());
 	v[n]->unparse(s, NULL, false, hex);
-	Value tv(m_args[n]);
+	OU::Value tv(m_args[n]);
 	const char *err;
 	if ((err = tv.parse(s.c_str(), NULL))) {
 	  fprintf(f, "error: %s (%s)\n", err, s.c_str());
@@ -219,7 +220,6 @@ namespace OCPI {
 	}
       }
       fprintf(f, "\n");
-      
     }
 
     // These initial values are for when a protocol is defined by operations
@@ -351,7 +351,7 @@ namespace OCPI {
 	m_maxMessageValues = op.m_myOffset; // still in bytes until later
       size_t minLength; // smallest message possible for this operation
       if (op.m_nArgs) {
-	Member &m = op.m_args[op.m_nArgs - 1];
+	OU::Member &m = op.m_args[op.m_nArgs - 1];
 	minLength =
 	  m.m_isSequence ? (op.m_nArgs == 1 ? 0 : m.m_offset + sizeof(uint32_t)) : op.m_myOffset;
       } else
@@ -369,7 +369,7 @@ namespace OCPI {
       // alignMembers and offset()
       size_t smallest = SIZE_MAX;
       for (unsigned n = 0; n < op.m_nArgs; n++) {
-	Member &m = op.m_args[n];
+	OU::Member &m = op.m_args[n];
 	if (m.m_elementBytes && m.m_elementBytes < smallest)
 	  smallest = m.m_elementBytes;
       }
@@ -479,17 +479,17 @@ namespace OCPI {
       finishParse();
     }
     // Generate a message for a random opcode
-    void Protocol::generateOperation(uint8_t &opcode, Value **&v) {
+    void Protocol::generateOperation(uint8_t &opcode, OU::Value **&v) {
       opcode = (uint8_t)((unsigned long)random() % m_nOperations);
       m_operations[opcode].generateArgs(v);
     }
 
-    void Protocol::printOperation(FILE *f, uint8_t opcode, Value **v) const {
+    void Protocol::printOperation(FILE *f, uint8_t opcode, OU::Value **v) const {
       fprintf(f, "%u:", opcode);
       m_operations[opcode].print(f, v);
       fflush(f);
     }
-    void Protocol::testOperation(FILE *f, uint8_t opcode, Value **v, bool hex) {
+    void Protocol::testOperation(FILE *f, uint8_t opcode, OU::Value **v, bool hex) {
       fprintf(f, "testing %u:", opcode);
       m_operations[opcode].testPrintParse(f, v, hex);
     }
@@ -498,7 +498,7 @@ namespace OCPI {
       const char *err = OE::ezxml_parse_str(proto, strlen(proto), x);
       if (err ||
 	  (err = parse(x, NULL, NULL, doOperation, this)))
-	err = esprintf("Error parsing xml protocol description: %s", err);
+	err = OU::esprintf("Error parsing xml protocol description: %s", err);
       return err;
     }
 
@@ -541,62 +541,62 @@ namespace OCPI {
       return finishParse();
     }
     void Protocol::printXML(std::string &out, unsigned indent) const {
-      formatAdd(out, "%*s<protocol", indent * 2, "");
+      OU::formatAdd(out, "%*s<protocol", indent * 2, "");
       if (!m_name.empty())
-	formatAdd(out, " name=\"%s\"", m_name.c_str());
+	OU::formatAdd(out, " name=\"%s\"", m_name.c_str());
       if (!m_qualifiedName.empty())
-	formatAdd(out, " qualifiedName=\"%s\"", m_qualifiedName.c_str());
+	OU::formatAdd(out, " qualifiedName=\"%s\"", m_qualifiedName.c_str());
       // Try to keep the summary attributes in the same order everywhere (see class declaration)
       if (m_defaultBufferSize != SIZE_MAX)
-	formatAdd(out, " defaultbuffersize=\"%zu\"", m_defaultBufferSize);
+	OU::formatAdd(out, " defaultbuffersize=\"%zu\"", m_defaultBufferSize);
       if (m_minBufferSize != 0)
-	formatAdd(out, " minbuffersize=\"%zu\"", m_minBufferSize);
+	OU::formatAdd(out, " minbuffersize=\"%zu\"", m_minBufferSize);
       if (m_dataValueWidth != 0)
-	formatAdd(out, " dataValueWidth=\"%zu\"", m_dataValueWidth);
+	OU::formatAdd(out, " dataValueWidth=\"%zu\"", m_dataValueWidth);
       if (m_dataValueGranularity != SIZE_MAX)
-	formatAdd(out, " dataValueGranularity=\"%zu\"", m_dataValueGranularity);
+	OU::formatAdd(out, " dataValueGranularity=\"%zu\"", m_dataValueGranularity);
       if (m_diverseDataSizes)
-	formatAdd(out, " diverseDataSizes=\"1\"");
+	OU::formatAdd(out, " diverseDataSizes=\"1\"");
       if (m_minMessageValues != 0)
-	formatAdd(out, " minMessageValues=\"%zu\"", m_minMessageValues);
+	OU::formatAdd(out, " minMessageValues=\"%zu\"", m_minMessageValues);
       if (m_maxMessageValues != SIZE_MAX)
-	formatAdd(out, " maxMessageValues=\"%zu\"", m_maxMessageValues);
+	OU::formatAdd(out, " maxMessageValues=\"%zu\"", m_maxMessageValues);
       if (m_variableMessageLength)
-	formatAdd(out, " variableMessageLength=\"true\"");
+	OU::formatAdd(out, " variableMessageLength=\"true\"");
       if (m_zeroLengthMessages)
-	formatAdd(out, " zeroLengthMessages=\"true\"");
+	OU::formatAdd(out, " zeroLengthMessages=\"true\"");
       if (m_isTwoWay)
-	formatAdd(out, " twoWay=\"true\"");
+	OU::formatAdd(out, " twoWay=\"true\"");
       if (m_isUnbounded)
-	formatAdd(out, " unBounded=\"true\"");
+	OU::formatAdd(out, " unBounded=\"true\"");
       if (!m_operations || m_nOpcodes != m_nOperations)
-	formatAdd(out, " numberOfOpcodes=\"%zu\"", m_nOpcodes);
+	OU::formatAdd(out, " numberOfOpcodes=\"%zu\"", m_nOpcodes);
       if (m_operations) {
-	formatAdd(out, ">\n");
+	OU::formatAdd(out, ">\n");
 	Operation *o = m_operations;
 	for (unsigned n = 0; n < m_nOperations; n++, o++)
 	  o->printXML(out, indent + 1);
-	formatAdd(out, "%*s</protocol>\n", indent * 2, "");
+	OU::formatAdd(out, "%*s</protocol>\n", indent * 2, "");
       } else
-	formatAdd(out, "/>\n");
+	OU::formatAdd(out, "/>\n");
     }
     // Send the data in the buffer to the writer
-    void Protocol::write(Writer &writer, const uint8_t *data, size_t length, uint8_t opcode) {
-      assert(!((intptr_t)data & (maxDataTypeAlignment - 1)));
+    void Protocol::write(OU::Writer &writer, const uint8_t *data, size_t length, uint8_t opcode) {
+      assert(!((intptr_t)data & (OU::maxDataTypeAlignment - 1)));
       if (!m_operations)
-	throw Error("No operations in protocol for writing");
+	throw OU::Error("No operations in protocol for writing");
       if (opcode >= m_nOperations)
-	throw Error("Invalid Opcode for protocol");
+	throw OU::Error("Invalid Opcode for protocol");
       writer.writeOpcode(m_operations[opcode].m_name.c_str(), opcode);
       m_operations[opcode].write(writer, data, length);
       writer.end();
     }
-    size_t Protocol::read(Reader &reader, uint8_t *data, size_t maxLength, uint8_t opcode) {
-      assert(!((intptr_t)data & (maxDataTypeAlignment - 1)));
+    size_t Protocol::read(OU::Reader &reader, uint8_t *data, size_t maxLength, uint8_t opcode) {
+      assert(!((intptr_t)data & (OU::maxDataTypeAlignment - 1)));
       if (!m_operations)
-	throw Error("No operations in protocol for reading");
+	throw OU::Error("No operations in protocol for reading");
       if (opcode >= m_nOperations)
-	throw Error("Invalid Opcode for protocol");
+	throw OU::Error("Invalid Opcode for protocol");
       size_t size = m_operations[opcode].read(reader, data, maxLength);
       reader.end();
       return size;

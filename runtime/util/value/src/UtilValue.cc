@@ -28,12 +28,12 @@
 #include <string.h>
 #include <pthread.h>
 #include "OsAssert.hh"
-#include "OcpiExprEvaluator.h"
+#include "UtilExpression.hh"
 #include "OcpiUtilEzxml.h"
 #include "OcpiUtilMisc.h"
 #include "OcpiUtilAutoMutex.h"
-#include "OcpiUtilValue.h"
-#include "OcpiUtilDataTypes.h"
+#include "UtilValue.hh"
+#include "UtilDataTypes.hh"
 
 // Prefix for interpreting string and char types as expressions
 #define EXPR_PREFIX "\\:"

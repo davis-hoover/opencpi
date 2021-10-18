@@ -20,7 +20,7 @@
 
 #ifndef VALUE_READER_H
 #define VALUE_READER_H
-#include "OcpiUtilValue.h"
+#include "UtilValue.hh"
 
 namespace OCPI {
   namespace Util {

@@ -27,8 +27,8 @@
 #include "OcpiUtilEzxml.h"
 #include "OcpiUtilMisc.h"
 #include "OcpiUtilException.h"
-#include "OcpiUtilDataTypes.h"
-#include "OcpiUtilValue.h"
+#include "UtilDataTypes.hh"
+#include "UtilValue.hh"
 
 namespace OCPI {
   namespace Util {
@@ -292,11 +292,11 @@ namespace OCPI {
 	  // enums have a baseTypeSize of 32 per IDL
 	}
 	if (m_baseType == OA::OCPI_String) {
-	  if ((err = OE::getExprNumber(xm, "StringLength", m_stringLength, &found,
-				       m_stringLengthExpr, resolver)) ||
+	  if ((err = getExprNumber(xm, "StringLength", m_stringLength, &found,
+				   m_stringLengthExpr, resolver)) ||
 	      (!found &&
-	       (err = OE::getExprNumber(xm, "size", m_stringLength, &found, m_stringLengthExpr,
-					resolver))))
+	       (err = getExprNumber(xm, "size", m_stringLength, &found, m_stringLengthExpr,
+				    resolver))))
 	    return err;
 	  if (a_isFixed) {
 	    if (!found)
@@ -318,7 +318,7 @@ namespace OCPI {
       size_t arrayLength;
       std::string expr;
       const char *arrayDimensions;
-      if ((err = OE::getExprNumber(xm, "ArrayLength", arrayLength, &isArray, expr, resolver)))
+      if ((err = getExprNumber(xm, "ArrayLength", arrayLength, &isArray, expr, resolver)))
 	return err;
       if (isArray) {
 	if (arrayLength == 0)
@@ -353,11 +353,11 @@ namespace OCPI {
       }
       if (m_arrayRank && !m_arrayDimensionsExprs[0].empty())
 	m_usesParameters = true;
-      if ((err = OE::getExprNumber(xm, "SequenceLength", m_sequenceLength, &m_isSequence,
-				   m_sequenceLengthExpr, resolver)) ||
+      if ((err = getExprNumber(xm, "SequenceLength", m_sequenceLength, &m_isSequence,
+			       m_sequenceLengthExpr, resolver)) ||
 	  (!m_isSequence &&
-	   ((err = OE::getExprNumber(xm, "SequenceSize", m_sequenceLength, &m_isSequence,
-				     m_sequenceLengthExpr, resolver)))))
+	   ((err = getExprNumber(xm, "SequenceSize", m_sequenceLength, &m_isSequence,
+				 m_sequenceLengthExpr, resolver)))))
 	return err;
       if (m_isSequence) {
 	if (a_isFixed) {

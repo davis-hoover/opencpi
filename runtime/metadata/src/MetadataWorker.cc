@@ -26,14 +26,15 @@
 #include "OsAssert.hh"
 #include "OcpiUtilMisc.h"
 #include "OcpiUtilEzxml.h"
-#include "OcpiUtilValue.h"
-#include "OcpiUtilWorker.h"
+#include "UtilValue.hh"
+#include "MetadataWorker.hh"
 
 namespace OCPI {
-  namespace Util {
+  namespace Metadata {
 
     const char *g_models[] = { OCPI_MODELS, NULL };
 
+    namespace OU = OCPI::Util;
     namespace OE = OCPI::Util::EzXml;
     Worker::Worker()
       : m_attributes(NULL), m_ports(NULL), m_memories(NULL), m_nPorts(0), m_nMemories(0),
@@ -63,7 +64,7 @@ namespace OCPI {
       Property *p = getProperty(id);
       if (p)
 	return p->m_ordinal;
-      throw Error("Unknown property: \"%s\" for worker \"%s\"", id, m_specName.c_str());
+      throw OU::Error("Unknown property: \"%s\" for worker \"%s\"", id, m_specName.c_str());
     }
 
     Property &Worker::findProperty(const char *id) const {
@@ -92,7 +93,7 @@ namespace OCPI {
 	  m_isDebug = true;
       }
       if (m_firstRaw) {
-	offset = roundUp(offset, 4);
+	offset = OU::roundUp(offset, 4);
 	p = m_properties;
 	for (unsigned n = 0; n < m_nProperties; n++, p++)
 	  if (p->m_isRaw && (err = p->offset(offset, totalSize, resolver)))
@@ -125,7 +126,7 @@ namespace OCPI {
 	if ((m_delegated = w.findMetaPort(port)))
 	  m_delegated->m_slave = ordinal; // set the slave ordinal of the delegated port
 	else
-	  err = esprintf("delegated port \"%s\" for slave \"%s\" not found", port, m_name);
+	  err = OU::esprintf("delegated port \"%s\" for slave \"%s\" not found", port, m_name);
       }
     }
 #endif
@@ -166,7 +167,7 @@ namespace OCPI {
       ezxml_t x;
       for (x = ezxml_cchild(xml, "property"); x; x = ezxml_cnext(x), prop++)
         if ((err = prop->parse(x, (unsigned)(prop - m_properties))))
-          return esprintf("Invalid xml property description: %s", err);
+          return OU::esprintf("Invalid xml property description: %s", err);
       prop = m_properties;
       size_t offset = 0;
       uint64_t totalSize = 0;
@@ -176,7 +177,7 @@ namespace OCPI {
 #else
       for (unsigned n = 0; n < m_nProperties; n++, prop++) {
 	if (m_firstRaw && prop == m_firstRaw)
-	  offset = roundUp(offset, 4);
+	  offset = OU::roundUp(offset, 4);
 	prop->offset(offset, totalSize);
       }
 #endif
@@ -188,27 +189,27 @@ namespace OCPI {
       unsigned n = 0;
       for (x = ezxml_cchild(xml, "port"); x; x = ezxml_cnext(x), p++, n++)
         if ((err = p->preParse(*this, x, n)))
-          return esprintf("Invalid xml port description(1): %s", err);
+          return OU::esprintf("Invalid xml port description(1): %s", err);
       // Second pass to do most of the parsing
       p = m_ports;
       for (n = 0; n < m_nPorts; n++, p++)
         if ((err = p->parse()))
-          return esprintf("Invalid xml port description(2): %s", err);
+          return OU::esprintf("Invalid xml port description(2): %s", err);
       // Third pass to propagate info from one port to another
       p = m_ports;
       for (unsigned nn = 0; nn < m_nPorts; nn++, p++)
 	if ((err = p->postParse()))
-          return esprintf("Invalid xml port description(3): %s", err);
+          return OU::esprintf("Invalid xml port description(3): %s", err);
 #if 1
       if (ezxml_cattr(xml, "slave") ||
 	  ezxml_cchild(xml, "slave"))
-	return esprintf("for worker %s, obsolete slave indications in artifact XML",  cname());
+	return OU::esprintf("for worker %s, obsolete slave indications in artifact XML",  cname());
 #else
       // Slaves must be parsed after ports
       const char *slave = ezxml_cattr(xml, "slave");
       if (slave) {
 	if (ezxml_cchild(xml, "slave"))
-	  return esprintf("cannot have slave elements when you have a slave attribute");
+	  return OU::esprintf("cannot have slave elements when you have a slave attribute");
 	m_slaves.emplace_back(slave);
       } else
 	for (ezxml_t cx = ezxml_cchild(xml, "slave"); cx; cx = ezxml_cnext(cx)) {
@@ -233,7 +234,7 @@ namespace OCPI {
       Memory* m = m_memories;
       for (x = ezxml_cchild(xml, "memory"); x; x = ezxml_cnext(x), m++ )
         if ((err = m->parse(x)))
-          return esprintf("Invalid xml local memory description: %s", err);
+          return OU::esprintf("Invalid xml local memory description: %s", err);
       for (x = ezxml_cchild(xml, "scaling"); x; x = ezxml_cnext(x)) {
 	std::string l_name;
 	OE::getOptionalString(x, l_name, "name");
@@ -250,7 +251,7 @@ namespace OCPI {
     }
 
     // Get a property value from the metadata
-    const char *Worker::getValue(const char *sym, ExprValue &val) const {
+    const char *Worker::getValue(const char *sym, OU::ExprValue &val) const {
       // Our builtin symbols take precendence, but can be overridden with @
       if (!strcasecmp(sym, "model")) {
 	val.setString(m_model);
@@ -277,7 +278,7 @@ namespace OCPI {
       for (unsigned n = 0; n < m_nProperties; n++, p++)
 	if (!strcasecmp(p->m_name.c_str(), sym))
 	  return p->getValue(val);
-      return esprintf("no property found for identifier \"%s\"", sym);
+      return OU::esprintf("no property found for identifier \"%s\"", sym);
     }
 
     const char *Worker::

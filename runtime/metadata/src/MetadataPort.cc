@@ -21,14 +21,15 @@
 #include <string>
 #include <ctype.h>
 #include "OcpiUtilEzxml.h"
-#include "OcpiUtilPort.h"
-#include "OcpiUtilWorker.h"
+#include "MetadataPort.hh"
+#include "MetadataWorker.hh"
 #include "OcpiUtilMisc.h"
 
 namespace OCPI {
-  namespace Util {
+  namespace Metadata {
     namespace OE = OCPI::Util::EzXml;
     namespace OA = OCPI::API;
+    namespace OU = OCPI::Util;
 
     void Port::
     init() {
@@ -103,7 +104,7 @@ namespace OCPI {
     {
       err = NULL;
       if (w.findMetaPort(a_name, this)) {
-	err = esprintf("Can't create port named \"%s\" since it already exists", a_name);
+	err = OU::esprintf("Can't create port named \"%s\" since it already exists", a_name);
 	return;
       }
       init();
@@ -140,7 +141,7 @@ namespace OCPI {
       if (!l_name)
 	return "Missing \"name\" attribute for port";
       if (w.findMetaPort(l_name, this))
-	return esprintf("Can't create port named \"%s\" since it already exists",
+	return OU::esprintf("Can't create port named \"%s\" since it already exists",
 			    m_name.c_str());
       m_name = l_name;
       m_worker = &w;
@@ -205,7 +206,7 @@ namespace OCPI {
 	if (bsp)
 	  m_bufferSizePort = bsp->m_ordinal;
 	else
-	  return esprintf("Buffersize set to '%s', which is not a port name or a number", bs);
+	  return OU::esprintf("Buffersize set to '%s', which is not a port name or a number", bs);
       } else if ((err = OE::getNumber(m_xml, "bufferSize", &m_bufferSize, 0, 0, false)))
 	return err;
       if (m_bufferSize == SIZE_MAX) {
@@ -216,8 +217,8 @@ namespace OCPI {
       }
 #if 0
       if (m_slave != SIZE_MAX && m_slave >= m_worker->m_slaves.size())
-	return esprintf("Slave index, %zu, not valid when worker has %zu slaves", m_slave,
-			m_worker->m_slaves.size());
+	return OU::esprintf("Slave index, %zu, not valid when worker has %zu slaves", m_slave,
+			    m_worker->m_slaves.size());
 #endif
       // FIXME: do we need the separately overridable nOpcodes here?
       return NULL;
@@ -234,7 +235,7 @@ namespace OCPI {
     // or overrided the default from the protocol.  If it is SIZE_MAX, then there is
     // no protocol and no default at all.
     size_t Port::
-    getBufferSize(const PValue *portParams, const PValue *connParams, size_t otherSize) const {
+    getBufferSize(const OU::PValue *portParams, const OU::PValue *connParams, size_t otherSize) const {
       size_t size = m_bufferSize;
       const char *type = "default";
       do {
@@ -244,19 +245,19 @@ namespace OCPI {
 	  size = DEFAULT_BUFFER_SIZE;
 	type = "port";
 	OA::ULong ul;
-	if (findULong(portParams, "bufferSize", ul) && (size = ul) < m_minBufferSize)
+	if (OU::findULong(portParams, "bufferSize", ul) && (size = ul) < m_minBufferSize)
 	  break;
 	type = "connection";
-	if (findULong(connParams, "bufferSize", ul) && (size = ul) < m_minBufferSize)
+	if (OU::findULong(connParams, "bufferSize", ul) && (size = ul) < m_minBufferSize)
 	  break;
 	type = m_bufferSize == SIZE_MAX ? "default" : "port-specified";
 	if (size < m_minBufferSize)
 	    break;
 	return size;
       } while (0);
-      throw Error("%s bufferSize %zu is below minimum for worker %s port %s of: %zu",
-		  type, (size_t)size, m_worker->cname(), m_name.c_str(),
-		  m_minBufferSize);
+      throw OU::Error("%s bufferSize %zu is below minimum for worker %s port %s of: %zu",
+		      type, (size_t)size, m_worker->cname(), m_name.c_str(),
+		      m_minBufferSize);
     }
 
     Port::Distribution Port::
@@ -276,9 +277,9 @@ namespace OCPI {
     //    external-to-external MUST specify a buffer size somehow.
     //    ports may depend on other ports for their buffer sizes
     size_t Port::
-    determineBufferSize(const Port *in, const PValue *paramsIn, size_t otherIn,
-			const Port *out, const PValue *paramsOut, size_t otherOut,
-			const PValue *connParams) {
+    determineBufferSize(const Port *in, const OU::PValue *paramsIn, size_t otherIn,
+			const Port *out, const OU::PValue *paramsOut, size_t otherOut,
+			const OU::PValue *connParams) {
       size_t
 	sizeIn = in ? in->getBufferSize(paramsIn, connParams, otherIn) : SIZE_MAX,
 	sizeOut = out ? out->getBufferSize(paramsOut, connParams, otherOut) : SIZE_MAX;
@@ -287,8 +288,8 @@ namespace OCPI {
 	sizeOut == SIZE_MAX ? sizeIn :
 	std::max(sizeIn, sizeOut);
       if (size == SIZE_MAX)
-	throw Error("Buffer size for connection must be specified");
-      size = roundUp(size, BUFFER_ALIGNMENT);
+	throw OU::Error("Buffer size for connection must be specified");
+      size = OU::roundUp(size, BUFFER_ALIGNMENT);
       return size;
     }
 
@@ -317,17 +318,17 @@ namespace OCPI {
       Scaling s;
       if (!def)
 	def = &s;
-      if (m_min != def->m_min) formatAdd(out, " min='%zu'", m_min);
-      if (m_max != def->m_max) formatAdd(out, " max='%zu'", m_max);
-      if (m_modulo != def->m_modulo) formatAdd(out, " modulo='%zu'", m_modulo);
-      if (m_default != def->m_default) formatAdd(out, " default='%zu'", m_default);
+      if (m_min != def->m_min) OU::formatAdd(out, " min='%zu'", m_min);
+      if (m_max != def->m_max) OU::formatAdd(out, " max='%zu'", m_max);
+      if (m_modulo != def->m_modulo) OU::formatAdd(out, " modulo='%zu'", m_modulo);
+      if (m_default != def->m_default) OU::formatAdd(out, " default='%zu'", m_default);
     }
 
     bool Port::Scaling::
     check(size_t scale, std::string &error) {
       if (scale &&
 	  (scale < m_min || (m_max && scale > m_max) || (m_modulo && scale % m_modulo))) {
-	format(error, "Scaling value of %zu incompatible with min: %zu, max: %zu, mod: %zu",
+	OU::format(error, "Scaling value of %zu incompatible with min: %zu, max: %zu, mod: %zu",
 		   scale, m_min, m_max, m_modulo);
 	return true;
       }
@@ -351,7 +352,7 @@ namespace OCPI {
       m_scaling.emit(out, def ? &def->m_scaling : NULL);
       m_overlap.emit(out, def ? &def->m_overlap : NULL);
       if (m_sourceDimension && (!def || m_sourceDimension != def->m_sourceDimension))
-	formatAdd(out, " source='%zu'", m_sourceDimension);
+	OU::formatAdd(out, " source='%zu'", m_sourceDimension);
     }
 
     Port::Overlap::
@@ -383,9 +384,9 @@ namespace OCPI {
       Overlap o;
       if (!def)
 	def = &o;
-      if (m_left != def->m_left) formatAdd(out, " left='%zu'", m_left);
-      if (m_right != def->m_right) formatAdd(out, " right='%zu'", m_right);
-      if (m_padding != def->m_padding) formatAdd(out, " padding='%s'", s_oNames[m_padding]);
+      if (m_left != def->m_left) OU::formatAdd(out, " left='%zu'", m_left);
+      if (m_right != def->m_right) OU::formatAdd(out, " right='%zu'", m_right);
+      if (m_padding != def->m_padding) OU::formatAdd(out, " padding='%s'", s_oNames[m_padding]);
     }
 
     const char *Port::s_dNames[] = {
@@ -403,25 +404,25 @@ namespace OCPI {
 	return err;
       d = (Distribution)n;
       if (m_isProducer && (d == Balanced || d == Hashed))
-	return esprintf("For port \"%s\": output ports cannot declare \"balanced\" "
-			"or hashed distribution", m_name.c_str());
+	return OU::esprintf("For port \"%s\": output ports cannot declare \"balanced\" "
+			    "or hashed distribution", m_name.c_str());
       if (!m_isProducer && d == Directed)
 	d = Random;
-      //	return esprintf("For port \"%s\": input ports cannot declare \"directed\" "
-      //			"distribution", m_name.c_str());
+      //	return OU::esprintf("For port \"%s\": input ports cannot declare \"directed\" "
+      //		            "distribution", m_name.c_str());
       if (OE::getOptionalString(m_xml, hash, "hashField")) {
 	if (d != Hashed)
 	  return
-	    esprintf("The \"hashfield\" attribute is only allowed with hashed distribution");
+	    OU::esprintf("The \"hashfield\" attribute is only allowed with hashed distribution");
 	if (!m_operations)
-	  return esprintf("The \"hashfield\" attribute cannot be used with there is no protocol");
+	  return OU::esprintf("The \"hashfield\" attribute cannot be used with there is no protocol");
 	Operation *o = m_operations;
 	bool found = false;
 	for (unsigned nn = 0; nn < m_nOperations; nn++)
 	  if (o->findArg(hash.c_str()))
 	    found = true;
 	if (!found)
-	  return esprintf("The \"hashfield\" attribute \"%s\" doesn't match any field "
+	  return OU::esprintf("The \"hashfield\" attribute \"%s\" doesn't match any field "
 			      "in the any operation", hash.c_str());
       }
       return err;
@@ -441,11 +442,11 @@ namespace OCPI {
 	  return err;
 	Operation *op = findOperation(oName.c_str());
 	if (!op)
-	  return esprintf("There is no operation named \"%s\" in the protocol", oName.c_str());
+	  return OU::esprintf("There is no operation named \"%s\" in the protocol", oName.c_str());
 	size_t ord = OCPI_SIZE_T_DIFF(op, m_operations);
 	if (m_opScaling[ord])
-	  return esprintf("Duplicate operation element with name \"%s\" for port \"%s\"",
-			  oName.c_str(), m_name.c_str());
+	  return OU::esprintf("Duplicate operation element with name \"%s\" for port \"%s\"",
+			      oName.c_str(), m_name.c_str());
 	OpScaling *os = new OpScaling(op->m_nArgs);
 	if ((err = os->parse(*this, *op, ox)))
 	  return err;
@@ -468,7 +469,7 @@ namespace OCPI {
       Operation *op = m_operations;
       for (unsigned o = 0; o < m_nOperations; o++, op++) {
 	OpScaling *os = m_opScaling[o];
-	Member *arg = op->m_args;
+	OU::Member *arg = op->m_args;
 	for (unsigned a = 0; a < op->m_nArgs; a++, arg++)
 	  if (arg->m_arrayRank || arg->m_isSequence) {
 	    Partitioning *ap = os ? os->m_partitioning[a] : NULL;
@@ -494,17 +495,17 @@ namespace OCPI {
 
     void Port::
     emitDistribution(std::string &out, const Distribution &d) const {
-      formatAdd(out, " distribution='%s'", s_dNames[d - (Distribution)0]);
+      OU::formatAdd(out, " distribution='%s'", s_dNames[d - (Distribution)0]);
     }
 
     void Port::
     emitScalingAttrs(std::string &out) const {
       if (m_scaleExpr.length())
-	formatAdd(out, " scale='%s'", m_scaleExpr.c_str());
+	OU::formatAdd(out, " scale='%s'", m_scaleExpr.c_str());
       if (m_defaultDistribution != Cyclic)
 	emitDistribution(out, m_defaultDistribution);
       if (m_defaultHashField.length())
-	formatAdd(out, " hashField='%s'", m_defaultHashField.c_str());
+	OU::formatAdd(out, " hashField='%s'", m_defaultHashField.c_str());
       m_defaultPartitioning.emit(out, NULL);
     }
 
@@ -519,36 +520,36 @@ namespace OCPI {
     // This should not be runtime...
     void Port::
     emitXml(std::string &out, size_t bufferSize) const {
-      formatAdd(out, "    <port name=\"%s\"", m_name.c_str());
+      OU::formatAdd(out, "    <port name=\"%s\"", m_name.c_str());
       if (m_isBidirectional)
-	formatAdd(out, " bidirectional='1'");
+	OU::formatAdd(out, " bidirectional='1'");
       else if (m_isProducer)
-	formatAdd(out, " producer='1'");
+	OU::formatAdd(out, " producer='1'");
       if (m_minBufferCount != 1)
-	formatAdd(out, " minBufferCount=\"%zu\"", m_minBufferCount);
+	OU::formatAdd(out, " minBufferCount=\"%zu\"", m_minBufferCount);
       if (m_defaultBufferCount != SIZE_MAX)
-	formatAdd(out, " BufferCount=\"%zu\"", m_defaultBufferCount);
+	OU::formatAdd(out, " BufferCount=\"%zu\"", m_defaultBufferCount);
       if (bufferSize != SIZE_MAX)
-	formatAdd(out, " bufferSize='%zu'", bufferSize);
+	OU::formatAdd(out, " bufferSize='%zu'", bufferSize);
       else if (m_bufferSizePort != SIZE_MAX)
-	formatAdd(out, " buffersize='%s'", m_worker->metaPort(m_bufferSizePort).cname());
+	OU::formatAdd(out, " buffersize='%s'", m_worker->metaPort(m_bufferSizePort).cname());
       else if (m_bufferSize != SIZE_MAX && m_bufferSize != m_defaultBufferSize)
-	formatAdd(out, " bufferSize='%zu'", m_bufferSize);
+	OU::formatAdd(out, " bufferSize='%zu'", m_bufferSize);
       if (m_isOptional)
-	formatAdd(out, " optional=\"%u\"", m_isOptional);
+	OU::formatAdd(out, " optional=\"%u\"", m_isOptional);
       if (m_isInternal)
-	formatAdd(out, " internal='1'");
+	OU::formatAdd(out, " internal='1'");
       if (m_workerEOF && !m_worker->m_workerEOF)
-	formatAdd(out, " workerEOF='1'");
+	OU::formatAdd(out, " workerEOF='1'");
 #if 0
       if (m_slave != SIZE_MAX)
-	formatAdd(out, " slave='%zu'", m_slave);
+	OU::formatAdd(out, " slave='%zu'", m_slave);
 #endif
       emitScalingAttrs(out);
-      formatAdd(out, ">\n");
+      OU::formatAdd(out, ">\n");
       printXML(out, 3);
       emitScaling(out);
-      formatAdd(out, "    </port>\n");
+      OU::formatAdd(out, "    </port>\n");
     }
 
     Port::OpScaling::
@@ -576,8 +577,8 @@ namespace OCPI {
       if (hash.empty() && m_distribution == Hashed)
 	hash = dp.m_defaultHashField;
       if (hash.length() && !(m_hashField = op.findArg(hash.c_str())))
-	return esprintf("hashfield attribute value \"%s\" not an argument to \"%s\"",
-			hash.c_str(), op.m_name.c_str());
+	return OU::esprintf("hashfield attribute value \"%s\" not an argument to \"%s\"",
+			    hash.c_str(), op.m_name.c_str());
       m_partitioning.resize(op.m_nArgs, 0);
       for (ezxml_t ax = ezxml_cchild(x, "argument"); ax; ax = ezxml_cnext(ax)) {
 	std::string aName;
@@ -585,10 +586,10 @@ namespace OCPI {
 	    (err = OE::checkElements(ax, "dimension", (void*)0)) ||
 	    (err = OE::getRequiredString(ax, aName, "name")))
 	  return err;
-	Member *a = op.findArg(aName.c_str());
+	OU::Member *a = op.findArg(aName.c_str());
 	if (!a)
-	  return esprintf("name attribute of argument element is not an argument to \"%s\"",
-			  op.m_name.c_str());
+	  return OU::esprintf("name attribute of argument element is not an argument to \"%s\"",
+			      op.m_name.c_str());
 	size_t nDims = a->m_isSequence ? 1 : a->m_arrayRank;
 	Partitioning *p = new Partitioning[nDims];
 	m_partitioning[OCPI_SIZE_T_DIFF(a, op.m_args)] = p;
@@ -603,7 +604,7 @@ namespace OCPI {
 	n = 0;
 	for (ezxml_t dx = ezxml_cchild(ax, "dimension"); dx; dx = ezxml_cnext(dx), n++, p++) {
 	  if (n >= nDims)
-	    return esprintf("Too many dimensions for argument \"%s\" in operation \"%s\"",
+	    return OU::esprintf("Too many dimensions for argument \"%s\" in operation \"%s\"",
 				a->m_name.c_str(), op.m_name.c_str());
 	  if ((err = OE::checkAttrs(dx, PARTITION_ATTRS, (void*)0)) ||
 	      (err = p->parse(dx, w)))
@@ -615,16 +616,16 @@ namespace OCPI {
 
     void Port::OpScaling::
     emit(std::string &out, const Port &port, const Operation &op) const {
-      formatAdd(out, "    <operation name='%s'", op.m_name.c_str());
+      OU::formatAdd(out, "    <operation name='%s'", op.m_name.c_str());
       if (m_distribution != port.m_defaultDistribution)
 	port.emitDistribution(out, m_distribution);
       if (m_hashField && m_hashField->m_name != port.m_defaultHashField)
-	formatAdd(out, " hashField='%s'", m_hashField->m_name.c_str());
+	OU::formatAdd(out, " hashField='%s'", m_hashField->m_name.c_str());
       m_defaultPartitioning.emit(out, &port.m_defaultPartitioning);
-      if (m_multiple) formatAdd(out, " multiple='1'");
-      if (m_allSeeOne) formatAdd(out, " allSeeOne='1'");
-      if (m_allSeeEnd) formatAdd(out, " allSeeEnd='1'");
-      Member *a = op.m_args;
+      if (m_multiple) OU::formatAdd(out, " multiple='1'");
+      if (m_allSeeOne) OU::formatAdd(out, " allSeeOne='1'");
+      if (m_allSeeEnd) OU::formatAdd(out, " allSeeEnd='1'");
+      OU::Member *a = op.m_args;
       bool first = true;
       for (unsigned n = 0; n < op.m_nArgs; n++, a++)
 	if (m_partitioning[n] && m_partitioning[n] != &port.m_defaultPartitioning) {

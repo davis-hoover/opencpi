@@ -38,8 +38,8 @@
 #define OCPI_METADATA_PROPERTY_H
 
 #include "ezxml.h"
-#include "OcpiUtilDataTypes.h"
-#include "OcpiUtilPropertyApi.h"
+#include "UtilDataTypes.hh"
+#include "OcpiPropertyApi.hh"
 
 namespace OCPI {
   namespace API {
@@ -63,7 +63,7 @@ namespace OCPI {
     };
   }
 
-  namespace Util {
+  namespace Metadata {
     class Property : public OCPI::API::PropertyInfo {
     public:
       // Describe structure member that might be the whole property
@@ -119,15 +119,15 @@ namespace OCPI {
     public:
       const char
 	*parse(ezxml_t x, bool includeImpl, unsigned ordinal,
-	       const IdentResolver *resolv = NULL),
-	*parseImpl(ezxml_t x, const IdentResolver *resolv = NULL),
+	       const OCPI::Util::IdentResolver *resolv = NULL),
+	*parseImpl(ezxml_t x, const OCPI::Util::IdentResolver *resolv = NULL),
 	*parse(ezxml_t x, unsigned ordinal),
-	*parseValue(const char *unparsed, Value &value, const char *end = NULL,
-		    const IdentResolver *resolv = NULL) const,
+	*parseValue(const char *unparsed, OCPI::Util::Value &value, const char *end = NULL,
+		    const OCPI::Util::IdentResolver *resolv = NULL) const,
         *checkType(OCPI::API::BaseType ctype, unsigned n, bool write),
-	*getValue(ExprValue &val),
+	*getValue(OCPI::Util::ExprValue &val),
 	*offset(size_t &cumOffset, uint64_t &sizeofConfigSpace,
-		const IdentResolver *resolv = NULL);
+		const OCPI::Util::IdentResolver *resolv = NULL);
     };
   }
 }

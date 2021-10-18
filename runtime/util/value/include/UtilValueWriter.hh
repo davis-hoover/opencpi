@@ -21,7 +21,7 @@
 #ifndef VALUE_WRITER_H
 #define VALUE_WRITER_H
 
-#include "OcpiUtilValue.h"
+#include "UtilValue.hh"
 
 namespace OCPI {
   namespace Util {

@@ -25,8 +25,8 @@
 #include "OsAssert.hh"
 #include "OcpiUtilEzxml.h"
 #include "OcpiUtilMisc.h"
-#include "OcpiUtilProperty.h"
-#include "OcpiUtilValue.h"
+#include "MetadataProperty.hh"
+#include "UtilValue.hh"
 
 // Used both in spec and in impl
 // Note "readable" and "padding" are here for backward compatibility only and will produce warnings
@@ -59,9 +59,10 @@ namespace OCPI {
     {}
   }
 
-  namespace Util {
-    namespace OE = EzXml;
+  namespace Metadata {
+    namespace OE = OCPI::Util::EzXml;
     namespace OA = OCPI::API;
+    namespace OU = OCPI::Util;
     Property::Property()
       : m_smallest(0), m_granularity(0), m_isSub32(false),
 	m_isPadding(false), m_isRaw(false), m_rawSet(false), m_isTest(false),
@@ -78,12 +79,12 @@ namespace OCPI {
     // parse a value for this property, which may be a struct
     // used for instance property values in an assembly, etc.
     const char *
-    Property::parseValue(const char *unparsed, Value &value, const char *end,
-			 const IdentResolver *resolv) const {
+    Property::parseValue(const char *unparsed, OU::Value &value, const char *end,
+			 const OU::IdentResolver *resolv) const {
       if (!value.m_vt)
 	value.setType(*this);
       const char *err = value.parse(unparsed, end, false, resolv);
-      return err ? esprintf("for property %s: %s", cname(), err) : NULL;
+      return err ? OU::esprintf("for property %s: %s", cname(), err) : NULL;
     }
 
     // FIXME find the caller and nuke this one
@@ -119,89 +120,89 @@ namespace OCPI {
 	  (err = OE::getNumber(prop, "Indirect", &indirect, &isIndirect, 0, true)) ||
 	  (err = OE::getNumber(prop, "PadBefore", &padBefore, &isPadBefore)) ||
 	  (err = OE::getBoolean(prop, "Padding", &isPadding)))
-	return esprintf("for property \"%s\": %s", cname(), err);
+	return OU::esprintf("for property \"%s\": %s", cname(), err);
       // Checks for bad combinations in any context
       if (isReadable && isReadback)
-	return esprintf("Error: for property \"%s\", only of one of the \"readable\" or \"readback\" "
-			"attributes are allowed, and \"readable\" is deprecated", cname());
+	return OU::esprintf("Error: for property \"%s\", only of one of the \"readable\" or \"readback\" "
+			    "attributes are allowed, and \"readable\" is deprecated", cname());
       if (valueAttr && defaultAttr)
-	  return esprintf("Error: for property \"%s\", only of one of the \"value\" or \"default\" "
-			  "attributes are allowed", cname());
+	  return OU::esprintf("Error: for property \"%s\", only of one of the \"value\" or \"default\" "
+			      "attributes are allowed", cname());
       if (isVolatile) {
 	if (isReadable) {
-	  ewprintf("for volatile property \"%s\", \"readable\" is invalid and ignored (and it is "
-		   "deprecated)", cname());
+	  OU::ewprintf("for volatile property \"%s\", \"readable\" is invalid and ignored (and it is "
+		       "deprecated)", cname());
 	  isReadable = false;
 	}
 	if (isReadback)
-	  return esprintf("for volatile property \"%s\", \"readback\" is invalid", cname());
+	  return OU::esprintf("for volatile property \"%s\", \"readback\" is invalid", cname());
 	if (isParameter)
-	  return esprintf("Error: for property \"%s\", \"parameter\" and \"volatile\" cannot "
-			  "both be true", cname());
+	  return OU::esprintf("Error: for property \"%s\", \"parameter\" and \"volatile\" cannot "
+			      "both be true", cname());
 	if (!isWritable && !isInitial && !m_isWritable && !m_isInitial && defaultAttr)
-	  return esprintf("Error: for volatile property \"%s\", the \"default\" attribute "
-			  "should not be used without either \"writable\" or \"initial\" being true",
-			  cname());
+	  return OU::esprintf("Error: for volatile property \"%s\", the \"default\" attribute "
+			      "should not be used without either \"writable\" or \"initial\" being true",
+			      cname());
 	if (valueAttr)
-	  return esprintf("Error: for volatile property \"%s\", the \"value\" attribute is "
-			  "invalid", cname());
+	  return OU::esprintf("Error: for volatile property \"%s\", the \"value\" attribute is "
+			      "invalid", cname());
       }
       int settables = !!isWritable + !!isInitial + !!isParameter;
       if (settables > 1) {
 	if (isParameter) {
-	  ewprintf("for property \"%s\", only one of \"writable\", \"initial\" "
-		   "and \"parameter\" can be true: \"parameter\" takes precedence; writable and "
-		   "initial are ignored here", cname());
+	  OU::ewprintf("for property \"%s\", only one of \"writable\", \"initial\" "
+		       "and \"parameter\" can be true: \"parameter\" takes precedence; writable and "
+		       "initial are ignored here", cname());
 	  isWritable = isInitial = false;
 	} else {
-	  ewprintf("for property \"%s\", only one of \"writable\", \"initial\" "
-		   "and \"parameter\" can be true: \"initial\" takes precedence; writable "
-		   "is ignored here", cname());
+	  OU::ewprintf("for property \"%s\", only one of \"writable\", \"initial\" "
+		       "and \"parameter\" can be true: \"initial\" takes precedence; writable "
+		       "is ignored here", cname());
 	  isWritable = false;
 	}
       } else if (settables == 0) {
 	if (defaultAttr && !m_isWritable && !m_isInitial && !m_isParameter)
-	  return esprintf("for property \"%s\", the \"default\" attribute is only "
-			  "valid for settable properties using \"parameter\", \"initial\" or "
-			  "\"writable\"", cname());
+	  return OU::esprintf("for property \"%s\", the \"default\" attribute is only "
+			      "valid for settable properties using \"parameter\", \"initial\" or "
+			      "\"writable\"", cname());
 	if (valueAttr && !m_isParameter)
-	  return esprintf("for property \"%s\", the \"value\" attribute is only "
-			  "valid for settable properties using \"parameter\"", cname());
+	  return OU::esprintf("for property \"%s\", the \"value\" attribute is only "
+			      "valid for settable properties using \"parameter\"", cname());
       }
       if (isPadding && (isReadable || isReadback || isWritable || isInitial || isVolatile ||
 			isHidden || valueAttr || defaultAttr))
-	  return esprintf("for property \"%s\", with \"padding\" == true, "
-			  "these attributes are not allowed:  readback, writable, initial, "
-			  "volatile, hidden, value, default, readable (deprecated)", cname());
+	  return OU::esprintf("for property \"%s\", with \"padding\" == true, "
+			      "these attributes are not allowed:  readback, writable, initial, "
+			      "volatile, hidden, value, default, readable (deprecated)", cname());
       if (isInitial || isWritable) {
 	if (valueAttr)
-	  return esprintf("for property \"%s\", with \"writable\" or \"initial\" being "
-			  "true, the \"value\" attribute is not allowed:  use \"default\" "
-			  "instead", cname());
+	  return OU::esprintf("for property \"%s\", with \"writable\" or \"initial\" being "
+			      "true, the \"value\" attribute is not allowed:  use \"default\" "
+			      "instead", cname());
 #if 0 // the zero default is historical and convenient, should be more fully tested
 	else if (!defaultAttr && !m_default)
-	  ewprintf("for property \"%s\", with \"writable\" or \"initial\" being "
-		   "true, the \"default\" attribute should be set, otherwise zero values are "
-		   "implied", cname());
+	  OU::ewprintf("for property \"%s\", with \"writable\" or \"initial\" being "
+		       "true, the \"default\" attribute should be set, otherwise zero values are "
+		       "implied", cname());
 #endif
       }
       if (isSpec) {
 	if (isReadback)
-	  return esprintf("for property \"%s\", in a spec(OCS), the \"readback\" attribute is not valid; "
-			  "it should be used in workers that require it", cname());
+	  return OU::esprintf("for property \"%s\", in a spec(OCS), the \"readback\" attribute is not valid; "
+			      "it should be used in workers that require it", cname());
 	if (isPadding)
-	  ewprintf("Warning: for property \"%s\", in a spec(OCS), padding is deprecated.  "
-		   "Use padBefore in <specproperty> in OWD", cname());
+	  OU::ewprintf("Warning: for property \"%s\", in a spec(OCS), padding is deprecated.  "
+		       "Use padBefore in <specproperty> in OWD", cname());
 	if (isRaw || isIndirect || isPadBefore)
-	  return esprintf("Warning: for property \"%s\", in a spec(OCS), none of these are "
-			  "allowed:  padding, padBefore, raw, indirect", cname());
+	  return OU::esprintf("Warning: for property \"%s\", in a spec(OCS), none of these are "
+			      "allowed:  padding, padBefore, raw, indirect", cname());
 	if (isParameter && !(defaultAttr || valueAttr)) {
 	  static bool once = false;
 	  if (!once)
-	    ewprintf("for property \"%s\", in a spec(OCS), \"parameter\" without \"value\" or "
-		     "\"default\" should be changed to default access (readable constant value), "
-		     "with the worker perhaps specifying it as a parameter in <specproperty>",
-		     cname());
+	    OU::ewprintf("for property \"%s\", in a spec(OCS), \"parameter\" without \"value\" or "
+			 "\"default\" should be changed to default access (readable constant value), "
+			 "with the worker perhaps specifying it as a parameter in <specproperty>",
+			 cname());
 	  once = true;
 	}
 	// Remember attributes that might be morphed by specproperty
@@ -211,35 +212,35 @@ namespace OCPI {
 	m_specReadable = isReadable; // actually invalid, but for compatibility
       } else if (addAccess) { // is a spec property
 	if (isPadding)
-	  return esprintf("Error: for specproperty \"%s\", setting \"padding\" is not allowed",
-			  cname());
+	  return OU::esprintf("Error: for specproperty \"%s\", setting \"padding\" is not allowed",
+			      cname());
 	if ((defaultAttr || valueAttr) && m_default && m_hasValue)
-	  return esprintf("Error: for specproperty \"%s\", setting \"value\" or \"default\" is not "
-			  "allowed when there is already a value or default in the spec(OCS)",
-			  cname());
+	  return OU::esprintf("Error: for specproperty \"%s\", setting \"value\" or \"default\" is not "
+			      "allowed when there is already a value or default in the spec(OCS)",
+			      cname());
 	// spec property - what are we allowed to change?
 	if (m_specWritable) {
 	  if (isWritable)
-	    ewprintf("for specproperty \"%s\", it is already specified as writable "
-		     "in the spec(OCS)", cname());
+	    OU::ewprintf("for specproperty \"%s\", it is already specified as writable "
+			 "in the spec(OCS)", cname());
 	  if (isInitial || isParameter)
-	    return esprintf("for specproperty \"%s\", it is \"writable\" is the "
-			    "spec(OCS), so neither \"initial\" nor \"parameter\" can be true",
-			    cname());
+	    return OU::esprintf("for specproperty \"%s\", it is \"writable\" is the "
+				"spec(OCS), so neither \"initial\" nor \"parameter\" can be true",
+				cname());
 	  isWritable = true;
 	} else if (m_specParameter) {
 	  if (isParameter)
-	    ewprintf("for specproperty \"%s\", it is already specified as "
-		     "parameter in the spec(OCS)", cname());
+	    OU::ewprintf("for specproperty \"%s\", it is already specified as "
+			 "parameter in the spec(OCS)", cname());
 	  if (isInitial || isWritable)
-	    return esprintf("Warning: for specproperty \"%s\", it is \"parameter\" is the "
-			    "spec(OCS), so neither \"initial\" nor \"writable\" can be true",
-			    cname());
+	    return OU::esprintf("Warning: for specproperty \"%s\", it is \"parameter\" is the "
+				"spec(OCS), so neither \"initial\" nor \"writable\" can be true",
+				cname());
 	  isParameter = true;
 	} else if (m_specInitial) {
 	  if (isInitial)
-	    ewprintf("for specproperty \"%s\", it is already specified as initial "
-		     "in the spec(OCS)", cname());
+	    OU::ewprintf("for specproperty \"%s\", it is already specified as initial "
+			 "in the spec(OCS)", cname());
 	  if (isParameter || isWritable) // if it is morphed from initial, start over
 	    m_isInitial = m_isWritable = false;
 	  else
@@ -249,29 +250,29 @@ namespace OCPI {
 	}
 	if (m_isVolatile) {
 	  if (isVolatile)
-	    ewprintf("for specproperty \"%s\", it is already specified as volatile "
-		     "in the spec(OCS)", cname());
+	    OU::ewprintf("for specproperty \"%s\", it is already specified as volatile "
+			 "in the spec(OCS)", cname());
 	  if (isReadable || isReadback)
-	    return esprintf("Error: for specproperty \"%s\", it is already specified as volatile "
-			    "in the spec(OCS), so neither \"readable\"(deprecated) nor \"readback\" can be "
-			    "true", cname());
+	    return OU::esprintf("Error: for specproperty \"%s\", it is already specified as "
+				"volatile in the spec(OCS), so neither \"readable\"(deprecated) nor "
+				"\"readback\" can be true", cname());
 	  isVolatile = true;
 	}
 	if (m_isReadback) {
 	  if (isReadback)
-	    ewprintf("for specproperty \"%s\", it is already specified as readback"
-		     "in the spec(OCS), which is not recommended in any case", cname());
+	    OU::ewprintf("for specproperty \"%s\", it is already specified as readback"
+			 "in the spec(OCS), which is not recommended in any case", cname());
 	  isReadback = true;
 	}
 	if ((m_specParameter || isParameter) && !m_default && !(defaultAttr || valueAttr))
-	  return esprintf("for parameter property \"%s\", in a specproperty, having no \"value\" or "
-			  "\"default\" is not valid", cname());
+	  return OU::esprintf("for parameter property \"%s\", in a specproperty, having no \"value\" or "
+			      "\"default\" is not valid", cname());
 	// end of spec property
       } else {
 #if 0 // nope - this is too aggressive for now
 	if (isParameter && !(defaultAttr || valueAttr))
-	  return esprintf("for worker parameter property \"%s\", having no \"value\" or "
-			  "\"default\" is not valid", cname());
+	  return OU::esprintf("for worker parameter property \"%s\", having no \"value\" or "
+			      "\"default\" is not valid", cname());
 #endif
 	// Defining a new property in the OWD.
 	// No specific error checks that are not above.
@@ -279,9 +280,9 @@ namespace OCPI {
       if (isReadable) {
 	static bool once = false;
 	if (!once)
-	  ewprintf("for property \"%s\", the \"readable\" attribute is deprecated: all properties "
-		   "are considered readable; workers can use the \"readback\" attribute in the OWD when "
-		   "required; see the CDG for details", cname());
+	  OU::ewprintf("for property \"%s\", the \"readable\" attribute is deprecated: all properties "
+		       "are considered readable; workers can use the \"readback\" attribute in the OWD when "
+		       "required; see the CDG for details", cname());
 	once = true;
 	isReadback = true; // backward compatibility
       }
@@ -309,20 +310,20 @@ namespace OCPI {
     Property::parseCheck() {
 #if 0
       if (m_isParameter && ((m_isWritable && !m_isInitial) || m_isIndirect || m_isVolatile))
-	return esprintf("Property \"%s\" is a parameter and can't be writable or indirect or volatile",
-			m_name.c_str());
+	return OU::esprintf("Property \"%s\" is a parameter and can't be writable or indirect or volatile",
+			    m_name.c_str());
 #if 0
       if (!m_isWritable && !m_isReadable && !m_isParameter && !m_isPadding)
-	return esprintf("Property \"%s\" is not readable or writable or padding or a parameter",
-			m_name.c_str());
+	return OU::esprintf("Property \"%s\" is not readable or writable or padding or a parameter",
+			    m_name.c_str());
 #endif
       if (!m_isImpl) {
 	if (m_isReadable && !m_isVolatile)
-	  return esprintf( "Warning: for property \"%s\" in a spec, the \"readable\" attribute "
-		  "should not be used", cname());
+	  return OU::esprintf( "Warning: for property \"%s\" in a spec, the \"readable\" attribute "
+			       "should not be used", cname());
 	if (m_isPadding)
-	  return esprintf( "Warning: for property \"%s\" in a spec, the \"padding\" attribute "
-		  "should not be used", cname());
+	  return OU::esprintf( "Warning: for property \"%s\" in a spec, the \"padding\" attribute "
+			       "should not be used", cname());
       }
 #endif
       return NULL;
@@ -332,7 +333,7 @@ namespace OCPI {
     // an implementation (includeImpl == true)
     const char *
     Property::parse(ezxml_t prop, bool includeImpl, unsigned ordinal,
-		    const IdentResolver *resolv) {
+		    const OU::IdentResolver *resolv) {
       const char *err;
 
       if ((err = includeImpl ?
@@ -366,7 +367,7 @@ namespace OCPI {
     // Here is where is need to ensure that all aspects of the underlying data type
     // are fully resolved.
     const char *Property::
-    offset(size_t &cumOffset, uint64_t &sizeofConfigSpace, const IdentResolver *resolver) {
+    offset(size_t &cumOffset, uint64_t &sizeofConfigSpace, const OU::IdentResolver *resolver) {
       const char *err = NULL;
       if (resolver && (err = finalize(*resolver, "property", !m_isParameter)))
 	return err;
@@ -383,7 +384,7 @@ namespace OCPI {
 	  sizeofConfigSpace = top;
 	m_offset = m_indirectAddr;
       } else if (!m_isParameter || m_isReadback) {
-	cumOffset = roundUp(cumOffset, m_align);
+	cumOffset = OU::roundUp(cumOffset, m_align);
 	m_offset = cumOffset;
 	cumOffset += m_nBytes;
 	if (cumOffset > sizeofConfigSpace)
@@ -428,8 +429,8 @@ namespace OCPI {
 	  (err = OE::getNumber(prop, "Indirect", &m_indirectAddr, &m_isIndirect, 0, true)))
 	return err;
       if (m_isParameter && !m_isReadback && m_isRaw)
-	return esprintf("Property %s specified as both parameter (without readback) and raw, which "
-			"is invalid", cname());
+	return OU::esprintf("Property %s specified as both parameter (without readback) and raw, which "
+			    "is invalid", cname());
       static const char *reduceNames[] = {
 #define OCPI_REDUCE(c) #c,
 	OCPI_REDUCTIONS
@@ -447,7 +448,7 @@ namespace OCPI {
 
     // This parses something that is adding impl attributes to an existing property
     const char *Property::
-    parseImpl(ezxml_t x, const IdentResolver *resolv) {
+    parseImpl(ezxml_t x, const OU::IdentResolver *resolv) {
       const char *err;
       if ((err = OE::checkAttrs(x, "Name", IMPL_ATTRIBUTES, "hidden", "default", "value", NULL)) ||
 	  (err = parseAccess(x, false, true)) ||
@@ -457,13 +458,13 @@ namespace OCPI {
 	*v = ezxml_cattr(x, "value"),
 	*d = ezxml_cattr(x, "default");
       if (m_default && (v || d) && !m_isParameter)
-	return esprintf("Implementation property named \"%s\" cannot override "
-			"previous default value in spec", m_name.c_str());
+	return OU::esprintf("Implementation property named \"%s\" cannot override "
+			    "previous default value in spec", m_name.c_str());
 
       if (v) {
 	if (m_hasValue)
-	  return esprintf("Property \"%s\" already has a non-default value which cannot be "
-			  "overridden", m_name.c_str());
+	  return OU::esprintf("Property \"%s\" already has a non-default value which cannot be "
+			      "overridden", m_name.c_str());
 	if ((err = parseDefault(v, "property", resolv)))
 	  return err;
 	m_hasValue = true;
@@ -472,12 +473,12 @@ namespace OCPI {
       return parseCheck();
     }
 
-    const char *Property::getValue(ExprValue &val) {
+    const char *Property::getValue(OU::ExprValue &val) {
       if (!m_default)
-	return esprintf("property \"%s\" has no value", m_name.c_str());
+	return OU::esprintf("property \"%s\" has no value", m_name.c_str());
       if (m_arrayRank || m_isSequence || m_baseType == OA::OCPI_Struct ||
 	  m_baseType == OA::OCPI_Type)
-	return esprintf("property \"%s\" is an array/sequence/struct", m_name.c_str());
+	return OU::esprintf("property \"%s\" is an array/sequence/struct", m_name.c_str());
       return m_default->getValue(val);
     }
   }

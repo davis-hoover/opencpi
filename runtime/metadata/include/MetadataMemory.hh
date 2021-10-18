@@ -23,11 +23,11 @@
 
 #include <string>
 #include "ezxml.h"
-#include "OcpiUtilMemory.h"
+#include "MetadataMemory.hh"
 
 namespace OCPI
 {
-  namespace Util
+  namespace Metadata
   {
     class Memory
     {

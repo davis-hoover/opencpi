@@ -24,11 +24,11 @@
 */
 
 #include "OcpiUtilEzxml.h"
-#include "OcpiUtilMemory.h"
+#include "MetadataMemory.hh"
 
 namespace OCPI
 {
-  namespace Util
+  namespace Metadata
   {
     namespace OE = OCPI::Util::EzXml;
 

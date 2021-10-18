@@ -113,7 +113,9 @@ namespace OCPI {
 		       const IdentResolver *resolver),
       *parseExprBool(const char *a, bool &b, std::string *expr,
 		     const IdentResolver *resolver),
-      // Convert an expression to C/C++
+      *getExprNumber(ezxml_t x, const char *attr, size_t &np, bool *found, std::string &expr,
+		     const IdentResolver *resolver),
+   // Convert an expression to C/C++
       *makeCexpression(const char *expr, const char *prefix, const char *suffix,
 		       bool toUpper, std::string &out);
   }

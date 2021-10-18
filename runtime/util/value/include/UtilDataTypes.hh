@@ -27,8 +27,8 @@
 #include <stdarg.h>
 #include <string>
 #include <vector>
-#include "OcpiExprEvaluator.h"
-#include "OcpiUtilDataTypesApi.h"
+#include "UtilExpression.hh"
+#include "OcpiDataTypesApi.hh"
 
 namespace OCPI {
   namespace Util {

@@ -29,8 +29,8 @@
 #include <gmpxx.h>
 #include "OcpiUtilMisc.h"
 #include "OcpiUtilEzxml.h"
-#include "OcpiUtilValue.h"
-#include "OcpiExprEvaluator.h"
+#include "UtilValue.hh"
+#include "UtilExpression.hh"
 
 namespace OU = OCPI::Util;
 namespace OX = OCPI::Util::EzXml;
@@ -901,6 +901,22 @@ const char *ExprValue::getString(std::string &s) const {
   else
     m_internal->getString(s);
   return s.c_str();
+}
+// Parse an integer (size_t) attribute that might be an expression
+// Only consider if we have an identifier resolver
+// The string value of the expression is returned in expr.
+const char *
+getExprNumber(ezxml_t x, const char *attr, size_t &np, bool *found, std::string &expr,
+	      const IdentResolver *resolver) {
+  const char *a = ezxml_cattr(x, attr);
+  if (a) {
+    if (found)
+      *found = true;
+    return parseExprNumber(a, np, &expr, resolver);
+  }
+  if (found)
+    *found = false;
+  return NULL;
 }
 
 }

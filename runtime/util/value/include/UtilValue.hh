@@ -29,7 +29,7 @@
 #include <cassert>
 #include "ezxml.h"
 #include "OcpiUtilAutoMutex.h"
-#include "OcpiUtilDataTypes.h"
+#include "UtilDataTypes.hh"
 
 namespace OCPI {
   namespace Util {

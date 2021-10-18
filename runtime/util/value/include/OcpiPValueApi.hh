@@ -33,7 +33,7 @@
 #ifndef OCPI_PVALUE_API_H
 #define OCPI_PVALUE_API_H
 
-#include "OcpiUtilDataTypesApi.h"
+#include "OcpiDataTypesApi.hh"
 
 namespace OCPI {
   

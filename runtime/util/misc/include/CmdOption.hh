@@ -25,8 +25,8 @@
 
 #include <assert.h>
 #include <vector>
-#include "OcpiUtilDataTypes.h"
-#include "OcpiUtilValue.h"
+#include "UtilDataTypes.hh"
+#include "UtilValue.hh"
 
 namespace OCPI {
   namespace Util {

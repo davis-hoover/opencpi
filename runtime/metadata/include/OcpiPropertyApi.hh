@@ -25,7 +25,7 @@
 #ifndef OCPI_UTIL_PROPERTY_API_H
 #define OCPI_UTIL_PROPERTY_API_H
 
-#include "OcpiUtilDataTypesApi.h"
+#include "OcpiDataTypesApi.hh"
 
 namespace OCPI {
   namespace API {
