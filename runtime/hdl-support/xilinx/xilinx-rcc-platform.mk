@@ -139,7 +139,7 @@ ifneq (,) # note test.its is a human concoction for patching the later root fs's
 	mkdir -p gen/patch_ub_image
 	mv boot/image.ub gen/patch_ub_image
 	set -evx; cd gen/patch_ub_image; \
-	PATH=$$PATH:$(local_repo)/u-boot-xlnx/tools:$(local_repo)/linux-xlnx/scripts/dtc; \
+	PATH=$(local_repo)/u-boot-xlnx/tools:$(local_repo)/linux-xlnx/scripts/dtc:$$PATH; \
 	echo Dumping metadata for image.ub; \
 	dumpimage -l image.ub; \
 	dumpimage -T flat_dt -i image.ub -p 0 old-kernel; \
