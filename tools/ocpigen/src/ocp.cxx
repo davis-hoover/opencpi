@@ -24,9 +24,6 @@
 #include "hdl.h"
 #include "assembly.h"
 
-namespace OE=OCPI::Util::EzXml;
-namespace OU=OCPI::Util;
-
 #undef OCP_SIGNAL_MT
 #define OCP_SIGNAL_MT(n, w) {#n, true, true, w, true, false, OCP_##n},
 #define OCP_SIGNAL_MTR(n, w) {#n, true, true, w, true, true, OCP_##n},

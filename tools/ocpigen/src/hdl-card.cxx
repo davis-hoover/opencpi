@@ -22,9 +22,6 @@
 #include "hdl-device.h"
 #include "hdl-card.h"
 
-namespace OE=OCPI::Util::EzXml;
-namespace OU=OCPI::Util;
-
 Cards Card::s_cards;        // registry of card types
 
 // A slot may have a default mapping to the external platform's signals,

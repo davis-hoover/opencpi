@@ -26,12 +26,6 @@
 #include "hdl-config.h"
 #include "hdl.h"
 
-namespace OM = OCPI::Metadata;
-namespace OM = OCPI::Metadata;
-namespace OM = OCPI::Metadata;
-namespace OU = OCPI::Util;
-namespace OE = OCPI::Util::EzXml;
-
 DevInstance::
 DevInstance(const Device &d, const Card *c, const Slot *s, bool control,
 	    const DevInstance *parent)

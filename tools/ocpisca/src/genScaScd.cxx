@@ -26,8 +26,7 @@
 
 namespace OCPI {
   namespace API {
-namespace OM = OCPI::Metadata;
-namespace OM = OCPI::Metadata;
+    namespace OM = OCPI::Metadata;
     namespace OU = OCPI::Util;
     namespace SCA = OCPI::SCA;
     namespace OC = OCPI::Container;

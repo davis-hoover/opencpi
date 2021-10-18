@@ -25,13 +25,12 @@
 
 namespace OCPI {
   namespace API {
-namespace OM = OCPI::Metadata;
-namespace OM = OCPI::Metadata;
+    namespace OM = OCPI::Metadata;
     namespace OU = OCPI::Util;
     namespace OX = OCPI::Util::EzXml;
     namespace SCA = OCPI::SCA;
     static void
-    emitProperty(ezxml_t root, unsigned level, const char *sname, const OM::Member &pr,
+    emitProperty(ezxml_t root, unsigned level, const char *sname, const OU::Member &pr,
 		 const char *mode, const char *value, bool config, bool allocation,
 		 bool external, bool uuid) {
       ocpiDebug("emitting property %s", pr.cname());
@@ -85,7 +84,7 @@ namespace OM = OCPI::Metadata;
 	break;
       case OCPI_Struct:
 	for (unsigned n = 0; n < pr.m_nMembers; n++) {
-	  OM::Member &m = pr.m_members[n];
+	  OU::Member &m = pr.m_members[n];
 	  if (m.m_baseType == OCPI_Struct || m.m_baseType == OCPI_Type || m.m_isSequence ||
 	      m.m_arrayRank)
 	    throw OU::Error("Unsupported struct member \"%s\" of property \"%s\" with data type: %s \"%s\"",

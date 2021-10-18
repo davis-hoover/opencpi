@@ -30,8 +30,6 @@
 #include "hdl.h"
 #include "hdl-platform.h"
 
-namespace OX = OCPI::Util::EzXml;
-
 const char *Instance::
 initHDL(::Assembly &assy) {
   const char *err;
@@ -281,7 +279,7 @@ parseHdlAssy() {
   const char *err;
   if ((err = addBuiltinProperties()))
     return err;
-  if (strcasecmp(OX::ezxml_tag(m_xml), "HdlAssembly") &&
+  if (strcasecmp(OE::ezxml_tag(m_xml), "HdlAssembly") &&
       ((err = addProperty("<property name='sdp_width' type='uchar' parameter='true' "
 			 "default='1'/>", true)) ||
        (err = addProperty("<property name='sdp_length' type='ushort' parameter='true' "

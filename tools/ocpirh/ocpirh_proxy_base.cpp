@@ -31,9 +31,6 @@
 namespace OA = OCPI::API;
 namespace OC = OCPI::Container;
 namespace OM = OCPI::Metadata;
-namespace OM = OCPI::Metadata;
-namespace OM = OCPI::Metadata;
-namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 namespace OS = OCPI::OS;
 
@@ -86,7 +83,7 @@ struct ocpirh_proxy_base::PropertyBase : public OA::Property {
     : OA::Property(app, name.c_str()) {
   }
   // Get the binary/parsed value (inefficiently).
-  void getValue(OM::Value &v) {
+  void getValue(OU::Value &v) {
     std::string s, n;
     bool unreadable;
     m_worker.getProperty(m_ordinal, n, s, &unreadable);
@@ -212,7 +209,7 @@ OCPI_DATA_TYPES
     : ocpirh_proxy_base::PropertyBase(app, name) {			\
     }									\
     RHTYPE_##pretty getValue() {					\
-      OM::Value v;							\
+      OU::Value v;							\
       ocpirh_proxy_base::PropertyBase::getValue(v);			\
       return v.m_##pretty;						\
     }									\
@@ -264,7 +261,7 @@ constructor() {
 	case OA::OCPI_##pretty: {					\
 	  typedef Ocpi##pretty##Property P;				\
           P &p = *new P(*m_application, name);				\
-	  OM::Value v;							\
+	  OU::Value v;							\
 	  p.ocpirh_proxy_base::PropertyBase::getValue(v);		\
           RHTYPE_##pretty init = v.m_##pretty;			        \
 	  std::string s;						\
@@ -307,7 +304,7 @@ OCPI_DATA_TYPES
 	const OM::Port &metaPort =
 	  static_cast<OCPI::Container::ExternalPort*>(&ocpiPort)->metaPort();
 	assert(metaPort.nOperations() == 1 && metaPort.operations()[0].nArgs() == 1);
-	OM::Member &arg = metaPort.operations()[0].args()[0];
+	OU::Member &arg = metaPort.operations()[0].args()[0];
 	assert((arg.m_isSequence || arg.m_arrayRank) && arg.m_baseType != OA::OCPI_Struct &&
 	       arg.m_baseType != OA::OCPI_Type && arg.m_baseType != OA::OCPI_String);
 	PortBase *p;

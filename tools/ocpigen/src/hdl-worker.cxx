@@ -27,11 +27,6 @@
 #include "hdl.h"
 #include "assembly.h"
 
-namespace OM = OCPI::Metadata;
-namespace OM = OCPI::Metadata;
-namespace OM = OCPI::Metadata;
-namespace OU = OCPI::Util;
-
 void
 emitSignal(const char *signal, FILE *f, Language lang, Signal::Direction dir,
 	   std::string &last, int width, unsigned n, const char *pref,

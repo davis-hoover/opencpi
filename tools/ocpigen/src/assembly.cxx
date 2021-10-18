@@ -23,13 +23,6 @@
 #include "assembly.h"
 // Generic (actually non-HDL) assembly support
 // This isn't as purely generic as it should be  FIXME
-namespace OM = OCPI::Metadata;
-namespace OM = OCPI::Metadata;
-namespace OM = OCPI::Metadata;
-namespace OM = OCPI::Metadata;
-namespace OM = OCPI::Metadata;
-namespace OU = OCPI::Util;
-namespace OA = OCPI::API;
 
 Assembly::
 Assembly(Worker &w)

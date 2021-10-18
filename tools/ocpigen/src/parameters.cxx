@@ -29,13 +29,6 @@
 #include "hdl.h"
 #include "hdl-device.h"
 #include "assembly.h"
-namespace OM = OCPI::Metadata;
-namespace OM = OCPI::Metadata;
-namespace OM = OCPI::Metadata;
-namespace OM = OCPI::Metadata;
-namespace OM = OCPI::Metadata;
-namespace OU=OCPI::Util;
-namespace OF=OCPI::OS::FileSystem;
 
 const char *Worker::
 addParamConfigSuffix(std::string &s) {

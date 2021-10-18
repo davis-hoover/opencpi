@@ -38,7 +38,6 @@
 #define TESTS "-tests.xml"
 #define MS_CONFIG "bypass", "metadata", "throttle", "full"
 
-namespace OL = OCPI::Library;
 namespace {
   // The package serves two purposes: the spec and the impl.
   // If the spec already has a package prefix, then it will only

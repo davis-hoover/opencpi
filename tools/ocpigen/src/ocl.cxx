@@ -35,9 +35,6 @@
 #include "data.h"
 #include "rcc.h"
 
-namespace OM = OCPI::Metadata;
-namespace OM = OCPI::Metadata;
-namespace OU = OCPI::Util;
 // Generate the readonly implementation file.
 // What implementations must explicitly (verilog) or implicitly (VHDL) include.
 #define HEADER ".h"
