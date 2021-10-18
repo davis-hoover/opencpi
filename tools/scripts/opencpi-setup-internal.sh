@@ -117,6 +117,7 @@ esac
 	 --ensure or -e:    do nothing if OpenCPI is already set up, otherwise like --set
 	 --set or -s:       setup the environment for OpenCPI when it is not yet set up
 	 --optimize:        enable the currently running host platform to use optimized code
+	 --install or -i:   unset all OpenCPI environment vars not needed for installation
 	When --set or --reset is used, the OpenCPI CDK location is inferred from the location
 	of this file, where sourced.  E.g. issuing the command "source a/b/c/opencpi-setup.sh -s"
 	will setup the CDK as found in a/b/c.
@@ -131,7 +132,8 @@ esac
 if shopt -q nullglob; then echo 'Note: Turning off nullglob; was active!'; shopt -u nullglob; fi
 
 # Parse opts
-ocpi_dynamic= ocpi_optimize= ocpi_reset= ocpi_verbose= ocpi_clean= ocpi_list= ocpi_ensure= ocpi_bootstrap=
+ocpi_dynamic= ocpi_optimize= ocpi_reset= ocpi_verbose= ocpi_clean=
+ocpi_list= ocpi_ensure= ocpi_bootstrap= ocpi_install= 
 ocpi_options=($*)
 while [ -n "$ocpi_options" ] ; do
   case $ocpi_options in
@@ -142,6 +144,7 @@ while [ -n "$ocpi_options" ] ; do
     -c|--clean) ocpi_clean=1;;
     -l|--list) ocpi_list=1;;
     -e|--ensure) ocpi_ensure=1;;
+    -i|--install) ocpi_install=1;;
     -b|--bootstrap) ocpi_bootstrap=1;;  # Undocumented option for internal use only
     -|-s|--set);; # perhaps the single required variable
     *)
@@ -168,6 +171,17 @@ if [ -z "$ocpi_bootstrap" ]; then
   fi
 fi
 unset ocpi_bootstrap
+
+[ -n "$ocpi_install" ] && { 
+  evars=`env | grep OCPI_ | grep -v -e PREREQ -e LOG | sort`
+  [ -n "$evars" ] && [ -n "$ocpi_verbose" ] && echo Unsetting the following OpenCPI variables prior to installation:
+  for ocpi_v in $evars 
+  do
+    [ -n "$ocpi_verbose" ] && echo "   $ocpi_v"
+    unset `echo $ocpi_v | cut -f1 -d=`
+  done
+  return 0
+}
 
 [ -n "$ocpi_clean" ] && {
   [ -n "$OCPI_CDK_DIR" ] && {
