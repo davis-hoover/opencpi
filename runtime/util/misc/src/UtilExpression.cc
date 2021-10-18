@@ -919,8 +919,55 @@ getExprNumber(ezxml_t x, const char *attr, size_t &np, bool *found, std::string 
   return NULL;
 }
 
+const char *
+parseConditionals(ezxml_t parent, const OU::IdentResolver &r) {
+  ezxml_t next; 
+  const char *err = NULL;
+  for (ezxml_t xml = parent ? parent->child : NULL; xml; xml = next) {
+    next = xml->ordered;
+    bool testValue;
+    const char *expr;
+    if (!strcasecmp(xml->name, "if")) {
+      if (!xml->child)
+	return "empty \"if\" element with no child elements";
+      if (!(expr = ezxml_cattr(xml, "test")))
+	return "missing \"test\" attribute in \"if\" element";
+      if ((err = OX::checkAttrs(xml, "test", NULL)) ||
+	  (err = OU::parseExprBool(expr, testValue, NULL, &r)))
+	return err;
+      // We need to look-ahead for an else.
+      OX::hoist(testValue, xml, parent);
+      if (next && !strcasecmp(next->name, "else")) {
+	if (!next->child)
+	  return "empty \"else\" element with no child elements";
+	if ((err = OX::checkAttrs(next, NULL)))
+	  return err;
+	OX::hoist(!testValue, next, parent);
+	next = parent->child; // one of <if> or <else> was hoisted
+      } else if (testValue)
+	next = parent->child; // <if> or <else> was hoisted
+      continue; // no recursion since we are restarting
+    } else if (!strcasecmp(xml->name, "else"))
+      return "invalid \"else\" element not after \"if\" element";
+    else if ((expr = ezxml_cattr(xml, "if"))) {
+      if ((err = OU::parseExprBool(expr, testValue, NULL, &r)))
+	return err;
+      if (testValue)
+	ezxml_set_attr(xml, "if", NULL);
+      else {
+	ezxml_cut(xml);
+	ezxml_free(xml);
+	continue; // no recursion since we're not including this
+      }
+    }
+    if ((err = parseConditionals(xml, r)))
+      return err;
+  }
+  return NULL;
 }
-}
+
+} // Util
+} // OCPI
 
 #if TEST_EXPR_EVALUATOR
 namespace OU = OCPI::Util;

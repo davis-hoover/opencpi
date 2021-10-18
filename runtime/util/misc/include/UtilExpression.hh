@@ -115,6 +115,7 @@ namespace OCPI {
 		     const IdentResolver *resolver),
       *getExprNumber(ezxml_t x, const char *attr, size_t &np, bool *found, std::string &expr,
 		     const IdentResolver *resolver),
+      *parseConditionals(ezxml_t parent, const IdentResolver &r),
    // Convert an expression to C/C++
       *makeCexpression(const char *expr, const char *prefix, const char *suffix,
 		       bool toUpper, std::string &out);
