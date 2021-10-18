@@ -33,7 +33,7 @@
 #include "OcpiUuid.h"
 #include "OcpiUtilMisc.h"
 #include "OcpiUtilEzxml.h"
-#include "OcpiUtilWorker.h"
+#include "MetadataWorker.hh"
 #include "XferManager.h"
 #include "HdlSimServer.h"
 #include "HdlDriver.h"
@@ -45,6 +45,7 @@ namespace OX = OCPI::Util::EzXml;
 namespace OE = OCPI::OS::Ether;
 namespace HE = OCPI::HDL::Net;
 namespace OH = OCPI::HDL;
+namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 namespace OA = OCPI::API;
 namespace OD = OCPI::DataTransport;
@@ -1394,7 +1395,7 @@ receiveRDMA(const char **/*ap*/) {
   if (endpoint.empty())
     endpoint = "ocpi-ether-rdma";
 #if 0
-  OU::PValue params[2] = {
+  OM::PValue params[2] = {
     OA::PVString("remote", endpoint.c_str()),
     OA::PVEnd
   };

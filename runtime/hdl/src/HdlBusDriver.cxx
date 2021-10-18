@@ -43,9 +43,10 @@
  namespace OCPI {
    namespace HDL {
      namespace Zynq {
+       namespace OM = OCPI::Metadata;
        namespace OU = OCPI::Util;
        namespace OF = OCPI::OS::FileSystem;
-       namespace OM = OCPI::HDL::ZynqMP;
+       namespace OZ = OCPI::HDL::ZynqMP;
        namespace OH = OCPI::HDL;
 
        const char
@@ -115,8 +116,8 @@
 	  ocpiDebug("Setting up the Zynq PL");
 #if defined(OCPI_ARCH_aarch64) // not a great ultrascale test, but works for now
 #if 0 // bus error due to the CSU being "secured"  Maybe we could do it in our kernel driver...
-	  volatile OM::CSU *csu;
-	  if (!(csu = (volatile OM::CSU*)m_driver.map(sizeof(*csu), OM::CSU_ADDR, err)))
+	  volatile OZ::CSU *csu;
+	  if (!(csu = (volatile OZ::CSU*)m_driver.map(sizeof(*csu), OZ::CSU_ADDR, err)))
 	    return true;
 	  uint32_t val = csu->IDCODE;;
 	  ocpiDebug("Zynq Ultrascale IDCODE is 0x%x", val);
@@ -142,7 +143,7 @@
 	  m_driver.unmap((uint8_t *)csu, sizeof(*csu), err);
 #endif
 	  volatile uint32_t *reg;
-	  if (!(reg = (volatile uint32_t *)m_driver.map(sizeof(uint32_t), OM::FPD_SLCR_AFI_FS_ADDR, err)))
+	  if (!(reg = (volatile uint32_t *)m_driver.map(sizeof(uint32_t), OZ::FPD_SLCR_AFI_FS_ADDR, err)))
 	    return true;
 #if 0
 	  *reg = (1<<8) | (1 << 10);  // set gp0/1 to 64bit mode
@@ -151,15 +152,15 @@
 #endif
 	  if (m_driver.unmap((uint8_t *)reg, sizeof(*reg), err))
 	    return true;
-	  volatile OM::ALL_AFIFMS *axi_hp;
+	  volatile OZ::ALL_AFIFMS *axi_hp;
 	  if (!(axi_hp =
-		(volatile OM::ALL_AFIFMS *)m_driver.map(sizeof(OM::ALL_AFIFMS), OM::S_AXI_HPX_FPD_ADDR, err)))
+		(volatile OZ::ALL_AFIFMS *)m_driver.map(sizeof(OZ::ALL_AFIFMS), OZ::S_AXI_HPX_FPD_ADDR, err)))
 	    return true;
-	  for (unsigned n = 0; n <  OM::NUM_S_AXI_HPNCS; n++) {
-	    axi_hp->afifm[OM::NUM_S_AXI_HPCS + n].rdctrl = 0xB1; // set 64 bits wide
-	    axi_hp->afifm[OM::NUM_S_AXI_HPCS + n].wrctrl = 0xB1;
+	  for (unsigned n = 0; n <  OZ::NUM_S_AXI_HPNCS; n++) {
+	    axi_hp->afifm[OZ::NUM_S_AXI_HPCS + n].rdctrl = 0xB1; // set 64 bits wide
+	    axi_hp->afifm[OZ::NUM_S_AXI_HPCS + n].wrctrl = 0xB1;
 	  }
-	  if (m_driver.unmap((uint8_t *)axi_hp, sizeof(OM::ALL_AFIFMS), err))
+	  if (m_driver.unmap((uint8_t *)axi_hp, sizeof(OZ::ALL_AFIFMS), err))
 	    return true;
 #else
 	  volatile SLCR *slcr = (volatile SLCR *)m_driver.map(sizeof(SLCR), SLCR_ADDR, err);
@@ -182,7 +183,7 @@
 #if defined(OCPI_ARCH_aarch64)
 	  // Pernaps we could use the ftm.gpi register if we needed to do the gp0/gp1 thing.
 	  // Note:  for parts that have the VCU (H.264/5), this is actually wrong.
-	  cpAddr = OM::M_HP0_PADDR;
+	  cpAddr = OZ::M_HP0_PADDR;
 #else
 	  volatile FTM *ftm = (volatile FTM *)m_driver.map(sizeof(FTM), FTM_ADDR, err);
 	  if (!ftm)

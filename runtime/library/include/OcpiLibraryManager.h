@@ -33,7 +33,7 @@
 #include "OcpiUtilEzxml.h"
 #include "OcpiUtilUUID.h"
 #include "OcpiDriverManager.h"
-#include "OcpiUtilWorker.h"
+#include "MetadataWorker.hh"
 #include "OcpiLibraryApi.h"
 
 namespace OCPI {
@@ -69,7 +69,7 @@ namespace OCPI {
     // A static connection inside the artifact
     struct Connection {
       Implementation *impl;
-      OCPI::Util::Port *port;
+      OCPI::Metadata::Port *port;
     };
     class Artifact;
     // This object represents a potentially usable implementation in an artifact.
@@ -79,19 +79,19 @@ namespace OCPI {
     public:
       Artifact &m_artifact;                 // FIXME this can be parent/child
       // This is the metadata description of the implementation, whether static instance or not
-      OCPI::Util::Worker &m_metadataImpl;
+      OCPI::Metadata::Worker &m_metadataImpl;
       ezxml_t m_staticInstance;             // static instances of this implementation
-      OCPI::Util::Port::Mask m_externals, m_internals;
+      OCPI::Metadata::Port::Mask m_externals, m_internals;
       Connection *m_connections;
       unsigned m_ordinal;                   // ordinal of worker within artifact
       bool m_inserted;
-      Implementation(Artifact &art, OCPI::Util::Worker &i, ezxml_t instance, unsigned ordinal);
+      Implementation(Artifact &art, OCPI::Metadata::Worker &i, ezxml_t instance, unsigned ordinal);
       // Does this implementation satify the selection criteria?  and if so, what is the score?
       //      bool satisfiesSelection(const char *selection, unsigned &score);
       ~Implementation();
       //      bool getValue(const char *symbol, OCPI::Util::ExprValue &val) const;
-      void setConnection(OCPI::Util::Port &myPort, Implementation *otherImpl = NULL,
-			 OCPI::Util::Port *otherPort = NULL);
+      void setConnection(OCPI::Metadata::Port &myPort, Implementation *otherImpl = NULL,
+			 OCPI::Metadata::Port *otherPort = NULL);
     };
 
     // Note due to xml persistence we don't need strings in the map
@@ -100,7 +100,7 @@ namespace OCPI {
     typedef WorkerMap::const_iterator WorkerIter;
     typedef std::pair<WorkerIter,WorkerIter> WorkerRange;
     class Library;
-    class Artifact : public OCPI::Util::Attributes {
+    class Artifact : public OCPI::Metadata::Attributes {
     protected:
       const char *m_metadata;
       std::time_t m_mtime; // modification time associated with when we read the metadata
@@ -109,7 +109,7 @@ namespace OCPI {
       ezxml_t m_xml;
       // A count and array of implementations found in the artifact, *not* static instances.
       unsigned m_nImplementations;
-      OCPI::Util::Worker *m_metaImplementations; // this array 
+      OCPI::Metadata::Worker *m_metaImplementations; // this array 
       // A map for implementations (*including* static instances) in this artifact
       // Used for artifact-by-artifact searches (FIXME: obsolete?)
       WorkerMap m_workers;      // Map from spec name to implementations
@@ -121,7 +121,7 @@ namespace OCPI {
     protected:
       Artifact();
       virtual ~Artifact();
-      Implementation *addImplementation(OCPI::Util::Worker &metaImpl, ezxml_t staticInstance);
+      Implementation *addImplementation(OCPI::Metadata::Worker &metaImpl, ezxml_t staticInstance);
       void getFileMetadata(const char *name);
       const char *setFileMetadata(const char *name, char *metadata, std::time_t mtime,
 				  uint64_t length, size_t metaLength);
@@ -198,7 +198,7 @@ namespace OCPI {
 				    const OCPI::API::Connection *conns,
 				    const char *&inst);
       void printArtifactsX(const Capabilities &caps, bool specs);
-      void doWorkers(void (*func)(OCPI::Util::Worker &));
+      void doWorkers(void (*func)(OCPI::Metadata::Worker &));
       // Inform the manager about an implementation
       void addImplementation(Implementation &imp);
     private:

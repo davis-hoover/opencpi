@@ -34,7 +34,7 @@
 #include "OsDataTypes.hh"
 #include <OcpiList.h>
 #include <OcpiDriverManager.h>
-#include <OcpiUtilProtocol.h>
+#include "MetadataProtocol.hh"
 
 namespace OCPI {
   namespace DataTransport {
@@ -88,7 +88,7 @@ namespace DataTransfer {
 	 * of this method should cache the service object if possible so that they
 	 * can be re-used.
 	 ***************************************/
-	virtual XferServices* getXferServices( const OCPI::Util::Protocol &protocol,
+	virtual XferServices* getXferServices( const OCPI::Metadata::Protocol &protocol,
 					       const char* other_url,
 					       const OCPI::Util::PValue *our_props=0,
 					       const OCPI::Util::PValue *other_props=0 )=0;
@@ -210,7 +210,7 @@ namespace DataTransfer {
        *        Errors:
        *                DataTransferEx for all exception conditions
        */
-      XferServices (  const OCPI::Util::Protocol & p, 
+      XferServices (  const OCPI::Metadata::Protocol & p, 
 		      const char  *a_url,
 		      const OCPI::Util::PValue *our_props=0,
 		      const OCPI::Util::PValue *other_props=0 )
@@ -241,7 +241,7 @@ namespace DataTransfer {
        * Member access
        */
       inline std::string & url(){return m_url;}
-      inline const OCPI::Util::Protocol & protocol(){return m_protocol;}
+      inline const OCPI::Metadata::Protocol & protocol(){return m_protocol;}
 
                  
       virtual ~XferServices () {};
@@ -249,7 +249,7 @@ namespace DataTransfer {
     private:
       int m_use_count;
       // FIXME:  make sure the life cycle is ok for this to be a reference
-      const OCPI::Util::Protocol  &m_protocol;
+      const OCPI::Metadata::Protocol  &m_protocol;
       std::string m_url;
 
 
@@ -292,7 +292,7 @@ namespace DataTransfer {
       {
       protected:
 	ConnectionBase<ConcDri, ConcConn, ConcXfer>(ConcConn &conn,
-						    const OCPI::Util::Protocol &a_protocol,
+						    const OCPI::Metadata::Protocol &a_protocol,
 						    const char* other_url,
 						    const OCPI::Util::PValue *our_props=0,
 						    const OCPI::Util::PValue *other_props=0 )

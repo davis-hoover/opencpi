@@ -26,6 +26,9 @@
 #include "hdl-config.h"
 #include "hdl.h"
 
+namespace OM = OCPI::Metadata;
+namespace OM = OCPI::Metadata;
+namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 namespace OE = OCPI::Util::EzXml;
 
@@ -57,7 +60,7 @@ emit(std::string &assy, bool emulated, bool content) const {
   }
   assy += content || m_instancePVs.size() ? ">\n" : "/>\n";
   if (m_instancePVs.size()) {
-    const OU::Assembly::Property *ap = &m_instancePVs[0];
+    const OM::Assembly::Property *ap = &m_instancePVs[0];
     for (size_t n = m_instancePVs.size(); n; n--, ap++)
       OU::formatAdd(assy, "    <property name='%s' value='%s'/>\n",
 		    ap->m_name.c_str(), ap->m_value.c_str());
@@ -200,7 +203,7 @@ parseDevInstance(const char *device, ezxml_t x, const char *parentFile, Worker *
 // device are copied to the instance so they are all in one place, but an instance cannot
 // override the parameters of the device as defined for the board.
 const char *DeviceType::
-parseDeviceProperties(ezxml_t x, OU::Assembly::Properties &iPVs) {
+parseDeviceProperties(ezxml_t x, OM::Assembly::Properties &iPVs) {
   const char *err;
   // First pass for error checking
   for (ezxml_t px = ezxml_cchild(x, "Property"); px; px = ezxml_cnext(px)) {
@@ -208,7 +211,7 @@ parseDeviceProperties(ezxml_t x, OU::Assembly::Properties &iPVs) {
     if ((err = OE::checkAttrs(px, "name", "value", "valuefile", NULL)) ||
 	(err = OE::getRequiredString(px, l_name, "name", "property")))
       return err;
-    OU::Property *p = findProperty(l_name.c_str());
+    OM::Property *p = findProperty(l_name.c_str());
     if (!p)
       return OU::esprintf("\"%s\" is not a property of device \"%s\"",
 			  l_name.c_str(), m_implName);
@@ -221,7 +224,7 @@ parseDeviceProperties(ezxml_t x, OU::Assembly::Properties &iPVs) {
   unsigned nPVs = 0;
   for (PropertiesIter pi = m_ctl.properties.begin(); pi != m_ctl.properties.end(); pi++)
     if ((*pi)->m_isParameter) {
-      OU::Property &p = **pi;
+      OM::Property &p = **pi;
       for (ezxml_t px = ezxml_cchild(x, "Property"); px; px = ezxml_cnext(px))
 	if (!strcasecmp(p.m_name.c_str(), ezxml_cattr(px, "name"))) {
 	  if ((err = iPVs[nPVs].parse(px)))

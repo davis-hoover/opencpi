@@ -31,7 +31,7 @@
 #include <string>
 #include <forward_list>
 #include "OcpiLibraryManager.h"
-#include "OcpiUtilAssembly.h"
+#include "MetadataAssembly.hh"
 
 // Attributes that ocpidev can use, but the runtime ignores
 #define OCPI_APP_DEV_ATTRS \
@@ -56,13 +56,13 @@ namespace OCPI {
       mutable size_t nInstances, nConnections;
       // Temporary port delegations need to be "undone" by using these fixups
       struct Fixup {
-	OCPI::Util::Assembly::Connection *appConn;
-	OCPI::Util::Assembly::Connection *slaveConn;
-	OCPI::Util::Assembly::ConnPort   *connPort;        // where to restore the app conn
-	OCPI::Util::Assembly::ConnPort    masterConnPort;  // The port/index value to restore
-	Fixup(OCPI::Util::Assembly::Connection *a_appConn,
-	      OCPI::Util::Assembly::Connection *a_slaveConn,
-	      OCPI::Util::Assembly::ConnPort *a_connPort)
+	OCPI::Metadata::Assembly::Connection *appConn;
+	OCPI::Metadata::Assembly::Connection *slaveConn;
+	OCPI::Metadata::Assembly::ConnPort   *connPort;        // where to restore the app conn
+	OCPI::Metadata::Assembly::ConnPort    masterConnPort;  // The port/index value to restore
+	Fixup(OCPI::Metadata::Assembly::Connection *a_appConn,
+	      OCPI::Metadata::Assembly::Connection *a_slaveConn,
+	      OCPI::Metadata::Assembly::ConnPort *a_connPort)
 	  : appConn(a_appConn), slaveConn(a_slaveConn), connPort(a_connPort),
 	    masterConnPort(*a_connPort) {
 	}
@@ -77,31 +77,31 @@ namespace OCPI {
     // A library::assembly adds value to the underlying/inherited util::assembly
     // By finding candidate implementations in the available artifact libraries,
     // and perhaps adding proxy slave instances
-    class Assembly : public OCPI::Util::Assembly,  public ImplementationCallback {
+    class Assembly : public OCPI::Metadata::Assembly,  public ImplementationCallback {
       // This instance class below is the library layer's overlay on the basic OU instance
       // It usually just references the OU::Assembly instance, but in the case of
       // proxies or file IO, the library layer may add instances
     public:
       struct Instance {
-	OCPI::Util::Assembly::Instance &m_utilInstance; // lower level assy instance structure
-	OCPI::Util::Assembly::Port **m_assyPorts;       // map impl port ordinal to OU assy port
+	OCPI::Metadata::Assembly::Instance &m_utilInstance; // lower level assy instance structure
+	OCPI::Metadata::Assembly::Port **m_assyPorts;       // map impl port ordinal to OU assy port
                                                 	// we do the map based on the first impl
 	Candidates m_candidates;                        // The candidate impls for this instance
 	unsigned m_nPorts;
 	size_t m_scale;
 	std::string m_device;                           // if instance specifies a device
 	Instance *m_master;                             // The master if this is a slave
-	Instance(OCPI::Util::Assembly::Instance &utilInstance, Instance *master = NULL);
+	Instance(OCPI::Metadata::Assembly::Instance &utilInstance, Instance *master = NULL);
 	~Instance();
 
-	bool resolveUtilPorts(const Implementation &i, OCPI::Util::Assembly &a);
+	bool resolveUtilPorts(const Implementation &i, OCPI::Metadata::Assembly &a);
 	bool checkConnectivity(Candidate &c, Assembly &assy);
 	bool foundImplementation(const Implementation &i, std::string &model,
 				 std::string &platform);
         void strip_pf(std::string&) const;
 	const std::string &name() const { return m_utilInstance.m_name; }
 	const std::string &specName() const { return m_utilInstance.m_specName; }
-	const OCPI::Util::Assembly::Properties &properties() const {
+	const OCPI::Metadata::Assembly::Properties &properties() const {
 	  return m_utilInstance.m_properties;
 	}
       };
@@ -125,11 +125,11 @@ namespace OCPI {
       size_t nInstances() { return m_instances.size(); }
       size_t nAppInstances() const { return m_nAppInstances; }
       Instances &instances() { return m_instances; }
-      OCPI::Util::Assembly::Instance &utilInstance(size_t n) const {
+      OCPI::Metadata::Assembly::Instance &utilInstance(size_t n) const {
 	return m_instances[n]->m_utilInstance;
       }
-      bool badConnection(const Implementation &thisImpl, const OCPI::Util::Port &thisPort,
-			 const Implementation &otherImpl, const OCPI::Util::Port &otherPort);
+      bool badConnection(const Implementation &thisImpl, const OCPI::Metadata::Port &thisPort,
+			 const Implementation &otherImpl, const OCPI::Metadata::Port &otherPort);
       Port **assyPorts(size_t inst) {
 	assert(m_instances[inst]->m_assyPorts);
 	return m_instances[inst]->m_assyPorts;
@@ -143,7 +143,7 @@ namespace OCPI {
       void operator --( int );
 
       const char *getPortAssignment(const char *pName, const char *assign, size_t &instn,
-				    size_t &portn, const OCPI::Util::Port *&port,
+				    size_t &portn, const OCPI::Metadata::Port *&port,
 				    const char *&value, bool removeExternal = false);
     private:
       void addInstance(const OCPI::Util::PValue *params);

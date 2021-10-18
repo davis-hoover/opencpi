@@ -28,13 +28,15 @@
 #include <sys/time.h>
 #include "OCL_Worker.h"
 #include "OcpiUtilCppMacros.h"
-#include "OcpiUtilWorker.h"
+#include "MetadataWorker.hh"
 #include "OcpiUtilMisc.h"
 #include "wip.h"
 #include "assembly.h"
 #include "data.h"
 #include "rcc.h"
 
+namespace OM = OCPI::Metadata;
+namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 // Generate the readonly implementation file.
 // What implementations must explicitly (verilog) or implicitly (VHDL) include.
@@ -187,7 +189,7 @@ emitImplOCL() {
     fprintf(f,
 	    " */\n");
     for (PropertiesIter pi = m_ctl.properties.begin(); pi != m_ctl.properties.end(); pi++) {
-      OU::Property &p = **pi;
+      OM::Property &p = **pi;
       if (p.m_isParameter) {
 	std::string value;
 	fprintf(f,
@@ -307,7 +309,7 @@ emitSkelOCL() {
   unsigned op = 0;
   const char **cp;
   const char *mName;
-  for (cp = OU::Worker::s_controlOpNames; *cp; cp++, op++)
+  for (cp = OM::Worker::s_controlOpNames; *cp; cp++, op++)
     if (m_ctl.controlOps & (1u << op)) {
       if ((err = rccMethodName(*cp, mName)))
 	return err;
@@ -474,7 +476,7 @@ emitEntryPointOCL() {
 	  "    break;\n");
   unsigned op = 0;
   const char* mName;
-  for (const char** cp = OU::Worker::s_controlOpNames; *cp; cp++, op++)
+  for (const char** cp = OM::Worker::s_controlOpNames; *cp; cp++, op++)
     if (m_ctl.controlOps & (1u << op)) {
       if ((err = rccMethodName (*cp, mName)))
         return err;

@@ -29,6 +29,11 @@
 #include "hdl.h"
 #include "hdl-device.h"
 #include "assembly.h"
+namespace OM = OCPI::Metadata;
+namespace OM = OCPI::Metadata;
+namespace OM = OCPI::Metadata;
+namespace OM = OCPI::Metadata;
+namespace OM = OCPI::Metadata;
 namespace OU=OCPI::Util;
 namespace OF=OCPI::OS::FileSystem;
 
@@ -40,7 +45,7 @@ addParamConfigSuffix(std::string &s) {
 }
 
 const char *Worker::
-findParamProperty(const char *a_name, OU::Property *&prop, size_t &nParam, bool includeInitial) {
+findParamProperty(const char *a_name, OM::Property *&prop, size_t &nParam, bool includeInitial) {
   size_t n = 0;
   for (PropertiesIter pi = m_ctl.properties.begin(); pi != m_ctl.properties.end(); pi++)
     if (!strcasecmp((*pi)->m_name.c_str(), a_name)) {
@@ -59,7 +64,7 @@ Param::Param() : m_valuesType(NULL), m_param(NULL), m_isDefault(false), m_worker
 		 m_isTest(false) {}
 
 void Param::
-fullName(const OCPI::Util::Property &prop, const Worker *w, std::string &name) {
+fullName(const OM::Property &prop, const Worker *w, std::string &name) {
   if (prop.m_isImpl) {
     assert(w);
     OU::format(name, "%s.%s.%s", w->cname(), w->m_modelString, prop.cname());
@@ -68,7 +73,7 @@ fullName(const OCPI::Util::Property &prop, const Worker *w, std::string &name) {
 }
 
 void Param::
-setProperty(const OCPI::Util::Property *prop, const Worker *w) {
+setProperty(const OM::Property *prop, const Worker *w) {
   assert(prop || m_param);
   //  assert(w || m_worker); no worker means a test property in unit test
   if (prop) {
@@ -181,7 +186,7 @@ onlyValue(std::string &uValue, Attributes *&attrs, const char *platform) {
 
 // parse a param value and check whether it is the default
 const char *Param::
-parseValue(const OU::Property &prop, const char *value) {
+parseValue(const OM::Property &prop, const char *value) {
   const char *err;
   OU::Value newValue;
   if ((err = prop.parseValue(value, newValue)))
@@ -205,7 +210,7 @@ parseValue(const OU::Property &prop, const char *value) {
 // configurations and so it cannot be given a value if it is dependent on other parameters for
 // its type (e.g. array dimensions)
 const char *Param::
-parse(ezxml_t px, const OU::Property *p, const Worker *worker, bool global) {
+parse(ezxml_t px, const OM::Property *p, const Worker *worker, bool global) {
   std::string xValue;
   const char *err;
   const char
@@ -218,7 +223,7 @@ parse(ezxml_t px, const OU::Property *p, const Worker *worker, bool global) {
     return OU::esprintf("Exactly one attribute must be specified among: "
 			"value, values, valuefile, valuesFile, or (for tests) generate");
   setProperty(p, worker);  // possibly overwriting
-  const OU::Property &prop = *m_param;
+  const OM::Property &prop = *m_param;
   if (generate) {
     m_generate = generate;
     return NULL;
@@ -339,7 +344,7 @@ doDefaults(bool missingOk) {
   size_t n = 0;
   for (PropertiesIter pi = m_worker.m_ctl.properties.begin();
        pi != m_worker.m_ctl.properties.end(); pi++) {
-    OU::Property &p = **pi;
+    OM::Property &p = **pi;
     if (p.m_isParameter) {
       assert(n == p.m_paramOrdinal);
       if (!params[n].m_param) { // If we didn't see it when parsing this config
@@ -389,7 +394,7 @@ parse(ezxml_t cx, const ParamConfigs &configs) { // , bool includeInitial) {
       return err;
     std::string name;
     size_t nParam;
-    OU::Property *p;
+    OM::Property *p;
     if ((err = OE::getRequiredString(px, name, "name")) ||
 	(err = m_worker.findParamProperty(name.c_str(), p, nParam)) ||
 	(err = p->finalize(*this, "property", false)) || // FIXME: false?  and what about doing this in a 2nd pass?
@@ -401,7 +406,7 @@ parse(ezxml_t cx, const ParamConfigs &configs) { // , bool includeInitial) {
 
 const char *ParamConfig::
 getParamValue(const char *sym, const OU::Value *&v) const {
-  OU::Property *prop;
+  OM::Property *prop;
   size_t nParam; // FIXME not needed since properties have m_paramOrdinal?
   const char *err;
   if ((err = m_worker.findParamProperty(sym, prop, nParam)))
@@ -419,7 +424,7 @@ getParamValue(const char *sym, const OU::Value *&v) const {
 
 const char *ParamConfig::
 getValue(const char *sym, OU::ExprValue &val) const {
-  OU::Property *prop;
+  OM::Property *prop;
   size_t nParam; // FIXME not needed since properties have m_paramOrdinal?
   const char *err;
   if ((err = m_worker.findParamProperty(sym, prop, nParam)))
@@ -456,7 +461,7 @@ void ParamConfig::
 write(FILE *xf, FILE *mf) {
   bool nonDefault = false;
   for (PropertiesIter pi = m_worker.m_ctl.properties.begin(); pi != m_worker.m_ctl.properties.end(); pi++) {
-    OU::Property &pr = **pi;
+    OM::Property &pr = **pi;
     if (!pr.m_isParameter)
       continue;
     Param *p = NULL;
@@ -522,7 +527,7 @@ writeConstants(FILE *gf, Language lang) {
     Param &p = params[n];
     if (p.m_param == NULL)
       continue;
-    const OU::Property &pr = *p.m_param;
+    const OM::Property &pr = *p.m_param;
     std::string value;
     if (lang == VHDL) {
       if (pr.m_baseType == OA::OCPI_String && pr.m_stringLength == 0) {
@@ -642,7 +647,7 @@ parseBuildXml(ezxml_t x, const std::string &file) {
     if ((err = OE::checkAttrs(px, PARAM_ATTRS, NULL)))
       return err;
     std::string l_name;
-    OU::Property *p;
+    OM::Property *p;
     size_t nParam;
     if ((err = OE::getRequiredString(px, l_name, "name", "property")) ||
 	(err = findParamProperty(l_name.c_str(), p, nParam, false)) ||
@@ -757,7 +762,7 @@ doParam(ParamConfig &info, PropertiesIter pi, bool fromXml, unsigned nParam) {
   if (pi == m_ctl.properties.end())
     addConfig(info, fromXml);
   else {
-    OU::Property &prop = **pi;
+    OM::Property &prop = **pi;
     assert(nParam == prop.m_paramOrdinal);
     Param &p = info.params[nParam];
     pi++;
@@ -881,7 +886,7 @@ emitToolParameters() {
   for (ezxml_t px = ezxml_cchild(x, "parameter"); px; px = ezxml_cnext(px)) {
     std::string l_name;
     bool hasValues;
-    OU::Property *p;
+    OM::Property *p;
     size_t nParam;
 
     if ((err = OE::getRequiredString(px, l_name, "name")) ||
@@ -966,14 +971,14 @@ emitHDLConstants(size_t config, bool other) {
 
 // Return NULL if none found that match inputs
 const char *Worker::
-findParamConfig(size_t low, size_t high, const OU::Assembly::Properties &instancePVs,
+findParamConfig(size_t low, size_t high, const OM::Assembly::Properties &instancePVs,
 		ParamConfig *&paramConfig) {
   paramConfig = NULL;
   for (size_t n = low; n <= high; n++) {
     ParamConfig *pc = m_paramConfigs[n];
     if (!pc)
       continue;
-    const OU::Assembly::Property *ap = &instancePVs[0];
+    const OM::Assembly::Property *ap = &instancePVs[0];
     for (unsigned nn = 0; nn < instancePVs.size(); nn++, ap++)
       if (ap->m_hasValue) {
 	Param *p = &pc->params[0];
@@ -1026,7 +1031,7 @@ writeAutoBuildFile(const char *file, ParamConfigs &paramConfigs, size_t low) {
 // Note this worker will then be parameter-value-specific.
 // If instancePVs is NULL, use paramconfig
 const char *Worker::
-setParamConfig(const OU::Assembly::Properties *instancePVs, size_t paramConfig,
+setParamConfig(const OM::Assembly::Properties *instancePVs, size_t paramConfig,
 	       const std::string &parent) {
   // This method can in fact be called more than once, but this should be FIXME.
   // HdlDevice::create and Device::parse both call this...
@@ -1044,10 +1049,10 @@ setParamConfig(const OU::Assembly::Properties *instancePVs, size_t paramConfig,
       return OU::esprintf("Worker '%s' has no parameter configurations, but config %zu specified",
 			  m_implName, paramConfig);
     if (instancePVs && instancePVs->size()) {
-      const OU::Assembly::Property *ap = &(*instancePVs)[0];
+      const OM::Assembly::Property *ap = &(*instancePVs)[0];
       for (unsigned nn = 0; nn < instancePVs->size(); nn++, ap++)
 	if (ap->m_hasValue) {
-	  OU::Property *p = findProperty(ap->m_name.c_str());
+	  OM::Property *p = findProperty(ap->m_name.c_str());
 	  if (!p || !p->m_isParameter)
 	    return OU::esprintf("Worker \"%s\" has no parameter property named \"%s\"",
 				m_implName, ap->m_name.c_str());
@@ -1119,7 +1124,7 @@ setParamConfig(const OU::Assembly::Properties *instancePVs, size_t paramConfig,
     return NULL;
   if (!g_autoAddParamConfig) {
     std::string bad;
-    const OU::Assembly::Property *ap = &(*instancePVs)[0];
+    const OM::Assembly::Property *ap = &(*instancePVs)[0];
     for (unsigned nn = 0; nn < instancePVs->size(); nn++, ap++)
       if (ap->m_hasValue)
 	OU::formatAdd(bad, "%s%s=\"%s\"", nn ? ", " : "", ap->m_name.c_str(), ap->m_value.c_str());
@@ -1127,11 +1132,11 @@ setParamConfig(const OU::Assembly::Properties *instancePVs, size_t paramConfig,
 			"parameter values: %s", cname(), bad.c_str());
   }
   ParamConfig *pc = new ParamConfig(*this);
-  const OU::Assembly::Property *ap = &(*instancePVs)[0];
+  const OM::Assembly::Property *ap = &(*instancePVs)[0];
   for (unsigned nn = 0; nn < instancePVs->size(); nn++, ap++)
     if (ap->m_hasValue) {
       size_t nParam;
-      OU::Property *p;
+      OM::Property *p;
       if ((err = findParamProperty(ap->m_name.c_str(), p, nParam)) ||
 	  (err = p->finalize(*this, "property", true)))
 	return err;

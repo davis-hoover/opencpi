@@ -20,7 +20,7 @@
 
 #include <assert.h>
 #include <string.h>
-#include "ValueWriter.h"
+#include "UtilValueWriter.hh"
 namespace OA = OCPI::API;
 namespace OCPI {
   namespace Util {

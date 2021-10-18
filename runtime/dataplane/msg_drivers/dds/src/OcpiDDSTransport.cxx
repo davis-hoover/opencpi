@@ -42,7 +42,7 @@
 #include "OsAssert.hh"
 #include <OcpiUtilAutoMutex.h>
 #include <OcpiUtilEzxml.h>
-#include <OcpiPValue.h>
+#include "UtilPValue.hh"
 #include <list>
 #include <stack>
 #include <map>
@@ -50,14 +50,16 @@
 #include <iostream>
 #include <OcpiBuffer.h>
 #include <OpenSpliceBindings.h>
-#include <OcpiUtilProtocol.h>
-#include "OcpiUtilValue.h"
+#include "MetadataProtocol.hh"
+#include "UtilValue.hh"
 
 #define BUF_SIZE 1024
 
 namespace OX = OCPI::Util::EzXml;
 using namespace std;
 using namespace OpenSpliceBindings;
+namespace OM = OCPI::Metadata;
+namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 namespace OA = OCPI::API;
 
@@ -204,11 +206,11 @@ namespace OCPI {
 	}
 
 
-	const char * ddsType( OU::Member & m ) {
+	const char * ddsType( OM::Member & m ) {
 
 	  OCPI::API::BaseType t = m.m_baseType;
 	  if ( m.m_baseType == OCPI::API::OCPI_Type ) {
-	    OU::Member * tm = m.m_type;
+	    OM::Member * tm = m.m_type;
 	    while ( tm ) {
 	      if ( tm->m_type == NULL ) {
 		t = tm->m_baseType;
@@ -263,7 +265,7 @@ namespace OCPI {
 
 
 
-	std::string & formatType( OU::Member& m, std::string & format, bool typname=true ) {
+	std::string & formatType( OM::Member& m, std::string & format, bool typname=true ) {
 	  char buf[BUF_SIZE];
 
 	  if ( typname && m.m_isSequence && (m.m_arrayRank>0) ) {
@@ -296,7 +298,7 @@ namespace OCPI {
 	}
 
 
-	std::string & formatSequence( OU::Member& m, std::string & format )
+	std::string & formatSequence( OM::Member& m, std::string & format )
 	{
 	  char buf[BUF_SIZE];
 	  if ( m.m_sequenceLength != 0 ) {
@@ -313,7 +315,7 @@ namespace OCPI {
 	  return format;
 	}
 
-	std::string & formatMember( OU::Member& m, std::string & format, bool named=true )
+	std::string & formatMember( OM::Member& m, std::string & format, bool named=true )
 	{
 	  char buf[BUF_SIZE];
 
@@ -377,7 +379,7 @@ namespace OCPI {
 
 
 
-	std::string & defineStruct( OU::Member &m, const char * name, std::string & format )
+	std::string & defineStruct( OM::Member &m, const char * name, std::string & format )
 	{
 	  char buf[BUF_SIZE];
 
@@ -449,7 +451,7 @@ namespace OCPI {
 	    OCPI::Util::Member & m = member(n);
 	    defineStruct ( m, m.m_name.c_str(), format );
 	    if ( m.m_type ) {
-	      OU::Member * mt = m.m_type;
+	      OM::Member * mt = m.m_type;
 	      int count=0;
 	      while( mt ) {
 		if ( snprintf( name, BUF_SIZE, "%s%d", m.m_name.c_str(),count ) < 0 ) {
@@ -592,7 +594,7 @@ namespace OCPI {
 	  p  = (uint8_t *)(((uintptr_t)p + (n - 1)) & ~((uintptr_t)(n)-1));
 	}
 
-	const char * ddsSubType( OU::Member &m ) {
+	const char * ddsSubType( OM::Member &m ) {
 
 	  if ( ! m.m_typeDef.empty() ) {
 	    return  m.m_typeDef.c_str();
@@ -641,7 +643,7 @@ namespace OCPI {
 
 
 
-	c_long * toSequence( c_base base, OU::Member& m , int size, c_long length, void * buf, std::vector<std::string> & str)
+	c_long * toSequence( c_base base, OM::Member& m , int size, c_long length, void * buf, std::vector<std::string> & str)
 	{
 	  static c_type type0 = NULL;
 	  c_type subtype0;
@@ -701,7 +703,7 @@ namespace OCPI {
 	    m_source.push(s);
 	  }
 
-	unsigned beginSequence(OU::Member &m) {
+	unsigned beginSequence(OM::Member &m) {
 
 #ifndef NDEBUG
 	  cout << endl << "**** In Begin Sequence !! " << m.m_name << " *** " << m_seq.size() << endl;
@@ -721,23 +723,23 @@ namespace OCPI {
 	  return size;
 	}
 
-	void endSequence( OU::Member &) {
+	void endSequence( OM::Member &) {
 	  m_seq.pop();
 	  m_source.pop();
 	}
 
-	void beginStruct(OU::Member &m) {
+	void beginStruct(OM::Member &m) {
 	  align( m.m_align,m_source.top());
 	}
 
-	void beginArray(OU::Member &m, uint32_t /* nItems */ ) {
+	void beginArray(OM::Member &m, uint32_t /* nItems */ ) {
 	  align( m.m_align,m_source.top());
 	}
 
-	void endArray(OU::Member & ) {
+	void endArray(OM::Member & ) {
 	}
 
-	unsigned beginString(OU::Member &, const char *&chars, bool /* start */ ) {
+	unsigned beginString(OM::Member &, const char *&chars, bool /* start */ ) {
 #ifndef NDEBUG
 	  cout << "In beginString !!" << endl;
 #endif
@@ -764,7 +766,7 @@ namespace OCPI {
 	}
 
 
-	void readData(OU::Member &m, OU::ReadDataPtr p, uint32_t nBytes, uint32_t /* nElements */) {
+	void readData(OM::Member &m, OU::ReadDataPtr p, uint32_t nBytes, uint32_t /* nElements */) {
 	    uint8_t * t = p.data;
 
 	    switch (m.m_baseType ) {
@@ -837,7 +839,7 @@ namespace OCPI {
 	  :m_td(td),m_orig(t),m_target(t),m_base(base),m_inSequence(0),m_inArray(0){}
 
 	// Writer
-	void beginSequence(OU::Member &m, uint32_t nElements) {
+	void beginSequence(OM::Member &m, uint32_t nElements) {
 
 	  m_inSequence++;
 	  m_nElements = nElements;
@@ -858,7 +860,7 @@ namespace OCPI {
 
 	}
 
-	void beginArray(OU::Member &m, uint32_t nItems) {
+	void beginArray(OM::Member &m, uint32_t nItems) {
 	  align(m.m_align,m_target);
 #ifndef NDEBUG
 	  printf("Array member offset = %d, items = %d, align = %d\n", m.m_offset, nItems, m.m_align );
@@ -868,15 +870,15 @@ namespace OCPI {
 
 	}
 
-	void endArray(OU::Member & ) {
+	void endArray(OM::Member & ) {
 	  // no op
 	}
 
-	void beginStruct(OU::Member &m) {
+	void beginStruct(OM::Member &m) {
 	  align(m.m_align,m_target);
 	}
 
-	void endSequence(OU::Member &m ) {
+	void endSequence(OM::Member &m ) {
 	  if ( m_seqStrings.size() ) {
 	    ocpiAssert(  m_seqStrings.size() == m_nElements );
 	    align(8,m_target);
@@ -893,7 +895,7 @@ namespace OCPI {
 	}
 
 
-	void writeString(OU::Member &, OU::WriteDataPtr p, uint32_t strLen , bool /* start */, bool /* top */) {
+	void writeString(OM::Member &, OU::WriteDataPtr p, uint32_t strLen , bool /* start */, bool /* top */) {
 	  (void)strLen;
 	  c_char * msg = (c_char*)(p.data);
 	  if ( m_inSequence ) {
@@ -907,7 +909,7 @@ namespace OCPI {
 	}
 
 	// Copying from p (worker buffer) to DDS
-	void writeData(OU::Member &m, OU::WriteDataPtr p, uint32_t nBytes, uint32_t ) {
+	void writeData(OM::Member &m, OU::WriteDataPtr p, uint32_t nBytes, uint32_t ) {
 
 	  uint8_t * tf = (uint8_t*)p.data;
 
@@ -1024,7 +1026,7 @@ namespace OCPI {
 	void   copyOut( void* from, void * to )
 	{
 #ifndef NDEBUG
-	  OU::Protocol & p = *m_data.m_proto;
+	  OM::Protocol & p = *m_data.m_proto;
 	  p.printXML(stdout);
 	  printf("Min Buffer Size: %u %u %u\n", p.m_minBufferSize, p.m_dataValueWidth, p.m_minMessageValues);
 
@@ -1040,7 +1042,7 @@ namespace OCPI {
 	c_bool copyIn( c_base base, void* from, void * to )
 	{
 #ifndef NDEBUG
-	  OU::Protocol & p = *m_data.m_proto;
+	  OM::Protocol & p = *m_data.m_proto;
 	  p.printXML(stdout);
 	  printf("Min Buffer Size: %u %u %u\n", p.m_minBufferSize, p.m_dataValueWidth, p.m_minMessageValues);
 	  fflush(stdout);

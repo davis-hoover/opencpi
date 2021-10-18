@@ -29,7 +29,7 @@
 
 HdlDevice *HdlDevice::
 create(ezxml_t xml, const char *xfile, const std::string &parentFile, Worker *parent,
-       OU::Assembly::Properties *instancePVs, const char *&err) {
+       OM::Assembly::Properties *instancePVs, const char *&err) {
   HdlDevice *hd = new HdlDevice(xml, xfile, parentFile, parent, Worker::Device, instancePVs, err);
   if (err ||
       (err = OE::checkTag(xml, "HdlDevice", "Expected 'HdlDevice' as tag in '%s'", xfile)) ||
@@ -43,7 +43,7 @@ create(ezxml_t xml, const char *xfile, const std::string &parentFile, Worker *pa
 }
 HdlDevice::
 HdlDevice(ezxml_t xml, const char *file, const std::string &parentFile, Worker *parent,
-	  Worker::WType type, OU::Assembly::Properties *instancePVs, const char *&err)
+	  Worker::WType type, OM::Assembly::Properties *instancePVs, const char *&err)
   : Worker(xml, file, parentFile, type, parent, instancePVs, err) {
   m_isDevice = true;
   if (err ||
@@ -112,13 +112,13 @@ get(const char *a_name, ezxml_t dtxml, const char *parentFile, Worker *parent, c
   std::string file("../" + name + ".hdl/" + name);
   if (!(err = parseFile(file.c_str(), parentFile, NULL, &xml, xfile)) ||
       !(err = parseFile(name.c_str(), parentFile, NULL, &xml, xfile))) {
-    OU::Assembly::Properties instancePVs;
+    OM::Assembly::Properties instancePVs;
     // Here we parse the configuration settings for this device on this board.
     // These settings are similar to instance property values in an assembly, but are
     // applied wherever the device is instanced.
     instancePVs.resize(OE::countChildren(dtxml, "Property"));
     if (instancePVs.size()) {
-      OU::Assembly::Property *pv = &instancePVs[0];
+      OM::Assembly::Property *pv = &instancePVs[0];
       for (ezxml_t px = ezxml_cchild(dtxml, "Property"); px; px = ezxml_cnext(px), pv++) {
 	std::string value;
 	if ((err = OE::checkAttrs(px, "name", "value", "valuefile", NULL)) ||

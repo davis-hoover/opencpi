@@ -28,7 +28,14 @@
 #include <vector>
 #include <map>
 #include <ezxml.h>
-#include <OcpiUtilMisc.h>
+#include "OcpiUtilMisc.h"
+#include "MetadataWorker.hh"
+
+namespace OE=OCPI::Util::EzXml;
+namespace OU=OCPI::Util;
+namespace OM=OCPI::Metadata;
+namespace OA=OCPI::API;
+namespace OS=OCPI::OS;
 
 enum Language {
   NoLanguage,

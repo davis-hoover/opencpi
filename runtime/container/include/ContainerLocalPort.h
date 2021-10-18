@@ -24,9 +24,9 @@
 #include "OcpiContainerApi.h"
 
 #include "OcpiUtilSelfMutex.h"
-#include "OcpiPValue.h"
+#include "UtilPValue.hh"
 #include "OcpiRDTInterface.h"
-#include "OcpiUtilPort.h"
+#include "MetadataPort.hh"
 #include "OcpiParentChild.h"
 #include "ContainerLauncher.h"
 #include "ContainerBasicPort.h"
@@ -91,23 +91,23 @@ namespace OCPI {
       // These are the functions to set up the bridge op according distribution and scale
       // on both sides, per op.
 
-      typedef void BridgeSetup(Launcher::Connection &c, const OCPI::Util::Port &output,
-			       const OCPI::Util::Port &input, unsigned op, BridgeOp &bo);
+      typedef void BridgeSetup(Launcher::Connection &c, const OCPI::Metadata::Port &output,
+			       const OCPI::Metadata::Port &input, unsigned op, BridgeOp &bo);
       static BridgeSetup
-	*bridgeModes[OCPI::Util::Port::DistributionLimit] [OCPI::Util::Port::DistributionLimit][2],
+	*bridgeModes[OCPI::Metadata::Port::DistributionLimit] [OCPI::Metadata::Port::DistributionLimit][2],
 	oAllP, oCycP, oFirst2, oBalP, oHashP, oAll, oCycMod, oFirst, oBal, oHash, oDirect,
 	iOneP, iFirst2, iAny, iFirst, iFirstCyc, iCycMod, ioCyc,
 	bad;
 
       // State of the current local buffer (external or member)
       ExternalBuffer                *m_localBuffer;         // current available buffer
-      OCPI::Util::Port::Distribution m_localDistribution;   // distribution for current opcode
+      OCPI::Metadata::Port::Distribution m_localDistribution;   // distribution for current opcode
       // Indexing in bridges for current local buffer
       unsigned                       m_firstBridge;         // first one for current local buf
       unsigned                       m_currentBridge;       // current bridge for local buf
       unsigned                       m_nextBridge;          // next one to use for any op
     protected:
-      LocalPort(Container &container, const OCPI::Util::Port &mPort, bool isProvider,
+      LocalPort(Container &container, const OCPI::Metadata::Port &mPort, bool isProvider,
 		const OCPI::Util::PValue *params);
       virtual ~LocalPort();
     private:
@@ -121,8 +121,8 @@ namespace OCPI {
       virtual bool isInProcess(LocalPort *other) const = 0;
       bool getLocalBuffer();
       void setupBridging(Launcher::Connection &c);
-      void determineBridgeOp(Launcher::Connection &c, const OCPI::Util::Port &output,
-			     const OCPI::Util::Port &input, unsigned op, BridgeOp &bo);
+      void determineBridgeOp(Launcher::Connection &c, const OCPI::Metadata::Port &output,
+			     const OCPI::Metadata::Port &input, unsigned op, BridgeOp &bo);
     protected:
       bool initialConnect(Launcher::Connection &c);
       bool finalConnect(Launcher::Connection &c);

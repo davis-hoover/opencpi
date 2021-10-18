@@ -36,7 +36,7 @@ namespace OS = OCPI::OS;
   CMD_OPTION(loglevel,   l,    UChar,  "0",     "Set logging level used during operation") \
   CMD_OPTION(library,    L,    String,  NULL,   "Set name of OpenCL library to test") \
 
-#include "CmdOption.h"
+#include "CmdOption.hh"
 
 const char *defaultLib =
 // FIXME - these should be based on autoconf

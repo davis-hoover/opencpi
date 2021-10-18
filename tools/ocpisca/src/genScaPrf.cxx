@@ -25,11 +25,13 @@
 
 namespace OCPI {
   namespace API {
+namespace OM = OCPI::Metadata;
+namespace OM = OCPI::Metadata;
     namespace OU = OCPI::Util;
     namespace OX = OCPI::Util::EzXml;
     namespace SCA = OCPI::SCA;
     static void
-    emitProperty(ezxml_t root, unsigned level, const char *sname, const OU::Member &pr,
+    emitProperty(ezxml_t root, unsigned level, const char *sname, const OM::Member &pr,
 		 const char *mode, const char *value, bool config, bool allocation,
 		 bool external, bool uuid) {
       ocpiDebug("emitting property %s", pr.cname());
@@ -83,7 +85,7 @@ namespace OCPI {
 	break;
       case OCPI_Struct:
 	for (unsigned n = 0; n < pr.m_nMembers; n++) {
-	  OU::Member &m = pr.m_members[n];
+	  OM::Member &m = pr.m_members[n];
 	  if (m.m_baseType == OCPI_Struct || m.m_baseType == OCPI_Type || m.m_isSequence ||
 	      m.m_arrayRank)
 	    throw OU::Error("Unsupported struct member \"%s\" of property \"%s\" with data type: %s \"%s\"",
@@ -133,7 +135,7 @@ genScaPrf(const char *outDir) const {
   const Property *p = m_properties;
   ezxml_t root = ezxml_new("properties");
   for (size_t n = m_nProperties; n; n--, p++) {
-    const OU::Property &pr =
+    const OM::Property &pr =
       m_instances[p->m_instance].
       m_bestDeployment.m_impls[0]->m_metadataImpl.property(p->m_property);
     // We make things readable that OpenCPI can cache even if they are not declared readable.

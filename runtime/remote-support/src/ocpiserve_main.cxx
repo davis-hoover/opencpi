@@ -56,7 +56,7 @@ namespace OR = OCPI::Remote;
   CMD_OPTION(max_callers,m,    ULong,   0,   "Quits server after connection count (probes included)")\
 
 // FIXME: local-only like ocpihdl simulate?
-#include "CmdOption.h"
+#include "CmdOption.hh"
 
 static void
 rmdir() {

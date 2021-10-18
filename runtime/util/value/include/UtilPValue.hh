@@ -37,7 +37,7 @@
 #include <cstdarg>
 #include "ezxml.h"
 #include "OcpiUtilException.h"
-#include "OcpiPValueApi.h"
+#include "OcpiPValueApi.hh"
 
 
 namespace OCPI {

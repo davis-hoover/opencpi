@@ -20,7 +20,7 @@
 
 #include <assert.h>
 #include <string.h>
-#include "ValueReader.h"
+#include "UtilValueReader.hh"
 
 namespace OA = OCPI::API;
 

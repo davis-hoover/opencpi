@@ -28,17 +28,18 @@
 namespace OCPI {
   namespace Container {
     namespace OA = OCPI::API;
+    namespace OM = OCPI::Metadata;
     namespace OU = OCPI::Util;
     namespace OD = OCPI::DataTransport;
     namespace OR = OCPI::RDT;
 
     LocalPort::
-    LocalPort(Container &a_container, const OCPI::Util::Port &mPort, bool a_isProvider,
+    LocalPort(Container &a_container, const OM::Port &mPort, bool a_isProvider,
 	      const OU::PValue *params)
       :  BasicPort(a_container, mPort, a_isProvider, params),
 	 m_scale(0), m_external(NULL), m_connectedBridgePorts(0), m_localBridgePort(NULL),
 	 m_bridgeContainer(NULL), m_localBuffer(NULL),
-	 m_localDistribution(OU::Port::DistributionLimit), m_firstBridge(0), m_currentBridge(0),
+	 m_localDistribution(OM::Port::DistributionLimit), m_firstBridge(0), m_currentBridge(0),
 	 m_nextBridge(0) {
     }
 
@@ -88,7 +89,7 @@ namespace OCPI {
 
     // Send each message to all in our partial range or discard if range is empty
     void LocalPort::
-    oAllP(Launcher::Connection &c, const OU::Port &/*output*/, const OU::Port &/*input*/,
+    oAllP(Launcher::Connection &c, const OM::Port &/*output*/, const OM::Port &/*input*/,
 	  unsigned /*op*/, LocalPort::BridgeOp &bo) {
       bo.m_mode = partialRange(c.m_out.m_scale, c.m_out.m_index, c.m_in.m_scale,
 			       bo.m_first, bo.m_last) ? Discard : All;
@@ -97,7 +98,7 @@ namespace OCPI {
 
     // Send cyclically to all, but discard if not in our range
     void LocalPort::
-    oCycP(Launcher::Connection &c, const OU::Port &/*output*/, const OU::Port &/*input*/,
+    oCycP(Launcher::Connection &c, const OM::Port &/*output*/, const OM::Port &/*input*/,
 	  unsigned /*op*/, LocalPort::BridgeOp &bo) {
       bo.m_mode = partialRange(c.m_out.m_scale, c.m_out.m_index, c.m_in.m_scale,
 			       bo.m_first, bo.m_last) ? Discard : CyclicSparse;
@@ -105,7 +106,7 @@ namespace OCPI {
 
     // Send balanced to all, but discard if not in our range
     void LocalPort::
-    oBalP(Launcher::Connection &c, const OU::Port &/*output*/, const OU::Port &/*input*/,
+    oBalP(Launcher::Connection &c, const OM::Port &/*output*/, const OM::Port &/*input*/,
 	  unsigned /*op*/, LocalPort::BridgeOp &bo) {
       bo.m_mode = partialRange(c.m_out.m_scale, c.m_out.m_index, c.m_in.m_scale,
 			       bo.m_first, bo.m_last) ? Discard : Balanced;
@@ -113,14 +114,14 @@ namespace OCPI {
 
     // Send balanced to all
     void LocalPort::
-    oBal(Launcher::Connection &/*c*/, const OU::Port &/*output*/, const OU::Port &/*input*/,
+    oBal(Launcher::Connection &/*c*/, const OM::Port &/*output*/, const OM::Port &/*input*/,
 	 unsigned /*op*/, LocalPort::BridgeOp &bo) {
       bo.m_mode = Balanced;
     }
 
     // Send cyclically to all, but discard if not in our range
     void LocalPort::
-    oHashP(Launcher::Connection &c, const OU::Port &/*output*/, const OU::Port &input,
+    oHashP(Launcher::Connection &c, const OM::Port &/*output*/, const OM::Port &input,
 	  unsigned op, LocalPort::BridgeOp &bo) {
       bo.m_mode = partialRange(c.m_out.m_scale, c.m_out.m_index, c.m_in.m_scale,
 			       bo.m_first, bo.m_last) ? Discard : Hashed;
@@ -129,7 +130,7 @@ namespace OCPI {
 
     // Send cyclically to all
     void LocalPort::
-    oHash(Launcher::Connection &/*c*/, const OU::Port &/*output*/, const OU::Port &input,
+    oHash(Launcher::Connection &/*c*/, const OM::Port &/*output*/, const OM::Port &input,
 	  unsigned op, LocalPort::BridgeOp &bo) {
       bo.m_mode = Hashed;
       bo.m_hashField = input.m_opScaling[op]->m_hashField;
@@ -137,7 +138,7 @@ namespace OCPI {
 
     // Send from first to first
     void LocalPort::
-    oFirst2(Launcher::Connection &c, const OU::Port &/*output*/, const OU::Port &/*input*/,
+    oFirst2(Launcher::Connection &c, const OM::Port &/*output*/, const OM::Port &/*input*/,
 	   unsigned /*op*/, LocalPort::BridgeOp &bo) {
       if (c.m_out.m_index == 0) {
 	bo.m_first = bo.m_last = 0;
@@ -148,7 +149,7 @@ namespace OCPI {
 
     // Send from first to first
     void LocalPort::
-    oFirst(Launcher::Connection &/*c*/, const OU::Port &/*output*/, const OU::Port &/*input*/,
+    oFirst(Launcher::Connection &/*c*/, const OM::Port &/*output*/, const OM::Port &/*input*/,
 	   unsigned /*op*/, LocalPort::BridgeOp &bo) {
       bo.m_first = bo.m_last = 0;
       bo.m_mode = All;
@@ -156,28 +157,28 @@ namespace OCPI {
 
     // Send to all.
     void LocalPort::
-    oAll(Launcher::Connection &/*c*/, const OU::Port &/*output*/, const OU::Port &/*input*/,
+    oAll(Launcher::Connection &/*c*/, const OM::Port &/*output*/, const OM::Port &/*input*/,
 	 unsigned /*op*/, LocalPort::BridgeOp &bo) {
       bo.m_mode = All;
     }
 
     // Send as directed
     void LocalPort::
-    oDirect(Launcher::Connection &/*c*/, const OU::Port &/*output*/, const OU::Port &/*input*/,
+    oDirect(Launcher::Connection &/*c*/, const OM::Port &/*output*/, const OM::Port &/*input*/,
 	    unsigned /*op*/, LocalPort::BridgeOp &bo) {
       bo.m_mode = Directed;
     }
 
     // Send/Receive to/from all cyclically
     void LocalPort::
-    ioCyc(Launcher::Connection &/*c*/, const OU::Port &/*output*/, const OU::Port &/*input*/,
+    ioCyc(Launcher::Connection &/*c*/, const OM::Port &/*output*/, const OM::Port &/*input*/,
 	  unsigned /*op*/, LocalPort::BridgeOp &bo) {
       bo.m_mode = Cyclic;
     }
 
     // Receive from all cyclically, modulo the other side
     void LocalPort::
-    iCycMod(Launcher::Connection &c, const OU::Port &/*output*/, const OU::Port &/*input*/,
+    iCycMod(Launcher::Connection &c, const OM::Port &/*output*/, const OM::Port &/*input*/,
 	     unsigned /*op*/, LocalPort::BridgeOp &bo) {
       bo.m_mode = CyclicModulo;
       bo.m_next = c.m_in.m_index % c.m_out.m_scale;
@@ -185,7 +186,7 @@ namespace OCPI {
 
     // Receive from all cyclically, modulo the other side
     void LocalPort::
-    oCycMod(Launcher::Connection &c, const OU::Port &/*output*/, const OU::Port &/*input*/,
+    oCycMod(Launcher::Connection &c, const OM::Port &/*output*/, const OM::Port &/*input*/,
 	     unsigned /*op*/, LocalPort::BridgeOp &bo) {
       bo.m_mode = CyclicModulo;
       bo.m_next = c.m_out.m_index % c.m_in.m_scale;
@@ -193,7 +194,7 @@ namespace OCPI {
 
     // Receive first to first
     void LocalPort::
-    iFirst2(Launcher::Connection &c, const OU::Port &/*output*/, const OU::Port &/*input*/,
+    iFirst2(Launcher::Connection &c, const OM::Port &/*output*/, const OM::Port &/*input*/,
 	    unsigned /*op*/, LocalPort::BridgeOp &bo) {
       if (c.m_in.m_index == 0) {
 	bo.m_first = bo.m_last = 0;
@@ -204,13 +205,13 @@ namespace OCPI {
 
     // Receive from one, defined by our range
     void LocalPort::
-    iFirstCyc(Launcher::Connection &c, const OU::Port &/*output*/, const OU::Port &/*input*/,
+    iFirstCyc(Launcher::Connection &c, const OM::Port &/*output*/, const OM::Port &/*input*/,
 	      unsigned /*op*/, LocalPort::BridgeOp &bo) {
       bo.m_mode = c.m_in.m_index == 0 ? Cyclic : Discard;
     }
 
     void LocalPort::
-    iFirst(Launcher::Connection &/*c*/, const OU::Port &/*output*/, const OU::Port &/*input*/,
+    iFirst(Launcher::Connection &/*c*/, const OM::Port &/*output*/, const OM::Port &/*input*/,
 	      unsigned /*op*/, LocalPort::BridgeOp &bo) {
       bo.m_first = bo.m_last = 0;
       bo.m_mode = AsAvailable;
@@ -218,14 +219,14 @@ namespace OCPI {
 
     // Receive from any
     void LocalPort::
-    iAny(Launcher::Connection &/*c*/, const OU::Port &/*output*/, const OU::Port &/*input*/,
+    iAny(Launcher::Connection &/*c*/, const OM::Port &/*output*/, const OM::Port &/*input*/,
 	unsigned /*op*/, LocalPort::BridgeOp &bo) {
       bo.m_mode = AsAvailable;
     }
 
     // Receive from one, defined by our range
     void LocalPort::
-    iOneP(Launcher::Connection &c, const OU::Port &/*output*/, const OU::Port &/*input*/,
+    iOneP(Launcher::Connection &c, const OM::Port &/*output*/, const OM::Port &/*input*/,
 	  unsigned /*op*/, LocalPort::BridgeOp &bo) {
       partialSender(c.m_out.m_scale, c.m_in.m_scale, c.m_in.m_index, bo.m_first);
       bo.m_last = bo.m_first;
@@ -234,7 +235,7 @@ namespace OCPI {
 
     // Receive from one, defined by our range
     void LocalPort::
-    bad(Launcher::Connection &/*c*/, const OU::Port &/*output*/, const OU::Port &/*input*/,
+    bad(Launcher::Connection &/*c*/, const OM::Port &/*output*/, const OM::Port &/*input*/,
 	unsigned /*op*/, LocalPort::BridgeOp &/*bo*/) {
       assert("Incompatible distributions between input and output"==0);
     }
@@ -242,7 +243,7 @@ namespace OCPI {
     // Each pair is output to input.
     // The first function sets up the output bridge, the second sets up the input bridge.
     LocalPort::BridgeSetup
-    *LocalPort::bridgeModes[OU::Port::DistributionLimit][OU::Port::DistributionLimit][2] = {
+    *LocalPort::bridgeModes[OM::Port::DistributionLimit][OM::Port::DistributionLimit][2] = {
       //     input->  All            Cyclic             First               Balanced        Directed   Random          Hashed
       // output \|/
       /* All */      {{oAllP,iOneP}, {oCycP,iOneP},     {oFirst2,iFirst2},  {oBalP,iAny},   {bad,bad}, {oCycP,iOneP},  {oHashP,iAny}},
@@ -259,7 +260,7 @@ namespace OCPI {
     // Figure out the three parameters for bridge port processing for the given op
     // at this port: the mode, the starting bridge port, and the ending bridge port.
     void LocalPort::
-    determineBridgeOp(Launcher::Connection &c, const OU::Port &output, const OU::Port &input,
+    determineBridgeOp(Launcher::Connection &c, const OM::Port &output, const OM::Port &input,
 		      unsigned op, BridgeOp &bo) {
       bo.m_last = m_bridgePorts.size() - 1;
       bridgeModes[output.getDistribution(op)][input.getDistribution(op)][isProvider() ? 1 : 0]
@@ -270,7 +271,7 @@ namespace OCPI {
     setupBridging(Launcher::Connection &c) {
       const Launcher::Port &other = isProvider() ? c.m_out : c.m_in;
       assert(other.m_port || other.m_metaPort);
-      const OU::Port
+      const OM::Port
 	&otherMeta = other.m_port ? other.m_port->m_metaPort : *other.m_metaPort,
 	&input = isProvider() ? m_metaPort : otherMeta,
 	&output = isProvider() ? otherMeta : m_metaPort;

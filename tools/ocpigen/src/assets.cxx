@@ -27,7 +27,7 @@
 #include "ezxml.h"
 #include "OcpiUtilEzxml.h"
 #include "OcpiUtilMisc.h"
-#include "OcpiUtilAssembly.h"
+#include "MetadataAssembly.hh"
 #include "OcpiLibraryAssembly.h"
 #include "cdkutils.h"
 

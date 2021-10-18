@@ -23,6 +23,11 @@
 #include "assembly.h"
 // Generic (actually non-HDL) assembly support
 // This isn't as purely generic as it should be  FIXME
+namespace OM = OCPI::Metadata;
+namespace OM = OCPI::Metadata;
+namespace OM = OCPI::Metadata;
+namespace OM = OCPI::Metadata;
+namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 namespace OA = OCPI::API;
 
@@ -45,9 +50,9 @@ InstanceProperty::
 InstanceProperty() : property(NULL) {
 }
 
-// Find the OU::Assembly::Instance's port in the instance's worker
+// Find the OM::Assembly::Instance's port in the instance's worker
 const char *Assembly::
-findPort(OU::Assembly::Port &ap, InstancePort *&found) {
+findPort(OM::Assembly::Port &ap, InstancePort *&found) {
   Instance &i = m_instances[ap.m_instance];
   found = NULL;
   unsigned nn = 0;
@@ -71,11 +76,11 @@ findPort(OU::Assembly::Port &ap, InstancePort *&found) {
   return NULL;
 }
 
-static const char *roleName(OU::Assembly::Role &r) { return r.isProducer() ? "producer" : "consumer"; }
+static const char *roleName(OM::Assembly::Role &r) { return r.isProducer() ? "producer" : "consumer"; }
 // A key challenge here is that we may not know the width of the connection until we look at
 // real ports
 const char *Assembly::
-parseConnection(OU::Assembly::Connection &aConn) {
+parseConnection(OM::Assembly::Connection &aConn) {
   const char *err;
   Connection &c = *new Connection(&aConn);
   m_connections.push_back(&c);
@@ -85,7 +90,7 @@ parseConnection(OU::Assembly::Connection &aConn) {
   InstancePort *found;
   size_t minCount = 1000;
   for (auto api = aConn.m_ports.begin(); api != aConn.m_ports.end(); api++) {
-    OU::Assembly::Port &ap = *(*api).first;
+    OM::Assembly::Port &ap = *(*api).first;
     if ((err = findPort(ap, found)))
       return err;
     if ((*api).second + (c.m_count ? c.m_count : 1) > found->m_port->count())
@@ -102,7 +107,7 @@ parseConnection(OU::Assembly::Connection &aConn) {
   if (!c.m_count)
     c.m_count = minCount;
   for (auto api = aConn.m_ports.begin(); api != aConn.m_ports.end(); api++) {
-    OU::Assembly::Port &ap = *(*api).first;
+    OM::Assembly::Port &ap = *(*api).first;
     if ((err = findPort(ap, found)) ||
 	(err = found->m_port->fixDataConnectionRole(ap.m_role)))
       return err;
@@ -117,9 +122,9 @@ parseConnection(OU::Assembly::Connection &aConn) {
     return "multiple external attachments on a connection unsupported";
   // Create instance ports (and underlying ports of this assembly worker).
   for (auto ei = aConn.m_externals.begin(); ei != aConn.m_externals.end(); ei++) {
-    OU::Assembly::External &ext = *ei->first;
+    OM::Assembly::External &ext = *ei->first;
     assert(aConn.m_ports.size() == 1);
-    OU::Assembly::Port &ap = *aConn.m_ports.front().first;
+    OM::Assembly::Port &ap = *aConn.m_ports.front().first;
     assert(ap.m_role.m_knownRole);
     // Inherit the role of the first internal connection
     if (!ext.m_role.m_knownRole)
@@ -205,19 +210,19 @@ getValue(const char *sym, OU::ExprValue &val) const {
 // Find the value in the assy worker's paramconfig.
 
 const char *Assembly::
-addAssemblyParameters(OU::Assembly::Properties &aiprops) {
+addAssemblyParameters(OM::Assembly::Properties &aiprops) {
   if (m_assyWorker.m_model == RccModel)
     return NULL; // proxy assemblies cannot have parameters at this point
   for (PropertiesIter api = m_assyWorker.m_ctl.properties.begin();
        api != m_assyWorker.m_ctl.properties.end(); api++)
     if ((*api)->m_isParameter) {
-      const OU::Property &ap = **api;
+      const OM::Property &ap = **api;
       assert(m_assyWorker.m_paramConfig);
       Param *p = &m_assyWorker.m_paramConfig->params[0];
       for (unsigned nn = 0; nn < m_assyWorker.m_paramConfig->params.size(); nn++, p++)
 	if (&ap == p->m_param && !p->m_isDefault) {
 	  // We have a non-default-value parameter value in this assy wkr's configuration
-	  OU::Assembly::Property *aip = &aiprops[0];
+	  OM::Assembly::Property *aip = &aiprops[0];
 	  size_t n;
 	  for (n = aiprops.size(); n; n--, aip++)
 	    if (!strcasecmp(ap.m_name.c_str(), aip->m_name.c_str()))
@@ -241,12 +246,12 @@ addAssemblyParameters(OU::Assembly::Properties &aiprops) {
 // possibly augmented by values from the assembly.  This happens AFTER we know
 // about the worker, so we can do error checking and value parsing
 const char *Instance::
-addParameters(const OU::Assembly::Properties &aiprops, InstanceProperty *&ipv) {
+addParameters(const OM::Assembly::Properties &aiprops, InstanceProperty *&ipv) {
   Worker &w = *m_worker;
   const char *err;
-  const OU::Assembly::Property *ap = &aiprops[0];
+  const OM::Assembly::Property *ap = &aiprops[0];
   for (size_t n = aiprops.size(); n; n--, ap++) {
-    const OU::Property *p = w.findProperty(ap->m_name.c_str());
+    const OM::Property *p = w.findProperty(ap->m_name.c_str());
     if (!p)
       return OU::esprintf("property '%s' is not a property of worker '%s'", ap->m_name.c_str(),
 			  w.m_implName);
@@ -271,14 +276,14 @@ addParameters(const OU::Assembly::Properties &aiprops, InstanceProperty *&ipv) {
   return NULL;
 }
 void Assembly::
-addParamConfigParameters(const ParamConfig &pc, const OU::Assembly::Properties &aiprops,
+addParamConfigParameters(const ParamConfig &pc, const OM::Assembly::Properties &aiprops,
 			 InstanceProperty *&ipv) {
   const Param *p = &pc.params[0];
   // For each parameter in the config
   for (unsigned nn = 0; nn < pc.params.size(); nn++, p++) {
     if (!p->m_param) // an orphaned parameter if the number of them grew..
       continue;
-    const OU::Assembly::Property *ap = &aiprops[0];
+    const OM::Assembly::Property *ap = &aiprops[0];
     size_t n;
     for (n = aiprops.size(); n; n--, ap++)
       if (!strcasecmp(ap->m_name.c_str(), p->m_param->m_name.c_str()))
@@ -294,7 +299,7 @@ addParamConfigParameters(const ParamConfig &pc, const OU::Assembly::Properties &
 
 const char *Instance::
 init(::Assembly &assy, const char *iName, const char *wName, ezxml_t ix,
-     OU::Assembly::Properties &xmlProperties) {
+     OM::Assembly::Properties &xmlProperties) {
   m_assy = &assy;
   //  m_instance = ai;
   m_xml = ix;
@@ -384,7 +389,7 @@ init(::Assembly &assy, const char *iName, const char *wName, ezxml_t ix,
 const char *Assembly::
 parseAssy(ezxml_t xml, const char **topAttrs, const char **instAttrs) {
   try {
-    m_utilAssembly = new OU::Assembly(xml, m_assyWorker.m_implName, true, topAttrs, instAttrs);
+    m_utilAssembly = new OM::Assembly(xml, m_assyWorker.m_implName, true, topAttrs, instAttrs);
   } catch (std::string &e) {
     return OU::esprintf("%s", e.c_str());
   }
@@ -397,12 +402,12 @@ parseAssy(ezxml_t xml, const char **topAttrs, const char **instAttrs) {
   Instance *i = &m_instances[0];
   // Initialize our instances based on the generic assembly instances
   for (unsigned n = 0; n < m_utilAssembly->nUtilInstances(); n++, i++) {
-    OU::Assembly::Instance &ai = m_utilAssembly->instance(n);
+    OM::Assembly::Instance &ai = m_utilAssembly->instance(n);
     if ((err =
 	 i->init(*this, ai.m_name.c_str(), ai.m_implName.c_str(), ai.xml(), ai.m_properties)))
       return err;
-    // If the instance in the OU::Assembly has "m_externals=true",
-    // and this instance port has no connections in the OU::Assembly
+    // If the instance in the OM::Assembly has "m_externals=true",
+    // and this instance port has no connections in the OM::Assembly
     // then we add an external connection for the instance port. Prior to this,
     // we didn't have access to the worker metadata to know what all the ports are.
     if (ai.m_externals) {
@@ -482,7 +487,7 @@ externalizePort(InstancePort &ip, const char *name, size_t *ordinal) {
   Port &extPort = p.clone(m_assyWorker, extName, p.m_arrayCount, NULL, err);
   if (err)
     return err;
-  OU::Assembly::External *ext = new OU::Assembly::External(extPort.m_name.c_str());
+  OM::Assembly::External *ext = new OM::Assembly::External(extPort.m_name.c_str());
   ext->m_role.m_provider = !p.m_master; // provisional
   ext->m_role.m_bidirectional = false;
   ext->m_role.m_knownRole = true;
@@ -529,10 +534,10 @@ emitXmlWorker(std::string &out, bool verbose) {
     OU::formatAdd(out, " sizeOfConfigSpace=\"%llu\"", (unsigned long long)m_ctl.sizeOfConfigSpace);
   if (m_ctl.controlOps) {
     bool first = true;
-    for (unsigned op = 0; op < OU::Worker::OpsLimit; op++)
+    for (unsigned op = 0; op < OM::Worker::OpsLimit; op++)
       if (m_ctl.controlOps & (1u << op)) {
 	OU::formatAdd(out, "%s%s", first ? " controlOperations=\"" : ",",
-		OU::Worker::s_controlOpNames[op]);
+		OM::Worker::s_controlOpNames[op]);
 	first = false;
       }
     if (!first)
@@ -554,7 +559,7 @@ emitXmlWorker(std::string &out, bool verbose) {
     out += " emulator='1'";
   out += ">\n";
   if (m_scalable) {
-    OU::Port::Scaling s;
+    OM::Port::Scaling s;
     if (!(s == m_scaling)) {
       std::string l_out;
       m_scaling.emit(out, NULL);
@@ -580,7 +585,7 @@ emitXmlWorker(std::string &out, bool verbose) {
       out += '\'';
       bool any = false;
       for (auto it = i->m_xmlProperties.begin(); it != i->m_xmlProperties.end(); ++it) {
-	const OU::Property *p = i->m_worker->findProperty(it->m_name.c_str());
+	const OM::Property *p = i->m_worker->findProperty(it->m_name.c_str());
 	assert(p);
 	if (!p->m_isParameter) {
 	  if (!any)
@@ -619,7 +624,7 @@ emitXmlWorker(std::string &out, bool verbose) {
     out += "    </slaves>\n";
   }
   for (PropertiesIter pi = m_ctl.properties.begin(); pi != m_ctl.properties.end(); pi++) {
-    OU::Property *prop = *pi;
+    OM::Property *prop = *pi;
     prop->printAttrs(out, "property", 2, prop->m_isParameter); // suppress default values for parameters
     if (prop->m_isImpl)
       out += " isImpl='1'";
@@ -712,12 +717,12 @@ InstancePort()
   init(NULL, NULL, NULL);
 }
 InstancePort::
-InstancePort(Instance *i, Port *p, OU::Assembly::External *ext) {
+InstancePort(Instance *i, Port *p, OM::Assembly::External *ext) {
   init(i, p, ext);
 }
 
 void InstancePort::
-init(Instance *i, Port *p, OU::Assembly::External *ext) {
+init(Instance *i, Port *p, OM::Assembly::External *ext) {
   m_instance = i;
   m_port = p;
   m_connected.assign(p ? p->count() : 1, false);
