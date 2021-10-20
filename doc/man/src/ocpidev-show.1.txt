@@ -60,6 +60,10 @@ Asset types to be specified in the '<noun>' argument are:
 *workers*::
     Display all workers in registered projects.
 
+*prerequisites*::
+    Show installed prerequisites.
+
+
 Use the keywords *`rcc`* and *`hdl`* to scope what is displayed
 for the *platforms* and *targets* nouns. For example, the command:
 
