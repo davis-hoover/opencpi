@@ -30,6 +30,7 @@
 
 
 //namespace OX = OCPI::Util::EzXml;
+namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 //namespace OA = OCPI::API;
 namespace OT = OCPI::DataTransport;
@@ -63,7 +64,7 @@ namespace OCPI {
       public:
 
 	MsgChannel(XferServices & xf,
-		   const OU::Protocol &protocol,
+		   const OM::Protocol &protocol,
 		   const char  * url,
 		   const OCPI::Util::PValue *ourParams,
 		   const OCPI::Util::PValue *otherParams)
@@ -168,14 +169,14 @@ namespace OCPI {
 
       class XferServices : public DataTransfer::Msg::ConnectionBase<XferFactory,XferServices,MsgChannel>
       {
-	const OU::Protocol &m_protocol;
+	const OM::Protocol &m_protocol;
       public:
-	XferServices ( const OCPI::Util::Protocol & protocol , const char  * other_url, 
-		       const OCPI::Util::PValue *our_props=0,
-		       const OCPI::Util::PValue *other_props=0 );
+	XferServices ( const OM::Protocol & protocol , const char  * other_url, 
+		       const OU::PValue *our_props=0,
+		       const OU::PValue *other_props=0 );
 	MsgChannel* getMsgChannel( const char  *a_url,
-				   const OCPI::Util::PValue *ourParams,
-				   const OCPI::Util::PValue *otherParams)
+				   const OU::PValue *ourParams,
+				   const OU::PValue *otherParams)
 	{
 	  return new MsgChannel( *this, m_protocol, a_url, ourParams, otherParams);
 	}
@@ -220,10 +221,10 @@ namespace OCPI {
 	    !strncasecmp(url, "ior:", sizeof("ior:") - 1);
 	}
 
-	virtual XferServices* getXferServices( const OCPI::Util::Protocol & protocol,
+	virtual XferServices* getXferServices( const OM::Protocol & protocol,
 					       const char* url,
-					       const OCPI::Util::PValue *ourParams,
-					       const OCPI::Util::PValue *otherParams)
+					       const OU::PValue *ourParams,
+					       const OU::PValue *otherParams)
 	{
 	  if (!m_services)
 	    m_services = new XferServices( protocol, url, ourParams, otherParams);
@@ -237,9 +238,9 @@ namespace OCPI {
 
 	
       XferServices::
-      XferServices ( const OCPI::Util::Protocol &a_protocol , const char  * other_url,
-		     const OCPI::Util::PValue *ourParams,
-		     const OCPI::Util::PValue *otherParams)
+      XferServices ( const OM::Protocol &a_protocol , const char  * other_url,
+		     const OU::PValue *ourParams,
+		     const OU::PValue *otherParams)
 	: DataTransfer::Msg::ConnectionBase<XferFactory,XferServices,MsgChannel>
 	  (*this, a_protocol, other_url, ourParams, otherParams),
 	  m_protocol(a_protocol)

@@ -48,10 +48,11 @@ namespace OCPI {
       Access m_properties;              // The accessor to the remote property space
       Device &m_device;
       size_t m_occpIndex;
-      OCPI::Util::Property *m_propInfo; // the array of property descriptors
+      OCPI::Metadata::Property *m_propInfo; // the array of property descriptors
       WciControl(Device &device, const char *impl, const char *inst, unsigned index, bool hasControl);
     public:
-      WciControl(Device &device, ezxml_t implXml, ezxml_t instXml, OCPI::Util::Property *props, bool doInit = true);
+      WciControl(Device &device, ezxml_t implXml, ezxml_t instXml, OCPI::Metadata::Property *props,
+		 bool doInit = true);
       virtual ~WciControl();
       inline size_t index() const { return m_occpIndex; }
     protected:
@@ -65,14 +66,14 @@ namespace OCPI {
       // Add the hardware considerations to the property object that supports
       // fast memory-mapped property access directly to users
       // the key members are "readVaddr" and "writeVaddr"
-      virtual void prepareProperty(OCPI::Util::Property &md,
+      virtual void prepareProperty(OCPI::Metadata::Property &md,
 				   volatile uint8_t *&writeVaddr,
 				   const volatile uint8_t *&readVaddr) const;
       // Map the control op numbers to structure members
       static const unsigned controlOffsets[];
       void checkControlState() const;
-      void controlOperation(OCPI::Util::Worker::ControlOperation op);
-      bool controlOperation(OCPI::Util::Worker::ControlOperation op, std::string &err);
+      void controlOperation(OCPI::Metadata::Worker::ControlOperation op);
+      bool controlOperation(OCPI::Metadata::Worker::ControlOperation op, std::string &err);
       inline uint32_t checkWindow(size_t offset, size_t nBytes) const {
 	ocpiAssert(m_hasControl);
 	unsigned windowBits = OCCP_WORKER_CONFIG_WINDOW_BITS - OCCP_WORKER_CONFIG_READSIZE_BITS;
@@ -215,14 +216,15 @@ OCPI_DATA_TYPES
       OCPI::Container::Port *findPort(const char *);
       const std::string &name() const;
       void
-      prepareProperty(OCPI::Util::Property &, volatile uint8_t *&, const volatile uint8_t *&) const;
+      prepareProperty(OCPI::Metadata::Property &, volatile uint8_t *&, const volatile uint8_t *&) 
+	const;
       OCPI::Container::Port &
-      createPort(const OCPI::Util::Port &, const OCPI::Util::PValue *);
+      createPort(const OCPI::Metadata::Port &, const OCPI::Util::PValue *);
       OCPI::Container::Port &
-      createOutputPort(OCPI::Util::PortOrdinal, size_t, size_t, const OCPI::Util::PValue*)
+      createOutputPort(OCPI::Metadata::PortOrdinal, size_t, size_t, const OCPI::Util::PValue*)
         throw (OCPI::Util::EmbeddedException);
       OCPI::Container::Port &
-      createInputPort(OCPI::Util::PortOrdinal, size_t, size_t, const OCPI::Util::PValue*)
+      createInputPort(OCPI::Metadata::PortOrdinal, size_t, size_t, const OCPI::Util::PValue*)
         throw (OCPI::Util::EmbeddedException);
       OCPI::Container::Application *application();
       OCPI::Container::Worker *nextWorker();

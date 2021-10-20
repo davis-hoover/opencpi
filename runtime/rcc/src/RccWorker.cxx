@@ -26,6 +26,7 @@
 
 namespace OC = OCPI::Container;
 namespace OS = OCPI::OS;
+namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 namespace OA = OCPI::API;
 
@@ -60,7 +61,7 @@ Worker(Application & app, Artifact *art, const char *a_name, ezxml_t impl, ezxml
      // For these test workers, initialize the control mask from the dispatch table
 #define CONTROL_OP(x, c, t, s1, s2, s3, s4) \
      if (m_dispatch->x)                     \
-	  mask |= 1 << OU::Worker::Op##c;
+	  mask |= 1 << OM::Worker::Op##c;
      OCPI_CONTROL_OPS
 #undef CONTROL_OP
      setControlMask(mask);
@@ -119,9 +120,9 @@ Worker::
   try {
     if (enabled) {
       enabled = false;
-      controlOperation(OU::Worker::OpStop);
+      controlOperation(OM::Worker::OpStop);
     }
-    controlOperation(OU::Worker::OpRelease);
+    controlOperation(OM::Worker::OpRelease);
   } catch(...) {
   }
 #ifdef EM_PORT_COMPLETE
@@ -147,7 +148,7 @@ Worker::
   if (m_errorString)
     free(m_errorString);
   while (!m_testPmds.empty()) {
-    OU::Port *pmd = m_testPmds.front();
+    OM::Port *pmd = m_testPmds.front();
     m_testPmds.pop_front();
     delete pmd;
   }
@@ -370,7 +371,7 @@ rccTake(RCCPort *rccPort, RCCBuffer *oldBuffer, RCCBuffer *newBuffer)
  // Also called from createInputPort and createOutputPort locally
  OC::Port &
  Worker::
- createPort(const OU::Port& mp, const OCPI::Util::PValue *params)
+ createPort(const OM::Port& mp, const OCPI::Util::PValue *params)
  {
    TRACE(" OCPI::RCC::Worker::createPort()");
    if (mp.m_minBufferCount == 0)
@@ -426,29 +427,29 @@ rccTake(RCCPort *rccPort, RCCBuffer *oldBuffer, RCCBuffer *newBuffer)
  // We add the explicitly specified buffer count and size to the
  // list of properties.
  OC::Port &Worker::
- createTestPort(OU::PortOrdinal portId, size_t bufferCount, size_t bufferSize, bool isProvider,
+ createTestPort(OM::PortOrdinal portId, size_t bufferCount, size_t bufferSize, bool isProvider,
 		const OU::PValue *props) {
-   OU::Port *pmd = new OU::Port(NULL, this);
+   OM::Port *pmd = new OM::Port(NULL, this);
    pmd->m_name = isProvider ? "unnamed input" : "unnamed output";
    pmd->m_ordinal = portId;
    pmd->m_provider = isProvider;
    pmd->m_bufferSize = bufferSize;
    pmd->m_minBufferCount = bufferCount;
    m_testPmds.push_back(pmd);
-   assert(!OU::Worker::m_ports); // no metadata ports here
-   OU::Worker::m_nPorts++;
+   assert(!OM::Worker::m_ports); // no metadata ports here
+   OM::Worker::m_nPorts++;
    assert(m_dispatch);
    if (m_dispatch->optionallyConnectedPorts & (1u << portId))
      optionalPorts() |= (1u << portId);
    return createPort(*pmd, props);
  }
  OC::Port &Worker::
- createOutputPort(OU::PortOrdinal portId, size_t bufferCount, size_t bufferSize,
+ createOutputPort(OM::PortOrdinal portId, size_t bufferCount, size_t bufferSize,
 		  const OU::PValue *props) {
    return createTestPort(portId, bufferCount, bufferSize, false, props);
  }
  OC::Port &Worker::
- createInputPort(OU::PortOrdinal portId, size_t bufferCount, size_t bufferSize,
+ createInputPort(OM::PortOrdinal portId, size_t bufferCount, size_t bufferSize,
 		 const OU::PValue *props) {
    return createTestPort(portId, bufferCount, bufferSize, true, props);
  }
@@ -463,9 +464,9 @@ rccTake(RCCPort *rccPort, RCCBuffer *oldBuffer, RCCBuffer *newBuffer)
  void Worker::
  portError(std::string &error) {
    enabled = false;
-   controlOperation(OU::Worker::OpStop);
-   controlOperation(OU::Worker::OpRelease);
-   setControlState(OU::Worker::UNUSABLE);
+   controlOperation(OM::Worker::OpStop);
+   controlOperation(OM::Worker::OpRelease);
+   setControlState(OM::Worker::UNUSABLE);
    ocpiBad("Worker \"%s\" received port error: %s", name().c_str(), error.c_str());
  }
 
@@ -485,7 +486,7 @@ propertyRead(unsigned ordinal) const {
 }
 
 void Worker::
-prepareProperty(OU::Property& md ,
+prepareProperty(OM::Property& md ,
 		volatile uint8_t *&writeVaddr,
 		const volatile uint8_t *&readVaddr) const {
   (void)readVaddr;
@@ -546,7 +547,7 @@ doEOF() {
   if (!fallThrough) {
     // all outputs have propagated, and there are no ports that handle EOFs, so we're done
     enabled = false;
-    setControlState(OU::Worker::FINISHED);
+    setControlState(OM::Worker::FINISHED);
     return true;
   }
   return false;
@@ -574,7 +575,7 @@ run(bool &anyone_run) {
 	didCallBack = true;
       else {
 	enabled = false;
-	setControlState(OU::Worker::UNUSABLE);
+	setControlState(OM::Worker::UNUSABLE);
 	return;
       }
     }
@@ -623,17 +624,17 @@ run(bool &anyone_run) {
       m_runTimer.restart();
     OCPI_EMIT_REGISTER_FULL_VAR( "Worker Run", OCPI::Time::Emit::DT_u, 1, OCPI::Time::Emit::State, wre );
     OCPI_EMIT_STATE_CAT_NR_(wre, 1, OCPI_EMIT_CAT_WORKER_DEV, OCPI_EMIT_CAT_WORKER_DEV_RUN_TIME);
-    ocpiDebug("Running worker \"%s/%s\"", name().c_str(), OU::Worker::cname());
+    ocpiDebug("Running worker \"%s/%s\"", name().c_str(), OM::Worker::cname());
     RCCResult rc;
     try {
       rc = m_dispatch ?
 	m_dispatch->run(m_context, timedOut, &newRunCondition) : m_user->run(timedOut);
     } catch (std::string &e) {
       throw OU::Error("RCC Worker \"%s/%s\" run method failed with exception: %s",
-		      name().c_str(), OU::Worker::cname(), e.c_str());
+		      name().c_str(), OM::Worker::cname(), e.c_str());
     } catch (...) {
       throw OU::Error("RCC Worker \"%s/%s\" run method failed with an unknown exception",
-		      name().c_str(), OU::Worker::cname());
+		      name().c_str(), OM::Worker::cname());
     }
     OCPI_EMIT_STATE_CAT_NR_(wre, 0, OCPI_EMIT_CAT_WORKER_DEV, OCPI_EMIT_CAT_WORKER_DEV_RUN_TIME);
     m_context->firstRun = false;
@@ -656,7 +657,7 @@ run(bool &anyone_run) {
 			   (m_runCondition->m_usecs % 1000000) * 1000);
     }
     // The state might have changed behind our back: e.g. in port exceptions
-    if (getState() != OU::Worker::UNUSABLE)
+    if (getState() != OM::Worker::UNUSABLE)
       switch (rc) {
       case RCC_ADVANCE:
 	advanceAll();
@@ -667,13 +668,13 @@ run(bool &anyone_run) {
       case RCC_FINISHED:
 	// FIXME:  release all current buffers
 	enabled = false;
-	setControlState(OU::Worker::FINISHED);
+	setControlState(OM::Worker::FINISHED);
 	break;
       case RCC_OK:
 	break;
       default:
 	enabled = false;
-	setControlState(OU::Worker::UNUSABLE);
+	setControlState(OM::Worker::UNUSABLE);
 	m_runTimer.reset();
 	{
 	  const char *err = m_context->errorString ? m_context->errorString : m_errorString;
@@ -710,14 +711,14 @@ advanceAll() {
 
 // Note we are already under a mutex here
 void Worker::
-controlOperation(OU::Worker::ControlOperation op) {
+controlOperation(OM::Worker::ControlOperation op) {
   RCCResult rc = RCC_OK;
   OCPI_EMIT_REGISTER_FULL_VAR( "Worker Control Op", OCPI::Time::Emit::DT_u, 3, OCPI::Time::Emit::Value, cop); \
   OU::AutoMutex guard(mutex(), true);
   OCPI_EMIT_VALUE_CAT_NR_(cop, op, OCPI_EMIT_CAT_WORKER_DEV, OCPI_EMIT_CAT_WORKER_DEV_RUN_TIME);
   pthread_setspecific(Driver::s_threadKey, this);
   enum {
-#define CONTROL_OP(x, c, t, s1, s2, s3, s4) My_##x = 1 << OU::Worker::Op##c,
+#define CONTROL_OP(x, c, t, s1, s2, s3, s4) My_##x = 1 << OM::Worker::Op##c,
 OCPI_CONTROL_OPS
 #undef CONTROL_OP
   };
@@ -725,10 +726,10 @@ OCPI_CONTROL_OPS
   (!(getControlMask() & My_##op) ? RCC_OK : \
    (m_dispatch ? (m_dispatch->op ? m_dispatch->op(m_context) : RCC_OK) : m_user->op()))
   switch (op) {
-  case OU::Worker::OpInitialize:
+  case OM::Worker::OpInitialize:
     rc = DISPATCH(initialize);
     break;
-  case OU::Worker::OpStart:
+  case OM::Worker::OpStart:
     {
       RCCPort *rccPort = m_context->ports;
       for (unsigned n = 0; n < m_nPorts; n++, rccPort++)
@@ -741,7 +742,7 @@ OCPI_CONTROL_OPS
       hasRun = false; // allow immediate execution after suspension for period execution
     }
     break;
-  case OU::Worker::OpStop:
+  case OM::Worker::OpStop:
     // If the worker says that stop failed, we're not stopped.
     if ((rc = DISPATCH(stop)) != RCC_OK)
       break;
@@ -749,31 +750,31 @@ OCPI_CONTROL_OPS
       enabled = false;
       m_runTimer.reset(); // just in case there is overhead with running the timer
     }
-    setControlState(OU::Worker::SUSPENDED);
+    setControlState(OM::Worker::SUSPENDED);
     break;
     // like stop, except don't call stop
-  case OU::Worker::OpRelease:
+  case OM::Worker::OpRelease:
     if (enabled) {
       enabled = false;
       m_runTimer.reset();
     }
     rc = DISPATCH(release);
-    setControlState(OU::Worker::UNUSABLE);
+    setControlState(OM::Worker::UNUSABLE);
     break;
-  case OU::Worker::OpTest:
+  case OM::Worker::OpTest:
     if (m_dispatch && !m_dispatch->test)
       throw OU::EmbeddedException( OU::TEST_NOT_IMPLEMENTED,
 				   "Worker has no test implementation",
 				   OU::ApplicationRecoverable);
     rc = DISPATCH(test);
     break;
-  case OU::Worker::OpBeforeQuery:
+  case OM::Worker::OpBeforeQuery:
     rc = DISPATCH(beforeQuery);
     break;
-  case OU::Worker::OpAfterConfigure:
+  case OM::Worker::OpAfterConfigure:
     rc = DISPATCH(afterConfigure);
     break;
-  case OU::Worker::OpsLimit:
+  case OM::Worker::OpsLimit:
     break;
   }
   const char *err = m_context->errorString ? m_context->errorString : m_errorString;
@@ -782,7 +783,7 @@ OCPI_CONTROL_OPS
     if (!err)
       err = rc == RCC_ERROR ? "returned RCC_ERROR" : "returned RCC_FATAL";
     OU::format(serr, "Worker \"%s\" produced an error during the \"%s\" control operation: %s",
-	       name().c_str(), OU::Worker::s_controlOpNames[op], err);
+	       name().c_str(), OM::Worker::s_controlOpNames[op], err);
     m_context->errorString = NULL;
     if (m_errorString) {
       free(m_errorString);
@@ -799,7 +800,7 @@ OCPI_CONTROL_OPS
     break;
   case RCC_FATAL:
     enabled = false;
-    setControlState(OU::Worker::UNUSABLE);
+    setControlState(OM::Worker::UNUSABLE);
     throw OU::EmbeddedException( OU::WORKER_FATAL, err,
 				 OU::ApplicationFatal);
     break;
@@ -807,7 +808,7 @@ OCPI_CONTROL_OPS
     enabled = false;
     throw
       OU::Error("Control operation \"%s\" on RCC worker \"%s\" returned invalid "
-		"RCCResult value: 0x%x", OU::Worker::s_controlOpNames[op],
+		"RCCResult value: 0x%x", OM::Worker::s_controlOpNames[op],
 		name().c_str(), rc);
   }
 }
@@ -1185,16 +1186,16 @@ RCCResult RCCUserWorker::run(bool /*timeout*/) {
      return OS::Time::now().bits();
    }
    bool RCCUserWorker::isInitialized() const {
-     return m_worker.getControlState() == OU::Worker::INITIALIZED;
+     return m_worker.getControlState() == OM::Worker::INITIALIZED;
    }
    bool RCCUserWorker::isSuspended() const {
-     return m_worker.getControlState() == OU::Worker::SUSPENDED;
+     return m_worker.getControlState() == OM::Worker::SUSPENDED;
    }
    bool RCCUserWorker::isFinished() const {
-     return m_worker.getControlState() == OU::Worker::FINISHED;
+     return m_worker.getControlState() == OM::Worker::FINISHED;
    }
    bool RCCUserWorker::isUnusable() const {
-     return m_worker.getControlState() == OU::Worker::UNUSABLE;
+     return m_worker.getControlState() == OM::Worker::UNUSABLE;
    }
    RCCUserPort::
    RCCUserPort()
@@ -1224,7 +1225,7 @@ RCCResult RCCUserWorker::run(bool /*timeout*/) {
      if (buf.m_rccBuffer->isNew_) {
        buf.initBuffer(!m_rccPort.metaPort->m_provider);
        if (!m_rccPort.metaPort->m_provider && m_rccPort.metaPort->operations()) {
-	 OU::Operation &op = m_rccPort.metaPort->operations()[a_opCode];
+	 OM::Operation &op = m_rccPort.metaPort->operations()[a_opCode];
 	 ocpiDebug("Implicit length for op %u set to %zu", a_opCode, op.defaultLength());
 	 size_t l_length = op.defaultLength(); // Could be using a non-zero default length
 	 if (op.m_nArgs > 1) {
@@ -1255,7 +1256,7 @@ RCCResult RCCUserWorker::run(bool /*timeout*/) {
    getArgAddress(RCCUserBuffer &buf, unsigned op, unsigned arg, size_t *a_length,
 		 size_t *capacity) const {
      checkOpCode(buf, op, false);
-     OU::Operation &o = m_rccPort.containerPort->metaPort().m_operations[op];
+     OM::Operation &o = m_rccPort.containerPort->metaPort().m_operations[op];
      const OU::Member &m = o.m_args[arg];
      uint8_t *p = (uint8_t *)buf.m_rccBuffer->data + m.m_offset;
      if (m.m_isSequence) {
@@ -1286,7 +1287,7 @@ RCCResult RCCUserWorker::run(bool /*timeout*/) {
    setArgSize(RCCUserBuffer &buf, unsigned op, unsigned arg, size_t size) const {
      assert(m_rccPort.containerPort);
      checkOpCode(buf, op);
-     OU::Operation &o = m_rccPort.containerPort->metaPort().m_operations[op];
+     OM::Operation &o = m_rccPort.containerPort->metaPort().m_operations[op];
      const OU::Member &m = o.m_args[arg];
      assert(m.m_isSequence);
      size_t
@@ -1300,7 +1301,7 @@ RCCResult RCCUserWorker::run(bool /*timeout*/) {
 		       "sequence size %zu (%zu bytes) exceeds remaining buffer size (%zu)",
 		       m_rccPort.containerPort->parent().name().c_str(),
 		       m_rccPort.containerPort->name().c_str(),
-		       m_rccPort.containerPort->metaPort().OU::Protocol::m_name.c_str(),
+		       m_rccPort.containerPort->metaPort().OM::Protocol::m_name.c_str(),
 		       o.cname(), m.cname(), size, nBytes, limit);
      if (o.m_nArgs > 1) {
        *(uint32_t *)((uint8_t*)buf.m_rccBuffer->data + m.m_offset) =
@@ -1416,7 +1417,7 @@ RCCResult RCCUserWorker::run(bool /*timeout*/) {
      // If there is a protocol, setting the default opcode sets the default size,
      // including any sequence being zero length.
      if (m_rccPort.metaPort->operations()) {
-       OU::Operation &op = m_rccPort.metaPort->operations()[a_opCode];
+       OM::Operation &op = m_rccPort.metaPort->operations()[a_opCode];
        ocpiDebug("Default length for op %u is %zu", a_opCode, op.defaultLength());
        if (!m_rccPort.useDefaultLength_)
 	 setDefaultLength(op.defaultLength());

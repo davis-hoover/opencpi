@@ -28,9 +28,9 @@
 #include "OcpiContainerApi.h"
 
 #include "OcpiUtilSelfMutex.h"
-#include "OcpiPValue.h"
+#include "UtilPValue.hh"
 #include "OcpiRDTInterface.h"
-#include "OcpiUtilPort.h"
+#include "MetadataPort.hh"
 #include "OcpiParentChild.h"
 #include "ContainerLauncher.h"
 
@@ -56,7 +56,7 @@ namespace OCPI {
      *********************************/  
     const unsigned DEFAULT_NBUFFERS = 2;
     class PortData {
-      OCPI::Util::PortOrdinal m_ordinal;
+      OCPI::Metadata::PortOrdinal m_ordinal;
       bool m_isProvider; // perhaps overriding bidirectional or metaport
       PortConnectionDesc *m_connectionData;
       PortConnectionDesc  connectionData;      // Port Connection Dependency data
@@ -67,13 +67,13 @@ namespace OCPI {
       size_t m_nBuffers;
       size_t m_bufferSize;
     public:
-      PortData(const OCPI::Util::Port &mPort, bool isProvider, PortConnectionDesc *desc = NULL);
+      PortData(const OCPI::Metadata::Port &mPort, bool isProvider, PortConnectionDesc *desc = NULL);
       virtual ~PortData(){};
       inline bool isProvider() const { return m_isProvider; }
       inline bool isOutput() const {return !isProvider(); }
       inline bool isInput() const {return isProvider(); }
       inline size_t nBuffers() const { return m_nBuffers; }
-      inline OCPI::Util::PortOrdinal ordinal() const { return m_ordinal; }
+      inline OCPI::Metadata::PortOrdinal ordinal() const { return m_ordinal; }
       virtual inline PortConnectionDesc &  getData() {
 	return m_connectionData ? *m_connectionData : connectionData;
       }
@@ -168,10 +168,10 @@ typedef int pthread_spinlock_t;
       BasicPort *m_backward; // if set, other is forwarded to here
       size_t m_nRead, m_nWritten;
       OCPI::RDT::Desc_t &myDesc; // convenience
-      const OCPI::Util::Port &m_metaPort;
+      const OCPI::Metadata::Port &m_metaPort;
       Container &m_container;
 
-      BasicPort(Container &container, const OCPI::Util::Port &mPort, bool isProvider,
+      BasicPort(Container &container, const OCPI::Metadata::Port &mPort, bool isProvider,
 		const OCPI::Util::PValue *params);
       virtual ~BasicPort();
       // Apply port parameters that are NOT connection parameters that apply to both sides.
@@ -194,7 +194,7 @@ typedef int pthread_spinlock_t;
       unsigned fullCount(), emptyCount();
     public:
       Container &container() const { return m_container; }
-      inline const OCPI::Util::Port &metaPort() const { return m_metaPort; }
+      inline const OCPI::Metadata::Port &metaPort() const { return m_metaPort; }
       OCPI::API::BaseType getOperationInfo(uint8_t opCode, size_t &nbytes);
       virtual void mapBuffers(size_t /*offset*/, size_t /*size*/) {};
       virtual void unmapBuffers(size_t /*offset*/, size_t /*size*/) {};

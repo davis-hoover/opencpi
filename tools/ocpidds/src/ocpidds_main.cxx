@@ -27,9 +27,9 @@
 #include <vector>
 #include "cdkutils.h"
 #include "ocpidds.h"
-#include "OcpiUtilProtocol.h"
+#include "MetadataProtocol.hh"
 #include "OcpiUtilMisc.h"
-#include "ValueReader.h"
+#include "UtilValueReader.hh"
 
 #define OCPI_OPTIONS_HELP \
   "Usage is: ocpidds [options] <input-files>\n"
@@ -48,13 +48,14 @@
  CMD_OPTION(in,         i, String, NULL, "input file to read protocol data from") \
  CMD_OPTION(out,        o, String, NULL, "output file to write protocol data to") \
 
-#include "CmdOption.h"
+#include "CmdOption.hh"
 
+namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 namespace OA = OCPI::API;
 
 static const char *
-parseAndWrite(OU::Protocol &p, OU::Operation &op, uint8_t opcode, const char *text, int out) {
+parseAndWrite(OM::Protocol &p, OM::Operation &op, uint8_t opcode, const char *text, int out) {
   struct {
     uint32_t length;
     uint32_t opcode;
@@ -115,7 +116,7 @@ parseAndWrite(OU::Protocol &p, OU::Operation &op, uint8_t opcode, const char *te
 
 static const char *
 emitData(const char *protoFile, const char *input, const char *output) {
-  OU::Protocol p;
+  OM::Protocol p;
   ezxml_t x;
   std::string dummy;
   const char *err = NULL;
@@ -136,7 +137,7 @@ emitData(const char *protoFile, const char *input, const char *output) {
   for (size_t lines = 1; (n = getline(&line, &len, in)) > 0 && line[n-1] == '\n'; lines++) {
     line[n-1] = '\0';
     char *text = line;
-    OU::Operation *op;
+    OM::Operation *op;
     if (n >= 4 && !strncmp("\\:", line, 2)) {
       char *end = strchr(line + 2, ':');
       if (end) {

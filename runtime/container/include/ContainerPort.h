@@ -25,9 +25,9 @@
 #include "OcpiContainerApi.h"
 
 #include "OcpiUtilSelfMutex.h"
-#include "OcpiPValue.h"
+#include "UtilPValue.hh"
 #include "OcpiRDTInterface.h"
-#include "OcpiUtilPort.h"
+#include "MetadataPort.hh"
 #include "OcpiParentChild.h"
 #include "ContainerApplication.h"
 #include "ContainerLocalPort.h"
@@ -51,7 +51,7 @@ namespace OCPI {
     protected:
       bool m_canBeExternal;
 
-      Port(Container &container, const OCPI::Util::Port &mport, const OCPI::Util::PValue *params = NULL);
+      Port(Container &container, const OCPI::Metadata::Port &mport, const OCPI::Util::PValue *params = NULL);
       virtual ~Port();
       bool canBeExternal() const { return m_canBeExternal; }
       virtual const std::string &name() const = 0;
@@ -90,7 +90,7 @@ namespace OCPI {
 	public OCPI::Util::Parent<Ext>,
         public Port {
     protected:
-      PortBase<Wrk,Prt,Ext>(Wrk &a_worker, Prt &prt, const OCPI::Util::Port &mport,
+      PortBase<Wrk,Prt,Ext>(Wrk &a_worker, Prt &prt, const OCPI::Metadata::Port &mport,
 			    const OCPI::Util::PValue *params)
       : OCPI::Util::Child<Wrk,Prt,portBase>(a_worker, prt, mport.m_name.c_str()),
 	Port(a_worker.parent().container(), mport, params) {}
@@ -120,7 +120,8 @@ namespace OCPI {
     class BridgePort : public BasicPort {
       friend class LocalPort;
     protected:
-      BridgePort(Container &c, const OCPI::Util::Port &mPort, bool provider, const OCPI::Util::PValue *params);
+      BridgePort(Container &c, const OCPI::Metadata::Port &mPort, bool provider,
+		 const OCPI::Util::PValue *params);
       ~BridgePort();
       bool canBeExternal() const { return true; }
     };

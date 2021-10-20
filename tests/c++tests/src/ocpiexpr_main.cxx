@@ -25,8 +25,8 @@
 #include <map>
 #include <string>
 #include "OsDebug.hh"
-#include "OcpiExprEvaluator.h"
-#include "OcpiUtilValue.h"
+#include "UtilExpression.hh"
+#include "UtilValue.hh"
 #include "OcpiUtilMisc.h"
 
 namespace OU = OCPI::Util;
@@ -45,7 +45,7 @@ namespace OA = OCPI::API;
   CMD_OPTION(loglevel,      l,   UChar,  "0",    "The logging level to be used during operation")\
   CMD_OPTION(quiet,         q,   Bool,   0,      "Only print the value")
 
-#include "CmdOption.h"
+#include "CmdOption.hh"
 
 static int mymain(const char **ap) {
   if (options.loglevel())

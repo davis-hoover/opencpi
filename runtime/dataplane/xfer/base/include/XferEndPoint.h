@@ -26,7 +26,7 @@
 #include <assert.h>
 #include <string>
 #include <map>
-#include "OcpiPValue.h"
+#include "UtilPValue.hh"
 #include "OcpiUuid.h"
 #include "OcpiRes.h"
 
@@ -152,6 +152,12 @@ protected:
 };
 typedef std::map<OCPI::Util::Uuid, EndPoint *, OCPI::Util::UuidComp> EndPoints;
 typedef EndPoints::iterator EndPointsIter;
+
+// FIXME: This constant should be negotiated by platforms.
+// It applies to both the base address of a set of buffers and the alignment of each buffer
+// in the set.
+// Latest update to 128: prevent AXI bursts, which are 128 bytes, from crossing a 4K boundary
+const unsigned BUFFER_ALIGNMENT = 128;
 
 // Shared memory MAPPING services.  Virtual/base class, With default NOP methods.
 // Not part of endpoint so that this object can be shared

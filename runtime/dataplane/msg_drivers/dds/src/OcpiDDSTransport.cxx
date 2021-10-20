@@ -42,7 +42,7 @@
 #include "OsAssert.hh"
 #include <OcpiUtilAutoMutex.h>
 #include <OcpiUtilEzxml.h>
-#include <OcpiPValue.h>
+#include "UtilPValue.hh"
 #include <list>
 #include <stack>
 #include <map>
@@ -50,14 +50,15 @@
 #include <iostream>
 #include <OcpiBuffer.h>
 #include <OpenSpliceBindings.h>
-#include <OcpiUtilProtocol.h>
-#include "OcpiUtilValue.h"
+#include "MetadataProtocol.hh"
+#include "UtilValue.hh"
 
 #define BUF_SIZE 1024
 
 namespace OX = OCPI::Util::EzXml;
 using namespace std;
 using namespace OpenSpliceBindings;
+namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 namespace OA = OCPI::API;
 
@@ -1024,7 +1025,7 @@ namespace OCPI {
 	void   copyOut( void* from, void * to )
 	{
 #ifndef NDEBUG
-	  OU::Protocol & p = *m_data.m_proto;
+	  OM::Protocol & p = *m_data.m_proto;
 	  p.printXML(stdout);
 	  printf("Min Buffer Size: %u %u %u\n", p.m_minBufferSize, p.m_dataValueWidth, p.m_minMessageValues);
 
@@ -1040,7 +1041,7 @@ namespace OCPI {
 	c_bool copyIn( c_base base, void* from, void * to )
 	{
 #ifndef NDEBUG
-	  OU::Protocol & p = *m_data.m_proto;
+	  OM::Protocol & p = *m_data.m_proto;
 	  p.printXML(stdout);
 	  printf("Min Buffer Size: %u %u %u\n", p.m_minBufferSize, p.m_dataValueWidth, p.m_minMessageValues);
 	  fflush(stdout);

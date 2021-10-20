@@ -25,6 +25,7 @@
 
 namespace OCPI {
   namespace API {
+    namespace OM = OCPI::Metadata;
     namespace OU = OCPI::Util;
     namespace OX = OCPI::Util::EzXml;
     namespace SCA = OCPI::SCA;
@@ -133,7 +134,7 @@ genScaPrf(const char *outDir) const {
   const Property *p = m_properties;
   ezxml_t root = ezxml_new("properties");
   for (size_t n = m_nProperties; n; n--, p++) {
-    const OU::Property &pr =
+    const OM::Property &pr =
       m_instances[p->m_instance].
       m_bestDeployment.m_impls[0]->m_metadataImpl.property(p->m_property);
     // We make things readable that OpenCPI can cache even if they are not declared readable.

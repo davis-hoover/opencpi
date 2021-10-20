@@ -38,7 +38,6 @@
 #define TESTS "-tests.xml"
 #define MS_CONFIG "bypass", "metadata", "throttle", "full"
 
-namespace OL = OCPI::Library;
 namespace {
   // The package serves two purposes: the spec and the impl.
   // If the spec already has a package prefix, then it will only
@@ -617,7 +616,7 @@ namespace {
     }
 
     // FIXME: this code is redundant with the OcpiUtilAssembly.cxx
-    const char *parseDelay(ezxml_t sx, const OU::Property &p) {
+    const char *parseDelay(ezxml_t sx, const OM::Property &p) {
       const char *err;
       if ((err = OE::checkAttrs(sx, "delay", "value", NULL)) ||
           (err = OE::checkElements(sx, NULL)))
@@ -795,7 +794,7 @@ namespace {
             Param &sp = pc.params[nn];
             if (sp.m_param == NULL)
               continue;
-            OU::Property *wprop = wci->second->findProperty(sp.m_param->cname());
+            OM::Property *wprop = wci->second->findProperty(sp.m_param->cname());
             for (unsigned n = 0; n < wcfg.params.size(); n++) {
               Param &wparam = wcfg.params[n];
               if (wparam.m_param && !strcasecmp(sp.m_param->cname(), wparam.m_param->cname())) {
@@ -1009,7 +1008,7 @@ namespace {
           if (io.m_port) {
             if (!io.m_port->isDataProducer() && io.m_script.size()) {
               if ((err = generateFile(first, "inputs", "input port", s,
-                                      io.m_port->OU::Port::m_name, io.m_script, env, file)))
+                                      io.m_port->OM::Port::m_name, io.m_script, env, file)))
                 return err;
             }
           }
@@ -1500,7 +1499,7 @@ namespace {
             Param &sp = pc.params[nn];
             if (sp.m_param == NULL)
               continue;
-            OU::Property *wprop = wci->second->findProperty(sp.m_param->cname());
+            OM::Property *wprop = wci->second->findProperty(sp.m_param->cname());
             for (unsigned n = 0; n < wcfg.params.size(); n++) {
               Param &wparam = wcfg.params[n];
               if (wparam.m_param && !strcasecmp(sp.m_param->cname(), wparam.m_param->cname())) {
@@ -1780,7 +1779,7 @@ namespace {
 static void
 addNonParameterProperties(Worker &w, ParamConfig &globals) {
   for (PropertiesIter pi = w.m_ctl.properties.begin(); pi != w.m_ctl.properties.end(); ++pi) {
-    OU::Property &p = **pi;
+    OM::Property &p = **pi;
     if (p.m_isParameter || !p.m_isWritable)
       continue;
     std::string name;
@@ -2021,7 +2020,7 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
       assert(!found);
       globals.params.resize(globals.params.size()+1);
       found = &globals.params.back();
-      OU::Property &newp = *new OU::Property();
+      OM::Property &newp = *new OM::Property();
       found->m_isTest = true;
       char *copy = ezxml_toxml(px);
       // Make legal property definition XML out of this xml
@@ -2053,7 +2052,7 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
     Param &param = globals.params[n];
     if (!param.m_param)
       continue;
-    const OU::Property &p = *param.m_param;
+    const OM::Property &p = *param.m_param;
     if (!p.m_isParameter && p.m_isWritable && param.m_uValues.empty())
       fprintf(stderr,
               "Warning:  no values for writable property with no default: \"%s\" %zu %zu\n",

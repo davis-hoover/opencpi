@@ -27,7 +27,7 @@ void *memset(void *s, int c, size_t n) {
     // This implementation could be optimized in the following ways:
     // Check if 'n' bytes is aligned on 16, 32, 64 bit boundaries, and use uint* types matching that
     // alignment to reduce the number of iterations in the loop below.
-    uint8_t *p = (uint8_t *) s; while (n--) *p++ = c;
+  uint8_t *p = (uint8_t *) s; while (n--) *p++ = (uint8_t)c;
     return s;
 }
 void *memcpy(void *dst, const void *src, size_t n) {

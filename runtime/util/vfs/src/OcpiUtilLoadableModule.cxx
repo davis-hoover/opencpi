@@ -213,7 +213,7 @@ open (OCPI::Util::Vfs::Vfs * vfs,
 
       while (!in->eof() && in->good()) {
         in->read (buffer, DEFAULT_BUFFER_SIZE);
-        if (::write (out, buffer, in->gcount()) != in->gcount()) {
+        if (::write (out, buffer, (size_t)in->gcount()) != in->gcount()) {
           break;
         }
       }

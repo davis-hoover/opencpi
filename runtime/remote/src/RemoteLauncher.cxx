@@ -26,7 +26,7 @@
 #include <cstring>
 #include <set>
 #include "OsSocket.hh"
-#include "OcpiUtilValue.h"
+#include "UtilValue.hh"
 #include "OcpiUtilMisc.h"
 #include "Container.h"
 #include "ContainerApplication.h"
@@ -35,6 +35,7 @@ namespace OA = OCPI::API;
 namespace OC = OCPI::Container;
 namespace OX = OCPI::Util::EzXml;
 namespace OL = OCPI::Library;
+namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 namespace OS = OCPI::OS;
 namespace OCPI {
@@ -500,7 +501,7 @@ getPropertyValue(unsigned remoteInstance, size_t propN, std::string &v, const st
 }
 
 void Launcher::
-controlOp(unsigned remoteInstance, OU::Worker::ControlOperation op) {
+controlOp(unsigned remoteInstance, OM::Worker::ControlOperation op) {
   OU::SelfAutoMutex guard(this);
   OU::format(m_request, "<control id='%u' op='%u'>\n",
 	     remoteInstance, op);
@@ -512,7 +513,7 @@ controlOp(unsigned remoteInstance, OU::Worker::ControlOperation op) {
     throw OU::Error("Error in control operation: %s", err);
 }
 
-OU::Worker::ControlState Launcher::
+OM::Worker::ControlState Launcher::
 getState(unsigned remoteInstance) {
   OU::SelfAutoMutex guard(this);
   OU::format(m_request, "<control id='%u' getState=''>\n", remoteInstance);
@@ -524,7 +525,7 @@ getState(unsigned remoteInstance) {
   if ((err  = ezxml_cattr(m_rx, "error")) ||
       (err = OX::getNumber(m_rx, "state", &state, NULL, 0, false, true)))
     throw OU::Error("Error in getControlState operation: %s", err);
-  return (OU::Worker::ControlState)state;
+  return (OM::Worker::ControlState)state;
 }
 
 bool Launcher::

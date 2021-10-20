@@ -23,7 +23,6 @@
 #include "OsMutex.hh"
 
 OCPI::Util::AutoMutex::AutoMutex (OCPI::OS::Mutex & mutex, bool locked)
-  throw (std::string)
   : m_locked (locked),
     m_mutex (mutex)
 {
@@ -33,7 +32,6 @@ OCPI::Util::AutoMutex::AutoMutex (OCPI::OS::Mutex & mutex, bool locked)
 }
 
 OCPI::Util::AutoMutex::~AutoMutex ()
-  throw ()
 {
   if (m_locked) {
     m_mutex.unlock ();
@@ -42,7 +40,6 @@ OCPI::Util::AutoMutex::~AutoMutex ()
 
 void
 OCPI::Util::AutoMutex::lock ()
-  throw (std::string)
 {
   ocpiAssert (!m_locked);
   m_mutex.lock ();
@@ -51,7 +48,6 @@ OCPI::Util::AutoMutex::lock ()
 
 bool
 OCPI::Util::AutoMutex::trylock ()
-  throw (std::string)
 {
   ocpiAssert (!m_locked);
   return (m_locked = m_mutex.trylock ());
@@ -59,7 +55,6 @@ OCPI::Util::AutoMutex::trylock ()
 
 void
 OCPI::Util::AutoMutex::unlock ()
-  throw (std::string)
 {
   ocpiAssert (m_locked);
   m_mutex.unlock ();

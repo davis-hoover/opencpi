@@ -27,9 +27,9 @@
 
 #include "OsMutex.hh"
 #include "OsTimer.hh"
-#include "OcpiUtilProperty.h"
-#include "OcpiUtilWorker.h"
-#include "OcpiPValue.h"
+#include "MetadataProperty.hh"
+#include "MetadataWorker.hh"
+#include "UtilPValue.hh"
 
 namespace OCPI {
 
@@ -41,16 +41,16 @@ namespace OCPI {
     // Unfortunately, it is virtually inheritable (see HDL container's use of it).
     class Controllable {
     public:
-      inline OCPI::Util::Worker::ControlState getState() const { return m_state; }
+      inline OCPI::Metadata::Worker::ControlState getState() const { return m_state; }
       inline uint32_t getControlMask() { return m_controlMask; }
       inline void setControlMask(uint32_t mask) { m_controlMask = mask; }
-      inline void setControlState(OCPI::Util::Worker::ControlState state) const {
+      inline void setControlState(OCPI::Metadata::Worker::ControlState state) const {
 	m_state = state;
       }
       // Default is that no polling is done
       virtual void checkControlState() const {}
 
-      OCPI::Util::Worker::ControlState getControlState() const {
+      OCPI::Metadata::Worker::ControlState getControlState() const {
 	checkControlState();
 	return m_state;
       }
@@ -59,7 +59,7 @@ namespace OCPI {
       void setControlOperations(const char *controlOperations);
       virtual ~Controllable(){}
     private:
-      mutable OCPI::Util::Worker::ControlState m_state;
+      mutable OCPI::Metadata::Worker::ControlState m_state;
       uint32_t m_controlMask;
     };
 
@@ -75,7 +75,7 @@ namespace OCPI {
       virtual ~WorkerControl();
     public:
       //      virtual const std::string &name() const = 0;
-      virtual void prepareProperty(OCPI::Util::Property &p,
+      virtual void prepareProperty(OCPI::Metadata::Property &p,
 				   volatile uint8_t *&m_writeVaddr,
 				   const volatile uint8_t *&m_readVaddr) const = 0;
       virtual void setPropertyBytes(const OCPI::API::PropertyInfo &info, size_t offset,
@@ -100,7 +100,7 @@ namespace OCPI {
 	const = 0;
       virtual uint64_t getProperty64(const OCPI::API::PropertyInfo &info, size_t offset, unsigned idx = 0)
 	const = 0;
-      virtual void controlOperation(OCPI::Util::Worker::ControlOperation) = 0;
+      virtual void controlOperation(OCPI::Metadata::Worker::ControlOperation) = 0;
       virtual size_t getSequenceLengthProperty(const OCPI::API::PropertyInfo &info,
 					       const OCPI::Util::Member &m, size_t offset) const;
     };
@@ -109,7 +109,7 @@ namespace OCPI {
     typedef std::vector<Worker *> Workers;
     extern const Workers NoWorkers;
     class Cache;
-    class Worker : public OCPI::Util::Worker, virtual public Controllable, virtual public WorkerControl,
+    class Worker : public OCPI::Metadata::Worker, virtual public Controllable, virtual public WorkerControl,
 		   public OCPI::API::Worker {
       friend class OCPI::API::Property;
       friend class Port;
@@ -129,10 +129,10 @@ namespace OCPI {
       mutable std::vector<Cache *> m_cache; // per property write cache, when needed
       bool beforeStart() const;
     protected:
-      void connectPort(OCPI::Util::PortOrdinal ordinal);
+      void connectPort(OCPI::Metadata::PortOrdinal ordinal);
       PortMask &connectedPorts() { return m_connectedPorts; }
       PortMask &optionalPorts() { return m_optionalPorts; }
-      virtual void portIsConnected(OCPI::Util::PortOrdinal /*ordinal*/) {};
+      virtual void portIsConnected(OCPI::Metadata::PortOrdinal /*ordinal*/) {};
       void checkControl();
       inline OCPI::OS::Mutex &mutex() { return m_workerMutex; }
       virtual Port *findPort(const char *name) = 0;
@@ -159,7 +159,7 @@ namespace OCPI {
       OCPI::API::PropertyInfo &setupProperty(unsigned n,
 					     volatile uint8_t *&m_writeVaddr,
 					     const volatile uint8_t *&m_readVaddr) const;
-      virtual Port &createPort(const OCPI::Util::Port &metaport,
+      virtual Port &createPort(const OCPI::Metadata::Port &metaport,
 			       const OCPI::Util::PValue *props) = 0;
       virtual Worker *nextWorker() = 0;
     public:
@@ -230,7 +230,7 @@ namespace OCPI {
 		       bool *unreadablep = NULL, bool hex = false, bool *cachedp = NULL,
 		       bool uncached = false, bool *hiddenp = NULL);
       // Return true when ignored due to "ignored due to existing state"
-      bool controlOp(OCPI::Util::Worker::ControlOperation);
+      bool controlOp(OCPI::Metadata::Worker::ControlOperation);
       virtual const std::string &name() const = 0;
       // This class is actually used in some contexts (e.g. ocpihdl),
       // Where it is not a child of an application, hence this method
@@ -246,11 +246,11 @@ namespace OCPI {
       Port &getPort(const char *name, size_t nOthers, const OCPI::API::PValue *params = NULL);
       // backward compatibility for ctests
       virtual Port
-	&createOutputPort(OCPI::Util::PortOrdinal portId, size_t bufferCount, size_t bufferSize,
+	&createOutputPort(OCPI::Metadata::PortOrdinal portId, size_t bufferCount, size_t bufferSize,
 			  const OCPI::Util::PValue *params = NULL),
-	&createInputPort(OCPI::Util::PortOrdinal portId, size_t bufferCount, size_t bufferSize,
+	&createInputPort(OCPI::Metadata::PortOrdinal portId, size_t bufferCount, size_t bufferSize,
 			 const OCPI::Util::PValue *params = NULL),
-	&createTestPort(OCPI::Util::PortOrdinal portId, size_t bufferCount, size_t bufferSize,
+	&createTestPort(OCPI::Metadata::PortOrdinal portId, size_t bufferCount, size_t bufferSize,
 			bool isProvider, const OCPI::Util::PValue *params = NULL);
       virtual void read(size_t offset, size_t size, void *data);
       virtual void write(size_t offset, size_t size, const void *data);

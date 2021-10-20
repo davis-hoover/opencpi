@@ -41,21 +41,18 @@ namespace OCPI {
       namespace OU = OCPI::Util;
       Doc::
       Doc ()
-	throw ()
 	: m_doc (0), m_rootNode (0)
       {
       }
       // reduce warnings about pointer members
       Doc::
       Doc (const Doc &)
-	throw ()
 	: m_doc (0), m_rootNode (0)
       {
       }
 
       Doc::
       Doc (const std::string & data)
-	throw (std::string)
 	: m_doc (0), m_rootNode (0)
       {
 	parse (data);
@@ -64,7 +61,6 @@ namespace OCPI {
 
       Doc::
       Doc (std::istream * in)
-	throw (std::string)
 	: m_doc (0), m_rootNode (0)
       {
 	parse (in);
@@ -73,7 +69,6 @@ namespace OCPI {
 
       Doc::
       Doc (OCPI::Util::Vfs::Vfs & fs, const std::string & fileName)
-	throw (std::string)
 	: m_doc (0), m_rootNode (0)
       {
 	parse (fs, fileName);
@@ -82,7 +77,6 @@ namespace OCPI {
 
       Doc::
       ~Doc ()
-	throw ()
       {
 	if (m_rootNode) {
 	  ezxml_free (m_rootNode);
@@ -93,7 +87,6 @@ namespace OCPI {
 
       ezxml_t Doc::
       parse (const std::string & data)
-	throw (std::string)
       {
 	ocpiAssert (!m_rootNode);
 
@@ -127,7 +120,6 @@ namespace OCPI {
 
       ezxml_t Doc::
       parse (char *data)
-	throw (std::string)
       {
 	ocpiAssert (!m_rootNode);
 
@@ -154,7 +146,6 @@ namespace OCPI {
 
       ezxml_t Doc::
       parse (std::istream * in)
-	throw (std::string)
       {
 	unsigned int blockSize = 16384;
 	size_t length = 0;
@@ -207,7 +198,6 @@ namespace OCPI {
 
       ezxml_t Doc::
       parse (OCPI::Util::Vfs::Vfs & fs, const std::string & fileName)
-	throw (std::string)
       {
 	ocpiAssert (!m_rootNode);
 
@@ -301,7 +291,6 @@ namespace OCPI {
 
       ezxml_t Doc::
       getRootNode ()
-	throw ()
       {
 	ocpiAssert (m_rootNode);
 	return m_rootNode;
@@ -828,22 +817,6 @@ namespace OCPI {
 	return n > 0 ? false : OU::eformat(error, "Error writing to %s: %s", msg, strerror(errno));
       }
 
-      // Parse an integer (size_t) attribute that might be an expression
-      // Only consider if we have an identifier resolver
-      // The string value of the expression is returned in expr.
-      const char *
-      getExprNumber(ezxml_t x, const char *attr, size_t &np, bool *found, std::string &expr,
-		    const IdentResolver *resolver) {
-	const char *a = ezxml_cattr(x, attr);
-	if (a) {
-	  if (found)
-	    *found = true;
-	  return parseExprNumber(a, np, &expr, resolver);
-	}
-	if (found)
-	  *found = false;
-	return NULL;
-      }
       ezxml_t
       addChild(ezxml_t x, const char *name, unsigned level, const char *txt, const char *attr1,
 	       const char *value1, const char *attr2, const char *value2) {
@@ -913,7 +886,7 @@ namespace OCPI {
 	in = str;
       }
       // Hoist children if testValue is true
-      static void hoist(bool testValue, ezxml_t node, ezxml_t parent) {
+      void hoist(bool testValue, ezxml_t node, ezxml_t parent) {
         ocpiDebug("BEFORE HOIST:\n%s", ezxml_toxml(parent));
 	ezxml_t node_next = node->ordered;
 	ezxml_cut(node); // remove the <if> in all cases
@@ -938,52 +911,6 @@ namespace OCPI {
 	  ocpiDebug("AFTER INSERTIONS:\n%s", ezxml_toxml(parent));
 	}
 	ezxml_free(node);
-      }
-      // The root node is not subject to conditionality
-      const char *parseConditionals(ezxml_t parent, const OU::IdentResolver &r) {
-	ezxml_t next; 
-	const char *err = NULL;
-	for (ezxml_t xml = parent ? parent->child : NULL; xml; xml = next) {
-	  next = xml->ordered;
-	  bool testValue;
-	  const char *expr;
-	  if (!strcasecmp(xml->name, "if")) {
-	    if (!xml->child)
-	      return "empty \"if\" element with no child elements";
-	    if (!(expr = ezxml_cattr(xml, "test")))
-	      return "missing \"test\" attribute in \"if\" element";
-	    if ((err = checkAttrs(xml, "test", NULL)) ||
-		(err = OU::parseExprBool(expr, testValue, NULL, &r)))
-	      return err;
-	    // We need to look-ahead for an else.
-	    hoist(testValue, xml, parent);
-	    if (next && !strcasecmp(next->name, "else")) {
-	      if (!next->child)
-		return "empty \"else\" element with no child elements";
-	      if ((err = checkAttrs(next, NULL)))
-		return err;
-	      hoist(!testValue, next, parent);
-	      next = parent->child; // one of <if> or <else> was hoisted
-	    } else if (testValue)
-	      next = parent->child; // <if> or <else> was hoisted
-	    continue; // no recursion since we are restarting
-	  } else if (!strcasecmp(xml->name, "else"))
-	    return "invalid \"else\" element not after \"if\" element";
-	  else if ((expr = ezxml_cattr(xml, "if"))) {
-	    if ((err = OU::parseExprBool(expr, testValue, NULL, &r)))
-		return err;
-	    if (testValue)
-	      ezxml_set_attr(xml, "if", NULL);
-	    else {
-	      ezxml_cut(xml);
-	      ezxml_free(xml);
-	      continue; // no recursion since we're not including this
-	    }
-	  }
-	  if ((err = parseConditionals(xml, r)))
-	    return err;
-	}
-	return NULL;
       }
     }
   }

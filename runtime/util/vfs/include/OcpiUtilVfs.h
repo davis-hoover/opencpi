@@ -78,8 +78,7 @@ namespace OCPI {
        */
 
       std::string joinNames (const std::string & dir,
-                             const std::string & name)
-        throw (std::string);
+                             const std::string & name);
 
       /**
        * Return all but the last path component of a file name.
@@ -91,8 +90,7 @@ namespace OCPI {
        * only, or if it is an invalid file name.
        */
 
-      std::string directoryName (const std::string & name)
-        throw (std::string);
+      std::string directoryName (const std::string & name);
 
       /**
        * Return a file name's last path component.
@@ -104,8 +102,7 @@ namespace OCPI {
        * \throw std::string If \a name is an invalid file name.
        */
 
-      std::string relativeName (const std::string & name)
-        throw (std::string);
+      std::string relativeName (const std::string & name);
 
       //@}
 
@@ -154,8 +151,7 @@ namespace OCPI {
          * Not user callable.
          */
 
-        Vfs ()
-          throw ();
+        Vfs ();
 
         /**
          * Destructor.
@@ -179,8 +175,7 @@ namespace OCPI {
          * \return The base URI.
          */
 
-        virtual std::string baseURI () const 
-          throw () = 0;
+        virtual std::string baseURI () const = 0;
 
         /**
          * Map the name of a file within this file system to a URI.
@@ -190,8 +185,7 @@ namespace OCPI {
          * \throw std::string If \a name is not a valid file name.
          */
 
-        virtual std::string nameToURI (const std::string & name) const
-          throw (std::string) = 0;
+        virtual std::string nameToURI (const std::string & name) const = 0;
 
         /**
          * Map a URI to the name of a file, if it identifies a file
@@ -205,8 +199,7 @@ namespace OCPI {
          * name space that the URI references.
          */
 
-        virtual std::string URIToName (const std::string & uri) const
-          throw (std::string) = 0;
+        virtual std::string URIToName (const std::string & uri) const = 0;
 
         //@}
 
@@ -230,8 +223,7 @@ namespace OCPI {
          * \throw std::string If name is not a valid file name.
          */
 
-        virtual std::string absoluteName (const std::string & name) const
-          throw (std::string);
+        virtual std::string absoluteName (const std::string & name) const;
 
         /**
          * Returns all but the last path component of a file name.
@@ -244,8 +236,7 @@ namespace OCPI {
          * \throw std::string If \a name is an invalid file name.
          */
 
-        virtual std::string directoryName (const std::string & name) const
-          throw (std::string);
+        virtual std::string directoryName (const std::string & name) const;
 
         //@}
 
@@ -261,8 +252,7 @@ namespace OCPI {
          * \return The absolute path of the current working directory.
          */
 
-        virtual std::string cwd () const
-          throw (std::string) = 0;
+        virtual std::string cwd () const = 0;
 
         /**
          * Change the current working directory.
@@ -277,8 +267,7 @@ namespace OCPI {
          * to the parent directory, use cd (directoryName (cwd())).
          */
 
-        virtual void cd (const std::string & dir)
-          throw (std::string) = 0;
+        virtual void cd (const std::string & dir) = 0;
 
         /**
          * Create a new directory.
@@ -290,8 +279,7 @@ namespace OCPI {
          * not exist or is not accessible.
          */
 
-        virtual void mkdir (const std::string & dir)
-          throw (std::string) = 0;
+        virtual void mkdir (const std::string & dir) = 0;
 
         /**
          * Remove a directory.
@@ -304,8 +292,7 @@ namespace OCPI {
          * or if the parent directory is not accessible.
          */
 
-        virtual void rmdir (const std::string & dir)
-          throw (std::string) = 0;
+        virtual void rmdir (const std::string & dir) = 0;
 
         //@}
 
@@ -339,8 +326,7 @@ namespace OCPI {
 
         virtual Iterator * list(const std::string & dir,
                                 const std::string & pattern = "*",
-				bool recursive = false)
-          throw (std::string);
+				bool recursive = false);
 
         //@}
 
@@ -361,8 +347,7 @@ namespace OCPI {
          *              false if it does not exist.
          */
 
-        virtual bool exists (const std::string & name, bool * isDir = 0)
-          throw (std::string) = 0;
+        virtual bool exists (const std::string & name, bool * isDir = 0) = 0;
 
         /**
          * Returns the size of a file.
@@ -374,8 +359,7 @@ namespace OCPI {
          * plain file.
          */
 
-        virtual unsigned long long size (const std::string & name)
-          throw (std::string) = 0;
+        virtual unsigned long long size (const std::string & name) = 0;
 
         /**
          * Returns the timestamp of the last modification.
@@ -386,8 +370,7 @@ namespace OCPI {
          * \throw std::string If "name" does not exist or is not accessible.
          */
 
-        virtual std::time_t lastModified (const std::string & name)
-          throw (std::string) = 0;
+        virtual std::time_t lastModified (const std::string & name) = 0;
 
         //@}
 
@@ -410,8 +393,7 @@ namespace OCPI {
          * \throw std::string If \a name does not exist or is not accessible.
          */
 
-        virtual std::iostream * open (const std::string & name, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
-          throw (std::string) = 0;
+        virtual std::iostream * open (const std::string & name, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out) = 0;
 
         /**
          * Open a file for reading.
@@ -426,8 +408,7 @@ namespace OCPI {
          * \throw std::string If \a name does not exist or is not accessible.
          */
 
-        virtual std::istream * openReadonly (const std::string & name, std::ios_base::openmode mode = std::ios_base::in)
-          throw (std::string) = 0;
+        virtual std::istream * openReadonly (const std::string & name, std::ios_base::openmode mode = std::ios_base::in) = 0;
 
         /**
          * Open a file for writing.
@@ -442,8 +423,7 @@ namespace OCPI {
          * \throw std::string If \a name does not exist or is not accessible.
          */
 
-        virtual std::ostream * openWriteonly (const std::string & name, std::ios_base::openmode mode = std::ios_base::out | std::ios_base::trunc)
-          throw (std::string) = 0;
+        virtual std::ostream * openWriteonly (const std::string & name, std::ios_base::openmode mode = std::ios_base::out | std::ios_base::trunc) = 0;
 
         /**
          * Close a stream, and release associated resources.
@@ -458,8 +438,7 @@ namespace OCPI {
          * closed.
          */
 
-        virtual void close (std::ios * stream)
-          throw (std::string) = 0;
+        virtual void close (std::ios * stream) = 0;
 
         //@}
 
@@ -488,8 +467,7 @@ namespace OCPI {
          * stream to the other.
          */
 
-        virtual void copy (const std::string & srcName, Vfs * destFs, const std::string & destName)
-          throw (std::string);
+        virtual void copy (const std::string & srcName, Vfs * destFs, const std::string & destName);
 
         /**
          * Move a file.
@@ -511,8 +489,7 @@ namespace OCPI {
          * remove(\a srcName).
          */
 
-        virtual void move (const std::string & srcName, Vfs * destFs, const std::string & destName)
-          throw (std::string);
+        virtual void move (const std::string & srcName, Vfs * destFs, const std::string & destName);
 
         /**
          * Rename a file.
@@ -527,8 +504,7 @@ namespace OCPI {
          * \note Equivalent to move (\a srcName, \a this, \a destName).
          */
 
-        virtual void rename (const std::string & srcName, const std::string & destName)
-          throw (std::string);
+        virtual void rename (const std::string & srcName, const std::string & destName);
 
         /**
          * Remove a file.
@@ -540,12 +516,11 @@ namespace OCPI {
          * \note Behavior is undefined if \a srcName identifies a directory.
          */
 
-        virtual void remove (const std::string & name)
-          throw (std::string) = 0;
+        virtual void remove (const std::string & name) = 0;
 
         //@}
 
-	virtual Dir &openDir(const std::string &) throw (std::string) = 0;
+	virtual Dir &openDir(const std::string &) = 0;
       private:
         /**
          * Not implemented.
@@ -568,8 +543,8 @@ namespace OCPI {
 	Vfs &m_fs;
 	std::string m_name;
 	Dir(Vfs &fs, const std::string &name);
-	Dir *pushDir(const std::string &s) throw(std::string);
-	virtual bool next(std::string &name, bool &isDir) throw (std::string) = 0;
+	Dir *pushDir(const std::string &s);
+	virtual bool next(std::string &name, bool &isDir) = 0;
 	Dir *popDir();
       public:
 	virtual ~Dir();

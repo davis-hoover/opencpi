@@ -46,19 +46,20 @@
 
 #include "ocpi-config.h"
 #include "OsFileSystem.hh"
-#include "OcpiUtilDataTypes.h"
-#include "OcpiUtilProtocol.h"
+#include "UtilDataTypes.hh"
+#include "MetadataProtocol.hh"
 #include "OcpiUtilMisc.h"
 #include "cdkutils.h"
 #include "ocpidds.h"
 
 namespace OS = OCPI::OS;
 namespace OA = OCPI::API;
+namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 const char *
 emitIDL(const char *outDir, const char *protoFile) {
   (void)outDir;
-  OU::Protocol p;
+  OM::Protocol p;
   const char *err = 0;
   ezxml_t x;
   std::string dummy;
@@ -616,12 +617,12 @@ getArg(OU::Member &m, const char *&cp, const char *term) {
 
 // Initialize a protocol from an interface in the repo
 static void 
-doInterface(OU::Protocol &p, const char *&cp) {
+doInterface(OM::Protocol &p, const char *&cp) {
   p.m_nOperations = getNum(cp, "\n");
   if (p.m_nOperations)
-    p.m_operations = new OU::Operation[p.m_nOperations];
+    p.m_operations = new OM::Operation[p.m_nOperations];
   // Loop over operations
-  for (OU::Operation *op = p.m_operations; *cp != '\n'; op++) {
+  for (OM::Operation *op = p.m_operations; *cp != '\n'; op++) {
     op->m_isTwoWay = *cp++ != '1';
     getString(op->m_name, cp);
     op->m_nArgs = getNum(cp);
@@ -630,7 +631,7 @@ doInterface(OU::Protocol &p, const char *&cp) {
       op->m_nArgs++;
     if (op->m_nArgs)
       op->m_args = new OU::Member[op->m_nArgs];
-    OU::Member *m = op->m_args;
+  OU::Member *m = op->m_args;
     if (!op->m_isTwoWay) {
       OU::Member dummy;
       getType(dummy, cp, "@");
@@ -648,8 +649,8 @@ doInterface(OU::Protocol &p, const char *&cp) {
     cp++;
     // Loop over exceptions - which we use "operations" for.
     if (op->m_nExceptions)
-      op->m_exceptions = new OU::Operation[op->m_nExceptions];
-    for (OU::Operation *ex = op->m_exceptions; *cp != '\n'; ex++) {
+      op->m_exceptions = new OM::Operation[op->m_nExceptions];
+    for (OM::Operation *ex = op->m_exceptions; *cp != '\n'; ex++) {
       getString(ex->m_name, cp);
       ex->m_nArgs = getNum(cp);
       n = sscanf(cp, "%u %n", &line, &len);
@@ -668,14 +669,14 @@ doInterface(OU::Protocol &p, const char *&cp) {
 }
 
 static const char *
-doStruct(OU::Protocol &p, const char *&cp) {
+doStruct(OM::Protocol &p, const char *&cp) {
   std::string tmp;
   getString(tmp, cp);
   assert(tmp == "struct");
 
   p.m_nOperations = 1;
-  p.m_operations = new OU::Operation[1];
-  OU::Operation &op = p.m_operations[0];
+  p.m_operations = new OM::Operation[1];
+  OM::Operation &op = p.m_operations[0];
   op.m_nArgs = getNum(cp);
   op.m_name = p.m_name;
   op.m_qualifiedName = p.m_qualifiedName;
@@ -751,7 +752,7 @@ emitProtocol(const char *const *argv, const char *outDir, const char *file,
   // Iterate through repository
   bool found = false;
   for (; !found && *cp; cp++) {
-    OU::Protocol p;
+    OM::Protocol p;
     getString(l1, cp, "\n");
     const char *qEnd = strrchr(l1.c_str(), ':');
     for (const char *q = strchr(l1.c_str(), ':') + 1; q < qEnd; q++)
