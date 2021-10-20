@@ -779,3 +779,4 @@ class HdlTarget(object):
         elif details == "json":
             json.dump(target_dict, sys.stdout)
             print()
+

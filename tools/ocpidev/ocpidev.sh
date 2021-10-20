@@ -2020,7 +2020,7 @@ usage: ocpidev [options] <verb> [<noun> [<name>]]
 
 Choices:
   <verb>: create, delete, build, clean, [un]register, [un]set, show, refresh, run
-  <noun>: project, registry, application, component, protocol, test, library,
+  <noun>: project, registry, prerequisites, application, component, protocol, test, library,
           worker, <model> <<model>_noun>
 
   <model>: hdl
