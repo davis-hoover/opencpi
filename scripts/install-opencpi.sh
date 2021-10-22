@@ -23,9 +23,6 @@
   exit 1
 }
 set -e
-for envar in $(env | egrep ^OCPI | sort | cut -f1 -d=); do
-  unset $envar
-done
 
 #
 # Quick and dirty argument parsing:
@@ -70,6 +67,7 @@ echo "Initializing OpenCPI CDK" in $(pwd -P)
 source ./scripts/init-opencpi.sh
 
 # Ensure CDK and TOOL variables
+OCPI_ESTABLISH_ENV="$(pwd)/cdk/opencpi-setup.sh"; source "$OCPI_ESTABLISH_ENV" -i -v
 OCPI_BOOTSTRAP="$(pwd)/cdk/scripts/ocpibootstrap.sh"; source "$OCPI_BOOTSTRAP"
 
 source $OCPI_CDK_DIR/scripts/util.sh
