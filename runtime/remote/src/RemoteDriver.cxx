@@ -21,7 +21,7 @@
 #include <cstring>
 #include "OsMisc.hh"
 #include "OsEther.hh"
-#include "OcpiUtilValue.h"
+#include "UtilValue.hh"
 #include "OcpiDriverManager.h"
 #include "ContainerManager.h"
 #include "RemoteLauncher.h"
@@ -38,6 +38,7 @@
 // a "network launcher" of applications.
 
 namespace OC = OCPI::Container;
+namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 namespace OX = OCPI::Util::EzXml;
 namespace OA = OCPI::API;
@@ -65,7 +66,7 @@ class Artifact : public OC::ArtifactBase<Container,Artifact> {
 class ExternalPort;
 class Worker;
 class Port : public OC::PortBase<Worker, Port, OCPI::API::ExternalPort> {
-  Port( Worker& w, const OU::Port & pmd, const OU::PValue *params)
+  Port( Worker& w, const OM::Port & pmd, const OU::PValue *params)
     :  OC::PortBase<Worker, Port, OCPI::API::ExternalPort> (w, *this, pmd, params) {
   }
 
@@ -82,11 +83,11 @@ class Worker
 	 const OC::Workers &/*slaves*/, bool hasMaster, size_t member, size_t crewSize,
 	 const OU::PValue *wParams, unsigned remoteInstance);
   virtual ~Worker() {}
-  OC::Port &createPort(const OU::Port&, const OU::PValue */*params*/) {
+  OC::Port &createPort(const OM::Port&, const OU::PValue */*params*/) {
     ocpiAssert("This method is not expected to ever be called" == 0);
     return *(OC::Port*)this;
   }
-  void controlOperation(OU::Worker::ControlOperation op) {
+  void controlOperation(OM::Worker::ControlOperation op) {
     if (getControlMask() & (1u << op))
       m_launcher.controlOp(m_remoteInstance, op);
   }
@@ -161,7 +162,7 @@ class Worker
   }
   void propertyWritten(unsigned /*ordinal*/) const {};
   void propertyRead(unsigned /*ordinal*/) const {};
-  void prepareProperty(OU::Property &,
+  void prepareProperty(OM::Property &,
 		       volatile uint8_t *&/*writeVaddr*/,
 		       const volatile uint8_t *&/*readVaddr*/) const {}
 
@@ -416,10 +417,10 @@ Worker(Application & app, Artifact *art, const char *a_name, ezxml_t impl, ezxml
 					    a_hasMaster, a_member, a_crewSize, wParams),
     m_remoteInstance(remoteInstance),
     m_launcher(*static_cast<Launcher *>(&app.parent().launcher())) {
-  setControlMask(getControlMask() | (OU::Worker::OpInitialize|
-				     OU::Worker::OpStart|
-				     OU::Worker::OpStop|
-				     OU::Worker::OpRelease));
+  setControlMask(getControlMask() | (OM::Worker::OpInitialize|
+				     OM::Worker::OpStart|
+				     OM::Worker::OpStop|
+				     OM::Worker::OpRelease));
   // Fake the connections.  The error checking is on the remote side, but this allows
   // the local (client-side) error checks about connectivity to succeed.
   // FIXME: possibly set this just based on what is actually in the launch info

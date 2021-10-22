@@ -46,14 +46,12 @@ namespace OCPI {
 std::string
 joinNames (const std::string & dir,
                            const std::string & name)
-  throw (std::string)
 {
   return OCPI::OS::FileSystem::joinNames (dir, name);
 }
 
 std::string
 directoryName (const std::string & name)
-  throw (std::string)
 {
   std::string::size_type slashPos = name.rfind ('/');
 
@@ -70,7 +68,6 @@ directoryName (const std::string & name)
 
 std::string
 relativeName (const std::string & name)
-  throw (std::string)
 {
   return OCPI::OS::FileSystem::relativeName (name);
 }
@@ -82,7 +79,6 @@ relativeName (const std::string & name)
  */
 
 Vfs::Vfs ()
-  throw ()
 {
 }
 
@@ -98,14 +94,12 @@ Vfs::~Vfs ()
 
 std::string
 Vfs::absoluteName (const std::string & name) const
-  throw (std::string)
 {
   return OCPI::Util::Vfs::joinNames (cwd(), name);
 }
 
 std::string
 Vfs::Vfs::directoryName (const std::string & name) const
-  throw (std::string)
 {
   return OCPI::Util::Vfs::directoryName (absoluteName (name));
 }
@@ -124,7 +118,6 @@ void
 Vfs::copy (const std::string & src,
                            Vfs * destfs,
                            const std::string & dest)
-  throw (std::string)
 {
   std::istream * srcStream = openReadonly (src, std::ios_base::binary);
   std::ostream * destStream;
@@ -256,7 +249,6 @@ Vfs::copy (const std::string & src,
 void
 Vfs::rename (const std::string & src,
                              const std::string & dest)
-  throw (std::string)
 {
   copy (src, this, dest);
   remove (src);
@@ -270,7 +262,6 @@ void
 Vfs::move (const std::string & src,
                            Vfs * destfs,
                            const std::string & dest)
-  throw (std::string)
 {
   if (this == destfs) {
     rename (src, dest);
@@ -283,7 +274,7 @@ Vfs::move (const std::string & src,
 Iterator * Vfs::list (const std::string & dir,
 		      const std::string & pattern,
 		      bool recursive)
-  throw (std::string) {
+{
   return new Iterator(*this, dir, pattern.c_str(), recursive);
 }
 
@@ -292,7 +283,7 @@ Dir::Dir(Vfs &fs, const std::string &name)
 }
 Dir::~Dir() {
 }
-Dir *Dir::pushDir(const std::string &s) throw(std::string) {
+Dir *Dir::pushDir(const std::string &s) {
   Dir &child = m_fs.openDir(joinNames(m_name, s));
   child.m_parent = this;
   return &child;
@@ -305,7 +296,7 @@ Dir *Dir::popDir() {
 
 #if 0
 void OCPI::Util::Vfs::Vfs::closeIterator (Iterator * it)
-  throw (std::string) {
+{
   delete it;
 }
 #endif

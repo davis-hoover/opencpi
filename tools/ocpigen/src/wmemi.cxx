@@ -48,7 +48,7 @@ WmemiPort(Worker &w, ezxml_t x, Port *sp, int ordinal, const char *&err)
 
 // Virtual constructor
 Port &WmemiPort::
-clone(Worker &, std::string &, size_t, OCPI::Util::Assembly::Role *, const char *&) const {
+clone(Worker &, std::string &, size_t, OM::Assembly::Role *, const char *&) const {
   throw OU::Error("Port type: %u cannot be cloned", m_type);
 #if 0
   WmemiPort *p = new WmemiPort(*this);

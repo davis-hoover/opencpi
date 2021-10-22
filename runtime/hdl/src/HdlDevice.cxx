@@ -34,6 +34,7 @@
 namespace OCPI {
   namespace HDL {
     namespace OE = OCPI::Util::EzXml;
+    namespace OM = OCPI::Metadata;
     namespace OU = OCPI::Util;
     namespace OO = OCPI::OS;
 
@@ -253,10 +254,10 @@ namespace OCPI {
         m_old = false;
         m_pfWorker->init(true, true);
         m_tsWorker->init(true, true);
-        if ((m_pfWorker->controlOperation(OU::Worker::OpInitialize, err)) ||
-            (m_tsWorker->controlOperation(OU::Worker::OpInitialize, err)) ||
-            (m_pfWorker->controlOperation(OU::Worker::OpStart, err)) ||
-            (m_tsWorker->controlOperation(OU::Worker::OpStart, err)))
+        if ((m_pfWorker->controlOperation(OM::Worker::OpInitialize, err)) ||
+            (m_tsWorker->controlOperation(OM::Worker::OpInitialize, err)) ||
+            (m_pfWorker->controlOperation(OM::Worker::OpStart, err)) ||
+            (m_tsWorker->controlOperation(OM::Worker::OpStart, err)))
           return true;
       }
       m_isAlive = true;

@@ -44,7 +44,7 @@
 #include "OcpiUtilAutoMutex.h"
 #include "OcpiUtilEzxml.h"
 #include "OcpiUtilMisc.h"
-#include "OcpiPValue.h"
+#include "UtilPValue.hh"
 #include "XferException.h"
 #include "XferDriver.h"
 #include "XferServices.h"
@@ -186,7 +186,6 @@ namespace DataTransfer {
       // Constructors
       EndPoint(XferFactory &factory, const char *protoInfo, const char *eps, const char *other,
 	       bool local, size_t size, const OU::PValue *params);
-      
       // Destructor
       virtual ~EndPoint();
 

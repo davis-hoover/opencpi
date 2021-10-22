@@ -25,7 +25,7 @@
 #endif
 #ifdef __cplusplus
 #include <string>
-#include "OcpiPValue.h"
+#include "UtilPValue.hh"
 #include "HdlDevice.h"
 
 

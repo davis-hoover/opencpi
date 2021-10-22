@@ -27,12 +27,10 @@
 #include "ezxml.h"
 #include "OcpiUtilEzxml.h"
 #include "OcpiUtilMisc.h"
-#include "OcpiUtilAssembly.h"
+#include "MetadataAssembly.hh"
 #include "OcpiLibraryAssembly.h"
 #include "cdkutils.h"
-
-namespace OE = OCPI::Util::EzXml;
-namespace OU = OCPI::Util;
+#include "ocpigen.h"
 
 	  // These are documented, although they may be deprecated...
 #define HDL_TARGET_ATTRS "HdlTargets", "HdlPlatforms"

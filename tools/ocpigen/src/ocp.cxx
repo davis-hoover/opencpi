@@ -24,9 +24,6 @@
 #include "hdl.h"
 #include "assembly.h"
 
-namespace OE=OCPI::Util::EzXml;
-namespace OU=OCPI::Util;
-
 #undef OCP_SIGNAL_MT
 #define OCP_SIGNAL_MT(n, w) {#n, true, true, w, true, false, OCP_##n},
 #define OCP_SIGNAL_MTR(n, w) {#n, true, true, w, true, true, OCP_##n},
@@ -83,7 +80,7 @@ OcpPort(Worker &w, ezxml_t x, Port *sp, int ordinal, WIPType type, const char *d
   if (err || (err = parseClock(x)) ||
       (err = OE::getBoolean(x, "ImpreciseBurst", &m_impreciseBurst)) ||
       (err = OE::getBoolean(x, "Continuous", &m_continuous)) ||
-      (err = OE::getExprNumber(x, "DataWidth", m_dataWidth,
+      (err = OU::getExprNumber(x, "DataWidth", m_dataWidth,
 			       &m_dataWidthFound, m_dataWidthExpr, &w)) ||
       (err = OE::getNumber(x, "ByteWidth", &m_byteWidth, 0, m_dataWidth)) ||
       (err = OE::getBoolean(x, "PreciseBurst", &m_preciseBurst)))

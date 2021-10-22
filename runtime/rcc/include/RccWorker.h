@@ -77,8 +77,8 @@ namespace OCPI {
       Worker(Application & app, Artifact *art, const char *name, ezxml_t impl, ezxml_t inst,
 	     const OCPI::Container::Workers &slaves, bool hasMaster, size_t member,
 	     size_t crewSize, const OCPI::Util::PValue *wParams);
-      OCPI::Container::Port& createPort(const OCPI::Util::Port&, const OCPI::Util::PValue *props);
-      void controlOperation(OCPI::Util::Worker::ControlOperation);
+      OCPI::Container::Port& createPort(const OCPI::Metadata::Port&, const OCPI::Util::PValue *props);
+      void controlOperation(OCPI::Metadata::Worker::ControlOperation);
 
       // These property access methods are called when the fast path
       // is not enabled, either due to no MMIO or that the property can
@@ -136,16 +136,16 @@ namespace OCPI {
       uint64_t getProperty64(const OCPI::API::PropertyInfo &info, size_t offset, unsigned idx) const;
       void propertyWritten(unsigned ordinal) const;
       void propertyRead(unsigned ordinal) const;
-      void prepareProperty(OCPI::Util::Property&,
+      void prepareProperty(OCPI::Metadata::Property&,
 			   volatile uint8_t *&writeVaddr,
 			   const volatile uint8_t *&readVaddr) const;
       // backward compatibility for ctests
       OCPI::Container::Port
-	&createInputPort(OCPI::Util::PortOrdinal portId, size_t bufferCount, size_t bufferSize,
+	&createInputPort(OCPI::Metadata::PortOrdinal portId, size_t bufferCount, size_t bufferSize,
 			 const OCPI::Util::PValue *params),
-	&createOutputPort(OCPI::Util::PortOrdinal portId, size_t bufferCount, size_t bufferSize,
+	&createOutputPort(OCPI::Metadata::PortOrdinal portId, size_t bufferCount, size_t bufferSize,
 			  const OCPI::Util::PValue *params),
-	&createTestPort(OCPI::Util::PortOrdinal portId, size_t bufferCount, size_t bufferSize,
+	&createTestPort(OCPI::Metadata::PortOrdinal portId, size_t bufferCount, size_t bufferSize,
 			bool isProvider, const OU::PValue *params);
       void read(size_t offset, size_t nBytes, void* p_data);
       void write(size_t offset, size_t nBytes, const void* p_data);
@@ -157,7 +157,7 @@ namespace OCPI {
       virtual ~Worker();
 
 
-      std::list<OCPI::Util::Port*> m_testPmds;
+      std::list<OCPI::Metadata::Port*> m_testPmds;
     private:
       void initializeContext();
       void checkError() const;

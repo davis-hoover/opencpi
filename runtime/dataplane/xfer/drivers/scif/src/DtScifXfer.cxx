@@ -57,6 +57,7 @@
 #define SCIF_FLAG_MEM_SIZE 2 * 0x1000
 //#define VA_GEN_MIN 0x80000
 
+namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 namespace DT = DataTransfer;
 namespace OCPI {
@@ -85,7 +86,7 @@ namespace OCPI {
       struct scif_portID m_portID;
     public:
       EndPoint(XF::XferFactory &factory, const char *protoInfo, const char *eps,
-	       const char *other, bool local, size_t size, const OU::PValue *params)
+	       const char *other, bool local, size_t size, const OM::PValue *params)
 	: XF::EndPoint(factory, eps, other, local, size, params) { 
 	if (sscanf(protoInfo, "%" SCNx16 ".%" SCNx16 "", &m_portID.node,
 		   &m_portID.port ) != 2)
@@ -210,7 +211,7 @@ namespace OCPI {
       getXferServices(DT::SmemServices* source, DT::SmemServices* target);
       
       std::string 
-      allocateEndpoint(const OU::PValue*, uint16_t mailBox, uint16_t maxMailBoxes) {
+      allocateEndpoint(const OM::PValue*, uint16_t mailBox, uint16_t maxMailBoxes) {
 	std::string ep;
 
 	OCPI::Util::formatString(ep, EPNAME ":%d.%d;%zu.%" PRIu16 ".%" PRIu16, m_node, m_port + next_ep_port,

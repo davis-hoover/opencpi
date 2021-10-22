@@ -34,16 +34,17 @@
 #include <stdlib.h>
 #include "OsMisc.hh"
 #include "OsAssert.hh"
-#include <OcpiRDTInterface.h>
-#include <test_utilities.h>
-#include <OcpiUtilCommandLineConfiguration.h>
+#include "OcpiRDTInterface.h"
+#include "test_utilities.h"
+#include "OcpiUtilCommandLineConfiguration.h"
 #include "UtGenericLoopbackWorkers.h"
-#include <OcpiThread.h>
+#include "OcpiThread.h"
 
 using namespace OCPI::Container;
 using namespace OCPI;
 using namespace OCPI::CONTAINER_TEST;
 namespace OU = OCPI::Util;
+namespace OM = OCPI::Metadata;
 
 static const char* g_ep[]    =  {
   "ocpi-smb-pio:test1:9000000.1.20",
@@ -618,7 +619,7 @@ static int config_and_run_test_method(const char *test_name, std::vector<CApp>& 
  */
 static int config_and_run_state_error_test1(const char *test_name, std::vector<CApp>& ca,
                                             std::vector<CWorker*>& workers,
-					    OU::Worker::ControlOperation state)
+					    OM::Worker::ControlOperation state)
 {
   ( void ) test_name;
   int testPassed = 1;
@@ -671,7 +672,7 @@ static int config_and_run_state_error_test1(const char *test_name, std::vector<C
     throw;
   }
 
-  if ( state == OU::Worker::OpStop ) {
+  if ( state == OM::Worker::OpStop ) {
     try {
       enableWorkers( ca, workers );
     }
@@ -682,11 +683,11 @@ static int config_and_run_state_error_test1(const char *test_name, std::vector<C
   }
 
   // Try setting the state if not initialize
-  if (state != OU::Worker::OpInitialize) {
+  if (state != OM::Worker::OpInitialize) {
     TRY_AND_SET(err_code, err_str, "",
 		switch (state) {
-		case OU::Worker::OpStart:   CONSUMER.worker->start(); break;
-		case OU::Worker::OpStop:   CONSUMER.worker->stop(); break;
+		case OM::Worker::OpStart:   CONSUMER.worker->start(); break;
+		case OM::Worker::OpStop:   CONSUMER.worker->stop(); break;
 		default:;
 		});
     if ( err_code != OU::NO_ERROR_ ) {  // Test failed, there should have been an error reported
@@ -703,8 +704,8 @@ static int config_and_run_state_error_test1(const char *test_name, std::vector<C
   // Try to set state again and make sure the container complains.
   TRY_AND_SET(err_code, err_str, "",
 	      switch (state) {
-	      case OU::Worker::OpStart:   CONSUMER.worker->start(); break;
-	      case OU::Worker::OpStop:   CONSUMER.worker->stop(); break;
+	      case OM::Worker::OpStart:   CONSUMER.worker->start(); break;
+	      case OM::Worker::OpStop:   CONSUMER.worker->stop(); break;
 	      default:;
 	      });
   if ( err_code != OU::NO_ERROR_ ) {  // Test failed, there should have been no error reported
@@ -734,7 +735,7 @@ static int config_and_run_state_error_test1(const char *test_name, std::vector<C
  */
 static int config_and_run_state_error_test2(const char *test_name, std::vector<CApp>& ca,
                                             std::vector<CWorker*>& workers,
-					    OU::Worker::ControlOperation state)
+					    OM::Worker::ControlOperation state)
 {
   ( void ) test_name;
   int testPassed = 1;
@@ -774,7 +775,7 @@ static int config_and_run_state_error_test2(const char *test_name, std::vector<C
     throw;
   }
 
-  if ( state == OU::Worker::OpStop ) {
+  if ( state == OM::Worker::OpStop ) {
     try {
       enableWorkers( ca, workers);
     }
@@ -791,8 +792,8 @@ static int config_and_run_state_error_test2(const char *test_name, std::vector<C
   TRY_AND_SET(err_code, err_str, ERROR_TEST_STRING,
 	      CONSUMER.worker->write( offset, nBytes, &tprop[0]);
 	      switch (state) {
-	      case OU::Worker::OpStart:   CONSUMER.worker->start(); break;
-	      case OU::Worker::OpStop:   CONSUMER.worker->stop(); break;
+	      case OM::Worker::OpStart:   CONSUMER.worker->start(); break;
+	      case OM::Worker::OpStop:   CONSUMER.worker->stop(); break;
 	      default:;
 	      });
   if ( err_code == OU::NO_ERROR_ ) {  // Test failed, there should have been an error reported
@@ -807,8 +808,8 @@ static int config_and_run_state_error_test2(const char *test_name, std::vector<C
   TRY_AND_SET(err_code, err_str, ERROR_TEST_STRING,
 	      CONSUMER.worker->write( offset, nBytes, &tprop[0]);
 	      switch (state) {
-	      case OU::Worker::OpStart:   CONSUMER.worker->start(); break;
-	      case OU::Worker::OpStop:   CONSUMER.worker->stop(); break;
+	      case OM::Worker::OpStart:   CONSUMER.worker->start(); break;
+	      case OM::Worker::OpStop:   CONSUMER.worker->stop(); break;
 	      default:;
 	      });
   if ( err_code == OU::NO_ERROR_ ) {
@@ -821,8 +822,8 @@ static int config_and_run_state_error_test2(const char *test_name, std::vector<C
 #if 0
   TRY_AND_SET(err_code, err_str, "",
 	      switch (state) {
-	      case OU::Worker::OpStart:   CONSUMER.worker->start(); break;
-	      case OU::Worker::OpStop:   CONSUMER.worker->stop(); break;
+	      case OM::Worker::OpStart:   CONSUMER.worker->start(); break;
+	      case OM::Worker::OpStop:   CONSUMER.worker->stop(); break;
 	      default:;
 	      });
   if ( err_code == OU::NO_ERROR_ ) {
@@ -1014,7 +1015,7 @@ int  main( int argc, char** argv)
   test_name = "init() Control Error Test 1";
   try {
     printf("\n\nRunning test (%s): \n", test_name );
-    test_rc &= config_and_run_state_error_test1( test_name, ca, workers, OU::Worker::OpInitialize );
+    test_rc &= config_and_run_state_error_test1( test_name, ca, workers, OM::Worker::OpInitialize );
   }
   catch( OCPI::Util::EmbeddedException& ex ) {
     printf("failed with an exception. errorno = %d, aux = %s\n",
@@ -1035,7 +1036,7 @@ int  main( int argc, char** argv)
   test_name = "init() Control Error Test 2";
   try {
     printf("\n\nRunning test (%s): \n", test_name );
-    test_rc &= config_and_run_state_error_test2( test_name, ca, workers, OU::Worker::OpInitialize );
+    test_rc &= config_and_run_state_error_test2( test_name, ca, workers, OM::Worker::OpInitialize );
   }
   catch( OCPI::Util::EmbeddedException& ex ) {
     printf("failed with an exception. errorno = %d, aux = %s\n",
@@ -1057,7 +1058,7 @@ int  main( int argc, char** argv)
   test_name = "start() Control Error Test 1";
   try {
     printf("\n\nRunning test (%s): \n", test_name );
-    test_rc &= config_and_run_state_error_test1( test_name, ca, workers, OU::Worker::OpStart );
+    test_rc &= config_and_run_state_error_test1( test_name, ca, workers, OM::Worker::OpStart );
   }
   catch( OCPI::Util::EmbeddedException& ex ) {
     printf("failed with an exception. errorno = %d, aux = %s\n",
@@ -1081,7 +1082,7 @@ int  main( int argc, char** argv)
   test_name = "start() Control Error Test 2";
   try {
     printf("\n\nRunning test (%s): \n", test_name );
-    test_rc &= config_and_run_state_error_test2( test_name, ca, workers, OU::Worker::OpStart );
+    test_rc &= config_and_run_state_error_test2( test_name, ca, workers, OM::Worker::OpStart );
   }
   catch( OCPI::Util::EmbeddedException& ex ) {
     printf("failed with an exception. errorno = %d, aux = %s\n",
@@ -1106,7 +1107,7 @@ int  main( int argc, char** argv)
   test_name = "stop() Control Error Test 1";
   try {
     printf("\n\nRunning test (%s): \n", test_name );
-    test_rc &= config_and_run_state_error_test1( test_name, ca, workers, OU::Worker::OpStop );
+    test_rc &= config_and_run_state_error_test1( test_name, ca, workers, OM::Worker::OpStop );
   }
   catch( OCPI::Util::EmbeddedException& ex ) {
     printf("failed with an exception. errorno = %d, aux = %s\n",
@@ -1149,7 +1150,7 @@ int  main( int argc, char** argv)
   test_name = "stop() Control Error Test 2";
   try {
     printf("\n\nRunning test (%s): \n", test_name );
-    test_rc &= config_and_run_state_error_test2( test_name, ca, workers, OU::Worker::OpStop  );
+    test_rc &= config_and_run_state_error_test2( test_name, ca, workers, OM::Worker::OpStop  );
   }
   catch( OCPI::Util::EmbeddedException& ex ) {
     printf("failed with an exception. errorno = %d, aux = %s\n",

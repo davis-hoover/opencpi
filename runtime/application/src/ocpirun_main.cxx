@@ -118,7 +118,7 @@
 //  CMD_OPTION(libraries,  ,  String, 0, "Search path for source libraries, implying to search for possible source workers")
 //  CMD_OPTION(build,      ,  String, 0, "Build any source workers deployed")
 
-#include "CmdOption.h"
+#include "CmdOption.hh"
 
 namespace OA = OCPI::API;
 namespace OU = OCPI::Util;

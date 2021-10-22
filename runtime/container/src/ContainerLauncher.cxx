@@ -26,6 +26,7 @@
 #include "ContainerLauncher.h"
 
 namespace OA = OCPI::API;
+namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 namespace OT = DataTransfer;
 namespace OCPI {
@@ -50,7 +51,7 @@ createWorker(Launcher::Member &i) {
     i.m_worker->setProperty(i.m_crew->m_propOrdinals[p], i.m_crew->m_propValues[p]);
   }
   unsigned nProps = i.m_impl->m_metadataImpl.nProperties();
-  OU::Property *prop = i.m_impl->m_metadataImpl.properties();
+  OM::Property *prop = i.m_impl->m_metadataImpl.properties();
   for (unsigned nn = 0; nn < nProps; nn++, prop++)
     if (prop->m_default && !prop->m_isParameter) {
       bool found = false;

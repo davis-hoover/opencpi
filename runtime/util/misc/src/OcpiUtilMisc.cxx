@@ -32,10 +32,10 @@
 #include <glob.h>
 #include "OsEther.hh"
 #include "OsFileSystem.hh"
-#include "OcpiUtilValue.h"
 #include "OcpiUtilException.h"
 #include "OcpiUtilUUID.h"
 #include "OcpiUtilMisc.h"
+#include "UtilValue.hh"
 
 /*
  * ----------------------------------------------------------------------
@@ -794,6 +794,50 @@ getSystemAddr() {
   }  
   return addr;
 }
+
+bool
+unparseChar(std::string &s, char argVal, bool hex) {
+  uint8_t val = (uint8_t)(argVal & 0xff);
+  if (isprint(val)) {
+    switch (val) {
+    case '\\':
+    case '"':
+    case ' ':
+    case ',':
+    case '}':
+    case '{':
+      s += '\\';
+      break;
+    default:      ;
+    }
+    s += (char)val;
+  } else {
+    s += '\\';
+    char c;
+    switch (val) {
+    case '\n': c = 'n'; break;
+    case '\t': c = 't'; break;
+    case '\v': c = 'v'; break;
+    case '\b': c = 'b'; break;
+    case '\r': c = 'r'; break;
+    case '\f': c = 'f'; break;
+    case '\a': c = 'a'; break;
+    default:
+      if (hex) {
+	s+= 'x';
+	s+= "0123456789abcdef"[(val >> 4) & 0xf];
+	c = "0123456789abcdef"[val & 0xf];
+      } else {
+	s += (char)('0' + ((val >> 6) & 7));
+	s += (char)('0' + ((val >> 3) & 7));
+	c = (char)('0' + (val & 7));
+      }
+    }
+    s += c;
+  }
+  return argVal == 0;
+}
+
 // Encode for embedding in single quotes, adding to the "out" argument.
 void
 encodeXmlAttrSingle(const std::string &s, std::string &out, bool raw) {

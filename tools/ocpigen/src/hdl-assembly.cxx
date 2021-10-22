@@ -30,8 +30,6 @@
 #include "hdl.h"
 #include "hdl-platform.h"
 
-namespace OX = OCPI::Util::EzXml;
-
 const char *Instance::
 initHDL(::Assembly &assy) {
   const char *err;
@@ -91,12 +89,12 @@ insertAdapter(Connection &c, InstancePort &from, InstancePort &to) {
   m_instances.resize(m_instances.size()+1);
   Instance &i = m_instances.back();
   i.m_inserted = true;
-  // We create an OU::AssemblyInstance to feed the rest of the code.
+  // We create an OM::AssemblyInstance to feed the rest of the code.
   std::string name;
   OU::format(name, "%s_%s_2_%s_%s", from.m_instance->cname(), dpFrom.pname(),
 	     to.m_instance->cname(), dpTo.pname());
   // Add the width parameters for the adapter
-  OU::Assembly::Properties props;
+  OM::Assembly::Properties props;
   std::string worker;
   std::string s;
 
@@ -281,7 +279,7 @@ parseHdlAssy() {
   const char *err;
   if ((err = addBuiltinProperties()))
     return err;
-  if (strcasecmp(OX::ezxml_tag(m_xml), "HdlAssembly") &&
+  if (strcasecmp(OE::ezxml_tag(m_xml), "HdlAssembly") &&
       ((err = addProperty("<property name='sdp_width' type='uchar' parameter='true' "
 			 "default='1'/>", true)) ||
        (err = addProperty("<property name='sdp_length' type='ushort' parameter='true' "
@@ -394,7 +392,7 @@ parseHdlAssy() {
     wci->m_myClock = true;
     wci->m_clock = &clk;
     wci->m_clock->m_port = wci;
-    OU::Assembly::External *ext = new OU::Assembly::External("wci");
+    OM::Assembly::External *ext = new OM::Assembly::External("wci");
     ext->m_role.m_provider = false; // provisional
     ext->m_role.m_bidirectional = false;
     ext->m_role.m_knownRole = true;
@@ -683,7 +681,7 @@ Attachment(InstancePort &ip, Connection &c, size_t index)
 {
 }
 Connection::
-Connection(OU::Assembly::Connection *connection, const char *name)
+Connection(OM::Assembly::Connection *connection, const char *name)
   : m_name(name ? name : (connection ? connection->m_name.c_str() : "")),
     m_nExternals(0), m_clock(NULL), m_external(NULL),
     m_count(connection ? connection->m_count : 0) {
@@ -871,7 +869,7 @@ emitAssyInstance(FILE *f, Instance *i) { // , unsigned nControlInstances) {
     unsigned n = 0;
     // Emit the compile-time properties (a.k.a. parameter properties).
     for (InstanceProperty *pv = &i->m_properties[0]; n < i->m_properties.size(); n++, pv++) {
-      const OU::Property *pr = pv->property;
+      const OM::Property *pr = pv->property;
       if (pr->m_isParameter) {
 	std::string value;
 	if (lang == VHDL) {

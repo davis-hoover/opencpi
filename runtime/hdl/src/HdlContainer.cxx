@@ -35,6 +35,7 @@ namespace OH = OCPI::HDL;
 namespace OA = OCPI::API;
 namespace OC = OCPI::Container;
 namespace OS = OCPI::OS;
+namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 namespace OE = OCPI::Util::EzXml;
 namespace OD = OCPI::DataTransport;
@@ -51,7 +52,7 @@ namespace OCPI {
     // It could be a cache line or a malloc granule...
     // It should come from somewhere else.  FIXME
     //    static const unsigned LOCAL_BUFFER_ALIGN = 32;
-    
+
 
     static OT::Emit::Time getTicksFunc(OT::Emit::TimeSource *ts) {
       return ts ? static_cast<Container *>(ts)->getMyTicks() : 0; // null-ptr warning
@@ -161,8 +162,8 @@ namespace OCPI {
 	    if (i->m_inserted) {
 	      WciControl wci(parent().hdlDevice(), i->m_metadataImpl.m_xml, i->m_staticInstance,
 			     NULL);
-	      wci.controlOperation(OU::Worker::OpInitialize);
-	      wci.controlOperation(OU::Worker::OpStart);
+	      wci.controlOperation(OM::Worker::OpInitialize);
+	      wci.controlOperation(OM::Worker::OpStart);
 	    }
 	  // attempts to sync time_server.hdl time_now to GPS
 	  bool isGPS;
@@ -277,13 +278,13 @@ namespace OCPI {
       {
 	deleteChildren(); // delete before out base class is gone.
       }
-      inline void controlOperation(OU::Worker::ControlOperation op) {
+      inline void controlOperation(OM::Worker::ControlOperation op) {
 	WciControl::controlOperation(op);
       }
 
-      OC::Port & createPort(const OU::Port &metaport, const OA::PValue *props);
+      OC::Port & createPort(const OM::Port &metaport, const OA::PValue *props);
 
-      virtual void prepareProperty(OU::Property &mp,
+      virtual void prepareProperty(OM::Property &mp,
 				   volatile uint8_t *&writeVaddr,
 				   const volatile uint8_t *&readVaddr) const {
         return WciControl::prepareProperty(mp, writeVaddr, readVaddr);
@@ -387,7 +388,7 @@ OCPI_DATA_TYPES
       DataTransfer::EndPoint *m_endPoint; // the data plane endpoint if externally connected
       Port(OCPI::HDL::Worker &w,
 	   const OA::PValue *params,
-           const OU::Port &mPort, // the parsed port metadata
+           const OM::Port &mPort, // the parsed port metadata
            ezxml_t connXml, // the xml connection for this port
            ezxml_t icwXml,  // the xml interconnect/infrastructure worker attached to this port if any
            ezxml_t icXml,   // the xml interconnect instance attached to this port if any
@@ -734,17 +735,17 @@ OCPI_DATA_TYPES
 				     OCDP_CONTROL(isProvider() ? OCDP_CONTROL_CONSUMER :
 						  OCDP_CONTROL_PRODUCER, myOcdpRole));
 	// We aren't a worker so someone needs to start us.
-	controlOperation(OU::Worker::OpInitialize);
+	controlOperation(OM::Worker::OpInitialize);
 	if (m_adapter) {
-	  m_adapter->controlOperation(OU::Worker::OpInitialize);
+	  m_adapter->controlOperation(OM::Worker::OpInitialize);
 	  if (m_hasAdapterConfig)
 	    m_adapter->m_properties.set32RegisterOffset(0, (uint32_t)m_adapterConfig);
-	  m_adapter->controlOperation(OU::Worker::OpStart);
+	  m_adapter->controlOperation(OM::Worker::OpStart);
 	}
 	// We need to tell the device object about this remote endpoint connection,
 	// at least for the case of simulators
 	m_device.connect(*m_endPoint, getData().data, other);
-	controlOperation(OU::Worker::OpStart);
+	controlOperation(OM::Worker::OpStart);
 	done = true;
 	portIsConnected();
 	return isProvider() ? NULL : &getData().data;
@@ -784,7 +785,7 @@ OCPI_DATA_TYPES
     // The port may be bidirectional.  If so we need to defer its direction.
     // FIXME: share all this parsing with the OU::Implementation code etc.
     OC::Port &Worker::
-    createPort(const OU::Port &mPort, const OA::PValue *props) {
+    createPort(const OM::Port &mPort, const OA::PValue *props) {
       const char *myName = mPort.m_name.c_str();
       // Find connections attached to this port
       ezxml_t conn, ic = 0, icw = 0, ad = 0, adw = 0;

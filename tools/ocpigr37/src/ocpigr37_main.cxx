@@ -29,6 +29,7 @@
 #include "OcpiDriverManager.h"
 #include "cdkutils.h"
 namespace OA = OCPI::API;
+namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 namespace OL = OCPI::Library;
 namespace OS = OCPI::OS;
@@ -44,8 +45,8 @@ namespace OX = OCPI::Util::EzXml;
   CMD_OPTION  (verbose,   v,    Bool,   NULL, "Be verbose") \
   CMD_OPTION  (directory, D,    String, ".", "Specify the directory in which to put output generated files") \
   /**/
-#include "CmdOption.h"
-static const char *bad(OU::Worker &w, const char *tag, const char *val) {
+#include "CmdOption.hh"
+static const char *bad(OM::Worker &w, const char *tag, const char *val) {
   fprintf(stderr, "Bad worker %s: can't map %s %s\n", w.cname(), tag, val);
   return "raw";
 }
@@ -79,7 +80,7 @@ std::map<std::string, StringSet> specToPlatforms;
 // For each platform, which model does it support
 std::map<std::string, std::string> platformToModel;
 // For each worker, add worker specific params
-std::map<std::string, std::map<std::string, std::set<OU::Property *>>> workerSpecificProperties;
+std::map<std::string, std::map<std::string, std::set<OM::Property *>>> workerSpecificProperties;
 StringSet specs;
 struct Category {
   std::string name;
@@ -121,7 +122,7 @@ struct Category {
   }
 } top;
 
-static void addProperty(OU::Worker &w, ezxml_t & root, OU::Property *p, __attribute__((unused)) std::string workerName="") {
+static void addProperty(OM::Worker &w, ezxml_t & root, OM::Property *p, __attribute__((unused)) std::string workerName="") {
     if (p->m_isHidden)
       return;
     ezxml_t px = OX::addChild(root, "param", 1);
@@ -188,7 +189,7 @@ static void addProperty(OU::Worker &w, ezxml_t & root, OU::Property *p, __attrib
     }
 }
 
-static void doWorker(OU::Worker &w) {
+static void doWorker(OM::Worker &w) {
   const char *err;
   //  printf("spec:  %-30s  worker:  %s\n", w.specName().c_str(), w.name().c_str());
   if (!specs.insert(w.specName()).second)
@@ -215,7 +216,7 @@ static void doWorker(OU::Worker &w) {
   OX::addChild(root, "make", 1, "");
   {
     unsigned np;
-    OU::Property *p = w.properties(np);
+    OM::Property *p = w.properties(np);
     for (unsigned n = 0; n < np; n++, p++) {
       if(p->m_isWritable && !p->m_isInitial) {
         OX::addChild(root, "callback", 1, ("self._ocpi_application_internal_black_box_0.set_property(\"$(id)\", \"" +
@@ -225,7 +226,7 @@ static void doWorker(OU::Worker &w) {
   }
   // Add all of the Component specific properties
   unsigned np;
-  OU::Property *p = w.properties(np);
+  OM::Property *p = w.properties(np);
   for (unsigned n = 0; n < np; n++, p++) {
     // Worker specific properties will be added later so skip them
     // for now so they don't get added twice.
@@ -334,9 +335,9 @@ static void doWorker(OU::Worker &w) {
 #endif
 
   // Add all of the properties specific to a particular worker
-  std::map<std::string, std::set<OU::Property *>>::const_iterator wsp = workerSpecificProperties[w.specName()].begin();
+  std::map<std::string, std::set<OM::Property *>>::const_iterator wsp = workerSpecificProperties[w.specName()].begin();
   while (wsp != workerSpecificProperties[w.specName()].end()) {
-    std::set<OU::Property *>::const_iterator prop = wsp->second.begin();
+    std::set<OM::Property *>::const_iterator prop = wsp->second.begin();
     while (prop != wsp->second.end()) {
       addProperty(w, root, *prop, wsp->first);
       prop++;
@@ -344,9 +345,9 @@ static void doWorker(OU::Worker &w) {
     wsp++;
   }
 
-  OU::Port *ports = w.ports(np);
+  OM::Port *ports = w.ports(np);
   for (unsigned n = 0; n < np; n++, ports++) {
-    OU::Port &port = *ports;
+    OM::Port &port = *ports;
     ezxml_t px = OX::addChild(root, port.m_provider ? "sink" : "source", 1);
     OX::addChild(px, "name", 2, port.cname());
     OX::addChild(px, "type", 2, "ocpi");
@@ -354,7 +355,7 @@ static void doWorker(OU::Worker &w) {
     if (port.m_isOptional) {
       OX::addChild(px, "optional", 2, "1");
     }
-    OX::addChild(px, "protocol", 2, port.OU::Protocol::cname());
+    OX::addChild(px, "protocol", 2, port.OM::Protocol::cname());
   }
 
   std::string
@@ -407,13 +408,13 @@ static void containerBlock() {
 	  throw OU::Error("error writing GRC XML file:  %s", err);
 }
 
-static void doWorkerPlatform(OU::Worker &w) {
+static void doWorkerPlatform(OM::Worker &w) {
   assert(w.attributes().platform().length());
   specToPlatforms[w.specName()].insert(w.attributes().platform());
   platformToModel[w.attributes().platform()] = w.model();
 
   unsigned np;
-  OU::Property *p = w.properties(np);
+  OM::Property *p = w.properties(np);
   for (unsigned n = 0; n < np; n++, p++) {
     if (p->m_isImpl) {
       // TODO. This isn't working.

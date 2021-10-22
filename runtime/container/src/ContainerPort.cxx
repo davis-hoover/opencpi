@@ -27,11 +27,12 @@
 namespace OCPI {
   namespace Container {
     namespace OA = OCPI::API;
+    namespace OM = OCPI::Metadata;
     namespace OU = OCPI::Util;
     namespace OD = OCPI::DataTransport;
     namespace OR = OCPI::RDT;
 
-    Port::Port(Container &a_container, const OU::Port &mPort, const OU::PValue *params) :
+    Port::Port(Container &a_container, const OM::Port &mPort, const OU::PValue *params) :
       LocalPort(a_container, mPort, mPort.m_provider, params),
       m_canBeExternal(true)
     {
@@ -66,7 +67,7 @@ namespace OCPI {
       c.m_out.m_port = isProvider() ? &other.containerPort() : this;
       assert(c.m_in.m_port->m_metaPort.m_bufferSizePort == SIZE_MAX &&
 	     c.m_out.m_port->m_metaPort.m_bufferSizePort == SIZE_MAX);
-      c.m_bufferSize = OU::Port::determineBufferSize(&c.m_in.m_port->m_metaPort, NULL, SIZE_MAX,
+      c.m_bufferSize = OM::Port::determineBufferSize(&c.m_in.m_port->m_metaPort, NULL, SIZE_MAX,
 						     &c.m_out.m_port->m_metaPort, NULL, SIZE_MAX, NULL);
       c.m_in.m_port->initialConnect(c);
       if (!c.m_out.m_done)
@@ -90,9 +91,9 @@ namespace OCPI {
 	}
 	if (!c.m_out.m_done)
 	more = true;
-      } while (more);	
+      } while (more);
       assert(c.m_in.m_done && c.m_out.m_done);
-    }    
+    }
     void Port::connectURL(const char*, const OU::PValue *, const OU::PValue *) {
       ocpiDebug("connectURL not allowed on this container !!");
       ocpiAssert( 0 );
@@ -115,7 +116,7 @@ namespace OCPI {
 
     // Bridge port constructor also does the equivalent of "startConnect" for itself.
     BridgePort::
-    BridgePort(Container &c, const OCPI::Util::Port &mPort, bool provider, const OU::PValue *params)
+    BridgePort(Container &c, const OM::Port &mPort, bool provider, const OU::PValue *params)
       : BasicPort(c, mPort, provider, params)
     {
     }

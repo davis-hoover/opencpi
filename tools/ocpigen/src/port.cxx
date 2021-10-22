@@ -72,7 +72,7 @@ Port(Worker &w, ezxml_t x, Port *sp, int nameOrdinal, WIPType type, const char *
       return;
     }
     if ((err = OE::getBoolean(m_xml, "master", &m_master)) ||
-	(err = OE::getExprNumber(m_xml, "count", m_arrayCount, NULL, m_countExpr, &w)))
+	(err = OU::getExprNumber(m_xml, "count", m_arrayCount, NULL, m_countExpr, &w)))
       return;
     m_ordinal = w.m_ports.size();
   }
@@ -111,7 +111,7 @@ Port(const Port &other, Worker &w, std::string &name, size_t a_count, const char
 }
 
 Port &Port::
-clone(Worker &, std::string &, size_t, OCPI::Util::Assembly::Role *, const char *&) const {
+clone(Worker &, std::string &, size_t, OM::Assembly::Role *, const char *&) const {
   throw OU::Error("Port type: %s cannot be cloned", typeName());
 }
 
@@ -672,7 +672,7 @@ RawPropPort(const RawPropPort &other, Worker &w , std::string &name, size_t a_co
 }
 
 Port &RawPropPort::
-clone(Worker &w, std::string &name, size_t a_count, OCPI::Util::Assembly::Role *, const char *&err)
+clone(Worker &w, std::string &name, size_t a_count, OM::Assembly::Role *, const char *&err)
   const {
   RawPropPort *rpp = new RawPropPort(*this, w, name, a_count, err);
   // We need to externalize the fact that the count was an expression, to preserve "array-ness"
@@ -755,7 +755,7 @@ CpPort(const CpPort &other, Worker &w , std::string &name, size_t a_count, const
 // Virtual constructor: the concrete instantiated classes must have a clone method,
 // which calls the corresponding specialized copy constructor
 Port &CpPort::
-clone(Worker &w, std::string &name, size_t a_count, OCPI::Util::Assembly::Role */*role*/,
+clone(Worker &w, std::string &name, size_t a_count, OM::Assembly::Role */*role*/,
       const char *&err) const {
   return *new CpPort(*this, w, name, a_count, err);
 }
@@ -805,7 +805,7 @@ NocPort(const NocPort &other, Worker &w , std::string &name, size_t a_count,
 // Virtual constructor: the concrete instantiated classes must have a clone method,
 // which calls the corresponding specialized copy constructor
 Port &NocPort::
-clone(Worker &w, std::string &name, size_t a_count, OCPI::Util::Assembly::Role */*role*/,
+clone(Worker &w, std::string &name, size_t a_count, OM::Assembly::Role */*role*/,
       const char *&err) const {
   return *new NocPort(*this, w, name, a_count, err);
 }
@@ -850,7 +850,7 @@ TimeServicePort(const TimeServicePort &other, Worker &w , std::string &name, siz
 // Virtual constructor: the concrete instantiated classes must have a clone method,
 // which calls the corresponding specialized copy constructor
 Port &TimeServicePort::
-clone(Worker &w, std::string &name, size_t a_count, OCPI::Util::Assembly::Role */*role*/,
+clone(Worker &w, std::string &name, size_t a_count, OM::Assembly::Role */*role*/,
       const char *&err) const {
   return *new TimeServicePort(*this, w, name, a_count, err);
 }
@@ -947,7 +947,7 @@ TimeBasePort(const TimeBasePort &other, Worker &w , std::string &name, size_t a_
 // Virtual constructor: the concrete instantiated classes must have a clone method,
 // which calls the corresponding specialized copy constructor
 Port &TimeBasePort::
-clone(Worker &w, std::string &name, size_t a_count, OCPI::Util::Assembly::Role */*role*/,
+clone(Worker &w, std::string &name, size_t a_count, OM::Assembly::Role */*role*/,
       const char *&err) const {
   return *new TimeBasePort(*this, w, name, a_count, err);
 }
@@ -1037,7 +1037,7 @@ MetaDataPort(const MetaDataPort &other, Worker &w , std::string &name, size_t a_
 // Virtual constructor: the concrete instantiated classes must have a clone method,
 // which calls the corresponding specialized copy constructor
 Port &MetaDataPort::
-clone(Worker &w, std::string &name, size_t a_count, OCPI::Util::Assembly::Role */*role*/,
+clone(Worker &w, std::string &name, size_t a_count, OM::Assembly::Role */*role*/,
       const char *&err) const {
   return *new MetaDataPort(*this, w, name, a_count, err);
 }
@@ -1077,7 +1077,7 @@ emitConnectionSignal(FILE *f, bool output, Language /*lang*/, bool /*clock*/, st
 }
 
 const char *Port::
-fixDataConnectionRole(OU::Assembly::Role &role) {
+fixDataConnectionRole(OM::Assembly::Role &role) {
   if (role.m_knownRole && (role.m_provider != !m_master || role.m_bidirectional))
     return OU::esprintf("Role of port %s of worker %s in connection is incompatible with a port"
 			" of type \"%s\"",
@@ -1089,7 +1089,7 @@ fixDataConnectionRole(OU::Assembly::Role &role) {
 }
 
 void Port::
-initRole(OCPI::Util::Assembly::Role &) {
+initRole(OM::Assembly::Role &) {
 }
 
 void Port::

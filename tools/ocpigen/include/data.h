@@ -21,8 +21,8 @@
 #ifndef DATA_H
 #define DATA_H
 
-#include "OcpiUtilPort.h"
-#include "OcpiUtilAssembly.h"
+#include "MetadataPort.hh"
+#include "MetadataAssembly.hh"
 #include "ocp.h"
 
 #define SPEC_DATA_PORT_ATTRS \
@@ -35,15 +35,15 @@
   } while(0)
 
 // FIXME:  This class should have a base class for data that is not HDL
-class DataPort : public OcpPort, public OCPI::Util::Port {
+class DataPort : public OcpPort, public OM::Port {
  protected:
   // This constructor is used when data port is inherited
   DataPort(Worker &w, ezxml_t x, DataPort *sp, int ordinal, WIPType type, const char *&err);
   DataPort(const DataPort &other, Worker &w , std::string &name, size_t count,
-	   OCPI::Util::Assembly::Role *role, const char *&err);
+	   OM::Assembly::Role *role, const char *&err);
  public:
   // Virtual constructor - every derived class must have one
-  ::Port &clone(Worker &w, std::string &name, size_t count, OCPI::Util::Assembly::Role *role,
+  ::Port &clone(Worker &w, std::string &name, size_t count, OM::Assembly::Role *role,
 	      const char *&err) const;
   inline const char *typeName() const { return "WDI"; }
   inline const char *prefix() const { return "data"; }
@@ -64,9 +64,9 @@ class DataPort : public OcpPort, public OCPI::Util::Port {
     *addProperty(const char *name, OCPI::API::BaseType type, bool isDebug, bool isParameter, bool isInitial,
 		 bool isVolatile, bool isImpl, bool isBuiltin = false, size_t value = 0, const char *enums = NULL),
     *addProperty(),
-    *fixDataConnectionRole(OCPI::Util::Assembly::Role &role),
+    *fixDataConnectionRole(OM::Assembly::Role &role),
     *resolveExpressions(OCPI::Util::IdentResolver &ir);
-  void initRole(OCPI::Util::Assembly::Role &role);
+  void initRole(OM::Assembly::Role &role);
   void emitOpcodes(FILE *f, const char *pName, Language lang);
   void emitPortDescription(FILE *f, Language lang) const;
   void emitRecordDataTypes(FILE *f);
@@ -114,10 +114,10 @@ class WsiPort : public DataPort {
   bool m_regRequest; // request is registered
   bool m_insertEOM;
   WsiPort(const WsiPort &other, Worker &w , std::string &name, size_t count,
-	  OCPI::Util::Assembly::Role *role, const char *&err);
+	  OM::Assembly::Role *role, const char *&err);
  public:
   WsiPort(Worker &w, ezxml_t x, DataPort *sp, int ordinal, const char *&err);
-  ::Port &clone(Worker &w, std::string &name, size_t count, OCPI::Util::Assembly::Role *role,
+  ::Port &clone(Worker &w, std::string &name, size_t count, OM::Assembly::Role *role,
 	      const char *&err) const;
   bool masterIn() const;
   inline const char *prefix() const { return "wsi"; }
@@ -145,10 +145,10 @@ class WmiPort : public DataPort {
   bool m_talkBack;
   size_t m_mflagWidth; // kludge for shep - FIXME
   WmiPort(const WmiPort &other, Worker &w , std::string &name, size_t count,
-	  OCPI::Util::Assembly::Role *role, const char *&err);
+	  OM::Assembly::Role *role, const char *&err);
  public:
   WmiPort(Worker &w, ezxml_t x, DataPort *sp, int ordinal, const char *&err);
-  ::Port &clone(Worker &w, std::string &name, size_t count, OCPI::Util::Assembly::Role *role,
+  ::Port &clone(Worker &w, std::string &name, size_t count, OM::Assembly::Role *role,
 	      const char *&err) const;
   inline const char *prefix() const { return "mem"; }
   inline const char *typeName() const { return "WMI"; }

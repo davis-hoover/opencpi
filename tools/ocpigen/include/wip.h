@@ -26,14 +26,14 @@
 #include <list>
 #include <map>
 #include <unordered_set>
-#include "OcpiPValue.h"
-#include "OcpiUtilProperty.h"
-#include "OcpiUtilProtocol.h"
-#include "OcpiUtilValue.h"
+#include "UtilPValue.hh"
+#include "MetadataProperty.hh"
+#include "MetadataProtocol.hh"
+#include "UtilValue.hh"
 #include "OcpiUtilEzxml.h"
 #include "OcpiUtilMisc.h"
-#include "OcpiUtilWorker.h"
-#include "OcpiUtilAssembly.h"
+#include "MetadataWorker.hh"
+#include "MetadataAssembly.hh"
 #include "OcpiUuid.h"
 #include "ezxml.h"
 #include "cdkutils.h"
@@ -41,11 +41,6 @@
 #include "port.h"
 #include "ocp.h"
 #include "clock.h"
-
-namespace OE=OCPI::Util::EzXml;
-namespace OU=OCPI::Util;
-namespace OA=OCPI::API;
-namespace OS=OCPI::OS;
 
 class Port;
 
@@ -102,7 +97,7 @@ class WmemiPort : public OcpPort {
   size_t m_maxBurstLength;
  public:
   WmemiPort(Worker &w, ezxml_t x, Port *sp, int ordinal, const char *&err);
-  Port &clone(Worker &w, std::string &name, size_t count, OCPI::Util::Assembly::Role *role,
+  Port &clone(Worker &w, std::string &name, size_t count, OCPI::Metadata::Assembly::Role *role,
 	      const char *&err)
     const;
   inline const char *prefix() const { return "mem"; }
@@ -119,7 +114,7 @@ class WtiPort : public OcpPort {
   WtiPort(const WtiPort &other, Worker &w, std::string &name, const char *&err);
  public:
   WtiPort(Worker &w, ezxml_t x, Port *sp, int ordinal, const char *&err);
-  Port &clone(Worker &w, std::string &name, size_t count, OCPI::Util::Assembly::Role *role,
+  Port &clone(Worker &w, std::string &name, size_t count, OCPI::Metadata::Assembly::Role *role,
 	      const char *&err) const;
   inline const char *typeName() const { return "WTI"; }
   inline const char *prefix() const { return "wti"; }
@@ -140,7 +135,7 @@ class CpPort : public Port {
   CpPort(const CpPort &other, Worker &w , std::string &name, size_t count, const char *&err);
  public:
   CpPort(Worker &w, ezxml_t x, Port *sp, int ordinal, const char *&err);
-  Port &clone(Worker &w, std::string &name, size_t count, OCPI::Util::Assembly::Role *role,
+  Port &clone(Worker &w, std::string &name, size_t count, OCPI::Metadata::Assembly::Role *role,
 	      const char *&err)
     const;
   inline const char *prefix() const { return "cp"; }
@@ -154,7 +149,7 @@ class NocPort : public Port {
 	  const char *&err);
  public:
   NocPort(Worker &w, ezxml_t x, Port *sp, int ordinal, const char *&err);
-  Port &clone(Worker &w, std::string &name, size_t count, OCPI::Util::Assembly::Role *role,
+  Port &clone(Worker &w, std::string &name, size_t count, OCPI::Metadata::Assembly::Role *role,
 	      const char *&err) const;
   inline const char *prefix() const { return "noc"; }
   inline const char *typeName() const { return "uNoc"; }
@@ -167,7 +162,7 @@ class SdpPort : public Port {
 	  const char *&err);
  public:
   SdpPort(Worker &w, ezxml_t x, Port *sp, int ordinal, const char *&err);
-  Port &clone(Worker &w, std::string &name, size_t count, OCPI::Util::Assembly::Role *role,
+  Port &clone(Worker &w, std::string &name, size_t count, OCPI::Metadata::Assembly::Role *role,
 	      const char *&err) const;
   inline const char *prefix() const { return "sdp"; }
   inline const char *typeName() const { return "SDP"; }
@@ -193,7 +188,7 @@ class MetaDataPort : public Port {
 		  const char *&err);
  public:
   MetaDataPort(Worker &w, ezxml_t x, Port *sp, int ordinal, const char *&err);
-  Port &clone(Worker &w, std::string &name, size_t count, OCPI::Util::Assembly::Role *role,
+  Port &clone(Worker &w, std::string &name, size_t count, OCPI::Metadata::Assembly::Role *role,
 	      const char *&err) const;
   inline const char *prefix() const { return "metadata"; }
   inline const char *typeName() const { return "Metadata"; }
@@ -206,7 +201,7 @@ class TimeServicePort : public Port {
 		  const char *&err);
  public:
   TimeServicePort(Worker &w, ezxml_t x, Port *sp, int ordinal, const char *&err);
-  Port &clone(Worker &w, std::string &name, size_t count, OCPI::Util::Assembly::Role *role,
+  Port &clone(Worker &w, std::string &name, size_t count, OCPI::Metadata::Assembly::Role *role,
 	      const char *&err) const;
   inline const char *prefix() const { return "time"; }
   inline const char *typeName() const { return "TimeService"; }
@@ -233,7 +228,7 @@ class TimeBasePort : public Port {
 		  const char *&err);
  public:
   TimeBasePort(Worker &w, ezxml_t x, Port *sp, int ordinal, const char *&err);
-  Port &clone(Worker &w, std::string &name, size_t count, OCPI::Util::Assembly::Role *role,
+  Port &clone(Worker &w, std::string &name, size_t count, OCPI::Metadata::Assembly::Role *role,
 	      const char *&err) const;
   inline const char *prefix() const { return "timebase"; }
   inline const char *typeName() const { return "TimeBase"; }
@@ -256,7 +251,7 @@ class RawPropPort : public Port {
   RawPropPort(Worker &w, ezxml_t x, Port *sp, int ordinal, const char *&err);
   RawPropPort(const RawPropPort &other, Worker &w, std::string &name, size_t count,
 	      const char *&err);
-  Port &clone(Worker &w, std::string &name, size_t count, OCPI::Util::Assembly::Role *role,
+  Port &clone(Worker &w, std::string &name, size_t count, OCPI::Metadata::Assembly::Role *role,
 	      const char *&err) const;
   inline const char *prefix() const { return "rawprop"; }
   inline const char *typeName() const { return "RawProperty"; }
@@ -277,7 +272,7 @@ class DevSignalsPort : public Port {
   DevSignalsPort(Worker &w, ezxml_t x, Port *sp, int ordinal, const char *&err);
   DevSignalsPort(const DevSignalsPort &other, Worker &w, std::string &name, size_t count,
 		 const char *&err);
-  Port &clone(Worker &w, std::string &name, size_t count, OCPI::Util::Assembly::Role *role,
+  Port &clone(Worker &w, std::string &name, size_t count, OCPI::Metadata::Assembly::Role *role,
 	      const char *&err) const;
   void emitRecordTypes(FILE *f);
   void emitRecordInterface(FILE *f, const char *implName);
@@ -316,7 +311,7 @@ class LocalMemory {
     size_t sizeOfLocalMemory;
 };
 
-typedef std::list<OU::Property *> Properties;
+typedef std::list<OM::Property *> Properties;
 typedef Properties::const_iterator PropertiesIter;
 class Control {
  public:
@@ -325,7 +320,7 @@ class Control {
   Properties properties;
   size_t offset;// temporary while properties are being parsed.
   unsigned ordinal; // ditto
-  OU::Property *firstRaw;
+  OM::Property *firstRaw;
   // Scalability
   bool startBarrier;      // Must there be a start barrier among members?
   // Below here, initialization is in initAccess
@@ -338,7 +333,7 @@ class Control {
   unsigned nRunProperties, nNonRawRunProperties, nParameters;
   Control();
   void initAccess();
-  void summarizeAccess(OU::Property &p, bool isSpecProperty = false);
+  void summarizeAccess(OM::Property &p, bool isSpecProperty = false);
 };
 
 enum Endian {
@@ -360,7 +355,7 @@ class Assembly;
 class HdlDevice;
 class DataPort;
 struct Instance;
-class Worker : public OU::Worker {
+class Worker : public OM::Worker {
  public:
   ezxml_t m_xml;
   std::string m_file, m_parentFile, m_fileName;
@@ -401,8 +396,8 @@ class Worker : public OU::Worker {
   SigMap  m_sigmap;                 // map signal names to signals
   const char *m_library;            // the component library name where the xml was found
   bool m_outer;                     // only generate the outer skeleton, not the inner one
-  OU::Property *m_debugProp;
-  OU::Assembly::Properties m_instancePVs;
+  OM::Property *m_debugProp;
+  OM::Assembly::Properties m_instancePVs;
   FILE *m_mkFile, *m_xmlFile;       // state during parameter processing
   const char *m_outDir;             // state during parameter processing
   ParamConfigs m_paramConfigs;      // the parsed file of all configs
@@ -422,11 +417,11 @@ class Worker : public OU::Worker {
   size_t m_proxyPortIndex;          // index of proxy port if it is an array port
 
   Worker(ezxml_t xml, const char *xfile, const std::string &parentFile, WType type,
-	 Worker *parent, OU::Assembly::Properties *ipvs, const char *&err);
+	 Worker *parent, OM::Assembly::Properties *ipvs, const char *&err);
   virtual ~Worker();
   static Worker *
     create(const char *file, const std::string &parentFile, const char *package,
-	   const char *outDir, Worker *parent, OU::Assembly::Properties *instancePropertyValues,
+	   const char *outDir, Worker *parent, OM::Assembly::Properties *instancePropertyValues,
 	   size_t paramConfig, const char *&err);
   const Ports &ports() const { return m_ports; }
   const char *parseClocks();
@@ -435,14 +430,14 @@ class Worker : public OU::Worker {
   Clock &addClock(const char *name, bool output = false);
   Clock &addClock(const std::string &name, bool output = false) { return addClock(name.c_str(), output); }
   Clock &addWciClockReset();
-  // FIXME: inconsistency between get/find on this worker class and vs. OU::worker's methods
-  OU::Property *findProperty(const char *name) const;
-  OU::Port *findMetaPort(const char *id, const OU::Port *except) const;
+  // FIXME: inconsistency between get/find on this worker class and vs. OM::worker's methods
+  OM::Property *findProperty(const char *name) const;
+  OM::Port *findMetaPort(const char *id, const OM::Port *except) const;
   const char *parseSlaves();
   std::string print_map();
   const char *addSlave(ezxml_t slave, const std::string &workerName, const std::string &slaveName);
   const char *addSlaves(ezxml_t slaves);
-  virtual OU::Port &metaPort(unsigned long which) const;
+  virtual OM::Port &metaPort(unsigned long which) const;
   const char
     *addBuiltinProperties(),
     *getPort(const char *name, Port *&p, Port *except = NULL) const,
@@ -492,7 +487,7 @@ class Worker : public OU::Worker {
     *emitToolParameters(),
     *emitMakefile(FILE *xmlFile = NULL),
     *emitHDLConstants(size_t config, bool other),
-    *setParamConfig(const OU::Assembly::Properties *instancePVs, size_t paramConfig,
+    *setParamConfig(const OM::Assembly::Properties *instancePVs, size_t paramConfig,
 		    const std::string &parent),
     *finalizeProperties(),
     *finalizeHDL(),
@@ -500,7 +495,7 @@ class Worker : public OU::Worker {
     *deriveOCP(),
     *hdlValue(const std::string &name, const OU::Value &v, std::string &value,
 	      bool param = false, Language = NoLanguage, bool finalized = false),
-    *findParamProperty(const char *name, OU::Property *&prop, size_t &nParam,
+    *findParamProperty(const char *name, OM::Property *&prop, size_t &nParam,
 		       bool includeInitial = false),
     *addConfig(ParamConfig &info, bool fromXml),
     *doParam(ParamConfig &info, PropertiesIter pi, bool fromXml, unsigned nParam),
@@ -515,11 +510,11 @@ class Worker : public OU::Worker {
     *emitImplOCL(),
     *emitEntryPointOCL(),
     *paramValue(const OU::Member &param, OU::Value &v, std::string &value),
-    *findParamConfig(size_t low, size_t high, const OCPI::Util::Assembly::Properties &ipvs,
+    *findParamConfig(size_t low, size_t high, const OCPI::Metadata::Assembly::Properties &ipvs,
 		     ParamConfig *&pc),
     *rccBaseValue(OU::Value &v, std::string &value, const OU::Member *param = NULL),
     *rccValue(OU::Value &v, std::string &value, const OU::Member &param),
-    *rccPropValue(OU::Property &p, std::string &value),
+    *rccPropValue(OM::Property &p, std::string &value),
     *emitSkelRCC(),
     *emitSkelOCL(),
     *emitAssyHDL();
@@ -546,10 +541,10 @@ class Worker : public OU::Worker {
     emitCppTypesNamespace(FILE *f, std::string &nsName, const std::string &slaveName=""),
     emitDeviceConnectionSignals(FILE *f, const char *iname, bool container),
     setParent(Worker *p), // when it can't happen at construction
-    prType(OU::Property &pr, std::string &type),
-    emitVhdlPropMemberData(FILE *f, OU::Property &pr, unsigned maxPropName),
-    emitVhdlPropMember(FILE *f, OU::Property &pr, unsigned maxPropName, bool in2worker),
-    rccPropType(OU::Property &p, std::string &typeDef, std::string &type, std::string &pretty),
+    prType(OM::Property &pr, std::string &type),
+    emitVhdlPropMemberData(FILE *f, OM::Property &pr, unsigned maxPropName),
+    emitVhdlPropMember(FILE *f, OM::Property &pr, unsigned maxPropName, bool in2worker),
+    rccPropType(OM::Property &p, std::string &typeDef, std::string &type, std::string &pretty),
     emitWorkersAttribute(),
     deleteAssy(), // just to keep the assembly details out of most files
     emitXmlWorker(std::string &out, bool verbose = false),
@@ -606,7 +601,7 @@ extern const char
   *createTests(const char *file, const char *package, const char *outDir, bool verbose),
   *createCases(const char **args, const char *package, const char *outDir, bool verbose),
 //  *addLibrary(const char *lib),
-  *extractExprValue(const OU::Property &p, const OU::Value &v, OU::ExprValue &val),
+  *extractExprValue(const OM::Property &p, const OU::Value &v, OU::ExprValue &val),
   *tryInclude(ezxml_t x, const std::string &parent, const char *element, ezxml_t *parsed,
 	      std::string &child, bool optional),
   *parseList(const char *list, const char * (*doit)(const char *tok, void *arg), void *arg),
@@ -628,7 +623,7 @@ extern const char
 extern bool g_dynamic, g_optimized, g_multipleWorkers, g_autoAddParamConfig;
 extern void
   doPrev(FILE *f, std::string &last, std::string &comment, const char *myComment),
-  vhdlType(const OU::Property &dt, std::string &typeDecl, std::string &type,
+  vhdlType(const OM::Property &dt, std::string &typeDecl, std::string &type,
 	   bool convert = false, bool finalized = false),
   emitConstant(FILE *f, const std::string &prefix, const char *name, size_t val, Language lang, bool ieee = false),
   emitVhdlLibraries(FILE *f),

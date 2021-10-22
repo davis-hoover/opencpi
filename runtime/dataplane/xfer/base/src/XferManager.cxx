@@ -29,7 +29,7 @@
 #include <OcpiUtilAutoMutex.h>
 #include <OcpiUtilEzxml.h>
 #include <OcpiUtilMisc.h>
-#include <OcpiPValue.h>
+#include "UtilPValue.hh"
 #include "XferEndPoint.h"
 #include "XferServices.h"
 #include "XferPioInternal.h"

@@ -220,7 +220,7 @@
 %{
 #include <climits>
 #include "OcpiApi.h"
-#include "OcpiPValue.h"
+#include "UtilPValue.hh"
 #include "OcpiUtilMisc.h"
   namespace OA=OCPI::API;
   namespace OU=OCPI::Util;
@@ -361,9 +361,9 @@
 // swig doesn't try to create a setter for it
 %immutable OCPI::API::Property::m_info;
 
-%include "OcpiUtilDataTypesApi.h"
-%include "OcpiPValueApi.h"
-%include "OcpiUtilPropertyApi.h"
+%include "OcpiDataTypesApi.hh"
+%include "OcpiPValueApi.hh"
+%include "OcpiPropertyApi.hh"
 %include "OcpiUtilExceptionApi.h"
 %include "OcpiLibraryApi.h"
 %include "OcpiContainerApi.h"

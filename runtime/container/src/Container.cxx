@@ -28,6 +28,7 @@
 #include "Container.h"
 
 namespace OA = OCPI::API;
+namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 namespace OS = OCPI::OS;
 namespace OL = OCPI::Library;
@@ -71,7 +72,7 @@ namespace OCPI {
       m_arch = OCPI_CPP_STRINGIFY(OCPI_ARCH);
     }
 
-    bool Container::supportsImplementation(OU::Worker &i) {
+    bool Container::supportsImplementation(OM::Worker &i) {
       static const char *opencpiVersion; // AV-2453
       static bool allowVersionMismatch = false;
 

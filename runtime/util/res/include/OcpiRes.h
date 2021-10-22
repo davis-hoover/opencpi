@@ -38,15 +38,10 @@ namespace OCPI {
     class MemBlockMgr
     {
     public:
-      MemBlockMgr(ResAddr start, size_t size)
-        throw( std::bad_alloc );
-      ~MemBlockMgr()
-        throw();
-      int alloc(size_t nbytes, unsigned alignment, ResAddr& req_addr)
-        throw( std::bad_alloc );
-      int free(ResAddr  addr )
-        throw( std::bad_alloc );
-
+      MemBlockMgr(ResAddr start, size_t size);
+      ~MemBlockMgr();
+      int alloc(size_t nbytes, unsigned alignment, ResAddr& req_addr);
+      int free(ResAddr  addr );
 
     private:
       ResPool *m_pool;

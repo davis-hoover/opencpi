@@ -28,6 +28,7 @@ namespace OCPI {
     namespace OA = OCPI::API;
     namespace OC = OCPI::Container;
     namespace OS = OCPI::OS;
+    namespace OM = OCPI::Metadata;
     namespace OU = OCPI::Util;
     namespace OE = OCPI::Util::EzXml;
 
@@ -43,7 +44,7 @@ namespace OCPI {
     }
 
     WciControl::
-    WciControl(Device &device, ezxml_t implXml, ezxml_t instXml, OU::Property *props, bool doInit)
+    WciControl(Device &device, ezxml_t implXml, ezxml_t instXml, OM::Property *props, bool doInit)
       : m_implName("<none>"), m_instName("<none>"), m_hasControl(false), m_timeout(DEFAULT_TIMEOUT),
 	m_device(device), m_occpIndex(0), m_propInfo(props)
     {
@@ -71,7 +72,7 @@ namespace OCPI {
       m_window = 0;
       //      m_wName = m_instName ? m_instName : "<unknown>";
       if (m_hasControl) {
-	setControlMask(getControlMask() | 1 << OU::Worker::OpStart);
+	setControlMask(getControlMask() | 1 << OM::Worker::OpStart);
 	// Find the log base 2 of the m_timeout value since that is what is specified in
 	// the hardware control register.
 	// FIXME: maybe use logTimeout = OU::ceilLog2(m_timeout).
@@ -123,7 +124,7 @@ namespace OCPI {
     // fast memory-mapped property access directly to users
     // the key members are "readVaddr" and "writeVaddr"
     void WciControl::
-    prepareProperty(OU::Property &md, 
+    prepareProperty(OM::Property &md, 
 		    volatile uint8_t *&writeVaddr,
 		    const volatile uint8_t *&readVaddr) const {
       ocpiAssert(m_hasControl);
@@ -142,7 +143,7 @@ namespace OCPI {
       if (!m_hasControl)
 	return;
       if (!m_device.isAlive() || m_device.isFailed()) {
-	setControlState(OU::Worker::UNUSABLE);
+	setControlState(OM::Worker::UNUSABLE);
 	return;
       }
       // This polling call is to detect the current control state when
@@ -157,25 +158,25 @@ namespace OCPI {
 	status = get32Register(status, OccpWorkerRegisters);
       } catch (...) {
 	// devices can disappear so if anything goes wrong...
-	setControlState(OU::Worker::UNUSABLE);
+	setControlState(OM::Worker::UNUSABLE);
 	return;
       }
       ocpiDebug("Checking control state for worker: status: 0x%x", status);
       if (status & OCCP_STATUS_ALL_ERRORS)
 	ocpiDebug("Worker %s has errors: %" PRIx32, m_instName, status);
       if ((status & OCCP_STATUS_FINISHED) &&
-	  (getState() == OU::Worker::OPERATING || getState() == OU::Worker::SUSPENDED))
-	setControlState(OU::Worker::FINISHED);
+	  (getState() == OM::Worker::OPERATING || getState() == OM::Worker::SUSPENDED))
+	setControlState(OM::Worker::FINISHED);
     }
     void WciControl::
-    controlOperation(OU::Worker::ControlOperation op) {
+    controlOperation(OM::Worker::ControlOperation op) {
       std::string err;
       if (controlOperation(op, err))
 	throw OU::Error(err);
     }
 
     bool WciControl::
-    controlOperation(OU::Worker::ControlOperation op, std::string &err) {
+    controlOperation(OM::Worker::ControlOperation op, std::string &err) {
       if (getControlMask() & (1u << op)) {
 	uint32_t result =
 	  // *((volatile uint32_t *)myRegisters + controlOffsets[op]);
@@ -202,18 +203,18 @@ namespace OCPI {
 	    oops = "returned unknown result value from control operation";
 	  }
 	  ocpiInfo("HDL Control Op Failed: worker %s:%s(%zu) op %s(%u) %s (%0x" PRIx32 ")",
-		   m_implName, m_instName, m_occpIndex, OU::Worker::s_controlOpNames[op],
+		   m_implName, m_instName, m_occpIndex, OM::Worker::s_controlOpNames[op],
 		   op, oops, result);
 	  OU::format(err, "HDL Control Op Failed: worker %s:%s(%zu) op %s(%u) %s (0x%" PRIx32 ")",
-		     m_implName, m_instName, m_occpIndex, OU::Worker::s_controlOpNames[op],
+		     m_implName, m_instName, m_occpIndex, OM::Worker::s_controlOpNames[op],
 		     op, oops, result);
 	  return true;
 	}
 	ocpiInfo("HDL Control Op Succeeded: worker %s:%s(%zu) op %s(%u)",
-		 m_implName, m_instName, m_occpIndex, OU::Worker::s_controlOpNames[op], op);
+		 m_implName, m_instName, m_occpIndex, OM::Worker::s_controlOpNames[op], op);
       } else
 	ocpiInfo("HDL Control Op Avoided worker %s:%s(%zu) op %s(%u)",
-		 m_implName, m_instName, m_occpIndex, OU::Worker::s_controlOpNames[op], op);
+		 m_implName, m_instName, m_occpIndex, OM::Worker::s_controlOpNames[op], op);
       return false;
     }
 
@@ -437,26 +438,26 @@ namespace OCPI {
       uint32_t
 	l_control = m_wAccess.get32Register(control, OccpWorkerRegisters),
 	l_status =  m_wAccess.get32Register(status, OccpWorkerRegisters);
-      OU::Worker::ControlState cs;
-      OU::Worker::ControlOperation lastOp =
-	(OU::Worker::ControlOperation)OCCP_STATUS_LAST_OP(l_status);
+      OM::Worker::ControlState cs;
+      OM::Worker::ControlOperation lastOp =
+	(OM::Worker::ControlOperation)OCCP_STATUS_LAST_OP(l_status);
       if (!(l_control & OCCP_WORKER_CONTROL_ENABLE))
-	cs = OU::Worker::EXISTS; // there is no specific reset state since it isn't hetero
+	cs = OM::Worker::EXISTS; // there is no specific reset state since it isn't hetero
       else if (!(l_status & OCCP_STATUS_CONFIG_OP_VALID) || lastOp == 4)
-	cs = OU::Worker::EXISTS; // no control op since reset
+	cs = OM::Worker::EXISTS; // no control op since reset
       else if (l_status & OCCP_STATUS_CONTROL_ERRORS)
-	cs = OU::Worker::UNUSABLE;
-      else if (lastOp == OU::Worker::OpRelease)
-	cs = OU::Worker::UNUSABLE;
+	cs = OM::Worker::UNUSABLE;
+      else if (lastOp == OM::Worker::OpRelease)
+	cs = OM::Worker::UNUSABLE;
       else if (l_status & OCCP_STATUS_FINISHED)
-	cs = OU::Worker::FINISHED;
+	cs = OM::Worker::FINISHED;
       else
 	switch(lastOp) {
-	case OU::Worker::OpInitialize: cs = OU::Worker::INITIALIZED; break;
-	case OU::Worker::OpStart: cs = OU::Worker::OPERATING; break;
-	case OU::Worker::OpStop: cs = OU::Worker::SUSPENDED; break;
+	case OM::Worker::OpInitialize: cs = OM::Worker::INITIALIZED; break;
+	case OM::Worker::OpStart: cs = OM::Worker::OPERATING; break;
+	case OM::Worker::OpStop: cs = OM::Worker::SUSPENDED; break;
 	default:
-	  cs = OU::Worker::OPERATING;
+	  cs = OM::Worker::OPERATING;
 	  // FIXME:  the beforeQuery, and AfterConfig and test ops screw us up here.
 	}
       setControlState(cs);
@@ -492,12 +493,12 @@ namespace OCPI {
 	}
       } else {
 	unsigned i;
-	for (i = 0; OU::Worker::s_controlOpNames[i]; i++) 
-	  if (!strcasecmp(OU::Worker::s_controlOpNames[i], op)) {
-	    ignored = controlOp((OU::Worker::ControlOperation)i);
+	for (i = 0; OM::Worker::s_controlOpNames[i]; i++) 
+	  if (!strcasecmp(OM::Worker::s_controlOpNames[i], op)) {
+	    ignored = controlOp((OM::Worker::ControlOperation)i);
 	    break;
 	  }
-	if (!OU::Worker::s_controlOpNames[i])
+	if (!OM::Worker::s_controlOpNames[i])
 	  throw OU::Error("Unknown control operation: %s", op);
       }
       if (ignored)
@@ -513,24 +514,24 @@ namespace OCPI {
 	     name().c_str(), implTag().c_str(),
 	     m_wAccess.get32Register(control,
 				     OccpWorkerRegisters) & OCCP_WORKER_CONTROL_ENABLE ?
-	                             OU::Worker::s_controlStateNames[getState()] : "RESET");
+	                             OM::Worker::s_controlStateNames[getState()] : "RESET");
     }
     OC::Port *DirectWorker::findPort(const char *) { return NULL; }
     const std::string &DirectWorker::name() const { return m_name; }
     void DirectWorker::
-    prepareProperty(OU::Property &, volatile uint8_t *&, const volatile uint8_t *&) const {}
-    OC::Port &DirectWorker::createPort(const OU::Port &, const OU::PValue *) {
+    prepareProperty(OM::Property &, volatile uint8_t *&, const volatile uint8_t *&) const {}
+    OC::Port &DirectWorker::createPort(const OM::Port &, const OU::PValue *) {
       ocpiAssert("This method is not expected to ever be called" == 0);
       return *(OC::Port*)this;
     }
     OC::Port &DirectWorker::
-    createOutputPort(OU::PortOrdinal, size_t, size_t, const OU::PValue*)
+    createOutputPort(OM::PortOrdinal, size_t, size_t, const OU::PValue*)
       throw (OU::EmbeddedException) {
       ocpiAssert("This method is not expected to ever be called" == 0);
       return *(OC::Port*)this;
     }
     OC::Port &DirectWorker::
-    createInputPort(OU::PortOrdinal, size_t, size_t, const OU::PValue*)
+    createInputPort(OM::PortOrdinal, size_t, size_t, const OU::PValue*)
       throw (OU::EmbeddedException) {
       ocpiAssert("This method is not expected to ever be called" == 0);
       return *(OC::Port*)this;

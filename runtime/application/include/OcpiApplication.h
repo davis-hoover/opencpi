@@ -66,7 +66,7 @@ namespace OCPI {
 	CMap m_feasible;
 	bool m_hasMaster;                       // convenience
 	std::string m_name;                     // convenience
-	const OCPI::Util::Assembly::Properties *m_properties; // convenience
+	const OCPI::Metadata::Assembly::Properties *m_properties; // convenience
 	std::vector<size_t> m_slaves;           // the instance ordinals of explicit slaves
 	// These members are used *after* deployment planning
 	size_t m_firstMember;                   // index of first member in launch members
@@ -108,7 +108,7 @@ namespace OCPI {
         const char *init(const OCPI::Library::Assembly &assy, size_t n, bool verbose,
 			 const PValue *params);
 	void collectCandidate(const OCPI::Library::Candidate &c, unsigned n);
-	void finalizePortParam(OCPI::Util::Assembly::Instance &ui, const OCPI::Util::PValue *params,
+	void finalizePortParam(OCPI::Metadata::Assembly::Instance &ui, const OCPI::Util::PValue *params,
 			       const char *param);
 	bool foundContainer(OCPI::Container::Container &i);
       };
@@ -136,10 +136,10 @@ namespace OCPI {
       // This is a queue entry for a delayed property value setting
       struct DelayedPropertyValue {
 	unsigned m_instance;
-	const OCPI::Util::Property *m_property;
+	const OCPI::Metadata::Property *m_property;
 	OCPI::Util::Value m_value;
       };
-      typedef std::multimap<OCPI::Util::Assembly::Delay, DelayedPropertyValue> DelayedPropertyValues;
+      typedef std::multimap<OCPI::Metadata::Assembly::Delay, DelayedPropertyValue> DelayedPropertyValues;
       DelayedPropertyValues    m_delayedPropertyValues;
       size_t m_nProperties;
       CMap m_allMap;              // A map of all containers chosen/used
@@ -176,7 +176,7 @@ namespace OCPI {
       unsigned m_currConn;
       unsigned m_bestScore;
       // This list is a copy of the connections active for the deployment
-      std::list<OCPI::Util::Assembly::Connection> m_bestConnections;
+      std::list<OCPI::Metadata::Assembly::Connection> m_bestConnections;
       bool m_hex;
       bool m_hidden;
       bool m_uncached;
@@ -190,11 +190,11 @@ namespace OCPI {
       void clear();
       void init(const OCPI::API::PValue *params);
       void initExternals(const OCPI::API::PValue *params);
-      void setLaunchPort(OCPI::Container::Launcher::Port &p, const OCPI::Util::Port *mp,
+      void setLaunchPort(OCPI::Container::Launcher::Port &p, const OCPI::Metadata::Port *mp,
 			 const OCPI::Util::PValue *connParams, const std::string &name,
 			 const OCPI::Util::PValue *portParams,
 			 const OCPI::Container::Launcher::Member *member,
-			 const OCPI::Util::Assembly::External *ep, size_t scale, size_t index);
+			 const OCPI::Metadata::Assembly::External *ep, size_t scale, size_t index);
       void initLaunchConnections();
       const OCPI::Container::Launcher::Connection &
 	findOtherConnection(const OCPI::Container::Launcher::Port &p);
@@ -202,23 +202,23 @@ namespace OCPI {
       void finalizeLaunchPort(OCPI::Container::Launcher::Port &p);
       void finalizeLaunchConnections();
       void finalizeLaunchMembers();
-      void checkPropertyValue(unsigned nInstance, const OCPI::Util::Worker &w,
-			      const OCPI::Util::Assembly::Property &aProp, unsigned *&pn,
+      void checkPropertyValue(unsigned nInstance, const OCPI::Metadata::Worker &w,
+			      const OCPI::Metadata::Assembly::Property &aProp, unsigned *&pn,
 			      OCPI::Util::Value *&pv);
-      const OCPI::Util::Port *getMetaPort(unsigned n) const;
+      const OCPI::Metadata::Port *getMetaPort(unsigned n) const;
       // return our used-container ordinal
       unsigned addContainer(unsigned container, bool existOk = false);
       unsigned getUsedContainer(unsigned container);
-      void delegateAssyPort(OCPI::Util::Assembly::Port &assyPort, unsigned instNum,
+      void delegateAssyPort(OCPI::Metadata::Assembly::Port &assyPort, unsigned instNum,
 			    unsigned slaveInstNum, const OCPI::Library::Implementation &slaveImpl,
-			    const OCPI::Util::Port &masterPort,
-			    const OCPI::Util::Port *&slavePort);
-      bool maybeDelegate(unsigned instNum, OCPI::Util::Assembly::Port &assyPort,
-			 const OCPI::Util::Port *&port,
+			    const OCPI::Metadata::Port &masterPort,
+			    const OCPI::Metadata::Port *&slavePort);
+      bool maybeDelegate(unsigned instNum, OCPI::Metadata::Assembly::Port &assyPort,
+			 const OCPI::Metadata::Port *&port,
 			 const OCPI::Library::Implementation *&impl);
       bool maybeDelegateToSlavePort(unsigned instNum, const OCPI::Library::Implementation &slaveImpl,
-				    const OCPI::Util::Port &port,
-				    OCPI::Util::Assembly::Port *&otherAssyPort);
+				    const OCPI::Metadata::Port &port,
+				    OCPI::Metadata::Assembly::Port *&otherAssyPort);
       bool resolveInstanceSlaves(unsigned instNum, OCPI::Library::Candidate &c,
 				 const std::string &reject);
       void restoreSlaves(OCPI::Library::Candidate &c);
@@ -270,7 +270,7 @@ namespace OCPI {
       size_t getPortCount();
       friend struct Property;
       size_t nProperties() const { return m_nProperties; }
-      const OCPI::Util::Property *property(unsigned ordinal, std::string &name) const;
+      const OCPI::Metadata::Property *property(unsigned ordinal, std::string &name) const;
       Worker &getPropertyWorker(const char *name, const char *&pname) const;
       const char *getProperty(unsigned ordinal, std::string &value, AccessList &list = emptyList,
 			      PropertyOptionList &options = noPropertyOptions,

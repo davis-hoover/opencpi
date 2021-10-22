@@ -21,7 +21,7 @@
 #ifndef ASSEMBLY_H
 #define ASSEMBLY_H
 
-#include "OcpiUtilAssembly.h"
+#include "MetadataAssembly.hh"
 #include "wip.h"
 #include "ocp.h"
 #include "hdl.h"
@@ -39,7 +39,7 @@ struct Connection {
     m_clockName;  // the signal to connect to internal clocks
   Attachment *m_external; // external assembly port - the last one
   size_t m_count; // width of all attachments
-  Connection(OU::Assembly::Connection *c, const char *name = NULL);
+  Connection(OM::Assembly::Connection *c, const char *name = NULL);
   const char *attachPort(InstancePort &ip, size_t index = 0); //, size_t count = 0);
   bool setClock(Clock &c);
   const char *cname() const { return m_name.c_str(); }
@@ -49,7 +49,7 @@ typedef std::list<Connection*> Connections;
 typedef Connections::const_iterator ConnectionsIter;
 
 struct InstanceProperty {
-  const OU::Property *property;
+  const OM::Property *property;
   OU::Value value;
   InstanceProperty();
 };
@@ -81,7 +81,7 @@ struct Instance : public OU::IdentResolver {
     Adapter,       // an adapter inserted by code generation
   } m_iType;
   const char *m_attach;  // external platform port instance is attached to for io or interconnect
-  OCPI::Util::Assembly::Properties m_xmlProperties; // explicit unparsed values for the instance
+  OCPI::Metadata::Assembly::Properties m_xmlProperties; // explicit unparsed values for the instance
   InstanceProperties m_properties;                  // fully parsed w/ full knowledge of worker
   bool m_hasConfig;      // for adapter configuration FIXME make normal properties
   size_t m_config;
@@ -90,14 +90,14 @@ struct Instance : public OU::IdentResolver {
   bool   m_inserted;   // was this instance auto-inserted?
   Instance();
   const char *cname() const { return m_name.c_str(); }
-  const char *init(OCPI::Util::Assembly::Instance *ai, ::Assembly &assy, const char *outDir);
+  const char *init(OCPI::Metadata::Assembly::Instance *ai, ::Assembly &assy, const char *outDir);
   const char *init(::Assembly &assy, const char *iName, const char *wName, ezxml_t x, 
-		   OU::Assembly::Properties &xmlProperties);
+		   OM::Assembly::Properties &xmlProperties);
   const char *initHDL(::Assembly &assy);
   void emitHdl(FILE *f, const char *prefix, size_t &index);
   void emitDeviceConnectionSignals(FILE *f, Worker &assy);
   const char *getValue(const char *sym, OU::ExprValue &val) const;
-  const char *addParameters(const OU::Assembly::Properties &aiprops, InstanceProperty *&ipv);
+  const char *addParameters(const OM::Assembly::Properties &aiprops, InstanceProperty *&ipv);
 };
 // To represent an attachment of a connection to an instance port.
 // This is currently only used for indexed ports
@@ -116,23 +116,23 @@ struct Attachment {
 struct InstancePort {
   Instance *m_instance;                // what instance does this belong to
   mutable Attachments m_attachments;   // what connections are attached to this port? mutable for sorting
-  OU::Assembly::External *m_external;  // corresponding external of assy, for externals
+  OM::Assembly::External *m_external;  // corresponding external of assy, for externals
   std::vector<bool> m_connected;       // to ensure indices are connected once
   Port *m_port;                        // The actual port of the instance's or assembly's worker
-  OU::Assembly::Role m_role;           // Our role, combining info from the worker port and the assy
+  OM::Assembly::Role m_role;           // Our role, combining info from the worker port and the assy
   OcpAdapt m_ocp[N_OCP_SIGNALS];       // Information for making the connection, perhaps tieoff etc.
   bool     m_hasExprs;                 // any signal adaptations with expressions present?
   bool     m_externalize;              // should be made external to the assembly
   std::string m_signalIn, m_signalOut; // Internal signal bundle for connecting here, when appropriate
   std::string m_clockSignal;           // Internal clock signal, when appropriate
   InstancePort();
-  InstancePort(Instance *i, Port *p, OU::Assembly::External *ext);
+  InstancePort(Instance *i, Port *p, OM::Assembly::External *ext);
   const char *attach(Attachment *a, size_t index); //, size_t count);
   const char *adjustConnections(FILE *f, Language lang, size_t &unused);
   void
     getClockSignal(bool output, Language lang),
     createConnectionSignals(FILE *f, Language lang),
-    init(Instance *i, Port *p, OU::Assembly::External *ext),
+    init(Instance *i, Port *p, OM::Assembly::External *ext),
     detach(Connection &c), // forget attachment for this connection
     emitConnectionSignal(FILE *f, bool output, Language lang/*, bool clock = false*/),
     emitTieoffAssignments(FILE *f);
@@ -146,19 +146,19 @@ class Assembly {
   size_t        m_nWCIs;
   std::vector<Instance>m_instances;
   Connections   m_connections;
-  OU::Assembly *m_utilAssembly;
+  OM::Assembly *m_utilAssembly;
   Language      m_language;
   InstanceProperties m_properties; // property values applied to the whole assembly
   size_t        m_nWti, m_nWmemi;
   const char
     *parseAssy(ezxml_t xml, const char **topAttrs, const char **instAttrs),
     *externalizePort(InstancePort &ip, const char *name, size_t *ordinal),
-    *findPort(OU::Assembly::Port &ap, InstancePort *&found),
+    *findPort(OM::Assembly::Port &ap, InstancePort *&found),
     // Add the assembly's parameters to the instance's parameter values list, as needed
-    *addAssemblyParameters(OCPI::Util::Assembly::Properties &aips),
+    *addAssemblyParameters(OCPI::Metadata::Assembly::Properties &aips),
     *insertAdapter(Connection &c, InstancePort &from, InstancePort &to),
-    *parseConnection(OCPI::Util::Assembly::Connection &aConn);
-void addParamConfigParameters(const ParamConfig &pc, const OU::Assembly::Properties &aiprops,
+    *parseConnection(OCPI::Metadata::Assembly::Connection &aConn);
+void addParamConfigParameters(const ParamConfig &pc, const OM::Assembly::Properties &aiprops,
 			      InstanceProperty *&ipv);
   // Find the instance port connected to an external with this name
   InstancePort *

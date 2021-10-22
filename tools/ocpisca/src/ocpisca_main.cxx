@@ -41,7 +41,7 @@ namespace OX = OCPI::Util::EzXml;
   CMD_OPTION(package,    p, String, 0, "package prefix for softpkg name") \
   CMD_OPTION(directory,  D, String, 0, "the directory where output files are placed") \
 
-#include "CmdOption.h"
+#include "CmdOption.hh"
 
 static int mymain(const char **ap) {
 

@@ -81,7 +81,7 @@
 #include <vector>
 #include <map>
 #include <ostream>
-#include <OcpiPValue.h>
+#include "UtilPValue.hh"
 #include "OsMutex.hh"
 #include <OcpiUtilAutoMutex.h>
 #include <OcpiUtilException.h>

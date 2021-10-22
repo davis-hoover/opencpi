@@ -20,9 +20,9 @@
 
 #include <climits> // CHAR_BIT
 #include "OsMisc.hh"
-#include "OcpiUtilValue.h"
-#include "ValueReader.h"
-#include "ValueWriter.h"
+#include "UtilValue.hh"
+#include "UtilValueReader.hh"
+#include "UtilValueWriter.hh"
 #include "Container.h"
 #include "ContainerPort.h"
 #include "ContainerApplication.h"
@@ -30,18 +30,19 @@
 #include "ContainerWorker.h"
 
 namespace OA = OCPI::API;
+namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 namespace OCPI {
   namespace Container {
     Controllable::Controllable()
-      : m_state(OU::Worker::EXISTS), m_controlMask(0) {
+      : m_state(OM::Worker::EXISTS), m_controlMask(0) {
     }
 
     void Controllable::setControlOperations(const char *ops) {
       if (ops) {
 #define CONTROL_OP(x, c, t, s1, s2, s3, s4)		\
 	if (strstr(ops, #x))				\
-	  m_controlMask |= 1 << OU::Worker::Op##c;
+	  m_controlMask |= 1 << OM::Worker::Op##c;
 	OCPI_CONTROL_OPS
 #undef CONTROL_OP
       }
@@ -140,7 +141,7 @@ namespace OCPI {
     Worker::
     Worker(Artifact *art, ezxml_t impl, ezxml_t inst, const Workers &a_slaves, bool a_hasMaster,
 	   size_t a_member, size_t a_crewSize, const OA::PValue *)
-      : OU::Worker::Worker(),
+      : OM::Worker::Worker(),
         m_artifact(art), m_xml(impl), m_instXml(inst), m_workerMutex(true),
 	m_controlOpPending(false), m_slaves(a_slaves), m_hasMaster(a_hasMaster),
         m_member(a_member), m_crewSize(a_crewSize), m_connectedPorts(0), m_optionalPorts(0),
@@ -172,11 +173,11 @@ namespace OCPI {
 
     bool Worker::
     isOperating() const{
-      return this->getControlState() == OU::Worker::OPERATING;
+      return this->getControlState() == OM::Worker::OPERATING;
     }
 
     void Worker::
-    connectPort(OU::PortOrdinal ordinal) {
+    connectPort(OM::PortOrdinal ordinal) {
       m_connectedPorts |= 1u << ordinal;
       portIsConnected(ordinal); // the virtual notification
     }
@@ -188,7 +189,7 @@ namespace OCPI {
 	assert(p->nOthers() == nOthers);
         return *p;
       }
-      OU::Port *mPort = findMetaPort(a_name);
+      OM::Port *mPort = findMetaPort(a_name);
       if (!mPort)
         throw OU::Error("no port found with name \"%s\"", a_name);
       Port &newP = createPort(*mPort, params);
@@ -207,7 +208,7 @@ namespace OCPI {
     OA::PropertyInfo & Worker::setupProperty(const char *pname,
 					     volatile uint8_t *&m_writeVaddr,
 					     const volatile uint8_t *&m_readVaddr) const {
-      OU::Property &prop = findProperty(pname);
+      OM::Property &prop = findProperty(pname);
       if (prop.m_isDebug && !isDebug())
 	throw OU::Error("For setting debug property \"%s\": worker \"%s\" is not in debug mode",
 			prop.cname(), cname());
@@ -225,7 +226,7 @@ namespace OCPI {
     OA::PropertyInfo & Worker::setupProperty(unsigned n,
 					     volatile uint8_t *&m_writeVaddr,
 					     const volatile uint8_t *&m_readVaddr) const {
-      OU::Property &prop = property(n);
+      OM::Property &prop = property(n);
       if (!prop.m_isParameter)
 	prepareProperty(prop, m_writeVaddr, m_readVaddr);
       return prop;
@@ -252,7 +253,7 @@ namespace OCPI {
     void Worker::
     setProperty(unsigned ordinal, const char *value, OA::AccessList &list) const {
       unsigned nProps;
-      OU::Property *props = properties(nProps);
+      OM::Property *props = properties(nProps);
       assert(ordinal < nProps); // internal
       setProperty(props[ordinal], value, list);
     }
@@ -261,7 +262,7 @@ namespace OCPI {
     getProperty(unsigned ordinal, std::string &value, OA::AccessList &list,
 		OA::PropertyOptionList &options, OA::PropertyAttributes *a_attributes) const {
       unsigned nProps;
-      OU::Property *props = properties(nProps);
+      OM::Property *props = properties(nProps);
       return ordinal >= nProps ? NULL :
 	getProperty(props[ordinal], value, list, options, a_attributes);
     }
@@ -417,7 +418,7 @@ namespace OCPI {
     // which might be into the middle of an array or sequence.
     void Worker::
     setProperty(unsigned ordinal, const OCPI::Util::Value &v) const {
-      OU::Property &p = property(ordinal);
+      OM::Property &p = property(ordinal);
       setProperty(p, v, p, 0);
     }
 
@@ -661,7 +662,7 @@ namespace OCPI {
     getProperty(unsigned ordinal, std::string &a_name, std::string &value, bool *unreadablep,
 		bool hex, bool *cachedp, bool uncached, bool *hiddenp) {
       unsigned nProps;
-      OU::Property *props = properties(nProps);
+      OM::Property *props = properties(nProps);
       if (ordinal >= nProps)
 	return false;
       const OA::PropertyInfo &p = props[ordinal];
@@ -729,16 +730,16 @@ namespace OCPI {
     // since the container might want to know anyway, even if the
     // worker doesn't have an implementation
 #define CONTROL_OP(x, c, t, s1, s2, s3, s4)	\
-    void Worker::x() { controlOp(OU::Worker::Op##c); }
+    void Worker::x() { controlOp(OM::Worker::Op##c); }
     OCPI_CONTROL_OPS
 #undef CONTROL_OP
 
     struct ControlTransition {
-      OU::Worker::ControlState valid[4];
-      OU::Worker::ControlState next;
+      OM::Worker::ControlState valid[4];
+      OM::Worker::ControlState next;
     } controlTransitions[] = {
 #define CONTROL_OP(x, c, t, s1, s2, s3, s4)	\
-      {{OU::Worker::s1, OU::Worker::s2, OU::Worker::s3, OU::Worker::s4}, OU::Worker::t},
+      {{OM::Worker::s1, OM::Worker::s2, OM::Worker::s3, OM::Worker::s4}, OM::Worker::t},
 	OCPI_CONTROL_OPS
 #undef CONTROL_OP
     };
@@ -755,7 +756,7 @@ namespace OCPI {
       }
     }
 
-    bool Worker::controlOp(OU::Worker::ControlOperation op) {
+    bool Worker::controlOp(OM::Worker::ControlOperation op) {
       // sched_yield does not work with the default
       // Linux scheduler: SCHED_OTHER, and it requires special permission/capability to use
       // the other "realtime" schedulers that actually implement sched_yield.
@@ -769,17 +770,17 @@ namespace OCPI {
       ControlState cs = getControlState();
       ControlTransition ct = controlTransitions[op];
       // Special case starting and stopping after finished
-      if (cs == OU::Worker::FINISHED && (op == OU::Worker::OpStop || op == OU::Worker::OpStart))
+      if (cs == OM::Worker::FINISHED && (op == OM::Worker::OpStop || op == OM::Worker::OpStart))
 	return true;
       // If we are already in the desired state, just ignore it so that
       // Neither workers nor containers need to deal with this
-      if (ct.next != OU::Worker::NONE && cs == ct.next)
+      if (ct.next != OM::Worker::NONE && cs == ct.next)
 	return true;
       if (cs == ct.valid[0] ||
 	  (ct.valid[1] != NONE && cs == ct.valid[1]) ||
 	  (ct.valid[2] != NONE && cs == ct.valid[2]) ||
 	  (ct.valid[3] != NONE && cs == ct.valid[3])) {
-	if (op == OU::Worker::OpStart) {
+	if (op == OM::Worker::OpStart) {
 	  // If a worker gets started before all of its required ports are created: error
 	  PortMask mandatory = ~(~0u << m_nPorts) & ~optionalPorts();
 	  PortMask bad = mandatory & ~connectedPorts();
@@ -798,11 +799,11 @@ namespace OCPI {
       } else
 	throw
 	  OU::Error("Control operation '%s' failed on worker '%s%s%s' in state: '%s'",
-		    OU::Worker::s_controlOpNames[op], implTag().c_str(),
+		    OM::Worker::s_controlOpNames[op], implTag().c_str(),
 		    instTag().empty() ? "" : "/", instTag().c_str(),
-		    OU::Worker::s_controlStateNames[cs]);
+		    OM::Worker::s_controlStateNames[cs]);
       Application *a = application();
-      if (a && op == OU::Worker::OpStart) {
+      if (a && op == OM::Worker::OpStart) {
 	ocpiInfo("After starting worker %s, starting container %s",
 		 cname(), a->container().cname());
 	a->container().start();
@@ -864,7 +865,7 @@ namespace OCPI {
     }									\
     run Worker::							\
     get##pretty##Parameter(unsigned ordinal, unsigned idx) const {	\
-      OU::Property &p = m_properties[ordinal];				\
+      OM::Property &p = m_properties[ordinal];				\
       assert(p.m_default);						\
       OU::Value &v = *p.m_default;					\
       return p.m_isSequence || p.m_arrayRank ? v.m_p##pretty[idx] : v.m_##pretty; \
@@ -1019,28 +1020,28 @@ namespace OCPI {
 
     void Worker::
     getStringParameter(unsigned ordinal, char *out, size_t length, unsigned idx) const {
-      OU::Property &p = m_properties[ordinal];
+      OM::Property &p = m_properties[ordinal];
       assert(p.m_default);
       OU::Value &v = *p.m_default;
       strncpy(out, p.m_isSequence || p.m_arrayRank ? v.m_pString[idx] : v.m_String, length);
     }
 
     Port &Worker::
-    createOutputPort(OU::PortOrdinal /*portId*/, size_t /*bufferCount*/, size_t /*bufferSize*/,
+    createOutputPort(OM::PortOrdinal /*portId*/, size_t /*bufferCount*/, size_t /*bufferSize*/,
 		     const OU::PValue */*params*/) {
       ocpiAssert("This method is not expected to ever be called" == 0);
       return *(Port*)this;
     }
 
     Port &Worker::
-    createInputPort(OU::PortOrdinal /*portId*/, size_t /*bufferCount*/, size_t /*bufferSize*/,
+    createInputPort(OM::PortOrdinal /*portId*/, size_t /*bufferCount*/, size_t /*bufferSize*/,
 		    const OU::PValue */*params*/) {
       ocpiAssert("This method is not expected to ever be called" == 0);
       return *(Port*)this;
     }
 
     Port &Worker::
-    createTestPort(OU::PortOrdinal /*portId*/, size_t /*bufferCount*/, size_t /*bufferSize*/,
+    createTestPort(OM::PortOrdinal /*portId*/, size_t /*bufferCount*/, size_t /*bufferSize*/,
 		   bool /*isProvider*/, const OU::PValue */*params*/) {
       ocpiAssert("This method is not expected to ever be called" == 0);
       return *(Port*)this;

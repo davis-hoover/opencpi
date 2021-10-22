@@ -21,18 +21,19 @@
 #include <stdio.h>
 #include <assert.h>
 #include <unistd.h>
-#include "ValueReader.h"
-#include "ValueWriter.h"
-#include "OcpiUtilProtocol.h"
-#include "OcpiUtilValue.h"
+#include "UtilValueReader.hh"
+#include "UtilValueWriter.hh"
+#include "MetadataProtocol.hh"
+#include "UtilValue.hh"
 #include "ocpidds.h"
 
+namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 namespace OA = OCPI::API;
 
 void dataTypeTest(const char *arg) {
   unsigned count;
-  OU::Protocol pp, *ppp;
+  OM::Protocol pp, *ppp;
   if (isdigit(*arg)) {
     count = atoi(arg);
     ppp = NULL;
@@ -56,8 +57,8 @@ void dataTypeTest(const char *arg) {
   size_t maxSize = 0;
   std::vector<uint8_t> buf, buf1;
   for (unsigned c = 0; c < count; c++) {
-    OU::Protocol genp;
-    OU::Protocol &p = ppp ? *ppp : genp;
+    OM::Protocol genp;
+    OM::Protocol &p = ppp ? *ppp : genp;
     printf("=== Test %u of %u ===\n", c+1, count);
     if (0 == (c+1)%10000)
       fprintf(stderr, "=== Test %u of %u ===\n", c+1, count);

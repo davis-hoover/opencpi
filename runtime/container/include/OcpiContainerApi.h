@@ -26,8 +26,8 @@
 #include <string>
 #include <initializer_list>
 #include <cassert>
-#include "OcpiPValueApi.h"
-#include "OcpiUtilPropertyApi.h"
+#include "OcpiPValueApi.hh"
+#include "OcpiPropertyApi.hh"
 #include "OcpiUtilExceptionApi.h"
 #include "OcpiLibraryApi.h"
 
