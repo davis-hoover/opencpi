@@ -37,6 +37,7 @@
 namespace OX = OCPI::Util::EzXml;
 namespace OC = OCPI::Container;
 namespace OL = OCPI::Library;
+namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 namespace OE = OCPI::OS::Ether;
 namespace OA = OCPI::API;
@@ -200,7 +201,7 @@ namespace OCPI {
       if ((x = ezxml_cchild(px, "params")) && (err = p.m_params.addXml(x)))
 	return err;
       if ((x = ezxml_cchild(px, "port"))) {
-	OU::Port *mp = new OU::Port(x);
+	OM::Port *mp = new OM::Port(x);
 	if ((err = mp->parse()) ||
 	    (err = mp->postParse())) {
 	  delete mp;
@@ -364,7 +365,7 @@ namespace OCPI {
 	    *u = OCPI_UTRUNCATE(unsigned, ord);
 	    const char *val = ezxml_cattr(px, "v");
 	    assert(ord <= i->m_impl->m_metadataImpl.nProperties());
-	    OU::Property &p = i->m_impl->m_metadataImpl.properties()[ord];
+	    OM::Property &p = i->m_impl->m_metadataImpl.properties()[ord];
 	    assert(!p.m_isParameter);
 	    v->setType(p);
 	    if ((err = v->parse(val)))
@@ -500,7 +501,7 @@ namespace OCPI {
       OC::Worker &w = *m_members[inst].m_worker;
       try {
 	if (get || set) {
-	  OU::Property &p = w.properties()[n];
+	  OM::Property &p = w.properties()[n];
 	  size_t offset, dimension, idx, nBytes;
 	  bool haveNbytes, string;
 	  if ((err = OX::getNumber(m_rx, "offset", &offset)) ||
@@ -550,7 +551,7 @@ namespace OCPI {
 	  } else
 	    w.setProperty(p, ezxml_txt(m_rx), *m, offset, dimension);
 	} else if (op)
-	  w.controlOp((OU::Worker::ControlOperation)n);
+	  w.controlOp((OM::Worker::ControlOperation)n);
 	else if (wait)
 	  if (n) {
 	    OS::Timer t(OCPI_UTRUNCATE(uint32_t, n), 0);

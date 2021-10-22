@@ -64,7 +64,7 @@ const char *Worker::
 finalizeHDL() {
   // This depends on the final property processing based on parameters etc.
   for (PropertiesIter pi = m_ctl.properties.begin(); pi != m_ctl.properties.end(); pi++) {
-    OU::Property &p = **pi;
+    OM::Property &p = **pi;
     // For HDL, we need the string length for string properties, so we compute it here
     if (p.m_isParameter && p.m_baseType == OA::OCPI_String && p.m_stringLength == 0) {
       assert(p.m_default);
@@ -132,11 +132,11 @@ parseHdlImpl(const char *a_package) {
       return OU::esprintf("for emulated device worker %s: %s", emulate, err);
     for (PropertiesIter pi = m_emulate->m_ctl.properties.begin();
 	 pi != m_emulate->m_ctl.properties.end(); ++pi) {
-      OU::Property &p = **pi;
+      OM::Property &p = **pi;
       if (p.m_isParameter || (p.m_isWritable && !p.m_isRaw)) {
 	// Roughly like addProperty.  FIXME: make a cloning version of addProperty and use it here
 	ocpiDebug("Cloning property %s from emulatee ", p.cname());
-	OU::Property *np = new OU::Property(p);
+	OM::Property *np = new OM::Property(p);
 	np->m_ordinal = m_ctl.ordinal++;
 	if (&p == m_emulate->m_debugProp)
 	  m_debugProp = np;

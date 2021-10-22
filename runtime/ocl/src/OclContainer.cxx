@@ -55,6 +55,7 @@ namespace OCPI {
   namespace OCL {
     namespace OS = OCPI::OS;
     namespace OA = OCPI::API;
+    namespace OM = OCPI::Metadata;
     namespace OU = OCPI::Util;
     namespace OC = OCPI::Container;
     namespace OR = OCPI::RDT;
@@ -576,7 +577,7 @@ namespace OCPI {
       OU::Parent<Application>::deleteChildren();
     }
     bool
-    Container::supportsImplementation(OU::Worker &i) {
+    Container::supportsImplementation(OM::Worker &i) {
       size_t rwgs;
       const char *err;
       if ((err = OX::getNumber(i.m_xml, "requiredworkgroupsize", &rwgs)))
@@ -869,7 +870,7 @@ namespace OCPI {
 	m_persistBytes =
 	  sizeof(OCLReturned) + m_oclWorkerSize + OU::roundUp(totalPropertySize(), 8);
 	size_t nMemories;
-	OU::Memory *m = memories(nMemories);
+	OM::Memory *m = memories(nMemories);
 	for (size_t n = 0; n < nMemories; n++, m++)
 	  m_persistBytes += OU::roundUp(m->m_nBytes, 8);
 
@@ -925,9 +926,9 @@ namespace OCPI {
 	try {
 	  if (m_isEnabled) {
 	    m_isEnabled = false;
-	    controlOperation ( OU::Worker::OpStop );
+	    controlOperation ( OM::Worker::OpStop );
 	  }
-	  controlOperation ( OU::Worker::OpRelease );
+	  controlOperation ( OM::Worker::OpRelease );
 	} catch (...) {
 	}
 	deleteChildren();
@@ -949,7 +950,7 @@ namespace OCPI {
       }
 
       // Defined below the port class since it needs it to be defined.
-      void controlOperation(OU::Worker::ControlOperation op);
+      void controlOperation(OM::Worker::ControlOperation op);
       void run(bool &anyone_run);
       bool chkForCompletion();
 
@@ -962,13 +963,13 @@ namespace OCPI {
 	ocpiAssert ( 0 );
       }
 
-      OC::Port &createPort(const OU::Port &metaport, const OA::PValue *props);
+      OC::Port &createPort(const OM::Port &metaport, const OA::PValue *props);
 
       bool enabled() const {
 	return m_isEnabled;
       }
 
-      void prepareProperty(OU::Property& md,
+      void prepareProperty(OM::Property& md,
 			   volatile uint8_t *&writeVaddr,
 			   const volatile uint8_t *&readVaddr) const {
 	if (md.m_baseType != OA::OCPI_Struct && !md.m_isSequence &&
@@ -1195,7 +1196,7 @@ namespace OCPI {
       cl_mem m_clBuffers;
 
     protected:
-      Port(Worker& w, const OA::PValue* params, const OU::Port& mPort)
+      Port(Worker& w, const OA::PValue* params, const OM::Port& mPort)
 	: OC::PortBase<OO::Worker,OO::Port,OO::ExternalPort> (w, *this, mPort, params),
 	  m_clBuffers(NULL) {
       }
@@ -1332,8 +1333,8 @@ namespace OCPI {
     }; // End: class Port
 
     void Worker::
-    controlOperation(OU::Worker::ControlOperation op) {
-      if (op == OU::Worker::OpStart) {
+    controlOperation(OM::Worker::ControlOperation op) {
+      if (op == OM::Worker::OpStart) {
 	m_oclWorker->connectedPorts = connectedPorts();
 	for (Port *p = firstChild(); p; p = p->nextChild()) {
 	  assert(p->ordinal() < m_nPorts);
@@ -1365,13 +1366,13 @@ namespace OCPI {
       } else
 	m_returned->result = OCL_OK;
       switch (op) {
-      case OU::Worker::OpStart:
+      case OM::Worker::OpStart:
 	m_isEnabled = true;
 	m_runTimer.reset();
 	m_runTimer.start();
 	break;
-      case  OU::Worker::OpStop:
-      case OU::Worker::OpRelease:
+      case  OM::Worker::OpStop:
+      case OM::Worker::OpRelease:
 	if (m_isEnabled) {
 	  m_runTimer.stop();
 	  m_runTimer.reset();
@@ -1386,21 +1387,21 @@ namespace OCPI {
 	break;
       case OCL_ERROR:
 	throw OU::Error("Control operation \"%s\" on OCL worker \"%s\" returned ERROR",
-			OU::Worker::s_controlOpNames[op], m_name.c_str());
+			OM::Worker::s_controlOpNames[op], m_name.c_str());
 	break;
       case OCL_FATAL:
 	m_isEnabled = false;
-	setControlState(OU::Worker::UNUSABLE);
+	setControlState(OM::Worker::UNUSABLE);
 	throw OU::Error("Control operation \"%s\" on OCL worker \"%s\" returned FATAL ",
-			OU::Worker::s_controlOpNames[op], m_name.c_str());
+			OM::Worker::s_controlOpNames[op], m_name.c_str());
 	break;
       default:
 	m_isEnabled = false;
 	throw
 	  OU::Error("Control operation \"%s\" on OCL worker \"%s\" returned invalid "
-		    "RCCResult value: 0x%x", OU::Worker::s_controlOpNames[op],
+		    "RCCResult value: 0x%x", OM::Worker::s_controlOpNames[op],
 		    m_name.c_str(), m_returned->result);
-      }    
+      }
     }
 
 
@@ -1494,7 +1495,7 @@ namespace OCPI {
 	if (m_isEnabled)
 	    m_runTimer.stop();
         m_isEnabled = false;
-	setControlState(OU::Worker::UNUSABLE);
+	setControlState(OM::Worker::UNUSABLE);
       }
 
       return true;
@@ -1607,7 +1608,7 @@ namespace OCPI {
     }
 
     OC::Port& Worker::
-    createPort(const OU::Port &mPort, const OA::PValue* props) {
+    createPort(const OM::Port &mPort, const OA::PValue* props) {
       return *new Port(*this, props, mPort);
     }
   } // End: namespace OCL

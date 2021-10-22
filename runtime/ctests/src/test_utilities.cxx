@@ -34,7 +34,7 @@
 #include "OsAssert.hh"
 #include "OcpiUtilMisc.h"
 #include "OcpiRDTInterface.h"
-#include "OcpiPValue.h"
+#include "UtilPValue.hh"
 #include "ContainerWorker.h"
 #include "ContainerPort.h"
 #include "test_utilities.h"

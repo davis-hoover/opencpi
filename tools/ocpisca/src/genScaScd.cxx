@@ -26,6 +26,7 @@
 
 namespace OCPI {
   namespace API {
+    namespace OM = OCPI::Metadata;
     namespace OU = OCPI::Util;
     namespace SCA = OCPI::SCA;
     namespace OC = OCPI::Container;
@@ -114,16 +115,16 @@ genScaScd(const char *outDir) const {
   }  
   ezxml_t psx = OX::addChild(cfx, "ports", 2); // this is required per the DTD even if empty
   std::set<std::string> portInterfaces;
-  for (OU::Assembly::ConnectionsIter ci = m_assembly.m_connections.begin();
+  for (OM::Assembly::ConnectionsIter ci = m_assembly.m_connections.begin();
        ci != m_assembly.m_connections.end(); ci++)
-    for (OU::Assembly::ExternalsIter ei = (*ci).m_externals.begin();
+    for (OM::Assembly::ExternalsIter ei = (*ci).m_externals.begin();
 	 ei != (*ci).m_externals.end(); ei++)
-      for (OU::Assembly::Connection::PortsIter pi = (*ci).m_ports.begin();
+      for (OM::Assembly::Connection::PortsIter pi = (*ci).m_ports.begin();
 	   pi != (*ci).m_ports.end(); pi++) {
-	OU::Assembly::Role &r = (*pi).m_role;
+	OM::Assembly::Role &r = (*pi).m_role;
 	assert(r.m_knownRole && !r.m_bidirectional);
 	const char *type;
-	const OU::Port *p;
+	const OM::Port *p;
 	for (unsigned n=0; (p = getMetaPort(n)); n++) {
 	  size_t nOps = p->nOperations();
 	  // For now we only support 1 operation

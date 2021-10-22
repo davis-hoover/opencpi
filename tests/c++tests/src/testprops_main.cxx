@@ -31,7 +31,7 @@ namespace OU = OCPI::Util;
 #define OCPI_OPTIONS \
   CMD_OPTION(loglevel,      l,   UChar,  "0",    "The logging level to be used during operation")
 
-#include "CmdOption.h"
+#include "CmdOption.hh"
 
 template <typename VT> void
 printType(const VT val) {

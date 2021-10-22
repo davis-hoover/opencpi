@@ -34,19 +34,20 @@ namespace OCPI {
       const char *status();
       OCPI::Container::Port *findPort(const char *) { return NULL; }
       const std::string &name() const { return m_name; }
-      void prepareProperty(OCPI::Util::Property &, volatile uint8_t *&, const volatile uint8_t *&) const {}
-      OCPI::Container::Port &createPort(const OCPI::Util::Port &, const OCPI::Util::PValue *) {
+      void prepareProperty(OCPI::Metadata::Property &, volatile uint8_t *&, const volatile uint8_t *&) const {}
+      OCPI::Container::Port &createPort(const OCPI::Metadata::Port &, const OCPI::Util::PValue *) {
 	assert("not called"==0);
 	return *(OCPI::Container::Port*)this;
       }
-      OCPI::Container::Port &createOutputPort(OCPI::Util::PortOrdinal, size_t, size_t,
+      OCPI::Container::Port &createOutputPort(OCPI::Metadata::PortOrdinal, size_t, size_t,
 					      const OCPI::Util::PValue*)
 	throw (OCPI::Util::EmbeddedException)
       {
 	assert("not called"==0);
 	return *(OCPI::Container::Port*)this;
       }
-      OCPI::Container::Port & createInputPort(OCPI::Util::PortOrdinal, size_t, size_t, const OCPI::Util::PValue*)
+      OCPI::Container::Port & createInputPort(OCPI::Metadata::PortOrdinal, size_t, size_t,
+					      const OCPI::Util::PValue*)
 	throw (OCPI::Util::EmbeddedException)
       {
 	assert("not called"==0);

@@ -21,9 +21,6 @@
 #include "cdkutils.h"
 #include "hdl-slot.h"
 
-namespace OE=OCPI::Util::EzXml;
-namespace OU=OCPI::Util;
-
 SlotTypes SlotType::s_slotTypes;
 
 SlotType::

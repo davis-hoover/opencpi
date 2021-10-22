@@ -105,10 +105,8 @@ namespace OCPI {
 
     inline int64_t struncate(int64_t val, size_t bytes) {
       (void)bytes;
-      ocpiAssert(bytes == sizeof(val) ||
-		 (val < 0 ?
-		  val >= (int64_t)-1 << (bytes*8-1) :
-		  val <= ~((int64_t)-1 << (bytes*8-1))));
+      int64_t min = (int64_t)(~(uint64_t)0 << (bytes*8-1));
+      ocpiAssert(bytes == sizeof(val) || (val < 0 ? val >= min : val <= ~min));
       return val;
     }
 

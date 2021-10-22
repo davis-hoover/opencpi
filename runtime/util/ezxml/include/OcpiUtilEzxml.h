@@ -38,7 +38,6 @@
 #include <cstring>
 #include <vector>
 #include "OcpiUtilVfs.h"
-#include "OcpiExprEvaluator.h"
 #include "ezxml.h"
 
 namespace OCPI {
@@ -66,12 +65,10 @@ namespace OCPI {
          * \post This instance is unused.
          */
 
-        Doc ()
-          throw ();
+        Doc();
 
 	// reduce warnings about pointer members
-	Doc (const Doc &)
-	  throw ();
+	Doc(const Doc &);
 
         /**
          * Constructor to parse XML from a string.
@@ -87,8 +84,7 @@ namespace OCPI {
          * \post This instance is in use.
          */
 
-        Doc (const std::string & data)
-          throw (std::string);
+        Doc (const std::string & data);
 
         /**
          * Constructor to parse XML from an input stream.
@@ -105,8 +101,7 @@ namespace OCPI {
          * \post This instance is in use.
          */
 
-        Doc (std::istream * in)
-          throw (std::string);
+        Doc (std::istream * in);
 
         /**
          * Constructor to parse XML from a file.
@@ -124,15 +119,13 @@ namespace OCPI {
          * \post This instance is in use.
          */
 
-        Doc (OCPI::Util::Vfs::Vfs & fs, const std::string & fileName)
-          throw (std::string);
+        Doc (OCPI::Util::Vfs::Vfs & fs, const std::string & fileName);
 
         /**
          * Destructor.  Releases the parsed document.
          */
 
-        ~Doc ()
-          throw ();
+        ~Doc();
 
         /**
          * Parse XML from a string.
@@ -146,8 +139,7 @@ namespace OCPI {
          * \post This instance is in use.
          */
 
-        ezxml_t parse (const std::string & data)
-          throw (std::string);
+        ezxml_t parse (const std::string & data);
 
         /**
          * Parse XML from a modifiable character array this will be owned
@@ -161,8 +153,7 @@ namespace OCPI {
          * \post This instance is in use.
          */
 
-        ezxml_t parse (char *data)
-          throw (std::string);
+        ezxml_t parse (char *data);
 
         /**
          * Parse XML from an input stream.
@@ -177,8 +168,7 @@ namespace OCPI {
          * \post This instance is in use.
          */
 
-        ezxml_t parse (std::istream * in)
-          throw (std::string);
+        ezxml_t parse (std::istream * in);
 
         /**
          * Parse XML from a file.
@@ -194,8 +184,7 @@ namespace OCPI {
          * \post This instance is in use.
          */
 
-        ezxml_t parse (OCPI::Util::Vfs::Vfs & fs, const std::string & fileName)
-          throw (std::string);
+        ezxml_t parse (OCPI::Util::Vfs::Vfs & fs, const std::string & fileName);
 
         /**
          * Get the document root element.
@@ -205,8 +194,7 @@ namespace OCPI {
          * \pre This instance is in use.
          */
 
-        ezxml_t getRootNode ()
-          throw ();
+        ezxml_t getRootNode();
 
       private:
         char * m_doc;
@@ -225,8 +213,6 @@ namespace OCPI {
       extern const char
 	*ezxml_parse_file(const char *file, ezxml_t &xml),
 	*ezxml_parse_str(char *string, size_t len, ezxml_t &xml),
-        // modify in-place based on conditional attributes or elements
-	*parseConditionals(ezxml_t xml, const OCPI::Util::IdentResolver &resolver),
 	*ezxml_tag(ezxml_t xml),
 	*checkTag(ezxml_t xml, const char *tag, const char *fmt, ...)
 	__attribute__((format(printf, 3, 4))),
@@ -257,9 +243,7 @@ namespace OCPI {
 		    bool setDefault = true),
         *getNumber64(ezxml_t x, const char *attr, uint64_t *np,
 		     bool *found = NULL, uint64_t defaultValue = 0,
-		     bool setDefault = true, bool required = false),
-	*getExprNumber(ezxml_t x, const char *attr, size_t &np, bool *found, std::string &expr,
-		       const IdentResolver *resolver);
+		     bool setDefault = true, bool required = false);
       extern unsigned
 	countChildren(ezxml_t x, const char*cName),
 	countAttributes(ezxml_t x);
@@ -276,6 +260,7 @@ namespace OCPI {
 	getOptionalString(ezxml_t x, std::string &s, const char *attr,
 			  const char *def = "");
       extern void
+        hoist(bool testValue, ezxml_t node, ezxml_t parent),
 	unindent(std::string &in), // strip common indent of lines in text element
 	getNameWithDefault(ezxml_t x, std::string &s, const char *fmt, unsigned &ord);
     }

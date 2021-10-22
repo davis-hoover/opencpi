@@ -43,7 +43,7 @@ SdpPort(const SdpPort &other, Worker &w , std::string &a_name, size_t a_count,
 // Virtual constructor: the concrete instantiated classes must have a clone method,
 // which calls the corresponding specialized copy constructor
 Port &SdpPort::
-clone(Worker &w, std::string &arg_name, size_t a_count, OCPI::Util::Assembly::Role */*role*/,
+clone(Worker &w, std::string &arg_name, size_t a_count, OM::Assembly::Role */*role*/,
       const char *&err) const {
   return *new SdpPort(*this, w, arg_name, a_count, err);
 }

@@ -31,7 +31,7 @@
 #define STDTR1 std::tr1
 #endif
 
-#include "OcpiPValue.h"
+#include "UtilPValue.hh"
 
 namespace OCPI
 {

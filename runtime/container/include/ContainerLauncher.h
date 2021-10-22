@@ -28,7 +28,7 @@
 #include <string>
 
 #include "OcpiUtilMisc.h" // Singleton
-#include "OcpiUtilValue.h"
+#include "UtilValue.hh"
 #include "OcpiLibraryManager.h"
 #include "OcpiRDTInterface.h"
 #include "OcpiContainerApi.h"
@@ -93,7 +93,7 @@ namespace OCPI {
 	LocalPort *m_port;
 	const char *m_name;
 	OCPI::Util::PValueList m_params;
-	const OCPI::Util::Port *m_metaPort; // needed on a server for the port that is not local
+	const OCPI::Metadata::Port *m_metaPort; // needed on a server for the port that is not local
 	// m_scale can be zero, meaning no fanout/fanin or bridging at all.
 	// If non-zero, it implies the need for bridging for local ports
 	size_t m_scale, m_index;           // ditto

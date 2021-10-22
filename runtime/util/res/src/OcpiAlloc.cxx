@@ -120,7 +120,6 @@ void OCPI::Util::ResPool::defrag()
 
 int OCPI::Util::MemBlockMgr::
 alloc(size_t nbytes, unsigned int alignment, OCPI::Util::ResAddrType& req_addr)
-  throw(std::bad_alloc) 
 {
 
   if (nbytes > 2000000) {
@@ -178,7 +177,6 @@ alloc(size_t nbytes, unsigned int alignment, OCPI::Util::ResAddrType& req_addr)
 
 
 int OCPI::Util::MemBlockMgr::free( OCPI::Util::ResAddrType addr )
-  throw( std::bad_alloc ) 
 {
 
   std::list<Block>::iterator it;
@@ -214,9 +212,7 @@ return -1;
 }
 
 OCPI::Util::MemBlockMgr::MemBlockMgr(OCPI::Util::ResAddrType start, size_t size )
-  throw( std::bad_alloc ) 
 {
-  
   m_pool = new OCPI::Util::ResPool;
   m_pool->total_size = size;
   m_pool->used = 0;
@@ -225,7 +221,6 @@ OCPI::Util::MemBlockMgr::MemBlockMgr(OCPI::Util::ResAddrType start, size_t size 
 
 
 OCPI::Util::MemBlockMgr::~MemBlockMgr()
-  throw()
 {
   ocpiDebug("Memory pool is using %zu of %zu on deletion", m_pool->used, m_pool->total_size);
   delete m_pool;

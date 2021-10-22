@@ -27,7 +27,7 @@
 namespace OU = OCPI::Util;
 
 #define OCPI_OPTIONS_HELP "This program loads all drivers. Supply at least one dummy argument.\n"
-#include "CmdOption.h" // for convenient main program and exception handling
+#include "CmdOption.hh" // for convenient main program and exception handling
 
 static int
 mymain(const char **) {

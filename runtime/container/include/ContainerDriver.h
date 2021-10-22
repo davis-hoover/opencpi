@@ -44,7 +44,7 @@
 #include "OcpiParentChild.h"
 #include "OcpiDriverManager.h"
 #include "TransportManager.hh"
-#include "OcpiUtilWorker.h"
+#include "MetadataWorker.hh"
 
 namespace OCPI {
   namespace Container {
@@ -85,8 +85,8 @@ namespace OCPI {
       inline static Container *find(const char *name) {
 	return getSingleton().findX(name);
       }
-      bool findContainersX(Callback &cb, OCPI::Util::Worker &i, const char *name);
-      inline static bool findContainers(Callback &cb, OCPI::Util::Worker &i, const char *name) {
+      bool findContainersX(Callback &cb, OCPI::Metadata::Worker &i, const char *name);
+      inline static bool findContainers(Callback &cb, OCPI::Metadata::Worker &i, const char *name) {
 	return getSingleton().findContainersX(cb, i, name);
       }
       void cleanForContextX(void *context);

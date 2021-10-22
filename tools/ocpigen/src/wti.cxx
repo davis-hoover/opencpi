@@ -27,9 +27,9 @@ WtiPort(Worker &w, ezxml_t x, Port *sp, int ordinal, const char *&err)
     m_secondsWidth(32), m_fractionWidth(0) {
   if ((err = OE::checkAttrs(x, "Name", "Clock", "SecondsWidth", "FractionWidth", "myoutputclock",
 			    "AllowUnavailable", "Pattern", "master", "myclock", "clockdirection", (void*)0)) ||
-      (err = OE::getExprNumber(x, "SecondsWidth", m_secondsWidth, NULL, m_secondsWidthExpr,
+      (err = OU::getExprNumber(x, "SecondsWidth", m_secondsWidth, NULL, m_secondsWidthExpr,
 			       &w)) ||
-      (err = OE::getExprNumber(x, "FractionWidth", m_fractionWidth, NULL, m_fractionWidthExpr,
+      (err = OU::getExprNumber(x, "FractionWidth", m_fractionWidth, NULL, m_fractionWidthExpr,
 			       &w)) ||
       (err = OE::getBoolean(x, "AllowUnavailable", &m_allowUnavailable)))
     return;
@@ -59,7 +59,7 @@ WtiPort(const WtiPort &other, Worker &w , std::string &name, const char *&err)
 // Virtual constructor: the concrete instantiated classes must have a clone method,
 // which calls the corresponding specialized copy constructor
 Port &WtiPort::
-clone(Worker &w, std::string &name, size_t a_count, OCPI::Util::Assembly::Role */*role*/,
+clone(Worker &w, std::string &name, size_t a_count, OM::Assembly::Role */*role*/,
       const char *&err) const {
   (void)a_count;
   assert(a_count <= 1);

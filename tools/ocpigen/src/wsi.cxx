@@ -47,7 +47,7 @@ WsiPort(Worker &w, ezxml_t x, DataPort *sp, int ordinal, const char *&err)
 // Our special copy constructor
 WsiPort::
 WsiPort(const WsiPort &other, Worker &w , std::string &a_name, size_t a_count,
-	OU::Assembly::Role *role, const char *&err)
+	OM::Assembly::Role *role, const char *&err)
   : DataPort(other, w, a_name, a_count, role, err) {
   if (err)
     return;
@@ -61,7 +61,7 @@ WsiPort(const WsiPort &other, Worker &w , std::string &a_name, size_t a_count,
 // Virtual constructor: the concrete instantiated classes must have a clone method,
 // which calls the corresponding specialized copy constructor
 Port &WsiPort::
-clone(Worker &w, std::string &a_name, size_t a_count, OCPI::Util::Assembly::Role *role,
+clone(Worker &w, std::string &a_name, size_t a_count, OM::Assembly::Role *role,
       const char *&err) const {
   err = NULL;
   return *new WsiPort(*this, w, a_name, a_count, role, err);
@@ -99,7 +99,7 @@ emitRecordSignal(FILE *f, std::string &last, const char *aprefix, bool inRecord,
     if (m_nOpcodes > 1) {
       d += "opcode => ";
       if (operations())
-	OU::formatAdd(d, "%s_OpCode_t'val(0), ", OU::Protocol::cname());
+	OU::formatAdd(d, "%s_OpCode_t'val(0), ", OM::Protocol::cname());
       else
 	d += "(others => '0'), ";
     }
@@ -179,18 +179,18 @@ emitVhdlShell(FILE *f, ::Port */*wci*/) {
 	fprintf(f,
 		"  %s_opcode <= %s_opcode_t'val(to_integer(unsigned(%s_opcode_temp)));\n",
 		name(), nOperations() ?
-		OU::Protocol::cname() : pname(), pname());
+		OM::Protocol::cname() : pname(), pname());
 #else
 	fprintf(f,
 		"  -- Xilinx/ISE 14.6 synthesis doesn't do the t'val(x) function properly\n"
 		"  -- Hence this workaround\n");
 	fprintf(f,
 		"  %s_opcode <=\n", cname());
-	OU::Operation *op = operations();
+	OM::Operation *op = operations();
 	unsigned nn;
 	for (nn = 0; nn < nOperations(); nn++, op++)
 	  fprintf(f, "%s    %s_%s_op_e when to_integer(unsigned(%s_opcode_temp)) = %u",
-		  nn ? " else\n" : "", OU::Protocol::cname(), op->cname(), pname(), nn);
+		  nn ? " else\n" : "", OM::Protocol::cname(), op->cname(), pname(), nn);
 	// If the protocol opcodes do not fill the space, fill it
 	if (nn < m_nOpcodes)
 #if 1 // fix inferred latch warning
@@ -212,16 +212,16 @@ emitVhdlShell(FILE *f, ::Port */*wci*/) {
 		"  -- Hence this workaround\n");
 	fprintf(f,
 		"  %s_opcode_pos <=\n", cname());
-	OU::Operation *op = operations();
+	OM::Operation *op = operations();
 	unsigned nn;
 	for (nn = 0; nn < nOperations(); nn++, op++)
 	  fprintf(f, "    %u when %s_opcode = %s_%s_op_e else\n",
-		  nn, cname(), OU::Protocol::cname(), op->cname());
+		  nn, cname(), OM::Protocol::cname(), op->cname());
 	// If the protocol opcodes do not fill the space, fill it
 	if (nn < m_nOpcodes)
 	  for (unsigned o = 0; nn < m_nOpcodes; nn++, o++)
 	    fprintf(f, "    %u when %s_opcode = %s_opcode_t'val(%u) else\n",
-		    nn, cname(), OU::Protocol::cname(), nn);
+		    nn, cname(), OM::Protocol::cname(), nn);
 	fprintf(f, "    0;\n");
 	fprintf(f,
 		"  %s_opcode_temp <= std_logic_vector(to_unsigned(%s_opcode_pos, %s_opcode_temp'length));\n",
@@ -444,7 +444,7 @@ emitImplSignals(FILE *f) {
 	    "  signal %s_opcode_temp : std_logic_vector(%zu downto 0);\n"
 	    "  signal %s_opcode_pos  : integer;\n",
 	    cname(), operations() ?
-	    OU::Protocol::m_name.c_str() : cname(), cname(), ocp.MReqInfo.width - 1, cname());
+	    OM::Protocol::m_name.c_str() : cname(), cname(), ocp.MReqInfo.width - 1, cname());
   }
   if (m_dataWidth)
     fprintf(f,
@@ -916,7 +916,7 @@ emitRecordInputs(FILE *f) {
     if (m_nOpcodes > 1)
       fprintf(f,
 	      "    opcode           : %s_OpCode_t;\n",
-	      operations() ? OU::Protocol::cname() : pname());
+	      operations() ? OM::Protocol::cname() : pname());
     fprintf(f,
 	    m_dataWidth ?
 	    "    som, valid, eom, eof  : Bool_t;           -- valid means data and byte_enable are present\n" :
@@ -960,7 +960,7 @@ emitRecordOutputs(FILE *f) {
     if (m_nOpcodes > 1)
       fprintf(f,
 	      "    opcode           : %s_OpCode_t;\n",
-	      operations() ? OU::Protocol::cname() : pname());
+	      operations() ? OM::Protocol::cname() : pname());
     if (m_dataWidth)
       fprintf(f,
 	      "    som, eom, valid  : Bool_t;       -- one or more must be true when 'give' is asserted\n");

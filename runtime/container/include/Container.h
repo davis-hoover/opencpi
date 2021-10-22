@@ -106,7 +106,7 @@ namespace OCPI {
       virtual bool portsInProcess() = 0;
       bool dynamic() const { return m_dynamic; }
       virtual Container *nextContainer() = 0;
-      virtual bool supportsImplementation(OCPI::Util::Worker &);
+      virtual bool supportsImplementation(OCPI::Metadata::Worker &);
       virtual OCPI::API::ContainerApplication *
 	createApplication(const char *name = NULL, const OCPI::Util::PValue *props = NULL)
         throw ( OCPI::Util::EmbeddedException ) = 0;

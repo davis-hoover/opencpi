@@ -79,7 +79,7 @@ namespace OCPI {
       //  optionally connected ports, you have optionally requested ports so that no buffer resources
       //  are used on a port until you specifically request buffers.
     public:
-      Port(Worker &w, const OCPI::Util::Port &md, const OCPI::Util::PValue *params, RCCPort &rp);
+      Port(Worker &w, const OCPI::Metadata::Port &md, const OCPI::Util::PValue *params, RCCPort &rp);
       virtual ~Port();
 
       bool isInProcess(OCPI::Container::LocalPort */*other*/) const { return true; }

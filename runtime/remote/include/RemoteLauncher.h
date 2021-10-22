@@ -69,10 +69,10 @@ namespace OCPI {
 	wait(unsigned remoteInstance, OCPI::OS::ElapsedTime timeout),
 	launch(Launcher::Members &members, Launcher::Connections &connections),
 	work(Launcher::Members &members, Launcher::Connections &connections);
-      OCPI::Util::Worker::ControlState getState(unsigned remoteInstance);
+      OCPI::Metadata::Worker::ControlState getState(unsigned remoteInstance);
       void
 	appShutdown(),
-	controlOp(unsigned remoteInstance, OU::Worker::ControlOperation),
+	controlOp(unsigned remoteInstance, OCPI::Metadata::Worker::ControlOperation),
 	setPropertyValue(unsigned remoteInstance, size_t propN, const char *v,
 			 const std::vector<uint8_t> &path, size_t offset, size_t dimension),
 	setPropertyBytes(unsigned remoteInstance, size_t propN, size_t offset, const uint8_t *v,

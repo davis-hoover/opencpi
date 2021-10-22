@@ -53,6 +53,7 @@ namespace OCPI {
     namespace OA = OCPI::API;
     namespace OD = OCPI::Driver;
     namespace OU = OCPI::Util;
+    namespace OM = OCPI::Metadata;
     namespace OT = OCPI::DataTransport;
     const char *container = "container";
 
@@ -131,7 +132,7 @@ namespace OCPI {
     void Manager::shutdown() {
       deleteChildren();
     }
-    bool Manager::findContainersX(Callback &cb, OU::Worker &i, const char *a_name) {
+    bool Manager::findContainersX(Callback &cb, OM::Worker &i, const char *a_name) {
       ocpiDebug("Finding containers for worker %s container name %s",
 		i.cname(), a_name ? a_name : "<none specified>");
       parent().configureOnce();

@@ -27,6 +27,7 @@
 namespace OA = OCPI::API;
 namespace OL = OCPI::Library;
 namespace OU = OCPI::Util;
+namespace OM = OCPI::Metadata;
 
 namespace OCPI {
   namespace Container {
@@ -98,8 +99,8 @@ namespace OCPI {
 	if (isSource == w->isSource() &&
 	    isMaster == (w->slaves().size() != 0 || w->isEmulator()) &&
 	    isSlave == w->hasMaster()) {
-	  assert(w->getState() == OU::Worker::INITIALIZED || 
-		 w->getState() == OU::Worker::SUSPENDED);
+	  assert(w->getState() == OM::Worker::INITIALIZED || 
+		 w->getState() == OM::Worker::SUSPENDED);
 	  ocpiInfo("Starting worker: %s in container %s from %s/%s", w->name().c_str(),
 		   container().name().c_str(), w->implTag().c_str(), w->instTag().c_str());
 	  w->start();

@@ -9,11 +9,11 @@ it may be either capitalized or upper case.
 
 Source Code file names
 -- C++ 
-   The intention is to move to "*.cc" and "*.hh", but for now it is "*.cxx" and "*.h".
-   These will be shorter, like OmniOrb, and hh makes it clear that the editing mode for the file
-   should be C++, not c.  User visible C++ files (workers) are already .cc etc.
+   The intention is to move to "*.cc" and "*.hh", but some are still "*.cxx" and "*.h".
+   The ".cc" and ".hh" suffixes are simpler and, like OmniOrb, and hh makes it clear that the
+   editing mode for the file should be C++, not C.  User visible C++ files (workers) are already .cc etc.
 
-   Generally camel-case to match classes, with the first word being the namespace
+   Generally camel-case to match namespaces (under OCPI) and classes, with the first word being the namespace
    of the directory of source files (without initial Ocpi), which usually matches the directory
    name which will be lower case.
    E.g. the file name ContainerPort.{cxx,cc,h,hh} would be in the directory named "container",
@@ -34,6 +34,8 @@ Source Code file names
    1. There must be a Ocpi prefix to the file name reflecting the global namespace.
    2. The end of the name before the suffix should be Api to unambiguously designate the file
       as appropriate for export and for API use (and for documentation).
+   The internal namespace-under-OCPI is generally NOT include in API headers, so they
+   must be globally unique since they are not qualified by the namespace-under-OCPI.
    Note that OcpiApi.hh is the "master API file" that should generally include all others.
 
 -- main programs
@@ -45,7 +47,7 @@ Source Code file names
 
 XML file names
    The .xml suffix is used uniformly.
-   Some files use a suffix after a hyphen when the suffix is not part of the name of the 
+   Some files use a suffix after a hyphen when the suffix is not part of the name of the
    thing being described in the file.  Two common ones are "-spec.xml" and "-prot.xml".
    Hyphens are used to make it clear that this is a type suffix, and not part of the name.
    Legacy files sometimes used underscore rather than hyphen.  Use hypen.

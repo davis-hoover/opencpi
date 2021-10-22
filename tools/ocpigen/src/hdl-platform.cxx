@@ -26,9 +26,6 @@
 #include "hdl.h"
 #include "hdl-platform.h"
 
-namespace OU = OCPI::Util;
-namespace OE = OCPI::Util::EzXml;
-
 HdlPlatform *HdlPlatform::
 create(ezxml_t xml, const char *xfile, const std::string &parentFile, Worker *parent, const char *&err) {
   err = NULL;

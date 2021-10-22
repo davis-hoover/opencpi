@@ -17,6 +17,7 @@ namespace OA = OCPI::API;
 namespace OL = OCPI::Library;
 namespace OS = OCPI::OS;
 namespace OU = OCPI::Util;
+namespace OM = OCPI::Metadata;
 
 typedef std::set<std::string> StringSet;
 typedef StringSet::const_iterator StringSetIter;
@@ -35,7 +36,7 @@ class OcpigrObj {
     int numWorkers;
     std::map<std::string, StringSet> specToPlatforms;
     std::map<std::string, std::string> platformToModel;
-    std::map<std::string, std::map<std::string, std::set<OU::Property *>>> workerSpecificProperties;
+    std::map<std::string, std::map<std::string, std::set<OM::Property *>>> workerSpecificProperties;
     StringSet specs;
 
     // Private functions for genPlatformBlocks
@@ -48,8 +49,8 @@ class OcpigrObj {
     void endTreeSeq(YAML::Emitter&, int&);
 
     // Private functions for genWorkerBlocks
-    void addProperty(YAML::Emitter&, OU::Worker&, OU::Property*);
-    const char* incompatibleType(OU::Worker&, const char*, const char*);
+    void addProperty(YAML::Emitter&, OM::Worker&, OM::Property*);
+    const char* incompatibleType(OM::Worker&, const char*, const char*);
 
   public:
     // Constructor
@@ -62,7 +63,7 @@ class OcpigrObj {
     { }
 
     // Public Functions for mymain
-    void genWorkerBlocks(OU::Worker&);
+    void genWorkerBlocks(OM::Worker&);
     void genOcpiBlockTree(void);
     void genContainerBlock(void);  
 };

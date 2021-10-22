@@ -31,7 +31,7 @@
 #include "OsFileSystem.hh"
 #include "OcpiUtilMisc.h"
 #include "OcpiUtilEzxml.h"
-#include "OcpiUtilAssembly.h"
+#include "MetadataAssembly.hh"
 #include "OcpiUtilCppMacros.h"
 #include "wip.h"
 #include "hdl.h"
@@ -176,7 +176,7 @@ tryOneChildInclude(ezxml_t top, const std::string &parent, const char *element,
 
 const char *Worker::
 addProperty(ezxml_t prop, bool includeImpl, bool anyIsBad, bool isRaw, bool isBuiltin) {
-  OU::Property &p = *new OU::Property;
+  OM::Property &p = *new OM::Property;
   const char *err;
 
   p.m_name = ezxml_cattr(prop, "name"); // do this redundantly to enable error messages
@@ -291,7 +291,7 @@ doMaybeProp(ezxml_t maybe, void *vpinfo) {
   const char *name = ezxml_cattr(maybe, "Name");
   if (!name)
     return pinfo.addError("Property or SpecProperty has no \"Name\" attribute");
-  OU::Property *p = NULL;
+  OM::Property *p = NULL;
   for (PropertiesIter pi = w->m_ctl.properties.begin(); pi != w->m_ctl.properties.end(); pi++) {
     if (!strcasecmp((*pi)->m_name.c_str(), name)) {
       p = *pi;
@@ -323,7 +323,7 @@ doMaybeProp(ezxml_t maybe, void *vpinfo) {
       bool raw = false;
       p->m_isRaw = true;
       for (PropertiesIter pi = w->m_ctl.properties.begin(); pi != w->m_ctl.properties.end(); pi++) {
-	OU::Property &pp = **pi;
+	OM::Property &pp = **pi;
 	if (&pp == p)
 	  raw = true;
 	else if (raw && !pp.m_rawSet && !pp.m_isParameter)
@@ -361,7 +361,7 @@ const char *parseControlOp(const char *op, void *arg) {
   Worker *w = (Worker *)arg;
   unsigned n = 0;
   const char **p;
-  for (p = OU::Worker::s_controlOpNames; *p; p++, n++)
+  for (p = OM::Worker::s_controlOpNames; *p; p++, n++)
     if (!strcasecmp(*p, op)) {
       w->m_ctl.controlOps |= 1u << n;
       break;
@@ -436,7 +436,7 @@ parseImplControl(ezxml_t &xctl) {
   if (firstRaw && !m_ctl.rawProperties) { // firstraw was not found yet.  Must simply be a spec property
     bool raw = false;
     for (PropertiesIter pi = m_ctl.properties.begin(); pi != m_ctl.properties.end(); pi++) {
-      OU::Property &p = **pi;
+      OM::Property &p = **pi;
       if (!strcasecmp(p.cname(), firstRaw)) {
 	if (p.m_isParameter)
 	  return OU::esprintf("The property designated as firstRaw (%s), cannot be a parameter property",
@@ -480,7 +480,7 @@ parseImplControl(ezxml_t &xctl) {
     if (findProperty(l_name.c_str()))
       return OU::esprintf("Scaling parameter \"%s\" conflicts with property name",
                           l_name.c_str());
-    OU::Port::Scaling s;
+    OM::Port::Scaling s;
     if ((err = s.parse(x, this)))
       return err;
     if (l_name.empty())
@@ -500,12 +500,12 @@ finalizeProperties() {
   // do the offset calculations and summarize the access type counts and flags
   const char *err;
 #if 0
-  if ((err = OU::Worker::finalizeProperties(m_ctl.offset, m_ctl.sizeOfConfigSpace, this)))
+  if ((err = OM::Worker::finalizeProperties(m_ctl.offset, m_ctl.sizeOfConfigSpace, this)))
     return err;
 #else
   bool raw = false;
   for (PropertiesIter pi = m_ctl.properties.begin(); pi != m_ctl.properties.end(); pi++) {
-    OU::Property &p = **pi;
+    OM::Property &p = **pi;
     if (p.m_isRaw)
       raw = true;
     else if ((err = p.offset(m_ctl.offset, m_ctl.sizeOfConfigSpace, this)))
@@ -514,7 +514,7 @@ finalizeProperties() {
   if (raw) {
     m_ctl.offset = OU::roundUp(m_ctl.offset, 4);
     for (PropertiesIter pi = m_ctl.properties.begin(); pi != m_ctl.properties.end(); pi++) {
-      OU::Property &p = **pi;
+      OM::Property &p = **pi;
       if (p.m_isRaw && (err = p.offset(m_ctl.offset, m_ctl.sizeOfConfigSpace, this)))
 	return err;
     }
@@ -737,7 +737,7 @@ getBoolean(ezxml_t x, const char *name, bool *b, bool trueOnly) {
 #endif
 
 const char*
-extractExprValue(const OU::Property &p, const OU::Value &v, OU::ExprValue &val) {
+extractExprValue(const OM::Property &p, const OU::Value &v, OU::ExprValue &val) {
   const char *err = val.setFromTypedValue(v);
   if (err)
     return OU::esprintf("the '%s' parameter property expression is invalid: %s",
@@ -759,10 +759,10 @@ const char *Worker::
 getValue(const char *sym, OU::ExprValue &val) const {
   for (PropertiesIter pi = m_ctl.properties.begin(); pi != m_ctl.properties.end(); pi++)
     if (!strcasecmp((*pi)->m_name.c_str(), sym)) {
-      OU::Property &p = **pi;
+      OM::Property &p = **pi;
       if (m_instancePVs.size()) {
         // FIXME: obviously a map would be nice here..
-        const OU::Assembly::Property *ap = &m_instancePVs[0];
+        const OM::Assembly::Property *ap = &m_instancePVs[0];
         for (size_t n = m_instancePVs.size(); n; n--, ap++)
           if (ap->m_hasValue && !strcasecmp(sym, ap->m_name.c_str())) {
             // The value of the expression identifier matches the name of a provided instance
@@ -850,7 +850,7 @@ skipFile(const char *file, void *arg) {
 // This will evolve as more things are based on derived classes
 Worker *Worker::
 create(const char *file, const std::string &parentFile, const char *package, const char *outDir,
-       Worker *parent, OU::Assembly::Properties *instancePVs, size_t paramConfig,
+       Worker *parent, OM::Assembly::Properties *instancePVs, size_t paramConfig,
        const char *&err) {
   err = NULL;
   // If there are slashes, it is "just a file name", so leave it alone.
@@ -866,7 +866,7 @@ create(const char *file, const std::string &parentFile, const char *package, con
   std::string fileName(file);
   if (!slash && dot && strcasecmp("xml", dot + 1)) {
     const char *model = NULL;
-    for (const char **cp = OU::g_models; *cp; ++cp)
+    for (const char **cp = OM::g_models; *cp; ++cp)
       if (!strcasecmp(*cp, dot + 1)) {
 	model = dot + 1;
 	break;
@@ -1037,14 +1037,14 @@ initAccess() {
 // But it may also change the counts (e.g. non-parameter to parameter)
 // All the raw stuff is done in the HDL parser.
 void Control::
-summarizeAccess(OU::Property &p, bool isSpecProperty) {
+summarizeAccess(OM::Property &p, bool isSpecProperty) {
   if (p.m_isParameter) {
     if (isSpecProperty) {
       // If we are being morphed to a parameter, we might need to
       // reassign parameter ordinals, so do it over again, and recount runtimes
       nRunProperties = nParameters = 0;
       for (PropertiesIter pi = properties.begin(); pi != properties.end(); pi++) {
-	OU::Property &pp = **pi;
+	OM::Property &pp = **pi;
 	if (pp.m_isParameter)
 	  pp.m_paramOrdinal = nParameters++;
 	else
@@ -1074,7 +1074,7 @@ summarizeAccess(OU::Property &p, bool isSpecProperty) {
 
 Worker::
 Worker(ezxml_t xml, const char *xfile, const std::string &parentFile,
-       WType type, Worker *parent, OU::Assembly::Properties *ipvs, const char *&err)
+       WType type, Worker *parent, OM::Assembly::Properties *ipvs, const char *&err)
   : m_xml(xml), m_file(xfile ? xfile : ""), m_parentFile(parentFile),
     m_model(NoModel), m_baseTypes(NULL), m_modelString(NULL), m_type(type), m_isDevice(false),
     m_wci(NULL), m_noControl(false), m_reusable(false),
@@ -1214,9 +1214,9 @@ getPort(const char *a_name, Port *&p, Port *except) const {
     OU::esprintf("No port named \"%s\" was found in worker \"%s\"", a_name, m_implName);
 }
 
-// virtual Callback from OU::Port - indexed by data ports, not all ports
-// FIXME: have the util data ports injected into the OU::Worker as they are created...
-OU::Port &Worker::
+// virtual Callback from OM::Port - indexed by data ports, not all ports
+// FIXME: have the util data ports injected into the OM::Worker as they are created...
+OM::Port &Worker::
 metaPort(unsigned long which) const {
   unsigned long ordinal = 0;
   for (unsigned n = 0; n < m_ports.size(); ++n)
@@ -1226,7 +1226,7 @@ metaPort(unsigned long which) const {
       ordinal++;
     }
   assert("Missing data port" == 0);
-  return *(OU::Port *)this;
+  return *(OM::Port *)this;
 }
 
 Worker::~Worker() {
@@ -1340,15 +1340,15 @@ deriveOCP() {
   return NULL;
 }
 
-OU::Property *Worker::
+OM::Property *Worker::
 findProperty(const char *a_name) const {
   for (PropertiesIter pi = m_ctl.properties.begin(); pi != m_ctl.properties.end(); pi++)
     if (!strcasecmp((*pi)->m_name.c_str(), a_name))
       return *pi;
   return NULL;
 }
-OU::Port *Worker::
-findMetaPort(const char *id, const OU::Port *except) const {
+OM::Port *Worker::
+findMetaPort(const char *id, const OM::Port *except) const {
   for (unsigned i = 0; i < m_ports.size(); i++) {
     Port *p = m_ports[i];
     if (p && p->m_name.length() && !strcasecmp(p->pname(), id) && p->isData() &&

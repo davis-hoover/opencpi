@@ -1,9 +1,19 @@
-This property facility manages runtime properties, types, and values.
+This directory contains code to support runtime typed data values.
+The typing system is roughly based on the IDL/CORBA typing system where there are scalars, structures,
+multidimensional arrays of scalars, and (runtime-variable-length single dimension) sequences of scalars
+or arrays or structs.
+Scalars are numbers of various types and sizes, as well as strings.
 
-Properties are named and typed and are associated with some other "thing" that wants to have readable and writable properties.
+And types can be recursive (sequences of arrays of sequences of sequences) etc.
 
-Property value lists, and lists of name/typed-value pairs that are used to convey a set of named values as parameter to various APIs, and can also be used to specify a set of values to be set on an object that has properties.
+There are these capabilities:
 
-Typed values are essentially a union type that can hold any of the allowable typed values.
+- Data type management, including parsing XML representations of data types.
+- Value management where we parse textual values into runtime values and "unparse" values into text.
+- A special case of typed scalar-only runtime parameter values, called PValues where variable length arrays
+  of typed scalar values are passed to certain high-level functions.
+- serialize and deserialize (reader/writer) functions for structures (ordered, named, typed, values) to
+  put these values into contiguous binary buffers of data.
 
-The set of potential types of value are limited to be a sweet spot of simplicity and convenience, and are intended to at least encompass property types as defined in the SCA specification.
+
+

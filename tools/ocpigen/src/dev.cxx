@@ -63,7 +63,7 @@ DevSignalsPort(const DevSignalsPort &other, Worker &w, std::string &name, size_t
 }
 
 Port &DevSignalsPort::
-clone(Worker &w, std::string &name, size_t a_count, OCPI::Util::Assembly::Role *, const char *&err)
+clone(Worker &w, std::string &name, size_t a_count, OM::Assembly::Role *, const char *&err)
   const {
   return *new DevSignalsPort(*this, w, name, a_count, err);
 }

@@ -28,9 +28,6 @@
 #include "data.h"
 #include "rcc.h"
 
-namespace OU = OCPI::Util;
-namespace OF = OCPI::OS::FileSystem;
-
 // Generate the readonly implementation file.
 // What implementations must explicitly (verilog) or implicitly (VHDL) include.
 #define RCC_C_HEADER ".h"
@@ -431,7 +428,7 @@ rccValue(OU::Value &v, std::string &value, const OU::Member &param) {
 
 
 const char *Worker::
-rccPropValue(OU::Property &p, std::string &value) {
+rccPropValue(OM::Property &p, std::string &value) {
   if (p.m_default)
     return rccValue(*p.m_default, value, p);
   // Generate a default value
@@ -577,7 +574,7 @@ emitRccArgTypes(FILE *f, bool &first) {
       if (worker().m_ports[n]->isData()) {
         DataPort &other = *static_cast<DataPort*>(worker().m_ports[n]);
         if (other.operations() &&
-            !strcasecmp(other.OU::Protocol::cname(), OU::Protocol::cname()))
+            !strcasecmp(other.OM::Protocol::cname(), OM::Protocol::cname()))
           return;
       }
     if (first)
@@ -586,14 +583,14 @@ emitRccArgTypes(FILE *f, bool &first) {
               "   * Data types for each protocol used by a port of this worker\n"
               "   */\n");
     first = false;
-    OU::Operation *o = operations();
+    OM::Operation *o = operations();
     std::string aprefix;
     if (nOperations()) {
-      camel(aprefix, OU::Protocol::cname());
+      camel(aprefix, OM::Protocol::cname());
       fprintf(f,
               "  // Enumeration constants for the operations of protocol \"%s\"\n"
               "  enum %sOpCodes { \n",
-              OU::Protocol::cname(), aprefix.c_str());
+              OM::Protocol::cname(), aprefix.c_str());
       for (unsigned nn = 0; nn < nOperations(); o++) {
         std::string s;
         camel(s, o->cname());
@@ -614,13 +611,13 @@ emitRccArgTypes(FILE *f, bool &first) {
                     "  /*\n"
                     "   * Argument data types for the \"%s\" protocol\n"
                     "   */\n",
-                    OU::Protocol::cname());
+                    OM::Protocol::cname());
           if (ofirst)
             fprintf(f,
                     "  /* Argument data types for the \"%s\" operation of the \"%s\" protocol */\n",
-                    o->cname(), OU::Protocol::cname());
+                    o->cname(), OM::Protocol::cname());
           pfirst = ofirst = false;
-          camel(aprefix, OU::Protocol::cname(), o->cname(), NULL);
+          camel(aprefix, OM::Protocol::cname(), o->cname(), NULL);
 
           worker().m_maxLevel = 0;
           unsigned pad = 0;
@@ -728,7 +725,7 @@ emitImplSlavesConfig(FILE *f, unsigned pc) {
 	    index+1, index+1, index);
     for (auto prop_it = (*it).second->m_ctl.properties.begin();
 	 prop_it != (*it).second->m_ctl.properties.end(); ++prop_it) {
-      OU::Property &p = **prop_it;
+      OM::Property &p = **prop_it;
       std::string cast, type, pretty;
       // This is the bare minimum for enum types and base types.
       // FIXME: more types
@@ -974,7 +971,7 @@ emitImplRCC() {
             " * Definitions for default values of parameter properties.\n"
             " */\n");
     for (PropertiesIter pi = m_ctl.properties.begin(); pi != m_ctl.properties.end(); pi++) {
-      OU::Property &p = **pi;
+      OM::Property &p = **pi;
       if (p.m_isParameter) {
         fprintf(f,
                 "/* The constant value of the parameter property named: %s */\n"
@@ -1080,7 +1077,7 @@ emitImplRCC() {
     if (writeNotifiers) {
       fprintf(f, "  %s::Notification %s::s_write_notifiers[] = {\\\n", s.c_str(), s.c_str());
       for (PropertiesIter pi = m_ctl.properties.begin(); pi != m_ctl.properties.end(); pi++) {
-        OU::Property &p = **pi;
+        OM::Property &p = **pi;
         if (!p.m_isParameter && p.m_writeSync)
           fprintf(f, "  &%c%sWorkerBase::%s_written,\\\n", toupper(m_implName[0]),
                   m_implName + 1, p.m_name.c_str());
@@ -1092,7 +1089,7 @@ emitImplRCC() {
     if (readNotifiers) {
       fprintf(f, "  %s::Notification %s::s_read_notifiers[] = {\\\n", s.c_str(), s.c_str());
       for (PropertiesIter pi = m_ctl.properties.begin(); pi != m_ctl.properties.end(); pi++) {
-        OU::Property &p = **pi;
+        OM::Property &p = **pi;
         if (!p.m_isParameter && p.m_readSync)
           fprintf(f, "  &%c%sWorkerBase::%s_read,\\\n", toupper(m_implName[0]),
                   m_implName + 1, p.m_name.c_str());
@@ -1156,7 +1153,7 @@ emitImplRCC() {
       last = "";
       fprintf(f, " %s RCCMethod ", m_pattern ? "extern" : "static");
       unsigned op = 0;
-      for (const char **cp = OU::Worker::s_controlOpNames; *cp; cp++, op++)
+      for (const char **cp = OM::Worker::s_controlOpNames; *cp; cp++, op++)
         if (m_ctl.controlOps & (1u << op)) {
           if ((err = rccMethodName(*cp, mName))) {
             free((void *)mName);
@@ -1198,7 +1195,7 @@ emitImplRCC() {
       fprintf(f, " .propertySize = sizeof(%c%sProperties),\\\n",
               toupper(m_implName[0]), m_implName + 1);
     unsigned op = 0;
-    for (const char **cp = OU::Worker::s_controlOpNames; *cp; cp++, op++)
+    for (const char **cp = OM::Worker::s_controlOpNames; *cp; cp++, op++)
       if (m_ctl.controlOps & (1u << op)) {
         if ((err = rccMethodName(*cp, mName))) {
           free((void *)mName);
@@ -1280,7 +1277,7 @@ emitSkelRCC() {
   unsigned op = 0;
   const char **cp;
   const char *mName; // TODO: Move to std::string to stop worrying
-  for (cp = OU::Worker::s_controlOpNames; *cp; cp++, op++)
+  for (cp = OM::Worker::s_controlOpNames; *cp; cp++, op++)
     if (m_ctl.controlOps & (1u << op)) {
       if ((err = rccMethodName(*cp, mName))) {
         free((void *)mName);
@@ -1367,7 +1364,7 @@ addSlavesConfig(ezxml_t a_slaves) {
   ocpiInfo("For config %zu, slave before conditional is:"
 	   "\n===Original:\n%s\n===Copy:\n%s",
 	   nConfig, ezxml_toxml(a_slaves), ezxml_toxml(m_slavesXml));
-  if ((err = OE::parseConditionals(m_slavesXml, *this)))
+  if ((err = OU::parseConditionals(m_slavesXml, *this)))
     return OU::esprintf("Error processing conditional slave assembly: %s", err);
   ocpiInfo("===After processing:\n%s", ezxml_toxml(m_slavesXml));
   //cout << ezxml_toxml(m_xml);
@@ -1631,7 +1628,7 @@ emitRccCppImpl(FILE *f) {
           "  class %c%sPort : public OCPI::RCC::RCCUserPort {\n",
           toupper(cname()[0]), cname()+1);
   // Now emit structs for messages
-  OU::Operation *o = operations();
+  OM::Operation *o = operations();
   if (o) {
     std::string ops;
     OU::format(ops, "%c%sOperations", toupper(cname()[0]), cname()+1);
@@ -1661,7 +1658,7 @@ emitRccCppImpl(FILE *f) {
       fprintf(f, "    //////// %s (%zu arguments) ////////\n", s.c_str(), o->nArgs());
       if (o->nArgs()) {
         std::string op;
-        camel(op, worker().m_implName, "WorkerTypes::", OU::Protocol::cname(),
+        camel(op, worker().m_implName, "WorkerTypes::", OM::Protocol::cname(),
               o->cname());
         fprintf(f,
                 "    class %sOp : public OCPI::RCC::RCCPortOperation {\n"
@@ -1714,7 +1711,7 @@ emitRccCppImpl(FILE *f) {
           std::string p;
           camel(p, cname() );
           std::string on;
-          camel(on, worker().m_implName, "WorkerTypes::", OU::Protocol::cname(),
+          camel(on, worker().m_implName, "WorkerTypes::", OM::Protocol::cname(),
                 o->cname());
           std::string type;
           size_t offset;
@@ -1760,7 +1757,7 @@ emitRccCppImpl(FILE *f) {
               if (n != o->nArgs() - 1)
                 return OU::esprintf("for protocol \"%s\" operation \"%s\" argument \"%s\": "
                                     "sequences can only be last argument in operation",
-                                    OU::Protocol::cname(), o->cname(),
+                                    OM::Protocol::cname(), o->cname(),
                                     m->cname());
               fprintf(f,
                       "         inline void resize(size_t size) {\n"
@@ -1819,7 +1816,7 @@ emitRccCppImpl(FILE *f) {
       if (o->nArgs()) {
         std::string s, prot, aprefix;
         camel(s, o->cname());
-        camel(prot, OU::Protocol::cname());
+        camel(prot, OM::Protocol::cname());
         camel(aprefix, worker().m_implName, "WorkerTypes::", prot.c_str(),
               o->cname());
         if (first) {
@@ -1848,7 +1845,7 @@ emitRccCImpl(FILE *f) {
         DataPort *dp = static_cast<DataPort*>(worker().m_ports[nn]);
 
         if (dp->operations() &&
-            !strcasecmp(dp->OU::Protocol::cname(), OU::Protocol::cname()))
+            !strcasecmp(dp->OM::Protocol::cname(), OM::Protocol::cname()))
           break;
       }
     if (nn >= ::Port::m_ordinal) {
@@ -1857,9 +1854,9 @@ emitRccCImpl(FILE *f) {
               " * Enumeration of operations for protocol %s (%s)\n"
               " */\n"
               "typedef enum {\n",
-              OU::Protocol::m_name.c_str(), OU::Protocol::m_qualifiedName.c_str());
-      OU::Operation *o = operations();
-      char *puName = upperdup(OU::Protocol::cname());
+              OM::Protocol::m_name.c_str(), OM::Protocol::m_qualifiedName.c_str());
+      OM::Operation *o = operations();
+      char *puName = upperdup(OM::Protocol::cname());
       for (unsigned no = 0; no < nOperations(); no++, o++) {
         char *ouName = upperdup(o->cname());
         fprintf(f, " %s_%s,\n", puName, ouName);
@@ -1867,8 +1864,8 @@ emitRccCImpl(FILE *f) {
       }
       free(puName);
       fprintf(f, "} %c%sOperation;\n",
-              toupper(*OU::Protocol::cname()),
-              OU::Protocol::cname() + 1);
+              toupper(*OM::Protocol::cname()),
+              OM::Protocol::cname() + 1);
     }
   }
 }
@@ -1883,7 +1880,7 @@ emitRccCImpl1(FILE *f) {
             " */\n"
             "typedef enum {\n",
             cname(), worker().m_implName);
-    OU::Operation *o = operations();
+    OM::Operation *o = operations();
     char *puName = upperdup(cname());
     for (unsigned nn = 0; nn < nOperations(); nn++, o++) {
       char *ouName = upperdup(o->cname());
