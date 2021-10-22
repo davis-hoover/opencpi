@@ -65,7 +65,7 @@ _ocpidev()
     # valid verbs
     verbs="build delete create clean register unregister set unset show refresh run utilization"
     # valid nouns in first slot
-    nouns1="project registry application component protocol test library worker hdl"
+    nouns1="project registry application component protocol test library worker hdl prerequisites"
     # valid nouns in second slot
     nouns2="assembly card slot device platform platforms targets primitive primitives"
     # valid nouns in third slot
@@ -112,7 +112,7 @@ _ocpidev()
     elif [[ ${verb} == show ]] ; then
       # valid nouns in first slot
       nouns1="projects registry components workers platforms targets hdl rcc project libraries \
-             tests component"
+             tests component prerequisites"
       # valid nouns in second slot
       nouns2="platforms targets"
       # valid nouns in third slot

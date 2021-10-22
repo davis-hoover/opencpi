@@ -30,4 +30,5 @@ __all__ = [
     "assembly",
     "library",
     "component",
+    "prerequisite"
     ]
