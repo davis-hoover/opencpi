@@ -134,6 +134,8 @@ PKGS_E+=(perl-ExtUtils-MakeMaker)
 PKGS_E+=(chrpath diffstat texinfo)
 #    Needed to generate gitlab-ci yaml
 PKGS_E+=(python36-PyYAML)
+#    Needed to build pillow >= 8.4.0 dependency for matplotlib
+PKGS_E+=(libjpeg-turbo-devel)
 
 ##########################################################################################
 # P. python3 packages that must be installed using pip3, which we have available
@@ -220,5 +222,6 @@ install_swig3
 
 # And finally, install the remaining python3 packages
 $SUDO pip3 install ${PKGS_P[*]}
+[ $? -ne 0 ] && bad "Installing pip3 packages failed"
 
 exit 0
