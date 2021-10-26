@@ -143,7 +143,7 @@ class Prerequisite(DictWrapper):
         """
         prereq = Prerequisite(root)
 
-        for platform in root.iterdir():
+        for platform in sorted(root.iterdir()):
             if platform.is_dir() and Prerequisite._platform_valid(platforms, platform):
                     prereq.add_platform(platform.name)
             else:
@@ -241,7 +241,7 @@ class Prerequisites(DictWrapper):
         except OCPIException:
             platforms = None
 
-        for directory in root.iterdir():
+        for directory in sorted(root.iterdir()):
             if directory.is_dir():
                 prereq_directory.add_prerequisite(directory.name, Prerequisite.create(directory, platforms))
 
@@ -251,7 +251,7 @@ class Prerequisites(DictWrapper):
         """
         Print the prereqs as a list of names
         """
-        print(" ".join(sorted(self.get_prerequisites())))
+        print(" ".join(self.get_prerequisites()))
 
     def print_table(self):
         """
