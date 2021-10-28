@@ -1160,6 +1160,8 @@ define OcpiSetAsset
     $$(infox Not including worker XML directly for make variables)
   else ifeq ($2,Platform)
     $$(infox Not including platform worker XML directly for make variables)
+  else ifeq ($2,Test)
+    $$(eval $$(call OcpiParseXml,$1,$$(subst .,-,$$(OcpiAssetName))))
   else ifneq ($(filter-out Platforms Primitive Primitives Applications Application,$2),)
     $$(error Unexpected asset type: $2)
   else ifeq ($2,Application)
