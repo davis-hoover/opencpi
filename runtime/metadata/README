@@ -1,12 +1,14 @@
-This directory contains code that implements objects that are the runtime behavior
-of things that have XML.
-
-It parses (imports) them and sometimes serializes (unparses, exports to text) them.
-
-Basically anything found in XML that is processed at runtime and needs a class for
-runtime behavior will have that class implemented here.
+This directory contains code that implements objects that are the runtime behavior of XML objects.
+It parses them and sometimes serializes them (writes out XML from data structure/objects).
+Basically anything found in XML that is processed at runtime and needs a runtime class for
+runtime behavior will have that class implemented here except data type XML which is at a lower level.
 
 Current examples are assemblies, workers, ports, protocols.
 
 XMl is used to provide a structured, hierarchical textual representation, and alternatives
 such as YAML would serve the same purposes.
+
+The assembly class is the runtime or tooltime parsing class to manage assemblies for
+various purposes.  In general, an assembly has instances of workers or components,
+with per-instance properties,  connections between the ports of the instances, and
+external connections that externalize ports of instances.

@@ -37,7 +37,6 @@
 #include <iostream>
 #include <cstring>
 #include <vector>
-#include "OcpiUtilVfs.h"
 #include "ezxml.h"
 
 namespace OCPI {
@@ -57,6 +56,7 @@ namespace OCPI {
        * memory in its destructor).
        */
 
+#if 0
       class Doc {
       public:
         /**
@@ -200,7 +200,7 @@ namespace OCPI {
         char * m_doc;
         ezxml_t m_rootNode;
       };
-
+#endif
       extern ezxml_t
 	ezxml_firstChild(ezxml_t xml),
 	ezxml_nextChild(ezxml_t xml),

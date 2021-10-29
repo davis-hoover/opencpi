@@ -1,0 +1,11 @@
+This library/layer contains infrastructure modules for OpenCPI that are widely used and
+widely depended on by all upper layers of OpenCPI.
+The functionality is fairly unique to OpenCPI and is thus not part of the more
+utilitarian librarys and layers below here.
+
+The layers below this one contain OS abstraction, imported/foreign code, and
+core that provides broadly common utility functions.
+
+So code that is very generic should probably go in the util layer below this, while
+code that should be considered OpenCPI infrastructure should be here.
+

@@ -28,7 +28,6 @@
 
 #include "ezxml.h"
 #include "OsAssert.hh"
-#include "OcpiUtilVfs.h"
 #include "OcpiUtilEzxml.h"
 #include "OcpiUtilMisc.h"
 
@@ -39,6 +38,7 @@ namespace OCPI {
 // Note: Before AV-2913, AV used a std::set<> to hold valid attributes/elements/etc. See git revision before this line was added for that code.
 
       namespace OU = OCPI::Util;
+#if 0
       Doc::
       Doc ()
 	: m_doc (0), m_rootNode (0)
@@ -295,7 +295,7 @@ namespace OCPI {
 	ocpiAssert (m_rootNode);
 	return m_rootNode;
       }
-
+#endif
       // common error return that collects valid possible values 3 ways.
       // uses "heavier" "std::set" but only happens when already failing
       static const char *

@@ -1,0 +1,13 @@
+This directory holds runtime C++ software for OpenCPI (and some foreign C code that is not C++)
+This is the software that is required to run applications.
+Some of the code here is also used by some development tools that do not really operate in the runtime environment.
+I.e. if software is used by both runtime and tools, it is considered runtime software since the runtime
+software has more constraints than tool software (i.e. it must run on embedded systems and many compilers).
+
+The runtime software here relies the OpenCPI os abstraction layer in ../os.
+It also relies on calls to some (runtime, cross-compiled) prerequisite software libraries like gpsd amd lzma,
+as well as standard C++ libraries, and OS system libraries and system calls.
+
+Thus the runtime stack of software is typically layered (higher levels can use lower levels, but NOT vice versa.).
+
+The actual ordering or layering is defined in the ../build/places file.
