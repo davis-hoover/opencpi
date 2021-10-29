@@ -42,7 +42,7 @@
 #define OCPI_DRIVER_MANAGER_H
 #include "OsMutex.hh"
 #include "OcpiParentChild.h"
-#include "OcpiPValue.h"
+#include "UtilPValue.hh"
 #include "OsAssert.hh"
 #include "OcpiUtilMisc.h" // Singleton
 #include "ezxml.h"

@@ -34,6 +34,7 @@
 
 namespace OC = OCPI::Container;
 namespace OA = OCPI::API;
+namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 namespace OD = OCPI::DataTransport;
 namespace OR = OCPI::RDT;
@@ -43,7 +44,7 @@ namespace OCPI {
   namespace RCC {
 
     Port::
-    Port(Worker& w, const OU::Port & pmd, const OU::PValue *params, RCCPort &rp)
+    Port(Worker& w, const OM::Port & pmd, const OU::PValue *params, RCCPort &rp)
       :  OC::PortBase<Worker, Port, OCPI::RCC::ExternalPort>(w, *this, pmd, params),
 	 m_localOther(NULL), m_rccPort(rp), m_buffer(NULL),
 	 // Internal ports for non-scaled crews don't get buffers
@@ -54,7 +55,7 @@ namespace OCPI {
 	m_rccPort.useDefaultOpCode_ = true;
 	if (pmd.nOperations() == 1) {
 	  m_rccPort.useDefaultLength_ = true;
-	  OU::Operation &o = pmd.operations()[0];
+	  OM::Operation &o = pmd.operations()[0];
 	  if (o.nArgs()) {
 	    m_rccPort.defaultLength_ = pmd.m_minBufferSize;
 	    if (o.nArgs() > 1) {

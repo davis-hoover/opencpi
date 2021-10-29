@@ -33,12 +33,14 @@
 namespace OCPI {
   namespace Container {
     namespace OA = OCPI::API;
+    namespace OM = OCPI::Metadata;
     namespace OU = OCPI::Util;
     namespace OD = OCPI::DataTransport;
     namespace OR = OCPI::RDT;
+    namespace XF = DataTransfer;
 
     PortData::
-    PortData(const OU::Port &mPort, bool a_isProvider, PortConnectionDesc *desc)
+    PortData(const OM::Port &mPort, bool a_isProvider, PortConnectionDesc *desc)
       : m_ordinal(mPort.m_ordinal), m_isProvider(a_isProvider), m_connectionData(desc)
     {
       OR::Descriptors &d = getData().data;
@@ -52,9 +54,9 @@ namespace OCPI {
       // FIXME: this is really set at connection time and should be removed here and left
       // == SIZE_MAX
       if (mPort.m_bufferSize == SIZE_MAX) {
-	m_bufferSize = OU::DEFAULT_BUFFER_SIZE;
+	m_bufferSize = OM::DEFAULT_BUFFER_SIZE;
 	ocpiDebug("PortData %s(%p): setting buffer size from default: %zu",
-		  mPort.m_name.c_str(), this, OU::DEFAULT_BUFFER_SIZE);
+		  mPort.m_name.c_str(), this, OM::DEFAULT_BUFFER_SIZE);
       } else {
 	m_bufferSize = mPort.m_bufferSize;
 	ocpiDebug("PortData %s(%p): setting buffer size from metadata: %zu",
@@ -119,7 +121,7 @@ namespace OCPI {
     }
 
     BasicPort::
-    BasicPort(Container &c, const OU::Port &mPort, bool a_isProvider, const OU::PValue *params)
+    BasicPort(Container &c, const OM::Port &mPort, bool a_isProvider, const OU::PValue *params)
       : PortData(mPort, a_isProvider, NULL), m_lastInBuffer(NULL), m_lastOutBuffer(NULL),
 	m_dtLastBuffer(NULL), m_dtPort(NULL), m_allocation(NULL), m_bufferStride(0),
 	m_next2write(NULL), m_next2put(NULL), m_next2read(NULL), m_next2release(NULL),
@@ -1088,7 +1090,7 @@ namespace OCPI {
     }
 
     size_t BasicPort::
-    bufferAlignment() const { return OU::BUFFER_ALIGNMENT; }
+    bufferAlignment() const { return XF::BUFFER_ALIGNMENT; }
 
     void BasicPort::
     forward2shim(BasicPort &shim) {
@@ -1239,7 +1241,7 @@ namespace OCPI {
 
     OA::BaseType BasicPort::
     getOperationInfo(uint8_t opCode, size_t &nbytes) {
-      OU::Operation *ops = m_metaPort.operations();
+      OM::Operation *ops = m_metaPort.operations();
       if (ops && opCode < m_metaPort.nOperations() && ops[opCode].nArgs() == 1) {
 	nbytes = ops[opCode].args()->m_elementBytes;
 	return ops[opCode].args()->m_baseType;

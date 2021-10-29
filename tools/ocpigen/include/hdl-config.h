@@ -35,7 +35,7 @@ struct DevInstance {
   const DevInstance *m_parent;
   std::string m_name;
   mutable std::vector<uint64_t> m_connected;
-  OCPI::Util::Assembly::Properties m_instancePVs; // parameters beyond those spec'd in platform
+  OM::Assembly::Properties m_instancePVs; // parameters beyond those spec'd in platform
   Worker *m_worker; // worker that is parameterized (sort of redundant with assy instance)
   DevInstance(const Device &d, const Card *c, const Slot *s, bool control,
 	      const DevInstance *parent);

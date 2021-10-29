@@ -28,7 +28,7 @@
 #include "OsAssert.hh"
 #include "OsMisc.hh"
 #include "OsDataTypes.hh"
-#include "OcpiUtilDataTypes.h"
+#include "UtilDataTypes.hh"
 #include <iostream>
 
 #define HANDLE_CLOCK_WRAP 1

@@ -35,6 +35,7 @@
 // This file contains code common to all library drivers
 
 namespace OA = OCPI::API;
+namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 namespace OD = OCPI::Driver;
 namespace OE = OCPI::Util::EzXml;
@@ -119,7 +120,7 @@ namespace OCPI {
       m_implementations.insert(WorkerMapPair(impl.m_metadataImpl.specName().c_str(), &impl));
     }
     static bool
-    satisfiesSelection(const char *selection, unsigned *score, OU::Worker &impl) {
+    satisfiesSelection(const char *selection, unsigned *score, OM::Worker &impl) {
       OU::ExprValue val;
       const char *err = OU::evalExpression(selection, val, &impl);
       if (err)
@@ -147,7 +148,7 @@ namespace OCPI {
     }
     void Manager::printArtifactsX(const Capabilities &caps, bool dospecs) {
       parent().configureOnce();
-      std::set<const char *, OCPI::Util::ConstCharComp> specs;
+      std::set<const char *, OU::ConstCharComp> specs;
       for (Driver *d = firstDriver(); d; d = d->nextDriver())
 	for (Library *l = d->firstLibrary(); l; l = l->nextLibrary())
 	  for (Artifact *a = l->firstArtifact(); a; a = a->nextArtifact())
@@ -159,9 +160,9 @@ namespace OCPI {
 	    }
     }
     // Call a function for all workers in all artifacts
-    void Manager::doWorkers(void (*func)(OU::Worker &)) {
+    void Manager::doWorkers(void (*func)(OM::Worker &)) {
       parent().configureOnce();
-      std::set<const char *, OCPI::Util::ConstCharComp> specs;
+      std::set<const char *, OU::ConstCharComp> specs;
       for (Driver *d = firstDriver(); d; d = d->nextDriver())
 	for (Library *l = d->firstLibrary(); l; l = l->nextLibrary())
 	  for (Artifact *a = l->firstArtifact(); a; a = a->nextArtifact()) {
@@ -205,7 +206,7 @@ namespace OCPI {
     }
 #endif
     Implementation::
-    Implementation(Artifact &art, OU::Worker &i, ezxml_t instance, unsigned ordinal)
+    Implementation(Artifact &art, OM::Worker &i, ezxml_t instance, unsigned ordinal)
 	: m_artifact(art), m_metadataImpl(i), m_staticInstance(instance),
 	  m_externals(0), m_internals(0), m_connections(NULL), m_ordinal(ordinal),
 	  m_inserted(false)
@@ -218,8 +219,8 @@ namespace OCPI {
     }
 
     void Implementation::
-    setConnection(OU::Port &myPort, Implementation *otherImpl,
-		  OU::Port *otherPort) {
+    setConnection(OM::Port &myPort, Implementation *otherImpl,
+		  OM::Port *otherPort) {
       ocpiDebug("Setting connection in %s on %s port %s with other %s port %s",
 	       m_artifact.name().c_str(), m_metadataImpl.cname(), myPort.m_name.c_str(),
 	       otherImpl ? otherImpl->m_metadataImpl.cname() : "none",
@@ -457,7 +458,7 @@ namespace OCPI {
       }
       return false;
     }
-    Implementation *Artifact::addImplementation(OU::Worker &metaImpl, ezxml_t staticInstance) {
+    Implementation *Artifact::addImplementation(OM::Worker &metaImpl, ezxml_t staticInstance) {
       Implementation *impl = new Implementation(*this, metaImpl, staticInstance, m_nWorkers++);
       // Record in the artifact's mapping
       m_workers.insert(WorkerMapPair(metaImpl.specName().c_str(), impl));
@@ -480,7 +481,7 @@ namespace OCPI {
       Attributes::parse(m_xml);
       // Loop over all the implementations
       m_nImplementations = OE::countChildren(m_xml, "worker");
-      OU::Worker *metaImpl = m_metaImplementations = new OU::Worker[m_nImplementations];
+      OM::Worker *metaImpl = m_metaImplementations = new OM::Worker[m_nImplementations];
       typedef std::map<const char*, Implementation *, OU::ConstCharComp> InstanceMap;
       typedef InstanceMap::iterator InstanceIter;
       InstanceMap instances; // record static instances for connection tracking
@@ -515,7 +516,7 @@ namespace OCPI {
           *in = ezxml_attr(conn, "in");    // provider port name
         if (!fromX || !toX || !out || !in)
 	  throw OU::Error("Invalid artifact XML: connection has bad attributes");
-	OU::Port *fromP = NULL, *toP = NULL; // quiet warnings
+	OM::Port *fromP = NULL, *toP = NULL; // quiet warnings
 	InstanceIter
 	  fromI = instances.find(fromX),
 	  toI = instances.find(toX);
@@ -558,7 +559,7 @@ namespace OCPI {
 
     }
     void Artifact::
-    printSpecs(std::set<const char *, OCPI::Util::ConstCharComp> &specs) const {
+    printSpecs(std::set<const char *, OU::ConstCharComp> &specs) const {
       for (WorkerIter wi = m_workers.begin(); wi != m_workers.end(); wi++)
 	if (specs.insert((*wi).second->m_metadataImpl.specName().c_str()).second)
 	  printf("%s\n", (*wi).second->m_metadataImpl.specName().c_str());

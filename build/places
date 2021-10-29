@@ -66,7 +66,7 @@
 prerequisites lzma gmp gpsd gtest ad9361
 # Host only prereqs are additional prereqs that are built for the host only.
 # Essentially, host prereqs = prereqs + host only prereqs
-host-only-prerequisites yaml-cpp
+host-only-prerequisites yaml_cpp
 # There is lots of leftover/unbuilt stuff in the foreign directories
 runtime/foreign -f -x .*/pwq/kern/.* -x .*/pwq/src/.*/.* -x .*/uuid/src/.*/.*
 # From old Makefiles:c and c++: for linux: -D_XOPEN_SOURCE=600 -D_FILE_OFFSET_BITS=64
@@ -84,6 +84,7 @@ runtime/dataplane/xfer/drivers/ofed -v
 runtime/dataplane/xfer/drivers/pio -v
 runtime/dataplane/xfer/drivers/socket -v
 runtime/dataplane/transport
+runtime/metadata
 runtime/dataplane/msg_driver_interface -d internal
 runtime/dataplane/msg_drivers
 runtime/library
@@ -101,7 +102,7 @@ runtime/ctests -n -d ctests -I runtime/rcc/include
 tests/c++tests -d cxxtests -n -s
 tools/cdkutils -t
 # ocpigen use some runtime libraries that are higher up the stack
-tools/ocpigen -n -t -I tools/cdkutils/include -I runtime/hdl/include -I runtime/library/include -I runtime/ocl/include -L cdkutils -L library
+tools/ocpigen -n -t -I tools/cdkutils/include -I runtime/hdl/include -I runtime/library/include -I runtime/ocl/include -I runtime/metadata/include -L cdkutils -L library -L metadata
 # ocpisca uses runtime so is not really a "tool" as far as builds go
 # but it is actually a tool so it won't be part of the runtime package
 # we stash it in "internal" and let the exports file put it into the devel
@@ -111,6 +112,6 @@ tools/ocpigen -n -t -I tools/cdkutils/include -I runtime/hdl/include -I runtime/
 tools/ocpirh
 # This ugliness is a workaround until dev host only prereqs are implemented.
 # https://gitlab.com/opencpi/opencpi/-/issues/1367
-tools/ocpigr -t -I tools/cdkutils/include -I runtime/library/include -L cdkutils -L library
-tools/ocpigr37 -t -I tools/cdkutils/include -I runtime/library/include -L cdkutils -L library
-tools/ocpidds -d cxxtests -n -r -t -I tools/cdkutils/include -L cdkutils
+tools/ocpigr -t -I tools/cdkutils/include -I runtime/metadata/include -I runtime/library/include -L cdkutils -L library -L metadata
+tools/ocpigr37 -t -I tools/cdkutils/include -I runtime/metadata/include -I runtime/library/include -L cdkutils -L library -L metadata
+tools/ocpidds -d cxxtests -n -r -t -I tools/cdkutils/include -I runtime/metadata/include -L cdkutils -L metadata

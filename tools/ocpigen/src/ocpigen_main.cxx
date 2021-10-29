@@ -105,7 +105,7 @@ add to tree.
 
 #define OCPI_OPTION
 #define OCPI_OPTIONS_NO_MAIN
-#include "CmdOption.h"
+#include "CmdOption.hh"
 
 int
 main(int argc, const char **argv) {

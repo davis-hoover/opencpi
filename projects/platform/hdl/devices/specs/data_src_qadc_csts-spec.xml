@@ -4,7 +4,7 @@
             type='ushort'
             parameter='true'
             default='12'
-            description='Number of bits in each of the I and Q values received
+            description='Number of bits in each of the real and imaginary values received
             from the ADC device.'/>
   <Property name='ADC_INPUT_IS_LSB_OF_OUT_PORT'
             type='bool'

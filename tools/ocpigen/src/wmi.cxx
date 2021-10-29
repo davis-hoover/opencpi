@@ -42,7 +42,7 @@ WmiPort(Worker &w, ezxml_t x, DataPort *sp, int ordinal, const char *&err)
 // Our special copy constructor
 WmiPort::
 WmiPort(const WmiPort &other, Worker &w , std::string &a_name, size_t a_count,
-	OCPI::Util::Assembly::Role *role, const char *&err)
+	OM::Assembly::Role *role, const char *&err)
   : DataPort(other, w, a_name, a_count, role, err) {
   if (err)
     return;
@@ -53,7 +53,7 @@ WmiPort(const WmiPort &other, Worker &w , std::string &a_name, size_t a_count,
 // Virtual constructor: the concrete instantiated classes must have a clone method,
 // which calls the corresponding specialized copy constructor
 Port &WmiPort::
-clone(Worker &w, std::string &a_name, size_t a_count, OCPI::Util::Assembly::Role *role,
+clone(Worker &w, std::string &a_name, size_t a_count, OM::Assembly::Role *role,
       const char *&err) const {
   return *new WmiPort(*this, w, a_name, a_count, role, err);
 }
@@ -206,7 +206,7 @@ emitRecordInputs(FILE *f) {
     if (m_nOpcodes > 1)
       fprintf(f,
 	      "    opcode           : %s_OpCode_t;\n",
-	      nOperations() ? OU::Protocol::cname() : pname());
+	      nOperations() ? OM::Protocol::cname() : pname());
     fprintf(f,
 	    m_dataWidth ?
 	    "    som, eom, valid  : Bool_t;           -- valid means data and byte_enable are present\n" :
@@ -236,7 +236,7 @@ emitRecordOutputs(FILE *f) {
     if (m_nOpcodes > 1)
       fprintf(f,
 	      "    opcode           : %s_OpCode_t;\n",
-	      nOperations() ? OU::Protocol::cname() : pname());
+	      nOperations() ? OM::Protocol::cname() : pname());
     fprintf(f,
 	    "    som, eom, valid  : Bool_t;            -- one or more must be true when 'give' is asserted\n");
       }

@@ -49,7 +49,7 @@ namespace OU =  OCPI::Util;
   CMD_OPTION(  verbose,    v,    Bool,   "false", "Provide verbose output during operation") \
   CMD_OPTION(  loglevel,   l,    UChar,  "0",     "Set logging level used during operation") \
 
-#include "CmdOption.h"
+#include "CmdOption.hh"
 
 namespace OC = OCPI::Container;
 namespace OCL = OCPI::OCL;

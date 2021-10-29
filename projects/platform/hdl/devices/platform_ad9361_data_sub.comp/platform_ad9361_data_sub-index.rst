@@ -45,7 +45,7 @@ which interfaces with the AD9361 device's ``DATA_CLK_P``/ ``DATA_CLK_N``, ``P0_D
 ``P1_D[11:0]``, ``RX_FRAME_P``, ``RX_FRAME_N``, ``TX_FRAME_P``,
 ``TX_FRAME_N``, ``TXNRX``, and ``ENABLE`` pins.
 
-The ``P0_D`` and ``P1)D`` pins are routed to the HDL subdevice worker
+The ``P0_D`` and ``P1_D`` pins are routed to the HDL subdevice worker
 that is appropriate for the given AD9361 data pin interface configuration
 (``ad9361_adc_sub.hdl`` or ``ad9361_dac_sub.hdl``; see ``../projects/assets/hdl/devices/``).
 

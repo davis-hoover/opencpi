@@ -40,7 +40,7 @@
 #include "OsMisc.hh"
 #include <OcpiUtilAutoMutex.h>
 #include <OcpiUtilEzxml.h>
-#include <OcpiPValue.h>
+#include "UtilPValue.hh"
 #include <DtMsgDriver.h>
 
 namespace OX = OCPI::Util::EzXml;

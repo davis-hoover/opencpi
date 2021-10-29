@@ -37,7 +37,7 @@
 #include <time.h>
 #include "ocpi-config.h"
 #include "OcpiUtilMisc.h"
-#include "CmdOption.h"
+#include "CmdOption.hh"
 #include "HdlZynq.h"
 
 namespace OU = OCPI::Util;

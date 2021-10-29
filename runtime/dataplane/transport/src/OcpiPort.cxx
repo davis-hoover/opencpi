@@ -32,7 +32,6 @@
 #include <inttypes.h>
 #include <ctype.h>
 #include "OsAssert.hh"
-#include "OcpiUtilPort.h"
 #include "DtHandshakeControl.h"
 #include "XferManager.h"
 #include "XferEndPoint.h"
@@ -54,7 +53,7 @@ namespace OU = OCPI::Util;
 namespace DDT = DtOsDataTypes;
 namespace XF = DataTransfer;
 // Buffer allignment
-#define BUF_ALIGNMENT OU::BUFFER_ALIGNMENT
+#define BUF_ALIGNMENT XF::BUFFER_ALIGNMENT
 namespace OCPI {
 namespace DataTransport {
 void Port::reset()

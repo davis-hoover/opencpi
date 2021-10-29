@@ -24,8 +24,8 @@
 #include <set>
 #include <string>
 #include <unordered_set>
-#include "OcpiUtilValue.h"
-#include "OcpiUtilProperty.h"
+#include "UtilValue.hh"
+#include "MetadataProperty.hh"
 #include "cdkutils.h"
 #include "ocpigen.h"
 
@@ -48,7 +48,7 @@ struct Param {
   std::string                 m_uValue;     // unparsed value: the canonical value for comparison
   OCPI::Util::Member         *m_valuesType; // the type (a sequence of these values).
   Values                      m_uValues;    // *Either* parsed from XML or captured from raw
-  const OCPI::Util::Property *m_param;      // the property that is a parameter
+  const OCPI::Metadata::Property *m_param;      // the property that is a parameter
   bool                        m_isDefault;  // is m_value from property default?
   const Worker               *m_worker;     // worker of param when the paramconfig spans impls
   bool                        m_isTest;
@@ -66,13 +66,13 @@ struct Param {
     Attributes() : m_onlyExcluded(false) {}
   };
   std::vector<Attributes>     m_attributes;
-  static void fullName(const OCPI::Util::Property &prop, const Worker *wkr, std::string &name);
+  static void fullName(const OCPI::Metadata::Property &prop, const Worker *wkr, std::string &name);
   Param();
-  void setProperty(const OCPI::Util::Property *prop, const Worker *w);
+  void setProperty(const OCPI::Metadata::Property *prop, const Worker *w);
   const char 
     // only one of w and wkrs should be set
-    *parseValue(const OCPI::Util::Property &prop, const char *value),
-    *parse(ezxml_t px, const OCPI::Util::Property *prop, const Worker *w = NULL, bool global = false),
+    *parseValue(const OCPI::Metadata::Property &prop, const char *value),
+    *parse(ezxml_t px, const OCPI::Metadata::Property *prop, const Worker *w = NULL, bool global = false),
     *excludeValue(std::string &uValue, Attributes *&attrs, const char *platform),
     *addValue(std::string &uValue, Attributes *&attrs, const char *platform),
     *onlyValue(std::string &uValue, Attributes *&attrs, const char *platform);

@@ -30,6 +30,7 @@
 
 namespace OA = OCPI::API;
 namespace OC = OCPI::Container;
+namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 namespace OS = OCPI::OS;
 
@@ -251,7 +252,7 @@ constructor() {
     const OA::ApplicationI &app = m_application->applicationI();
     m_properties.resize(app.nProperties());
     std::string name;
-    const OU::Property *p;
+    const OM::Property *p;
     for (unsigned n = 0; (p = app.property(n, name)); n++) {
       std::string mode(p->m_isWritable ? "readwrite" : "readonly");
       switch (p->m_baseType) {
@@ -300,7 +301,7 @@ OCPI_DATA_TYPES
 	std::string name;
 	OA::ExternalPort &ocpiPort = m_application->getPort(n, name);
 	// Here we use internal/non-API types to get the protocol metadata
-	const OU::Port &metaPort =
+	const OM::Port &metaPort =
 	  static_cast<OCPI::Container::ExternalPort*>(&ocpiPort)->metaPort();
 	assert(metaPort.nOperations() == 1 && metaPort.operations()[0].nArgs() == 1);
 	OU::Member &arg = metaPort.operations()[0].args()[0];

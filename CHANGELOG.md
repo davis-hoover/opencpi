@@ -1,3 +1,24 @@
+# [v2.3.1](https://gitlab.com/opencpi/opencpi/-/compare/v2.3.0...v2.3.1) (2021-10-13)
+
+Changes/additions since [OpenCPI Release v2.3.0](https://gitlab.com/opencpi/opencpi/-/releases/v2.3.0)
+
+### Enhancements
+- **doc**: add Sphinx/RST-formatted versions of data sheets for data_sink_qdac_csts, data_src_qadc_csts, platform_ad9361_config_csts, platform_ad9361_config_proxy_csts, platform_ad9361_spi_csts, platform_csts_ad9361_data_sub assets in projects/platform/hdl/devices/. (!724)(1f899cf1)
+- **doc**: add LibreOffice ODG source versions and SVG output of component/worker block diagrams in platform_ad9361_config_csts.comp/, platform_ad9361_config_proxy_csts.comp/, platform_ad9361_spi_csts.comp/, platform_csts_ad9361_data_sub.comp/ in projects/platform/hdl/devices/. (!724)(1f899cf1)
+- **hdl base**: update data_sink_qdac_csts-spec.xml and data_src_qadc_csts-spec.xml in projects/platform/hdl/devices/specs/to use "real/imaginary" terms, not "IQ". (!724)(1f899cf1)
+- **tools**: add `checkAssetName` function to `util.sh`. (!731)(8a74c5e1)
+
+### Bug Fixes
+- **devops**: fix CI pipelines failing to build sdcards when building for an OSP and Comp project. (!718)(e153b531)
+- **hdl base**: fix `generic_pcie` makefile. (!717)(28b533cd)
+- **runtime**: set correct PCI dmaOptions for scalable data-plane. (!730)(3870faa2)
+- **tools**: fix document generation in non-website-project pipelines. (!719)(9c4a9d5a)
+- **tools**: fix `centos8-packages.sh` for use in containers. (!721)(e48d6bc5)
+- **tools**: fix broken install if OCPI_* envars exist. (!725)(b6021ac4)
+- **tools**: fix local source installation of `yaml-cpp` prerequisite. (!731)(8a74c5e1)
+- **tools**: fix illegal prereq names `yaml-cpp` and `rsync-3.1.1`. (!731)(8a74c5e1)
+- **tools**: detect empty SAMPLES messages and report the error rather than dump a stack frame. (!733)(594c55ae)
+
 # [v2.3.0](https://gitlab.com/opencpi/opencpi/-/compare/v2.3.0-rc.1...v2.3.0) (2021-09-08)
 
 Changes/additions since [OpenCPI Release v2.3.0-rc.1](https://gitlab.com/opencpi/opencpi/-/releases/v2.3.0-rc.1)

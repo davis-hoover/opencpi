@@ -49,7 +49,7 @@ namespace OCPI {
     public:
       ~Container();
 
-      bool supportsImplementation(OCPI::Util::Worker &i);
+      bool supportsImplementation(OCPI::Metadata::Worker &i);
       OCPI::Container::Container::DispatchRetCode dispatch(DataTransfer::EventManager* event_manager)
         throw (OU::EmbeddedException);
 

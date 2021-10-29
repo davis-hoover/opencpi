@@ -47,9 +47,9 @@ WciPort(Worker &w, ezxml_t x, Port *sp, int ordinal, const char *&err)
        (err = OE::getNumber(x, "Timeout", &m_timeout, 0, 0)) ||
        (err = OE::getBoolean(x, "ResetWhileSuspended", &m_resetWhileSuspended))))
     return;
-  w.m_ctl.controlOps |= 1 << OU::Worker::OpStart;
+  w.m_ctl.controlOps |= 1 << OM::Worker::OpStart;
   if (w.m_language == VHDL)
-    w.m_ctl.controlOps |= 1 << OU::Worker::OpStop;
+    w.m_ctl.controlOps |= 1 << OM::Worker::OpStop;
   m_dataWidth = 32;
   m_byteWidth = 8;
 }
@@ -76,10 +76,10 @@ emitPortDescription(FILE *f, Language lang) const {
 	  comment);
   {
     bool first = true;
-    for (unsigned op = 0; op < OU::Worker::OpsLimit; op++, first = false)
-      if (op != OU::Worker::OpStart &&
+    for (unsigned op = 0; op < OM::Worker::OpsLimit; op++, first = false)
+      if (op != OM::Worker::OpStart &&
 	  m_worker->m_ctl.controlOps & (1u << op))
-	fprintf(f, "%s%s", first ? "" : ",", OU::Worker::s_controlOpNames[op]);
+	fprintf(f, "%s%s", first ? "" : ",", OM::Worker::s_controlOpNames[op]);
   }
   fprintf(f, "\n");
   fprintf(f, "  %s   ResetWhileSuspended: %s\n",
@@ -172,7 +172,7 @@ emitImplAliases(FILE *f, unsigned n, Language lang) {
     for (PropertiesIter pi = m_worker->m_ctl.properties.begin();
 	 pi != m_worker->m_ctl.properties.end(); pi++)
       if (!(*pi)->m_isParameter && !(*pi)->m_isReadable) {
-	OU::Property *pr = *pi;
+	OM::Property *pr = *pi;
 	if (lang != VHDL)
 	  fprintf(f, "  localparam [%zu:0] %sAddr = %zu'h%0*zx;\n",
 		  ocp.MAddr.width - 1, pr->m_name.c_str(), ocp.MAddr.width,
@@ -323,7 +323,7 @@ emitPropertyAttributeConstants(FILE *f, Language lang) {
   bool first = true;
   size_t last_end = 0;
   for (PropertiesIter pi = m_ctl.properties.begin(); pi != m_ctl.properties.end(); pi++) {
-    OU::Property &pr = **pi;
+    OM::Property &pr = **pi;
     if (first &&
 	(pr.m_stringLengthExpr.length() ||
 	 pr.m_sequenceLengthExpr.length() ||
@@ -465,7 +465,7 @@ emitSkelSignals(FILE *f) {
       return;
     for (PropertiesIter pi = m_worker->m_ctl.properties.begin();
 	 pi != m_worker->m_ctl.properties.end(); pi++) {
-      const OU::Property &pr = **pi;
+      const OM::Property &pr = **pi;
       if (!pr.m_isBuiltin && !pr.m_isParameter &&
 	  (pr.m_isVolatile || (pr.m_isReadable && !pr.m_isWritable))) {
 	if (pr.m_isSequence)

@@ -3,8 +3,6 @@
 #include "wip.h"
 #include "clock.h"
 
-namespace OE=OCPI::Util::EzXml;
-
 const char *Worker::
 parseClocks() {
   // Now we do clocks before interfaces since they may refer to clocks

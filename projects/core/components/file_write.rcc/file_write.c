@@ -84,40 +84,39 @@ run(RCCWorker *self, RCCBoolean timedOut, RCCBoolean *newRunCondition) {
  (void)timedOut;(void)newRunCondition;
  if (self->firstRun)
    s->startTime = self->container.getTime();
- assert(port->input.eof || port->current.data);
- if (port->current.data) {
-   if (props->messagesInFile) {
-     struct {
-       uint32_t length;
-       uint32_t opcode;
-     } m = { port->input.length, port->input.u.operation };
-     if ((rv = write(s->fd, &m, sizeof(m)) != (ssize_t)sizeof(m)))
-       return self->container.setError("error writing header to file: %s (%zd)",
-				       strerror(errno), rv);
-   }
-   if (port->input.length) {
-     if (props->countData) {
-       // touch the data and check it if is a correct output from test_source component
-       // which simply sends an incrementing 32 bit number until eof
-       uint32_t *p = (uint32_t *)port->current.data;
-       for (unsigned n = port->input.length/sizeof(uint32_t); n; --n) {
-	 if (s->count++ != *p)
-	   return self->container.setError("counting error: is %u, should be %u", *p, --s->count);
-	 s->sum += *p++;
-       }
-     }
-     if (!props->suppressWrites &&
-	 (rv = write(s->fd, port->current.data, port->input.length)) != (ssize_t)port->input.length)
-       return self->container.setError("error writing data to file: length %zu(%zx): %s (%zd)",
-				       port->input.length, port->input.length, strerror(errno), rv);
-   }
-   props->bytesWritten += port->input.length;
-   props->messagesWritten++; // this includes non-EOF ZLMs even though no data was written.
- }
- if (port->input.eof) {
+assert(port->input.eof || port->current.data);
+ if (port->input.eof) { // length == 0 && port->input.u.operation == 0 && props->stopOnEOF)
    uint64_t nanos = self->container.nanoTime(self->container.getTime() - s->startTime);
    props->bytesPerSecond = (props->bytesWritten * 1000000000llu) / (nanos ? nanos : 1);
    return RCC_ADVANCE_DONE;
  }
+if (port->current.data) { 
+ if (props->messagesInFile) {
+   struct {
+     uint32_t length;
+     uint32_t opcode;
+   } m = { port->input.length, port->input.u.operation };
+   if ((rv = write(s->fd, &m, sizeof(m)) != (ssize_t)sizeof(m)))
+     return self->container.setError("error writing header to file: %s (%zd)", strerror(errno), rv);
+ }
+ if (port->input.length) {
+   if (props->countData) {
+     // touch the data and check it if is a correct output from test_source component
+     // which simply sends an incrementing 32 bit number until eof
+     uint32_t *p = (uint32_t *)port->current.data;
+     for (unsigned n = port->input.length/sizeof(uint32_t); n; --n) {
+       if (s->count++ != *p)
+	 return self->container.setError("counting error: is %u, should be %u", *p, --s->count);
+       s->sum += *p++;
+     }
+   }
+   if (!props->suppressWrites &&
+       (rv = write(s->fd, port->current.data, port->input.length)) != (ssize_t)port->input.length)
+     return self->container.setError("error writing data to file: length %zu(%zx): %s (%zd)",
+				     port->input.length, port->input.length, strerror(errno), rv);
+}
+}
+ props->bytesWritten += port->input.length;
+ props->messagesWritten++; // this includes non-EOF ZLMs even though no data was written.
  return RCC_ADVANCE;
 }

@@ -46,7 +46,8 @@
 namespace OCPI {
   namespace RCC { class Port; }
   namespace DataTransport { class BufferUserFacet; }
-  namespace Util { class Member; class Port;}
+  namespace Util { class Member;}
+  namespace Metadata { class Port;}
 }
 #undef RCC_CONST
 #define RCC_CONST // for (C++) framework code these things are not const
@@ -181,7 +182,7 @@ struct RCCPort {
   OCPI::RCC::Port *containerPort;
   RCCUserPort *userPort;
   OCPI::Util::Member *sequence;
-  OCPI::Util::Port *metaPort;
+  OCPI::Metadata::Port *metaPort;
 #else
   void *containerPort, *userPort, *sequence, *metaPort;
 #endif

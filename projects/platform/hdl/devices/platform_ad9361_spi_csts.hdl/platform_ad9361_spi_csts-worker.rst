@@ -28,9 +28,12 @@
 
 Detail
 ------
-The AD9361 SPI HDL subdevice worker is intended for use in platforms and cards
+.. note::
+   This HDL subdevice worker is functionally equivalent to the AD9361 SPI HDL subdevice worker except that it specifies the Complex Short Timed Sample (CSTS) protocol in port definitions instead of the Complex Short With Metadata (CSWM) protocol. The CSTS version of this worker will replace the CSWM version in a future release.
+
+The AD9361 SPI CSTS HDL subdevice worker is intended for use in platforms and cards
 with an SPI bus that addresses only the AD9361. SPI read/writes are
-actuated by the ``rprops`` RawProperty port. A DevSignal is also sent which
+actuated by the ``rprops`` RawProperty port. A ``devsignal`` is also sent which
 can force the AD9361 RESETB pin, which is active-low, to logic 0.
 
 .. ocpi_documentation_worker::
@@ -149,7 +152,7 @@ the section "Vivado timing analysis" for details.
 
 Control Timing and Signals
 --------------------------
-The AD9361 SPI HDL subdevice worker operates entirely in
+The AD9361 SPI CSTS HDL subdevice worker operates entirely in
 the control plane clock domain. All SPI data and SPI
 clock signals are generated in the control plane clock domain.
 Note that SPI clock can only be a divided version of the control plane clock.

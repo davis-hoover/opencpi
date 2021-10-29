@@ -23,14 +23,15 @@
 #include "OsFileSystem.hh"
 #include "OcpiContainerApi.h"
 #include "OsMisc.hh"
-#include "OcpiUtilValue.h"
-#include "OcpiPValue.h"
+#include "UtilValue.hh"
+#include "UtilPValue.hh"
 #include "OcpiTimeEmit.h"
 #include "OcpiUtilMisc.h"
 #include "ContainerLauncher.h"
 #include "OcpiApplication.h"
 
 namespace OC = OCPI::Container;
+namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 namespace OE = OCPI::Util::EzXml;
 namespace OL = OCPI::Library;
@@ -298,7 +299,7 @@ namespace OCPI {
 	if (!w.slaveAssy())
 	  continue;
 	const auto &masterContainer = OC::Container::nthContainer(i->m_deployment.m_containers[0]);
-	const OU::Assembly::Instance &ui = m_assembly.instance(n).m_utilInstance;
+	const OM::Assembly::Instance &ui = m_assembly.instance(n).m_utilInstance;
 	for (unsigned ns = 0; ns < ui.m_slaveInstances.size(); ++ns) {
 	  const auto &slave = m_instances[ui.slaveInstances()[ns]];
 	  const auto &slaveContainer = OC::Container::nthContainer(slave.m_deployment.m_containers[0]);
@@ -327,7 +328,7 @@ namespace OCPI {
     bool ApplicationI::
     resolveInstanceSlaves(unsigned instNum, OL::Candidate &c, const std::string &reject) {
       ezxml_t slaves = c.impl->m_metadataImpl.slaveAssy();
-      const OU::Assembly::Instance &ui = m_assembly.instance(instNum).m_utilInstance;
+      const OM::Assembly::Instance &ui = m_assembly.instance(instNum).m_utilInstance;
       if (slaves) {
 	if (!c.slaves) {
 	  // Do this work one time for this candidate of this instance, which caches this work so that it can
@@ -356,7 +357,7 @@ namespace OCPI {
 	  // Patch the instances and ports in slave assembly for (repeated) insertion into the app
 	  for (unsigned n = 0; n < c.slaves->instances().size(); ++n) {
 	    auto &libInst = *c.slaves->instances()[n];
-	    auto &utilInst = *(OU::Assembly::Instance*)&libInst.m_utilInstance; // ugly un-const
+	    auto &utilInst = *(OM::Assembly::Instance*)&libInst.m_utilInstance; // ugly un-const
 	    std::string old(utilInst.m_name);
 	    if (ui.m_slaveNames.empty()) // don't rename for explicit slaves
 	      OU::format(utilInst.m_name, "%s.%s", ui.cname(), old.c_str()); // proxy inst name is prefix
@@ -416,20 +417,20 @@ namespace OCPI {
 	// if the app has a connection to the corresponding proxy port, we modify (repurpose) that
 	// app connection to change its port from the proxy port to the port in the slave assy
 	for (auto it = c.slaves->m_connections.begin(); it != c.slaves->m_connections.end(); ++it) {
-	  OU::Assembly::Connection &slaveConn = **it;
+	  OM::Assembly::Connection &slaveConn = **it;
 	  if (slaveConn.m_externals.empty())
 	    m_assembly.m_connections.push_back(&slaveConn);
 	  else {
 	    assert(slaveConn.m_ports.size() == 1 && slaveConn.m_externals.size() == 1 &&
 		   slaveConn.m_count <= 1);
 	    // Find the master's impl port corresponding to the slave assy external port
-	    const OU::Port &masterImplPort =
+	    const OM::Port &masterImplPort =
 	      *c.impl->m_metadataImpl.findMetaPort(slaveConn.m_externals.front().first->m_name);
 	    // Find the app assy port for the master port.  If its null there is no app connection
-	    OU::Assembly::Port *masterPort = m_assembly.assyPort(instNum, masterImplPort.m_ordinal);
+	    OM::Assembly::Port *masterPort = m_assembly.assyPort(instNum, masterImplPort.m_ordinal);
 	    if (masterPort) { // master port has at least one connection.  find it
-	      OU::Assembly::Connection *appConn = NULL;
-	      OU::Assembly::ConnPort *appConnPort = NULL; // warning
+	      OM::Assembly::Connection *appConn = NULL;
+	      OM::Assembly::ConnPort *appConnPort = NULL; // warning
 	      // find the app connection that connects to the master/external port
 	      for (auto cit = m_assembly.m_connections.begin();
 		   appConn == NULL && cit != m_assembly.m_connections.end(); ++cit)
@@ -486,7 +487,7 @@ namespace OCPI {
     // It has the side effect of initializing the m_deployment.m_slaves array for the instance
     bool ApplicationI::
     connectionsOk(OL::Candidate &c, unsigned instNum) {
-      //      const OU::Assembly::Instance &ui = m_assembly.instance(instNum).m_utilInstance;
+      //      const OM::Assembly::Instance &ui = m_assembly.instance(instNum).m_utilInstance;
       std::string reject;
       OU::format(reject,
                  "    Rejecting implementation \"%s%s%s\" with score %u "
@@ -499,9 +500,9 @@ namespace OCPI {
 	return false;
       // Now check all connected ports, including when they are aliased to slave ports.
       unsigned nPorts;
-      const OU::Port *port = c.impl->m_metadataImpl.ports(nPorts);
+      const OM::Port *port = c.impl->m_metadataImpl.ports(nPorts);
       for (unsigned nn = 0; nn < nPorts; ++port, ++nn) { // for each candidate port
-        OU::Assembly::Port *ap = m_assembly.assyPort(instNum, nn);
+        OM::Assembly::Port *ap = m_assembly.assyPort(instNum, nn);
 	if (!ap || ap->m_connections.empty()) // port not connected in app
 	  continue;
 	// For connections to this port (presumably with different indices)
@@ -521,7 +522,7 @@ namespace OCPI {
 	    continue;
 	  assert(other->m_instance != instNum);
 	  const OL::Implementation *thisImpl = c.impl, *otherImpl = NULL;
-	  const OU::Port *thisPort = port, *otherPort = NULL;
+	  const OM::Port *thisPort = port, *otherPort = NULL;
           otherImpl = m_instances[other->m_instance].m_deployment.m_impls[0];
 	  otherPort = otherImpl->m_metadataImpl.findMetaPort(other->cname());
 	  // check for prewired compatibility, post-delegation
@@ -563,12 +564,12 @@ namespace OCPI {
     }
 
     void ApplicationI::
-    checkPropertyValue(unsigned nInstance, const OU::Worker &w,
-                       const OU::Assembly::Property &aProp, unsigned *&pn, OU::Value *&pv) {
+    checkPropertyValue(unsigned nInstance, const OM::Worker &w,
+                       const OM::Assembly::Property &aProp, unsigned *&pn, OU::Value *&pv) {
       const char
         *pName = aProp.m_name.c_str(),
         *iName = m_assembly.instance(nInstance).name().c_str();
-      const OU::Property &uProp = w.findProperty(pName);
+      const OM::Property &uProp = w.findProperty(pName);
       if (uProp.m_isParameter)
         return;
       if (!uProp.m_isWritable && (aProp.m_hasDelay || !uProp.m_isInitial))
@@ -603,9 +604,9 @@ namespace OCPI {
                           "Format is: <external>=<parameter-value>", assign);
         size_t len = (size_t)(eq - assign);
         for (auto ci = m_assembly.m_connections.begin(); ci != m_assembly.m_connections.end(); ++ci) {
-          const OU::Assembly::Connection &c = **ci;
+          const OM::Assembly::Connection &c = **ci;
           if (c.m_externals.size()) {
-            const OU::Assembly::External &e = *c.m_externals.front().first;
+            const OM::Assembly::External &e = *c.m_externals.front().first;
             if (e.m_name.length() == len && !strncasecmp(assign, e.m_name.c_str(), len)) {
               assign = NULL;
               break;
@@ -620,14 +621,14 @@ namespace OCPI {
     void ApplicationI::
     prepareInstanceProperties(unsigned nInstance, const OL::Implementation &impl, unsigned *&pn,
                               OU::Value *&pv) {
-      const OU::Assembly::Properties &aProps = *m_bestDeployments[nInstance].m_properties;
+      const OM::Assembly::Properties &aProps = *m_bestDeployments[nInstance].m_properties;
       // Prepare all the property values in the assembly, avoiding those in parameters.
       for (unsigned p = 0; p < aProps.size(); p++) {
         if (aProps[p].m_dumpFile.size()) {
           // findProperty throws on error if bad name
 #if 0
           const char *pName = aProps[p].m_name.c_str();
-          OU::Property &uProp = impl.m_metadataImpl.findProperty(pName);
+          OM::Property &uProp = impl.m_metadataImpl.findProperty(pName);
           if (!uProp.m_isReadable && !uProp.m_isParameter) // all is readable now
             throw OU::Error("Cannot dump property '%s' for instance '%s'. It is not readable.",
                             pName, m_assembly.instance(nInstance).name().c_str());
@@ -655,7 +656,7 @@ it is really per actual worker config...
       for (unsigned n = 0; n < m_bestDeployments.size(); n++, d++) {
         // The chosen, best, feasible implementation for the instance
         const char *iName = d->m_name.c_str();
-        const OU::Assembly::Properties &aProps = *d->m_properties;
+        const OM::Assembly::Properties &aProps = *d->m_properties;
         size_t nPropValues = aProps.size();
         const char *sDummy;
         // Count any properties that were provided in parameters specific to instance
@@ -663,7 +664,7 @@ it is really per actual worker config...
           nPropValues++;
         // Count any parameter properties that were mapped to this instance
 	// Note these cannot apply to inferred slaves so the ordinals should be ok
-	OU::Assembly::MappedProperty *mp = &m_assembly.m_mappedProperties[0];
+	OM::Assembly::MappedProperty *mp = &m_assembly.m_mappedProperties[0];
         unsigned nDummy = 0;
         for (size_t nn = m_assembly.m_mappedProperties.size(); nn; nn--, mp++)
           if (mp->m_instance == n &&
@@ -672,7 +673,7 @@ it is really per actual worker config...
         // Account for the runtime properties set here, e.g. output port buffer size
         const OL::Implementation &impl = *d->m_impls[0];
         unsigned nPorts;
-        for (OU::Port *p = impl.m_metadataImpl.ports(nPorts); nPorts; --nPorts, p++)
+        for (OM::Port *p = impl.m_metadataImpl.ports(nPorts); nPorts; --nPorts, p++)
           if (p->m_isProducer)
             nPropValues++;
         if (nPropValues) {
@@ -690,7 +691,7 @@ it is really per actual worker config...
             OC::Launcher::Connection &c = *it;
             if (c.m_out.m_member &&
 		c.m_out.m_member->m_crew == m_launchMembers[d->m_firstMember].m_crew) {
-              OU::Assembly::Property aProp;
+              OM::Assembly::Property aProp;
               aProp.m_name = "ocpi_buffer_size_" + c.m_out.m_metaPort->m_name;
               if (!impl.m_metadataImpl.getProperty(aProp.m_name.c_str())) {
                 ocpiInfo("Missing %s property for %s", aProp.m_name.c_str(), impl.m_metadataImpl.cname());
@@ -713,7 +714,7 @@ it is really per actual worker config...
         m_nProperties += d->m_impls[0]->m_metadataImpl.nProperties();
       // Over allocate: mapped ones plus all the instances' ones
       Property *p = m_properties = new Property[m_nProperties];
-      OU::Assembly::MappedProperty *mp = &m_assembly.m_mappedProperties[0];
+      OM::Assembly::MappedProperty *mp = &m_assembly.m_mappedProperties[0];
       for (size_t n = m_assembly.m_mappedProperties.size(); n; n--, mp++, p++) {
         p->m_property =
           m_bestDeployments[mp->m_instance].m_impls[0]->m_metadataImpl.
@@ -728,7 +729,7 @@ it is really per actual worker config...
       d = &m_bestDeployments[0];
       for (unsigned n = 0; n < m_bestDeployments.size(); n++, d++) {
         unsigned nProps;
-        OU::Property *meta = d->m_impls[0]->m_metadataImpl.properties(nProps);
+        OM::Property *meta = d->m_impls[0]->m_metadataImpl.properties(nProps);
         for (unsigned nn = 0; nn < nProps; nn++, meta++, p++) {
           p->m_name = d->m_name + "." + meta->m_name;
           p->m_instance = n;
@@ -736,7 +737,7 @@ it is really per actual worker config...
           ocpiDebug("Instance %s (%u) property %s (%u) named %s", d->m_name.c_str(), n,
                     meta->m_name.c_str(), nn, p->m_name.c_str());
           // Record dump file for this property if there is one.
-          const OU::Assembly::Properties &aProps = *d->m_properties;
+          const OM::Assembly::Properties &aProps = *d->m_properties;
           p->m_dumpFile = NULL;
           for (unsigned nnn = 0; nnn < aProps.size(); nnn++)
             if (aProps[nnn].m_dumpFile.size() &&
@@ -765,7 +766,7 @@ it is really per actual worker config...
       for (unsigned n = 0; OU::findAssignNext(params, pName, NULL, assign, n); ) {
         const char *value, *err;
         size_t instn, portn;
-        const OU::Port *p;
+        const OM::Port *p;
         if ((err = m_assembly.getPortAssignment(pName, assign, instn, portn, p, value)))
           return err;
         // This is taking the string value of a app-level assigned port param and using the same param
@@ -777,7 +778,7 @@ it is really per actual worker config...
         // Override any same-named connection params
 	for (auto ci = m_bestConnections.begin(); ci != m_bestConnections.end(); ++ci)
 	  for (auto pi = (*ci).m_ports.begin(); pi != (*ci).m_ports.end(); ++pi) {
-	    OU::Assembly::Port &ap = *(*pi).first;
+	    OM::Assembly::Port &ap = *(*pi).first;
 	    assert(!ap.m_name.empty());
 	    if (ap.m_instance == instn && !strcasecmp(ap.m_name.c_str(), p->cname()))
 	      ap.setParam(*ci, newName, value);
@@ -860,7 +861,7 @@ it is really per actual worker config...
     doScaledInstance(unsigned instNum, unsigned score) {
       Instance *i = &m_instances[instNum];
       OL::Assembly::Instance &li = m_assembly.instance(instNum);
-      const OU::Assembly::Instance &ui = li.m_utilInstance;
+      const OM::Assembly::Instance &ui = li.m_utilInstance;
       for (Instance::ScalableCandidatesIter sci = i->m_scalableCandidates.begin();
            sci != i->m_scalableCandidates.end(); sci++) {
         CMap map = 0;
@@ -945,7 +946,7 @@ it is really per actual worker config...
     }
     void ApplicationI::Instance::
     collectCandidate(const OL::Candidate &c, unsigned n) {
-      OU::Worker &w = c.impl->m_metadataImpl;
+      OM::Worker &w = c.impl->m_metadataImpl;
       std::string qname(w.package());
       qname += ".";
       qname += w.cname();
@@ -961,7 +962,7 @@ it is really per actual worker config...
     const char *ApplicationI::Instance::
     init(const OL::Assembly &assy, size_t n, bool verbose, const PValue *params) {
       const OL::Candidates &cs = assy.instance(n).m_candidates;
-      const OU::Assembly::Instance &ai = assy.utilInstance(n);
+      const OM::Assembly::Instance &ai = assy.utilInstance(n);
       size_t nCandidates = cs.size();
       m_feasibleContainers.resize(nCandidates);
       std::string container;
@@ -974,7 +975,7 @@ it is really per actual worker config...
 	       n, ai.m_name.c_str(), nCandidates);
       for (unsigned m = 0; m < nCandidates; m++) {
 	m_curMap = 0;        // to accumulate containers suitable for this candidate
-	OU::Worker &w = cs[m].impl->m_metadataImpl;
+	OM::Worker &w = cs[m].impl->m_metadataImpl;
 	ocpiInfo("  --------------------------------------------------------------------------------");
 	ocpiInfo("  Candidate %2u: checking implementation %s model %s os %s version %s arch %s "
 		 "platform %s dynamic %u opencpi version %s",
@@ -1007,7 +1008,7 @@ it is really per actual worker config...
 		  ai.m_name.c_str(), ai.m_specName.c_str());
 	  for (unsigned m = 0; m < nCandidates; m++) {
 	    const OL::Implementation &lImpl = *cs[m].impl;
-	    OU::Worker &mImpl = lImpl.m_metadataImpl;
+	    OM::Worker &mImpl = lImpl.m_metadataImpl;
 	    fprintf(stderr, "  Name: %s, Model: %s, Arch: %s, Platform: %s%s%s, OpenCPI Version: %s, File: %s\n",
 		    mImpl.cname(),
 		    mImpl.model().c_str(),
@@ -1263,12 +1264,12 @@ it is really per actual worker config...
                       impl.m_staticInstance ? ezxml_cattr(impl.m_staticInstance, "name") : "",
                       impl.m_artifact.name().c_str(), tbuf);
 	    }
-	  const OU::Port *p;
+	  const OM::Port *p;
 	  for (unsigned nn = 0; (p = getMetaPort(nn)); nn++) {
 	    if (nn == 0)
 	      fprintf(stderr, "External ports:\n");
 	    fprintf(stderr, " %u: application port \"%s\" is %s\n", nn,
-		    p->OU::Port::m_name.c_str(), p->m_provider ? "input" : "output");
+		    p->OM::Port::m_name.c_str(), p->m_provider ? "input" : "output");
 	  }
         }
       } catch (...) {
@@ -1283,9 +1284,9 @@ it is really per actual worker config...
     }
 
     void ApplicationI::
-    setLaunchPort(OC::Launcher::Port &p, const OU::Port *mp, const OU::PValue *connParams,
+    setLaunchPort(OC::Launcher::Port &p, const OM::Port *mp, const OU::PValue *connParams,
                   const std::string &a_name, const OU::PValue *portParams,
-                  const OC::Launcher::Member *member, const OU::Assembly::External *ep,
+                  const OC::Launcher::Member *member, const OM::Assembly::External *ep,
                   size_t scale, size_t index) {
       p.m_scale = scale == 1 ? 0 : scale; // zero means no scaling/bridging/fanin/fanout
       p.m_index = index;
@@ -1343,7 +1344,7 @@ it is really per actual worker config...
       assert("missing connection for buffersizeport"==0);
       return *lc;
     }
-    // Initialize our own database of connections from the OU::Assembly connections
+    // Initialize our own database of connections from the OM::Assembly connections
     // This can be done before any resources are actually allocated.  It is just
     // building the launch database.  finalizeLaunchConnections must be done after
     // containers are established for instances.
@@ -1359,7 +1360,7 @@ it is really per actual worker config...
       for (auto ci = m_bestConnections.begin(); ci != m_bestConnections.end(); ++ci) {
         Deployment *dIn = NULL, *dOut = NULL;
         for (auto pi = (*ci).m_ports.begin(); pi != (*ci).m_ports.end(); ++pi) {
-          OU::Assembly::Role &r = (*pi).first->m_role;
+          OM::Assembly::Role &r = (*pi).first->m_role;
           assert(r.m_knownRole && !r.m_bidirectional);
           (r.m_provider ? dIn : dOut) = &m_bestDeployments[(*pi).first->m_instance];
         }
@@ -1368,9 +1369,9 @@ it is really per actual worker config...
       // Pass 1a: count the connections required that are internal to an instance crew
       auto *d = &m_bestDeployments[0];
       for (unsigned n = 0; n < m_bestDeployments.size(); n++, d++) {
-        const OU::Worker &firstImpl = d->m_impls[0]->m_metadataImpl;
+        const OM::Worker &firstImpl = d->m_impls[0]->m_metadataImpl;
         unsigned nPorts;
-        OU::Port *p = firstImpl.ports(nPorts);
+        OM::Port *p = firstImpl.ports(nPorts);
         for (unsigned nn = 0; nn < nPorts; nn++, p++)
           if (p->m_isInternal) {
             if (!p->m_isOptional || d->m_scale > 1)
@@ -1382,14 +1383,14 @@ it is really per actual worker config...
       m_launchConnections.resize(nMemberConnections);
       OC::Launcher::Connection *lc = &m_launchConnections[0];
       for (auto ci = m_bestConnections.begin(); ci != m_bestConnections.end(); ++ci) {
-        const OU::Assembly::Port *aIn = NULL, *aOut = NULL;
+        const OM::Assembly::Port *aIn = NULL, *aOut = NULL;
         Deployment *dIn = NULL, *dOut = NULL;
-        OU::Port *pIn = NULL, *pOut = NULL;
+        OM::Port *pIn = NULL, *pOut = NULL;
         size_t inScale = 1, outScale = 1;
         for (auto pi = (*ci).m_ports.begin(); pi != (*ci).m_ports.end(); ++pi) {
 	  auto &ap = *(*pi).first;
           d = &m_bestDeployments[ap.m_instance];
-          OU::Port *p =
+          OM::Port *p =
             d->m_impls[0]->m_metadataImpl.findMetaPort(ap.m_name.c_str());
           assert(p);
           if (ap.m_role.m_provider) {
@@ -1404,7 +1405,7 @@ it is really per actual worker config...
             outScale = d->m_crew.m_size;
           }
         }
-        OU::Assembly::External *e = NULL;
+        OM::Assembly::External *e = NULL;
         const OU::PValue *eParams = NULL;
         if ((*ci).m_externals.size()) {
           e = (*ci).m_externals.front().first;
@@ -1433,10 +1434,10 @@ it is really per actual worker config...
       // Pass 2a: add the internal connections
       d = &m_bestDeployments[0];
       for (unsigned n = 0; n < m_bestDeployments.size(); n++, d++) {
-        const OU::Worker &firstImpl = d->m_impls[0]->m_metadataImpl;
+        const OM::Worker &firstImpl = d->m_impls[0]->m_metadataImpl;
         size_t scale = d->m_scale;
         unsigned nPorts;
-        OU::Port *p = firstImpl.ports(nPorts);
+        OM::Port *p = firstImpl.ports(nPorts);
         for (unsigned nn = 0; nn < nPorts; nn++, p++)
           if (p->m_isInternal) {
             if (!p->m_isOptional || d->m_scale > 1) {
@@ -1474,7 +1475,7 @@ it is really per actual worker config...
             lc->m_in.m_metaPort->m_bufferSizePort == SIZE_MAX &&
             lc->m_out.m_metaPort->m_bufferSizePort == SIZE_MAX)
           lc->m_bufferSize =
-            OU::Port::determineBufferSize(lc->m_in.m_metaPort, lc->m_in.m_params, SIZE_MAX,
+            OM::Port::determineBufferSize(lc->m_in.m_metaPort, lc->m_in.m_params, SIZE_MAX,
                                           lc->m_out.m_metaPort, lc->m_out.m_params, SIZE_MAX, NULL);
         else {
           if (lc->m_in.m_metaPort->m_bufferSizePort != SIZE_MAX)
@@ -1492,7 +1493,7 @@ it is really per actual worker config...
               (!lc->m_in.m_otherConn || lc->m_in.m_otherConn->m_bufferSize != SIZE_MAX) &&
               (!lc->m_out.m_otherConn || lc->m_out.m_otherConn->m_bufferSize != SIZE_MAX)) {
             lc->m_bufferSize =
-              OU::Port::determineBufferSize(lc->m_in.m_metaPort, lc->m_in.m_params,
+              OM::Port::determineBufferSize(lc->m_in.m_metaPort, lc->m_in.m_params,
                                             lc->m_in.m_otherConn ? lc->m_in.m_otherConn->m_bufferSize : SIZE_MAX,
                                             lc->m_out.m_metaPort, lc->m_out.m_params,
                                             lc->m_out.m_otherConn ? lc->m_out.m_otherConn->m_bufferSize : SIZE_MAX,
@@ -1599,10 +1600,10 @@ it is really per actual worker config...
     // Support querying the application for its ports for internal tools
     // Return a pointer or null, based on ordinal
     // The caller does:
-    //    OU::Port *p;
+    //    OM::Port *p;
     //    for(unsigned n = 0; app.getMetaPort(n); n++)
     //       do-something-with-p
-    const OU::Port *ApplicationI::
+    const OM::Port *ApplicationI::
     getMetaPort(unsigned n) const {
       if (n >= m_externalsOrdered.size())
         return NULL;
@@ -1751,7 +1752,7 @@ it is really per actual worker config...
       if (m_delayedPropertyValues.size()) {
         if (m_verbose)
           fprintf(stderr, "Setting delayed property values while application is running.\n");
-        OU::Assembly::Delay now = 0;
+        OM::Assembly::Delay now = 0;
         for (auto it = m_delayedPropertyValues.begin();
              it != m_delayedPropertyValues.end(); ++it) {
           if (it->first > now) {
@@ -1933,7 +1934,7 @@ it is really per actual worker config...
         m_member(m_info) {
       init();
     }
-    const OU::Property *ApplicationI::property(unsigned ordinal, std::string &a_name) const {
+    const OM::Property *ApplicationI::property(unsigned ordinal, std::string &a_name) const {
       if (ordinal >= m_nProperties)
         return NULL;
       Property &p = m_properties[ordinal];
@@ -2064,7 +2065,7 @@ it is really per actual worker config...
     void ApplicationI::Deployment::
     set(const std::string &name, size_t scale, const unsigned *containers,
 	const OL::Implementation * const *impls, CMap feasible, bool hasMaster,
-	const OU::Assembly::Properties *properties) {
+	const OM::Assembly::Properties *properties) {
       m_name = name;
       m_scale = scale;
       m_impls.resize(scale);

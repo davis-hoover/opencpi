@@ -22,11 +22,12 @@
 #include <strings.h>
 #include <iostream>
 #include "OcpiLibraryAssembly.h"
-#include "OcpiUtilValue.h"
+#include "UtilValue.hh"
 #include "OcpiUtilEzxml.h"
 
 namespace OCPI {
   namespace Library {
+    namespace OM = OCPI::Metadata;
     namespace OU = OCPI::Util;
     namespace OE = OCPI::Util::EzXml;
 
@@ -38,8 +39,8 @@ namespace OCPI {
     static const char *instAttrs[] = { COLLOCATION_POLICY_ATTRS,
 				       "model", "platform", "container", NULL};
 
-    Assembly::Assembly(ezxml_t a_xml, const char *a_name, const OCPI::Util::PValue *params)
-      : OU::Assembly(a_xml, a_name, false, assyAttrs, instAttrs, params), m_refCount(1) {
+    Assembly::Assembly(ezxml_t a_xml, const char *a_name, const OU::PValue *params)
+      : OM::Assembly(a_xml, a_name, false, assyAttrs, instAttrs, params), m_refCount(1) {
       m_nAppInstances = nUtilInstances();
       findImplementations(params);
     }
@@ -71,7 +72,7 @@ namespace OCPI {
     // will replace it.
     const char *Assembly::
     getPortAssignment(const char *pName, const char *assign, size_t &instn, size_t &portn,
-		      const OU::Port *&port, const char *&value, bool removeExternal) {
+		      const OM::Port *&port, const char *&value, bool removeExternal) {
       unsigned neqs = 0;
       const char *eq = strchr(assign, '?'); // points past instance or external port
       for (const char *cp = assign; *cp && (!eq || cp < eq); cp++)
@@ -82,9 +83,9 @@ namespace OCPI {
       auto ci = m_connections.end();
       if (neqs == 1) { // find an external port with this name
 	pname.assign(assign, OCPI_SIZE_T_DIFF(eq, assign));
-	const OU::Assembly::Port *ap = NULL;
+	const OM::Assembly::Port *ap = NULL;
 	for (ci = m_connections.begin(); ci != m_connections.end(); ci++) {
-	  const OU::Assembly::Connection &c = **ci;
+	  const OM::Assembly::Connection &c = **ci;
 	  if (c.m_externals.size() &&
 	      !strcasecmp(pname.c_str(), c.m_externals.front().first->m_name.c_str())) {
 	    ap = c.m_ports.front().first;
@@ -105,8 +106,8 @@ namespace OCPI {
 	// There might be an external connection on this port that has to be removed...
 	if (removeExternal)
 	  for (ci = m_connections.begin(); ci != m_connections.end(); ci++) {
-	    const OU::Assembly::Connection &c = **ci;
-	    const OU::Assembly::Port *ap = c.m_ports.front().first;
+	    const OM::Assembly::Connection &c = **ci;
+	    const OM::Assembly::Port *ap = c.m_ports.front().first;
 	    if (c.m_externals.size() && ap->m_instance == instn &&
 		!strcasecmp(ap->m_name.c_str(), pname.c_str()))
 		  break;
@@ -116,7 +117,7 @@ namespace OCPI {
 			    "<instance>=<port>=<filename> of <external-port>=<filename>",
 			    pName, assign);
       unsigned nPorts;
-      const OU::Port *p = m_instances[instn]->m_candidates[0].impl->m_metadataImpl.ports(nPorts);
+      const OM::Port *p = m_instances[instn]->m_candidates[0].impl->m_metadataImpl.ports(nPorts);
       for (unsigned nn = 0; nn < nPorts; nn++, p++)
 	if (!strcasecmp(pname.c_str(), p->m_name.c_str())) {
 	  value = eq + 1;
@@ -133,12 +134,12 @@ namespace OCPI {
     // After all the other implementations are established, so we know port directions etc.,
     // insert file read/write components
     const char *Assembly::
-    addFileIoInstances(const OCPI::Util::PValue *params) {
+    addFileIoInstances(const OU::PValue *params) {
       const char *assign;
       for (unsigned n = 0; OU::findAssignNext(params, "file", NULL, assign, n); ) {
 	const char *value, *err;
 	size_t instn, portn;
-	const OU::Port *port;
+	const OM::Port *port;
 	if ((err = getPortAssignment("file", assign, instn, portn, port, value, true)))
 	  return err;
 	bool reading = port->m_provider;
@@ -173,7 +174,7 @@ namespace OCPI {
 	char *x = ezxml_toxml(inst);
 	ocpiInfo("adding file I/O component: %s", x);
 	free(x);
-	if ((err = OU::Assembly::addInstance(inst, NULL, NULL, true)) ||
+	if ((err = OM::Assembly::addInstance(inst, NULL, NULL, true)) ||
 	    (err = utilInstance(nUtilInstances() - 1).parseConnection(inst, *this, params)))
 	  return err;
 	addInstance(params);
@@ -187,7 +188,7 @@ namespace OCPI {
     // Here is where we process the matchup between the port names in the util::assembly
     // and the port names in implementations in the libraries
     bool Assembly::Instance::
-    resolveUtilPorts(const Implementation &i, OU::Assembly &utilAssy) {
+    resolveUtilPorts(const Implementation &i, OM::Assembly &utilAssy) {
       // This test works even when there are no ports
       if (m_assyPorts) {
 	// We have processed an implementation before, just check for consistency
@@ -203,17 +204,17 @@ namespace OCPI {
       // If it fails for some reason, we just rejected it and wait for another one.
       // We undo any side effects on failure so that if a good match comes later,
       // we can accept it.
-      OU::Port *ports = i.m_metadataImpl.ports(m_nPorts);
-      OU::Assembly::Port **ap = new OU::Assembly::Port *[m_nPorts];
+      OM::Port *ports = i.m_metadataImpl.ports(m_nPorts);
+      OM::Assembly::Port **ap = new OM::Assembly::Port *[m_nPorts];
       for (unsigned n = 0; n < m_nPorts; n++)
 	ap[n] = NULL;
-      OU::Assembly::Instance &inst = m_utilInstance;
-      OU::Port *p;
+      OM::Assembly::Instance &inst = m_utilInstance;
+      OM::Port *p;
 
       // build the map from implementation port ordinals to util::assembly::ports
       for (auto pi = inst.m_ports.begin(); pi != inst.m_ports.end(); pi++) {
-	OU::Port *found = NULL;
-	OU::Assembly::Port &asp = *pi;
+	OM::Port *found = NULL;
+	OM::Assembly::Port &asp = *pi;
 	if (asp.m_name.empty()) {
 	  // Resolve empty port names to be unambiguous if possible
 	  p = ports;
@@ -279,7 +280,7 @@ namespace OCPI {
       }
       // Final side effects on success
       if (inst.m_externals) {
-	// If the OU::Assembly instance specified that unconnected ports
+	// If the OM::Assembly instance specified that unconnected ports
 	// should be externalized, we do that now.
 	p = ports;
 	for (unsigned n = 0; n < m_nPorts; n++, p++) {
@@ -335,8 +336,8 @@ namespace OCPI {
       // some connectivity constraints.  If the implementation has hard-wired connections
       // that are incompatible with the assembly, we reject it.
       if (i.m_externals) {
-	OU::Port::Mask m = 1;
-	for (unsigned n = 0; n < OU::Port::c_maxPorts; n++, m <<= 1)
+	OM::Port::Mask m = 1;
+	for (unsigned n = 0; n < OM::Port::c_maxPorts; n++, m <<= 1)
 	  if (m & i.m_externals) {
 	    // This port cannot be connected to another instance in the same container.
 	    // Thus it PRECLUDES other connected instances on the same container.
@@ -348,12 +349,12 @@ namespace OCPI {
       if (i.m_internals) {
 	OCPI::Library::Connection *c = i.m_connections;
 	unsigned nPorts;
-	OU::Port *p = i.m_metadataImpl.ports(nPorts);
-	OU::Port::Mask m = 1;
+	OM::Port *p = i.m_metadataImpl.ports(nPorts);
+	OM::Port::Mask m = 1;
 	unsigned bump = 0;
 	for (unsigned n = 0; n < nPorts; n++, m <<= 1, c++, p++)
 	  if (m & i.m_internals) { // port is connected inside the artifact
-	    OU::Assembly::Port *ap = m_assyPorts[n];
+	    OM::Assembly::Port *ap = m_assyPorts[n];
 	    if (!ap) // port not connected at all, which is not viable
 	      return reject(*this, i,
 			    "artifact having port \"%s\" connected while application doesn't.",
@@ -492,20 +493,20 @@ namespace OCPI {
       // Check for property and parameter matches
       // Mentioned Property values have to be initial, and if parameters, they must match
       // values.
-      const OU::Assembly::Properties &aProps = m_utilInstance.m_properties;
+      const OM::Assembly::Properties &aProps = m_utilInstance.m_properties;
       for (unsigned ap = 0; ap < aProps.size(); ap++) {
 	const char
 	  *apName = aProps[ap].m_name.c_str(),
 	  *apValue = aProps[ap].m_value.c_str();
 
-	OU::Property *up = impl.m_metadataImpl.getProperty(apName);
+	OM::Property *up = impl.m_metadataImpl.getProperty(apName);
 	if (!up) {
 	  ocpiInfo("    Rejected: initial property \"%s\" not found", apName);
 	  return false;
 	}
 	if (!aProps[ap].m_hasValue)
 	  continue; // used by dumpfile
-	OU::Property &uProp = *up;
+	OM::Property &uProp = *up;
 	if (!uProp.m_isWritable && !uProp.m_isParameter) {
 	  ocpiInfo("    Rejected: initial property \"%s\" was neither writable nor a parameter",
 		   apName);
@@ -556,7 +557,7 @@ namespace OCPI {
     void Assembly::
     addInstance(const OU::PValue *params) {
       unsigned n = (unsigned)m_instances.size();
-      m_instances.push_back(new Instance(OU::Assembly::instance(n)));
+      m_instances.push_back(new Instance(OM::Assembly::instance(n)));
       ocpiInfo("================================================================================");
       ocpiInfo("For instance %2u: \"%s\", finding and checking candidate implementations/workers",
 	       n, utilInstance(n).cname());
@@ -564,7 +565,7 @@ namespace OCPI {
       if (m_deployed)
 	return;
       m_tempInstance = m_instances.back();
-      const OU::Assembly::Instance &inst = m_tempInstance->m_utilInstance;
+      const OM::Assembly::Instance &inst = m_tempInstance->m_utilInstance;
       // need to deal with params that can filter impls: model and platform
       ezxml_t x = inst.xml();
       if (!OU::findAssign(params, "model", inst.m_name.c_str(), m_model) &&
@@ -650,12 +651,12 @@ namespace OCPI {
       // We assume all implementations have the same protocol metadata
       //      unsigned nConns = m_connections.size();
       for (auto ci = m_connections.begin(); ci != m_connections.end(); ci++) {
-	const OU::Assembly::Connection &c = **ci;
+	const OM::Assembly::Connection &c = **ci;
 	if (c.m_ports.size() == 2) {
-	  const OU::Worker // implementations on both sides of the connection
+	  const OM::Worker // implementations on both sides of the connection
 	    &i0 = m_instances[c.m_ports.front().first->m_instance]->m_candidates[0].impl->m_metadataImpl,
 	    &i1 = m_instances[c.m_ports.back().first->m_instance]->m_candidates[0].impl->m_metadataImpl;
-	  OU::Port // ports on both sides of the connection
+	  OM::Port // ports on both sides of the connection
 	    *ap0 = i0.findMetaPort(c.m_ports.front().first->m_name),
 	    *ap1 = i1.findMetaPort(c.m_ports.back().first->m_name);
 	  if (!ap0 || !ap1)
@@ -672,7 +673,7 @@ namespace OCPI {
 			    utilInstance(c.m_ports.back().first->m_instance).m_name.c_str(),
 			    (ap1->m_provider ? "true" : "false"));
 	  // Protocol on both sides of the connection
-	  OU::Protocol &p0 = *ap0, &p1 = *ap1;
+	  OM::Protocol &p0 = *ap0, &p1 = *ap1;
 	  if (p0.m_name.size() && p1.m_name.size() && p0.m_name != p1.m_name)
 	    throw OU::Error("Protocols in connection are incompatible: "
 			    "port \"%s\" of instance \"%s\" has protocol \"%s\" vs. "
@@ -694,8 +695,8 @@ namespace OCPI {
     // with an already chosen implementation. Now we can check whether this impl conflicts with
     // that one or not
     bool Assembly::
-    badConnection(const Implementation &thisImpl, const OCPI::Util::Port &thisPort,
-		  const Implementation &otherImpl, const OCPI::Util::Port &otherPort) {
+    badConnection(const Implementation &thisImpl, const OM::Port &thisPort,
+		  const Implementation &otherImpl, const OM::Port &otherPort) {
       if (thisImpl.m_internals & (1u << thisPort.m_ordinal)) {
 	if (!(otherImpl.m_internals & (1u << otherPort.m_ordinal)) ||
 	    otherImpl.m_connections[otherPort.m_ordinal].impl != &thisImpl ||
@@ -718,7 +719,7 @@ namespace OCPI {
     }
 
     Assembly::Instance::
-    Instance(OU::Assembly::Instance &utilInstance, Instance *master)
+    Instance(OM::Assembly::Instance &utilInstance, Instance *master)
       : m_utilInstance(utilInstance), m_assyPorts(NULL), m_nPorts(0), m_master(master) {
       // m_assyPorts will be initialized based on first impl found
     }

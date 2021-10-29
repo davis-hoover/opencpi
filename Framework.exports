@@ -78,6 +78,7 @@
 +tools/ocpidev/assets/library.py <target>/lib/_opencpi/assets/
 +tools/ocpidev/assets/platform.py <target>/lib/_opencpi/assets/
 +tools/ocpidev/assets/project.py <target>/lib/_opencpi/assets/
++tools/ocpidev/assets/prerequisite.py <target>/lib/_opencpi/assets/
 +tools/ocpidev/assets/registry.py <target>/lib/_opencpi/assets/
 +tools/ocpidev/assets/test.py <target>/lib/_opencpi/assets/
 +tools/ocpidev/assets/worker.py <target>/lib/_opencpi/assets/
@@ -243,9 +244,9 @@
 +runtime/application/include/OcpiApplicationApi.h include/rcc/
 +runtime/container/include/OcpiContainerApi.h include/rcc/
 +runtime/util/ior/include/OcpiCorbaApi.h include/rcc/
-+runtime/util/property/include/OcpiPValueApi.h include/rcc/
-+runtime/util/property/include/OcpiUtilDataTypesApi.h include/rcc/
-+runtime/util/property/include/OcpiUtilPropertyApi.h include/rcc/
++runtime/util/value/include/OcpiPValueApi.hh include/rcc/
++runtime/util/value/include/OcpiDataTypesApi.hh include/rcc/
++runtime/metadata/include/OcpiPropertyApi.hh include/rcc/
 +runtime/util/misc/include/OcpiUtilExceptionApi.h include/rcc/
 +runtime/library/include/OcpiLibraryApi.h include/rcc/
 # End of undocumented temporary stuff until multi-slaves

@@ -20,10 +20,10 @@
 
 #include <cstring>
 #include "OsMisc.hh"
-#include "OcpiUtilValue.h"
+#include "UtilValue.hh"
 #include "OcpiUtilMisc.h"
 #define OCPI_OPTIONS_NO_MAIN 1
-#include "CmdOption.h"
+#include "CmdOption.hh"
 
 // Limitations:
 //  No support for multiple letter options in one flag (dubious UI in any case)

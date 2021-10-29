@@ -43,12 +43,12 @@
 #include "OcpiLibraryManager.h"  // OL::* stuff
 #include "OsAssert.hh"  // ocpiLog macros
 #include "OsFileSystem.hh"  // Filesystem ops like mkdir etc.
-#include "OcpiUtilDataTypesApi.h"  // OA::OCPI_* types
+#include "OcpiDataTypesApi.hh"  // OA::OCPI_* types
 #include "OcpiUtilException.h"  // OU::Error
 #include "OcpiUtilMisc.h"  // OU::format, getProjectRegistry, string2File
-#include "OcpiUtilPort.h"  // OU::Port
-#include "OcpiUtilProperty.h"  // OU::Property
-#include "OcpiUtilWorker.h"  // OU::Worker
+#include "MetadataPort.hh"  // OM::Port
+#include "MetadataProperty.hh"  // OM::Property
+#include "MetadataWorker.hh"  // OM::Worker
 
 #define AUTO_PLATFORM_COLOR "#afaf75"
 
@@ -64,12 +64,12 @@
   CMD_OPTION  (verbose,   v, Bool,   NULL, "Set verbosity to info level") \
   CMD_OPTION  (debug,     d, Bool,   NULL, "Set verbosity to debug level") \
   CMD_OPTION  (directory, D, String, ".",  "Specify the directory in which to put output generated files")
-#include "CmdOption.h"
+#include "CmdOption.hh"
 
 // Instantiate ocipgr object
 static OcpigrObj ocpigr;
 
-static void genWorkerBlocks(OU::Worker &w){
+static void genWorkerBlocks(OM::Worker &w){
   ocpigr.genWorkerBlocks(w);
 }
 
@@ -138,7 +138,7 @@ static int mymain(const char ** /*ap*/) {
 //
 // Output: none - write out a yaml file into the chosen directory
 //////////
-void OcpigrObj::genWorkerBlocks(OU::Worker &w) {
+void OcpigrObj::genWorkerBlocks(OM::Worker &w) {
   assert(w.attributes().platform().length());
 
   // Only process each worker once
@@ -250,7 +250,7 @@ void OcpigrObj::genWorkerBlocks(OU::Worker &w) {
   
   // Add component specific properties in parameters
   uint32_t np = 0;
-  OU::Property* p = w.properties(np);
+  OM::Property* p = w.properties(np);
   for (uint32_t n = 0; n < np; ++n, ++p) {
     if (!p->m_isImpl) {
       addProperty(workerEmitter, w, p);
@@ -262,9 +262,9 @@ void OcpigrObj::genWorkerBlocks(OU::Worker &w) {
   }
 
   // Add properties specific to a particular worker
-  std::map<std::string, std::set < OU::Property *>>::const_iterator wsp = workerSpecificProperties[w.specName()].begin();
+  std::map<std::string, std::set < OM::Property *>>::const_iterator wsp = workerSpecificProperties[w.specName()].begin();
   while (wsp != workerSpecificProperties[w.specName()].end()) {
-    std::set<OU::Property *>::const_iterator prop = wsp->second.begin();
+    std::set<OM::Property *>::const_iterator prop = wsp->second.begin();
     while (prop != wsp->second.end()) {
       addProperty(workerEmitter, w, *prop);
       prop++;
@@ -281,11 +281,11 @@ void OcpigrObj::genWorkerBlocks(OU::Worker &w) {
   std::vector<std::map<std::string, std::string>> inputsVector;
   std::vector<std::map<std::string, std::string>> outputsVector;
   np = 0; // reset np
-  OU::Port *ports = w.ports(np);
+  OM::Port *ports = w.ports(np);
 
   // Loop through ports and gather input and output information for the worker
   for (uint32_t n = 0; n < np; ++n, ++ports) {
-    OU::Port &port = *ports;
+    OM::Port &port = *ports;
 
     // Build portMap which contains the following information for a given input or output
     // label, domain, dtype, optional, protocol
@@ -399,7 +399,7 @@ void OcpigrObj::genWorkerBlocks(OU::Worker &w) {
 //
 // Output: None - adds data to the yaml emitter
 //////////
-void OcpigrObj::addProperty(YAML::Emitter& emitter, OU::Worker &w, OU::Property *p) {
+void OcpigrObj::addProperty(YAML::Emitter& emitter, OM::Worker &w, OM::Property *p) {
   // Add parameter id and label to yaml emitter
   emitter << YAML::BeginMap; // start parameter_map
   emitter << YAML::Key << "id" << YAML::Value << p->cname();
@@ -498,7 +498,7 @@ void OcpigrObj::addProperty(YAML::Emitter& emitter, OU::Worker &w, OU::Property 
 //
 // Output: "raw" - raw is the catch all type in GRC yaml blocks
 //////////
-const char* OcpigrObj::incompatibleType(OU::Worker& w, const char* tag, const char* val) {
+const char* OcpigrObj::incompatibleType(OM::Worker& w, const char* tag, const char* val) {
   ocpiInfo("Incompatible type in worker: %s - can't map %s %s\n", w.cname(), tag, val);
   return "raw";
 }

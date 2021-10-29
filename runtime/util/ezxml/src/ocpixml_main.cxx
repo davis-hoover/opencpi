@@ -57,7 +57,7 @@ namespace OS = OCPI::OS;
                                            "if no attributes are specified top element name is printed\n") \
     CMD_OPTION(silent,       s, Bool,  0, "<silent>") \
 
-#include "CmdOption.h"
+#include "CmdOption.hh"
 
 static void bad(const char *fmt, ...) {
   if (options.silent())

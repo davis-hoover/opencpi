@@ -20,9 +20,9 @@
 
 #include <limits>
 #include "OsAssert.hh"
-#include "OcpiUtilProperty.h"
+#include "MetadataProperty.hh"
 #include "OcpiUtilException.h"
-#include "OcpiUtilValue.h"
+#include "UtilValue.hh"
 #include "OcpiContainerApi.h"
 
 namespace OU = OCPI::Util;

@@ -3,7 +3,7 @@
             Type="UChar"
             Parameter="True"
             Default="12"
-            Description="Number of bits in each of the I and Q values delivered to the DAC device"/>
+            Description="Number of bits in each of the real and imaginary values delivered to the DAC device"/>
   <Property Name="DAC_OUTPUT_IS_LSB_OF_IN_PORT" 
             Type="Bool" 
             Parameter="True"

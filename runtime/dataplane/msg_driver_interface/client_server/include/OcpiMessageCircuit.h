@@ -34,7 +34,6 @@
 #define OCPI_Transport_Message_Circuit_H_
 
 #include "OsTimer.hh"
-#include <OcpiUtilProtocol.h>
 #include <OcpiTransport.h>
 
 namespace OCPI {

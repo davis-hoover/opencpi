@@ -32,7 +32,7 @@
 #include <fstream>
 #include <iostream>
 #include "OsAssert.hh"
-#include <OcpiUtilDataTypesApi.h>
+#include "OcpiDataTypesApi.hh"
 
 #ifndef OCPI_TIME_ANALYZER_INLINE_VALID_USE__
 #error "You are not permitted to include this file standalone"

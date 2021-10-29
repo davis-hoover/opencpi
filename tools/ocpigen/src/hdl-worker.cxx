@@ -27,8 +27,6 @@
 #include "hdl.h"
 #include "assembly.h"
 
-namespace OU = OCPI::Util;
-
 void
 emitSignal(const char *signal, FILE *f, Language lang, Signal::Direction dir,
 	   std::string &last, int width, unsigned n, const char *pref,
@@ -147,7 +145,7 @@ vhdlBaseType(const OU::Member &dt, std::string &s, bool convert, bool finalized)
 }
 
 static void
-vhdlArrayType(const OU::Property &dt, size_t rank, const size_t */*dims*/, std::string &decl,
+vhdlArrayType(const OM::Property &dt, size_t rank, const size_t */*dims*/, std::string &decl,
 	      std::string &type, bool convert, bool finalized) {
   if (convert) {
     OU::format(type, "std_logic_vector(%zu*(%s)-1 downto 0)", dt.m_nItems,
@@ -204,7 +202,7 @@ vhdlArrayType(const OU::Property &dt, size_t rank, const size_t */*dims*/, std::
 
 // Custom types are for enumerations or string arrays - otherwise built-in types are used.
 void
-vhdlType(const OU::Property &dt, std::string &decl, std::string &type, bool convert,
+vhdlType(const OM::Property &dt, std::string &decl, std::string &type, bool convert,
 	 bool finalized) {
   decl.clear();
   if (!convert && dt.m_baseType == OA::OCPI_Enum) {
@@ -438,7 +436,7 @@ vhdlInnerValue(const std::string &name, const char *pkg, const OU::Value &v, boo
 // The readback value is what is fed to the readback module for muxing
 // into the control plane output datapath
 static void
-vhdlConstant2Readback(const OU::Property &pr, const std::string &val, std::string &out) {
+vhdlConstant2Readback(const OM::Property &pr, const std::string &val, std::string &out) {
   std::string decl, type;
   vhdlType(pr, decl, type, false);
   if (decl.length() && pr.m_baseType == OA::OCPI_Enum)
@@ -611,7 +609,7 @@ emitParameters(FILE *f, Language lang, bool useDefaults, bool convert) {
   bool first = true;
   std::string last;
   for (PropertiesIter pi = m_ctl.properties.begin(); pi != m_ctl.properties.end(); pi++) {
-    OU::Property &pr = **pi;
+    OM::Property &pr = **pi;
     if (pr.m_isParameter) {
       if (first) {
 	if (lang == VHDL)
@@ -814,7 +812,7 @@ emitSignals(FILE *f, Language lang, bool useRecords, bool inPackage, bool inWork
 }
 
 // Add to the referenced string the value that is the number of elements of the property
-static void prElemsAdd(OU::Property &pr, const std::string &prefix, std::string &s) {
+static void prElemsAdd(OM::Property &pr, const std::string &prefix, std::string &s) {
   if (pr.m_isSequence) {
     if (pr.m_sequenceLengthExpr.length())
       s += prefix + "_sequence_length";
@@ -843,7 +841,7 @@ static void prElemsAdd(OU::Property &pr, const std::string &prefix, std::string 
 // -- string arrays have a generated array type
 // -- generated array types are <pname>_array_t
 void Worker::
-prType(OU::Property &pr, std::string &type) {
+prType(OM::Property &pr, std::string &type) {
   // Now we will be using built-in base types or built-in array types
   std::string prefix;
   OU::format(prefix, "work.%s_constants.%s", m_implName, pr.m_name.c_str());
@@ -911,7 +909,7 @@ tempName(char *&temp, unsigned len, const char *fmt, ...) {
 }
 
 void Worker::
-emitVhdlPropMemberData(FILE *f, OU::Property &pr, unsigned maxPropName) {
+emitVhdlPropMemberData(FILE *f, OM::Property &pr, unsigned maxPropName) {
   std::string type;
   if (pr.m_isSequence) {
     type = pr.m_name;
@@ -922,7 +920,7 @@ emitVhdlPropMemberData(FILE *f, OU::Property &pr, unsigned maxPropName) {
   fprintf(f, "    %-*s : %s;\n", maxPropName, pr.m_name.c_str(), type.c_str());
 }
 void Worker::
-emitVhdlPropMember(FILE *f, OU::Property &pr, unsigned maxPropName, bool in2worker) {
+emitVhdlPropMember(FILE *f, OM::Property &pr, unsigned maxPropName, bool in2worker) {
   if (in2worker) {
     char *temp = NULL;
     if (pr.m_isWritable) {
@@ -984,13 +982,13 @@ emitVhdlLibraries(FILE *f) {
 
 const char *Worker::
 emitVhdlPackageConstants(FILE *f) {
-  char ops[OU::Worker::OpsLimit + 1 + 1];
-  for (unsigned op = 0; op <= OU::Worker::OpsLimit; op++)
-    ops[OU::Worker::OpsLimit - op] = '0';
-  ops[OU::Worker::OpsLimit+1] = 0;
+  char ops[OM::Worker::OpsLimit + 1 + 1];
+  for (unsigned op = 0; op <= OM::Worker::OpsLimit; op++)
+    ops[OM::Worker::OpsLimit - op] = '0';
+  ops[OM::Worker::OpsLimit+1] = 0;
   if (m_wci)
-    for (unsigned op = 0; op <= OU::Worker::OpsLimit; op++)
-      ops[OU::Worker::OpsLimit - op] = m_ctl.controlOps & (1u << op) ? '1' : '0';
+    for (unsigned op = 0; op <= OM::Worker::OpsLimit; op++)
+      ops[OM::Worker::OpsLimit - op] = m_ctl.controlOps & (1u << op) ? '1' : '0';
   if (!m_ctl.nNonRawRunProperties) {
     fprintf(f, "-- no properties for this worker\n");
     //	      "  constant properties : ocpi.wci.properties_t(1 to 0) := "
@@ -1003,7 +1001,7 @@ emitVhdlPackageConstants(FILE *f) {
     unsigned n = 0;
     const char *last = NULL;
     for (PropertiesIter pi = m_ctl.properties.begin(); pi != m_ctl.properties.end(); pi++) {
-      OU::Property &pr = **pi;
+      OM::Property &pr = **pi;
       if (!pr.m_isRaw && (!pr.m_isParameter || pr.m_isReadable)) {
 #if 1
 	std::string nElements;
@@ -1174,7 +1172,7 @@ emitDefsHDL(bool wrap) {
 	    "package %s_constants is\n", m_implName);
     bool first = true;
     for (PropertiesIter pi = m_ctl.properties.begin(); pi != m_ctl.properties.end(); pi++) {
-      OU::Property &p = **pi;
+      OM::Property &p = **pi;
       std::string decl, type;
       // Introduce a constant for string/sequence/array lengths that are parameterized
       if (p.m_baseType == OA::OCPI_String) // && p.m_stringLengthExpr.length())
@@ -1441,7 +1439,7 @@ emitVhdlShell(FILE *f) {
       // Assign all members
       const char *last = "";
       for (PropertiesIter pi = m_ctl.properties.begin(); pi != m_ctl.properties.end(); pi++) {
-	OU::Property &p = **pi;
+	OM::Property &p = **pi;
 	if (!p.m_isParameter && !p.m_isRaw && (p.m_isVolatile || (p.m_isReadable && !p.m_isWritable))) {
 	  if (p.m_isSequence) {
 	    fprintf(f, "%s%s_length => props_%s%s_length",
@@ -1699,7 +1697,7 @@ emitVhdlRecordWrapper(FILE *f) {
     bool first = true;
     for (PropertiesIter pi = m_ctl.properties.begin(); pi != m_ctl.properties.end(); pi++)
       if ((*pi)->m_isParameter) {
-	OU::Property &p = **pi;
+	OM::Property &p = **pi;
 	if (first) {
 	  fprintf(f,
 		  "    generic map(\n");
@@ -1770,7 +1768,7 @@ emitImplHDL(bool wrap) {
 	  comment, m_implName, comment, m_pattern);
   unsigned maxPropName = 18;
   for (PropertiesIter pi = m_ctl.properties.begin(); pi != m_ctl.properties.end(); pi++) {
-    OU::Property &pr = **pi;
+    OM::Property &pr = **pi;
     if (pr.m_isRaw)
       continue;
     size_t len = pr.m_name.length();
@@ -1903,7 +1901,7 @@ emitImplHDL(bool wrap) {
 	      "                                                -- worker uses 'done' to delay it\n",
 	      m_implName, m_implName, m_implName, m_implName,
 	      maxPropName, "inputs", m_wci->typeNameIn.c_str(),
-	      maxPropName, "done",
+	      maxPropName, "done", // DEPRECATION NOTICE: This attribute is deprecated and will be replaced with finished in OpenCPI 3.0.
 	      maxPropName, "error",
 	      maxPropName, "finished",
 	      maxPropName, "attention",
@@ -1999,7 +1997,7 @@ emitImplHDL(bool wrap) {
 	}
 	bool first = true;
 	for (PropertiesIter pi = m_ctl.properties.begin(); pi != m_ctl.properties.end(); pi++) {
-	  OU::Property &pr = **pi;
+	  OM::Property &pr = **pi;
 	  if (pr.m_isRaw)
 	    continue;
 	  std::string type;
@@ -2196,7 +2194,7 @@ emitImplHDL(bool wrap) {
 		(m_ctl.rawReadables ? "props_from_worker.raw.data" : "(others => '0')"));
       n = 0;
       for (PropertiesIter pi = m_ctl.properties.begin(); pi != m_ctl.properties.end(); pi++) {
-	OU::Property &pr = **pi;
+	OM::Property &pr = **pi;
 	if (pr.m_isRaw)
 	  continue;
 	const char *name = pr.m_name.c_str();
