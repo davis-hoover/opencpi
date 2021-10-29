@@ -22,7 +22,7 @@
 #include <iostream>
 #include <string>
 #include <typeinfo>
-#include "OcpiUtilTest.h"
+#include "UtilTest.hh"
 
 
 /* ---- Implementation of the test class --------------------------------- */

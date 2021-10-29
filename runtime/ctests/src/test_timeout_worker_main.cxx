@@ -32,11 +32,11 @@
 #include "OsAssert.hh"
 #include <OcpiRDTInterface.h>
 #include <test_utilities.h>
-#include <OcpiUtilCommandLineConfiguration.h>
+#include "UtilCommandLineConfiguration.hh"
 
 #include "UtGenericLoopbackWorkers.h"
 
-#include <OcpiThread.h>
+#include "UtilThread.hh"
 using namespace OCPI::Container;
 using namespace OCPI;
 using namespace OCPI::CONTAINER_TEST;

@@ -35,9 +35,9 @@
  */
 
 #include <OcpiUtilVfs.h>
-#include <OcpiUtilHttpMisc.h>
-#include <OcpiLoggerLogger.h>
-#include <OcpiLoggerNullOutput.h>
+#include "UtilHttpMisc.hh"
+#include "UtilLogger.hh"
+#include "UtilLoggerNullOutput.hh"
 
 namespace OCPI {
   namespace Util {

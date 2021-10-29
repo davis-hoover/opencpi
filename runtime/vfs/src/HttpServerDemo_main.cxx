@@ -18,11 +18,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <OcpiLoggerLogger.h>
-#include <OcpiLoggerDebugLogger.h>
-#include <OcpiLoggerOStreamOutput.h>
+#include "UtilLogger.hh"
+#include "UtilLoggerDebugLogger.hh"
+#include "UtilLoggerOStreamOutput.hh"
 #include <OcpiUtilHttpServer.h>
-#include <OcpiUtilTcpServer.h>
+#include "UtilTcpServer.hh"
 #include <OcpiUtilFileFs.h>
 #include "OsFileSystem.hh"
 #include <iostream>

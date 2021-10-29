@@ -38,15 +38,16 @@
 #include <ezxml.h>
 #include "OsAssert.hh"
 #include "OsMisc.hh"
-#include <OcpiUtilAutoMutex.h>
-#include <OcpiUtilEzxml.h>
-#include "UtilPValue.hh"
+#include "UtilAutoMutex.hh"
+#include "UtilEzxml.hh"
+#include "BasePValue.hh"
 #include <DtMsgDriver.h>
 
 namespace OX = OCPI::Util::EzXml;
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 namespace OS = OCPI::OS;
-namespace OD = OCPI::Driver;
+namespace OD = OCPI::Base::Plugin;
 namespace DTM = DataTransfer::Msg;
 
 using namespace DTM;
@@ -108,10 +109,9 @@ configure( ezxml_t x)
 
 DTM::XferFactory* 
 DTM::XferFactoryManager::
-findFactory( const char* url,
-	    const OCPI::Util::PValue *our_props,
-	    const OCPI::Util::PValue *other_props )
-{
+findFactory(const char* url,
+	    const OB::PValue *our_props,
+	    const OB::PValue *other_props) {
   parent().configure();
   OU::AutoMutex guard ( m_mutex, true );
   for (XferFactory* d = firstDriver(); d; d = d->nextDriver())
@@ -138,7 +138,7 @@ DTM::XferFactoryManager::
 
 DTM::XferFactory::
 XferFactory(const char *a_name)
-  : OCPI::Driver::DriverType<DTM::XferFactoryManager, DTM::XferFactory>(a_name, *this) {
+  : OD::DriverType<DTM::XferFactoryManager, DTM::XferFactory>(a_name, *this) {
 }
 
 void 

@@ -22,9 +22,9 @@
 #include <cstring>
 #include <fstream>
 #include <iostream>
-#include <OcpiLoggerLogger.h>
-#include <OcpiUtilIIOP.h>
-#include <OcpiUtilLwLoggerOutput.h>
+#include "UtilLogger.hh"
+#include "UtilIIOP.hh"
+#include "UtilLwLoggerOutput.hh"
 
 #if !defined (NDEBUG)
 #include "OsDebug.hh"

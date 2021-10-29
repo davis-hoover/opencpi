@@ -28,12 +28,12 @@
 #include <string.h>
 #include <pthread.h>
 #include "OsAssert.hh"
-#include "UtilExpression.hh"
-#include "OcpiUtilEzxml.h"
-#include "OcpiUtilMisc.h"
-#include "OcpiUtilAutoMutex.h"
-#include "UtilValue.hh"
-#include "UtilDataTypes.hh"
+#include "BaseExpression.hh"
+#include "UtilEzxml.hh"
+#include "UtilMisc.hh"
+#include "UtilAutoMutex.hh"
+#include "BaseValue.hh"
+#include "BaseDataTypes.hh"
 
 // Prefix for interpreting string and char types as expressions
 #define EXPR_PREFIX "\\:"
@@ -43,10 +43,10 @@
 #define POSITIONAL_PREFIX_LEN (sizeof(POSITIONAL_PREFIX)-1)
 
 namespace OA = OCPI::API;
+namespace OU = OCPI::Util;
 namespace OE = OCPI::Util::EzXml;
 namespace OCPI {
-  namespace Util {
-
+  namespace Base {
     namespace {
       pthread_once_t s_resolverOnce = PTHREAD_ONCE_INIT;
       pthread_key_t s_resolverKey;
@@ -110,7 +110,7 @@ namespace OCPI {
 	    // !!! There is a very similar loop in parseString
 	    while (unparsed < stop && *unparsed && *unparsed != '"') {
 	      char dummy;
-	      if (parseOneChar(unparsed, stop, dummy))
+	      if (OU::parseOneChar(unparsed, stop, dummy))
 		return "bad double quoted string value";
 	    }
 	    if (unparsed >= stop || !*unparsed)
@@ -119,8 +119,8 @@ namespace OCPI {
 	    break;
 	  case '}':
 	    if (nBraces == 0)
-	      return esprintf("unbalanced braces - extra close brace for (%*s) (%zu)",
-			      (int)(stop - tmp), tmp, stop - tmp);
+	      return OU::esprintf("unbalanced braces - extra close brace for (%*s) (%zu)",
+				  (int)(stop - tmp), tmp, stop - tmp);
 	    if (--nBraces == 0 && !comma) {
 	      end = unparsed;
 	      goto break2;
@@ -196,139 +196,10 @@ namespace OCPI {
       return OCPI::Util::EzXml::parseBool(a, end, &b) ? "bad boolean value" : NULL;
     }
 
-    // cp points after slash at the 'x'
-    // leave cp on last char used if no error
-    static bool
-    hex(const char *&cp, const char *end, char &vp) {
-      if (cp < --end) { // end is now last, not past last
-	char c = *++cp;      // must have one more to be valid
-	if (isxdigit(c)) {
-	  unsigned n;
-	  n = isdigit(c) ? OCPI_CHAR_DIFF(c, '0') : OCPI_CHAR_DIFF(tolower(c), 'a') + 10;
-	  if (cp < end && isxdigit(cp[1])) {
-	    n <<= 4;
-	    c = *++cp;
-	    n += isdigit(c) ? OCPI_CHAR_DIFF(c, '0') : OCPI_CHAR_DIFF(tolower(c), 'a') + 10;
-	  }
-	  vp = (char)(n);
-	  return false;
-	}
-      }
-      return true;
-    }
-
-    // cp points after slash at the 'd'
-    // leave cp on last char used if no error
-    static bool
-    decimal(const char *&cp, const char *end, char &vp, bool isSigned) {
-      if (cp < --end) { // end is now last, not past last
-	char c = *++cp;      // must have one more to be valid
-	bool minus = false;
-	if (isSigned && c == '-') {
-	  if (cp >= end)
-	    return true;
-	  minus = true;
-	  c = *++cp;
-	}
-	if (isdigit(c)) {
-	  int n = c - '0';
-	  if (cp < end && isdigit(cp[1])) {
-	    n *= 10;
-	    n += *++cp - '0';
-	    if (cp < end && isdigit(cp[1])) {
-	      n *= 10;
-	      n += *++cp - '0';
-	      if (n > (minus ? 128 : (isSigned ? 127 : 255)))
-		return true;
-	    }	    
-	  }
-	  vp = (char)(minus ? -n : n);
-	  return false;
-	}
-      }
-      return true;
-    }
-
-    // cp points after slash to an octal digit - 1, 2 or 3 octal digits
-    // leave cp on last char used if no error
-    static bool
-    octal(const char *&cp, const char *end, char &vp) {
-      char c = *cp;
-      unsigned n = OCPI_CHAR_DIFF(c, '0');
-      if (cp < --end) { // end is now the last, not past the last
-	c = cp[1];
-	if (isdigit(c) && c <= '7') {
-	  cp++;
-	  n <<= 3;
-	  n += OCPI_CHAR_DIFF(c, '0');
-	  if (cp < end) {
-	    c = cp[1];
-	    if (isdigit(c) && c <= '7') {
-	      cp++;
-	      n <<= 3;
-	      n += OCPI_CHAR_DIFF(c, '0');
-	      if (n > 0xff)
-		return true;
-	    }
-	  }
-	}
-      }
-      vp = (char)n;
-      return false;
-    }
-    // We implement the defined escapes (in IDL, and C/C++), and we make sure
-    // escaping commas and braces works too
-    // We advance cp over the char
-    bool
-    parseOneChar(const char *&cp, const char *end, char &vp) {
-      if (!*cp || cp == end)
-	return true;
-      if (*cp != '\\' || cp + 1 >= end) {
-	vp = *cp++;
-	return false;
-      }
-      switch (*++cp) {
-      case 'n': vp = '\n'; break;
-      case 't': vp = '\t'; break;
-      case 'v': vp = '\v'; break;
-      case 'b': vp = '\b'; break;
-      case 'r': vp = '\r'; break;
-      case 'f': vp = '\f'; break;
-      case 'a': vp = '\a'; break;
-      case 'd':
-	if (decimal(cp, end, vp, true))
-	  return true;
-	break;
-      case 'u':
-	if (decimal(cp, end, vp, false))
-	  return true;
-	break;
-      case 'x':
-	if (hex(cp, end, vp))
-	  return true;
-	break;
-      case '0': case '1': case '2': case '3': 
-      case '4': case '5': case '6': case '7':
-	if (octal(cp, end, vp))
-	  return true;
-	break;
-      case '\\':
-      case '?':
-      case '\'':
-      case '\"':
-      case ',': case '{': case '}': case ' ':// these are ours, not from C/C++/IDL
-	vp = *cp;
-	break;
-      default:
-	return true;
-      }
-      cp++;
-      return false;
-    }
     const char *Value::
     parseChar(const char*cp, const char *end, char &vp) {
       const char *tmp = cp;
-      return parseOneChar(tmp, end, vp) || tmp != end ? "bad Char value" : NULL;
+      return OU::parseOneChar(tmp, end, vp) || tmp != end ? "bad Char value" : NULL;
     }
     const char *Value::
     parseDouble(const char*cp, const char *end, double &vp) {
@@ -441,7 +312,7 @@ namespace OCPI {
 	  break;
 	} else if (m_vt->m_stringLength && len >= m_vt->m_stringLength)
 	  return "string too long";
-	else if (parseOneChar(cp, end, nextStringChar()))
+	else if (OU::parseOneChar(cp, end, nextStringChar()))
 	  return "bad String value";
       setNextStringChar(0);
       vp = (const char *)start;
@@ -484,11 +355,11 @@ namespace OCPI {
 	    err.append(start,  OCPI_SIZE_T_DIFF(endOfName, start));
 	    err += "\" did not match any of the expected member names (";
 	    for (size_t ii = 0; ii < m_vt->m_nMembers; ii++)
-	      formatAdd(err, "%s\"%s\"", ii ? ", " : "", m_vt->m_members[ii].cname());
+	      OU::formatAdd(err, "%s\"%s\"", ii ? ", " : "", m_vt->m_members[ii].cname());
 	    err += ")";
-	    return esprintf("%s%s", err.c_str(), *start == '{' ?
-			    ", note that opening curly braces are only used for structs when "
-			    "they occur within an array or sequence or struct" : "");
+	    return OU::esprintf("%s%s", err.c_str(), *start == '{' ?
+				", note that opening curly braces are only used for structs when "
+				"they occur within an array or sequence or struct" : "");
 	  }
 	  if (sv[n])
 	    return "duplicate member name in struct value";
@@ -500,8 +371,8 @@ namespace OCPI {
 	  start++;
 	if (v->needsComma()) {
 	  if (*start != '{' || end[-1] != '}')
-	    return esprintf("struct member value needs be enclosed in {} (%*s) (%zu)",
-			    (int)(end - start), start, end - start);
+	    return OU::esprintf("struct member value needs be enclosed in {} (%*s) (%zu)",
+				(int)(end - start), start, end - start);
 	  start++;
 	  end--;
 	}
@@ -594,8 +465,8 @@ namespace OCPI {
 	if (m_nElements == 0 && m_vt->m_baseType != OA::OCPI_String)
 	  return NULL;
 	if (m_vt->m_sequenceLength && m_nElements > m_vt->m_sequenceLength)
-	  return esprintf("Too many elements (%zu) in bounded sequence (%zu)",
-			  m_nElements, m_vt->m_sequenceLength);
+	  return OU::esprintf("Too many elements (%zu) in bounded sequence (%zu)",
+			      m_nElements, m_vt->m_sequenceLength);
       }
       size_t oldLength = m_length;
       try {
@@ -628,11 +499,11 @@ namespace OCPI {
 	case OA::OCPI_none: case OA::OCPI_scalar_type_limit:;
 	}
       } catch (std::bad_alloc &e) {
-	return esprintf("Allocation exception when making value: %s", e.what());
+	return OU::esprintf("Allocation exception when making value: %s", e.what());
       } catch (std::string &e) {
-	return esprintf("Exception when making value: %s", e.c_str());
+	return OU::esprintf("Exception when making value: %s", e.c_str());
       } catch (...) {
-        return  esprintf("Unexpected/unknown exception when making value");
+        return  OU::esprintf("Unexpected/unknown exception when making value");
       }
       if (m_vt->m_baseType == OA::OCPI_Struct) {
 	assert(!add);
@@ -643,7 +514,7 @@ namespace OCPI {
       } else if (m_vt->m_baseType == OA::OCPI_Type) {
 	assert(!add);
 	// This mutex/static ugliness is to supply an argument to the default constructor of Value
-	AutoMutex am(s_mutex);
+	OU::AutoMutex am(s_mutex);
 	Value::s_vt = m_vt->m_type;
 	Value::s_parent = this;
 	m_types = m_typeNext = new Value[m_nTotal];
@@ -761,8 +632,8 @@ namespace OCPI {
 	  break; // return "insufficient array elements";
 	if (nextDim < m_vt->m_arrayRank) {
 	  if (start == end || start[0] != '{' || end[-1] != '}')
-	    return esprintf("array elements not enclosed in {} for (%*s) (%zu)",
-			    (int)(end - start), start, end - start);
+	    return OU::esprintf("array elements not enclosed in {} for (%*s) (%zu)",
+				(int)(end - start), start, end - start);
 	  if ((err = parseDimension(start+1, end-1, nseq, nextDim, offset, skip)))
 	    return err;
 	  offset += skip;
@@ -770,8 +641,8 @@ namespace OCPI {
 	  // strip braces if they were added
 	  if (needsCommaDimension()) {
 	    if (start[0] != '{' || end[-1] != '}')
-	      return esprintf("struct or array element not enclosed in {} for (%*s) (%zu)",
-			      (int)(end - start), start, end - start);
+	      return OU::esprintf("struct or array element not enclosed in {} for (%*s) (%zu)",
+				  (int)(end - start), start, end - start);
 	    start++;
 	    end--;
 	  }
@@ -780,7 +651,7 @@ namespace OCPI {
 	}
       }
       if (unparsed < stop)
-	return esprintf("excess data for array: \"%-*s\"", (int)(stop - unparsed), unparsed);
+	return OU::esprintf("excess data for array: \"%-*s\"", (int)(stop - unparsed), unparsed);
       return NULL;
     }
     // Parse a value that is a sequence element or a single standalone value.
@@ -861,7 +732,9 @@ namespace OCPI {
 	err = "Unexpected illegal type in parsing value";
       }
       return err ?
-	esprintf("in value \"%.*s\" (length of prop value is %zu chars): %s", (int)(end-start), start, end-start, err) : NULL;
+	OU::esprintf("in value \"%.*s\" (length of prop value is %zu chars): %s",
+		     (int)(end-start), start, end-start, err) :
+	NULL;
     }
 
 Unparser::
@@ -936,7 +809,7 @@ doFormat(std::string &s, const char *fmt, ...) const {
   va_list ap;
   va_start(ap, fmt);
   //  formatAddV(s, m_vt->m_format.empty() ? fmt : m_vt->m_format.c_str(), ap);
-  formatAddV(s, fmt, ap);
+  OU::formatAddV(s, fmt, ap);
   va_end(ap);
 }
 
@@ -1206,7 +1079,7 @@ unparseEnum(std::string &s, EnumValue val, const char **enums, size_t nEnums, bo
   if (val < nEnums)
     s += enums[val];
   else
-    formatAdd(s, "<invalid enum 0x%x>", val);
+    OU::formatAdd(s, "<invalid enum 0x%x>", val);
   return val == 0;
 }
 void Value::

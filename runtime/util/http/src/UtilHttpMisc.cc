@@ -18,15 +18,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <OcpiUtilHttpMisc.h>
-#include <OcpiUtilMisc.h>
+#include "UtilHttpMisc.hh"
+#include "UtilMisc.hh"
 #include <string>
 #include <ctime>
 #include <cstdlib>
 
 bool
 OCPI::Util::Http::isToken (const std::string & str)
-  throw ()
+
 {
   std::string::size_type fni;
 
@@ -78,7 +78,7 @@ namespace {
 
 std::time_t
 OCPI::Util::Http::parseHttpDate (const std::string & httpDate)
-  throw (std::string)
+
 {
   struct tm timeStr;
   std::string::size_type idx, idx2;
@@ -259,7 +259,7 @@ OCPI::Util::Http::parseHttpDate (const std::string & httpDate)
 
 std::string
 OCPI::Util::Http::makeHttpDate (std::time_t curTime)
-  throw (std::string)
+
 {
   std::string res;
 
@@ -316,7 +316,7 @@ OCPI::Util::Http::makeHttpDate (std::time_t curTime)
 
 std::string
 OCPI::Util::Http::getHttpTimestamp ()
-  throw ()
+
 {
   return makeHttpDate (time(0));
 }

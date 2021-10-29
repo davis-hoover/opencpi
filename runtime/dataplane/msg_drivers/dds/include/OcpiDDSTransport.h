@@ -36,7 +36,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <OcpiParentChild.h>
+#include "BaseParentChild.hh"
 #include <DtMsgDriver.h>
 
 

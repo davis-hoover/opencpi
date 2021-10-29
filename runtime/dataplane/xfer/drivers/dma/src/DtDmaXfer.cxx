@@ -36,13 +36,14 @@
 #include "ocpi-config.h"
 #include "OsKernelDriver.h"
 #include "OsDebug.hh"
-#include "OcpiUtilMisc.h"
+#include "UtilMisc.hh"
 #include "XferDriver.h"
 #include "XferEndPoint.h"
 #include "XferServices.h"
 #include "XferPio.h"
 
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 namespace XF = DataTransfer;
 namespace OCPI {
   namespace DMA {
@@ -141,7 +142,7 @@ namespace OCPI {
       getProtocol() { return EPNAME; }
 
       XF::EndPoint &createEndPoint(const char *protoInfo, const char *eps, const char *other,
-				   bool local, size_t size, const OCPI::Util::PValue *params);
+				   bool local, size_t size, const OB::PValue *params);
 
       XF::XferServices &
       createXferServices(XF::EndPoint &source, XF::EndPoint &target);
@@ -173,7 +174,7 @@ namespace OCPI {
       uint8_t *m_baseVaddr;
     public:
       EndPoint(XferFactory &a_factory, const char *protoInfo, const char *eps,
-	       const char *other, bool a_local, size_t a_size, const OU::PValue *params)
+	       const char *other, bool a_local, size_t a_size, const OB::PValue *params)
 	: XF::EndPoint(a_factory, eps, other, a_local, a_size, params), 
 	m_dmaFactory(a_factory), m_holeOffset(0), m_holeEnd(0), m_busAddr(0) {
 	if (protoInfo) {
@@ -248,7 +249,7 @@ namespace OCPI {
 
     XF::EndPoint &XferFactory::
     createEndPoint(const char *protoInfo, const char *eps, const char *other, bool local,
-		   size_t size, const OCPI::Util::PValue *params) {
+		   size_t size, const OB::PValue *params) {
       EndPoint &ep = *new EndPoint(*this, protoInfo, eps, other, local, size, params);
       if (!local) {
 	// This endpoint is remote: it means we have been told about it using the URL, which

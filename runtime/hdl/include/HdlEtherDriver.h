@@ -39,7 +39,7 @@ namespace OCPI {
 	virtual ~Driver();
 	// constructor
 	virtual Net::Device *createDevice(OS::Ether::Interface &ifc, OS::Ether::Address &addr,
-					  bool discovery, const OCPI::Util::PValue *params,
+					  bool discovery, const OCPI::Base::PValue *params,
 					  std::string &error);
       };
     }

@@ -20,7 +20,7 @@
 
 #include <unistd.h>
 #include "OsAssert.hh"
-#include "OcpiUtilMisc.h"
+#include "UtilMisc.hh"
 #include "ContainerManager.h"
 #include "HdlOCDP.h"
 #include "HdlSdp.h"
@@ -37,6 +37,7 @@ namespace OC = OCPI::Container;
 namespace OS = OCPI::OS;
 namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 namespace OE = OCPI::Util::EzXml;
 namespace OD = OCPI::DataTransport;
 namespace OT = OCPI::Time;
@@ -58,7 +59,7 @@ namespace OCPI {
       return ts ? static_cast<Container *>(ts)->getMyTicks() : 0; // null-ptr warning
     }
     Container::
-    Container(OCPI::HDL::Device &device, ezxml_t config, const OU::PValue *params) 
+    Container(OCPI::HDL::Device &device, ezxml_t config, const OB::PValue *params) 
       : OC::ContainerBase<Driver,Container,Application,Artifact>
 	(*this, device.name().c_str(), config, params),
 	Access(device.cAccess()), OT::Emit::TimeSource(getTicksFunc),
@@ -123,7 +124,7 @@ namespace OCPI {
 
     // This simply insulates the driver code from needing the container class implementation decl.
     OC::Container *Driver::
-    createContainer(OCPI::HDL::Device &dev, ezxml_t config, const OU::PValue *params)  {
+    createContainer(OCPI::HDL::Device &dev, ezxml_t config, const OB::PValue *params)  {
       return new Container(dev, config, params);
     }
     class Worker;
@@ -249,11 +250,11 @@ namespace OCPI {
       {}
       OC::Worker & createWorker(OC::Artifact *art, const char *appInstName, ezxml_t impl,
 				ezxml_t inst, const OC::Workers &slaves, bool hasMaster,
-			        size_t member, size_t crewSize, const OU::PValue *wParams);
+			        size_t member, size_t crewSize, const OB::PValue *wParams);
     };
 
     OA::ContainerApplication *Container::
-    createApplication(const char *a_name, const OCPI::Util::PValue *props)
+    createApplication(const char *a_name, const OB::PValue *props)
       throw ( OCPI::Util::EmbeddedException ) {
       return new Application(*this, a_name, props);
     };
@@ -294,7 +295,7 @@ namespace OCPI {
 
 #define OCPI_DATA_TYPE(sca,corba,letter,bits,run,pretty,store)     	    \
       void								    \
-      set##pretty##Property(const OCPI::API::PropertyInfo &info, const Util::Member &m, \
+      set##pretty##Property(const OCPI::API::PropertyInfo &info, const OCPI::Base::Member &m, \
 			    size_t off, const run val, unsigned idx) const { \
         WciControl::set##pretty##Property(info, m, off, val, idx);	\
       }									    \
@@ -304,7 +305,7 @@ namespace OCPI {
 	WciControl::set##pretty##SequenceProperty(info, vals, length);	    \
       }									    \
       run								    \
-      get##pretty##Property(const OCPI::API::PropertyInfo &info, const Util::Member &m, \
+      get##pretty##Property(const OCPI::API::PropertyInfo &info, const OCPI::Base::Member &m, \
 			    size_t off, unsigned idx) const {		\
 	return WciControl::get##pretty##Property(info, m, off, idx); \
       }									    \
@@ -316,7 +317,7 @@ namespace OCPI {
 #define OCPI_DATA_TYPE_S(sca,corba,letter,bits,run,pretty,store)
 OCPI_DATA_TYPES
       void
-      setStringProperty(const OCPI::API::PropertyInfo &info, const Util::Member &m, size_t off,
+      setStringProperty(const OCPI::API::PropertyInfo &info, const OCPI::Base::Member &m, size_t off,
 			const char* val, unsigned idx) const {
         WciControl::setStringProperty(info, m, off, val, idx);
       }
@@ -326,7 +327,7 @@ OCPI_DATA_TYPES
 	WciControl::setStringSequenceProperty(info, val, n);
       }
       void
-      getStringProperty(const OCPI::API::PropertyInfo &info, const Util::Member &m, size_t off,
+      getStringProperty(const OCPI::API::PropertyInfo &info, const OCPI::Base::Member &m, size_t off,
 			char *val, size_t length, unsigned idx) const {
 	WciControl::getStringProperty(info, m, off, val, length, idx);
       }
@@ -359,7 +360,7 @@ OCPI_DATA_TYPES
     OC::Worker & Application::
     createWorker(OC::Artifact *art, const char *appInstName, ezxml_t impl, ezxml_t inst,
 		 const OC::Workers &slaves, bool hasMaster, size_t member, size_t crewSize,
-		 const OCPI::Util::PValue *wParams) {
+		 const OB::PValue *wParams) {
       assert(slaves.empty());
       return *new Worker(*this, art, appInstName, impl, inst, slaves, hasMaster, member, crewSize,
 			 wParams);
@@ -751,7 +752,7 @@ OCPI_DATA_TYPES
 	return isProvider() ? NULL : &getData().data;
       }
       OC::ExternalPort &createExternal(const char *extName, bool isProvider,
-				       const OU::PValue *extParams, const OU::PValue *connParams);
+				       const OB::PValue *extParams, const OB::PValue *connParams);
     };
     // Connection between two ports inside this container
     // We know they must be in the same artifact, and have a metadata-defined connection

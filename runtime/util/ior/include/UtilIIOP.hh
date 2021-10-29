@@ -37,7 +37,7 @@
 #include "OsDataTypes.hh"
 #include <string>
 #include <vector>
-#include "OcpiUtilIOP.h"
+#include "UtilIOP.hh"
 
 namespace OCPI {
   namespace Util {
@@ -73,8 +73,7 @@ namespace OCPI {
          * Default constructor.
          */
 
-        ProfileBody ()
-          throw ();
+        ProfileBody ();
 
         /**
          * Constructor from encapsulated data.
@@ -86,8 +85,7 @@ namespace OCPI {
          * from \a data.
          */
 
-        explicit ProfileBody (const std::string & data)
-          throw (std::string);
+        explicit ProfileBody (const std::string & data);
 
         /**
          * Copy constructor.
@@ -95,8 +93,7 @@ namespace OCPI {
          * \param[in] other Another ProfileBody.
          */
 
-        ProfileBody (const ProfileBody & other)
-          throw ();
+        ProfileBody (const ProfileBody & other);
 
         /**
          * Assignment operator.
@@ -105,8 +102,7 @@ namespace OCPI {
          * \return *this
          */
 
-        ProfileBody & operator= (const ProfileBody & other)
-          throw ();
+        ProfileBody & operator= (const ProfileBody & other);
 
         /**
          * Assign from CDR-encapsulated data.
@@ -120,8 +116,7 @@ namespace OCPI {
          * \note Equivalent to operator= (ProfileBody (data)).
          */
 
-        void decode (const std::string & data)
-          throw (std::string);
+        void decode (const std::string & data);
 
         /**
          * Marshal this ProfileBody as CDR-encapsulated data.
@@ -132,8 +127,7 @@ namespace OCPI {
          * is not 1.0, 1.1, 1.2 or 1.3.
          */
 
-        std::string encode () const
-          throw (std::string);
+        std::string encode () const;
 
         /**
          * \name Access to tagged components
@@ -152,8 +146,7 @@ namespace OCPI {
          * \pre !#hasComponent(\a tag)
          */
 
-        void addComponent (OCPI::Util::IOP::ComponentId tag, const void * data, unsigned long len)
-          throw ();
+        void addComponent (OCPI::Util::IOP::ComponentId tag, const void * data, unsigned long len);
 
         /**
          * Add a component to the set of tagged components.
@@ -165,8 +158,7 @@ namespace OCPI {
          * \pre !#hasComponent(\a tag)
          */
 
-        void addComponent (OCPI::Util::IOP::ComponentId tag, const std::string & data)
-          throw ();
+        void addComponent (OCPI::Util::IOP::ComponentId tag, const std::string & data);
 
         /**
          * Check if the profile contains a tagged component.
@@ -176,8 +168,7 @@ namespace OCPI {
          *                 tag, false if not.
          */
 
-        bool hasComponent (OCPI::Util::IOP::ComponentId tag)
-          throw ();
+        bool hasComponent (OCPI::Util::IOP::ComponentId tag);
 
         /**
          * Access the data associated with a component (non-const version).
@@ -193,8 +184,7 @@ namespace OCPI {
          * \pre #hasComponent(\a tag).
          */
 
-        std::string & componentData (OCPI::Util::IOP::ComponentId tag)
-          throw (std::string);
+        std::string & componentData (OCPI::Util::IOP::ComponentId tag);
 
         /**
          * Access the data associated with a component (const version).
@@ -208,8 +198,7 @@ namespace OCPI {
          * \pre #hasComponent(\a tag).
          */
 
-        const std::string & componentData (OCPI::Util::IOP::ComponentId tag) const
-          throw (std::string);
+        const std::string & componentData (OCPI::Util::IOP::ComponentId tag) const;
 
         /**
          * The number of tagged components in this profile.
@@ -217,8 +206,7 @@ namespace OCPI {
          * \return The number of tagged components in this profile.
          */
 
-        unsigned long numComponents () const
-          throw ();
+        unsigned long numComponents () const;
 
         /**
          * Access to a tagged component (non-const version).
@@ -234,8 +222,7 @@ namespace OCPI {
          * \pre \a idx < #numComponents().
          */
 
-        OCPI::Util::IOP::TaggedComponent & getComponent (unsigned long idx)
-          throw (std::string);
+        OCPI::Util::IOP::TaggedComponent & getComponent (unsigned long idx);
 
         /**
          * Access to a tagged component (const version).
@@ -249,8 +236,7 @@ namespace OCPI {
          * \pre \a idx < #numComponents().
          */
 
-        const OCPI::Util::IOP::TaggedComponent & getComponent (unsigned long idx) const
-          throw (std::string);
+        const OCPI::Util::IOP::TaggedComponent & getComponent (unsigned long idx) const;
 
         //@}
 

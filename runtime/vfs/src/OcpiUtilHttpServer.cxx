@@ -19,13 +19,13 @@
  */
 
 #include <OcpiUtilHttpServer.h>
-#include <OcpiUtilHttpMisc.h>
+#include "UtilHttpMisc.hh"
 #include <OcpiUtilVfs.h>
-#include <OcpiUtilUri.h>
-#include <OcpiUtilMisc.h>
-#include <OcpiLoggerLogger.h>
-#include <OcpiLoggerNullOutput.h>
-#include <OcpiLoggerDebugLogger.h>
+#include "UtilUri.hh"
+#include "UtilMisc.hh"
+#include "UtilLogger.hh"
+#include "UtilLoggerNullOutput.hh"
+#include "UtilLoggerDebugLogger.hh"
 #include <iostream>
 #include <string>
 #include <ctime>

@@ -29,10 +29,10 @@
 
 #include <string>
 #include "OsMutex.hh"
-#include <OcpiUtilIOP.h>
-#include <OcpiUtilIIOP.h>
-#include <OcpiLoggerLogger.h>
-#include <OcpiUtilTcpClient.h>
+#include "UtilIOP.hh"
+#include "UtilIIOP.hh"
+#include "UtilLogger.hh"
+#include "UtilTcpClient.hh"
 
 namespace OCPI {
   namespace Util {

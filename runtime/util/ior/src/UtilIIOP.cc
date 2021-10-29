@@ -23,9 +23,9 @@
 #include <vector>
 
 #include "OsAssert.hh"
-#include "OcpiUtilCDR.h"
-#include "OcpiUtilIOP.h"
-#include "OcpiUtilIIOP.h"
+#include "UtilCDR.hh"
+#include "UtilIOP.hh"
+#include "UtilIIOP.hh"
 
 /*
  * ----------------------------------------------------------------------
@@ -35,20 +35,20 @@
 
 OCPI::Util::IIOP::ProfileBody::
 ProfileBody ()
-  throw ()
+
 {
 }
 
 OCPI::Util::IIOP::ProfileBody::
 ProfileBody (const std::string & data)
-  throw (std::string)
+
 {
   decode (data);
 }
 
 OCPI::Util::IIOP::ProfileBody::
 ProfileBody (const ProfileBody & other)
-  throw ()
+
   : iiop_version (other.iiop_version),
     host (other.host),
     port (other.port),
@@ -60,7 +60,7 @@ ProfileBody (const ProfileBody & other)
 OCPI::Util::IIOP::ProfileBody &
 OCPI::Util::IIOP::ProfileBody::
 operator= (const ProfileBody & other)
-  throw ()
+
 {
   iiop_version = other.iiop_version;
   host = other.host;
@@ -73,7 +73,7 @@ operator= (const ProfileBody & other)
 void
 OCPI::Util::IIOP::ProfileBody::
 decode (const std::string & data)
-  throw (std::string)
+
 {
   try {
     OCPI::Util::CDR::Decoder cd (data);
@@ -125,7 +125,7 @@ decode (const std::string & data)
 std::string
 OCPI::Util::IIOP::ProfileBody::
 encode () const
-  throw (std::string)
+
 {
   if (iiop_version.major != 1 ||
       iiop_version.minor > 3) {
@@ -160,7 +160,7 @@ encode () const
 void
 OCPI::Util::IIOP::ProfileBody::
 addComponent (OCPI::Util::IOP::ComponentId tag, const void * data, unsigned long len)
-  throw ()
+
 {
   unsigned long numComps = components.size ();
   components.resize (numComps+1);
@@ -171,7 +171,7 @@ addComponent (OCPI::Util::IOP::ComponentId tag, const void * data, unsigned long
 void
 OCPI::Util::IIOP::ProfileBody::
 addComponent (OCPI::Util::IOP::ComponentId tag, const std::string & data)
-  throw ()
+
 {
   addComponent (tag, data.data(), data.length());
 }
@@ -179,7 +179,7 @@ addComponent (OCPI::Util::IOP::ComponentId tag, const std::string & data)
 bool
 OCPI::Util::IIOP::ProfileBody::
 hasComponent (OCPI::Util::IOP::ComponentId tag)
-  throw ()
+
 {
   unsigned long numComps = components.size ();
 
@@ -195,7 +195,7 @@ hasComponent (OCPI::Util::IOP::ComponentId tag)
 std::string &
 OCPI::Util::IIOP::ProfileBody::
 componentData (OCPI::Util::IOP::ComponentId tag)
-  throw (std::string)
+
 {
   unsigned long numComps = components.size ();
   unsigned long pi;
@@ -216,7 +216,7 @@ componentData (OCPI::Util::IOP::ComponentId tag)
 const std::string &
 OCPI::Util::IIOP::ProfileBody::
 componentData (OCPI::Util::IOP::ComponentId tag) const
-  throw (std::string)
+
 {
   unsigned long numComps = components.size ();
   unsigned long pi;
@@ -237,7 +237,7 @@ componentData (OCPI::Util::IOP::ComponentId tag) const
 unsigned long
 OCPI::Util::IIOP::ProfileBody::
 numComponents () const
-  throw ()
+
 {
   return components.size ();
 }
@@ -245,7 +245,7 @@ numComponents () const
 OCPI::Util::IOP::TaggedComponent &
 OCPI::Util::IIOP::ProfileBody::
 getComponent (unsigned long idx)
-  throw (std::string)
+
 {
   if (idx >= components.size()) {
     throw std::string ("invalid index");
@@ -257,7 +257,7 @@ getComponent (unsigned long idx)
 const OCPI::Util::IOP::TaggedComponent &
 OCPI::Util::IIOP::ProfileBody::
 getComponent (unsigned long idx) const
-  throw (std::string)
+
 {
   if (idx >= components.size()) {
     throw std::string ("invalid index");

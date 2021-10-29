@@ -27,13 +27,14 @@
 #include <sstream>
 #include <map>
 #include <stdexcept>
-#include "OcpiXmlEmbedded.h"
+#include "BaseEmbeddedXml.hh"
 #include "OsFileSystem.hh" // This is NOT fully OCPI::OS-enabled, e.g. path names, etc.
-#include "OcpiUtilEzxml.h"
-#include "OcpiUtilMisc.h"
+#include "UtilEzxml.hh"
+#include "UtilMisc.hh"
 
 namespace OU = OCPI::Util;
 namespace OX = OCPI::Util::EzXml;
+namespace OB = OCPI::Base;
 namespace OS = OCPI::OS;
 
 #define OCPI_OPTIONS_HELP \
@@ -57,7 +58,7 @@ namespace OS = OCPI::OS;
                                            "if no attributes are specified top element name is printed\n") \
     CMD_OPTION(silent,       s, Bool,  0, "<silent>") \
 
-#include "CmdOption.hh"
+#include "BaseOption.hh"
 
 static void bad(const char *fmt, ...) {
   if (options.silent())
@@ -98,12 +99,12 @@ static int mymain(const char **argv) {
       buffer << src.rdbuf();
     }
     xml = buffer.str();
-    OX::artifact_addXML(argv[1],xml); // Throws if invalid XML
+    OB::artifact_addXML(argv[1],xml); // Throws if invalid XML
   }
 
   // get
   if (0 == strcmp("get", argv[0])) {
-    OX::artifact_getXML(argv[1], xml);
+    OB::artifact_getXML(argv[1], xml);
     if (xml.empty()) {
       std::cerr << "This file \"" << argv[1] << "\" is not an artifact file.\n";
       return 1;
@@ -113,14 +114,14 @@ static int mymain(const char **argv) {
 
   // check
   if (0 == strcmp("check", argv[0])) {
-    OX::artifact_getXML(argv[1], xml);
+    OB::artifact_getXML(argv[1], xml);
     return xml.empty() ? 1 : 0;
   }
 
   // strip
   if (0 == strcmp("strip", argv[0])) {
     OS::FileSystem::copy(argv[1], argv[2]);
-    if (!OX::artifact_stripXML(argv[2])) {
+    if (!OB::artifact_stripXML(argv[2])) {
       std::cerr << "This file \"" << argv[1] << "\" is not an artifact file.\n";
       OS::FileSystem::remove(argv[2]);
       return 1;

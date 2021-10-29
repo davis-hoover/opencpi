@@ -30,7 +30,7 @@
 #define OCPILOGGEROSTREAMOUTPUT_H__
 
 #include "OsMutex.hh"
-#include <OcpiLoggerLogger.h>
+#include "UtilLogger.hh"
 
 namespace OCPI {
   namespace Logger {

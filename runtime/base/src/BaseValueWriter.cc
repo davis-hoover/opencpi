@@ -20,10 +20,10 @@
 
 #include <assert.h>
 #include <string.h>
-#include "UtilValueWriter.hh"
+#include "BaseValueWriter.hh"
 namespace OA = OCPI::API;
 namespace OCPI {
-  namespace Util {
+namespace Base {
 
 // Class to "write" marshalled/serialized data into "Value" data structure.
 

@@ -34,7 +34,7 @@
  *
  */
 
-#include <OcpiUtilTcpClient.h>
+#include "UtilTcpClient.hh"
 #include <iostream>
 #include <string>
 
@@ -64,8 +64,7 @@ namespace OCPI {
          * \post The connector is unconnected.
          */
 
-        Connector ()
-          throw ();
+        Connector ();
 
         /**
          * Destructor.
@@ -73,8 +72,7 @@ namespace OCPI {
          * \pre The connector is unconnected.
          */
 
-        ~Connector ()
-          throw ();
+        ~Connector ();
 
         /**
          * Connect to a remote \a authority, which must be in appropriate
@@ -91,8 +89,7 @@ namespace OCPI {
          * \post The connector is connected.
          */
 
-        std::iostream * connect (const std::string & authority)
-          throw (std::string);
+        std::iostream * connect (const std::string & authority);
 
         /**
          * Performs a half-close.  See OCPI::Util::Tcp::Stream::shutdown()
@@ -105,8 +102,7 @@ namespace OCPI {
          * \pre The connector is connected.
          */
 
-        void shutdown (std::ios_base::openmode mode = std::ios_base::out)
-          throw (std::string);
+        void shutdown (std::ios_base::openmode mode = std::ios_base::out);
 
         /**
          * Closes the connection.
@@ -115,8 +111,7 @@ namespace OCPI {
          * \post The connector is unconnected.
          */
 
-        void close ()
-          throw (std::string);
+        void close ();
 
         /**
          * The static string, "http".

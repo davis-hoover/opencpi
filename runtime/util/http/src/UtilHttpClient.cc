@@ -45,10 +45,10 @@
  *                  Initial version.
  */
 
-#include <OcpiUtilHttpClient.h>
-#include <OcpiUtilHttpMisc.h>
-#include <OcpiUtilUri.h>
-#include <OcpiUtilMisc.h>
+#include "UtilHttpClient.hh"
+#include "UtilHttpMisc.hh"
+#include "UtilUri.hh"
+#include "UtilMisc.hh"
 #include <streambuf>
 #include <iostream>
 #include <string>
@@ -119,7 +119,7 @@ OCPI::Util::Http::ServerError::ServerError (int code,
 
 OCPI::Util::Http::ClientStream::ClientBuf::
 ClientBuf ()
-  throw ()
+
 {
   m_inConn = 0;
   m_outConn = 0;
@@ -128,7 +128,7 @@ ClientBuf ()
 
 OCPI::Util::Http::ClientStream::ClientBuf::
 ~ClientBuf ()
-  throw ()
+
 {
 }
 
@@ -138,7 +138,7 @@ setConn (std::istream * in,
          std::ostream * out,
          void (*shutdown) (void *),
          void * sdopaque)
-  throw ()
+
 {
   m_statusCode = 0;
   m_inConn = in;
@@ -158,7 +158,7 @@ setConn (std::istream * in,
 void
 OCPI::Util::Http::ClientStream::ClientBuf::
 resetConn ()
-  throw ()
+
 {
   m_inConn = 0;
   m_outConn = 0;
@@ -172,7 +172,7 @@ resetConn ()
 void
 OCPI::Util::Http::ClientStream::ClientBuf::
 startRequest (int requestType)
-  throw (std::string)
+
 {
   if (!m_outConn || !m_outConn->good()) {
     throw std::string ("no connection");
@@ -191,7 +191,7 @@ OCPI::Util::Http::ClientStream::ClientBuf::
 sendAnyRequest (const OCPI::Util::Uri & uri,
                 const std::string & request,
                 const Headers & requestHeaders)
-  throw (std::string)
+
 {
   Headers::const_iterator hit;
 
@@ -270,7 +270,7 @@ sendAnyRequest (const OCPI::Util::Uri & uri,
 void
 OCPI::Util::Http::ClientStream::ClientBuf::
 receiveStatus ()
-  throw (std::string)
+
 {
   m_status = OCPI::Util::readline (m_inConn, MAX_LENGTH_OF_HEADER_LINE);
 
@@ -325,7 +325,7 @@ receiveStatus ()
 void
 OCPI::Util::Http::ClientStream::ClientBuf::
 receiveHeaders ()
-  throw (std::string)
+
 {
   std::string::size_type colonPos;
   std::string headerLine =
@@ -408,7 +408,7 @@ OCPI::Util::Http::ClientStream::ClientBuf::
 sendRequest (int requestType,
              const OCPI::Util::Uri & uri,
              const Headers & headers)
-  throw (std::string)
+
 {
   switch (requestType) {
   case REQUEST_GET:
@@ -427,7 +427,7 @@ OCPI::Util::Http::ClientStream::ClientBuf::
 sendGetOrHeadOrDeleteRequest (int requestType,
                               const OCPI::Util::Uri & uri,
                               const Headers & headers)
-  throw (std::string)
+
 {
   /*
    * Send request
@@ -518,7 +518,7 @@ OCPI::Util::Http::ClientStream::ClientBuf::
 sendPutOrPostRequest (int requestType,
                       const OCPI::Util::Uri & uri,
                       const Headers & headers)
-  throw (std::string)
+
 {
   /*
    * We upload using HTTP/1.0 to avoid conflicts when trying to send a
@@ -550,7 +550,7 @@ sendPutOrPostRequest (int requestType,
 void
 OCPI::Util::Http::ClientStream::ClientBuf::
 completeUpload ()
-  throw (std::string)
+
 {
   if (m_state != STATE_UPLOAD) {
     return;
@@ -594,7 +594,7 @@ completeUpload ()
 int
 OCPI::Util::Http::ClientStream::ClientBuf::
 getStatusCode ()
-  throw (std::string)
+
 {
   completeUpload ();
   return m_statusCode;
@@ -603,7 +603,7 @@ getStatusCode ()
 std::string
 OCPI::Util::Http::ClientStream::ClientBuf::
 getReasonPhrase ()
-  throw (std::string)
+
 {
   completeUpload ();
   return m_reason;
@@ -612,7 +612,7 @@ getReasonPhrase ()
 const OCPI::Util::Http::Headers &
 OCPI::Util::Http::ClientStream::ClientBuf::
 getResponseHeaders ()
-  throw (std::string)
+
 {
   completeUpload ();
   return m_responseHeaders;
@@ -621,7 +621,7 @@ getResponseHeaders ()
 unsigned long long
 OCPI::Util::Http::ClientStream::ClientBuf::
 getContentLength ()
-  throw (std::string)
+
 {
   completeUpload ();
   Headers::const_iterator it = m_responseHeaders.find ("Content-Length");
@@ -970,7 +970,7 @@ xsputn (const char * s, std::streamsize n)
 
 OCPI::Util::Http::ClientStream::
 ClientStream ()
-  throw ()
+
   : std::iostream (0)
 {
   this->init (&m_buf);
@@ -982,7 +982,7 @@ ClientStream ()
 
 OCPI::Util::Http::ClientStream::
 ~ClientStream ()
-  throw ()
+
 {
   /*
    * We can't do that here, because we depend on a derived class
@@ -1005,7 +1005,7 @@ OCPI::Util::Http::ClientStream::
 void
 OCPI::Util::Http::ClientStream::
 connect (const OCPI::Util::Uri & uri)
-  throw (std::string)
+
 {
   if (m_connected) {
     reset ();
@@ -1053,7 +1053,7 @@ close ()
 void
 OCPI::Util::Http::ClientStream::
 reset ()
-  throw ()
+
 {
   try {
     close ();
@@ -1073,7 +1073,7 @@ reset ()
 void
 OCPI::Util::Http::ClientStream::
 readBody ()
-  throw ()
+
 {
   char bodyBuffer[10240];
   while (this->good() && !this->eof() &&
@@ -1556,7 +1556,7 @@ body ()
 void
 OCPI::Util::Http::ClientStream::
 shutdownForBuf (void * opaque)
-  throw (std::string)
+
 {
   ClientStream * me = reinterpret_cast<ClientStream *> (opaque);
   me->shutdownConnection (std::ios_base::out);

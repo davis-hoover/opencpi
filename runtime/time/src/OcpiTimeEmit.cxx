@@ -28,7 +28,7 @@
 #include "OsAssert.hh"
 #include "OsMisc.hh"
 #include "OsDataTypes.hh"
-#include "UtilDataTypes.hh"
+#include "BaseDataTypes.hh"
 #include <iostream>
 
 #define HANDLE_CLOCK_WRAP 1
@@ -55,20 +55,6 @@ namespace OCPI {
       }
     }
 
-
-    static 
-    void
-    exitHandler()
-    {
-      static bool once=false;
-      if ( ! once ) {
-	Emit::endQue();
-	once = true;
-	EmitFormatter ef( Emit::getHeader().dumpFormat  );
-	Emit::getHeader().dumpFileStream << ef;
-      }
-    }
-
     void
     Emit::
     init() {
@@ -85,13 +71,16 @@ namespace OCPI {
 	getHeader().traceCD = 0;
       }
 
+#if 0 // we must coordinate exiting with the plugin manager
       if ( ( tmp = getenv("OCPI_TIME_EMIT_DUMP_ON_EXIT") ) != NULL ) {
 	getHeader().dumpOnExit = tmp[0] == '1';
 	if ( getHeader().dumpOnExit ) {
 	  atexit( exitHandler );
 	}
       }
-      else {
+      else
+#endif
+      {
 	getHeader().dumpOnExit = 0;
       }
       getHeader().dumpFormat =  EmitFormatter::OCPIRAW;
@@ -368,23 +357,6 @@ namespace OCPI {
       return *g_header;
     }
 
-    void
-    Emit::
-    shutdown() {
-
-      if ( getHeader().dumpOnExit && !getHeader().shuttingDown) {
-	exitHandler();
-      }
-
-      try {
-	getHeader().shuttingDown = true;
-	delete g_header;
-      }
-      catch ( ... ) {
-	// Ignore
-      }
-      g_header = NULL;
-    }
 
 
 
@@ -820,10 +792,39 @@ namespace OCPI {
       return Emit::SimpleSystemTime::getTimeOfDay();
     }
 
+    // A driver manager mostly for shutdown handling
+    class Driver : public OCPI::Base::Plugin::DriverType<Manager,Driver> {
+      Driver(const char *a_name) 
+	: OD::DriverType<Manager,Driver>(a_name, *this) {
+      }
+    }
+    class Manager: public OCPI::Base::Plugin::ManagerBase<Manager, Driver, time_emit> {
+      // Make sure we cleanup last since we want to allow recording of other shutdown events
+      unsigned cleanupPosition() { return 9; }
 
-
+      // Shutdown processing when the plugin system is shutting down
+      ~Manager() {
+	if (getHeader().dumpOnExit && !getHeader().shuttingDown) {
+	  static bool once=false;
+	  if ( ! once ) {
+	    Emit::endQue();
+	    once = true;
+	    EmitFormatter ef( Emit::getHeader().dumpFormat  );
+	    Emit::getHeader().dumpFileStream << ef;
+	  }
+	}
+	try {
+	  getHeader().shuttingDown = true;
+	  delete g_header;
+	} catch ( ... ) {
+	  // Ignore
+	}
+	g_header = NULL;
+      }
+    }
+    static OCPI::Base::Plugin::Registration<Manager> tm;
   }
-
 }
+
 #endif
 

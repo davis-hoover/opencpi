@@ -65,7 +65,7 @@ class DataPort : public OcpPort, public OM::Port {
 		 bool isVolatile, bool isImpl, bool isBuiltin = false, size_t value = 0, const char *enums = NULL),
     *addProperty(),
     *fixDataConnectionRole(OM::Assembly::Role &role),
-    *resolveExpressions(OCPI::Util::IdentResolver &ir);
+    *resolveExpressions(OB::IdentResolver &ir);
   void initRole(OM::Assembly::Role &role);
   void emitOpcodes(FILE *f, const char *pName, Language lang);
   void emitPortDescription(FILE *f, Language lang) const;

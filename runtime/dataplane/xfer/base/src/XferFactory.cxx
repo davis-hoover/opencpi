@@ -25,11 +25,11 @@
 #include <ezxml.h>
 #include "OsAssert.hh"
 #include "OsMisc.hh"
-#include <OcpiUtilHash.h>
-#include <OcpiUtilAutoMutex.h>
-#include <OcpiUtilEzxml.h>
-#include <OcpiUtilMisc.h>
-#include "UtilPValue.hh"
+#include "UtilHash.hh"
+#include "UtilAutoMutex.hh"
+#include "UtilEzxml.hh"
+#include "UtilMisc.hh"
+#include "BasePValue.hh"
 #include "XferServices.h"
 #include "XferFactory.h"
 #include "XferManager.h"
@@ -37,7 +37,7 @@
 namespace OX = OCPI::Util::EzXml;
 namespace OU = OCPI::Util;
 namespace OS = OCPI::OS;
-namespace OD = OCPI::Driver;
+namespace OD = OCPI::Base::Plugin;
 namespace DataTransfer {
 
 // An XferFactory keeps track of which templates exist.

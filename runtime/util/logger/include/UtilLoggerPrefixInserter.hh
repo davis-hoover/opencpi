@@ -29,7 +29,7 @@
 #ifndef OCPILOGGERPREFIXINSERTER_H__
 #define OCPILOGGERPREFIXINSERTER_H__
 
-#include <OcpiLoggerLogger.h>
+#include "UtilLogger.hh"
 #include <string>
 
 namespace OCPI {

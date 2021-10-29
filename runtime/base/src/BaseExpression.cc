@@ -27,10 +27,10 @@
 #include <cfloat>
 #include <cerrno>
 #include <gmpxx.h>
-#include "OcpiUtilMisc.h"
-#include "OcpiUtilEzxml.h"
-#include "UtilValue.hh"
-#include "UtilExpression.hh"
+#include "UtilMisc.hh"
+#include "UtilEzxml.hh"
+#include "BaseValue.hh"
+#include "BaseExpression.hh"
 
 namespace OU = OCPI::Util;
 namespace OX = OCPI::Util::EzXml;
@@ -111,7 +111,7 @@ void init() {
   for (unsigned i = 0; i <= OA::OCPI_ULongLong; i++) {
     std::string s1, s2;
     ocpiLog(20, "GMP MPF init: for %s min: %s max: %s",
-	    OU::baseTypeNames[i], mpfString(mpz_min[i], s1), mpfString(mpz_max[i], s2));
+	    OCPI::Base::baseTypeNames[i], mpfString(mpz_min[i], s1), mpfString(mpz_max[i], s2));
   }
 #endif
 }
@@ -165,7 +165,7 @@ inline bool mpf2bool(const mpf_class &number) {
 
 
 namespace OCPI {
-namespace Util {
+namespace Base {
 // Supply value argument for constants
 struct ExprToken;
 class ExprValue::Internal {
@@ -176,7 +176,7 @@ public:
   bool        m_usesVariable;
   Internal() : m_number(0, 64), m_isString(false), m_usesVariable(false) {
   }
-  static OU::ExprValue::Internal fdummy;
+  static ExprValue::Internal fdummy;
   // Numbers can express base by 0[digit] octal, or 0t, 0b, 0x for decimal, binary, hex
   // If none, then defaultBase is used. Dots are only considered if "dot" is true
   static const char *
@@ -199,8 +199,7 @@ public:
     start = cp;
     // Find the separation between mantissa and exponent
     while (++cp < last && *cp && (((dot && *cp == '.') || isdigit(*cp) ||
-				   (base == 16 && strchr("aAbBcCdDeEfF", *cp)))))
-      ;
+				   (base == 16 && strchr("aAbBcCdDeEfF", *cp)))))      ;
     // now deal with any binary multiplier (k/m/g)
     multiply = 1;
     if (cp < last && *cp && strchr("kKmMgG", *cp))
@@ -524,8 +523,7 @@ parse(const char *buf, const char *end, ExprToken *&tokens, const IdentResolver 
   Internal dumval;
 
   pthread_once(&once, init);
-  for (cp = buf; !(err = dumval.lex(cp, end, dummy, dummy, op)) && op != OpEnd; nTokens++)
-    ;
+  for (cp = buf; !(err = dumval.lex(cp, end, dummy, dummy, op)) && op != OpEnd; nTokens++)    ;
   if (err)
     return err;
   bool usesVariable = false;
@@ -553,7 +551,7 @@ parse(const char *buf, const char *end, ExprToken *&tokens, const IdentResolver 
 	} else if (!resolver)
 	  return "no symbols are available for this expression";
 	else {
-	  OU::ExprValue v;
+	  ExprValue v;
 	  if ((err = resolver->getValue(sym.c_str(), v)))
 	    return err;
 	  if (!v.m_internal || v.m_internal->m_isString)
@@ -582,8 +580,7 @@ parse(const char *buf, const char *end, ExprToken *&tokens, const IdentResolver 
       if ((err = reduce(lpar+1, t, true))) // return value points to resolved value
 	return err;
       if (nParens)
-	for (lpar--; lpar->op != OpLpar; lpar--)
-	  ;
+	for (lpar--; lpar->op != OpLpar; lpar--)	  ;
       else
 	lpar = 0;
       break;
@@ -608,8 +605,8 @@ parse(const char *buf, const char *end, ExprToken *&tokens, const IdentResolver 
     default:
       // we have a binary or conditional operator
       if (t == tokens || t[-1].op < OpEnd)
-	return esprintf("binary operator \"%s\" with no value on left side",
-			opNames[t->op]);
+	return OU::esprintf("binary operator \"%s\" with no value on left side",
+			    opNames[t->op]);
       // previous op might be unary
       if (t >= (lpar ? lpar : tokens) + 2 && t->op <= t[-2].op)
 	if ((err = reduce(lpar ? lpar + 1 : tokens, t)))
@@ -635,7 +632,7 @@ const char *evalExpression(const char *start, ExprValue &val, const IdentResolve
   ocpiLog(20, "Evaluating expression: %.*s err: \"%s\" value: \"%s\"",
   	    (int)(end - start), start, err ? err : "", val.getString(s));
   return
-    err ? esprintf("when parsing expression \"%.*s\": %s", (int)(end-start), start, err) :
+    err ? OU::esprintf("when parsing expression \"%.*s\": %s", (int)(end-start), start, err) :
     NULL;
 }
 
@@ -650,7 +647,7 @@ parseExprNumber(const char *a, size_t &np, std::string *expr, const IdentResolve
   const char *err = evalExpression(a, v, resolver);
   if (!err) {
     if (!v.isNumber())
-      err = esprintf("the expression \"%s\" does not evaluate to a number", a);
+      err = OU::esprintf("the expression \"%s\" does not evaluate to a number", a);
     else {
       np = OCPI_UTRUNCATE(size_t, v.getNumber());
       if (expr) {
@@ -694,7 +691,7 @@ parseExprString(const char *a, std::string &s, std::string *expr, const IdentRes
   const char *err = evalExpression(a, v, resolver);
   if (!err) {
     if (v.isNumber())
-      err = esprintf("the expression \"%s\" does not evaluate to a string", a);
+      err = OU::esprintf("the expression \"%s\" does not evaluate to a string", a);
     else {
       v.getString(s);
       if (expr) {
@@ -754,7 +751,7 @@ void ExprValue::setNumber(int64_t i) {
   int64_2_mpf(i, m_internal->m_number);
 }
 
-// Extract and convert the almost-untyped ExprValue into the typed OU::Value
+// Extract and convert the almost-untyped ExprValue into the typed Value
 const char *ExprValue::
 getTypedValue(Value &v, size_t index) const {
   const char *err;
@@ -780,10 +777,10 @@ getTypedValue(Value &v, size_t index) const {
 	  z > mpz_max[v.m_vt->m_baseType] ||
 	  (v.m_vt->m_baseType == OA::OCPI_Enum && z >= v.m_vt->m_nEnums)) {
 	std::string smin, smax;
-	return esprintf("Expression value (%s) is out of range for %s type properties (%s to %s)",
-			mpfString(m_internal->m_number, s), baseTypeNames[v.m_vt->m_baseType],
-			mpfString(mpz_min[v.m_vt->m_baseType], smin),
-			mpfString(mpz_max[v.m_vt->m_baseType], smax));
+	return OU::esprintf("Expression value (%s) is out of range for %s type properties (%s to %s)",
+			    mpfString(m_internal->m_number, s), baseTypeNames[v.m_vt->m_baseType],
+			    mpfString(mpz_min[v.m_vt->m_baseType], smin),
+			    mpfString(mpz_max[v.m_vt->m_baseType], smax));
       }
       mpz_class tmp = z & (uint32_t)-1;
       uint32_t low32 = (uint32_t)tmp.get_ui();
@@ -819,16 +816,15 @@ getTypedValue(Value &v, size_t index) const {
       return "A numeric expression cannot be assigned to a string property";
     v.reserveStringSpace(m_internal->m_string.length(), items); 
     (items ? v.m_pString[index] : v.m_String) = v.m_stringNext;
-    for (const char *cp = m_internal->m_string.c_str(); v.setNextStringChar(*cp); ++cp)
-      ;
+    for (const char *cp = m_internal->m_string.c_str(); v.setNextStringChar(*cp); ++cp)      ;
     break;
   case OA::OCPI_Float:
     if (!isNumber())
       return "A string value cannot be assigned to a float property";
     if (m_internal->m_number < -std::numeric_limits<float>::max() ||
 	m_internal->m_number > std::numeric_limits<float>::max())
-      return esprintf("Value %s out of range for type: float",
-		      mpfString(m_internal->m_number, s));
+      return OU::esprintf("Value %s out of range for type: float",
+			  mpfString(m_internal->m_number, s));
     (items ? v.m_pFloat[index] : v.m_Float) = (float)m_internal->m_number.get_d();
     break;
   case OA::OCPI_Double:
@@ -836,8 +832,8 @@ getTypedValue(Value &v, size_t index) const {
       return "A string value cannot be assigned to a double property";
     if (m_internal->m_number < -std::numeric_limits<double>::max() ||
 	m_internal->m_number > std::numeric_limits<double>::max())
-      return esprintf("Value %s out of range for type: double",
-		      mpfString(m_internal->m_number, s));
+      return OU::esprintf("Value %s out of range for type: double",
+			  mpfString(m_internal->m_number, s));
     (items ? v.m_pDouble[index] : v.m_Double) = m_internal->m_number.get_d();
     break;
   default:;
@@ -845,7 +841,7 @@ getTypedValue(Value &v, size_t index) const {
   return NULL;
 }
 
-// Set the ExprValue from the typed OU::Value
+// Set the ExprValue from the typed Value
 const char *ExprValue::setFromTypedValue(const Value &v) {
   if (!m_internal)
     m_internal = new Internal;
@@ -920,7 +916,7 @@ getExprNumber(ezxml_t x, const char *attr, size_t &np, bool *found, std::string 
 }
 
 const char *
-parseConditionals(ezxml_t parent, const OU::IdentResolver &r) {
+parseConditionals(ezxml_t parent, const IdentResolver &r) {
   ezxml_t next; 
   const char *err = NULL;
   for (ezxml_t xml = parent ? parent->child : NULL; xml; xml = next) {
@@ -933,7 +929,7 @@ parseConditionals(ezxml_t parent, const OU::IdentResolver &r) {
       if (!(expr = ezxml_cattr(xml, "test")))
 	return "missing \"test\" attribute in \"if\" element";
       if ((err = OX::checkAttrs(xml, "test", NULL)) ||
-	  (err = OU::parseExprBool(expr, testValue, NULL, &r)))
+	  (err = parseExprBool(expr, testValue, NULL, &r)))
 	return err;
       // We need to look-ahead for an else.
       OX::hoist(testValue, xml, parent);
@@ -950,7 +946,7 @@ parseConditionals(ezxml_t parent, const OU::IdentResolver &r) {
     } else if (!strcasecmp(xml->name, "else"))
       return "invalid \"else\" element not after \"if\" element";
     else if ((expr = ezxml_cattr(xml, "if"))) {
-      if ((err = OU::parseExprBool(expr, testValue, NULL, &r)))
+      if ((err = parseExprBool(expr, testValue, NULL, &r)))
 	return err;
       if (testValue)
 	ezxml_set_attr(xml, "if", NULL);
@@ -970,7 +966,6 @@ parseConditionals(ezxml_t parent, const OU::IdentResolver &r) {
 } // OCPI
 
 #if TEST_EXPR_EVALUATOR
-namespace OU = OCPI::Util;
 int main(int argc, char **argv) {
   const char *err;
   const char *start, *end;
@@ -994,8 +989,8 @@ int main(int argc, char **argv) {
     printf("Error lexing: %s\n", err);
     return 1;
   }
-  class mine : public OU::IdentResolver {
-    const char *getValue(const char *symbol, OU::ExprValue &val) {
+  class mine : public IdentResolver {
+    const char *getValue(const char *symbol, ExprValue &val) {
       if (!strcasecmp(symbol, "fred")) {
 	val.string = "barar";
 	val.isNumber = false;
@@ -1004,8 +999,8 @@ int main(int argc, char **argv) {
       return "identifier not defined";
     }
   } me;
-  OU::ExprValue v;
-  if ((err = OU::evalExpression(argv[1], v, &me)))
+  ExprValue v;
+  if ((err = evalExpression(argv[1], v, &me)))
     printf("Error eval: %s\n", err);
   else if (v.isNumber)
     printf("Value is number: %lld 0(x%llx)\n", (long long)v.number, (long long)v.number);

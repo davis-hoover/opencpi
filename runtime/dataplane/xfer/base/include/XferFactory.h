@@ -21,8 +21,8 @@
 #ifndef Xfer_Factory_H_
 #define Xfer_Factory_H_
 
-#include "OcpiUtilSelfMutex.h"
-#include "OcpiDriverManager.h"
+#include "UtilSelfMutex.hh"
+#include "BasePluginManager.hh"
 #include "XferEndPoint.h"
 
 namespace DataTransfer {
@@ -55,7 +55,7 @@ namespace DataTransfer {
   // template and thus is not evident here.
   class XferManager;
   class XferFactory
-    : public OCPI::Driver::DriverType<XferManager, XferFactory>,
+    : public OCPI::Base::Plugin::DriverType<XferManager, XferFactory>,
       public FactoryConfig,
       virtual protected OCPI::Util::SelfMutex {
     TemplateMap m_templates; // which templates exist for this driver?
@@ -88,7 +88,7 @@ namespace DataTransfer {
     // Create an endpoint with some protocol info specific to this protocol,
     // and possibly a string for the "other" endpoint that we are trying to avoid.
     virtual EndPoint &createEndPoint(const char *protoInfo, const char *eps, const char *other,
-				     bool local, size_t size, const OCPI::Util::PValue *params)
+				     bool local, size_t size, const OCPI::Base::PValue *params)
       = 0;
     // Tell the factory about a new mailbox (beyond automatic parent/child relationship).
     // Return value is the new mailbox number.  Other is mailbox to avoid.
@@ -109,7 +109,7 @@ namespace DataTransfer {
   // OCPI::Driver::Device is virtually inherited to give access
   // to the class that is not normally inherited here.
   // This also delays the calling of the destructor
-  class Device : public FactoryConfig, virtual public OCPI::Driver::Device {
+  class Device : public FactoryConfig, virtual public OCPI::Base::Plugin::Device {
     virtual XferFactory &driverBase() = 0;
   protected:
     void configure(ezxml_t x);

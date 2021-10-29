@@ -20,12 +20,12 @@
 
 #include <assert.h>
 #include <string.h>
-#include "UtilValueReader.hh"
+#include "BaseValueReader.hh"
 
 namespace OA = OCPI::API;
 
 namespace OCPI {
-namespace Util {
+namespace Base {
 
 ValueReader::
 ValueReader(const Value **v)

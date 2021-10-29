@@ -23,8 +23,7 @@
 #include <cstdio>
 
 #include "OsAssert.hh"
-#include "OcpiDriverManager.h"
-#include "OcpiUtilException.h"
+#include "UtilException.hh"
 
 namespace OCPI {
 
@@ -32,6 +31,7 @@ namespace OCPI {
     Error::~Error(){}
   }
   namespace Util {
+    bool g_exiting = false;
     // Convenience for single line, multi-string, API exceptions (API called badly)
     // Its easy to scan all callers for the terminating null
     ApiError::ApiError(const char *err, ...)
@@ -83,7 +83,7 @@ namespace OCPI {
     void Error::setFormatV(const char *err, va_list ap) {
       char *s;
       ocpiCheck(vasprintf(&s, err, ap) >= 0);
-      if (OCPI::Driver::ManagerManager::exiting()) {
+      if (g_exiting) {
 	// We are in a very primitive mode here. No error checking.
 	static const char pre[] = "\n***Exception during shutdown: ";
 	static const char post[] = "***\n";

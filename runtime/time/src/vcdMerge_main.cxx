@@ -28,7 +28,7 @@
 #include <cstring>
 #include <vector>
 #include <stdint.h>
-#include <OcpiUtilCommandLineConfiguration.h>
+#include "UtilCommandLineConfiguration.hh"
 #include "OsAssert.hh"
 
 class OcpiRccBinderConfigurator

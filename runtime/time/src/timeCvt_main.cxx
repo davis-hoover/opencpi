@@ -32,8 +32,8 @@
 #include <iostream>
 #include <fstream>
 #include <OcpiTimeEmit.h>
-#include <OcpiUtilCommandLineConfiguration.h>
-#include <OcpiUtilEzxml.h>
+#include "UtilCommandLineConfiguration.hh"
+#include "UtilEzxml.hh"
 #include <OcpiTimeEmitOutputFormat.h>
 
 using namespace OCPI::API;

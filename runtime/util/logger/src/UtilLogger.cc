@@ -18,7 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <OcpiLoggerLogger.h>
+#include "UtilLogger.hh"
 #include <iostream>
 
 OCPI::Logger::Logger::LogBuf::~LogBuf ()

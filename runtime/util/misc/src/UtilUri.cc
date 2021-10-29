@@ -18,7 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <OcpiUtilUri.h>
+#include "UtilUri.hh"
 #include <string>
 #include <cstring>
 #include <cctype>
@@ -33,7 +33,7 @@ namespace {
 
   std::string
   decodeURI (const char * uri, size_t length)
-    throw ()
+
   {
     std::string res;
     int c, x1, x2;
@@ -63,7 +63,7 @@ namespace {
   std::string
   encodeURI (const char * uri, size_t length,
              const char * allowedChars, size_t numAllowedChars)
-    throw ()
+
   {
     std::string res;
     int x1, x2;
@@ -103,7 +103,7 @@ namespace {
 
 std::string
 OCPI::Util::Uri::decode (const char * uri)
-  throw (std::string)
+
 {
   if (!uri) {
     throw std::string ("null uri");
@@ -114,14 +114,14 @@ OCPI::Util::Uri::decode (const char * uri)
 
 std::string
 OCPI::Util::Uri::decode (const std::string & uri)
-  throw (std::string)
+
 {
   return decodeURI (uri.data(), uri.length());
 }
 
 std::string
 OCPI::Util::Uri::encode (const char * uri, const char * allowedChars)
-  throw (std::string)
+
 {
   if (!uri) {
     throw std::string ("null uri");
@@ -133,7 +133,7 @@ OCPI::Util::Uri::encode (const char * uri, const char * allowedChars)
 
 std::string
 OCPI::Util::Uri::encode (const std::string & uri, const char * allowedChars)
-  throw (std::string)
+
 {
   return encodeURI (uri.data(), uri.length(), allowedChars,
                     allowedChars ? std::strlen (allowedChars) : 0);
@@ -141,7 +141,7 @@ OCPI::Util::Uri::encode (const std::string & uri, const char * allowedChars)
 
 std::string
 OCPI::Util::Uri::encode (const std::string & uri, const std::string & allowedChars)
-  throw (std::string)
+
 {
   return encodeURI (uri.data(), uri.length(),
                     allowedChars.data(), allowedChars.length());
@@ -157,7 +157,7 @@ bool
 OCPI::Util::Uri::isPrefix (const std::string & fullURI,
                           const std::string & baseURI,
                           std::string * prefix, std::string * tail)
-  throw ()
+
 {
   std::string::size_type idx1, idx2;
   int c, x1, x2;
@@ -247,31 +247,31 @@ OCPI::Util::Uri::isPrefix (const std::string & fullURI,
  */
 
 OCPI::Util::Uri::Uri ()
-  throw ()
+
 {
 }
 
 OCPI::Util::Uri::Uri (const char * theuri)
-  throw (std::string)
+
 {
   parse (std::string (theuri));
 }
 
 OCPI::Util::Uri::Uri (const std::string & theuri)
-  throw (std::string)
+
 {
   parse (theuri);
 }
 
 OCPI::Util::Uri::Uri (const OCPI::Util::Uri & theuri)
-  throw ()
+
 {
   parse (theuri.get());
 }
 
 OCPI::Util::Uri &
 OCPI::Util::Uri::operator= (const char * theuri)
-  throw (std::string)
+
 {
   parse (std::string (theuri));
   return *this;
@@ -279,7 +279,7 @@ OCPI::Util::Uri::operator= (const char * theuri)
 
 OCPI::Util::Uri &
 OCPI::Util::Uri::operator= (const std::string & theuri)
-  throw (std::string)
+
 {
   parse (theuri);
   return *this;
@@ -287,7 +287,7 @@ OCPI::Util::Uri::operator= (const std::string & theuri)
 
 OCPI::Util::Uri &
 OCPI::Util::Uri::operator= (const OCPI::Util::Uri & theuri)
-  throw ()
+
 {
   parse (theuri.get());
   return *this;
@@ -299,7 +299,7 @@ OCPI::Util::Uri::operator= (const OCPI::Util::Uri & theuri)
 
 OCPI::Util::Uri &
 OCPI::Util::Uri::operator+= (const char * theuri)
-  throw (std::string)
+
 {
   resolve (Uri (theuri));
   return *this;
@@ -307,7 +307,7 @@ OCPI::Util::Uri::operator+= (const char * theuri)
 
 OCPI::Util::Uri &
 OCPI::Util::Uri::operator+= (const std::string & theuri)
-  throw (std::string)
+
 {
   resolve (Uri (theuri));
   return *this;
@@ -315,7 +315,7 @@ OCPI::Util::Uri::operator+= (const std::string & theuri)
 
 OCPI::Util::Uri &
 OCPI::Util::Uri::operator+= (const OCPI::Util::Uri & theuri)
-  throw (std::string)
+
 {
   resolve (theuri);
   return *this;
@@ -327,7 +327,7 @@ OCPI::Util::Uri::operator+= (const OCPI::Util::Uri & theuri)
 
 bool
 OCPI::Util::Uri::isAbsolute () const
-  throw ()
+
 {
   if (scheme.length()) {
     return true;
@@ -338,98 +338,98 @@ OCPI::Util::Uri::isAbsolute () const
 
 bool
 OCPI::Util::Uri::isRelative () const
-  throw ()
+
 {
   return !isAbsolute ();
 }
 
 const std::string &
 OCPI::Util::Uri::get () const
-  throw ()
+
 {
   return uri;
 }
 
 const std::string &
 OCPI::Util::Uri::getScheme () const
-  throw ()
+
 {
   return scheme;
 }
 
 const std::string &
 OCPI::Util::Uri::getPath () const
-  throw ()
+
 {
   return path;
 }
 
 const std::string &
 OCPI::Util::Uri::getFileName () const
-  throw ()
+
 {
   return filename;
 }
 
 const std::string &
 OCPI::Util::Uri::getQuery () const
-  throw ()
+
 {
   return query;
 }
 
 const std::string &
 OCPI::Util::Uri::getRequest () const
-  throw ()
+
 {
   return request;
 }
 
 const std::string &
 OCPI::Util::Uri::getAuthority () const
-  throw ()
+
 {
   return authority;
 }
 
 const std::string &
 OCPI::Util::Uri::getUserinfo () const
-  throw ()
+
 {
   return userinfo;
 }
 
 const std::string &
 OCPI::Util::Uri::getHostport () const
-  throw ()
+
 {
   return hostport;
 }
 
 const std::string &
 OCPI::Util::Uri::getHost () const
-  throw ()
+
 {
   return host;
 }
 
 const std::string &
 OCPI::Util::Uri::getPort () const
-  throw ()
+
 {
   return port;
 }
 
 const std::string &
 OCPI::Util::Uri::getFragment () const
-  throw ()
+
 {
   return fragment;
 }
 
 unsigned int
 OCPI::Util::Uri::getNumPathSegments () const
-  throw ()
+
 {
   std::string::size_type segBegin, segEnd;
   unsigned int count = 0;
@@ -463,7 +463,7 @@ OCPI::Util::Uri::getNumPathSegments () const
 
 std::string
 OCPI::Util::Uri::getPathSegment (unsigned int num) const
-  throw ()
+
 {
   std::string::size_type segBegin, segEnd;
   unsigned int count = 0;
@@ -510,7 +510,7 @@ OCPI::Util::Uri::getPathSegment (unsigned int num) const
 
 void
 OCPI::Util::Uri::parse (const std::string & data)
-  throw (std::string)
+
 {
   std::string::size_type idx, beg, pos;
   std::string::size_type uriLength = data.length ();
@@ -683,7 +683,7 @@ OCPI::Util::Uri::parse (const std::string & data)
 
 void
 OCPI::Util::Uri::resolve (const OCPI::Util::Uri & other)
-  throw (std::string)
+
 {
   if (other.isAbsolute()) {
     operator= (other);
@@ -770,7 +770,7 @@ OCPI::Util::Uri::resolve (const OCPI::Util::Uri & other)
 
 std::string
 OCPI::Util::Uri::normalizePath (const std::string & path)
-  throw ()
+
 {
   std::string::size_type beg, pos, last;
   std::string res, seg;

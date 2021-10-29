@@ -25,8 +25,8 @@
 #include <cerrno>
 #include <climits>
 #include <cstdlib> // strtoull
-#include "OcpiUtilMisc.h"
-#include "OcpiUtilPci.h"
+#include "UtilMisc.hh"
+#include "UtilPci.hh"
 
 namespace OCPI {
 namespace Util {

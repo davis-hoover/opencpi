@@ -56,7 +56,7 @@ namespace OR = OCPI::Remote;
   CMD_OPTION(max_callers,m,    ULong,   0,   "Quits server after connection count (probes included)")\
 
 // FIXME: local-only like ocpihdl simulate?
-#include "CmdOption.hh"
+#include "BaseOption.hh"
 
 static void
 rmdir() {
@@ -159,7 +159,7 @@ static int mymain(const char **) {
   ocpiCheck(signal(SIGINT, sigint) != SIG_ERR);
   if (options.remove())
     ocpiCheck(signal(SIGTERM, sigint) != SIG_ERR);
-  OCPI::Driver::ManagerManager::configure();
+  OCPI::Base::Plugin::ManagerManager::configure();
   if (options.list()) {
     OA::ContainerManager::list(options.only_platforms());
     return 0;

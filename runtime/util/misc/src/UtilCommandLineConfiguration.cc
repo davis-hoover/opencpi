@@ -23,12 +23,12 @@
 #include <cstring>
 #include <cctype>
 #include "OsAssert.hh"
-#include "OcpiUtilMisc.h"
-#include "OcpiUtilCommandLineConfiguration.h"
+#include "UtilMisc.hh"
+#include "UtilCommandLineConfiguration.hh"
 
 OCPI::Util::CommandLineConfiguration::
 CommandLineConfiguration (const Option * options)
-  throw ()
+
   : m_numOpts (0),
     m_options (options)
 {
@@ -46,7 +46,7 @@ OCPI::Util::CommandLineConfiguration::
 const OCPI::Util::CommandLineConfiguration::Option *
 OCPI::Util::CommandLineConfiguration::
 findOption (const std::string & name)
-  throw ()
+
 {
   for (const Option * oi = m_options;
        oi->type != OptionType::END;
@@ -67,7 +67,7 @@ OCPI::Util::CommandLineConfiguration::
 configure (int & argc, char *argv[],
            bool ignoreUnknown,
            bool removeFromSet)
-  throw (std::string)
+
 {
   int newargc;
   int cmdidx;
@@ -235,7 +235,7 @@ OCPI::Util::CommandLineConfiguration::
 configureOption (unsigned int type,
                  void * valuePtr,
                  const std::string & optionValue)
-  throw (std::string)
+
 {
   switch (type) {
   case OptionType::NONE:
@@ -418,7 +418,7 @@ configureOption (unsigned int type,
 void
 OCPI::Util::CommandLineConfiguration::
 printOptions (std::ostream & out)
-  throw ()
+
 {
   for (const Option * oi = m_options;
        oi->type != OptionType::END;
@@ -497,7 +497,7 @@ printOptions (std::ostream & out)
 std::string
 OCPI::Util::CommandLineConfiguration::
 printOptionSpec (unsigned int) const
-  throw ()
+
 {
   ocpiAssert (0);
   // silence compiler warning

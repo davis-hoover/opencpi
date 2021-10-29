@@ -19,8 +19,8 @@
  */
 
 #include "OsFileSystem.hh"
-#include "OcpiDriverManager.h"
-#include "OcpiUtilEzxml.h"
+#include "BasePluginManager.hh"
+#include "UtilEzxml.hh"
 #include "OcpiApplication.h"
 
 namespace OA = OCPI::API;
@@ -41,7 +41,7 @@ namespace OX = OCPI::Util::EzXml;
   CMD_OPTION(package,    p, String, 0, "package prefix for softpkg name") \
   CMD_OPTION(directory,  D, String, 0, "the directory where output files are placed") \
 
-#include "CmdOption.hh"
+#include "BaseOption.hh"
 
 static int mymain(const char **ap) {
 

@@ -125,7 +125,7 @@
 
 #include "OsAssert.hh"
 #include "OsMutex.hh"
-#include <OcpiLoggerLogger.h>
+#include "UtilLogger.hh"
 #include <streambuf>
 #include <iostream>
 #include <string>

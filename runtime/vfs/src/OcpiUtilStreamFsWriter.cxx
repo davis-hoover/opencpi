@@ -39,9 +39,9 @@
 #include <cstdlib>
 #include "OsAssert.hh"
 #include "OsMutex.hh"
-#include <OcpiUtilUri.h>
-#include <OcpiUtilMisc.h>
-#include <OcpiUtilAutoMutex.h>
+#include "UtilUri.hh"
+#include "UtilMisc.hh"
+#include "UtilAutoMutex.hh"
 #include "OcpiUtilVfs.h"
 #include "OcpiUtilVfsIterator.h"
 #include "OcpiUtilStreamFsWriter.h"

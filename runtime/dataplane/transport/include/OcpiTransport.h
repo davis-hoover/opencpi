@@ -37,7 +37,7 @@
 #include <list>
 #include "OsTimer.hh"
 #include "OsMutex.hh"
-#include <OcpiParentChild.h>
+#include "BaseParentChild.hh"
 #include <OcpiTimeEmit.h>
 #include "XferException.h"
 #include "XferEndPoint.h"
@@ -138,7 +138,7 @@ namespace OCPI {
 					     OCPI::RDT::Descriptors &desc);
       // Use this one when you know there is only one input port
       Port * createInputPort(OCPI::RDT::Descriptors& desc,
-			     const OCPI::Util::PValue *params = NULL);
+			     const OCPI::Base::PValue *params = NULL);
       // Use this one when you know there is only one output port
       // And the input port is remote
       Port * createOutputPort(OCPI::RDT::Descriptors& outputDesc,

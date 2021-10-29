@@ -68,8 +68,7 @@ namespace OCPI {
        * times.
        */
 
-      BinaryUUID produceRandomUUID ()
-        throw ();
+      BinaryUUID produceRandomUUID ();
 
       /**
        * \brief Convert a binary UUID to the hexadecimal representation.
@@ -78,8 +77,7 @@ namespace OCPI {
        * \return The UUID in hexadecimal representation.
        */
 
-      std::string binaryToHex (const BinaryUUID &uuid)
-        throw ();
+      std::string binaryToHex (const BinaryUUID &uuid);
 
     }
 

@@ -22,7 +22,7 @@
 #include <OcpiTimeEmit.h>
 #define _c_plus_plus
 #include <OcpiTimeEmitC.h>
-#include <OcpiUtilCommandLineConfiguration.h>
+#include "UtilCommandLineConfiguration.hh"
 
 using namespace OCPI::API;
 using namespace OCPI::Time;

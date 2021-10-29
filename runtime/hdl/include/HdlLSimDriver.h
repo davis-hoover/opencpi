@@ -39,10 +39,10 @@ namespace OCPI {
       private:
 	Device *createDevice(const std::string &name, const std::string &platform,
 			     uint8_t spinCount, unsigned sleepUsecs, unsigned simTicks,
-			     const OCPI::Util::PValue *params, bool dump, const char *dir, std::string &error);
+			     const OCPI::Base::PValue *params, bool dump, const char *dir, std::string &error);
       public:
 	unsigned
-	search(const OCPI::Util::PValue *props, const char **exclude, bool discoveryOnly,
+	search(const OCPI::Base::PValue *props, const char **exclude, bool discoveryOnly,
 	       std::string &error);
 	OCPI::HDL::Device *
 	open(const char *name, const OCPI::API::PValue *params, std::string &err);

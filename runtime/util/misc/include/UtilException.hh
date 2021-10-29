@@ -36,12 +36,12 @@
 #include <stdarg.h>
 #include <string>
 #include "OsDataTypes.hh"
-#include "OcpiUtilExceptionApi.h"
+#include "OcpiExceptionApi.hh"
 
 namespace OCPI {
 
   namespace Util {
-
+    extern bool g_exiting; // set when exception reporting needs to be primitive
 
       // This is the implementation class of the API error class
       class Error : public OCPI::API::Error, public std::string {

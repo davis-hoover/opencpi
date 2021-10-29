@@ -61,7 +61,7 @@ namespace OCPI {
       OCPI::Container::Artifact &
 	createArtifact(OCPI::Library::Artifact &lart, const OCPI::API::PValue *artifactParams);
       OCPI::API::ContainerApplication *
-	createApplication(const char *name, const OCPI::Util::PValue *props)
+	createApplication(const char *name, const OCPI::Base::PValue *props)
 	throw ( OCPI::Util::EmbeddedException );
       bool needThread();
       Container::DispatchRetCode dispatch(DataTransfer::EventManager*);

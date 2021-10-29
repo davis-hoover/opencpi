@@ -24,7 +24,7 @@
 #include <cstdio>
 #include <cstring>
 #include <cassert>
-#include "OcpiUtilMisc.h"
+#include "UtilMisc.hh"
 #include "data.h"
 #include "assembly.h"
 #include "hdl.h"

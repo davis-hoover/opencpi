@@ -18,8 +18,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <OcpiLoggerLogger.h>
-#include <OcpiLoggerNullOutput.h>
+#include "UtilLogger.hh"
+#include "UtilLoggerNullOutput.hh"
 #include <streambuf>
 #include <iostream>
 

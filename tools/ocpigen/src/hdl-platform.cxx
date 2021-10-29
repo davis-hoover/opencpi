@@ -20,8 +20,8 @@
 
 #include <stdint.h>
 #include <map>
-#include "OcpiUtilMisc.h"
-#include "OcpiUtilEzxml.h"
+#include "UtilMisc.hh"
+#include "UtilEzxml.hh"
 #include "assembly.h"
 #include "hdl.h"
 #include "hdl-platform.h"

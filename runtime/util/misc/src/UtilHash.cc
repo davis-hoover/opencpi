@@ -28,7 +28,7 @@
  *
  */
 
-#include "OcpiUtilHash.h"
+#include "UtilHash.hh"
 #include <cstring>
 
 unsigned int

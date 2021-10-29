@@ -18,7 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <OcpiUtilAutoMutex.h>
+#include "UtilAutoMutex.hh"
 #include "OsAssert.hh"
 #include "OsMutex.hh"
 

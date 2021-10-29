@@ -26,7 +26,7 @@
 #include <climits>
 #include <set>
 #include "ocpi-config.h"
-#include "OcpiUtilException.h"
+#include "UtilException.hh"
 #include "OcpiLibraryManager.h"
 #include "LibrarySimple.h"
 #include "OcpiComponentLibrary.h"
@@ -37,7 +37,8 @@
 namespace OA = OCPI::API;
 namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
-namespace OD = OCPI::Driver;
+namespace OB = OCPI::Base;
+namespace OD = OCPI::Base::Plugin;
 namespace OE = OCPI::Util::EzXml;
 
 namespace OCPI {
@@ -45,7 +46,7 @@ namespace OCPI {
     const char *library = "library";
     // This is intended to force this "driver" to be statically linked into this library
     const char **complib OCPI_USED = &CompLib::component;
-    static OCPI::Driver::Registration<Manager> lm;
+    static OD::Registration<Manager> lm;
     // The Library Driver Manager class
     Manager::Manager() {
     }
@@ -121,8 +122,8 @@ namespace OCPI {
     }
     static bool
     satisfiesSelection(const char *selection, unsigned *score, OM::Worker &impl) {
-      OU::ExprValue val;
-      const char *err = OU::evalExpression(selection, val, &impl);
+      OB::ExprValue val;
+      const char *err = OB::evalExpression(selection, val, &impl);
       if (err)
 	throw OU::Error("Error parsing selection expression: %s", err);
       if (!val.isNumber())
@@ -325,7 +326,7 @@ namespace OCPI {
 	throw OU::Error("File: \"%s\" is not a normal file", name);
       }
       mtime = info.st_mtime;
-      length = info.st_size;
+      length = (uint64_t)info.st_size;
       char buf[64/3+4]; // octal + \r + \n + null
       const size_t bufsize = sizeof(buf)-1; // Ensure trailing null character
       buf[bufsize] = '\0';
@@ -340,14 +341,14 @@ namespace OCPI {
 	  if (*cp == 'X' && isdigit(cp[1])) {
 	    char *end;
 	    long l = strtol(cp + 1, &end, 10);
-	    off_t n = (off_t)l;
+	    size_t n = (size_t)l;
 	    // strtoll error reporting is truly bizarre
 	    if (l != LONG_MAX && l > 0 && cp[1] && isspace(*end)) {
-	      metaLength = n + (&buf[bufsize] - cp);
-	      off_t metaStart = fileLength - metaLength;
+	      metaLength = n + OCPI_SIZE_T_DIFF(&buf[bufsize], cp);
+	      off_t metaStart = fileLength - (off_t)metaLength;
 	      if (lseek(fd, metaStart, SEEK_SET) != -1) {
 		data = new char[n + 1];
-		if (read(fd, data, n) == n)
+		if (read(fd, data, n) == (off_t)n)
 		  data[n] = '\0';
 		else {
 		  delete [] data;

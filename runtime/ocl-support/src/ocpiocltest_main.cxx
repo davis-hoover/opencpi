@@ -20,9 +20,9 @@
 #include "cl.h"
 #include "cl_ext.h"
 #include "ocpi-config.h"
-#include "OcpiOsDebugApi.hh"
+#include "OcpiDebugApi.hh"
 #include "OsLoadableModule.hh"
-#include "OcpiDriverManager.h"
+#include "BasePluginManager.hh"
 
 namespace OS = OCPI::OS;
 
@@ -36,7 +36,7 @@ namespace OS = OCPI::OS;
   CMD_OPTION(loglevel,   l,    UChar,  "0",     "Set logging level used during operation") \
   CMD_OPTION(library,    L,    String,  NULL,   "Set name of OpenCL library to test") \
 
-#include "CmdOption.hh"
+#include "BaseOption.hh"
 
 const char *defaultLib =
 // FIXME - these should be based on autoconf
@@ -53,7 +53,7 @@ mymain(const char **/*ap*/) {
     OS::logSetLevel(options.loglevel());
   if (options.verbose() && !OCPI::OS::logWillLog(8))
     OS::logSetLevel(8);
-  OCPI::Driver::ManagerManager::suppressDiscovery();
+  OCPI::Base::Plugin::ManagerManager::suppressDiscovery();
   const char *env = getenv("OCPI_HAVE_OPENCL");
   if (!env || env[0] != '1') {
     if (options.verbose())

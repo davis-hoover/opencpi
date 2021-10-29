@@ -96,6 +96,7 @@ namespace OCPI {
     /**
      * \brief Miscellaneous utilities.
      */
+    extern bool parseOneChar(const char *&cp, const char *end, char &vp);
 
     inline uint64_t utruncate(uint64_t val, size_t bytes) {
       (void)bytes;

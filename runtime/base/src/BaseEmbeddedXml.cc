@@ -24,10 +24,10 @@
 #include <cstdlib> // atol, free
 #include <unistd.h> // truncate
 #include <stdexcept>
-#include "OcpiXmlEmbedded.h"
+#include "BaseEmbeddedXml.hh"
 
 // In the name of security, these checks are excessively robust...
-// Using C-style file I/O is not RAII-compliant, so throw()ing may lose a file descriptor
+// Using C-style file I/O is not RAII-compliant, soing may lose a file descriptor
 
 namespace {
 enum xmlmode_t {readonly, readwrite};
@@ -54,9 +54,9 @@ bool is_valid_signature(FILE *file, size_t &xml_start, size_t &xml_length) {
   xml_length = 0;
   int res = fseek(file, 0, SEEK_END);
   if (res) throw std::runtime_error(strerror(errno));
-  size_t end = ftell(file);
+  size_t end = (size_t)ftell(file);
   if (end < 21) return false; // throw std::runtime_error("File too small");
-  res = fseek(file, end-20, SEEK_SET);
+  res = fseek(file, (long)(end-20), SEEK_SET);
   if (res) throw std::runtime_error(strerror(errno));
   std::string tail(21, '\0');
   size_t ress = fread(&tail[0], 1, 20, file);
@@ -91,7 +91,7 @@ bool verify_XML_block(const std::string &xml) {
 // Private helper function that gives XML string when given start/length from is_valid_signature.
 void extract_XML(FILE *file, const size_t xml_start, const size_t xml_length, std::string &xml) {
   xml.clear();
-  const int res = fseek(file, xml_start, SEEK_SET);
+  const int res = fseek(file, (long)xml_start, SEEK_SET);
   if (res) return;
   xml.resize(xml_length);
   const size_t ress = fread(&xml[0], 1, xml_length, file);
@@ -101,15 +101,14 @@ void extract_XML(FILE *file, const size_t xml_start, const size_t xml_length, st
 } // anon namespace
 
 namespace OCPI {
-namespace Util {
-namespace EzXml {
+namespace Base {
 
 void artifact_addXML(const std::string &fname, const std::string &xml) {
   // Verify XML buffer
   //TODO allow for blank lines at the end of a file
   if (not verify_XML_block(xml)) throw std::runtime_error("XML input not valid!");
   // Difference between old version and new version: old version blindly appended
-  while (artifact_stripXML(fname)) {};
+  while (Base::artifact_stripXML(fname)) {};
   FILE *f;
   open_file(fname, readwrite, &f);
   if (fseek(f, 0, SEEK_END)) throw std::runtime_error(strerror(errno));
@@ -144,10 +143,9 @@ bool artifact_stripXML(const std::string &fname) {
   fclose(f);
   if (!valid)
     return false;
-  const int res = truncate(fname.c_str(), start);
+  const int res = truncate(fname.c_str(), (off_t)start);
   if (res) throw std::runtime_error(strerror(errno));
   return true;
 };
-} // EzXml
-} // Util
+} // Base
 } // OCPI

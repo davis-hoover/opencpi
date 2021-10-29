@@ -34,7 +34,7 @@
  */
 
 #include <OcpiUtilVfs.h>
-#include <OcpiUtilHttpClient.h>
+#include "UtilHttpClient.hh"
 #include "OsMutex.hh"
 #include <iostream>
 #include <string>

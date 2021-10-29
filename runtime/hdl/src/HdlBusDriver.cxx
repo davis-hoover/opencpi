@@ -45,6 +45,7 @@
      namespace Zynq {
        namespace OM = OCPI::Metadata;
        namespace OU = OCPI::Util;
+       namespace OB = OCPI::Base;
        namespace OF = OCPI::OS::FileSystem;
        namespace OZ = OCPI::HDL::ZynqMP;
        namespace OH = OCPI::HDL;
@@ -65,7 +66,7 @@
 	 uint8_t *m_vaddr;
 	 bool     m_fpgaManager;
 	 friend class Driver;
-	 Device(Driver &driver, std::string &a_name, bool forLoad, const OU::PValue *params,
+	 Device(Driver &driver, std::string &a_name, bool forLoad, const OB::PValue *params,
 		std::string &err)
 	   : OCPI::HDL::Device(a_name, "ocpi-dma-pio", params),
 	     m_driver(driver), m_vaddr(NULL) {
@@ -479,7 +480,7 @@
       }
 
       unsigned Driver::
-      search(const OU::PValue *params, const char **exclude, bool discoveryOnly,
+      search(const OB::PValue *params, const char **exclude, bool discoveryOnly,
 	     std::string &error) {
 	// Opening implies canonicalizing the name, which is needed for excludes
 	ocpiInfo("Searching for local Zynq/PL HDL device.");
@@ -488,7 +489,7 @@
       }
 
       OCPI::HDL::Device *Driver::
-      open(const char *busName, bool forLoad, const OU::PValue *params, std::string &error) {
+      open(const char *busName, bool forLoad, const OB::PValue *params, std::string &error) {
 	(void)params;
 	std::string name("PL:");
 	name += busName;

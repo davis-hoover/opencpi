@@ -28,11 +28,11 @@
 #include <string>
 #include <cassert>
 #include "ezxml.h"
-#include "OcpiUtilAutoMutex.h"
-#include "UtilDataTypes.hh"
+#include "UtilAutoMutex.hh"
+#include "BaseDataTypes.hh"
 
 namespace OCPI {
-  namespace Util {
+  namespace Base {
     class Value;
     typedef Value **StructValue;
     // A type value is a pointer to a value
@@ -64,7 +64,6 @@ namespace OCPI {
       virtual bool
       sequenceUnparse(const Value &v, std::string &s, bool hex, char comma) const;
     };
-    extern bool parseOneChar(const char *&cp, const char *end, char &vp);
     struct IdentResolver;
     // A typed value
     class Value : public Unparser {

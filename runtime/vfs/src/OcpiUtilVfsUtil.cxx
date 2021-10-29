@@ -24,7 +24,7 @@
 #include "OcpiUtilVfsUtil.h"
 #include "OcpiUtilVfs.h"
 #include "OcpiUtilVfsIterator.h"
-#include "OcpiUtilMisc.h"
+#include "UtilMisc.hh"
 
 /*
  * ----------------------------------------------------------------------

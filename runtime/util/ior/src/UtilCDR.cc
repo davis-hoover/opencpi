@@ -22,7 +22,7 @@
 #include "OsDataTypes.hh"
 #include <string>
 #include <cstring>
-#include "OcpiUtilCDR.h"
+#include "UtilCDR.hh"
 
 /*
  * ----------------------------------------------------------------------
@@ -33,7 +33,7 @@
 bool
 OCPI::Util::CDR::
 nativeByteorder ()
-  throw ()
+
 {
   OCPI::OS::uint32_t v = 0x01020304;
   char * cv = reinterpret_cast<char *> (&v);
@@ -52,14 +52,14 @@ nativeByteorder ()
 
 OCPI::Util::CDR::Encoder::
 Encoder ()
-  throw ()
+
 {
 }
 
 void
 OCPI::Util::CDR::Encoder::
 align (unsigned long modulus)
-  throw ()
+
 {
   std::string::size_type curpos = m_data.length ();
   std::string::size_type newpos = modulus*((curpos+modulus-1)/modulus);
@@ -69,7 +69,7 @@ align (unsigned long modulus)
 void
 OCPI::Util::CDR::Encoder::
 putBoolean (bool value)
-  throw ()
+
 {
   if (value) {
     m_data.append ("\1", 1);
@@ -82,7 +82,7 @@ putBoolean (bool value)
 void
 OCPI::Util::CDR::Encoder::
 putOctet (unsigned char value)
-  throw ()
+
 {
   m_data.append (reinterpret_cast<char *> (&value), 1);
 }
@@ -90,7 +90,7 @@ putOctet (unsigned char value)
 void
 OCPI::Util::CDR::Encoder::
 putUShort (OCPI::OS::uint16_t value)
-  throw ()
+
 {
   align (2);
   m_data.append (reinterpret_cast<char *> (&value), 2);
@@ -99,7 +99,7 @@ putUShort (OCPI::OS::uint16_t value)
 void
 OCPI::Util::CDR::Encoder::
 putULong (OCPI::OS::uint32_t value)
-  throw ()
+
 {
   align (4);
   m_data.append (reinterpret_cast<char *> (&value), 4);
@@ -107,7 +107,7 @@ putULong (OCPI::OS::uint32_t value)
 void
 OCPI::Util::CDR::Encoder::
 putLong (OCPI::OS::int32_t value)
-  throw ()
+
 {
   align (4);
   m_data.append (reinterpret_cast<char *> (&value), 4);
@@ -116,7 +116,7 @@ putLong (OCPI::OS::int32_t value)
 void
 OCPI::Util::CDR::Encoder::
 putULongLong (OCPI::OS::uint64_t value)
-  throw ()
+
 {
   align (8);
   m_data.append (reinterpret_cast<char *> (&value), 8);
@@ -125,7 +125,7 @@ putULongLong (OCPI::OS::uint64_t value)
 void
 OCPI::Util::CDR::Encoder::
 putString (const std::string & value)
-  throw ()
+
 {
   putULong ((uint32_t)(value.length() + 1));
   m_data.append (value.data(), value.length());
@@ -135,7 +135,7 @@ putString (const std::string & value)
 void
 OCPI::Util::CDR::Encoder::
 putOctetSeq (const std::string & value)
-  throw ()
+
 {
   putULong ((uint32_t)value.length());
   m_data.append (value.data(), value.length());
@@ -144,7 +144,7 @@ putOctetSeq (const std::string & value)
 const std::string &
 OCPI::Util::CDR::Encoder::
 data () const
-  throw ()
+
 {
   return m_data;
 }
@@ -157,7 +157,7 @@ data () const
 
 OCPI::Util::CDR::Decoder::
 Decoder (const void * data, unsigned long size)
-  throw ()
+
   : m_pos (0),
     m_len (size),
     m_data (reinterpret_cast<const char *> (data))
@@ -167,7 +167,7 @@ Decoder (const void * data, unsigned long size)
 
 OCPI::Util::CDR::Decoder::
 Decoder (const std::string & data)
-  throw ()
+
   : m_pos (0),
     m_len (data.length()),
     m_data (data.data())
@@ -178,7 +178,7 @@ Decoder (const std::string & data)
 void
 OCPI::Util::CDR::Decoder::
 byteorder (bool bo)
-  throw ()
+
 {
   m_dataByteorder = bo;
 }
@@ -186,7 +186,7 @@ byteorder (bool bo)
 bool
 OCPI::Util::CDR::Decoder::
 byteorder () const
-  throw ()
+
 {
   return m_dataByteorder;
 }
@@ -194,7 +194,7 @@ byteorder () const
 void
 OCPI::Util::CDR::Decoder::
 align (unsigned long modulus)
-  throw ()
+
 {
   m_pos = modulus*((m_pos+modulus-1)/modulus);
 }
@@ -202,7 +202,7 @@ align (unsigned long modulus)
 unsigned long
 OCPI::Util::CDR::Decoder::
 remainingData () const
-  throw ()
+
 {
   if (m_pos > m_len) {
     return 0;

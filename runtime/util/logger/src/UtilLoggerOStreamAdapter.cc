@@ -19,8 +19,8 @@
  */
 
 #include "OsMutex.hh"
-#include <OcpiLoggerLogger.h>
-#include <OcpiLoggerOStreamAdapter.h>
+#include "UtilLogger.hh"
+#include "UtilLoggerOStreamAdapter.hh"
 #include <iostream>
 
 /*

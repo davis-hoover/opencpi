@@ -60,8 +60,7 @@ namespace OCPI {
        * shall not manipulate \a mutex directly.
        */
 
-      AutoRDLock (OCPI::OS::RWLock & rwlock, bool locked = true)
-        throw (std::string);
+      AutoRDLock (OCPI::OS::RWLock & rwlock, bool locked = true);
 
       /**
        * Destructor.
@@ -69,17 +68,13 @@ namespace OCPI {
        * Releases the read lock if it is currently held.
        */
 
-      ~AutoRDLock ()
-        throw ();
+      ~AutoRDLock ();
 
-      void lock ()
-        throw (std::string);
+      void lock ();
 
-      bool trylock ()
-        throw (std::string);
+      bool trylock ();
 
-      void unlock ()
-        throw (std::string);
+      void unlock ();
 
     private:
       bool m_locked;

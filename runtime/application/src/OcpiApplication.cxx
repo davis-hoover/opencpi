@@ -1,4 +1,4 @@
-/*
+ /*
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -23,16 +23,17 @@
 #include "OsFileSystem.hh"
 #include "OcpiContainerApi.h"
 #include "OsMisc.hh"
-#include "UtilValue.hh"
-#include "UtilPValue.hh"
+#include "BaseValue.hh"
+#include "BasePValue.hh"
 #include "OcpiTimeEmit.h"
-#include "OcpiUtilMisc.h"
+#include "UtilMisc.hh"
 #include "ContainerLauncher.h"
 #include "OcpiApplication.h"
 
 namespace OC = OCPI::Container;
 namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 namespace OE = OCPI::Util::EzXml;
 namespace OL = OCPI::Library;
 namespace OA = OCPI::API;
@@ -47,8 +48,8 @@ namespace OCPI {
       const char *env = getenv("OCPI_APPLICATION_PARAMS");
       ocpiDebug("OCPI_APPLICATION_PARAMS:%s", env ? env : "");
       if (env) {
-	OU::PValueList *envParams = new OU::PValueList;
-        OU::PValueList tempParams;
+	OB::PValueList *envParams = new OB::PValueList;
+        OB::PValueList tempParams;
         for (OU::TokenIter li(env); li.token(); li.next()) {
           const char *eq = strchr(li.token(), '=');
           if (!eq)
@@ -64,21 +65,21 @@ namespace OCPI {
         OCPI_DISCOVERY_PARAMETERS, OCPI_DISCOVERY_ONLY_PARAMETERS, NULL
       };
       // Patch/rename overloaded pvalue names for compatibility - note nasty cast, which should be ok
-      for (OU::PValue *p = (OU::PValue *)params; p && p->name; p++)
+      for (OB::PValue *p = (OB::PValue *)params; p && p->name; p++)
         if (!strcasecmp(p->name, "buffersize"))
           p->name = "portbuffersize";
         else if (!strcasecmp(p->name, "buffercount"))
           p->name = "portbuffercount";
-      OU::PValueList discoveryParams;
+      OB::PValueList discoveryParams;
       for (const char **dp = forDiscovery; *dp; ++dp) {
-        const PValue *p = OU::find(params, *dp);
+        const PValue *p = OB::find(params, *dp);
         if (p)
           discoveryParams.add(*p);
       }
-      OCPI::Driver::ManagerManager::getManagerManager().configureOnce(NULL,
-                                                                      &discoveryParams[0]);
+      OCPI::Base::Plugin::ManagerManager::getManagerManager().configureOnce(NULL,
+									    &discoveryParams[0]);
       bool verbose = false;
-      OU::findBool(params, "verbose", verbose);
+      OB::findBool(params, "verbose", verbose);
       if (verbose) {
         OA::Container *c;
         for (unsigned n = 0; (c = OA::ContainerManager::get(n)); n++)
@@ -275,13 +276,13 @@ namespace OCPI {
     setPolicy(const PValue *params) {
       uint32_t pcount;
       bool rr;
-      if (OU::findULong(params, "MaxProcessors", pcount)) {
+      if (OB::findULong(params, "MaxProcessors", pcount)) {
         m_cMapPolicy = MaxProcessors;
         m_processors = pcount;
-      } else if (OU::findULong(params, "MinProcessors", pcount)) {
+      } else if (OB::findULong(params, "MinProcessors", pcount)) {
         m_cMapPolicy = MinProcessors;
         m_processors = pcount;
-      } else if (OU::findBool(params, "RoundRobin", rr) && rr) {
+      } else if (OB::findBool(params, "RoundRobin", rr) && rr) {
         m_cMapPolicy = RoundRobin;
         m_processors = 0;
       }
@@ -565,7 +566,7 @@ namespace OCPI {
 
     void ApplicationI::
     checkPropertyValue(unsigned nInstance, const OM::Worker &w,
-                       const OM::Assembly::Property &aProp, unsigned *&pn, OU::Value *&pv) {
+                       const OM::Assembly::Property &aProp, unsigned *&pn, OB::Value *&pv) {
       const char
         *pName = aProp.m_name.c_str(),
         *iName = m_assembly.instance(nInstance).name().c_str();
@@ -575,7 +576,7 @@ namespace OCPI {
       if (!uProp.m_isWritable && (aProp.m_hasDelay || !uProp.m_isInitial))
         throw OU::Error("Cannot set property '%s' for instance '%s'. It is not writable.",
                         pName, iName);
-      OU::Value *v;
+      OB::Value *v;
       if (aProp.m_hasDelay) {
         const auto dpv =
           m_delayedPropertyValues.insert(std::make_pair(aProp.m_delay, DelayedPropertyValue()));
@@ -594,10 +595,10 @@ namespace OCPI {
                         pName, iName, w.specName().c_str(), err);
     }
     void ApplicationI::
-    checkExternalParams(const char *pName, const OU::PValue *params) {
+    checkExternalParams(const char *pName, const OB::PValue *params) {
       // Error check instance assignment parameters for externals
       const char *assign;
-      for (unsigned n = 0; OU::findAssignNext(params, pName, NULL, assign, n); ) {
+      for (unsigned n = 0; OB::findAssignNext(params, pName, NULL, assign, n); ) {
         const char *eq = strchr(assign, '=');
         if (!eq)
           throw OU::Error("Parameter assignment '%s' is invalid. "
@@ -620,7 +621,7 @@ namespace OCPI {
     // Prepare all the property values for an instance
     void ApplicationI::
     prepareInstanceProperties(unsigned nInstance, const OL::Implementation &impl, unsigned *&pn,
-                              OU::Value *&pv) {
+                              OB::Value *&pv) {
       const OM::Assembly::Properties &aProps = *m_bestDeployments[nInstance].m_properties;
       // Prepare all the property values in the assembly, avoiding those in parameters.
       for (unsigned p = 0; p < aProps.size(); p++) {
@@ -649,7 +650,7 @@ it is really per actual worker config...
     prepareInstanceProperties(
 #endif
     void ApplicationI::
-    finalizeProperties(const OU::PValue *params) {
+    finalizeProperties(const OB::PValue *params) {
       auto *d = &m_bestDeployments[0];
       // Collect and check the property values for each instance (not inferred slaves)
       assert(m_nInstances <= m_bestDeployments.size());
@@ -660,7 +661,7 @@ it is really per actual worker config...
         size_t nPropValues = aProps.size();
         const char *sDummy;
         // Count any properties that were provided in parameters specific to instance
-        for (unsigned nn = 0; OU::findAssignNext(params, "property", iName, sDummy, nn); )
+        for (unsigned nn = 0; OB::findAssignNext(params, "property", iName, sDummy, nn); )
           nPropValues++;
         // Count any parameter properties that were mapped to this instance
 	// Note these cannot apply to inferred slaves so the ordinals should be ok
@@ -668,7 +669,7 @@ it is really per actual worker config...
         unsigned nDummy = 0;
         for (size_t nn = m_assembly.m_mappedProperties.size(); nn; nn--, mp++)
           if (mp->m_instance == n &&
-              OU::findAssignNext(params, "property", mp->m_name.c_str(), sDummy, nDummy))
+              OB::findAssignNext(params, "property", mp->m_name.c_str(), sDummy, nDummy))
             nPropValues++;
         // Account for the runtime properties set here, e.g. output port buffer size
         const OL::Implementation &impl = *d->m_impls[0];
@@ -681,7 +682,7 @@ it is really per actual worker config...
           // array by prepareInstanceProperties
           d->m_crew.m_propValues.resize(nPropValues);
           d->m_crew.m_propOrdinals.resize(nPropValues);
-          OU::Value *pv = &d->m_crew.m_propValues[0];
+          OB::Value *pv = &d->m_crew.m_propValues[0];
           unsigned *pn = &d->m_crew.m_propOrdinals[0];
           // Note that for scaled instances we assume the impls are compatible as far as
           // properties go.  FIXME:  WE MUST CHECK COMPILED VALUES WHEN COMPARING IMPLS
@@ -761,9 +762,9 @@ it is really per actual worker config...
 
     // Apply parameters to ports
     const char *ApplicationI::
-    finalizePortParam(const OU::PValue *params, const char *pName) {
+    finalizePortParam(const OB::PValue *params, const char *pName) {
       const char *assign;
-      for (unsigned n = 0; OU::findAssignNext(params, pName, NULL, assign, n); ) {
+      for (unsigned n = 0; OB::findAssignNext(params, pName, NULL, assign, n); ) {
         const char *value, *err;
         size_t instn, portn;
         const OM::Port *p;
@@ -966,8 +967,8 @@ it is really per actual worker config...
       size_t nCandidates = cs.size();
       m_feasibleContainers.resize(nCandidates);
       std::string container;
-      if (!OU::findAssign(params, "container", ai.m_name.c_str(), container) &&
-	  !OU::findAssign(params, "container", ai.m_specName.c_str(), container))
+      if (!OB::findAssign(params, "container", ai.m_name.c_str(), container) &&
+	  !OB::findAssign(params, "container", ai.m_specName.c_str(), container))
 	OE::getOptionalString(ai.xml(), container, "container");
       CMap sum = 0;
       ocpiInfo("================================================================================");
@@ -1134,7 +1135,7 @@ it is really per actual worker config...
           throw OU::Error("Port mismatch for instance \"%s\" in artifact \"%s\"",
                           iname, artifact);
         bool execution;
-        if (OU::findBool(params, "execution", execution) && !execution)
+        if (OB::findBool(params, "execution", execution) && !execution)
           continue;
         OC::Container *c = OC::Manager::find(i->m_containerName);
         if (!c)
@@ -1176,15 +1177,15 @@ it is really per actual worker config...
         m_verbose = false;
         m_dump = false;
         m_dumpPlatforms = false;
-        OU::findBool(params, "verbose", m_verbose);
-        OU::findBool(params, "dump", m_dump);
+        OB::findBool(params, "verbose", m_verbose);
+        OB::findBool(params, "dump", m_dump);
         const char *dumpFile;
-        if (OU::findString(params, "dumpFile", dumpFile))
+        if (OB::findString(params, "dumpFile", dumpFile))
           m_dumpFile = dumpFile;
-        OU::findBool(params, "dumpPlatforms", m_dumpPlatforms);
-        OU::findBool(params, "hex", m_hex);
-        OU::findBool(params, "hidden", m_hidden);
-        OU::findBool(params, "uncached", m_uncached);
+        OB::findBool(params, "dumpPlatforms", m_dumpPlatforms);
+        OB::findBool(params, "hex", m_hex);
+        OB::findBool(params, "hidden", m_hidden);
+        OB::findBool(params, "uncached", m_uncached);
         // Initializations for externals may add instances to the assembly
         initExternals(params);
         // Now that we have added any extra instances for external connections, do
@@ -1201,7 +1202,7 @@ it is really per actual worker config...
           throw OU::Error("%s", err);
         // We are at the point where we need to either plan or import the deployment.
         const char *dfile = NULL;
-        if (m_deployXml || OU::findString(params, "deployment", dfile))
+        if (m_deployXml || OB::findString(params, "deployment", dfile))
           importDeployment(dfile, m_deployXml, params);
         else
           planDeployment(params);
@@ -1284,8 +1285,8 @@ it is really per actual worker config...
     }
 
     void ApplicationI::
-    setLaunchPort(OC::Launcher::Port &p, const OM::Port *mp, const OU::PValue *connParams,
-                  const std::string &a_name, const OU::PValue *portParams,
+    setLaunchPort(OC::Launcher::Port &p, const OM::Port *mp, const OB::PValue *connParams,
+                  const std::string &a_name, const OB::PValue *portParams,
                   const OC::Launcher::Member *member, const OM::Assembly::External *ep,
                   size_t scale, size_t index) {
       p.m_scale = scale == 1 ? 0 : scale; // zero means no scaling/bridging/fanin/fanout
@@ -1305,8 +1306,8 @@ it is really per actual worker config...
     }
 
     static void
-    setLaunchTransport(OC::Launcher::Connection &lc, const OU::PValue *inParams,
-                       const OU::PValue *outParams, const OU::PValue *cParams) {
+    setLaunchTransport(OC::Launcher::Connection &lc, const OB::PValue *inParams,
+                       const OB::PValue *outParams, const OB::PValue *cParams) {
       // Now finalize the transport selection
       // FIXME: cache results for same inputs
       // Check for collocated ports
@@ -1406,7 +1407,7 @@ it is really per actual worker config...
           }
         }
         OM::Assembly::External *e = NULL;
-        const OU::PValue *eParams = NULL;
+        const OB::PValue *eParams = NULL;
         if ((*ci).m_externals.size()) {
           e = (*ci).m_externals.front().first;
           eParams = e->m_parameters;
@@ -1416,7 +1417,7 @@ it is really per actual worker config...
             pIn = pOut;
           m_externals.insert(ExternalPair(e->m_name.c_str(), External(*lc)));
         }
-        const OU::PValue *connParams = (*ci).m_parameters;
+        const OB::PValue *connParams = (*ci).m_parameters;
         for (unsigned nIn = 0; nIn < inScale; nIn++) {
           OC::Launcher::Member *mIn = aIn ? &m_launchMembers[dIn->m_firstMember + nIn] : NULL;
           for (unsigned nOut = 0; nOut < outScale; nOut++, lc++) {
@@ -1425,8 +1426,8 @@ it is really per actual worker config...
                           aIn ? aIn->m_parameters.list() : NULL, mIn, e, inScale, nIn);
             setLaunchPort(lc->m_out, pOut, connParams, pOut->m_name,
                           aOut ? aOut->m_parameters.list() : NULL, mOut, e, outScale, nOut);
-            setLaunchTransport(*lc, aIn ? (const OU::PValue *)aIn->m_parameters : eParams,
-                               aOut ? (const OU::PValue *)aOut->m_parameters : eParams,
+            setLaunchTransport(*lc, aIn ? (const OB::PValue *)aIn->m_parameters : eParams,
+                               aOut ? (const OB::PValue *)aOut->m_parameters : eParams,
                                (*ci).m_parameters);
           }
         }
@@ -2241,7 +2242,7 @@ it is really per actual worker config...
     setPropertyValue<run>(const char *w, const char *p, const run value, AccessList &l) const { \
       Property prop(*this, w, p);                                          \
       ocpiDebug("Application::setPropertyValue on %s %s->%s\n", prop.m_info.cname(),    \
-                OU::baseTypeNames[OCPI_##pretty], OU::baseTypeNames[prop.m_info.m_baseType]); \
+                OB::baseTypeNames[OCPI_##pretty], OB::baseTypeNames[prop.m_info.m_baseType]); \
       prop.setValue<run>(value, l);                                     \
     }
     OCPI_PROPERTY_DATA_TYPES

@@ -169,7 +169,7 @@
 }
 %typemap(typecheck) const OCPI::API::PValue * {
 }
-%typemap(in) const OCPI::API::PValue * (OU::PValueList temppv) {
+%typemap(in) const OCPI::API::PValue * (OB::PValueList temppv) {
   if ($input != Py_None) {
     SWIG_contract_assert(PyDict_Check($input),
 			 "const OCPI::API::PValue* arguments must be python dictionaries");
@@ -179,7 +179,7 @@
       SWIG_contract_assert(PyUnicode_Check(key),
 			   "const OCPI::API::PValue* dictionary keys must be strings");
       const char *name = PyUnicode_AsUTF8(key);
-      const OCPI::Util::PValue *pv = OU::find(OU::allPVParams, name);
+      const OCPI::Base::PValue *pv = OB::find(OB::allPVParams, name);
       std::string msg;
       if (!pv) {
 	OU::format(msg, "unknown PValue name: \"%s\"", name);
@@ -220,12 +220,13 @@
 %{
 #include <climits>
 #include "OcpiApi.h"
-#include "UtilPValue.hh"
+#include "BasePValue.hh"
 #include "OcpiUtilMisc.h"
   namespace OA=OCPI::API;
   namespace OU=OCPI::Util;
+  namespace OB=OCPI::Base;
   // Convert python type to PV given, return true on error
-  bool python2PValue(const char *name, OA::BaseType type, PyObject *value, OU::PValueList &list) {
+  bool python2PValue(const char *name, OA::BaseType type, PyObject *value, OB::PValueList &list) {
     int check;
     switch (type) {
     case OA::OCPI_Bool:

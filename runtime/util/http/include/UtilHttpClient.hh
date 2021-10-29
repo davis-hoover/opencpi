@@ -34,9 +34,9 @@
  *
  */
 
-#include <OcpiUtilHttpMisc.h>
-#include <OcpiUtilUri.h>
-#include <OcpiUtilMisc.h>
+#include "UtilHttpMisc.hh"
+#include "UtilUri.hh"
+#include "UtilMisc.hh"
 #include <streambuf>
 #include <iostream>
 #include <string>
@@ -257,18 +257,14 @@ namespace OCPI {
           };
 
         public:
-          ClientBuf ()
-            throw ();
+          ClientBuf ();
 
-          ~ClientBuf ()
-            throw ();
+          ~ClientBuf ();
 
           void setConn (std::istream *, std::ostream *,
-                        void (*) (void *) = 0, void * = 0)
-            throw ();
+                        void (*) (void *) = 0, void * = 0);
 
-          void resetConn ()
-            throw ();
+          void resetConn ();
 
           /*
            * Send a request
@@ -276,48 +272,36 @@ namespace OCPI {
 
           void sendRequest (int requestType,
                             const OCPI::Util::Uri & uri,
-                            const Headers & headers = Headers())
-            throw (std::string);
+                            const Headers & headers = Headers());
 
-          void completeUpload ()
-            throw (std::string);
+          void completeUpload ();
 
-          int getStatusCode ()
-            throw (std::string);
+          int getStatusCode ();
 
-          std::string getReasonPhrase ()
-            throw (std::string);
+          std::string getReasonPhrase ();
 
-          const Headers & getResponseHeaders ()
-            throw (std::string);
+          const Headers & getResponseHeaders ();
 
-          unsigned long long getContentLength ()
-            throw (std::string);
+          unsigned long long getContentLength ();
 
         private:
-          void startRequest (int requestType)
-            throw (std::string);
+          void startRequest (int requestType);
 
           void sendAnyRequest (const OCPI::Util::Uri & uri,
                                const std::string & request,
-                               const Headers & requestHeaders)
-            throw (std::string);
+                               const Headers & requestHeaders);
 
           void sendGetOrHeadOrDeleteRequest (int requestType,
                                              const OCPI::Util::Uri & uri,
-                                             const Headers & headers = Headers())
-            throw (std::string);
+                                             const Headers & headers = Headers());
 
           void sendPutOrPostRequest (int requestType,
                                      const OCPI::Util::Uri & uri,
-                                     const Headers & headers = Headers())
-            throw (std::string);
+                                     const Headers & headers = Headers());
 
-          void receiveStatus ()
-            throw (std::string);
+          void receiveStatus ();
 
-          void receiveHeaders ()
-            throw (std::string);
+          void receiveHeaders ();
 
         protected:
           /*
@@ -406,15 +390,13 @@ namespace OCPI {
          * \post The client stream is unconnected.
          */
 
-        ClientStream ()
-          throw ();
+        ClientStream ();
 
         /**
          * Destructor.
          */
 
-        virtual ~ClientStream ()
-          throw ();
+        virtual ~ClientStream ();
 
         /**
          * \name Initiating HTTP requests.
@@ -936,7 +918,7 @@ namespace OCPI {
         virtual void openConnection (const OCPI::Util::Uri & uri,
                                      std::istream * & inStream,
                                      std::ostream * & outStream)
-          throw (std::string) = 0;
+= 0;
 
         /**
          * Perform a half-close of the connection that was previously
@@ -950,7 +932,7 @@ namespace OCPI {
          */
 
         virtual void shutdownConnection (std::ios_base::openmode mode = std::ios_base::out)
-          throw (std::string) = 0;
+= 0;
 
         /**
          * Close the input and output channels that were previously
@@ -961,7 +943,7 @@ namespace OCPI {
          */
 
         virtual void closeConnection ()
-          throw (std::string) = 0;
+= 0;
 
         //@}
 
@@ -972,11 +954,9 @@ namespace OCPI {
         /** \cond */
 
       protected:
-        void connect (const OCPI::Util::Uri &)
-          throw (std::string);
+        void connect (const OCPI::Util::Uri &);
 
-        void reset ()
-          throw ();
+        void reset ();
 
         void checkRelocation ()
           throw (std::string, Redirection);
@@ -984,8 +964,7 @@ namespace OCPI {
         void checkServerError ()
           throw (std::string, ClientError, ServerError);
 
-        void readBody ()
-          throw ();
+        void readBody ();
 
       protected:
         void headOrDelete (int, const OCPI::Util::Uri &, std::ios_base::openmode)
@@ -995,8 +974,7 @@ namespace OCPI {
           throw (std::string, Redirection, ClientError, ServerError);
 
       protected:
-        static void shutdownForBuf (void *)
-          throw (std::string);
+        static void shutdownForBuf (void *);
 
       protected:
         bool m_connected;
@@ -1057,8 +1035,7 @@ namespace OCPI {
          * operations in the ClientStream base class.
          */
 
-        inline Client ()
-          throw ();
+        inline Client ();
 
         /**
          * Constructor.
@@ -1081,8 +1058,7 @@ namespace OCPI {
          * Destructor.
          */
 
-        inline ~Client ()
-          throw ();
+        inline ~Client ();
 
       protected:
         /**
@@ -1093,14 +1069,11 @@ namespace OCPI {
 
         void openConnection (const OCPI::Util::Uri & uri,
                              std::istream * & inConn,
-                             std::ostream * & outConn)
-          throw (std::string);
+                             std::ostream * & outConn);
 
-        void shutdownConnection (std::ios_base::openmode mode = std::ios_base::out)
-          throw (std::string);
+        void shutdownConnection (std::ios_base::openmode mode = std::ios_base::out);
 
-        void closeConnection ()
-          throw (std::string);
+        void closeConnection ();
 
         //@}
 
@@ -1133,7 +1106,7 @@ namespace OCPI {
 template<class Connector>
 inline
 OCPI::Util::Http::Client<Connector>::Client ()
-  throw ()
+
 {
 }
 
@@ -1148,7 +1121,7 @@ OCPI::Util::Http::Client<Connector>::Client (const OCPI::Util::Uri & uri)
 template<class Connector>
 inline
 OCPI::Util::Http::Client<Connector>::~Client ()
-  throw ()
+
 {
   try {
     close ();
@@ -1164,7 +1137,7 @@ OCPI::Util::Http::Client<Connector>::
 openConnection (const OCPI::Util::Uri & uri,
                 std::istream * & inConn,
                 std::ostream * & outConn)
-  throw (std::string)
+
 {
   std::string authority = OCPI::Util::Uri::decode (uri.getHostport());
   std::iostream * str = m_conn.connect (authority);
@@ -1177,7 +1150,7 @@ inline
 void
 OCPI::Util::Http::Client<Connector>::
 shutdownConnection (std::ios_base::openmode mode)
-  throw (std::string)
+
 {
   m_conn.shutdown (mode);
 }
@@ -1187,7 +1160,7 @@ inline
 void
 OCPI::Util::Http::Client<Connector>::
 closeConnection ()
-  throw (std::string)
+
 {
   m_conn.close ();
 }

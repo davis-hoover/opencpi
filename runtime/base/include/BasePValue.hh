@@ -36,12 +36,12 @@
 #include <cstring>
 #include <cstdarg>
 #include "ezxml.h"
-#include "OcpiUtilException.h"
+#include "UtilException.hh"
 #include "OcpiPValueApi.hh"
 
 
 namespace OCPI {
-  namespace Util {
+  namespace Base {
     typedef OCPI::API::PValue PValue;
     extern PValue allPVParams[];
 #define OCPI_DATA_TYPE(sca, corba, letter, bits, run, pretty, store) \

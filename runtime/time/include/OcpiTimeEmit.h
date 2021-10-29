@@ -81,10 +81,10 @@
 #include <vector>
 #include <map>
 #include <ostream>
-#include "UtilPValue.hh"
+#include "BasePValue.hh"
 #include "OsMutex.hh"
-#include <OcpiUtilAutoMutex.h>
-#include <OcpiUtilException.h>
+#include "UtilAutoMutex.hh"
+#include "UtilException.hh"
 
 
 // Support macros that are not used by the end user

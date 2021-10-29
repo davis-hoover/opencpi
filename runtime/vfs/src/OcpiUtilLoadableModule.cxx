@@ -36,8 +36,8 @@
 #include "OsMisc.hh"
 #include "OsLoadableModule.hh"
 #include "OsFileSystem.hh"
-#include <OcpiUtilAutoMutex.h>
-#include <OcpiUtilMisc.h>
+#include "UtilAutoMutex.hh"
+#include "UtilMisc.hh"
 #include <OcpiUtilVfs.h>
 #include <sys/types.h>
 #include <sys/stat.h>

@@ -25,7 +25,7 @@
 #include "gtest/gtest.h"
 
 #include "OsDebug.hh"
-#include "OcpiLoggerOStreamOutput.h"
+#include "UtilLoggerOStreamOutput.hh"
 #include "OsThreadManager.hh"
 #include "OsMisc.hh"
 

@@ -29,8 +29,8 @@
  */
 #include <inttypes.h>
 #include "OsEther.hh"
-#include "OcpiUtilException.h"
-#include "OcpiUtilMisc.h"
+#include "UtilException.hh"
+#include "UtilMisc.hh"
 #include "XferException.h"
 #include "DtDataGramXfer.h"
 
@@ -42,6 +42,7 @@ namespace DataTransfer {
 
     namespace OE = OCPI::OS::Ether;
     namespace OU = OCPI::Util;
+    namespace OB = OCPI::Base;
 
 #define OCPI_ETHER_RDMA "ocpi-ether-rdma"
 #define DATAGRAM_PAYLOAD_SIZE OE::MaxPacketSize;
@@ -57,7 +58,7 @@ namespace DataTransfer {
       friend class XferFactory;
     protected:
       EndPoint(XF::XferFactory &a_factory, const char *protoInfo, const char *eps,
-	       const char *other, bool a_local, size_t a_size, const OU::PValue *params)
+	       const char *other, bool a_local, size_t a_size, const OB::PValue *params)
 	: DG::DGEndPoint(a_factory, eps, other, a_local, a_size, params) { 
 	if (protoInfo) {
 	  m_protoInfo = protoInfo;
@@ -77,7 +78,7 @@ namespace DataTransfer {
 	    m_ifname.assign(other, OCPI_SIZE_T_DIFF(sp, other));
 	  } else {
 	    const char *l_name;
-	    if (!OU::findString(params, "interface", l_name))
+	    if (!OB::findString(params, "interface", l_name))
 	      l_name = getenv("OCPI_ETHER_INTERFACE");
 	    if (!l_name)
 	      throw OU::Error(OCPI_ETHER_RDMA ": no interface specified");
@@ -167,7 +168,7 @@ namespace DataTransfer {
       XF::XferServices &createXferServices(XF::EndPoint &source, XF::EndPoint &target);
       DG::Socket &createSocket(XF::EndPoint&);
       XF::EndPoint &createEndPoint(const char *protoInfo, const char *eps, const char *other,
-				   bool local, size_t size, const OCPI::Util::PValue *params);
+				   bool local, size_t size, const OB::PValue *params);
       // End boilerplate methods
 
       const char* getProtocol() { return OCPI_ETHER_RDMA; }

@@ -21,8 +21,8 @@
 #include <OcpiUtilFileFs.h>
 #include <OcpiUtilVfs.h>
 #include <OcpiUtilVfsIterator.h>
-#include <OcpiUtilUri.h>
-#include <OcpiUtilAutoMutex.h>
+#include "UtilUri.hh"
+#include "UtilAutoMutex.hh"
 #include "OsAssert.hh"
 #include "OsFileSystem.hh"
 #include "OsFileIterator.hh"

@@ -21,7 +21,7 @@
 #include "gtest/gtest.h"
 
 #include "OsDebug.hh"
-#include "OcpiLoggerFallback.h"
+#include "UtilLoggerFallback.hh"
 
 #include "MessageKeeper.h"
 

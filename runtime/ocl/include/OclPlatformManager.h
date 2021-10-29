@@ -31,7 +31,7 @@
 #define STDTR1 std::tr1
 #endif
 
-#include "UtilPValue.hh"
+#include "BasePValue.hh"
 
 namespace OCPI
 {
@@ -112,12 +112,12 @@ namespace OCPI
     class DeviceContext
     {
       public:
-        explicit DeviceContext ( const OCPI::Util::PValue* props = 0 );
+        explicit DeviceContext ( const OCPI::Base::PValue* props = 0 );
 
         ~DeviceContext ( );
 
         void loadArtifact ( const std::string& pathToArtifact,
-                            const OCPI::Util::PValue* artifactParams );
+                            const OCPI::Base::PValue* artifactParams );
 
         void unloadArtifact ( const std::string& pathToArtifact );
 

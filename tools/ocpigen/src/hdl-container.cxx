@@ -19,8 +19,8 @@
  */
 
 #include <stdint.h>
-#include "OcpiUtilMisc.h"
-#include "OcpiUtilEzxml.h"
+#include "UtilMisc.hh"
+#include "UtilEzxml.hh"
 #include "HdlOCCP.h"
 #include "assembly.h"
 #include "hdl.h"

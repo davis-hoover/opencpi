@@ -20,12 +20,12 @@
 
 #include <OcpiUtilStaticMemFs.h>
 #include <OcpiUtilStaticMemFile.h>
-#include <OcpiUtilAutoRDLock.h>
-#include <OcpiUtilAutoWRLock.h>
+#include "UtilAutoRDLock.hh"
+#include "UtilAutoWRLock.hh"
 #include <OcpiUtilVfs.h>
 #include <OcpiUtilVfsIterator.h>
-#include <OcpiUtilUri.h>
-#include <OcpiUtilMisc.h>
+#include "UtilUri.hh"
+#include "UtilMisc.hh"
 #include "OsAssert.hh"
 #include "OsRWLock.hh"
 #include <iostream>

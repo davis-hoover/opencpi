@@ -24,11 +24,11 @@
 #include <strings.h>
 #include <assert.h>
 #include <cstring>
-#include "OcpiUtilEzxml.h"
-#include "OcpiUtilMisc.h"
-#include "UtilDataTypes.hh"
-#include "UtilValue.hh"
-#include "UtilPValue.hh"
+#include "UtilEzxml.hh"
+#include "UtilMisc.hh"
+#include "BaseDataTypes.hh"
+#include "BaseValue.hh"
+#include "BasePValue.hh"
 
 namespace OU = OCPI::Util;
 namespace OE = OCPI::Util::EzXml;
@@ -57,8 +57,8 @@ namespace OCPI {
       return n;
     }
     const std::string &PValue::unparse(std::string &sval, bool add) const {
-      OU::ValueType vtype(type);
-      OU::Value val(vtype);
+      OCPI::Base::ValueType vtype(type);
+      OCPI::Base::Value val(vtype);
       // FIXME: PValues and Values must be better integrated...
       switch (type) {
 #define OCPI_DATA_TYPE(sca,corba,letter,bits,run,pretty,store) \
@@ -71,7 +71,7 @@ namespace OCPI {
       return sval;
     }
   }
-  namespace Util {
+  namespace Base {
     // This list provides names and types and defaults
     PValue allPVParams[] = {
       PVString("transport"),
@@ -136,7 +136,7 @@ namespace OCPI {
           value = fp->v##pretty;				    \
           return true;						    \
 	} else							    \
-	  throw Error("Property \"%s\" is not a %s", name, #pretty);\
+	  throw OU::Error("Property \"%s\" is not a %s", name, #pretty); \
       }                                                             \
       return false;						    \
     }                                                               \
@@ -167,7 +167,7 @@ namespace OCPI {
       for (; p && p->name; p++)
 	if (!strcasecmp(p->name, name)) {
 	  if (p->type != OA::OCPI_String)
-	    throw Error("Parameter \"%s\" value for \"%s\" is not a string", var, name);
+	    throw OU::Error("Parameter \"%s\" value for \"%s\" is not a string", var, name);
 	  if (p->vString[0] != '=') {
 	    size_t len = strlen(var);
 	    const char *match = p->vString;
@@ -175,7 +175,7 @@ namespace OCPI {
 	      match++;
 	    if (!strncasecmp(var, match, len) && match[len] == '=') {
 	      if (specific)
-		throw Error("Parameter \"%s\" for instance \"%s\" is specified more than once",
+		throw OU::Error("Parameter \"%s\" for instance \"%s\" is specified more than once",
 			    name,  var);
 	      specific = true;
 	      val = match + len + 1;
@@ -207,7 +207,7 @@ namespace OCPI {
 		}
 	      }
 	    } else
-	      throw ApiError("Parameter \"", name, "\" is not a string", NULL);
+	      throw OU::ApiError("Parameter \"", name, "\" is not a string", NULL);
 	  }
       return false;
     }
@@ -261,7 +261,7 @@ namespace OCPI {
     static const char *parseParam(const char *name, const char *value, PValue &p) {
       const PValue *allP = find(allPVParams, name);
       if (!allP)
-	return esprintf("parameter named \"%s\" not defined, misspelled?", name);
+	return OU::esprintf("parameter named \"%s\" not defined, misspelled?", name);
       p.name = allP->name;
       p.type = allP->type;
       ValueType type(allP->type);

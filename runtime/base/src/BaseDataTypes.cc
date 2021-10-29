@@ -24,15 +24,16 @@
 #include <set>
 
 #include "OsAssert.hh"
-#include "OcpiUtilEzxml.h"
-#include "OcpiUtilMisc.h"
-#include "OcpiUtilException.h"
-#include "UtilDataTypes.hh"
-#include "UtilValue.hh"
+#include "UtilEzxml.hh"
+#include "UtilMisc.hh"
+#include "UtilException.hh"
+#include "BaseDataTypes.hh"
+#include "BaseValue.hh"
 
 namespace OCPI {
-  namespace Util {
+  namespace Base {
     namespace OA = OCPI::API;
+    namespace OU = OCPI::Util;
     namespace OE = OCPI::Util::EzXml;
 
     ValueTypeInternal::ValueTypeInternal(OCPI::API::BaseType bt, bool isSequence)
@@ -191,7 +192,7 @@ namespace OCPI {
 	bool isVariable;
 	const char *err = m_default->parse(defValue, NULL, false, resolv, &isVariable);
 	if (err)
-	  return esprintf("for %s %s: %s", tag, m_name.c_str(), err);
+	  return OU::esprintf("for %s %s: %s", tag, m_name.c_str(), err);
 	if (isVariable)
 	  m_defaultExpr = defValue;
       }
@@ -218,13 +219,13 @@ namespace OCPI {
       ezxml_t desc = ezxml_cchild(xm, "description");
       if (desc) {
 	if (!m_description.empty())
-	  return esprintf("Having both description attributes and description elements is invalid");
+	  return OU::esprintf("Having both description attributes and description elements is invalid");
 	m_description = ezxml_txt(desc);
       }
       OE::unindent(m_description);
       // ocpiLog(10, "Description of property %s: \"%s\"", cname(), m_description.c_str());
       if (OS::logWillLog(10))
-	for (TokenIter ti(m_description, "\n"); ti.token(); ti.next())
+	for (OU::TokenIter ti(m_description, "\n"); ti.token(); ti.next())
 	  ocpiLog(10, "|%s|", ti.token());
       OE::getOptionalString(xm, m_format, "Format");
       const char *typeName = ezxml_cattr(xm, "Type");
@@ -267,7 +268,7 @@ namespace OCPI {
 	  if (!strcasecmp(typeName, *tp))
 	    break;
 	if (!*tp)
-	  return esprintf("Unknown property/argument type: \"%s\"", typeName);
+	  return OU::esprintf("Unknown property/argument type: \"%s\"", typeName);
 	m_baseType = (OA::BaseType)(tp - baseTypeNames);
 	if (m_baseType == OA::OCPI_Enum) {
 	  const char *enums = ezxml_cattr(xm, "enums");
@@ -279,7 +280,7 @@ namespace OCPI {
 	  vt.m_sequenceLength = 0;
 	  Value v(vt);
 	  if ((err = v.parse(enums)))
-	    return esprintf("Error parsing enums attribute: %s", err);
+	    return OU::esprintf("Error parsing enums attribute: %s", err);
 	  m_nEnums = v.m_nElements;
 	  m_enums = new const char*[m_nEnums + 1];
 	  const char **ep = m_enums;
@@ -337,7 +338,7 @@ namespace OCPI {
 	vt.m_sequenceLength = 10;
 	Value v(vt);
 	if ((err = v.parse(arrayDimensions)))
-	  return esprintf("Error parsing array dimensions: %s", err);
+	  return OU::esprintf("Error parsing array dimensions: %s", err);
 	m_arrayRank = v.m_nElements;
 	m_arrayDimensions = new size_t[v.m_nElements];
 	m_arrayDimensionsExprs.resize(v.m_nElements);
@@ -373,7 +374,7 @@ namespace OCPI {
       if (hasDefault && (err = parseDefault(ezxml_cattr(xm, hasDefault), tag, resolver)))
 	return err;
       if (m_format.size() && !strchr(m_format.c_str(), '%'))
-	return esprintf("invalid format string '%s' for '%s'", m_format.c_str(), m_name.c_str());
+	return OU::esprintf("invalid format string '%s' for '%s'", m_format.c_str(), m_name.c_str());
       return 0;
     }
 
@@ -419,37 +420,37 @@ namespace OCPI {
 
     void Member::
     printAttrs(std::string &out, const char *tag, unsigned indent, bool suppressDefault) {
-      formatAdd(out, "%*s<%s", indent * 2, "", tag);
+      OU::formatAdd(out, "%*s<%s", indent * 2, "", tag);
       if (!m_name.empty())
-	formatAdd(out, " name=\"%s\"", m_name.c_str());
+	OU::formatAdd(out, " name=\"%s\"", m_name.c_str());
       if (m_baseType != OA::OCPI_ULong)
-	formatAdd(out, " type=\"%s\"", baseTypeNames[m_baseType]);
+	OU::formatAdd(out, " type=\"%s\"", baseTypeNames[m_baseType]);
       if (m_baseType == OA::OCPI_String)
-	formatAdd(out, " stringLength=\"%zu\"", m_stringLength);
+	OU::formatAdd(out, " stringLength=\"%zu\"", m_stringLength);
       if (m_isSequence)
-	formatAdd(out, " sequenceLength=\"%zu\"", m_sequenceLength);
+	OU::formatAdd(out, " sequenceLength=\"%zu\"", m_sequenceLength);
       if (m_arrayRank == 1)
-	formatAdd(out, " arrayLength=\"%zu\"", m_arrayDimensions[0]);
+	OU::formatAdd(out, " arrayLength=\"%zu\"", m_arrayDimensions[0]);
       else if (m_arrayRank > 1) {
-	formatAdd(out, " arrayDimensions=\"");
+	OU::formatAdd(out, " arrayDimensions=\"");
 	for (size_t n = 0; n < m_arrayRank; n++)
-	  formatAdd(out, "%s%zu", n ? "," : "", m_arrayDimensions[n]);
-	formatAdd(out, "\"");
+	  OU::formatAdd(out, "%s%zu", n ? "," : "", m_arrayDimensions[n]);
+	OU::formatAdd(out, "\"");
       }
       if (m_nEnums) {
-	formatAdd(out, " enums=\"");
+	OU::formatAdd(out, " enums=\"");
 	for (unsigned n = 0; n < m_nEnums; n++)
-	  formatAdd(out, "%s%s", n ? "," : "", m_enums[n]);
-	formatAdd(out, "\"");
+	  OU::formatAdd(out, "%s%s", n ? "," : "", m_enums[n]);
+	OU::formatAdd(out, "\"");
       }
       if (m_isKey)
-	formatAdd(out, " key=\"true\"");
+	OU::formatAdd(out, " key=\"true\"");
       if (m_default && !suppressDefault) {
 	std::string val;
 	m_default->unparse(val);
 	out += " default='";
 	std::string xml;
-	encodeXmlAttrSingle(val, xml);
+	OU::encodeXmlAttrSingle(val, xml);
 	out += xml;
 	out += "'";
       }
@@ -458,7 +459,7 @@ namespace OCPI {
     void Member::
     printChildren(std::string &out, const char *tag, unsigned indent) {
       if (m_baseType == OA::OCPI_Struct || m_baseType == OA::OCPI_Type) {
-	formatAdd(out, ">\n");
+	OU::formatAdd(out, ">\n");
 	if (m_baseType == OA::OCPI_Struct) {
 	  for (unsigned n = 0; n < m_nMembers; n++) {
 	    m_members[n].printAttrs(out, "member", indent + 1);
@@ -468,9 +469,9 @@ namespace OCPI {
 	  m_type->printAttrs(out, "type", indent + 1);
 	  m_type->printChildren(out, "type", indent + 1);
 	}
-	formatAdd(out, "%*s</%s>\n", indent * 2, "", tag);
+	OU::formatAdd(out, "%*s</%s>\n", indent * 2, "", tag);
       } else
-	formatAdd(out, "/>\n");
+	OU::formatAdd(out, "/>\n");
     }
 
     void Member::
@@ -481,8 +482,8 @@ namespace OCPI {
 
     inline void advance(const uint8_t *&p, size_t nBytes, size_t &length) {
       if (nBytes > length)
-	throw Error("Aligning data exceeds buffer when writing: length %zu advance %zu",
-		    length, nBytes);
+	throw OU::Error("Aligning data exceeds buffer when writing: length %zu advance %zu",
+			length, nBytes);
       // Cannot enforce this because a "fake" mode is used to prepass and determine buffer size:
       // ocpiAssert(p != nullptr);
       length -= nBytes;
@@ -521,8 +522,8 @@ namespace OCPI {
 	startData = data;
 	startLength = length;
 	if (m_sequenceLength != 0 && nElements > m_sequenceLength)
-	  throw Error("Sequence in buffer (%zu) exceeds maximum length (%zu)", nElements,
-		      m_sequenceLength);
+	  throw OU::Error("Sequence in buffer (%zu) exceeds maximum length (%zu)", nElements,
+			  m_sequenceLength);
 	writer.beginSequence(*this, nElements);
 	if (!nElements) {
 	  advance(data, m_fixedLayout && !topSeq ? m_nBytes : m_align, length);
@@ -599,7 +600,7 @@ namespace OCPI {
 	startLength = length;
 	nElements = reader.beginSequence(*this);
 	if (m_sequenceLength != 0 && nElements > m_sequenceLength)
-	  throw Error("Sequence being read (%zu) exceeds max length (%zu)", nElements, m_sequenceLength);
+	  throw OU::Error("Sequence being read (%zu) exceeds max length (%zu)", nElements, m_sequenceLength);
 	if (!fake)
 	  *(uint32_t *)data = (uint32_t)nElements;
 	if (!nElements) {
@@ -636,7 +637,7 @@ namespace OCPI {
 	  const char *chars;
 	  size_t strLength = reader.beginString(*this, chars, n == 0);
 	  if (m_stringLength != 0 && strLength > m_stringLength)
-	    throw Error("String being read is larger than max length");
+	    throw OU::Error("String being read is larger than max length");
 	  uint8_t *start = data;
 	  // Error check before copy
 	  radvance(data, m_fixedLayout ? (m_stringLength + 4) & ~3u : strLength + 1, length);
@@ -755,7 +756,7 @@ namespace OCPI {
       for (ezxml_t m = ezxml_cchild(mems, tag); m ; m = ezxml_cnext(m))
 	nMembers++;
       if (nMembers) {
-	std::set<const char *, ConstCharCaseComp> names, abbrevs;
+	std::set<const char *, OU::ConstCharCaseComp> names, abbrevs;
 	Member *m = new Member[nMembers];
 	members = m;
 	const char *err = NULL;
@@ -766,9 +767,9 @@ namespace OCPI {
 	      (err = m->parse(mx, a_isFixed, true, hasDefault, "member", ordinal, resolver)))
 	    return err;
 	  if (!names.insert(m->m_name.c_str()).second)
-	    return esprintf("Duplicate member name: %s", m->m_name.c_str());
+	    return OU::esprintf("Duplicate member name: %s", m->m_name.c_str());
 	  if (m->m_abbrev.size() && !abbrevs.insert(m->m_abbrev.c_str()).second)
-	    return esprintf("Duplicate member abbreviation: %s", m->m_name.c_str());
+	    return OU::esprintf("Duplicate member abbreviation: %s", m->m_name.c_str());
 	  if (pathp)
 	    m->m_path = *pathp, m->m_path.push_back(OCPI_UTRUNCATE(uint8_t, ordinal));
 	}
@@ -808,12 +809,12 @@ namespace OCPI {
 	  if (!a->m_number)
 	    return "sequence property not indexed with a number";
 	  if (a->m_u.m_index >= m->m_sequenceLength)
-	    return esprintf("sequence index (%zu) >= than maximum sequence length (%zu)",
-			    a->m_u.m_index, m->m_sequenceLength);
+	    return OU::esprintf("sequence index (%zu) >= than maximum sequence length (%zu)",
+				a->m_u.m_index, m->m_sequenceLength);
 	  if (value) {
 	    if (a->m_u.m_index >= value->m_nElements)
-	      return esprintf("sequence index (%zu) >= than current sequence length (%zu)",
-			      a->m_u.m_index, value->m_nElements);
+	      return OU::esprintf("sequence index (%zu) >= than current sequence length (%zu)",
+				  a->m_u.m_index, value->m_nElements);
 	    l_offset += a->m_u.m_index * m->m_nItems;
 	  } else
 	    l_offset +=
@@ -848,7 +849,7 @@ namespace OCPI {
 	      break;
 	    }
 	  if (n >= m->m_nMembers)
-	    return esprintf("member name \"%s\" not found in structure", a->m_u.m_member);
+	    return OU::esprintf("member name \"%s\" not found in structure", a->m_u.m_member);
 	  if (value) {
 	    value = m->m_isSequence || m->m_arrayRank ?
 	      value->m_pStruct[l_offset][n] : value->m_Struct[n];
@@ -930,14 +931,14 @@ namespace OCPI {
       }
       m_elementBytes = OCPI_UTRUNCATE(size_t, nBytes); // was m_nBits/CHAR_BIT;
       if (m_arrayRank || m_isSequence)
-	m_elementBytes = roundUp((uint32_t)m_elementBytes, m_align);
+	m_elementBytes = OU::roundUp((uint32_t)m_elementBytes, m_align);
       // Calculate the number of bytes in each element of an array/sequence
       if (nBytes > UINT32_MAX)
 	return "Total member size in bytes is too large (> 4G)";
       // Array?
       if (m_arrayRank) {
 	size_t *p = m_arrayDimensions;
-	nBytes = roundUp((uint32_t)nBytes, m_align);
+	nBytes = OU::roundUp((uint32_t)nBytes, m_align);
 	for (unsigned n = 0; n < m_arrayRank; n++, p++) {
 	  nBytes *= *p;
 	  if (nBytes > UINT32_MAX)
@@ -948,7 +949,7 @@ namespace OCPI {
       if (m_isSequence) {
 	isVariable = true;
 	// Pad the size to be what is required for an array of same.
-	nBytes = roundUp((uint32_t)nBytes, m_align);
+	nBytes = OU::roundUp((uint32_t)nBytes, m_align);
 	if (m_sequenceLength != 0)
 	  nBytes *= m_sequenceLength;
 	else
@@ -967,7 +968,7 @@ namespace OCPI {
       if (m_align < 4)
 	sub32 = true;
       m_nBytes = (uint32_t)nBytes;
-      argOffset = roundUp(argOffset, m_align);
+      argOffset = OU::roundUp(argOffset, m_align);
       m_offset = argOffset;
       argOffset += m_nBytes;
       return 0;

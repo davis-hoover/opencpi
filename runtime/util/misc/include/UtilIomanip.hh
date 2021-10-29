@@ -63,7 +63,7 @@ namespace OCPI
               CustomIoFormatter ( std::basic_ostream<C>& ( *p_fn )
                                   ( std::basic_ostream<C>&, T ),
                                   T arg )
-              throw ()
+
                 : d_p_format_fn ( p_fn ),
                   d_arg1 ( arg ),
                   d_arg2 ( 0 )
@@ -75,7 +75,7 @@ namespace OCPI
                                   ( std::basic_ostream<C>&, T, T ),
                                   T arg1,
                                   T arg2 )
-              throw ()
+
                 : d_p_format_fn ( p_fn ),
                   d_arg1 ( arg1 ),
                   d_arg2 ( arg2 )
@@ -84,7 +84,7 @@ namespace OCPI
               }
 
               void operator( ) ( std::basic_ostream<C>& os ) const
-              throw ()
+
               {
                 d_p_format_fn ( os, d_arg1, d_arg2 );
               }
@@ -104,7 +104,7 @@ namespace OCPI
           template<typename T, typename C>
           std::basic_ostream<C>& operator<< ( std::basic_ostream<C>& os,
                                       const CustomIoFormatter<T, C>& fmt )
-          throw ()
+
           {
              fmt ( os );
 
@@ -126,7 +126,7 @@ namespace OCPI
 
           inline
           std::ostream& dec_impl ( std::ostream& os, int width, int pad )
-          throw ()
+
           {
              return os << std::dec
                        << std::right
@@ -149,7 +149,7 @@ namespace OCPI
 
           inline
           std::ostream& hex_impl ( std::ostream& os, int width, int )
-          throw ()
+
           {
             return os << "0x"
                       << std::hex
@@ -178,7 +178,7 @@ namespace OCPI
           std::ostream& flt_impl ( std::ostream& os,
                                    int width,
                                    int precision )
-          throw ()
+
           {
             return os << std::setw ( width )
                       << std::right
@@ -202,7 +202,7 @@ namespace OCPI
       inline
       impl::CustomIoFormatter<int, char> dec ( int width = 10,
                                                  int pad = ' ' )
-      throw ()
+
       {
         return impl::CustomIoFormatter<int, char> ( impl::dec_impl,
                                                       width,
@@ -220,7 +220,7 @@ namespace OCPI
 
       inline
       impl::CustomIoFormatter<int, char> hex ( int width = 8 )
-      throw ()
+
       {
         return impl::CustomIoFormatter<int, char> ( impl::hex_impl,
                                                       width,
@@ -243,7 +243,7 @@ namespace OCPI
       inline
       impl::CustomIoFormatter<int, char> flt ( int width = 16,
                                                int precision = 8 )
-      throw ()
+
       {
         return impl::CustomIoFormatter<int, char> ( impl::flt_impl,
                                                       width,

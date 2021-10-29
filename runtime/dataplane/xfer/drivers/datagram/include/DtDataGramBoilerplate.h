@@ -66,7 +66,7 @@ createSocket(XF::EndPoint &source) {
 }
 XF::EndPoint &XferFactory::
 createEndPoint(const char *protoInfo, const char *eps, const char *other, bool local,
-	       size_t size, const OCPI::Util::PValue *params) {
+	       size_t size, const OCPI::Base::PValue *params) {
   return *new EndPoint(*this, protoInfo, eps, other, local, size, params);
 }
 XF::SmemServices &EndPoint::

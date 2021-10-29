@@ -31,8 +31,8 @@
 #include "ocpi-config.h"
 #include "OsMisc.hh"
 #include "OcpiUuid.h"
-#include "OcpiUtilMisc.h"
-#include "OcpiUtilEzxml.h"
+#include "UtilMisc.hh"
+#include "UtilEzxml.hh"
 #include "MetadataWorker.hh"
 #include "XferManager.h"
 #include "HdlSimServer.h"
@@ -78,12 +78,12 @@ search, emulate, ethers, probe, testdma, admin, bram, unbram, uuid, reset, set, 
   wread, wwrite, sendData, receiveData, receiveRDMA, sendRDMA, simulate, getxml, load, unload,
   status;
 static bool verbose = false, parseable = false, hex = false, isPublic = false;
-static int logLevel = -1;
 std::string platform, simExec;
 static const char
 *interface = NULL, *device = NULL, *part = NULL;
 static bool simDump = true;
-static unsigned
+static unsigned long // for strtoul
+  logLevel = ULONG_MAX,
   timeout = 0,
   sleepUsecs = 200000,  // how much time between quota injections
   spinCount = 20,      // how much quote per timeout AND per control message
@@ -239,7 +239,7 @@ static OH::Driver &getDriver() {
   if (!driver) {
     // Now we explicitly load the remote container driver
     std::string err;
-    OCPI::Driver::Driver *d = OCPI::Driver::ManagerManager::loadDriver("container", "hdl", err);
+    auto *d = OCPI::Base::Plugin::ManagerManager::loadDriver("container", "hdl", err);
     if (!d)
       bad("error loading HDL driver: %s", err.c_str());
     driver = static_cast<OH::Driver *>(d);
@@ -293,19 +293,19 @@ doFlags(const char **&ap) {
       part = next(ap);
       break;
     case 'l':
-      logLevel = atoi(next(ap));
+      logLevel = strtoul(next(ap), NULL, 0);
       break;
     case 's':
-      spinCount = atoi(next(ap));
+      spinCount = strtoul(next(ap), NULL, 0);
       break;
     case 't':
-      sleepUsecs = atoi(next(ap));
+      sleepUsecs = strtoul(next(ap), NULL, 0);
       break;
     case 'T':
-      simTicks = atoi(next(ap));
+      simTicks = strtoul(next(ap), NULL, 0);
       break;
     case 'O':
-      timeout = atoi(next(ap));
+      timeout = strtoul(next(ap), NULL, 0);
       break;
     case 'D':
       simDump = false;
@@ -329,7 +329,7 @@ main(int argc, const char **argv)
 {
   signal(SIGPIPE, SIG_IGN);
   try {
-    OCPI::Driver::ManagerManager::suppressDiscovery();
+    OCPI::Base::Plugin::ManagerManager::suppressDiscovery();
     const char *argv0 = strrchr(argv[0], '/');
     if (argv0)
       argv0++;
@@ -364,8 +364,8 @@ main(int argc, const char **argv)
     }
     argv++;
     doFlags(argv);
-    if (logLevel != -1)
-      OCPI::OS::logSetLevel(logLevel);
+    if (logLevel != ULONG_MAX)
+      OCPI::OS::logSetLevel((uint8_t)logLevel);
 #if 0
     if ((exact->options & SUDO) && geteuid()) {
       int dfd = ::open(OCPI_DRIVER_MEM, O_RDONLY);
@@ -395,8 +395,8 @@ main(int argc, const char **argv)
 	  bad("Worker number `%s' invalid", cp);
 	if (*ep)
 	  ep++;
-	cAccess->offsetRegisters(wAccess, (intptr_t)(&((OH::OccpSpace*)0)->worker[workerIdx]));
-	cAccess->offsetRegisters(confAccess, (intptr_t)(&((OH::OccpSpace*)0)->config[workerIdx]));
+	cAccess->offsetRegisters(wAccess, (uintptr_t)(&((OH::OccpSpace*)0)->worker[workerIdx]));
+	cAccess->offsetRegisters(confAccess, (uintptr_t)(&((OH::OccpSpace*)0)->config[workerIdx]));
 	exact->func(argv);
       } while (*(cp = ep));
     } else
@@ -574,7 +574,7 @@ static void emulate(const char **) {
 	      ecnr.mbx40 = 0x40;
 	      ecnr.mbz0 = 0;
 	      memcpy(ecnr.mac, OU::getSystemAddr().addr(), OS::Ether::Address::s_size);
-	      ecnr.pid = getpid();
+	      ecnr.pid = OCPI_UTRUNCATE(uint32_t, getpid());
 	      ocpiDebug("Sending nop response packet: length is sizeof %zu, htons %u, ntohs %u",
 			sizeof(HE::EtherControlNopResponse), ech_in.length, ntohs(ech_in.length));
 	    }
@@ -636,7 +636,7 @@ testdma(const char **) {
   dmaSize = (uint64_t)dmaMeg * 1024 * 1024;
   printf("The OCPI_DMA_MEMORY environment variable indicates %zuMB at 0x%" PRIx64 ", ending at 0x%" PRIx64 "\n",
 	 dmaMeg, dmaBase, dmaBase + dmaSize);
-  int pageSize = getpagesize();
+  unsigned pageSize = (unsigned)getpagesize();
   if (dmaBase & (pageSize - 1))
     bad("DMA memory starting address 0x%" PRIx64 " does not start on a page boundary, %u (0x%x)",
 	dmaBase, pageSize, pageSize);
@@ -763,12 +763,12 @@ bram(const char **ap) {
   FILE *ofp = fopen(ap[1], "w");
   if (!ofp)
     bad("Cannot open output file '%s'", ap[1]);
-  off_t length = 0; // for warning
+  size_t length = 0; // for warning
   if (fd < 0 ||
-      (length = lseek(fd, 0, SEEK_END)) == -1 ||
+      (length = (size_t)lseek(fd, 0, SEEK_END)) == (size_t)-1 ||
       lseek(fd, 0, SEEK_SET) != 0 ||
       (in = (unsigned char*)malloc(length)) == NULL ||
-      read(fd, in, length) != length ||
+      read(fd, in, length) != (off_t)length ||
       (out = (unsigned char*)malloc(length)) == NULL)
     bad("Could not open or read the input file");
   size_t total, check;
@@ -1001,7 +1001,7 @@ atoi_any(const char *arg, unsigned *sizep)
       case '2':
       case '4':
       case '8':
-	*sizep = *sp - '0';
+	*sizep = (unsigned)(*sp - '0');
       }
     else
       *sizep = 4;
@@ -1016,9 +1016,9 @@ radmin(const char **ap) {
   switch (size) {
   case 1:
     {
-      uint8_t x = cAccess->get16RegisterOffset(off);
+      uint8_t x = cAccess->get8RegisterOffset(off);
       if (parseable)
-	printf("0x%" PRIx32 "\n", x);
+	printf("0x%" PRIx8 "\n", x);
       else
 	printf("Admin for hdl-device '%s' at offset 0x%x is 0x%x (%u)\n",
 	       device, off, x, x);
@@ -1117,16 +1117,13 @@ settime(const char **) {
 
   cAccess->set64Register(time, OH::OccpAdminRegisters,
 #if FPGA_IS_OPPOSITE_ENDIAN_FROM_CPU()
-			((uint64_t)fraction << 32) | tv.tv_sec
+			 ((uint64_t)fraction << 32) | (uint64_t)tv.tv_sec
 #else
-			((uint64_t)tv.tv_sec << 32) | fraction
+			 ((uint64_t)tv.tv_sec << 32) | fraction
 #endif
 			);
 }
 typedef unsigned long long ull;
-static inline int64_t ticks2ns(uint64_t ticks) {
-  return ((ticks) * 1000000000ull + (1ull << 31))/ (1ull << 32);
-}
 static inline int64_t dticks2ns(int64_t ticks) {
   return ((ticks) * 1000000000ll + (1ll << 31))/ (1ll << 32);
 }
@@ -1155,9 +1152,9 @@ deltatime(const char **) {
   sum = (sum + 45) / 90;
   // we have average delay
   printf("Delta ns min %" PRIi64 " max %" PRIi64 ". average: (of best 90 out of 100) %" PRIi64 "\n",
-	 ticks2ns(delta[0]), ticks2ns(delta[99]), ticks2ns(sum));
+	 dticks2ns(delta[0]), dticks2ns(delta[99]), dticks2ns(sum));
   uint64_t time = swap32(cAccess->get64Register(time, OH::OccpAdminRegisters));
-  cAccess->set64Register(timeDelta, OH::OccpAdminRegisters, swap32(time + sum));
+  cAccess->set64Register(timeDelta, OH::OccpAdminRegisters, swap32((uint64_t)((int64_t)time + sum)));
   int32_t deltatime = (int32_t)swap32(cAccess->get64Register(timeDelta, OH::OccpAdminRegisters));
   printf("Now after correction, delta is: %" PRIi64 "ns\n", dticks2ns(deltatime));
 }
@@ -1207,7 +1204,7 @@ wdump(const char **) {
   printf(" PageWindow: 0x%08x\n", wAccess.get32Register(window, OH::OccpWorkerRegisters));
 }
 
-static int
+static uint32_t
 wwreset(OH::Access &w) {
   uint32_t i = w.get32Register(control, OH::OccpWorkerRegisters);
   w.set32Register(control, OH::OccpWorkerRegisters, i & ~OCCP_WORKER_CONTROL_ENABLE);
@@ -1219,7 +1216,7 @@ wreset(const char **) {
   printf("Worker %zu on device %s: reset asserted, was %s\n",
 	 workerIdx, device, (i & OCCP_WORKER_CONTROL_ENABLE) ? "deasserted" : "already asserted");
 }
-static int
+static uint32_t
 wwunreset(OH::Access &w) {
   uint32_t i = w.get32Register(control, OH::OccpWorkerRegisters);
   w.set32Register(control, OH::OccpWorkerRegisters, i  | OCCP_WORKER_CONTROL_ENABLE);
@@ -1465,14 +1462,14 @@ receiveRDMA(const char **/*ap*/) {
     // The output port is a hardware port.  We need to program the hardware
     // as well as produce/synthesize the output descriptor for the remote hardware port.
     // 1. Get acccessors to all workers with control and configuration accessors for each.
-    cAccess->offsetRegisters(edpAccess, (intptr_t)(&((OH::OccpSpace*)0)->worker[EDP_WORKER]));
-    cAccess->offsetRegisters(edpConfAccess, (intptr_t)(&((OH::OccpSpace*)0)->config[EDP_WORKER]));
-    cAccess->offsetRegisters(smaAccess, (intptr_t)(&((OH::OccpSpace*)0)->worker[SMA_WORKER]));
-    cAccess->offsetRegisters(smaConfAccess, (intptr_t)(&((OH::OccpSpace*)0)->config[SMA_WORKER]));
-    cAccess->offsetRegisters(gbeAccess, (intptr_t)(&((OH::OccpSpace*)0)->worker[GBE_WORKER]));
-    cAccess->offsetRegisters(gbeConfAccess, (intptr_t)(&((OH::OccpSpace*)0)->config[GBE_WORKER]));
-    cAccess->offsetRegisters(genAccess, (intptr_t)(&((OH::OccpSpace*)0)->worker[GEN_WORKER]));
-    cAccess->offsetRegisters(genConfAccess, (intptr_t)(&((OH::OccpSpace*)0)->config[GEN_WORKER]));
+    cAccess->offsetRegisters(edpAccess, (uintptr_t)(&((OH::OccpSpace*)0)->worker[EDP_WORKER]));
+    cAccess->offsetRegisters(edpConfAccess, (uintptr_t)(&((OH::OccpSpace*)0)->config[EDP_WORKER]));
+    cAccess->offsetRegisters(smaAccess, (uintptr_t)(&((OH::OccpSpace*)0)->worker[SMA_WORKER]));
+    cAccess->offsetRegisters(smaConfAccess, (uintptr_t)(&((OH::OccpSpace*)0)->config[SMA_WORKER]));
+    cAccess->offsetRegisters(gbeAccess, (uintptr_t)(&((OH::OccpSpace*)0)->worker[GBE_WORKER]));
+    cAccess->offsetRegisters(gbeConfAccess, (uintptr_t)(&((OH::OccpSpace*)0)->config[GBE_WORKER]));
+    cAccess->offsetRegisters(genAccess, (uintptr_t)(&((OH::OccpSpace*)0)->worker[GEN_WORKER]));
+    cAccess->offsetRegisters(genConfAccess, (uintptr_t)(&((OH::OccpSpace*)0)->config[GEN_WORKER]));
     wwreset(edpAccess);
     wwreset(smaAccess);
     wwreset(gbeAccess);
@@ -1791,7 +1788,7 @@ struct Arg {
   void
   setup() {
     if (isdigit(**args))
-      index = atoi(*args);
+      index = strtoul(*args, NULL, 0);
     else
       name = *args;
   }
@@ -1811,7 +1808,7 @@ struct Arg {
       if (control || status || value || prop)
 	bad("Can't do control/status/get/put on workers with no control interface");
     } else {
-      w = driver->createDirectWorker(*dev, *cAccess, wAccess, impl, inst, idx, timeout);
+      w = driver->createDirectWorker(*dev, *cAccess, wAccess, impl, inst, idx, OCPI_UTRUNCATE(uint32_t, timeout));
       workerIdx = w->index();
       if (control)
 	w->control(prop);

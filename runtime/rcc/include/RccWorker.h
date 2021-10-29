@@ -76,8 +76,8 @@ namespace OCPI {
 
       Worker(Application & app, Artifact *art, const char *name, ezxml_t impl, ezxml_t inst,
 	     const OCPI::Container::Workers &slaves, bool hasMaster, size_t member,
-	     size_t crewSize, const OCPI::Util::PValue *wParams);
-      OCPI::Container::Port& createPort(const OCPI::Metadata::Port&, const OCPI::Util::PValue *props);
+	     size_t crewSize, const OCPI::Base::PValue *wParams);
+      OCPI::Container::Port& createPort(const OCPI::Metadata::Port&, const OCPI::Base::PValue *props);
       void controlOperation(OCPI::Metadata::Worker::ControlOperation);
 
       // These property access methods are called when the fast path
@@ -85,7 +85,7 @@ namespace OCPI {
       // return errors.
 #undef OCPI_DATA_TYPE_S
 #define OCPI_DATA_TYPE(sca,corba,letter,bits,run,pretty,store)		\
-      void set##pretty##Property(const OCPI::API::PropertyInfo &info, const Util::Member &, \
+      void set##pretty##Property(const OCPI::API::PropertyInfo &info, const OCPI::Base::Member &, \
 				 size_t off, const run val, unsigned idx) const; \
       void set##pretty##SequenceProperty(const OCPI::API::PropertyInfo &p, const run *vals, \
 					 size_t length) const;
@@ -94,7 +94,7 @@ namespace OCPI {
       // are aligned on 4 byte boundaries.  The offset calculations
       // and structure padding are assumed to do this.
 #define OCPI_DATA_TYPE_S(sca,corba,letter,bits,run,pretty,store)	\
-      void set##pretty##Property(const OCPI::API::PropertyInfo &info, const Util::Member &, \
+      void set##pretty##Property(const OCPI::API::PropertyInfo &info, const OCPI::Base::Member &, \
 				 size_t offset, const run val, unsigned idx) const;     \
       void set##pretty##SequenceProperty(const OCPI::API::PropertyInfo &p, const run *vals, \
 					 size_t length) const;
@@ -104,7 +104,7 @@ namespace OCPI {
       // Get Scalar Property
 #define OCPI_DATA_TYPE(sca,corba,letter,bits,run,pretty,store)	             \
 	run get##pretty##Property(const OCPI::API::PropertyInfo &info,	\
-				  const OCPI::Util::Member &m, size_t offset, \
+				  const OCPI::Base::Member &m, size_t offset, \
 				  unsigned idx) const;			\
         unsigned get##pretty##SequenceProperty(const OCPI::API::PropertyInfo &p, \
 					       run *vals, size_t length) const;
@@ -112,7 +112,7 @@ namespace OCPI {
       // are aligned on 4 byte boundaries.  The offset calculations
       // and structure padding are assumed to do this.
 #define OCPI_DATA_TYPE_S(sca,corba,letter,bits,run,pretty,store)	      \
-	void get##pretty##Property(const OCPI::API::PropertyInfo &info, const Util::Member &, \
+      void get##pretty##Property(const OCPI::API::PropertyInfo &info, const OCPI::Base::Member &, \
 				   size_t off, char *cp, size_t length, unsigned idx) const; \
       unsigned get##pretty##SequenceProperty                                  \
 	(const OCPI::API::PropertyInfo &p, char **vals, size_t length, char *buf, \
@@ -142,11 +142,11 @@ namespace OCPI {
       // backward compatibility for ctests
       OCPI::Container::Port
 	&createInputPort(OCPI::Metadata::PortOrdinal portId, size_t bufferCount, size_t bufferSize,
-			 const OCPI::Util::PValue *params),
+			 const OCPI::Base::PValue *params),
 	&createOutputPort(OCPI::Metadata::PortOrdinal portId, size_t bufferCount, size_t bufferSize,
-			  const OCPI::Util::PValue *params),
+			  const OCPI::Base::PValue *params),
 	&createTestPort(OCPI::Metadata::PortOrdinal portId, size_t bufferCount, size_t bufferSize,
-			bool isProvider, const OU::PValue *params);
+			bool isProvider, const OCPI::Base::PValue *params);
       void read(size_t offset, size_t nBytes, void* p_data);
       void write(size_t offset, size_t nBytes, const void* p_data);
       // end backward compatibility for ctests

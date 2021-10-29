@@ -34,7 +34,7 @@
 #include "OsTimer.hh"
 #include <OcpiMessageCircuit.h>
 #include <OcpiThreadHook.h>
-#include <OcpiList.h>
+#include "UtilList.hh"
 #include <string>
 #include <DtIntEventHandler.h>
 #include <OcpiTransport.h>

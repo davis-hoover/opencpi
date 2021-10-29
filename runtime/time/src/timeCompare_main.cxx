@@ -32,7 +32,7 @@
 #include <iostream>
 #include <fstream>
 #include <math.h>
-#include <OcpiUtilCommandLineConfiguration.h>
+#include "UtilCommandLineConfiguration.hh"
 
 class OcpiConfigurator
   : public OCPI::Util::CommandLineConfiguration

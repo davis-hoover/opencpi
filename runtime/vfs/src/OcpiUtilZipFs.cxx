@@ -22,10 +22,10 @@
 #include <OcpiUtilZipStream.h>
 #include <OcpiUtilVfs.h>
 #include <OcpiUtilVfsIterator.h>
-#include <OcpiUtilAutoRDLock.h>
-#include <OcpiUtilAutoWRLock.h>
-#include <OcpiUtilUri.h>
-#include <OcpiUtilMisc.h>
+#include "UtilAutoRDLock.hh"
+#include "UtilAutoWRLock.hh"
+#include "UtilUri.hh"
+#include "UtilMisc.hh"
 #include "OsAssert.hh"
 #include "OsRWLock.hh"
 #include "OsSizeCheck.hh"

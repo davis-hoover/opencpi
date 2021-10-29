@@ -57,6 +57,7 @@ namespace OCPI {
     namespace OA = OCPI::API;
     namespace OM = OCPI::Metadata;
     namespace OU = OCPI::Util;
+    namespace OB = OCPI::Base;
     namespace OC = OCPI::Container;
     namespace OR = OCPI::RDT;
     namespace OO = OCPI::OCL;
@@ -468,7 +469,7 @@ namespace OCPI {
 	    throw OU::Error("Can't load artifact: %s (%s, %d)\n",
 			    name().c_str(), strerror(errno), errno);
 	  cl_int rc, rc1;
-	  size_t bytes = OCPI_SIZE_T_DIFF(length, lart.metadataLength());
+	  size_t bytes = (size_t)length - lart.metadataLength();
 
 	  const unsigned char *binary = (const unsigned char *)mapped;
 	  ocpiDebug("clCreateProgramWithBinary ctx %p id %p bytes %zu", ctx, id, bytes);
@@ -551,13 +552,13 @@ namespace OCPI {
     protected:
       OC::Worker &createWorker(Application &, const char* appInstName, ezxml_t impl, ezxml_t inst,
 			       const OC::Workers &slaves, bool hasMaster, size_t member,
-			       size_t crewSize, const OU::PValue* wParams, int que);
+			       size_t crewSize, const OB::PValue* wParams, unsigned que);
 
       cl_program &program() { return m_program; }
     };
 
     Container::
-    Container(OCPI::OCL::Device &a_device, const ezxml_t config, const OU::PValue* params)
+    Container(OCPI::OCL::Device &a_device, const ezxml_t config, const OB::PValue* params)
       : OC::ContainerBase<Driver,Container,Application,Artifact>
 	(*this, a_device.name().c_str(), config, params),
 	m_device(a_device) {
@@ -653,8 +654,8 @@ namespace OCPI {
 	  throw OU::Error("No OCL target named \"%s\"", type);
       }
       bool printOnly = false, verbose = false;
-      OU::findBool(params, "printOnly", printOnly);
-      OU::findBool(params, "verbose", verbose);
+      OB::findBool(params, "printOnly", printOnly);
+      OB::findBool(params, "verbose", verbose);
       cl_int rc = clGetPlatformIDs(0, 0,&np);
       if (rc)
 	ocpiInfo("OpenCL clGetPlatformIDs query returned error: %s [%d]",
@@ -780,7 +781,7 @@ namespace OCPI {
       OC::Worker &
       createWorker(OC::Artifact* artifact, const char* appInstName, ezxml_t impl, ezxml_t inst,
 		   const OC::Workers &slaves, bool hasMaster, size_t member, size_t crewSize,
-		   const OU::PValue* params) {
+		   const OB::PValue* params) {
 	assert(slaves.empty());
 	assert(artifact);
 	Artifact &art = static_cast<Artifact&>(*artifact);
@@ -796,7 +797,7 @@ namespace OCPI {
     }; // End: class Application
 
     OA::ContainerApplication* Container::
-    createApplication (const char *a_name, const OCPI::Util::PValue *params)
+    createApplication (const char *a_name, const OB::PValue *params)
       throw (OCPI::Util::EmbeddedException)
     {
       return new Application(*this, a_name, params);
@@ -844,7 +845,7 @@ namespace OCPI {
       cl_kernel                m_clKernel;
       OCPI::OS::Timer          m_runTimer;
       std::vector<Port*>       m_myPorts;
-      uint32_t                 m_que;
+      unsigned                 m_que;
 
 
       bool                     m_running;
@@ -855,7 +856,7 @@ namespace OCPI {
 
       Worker(Application &app, Artifact &art, Kernel &k, const char *a_name, ezxml_t implXml,
 	     ezxml_t instXml, const OC::Workers &a_slaves, bool a_hasMaster, size_t a_member,
-	     size_t a_crewSize, const OA::PValue* params, uint32_t que )
+	     size_t a_crewSize, const OA::PValue* params, unsigned que)
 	  : OC::WorkerBase<Application, Worker, Port>(app, *this, &art, a_name, implXml, instXml,
 						      a_slaves, a_hasMaster, a_member, a_crewSize,
 						      params),
@@ -878,7 +879,6 @@ namespace OCPI {
 	       clCreateBuffer(m_container.device().context(),
 			      CL_MEM_READ_WRITE|CL_MEM_ALLOC_HOST_PTR, m_persistBytes,
 			      NULL, &rc));
-	
 	void *vp;
 	ocpiDebug("enqueuemap persistent(%u)", m_que);
 	OCL_RC(vp, clEnqueueMapBuffer(m_container.device().cmdq(m_que), m_clPersistent,
@@ -973,7 +973,7 @@ namespace OCPI {
 			   volatile uint8_t *&writeVaddr,
 			   const volatile uint8_t *&readVaddr) const {
 	if (md.m_baseType != OA::OCPI_Struct && !md.m_isSequence &&
-	    md.m_baseType != OA::OCPI_String && OU::baseTypeSizes[md.m_baseType] <= 32 &&
+	    md.m_baseType != OA::OCPI_String && OB::baseTypeSizes[md.m_baseType] <= 32 &&
 	    !md.m_writeError) {
 	  if ((md.m_offset + md.m_nBytes) > totalPropertySize())
 	    throw OU::Error( "OCL property is out of bounds." );
@@ -992,7 +992,7 @@ namespace OCPI {
 #undef OCPI_DATA_TYPE_S
       // Set a scalar property value
 #define OCPI_DATA_TYPE(sca,corba,letter,bits,run,pretty,store) \
-      void set##pretty##Property(const OCPI::API::PropertyInfo &info, const Util::Member &m, \
+      void set##pretty##Property(const OCPI::API::PropertyInfo &info, const OB::Member &m, \
 				 size_t offset, const run val, unsigned idx) const { \
         if (info.m_writeError ) \
           throw; /*"worker has errors before write */ \
@@ -1022,7 +1022,7 @@ namespace OCPI {
       // and structure padding are assumed to do this.
 #define OCPI_DATA_TYPE_S(sca,corba,letter,bits,run,pretty,store)                         \
       virtual void							                 \
-      set##pretty##Property(const OCPI::API::PropertyInfo &info, const Util::Member &m,  \
+      set##pretty##Property(const OCPI::API::PropertyInfo &info, const OB::Member &m,  \
 			    size_t offset, const run val, unsigned idx) const {          \
         size_t ocpi_length;						                 \
         if (!val || (ocpi_length = strlen(val)) > m.m_stringLength)                      \
@@ -1063,7 +1063,7 @@ namespace OCPI {
       // Get Scalar Property
 #define OCPI_DATA_TYPE(sca,corba,letter,bits,run,pretty,store) \
       virtual run \
-      get##pretty##Property(const OCPI::API::PropertyInfo &info, const Util::Member &m, \
+      get##pretty##Property(const OCPI::API::PropertyInfo &info, const OB::Member &m, \
 			    size_t offset, unsigned idx) const { \
         if (info.m_readError) \
           throw; /*"worker has errors before read "*/ \
@@ -1074,7 +1074,7 @@ namespace OCPI {
                 uint32_t u32[bits/32]; \
         } u; \
         if (bits > 32) \
-          u.u32[1] = pp[1]; \
+          u.u32[bits/32-1] = pp[bits/32-1]; \
         u.u32[0] = pp[0]; \
         if (info.m_readError) \
           throw; /*"worker has errors after read */ \
@@ -1098,7 +1098,7 @@ namespace OCPI {
       // and structure padding are assumed to do this. FIXME redundant length check
 #define OCPI_DATA_TYPE_S(sca,corba,letter,bits,run,pretty,store) \
       virtual void \
-      get##pretty##Property(const OCPI::API::PropertyInfo &info, const Util::Member &m, \
+      get##pretty##Property(const OCPI::API::PropertyInfo &info, const OB::Member &m, \
 			    size_t off, char *cp, size_t length, unsigned idx) const { \
         size_t stringLength = m.m_stringLength;                           \
         if (length < stringLength + 1) \
@@ -1167,7 +1167,7 @@ namespace OCPI {
     OC::Worker& Artifact::
     createWorker(Application &app, const char* appInstName, ezxml_t impl, ezxml_t inst,
 		 const OC::Workers &slaves, bool hasMaster, size_t member, size_t crewSize,
-		 const OU::PValue* wParams, int que) {
+		 const OB::PValue* wParams, unsigned que) {
       const char *kname = ezxml_cattr(impl, "name");
       assert(kname);
       std::string kstr(kname);

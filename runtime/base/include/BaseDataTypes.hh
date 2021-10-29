@@ -27,11 +27,11 @@
 #include <stdarg.h>
 #include <string>
 #include <vector>
-#include "UtilExpression.hh"
+#include "BaseExpression.hh"
 #include "OcpiDataTypesApi.hh"
 
 namespace OCPI {
-  namespace Util {
+  namespace Base {
     // Since arrays are part of the declarator, and not the type, a member with both
     // sequence and array characteristics is a sequence of arrays, not an array of sequences.
     // I.e. if it is an array of sequences, then the member must refer to a subsidiary type,

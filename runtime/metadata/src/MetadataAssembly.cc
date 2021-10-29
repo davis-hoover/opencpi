@@ -21,11 +21,11 @@
 #include <set>
 #include <limits>
 #include <climits>
-#include "OcpiUtilExceptionApi.h"
-#include "OcpiUtilEzxml.h"
-#include "OcpiUtilMisc.h"
-#include "UtilDataTypes.hh"
-#include "UtilValue.hh"
+#include "OcpiExceptionApi.hh"
+#include "UtilEzxml.hh"
+#include "UtilMisc.hh"
+#include "BaseDataTypes.hh"
+#include "BaseValue.hh"
 #include "MetadataWorker.hh"
 #include "MetadataAssembly.hh"
 
@@ -33,10 +33,11 @@ namespace OCPI {
   namespace Metadata {
     namespace OA = OCPI::API;
     namespace OU = OCPI::Util;
+    namespace OB = OCPI::Base;
     namespace OE = OCPI::Util::EzXml;
 
     Assembly::Assembly(const char *file, const char **extraTopAttrs,
-                       const char **extraInstAttrs, const OU::PValue *params)
+                       const char **extraInstAttrs, const OB::PValue *params)
       : m_copy(NULL), m_xmlOnly(false), m_isImpl(false) {
       const char *cp = file;
       while (isspace(*cp))
@@ -53,7 +54,7 @@ namespace OCPI {
         throw OU::Error("%s", err);
     }
     Assembly::Assembly(const std::string &string, const char **extraTopAttrs,
-                       const char **extraInstAttrs, const OU::PValue *params)
+                       const char **extraInstAttrs, const OB::PValue *params)
       : m_xmlOnly(false), m_isImpl(false) {
       m_copy = new char[string.size() + 1];
       strcpy(m_copy, string.c_str());
@@ -63,7 +64,7 @@ namespace OCPI {
     }
     Assembly::Assembly(const ezxml_t top, const char *defaultName, bool a_isImpl,
                        const char **extraTopAttrs, const char **extraInstAttrs,
-                       const OU::PValue *params)
+                       const OB::PValue *params)
       : m_xml(top), m_copy(NULL), m_xmlOnly(true), m_isImpl(a_isImpl) {
       const char *err = parse(defaultName, extraTopAttrs, extraInstAttrs, params);
       if (err)
@@ -80,7 +81,7 @@ namespace OCPI {
     unsigned Assembly::s_count = 0;
 
     const char *Assembly::
-    addInstance(ezxml_t ix, const char **extraInstAttrs, const OU::PValue *params, bool addXml) {
+    addInstance(ezxml_t ix, const char **extraInstAttrs, const OB::PValue *params, bool addXml) {
       unsigned n = (unsigned)m_instances.size();
       Instance *i = new Instance;
       m_instances.push_back(i);
@@ -90,7 +91,7 @@ namespace OCPI {
 
     const char *Assembly::
     parse(const char *defaultName, const char **extraTopAttrs, const char **extraInstAttrs,
-          const OU::PValue *params) {
+          const OB::PValue *params) {
       // This is where common initialization is done except m_xml and m_copy
       m_doneInstance = UINT_MAX;
       m_cMapPolicy = RoundRobin;
@@ -216,13 +217,13 @@ namespace OCPI {
 
     // Error check parameters for that have instance names
     const char *Assembly::
-    checkInstanceParams(const char *pName, const OU::PValue *params, bool checkMapped,
+    checkInstanceParams(const char *pName, const OB::PValue *params, bool checkMapped,
                         bool singleAssignment) {
       const char *assign;
       // Keep track of which instances we have seen for this parameter, using ordinals
       std::set<unsigned> instancesSeen;
       bool emptySeen = false;
-      for (unsigned n = 0; OU::findAssignNext(params, pName, NULL, assign, n); ) {
+      for (unsigned n = 0; OB::findAssignNext(params, pName, NULL, assign, n); ) {
         const char *eq = strchr(assign, '=');
         if (!eq || (!emptySeen && !eq[1])) // empty value only if wildcard previously
           return OU::esprintf("Parameter assignment '%s' is invalid. "
@@ -283,7 +284,7 @@ namespace OCPI {
     }
     const char *Assembly::
     addPortConnection(ezxml_t ix, size_t from, const char *fromPort, size_t to,
-		      const char *toPort, const OU::PValue *params) {
+		      const char *toPort, const OB::PValue *params) {
       std::string l_name = m_instances[from]->m_name + "." + (fromPort ? fromPort : "output");
       Connection *c;
       Port *toP, *fromP;
@@ -301,7 +302,7 @@ namespace OCPI {
     // It is also called from upper layers when ports are externalized (and port direction is known)
     // Hence the isInput, bidi, known optional arguments
     const char *Assembly::
-    addExternalConnection(ezxml_t x, size_t a_instance, const char *port, const OU::PValue *params,
+    addExternalConnection(ezxml_t x, size_t a_instance, const char *port, const OB::PValue *params,
                           bool isInput, bool bidi, bool known) {
       const char *err;
       Connection *c;
@@ -387,7 +388,7 @@ namespace OCPI {
     }
 
     const char *Assembly::MappedProperty::
-    parse(ezxml_t px, Assembly &a, const OU::PValue *params) {
+    parse(ezxml_t px, Assembly &a, const OB::PValue *params) {
       const char *err;
       std::string instance;
 
@@ -406,7 +407,7 @@ namespace OCPI {
 	return err;
       // Add any top-level property assignment in params for this mapped property
       const char *propAssign;
-      for (unsigned n = 0; OU::findAssignNext(params, "property", m_name.c_str(), propAssign, n); ) {
+      for (unsigned n = 0; OB::findAssignNext(params, "property", m_name.c_str(), propAssign, n); ) {
 	std::string assign = m_instPropName + "=" + propAssign;
 	if ((err = a.m_instances[m_instance]->setProperty(assign.c_str())))
 	  return err;
@@ -469,7 +470,7 @@ namespace OCPI {
     // connect, then optionally, which local port (from) and which dest port (to).
     // external=port, connect=instance, then to or from?
     const char *Assembly::Instance::
-    parseConnection(ezxml_t ix, Assembly &a, const OU::PValue *params) {
+    parseConnection(ezxml_t ix, Assembly &a, const OB::PValue *params) {
       const char *err, *c, *e, *ci = NULL; // quiet compiler warning
       if ((c = ezxml_cattr(ix, "connect")) || (ci = ezxml_cattr(ix, "connectinput"))) {
         unsigned n;
@@ -506,8 +507,8 @@ namespace OCPI {
     parseDelay(ezxml_t x, Assembly::Delay &usecs, bool &hasDelay) {
       const char *delay = ezxml_cattr(x, "delay");
       if (delay) {
-        OU::ValueType vt(OA::OCPI_Double);
-        OU::Value v(vt);
+        OB::ValueType vt(OA::OCPI_Double);
+        OB::Value v(vt);
         const char *err;
         if ((err = v.parse(delay)))
           return err;
@@ -621,7 +622,7 @@ namespace OCPI {
     // There is no non-default constructor so initialize here...
     const char *Assembly::Instance::
     parse(ezxml_t ix, Assembly &a, unsigned ordinal, const char **extraInstAttrs,
-	  const OU::PValue *params) {
+	  const OB::PValue *params) {
       m_ordinal = ordinal;
       m_hasMaster = false;
       const char *err;
@@ -688,12 +689,12 @@ namespace OCPI {
           m_name = myBase;
       }
       if (!a.isImpl()) {
-        if (!OU::findAssign(params, "worker", m_name.c_str(), m_implName) &&
-	    !OU::findAssign(params, "worker", m_specName.c_str(), m_implName))
+        if (!OB::findAssign(params, "worker", m_name.c_str(), m_implName) &&
+	    !OB::findAssign(params, "worker", m_specName.c_str(), m_implName))
           OE::getOptionalString(ix, m_implName, "worker");
       }
-      if (!OU::findAssign(params, "selection", m_name.c_str(), m_selection) &&
-	  !OU::findAssign(params, "selection", m_specName.c_str(), m_selection))
+      if (!OB::findAssign(params, "selection", m_name.c_str(), m_selection) &&
+	  !OB::findAssign(params, "selection", m_specName.c_str(), m_selection))
         OE::getOptionalString(ix, m_selection, "selection");
       ocpiInfo("Component %2d: %s name: %s impl: %s spec: %s selection: %s", ordinal,
                 component.c_str(), m_name.c_str(), m_implName.c_str(), m_specName.c_str(),
@@ -710,10 +711,10 @@ namespace OCPI {
       // Now deal with instance-based property parameters that might override the XML ones
       // First, process the parameters for ALL instances, then the parameters for specific
       // instances
-      for (unsigned n = 0; OU::findAssignNext(params, "property", NULL, propAssign, n); )
+      for (unsigned n = 0; OB::findAssignNext(params, "property", NULL, propAssign, n); )
         if (propAssign[0] == '=' && (err = setProperty(propAssign + 1)))
           return err;
-      for (unsigned n = 0; OU::findAssignNext(params, "property", m_name.c_str(), propAssign, n); )
+      for (unsigned n = 0; OB::findAssignNext(params, "property", m_name.c_str(), propAssign, n); )
         if ((err = setProperty(propAssign)))
           return err;
       // Now check for additional or override values from parameters
@@ -777,7 +778,7 @@ namespace OCPI {
     }
 #endif
     const char *Assembly::Connection::
-    parse(ezxml_t cx, Assembly &a, unsigned &n, const OU::PValue *params) {
+    parse(ezxml_t cx, Assembly &a, unsigned &n, const OB::PValue *params) {
       const char *err;
       if ((err = OE::checkElements(cx, "port", "external", NULL)) ||
           //      (err = OE::checkAttrs(cx, "name", "transport", "external", "count", NULL)) ||
@@ -804,7 +805,7 @@ namespace OCPI {
 
     const char *Assembly::Connection::
     addPort(Assembly &a, size_t instance, const char *portName, bool isInput, bool bidi,
-            bool known, size_t index, const OU::PValue */*params*/, Assembly::Port *&port) {
+            bool known, size_t index, const OB::PValue */*params*/, Assembly::Port *&port) {
       const char *err;
       if ((err = a.m_instances[instance]->getPort(portName, isInput, bidi, known, port)))
 	return err;
@@ -925,7 +926,7 @@ namespace OCPI {
     //    Optional:  name, url, index
     //    Invalid:   port, instance, count
     const char *Assembly::
-    parseExternal(ezxml_t x, Connection *a_conn, const char *a_role, const OU::PValue *pvl) {
+    parseExternal(ezxml_t x, Connection *a_conn, const char *a_role, const OB::PValue *pvl) {
       const char
 	*l_name = ezxml_cattr(x, "name"),
 	*url = ezxml_cattr(x, "url"),

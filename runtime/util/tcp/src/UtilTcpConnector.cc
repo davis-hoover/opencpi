@@ -18,9 +18,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <OcpiUtilTcpConnector.h>
-#include <OcpiUtilTcpClient.h>
-#include <OcpiUtilMisc.h>
+#include "UtilTcpConnector.hh"
+#include "UtilTcpClient.hh"
+#include "UtilMisc.hh"
 #include <iostream>
 #include <string>
 #include <cstdlib>
@@ -35,18 +35,18 @@ std::string
 OCPI::Util::Tcp::Connector::g_scheme = "http";
 
 OCPI::Util::Tcp::Connector::Connector ()
-  throw ()
+
 {
 }
 
 OCPI::Util::Tcp::Connector::~Connector ()
-  throw ()
+
 {
 }
 
 std::iostream *
 OCPI::Util::Tcp::Connector::connect (const std::string & authority)
-  throw (std::string)
+
 {
   std::string::size_type pos = authority.rfind (':');
   std::string host, portAsString;
@@ -87,14 +87,14 @@ OCPI::Util::Tcp::Connector::connect (const std::string & authority)
 
 void
 OCPI::Util::Tcp::Connector::shutdown (std::ios_base::openmode mode)
-  throw (std::string)
+
 {
   m_socket.shutdown (mode);
 }
 
 void
 OCPI::Util::Tcp::Connector::close ()
-  throw (std::string)
+
 {
   m_socket.close ();
 }

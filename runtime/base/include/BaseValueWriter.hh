@@ -21,10 +21,10 @@
 #ifndef VALUE_WRITER_H
 #define VALUE_WRITER_H
 
-#include "UtilValue.hh"
+#include "BaseValue.hh"
 
 namespace OCPI {
-  namespace Util {
+namespace Base {
 
 
 // Class to "write" demarshalled data into "Value" data structure.

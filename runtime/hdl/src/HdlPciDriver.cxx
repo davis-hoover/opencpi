@@ -28,7 +28,7 @@
 #ifdef OCPI_OS_macos
 #define mmap64 mmap
 #endif
-#include "OcpiUtilPci.h"
+#include "UtilPci.hh"
 
 #include "fasttime.h"
 
@@ -40,6 +40,7 @@
 // This is the linux version (kernel 2.6+).
 namespace OS = OCPI::OS;
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 namespace OCPI {
   namespace HDL {
     namespace PCI {
@@ -51,7 +52,7 @@ namespace OCPI {
 	int m_fd;
 	friend class Driver;
 	Device(std::string &a_name, int fd, ocpi_pci_t &pci, void *bar0, void *bar1,
-	       const OU::PValue *params, std::string &err)
+	       const OB::PValue *params, std::string &err)
 	  : OCPI::HDL::Device(a_name, "ocpi-dma-pio", params), m_bar0(bar0), m_bar1(bar1),
 	    m_bar0size(pci.size0), m_bar1size(pci.size1), m_fd(fd) {
 	  uint64_t endpointPaddr, controlOffset, bufferOffset, holeStartOffset, holeEndOffset;
@@ -239,7 +240,7 @@ namespace OCPI {
 	}
       }
       unsigned Driver::
-      search(const OU::PValue *params, const char **excludes, bool discoveryOnly,
+      search(const OB::PValue *params, const char **excludes, bool discoveryOnly,
 	     std::string &error) {
 	ocpiInfo("Searching for local PCI-based HDL devices.");
 	error.clear();
@@ -267,7 +268,7 @@ namespace OCPI {
       }
       
       OCPI::HDL::Device *Driver::
-      open(const char *pciName, const OU::PValue *params, std::string &error) {
+      open(const char *pciName, const OB::PValue *params, std::string &error) {
 	const char *cp;
 	for (cp = pciName; *cp && isdigit(*cp); cp++)
 	  ;

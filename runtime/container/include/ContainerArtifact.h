@@ -57,7 +57,7 @@ namespace OCPI {
       Workers m_workers; // what workers exist created based on this loaded artifact
       OCPI::Library::Artifact &m_libArtifact;
     protected:
-      Artifact(OCPI::Library::Artifact &lart, const OCPI::Util::PValue *props = NULL);
+      Artifact(OCPI::Library::Artifact &lart, const OCPI::Base::PValue *props = NULL);
       void removeWorker(Worker &);
     public:
       // Make sure this is loaded and ready to execute in case it was unloaded
@@ -67,13 +67,13 @@ namespace OCPI {
       bool hasArtifact(const void *art);
       Worker &createWorker(Application &a,  const char *instName,
 			   const char *impltag, const char *instTag,
-			   const OCPI::Util::PValue *props = NULL,
-			   const OCPI::Util::PValue *params = NULL);
+			   const OCPI::Base::PValue *props = NULL,
+			   const OCPI::Base::PValue *params = NULL);
       Worker &createWorker(Application &app,
 			   const char *appInstName,
 			   ezxml_t impl, ezxml_t inst, const OCPI::Container::Workers &slaves,
 			   bool hasMaster, size_t member, size_t crewSize,
-			   const OCPI::Util::PValue *wparams = NULL);
+			   const OCPI::Base::PValue *wparams = NULL);
     protected:
       virtual ~Artifact();
     };

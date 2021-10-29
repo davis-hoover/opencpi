@@ -29,7 +29,7 @@
 #ifndef OCPILOGGERTEE_H__
 #define OCPILOGGERTEE_H__
 
-#include <OcpiLoggerLogger.h>
+#include "UtilLogger.hh"
 #include "OsMutex.hh"
 #include <string>
 #include <vector>

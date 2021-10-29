@@ -185,7 +185,7 @@ Instance()
 // When evaluating an expression for an instance's property value, allow use of assembly-provided values
 // when indicated by a leading $.
 const char *Instance::
-getValue(const char *sym, OU::ExprValue &val) const {
+getValue(const char *sym, OB::ExprValue &val) const {
   if (*sym == '$')
     return m_assy->m_assyWorker.getValue(++sym, val);
   const InstanceProperty *ipv = &m_properties[0];
@@ -663,7 +663,7 @@ emitXmlWorker(std::string &out, bool verbose) {
       OU::formatAdd(out, " indirect=\"%zu\"", prop->m_indirectAddr);
     if (prop->m_isParameter) {
       out += " parameter='1'";
-      OU::Value *v =
+      OB::Value *v =
 	m_paramConfig && prop->m_paramOrdinal < m_paramConfig->params.size() &&
 	!m_paramConfig->params[prop->m_paramOrdinal].m_isDefault ?
 	&m_paramConfig->params[prop->m_paramOrdinal].m_value : prop->m_default;

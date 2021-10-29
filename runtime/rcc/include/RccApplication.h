@@ -89,12 +89,12 @@ namespace OCPI {
 	OCPI::Container::Worker &
 	createWorker(OCPI::Container::Artifact *art, const char *appInstName, ezxml_t impl,
 		     ezxml_t inst, const OCPI::Container::Workers &slaves, bool hasMaster,
-		     size_t member, size_t crewSize, const OCPI::Util::PValue *wParams);
+		     size_t member, size_t crewSize, const OCPI::Base::PValue *wParams);
 
       /**********************************
        * Constructor
        *********************************/  
-        Application(Container &, const char *, const OCPI::Util::PValue *);
+        Application(Container &, const char *, const OCPI::Base::PValue *);
 
       /**********************************
        * Destructor

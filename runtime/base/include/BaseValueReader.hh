@@ -20,10 +20,10 @@
 
 #ifndef VALUE_READER_H
 #define VALUE_READER_H
-#include "UtilValue.hh"
+#include "BaseValue.hh"
 
 namespace OCPI {
-  namespace Util {
+  namespace Base {
 
 // Our reader object that supplies data from our Value data structure
 class ValueReader : public Reader {

@@ -31,8 +31,8 @@
  */
 #include <inttypes.h>
 #include <unistd.h>
-#include "OcpiUtilMisc.h"
-#include "OcpiUtilSelfMutex.h"
+#include "UtilMisc.hh"
+#include "UtilSelfMutex.hh"
 #include "XferEndPoint.h"
 #include "XferDriver.h"
 #include "XferPio.h"
@@ -40,6 +40,7 @@
 // Programmed I/O via named shared memory buffers
 
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 namespace XF = DataTransfer;
 namespace OCPI {
   namespace PIO {  
@@ -49,7 +50,7 @@ class EndPoint : public XF::EndPoint {
   std::string m_smb_name;
 protected:
   EndPoint(XF::XferFactory &a_factory, const char *protoInfo, const char *eps, const char *other,
-	   bool a_local, size_t a_size, const OU::PValue *params)
+	   bool a_local, size_t a_size, const OB::PValue *params)
     : XF::EndPoint(a_factory, eps, other, a_local, a_size, params) { 
     static uint16_t smb_count = 0;
     if (protoInfo) {
@@ -122,7 +123,7 @@ protected:
 
   XF::EndPoint &
   createEndPoint(const char *protoInfo, const char *eps, const char *other, bool local,
-		 size_t size, const OCPI::Util::PValue *params) {
+		 size_t size, const OB::PValue *params) {
     ocpiDebug("In PIO::XferFactory::createEndPoint(): %zu", m_SMBSize);
     return *new EndPoint(*this, protoInfo, eps, other, local, size, params);
   }

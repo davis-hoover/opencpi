@@ -23,7 +23,7 @@
   <localMemory name="mem1" size="2048"/>
 */
 
-#include "OcpiUtilEzxml.h"
+#include "UtilEzxml.hh"
 #include "MetadataMemory.hh"
 
 namespace OCPI

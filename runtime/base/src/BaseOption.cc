@@ -20,10 +20,10 @@
 
 #include <cstring>
 #include "OsMisc.hh"
-#include "UtilValue.hh"
-#include "OcpiUtilMisc.h"
+#include "BaseValue.hh"
+#include "UtilMisc.hh"
 #define OCPI_OPTIONS_NO_MAIN 1
-#include "CmdOption.hh"
+#include "BaseOption.hh"
 
 // Limitations:
 //  No support for multiple letter options in one flag (dubious UI in any case)
@@ -32,8 +32,9 @@
 //  No support for different flags affecting the same value
 //    e.g. --quiet vs. --verbose
 namespace OCPI {
-  namespace Util {
+  namespace Base {
     namespace OA = OCPI::API;
+    namespace OU = OCPI::Util;
 
     BaseCommandOptions::
     BaseCommandOptions(Member *members, unsigned nMembers, const char *help, const char **defaults)
@@ -71,24 +72,24 @@ namespace OCPI {
       size_t ordinal = OCPI_SIZE_T_DIFF(&m, m_options);
       bool seen = m_seen[ordinal];
       if (!m.m_isSequence && seen)
-	return setError(esprintf("Multiple '%s' options are present, which is not allowed",
-				 m_names[ordinal].c_str()));
+	return setError(OU::esprintf("Multiple '%s' options are present, which is not allowed",
+				     m_names[ordinal].c_str()));
       m_seen[ordinal] = true;
       if (!m.m_isSequence && m.m_baseType == OA::OCPI_Bool) {
 	if (argValue)
-	  return setError(esprintf("Extraneous value found in option: '%s'", *a_argv));
+	  return setError(OU::esprintf("Extraneous value found in option: '%s'", *a_argv));
 	v.m_Bool = m.m_default ? !m.m_default->m_Bool : true;
       } else {
 	if (!argValue) {
 	  if (!a_argv[1])
-	    return setError(esprintf("Missing value for option: '%s'", *a_argv));
+	    return setError(OU::esprintf("Missing value for option: '%s'", *a_argv));
 	  argValue = a_argv[1];
 	  a_argv++;
 	}
 	const char *err;
 	if ((err = v.parse(argValue, NULL, m.m_isSequence))) // seen)))
-	  return setError(esprintf("When parsing option '%s', value '%s' invalid: %s",
-				   *a_argv, argValue, err));
+	  return setError(OU::esprintf("When parsing option '%s', value '%s' invalid: %s",
+				       *a_argv, argValue, err));
       }
       return NULL;
     }
@@ -141,7 +142,7 @@ namespace OCPI {
 	      goto cont2;
 	    }
 	}
-	return setError(esprintf("Unknown option name/letter in option '%s'", *ap));
+	return setError(OU::esprintf("Unknown option name/letter in option '%s'", *ap));
       cont2:;
       }
       m_argvCount = m_argv.size();
@@ -236,9 +237,9 @@ namespace OCPI {
       va_list ap;
       va_start(ap, fmt);
       std::string e = "Exiting for problem: ";
-      formatAddV(e, fmt, ap);
+      OU::formatAddV(e, fmt, ap);
       if (m_error.size())
-	formatAdd(e, ": %s", m_error.c_str());
+	OU::formatAdd(e, ": %s", m_error.c_str());
       va_end(ap);
       throw e;
     }

@@ -21,7 +21,7 @@
 #include <algorithm>
 #include "farmhash.h"
 #include "OsAssert.hh"
-#include "OcpiUtilCDR.h"
+#include "UtilCDR.hh"
 #include "Container.h"
 #include "ContainerPort.h"
 
@@ -30,12 +30,13 @@ namespace OCPI {
     namespace OA = OCPI::API;
     namespace OM = OCPI::Metadata;
     namespace OU = OCPI::Util;
+    namespace OB = OCPI::Base;
     namespace OD = OCPI::DataTransport;
     namespace OR = OCPI::RDT;
 
     LocalPort::
     LocalPort(Container &a_container, const OM::Port &mPort, bool a_isProvider,
-	      const OU::PValue *params)
+	      const OB::PValue *params)
       :  BasicPort(a_container, mPort, a_isProvider, params),
 	 m_scale(0), m_external(NULL), m_connectedBridgePorts(0), m_localBridgePort(NULL),
 	 m_bridgeContainer(NULL), m_localBuffer(NULL),

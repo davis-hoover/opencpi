@@ -18,12 +18,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <OcpiUtilAutoWRLock.h>
+#include "UtilAutoWRLock.hh"
 #include "OsAssert.hh"
 #include "OsRWLock.hh"
 
 OCPI::Util::AutoWRLock::AutoWRLock (OCPI::OS::RWLock & rwlock, bool locked)
-  throw (std::string)
+
   : m_locked (locked),
     m_rwlock (rwlock)
 {
@@ -33,7 +33,7 @@ OCPI::Util::AutoWRLock::AutoWRLock (OCPI::OS::RWLock & rwlock, bool locked)
 }
 
 OCPI::Util::AutoWRLock::~AutoWRLock ()
-  throw ()
+
 {
   if (m_locked) {
     m_rwlock.wrUnlock ();
@@ -42,7 +42,7 @@ OCPI::Util::AutoWRLock::~AutoWRLock ()
 
 void
 OCPI::Util::AutoWRLock::lock ()
-  throw (std::string)
+
 {
   ocpiAssert (!m_locked);
   m_rwlock.wrLock ();
@@ -51,7 +51,7 @@ OCPI::Util::AutoWRLock::lock ()
 
 bool
 OCPI::Util::AutoWRLock::trylock ()
-  throw (std::string)
+
 {
   ocpiAssert (!m_locked);
   return (m_locked = m_rwlock.wrTrylock ());
@@ -59,7 +59,7 @@ OCPI::Util::AutoWRLock::trylock ()
 
 void
 OCPI::Util::AutoWRLock::unlock ()
-  throw (std::string)
+
 {
   ocpiAssert (m_locked);
   m_rwlock.wrUnlock ();

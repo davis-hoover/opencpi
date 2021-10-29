@@ -18,11 +18,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef OcpiDriverManager_h
-#define OcpiDriverManager_h
+#ifndef OcpiPluginManager_h
+#define OcpiPluginManager_h
 namespace OCPI {
   namespace API {
-    class DriverManager {
+    class PluginManager {
       static void configure(const char *file = NULL);
     };
   }

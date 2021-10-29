@@ -20,9 +20,9 @@
 
 #include <OcpiUtilHttpFs.h>
 #include <OcpiUtilVfs.h>
-#include <OcpiUtilHttpClient.h>
-#include <OcpiUtilMisc.h>
-#include <OcpiUtilAutoMutex.h>
+#include "UtilHttpClient.hh"
+#include "UtilMisc.hh"
+#include "UtilAutoMutex.hh"
 #include "OsFileSystem.hh"
 #include "OsMutex.hh"
 #include <iostream>

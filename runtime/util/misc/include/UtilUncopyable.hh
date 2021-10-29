@@ -55,13 +55,13 @@ namespace OCPI
       protected:
 
         Uncopyable ( )
-        throw ()
+
         {
           // Empty
         }
 
         ~Uncopyable ( )
-        throw ()
+
         {
           // Empty
         }

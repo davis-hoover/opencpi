@@ -18,9 +18,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <OcpiUtilUri.h>
+#include "UtilUri.hh"
 #include <OcpiUtilHttpFs.h>
-#include <OcpiUtilTcpConnector.h>
+#include "UtilTcpConnector.hh"
 #include <OcpiUtilFileFs.h>
 #include <OcpiUtilUriFs.h>
 #include "OsFileSystem.hh"

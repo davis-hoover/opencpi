@@ -52,8 +52,7 @@ namespace OCPI {
        *         systems.
        */
 
-      bool nativeByteorder ()
-        throw ();
+      bool nativeByteorder ();
 
       /**
        * Copy 2 octets in reverse order, thus changing the byteorder.
@@ -64,8 +63,7 @@ namespace OCPI {
        * \pre \a pdest and \a psrc must not overlap.
        */
 
-      void copyswap2 (char * pdest, const char * psrc)
-        throw ();
+      void copyswap2 (char * pdest, const char * psrc);
 
       /**
        * Copy 4 octets in reverse order, thus changing the byteorder.
@@ -76,8 +74,7 @@ namespace OCPI {
        * \pre \a pdest and \a psrc must not overlap.
        */
 
-      void copyswap4 (char * pdest, const char * psrc)
-        throw ();
+      void copyswap4 (char * pdest, const char * psrc);
 
       /**
        * Copy 8 octets in reverse order, thus changing the byteorder.
@@ -88,8 +85,7 @@ namespace OCPI {
        * \pre \a pdest and \a psrc must not overlap.
        */
 
-      void copyswap8 (char * pdest, const char * psrc)
-        throw ();
+      void copyswap8 (char * pdest, const char * psrc);
 
       /**
        * \brief CDR Encoder
@@ -104,8 +100,7 @@ namespace OCPI {
          * Constructor.
          */
 
-        Encoder ()
-          throw ();
+        Encoder ();
 
         /**
          * Add padding so that the following data is aligned with respect
@@ -114,8 +109,7 @@ namespace OCPI {
          * \param[in] mod The modulus to align to.
          */
 
-        void align (unsigned long mod)
-          throw ();
+        void align (unsigned long mod);
 
         /**
          * \name Marshalling data.
@@ -129,8 +123,7 @@ namespace OCPI {
          * \param[in] value A boolean value.
          */
 
-        void putBoolean (bool value)
-          throw ();
+        void putBoolean (bool value);
 
         /**
          * Marshal an octet value.
@@ -138,8 +131,7 @@ namespace OCPI {
          * \param[in] value An octet value.
          */
 
-        void putOctet (unsigned char value)
-          throw ();
+        void putOctet (unsigned char value);
 
         /**
          * Marshal a CORBA::UShort value.  Padding is added if necessary.
@@ -147,8 +139,7 @@ namespace OCPI {
          * \param[in] value A CORBA::UShort value.
          */
 
-        void putUShort (OCPI::OS::uint16_t value)
-          throw ();
+        void putUShort (OCPI::OS::uint16_t value);
 
         /**
          * Marshal a CORBA::ULong value.  Padding is added if necessary.
@@ -156,10 +147,8 @@ namespace OCPI {
          * \param[in] value A CORBA::ULong value.
          */
 
-        void putULong (OCPI::OS::uint32_t value)
-          throw ();
-        void putLong (OCPI::OS::int32_t value)
-          throw ();
+        void putULong (OCPI::OS::uint32_t value);
+        void putLong (OCPI::OS::int32_t value);
         
         /**
          * Marshal a CORBA::ULongLong value.  Padding is added if necessary.
@@ -167,8 +156,7 @@ namespace OCPI {
          * \param[in] value A CORBA::ULongLong value.
          */
 
-        void putULongLong (OCPI::OS::uint64_t value)
-          throw ();
+        void putULongLong (OCPI::OS::uint64_t value);
 
         /**
          * Marshal a CORBA string.
@@ -176,8 +164,7 @@ namespace OCPI {
          * \param[in] value A string.
          */
 
-        void putString (const std::string & value)
-          throw ();
+        void putString (const std::string & value);
 
         /**
          * Marshal a sequence&lt;octet&gt;.
@@ -185,8 +172,7 @@ namespace OCPI {
          * \param[in] value An octet sequence.
          */
 
-        void putOctetSeq (const std::string & value)
-          throw ();
+        void putOctetSeq (const std::string & value);
 
         //@}
 
@@ -202,8 +188,7 @@ namespace OCPI {
          * the stream itself.)
          */
 
-        const std::string & data () const
-          throw ();
+        const std::string & data () const;
 
       protected:
         std::string m_data;
@@ -234,8 +219,7 @@ namespace OCPI {
          * object, as no copy is made.
          */
 
-        Decoder (const void * data, unsigned long size)
-          throw ();
+        Decoder (const void * data, unsigned long size);
 
         /**
          * Constructor.
@@ -246,8 +230,7 @@ namespace OCPI {
          * object, as no copy is made.
          */
 
-        Decoder (const std::string & data)
-          throw ();
+        Decoder (const std::string & data);
 
         /**
          * Get the current byteorder value.
@@ -256,8 +239,7 @@ namespace OCPI {
          *         little-endian, false for big-endian.
          */
 
-        bool byteorder () const
-          throw ();
+        bool byteorder () const;
 
         /**
          * Set the byteorder for unmarshalling.  If this is different
@@ -268,8 +250,7 @@ namespace OCPI {
          *               false for big-endian.
          */
 
-        void byteorder (bool bo)
-          throw ();
+        void byteorder (bool bo);
 
         /**
          * Skip data so that the following data is aligned with respect
@@ -278,8 +259,7 @@ namespace OCPI {
          * \param[in] mod The modulus to align to.
          */
 
-        void align (unsigned long mod)
-          throw ();
+        void align (unsigned long mod);
 
         /**
          * Returns the remaining number of octets in the buffer.
@@ -293,8 +273,7 @@ namespace OCPI {
          * \return The number of octets left in the buffer.
          */
 
-        unsigned long remainingData () const
-          throw ();
+        unsigned long remainingData () const;
 
         /**
          * \name Unmarshalling data.
@@ -407,7 +386,7 @@ inline
 void
 OCPI::Util::CDR::
 copyswap2 (char * pdest, const char * psrc)
-  throw ()
+
 {
   *pdest++ = psrc[1];
   *pdest = psrc[0];
@@ -417,7 +396,7 @@ inline
 void
 OCPI::Util::CDR::
 copyswap4 (char * pdest, const char * psrc)
-  throw ()
+
 {
   psrc += 3;
   *pdest++ = *psrc--;
@@ -430,7 +409,7 @@ inline
 void
 OCPI::Util::CDR::
 copyswap8 (char * pdest, const char * psrc)
-  throw ()
+
 {
   copyswap4 (pdest, psrc+4);
   copyswap4 (pdest+4, psrc);

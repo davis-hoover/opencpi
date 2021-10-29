@@ -24,6 +24,7 @@
 #pragma GCC diagnostic ignored "-Wfloat-equal"
 namespace OA = OCPI::API;
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 #define OCPI_OPTIONS_HELP \
   "Usage syntax is: ocpiexpr [options] expression\n" \
   "This command evaluates the expression, with the provided variables and result type.\n"
@@ -31,7 +32,7 @@ namespace OU = OCPI::Util;
 #define OCPI_OPTIONS \
   CMD_OPTION(loglevel,      l,   UChar,  "0",    "The logging level to be used during operation")
 
-#include "CmdOption.hh"
+#include "BaseOption.hh"
 
 template <typename VT> void
 printType(const VT val) {
@@ -56,7 +57,7 @@ printType<double>(double val) {
 template <typename VT> void
 doVType(OA::Application &app, OA::BaseType t, const char *name, const char *desc, VT val,
 	OA::AccessList &list) {
-  printf("=========== Setting %s %s value(", desc, OU::baseTypeNames[t]);
+  printf("=========== Setting %s %s value(", desc, OB::baseTypeNames[t]);
   printType(val);  
   printf(")\n");
   try {

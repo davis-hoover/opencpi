@@ -31,7 +31,7 @@
  *                  Initial version.
  */
 
-#include <OcpiUtilTcpStream.h>
+#include "UtilTcpStream.hh"
 #include "OsAssert.hh"
 #include "OsSocket.hh"
 #include <streambuf>
@@ -209,7 +209,7 @@ xsputn (const char * s, std::streamsize n)
  */
 
 OCPI::Util::Tcp::Stream::Stream ()
-  throw ()
+
   : std::iostream (0)
 {
   this->init (&m_buf);
@@ -218,7 +218,7 @@ OCPI::Util::Tcp::Stream::Stream ()
 
 OCPI::Util::Tcp::Stream::Stream (OCPI::OS::Socket & sock,
                                 std::ios_base::openmode mode)
-  throw (std::string)
+
   : std::iostream (0)
 {
   this->init (&m_buf);
@@ -227,7 +227,7 @@ OCPI::Util::Tcp::Stream::Stream (OCPI::OS::Socket & sock,
 }
 
 OCPI::Util::Tcp::Stream::~Stream ()
-  throw ()
+
 {
   if (m_mode) {
     close ();
@@ -237,7 +237,7 @@ OCPI::Util::Tcp::Stream::~Stream ()
 void
 OCPI::Util::Tcp::Stream::setSocket (OCPI::OS::Socket & sock,
                                    std::ios_base::openmode mode)
-  throw (std::string)
+
 {
   if (!mode) {
     throw std::string ("invalid mode");
@@ -250,7 +250,7 @@ OCPI::Util::Tcp::Stream::setSocket (OCPI::OS::Socket & sock,
 
 void
 OCPI::Util::Tcp::Stream::linger (bool opt)
-  throw (std::string)
+
 {
   if (!m_mode) {
     throw std::string ("not connected");
@@ -261,7 +261,7 @@ OCPI::Util::Tcp::Stream::linger (bool opt)
 OCPI::Util::Tcp::Stream *
 OCPI::Util::Tcp::Stream::dup (bool shutdownWhenClosed,
                              std::ios_base::openmode shutdownMode)
-  throw (std::string)
+
 {
   if (!m_mode) {
     throw std::string ("not connected");
@@ -276,7 +276,7 @@ OCPI::Util::Tcp::Stream::dup (bool shutdownWhenClosed,
 
 void
 OCPI::Util::Tcp::Stream::shutdown (std::ios_base::openmode mode)
-  throw (std::string)
+
 {
   if (!m_mode) {
     throw std::string ("not connected");
@@ -296,7 +296,7 @@ OCPI::Util::Tcp::Stream::shutdown (std::ios_base::openmode mode)
 
 void
 OCPI::Util::Tcp::Stream::close ()
-  throw (std::string)
+
 {
   if (!m_mode) {
     throw std::string ("not connected");
@@ -312,7 +312,7 @@ OCPI::Util::Tcp::Stream::close ()
 
 unsigned int
 OCPI::Util::Tcp::Stream::getPortNo ()
-  throw (std::string)
+
 {
   if (!m_mode) {
     throw std::string ("not connected");
@@ -323,7 +323,7 @@ OCPI::Util::Tcp::Stream::getPortNo ()
 
 void
 OCPI::Util::Tcp::Stream::getPeerName (std::string & host, uint16_t & port)
-  throw (std::string)
+
 { 
   if (!m_mode) {
     throw std::string ("not connected");

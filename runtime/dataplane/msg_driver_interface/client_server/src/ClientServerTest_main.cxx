@@ -26,7 +26,7 @@
 #include <OcpiTransportServer.h>
 #include <OcpiMessageEndpoint.h>
 #include <OcpiRDTInterface.h>
-#include <OcpiThread.h>
+#include "UtilThread.hh"
 #include <OcpiBuffer.h>
 
 

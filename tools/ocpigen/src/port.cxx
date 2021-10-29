@@ -72,7 +72,7 @@ Port(Worker &w, ezxml_t x, Port *sp, int nameOrdinal, WIPType type, const char *
       return;
     }
     if ((err = OE::getBoolean(m_xml, "master", &m_master)) ||
-	(err = OU::getExprNumber(m_xml, "count", m_arrayCount, NULL, m_countExpr, &w)))
+	(err = OB::getExprNumber(m_xml, "count", m_arrayCount, NULL, m_countExpr, &w)))
       return;
     m_ordinal = w.m_ports.size();
   }
@@ -126,7 +126,7 @@ parse() {
 }
 
 const char *Port::
-resolveExpressions(OU::IdentResolver &ir) {
+resolveExpressions(OB::IdentResolver &ir) {
   return m_countExpr.length() ?
     parseExprNumber(m_countExpr.c_str(), m_arrayCount, NULL, &ir) : NULL;
 }

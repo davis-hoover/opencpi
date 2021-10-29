@@ -37,7 +37,7 @@
 #include <string>
 #include <map>
 #include <ctime>
-#include "OcpiUtilMisc.h"
+#include "UtilMisc.hh"
 
 namespace OCPI {
   namespace Util {
@@ -68,8 +68,7 @@ namespace OCPI {
        *           Returns false otherwise.
        */
 
-      bool isToken (const std::string & str)
-        throw ();
+      bool isToken (const std::string & str);
 
       /**
        * Parse a HTTP date/time stamp.
@@ -81,8 +80,7 @@ namespace OCPI {
        * rule for <em>HTTP-date</em>.
        */
 
-      std::time_t parseHttpDate (const std::string & str)
-        throw (std::string);
+      std::time_t parseHttpDate (const std::string & str);
 
       /**
        * Create a date/time stamp string suitable for use in the HTTP
@@ -92,8 +90,7 @@ namespace OCPI {
        * \return A <em>HTTP-date</em> encoded string.
        */
 
-      std::string makeHttpDate (std::time_t ts)
-        throw (std::string);
+      std::string makeHttpDate (std::time_t ts);
 
       /*
        * Create a date/time stamp string, representing the current time,
@@ -102,8 +99,7 @@ namespace OCPI {
        * \return A <em>HTTP-date</em> encoded string.
        */
 
-      std::string getHttpTimestamp ()
-        throw ();
+      std::string getHttpTimestamp ();
 
     }
   }

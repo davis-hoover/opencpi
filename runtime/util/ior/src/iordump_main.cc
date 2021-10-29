@@ -23,9 +23,9 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include "OcpiUtilIOP.h"
-#include "OcpiUtilIIOP.h"
-#include "OcpiUtilMisc.h"
+#include "UtilIOP.hh"
+#include "UtilIIOP.hh"
+#include "UtilMisc.hh"
 
 #if !defined (NDEBUG)
 #include "OsDebug.hh"

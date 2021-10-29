@@ -31,9 +31,10 @@ namespace OCPI {
     namespace Sim {
       namespace OS = OCPI::OS;
       namespace OU = OCPI::Util;
+      namespace OB = OCPI::Base;
       namespace OE = OCPI::OS::Ether;
       namespace OH = OCPI::HDL;
-      
+
       class Device
 	: public OCPI::HDL::Net::Device {
 	friend class Driver;
@@ -41,7 +42,7 @@ namespace OCPI {
 	bool m_sdpConnected;
       protected:
 	Device(Driver &driver, OS::Ether::Interface &ifc, std::string &a_name,
-	       OE::Address a_addr, bool discovery, const OU::PValue *params, std::string &error)
+	       OE::Address a_addr, bool discovery, const OB::PValue *params, std::string &error)
 	  : Net::Device(driver, ifc, a_name, a_addr, discovery, "ocpi-udp-rdma", 10000,
 			OH::SDP::Header::max_addressable_bytes * OH::SDP::Header::max_nodes,
 			0, OH::SDP::Header::max_addressable_bytes, params, error),
@@ -280,7 +281,7 @@ namespace OCPI {
       }
       Net::Device *Driver::
       createDevice(OS::Ether::Interface &ifc, OS::Ether::Address &addr, bool discovery,
-		   const OU::PValue *params, std::string &error) {
+		   const OB::PValue *params, std::string &error) {
 	std::string name("sim:");
 	name += addr.pretty();
 	Device *d = new Device(*this, ifc, name, addr, discovery, params, error);

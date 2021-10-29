@@ -34,7 +34,7 @@
  *
  */
 
-#include <OcpiUtilTcpStream.h>
+#include "UtilTcpStream.hh"
 #include "OsServerSocket.hh"
 
 namespace OCPI {
@@ -54,8 +54,7 @@ namespace OCPI {
          * \post The server socket is unbound.
          */
 
-        Server ()
-          throw ();
+        Server ();
 
         /**
          * Constructor.
@@ -72,15 +71,13 @@ namespace OCPI {
          * \post The server socket is bound.
          */
 
-        Server (uint16_t portno, bool reuse = false)
-          throw (std::string);
+        Server (uint16_t portno, bool reuse = false);
 
         /**
          * Destructor.  Calls close().
          */
 
-        ~Server ()
-          throw ();
+        ~Server ();
 
         /**
          * Bind the socket.
@@ -108,8 +105,7 @@ namespace OCPI {
          * \post The server socket is bound.
          */
 
-        void bind (uint16_t portno = 0, bool reuse = false)
-          throw (std::string);
+        void bind (uint16_t portno = 0, bool reuse = false);
 
         /**
          * Wait for and accept a new connection.
@@ -128,8 +124,7 @@ namespace OCPI {
          * \pre The server socket is bound.
          */
 
-        OCPI::Util::Tcp::Stream * accept (unsigned long timeout = static_cast<unsigned long> (-1))
-          throw (std::string);
+        OCPI::Util::Tcp::Stream * accept (unsigned long timeout = static_cast<unsigned long> (-1));
 
         /**
          * The port number that this server socket is bound to.  Returns
@@ -141,8 +136,7 @@ namespace OCPI {
          * \pre The server socket is bound.
          */
 
-        uint16_t getPortNo ()
-          throw (std::string);
+        uint16_t getPortNo ();
 
         /**
          * Close the server socket.
@@ -154,8 +148,7 @@ namespace OCPI {
          * \post The server socket is unbound.
          */
 
-        void close ()
-          throw (std::string);
+        void close ();
 
       private:
         bool m_open;

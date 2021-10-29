@@ -32,10 +32,9 @@
 #include <glob.h>
 #include "OsEther.hh"
 #include "OsFileSystem.hh"
-#include "OcpiUtilException.h"
-#include "OcpiUtilUUID.h"
-#include "OcpiUtilMisc.h"
-#include "UtilValue.hh"
+#include "UtilException.hh"
+#include "UtilUUID.hh"
+#include "UtilMisc.hh"
 
 /*
  * ----------------------------------------------------------------------
@@ -52,7 +51,8 @@ namespace {
 
 namespace OE = OCPI::OS::Ether;
 namespace OCPI {
-  namespace Util {
+namespace Util {
+
 std::string
 integerToString (int value)
 {
@@ -571,8 +571,7 @@ file2String(std::string &out, const char *file, const char *start, const char *m
       char *cp = buf;
       if (initial) {
 	// Trim initial white space
-	for (; n && isspace(*cp) && *cp != '\n'; n--, cp++)
-	  ;
+	for (; n && isspace(*cp) && *cp != '\n'; n--, cp++)	  ;
 	if (n) {
 	  initial = false;
 	  if (start)
@@ -841,7 +840,6 @@ unparseChar(std::string &s, char argVal, bool hex) {
 // Encode for embedding in single quotes, adding to the "out" argument.
 void
 encodeXmlAttrSingle(const std::string &s, std::string &out, bool raw) {
-  Unparser up;
   const char *cp = s.data();
   for (size_t n = s.length(); n; n--, cp++) {
     if (*cp == '\'')
@@ -849,7 +847,7 @@ encodeXmlAttrSingle(const std::string &s, std::string &out, bool raw) {
     else if (*cp == '&')
       out += "&amp;";
     else if (raw)
-      up.unparseChar(out, *cp, true);
+      unparseChar(out, *cp, true);
     else
       out += *cp;
   }
@@ -1128,5 +1126,136 @@ getCDK() {
   }
   return s_cdk;
 }
+// cp points after slash at the 'x'
+// leave cp on last char used if no error
+static bool
+hex(const char *&cp, const char *end, char &vp) {
+  if (cp < --end) { // end is now last, not past last
+    char c = *++cp;      // must have one more to be valid
+    if (isxdigit(c)) {
+      unsigned n;
+      n = isdigit(c) ? OCPI_CHAR_DIFF(c, '0') : OCPI_CHAR_DIFF(tolower(c), 'a') + 10;
+      if (cp < end && isxdigit(cp[1])) {
+	n <<= 4;
+	c = *++cp;
+	n += isdigit(c) ? OCPI_CHAR_DIFF(c, '0') : OCPI_CHAR_DIFF(tolower(c), 'a') + 10;
+      }
+      vp = (char)(n);
+      return false;
+    }
+  }
+  return true;
+}
+
+// cp points after slash at the 'd'
+// leave cp on last char used if no error
+static bool
+decimal(const char *&cp, const char *end, char &vp, bool isSigned) {
+  if (cp < --end) { // end is now last, not past last
+    char c = *++cp;      // must have one more to be valid
+    bool minus = false;
+    if (isSigned && c == '-') {
+      if (cp >= end)
+	return true;
+      minus = true;
+      c = *++cp;
+    }
+    if (isdigit(c)) {
+      int n = c - '0';
+      if (cp < end && isdigit(cp[1])) {
+	n *= 10;
+	n += *++cp - '0';
+	if (cp < end && isdigit(cp[1])) {
+	  n *= 10;
+	  n += *++cp - '0';
+	  if (n > (minus ? 128 : (isSigned ? 127 : 255)))
+	    return true;
+	}	    
+      }
+      vp = (char)(minus ? -n : n);
+      return false;
+    }
+  }
+  return true;
+}
+
+// cp points after slash to an octal digit - 1, 2 or 3 octal digits
+// leave cp on last char used if no error
+static bool
+octal(const char *&cp, const char *end, char &vp) {
+  char c = *cp;
+  unsigned n = OCPI_CHAR_DIFF(c, '0');
+  if (cp < --end) { // end is now the last, not past the last
+    c = cp[1];
+    if (isdigit(c) && c <= '7') {
+      cp++;
+      n <<= 3;
+      n += OCPI_CHAR_DIFF(c, '0');
+      if (cp < end) {
+	c = cp[1];
+	if (isdigit(c) && c <= '7') {
+	  cp++;
+	  n <<= 3;
+	  n += OCPI_CHAR_DIFF(c, '0');
+	  if (n > 0xff)
+	    return true;
+	}
+      }
+    }
+  }
+  vp = (char)n;
+  return false;
+}
+
+// We implement the defined escapes (in IDL, and C/C++), and we make sure
+// escaping commas and braces works too
+// We advance cp over the char
+bool
+parseOneChar(const char *&cp, const char *end, char &vp) {
+  if (!*cp || cp == end)
+    return true;
+  if (*cp != '\\' || cp + 1 >= end) {
+    vp = *cp++;
+    return false;
+  }
+  switch (*++cp) {
+  case 'n': vp = '\n'; break;
+  case 't': vp = '\t'; break;
+  case 'v': vp = '\v'; break;
+  case 'b': vp = '\b'; break;
+  case 'r': vp = '\r'; break;
+  case 'f': vp = '\f'; break;
+  case 'a': vp = '\a'; break;
+  case 'd':
+    if (decimal(cp, end, vp, true))
+      return true;
+    break;
+  case 'u':
+    if (decimal(cp, end, vp, false))
+      return true;
+    break;
+  case 'x':
+    if (hex(cp, end, vp))
+      return true;
+    break;
+  case '0': case '1': case '2': case '3': 
+  case '4': case '5': case '6': case '7':
+    if (octal(cp, end, vp))
+      return true;
+    break;
+  case '\\':
+  case '?':
+  case '\'':
+  case '\"':
+  case ',': case '{': case '}': case ' ':// these are ours, not from C/C++/IDL
+    vp = *cp;
+    break;
+  default:
+    return true;
+  }
+  cp++;
+  return false;
+}
+
 } // Util
 } // OCPI

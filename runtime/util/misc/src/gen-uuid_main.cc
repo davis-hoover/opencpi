@@ -21,7 +21,7 @@
 #include <iostream>
 #include <cstring>
 #include "OsDebug.hh"
-#include "OcpiUtilUUID.h"
+#include "UtilUUID.hh"
 
 static
 int

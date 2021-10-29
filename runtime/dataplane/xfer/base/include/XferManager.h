@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 #include "OsMutex.hh"
-#include "OcpiDriverManager.h"
+#include "BasePluginManager.hh"
 #include "XferException.h"
 #include "XferFactory.h"
 
@@ -35,7 +35,7 @@ namespace DataTransfer {
   // This is the transfer driver (XferFactory) manager
   extern const char *xfer;
   class XferManager :
-    public OCPI::Driver::ManagerBase<XferManager, XferFactory, xfer>,
+    public OCPI::Base::Plugin::ManagerBase<XferManager, XferFactory, xfer>,
     public FactoryConfig
   {
     friend class XferFactory;

@@ -63,8 +63,7 @@ namespace OCPI {
        * Initialize an empty URI.
        */
 
-      Uri ()
-        throw ();
+      Uri ();
 
       /**
        * Constructor.
@@ -76,8 +75,7 @@ namespace OCPI {
        * \throw std::string If \a can not be parsed as a URI.
        */
 
-      explicit Uri (const char * str)
-        throw (std::string);
+      explicit Uri (const char * str);
 
       /**
        * Constructor.
@@ -89,8 +87,7 @@ namespace OCPI {
        * \throw std::string If \a can not be parsed as a URI.
        */
 
-      explicit Uri (const std::string & str)
-        throw (std::string);
+      explicit Uri (const std::string & str);
 
       /**
        * Copy constructor.
@@ -98,8 +95,7 @@ namespace OCPI {
        * \param[in] other Another Uri object.
        */
 
-      Uri (const Uri & other)
-        throw ();
+      Uri (const Uri & other);
 
       /**
        * \name Assignment operators.
@@ -118,8 +114,7 @@ namespace OCPI {
        * \throw std::string If \a can not be parsed as a URI.
        */
 
-      Uri & operator= (const char * str)
-        throw (std::string);
+      Uri & operator= (const char * str);
 
       /**
        * Assignment operator.  Re-initializes the Uri from a string.
@@ -130,8 +125,7 @@ namespace OCPI {
        * \throw std::string If \a can not be parsed as a URI.
        */
 
-      Uri & operator= (const std::string & str)
-        throw (std::string);
+      Uri & operator= (const std::string & str);
 
       /**
        * Assignment operator.  Copies another Uri.
@@ -140,8 +134,7 @@ namespace OCPI {
        * \return *this
        */
 
-      Uri & operator= (const Uri & other)
-        throw ();
+      Uri & operator= (const Uri & other);
 
       //@}
 
@@ -172,8 +165,7 @@ namespace OCPI {
        * \pre isAbsolute() is true.
        */
 
-      Uri & operator+= (const char * str)
-        throw (std::string);
+      Uri & operator+= (const char * str);
 
       /**
        * Addition operator.  If \a str is an absolute URI, then \a str
@@ -191,8 +183,7 @@ namespace OCPI {
        * \pre isAbsolute() is true.
        */
 
-      Uri & operator+= (const std::string & str)
-        throw (std::string);
+      Uri & operator+= (const std::string & str);
 
       /**
        * Addition operator.  If \a other is an absolute URI, then \a other
@@ -209,8 +200,7 @@ namespace OCPI {
        * \pre isAbsolute() is true.
        */
 
-      Uri & operator+= (const Uri & other)
-        throw (std::string);
+      Uri & operator+= (const Uri & other);
 
       //@}
 
@@ -224,15 +214,13 @@ namespace OCPI {
        * \return True if the URI is absolute, false otherwise.
        */
 
-      bool isAbsolute () const
-        throw ();
+      bool isAbsolute () const;
 
       /**
        * \return True if the URI is relative, false otherwise.
        */
 
-      bool isRelative () const
-        throw ();
+      bool isRelative () const;
 
       //@}
 
@@ -246,8 +234,7 @@ namespace OCPI {
        * \return The entire URI.
        */
 
-      const std::string & get () const
-        throw ();
+      const std::string & get () const;
 
       /**
        * Return the scheme component of the URI, i.e., the string before
@@ -257,8 +244,7 @@ namespace OCPI {
        * \return The scheme component of the URI.
        */
 
-      const std::string & getScheme () const
-        throw ();
+      const std::string & getScheme () const;
 
       /**
        * Return the request component of the URI, i.e., everything
@@ -270,8 +256,7 @@ namespace OCPI {
        * did not contain a request component.
        */
 
-      const std::string & getRequest () const
-        throw ();
+      const std::string & getRequest () const;
 
       /**
        * Return the path component of the URI, i.e., the string
@@ -281,8 +266,7 @@ namespace OCPI {
        * empty string.
        */
 
-      const std::string & getPath () const
-        throw ();
+      const std::string & getPath () const;
 
       /**
        * Return the file name component of the URI, i.e., the last
@@ -293,8 +277,7 @@ namespace OCPI {
        * empty string.
        */
 
-      const std::string & getFileName () const
-        throw ();
+      const std::string & getFileName () const;
 
       /**
        * Return the query component of the URI, i.e., the string
@@ -304,8 +287,7 @@ namespace OCPI {
        * empty string.
        */
 
-      const std::string & getQuery () const
-        throw ();
+      const std::string & getQuery () const;
 
       /**
        * Return the authority component of the URI.  This is the
@@ -318,8 +300,7 @@ namespace OCPI {
        * \pre isAbsolute() is true.
        */
 
-      const std::string & getAuthority () const
-        throw ();
+      const std::string & getAuthority () const;
 
       /**
        * Return the userinfo component of the URI, which is the part
@@ -329,8 +310,7 @@ namespace OCPI {
        * empty string.
        */
 
-      const std::string & getUserinfo () const
-        throw ();
+      const std::string & getUserinfo () const;
 
       /**
        * Return the hostport component of the URI, which is the part
@@ -347,8 +327,7 @@ namespace OCPI {
        * \pre isAbsolute() is true.
        */
 
-      const std::string & getHostport () const
-        throw ();
+      const std::string & getHostport () const;
 
       /**
        * Return the host component of the URI, which is the part
@@ -360,8 +339,7 @@ namespace OCPI {
        * \pre isAbsolute() is true.
        */
 
-      const std::string & getHost () const
-        throw ();
+      const std::string & getHost () const;
 
       /**
        * Return the port component of the URI, which is the part
@@ -373,8 +351,7 @@ namespace OCPI {
        * empty string.
        */
 
-      const std::string & getPort () const
-        throw ();
+      const std::string & getPort () const;
 
       /**
        * Return the fragment component of the URI, i.e., the string
@@ -384,8 +361,7 @@ namespace OCPI {
        * empty string.
        */
 
-      const std::string & getFragment () const
-        throw ();
+      const std::string & getFragment () const;
 
       //@}
 
@@ -399,8 +375,7 @@ namespace OCPI {
        * \return The number of segments in the URI path component.
        */
 
-      unsigned int getNumPathSegments () const
-        throw ();
+      unsigned int getNumPathSegments () const;
 
       /**
        * \param[in] n The index of the desired path segment.
@@ -410,8 +385,7 @@ namespace OCPI {
        * \pre \a n &lt; getNumPathSegments()
        */
 
-      std::string getPathSegment (unsigned int n) const
-        throw ();
+      std::string getPathSegment (unsigned int n) const;
 
       //@}
 
@@ -431,8 +405,7 @@ namespace OCPI {
        * unescaped character.
        */
 
-      static std::string decode (const char * str)
-        throw (std::string);
+      static std::string decode (const char * str);
 
       /**
        * Escape-decodes a string.
@@ -444,8 +417,7 @@ namespace OCPI {
        * unescaped character.
        */
 
-      static std::string decode (const std::string & str)
-        throw (std::string);
+      static std::string decode (const std::string & str);
 
       /**
        * Escape-encodes a string.
@@ -462,8 +434,7 @@ namespace OCPI {
        */
 
       static std::string encode (const char * str,
-                                 const char * allowedChars = 0)
-        throw (std::string);
+                                 const char * allowedChars = 0);
 
       /**
        * Escape-encodes a string.
@@ -480,8 +451,7 @@ namespace OCPI {
        */
 
       static std::string encode (const std::string & str,
-                                 const char * allowedChars = 0)
-        throw (std::string);
+                                 const char * allowedChars = 0);
 
       /**
        * Escape-encodes a string.
@@ -498,8 +468,7 @@ namespace OCPI {
        */
 
       static std::string encode (const std::string & str,
-                                 const std::string & allowedChars)
-        throw (std::string);
+                                 const std::string & allowedChars);
 
       //@}
 
@@ -523,8 +492,7 @@ namespace OCPI {
       static bool isPrefix (const std::string & fullURI,
                             const std::string & baseURI,
                             std::string * prefix = 0,
-                            std::string * tail = 0)
-        throw ();
+                            std::string * tail = 0);
 
       /**
        * \name RFC 2396 Character set helpers.
@@ -537,84 +505,84 @@ namespace OCPI {
        * \return True if \a c is part of the <em>alpha</em> character set.
        */
 
-      static bool isalpha (char c) throw ();
+      static bool isalpha (char c);
 
       /**
        * \param[in] c A character.
        * \return True if \a c is part of the <em>digit</em> character set.
        */
 
-      static bool isdigit (char c) throw ();
+      static bool isdigit (char c);
 
       /**
        * \param[in] c A character.
        * \return True if \a c is part of the <em>alphanum</em> character set.
        */
 
-      static bool isalphanum (char c) throw ();
+      static bool isalphanum (char c);
 
       /**
        * \param[in] c A character.
        * \return True if \a c is part of the <em>uric</em> character set.
        */
 
-      static bool isuric (char c) throw ();
+      static bool isuric (char c);
 
       /**
        * \param[in] c A character.
        * \return True if \a c is part of the <em>reserved</em> character set.
        */
 
-      static bool isreserved (char c) throw ();
+      static bool isreserved (char c);
 
       /**
        * \param[in] c A character.
        * \return True if \a c is part of the <em>unreserved</em> character set.
        */
 
-      static bool isunreserved (char c) throw ();
+      static bool isunreserved (char c);
 
       /**
        * \param[in] c A character.
        * \return True if \a c is part of the <em>mark</em> character set.
        */
 
-      static bool ismark (char c) throw ();
+      static bool ismark (char c);
 
       /**
        * \param[in] c A character.
        * \return True if \a c is part of the <em>hex</em> character set.
        */
 
-      static bool ishex (char c) throw ();
+      static bool ishex (char c);
 
       /**
        * \param[in] c A character.
        * \return True if \a c is part of the <em>control</em> character set.
        */
 
-      static bool iscontrol (char c) throw ();
+      static bool iscontrol (char c);
 
       /**
        * \param[in] c A character.
        * \return True if \a c is part of the <em>space</em> character set.
        */
 
-      static bool isspace (char c) throw ();
+      static bool isspace (char c);
 
       /**
        * \param[in] c A character.
        * \return True if \a c is part of the <em>delim</em> character set.
        */
 
-      static bool isdelim (char c) throw ();
+      static bool isdelim (char c);
 
       /**
        * \param[in] c A character.
        * \return True if \a c is part of the <em>unwise</em> character set.
        */
 
-      static bool isunwise (char c) throw ();
+      static bool isunwise (char c);
 
       //@}
 
@@ -625,14 +593,11 @@ namespace OCPI {
     private:
       /** \cond */
 
-      void parse (const std::string &)
-        throw (std::string);
+      void parse (const std::string &);
 
-      void resolve (const Uri &)
-        throw (std::string);
+      void resolve (const Uri &);
 
-      static std::string normalizePath (const std::string &)
-        throw ();
+      static std::string normalizePath (const std::string &);
 
       /** \endcond */
 
@@ -662,35 +627,35 @@ namespace OCPI {
 
 inline bool
 OCPI::Util::Uri::isalpha (char c)
-  throw ()
+
 {
   return (std::isalpha (c) ? true : false);
 }
 
 inline bool
 OCPI::Util::Uri::isdigit (char c)
-  throw ()
+
 {
   return (std::isdigit (c) ? true : false);
 }
 
 inline bool
 OCPI::Util::Uri::ishex (char c)
-  throw ()
+
 {
   return (std::isxdigit (c) ? true : false);
 }
 
 inline bool
 OCPI::Util::Uri::isalphanum (char c)
-  throw ()
+
 {
   return (std::isalnum (c) ? true : false);
 }
 
 inline bool
 OCPI::Util::Uri::isreserved (char c)
-  throw ()
+
 {
   switch (c) {
   case ';':
@@ -711,7 +676,7 @@ OCPI::Util::Uri::isreserved (char c)
 
 inline bool
 OCPI::Util::Uri::ismark (char c)
-  throw ()
+
 {
   switch (c) {
   case '-':
@@ -731,35 +696,35 @@ OCPI::Util::Uri::ismark (char c)
 
 inline bool
 OCPI::Util::Uri::isunreserved (char c)
-  throw ()
+
 {
   return isalphanum (c) || ismark (c);
 }
 
 inline bool
 OCPI::Util::Uri::isuric (char c)
-  throw ()
+
 {
   return isreserved (c) || isunreserved (c) || (c == '%');
 }
 
 inline bool
 OCPI::Util::Uri::iscontrol (char c)
-  throw ()
+
 {
   return (c <= 0x1f) || (c == 0x7f);
 }
 
 inline bool
 OCPI::Util::Uri::isspace (char c)
-  throw ()
+
 {
   return (c == 0x20);
 }
 
 inline bool
 OCPI::Util::Uri::isdelim (char c)
-  throw ()
+
 {
   switch (c) {
   case '<':
@@ -775,7 +740,7 @@ OCPI::Util::Uri::isdelim (char c)
 
 inline bool
 OCPI::Util::Uri::isunwise (char c)
-  throw ()
+
 {
   switch (c) {
   case '{':

@@ -25,7 +25,7 @@
 #endif
 #ifdef __cplusplus
 #include <string>
-#include "UtilPValue.hh"
+#include "BasePValue.hh"
 #include "HdlDevice.h"
 
 
@@ -56,10 +56,10 @@ namespace OCPI {
 	//	void *
 	//	map(uint32_t size, uint64_t &base, std::string &error);
 	unsigned
-	  search(const OCPI::Util::PValue *props, const char **exclude, bool discoveryOnly,
+	  search(const OCPI::Base::PValue *props, const char **exclude, bool discoveryOnly,
 		 std::string &error);
 	OCPI::HDL::Device *
-        open(const char *pciName, const OCPI::Util::PValue *params, std::string &err);
+        open(const char *pciName, const OCPI::Base::PValue *params, std::string &err);
 	// Callback when found
 	virtual bool found(OCPI::HDL::Device &dev, const char **excludes, bool discoveryOnly,
 			   std::string &error) = 0;

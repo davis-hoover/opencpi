@@ -143,8 +143,7 @@ namespace OCPI {
          * empty set of profiles.
          */
 
-        IOR ()
-          throw ();
+        IOR ();
 
         /**
          * Constructor from encapsulated data.
@@ -155,8 +154,7 @@ namespace OCPI {
          * \a data.
          */
 
-        explicit IOR (const std::string & data)
-          throw (std::string);
+        explicit IOR (const std::string & data);
 
         /**
          * Constructor from stringified IOR
@@ -166,8 +164,7 @@ namespace OCPI {
          * \throw std::string If the IOR can not be unmarshalled from
          * \a data.
          */
-        explicit IOR (const char *data)
-          throw (std::string);
+        explicit IOR (const char *data);
 
         /**
          * Copy constructor.
@@ -175,8 +172,7 @@ namespace OCPI {
          * \param[in] other Another IOR.
          */
 
-        IOR (const IOR & other)
-          throw ();
+        IOR (const IOR & other);
 
         /**
          * Assignment operator.
@@ -185,8 +181,7 @@ namespace OCPI {
          * \return *this
          */
 
-        IOR & operator= (const IOR & other)
-          throw ();
+        IOR & operator= (const IOR & other);
 
         /**
          * Assign from CDR-encapsulated data.
@@ -199,8 +194,7 @@ namespace OCPI {
          * \note Equivalent to operator= (IOR (data)).
          */
 
-        void decode (const std::string & data)
-          throw (std::string);
+        void decode (const std::string & data);
 
         /**
          * Marshal this IOR as CDR-encapsulated data.
@@ -208,8 +202,7 @@ namespace OCPI {
          * \return The CDR-encapsulated IOR.
          */
 
-        std::string encode () const
-          throw ();
+        std::string encode () const;
 
         /**
          * Access the IOR's <em>type_id</em> field.
@@ -217,8 +210,7 @@ namespace OCPI {
          * \return The IOR's <em>type_id</em>.
          */
 
-        const std::string & type_id () const
-          throw ();
+        const std::string & type_id () const;
 
         /**
          * Set the IOR's <em>type_id</em> field.
@@ -227,8 +219,7 @@ namespace OCPI {
          * the most derived type that the server wishes to publish.
          */
 
-        void type_id (const std::string & id)
-          throw ();
+        void type_id (const std::string & id);
 
         /**
          * \name Access to tagged profiles
@@ -247,8 +238,7 @@ namespace OCPI {
          * \pre !#hasProfile(\a tag)
          */
 
-        void addProfile (ProfileId tag, const void * data, unsigned long len)
-          throw ();
+        void addProfile (ProfileId tag, const void * data, unsigned long len);
 
         /**
          * Add a profile to the IOR's set of profiles.
@@ -260,8 +250,7 @@ namespace OCPI {
          * \pre !#hasProfile(\a tag)
          */
 
-        void addProfile (ProfileId tag, const std::string & data)
-          throw ();
+        void addProfile (ProfileId tag, const std::string & data);
 
         /**
          * Check if the IOR contains a tagged profile.
@@ -271,8 +260,7 @@ namespace OCPI {
          *                 false if not.
          */
 
-        bool hasProfile (ProfileId tag)
-          throw ();
+        bool hasProfile (ProfileId tag);
 
         /**
          * Access the data associated with a profile (non-const version).
@@ -287,8 +275,7 @@ namespace OCPI {
          * \pre #hasProfile(\a tag).
          */
 
-        std::string & profileData (ProfileId tag)
-          throw (std::string);
+        std::string & profileData (ProfileId tag);
 
         /**
          * Access the data associated with a profile (const version).
@@ -302,8 +289,7 @@ namespace OCPI {
          * \pre #hasProfile(\a tag).
          */
 
-        const std::string & profileData (ProfileId tag) const
-          throw (std::string);
+        const std::string & profileData (ProfileId tag) const;
 
         /**
          * The number of profiles in this IOR.
@@ -311,8 +297,7 @@ namespace OCPI {
          * \return The number of profiles in this IOR.
          */
 
-        unsigned long numProfiles () const
-          throw ();
+        unsigned long numProfiles () const;
 
         /**
          * Access to a profile (non-const version).
@@ -327,8 +312,7 @@ namespace OCPI {
          * \pre \a idx < #numProfiles().
          */
 
-        TaggedProfile & getProfile (unsigned long idx)
-          throw (std::string);
+        TaggedProfile & getProfile (unsigned long idx);
 
         /**
          * Access to a profile (const version).
@@ -342,22 +326,20 @@ namespace OCPI {
          * \pre \a idx < #numProfiles().
          */
 
-        const TaggedProfile & getProfile (unsigned long idx) const
-          throw (std::string);
+        const TaggedProfile & getProfile (unsigned long idx) const;
 
         //@}
 
-        const std::string & corbaloc()
-          throw (std::string);
+        const std::string & corbaloc();
       protected:
         std::string m_type_id;
 	std::string m_corbaloc;
         TaggedProfileSeq m_profiles;
       private:
-	void doKey(const std::string &key) throw();
-	void doAddress(const std::string &addr) throw ();
-	void doIPAddress(unsigned major, unsigned minor, const std::string &host, uint16_t port) throw ();
-	void doComponent(TaggedComponent &tc) throw (std::string);
+	void doKey(const std::string &key);
+	void doAddress(const std::string &addr);
+	void doIPAddress(unsigned major, unsigned minor, const std::string &host, uint16_t port);
+	void doComponent(TaggedComponent &tc);
       };
 
       /**
@@ -376,8 +358,7 @@ namespace OCPI {
        * \throw std::string If the string is not a valid stringified IOR.
        */
 
-      IOR string_to_ior (const std::string & hex)
-        throw (std::string);
+      IOR string_to_ior (const std::string & hex);
 
       /**
        * Produce a stringified IOR from an IOR object.
@@ -386,8 +367,7 @@ namespace OCPI {
        * \return        A stringified object reference.
        */
 
-      std::string ior_to_string (const IOR & ior)
-        throw ();
+      std::string ior_to_string (const IOR & ior);
 
       //@}
 
@@ -445,8 +425,7 @@ namespace OCPI {
          * Default constructor.
          */
 
-        MultipleComponentProfile ()
-          throw ();
+        MultipleComponentProfile ();
 
         /**
          * Constructor from encapsulated data.
@@ -457,8 +436,7 @@ namespace OCPI {
          * unmarshalled from \a data.
          */
 
-        explicit MultipleComponentProfile (const std::string & data)
-          throw (std::string);
+        explicit MultipleComponentProfile (const std::string & data);
 
         /**
          * Copy constructor.
@@ -466,8 +444,7 @@ namespace OCPI {
          * \param[in] other Another MultipleComponentProfile.
          */
 
-        MultipleComponentProfile (const MultipleComponentProfile & other)
-          throw ();
+        MultipleComponentProfile (const MultipleComponentProfile & other);
 
         /**
          * Assignment operator.
@@ -476,8 +453,7 @@ namespace OCPI {
          * \return *this
          */
 
-        MultipleComponentProfile & operator= (const MultipleComponentProfile & other)
-          throw ();
+        MultipleComponentProfile & operator= (const MultipleComponentProfile & other);
 
         /**
          * Assign from CDR-encapsulated data.
@@ -491,8 +467,7 @@ namespace OCPI {
          * \note Equivalent to operator= (MultipleComponentProfile (data)).
          */
 
-        void decode (const std::string & data)
-          throw (std::string);
+        void decode (const std::string & data);
 
         /*
          * Marshal this MultipleComponentProfile as CDR-encapsulated data.
@@ -500,8 +475,7 @@ namespace OCPI {
          * \return The CDR-encapsulated MultipleComponentProfile.
          */
 
-        std::string encode () const
-          throw ();
+        std::string encode () const;
 
         /**
          * \name Access to tagged components
@@ -520,8 +494,7 @@ namespace OCPI {
          * \pre !#hasComponent(\a tag)
          */
 
-        void addComponent (ComponentId tag, const void * data, unsigned long len)
-          throw ();
+        void addComponent (ComponentId tag, const void * data, unsigned long len);
 
         /**
          * Add a component to the set of tagged components.
@@ -533,8 +506,7 @@ namespace OCPI {
          * \pre !#hasComponent(\a tag)
          */
 
-        void addComponent (ComponentId tag, const std::string & data)
-          throw ();
+        void addComponent (ComponentId tag, const std::string & data);
 
         /**
          * Check if the profile contains a tagged component.
@@ -544,8 +516,7 @@ namespace OCPI {
          *                 tag, false if not.
          */
 
-        bool hasComponent (ComponentId tag)
-          throw ();
+        bool hasComponent (ComponentId tag);
 
         /**
          * Access the data associated with a component (non-const version).
@@ -561,8 +532,7 @@ namespace OCPI {
          * \pre #hasComponent(\a tag).
          */
 
-        std::string & componentData (ComponentId tag)
-          throw (std::string);
+        std::string & componentData (ComponentId tag);
 
         /**
          * Access the data associated with a component (const version).
@@ -576,8 +546,7 @@ namespace OCPI {
          * \pre #hasComponent(\a tag).
          */
 
-        const std::string & componentData (ComponentId tag) const
-          throw (std::string);
+        const std::string & componentData (ComponentId tag) const;
 
         /**
          * The number of tagged components in this profile.
@@ -585,8 +554,7 @@ namespace OCPI {
          * \return The number of tagged components in this profile.
          */
 
-        unsigned long numComponents () const
-          throw ();
+        unsigned long numComponents () const;
 
         /**
          * Access to a tagged component (non-const version).
@@ -602,8 +570,7 @@ namespace OCPI {
          * \pre \a idx < #numComponents().
          */
 
-        TaggedComponent & getComponent (unsigned long idx)
-          throw (std::string);
+        TaggedComponent & getComponent (unsigned long idx);
 
         /**
          * Access to a tagged component (const version).
@@ -617,8 +584,7 @@ namespace OCPI {
          * \pre \a idx < #numComponents().
          */
 
-        const TaggedComponent & getComponent (unsigned long idx) const
-          throw (std::string);
+        const TaggedComponent & getComponent (unsigned long idx) const;
 
         //@}
 
@@ -648,8 +614,7 @@ namespace OCPI {
          * Default constructor.
          */
 
-        ORBTypeComponent ()
-          throw ();
+        ORBTypeComponent ();
 
         /**
          * Constructor.
@@ -657,8 +622,7 @@ namespace OCPI {
          * \param[in] type The OCPI_CORBA_ORB type ID.
          */
 
-        explicit ORBTypeComponent (OCPI::OS::uint32_t type)
-          throw ();
+        explicit ORBTypeComponent (OCPI::OS::uint32_t type);
 
         /**
          * Constructor from encapsulated data.
@@ -669,8 +633,7 @@ namespace OCPI {
          * <em>TAG_ORB_TYPE</em> component.
          */
 
-        explicit ORBTypeComponent (const std::string & data)
-          throw (std::string);
+        explicit ORBTypeComponent (const std::string & data);
 
         /**
          * Copy constructor.
@@ -678,8 +641,7 @@ namespace OCPI {
          * \param[in] other Another <em>TAG_ORB_TYPE</em> component.
          */
 
-        ORBTypeComponent (const ORBTypeComponent & other)
-          throw ();
+        ORBTypeComponent (const ORBTypeComponent & other);
 
         /**
          * Assignment operator.
@@ -687,8 +649,7 @@ namespace OCPI {
          * \param[in] type The OCPI_CORBA_ORB type ID.
          */
 
-        ORBTypeComponent & operator= (OCPI::OS::uint32_t type)
-          throw ();
+        ORBTypeComponent & operator= (OCPI::OS::uint32_t type);
 
         /**
          * Assignment operator.
@@ -697,8 +658,7 @@ namespace OCPI {
          * \return *this
          */
 
-        ORBTypeComponent & operator= (const ORBTypeComponent & other)
-          throw ();
+        ORBTypeComponent & operator= (const ORBTypeComponent & other);
 
         /**
          * Assign from CDR-encapsulated data.
@@ -709,8 +669,7 @@ namespace OCPI {
          * <em>TAG_ORB_TYPE</em> component.
          */
 
-        void decode (const std::string & data)
-          throw (std::string);
+        void decode (const std::string & data);
 
         /*
          * Marshal this component as CDR-encapsulated data.
@@ -718,8 +677,7 @@ namespace OCPI {
          * \return The CDR-encapsulated <em>TAG_ORB_TYPE</em> component.
          */
 
-        std::string encode () const
-          throw ();
+        std::string encode () const;
 
       public:
         /**
@@ -750,8 +708,7 @@ namespace OCPI {
          * Default constructor.
          */
 
-        AlternateIIOPAddressComponent ()
-          throw ();
+        AlternateIIOPAddressComponent ();
 
         /**
          * Constructor from encapsulated data.
@@ -763,8 +720,7 @@ namespace OCPI {
          * <em>TAG_ALTERNATE_IIOP_ADDRESS</em> component.
          */
 
-        explicit AlternateIIOPAddressComponent (const std::string & data)
-          throw (std::string);
+        explicit AlternateIIOPAddressComponent (const std::string & data);
 
         /**
          * Copy constructor.
@@ -773,8 +729,7 @@ namespace OCPI {
          *                  component.
          */
 
-        AlternateIIOPAddressComponent (const AlternateIIOPAddressComponent & other)
-          throw ();
+        AlternateIIOPAddressComponent (const AlternateIIOPAddressComponent & other);
 
         /**
          * Assignment operator.
@@ -784,8 +739,7 @@ namespace OCPI {
          * \return *this
          */
 
-        AlternateIIOPAddressComponent & operator= (const AlternateIIOPAddressComponent & other)
-          throw ();
+        AlternateIIOPAddressComponent & operator= (const AlternateIIOPAddressComponent & other);
 
         /**
          * Assign from CDR-encapsulated data.
@@ -797,8 +751,7 @@ namespace OCPI {
          * <em>TAG_ALTERNATE_IIOP_ADDRESS</em> component.
          */
 
-        void decode (const std::string & data)
-          throw (std::string);
+        void decode (const std::string & data);
 
         /**
          * Marshal this component as CDR-encapsulated data.
@@ -807,8 +760,7 @@ namespace OCPI {
          * <em>TAG_ALTERNATE_IIOP_ADDRESS</em> component.
          */
 
-        std::string encode () const
-          throw ();
+        std::string encode () const;
 
       public:
         /**

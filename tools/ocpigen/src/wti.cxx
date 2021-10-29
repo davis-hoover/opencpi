@@ -27,9 +27,9 @@ WtiPort(Worker &w, ezxml_t x, Port *sp, int ordinal, const char *&err)
     m_secondsWidth(32), m_fractionWidth(0) {
   if ((err = OE::checkAttrs(x, "Name", "Clock", "SecondsWidth", "FractionWidth", "myoutputclock",
 			    "AllowUnavailable", "Pattern", "master", "myclock", "clockdirection", (void*)0)) ||
-      (err = OU::getExprNumber(x, "SecondsWidth", m_secondsWidth, NULL, m_secondsWidthExpr,
+      (err = OB::getExprNumber(x, "SecondsWidth", m_secondsWidth, NULL, m_secondsWidthExpr,
 			       &w)) ||
-      (err = OU::getExprNumber(x, "FractionWidth", m_fractionWidth, NULL, m_fractionWidthExpr,
+      (err = OB::getExprNumber(x, "FractionWidth", m_fractionWidth, NULL, m_fractionWidthExpr,
 			       &w)) ||
       (err = OE::getBoolean(x, "AllowUnavailable", &m_allowUnavailable)))
     return;
@@ -215,7 +215,7 @@ finalizeExternal(Worker &aw, Worker &/*iw*/, InstancePort &ip,
 }
 
 const char *WtiPort::
-resolveExpressions(OCPI::Util::IdentResolver &ir) {
+resolveExpressions(OB::IdentResolver &ir) {
   const char *err;
   if ((m_secondsWidthExpr.length() &&
        (err = parseExprNumber(m_secondsWidthExpr.c_str(), m_secondsWidth, NULL, &ir))) ||

@@ -22,7 +22,7 @@
 #define HDLDUMMYWORKER_H
 #include "ContainerPort.h"
 #include "HdlWciControl.h"
-#include "OcpiUtilEzxml.h"
+#include "UtilEzxml.hh"
 namespace OCPI {
   namespace HDL {
     // We create a worker class that does not have to be part of anything else.
@@ -35,19 +35,19 @@ namespace OCPI {
       OCPI::Container::Port *findPort(const char *) { return NULL; }
       const std::string &name() const { return m_name; }
       void prepareProperty(OCPI::Metadata::Property &, volatile uint8_t *&, const volatile uint8_t *&) const {}
-      OCPI::Container::Port &createPort(const OCPI::Metadata::Port &, const OCPI::Util::PValue *) {
+      OCPI::Container::Port &createPort(const OCPI::Metadata::Port &, const OCPI::Base::PValue *) {
 	assert("not called"==0);
 	return *(OCPI::Container::Port*)this;
       }
       OCPI::Container::Port &createOutputPort(OCPI::Metadata::PortOrdinal, size_t, size_t,
-					      const OCPI::Util::PValue*)
+					      const OCPI::Base::PValue*)
 	throw (OCPI::Util::EmbeddedException)
       {
 	assert("not called"==0);
 	return *(OCPI::Container::Port*)this;
       }
       OCPI::Container::Port & createInputPort(OCPI::Metadata::PortOrdinal, size_t, size_t,
-					      const OCPI::Util::PValue*)
+					      const OCPI::Base::PValue*)
 	throw (OCPI::Util::EmbeddedException)
       {
 	assert("not called"==0);

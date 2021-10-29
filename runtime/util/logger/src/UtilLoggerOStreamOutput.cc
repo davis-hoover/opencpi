@@ -20,8 +20,8 @@
 
 #include "OsAssert.hh"
 #include "OsMutex.hh"
-#include <OcpiLoggerLogger.h>
-#include <OcpiLoggerOStreamOutput.h>
+#include "UtilLogger.hh"
+#include "UtilLoggerOStreamOutput.hh"
 #include <iostream>
 
 /*

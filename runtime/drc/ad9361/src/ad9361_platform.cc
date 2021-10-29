@@ -51,7 +51,7 @@ extern "C" {
 #include "ad9361_api.h"
 #include "ad9361_platform.h" // ours
 }
-#include "OcpiOsDebugApi.hh" // OCPI::OS::logPrint(), OCPI_LOG_DEBUG
+#include "OcpiDebugApi.hh" // OCPI::OS::logPrint(), OCPI_LOG_DEBUG
 
 // get the thread key for different callers to share this library
 // if ad9361_get_opencpi_key() has been called, use that callback

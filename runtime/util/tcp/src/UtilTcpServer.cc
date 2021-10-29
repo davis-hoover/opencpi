@@ -18,8 +18,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <OcpiUtilTcpServer.h>
-#include <OcpiUtilTcpStream.h>
+#include "UtilTcpServer.hh"
+#include "UtilTcpStream.hh"
 #include "OsServerSocket.hh"
 #include "OsSocket.hh"
 #include <string>
@@ -31,20 +31,20 @@
  */
 
 OCPI::Util::Tcp::Server::Server ()
-  throw ()
+
 {
   m_open = false;
 }
 
 OCPI::Util::Tcp::Server::Server (uint16_t portno, bool reuse)
-  throw (std::string)
+
 {
   m_open = false;
   bind (portno, reuse);
 }
 
 OCPI::Util::Tcp::Server::~Server ()
-  throw ()
+
 {
   if (m_open) {
     close ();
@@ -53,7 +53,7 @@ OCPI::Util::Tcp::Server::~Server ()
 
 void
 OCPI::Util::Tcp::Server::bind (uint16_t portNo, bool reuse)
-  throw (std::string)
+
 {
   if (m_open) {
     throw std::string ("already bound");
@@ -65,7 +65,7 @@ OCPI::Util::Tcp::Server::bind (uint16_t portNo, bool reuse)
 
 OCPI::Util::Tcp::Stream *
 OCPI::Util::Tcp::Server::accept (unsigned long timeout)
-  throw (std::string)
+
 {
   if (!m_open) {
     throw std::string ("not bound");
@@ -82,7 +82,7 @@ OCPI::Util::Tcp::Server::accept (unsigned long timeout)
 
 uint16_t
 OCPI::Util::Tcp::Server::getPortNo ()
-  throw (std::string)
+
 {
   if (!m_open) {
     throw std::string ("not bound");
@@ -93,7 +93,7 @@ OCPI::Util::Tcp::Server::getPortNo ()
 
 void
 OCPI::Util::Tcp::Server::close ()
-  throw (std::string)
+
 {
   if (!m_open) {
     throw std::string ("not bound");

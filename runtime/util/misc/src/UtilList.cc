@@ -41,7 +41,7 @@
 #include <stdlib.h>
 
 /* Facility Interface Includes */
-#include <OcpiList.h>
+#include "UtilList.hh"
 #include "OsAssert.hh"
 
 

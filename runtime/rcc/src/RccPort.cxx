@@ -36,6 +36,7 @@ namespace OC = OCPI::Container;
 namespace OA = OCPI::API;
 namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 namespace OD = OCPI::DataTransport;
 namespace OR = OCPI::RDT;
 namespace DTM = DataTransfer::Msg;
@@ -44,7 +45,7 @@ namespace OCPI {
   namespace RCC {
 
     Port::
-    Port(Worker& w, const OM::Port & pmd, const OU::PValue *params, RCCPort &rp)
+    Port(Worker& w, const OM::Port & pmd, const OB::PValue *params, RCCPort &rp)
       :  OC::PortBase<Worker, Port, OCPI::RCC::ExternalPort>(w, *this, pmd, params),
 	 m_localOther(NULL), m_rccPort(rp), m_buffer(NULL),
 	 // Internal ports for non-scaled crews don't get buffers
@@ -59,7 +60,7 @@ namespace OCPI {
 	  if (o.nArgs()) {
 	    m_rccPort.defaultLength_ = pmd.m_minBufferSize;
 	    if (o.nArgs() > 1) {
-	      OU::Member &m = o.args()[o.nArgs() - 1];
+	      OB::Member &m = o.args()[o.nArgs() - 1];
 	      if (m.isSequence())
 		m_rccPort.sequence = &m;
 	    }
@@ -81,8 +82,8 @@ namespace OCPI {
     }
 
     void Port::
-    connectURL(const char */*url*/, const OU::PValue */*myParams*/,
-	       const OU::PValue */*otherParams*/)
+    connectURL(const char */*url*/, const OB::PValue */*myParams*/,
+	       const OB::PValue */*otherParams*/)
     {
     }
     bool Port::advanceRcc(size_t max) {

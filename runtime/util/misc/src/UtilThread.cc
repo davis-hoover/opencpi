@@ -19,7 +19,7 @@
  */
 
 #include "OsThreadManager.hh"
-#include "OcpiThread.h"
+#include "UtilThread.hh"
 namespace OCPI {
 namespace Util {
 

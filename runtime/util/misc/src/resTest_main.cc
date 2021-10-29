@@ -20,7 +20,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <OcpiRes.h>
+#include "UtilRes.hh"
 
 int main( int argc, char** argv )
 {

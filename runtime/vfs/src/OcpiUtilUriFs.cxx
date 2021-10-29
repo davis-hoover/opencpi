@@ -20,11 +20,11 @@
 
 #include <OcpiUtilUriFs.h>
 #include <OcpiUtilVfs.h>
-#include <OcpiUtilUri.h>
+#include "UtilUri.hh"
 #include "OsAssert.hh"
 #include "OsRWLock.hh"
-#include <OcpiUtilAutoRDLock.h>
-#include <OcpiUtilAutoWRLock.h>
+#include "UtilAutoRDLock.hh"
+#include "UtilAutoWRLock.hh"
 #include <iostream>
 #include <string>
 #include <ctime>

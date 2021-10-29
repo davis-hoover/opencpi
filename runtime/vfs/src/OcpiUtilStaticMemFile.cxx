@@ -36,7 +36,7 @@
 
 #include <OcpiUtilStaticMemFile.h>
 #include <OcpiUtilMemFileChunk.h>
-#include <OcpiUtilMisc.h>
+#include "UtilMisc.hh"
 #include <streambuf>
 #include <istream>
 #include <ctime>

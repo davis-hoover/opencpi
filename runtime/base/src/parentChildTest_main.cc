@@ -19,7 +19,7 @@
  */
 
 #include <cstdio>
-#include <OcpiParentChild.h>
+#include "BaseParentChild.hh"
 
 class Child1;
 class Child2;

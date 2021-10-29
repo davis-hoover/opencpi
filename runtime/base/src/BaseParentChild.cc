@@ -19,8 +19,8 @@
  */
 
 #include <stdint.h>
-#include <OcpiUtilMisc.h>
-#include <OcpiParentChild.h>
+#include "UtilMisc.hh"
+#include "BaseParentChild.hh"
 namespace OCPI {
   namespace Util {
     const char *child = "child";  // template argument

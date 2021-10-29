@@ -23,11 +23,11 @@
 #include "OsAssert.hh"
 #include "OsDataTypes.hh"
 #include "OsMutex.hh"
-#include <OcpiUtilCDR.h>
-#include <OcpiUtilIOP.h>
-#include <OcpiLoggerLogger.h>
-#include <OcpiUtilTcpClient.h>
-#include "OcpiUtilLwLoggerOutput.h"
+#include "UtilCDR.hh"
+#include "UtilIOP.hh"
+#include "UtilLogger.hh"
+#include "UtilTcpClient.hh"
+#include "UtilLwLoggerOutput.hh"
 
 OCPI::Util::LwLoggerOutput::Buf::
 Buf (const OCPI::Util::IOP::IOR & ior)

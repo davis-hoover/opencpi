@@ -25,11 +25,11 @@
 
 #include <assert.h>
 #include <vector>
-#include "UtilDataTypes.hh"
-#include "UtilValue.hh"
+#include "BaseDataTypes.hh"
+#include "BaseValue.hh"
 
 namespace OCPI {
-  namespace Util {
+  namespace Base {
     class BaseCommandOptions {
       const char **m_beforeArgv;
       std::vector<const char *> m_argv;
@@ -72,7 +72,7 @@ namespace {
 #if !defined(OCPI_OPTIONS_HELP)
 #define OCPI_OPTIONS_HELP ""
 #endif
-  class OCPI_OPTIONS_CLASS_NAME : public OCPI::Util::BaseCommandOptions {
+  class OCPI_OPTIONS_CLASS_NAME : public OCPI::Base::BaseCommandOptions {
     // Define the enumeration of options, and the limit
     enum Option {
 #define CMD_OPTION(n,b,t,v,d) Option_##n,
@@ -80,16 +80,16 @@ namespace {
 #undef CMD_OPTION
      CMD_OPTION_LIMIT_
     };
-    static OCPI::Util::Member s_options[CMD_OPTION_LIMIT_];
+    static OCPI::Base::Member s_options[CMD_OPTION_LIMIT_];
     static const char *s_defaults[CMD_OPTION_LIMIT_];
 #undef  CMD_OPTION_S
-    //    static OCPI::Util::Value s_values[CMD_OPTION_LIMIT_];
+    //    static OCPI::Base::Value s_values[CMD_OPTION_LIMIT_];
   public:
 #define CMD_OPTION(n,b,t,v,d)						\
     OCPI::API::t n() const { return m_options[Option_##n].m_default->m_##t; }
 #define CMD_OPTION_S(n,b,t,v,d)		   \
     OCPI::API::t *n(size_t &num) const {                         \
-      OCPI::Util::Value *val_ = m_options[Option_##n].m_default; \
+      OCPI::Base::Value *val_ = m_options[Option_##n].m_default; \
       assert(val_);                                              \
       assert(val_->m_vt);                                        \
       assert(val_->m_vt->m_isSequence);                          \
@@ -107,9 +107,9 @@ namespace {
       : BaseCommandOptions(s_options, CMD_OPTION_LIMIT_, OCPI_OPTIONS_HELP, s_defaults) {
     };
   };
-#define CMD_OPTION(n,b,t,v,d) OCPI::Util::Member(#n,#b,d,OCPI::API::OCPI_##t,false,v),
-#define CMD_OPTION_S(n,b,t,v,d) OCPI::Util::Member(#n,#b,d,OCPI::API::OCPI_##t,true,v),
-  OCPI::Util::Member OCPI_OPTIONS_CLASS_NAME::s_options[CMD_OPTION_LIMIT_] = { OCPI_OPTIONS };
+#define CMD_OPTION(n,b,t,v,d) OCPI::Base::Member(#n,#b,d,OCPI::API::OCPI_##t,false,v),
+#define CMD_OPTION_S(n,b,t,v,d) OCPI::Base::Member(#n,#b,d,OCPI::API::OCPI_##t,true,v),
+  OCPI::Base::Member OCPI_OPTIONS_CLASS_NAME::s_options[CMD_OPTION_LIMIT_] = { OCPI_OPTIONS };
 #undef CMD_OPTION
 #undef CMD_OPTION_S
 #define CMD_OPTION(n,b,t,v,d) v,

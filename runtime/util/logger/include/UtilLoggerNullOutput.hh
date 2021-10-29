@@ -29,7 +29,7 @@
 #ifndef OCPILOGGERNULLOUTPUT_H__
 #define OCPILOGGERNULLOUTPUT_H__
 
-#include <OcpiLoggerLogger.h>
+#include "UtilLogger.hh"
 
 namespace OCPI {
   namespace Logger {

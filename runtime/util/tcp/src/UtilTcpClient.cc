@@ -18,7 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <OcpiUtilTcpClient.h>
+#include "UtilTcpClient.hh"
 #include "OsSocket.hh"
 #include <string>
 
@@ -29,24 +29,24 @@
  */
 
 OCPI::Util::Tcp::Client::Client ()
-  throw ()
+
 {
 }
 
 OCPI::Util::Tcp::Client::Client (const std::string & host, uint16_t port)
-    throw (std::string)
+
 {
   connect (host, port);
 }
 
 OCPI::Util::Tcp::Client::~Client ()
-  throw ()
+
 {
 }
 
 void
 OCPI::Util::Tcp::Client::connect (const std::string & host, uint16_t port)
-    throw (std::string)
+
 {
   OCPI::OS::Socket conn;
   conn.connect(host, port);

@@ -30,7 +30,7 @@
 
 #include "OsMisc.hh"
 #include "OsAssert.hh"
-#include "OcpiUtilMisc.h"
+#include "UtilMisc.hh"
 #include "DtDataGramXfer.h"
 
 namespace XF = DataTransfer;

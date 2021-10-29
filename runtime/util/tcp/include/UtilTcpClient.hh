@@ -34,7 +34,7 @@
  *
  */
 
-#include <OcpiUtilTcpStream.h>
+#include "UtilTcpStream.hh"
 #include <string>
 
 namespace OCPI {
@@ -65,8 +65,7 @@ namespace OCPI {
          * \post The stream is unconnected.
          */
 
-        Client ()
-          throw ();
+        Client ();
 
         /**
          * Constructor.  Creates a socket that is connected to a remote peer.
@@ -83,15 +82,13 @@ namespace OCPI {
          * \throw std::string If the connection can not be established.
          */
 
-        Client (const std::string & host, uint16_t port)
-          throw (std::string);
+        Client (const std::string & host, uint16_t port);
 
         /**
          * Destructor.
          */
 
-        ~Client ()
-          throw ();
+        ~Client ();
 
         /**
          * Connect the socket, if it was not connected upon construction.
@@ -106,8 +103,7 @@ namespace OCPI {
          * \throw std::string If the connection can not be established.
          */
 
-        void connect (const std::string & host, uint16_t port)
-          throw (std::string);
+        void connect (const std::string & host, uint16_t port);
 
       private:
         /**

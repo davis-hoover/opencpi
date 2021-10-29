@@ -132,7 +132,7 @@ get(const char *a_name, ezxml_t dtxml, const char *parentFile, Worker *parent, c
   return NULL;
 }
 const char *HdlDevice::
-resolveExpressions(OCPI::Util::IdentResolver &ir) {
+resolveExpressions(OB::IdentResolver &ir) {
   Worker::resolveExpressions(ir);
   const char *err;
   for (SignalsIter si = m_signals.begin(); si != m_signals.end(); si++) {

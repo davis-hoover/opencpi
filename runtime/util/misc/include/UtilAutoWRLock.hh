@@ -60,20 +60,15 @@ namespace OCPI {
        * shall not manipulate \a mutex directly.
        */
 
-      AutoWRLock (OCPI::OS::RWLock & rwlock, bool locked = true)
-        throw (std::string);
+      AutoWRLock (OCPI::OS::RWLock & rwlock, bool locked = true);
 
-      ~AutoWRLock ()
-        throw ();
+      ~AutoWRLock ();
 
-      void lock ()
-        throw (std::string);
+      void lock ();
 
-      bool trylock ()
-        throw (std::string);
+      bool trylock ();
 
-      void unlock ()
-        throw (std::string);
+      void unlock ();
 
     private:
       bool m_locked;

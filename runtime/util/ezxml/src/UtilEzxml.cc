@@ -28,8 +28,8 @@
 
 #include "ezxml.h"
 #include "OsAssert.hh"
-#include "OcpiUtilEzxml.h"
-#include "OcpiUtilMisc.h"
+#include "UtilEzxml.hh"
+#include "UtilMisc.hh"
 
 namespace OCPI {
   namespace Util {
@@ -777,8 +777,7 @@ namespace OCPI {
 	size_t total = OCPI_UTRUNCATE(size_t, len);
 	buf.resize(total);
 	for (char *cp = &buf[0];
-	     total && (n = ::read(fd, cp, total)) > 0; total -= (size_t)n, cp += (size_t)n)
-	  ;
+	     total && (n = ::read(fd, cp, total)) > 0; total -= (size_t)n, cp += (size_t)n)	  ;
 	if (n <= 0) {
 	  OU::format(error, "message read error: %s (%zu)", strerror(errno), n);
 	  return true;

@@ -305,8 +305,7 @@ namespace OCPI {
        *               to OCPI::Util::CommandLineConfiguration::OptionType::END.
        */
 
-      CommandLineConfiguration (const Option * options)
-        throw ();
+      CommandLineConfiguration (const Option * options);
 
       /**
        * Destructor.
@@ -317,10 +316,10 @@ namespace OCPI {
        * not intended for polymorphic use, but let's just avoid the
        * warning.
        *
-       * Ordinarily, the exception specification "throw ()" should be,
+       * Ordinarily, the exception specification "" should be,
        * added, but since the default destructor, if a derived class did
        * not define a destructor, does not have an exception specification,
-       * it would conflict with the more strict "throw ()" in the base
+       * it would conflict with the more strict "" in the base
        * class.
        */
 
@@ -355,8 +354,7 @@ namespace OCPI {
 
       void configure (int & argc, char * argv[],
                       bool ignoreUnknown = false,
-                      bool removeFromSet = true)
-        throw (std::string);
+                      bool removeFromSet = true);
 
       /**
        * Print a human-readable description of available command-line
@@ -377,8 +375,7 @@ namespace OCPI {
        * to.
        */
 
-      void printOptions (std::ostream & out)
-        throw ();
+      void printOptions (std::ostream & out);
 
     protected:
       /**
@@ -413,8 +410,7 @@ namespace OCPI {
 
       virtual void configureOption (unsigned int type,
                                     void * valuePtr,
-                                    const std::string & optionValue)
-        throw (std::string);
+                                    const std::string & optionValue);
 
       /**
        * Returns a string indicating how to options of a certain type
@@ -437,12 +433,10 @@ namespace OCPI {
        *         command line.
        */
 
-      virtual std::string printOptionSpec (unsigned int type) const
-        throw ();
+      virtual std::string printOptionSpec (unsigned int type) const;
 
     protected:
-      const Option * findOption (const std::string & name)
-        throw ();
+      const Option * findOption (const std::string & name);
 
     protected:
       unsigned long m_numOpts;

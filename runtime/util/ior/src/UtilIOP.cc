@@ -22,11 +22,11 @@
 #include <cstring>
 #include <vector>
 #include "OsAssert.hh"
-#include "OcpiUtilMisc.h"
-#include "OcpiUtilCDR.h"
-#include "OcpiUtilIOP.h"
-#include "OcpiUtilIIOP.h"
-#include "OcpiCorbaApi.h"
+#include "UtilMisc.hh"
+#include "UtilCDR.hh"
+#include "UtilIOP.hh"
+#include "UtilIIOP.hh"
+#include "OcpiCorbaApi.hh"
 /*
  * ----------------------------------------------------------------------
  * Constants
@@ -84,7 +84,7 @@ namespace {
 
   bool
   hex2blob (std::string & res, const char * data, unsigned long length)
-    throw ()
+
   {
     const unsigned char * src = reinterpret_cast <const unsigned char *> (data);
     unsigned char * buf = new unsigned char [length/2];
@@ -137,7 +137,7 @@ namespace {
 
   std::string
   blob2hex (const char * data, unsigned long length)
-    throw ()
+
   {
     const unsigned char * src = reinterpret_cast <const unsigned char *> (data);
     unsigned char * buf = new unsigned char [length*2];
@@ -165,13 +165,13 @@ namespace {
 
 IOR::
 IOR ()
-  throw ()
+
 {
 }
 
 IOR::
 IOR (const std::string & data)
-  throw (std::string)
+
 {
   decode (data);
 }
@@ -195,7 +195,7 @@ decode_ior_string(const char *ior, std::string &out) {
 
 IOR::
 IOR (const char *uri)
-  throw (std::string)
+
 {
   std::string data;
   if (!decode_ior_string(uri, data))
@@ -205,7 +205,7 @@ IOR (const char *uri)
 
 IOR::
 IOR (const IOR & other)
-  throw ()
+
   : m_type_id (other.m_type_id),
     m_profiles (other.m_profiles)
 {
@@ -214,7 +214,7 @@ IOR (const IOR & other)
 IOR &
 IOR::
 operator= (const IOR & other)
-  throw ()
+
 {
   m_type_id = other.m_type_id;
   m_profiles = other.m_profiles;
@@ -224,7 +224,7 @@ operator= (const IOR & other)
 void
 IOR::
 decode (const std::string & data)
-  throw (std::string)
+
 {
   try {
     OCPI::Util::CDR::Decoder cd (data);
@@ -259,7 +259,7 @@ decode (const std::string & data)
 std::string
 IOR::
 encode () const
-  throw ()
+
 {
   OCPI::Util::CDR::Encoder ce;
 
@@ -282,7 +282,7 @@ encode () const
 const std::string &
 IOR::
 type_id () const
-  throw ()
+
 {
   return m_type_id;
 }
@@ -290,7 +290,7 @@ type_id () const
 void
 IOR::
 type_id (const std::string & id)
-  throw ()
+
 {
   m_type_id = id;
 }
@@ -298,7 +298,7 @@ type_id (const std::string & id)
 void
 IOR::
 addProfile (ProfileId tag, const void * data, unsigned long len)
-  throw ()
+
 {
   unsigned long numProfs = m_profiles.size ();
   m_profiles.resize (numProfs+1);
@@ -309,7 +309,7 @@ addProfile (ProfileId tag, const void * data, unsigned long len)
 void
 IOR::
 addProfile (ProfileId tag, const std::string & data)
-  throw ()
+
 {
   addProfile (tag, data.data(), data.length());
 }
@@ -317,7 +317,7 @@ addProfile (ProfileId tag, const std::string & data)
 bool
 IOR::
 hasProfile (ProfileId tag)
-  throw ()
+
 {
   unsigned long numProfs = m_profiles.size ();
 
@@ -333,7 +333,7 @@ hasProfile (ProfileId tag)
 std::string &
 IOR::
 profileData (ProfileId tag)
-  throw (std::string)
+
 {
   unsigned long numProfs = m_profiles.size ();
   unsigned long pi;
@@ -354,7 +354,7 @@ profileData (ProfileId tag)
 const std::string &
 IOR::
 profileData (ProfileId tag) const
-  throw (std::string)
+
 {
   unsigned long numProfs = m_profiles.size ();
   unsigned long pi;
@@ -375,7 +375,7 @@ profileData (ProfileId tag) const
 unsigned long
 IOR::
 numProfiles () const
-  throw ()
+
 {
   return m_profiles.size ();
 }
@@ -383,7 +383,7 @@ numProfiles () const
 TaggedProfile &
 IOR::
 getProfile (unsigned long idx)
-  throw (std::string)
+
 {
   if (idx >= m_profiles.size()) {
     throw std::string ("invalid index");
@@ -395,7 +395,7 @@ getProfile (unsigned long idx)
 const TaggedProfile &
 IOR::
 getProfile (unsigned long idx) const
-  throw (std::string)
+
 {
   if (idx >= m_profiles.size()) {
     throw std::string ("invalid index");
@@ -405,14 +405,14 @@ getProfile (unsigned long idx) const
 }
 
 void IOR::
-doAddress(const std::string &addr) throw () {
+doAddress(const std::string &addr){
   m_corbaloc += m_corbaloc.empty() ? "corbaloc:" : ",";
   m_corbaloc += addr;
 }
 
 void IOR::
 doIPAddress(unsigned major, unsigned minor, const std::string &host, uint16_t port)
-  throw()
+
 {
   std::string addr;
   OU::formatString(addr, "iiop:%u.%u@%s:%u", major, minor, host.c_str(), port);
@@ -421,7 +421,7 @@ doIPAddress(unsigned major, unsigned minor, const std::string &host, uint16_t po
 
 
 void IOR::
-doComponent(TaggedComponent &tc) throw(std::string) {
+doComponent(TaggedComponent &tc){
   switch (tc.tag) {
   case TAG_ALTERNATE_IIOP_ADDRESS:
     {
@@ -464,7 +464,7 @@ doComponent(TaggedComponent &tc) throw(std::string) {
 }
 
 void IOR::
-doKey(const std::string &key) throw() {
+doKey(const std::string &key){
   m_corbaloc += "/";
   const char *cp = key.data();
   ocpiDebug("key length is %zu", key.length());
@@ -486,7 +486,7 @@ doKey(const std::string &key) throw() {
 
 // We only know IIOP and our own protocols
 const std::string &IOR::
-corbaloc() throw (std::string) {
+corbaloc(){
   if (m_corbaloc.empty()) {
     bool key = false;
     // Now do all addresses
@@ -512,8 +512,7 @@ corbaloc() throw (std::string) {
 	}
 	break;
       default:
-	// ignore
-	;
+	// ignore	;
       }
     }
     if (!key)
@@ -533,7 +532,7 @@ corbaloc() throw (std::string) {
 IOR
 
 string_to_ior (const std::string & ior)
-  throw (std::string)
+
 {
 #if 0
   const char * ptr = ior.data ();
@@ -570,7 +569,7 @@ string_to_ior (const std::string & ior)
 std::string
 
 ior_to_string (const IOR & ior)
-  throw ()
+
 {
   std::string blob = ior.encode ();
   std::string hex = blob2hex (blob.data(), blob.length());
@@ -587,20 +586,20 @@ ior_to_string (const IOR & ior)
 
 MultipleComponentProfile::
 MultipleComponentProfile ()
-  throw ()
+
 {
 }
 
 MultipleComponentProfile::
 MultipleComponentProfile (const std::string & data)
-  throw (std::string)
+
 {
   decode (data);
 }
 
 MultipleComponentProfile::
 MultipleComponentProfile (const MultipleComponentProfile & other)
-  throw ()
+
   : m_components (other.m_components)
 {
 }
@@ -608,7 +607,7 @@ MultipleComponentProfile (const MultipleComponentProfile & other)
 MultipleComponentProfile &
 MultipleComponentProfile::
 operator= (const MultipleComponentProfile & other)
-  throw ()
+
 {
   m_components = other.m_components;
   return *this;
@@ -617,7 +616,7 @@ operator= (const MultipleComponentProfile & other)
 void
 MultipleComponentProfile::
 decode (const std::string & data)
-  throw (std::string)
+
 {
   try {
     OCPI::Util::CDR::Decoder cd (data);
@@ -649,7 +648,7 @@ decode (const std::string & data)
 std::string
 MultipleComponentProfile::
 encode () const
-  throw ()
+
 {
   OCPI::Util::CDR::Encoder ce;
 
@@ -670,7 +669,7 @@ encode () const
 void
 MultipleComponentProfile::
 addComponent (ComponentId tag, const void * data, unsigned long len)
-  throw ()
+
 {
   unsigned long numComps = m_components.size ();
   m_components.resize (numComps+1);
@@ -681,7 +680,7 @@ addComponent (ComponentId tag, const void * data, unsigned long len)
 void
 MultipleComponentProfile::
 addComponent (ComponentId tag, const std::string & data)
-  throw ()
+
 {
   addComponent (tag, data.data(), data.length());
 }
@@ -689,7 +688,7 @@ addComponent (ComponentId tag, const std::string & data)
 bool
 MultipleComponentProfile::
 hasComponent (ComponentId tag)
-  throw ()
+
 {
   unsigned long numComps = m_components.size ();
 
@@ -705,7 +704,7 @@ hasComponent (ComponentId tag)
 std::string &
 MultipleComponentProfile::
 componentData (ComponentId tag)
-  throw (std::string)
+
 {
   unsigned long numComps = m_components.size ();
   unsigned long pi;
@@ -726,7 +725,7 @@ componentData (ComponentId tag)
 const std::string &
 MultipleComponentProfile::
 componentData (ComponentId tag) const
-  throw (std::string)
+
 {
   unsigned long numComps = m_components.size ();
   unsigned long pi;
@@ -747,7 +746,7 @@ componentData (ComponentId tag) const
 unsigned long
 MultipleComponentProfile::
 numComponents () const
-  throw ()
+
 {
   return m_components.size ();
 }
@@ -755,7 +754,7 @@ numComponents () const
 TaggedComponent &
 MultipleComponentProfile::
 getComponent (unsigned long idx)
-  throw (std::string)
+
 {
   if (idx >= m_components.size()) {
     throw std::string ("invalid index");
@@ -767,7 +766,7 @@ getComponent (unsigned long idx)
 const TaggedComponent &
 MultipleComponentProfile::
 getComponent (unsigned long idx) const
-  throw (std::string)
+
 {
   if (idx >= m_components.size()) {
     throw std::string ("invalid index");
@@ -784,27 +783,27 @@ getComponent (unsigned long idx) const
 
 ORBTypeComponent::
 ORBTypeComponent ()
-  throw ()
+
 {
 }
 
 ORBTypeComponent::
 ORBTypeComponent (OCPI::OS::uint32_t type)
-  throw ()
+
   : orb_type (type)
 {
 }
 
 ORBTypeComponent::
 ORBTypeComponent (const ORBTypeComponent & other)
-  throw ()
+
   : orb_type (other.orb_type)
 {
 }
 
 ORBTypeComponent::
 ORBTypeComponent (const std::string & data)
-  throw (std::string)
+
 {
   decode (data);
 }
@@ -812,7 +811,7 @@ ORBTypeComponent (const std::string & data)
 ORBTypeComponent &
 ORBTypeComponent::
 operator= (OCPI::OS::uint32_t type)
-  throw ()
+
 {
   orb_type = type;
   return *this;
@@ -821,7 +820,7 @@ operator= (OCPI::OS::uint32_t type)
 ORBTypeComponent &
 ORBTypeComponent::
 operator= (const ORBTypeComponent & other)
-  throw ()
+
 {
   orb_type = other.orb_type;
   return *this;
@@ -830,7 +829,7 @@ operator= (const ORBTypeComponent & other)
 void
 ORBTypeComponent::
 decode (const std::string & data)
-  throw (std::string)
+
 {
   try {
     OCPI::Util::CDR::Decoder cd (data);
@@ -849,7 +848,7 @@ decode (const std::string & data)
 std::string
 ORBTypeComponent::
 encode () const
-  throw ()
+
 {
   OCPI::Util::CDR::Encoder ce;
 
@@ -868,13 +867,13 @@ encode () const
 
 AlternateIIOPAddressComponent::
 AlternateIIOPAddressComponent ()
-  throw ()
+
 {
 }
 
 AlternateIIOPAddressComponent::
 AlternateIIOPAddressComponent (const AlternateIIOPAddressComponent & other)
-  throw ()
+
   : HostID (other.HostID),
     port (other.port)
 {
@@ -882,7 +881,7 @@ AlternateIIOPAddressComponent (const AlternateIIOPAddressComponent & other)
 
 AlternateIIOPAddressComponent::
 AlternateIIOPAddressComponent (const std::string & data)
-  throw (std::string)
+
 {
   decode (data);
 }
@@ -890,7 +889,7 @@ AlternateIIOPAddressComponent (const std::string & data)
 AlternateIIOPAddressComponent &
 AlternateIIOPAddressComponent::
 operator= (const AlternateIIOPAddressComponent & other)
-  throw ()
+
 {
   HostID = other.HostID;
   port = other.port;
@@ -900,7 +899,7 @@ operator= (const AlternateIIOPAddressComponent & other)
 void
 AlternateIIOPAddressComponent::
 decode (const std::string & data)
-  throw (std::string)
+
 {
   try {
     OCPI::Util::CDR::Decoder cd (data);
@@ -921,7 +920,7 @@ decode (const std::string & data)
 std::string
 AlternateIIOPAddressComponent::
 encode () const
-  throw ()
+
 {
   OCPI::Util::CDR::Encoder ce;
 
@@ -940,7 +939,7 @@ encode () const
   }
   namespace API {
     void ior2corbaloc(const char *sior, std::string &corbaloc)
-      throw (std::string)
+
     {
       if (!strncasecmp(sior, "corbaloc:", sizeof("corbaloc:")-1))
 	corbaloc = sior;

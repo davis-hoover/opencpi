@@ -24,8 +24,8 @@
 #include <cstdio>
 #include "OsDataTypes.hh"
 #include "OsAssert.hh"
-#include "OcpiUtilMisc.h"
-#include "OcpiRes.h"
+#include "UtilMisc.hh"
+#include "UtilRes.hh"
 
 namespace OCPI {
   namespace Util {

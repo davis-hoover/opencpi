@@ -26,7 +26,7 @@
 #include <string>
 #include <cstdio>
 #include "MetadataProtocol.hh"
-#include "UtilPValue.hh"
+#include "BasePValue.hh"
 #include "ezxml.h"
 
 namespace OCPI {
@@ -106,7 +106,7 @@ namespace OCPI {
 #define DISTRIBUTION_ATTRS "distribution", "hashfield", "indistribution", "outdistribution"
       struct OpScaling {
 	Distribution                m_distribution;
-	OCPI::Util::Member         *m_hashField;
+	OCPI::Base::Member         *m_hashField;
 	Partitioning                m_defaultPartitioning; // default for all args
 	bool                        m_multiple;
 	bool                        m_allSeeOne;
@@ -172,15 +172,15 @@ namespace OCPI {
       void emitScalingAttrs(std::string &out) const;
       void emitScaling(std::string &out) const;
       // Get the buffer size to use on this port given meta info and params and defaults
-      size_t getBufferSize(const OCPI::Util::PValue *portParams, const OCPI::Util::PValue *connParams,
+      size_t getBufferSize(const OCPI::Base::PValue *portParams, const OCPI::Base::PValue *connParams,
 			   size_t otherSize) const;
       Distribution getDistribution(unsigned op) const;
       // Determine the buffer size for a connection, where "in" or "out" could be NULL when
       // they are "external" and not specified by any port metadata.
-      static size_t determineBufferSize(const Port *in, const OCPI::Util::PValue *paramsIn,
+      static size_t determineBufferSize(const Port *in, const OCPI::Base::PValue *paramsIn,
 					size_t otherIn, const Port *out,
-					const OCPI::Util::PValue *paramsOut, size_t otherOut,
-					const OCPI::Util::PValue *connParams);
+					const OCPI::Base::PValue *paramsOut, size_t otherOut,
+					const OCPI::Base::PValue *connParams);
     };
 
   }

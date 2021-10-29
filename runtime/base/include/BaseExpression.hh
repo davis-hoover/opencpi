@@ -66,7 +66,7 @@
 #include "ezxml.h"
 
 namespace OCPI {
-  namespace Util {
+  namespace Base {
     // The value returned from parsing an expression and also returned as the value of an identifier
     class Value;
     class ExprValue {

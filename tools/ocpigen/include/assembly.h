@@ -50,13 +50,13 @@ typedef Connections::const_iterator ConnectionsIter;
 
 struct InstanceProperty {
   const OM::Property *property;
-  OU::Value value;
+  OB::Value value;
   InstanceProperty();
 };
 typedef std::vector<InstanceProperty> InstanceProperties;
 
 class Assembly;
-struct Instance : public OU::IdentResolver {
+struct Instance : public OB::IdentResolver {
   ::Assembly *m_assy;
   ezxml_t     m_xml;
   std::string m_name;
@@ -81,7 +81,7 @@ struct Instance : public OU::IdentResolver {
     Adapter,       // an adapter inserted by code generation
   } m_iType;
   const char *m_attach;  // external platform port instance is attached to for io or interconnect
-  OCPI::Metadata::Assembly::Properties m_xmlProperties; // explicit unparsed values for the instance
+  OM::Assembly::Properties m_xmlProperties; // explicit unparsed values for the instance
   InstanceProperties m_properties;                  // fully parsed w/ full knowledge of worker
   bool m_hasConfig;      // for adapter configuration FIXME make normal properties
   size_t m_config;
@@ -90,13 +90,13 @@ struct Instance : public OU::IdentResolver {
   bool   m_inserted;   // was this instance auto-inserted?
   Instance();
   const char *cname() const { return m_name.c_str(); }
-  const char *init(OCPI::Metadata::Assembly::Instance *ai, ::Assembly &assy, const char *outDir);
+  const char *init(OM::Assembly::Instance *ai, ::Assembly &assy, const char *outDir);
   const char *init(::Assembly &assy, const char *iName, const char *wName, ezxml_t x, 
 		   OM::Assembly::Properties &xmlProperties);
   const char *initHDL(::Assembly &assy);
   void emitHdl(FILE *f, const char *prefix, size_t &index);
   void emitDeviceConnectionSignals(FILE *f, Worker &assy);
-  const char *getValue(const char *sym, OU::ExprValue &val) const;
+  const char *getValue(const char *sym, OB::ExprValue &val) const;
   const char *addParameters(const OM::Assembly::Properties &aiprops, InstanceProperty *&ipv);
 };
 // To represent an attachment of a connection to an instance port.
@@ -155,9 +155,9 @@ class Assembly {
     *externalizePort(InstancePort &ip, const char *name, size_t *ordinal),
     *findPort(OM::Assembly::Port &ap, InstancePort *&found),
     // Add the assembly's parameters to the instance's parameter values list, as needed
-    *addAssemblyParameters(OCPI::Metadata::Assembly::Properties &aips),
+    *addAssemblyParameters(OM::Assembly::Properties &aips),
     *insertAdapter(Connection &c, InstancePort &from, InstancePort &to),
-    *parseConnection(OCPI::Metadata::Assembly::Connection &aConn);
+    *parseConnection(OM::Assembly::Connection &aConn);
 void addParamConfigParameters(const ParamConfig &pc, const OM::Assembly::Properties &aiprops,
 			      InstanceProperty *&ipv);
   // Find the instance port connected to an external with this name

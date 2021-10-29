@@ -23,7 +23,7 @@
 #include <stdlib.h>
 #include <memory>
 #include "OsFileSystem.hh"
-#include "OcpiDriverManager.h"
+#include "BasePluginManager.hh"
 #include "OcpiLibraryManager.h"
 #include "wip.h"
 #include "hdl-container.h"
@@ -105,11 +105,11 @@ add to tree.
 
 #define OCPI_OPTION
 #define OCPI_OPTIONS_NO_MAIN
-#include "CmdOption.hh"
+#include "BaseOption.hh"
 
 int
 main(int argc, const char **argv) {
-  OCPI::Driver::ManagerManager::suppressDiscovery();
+  OCPI::Base::Plugin::ManagerManager::suppressDiscovery();
   if (options.setArgv(argv))
     return 1;
   if (options.log_level())
@@ -280,7 +280,7 @@ main(int argc, const char **argv) {
     else
       try {
         setenv("OCPI_SYSTEM_CONFIG", "", 1);
-        OCPI::Driver::ManagerManager::suppressDiscovery();
+        OCPI::Base::Plugin::ManagerManager::suppressDiscovery();
         if (doCases)
           OCPI::Library::getManager().enableDiscovery();
         std::string parent;

@@ -22,15 +22,15 @@
 #include "ocpi-config.h"
 #include "OsFileSystem.hh"
 #include "OsLoadableModule.hh"
-#include "OcpiUtilCppMacros.h"
-#include "OcpiUtilEzxml.h"
-#include "OcpiUtilAutoMutex.h"
-#include "OcpiUtilMisc.h"
-#include "OcpiDriverManager.h"
-#include "OcpiDriverApi.h"
-#include "OcpiTimeEmit.h"
+#include "UtilCppMacros.hh"
+#include "UtilEzxml.hh"
+#include "UtilAutoMutex.hh"
+#include "UtilMisc.hh"
+#include "BasePluginManager.hh"
+#include "OcpiPluginApi.hh"
 namespace OCPI {
-  namespace Driver {
+namespace Base {
+namespace Plugin {
     namespace OU = OCPI::Util;
     namespace OX = OCPI::Util::EzXml;
     void Registration_debug_hook() {} // easier static constructor debug
@@ -158,7 +158,7 @@ namespace OCPI {
     }
 
     // This is NOT a static method
-    void ManagerManager::configureOnce(const char *file, const OCPI::Util::PValue *params) {
+    void ManagerManager::configureOnce(const char *file, const PValue *params) {
       if (m_configured)
 	return;
       OCPI::Util::AutoMutex guard(m_mutex);
@@ -251,6 +251,7 @@ namespace OCPI {
     void ManagerManager::cleanup() {
       assert(!s_exiting);
       s_exiting = true;
+      OU::g_exiting = true; // for exception handling
       ManagerManager *mm = &OU::Singleton<ManagerManager>::getSingleton();
       // Before simply deleting the managermanager, we delete the
       // managers in order of their "cleanupPosition()"
@@ -261,7 +262,6 @@ namespace OCPI {
 	  if (d->cleanupPosition() == i)
 	    delete d;
 	}
-      OCPI::Time::Emit::shutdown();
       delete mm;
     }
     OCPI_NORETURN
@@ -313,9 +313,11 @@ namespace OCPI {
     void Device::configure(ezxml_t xml) { (void)xml;}
     Device::~Device(){}
   }
+} // Plugin
   namespace API {
-    void DriverManager::configure(const char *cf) {
-      OCPI::Driver::ManagerManager::configure(cf);
+    void PluginManager::configure(const char *cf) {
+      OCPI::Base::Plugin::ManagerManager::configure(cf);
     }
-  }
-}
+
+} // Base
+} // OCPI

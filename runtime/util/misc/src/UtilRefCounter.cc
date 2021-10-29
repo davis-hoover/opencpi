@@ -18,7 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <OcpiUtilRefCounter.h>
+#include "UtilRefCounter.hh"
 #include "OsAssert.hh"
 
 OCPI::Util::Misc::RefCounter::RefCounter()

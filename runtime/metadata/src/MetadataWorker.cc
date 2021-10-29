@@ -22,11 +22,11 @@
 #include <string.h>
 #include <strings.h>
 #include "ocpi-config.h"
-#include "OcpiUtilCppMacros.h"
+#include "UtilCppMacros.hh"
 #include "OsAssert.hh"
-#include "OcpiUtilMisc.h"
-#include "OcpiUtilEzxml.h"
-#include "UtilValue.hh"
+#include "UtilMisc.hh"
+#include "UtilEzxml.hh"
+#include "BaseValue.hh"
 #include "MetadataWorker.hh"
 
 namespace OCPI {
@@ -35,6 +35,7 @@ namespace OCPI {
     const char *g_models[] = { OCPI_MODELS, NULL };
 
     namespace OU = OCPI::Util;
+    namespace OB = OCPI::Base;
     namespace OE = OCPI::Util::EzXml;
     Worker::Worker()
       : m_attributes(NULL), m_ports(NULL), m_memories(NULL), m_nPorts(0), m_nMemories(0),
@@ -251,7 +252,7 @@ namespace OCPI {
     }
 
     // Get a property value from the metadata
-    const char *Worker::getValue(const char *sym, OU::ExprValue &val) const {
+    const char *Worker::getValue(const char *sym, OB::ExprValue &val) const {
       // Our builtin symbols take precendence, but can be overridden with @
       if (!strcasecmp(sym, "model")) {
 	val.setString(m_model);

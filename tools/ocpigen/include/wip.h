@@ -26,12 +26,12 @@
 #include <list>
 #include <map>
 #include <unordered_set>
-#include "UtilPValue.hh"
+#include "BasePValue.hh"
 #include "MetadataProperty.hh"
 #include "MetadataProtocol.hh"
-#include "UtilValue.hh"
-#include "OcpiUtilEzxml.h"
-#include "OcpiUtilMisc.h"
+#include "BaseValue.hh"
+#include "UtilEzxml.hh"
+#include "UtilMisc.hh"
 #include "MetadataWorker.hh"
 #include "MetadataAssembly.hh"
 #include "OcpiUuid.h"
@@ -127,7 +127,7 @@ class WtiPort : public OcpPort {
   void emitPortDescription(FILE *f, Language lang) const;
   void emitRecordInterfaceConstants(FILE *f);
   void emitInterfaceConstants(FILE *f, Language lang);
-  const char *resolveExpressions(OCPI::Util::IdentResolver &ir);
+  const char *resolveExpressions(OB::IdentResolver &ir);
   const char *finalizeExternal(Worker &aw, Worker &iw, InstancePort &ip,
 			       bool &cantDataResetWhileSuspended);
 };
@@ -441,7 +441,7 @@ class Worker : public OM::Worker {
   const char
     *addBuiltinProperties(),
     *getPort(const char *name, Port *&p, Port *except = NULL) const,
-    *getValue(const char *sym, OU::ExprValue &val) const,
+    *getValue(const char *sym, OB::ExprValue &val) const,
     *getNumber(ezxml_t x, const char *attr, size_t *np, bool *found = NULL,
 	       size_t defaultValue = 0, bool setDefault = true) const,
     //    *getBoolean(ezxml_t x, const char *name, bool *b, bool trueOnly),
@@ -493,7 +493,7 @@ class Worker : public OM::Worker {
     *finalizeHDL(),
     *finalizeRCC(),
     *deriveOCP(),
-    *hdlValue(const std::string &name, const OU::Value &v, std::string &value,
+    *hdlValue(const std::string &name, const OB::Value &v, std::string &value,
 	      bool param = false, Language = NoLanguage, bool finalized = false),
     *findParamProperty(const char *name, OM::Property *&prop, size_t &nParam,
 		       bool includeInitial = false),
@@ -509,17 +509,17 @@ class Worker : public OM::Worker {
     *rccMethodName(const char *method, const char *&mName),
     *emitImplOCL(),
     *emitEntryPointOCL(),
-    *paramValue(const OU::Member &param, OU::Value &v, std::string &value),
+    *paramValue(const OB::Member &param, OB::Value &v, std::string &value),
     *findParamConfig(size_t low, size_t high, const OCPI::Metadata::Assembly::Properties &ipvs,
 		     ParamConfig *&pc),
-    *rccBaseValue(OU::Value &v, std::string &value, const OU::Member *param = NULL),
-    *rccValue(OU::Value &v, std::string &value, const OU::Member &param),
+    *rccBaseValue(OB::Value &v, std::string &value, const OB::Member *param = NULL),
+    *rccValue(OB::Value &v, std::string &value, const OB::Member &param),
     *rccPropValue(OM::Property &p, std::string &value),
     *emitSkelRCC(),
     *emitSkelOCL(),
     *emitAssyHDL();
   virtual const char
-    *resolveExpressions(OCPI::Util::IdentResolver &ir),
+    *resolveExpressions(OB::IdentResolver &ir),
     *parseInstance(Worker &parent, Instance &inst, ezxml_t x), // FIXME: should be HdlInstance...
     *emitArtXML(const char *wksFile),
     *emitToolArtXML(),
@@ -558,15 +558,15 @@ class Worker : public OM::Worker {
 		bool convert = false),
     rccEmitDimension(size_t numeric, const std::string &expr, const char *surround,
 		     std::string &out),
-    rccArray(std::string &type, OU::Member &m, bool isFixed, bool &isLast, bool topSeq, bool end),
-    rccStruct(std::string &type, size_t nMembers, OU::Member *members, unsigned level,
+    rccArray(std::string &type, OB::Member &m, bool isFixed, bool &isLast, bool topSeq, bool end),
+    rccStruct(std::string &type, size_t nMembers, OB::Member *members, unsigned level,
 	      const char *parent, bool isFixed, bool &isLast, bool topSeq, unsigned predef,
 	      size_t elementBytes = 0),
-    rccMember(std::string &type, OU::Member &m, unsigned level, size_t &offset, unsigned &pad,
+    rccMember(std::string &type, OB::Member &m, unsigned level, size_t &offset, unsigned &pad,
 	      const char *parent, bool isFixed, bool &isLast, bool topSeq, unsigned predef, bool cnst = false),
-    rccType(std::string &type, OU::Member &m, unsigned level, size_t &offset, unsigned &pad,
+    rccType(std::string &type, OB::Member &m, unsigned level, size_t &offset, unsigned &pad,
 	    const char *parent, bool isFixed, bool &isLast, bool topSeq, unsigned predef, bool cnst = false),
-    rccBaseType(std::string &type, OU::Member &m, unsigned level, size_t &offset, unsigned &pad,
+    rccBaseType(std::string &type, OB::Member &m, unsigned level, size_t &offset, unsigned &pad,
 		const char *parent, bool isFixed, bool &isLast, unsigned predefine, bool cnst = false),
     emitPropertyAttributeConstants(FILE *f, Language lang),
     emitSignalMacros(FILE *f, Language lang),
@@ -601,15 +601,15 @@ extern const char
   *createTests(const char *file, const char *package, const char *outDir, bool verbose),
   *createCases(const char **args, const char *package, const char *outDir, bool verbose),
 //  *addLibrary(const char *lib),
-  *extractExprValue(const OM::Property &p, const OU::Value &v, OU::ExprValue &val),
+  *extractExprValue(const OM::Property &p, const OB::Value &v, OB::ExprValue &val),
   *tryInclude(ezxml_t x, const std::string &parent, const char *element, ezxml_t *parsed,
 	      std::string &child, bool optional),
   *parseList(const char *list, const char * (*doit)(const char *tok, void *arg), void *arg),
   *parseControlOp(const char *op, void *arg),
-  *vhdlValue(const char *pkg, const std::string &name, const OU::Value &v, std::string &value,
+  *vhdlValue(const char *pkg, const std::string &name, const OB::Value &v, std::string &value,
 	     bool param = false, bool finalized = false),
-  *verilogValue(const OU::Value &v, std::string &value, bool finalized = false),
-  *rccValue(OU::Value &v, std::string &value),
+  *verilogValue(const OB::Value &v, std::string &value, bool finalized = false),
+  *rccValue(OB::Value &v, std::string &value),
   *g_platform, *g_device, *load, *g_os, *g_os_version, *g_arch, **libraries, **mappedLibraries,
   *assembly, *attribute, *platformDir,
 //  *addLibMap(const char *),
@@ -629,5 +629,5 @@ extern void
   emitVhdlLibraries(FILE *f),
   emitLastSignal(FILE *f, std::string &last, Language lang, bool end);
 
-extern size_t rawBitWidth(const OU::ValueType &dt);
+extern size_t rawBitWidth(const OB::ValueType &dt);
 #endif

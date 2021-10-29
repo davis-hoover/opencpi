@@ -21,11 +21,11 @@
 #include <ctime>
 #include <cstdlib>
 #include "OsMisc.hh"
-#include <OcpiUtilUUID.h>
+#include "UtilUUID.hh"
 
 OCPI::Util::UUID::BinaryUUID
 OCPI::Util::UUID::produceRandomUUID ()
-  throw ()
+
 {
   static bool isSeeded = false;
   BinaryUUID value;
@@ -76,7 +76,7 @@ OCPI::Util::UUID::produceRandomUUID ()
 
 std::string
 OCPI::Util::UUID::binaryToHex (const BinaryUUID &uuid)
-  throw ()
+
 {
   static const char * hexDigits = "0123456789abcdef";
   char tmp[36];

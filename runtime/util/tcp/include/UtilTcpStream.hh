@@ -106,8 +106,7 @@ namespace OCPI {
          * the setSocket() operation.
          */
 
-        Stream ()
-          throw ();
+        Stream ();
 
         /**
          * Constructor. Creates a connected stream.
@@ -121,15 +120,13 @@ namespace OCPI {
          * \post The socket \a sock shall not be used.
          */
 
-        Stream (OCPI::OS::Socket & sock, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
-          throw (std::string);
+        Stream (OCPI::OS::Socket & sock, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out);
 
         /**
          * Destructor. Calls close() if connected.
          */
 
-        ~Stream ()
-          throw ();
+        ~Stream ();
 
         /*
          * Sets the connected socket, if the stream was not connected upon
@@ -145,8 +142,7 @@ namespace OCPI {
          * \post The socket \a sock shall not be used.
          */
 
-        void setSocket (OCPI::OS::Socket & sock, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
-          throw (std::string);
+        void setSocket (OCPI::OS::Socket & sock, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out);
 
         /**
          * Configure the behavior upon close().  If the linger option is
@@ -160,8 +156,7 @@ namespace OCPI {
          * \pre The stream is connected.
          */
 
-        void linger (bool opt)
-          throw (std::string);
+        void linger (bool opt);
 
         /**
          * Create a duplicate of the socket.
@@ -184,8 +179,7 @@ namespace OCPI {
          */
 
         Stream * dup (bool shutdownWhenClosed = false,
-                      std::ios_base::openmode shutdownMode = std::ios_base::out)
-          throw (std::string);
+                      std::ios_base::openmode shutdownMode = std::ios_base::out);
 
         /**
          * Performs a half-close.
@@ -215,8 +209,7 @@ namespace OCPI {
          * \pre The stream is connected.
          */
 
-        void shutdown (std::ios_base::openmode mode = std::ios_base::out)
-          throw (std::string);
+        void shutdown (std::ios_base::openmode mode = std::ios_base::out);
 
         /**
          * Close the socket.
@@ -235,8 +228,7 @@ namespace OCPI {
          * \post The stream is unconnected.
          */
 
-        void close ()
-          throw (std::string);
+        void close ();
 
         /**
          * The local port number.
@@ -246,8 +238,7 @@ namespace OCPI {
          * \pre The stream is connected.
          */
 
-        unsigned int getPortNo ()
-          throw (std::string);
+        unsigned int getPortNo ();
 
         /**
          * The host name and port number of the remote peer.
@@ -258,8 +249,7 @@ namespace OCPI {
          *                  connection.
          */
 
-        void getPeerName (std::string & host, uint16_t & port)
-          throw (std::string);
+        void getPeerName (std::string & host, uint16_t & port);
 
         /** \cond */
 
