@@ -157,6 +157,7 @@ parseHdlPlatforms(ezxml_t xml) {
 #define HDL_ASSEMBLY_ATTRS  "Containers", "DefaultContainers"
 static const char *
 parseHdlAssembly(ezxml_t xml) {
+  assert("unexpected XML parse of hdl assembly" == NULL);
   const char *err;
   if ((err = OE::checkAttrs(xml, TARGET_ATTRS, HDL_ASSEMBLY_ATTRS, NULL)) ||
       (err = OE::checkElements(xml, "instance", "connection", "external", NULL)))
