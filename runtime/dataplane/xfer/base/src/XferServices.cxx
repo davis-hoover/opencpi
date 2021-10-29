@@ -30,7 +30,6 @@
 #include "UtilEzxml.hh"
 #include "UtilMisc.hh"
 #include "BasePValue.hh"
-//#include "xfer_internal.h"
 #include "XferEndPoint.h"
 #include "XferServices.h"
 #include "XferPioInternal.h"

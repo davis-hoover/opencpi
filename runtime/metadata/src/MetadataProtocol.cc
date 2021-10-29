@@ -44,13 +44,13 @@ namespace OCPI {
       if (m_exceptions)
 	delete [] m_exceptions;
     }
-    Operation & 
+    Operation &
     Operation::
     operator=(const Operation & p ) {
       return operator=(&p);
     }
-    
-    Operation & 
+
+    Operation &
     Operation::
     operator=(const Operation * p )
     {

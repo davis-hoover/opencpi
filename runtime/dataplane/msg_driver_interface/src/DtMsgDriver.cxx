@@ -41,7 +41,7 @@
 #include "UtilAutoMutex.hh"
 #include "UtilEzxml.hh"
 #include "BasePValue.hh"
-#include <DtMsgDriver.h>
+#include "DtMsgDriver.h"
 
 namespace OX = OCPI::Util::EzXml;
 namespace OU = OCPI::Util;

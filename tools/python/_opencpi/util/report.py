@@ -166,10 +166,77 @@ def snip_widest_column(rows, forced_screen_width=None):
 
     return rows
 
+class TableCell:
+    """
+        Class passed as an item to the print_table and format_table 
+        method to allow a footnote to be printed
+    """
+    def __init__(self, text: str, footnote: str = None):
+        """
+        Args:
+            text: str, the text to appear in the cell as a string
+            footnote: str, the text to appear as the footnote (optional)
+        """
+        self.text = text
+        self.footnote = footnote
+
+    def __str__(self):
+        return self.text
+
+def split_table_from_footnotes(rows, footnote_marker):
+    """
+    The rows given might contain some TableCells with footnote information.
+    This method splits these out and formats it nicely by adding the footnote_marker
+    eg: Tablecell("hello", "ft") gives a table cell value of "hello*" and a footnote of
+       *) ft
+
+    This will reduce any repeated footnotes into one, and add an extra footnote_marker
+    for each footnote added eg:
+        TableCell("hello", "ft"), TableCell("world", "gg") gives:
+        table values of "hello*", "world**" and footnotes of 
+        *) ft
+        **) gg
+
+    Also with repeated footnotes example:
+        TableCell("hello", "ft"), TableCell("world", "ft") gives:
+        table values of "hello*", "world*" and footnotes of 
+        *) ft
+
+    This method also allows compatibility with plain old strings, so the user can just
+    pass in a bunch of other objects as the table contents and it'll still work as it's all based
+    on the __str__ method
+
+    args:
+        rows: list of list of strings or TableCells or other objects
+        footnote_marks: str - what to use to show it's a footnote
+    """
+    rows_with_footnote = []
+    footnotes = []
+    for row in rows:
+        col = []
+        for column in row:
+            try:
+                if column.footnote is not None:
+                    if column.footnote not in footnotes:
+                        column.text += footnote_marker * (len(footnotes) + 1)
+                        footnotes.append(column.footnote)
+                    else:
+                        idx = footnotes.index(column.footnote)
+                        column.text += footnote_marker * (idx + 1)
+            except AttributeError:
+                # Expect some exceptions for things which are other objects so don't have a .footnote method
+                pass
+
+            col.append(column)
+        rows_with_footnote.append(col)
+
+    return rows_with_footnote, footnotes
+
+
 #TODO change to kwargs too many aruments
 # pylint:disable=too-many-arguments
 def format_table(rows, col_delim='|', row_delim=None, surr_cols_delim='|', surr_rows_delim='-',
-                 underline=None):
+                 underline=None, footnote_marker="*"):
     """
     Return a table specified by the list of rows in the 'rows' parameter. Optionally specify
     col_delim and row_delim which are each a single character that will be repeated to separate
@@ -178,7 +245,8 @@ def format_table(rows, col_delim='|', row_delim=None, surr_cols_delim='|', surr_
     determine the border of the table.
     """
 
-    rows_norm = snip_widest_column(normalize_column_lengths(rows))
+    rows_with_footnote, footnotes = split_table_from_footnotes(rows, footnote_marker)
+    rows_norm = snip_widest_column(normalize_column_lengths(rows_with_footnote))
 
     # If an underline character was provided, insert a row containing this character repeated
     # at position 1 (right below the header)
@@ -221,17 +289,20 @@ def format_table(rows, col_delim='|', row_delim=None, surr_cols_delim='|', surr_
         # the borders of the table
         table_str += surr_rows_delim * max_row_len + "\n"
 
+    for idx, footnote in enumerate(footnotes):
+        table_str += f'{footnote_marker*(idx+1)}) {footnote}\n'
+
     return table_str
 # pylint:enable=too-many-arguments
 
 #TODO change to kwargs too many aruments
 # pylint:disable=too-many-arguments
 def print_table(rows, col_delim='|', row_delim=None, surr_cols_delim='|', surr_rows_delim='-',
-                underline=None):
+                underline=None, footnote_marker="*"):
     """
     Wrapper for "format_table()" that prints the returned table
     """
-    print(format_table(rows, col_delim, row_delim, surr_cols_delim, surr_rows_delim, underline))
+    print(format_table(rows, col_delim, row_delim, surr_cols_delim, surr_rows_delim, underline, footnote_marker))
 # pylint:enable=too-many-arguments
 
 class Report(object):

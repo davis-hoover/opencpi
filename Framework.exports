@@ -78,6 +78,7 @@
 +tools/ocpidev/assets/library.py <target>/lib/_opencpi/assets/
 +tools/ocpidev/assets/platform.py <target>/lib/_opencpi/assets/
 +tools/ocpidev/assets/project.py <target>/lib/_opencpi/assets/
++tools/ocpidev/assets/prerequisite.py <target>/lib/_opencpi/assets/
 +tools/ocpidev/assets/registry.py <target>/lib/_opencpi/assets/
 +tools/ocpidev/assets/test.py <target>/lib/_opencpi/assets/
 +tools/ocpidev/assets/worker.py <target>/lib/_opencpi/assets/

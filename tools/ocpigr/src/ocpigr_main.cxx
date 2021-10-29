@@ -64,6 +64,7 @@
   CMD_OPTION  (verbose,   v, Bool,   NULL, "Set verbosity to info level") \
   CMD_OPTION  (debug,     d, Bool,   NULL, "Set verbosity to debug level") \
   CMD_OPTION  (directory, D, String, ".",  "Specify the directory in which to put output generated files")
+
 #include "BaseOption.hh"
 
 // Instantiate ocipgr object
