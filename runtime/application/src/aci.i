@@ -221,7 +221,7 @@
 #include <climits>
 #include "OcpiApi.h"
 #include "BasePValue.hh"
-#include "OcpiUtilMisc.h"
+#include "UtilMisc.hh"
   namespace OA=OCPI::API;
   namespace OU=OCPI::Util;
   namespace OB=OCPI::Base;
@@ -365,7 +365,7 @@
 %include "OcpiDataTypesApi.hh"
 %include "OcpiPValueApi.hh"
 %include "OcpiPropertyApi.hh"
-%include "OcpiUtilExceptionApi.h"
+%include "OcpiExceptionApi.hh"
 %include "OcpiLibraryApi.h"
 %include "OcpiContainerApi.h"
 %include "OcpiApplicationApi.h"

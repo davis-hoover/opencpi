@@ -19,7 +19,7 @@
  */
 
 #include <cmath> // pow()
-#include "OcpiOsDebugApi.hh" // OCPI_LOG_..., OCPI::OS::logPrintV()
+#include "OcpiDebugApi.hh" // OCPI_LOG_..., OCPI::OS::logPrintV()
 #include "AD9361ConfigProxy.hh" // AD9361ConfigProxy class, AD9361 class
 
 extern "C" {

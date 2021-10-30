@@ -512,7 +512,8 @@ corbaloc(){
 	}
 	break;
       default:
-	// ignore	;
+	// ignore
+	;
       }
     }
     if (!key)
