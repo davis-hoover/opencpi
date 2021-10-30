@@ -79,7 +79,8 @@ extern const char *endians[];
 // so there is no "extra" elements for any of them, only top attrs, and instance attrs
 
 // XML for HDL assemblies, that are not configurations or containers
-#define HDL_ASSEMBLY_EXTRA_TOP_ATTRS HDL_TOP_ATTRS, "language", "containers", "defaultcontainers",
+#define HDL_ASSEMBLY_EXTRA_TOP_ATTRS BUILD_ATTRS, HDL_TOP_ATTRS, "language", "containers", "defaultcontainers",
+
 #define HDL_ASSEMBLY_EXTRA_INST_ATTRS "paramconfig",
 
 // XML for HDL platform configuration assemblies (not the config xml files)
