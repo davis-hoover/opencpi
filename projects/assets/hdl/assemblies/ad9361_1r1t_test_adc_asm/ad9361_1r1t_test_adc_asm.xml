@@ -3,6 +3,7 @@
                 cnt_1rx_0tx_thruasm_fmcomms_2_3_lpc_LVDS_ml605
 		cnt_nopfcfg_1rx_0tx_fmcomms_2_3_lpc_thruasm_zed'
     DefaultContainers=''
+    ExcludePlatforms='isim modelsim xsim'
     >
   <Connection Name="in_to_asm_rx_path_from_adc" External="consumer">
     <Port Instance="fifo" Name="in"/>
