@@ -78,11 +78,11 @@ runtime/util -d internal
 # Code above this line is not really part of the runtime infrastructure/layers of OpenCPI.
 # Tools that use any layers above this must do so explicitly (-I and -L)
 end-of-runtime-for-tools
-runtime/vfs
+runtime/vfs -d internal
 # The base library needs to call into the time(emit) layer at shutdown
-runtime/base -T ocpixml
+runtime/base -d internal -T ocpixml
 # The time library does timekeepping and time-based event recording
-runtime/time
+runtime/time -d internal
 runtime/drc/base -l drc
 runtime/drc/ad9361 -l drc_ad9361
 runtime/dataplane/xfer/base -l xfer

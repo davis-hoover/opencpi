@@ -244,8 +244,8 @@
 +runtime/application/include/OcpiApplicationApi.h include/rcc/
 +runtime/container/include/OcpiContainerApi.h include/rcc/
 +runtime/util/ior/include/OcpiCorbaApi.h include/rcc/
-+runtime/Base/include/OcpiPValueApi.hh include/rcc/
-+runtime/Base/include/OcpiDataTypesApi.hh include/rcc/
++runtime/base/include/OcpiPValueApi.hh include/rcc/
++runtime/base/include/OcpiDataTypesApi.hh include/rcc/
 +runtime/metadata/include/OcpiPropertyApi.hh include/rcc/
 +runtime/util/misc/include/OcpiExceptionApi.hh include/rcc/
 +runtime/library/include/OcpiLibraryApi.h include/rcc/
