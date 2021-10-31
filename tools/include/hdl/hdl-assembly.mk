@@ -50,19 +50,26 @@ ifeq ($(HdlPlatform)$(HdlPlatforms),)
     override DefaultContainers=
   endif
 endif
-# Make sure the build files are processed early because there are make variables
+# Add to the component libraries specified in the assembly Makefile, if any,
+# and also include those passed down from the "assemblies" level via ComponentLibrariesInternal
+# THIS LIST IS FOR THE APPLICATION ASSEMBLY NOT FOR THE CONTAINER
+# This is done here so that the build file + OWD parsing will succeed when this assembly
+# sets ComponentLlibraries in its Makefile.
+# But it will need to be done again *after* the build/OWD files are processes in case
+# the build/OWD XML file sets ComponentLibraries
+override ComponentLibraries+= $(ComponentLibrariesInternal) components adapters
+# Override since they may be passed in from assemblies level
+override XmlIncludeDirsInternal:=$(XmlIncludeDirs) $(XmlIncludeDirsInternal)
+# Make sure the build and OWD files are processed early because there are make variables
 # that will affect target processing in hdl-pre.mk
 # For assemblies, these are generated from the OWD XML
 ifeq ($(ShellHdlAssemblyVars)$(filter clean%,$(MAKECMDGOALS)),)
   $(eval $(OcpiProcessBuildFiles))
+  # These are done here (again) in case the build files or OWD mentions component libraries in XML
+  override ComponentLibraries+= $(ComponentLibrariesInternal) components adapters
+  override XmlIncludeDirsInternal:=$(XmlIncludeDirs) $(XmlIncludeDirsInternal)
 endif
 include $(OCPI_CDK_DIR)/include/hdl/hdl-pre.mk
-# Add to the component libraries specified in the assembly Makefile,
-# and also include those passed down from the "assemblies" level
-# THIS LIST IS FOR THE APPLICATION ASSEMBLY NOT FOR THE CONTAINER
-override ComponentLibraries+= $(ComponentLibrariesInternal) components adapters
-# Override since they may be passed in from assemblies level
-override XmlIncludeDirsInternal:=$(XmlIncludeDirs) $(XmlIncludeDirsInternal)
 ifdef Container
   ifndef Containers
     Containers:=$(Container)
