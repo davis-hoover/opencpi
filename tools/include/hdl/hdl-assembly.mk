@@ -50,6 +50,12 @@ ifeq ($(HdlPlatform)$(HdlPlatforms),)
     override DefaultContainers=
   endif
 endif
+# Make sure the build files are processed early because there are make variables
+# that will affect target processing in hdl-pre.mk
+# For assemblies, these are generated from the OWD XML
+ifeq ($(ShellHdlAssemblyVars)$(filter clean%,$(MAKECMDGOALS)),)
+  $(eval $(OcpiProcessBuildFiles))
+endif
 include $(OCPI_CDK_DIR)/include/hdl/hdl-pre.mk
 # Add to the component libraries specified in the assembly Makefile,
 # and also include those passed down from the "assemblies" level
@@ -189,7 +195,6 @@ else # for "clean" goal
 endif
 ifdef HdlContainers
   ifndef ShellHdlAssemblyVars
-    $(eval $(OcpiProcessBuildFiles))
     include $(OCPI_CDK_DIR)/include/hdl/hdl-worker.mk
   endif
 endif

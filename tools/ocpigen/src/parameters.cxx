@@ -1183,8 +1183,7 @@ onlyExclude(const char *thing,
     else if (baseExclude.size())
       for (auto it = newExclude.begin(); it != newExclude.end(); ++it)
 	baseExclude.push_back(*it);
-  } else
-    baseExclude = newExclude;
+  }
   return NULL;
 }
 
