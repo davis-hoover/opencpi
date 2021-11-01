@@ -2,7 +2,7 @@
     "rules": [
         {
             "rulePriority": 1,
-            "description": "Expire images older than 3 days",
+            "description": "Expire images older than 7 days",
             "selection": {
                 "tagStatus": "any",
                 "countType": "sinceImagePushed",
