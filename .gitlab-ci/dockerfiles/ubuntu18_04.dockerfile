@@ -3,6 +3,7 @@ FROM ubuntu:18.04
 ENV DEBIAN_FRONTEND=noninteractive
 ADD . /opencpi
 WORKDIR /opencpi
+ENTRYPOINT ["/bin/bash", "-lc"]
 
 ARG SCRIPT
 RUN eval $SCRIPT
