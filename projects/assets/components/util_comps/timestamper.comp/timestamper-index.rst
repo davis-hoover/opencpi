@@ -107,4 +107,6 @@ For the normal mode test case, the expected output waveform is the identical ram
 inserted before each data message.  For verification, the timestamps are
 extracted and checked for incrementing values.
 
+.. ocpi_documentation_test_platforms::
+
 .. ocpi_documentation_test_result_summary::

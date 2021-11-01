@@ -104,4 +104,6 @@ No unit test for this component exists. However, a hardware-in-the-loop
 application (which is *not* a unit test) exists for testing purposes (see
 ``projects/platform/applications/ad9361_config_proxy_test``).
 
+.. ocpi_documentation_test_platforms::
+
 .. ocpi_documentation_test_result_summary::

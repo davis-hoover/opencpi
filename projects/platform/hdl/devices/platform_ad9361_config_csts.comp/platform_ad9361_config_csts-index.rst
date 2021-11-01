@@ -123,4 +123,6 @@ Limitations of ``platform_ad9361_config_csts`` are:
 
 Testing
 -------
+.. ocpi_documentation_test_platforms::
+
 .. ocpi_documentation_test_result_summary::
