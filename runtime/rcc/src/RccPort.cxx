@@ -95,8 +95,10 @@ namespace OCPI {
 			  (parent().version() <= 1 && m_rccPort.current.length_ == 0 &&
 			   m_rccPort.current.opCode_ == 0),
 			  m_rccPort.current.direct_);
-	  else
+	  else {
+	    m_rccPort.input.eof = false;
 	    release(); // m_buffer->release(); must release on port gotten from
+	  }
 	  m_rccPort.current.data = NULL;
 	  m_buffer = NULL;
 	}
