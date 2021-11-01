@@ -31,6 +31,7 @@ from .ocpi_documentation_test_result_summary import \
     OcpiDocumentationTestResultSummary
 from .ocpi_documentation_utilization import OcpiDocumentationUtilization
 from .ocpi_documentation_worker import OcpiDocumentationWorker
+from .ocpi_documentation_test_platforms import OcpiDocumentationTestPlatforms
 
 
 def setup(app):
@@ -55,3 +56,5 @@ def setup(app):
     app.add_directive("ocpi_documentation_utilization",
                       OcpiDocumentationUtilization)
     app.add_directive("ocpi_documentation_worker", OcpiDocumentationWorker)
+    app.add_directive("ocpi_documentation_test_platforms", 
+                      OcpiDocumentationTestPlatforms)

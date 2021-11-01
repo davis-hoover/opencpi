@@ -67,7 +67,6 @@ Limitations of ``complex_mixer`` are:
 
 Testing
 -------
-
 Test cases for the complex mixer are derived from the number of
 properties and their respective values as listed in
 ``complex_mixer-test.xml``.  The following test cases
@@ -83,5 +82,7 @@ are implemented to validate the ``complex_mixer`` component:
 
 For both of these cases, the input file contains a tone of 12.5Hz sampled at 100Hz
 and an amplitude of 32767.
+
+.. ocpi_documentation_test_platforms::
 
 .. ocpi_documentation_test_result_summary::

@@ -193,4 +193,6 @@ Case 13 - Tests the RCC version of this component, which is nothing but a placeh
 In all test cases, the data is simply passed through the component and the tests
 are determined to be successful by comparing the input and output files.
 
+.. ocpi_documentation_test_platforms::
+
 .. ocpi_documentation_test_result_summary::
