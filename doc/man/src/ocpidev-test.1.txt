@@ -43,13 +43,12 @@ only meaningful for test suites that operate on HDL workers.
 - Prepare: examine available built workers and available platforms,
 creating execution scripts to use them all for executing feasible tests.
 
-- Run: execute tests for all workers, configurations, test cases and platforms.
+- Execute: execute tests for all workers, configurations, test cases and platforms.
 
 - Verify: verify results from the execution of tests on workers and platforms.
 
-The *`--mode=`* option to the *`run`* operation for a test suite can
-be used to set these phases. Note that HDL workers must be built before
-generating/building tests for them.
+The *`ocpidev build`* operation performs the generate and build phases, while the
+*`ocpidev run`* operation performs the prepare, execute, and verify phases.
 
 A component unit test suite is described by an OpenCPI Test Suite
 Description (OTSD), which is an XML file that specifies the test cases and
@@ -75,7 +74,7 @@ Running the build and generate phases creates two additional subdirectories:
 
 - An *`applications/`* subdirectory that contains OpenCPI Application Specification (OAS) files and scripts used by the OpenCPI test framework to execute the test cases
 
-Running the prepare and run phases creates an additional *`run/`* subdirectory
+Running the prepare and execute phases creates an additional *`run/`* subdirectory
 that contains the results of the test case executions, such as output data
 from each output port, final values of all properties, including volatile
 properties, and a log file of the actual test execution.
@@ -232,25 +231,16 @@ Options When Running Component Unit Tests Suites
     is successful. Warning: Simulation files can become large!
 
 *`--library=`*'<library>', *`-l`* '<library>'::
-    Run the component unit test suite(s) in the specified library.
-    
-*`--mode=`*'<mode>'[,'<mode>'[,'<mode>'...]]::
-    Specify which phase(s) of the component unit test suite(s) to execute. Valid modes are:
-    - *all*:  execute all five phases (the default if *`--mode`* is not used)
-    - *gen*: execute generate phase
-    - *gen_build*: execute generate and build phases. This mode is
-      analagous to the *`build`* verb.
-    - *prep_run_verify*: execute prepare, run, and verify phases
-    - *prep*: execute prepare phase
-    - *run*: execute run phase
-    - *prep_run*: execute prepare and run phases
-    - *verify*: execute verify phase 
-    - *view*: execute the view script (view.sh) on an already executed run  
-    - *clean_all*: clean all generated files. This mode is analogous to the *`clean`* verb.
-    - *clean_run*: clean all files generated during the run phase 
-    
+    Run the component unit test suite(s) in the specified library.  
+   
 *`--only-platform=`*'<platform>', *`-G`* '<platform>'+:: 
     Specify the runtime platform to use with the component unit test suite(s).
+
+*`--phase=`*'<phase>'+::
+    Specify which non-building phase(s) of unit testing to run.
+    Valid phases here are: *`prepare`*, *`execute`*, *`verify`*, and *`view`*.
+    The *`view`* 'phase' is used to run 'only' the view scripts for the unit test,
+    without other phases.  The *`--view`* 'option' can be used to add viewing along with other phases.
 
 *`--rcc-platform=`*'<platform>'+:: 
     Specify the RCC platform to use to build and generate the component unit test suite(s).
@@ -292,26 +282,26 @@ unit test suite for the *`mycomp`* component:
 ocpidev create test mycomp
 --------------------------
 +
-. Inside the *`components`* library, create a test suite for the *`mycomp`*
+. Inside the *`components`* library, create a unit test suite for the *`mycomp`*
 component that only runs on the *`centos7`* platform:
 +
 -------------------------------------------------
 ocpidev create test mycomp --only-platform=centos7
 -------------------------------------------------
 +
-. Inside the *`components`* library, create a test suite for the *`mycomp`*
+. Inside the *`components`* library, create a unit test suite for the *`mycomp`*
 component that only runs on platforms that implement the *`zynq`* architecture:
 +
 ----------------------------------
 ocpidev create test mycomp -T zynq
 ----------------------------------
 +
-. Inside the *`mycomp.test`* directory, build the component
-unit test suite for the *`zed`* HDL platform and *`xilinx13_3`* RCC platform.
+. Inside the *`mycomp.test`* directory, build the component unit
+test suite for the *`zed`* HDL platform and *`xilinx13_3`* RCC platform.
 +
 ---------------------------------------------------------------
 ocpidev build test --hdl-platform zed --rcc-platform xilinx13_3
---------------------------------------------------------------
+---------------------------------------------------------------
 +
 . Inside the *`mycomp.test`* directory, clean the directory:
 +
@@ -320,35 +310,33 @@ ocpidev clean test
 ------------------
 +
 . Inside the *`components`* library in the current project, run
-the prepare, run and verify phases of the unit test suite for
+all phases of the component unit test suite for
 the *`mycomp`* component, accumulating any errors and invoking
 the viewer shell script (*`view.sh`*) to view the plotted test results:
 +
---------------------------------------------
-ocpidev run test mycomp.test --accumulate_errors
-                             --mode=prep_run_verify
-                             --view
----------------------------------------------
+--------------------------------------------------------
+ocpidev run test mycomp.test --accumulate_errors --view
+--------------------------------------------------------
 +
-. Inside the *`assets`* project, run the test suite for the timestamper
-component in the *`util_comps`* library:
+. Inside the *`assets`* project, run the view script only for the timestamper
+component unit test suite in the *`util_comps`* library:
 +
-------------------------------------------------------
-ocpidev run test timestamper.test --library=util_comps
-------------------------------------------------------
+--------------------------------------------------------------------
+ocpidev run test timestamper.test --library=util_comps --phase=view
+--------------------------------------------------------------------
 +
 . Inside the *`components`* library in the current project, run
 all the component unit test suites in the library:
 +
 -----------------
 ocpidev run tests
-----------------
+-----------------
 +
 . Display information about the component unit test suites in the current project:
 +
---------------------------------
+---------------------------------
 ocpidev show tests --local-scope
---------------------------------
+---------------------------------
 
 BUGS
 ----
@@ -377,7 +365,7 @@ link:ocpidev-worker.1.html[ocpidev-worker(1)]
 
 COPYING
 -------
-Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2022 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your
