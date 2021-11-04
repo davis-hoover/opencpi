@@ -1,4 +1,4 @@
-This files provide user mode virtual file service to several underlying file technologies, including
+This library provides user mode virtual file service access to several underlying file technologies, including
 
 -- actual local operating system file system calls
 -- as http client
@@ -11,7 +11,7 @@ This files provide user mode virtual file service to several underlying file tec
 -- using a "readonly" filter for an underlying file system
 
 
-Several utility functions are alwo provided for files accessed using this VFS interface.
+Several utility functions are also provided for files accessed using this VFS interface.
 
 -- md5 hash of a file
 -- checking if the file is an XML document

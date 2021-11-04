@@ -15,6 +15,8 @@ Functionality found here includes code for:
 - Managing data types for properties, protocols, command options, and PValues.
 - Data-typed runtime values (the Value class)
 - Variable length, data typed, function/method arguments (the PValue class)
-- Artifact files that contain embedded XML metadata to descrive what is inside them
+- Artifact files that contain embedded XML metadata to describe what is inside them
 
-Basically these are functionalitiess that are not really big enough to deserve their own library.
+Basically this includes functionality that is not really big enough to deserve its own library.
+
+

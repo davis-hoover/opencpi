@@ -39,7 +39,7 @@
 namespace OX = OCPI::Util::EzXml;
 namespace OU = OCPI::Util;
 namespace OS = OCPI::OS;
-namespace OD = OCPI::Base::Plugin;
+namespace OP = OCPI::Base::Plugin;
 namespace DDT = DtOsDataTypes;
 namespace DataTransfer {
 
@@ -59,7 +59,7 @@ configure(ezxml_t x) {
     throw OU::Error("Invalid OCPI_SMB_SIZE value: %s", env);
   ocpiDebug("After environment, SMB size is %zu", m_SMBSize);
   // Now configure the drivers
-  OD::Manager::configure(x);
+  OP::Manager::configure(x);
   for (XferFactory* d = firstDriver(); d; d = d->nextDriver())
     ocpiInfo("Transfer Driver manager has protocol %s", d->getProtocol());
 }
@@ -87,7 +87,7 @@ getDriver(const char *name) {
 }
 
 const char *xfer = "transfer";
-  static OD::Registration<XferManager> xfm;
+  static OP::Registration<XferManager> xfm;
 XferManager::
 XferManager()
   : m_mutex(true), m_configured(false) {

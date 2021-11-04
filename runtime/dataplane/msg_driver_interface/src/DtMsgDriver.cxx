@@ -47,7 +47,7 @@ namespace OX = OCPI::Util::EzXml;
 namespace OU = OCPI::Util;
 namespace OB = OCPI::Base;
 namespace OS = OCPI::OS;
-namespace OD = OCPI::Base::Plugin;
+namespace OP = OCPI::Base::Plugin;
 namespace DTM = DataTransfer::Msg;
 
 using namespace DTM;
@@ -102,7 +102,7 @@ configure( ezxml_t x)
     */
 
     // Now configure the drivers
-    OD::Manager::configure(x);
+    OP::Manager::configure(x);
 
   }
 }
@@ -138,7 +138,7 @@ DTM::XferFactoryManager::
 
 DTM::XferFactory::
 XferFactory(const char *a_name)
-  : OD::DriverType<DTM::XferFactoryManager, DTM::XferFactory>(a_name, *this) {
+  : OP::DriverType<DTM::XferFactoryManager, DTM::XferFactory>(a_name, *this) {
 }
 
 void 
@@ -147,7 +147,7 @@ configure(ezxml_t x) {
   // parse generic attributes and default from parent
   parse(&DTM::XferFactoryManager::getFactoryManager(), x);
   // base class does device config if present
-  OD::Driver::configure(x); 
+  OP::Driver::configure(x); 
 }
 
 
@@ -155,7 +155,7 @@ void
 DTM::Device::
 configure(ezxml_t x)
 {
-  OD::Device::configure(x); // give the base class a chance to do generic configuration
+  OP::Device::configure(x); // give the base class a chance to do generic configuration
   parse(&driverBase(), x);
 }
 

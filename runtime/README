@@ -8,6 +8,6 @@ The runtime software here relies the OpenCPI os abstraction layer in ../os.
 It also relies on calls to some (runtime, cross-compiled) prerequisite software libraries like gpsd amd lzma,
 as well as standard C++ libraries, and OS system libraries and system calls.
 
-Thus the runtime stack of software is typically layered (higher levels can use lower levels, but NOT vice versa.).
+Thus the runtime stack of software is typically layered (higher levels can use lower levels, but NOT vice versa).
 
 The actual ordering or layering is defined in the ../build/places file.

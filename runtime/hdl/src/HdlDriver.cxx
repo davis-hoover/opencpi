@@ -63,9 +63,8 @@ namespace OCPI {
     namespace OA = OCPI::API;
     namespace OU = OCPI::Util;
     namespace OB = OCPI::Base;
-    namespace OP = OCPI::HDL::PCI;
     namespace OS = OCPI::OS;
-    namespace OD = OCPI::Base::Plugin;
+    namespace OP = OCPI::Base::Plugin;
 
     const char *hdl = "hdl";
 
@@ -279,7 +278,7 @@ namespace OCPI {
     void Driver::
     configure(ezxml_t xml) {
       // First, do the generic configuration, which configures discovered devices for this driver
-      OD::Driver::configure(xml);
+      OP::Driver::configure(xml);
       ezxml_t xx;
       if (!xml || !(xx = ezxml_cchild(xml, "gpsd"))) return;
       m_doGpsd = true;

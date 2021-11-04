@@ -113,4 +113,6 @@ other tests, a binary data file is generated containing complex signed 16-bit sa
 a tone at a configurable center frequency and sample frequency. Plotting of the I/O data
 is available, via ``View=1``, if desired.
 
+.. ocpi_documentation_test_platforms::
+
 .. ocpi_documentation_test_result_summary::

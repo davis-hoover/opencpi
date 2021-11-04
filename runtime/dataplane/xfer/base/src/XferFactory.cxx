@@ -37,7 +37,7 @@
 namespace OX = OCPI::Util::EzXml;
 namespace OU = OCPI::Util;
 namespace OS = OCPI::OS;
-namespace OD = OCPI::Base::Plugin;
+namespace OP = OCPI::Base::Plugin;
 namespace DataTransfer {
 
 // An XferFactory keeps track of which templates exist.
@@ -169,7 +169,7 @@ supportsEndPoint(const char *a_name) {
 
 XferFactory::
 XferFactory(const char *a_name)
-  : OD::DriverType<XferManager,XferFactory>(a_name, *this) {
+  : OP::DriverType<XferManager,XferFactory>(a_name, *this) {
 }
 
 // Destructor
@@ -217,7 +217,7 @@ configure(ezxml_t x) {
   // parse generic attributes and default from parent
   parse(&XferManager::getFactoryManager(), x);
   // base class does device config if present
-  OD::Driver::configure(x); 
+  OP::Driver::configure(x); 
 }
 
 // Internal method
@@ -321,7 +321,7 @@ addCompatibleLocalEndPoint(const char *remote) {
 
 void Device::
 configure(ezxml_t x) {
-  OD::Device::configure(x); // give the base class a chance to do generic configuration
+  OP::Device::configure(x); // give the base class a chance to do generic configuration
   parse(&driverBase(), x);
 }
 

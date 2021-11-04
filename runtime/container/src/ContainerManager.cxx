@@ -51,7 +51,7 @@ extern "C" {
 namespace OCPI {
   namespace Container {
     namespace OA = OCPI::API;
-    namespace OD = OCPI::Base::Plugin;
+    namespace OP = OCPI::Base::Plugin;
     namespace OU = OCPI::Util;
     namespace OB = OCPI::Base;
     namespace OM = OCPI::Metadata;
@@ -100,7 +100,7 @@ namespace OCPI {
 	if (d)
 	  d->configure(dx);
 	else
-	  OD::ManagerManager::
+	  OP::ManagerManager::
 	    configError(x, "element '%s' doesn't match any loaded container driver");
       }
     }
@@ -166,7 +166,7 @@ namespace OCPI {
       DataTransfer::XferManager::getFactoryManager().cleanForContext(context);
     }
     Driver::Driver(const char *a_name) 
-      : OD::DriverType<Manager,Driver>(a_name, *this) {
+      : OP::DriverType<Manager,Driver>(a_name, *this) {
     }
     const char
       *application = "application",

@@ -38,7 +38,6 @@
 namespace OX = OCPI::Util::EzXml;
 namespace OU = OCPI::Util;
 namespace OS = OCPI::OS;
-namespace OD = OCPI::Base::Plugin;
 namespace DDT = DtOsDataTypes;
 namespace DataTransfer {
 
