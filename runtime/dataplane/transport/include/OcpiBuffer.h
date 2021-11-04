@@ -34,7 +34,7 @@
 #define OCPI_DataTransport_Buffer_H_
 
 #include "OsDataTypes.hh"
-#include <OcpiList.h>
+#include "UtilList.hh"
 #include <OcpiTransportConstants.h>
 #include <OcpiPortMetaData.h>
 #include <DtHandshakeControl.h>

@@ -29,7 +29,7 @@
 #include "OsTimer.hh"
 #include "MetadataProperty.hh"
 #include "MetadataWorker.hh"
-#include "UtilPValue.hh"
+#include "BasePValue.hh"
 
 namespace OCPI {
 
@@ -102,7 +102,7 @@ namespace OCPI {
 	const = 0;
       virtual void controlOperation(OCPI::Metadata::Worker::ControlOperation) = 0;
       virtual size_t getSequenceLengthProperty(const OCPI::API::PropertyInfo &info,
-					       const OCPI::Util::Member &m, size_t offset) const;
+					       const OCPI::Base::Member &m, size_t offset) const;
     };
     typedef uint32_t PortMask;
     class Worker;
@@ -152,7 +152,7 @@ namespace OCPI {
       inline size_t member() const { return m_member; }
       inline size_t crewSize() const { return m_crewSize; }
       Worker(Artifact *art, ezxml_t impl, ezxml_t inst, const Workers &slaves, bool hasMaster,
-	     size_t member, size_t crewSize, const OCPI::Util::PValue *params = NULL);
+	     size_t member, size_t crewSize, const OCPI::Base::PValue *params = NULL);
       OCPI::API::PropertyInfo &setupProperty(const char *name,
 					     volatile uint8_t *&m_writeVaddr,
 					     const volatile uint8_t *&m_readVaddr) const;
@@ -160,7 +160,7 @@ namespace OCPI {
 					     volatile uint8_t *&m_writeVaddr,
 					     const volatile uint8_t *&m_readVaddr) const;
       virtual Port &createPort(const OCPI::Metadata::Port &metaport,
-			       const OCPI::Util::PValue *props) = 0;
+			       const OCPI::Base::PValue *props) = 0;
       virtual Worker *nextWorker() = 0;
     public:
       static bool hasOption(OCPI::API::PropertyOptionList &options, OCPI::API::PropertyOption o);
@@ -188,28 +188,28 @@ namespace OCPI {
 			      OCPI::API::PropertyAttributes *attributes) const;
       // Level 3 of 5: Interceptable for most efficient remote access
       virtual void setProperty(const OCPI::API::PropertyInfo &info, const char *val,
-			       const OCPI::Util::Member &m, size_t offset, size_t dimension) const;
+			       const OCPI::Base::Member &m, size_t offset, size_t dimension) const;
       virtual void getProperty(const OCPI::API::PropertyInfo &info, std::string &val,
-			       const OCPI::Util::Member &m, size_t offset, size_t dimension,
+			       const OCPI::Base::Member &m, size_t offset, size_t dimension,
 			       OCPI::API::PropertyOptionList &options = OCPI::API::noPropertyOptions,
 			       OCPI::API::PropertyAttributes *a_attributes = NULL) const;
       // Level 4 of 5: internal call after processing the data type for slicing etc.
       void setProperty(const OCPI::API::PropertyInfo &info, const char *val,
-		       const OCPI::Util::Member &m, size_t offset) const;
+		       const OCPI::Base::Member &m, size_t offset) const;
       void getProperty(const OCPI::API::PropertyInfo &info, std::string &val,
-		       const OCPI::Util::Member &m, size_t offset,
+		       const OCPI::Base::Member &m, size_t offset,
 		       OCPI::API::PropertyOptionList &options = OCPI::API::noPropertyOptions,
 		       OCPI::API::PropertyAttributes *a_attributes = NULL) const;
       // Level 5 of 5: The actual local work that involves caching etc.
-      void setProperty(unsigned ordinal, const OCPI::Util::Value &v) const; // for launcher
+      void setProperty(unsigned ordinal, const OCPI::Base::Value &v) const; // for launcher
     private:
-      void setProperty(const OCPI::API::PropertyInfo &info, const OCPI::Util::Value &v,
-		       const OCPI::Util::Member &m, size_t offset) const;
-      void getProperty(const OCPI::API::PropertyInfo &info, OCPI::Util::Value &v,
-		       const OCPI::Util::Member &m, size_t offset,
+      void setProperty(const OCPI::API::PropertyInfo &info, const OCPI::Base::Value &v,
+		       const OCPI::Base::Member &m, size_t offset) const;
+      void getProperty(const OCPI::API::PropertyInfo &info, OCPI::Base::Value &v,
+		       const OCPI::Base::Member &m, size_t offset,
 		       OCPI::API::PropertyOptionList &options = OCPI::API::noPropertyOptions,
 		       OCPI::API::PropertyAttributes *a_attributes = NULL) const;
-      Cache *getCache(const OCPI::API::PropertyInfo &info, size_t offset, const OCPI::Util::Member &m,
+      Cache *getCache(const OCPI::API::PropertyInfo &info, size_t offset, const OCPI::Base::Member &m,
 		      bool *dirty = NULL,
 		      OCPI::API::PropertyOptionList &options = OCPI::API::noPropertyOptions,
 		      OCPI::API::PropertyAttributes *a_attributes = NULL) const;
@@ -247,11 +247,11 @@ namespace OCPI {
       // backward compatibility for ctests
       virtual Port
 	&createOutputPort(OCPI::Metadata::PortOrdinal portId, size_t bufferCount, size_t bufferSize,
-			  const OCPI::Util::PValue *params = NULL),
+			  const OCPI::Base::PValue *params = NULL),
 	&createInputPort(OCPI::Metadata::PortOrdinal portId, size_t bufferCount, size_t bufferSize,
-			 const OCPI::Util::PValue *params = NULL),
+			 const OCPI::Base::PValue *params = NULL),
 	&createTestPort(OCPI::Metadata::PortOrdinal portId, size_t bufferCount, size_t bufferSize,
-			bool isProvider, const OCPI::Util::PValue *params = NULL);
+			bool isProvider, const OCPI::Base::PValue *params = NULL);
       virtual void read(size_t offset, size_t size, void *data);
       virtual void write(size_t offset, size_t size, const void *data);
       // end backward compatibility for ctests
@@ -267,16 +267,16 @@ namespace OCPI {
 #undef OCPI_DATA_TYPE
 #undef OCPI_DATA_TYPE_S
     protected:
-     size_t getSequenceLengthCached(const OCPI::API::PropertyInfo &info, const OCPI::Util::Member &m,
+     size_t getSequenceLengthCached(const OCPI::API::PropertyInfo &info, const OCPI::Base::Member &m,
 				    size_t offset) const;
     public:
 #define OCPI_DATA_TYPE(sca,corba,letter,bits,run,pretty,store) \
       void set##pretty##PropertyOrd(unsigned ordinal, run val, unsigned idx) const; \
       run get##pretty##PropertyOrd(unsigned ordinal, unsigned idx) const; \
       run get##pretty##Parameter(unsigned ordinal, unsigned idx) const; \
-      void set##pretty##Cached(const OCPI::API::PropertyInfo &info, const OCPI::Util::Member &m, \
+      void set##pretty##Cached(const OCPI::API::PropertyInfo &info, const OCPI::Base::Member &m, \
 			       size_t offset, run val, unsigned idx) const; \
-      run get##pretty##Cached(const OCPI::API::PropertyInfo &info, const OCPI::Util::Member &m, \
+      run get##pretty##Cached(const OCPI::API::PropertyInfo &info, const OCPI::Base::Member &m, \
 			      size_t offset, unsigned idx) const; \
       void set##pretty##SequenceCached(const OCPI::API::PropertyInfo &info, const run *vals, size_t n) const; \
       unsigned get##pretty##SequenceCached(const OCPI::API::PropertyInfo &info, run *vals, size_t n) const;
@@ -285,9 +285,9 @@ namespace OCPI {
       void set##pretty##PropertyOrd(unsigned ordinal, run val, unsigned idx) const; \
       void get##pretty##PropertyOrd(unsigned ordinal, char *, size_t length, unsigned idx) const; \
       void get##pretty##Parameter(unsigned ordinal, char *, size_t length, unsigned idx) const; \
-      void set##pretty##Cached(const OCPI::API::PropertyInfo &info, const OCPI::Util::Member &m, \
+      void set##pretty##Cached(const OCPI::API::PropertyInfo &info, const OCPI::Base::Member &m, \
 			       size_t offset, run val, unsigned idx) const; \
-      run get##pretty##Cached(const OCPI::API::PropertyInfo &info, const OCPI::Util::Member &m, \
+      run get##pretty##Cached(const OCPI::API::PropertyInfo &info, const OCPI::Base::Member &m, \
 			      size_t offset, char *, size_t, unsigned idx) const; \
       void set##pretty##SequenceCached(const OCPI::API::PropertyInfo &info, const run *vals, size_t n) const; \
       unsigned get##pretty##SequenceCached(const OCPI::API::PropertyInfo &info, char **vals, size_t n, \

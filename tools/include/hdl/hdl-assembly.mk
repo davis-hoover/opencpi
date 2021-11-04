@@ -54,7 +54,7 @@ endif
 # and also include those passed down from the "assemblies" level via ComponentLibrariesInternal
 # THIS LIST IS FOR THE APPLICATION ASSEMBLY NOT FOR THE CONTAINER
 # This is done here so that the build file + OWD parsing will succeed when this assembly
-# sets ComponentLlibraries in its Makefile.
+# sets ComponentLibraries in its Makefile.
 # But it will need to be done again *after* the build/OWD files are processes in case
 # the build/OWD XML file sets ComponentLibraries
 override ComponentLibraries+= $(ComponentLibrariesInternal) components adapters

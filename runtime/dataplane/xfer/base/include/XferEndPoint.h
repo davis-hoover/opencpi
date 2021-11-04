@@ -26,9 +26,9 @@
 #include <assert.h>
 #include <string>
 #include <map>
-#include "UtilPValue.hh"
+#include "BasePValue.hh"
 #include "OcpiUuid.h"
-#include "OcpiRes.h"
+#include "UtilRes.hh"
 
 namespace DataTransfer {
 
@@ -103,7 +103,7 @@ protected:
   uint64_t             m_address;    // Address of endpoint in its address space (usually 0)
   bool                 m_needsFlags; // Endpoint requires a flag region (uncached).
   EndPoint(XferFactory &factory, const char *eps, const char *other, bool local, size_t size,
-	   const OCPI::Util::PValue *params);
+	   const OCPI::Base::PValue *params);
  public:
   virtual ~EndPoint();
  private:

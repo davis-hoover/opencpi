@@ -62,9 +62,9 @@ namespace OCPI {
     namespace OC = OCPI::Container;
     namespace OA = OCPI::API;
     namespace OU = OCPI::Util;
-    namespace OP = OCPI::HDL::PCI;
+    namespace OB = OCPI::Base;
     namespace OS = OCPI::OS;
-    namespace OD = OCPI::Driver;
+    namespace OP = OCPI::Base::Plugin;
 
     const char *hdl = "hdl";
 
@@ -144,7 +144,7 @@ namespace OCPI {
 	    goto out;
       if (!setup(dev, config, error)) {
 	bool printOnly = false;
-	if ((OU::findBool(m_params, "printOnly", printOnly) && printOnly))
+	if ((OB::findBool(m_params, "printOnly", printOnly) && printOnly))
 	  dev.print(); // fall through to delete
 	else {
 #if 0
@@ -278,7 +278,7 @@ namespace OCPI {
     void Driver::
     configure(ezxml_t xml) {
       // First, do the generic configuration, which configures discovered devices for this driver
-      OD::Driver::configure(xml);
+      OP::Driver::configure(xml);
       ezxml_t xx;
       if (!xml || !(xx = ezxml_cchild(xml, "gpsd"))) return;
       m_doGpsd = true;
@@ -356,7 +356,8 @@ namespace OCPI {
         }
       }
       if (m_gpsdp->m_session.gpsdata.fix.mode >= MODE_2D)
-        return OS::Time(round(m_gpsdp->m_session.gpsdata.fix.time), 0);
+	// Only use seconds
+        return OS::Time((uint32_t)lround(m_gpsdp->m_session.gpsdata.fix.time), 0);
       else
         isGps = false;
       ocpiInfo("HDL Driver: GPS fix not acquired");

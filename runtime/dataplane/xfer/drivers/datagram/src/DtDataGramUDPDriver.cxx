@@ -36,8 +36,8 @@
 #include "OsServerSocket.hh"
 #include "OsAssert.hh"
 #include "OsEther.hh"
-#include "OcpiUtilMisc.h"
-#include "OcpiUtilEzxml.h"
+#include "UtilMisc.hh"
+#include "UtilEzxml.hh"
 #include "XferException.h"
 #include "DtDataGramXfer.h"
 
@@ -45,6 +45,7 @@
 
 namespace XF = DataTransfer;
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 namespace OS = OCPI::OS;
 namespace DG = DataTransfer::Datagram;
 namespace OE = OCPI::OS::Ether;
@@ -62,7 +63,7 @@ namespace DataTransfer {
       struct sockaddr_in m_sockaddr;
     public:
       EndPoint(XF::XferFactory &a_factory, const char *protoInfo, const char *eps,
-	       const char *other, bool a_local, size_t a_size, const OU::PValue *params)
+	       const char *other, bool a_local, size_t a_size, const OB::PValue *params)
 	: DG::DGEndPoint(a_factory, eps, other, a_local, a_size, params) { 
 	if (protoInfo) {
 	  m_protoInfo = protoInfo;
@@ -218,7 +219,7 @@ namespace DataTransfer {
       XF::XferServices &createXferServices(XF::EndPoint &source, XF::EndPoint &target);
       DG::Socket &createSocket(XF::EndPoint &sep);
       XF::EndPoint &createEndPoint(const char *protoInfo, const char *eps, const char *other,
-				   bool local, size_t size, const OCPI::Util::PValue *params);
+				   bool local, size_t size, const OB::PValue *params);
       // End boilerplate methods
       const char* getProtocol() { return "ocpi-udp-rdma";}
     };

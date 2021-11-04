@@ -27,8 +27,8 @@
 #include "OsAssert.hh"
 #include "OsFileIterator.hh"
 #include "OsFileSystem.hh"
-#include "OcpiUtilException.h"
-#include "OcpiUtilEzxml.h"
+#include "UtilException.hh"
+#include "UtilEzxml.hh"
 #include "OcpiLibraryManager.h"
 #include "OcpiComponentLibrary.h"
 
@@ -93,7 +93,7 @@ namespace OCPI {
 	  doPath(globbedName);
 	}
 	OCPI::Library::Artifact *
-	addArtifact(const char *url, const OCPI::API::PValue *params) {
+	addArtifact(const char *url, const OA::PValue *params) {
 	  std::time_t mtime;
 	  uint64_t length;
 	  size_t metaLength;
@@ -157,7 +157,7 @@ namespace OCPI {
 	  // First we call the base class, which loads explicit libraries.
 	  OL::Driver::configure(x);
 	}
-	unsigned search(const PValue* /*props*/, const char **/*exclude*/,
+	unsigned search(const OA::PValue* /*props*/, const char **/*exclude*/,
 			bool /* discoveryOnly */) {
 	  unsigned n = 0;
 	  // Now we look in the path environment variable

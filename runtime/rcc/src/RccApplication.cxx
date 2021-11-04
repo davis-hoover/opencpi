@@ -39,6 +39,7 @@ namespace OCPI {
     namespace OC = OCPI::Container;
     namespace OA = OCPI::API;
     namespace OU = OCPI::Util;
+    namespace OB = OCPI::Base;
 
 Artifact::
 Artifact(Container &c, OCPI::Library::Artifact &lart, const OA::PValue *props)
@@ -52,7 +53,7 @@ Artifact(Container &c, OCPI::Library::Artifact &lart, const OA::PValue *props)
     ocpiInfo("Loading RCC worker artifact %s", url);
     m_loader.open(url);
     m_open = true;
-    OU::findString(props, "DLLEntryPoint", entryPoint);
+    OB::findString(props, "DLLEntryPoint", entryPoint);
     m_entryTable = (RCCEntryTable *)m_loader.getSymbol(entryPoint);
   } catch (std::string &error) {
     OU::format(err, "Could not open RCC worker file %s: %s", url, error.c_str());
@@ -93,7 +94,7 @@ Artifact::
  * Constructor
  *********************************/
 Application::
-Application(Container &c, const char *a_name, const OU::PValue *props)
+Application(Container &c, const char *a_name, const OB::PValue *props)
   : OC::ApplicationBase<Container,Application,Worker>(c, *this, a_name, props)
 {
   // Empty
@@ -123,7 +124,7 @@ Application::
 OC::Worker & Application::
 createWorker(OC::Artifact *art, const char *appInstName, ezxml_t impl, ezxml_t inst,
 	     const OC::Workers &slaves, bool hasMaster, size_t member, size_t crewSize,
-	     const OCPI::Util::PValue *wParams) {
+	     const OB::PValue *wParams) {
   OU::SelfAutoMutex guard(&container());
   return *new Worker(*this, art ? static_cast<Artifact*>(art) : NULL,
 		     appInstName ? appInstName : "unnamed-worker", impl, inst, slaves, hasMaster,

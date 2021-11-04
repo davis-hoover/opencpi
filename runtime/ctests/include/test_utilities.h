@@ -35,8 +35,8 @@
 #include "OsAssert.hh"
 #include "OcpiTimeEmit.h"
 #include "OcpiRDTInterface.h"
-#include "OcpiThread.h"
-#include "UtilPValue.hh"
+#include "UtilThread.hh"
+#include "BasePValue.hh"
 #include "Container.h"
 #include "ContainerWorker.h"
 #include "ContainerPort.h"
@@ -102,7 +102,7 @@ struct CWorker {
     ConData() : worker(NULL), pid(0) {}
   };
   struct Pdata {
-    OCPI::Util::PValue            *props;
+    OCPI::Base::PValue            *props;
     bool                          input;
     size_t                        bufferCount;
     OCPI::Container::Port *       port;

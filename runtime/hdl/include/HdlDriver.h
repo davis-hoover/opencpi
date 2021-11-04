@@ -50,7 +50,7 @@ namespace OCPI {
       Access, // for temporary probing
 	virtual protected OCPI::Util::SelfMutex
     {
-      const OCPI::Util::PValue *m_params; // a temporary during discovery
+      const OCPI::Base::PValue *m_params; // a temporary during discovery
       bool setup(Device &dev, ezxml_t &config, std::string &err);
       struct GPSDParams* m_gpsdp;
     protected:
@@ -80,7 +80,7 @@ namespace OCPI {
       // Create an actual container.
       static OCPI::Container::Container *
       createContainer(Device &dev, ezxml_t config = NULL,
-		      const OCPI::Util::PValue *params = NULL);
+		      const OCPI::Base::PValue *params = NULL);
       // Create a dummy worker. - virtual due to driver access
       virtual DirectWorker *
       createDirectWorker(Device &dev, const Access &cAccess, Access &wAccess, ezxml_t impl,

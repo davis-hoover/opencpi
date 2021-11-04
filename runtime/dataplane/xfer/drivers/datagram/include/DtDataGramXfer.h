@@ -26,8 +26,8 @@
 #include <vector>
 #include "OsIovec.hh"
 #include "OsTimer.hh"
-#include "OcpiThread.h"
-#include "OcpiUtilSelfMutex.h"
+#include "UtilThread.hh"
+#include "UtilSelfMutex.hh"
 #include "XferDriver.h"
 #include "XferEndPoint.h"
 #include "XferFactory.h"
@@ -78,7 +78,7 @@ class DGEndPoint : public DataTransfer::EndPoint, protected virtual OCPI::Util::
   std::vector<XferServices *> m_xferServices;
 protected:
   DGEndPoint(DataTransfer::XferFactory &a_factory, const char *eps, const char *other, bool a_local,
-	     size_t a_size, const OCPI::Util::PValue *params)
+	     size_t a_size, const OCPI::Base::PValue *params)
     : DataTransfer::EndPoint(a_factory, eps, other, a_local, a_size, params), m_xferServices(32) {}
   ~DGEndPoint() {}
   void stop(); // stop all the underlying threads

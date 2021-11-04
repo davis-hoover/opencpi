@@ -19,7 +19,7 @@
  */
 
 #include <set>
-#include "OcpiUtilUUID.h"
+#include "UtilUUID.hh"
 #include "OcpiApplication.h"
 #include "cdkutils.h"
 #include "utils.h"

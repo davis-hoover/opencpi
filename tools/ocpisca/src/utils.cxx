@@ -20,8 +20,8 @@
 
 #include <string>
 #include <cstdio>
-#include "OcpiUtilMisc.h"
-#include "OcpiUtilException.h"
+#include "UtilMisc.hh"
+#include "UtilException.hh"
 #include "utils.h"
 
 namespace OU = OCPI::Util;

@@ -33,13 +33,13 @@
 #ifndef OCPI_DataTransport_Circuit_H_
 #define OCPI_DataTransport_Circuit_H_
 
-#include <OcpiList.h>
-#include "OcpiUtilSelfMutex.h"
+#include "UtilList.hh"
+#include "UtilSelfMutex.hh"
 #include <OcpiTimeEmit.h>
 #include <OcpiCircuit.h>
 #include "TransportPortSet.hh"
 #include <OcpiTransportConstants.h>
-#include <OcpiParentChild.h>
+#include "BaseParentChild.hh"
 
 namespace CU = ::OCPI::Util;
 namespace OCPI {

@@ -27,8 +27,8 @@
 #define CONTAINER_LAUNCHER_H
 #include <string>
 
-#include "OcpiUtilMisc.h" // Singleton
-#include "UtilValue.hh"
+#include "UtilMisc.hh" // Singleton
+#include "BaseValue.hh"
 #include "OcpiLibraryManager.h"
 #include "OcpiRDTInterface.h"
 #include "OcpiContainerApi.h"
@@ -64,7 +64,7 @@ namespace OCPI {
       // This structure shared by launch instances (members) in the same crew.
       struct Crew {
 	size_t m_size;
-	std::vector<OCPI::Util::Value> m_propValues;   // Array of property values to set
+	std::vector<OCPI::Base::Value> m_propValues;   // Array of property values to set
 	std::vector<unsigned> m_propOrdinals;          // Array of property ordinals
 	Crew();
       };
@@ -73,7 +73,7 @@ namespace OCPI {
 	Container *m_container;  // note that this will be set for external ports
 	std::string m_name;                            // if local, copied from assembly
 	const OCPI::Library::Implementation *m_impl;   // ptr since set after construction
-	std::vector<OCPI::Util::Value> m_propValues;   // Array of property values to set
+	std::vector<OCPI::Base::Value> m_propValues;   // Array of property values to set
 	std::vector<unsigned> m_propOrdinals;          // Array of property ordinals
 	bool m_hasMaster, m_doneInstance;
 	std::vector<Member *> m_slaves;
@@ -92,7 +92,7 @@ namespace OCPI {
 	const Member *m_member;
 	LocalPort *m_port;
 	const char *m_name;
-	OCPI::Util::PValueList m_params;
+	OCPI::Base::PValueList m_params;
 	const OCPI::Metadata::Port *m_metaPort; // needed on a server for the port that is not local
 	// m_scale can be zero, meaning no fanout/fanin or bridging at all.
 	// If non-zero, it implies the need for bridging for local ports

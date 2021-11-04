@@ -20,9 +20,9 @@
 
 #include <climits> // CHAR_BIT
 #include "OsMisc.hh"
-#include "UtilValue.hh"
-#include "UtilValueReader.hh"
-#include "UtilValueWriter.hh"
+#include "BaseValue.hh"
+#include "BaseValueReader.hh"
+#include "BaseValueWriter.hh"
 #include "Container.h"
 #include "ContainerPort.h"
 #include "ContainerApplication.h"
@@ -32,6 +32,7 @@
 namespace OA = OCPI::API;
 namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 namespace OCPI {
   namespace Container {
     Controllable::Controllable()
@@ -273,7 +274,7 @@ namespace OCPI {
     void Worker::
     setProperty(const OA::PropertyInfo &prop, const char *v, OA::AccessList &list) const {
       size_t offset, dimension;
-      const OU::Member *m;
+      const OB::Member *m;
       const char *err = prop.descend(list, m, NULL, &offset, &dimension);
       if (err)
 	throw OU::Error("For setting value \"%s\" for property \"%s\": %s", v, prop.cname(), err);
@@ -284,7 +285,7 @@ namespace OCPI {
     getProperty(const OCPI::API::PropertyInfo &prop, std::string &v, OA::AccessList &list,
 		OA::PropertyOptionList &options, OA::PropertyAttributes *a_attributes) const {
       size_t offset, dimension;
-      const OU::Member *m;
+      const OB::Member *m;
       const char *err = prop.descend(list, m, NULL, &offset, &dimension);
       if (err)
 	throw OU::Error("For getting value \"%s\" for property \"%s\": %s", v.c_str(), prop.cname(), err);
@@ -309,14 +310,14 @@ namespace OCPI {
     // Level 3 of 5, post, navigation, adjusting the data type based on dimension/slicing
     // This is the level that is intercepted for remote containers to avoid parse/unparse etc.
     void Worker::
-    setProperty(const OA::PropertyInfo &prop, const char *val, const OU::Member &a_member, size_t offset,
+    setProperty(const OA::PropertyInfo &prop, const char *val, const OB::Member &a_member, size_t offset,
 		size_t dimension) const {
       if (prop.m_isDebug && !isDebug())
 	throw OU::Error("For setting debug property \"%s\": worker is not in debug mode",
 			prop.cname());
       if (dimension) {
 	// Clone the data type, and then trim the dimensions.
-	OU::Member m(a_member);
+	OB::Member m(a_member);
 	if (m.m_isSequence) {
 	  m.m_isSequence = false;
 	  dimension--;
@@ -338,7 +339,7 @@ namespace OCPI {
 
     void Worker::
     getProperty(const OCPI::API::PropertyInfo &prop, std::string &val,
-		const OCPI::Util::Member &a_member, size_t offset, size_t dimension,
+		const OB::Member &a_member, size_t offset, size_t dimension,
 		OA::PropertyOptionList &options, OA::PropertyAttributes *a_attributes) const {
       if (prop.m_isDebug && !isDebug()) {
 	if (hasOption(options, OA::PropertyOption::UNREADABLE_OK)) {
@@ -353,7 +354,7 @@ namespace OCPI {
       }
       if (dimension) {
 	// Clone the data type, and then trim the dimensions.
-	OU::Member m(a_member);
+	OB::Member m(a_member);
 	if (m.m_isSequence) {
 	  m.m_isSequence = false;
 	  dimension--;
@@ -373,12 +374,12 @@ namespace OCPI {
 	getProperty(prop, val, a_member, offset, options, a_attributes);
     }
 
-    // Level 4 of 5, parsing the value string into a OU::Value object
+    // Level 4 of 5, parsing the value string into a OB::Value object
     // Used to avoid heap allocation when there is slicing (above).
     void Worker::
-    setProperty(const OA::PropertyInfo &prop, const char *v, const OU::Member &m,
+    setProperty(const OA::PropertyInfo &prop, const char *v, const OB::Member &m,
 		size_t offset) const {
-      OU::Value val(m);
+      OB::Value val(m);
       const char *err = val.parse(v);
       if (err)
 	throw OU::Error("For value \"%s\" for property \"%s\": %s", v, prop.m_name.c_str(), err);
@@ -394,10 +395,10 @@ namespace OCPI {
     }
 
     void Worker::
-    getProperty(const OCPI::API::PropertyInfo &info, std::string &val, const OCPI::Util::Member &m,
+    getProperty(const OCPI::API::PropertyInfo &info, std::string &val, const OB::Member &m,
 		size_t offset, OA::PropertyOptionList &options,
 		OA::PropertyAttributes *a_attributes) const {
-      OU::Value v(m);
+      OB::Value v(m);
       getProperty(info, v, m, offset, options, a_attributes);
       if (a_attributes && a_attributes->isUnreadable) {
 	if (!hasOption(options, OA::PropertyOption::APPEND))
@@ -410,21 +411,21 @@ namespace OCPI {
     // Level 5 of 5: doing the real work based on a value object and an offset, dealing with caching
     // This level is used directly for delayed settings from the application level
     // Internal used by others.
-    // FIXME:  would a copy-constructor of OU::Value be better for caching?
-    //         most callers are constructing an OU::Value already
-    //         m_cache could be a sparse OU::Value pointer vector?
+    // FIXME:  would a copy-constructor of OB::Value be better for caching?
+    //         most callers are constructing an OB::Value already
+    //         m_cache could be a sparse OB::Value pointer vector?
     // The optionally non-NULL memberp arg identifies the member within this property
     // which might a struct member, and moffset is an offset into the overall property
     // which might be into the middle of an array or sequence.
     void Worker::
-    setProperty(unsigned ordinal, const OCPI::Util::Value &v) const {
+    setProperty(unsigned ordinal, const OB::Value &v) const {
       OM::Property &p = property(ordinal);
       setProperty(p, v, p, 0);
     }
 
     // dirty != NULL means for reading rather than writing
     Cache *Worker::
-    getCache(const OA::PropertyInfo &info, size_t offset, const OU::Member &m, bool *dirty,
+    getCache(const OA::PropertyInfo &info, size_t offset, const OB::Member &m, bool *dirty,
 	     OA::PropertyOptionList &options, OA::PropertyAttributes *a_attributes) const {
       if (dirty) {
 	*dirty = false;
@@ -529,7 +530,7 @@ namespace OCPI {
     }
 
     void Worker::
-    setProperty(const OA::PropertyInfo &info, const OU::Value &v, const OU::Member &m,
+    setProperty(const OA::PropertyInfo &info, const OB::Value &v, const OB::Member &m,
 		size_t mOffset) const {
       if (!info.m_isWritable)
 	throw OU::Error("The '%s' property of worker '%s' is not writable",
@@ -565,8 +566,8 @@ namespace OCPI {
 	    alloc = new uint64_t[(nBytes + 7)/8]; // round nBytes up to next 64bit chunk
 	    size_t length = nBytes;
 	    data = (uint8_t*)alloc;
-	    const OU::Value *vp = &v;
-	    OU::ValueReader reader(&vp);
+	    const OB::Value *vp = &v;
+	    OB::ValueReader reader(&vp);
 	    // put data from the value object into the data buffer, not fake top level
 	    m.read(reader, data, length, false, true);
 	    if (m.m_isSequence) {
@@ -602,7 +603,7 @@ namespace OCPI {
     }
 
     void Worker::
-    getProperty(const OA::PropertyInfo &info, OU::Value &v, const OU::Member &m,
+    getProperty(const OA::PropertyInfo &info, OB::Value &v, const OB::Member &m,
 		size_t mOffset, OA::PropertyOptionList &options,
 		OA::PropertyAttributes *a_attributes) const {
       if (info.m_baseType == OA::OCPI_Type || m.m_baseType == OA::OCPI_Type)
@@ -637,8 +638,8 @@ namespace OCPI {
 	  size_t length = nBytes;
 	  // The writer creates its own value objects...
 	  // FIXME: use more ValueWriter functionality for this whole method
-	  OU::Value *vp = NULL;
-	  OU::ValueWriter writer(&vp, 1);
+	  OB::Value *vp = NULL;
+	  OB::ValueWriter writer(&vp, 1);
 	  m.write(writer, data, length, true); // is top-level
 	  assert(length < m.m_dataAlign); // padding at end may not be taken
 	  delete [] alloc;  // deallocate if not null
@@ -867,17 +868,17 @@ namespace OCPI {
     get##pretty##Parameter(unsigned ordinal, unsigned idx) const {	\
       OM::Property &p = m_properties[ordinal];				\
       assert(p.m_default);						\
-      OU::Value &v = *p.m_default;					\
+      OB::Value &v = *p.m_default;					\
       return p.m_isSequence || p.m_arrayRank ? v.m_p##pretty[idx] : v.m_##pretty; \
     } \
     void Worker::							\
-    set##pretty##Cached(const OCPI::API::PropertyInfo &info, const OCPI::Util::Member &m, \
+    set##pretty##Cached(const OCPI::API::PropertyInfo &info, const OB::Member &m, \
 			size_t offset, run val, unsigned idx) const {	\
       Cache *cache = getCache(info, offset, m);				\
       setData(info, cache, offset + idx * m.m_elementBytes, (uint8_t*)&val, 0, m.m_nBits); \
     }									\
     run Worker::							\
-    get##pretty##Cached(const OCPI::API::PropertyInfo &info, const OCPI::Util::Member &m, \
+    get##pretty##Cached(const OCPI::API::PropertyInfo &info, const OB::Member &m, \
 			size_t offset, unsigned idx) const {;		\
       if (info.m_isParameter)                                           \
     	return m.m_default->m_##pretty;                                 \
@@ -929,7 +930,7 @@ namespace OCPI {
     }
 
     void Worker::
-    setStringCached(const OCPI::API::PropertyInfo &info, const OCPI::Util::Member &m,
+    setStringCached(const OCPI::API::PropertyInfo &info, const OB::Member &m,
 		    size_t offset, const char *val, unsigned idx) const {
       size_t len = strlen(val);
       if (len > m.m_stringLength)
@@ -940,7 +941,7 @@ namespace OCPI {
     }
 
     const char *Worker::
-    getStringCached(const OCPI::API::PropertyInfo &info, const OCPI::Util::Member &m,
+    getStringCached(const OCPI::API::PropertyInfo &info, const OB::Member &m,
 		    size_t offset, char *buf, size_t a_len, unsigned idx) const {
       if (a_len < m.m_stringLength + 1)
 	throw OU::Error("String value for %s property too long for buffer (%zu vs. %zu)",
@@ -1000,7 +1001,7 @@ namespace OCPI {
     }
 
     size_t Worker::
-    getSequenceLengthCached(const OCPI::API::PropertyInfo &info, const OCPI::Util::Member &m,
+    getSequenceLengthCached(const OCPI::API::PropertyInfo &info, const OB::Member &m,
 			    size_t offset) const {
       if (info.m_isParameter) // will fail if sequence is not at top level
 	return m.m_default->m_nElements;
@@ -1013,7 +1014,7 @@ namespace OCPI {
     }
 
     size_t WorkerControl::
-    getSequenceLengthProperty(const OCPI::API::PropertyInfo &info, const Util::Member &/*m*/,
+    getSequenceLengthProperty(const OCPI::API::PropertyInfo &info, const OB::Member &/*m*/,
 			      size_t offset) const {
       return getProperty32(info, offset, 0);
     }
@@ -1022,27 +1023,27 @@ namespace OCPI {
     getStringParameter(unsigned ordinal, char *out, size_t length, unsigned idx) const {
       OM::Property &p = m_properties[ordinal];
       assert(p.m_default);
-      OU::Value &v = *p.m_default;
+      OB::Value &v = *p.m_default;
       strncpy(out, p.m_isSequence || p.m_arrayRank ? v.m_pString[idx] : v.m_String, length);
     }
 
     Port &Worker::
     createOutputPort(OM::PortOrdinal /*portId*/, size_t /*bufferCount*/, size_t /*bufferSize*/,
-		     const OU::PValue */*params*/) {
+		     const OB::PValue */*params*/) {
       ocpiAssert("This method is not expected to ever be called" == 0);
       return *(Port*)this;
     }
 
     Port &Worker::
     createInputPort(OM::PortOrdinal /*portId*/, size_t /*bufferCount*/, size_t /*bufferSize*/,
-		    const OU::PValue */*params*/) {
+		    const OB::PValue */*params*/) {
       ocpiAssert("This method is not expected to ever be called" == 0);
       return *(Port*)this;
     }
 
     Port &Worker::
     createTestPort(OM::PortOrdinal /*portId*/, size_t /*bufferCount*/, size_t /*bufferSize*/,
-		   bool /*isProvider*/, const OU::PValue */*params*/) {
+		   bool /*isProvider*/, const OB::PValue */*params*/) {
       ocpiAssert("This method is not expected to ever be called" == 0);
       return *(Port*)this;
     }

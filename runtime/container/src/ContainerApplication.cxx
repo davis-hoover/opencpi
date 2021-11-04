@@ -26,7 +26,7 @@
 
 namespace OA = OCPI::API;
 namespace OL = OCPI::Library;
-namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 namespace OM = OCPI::Metadata;
 
 namespace OCPI {
@@ -34,7 +34,7 @@ namespace OCPI {
     Application::Application(const OA::PValue *params)
       : m_apiApplication(NULL) {
       const char *package;
-      if (OU::findString(params, "package", package))
+      if (OB::findString(params, "package", package))
 	m_package = package;
       else
 	m_package = "local";
@@ -86,7 +86,7 @@ namespace OCPI {
     Worker &Application::
     createWorker(OCPI::Library::Artifact &art, const char *appInstName, 
 		 ezxml_t impl, ezxml_t inst, const Workers &slaves, bool hasMaster,
-		 size_t member, size_t crewSize, const OCPI::Util::PValue *wParams) {
+		 size_t member, size_t crewSize, const OB::PValue *wParams) {
       // Load the artifact and create the worker
       return
 	container().loadArtifact(art).createWorker(*this, appInstName, impl, inst, slaves,

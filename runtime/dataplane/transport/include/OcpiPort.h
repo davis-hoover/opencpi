@@ -37,8 +37,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits>
-#include <OcpiList.h>
-#include <OcpiParentChild.h>
+#include "UtilList.hh"
+#include "BaseParentChild.hh"
 #include <OcpiTimeEmit.h>
 #include "XferEndPoint.h"
 #include "XferFactory.h"

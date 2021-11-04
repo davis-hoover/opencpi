@@ -21,19 +21,20 @@
 #include <limits>
 #include "OsAssert.hh"
 #include "MetadataProperty.hh"
-#include "OcpiUtilException.h"
-#include "UtilValue.hh"
+#include "UtilException.hh"
+#include "BaseValue.hh"
 #include "OcpiContainerApi.h"
 
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 namespace OS = OCPI::OS;
 namespace OCPI {
   namespace API {
     PropertyAccess::~PropertyAccess(){}
     void Property::
-    checkTypeAlways(const OU::Member &m, BaseType ctype, size_t n, bool write) const {
-      ocpiDebug("checkTypeAlways on %s, for %s which is %s", OU::baseTypeNames[ctype],
-		m_info.cname(), OU::baseTypeNames[m_info.m_baseType]);
+    checkTypeAlways(const OB::Member &m, BaseType ctype, size_t n, bool write) const {
+      ocpiDebug("checkTypeAlways on %s, for %s which is %s", OB::baseTypeNames[ctype],
+		m_info.cname(), OB::baseTypeNames[m_info.m_baseType]);
       const char *err = NULL;
       if (write && !m_info.m_isWritable)
 	err = "trying to write a non-writable property";
@@ -86,9 +87,9 @@ namespace OCPI {
       m_worker(w), m_info(w.setupProperty(n, m_writeVaddr, m_readVaddr)), m_member(m_info) {
       init();
     }
-    const OU::Member &Property::
+    const OB::Member &Property::
     descend(AccessList &list, size_t &offset, size_t *dimensionp) const {
-      const OU::Member *m;
+      const OB::Member *m;
       const char *err = m_info.descend(list, m, NULL, &offset, dimensionp);
       if (err)
 	throwError(err);
@@ -103,8 +104,8 @@ namespace OCPI {
     size_t Property::
     getSequenceLength(AccessList &list, bool uncached) const {
       size_t dimension, offset;
-      const OU::Member *m;
-      const OU::Value *vp; // when we are reading a default value from a parameter
+      const OB::Member *m;
+      const OB::Value *vp; // when we are reading a default value from a parameter
       const char *err;
       if ((err = m_info.descend(list, m, m_info.m_isParameter ? &vp : NULL, &offset, &dimension)))
 	throwError(err);
@@ -135,7 +136,7 @@ namespace OCPI {
     // This internal template method is called after all error checking is done and is not called
     // on strings, so the static_casts should not cause any unexpected results.
     template <typename val_t> void Property::
-    setValueInternal(const OU::Member &m, size_t offset, const val_t val) const {
+    setValueInternal(const OB::Member &m, size_t offset, const val_t val) const {
       switch (m.m_baseType) {
 
 #undef OCPI_DATA_TYPE_S
@@ -187,7 +188,7 @@ namespace OCPI {
       }
     }
     template <typename val_t> val_t Property::
-    getValueInternal(const OU::Member &m, size_t offset) const {
+    getValueInternal(const OB::Member &m, size_t offset) const {
       switch (m.m_baseType) {
 #undef OCPI_DATA_TYPE_S
 #define OCPI_DATA_TYPE_S(sca,corba,letter,bits,run,pretty,store)
@@ -242,9 +243,9 @@ namespace OCPI {
     template <> void Property::						\
     setValue<run>(const run val, AccessList &list) const {		\
       size_t offset;							\
-      const OU::Member &m = descend(list, offset);			\
+      const OB::Member &m = descend(list, offset);			\
       ocpiDebug("Property::setValue on %s %s->%s\n", m_info.cname(),	\
-		OU::baseTypeNames[OCPI_##pretty], OU::baseTypeNames[m_info.m_baseType]); \
+		OB::baseTypeNames[OCPI_##pretty], OB::baseTypeNames[m_info.m_baseType]); \
       if (m.m_baseType != OCPI_String)				\
 	throwError("setting non-string property with string value");	\
       set##pretty##Value(m, offset, val);				\
@@ -253,9 +254,9 @@ namespace OCPI {
     template <> void Property::						\
     setValue<run>(run val, AccessList &list) const {			\
       size_t offset;							\
-      const OU::Member &m = descend(list, offset);			\
+      const OB::Member &m = descend(list, offset);			\
       ocpiDebug("setValue on %s %s->%s\n", m_info.cname(),		\
-		OU::baseTypeNames[OCPI_##pretty], OU::baseTypeNames[m_info.m_baseType]); \
+		OB::baseTypeNames[OCPI_##pretty], OB::baseTypeNames[m_info.m_baseType]); \
       if (m.m_baseType == OCPI_##pretty)				\
 	set##pretty##Value(m, offset, val);				\
       else if (m_info.m_baseType == OCPI_String)			\
@@ -266,9 +267,9 @@ namespace OCPI {
     template <> run Property::						\
     getValue<run>(AccessList &list) const {				\
       size_t offset;							\
-      const OU::Member &m = descend(list, offset);			\
+      const OB::Member &m = descend(list, offset);			\
       ocpiDebug("getValue on %s %s->%s\n", m_info.cname(),		\
-		OU::baseTypeNames[OCPI_##pretty], OU::baseTypeNames[m_info.m_baseType]);  \
+		OB::baseTypeNames[OCPI_##pretty], OB::baseTypeNames[m_info.m_baseType]);  \
       if (m.m_baseType == OCPI_String)					\
 	throwError("getting a " #run " value from a string property");	\
       return m.m_baseType == OCPI_##pretty ?				\
@@ -291,9 +292,9 @@ namespace OCPI {
     template <> std::string Property::
     getValue<std::string>(AccessList &list) const {
       size_t offset;
-      const OU::Member &m = descend(list, offset);
+      const OB::Member &m = descend(list, offset);
       ocpiDebug("getValue on %s %s->%s\n", m_info.cname(),
-		OU::baseTypeNames[OCPI_String], OU::baseTypeNames[m_info.m_baseType]);
+		OB::baseTypeNames[OCPI_String], OB::baseTypeNames[m_info.m_baseType]);
       if (m.m_baseType != OCPI_String)
 	throwError("getting a string value from a non-string property");
       std::vector<char> s(m.m_stringLength + 1);
@@ -306,9 +307,9 @@ namespace OCPI {
     template <> long Property::
     getValue<long>(AccessList &list) const {
       size_t offset;
-      const OU::Member &m = descend(list, offset);
+      const OB::Member &m = descend(list, offset);
       ocpiDebug("getValue on %s %s->%s\n", m_info.cname(),
-		OU::baseTypeNames[OCPI_Long], OU::baseTypeNames[m_info.m_baseType]);
+		OB::baseTypeNames[OCPI_Long], OB::baseTypeNames[m_info.m_baseType]);
       if (m.m_baseType == OCPI_String)
 	throwError("getting a " "Long" " value from a string property");
       return m.m_baseType == OCPI_Long ?
@@ -317,9 +318,9 @@ namespace OCPI {
     template <> unsigned long Property::
     getValue<unsigned long>(AccessList &list) const {
       size_t offset;
-      const OU::Member &m = descend(list, offset);
+      const OB::Member &m = descend(list, offset);
       ocpiDebug("getValue on %s %s->%s\n", m_info.cname(),
-		OU::baseTypeNames[OCPI_ULong], OU::baseTypeNames[m_info.m_baseType]);
+		OB::baseTypeNames[OCPI_ULong], OB::baseTypeNames[m_info.m_baseType]);
       if (m.m_baseType == OCPI_String)
 	throwError("getting a " "ULong" " value from a string property");
       return m.m_baseType == OCPI_ULong ?

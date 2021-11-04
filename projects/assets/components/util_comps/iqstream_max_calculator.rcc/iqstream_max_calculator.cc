@@ -29,7 +29,7 @@
 #include <cstdint> // int16_t
 #include <cstdio> // size_t
 #include "iqstream_max_calculator-worker.hh"
-#include "OcpiOsDebugApi.hh" // OCPI_LOG_INFO
+#include "OcpiDebugApi.hh" // OCPI_LOG_INFO
 
 
 using namespace OCPI::RCC; // for easy access to RCC data types and constants

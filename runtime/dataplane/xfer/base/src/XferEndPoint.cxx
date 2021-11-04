@@ -28,7 +28,7 @@
 // semicolon even if it has nothing after that
 
 #include <unistd.h>
-#include "OcpiUtilMisc.h"
+#include "UtilMisc.hh"
 #include "XferException.h"
 #include "XferEndPoint.h"
 #include "XferFactory.h"
@@ -40,7 +40,7 @@ namespace DataTransfer {
 
 EndPoint::
 EndPoint(XferFactory &a_factory, const char *eps, const char *other, bool a_local, size_t a_size,
-	 const OCPI::Util::PValue */*params*/)
+	 const OCPI::Base::PValue */*params*/)
   : m_mailBox(0), m_maxCount(0), m_size(0), m_flagSize(0), m_local(a_local), m_factory(a_factory),
     m_refCount(0), m_receiver(NULL), m_sMemServices(NULL), m_resourceMgr(NULL), m_comms(NULL),
     m_context(XferManager::getFactoryManager().getEndPointContext()), m_address(0),

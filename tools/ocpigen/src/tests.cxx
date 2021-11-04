@@ -26,10 +26,10 @@
 #include <limits>
 #include <algorithm>
 #include <unordered_set>
-#include "OcpiOsDebugApi.hh"
+#include "OcpiDebugApi.hh"
 #include "OsFileSystem.hh"
-#include "OcpiUtilMisc.h"
-#include "OcpiUtilEzxml.h"
+#include "UtilMisc.hh"
+#include "UtilEzxml.hh"
 #include "OcpiLibraryManager.h"
 #include "wip.h"
 #include "data.h"
@@ -625,8 +625,8 @@ namespace {
         return "delayed property settings are not allowed for test properties";
       // We are preparsing these delays to produce earlier errors, otherwise we could just
       // save the XML and attach it to the generated apps
-      OU::ValueType vt(OA::OCPI_Double);
-      OU::Value v(vt);
+      OB::ValueType vt(OA::OCPI_Double);
+      OB::Value v(vt);
       const char
         *delay = ezxml_cattr(sx, "delay"),
         *value = ezxml_cattr(sx, "value");
@@ -1921,7 +1921,7 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
           goto next;
       if (!gp.m_valuesType) {
         gp.m_valuesType = &p.m_param->sequenceType();
-        gp.m_valuesType->m_default = new OU::Value(*gp.m_valuesType);
+        gp.m_valuesType->m_default = new OB::Value(*gp.m_valuesType);
       }
       gp.m_valuesType->m_default->parse(p.m_uValue.c_str(), NULL, gp.m_uValues.size() != 0);
       gp.m_uValues.push_back(p.m_uValue);

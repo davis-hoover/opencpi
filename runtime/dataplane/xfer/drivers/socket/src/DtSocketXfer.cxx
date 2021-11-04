@@ -26,8 +26,8 @@
 #include "OsAssert.hh"
 #include "OsServerSocket.hh"
 #include "OsEther.hh"
-#include "OcpiUtilMisc.h"
-#include "OcpiThread.h"
+#include "UtilMisc.hh"
+#include "UtilThread.hh"
 #include "XferDriver.h"
 #include "XferEndPoint.h"
 #include "XferPio.h"
@@ -35,6 +35,7 @@
 namespace DataTransfer {
   namespace Socket {
     namespace OU = OCPI::Util;
+    namespace OB = OCPI::Base;
     namespace OS = OCPI::OS;
     namespace OE = OCPI::OS::Ether;
     namespace XF = DataTransfer;
@@ -57,7 +58,7 @@ protected:
   uint16_t    m_portNum;
 public:
   EndPoint(XF::XferFactory &a_factory, const char *protoInfo, const char *eps, const char *other,
-	   bool a_local, size_t a_size, const OU::PValue *params)
+	   bool a_local, size_t a_size, const OB::PValue *params)
     : XF::EndPoint(a_factory, eps, other, a_local, a_size, params),
       m_portNum(0) {
     if (protoInfo) {
@@ -129,7 +130,7 @@ public:
 protected:
   XF::EndPoint &
   createEndPoint(const char *protoInfo, const char *eps, const char *other, bool local,
-		 size_t size, const OCPI::Util::PValue *params) {
+		 size_t size, const OB::PValue *params) {
     ocpiDebug("In Socket::XferFactory::createEndPoint(): %zu", m_SMBSize);
     return *new EndPoint(*this, protoInfo, eps, other, local, size, params);
   }

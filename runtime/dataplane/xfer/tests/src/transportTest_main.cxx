@@ -43,13 +43,13 @@
 
 #include "OsAssert.hh"
 #include "OsMisc.hh"
-#include "OcpiUtilMisc.h"
-#include "OcpiUtilEzxml.h"
+#include "UtilMisc.hh"
+#include "UtilEzxml.hh"
 #include "XferEndPoint.h"
 #include "XferServices.h"
 #include "XferFactory.h"
 #include "XferManager.h"
-#include "OcpiUtilCommandLineConfiguration.h"
+#include "UtilCommandLineConfiguration.hh"
 
 namespace XF = DataTransfer;
 static int socket_fd;

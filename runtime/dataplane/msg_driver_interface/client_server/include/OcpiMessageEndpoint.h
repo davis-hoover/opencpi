@@ -32,7 +32,7 @@
 #include <string>
 #include <queue>
 #include "OsTimer.hh"
-#include <OcpiUtilSelfMutex.h>
+#include "UtilSelfMutex.hh"
 #include <OcpiTransport.h>
 #include <OcpiMessageCircuit.h>
 #include "XferEndPoint.h"

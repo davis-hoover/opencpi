@@ -25,11 +25,12 @@
 #include <map>
 #include <string>
 #include "OsDebug.hh"
-#include "UtilExpression.hh"
-#include "UtilValue.hh"
-#include "OcpiUtilMisc.h"
+#include "BaseExpression.hh"
+#include "BaseValue.hh"
+#include "UtilMisc.hh"
 
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 namespace OA = OCPI::API;
 
 #define OCPI_OPTIONS_HELP \
@@ -45,14 +46,14 @@ namespace OA = OCPI::API;
   CMD_OPTION(loglevel,      l,   UChar,  "0",    "The logging level to be used during operation")\
   CMD_OPTION(quiet,         q,   Bool,   0,      "Only print the value")
 
-#include "CmdOption.hh"
+#include "BaseOption.hh"
 
 static int mymain(const char **ap) {
   if (options.loglevel())
     OCPI::OS::logSetLevel(options.loglevel());
   size_t nvars;
-  struct Vars : OU::IdentResolver {
-    typedef std::map<std::string,OU::Value *> Map;
+  struct Vars : OB::IdentResolver {
+    typedef std::map<std::string,OB::Value *> Map;
     typedef Map::const_iterator MapIter;
     Map map;
     Vars(const char **argv) {
@@ -69,34 +70,34 @@ static int mymain(const char **ap) {
 	  std::string typeName;
 	  typeName.assign(colon + 1, eq - (colon + 1));
 	  const char **tp;
-	  for (tp = OU::baseTypeNames; *tp; tp++)
+	  for (tp = OB::baseTypeNames; *tp; tp++)
 	    if (!strcasecmp(typeName.c_str(), *tp))
 	      break;
 	  if (!*tp)
 	    options.bad("Unknown variable type: \"%s\"", typeName.c_str());
-	  type = (OA::BaseType)(tp - OU::baseTypeNames);
+	  type = (OA::BaseType)(tp - OB::baseTypeNames);
 	  if (type == OA::OCPI_Enum || type == OA::OCPI_Struct || type == OA::OCPI_Type)
 	    options.bad("Ivalid variable type: \"%s\"", typeName.c_str());
 	} else {
 	  var.assign(*vars, eq - *vars);
 	  type = OA::OCPI_Long;
 	}
-	OU::ValueType *vt = new OU::ValueType(type);
-	OU::Value *v = new OU::Value(*vt);
+	OB::ValueType *vt = new OB::ValueType(type);
+	OB::Value *v = new OB::Value(*vt);
 	const char *err;
 	if ((err = v->parse(eq + 1)))
 	  options.bad(err);
 	map[var] = v;
       }
       for (MapIter i = map.begin(); i != map.end(); i++) {
-	OU::Value *v = i->second;
+	OB::Value *v = i->second;
 	std::string pretty;
 	v->unparse(pretty);
 	printf("%s: type: %s value: %s\n", i->first.c_str(),
-	       OU::baseTypeNames[v->m_vt->m_baseType], pretty.c_str());
+	       OB::baseTypeNames[v->m_vt->m_baseType], pretty.c_str());
       }
     }
-    const char *getValue(const char *sym, OU::ExprValue &val) const {
+    const char *getValue(const char *sym, OB::ExprValue &val) const {
       printf("getValue: %s\n", sym);
       std::string s(sym);
       MapIter mi = map.find(s);
@@ -106,31 +107,31 @@ static int mymain(const char **ap) {
       return NULL;
     }
   } vars(options.variable(nvars));
-  OU::ExprValue val;
+  OB::ExprValue val;
   const char *expr = ap[0];
   if (options.c_expression()) {
     std::string out;
-    OU::makeCexpression(expr+1, "PREF_", NULL, false, out);
+    OB::makeCexpression(expr+1, "PREF_", NULL, false, out);
     printf("c expr is: %s\n", out.c_str());
   } else {
     const char *err;
     std::string s;
     if (options.type()) {
       const char **tp;
-      for (tp = OU::baseTypeNames; *tp; tp++)
+      for (tp = OB::baseTypeNames; *tp; tp++)
 	if (!strcasecmp(options.type(), *tp))
 	  break;
       if (!*tp)
 	options.bad("Unknown variable type: \"%s\"", options.type());
-      OA::BaseType type = (OA::BaseType)(tp - OU::baseTypeNames);
-      OU::ValueType vt(type);
-      OU::Value v(vt);
+      OA::BaseType type = (OA::BaseType)(tp - OB::baseTypeNames);
+      OB::ValueType vt(type);
+      OB::Value v(vt);
       if (options.as_value()) {
 	if ((err = v.parse(expr, NULL, false, &vars)))
 	  options.bad("error: %s", err);
 	v.unparse(s, NULL, false, options.hex());
 	printf("Final unparsed typed value: '%s'\n", s.c_str());
-      } else if ((err = OU::evalExpression(expr, val, &vars)))
+      } else if ((err = OB::evalExpression(expr, val, &vars)))
 	options.bad("error: %s", err);
       else if (options.quiet()) {
 	if ((err = val.getTypedValue(v)))
@@ -153,7 +154,7 @@ static int mymain(const char **ap) {
       }
     } else if (options.as_value())
       options.bad("must supply type option with as-value option");
-    else if ((err = OU::evalExpression(expr, val, &vars)))
+    else if ((err = OB::evalExpression(expr, val, &vars)))
       options.bad("error: %s", err);
     else
       printf("Expression value is %s:  %s\n", val.isNumber() ? "number" : "string",

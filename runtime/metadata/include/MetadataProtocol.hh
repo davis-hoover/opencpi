@@ -21,9 +21,9 @@
 #ifndef OCPI_METADATA_PROTOCOL_H
 #define OCPI_METADATA_PROTOCOL_H
 #include <string>
-#include "OcpiUtilException.h"
+#include "UtilException.hh"
 #include "MetadataProperty.hh"
-#include "OcpiUtilEzxml.h"
+#include "UtilEzxml.hh"
 
 // The attributes normally derived from examining the protocol operations.
 // In the absence of protocol operations, they can be specified directly.
@@ -44,7 +44,7 @@ namespace OCPI  {
       std::string m_name, m_qualifiedName;
       bool m_isTwoWay;         // not supported much yet...
       size_t m_nArgs;
-      OCPI::Util::Member *m_args;           // both input and output args.  if twoway, first is return value
+      OCPI::Base::Member *m_args;           // both input and output args.  if twoway, first is return value
       size_t m_nExceptions;
       Operation *m_exceptions;  // if twoway
       size_t m_myOffset;      // for determining message sizes
@@ -55,21 +55,21 @@ namespace OCPI  {
       Operation & operator=(const Operation * p );
       Operation & operator=(const Operation & p );
       const char *parse(ezxml_t op, Protocol &);
-      OCPI::Util::Member *findArg(const char *name) const;
+      OCPI::Base::Member *findArg(const char *name) const;
       inline bool isTwoWay() const { return m_isTwoWay; }
-      inline OCPI::Util::Member *args() const { return m_args; }
+      inline OCPI::Base::Member *args() const { return m_args; }
       inline size_t nArgs() const { return m_nArgs; }
       virtual const char *cname() const { return m_name.c_str(); }
       inline bool isTopFixedSequence() const { return m_topFixedSequence; }
       size_t defaultLength() const;
       void printXML(std::string &out, unsigned indent = 0) const;
-      void write(OCPI::Util::Writer &writer, const uint8_t *data, size_t length);
-      size_t read(OCPI::Util::Reader &reader, uint8_t *data, size_t maxLength);
+      void write(OCPI::Base::Writer &writer, const uint8_t *data, size_t length);
+      size_t read(OCPI::Base::Reader &reader, uint8_t *data, size_t maxLength);
       // for testing
       void generate(const char *name, Protocol &p);
-      void generateArgs(OCPI::Util::Value **&);
-      void print(FILE *, OCPI::Util::Value **v) const;
-      void testPrintParse(FILE *f, OCPI::Util::Value **v, bool hex);
+      void generateArgs(OCPI::Base::Value **&);
+      void print(FILE *, OCPI::Base::Value **v) const;
+      void testPrintParse(FILE *f, OCPI::Base::Value **v, bool hex);
     };
     class Protocol {
     public:
@@ -122,13 +122,13 @@ namespace OCPI  {
       const char *parseSummary(ezxml_t x);
       const char *finishParse();
       void printXML(std::string &out, unsigned indent = 0) const;
-      void write(OCPI::Util::Writer &writer, const uint8_t *data, size_t length, uint8_t opcode);
-      size_t read(OCPI::Util::Reader &reader, uint8_t *data, size_t maxLength, uint8_t opcode);
+      void write(OCPI::Base::Writer &writer, const uint8_t *data, size_t length, uint8_t opcode);
+      size_t read(OCPI::Base::Reader &reader, uint8_t *data, size_t maxLength, uint8_t opcode);
       void generate(const char *name);
-      void generateOperation(uint8_t &opcode, OCPI::Util::Value **&v);
-      void freeOperation(uint8_t operation, OCPI::Util::Value **v);
-      void printOperation(FILE *, uint8_t opcode, OCPI::Util::Value **v) const;
-      void testOperation(FILE *, uint8_t opcode, OCPI::Util::Value **v, bool hex);
+      void generateOperation(uint8_t &opcode, OCPI::Base::Value **&v);
+      void freeOperation(uint8_t operation, OCPI::Base::Value **v);
+      void printOperation(FILE *, uint8_t opcode, OCPI::Base::Value **v) const;
+      void testOperation(FILE *, uint8_t opcode, OCPI::Base::Value **v, bool hex);
     };
   }
 }

@@ -33,7 +33,7 @@
 #ifndef OCPI_DataTransport_PortMetaData_H_
 #define OCPI_DataTransport_PortMetaData_H_
 
-#include "OcpiParentChild.h"
+#include "BaseParentChild.hh"
 #include "DtHandshakeControl.h"
 #include "OcpiTransportConstants.h"
 #include "OcpiRDTInterface.h"

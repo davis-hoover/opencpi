@@ -32,7 +32,7 @@
 #include "OsFileSystem.hh"
 #include "OsSemaphore.hh"
 #include "OsMisc.hh"
-#include "OcpiUtilAutoMutex.h"
+#include "UtilAutoMutex.hh"
 #include "XferManager.h"
 #include "OcpiTransport.h"
 #include "LibrarySimple.h"
@@ -46,6 +46,7 @@ namespace OCPI {
     namespace LSim {
       namespace OS = OCPI::OS;
       namespace OU = OCPI::Util;
+      namespace OB = OCPI::Base;
       namespace OH = OCPI::HDL;
       namespace OL = OCPI::Library;
       namespace OX = OCPI::Util::EzXml;
@@ -207,7 +208,7 @@ protected:
   */
   Device(const std::string &a_name, const std::string &simDir, const std::string &a_platform,
 	 const std::string &script, uint8_t spinCount, unsigned sleepUsecs,
-	 unsigned simTicks, const OU::PValue *params, bool dump, std::string &error)
+	 unsigned simTicks, const OB::PValue *params, bool dump, std::string &error)
     : OH::Device("lsim:" + a_name, "ocpi-socket-rdma", params),
       m_state(EMULATING),
       m_req(simDir + "/request", false),
@@ -1167,7 +1168,7 @@ getSims(std::vector<std::string> &sims) {
 }
 
 unsigned Driver::
-search(const OU::PValue *params, const char **excludes, bool discoveryOnly, std::string &error) {
+search(const OB::PValue *params, const char **excludes, bool discoveryOnly, std::string &error) {
   error.clear();
   const char *env;
   // Note that the default here is to DO discovery, i.e. to disablediscovery
@@ -1176,7 +1177,7 @@ search(const OU::PValue *params, const char **excludes, bool discoveryOnly, std:
     return 0;
   ocpiInfo("Searching for local HDL simulators.");
   bool verbose = false;
-  OU::findBool(params, "verbose", verbose);
+  OB::findBool(params, "verbose", verbose);
   unsigned count = 0;
   const char *envsim = getenv("OCPI_HDL_SIMULATOR");
   if (envsim) {
@@ -1257,25 +1258,25 @@ open(const char *name, const OA::PValue *params, std::string &err) {
   std::string platform;
   platform.assign(name, OCPI_SIZE_T_DIFF(cp, name));
   bool verbose = false;
-  OU::findBool(params, "verbose", verbose);
+  OB::findBool(params, "verbose", verbose);
   const char *dir = "simulations";
   // Backward compatibility for old default of "simtest".
   // If you don't mention it, and simtest exists, use it
-  if (!OU::findString(params, "simDir", dir)) {
+  if (!OB::findString(params, "simDir", dir)) {
     bool isDir;
     if (OS::FileSystem::exists("simtest", &isDir) && isDir)
       dir = "simtest";
   }
   uint32_t simTicks = 200000000, sleepUsecs = 200000;
   uint8_t spinCount = 20;
-  OU::findULong(params, "simTicks", simTicks);
+  OB::findULong(params, "simTicks", simTicks);
 
   return createDevice(name, platform, spinCount, sleepUsecs, simTicks, params, false, dir, err);
 }
 
 Device *Driver::
 createDevice(const std::string &name, const std::string &platform, uint8_t spinCount,
-	     unsigned sleepUsecs, unsigned simTicks, const OU::PValue *params, bool dump,
+	     unsigned sleepUsecs, unsigned simTicks, const OB::PValue *params, bool dump,
 	     const char *dir, std::string &error) {
   std::string path, script, actualPlatform;
   const char *err;

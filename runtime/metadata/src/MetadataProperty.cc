@@ -23,10 +23,10 @@
 #include <cassert>
 #include <climits>
 #include "OsAssert.hh"
-#include "OcpiUtilEzxml.h"
-#include "OcpiUtilMisc.h"
+#include "UtilEzxml.hh"
+#include "UtilMisc.hh"
 #include "MetadataProperty.hh"
-#include "UtilValue.hh"
+#include "BaseValue.hh"
 
 // Used both in spec and in impl
 // Note "readable" and "padding" are here for backward compatibility only and will produce warnings
@@ -63,6 +63,7 @@ namespace OCPI {
     namespace OE = OCPI::Util::EzXml;
     namespace OA = OCPI::API;
     namespace OU = OCPI::Util;
+    namespace OB = OCPI::Base;
     Property::Property()
       : m_smallest(0), m_granularity(0), m_isSub32(false),
 	m_isPadding(false), m_isRaw(false), m_rawSet(false), m_isTest(false),
@@ -79,8 +80,8 @@ namespace OCPI {
     // parse a value for this property, which may be a struct
     // used for instance property values in an assembly, etc.
     const char *
-    Property::parseValue(const char *unparsed, OU::Value &value, const char *end,
-			 const OU::IdentResolver *resolv) const {
+    Property::parseValue(const char *unparsed, OB::Value &value, const char *end,
+			 const OB::IdentResolver *resolv) const {
       if (!value.m_vt)
 	value.setType(*this);
       const char *err = value.parse(unparsed, end, false, resolv);
@@ -333,7 +334,7 @@ namespace OCPI {
     // an implementation (includeImpl == true)
     const char *
     Property::parse(ezxml_t prop, bool includeImpl, unsigned ordinal,
-		    const OU::IdentResolver *resolv) {
+		    const OB::IdentResolver *resolv) {
       const char *err;
 
       if ((err = includeImpl ?
@@ -367,7 +368,7 @@ namespace OCPI {
     // Here is where is need to ensure that all aspects of the underlying data type
     // are fully resolved.
     const char *Property::
-    offset(size_t &cumOffset, uint64_t &sizeofConfigSpace, const OU::IdentResolver *resolver) {
+    offset(size_t &cumOffset, uint64_t &sizeofConfigSpace, const OB::IdentResolver *resolver) {
       const char *err = NULL;
       if (resolver && (err = finalize(*resolver, "property", !m_isParameter)))
 	return err;
@@ -448,7 +449,7 @@ namespace OCPI {
 
     // This parses something that is adding impl attributes to an existing property
     const char *Property::
-    parseImpl(ezxml_t x, const OU::IdentResolver *resolv) {
+    parseImpl(ezxml_t x, const OB::IdentResolver *resolv) {
       const char *err;
       if ((err = OE::checkAttrs(x, "Name", IMPL_ATTRIBUTES, "hidden", "default", "value", NULL)) ||
 	  (err = parseAccess(x, false, true)) ||
@@ -473,7 +474,7 @@ namespace OCPI {
       return parseCheck();
     }
 
-    const char *Property::getValue(OU::ExprValue &val) {
+    const char *Property::getValue(OB::ExprValue &val) {
       if (!m_default)
 	return OU::esprintf("property \"%s\" has no value", m_name.c_str());
       if (m_arrayRank || m_isSequence || m_baseType == OA::OCPI_Struct ||

@@ -27,9 +27,9 @@
 #include <ctype.h>
 #include <sys/time.h>
 #include "OCL_Worker.h"
-#include "OcpiUtilCppMacros.h"
+#include "UtilCppMacros.hh"
 #include "MetadataWorker.hh"
-#include "OcpiUtilMisc.h"
+#include "UtilMisc.hh"
 #include "wip.h"
 #include "assembly.h"
 #include "data.h"
@@ -61,7 +61,7 @@ static const char *oclTypes[] = {"none",
 
 #if 0
 static void
-printMember(FILE *f, OU::Member *t, const char *prefix, size_t &offset, unsigned &pad)
+printMember(FILE *f, OB::Member *t, const char *prefix, size_t &offset, unsigned &pad)
 {
   size_t rem = offset & (t->m_align - 1);
   if (rem)

@@ -89,7 +89,7 @@ namespace OCPI {
       OCPI::Container::Container::DispatchRetCode
       dispatch(DataTransfer::EventManager *event_manager = NULL);
       OCPI::API::ContainerApplication*
-      createApplication(const char *name, const OCPI::Util::PValue *params)
+      createApplication(const char *name, const OCPI::Base::PValue *params)
 	throw (OCPI::Util::EmbeddedException);
       OCPI::Container::Artifact &
       createArtifact(OCPI::Library::Artifact &lart, const OCPI::API::PValue *artifactParams);

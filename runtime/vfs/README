@@ -1,0 +1,23 @@
+This library provides user mode virtual file service access to several underlying file technologies, including
+
+-- actual local operating system file system calls
+-- as http client
+-- using URI
+-- using a stream'd VFS to extract files from
+-- using a ZIP file
+-- using a ZIP'd stream
+-- using simple chunks of memory as a file contents
+-- using a "filter" for allowable file names in an underlying VFS
+-- using a "readonly" filter for an underlying file system
+
+
+Several utility functions are also provided for files accessed using this VFS interface.
+
+-- md5 hash of a file
+-- checking if the file is an XML document
+-- recursive file and directory copy and remove
+-- module loading from a VFS
+
+This was originally created to meet the SCA requirement for user-mode file access.
+It is not currently (2.3) used anywhere in OpenCPI.
+

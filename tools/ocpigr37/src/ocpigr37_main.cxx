@@ -23,10 +23,10 @@
 #include <cstring>
 #include <cctype>
 #include "OsFileSystem.hh"
-#include "OcpiUtilMisc.h"
-#include "OcpiUtilException.h"
+#include "UtilMisc.hh"
+#include "UtilException.hh"
 #include "OcpiLibraryManager.h"
-#include "OcpiDriverManager.h"
+#include "BasePluginManager.hh"
 #include "cdkutils.h"
 namespace OA = OCPI::API;
 namespace OM = OCPI::Metadata;
@@ -45,7 +45,7 @@ namespace OX = OCPI::Util::EzXml;
   CMD_OPTION  (verbose,   v,    Bool,   NULL, "Be verbose") \
   CMD_OPTION  (directory, D,    String, ".", "Specify the directory in which to put output generated files") \
   /**/
-#include "CmdOption.hh"
+#include "BaseOption.hh"
 static const char *bad(OM::Worker &w, const char *tag, const char *val) {
   fprintf(stderr, "Bad worker %s: can't map %s %s\n", w.cname(), tag, val);
   return "raw";
@@ -426,7 +426,7 @@ static void doWorkerPlatform(OM::Worker &w) {
 static int
 mymain(const char ** /*ap*/) {
   setenv("OCPI_SYSTEM_CONFIG", "", 1);
-  OCPI::Driver::ManagerManager::suppressDiscovery();
+  OCPI::Base::Plugin::ManagerManager::suppressDiscovery();
   OL::getManager().enableDiscovery();
   OS::FileSystem::mkdir(options.directory(), true);
   top.name = "[OpenCPI]";

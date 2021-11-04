@@ -74,7 +74,7 @@ public:
   virtual ~HdlDevice() {}
   const char *cname() const;
   const char *parseDeviceProperties(ezxml_t x, OM::Assembly::Properties &iPVs);
-  const char *resolveExpressions(OCPI::Util::IdentResolver &ir);
+  const char *resolveExpressions(OB::IdentResolver &ir);
 };
 typedef HdlDevice DeviceType;
 struct Board;

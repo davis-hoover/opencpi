@@ -26,8 +26,8 @@
 #include <vector>
 #include <string.h>
 #include "ezxml.h"
-#include "OcpiUtilSelfMutex.h"
-#include "OcpiDriverManager.h"
+#include "UtilSelfMutex.hh"
+#include "BasePluginManager.hh"
 #include "XferEndPoint.h"
 
 // Forward declarations to avoid circular dependencies.

@@ -181,7 +181,7 @@ struct RCCPort {
 #ifdef WORKER_INTERNAL
   OCPI::RCC::Port *containerPort;
   RCCUserPort *userPort;
-  OCPI::Util::Member *sequence;
+  OCPI::Base::Member *sequence;
   OCPI::Metadata::Port *metaPort;
 #else
   void *containerPort, *userPort, *sequence, *metaPort;

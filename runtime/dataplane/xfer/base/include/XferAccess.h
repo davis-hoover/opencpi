@@ -26,7 +26,7 @@
 
 #include <inttypes.h>
 #include <cstddef>
-#include "OcpiUtilMisc.h"
+#include "UtilMisc.hh"
 #include "XferEndPoint.h"
 
 namespace DataTransfer {

@@ -20,7 +20,7 @@
 
 #include <sstream>         // std::ostringstream
 #include <cstdint>         // uin32_t, etc
-#include "OcpiUtilMisc.h"
+#include "UtilMisc.hh"
 #include "ad9361_platform.h" // regs_general_rfpll_divider_t
 #include "ad9361.h"        // RFPLL_MODULUS macro (this is a ADI No-OS header)
 #include "calc_ad9361_rf_tx_pll.h"

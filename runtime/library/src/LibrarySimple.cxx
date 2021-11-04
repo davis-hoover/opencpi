@@ -21,15 +21,14 @@
 // This file implements a "simple" library, meaning one that is simply given artifacts manually,
 // and which has no "root directory"
 
-#include "OcpiUtilException.h"
-#include "OcpiUtilEzxml.h"
+#include "UtilException.hh"
+#include "UtilEzxml.hh"
 #include "OcpiLibraryManager.h"
 #include "LibrarySimple.h"
 
 namespace OL = OCPI::Library;
 namespace OA = OCPI::API;
 namespace OU = OCPI::Util;
-namespace OD = OCPI::Driver;
 
 namespace OCPI {
   namespace Library {

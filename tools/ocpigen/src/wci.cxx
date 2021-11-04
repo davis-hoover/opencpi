@@ -474,7 +474,7 @@ emitSkelSignals(FILE *f) {
 		  "  props_out.%s_length <= (others => '0');\n", pr.m_name.c_str());
 	else {
 	  std::string value;
-	  OU::Value v(pr); // This constructor creates a zero value
+	  OB::Value v(pr); // This constructor creates a zero value
 	  vhdlValue(NULL, pr.m_name.c_str(), v, value, false);
 	  fprintf(f, "  props_out.%s <= %s;\n", pr.m_name.c_str(), value.c_str());
 	}

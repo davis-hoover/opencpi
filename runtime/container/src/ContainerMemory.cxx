@@ -24,7 +24,7 @@
 */
 
 #include <iostream>
-#include "OcpiUtilEzxml.h"
+#include "UtilEzxml.hh"
 #include "ContainerMemory.h"
 
 namespace OX = OCPI::Util::EzXml;

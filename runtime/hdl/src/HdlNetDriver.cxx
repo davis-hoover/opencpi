@@ -33,8 +33,8 @@ namespace OCPI {
     namespace Net {
       namespace OS = OCPI::OS;
       namespace OU = OCPI::Util;
+      namespace OB = OCPI::Base;
       namespace OE = OCPI::OS::Ether;
-
 
       unsigned typeLength[] = {
 	sizeof(EtherControlNop), sizeof(EtherControlWrite),
@@ -44,7 +44,7 @@ namespace OCPI {
       Device(Driver &driver, OE::Interface &ifc, std::string &a_name,
 	     OS::Ether::Address &devAddr, bool discovery, const char *data_proto,
 	     unsigned delayms, uint64_t ep_size, uint64_t controlOffset, uint64_t dataOffset,
-	     const OU::PValue *params, std::string &error)
+	     const OB::PValue *params, std::string &error)
 	: OCPI::HDL::Device(a_name, data_proto, params),
 	  m_socket(NULL), m_devAddr(devAddr), m_discovery(discovery), m_delayms(delayms) {
 	// We need to get a socket to talk to this device.
@@ -179,8 +179,8 @@ namespace OCPI {
       set(RegisterOffset offset, size_t bytes, uint32_t data, uint32_t *status) {
 	ocpiDebug("Accessor write for offset 0x%zx of %zu bytes", offset, bytes);
 	EtherControlWrite &ecw =  *(EtherControlWrite *)(m_request.payload);
-	ecw.address = htonl((offset & 0xffffff) & ~3);
-	ecw.data = htonl(data << ((offset & 3) * 8));
+	ecw.address = htonl((offset & 0xffffff) & ~3u);
+	ecw.data = htonl(data << ((offset & 3u) * 8));
 	ecw.header.length = htons((short)(sizeof(ecw)-2));
 	OS::Ether::Packet recvFrame;
 	request(OCCP_WRITE, offset, bytes, recvFrame, status);
@@ -308,7 +308,7 @@ namespace OCPI {
       bool Driver::
       trySocket(OE::Interface &ifc, OE::Socket &s, OE::Address &addr, bool discovery,
 		const char **exclude, Macs *argMacs, Device **dev, 
-		const OU::PValue *params, std::string &error) {
+		const OB::PValue *params, std::string &error) {
 	// keep track of different discovery source addresses discovered when we broadcast.
 	ocpiDebug("Trying socket on interface %s to address %s",
 		  ifc.name.c_str(), addr.pretty());
@@ -403,7 +403,7 @@ namespace OCPI {
       tryIface(OE::Interface &ifc, OE::Address &devAddr, const char **exclude,
 	       Device **dev,   // optional output arg to return the found device when mac != NULL
 	       bool discovery, // is this about discovery? (broadcast *OR* specific probing)
-	       Macs *macs, const OU::PValue *params, std::string &error) {
+	       Macs *macs, const OB::PValue *params, std::string &error) {
 	error.clear();
 	unsigned count = 0;
 	if (devAddr.isEther()) {
@@ -430,11 +430,11 @@ namespace OCPI {
       }
 
       OCPI::HDL::Device *Driver::
-      open(const char *name, bool discovery, const OU::PValue *params, std::string &error) {
+      open(const char *name, bool discovery, const OB::PValue *params, std::string &error) {
 	const char *slash = strchr(name, '/');
 	std::string iName;
 	if (slash) {
-	  iName.assign(name,  slash - name);
+	  iName.assign(name,  OCPI_SIZE_T_DIFF(slash, name));
 	  name = slash + 1;
 	}
 	OE::Address addr(name);
@@ -465,7 +465,7 @@ namespace OCPI {
       }
 
       unsigned Driver::
-      search(const OU::PValue *params, const char **excludes, bool discoveryOnly, bool udp,
+      search(const OB::PValue *params, const char **excludes, bool discoveryOnly, bool udp,
 	     std::string &error) {
 	// Note that the default here is to NOT do discovery, i.e. to enable discovery
 	// the variable must be set and set to 1
@@ -479,7 +479,7 @@ namespace OCPI {
 	if (error.size())
 	  return 0;
 	const char *ifName = NULL;
-	OU::findString(params, "interface", ifName);
+	OB::findString(params, "interface", ifName);
 	OE::Interface eif;
 	Macs macs;
 	while (ifs.getNext(eif, error, ifName)) {

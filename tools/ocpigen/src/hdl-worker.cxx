@@ -23,7 +23,7 @@
 #include <cstdio>
 #include <climits>
 
-#include "OcpiUtilMisc.h"
+#include "UtilMisc.hh"
 #include "hdl.h"
 #include "assembly.h"
 
@@ -79,7 +79,7 @@ emitLastSignal(FILE *f, std::string &last, Language lang, bool end) {
 
 // This is the encoded bit width when encoded for std_logic_vectors
 size_t
-rawBitWidth(const OU::ValueType &dt) {
+rawBitWidth(const OB::ValueType &dt) {
   switch (dt.m_baseType) {
   case OA::OCPI_Bool:
     return 1;
@@ -94,7 +94,7 @@ rawBitWidth(const OU::ValueType &dt) {
 
 // This is the encoded bit width in string form, subject to the data type being finalized or not
 static const char *
-rawBitWidthCstr(const OU::Member &dt, bool finalized = false) {
+rawBitWidthCstr(const OB::Member &dt, bool finalized = false) {
   static std::string s;
   switch (dt.m_baseType) {
   case OA::OCPI_Bool:
@@ -114,7 +114,7 @@ rawBitWidthCstr(const OU::Member &dt, bool finalized = false) {
 // which is based on the "run" value of the OCPI_DATA_TYPE macro
 // which is in bytes
 size_t
-rawValueBytes(const OU::ValueType &dt) {
+rawValueBytes(const OB::ValueType &dt) {
   switch (dt.m_baseType) {
   case OA::OCPI_Bool:
     return sizeof(bool);// must be consistent with the "run" value
@@ -130,7 +130,7 @@ rawValueBytes(const OU::ValueType &dt) {
 // Third arg is saying that the type must be appropriate for VHDL to pass
 // to verilog
 static void
-vhdlBaseType(const OU::Member &dt, std::string &s, bool convert, bool finalized) {
+vhdlBaseType(const OB::Member &dt, std::string &s, bool convert, bool finalized) {
   if (convert)
     OU::formatAdd(s, "std_logic_vector((%s)-1 downto 0)", rawBitWidthCstr(dt, finalized));
   else if (dt.m_baseType == OA::OCPI_String)
@@ -138,7 +138,7 @@ vhdlBaseType(const OU::Member &dt, std::string &s, bool convert, bool finalized)
   else if (dt.m_baseType == OA::OCPI_Enum)
     OU::formatAdd(s, "%s_t", dt.cname());
   else {
-    for (const char *cp = OU::baseTypeNames[dt.m_baseType]; *cp; cp++)
+    for (const char *cp = OB::baseTypeNames[dt.m_baseType]; *cp; cp++)
       s += (char)tolower(*cp);
     s += "_t";
   }
@@ -154,7 +154,7 @@ vhdlArrayType(const OM::Property &dt, size_t rank, const size_t */*dims*/, std::
   }
   // Single dimensional arrays when type is neither enum nor string us built-in array types
   if (rank == 1 && dt.m_baseType != OA::OCPI_String && dt.m_baseType != OA::OCPI_Enum) {
-    for (const char *cp = OU::baseTypeNames[dt.m_baseType]; *cp; cp++)
+    for (const char *cp = OB::baseTypeNames[dt.m_baseType]; *cp; cp++)
       type += (char)tolower(*cp);
     type += "_array_t";
     return;
@@ -233,7 +233,7 @@ vhdlType(const OM::Property &dt, std::string &decl, std::string &type, bool conv
 // levels.  At the top level, it intercepts the "valueUnparse" method of
 // the default unparser in order to "wrap" the values in conversion
 // functions.  The wrapping is a little type-specific, hence, the switch
-// statement in "OU::Unparser::valueUnparse()".
+// statement in "OB::Unparser::valueUnparse()".
 //
 // For each data type to produce the actual value (like producing the
 // string "123" for the ushort value of 123), it uses the default for
@@ -241,12 +241,12 @@ vhdlType(const OM::Property &dt, std::string &decl, std::string &type, bool conv
 // bool/char/string/float/double/longlong/ulonglong methods to make
 // the actual values syntactically valid for VHDL.
 //
-static struct VhdlUnparser : public OU::Unparser {
+static struct VhdlUnparser : public OB::Unparser {
   const char *m_name;
   bool m_finalized;
 
   bool
-  elementUnparse(const OU::Value &v, std::string &s, unsigned nSeq, bool hex, char comma,
+  elementUnparse(const OB::Value &v, std::string &s, unsigned nSeq, bool hex, char comma,
 		 bool wrap, const Unparser &up) const {
     if (wrap) s+= '(';
     bool r = Unparser::elementUnparse(v, s, nSeq, hex, comma, false, up);
@@ -255,7 +255,7 @@ static struct VhdlUnparser : public OU::Unparser {
   }
 
   bool
-  dimensionUnparse(const OU::Value &v, std::string &s, unsigned nseq, size_t dim,
+  dimensionUnparse(const OB::Value &v, std::string &s, unsigned nseq, size_t dim,
 		   size_t offset, size_t nItems, bool hex, char comma,
 		   const Unparser &up) const {
     if (dim + 1 == v.m_vt->m_arrayRank && v.m_vt->m_arrayDimensions[dim] == 1)
@@ -268,7 +268,7 @@ static struct VhdlUnparser : public OU::Unparser {
   // and also suppress the suppression of zeroes...
   //
   bool
-  valueUnparse(const OU::Value &v, std::string &s, unsigned nSeq, size_t nArray, bool hex,
+  valueUnparse(const OB::Value &v, std::string &s, unsigned nSeq, size_t nArray, bool hex,
 	       char comma, bool /*wrap*/, const Unparser &up) const {
     switch (v.m_vt->m_baseType) {
     case OA::OCPI_Enum:
@@ -293,7 +293,7 @@ static struct VhdlUnparser : public OU::Unparser {
       break;
     default:
       s += "to_";
-      for (const char *cp = OU::baseTypeNames[v.m_vt->m_baseType]; *cp; cp++)
+      for (const char *cp = OB::baseTypeNames[v.m_vt->m_baseType]; *cp; cp++)
 	s += (char)tolower(*cp);
       s += '(';
       //
@@ -398,7 +398,7 @@ static struct VhdlUnparser : public OU::Unparser {
 } vhdlUnparser;
 
 static void
-vhdlInnerValue(const std::string &name, const char *pkg, const OU::Value &v, bool finalized,
+vhdlInnerValue(const std::string &name, const char *pkg, const OB::Value &v, bool finalized,
 	       std::string &s) {
   if (v.needsComma())
     s += "(";
@@ -453,7 +453,7 @@ vhdlConstant2Readback(const OM::Property &pr, const std::string &val, std::strin
 // Convert a value in v for passing between vhdl _rv and verilog.
 // The "v" string might be a variable name.
 static const char*
-vhdlConvert(const std::string &name, const OU::ValueType &dt, std::string &v, std::string &s,
+vhdlConvert(const std::string &name, const OB::ValueType &dt, std::string &v, std::string &s,
 	    bool toVerilog = true) {
   if (dt.m_arrayRank) {
     if (toVerilog) {
@@ -476,17 +476,17 @@ vhdlConvert(const std::string &name, const OU::ValueType &dt, std::string &v, st
 	}
       } else
 	if (isalpha(v[0]))
-	  OU::formatAdd(s, "ocpi.types.slv(%s_array_t(%s))", OU::baseTypeNames[dt.m_baseType],
+	  OU::formatAdd(s, "ocpi.types.slv(%s_array_t(%s))", OB::baseTypeNames[dt.m_baseType],
 			v.c_str());
 	else
-	  OU::formatAdd(s, "ocpi.types.slv(%s_array_t'%s)", OU::baseTypeNames[dt.m_baseType],
+	  OU::formatAdd(s, "ocpi.types.slv(%s_array_t'%s)", OB::baseTypeNames[dt.m_baseType],
 			v.c_str());
     } else if (dt.m_baseType == OA::OCPI_String)
       OU::formatAdd(s, "%s_array_t(to_%s_t(%s,%zu))", name.c_str(),
 		    name.c_str(), v.c_str(), dt.m_stringLength);
     else
       OU::formatAdd(s, "ocpi.types.to_%s_array(%s)",
-		    OU::baseTypeNames[dt.m_baseType], v.c_str());
+		    OB::baseTypeNames[dt.m_baseType], v.c_str());
   } else if (dt.m_baseType == OA::OCPI_Enum) {
     if (toVerilog)
       OU::formatAdd(s, "std_logic_vector(to_unsigned(%s_t'pos(%s), %zu))",
@@ -496,13 +496,13 @@ vhdlConvert(const std::string &name, const OU::ValueType &dt, std::string &v, st
 		    name.c_str(), v.c_str());
   } else if (dt.m_baseType == OA::OCPI_Bool || dt.m_baseType == OA::OCPI_String) {
     if (toVerilog)
-      OU::formatAdd(s, "from_%s(%s)", OU::baseTypeNames[dt.m_baseType], v.c_str());
+      OU::formatAdd(s, "from_%s(%s)", OB::baseTypeNames[dt.m_baseType], v.c_str());
     else
-      OU::formatAdd(s, "to_%s(%s)", OU::baseTypeNames[dt.m_baseType], v.c_str());
+      OU::formatAdd(s, "to_%s(%s)", OB::baseTypeNames[dt.m_baseType], v.c_str());
   } else if (toVerilog)
-    OU::formatAdd(s, "from_%s(%s)", OU::baseTypeNames[dt.m_baseType], v.c_str());
+    OU::formatAdd(s, "from_%s(%s)", OB::baseTypeNames[dt.m_baseType], v.c_str());
   else
-    OU::formatAdd(s, "%s_t(%s)", OU::baseTypeNames[dt.m_baseType], v.c_str());
+    OU::formatAdd(s, "%s_t(%s)", OB::baseTypeNames[dt.m_baseType], v.c_str());
 
   return s.c_str();
 }
@@ -511,7 +511,7 @@ vhdlConvert(const std::string &name, const OU::ValueType &dt, std::string &v, st
 // on the visibility of our packages and libraries.
 // If param==true, the value is used in a top level generic setting in tools
 const char *
-vhdlValue(const char *pkg, const std::string &name, const OU::Value &v, std::string &s,
+vhdlValue(const char *pkg, const std::string &name, const OB::Value &v, std::string &s,
 	  bool convert, bool finalized) {
   std::string tmp;
   vhdlInnerValue(name, pkg, v, finalized, tmp);
@@ -525,8 +525,8 @@ vhdlValue(const char *pkg, const std::string &name, const OU::Value &v, std::str
 }
 
 const char*
-verilogValue(const OU::Value &v, std::string &s, bool finalized) {
-  const OU::ValueType &dt = *v.m_vt;
+verilogValue(const OB::Value &v, std::string &s, bool finalized) {
+  const OB::ValueType &dt = *v.m_vt;
 #if 0
   if (dt.m_baseType == OA::OCPI_String) {
     bool indirect = dt.m_arrayRank || dt.m_isSequence;
@@ -596,7 +596,7 @@ verilogValue(const OU::Value &v, std::string &s, bool finalized) {
   return s.c_str();
 }
 const char *Worker::
-hdlValue(const std::string &a_name, const OU::Value &v, std::string &value, bool convert,
+hdlValue(const std::string &a_name, const OB::Value &v, std::string &value, bool convert,
 	 Language lang, bool finalized) {
   if (lang == NoLanguage)
     lang = m_language;
@@ -849,7 +849,7 @@ prType(OM::Property &pr, std::string &type) {
     if (pr.m_baseType == OA::OCPI_Enum)
       type = prefix;
     else
-      type = OU::baseTypeNames[pr.m_baseType];
+      type = OB::baseTypeNames[pr.m_baseType];
     type += "_t";
     if (pr.m_baseType == OA::OCPI_String) {
       std::string len;
@@ -863,7 +863,7 @@ prType(OM::Property &pr, std::string &type) {
   }
   type =
     pr.m_baseType == OA::OCPI_Enum || pr.m_baseType == OA::OCPI_String ? prefix.c_str() :
-    OU::baseTypeNames[pr.m_baseType];
+    OB::baseTypeNames[pr.m_baseType];
   type += "_array_t";
   if (!(pr.m_baseType == OA::OCPI_Enum || pr.m_baseType == OA::OCPI_String) ||
       (pr.m_isSequence && pr.m_sequenceLengthExpr.length()) ||
@@ -2026,9 +2026,9 @@ emitImplHDL(bool wrap) {
 	    // Writable array/sequence properties need their default values defined in a
 	    // constant since the primitives for holding them take an unconstrained array
 	    // as a generic argument. FIXME: make this array-to-scalar a method elsewhere
-	    OU::ValueType vt(pr.m_baseType);
+	    OB::ValueType vt(pr.m_baseType);
 	    vt.m_stringLength = pr.m_stringLength;
-	    const OU::Value def(vt);
+	    const OB::Value def(vt);
 	    std::string vv;
 	    vhdlValue(NULL, pr.m_name.c_str(), pr.m_default ? *pr.m_default : def, vv, false);
 	    fprintf(f,
@@ -2253,7 +2253,7 @@ emitImplHDL(bool wrap) {
 		  "  %s_property : component ocpi.props.%s%s_property\n"
 		  "    generic map(worker       => work.%s_worker_defs.worker,\n"
 		  "                property     => work.%s_worker_defs.properties(%u)",
-		  name, OU::baseTypeNames[pr.m_baseType == OA::OCPI_Enum ?
+		  name, OB::baseTypeNames[pr.m_baseType == OA::OCPI_Enum ?
 					  OA::OCPI_ULong : pr.m_baseType],
 		  pr.m_arrayRank || pr.m_isSequence ? "_array" : "",
 		  m_implName, m_implName, n);
@@ -2381,7 +2381,7 @@ emitImplHDL(bool wrap) {
 		  "                property     => work.%s_worker_defs.properties(%u))\n"
 		  "    port map(",
 		  pr.m_name.c_str(),
-		  OU::baseTypeNames[pr.m_baseType == OA::OCPI_Enum ?
+		  OB::baseTypeNames[pr.m_baseType == OA::OCPI_Enum ?
 				    OA::OCPI_ULong : pr.m_baseType],
 		  pr.m_arrayRank || pr.m_isSequence ? "_array" : "",
 		  m_implName, m_implName, n);
@@ -2390,7 +2390,7 @@ emitImplHDL(bool wrap) {
 	    fprintf(f, "sa_temp,\n");
 	  else if (pr.m_isSequence || pr.m_arrayRank)
 	    fprintf(f, "%s_array_t(%s),\n",
-		      OU::baseTypeNames[pr.m_baseType == OA::OCPI_Enum ?
+		      OB::baseTypeNames[pr.m_baseType == OA::OCPI_Enum ?
 					OA::OCPI_ULong : pr.m_baseType],
 		    var.c_str());
 	  else

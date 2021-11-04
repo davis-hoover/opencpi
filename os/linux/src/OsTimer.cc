@@ -61,7 +61,7 @@ Time Time::now() {
 #ifdef __APPLE__
   struct timeval tv;
   gettimeofday(&tv, NULL);
-  return Time((uint32_t)tv.tv_sec, tv.tv_usec * 1000u);
+  return Time((uint32_t)tv.tv_sec, (uint32_t)(tv.tv_usec * 1000));
 #else
   struct timespec ts;
   ocpiCheck(clock_gettime(OCPI_GETTIME_CLOCK_TYPE, &ts) == 0);

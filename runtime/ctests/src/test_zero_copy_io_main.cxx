@@ -38,7 +38,7 @@
 
 #include <UtZeroCopyIOWorkers.h>
 
-#include <OcpiThread.h>
+#include "UtilThread.hh"
 
 #ifdef OCPI_HAVE_VALGRIND_H
 #include <valgrind/valgrind.h>

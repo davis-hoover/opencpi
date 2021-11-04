@@ -35,11 +35,11 @@
 #include "OsAssert.hh"
 #include <OcpiRDTInterface.h>
 #include <test_utilities.h>
-#include <OcpiUtilCommandLineConfiguration.h>
+#include "UtilCommandLineConfiguration.hh"
 #include <UtZeroCopyIOWorkers.h>
 #include <OcpiTimeEmit.h>
 
-#include <OcpiThread.h>
+#include "UtilThread.hh"
 
 using namespace OCPI::Container;
 using namespace OCPI;
@@ -142,7 +142,7 @@ static void createPorts( std::vector<CApp>& ca )
 
 
       /*
-      static OCPI::Util::PValue cprops[] = {OCPI::Util::PVString("endpoint",""),
+      static OCPI::Base::PValue cprops[] = {OCPI::Util::PVString("endpoint",""),
                                            OCPI::Util::PVEnd };
 
       std::vector<std::string> eps = ca[LOOPBACK.cid].container->getSupportedEndpoints();

@@ -40,6 +40,7 @@
 namespace OC = OCPI::Container;
 namespace OA = OCPI::API;
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 namespace OR = OCPI::RDT;
 
 namespace OCPI {
@@ -281,7 +282,7 @@ dispatch(DataTransfer::EventManager* event_manager)
  * Creates an application 
  *********************************/
 OA::ContainerApplication * Container::
-createApplication(const char *a_name, const OCPI::Util::PValue *props)
+createApplication(const char *a_name, const OB::PValue *props)
   throw ( OU::EmbeddedException )
 {
   TRACE( "OCPI::RCC::Container::createApplication()");

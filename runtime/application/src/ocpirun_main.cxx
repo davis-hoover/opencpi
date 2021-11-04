@@ -35,8 +35,8 @@
 #include "ContainerManager.h"
 #include "OsDebug.hh"
 #include "OsFileSystem.hh"
-#include "OcpiUtilMisc.h"
-#include "OcpiUtilEzxml.h"
+#include "UtilMisc.hh"
+#include "UtilEzxml.hh"
 #include "RemoteClient.h"
 #define OCPI_OPTIONS_HELP \
   "Usage is: ocpirun <options>... [<application-xml-file>]\n" \
@@ -118,17 +118,18 @@
 //  CMD_OPTION(libraries,  ,  String, 0, "Search path for source libraries, implying to search for possible source workers")
 //  CMD_OPTION(build,      ,  String, 0, "Build any source workers deployed")
 
-#include "CmdOption.hh"
+#include "BaseOption.hh"
 
 namespace OA = OCPI::API;
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 namespace OS = OCPI::OS;
 namespace OL = OCPI::Library;
 namespace OC = OCPI::Container;
 namespace OR = OCPI::Remote;
 namespace OE = OCPI::Util::EzXml;
 
-static void addParams(const char *name, const char **ap, OU::PValueList &params) {
+static void addParams(const char *name, const char **ap, OB::PValueList &params) {
   const char *err;
   while (ap && *ap)
     if ((err = params.add(name, *ap++)))
@@ -168,7 +169,7 @@ static void doTarget(const char *a_target, bool specs) {
 
 // Return true on error
 static bool setup(const char *arg, ezxml_t &xml, std::string &file,
-		  OU::PValueList &params, std::string &error) {
+		  OB::PValueList &params, std::string &error) {
   const char *e = NULL;
   if (arg) {
     if (options.artifacts() || options.list_artifacts() || options.specs() ||
@@ -220,7 +221,7 @@ static bool setup(const char *arg, ezxml_t &xml, std::string &file,
 			 ezxml_name(xml));
   } else if (options.artifacts() || options.list_artifacts() || options.specs() ||
 	     options.list_specs()) {
-    OCPI::Driver::ManagerManager::suppressDiscovery();
+    OCPI::Base::Plugin::ManagerManager::suppressDiscovery();
     OL::getManager().enableDiscovery();
     const char **targets;
     // ========= start backwards compatibility
@@ -250,7 +251,7 @@ static bool setup(const char *arg, ezxml_t &xml, std::string &file,
       doTarget(*tp, options.specs() || options.list_specs());
     return false;
   } else if (options.list()) { // no xml here
-    OCPI::Driver::ManagerManager::suppressDiscovery();
+    OCPI::Base::Plugin::ManagerManager::suppressDiscovery();
     OC::getManager().enableDiscovery();
   }
   if (options.deployment())
@@ -270,7 +271,7 @@ static bool setup(const char *arg, ezxml_t &xml, std::string &file,
     (void)OA::ContainerManager::get(0); // force config/discovery
     // Discovery has been done, so all servers in the environment variables are processed already
     // So we only add probing for the ones on the command line
-    for (const OU::PValue *p = params; p && p->name; ++p)
+    for (const OB::PValue *p = params; p && p->name; ++p)
       if (!strcasecmp(p->name, "server")) {
 	assert(p->type == OA::OCPI_String);
 	OA::useServer(p->vString, options.verbose()); // we know it is a string
@@ -281,7 +282,7 @@ static bool setup(const char *arg, ezxml_t &xml, std::string &file,
 }
 
 static int mymain(const char **ap) {
-  OU::PValueList params;
+  OB::PValueList params;
 
   if (options.version()) {
     printf("OpenCPI version is " OCPI_PACKAGE_VERSION "\n");

@@ -27,11 +27,11 @@
 
 #include "OcpiContainerApi.h"
 
-#include "OcpiUtilSelfMutex.h"
-#include "UtilPValue.hh"
+#include "UtilSelfMutex.hh"
+#include "BasePValue.hh"
 #include "OcpiRDTInterface.h"
 #include "MetadataPort.hh"
-#include "OcpiParentChild.h"
+#include "BaseParentChild.hh"
 #include "ContainerLauncher.h"
 
 namespace OCPI {
@@ -172,11 +172,11 @@ typedef int pthread_spinlock_t;
       Container &m_container;
 
       BasicPort(Container &container, const OCPI::Metadata::Port &mPort, bool isProvider,
-		const OCPI::Util::PValue *params);
+		const OCPI::Base::PValue *params);
       virtual ~BasicPort();
       // Apply port parameters that are NOT connection parameters that apply to both sides.
       // I.e. apply only one-sided parameters like buffercount.
-      void applyPortParams(const OCPI::Util::PValue *params);
+      void applyPortParams(const OCPI::Base::PValue *params);
       // Apply information in the connection to the descriptor for this port
       void setBufferSize(size_t bufferSize);
       void applyConnection(const Transport &t, size_t bufferSize);
@@ -225,9 +225,9 @@ typedef int pthread_spinlock_t;
       bool finishRemote(Launcher::Connection &c);
       // Figure out the transport, interconnect instance id, and roles for a connection
       static void determineTransport(const Transports &in, const Transports &out,
-				     const OCPI::Util::PValue *paramsIn,
-				     const OCPI::Util::PValue *paramsOut,
-				     const OCPI::Util::PValue *connParams,
+				     const OCPI::Base::PValue *paramsIn,
+				     const OCPI::Base::PValue *paramsOut,
+				     const OCPI::Base::PValue *connParams,
 				     Transport &transport);
       static void packPortDesc(const OCPI::RDT::Descriptors&  port, std::string &out ) throw ();
       static bool unpackPortDesc(const std::string& desc, OCPI::RDT::Descriptors &desc_storage)

@@ -20,7 +20,7 @@
 
 #include <string>
 
-#include "OcpiLoggerLogger.h"
+#include "UtilLogger.hh"
 
 #include "MessageKeeper.h"
 
