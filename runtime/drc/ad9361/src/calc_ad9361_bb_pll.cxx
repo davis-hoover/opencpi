@@ -51,7 +51,7 @@
 
 #include <cstdint>         // uint8_t, uint32_t types
 #include <sstream>         // std::ostringstream
-#include "OcpiUtilMisc.h"  // esprintf
+#include "UtilMisc.hh"  // esprintf
 #include "ad9361.h"        // BBPLL_MODULUS macro
 #include "ad9361_platform.h" // regs_clock_bbpll_t
 #include "calc_ad9361_bb_pll.h"

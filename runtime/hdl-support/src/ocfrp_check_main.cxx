@@ -33,7 +33,7 @@
 #include <sys/mman.h>
 #include "OcpiUuid.h"
 #include "HdlOCCP.h"
-#include "OcpiUtilPci.h"
+#include "UtilPci.hh"
 #include "HdlPciDriver.h"
 
 namespace OP = OCPI::HDL::PCI;

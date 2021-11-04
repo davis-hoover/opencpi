@@ -34,7 +34,7 @@
 #define OCPI_DATATRANSPORT_EXCEPTIONS_H_
 
 #include <stdint.h>
-#include "OcpiUtilException.h"
+#include "UtilException.hh"
 
 namespace OCPI {
 

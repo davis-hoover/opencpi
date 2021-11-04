@@ -21,7 +21,7 @@
 #include <inttypes.h>
 #include "OsAssert.hh"
 #include "OsMisc.hh"
-#include "OcpiUtilMisc.h"
+#include "UtilMisc.hh"
 #include "XferAccess.h"
 
 namespace DataTransfer {

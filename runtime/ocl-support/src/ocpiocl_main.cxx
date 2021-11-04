@@ -25,9 +25,9 @@
 #include <sys/mman.h>
 #include <cstring>
 #include "ocpi-config.h"
-#include "OcpiUtilCppMacros.h"
+#include "UtilCppMacros.hh"
 #include "OsLoadableModule.hh"
-#include "OcpiDriverManager.h"
+#include "BasePluginManager.hh"
 #include "OclContainer.h"
 
 namespace OU =  OCPI::Util;
@@ -49,12 +49,12 @@ namespace OU =  OCPI::Util;
   CMD_OPTION(  verbose,    v,    Bool,   "false", "Provide verbose output during operation") \
   CMD_OPTION(  loglevel,   l,    UChar,  "0",     "Set logging level used during operation") \
 
-#include "CmdOption.hh"
+#include "BaseOption.hh"
 
 namespace OC = OCPI::Container;
 namespace OCL = OCPI::OCL;
 namespace OA = OCPI::API;
-namespace OD = OCPI::Driver;
+namespace OD = OCPI::Base::Plugin;
 
 // FIXME:  this assumes that the environment and or configuration will be set to the default
 // location.  This is "pending" while we figure out the difference between a default place
@@ -64,7 +64,7 @@ const char *defaultLib = OCPI_CPP_STRINGIFY(OCPI_OPENCL_LIB);
 
 static int mymain(const char **ap) {
   OCPI::OS::logSetLevel(options.loglevel());
-  OCPI::Driver::ManagerManager::suppressDiscovery();
+  OCPI::Base::Plugin::ManagerManager::suppressDiscovery();
   const char *env = getenv("OCPI_OPENCL_LIB");
   const char *lib = env && env[0] ? env : defaultLib;
   try {

@@ -29,7 +29,7 @@
 #include <map>
 
 #include "OsEther.hh"
-#include "UtilPValue.hh"
+#include "BasePValue.hh"
 #include "HdlDevice.h"
 #include "HdlNetDefs.h"
 
@@ -58,7 +58,7 @@ namespace OCPI {
 	Sockets m_sockets;
 	bool trySocket(OCPI::OS::Ether::Interface &ifc, OCPI::OS::Ether::Socket &s,
 		       OCPI::OS::Ether::Address &addr, bool discovery, const char **exclude,
-		       Macs *macs, Device **dev, const OCPI::Util::PValue *params,
+		       Macs *macs, Device **dev, const OCPI::Base::PValue *params,
 		       std::string &error);
 	// Try to find one or more devices on this interface
 	// mac is NULL for broadcast
@@ -66,22 +66,22 @@ namespace OCPI {
 	unsigned 
 	tryIface(OCPI::OS::Ether::Interface &ifc, OCPI::OS::Ether::Address &devAddr,
 		 const char **exclude, Device **dev, bool discovery, Macs *macs,
-		 const OCPI::Util::PValue *params, std::string &error);
+		 const OCPI::Base::PValue *params, std::string &error);
       protected:
 	virtual ~Driver();
 	// device constructor
 	virtual Device *createDevice(OS::Ether::Interface &ifc, OS::Ether::Address &addr,
-				     bool discovery, const OCPI::Util::PValue *params,
+				     bool discovery, const OCPI::Base::PValue *params,
 				     std::string &error) = 0;
       public:
 	// Find the discovery socket for this interface
 	OCPI::OS::Ether::Socket *
 	findSocket(OCPI::OS::Ether::Interface &ifc, bool discovery, std::string &error);
 	unsigned
-	search(const OCPI::Util::PValue *props, const char **exclude, bool discoveryOnly,
+	search(const OCPI::Base::PValue *props, const char **exclude, bool discoveryOnly,
 	       bool udp, std::string &error);
 	OCPI::HDL::Device *
-	open(const char *etherName, bool discovery, const OCPI::Util::PValue *params,
+	open(const char *etherName, bool discovery, const OCPI::Base::PValue *params,
 	     std::string &err);
 	// Callback when found
 	virtual bool found(OCPI::HDL::Device &dev, const char **excludes, bool discoveryOnly,
@@ -101,7 +101,7 @@ namespace OCPI {
 	Device(Driver &driver, OCPI::OS::Ether::Interface &ifc, std::string &name,
 	       OCPI::OS::Ether::Address &devAddr, bool discovery, const char *data_proto,
 	       unsigned delayms,  uint64_t ep_size, uint64_t controlOffset, uint64_t dataOffset,
-	       const OCPI::Util::PValue *params, std::string &);
+	       const OCPI::Base::PValue *params, std::string &);
       public:
 	virtual ~Device();
 	// Load a bitstream via jtag

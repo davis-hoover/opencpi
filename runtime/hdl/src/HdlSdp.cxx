@@ -22,8 +22,8 @@
 #include <unistd.h>
 #include <errno.h>
 #include "OsDebug.hh"
-#include "OcpiUtilMisc.h"
-#include "OcpiUtilException.h"
+#include "UtilMisc.hh"
+#include "UtilException.hh"
 #include "HdlSdp.h"
 namespace OCPI {
   namespace HDL {

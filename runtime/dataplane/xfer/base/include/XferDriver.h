@@ -24,7 +24,7 @@
 #ifndef XferDriver_h
 #define XferDriver_h
 
-#include "OcpiDriverManager.h"
+#include "BasePluginManager.hh"
 #include "XferFactory.h"
 
 struct XFTemplate;
@@ -44,21 +44,21 @@ namespace DataTransfer {
 	    const char *&name, class Base = DataTransfer::XferFactory>
   class DriverBase :
     public OCPI::Util::Parent<ConcreteSvcs>, // destroy these last
-    public OCPI::Driver::DriverBase<XferManager, Base,
-				    ConcreteDriver, ConcreteDevice, name>
+    public OCPI::Base::Plugin::DriverBase<XferManager, Base,
+					  ConcreteDriver, ConcreteDevice, name>
   {
   };
   template <class Dri, class Dev>
   class DeviceBase :
-    public OCPI::Driver::DeviceBase<Dri,Dev>,
+    public OCPI::Base::Plugin::DeviceBase<Dri,Dev>,
     public Device
   {
   protected:
     DeviceBase<Dri, Dev>(const char *childName, Dev &dev)
-    : OCPI::Driver::DeviceBase<Dri, Dev>(childName, dev)
+      : OCPI::Base::Plugin::DeviceBase<Dri, Dev>(childName, dev)
     {}
     inline XferFactory &driverBase() {
-      return OCPI::Driver::DeviceBase<Dri,Dev>::parent();
+      return OCPI::Base::Plugin::DeviceBase<Dri,Dev>::parent();
     }
   };
 
@@ -92,7 +92,7 @@ namespace DataTransfer {
   };
   template <class Dri>
   class RegisterTransferDriver
-    : OCPI::Driver::Registration<Dri>
+    : OCPI::Base::Plugin::Registration<Dri>
   {};
 }
 #endif

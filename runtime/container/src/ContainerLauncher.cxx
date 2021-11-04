@@ -28,6 +28,7 @@
 namespace OA = OCPI::API;
 namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 namespace OT = DataTransfer;
 namespace OCPI {
   namespace Container {
@@ -195,14 +196,14 @@ prepare() {
   // Make sure that the input side knows about any transports implied at the
   // output side.
   const char *cp;
-  if (!OU::findString(m_in.m_params, "endpoint", cp) &&
-      !OU::findString(m_in.m_params, "transport", cp)) {
+  if (!OB::findString(m_in.m_params, "endpoint", cp) &&
+      !OB::findString(m_in.m_params, "transport", cp)) {
     // There is no transport specified on the input side,
     // check the output side.
     std::string transport;
-    if (OU::findString(m_out.m_params, "endpoint", cp))
+    if (OB::findString(m_out.m_params, "endpoint", cp))
       OT::EndPoint::getProtocolFromString(cp, transport);
-    else if (OU::findString(m_out.m_params, "transport", cp))
+    else if (OB::findString(m_out.m_params, "transport", cp))
       transport = cp;
     if (transport.length())
       m_in.m_params.add("transport", transport.c_str());

@@ -35,7 +35,7 @@
 #include <OcpiCircuit.h>
 #include <OcpiOutputBuffer.h>
 #include "OsAssert.hh"
-#include <OcpiUtilAutoMutex.h>
+#include "UtilAutoMutex.hh"
 #include "TransportController.hh"
 #include <OcpiPullDataDriver.h>
 #include <OcpiTimeEmitCategories.h>

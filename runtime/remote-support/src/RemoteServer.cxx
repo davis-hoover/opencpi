@@ -39,6 +39,7 @@ namespace OC = OCPI::Container;
 namespace OL = OCPI::Library;
 namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 namespace OE = OCPI::OS::Ether;
 namespace OA = OCPI::API;
 namespace OR = OCPI::RDT;
@@ -357,7 +358,7 @@ namespace OCPI {
 	  // we are the first seen member of the crew - we can parse the property values since we
 	  // know the impl now
 	  unsigned *u = &i->m_crew->m_propOrdinals[0];
-	  OU::Value *v = &i->m_crew->m_propValues[0];
+	  OB::Value *v = &i->m_crew->m_propValues[0];
 	  for (ezxml_t px = crewsXml[crewN]; px; px = ezxml_cnext(px), u++, v++) {
 	    size_t ord;
 	    if ((err = OX::getNumber(px, "n", &ord)))
@@ -510,7 +511,7 @@ namespace OCPI {
 	      (err = OX::getBoolean(m_rx, "string", &string)) ||
 	      (err = OX::getNumber(m_rx, "idx", &idx)))
 	    return OU::eformat(error, "Get/set property control message error: %s", err);
-	  OU::Member *m = &p;
+	  OB::Member *m = &p;
 	  for (const char *path = ezxml_cattr(m_rx, "path");
 	       path && path[0] && path[1]; path += 2) {
 	    size_t ordinal;

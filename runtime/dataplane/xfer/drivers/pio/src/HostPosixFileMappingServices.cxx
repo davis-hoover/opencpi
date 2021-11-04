@@ -43,7 +43,7 @@
 #include "ocpi-config.h"
 #include "OsAssert.hh"
 #include "HostFileMappingServices.h"
-#include "OcpiUtilMisc.h"
+#include "UtilMisc.hh"
 
 #ifndef OCPI_OS_VERSION_zynq
 // This fails on zynq and we have not dug into it yet.
@@ -74,7 +74,7 @@ namespace DataTransfer {
 	  struct stat statbuf;
 	  rc = fstat (m_fd, &statbuf);
 	  if (rc == 0 && statbuf.st_size < (off_t)iMaxSize)
-	    rc = ftruncate (m_fd, iMaxSize);
+	    rc = ftruncate(m_fd, (off_t)iMaxSize);
 	  m_errno = errno;
 	  if (rc != 0)
 	    {

@@ -24,11 +24,11 @@
 
 #include "OcpiContainerApi.h"
 
-#include "OcpiUtilSelfMutex.h"
-#include "UtilPValue.hh"
+#include "UtilSelfMutex.hh"
+#include "BasePValue.hh"
 #include "OcpiRDTInterface.h"
 #include "MetadataPort.hh"
-#include "OcpiParentChild.h"
+#include "BaseParentChild.hh"
 #include "ContainerApplication.h"
 #include "ContainerLocalPort.h"
 
@@ -51,17 +51,17 @@ namespace OCPI {
     protected:
       bool m_canBeExternal;
 
-      Port(Container &container, const OCPI::Metadata::Port &mport, const OCPI::Util::PValue *params = NULL);
+      Port(Container &container, const OCPI::Metadata::Port &mport, const OCPI::Base::PValue *params = NULL);
       virtual ~Port();
       bool canBeExternal() const { return m_canBeExternal; }
       virtual const std::string &name() const = 0;
       virtual Worker &worker() const = 0;
       // other port is the same container type.  Return true if you do it.
-      virtual bool connectLike(Port &other, const OCPI::Util::PValue *myProps=NULL,
-			       const OCPI::Util::PValue *otherProps=NULL);
+      virtual bool connectLike(Port &other, const OCPI::Base::PValue *myProps=NULL,
+			       const OCPI::Base::PValue *otherProps=NULL);
 
-      virtual void connectURL(const char* url, const OCPI::Util::PValue *myParams,
-			      const OCPI::Util::PValue *otherParams);
+      virtual void connectURL(const char* url, const OCPI::Base::PValue *myParams,
+			      const OCPI::Base::PValue *otherParams);
       void portIsConnected();
     public:
       //      void determineRoles(OCPI::RDT::Descriptors &other);
@@ -91,7 +91,7 @@ namespace OCPI {
         public Port {
     protected:
       PortBase<Wrk,Prt,Ext>(Wrk &a_worker, Prt &prt, const OCPI::Metadata::Port &mport,
-			    const OCPI::Util::PValue *params)
+			    const OCPI::Base::PValue *params)
       : OCPI::Util::Child<Wrk,Prt,portBase>(a_worker, prt, mport.m_name.c_str()),
 	Port(a_worker.parent().container(), mport, params) {}
       inline Worker &worker() const { return OCPI::Util::Child<Wrk,Prt,portBase>::parent(); }
@@ -121,7 +121,7 @@ namespace OCPI {
       friend class LocalPort;
     protected:
       BridgePort(Container &c, const OCPI::Metadata::Port &mPort, bool provider,
-		 const OCPI::Util::PValue *params);
+		 const OCPI::Base::PValue *params);
       ~BridgePort();
       bool canBeExternal() const { return true; }
     };

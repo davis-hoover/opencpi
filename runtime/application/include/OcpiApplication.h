@@ -30,7 +30,7 @@
 
 #include <string>
 #include <map>
-#include "OcpiUtilMisc.h"
+#include "UtilMisc.hh"
 #include "OcpiLibraryAssembly.h"
 #include "ContainerManager.h"
 #include "ContainerApplication.h"
@@ -108,7 +108,7 @@ namespace OCPI {
         const char *init(const OCPI::Library::Assembly &assy, size_t n, bool verbose,
 			 const PValue *params);
 	void collectCandidate(const OCPI::Library::Candidate &c, unsigned n);
-	void finalizePortParam(OCPI::Metadata::Assembly::Instance &ui, const OCPI::Util::PValue *params,
+	void finalizePortParam(OCPI::Metadata::Assembly::Instance &ui, const OCPI::Base::PValue *params,
 			       const char *param);
 	bool foundContainer(OCPI::Container::Container &i);
       };
@@ -137,7 +137,7 @@ namespace OCPI {
       struct DelayedPropertyValue {
 	unsigned m_instance;
 	const OCPI::Metadata::Property *m_property;
-	OCPI::Util::Value m_value;
+	OCPI::Base::Value m_value;
       };
       typedef std::multimap<OCPI::Metadata::Assembly::Delay, DelayedPropertyValue> DelayedPropertyValues;
       DelayedPropertyValues    m_delayedPropertyValues;
@@ -191,8 +191,8 @@ namespace OCPI {
       void init(const OCPI::API::PValue *params);
       void initExternals(const OCPI::API::PValue *params);
       void setLaunchPort(OCPI::Container::Launcher::Port &p, const OCPI::Metadata::Port *mp,
-			 const OCPI::Util::PValue *connParams, const std::string &name,
-			 const OCPI::Util::PValue *portParams,
+			 const OCPI::Base::PValue *connParams, const std::string &name,
+			 const OCPI::Base::PValue *portParams,
 			 const OCPI::Container::Launcher::Member *member,
 			 const OCPI::Metadata::Assembly::External *ep, size_t scale, size_t index);
       void initLaunchConnections();
@@ -204,7 +204,7 @@ namespace OCPI {
       void finalizeLaunchMembers();
       void checkPropertyValue(unsigned nInstance, const OCPI::Metadata::Worker &w,
 			      const OCPI::Metadata::Assembly::Property &aProp, unsigned *&pn,
-			      OCPI::Util::Value *&pv);
+			      OCPI::Base::Value *&pv);
       const OCPI::Metadata::Port *getMetaPort(unsigned n) const;
       // return our used-container ordinal
       unsigned addContainer(unsigned container, bool existOk = false);
@@ -223,8 +223,8 @@ namespace OCPI {
 				 const std::string &reject);
       void restoreSlaves(OCPI::Library::Candidate &c);
       bool connectionsOk(OCPI::Library::Candidate &c, unsigned instNum);
-      void finalizeProperties(const OCPI::Util::PValue *params);
-      const char *finalizePortParam(const OCPI::Util::PValue *params, const char *pName);
+      void finalizeProperties(const OCPI::Base::PValue *params);
+      const char *finalizePortParam(const OCPI::Base::PValue *params, const char *pName);
       void finalizeExternals();
       bool resolveExplicitSlaves();
       bool bookingOk(Booking &b, OCPI::Library::Candidate &c, unsigned n);
@@ -237,10 +237,10 @@ namespace OCPI {
 			  unsigned *containers, const OCPI::Library::Implementation **impls,
 			  CMap feasible);
       void doInstance(unsigned instNum, unsigned score);
-      void checkExternalParams(const char *pName, const OCPI::Util::PValue *params);
+      void checkExternalParams(const char *pName, const OCPI::Base::PValue *params);
       void prepareInstanceProperties(unsigned nInstance,
 				     const OCPI::Library::Implementation &impl,
-				     unsigned *&pn, OCPI::Util::Value *&pv);
+				     unsigned *&pn, OCPI::Base::Value *&pv);
       void planDeployment(const PValue *params);
       void importDeployment(const char *file, ezxml_t &xml, const PValue *params);
       const char *timeDiff(OS::Time later, OS::Time earlier);

@@ -24,11 +24,11 @@
 #ifndef OCPI_DataTransport_Controller_H_
 #define OCPI_DataTransport_Controller_H_
 
-#include "OcpiUtilMisc.h"
+#include "UtilMisc.hh"
 #include "TransportTransfer.hh"
 #include "OcpiBuffer.h"
 #include "OcpiOutputBuffer.h"
-#include "OcpiUtilRefCounter.h"
+#include "UtilRefCounter.hh"
 
 namespace DataTransfer {
   class XferRequest;

@@ -41,10 +41,10 @@
 #include "OsDataTypes.hh"
 #include "OsMisc.hh"
 #include "OsAssert.hh"
-#include "OcpiUtilAutoMutex.h"
-#include "OcpiUtilEzxml.h"
-#include "OcpiUtilMisc.h"
-#include "UtilPValue.hh"
+#include "UtilAutoMutex.hh"
+#include "UtilEzxml.hh"
+#include "UtilMisc.hh"
+#include "BasePValue.hh"
 #include "XferException.h"
 #include "XferDriver.h"
 #include "XferServices.h"
@@ -58,6 +58,7 @@ using namespace OCPI::Util;
 using namespace OCPI::OS;
 namespace OX = OCPI::Util::EzXml;
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 namespace XF = DataTransfer;
 // Create tranfer services template
 const int MAX_TX_DEPTH = 8*1024;
@@ -185,7 +186,7 @@ namespace DataTransfer {
       uint8_t               m_port;
       // Constructors
       EndPoint(XferFactory &factory, const char *protoInfo, const char *eps, const char *other,
-	       bool local, size_t size, const OU::PValue *params);
+	       bool local, size_t size, const OB::PValue *params);
       // Destructor
       virtual ~EndPoint();
 
@@ -321,9 +322,9 @@ namespace DataTransfer {
        *  Get the location via the endpoint
        ***************************************/
       XF::EndPoint &createEndPoint(const char *protoInfo, const char *eps, const char *other,
-				   bool local, size_t size, const OCPI::Util::PValue *params);
+				   bool local, size_t size, const OB::PValue *params);
       // From driver base class
-      unsigned search(const OCPI::Util::PValue* props, const char **exclude, bool discoveryOnly)
+      unsigned search(const OB::PValue* props, const char **exclude, bool discoveryOnly)
 	throw (OCPI::Util::EmbeddedException);
 
     protected:
@@ -453,7 +454,7 @@ namespace DataTransfer {
     };
     EndPoint::
     EndPoint(XferFactory &a_factory, const char *protoInfo, const char *eps, const char *other,
-	     bool a_local, size_t a_size, const OU::PValue *params)
+	     bool a_local, size_t a_size, const OB::PValue *params)
       : XF::EndPoint(a_factory, eps, other, a_local, a_size, params) { 
       if (protoInfo) {
 	m_protoInfo = protoInfo;
@@ -461,7 +462,7 @@ namespace DataTransfer {
       } else {
 	Device *d;
 	const char *deviceName = 0;
-	if (OU::findString(params, "Device", deviceName))
+	if (OB::findString(params, "Device", deviceName))
 	  d = a_factory.findDevice(deviceName);
 	else
 	  d = a_factory.firstDevice();
@@ -507,7 +508,7 @@ namespace DataTransfer {
 
     unsigned 
     XferFactory::
-    search(const OCPI::Util::PValue* /*props*/, const char ** /*exclude*/, bool /* discoveryOnly */)
+    search(const OB::PValue* /*props*/, const char ** /*exclude*/, bool /* discoveryOnly */)
       throw (OCPI::Util::EmbeddedException) 
     {
       int num_of_device;
@@ -526,7 +527,7 @@ namespace DataTransfer {
 	d->configure(devXml);
       }
       // FIXME:  report devices that don't match in xml?
-      return num_of_device;
+      return (unsigned)num_of_device;
     }
 
 #if 0
@@ -561,7 +562,7 @@ namespace DataTransfer {
 
     XF::EndPoint &XferFactory::
     createEndPoint(const char *protoInfo, const char *eps, const char *other, bool local,
-		   size_t size, const OCPI::Util::PValue *params) {
+		   size_t size, const OB::PValue *params) {
       EndPoint &ep = *new EndPoint(*this, protoInfo, eps, other, local, size, params);
       for (Device *d = firstDevice(); d; d = d->nextDevice())
 	if ( d->name() == ep.m_dev ) {
@@ -1012,7 +1013,7 @@ namespace DataTransfer {
     {
 
       if (ep.local()) {
-	if (posix_memalign((void**)&m_mem, sysconf(_SC_PAGESIZE), ep.size())) {
+	if (posix_memalign((void**)&m_mem, (size_t)sysconf(_SC_PAGESIZE), ep.size())) {
 	  ocpiDebug("OFED::SmemServices Error: Couldn't allocate SMB.");
 	  throw XF::DataTransferEx( NO_MORE_SMB, "memalign failed" );
 	}

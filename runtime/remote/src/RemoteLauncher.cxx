@@ -26,8 +26,8 @@
 #include <cstring>
 #include <set>
 #include "OsSocket.hh"
-#include "UtilValue.hh"
-#include "OcpiUtilMisc.h"
+#include "BaseValue.hh"
+#include "UtilMisc.hh"
 #include "Container.h"
 #include "ContainerApplication.h"
 #include "RemoteLauncher.h"
@@ -37,6 +37,7 @@ namespace OX = OCPI::Util::EzXml;
 namespace OL = OCPI::Library;
 namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 namespace OS = OCPI::OS;
 namespace OCPI {
   namespace Remote {
@@ -92,7 +93,7 @@ emitCrew(const OCPI::Container::Launcher::Crew &crew) {
   OU::formatAdd(m_request, "  <crew size='%zu'", crew.m_size);
   if (crew.m_propValues.size()) {
     m_request += ">\n";
-    const OU::Value *vals = &crew.m_propValues[0];
+    const OB::Value *vals = &crew.m_propValues[0];
     const unsigned *po = &crew.m_propOrdinals[0];
     for (unsigned n = 0; n < crew.m_propValues.size(); n++, vals++, po++) {
       OU::formatAdd(m_request, "    <property n='%u' v='", *po);
@@ -137,7 +138,7 @@ emitPort(const Launcher::Member &i, const char *port, const OA::PValue *params,
 }
 #endif
 static void 
-unparseParams(const OU::PValue *params, std::string &out) {
+unparseParams(const OB::PValue *params, std::string &out) {
   for (;params && params->name; params++) {
     OU::formatAdd(out, " %s='", params->name);
     params->unparse(out, true);
@@ -402,7 +403,7 @@ work(Launcher::Members &instances, Launcher::Connections &connections) {
       Launcher::Member *i = &instances[0];
       for (unsigned n = 0; n < instances.size(); n++, i++)
 	if (&i->m_container->launcher() == this && !i->m_worker) {
-	  OU::PValue pv[] = { OU::PVULong("remoteInstance", m_instanceMap[n]), OU::PVEnd };
+	  OB::PValue pv[] = { OB::PVULong("remoteInstance", m_instanceMap[n]), OB::PVEnd };
 	  i->m_worker =
 	    &i->m_containerApp->createWorker(i->m_impl->m_artifact, i->m_name.c_str(),
 					     i->m_impl->m_metadataImpl.m_xml,

@@ -25,11 +25,12 @@
 namespace OL = OCPI::Library;
 namespace OA = OCPI::API;
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 namespace OC = OCPI::Container;
 
 namespace OCPI {
   namespace Container {
-    Artifact::Artifact(OL::Artifact &lart, const OCPI::Util::PValue *) 
+    Artifact::Artifact(OL::Artifact &lart, const OB::PValue *) 
       : m_libArtifact(lart) {
       // FIXME: ref count loads from library artifact?
     }
@@ -128,7 +129,7 @@ namespace OCPI {
     Worker & Artifact::createWorker(Application &app, const char *appInstName, ezxml_t impl,
 				    ezxml_t inst, const OC::Workers &slaves, bool hasMaster,
 				    size_t member, size_t crewSize,
-				    const OCPI::Util::PValue *wParams) {
+				    const OCPI::Base::PValue *wParams) {
       Worker &w = app.createWorker(this, appInstName, impl, inst, slaves, hasMaster, member,
 				   crewSize, wParams);
       m_workers.push_back(&w);

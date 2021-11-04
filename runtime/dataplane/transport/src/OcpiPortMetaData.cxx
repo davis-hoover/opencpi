@@ -33,7 +33,7 @@
 #include "OsAssert.hh"
 #include "XferEndPoint.h"
 #include "XferManager.h"
-#include "OcpiUtilMisc.h"
+#include "UtilMisc.hh"
 #include "TransportPortSet.hh"
 #include "OcpiPortMetaData.h"
 

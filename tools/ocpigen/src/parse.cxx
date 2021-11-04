@@ -29,10 +29,10 @@
 #include <ctype.h>
 #include "ocpi-config.h"
 #include "OsFileSystem.hh"
-#include "OcpiUtilMisc.h"
-#include "OcpiUtilEzxml.h"
+#include "UtilMisc.hh"
+#include "UtilEzxml.hh"
 #include "MetadataAssembly.hh"
-#include "OcpiUtilCppMacros.h"
+#include "UtilCppMacros.hh"
 #include "wip.h"
 #include "hdl.h"
 #include "rcc.h"
@@ -737,7 +737,7 @@ getBoolean(ezxml_t x, const char *name, bool *b, bool trueOnly) {
 #endif
 
 const char*
-extractExprValue(const OM::Property &p, const OU::Value &v, OU::ExprValue &val) {
+extractExprValue(const OM::Property &p, const OB::Value &v, OB::ExprValue &val) {
   const char *err = val.setFromTypedValue(v);
   if (err)
     return OU::esprintf("the '%s' parameter property expression is invalid: %s",
@@ -756,7 +756,7 @@ extractExprValue(const OM::Property &p, const OU::Value &v, OU::ExprValue &val) 
 // We first look for instance property values applied in the assembly,
 // and then look for parameter values directly
 const char *Worker::
-getValue(const char *sym, OU::ExprValue &val) const {
+getValue(const char *sym, OB::ExprValue &val) const {
   for (PropertiesIter pi = m_ctl.properties.begin(); pi != m_ctl.properties.end(); pi++)
     if (!strcasecmp((*pi)->m_name.c_str(), sym)) {
       OM::Property &p = **pi;
@@ -769,7 +769,7 @@ getValue(const char *sym, OU::ExprValue &val) const {
             // property value so we use that value for this identifier's value
             // FIXME: why isn't this IPV value already parsed?
             // FIXME: the instance has parsed property values but it not accessible here
-            OU::Value v(p);
+            OB::Value v(p);
             const char *err;
             if ((err = v.parse(ap->m_value.c_str())))
               return err;
@@ -1178,7 +1178,7 @@ Worker(ezxml_t xml, const char *xfile, const std::string &parentFile,
 
 // Base class has no worker level expressions, but does all the ports
 const char *Worker::
-resolveExpressions(OCPI::Util::IdentResolver &ir) {
+resolveExpressions(OB::IdentResolver &ir) {
   const char *err;
   for (PortsIter pi = m_ports.begin(); pi != m_ports.end(); pi++)
     if ((err = (**pi).resolveExpressions(ir)))

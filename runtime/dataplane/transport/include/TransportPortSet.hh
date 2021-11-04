@@ -24,7 +24,7 @@
 #include "OcpiTransportConstants.h"
 #include "TransportDistribution.hh"
 #include "OcpiPort.h"
-#include "OcpiParentChild.h"
+#include "BaseParentChild.hh"
 #include "OcpiTimeEmit.h"
 
 namespace OCPI {

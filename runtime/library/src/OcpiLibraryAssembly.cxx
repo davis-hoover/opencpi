@@ -22,13 +22,14 @@
 #include <strings.h>
 #include <iostream>
 #include "OcpiLibraryAssembly.h"
-#include "UtilValue.hh"
-#include "OcpiUtilEzxml.h"
+#include "BaseValue.hh"
+#include "UtilEzxml.hh"
 
 namespace OCPI {
   namespace Library {
     namespace OM = OCPI::Metadata;
     namespace OU = OCPI::Util;
+    namespace OB = OCPI::Base;
     namespace OE = OCPI::Util::EzXml;
 
     // Attributes specific to an application assembly
@@ -39,7 +40,7 @@ namespace OCPI {
     static const char *instAttrs[] = { COLLOCATION_POLICY_ATTRS,
 				       "model", "platform", "container", NULL};
 
-    Assembly::Assembly(ezxml_t a_xml, const char *a_name, const OU::PValue *params)
+    Assembly::Assembly(ezxml_t a_xml, const char *a_name, const OB::PValue *params)
       : OM::Assembly(a_xml, a_name, false, assyAttrs, instAttrs, params), m_refCount(1) {
       m_nAppInstances = nUtilInstances();
       findImplementations(params);
@@ -134,9 +135,9 @@ namespace OCPI {
     // After all the other implementations are established, so we know port directions etc.,
     // insert file read/write components
     const char *Assembly::
-    addFileIoInstances(const OU::PValue *params) {
+    addFileIoInstances(const OB::PValue *params) {
       const char *assign;
-      for (unsigned n = 0; OU::findAssignNext(params, "file", NULL, assign, n); ) {
+      for (unsigned n = 0; OB::findAssignNext(params, "file", NULL, assign, n); ) {
 	const char *value, *err;
 	size_t instn, portn;
 	const OM::Port *port;
@@ -439,9 +440,9 @@ namespace OCPI {
       if (m_utilInstance.m_selection.empty())
 	score = 1;
       else {
-	OU::ExprValue val;
+	OB::ExprValue val;
 	const char *err =
-	  OU::evalExpression(m_utilInstance.m_selection.c_str(), val, &impl.m_metadataImpl);
+	  OB::evalExpression(m_utilInstance.m_selection.c_str(), val, &impl.m_metadataImpl);
 	if (!err && !val.isNumber())
 	  err = "selection expression has string value";
 	if (err)
@@ -512,7 +513,7 @@ namespace OCPI {
 		   apName);
 	  return false;
 	}
-	OU::Value aValue; // FIXME - save this and use it later
+	OB::Value aValue; // FIXME - save this and use it later
 	const char *err = uProp.parseValue(apValue, aValue, NULL, &impl.m_metadataImpl);
 	if (err) {
 	  ocpiInfo("    Rejected: the value \"%s\" for the \"%s\" property, \"%s\", was invalid: %s",
@@ -555,7 +556,7 @@ namespace OCPI {
     }
 
     void Assembly::
-    addInstance(const OU::PValue *params) {
+    addInstance(const OB::PValue *params) {
       unsigned n = (unsigned)m_instances.size();
       m_instances.push_back(new Instance(OM::Assembly::instance(n)));
       ocpiInfo("================================================================================");
@@ -568,15 +569,15 @@ namespace OCPI {
       const OM::Assembly::Instance &inst = m_tempInstance->m_utilInstance;
       // need to deal with params that can filter impls: model and platform
       ezxml_t x = inst.xml();
-      if (!OU::findAssign(params, "model", inst.m_name.c_str(), m_model) &&
-	  !OU::findAssign(params, "model", inst.m_specName.c_str(), m_model))
+      if (!OB::findAssign(params, "model", inst.m_name.c_str(), m_model) &&
+	  !OB::findAssign(params, "model", inst.m_specName.c_str(), m_model))
 	OE::getOptionalString(x, m_model, "model");
-      if (!OU::findAssign(params, "platform", inst.m_name.c_str(), m_platform) &&
-	  !OU::findAssign(params, "platform", inst.m_specName.c_str(), m_platform))
+      if (!OB::findAssign(params, "platform", inst.m_name.c_str(), m_platform) &&
+	  !OB::findAssign(params, "platform", inst.m_specName.c_str(), m_platform))
 	OE::getOptionalString(x, m_platform, "platform");
       const char *scale;
-      if (!OU::findAssign(params, "scale", inst.m_name.c_str(), scale) &&
-	  !OU::findAssign(params, "scale", inst.m_specName.c_str(), scale))
+      if (!OB::findAssign(params, "scale", inst.m_name.c_str(), scale) &&
+	  !OB::findAssign(params, "scale", inst.m_specName.c_str(), scale))
 	scale = ezxml_cattr(inst.xml(), "scale");
       m_tempInstance->m_scale = 1;
       if (scale && OE::getUNum(scale, &m_tempInstance->m_scale))
@@ -586,8 +587,8 @@ namespace OCPI {
 			"for \"%s\".  Use log level 8 for more detail.",
 			inst.m_specName.c_str());
       const char *device = NULL;
-      if (!OU::findAssign(params, "device", inst.m_name.c_str(), scale) &&
-	  !OU::findAssign(params, "device", inst.m_specName.c_str(), scale))
+      if (!OB::findAssign(params, "device", inst.m_name.c_str(), scale) &&
+	  !OB::findAssign(params, "device", inst.m_specName.c_str(), scale))
 	device = ezxml_cattr(inst.xml(), "device");
       if (device)
 	m_tempInstance->m_device = device;
@@ -596,7 +597,7 @@ namespace OCPI {
     }
 
     // A common method used by constructors
-    void Assembly::findImplementations(const OU::PValue *params) {
+    void Assembly::findImplementations(const OB::PValue *params) {
       const char *err;
       if ((err = checkInstanceParams("model", params, false, true)) ||
 	  (err = checkInstanceParams("platform", params, false, true)))
@@ -604,7 +605,7 @@ namespace OCPI {
       m_params = params; // for access by callback
       m_maxCandidates = 0;
       const char *deployment = NULL;
-      m_deployed = OU::findString(params, "deployment", deployment);
+      m_deployed = OB::findString(params, "deployment", deployment);
       // Pass 1:  Initialize our instances list from the Util assy, but we might add to it later
       // for slaves or file I/O instances.  Find candidates implementations.
       m_nAppInstances = nUtilInstances();

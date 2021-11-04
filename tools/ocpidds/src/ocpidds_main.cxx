@@ -28,8 +28,8 @@
 #include "cdkutils.h"
 #include "ocpidds.h"
 #include "MetadataProtocol.hh"
-#include "OcpiUtilMisc.h"
-#include "UtilValueReader.hh"
+#include "UtilMisc.hh"
+#include "BaseValueReader.hh"
 
 #define OCPI_OPTIONS_HELP \
   "Usage is: ocpidds [options] <input-files>\n"
@@ -48,10 +48,11 @@
  CMD_OPTION(in,         i, String, NULL, "input file to read protocol data from") \
  CMD_OPTION(out,        o, String, NULL, "output file to write protocol data to") \
 
-#include "CmdOption.hh"
+#include "BaseOption.hh"
 
 namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 namespace OA = OCPI::API;
 
 static const char *
@@ -69,18 +70,18 @@ parseAndWrite(OM::Protocol &p, OM::Operation &op, uint8_t opcode, const char *te
   const char *err;
 
   if (op.nArgs()) {
-    std::vector<OU::Value *> values(op.nArgs(), NULL);
-    const OU::Value **v;
+    std::vector<OB::Value *> values(op.nArgs(), NULL);
+    const OB::Value **v;
     if (op.nArgs() == 1) {
-      values[0] = new OU::Value(*op.args());
+      values[0] = new OB::Value(*op.args());
       values[0]->parse(text);
-      v = (const OU::Value **)&values[0];
+      v = (const OB::Value **)&values[0];
     } else {
       size_t maxAlign = 1, minSize = 0, myOffset = 0;
       bool diverseSizes, unBounded, variable, isSub32; // we are precluding unbounded in any case
 
       // FIXME:  elide structures and operations
-      OU::Member m(op.cname(), NULL, NULL, OA::OCPI_Struct, false, NULL);
+      OB::Member m(op.cname(), NULL, NULL, OA::OCPI_Struct, false, NULL);
       m.m_members = op.args();
       m.m_nMembers = op.nArgs();
       if ((err = m.offset(maxAlign, myOffset, minSize, diverseSizes, isSub32, unBounded, 
@@ -89,20 +90,20 @@ parseAndWrite(OM::Protocol &p, OM::Operation &op, uint8_t opcode, const char *te
 	m.m_nMembers = 0;
 	return err;
       }
-      OU::Value sv(m);
+      OB::Value sv(m);
       err = sv.parse(text);
       m.m_members = 0;
       m.m_nMembers = 0;
       if (err)
 	return err;
-      v = (const OU::Value **)sv.m_struct;
+      v = (const OB::Value **)sv.m_struct;
       size_t dataLen;
       {
-	OU::ValueReader r(v);
+	OB::ValueReader r(v);
 	dataLen = p.read(r, NULL, SIZE_MAX, opcode);
       }      
       data.resize(dataLen);
-      OU::ValueReader r(v);
+      OB::ValueReader r(v);
       ocpiCheck(dataLen == p.read(r, &data[0], dataLen, opcode));
       iov[1].iov_base = &data[0];
       iov[1].iov_len = dataLen;

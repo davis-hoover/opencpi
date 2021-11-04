@@ -33,7 +33,7 @@
 
 #include <OcpiMessageCircuit.h>
 #include <OcpiThreadHook.h>
-#include <OcpiList.h>
+#include "UtilList.hh"
 #include <OcpiCircuit.h>
 #include <OcpiTransport.h>
 

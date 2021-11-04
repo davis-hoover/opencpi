@@ -19,7 +19,7 @@
  */
 
 #include "gtest/gtest.h"
-#include "OcpiUtilMisc.h"
+#include "UtilMisc.hh"
 
 namespace {
   namespace OU = OCPI::Util;

@@ -28,7 +28,7 @@
 #include <cassert>
 #include "OcpiPValueApi.hh"
 #include "OcpiPropertyApi.hh"
-#include "OcpiUtilExceptionApi.h"
+#include "OcpiExceptionApi.hh"
 #include "OcpiLibraryApi.h"
 
 namespace OCPI {
@@ -40,7 +40,7 @@ namespace OCPI {
   namespace Remote {
     class RemoteLauncher;
   }
-  namespace Util {
+  namespace Base {
     class Member;
   }
   namespace RCC {
@@ -113,14 +113,14 @@ namespace OCPI {
       virtual ~PropertyAccess();
       virtual void propertyWritten(unsigned ordinal) const = 0;
       virtual void propertyRead(unsigned ordinal) const = 0;
-      virtual size_t getSequenceLengthProperty(const PropertyInfo &, const OCPI::Util::Member &m,
+      virtual size_t getSequenceLengthProperty(const PropertyInfo &, const OCPI::Base::Member &m,
 					     size_t offset) const = 0;
       // FIXME:  These should be protected, but the proxy code generator uses them too
       // These methods are used by the Property methods below when the
       // fast path using memory-mapped access cannot be used.
 #define OCPI_DATA_TYPE(sca,corba,letter,bits,run,pretty,store)		\
       virtual void							\
-      set##pretty##Property(const PropertyInfo &, const OCPI::Util::Member &m, size_t offset, \
+      set##pretty##Property(const PropertyInfo &, const OCPI::Base::Member &m, size_t offset, \
 			    const run, unsigned idx) const = 0;			\
       virtual void							\
       set##pretty##SequenceProperty(const PropertyInfo &, const run *, size_t nElements) const = 0; \
@@ -132,7 +132,7 @@ namespace OCPI {
 // The prop/member one is for ACI, which has navigation
 #define OCPI_DATA_TYPE(sca,corba,letter,bits,run,pretty,store)		\
     virtual run								\
-    get##pretty##Property(const PropertyInfo &, const Util::Member &, size_t off, \
+    get##pretty##Property(const PropertyInfo &, const OCPI::Base::Member &, size_t off, \
 			  unsigned idx) const = 0;			\
     virtual unsigned							\
     get##pretty##SequenceProperty(const PropertyInfo &, run *, size_t length) const = 0; \
@@ -141,7 +141,7 @@ namespace OCPI {
 // The prop/member one is for ACI, which has navigation
 #define OCPI_DATA_TYPE_S(sca,corba,letter,bits,run,pretty,store)	\
     virtual void							\
-    get##pretty##Property(const PropertyInfo &, const Util::Member &, size_t off, char *, \
+    get##pretty##Property(const PropertyInfo &, const OCPI::Base::Member &, size_t off, char *, \
 			  size_t length, unsigned idx) const = 0;	\
     virtual unsigned							\
     get##pretty##SequenceProperty(const PropertyInfo &, char **, size_t length, char *buf, \
@@ -223,12 +223,12 @@ namespace OCPI {
       virtual void						\
       set##pretty##PropertyOrd(unsigned ordinal, const run, unsigned idx) const = 0; \
       virtual void							\
-      set##pretty##Cached(const PropertyInfo &, const Util::Member &m, size_t offset, \
+      set##pretty##Cached(const PropertyInfo &, const OCPI::Base::Member &m, size_t offset, \
 			  run, unsigned idx) const = 0;		\
       virtual void							\
       set##pretty##SequenceCached(const PropertyInfo &, const run *, size_t nElements) const = 0; \
       virtual run							\
-      get##pretty##Cached(const PropertyInfo &, const Util::Member &, size_t off, \
+      get##pretty##Cached(const PropertyInfo &, const OCPI::Base::Member &, size_t off, \
 			  unsigned idx) const = 0;			\
       virtual unsigned							\
       get##pretty##SequenceCached(const PropertyInfo &, run *, size_t length) const = 0; \
@@ -240,12 +240,12 @@ namespace OCPI {
       virtual void							\
       get##pretty##PropertyOrd(unsigned ord, char *, size_t length, unsigned idx) const = 0; \
       virtual void							\
-      set##pretty##Cached(const PropertyInfo &, const Util::Member &m, size_t offset, \
+      set##pretty##Cached(const PropertyInfo &, const OCPI::Base::Member &m, size_t offset, \
 			  run, unsigned idx) const = 0;		\
       virtual void							\
       set##pretty##SequenceCached(const PropertyInfo &, const run *, size_t nElements) const = 0; \
       virtual run							\
-      get##pretty##Cached(const PropertyInfo &, const Util::Member &, size_t off, char *, \
+      get##pretty##Cached(const PropertyInfo &, const OCPI::Base::Member &, size_t off, char *, \
 			  size_t length, unsigned idx) const = 0;	\
       virtual unsigned							\
       get##pretty##SequenceCached(const PropertyInfo &, char **, size_t length, char *buf, \
@@ -255,7 +255,7 @@ namespace OCPI {
 #undef OCPI_DATA_TYPE
 #undef OCPI_DATA_TYPE_S
 #define OCPI_DATA_TYPE_S OCPI_DATA_TYPE
-      virtual size_t getSequenceLengthCached(const PropertyInfo &, const Util::Member &,
+      virtual size_t getSequenceLengthCached(const PropertyInfo &, const OCPI::Base::Member &,
 					     size_t off) const = 0;
       virtual void getRawPropertyBytes(size_t offset, uint8_t *buf, size_t count) = 0;
       virtual void setRawPropertyBytes(size_t offset, const uint8_t *buf, size_t count) = 0;
@@ -345,7 +345,7 @@ namespace OCPI {
     public:
       PropertyInfo &m_info;           // details about property, not defined in the API
     private:
-      OCPI::Util::Member &m_member;   // details about top-level member, not defined in the API
+      OCPI::Base::Member &m_member;   // details about top-level member, not defined in the API
     private:
       const volatile uint8_t *m_readVaddr;
       volatile uint8_t *m_writeVaddr;
@@ -362,15 +362,15 @@ namespace OCPI {
     private:
       void init();
       void throwError(const char *err) const;
-      const OCPI::Util::Member
+      const OCPI::Base::Member
 	&descend(AccessList &list, size_t &offset, size_t *dimensionp = NULL) const;
-      template <typename val_t> void setValueInternal(const OCPI::Util::Member &m, size_t off,
+      template <typename val_t> void setValueInternal(const OCPI::Base::Member &m, size_t off,
 						      const val_t val) const;
-      template <typename val_t> val_t getValueInternal(const OCPI::Util::Member &m,
+      template <typename val_t> val_t getValueInternal(const OCPI::Base::Member &m,
 						       size_t off) const;
-      void checkTypeAlways(const OCPI::Util::Member &m, BaseType ctype, size_t n,
+      void checkTypeAlways(const OCPI::Base::Member &m, BaseType ctype, size_t n,
 			   bool write) const;
-      inline void checkType(const OCPI::Util::Member &m, BaseType ctype, size_t n,
+      inline void checkType(const OCPI::Base::Member &m, BaseType ctype, size_t n,
 			    bool write) const {
 #if !defined(NDEBUG) || defined(OCPI_API_CHECK_PROPERTIES)
         checkTypeAlways(m, ctype, n, write);
@@ -391,7 +391,7 @@ namespace OCPI {
 
 #define OCPI_DATA_TYPE(sca,corba,letter,bits,run,pretty,store)                  \
       inline void							        \
-      set##pretty##Value(const OCPI::Util::Member &m, size_t offset, run val,   \
+      set##pretty##Value(const OCPI::Base::Member &m, size_t offset, run val,   \
 			 bool uncached = false) const {				\
         checkType(m, OCPI_##pretty, 0, true);			                \
         if (m_writeVaddr && uncached) {						\
@@ -418,7 +418,7 @@ namespace OCPI {
 	  m_worker.set##pretty##SequenceCached(m_info, vals, n);		\
       }                                                                         \
       inline run							        \
-      get##pretty##Value(const OCPI::Util::Member &m, size_t offset,            \
+      get##pretty##Value(const OCPI::Base::Member &m, size_t offset,            \
 			 bool uncached = false) const {  			\
         checkType(m, OCPI_##pretty, 0, false);			                \
         if (m_readVaddr && uncached) {                                          \
@@ -447,7 +447,7 @@ namespace OCPI {
       // for a string we will take a function call overhead
 #define OCPI_DATA_TYPE_S(sca,corba,letter,bits,run,pretty,store)                   \
       inline void							           \
-      set##pretty##Value(const OCPI::Util::Member &m, size_t offset, const run val,\
+      set##pretty##Value(const OCPI::Base::Member &m, size_t offset, const run val,\
                          bool uncached = false) const {			           \
         checkType(m, OCPI_##pretty, 0, true);				           \
 	if (uncached)							           \
@@ -467,7 +467,7 @@ namespace OCPI {
 	  m_worker.set##pretty##SequenceCached(m_info, vals, n);	                   \
       }                                                                            \
       inline const char *						           \
-      get##pretty##Value(const OCPI::Util::Member &m, size_t offset, char *val,    \
+      get##pretty##Value(const OCPI::Base::Member &m, size_t offset, char *val,    \
 			 size_t length, bool uncached = false) const {		   \
         checkType(m, OCPI_##pretty, 0, false);				           \
 	if (uncached)							           \

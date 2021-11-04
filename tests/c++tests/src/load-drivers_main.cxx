@@ -19,15 +19,15 @@
  */
 #include "dlfcn.h"
 #include "ocpi-config.h"
-#include "OcpiUtilCppMacros.h"
-#include "OcpiUtilMisc.h"
-#include "OcpiUtilException.h"
+#include "UtilCppMacros.hh"
+#include "UtilMisc.hh"
+#include "UtilException.hh"
 #include "ContainerManager.h"
 
 namespace OU = OCPI::Util;
 
 #define OCPI_OPTIONS_HELP "This program loads all drivers. Supply at least one dummy argument.\n"
-#include "CmdOption.hh" // for convenient main program and exception handling
+#include "BaseOption.hh" // for convenient main program and exception handling
 
 static int
 mymain(const char **) {

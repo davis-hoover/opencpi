@@ -40,9 +40,9 @@
 #include "OsMutex.hh"
 #include "OsMisc.hh"
 #include "OsAssert.hh"
-#include <OcpiUtilAutoMutex.h>
-#include <OcpiUtilEzxml.h>
-#include "UtilPValue.hh"
+#include "UtilAutoMutex.hh"
+#include "UtilEzxml.hh"
+#include "BasePValue.hh"
 #include <list>
 #include <stack>
 #include <map>
@@ -51,7 +51,7 @@
 #include <OcpiBuffer.h>
 #include <OpenSpliceBindings.h>
 #include "MetadataProtocol.hh"
-#include "UtilValue.hh"
+#include "BaseValue.hh"
 
 #define BUF_SIZE 1024
 

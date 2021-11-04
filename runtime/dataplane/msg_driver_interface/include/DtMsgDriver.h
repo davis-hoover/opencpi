@@ -32,8 +32,8 @@
 #include <string.h>
 #include "ezxml.h"
 #include "OsDataTypes.hh"
-#include <OcpiList.h>
-#include <OcpiDriverManager.h>
+#include "UtilList.hh"
+#include "BasePluginManager.hh"
 #include "MetadataProtocol.hh"
 
 namespace OCPI {
@@ -62,7 +62,7 @@ namespace DataTransfer {
     class XferServices;
     class XferFactoryManager;
     class XferFactory
-      : public OCPI::Driver::DriverType<XferFactoryManager, XferFactory>,
+      : public OCPI::Base::Plugin::DriverType<XferFactoryManager, XferFactory>,
       public FactoryConfig
       {
       public:
@@ -80,8 +80,8 @@ namespace DataTransfer {
 
 	// Supports transfer query
 	virtual bool supportsTx( const char* url,
-				 const OCPI::Util::PValue *our_props=0,
-				 const OCPI::Util::PValue *other_props=0 )=0;
+				 const OCPI::Base::PValue *our_props=0,
+				 const OCPI::Base::PValue *other_props=0 )=0;
 
 	/***************************************
 	 *  This method is used to get a transfer service object. The implementation
@@ -90,8 +90,8 @@ namespace DataTransfer {
 	 ***************************************/
 	virtual XferServices* getXferServices( const OCPI::Metadata::Protocol &protocol,
 					       const char* other_url,
-					       const OCPI::Util::PValue *our_props=0,
-					       const OCPI::Util::PValue *other_props=0 )=0;
+					       const OCPI::Base::PValue *our_props=0,
+					       const OCPI::Base::PValue *other_props=0 )=0;
       protected:
 
 
@@ -102,7 +102,7 @@ namespace DataTransfer {
     // - the driver manager for transfer drivers
     extern const char *msg_transfer;
     class XferFactoryManager : 
-    public OCPI::Driver::ManagerBase<XferFactoryManager, XferFactory, msg_transfer >,
+      public OCPI::Base::Plugin::ManagerBase<XferFactoryManager, XferFactory, msg_transfer >,
       public FactoryConfig
       {
       public:
@@ -117,8 +117,8 @@ namespace DataTransfer {
 
 	// Get the factory from the url
 	XferFactory* findFactory( const char* url,
-				  const OCPI::Util::PValue *our_props=0,
-				  const OCPI::Util::PValue *other_props=0 );
+				  const OCPI::Base::PValue *our_props=0,
+				  const OCPI::Base::PValue *other_props=0 );
 
 	// Constructors/Destructors
 	XferFactoryManager();
@@ -136,7 +136,7 @@ namespace DataTransfer {
     // OCPI::Driver::Device is virtually inherited to give access
     // to the class that is not normally inherited here.
     // This also delays the calling of the destructor
-    class Device : public FactoryConfig, virtual public OCPI::Driver::Device {
+    class Device : public FactoryConfig, virtual public OCPI::Base::Plugin::Device {
     public:
       Device(){};
       virtual XferFactory &driverBase() = 0;
@@ -212,8 +212,8 @@ namespace DataTransfer {
        */
       XferServices (  const OCPI::Metadata::Protocol & p, 
 		      const char  *a_url,
-		      const OCPI::Util::PValue *our_props=0,
-		      const OCPI::Util::PValue *other_props=0 )
+		      const OCPI::Base::PValue *our_props=0,
+		      const OCPI::Base::PValue *other_props=0 )
 	: m_protocol(p),m_url(a_url)
 	{(void)our_props;(void)other_props;attach(); };
 
@@ -227,8 +227,8 @@ namespace DataTransfer {
        * Create tranfer request object
        */
       virtual MsgChannel* getMsgChannel( const char  * url,
-		      const OCPI::Util::PValue *our_props=0,
-					 const OCPI::Util::PValue *other_props=0 )=0;
+		      const OCPI::Base::PValue *our_props=0,
+					 const OCPI::Base::PValue *other_props=0 )=0;
 
       /*
        * use counter
@@ -263,22 +263,22 @@ namespace DataTransfer {
     template <class ConcreteDriver, class ConcreteDevice, class ConcreteSvcs,
       const char *&name>
       class DriverBase :
-    public OCPI::Driver::DriverBase<XferFactoryManager, XferFactory,
+      public OCPI::Base::Plugin::DriverBase<XferFactoryManager, XferFactory,
       ConcreteDriver, ConcreteDevice, name>,
       public OCPI::Util::Parent<ConcreteSvcs>
       {
       };
     template <class Dri, class Dev>
       class DeviceBase :
-    public OCPI::Driver::DeviceBase<Dri,Dev>,
+      public OCPI::Base::Plugin::DeviceBase<Dri,Dev>,
       public Device
       {
       protected:
 	DeviceBase<Dri, Dev>(const char *childName, Dev &dev)
-	  : OCPI::Driver::DeviceBase<Dri, Dev>(childName, dev)
+	  : OCPI::Base::Plugin::DeviceBase<Dri, Dev>(childName, dev)
 	  {}
 	  inline XferFactory &driverBase() {
-	    return OCPI::Driver::DeviceBase<Dri,Dev>::parent();
+	    return OCPI::Base::Plugin::DeviceBase<Dri,Dev>::parent();
 	  }
       };
 
@@ -294,8 +294,8 @@ namespace DataTransfer {
 	ConnectionBase<ConcDri, ConcConn, ConcXfer>(ConcConn &conn,
 						    const OCPI::Metadata::Protocol &a_protocol,
 						    const char* other_url,
-						    const OCPI::Util::PValue *our_props=0,
-						    const OCPI::Util::PValue *other_props=0 )
+						    const OCPI::Base::PValue *our_props=0,
+						    const OCPI::Base::PValue *other_props=0 )
 	  : OCPI::Util::Child<ConcDri,ConcConn> (OCPI::Util::Singleton<ConcDri>::
 						 getSingleton(), conn),
 	  XferServices(a_protocol,other_url,our_props,other_props)
@@ -312,7 +312,7 @@ namespace DataTransfer {
       };
     template <class Dri>
       class RegisterTransferDriver
-      : OCPI::Driver::Registration<Dri>
+      : OCPI::Base::Plugin::Registration<Dri>
       {};
 
 

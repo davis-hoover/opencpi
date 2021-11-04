@@ -23,11 +23,11 @@
 
 #include "OcpiContainerApi.h"
 
-#include "OcpiUtilSelfMutex.h"
-#include "UtilPValue.hh"
+#include "UtilSelfMutex.hh"
+#include "BasePValue.hh"
 #include "OcpiRDTInterface.h"
 #include "MetadataPort.hh"
-#include "OcpiParentChild.h"
+#include "BaseParentChild.hh"
 #include "ContainerLauncher.h"
 #include "ContainerBasicPort.h"
 
@@ -82,7 +82,7 @@ namespace OCPI {
 	  m_first,  // first opposite member to deal with
 	  m_last,   // last opposite member to deal with
 	  m_next;   // next opposite member to deal with
-	const OCPI::Util::Member *m_hashField;
+	const OCPI::Base::Member *m_hashField;
 	BridgeMode m_mode;
 	BridgeOp();
       } *m_bridgeOp;
@@ -108,7 +108,7 @@ namespace OCPI {
       unsigned                       m_nextBridge;          // next one to use for any op
     protected:
       LocalPort(Container &container, const OCPI::Metadata::Port &mPort, bool isProvider,
-		const OCPI::Util::PValue *params);
+		const OCPI::Base::PValue *params);
       virtual ~LocalPort();
     private:
       // Is this port actually *operating* in this process, with its buffers in this process?
@@ -134,7 +134,7 @@ namespace OCPI {
       size_t nOthers() const { return m_bridgePorts.size(); }
 #if 0
       void applyConnectParams(const OCPI::RDT::Descriptors *other,
-			      const OCPI::Util::PValue *params);
+			      const OCPI::Base::PValue *params);
       // These may involve bridge ports.  The return value may point to the supplied buf.
       // The "done" output says whether this port needs anything more to be operational
       const OCPI::RDT::Descriptors

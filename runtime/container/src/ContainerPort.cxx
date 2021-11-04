@@ -19,7 +19,7 @@
  */
 
 #include "OsAssert.hh"
-#include "OcpiUtilCDR.h"
+#include "UtilCDR.hh"
 #include "Container.h"
 #include "ContainerWorker.h"
 #include "ContainerPort.h"
@@ -29,10 +29,11 @@ namespace OCPI {
     namespace OA = OCPI::API;
     namespace OM = OCPI::Metadata;
     namespace OU = OCPI::Util;
+    namespace OB = OCPI::Base;
     namespace OD = OCPI::DataTransport;
     namespace OR = OCPI::RDT;
 
-    Port::Port(Container &a_container, const OM::Port &mPort, const OU::PValue *params) :
+    Port::Port(Container &a_container, const OM::Port &mPort, const OB::PValue *params) :
       LocalPort(a_container, mPort, mPort.m_provider, params),
       m_canBeExternal(true)
     {
@@ -53,8 +54,8 @@ namespace OCPI {
 
     // The default behavior is that there is nothing special to do between
     // ports of like containers.
-    bool Port::connectLike(Port &other, const OU::PValue *myProps,
-			   const OU::PValue *otherProps) {
+    bool Port::connectLike(Port &other, const OB::PValue *myProps,
+			   const OB::PValue *otherProps) {
       (void)other;(void)myProps;(void)otherProps;
       return false;
     }
@@ -94,7 +95,7 @@ namespace OCPI {
       } while (more);
       assert(c.m_in.m_done && c.m_out.m_done);
     }
-    void Port::connectURL(const char*, const OU::PValue *, const OU::PValue *) {
+    void Port::connectURL(const char*, const OB::PValue *, const OB::PValue *) {
       ocpiDebug("connectURL not allowed on this container !!");
       ocpiAssert( 0 );
     }
@@ -116,7 +117,7 @@ namespace OCPI {
 
     // Bridge port constructor also does the equivalent of "startConnect" for itself.
     BridgePort::
-    BridgePort(Container &c, const OM::Port &mPort, bool provider, const OU::PValue *params)
+    BridgePort(Container &c, const OM::Port &mPort, bool provider, const OB::PValue *params)
       : BasicPort(c, mPort, provider, params)
     {
     }

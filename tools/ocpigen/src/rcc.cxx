@@ -96,7 +96,7 @@ rccEmitDimension(size_t numeric, const std::string &expr, const char *surround,
       upperconstant(prefix, m_implName, "");
     else
       OU::format(prefix, "OCPI_PARAM_%s_", m_implName);
-    OU::makeCexpression(expr.c_str(), prefix.c_str(), m_language == CC ? "" : "()",
+    OB::makeCexpression(expr.c_str(), prefix.c_str(), m_language == CC ? "" : "()",
                         m_language == CC, cexpr);
     out += cexpr;
   } else
@@ -106,7 +106,7 @@ rccEmitDimension(size_t numeric, const std::string &expr, const char *surround,
 }
 
 static void
-rccEnd(OU::Member &m, bool topSeq, std::string &type) {
+rccEnd(OB::Member &m, bool topSeq, std::string &type) {
   // End of declarator.
   OU::formatAdd(type, "; /* 0x%02zX%s */\n", m.m_offset, topSeq?" this is a top level sequence of fixed size elements":"");
 #if 0
@@ -118,7 +118,7 @@ rccEnd(OU::Member &m, bool topSeq, std::string &type) {
 }
 
 void Worker::
-rccArray(std::string &type, OU::Member &m, bool isFixed, bool &isLast, bool topSeq, bool end) {
+rccArray(std::string &type, OB::Member &m, bool isFixed, bool &isLast, bool topSeq, bool end) {
   if (m.m_arrayRank)
     for (unsigned n = 0; n < m.m_arrayRank; n++)
       rccEmitDimension(m.m_arrayDimensions[n], m.m_arrayDimensionsExprs[n], "[]", type);
@@ -142,7 +142,7 @@ rccArray(std::string &type, OU::Member &m, bool isFixed, bool &isLast, bool topS
 }
 // Just print the data type, not the "member", with names or arrays etc.
 void Worker::
-rccBaseType(std::string &type, OU::Member &m, unsigned level, size_t &offset, unsigned &pad,
+rccBaseType(std::string &type, OB::Member &m, unsigned level, size_t &offset, unsigned &pad,
             const char *parent, bool isFixed, bool &isLast, unsigned predefine, bool isCnst) {
   if (level > m_maxLevel)
     m_maxLevel = level;
@@ -211,7 +211,7 @@ rccBaseType(std::string &type, OU::Member &m, unsigned level, size_t &offset, un
 // define structures/types from leaf to root.
 // predefine is 0 when the top level (like actual properties)
 void Worker::
-rccType(std::string &type, OU::Member &m, unsigned level, size_t &offset, unsigned &pad,
+rccType(std::string &type, OB::Member &m, unsigned level, size_t &offset, unsigned &pad,
         const char *parent, bool isFixed, bool &isLast, bool topSeq, unsigned predefine,
         bool cnst) {
   int indent = (int)level * 2 + 2;
@@ -251,7 +251,7 @@ rccType(std::string &type, OU::Member &m, unsigned level, size_t &offset, unsign
 // Returns true when something is variable length.
 // strings or sequences are like that unless then are bounded.
 void Worker::
-rccMember(std::string &type, OU::Member &m, unsigned level, size_t &offset, unsigned &pad,
+rccMember(std::string &type, OB::Member &m, unsigned level, size_t &offset, unsigned &pad,
           const char *parent, bool isFixed, bool &isLast, bool topSeq, unsigned predefine,
           bool cnst) {
   int indent = (int)level * 2 + 2;
@@ -323,7 +323,7 @@ rccMethodName(const char *method, const char *&mName) {
 }
 
 void Worker::
-rccStruct(std::string &type, size_t nMembers, OU::Member *members, unsigned level,
+rccStruct(std::string &type, size_t nMembers, OB::Member *members, unsigned level,
           const char *parent, bool isFixed, bool &isLast, bool topSeq, unsigned predefine,
           size_t elementBytes) {
   size_t offset = 0;
@@ -338,13 +338,13 @@ rccStruct(std::string &type, size_t nMembers, OU::Member *members, unsigned leve
 }
 
 // An unparser specialized for C
-struct C_Unparser : public OU::Unparser {
+struct C_Unparser : public OB::Unparser {
   const Worker &m_worker;
-  const OU::Member &m_member;
-  C_Unparser(const Worker &w, const OU::Member &mem) : m_worker(w), m_member(mem) {
+  const OB::Member &m_member;
+  C_Unparser(const Worker &w, const OB::Member &mem) : m_worker(w), m_member(mem) {
   }
   bool
-  dimensionUnparse(const OU::Value &v, std::string &s, unsigned nseq, size_t dim,
+  dimensionUnparse(const OB::Value &v, std::string &s, unsigned nseq, size_t dim,
                    size_t offset, size_t nItems, bool hex, char comma,
                    const Unparser &up) const {
     if (dim == 0)
@@ -360,7 +360,7 @@ struct C_Unparser : public OU::Unparser {
     return !val;
   }
   bool
-  unparseEnum(std::string &s, OU::EnumValue val, const char **enums, size_t nEnums,
+  unparseEnum(std::string &s, OB::EnumValue val, const char **enums, size_t nEnums,
               bool /*hex*/) const {
     if (val >= nEnums)
       throw OU::Error("Invalid enumberation value: 0x%x", val);
@@ -380,12 +380,12 @@ struct C_Unparser : public OU::Unparser {
     return !val || *val == '\0';
   }
   bool
-  sequenceUnparse(const OU::Value &v, std::string &s, bool hex, char comma) const {
+  sequenceUnparse(const OB::Value &v, std::string &s, bool hex, char comma) const {
     OU::formatAdd(s, "{ %zu", v.m_nElements);
     bool ret;
     if (v.m_nElements) {
       s += ", {";
-      ret = OU::Unparser::sequenceUnparse(v, s, hex, comma);
+      ret = OB::Unparser::sequenceUnparse(v, s, hex, comma);
       s += "}";
     } else
       ret = true;
@@ -395,14 +395,14 @@ struct C_Unparser : public OU::Unparser {
 };
 
 struct CC_Unparser : public C_Unparser {
-  CC_Unparser(const Worker &w, const OU::Member &mem) : C_Unparser(w, mem) {}
+  CC_Unparser(const Worker &w, const OB::Member &mem) : C_Unparser(w, mem) {}
   bool
   unparseBool(std::string &s, bool val, bool) const {
     s += val ? "true" : "false";
     return !val;
   }
   bool
-  unparseEnum(std::string &s, OU::EnumValue val, const char **enums, size_t nEnums, bool hex)
+  unparseEnum(std::string &s, OB::EnumValue val, const char **enums, size_t nEnums, bool hex)
     const {
     if (!strcasecmp("ocpi_endian", m_member.m_name.c_str())) {
       s = "OCPI::RCC::";
@@ -414,7 +414,7 @@ struct CC_Unparser : public C_Unparser {
 };
 
 const char *Worker::
-rccValue(OU::Value &v, std::string &value, const OU::Member &param) {
+rccValue(OB::Value &v, std::string &value, const OB::Member &param) {
   if (m_language == CC) {
     CC_Unparser p(*this, param);
     v.unparse(value, &p);
@@ -602,7 +602,7 @@ emitRccArgTypes(FILE *f, bool &first) {
     bool pfirst = true;
     o = operations();
     for (unsigned n  = 0; n < nOperations(); n++, o++) {
-      OU::Member *m = o->args();
+      OB::Member *m = o->args();
       bool ofirst = true;
       for (unsigned nn = 0; nn < o->nArgs(); nn++, m++)
         if (m->m_baseType == OA::OCPI_Enum || m->m_baseType == OA::OCPI_Struct) {
@@ -1364,7 +1364,7 @@ addSlavesConfig(ezxml_t a_slaves) {
   ocpiInfo("For config %zu, slave before conditional is:"
 	   "\n===Original:\n%s\n===Copy:\n%s",
 	   nConfig, ezxml_toxml(a_slaves), ezxml_toxml(m_slavesXml));
-  if ((err = OU::parseConditionals(m_slavesXml, *this)))
+  if ((err = OB::parseConditionals(m_slavesXml, *this)))
     return OU::esprintf("Error processing conditional slave assembly: %s", err);
   ocpiInfo("===After processing:\n%s", ezxml_toxml(m_slavesXml));
   //cout << ezxml_toxml(m_xml);
@@ -1666,7 +1666,7 @@ emitRccCppImpl(FILE *f) {
                 "       %sOp(RCCUserPort &p)\n"
                 "         : OCPI::RCC::RCCPortOperation(p, %s_OPERATION),\n",
                 s.c_str(), s.c_str(), op.c_str());
-        OU::Member *m = o->args();
+        OB::Member *m = o->args();
         for (unsigned n = 0; n < o->nArgs(); m++) {
           std::string a;
           camel(a, m->m_name.c_str());
@@ -1911,7 +1911,7 @@ emitRccCImpl1(FILE *f) {
         fprintf(f, "%s} %s;\n", type.c_str(), s.c_str());
         OpScaling *os = m_opScaling.empty() ? NULL : m_opScaling[nn];
         if (os && os->m_isPartitioned) {
-          OU::Member *arg = o->m_args;
+          OB::Member *arg = o->m_args;
           fprintf(f,
                   "/*\n"
                   " * PartInfo Structure for the %s operation on port %s\n"

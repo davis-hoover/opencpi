@@ -110,16 +110,16 @@ namespace OCPI {
       typedef Instances::iterator InstancesIter;
       std::string m_model;                        // used during implementation processing
       std::string m_platform;                     // ditto
-      const PValue *m_params;                     // params of assembly during parsing (not copied)
+      const OCPI::Base::PValue *m_params;         // params of assembly during parsing (not copied)
       unsigned m_maxCandidates;                   // maximum number of candidates for any instance
       Instance *m_tempInstance;                   // our instance currently being processed
       Instances m_instances;                      // This layer's instances
       bool      m_deployed;                       // deployment decisions are already made
       size_t    m_nAppInstances;                  // original app instance count
     public:
-      // explicit Assembly(const char *file, const OCPI::Util::PValue *params);
-      // explicit Assembly(const std::string &string, const OCPI::Util::PValue *params);
-      explicit Assembly(ezxml_t xml, const char *name, const OCPI::Util::PValue *params);
+      // explicit Assembly(const char *file, const OCPI::Base::PValue *params);
+      // explicit Assembly(const std::string &string, const OCPI::Base::PValue *params);
+      explicit Assembly(ezxml_t xml, const char *name, const OCPI::Base::PValue *params);
       ~Assembly();
       Instance &instance(size_t n) const { return *m_instances[n]; }
       size_t nInstances() { return m_instances.size(); }
@@ -146,9 +146,9 @@ namespace OCPI {
 				    size_t &portn, const OCPI::Metadata::Port *&port,
 				    const char *&value, bool removeExternal = false);
     private:
-      void addInstance(const OCPI::Util::PValue *params);
-      const char *addFileIoInstances(const OCPI::Util::PValue *params);
-      void findImplementations(const OCPI::Util::PValue *params);
+      void addInstance(const OCPI::Base::PValue *params);
+      const char *addFileIoInstances(const OCPI::Base::PValue *params);
+      void findImplementations(const OCPI::Base::PValue *params);
       bool foundImplementation(const Implementation &i, bool &accepted);
       int m_refCount;
     };

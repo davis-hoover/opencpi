@@ -20,16 +20,17 @@
 
 #include <string>
 #include <ctype.h>
-#include "OcpiUtilEzxml.h"
+#include "UtilEzxml.hh"
 #include "MetadataPort.hh"
 #include "MetadataWorker.hh"
-#include "OcpiUtilMisc.h"
+#include "UtilMisc.hh"
 
 namespace OCPI {
   namespace Metadata {
     namespace OE = OCPI::Util::EzXml;
     namespace OA = OCPI::API;
     namespace OU = OCPI::Util;
+    namespace OB = OCPI::Base;
 
     void Port::
     init() {
@@ -235,7 +236,7 @@ namespace OCPI {
     // or overrided the default from the protocol.  If it is SIZE_MAX, then there is
     // no protocol and no default at all.
     size_t Port::
-    getBufferSize(const OU::PValue *portParams, const OU::PValue *connParams, size_t otherSize) const {
+    getBufferSize(const OB::PValue *portParams, const OB::PValue *connParams, size_t otherSize) const {
       size_t size = m_bufferSize;
       const char *type = "default";
       do {
@@ -245,10 +246,10 @@ namespace OCPI {
 	  size = DEFAULT_BUFFER_SIZE;
 	type = "port";
 	OA::ULong ul;
-	if (OU::findULong(portParams, "bufferSize", ul) && (size = ul) < m_minBufferSize)
+	if (OB::findULong(portParams, "bufferSize", ul) && (size = ul) < m_minBufferSize)
 	  break;
 	type = "connection";
-	if (OU::findULong(connParams, "bufferSize", ul) && (size = ul) < m_minBufferSize)
+	if (OB::findULong(connParams, "bufferSize", ul) && (size = ul) < m_minBufferSize)
 	  break;
 	type = m_bufferSize == SIZE_MAX ? "default" : "port-specified";
 	if (size < m_minBufferSize)
@@ -277,9 +278,9 @@ namespace OCPI {
     //    external-to-external MUST specify a buffer size somehow.
     //    ports may depend on other ports for their buffer sizes
     size_t Port::
-    determineBufferSize(const Port *in, const OU::PValue *paramsIn, size_t otherIn,
-			const Port *out, const OU::PValue *paramsOut, size_t otherOut,
-			const OU::PValue *connParams) {
+    determineBufferSize(const Port *in, const OB::PValue *paramsIn, size_t otherIn,
+			const Port *out, const OB::PValue *paramsOut, size_t otherOut,
+			const OB::PValue *connParams) {
       size_t
 	sizeIn = in ? in->getBufferSize(paramsIn, connParams, otherIn) : SIZE_MAX,
 	sizeOut = out ? out->getBufferSize(paramsOut, connParams, otherOut) : SIZE_MAX;
@@ -469,7 +470,7 @@ namespace OCPI {
       Operation *op = m_operations;
       for (unsigned o = 0; o < m_nOperations; o++, op++) {
 	OpScaling *os = m_opScaling[o];
-	OU::Member *arg = op->m_args;
+	OB::Member *arg = op->m_args;
 	for (unsigned a = 0; a < op->m_nArgs; a++, arg++)
 	  if (arg->m_arrayRank || arg->m_isSequence) {
 	    Partitioning *ap = os ? os->m_partitioning[a] : NULL;
@@ -586,7 +587,7 @@ namespace OCPI {
 	    (err = OE::checkElements(ax, "dimension", (void*)0)) ||
 	    (err = OE::getRequiredString(ax, aName, "name")))
 	  return err;
-	OU::Member *a = op.findArg(aName.c_str());
+	OB::Member *a = op.findArg(aName.c_str());
 	if (!a)
 	  return OU::esprintf("name attribute of argument element is not an argument to \"%s\"",
 			      op.m_name.c_str());
@@ -625,7 +626,7 @@ namespace OCPI {
       if (m_multiple) OU::formatAdd(out, " multiple='1'");
       if (m_allSeeOne) OU::formatAdd(out, " allSeeOne='1'");
       if (m_allSeeEnd) OU::formatAdd(out, " allSeeEnd='1'");
-      OU::Member *a = op.m_args;
+      OB::Member *a = op.m_args;
       bool first = true;
       for (unsigned n = 0; n < op.m_nArgs; n++, a++)
 	if (m_partitioning[n] && m_partitioning[n] != &port.m_defaultPartitioning) {

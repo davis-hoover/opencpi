@@ -35,10 +35,10 @@
 #include "OsMutex.hh"
 #include "OsMisc.hh"
 #include "OsAssert.hh"
-#include "OcpiList.h"
-#include "OcpiUtilHash.h"
-#include "OcpiUtilAutoMutex.h"
-#include "OcpiUtilMisc.h"
+#include "UtilList.hh"
+#include "UtilHash.hh"
+#include "UtilAutoMutex.hh"
+#include "UtilMisc.hh"
 #include "DtHandshakeControl.h"
 #include "XferEndPoint.h"
 #include "XferManager.h"
@@ -47,6 +47,7 @@
 
 namespace XF = DataTransfer;
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 namespace OS = OCPI::OS;
 namespace DDT = DtOsDataTypes;
 namespace OCPI {
@@ -459,7 +460,7 @@ createOutputPort(OCPI::RDT::Descriptors& outputDesc, Port &inputPort) {
 }
 
 Port *Transport::
-createInputPort(OCPI::RDT::Descriptors& desc, const OU::PValue */*params*/)
+createInputPort(OCPI::RDT::Descriptors& desc, const OB::PValue */*params*/)
 {
   const char *epString = desc.desc.oob.oep;
   XF::EndPoint *ep = strchr(desc.desc.oob.oep, ':') ?

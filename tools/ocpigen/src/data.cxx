@@ -229,7 +229,7 @@ addProperty(const char *a_name, OA::BaseType type, bool isDebug, bool isParamete
   std::string property;
   OU::format(property, "<property name='ocpi_%s_%s' hidden='1' parameter='%u' debug='%u' type='%s'"
 	     "%s initial='%u' volatile='%u'%s%s%s",
-	     a_name, cname(), isParameter ? 1 : 0, isDebug ? 1 : 0, OU::baseTypeNames[type],
+	     a_name, cname(), isParameter ? 1 : 0, isDebug ? 1 : 0, OB::baseTypeNames[type],
 	     isImpl ? " raw='0'" : "", isInitial ? 1 : 0, isVolatile ? 1 : 0, enums ? " enums='" : "",
 	     enums ? enums : "", enums ? "'" : "");
   if (isInitial || isParameter)
@@ -583,7 +583,7 @@ initRole(OM::Assembly::Role &role) {
 }
 
 const char *DataPort::
-resolveExpressions(OCPI::Util::IdentResolver &ir) {
+resolveExpressions(OB::IdentResolver &ir) {
   const char *err;
   return (err = OcpPort::resolveExpressions(ir)) ? err : finalize();
 }

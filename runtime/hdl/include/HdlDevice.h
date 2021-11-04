@@ -72,7 +72,7 @@ namespace OCPI {
 			    OCPI::Util::UuidString *uuidString);
     protected:
       Device(const std::string &name, const char *protocol = "", 
-	     const OCPI::Util::PValue *params = NULL);
+	     const OCPI::Base::PValue *params = NULL);
     public:
       virtual ~Device();
       bool getPPSIsOkay(useconds_t timeout, useconds_t sleepTime);

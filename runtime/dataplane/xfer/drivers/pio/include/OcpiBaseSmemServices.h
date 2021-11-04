@@ -25,7 +25,7 @@
 
 #include <map>
 #include <string>
-#include "OcpiUtilMisc.h"
+#include "UtilMisc.hh"
 #include "XferEndPoint.h"
 #include "XferException.h"
 

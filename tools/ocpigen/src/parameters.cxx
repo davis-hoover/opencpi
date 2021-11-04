@@ -181,7 +181,7 @@ onlyValue(std::string &uValue, Attributes *&attrs, const char *platform) {
 const char *Param::
 parseValue(const OM::Property &prop, const char *value) {
   const char *err;
-  OU::Value newValue;
+  OB::Value newValue;
   if ((err = prop.parseValue(value, newValue)))
     return err;
   m_isDefault = false;
@@ -246,7 +246,7 @@ parse(ezxml_t px, const OM::Property *p, const Worker *worker, bool global) {
     // if (m_valuesType) This is now a memory leak: FIXME: write the copy-constructor
     //       delete m_valuesType;
     m_valuesType = &prop.sequenceType();
-    m_valuesType->m_default = new OU::Value(*m_valuesType);
+    m_valuesType->m_default = new OB::Value(*m_valuesType);
     if ((err = m_valuesType->m_default->parse(values, NULL, false, NULL)))
       return err;
     // The specified values are in: *m_valuesType->m_default, not unparsed
@@ -398,7 +398,7 @@ parse(ezxml_t cx, const ParamConfigs &configs) { // , bool includeInitial) {
 }
 
 const char *ParamConfig::
-getParamValue(const char *sym, const OU::Value *&v) const {
+getParamValue(const char *sym, const OB::Value *&v) const {
   OM::Property *prop;
   size_t nParam; // FIXME not needed since properties have m_paramOrdinal?
   const char *err;
@@ -416,14 +416,14 @@ getParamValue(const char *sym, const OU::Value *&v) const {
 }
 
 const char *ParamConfig::
-getValue(const char *sym, OU::ExprValue &val) const {
+getValue(const char *sym, OB::ExprValue &val) const {
   OM::Property *prop;
   size_t nParam; // FIXME not needed since properties have m_paramOrdinal?
   const char *err;
   if ((err = m_worker.findParamProperty(sym, prop, nParam)))
     return err;
   const Param &param = params[nParam];
-  const OU::Value *v;
+  const OB::Value *v;
   if (param.m_param) {
     if (param.m_uValues.size() > 1)
       return OU::esprintf("parameter property %s used in expression, but has multiple values",
@@ -436,7 +436,7 @@ getValue(const char *sym, OU::ExprValue &val) const {
 }
 
 const char *Worker::
-paramValue(const OU::Member &param, OU::Value &v, std::string &value) {
+paramValue(const OB::Member &param, OB::Value &v, std::string &value) {
   switch (m_model) {
   case HdlModel:
     return hdlValue(param.m_name.c_str(), v, value, true);
@@ -780,7 +780,7 @@ addValue(Param &p, const char *start, const char *end, Values &values) {
   std::string sval(start, (size_t)(end - start));
   ocpiDebug("Adding a value for the %s parameter: \"%.*s\"",
 	    p.m_param->m_name.c_str(), (unsigned)(end - start), start);
-  OU::Value v;
+  OB::Value v;
   const char *err;
   if ((err = p.m_param->parseValue(sval.c_str(), v)))
     return err;
@@ -977,7 +977,7 @@ findParamConfig(size_t low, size_t high, const OM::Assembly::Properties &instanc
 	Param *p = &pc->params[0];
 	for (unsigned nnn = 0; nnn < pc->params.size(); nnn++, p++)
 	  if (!strcasecmp(ap->m_name.c_str(), p->m_param->m_name.c_str())) {
-	    OU::Value apValue;
+	    OB::Value apValue;
 	    const char *err;
 	    if ((err = p->m_param->parseValue(ap->m_value.c_str(), apValue)))
 	      return err;
@@ -1052,7 +1052,7 @@ setParamConfig(const OM::Assembly::Properties *instancePVs, size_t paramConfig,
 	  if (p->m_default) {
 	    std::string defValue, newValue;
 	    p->m_default->unparse(defValue);
-	    OU::Value ipv;
+	    OB::Value ipv;
 	    ipv.setType(*p);
 	    if (!(err = ipv.parse(ap->m_value.c_str()))) {
 	      ipv.unparse(newValue);

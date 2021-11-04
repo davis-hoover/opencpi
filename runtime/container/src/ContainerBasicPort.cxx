@@ -25,7 +25,7 @@
 #include "../../../foreign/pwq/src/platform.c"
 #endif
 #include "OsAssert.hh"
-#include "OcpiUtilCDR.h"
+#include "UtilCDR.hh"
 #include "Container.h"
 #include "ContainerPort.h"
 
@@ -35,6 +35,7 @@ namespace OCPI {
     namespace OA = OCPI::API;
     namespace OM = OCPI::Metadata;
     namespace OU = OCPI::Util;
+    namespace OB = OCPI::Base;
     namespace OD = OCPI::DataTransport;
     namespace OR = OCPI::RDT;
     namespace XF = DataTransfer;
@@ -68,8 +69,8 @@ namespace OCPI {
 		m_nBuffers, m_bufferSize);
     }
 
-    static bool findRole(const OU::PValue *params, const char *&s, OR::PortRole &role) {
-      if (OU::findString(params, "transferRole", s)) {
+    static bool findRole(const OB::PValue *params, const char *&s, OR::PortRole &role) {
+      if (OB::findString(params, "transferRole", s)) {
 	if (!strcasecmp(s, "passive"))
 	  role = OR::Passive;
 	else if (!strcasecmp(s, "active") ||
@@ -121,7 +122,7 @@ namespace OCPI {
     }
 
     BasicPort::
-    BasicPort(Container &c, const OM::Port &mPort, bool a_isProvider, const OU::PValue *params)
+    BasicPort(Container &c, const OM::Port &mPort, bool a_isProvider, const OB::PValue *params)
       : PortData(mPort, a_isProvider, NULL), m_lastInBuffer(NULL), m_lastOutBuffer(NULL),
 	m_dtLastBuffer(NULL), m_dtPort(NULL), m_allocation(NULL), m_bufferStride(0),
 	m_next2write(NULL), m_next2put(NULL), m_next2read(NULL), m_next2release(NULL),
@@ -155,9 +156,9 @@ namespace OCPI {
     }
 
     void BasicPort::
-    applyPortParams(const OU::PValue *params) {
+    applyPortParams(const OB::PValue *params) {
       OA::ULong ul;
-      if (OU::findULong(params, "bufferCount", ul)) {
+      if (OB::findULong(params, "bufferCount", ul)) {
 	if (ul < m_metaPort.m_minBufferCount)
 	  throw OU::Error("bufferCount is below worker's minimum");
         else {
@@ -475,8 +476,8 @@ namespace OCPI {
     // static method
     void BasicPort::
     determineTransport(const Transports &in, const Transports &out,
-		       const OU::PValue *paramsIn, const OU::PValue *paramsOut,
-		       const OU::PValue *paramsConn, Transport &transport) {
+		       const OB::PValue *paramsIn, const OB::PValue *paramsOut,
+		       const OB::PValue *paramsConn, Transport &transport) {
       // Giving priority to the input side in a tie, find the first transport that
       // both sides support that have compatible roles.
       static const char *roleNames[] = { OCPI_RDT_ROLE_NAMES };
@@ -486,19 +487,19 @@ namespace OCPI {
       findRole(paramsOut, s, roleOut);
       const char *err = NULL, *tIn, *tOut, *tConn;
       std::string sIn, sOut, sConn;
-      if (OU::findString(paramsConn, "transport", tConn)) {
+      if (OB::findString(paramsConn, "transport", tConn)) {
 	if (!strchr(tConn, '-'))
 	  OU::format(sConn, "ocpi-%s-rdma", tConn);
 	else
 	  sConn = tConn;
       }
-      if (OU::findString(paramsIn, "transport", tIn)) {
+      if (OB::findString(paramsIn, "transport", tIn)) {
 	if (!strchr(tIn, '-'))
 	  OU::format(sIn, "ocpi-%s-rdma", tIn);
 	else
 	  sIn = tIn;
       }
-      if (OU::findString(paramsOut, "transport", tOut)) {
+      if (OB::findString(paramsOut, "transport", tOut)) {
 	if (!strchr(tOut, '-'))
 	  OU::format(sOut, "ocpi-%s-rdma", tOut);
 	else

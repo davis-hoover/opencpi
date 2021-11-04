@@ -36,9 +36,9 @@
 #include <string>
 #include <stdio.h>
 #include "OsDataTypes.hh"
-#include <OcpiList.h>
+#include "UtilList.hh"
 #include <OcpiPortMetaData.h>
-#include <OcpiParentChild.h>
+#include "BaseParentChild.hh"
 namespace CU = ::OCPI::Util;
 
 namespace OCPI {

@@ -42,7 +42,7 @@
 #include "OcpiContainerApi.h"
 
 #include "OsThreadManager.hh"
-#include "OcpiUtilSelfMutex.h"
+#include "UtilSelfMutex.hh"
 #include "OcpiTransport.h"
 #include "OcpiLibraryManager.h"
 #include "ContainerPort.h"
@@ -86,7 +86,7 @@ namespace OCPI {
       Transports m_transports;  // terminology clash is unfortunate....
       BridgedPorts m_bridgedPorts;
       Container(const char *name, const ezxml_t config = NULL,
-		const OCPI::Util::PValue* params = NULL)
+		const OCPI::Base::PValue* params = NULL)
         throw (OCPI::Util::EmbeddedException);
     public:
       virtual ~Container();
@@ -108,11 +108,11 @@ namespace OCPI {
       virtual Container *nextContainer() = 0;
       virtual bool supportsImplementation(OCPI::Metadata::Worker &);
       virtual OCPI::API::ContainerApplication *
-	createApplication(const char *name = NULL, const OCPI::Util::PValue *props = NULL)
+	createApplication(const char *name = NULL, const OCPI::Base::PValue *props = NULL)
         throw ( OCPI::Util::EmbeddedException ) = 0;
       virtual void dump(bool /*before*/, bool /*hex*/) {}
-      OCPI::Util::PValue *getProperties();
-      OCPI::Util::PValue *getProperty(const char *);
+      OCPI::Base::PValue *getProperties();
+      OCPI::Base::PValue *getProperty(const char *);
 
       /*
 	This is the method that gets called by the creator to provide thread time to the
@@ -129,10 +129,10 @@ namespace OCPI {
       virtual bool needThread() = 0;
       // Load from url
       Artifact & loadArtifact(const char *url,
-			      const OCPI::Util::PValue *artifactParams = NULL);
+			      const OCPI::Base::PValue *artifactParams = NULL);
       // Load from library artifact
       Artifact & loadArtifact(OCPI::Library::Artifact &art,
-			      const OCPI::Util::PValue *artifactParams = NULL);
+			      const OCPI::Base::PValue *artifactParams = NULL);
       virtual Artifact *findLoadedArtifact(const char *url) = 0;
       virtual Artifact *findLoadedArtifact(const OCPI::Library::Artifact &a) = 0;
       virtual Artifact &createArtifact(OCPI::Library::Artifact &,

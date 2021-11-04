@@ -34,7 +34,7 @@
 #include "OcpiTransportConstants.h"
 #include "OcpiOutputBuffer.h"
 #include "OcpiInputBuffer.h"
-#include "OcpiList.h"
+#include "UtilList.hh"
 #include "OsAssert.hh"
 
 namespace OCPI {

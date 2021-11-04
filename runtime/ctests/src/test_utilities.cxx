@@ -32,9 +32,9 @@
 #include <sstream>
 #include "OsMisc.hh"
 #include "OsAssert.hh"
-#include "OcpiUtilMisc.h"
+#include "UtilMisc.hh"
 #include "OcpiRDTInterface.h"
-#include "UtilPValue.hh"
+#include "BasePValue.hh"
 #include "ContainerWorker.h"
 #include "ContainerPort.h"
 #include "test_utilities.h"
@@ -237,10 +237,10 @@ std::vector<CApp> OCPI::CONTAINER_TEST::createContainers( std::vector<ContainerD
   CApp ca;
   std::vector<CApp> containers;
 
-  static OCPI::Util::PValue cprops[] = {
-                                       OCPI::Util::PVBool("polling",1),
-                                       OCPI::Util::PVBool("verbose",true),
-                                       OCPI::Util::PVEnd };
+  static OCPI::Base::PValue cprops[] = {
+                                       OCPI::Base::PVBool("polling",1),
+                                       OCPI::Base::PVBool("verbose",true),
+                                       OCPI::Base::PVEnd };
   // Create the container
   try { 
     for ( unsigned int n=0; n<eps.size();n++) { 
@@ -272,9 +272,9 @@ std::vector<CApp> OCPI::CONTAINER_TEST::createContainers( std::vector<const char
 
   std::vector<CApp> containers;
 
-  static OCPI::Util::PValue cprops[] = {
-                                       OCPI::Util::PVBool("polling",1),
-                                       OCPI::Util::PVEnd };
+  static OCPI::Base::PValue cprops[] = {
+                                       OCPI::Base::PVBool("polling",1),
+                                       OCPI::Base::PVEnd };
 
   // Create the container
   try { 

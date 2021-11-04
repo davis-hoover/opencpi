@@ -290,8 +290,8 @@ static void ucase(std::string &s) {
 const char *Signal::directions[] = { DIRECTIONS, NULL };
 
 const char *Signal::
-parseDirection(const char *direction, std::string *expr, OCPI::Util::IdentResolver &ir) {
-  static OU::Member dirType;
+parseDirection(const char *direction, std::string *expr, OB::IdentResolver &ir) {
+  static OB::Member dirType;
   if (dirType.m_baseType == OA::OCPI_none) {
     std::string enums;
     for (const char **ap = directions; *ap; ap++)
@@ -303,7 +303,7 @@ parseDirection(const char *direction, std::string *expr, OCPI::Util::IdentResolv
     ocpiCheck(!dirType.parse(tx, false, false, NULL, "direction", 0, NULL));
     free(xml);
   }
-  OU::Value dirValue(dirType);
+  OB::Value dirValue(dirType);
   bool isVariable;
   const char *err;
   if ((err = dirValue.parse(direction, NULL, false, &ir, &isVariable)))
@@ -318,8 +318,8 @@ parseDirection(const char *direction, std::string *expr, OCPI::Util::IdentResolv
 }
 
 const char *Signal::
-parseWidth(const char *width, std::string *expr, OCPI::Util::IdentResolver &ir) {
-    OU::Value widthValue(OA::OCPI_ULong);
+parseWidth(const char *width, std::string *expr, OB::IdentResolver &ir) {
+    OB::Value widthValue(OA::OCPI_ULong);
     bool isVariable;
     const char *err;
     if ((err = widthValue.parse(width, NULL, false, &ir, &isVariable)))

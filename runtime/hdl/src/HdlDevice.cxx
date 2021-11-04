@@ -36,6 +36,7 @@ namespace OCPI {
     namespace OE = OCPI::Util::EzXml;
     namespace OM = OCPI::Metadata;
     namespace OU = OCPI::Util;
+    namespace OB = OCPI::Base;
     namespace OO = OCPI::OS;
 
     enum TimeService_PPS_out_source {
@@ -73,11 +74,11 @@ namespace OCPI {
     // The derived class will set up accessors after this constructor is done
     // So we can't perform accesses until that time, which is the "init" call.
     Device::
-    Device(const std::string &a_name, const char *a_protocol, const OU::PValue *params)
+    Device(const std::string &a_name, const char *a_protocol, const OB::PValue *params)
       : m_metadata(NULL), m_implXml(NULL), m_old(false), m_name(a_name), m_protocol(a_protocol),
         m_isAlive(true), m_pfWorker(NULL), m_tsWorker(NULL), m_isFailed(false), m_verbose(false),
         m_timeCorrection(0), m_endPoint(NULL) {
-      OU::findBool(params, "verbose", m_verbose);
+      OB::findBool(params, "verbose", m_verbose);
       memset((void*)&m_UUID, 0, sizeof(m_UUID));
     }
     Device::

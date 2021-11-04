@@ -79,12 +79,12 @@ namespace OCPI {
       //  optionally connected ports, you have optionally requested ports so that no buffer resources
       //  are used on a port until you specifically request buffers.
     public:
-      Port(Worker &w, const OCPI::Metadata::Port &md, const OCPI::Util::PValue *params, RCCPort &rp);
+      Port(Worker &w, const OCPI::Metadata::Port &md, const OCPI::Base::PValue *params, RCCPort &rp);
       virtual ~Port();
 
       bool isInProcess(OCPI::Container::LocalPort */*other*/) const { return true; }
-      void connectURL(const char* url, const OCPI::Util::PValue *myProps,
-		      const OCPI::Util::PValue * otherProps);
+      void connectURL(const char* url, const OCPI::Base::PValue *myProps,
+		      const OCPI::Base::PValue * otherProps);
     private:
       void disconnectInternal();
       void disconnect();
@@ -93,8 +93,8 @@ namespace OCPI {
       // These next methods are required by or override the OCPI::Container::Port implementation
       OCPI::Container::ExternalPort &
       createExternal(const char *extName, bool provider,
-		     const OCPI::Util::PValue *extParams,
-		     const OCPI::Util::PValue *connParams);
+		     const OCPI::Base::PValue *extParams,
+		     const OCPI::Base::PValue *connParams);
     public:
       // These methods are called in one place from the worker from C, hence public and inline
       bool requestRcc(size_t max = 0) {
@@ -119,7 +119,8 @@ namespace OCPI {
 	    }
 	  } else if ((m_buffer = getBuffer(data, m_rccPort.current.length_,
 					   m_rccPort.current.opCode_, m_rccPort.current.eof_))) {
-	    m_rccPort.current.data = (void*)data;
+	    // m_rccPort.current.data = (void*)data;
+	    m_rccPort.current.data = m_rccPort.current.eof_ ? NULL : (void*)data;
 	    m_rccPort.input.u.operation = m_rccPort.current.opCode_;
 	    m_rccPort.input.length = m_rccPort.current.length_;
 	    m_rccPort.input.eof = m_rccPort.current.eof_;
@@ -144,6 +145,7 @@ namespace OCPI {
 	if (&m_rccPort.current == &buffer) {
 	  m_buffer = NULL;
 	  m_rccPort.current.data = NULL;
+	  m_rccPort.input.eof = false;
 	}
 	try {
 	  buffer.portBuffer->release();
@@ -160,6 +162,7 @@ namespace OCPI {
 
 	newBuffer = m_rccPort.current; // copy the structure
 	m_rccPort.current.data = NULL;
+	m_rccPort.input.eof = false;
 	m_buffer->take(); // tell lower levels to move on, but not release
 	m_buffer = NULL;
 	if (oldBuffer) {

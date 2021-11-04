@@ -25,11 +25,12 @@
 #include <ezxml.h>
 #include "OsAssert.hh"
 #include "OsMisc.hh"
-#include <OcpiUtilHash.h>
-#include <OcpiUtilAutoMutex.h>
-#include <OcpiUtilEzxml.h>
-#include <OcpiUtilMisc.h>
-#include "UtilPValue.hh"
+#include "UtilHash.hh"
+#include "UtilAutoMutex.hh"
+#include "UtilEzxml.hh"
+#include "UtilMisc.hh"
+#include "BasePValue.hh"
+#include "BasePluginManager.hh"
 #include "XferEndPoint.h"
 #include "XferServices.h"
 #include "XferPioInternal.h"
@@ -38,7 +39,7 @@
 namespace OX = OCPI::Util::EzXml;
 namespace OU = OCPI::Util;
 namespace OS = OCPI::OS;
-namespace OD = OCPI::Driver;
+namespace OP = OCPI::Base::Plugin;
 namespace DDT = DtOsDataTypes;
 namespace DataTransfer {
 
@@ -58,7 +59,7 @@ configure(ezxml_t x) {
     throw OU::Error("Invalid OCPI_SMB_SIZE value: %s", env);
   ocpiDebug("After environment, SMB size is %zu", m_SMBSize);
   // Now configure the drivers
-  OD::Manager::configure(x);
+  OP::Manager::configure(x);
   for (XferFactory* d = firstDriver(); d; d = d->nextDriver())
     ocpiInfo("Transfer Driver manager has protocol %s", d->getProtocol());
 }
@@ -86,7 +87,7 @@ getDriver(const char *name) {
 }
 
 const char *xfer = "transfer";
-static OCPI::Driver::Registration<XferManager> xfm;
+  static OP::Registration<XferManager> xfm;
 XferManager::
 XferManager()
   : m_mutex(true), m_configured(false) {
