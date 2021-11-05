@@ -159,9 +159,23 @@ parseHdlPlatforms(ezxml_t xml) {
 #define HDL_ASSEMBLY_ATTRS  "Containers", "DefaultContainers"
 static const char *
 parseHdlAssembly(ezxml_t xml) {
+  assert("unexpected XML parse of hdl assembly" == NULL);
   const char *err;
   if ((err = OE::checkAttrs(xml, TARGET_ATTRS, HDL_ASSEMBLY_ATTRS, NULL)) ||
       (err = OE::checkElements(xml, "instance", "connection", "external", NULL)))
+    return err;
+  return NULL;
+}
+
+// FIXME this is redundant with what is in tests.cc
+#define TEST_ATTRS "spec", "timeout", "duration", "onlyWorkers", \
+                   "excludeWorkers", "useHDLFileIo", "mode", "onlyPlatforms", \
+                   "excludePlatforms", "finishPort", "doneWorkerIsUUT"
+#define TEST_MAKE_ATTRS "onlyplatforms", "excludeplatforms"
+static const char *
+parseTests(ezxml_t xml) {
+  const char *err;
+  if ((err = OE::checkAttrs(xml, TEST_ATTRS, NULL)))
     return err;
   return NULL;
 }
@@ -170,7 +184,7 @@ parseHdlAssembly(ezxml_t xml) {
   HDL_TARGET_ATTRS, TARGET_ATTRS, PACKAGE_ATTRS, PROJECT_AND_LIBRARY_ATTRS, PROJECT_ONLY_ATTRS, \
   LIBRARY_ONLY_ATTRS, APPLICATION_ATTRS, APPLICATIONS_ONLY_ATTRS, \
   HDL_LIBRARY_AND_CORE_ATTRS, HDL_LIBRARY_ONLY_ATTRS, HDL_CORE_ONLY_ATTRS, \
-  HDL_PRIMITIVES_ONLY_ATTRS
+  HDL_PRIMITIVES_ONLY_ATTRS, TEST_MAKE_ATTRS
 
 // The argument is [<expected-asset-type>:]<xml-file>
 const char *
@@ -190,6 +204,7 @@ parseAsset(const char *file, const char *topElement) {
        !strcasecmp(xml->name, "libraries") ? parseLibraries(xml) :
        !strcasecmp(xml->name, "applications") ? parseApplications(xml) :
        !strcasecmp(xml->name, "application") ? parseApplication(xml) :
+       !strcasecmp(xml->name, "tests") ? parseTests(xml) :
        "Unknown asset type"))
     return OU::esprintf("For <%s> XML file %s:  %s", xml->name, file, err);
   static const char *attrs[] = { ALL_ATTRS, NULL };
