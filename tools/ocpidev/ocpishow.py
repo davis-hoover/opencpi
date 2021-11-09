@@ -30,13 +30,15 @@ import _opencpi.assets.factory as ocpifactory
 import _opencpi.assets.registry as ocpiregistry
 import _opencpi.assets.project as ocpiproj
 import _opencpi.assets.platform as ocpiplat
+import _opencpi.assets.prerequisite as ocpipre
+
 
 # There is a top-level parser that parses FIRST_NOUNS
 # If the noun is a PLAIN_NOUN, it proceeds normally,
 # but if the noun is a SUB_PARSER_NOUN, then it
 # looks for a second noun from the SUBNOUNS list.
 PLAIN_NOUNS = ["registry", "projects", "workers", "components", "platforms", "targets", "tests",
-               "libraries", "project", "component", "worker"]
+               "libraries", "project", "component", "worker", "prerequisites"]
 SUB_PARSER_NOUNS = ["hdl", "rcc"]
 FIRST_NOUNS = PLAIN_NOUNS + SUB_PARSER_NOUNS
 SUBNOUNS = {}
@@ -59,7 +61,7 @@ for loop_noun in SUB_PARSER_NOUNS:
 # of that type (hdl/assemblies).
 #
 # Likewise, applications is a dirtype because there is a directory of that type.
-NOUN_PLURALS = ["projects", "workers", "components", "platforms", "targets", "tests", "libraries"]
+NOUN_PLURALS = ["projects", "workers", "components", "platforms", "targets", "tests", "libraries", "prerequisites" ]
 DIR_TYPES = [dir_noun for dir_noun in NOUNS if dir_noun not in NOUN_PLURALS]
 
 def parse_cl_vars():
@@ -194,6 +196,7 @@ def check_scope_options(scope, noun):
         "rcctargets":["global"],
         "hdlplatforms":["global"],
         "hdltargets":["global"],
+        "prerequisites": ["global"]
     }
     if scope not in valid_scope_dict[noun]:
         raise ocpiutil.OCPIException("Invalid scope option '" + scope + "' for " + noun +
@@ -232,6 +235,7 @@ def get_noun_from_plural(args, noun, scope):
         "hdlplatforms": "ocpiplat.HdlPlatform",
         "rccplatforms": "ocpiplat.RccPlatform",
         "platforms":    "ocpiplat.Platform",
+        "prerequisites": "ocpipre.Prerequisites"
         }
     if args["noun"] in ["tests", "libraries", "workers", "components"]:
         action = "show_" + args["noun"]
@@ -250,6 +254,8 @@ def get_dir_from_noun(noun, name, args):
     """
     if noun in ["registry", "projects"]:
         directory = ocpiregistry.Registry.get_registry_dir()
+    elif noun in ["prerequisites"]:
+         directory = ocpipre.Prerequisites.get_default_location()
     elif noun not in ["libraries", "hdlplatforms", "hdltargets", "rccplatforms",
                       "rcctargets", "platforms", "targets", "workers", "components"]:
 
@@ -323,7 +329,7 @@ def main():
                 (noun, action) = get_noun_from_plural(args, noun, args.get("scope", None))
             ocpiutil.logging.debug('Choose noun: "' + str(noun) + '" and action: "' + action +'"')
             if noun not in [None, "hdlplatforms", "hdltargets", "rccplatforms", "rcctargets",
-                            "platforms", "targets", "projects"]:
+                            "platforms", "targets", "projects", "prerequisites"]:
                 # pylint:disable=unused-variable
                 ocpiutil.logging.debug("constructing asset noun: " + noun + " directory: " +
                                        str(directory) + " args : " + str(args))

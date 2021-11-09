@@ -1,3 +1,27 @@
+# [v2.3.2](https://gitlab.com/opencpi/opencpi/-/compare/v2.3.1...v2.3.2) (2021-11-08)
+
+Changes/additions since [OpenCPI Release v2.3.1](https://gitlab.com/opencpi/opencpi/-/releases/v2.3.1)
+
+### Enhancements
+- **tools**: add `ocpidev show prerequisites` command. (!744)(321aa8cc)
+
+### Bug Fixes
+- **comp**: undo a `file_write.c` change to fix timestamper_scdcd unit test. (!732)(c1e0a68b)
+- **devops,tools**: build-pages.py: fix detached HEAD processing. (!741)(963d24b8)
+- **runtime**: disable data on a rcc port if there is EOF. (!754)(0416e081)
+- **tests,tools**: fix failing test in `tests/pytests/show_prereqs_test.py`. (!750)(b72e4dfb)
+- **tools**: do not clear OCPI_PREREQUISITE_* envars that lead to install/build errors. (!736)(a3e2c459)
+- **tools**: update path in scripts to prioritize local xilinx version of dumpimage. (!738)(30c8f46f)
+- **tools**: detect empty SAMPLES messages and report the error rather than dump a stack frame. (!739)(d00d2536)
+- **tools**: add missing JPEG development package to `centos7-packages.sh`. (!749)(ae88e3dc)
+- **tools**: add missing error check for pip3 package installation. (!749)(ae88e3dc)
+- **tools**: fix unsorted output issue for `ocpidev show prerequisites --table`. (!750)(b72e4dfb)
+- **tools**: fix makeless issues in unit tests and HDL assemblies. (!753)(3102e9ae)
+- **tools**: createXilinxLinuxKernelHeaders.sh: fix broken handling of `uconfig` for `aarch64`. (!759)(0559eaf1)
+
+### Miscellaneous
+- **tests**: enable previously disabled test platforms that have been fixed. (!747)(1e15ee14)
+
 # [v2.3.1](https://gitlab.com/opencpi/opencpi/-/compare/v2.3.0...v2.3.1) (2021-10-13)
 
 Changes/additions since [OpenCPI Release v2.3.0](https://gitlab.com/opencpi/opencpi/-/releases/v2.3.0)

@@ -1173,8 +1173,7 @@ onlyExclude(const char *thing,
     else if (baseExclude.size())
       for (auto it = newExclude.begin(); it != newExclude.end(); ++it)
 	baseExclude.push_back(*it);
-  } else
-    baseExclude = newExclude;
+  }
   return NULL;
 }
 
@@ -1289,13 +1288,15 @@ parse(ezxml_t x, const char *buildFile) {
       return "Invalid \"Containers\" attribute:  worker model is not HDL";
     else
       m_containers.push_back(ti.token());
-  for (OU::TokenIter ti(ezxml_cattr(x, "DefaultContainers")); ti.token(); ti.next())
-    if (m != HdlModel)
-      return "Invalid \"DefaultContainers\" attribute:  worker model is not HDL";
-    else {
-      m_defaultContainers.push_back(ti.token());
-      m_anyDefaultContainers = true;
-    }
+  const char *defaultContainers = ezxml_cattr(x, "DefaultContainers");
+  if (defaultContainers) {
+    m_anyDefaultContainers = true;
+    for (OU::TokenIter ti(defaultContainers); ti.token(); ti.next())
+      if (m != HdlModel)
+	return "Invalid \"DefaultContainers\" attribute:  worker model is not HDL";
+      else
+	m_defaultContainers.push_back(ti.token());
+  }
   for (OU::TokenIter ti(ezxml_cattr(x, "configurations")); ti.token(); ti.next()) {
     if (m != HdlModel)
       return "Invalid \"configurations\" attribute:  worker model is not HDL";
@@ -1351,8 +1352,8 @@ parse(ezxml_t x, const char *buildFile) {
   return NULL;
 }
 
-static void writeVar(FILE *f, const char *var, OrderedStringSet &vals) {
-  if (vals.empty())
+static void writeVar(FILE *f, const char *var, OrderedStringSet &vals, bool emptyok = false) {
+  if (vals.empty() and !emptyok)
     return;
   fprintf(f,"%s:=", var);
   for (auto i = vals.begin(); i != vals.end(); ++i)
@@ -1378,6 +1379,6 @@ writeMakeVars(FILE *mkf) {
   writeVar(mkf, "HdlExactParts", m_exactParts);
   writeVar(mkf, "Containers", m_containers);
   if (m_anyDefaultContainers) // need to distinguish between not defined and empty
-    writeVar(mkf, "DefaultContainers", m_defaultContainers);
+    writeVar(mkf, "DefaultContainers", m_defaultContainers, true);
 
 }

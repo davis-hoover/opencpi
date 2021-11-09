@@ -65,12 +65,15 @@ class UrlLink(object):
 
 
 def main():
+    # my_logger = logging.getLogger()
+    # my_logger.setLevel(logging.DEBUG)
     logging.debug(f"CURDIR        : {CURDIR}")
     logging.debug(f"OCPI_ROOT     : {OCPI_ROOT}")
     logging.debug(f"OCPI_TEMPLATES: {OCPI_TEMPLATES}")
     logging.debug(f"REPODIR       : {args.repodir}")
     logging.debug(f"OUTPUTDIR     : {args.outputdir}")
     logging.debug(f"WEBROOT       : {args.webroot}")
+    logging.debug(f"RELEASES      : {args.releases}")
 
     # rm -rf pdf dir
     if args.clean_all and args.outputdir.exists():
@@ -80,6 +83,7 @@ def main():
 
     # Resolve HEAD because it doesn't work with all git commands
     head = get_name_rev(args.repodir / ".git", "HEAD")
+    logging.debug(f"head          : {head}")
     if "HEAD" in args.releases:
         args.releases[args.releases.index("HEAD")] = head
     if "HEAD" in args.clean:
@@ -771,12 +775,29 @@ def get_branches(git_dir: Path) -> List[str]:
 
 
 def get_name_rev(git_dir: Path, rev: str):
+    # Try to get a branch name first.  This should fail
+    # only if "rev == HEAD" and HEAD is detached.
+    cmd = ["git", "--git-dir", str(git_dir.resolve()), "symbolic-ref", "--short",
+           "-q", rev]
+    try:
+        name = subprocess.check_output(cmd).decode().strip("\n")
+        if len(name):
+            return name
+    except subprocess.CalledProcessError as e:
+        logging.info(f"'{rev}' is detached: will look for a tag.")
+
+    # "rev == HEAD" is detached.  Try to find a tag.
     cmd = ["git", "--git-dir", str(git_dir.resolve()), "name-rev", "--name-only",
-           "--no-undefined", rev]
-    name = subprocess.check_output(cmd).decode().strip("\n")
-    if len(name):
-        return name
-    raise RuntimeError(f"Could not resolve {rev} to a branch name")
+           "--no-undefined", "--tags", rev]
+    try:
+        name = subprocess.check_output(cmd).decode().strip("\n")
+        if len(name):
+            return name
+    except subprocess.CalledProcessError as e:
+        logging.info(f"'{rev}' does not have an associated tag.")
+
+    # We struck out.  Will this ever be reached?
+    raise RuntimeError(f"Could not resolve {rev} to a branch name or tag")
 
 
 def sort_tags(tags: List[str], reverse: bool = False):

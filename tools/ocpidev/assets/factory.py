@@ -68,6 +68,7 @@ class AssetFactory():
         import _opencpi.assets.project
         import _opencpi.assets.registry
         import _opencpi.assets.component
+        import _opencpi.assets.prerequisite
         actions = {"worker":         cls.__worker_with_model,
                    "hdl-assemblies":_opencpi.assets.assembly.HdlAssembliesCollection,
                    "hdl-assembly":  _opencpi.assets.assembly.HdlApplicationAssembly,
@@ -87,8 +88,10 @@ class AssetFactory():
                    "hdl-slot":      _opencpi.assets.component.Slot,
                    "hdl-card":      _opencpi.assets.component.Card,
                    "project":       partial(cls.__get_or_create, _opencpi.assets.project.Project),
-                   "registry":      partial(cls.__get_or_create, _opencpi.assets.registry.Registry)}
-
+                   "registry":      partial(cls.__get_or_create, _opencpi.assets.registry.Registry),
+                   "prerequisite":  partial(cls.__get_or_create, _opencpi.assets.prerequisite.Prerequisites)
+                   }
+        
         if asset_type not in actions.keys():
             if not asset_type:
                 asset_type = "unknown"

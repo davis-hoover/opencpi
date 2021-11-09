@@ -42,6 +42,8 @@ sys.path.append(os.getenv('OCPI_CDK_DIR') + '/' + os.getenv('OCPI_TOOL_PLATFORM'
 import _opencpi.util as ocpiutil
 from  _opencpi.assets.factory import *
 from  _opencpi.assets.registry import *
+import io
+from contextlib import redirect_stdout
 
 # The following globals are used within the test cases for
 # setting up and verifying projects and paths
@@ -95,7 +97,193 @@ else:
     SET_X = " "
     OCPIDEV_CMD = OCPIDEV_PATH
 
-#TODO: test get_ok and print_table
+#TODO: test get_ok
+
+class TestPrintTable(unittest.TestCase):
+    def test_simple_print(self):
+        f = io.StringIO()
+        with redirect_stdout(f):
+            ocpiutil.print_table([["Col1","Col2"], ["foo", "bar"]])
+        actual = f.getvalue()
+
+        expected =  "---------------\n"
+        expected += "| Col1 | Col2 |\n"
+        expected += "| foo  | bar  |\n"
+        expected += "---------------\n\n"
+        
+        self.assertEqual(actual, expected)
+
+    def test_simple_print_ints(self):
+        f = io.StringIO()
+        with redirect_stdout(f):
+            ocpiutil.print_table([["Col1","Col2"], [3, 4]])
+        actual = f.getvalue()
+
+        expected =  "---------------\n"
+        expected += "| Col1 | Col2 |\n"
+        expected += "| 3    | 4    |\n"
+        expected += "---------------\n\n"
+        
+        self.assertEqual(actual, expected)
+
+    def test_print_with_header(self):
+        f = io.StringIO()
+        with redirect_stdout(f):
+            ocpiutil.print_table([["Col1","Col2"], ["foo", "bar"]], underline="-")
+        actual = f.getvalue()
+
+        expected =  "---------------\n"
+        expected += "| Col1 | Col2 |\n"
+        expected += "| ---- | ---- |\n"
+        expected += "| foo  | bar  |\n"
+        expected += "---------------\n\n"
+        
+        self.assertEqual(actual, expected)
+
+    def test_print_with_footnote(self):
+        f = io.StringIO()
+        c = ocpiutil.TableCell("Col1", "hello")
+        with redirect_stdout(f):
+            ocpiutil.print_table([[c,"Col2"], ["foo", "bar"]])
+        actual = f.getvalue()
+
+        expected =  "----------------\n"
+        expected += "| Col1* | Col2 |\n"
+        expected += "| foo   | bar  |\n"
+        expected += "----------------\n"
+        expected += "*) hello\n\n"
+
+        self.assertEqual(actual, expected)
+
+    def test_print_with_footnotes_with_marker(self):
+        f = io.StringIO()
+        c = ocpiutil.TableCell("Col1", "hello")
+        c2 = ocpiutil.TableCell("bar", "hello again")
+        with redirect_stdout(f):
+            ocpiutil.print_table([[c,"Col2"], ["foo", c2]], footnote_marker="!")
+        actual = f.getvalue()
+
+        expected =  "-----------------\n"
+        expected += "| Col1! | Col2  |\n"
+        expected += "| foo   | bar!! |\n"
+        expected += "-----------------\n"
+        expected += "!) hello\n"
+        expected += "!!) hello again\n\n"
+
+        self.assertEqual(actual, expected)
+    def test_print_with_footnotes(self):
+        f = io.StringIO()
+        c = ocpiutil.TableCell("Col1", "hello")
+        c2 = ocpiutil.TableCell("bar", "hello again")
+        with redirect_stdout(f):
+            ocpiutil.print_table([[c,"Col2"], ["foo", c2]])
+        actual = f.getvalue()
+
+        expected =  "-----------------\n"
+        expected += "| Col1* | Col2  |\n"
+        expected += "| foo   | bar** |\n"
+        expected += "-----------------\n"
+        expected += "*) hello\n"
+        expected += "**) hello again\n\n"
+
+        self.assertEqual(actual, expected)
+
+    def test_print_with_footnotes_reduced_footnote_marker(self):
+        f = io.StringIO()
+        c = ocpiutil.TableCell("Col1", "hello")
+        c2 = ocpiutil.TableCell("bar", "hello")
+        with redirect_stdout(f):
+            ocpiutil.print_table([[c,"Col2"], ["foo", c2]], footnote_marker="!")
+        actual = f.getvalue()
+
+        expected =  "----------------\n"
+        expected += "| Col1! | Col2 |\n"
+        expected += "| foo   | bar! |\n"
+        expected += "----------------\n"
+        expected += "!) hello\n\n"
+
+        self.assertEqual(actual, expected)
+    def test_print_with_footnotes_reduced(self):
+        f = io.StringIO()
+        c = ocpiutil.TableCell("Col1", "hello")
+        c2 = ocpiutil.TableCell("bar", "hello")
+        with redirect_stdout(f):
+            ocpiutil.print_table([[c,"Col2"], ["foo", c2]])
+        actual = f.getvalue()
+
+        expected =  "----------------\n"
+        expected += "| Col1* | Col2 |\n"
+        expected += "| foo   | bar* |\n"
+        expected += "----------------\n"
+        expected += "*) hello\n\n"
+
+        self.assertEqual(actual, expected)
+
+    def test_print_with_footnotes_reduced_surr_col_delim(self):
+        f = io.StringIO()
+        c = ocpiutil.TableCell("Col1", "hello")
+        c2 = ocpiutil.TableCell("bar", "hello")
+        with redirect_stdout(f):
+            ocpiutil.print_table([[c,"Col2"], ["foo", c2]], surr_cols_delim="!")
+        actual = f.getvalue()
+
+        expected =  "----------------\n"
+        expected += "! Col1* | Col2 !\n"
+        expected += "! foo   | bar* !\n"
+        expected += "----------------\n"
+        expected += "*) hello\n\n"
+
+        self.assertEqual(actual, expected)
+    def test_print_with_footnotes_reduced_surr_rows_delim(self):
+        f = io.StringIO()
+        c = ocpiutil.TableCell("Col1", "hello")
+        c2 = ocpiutil.TableCell("bar", "hello")
+        with redirect_stdout(f):
+            ocpiutil.print_table([[c,"Col2"], ["foo", c2]], surr_rows_delim="!")
+        actual = f.getvalue()
+
+        expected =  "!!!!!!!!!!!!!!!!\n"
+        expected += "| Col1* | Col2 |\n"
+        expected += "| foo   | bar* |\n"
+        expected += "!!!!!!!!!!!!!!!!\n"
+        expected += "*) hello\n\n"
+
+        self.assertEqual(actual, expected)
+
+    def test_print_with_footnotes_reduced_col_delim(self):
+        f = io.StringIO()
+        c = ocpiutil.TableCell("Col1", "hello")
+        c2 = ocpiutil.TableCell("bar", "hello")
+        with redirect_stdout(f):
+            ocpiutil.print_table([[c,"Col2"], ["foo", c2]], col_delim="!")
+        actual = f.getvalue()
+
+        expected =  "----------------\n"
+        expected += "| Col1* ! Col2 |\n"
+        expected += "| foo   ! bar* |\n"
+        expected += "----------------\n"
+        expected += "*) hello\n\n"
+
+        self.assertEqual(actual, expected)
+
+    def test_print_with_footnotes_reduced_row_delim(self):
+        f = io.StringIO()
+        c = ocpiutil.TableCell("Col1", "hello")
+        c2 = ocpiutil.TableCell("bar", "hello")
+        with redirect_stdout(f):
+            ocpiutil.print_table([[c,"Col2"], ["foo", c2]], row_delim="!")
+        actual = f.getvalue()
+
+        expected =  "----------------\n"
+        expected += "| Col1* | Col2 |\n"
+        expected += "!!!!!!!!!!!!!!!!\n"
+        expected += "| foo   | bar* |\n"
+        expected += "!!!!!!!!!!!!!!!!\n"
+        expected += "----------------\n"
+        expected += "*) hello\n\n"
+
+        self.assertEqual(actual, expected)
+
 
 class TestPathFunctions(unittest.TestCase):
     """

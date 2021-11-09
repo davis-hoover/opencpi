@@ -298,6 +298,12 @@ echo "ocpidev show registry --simple"
 do_ocpidev show registry --simple
 echo "ocpidev show registry --json"
 do_ocpidev show registry --json
+echo "ocpidev show prerequisites"
+do_ocpidev show prerequisites
+echo "ocpidev show prerequisites --simple"
+do_ocpidev show prerequisites --simple
+echo "ocpidev show prerequisites --json"
+do_ocpidev show prerequisites --json
 echo "ocpidev show tests --json --local-scope"
 do_ocpidev show tests --json --local-scope
 echo "ocpidev show tests --local-scope"
