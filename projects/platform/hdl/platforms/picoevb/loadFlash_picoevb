@@ -22,6 +22,87 @@
 # Usage : "Usage : loadFlash_picoevb [input-bit-file]
 # The output binary is always written as flashImage.bin 
 
-# Generate the flash binary file
-exec $OCPI_ROOT_DIR/runtime/hdl-support/xilinx/loadFlash_openocd $1
+# Args are: 
+# 0. Optional -v for verbose 
+# 1. The bitstream file to load to flash 
+# 2. The usb serial number of the jtag device to use
+dir=`dirname $0`
+[ "$1" = -v ] && {
+  verbose=$1
+  shift
+}
 
+if [ $# -lt 1 ]
+then
+  echo Usage is: ./`basename $0` bitfile jtag-iSerial 1>&2
+  exit 1
+fi
+
+source $OCPI_CDK_DIR/scripts/util.sh
+setVarsFromMake $OCPI_CDK_DIR/include/hdl/xilinx.mk ShellIseVars=1 $verbose
+
+source $OcpiXilinxVivadoDir/settings64.sh 1>&2
+if test $? != 0; then
+  echo Xilinx tools setup failed. 1>&2
+  exit 1
+fi
+
+myusb=`$dir/scripts/findJtagCable.sh $2`
+if test $? != 0; then
+  echo Failed to find a JTAG USB cable with iSerial $2. 
+  exit 1
+fi 
+
+temp=/tmp/ocpibitstream$$
+tlog=$temp.1
+case $1 in
+  (*.gz|*.bitz)
+    echo The bitstream file \"$1\" is compressed.  Expanding it.
+    gunzip -q -c < $1 > $temp.bit 2> $tlog
+    # Note that gunzip issues warnings and returns status == 2 when there is
+    # artifact metadata at end of file.
+    if test $? != 0 -a $? != 2; then
+      echo Decompression failed. Log is in $tlog; exit 1
+      exit 1
+    fi
+    rm $temp.1
+    echo Bitstream file decompressed into \"$temp.bit\"
+    bitfile=$temp.bit
+    ;;
+  (*.bit)
+    echo The bitstream file \"$1\" is not compressed.  Using it directly.
+    bitfile=$1
+    ;;
+  (*)
+    echo The bitstream file \"$1\" does not have a valid suffix "(.bit or .bitz)".
+    exit 1
+esac
+
+echo Converting \"$bitfile\" to flash format in \"$temp.mcs\" using xilinx vivado. 
+vivado -mode batch -source scripts/runWriteCfgMem.tcl -tclargs $bitfile $temp.mcs 2>&1 | tee $tlog 
+if test $? != 0; then
+  echo "Conversion to flash file format failed. See log in $temp.1" 
+  exit 1
+fi
+
+xvcdArgs="-P 0x6015"
+if [ ! -z "$2" ] 
+then
+  xvcdArgs="-s s:0x0403:0x6015:$2"
+fi
+
+tlog=$temp.2
+echo starting Xilinx Virtual Cable Driver
+LD_LIBRARY_PATH=$OCPI_PREREQUISITES_DIR/xvcd/lib/libftdi/$OCPI_TOOL_DIR/lib $OCPI_PREREQUISITES_DIR/xvcd/$OCPI_TOOL_DIR/bin/xvcd $xvcdArgs & 
+xvcdPid=$! 
+echo starting flash programming
+vivado -mode batch -source scripts/runWriteFlash.tcl -tclargs $temp.mcs 2>&1 | tree $tlog 
+if test $? != 0; then
+  echo "Flash programming failed. See log in $temp.2" 
+  kill $xvcdPid
+  echo "Xilinx Virtual Cable Driver stopped" 
+  exit 1
+fi 
+echo "Flash programming completed."
+kill $xvcdPid
+echo "Xilinx Virtual Cable Driver stopped" 
