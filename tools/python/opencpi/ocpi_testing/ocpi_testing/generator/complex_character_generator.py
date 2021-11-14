@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Class for generating double precision floating point sample input data
+# Class for generating complex character sample input data
 #
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
@@ -24,12 +24,12 @@
 import math
 import random
 
-import numpy
-
 from . import base_generator
+# Default value is the same as for a real (not complex) character values
+from .character_generator import CharacterGeneratorDefaults
 
 
-class DoubleGeneratorDefaults:
+class ComplexCharacterGeneratorDefaults(CharacterGeneratorDefaults):
     # This class houses all the default values used. The structure is designed
     # for importing and documenting in an easier way.
 
@@ -38,46 +38,21 @@ class DoubleGeneratorDefaults:
 
     #: Number of samples in a sample message for the message size test case and
     #: longest test subcase.
-    MESSAGE_SIZE_LONGEST = 2048
-
-    #: Minimum value a double precision floating point number allows.
-    DOUBLE_MINIMUM = float(numpy.float64(numpy.finfo(numpy.float64).min))
-
-    #: Maximum value a double precision floating point number allows.
-    DOUBLE_MAXIMUM = float(numpy.float64(numpy.finfo(numpy.float64).max))
-
-    #: Near smallest resolution a double precision floating point number
-    #: allows.
-    DOUBLE_SMALL = 10 * numpy.float64(numpy.finfo(numpy.float64).tiny)
-
-    #: Mean of the Gaussian probability distribution function of the random
-    #: number generator used to set the amplitude of the sinusoidal waves that
-    #: are combined in a sample message for the typical test case.
-    TYPICAL_AMPLITUDE_MEAN = DOUBLE_MAXIMUM / 10
-
-    #: Width of the Gaussian probability distribution function of the random
-    #: number generator used to set the amplitude of the sinusoidal waves that
-    #: are combined in a sample message for the typical test case.
-    TYPICAL_AMPLITUDE_DISTRIBUTION_WIDTH = DOUBLE_MAXIMUM / 50
-
-    #: Maximum amplitude of the sinusoidal waves that are combined in a sample
-    #: message for typical test case.
-    TYPICAL_MAXIMUM_AMPLITUDE = (
-        DOUBLE_MAXIMUM * base_generator.GeneratorDefaults.LIMITED_SCALE_FACTOR)
+    MESSAGE_SIZE_LONGEST = 8192
 
 
-class DoubleGenerator(base_generator.BaseGenerator):
-    """ Double protocol test data generator
+class ComplexCharacterGenerator(base_generator.BaseGenerator):
+    """ Complex character protocol test data generator
     """
 
     def __init__(self):
-        """ Initialise double generator class
+        """ Initialise complex character generator class
 
         Defines the default values for the variables that control the values
         and size of messages that are generated.
 
         Returns:
-            An initialised DoubleGenerator instance.
+            An initialised ComplexCharacterGenerator instance.
         """
         super().__init__()
 
@@ -85,16 +60,15 @@ class DoubleGenerator(base_generator.BaseGenerator):
         # generator. Keep the same variable names to ensure documentation
         # matches.
         self.MESSAGE_SIZE_LONGEST = \
-            DoubleGeneratorDefaults.MESSAGE_SIZE_LONGEST
-        self.DOUBLE_MINIMUM = DoubleGeneratorDefaults.DOUBLE_MINIMUM
-        self.DOUBLE_MAXIMUM = DoubleGeneratorDefaults.DOUBLE_MAXIMUM
-        self.DOUBLE_SMALL = DoubleGeneratorDefaults.DOUBLE_SMALL
+            ComplexCharacterGeneratorDefaults.MESSAGE_SIZE_LONGEST
+        self.CHARACTER_MINIMUM = CharacterGeneratorDefaults.CHARACTER_MINIMUM
+        self.CHARACTER_MAXIMUM = CharacterGeneratorDefaults.CHARACTER_MAXIMUM
         self.TYPICAL_AMPLITUDE_MEAN = \
-            DoubleGeneratorDefaults.TYPICAL_AMPLITUDE_MEAN
+            CharacterGeneratorDefaults.TYPICAL_AMPLITUDE_MEAN
         self.TYPICAL_AMPLITUDE_DISTRIBUTION_WIDTH = \
-            DoubleGeneratorDefaults.TYPICAL_AMPLITUDE_DISTRIBUTION_WIDTH
+            CharacterGeneratorDefaults.TYPICAL_AMPLITUDE_DISTRIBUTION_WIDTH
         self.TYPICAL_MAXIMUM_AMPLITUDE = \
-            DoubleGeneratorDefaults.TYPICAL_MAXIMUM_AMPLITUDE
+            CharacterGeneratorDefaults.TYPICAL_MAXIMUM_AMPLITUDE
 
     def typical(self, seed, subcase):
         """ Generate a sample message with typical data inputs
@@ -149,12 +123,15 @@ class DoubleGenerator(base_generator.BaseGenerator):
             scale_factor = self.TYPICAL_MAXIMUM_AMPLITUDE / amplitude_sum
             amplitudes = [amplitude * scale_factor for amplitude in amplitudes]
 
-        data = [0.0] * self.SAMPLE_DATA_LENGTH
+        data = [complex(0, 0)] * self.SAMPLE_DATA_LENGTH
         for index in range(len(data)):
             for frequency, phase, amplitude in zip(
                     frequencies, phases, amplitudes):
-                data[index] = data[index] + amplitude * math.cos(
-                    2 * math.pi * frequency * index + phase)
+                data[index] = data[index] + complex(
+                    int(amplitude * math.cos(2 * math.pi * frequency * index
+                                             + phase)),
+                    int(amplitude * math.sin(2 * math.pi * frequency * index +
+                                             phase)))
 
         return [{"opcode": "sample", "data": data}]
 
@@ -174,64 +151,60 @@ class DoubleGenerator(base_generator.BaseGenerator):
         random.seed(seed)
         if subcase == "all_zero":
             return [{"opcode": "sample",
-                     "data": [0.0] * self.SAMPLE_DATA_LENGTH}]
+                     "data": [complex(0, 0)] * self.SAMPLE_DATA_LENGTH}]
 
         elif subcase == "all_maximum":
-            return [{"opcode": "sample",
-                     "data": [self.DOUBLE_MAXIMUM] * self.SAMPLE_DATA_LENGTH}]
+            return [
+                {"opcode": "sample",
+                 "data": [complex(self.CHARACTER_MAXIMUM, self.CHARACTER_MAXIMUM)] *
+                 self.SAMPLE_DATA_LENGTH}]
 
         elif subcase == "all_minimum":
-            return [{"opcode": "sample",
-                     "data": [self.DOUBLE_MINIMUM] * self.SAMPLE_DATA_LENGTH}]
+            return [
+                {"opcode": "sample",
+                 "data": [complex(self.CHARACTER_MINIMUM, self.CHARACTER_MINIMUM)] *
+                 self.SAMPLE_DATA_LENGTH}]
+
+        elif subcase == "real_zero":
+            data = [complex(0, 0)] * self.SAMPLE_DATA_LENGTH
+            for index in range(self.SAMPLE_DATA_LENGTH):
+                data[index] = complex(
+                    0, random.randint(self.CHARACTER_MINIMUM, self.CHARACTER_MAXIMUM))
+            return [{"opcode": "sample", "data": data}]
+
+        elif subcase == "imaginary_zero":
+            data = [complex(0, 0)] * self.SAMPLE_DATA_LENGTH
+            for index in range(self.SAMPLE_DATA_LENGTH):
+                data[index] = complex(
+                    random.randint(self.CHARACTER_MINIMUM, self.CHARACTER_MAXIMUM), 0)
+            return [{"opcode": "sample", "data": data}]
 
         elif subcase == "large_positive":
-            data = [0.0] * self.SAMPLE_DATA_LENGTH
+            data = [complex(0, 0)] * self.SAMPLE_DATA_LENGTH
             for index in range(self.SAMPLE_DATA_LENGTH):
-                data[index] = random.uniform(
-                    self.DOUBLE_MAXIMUM - self.SAMPLE_NEAR_RANGE,
-                    self.DOUBLE_MAXIMUM)
+                near_random_limit = self.CHARACTER_MAXIMUM - self.SAMPLE_NEAR_RANGE
+                data[index] = complex(
+                    random.randint(near_random_limit, self.CHARACTER_MAXIMUM),
+                    random.randint(near_random_limit, self.CHARACTER_MAXIMUM))
             return [{"opcode": "sample", "data": data}]
 
         elif subcase == "large_negative":
-            data = [0.0] * self.SAMPLE_DATA_LENGTH
+            data = [complex(0, 0)] * self.SAMPLE_DATA_LENGTH
             for index in range(self.SAMPLE_DATA_LENGTH):
-                data[index] = random.uniform(
-                    self.DOUBLE_MINIMUM,
-                    self.DOUBLE_MINIMUM + self.SAMPLE_NEAR_RANGE)
+                near_random_limit = self.CHARACTER_MINIMUM + self.SAMPLE_NEAR_RANGE
+                data[index] = complex(
+                    random.randint(self.CHARACTER_MINIMUM, near_random_limit),
+                    random.randint(self.CHARACTER_MINIMUM, near_random_limit))
             return [{"opcode": "sample", "data": data}]
 
         elif subcase == "near_zero":
-            data = [0.0] * self.SAMPLE_DATA_LENGTH
+            data = [complex(0, 0)] * self.SAMPLE_DATA_LENGTH
             for index in range(self.SAMPLE_DATA_LENGTH):
-                data[index] = random.uniform(-self.DOUBLE_SMALL,
-                                             self.DOUBLE_SMALL)
-            return [{"opcode": "sample", "data": data}]
-
-        elif subcase == "positive_infinity":
-            data = self._get_sample_values()
-            data[5] = float("inf")
-            data[25] = float("inf")
-            data[30] = float("inf")
-            data[31] = float("inf")
-
-            return [{"opcode": "sample", "data": data}]
-
-        elif subcase == "negative_infinity":
-            data = self._get_sample_values()
-            data[5] = -float("inf")
-            data[25] = -float("inf")
-            data[30] = -float("inf")
-            data[31] = -float("inf")
-
-            return [{"opcode": "sample", "data": data}]
-
-        elif subcase == "not_a_number":
-            data = self._get_sample_values()
-            data[5] = float("nan")
-            data[25] = float("nan")
-            data[30] = float("nan")
-            data[31] = float("nan")
-
+                data[index] = complex(
+                    random.randint(-self.SAMPLE_NEAR_RANGE,
+                                   self.SAMPLE_NEAR_RANGE),
+                    random.randint(-self.SAMPLE_NEAR_RANGE,
+                                   self.SAMPLE_NEAR_RANGE))
             return [{"opcode": "sample", "data": data}]
 
         else:
@@ -252,11 +225,10 @@ class DoubleGenerator(base_generator.BaseGenerator):
         Returns:
             Messages for the typical case and the stated subcase.
         """
-        random.seed(seed)
         return [{"opcode": "sample", "data": self._get_sample_values()}]
 
     def _full_scale_random_sample_values(self, number_of_samples=None):
-        """ Generate a random sample of double precision floating point numbers
+        """ Generate a random sample of complex characters
 
         Args:
             number_of_samples (int, optional): The number of random values to
@@ -270,18 +242,19 @@ class DoubleGenerator(base_generator.BaseGenerator):
         if number_of_samples is None:
             number_of_samples = self.SAMPLE_DATA_LENGTH
 
-        data = [0] * number_of_samples
+        data = [complex(0, 0)] * number_of_samples
         for index in range(number_of_samples):
-            data[index] = random.uniform(self.DOUBLE_MINIMUM,
-                                         self.DOUBLE_MAXIMUM)
+            data[index] = complex(
+                random.randint(self.CHARACTER_MINIMUM, self.CHARACTER_MAXIMUM),
+                random.randint(self.CHARACTER_MINIMUM, self.CHARACTER_MAXIMUM))
         return data
 
     def _get_sample_values(self, number_of_samples=None):
-        """ Generate a random sample of double precision floating point numbers
+        """ Generate a random sample of complex characters
 
         The values generated are a subset of the whole supported range that
-        double precision floating point numbers can represent, this range size
-        is set by self.LIMITED_SCALE_FACTOR.
+        characters can represent, this range size is set by
+        self.LIMITED_SCALE_FACTOR.
 
         Args:
             number_of_samples (int, optional): The number of random values to
@@ -295,10 +268,14 @@ class DoubleGenerator(base_generator.BaseGenerator):
         if number_of_samples is None:
             number_of_samples = self.SAMPLE_DATA_LENGTH
 
-        limited_range_min = self.LIMITED_SCALE_FACTOR * self.DOUBLE_MINIMUM
-        limited_range_max = self.LIMITED_SCALE_FACTOR * self.DOUBLE_MAXIMUM
+        limited_range_min = round(
+            self.LIMITED_SCALE_FACTOR * self.CHARACTER_MINIMUM)
+        limited_range_max = round(
+            self.LIMITED_SCALE_FACTOR * self.CHARACTER_MAXIMUM)
 
-        data = [0] * number_of_samples
+        data = [complex(0, 0)] * number_of_samples
         for index in range(number_of_samples):
-            data[index] = random.uniform(limited_range_min, limited_range_max)
+            data[index] = complex(
+                random.randint(limited_range_min, limited_range_max),
+                random.randint(limited_range_min, limited_range_max))
         return data

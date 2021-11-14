@@ -44,6 +44,13 @@ class TestComplexDoubleGenerator(unittest.TestCase):
 
     def assertComplexDouble(self, value):
         self.assertIsInstance(value, complex)
+        if math.isnan(value.real) or math.isnan(value.imag) or \
+                math.isinf(value.real) or math.isinf(value.imag):
+            return
+        self.assertGreaterEqual(value.real, DOUBLE_MIN)
+        self.assertLessEqual(value.real, DOUBLE_MAX)
+        self.assertGreaterEqual(value.imag, DOUBLE_MIN)
+        self.assertLessEqual(value.imag, DOUBLE_MAX)
 
     def test_typical(self):
         messages = self.test_generator.generate(
@@ -98,8 +105,8 @@ class TestComplexDoubleGenerator(unittest.TestCase):
         reference_data = [0] * len(messages[0]["data"])
         for index in range(len(reference_data)):
             reference_data[index] = complex(
-                int(amplitude * math.cos(2 * math.pi * frequency * index
-                                         + phase)),
+                int(amplitude * math.cos(2 * math.pi * frequency * index +
+                                         phase)),
                 int(amplitude * math.sin(2 * math.pi * frequency * index +
                                          phase)))
 
@@ -181,8 +188,13 @@ class TestComplexDoubleGenerator(unittest.TestCase):
         self.assertEqual(messages[0]["opcode"], "sample")
         self.assertEqual(len(messages[0]["data"]),
                          self.test_generator.SAMPLE_DATA_LENGTH)
+        # Ensure the error between values is less than 0.1%
+        min_expected_value = DOUBLE_MAX - \
+            (1.001 * self.test_generator.SAMPLE_NEAR_RANGE)
         for value in messages[0]["data"]:
             self.assertComplexDouble(value)
+            self.assertGreaterEqual(value.real, min_expected_value)
+            self.assertGreaterEqual(value.imag, min_expected_value)
 
     def test_sample_large_negative_subcase(self):
         messages = self.test_generator.generate(
@@ -192,8 +204,13 @@ class TestComplexDoubleGenerator(unittest.TestCase):
         self.assertEqual(messages[0]["opcode"], "sample")
         self.assertEqual(len(messages[0]["data"]),
                          self.test_generator.SAMPLE_DATA_LENGTH)
+        # Ensure the error between values is less than 0.1%
+        max_expected_value = DOUBLE_MIN + \
+            (1.001 * self.test_generator.SAMPLE_NEAR_RANGE)
         for value in messages[0]["data"]:
             self.assertComplexDouble(value)
+            self.assertLessEqual(value.real, max_expected_value)
+            self.assertLessEqual(value.imag, max_expected_value)
 
     def test_sample_near_zero_subcase(self):
         messages = self.test_generator.generate(
@@ -203,8 +220,12 @@ class TestComplexDoubleGenerator(unittest.TestCase):
         self.assertEqual(messages[0]["opcode"], "sample")
         self.assertEqual(len(messages[0]["data"]),
                          self.test_generator.SAMPLE_DATA_LENGTH)
+        # Ensure the error between values is less than 0.1%
+        max_expected_value = (1.001 * self.test_generator.SAMPLE_NEAR_RANGE)
         for value in messages[0]["data"]:
             self.assertComplexDouble(value)
+            self.assertLessEqual(abs(value.real), max_expected_value)
+            self.assertLessEqual(abs(value.imag), max_expected_value)
 
     def test_sample_positive_infinity_subcase(self):
         messages = self.test_generator.generate(
@@ -247,6 +268,11 @@ class TestComplexDoubleGenerator(unittest.TestCase):
         for value in messages[0]["data"]:
             self.assertComplexDouble(value)
 
+    def test_sample_invalid_subcase(self):
+        with self.assertRaises(ValueError):
+            self.test_generator.generate(
+                self.seed, "sample", "invalid_subcase", "01", "02")
+
     def test_message_size_longest_subcase(self):
         messages = self.test_generator.generate(
             self.seed, "message_size", "longest", "01", "02")
@@ -259,11 +285,6 @@ class TestComplexDoubleGenerator(unittest.TestCase):
         self.assertEqual(messages[0]["opcode"], "sample")
         self.assertEqual(len(messages[0]["data"]),
                          self.test_generator.MESSAGE_SIZE_LONGEST)
-
-    def test_sample_invalid_subcase(self):
-        with self.assertRaises(ValueError):
-            self.test_generator.generate(
-                self.seed, "sample", "invalid_subcase", "01", "02")
 
     def test_full_scale_random_sample_values_none_number_of_samples(self):
         values = self.test_generator._full_scale_random_sample_values()

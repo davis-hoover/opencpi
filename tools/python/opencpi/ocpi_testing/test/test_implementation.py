@@ -65,7 +65,7 @@ class TestImplementation(unittest.TestCase):
         with self.assertRaises(TypeError):
             implementation = no_sample_implementation()
 
-    def test_no_resetrror(self):
+    def test_no_reset_error(self):
         class no_reset_implementation(ocpi_testing.Implementation):
             def sample(self, *inputs):
                 pass
