@@ -142,8 +142,8 @@ protected:
   void release();
   // Commit resources.  Caller says whether remote access will be required.
   void finalize();
-  virtual void doneWithInput(void */*buffer*/, unsigned /*length*/) {};
-  virtual void doneWithOutput(void */*buffer*/, unsigned /*length*/) {};
+  virtual void doneWithInput(void */*buffer*/, size_t /*length*/) {};
+  virtual void doneWithOutput(void */*buffer*/, size_t /*length*/) {};
 };
 typedef std::map<OCPI::Util::Uuid, EndPoint *, OCPI::Util::UuidComp> EndPoints;
 typedef EndPoints::iterator EndPointsIter;

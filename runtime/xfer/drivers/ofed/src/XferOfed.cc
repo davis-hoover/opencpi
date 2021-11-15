@@ -323,8 +323,7 @@ namespace Xfer {
       XF::EndPoint &createEndPoint(const char *protoInfo, const char *eps, const char *other,
 				   bool local, size_t size, const OB::PValue *params);
       // From driver base class
-      unsigned search(const OB::PValue* props, const char **exclude, bool discoveryOnly)
-	throw (OCPI::Util::EmbeddedException);
+      unsigned search(const OB::PValue* props, const char **exclude, bool discoveryOnly);
 
     protected:
       //OCPI::OS::Mutex                  m_mutex;
@@ -508,7 +507,6 @@ namespace Xfer {
     unsigned 
     XferFactory::
     search(const OB::PValue* /*props*/, const char ** /*exclude*/, bool /* discoveryOnly */)
-      throw (OCPI::Util::EmbeddedException) 
     {
       int num_of_device;
       ibv_device **dev_list;

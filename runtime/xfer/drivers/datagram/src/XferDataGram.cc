@@ -518,9 +518,9 @@ release() {
   if (is_free)
     return;
   // We have to release the individual messages for the transaction here.
-  for (unsigned int n=msg_start; n<(msg_count+msg_start); n++ ) {
-    ocpiAssert( transaction );
-    transaction->ACK( n );
+  for (uint16_t n = msg_start; n < msg_count + msg_start; n++) {
+    ocpiAssert(transaction);
+    transaction->ACK(n);
   }
   transaction = 0;
   is_free = true;

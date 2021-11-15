@@ -77,11 +77,11 @@ getListOfSupportedProtocols() {
 }
 
 XferFactory* XferManager::
-getDriver(const char *name) {
+getDriver(const char *a_name) {
   parent().configure();
   OU::AutoMutex guard(m_mutex, true);
   for (XferFactory* d = firstDriver(); d; d = d->nextDriver())
-    if (d->supportsEndPoint(name))
+    if (d->supportsEndPoint(a_name))
       return d;
   return NULL;
 }

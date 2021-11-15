@@ -29,9 +29,9 @@ namespace Xfer {
 namespace OU = OCPI::Util;
 
 Access::
-Access(volatile uint8_t *a_registers,  Accessor *accessor, RegisterOffset base)
+Access(volatile uint8_t *a_registers,  Accessor *a_accessor, RegisterOffset a_base)
   : m_accessor(NULL), m_child(false) {
-  setAccess(a_registers, accessor, base); //, buffers);
+  setAccess(a_registers, a_accessor, a_base); //, buffers);
 }
 // Take the content and ownership away from the other access structure
 Access::
@@ -45,14 +45,14 @@ Access::
 }
 
 void Access::
-setAccess(volatile uint8_t *a_registers,  Accessor *accessor,
-	  RegisterOffset base, bool child) {
+setAccess(volatile uint8_t *a_registers,  Accessor *a_accessor,
+	  RegisterOffset a_base, bool child) {
   if (!m_child)
     delete m_accessor;
   m_child = child;
   m_registers = a_registers;
-  m_accessor = accessor;
-  m_base = OCPI_UTRUNCATE(Offset, base);
+  m_accessor = a_accessor;
+  m_base = OCPI_UTRUNCATE(Offset, a_base);
   //      m_buffers = buffers;
 }
 

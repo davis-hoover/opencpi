@@ -148,17 +148,17 @@ namespace Xfer {
       XF::XferServices &
       createXferServices(XF::EndPoint &source, XF::EndPoint &target);
 
-      void doneWithInput(uint64_t busAddr, unsigned length) {
+      void doneWithInput(uint64_t busAddr, size_t length) {
 	if (m_disableCacheSync)
 	  return;
-	ocpi_cache_t request = { busAddr, length };
+	ocpi_cache_t request = { busAddr, OCPI_UTRUNCATE(ocpi_size_t, length) };
 	if (ioctl(m_dmaCachedFd, OCPI_CMD_INVALIDATE, &request))
 	  throw OU::Error("Error on OpenCPI IOCTL: invalidate: %u", errno);
       }
-      void doneWithOutput(uint64_t busAddr, unsigned length) {
+      void doneWithOutput(uint64_t busAddr, size_t length) {
 	if (m_disableCacheSync)
 	  return;
-	ocpi_cache_t request = { busAddr, length };
+	ocpi_cache_t request = { busAddr, OCPI_UTRUNCATE(ocpi_size_t, length) };
 	if (ioctl(m_dmaCachedFd, OCPI_CMD_FLUSH, &request))
 	  throw OU::Error("Error on OpenCPI IOCTL: flush: %u", errno);
       }

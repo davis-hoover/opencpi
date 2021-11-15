@@ -183,7 +183,7 @@ namespace Xfer {
 	m_msghdr.msg_name = &static_cast<EndPoint *>(&destEp)->sockaddr();
 	// We are depending on structure compatibility
 	m_msghdr.msg_iov = (struct iovec *)frame.iov;
-	m_msghdr.msg_iovlen = (int)frame.iovlen;
+	m_msghdr.msg_iovlen = (decltype(m_msghdr.msg_iovlen))frame.iovlen;
 	m_server.sendmsg(&m_msghdr, 0);
       }
       size_t

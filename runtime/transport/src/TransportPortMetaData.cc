@@ -162,7 +162,7 @@ PortMetaData( PortOrdinal pid,
     m_shadow_location(&ep),  m_shadow_tfactory(&ep.factory()), m_localPortSetControl(0),
     m_bufferData(NULL)
 {
-  memcpy(&m_externPortDependencyData,&pdd.desc,sizeof(Descriptors) );
+  memcpy(&m_externPortDependencyData, &pdd, sizeof(Descriptors) );
   psmd->getBufferCount()  = pdd.desc.nBuffers;
   psmd->getBufferLength() = pdd.desc.dataBufferSize;
 

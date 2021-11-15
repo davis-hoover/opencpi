@@ -29,7 +29,7 @@ namespace OCPI {
 namespace Transport {
 
 PortSet::
-PortSet(Circuit &c, bool isOutput, DataDistribution &dd, unsigned bufferCount,
+PortSet(Circuit &c, bool a_isOutput, DataDistribution &dd, unsigned bufferCount,
 	unsigned bufferSize,
 	unsigned portCount,             // if zero we are creating it empty (with no ports yet)
 	XF::EndPoint *outputEp,        // non-NULL when we are creating ports
@@ -37,7 +37,7 @@ PortSet(Circuit &c, bool isOutput, DataDistribution &dd, unsigned bufferCount,
 	const Descriptors *inputDesc) // when we are creating ports, per port
   : OCPI::Util::Child<Circuit,PortSet>(c, *this ),
     OCPI::Time::Emit(&c, "PortSet"),
-    m_portCount(portCount), m_isOutput(isOutput), m_transferController(NULL),
+    m_portCount(portCount), m_isOutput(a_isOutput), m_transferController(NULL),
   m_dataDistribution(dd), m_bufferCount(bufferCount), m_bufferLength(bufferSize) {
 
   m_ports.noShuffle();

@@ -687,12 +687,12 @@ void
 Circuit::
 checkIOZCopyQ()
 {
-  int total = 0;
+  unsigned total = 0;
 
 
-  for ( uint32_t n=0; n<m_maxPortOrd; n++ ) {
+  for (unsigned n = 0; n<m_maxPortOrd; n++) {
 
-    uint32_t n_queued = m_queuedInputOutputTransfers[n].getElementCount();
+    unsigned n_queued = m_queuedInputOutputTransfers[n].getElementCount();
     total += n_queued;
 
     if ( n_queued == 0 ) {
