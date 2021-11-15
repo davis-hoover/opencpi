@@ -33,11 +33,11 @@
 #include <stdlib.h>
 #include "OsMisc.hh"
 #include "OsAssert.hh"
-#include <OcpiRDTInterface.h>
+#include "TransportRDTInterface.hh"
 #include <test_utilities.h>
 #include "UtilCommandLineConfiguration.hh"
 #include <UtZeroCopyIOWorkers.h>
-#include <OcpiTimeEmit.h>
+#include "TimeEmit.hh"
 #include "UtilThread.hh"
 
 using namespace OCPI::Container;
@@ -375,7 +375,7 @@ int  main( int argc, char** argv)
   SignalHandler sh(sig_handler);
 
   int test_rc = 1;
-  DataTransfer::EventManager* event_manager;
+  OCPI::Xfer::EventManager* event_manager;
   int cmap[3];
 
   try {

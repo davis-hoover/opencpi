@@ -114,7 +114,7 @@ static int mymain(const char **ap) {
       ocpiDebug("Compiling OCL input file %s", sources[n]);
       if ((fds[n] = open(sources[n], O_RDONLY)) < 0 ||
 	  (sizes[n*2+1] = lseek(fds[n], 0, SEEK_END)) == -1 ||
-	  (maddr = mmap(NULL, sizes[n*2+1], PROT_READ, MAP_SHARED, fds[n], 0)) == MAP_FAILED)
+	  (maddr = mmap(NULL, (size_t)sizes[n*2+1], PROT_READ, MAP_SHARED, fds[n], 0)) == MAP_FAILED)
 	options.bad("Can't open or map source file: %s", sources[n]);
       mapped[n*2+1] = (const char *)maddr;
       ocpiDebug("Mapped OCL input file %s has length %zu", sources[n], (size_t)sizes[n*2+1]);
@@ -123,7 +123,7 @@ static int mymain(const char **ap) {
       char *cp =  new char[line.size()+1];
       strcpy(cp, line.c_str());
       mapped[n*2] = cp;
-      sizes[n*2] = line.size();
+      sizes[n*2] = (off_t)line.size();
       ocpiDebug("Mapped OCL input file has: '%s' has length %zu %d/%d", mapped[n*2],
 		(size_t)sizes[n*2], mapped[n*2][sizes[n*2]], mapped[n*2+1][sizes[n*2+1]]);
     }

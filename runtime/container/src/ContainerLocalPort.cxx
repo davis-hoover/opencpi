@@ -27,12 +27,10 @@
 
 namespace OCPI {
   namespace Container {
-    namespace OA = OCPI::API;
     namespace OM = OCPI::Metadata;
     namespace OU = OCPI::Util;
     namespace OB = OCPI::Base;
-    namespace OD = OCPI::DataTransport;
-    namespace OR = OCPI::RDT;
+    namespace OT = OCPI::Transport;
 
     LocalPort::
     LocalPort(Container &a_container, const OM::Port &mPort, bool a_isProvider,

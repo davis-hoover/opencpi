@@ -22,7 +22,7 @@
 #include "ocpi-config.h"
 #include "OsMisc.hh"
 #include "UtilCppMacros.hh"
-#include "XferManager.h"
+#include "XferManager.hh"
 #include "ContainerManager.h"
 #include "ContainerLauncher.h"
 #include "Container.h"
@@ -33,8 +33,8 @@ namespace OU = OCPI::Util;
 namespace OB = OCPI::Base;
 namespace OS = OCPI::OS;
 namespace OL = OCPI::Library;
-namespace OR = OCPI::RDT;
-namespace XF = DataTransfer;
+namespace OT = OCPI::Transport;
+namespace XF = OCPI::Xfer;
 
 namespace OCPI {
   namespace Container {
@@ -45,7 +45,7 @@ namespace OCPI {
       : //m_ourUID(mkUID()),
       OCPI::Time::Emit("Container", a_name ),
       m_enabled(false), m_ownThread(true), m_verbose(false), m_thread(NULL),
-      m_transport(*new OCPI::DataTransport::Transport(&Manager::getTransportManager(params), false, this))
+      m_transport(*new OT::Transport(&Manager::getTransportManager(params), false, this))
     {
       OB::findBool(params, "verbose", m_verbose);
       OU::SelfAutoMutex guard (this);
@@ -173,7 +173,7 @@ namespace OCPI {
       delete &m_transport;
     }
 
-    Container::DispatchRetCode Container::dispatch(DataTransfer::EventManager*)
+    Container::DispatchRetCode Container::dispatch(XF::EventManager*)
     {
       return Container::DispatchNoMore;
     }
@@ -195,7 +195,7 @@ namespace OCPI {
 	for (BridgedPortsIter bpi = m_bridgedPorts.begin(); bpi != m_bridgedPorts.end(); bpi++)
 	  (*bpi)->runBridge();
       }
-      DataTransfer::EventManager *em = getEventManager();
+      XF::EventManager *em = getEventManager();
       switch (dispatch(em)) {
       case DispatchNoMore:
 	// All done, exit from dispatch thread.
@@ -218,7 +218,7 @@ namespace OCPI {
 	 * threads a chance to run.
 	 */
 	if (em &&
-	    em->waitForEvent(usecs) == DataTransfer::EventTimeout && m_verbose)
+	    em->waitForEvent(usecs) == XF::EventTimeout && m_verbose)
 	  ocpiBad("Timeout after %u usecs waiting for event", usecs);
 	// if there is no application on this container, use less CPU
 	OCPI::OS::sleep(firstApplication() || m_bridgedPorts.size() ? 0 : 100);
@@ -311,7 +311,7 @@ namespace OCPI {
       return LocalLauncher::getSingleton();
     }
     void Container::
-    addTransport(const char *a_name, const char *id, OR::PortRole roleIn,  OR::PortRole roleOut,
+    addTransport(const char *a_name, const char *id, OT::PortRole roleIn,  OT::PortRole roleOut,
 		 uint32_t inOptions, uint32_t outOptions) {
       if (XF::getManager().find(a_name)) {
 	Transport t;

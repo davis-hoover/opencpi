@@ -31,7 +31,7 @@
 #include "OcpiContainerApi.h"
 #include "OcpiApplication.h"
 #include "OcpiLibraryManager.h"
-#include "XferManager.h"
+#include "XferManager.hh"
 #include "ContainerManager.h"
 #include "OsDebug.hh"
 #include "OsFileSystem.hh"

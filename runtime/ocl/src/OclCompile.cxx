@@ -23,9 +23,9 @@
 #include <unistd.h>
 #include "OclContainer.h"
 #include "OclDevice.h"
+namespace OU = OCPI::Util;
 namespace OCPI {
   namespace OCL {
-    
     // Compile the provided, in-memory source files.
     void Driver::
     compile(size_t nSources, const char **mapped_sources, off_t *sizes,

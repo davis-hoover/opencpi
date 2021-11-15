@@ -59,10 +59,10 @@ namespace OCPI {
     namespace OU = OCPI::Util;
     namespace OB = OCPI::Base;
     namespace OC = OCPI::Container;
-    namespace OR = OCPI::RDT;
     namespace OO = OCPI::OCL;
     namespace OX = OCPI::Util::EzXml;
-
+    namespace OT = OCPI::Transport;
+    namespace XF = OCPI::Xfer;
 
     // Data base of vendor, family, device
     struct OclVendor {
@@ -793,7 +793,7 @@ namespace OCPI {
       }
 
       void
-      run(DataTransfer::EventManager* event_manager, bool& more_to_do);
+      run(XF::EventManager* event_manager, bool& more_to_do);
     }; // End: class Application
 
     OA::ContainerApplication* Container::
@@ -804,7 +804,7 @@ namespace OCPI {
     }
 
     OC::Container::DispatchRetCode Container::
-    dispatch(DataTransfer::EventManager* event_manager) throw (OU::EmbeddedException) {
+    dispatch(XF::EventManager* event_manager) throw (OU::EmbeddedException) {
       bool more_to_do = false;
       if (!m_enabled)
 	return Stopped;
@@ -843,7 +843,7 @@ namespace OCPI {
       Container               &m_container;
       bool                     m_isEnabled;
       cl_kernel                m_clKernel;
-      OCPI::OS::Timer          m_runTimer;
+      OS::Timer                m_runTimer;
       std::vector<Port*>       m_myPorts;
       unsigned                 m_que;
 
@@ -1186,7 +1186,7 @@ namespace OCPI {
     }
 
     void Application::
-    run(DataTransfer::EventManager* /*event_manager*/, bool &more_to_do) {
+    run(XF::EventManager* /*event_manager*/, bool &more_to_do) {
       for (Worker* w = OU::Parent<Worker>::firstChild (); w; w = w->nextChild())
         w->run(more_to_do);
     }
@@ -1303,8 +1303,8 @@ namespace OCPI {
 
       // Start a connection that uses DMA
       // It is only at this point that we know that this port will use DMA and not local buffers.
-      const OCPI::RDT::Descriptors *
-      startConnect(const OCPI::RDT::Descriptors */*other*/, OCPI::RDT::Descriptors &/*feedback*/,
+      const OT::Descriptors *
+      startConnect(const OT::Descriptors */*other*/, OT::Descriptors &/*feedback*/,
 		   bool &/*done*/) {
 	if (!parent().m_container.m_device.isAmdDma())
 	  throw OU::Error("Connection to port %s of worker %s without OpenCL DMA not supported",

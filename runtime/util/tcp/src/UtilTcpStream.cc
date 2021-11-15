@@ -118,7 +118,7 @@ underflow ()
   size_t count;
 
   try {
-    count = m_socket.recv (m_inputBuffer, m_inputBufferSize);
+    count = m_socket.recv(m_inputBuffer, (size_t)m_inputBufferSize);
   }
   catch (const std::string &) {
     return traits_type::eof ();
@@ -182,7 +182,7 @@ xsputn (const char * s, std::streamsize n)
 
   while (remaining > 0) {
     try {
-      count = m_socket.send (s, remaining);
+      count = m_socket.send (s, (size_t)remaining);
     }
     catch (const std::string &) {
       return n - remaining;

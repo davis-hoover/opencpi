@@ -33,21 +33,18 @@
 #include "OsMisc.hh"
 #include "OsAssert.hh"
 #include "UtilMisc.hh"
-#include "OcpiRDTInterface.h"
+#include "TransportRDTInterface.hh"
 #include "BasePValue.hh"
 #include "ContainerWorker.h"
 #include "ContainerPort.h"
 #include "test_utilities.h"
 
-using namespace OCPI::Container;
-using namespace OCPI;
-
-
 SignalCb * SignalHandler::m_cb;
 bool SignalHandler::once;
 bool g_testUtilVerbose=true;
-static int   OCPI_RCC_DEFAULT_DATA_BUFFER_SIZE   = 2048;
+static unsigned   OCPI_RCC_DEFAULT_DATA_BUFFER_SIZE = 2048u;
 
+namespace XF = OCPI::Xfer;
 namespace OCPI {
   namespace CONTAINER_TEST {
     void  dumpPortData( OCPI::Container::Port *  p )
@@ -102,7 +99,7 @@ void OCPI::CONTAINER_TEST::connectWorkers(std::vector<CApp>& ca, std::vector<CWo
 
   std::vector<CWorker*>::iterator wit;
   for ( wit=workers.begin(); wit!=workers.end(); ++wit ) {
-    for ( int n=0; n<(*wit)->tPortCount+(*wit)->sPortCount; n++ ) {
+    for ( unsigned n=0; n<(*wit)->tPortCount+(*wit)->sPortCount; n++ ) {
       if ( (*wit)->pdata[n].input ){
         continue;
       }
@@ -138,7 +135,7 @@ void  OCPI::CONTAINER_TEST::testDispatch(OCPI::API::Container* rcc_container)
   if ( event_manager ) {
     do {
       rcc_container->dispatch(event_manager);
-      if ( event_manager->waitForEvent( 100  ) == DataTransfer::EventTimeout ) {
+      if ( event_manager->waitForEvent( 100  ) == XF::EventTimeout ) {
         printf("We have not recieved an event for 100 uSec.\n");
       }
       else {
@@ -191,7 +188,7 @@ void OCPI::CONTAINER_TEST::createPorts( std::vector<CApp>& ca, std::vector<CWork
   TUPRINTF( "In  OCPI::CONTAINER_TEST::createPorts\n");
 
   std::vector<CWorker*>::iterator wit;
-  int n;
+  unsigned n;
   for ( wit=workers.begin(); wit!=workers.end(); ++wit ) {
     TUPRINTF( "Worker target port count = %d\n", (*wit)->tPortCount );
 
@@ -229,7 +226,7 @@ OCPI::Util::Thread*  OCPI::CONTAINER_TEST::runTestDispatch(  OCPI::CONTAINER_TES
 
 
 std::vector<CApp> OCPI::CONTAINER_TEST::createContainers( std::vector<ContainerDesc>& eps, 
-                                                         DataTransfer::EventManager*& ,
+                                                         XF::EventManager*& ,
                                                          bool )
 {
   TUPRINTF( "In  OCPI::CONTAINER_TEST::createContainers\n");
@@ -260,8 +257,8 @@ std::vector<CApp> OCPI::CONTAINER_TEST::createContainers( std::vector<ContainerD
   return containers;
 }
 
-std::vector<CApp> OCPI::CONTAINER_TEST::createContainers( std::vector<const char*>& eps, 
-                                                         DataTransfer::EventManager*& event_manager, bool polling )
+std::vector<CApp> OCPI::CONTAINER_TEST::createContainers( std::vector<const char*>& eps,
+                                                         XF::EventManager*& event_manager, bool polling )
 {
   ( void ) eps;
   ( void ) polling;
@@ -303,7 +300,7 @@ void OCPI::CONTAINER_TEST::disconnectPorts( std::vector<CApp>& ca, std::vector<C
   std::vector<CWorker*>::iterator wit;
 
   for ( wit=workers.begin(); wit!=workers.end(); ++wit ) {
-    for ( int n=0; n<((*wit)->sPortCount+(*wit)->tPortCount); n++ ) {
+    for ( unsigned n=0; n<((*wit)->sPortCount+(*wit)->tPortCount); n++ ) {
       if ( (*wit)->pdata[n].port ) {
         (*wit)->pdata[n].port->disconnect();
       }

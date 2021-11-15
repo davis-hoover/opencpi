@@ -367,8 +367,8 @@ run(const char *command, char *&out)
 	  // since windows translates CRLF sequences, the size of the
 	  // file is NOT what will be read.  Any CRLFs read as LFs.
 	  if (lseek(ofd, 0, SEEK_SET) != 0 ||
-	      !(out = (char *)malloc(oSize + 1)) ||
-	      read(ofd, (char *)out, oSize) < 0)
+	      !(out = (char *)malloc((size_t)oSize + 1u)) ||
+	      read(ofd, (char *)out, (size_t)oSize) < 0)
 	    err = "internal error running idl parser 7";
 	  else
 	    out[oSize] = 0;
@@ -387,8 +387,8 @@ run(const char *command, char *&out)
 	  // since windows translates CRLF sequences, the size of the
 	  // file is NOT what will be read.  Any CRLFs read as LFs.
 	  if (lseek(efd, 0, SEEK_SET) != 0 ||
-	      !(myErr = (char *)malloc(eSize + 1)) ||
-	      (n = read(efd, (void *)myErr, eSize)) < 0)
+	      !(myErr = (char *)malloc((size_t)eSize + 1u)) ||
+	      (n = read(efd, (void *)myErr, (size_t)eSize)) < 0)
 	    err = "internal error running idl parser 10";
 	  else {
 	    while (eSize && myErr[eSize-1] == '\n')
@@ -500,7 +500,7 @@ static void getString(std::string &s, const char *&p, const char *sep = " ") {
   const char *np = p;
   while (*np && !strchr(sep, *np))
     np++;
-  size_t length = np - p;
+  size_t length = OCPI_SIZE_T_DIFF(np, p);
   s.assign(p, length);
   p += length;
   if (*p)
@@ -508,7 +508,7 @@ static void getString(std::string &s, const char *&p, const char *sep = " ") {
 }
   // parse a positive number up to a space, and update the pointer
 unsigned long getNum(const char *&cp, const char *term = " ") {
-  unsigned n = atoi(cp);
+  unsigned n = (unsigned)atoi(cp);
   while (*cp && !strchr(term, *cp))
     cp++;
   if (*cp)
@@ -737,7 +737,7 @@ emitProtocol(const char *const *argv, const char *outDir, const char *file,
       slash = file;
     if (!dot)
       dot = file + strlen(file);
-    s.assign(slash, dot - slash);
+    s.assign(slash, OCPI_SIZE_T_DIFF(dot, slash));
     structName = s.c_str();
   }
   char *repo;

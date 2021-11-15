@@ -233,7 +233,7 @@ sendAnyRequest (const OCPI::Util::Uri & uri,
   requestLine += (char) ('0' + m_minorVersion);
   requestLine += "\r\n";
 
-  m_outConn->write (requestLine.data(), requestLine.length());
+  m_outConn->write (requestLine.data(), (std::streamsize)requestLine.length());
 
   if (requestHeaders.find ("Host") == requestHeaders.end()) {
     *m_outConn << "Host: "
@@ -935,10 +935,10 @@ xsgetn (char * s, std::streamsize n)
     s += count;
 
     if (m_chunked) {
-      m_chunkRemaining -= count;
+      m_chunkRemaining -= (decltype(m_chunkRemaining))count;
     }
     else if (m_contentLength != static_cast<unsigned long long> (-1)) {
-      m_contentRemaining -= count;
+      m_contentRemaining -= (decltype(m_contentRemaining))count;
     }
   }
 
@@ -1079,7 +1079,7 @@ readBody ()
   while (this->good() && !this->eof() &&
          m_body.length() < MAX_LENGTH_OF_BODY) {
     this->read (bodyBuffer, 10240);
-    m_body.append (bodyBuffer, this->gcount());
+    m_body.append (bodyBuffer, (size_t)this->gcount());
   }
 }
 

@@ -112,7 +112,7 @@ OCPI::Logger::Tee::TeeBuf::sync ()
       if ((*it).delegatee->good ()) {
         (*it).delegatee->setLogLevel (m_logLevel);
         (*it).delegatee->setProducerName (m_producerName.c_str());
-        (*it).delegatee->write (m_logMessage.data(), m_logMessage.length());
+        (*it).delegatee->write (m_logMessage.data(), (std::streamsize)m_logMessage.length());
         (*it).delegatee->flush ();
       }
 
@@ -160,7 +160,7 @@ OCPI::Logger::Tee::TeeBuf::xsputn (const char * data, std::streamsize count)
     overflow (traits_type::eof());
   }
 
-  m_logMessage.append (data, count);
+  m_logMessage.append(data, (size_t)count);
   return count;
 }
 

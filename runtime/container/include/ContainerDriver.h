@@ -68,7 +68,7 @@ namespace OCPI {
     class Manager : public OCPI::API::ContainerManager,
 		    public OCPI::Base::Plugin::ManagerBase<Manager, Driver, container> {
       unsigned cleanupPosition();
-      OCPI::DataTransport::TransportManager &getTransportManagerInternal(const OCPI::Base::PValue *params);
+      OCPI::Transport::TransportManager &getTransportManagerInternal(const OCPI::Base::PValue *params);
       friend class Container;
       friend class OCPI::API::ContainerManager;
     protected:
@@ -95,7 +95,7 @@ namespace OCPI {
       }
       void shutdown();
       // convenience
-      static inline OCPI::DataTransport::TransportManager &
+      static inline OCPI::Transport::TransportManager &
       getTransportManager(const OCPI::Base::PValue *params = NULL) {
 	return getSingleton().getTransportManagerInternal(params);
       }
@@ -103,7 +103,7 @@ namespace OCPI {
       static bool optimized();
     private:
       // Globals dependant on polling
-      OCPI::DataTransport::TransportManager *m_tpg_events, *m_tpg_no_events;
+      OCPI::Transport::TransportManager *m_tpg_events, *m_tpg_no_events;
     };
     static inline Manager &getManager() { return Manager::getSingleton(); }
 

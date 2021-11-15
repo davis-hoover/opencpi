@@ -28,11 +28,11 @@
 #include "RemoteServer.h"
 #include "OcpiServer.h"
 
-namespace OU =  OCPI::Util;
+namespace OU = OCPI::Util;
 namespace OC = OCPI::Container;
 namespace OA = OCPI::API;
 namespace OS = OCPI::OS;
-namespace OT = OCPI::RDT;
+namespace OT = OCPI::Transport;
 namespace OR = OCPI::Remote;
 
 

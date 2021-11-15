@@ -39,7 +39,8 @@ OcpiCanRemoveNeeded=0
 # -install_name @rpath/$(notdir $@)
 # MacOS uses CLANG/LLVM
 OcpiCXX=c++
-OcpiCXXFlags+=-I/opt/local/include -Wl,-L/opt/local/lib
+OcpiCXXFlags+=-I/opt/local/include
+#-Wl,-L/opt/local/lib
 OcpiCFlags+=-D_DARWIN_C_SOURCE=900000L
 OcpiCXXLD=c++
 OcpiExtraLibs:=

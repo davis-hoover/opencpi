@@ -30,7 +30,7 @@
 #include "UtilMisc.hh" // Singleton
 #include "BaseValue.hh"
 #include "OcpiLibraryManager.h"
-#include "OcpiRDTInterface.h"
+#include "TransportRDTInterface.hh"
 #include "OcpiContainerApi.h"
 #include "ContainerWorker.h"
 
@@ -50,8 +50,8 @@ namespace OCPI {
     struct Transport {
       std::string   transport;     // transport driver/mechanism/protocol to move data
       std::string   id;            // the identity of the instance of the fabric/network
-      OCPI::RDT::PortRole roleIn;  // what is the preferred role for input
-      OCPI::RDT::PortRole roleOut; // what is the preferred role for output
+      OCPI::Transport::PortRole roleIn;  // what is the preferred role for input
+      OCPI::Transport::PortRole roleOut; // what is the preferred role for output
       uint32_t optionsIn;          // available options for input
       uint32_t optionsOut;         // available options for output
       Transport();

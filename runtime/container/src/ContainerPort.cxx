@@ -30,8 +30,7 @@ namespace OCPI {
     namespace OM = OCPI::Metadata;
     namespace OU = OCPI::Util;
     namespace OB = OCPI::Base;
-    namespace OD = OCPI::DataTransport;
-    namespace OR = OCPI::RDT;
+    namespace OT = OCPI::Transport;
 
     Port::Port(Container &a_container, const OM::Port &mPort, const OB::PValue *params) :
       LocalPort(a_container, mPort, mPort.m_provider, params),
@@ -61,8 +60,8 @@ namespace OCPI {
     }
 
     // Older API for compatibility with ctests
-    void Port::connect(OCPI::API::Port &other, const OCPI::API::PValue */*myParams*/,
-		       const OCPI::API::PValue */*otherParams*/) {
+    void Port::connect(OA::Port &other, const OA::PValue */*myParams*/,
+		       const OA::PValue */*otherParams*/) {
       Launcher::Connection c;
       c.m_in.m_port = isProvider() ? this : &other.containerPort(),
       c.m_out.m_port = isProvider() ? &other.containerPort() : this;

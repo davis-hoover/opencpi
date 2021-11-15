@@ -34,7 +34,7 @@
 #include "UtilMisc.hh"
 #include "UtilEzxml.hh"
 #include "MetadataWorker.hh"
-#include "XferManager.h"
+#include "XferManager.hh"
 #include "HdlSimServer.h"
 #include "HdlDriver.h"
 #include "HdlContainer.h"
@@ -48,10 +48,10 @@ namespace OH = OCPI::HDL;
 namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 namespace OA = OCPI::API;
-namespace OD = OCPI::DataTransport;
+namespace OT = OCPI::Transport;
 namespace OC = OCPI::Container;
 namespace OS = OCPI::OS;
-namespace DT = DataTransfer;
+namespace XF = OCPI::Xfer;
 /*
   usage message
   verbose
@@ -1387,8 +1387,8 @@ receiveRDMA(const char **/*ap*/) {
   if (!*ap)
     setupDevice(false);
   std::string file;
-  OD::TransportGlobal &global(OC::Manager::getTransportGlobal());
-  OD::Transport transport(&global, false);
+  OT::TransportGlobal &global(OC::Manager::getTransportGlobal());
+  OT::Transport transport(&global, false);
   if (endpoint.empty())
     endpoint = "ocpi-ether-rdma";
 #if 0
@@ -1397,12 +1397,12 @@ receiveRDMA(const char **/*ap*/) {
     OA::PVEnd
   };
 #endif
-  OD::Descriptor myInputDesc;
+  OT::Descriptor myInputDesc;
   // Initialize out input descriptor before it is processed and
   // completed by the transport system.
-  myInputDesc.type = OD::ConsumerDescT;
-  myInputDesc.role = OD::ActiveFlowControl;
-  myInputDesc.options = 1 << OD::MandatedRole;
+  myInputDesc.type = OT::ConsumerDescT;
+  myInputDesc.role = OT::ActiveFlowControl;
+  myInputDesc.options = 1 << OT::MandatedRole;
   myInputDesc.desc.nBuffers = 10;
   myInputDesc.desc.dataBufferBaseAddr = 0;
   myInputDesc.desc.dataBufferPitch = 0;
@@ -1421,13 +1421,13 @@ receiveRDMA(const char **/*ap*/) {
   memset( myInputDesc.desc.oob.oep, 0, sizeof(myInputDesc.desc.oob.oep));
   myInputDesc.desc.oob.cookie = 0;
 #if 0
-  OD::Port &port = *transport.createInputPort(myInputDesc, params);
+  OT::Port &port = *transport.createInputPort(myInputDesc, params);
 #else
-  OD::Port &port = *transport.createInputPort(myInputDesc);
+  OT::Port &port = *transport.createInputPort(myInputDesc);
 #endif
   ocpiDebug("Our input descriptor: %s", myInputDesc.desc.oob.oep);
   // Now the normal transport/transfer driver has initialized (not finalized) the input port.
-  OD::Descriptor theOutputDesc;
+  OT::Descriptor theOutputDesc;
   OH::Access
     edpAccess, edpConfAccess, smaAccess, smaConfAccess, gbeAccess, gbeConfAccess,
     genAccess, genConfAccess;
@@ -1437,7 +1437,7 @@ receiveRDMA(const char **/*ap*/) {
     file = *ap;
     file += ".in";
     // Strip out our ether interface.
-    OD::Descriptor sendDesc = myInputDesc;
+    OT::Descriptor sendDesc = myInputDesc;
     const char *sp = strchr(myInputDesc.desc.oob.oep,'/');
     std::string clean("ocpi-ether-rdma:");
     clean.append(sp+1);
@@ -1483,9 +1483,9 @@ receiveRDMA(const char **/*ap*/) {
     ocpiCheck(wwop(gbeAccess, "initialize") == OCCP_SUCCESS_RESULT);
     ocpiCheck(wwop(genAccess, "initialize") == OCCP_SUCCESS_RESULT);
     // 2. Synthesize the output descriptor
-    theOutputDesc.type = OD::ProducerDescT;
-    theOutputDesc.role = OD::ActiveMessage;
-    theOutputDesc.options = 1 << OD::MandatedRole;
+    theOutputDesc.type = OT::ProducerDescT;
+    theOutputDesc.role = OT::ActiveMessage;
+    theOutputDesc.options = 1 << OT::MandatedRole;
     theOutputDesc.desc.nBuffers = 3;
     theOutputDesc.desc.dataBufferBaseAddr = 0;
     theOutputDesc.desc.dataBufferPitch = 4096;
@@ -1504,9 +1504,9 @@ receiveRDMA(const char **/*ap*/) {
     theOutputDesc.desc.oob.port_id = 0;
     theOutputDesc.desc.oob.cookie = 0;
     uint32_t outputEndPointSize = edpConfAccess.get32Register(memoryBytes, OH::OcdpProperties);
-    DT::EndPoint &outputEndPoint =
-      DT::getManager().allocateProxyEndPoint(endpoint.c_str(), true, outputEndPointSize);
-    OD::Transport::fillDescriptorFromEndPoint(outputEndPoint, theOutputDesc);
+    XF::EndPoint &outputEndPoint =
+      XF::getManager().allocateProxyEndPoint(endpoint.c_str(), true, outputEndPointSize);
+    OT::Transport::fillDescriptorFromEndPoint(outputEndPoint, theOutputDesc);
   }
   // Finalizing the input port takes: role, type flow, emptyflagbase, size, pitch, value
   // This makes the input port ready to data from the output port
@@ -1597,7 +1597,7 @@ receiveRDMA(const char **/*ap*/) {
     uint8_t opCode;
     size_t length;
     uint8_t *vdata;
-    OD::BufferUserFacet *buf;
+    OT::BufferUserFacet *buf;
     unsigned t;
     for (t = 0; t < 1000000 && !(buf = port.getNextFullInputBuffer(vdata, length, opCode)); t++)
       OS::sleep(1);
@@ -1621,12 +1621,12 @@ sendRDMA(const char **ap) {
   if (!*ap)
     setupDevice(false);
   std::string file;
-  OD::TransportManager &global(OC::Manager::getTransportManager());
-  OD::Transport transport(&global, false);
-  OD::Descriptor myOutputDesc;
-  myOutputDesc.type = OD::ProducerDescT;
-  myOutputDesc.role = OD::ActiveMessage;
-  myOutputDesc.options = 1 << OD::MandatedRole;
+  OT::TransportManager &global(OC::Manager::getTransportManager());
+  OT::Transport transport(&global, false);
+  OT::Descriptor myOutputDesc;
+  myOutputDesc.type = OT::ProducerDescT;
+  myOutputDesc.role = OT::ActiveMessage;
+  myOutputDesc.options = 1 << OT::MandatedRole;
   myOutputDesc.desc.nBuffers = 10;
   myOutputDesc.desc.dataBufferBaseAddr = 0;
   myOutputDesc.desc.dataBufferPitch = 0;
@@ -1645,7 +1645,7 @@ sendRDMA(const char **ap) {
   memset( myOutputDesc.desc.oob.oep, 0, sizeof(myOutputDesc.desc.oob.oep));
   myOutputDesc.desc.oob.cookie = 0;
 
-  OD::Descriptor theInputDesc;
+  OT::Descriptor theInputDesc;
   if (*ap) {
     file = *ap;
     file += ".in";
@@ -1656,9 +1656,9 @@ sendRDMA(const char **ap) {
       bad("Reading file for RDMA input descriptor");
     ocpiDebug("Received descriptor for: %s", myOutputDesc.desc.oob.oep);
   } else {
-    theInputDesc.type = OD::ProducerDescT;
-    theInputDesc.role = OD::ActiveMessage;
-    theInputDesc.options = 1 << OD::MandatedRole;
+    theInputDesc.type = OT::ProducerDescT;
+    theInputDesc.role = OT::ActiveMessage;
+    theInputDesc.options = 1 << OT::MandatedRole;
     theInputDesc.desc.nBuffers = 10;
     theInputDesc.desc.dataBufferBaseAddr = 0;
     theInputDesc.desc.dataBufferPitch = 0;
@@ -1677,16 +1677,16 @@ sendRDMA(const char **ap) {
     memset( theInputDesc.desc.oob.oep, 0, sizeof(theInputDesc.desc.oob.oep));
     theInputDesc.desc.oob.cookie = 0;
   }
-  OD::Port &port = *transport.createOutputPort(myOutputDesc, theInputDesc);
-  OD::Descriptor localShadowPort, feedback;
+  OT::Port &port = *transport.createOutputPort(myOutputDesc, theInputDesc);
+  OT::Descriptor localShadowPort, feedback;
   bool done;
-  const OD::Descriptor *outDesc =
+  const OT::Descriptor *outDesc =
     port.finalize(&theInputDesc, myOutputDesc, &localShadowPort, done);
   assert(outDesc);
   if (*ap) {
     file = *ap;
     file += ".out";
-    OD::Descriptor sendDesc = *outDesc;
+    OT::Descriptor sendDesc = *outDesc;
     const char *sp = strchr(outDesc->desc.oob.oep, '/');
     std::string clean("ocpi-ether-rdma:");
     clean.append(sp+1);
@@ -1703,7 +1703,7 @@ sendRDMA(const char **ap) {
   for (unsigned n = 0; n < 10; n++) {
     uint8_t *vdata;
     size_t length;
-    OD::BufferUserFacet *buf;
+    OT::BufferUserFacet *buf;
     unsigned t;
     for (t = 0; t < 1000000 && !(buf = port.getNextEmptyOutputBuffer(vdata, length)); t++)
       OS::sleep(1);

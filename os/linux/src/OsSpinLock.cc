@@ -27,8 +27,8 @@
 #include "OsPosixError.hh"
 
 #ifdef __APPLE__
-#include <libkern/OSAtomic.h>
-typedef volatile OSSpinLock pthread_spinlock_t;
+#include <os/lock.h>
+typedef os_unfair_lock pthread_spinlock_t;
 #endif
 /*
  * Linux does implement spinlocks as defined in "Advanced Realtime Threads"
@@ -56,7 +56,7 @@ OCPI::OS::SpinLock::SpinLock ()
     throw OCPI::OS::Posix::getErrorMessage (res);
   }
 #else
-  *o2pm(m_osOpaque) = 0;
+  *o2pm(m_osOpaque) = OS_UNFAIR_LOCK_INIT;
 #endif
 }
 
@@ -78,7 +78,7 @@ OCPI::OS::SpinLock::lock ()
     throw OCPI::OS::Posix::getErrorMessage (res);
   }
 #else
-  OSSpinLockLock(o2pm(m_osOpaque));
+  os_unfair_lock_unlock(o2pm(m_osOpaque));
 #endif
 }
 
@@ -93,7 +93,7 @@ OCPI::OS::SpinLock::trylock ()
   }
   return ((res == 0) ? true : false);
 #else
-  return OSSpinLockTry(o2pm(m_osOpaque));
+  return os_unfair_lock_trylock(o2pm(m_osOpaque));
 #endif
 }
 
@@ -107,6 +107,6 @@ OCPI::OS::SpinLock::unlock ()
     throw OCPI::OS::Posix::getErrorMessage (res);
   }
 #else
-  OSSpinLockUnlock(o2pm(m_osOpaque));
+  os_unfair_lock_unlock(o2pm(m_osOpaque));
 #endif
 }

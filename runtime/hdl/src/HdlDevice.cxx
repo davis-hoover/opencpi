@@ -23,7 +23,7 @@
 #include <signal.h>
 #include <lzma.h>
 #include <unistd.h>
-#include "XferManager.h"
+#include "XferManager.hh"
 #include "HdlDevice.h"
 #include "HdlDriver.h"
 #include "HdlContainer.h"
@@ -37,7 +37,9 @@ namespace OCPI {
     namespace OM = OCPI::Metadata;
     namespace OU = OCPI::Util;
     namespace OB = OCPI::Base;
-    namespace OO = OCPI::OS;
+    namespace OS = OCPI::OS;
+    namespace XF = OCPI::Xfer;
+    namespace OT = OCPI::Transport;
 
     enum TimeService_PPS_out_source {
       TIME_SERVICE_PPS_OUT_SOURCE_TIMESERVER_BASED,
@@ -131,7 +133,7 @@ namespace OCPI {
     void Device::
     enableTimeNowUpdatesFromPPS() {
       Access *ts = timeServer();
-      auto os = 0;
+      size_t os = 0;
       if (ts) {
         if (getUsingPPS()) {
           os = offsetof(TimeService, enable_time_now_updates_from_PPS);
@@ -191,9 +193,9 @@ namespace OCPI {
           // See AV-4297 for more information
 
           // The uint type we are using to iterate over the magic number.
-          const int iter_size = 8;
-          const int num_iter = (sizeof(magic) * 8)/iter_size;
-          for (int i=0; i < num_iter; i++) {
+          const unsigned iter_size = 8;
+          const unsigned num_iter = (sizeof(magic) * 8)/iter_size;
+          for (unsigned i = 0; i < num_iter; i++) {
             // Get the magic number in uint8's going right to left
             const uint8_t curr = m_cAccess.get8RegisterOffset(offsetof(OccpAdminRegisters, magic) + 
                                                               sizeof(uint8_t) * i);
@@ -276,7 +278,7 @@ namespace OCPI {
                                                         sizeof(HdlUUID), 8);
       // Fix the endianness
       for (unsigned n = 0; n < sizeof(HdlUUID); n++)
-        ((uint8_t*)&m_UUID)[n] = ((uint8_t *)&myUUIDtmp)[(n & ~3) + (3 - (n&3))];
+        ((uint8_t*)&m_UUID)[n] = ((uint8_t *)&myUUIDtmp)[(n & ~3u) + (3u - (n&3u))];
       memcpy(&m_loadedUUID, m_UUID.uuid, sizeof(m_loadedUUID));
     }
     RomWord Device::
@@ -466,26 +468,26 @@ namespace OCPI {
       if (index >= OCCP_MAX_WORKERS)
         throw OU::Error("Invalid occpIndex property");
       // FIXME:  check runtime for connected worker
-      m_cAccess.offsetRegisters(worker, (intptr_t)(&((OccpSpace*)0)->worker[index]));
-      m_cAccess.offsetRegisters(a_properties,(intptr_t)(&((OccpSpace*)0)->config[index]));
+      m_cAccess.offsetRegisters(worker, (uintptr_t)(&((OccpSpace*)0)->worker[index]));
+      m_cAccess.offsetRegisters(a_properties,(uintptr_t)(&((OccpSpace*)0)->config[index]));
     }
     void Device::
     releaseWorkerAccess(size_t /* index */,
                         Access & /* worker */,
                         Access & /* properties */) {
     }
-    DataTransfer::EndPoint &Device::
+    XF::EndPoint &Device::
     getEndPoint() {
       if (!m_endPoint) {
-	m_endPoint = &DataTransfer::getManager().allocateProxyEndPoint(m_endpointSpecific.c_str(), false,
+	m_endPoint = &XF::getManager().allocateProxyEndPoint(m_endpointSpecific.c_str(), false,
 								       OCPI_UTRUNCATE(size_t, m_endpointSize));
 	m_endPoint->addRef();
       }
       return *m_endPoint;
     }
     void Device::
-    connect(DataTransfer::EndPoint &/*ep*/, OCPI::RDT::Descriptors &/*mine*/,
-            const OCPI::RDT::Descriptors &/*other*/) {
+    connect(XF::EndPoint &/*ep*/, OT::Descriptors &/*mine*/,
+            const OT::Descriptors &/*other*/) {
     }
     // Static
     void Device::
@@ -527,7 +529,7 @@ namespace OCPI {
       strcpy(temp.load, "ld");
       strcpy(temp.dna, "\001\002\003\004\005\006\007");
       for (unsigned n = 0; n < sizeof(HdlUUID); n++)
-        ((uint8_t *)&hdlUuid)[n] = ((uint8_t *)&temp)[(n & ~3) + (3 - (n & 3))];
+        ((uint8_t *)&hdlUuid)[n] = ((uint8_t *)&temp)[(n & ~3u) + (3u - (n & 3u))];
     }
   }
 }

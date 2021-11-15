@@ -35,6 +35,7 @@ namespace OCPI {
       namespace OU = OCPI::Util;
       namespace OB = OCPI::Base;
       namespace OE = OCPI::OS::Ether;
+      namespace OT = OCPI::Transport;
 
       unsigned typeLength[] = {
 	sizeof(EtherControlNop), sizeof(EtherControlWrite),
@@ -72,7 +73,7 @@ namespace OCPI {
       // Networks only push.
       uint32_t Device::
       dmaOptions(ezxml_t /*icImplXml*/, ezxml_t /*icInstXml*/, bool isProvider) {
-	return 1 << (isProvider ? OCPI::RDT::ActiveFlowControl : OCPI::RDT::ActiveMessage);
+	return 1 << (isProvider ? OT::ActiveFlowControl : OT::ActiveMessage);
       }
       void Device::
       request(EtherControlMessageType type, RegisterOffset offset,

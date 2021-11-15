@@ -33,7 +33,7 @@
 #include <stdlib.h>
 #include "OsMisc.hh"
 #include "OsAssert.hh"
-#include <OcpiRDTInterface.h>
+#include "TransportRDTInterface.hh"
 #include <test_utilities.h>
 
 #include <UtZeroCopyIOWorkers.h>
@@ -331,7 +331,7 @@ int  main( int /*argc*/, char** /*argv*/)
 #endif
 {
   int test_rc = 1;
-  DataTransfer::EventManager* event_manager;
+  OCPI::Xfer::EventManager* event_manager;
   std::vector<const char*> endpoints;
   endpoints.push_back( g_ep1 );
   endpoints.push_back( g_ep2 );

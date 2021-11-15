@@ -30,7 +30,7 @@
 #include <stdio.h>
 #include <string.h>
 #ifdef TIME_IT
-#include <OcpiTimeEmitC.h>
+#include "TimeEmitC.hh"
 #endif
 #include "UtZeroCopyIOWorkers.h"
 
