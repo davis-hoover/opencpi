@@ -66,9 +66,9 @@ static int mymain(const char **ap) {
 	std::string var;
 	OA::BaseType type;
 	if (colon && colon < eq) {
-	  var.assign(*vars, colon - *vars);
+	  var.assign(*vars, OCPI_SIZE_T_DIFF(colon, *vars));
 	  std::string typeName;
-	  typeName.assign(colon + 1, eq - (colon + 1));
+	  typeName.assign(colon + 1, OCPI_SIZE_T_DIFF(eq, (colon + 1)));
 	  const char **tp;
 	  for (tp = OB::baseTypeNames; *tp; tp++)
 	    if (!strcasecmp(typeName.c_str(), *tp))
@@ -79,7 +79,7 @@ static int mymain(const char **ap) {
 	  if (type == OA::OCPI_Enum || type == OA::OCPI_Struct || type == OA::OCPI_Type)
 	    options.bad("Ivalid variable type: \"%s\"", typeName.c_str());
 	} else {
-	  var.assign(*vars, eq - *vars);
+	  var.assign(*vars, OCPI_SIZE_T_DIFF(eq, *vars));
 	  type = OA::OCPI_Long;
 	}
 	OB::ValueType *vt = new OB::ValueType(type);

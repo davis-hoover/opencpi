@@ -26,7 +26,7 @@ int main()
     int i;
     int method;
     int result;
-    long int wait_time;
+    long unsigned wait_time;
     fasttime_statistics_t stats;
     
     method = fasttime_init_context(NULL, 
@@ -57,7 +57,7 @@ int main()
     if (!stats.ready)
     {
       clock_gettime(CLOCK_REALTIME, &tp_actual);
-      wait_time = stats.ready_time - tp_actual.tv_sec;
+      wait_time = (unsigned long)(stats.ready_time - tp_actual.tv_sec);
         if (wait_time > 0)
         {
             printf("Waiting %ld secs for fasttime to get ready...\n", wait_time);
@@ -81,13 +81,13 @@ int main()
     for (i = 0; i < RUNS; i++)
         fasttime_gettime(&tp_end);  
     fast_time = ((uint64_t) (tp_end.tv_sec - tp_start.tv_sec)) * 1000000000 +
-                            (tp_end.tv_nsec - tp_start.tv_nsec);
+      (uint64_t)(tp_end.tv_nsec - tp_start.tv_nsec);
 
     fasttime_gettime(&tp_start);
     for (i = 0; i < RUNS; i++)
       clock_gettime(CLOCK_REALTIME, &tp_end ); 
     actual_time = ((uint64_t) (tp_end.tv_sec - tp_start.tv_sec)) * 1000000000 +
-                              (tp_end.tv_nsec - tp_start.tv_nsec);
+      (uint64_t)(tp_end.tv_nsec - tp_start.tv_nsec);
     
     printf(" Fast:   %f secs\n", (double) fast_time / 1000000000.0);
     printf(" Actual: %f secs\n", (double) actual_time / 1000000000.0);

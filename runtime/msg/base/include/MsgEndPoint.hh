@@ -35,7 +35,7 @@
 #include "UtilSelfMutex.hh"
 #include "XferEndPoint.hh"
 #include "Transport.hh"
-#include "TransportMsgCircuit.hh"
+#include "MsgCircuit.hh"
 
 namespace OCPI {
   namespace Msg {

@@ -36,8 +36,8 @@
 #include <string>
 #include "Transport.hh"
 #include "TransportIntEventHandler.hh"
-#include "TransportMsgThreadHook.hh"
-#include "TransportMsgCircuit.hh"
+#include "MsgThreadHook.hh"
+#include "MsgCircuit.hh"
 
 
 namespace OCPI {

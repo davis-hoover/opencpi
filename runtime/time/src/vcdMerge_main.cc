@@ -147,7 +147,7 @@ struct VCDValue :  public VCDBase {
     :VCDBase(v),type(JunkT){parse();}
   void parse() {
     int c;
-    for (unsigned int n=0; n<m_value.size(); n++) {
+    for (size_t n = 0; n < m_value.size(); n++) {
       if ( isspace( m_value[n] ) ) {
         continue;
       }
@@ -168,8 +168,9 @@ struct VCDValue :  public VCDBase {
         type = VariableT;
         // Format 01010token
         std::string t;
-        long nn;
-        for (nn=m_value.length()-1; nn>=0; nn--) {
+        size_t nn;
+        for (nn = m_value.length(); nn;) {
+	  --nn;
           if ( (m_value[nn]>=48) && (m_value[nn]<=57) ) {
             memcpy(token,t.c_str(),t.length());
             token[t.length()]=0;
@@ -370,7 +371,7 @@ public:
         }
       }
     }
-    for ( int n=0; n<(int)time.size(); n++ ) {
+    for (unsigned n=0; n<time.size(); n++ ) {
       replaceTokens( time[n], val_defs );
     }
 

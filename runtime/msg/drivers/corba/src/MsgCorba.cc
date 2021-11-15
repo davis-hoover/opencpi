@@ -25,8 +25,8 @@
 
 #include <list>
 #include "UtilIOP.hh"
-#include "TransportMsgEndPoint.hh"
-#include "TransportMsgDriver.hh"
+#include "MsgEndPoint.hh"
+#include "MsgDriver.hh"
 
 namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;

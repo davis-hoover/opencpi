@@ -26,9 +26,9 @@
 #include "UtilThread.hh"
 #include "TransportRDTInterface.hh"
 #include "TransportBuffer.hh"
-#include "TransportMsgServer.hh"
-#include "TransportMsgCircuit.hh"
-#include "TransportMsgEndPoint.hh"
+#include "MsgServer.hh"
+#include "MsgCircuit.hh"
+#include "MsgEndPoint.hh"
 
 
 #define CATCH_ALL_RETURN1( msg )						\
@@ -36,7 +36,7 @@
     printf("gpp: Caught an int exception while %s = %d\n", msg,ii );	\
     return 1;								\
   }									\
-  catch ( OCPI::Util::EmbeddedException& eex ) {			\
+  catch (OU::EmbeddedException &eex) {			\
     printf(" gpp: Caught an embedded exception while %s:\n", msg);	\
     printf( " error number = %d", eex.m_errorCode );			\
     printf( " aux info = %s\n", eex.m_auxInfo.c_str() );                \
@@ -65,34 +65,37 @@ int  OCPI_RCC_CONT_NBUFFERS      = 1;
 
 namespace OT = OCPI::Transport;
 namespace OS = OCPI::OS;
+namespace OU = OCPI::Util;
+namespace OCPI {
+namespace Msg {
 // Program globals
 static const char *server_end_point = "ocpi-socket-rdma:localhost;40006:600000.2.8";
 static const char *loopback_end_point = "ocpi-socket-rdma:localhost;0:600000.3.8";
 static volatile int circuit_count=0;
-static OT::MessageCircuit     *gpp_circuits[10];
+static MessageCircuit     *gpp_circuits[10];
 //static Server *server=NULL;
 
 
 #define CS_DISPATCH if (server)server->dispatch();if(client)client->dispatch();
 
-class TransportSEventHandler : public OT::ServerEventHandler
+class TransportSEventHandler : public ServerEventHandler
 {
 public:
 
-  void newMessageCircuitAvailable( OT::MessageCircuit* new_circuit )
+  void newMessageCircuitAvailable(MessageCircuit* new_circuit )
   {
     printf("TransportEventHandler::newCircuitAvailable new circuit available\n");
     gpp_circuits[circuit_count++] = new_circuit;
   }
 
-  void dataAvailable( OT::MessageCircuit* /* circuit */ ) {
+  void dataAvailable(MessageCircuit* /* circuit */ ) {
 
   }
 
   /**********************************
    * This method gets called when an error gets generated
    *********************************/
-  void error( OCPI::Util::EmbeddedException& ex )
+  void error(OU::EmbeddedException& ex )
   {
     printf("TransportEventHandler: Got an exception, (%d%s)\n", ex.getErrorCode(), ex.getAuxInfo() );
   }
@@ -108,7 +111,7 @@ public:
   /**********************************
    *  This method gets called when data is available on a circuit
    **********************************/        
-  void dataAvailable( OT::MessageCircuit* /* circuit */ )
+  void dataAvailable(MessageCircuit* /* circuit */)
   {
 
   }
@@ -116,7 +119,7 @@ public:
   /**********************************
    * This method gets called when an error gets generated
    *********************************/
-  virtual void error( OCPI::Util::EmbeddedException& /* ex */ )
+  virtual void error( OU::EmbeddedException& /* ex */ )
   {
 
   }
@@ -153,7 +156,7 @@ int gpp_cont(int argc, char** argv)
     loopback = parseArgs(argc,argv);
     if ( !loopback ) {
       printf("Setting up for server mode using %s\n", server_end_point);
-      OT::MessageCircuit *mc;
+      MessageCircuit *mc;
 
 #if 0
       // Create the server endpoint and its processing thread
@@ -167,9 +170,9 @@ int gpp_cont(int argc, char** argv)
         OCPI::OS::sleep( 500 );
         printf("Waiting for a client to connect\n");
       }
-      OT::MessageCircuit *mc = gpp_circuits[0];
+      MessageCircuit *mc = gpp_circuits[0];
 #else
-      OT::MessageEndpoint &mep = OT::MessageEndpoint::getMessageEndpoint(server_end_point);
+      MessageEndpoint &mep = MessageEndpoint::getMessageEndpoint(server_end_point);
       printf("Local server endpoint is: %s\n", mep.endpoint());
       do {
 	OS::Timer timer(2, 0);
@@ -202,9 +205,9 @@ int gpp_cont(int argc, char** argv)
     else {
       printf("Setting up for loopback mode using %s\n", loopback_end_point);
       OS::Timer timer(10, 0);
-      std::auto_ptr<OT::MessageCircuit> c(&OT::MessageEndpoint::connect(server_end_point, 4096,
+      std::auto_ptr<MessageCircuit> c(&MessageEndpoint::connect(server_end_point, 4096,
 								"Hello, World", &timer));
-      //      OT::MessageCircuit c(loopback_end_point, 1024);
+      //      MessageCircuit c(loopback_end_point, 1024);
       //      printf("***** Client connecting to: %s\n", server_end_point);
       //      c.connect( server_end_point );   
       printf("Client side:\n  local:  %s\n  remote: %s\n ",
@@ -216,7 +219,7 @@ int gpp_cont(int argc, char** argv)
 	size_t length;
 	uint8_t opcode;
 	while (!(buffer = c->getNextFullInputBuffer(data, length, opcode)))
-	  OCPI::OS::sleep(1);
+	  OS::sleep(1);
 	if (length != 0) {
 	  ocpiAssert(length == strlen((char *)data) + 1);
 	  printf("Message %d from server = %s, op %xx\n", n, (char*)data, opcode);
@@ -226,20 +229,21 @@ int gpp_cont(int argc, char** argv)
 	  printf("Message %d empty\n", n);
 	  break;
 	}
-	OCPI::OS::sleep(1);
+	OS::sleep(1);
       }
       printf("****Client done\n");
     }
   }
   CATCH_ALL_RETURN1("running client/server test")
-    OT::MessageEndpoint::destroyMessageEndpoints();
+    MessageEndpoint::destroyMessageEndpoints();
   return 0;
 }
-
+}
+}
 int main( int argc, char** argv)
 {
   setlinebuf(stdout);
   // Start the container in a thead
-  return gpp_cont(argc,argv);
+  return OCPI::Msg::gpp_cont(argc,argv);
 }
 

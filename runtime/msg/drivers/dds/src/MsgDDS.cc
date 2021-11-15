@@ -34,7 +34,7 @@
  *
  */
 
-#include "TransportMsgDDS.hh"
+#include "MsgDDS.hh"
 #include <ezxml.h>
 #include "OsDataTypes.hh"
 #include "OsMutex.hh"

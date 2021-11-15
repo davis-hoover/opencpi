@@ -41,7 +41,7 @@
 #include "UtilAutoMutex.hh"
 #include "UtilEzxml.hh"
 #include "BasePValue.hh"
-#include "TransportMsgDriver.hh"
+#include "MsgDriver.hh"
 
 namespace OX = OCPI::Util::EzXml;
 namespace OU = OCPI::Util;

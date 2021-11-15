@@ -20,21 +20,22 @@
 
 #include "OsMisc.hh"
 #include "OsAssert.hh"
-#include "TransportMsgCircuit.hh"
+#include "MsgCircuit.hh"
 #include "XferEndPoint.hh"
 
 namespace OS = OCPI::OS;
 namespace OU = OCPI::Util;
 namespace XF = OCPI::Xfer;
+namespace OT = OCPI::Transport;
 namespace OCPI {
-  namespace Transport {
+  namespace Msg {
 
     // Server side creation from underlying circuits
     MessageCircuit::
-    MessageCircuit(Transport &transport,
+    MessageCircuit(OT::Transport &transport,
 		   //		   OS::Mutex &mutex,
-		   Circuit &send,
-		   Circuit &rcv)
+		   OT::Circuit &send,
+		   OT::Circuit &rcv)
       : m_transport(transport),	m_bufferSize(0),// m_mutex(mutex), 
 	m_rcv_port(rcv.getInputPortSet(0)->getPort(0)),
 	m_send_port(send.getOutputPortSet()->getPort(0))
@@ -44,7 +45,7 @@ namespace OCPI {
 
     // Client side creation - providing optional protocol string info
     MessageCircuit::
-    MessageCircuit(Transport &transport, const char *a_localEndpoint,
+    MessageCircuit(OT::Transport &transport, const char *a_localEndpoint,
 		   const char *a_remoteEndpoint, uint32_t bufferSize, const char *protocol,
 		   OS::Timer *timer)
       : m_transport(transport),	m_bufferSize(bufferSize ? bufferSize : defaultBufferSize),
@@ -54,9 +55,9 @@ namespace OCPI {
 	&local = transport.getLocalEndpoint(a_localEndpoint),
 	&remote = transport.addRemoteEndPoint(a_remoteEndpoint);
 
-      Circuit &send = makeCircuit(local, remote, true, protocol, timer);
+      OT::Circuit &send = makeCircuit(local, remote, true, protocol, timer);
       try {
-	Circuit &rcv = makeCircuit(remote, local, false, NULL, timer);
+	OT::Circuit &rcv = makeCircuit(remote, local, false, NULL, timer);
 	m_rcv_port = rcv.getInputPortSet(0)->getPort(0);
 	m_send_port = send.getOutputPortSet()->getPort(0);
       } catch(...) {
@@ -73,12 +74,12 @@ namespace OCPI {
     }
 
     // Complete one of the two circuits
-    Circuit & MessageCircuit::
+    OT::Circuit & MessageCircuit::
     makeCircuit(OCPI::Xfer::EndPoint &from, OCPI::Xfer::EndPoint &to, bool send,
 		const char *protocol, OS::Timer *timer) {
-      Circuit &c =
+      OT::Circuit &c =
 	*m_transport.createCircuit(0, &from, NULL, &to, 1, m_bufferSize,
-				    NewConnectionFlag | (send ? SendCircuitFlag : RcvCircuitFlag),
+				   OT::NewConnectionFlag | (send ? OT::SendCircuitFlag : OT::RcvCircuitFlag),
 				    protocol, timer);
       while (!c.ready()) {
 	m_transport.dispatch();
@@ -106,12 +107,12 @@ namespace OCPI {
 	getMetaData()->real_location_string.c_str();
     }
 
-    BufferUserFacet* MessageCircuit::
+    OT::BufferUserFacet* MessageCircuit::
     getNextEmptyOutputBuffer(uint8_t *&data, size_t &length, OS::Timer *timer)
     {
       m_transport.dispatch();
       if (timer) {
-	BufferUserFacet* b;
+	OT::BufferUserFacet* b;
 	while (!(b = m_send_port->getNextEmptyOutputBuffer(data, length))) {
 	  if (timer->expired())
 	    return 0;
@@ -124,7 +125,7 @@ namespace OCPI {
     }
 
     void MessageCircuit::
-    sendOutputBuffer( BufferUserFacet* buffer, size_t length, uint8_t opcode )
+    sendOutputBuffer(OT::BufferUserFacet* buffer, size_t length, uint8_t opcode )
     {
       return m_send_port->sendOutputBuffer(buffer, length, opcode);
     }
@@ -139,10 +140,10 @@ namespace OCPI {
     //      return m_rcv_port->hasFullInputBuffer();
     //    }
 
-    BufferUserFacet* MessageCircuit::
+    OT::BufferUserFacet* MessageCircuit::
     getNextFullInputBuffer(uint8_t *&data, size_t &length, uint8_t &opcode, OS::Timer *timer)
     {
-      BufferUserFacet *r_buf = NULL;
+      OT::BufferUserFacet *r_buf = NULL;
       bool end;
 
       if (timer) {
@@ -156,7 +157,7 @@ namespace OCPI {
 	r_buf = m_rcv_port->getNextFullInputBuffer(data, length, opcode, end);
 
       static bool one_time_warning = 0;
-      if ( m_rcv_port->getCircuit()->getStatus() == Circuit::Disconnecting ) {
+      if ( m_rcv_port->getCircuit()->getStatus() == OT::Circuit::Disconnecting ) {
 	if ( ! one_time_warning ) {
 	  printf("WARNING: Circuit is disconnecting\n");
 	  one_time_warning = 1;
@@ -166,7 +167,7 @@ namespace OCPI {
     }
 
     void MessageCircuit::
-    releaseInputBuffer( BufferUserFacet* msg )
+    releaseInputBuffer(OT::BufferUserFacet* msg )
     {
       m_rcv_port->releaseInputBuffer(msg);
     }

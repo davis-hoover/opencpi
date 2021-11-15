@@ -34,8 +34,8 @@
 #include "UtilList.hh"
 #include "Transport.hh"
 #include "TransportCircuit.hh"
-#include "TransportMsgCircuit.hh"
-#include "TransportMsgThreadHook.hh"
+#include "MsgCircuit.hh"
+#include "MsgThreadHook.hh"
 
 namespace OCPI {
   namespace Msg {
@@ -122,7 +122,7 @@ namespace OCPI {
       bool runThreadFlag;
 
       // Ocpi transport 
-      Transport *m_transport;
+      OCPI::Transport::Transport *m_transport;
 
       // Our location
       OCPI::Xfer::EndPoint* m_end_point;

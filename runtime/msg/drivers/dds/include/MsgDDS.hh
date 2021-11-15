@@ -37,7 +37,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "BaseParentChild.hh"
-#include "TransportMsgDriver.hh"
+#include "MsgDriver.hh"
 
 
 namespace OCPI {

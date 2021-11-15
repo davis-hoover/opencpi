@@ -26,13 +26,14 @@
 // The "accept" static method accepts a connection from all available protocols.
 
 #include "OsMisc.hh"
-#include "TransportMsgEndPoint.hh"
+#include "MsgEndPoint.hh"
 #include "XferEndPoint.hh"
 
 namespace OS = OCPI::OS;
 namespace XF = OCPI::Xfer;
+namespace OT = OCPI::Transport;
 namespace OCPI {
-  namespace Transport {
+  namespace Msg {
 
     // Public methods
 
@@ -40,10 +41,10 @@ namespace OCPI {
     // Getting our endpoint might end up creating a new one, and if so we want to nuke it
     MessageEndpoint::
     MessageEndpoint(const char *a_endpoint)
-      : m_transportManager(*new TransportManager(0, (char**)0)),
+      : m_transportManager(*new OT::TransportManager(0, (char**)0)),
 	m_transport(NULL), m_endpoint(NULL) {
       try {
-	m_transport = new Transport(&m_transportManager, true);
+	m_transport = new OT::Transport(&m_transportManager, true);
 	m_transport->setNewCircuitRequestListener(this);
 	m_endpoint = &m_transport->getLocalCompatibleEndpoint(a_endpoint, true);
       } catch (...) {
@@ -147,7 +148,7 @@ namespace OCPI {
 
     // Callback from the transport when a new circuit is started.
     void MessageEndpoint::
-    newCircuitAvailable(Circuit* circuit) {
+    newCircuitAvailable(OT::Circuit* circuit) {
 
 #ifndef NDEBUG
       printf("In MessageEndpoint::newCircuitAvailable, got a new circuit \n");
@@ -165,14 +166,14 @@ namespace OCPI {
 	    continue;
 	  //	  (*i)->initializeDataTransfers();
 	  // We need to match two circuits that have the same other side
-	  Port *iInput = (*i)->getInputPortSet(0)->getPortFromIndex(0);
+	  OT::Port *iInput = (*i)->getInputPortSet(0)->getPortFromIndex(0);
 	  if (!iInput->isShadow()) {
 	    XF::EndPoint *remote = iInput->getMetaData()->m_shadow_location;
 	    for (HalfCircuits::iterator j = m_halfCircuits.begin(); j != m_halfCircuits.end(); j++) {
 	      if (i == j || !(*j)->ready())
 		continue;
 	      // (*i)->initializeDataTransfers();
-	      Port *jOutput = (*j)->getOutputPortSet()->getPortFromIndex(0);
+	      OT::Port *jOutput = (*j)->getOutputPortSet()->getPortFromIndex(0);
 	      if (!jOutput->isShadow() && jOutput->getMetaData()->m_shadow_location == remote) {
 		MessageCircuit *mc = new MessageCircuit(*m_transport, /* *this/, */ **j, **i);
 		m_halfCircuits.erase(i);
