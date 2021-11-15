@@ -15,10 +15,4 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-
-# Development files for building for this platform
-+<platform_dir>/picoevb.xdc
-
-# Udev rules for runtime on dev host
-# They are always placed in the udev-rules subdir in the runtime packages
-=<platform-dir>/52-picoevb.rules udev-rules/
+ATTR{idVendor}=="0403", ATTR{idProduct}=="6015", MODE="666"

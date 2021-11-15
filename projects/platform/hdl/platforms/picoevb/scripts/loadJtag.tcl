@@ -15,10 +15,16 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+set Path [lindex $argv 0]
 
-# Development files for building for this platform
-+<platform_dir>/picoevb.xdc
+open_hw_manager
+connect_hw_server
+open_hw_target -xvc_url localhost:2542
 
-# Udev rules for runtime on dev host
-# They are always placed in the udev-rules subdir in the runtime packages
-=<platform-dir>/52-picoevb.rules udev-rules/
+# Program and Refresh the xc7a50t Device
+set Device [lindex [get_hw_devices] 0] 
+current_hw_device [get_hw_devices xc7a50t_0]
+refresh_hw_device -update_hw_probes false $Device
+set_property PROGRAM.FILE $Path $Device
+program_hw_devices $Device
+refresh_hw_device $Device

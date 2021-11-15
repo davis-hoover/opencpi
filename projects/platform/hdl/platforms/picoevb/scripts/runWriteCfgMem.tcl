@@ -15,10 +15,9 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+package require fileutil
 
-# Development files for building for this platform
-+<platform_dir>/picoevb.xdc
+set bitFileIn  [lindex $argv 0]
+set mcsFileOut [lindex $argv 1]
 
-# Udev rules for runtime on dev host
-# They are always placed in the udev-rules subdir in the runtime packages
-=<platform-dir>/52-picoevb.rules udev-rules/
+write_cfgmem -format mcs -size 4 -interface SPIx4 -loadbit "up 0x00000000 $bitFileIn" -checksum -force -file $mcsFileOut

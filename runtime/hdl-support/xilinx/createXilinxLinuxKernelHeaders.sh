@@ -125,12 +125,15 @@ fi
 # There is no stability in the uboot zynqmp configurations, but we are not typically using the
 # actual u-boot that is getting built so its not critical that it always be the same
 if [ $arch = aarch64 ]; then
-    if [ ! -r configs/$uconfig ]; then
-	uconfig=xilinx_xynqmp_ep_defconfig
-	if [ ! -r configs/$uconfig ]; then
-	    uconfig=xilinx_zynqmp_zcu104_revC_defconfig
+    # uconfig="xilinx_zynqmp_ep_defconfig xilinx_zynqmp_mini_defconfig"
+    found=""
+    for c in $uconfig; do
+	if [ -r configs/$c ]; then
+	    found=$c
+	    break
 	fi
-    fi
+    done
+    [ -n "$found" ] && uconfig=$found || uconfig=xilinx_zynqmp_zcu104_revC_defconfig
 fi
 echo ==============================================================================
 echo Building u-boot to get the mkimage and other commands.
