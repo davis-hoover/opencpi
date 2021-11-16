@@ -234,10 +234,10 @@ class Implementation(abc.ABC):
         output format.
 
         Args:
-            outputs (lists): There should be an argument for each port defined
-                in self.output_ports, in a matching order. The lists must be
-                lists of dictionaries where each dictionary is a message. Empty
-                lists for ports are allowed.
+            outputs (multiple arguments, each lists): There should be an
+                argument for each port defined in self.output_ports, in a
+                matching order. The lists must be lists of dictionaries where
+                each dictionary is a message. Empty lists for ports are allowed.
 
         Returns:
             A named tuple where each item in the tuple relates to each output

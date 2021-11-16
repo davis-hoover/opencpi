@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Testing of code in float_generator.py
+# Testing of code in complex_character_generator.py
 #
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
@@ -26,27 +26,24 @@ import unittest
 
 import numpy
 
-from ocpi_testing.generator import FloatGenerator
+from ocpi_testing.generator import ComplexCharacterGenerator
 
 
-FLOAT_MIN = -340282346638528859811704183484516925440.0
-FLOAT_MAX = 340282346638528859811704183484516925440.0
+CHARACTER_MIN = -(2**7)
+CHARACTER_MAX = (2**7) - 1
 
 
-class TestFloatGenerator(unittest.TestCase):
+class TestComplexCharacterGenerator(unittest.TestCase):
     def setUp(self):
-        self.test_generator = FloatGenerator()
-        self.seed = 71547
+        self.test_generator = ComplexCharacterGenerator()
+        self.seed = 3583
 
-    def assertFloat(self, value):
-        self.assertIsInstance(value, float)
-        if math.isnan(value) or math.isinf(value):
-            return
-
-        # Since Python floats have double precision accuracy make sure within
-        # allowed range for OpenCPI floats.
-        self.assertGreaterEqual(value, FLOAT_MIN)
-        self.assertLessEqual(value, FLOAT_MAX)
+    def assertComplexCharacter(self, value):
+        self.assertIsInstance(value, complex)
+        self.assertGreaterEqual(value.real, CHARACTER_MIN)
+        self.assertLessEqual(value.real, CHARACTER_MAX)
+        self.assertGreaterEqual(value.imag, CHARACTER_MIN)
+        self.assertLessEqual(value.imag, CHARACTER_MAX)
 
     def test_typical(self):
         messages = self.test_generator.generate(
@@ -60,7 +57,7 @@ class TestFloatGenerator(unittest.TestCase):
         self.assertEqual(len(messages[0]["data"]),
                          self.test_generator.SAMPLE_DATA_LENGTH)
         for value in messages[0]["data"]:
-            self.assertFloat(value)
+            self.assertComplexCharacter(value)
 
     def test_typical_same_seed_same_messages(self):
         messages_1 = self.test_generator.generate(
@@ -72,7 +69,7 @@ class TestFloatGenerator(unittest.TestCase):
 
     def test_typical_single_wave(self):
         frequency = 0.1
-        amplitude = 7000000
+        amplitude = 100
         self.test_generator.TYPICAL_NUMBER_OF_WAVES_MODAL = 1
         self.test_generator.TYPICAL_NUMBER_OF_WAVES_DISTRIBUTION_WIDTH = 1
         self.test_generator.TYPICAL_NUMBER_OF_WAVES_MIN = 1
@@ -89,30 +86,34 @@ class TestFloatGenerator(unittest.TestCase):
 
         # Cannot externally set the phase so determine
         # First keep value within acos support range
-        scaled_data = messages[0]["data"][0] / amplitude
+        scaled_data = messages[0]["data"][0].real / amplitude
         scaled_data = min(1, scaled_data)
         scaled_data = max(-1, scaled_data)
         phase = math.acos(scaled_data)
         # As inverse cosine (acos) is not unique for all inputs, determine the
         # gradient and so quadrant the wave is in
-        if messages[0]["data"][0] < messages[0]["data"][1]:
+        if messages[0]["data"][0].real < messages[0]["data"][1].real:
             phase = -phase
 
         reference_data = [0] * len(messages[0]["data"])
         for index in range(len(reference_data)):
-            reference_data[index] = \
-                amplitude * math.cos(2 * math.pi * frequency * index + phase)
+            reference_data[index] = complex(
+                int(amplitude * math.cos(2 * math.pi * frequency * index +
+                                         phase)),
+                int(amplitude * math.sin(2 * math.pi * frequency * index +
+                                         phase)))
 
+        # Reference data will not be exact match, so ensure mean is small (in
+        # relation to whole supported range of shorts)
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0]["opcode"], "sample")
         self.assertEqual(len(messages[0]["data"]),
                          self.test_generator.SAMPLE_DATA_LENGTH)
-        for test_value, reference_value in zip(messages[0]["data"],
-                                               reference_data):
-            self.assertFloat(test_value)
-            # Ensure the error between values is less than 0.1%
-            difference = abs(test_value - reference_value)
-            self.assertLess(difference / reference_value, 0.001)
+        for index, (test_value, reference_value) in enumerate(
+                zip(messages[0]["data"], reference_data)):
+            self.assertComplexCharacter(test_value)
+            # Ensure the error between values is less than 4
+            self.assertLess(abs(test_value - reference_value), 4)
 
     def test_sample_all_zero_subcase(self):
         messages = self.test_generator.generate(
@@ -123,8 +124,8 @@ class TestFloatGenerator(unittest.TestCase):
         self.assertEqual(len(messages[0]["data"]),
                          self.test_generator.SAMPLE_DATA_LENGTH)
         for value in messages[0]["data"]:
-            self.assertFloat(value)
-            self.assertEqual(value, 0)
+            self.assertComplexCharacter(value)
+            self.assertEqual(value, complex(0, 0))
 
     def test_sample_all_maximum_subcase(self):
         messages = self.test_generator.generate(
@@ -135,8 +136,8 @@ class TestFloatGenerator(unittest.TestCase):
         self.assertEqual(len(messages[0]["data"]),
                          self.test_generator.SAMPLE_DATA_LENGTH)
         for value in messages[0]["data"]:
-            self.assertFloat(value)
-            self.assertEqual(value, FLOAT_MAX)
+            self.assertComplexCharacter(value)
+            self.assertEqual(value, complex(CHARACTER_MAX, CHARACTER_MAX))
 
     def test_sample_all_minimum_subcase(self):
         messages = self.test_generator.generate(
@@ -147,8 +148,32 @@ class TestFloatGenerator(unittest.TestCase):
         self.assertEqual(len(messages[0]["data"]),
                          self.test_generator.SAMPLE_DATA_LENGTH)
         for value in messages[0]["data"]:
-            self.assertFloat(value)
-            self.assertEqual(value, FLOAT_MIN)
+            self.assertComplexCharacter(value)
+            self.assertEqual(value, complex(CHARACTER_MIN, CHARACTER_MIN))
+
+    def test_sample_real_zero_subcase(self):
+        messages = self.test_generator.generate(
+            self.seed, "sample", "real_zero", "01", "02")
+
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0]["opcode"], "sample")
+        self.assertEqual(len(messages[0]["data"]),
+                         self.test_generator.SAMPLE_DATA_LENGTH)
+        for value in messages[0]["data"]:
+            self.assertComplexCharacter(value)
+            self.assertEqual(value.real, 0)
+
+    def test_sample_imaginary_zero_subcase(self):
+        messages = self.test_generator.generate(
+            self.seed, "sample", "imaginary_zero", "01", "02")
+
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0]["opcode"], "sample")
+        self.assertEqual(len(messages[0]["data"]),
+                         self.test_generator.SAMPLE_DATA_LENGTH)
+        for value in messages[0]["data"]:
+            self.assertComplexCharacter(value)
+            self.assertEqual(value.imag, 0)
 
     def test_sample_large_positive_subcase(self):
         messages = self.test_generator.generate(
@@ -158,12 +183,11 @@ class TestFloatGenerator(unittest.TestCase):
         self.assertEqual(messages[0]["opcode"], "sample")
         self.assertEqual(len(messages[0]["data"]),
                          self.test_generator.SAMPLE_DATA_LENGTH)
-        # Ensure the error between values is less than 0.1%
-        min_expected_value = FLOAT_MAX - \
-            (1.001 * self.test_generator.SAMPLE_NEAR_RANGE)
+        min_expected_value = CHARACTER_MAX - self.test_generator.SAMPLE_NEAR_RANGE
         for value in messages[0]["data"]:
-            self.assertFloat(value)
-            self.assertGreaterEqual(value, min_expected_value)
+            self.assertComplexCharacter(value)
+            self.assertGreaterEqual(value.real, min_expected_value)
+            self.assertGreaterEqual(value.imag, min_expected_value)
 
     def test_sample_large_negative_subcase(self):
         messages = self.test_generator.generate(
@@ -173,12 +197,11 @@ class TestFloatGenerator(unittest.TestCase):
         self.assertEqual(messages[0]["opcode"], "sample")
         self.assertEqual(len(messages[0]["data"]),
                          self.test_generator.SAMPLE_DATA_LENGTH)
-        # Ensure the error between values is less than 0.1%
-        max_expected_value = FLOAT_MIN + \
-            (1.001 * self.test_generator.SAMPLE_NEAR_RANGE)
+        max_expected_value = CHARACTER_MIN + self.test_generator.SAMPLE_NEAR_RANGE
         for value in messages[0]["data"]:
-            self.assertFloat(value)
-            self.assertLessEqual(value, max_expected_value)
+            self.assertComplexCharacter(value)
+            self.assertLessEqual(value.real, max_expected_value)
+            self.assertLessEqual(value.imag, max_expected_value)
 
     def test_sample_near_zero_subcase(self):
         messages = self.test_generator.generate(
@@ -188,50 +211,11 @@ class TestFloatGenerator(unittest.TestCase):
         self.assertEqual(messages[0]["opcode"], "sample")
         self.assertEqual(len(messages[0]["data"]),
                          self.test_generator.SAMPLE_DATA_LENGTH)
-        # Ensure the error between values is less than 0.1%
-        max_expected_value = (1.001 * self.test_generator.SAMPLE_NEAR_RANGE)
+        max_expected_value = self.test_generator.SAMPLE_NEAR_RANGE
         for value in messages[0]["data"]:
-            self.assertFloat(value)
-            self.assertLessEqual(abs(value), max_expected_value)
-
-    def test_sample_positive_infinity_subcase(self):
-        messages = self.test_generator.generate(
-            self.seed, "sample", "positive_infinity", "01", "02")
-
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(messages[0]["opcode"], "sample")
-        self.assertEqual(len(messages[0]["data"]),
-                         self.test_generator.SAMPLE_DATA_LENGTH)
-        self.assertIn(float("inf"), messages[0]["data"])
-        for value in messages[0]["data"]:
-            self.assertFloat(value)
-
-    def test_sample_negative_infinity_subcase(self):
-        messages = self.test_generator.generate(
-            self.seed, "sample", "negative_infinity", "01", "02")
-
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(messages[0]["opcode"], "sample")
-        self.assertEqual(len(messages[0]["data"]),
-                         self.test_generator.SAMPLE_DATA_LENGTH)
-        self.assertIn(-float("inf"), messages[0]["data"])
-        for value in messages[0]["data"]:
-            self.assertFloat(value)
-
-    def test_sample_not_a_number_subcase(self):
-        messages = self.test_generator.generate(
-            self.seed, "sample", "not_a_number", "01", "02")
-
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(messages[0]["opcode"], "sample")
-        self.assertEqual(len(messages[0]["data"]),
-                         self.test_generator.SAMPLE_DATA_LENGTH)
-        # Cannot use float("nan") in messages[0]["data"] as by convention all
-        # comparisons to NaN return false, including the in list check.
-        self.assertTrue(
-            any([math.isnan(value) for value in messages[0]["data"]]))
-        for value in messages[0]["data"]:
-            self.assertFloat(value)
+            self.assertComplexCharacter(value)
+            self.assertLessEqual(abs(value.real), max_expected_value)
+            self.assertLessEqual(abs(value.imag), max_expected_value)
 
     def test_sample_invalid_subcase(self):
         with self.assertRaises(ValueError):
@@ -256,7 +240,7 @@ class TestFloatGenerator(unittest.TestCase):
 
         self.assertEqual(len(values), self.test_generator.SAMPLE_DATA_LENGTH)
         for value in values:
-            self.assertFloat(value)
+            self.assertComplexCharacter(value)
 
     def test_full_scale_random_sample_values_set_number_of_samples(self):
         number_of_values = 100
@@ -265,14 +249,14 @@ class TestFloatGenerator(unittest.TestCase):
 
         self.assertEqual(len(values), number_of_values)
         for value in values:
-            self.assertFloat(value)
+            self.assertComplexCharacter(value)
 
     def test_get_sample_values_none_number_of_samples(self):
         values = self.test_generator._get_sample_values()
 
         self.assertEqual(len(values), self.test_generator.SAMPLE_DATA_LENGTH)
         for value in values:
-            self.assertFloat(value)
+            self.assertComplexCharacter(value)
 
     def test_get_sample_values_set_number_of_samples(self):
         number_of_values = 100
@@ -280,4 +264,4 @@ class TestFloatGenerator(unittest.TestCase):
 
         self.assertEqual(len(values), number_of_values)
         for value in values:
-            self.assertFloat(value)
+            self.assertComplexCharacter(value)

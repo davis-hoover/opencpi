@@ -98,8 +98,8 @@ class TestComplexLongGenerator(unittest.TestCase):
         reference_data = [0] * len(messages[0]["data"])
         for index in range(len(reference_data)):
             reference_data[index] = complex(
-                int(amplitude * math.cos(2 * math.pi * frequency * index
-                                         + phase)),
+                int(amplitude * math.cos(2 * math.pi * frequency * index +
+                                         phase)),
                 int(amplitude * math.sin(2 * math.pi * frequency * index +
                                          phase)))
 
@@ -181,8 +181,11 @@ class TestComplexLongGenerator(unittest.TestCase):
         self.assertEqual(messages[0]["opcode"], "sample")
         self.assertEqual(len(messages[0]["data"]),
                          self.test_generator.SAMPLE_DATA_LENGTH)
+        min_expected_value = LONG_MAX - self.test_generator.SAMPLE_NEAR_RANGE
         for value in messages[0]["data"]:
             self.assertComplexLong(value)
+            self.assertGreaterEqual(value.real, min_expected_value)
+            self.assertGreaterEqual(value.imag, min_expected_value)
 
     def test_sample_large_negative_subcase(self):
         messages = self.test_generator.generate(
@@ -192,8 +195,11 @@ class TestComplexLongGenerator(unittest.TestCase):
         self.assertEqual(messages[0]["opcode"], "sample")
         self.assertEqual(len(messages[0]["data"]),
                          self.test_generator.SAMPLE_DATA_LENGTH)
+        max_expected_value = LONG_MIN + self.test_generator.SAMPLE_NEAR_RANGE
         for value in messages[0]["data"]:
             self.assertComplexLong(value)
+            self.assertLessEqual(value.real, max_expected_value)
+            self.assertLessEqual(value.imag, max_expected_value)
 
     def test_sample_near_zero_subcase(self):
         messages = self.test_generator.generate(
@@ -203,8 +209,11 @@ class TestComplexLongGenerator(unittest.TestCase):
         self.assertEqual(messages[0]["opcode"], "sample")
         self.assertEqual(len(messages[0]["data"]),
                          self.test_generator.SAMPLE_DATA_LENGTH)
+        max_expected_value = self.test_generator.SAMPLE_NEAR_RANGE
         for value in messages[0]["data"]:
             self.assertComplexLong(value)
+            self.assertLessEqual(abs(value.real), max_expected_value)
+            self.assertLessEqual(abs(value.imag), max_expected_value)
 
     def test_sample_invalid_subcase(self):
         with self.assertRaises(ValueError):
