@@ -18,18 +18,17 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "XferEndPoint.h"
+#include "XferEndPoint.hh"
 #include "Container.h"
 #include "ContainerPort.h"
 #include "ContainerWorker.h"
 #include "ContainerApplication.h"
 #include "ContainerLauncher.h"
 
-namespace OA = OCPI::API;
 namespace OM = OCPI::Metadata;
-namespace OU = OCPI::Util;
 namespace OB = OCPI::Base;
-namespace OT = DataTransfer;
+namespace OT = OCPI::Transport;
+namespace XF = OCPI::Xfer;
 namespace OCPI {
   namespace Container {
 
@@ -202,7 +201,7 @@ prepare() {
     // check the output side.
     std::string transport;
     if (OB::findString(m_out.m_params, "endpoint", cp))
-      OT::EndPoint::getProtocolFromString(cp, transport);
+      XF::EndPoint::getProtocolFromString(cp, transport);
     else if (OB::findString(m_out.m_params, "transport", cp))
       transport = cp;
     if (transport.length())
@@ -212,7 +211,7 @@ prepare() {
 
 Transport::
 Transport()
-  : roleIn(OCPI::RDT::NoRole), roleOut(OCPI::RDT::NoRole), optionsIn(0), optionsOut(0) {
+  : roleIn(OT::NoRole), roleOut(OT::NoRole), optionsIn(0), optionsOut(0) {
 }
   }
 }

@@ -43,7 +43,7 @@
 
 #include "OsThreadManager.hh"
 #include "UtilSelfMutex.hh"
-#include "OcpiTransport.h"
+#include "Transport.hh"
 #include "OcpiLibraryManager.h"
 #include "ContainerPort.h"
 
@@ -81,7 +81,7 @@ namespace OCPI {
       bool m_verbose;
       OCPI::OS::ThreadManager *m_thread;
       // This is not an embedded member to potentially control lifecycle better...
-      OCPI::DataTransport::Transport &m_transport;
+      OCPI::Transport::Transport &m_transport;
       // This vector will be filled in by derived classes
       Transports m_transports;  // terminology clash is unfortunate....
       BridgedPorts m_bridgedPorts;
@@ -123,7 +123,7 @@ namespace OCPI {
 	Event Manager object that is associated with this container.  This parameter can be
 	NULL if the container is being used in polled mode.
       */
-      virtual DispatchRetCode dispatch(DataTransfer::EventManager*);
+      virtual DispatchRetCode dispatch(OCPI::Xfer::EventManager*);
       //      bool run(uint32_t usecs = 0);
       void thread();
       virtual bool needThread() = 0;
@@ -137,13 +137,13 @@ namespace OCPI {
       virtual Artifact *findLoadedArtifact(const OCPI::Library::Artifact &a) = 0;
       virtual Artifact &createArtifact(OCPI::Library::Artifact &,
 				       const OCPI::API::PValue *props = NULL) = 0;
-      //      virtual void start(DataTransfer::EventManager* event_manager) throw();
-      //      virtual void stop(DataTransfer::EventManager* event_manager) throw();
+      //      virtual void start(OCPI::Xfer::EventManager* event_manager) throw();
+      //      virtual void stop(OCPI::Xfer::EventManager* event_manager) throw();
       virtual void stop();
       // FIXME: default start behavior is for software containers.
       virtual void start();
       //! get the event manager for this container
-      virtual DataTransfer::EventManager* getEventManager() { return NULL; }
+      virtual OCPI::Xfer::EventManager* getEventManager() { return NULL; }
       bool hasName(const char *name);
       inline unsigned ordinal() const { return m_ordinal; }
       static Container &nthContainer(unsigned n);
@@ -151,11 +151,11 @@ namespace OCPI {
       static Container &baseContainer();
       // Launcher: default is to
       virtual Launcher &launcher() const;
-      inline OCPI::DataTransport::Transport &getTransport() { return m_transport; }
+      inline OCPI::Transport::Transport &getTransport() { return m_transport; }
       void registerBridgedPort(LocalPort &p);
       void unregisterBridgedPort(LocalPort &p);
-      void addTransport(const char *name, const char *id, OCPI::RDT::PortRole roleIn,
-			OCPI::RDT::PortRole roleOut, uint32_t inOptions, uint32_t outOptions);
+      void addTransport(const char *name, const char *id, OCPI::Transport::PortRole roleIn,
+			OCPI::Transport::PortRole roleOut, uint32_t inOptions, uint32_t outOptions);
       const Transports &transports() const { return m_transports; }
       // Return false if internal connection was not made
       virtual bool connectInside(BasicPort &/*in*/, BasicPort &/*out*/) { return false; }

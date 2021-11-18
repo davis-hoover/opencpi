@@ -40,6 +40,7 @@ namespace OCPI {
     namespace OA = OCPI::API;
     namespace OU = OCPI::Util;
     namespace OB = OCPI::Base;
+    namespace XF = OCPI::Xfer;
 
 Artifact::
 Artifact(Container &c, OCPI::Library::Artifact &lart, const OA::PValue *props)
@@ -132,7 +133,7 @@ createWorker(OC::Artifact *art, const char *appInstName, ezxml_t impl, ezxml_t i
 }
 
 void Application::
-run(DataTransfer::EventManager* event_manager, bool &more_to_do) {
+run(XF::EventManager* event_manager, bool &more_to_do) {
   for (Worker *w = OU::Parent<Worker>::firstChild(); w; w = w->nextChild()) {
     // Give our transport some time
     parent().getTransport().dispatch( event_manager );

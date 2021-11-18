@@ -127,7 +127,7 @@ xsputn (const char * data, std::streamsize count)
 {
   ocpiAssert (m_locked);
   m_first = false;
-  m_logMessage.append (data, count);
+  m_logMessage.append(data, (size_t)count);
   return count;
 }
 
@@ -261,7 +261,7 @@ sendMessage ()
    * Send request.
    */
 
-  m_conn.write (requestData.data(), requestData.length());
+  m_conn.write(requestData.data(), (std::streamsize)requestData.length());
 
   /*
    * Done.

@@ -233,7 +233,7 @@ sendAnyRequest (const OCPI::Util::Uri & uri,
   requestLine += (char) ('0' + m_minorVersion);
   requestLine += "\r\n";
 
-  m_outConn->write (requestLine.data(), requestLine.length());
+  m_outConn->write (requestLine.data(), (std::streamsize)requestLine.length());
 
   if (requestHeaders.find ("Host") == requestHeaders.end()) {
     *m_outConn << "Host: "
@@ -935,10 +935,10 @@ xsgetn (char * s, std::streamsize n)
     s += count;
 
     if (m_chunked) {
-      m_chunkRemaining -= count;
+      m_chunkRemaining -= (decltype(m_chunkRemaining))count;
     }
     else if (m_contentLength != static_cast<unsigned long long> (-1)) {
-      m_contentRemaining -= count;
+      m_contentRemaining -= (decltype(m_contentRemaining))count;
     }
   }
 
@@ -1026,7 +1026,6 @@ connect (const OCPI::Util::Uri & uri)
 void
 OCPI::Util::Http::ClientStream::
 close ()
-  throw (std::string, Redirection, ClientError, ServerError)
 {
   if (m_connected) {
     m_connected = false;
@@ -1079,14 +1078,13 @@ readBody ()
   while (this->good() && !this->eof() &&
          m_body.length() < MAX_LENGTH_OF_BODY) {
     this->read (bodyBuffer, 10240);
-    m_body.append (bodyBuffer, this->gcount());
+    m_body.append (bodyBuffer, (size_t)this->gcount());
   }
 }
 
 void
 OCPI::Util::Http::ClientStream::
 completeUpload ()
-  throw (std::string, Redirection, ClientError, ServerError)
 {
   if (m_uploading && (m_mode & std::ios_base::out)) {
     m_uploading = false;
@@ -1102,7 +1100,6 @@ completeUpload ()
 void
 OCPI::Util::Http::ClientStream::
 checkRelocation ()
-  throw (std::string, Redirection)
 {
   if (m_buf.getStatusCode() >= 300 &&
       m_buf.getStatusCode()  < 400 &&
@@ -1129,7 +1126,6 @@ checkRelocation ()
 void
 OCPI::Util::Http::ClientStream::
 checkServerError ()
-  throw (std::string, ClientError, ServerError)
 {
   if (m_buf.getStatusCode() >= 400 && !m_errorReported && m_connected) {
     readBody ();
@@ -1160,7 +1156,6 @@ checkServerError ()
 void
 OCPI::Util::Http::ClientStream::
 head (const OCPI::Util::Uri & uri)
-  throw (std::string, Redirection, ClientError, ServerError)
 {
   headOrDelete (ClientBuf::REQUEST_HEAD, uri, (std::ios_base::openmode) 0);
 }
@@ -1169,7 +1164,6 @@ void
 OCPI::Util::Http::ClientStream::
 remove (const OCPI::Util::Uri & uri,
         std::ios_base::openmode mode)
-  throw (std::string, Redirection, ClientError, ServerError)
 {
   if ((mode & std::ios_base::out)) {
     throw std::string ("invalid openmode for delete: out");
@@ -1183,7 +1177,6 @@ OCPI::Util::Http::ClientStream::
 headOrDelete (int requestType,
               const OCPI::Util::Uri & uri,
               std::ios_base::openmode mode)
-  throw (std::string, Redirection, ClientError, ServerError)
 {
   m_mode = mode;
 
@@ -1217,7 +1210,6 @@ headOrDelete (int requestType,
 void
 OCPI::Util::Http::ClientStream::
 get (const OCPI::Util::Uri & uri)
-  throw (std::string, Redirection, ClientError, ServerError)
 {
   m_mode = std::ios_base::in;
 
@@ -1248,7 +1240,6 @@ void
 OCPI::Util::Http::ClientStream::
 put (const OCPI::Util::Uri & uri,
      std::ios_base::openmode mode)
-  throw (std::string, Redirection, ClientError, ServerError)
 {
   put (uri, std::string(), static_cast<unsigned long long> (-1), mode);
 }
@@ -1259,7 +1250,6 @@ put (const OCPI::Util::Uri & uri,
      const std::string & a_contentType,
      unsigned long long a_contentLength,
      std::ios_base::openmode mode)
-  throw (std::string, Redirection, ClientError, ServerError)
 {
   putOrPost (ClientBuf::REQUEST_PUT, uri, a_contentType, a_contentLength, mode);
 }
@@ -1268,7 +1258,6 @@ void
 OCPI::Util::Http::ClientStream::
 post (const OCPI::Util::Uri & uri,
       std::ios_base::openmode mode)
-  throw (std::string, Redirection, ClientError, ServerError)
 {
   post (uri, std::string(), static_cast<unsigned long long> (-1), mode);
 }
@@ -1279,7 +1268,6 @@ post (const OCPI::Util::Uri & uri,
       const std::string & a_contentType,
       unsigned long long a_contentLength,
       std::ios_base::openmode mode)
-  throw (std::string, Redirection, ClientError, ServerError)
 {
   putOrPost (ClientBuf::REQUEST_PUT, uri, a_contentType, a_contentLength, mode);
 }
@@ -1291,7 +1279,6 @@ putOrPost (int requestType,
            const std::string & a_contentType,
            unsigned long long a_contentLength,
            std::ios_base::openmode mode)
-  throw (std::string, Redirection, ClientError, ServerError)
 {
   m_mode = mode | std::ios_base::out;
   Headers headers;
@@ -1328,7 +1315,6 @@ putOrPost (int requestType,
 int
 OCPI::Util::Http::ClientStream::
 statusCode ()
-  throw (std::string, Redirection, ClientError, ServerError)
 {
   try {
     completeUpload ();
@@ -1342,7 +1328,6 @@ statusCode ()
 const OCPI::Util::Http::Headers &
 OCPI::Util::Http::ClientStream::
 responseHeaders ()
-  throw (std::string, Redirection, ClientError, ServerError)
 {
   try {
     completeUpload ();
@@ -1356,7 +1341,6 @@ responseHeaders ()
 unsigned long long
 OCPI::Util::Http::ClientStream::
 contentLength ()
-  throw (std::string, Redirection, ClientError, ServerError)
 {
   try {
     completeUpload ();
@@ -1370,7 +1354,6 @@ contentLength ()
 std::string
 OCPI::Util::Http::ClientStream::
 contentType ()
-  throw (std::string, Redirection, ClientError, ServerError)
 {
   try {
     completeUpload ();
@@ -1414,7 +1397,6 @@ contentType ()
 std::string
 OCPI::Util::Http::ClientStream::
 charset ()
-  throw (std::string, Redirection, ClientError, ServerError)
 {
   const Headers & headers = m_buf.getResponseHeaders ();
   Headers::const_iterator it = headers.find ("Content-Type");
@@ -1513,7 +1495,6 @@ charset ()
 std::time_t
 OCPI::Util::Http::ClientStream::
 lastModified ()
-  throw (std::string, Redirection, ClientError, ServerError)
 {
   try {
     completeUpload ();
@@ -1534,7 +1515,6 @@ lastModified ()
 const std::string &
 OCPI::Util::Http::ClientStream::
 body ()
-  throw (std::string, Redirection, ClientError, ServerError)
 {
   /*
    * The body is only available if there was a server error (4xx or

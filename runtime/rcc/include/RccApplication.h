@@ -84,7 +84,7 @@ namespace OCPI {
         friend class Container;
         friend class Controller;
       protected:
-	void run(DataTransfer::EventManager* event_manager, bool &more_to_do);
+	void run(OCPI::Xfer::EventManager* event_manager, bool &more_to_do);
       public:
 	OCPI::Container::Worker &
 	createWorker(OCPI::Container::Artifact *art, const char *appInstName, ezxml_t impl,

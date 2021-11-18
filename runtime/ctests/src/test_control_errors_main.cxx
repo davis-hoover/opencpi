@@ -34,7 +34,7 @@
 #include <stdlib.h>
 #include "OsMisc.hh"
 #include "OsAssert.hh"
-#include "OcpiRDTInterface.h"
+#include "TransportRDTInterface.hh"
 #include "test_utilities.h"
 #include "UtilCommandLineConfiguration.hh"
 #include "UtGenericLoopbackWorkers.h"
@@ -855,7 +855,7 @@ int  main( int argc, char** argv)
 {
   int test_rc = 1;
   int oa_test_rc = 1;
-  DataTransfer::EventManager* event_manager;
+  OCPI::Xfer::EventManager* event_manager;
   int cmap[3];
   const char* test_name;
 

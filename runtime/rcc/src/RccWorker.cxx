@@ -19,7 +19,7 @@
  */
 
 #include <climits>
-#include "OcpiTimeEmitCategories.h"
+#include "TimeEmitCategories.hh"
 #include "RccApplication.h"
 #include "RccPort.h"
 #include "RccWorker.h"

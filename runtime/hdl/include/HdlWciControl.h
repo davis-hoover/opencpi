@@ -23,16 +23,16 @@
 
 #include "ContainerWorker.h"
 #include "HdlOCCP.h"
-#include "XferAccess.h"
+#include "XferAccess.hh"
 
 namespace OCPI {
   namespace HDL {
 
     // The class that knows about WCI interfaces and the OCCP.
     class Device;
-    typedef DataTransfer::Access Access;
-    typedef DataTransfer::Accessor Accessor;
-    typedef DataTransfer::RegisterOffset RegisterOffset;
+    typedef OCPI::Xfer::Access Access;
+    typedef OCPI::Xfer::Accessor Accessor;
+    typedef OCPI::Xfer::RegisterOffset RegisterOffset;
     class WciControl : public Access, virtual public OCPI::Container::Controllable,
       virtual public OCPI::API::PropertyAccess, virtual OCPI::Container::WorkerControl {
       friend class Port;

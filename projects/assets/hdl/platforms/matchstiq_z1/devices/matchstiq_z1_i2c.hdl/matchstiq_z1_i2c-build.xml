@@ -13,4 +13,11 @@
     <parameter name='ocpi_debug' value='false'/>
     <parameter name='ocpi_endian' value='little'/>
   </configuration>
+  <configuration id='2'>
+    <parameter name='NUSERS_p' value='1'/>
+    <parameter name='SLAVE_ADDRESS_p' value='69'/>
+    <parameter name='CLK_FREQ_p' value='5e+07'/>
+    <parameter name='ocpi_debug' value='false'/>
+    <parameter name='ocpi_endian' value='little'/>
+  </configuration>
 </build>

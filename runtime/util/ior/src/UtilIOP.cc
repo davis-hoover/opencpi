@@ -145,8 +145,8 @@ namespace {
     unsigned long olen = length;
 
     while (length) {
-      *ptr++ = i2hc[*src>>4];
-      *ptr++ = i2hc[*src&15];
+      *ptr++ = (unsigned char)i2hc[*src>>4];
+      *ptr++ = (unsigned char)i2hc[*src&15];
       length--;
       src++;
     }

@@ -50,8 +50,8 @@ namespace OCPI {
       ~Container();
 
       bool supportsImplementation(OCPI::Metadata::Worker &i);
-      OCPI::Container::Container::DispatchRetCode dispatch(DataTransfer::EventManager* event_manager)
-        throw (OU::EmbeddedException);
+      OCPI::Container::Container::DispatchRetCode dispatch(OCPI::Xfer::EventManager* event_manager)
+        throw (OCPI::Util::EmbeddedException);
 
       OCPI::Container::Artifact &
 	createArtifact(OCPI::Library::Artifact &lart, const OCPI::API::PValue *artifactParams);

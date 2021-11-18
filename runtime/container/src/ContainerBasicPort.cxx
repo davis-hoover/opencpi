@@ -36,17 +36,16 @@ namespace OCPI {
     namespace OM = OCPI::Metadata;
     namespace OU = OCPI::Util;
     namespace OB = OCPI::Base;
-    namespace OD = OCPI::DataTransport;
-    namespace OR = OCPI::RDT;
-    namespace XF = DataTransfer;
+    namespace OT = OCPI::Transport;
+    namespace XF = OCPI::Xfer;
 
     PortData::
     PortData(const OM::Port &mPort, bool a_isProvider, PortConnectionDesc *desc)
       : m_ordinal(mPort.m_ordinal), m_isProvider(a_isProvider), m_connectionData(desc)
     {
-      OR::Descriptors &d = getData().data;
-      d.type = m_isProvider ? OR::ConsumerDescT : OR::ProducerDescT;
-      d.role = OR::NoRole;
+      OT::Descriptors &d = getData().data;
+      d.type = m_isProvider ? OT::ConsumerDescT : OT::ProducerDescT;
+      d.role = OT::NoRole;
       d.options = 0;
       bzero((void *)&d.desc, sizeof(d.desc));
       size_t l_nBuffers =
@@ -69,18 +68,18 @@ namespace OCPI {
 		m_nBuffers, m_bufferSize);
     }
 
-    static bool findRole(const OB::PValue *params, const char *&s, OR::PortRole &role) {
+    static bool findRole(const OB::PValue *params, const char *&s, OT::PortRole &role) {
       if (OB::findString(params, "transferRole", s)) {
 	if (!strcasecmp(s, "passive"))
-	  role = OR::Passive;
+	  role = OT::Passive;
 	else if (!strcasecmp(s, "active") ||
 		 !strcasecmp(s, "activemessage"))
-	  role = OR::ActiveMessage;
+	  role = OT::ActiveMessage;
 	else if (!strcasecmp(s, "flowcontrol") ||
 		 !strcasecmp(s, "activeflowcontrol"))
-	  role = OR::ActiveFlowControl;
+	  role = OT::ActiveFlowControl;
 	else if (!strcasecmp(s, "activeonly"))
-	  role = OR::ActiveOnly;
+	  role = OT::ActiveOnly;
 	else
 	  throw OU::Error("transferRole property must be passive|active|flowcontrol|activeonly");
 	return true;
@@ -180,31 +179,31 @@ namespace OCPI {
     static int
     pack_unpack_test (int argc, char *argv[])
     {
-      OR::Descriptors d;
+      OT::Descriptors d;
       std::string data;
       bool good;
 
-      std::memset (&d, 0, sizeof (OR::Descriptors));
-      d.mode = OR::ConsumerDescType;
+      std::memset (&d, 0, sizeof (OT::Descriptors));
+      d.mode = OT::ConsumerDescType;
       d.desc.c.fullFlagValue = 42;
       std::strcpy (d.desc.c.oob.oep, "Hello World");
       data = packDescriptor (d);
-      std::memset (&d, 0, sizeof (OR::Descriptors));
+      std::memset (&d, 0, sizeof (OT::Descriptors));
       good = unpackDescriptor (data, d);
       ocpiAssert (good);
-      ocpiAssert (d.mode == OR::ConsumerDescType);
+      ocpiAssert (d.mode == OT::ConsumerDescType);
       ocpiAssert (d.desc.c.fullFlagValue == 42);
       ocpiAssert (std::strcmp (d.desc.c.oob.oep, "Hello World") == 0);
 
-      std::memset (&d, 0, sizeof (OR::Descriptors));
-      d.mode = OR::ProducerDescType;
+      std::memset (&d, 0, sizeof (OT::Descriptors));
+      d.mode = OT::ProducerDescType;
       d.desc.p.emptyFlagValue = 42;
       std::strcpy (d.desc.p.oob.oep, "Hello World");
       data = packDescriptor (d);
-      std::memset (&d, 0, sizeof (OR::Descriptors));
+      std::memset (&d, 0, sizeof (OT::Descriptors));
       good = unpackDescriptor (data, d);
       ocpiAssert (good);
-      ocpiAssert (d.mode == OR::ProducerDescType);
+      ocpiAssert (d.mode == OT::ProducerDescType);
       ocpiAssert (d.desc.p.emptyFlagValue == 42);
       ocpiAssert (std::strcmp (d.desc.p.oob.oep, "Hello World") == 0);
 
@@ -216,7 +215,7 @@ namespace OCPI {
     }
     */
 
-    static void putOffset(OU::CDR::Encoder &packer, DtOsDataTypes::Offset val) {
+    static void putOffset(OU::CDR::Encoder &packer, XF::Offset val) {
       packer.
 #if OCPI_EP_SIZE_BITS == 64
       putULongLong(val);
@@ -225,7 +224,7 @@ namespace OCPI {
 #endif
     }
 
-    static void putFlag(OU::CDR::Encoder &packer, DtOsDataTypes::Flag val) {
+    static void putFlag(OU::CDR::Encoder &packer, XF::Flag val) {
       packer.
 #if OCPI_EP_FLAG_BITS == 64
       putULongLong(val);
@@ -234,7 +233,7 @@ namespace OCPI {
 #endif
     }
 
-    static void getOffset(OU::CDR::Decoder &unpacker, DtOsDataTypes::Offset &val) {
+    static void getOffset(OU::CDR::Decoder &unpacker, XF::Offset &val) {
       unpacker.
 #if OCPI_EP_SIZE_BITS == 64
       getULongLong(val);
@@ -243,7 +242,7 @@ namespace OCPI {
 #endif
     }
 
-    static void getFlag(OU::CDR::Decoder &unpacker, DtOsDataTypes::Flag &val) {
+    static void getFlag(OU::CDR::Decoder &unpacker, XF::Flag &val) {
       unpacker.
 #if OCPI_EP_FLAG_BITS == 64
       getULongLong(val);
@@ -253,7 +252,7 @@ namespace OCPI {
     }
 
     void BasicPort::
-    packPortDesc(const OR::Descriptors & desc, std::string &out) throw() {
+    packPortDesc(const OT::Descriptors & desc, std::string &out) throw() {
       ocpiDebug("Packing desc %p into %p %p %zu %zu",
 		&desc, &out, out.data(), out.length(), out.capacity());
       OU::CDR::Encoder packer;
@@ -261,7 +260,7 @@ namespace OCPI {
       packer.putULong     (desc.type);
       packer.putULong     (desc.role);
       packer.putULong     (desc.options);
-      const OR::Desc_t & d = desc.desc;
+      const OT::Desc_t & d = desc.desc;
       packer.putULong     (d.nBuffers);
       putOffset(packer, d.dataBufferBaseAddr);
       packer.putULong     (d.dataBufferPitch);
@@ -286,7 +285,7 @@ namespace OCPI {
     }
 
     bool BasicPort::
-    unpackPortDesc(const std::string &data, OR::Descriptors &desc) throw () {
+    unpackPortDesc(const std::string &data, OT::Descriptors &desc) throw () {
       OU::CDR::Decoder unpacker (data);
 
       try {
@@ -296,7 +295,7 @@ namespace OCPI {
         unpacker.getULong (desc.type);
         unpacker.getULong (desc.role);
         unpacker.getULong (desc.options);
-	OR::Desc_t & d = desc.desc;
+	OT::Desc_t & d = desc.desc;
 	unpacker.getULong     (d.nBuffers);
 	getOffset(unpacker, d.dataBufferBaseAddr);
 	unpacker.getULong     (d.dataBufferPitch);
@@ -326,11 +325,11 @@ namespace OCPI {
       return true;
     }
 
-    static void defaultRole(OR::PortRole &role, unsigned options) {
-      if (role == OR::NoRole) {
-	for (unsigned n = 0; n < OR::MaxRole; n++)
+    static void defaultRole(OT::PortRole &role, unsigned options) {
+      if (role == OT::NoRole) {
+	for (unsigned n = 0; n < OT::MaxRole; n++)
 	  if (options & (1u << n)) {
-	    role = (OR::PortRole)n;
+	    role = (OT::PortRole)n;
 	    return;
 	  }
 	throw OU::Error("Container port has no transfer roles");
@@ -341,44 +340,44 @@ namespace OCPI {
     // The existing settings are either NoRole, a preference, or a mandate
     // static method
     const char *BasicPort::
-    chooseRoles(OR::PortRole &uRole, unsigned &uOptions, OR::PortRole &pRole, unsigned &pOptions)
+    chooseRoles(OT::PortRole &uRole, unsigned &uOptions, OT::PortRole &pRole, unsigned &pOptions)
     {
       // FIXME this relies on knowledge of the values of the enum constants
-      static OR::PortRole otherRoles[] = { OCPI_RDT_OTHER_ROLES };
+      static OT::PortRole otherRoles[] = { OCPI_RDT_OTHER_ROLES };
       defaultRole(uRole, uOptions);
       defaultRole(pRole, pOptions);
-      OR::PortRole
+      OT::PortRole
         pOther = otherRoles[pRole],
         uOther = otherRoles[uRole];
-      if (uOptions & (1u << OCPI::RDT::FlagIsMeta)) {
-	if (!(pOptions & ((1u << OCPI::RDT::FlagIsMeta) | (1u << OCPI::RDT::FlagIsMetaOptional))))
+      if (uOptions & (1u << OT::FlagIsMeta)) {
+	if (!(pOptions & ((1u << OT::FlagIsMeta) | (1u << OT::FlagIsMetaOptional))))
 	  return "Incompatible Metadata mode: input side cannot do flag-is-meta, output must";
-	pOptions |= (1u << OCPI::RDT::FlagIsMeta);
-      } else if (uOptions & (1u << OCPI::RDT::FlagIsMetaOptional)) {
-	if (pOptions & ((1u << OCPI::RDT::FlagIsMeta) | (1u << OCPI::RDT::FlagIsMetaOptional))) {
-	  pOptions |= (1u << OCPI::RDT::FlagIsMeta);
-	  uOptions |= (1u << OCPI::RDT::FlagIsMeta);
+	pOptions |= (1u << OT::FlagIsMeta);
+      } else if (uOptions & (1u << OT::FlagIsMetaOptional)) {
+	if (pOptions & ((1u << OT::FlagIsMeta) | (1u << OT::FlagIsMetaOptional))) {
+	  pOptions |= (1u << OT::FlagIsMeta);
+	  uOptions |= (1u << OT::FlagIsMeta);
 	} else
-	  uOptions &= ~(1u << OCPI::RDT::FlagIsMeta);
-      } else if (pOptions & (1u << OCPI::RDT::FlagIsMeta))
+	  uOptions &= ~(1u << OT::FlagIsMeta);
+      } else if (pOptions & (1u << OT::FlagIsMeta))
 	return "Incompatible Metadata mode: output side cannot do flag-is-meta, input must";
-      if (pOptions & (1u << OR::MandatedRole)) {
+      if (pOptions & (1u << OT::MandatedRole)) {
         // provider has a mandate
-        ocpiAssert(pRole != OR::NoRole);
+        ocpiAssert(pRole != OT::NoRole);
         if (uRole == pOther)
           return NULL;
-        if (uOptions & (1u << OR::MandatedRole))
+        if (uOptions & (1u << OT::MandatedRole))
           return "Incompatible mandated transfer roles";
         if (uOptions & (1u << pOther)) {
           uRole = pOther;
           return NULL;
         }
         return "No compatible role available against mandated role";
-      } else if (pRole != OR::NoRole) {
+      } else if (pRole != OT::NoRole) {
         // provider has a preference
-        if (uOptions & (1u << OR::MandatedRole)) {
+        if (uOptions & (1u << OT::MandatedRole)) {
           // user has a mandate
-          ocpiAssert(uRole != OR::NoRole);
+          ocpiAssert(uRole != OT::NoRole);
           if (pRole == uOther)
             return NULL;
           if (pOptions & (1u << uOther)) {
@@ -386,37 +385,37 @@ namespace OCPI {
             return NULL;
           }
           throw OU::Error("No compatible role available against mandated role");
-        } else if (uRole != OR::NoRole) {
+        } else if (uRole != OT::NoRole) {
           // We have preferences on both sides, but no mandate
           // If preferences match, all is well
           if (pRole == uOther)
             return NULL;
           // If one preference is against push, we better listen to it.
-          if (uRole == OR::ActiveFlowControl &&
-              pOptions & (1u << OR::ActiveMessage)) {
-            pRole = OR::ActiveMessage;
+          if (uRole == OT::ActiveFlowControl &&
+              pOptions & (1u << OT::ActiveMessage)) {
+            pRole = OT::ActiveMessage;
             return NULL;
           }
           // Let's try active push if we can
-          if (uRole == OR::ActiveMessage &&
-              pOptions & (1u << OR::ActiveFlowControl)) {
-            pRole = OR::ActiveFlowControl;
+          if (uRole == OT::ActiveMessage &&
+              pOptions & (1u << OT::ActiveFlowControl)) {
+            pRole = OT::ActiveFlowControl;
             return NULL;
           }
-          if (pRole == OR::ActiveFlowControl &&
-              uOptions & (1u << OR::ActiveMessage)) {
-            uRole = OR::ActiveFlowControl;
+          if (pRole == OT::ActiveFlowControl &&
+              uOptions & (1u << OT::ActiveMessage)) {
+            uRole = OT::ActiveFlowControl;
             return NULL;
           }
           // Let's try activeonly push if we can
-          if (uRole == OR::ActiveOnly &&
-              pOptions & (1u << OR::Passive)) {
-            pRole = OR::Passive;
+          if (uRole == OT::ActiveOnly &&
+              pOptions & (1u << OT::Passive)) {
+            pRole = OT::Passive;
             return NULL;
           }
-          if (pRole == OR::Passive &&
-              pOptions & (1u << OR::ActiveOnly)) {
-            pRole = OR::ActiveOnly;
+          if (pRole == OT::Passive &&
+              pOptions & (1u << OT::ActiveOnly)) {
+            pRole = OT::ActiveOnly;
             return NULL;
           }
           // Let's give priority to the "better" role.
@@ -443,14 +442,14 @@ namespace OCPI {
           }
           // Can't use provider preference, Fall through to no mandates, no preferences
         }
-      } else if (uOptions & (1u << OR::MandatedRole)) {
+      } else if (uOptions & (1u << OT::MandatedRole)) {
         // Provider has no mandate or preference, but user has a mandate
         if (pOptions & (1u << uOther)) {
           pRole = uOther;
           return NULL;
         }
         return "No compatible role available against mandated role";
-      } else if (uRole != OR::NoRole) {
+      } else if (uRole != OT::NoRole) {
         // Provider has no mandate or preference, but user has a preference
         if (pOptions & (1u << uOther)) {
           pRole = uOther;
@@ -459,11 +458,11 @@ namespace OCPI {
         // Fall through to no mandates, no preferences.
       }
       // Neither has useful mandates or preferences.  Find anything, biasing to push
-      for (unsigned i = 0; i < OR::MaxRole; i++)
+      for (unsigned i = 0; i < OT::MaxRole; i++)
         // Provider has no mandate or preference
         if (uOptions & (1u << i) &&
             pOptions & (1u << otherRoles[i])) {
-          uRole = (OR::PortRole)i;
+          uRole = (OT::PortRole)i;
           pRole = otherRoles[i];
           return NULL;
         }
@@ -481,7 +480,7 @@ namespace OCPI {
       // Giving priority to the input side in a tie, find the first transport that
       // both sides support that have compatible roles.
       static const char *roleNames[] = { OCPI_RDT_ROLE_NAMES };
-      OR::PortRole roleIn = OR::NoRole, roleOut = OR::NoRole;
+      OT::PortRole roleIn = OT::NoRole, roleOut = OT::NoRole;
       const char *s;
       findRole(paramsIn, s, roleIn); // overrides per port for xfer role
       findRole(paramsOut, s, roleOut);
@@ -526,7 +525,7 @@ namespace OCPI {
 	if (sConn.length() && strcasecmp(sConn.c_str(), it.transport.c_str()))
 	  ocpiInfo("Rejecting input transport %s since %s was specified for the connection",
 		   it.transport.c_str(), sConn.c_str());
-	else if (roleIn != OR::NoRole && !((1u << roleIn) & it.optionsIn))
+	else if (roleIn != OT::NoRole && !((1u << roleIn) & it.optionsIn))
 	  ocpiInfo("Rejecting input role %s for transport %s: container doesn't support it",
 		   roleNames[roleIn], it.transport.c_str());
 	else
@@ -542,7 +541,7 @@ namespace OCPI {
 	    else if (sConn.length() && strcasecmp(sConn.c_str(), ot.transport.c_str()))
 	      ocpiInfo("Rejecting output transport %s since %s was specified for the connection",
 		       ot.transport.c_str(), sConn.c_str());
-	    else if (roleOut != OR::NoRole && !((1u << roleOut) & ot.optionsOut))
+	    else if (roleOut != OT::NoRole && !((1u << roleOut) & ot.optionsOut))
 	      ocpiInfo("Rejecting output role %s for transport %s: container doesn't support it",
 		       roleNames[roleOut], ot.transport.c_str());
 	    else {
@@ -551,13 +550,13 @@ namespace OCPI {
 	      transport.optionsOut = ot.optionsOut;
 	      transport.roleIn = it.roleIn;
 	      transport.roleOut = ot.roleOut;
-	      if (roleIn != OR::NoRole) {
+	      if (roleIn != OT::NoRole) {
 		transport.roleIn = roleIn;
-		transport.optionsIn |= 1u << OR::MandatedRole;
+		transport.optionsIn |= 1u << OT::MandatedRole;
 	      }
-	      if (roleOut != OR::NoRole) {
+	      if (roleOut != OT::NoRole) {
 		transport.roleOut = roleOut;
-		transport.optionsOut |= 1u << OR::MandatedRole;
+		transport.optionsOut |= 1u << OT::MandatedRole;
 	      }
 	      if ((err = chooseRoles(transport.roleOut, transport.optionsOut, transport.roleIn,
 				     transport.optionsIn)))
@@ -566,8 +565,8 @@ namespace OCPI {
 	      else {
 		transport.transport = it.transport;
 		transport.id = it.id;
-		transport.optionsIn |= (1u << OR::MandatedRole);
-		transport.optionsOut |= (1u << OR::MandatedRole);
+		transport.optionsIn |= (1u << OT::MandatedRole);
+		transport.optionsOut |= (1u << OT::MandatedRole);
 		ocpiInfo("Choosing transport %s id \"%s\" for connection with roles %s(0x%x)->%s(0x%x)",
 			 it.transport.c_str(), it.id.c_str(), roleNames[transport.roleOut],
 			 transport.optionsOut, roleNames[transport.roleIn], transport.optionsIn);
@@ -1021,7 +1020,7 @@ namespace OCPI {
 
     void BasicPort::
     applyConnection(const Transport &t, size_t a_bufferSize) {
-      OR::Descriptors &d = getData().data;
+      OT::Descriptors &d = getData().data;
       d.role = isProvider() ? t.roleIn : t.roleOut;
       d.options = isProvider() ? t.optionsIn : t.optionsOut;
       if (!d.desc.oob.oep[0])
@@ -1109,9 +1108,9 @@ namespace OCPI {
       BasicPort
 	&in = isProvider() ? *this : other,
 	&out = isProvider() ? other : *this;
-      OR::Descriptors buf, buf1;
+      OT::Descriptors buf, buf1;
       bool inDone = false, outDone = false;
-      const OR::Descriptors *result = in.startConnect(NULL, buf, inDone);
+      const OT::Descriptors *result = in.startConnect(NULL, buf, inDone);
       assert(result);
       result = out.startConnect(result, buf1, outDone);
       assert((result && !inDone) || (!result && inDone));
@@ -1135,7 +1134,7 @@ namespace OCPI {
 	&p = isProvider() ? c.m_in : c.m_out,
 	&other = isProvider() ? c.m_out : c.m_in;
       assert(!p.m_done);
-      OR::Descriptors buf, buf1, *otherInfo = NULL;
+      OT::Descriptors buf, buf1, *otherInfo = NULL;
       ocpiDebug("StartRemote %p prov %u initial %p length %zu other %p %zu",
 		this, isProvider(), &p.m_initial, p.m_initial.length(),
 		&other.m_initial, other.m_initial.length());
@@ -1144,7 +1143,7 @@ namespace OCPI {
 	other.m_initial.clear();
 	otherInfo = &buf;
       }
-      const OR::Descriptors *result = startConnect(otherInfo, buf1, p.m_done);
+      const OT::Descriptors *result = startConnect(otherInfo, buf1, p.m_done);
       if (result) {
 	p.m_started = true;
 	ocpiDebug("pack0 %p prov %u initial %p length %zu data %p",
@@ -1163,8 +1162,8 @@ namespace OCPI {
     // return true if more to do - we need more info
     bool BasicPort::
     finishRemote(Launcher::Connection &c) {
-      OR::Descriptors buf, buf1;
-      const OR::Descriptors *result;
+      OT::Descriptors buf, buf1;
+      const OT::Descriptors *result;
       Launcher::Port
 	&p = isProvider() ? c.m_in : c.m_out,
 	&other = isProvider() ? c.m_out : c.m_in;
@@ -1184,8 +1183,8 @@ namespace OCPI {
     }
 
     // Default local behavior for basic ports that need to behave like external or bridge ports
-    const OCPI::RDT::Descriptors *BasicPort::
-    startConnect(const OCPI::RDT::Descriptors *other, OCPI::RDT::Descriptors &feedback, bool &done) {
+    const OT::Descriptors *BasicPort::
+    startConnect(const OT::Descriptors *other, OT::Descriptors &feedback, bool &done) {
       if (isProvider())
 	m_dtPort = container().getTransport().createInputPort(getData().data);
       else if (other)
@@ -1202,12 +1201,12 @@ namespace OCPI {
       return NULL; // we got nuthin
     }
 
-    const OCPI::RDT::Descriptors *BasicPort::
-    finishConnect(const OCPI::RDT::Descriptors *other, OCPI::RDT::Descriptors &feedback,
+    const OT::Descriptors *BasicPort::
+    finishConnect(const OT::Descriptors *other, OT::Descriptors &feedback,
 		  bool &done) {
       ocpiDebug("finishConnect enter on '%s' other %p dtport %p",
 		name().c_str(), other, m_dtPort);
-      const OCPI::RDT::Descriptors *rv;
+      const OT::Descriptors *rv;
       if (!m_dtPort) {
 	assert(!isProvider());
 	assert(other);

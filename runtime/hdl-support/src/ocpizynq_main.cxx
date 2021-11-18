@@ -88,6 +88,7 @@ print_spi_idx_msg(unsigned idx, const char* msg, ...) {
   va_end(arg);
 }
 
+#if defined(OCPI_ARCH_aarch64)
 
 static void
 doPLL(const char *name, uint32_t control) {
@@ -104,6 +105,7 @@ doFclk(unsigned n, uint32_t control) {
 	 (control >> 24) & 1, (control >> 16) & 0x3f, (control >> 8) & 0x3f,
 	 plls[control & 3]);
 }
+#endif
 int
 mymain(const char **argv) {
 #if !defined(OCPI_ARCH_arm) && !defined(OCPI_ARCH_arm_cs) && !defined(OCPI_ARCH_aarch32) && !defined(OCPI_ARCH_aarch64)

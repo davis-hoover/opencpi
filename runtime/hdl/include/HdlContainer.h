@@ -64,7 +64,7 @@ namespace OCPI {
 	createApplication(const char *name, const OCPI::Base::PValue *props)
 	throw ( OCPI::Util::EmbeddedException );
       bool needThread();
-      Container::DispatchRetCode dispatch(DataTransfer::EventManager*);
+      Container::DispatchRetCode dispatch(OCPI::Xfer::EventManager*);
       void dump(bool before, bool hex);
     };
   }

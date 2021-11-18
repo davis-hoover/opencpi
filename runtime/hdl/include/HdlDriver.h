@@ -86,7 +86,7 @@ namespace OCPI {
       createDirectWorker(Device &dev, const Access &cAccess, Access &wAccess, ezxml_t impl,
 			 ezxml_t inst, const char *idx, unsigned timeout);
       virtual void initAdmin(OccpAdminRegisters &admin, const char *platform, HdlUUID &hdlUuid,
-			     OU::UuidString *uuidString);
+			     OCPI::Util::UuidString *uuidString);
     };
   }
 }

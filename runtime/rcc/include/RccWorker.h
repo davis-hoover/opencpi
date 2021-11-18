@@ -152,7 +152,7 @@ namespace OCPI {
       // end backward compatibility for ctests
 
       // Get our transport
-      inline OCPI::DataTransport::Transport &getTransport() { return m_transport; }
+      inline OCPI::Transport::Transport &getTransport() { return m_transport; }
 
       virtual ~Worker();
 
@@ -204,7 +204,7 @@ namespace OCPI {
       uint64_t worker_run_count;
 
       // Pointer into actual RCC worker binary for its dispatch struct
-      OCPI::DataTransport::Transport &m_transport;
+      OCPI::Transport::Transport &m_transport;
 
       // Task semaphore
       OCPI::OS::Semaphore m_taskSem;

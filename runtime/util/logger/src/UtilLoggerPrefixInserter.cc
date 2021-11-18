@@ -103,7 +103,7 @@ OCPI::Logger::PrefixInserter::
 PrefixInserterBuf::overflow (int_type c)
 {
   if (m_first) {
-    std::streamsize pp = m_out.sputn (m_prefix.data(), m_prefix.length());
+    std::streamsize pp = m_out.sputn (m_prefix.data(), (std::streamsize)m_prefix.length());
     if (pp < 0 || static_cast<std::string::size_type> (pp) != m_prefix.length()) {
       return traits_type::eof();
     }

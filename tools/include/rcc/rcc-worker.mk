@@ -75,7 +75,7 @@ ifdef OcpiBuildingACI
   RccSpecificLinkOptions=\
     $(call RccPrioritize,MainLinkOptions,$(OcpiLanguage),$(RccTarget),$(RccRealPlatform))
   override RccLibrariesInternal+=\
-    application remote_support container library msg_driver_interface metadata transport xfer drc \
+    application remote_support container library msg metadata transport xfer drc \
     drc_ad9361 base util foreign os
 else
   RccSpecificLinkOptions=\

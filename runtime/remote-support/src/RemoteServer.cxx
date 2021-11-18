@@ -32,7 +32,7 @@
 #include "ContainerLauncher.h"
 #include "RemoteLauncher.h"
 #include "RemoteServer.h"
-#include "XferManager.h"
+#include "XferManager.hh"
 
 namespace OX = OCPI::Util::EzXml;
 namespace OC = OCPI::Container;
@@ -42,7 +42,8 @@ namespace OU = OCPI::Util;
 namespace OB = OCPI::Base;
 namespace OE = OCPI::OS::Ether;
 namespace OA = OCPI::API;
-namespace OR = OCPI::RDT;
+namespace OT = OCPI::Transport;
+namespace XF = OCPI::Xfer;
 namespace OCPI {
   namespace Remote {
 
@@ -75,7 +76,7 @@ namespace OCPI {
 
     bool Server::
     receive(bool &eof, std::string &error) {
-      DataTransfer::XferManager::getFactoryManager().setEndPointContext(this);
+      XF::XferManager::getFactoryManager().setEndPointContext(this);
       if (m_downloading)
 	return download(error);
       if (OX::receiveXml(fd(), m_rx, m_buf, eof, error))
@@ -261,8 +262,8 @@ namespace OCPI {
 	  (err = doSide2(c.m_in, c.m_out)) ||
 	  (err = doSide2(c.m_out, c.m_in)))
 	return OU::eformat(error, "Error processing connection values for launch: %s", err);
-      c.m_transport.roleIn = OCPI_UTRUNCATE(OR::PortRole, roleIn);
-      c.m_transport.roleOut = OCPI_UTRUNCATE(OR::PortRole, roleOut);
+      c.m_transport.roleIn = OCPI_UTRUNCATE(OT::PortRole, roleIn);
+      c.m_transport.roleOut = OCPI_UTRUNCATE(OT::PortRole, roleOut);
       c.m_transport.optionsIn = OCPI_UTRUNCATE(uint32_t, optionsIn);
       c.m_transport.optionsOut = OCPI_UTRUNCATE(uint32_t, optionsOut);
       updateConnection(c, cx);

@@ -85,17 +85,17 @@ runtime/base -d internal -T ocpixml
 runtime/time -d internal
 runtime/drc/base -l drc
 runtime/drc/ad9361 -l drc_ad9361
-runtime/dataplane/xfer/base -l xfer
-runtime/dataplane/xfer/tests -n -d internal -l xfer_tests
-runtime/dataplane/xfer/drivers/datagram -v
-runtime/dataplane/xfer/drivers/dma -v
-runtime/dataplane/xfer/drivers/ofed -v
-runtime/dataplane/xfer/drivers/pio -v
-runtime/dataplane/xfer/drivers/socket -v
-runtime/dataplane/transport
+runtime/xfer/base -l xfer
+runtime/xfer/tests -n -d internal -l xfer_tests
+runtime/xfer/drivers/datagram -v
+runtime/xfer/drivers/dma -v
+runtime/xfer/drivers/ofed -v
+runtime/xfer/drivers/pio -v
+runtime/xfer/drivers/socket -v
+runtime/transport
 runtime/metadata
-runtime/dataplane/msg_driver_interface -d internal
-runtime/dataplane/msg_drivers
+runtime/msg/base -d internal -l msg
+runtime/msg/drivers -l msg_drivers
 runtime/library
 runtime/container
 runtime/remote -v

@@ -442,8 +442,7 @@ namespace OCPI {
          * \post Reply information is available.
          */
 
-        void head (const OCPI::Util::Uri & uri)
-          throw (std::string, Redirection, ClientError, ServerError);
+        void head(const OCPI::Util::Uri &uri);
 
         /**
          * Initiate a <tt>GET</tt> request.
@@ -464,8 +463,7 @@ namespace OCPI {
          * \post Reply information is available.
          */
 
-        void get (const OCPI::Util::Uri & uri)
-          throw (std::string, Redirection, ClientError, ServerError);
+        void get(const OCPI::Util::Uri &uri);
 
         /**
          * Initiate a <tt>PUT</tt> request.
@@ -503,8 +501,7 @@ namespace OCPI {
          * \post The client stream is connected.
          */
 
-        void put (const OCPI::Util::Uri & uri, std::ios_base::openmode mode = std::ios_base::out)
-          throw (std::string, Redirection, ClientError, ServerError);
+        void put(const OCPI::Util::Uri &uri, std::ios_base::openmode mode = std::ios_base::out);
 
         /**
          * Initiate a <tt>PUT</tt> request.
@@ -546,8 +543,7 @@ namespace OCPI {
          * \post The client stream is connected.
          */
 
-        void put (const OCPI::Util::Uri & uri, const std::string & contentType, unsigned long long size, std::ios_base::openmode mode)
-          throw (std::string, Redirection, ClientError, ServerError);
+        void put(const OCPI::Util::Uri &uri, const std::string &contentType, unsigned long long size, std::ios_base::openmode mode);
 
         /*
          * Initiate a <tt>POST</tt> request.
@@ -594,8 +590,8 @@ namespace OCPI {
          * \post The client stream is connected.
          */
 
-        void post (const OCPI::Util::Uri & uri, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
-          throw (std::string, Redirection, ClientError, ServerError);
+        void post(const OCPI::Util::Uri &uri,
+		  std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out);
 
         /**
          * Initiate a <tt>POST</tt> request.
@@ -637,8 +633,8 @@ namespace OCPI {
          * \post The client stream is connected.
          */
 
-        void post (const OCPI::Util::Uri & uri, const std::string & contentType, unsigned long long size, std::ios_base::openmode mode)
-          throw (std::string, Redirection, ClientError, ServerError);
+        void post(const OCPI::Util::Uri &uri, const std::string &contentType,
+		  unsigned long long size, std::ios_base::openmode mode);
 
         /**
          * Initiate a <tt>DELETE</tt> request.
@@ -665,8 +661,7 @@ namespace OCPI {
          * \post Reply information is available.
          */
 
-        void remove (const OCPI::Util::Uri & uri, std::ios_base::openmode mode = (std::ios_base::openmode) 0)
-          throw (std::string, Redirection, ClientError, ServerError);
+        void remove(const OCPI::Util::Uri &uri, std::ios_base::openmode mode = (std::ios_base::openmode) 0);
 
         //@}
 
@@ -702,8 +697,7 @@ namespace OCPI {
          * \post Reply information is available.
          */
 
-        void completeUpload ()
-          throw (std::string, Redirection, ClientError, ServerError);
+        void completeUpload();
 
         /**
          * Completes the request and closes the stream.
@@ -729,8 +723,7 @@ namespace OCPI {
          * \post Reply information is available.
          */
 
-        void close ()
-          throw (std::string, Redirection, ClientError, ServerError);
+        void close();
 
         //@}
 
@@ -763,8 +756,7 @@ namespace OCPI {
          * \return The HTTP status code from the response status line.
          */
 
-        int statusCode ()
-          throw (std::string, Redirection, ClientError, ServerError);
+        int statusCode();
 
         /*
          * The set of header fields in the response.
@@ -779,8 +771,7 @@ namespace OCPI {
          * \return The set of header fields in the response.
          */
 
-        const Headers & responseHeaders ()
-          throw (std::string, Redirection, ClientError, ServerError);
+        const Headers &responseHeaders();
 
         /**
          * The content type of the reply body.
@@ -795,8 +786,7 @@ namespace OCPI {
          * \return The content type.
          */
 
-        std::string contentType ()
-          throw (std::string, Redirection, ClientError, ServerError);
+        std::string contentType();
 
         /*
          * The character set used by the reply body.
@@ -824,8 +814,7 @@ namespace OCPI {
          * <tt>text</tt>.
          */
 
-        std::string charset ()
-          throw (std::string, Redirection, ClientError, ServerError);
+        std::string charset();
 
         /**
          * The length of the reply body, as indicated by the
@@ -842,8 +831,7 @@ namespace OCPI {
          * clients to ignore the value (e.g., when HTTP chunking is used).
          */
 
-        unsigned long long contentLength ()
-          throw (std::string, Redirection, ClientError, ServerError);
+        unsigned long long contentLength();
 
         /**
          * The last-modification timestamp, as indicated by the
@@ -860,8 +848,7 @@ namespace OCPI {
          * parsed.
          */
 
-        std::time_t lastModified ()
-          throw (std::string, Redirection, ClientError, ServerError);
+        std::time_t lastModified();
 
         /**
          * The reply body, if it was read internally.
@@ -878,8 +865,7 @@ namespace OCPI {
          * if an error occured while reading the body.
          */
 
-        const std::string & body ()
-          throw (std::string, Redirection, ClientError, ServerError);
+        const std::string &body();
 
         //@}
 
@@ -958,20 +944,17 @@ namespace OCPI {
 
         void reset ();
 
-        void checkRelocation ()
-          throw (std::string, Redirection);
+        void checkRelocation();
 
-        void checkServerError ()
-          throw (std::string, ClientError, ServerError);
+        void checkServerError();
 
         void readBody ();
 
       protected:
-        void headOrDelete (int, const OCPI::Util::Uri &, std::ios_base::openmode)
-          throw (std::string, Redirection, ClientError, ServerError);
+        void headOrDelete(int, const OCPI::Util::Uri &, std::ios_base::openmode);
 
-        void putOrPost (int, const OCPI::Util::Uri &, const std::string &, unsigned long long, std::ios_base::openmode)
-          throw (std::string, Redirection, ClientError, ServerError);
+        void putOrPost(int, const OCPI::Util::Uri &, const std::string &, unsigned long long,
+		       std::ios_base::openmode);
 
       protected:
         static void shutdownForBuf (void *);
@@ -1051,8 +1034,7 @@ namespace OCPI {
          * the server.
          */
 
-        inline Client (const OCPI::Util::Uri & uri)
-          throw (std::string, Redirection, ClientError, ServerError);
+        inline Client (const OCPI::Util::Uri &uri);
 
         /**
          * Destructor.
@@ -1113,7 +1095,6 @@ OCPI::Util::Http::Client<Connector>::Client ()
 template<class Connector>
 inline
 OCPI::Util::Http::Client<Connector>::Client (const OCPI::Util::Uri & uri)
-  throw (std::string, Redirection, ClientError, ServerError)
 {
   get (uri);
 }

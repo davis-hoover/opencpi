@@ -71,7 +71,7 @@ OCPI::Util::Tcp::Server::accept (unsigned long timeout)
     throw std::string ("not bound");
   }
 
-  if (!m_socket.wait (timeout)) {
+  if (!m_socket.wait((long)timeout)) {
     return 0;
   }
 

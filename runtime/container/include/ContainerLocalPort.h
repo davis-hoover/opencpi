@@ -25,7 +25,7 @@
 
 #include "UtilSelfMutex.hh"
 #include "BasePValue.hh"
-#include "OcpiRDTInterface.h"
+#include "TransportRDTInterface.hh"
 #include "MetadataPort.hh"
 #include "BaseParentChild.hh"
 #include "ContainerLauncher.h"
@@ -133,15 +133,15 @@ namespace OCPI {
     public:
       size_t nOthers() const { return m_bridgePorts.size(); }
 #if 0
-      void applyConnectParams(const OCPI::RDT::Descriptors *other,
+      void applyConnectParams(const OCPI::Transport::Descriptors *other,
 			      const OCPI::Base::PValue *params);
       // These may involve bridge ports.  The return value may point to the supplied buf.
       // The "done" output says whether this port needs anything more to be operational
-      const OCPI::RDT::Descriptors
-        *initialConnect(const Launcher::Connection &c, const OCPI::RDT::Descriptor *other,
-			OCPI::RDT::Descriptors &buf, bool &done),
-	*finalConnect(const Launcher::Connection &c, const OCPI::RDT::Descriptors *other,
-		      OCPI::RDT::Descriptors &buf, bool &done);
+      const OCPI::Transport::Descriptors
+        *initialConnect(const Launcher::Connection &c, const OCPI::Transport::Descriptor *other,
+			OCPI::Transport::Descriptors &buf, bool &done),
+	*finalConnect(const Launcher::Connection &c, const OCPI::Transport::Descriptors *other,
+		      OCPI::Transport::Descriptors &buf, bool &done);
 #endif
 #if 0
       // Remote connection: up to 5 steps! worst case.

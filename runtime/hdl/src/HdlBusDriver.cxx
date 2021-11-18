@@ -49,6 +49,7 @@
        namespace OF = OCPI::OS::FileSystem;
        namespace OZ = OCPI::HDL::ZynqMP;
        namespace OH = OCPI::HDL;
+       namespace OT = OCPI::Transport;
 
        const char
          fpgaMgrState[]  = "/sys/class/fpga_manager/fpga0/state",
@@ -250,8 +251,8 @@
 	// (M_AXI_GP0/1 is dedicated to the control plane).
 	uint32_t dmaOptions(ezxml_t /*icImplXml*/, ezxml_t /*icInstXml*/, bool isProvider) {
 	  return isProvider ?
-	    (1 << OCPI::RDT::ActiveMessage) | (1 << OCPI::RDT::FlagIsMeta) :
-	    (1 << OCPI::RDT::ActiveMessage) | (1 << OCPI::RDT::FlagIsMetaOptional);
+	    (1 << OT::ActiveMessage) | (1 << OT::FlagIsMeta) :
+	    (1 << OT::ActiveMessage) | (1 << OT::FlagIsMetaOptional);
 	}
 
 	// Scan the buffer and identify the start of the sync pattern

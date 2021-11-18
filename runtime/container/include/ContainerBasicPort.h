@@ -29,9 +29,10 @@
 
 #include "UtilSelfMutex.hh"
 #include "BasePValue.hh"
-#include "OcpiRDTInterface.h"
-#include "MetadataPort.hh"
 #include "BaseParentChild.hh"
+#include "MetadataPort.hh"
+#include "TransportRDTInterface.hh"
+#include "TransportBuffer.hh"
 #include "ContainerLauncher.h"
 
 namespace OCPI {
@@ -48,7 +49,7 @@ namespace OCPI {
     // Port connection dependency data: what is communicated between containers
     struct PortConnectionDesc
     {
-      OCPI::RDT::Descriptors        data;        // Connection data
+      OCPI::Transport::Descriptors        data;        // Connection data
     };
 
     /**********************************
@@ -112,7 +113,7 @@ typedef int pthread_spinlock_t;
 # endif
       pthread_spinlock_t m_zcLock;          // use until lockless...
       // This is specific to the "transport" mode, with a buffer from the transport system
-      OCPI::DataTransport::BufferUserFacet *m_dtBuffer;
+      OCPI::Transport::BufferUserFacet *m_dtBuffer;
       uint8_t *m_dtData;
     protected:
       ExternalBuffer(BasicPort &port, ExternalBuffer *next, unsigned position);
@@ -153,7 +154,7 @@ typedef int pthread_spinlock_t;
       ExternalBuffer *m_lastOutBuffer; // only used for upper level API
       // These two are for external port mode as opposed to shim mode
       ExternalBuffer *m_dtLastBuffer; // the "current buffer" for DT mode
-      OCPI::DataTransport::Port *m_dtPort; // NULL for shim
+      OCPI::Transport::Port *m_dtPort; // NULL for shim
       // End external port mode
       // Shim mode.  Slightly clever allocation in order to allocate once for headers and data
       // that is sized at runtime - better locality, no fragmentation, sequential access
@@ -167,7 +168,7 @@ typedef int pthread_spinlock_t;
       BasicPort *m_forward;  // if set, forward worker-side to this other port
       BasicPort *m_backward; // if set, other is forwarded to here
       size_t m_nRead, m_nWritten;
-      OCPI::RDT::Desc_t &myDesc; // convenience
+      OCPI::Transport::Desc_t &myDesc; // convenience
       const OCPI::Metadata::Port &m_metaPort;
       Container &m_container;
 
@@ -215,11 +216,11 @@ typedef int pthread_spinlock_t;
       const char *cname() const { return m_metaPort.cname(); }
       // Start/Finish this side of the connection, and return the right descriptor to return.
       // set "done" true if this side is done and can "operate" (e.g. send messages).
-      virtual const OCPI::RDT::Descriptors *
-      startConnect(const OCPI::RDT::Descriptors *other, OCPI::RDT::Descriptors &feedback,
+      virtual const OCPI::Transport::Descriptors *
+      startConnect(const OCPI::Transport::Descriptors *other, OCPI::Transport::Descriptors &feedback,
 		   bool &done);
-      virtual const OCPI::RDT::Descriptors *
-      finishConnect(const OCPI::RDT::Descriptors *other, OCPI::RDT::Descriptors &feedback,
+      virtual const OCPI::Transport::Descriptors *
+      finishConnect(const OCPI::Transport::Descriptors *other, OCPI::Transport::Descriptors &feedback,
 		    bool &done);
       bool startRemote(Launcher::Connection &c);
       bool finishRemote(Launcher::Connection &c);
@@ -229,18 +230,17 @@ typedef int pthread_spinlock_t;
 				     const OCPI::Base::PValue *paramsOut,
 				     const OCPI::Base::PValue *connParams,
 				     Transport &transport);
-      static void packPortDesc(const OCPI::RDT::Descriptors&  port, std::string &out ) throw ();
-      static bool unpackPortDesc(const std::string& desc, OCPI::RDT::Descriptors &desc_storage)
+      static void packPortDesc(const OCPI::Transport::Descriptors&  port, std::string &out ) throw ();
+      static bool unpackPortDesc(const std::string& desc, OCPI::Transport::Descriptors &desc_storage)
         throw ();
-      static const char *chooseRoles(OCPI::RDT::PortRole &uRole, unsigned &uOptions,
-				     OCPI::RDT::PortRole &pRole, unsigned &pOptions);
+      static const char *chooseRoles(OCPI::Transport::PortRole &uRole, unsigned &uOptions,
+				     OCPI::Transport::PortRole &pRole, unsigned &pOptions);
       OCPI::API::ExternalBuffer
         *getBuffer(uint8_t *&data, size_t &length, uint8_t &opCode, bool &end),
 	*getBuffer(uint8_t *&data, size_t &length);
       // Internal methods.
       bool peekOpCode(uint8_t &op);
       ExternalBuffer *getFullBuffer(), *getEmptyBuffer();
-         
       bool endOfData();
       bool tryFlush();
       // release most recently gotten input buffer

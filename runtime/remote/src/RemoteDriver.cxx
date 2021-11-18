@@ -46,7 +46,7 @@ namespace OA = OCPI::API;
 namespace OL = OCPI::Library;
 namespace OE = OCPI::OS::Ether;
 namespace OS = OCPI::OS;
-namespace OR = OCPI::RDT;
+namespace OT = OCPI::Transport;
 namespace OCPI {
   namespace Remote {
 
@@ -371,7 +371,7 @@ public:
 	throw OU::Error("Bad transport string in container discovery: %s: %d", a_transports, rv);
       if (id[0] == ' ') // local sscanf issue - field cannot be empty
 	id[0] = '\0';
-      addTransport(transport, id, (OR::PortRole)roleIn, (OR::PortRole)roleOut, optionsIn,
+      addTransport(transport, id, (OT::PortRole)roleIn, (OT::PortRole)roleOut, optionsIn,
 		   optionsOut);
       a_transports += nChars;
     }

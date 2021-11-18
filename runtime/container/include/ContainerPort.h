@@ -26,17 +26,13 @@
 
 #include "UtilSelfMutex.hh"
 #include "BasePValue.hh"
-#include "OcpiRDTInterface.h"
+#include "TransportRDTInterface.hh"
 #include "MetadataPort.hh"
 #include "BaseParentChild.hh"
 #include "ContainerApplication.h"
 #include "ContainerLocalPort.h"
 
 namespace OCPI {
-  namespace DataTransport {
-    class Port;
-    class BufferUserFacet;
-  }
   namespace Container {
 
     class Worker;
@@ -64,14 +60,14 @@ namespace OCPI {
 			      const OCPI::Base::PValue *otherParams);
       void portIsConnected();
     public:
-      //      void determineRoles(OCPI::RDT::Descriptors &other);
+      //      void determineRoles(OCPI::Transport::Descriptors &other);
       inline Port &containerPort() { return *this; }
       // If isLocal(), then this method can be used.
-      virtual void localConnect(OCPI::DataTransport::Port &/*input*/) {}
+      virtual void localConnect(OCPI::Transport::Port &/*input*/) {}
       // If islocal(), then this can be used.
-      virtual OCPI::DataTransport::Port &dtPort() {
+      virtual OCPI::Transport::Port &dtPort() {
         assert("Illegal call to dtPort"==0);
-        return *(OCPI::DataTransport::Port *)this;
+        return *(OCPI::Transport::Port *)this;
       }
       void disconnect() {}
 

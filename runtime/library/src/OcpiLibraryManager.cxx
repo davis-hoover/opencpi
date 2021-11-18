@@ -540,7 +540,7 @@ namespace OCPI {
 	Implementation &i = *ii->second;
 	if (i.m_staticInstance)
 	  for (unsigned nn = 0; nn < i.m_metadataImpl.nPorts(); ++nn)
-	    if (i.m_internals & (1<<nn)) {
+	    if (i.m_internals & (1u<<nn)) {
 	      Implementation &otherImpl = *i.m_connections[nn].impl;
 	      if (otherImpl.m_inserted) {
 		// Big assumption that adapters only have two ports

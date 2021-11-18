@@ -41,6 +41,7 @@
 namespace OS = OCPI::OS;
 namespace OU = OCPI::Util;
 namespace OB = OCPI::Base;
+namespace OT = OCPI::Transport;
 namespace OCPI {
   namespace HDL {
     namespace PCI {
@@ -89,8 +90,8 @@ namespace OCPI {
 	uint32_t
 	dmaOptions(ezxml_t /*icImplXml*/, ezxml_t /*icInstXml*/, bool isProvider) {
           return isProvider ?
-                (1 << OCPI::RDT::ActiveMessage) | (1 << OCPI::RDT::FlagIsMeta) :
-                (1 << OCPI::RDT::ActiveMessage) | (1 << OCPI::RDT::FlagIsMetaOptional);
+                (1 << OT::ActiveMessage) | (1 << OT::FlagIsMeta) :
+                (1 << OT::ActiveMessage) | (1 << OT::FlagIsMetaOptional);
 	}
 	static int compu32(const void *a, const void *b) { return *(int32_t*)a - *(int32_t*)b; }
     // Set up the FPGAs clock, assuming it has no GPS.

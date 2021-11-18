@@ -41,7 +41,7 @@
 #endif
 
 #include "RCC_Worker.h"
-#include "OcpiPort.h"
+#include "TransportPort.hh"
 #include "ContainerPort.h"
 #include "RccApplication.h"
 #include "RccContainer.h"
@@ -53,13 +53,6 @@ namespace DataTransfer {
 }
 
 namespace OCPI {
-
-  namespace DataTransport {
-    class Buffer;
-    class Port;
-  }
-
-
   namespace RCC {
 
     class Application;
@@ -127,7 +120,7 @@ namespace OCPI {
 	  }
 	  if (m_buffer) {
 	    if (max && isOutput() && max < m_rccPort.output.length)
-	      throw OU::Error("Requested output buffer size is unavailable");
+	      throw OCPI::Util::Error("Requested output buffer size is unavailable");
 	    m_rccPort.current.portBuffer = m_buffer;
 	    m_rccPort.current.containerPort = this;
             m_rccPort.current.isNew_ = true; // flag usable by higher levels for one-time init
@@ -156,9 +149,9 @@ namespace OCPI {
 
       inline void takeRcc(RCCBuffer *oldBuffer, RCCBuffer &newBuffer) {
 	if (isOutput())
-	  throw OU::Error("The 'take' container function cannot be used on an output port");
+	  throw OCPI::Util::Error("The 'take' container function cannot be used on an output port");
 	if (!m_buffer)
-	  throw OU::Error("The 'take' container function cannot be called when there is no current buffer");
+	  throw OCPI::Util::Error("The 'take' container function cannot be called when there is no current buffer");
 
 	newBuffer = m_rccPort.current; // copy the structure
 	m_rccPort.current.data = NULL;
@@ -180,7 +173,7 @@ namespace OCPI {
 	ocpiAssert(buffer.portBuffer && buffer.containerPort);
 	try {
 	  if (isInput())
-	    throw OU::Error("The 'send' container function cannot be called on an input port");
+	    throw OCPI::Util::Error("The 'send' container function cannot be called on an input port");
 	  if (buffer.containerPort == this) {
 	    assert(&buffer == &buffer.containerPort->m_rccPort.current);
 	    advanceRcc(0);

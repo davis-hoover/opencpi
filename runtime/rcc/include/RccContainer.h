@@ -87,7 +87,7 @@ namespace OCPI {
       void initWorkQueues();
       bool portsInProcess() { return true; }
       OCPI::Container::Container::DispatchRetCode
-      dispatch(DataTransfer::EventManager *event_manager = NULL);
+      dispatch(OCPI::Xfer::EventManager *event_manager = NULL);
       OCPI::API::ContainerApplication*
       createApplication(const char *name, const OCPI::Base::PValue *params)
 	throw (OCPI::Util::EmbeddedException);
@@ -99,9 +99,9 @@ namespace OCPI {
       void addTask( RCCUserTask * task );
       bool join( bool block, OCPI::OS::Semaphore & sem );
 
-      //      void start(DataTransfer::EventManager* event_manager) throw();
-      //      void stop(DataTransfer::EventManager* event_manager) throw();
-      DataTransfer::EventManager*  getEventManager();
+      //      void start(OCPI::Xfer::EventManager* event_manager) throw();
+      //      void stop(OCPI::Xfer::EventManager* event_manager) throw();
+      OCPI::Xfer::EventManager*  getEventManager();
       bool needThread() { return true; }
     };
   }

@@ -36,7 +36,7 @@ void dataTypeTest(const char *arg) {
   unsigned count;
   OM::Protocol pp, *ppp;
   if (isdigit(*arg)) {
-    count = atoi(arg);
+    count = (unsigned)atoi(arg);
     ppp = NULL;
   } else {
     char buf[10000];
