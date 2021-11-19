@@ -171,7 +171,6 @@ function office_kernel {
 #   MYLOC - The path of the directory that contains this script
 #   OUTPUT_PATH - The path where the PDFs are to be written
 #   REPO_PATH - The path where the opencpi repo is located
-#   OSPS - Array of the available osps (filtered)
 # Arguments:
 #   $1: If $1 is provided it means we want to use our own search path for
 #       dirs_to_search instead of the provided ones we use
@@ -192,9 +191,18 @@ function generate_pdfs {
     dirs_to_search+=("${REPO_PATH}/doc/tex")
     dirs_to_search+=("${REPO_PATH}/doc/tutorials")
 
+    #
     # Loop over projects, skipping inactive
+    #
+    # FIXME: OTHERs (other projects) require special
+    # handling because they are not in the "projects"
+    # directory as OSPs and COMPs are.  Note that we
+    # we do not treat COMPs in a manner similar to OSPs,
+    # mostly because COMPs docs are in RST format only.
+    #
     mapfile -t < <(find "${REPO_PATH}/projects" \
-      -mindepth 1 -maxdepth 1 -type d)
+      -mindepth 1 -maxdepth 1 -type d ; \
+      echo "${REPO_PATH}/ie-gui")
     for proj in "${MAPFILE[@]}"; do
       case "$(basename "${proj}")" in
         inactive) continue ;;

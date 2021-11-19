@@ -35,6 +35,9 @@ OSP_TAGS = dict()  # Will be filled in later
 COMPS = ["ocpi.comp.sdr"]
 COMP_TAGS = dict()
 
+# Other supported projects associated with OpenCPI
+OTHERS = ["ie-gui"]
+OTHER_TAGS = dict()
 
 class SectionData(object):
     def __init__(self, name: str, title: str, files: dict):
@@ -124,7 +127,13 @@ def main():
         COMP_TAGS[comp] = get_tags(OCPI_COMPDIR / comp / ".git")
         COMP_TAGS[comp].append("develop")  # develop will always be a valid git revision
 
-    # Build each release and its OSPs and COMPs
+    # Download supported OTHERs
+    for other in OTHERS:
+        download_other(other)
+        OTHER_TAGS[other] = get_tags(OCPI_OTHERDIR / other / ".git")
+        OTHER_TAGS[other].append("develop")  # develop will always be a valid git revision
+
+    # Build each release and its OSPs, COMPs, and OTHERs
     for release in releases:
         is_latest = True if latest_release == release else False
         build(release)
@@ -222,6 +231,24 @@ def build(tag: str) -> None:
             try:
                 logging.info(f"Cloning {comp_src} to {comp_dst}")
                 cmd = base_cmd + ["--branch", tag, str(comp_src), str(comp_dst)]
+                logging.debug(f"Executing cmd: {cmd}")
+                subprocess.check_call(cmd)
+            except subprocess.CalledProcessError as e:
+                logging.critical(f"Command failed: {e.cmd}")
+                exit(-1)
+
+        # Clone supported OTHERs
+        for other in OTHERS:
+            other_src = OCPI_OTHERDIR / other
+            other_dst = tmprepo / other
+            other_tags = OTHER_TAGS[other]
+            logging.debug(f"{other} tags: {other_tags}")
+            if tag not in other_tags:
+                logging.info(f"Tag '{tag}' doesn't exist for other project '{other}'. Skipping...")
+                continue
+            try:
+                logging.info(f"Cloning {other_src} to {other_dst}")
+                cmd = base_cmd + ["--branch", tag, str(other_src), str(other_dst)]
                 logging.debug(f"Executing cmd: {cmd}")
                 subprocess.check_call(cmd)
             except subprocess.CalledProcessError as e:
@@ -698,6 +725,23 @@ def download_comp(comp: str):
         subprocess.check_call(cmd)
 
 
+def download_other(other: str):
+    other_path = OCPI_OTHERDIR / other
+    if other_path.exists():
+        logging.info(f"Updating existing OTHER {other} located at {other_path}")
+        cmd = ["git", "--git-dir", str(other_path / ".git"), "fetch"]
+        logging.debug(f"Executing cmd: {cmd}")
+        subprocess.check_call(cmd)
+    else:
+        # We want the full repo as it will be used later when building each tagged release
+        logging.info(f"Downloading OTHER {other} to {other_path}")
+        # Force local branch to be "develop", which should
+        # be the default branch (pointed to by HEAD) anyway.
+        cmd = ["git", "clone", "--branch", "develop", f"https://gitlab.com/opencpi/{other}.git", other_path]
+        logging.debug(f"Executing cmd: {cmd}")
+        subprocess.check_call(cmd)
+
+
 def find_file(search_dir: Union[str, Path], filename: str,
               case_sensitive=True) -> Union[Path, None]:
     if not isinstance(search_dir, Path):
@@ -906,6 +950,7 @@ if __name__ == "__main__":
         args.repodir = default_repodir
     OCPI_OSPDIR = args.repodir / "projects" / "osps"
     OCPI_COMPDIR = args.repodir / "projects"
+    OCPI_OTHERDIR = args.repodir
 
     # Get list of tags and checked out branches
     GIT_TAGS = get_tags(args.repodir / ".git")
