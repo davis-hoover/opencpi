@@ -30,26 +30,13 @@ dir=`dirname $0`
 #echo bitfile=$1 device=$2 part=$3 esn=$4 position=$5 temp=$6
 
 setVarsFromMake $OCPI_CDK_DIR/include/hdl/xilinx.mk ShellIseVars=1 $verbose
-# Xilinx lab tools are not required for now.
-# # [ -z "$OcpiXilinxLabToolsDir" ] && {
-# #   echo "Error: Could not find the directory for XILINX LabTools or ISE."
-# #   exit 1
-# # }
-openocd="$OCPI_ROOT_DIR/runtime/hdl-support/xilinx/cfgFiles_openocd/openocd"
-if test ! -x $openocd; then
-  echo Error: OpenOCD executable not found at $openocd 1>&2
+
+source $OcpiXilinxVivadoDir/settings64.sh 1>&2
+if test $? != 0; then
+  echo Xilinx tools setup failed. 1>&2
   exit 1
 fi
-fpgaCFG="$OCPI_ROOT_DIR/runtime/hdl-support/xilinx/cfgFiles_openocd/fpga.cfg"
-if test ! -r $fpgaCFG; then
-  echo Error: OpenOCD FPGA config files not found at $fpgaCFG 1>&2
-  exit 1
-fi
-bitFileLOC="$OCPI_ROOT_DIR/runtime/hdl-support/xilinx/cfgFiles_openocd"
-if test ! -w $bitFileLOC; then
-  echo Error: Unable to create temp bitfile at $bitFileLOC 1>&2
-  exit 1
-fi
+
 
 function good {
   rm -f $temps $temp.log
@@ -158,14 +145,29 @@ case $func in
        bad
        ;;
     esac
-    cp $bitfile -f $bitFileLOC/fpgaBitFile.bit
-    $openocd -f $fpgaCFG -d3 --search $bitFileLOC
+    
+    xvcdArgs="-P 0x6015"
+#    if [ ! -z "$3" ]
+#    then
+#      xvcdArgs="-s s:0x0403:0x6015:$3"
+#    fi
 
-    if test $? != 0; then
-      echo "-n Error: OpenOCD FPGA programming failed!"
+    echo starting Xilinx Virtual Cable Driver
+    LD_LIBRARY_PATH=$OCPI_PREREQUISITES_DIR/xvcd/lib/libftdi/$OCPI_TOOL_DIR/lib $OCPI_PREREQUISITES_DIR/xvcd/$OCPI_TOOL_DIR/bin/xvcd $xvcdArgs &
+    xvcdPid=$!
+    sleep 4
+    echo starting vivado 
+    vivado -mode batch -source $OCPI_ROOT_DIR/projects/platform/hdl/platforms/picoevb/scripts/loadJtag.tcl -tclargs $bitfile 
+    vivado_status=$?
+
+    kill $xvcdPid
+    echo "Xilinx Virtual Cable Driver stopped"
+
+    if test $vivado_status != 0; then
+      echo "-n Error: FPGA programming failed!"
       bad
     else
-      echo "-n Error: OpenOCD FPGA programming succeeded!"
+      echo "-n Error: FPGA programming succeeded!"
     fi
     good
     ;;

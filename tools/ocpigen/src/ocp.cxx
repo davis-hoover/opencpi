@@ -19,7 +19,7 @@
  */
 
 #include <assert.h>
-#include "OcpiUtilMisc.h"
+#include "UtilMisc.hh"
 #include "ocp.h"
 #include "hdl.h"
 #include "assembly.h"
@@ -80,7 +80,7 @@ OcpPort(Worker &w, ezxml_t x, Port *sp, int ordinal, WIPType type, const char *d
   if (err || (err = parseClock(x)) ||
       (err = OE::getBoolean(x, "ImpreciseBurst", &m_impreciseBurst)) ||
       (err = OE::getBoolean(x, "Continuous", &m_continuous)) ||
-      (err = OU::getExprNumber(x, "DataWidth", m_dataWidth,
+      (err = OB::getExprNumber(x, "DataWidth", m_dataWidth,
 			       &m_dataWidthFound, m_dataWidthExpr, &w)) ||
       (err = OE::getNumber(x, "ByteWidth", &m_byteWidth, 0, m_dataWidth)) ||
       (err = OE::getBoolean(x, "PreciseBurst", &m_preciseBurst)))
@@ -832,7 +832,7 @@ connectOcpSignal(OcpSignalDesc &osd, OcpSignal &os, const OcpAdapt *oa, std::str
 }
 
 const char *OcpPort::
-resolveExpressions(OCPI::Util::IdentResolver &ir) {
+resolveExpressions(OB::IdentResolver &ir) {
   if (m_dataWidthExpr.length()) {
     const char *err = parseExprNumber(m_dataWidthExpr.c_str(), m_dataWidth, NULL, &ir);
     if (err)

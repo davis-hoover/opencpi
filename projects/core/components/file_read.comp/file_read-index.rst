@@ -199,5 +199,7 @@ Testing
 -------
 All test benches use the worker implementation as part of the verification process.
 This component does not have a unit test suite.
- 
+
+.. ocpi_documentation_test_platforms::
+
 .. ocpi_documentation_test_result_summary::

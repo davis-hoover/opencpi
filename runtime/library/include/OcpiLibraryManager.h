@@ -28,20 +28,17 @@
  */
 #include <map>
 #include <set>
+#include <ctime>
 #include "ezxml.h"
-#include "OcpiUtilMisc.h"
-#include "OcpiUtilEzxml.h"
-#include "OcpiUtilUUID.h"
-#include "OcpiDriverManager.h"
+#include "UtilMisc.hh"
+#include "UtilEzxml.hh"
+#include "UtilUUID.hh"
+#include "BasePluginManager.hh"
 #include "MetadataWorker.hh"
 #include "OcpiLibraryApi.h"
 
 namespace OCPI {
   namespace Library {
-    using OCPI::Util::Child;
-    using OCPI::Util::Parent;
-    using OCPI::Util::PValue;
-
     class Driver;   // base class of all library drivers
 
     // This structure describes the capabilities of a container
@@ -162,7 +159,7 @@ namespace OCPI {
 
     // The manager/owner of all library drivers
     extern const char *library;
-    class Manager : public OCPI::Driver::ManagerBase<Manager, Driver, library> {
+    class Manager : public OCPI::Base::Plugin::ManagerBase<Manager, Driver, library> {
       std::string m_libraryPath;
       WorkerMap m_implementations;
       friend class OCPI::API::LibraryManager;
@@ -217,7 +214,7 @@ namespace OCPI {
     };
     static inline Manager &getManager() { return Manager::getSingleton(); }
     // This is the base class for all library drivers
-    class Driver : public OCPI::Driver::DriverType<Manager,Driver> {
+    class Driver : public OCPI::Base::Plugin::DriverType<Manager,Driver> {
       //      virtual Library *findLibrary(const char *url) = 0;
     protected:
       Driver(const char *);
@@ -237,12 +234,12 @@ namespace OCPI {
     // This is the template inherited by concrete library drivers
     template <class ConcDri, class ConcreteLibrary, const char *&name>
     class DriverBase :
-      public OCPI::Driver::DriverBase
+      public OCPI::Base::Plugin::DriverBase
       <Manager, Driver, ConcDri, ConcreteLibrary, name>
     {
       inline Library *firstLibrary() {
 	return
-	  OCPI::Driver::
+	  OCPI::Base::Plugin::
 	  DriverBase<Manager,Driver,ConcDri,ConcreteLibrary, name>::
 	  firstDevice();
       }
@@ -252,7 +249,7 @@ namespace OCPI {
       }
 #endif
       virtual Artifact *findArtifact(const char *url) {
-	for (ConcreteLibrary *l = Parent<ConcreteLibrary>::firstChild();
+	for (ConcreteLibrary *l = OCPI::Util::Parent<ConcreteLibrary>::firstChild();
 	     l; l = l->nextChild())
 	  return l->findArtifact(url);
 	return NULL;
@@ -291,23 +288,23 @@ namespace OCPI {
     // The template class inherited by all concrete libraries.
     template <class Dri, class Lib, class Art>
     class LibraryBase :
-      public OCPI::Driver::DeviceBase<Dri,Lib>,
+      public OCPI::Base::Plugin::DeviceBase<Dri,Lib>,
       public OCPI::Util::Parent<Art>,
       public Library
     {
     public:
-      inline Artifact *firstArtifact() { return Parent<Art>::firstChild(); }
+      inline Artifact *firstArtifact() { return OCPI::Util::Parent<Art>::firstChild(); }
       inline Library *nextLibrary() {
-	return OCPI::Driver::DeviceBase<Dri,Lib>::nextDevice();
+	return OCPI::Base::Plugin::DeviceBase<Dri,Lib>::nextDevice();
       }
       inline Artifact *findArtifact(const char *url) {
-	return Parent<Art>::findChildByName(url);
+	return OCPI::Util::Parent<Art>::findChildByName(url);
       }
     protected:
       LibraryBase<Dri, Lib, Art>(Lib &lib, const char *childName)
-      : OCPI::Driver::DeviceBase<Dri, Lib>(childName, lib),
+      : OCPI::Base::Plugin::DeviceBase<Dri, Lib>(childName, lib),
       // pass the name to the base class
-	Library(OCPI::Driver::DeviceBase<Dri, Lib>::name()) {}
+	Library(OCPI::Base::Plugin::DeviceBase<Dri, Lib>::name()) {}
     };
 
     // This is the template inherited by concrete artifacts
@@ -332,7 +329,7 @@ namespace OCPI {
       }
     };
     template <class Dri>
-    class RegisterLibraryDriver : public OCPI::Driver::Registration<Dri>{};
+    class RegisterLibraryDriver : public OCPI::Base::Plugin::Registration<Dri>{};
   }
 }
 

@@ -15,7 +15,5 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-# xsim fails when the is_operating synchronizer in the wsi_to_zero adapter does not set s_src_reg to a defined value
-# isim fails for unknown reasons
-OnlyPlatforms=modelsim
+OnlyPlatforms=isim xsim modelsim
 include $(OCPI_CDK_DIR)/include/test.mk

@@ -158,8 +158,12 @@ class TestFloatGenerator(unittest.TestCase):
         self.assertEqual(messages[0]["opcode"], "sample")
         self.assertEqual(len(messages[0]["data"]),
                          self.test_generator.SAMPLE_DATA_LENGTH)
+        # Ensure the error between values is less than 0.1%
+        min_expected_value = FLOAT_MAX - \
+            (1.001 * self.test_generator.SAMPLE_NEAR_RANGE)
         for value in messages[0]["data"]:
             self.assertFloat(value)
+            self.assertGreaterEqual(value, min_expected_value)
 
     def test_sample_large_negative_subcase(self):
         messages = self.test_generator.generate(
@@ -169,8 +173,12 @@ class TestFloatGenerator(unittest.TestCase):
         self.assertEqual(messages[0]["opcode"], "sample")
         self.assertEqual(len(messages[0]["data"]),
                          self.test_generator.SAMPLE_DATA_LENGTH)
+        # Ensure the error between values is less than 0.1%
+        max_expected_value = FLOAT_MIN + \
+            (1.001 * self.test_generator.SAMPLE_NEAR_RANGE)
         for value in messages[0]["data"]:
             self.assertFloat(value)
+            self.assertLessEqual(value, max_expected_value)
 
     def test_sample_near_zero_subcase(self):
         messages = self.test_generator.generate(
@@ -180,8 +188,11 @@ class TestFloatGenerator(unittest.TestCase):
         self.assertEqual(messages[0]["opcode"], "sample")
         self.assertEqual(len(messages[0]["data"]),
                          self.test_generator.SAMPLE_DATA_LENGTH)
+        # Ensure the error between values is less than 0.1%
+        max_expected_value = (1.001 * self.test_generator.SAMPLE_NEAR_RANGE)
         for value in messages[0]["data"]:
             self.assertFloat(value)
+            self.assertLessEqual(abs(value), max_expected_value)
 
     def test_sample_positive_infinity_subcase(self):
         messages = self.test_generator.generate(

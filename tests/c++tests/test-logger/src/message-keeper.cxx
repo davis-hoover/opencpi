@@ -20,7 +20,7 @@
 
 #include <string>
 
-#include "OcpiLoggerLogger.h"
+#include "UtilLogger.hh"
 
 #include "MessageKeeper.h"
 
@@ -121,7 +121,7 @@ xsputn (const char * data, std::streamsize count)
     overflow (traits_type::eof());
   }
 
-  m_logMessage.append (data, count);
+  m_logMessage.append(data, (size_t)count);
   return count;
 }
 

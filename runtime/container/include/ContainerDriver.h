@@ -41,8 +41,8 @@
 #define OCPI_CONTAINER_DRIVER_H
 #include "OcpiContainerApi.h"
 
-#include "OcpiParentChild.h"
-#include "OcpiDriverManager.h"
+#include "BaseParentChild.hh"
+#include "BasePluginManager.hh"
 #include "TransportManager.hh"
 #include "MetadataWorker.hh"
 
@@ -66,9 +66,9 @@ namespace OCPI {
     };
     // The concrete class that manages container drivers
     class Manager : public OCPI::API::ContainerManager,
-		    public OCPI::Driver::ManagerBase<Manager, Driver, container> {
+		    public OCPI::Base::Plugin::ManagerBase<Manager, Driver, container> {
       unsigned cleanupPosition();
-      OCPI::DataTransport::TransportManager &getTransportManagerInternal(const OCPI::Util::PValue *params);
+      OCPI::Transport::TransportManager &getTransportManagerInternal(const OCPI::Base::PValue *params);
       friend class Container;
       friend class OCPI::API::ContainerManager;
     protected:
@@ -95,20 +95,20 @@ namespace OCPI {
       }
       void shutdown();
       // convenience
-      static inline OCPI::DataTransport::TransportManager &
-      getTransportManager(const OCPI::Util::PValue *params = NULL) {
+      static inline OCPI::Transport::TransportManager &
+      getTransportManager(const OCPI::Base::PValue *params = NULL) {
 	return getSingleton().getTransportManagerInternal(params);
       }
       static bool dynamic();
       static bool optimized();
     private:
       // Globals dependant on polling
-      OCPI::DataTransport::TransportManager *m_tpg_events, *m_tpg_no_events;
+      OCPI::Transport::TransportManager *m_tpg_events, *m_tpg_no_events;
     };
     static inline Manager &getManager() { return Manager::getSingleton(); }
 
     // A base class inherited by all container drivers for common behavior
-    class Driver : public OCPI::Driver::DriverType<Manager,Driver> {
+    class Driver : public OCPI::Base::Plugin::DriverType<Manager,Driver> {
     protected:
       Driver(const char *);
     public:
@@ -123,7 +123,7 @@ namespace OCPI {
     // requirement that the name of the container driver be passed to the template.
     template <class ConcreteDriver, class ConcreteCont, const char *&name>
     class DriverBase :
-      public OCPI::Driver::DriverBase
+      public OCPI::Base::Plugin::DriverBase
       <Manager, Driver, ConcreteDriver, ConcreteCont, name>
     {
       Container *firstContainer() const { return Parent<ConcreteCont>::firstChild(); }
@@ -135,7 +135,7 @@ namespace OCPI {
     };
     // The convenience class for driver registration/static instantiation
     template<class Driver>
-    class RegisterContainerDriver : OCPI::Driver::Registration<Driver> {
+    class RegisterContainerDriver : OCPI::Base::Plugin::Registration<Driver> {
     };
   }
 }

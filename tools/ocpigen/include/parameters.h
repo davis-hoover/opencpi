@@ -24,7 +24,7 @@
 #include <set>
 #include <string>
 #include <unordered_set>
-#include "UtilValue.hh"
+#include "BaseValue.hh"
 #include "MetadataProperty.hh"
 #include "cdkutils.h"
 #include "ocpigen.h"
@@ -44,9 +44,9 @@ class Assembly;
 #define PARAM_ATTRS "name", "value", "values", "valueFile", "valuesFile"
 struct Param {
   std::string                 m_name;       // if spec, same as m_param->m_name, if impl worker.model.property
-  OCPI::Util::Value           m_value;      // value for the current config, perhaps the default
+  OCPI::Base::Value           m_value;      // value for the current config, perhaps the default
   std::string                 m_uValue;     // unparsed value: the canonical value for comparison
-  OCPI::Util::Member         *m_valuesType; // the type (a sequence of these values).
+  OCPI::Base::Member         *m_valuesType; // the type (a sequence of these values).
   Values                      m_uValues;    // *Either* parsed from XML or captured from raw
   const OCPI::Metadata::Property *m_param;      // the property that is a parameter
   bool                        m_isDefault;  // is m_value from property default?
@@ -83,7 +83,7 @@ class ParamConfig;
 // This must be pointers since it has a reference member which can't be copied,
 // and we're not using c++11 yet, with "emplace".
 typedef std::vector<ParamConfig*> ParamConfigs;
-class ParamConfig : public OCPI::Util::IdentResolver {
+class ParamConfig : public OCPI::Base::IdentResolver {
   Worker &m_worker;
  public:
   char *m_slavesString;
@@ -112,8 +112,8 @@ class ParamConfig : public OCPI::Util::IdentResolver {
   // Is the given configuration the same as this one?
   bool equal(ParamConfig &other);
   // The callback when evaluating expressions for data types (e.g. array length).
-  const char *getValue(const char *sym, OCPI::Util::ExprValue &val) const;
-  const char *getParamValue(const char *sym, const OCPI::Util::Value *&v) const;
+  const char *getValue(const char *sym, OCPI::Base::ExprValue &val) const;
+  const char *getParamValue(const char *sym, const OCPI::Base::Value *&v) const;
   const Worker &worker() const { return m_worker; }
 };
 

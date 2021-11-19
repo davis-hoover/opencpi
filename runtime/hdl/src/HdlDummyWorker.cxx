@@ -43,9 +43,9 @@ DummyWorker(Device &device, ezxml_t impl, ezxml_t inst, const char *idx)
   // errors from the worker itself, but it doesn't remember whether the
   // previous control operation failed for other reasons (FIXME: the OCCP should
   // capture this information).  We do our best here by first bypassing the software.
-  unsigned worker = atoi(idx);
+  unsigned worker = (unsigned)atoi(idx);
 
-  device.cAccess().offsetRegisters(m_wAccess, (intptr_t)(&((OccpSpace*)0)->worker[worker]));
+  device.cAccess().offsetRegisters(m_wAccess, (uintptr_t)(&((OccpSpace*)0)->worker[worker]));
   uint32_t
     control = m_wAccess.get32Register(control, OccpWorkerRegisters),
     l_status =  m_wAccess.get32Register(status, OccpWorkerRegisters);

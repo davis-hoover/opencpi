@@ -46,9 +46,9 @@
 
 #include "ocpi-config.h"
 #include "OsFileSystem.hh"
-#include "UtilDataTypes.hh"
+#include "BaseDataTypes.hh"
 #include "MetadataProtocol.hh"
-#include "OcpiUtilMisc.h"
+#include "UtilMisc.hh"
 #include "cdkutils.h"
 #include "ocpidds.h"
 
@@ -56,6 +56,7 @@ namespace OS = OCPI::OS;
 namespace OA = OCPI::API;
 namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 const char *
 emitIDL(const char *outDir, const char *protoFile) {
   (void)outDir;
@@ -366,8 +367,8 @@ run(const char *command, char *&out)
 	  // since windows translates CRLF sequences, the size of the
 	  // file is NOT what will be read.  Any CRLFs read as LFs.
 	  if (lseek(ofd, 0, SEEK_SET) != 0 ||
-	      !(out = (char *)malloc(oSize + 1)) ||
-	      read(ofd, (char *)out, oSize) < 0)
+	      !(out = (char *)malloc((size_t)oSize + 1u)) ||
+	      read(ofd, (char *)out, (size_t)oSize) < 0)
 	    err = "internal error running idl parser 7";
 	  else
 	    out[oSize] = 0;
@@ -386,8 +387,8 @@ run(const char *command, char *&out)
 	  // since windows translates CRLF sequences, the size of the
 	  // file is NOT what will be read.  Any CRLFs read as LFs.
 	  if (lseek(efd, 0, SEEK_SET) != 0 ||
-	      !(myErr = (char *)malloc(eSize + 1)) ||
-	      (n = read(efd, (void *)myErr, eSize)) < 0)
+	      !(myErr = (char *)malloc((size_t)eSize + 1u)) ||
+	      (n = read(efd, (void *)myErr, (size_t)eSize)) < 0)
 	    err = "internal error running idl parser 10";
 	  else {
 	    while (eSize && myErr[eSize-1] == '\n')
@@ -499,7 +500,7 @@ static void getString(std::string &s, const char *&p, const char *sep = " ") {
   const char *np = p;
   while (*np && !strchr(sep, *np))
     np++;
-  size_t length = np - p;
+  size_t length = OCPI_SIZE_T_DIFF(np, p);
   s.assign(p, length);
   p += length;
   if (*p)
@@ -507,7 +508,7 @@ static void getString(std::string &s, const char *&p, const char *sep = " ") {
 }
   // parse a positive number up to a space, and update the pointer
 unsigned long getNum(const char *&cp, const char *term = " ") {
-  unsigned n = atoi(cp);
+  unsigned n = (unsigned)atoi(cp);
   while (*cp && !strchr(term, *cp))
     cp++;
   if (*cp)
@@ -517,16 +518,16 @@ unsigned long getNum(const char *&cp, const char *term = " ") {
   // look up the type kind
 OA::BaseType getKind(std::string &kind) {
   unsigned k = 0;
-  for (const char **ap = OU::idlTypeNames; *ap; ap++, k++)
+  for (const char **ap = OB::idlTypeNames; *ap; ap++, k++)
     if (!strcasecmp(*ap, kind.c_str()))
       return (OA::BaseType)k;
   return OA::OCPI_none;
 }
 
-static void getMember(OU::Member &m, const char *&cp, const char *term);
+static void getMember(OB::Member &m, const char *&cp, const char *term);
 
 // cp points to the type description, parse a type and return it
-void getType(OU::ValueType &t, const char *&cp, const char *term) {
+void getType(OB::ValueType &t, const char *&cp, const char *term) {
   const char *save = cp;
   std::string kind;
   getString(kind, cp, term);
@@ -555,7 +556,7 @@ void getType(OU::ValueType &t, const char *&cp, const char *term) {
   if (kind == "array" || kind == "sequence") {
     t.m_baseType = OA::OCPI_Type;
     cp = save;
-    t.m_type = new OU::Member;
+    t.m_type = new OB::Member;
     getType(*t.m_type, cp, term);
   } else {
     t.m_baseType = getKind(kind);
@@ -575,8 +576,8 @@ void getType(OU::ValueType &t, const char *&cp, const char *term) {
     case OA::OCPI_Struct:
       t.m_nMembers = getNum(cp);
       if (t.m_nMembers)
-	t.m_members = new OU::Member[t.m_nMembers];
-      for (OU::Member *m = t.m_members; *cp != '.'; m++)
+	t.m_members = new OB::Member[t.m_nMembers];
+      for (OB::Member *m = t.m_members; *cp != '.'; m++)
 	getMember(*m, cp, " ;");
       cp += 2; // skip period and type terminator
       break;
@@ -600,14 +601,14 @@ void getType(OU::ValueType &t, const char *&cp, const char *term) {
 }
 
 static void
-getMember(OU::Member &m, const char *&cp, const char *term) {
+getMember(OB::Member &m, const char *&cp, const char *term) {
   getString(m.m_name, cp);
   getType(m, cp, term);
 }
 
   // Parameters can be operation parameters, or exception members
 static void
-getArg(OU::Member &m, const char *&cp, const char *term) {
+getArg(OB::Member &m, const char *&cp, const char *term) {
   char inout = *cp++;
   getString(m.m_name, cp);
   getType(m, cp, term);
@@ -630,10 +631,10 @@ doInterface(OM::Protocol &p, const char *&cp) {
     if (op->m_isTwoWay)
       op->m_nArgs++;
     if (op->m_nArgs)
-      op->m_args = new OU::Member[op->m_nArgs];
-  OU::Member *m = op->m_args;
+      op->m_args = new OB::Member[op->m_nArgs];
+  OB::Member *m = op->m_args;
     if (!op->m_isTwoWay) {
-      OU::Member dummy;
+      OB::Member dummy;
       getType(dummy, cp, "@");
     } else
       getType(*m++, cp, "@");
@@ -659,9 +660,9 @@ doInterface(OM::Protocol &p, const char *&cp) {
       getString(tmp, cp, "\n");
       addDep(tmp.c_str(), false);
       if (ex->m_nArgs)
-	ex->m_args = new OU::Member[ex->m_nArgs];
+	ex->m_args = new OB::Member[ex->m_nArgs];
       // Loop over parameters to exception
-      for (OU::Member *em = ex->m_args; *cp != '\n'; em++)
+      for (OB::Member *em = ex->m_args; *cp != '\n'; em++)
 	getMember(*em, cp, " \n");
       cp++;
     }
@@ -682,8 +683,8 @@ doStruct(OM::Protocol &p, const char *&cp) {
   op.m_qualifiedName = p.m_qualifiedName;
   op.m_isTwoWay = false;
   if (op.m_nArgs)
-    op.m_args = new OU::Member[op.m_nArgs];  
-  for (OU::Member *m = op.m_args; *cp != '.'; m++)
+    op.m_args = new OB::Member[op.m_nArgs];  
+  for (OB::Member *m = op.m_args; *cp != '.'; m++)
     getMember(*m, cp, " ;");
   cp += 2; // skip period and nl
   while (*cp != '\n') {
@@ -698,7 +699,7 @@ doStruct(OM::Protocol &p, const char *&cp) {
       if (tmp1 == p.m_name) {
 	while (*prag) {
 	  getString(tmp1, prag, " \n");
-	  OU::Member *a = op.m_args;
+	  OB::Member *a = op.m_args;
 	  while (isspace(*prag)) // don't trust pragma spacing
 	    prag++;
 	  unsigned n;
@@ -736,7 +737,7 @@ emitProtocol(const char *const *argv, const char *outDir, const char *file,
       slash = file;
     if (!dot)
       dot = file + strlen(file);
-    s.assign(slash, dot - slash);
+    s.assign(slash, OCPI_SIZE_T_DIFF(dot, slash));
     structName = s.c_str();
   }
   char *repo;

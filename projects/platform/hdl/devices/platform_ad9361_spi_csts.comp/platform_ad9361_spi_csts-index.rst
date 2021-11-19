@@ -102,4 +102,6 @@ Testing
 -------
 The test outlined in the `AD9361 DAC <https://opencpi.gitlab.io/releases/develop/docs/assets/AD9361_DAC.pdf>`_ component description (see ``ocpi.assets.devices``) includes validation of a subset of this worker’s functionality.
 
+.. ocpi_documentation_test_platforms::
+
 .. ocpi_documentation_test_result_summary::

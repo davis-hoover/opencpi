@@ -41,7 +41,7 @@
 #endif
 
 #include "RCC_Worker.h"
-#include "OcpiPort.h"
+#include "TransportPort.hh"
 #include "ContainerPort.h"
 #include "RccApplication.h"
 #include "RccContainer.h"
@@ -53,13 +53,6 @@ namespace DataTransfer {
 }
 
 namespace OCPI {
-
-  namespace DataTransport {
-    class Buffer;
-    class Port;
-  }
-
-
   namespace RCC {
 
     class Application;
@@ -79,12 +72,12 @@ namespace OCPI {
       //  optionally connected ports, you have optionally requested ports so that no buffer resources
       //  are used on a port until you specifically request buffers.
     public:
-      Port(Worker &w, const OCPI::Metadata::Port &md, const OCPI::Util::PValue *params, RCCPort &rp);
+      Port(Worker &w, const OCPI::Metadata::Port &md, const OCPI::Base::PValue *params, RCCPort &rp);
       virtual ~Port();
 
       bool isInProcess(OCPI::Container::LocalPort */*other*/) const { return true; }
-      void connectURL(const char* url, const OCPI::Util::PValue *myProps,
-		      const OCPI::Util::PValue * otherProps);
+      void connectURL(const char* url, const OCPI::Base::PValue *myProps,
+		      const OCPI::Base::PValue * otherProps);
     private:
       void disconnectInternal();
       void disconnect();
@@ -93,8 +86,8 @@ namespace OCPI {
       // These next methods are required by or override the OCPI::Container::Port implementation
       OCPI::Container::ExternalPort &
       createExternal(const char *extName, bool provider,
-		     const OCPI::Util::PValue *extParams,
-		     const OCPI::Util::PValue *connParams);
+		     const OCPI::Base::PValue *extParams,
+		     const OCPI::Base::PValue *connParams);
     public:
       // These methods are called in one place from the worker from C, hence public and inline
       bool requestRcc(size_t max = 0) {
@@ -119,14 +112,15 @@ namespace OCPI {
 	    }
 	  } else if ((m_buffer = getBuffer(data, m_rccPort.current.length_,
 					   m_rccPort.current.opCode_, m_rccPort.current.eof_))) {
-	    m_rccPort.current.data = (void*)data;
+	    // m_rccPort.current.data = (void*)data;
+	    m_rccPort.current.data = m_rccPort.current.eof_ ? NULL : (void*)data;
 	    m_rccPort.input.u.operation = m_rccPort.current.opCode_;
 	    m_rccPort.input.length = m_rccPort.current.length_;
 	    m_rccPort.input.eof = m_rccPort.current.eof_;
 	  }
 	  if (m_buffer) {
 	    if (max && isOutput() && max < m_rccPort.output.length)
-	      throw OU::Error("Requested output buffer size is unavailable");
+	      throw OCPI::Util::Error("Requested output buffer size is unavailable");
 	    m_rccPort.current.portBuffer = m_buffer;
 	    m_rccPort.current.containerPort = this;
             m_rccPort.current.isNew_ = true; // flag usable by higher levels for one-time init
@@ -144,6 +138,7 @@ namespace OCPI {
 	if (&m_rccPort.current == &buffer) {
 	  m_buffer = NULL;
 	  m_rccPort.current.data = NULL;
+	  m_rccPort.input.eof = false;
 	}
 	try {
 	  buffer.portBuffer->release();
@@ -154,12 +149,13 @@ namespace OCPI {
 
       inline void takeRcc(RCCBuffer *oldBuffer, RCCBuffer &newBuffer) {
 	if (isOutput())
-	  throw OU::Error("The 'take' container function cannot be used on an output port");
+	  throw OCPI::Util::Error("The 'take' container function cannot be used on an output port");
 	if (!m_buffer)
-	  throw OU::Error("The 'take' container function cannot be called when there is no current buffer");
+	  throw OCPI::Util::Error("The 'take' container function cannot be called when there is no current buffer");
 
 	newBuffer = m_rccPort.current; // copy the structure
 	m_rccPort.current.data = NULL;
+	m_rccPort.input.eof = false;
 	m_buffer->take(); // tell lower levels to move on, but not release
 	m_buffer = NULL;
 	if (oldBuffer) {
@@ -177,7 +173,7 @@ namespace OCPI {
 	ocpiAssert(buffer.portBuffer && buffer.containerPort);
 	try {
 	  if (isInput())
-	    throw OU::Error("The 'send' container function cannot be called on an input port");
+	    throw OCPI::Util::Error("The 'send' container function cannot be called on an input port");
 	  if (buffer.containerPort == this) {
 	    assert(&buffer == &buffer.containerPort->m_rccPort.current);
 	    advanceRcc(0);

@@ -24,7 +24,7 @@
 #include <cstddef>
 #include <string>
 #include <cassert>
-#include "OcpiUtilEzxml.h"
+#include "UtilEzxml.hh"
 #include "MetadataAssembly.hh"
 #include "ocpigen.h"
 
@@ -100,7 +100,7 @@ public:
   Worker &worker() const { return *m_worker; }
   const char *parseClock(ezxml_t);
   virtual const char *parse();    // second pass parsing for ports referring to each other
-  virtual const char *resolveExpressions(OCPI::Util::IdentResolver &ir);
+  virtual const char *resolveExpressions(OB::IdentResolver &ir);
   virtual bool masterIn() const;  // Are master signals inputs at this port?
   Clock &addMyClock(bool output);
   const char *addMyClock(const char *direction);

@@ -21,21 +21,22 @@
 #include <stdio.h>
 #include <assert.h>
 #include <unistd.h>
-#include "UtilValueReader.hh"
-#include "UtilValueWriter.hh"
+#include "BaseValueReader.hh"
+#include "BaseValueWriter.hh"
 #include "MetadataProtocol.hh"
-#include "UtilValue.hh"
+#include "BaseValue.hh"
 #include "ocpidds.h"
 
 namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 namespace OA = OCPI::API;
 
 void dataTypeTest(const char *arg) {
   unsigned count;
   OM::Protocol pp, *ppp;
   if (isdigit(*arg)) {
-    count = atoi(arg);
+    count = (unsigned)atoi(arg);
     ppp = NULL;
   } else {
     char buf[10000];
@@ -67,7 +68,7 @@ void dataTypeTest(const char *arg) {
     std::string out;
     p.printXML(out);
     fputs(out.c_str(), stdout);
-    OU::Value **v;
+    OB::Value **v;
     uint8_t opcode = 0;
     p.generateOperation(opcode, v);
     p.printOperation(stdout, opcode, v);
@@ -77,7 +78,7 @@ void dataTypeTest(const char *arg) {
     fflush(stdout);
     size_t len;
     {
-      OU::ValueReader r((const OU::Value **)v);
+      OB::ValueReader r((const OB::Value **)v);
       len = p.read(r, NULL, SIZE_MAX, opcode);
     }
     maxSize = std::max(len, maxSize);
@@ -85,15 +86,15 @@ void dataTypeTest(const char *arg) {
     if (!len)
       continue;
     buf.resize(len);
-    OU::ValueReader r((const OU::Value **)v);
+    OB::ValueReader r((const OB::Value **)v);
     size_t rlen = p.read(r, &buf[0], len, opcode);
     printf("Length was %zu\n", rlen);
     size_t nArgs = p.m_operations[opcode].m_nArgs;
-    OU::Value **v1 = new OU::Value *[nArgs];
-    OU::ValueWriter w(v1, nArgs);
+    OB::Value **v1 = new OB::Value *[nArgs];
+    OB::ValueWriter w(v1, nArgs);
     p.write(w, &buf[0], len, opcode);
     buf1.resize(rlen, 0);
-    OU::ValueReader r1((const OU::Value **)v1);
+    OB::ValueReader r1((const OB::Value **)v1);
     size_t rlen1 = p.read(r1, &buf1[0], rlen, opcode);
     assert(rlen == rlen1);
     int dif = memcmp(&buf[0], &buf1[0], rlen);

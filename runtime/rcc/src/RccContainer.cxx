@@ -40,15 +40,16 @@
 namespace OC = OCPI::Container;
 namespace OA = OCPI::API;
 namespace OU = OCPI::Util;
-namespace OR = OCPI::RDT;
-
+namespace OB = OCPI::Base;
+namespace OT = OCPI::Transport;
+namespace XF = OCPI::Xfer;
 namespace OCPI {
   namespace RCC {
 
     bool Container::m_wqInit = false;
     pthread_workqueue_t Container::m_workqueues[2];
 
-DataTransfer::EventManager*  
+XF::EventManager*  
 Container::
 getEventManager()
 {
@@ -63,28 +64,28 @@ Container(const char *a_name, const OA::PValue* /* params */)
 {
   const char *system = OU::getSystemId().c_str();
   m_model = "rcc";
-  addTransport("ocpi-dma-pio", system, OR::ActiveFlowControl, OR::ActiveMessage,
-	       //	       (1 << OR::FlagIsCounting) | // ask for counting flags
-	       (1 << OR::ActiveFlowControl) | (1 << OR::ActiveMessage) | (1 << OR::FlagIsMetaOptional),
-	       //	       (1 << OR::FlagIsCounting) | // ask for counting flags
-	       (1 << OR::ActiveFlowControl) | (1 << OR::ActiveMessage) | (1 << OR::FlagIsMetaOptional));
-  addTransport("ocpi-smb-pio", system, OR::ActiveMessage, OR::ActiveMessage,
-	       (1 << OR::ActiveFlowControl) | (1 << OR::ActiveMessage) | (1 << OR::Passive),
-	       (1 << OR::ActiveFlowControl) | (1 << OR::ActiveMessage) | (1 << OR::Passive));
-  addTransport("ocpi-scif-dma", system, OR::ActiveMessage, OR::ActiveMessage,
-	       (1 << OR::ActiveFlowControl) | (1 << OR::ActiveMessage) | (1 << OR::Passive),
-	       (1 << OR::ActiveFlowControl) | (1 << OR::ActiveMessage) | (1 << OR::Passive));
-  addTransport("ocpi-socket-rdma", NULL, OR::ActiveFlowControl, OR::ActiveMessage,
-	       (1 << OR::ActiveFlowControl) | (1 << OR::FlagIsMeta),
-	       (1 << OR::ActiveFlowControl) | (1 << OR::ActiveMessage) | (1 << OR::FlagIsMeta));
-  //	       (1 << OR::ActiveFlowControl) | (1 << OR::ActiveMessage) | (1 << OR::Passive),
-  //	       (1 << OR::ActiveFlowControl) | (1 << OR::ActiveMessage) | (1 << OR::FlagIsMetaOptional));
-  addTransport("ocpi-udp-rdma", NULL, OR::ActiveFlowControl, OR::ActiveMessage,
-	       (1 << OR::ActiveFlowControl) | (1 << OR::FlagIsMeta),
-	       (1 << OR::ActiveMessage) | (1 << OR::FlagIsMeta)),
-  addTransport("ocpi-ether-rdma", NULL, OR::ActiveFlowControl, OR::ActiveMessage,
-	       (1 << OR::ActiveFlowControl) | (1 << OR::FlagIsMeta),
-	       (1 << OR::ActiveMessage) | (1 << OR::FlagIsMeta));
+  addTransport("ocpi-dma-pio", system, OT::ActiveFlowControl, OT::ActiveMessage,
+	       //	       (1 << OT::FlagIsCounting) | // ask for counting flags
+	       (1 << OT::ActiveFlowControl) | (1 << OT::ActiveMessage) | (1 << OT::FlagIsMetaOptional),
+	       //	       (1 << OT::FlagIsCounting) | // ask for counting flags
+	       (1 << OT::ActiveFlowControl) | (1 << OT::ActiveMessage) | (1 << OT::FlagIsMetaOptional));
+  addTransport("ocpi-smb-pio", system, OT::ActiveMessage, OT::ActiveMessage,
+	       (1 << OT::ActiveFlowControl) | (1 << OT::ActiveMessage) | (1 << OT::Passive),
+	       (1 << OT::ActiveFlowControl) | (1 << OT::ActiveMessage) | (1 << OT::Passive));
+  addTransport("ocpi-scif-dma", system, OT::ActiveMessage, OT::ActiveMessage,
+	       (1 << OT::ActiveFlowControl) | (1 << OT::ActiveMessage) | (1 << OT::Passive),
+	       (1 << OT::ActiveFlowControl) | (1 << OT::ActiveMessage) | (1 << OT::Passive));
+  addTransport("ocpi-socket-rdma", NULL, OT::ActiveFlowControl, OT::ActiveMessage,
+	       (1 << OT::ActiveFlowControl) | (1 << OT::FlagIsMeta),
+	       (1 << OT::ActiveFlowControl) | (1 << OT::ActiveMessage) | (1 << OT::FlagIsMeta));
+  //	       (1 << OT::ActiveFlowControl) | (1 << OT::ActiveMessage) | (1 << OT::Passive),
+  //	       (1 << OT::ActiveFlowControl) | (1 << OT::ActiveMessage) | (1 << OT::FlagIsMetaOptional));
+  addTransport("ocpi-udp-rdma", NULL, OT::ActiveFlowControl, OT::ActiveMessage,
+	       (1 << OT::ActiveFlowControl) | (1 << OT::FlagIsMeta),
+	       (1 << OT::ActiveMessage) | (1 << OT::FlagIsMeta)),
+  addTransport("ocpi-ether-rdma", NULL, OT::ActiveFlowControl, OT::ActiveMessage,
+	       (1 << OT::ActiveFlowControl) | (1 << OT::FlagIsMeta),
+	       (1 << OT::ActiveMessage) | (1 << OT::FlagIsMeta));
   // We inherit these attribute from the core framework build, although since the RCC container driver
   // is itself a loadable plugin, it could theoretically have its own attributes
   m_dynamic = OC::Manager::dynamic();
@@ -237,7 +238,7 @@ volatile int ocpi_dbg_run=0;
  * For single threaded containers, this is the dispatch hook
  *********************************/
 OC::Container::DispatchRetCode Container::
-dispatch(DataTransfer::EventManager* event_manager)
+dispatch(XF::EventManager* event_manager)
 {
   bool more_to_do = false;
   if ( ! m_enabled ) {
@@ -281,7 +282,7 @@ dispatch(DataTransfer::EventManager* event_manager)
  * Creates an application 
  *********************************/
 OA::ContainerApplication * Container::
-createApplication(const char *a_name, const OCPI::Util::PValue *props)
+createApplication(const char *a_name, const OB::PValue *props)
   throw ( OU::EmbeddedException )
 {
   TRACE( "OCPI::RCC::Container::createApplication()");
@@ -300,7 +301,7 @@ createApplication(const char *a_name, const OCPI::Util::PValue *props)
 #if 0
 void 
 Container::
-start(DataTransfer::EventManager* event_manager)
+start(XF::EventManager* event_manager)
   throw()
 {
  ( void ) event_manager;
@@ -309,7 +310,7 @@ start(DataTransfer::EventManager* event_manager)
 
 #ifdef EM_PORT_COMPLETE
     if ( event_manager ) {
-      DataTransfer::EndPoint* ep = getTransport().getEndpoint();
+      XF::EndPoint* ep = getTransport().getEndpoint();
       event_manager->spin(ep, false);
     }
 #endif
@@ -323,7 +324,7 @@ start(DataTransfer::EventManager* event_manager)
 
 void 
 Container::
-stop(DataTransfer::EventManager* event_manager)
+stop(XF::EventManager* event_manager)
   throw()
 {
   ( void ) event_manager;
@@ -331,7 +332,7 @@ stop(DataTransfer::EventManager* event_manager)
     m_enabled = false;
 #ifdef EM_PORT_COMPLETE
     if ( event_manager ) {
-      DataTransfer::EndPoint* ep = getTransport().getEndpoint();
+      XF::EndPoint* ep = getTransport().getEndpoint();
       event_manager->spin(ep, true);  
     }
 #endif

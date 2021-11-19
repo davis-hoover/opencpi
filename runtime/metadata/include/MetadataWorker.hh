@@ -43,7 +43,7 @@
 #include <map>
 #include "ezxml.h"
 #include "OsAssert.hh"
-#include "OcpiUtilException.h"
+#include "UtilException.hh"
 #include "MetadataProperty.hh"
 #include "MetadataProtocol.hh"
 #include "MetadataPort.hh"
@@ -128,7 +128,7 @@ namespace OCPI {
     // This class represents what we know, generically, about a component implementation
     // Currently there is no separate "spec" metadata - it is redundant in each implementation
     class Assembly;
-    class Worker : public OCPI::Util::IdentResolver {
+    class Worker : public OCPI::Base::IdentResolver {
       friend class Port;
     protected:
       std::string
@@ -184,7 +184,7 @@ namespace OCPI {
       unsigned whichProperty(const char *id) const;
       // This one returns NULL
       Property *getProperty(const char *id) const;
-      const char *getValue(const char *sym, OCPI::Util::ExprValue &val) const;
+      const char *getValue(const char *sym, OCPI::Base::ExprValue &val) const;
       inline Property *properties() const { return m_properties; }
       inline unsigned nProperties() const { return m_nProperties; }
       inline Property *properties(unsigned &np) const {
@@ -225,7 +225,7 @@ namespace OCPI {
         return m_totalPropertySize;
       }
       const char *finalizeProperties(size_t &offset, uint64_t &totalSize,
-				     const OCPI::Util::IdentResolver *resolver);
+				     const OCPI::Base::IdentResolver *resolver);
       ezxml_t slaveAssy() const { return m_slaveAssembly; } // just return the XML for the slaves
       enum ControlOperation {
 #define CONTROL_OP(x, c, t, s1, s2, s3, s4)  Op##c,

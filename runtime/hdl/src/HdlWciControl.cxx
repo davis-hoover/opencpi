@@ -30,6 +30,7 @@ namespace OCPI {
     namespace OS = OCPI::OS;
     namespace OM = OCPI::Metadata;
     namespace OU = OCPI::Util;
+    namespace OB = OCPI::Base;
     namespace OE = OCPI::Util::EzXml;
 
     static const unsigned DEFAULT_TIMEOUT = 16;
@@ -132,7 +133,7 @@ namespace OCPI {
       if (m_properties.registers() &&
 	  md.m_baseType != OA::OCPI_Struct && !md.m_isSequence &&
 	  md.m_baseType != OA::OCPI_String &&
-	  OU::baseTypeSizes[md.m_baseType] <= 32 &&
+	  OB::baseTypeSizes[md.m_baseType] <= 32 &&
 	  md.m_offset < OCCP_WORKER_CONFIG_SIZE &&
 	  !md.m_writeError &&
 	  !md.m_isIndirect)
@@ -364,7 +365,7 @@ namespace OCPI {
     }
 
     void WciControl::
-    setStringProperty(const OCPI::API::PropertyInfo &info, const Util::Member &, size_t offset,
+    setStringProperty(const OCPI::API::PropertyInfo &info, const OB::Member &, size_t offset,
 		      const char* val, unsigned idx) const {
       size_t n = strlen(val) + 1;
       setPropertyBytes(info, info.m_offset + offset, (const uint8_t*)val, n, idx);
@@ -375,7 +376,7 @@ namespace OCPI {
       throw OU::Error("No support for properties that are sequences of strings");
     }
     void WciControl::
-    getStringProperty(const OCPI::API::PropertyInfo &info, const Util::Member &, size_t offset,
+    getStringProperty(const OCPI::API::PropertyInfo &info, const OB::Member &, size_t offset,
 		      char *val, size_t length, unsigned idx) const {
       getPropertyBytes(info, info.m_offset + offset, (uint8_t*)val, length, idx, true);
     }
@@ -520,18 +521,18 @@ namespace OCPI {
     const std::string &DirectWorker::name() const { return m_name; }
     void DirectWorker::
     prepareProperty(OM::Property &, volatile uint8_t *&, const volatile uint8_t *&) const {}
-    OC::Port &DirectWorker::createPort(const OM::Port &, const OU::PValue *) {
+    OC::Port &DirectWorker::createPort(const OM::Port &, const OB::PValue *) {
       ocpiAssert("This method is not expected to ever be called" == 0);
       return *(OC::Port*)this;
     }
     OC::Port &DirectWorker::
-    createOutputPort(OM::PortOrdinal, size_t, size_t, const OU::PValue*)
+    createOutputPort(OM::PortOrdinal, size_t, size_t, const OB::PValue*)
       throw (OU::EmbeddedException) {
       ocpiAssert("This method is not expected to ever be called" == 0);
       return *(OC::Port*)this;
     }
     OC::Port &DirectWorker::
-    createInputPort(OM::PortOrdinal, size_t, size_t, const OU::PValue*)
+    createInputPort(OM::PortOrdinal, size_t, size_t, const OB::PValue*)
       throw (OU::EmbeddedException) {
       ocpiAssert("This method is not expected to ever be called" == 0);
       return *(OC::Port*)this;

@@ -40,14 +40,15 @@ with open(sys.argv[1], 'wb') as f:
         # Toggle pins on and off.
         # Case 1 does not use the debounce circuit, edge detector circuit, or toggle circuit.
         # Case 3 tests the edge detector circuit
+        f.write(struct.pack("<I", 0))
         f.write(struct.pack("<I", 1))
         f.write(struct.pack("<I", 0))
     elif testCase == 2:
         # Toggle pins on and off. This case tests only the debounce circuit.
         # Need to keep the input the same for counterClockCycles number of clock cycles
+        f.write(struct.pack("<I", 0))
         for x in range(0, counterClockCycles):
             f.write(struct.pack("<I", 1))
-
         for x in range(0, counterClockCycles):
             f.write(struct.pack("<I", 0))
     elif testCase == 4:

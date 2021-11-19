@@ -21,8 +21,8 @@
 #include <cstring>
 #include "OsMisc.hh"
 #include "OsEther.hh"
-#include "UtilValue.hh"
-#include "OcpiDriverManager.h"
+#include "BaseValue.hh"
+#include "BasePluginManager.hh"
 #include "ContainerManager.h"
 #include "RemoteLauncher.h"
 #include "RemoteDriver.h"
@@ -40,12 +40,13 @@
 namespace OC = OCPI::Container;
 namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 namespace OX = OCPI::Util::EzXml;
 namespace OA = OCPI::API;
 namespace OL = OCPI::Library;
 namespace OE = OCPI::OS::Ether;
 namespace OS = OCPI::OS;
-namespace OR = OCPI::RDT;
+namespace OT = OCPI::Transport;
 namespace OCPI {
   namespace Remote {
 
@@ -66,7 +67,7 @@ class Artifact : public OC::ArtifactBase<Container,Artifact> {
 class ExternalPort;
 class Worker;
 class Port : public OC::PortBase<Worker, Port, OCPI::API::ExternalPort> {
-  Port( Worker& w, const OM::Port & pmd, const OU::PValue *params)
+  Port( Worker& w, const OM::Port & pmd, const OB::PValue *params)
     :  OC::PortBase<Worker, Port, OCPI::API::ExternalPort> (w, *this, pmd, params) {
   }
 
@@ -81,9 +82,9 @@ class Worker
   Launcher &m_launcher;
   Worker(Application & app, Artifact *art, const char *name, ezxml_t impl, ezxml_t inst,
 	 const OC::Workers &/*slaves*/, bool hasMaster, size_t member, size_t crewSize,
-	 const OU::PValue *wParams, unsigned remoteInstance);
+	 const OB::PValue *wParams, unsigned remoteInstance);
   virtual ~Worker() {}
-  OC::Port &createPort(const OM::Port&, const OU::PValue */*params*/) {
+  OC::Port &createPort(const OM::Port&, const OB::PValue */*params*/) {
     ocpiAssert("This method is not expected to ever be called" == 0);
     return *(OC::Port*)this;
   }
@@ -91,14 +92,14 @@ class Worker
     if (getControlMask() & (1u << op))
       m_launcher.controlOp(m_remoteInstance, op);
   }
-  void setProperty(const OCPI::API::PropertyInfo &info, const char *val, const OU::Member &m,
+  void setProperty(const OCPI::API::PropertyInfo &info, const char *val, const OB::Member &m,
 		   size_t offset, size_t dimension) const {
     // Pass raw info for (maybe sub-) property access
     m_launcher.setPropertyValue(m_remoteInstance, info.m_ordinal, val, m.m_path, offset, dimension);
   }
   // FIXME: this should be at the lower level for just reading the bytes remotely to enable caching
   // properly, but we have to be careful to cache for remote proxies...
-  void getProperty(const OA::PropertyInfo &info, std::string &v, const OU::Member &m, size_t offset,
+  void getProperty(const OA::PropertyInfo &info, std::string &v, const OB::Member &m, size_t offset,
 		   size_t dimension, OA::PropertyOptionList &options,
 		   OA::PropertyAttributes *a_attributes = NULL) const {
     m_launcher.getPropertyValue(m_remoteInstance, info.m_ordinal, v, m.m_path, offset, dimension,				options, a_attributes);
@@ -170,9 +171,9 @@ class Worker
   // case, since the RPC is string-based anyway.
 #undef OCPI_DATA_TYPE_S
 #define OCPI_DATA_TYPE(sca,corba,letter,bits,run,pretty,store)		\
-  void set##pretty##Property(const OCPI::API::PropertyInfo &info, const OCPI::Util::Member &m, \
+  void set##pretty##Property(const OCPI::API::PropertyInfo &info, const OB::Member &m, \
 			     size_t offset, const run val, unsigned idx) const { \
-    OU::Unparser up;							\
+    OB::Unparser up;							\
     std::string s;							\
     up.unparse##pretty(s, val, true);					\
     setProperty(info, s.c_str(), m, offset + idx * m.m_elementBytes,	\
@@ -180,14 +181,14 @@ class Worker
   }									\
   void set##pretty##SequenceProperty(const OA::PropertyInfo &info, const run *vals, \
 				     size_t length) const { \
-    OU::Unparser up;					    \
+    OB::Unparser up;					    \
     std::string s;					    \
     for (unsigned n = 0; n < length; ++n)		    \
       up.unparse##pretty(s, *vals++, true);		    \
     setProperty(info, s.c_str(), info, 0, 0);		    \
   }
 #if 0
-  void set##pretty##Cached(const OCPI::API::PropertyInfo &info, const OCPI::Util::Member &m, \
+  void set##pretty##Cached(const OCPI::API::PropertyInfo &info, const OB::Member &m, \
 			     size_t offset, const run val, unsigned idx) const { \
     set##pretty##Property(info, m, offset, val, idx); \
   } \
@@ -198,9 +199,9 @@ class Worker
   // are aligned on 4 byte boundaries.  The offset calculations
   // and structure padding are assumed to do this.
 #define OCPI_DATA_TYPE_S(sca,corba,letter,bits,run,pretty,store)      \
-  void set##pretty##Property(const OCPI::API::PropertyInfo &info, const OCPI::Util::Member &m, \
+  void set##pretty##Property(const OCPI::API::PropertyInfo &info, const OB::Member &m, \
 			     size_t offset, const run val, unsigned idx) const { \
-    OU::Unparser up;							\
+    OB::Unparser up;							\
     std::string s;							\
     up.unparse##pretty(s, val, true);					\
     setProperty(info, s.c_str(), m, offset + idx * m.m_elementBytes,	\
@@ -209,7 +210,7 @@ class Worker
   void set##pretty##SequenceProperty(const OA::PropertyInfo &/*p*/, const run */*vals*/, \
 				     size_t /*length*/) const {}
 #if 0
-  void set##pretty##Cached(const OCPI::API::PropertyInfo &info, const OCPI::Util::Member &m, \
+  void set##pretty##Cached(const OCPI::API::PropertyInfo &info, const OB::Member &m, \
 			   size_t offset, const run val, unsigned idx) const { \
     set##pretty##Property(info, m, offset, val, idx);			\
   }									\
@@ -221,15 +222,15 @@ class Worker
   // Get Scalar Property by in fact getting the string and parsing it
   // We get the string because that is the natural remote operation
 #define OCPI_DATA_TYPE(sca,corba,letter,bits,run,pretty,store)		             \
-  run get##pretty##Property(const OCPI::API::PropertyInfo &info, const Util::Member &m, \
+  run get##pretty##Property(const OCPI::API::PropertyInfo &info, const OB::Member &m, \
 			    size_t offset, unsigned idx) const {	             \
     std::string uValue; /* unparsed value */                                         \
     getProperty(info, uValue, m, offset + idx * info.m_elementBytes, \
 		m.m_isSequence || m.m_arrayRank ? 1 : 0, OA::PropertyOptionList({ OA::HEX })); \
-    OU::ValueType vt(m);						\
+    OB::ValueType vt(m);						\
     vt.m_isSequence = false;						\
     vt.m_arrayRank = 0;							\
-    OU::Value v(vt);							\
+    OB::Value v(vt);							\
     (void)v.parse(uValue.c_str());					\
     return v.m_##pretty;						\
   }									\
@@ -237,7 +238,7 @@ class Worker
 					 size_t length) const {		\
     std::string uValue; /* unparsed value */				\
     getProperty(info, uValue, info, 0, 0, OA::PropertyOptionList({ OA::HEX })); \
-    OU::Value v(info);							\
+    OB::Value v(info);							\
     (void)v.parse(uValue.c_str());					\
     if (vals) {								\
       if (v.m_nTotal > length)						\
@@ -247,7 +248,7 @@ class Worker
     return OCPI_UTRUNCATE(unsigned, v.m_nTotal);			\
   }
 #if 0
-  run get##pretty##Cached(const OCPI::API::PropertyInfo &info, const Util::Member &m, \
+  run get##pretty##Cached(const OCPI::API::PropertyInfo &info, const OB::Member &m, \
 			  size_t offset, unsigned idx) const {		\
     return get##pretty##Property(info, m, offset, idx);			\
   }									\
@@ -257,7 +258,7 @@ class Worker
   // are aligned on 4 byte boundaries.  The offset calculations
   // and structure padding are assumed to do this.
 #define OCPI_DATA_TYPE_S(sca,corba,letter,bits,run,pretty,store)	\
-  void get##pretty##Property(const OCPI::API::PropertyInfo &info, const Util::Member &m, \
+  void get##pretty##Property(const OCPI::API::PropertyInfo &info, const OB::Member &m, \
 			     size_t offset, char *cp, size_t length, unsigned idx) const { \
     assert(m.m_stringLength < length); /* sb checked elsewhere */	\
     std::string uValue; /* unparsed value */				\
@@ -269,7 +270,7 @@ class Worker
   (const OA::PropertyInfo &/*p*/, char **/*vals*/, size_t /*length*/, char */*buf*/, \
    size_t /*space*/) const { return 0; }
 #if 0
-  run get##pretty##Cached(const OCPI::API::PropertyInfo &info, const Util::Member &m, \
+  run get##pretty##Cached(const OCPI::API::PropertyInfo &info, const OB::Member &m, \
 			   size_t offset, char *cp, size_t length, unsigned idx) const { \
     get##pretty##Property(info, m, offset, cp, length, idx); \
     return cp; \
@@ -285,7 +286,7 @@ class Worker
 class Application
   : public OC::ApplicationBase<Container,Application,Worker> {
   friend class Container;
-  Application(Container &c, const char *a_name, const OU::PValue *params)
+  Application(Container &c, const char *a_name, const OB::PValue *params)
     : OC::ApplicationBase<Container,Application,Worker>(c, *this, a_name, params) {
   }
   virtual ~Application() {
@@ -295,9 +296,9 @@ class Application
   OC::Worker &
   createWorker(OC::Artifact *art, const char *appInstName, ezxml_t impl, ezxml_t inst,
 	       const OC::Workers &slaves, bool hasMaster, size_t member, size_t crewSize,
-	       const OU::PValue *wParams) {
+	       const OB::PValue *wParams) {
     uint32_t remoteInstance;
-    if (!OU::findULong(wParams, "remoteInstance", remoteInstance))
+    if (!OB::findULong(wParams, "remoteInstance", remoteInstance))
       throw OU::Error("Remote ContainerApplication expects remoteInstance parameter");
     return *new Worker(*this, art ? static_cast<Artifact*>(art) : NULL,
 		       appInstName ? appInstName : "unnamed-worker", impl, inst, slaves,
@@ -370,7 +371,7 @@ public:
 	throw OU::Error("Bad transport string in container discovery: %s: %d", a_transports, rv);
       if (id[0] == ' ') // local sscanf issue - field cannot be empty
 	id[0] = '\0';
-      addTransport(transport, id, (OR::PortRole)roleIn, (OR::PortRole)roleOut, optionsIn,
+      addTransport(transport, id, (OT::PortRole)roleIn, (OT::PortRole)roleOut, optionsIn,
 		   optionsOut);
       a_transports += nChars;
     }
@@ -395,7 +396,7 @@ public:
     return m_client;
   }
   OA::ContainerApplication*
-  createApplication(const char *a_name, const OU::PValue *props)
+  createApplication(const char *a_name, const OB::PValue *props)
     throw (OU::EmbeddedException) {
     return new Application(*this, a_name, props);
   }
@@ -412,7 +413,7 @@ public:
 Worker::
 Worker(Application & app, Artifact *art, const char *a_name, ezxml_t impl, ezxml_t inst,
        const OC::Workers &a_slaves, bool a_hasMaster, size_t a_member, size_t a_crewSize,
-       const OU::PValue *wParams, unsigned remoteInstance)
+       const OB::PValue *wParams, unsigned remoteInstance)
   : OC::WorkerBase<Application,Worker,Port>(app, *this, art, a_name, impl, inst, a_slaves,
 					    a_hasMaster, a_member, a_crewSize, wParams),
     m_remoteInstance(remoteInstance),
@@ -442,7 +443,7 @@ Driver::Driver() throw() {
 
 // The driver entry point to deal with explicitly specified servers, in params or the environment
 bool Driver::
-useServers(const OU::PValue *params, bool verbose, bool discovery, unsigned &count, std::string &error) {
+useServers(const OB::PValue *params, bool verbose, bool discovery, unsigned &count, std::string &error) {
   char *saddr = getenv("OCPI_SERVER_ADDRESS");
   if (saddr && probeServer(saddr, verbose, NULL, NULL, discovery, count, error))
     return true;
@@ -461,7 +462,7 @@ useServers(const OU::PValue *params, bool verbose, bool discovery, unsigned &cou
       if (probeServer(li.token(), verbose, NULL, NULL, discovery, count, error))
 	return true;
   }
-  for (const OU::PValue *p = params; p && p->name; ++p)
+  for (const OB::PValue *p = params; p && p->name; ++p)
     if (!strcasecmp(p->name, "server")) {
       if (p->type != OA::OCPI_String)
 	throw OU::Error("Value of \"server\" parameter is not a string");
@@ -473,7 +474,7 @@ useServers(const OU::PValue *params, bool verbose, bool discovery, unsigned &cou
 
 void Driver::
 configure(ezxml_t xml) {
-  OCPI::Driver::Driver::configure(xml);
+  OCPI::Base::Plugin::Driver::configure(xml);
   std::string error;
 #if 0
   if (useServers(NULL, false, error))
@@ -494,7 +495,7 @@ probeServer(const char *a_server, bool verbose, const char **exclude, char *cont
   const char *sport = strchr(server, ':');
   if (sport) {
     const char *err;
-    if ((err = OU::Value::parseUShort(sport + 1, NULL, port)))
+    if ((err = OB::Value::parseUShort(sport + 1, NULL, port)))
       return OU::eformat(error, "Bad port number in server name: \"%s\"", server);
     host.resize(OCPI_SIZE_T_DIFF(sport, server));
   } else
@@ -701,7 +702,7 @@ search(const OA::PValue* params, const char **exclude, bool discoveryOnly) {
   bool verbose = false;
   std::string error;
   unsigned count = 0;
-  OU::findBool(params, "verbose", verbose);
+  OB::findBool(params, "verbose", verbose);
   // Probe servers in the environment
   if (useServers(NULL, verbose, discoveryOnly, count, error)) {
     ocpiInfo("Error during explicit container server discovery: %s", error.c_str());
@@ -720,10 +721,10 @@ search(const OA::PValue* params, const char **exclude, bool discoveryOnly) {
   if (error.size())
     return 0;
   bool printOnly = discoveryOnly;
-  OU::findBool(params, "printOnly", printOnly);
-  OU::findBool(params, "verbose", verbose);
+  OB::findBool(params, "printOnly", printOnly);
+  OB::findBool(params, "verbose", verbose);
   const char *ifName = NULL;
-  OU::findString(params, "interface", ifName);
+  OB::findString(params, "interface", ifName);
   OE::Interface eif;
   if (verbose)
     printf("Searching for container servers via all active network interfaces.\n");

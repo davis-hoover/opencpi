@@ -33,12 +33,12 @@
 #include <stdlib.h>
 #include "OsMisc.hh"
 #include "OsAssert.hh"
-#include <OcpiRDTInterface.h>
+#include "TransportRDTInterface.hh"
 #include <test_utilities.h>
-#include <OcpiUtilCommandLineConfiguration.h>
+#include "UtilCommandLineConfiguration.hh"
 #include <UtZeroCopyIOWorkers.h>
-#include <OcpiTimeEmit.h>
-#include <OcpiThread.h>
+#include "TimeEmit.hh"
+#include "UtilThread.hh"
 
 using namespace OCPI::Container;
 using namespace OCPI;
@@ -375,7 +375,7 @@ int  main( int argc, char** argv)
   SignalHandler sh(sig_handler);
 
   int test_rc = 1;
-  DataTransfer::EventManager* event_manager;
+  OCPI::Xfer::EventManager* event_manager;
   int cmap[3];
 
   try {
@@ -429,14 +429,14 @@ int  main( int argc, char** argv)
   //  test_rc &= config_and_run_ap_container_test1(ca,workers,cmap, bcmap[1] );
 
   // Run test with producer role of ActiveFlowControl
-  static OCPI::Util::PValue t2props[] = {OCPI::Util::PVString("role","ActiveOnly"),
-                                        OCPI::Util::PVEnd };
+  static OCPI::Base::PValue t2props[] = {OCPI::Base::PVString("role","ActiveOnly"),
+                                        OCPI::Base::PVEnd };
   PRODUCER.pdata[PRODUCER_OUTPUT_PORT].props = t2props;
 
-  //  static OCPI::Util::PValue c_port_props[] = {OCPI::Util::PVString("protocol","ocpi-socket-rdma"),
-  static OCPI::Util::PValue c_port_props[] = {OCPI::Util::PVString("protocol","ocpi-smb-pio"),
-  //  static OCPI::Util::PValue c_port_props[] = {OCPI::Util::PVString("protocol","ocpi-ofed-rdma"),
-                                                                                  OCPI::Util::PVEnd };
+  //  static OCPI::Base::PValue c_port_props[] = {OCPI::Base::PVString("protocol","ocpi-socket-rdma"),
+  static OCPI::Base::PValue c_port_props[] = {OCPI::Base::PVString("protocol","ocpi-smb-pio"),
+  //  static OCPI::Base::PValue c_port_props[] = {OCPI::Base::PVString("protocol","ocpi-ofed-rdma"),
+                                                                                  OCPI::Base::PVEnd };
   CONSUMER.pdata[CONSUMER_INPUT_PORT].props = c_port_props;
 
 

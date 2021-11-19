@@ -84,17 +84,17 @@ namespace OCPI {
         friend class Container;
         friend class Controller;
       protected:
-	void run(DataTransfer::EventManager* event_manager, bool &more_to_do);
+	void run(OCPI::Xfer::EventManager* event_manager, bool &more_to_do);
       public:
 	OCPI::Container::Worker &
 	createWorker(OCPI::Container::Artifact *art, const char *appInstName, ezxml_t impl,
 		     ezxml_t inst, const OCPI::Container::Workers &slaves, bool hasMaster,
-		     size_t member, size_t crewSize, const OCPI::Util::PValue *wParams);
+		     size_t member, size_t crewSize, const OCPI::Base::PValue *wParams);
 
       /**********************************
        * Constructor
        *********************************/  
-        Application(Container &, const char *, const OCPI::Util::PValue *);
+        Application(Container &, const char *, const OCPI::Base::PValue *);
 
       /**********************************
        * Destructor

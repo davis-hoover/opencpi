@@ -33,13 +33,13 @@
 #include <stdlib.h>
 #include "OsMisc.hh"
 #include "OsAssert.hh"
-#include <OcpiRDTInterface.h>
+#include "TransportRDTInterface.hh"
 #include <test_utilities.h>
-#include <OcpiUtilCommandLineConfiguration.h>
+#include "UtilCommandLineConfiguration.hh"
 #include <UtZeroCopyIOWorkers.h>
-#include <OcpiTimeEmit.h>
+#include "TimeEmit.hh"
 
-#include <OcpiThread.h>
+#include "UtilThread.hh"
 
 using namespace OCPI::Container;
 using namespace OCPI;
@@ -114,7 +114,7 @@ int  main( int argc, char** argv)
   SignalHandler sh(sig_handler);
 
   int test_rc = 1;
-  DataTransfer::EventManager* event_manager;
+  OCPI::Xfer::EventManager* event_manager;
   //int cmap[3];
 
   try {
@@ -173,8 +173,8 @@ int  main( int argc, char** argv)
   //  std::string flowc = pout.setFinalProviderInfo( p );
   //  cin.setFinalUserInfo( flowc );
 
-  static OCPI::API::PValue props[] = {OCPI::Util::PVString("protocol","ocpi-smb-pio"),
-				       OCPI::Util::PVEnd };
+  static OCPI::API::PValue props[] = {OCPI::Base::PVString("protocol","ocpi-smb-pio"),
+				       OCPI::Base::PVEnd };
   
   cin.connect( pout, props );
 

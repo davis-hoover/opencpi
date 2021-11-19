@@ -20,8 +20,8 @@
 
 #include <strings.h>
 #include <stdint.h>
-#include "OcpiUtilMisc.h"
-#include "OcpiUtilEzxml.h"
+#include "UtilMisc.hh"
+#include "UtilEzxml.hh"
 #include "assembly.h"
 #include "hdl-config.h"
 #include "hdl.h"
@@ -482,7 +482,7 @@ HdlConfig(HdlPlatform &pf, ezxml_t xml, const char *xfile, const std::string &pa
   // Add the platform worker as a device instance
   const DevInstance *pfdi;
   const HdlPlatform &cpf = pf;
-  const OU::Value *v;
+  const OB::Value *v;
   if ((err = addDevInstance(cpf, NULL, NULL, control, NULL, NULL, xml, pfdi)) ||
       (err = pf.parseSignalMappings(xml, pf, NULL)) ||
       (err = pfdi->m_worker->m_paramConfig->getParamValue("sdp_width", v)))

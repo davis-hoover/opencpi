@@ -21,7 +21,7 @@
 #include "gtest/gtest.h"
 
 #include "OsDebug.hh"
-#include "OcpiLoggerNullOutput.h"
+#include "UtilLoggerNullOutput.hh"
 
 namespace
 {

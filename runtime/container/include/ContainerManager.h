@@ -55,7 +55,7 @@ namespace OCPI {
     // driver use the concrete/derived container class without casting.
     template <class Dri, class Con, class App, class Art>
     class ContainerBase
-      : public OCPI::Driver::DeviceBase<Dri,Con>, // for the relationship with our driver
+      : public OCPI::Base::Plugin::DeviceBase<Dri,Con>, // for the relationship with our driver
 	public Parent<Art>,
 	public Parent<App>,
 	public Container
@@ -63,9 +63,9 @@ namespace OCPI {
     protected:
       ContainerBase<Dri, Con, App, Art>(Con &con, const char *a_name,
 					const ezxml_t config = NULL,
-					const OCPI::Util::PValue *props = NULL)
-	: OCPI::Driver::DeviceBase<Dri,Con>(a_name, con), Container(a_name, config, props) {}
-      inline Driver &driver() { return OCPI::Driver::DeviceBase<Dri,Con>::parent(); }
+					const OCPI::Base::PValue *props = NULL)
+	: OCPI::Base::Plugin::DeviceBase<Dri,Con>(a_name, con), Container(a_name, config, props) {}
+      inline Driver &driver() { return OCPI::Base::Plugin::DeviceBase<Dri,Con>::parent(); }
       Artifact *findLoadedArtifact(const char *a_name) {
 	return Parent<Art>::findChildByName(a_name);
       }
@@ -78,10 +78,10 @@ namespace OCPI {
       Application *firstApplication() const {
 	return Parent<App>::firstChild();
       }
-      Container *nextContainer() { return OCPI::Driver::DeviceBase<Dri,Con>::nextDevice(); }
+      Container *nextContainer() { return OCPI::Base::Plugin::DeviceBase<Dri,Con>::nextDevice(); }
     public:
       const std::string &name() const {
-	return OCPI::Driver::DeviceBase<Dri,Con>::name();
+	return OCPI::Base::Plugin::DeviceBase<Dri,Con>::name();
       }
     };
     extern const char *application;
@@ -93,7 +93,7 @@ namespace OCPI {
     {
     protected:
       ApplicationBase<Con, App, Wrk>(Con &con, App &app, const char *a_name,
-				     const OCPI::Util::PValue *props)
+				     const OCPI::Base::PValue *props)
       : Child<Con, App, application>(con, app, a_name), Application(props) {}
     public:
       Container &container() { return Child<Con,App,application>::parent(); }
@@ -109,7 +109,7 @@ namespace OCPI {
       : public Child<Con, Art, artifact>,
         public Artifact {
     protected:
-      ArtifactBase<Con,Art>(Con &con, Art &art, OCPI::Library::Artifact &lart, const OCPI::Util::PValue *props)
+      ArtifactBase<Con,Art>(Con &con, Art &art, OCPI::Library::Artifact &lart, const OCPI::Base::PValue *props)
       : Child<Con, Art, artifact>(con, art, lart.name().c_str()), Artifact(lart, props) {}
     public:
       inline Con &container() { return Child<Con,Art,artifact>::parent(); }
@@ -127,7 +127,7 @@ namespace OCPI {
       WorkerBase<App,Wrk,Prt>(App &app, Wrk &wrk, Artifact *art, const char *a_name,
 			      ezxml_t impl, ezxml_t inst, const Workers &a_slaves,
 			      bool a_hasMaster, size_t a_member, size_t a_crewSize,
-			      const OCPI::Util::PValue *params)
+			      const OCPI::Base::PValue *params)
       : Child<App,Wrk,worker>(app, wrk, a_name),
 	Worker(art, impl, inst, a_slaves, a_hasMaster, a_member, a_crewSize, params)
       {

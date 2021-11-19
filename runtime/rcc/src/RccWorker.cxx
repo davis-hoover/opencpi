@@ -19,7 +19,7 @@
  */
 
 #include <climits>
-#include "OcpiTimeEmitCategories.h"
+#include "TimeEmitCategories.hh"
 #include "RccApplication.h"
 #include "RccPort.h"
 #include "RccWorker.h"
@@ -28,6 +28,7 @@ namespace OC = OCPI::Container;
 namespace OS = OCPI::OS;
 namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 namespace OA = OCPI::API;
 
 namespace OCPI {
@@ -36,7 +37,7 @@ namespace OCPI {
 Worker::
 Worker(Application & app, Artifact *art, const char *a_name, ezxml_t impl, ezxml_t inst,
        const OC::Workers &a_slaves, bool a_hasMaster, size_t a_member, size_t a_crewSize,
-       const OU::PValue *wParams)
+       const OB::PValue *wParams)
   : OC::WorkerBase<Application,Worker,Port>(app, *this, art, a_name, impl, inst, a_slaves,
 					    a_hasMaster, a_member, a_crewSize, wParams),
     OCPI::Time::Emit(&parent().parent(), "Worker", a_name),
@@ -371,7 +372,7 @@ rccTake(RCCPort *rccPort, RCCBuffer *oldBuffer, RCCBuffer *newBuffer)
  // Also called from createInputPort and createOutputPort locally
  OC::Port &
  Worker::
- createPort(const OM::Port& mp, const OCPI::Util::PValue *params)
+ createPort(const OM::Port& mp, const OB::PValue *params)
  {
    TRACE(" OCPI::RCC::Worker::createPort()");
    if (mp.m_minBufferCount == 0)
@@ -428,7 +429,7 @@ rccTake(RCCPort *rccPort, RCCBuffer *oldBuffer, RCCBuffer *newBuffer)
  // list of properties.
  OC::Port &Worker::
  createTestPort(OM::PortOrdinal portId, size_t bufferCount, size_t bufferSize, bool isProvider,
-		const OU::PValue *props) {
+		const OB::PValue *props) {
    OM::Port *pmd = new OM::Port(NULL, this);
    pmd->m_name = isProvider ? "unnamed input" : "unnamed output";
    pmd->m_ordinal = portId;
@@ -445,12 +446,12 @@ rccTake(RCCPort *rccPort, RCCBuffer *oldBuffer, RCCBuffer *newBuffer)
  }
  OC::Port &Worker::
  createOutputPort(OM::PortOrdinal portId, size_t bufferCount, size_t bufferSize,
-		  const OU::PValue *props) {
+		  const OB::PValue *props) {
    return createTestPort(portId, bufferCount, bufferSize, false, props);
  }
  OC::Port &Worker::
  createInputPort(OM::PortOrdinal portId, size_t bufferCount, size_t bufferSize,
-		 const OU::PValue *props) {
+		 const OB::PValue *props) {
    return createTestPort(portId, bufferCount, bufferSize, true, props);
  }
 
@@ -491,10 +492,10 @@ prepareProperty(OM::Property& md ,
 		const volatile uint8_t *&readVaddr) const {
   (void)readVaddr;
   if (md.m_baseType != OA::OCPI_Struct && !md.m_isSequence && md.m_baseType != OA::OCPI_String &&
-      OU::baseTypeSizes[md.m_baseType] <= 32 &&
+      OB::baseTypeSizes[md.m_baseType] <= 32 &&
       !md.m_writeError) {
     if (!m_context->properties ||
-	(md.m_offset+OU::baseTypeSizes[md.m_baseType]/8) > m_info.propertySize ) {
+	(md.m_offset+OB::baseTypeSizes[md.m_baseType]/8) > m_info.propertySize ) {
       throw OU::EmbeddedException( OU::PROPERTY_SET_EXCEPTION, NULL, OU::ApplicationRecoverable);
     }
     writeVaddr = (uint8_t *)m_context->properties + md.m_offset;
@@ -820,7 +821,7 @@ OCPI_CONTROL_OPS
       // Set a scalar property value
 #define OCPI_DATA_TYPE(sca,corba,letter,bits,run,pretty,store)		\
     void Worker:: \
-    set##pretty##Property(const OCPI::API::PropertyInfo &info, const Util::Member &m, \
+    set##pretty##Property(const OCPI::API::PropertyInfo &info, const OCPI::Base::Member &m, \
 			  size_t offset, const run val, unsigned idx) const { \
     if (info.m_writeError)                                     \
       throw; /*"worker has errors before write */              \
@@ -861,7 +862,7 @@ OCPI_CONTROL_OPS
 // and structure padding are assumed to do this.
 #define OCPI_DATA_TYPE_S(sca,corba,letter,bits,run,pretty,store)      \
   void Worker:: \
-  set##pretty##Property(const OCPI::API::PropertyInfo &info, const Util::Member &m, \
+  set##pretty##Property(const OCPI::API::PropertyInfo &info, const OCPI::Base::Member &m, \
 			size_t offset, const run val, unsigned idx) const { \
     size_t ocpi_length;                                               \
     if (!val || (ocpi_length = strlen(val)) > m.m_stringLength)      \
@@ -903,7 +904,7 @@ OCPI_CONTROL_OPS
 #undef OCPI_DATA_TYPE
       // Get Scalar Property
 #define OCPI_DATA_TYPE(sca,corba,letter,bits,run,pretty,store)		    \
-      run Worker::get##pretty##Property(const OA::PropertyInfo &info, const OU::Member &m, \
+      run Worker::get##pretty##Property(const OA::PropertyInfo &info, const OB::Member &m, \
 					size_t offset, unsigned idx) const { \
 	if (info.m_readSync)						    \
 	  propertyRead(info.m_ordinal);					    \
@@ -952,7 +953,7 @@ OCPI_CONTROL_OPS
       // and structure padding are assumed to do this.
 #define OCPI_DATA_TYPE_S(sca,corba,letter,bits,run,pretty,store)	            \
       void Worker:: \
-      get##pretty##Property(const OCPI::API::PropertyInfo &info, const Util::Member &m,	\
+      get##pretty##Property(const OCPI::API::PropertyInfo &info, const OCPI::Base::Member &m, \
 			    size_t offset, char *cp, size_t length, unsigned idx) const { \
 	  if (info.m_readSync)	   				                    \
 	    propertyRead(info.m_ordinal);				            \
@@ -1229,7 +1230,7 @@ RCCResult RCCUserWorker::run(bool /*timeout*/) {
 	 ocpiDebug("Implicit length for op %u set to %zu", a_opCode, op.defaultLength());
 	 size_t l_length = op.defaultLength(); // Could be using a non-zero default length
 	 if (op.m_nArgs > 1) {
-	   const OU::Member &m = op.m_args[op.m_nArgs - 1];
+	   const OB::Member &m = op.m_args[op.m_nArgs - 1];
 	   if (m.m_isSequence) // make sure any sequence is initially zero length
 	     *(uint32_t *)((uint8_t *)buf.m_rccBuffer->data + m.m_offset) =
 	       (uint32_t)((l_length - (m.m_offset + m.m_align)) / m.m_elementBytes);
@@ -1257,7 +1258,7 @@ RCCResult RCCUserWorker::run(bool /*timeout*/) {
 		 size_t *capacity) const {
      checkOpCode(buf, op, false);
      OM::Operation &o = m_rccPort.containerPort->metaPort().m_operations[op];
-     const OU::Member &m = o.m_args[arg];
+     const OB::Member &m = o.m_args[arg];
      uint8_t *p = (uint8_t *)buf.m_rccBuffer->data + m.m_offset;
      if (m.m_isSequence) {
        assert(a_length);
@@ -1288,7 +1289,7 @@ RCCResult RCCUserWorker::run(bool /*timeout*/) {
      assert(m_rccPort.containerPort);
      checkOpCode(buf, op);
      OM::Operation &o = m_rccPort.containerPort->metaPort().m_operations[op];
-     const OU::Member &m = o.m_args[arg];
+     const OB::Member &m = o.m_args[arg];
      assert(m.m_isSequence);
      size_t
        nBytes = size * m.m_elementBytes,
@@ -1345,7 +1346,7 @@ RCCResult RCCUserWorker::run(bool /*timeout*/) {
 	 // and the last argument is a sequence that is not the first argument, make sure
 	 // to set the embedded sequence length to maintain the integrity of the message
 	 if (m_rccPort.sequence) {
-	   const OU::Member &m = *m_rccPort.sequence;
+	   const OB::Member &m = *m_rccPort.sequence;
 	   *(uint32_t *)((uint8_t*)m_rccPort.current.data + m.m_offset) =
 	     OCPI_UTRUNCATE(uint32_t,
 			    (m_rccPort.current.length_ - (m.m_offset + m.m_align)) /

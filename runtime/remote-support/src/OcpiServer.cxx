@@ -29,7 +29,7 @@
 #include <utime.h>
 #include "OsFileSystem.hh"
 #include "OsAssert.hh"
-#include "OcpiUtilMisc.h"
+#include "UtilMisc.hh"
 #include "OcpiServer.h"
 
 namespace OE = OCPI::OS::Ether;

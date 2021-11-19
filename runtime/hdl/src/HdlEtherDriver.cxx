@@ -25,6 +25,7 @@ namespace OCPI {
     namespace Ether {
       namespace OS = OCPI::OS;
       namespace OU = OCPI::Util;
+      namespace OB = OCPI::Base;
       namespace OE = OCPI::OS::Ether;
 
       class Device
@@ -32,7 +33,7 @@ namespace OCPI {
 	friend class Driver;
       protected:
 	Device(Driver &driver, OS::Ether::Interface &ifc, std::string &a_name,
-	       OE::Address &a_addr, bool discovery, const OU::PValue *params, std::string &error)
+	       OE::Address &a_addr, bool discovery, const OB::PValue *params, std::string &error)
 	  : Net::Device(driver, ifc, a_name, a_addr, discovery, "ocpi-ether-rdma", 0,
 			(uint64_t)1 << 32, ((uint64_t)1 << 32) - sizeof(OccpSpace), 0, params,
 			error) {
@@ -53,7 +54,7 @@ namespace OCPI {
       }
       Net::Device *Driver::
       createDevice(OS::Ether::Interface &ifc, OS::Ether::Address &addr, bool discovery,
-		   const OU::PValue *params, std::string &error) {
+		   const OB::PValue *params, std::string &error) {
 	std::string name("Ether:" + ifc.name + "/" + addr.pretty());
 	Device *d = new Device(*this, ifc, name, addr, discovery, params, error);
 	if (error.empty())

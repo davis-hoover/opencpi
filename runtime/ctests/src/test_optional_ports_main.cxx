@@ -31,17 +31,17 @@
 #include <stdlib.h>
 #include "OsMisc.hh"
 #include "OsAssert.hh"
-#include "XferManager.h"
-#include <OcpiRDTInterface.h>
+#include "XferManager.hh"
+#include "TransportRDTInterface.hh"
 #include <test_utilities.h>
-#include <OcpiUtilCommandLineConfiguration.h>
+#include "UtilCommandLineConfiguration.hh"
 #include "UtGenericLoopbackWorkers.h"
-#include <OcpiThread.h>
+#include "UtilThread.hh"
 
 using namespace OCPI::Container;
 using namespace OCPI;
 using namespace OCPI::CONTAINER_TEST;
-namespace XF = DataTransfer;
+namespace XF = OCPI::Xfer;
 namespace OU = OCPI::Util;
 
 static const char* g_ep1    = "ocpi-smb-pio:test1:900000.1.20";
@@ -346,7 +346,7 @@ int  main( int argc, char** argv)
 {
   int test_rc = 1;
   int oa_test_rc = 1;
-  DataTransfer::EventManager* event_manager;
+  XF::EventManager* event_manager;
   int cmap[3];
   const char* test_name;
 

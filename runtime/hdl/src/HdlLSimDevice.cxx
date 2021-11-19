@@ -32,9 +32,9 @@
 #include "OsFileSystem.hh"
 #include "OsSemaphore.hh"
 #include "OsMisc.hh"
-#include "OcpiUtilAutoMutex.h"
-#include "XferManager.h"
-#include "OcpiTransport.h"
+#include "UtilAutoMutex.hh"
+#include "XferManager.hh"
+#include "Transport.hh"
 #include "LibrarySimple.h"
 #include "HdlSdp.h"
 #include "HdlLSimDriver.h"
@@ -46,12 +46,13 @@ namespace OCPI {
     namespace LSim {
       namespace OS = OCPI::OS;
       namespace OU = OCPI::Util;
+      namespace OB = OCPI::Base;
       namespace OH = OCPI::HDL;
       namespace OL = OCPI::Library;
       namespace OX = OCPI::Util::EzXml;
       namespace OA = OCPI::API;
-      namespace OT = OCPI::DataTransport;
-      namespace DT = DataTransfer;
+      namespace OT = OCPI::Transport;
+      namespace XF = OCPI::Xfer;
 
       // Our named pipes.
 struct Fifo {
@@ -117,7 +118,7 @@ struct Fifo {
 };
 
 class Device
-  : public OH::Device, public OH::Accessor, DT::EndPoint::Receiver,
+  : public OH::Device, public OH::Accessor, XF::EndPoint::Receiver,
     virtual public OCPI::Util::SelfMutex
  {
   friend class Driver;
@@ -178,7 +179,7 @@ class Device
   };
   std::queue<Request*, std::list<Request*> > m_respQueue;
   OS::Mutex m_sdpSendMutex; // mutex usage between control and data
-  typedef std::vector<DT::XferServices *> XferServices;
+  typedef std::vector<XF::XferServices *> XferServices;
   XferServices m_writeServices;
   XferServices m_readServices;
   std::string m_exec; // simulation executable local relative path name
@@ -207,7 +208,7 @@ protected:
   */
   Device(const std::string &a_name, const std::string &simDir, const std::string &a_platform,
 	 const std::string &script, uint8_t spinCount, unsigned sleepUsecs,
-	 unsigned simTicks, const OU::PValue *params, bool dump, std::string &error)
+	 unsigned simTicks, const OB::PValue *params, bool dump, std::string &error)
     : OH::Device("lsim:" + a_name, "ocpi-socket-rdma", params),
       m_state(EMULATING),
       m_req(simDir + "/request", false),
@@ -268,9 +269,9 @@ protected:
   dmaOptions(ezxml_t /*icImplXml*/, ezxml_t /*icInstXml*/, bool isProvider) {
     const char *e = getenv("OCPI_HDL_FORCE_SIM_DMA_PULL");
     return isProvider ?
-      (e && !strcmp(e, "1") ? 0 : 1 << OCPI::RDT::ActiveFlowControl) |
-      (1 << OCPI::RDT::ActiveMessage) | (1 << OCPI::RDT::FlagIsMeta) :
-      1 << OCPI::RDT::ActiveMessage  | (1 << OCPI::RDT::FlagIsMetaOptional) ;
+      (e && !strcmp(e, "1") ? 0 : 1 << OT::ActiveFlowControl) |
+      (1 << OT::ActiveMessage) | (1 << OT::FlagIsMeta) :
+      1 << OT::ActiveMessage  | (1 << OT::FlagIsMetaOptional) ;
   }
   // Our added-value wait-for-process call.
   // If "hang", we wait for the process to end, and if it stops, we term+kill it.
@@ -636,13 +637,13 @@ protected:
 	  myassert(h.getLength() <= sizeof(m_sdpDataBuf));
 	  if (h.endRequest(h, m_resp.m_rfd, m_sdpDataBuf, error))
 	    return true;
-	  xfs[mbox]->send(OCPI_UTRUNCATE(DtOsDataTypes::Offset, whole_addr),
+	  xfs[mbox]->send(OCPI_UTRUNCATE(XF::Offset, whole_addr),
 			  m_sdpDataBuf, h.getLength());
 	} else {
 	  // Active message read/pull DMA, which will only work with locally mapped endpoints
 	  uint8_t *data =
 	    (uint8_t *)xfs[mbox]->
-	    from().sMemServices().map(OCPI_UTRUNCATE(DtOsDataTypes::Offset, whole_addr),
+	    from().sMemServices().map(OCPI_UTRUNCATE(XF::Offset, whole_addr),
 				      h.getLength());
 	  send2sdp(h, data, true, "DMA read response", error);
 	}
@@ -1077,19 +1078,19 @@ public:
   unload(std::string &error) {
     return OU::eformat(error, "Can't unload bitstreams for simulated devices yet");
   }
-  void receive(DtOsDataTypes::Offset offset, uint8_t *data, size_t count) {
+  void receive(XF::Offset offset, uint8_t *data, size_t count) {
     SDP::Header h(false, offset, count);
     std::string error;
     send2sdp(h, data, false, "data", error);
   }
-  DT::EndPoint &getEndPoint() {
+  XF::EndPoint &getEndPoint() {
     if (m_endPoint)
       return *m_endPoint;
     // Create an endpoint that is specialized to call back the container
     // when data arrives for the endpount rather than allocating a large internal buffer.
     // Size comes from the properties of the SDP worker.
-    DT::EndPoint &ep =
-      DT::getManager().allocateProxyEndPoint(m_endpointSpecific.c_str(), true,
+    XF::EndPoint &ep =
+      XF::getManager().allocateProxyEndPoint(m_endpointSpecific.c_str(), true,
 					     OCPI_UTRUNCATE(size_t, m_endpointSize));
     ep.addRef();
     ep.finalize();
@@ -1102,15 +1103,15 @@ public:
     return ep;
   }
   // FIXME: the "other" argument should be an endpoint, but that isn't easy now
-  void connect(DT::EndPoint &ep, OCPI::RDT::Descriptors &mine,
-	       const OCPI::RDT::Descriptors &other) {
+  void connect(XF::EndPoint &ep, OT::Descriptors &mine,
+	       const OT::Descriptors &other) {
     OT::Transport::fillDescriptorFromEndPoint(ep, mine); // needed?
     assert(m_endPoint);
     assert(&ep == m_endPoint);
-    DT::EndPoint &otherEp = m_endPoint->factory().getEndPoint(other.desc.oob.oep);
+    XF::EndPoint &otherEp = m_endPoint->factory().getEndPoint(other.desc.oob.oep);
     assert(otherEp.mailBox() < m_writeServices.size() &&
 	   otherEp.mailBox() < m_readServices.size());
-    DT::XferServices
+    XF::XferServices
       &newWrite = m_endPoint->factory().getTemplate(*m_endPoint, otherEp),
       &newRead = m_endPoint->factory().getTemplate(otherEp, *m_endPoint),
       **oldWrite = &m_writeServices[otherEp.mailBox()],
@@ -1167,7 +1168,7 @@ getSims(std::vector<std::string> &sims) {
 }
 
 unsigned Driver::
-search(const OU::PValue *params, const char **excludes, bool discoveryOnly, std::string &error) {
+search(const OB::PValue *params, const char **excludes, bool discoveryOnly, std::string &error) {
   error.clear();
   const char *env;
   // Note that the default here is to DO discovery, i.e. to disablediscovery
@@ -1176,7 +1177,7 @@ search(const OU::PValue *params, const char **excludes, bool discoveryOnly, std:
     return 0;
   ocpiInfo("Searching for local HDL simulators.");
   bool verbose = false;
-  OU::findBool(params, "verbose", verbose);
+  OB::findBool(params, "verbose", verbose);
   unsigned count = 0;
   const char *envsim = getenv("OCPI_HDL_SIMULATOR");
   if (envsim) {
@@ -1257,25 +1258,25 @@ open(const char *name, const OA::PValue *params, std::string &err) {
   std::string platform;
   platform.assign(name, OCPI_SIZE_T_DIFF(cp, name));
   bool verbose = false;
-  OU::findBool(params, "verbose", verbose);
+  OB::findBool(params, "verbose", verbose);
   const char *dir = "simulations";
   // Backward compatibility for old default of "simtest".
   // If you don't mention it, and simtest exists, use it
-  if (!OU::findString(params, "simDir", dir)) {
+  if (!OB::findString(params, "simDir", dir)) {
     bool isDir;
     if (OS::FileSystem::exists("simtest", &isDir) && isDir)
       dir = "simtest";
   }
   uint32_t simTicks = 200000000, sleepUsecs = 200000;
   uint8_t spinCount = 20;
-  OU::findULong(params, "simTicks", simTicks);
+  OB::findULong(params, "simTicks", simTicks);
 
   return createDevice(name, platform, spinCount, sleepUsecs, simTicks, params, false, dir, err);
 }
 
 Device *Driver::
 createDevice(const std::string &name, const std::string &platform, uint8_t spinCount,
-	     unsigned sleepUsecs, unsigned simTicks, const OU::PValue *params, bool dump,
+	     unsigned sleepUsecs, unsigned simTicks, const OB::PValue *params, bool dump,
 	     const char *dir, std::string &error) {
   std::string path, script, actualPlatform;
   const char *err;

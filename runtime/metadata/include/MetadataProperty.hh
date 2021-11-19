@@ -38,13 +38,13 @@
 #define OCPI_METADATA_PROPERTY_H
 
 #include "ezxml.h"
-#include "UtilDataTypes.hh"
+#include "BaseDataTypes.hh"
 #include "OcpiPropertyApi.hh"
 
 namespace OCPI {
   namespace API {
     // This class is only exposed as a pointer in the API, hence it can be defined with OCPI::Util
-    class PropertyInfo : public OCPI::Util::Member {
+    class PropertyInfo : public OCPI::Base::Member {
     public:
       PropertyInfo();
       // Spec-level attributes - allowable in normal specs
@@ -119,15 +119,15 @@ namespace OCPI {
     public:
       const char
 	*parse(ezxml_t x, bool includeImpl, unsigned ordinal,
-	       const OCPI::Util::IdentResolver *resolv = NULL),
-	*parseImpl(ezxml_t x, const OCPI::Util::IdentResolver *resolv = NULL),
+	       const OCPI::Base::IdentResolver *resolv = NULL),
+	*parseImpl(ezxml_t x, const OCPI::Base::IdentResolver *resolv = NULL),
 	*parse(ezxml_t x, unsigned ordinal),
-	*parseValue(const char *unparsed, OCPI::Util::Value &value, const char *end = NULL,
-		    const OCPI::Util::IdentResolver *resolv = NULL) const,
+	*parseValue(const char *unparsed, OCPI::Base::Value &value, const char *end = NULL,
+		    const OCPI::Base::IdentResolver *resolv = NULL) const,
         *checkType(OCPI::API::BaseType ctype, unsigned n, bool write),
-	*getValue(OCPI::Util::ExprValue &val),
+	*getValue(OCPI::Base::ExprValue &val),
 	*offset(size_t &cumOffset, uint64_t &sizeofConfigSpace,
-		const OCPI::Util::IdentResolver *resolv = NULL);
+		const OCPI::Base::IdentResolver *resolv = NULL);
     };
   }
 }

@@ -26,8 +26,8 @@
 #include "ocpi-config.h"
 #include "OsFileIterator.hh"
 #include "OsFileSystem.hh"
-#include "OcpiUtilCppMacros.h"
-#include "OcpiUtilMisc.h"
+#include "UtilCppMacros.hh"
+#include "UtilMisc.hh"
 #include "cdkutils.h"
 
 namespace OS = OCPI::OS;

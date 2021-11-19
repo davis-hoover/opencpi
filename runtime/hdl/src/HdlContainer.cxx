@@ -20,7 +20,7 @@
 
 #include <unistd.h>
 #include "OsAssert.hh"
-#include "OcpiUtilMisc.h"
+#include "UtilMisc.hh"
 #include "ContainerManager.h"
 #include "HdlOCDP.h"
 #include "HdlSdp.h"
@@ -37,11 +37,12 @@ namespace OC = OCPI::Container;
 namespace OS = OCPI::OS;
 namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 namespace OE = OCPI::Util::EzXml;
-namespace OD = OCPI::DataTransport;
-namespace OT = OCPI::Time;
+namespace OTM = OCPI::Time;
 namespace OL = OCPI::Library;
-namespace OR = OCPI::RDT;
+namespace OT = OCPI::Transport;
+namespace XF = OCPI::Xfer;
 
 namespace OCPI {
   namespace Container {}
@@ -54,19 +55,19 @@ namespace OCPI {
     //    static const unsigned LOCAL_BUFFER_ALIGN = 32;
 
 
-    static OT::Emit::Time getTicksFunc(OT::Emit::TimeSource *ts) {
+    static OTM::Emit::Time getTicksFunc(OTM::Emit::TimeSource *ts) {
       return ts ? static_cast<Container *>(ts)->getMyTicks() : 0; // null-ptr warning
     }
     Container::
-    Container(OCPI::HDL::Device &device, ezxml_t config, const OU::PValue *params) 
+    Container(OCPI::HDL::Device &device, ezxml_t config, const OB::PValue *params) 
       : OC::ContainerBase<Driver,Container,Application,Artifact>
 	(*this, device.name().c_str(), config, params),
-	Access(device.cAccess()), OT::Emit::TimeSource(getTicksFunc),
+	Access(device.cAccess()), OTM::Emit::TimeSource(getTicksFunc),
 	m_device(device), m_hwEvents(this, *this, "FPGA Events")
     {
       // Note that the device has retrieved all the info from the admin space already
 #if 0
-      static OT::Emit::RegisterEvent te("testevent");
+      static OTM::Emit::RegisterEvent te("testevent");
       m_hwEvents.emit(te);
       m_hwEvents.emitT(te, getMyTicks());
 #endif
@@ -78,7 +79,7 @@ namespace OCPI {
       addTransport(m_device.protocol(),
 		   // FIXME delegate this better to the device
 		   strstr(m_device.protocol(), "socket") ? "" : OU::getSystemId().c_str(),
-		   OR::ActiveMessage, OR::ActiveMessage,
+		   OT::ActiveMessage, OT::ActiveMessage,
 		   m_device.dmaOptions(NULL, NULL, true),
 		   m_device.dmaOptions(NULL, NULL, false));		   
       ocpiDebug("HDL Container for device %s constructed.  ESN: '%s' Platform/part is %s/%s.",
@@ -91,7 +92,7 @@ namespace OCPI {
       // Shut this base class down while we're still here
       // Ignore any errors since it is not critical.
       try {
-	OT::Emit::shutdown();
+	OTM::Emit::shutdown();
       } catch (...) {
 	static const char msg[] = "***Exception during container shutdown\n";
 	ocpiIgnore(write(2, msg, strlen(msg)));
@@ -117,13 +118,13 @@ namespace OCPI {
     needThread() { return m_device.needThread(); }
 
     Container::DispatchRetCode Container::
-    dispatch(DataTransfer::EventManager*) {
+    dispatch(XF::EventManager*) {
       return m_device.run() ? Container::DispatchNoMore : Container::MoreWorkNeeded;
     }
 
     // This simply insulates the driver code from needing the container class implementation decl.
     OC::Container *Driver::
-    createContainer(OCPI::HDL::Device &dev, ezxml_t config, const OU::PValue *params)  {
+    createContainer(OCPI::HDL::Device &dev, ezxml_t config, const OB::PValue *params)  {
       return new Container(dev, config, params);
     }
     class Worker;
@@ -249,11 +250,11 @@ namespace OCPI {
       {}
       OC::Worker & createWorker(OC::Artifact *art, const char *appInstName, ezxml_t impl,
 				ezxml_t inst, const OC::Workers &slaves, bool hasMaster,
-			        size_t member, size_t crewSize, const OU::PValue *wParams);
+			        size_t member, size_t crewSize, const OB::PValue *wParams);
     };
 
     OA::ContainerApplication *Container::
-    createApplication(const char *a_name, const OCPI::Util::PValue *props)
+    createApplication(const char *a_name, const OB::PValue *props)
       throw ( OCPI::Util::EmbeddedException ) {
       return new Application(*this, a_name, props);
     };
@@ -294,7 +295,7 @@ namespace OCPI {
 
 #define OCPI_DATA_TYPE(sca,corba,letter,bits,run,pretty,store)     	    \
       void								    \
-      set##pretty##Property(const OCPI::API::PropertyInfo &info, const Util::Member &m, \
+      set##pretty##Property(const OCPI::API::PropertyInfo &info, const OCPI::Base::Member &m, \
 			    size_t off, const run val, unsigned idx) const { \
         WciControl::set##pretty##Property(info, m, off, val, idx);	\
       }									    \
@@ -304,7 +305,7 @@ namespace OCPI {
 	WciControl::set##pretty##SequenceProperty(info, vals, length);	    \
       }									    \
       run								    \
-      get##pretty##Property(const OCPI::API::PropertyInfo &info, const Util::Member &m, \
+      get##pretty##Property(const OCPI::API::PropertyInfo &info, const OCPI::Base::Member &m, \
 			    size_t off, unsigned idx) const {		\
 	return WciControl::get##pretty##Property(info, m, off, idx); \
       }									    \
@@ -316,7 +317,7 @@ namespace OCPI {
 #define OCPI_DATA_TYPE_S(sca,corba,letter,bits,run,pretty,store)
 OCPI_DATA_TYPES
       void
-      setStringProperty(const OCPI::API::PropertyInfo &info, const Util::Member &m, size_t off,
+      setStringProperty(const OCPI::API::PropertyInfo &info, const OCPI::Base::Member &m, size_t off,
 			const char* val, unsigned idx) const {
         WciControl::setStringProperty(info, m, off, val, idx);
       }
@@ -326,7 +327,7 @@ OCPI_DATA_TYPES
 	WciControl::setStringSequenceProperty(info, val, n);
       }
       void
-      getStringProperty(const OCPI::API::PropertyInfo &info, const Util::Member &m, size_t off,
+      getStringProperty(const OCPI::API::PropertyInfo &info, const OCPI::Base::Member &m, size_t off,
 			char *val, size_t length, unsigned idx) const {
 	WciControl::getStringProperty(info, m, off, val, length, idx);
       }
@@ -359,7 +360,7 @@ OCPI_DATA_TYPES
     OC::Worker & Application::
     createWorker(OC::Artifact *art, const char *appInstName, ezxml_t impl, ezxml_t inst,
 		 const OC::Workers &slaves, bool hasMaster, size_t member, size_t crewSize,
-		 const OCPI::Util::PValue *wParams) {
+		 const OB::PValue *wParams) {
       assert(slaves.empty());
       return *new Worker(*this, art, appInstName, impl, inst, slaves, hasMaster, member, crewSize,
 			 wParams);
@@ -385,7 +386,7 @@ OCPI_DATA_TYPES
       bool m_hasAdapterConfig;
       size_t m_adapterConfig;
       static int dumpFd;
-      DataTransfer::EndPoint *m_endPoint; // the data plane endpoint if externally connected
+      XF::EndPoint *m_endPoint; // the data plane endpoint if externally connected
       Port(OCPI::HDL::Worker &w,
 	   const OA::PValue *params,
            const OM::Port &mPort, // the parsed port metadata
@@ -423,7 +424,7 @@ OCPI_DATA_TYPES
 	// If the endpoint into is just a protocol, we just create one locally
 	m_endPoint = &device.getEndPoint();
 	m_endPoint->addRef();
-	OD::Transport::fillDescriptorFromEndPoint(*m_endPoint, getData().data);
+	OCPI::Transport::Transport::fillDescriptorFromEndPoint(*m_endPoint, getData().data);
         // These will be determined at connection time
         myDesc.dataBufferPitch   = 0;
         myDesc.metaDataBaseAddr  = 0;
@@ -479,7 +480,7 @@ OCPI_DATA_TYPES
 	  myDesc.metaDataPitch = sizeof(OcdpMetadata);
 	  if (isProvider()) {
 	    // CONSUMER
-	    // BasicPort does this: getData().data.type = OCPI::RDT::ConsumerDescT;
+	    // BasicPort does this: getData().data.type = OT::ConsumerDescT;
 	    // The flag is in the OCDP's register space.
 	    // "full" is the flag telling me (the consumer) a buffer has become full
 	    // Mode dependent usage:
@@ -497,7 +498,7 @@ OCPI_DATA_TYPES
 	    myDesc.emptyFlagBaseAddr =
 	      m_properties.physOffset(offsetof(OcdpProperties, nReady));
 	  } else {
-	    // BasicPort does this: getData().data.type = OCPI::RDT::ProducerDescT;
+	    // BasicPort does this: getData().data.type = OT::ProducerDescT;
 	    // The flag is in the OCDP's register space.
 	    // "empty" is the flag telling me (the producer) a buffer has become empty
 	    // Mode dependent usage:
@@ -555,8 +556,8 @@ OCPI_DATA_TYPES
       // FIXME:  we are relying on dataBufferBaseAddr being set before we know
       // buffer sizes etc.  If we are sharing a memory pool, this will not be the case,
       // and we would probably allocate the whole thing here.
-      const OCPI::RDT::Descriptors *
-      startConnect(const OR::Descriptors *other, OR::Descriptors &feedback, bool &done) {
+      const OT::Descriptors *
+      startConnect(const OT::Descriptors *other, OT::Descriptors &feedback, bool &done) {
 	assert(m_canBeExternal);
 	uint32_t required;
 	if (m_sdp) {
@@ -596,17 +597,17 @@ OCPI_DATA_TYPES
     private:
       // All the info is in.  Do final work to (locally) establish the connection
       // If we're output, we must return the flow control descriptor
-      const OCPI::RDT::Descriptors *
-      finishConnect(const OR::Descriptors *argOther,
-		    OR::Descriptors &/*feedback*/, bool &done) {
+      const OT::Descriptors *
+      finishConnect(const OT::Descriptors *argOther,
+		    OT::Descriptors &/*feedback*/, bool &done) {
 	assert(argOther);
-	const OCPI::RDT::Descriptors &other = *argOther;
+	const OT::Descriptors &other = *argOther;
 	if (m_sdp) {
 	  m_properties.set8Register(buffer_count, SDP::Properties,
 				    OCPI_UTRUNCATE(uint8_t, myDesc.nBuffers));
 	  m_properties.set32Register(buffer_size, SDP::Properties, myDesc.dataBufferPitch);
 	  m_properties.set8Register(readsAllowed, SDP::Properties,
-				    getData().data.options & (1<<OCPI::RDT::FlagIsMeta) ? 1 : 0);
+				    getData().data.options & (1<<OT::FlagIsMeta) ? 1 : 0);
 	} else {
 	  // Here is where we can setup the OCDP producer/user
 	  ocpiAssert(m_properties.get32Register(foodFace, OcdpProperties) == 0xf00dface);
@@ -617,7 +618,7 @@ OCPI_DATA_TYPES
 				     m_memorySize - myDesc.nBuffers * OCDP_METADATA_SIZE);
 	}
         OcdpRole myOcdpRole;
-        OCPI::RDT::PortRole myRole = (OCPI::RDT::PortRole)getData().data.role;
+        OT::PortRole myRole = (OT::PortRole)getData().data.role;
 
         ocpiDebug("finishConnection: other = %" PRIx64 ", offset = %" DTOSDATATYPES_OFFSET_PRIx
 		  ", RFB = %" PRIx64 "",
@@ -629,7 +630,7 @@ OCPI_DATA_TYPES
         switch (myRole) {
 	  uint64_t addr;
 	  uint32_t pitch;
-        case OCPI::RDT::ActiveFlowControl:
+        case OT::ActiveFlowControl:
           myOcdpRole = OCDP_ACTIVE_FLOWCONTROL;
 	  addr = other.desc.oob.address +
 	    (isProvider() ? other.desc.emptyFlagBaseAddr : other.desc.fullFlagBaseAddr);
@@ -646,7 +647,7 @@ OCPI_DATA_TYPES
 	  ocpiDebug("HDL Port is %s, AFC, flag is 0x%" PRIx64 " pitch %u", 
 		    isProvider() ? "consumer" : "producer", addr, pitch);
           break;
-        case OCPI::RDT::ActiveMessage:
+        case OT::ActiveMessage:
           myOcdpRole = OCDP_ACTIVE_MESSAGE;
           if (isProvider()) {
             if (other.desc.dataBufferSize > myDesc.dataBufferSize)
@@ -703,7 +704,7 @@ OCPI_DATA_TYPES
 				       other.desc.emptyFlagPitch : other.desc.fullFlagPitch);
 	  }
           break;
-        case OCPI::RDT::Passive:
+        case OT::Passive:
           myOcdpRole = OCDP_PASSIVE;
 	  // We don't need to know anything about the other side
           break;
@@ -751,7 +752,7 @@ OCPI_DATA_TYPES
 	return isProvider() ? NULL : &getData().data;
       }
       OC::ExternalPort &createExternal(const char *extName, bool isProvider,
-				       const OU::PValue *extParams, const OU::PValue *connParams);
+				       const OB::PValue *extParams, const OB::PValue *connParams);
     };
     // Connection between two ports inside this container
     // We know they must be in the same artifact, and have a metadata-defined connection
@@ -766,7 +767,7 @@ OCPI_DATA_TYPES
       return true;
 #if 0
       bool done;
-      OCPI::RDT::Descriptors dummy;
+      OT::Descriptors dummy;
       pport.startConnect(NULL, dummy, done);
       // We're both in the same runtime artifact object, so we know the port class
       if (uport.m_connection != pport.m_connection)

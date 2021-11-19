@@ -31,10 +31,10 @@
 #include "ocpi-config.h"
 #include "OsMisc.hh"
 #include "OcpiUuid.h"
-#include "OcpiUtilMisc.h"
-#include "OcpiUtilEzxml.h"
+#include "UtilMisc.hh"
+#include "UtilEzxml.hh"
 #include "MetadataWorker.hh"
-#include "XferManager.h"
+#include "XferManager.hh"
 #include "HdlSimServer.h"
 #include "HdlDriver.h"
 #include "HdlContainer.h"
@@ -48,10 +48,10 @@ namespace OH = OCPI::HDL;
 namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 namespace OA = OCPI::API;
-namespace OD = OCPI::DataTransport;
+namespace OT = OCPI::Transport;
 namespace OC = OCPI::Container;
 namespace OS = OCPI::OS;
-namespace DT = DataTransfer;
+namespace XF = OCPI::Xfer;
 /*
   usage message
   verbose
@@ -78,12 +78,12 @@ search, emulate, ethers, probe, testdma, admin, bram, unbram, uuid, reset, set, 
   wread, wwrite, sendData, receiveData, receiveRDMA, sendRDMA, simulate, getxml, load, unload,
   status;
 static bool verbose = false, parseable = false, hex = false, isPublic = false;
-static int logLevel = -1;
 std::string platform, simExec;
 static const char
 *interface = NULL, *device = NULL, *part = NULL;
 static bool simDump = true;
-static unsigned
+static unsigned long // for strtoul
+  logLevel = ULONG_MAX,
   timeout = 0,
   sleepUsecs = 200000,  // how much time between quota injections
   spinCount = 20,      // how much quote per timeout AND per control message
@@ -239,7 +239,7 @@ static OH::Driver &getDriver() {
   if (!driver) {
     // Now we explicitly load the remote container driver
     std::string err;
-    OCPI::Driver::Driver *d = OCPI::Driver::ManagerManager::loadDriver("container", "hdl", err);
+    auto *d = OCPI::Base::Plugin::ManagerManager::loadDriver("container", "hdl", err);
     if (!d)
       bad("error loading HDL driver: %s", err.c_str());
     driver = static_cast<OH::Driver *>(d);
@@ -293,19 +293,19 @@ doFlags(const char **&ap) {
       part = next(ap);
       break;
     case 'l':
-      logLevel = atoi(next(ap));
+      logLevel = strtoul(next(ap), NULL, 0);
       break;
     case 's':
-      spinCount = atoi(next(ap));
+      spinCount = strtoul(next(ap), NULL, 0);
       break;
     case 't':
-      sleepUsecs = atoi(next(ap));
+      sleepUsecs = strtoul(next(ap), NULL, 0);
       break;
     case 'T':
-      simTicks = atoi(next(ap));
+      simTicks = strtoul(next(ap), NULL, 0);
       break;
     case 'O':
-      timeout = atoi(next(ap));
+      timeout = strtoul(next(ap), NULL, 0);
       break;
     case 'D':
       simDump = false;
@@ -329,7 +329,7 @@ main(int argc, const char **argv)
 {
   signal(SIGPIPE, SIG_IGN);
   try {
-    OCPI::Driver::ManagerManager::suppressDiscovery();
+    OCPI::Base::Plugin::ManagerManager::suppressDiscovery();
     const char *argv0 = strrchr(argv[0], '/');
     if (argv0)
       argv0++;
@@ -364,8 +364,8 @@ main(int argc, const char **argv)
     }
     argv++;
     doFlags(argv);
-    if (logLevel != -1)
-      OCPI::OS::logSetLevel(logLevel);
+    if (logLevel != ULONG_MAX)
+      OCPI::OS::logSetLevel((uint8_t)logLevel);
 #if 0
     if ((exact->options & SUDO) && geteuid()) {
       int dfd = ::open(OCPI_DRIVER_MEM, O_RDONLY);
@@ -395,8 +395,8 @@ main(int argc, const char **argv)
 	  bad("Worker number `%s' invalid", cp);
 	if (*ep)
 	  ep++;
-	cAccess->offsetRegisters(wAccess, (intptr_t)(&((OH::OccpSpace*)0)->worker[workerIdx]));
-	cAccess->offsetRegisters(confAccess, (intptr_t)(&((OH::OccpSpace*)0)->config[workerIdx]));
+	cAccess->offsetRegisters(wAccess, (uintptr_t)(&((OH::OccpSpace*)0)->worker[workerIdx]));
+	cAccess->offsetRegisters(confAccess, (uintptr_t)(&((OH::OccpSpace*)0)->config[workerIdx]));
 	exact->func(argv);
       } while (*(cp = ep));
     } else
@@ -574,7 +574,7 @@ static void emulate(const char **) {
 	      ecnr.mbx40 = 0x40;
 	      ecnr.mbz0 = 0;
 	      memcpy(ecnr.mac, OU::getSystemAddr().addr(), OS::Ether::Address::s_size);
-	      ecnr.pid = getpid();
+	      ecnr.pid = OCPI_UTRUNCATE(uint32_t, getpid());
 	      ocpiDebug("Sending nop response packet: length is sizeof %zu, htons %u, ntohs %u",
 			sizeof(HE::EtherControlNopResponse), ech_in.length, ntohs(ech_in.length));
 	    }
@@ -636,7 +636,7 @@ testdma(const char **) {
   dmaSize = (uint64_t)dmaMeg * 1024 * 1024;
   printf("The OCPI_DMA_MEMORY environment variable indicates %zuMB at 0x%" PRIx64 ", ending at 0x%" PRIx64 "\n",
 	 dmaMeg, dmaBase, dmaBase + dmaSize);
-  int pageSize = getpagesize();
+  unsigned pageSize = (unsigned)getpagesize();
   if (dmaBase & (pageSize - 1))
     bad("DMA memory starting address 0x%" PRIx64 " does not start on a page boundary, %u (0x%x)",
 	dmaBase, pageSize, pageSize);
@@ -763,12 +763,12 @@ bram(const char **ap) {
   FILE *ofp = fopen(ap[1], "w");
   if (!ofp)
     bad("Cannot open output file '%s'", ap[1]);
-  off_t length = 0; // for warning
+  size_t length = 0; // for warning
   if (fd < 0 ||
-      (length = lseek(fd, 0, SEEK_END)) == -1 ||
+      (length = (size_t)lseek(fd, 0, SEEK_END)) == (size_t)-1 ||
       lseek(fd, 0, SEEK_SET) != 0 ||
       (in = (unsigned char*)malloc(length)) == NULL ||
-      read(fd, in, length) != length ||
+      read(fd, in, length) != (off_t)length ||
       (out = (unsigned char*)malloc(length)) == NULL)
     bad("Could not open or read the input file");
   size_t total, check;
@@ -1001,7 +1001,7 @@ atoi_any(const char *arg, unsigned *sizep)
       case '2':
       case '4':
       case '8':
-	*sizep = *sp - '0';
+	*sizep = (unsigned)(*sp - '0');
       }
     else
       *sizep = 4;
@@ -1016,9 +1016,9 @@ radmin(const char **ap) {
   switch (size) {
   case 1:
     {
-      uint8_t x = cAccess->get16RegisterOffset(off);
+      uint8_t x = cAccess->get8RegisterOffset(off);
       if (parseable)
-	printf("0x%" PRIx32 "\n", x);
+	printf("0x%" PRIx8 "\n", x);
       else
 	printf("Admin for hdl-device '%s' at offset 0x%x is 0x%x (%u)\n",
 	       device, off, x, x);
@@ -1117,16 +1117,13 @@ settime(const char **) {
 
   cAccess->set64Register(time, OH::OccpAdminRegisters,
 #if FPGA_IS_OPPOSITE_ENDIAN_FROM_CPU()
-			((uint64_t)fraction << 32) | tv.tv_sec
+			 ((uint64_t)fraction << 32) | (uint64_t)tv.tv_sec
 #else
-			((uint64_t)tv.tv_sec << 32) | fraction
+			 ((uint64_t)tv.tv_sec << 32) | fraction
 #endif
 			);
 }
 typedef unsigned long long ull;
-static inline int64_t ticks2ns(uint64_t ticks) {
-  return ((ticks) * 1000000000ull + (1ull << 31))/ (1ull << 32);
-}
 static inline int64_t dticks2ns(int64_t ticks) {
   return ((ticks) * 1000000000ll + (1ll << 31))/ (1ll << 32);
 }
@@ -1155,9 +1152,9 @@ deltatime(const char **) {
   sum = (sum + 45) / 90;
   // we have average delay
   printf("Delta ns min %" PRIi64 " max %" PRIi64 ". average: (of best 90 out of 100) %" PRIi64 "\n",
-	 ticks2ns(delta[0]), ticks2ns(delta[99]), ticks2ns(sum));
+	 dticks2ns(delta[0]), dticks2ns(delta[99]), dticks2ns(sum));
   uint64_t time = swap32(cAccess->get64Register(time, OH::OccpAdminRegisters));
-  cAccess->set64Register(timeDelta, OH::OccpAdminRegisters, swap32(time + sum));
+  cAccess->set64Register(timeDelta, OH::OccpAdminRegisters, swap32((uint64_t)((int64_t)time + sum)));
   int32_t deltatime = (int32_t)swap32(cAccess->get64Register(timeDelta, OH::OccpAdminRegisters));
   printf("Now after correction, delta is: %" PRIi64 "ns\n", dticks2ns(deltatime));
 }
@@ -1207,7 +1204,7 @@ wdump(const char **) {
   printf(" PageWindow: 0x%08x\n", wAccess.get32Register(window, OH::OccpWorkerRegisters));
 }
 
-static int
+static uint32_t
 wwreset(OH::Access &w) {
   uint32_t i = w.get32Register(control, OH::OccpWorkerRegisters);
   w.set32Register(control, OH::OccpWorkerRegisters, i & ~OCCP_WORKER_CONTROL_ENABLE);
@@ -1219,7 +1216,7 @@ wreset(const char **) {
   printf("Worker %zu on device %s: reset asserted, was %s\n",
 	 workerIdx, device, (i & OCCP_WORKER_CONTROL_ENABLE) ? "deasserted" : "already asserted");
 }
-static int
+static uint32_t
 wwunreset(OH::Access &w) {
   uint32_t i = w.get32Register(control, OH::OccpWorkerRegisters);
   w.set32Register(control, OH::OccpWorkerRegisters, i  | OCCP_WORKER_CONTROL_ENABLE);
@@ -1390,8 +1387,8 @@ receiveRDMA(const char **/*ap*/) {
   if (!*ap)
     setupDevice(false);
   std::string file;
-  OD::TransportGlobal &global(OC::Manager::getTransportGlobal());
-  OD::Transport transport(&global, false);
+  OT::TransportGlobal &global(OC::Manager::getTransportGlobal());
+  OT::Transport transport(&global, false);
   if (endpoint.empty())
     endpoint = "ocpi-ether-rdma";
 #if 0
@@ -1400,12 +1397,12 @@ receiveRDMA(const char **/*ap*/) {
     OA::PVEnd
   };
 #endif
-  OD::Descriptor myInputDesc;
+  OT::Descriptor myInputDesc;
   // Initialize out input descriptor before it is processed and
   // completed by the transport system.
-  myInputDesc.type = OD::ConsumerDescT;
-  myInputDesc.role = OD::ActiveFlowControl;
-  myInputDesc.options = 1 << OD::MandatedRole;
+  myInputDesc.type = OT::ConsumerDescT;
+  myInputDesc.role = OT::ActiveFlowControl;
+  myInputDesc.options = 1 << OT::MandatedRole;
   myInputDesc.desc.nBuffers = 10;
   myInputDesc.desc.dataBufferBaseAddr = 0;
   myInputDesc.desc.dataBufferPitch = 0;
@@ -1424,13 +1421,13 @@ receiveRDMA(const char **/*ap*/) {
   memset( myInputDesc.desc.oob.oep, 0, sizeof(myInputDesc.desc.oob.oep));
   myInputDesc.desc.oob.cookie = 0;
 #if 0
-  OD::Port &port = *transport.createInputPort(myInputDesc, params);
+  OT::Port &port = *transport.createInputPort(myInputDesc, params);
 #else
-  OD::Port &port = *transport.createInputPort(myInputDesc);
+  OT::Port &port = *transport.createInputPort(myInputDesc);
 #endif
   ocpiDebug("Our input descriptor: %s", myInputDesc.desc.oob.oep);
   // Now the normal transport/transfer driver has initialized (not finalized) the input port.
-  OD::Descriptor theOutputDesc;
+  OT::Descriptor theOutputDesc;
   OH::Access
     edpAccess, edpConfAccess, smaAccess, smaConfAccess, gbeAccess, gbeConfAccess,
     genAccess, genConfAccess;
@@ -1440,7 +1437,7 @@ receiveRDMA(const char **/*ap*/) {
     file = *ap;
     file += ".in";
     // Strip out our ether interface.
-    OD::Descriptor sendDesc = myInputDesc;
+    OT::Descriptor sendDesc = myInputDesc;
     const char *sp = strchr(myInputDesc.desc.oob.oep,'/');
     std::string clean("ocpi-ether-rdma:");
     clean.append(sp+1);
@@ -1465,14 +1462,14 @@ receiveRDMA(const char **/*ap*/) {
     // The output port is a hardware port.  We need to program the hardware
     // as well as produce/synthesize the output descriptor for the remote hardware port.
     // 1. Get acccessors to all workers with control and configuration accessors for each.
-    cAccess->offsetRegisters(edpAccess, (intptr_t)(&((OH::OccpSpace*)0)->worker[EDP_WORKER]));
-    cAccess->offsetRegisters(edpConfAccess, (intptr_t)(&((OH::OccpSpace*)0)->config[EDP_WORKER]));
-    cAccess->offsetRegisters(smaAccess, (intptr_t)(&((OH::OccpSpace*)0)->worker[SMA_WORKER]));
-    cAccess->offsetRegisters(smaConfAccess, (intptr_t)(&((OH::OccpSpace*)0)->config[SMA_WORKER]));
-    cAccess->offsetRegisters(gbeAccess, (intptr_t)(&((OH::OccpSpace*)0)->worker[GBE_WORKER]));
-    cAccess->offsetRegisters(gbeConfAccess, (intptr_t)(&((OH::OccpSpace*)0)->config[GBE_WORKER]));
-    cAccess->offsetRegisters(genAccess, (intptr_t)(&((OH::OccpSpace*)0)->worker[GEN_WORKER]));
-    cAccess->offsetRegisters(genConfAccess, (intptr_t)(&((OH::OccpSpace*)0)->config[GEN_WORKER]));
+    cAccess->offsetRegisters(edpAccess, (uintptr_t)(&((OH::OccpSpace*)0)->worker[EDP_WORKER]));
+    cAccess->offsetRegisters(edpConfAccess, (uintptr_t)(&((OH::OccpSpace*)0)->config[EDP_WORKER]));
+    cAccess->offsetRegisters(smaAccess, (uintptr_t)(&((OH::OccpSpace*)0)->worker[SMA_WORKER]));
+    cAccess->offsetRegisters(smaConfAccess, (uintptr_t)(&((OH::OccpSpace*)0)->config[SMA_WORKER]));
+    cAccess->offsetRegisters(gbeAccess, (uintptr_t)(&((OH::OccpSpace*)0)->worker[GBE_WORKER]));
+    cAccess->offsetRegisters(gbeConfAccess, (uintptr_t)(&((OH::OccpSpace*)0)->config[GBE_WORKER]));
+    cAccess->offsetRegisters(genAccess, (uintptr_t)(&((OH::OccpSpace*)0)->worker[GEN_WORKER]));
+    cAccess->offsetRegisters(genConfAccess, (uintptr_t)(&((OH::OccpSpace*)0)->config[GEN_WORKER]));
     wwreset(edpAccess);
     wwreset(smaAccess);
     wwreset(gbeAccess);
@@ -1486,9 +1483,9 @@ receiveRDMA(const char **/*ap*/) {
     ocpiCheck(wwop(gbeAccess, "initialize") == OCCP_SUCCESS_RESULT);
     ocpiCheck(wwop(genAccess, "initialize") == OCCP_SUCCESS_RESULT);
     // 2. Synthesize the output descriptor
-    theOutputDesc.type = OD::ProducerDescT;
-    theOutputDesc.role = OD::ActiveMessage;
-    theOutputDesc.options = 1 << OD::MandatedRole;
+    theOutputDesc.type = OT::ProducerDescT;
+    theOutputDesc.role = OT::ActiveMessage;
+    theOutputDesc.options = 1 << OT::MandatedRole;
     theOutputDesc.desc.nBuffers = 3;
     theOutputDesc.desc.dataBufferBaseAddr = 0;
     theOutputDesc.desc.dataBufferPitch = 4096;
@@ -1507,9 +1504,9 @@ receiveRDMA(const char **/*ap*/) {
     theOutputDesc.desc.oob.port_id = 0;
     theOutputDesc.desc.oob.cookie = 0;
     uint32_t outputEndPointSize = edpConfAccess.get32Register(memoryBytes, OH::OcdpProperties);
-    DT::EndPoint &outputEndPoint =
-      DT::getManager().allocateProxyEndPoint(endpoint.c_str(), true, outputEndPointSize);
-    OD::Transport::fillDescriptorFromEndPoint(outputEndPoint, theOutputDesc);
+    XF::EndPoint &outputEndPoint =
+      XF::getManager().allocateProxyEndPoint(endpoint.c_str(), true, outputEndPointSize);
+    OT::Transport::fillDescriptorFromEndPoint(outputEndPoint, theOutputDesc);
   }
   // Finalizing the input port takes: role, type flow, emptyflagbase, size, pitch, value
   // This makes the input port ready to data from the output port
@@ -1600,7 +1597,7 @@ receiveRDMA(const char **/*ap*/) {
     uint8_t opCode;
     size_t length;
     uint8_t *vdata;
-    OD::BufferUserFacet *buf;
+    OT::BufferUserFacet *buf;
     unsigned t;
     for (t = 0; t < 1000000 && !(buf = port.getNextFullInputBuffer(vdata, length, opCode)); t++)
       OS::sleep(1);
@@ -1624,12 +1621,12 @@ sendRDMA(const char **ap) {
   if (!*ap)
     setupDevice(false);
   std::string file;
-  OD::TransportManager &global(OC::Manager::getTransportManager());
-  OD::Transport transport(&global, false);
-  OD::Descriptor myOutputDesc;
-  myOutputDesc.type = OD::ProducerDescT;
-  myOutputDesc.role = OD::ActiveMessage;
-  myOutputDesc.options = 1 << OD::MandatedRole;
+  OT::TransportManager &global(OC::Manager::getTransportManager());
+  OT::Transport transport(&global, false);
+  OT::Descriptor myOutputDesc;
+  myOutputDesc.type = OT::ProducerDescT;
+  myOutputDesc.role = OT::ActiveMessage;
+  myOutputDesc.options = 1 << OT::MandatedRole;
   myOutputDesc.desc.nBuffers = 10;
   myOutputDesc.desc.dataBufferBaseAddr = 0;
   myOutputDesc.desc.dataBufferPitch = 0;
@@ -1648,7 +1645,7 @@ sendRDMA(const char **ap) {
   memset( myOutputDesc.desc.oob.oep, 0, sizeof(myOutputDesc.desc.oob.oep));
   myOutputDesc.desc.oob.cookie = 0;
 
-  OD::Descriptor theInputDesc;
+  OT::Descriptor theInputDesc;
   if (*ap) {
     file = *ap;
     file += ".in";
@@ -1659,9 +1656,9 @@ sendRDMA(const char **ap) {
       bad("Reading file for RDMA input descriptor");
     ocpiDebug("Received descriptor for: %s", myOutputDesc.desc.oob.oep);
   } else {
-    theInputDesc.type = OD::ProducerDescT;
-    theInputDesc.role = OD::ActiveMessage;
-    theInputDesc.options = 1 << OD::MandatedRole;
+    theInputDesc.type = OT::ProducerDescT;
+    theInputDesc.role = OT::ActiveMessage;
+    theInputDesc.options = 1 << OT::MandatedRole;
     theInputDesc.desc.nBuffers = 10;
     theInputDesc.desc.dataBufferBaseAddr = 0;
     theInputDesc.desc.dataBufferPitch = 0;
@@ -1680,16 +1677,16 @@ sendRDMA(const char **ap) {
     memset( theInputDesc.desc.oob.oep, 0, sizeof(theInputDesc.desc.oob.oep));
     theInputDesc.desc.oob.cookie = 0;
   }
-  OD::Port &port = *transport.createOutputPort(myOutputDesc, theInputDesc);
-  OD::Descriptor localShadowPort, feedback;
+  OT::Port &port = *transport.createOutputPort(myOutputDesc, theInputDesc);
+  OT::Descriptor localShadowPort, feedback;
   bool done;
-  const OD::Descriptor *outDesc =
+  const OT::Descriptor *outDesc =
     port.finalize(&theInputDesc, myOutputDesc, &localShadowPort, done);
   assert(outDesc);
   if (*ap) {
     file = *ap;
     file += ".out";
-    OD::Descriptor sendDesc = *outDesc;
+    OT::Descriptor sendDesc = *outDesc;
     const char *sp = strchr(outDesc->desc.oob.oep, '/');
     std::string clean("ocpi-ether-rdma:");
     clean.append(sp+1);
@@ -1706,7 +1703,7 @@ sendRDMA(const char **ap) {
   for (unsigned n = 0; n < 10; n++) {
     uint8_t *vdata;
     size_t length;
-    OD::BufferUserFacet *buf;
+    OT::BufferUserFacet *buf;
     unsigned t;
     for (t = 0; t < 1000000 && !(buf = port.getNextEmptyOutputBuffer(vdata, length)); t++)
       OS::sleep(1);
@@ -1791,7 +1788,7 @@ struct Arg {
   void
   setup() {
     if (isdigit(**args))
-      index = atoi(*args);
+      index = strtoul(*args, NULL, 0);
     else
       name = *args;
   }
@@ -1811,7 +1808,7 @@ struct Arg {
       if (control || status || value || prop)
 	bad("Can't do control/status/get/put on workers with no control interface");
     } else {
-      w = driver->createDirectWorker(*dev, *cAccess, wAccess, impl, inst, idx, timeout);
+      w = driver->createDirectWorker(*dev, *cAccess, wAccess, impl, inst, idx, OCPI_UTRUNCATE(uint32_t, timeout));
       workerIdx = w->index();
       if (control)
 	w->control(prop);

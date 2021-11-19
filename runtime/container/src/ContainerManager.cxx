@@ -27,8 +27,8 @@
 #include "OsServerSocket.hh"     // just for linkage hooks
 #include "OsSemaphore.hh"        // just for linkage hooks
 #include "OcpiUuid.h"               // just for linkage hooks
-#include "OcpiThread.h"             // just for linkage hooks
-#include "OcpiUtilPci.h"            // just for linkage hooks
+#include "UtilThread.hh"             // just for linkage hooks
+#include "UtilPci.hh"            // just for linkage hooks
 #include "ContainerPort.h"          // just for linkage hooks
 #if 1
 #include "UtilLogPrefix.hh"         // just for linkage hooks
@@ -43,25 +43,27 @@ extern "C" {
 }
 #endif
 #include "OcpiContainerRunConditionApi.h"
-#include "XferAccess.h"
-#include "XferManager.h"
+#include "XferAccess.hh"
+#include "XferManager.hh"
 
 #include "ContainerManager.h"
 #include "ContainerLauncher.h"
 namespace OCPI {
   namespace Container {
     namespace OA = OCPI::API;
-    namespace OD = OCPI::Driver;
-    namespace OU = OCPI::Util;
+    namespace OP = OCPI::Base::Plugin;
+    namespace OB = OCPI::Base;
     namespace OM = OCPI::Metadata;
-    namespace OT = OCPI::DataTransport;
+    namespace OT = OCPI::Transport;
+    namespace OU = OCPI::Util;
+    namespace XF = OCPI::Xfer;
     const char *container = "container";
 
     unsigned Manager::s_nContainers = 0;
     // TODO: Move this to a vector to manage its own memory...?
     Container **Manager::s_containers;
     unsigned Manager::s_maxContainer;
-    static OCPI::Driver::Registration<Manager> cm;
+    static OCPI::Base::Plugin::Registration<Manager> cm;
     Manager::Manager() : m_tpg_events(NULL), m_tpg_no_events(NULL) {
     }
 
@@ -76,11 +78,11 @@ namespace OCPI {
 
     // Note this is not dependent on configuration.
     // It is currently used in lieu of a generic data transport shutdowm.
-    OCPI::DataTransport::TransportManager &Manager::
-    getTransportManagerInternal(const OU::PValue *params) {
+    OT::TransportManager &Manager::
+    getTransportManagerInternal(const OB::PValue *params) {
       static unsigned event_range_start = 0;
       bool polled = true;
-      OU::findBool(params, "polled", polled);
+      OB::findBool(params, "polled", polled);
       OT::TransportManager **tpg = polled ? &m_tpg_no_events : &m_tpg_events;
       if (!*tpg)
 	*tpg = new OT::TransportManager( event_range_start++, !polled );
@@ -99,7 +101,7 @@ namespace OCPI {
 	if (d)
 	  d->configure(dx);
 	else
-	  OD::ManagerManager::
+	  OP::ManagerManager::
 	    configError(x, "element '%s' doesn't match any loaded container driver");
       }
     }
@@ -162,10 +164,10 @@ namespace OCPI {
       for (Driver *d = firstChild(); d; d = d->nextChild())
 	for (Container *c = d->firstContainer(); c; c = c->nextContainer())
 	  c->getTransport().cleanForContext(context);
-      DataTransfer::XferManager::getFactoryManager().cleanForContext(context);
+      XF::XferManager::getFactoryManager().cleanForContext(context);
     }
     Driver::Driver(const char *a_name) 
-      : OD::DriverType<Manager,Driver>(a_name, *this) {
+      : OP::DriverType<Manager,Driver>(a_name, *this) {
     }
     const char
       *application = "application",
@@ -223,34 +225,35 @@ namespace OCPI {
    */
 #if defined(__clang__)
 #pragma clang optimize off
-#endif
+#else
 #pragma GCC push_options
 #pragma GCC optimize ("O0")
+#endif
   namespace Container {
     intptr_t linkme() {
-      ((DataTransfer::Access *)linkme)->closeAccess();
+      ((XF::Access *)linkme)->closeAccess();
       ((OA::RunCondition *)linkme)->setPortMasks((OA::OcpiPortMask *)NULL);
       ((Container*)linkme)->start();
-      ((DataTransfer::XferServices*)linkme)->DataTransfer::XferServices::send(0, NULL, 0);
-      ((DataTransfer::EndPoint*)linkme)->DataTransfer::EndPoint::createResourceServices();
-      ((OCPI::Util::Thread*)linkme)->join();
-      OCPI::Util::Uuid uuid;
-      OCPI::Util::UuidString us;
-      OCPI::Util::uuid2string(uuid, us);
+      ((XF::XferServices*)linkme)->XF::XferServices::send(0, NULL, 0);
+      ((XF::EndPoint*)linkme)->XF::EndPoint::createResourceServices();
+      ((OU::Thread*)linkme)->join();
+      OU::Uuid uuid;
+      OU::UuidString us;
+      OU::uuid2string(uuid, us);
       std::string str;
-      OCPI::Util::searchPath(NULL, NULL, str, NULL, NULL);
-      (void)OCPI::Util::getCDK();
+      OU::searchPath(NULL, NULL, str, NULL, NULL);
+      (void)OU::getCDK();
       size_t dum2;
       (void)((BasicPort*)linkme)->BasicPort::getOperationInfo(0, dum2);
       unsigned dum3;
-      (void)OCPI::Util::probePci(NULL, 0, 0, 0, 0, 0, NULL, dum3, str);
+      (void)OU::probePci(NULL, 0, 0, 0, 0, 0, NULL, dum3, str);
       // Msg::XferFactoryManager::getFactoryManager();
-      OCPI::OS::Socket s;
-      OCPI::OS::ServerSocket ss;
-      OCPI::OS::Semaphore sem;
+      OS::Socket s;
+      OS::ServerSocket ss;
+      OS::Semaphore sem;
       gzerror(NULL, (int*)0);
       // p.applyConnectParams(NULL, NULL);
-      ((OCPI::Container::Application*)0)->createWorker(NULL, NULL, NULL, NULL, NULL, NULL);
+      ((Application*)0)->createWorker(NULL, NULL, NULL, NULL, NULL, NULL);
       pthread_workqueue_create_np(NULL, NULL);
       pthread_workqueue_additem_np(NULL, NULL, NULL, NULL, NULL);
       // DRC support
@@ -267,9 +270,10 @@ namespace OCPI {
       return (intptr_t)&lzma_stream_buffer_decode & (intptr_t)&gpsd_drivers;
     }
   }
-#pragma GCC pop_options
 #if defined(__clang__)
 #pragma clang optimize on
+#else
+#pragma GCC pop_options
 #endif
 }
 

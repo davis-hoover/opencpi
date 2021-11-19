@@ -18,17 +18,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "OcpiUtilException.h"
-#include "OcpiDriverManager.h"
-#include "OcpiUtilMisc.h"
+#include "UtilException.hh"
+#include "BasePluginManager.hh"
+#include "UtilMisc.hh"
 #include "RemoteDriver.h"
 #include "RemoteClient.h"
 
 // This "remote" code is not part of the remote driver library, but supports the ACI
 // whether or not the remote driver is loaded.
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 namespace OR = OCPI::Remote;
-namespace OD = OCPI::Driver;
+namespace OD = OCPI::Base::Plugin;
 namespace OCPI {
   // When the remote container driver is loaded it needs to see this.
   namespace Remote {
@@ -57,7 +58,7 @@ namespace OCPI {
       OR::probeServer(driver, server, verbose);
     }
     // Use servers found in the environment or in the params supplied or in the arg supplied
-    void useServers(const char *server, const PValue *params, bool verbose) {
+    void useServers(const char *server, const OB::PValue *params, bool verbose) {
       OR::Driver *driver = NULL;
       if (server)
 	OR::probeServer(driver, server, verbose);
@@ -75,7 +76,7 @@ namespace OCPI {
 	for (OU::TokenIter li(addrs); li.token(); li.next())
 	  OR::probeServer(driver, li.token(), verbose);
       }
-      for (const OU::PValue *p = params; p && p->name; ++p)
+      for (const OB::PValue *p = params; p && p->name; ++p)
 	if (!strcasecmp(p->name, "server")) {
 	  if (p->type != OCPI_String)
 	    throw OU::Error("Value of \"server\" parameter is not a string");

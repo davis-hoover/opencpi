@@ -10,7 +10,7 @@ it may be either capitalized or upper case.
 Source Code file names
 -- C++ 
    The intention is to move to "*.cc" and "*.hh", but some are still "*.cxx" and "*.h".
-   The ".cc" and ".hh" suffixes are simpler and, like OmniOrb, and hh makes it clear that the
+   The ".cc" and ".hh" suffixes are simpler and like OmniOrb.  The hh suffix also makes it clear that the
    editing mode for the file should be C++, not C.  User visible C++ files (workers) are already .cc etc.
 
    Generally camel-case to match namespaces (under OCPI) and classes, with the first word being the namespace
@@ -58,6 +58,10 @@ worker/platform/configuration/container names (before prefix) in xml
 C++ Namespace names
    All start in the OCPI namespace. (There are exceptions that will go away).
    If it is an abbreviation (like HDL, etc.) it is all upper case. If not, camelcase.
+   For runtime files, header files should NOT use abbreviations so that they do not pollute the
+   users/callers abbreviation namespace. Source files should use localized namespace abbreviations.
+   For tools that are simply a batch of source code made into an executable (like ocpigen),
+   having global namespace abbreviations is acceptable, since it is never treated as a library.
 
 C++ type/class names
    Capitalized camelcase.

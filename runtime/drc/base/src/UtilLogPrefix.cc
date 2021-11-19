@@ -20,7 +20,7 @@
 
 #include <cstdarg> // va_list, va_start(), va_end()
 #include <cstdio>  // printf()
-#include "OcpiOsDebugApi.hh"
+#include "OcpiDebugApi.hh"
 #include "UtilLogPrefix.hh"
 
 namespace OS = OCPI::OS;

@@ -39,13 +39,13 @@
 #include <yaml-cpp/yaml.h> // YAML
 
 // OCPI headers
-#include "OcpiDriverManager.h" // OCPI::Driver::ManagerManager::suppressDiscovery
+#include "BasePluginManager.hh" // OCPI::Driver::ManagerManager::suppressDiscovery
 #include "OcpiLibraryManager.h"  // OL::* stuff
 #include "OsAssert.hh"  // ocpiLog macros
 #include "OsFileSystem.hh"  // Filesystem ops like mkdir etc.
 #include "OcpiDataTypesApi.hh"  // OA::OCPI_* types
-#include "OcpiUtilException.h"  // OU::Error
-#include "OcpiUtilMisc.h"  // OU::format, getProjectRegistry, string2File
+#include "UtilException.hh"  // OU::Error
+#include "UtilMisc.hh"  // OU::format, getProjectRegistry, string2File
 #include "MetadataPort.hh"  // OM::Port
 #include "MetadataProperty.hh"  // OM::Property
 #include "MetadataWorker.hh"  // OM::Worker
@@ -64,7 +64,8 @@
   CMD_OPTION  (verbose,   v, Bool,   NULL, "Set verbosity to info level") \
   CMD_OPTION  (debug,     d, Bool,   NULL, "Set verbosity to debug level") \
   CMD_OPTION  (directory, D, String, ".",  "Specify the directory in which to put output generated files")
-#include "CmdOption.hh"
+
+#include "BaseOption.hh"
 
 // Instantiate ocipgr object
 static OcpigrObj ocpigr;
@@ -109,7 +110,7 @@ static int mymain(const char ** /*ap*/) {
   ocpiInfo("Created directory or already exist: %s", options.directory());
 
   // We only want to discover libraries
-  OCPI::Driver::ManagerManager::suppressDiscovery();
+  OCPI::Base::Plugin::ManagerManager::suppressDiscovery();
   OL::getManager().enableDiscovery();
 
   // Discover and generate OpenCPI workers blocks

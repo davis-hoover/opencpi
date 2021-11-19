@@ -136,14 +136,14 @@ Options That Apply to Unit Tests Only
     By default, simulation files are removed if the verification
     is successful. Warning: Simulation files can become large!
 
+*`--only-platform=`*'<platform>', *-G* '<platform>'+::
+    Specify the runtime platform to use with a unit test.
+
 *`--phase=`*'<phase>'+::
     Specify which non-building phase(s) of unit testing to run.
     Valid phases here are: *`prepare`*, *`execute`*, *`verify`*, and *`view`*.
     The *`view`* 'phase' is used to run 'only' the view scripts for the unit test,
     without other phases.  The *`--view`* 'option' can be used to add viewing along with other phases.
-
-*`--only-platform=`*'<platform>', *-G* '<platform>'+::
-    Specify the runtime platform to use with a unit test.
 
 *`--remotes=`*'<system>'::
     Specify the remote system to run the test(s) by setting the
@@ -169,15 +169,15 @@ EXAMPLES
 --------
 . Run an application named *`myapp`*:
 +
-----------------------------
+-----------------------------
 ocpidev run application myapp
 -----------------------------
 +
 . Run all the applications in the current project:
 +
---------------------------------------------
+-------------------------
 ocpidev run applications
--------------------------------------------
+-------------------------
 +
 . Inside the *`assets`* project, run the *`fir_real_see`* unit test
 in the *`dsp_comps`* library located at *`components/dsp_comps`*:
@@ -189,16 +189,16 @@ ocpidev run -l dsp_comps test fir_real_sse
 . Inside the *`assets`* project, run all tests in the *`dsp_comps`* library
 located at *`components/dsp_comps`*:
 +
---------------------------------------------------
+-------------------------------
 ocpidev run library dsp_comps
---------------------------------------------------
+-------------------------------
 +
-. Inside the *`assets`* project, run the generate and
-build stages of the *`fir_real_sse`* test in the *`dsp_comps`* library
+. Inside the *`assets`* project, run the view script
+only for the *`fir_real_sse`* test in the *`dsp_comps`* library
 located at *`components/dsp_comps`*:
 +
 --------------------------------------------------------
-ocpidev run -l dsp_comps --mode=gen_build test fir_real_sse
+ocpidev run -l dsp_comps --phase=view test fir_real_sse
 --------------------------------------------------------
 
 BUGS
@@ -227,7 +227,7 @@ link:ocpirun.1.html[ocpirun(1)]
 
 COPYING
 -------
-Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2022 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your

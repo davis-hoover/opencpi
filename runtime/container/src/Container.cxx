@@ -21,8 +21,8 @@
 #include <signal.h>
 #include "ocpi-config.h"
 #include "OsMisc.hh"
-#include "OcpiUtilCppMacros.h"
-#include "XferManager.h"
+#include "UtilCppMacros.hh"
+#include "XferManager.hh"
 #include "ContainerManager.h"
 #include "ContainerLauncher.h"
 #include "Container.h"
@@ -30,23 +30,24 @@
 namespace OA = OCPI::API;
 namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 namespace OS = OCPI::OS;
 namespace OL = OCPI::Library;
-namespace OR = OCPI::RDT;
-namespace XF = DataTransfer;
+namespace OT = OCPI::Transport;
+namespace XF = OCPI::Xfer;
 
 namespace OCPI {
   namespace Container {
 
     Container::Container(const char *a_name, const ezxml_t config,
-			 const OCPI::Util::PValue *params)
+			 const OB::PValue *params)
       throw ( OU::EmbeddedException )
       : //m_ourUID(mkUID()),
       OCPI::Time::Emit("Container", a_name ),
       m_enabled(false), m_ownThread(true), m_verbose(false), m_thread(NULL),
-      m_transport(*new OCPI::DataTransport::Transport(&Manager::getTransportManager(params), false, this))
+      m_transport(*new OT::Transport(&Manager::getTransportManager(params), false, this))
     {
-      OU::findBool(params, "verbose", m_verbose);
+      OB::findBool(params, "verbose", m_verbose);
       OU::SelfAutoMutex guard (this);
       m_ordinal = Manager::s_nContainers++;
       if (m_ordinal >= Manager::s_maxContainer) {
@@ -63,7 +64,7 @@ namespace OCPI {
       // FIXME:  this should really be in a baseclass inherited by software containers
       // It works because stuff can be overriden and no threads are created until
       // "start", which is
-      OU::findBool(params, "ownthread", m_ownThread);
+      OB::findBool(params, "ownthread", m_ownThread);
       if (getenv("OCPI_NO_THREADS"))
 	m_ownThread = false;
       m_os = &OCPI_CPP_STRINGIFY(OCPI_OS)[strlen("OCPI")];
@@ -144,10 +145,10 @@ namespace OCPI {
     // Ultimately there would be a set of "base class" generic properties
     // and the derived class would merge them.
     // FIXME: define base class properties for all apps
-    OCPI::Util::PValue *Container::getProperties() {
+    OB::PValue *Container::getProperties() {
       return 0;
     }
-    OCPI::Util::PValue *Container::getProperty(const char *) {
+    OB::PValue *Container::getProperty(const char *) {
       return 0;
     }
     // This is for the derived class's destructor to call
@@ -172,7 +173,7 @@ namespace OCPI {
       delete &m_transport;
     }
 
-    Container::DispatchRetCode Container::dispatch(DataTransfer::EventManager*)
+    Container::DispatchRetCode Container::dispatch(XF::EventManager*)
     {
       return Container::DispatchNoMore;
     }
@@ -194,7 +195,7 @@ namespace OCPI {
 	for (BridgedPortsIter bpi = m_bridgedPorts.begin(); bpi != m_bridgedPorts.end(); bpi++)
 	  (*bpi)->runBridge();
       }
-      DataTransfer::EventManager *em = getEventManager();
+      XF::EventManager *em = getEventManager();
       switch (dispatch(em)) {
       case DispatchNoMore:
 	// All done, exit from dispatch thread.
@@ -217,7 +218,7 @@ namespace OCPI {
 	 * threads a chance to run.
 	 */
 	if (em &&
-	    em->waitForEvent(usecs) == DataTransfer::EventTimeout && m_verbose)
+	    em->waitForEvent(usecs) == XF::EventTimeout && m_verbose)
 	  ocpiBad("Timeout after %u usecs waiting for event", usecs);
 	// if there is no application on this container, use less CPU
 	OCPI::OS::sleep(firstApplication() || m_bridgedPorts.size() ? 0 : 100);
@@ -310,7 +311,7 @@ namespace OCPI {
       return LocalLauncher::getSingleton();
     }
     void Container::
-    addTransport(const char *a_name, const char *id, OR::PortRole roleIn,  OR::PortRole roleOut,
+    addTransport(const char *a_name, const char *id, OT::PortRole roleIn,  OT::PortRole roleOut,
 		 uint32_t inOptions, uint32_t outOptions) {
       if (XF::getManager().find(a_name)) {
 	Transport t;

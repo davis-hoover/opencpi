@@ -32,16 +32,18 @@
 #include "ContainerLauncher.h"
 #include "RemoteLauncher.h"
 #include "RemoteServer.h"
-#include "XferManager.h"
+#include "XferManager.hh"
 
 namespace OX = OCPI::Util::EzXml;
 namespace OC = OCPI::Container;
 namespace OL = OCPI::Library;
 namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
 namespace OE = OCPI::OS::Ether;
 namespace OA = OCPI::API;
-namespace OR = OCPI::RDT;
+namespace OT = OCPI::Transport;
+namespace XF = OCPI::Xfer;
 namespace OCPI {
   namespace Remote {
 
@@ -74,7 +76,7 @@ namespace OCPI {
 
     bool Server::
     receive(bool &eof, std::string &error) {
-      DataTransfer::XferManager::getFactoryManager().setEndPointContext(this);
+      XF::XferManager::getFactoryManager().setEndPointContext(this);
       if (m_downloading)
 	return download(error);
       if (OX::receiveXml(fd(), m_rx, m_buf, eof, error))
@@ -260,8 +262,8 @@ namespace OCPI {
 	  (err = doSide2(c.m_in, c.m_out)) ||
 	  (err = doSide2(c.m_out, c.m_in)))
 	return OU::eformat(error, "Error processing connection values for launch: %s", err);
-      c.m_transport.roleIn = OCPI_UTRUNCATE(OR::PortRole, roleIn);
-      c.m_transport.roleOut = OCPI_UTRUNCATE(OR::PortRole, roleOut);
+      c.m_transport.roleIn = OCPI_UTRUNCATE(OT::PortRole, roleIn);
+      c.m_transport.roleOut = OCPI_UTRUNCATE(OT::PortRole, roleOut);
       c.m_transport.optionsIn = OCPI_UTRUNCATE(uint32_t, optionsIn);
       c.m_transport.optionsOut = OCPI_UTRUNCATE(uint32_t, optionsOut);
       updateConnection(c, cx);
@@ -357,7 +359,7 @@ namespace OCPI {
 	  // we are the first seen member of the crew - we can parse the property values since we
 	  // know the impl now
 	  unsigned *u = &i->m_crew->m_propOrdinals[0];
-	  OU::Value *v = &i->m_crew->m_propValues[0];
+	  OB::Value *v = &i->m_crew->m_propValues[0];
 	  for (ezxml_t px = crewsXml[crewN]; px; px = ezxml_cnext(px), u++, v++) {
 	    size_t ord;
 	    if ((err = OX::getNumber(px, "n", &ord)))
@@ -510,7 +512,7 @@ namespace OCPI {
 	      (err = OX::getBoolean(m_rx, "string", &string)) ||
 	      (err = OX::getNumber(m_rx, "idx", &idx)))
 	    return OU::eformat(error, "Get/set property control message error: %s", err);
-	  OU::Member *m = &p;
+	  OB::Member *m = &p;
 	  for (const char *path = ezxml_cattr(m_rx, "path");
 	       path && path[0] && path[1]; path += 2) {
 	    size_t ordinal;

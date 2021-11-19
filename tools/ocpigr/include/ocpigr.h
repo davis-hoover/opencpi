@@ -2,7 +2,7 @@
 #define OCPIGR_H
 
 // OCPI headers
-#include "OcpiDriverManager.h"   // OCPI::Driver::ManagerManager::suppressDiscovery
+#include "BasePluginManager.hh"   // OCPI::Driver::ManagerManager::suppressDiscovery
 #include "OcpiLibraryManager.h"  // OL::* stuff
 
 // 3rd party headers

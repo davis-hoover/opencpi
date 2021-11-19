@@ -35,7 +35,7 @@ typedef uint8_t OcpiBoolean;
 #include <cstdint>
 #include <cstdarg>
 #include <cstdlib>
-#include "OcpiOsConfigApi.hh" // for OCPI_API_DEPRECATED
+#include "OcpiConfigApi.hh" // for OCPI_API_DEPRECATED
 // Not exposed to workers at this time; if it is, multiple calls to assert() below should be changed:
 // #include "OsAssert.hh"
 #include <cassert>

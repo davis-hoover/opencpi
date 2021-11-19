@@ -21,6 +21,4 @@
 
 # Udev rules for runtime on dev host
 # They are always placed in the udev-rules subdir in the runtime packages
-# =<platform-dir>/98-picoevb.rules udev-rules/
-
-
+=<platform-dir>/52-picoevb.rules udev-rules/

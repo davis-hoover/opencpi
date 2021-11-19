@@ -45,18 +45,18 @@ namespace OCPI {
 
     protected:
       Container(OCPI::OCL::Device &device, const ezxml_t config = NULL,
-		const OCPI::Util::PValue *params = NULL);
+		const OCPI::Base::PValue *params = NULL);
     public:
       ~Container();
 
       bool supportsImplementation(OCPI::Metadata::Worker &i);
-      OCPI::Container::Container::DispatchRetCode dispatch(DataTransfer::EventManager* event_manager)
-        throw (OU::EmbeddedException);
+      OCPI::Container::Container::DispatchRetCode dispatch(OCPI::Xfer::EventManager* event_manager)
+        throw (OCPI::Util::EmbeddedException);
 
       OCPI::Container::Artifact &
 	createArtifact(OCPI::Library::Artifact &lart, const OCPI::API::PValue *artifactParams);
       OCPI::API::ContainerApplication *
-	createApplication(const char *name, const OCPI::Util::PValue *props)
+	createApplication(const char *name, const OCPI::Base::PValue *props)
 	throw ( OCPI::Util::EmbeddedException );
 
       bool needThread() { return true; }

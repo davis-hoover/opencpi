@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <OcpiTimeEmitC.h>
+#include "TimeEmitC.hh"
 
 #undef c_plus_plus
 #include "LoopbackWorker.h"

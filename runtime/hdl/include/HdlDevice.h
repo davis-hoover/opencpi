@@ -28,10 +28,10 @@
 #include <climits>
 #include "ezxml.h"
 #include "OcpiUuid.h"
-#include "XferEndPoint.h"
-#include "OcpiRDTInterface.h"
+#include "XferEndPoint.hh"
+#include "TransportRDTInterface.hh"
 #include "HdlWciControl.h"
-#include "XferAccess.h"
+#include "XferAccess.hh"
 
 namespace OCPI {
   namespace HDL {
@@ -67,12 +67,12 @@ namespace OCPI {
       bool m_verbose;
     public:
       uint32_t m_timeCorrection;
-      DataTransfer::EndPoint *m_endPoint;
+      OCPI::Xfer::EndPoint *m_endPoint;
       static void initAdmin(OccpAdminRegisters &admin, const char *a_platform, HdlUUID &hdlUuid,
 			    OCPI::Util::UuidString *uuidString);
     protected:
       Device(const std::string &name, const char *protocol = "", 
-	     const OCPI::Util::PValue *params = NULL);
+	     const OCPI::Base::PValue *params = NULL);
     public:
       virtual ~Device();
       bool getPPSIsOkay(useconds_t timeout, useconds_t sleepTime);
@@ -113,9 +113,9 @@ namespace OCPI {
 			       Access & properties);
       // Methods when the container is making connections and the device needs to know about it,
       // mostly for simulation.
-      virtual DataTransfer::EndPoint &getEndPoint();
-      virtual void connect(DataTransfer::EndPoint &ep, OCPI::RDT::Descriptors &mine,
-			   const OCPI::RDT::Descriptors &other);
+      virtual OCPI::Xfer::EndPoint &getEndPoint();
+      virtual void connect(OCPI::Xfer::EndPoint &ep, OCPI::Transport::Descriptors &mine,
+			   const OCPI::Transport::Descriptors &other);
       virtual uint32_t dmaOptions(ezxml_t icImplXml, ezxml_t icInstXml, bool isProvider) = 0;
       // This method has a required base class implementation.
       // If it is overridden, the base class method must be called from there.

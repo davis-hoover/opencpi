@@ -68,25 +68,34 @@ prerequisites lzma gmp gpsd gtest ad9361
 # Essentially, host prereqs = prereqs + host only prereqs
 host-only-prerequisites yaml_cpp
 # There is lots of leftover/unbuilt stuff in the foreign directories
+# Foreign code does not call any of our code
 runtime/foreign -f -x .*/pwq/kern/.* -x .*/pwq/src/.*/.* -x .*/uuid/src/.*/.*
-# From old Makefiles:c and c++: for linux: -D_XOPEN_SOURCE=600 -D_FILE_OFFSET_BITS=64
+# Our OS code might call foreign code (above), but it cannot call any other OpenCPI code (below).
 os -I os/include -x .*/driver/.* -x .*/winnt/.*
-runtime/util -d internal -T ocpixml
+# Our utility code consists of convenience functions that are not really a "layer", and do not call
+# any other code other than perhaps the OS abstraction and foreign code
+runtime/util -d internal
+# Code above this line is not really part of the runtime infrastructure/layers of OpenCPI.
+# Tools that use any layers above this must do so explicitly (-I and -L)
 end-of-runtime-for-tools
-
+runtime/vfs -d internal
+# The base library needs to call into the time(emit) layer at shutdown
+runtime/base -d internal -T ocpixml
+# The time library does timekeeping and time-based event recording
+runtime/time -d internal
 runtime/drc/base -l drc
 runtime/drc/ad9361 -l drc_ad9361
-runtime/dataplane/xfer/base -l xfer
-runtime/dataplane/xfer/tests -n -d internal -l xfer_tests
-runtime/dataplane/xfer/drivers/datagram -v
-runtime/dataplane/xfer/drivers/dma -v
-runtime/dataplane/xfer/drivers/ofed -v
-runtime/dataplane/xfer/drivers/pio -v
-runtime/dataplane/xfer/drivers/socket -v
-runtime/dataplane/transport
+runtime/xfer/base -l xfer
+runtime/xfer/tests -n -d internal -l xfer_tests
+runtime/xfer/drivers/datagram -v
+runtime/xfer/drivers/dma -v
+runtime/xfer/drivers/ofed -v
+runtime/xfer/drivers/pio -v
+runtime/xfer/drivers/socket -v
+runtime/transport
 runtime/metadata
-runtime/dataplane/msg_driver_interface -d internal
-runtime/dataplane/msg_drivers
+runtime/msg/base -d internal -l msg
+runtime/msg/drivers -l msg_drivers
 runtime/library
 runtime/container
 runtime/remote -v
@@ -102,7 +111,9 @@ runtime/ctests -n -d ctests -I runtime/rcc/include
 tests/c++tests -d cxxtests -n -s
 tools/cdkutils -t
 # ocpigen use some runtime libraries that are higher up the stack
-tools/ocpigen -n -t -I tools/cdkutils/include -I runtime/hdl/include -I runtime/library/include -I runtime/ocl/include -I runtime/metadata/include -L cdkutils -L library -L metadata
+# FIXME: ocpigen should not really use these libraries, and there should be
+# separate executables that are in the runtime environment, e.g. to do the "prep" for testing
+tools/ocpigen -n -t -I tools/cdkutils/include -I runtime/hdl/include -I runtime/library/include -I runtime/ocl/include -I runtime/metadata/include -I runtime/base/include -L cdkutils -L library -L metadata -L base
 # ocpisca uses runtime so is not really a "tool" as far as builds go
 # but it is actually a tool so it won't be part of the runtime package
 # we stash it in "internal" and let the exports file put it into the devel
@@ -112,6 +123,6 @@ tools/ocpigen -n -t -I tools/cdkutils/include -I runtime/hdl/include -I runtime/
 tools/ocpirh
 # This ugliness is a workaround until dev host only prereqs are implemented.
 # https://gitlab.com/opencpi/opencpi/-/issues/1367
-tools/ocpigr -t -I tools/cdkutils/include -I runtime/metadata/include -I runtime/library/include -L cdkutils -L library -L metadata
-tools/ocpigr37 -t -I tools/cdkutils/include -I runtime/metadata/include -I runtime/library/include -L cdkutils -L library -L metadata
-tools/ocpidds -d cxxtests -n -r -t -I tools/cdkutils/include -I runtime/metadata/include -L cdkutils -L metadata
+tools/ocpigr -t -I tools/cdkutils/include -I runtime/metadata/include -I runtime/library/include -L cdkutils -L library -L metadata -I runtime/base/include -L base
+tools/ocpigr37 -t -I tools/cdkutils/include -I runtime/metadata/include -I runtime/library/include -L cdkutils -L library -L metadata -I runtime/base/include -L base
+tools/ocpidds -d cxxtests -n -r -t -I tools/cdkutils/include -I runtime/metadata/include -I runtime/base/include -L cdkutils -L metadata -L base

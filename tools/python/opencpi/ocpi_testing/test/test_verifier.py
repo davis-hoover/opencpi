@@ -34,7 +34,7 @@ import ocpi_testing
 
 
 # A simple pass through implementation as the sample data handling
-class SomeImplementation(ocpi_testing.Implementation):
+class SingleOutputPortImplementation(ocpi_testing.Implementation):
     def reset(self):
         pass
 
@@ -58,6 +58,64 @@ class SomeImplementation(ocpi_testing.Implementation):
         return self.output_formatter(*resultant_messages)
 
 
+class MultiOutputPortImplementation(ocpi_testing.Implementation):
+    def __init__(self):
+        super().__init__()
+
+        self.input_ports = ["input_1", "input_2"]
+        self.output_ports = ["output_1", "output_2"]
+
+    def reset(self):
+        pass
+
+    def select_input(self, input_1, input_2):
+        if input_1 is not None:
+            return 0
+        else:
+            return 1
+
+    def sample(self, input_1, input_2):
+        return self._inputs_to_outputs_data_pass_through(
+            "sample", input_1, input_2)
+
+    def time(self, input_1, input_2):
+        return self._inputs_to_outputs_data_pass_through(
+            "time", input_1, input_2)
+
+    def sample_interval(self, input_1, input_2):
+        return self._inputs_to_outputs_data_pass_through(
+            "sample_interval", input_1, input_2)
+
+    def discontinuity(self, input_1, input_2):
+        return self._inputs_to_outputs_no_data_pass_through(
+            "discontinuity", input_1, input_2)
+
+    def flush(self, input_1, input_2):
+        return self._inputs_to_outputs_no_data_pass_through(
+            "flush", input_1, input_2)
+
+    def metadata(self, input_1, input_2):
+        return self._inputs_to_outputs_data_pass_through(
+            "metadata", input_1, input_2)
+
+    def _inputs_to_outputs_data_pass_through(self, opcode, *inputs):
+        # For opcodes with data (i.e. sample, time, sample interval and
+        # metadata)
+        outputs = [[] for _ in inputs]
+        for index, input_data in enumerate(inputs):
+            if input_data is not None:
+                outputs[index].append({"opcode": opcode, "data": input_data})
+        return self.output_formatter(*outputs)
+
+    def _inputs_to_outputs_no_data_pass_through(self, opcode, *inputs):
+        # For opcodes without data (i.e. discontinuity and flush)
+        outputs = [[] for _ in inputs]
+        for index, input_data in enumerate(inputs):
+            if input_data is True:
+                outputs[index].append({"opcode": opcode, "data": None})
+        return self.output_formatter(*outputs)
+
+
 class TestVerifier(unittest.TestCase):
     def setUp(self):
         # Create a temporary test file structure
@@ -74,6 +132,8 @@ class TestVerifier(unittest.TestCase):
             "run").joinpath("test_platform").mkdir(parents=True)
         test_directory_structure.joinpath("a_component.test").joinpath(
             "gen").joinpath("inputs").mkdir(parents=True)
+        test_directory_structure.joinpath("a_component.test").joinpath(
+            "a_implementation.py").touch()
         self._test_directory_base.joinpath(
             "a_project").joinpath(".project").touch()
 
@@ -93,15 +153,15 @@ class TestVerifier(unittest.TestCase):
 
     # Test case for verifier with mostly default values
     def test_verifier_init(self):
-        implementation = SomeImplementation()
+        implementation = SingleOutputPortImplementation()
         test_verifier = ocpi_testing.Verifier(implementation)
 
         self.assertIsNotNone(test_verifier._test_log)
 
     def test_verify_equal_correct_data(self):
         # Create input data file
-        input_file_path = self._test_directory_base.joinpath("a_project").joinpath(
-            "components").joinpath("dsp").joinpath(
+        input_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
             "a_component.test").joinpath("gen").joinpath("inputs").joinpath(
             "test.port")
         with ocpi_protocols.WriteMessagesFile(
@@ -111,8 +171,8 @@ class TestVerifier(unittest.TestCase):
             input_data_file.write_message("sample", [10, 11, 12])
 
         # Create output data file
-        output_file_path = self._test_directory_base.joinpath("a_project").joinpath(
-            "components").joinpath("dsp").joinpath(
+        output_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
             "a_component.test").joinpath("run").joinpath(
             "test_platform").joinpath(
             "case00.01.a_component.worker_type.output.out")
@@ -122,7 +182,7 @@ class TestVerifier(unittest.TestCase):
             output_data_file.write_message("time", 1.23)
             output_data_file.write_message("sample", [10, 11, 12])
 
-        implementation = SomeImplementation()
+        implementation = SingleOutputPortImplementation()
         test_verifier = ocpi_testing.Verifier(implementation)
         test_verifier.set_port_types(["short_timed_sample"], [
                                      "short_timed_sample"], ["equal"])
@@ -146,8 +206,8 @@ class TestVerifier(unittest.TestCase):
 
     def test_verify_equal_incorrect_data(self):
         # Create input data file
-        input_file_path = self._test_directory_base.joinpath("a_project").joinpath(
-            "components").joinpath("dsp").joinpath(
+        input_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
             "a_component.test").joinpath("gen").joinpath("inputs").joinpath(
             "test.port")
         with ocpi_protocols.WriteMessagesFile(
@@ -157,8 +217,8 @@ class TestVerifier(unittest.TestCase):
             input_data_file.write_message("sample", [10, 11, 12])
 
         # Create output data file
-        output_file_path = self._test_directory_base.joinpath("a_project").joinpath(
-            "components").joinpath("dsp").joinpath(
+        output_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
             "a_component.test").joinpath("run").joinpath(
             "test_platform").joinpath(
             "case00.01.a_component.worker_type.output.out")
@@ -168,7 +228,7 @@ class TestVerifier(unittest.TestCase):
             output_data_file.write_message("time", 1.23)
             output_data_file.write_message("sample", [20, 21, 22])
 
-        implementation = SomeImplementation()
+        implementation = SingleOutputPortImplementation()
         test_verifier = ocpi_testing.Verifier(implementation)
         test_verifier.set_port_types(["short_timed_sample"], [
                                      "short_timed_sample"], ["equal"])
@@ -192,8 +252,8 @@ class TestVerifier(unittest.TestCase):
 
     def test_verify_statistical_correct_data(self):
         # Create input data file
-        input_file_path = self._test_directory_base.joinpath("a_project").joinpath(
-            "components").joinpath("dsp").joinpath(
+        input_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
             "a_component.test").joinpath("gen").joinpath("inputs").joinpath(
             "test.port")
         with ocpi_protocols.WriteMessagesFile(
@@ -203,18 +263,18 @@ class TestVerifier(unittest.TestCase):
             input_data_file.write_message("sample", [10, 11, 12])
 
         # Create output data file
-        output_file_path = self._test_directory_base.joinpath("a_project").joinpath(
-            "components").joinpath("dsp").joinpath(
+        output_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
             "a_component.test").joinpath("run").joinpath(
             "test_platform").joinpath(
-            "caseXX.XX.a_component.worker_type.output.out")
+            "case00.01.a_component.worker_type.output.out")
         with ocpi_protocols.WriteMessagesFile(
                 output_file_path, "short_timed_sample") as output_data_file:
             output_data_file.write_message("discontinuity", None)
             output_data_file.write_message("time", 1.23)
             output_data_file.write_message("sample", [10, 11, 12])
 
-        implementation = SomeImplementation()
+        implementation = SingleOutputPortImplementation()
         test_verifier = ocpi_testing.Verifier(implementation)
         test_verifier.set_port_types(["short_timed_sample"], [
                                      "short_timed_sample"], ["statistical"])
@@ -230,7 +290,7 @@ class TestVerifier(unittest.TestCase):
             "a_project").joinpath("components").joinpath("dsp").joinpath(
             "a_component.test").joinpath("run").joinpath(
             "test_platform").joinpath(
-            "caseXX.XX.a_component.worker_type.output.reference")
+            "case00.01.a_component.worker_type.output.reference")
         self.assertTrue(reference_file_path.exists())
         with open(reference_file_path, "rb") as reference_file:
             reference_data = reference_file.read()
@@ -238,8 +298,8 @@ class TestVerifier(unittest.TestCase):
 
     def test_verify_statistical_incorrect_data(self):
         # Create input data file
-        input_file_path = self._test_directory_base.joinpath("a_project").joinpath(
-            "components").joinpath("dsp").joinpath(
+        input_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
             "a_component.test").joinpath("gen").joinpath("inputs").joinpath(
             "test.port")
         with ocpi_protocols.WriteMessagesFile(
@@ -249,18 +309,18 @@ class TestVerifier(unittest.TestCase):
             input_data_file.write_message("sample", [10, 11, 12])
 
         # Create output data file
-        output_file_path = self._test_directory_base.joinpath("a_project").joinpath(
-            "components").joinpath("dsp").joinpath(
+        output_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
             "a_component.test").joinpath("run").joinpath(
             "test_platform").joinpath(
-            "caseXX.XX.a_component.worker_type.output.out")
+            "case00.01.a_component.worker_type.output.out")
         with ocpi_protocols.WriteMessagesFile(
                 output_file_path, "short_timed_sample") as output_data_file:
             output_data_file.write_message("discontinuity", None)
             output_data_file.write_message("time", 1.23)
             output_data_file.write_message("sample", [20, 21, 22])
 
-        implementation = SomeImplementation()
+        implementation = SingleOutputPortImplementation()
         test_verifier = ocpi_testing.Verifier(implementation)
         test_verifier.set_port_types(["short_timed_sample"], [
                                      "short_timed_sample"], ["statistical"])
@@ -276,7 +336,7 @@ class TestVerifier(unittest.TestCase):
             "a_project").joinpath("components").joinpath("dsp").joinpath(
             "a_component.test").joinpath("run").joinpath(
             "test_platform").joinpath(
-            "caseXX.XX.a_component.worker_type.output.reference")
+            "case00.01.a_component.worker_type.output.reference")
         self.assertTrue(reference_file_path.exists())
         with open(reference_file_path, "rb") as reference_file:
             reference_data = reference_file.read()
@@ -286,27 +346,27 @@ class TestVerifier(unittest.TestCase):
         # As the data files to be imported are the output of implementation-
         # under-test it is possible this data output may not be perfect (as
         # it comes from the test target). Therefore importing such data that is
-        # not correctly formatted in an file is a possible occurance, so should
-        # be handled - and therefore tested.
+        # not correctly formatted in an file is a possible occurrence, so
+        # should be handled - and therefore tested.
 
         sample_data_1 = [1] * 10
         sample_data_2 = [2] * 10
 
         # Create input data file
-        input_file_path = self._test_directory_base.joinpath("a_project").joinpath(
-            "components").joinpath("dsp").joinpath(
+        input_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
             "a_component.test").joinpath("gen").joinpath("inputs").joinpath(
             "test.port")
-        with ocpi_protocols.WriteMessagesFile(input_file_path, "short_timed_sample") as \
-                input_data_file:
+        with ocpi_protocols.WriteMessagesFile(
+                input_file_path, "short_timed_sample") as input_data_file:
             input_data_file.write_message("sample_interval", 2**-26)
             input_data_file.write_message("time", 1.0)
             input_data_file.write_message("sample", sample_data_1)
             input_data_file.write_message("sample", sample_data_2)
 
         # Create output data file - which contains a error
-        output_file_path = self._test_directory_base.joinpath("a_project").joinpath(
-            "components").joinpath("dsp").joinpath(
+        output_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
             "a_component.test").joinpath("run").joinpath(
             "test_platform").joinpath(
             "case00.01.a_component.worker_type.output.out")
@@ -335,7 +395,7 @@ class TestVerifier(unittest.TestCase):
         with open(output_file_path, "wb") as binary_file:
             binary_file.write(bytes(test_data))
 
-        implementation = SomeImplementation()
+        implementation = SingleOutputPortImplementation()
         test_verifier = ocpi_testing.Verifier(implementation)
         test_verifier.set_port_types(["short_timed_sample"], [
                                      "short_timed_sample"], ["equal"])
@@ -349,7 +409,7 @@ class TestVerifier(unittest.TestCase):
         subcase = "04"
         worker = "test_worker.rcc"
         port = "output"
-        implementation = SomeImplementation()
+        implementation = SingleOutputPortImplementation()
         test_verifier = ocpi_testing.Verifier(implementation)
         test_verifier.set_port_types(["short_timed_sample"], [
                                      "short_timed_sample"], ["equal"])
@@ -401,7 +461,7 @@ class TestVerifier(unittest.TestCase):
         worker = "test_worker.hdl"
         port = "output"
         failure_message = "Testing of test_failed()"
-        implementation = SomeImplementation()
+        implementation = SingleOutputPortImplementation()
         test_verifier = ocpi_testing.Verifier(implementation)
         test_verifier.set_port_types(["short_timed_sample"], [
                                      "short_timed_sample"], ["equal"])
@@ -455,7 +515,7 @@ class TestVerifier(unittest.TestCase):
         self.assertIn("primitive_directory_commit_id",
                       written_log[case][subcase][worker]["test_platform"])
 
-    def test_verify_no_docs_directory(self):
+    def test_verify_no_comp_directory(self):
         # Delete the documentation directory made during setup()
         self._test_directory_base = pathlib.Path(__file__).parent.joinpath(
             "temp")
@@ -464,8 +524,8 @@ class TestVerifier(unittest.TestCase):
         shutil.rmtree(test_directory_structure.joinpath("a_component.comp"))
 
         # Create input data file
-        input_file_path = self._test_directory_base.joinpath("a_project").joinpath(
-            "components").joinpath("dsp").joinpath(
+        input_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
             "a_component.test").joinpath("gen").joinpath("inputs").joinpath(
             "test.port")
         with ocpi_protocols.WriteMessagesFile(
@@ -475,8 +535,8 @@ class TestVerifier(unittest.TestCase):
             input_data_file.write_message("sample", [10, 11, 12])
 
         # Create output data file
-        output_file_path = self._test_directory_base.joinpath("a_project").joinpath(
-            "components").joinpath("dsp").joinpath(
+        output_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
             "a_component.test").joinpath("run").joinpath(
             "test_platform").joinpath(
             "case00.01.a_component.worker_type.output.out")
@@ -486,7 +546,7 @@ class TestVerifier(unittest.TestCase):
             output_data_file.write_message("time", 1.23)
             output_data_file.write_message("sample", [10, 11, 12])
 
-        implementation = SomeImplementation()
+        implementation = SingleOutputPortImplementation()
         test_verifier = ocpi_testing.Verifier(implementation)
         test_verifier.set_port_types(["short_timed_sample"], [
                                      "short_timed_sample"], ["equal"])
@@ -507,3 +567,697 @@ class TestVerifier(unittest.TestCase):
         with open(reference_file_path, "rb") as reference_file:
             reference_data = reference_file.read()
         self.assertGreater(len(reference_data), 0)
+
+    def test_multiple_outputs_correct_data(self):
+        # Create input data files
+        input_1_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("gen").joinpath("inputs").joinpath(
+            "input_1.port")
+        with ocpi_protocols.WriteMessagesFile(
+                input_1_file_path, "short_timed_sample") as input_1_data_file:
+            input_1_data_file.write_message("discontinuity", None)
+            input_1_data_file.write_message("time", 1.23)
+            input_1_data_file.write_message("sample", [10, 11, 12])
+        input_2_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("gen").joinpath("inputs").joinpath(
+            "input_2.port")
+        with ocpi_protocols.WriteMessagesFile(
+                input_2_file_path, "short_timed_sample") as input_2_data_file:
+            input_2_data_file.write_message("flush", None)
+            input_2_data_file.write_message("sample_interval", 0.1)
+            input_2_data_file.write_message("sample", [100, 200, 300])
+
+        # Create output data files
+        output_1_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output_1.out")
+        with ocpi_protocols.WriteMessagesFile(
+                output_1_file_path,
+                "short_timed_sample") as output_1_data_file:
+            output_1_data_file.write_message("discontinuity", None)
+            output_1_data_file.write_message("time", 1.23)
+            output_1_data_file.write_message("sample", [10, 11, 12])
+        output_2_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output_2.out")
+        with ocpi_protocols.WriteMessagesFile(
+                output_2_file_path,
+                "short_timed_sample") as output_2_data_file:
+            output_2_data_file.write_message("flush", None)
+            output_2_data_file.write_message("sample_interval", 0.1)
+            output_2_data_file.write_message("sample", [100, 200, 300])
+
+        implementation = MultiOutputPortImplementation()
+        test_verifier = ocpi_testing.Verifier(implementation)
+        test_verifier.set_port_types(
+            ["short_timed_sample", "short_timed_sample"],
+            ["short_timed_sample", "short_timed_sample"],
+            ["equal", "equal"])
+
+        self.assertTrue(
+            test_verifier.verify("case00.01",
+                                 [input_1_file_path, input_2_file_path],
+                                 output_1_file_path, port_select=1))
+
+        # Check reference outputs have been written to file
+        reference_1_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output_1.reference")
+        self.assertTrue(reference_1_file_path.exists())
+        with open(reference_1_file_path, "rb") as reference_1_file:
+            self.assertGreater(len(reference_1_file.read()), 0)
+        reference_2_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output_2.reference")
+        self.assertTrue(reference_2_file_path.exists())
+        with open(reference_2_file_path, "rb") as reference_2_file:
+            self.assertGreater(len(reference_2_file.read()), 0)
+
+        # Purposefully make output 1's data incorrect so if the wrong port is
+        # being verified it will fail, and since this unit test aims to test
+        # correct data outputs the unit test will also fail
+        with ocpi_protocols.ParseMessagesFile(
+                reference_1_file_path,
+                "short_timed_sample") as reference_1_file:
+            reference_1_data = reference_1_file.get_all_messages()
+        with ocpi_protocols.WriteMessagesFile(
+                reference_1_file_path,
+                "short_timed_sample") as reference_1_file:
+            for index, message in enumerate(reference_1_data):
+                if message["opcode"] == "sample":
+                    data = [value + 1 for value in reference_1_data[index]["data"]]
+                    reference_1_file.write_message("sample", data)
+                else:
+                    reference_1_file.write_dict_message(message)
+
+        # Get the time the reference files were modified as these should not be
+        # regenerated between output verifications where the implementation-
+        # under-test data is not new.
+        reference_1_file_modification_time = os.path.getmtime(
+            reference_1_file_path)
+        reference_2_file_modification_time = os.path.getmtime(
+            reference_2_file_path)
+
+        self.assertTrue(
+            test_verifier.verify("case00.01",
+                                 [input_1_file_path, input_2_file_path],
+                                 output_2_file_path, port_select=2))
+
+        # Check the reference files have not been regenerated
+        self.assertEqual(reference_1_file_modification_time,
+                         os.path.getmtime(reference_1_file_path))
+        self.assertEqual(reference_2_file_modification_time,
+                         os.path.getmtime(reference_2_file_path))
+
+    def test_require_rerun_reference_new_implementation_output(self):
+        # Test that the reference is generated in cases where the
+        # implementation-under-test output is newer than any existing
+        # reference. Since verify only generates reference output when expected
+        # to be required, but need to ensure reference being used is always
+        # up-to-date.
+
+        # Create input data files
+        input_1_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("gen").joinpath("inputs").joinpath(
+            "input_1.port")
+        with ocpi_protocols.WriteMessagesFile(
+                input_1_file_path, "short_timed_sample") as input_1_data_file:
+            input_1_data_file.write_message("discontinuity", None)
+            input_1_data_file.write_message("time", 1.23)
+            input_1_data_file.write_message("sample", [10, 11, 12])
+        input_2_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("gen").joinpath("inputs").joinpath(
+            "input_2.port")
+        with ocpi_protocols.WriteMessagesFile(
+                input_2_file_path, "short_timed_sample") as input_2_data_file:
+            input_2_data_file.write_message("flush", None)
+            input_2_data_file.write_message("sample_interval", 0.1)
+            input_2_data_file.write_message("sample", [100, 200, 300])
+
+        # Create output data files. Additionally output 2 will be made
+        # incorrect so when testing verify with output 1 ensuring only one
+        # ports test will pass so checking the correct port is being tested.
+        output_1_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output_1.out")
+        with ocpi_protocols.WriteMessagesFile(
+                output_1_file_path,
+                "short_timed_sample") as output_1_data_file:
+            output_1_data_file.write_message("discontinuity", None)
+            output_1_data_file.write_message("time", 1.23)
+            output_1_data_file.write_message("sample", [10, 11, 12])
+        output_2_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output_2.out")
+        with ocpi_protocols.WriteMessagesFile(
+                output_2_file_path,
+                "short_timed_sample") as output_2_data_file:
+            output_2_data_file.write_message("flush", None)
+            output_2_data_file.write_message("sample_interval", 0.1)
+            output_2_data_file.write_message("sample", [50, 50, 50])
+
+        implementation = MultiOutputPortImplementation()
+        test_verifier = ocpi_testing.Verifier(implementation)
+        test_verifier.set_port_types(
+            ["short_timed_sample", "short_timed_sample"],
+            ["short_timed_sample", "short_timed_sample"],
+            ["equal", "equal"])
+
+        self.assertTrue(
+            test_verifier.verify("case00.01",
+                                 [input_1_file_path, input_2_file_path],
+                                 output_1_file_path, port_select=1))
+
+        # Check reference outputs have been written to file
+        reference_1_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output_1.reference")
+        self.assertTrue(reference_1_file_path.exists())
+        with open(reference_1_file_path, "rb") as reference_1_file:
+            self.assertGreater(len(reference_1_file.read()), 0)
+        reference_2_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output_2.reference")
+        self.assertTrue(reference_2_file_path.exists())
+        with open(reference_2_file_path, "rb") as reference_2_file:
+            self.assertGreater(len(reference_2_file.read()), 0)
+
+        # Get the time the reference files were modified as these should not be
+        # regenerated between output verifications where the implementation-
+        # under-test data is not new.
+        reference_1_file_modification_time = os.path.getmtime(
+            reference_1_file_path)
+        reference_2_file_modification_time = os.path.getmtime(
+            reference_2_file_path)
+
+        # Make new implementation-under-test output data files, which should
+        # trigger the verifier to make new reference output files at the next
+        # verify. Additionally output 1 will be made incorrect so when testing
+        # verify with output 2 ensuring only one ports test will pass so
+        # checking the correct port is being tested.
+        output_1_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output_1.out")
+        with ocpi_protocols.WriteMessagesFile(
+                output_1_file_path,
+                "short_timed_sample") as output_1_data_file:
+            output_1_data_file.write_message("discontinuity", None)
+            output_1_data_file.write_message("time", 1.23)
+            output_1_data_file.write_message("sample", [20, 20, 20])
+        output_2_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output_2.out")
+        with ocpi_protocols.WriteMessagesFile(
+                output_2_file_path,
+                "short_timed_sample") as output_2_data_file:
+            output_2_data_file.write_message("flush", None)
+            output_2_data_file.write_message("sample_interval", 0.1)
+            output_2_data_file.write_message("sample", [100, 200, 300])
+
+        self.assertTrue(
+            test_verifier.verify("case00.01",
+                                 [input_1_file_path, input_2_file_path],
+                                 output_2_file_path, port_select=2))
+
+    def test_require_rerun_reference_new_python_implementation(self):
+        # Test that the reference is generated in cases where the Python
+        # implementation is newer than any existing reference output data.
+        # Since verify only generates reference output when expected to be
+        # required, but need to ensure reference being used is always
+        # up-to-date.
+
+        # Create input data files
+        input_1_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("gen").joinpath("inputs").joinpath(
+            "input_1.port")
+        with ocpi_protocols.WriteMessagesFile(
+                input_1_file_path, "short_timed_sample") as input_1_data_file:
+            input_1_data_file.write_message("discontinuity", None)
+            input_1_data_file.write_message("time", 1.23)
+            input_1_data_file.write_message("sample", [10, 11, 12])
+        input_2_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("gen").joinpath("inputs").joinpath(
+            "input_2.port")
+        with ocpi_protocols.WriteMessagesFile(
+                input_2_file_path, "short_timed_sample") as input_2_data_file:
+            input_2_data_file.write_message("flush", None)
+            input_2_data_file.write_message("sample_interval", 0.1)
+            input_2_data_file.write_message("sample", [100, 200, 300])
+
+        # Create output data files.
+        output_1_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output_1.out")
+        with ocpi_protocols.WriteMessagesFile(
+                output_1_file_path,
+                "short_timed_sample") as output_1_data_file:
+            output_1_data_file.write_message("discontinuity", None)
+            output_1_data_file.write_message("time", 1.23)
+            output_1_data_file.write_message("sample", [10, 11, 12])
+        output_2_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output_2.out")
+        with ocpi_protocols.WriteMessagesFile(
+                output_2_file_path,
+                "short_timed_sample") as output_2_data_file:
+            output_2_data_file.write_message("flush", None)
+            output_2_data_file.write_message("sample_interval", 0.1)
+            output_2_data_file.write_message("sample", [100, 200, 300])
+
+        implementation = MultiOutputPortImplementation()
+        test_verifier = ocpi_testing.Verifier(implementation)
+        test_verifier.set_port_types(
+            ["short_timed_sample", "short_timed_sample"],
+            ["short_timed_sample", "short_timed_sample"],
+            ["equal", "equal"])
+
+        self.assertTrue(
+            test_verifier.verify("case00.01",
+                                 [input_1_file_path, input_2_file_path],
+                                 output_1_file_path, port_select=1))
+
+        # Check reference outputs have been written to file
+        reference_1_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output_1.reference")
+        self.assertTrue(reference_1_file_path.exists())
+        with open(reference_1_file_path, "rb") as reference_1_file:
+            self.assertGreater(len(reference_1_file.read()), 0)
+        reference_2_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output_2.reference")
+        self.assertTrue(reference_2_file_path.exists())
+        with open(reference_2_file_path, "rb") as reference_2_file:
+            self.assertGreater(len(reference_2_file.read()), 0)
+
+        # Get the time the reference files were modified as these should not be
+        # regenerated between output verifications where the implementation-
+        # under-test data is not new.
+        reference_1_file_modification_time = os.path.getmtime(
+            reference_1_file_path)
+        reference_2_file_modification_time = os.path.getmtime(
+            reference_2_file_path)
+
+        # Update / modify a Python implementation file
+        self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("a_implementation.py").touch()
+
+        self.assertTrue(
+            test_verifier.verify("case00.01",
+                                 [input_1_file_path, input_2_file_path],
+                                 output_2_file_path, port_select=2))
+
+        # Check the reference files have been regenerated
+        self.assertGreater(os.path.getmtime(reference_1_file_path),
+                           reference_1_file_modification_time)
+        self.assertGreater(os.path.getmtime(reference_2_file_path),
+                           reference_2_file_modification_time)
+
+    def test_multiple_outputs_one_pass_one_fail(self):
+        # Create input data files
+        input_1_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("gen").joinpath("inputs").joinpath(
+            "input_1.port")
+        with ocpi_protocols.WriteMessagesFile(
+                input_1_file_path, "short_timed_sample") as input_1_data_file:
+            input_1_data_file.write_message("discontinuity", None)
+            input_1_data_file.write_message("time", 1.23)
+            input_1_data_file.write_message("sample", [10, 11, 12])
+        input_2_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("gen").joinpath("inputs").joinpath(
+            "input_2.port")
+        with ocpi_protocols.WriteMessagesFile(
+                input_2_file_path, "short_timed_sample") as input_2_data_file:
+            input_2_data_file.write_message("flush", None)
+            input_2_data_file.write_message("sample_interval", 0.1)
+            input_2_data_file.write_message("sample", [100, 200, 300])
+
+        # Create output data files
+        output_1_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output_1.out")
+        with ocpi_protocols.WriteMessagesFile(
+                output_1_file_path,
+                "short_timed_sample") as output_1_data_file:
+            output_1_data_file.write_message("discontinuity", None)
+            output_1_data_file.write_message("time", 1.23)
+            output_1_data_file.write_message("sample", [10, 11, 12])
+        output_2_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output_2.out")
+        with ocpi_protocols.WriteMessagesFile(
+                output_2_file_path,
+                "short_timed_sample") as output_2_data_file:
+            output_2_data_file.write_message("flush", None)
+            output_2_data_file.write_message("sample_interval", 0.1)
+            output_2_data_file.write_message("sample", [151, 252, 353])
+
+        implementation = MultiOutputPortImplementation()
+        test_verifier = ocpi_testing.Verifier(implementation)
+        test_verifier.set_port_types(
+            ["short_timed_sample", "short_timed_sample"],
+            ["short_timed_sample", "short_timed_sample"],
+            ["equal", "equal"])
+
+        self.assertTrue(
+            test_verifier.verify("case00.01",
+                                 [input_1_file_path, input_2_file_path],
+                                 output_1_file_path, port_select=1))
+        self.assertFalse(
+            test_verifier.verify("case00.01",
+                                 [input_1_file_path, input_2_file_path],
+                                 [output_2_file_path], port_select=2))
+
+        # Check reference outputs have been written to file
+        reference_1_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output_1.reference")
+        self.assertTrue(reference_1_file_path.exists())
+        with open(reference_1_file_path, "rb") as reference_1_file:
+            self.assertGreater(len(reference_1_file.read()), 0)
+        reference_2_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output_2.reference")
+        self.assertTrue(reference_2_file_path.exists())
+        with open(reference_2_file_path, "rb") as reference_2_file:
+            self.assertGreater(len(reference_2_file.read()), 0)
+
+    def test_multiple_outputs_one_fail_one_pass(self):
+        # The pass / fail port order here is the opposite way round to the test
+        # test_multiple_outputs_one_pass_one_fail
+
+        # Create input data files
+        input_1_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("gen").joinpath("inputs").joinpath(
+            "input_1.port")
+        with ocpi_protocols.WriteMessagesFile(
+                input_1_file_path, "short_timed_sample") as input_1_data_file:
+            input_1_data_file.write_message("discontinuity", None)
+            input_1_data_file.write_message("time", 1.23)
+            input_1_data_file.write_message("sample", [10, 11, 12])
+        input_2_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("gen").joinpath("inputs").joinpath(
+            "input_2.port")
+        with ocpi_protocols.WriteMessagesFile(
+                input_2_file_path, "short_timed_sample") as input_2_data_file:
+            input_2_data_file.write_message("flush", None)
+            input_2_data_file.write_message("sample_interval", 0.1)
+            input_2_data_file.write_message("sample", [100, 200, 300])
+
+        # Create output data files
+        output_1_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output_1.out")
+        with ocpi_protocols.WriteMessagesFile(
+                output_1_file_path,
+                "short_timed_sample") as output_1_data_file:
+            output_1_data_file.write_message("discontinuity", None)
+            output_1_data_file.write_message("time", 1.23)
+            output_1_data_file.write_message("sample", [-1, -2, -3])
+        output_2_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output_2.out")
+        with ocpi_protocols.WriteMessagesFile(
+                output_2_file_path,
+                "short_timed_sample") as output_2_data_file:
+            output_2_data_file.write_message("flush", None)
+            output_2_data_file.write_message("sample_interval", 0.1)
+            output_2_data_file.write_message("sample", [100, 200, 300])
+
+        implementation = MultiOutputPortImplementation()
+        test_verifier = ocpi_testing.Verifier(implementation)
+        test_verifier.set_port_types(
+            ["short_timed_sample", "short_timed_sample"],
+            ["short_timed_sample", "short_timed_sample"],
+            ["equal", "equal"])
+
+        self.assertFalse(
+            test_verifier.verify("case00.01",
+                                 [input_1_file_path, input_2_file_path],
+                                 output_1_file_path, port_select=1))
+        self.assertTrue(
+            test_verifier.verify("case00.01",
+                                 [input_1_file_path, input_2_file_path],
+                                 output_2_file_path, port_select=2))
+
+        # Check reference outputs have been written to file
+        reference_1_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output_1.reference")
+        self.assertTrue(reference_1_file_path.exists())
+        with open(reference_1_file_path, "rb") as reference_1_file:
+            self.assertGreater(len(reference_1_file.read()), 0)
+        reference_2_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output_2.reference")
+        self.assertTrue(reference_2_file_path.exists())
+        with open(reference_2_file_path, "rb") as reference_2_file:
+            self.assertGreater(len(reference_2_file.read()), 0)
+
+    def test_multiple_outputs_different_comparison_methods(self):
+        # Create input data files
+        input_1_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("gen").joinpath("inputs").joinpath(
+            "input_1.port")
+        with ocpi_protocols.WriteMessagesFile(
+                input_1_file_path, "short_timed_sample") as input_1_data_file:
+            input_1_data_file.write_message("discontinuity", None)
+            input_1_data_file.write_message("time", 1.23)
+            input_1_data_file.write_message("sample", [10, 11, 12])
+        input_2_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("gen").joinpath("inputs").joinpath(
+            "input_2.port")
+        with ocpi_protocols.WriteMessagesFile(
+                input_2_file_path, "short_timed_sample") as input_2_data_file:
+            input_2_data_file.write_message("flush", None)
+            input_2_data_file.write_message("sample_interval", 0.1)
+            input_2_data_file.write_message("sample", [100, 200, 300])
+
+        # Create output data files, make the output 2 data pass a bounded
+        # comparison but not equal comparison test
+        output_1_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output_1.out")
+        with ocpi_protocols.WriteMessagesFile(
+                output_1_file_path,
+                "short_timed_sample") as output_1_data_file:
+            output_1_data_file.write_message("discontinuity", None)
+            output_1_data_file.write_message("time", 1.23)
+            output_1_data_file.write_message("sample", [10, 11, 12])
+        output_2_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output_2.out")
+        with ocpi_protocols.WriteMessagesFile(
+                output_2_file_path,
+                "short_timed_sample") as output_2_data_file:
+            output_2_data_file.write_message("flush", None)
+            output_2_data_file.write_message("sample_interval", 0.1)
+            output_2_data_file.write_message("sample", [100, 204, 301])
+
+        implementation = MultiOutputPortImplementation()
+        test_verifier = ocpi_testing.Verifier(implementation)
+        test_verifier.set_port_types(
+            ["short_timed_sample", "short_timed_sample"],
+            ["short_timed_sample", "short_timed_sample"],
+            ["equal", "bounded"])
+        test_verifier.comparison[1].BOUND = 5
+
+        self.assertTrue(
+            test_verifier.verify("case00.01",
+                                 [input_1_file_path, input_2_file_path],
+                                 output_1_file_path, port_select=1))
+        self.assertTrue(
+            test_verifier.verify("case00.01",
+                                 [input_1_file_path, input_2_file_path],
+                                 output_2_file_path, port_select=2))
+
+        # Check reference outputs have been written to file
+        reference_1_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output_1.reference")
+        self.assertTrue(reference_1_file_path.exists())
+        with open(reference_1_file_path, "rb") as reference_1_file:
+            self.assertGreater(len(reference_1_file.read()), 0)
+        reference_2_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output_2.reference")
+        self.assertTrue(reference_2_file_path.exists())
+        with open(reference_2_file_path, "rb") as reference_2_file:
+            self.assertGreater(len(reference_2_file.read()), 0)
+
+    def test_multiple_outputs_verify_invalid_port(self):
+        # Test behaviour for multiple port verification when the port to be
+        # verified does not exist
+
+        # Create input data files
+        input_1_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("gen").joinpath("inputs").joinpath(
+            "input_1.port")
+        with ocpi_protocols.WriteMessagesFile(
+                input_1_file_path, "short_timed_sample") as input_1_data_file:
+            input_1_data_file.write_message("discontinuity", None)
+            input_1_data_file.write_message("time", 1.23)
+            input_1_data_file.write_message("sample", [10, 11, 12])
+        input_2_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("gen").joinpath("inputs").joinpath(
+            "input_2.port")
+        with ocpi_protocols.WriteMessagesFile(
+                input_2_file_path, "short_timed_sample") as input_2_data_file:
+            input_2_data_file.write_message("flush", None)
+            input_2_data_file.write_message("sample_interval", 0.1)
+            input_2_data_file.write_message("sample", [100, 200, 300])
+
+        # Create output data files
+        output_1_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output_1.out")
+        with ocpi_protocols.WriteMessagesFile(
+                output_1_file_path,
+                "short_timed_sample") as output_1_data_file:
+            output_1_data_file.write_message("discontinuity", None)
+            output_1_data_file.write_message("time", 1.23)
+            output_1_data_file.write_message("sample", [10, 20, 30])
+        output_2_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output_2.out")
+        with ocpi_protocols.WriteMessagesFile(
+                output_2_file_path,
+                "short_timed_sample") as output_2_data_file:
+            output_2_data_file.write_message("flush", None)
+            output_2_data_file.write_message("sample_interval", 0.1)
+            output_2_data_file.write_message("sample", [100, 200, 300])
+
+        implementation = MultiOutputPortImplementation()
+        test_verifier = ocpi_testing.Verifier(implementation)
+        test_verifier.set_port_types(
+            ["short_timed_sample", "short_timed_sample"],
+            ["short_timed_sample", "short_timed_sample"],
+            ["equal", "equal"])
+
+        with self.assertRaises(ValueError):
+            test_verifier.verify("case00.01",
+                                 [input_1_file_path, input_2_file_path],
+                                 [output_1_file_path, output_2_file_path],
+                                 port_select=3)
+
+    def test_set_port_types_incorrect_number_inputs(self):
+        implementation = MultiOutputPortImplementation()
+        test_verifier = ocpi_testing.Verifier(implementation)
+
+        with self.assertRaises(ValueError):
+            test_verifier.set_port_types(
+                ["short_timed_sample"],
+                ["short_timed_sample", "short_timed_sample"],
+                ["equal", "equal"])
+
+    def test_set_port_types_incorrect_number_outputs(self):
+        implementation = MultiOutputPortImplementation()
+        test_verifier = ocpi_testing.Verifier(implementation)
+
+        with self.assertRaises(ValueError):
+            test_verifier.set_port_types(
+                ["short_timed_sample", "short_timed_sample"],
+                ["short_timed_sample"],
+                ["equal", "equal"])
+
+    def test_set_port_types_not_called(self):
+        # Create input data file
+        input_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("gen").joinpath("inputs").joinpath(
+            "test.port")
+        with ocpi_protocols.WriteMessagesFile(
+                input_file_path, "short_timed_sample") as input_data_file:
+            input_data_file.write_message("discontinuity", None)
+            input_data_file.write_message("time", 1.23)
+            input_data_file.write_message("sample", [10, 11, 12])
+
+        # Create output data file
+        output_file_path = self._test_directory_base.joinpath(
+            "a_project").joinpath("components").joinpath("dsp").joinpath(
+            "a_component.test").joinpath("run").joinpath(
+            "test_platform").joinpath(
+            "case00.01.a_component.worker_type.output.out")
+        with ocpi_protocols.WriteMessagesFile(
+                output_file_path, "short_timed_sample") as output_data_file:
+            output_data_file.write_message("discontinuity", None)
+            output_data_file.write_message("time", 1.23)
+            output_data_file.write_message("sample", [10, 11, 12])
+
+        implementation = SingleOutputPortImplementation()
+        test_verifier = ocpi_testing.Verifier(implementation)
+
+        with self.assertRaises(RuntimeError):
+            test_verifier.verify("case00.01", [input_file_path],
+                                 [output_file_path])

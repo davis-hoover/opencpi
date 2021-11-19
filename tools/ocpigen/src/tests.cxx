@@ -26,10 +26,10 @@
 #include <limits>
 #include <algorithm>
 #include <unordered_set>
-#include "OcpiOsDebugApi.hh"
+#include "OcpiDebugApi.hh"
 #include "OsFileSystem.hh"
-#include "OcpiUtilMisc.h"
-#include "OcpiUtilEzxml.h"
+#include "UtilMisc.hh"
+#include "UtilEzxml.hh"
 #include "OcpiLibraryManager.h"
 #include "wip.h"
 #include "data.h"
@@ -625,8 +625,8 @@ namespace {
         return "delayed property settings are not allowed for test properties";
       // We are preparsing these delays to produce earlier errors, otherwise we could just
       // save the XML and attach it to the generated apps
-      OU::ValueType vt(OA::OCPI_Double);
-      OU::Value v(vt);
+      OB::ValueType vt(OA::OCPI_Double);
+      OB::Value v(vt);
       const char
         *delay = ezxml_cattr(sx, "delay"),
         *value = ezxml_cattr(sx, "value");
@@ -1921,7 +1921,7 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
           goto next;
       if (!gp.m_valuesType) {
         gp.m_valuesType = &p.m_param->sequenceType();
-        gp.m_valuesType->m_default = new OU::Value(*gp.m_valuesType);
+        gp.m_valuesType->m_default = new OB::Value(*gp.m_valuesType);
       }
       gp.m_valuesType->m_default->parse(p.m_uValue.c_str(), NULL, gp.m_uValues.size() != 0);
       gp.m_uValues.push_back(p.m_uValue);
@@ -2149,7 +2149,22 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
   bool first = true;
   doProp(globals, out, 0, 0, first);
 #endif
-  // ================= 11. Generate HDL assemblies in gen/assemblies
+  // ================= 11. Generate subcases for each case
+  if (verbose)
+    fprintf(out,
+          "\n"
+          "Descriptions of the %zu case%s and %s subcases:\n"
+          "==============================================\n",
+          cases.size(), cases.size() > 1 ? "s" : "", cases.size() > 1 ? "their" : "its");
+  for (unsigned n = 0; n < cases.size(); n++) {
+    cases[n]->m_subCases.push_back(new ParamConfig(cases[n]->m_settings)); 
+    cases[n]->doProp(0); 
+    if ((err = cases[n]->pruneSubCases())) // or here 
+      return err;
+    cases[n]->print(out);
+  }
+  fclose(out);
+  // ================= 12. Generate HDL assemblies in gen/assemblies
   if (verbose)
     fprintf(stderr, "Generating required HDL assemblies in gen/assemblies\n");
   bool hdlFileIO;
@@ -2170,38 +2185,61 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
         ParamConfig &pc = *w.m_paramConfigs[c];
         // Make sure the configuration is in the test matrix (e.g. globals)
         std::unordered_set <uint32_t> case_match;
+        std::unordered_set <uint32_t> subcase_match;
         for (unsigned j = 0; j < cases.size(); j++) {
           bool allOk = true;
-          for (unsigned q = 0; q < cases[j]->m_settings.params.size(); q++) {
+          for (unsigned mm = 0; mm < cases[j]->m_subCases.size(); mm++) {
+            std::unordered_set <uint32_t> subcase_invalid;
+            unsigned sIsOk = 0;
+            unsigned ms = 0;
             for (unsigned n = 0; n < pc.params.size(); n++) {
               Param &p = pc.params[n];
-              Param &cp = cases[j]->m_settings.params[q];
-              if ((p.m_name == cp.m_name) && p.m_param) {
-                bool gIsOk = false;
-                bool cIsOk = false;
-                for (unsigned nn = 0; nn < globals.params.size(); nn++) { // check if this is in the global matrix (is this still necessary?)
-                  Param &gp = globals.params[nn];
-                  if (gp.m_param && !strcasecmp(p.m_param->cname(), gp.m_param->cname()))
-                    for (unsigned v = 0; v < gp.m_uValues.size(); v++)
-                      if (p.m_uValue == gp.m_uValues[v]) {
-                        gIsOk = true;
-                        break;                     
-                      }
-                }
-                if (!gIsOk)
-                  goto NO_MATCH; // if not in globals
-                if (p.m_uValue == cp.m_uValue)
-                  cIsOk = true;
-                if (!cIsOk) {
-                  allOk = false;
-                  goto NO_MATCH;
+              for (unsigned nn = 0; nn < cases[j]->m_subCases[mm]->params.size(); nn++) {
+                Param &sp = cases[j]->m_subCases[mm]->params[nn];
+                if (p.m_name == sp.m_name) {
+                  ms++;
+                  if (p.m_uValue == sp.m_uValue) {
+                    sIsOk++;
+                    break;
+                  }
+                  else {
+                    subcase_invalid.insert(nn);
+                    break;
+                  }
                 }
               }
+              for (unsigned q = 0; q < cases[j]->m_settings.params.size(); q++) {
+                Param &cp = cases[j]->m_settings.params[q];
+                if ((p.m_name == cp.m_name) && p.m_param) {
+                  bool gIsOk = false;
+                  bool cIsOk = false;
+                  for (unsigned nn = 0; nn < globals.params.size(); nn++) { // check if this is in the global matrix (is this still necessary?)
+                    Param &gp = globals.params[nn];
+                    if (gp.m_param && !strcasecmp(p.m_param->cname(), gp.m_param->cname()))
+                      for (unsigned v = 0; v < gp.m_uValues.size(); v++)
+                        if (p.m_uValue == gp.m_uValues[v]) {
+                          gIsOk = true;
+                          break;
+                        }
+                  }
+                  if (!gIsOk)
+                    goto NO_MATCH;
+                  if (p.m_uValue == cp.m_uValue) {
+                    cIsOk = true;
+                  }
+                  if (!cIsOk) {
+                    allOk = false;
+                    goto NO_MATCH;
+                  }
+                }
+              }
+              if (allOk)
+                case_match.insert(c);
+              NO_MATCH:continue;   
             }
+            if (subcase_invalid.empty())
+              subcase_match.insert(c);
           }
-          if (allOk)
-            case_match.insert(j);
-          NO_MATCH:continue;
         }
         if (!seenHDL) {
           OS::FileSystem::mkdir(assemblies, true);
@@ -2233,7 +2271,7 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
             unconnected += "ports_unconnected_";
           else if (ucp == 1)
             unconnected += "port_unconnected_";
-          if (case_match.find(n) != case_match.end())
+          if (subcase_match.find(c) != subcase_match.end())
             if (bitmap_processed.insert(bitmask).second) {
               if ((err = generateHdlAssemblies(w, c, dir + unconnected + temp.str(),
               name + unconnected + temp.str(), false, assyDirs, cases[n]->m_ports)))
@@ -2254,20 +2292,7 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
         (err = remove(assemblies + "/" + iter.relativeName())))
       return err;
 
-  // ================= 12. Generate subcases for each case, and generate outputs per subcase
-  fprintf(out,
-          "\n"
-          "Descriptions of the %zu case%s and %s subcases:\n"
-          "==============================================\n",
-          cases.size(), cases.size() > 1 ? "s" : "", cases.size() > 1 ? "their" : "its");
-  for (unsigned n = 0; n < cases.size(); n++) {
-    cases[n]->m_subCases.push_back(new ParamConfig(cases[n]->m_settings));
-    cases[n]->doProp(0);
-    if ((err = cases[n]->pruneSubCases()))
-      return err;
-    cases[n]->print(out);
-  }
-  fclose(out);
+  // ================= 13. Generate outputs per subcase
   if (verbose)
     fprintf(stderr, "Generating required input and property value files in gen/inputs/ and "
             "gen/properties/\n");

@@ -23,16 +23,16 @@
 
 #include "ContainerWorker.h"
 #include "HdlOCCP.h"
-#include "XferAccess.h"
+#include "XferAccess.hh"
 
 namespace OCPI {
   namespace HDL {
 
     // The class that knows about WCI interfaces and the OCCP.
     class Device;
-    typedef DataTransfer::Access Access;
-    typedef DataTransfer::Accessor Accessor;
-    typedef DataTransfer::RegisterOffset RegisterOffset;
+    typedef OCPI::Xfer::Access Access;
+    typedef OCPI::Xfer::Accessor Accessor;
+    typedef OCPI::Xfer::RegisterOffset RegisterOffset;
     class WciControl : public Access, virtual public OCPI::Container::Controllable,
       virtual public OCPI::API::PropertyAccess, virtual OCPI::Container::WorkerControl {
       friend class Port;
@@ -167,7 +167,7 @@ namespace OCPI {
 
 #define OCPI_DATA_TYPE(sca,corba,letter,bits,run,pretty,store)		\
       void								\
-      set##pretty##Property(const OCPI::API::PropertyInfo &info, const Util::Member &, \
+      set##pretty##Property(const OCPI::API::PropertyInfo &info, const OCPI::Base::Member &, \
 			    size_t off, const run val, unsigned idx) const { \
 	setProperty##bits(info, off, *(uint##bits##_t *)&val, idx);	\
       }									\
@@ -179,7 +179,7 @@ namespace OCPI {
 			    length, length * (bits/8));			\
       }									\
       run								\
-      get##pretty##Property(const OCPI::API::PropertyInfo &info, const Util::Member &, \
+      get##pretty##Property(const OCPI::API::PropertyInfo &info, const OCPI::Base::Member &, \
 			    size_t offset, unsigned idx) const {	\
 	return (run)getProperty##bits(info, offset, idx);		\
       }									\
@@ -192,11 +192,11 @@ namespace OCPI {
 #define OCPI_DATA_TYPE_S(sca,corba,letter,bits,run,pretty,store)
 OCPI_DATA_TYPES
 #undef OCPI_DATA_TYPE
-      void setStringProperty(const OCPI::API::PropertyInfo &info, const Util::Member &,
+      void setStringProperty(const OCPI::API::PropertyInfo &info, const OCPI::Base::Member &,
 			     size_t offset, const char* val, unsigned idx) const;
       void setStringSequenceProperty(const OCPI::API::PropertyInfo &, const char * const *,
 				     size_t ) const;
-      void getStringProperty(const OCPI::API::PropertyInfo &info, const Util::Member &,
+      void getStringProperty(const OCPI::API::PropertyInfo &info, const OCPI::Base::Member &,
 			     size_t offset, char *val, size_t length, unsigned idx) const;
       unsigned getStringSequenceProperty(const OCPI::API::PropertyInfo &, char * *,
 					 size_t ,char*, size_t) const;
@@ -219,12 +219,12 @@ OCPI_DATA_TYPES
       prepareProperty(OCPI::Metadata::Property &, volatile uint8_t *&, const volatile uint8_t *&) 
 	const;
       OCPI::Container::Port &
-      createPort(const OCPI::Metadata::Port &, const OCPI::Util::PValue *);
+      createPort(const OCPI::Metadata::Port &, const OCPI::Base::PValue *);
       OCPI::Container::Port &
-      createOutputPort(OCPI::Metadata::PortOrdinal, size_t, size_t, const OCPI::Util::PValue*)
+      createOutputPort(OCPI::Metadata::PortOrdinal, size_t, size_t, const OCPI::Base::PValue*)
         throw (OCPI::Util::EmbeddedException);
       OCPI::Container::Port &
-      createInputPort(OCPI::Metadata::PortOrdinal, size_t, size_t, const OCPI::Util::PValue*)
+      createInputPort(OCPI::Metadata::PortOrdinal, size_t, size_t, const OCPI::Base::PValue*)
         throw (OCPI::Util::EmbeddedException);
       OCPI::Container::Application *application();
       OCPI::Container::Worker *nextWorker();
