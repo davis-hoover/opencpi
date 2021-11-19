@@ -119,6 +119,7 @@ class BooleanGenerator(base_generator.BaseGenerator):
         Returns:
             Messages for the typical case and the stated subcase.
         """
+        random.seed(seed)
         return [{"opcode": "sample", "data": self._get_sample_values()}]
 
     def _full_scale_random_sample_values(self, number_of_samples=None):

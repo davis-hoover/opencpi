@@ -318,7 +318,7 @@ class ParseMessagesFile:
     a class instance to interact with the data.
     """
 
-    def __init__(self, file_path, protocol):
+    def __init__(self, file_path, protocol, number_of_messages=None):
         """ Initialised a ParseMessagesFile instance
 
         Args:
@@ -327,14 +327,18 @@ class ParseMessagesFile:
                 the protocol used for the file write was one of the timed
                 sample protocols.
             protocol (str): Name of the protocol this file relates to.
+            number_of_messages (``int``, optional): If not set, or set to
+                ``None`` (default), will parse the whole file. Otherwise the
+                file is truncated in size to contain up to this many messages.
 
         Returns:
             Initialised ``ParseMessagesFile`` instance.
         """
         self._file_path = file_path
         self._protocol_type = protocol
+        self._number_of_messages = number_of_messages
 
-        self._file = open(file_path, "rb")
+        self._file = open(file_path, "rb+")
         self._file.seek(0)
         self._protocol = OcpiProtocols(protocol)
 
@@ -343,13 +347,21 @@ class ParseMessagesFile:
         self.headers = []
 
         # Import the headers
-        raw_header = self._file.read(HEADER_LENGTH)
+        if self._number_of_messages == 0:
+            raw_header = b"";
+        else:
+            raw_header = self._file.read(HEADER_LENGTH)
+
         while raw_header != b"":
             (data_size, opcode_value) = struct.unpack("<IBxxx", raw_header)
             opcode_name = OPCODES[opcode_value]
             self.headers.append({"opcode": opcode_name, "size": data_size})
             # Move past the data body
             self._file.seek(data_size, 1)
+            if self._number_of_messages is not None:
+                # Limit number of messages in file
+                if len(self.headers) >= self._number_of_messages:
+                    self._file.truncate()
             raw_header = self._file.read(HEADER_LENGTH)
 
         #: Access the raw data (as the bytes are saved in the file) of the

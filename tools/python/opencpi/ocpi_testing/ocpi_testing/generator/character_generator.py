@@ -207,7 +207,7 @@ class CharacterGenerator(base_generator.BaseGenerator):
         else:
             raise ValueError(f"Unexpected subcase of {subcase} for sample()")
 
-    def _sample_other_port(self, seed, subcase):
+    def sample_other_port(self, seed, subcase):
         """ Messages when testing another port's handling of sample messages
 
         In all subcases generate some random data for the port.
@@ -222,6 +222,7 @@ class CharacterGenerator(base_generator.BaseGenerator):
         Returns:
             Messages for the typical case and the stated subcase.
         """
+        random.seed(seed)
         return [{"opcode": "sample", "data": self._get_sample_values()}]
 
     def _full_scale_random_sample_values(self, number_of_samples=None):
