@@ -499,7 +499,8 @@ def gen_release_index(tag: str, is_latest=False):
         if fname in [
             "opencpi installation", "opencpi user", "opencpi application development",
             "opencpi component development",
-            "opencpi rcc development", "opencpi hdl development", "opencpi platform development"
+            "opencpi rcc development", "opencpi hdl development", "opencpi platform development",
+            "opencpi gui user"
         ]:
             return file_name + " Guide"
         elif fname.endswith("getting started"):
