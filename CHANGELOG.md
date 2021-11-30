@@ -1,3 +1,18 @@
+# [v2.3.3](https://gitlab.com/opencpi/opencpi/-/compare/v2.3.2...v2.3.3) (2021-11-30)
+
+Changes/additions since [OpenCPI Release v2.3.2](https://gitlab.com/opencpi/opencpi/-/releases/v2.3.2)
+
+### Enhancements
+- **tools**: add `ie-gui/doc` to document processing scripts. (!763)(7946be52)
+
+### Bug Fixes
+- **tests**: fix to `ocpi_testing` and `ocpi_protocols` for ocpi.comp.sdr unit tests. (!760)(28e30a6d)
+- **tools**: genDocumentation.sh: skip non-existent directories in default search path. (!765)(396a781d)
+- **tools**: build-pages.py: don't try to patch non-existent man page source docs. (!768)(6eff2030)
+
+### Miscellaneous
+- **doc**: delete user guide for Eclipse-based GUI. (!764)(30795061)
+
 # [v2.3.2](https://gitlab.com/opencpi/opencpi/-/compare/v2.3.1...v2.3.2) (2021-11-08)
 
 Changes/additions since [OpenCPI Release v2.3.1](https://gitlab.com/opencpi/opencpi/-/releases/v2.3.1)
