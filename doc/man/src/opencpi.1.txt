@@ -20,9 +20,6 @@ These tools include:
 link:ocpiadmin.1.html[ocpiadmin(1)]::
     Command-line tool for managing an OpenCPI installation
 
-link:ocpiav.1.html[ocpiav(1)]::
-    Eclipse-based graphical user interface for managing OpenCPI assets    
-
 link:ocpidev.1.html[ocpidev(1)]::
     Command-line tool for managing OpenCPI assets
 
@@ -33,6 +30,9 @@ link:ocpidriver.1.html[ocpidriver(1)]::
 link:ocpigr.1.html[ocpigr(1)]::
     Command-line tool for creating GNU Radio Companion (GRC) block files
     from OpenCPI artifacts
+
+link:ocpigui.1.html[ocpigui(1)]::
+    Graphical user interface for managing OpenCPI assets    
 
 link:ocpihdl.1.html[ocpihdl(1)]::
     Command-line tool for performing HDL development tasks
@@ -230,10 +230,10 @@ See https://www.opencpi.org/report-defects
 SEE ALSO
 --------
 link:ocpiadmin.1.html[ocpiadmin(1)]
-link:ocpiav.1.html[ocpiav(1)]
 link:ocpidev.1.html[ocpidev(1)]
 link:ocpidriver.1.html[ocpidriver(1)]
 link:ocpigr.1.html[ocpigr(1)]
+link:ocpigui.1.html[ocpigui(1)]
 link:ocpihdl.1.html[ocpihdl(1)]
 link:ocpiremote.1.html[ocpiremote(1)]
 link:ocpirun.1.html[ocpirun(1)]
