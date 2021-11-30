@@ -2701,7 +2701,7 @@
     <text:sequence-decl text:display-outline-level="0" text:name="Figure"/>
     <text:sequence-decl text:display-outline-level="0" text:name="Diagram"/>
    </text:sequence-decls>
-   <text:p text:style-name="ReleaseSubtitle">OpenCPI Release:  v2.3.2</text:p>
+   <text:p text:style-name="ReleaseSubtitle">OpenCPI Release:  v2.3.3</text:p>
   </office:text>
  </office:body>
 </office:document>
