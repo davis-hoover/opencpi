@@ -40,7 +40,7 @@ function framework_test {
 # 1. Framework tests that do not deal with projects at all.
 # 2. Tests that might test project tools, but not using the builtin projects
 # 3. Tests using the built-in projects
-minimal_tests="driver os datatype load-drivers container"
+minimal_tests="driver os datatype load-plugins container"
 network_tests="assets"
 dev_tests="swig python project ocpidev core inactive"
 alltests="$minimal_tests $network_tests $dev_tests"
@@ -183,9 +183,9 @@ for t in $tests; do
       echo ======================= Running ocpidev_test tests
       (framework_test ocpidev_test && rm -r -f test_project &&
          HDL_PLATFORM=$hplats ./test-ocpidev.sh);;
-    load-drivers)
-      echo ======================= Loading all the OpenCPI plugins/drivers.
-      $bin/cxxtests/load-drivers x;;
+    load-plugins)
+      echo ======================= Loading all the OpenCPI plugins.
+      $bin/cxxtests/load-plugins x;;
     driver)
       if [ ! -e $OCPI_CDK_DIR/scripts/ocpi_${OCPI_TOOL_OS}_driver ]; then
         echo ======================= Skipping loading the OpenCPI kernel driver:  not supported.

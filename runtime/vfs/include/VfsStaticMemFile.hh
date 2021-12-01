@@ -98,7 +98,7 @@ namespace OCPI {
          */
 
         StaticMemFile (const char * ptr,
-                       unsigned long long size,
+                       size_t size,
                        std::time_t lastModified = (std::time_t) -1);
 
         /**
@@ -124,7 +124,7 @@ namespace OCPI {
          * \return The size, in octets.
          */
 
-        unsigned long long size ();
+        size_t size ();
 
         /**
          * Last modification timestamp.
@@ -156,7 +156,7 @@ namespace OCPI {
         /** \cond */
 
       private:
-        unsigned long long m_size;
+        size_t m_size;
         std::time_t m_lastModified;
         const char * m_ptr; // either ...
         const OCPI::VFS::MemFs::MemFileChunk * m_chunks; // or

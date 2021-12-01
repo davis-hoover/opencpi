@@ -207,7 +207,7 @@ ex_data( HSDesc & ep1, HSDesc & ep2  )
   ssize_t l = read( socket_fd, &ep2.cookie, 8); 
   printf("Read %zd bytes, expected %d\n", l , 8);
   l = read( socket_fd, &us, sizeof(uint32_t));    
-  ocpiAssert( l == sizeof(uint32_t));
+  ocpiAssert( (size_t)l == sizeof(uint32_t));
   l = read( socket_fd, buf, us);
   printf("READ (%s) from socket\n", buf );
   ocpiAssert( l > 0 );
@@ -239,7 +239,7 @@ public:
   std::string endpoint;
   int  endpoint_index;
   std::string server;
-  int iters;
+  unsigned iters;
   bool show_drivers;
   std::string xml_config;
 private:
@@ -369,8 +369,8 @@ public:
   void createBufferXferLists()
   {
     // Here for completness we will create a transfer for each of our buffers to each of the other sides buffers
-    for ( int n=0; n<BUFFER_COUNT; n++ ) {
-      for ( int y=0; y<BUFFER_COUNT; y++ ) {
+    for ( unsigned n=0; n<BUFFER_COUNT; n++ ) {
+      for ( unsigned y=0; y<BUFFER_COUNT; y++ ) {
 	size_t s_ff_off = offsetof( struct MemLayout, buffers[0].full_flag ) + sizeof( TestMemLayout ) * n;
 	size_t s_data_off = offsetof( struct MemLayout, buffers[0].data ) + sizeof( TestMemLayout ) * n;
 	size_t s_nbytes_off = offsetof( struct MemLayout, buffers[0].nbytes ) + sizeof( TestMemLayout ) * n;
@@ -435,13 +435,14 @@ public:
     return  m_Rxmem->buffers[buffer_id].nbytes;
   }
 
+#if 0
   int32_t checkForMsg( int buffer_id ) {
     if ( m_Rxmem->buffers[buffer_id].full_flag != 0 ) {
       return  m_Rxmem->buffers[buffer_id].nbytes;
     }
     return -1;
   }
-
+#endif
   const std::string & endpoint()
   {
     return m_endpoint->name();
@@ -499,7 +500,7 @@ public:
     for (;;) {
 
       printf("*****  About to wait for message\n");
-      int c = waitForMsg( 0 );
+      unsigned c = waitForMsg( 0 );
       printf("Got a  message\n");
 
       if (  c == 0 ) {
@@ -539,11 +540,11 @@ public:
     
     
     // Create the transfer that sends our URL
-    int con_off = offsetof( struct ConnectMemLayout, connected );
-    int url_off = offsetof( struct ConnectMemLayout, url );
+    XF::Offset con_off = offsetof( struct ConnectMemLayout, connected );
+    XF::Offset url_off = offsetof( struct ConnectMemLayout, url );
 
     // We will use our scratch as a staging area
-    int s_start_off = offsetof( struct MemLayout, scratch );
+    XF::Offset s_start_off = offsetof( struct MemLayout, scratch );
 
     // Now create the request to send the server our url so it can talk back to us
     XF::XferRequest * server_init_req = m_xferServices->createXferRequest();
@@ -631,7 +632,7 @@ int main( int argc, char** argv )
       printf("Invalid --pe argument, maximum value is %d\n", (int)protolist.size() );
       exit(-1);
     }
-    std::string p = protolist[config.protocol_index];
+    std::string p = protolist[(unsigned)config.protocol_index];
     
     printf("Selected protocol = %s\n", p.c_str() );
 
@@ -752,15 +753,15 @@ int main( int argc, char** argv )
       uint8_t * out_data = (uint8_t*)client.getMsgBuffer(2, true);
       uint8_t * in_data = (uint8_t*)client.getMsgBuffer(0, false);
 
-      for ( int n=0; n<config.iters; n++ ) {
+      for ( unsigned n=0; n<config.iters; n++ ) {
 
-	for ( int y=1; y<BUFFER_SIZE; y++ ) {
+	for ( unsigned y=1; y<BUFFER_SIZE; y++ ) {
 	  count++;
 
 	  // Clear the data available flag
 	  client.consume(0);
 
-	  int z;
+	  unsigned z;
 	  for ( z=0; z<y; z++ ) {
 	    out_data[z] = (uint8_t)((z + y + 11)%256);
 	  }
@@ -775,7 +776,7 @@ int main( int argc, char** argv )
 
 	  //	  OCPI::OS::sleep( 1000 );
 
-	  int c = client.waitForMsg(0);
+	  unsigned c = client.waitForMsg(0);
 
 	  if ( c != y ) {
 	    printf("Error: B(%d) Expected %d bytes from server, got %d bytes back\n", count,y, c);

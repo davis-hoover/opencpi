@@ -137,9 +137,9 @@ namespace PIO {
       if (fRet == 0)
 	{
 #ifdef REAL_SHM
-	  iRet = mmap (NULL, lLength, iProtect, MAP_SHARED, m_fd, iOffset);
+	  iRet = mmap(NULL, lLength, iProtect, MAP_SHARED, m_fd, (off_t)iOffset);
 #else
-          iRet = mmap (NULL, lLength, iProtect, MAP_PRIVATE|MAP_ANON, -1, iOffset);
+          iRet = mmap(NULL, lLength, iProtect, MAP_PRIVATE|MAP_ANON, -1, (off_t)iOffset);
 #endif
 	  ocpiDebug("mmap on %d at offset %u length %zu returns %p errno %d",
 		    m_fd, iOffset, lLength, iRet, errno);

@@ -371,9 +371,8 @@ public:
         }
       }
     }
-    for (unsigned n=0; n<time.size(); n++ ) {
-      replaceTokens( time[n], val_defs );
-    }
+    for (unsigned n = 0; n < time.size(); n++)
+      replaceTokens(time[n], val_defs);
 
     if ( header.empty() ||
          val_defs.empty() ||

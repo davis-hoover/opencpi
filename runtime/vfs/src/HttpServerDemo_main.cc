@@ -30,6 +30,8 @@
 #include <cstdlib>
 
 namespace OV = OCPI::VFS;
+namespace OU = OCPI::Util;
+namespace OL = OCPI::Logger;
 int
 main (int argc, char *argv[])
 {
@@ -45,10 +47,10 @@ main (int argc, char *argv[])
   }
 
   try {
-    OCPI::Logger::OStreamOutput logger (std::cout);
+    OL::OStreamOutput logger (std::cout);
     OV::FileFs localFs;
-    OCPI::VFS::Http::Server server (&localFs, &logger);
-    OCPI::Util::Tcp::Server serverPort (portNo, true);
+    OV::Http::Server server (&localFs, &logger);
+    OU::Tcp::Server serverPort (portNo, true);
 
     OCPI::Logger::debug ("All", 42);
 
@@ -57,7 +59,7 @@ main (int argc, char *argv[])
               << "."
               << std::endl;
 
-    OCPI::Util::Tcp::Stream * stream;
+    OU::Tcp::Stream * stream;
 
     while ((stream = serverPort.accept())) {
       server.resetConn (stream, stream);

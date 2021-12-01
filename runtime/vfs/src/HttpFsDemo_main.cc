@@ -36,9 +36,9 @@ main (int argc, char *argv[])
     return 1;
   }
 
-  OCPI::VFS::FileFs localFs;
-  OCPI::VFS::Http::HttpFs<OCPI::Util::Tcp::Connector> remoteFs;
-  OCPI::VFS::UriFs ufs;
+  OV::FileFs localFs;
+  OV::Http::HttpFs<OCPI::Util::Tcp::Connector> remoteFs;
+  OV::UriFs ufs;
 
   ufs.mount (&localFs);
   ufs.mount (&remoteFs);

@@ -57,7 +57,8 @@ ifneq ($(filter speclinks workersfile,$(MAKECMDGOALS)),)
 workersfile:
 	$(AT): # nothing - just suppress message
 speclinks:
-	$(AT)mkdir -p $(OutDir)lib;$(foreach f,$(wildcard specs/*.xml),$(call MakeSymLink,$f,lib);)
+	$(AT)mkdir -p $(OutDir)lib
+	$(AT)$(foreach f,$(wildcard specs/*.xml *.comp/*-spec.xml),$(call MakeSymLink,$f,lib);)
 else
 HdlInstallDir=lib
 include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk

@@ -387,8 +387,7 @@ consume(Buffer *buffer) {
 /**********************************
  * This method gets the next available buffer from the specified output port
  *********************************/
-Buffer *
-TransferController1AFCShadow::
+Buffer *TransferController1AFCShadow::
 getNextEmptyOutputBuffer(Port* src_port) {
   OutputBuffer* boi=NULL;
   OCPI::OS::uint32_t &n = src_port->getLastBufferTidProcessed();
