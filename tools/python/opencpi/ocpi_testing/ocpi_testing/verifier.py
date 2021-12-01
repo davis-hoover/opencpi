@@ -112,6 +112,22 @@ class Verifier:
                              + "output_port_protocols is "
                              + f"{len(output_port_protocols)}. Length of "
                              + f"comparisons is {len(comparisons)}.")
+        if len(input_port_protocols) != len(
+                self._reference_implementation.input_ports):
+            raise ValueError(
+                "Protocols not set for all input ports. " +
+                f"{len(input_port_protocols)} input port protocols set " +
+                "while reference implementation has " +
+                f"{len(self._reference_implementation.input_ports)} input " +
+                "ports")
+        if len(output_port_protocols) != len(
+                self._reference_implementation.output_ports):
+            raise ValueError(
+                "Protocols not set for all output ports. " +
+                f"{len(output_port_protocols)} output port protocols set " +
+                "while reference implementation has " +
+                f"{len(self._reference_implementation.output_ports)} output " +
+                "ports")
 
         self._input_port_protocols = input_port_protocols
         self._output_port_protocols = output_port_protocols
@@ -137,7 +153,8 @@ class Verifier:
 
         self._port_types_set = True
 
-    def verify(self, test_id, input_file_paths, test_output_file_paths):
+    def verify(self, test_id, input_file_paths, verify_output_file_path,
+               port_select=None):
         """ Determine if unit test passes
 
         Check if the implementation-under-test's output matches that of the
@@ -152,130 +169,132 @@ class Verifier:
                 ports. The order of input ports in this list should match the
                 expected input order of arguments for the implementation's
                 functions.
-            test_output_file_paths (list): List of file paths for the output
-                from each output port of the implementation-under-test. The
-                order of output ports order should match the order output port
-                values are given by the implementation's ``process_messages()``
-                function.
+            verify_output_file_path (str, list): File paths of the output to be
+                checked is correct. Can be a list of one element, to maintain
+                backwards compatibility.
+            port_select (str, int, optional): For multiple output components
+                this specifies which output port is to be verified, and only
+                this output is verified - so each output port should be
+                verified in turn. For single output port components this does
+                not need to be set.
 
         Returns:
             Boolean to indicate if the unit test passed (True) or failed
                 (False).
         """
-        test_case, test_subcase = id_to_case(test_id)
-        # Only record first comparison method as should only be one per verify
-        # script
-        self._test_log.record_comparison_method(
-            test_case, test_subcase, type(self.comparison[0]).__name__.lower(),
-            self.comparison[0].variable_summary())
+        if self._port_types_set is False:
+            raise RuntimeError("set_port_types() must be called and port " +
+                               "protocol types set before verify() is called.")
 
-        result, message = self.verify_without_save(input_file_paths,
-                                                   test_output_file_paths)
+        # To maintain backward compability this argument can be a list, however
+        # if is a list then must be a list of one element
+        if isinstance(verify_output_file_path, list):
+            if len(verify_output_file_path) != 1:
+                raise ValueError("verify_output_file_path can be a list for " +
+                                 "backward compability only. When used as a " +
+                                 "list must be a list of one element")
+            verify_output_file_path = verify_output_file_path[0]
+
+        if len(self._reference_implementation.output_ports) == 1:
+            port_index = 0
+        else:
+            if port_select is None:
+                raise ValueError("For multiple output components " +
+                                 "verify_output must be set as either the " +
+                                 "port number or name to be verified")
+            if isinstance(port_select, int):
+                # Less one as by the input argument definition port indexes are
+                # counted from 1
+                port_index = port_select - 1
+            else:
+                port_index = self._reference_implementation.output_ports.index(
+                    port_select)
+
+            if port_index >= len(self._reference_implementation.output_ports):
+                raise ValueError(
+                    f"Attempting to verify port {port_index} (from port " +
+                    f"select value {port_select}) however there are only " +
+                    f"{len(self._reference_implementation.output_ports)} " +
+                    "output ports")
+
+        implementation_file_path = pathlib.Path(verify_output_file_path)
+        reference_file_path = pathlib.Path(
+            verify_output_file_path).with_suffix(".reference")
+
+        test_case, test_subcase = id_to_case(test_id)
 
         # No runtime variables has the worker under test so use the output data
-        # file name
-        case_worker_port = pathlib.Path(
-            test_output_file_paths[0]).stem.split(".")
+        # file name, these values are used for test result reporting
+        case_worker_port = reference_file_path.stem.split(".")
         # Extract the worker and port number - indexing from the end as the
         # case name could be set by a variable and so risk this could change
         port = case_worker_port[-1]
         worker = f"{case_worker_port[-3]}.{case_worker_port[-2]}"
 
-        if result is True:
+        # To maintain compatibility with documentation generator, only one
+        # comparison method can be recorded - so record first one
+        self._test_log.record_comparison_method(
+            test_case, test_subcase, type(self.comparison[0]).__name__.lower(),
+            self.comparison[0].variable_summary())
+
+        try:
+            implementation_file_time = implementation_file_path.stat().st_mtime
+        except FileNotFoundError as exception_:
+            print("Test implementation file cannot be accessed. Check run " +
+                  "stage of test have completed and generated an output.")
+            raise exception_
+
+        # There are three cases when the reference should be generated:
+        #  1. No reference currently exists
+        #  2. The implementation-under-test is newer, so the reference may be
+        #     out-of-date / generated with a different input data set.
+        #  3. Any of the file that control the tests have been updated more
+        #     recently than a reference has been generated, which could include
+        #     the Python reference implementation being updated.
+        # Do as separate if / elif statements, as prevents stat() lookups on
+        # reference output file when does not exit, and more readable than when
+        # on if with "or" conditions.
+        if not reference_file_path.is_file():
+            self._generate_reference_output(
+                input_file_paths, implementation_file_path.parent, test_id,
+                worker)
+        elif reference_file_path.stat().st_mtime < implementation_file_time:
+            self._generate_reference_output(
+                input_file_paths, implementation_file_path.parent, test_id,
+                worker)
+        elif any([test_directory_file.stat().st_mtime >
+                  reference_file_path.stat().st_mtime for
+                  test_directory_file in
+                  reference_file_path.parent.parent.parent.glob("*.*")]):
+            self._generate_reference_output(
+                input_file_paths, implementation_file_path.parent, test_id,
+                worker)
+        reference_output = self._import_saved_messages(
+            reference_file_path, self._output_port_protocols[port_index])
+
+        try:
+            implementation_output = self._import_saved_messages(
+                implementation_file_path,
+                self._output_port_protocols[port_index])
+        except struct.error:
+            self.test_failed(worker, port, test_case, test_subcase,
+                             "Cannot import implementation-under-test " +
+                             "messages from file. Likely badly formatted " +
+                             "data outputted by implementation-under-test " +
+                             "and so badly formatted data written to file " +
+                             "during test run.")
+            return False
+
+        test_result, test_message = self.comparison[port_index].same(
+            reference_output, implementation_output)
+
+        if test_result is True:
             self.test_passed(worker, port, test_case, test_subcase)
             return True
         else:
-            self.test_failed(worker, port, test_case, test_subcase, message)
+            self.test_failed(worker, port, test_case,
+                             test_subcase, test_message)
             return False
-
-    def verify_without_save(self, input_file_paths, test_output_file_paths):
-        """ Determine if unit test passes
-
-        Check if the implementation-under-test's output matches that of the
-        output of the reference implementation, when given the same input data.
-
-        Does not save test result to test log or print user output.
-
-        Args:
-            input_file_paths (list): List of file paths for each of the input
-                ports. The order of input ports in this list should match the
-                expected input order of arguments for the implementation's
-                functions.
-            test_output_file_paths (list): List of file paths for the output
-                from each output port of the implementation-under-test. The
-                order of output ports order should match the order output port
-                values are given by the implementation's ``process_messages()``
-                function.
-
-        Returns:
-            Boolean to indicate if the unit test passed (True) or failed
-                (False). And string which is the failure reason, which will be
-                an empty string if test passes.
-        """
-        if self._port_types_set is False:
-            raise RuntimeError("set_port_types() must be called and port " +
-                               "protocol types set before verify() is called.")
-
-        # Get input test data
-        # While for single input it would be more efficient to only read one
-        # message at a time and pass to the implementation to get one output at
-        # a time; in the case of multiple ports this cannot be done - to allow
-        # the same code to be used in both cases the multiple port case is used
-        # for the single port case with a loss of efficiency.
-        test_input_data = []
-        for data_path, protocol in zip(input_file_paths,
-                                       self._input_port_protocols):
-            with ocpi_protocols.ParseMessagesFile(data_path, protocol) as \
-                    data_file:
-                test_input_data.append(data_file.get_all_messages())
-
-        reference_output = self._generate_reference_output(*test_input_data)
-
-        # Save the result of applying the Python reference implementation to
-        # the input data to file.
-        for port_name, port_protocol, port_data, output_path in zip(
-                self._reference_implementation.output_ports,
-                self._output_port_protocols,
-                reference_output,
-                test_output_file_paths):
-            save_path = pathlib.Path(output_path).with_suffix(".reference")
-            if port_name not in str(save_path):
-                raise ValueError("Reference output save path of " +
-                                 f"{str(save_path)} does not include port " +
-                                 f"{port_name}. No way to identify output " +
-                                 "for each port. Ensure " +
-                                 "test_output_file_paths are in same order " +
-                                 "as output_ports of implementation.")
-            with ocpi_protocols.WriteMessagesFile(
-                    save_path, port_protocol) as output_file:
-                output_file.write_dict_messages(port_data)
-
-        # If reading the implementation-under-test's output from file is
-        # failing, is likely when the implementation-under-test ran it did not
-        # write to file correctly. This will be because the data the
-        # implementation-under-test returned during its test run was not
-        # correctly formatted. Therefore, the test must fail.
-        try:
-            test_implementation_output = self._import_saved_messages(
-                test_output_file_paths, self._output_port_protocols)
-        except struct.error:
-            return False, (
-                "Cannot import implementation-under-test messages from " +
-                "file. Likely badly formatted data outputted by " +
-                "implementation-under-test and so badly formatted data " +
-                "written to file during test run.")
-
-        # For each output port run the comparison test
-        for index, (comparison, reference, implementation) in enumerate(
-                zip(self.comparison, reference_output,
-                    test_implementation_output)):
-            test_result, test_message = comparison.same(reference,
-                                                        implementation)
-            if test_result is False:
-                return False, f"For port {index}; {test_message}"
-
-        # All comparison checks pass
-        return True, ""
 
     def test_passed(self, worker, port, test_case, test_subcase):
         """ Report that test has passed
@@ -347,44 +366,55 @@ class Verifier:
             raise NotImplementedError("process_messages of reference " +
                                       "implementation is not callable")
 
-    def _generate_reference_output(self, *inputs):
-        """ Generate the reference output to validate test data against
+    def _generate_reference_output(self, inputs, save_directory, test_id, worker):
+        """ Generate and saves the reference output
 
         The reference output is generated by passing the input to the reference
         implementation.
 
         Args:
-            *inputs (lists): An input argument should be given for each input
-                port. All inputs must be a list of messages. All messages are
-                dictionaries which must have the keys "opcode" and "data".
-
-        Returns:
-            Tuple of the output messages. The tuple length will match the
-                number output ports. Each element of the tuple will contain a
-                list of the output messages.
+            inputs (lists): File path of the input for each input port.
+            save_directory (str): Directory to save the reference output(s) to.
+            test_id (str): Test ID, used for setting the file name the
+                reference output is saved to.
+            worker (str): Worker name, used for setting the file name the
+                reference output is saved to.
         """
-        self._reference_implementation.reset()
-        return self._reference_implementation.process_messages(*inputs)
+        input_data = []
+        for input_, protocol in zip(inputs, self._input_port_protocols):
+            input_data.append(self._import_saved_messages(input_, protocol))
 
-    def _import_saved_messages(self, import_files, file_protocols):
-        """ Read in messages from multiple files
+        self._reference_implementation.reset()
+        reference_output = self._reference_implementation.process_messages(
+            *input_data)
+
+        save_directory = pathlib.Path(save_directory)
+
+        for port_name, port_protocol, port_data in zip(
+                self._reference_implementation.output_ports,
+                self._output_port_protocols,
+                reference_output):
+            save_path = save_directory.joinpath(
+                f"{test_id}.{worker}.{port_name}.reference")
+            with ocpi_protocols.WriteMessagesFile(
+                    save_path, port_protocol) as output_file:
+                output_file.write_dict_messages(port_data)
+
+    def _import_saved_messages(self, file_path, protocol):
+        """ Read in messages from a file
 
         Args:
-            import_files (list): Each of the file to be read in.
-            file_protocols (list): List of the names of the protocols used for
-                each of the import files.
+            file_path (str): Path of the messages file to be read
+            protocol (str): Names of the protocols used for reading in
+                the file.
 
         Returns:
-            Tuple of all the imported message files, the order of elements in
-                tuple will match that of ``import_files``.
+            List of all the messages in a file.
         """
-        imported_data = []
-        for file_path, protocol in zip(import_files, file_protocols):
-            with ocpi_protocols.ParseMessagesFile(file_path, protocol) as \
-                    import_file:
-                imported_data.append(import_file.get_all_messages())
-
-        return tuple(imported_data)
+        with ocpi_protocols.ParseMessagesFile(file_path, protocol) as \
+                import_file:
+            messages = import_file.get_all_messages()
+        return messages
 
     def __repr__(self):
         """ Official string representation of object

@@ -33,6 +33,7 @@ from .unsigned_short_generator import UnsignedShortGenerator
 from .unsigned_long_generator import UnsignedLongGenerator
 from .float_generator import FloatGenerator
 from .double_generator import DoubleGenerator
+from .complex_character_generator import ComplexCharacterGenerator
 from .complex_short_generator import ComplexShortGenerator
 from .complex_long_generator import ComplexLongGenerator
 from .complex_float_generator import ComplexFloatGenerator

@@ -171,7 +171,6 @@ function office_kernel {
 #   MYLOC - The path of the directory that contains this script
 #   OUTPUT_PATH - The path where the PDFs are to be written
 #   REPO_PATH - The path where the opencpi repo is located
-#   OSPS - Array of the available osps (filtered)
 # Arguments:
 #   $1: If $1 is provided it means we want to use our own search path for
 #       dirs_to_search instead of the provided ones we use
@@ -186,22 +185,42 @@ function generate_pdfs {
 
   if [ -z "$search_path" ]; then
     echo "${BOLD}Building PDFs from '${REPO_PATH}' with results in '${OUTPUT_PATH}'${RESET}"
-    dirs_to_search+=("${REPO_PATH}/doc/briefings")
-    dirs_to_search+=("${REPO_PATH}/doc/av/tex")
-    dirs_to_search+=("${REPO_PATH}/doc/reference")
-    dirs_to_search+=("${REPO_PATH}/doc/tex")
-    dirs_to_search+=("${REPO_PATH}/doc/tutorials")
+    #
+    # Skip directories under "${REPO_PATH}/doc" that do not exist.
+    # The "tex" subdirectory went away when the old GUI user guide
+    # was deleted.
+    #
+    for d in "briefings" "av/tex" "reference" "tex" "tutorials"; do
+      if [ -e "${REPO_PATH}/doc/${d}" ]; then
+        dirs_to_search+=("${REPO_PATH}/doc/${d}")
+      fi
+    done
 
+    #
     # Loop over projects, skipping inactive
+    #
+    # FIXME: OTHERs (other projects) require special
+    # handling because they are not in the "projects"
+    # directory as OSPs and COMPs are.  Note that we
+    # we do not treat COMPs in a manner similar to OSPs,
+    # mostly because COMPs docs are in RST format only.
+    #
     mapfile -t < <(find "${REPO_PATH}/projects" \
-      -mindepth 1 -maxdepth 1 -type d)
+      -mindepth 1 -maxdepth 1 -type d ; \
+      echo "${REPO_PATH}/ie-gui")
     for proj in "${MAPFILE[@]}"; do
-      case "$(basename "${proj}")" in
-        inactive) continue ;;
-        *) ;;
-      esac
-      mapfile -t < <(find "${proj}" -type d \( -name doc -o -name docs \))
-      dirs_to_search+=("${MAPFILE[@]}")
+      #
+      # Must check for existence of project
+      # because of OTHERs being hard-coded.
+      #
+      if [ -e "${proj}" ]; then
+        case "$(basename "${proj}")" in
+          inactive) continue ;;
+          *) ;;
+        esac
+        mapfile -t < <(find "${proj}" -type d \( -name doc -o -name docs \))
+        dirs_to_search+=("${MAPFILE[@]}")
+      fi
     done
   else # given directories to search
     local tmp_array=("$search_path")

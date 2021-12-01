@@ -144,8 +144,10 @@ class TestUnsignedShortGenerator(unittest.TestCase):
         self.assertEqual(messages[0]["opcode"], "sample")
         self.assertEqual(len(messages[0]["data"]),
                          self.test_generator.SAMPLE_DATA_LENGTH)
+        min_expected_value = UNSIGNED_SHORT_MAX - self.test_generator.SAMPLE_NEAR_RANGE
         for value in messages[0]["data"]:
             self.assertUnsignedShort(value)
+            self.assertGreaterEqual(value, min_expected_value)
 
     def test_sample_near_zero_subcase(self):
         messages = self.test_generator.generate(
@@ -155,8 +157,10 @@ class TestUnsignedShortGenerator(unittest.TestCase):
         self.assertEqual(messages[0]["opcode"], "sample")
         self.assertEqual(len(messages[0]["data"]),
                          self.test_generator.SAMPLE_DATA_LENGTH)
+        max_expected_value = self.test_generator.SAMPLE_NEAR_RANGE
         for value in messages[0]["data"]:
             self.assertUnsignedShort(value)
+            self.assertLessEqual(abs(value), max_expected_value)
 
     def test_sample_invalid_subcase(self):
         with self.assertRaises(ValueError):
