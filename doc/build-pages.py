@@ -306,6 +306,7 @@ def gen_copy_man(src_dir: Path, dst_dir: Path):
         if man_mk.exists():
             # post-v2.1.1: build the man pages.
             logging.info(f'"{man_mk}" found: building man pages')
+            #
             # Unfortunately, any man page source patching for a particular
             # version must happen here rather than in the context of that
             # version.  As long as the list of patches remains small, the
@@ -314,24 +315,22 @@ def gen_copy_man(src_dir: Path, dst_dir: Path):
             #   v2.2.0: "ocpidev-application.1.txt", "ocpidev-run.1.txt",
             #           "ocpiav.1.txt", "ocpigr.1.txt", "ocpihdl.1.txt",
             #           "ocpirun.1.txt"
+            # Effective 23 Nov 2021, we no longer hard-code the list of
+            # files that potentially need patching.  This "future-proofs"
+            # the code against new files needing patching, and old files
+            # that needed patching no longer existing.
+            #
             # N.B.: We do not need to do anything for the man page build
             # except "install-packages.sh" and "install-prerequisites.sh",
             # but "ocpidoc" (needed by gen_copy_rst() function) will not be
             # available with anything less than a full "minimal" (oxymoron?)
             # install of the framework.  Incur the pain once here.
+            #
             cmd = ["bash", "-c", fr'cd {src_dir} ; \
-sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9c/\"/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpidev-application.1.txt > doc/man/src/ocpidev-application.1.txt.new ; \
-mv doc/man/src/ocpidev-application.1.txt.new doc/man/src/ocpidev-application.1.txt ; \
-sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9c/\"/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpidev-run.1.txt > doc/man/src/ocpidev-run.1.txt.new ; \
-mv doc/man/src/ocpidev-run.1.txt.new doc/man/src/ocpidev-run.1.txt ; \
-sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9c/\"/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpiav.1.txt > doc/man/src/ocpiav.1.txt.new ; \
-mv doc/man/src/ocpiav.1.txt.new doc/man/src/ocpiav.1.txt ; \
-sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9c/\"/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpigr.1.txt > doc/man/src/ocpigr.1.txt.new ; \
-mv doc/man/src/ocpigr.1.txt.new doc/man/src/ocpigr.1.txt ; \
-sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9c/\"/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpihdl.1.txt > doc/man/src/ocpihdl.1.txt.new ; \
-mv doc/man/src/ocpihdl.1.txt.new doc/man/src/ocpihdl.1.txt ; \
-sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9c/\"/g" -e "s/\xe2\x80\x9d/\"/g" doc/man/src/ocpirun.1.txt > doc/man/src/ocpirun.1.txt.new ; \
-mv doc/man/src/ocpirun.1.txt.new doc/man/src/ocpirun.1.txt ; \
+for f in doc/man/src/*.txt; \
+do sed -e "s/\xe2\x80\x99/\'/g" -e "s/\xe2\x80\x93/\-/g" -e "s/\xe2\x80\x9c/\"/g" -e "s/\xe2\x80\x9d/\"/g" $f > $f.new ; \
+mv $f.new $f; \
+done; \
 export LANG=en_US.utf8 ; \
 scripts/install-opencpi.sh --minimal --no-kernel']
             logging.debug(f'Executing "{cmd}" in directory "{src_dir}"')
@@ -499,7 +498,8 @@ def gen_release_index(tag: str, is_latest=False):
         if fname in [
             "opencpi installation", "opencpi user", "opencpi application development",
             "opencpi component development",
-            "opencpi rcc development", "opencpi hdl development", "opencpi platform development"
+            "opencpi rcc development", "opencpi hdl development", "opencpi platform development",
+            "opencpi gui user"
         ]:
             return file_name + " Guide"
         elif fname.endswith("getting started"):

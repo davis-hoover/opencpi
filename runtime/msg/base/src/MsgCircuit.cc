@@ -125,8 +125,7 @@ namespace OCPI {
     }
 
     void MessageCircuit::
-    sendOutputBuffer(OT::BufferUserFacet* buffer, size_t length, uint8_t opcode )
-    {
+    sendOutputBuffer(OT::BufferUserFacet *buffer, size_t length, uint8_t opcode) {
       return m_send_port->sendOutputBuffer(buffer, length, opcode);
     }
 
@@ -167,8 +166,7 @@ namespace OCPI {
     }
 
     void MessageCircuit::
-    releaseInputBuffer(OT::BufferUserFacet* msg )
-    {
+    releaseInputBuffer(OT::BufferUserFacet *msg) {
       m_rcv_port->releaseInputBuffer(msg);
     }
 

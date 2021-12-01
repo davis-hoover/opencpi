@@ -195,13 +195,13 @@ namespace Xfer {
 
       XF::SmemServices &createSmemServices();
 
-      void doneWithInput(void *buffer, unsigned length) {
-	ocpiDebug("doneWithInput: %p %p %u", buffer, m_baseVaddr, length);
+      void doneWithInput(void *buffer, size_t length) {
+	ocpiDebug("doneWithInput: %p %p %zu", buffer, m_baseVaddr, length);
 	m_dmaFactory.doneWithInput(m_busAddr + flagSize() +
 				   OCPI_SIZE_T_DIFF((uint8_t*)buffer, m_baseVaddr), length);
       }
-      void doneWithOutput(void *buffer, unsigned length) {
-	ocpiDebug("doneWithOutput: %p %p %u", buffer, m_baseVaddr, length);
+      void doneWithOutput(void *buffer, size_t length) {
+	ocpiDebug("doneWithOutput: %p %p %zu", buffer, m_baseVaddr, length);
 	m_dmaFactory.doneWithOutput(m_busAddr + flagSize() +
 				    OCPI_SIZE_T_DIFF((uint8_t*)buffer, m_baseVaddr), length);
       }

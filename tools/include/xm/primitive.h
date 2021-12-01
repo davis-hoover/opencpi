@@ -58,7 +58,7 @@ using std::logic_error;
 /* ----------------------------------------------------------------------- */
 
 #define WORKER_INTERNAL
-#include "RCC_Worker.h"
+#include "RCC_Worker.hh"
 #include "ocpi_xm_intercept_c++.h"
 
 #endif // End: #ifndef INCLUDED_PRIMITIVE_H

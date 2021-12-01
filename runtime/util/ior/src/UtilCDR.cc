@@ -214,7 +214,6 @@ remainingData () const
 void
 OCPI::Util::CDR::Decoder::
 getBoolean (bool & value)
-  throw (InvalidData)
 {
   if (m_pos+1 > m_len) {
     throw InvalidData();
@@ -239,7 +238,6 @@ getBoolean (bool & value)
 void
 OCPI::Util::CDR::Decoder::
 getOctet (unsigned char & value)
-  throw (InvalidData)
 {
   if (m_pos+1 > m_len) {
     throw InvalidData();
@@ -251,7 +249,6 @@ getOctet (unsigned char & value)
 void
 OCPI::Util::CDR::Decoder::
 getUShort (OCPI::OS::uint16_t & value)
-  throw (InvalidData)
 {
   align (2);
 
@@ -272,7 +269,6 @@ getUShort (OCPI::OS::uint16_t & value)
 void
 OCPI::Util::CDR::Decoder::
 getULong (OCPI::OS::uint32_t & value)
-  throw (InvalidData)
 {
   align (4);
 
@@ -292,7 +288,6 @@ getULong (OCPI::OS::uint32_t & value)
 void
 OCPI::Util::CDR::Decoder::
 getLong (OCPI::OS::int32_t & value)
-  throw (InvalidData)
 {
   align (4);
 
@@ -313,7 +308,6 @@ getLong (OCPI::OS::int32_t & value)
 void
 OCPI::Util::CDR::Decoder::
 getULongLong (OCPI::OS::uint64_t & value)
-  throw (InvalidData)
 {
   align (8);
 
@@ -334,7 +328,6 @@ getULongLong (OCPI::OS::uint64_t & value)
 void
 OCPI::Util::CDR::Decoder::
 getString (std::string & value)
-  throw (InvalidData)
 {
   OCPI::OS::uint32_t length;
   getULong (length);
@@ -350,7 +343,6 @@ getString (std::string & value)
 void
 OCPI::Util::CDR::Decoder::
 getOctetSeq (std::string & value)
-  throw (InvalidData)
 {
   OCPI::OS::uint32_t length;
   getULong (length);

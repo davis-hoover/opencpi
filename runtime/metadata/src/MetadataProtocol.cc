@@ -583,7 +583,7 @@ namespace OCPI {
     }
     // Send the data in the buffer to the writer
     void Protocol::write(OB::Writer &writer, const uint8_t *data, size_t length, uint8_t opcode) {
-      assert(!((intptr_t)data & (OB::maxDataTypeAlignment - 1)));
+      assert(!((uintptr_t)data & (OB::maxDataTypeAlignment - 1)));
       if (!m_operations)
 	throw OU::Error("No operations in protocol for writing");
       if (opcode >= m_nOperations)
@@ -593,7 +593,7 @@ namespace OCPI {
       writer.end();
     }
     size_t Protocol::read(OB::Reader &reader, uint8_t *data, size_t maxLength, uint8_t opcode) {
-      assert(!((intptr_t)data & (OB::maxDataTypeAlignment - 1)));
+      assert(!((uintptr_t)data & (OB::maxDataTypeAlignment - 1)));
       if (!m_operations)
 	throw OU::Error("No operations in protocol for reading");
       if (opcode >= m_nOperations)

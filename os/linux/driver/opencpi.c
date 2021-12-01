@@ -92,9 +92,9 @@
 #define VM_RESERVED (VM_DONTEXPAND | VM_DONTDUMP)
 #endif
 
-#include "HdlOCCP.h"
-#include "HdlPciDriver.h"
-#include "HdlNetDefs.h"
+#include "HdlOCCP.hh"
+#include "HdlPciDriver.hh"
+#include "HdlNetDefs.hh"
 #include "OsKernelDriver.h"                    // includes shared with user mode
 
 //#define _SCIF_ 1

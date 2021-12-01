@@ -268,6 +268,21 @@ function checkAssetName {
   fi
 }
 
+function getSoName {
+    if [ "$(uname -s)" = Darwin ]; then
+      otool -D -X $1 | sed 's=.*/=='
+    else
+      patchelf --print-soname $1
+    fi
+}
+function setSoName {
+    if [ "$(uname -s)" = Darwin ]; then
+      install_name_tool -id $1 $2
+    else
+      patchelf --set-soname $1 $2
+    fi
+}
+
 if [ "$1" = __test__ ] ; then
   if eval findInProjectPath $2 $3 result ; then
     echo good result is $result

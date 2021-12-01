@@ -23,12 +23,9 @@ $(if $(realpath $(OCPI_CDK_DIR)),,\
 #      Anything from them exposed to the ACI should be in Ocpi*Api.h files
 #      https://gitlab.com/opencpi/opencpi/issues/887
 IncludeDirs+=\
-	../../../../runtime/util/driver/include/ \
-	../../../../runtime/util/ezxml/include/ \
-	../../../../runtime/util/misc/include/ \
-	../../../../runtime/util/parentChild/include/ \
-	../../../../runtime/util/property/include/ \
-	../../../../runtime/util/vfs/include/ \
-	../../../../os/include/
+	../../../../runtime/base/include \
+	../../../../runtime/util/ezxml/include \
+	../../../../runtime/util/misc/include \
+	../../../../os/include
 
 include $(OCPI_CDK_DIR)/include/application.mk

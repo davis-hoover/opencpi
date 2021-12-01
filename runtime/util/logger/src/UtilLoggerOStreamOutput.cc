@@ -162,15 +162,15 @@ OCPI::Logger::OStreamOutput::OStreamOutputBuf::xsputn (const char * data, std::s
   return (m_out->good()) ? count : 0;
 }
 
-OCPI::Logger::OStreamOutput::OStreamOutput (std::ostream & out)
+OCPI::Logger::OStreamOutput::OStreamOutput (std::ostream &a_out)
   : Logger (m_obuf),
-    m_obuf (&out, false)
+    m_obuf (&a_out, false)
 {
 }
 
-OCPI::Logger::OStreamOutput::OStreamOutput (std::ostream * out, bool adopt)
+OCPI::Logger::OStreamOutput::OStreamOutput (std::ostream *a_out, bool adopt)
   : Logger (m_obuf),
-    m_obuf (out, adopt)
+    m_obuf (a_out, adopt)
 {
 }
 

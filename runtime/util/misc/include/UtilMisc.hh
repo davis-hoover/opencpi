@@ -337,6 +337,7 @@ namespace OCPI {
     const char
       *format(std::string &out, const char *fmt, ...) __attribute__((format(printf, 2, 3))),
       *formatAdd(std::string &out, const char *fmt, ...) __attribute__((format(printf, 2, 3))),
+      *formatV(std::string &out, const char *fmt, va_list ap),
       *formatAddV(std::string &out, const char *fmt, va_list ap);
     bool
       // This one just returns true as a convenience for the error handling protocol

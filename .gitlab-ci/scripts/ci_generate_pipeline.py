@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import asyncio
-from typing import List
+from typing import List, Tuple
 import json
 from pathlib import Path
 from os import environ, getenv
@@ -34,15 +34,21 @@ def main(pipeline_type: str):
 def _set_env():
     """Set environment variables to simulate a pipeline's environment"""
     environ['CI_PIPELINE_SOURCE'] = 'parent_pipeline'
-    environ['CI_OCPI_HOSTS'] = 'centos7 ubuntu18_04'
+    environ['CI_OCPI_HOSTS'] = 'centos7'
     environ['CI_OCPI_HOST'] = 'centos7'
-    environ['CI_OCPI_PLATFORMS'] = 'zed matchstiq_z1'
-    environ['CI_OCPI_PLATFORM'] = 'xsim'
+    environ['CI_OCPI_PLATFORMS'] = 'zed:xilinx19_2_aarch32'
+    environ['CI_OCPI_PLATFORM'] = 'zed'
+    environ['CI_OCPI_OTHER_PLATFORM'] = 'xilinx19_2_aarch32'
     environ['CI_OCPI_PROJECTS'] = 'ocpi.comp.sdr ocpi.osp.plutosdr'
     environ['CI_OCPI_ROOT_PIPELINE_ID'] = '123456789'
     environ['CI_JOB_ID'] = '987654321'
     environ['CI_OCPI_CONTAINER_REGISTRY'] = 'dummy-registry'
     environ['CI_PROJECT_DIR'] = '/home/gitlab-runner/builds/x/opencpi/opencpi'
+    environ['CI_OCPI_CONTAINER_REPO'] = 'centos7/zed/xilinx19_2_aarch32'
+    environ['CI_OCPI_HDL_HWIL'] = 'True'
+    environ['CI_OCPI_RCC_HWIL'] = 'False'
+    environ['CI_COMMIT_TAG'] = 'v2.4.0'
+    environ['CI_COMMIT_REF_NAME'] = 'develop'
 
 
 def _get_builder(builder_type: str, dump_path: Path, config: dict=None):
@@ -51,8 +57,8 @@ def _get_builder(builder_type: str, dump_path: Path, config: dict=None):
     the provided builder_type
     """
     builders = {
-        'host': _make_host_pipeline, 
-        'cross': _make_cross_pipeline
+        'platform': _make_platform_pipeline, 
+        'assembly': _make_assembly_pipeline
     }
     if config is None:
         config = {}
@@ -64,8 +70,8 @@ def _get_builder(builder_type: str, dump_path: Path, config: dict=None):
     sys.exit(err_msg)
 
 
-def _make_host_pipeline(dump_path: Path, 
-    config: str=None) -> HostPipelineBuilder:
+def _make_platform_pipeline(dump_path: Path, 
+    config: str=None) -> PlatformPipelineBuilder:
     """Initialize and return a HostPipelineBuilder"""
     try:
         pipeline_id = environ['CI_OCPI_ROOT_PIPELINE_ID']
@@ -73,38 +79,87 @@ def _make_host_pipeline(dump_path: Path,
         pipeline_id = environ['CI_PIPELINE_ID']
     container_registry = getenv('CI_OCPI_CONTAINER_REGISTRY', '')
     hosts = re.split(r'\s|,\s|,', getenv('CI_OCPI_HOSTS', ''))
-    platforms = re.split(r'\s|,\s|,', getenv('CI_OCPI_PLATFORMS', ''))
+    platforms = _parse_platforms_directive()
     projects = re.split(r'\s|,\s|,', getenv('CI_OCPI_PROJECTS', ''))
-    pipeline_builder = HostPipelineBuilder(pipeline_id, container_registry, 
-        hosts, platforms, projects, dump_path, config)
+    tag = getenv('CI_COMMIT_TAG', None)
+    branch = getenv('CI_COMMIT_REF_NAME', '')
+    if tag is None:
+        tag = branch if branch == 'develop' else tag
+    pipeline_builder = PlatformPipelineBuilder(pipeline_id, container_registry, 
+        hosts, platforms, projects, dump_path, config, tag=tag)
 
     return pipeline_builder
 
 
-def _make_cross_pipeline(dump_path: Path, 
-    config: str=None) -> CrossPipelineBuilder:
-    """Initialize and return a CrossPipelineBuilder"""
+def _make_assembly_pipeline(dump_path: Path, 
+    config: str=None) -> AssemblyPipelineBuilder:
+    """Initialize and return an AssemblyPipelineBuilder"""
     try:
         pipeline_id = environ['CI_OCPI_ROOT_PIPELINE_ID']
     except KeyError:
         pipeline_id = environ['CI_PIPELINE_ID']
-    platforms = _get_platforms()
     platform = getenv('CI_OCPI_PLATFORM')
-    if platform in platforms['rcc']:
-        model = 'rcc'
-    elif platform in platforms['hdl']:
-        model = 'hdl'
-    else:
-        sys.exit('Error: Unkown platform: {}'.format(platform))
+    host = getenv('CI_OCPI_HOST')
+    other_platform = getenv('CI_OCPI_OTHER_PLATFORM')
     project_dirs = _get_projects()
     assembly_dirs = _get_assemblies(project_dirs)
     test_dirs = _get_tests(project_dirs)
     container_registry = getenv('CI_OCPI_CONTAINER_REGISTRY')
-    host = getenv('CI_OCPI_HOST')
-    pipeline_builder = CrossPipelineBuilder(pipeline_id, container_registry, 
-        host, platform, model, assembly_dirs, test_dirs, dump_path, config)
+    container_repo = getenv('CI_OCPI_CONTAINER_REPO')
+    model = _get_platform_model(platform)
+    runners = config['ci']['runners']
+    if platform.startswith('sim'):
+        do_hwil = False
+    else:
+        do_hwil = getenv('CI_OCPI_{}_HWIL'.format(model.upper()), '')
+        do_hwil = do_hwil.lower() in ['t', 'y', 'true', 'yes', '1']
+    if model == 'hdl' and platform in config:
+        config = config[platform]
+    elif model == 'rcc' and other_platform and other_platform in config:
+        config = config[other_platform]
+    else:
+        config = None
+    pipeline_builder = AssemblyPipelineBuilder(pipeline_id, container_registry, 
+        container_repo, host, platform, model, other_platform, assembly_dirs, 
+        test_dirs, dump_path, config=config, runners=runners, do_hwil=do_hwil)
 
-    return pipeline_builder   
+    return pipeline_builder  
+
+
+def _get_platform_model(platform: str) -> str:
+    """Returns the model of the given platform"""
+    rcc_platforms,hdl_platforms = _get_platforms().values()
+    if platform in rcc_platforms:
+        return 'rcc'
+    if platform in hdl_platforms:
+        return 'hdl'
+
+    sys.exit('Error: Unknown platform "{}"'.format(platform))
+
+
+def _parse_platforms_directive() -> Tuple[str, str, List[str]]:
+    """
+    Parses CI_OCPI_PLATFORMS env var to determine platforms to build for
+    as well as any associated platforms to build ontop of it
+
+    env var is expected to be in the form of:
+        platform1:platform_2,...,platform_n
+    """
+    platforms_directive = getenv('CI_OCPI_PLATFORMS').split(' ')
+    platforms = {}
+    for platform_directive in platforms_directive:
+        if ':' in platform_directive:
+            left_platform,right_platforms = platform_directive.split(':')
+            right_platforms = right_platforms.split(',')
+        else:
+            left_platform = platform_directive
+            right_platforms = []
+        if left_platform in platforms:
+            platforms[left_platform] += right_platforms
+        else:
+            platforms[left_platform] = right_platforms
+
+    return platforms
 
 
 async def _ocpidev_show(noun, directory='.', scope=None) -> dict:
@@ -141,6 +196,7 @@ def _get_projects() -> List[str]:
                 if project != 'tutorial']
 
     return projects
+
 
 def _get_platforms() -> List[str]:
     """Returns opencpi platforms"""

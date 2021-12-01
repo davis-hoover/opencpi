@@ -65,7 +65,7 @@ generate:
   script:
   - yum install epel-release -y
   - yum install python36-PyYAML -y
-  - .gitlab-ci/scripts/ci_generate_pipeline.py host
+  - .gitlab-ci/scripts/ci_generate_pipeline.py platform
   stage: generate
   tags:
   - docker

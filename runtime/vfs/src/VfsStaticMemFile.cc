@@ -55,7 +55,7 @@ namespace OcpiUtilStaticMemFile {
   protected:
     class MemIStreamBuf : public std::streambuf {
     public:
-      MemIStreamBuf (const char *, unsigned long long);
+      MemIStreamBuf (const char *, size_t);
       MemIStreamBuf (const OCPI::VFS::MemFs::MemFileChunk *);
       ~MemIStreamBuf ();
 
@@ -71,10 +71,10 @@ namespace OcpiUtilStaticMemFile {
 
     protected:
       const char * m_ptr;
-      unsigned long long m_size;
+      size_t m_size;
       const OCPI::VFS::MemFs::MemFileChunk * m_chunk;
       const OCPI::VFS::MemFs::MemFileChunk * m_chunks;
-      unsigned long long m_firstByteInChunk;
+      size_t m_firstByteInChunk;
 
     private:
       MemIStreamBuf (const MemIStreamBuf &);
@@ -82,7 +82,7 @@ namespace OcpiUtilStaticMemFile {
     };
 
   public:
-    MemIStream (const char *, unsigned long long);
+    MemIStream (const char *, size_t);
     MemIStream (const OCPI::VFS::MemFs::MemFileChunk *);
     ~MemIStream ();
 
@@ -99,7 +99,7 @@ namespace OcpiUtilStaticMemFile {
 using namespace OcpiUtilStaticMemFile;
 
 MemIStream::MemIStreamBuf::MemIStreamBuf (const char * ptr,
-                                          unsigned long long size)
+                                          size_t size)
   : m_ptr (ptr),
     m_size (size),
     m_chunks (0)
@@ -126,7 +126,7 @@ MemIStream::MemIStreamBuf::~MemIStreamBuf ()
 std::streambuf::int_type
 MemIStream::MemIStreamBuf::underflow_common (bool bump)
 {
-  unsigned long long curpos = OCPI_SIZE_T_DIFF(gptr(), eback());
+  size_t curpos = OCPI_SIZE_T_DIFF(gptr(), eback());
   std::streambuf::int_type res;
 
   if (m_ptr) {
@@ -249,7 +249,7 @@ MemIStream::MemIStreamBuf::pbackfail (int_type c)
     }
 
     const OCPI::VFS::MemFs::MemFileChunk * prevChunk = m_chunk - 1;
-    unsigned long long curpos = m_chunk->size - 1;
+    size_t curpos = m_chunk->size - 1;
 
     if (prevChunk->size == 0) {
       return traits_type::eof ();
@@ -289,7 +289,7 @@ MemIStream::MemIStreamBuf::seekoff (off_type off, std::ios_base::seekdir way,
       origin = OCPI_SIZE_T_DIFF(gptr(), eback());
     }
     else {
-      origin = m_firstByteInChunk + OCPI_SIZE_T_DIFF(gptr(), eback());
+      origin = (m_firstByteInChunk + OCPI_SIZE_T_DIFF(gptr(), eback()));
     }
     break;
 
@@ -355,7 +355,7 @@ MemIStream::MemIStreamBuf::seekpos (pos_type ptpos, std::ios_base::openmode)
       return static_cast<pos_type> (-1);
     }
 
-    unsigned long long curpos = pos - m_firstByteInChunk;
+    size_t curpos = pos - m_firstByteInChunk;
 
     char * ncptr = const_cast<char *> (m_chunk->ptr);
     setg (ncptr, ncptr + curpos, ncptr + m_chunk->size);
@@ -365,7 +365,7 @@ MemIStream::MemIStreamBuf::seekpos (pos_type ptpos, std::ios_base::openmode)
 }
 
 MemIStream::MemIStream (const char * ptr,
-                        unsigned long long size)
+                        size_t size)
   : std::istream (0),
     m_buf (ptr, size)
 {
@@ -391,7 +391,7 @@ MemIStream::~MemIStream ()
 
 OCPI::VFS::MemFs::StaticMemFile::
 StaticMemFile (const char * ptr,
-               unsigned long long a_size,
+               size_t a_size,
                std::time_t a_lastModified)
 
   : m_size (a_size),
@@ -417,11 +417,11 @@ OCPI::VFS::MemFs::StaticMemFile::
 {
 }
 
-unsigned long long
+size_t
 OCPI::VFS::MemFs::StaticMemFile::size ()
 
 {
-  unsigned long long res;
+  size_t res;
 
   if (m_ptr) {
     res = m_size;

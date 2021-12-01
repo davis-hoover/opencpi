@@ -34,9 +34,9 @@
 #include <stdint.h>
 #include <sys/time.h>
 #include "OsKernelDriver.h"
-#include "HdlOCCP.h"
-#include "HdlOCDP.h"
-#include "HdlZynq.h"
+#include "HdlOCCP.hh"
+#include "HdlOCDP.hh"
+#include "HdlZynq.hh"
 #include "getPci.h"
 
 //#define WORKER_DP0 (2)

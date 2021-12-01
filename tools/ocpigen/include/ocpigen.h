@@ -30,7 +30,7 @@
 #include <ezxml.h>
 #include "UtilMisc.hh"
 #include "OsFileSystem.hh"
-#include "OcpiLibraryAssembly.h"
+#include "LibraryAssembly.hh"
 #include "MetadataWorker.hh"
 
 namespace OE = OCPI::Util::EzXml;

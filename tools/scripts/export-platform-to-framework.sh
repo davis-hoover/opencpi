@@ -210,8 +210,8 @@ done
 
 # Ensure driver list is exported
 mkdir -p exports/runtime/$platform/lib exports/$platform/lib
-echo $drivers>exports/runtime/$platform/lib/driver-list
-echo $drivers>exports/$platform/lib/driver-list
+echo $drivers>exports/runtime/$platform/lib/plugin-list
+echo $drivers>exports/$platform/lib/plugin-list
 
 # Enable prerequisite libraries to be found/exported in our lib directory
 function liblink {

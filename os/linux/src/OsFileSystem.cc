@@ -585,16 +585,26 @@ Dir::~Dir(){
 }
 
 bool Dir::next(std::string &s, bool &isDir){
-  struct dirent entry, *result;
+  struct dirent *result;
   DIR *dfd = (DIR *)m_opaque;
-  int errnum;
-  do
+#if 0 // readdir_r is now deprecated and "modern" readdir is now threadsafe...
+  struct dirent entry;
+  do {
+    int errnum;
     if ((errnum = readdir_r(dfd, &entry, &result)))
       throw "Error reading directory: " + OCPI::OS::Posix::getErrorMessage(errnum);
-  while (result && entry.d_name[0] == '.' &&
-	 (!entry.d_name[1] || (entry.d_name[1] == '.' && !entry.d_name[2])));
+  }
+#else
+  do {
+      errno = 0; // linux man page says errno it is not changed on EOF
+      if (!(result = readdir(dfd)) && errno)
+	throw "Error reading directory: " + OCPI::OS::Posix::getErrorMessage(errno);
+  }
+#endif
+  while (result && result->d_name[0] == '.' &&
+	 (!result->d_name[1] || (result->d_name[1] == '.' && !result->d_name[2])));
   if (result) {
-    s = entry.d_name;
+    s = result->d_name;
     // isDir = entry.d_type == DT_DIR; // for BSD...
     exists(m_name + "/" + s, &isDir);
     return true;
