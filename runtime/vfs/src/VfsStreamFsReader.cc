@@ -250,10 +250,10 @@ namespace OcpiUtilStreamFsReader {
   }
 
   StreamFsReaderStream::StreamFsReaderStream (std::istream * str,
-                                              unsigned long long beg,
+                                              unsigned long long a_beg,
                                               unsigned long long size)
     : std::istream (0),
-      m_buf (str, beg, size)
+      m_buf (str, a_beg, size)
   {
     this->init (&m_buf);
   }

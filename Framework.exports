@@ -211,8 +211,9 @@
 # RCC related exclusions and additions
 # We don't want everything so we are selective here.  was: +tools/include/rcc include/rcc
 # After more cleanup we may be able to default to everything
-+runtime/rcc/include/RCC_Worker.h include/rcc/
-+runtime/container/include/OcpiContainerRunConditionApi.h include/rcc/
++runtime/rcc/include/RCC_Worker.hh include/rcc/RCC_Worker.h
++runtime/rcc/include/RCC_Worker.hh include/rcc/
++runtime/container/include/OcpiContainerRunConditionApi.hh include/rcc/
 +os/include/OcpiConfigApi.hh include/rcc/
 +tools/include/rcc/rcc-targets.mk include/rcc/
 +tools/include/rcc/rcc-make.mk include/rcc/
@@ -222,7 +223,8 @@
 # OCL additions
 +tools/include/ocl/ocl-make.mk include/ocl/
 +tools/include/ocl/ocl-worker.mk include/ocl/
-+runtime/ocl/include/OCL_Worker.h include/ocl/
++runtime/ocl/include/OCL_Worker.hh include/ocl/
++runtime/ocl/include/OCL_Worker.hh include/ocl/OCL_Worker.h
 # We export everything in tools/include/hdl, although we could be more careful...
 +tools/include/hdl/* include/hdl/
 # These three are links for bootstrapping purposes only
@@ -236,19 +238,19 @@
 # They are currently redundant with the top level include, but they are here so we can
 # Ultimately control visibility for workers
 # Expose API headers to the ACI - this is mostly automated *Api.h
-+runtime/application/include/OcpiApi.h include/aci/OcpiApi.hh
++runtime/application/include/OcpiApi.hh include/aci/OcpiApi.h
 # These are horrible, but until we get multiple slaves, we need them
-+runtime/application/include/OcpiApi.h include/rcc/OcpiApi.hh
-+runtime/application/include/OcpiApi.h include/rcc/OcpiApi.h
-+os/include/OcpiDebugApi.hh include/rcc/OcpiDebugApi.hh
-+runtime/application/include/OcpiApplicationApi.h include/rcc/
-+runtime/container/include/OcpiContainerApi.h include/rcc/
-+runtime/util/ior/include/OcpiCorbaApi.h include/rcc/
++runtime/application/include/OcpiApi.hh include/rcc/
++runtime/application/include/OcpiApi.hh include/rcc/OcpiApi.h
++os/include/OcpiDebugApi.hh include/rcc/
++runtime/application/include/OcpiApplicationApi.hh include/rcc/
++runtime/container/include/OcpiContainerApi.hh include/rcc/
++runtime/util/ior/include/OcpiCorbaApi.hh include/rcc/
 +runtime/base/include/OcpiPValueApi.hh include/rcc/
 +runtime/base/include/OcpiDataTypesApi.hh include/rcc/
 +runtime/metadata/include/OcpiPropertyApi.hh include/rcc/
 +runtime/util/misc/include/OcpiExceptionApi.hh include/rcc/
-+runtime/library/include/OcpiLibraryApi.h include/rcc/
++runtime/library/include/OcpiLibraryApi.hh include/rcc/
 # End of undocumented temporary stuff until multi-slaves
 ################################################################################
 # HDL related exclusions and additions

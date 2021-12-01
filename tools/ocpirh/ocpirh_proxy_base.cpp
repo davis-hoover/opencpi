@@ -25,8 +25,8 @@
 #include "ocpirh_proxy_base.h"
 #include "OcpiApi.hh"
 #include "OsFileSystem.hh"
-#include "ContainerPort.h"
-#include "OcpiApplication.h"
+#include "ContainerPort.hh"
+#include "Application.hh"
 
 namespace OA = OCPI::API;
 namespace OC = OCPI::Container;

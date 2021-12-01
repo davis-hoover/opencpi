@@ -21,7 +21,7 @@
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "HdlPciDriver.h"
+#include "HdlPciDriver.hh"
 
 #ifndef __cplusplus
 typedef int bool;

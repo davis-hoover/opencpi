@@ -51,7 +51,7 @@ main (int argc, char *argv[])
   std::cout << "Zip File Contents" << std::endl;
   std::cout << "-----------------" << std::endl;
 
-  std::auto_ptr<OCPI::VFS::Iterator> contents(zipFs.list (zipFs.cwd()));
+  std::unique_ptr<OCPI::VFS::Iterator> contents(zipFs.list (zipFs.cwd()));
 
   std::string name;
   bool isDir;

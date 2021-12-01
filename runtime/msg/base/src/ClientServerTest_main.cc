@@ -119,9 +119,7 @@ public:
   /**********************************
    * This method gets called when an error gets generated
    *********************************/
-  virtual void error( OU::EmbeddedException& /* ex */ )
-  {
-
+  virtual void error(OU::EmbeddedException &/* ex */) {
   }
 
 };
@@ -205,7 +203,7 @@ int gpp_cont(int argc, char** argv)
     else {
       printf("Setting up for loopback mode using %s\n", loopback_end_point);
       OS::Timer timer(10, 0);
-      std::auto_ptr<MessageCircuit> c(&MessageEndpoint::connect(server_end_point, 4096,
+      std::unique_ptr<MessageCircuit> c(&MessageEndpoint::connect(server_end_point, 4096,
 								"Hello, World", &timer));
       //      MessageCircuit c(loopback_end_point, 1024);
       //      printf("***** Client connecting to: %s\n", server_end_point);

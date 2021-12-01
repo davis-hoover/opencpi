@@ -41,7 +41,7 @@ AX_PREFIX_CONFIG_H(ocpi-config.h,OCPI,config.h)
 AC_CONFIG_MACRO_DIR([acinclude])
 AC_CONFIG_AUX_DIR([build-aux])
 dnl This is a pathname that must be present so you know you are executing in the right place.
-AC_CONFIG_SRCDIR([runtime/rcc/src/RccContainer.cxx])
+AC_CONFIG_SRCDIR([runtime/rcc/src/RccContainer.cc])
 dnl ============================================================================================
 dnl 1. Import the OpenCPI platform variable values and set libtool variables
 dnl    all for substitutions in Makefile.am, ocpi-config.h, or ocpi-platform-config.h
