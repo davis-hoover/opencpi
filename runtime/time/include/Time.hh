@@ -43,7 +43,7 @@ static inline uint64_t getticks()
 
   return
     ((uint64_t)tv.tv_usec << 32) |
-    ((tv.tv_usec * ((uint64_t)0x100000000ull + 500))/1000);
+    (((uint64_t)tv.tv_usec * ((uint64_t)0x100000000ull + 500))/1000);
 }
 #else
 #include "cycle.h" // This is an externally supplied header file from fftw.org

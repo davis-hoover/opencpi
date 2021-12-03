@@ -23,6 +23,8 @@
 ################################################################################
 [ -z "$OCPI_CDK_DIR" ] && echo 'Environment variable OCPI_CDK_DIR not set' && exit 1
 
+[ `uname -s` = Darwin ] && echo "Suppressing installation of xvcd prereq on MacOS" && exit 0
+
 # determine this script location
 scriptDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 xvcdPackage=xvcd

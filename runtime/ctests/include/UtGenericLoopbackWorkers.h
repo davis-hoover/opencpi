@@ -30,7 +30,7 @@
 #ifndef UT_GENERIC_ZEROCOPY_IO_WORKERS_H
 #define UT_GENERIC_ZEROCOPY_IO_WORKERS_H
 
-#include <RCC_Worker.h>
+#include "RCC_Worker.hh"
 
 #ifdef __cplusplus
 using namespace OCPI::RCC;

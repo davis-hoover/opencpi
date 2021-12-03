@@ -21,7 +21,7 @@
 // A messaging endpoint for communication.
 // This class essentially binds the addressing aspect (OCPI::Xfer::Endpoint), with the
 // runtime aspect (OCPI::Transport::Transport) to support a multiplicity of circuits,
-// which com into existence client-style, where the creation of a message circuit is initiated locally,
+// which come into existence client-style, where the creation of a message circuit is initiated locally,
 // or server-style, where the creation of a circuit is initiated remotely.
 
 #ifndef OCPI_Message_Endpoint_H_

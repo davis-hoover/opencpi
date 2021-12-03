@@ -29,7 +29,7 @@
 # 2: ocpi_dynamic (0 or 1)
 # 3: platform target string
 # 4: host platform
-# 5: drivers
+# 5: plugins
 # 6: swigs
 # 7: prereqs
 # 8: prereqs dir
@@ -58,7 +58,7 @@ dynsuff=$1
 dynamic=$2
 target=$3
 host=$4
-drivers=$5
+plugins=$5
 swigs=$6
 prereqs=$7
 prereq_inst=$8
@@ -174,7 +174,7 @@ else
     me=$(basename $i $dynsuff | sed 's/^libocpi_//')
     found=
     # See if its a driver library. If so Remove DT_NEEDED and rename to _s
-    for d in $drivers; do
+    for d in $plugins; do
       [ "$d" = "$me" ] && {
         echo Removing OpenCPI DT_NEEDED entries from driver library: $d
 	fix_static_driver $i "$prereqs" $1
@@ -194,5 +194,5 @@ else
     rm $i
   done
 fi
-echo $drivers > lib/driver-list
+echo $plugins > lib/plugin-list
 exit 0

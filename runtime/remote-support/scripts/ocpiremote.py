@@ -481,14 +481,14 @@ def load(args):
     if args.optimize:
         rcc += "-o"
     hdl = args.hw_platform or args.hdl_platform
-    driver_list = os.path.join(cdk, rcc, 'lib', 'driver-list')
-    if not os.path.exists(driver_list):
+    plugin_list = os.path.join(cdk, rcc, 'lib', 'plugin-list')
+    if not os.path.exists(plugin_list):
        sys.exit('Error:  RCC/software platform "{}" not found or not built:'\
-                ' did not find: {}'.format(rcc, driver_list))
-    with open(driver_list) as driver_file:
-        drivers = ['libocpi_{}_s.so'.format(driver) for line in driver_file
-                   for driver in line.strip().split()]
-        drivers = [os.path.join(cdk, rcc, 'lib', driver) for driver in drivers]
+                ' did not find: {}'.format(rcc, plugin_list))
+    with open(plugin_list) as plugin_file:
+        plugins = ['libocpi_{}_s.so'.format(plugin) for line in plugin_file
+                   for plugin in line.strip().split()]
+        plugins = [os.path.join(cdk, rcc, 'lib', plugin) for plugin in plugins]
 
     localtime = os.path.join('/etc', 'localtime')
     os_driver = os.path.join(cdk, 'scripts', 'ocpi_linux_driver')
@@ -500,7 +500,7 @@ def load(args):
     sdk = glob.glob(os.path.join(cdk, rcc, 'sdk', '*'))
     bitstream = glob.glob(os.path.join(cdk, hdl, '*.bitz'))
     # List of files to add to tar
-    tar_files = (drivers
+    tar_files = (plugins
              + kernel_objects
              + rules
              + bin_files

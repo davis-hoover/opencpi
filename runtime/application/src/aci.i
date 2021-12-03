@@ -219,7 +219,7 @@
 
 %{
 #include <climits>
-#include "OcpiApi.h"
+#include "OcpiApi.hh"
 #include "BasePValue.hh"
 #include "UtilMisc.hh"
   namespace OA=OCPI::API;
@@ -366,7 +366,7 @@
 %include "OcpiPValueApi.hh"
 %include "OcpiPropertyApi.hh"
 %include "OcpiExceptionApi.hh"
-%include "OcpiLibraryApi.h"
-%include "OcpiContainerApi.h"
-%include "OcpiApplicationApi.h"
-%include "OcpiApi.h"
+%include "OcpiLibraryApi.hh"
+%include "OcpiContainerApi.hh"
+%include "OcpiApplicationApi.hh"
+%include "OcpiApi.hh"

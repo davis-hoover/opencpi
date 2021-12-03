@@ -37,10 +37,10 @@
 #include "TransportRDTInterface.hh"
 #include "UtilThread.hh"
 #include "BasePValue.hh"
-#include "Container.h"
-#include "ContainerWorker.h"
-#include "ContainerPort.h"
-#include "RCC_Worker.h"
+#include "Container.hh"
+#include "ContainerWorker.hh"
+#include "ContainerPort.hh"
+#include "RCC_Worker.hh"
 
 extern bool g_testUtilVerbose;
 // #define TUPRINTF if(g_testUtilVerbose) printf

@@ -23,6 +23,7 @@
 #ifndef OCPIUTILMEMFILECHUNK_H__
 #define OCPIUTILMEMFILECHUNK_H__
 
+#include <cstddef>
 /**
  * \file
  * \brief The OCPI::Util::MemFs::MemFileChunk data type.
@@ -61,7 +62,7 @@ namespace OCPI {
          * The number of octets in this chunk.
          */
 
-        unsigned long long size;
+        size_t size;
       };
 
     }

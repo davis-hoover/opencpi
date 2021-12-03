@@ -81,8 +81,8 @@ make install
           link=$(readlink $i)
           ln -fs ${link/$old/$new} $i
         elif [[ -x $i ]]; then
-          soname=$(patchelf --print-soname $i)
-          patchelf --set-soname ${soname/$old/$new} $i
+          soname=$(getSoName $i)
+          setSoName ${soname/$old/$new} $i
         fi
         mv $i ${i/$old/$new}
         ;;

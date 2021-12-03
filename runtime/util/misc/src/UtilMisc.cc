@@ -501,21 +501,24 @@ formatAddV(std::string &out, const char *fmt, va_list ap) {
   free(cp);
   return out.c_str();
 }
+const char *
+formatV(std::string &out, const char *fmt, va_list ap) {
+  out.clear();
+  return formatAddV(out, fmt, ap);
+}
 // FIXME remove this when all callers are fixed.
 void 
 formatString(std::string &out, const char *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
-  out.clear();
-  formatAddV(out, fmt, ap);
+  formatV(out, fmt, ap);
   va_end(ap);
 }
 const char * 
 format(std::string &out, const char *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
-  out.clear();
-  formatAddV(out, fmt, ap);
+  formatV(out, fmt, ap);
   va_end(ap);
   return out.c_str();
 }
@@ -523,8 +526,7 @@ bool
 eformat(std::string &out, const char *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
-  out.clear();
-  formatAddV(out, fmt, ap);
+  formatV(out, fmt, ap);
   va_end(ap);
   return true;
 }

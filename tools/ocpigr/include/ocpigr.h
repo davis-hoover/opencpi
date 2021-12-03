@@ -1,16 +1,16 @@
 #ifndef OCPIGR_H
 #define OCPIGR_H
 
-// OCPI headers
-#include "BasePluginManager.hh"   // OCPI::Driver::ManagerManager::suppressDiscovery
-#include "OcpiLibraryManager.h"  // OL::* stuff
+// System headers
+#include <string>          // std::string
+#include <vector>          // std::vector
 
 // 3rd party headers
 #include <yaml-cpp/yaml.h> // YAML::Emitter
 
-// System headers
-#include <string>          // std::string
-#include <vector>          // std::vector
+// OCPI headers
+#include "BasePluginManager.hh"   // OCPI::Driver::ManagerManager::suppressDiscovery
+#include "LibraryManager.hh"  // OL::* stuff
 
 
 namespace OA = OCPI::API;
@@ -44,9 +44,9 @@ class OcpigrObj {
   
     // Private functions for genOcpiBlockTree
     std::vector<std::string> splitString(std::string, std::string);
-    int compareBlockVectors(std::vector<std::string>&, std::vector<std::string>&);
-    void createTreeSeq(YAML::Emitter&, std::vector<std::string>&, int&);
-    void endTreeSeq(YAML::Emitter&, int&);
+    size_t compareBlockVectors(std::vector<std::string>&, std::vector<std::string>&);
+    void createTreeSeq(YAML::Emitter&, std::vector<std::string>&, size_t&);
+    void endTreeSeq(YAML::Emitter&, size_t&);
 
     // Private functions for genWorkerBlocks
     void addProperty(YAML::Emitter&, OM::Worker&, OM::Property*);

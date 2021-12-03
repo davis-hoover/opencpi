@@ -766,12 +766,13 @@ namespace OCPI {
 	uint32_t len = 0;
 	eof = false;
 	ssize_t n = ::read(fd, (char *)&len, sizeof(len));
-	if (n != sizeof(len) || len > 256*1024) {
+	if ((size_t)n != sizeof(len) || len > 256*1024) {
 	  if (n == 0) {
 	    eof = true;
 	    error = "EOF on socket read";
 	  } else
-	    OU::format(error, "read error or XML message too large: %s (%zd, %zu)", strerror(errno), n, (size_t)len);
+	    OU::format(error, "read error or XML message too large: %s (%zd, %zu)", strerror(errno),
+		       n, (size_t)len);
 	  return true;
 	}
 	size_t total = OCPI_UTRUNCATE(size_t, len);

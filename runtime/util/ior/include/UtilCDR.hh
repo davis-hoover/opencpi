@@ -289,8 +289,7 @@ namespace OCPI {
          * \throw InvalidData At the end of the stream.
          */
 
-        void getBoolean (bool & value)
-          throw (InvalidData);
+        void getBoolean (bool & value);
 
         /**
          * Unmarshal an octet value.
@@ -300,8 +299,7 @@ namespace OCPI {
          * \throw InvalidData At the end of the stream.
          */
 
-        void getOctet (unsigned char & value)
-          throw (InvalidData);
+        void getOctet (unsigned char & value);
 
         /**
          * Unmarshal a CORBA::UShort value, aligning and byte-swapping if
@@ -312,8 +310,7 @@ namespace OCPI {
          * \throw InvalidData At the end of the stream.
          */
 
-        void getUShort (OCPI::OS::uint16_t & value)
-          throw (InvalidData);
+        void getUShort (OCPI::OS::uint16_t & value);
 
         /**
          * Unmarshal a CORBA::ULong value, aligning and byte-swapping if
@@ -324,10 +321,8 @@ namespace OCPI {
          * \throw InvalidData At the end of the stream.
          */
 
-        void getULong (OCPI::OS::uint32_t & value)
-          throw (InvalidData);
-        void getLong (OCPI::OS::int32_t & value)
-          throw (InvalidData);
+        void getULong (OCPI::OS::uint32_t & value);
+        void getLong (OCPI::OS::int32_t & value);
 
         /**
          * Unmarshal a CORBA::ULongLong value, aligning and byte-swapping
@@ -338,8 +333,7 @@ namespace OCPI {
          * \throw InvalidData At the end of the stream.
          */
 
-        void getULongLong (OCPI::OS::uint64_t & value)
-          throw (InvalidData);
+        void getULongLong (OCPI::OS::uint64_t & value);
 
         /**
          * Unmarshal a CORBA string.
@@ -349,8 +343,7 @@ namespace OCPI {
          * \throw InvalidData At the end of the stream.
          */
 
-        void getString (std::string & value)
-          throw (InvalidData);
+        void getString (std::string & value);
 
         /**
          * Unmarshal a sequence of octets.
@@ -360,8 +353,7 @@ namespace OCPI {
          * \throw InvalidData At the end of the stream.
          */
 
-        void getOctetSeq (std::string & value)
-          throw (InvalidData);
+        void getOctetSeq (std::string & value);
 
         //@}
 

@@ -165,41 +165,13 @@ overflow (int_type i)
   return i;
 }
 
-std::streamsize
-OCPI::Util::Tcp::Stream::StreamBuf::
-xsputn (const char * s, std::streamsize n)
-{
-  /*
-   * Opened for writing?
-   */
-
-  if (!(m_mode & std::ios_base::out)) {
-    return traits_type::eof ();
-  }
-     
-  std::streamsize remaining = n;
-  unsigned long long count;
-
-  while (remaining > 0) {
-    try {
-      count = m_socket.send (s, (size_t)remaining);
-    }
-    catch (const std::string &) {
-      return n - remaining;
-    }
-
-    if (count == 0) {
-      return n - remaining;
-    }
-
-    unsigned int icount = static_cast<unsigned int> (count);
-    ocpiAssert (static_cast<unsigned long long> (icount) == count);
-
-    remaining -= icount;
-    s += count;
-  }
-
-  return n - remaining;
+std::streamsize OCPI::Util::Tcp::Stream::StreamBuf::
+xsputn(const char *s, std::streamsize n) {
+  if (!(m_mode & std::ios_base::out)) // Opened for writing?
+    return traits_type::eof();
+  // OS::Socket::send persists in sending or throws
+  ocpiCheck(m_socket.send(s, (size_t)n) == (size_t)n);
+  return n;
 }
 
 /*
