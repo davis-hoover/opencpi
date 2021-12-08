@@ -16,5 +16,5 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# This is the Makefile for worker counter.hdl
-include $(OCPI_CDK_DIR)/include/worker.mk
+# This is the Makefile for the test directory which tests component "tcounter"
+include $(OCPI_CDK_DIR)/include/test.mk
