@@ -1,9 +1,9 @@
-<!-- This is the spec file (OCS) for: counter
+<!-- This is the spec file (OCS) for: tcounter
      Add component spec attributes, like "protocol".
      Add property elements for spec properties.
      Add port elements for i/o ports -->
 <ComponentSpec>
   <!-- Add property and port elements here -->
-    <Property name="counter" volatile="true" type="uShort"></Property>
+    <Property name="tcounter" volatile="true" type="uShort"></Property>
     <Property name="max" default="10" initial="true"></Property>
 </ComponentSpec>
