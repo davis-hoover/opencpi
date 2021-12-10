@@ -1,4 +1,4 @@
-<!-- This is the test xml for testing component "counter" -->
+<!-- This is the test xml for testing component "tcounter" -->
 <Tests UseHDLFileIo='true'>
   <!-- Set properties here. 
        Use test='true' to create a test-exclusive property. -->
