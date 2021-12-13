@@ -36,19 +36,22 @@ def _set_env():
     environ['CI_PIPELINE_SOURCE'] = 'parent_pipeline'
     environ['CI_OCPI_HOSTS'] = 'centos7'
     environ['CI_OCPI_HOST'] = 'centos7'
-    environ['CI_OCPI_PLATFORMS'] = 'zed:xilinx19_2_aarch32'
-    environ['CI_OCPI_PLATFORM'] = 'zed'
-    environ['CI_OCPI_OTHER_PLATFORM'] = 'xilinx19_2_aarch32'
-    environ['CI_OCPI_PROJECTS'] = 'ocpi.comp.sdr ocpi.osp.plutosdr'
+    environ['CI_OCPI_PLATFORMS'] = 'plutosdr:adi_plutosdr0_32'
+    environ['CI_OCPI_PLATFORM'] = 'plutosdr'
+    environ['CI_OCPI_OTHER_PLATFORM'] = 'adi_plutosdr0_32'
+    environ['CI_OCPI_PROJECTS'] = 'ocpi.comp.sdr osp/ocpi.osp.plutosdr'
     environ['CI_OCPI_ROOT_PIPELINE_ID'] = '123456789'
+    environ['CI_PIPELINE_ID'] = '234567890'
     environ['CI_JOB_ID'] = '987654321'
     environ['CI_OCPI_CONTAINER_REGISTRY'] = 'dummy-registry'
     environ['CI_PROJECT_DIR'] = '/home/gitlab-runner/builds/x/opencpi/opencpi'
-    environ['CI_OCPI_CONTAINER_REPO'] = 'centos7/zed/xilinx19_2_aarch32'
+    environ['CI_OCPI_CONTAINER_REPO'] = 'centos7/plutosdr/adi_plutosdr0_32'
     environ['CI_OCPI_HDL_HWIL'] = 'True'
     environ['CI_OCPI_RCC_HWIL'] = 'False'
-    environ['CI_COMMIT_TAG'] = 'v2.4.0'
+    # environ['CI_COMMIT_TAG'] = 'v2.4.0'
     environ['CI_COMMIT_REF_NAME'] = 'develop'
+    environ['CI_OCPI_REF_NAME'] = 'develop'
+    environ['CI_PROJECT_NAME'] = 'ocpi.osp.plutosdr'
 
 
 def _get_builder(builder_type: str, dump_path: Path, config: dict=None):
@@ -58,7 +61,8 @@ def _get_builder(builder_type: str, dump_path: Path, config: dict=None):
     """
     builders = {
         'platform': _make_platform_pipeline, 
-        'assembly': _make_assembly_pipeline
+        'assembly': _make_assembly_pipeline,
+        'osp': _make_osp_pipeline,
     }
     if config is None:
         config = {}
@@ -80,13 +84,54 @@ def _make_platform_pipeline(dump_path: Path,
     container_registry = getenv('CI_OCPI_CONTAINER_REGISTRY', '')
     hosts = re.split(r'\s|,\s|,', getenv('CI_OCPI_HOSTS', ''))
     platforms = _parse_platforms_directive()
-    projects = re.split(r'\s|,\s|,', getenv('CI_OCPI_PROJECTS', ''))
-    tag = getenv('CI_COMMIT_TAG', None)
-    branch = getenv('CI_COMMIT_REF_NAME', '')
-    if tag is None:
-        tag = branch if branch == 'develop' else tag
-    pipeline_builder = PlatformPipelineBuilder(pipeline_id, container_registry, 
-        hosts, platforms, projects, dump_path, config, tag=tag)
+    projects = _parse_projects_directive()
+    image_tag = base_image_tag = getenv('CI_COMMIT_TAG', None)
+    if image_tag is None:
+    # Not a tag pipeline; check if branch is deveop
+        ref = getenv('CI_COMMIT_REF_NAME', '')
+        ocpi_ref = getenv('CI_OCPI_REF_NAME', '')
+        image_tag = ref if ref == 'develop' else image_tag
+        base_image_tag = ocpi_ref if ocpi_ref == 'develop' else base_image_tag
+    image_tags = [image_tag]
+    if base_image_tag is None:
+        base_image_tag = pipeline_id
+    pipeline_builder = PlatformPipelineBuilder(pipeline_id, container_registry,
+        base_image_tag, hosts, platforms, projects, dump_path, config, 
+        image_tags=image_tags)
+
+    return pipeline_builder
+
+
+def _make_osp_pipeline(dump_path: Path, 
+    config: str=None) -> OspPipelineBuilder:
+    """Initialize and return a OspPipelineBuilder"""
+    try:
+    # Pipeline launched from opencpi project; get its pipeline ID
+        pipeline_id = base_image_tag = environ['CI_OCPI_ROOT_PIPELINE_ID']
+    except KeyError:
+    # Pipeline not launched from opencpi project; use own pipeline ID
+        pipeline_id = environ['CI_PIPELINE_ID']
+        base_image_tag = getenv('CI_COMMIT_TAG', None)
+        if base_image_tag is None:
+        # Not a release pipeline; use 'develop' or pipeline_id for base image
+            ocpi_ref = getenv('CI_OCPI_REF_NAME', '')
+            base_image_tag = ocpi_ref if ocpi_ref == 'develop' else pipeline_id
+    # If pipeline is a release or develop pipeline, add to list of image tags
+    image_tag = getenv('CI_COMMIT_TAG', None)
+    image_tags = []
+    if image_tag is None:
+        ref = getenv('CI_COMMIT_REF_NAME', '')
+        image_tag = ref if ref == 'develop' else image_tag
+    if image_tag:
+        image_tags.append(image_tag)
+    container_registry = getenv('CI_OCPI_CONTAINER_REGISTRY', '')
+    hosts = re.split(r'\s|,\s|,', getenv('CI_OCPI_HOSTS', ''))
+    platforms = _parse_platforms_directive()
+    projects = _parse_projects_directive()
+    project = getenv('CI_PROJECT_NAME', '')
+    pipeline_builder = OspPipelineBuilder(pipeline_id, container_registry,
+        base_image_tag, hosts, platforms, projects, project, dump_path, 
+        config, image_tags=image_tags)
 
     return pipeline_builder
 
@@ -95,9 +140,9 @@ def _make_assembly_pipeline(dump_path: Path,
     config: str=None) -> AssemblyPipelineBuilder:
     """Initialize and return an AssemblyPipelineBuilder"""
     try:
-        pipeline_id = environ['CI_OCPI_ROOT_PIPELINE_ID']
+        pipeline_id = base_image_tag = environ['CI_OCPI_ROOT_PIPELINE_ID']
     except KeyError:
-        pipeline_id = environ['CI_PIPELINE_ID']
+        pipeline_id = base_image_tag = environ['CI_PIPELINE_ID']
     platform = getenv('CI_OCPI_PLATFORM')
     host = getenv('CI_OCPI_HOST')
     other_platform = getenv('CI_OCPI_OTHER_PLATFORM')
@@ -108,7 +153,7 @@ def _make_assembly_pipeline(dump_path: Path,
     container_repo = getenv('CI_OCPI_CONTAINER_REPO')
     model = _get_platform_model(platform)
     runners = config['ci']['runners']
-    if platform.startswith('sim'):
+    if platform.endswith('sim'):
         do_hwil = False
     else:
         do_hwil = getenv('CI_OCPI_{}_HWIL'.format(model.upper()), '')
@@ -120,8 +165,9 @@ def _make_assembly_pipeline(dump_path: Path,
     else:
         config = None
     pipeline_builder = AssemblyPipelineBuilder(pipeline_id, container_registry, 
-        container_repo, host, platform, model, other_platform, assembly_dirs, 
-        test_dirs, dump_path, config=config, runners=runners, do_hwil=do_hwil)
+        container_repo, base_image_tag, host, platform, model, other_platform, 
+        assembly_dirs, test_dirs, dump_path, config=config, runners=runners, 
+        do_hwil=do_hwil)
 
     return pipeline_builder  
 
@@ -137,7 +183,26 @@ def _get_platform_model(platform: str) -> str:
     sys.exit('Error: Unknown platform "{}"'.format(platform))
 
 
-def _parse_platforms_directive() -> Tuple[str, str, List[str]]:
+def _parse_projects_directive() -> dict:
+    """Parses CI_OCPI_PROJECTS to return projects sorted by group"""
+    projects_directive = re.split(r'\s|,\s|,', getenv('CI_OCPI_PROJECTS', ''))
+    projects = {'osp': [], 'comp': []}
+    for project in projects_directive:
+        if '/' not in project:
+        # Group not specified; attempt to get group by project name
+            try:
+                group = re.search(r'.*\.(.*)\..*', project).group(1)
+                project = '{}/{}'.format(group, project)
+            except AttributeError:
+                continue
+        group = project.split('/', 1)[0]
+        if group in projects:
+            projects[group].append(project)
+
+    return projects
+
+
+def _parse_platforms_directive() -> dict:
     """
     Parses CI_OCPI_PLATFORMS env var to determine platforms to build for
     as well as any associated platforms to build ontop of it
@@ -145,8 +210,12 @@ def _parse_platforms_directive() -> Tuple[str, str, List[str]]:
     env var is expected to be in the form of:
         platform1:platform_2,...,platform_n
     """
-    platforms_directive = getenv('CI_OCPI_PLATFORMS').split(' ')
     platforms = {}
+    platforms_directive = getenv('CI_OCPI_PLATFORMS')
+    if not platforms_directive:
+        return platforms
+    
+    platforms_directive = platforms_directive.split(' ')
     for platform_directive in platforms_directive:
         if ':' in platform_directive:
             left_platform,right_platforms = platform_directive.split(':')

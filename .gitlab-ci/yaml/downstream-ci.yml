@@ -1,9 +1,5 @@
-workflow:
-  rules:
-    - when: always
-
-stages:
-  - trigger-opencpi
+include:
+ - .gitlab-ci/yaml/osp.yml
 
 .bridge:
   stage: trigger-opencpi
@@ -21,6 +17,8 @@ trigger-opencpi:
     branch: '$CI_OCPI_REF_NAME'
     strategy: depend
   rules:
+    - if: "$CI_OCPI_PIPELINE == 'new'"
+      when: never
     - if: '$CI_COMMIT_TAG'
       when: never
     - when: always
@@ -33,6 +31,8 @@ trigger-opencpi-tag:
     branch: '$CI_COMMIT_TAG'
     strategy: depend
   rules:
+    - if: "$CI_OCPI_PIPELINE == 'new'"
+      when: never
     - if: '$CI_COMMIT_TAG'
       when: always
     - when: never
