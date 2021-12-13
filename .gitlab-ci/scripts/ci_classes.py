@@ -112,9 +112,12 @@ class PipelineBuilder(ABC):
         _build_jobs()
     """
     def __init__(self, pipeline_id: str, container_registry: str, 
-        dump_path: Path, config: dict):
+        base_image_tag: str, dump_path: Path, config: dict, 
+        image_tags: List[str]=None):
         """Initializes a Pipelinebuilder"""
         self.pipeline_id = pipeline_id
+        self.image_tags = image_tags
+        self.base_image_tag = base_image_tag
         self.config = config
         self.dump_path = dump_path
         self.container_registry = container_registry
@@ -164,16 +167,8 @@ class PipelineBuilder(ABC):
         trigger = {}
         if project:
         # Trigger is for an external project
-            if '/' not in project:
-            # If the project does not contain a group, try to get group
-            # from middle of project name. Ex: ocpi.comp.sdr group == comp,
-            # so full project == comp/ocpi.comp.sdr
-                try:
-                    group = re.search(r'.*\.(.*)\..*', project).group(1)
-                    project = '{}/{}'.format(group, project)
-                except AttributeError:
-                    pass
-            trigger['project'] = project
+            trigger['project'] = 'opencpi/' + project
+            trigger['strategy'] = 'depend'
         else:
         # Trigger is for a child pipeline
             if stage == 'assemblies-platform':
@@ -261,7 +256,7 @@ class PipelineBuilder(ABC):
         elif cmd == 'start':
             docker_cmd = 'docker start -a $CI_JOB_ID'
         elif cmd == 'tag':
-            if not self.tag:
+            if not tag:
                 raise Exception('docker cmd "tag" requires a tag')
             docker_cmd = 'docker tag {} {}'.format(image, tag)
         else:
@@ -318,33 +313,44 @@ class PipelineBuilder(ABC):
 
 class PlatformPipelineBuilder(PipelineBuilder):
     def __init__(self, pipeline_id: str, container_registry: str, 
-        hosts: List[str], platforms: List[str], projects: List[str], 
-        dump_path: Path, config: dict, tag: str=None):
+        base_image_tag: str, hosts: List[str], platforms: List[str], 
+        projects: List[str], dump_path: Path, config: dict, 
+        image_tags: List[str]=None):
         """Initializes a PlatformPipelineBuilder"""
-        super().__init__(pipeline_id, container_registry, dump_path, config)
+        super().__init__(pipeline_id, container_registry, base_image_tag, 
+            dump_path, config, image_tags)
         self.stages = [
             'packages', 
             'prereqs', 
             'build', 
-            'test', 
+            'test',
+            'osp',
             'install-base-platform',
             'install-platform',
             'generate-base-platform',
             'generate-platform',
+            'comp',
             'assemblies-base-platform',
-            'assemblies-platform'
+            'assemblies-platform',
         ]
         self.hosts = hosts
         self.platforms = platforms
         self.projects = projects
-        self.tag = tag
 
     def _build_jobs(self) -> List[Job]:
         """Create jobs for host platforms"""
         jobs = []
-        for host in self.hosts:
-        # Build job for each host
-            for stage in self.stages:
+        for stage in self.stages:
+        # Build job for each stage
+            if stage in ['osp', 'comp']:
+            # Build bridge job for each project
+                projects = self.projects[stage]
+                for project in projects:
+                    job = self._build_job(stage, None, project=project)
+                    jobs.append(job)
+                continue
+            for host in self.hosts:
+            # Build job for each host
                 if stage in ['packages', 'prereqs', 'build', 'test']:
                 # Build job for host platform
                     job = self._build_job(stage, host)
@@ -382,9 +388,13 @@ class PlatformPipelineBuilder(PipelineBuilder):
     def _build_job(self, stage: str, host: str, platform: str=None, 
         base_platform: str=None, project: str=None) -> Job:
         """Build a bridge or script job"""
-        name = self._build_name(host, base_platform, platform, project, stage)
-        if stage in ['assemblies-base-platform', 'assemblies-platform']:
+        if stage in ['assemblies-base-platform', 'assemblies-platform', 'osp', 
+                     'comp']:
         # Build bridge job
+            if stage in ['osp', 'comp']:
+                name = self._build_name(project.split('.')[-1], stage)
+            else:
+                name = self._build_name(host, base_platform, platform, stage)
             variables = self._build_variables(stage, host, platform)
             trigger = self._build_trigger(stage, host=host, platform=platform, 
                 base_platform=base_platform, project=project)
@@ -394,6 +404,7 @@ class PlatformPipelineBuilder(PipelineBuilder):
                             needs=needs)
         else:
         # Build script job
+            name = self._build_name(host, base_platform, platform, stage)
             variables = self._build_variables(stage, host, platform=platform,
                 base_platform=base_platform)
             script = self._build_script(stage, host, platform=platform, 
@@ -435,7 +446,7 @@ class PlatformPipelineBuilder(PipelineBuilder):
         else:
         # Create 'docker run' cmd
             if stage in ['install-platform', 'install-base-platform']:
-                volumes =['/opt/Xilinx:/opt/Xilinx']
+                volumes = ['/opt/Xilinx:/opt/Xilinx']
             else:
                 volumes = None
             base_image = self._build_base_image_name(host, stage, 
@@ -456,6 +467,14 @@ class PlatformPipelineBuilder(PipelineBuilder):
             ecr_repo_cmd = PipelineBuilder._build_ecr_repo_cmd(repo)
             docker_push_cmd = self._build_docker_cmd('push', image, stage)
             script += [docker_commit_cmd, ecr_repo_cmd, docker_push_cmd]
+        # Add additional tag to image
+            for tag in self.image_tags:
+                tag = self._build_image_name(host, stage, platform=platform, 
+                    base_platform=base_platform, tag=tag)
+                docker_tag_cmd = self._build_docker_cmd('tag', image, stage,
+                    tag=tag)
+                docker_push_cmd = self._build_docker_cmd('push', tag, stage)
+                script += [docker_tag_cmd, docker_push_cmd]
         elif stage in ['generate-platform', 'generate-base-platform']:
         # Create 'docker cp' cmd to copy generate yml file to host machine
         # So that it can be uploaded as a GitLab artifact
@@ -464,15 +483,15 @@ class PlatformPipelineBuilder(PipelineBuilder):
             docker_cp_cmd = self._build_docker_cmd(
                 'cp', base_image, stage, source=source)
             script.append(docker_cp_cmd)
-        if self.tag is not None and stage in ['build', 'install-base-platform', 
-                                              'install-platform']:
+        if stage in ['build', 'install-platform', 'install-base-platform']:
         # Add additional tag to image
-            tag = self._build_image_name(host, stage, platform=platform, 
-                base_platform=base_platform, tag=self.tag)
-            docker_tag_cmd = self._build_docker_cmd('tag', image, stage,
-                tag=tag)
-            docker_push_cmd = self._build_docker_cmd('push', tag, stage)
-            script += [docker_tag_cmd, docker_push_cmd]
+            for tag in self.image_tags:
+                tag = self._build_image_name(host, stage, platform=platform, 
+                    base_platform=base_platform, tag=tag)
+                docker_tag_cmd = self._build_docker_cmd('tag', image, stage,
+                    tag=tag)
+                docker_push_cmd = self._build_docker_cmd('push', tag, stage)
+                script += [docker_tag_cmd, docker_push_cmd]
 
         return script
 
@@ -520,25 +539,33 @@ class PlatformPipelineBuilder(PipelineBuilder):
         dictionary
         """
         variables = {}
-        if stage != 'packages':
+        if stage not in ['packages', 'osp', 'comp']:
         # Only clone repo in 'packages' stage
             variables['GIT_STRATEGY'] = 'none'
-        if stage in ['generate-platform', 'generate-base-platform']:
-        # Gather variables for generating child pipeline
+        if stage in ['generate-platform', 'generate-base-platform', 
+                       'osp', 'comp']:
+        # Gather variables for generating child pipeline or triggering project
             for key,val in environ.items():
                 if key.startswith('CI_OCPI_') or key.startswith('OCPI_'):
+                # Gather OCPI_ and CI_OCPI_ env vars to pass
                     variables[key] = val
-            variables['CI_OCPI_HOST'] = host
             variables['CI_OCPI_ROOT_PIPELINE_ID'] = self.pipeline_id
-            variables['CI_OCPI_CONTAINER_REPO'] = self._build_base_repo_name(
-                host, stage, platform=platform, base_platform=base_platform)
-            if stage == 'generate-platform':
-                variables['CI_OCPI_PLATFORM'] = platform
-                if base_platform:
-                    variables['CI_OCPI_OTHER_PLATFORM'] = base_platform
-            else:
-                variables['CI_OCPI_PLATFORM'] = base_platform
-                variables['CI_OCPI_OTHER_PLATFORM'] = platform
+            if stage in ['generate-platform', 'generate-base-platform']:
+            # Add variables needed to generate yaml for child pipeline
+                variables['CI_OCPI_HOST'] = host
+                container_repo = self._build_base_repo_name(host, stage, 
+                    platform=platform, base_platform=base_platform)
+                variables['CI_OCPI_CONTAINER_REPO'] = container_repo
+                if stage == 'generate-platform':
+                    variables['CI_OCPI_PLATFORM'] = platform
+                    if base_platform:
+                        variables['CI_OCPI_OTHER_PLATFORM'] = base_platform
+                else:
+                    variables['CI_OCPI_PLATFORM'] = base_platform
+                    variables['CI_OCPI_OTHER_PLATFORM'] = platform
+            elif stage == 'osp':
+            # Don't override platforms if triggering an osp
+                variables.pop('CI_OCPI_PLATFORMS')
         else:
         # Get variables from config
             if stage == 'install-platform':
@@ -558,6 +585,8 @@ class PlatformPipelineBuilder(PipelineBuilder):
     def _build_needs(self, stage: str, host: str, platform: str=None,
         base_platform: str=None) -> List[str]:
         """Constructs and returns a job's needs as a list of strings"""
+        if stage in ['osp', 'comp']:
+            return None
         needs = []
         if stage == 'packages':
             return needs
@@ -567,8 +596,6 @@ class PlatformPipelineBuilder(PipelineBuilder):
             else:
                 need_stage = 'generate-base-platform'
             need = self._build_name(host, base_platform, platform, need_stage)
-        elif stage == 'projects':
-            need = self._build_name(host, 'test')
         elif stage in ['install-platform', 'install-base-platform']:
             need_stage = 'install-base-platform' if base_platform else 'test'
             need = self._build_name(host, base_platform, need_stage)
@@ -625,8 +652,10 @@ class PlatformPipelineBuilder(PipelineBuilder):
                 raise Exception('platform required to build ocpi cmd')
             ocpi_cmd = 'ocpiadmin install platform {}'.format(platform)
             if base_platform:
-                ocpi_cmd += ' && ocpiadmin deploy platform {} {}'.format(
+                ocpi_cmd += ' && (ocpiadmin deploy platform {} {}'.format(
                     platform, base_platform)
+                ocpi_cmd += ' || ocpiadmin deploy platform {} {})'.format(
+                    base_platform, platform)
         elif stage in ['generate-base-platform', 'generate-platform']:
             ocpi_cmd = '.gitlab-ci/scripts/ci_generate_pipeline.py assembly'
         elif stage == 'test':
@@ -671,9 +700,9 @@ class PlatformPipelineBuilder(PipelineBuilder):
     def _build_image_name(self, host: str, stage: str, platform: str=None,
         base_platform: str=None, tag=None) -> str:
         """Constructs a name for a docker image base on job's stage"""
+        tag = self.pipeline_id if tag == None else tag
         repo = self._build_repo_name(host, stage, platform=platform, 
             base_platform=base_platform)
-        tag = tag if tag is not None else self.pipeline_id
         image_name = super()._build_image_name(repo, tag)
 
         return image_name
@@ -681,20 +710,129 @@ class PlatformPipelineBuilder(PipelineBuilder):
     def _build_base_image_name(self, host: str, stage: str, platform: str=None,
         base_platform: str=None, tag=None) -> str:
         """Constructs a name for a docker base image based on job's stage"""
+        tag = self.base_image_tag if tag == None else tag
         repo = self._build_base_repo_name(host, stage, platform=platform,
             base_platform=base_platform)
-        tag = tag if tag is not None else self.pipeline_id
         image_name = super()._build_image_name(repo, tag)
 
         return image_name
 
 
+class OspPipelineBuilder(PlatformPipelineBuilder):
+    def __init__(self, pipeline_id: str, container_registry: str, 
+        base_image_tag: str, hosts: List[str], platforms: List[str], 
+        projects: List[str], project: str, dump_path: Path, config: dict, 
+        image_tags: List[str]=None):
+        """Initialize an OspPipelineBuilder"""
+        super().__init__(pipeline_id, container_registry,
+            base_image_tag, hosts, platforms, projects, dump_path, config,
+            image_tags)
+        self.stages = [
+            'install-base-platform',
+            'install-platform',
+            'comp',
+            'generate-base-platform',
+            'generate-platform',
+            'assemblies-base-platform',
+            'assemblies-platform'
+        ]
+        self.project = project
+
+    def _build_script(self, stage: str, host: str, platform: str=None,
+        base_platform: str=None) -> str:
+        """Build a script for a job"""
+        script = []
+        if stage in ['install-platform', 'install-base-platform']:
+            base_image = self._build_base_image_name(host, stage, 
+                platform=platform, base_platform=base_platform)
+            ocpi_cmd = self._build_ocpi_cmd(stage, platform, base_platform)
+            volumes = ['/opt/Xilinx:/opt/Xilinx']
+            docker_create_cmd = self._build_docker_cmd('create', base_image, 
+                stage, ocpi_cmd=ocpi_cmd, volumes=volumes)
+            source = '.'
+            dest = '$CI_JOB_ID:/opencpi/projects/osps/{}'.format(self.project)
+            docker_cp_cmd = self._build_docker_cmd('cp', None, stage, 
+                source=source, dest=dest)
+            docker_start_cmd = self._build_docker_cmd('start', None, stage)
+            script += [docker_create_cmd, docker_cp_cmd, docker_start_cmd]
+            # Create 'docker commit' and 'docker push' cmds
+            image = self._build_image_name(host, stage, platform=platform,
+                base_platform=base_platform)
+            repo = self._build_repo_name(host, stage, platform=platform, 
+                base_platform=base_platform)
+            docker_commit_cmd = self._build_docker_cmd('commit', image, stage)
+            ecr_repo_cmd = PipelineBuilder._build_ecr_repo_cmd(repo)
+            docker_push_cmd = self._build_docker_cmd('push', image, stage)
+            script += [docker_commit_cmd, ecr_repo_cmd, docker_push_cmd]
+            # Add additional tag to image
+            for tag in self.image_tags:
+                tag = self._build_image_name(host, stage, platform=platform, 
+                    base_platform=base_platform, tag=tag)
+                docker_tag_cmd = self._build_docker_cmd('tag', image, stage,
+                    tag=tag)
+                docker_push_cmd = self._build_docker_cmd('push', tag, stage)
+                script += [docker_tag_cmd, docker_push_cmd]
+        else:
+            script += super()._build_script(stage, host, platform=platform, 
+                base_platform=base_platform)
+
+        return script
+
+    def _build_needs(self, stage: str, host: str, platform: str=None,
+        base_platform: str=None) -> List[str]:
+        """Constructs and returns a job's needs as a list of strings"""
+        if stage == 'install-base-platform':
+            needs = []
+        elif stage == 'install-platform' and base_platform:
+            need = self._build_name(host, base_platform, 
+                'install-base-platform')
+            needs = [need]
+        else:
+            needs = super()._build_needs(stage, host, platform=platform,
+                base_platform=base_platform)
+
+        return needs
+
+    def _build_ocpi_cmd(self, stage: str, platform: str=None, 
+        base_platform: str=None) -> str:
+        """Returns an ocpi command based on the job's stage"""
+        ocpi_cmd = super()._build_ocpi_cmd(stage, platform=platform,
+            base_platform=base_platform)
+        if (stage == 'install-base-platform' 
+            or (stage == 'install-platform' and base_platform is None)):
+        # First stage in pipeline; need to register project
+            ocpi_cmd = " && ".join([
+                'ocpidev register project -d projects/osps/{}'.format(
+                    self.project),
+                ocpi_cmd
+            ])
+
+        return ocpi_cmd
+
+    def _build_variables(self, stage: str, host: str, platform: str = None, 
+        base_platform: str = None, **kwargs: dict) -> dict:
+        """Constructs and returns a job's variables as a dictionary
+        
+        Any key/value pair provided as **kwargs will be added to the
+        dictionary
+        """
+        variables = super()._build_variables(stage, host, platform=platform, 
+            base_platform=base_platform, **kwargs)
+        if (stage == 'install-base-platform' 
+            or (stage == 'install-platform' and base_platform is None)):
+        # Need to add project to image, so remove 'GIT_STRATEGY' = none
+            variables.pop('GIT_STRATEGY')
+
+        return variables
+
+
 class AssemblyPipelineBuilder(PipelineBuilder):
     def __init__(self, pipeline_id, container_registry, container_repo,
-        host, platform, model, other_platform, assembly_dirs, test_dirs, 
-        dump_path, config=None, runners=list(), do_hwil=False):
+        base_image_tag, host, platform, model, other_platform, assembly_dirs, 
+        test_dirs, dump_path, config=None, runners=list(), do_hwil=False):
         """Initializes an AssemblyPipelineBuilder"""
-        super().__init__(pipeline_id, container_registry, dump_path, config)
+        super().__init__(pipeline_id, container_registry, base_image_tag,
+            dump_path, config)
         self.container_repo = container_repo
         self.assembly_dirs = assembly_dirs
         self.test_dirs = test_dirs
@@ -763,7 +901,7 @@ class AssemblyPipelineBuilder(PipelineBuilder):
         """Build a job's script"""
         ocpi_cmd = self._build_ocpi_cmd(stage, asset)
         base_image = self._build_base_image_name(stage)
-        volumes =['/opt/Xilinx:/opt/Xilinx']
+        volumes = ['/opt/Xilinx:/opt/Xilinx']
         if stage == 'run-unit_tests':
         # Create "docker create" cmd, copy artifacts to container, and create
         # "docker start" cmd
@@ -901,14 +1039,12 @@ class AssemblyPipelineBuilder(PipelineBuilder):
             if self.ip:
                 ocpiremote_load_cmd = self._build_ocpiremote_cmd('load')
                 ocpiremote_start_cmd = self._build_ocpiremote_cmd('start')
-                ocpiremote_stop_cmd = self._build_ocpiremote_cmd('stop')
                 ocpiremote_unload_cmd = self._build_ocpiremote_cmd('unload')
                 ocpi_cmds = [
                     ocpiremote_unload_cmd + ' || true',
                     ocpiremote_load_cmd, 
                     ocpiremote_start_cmd,
                     ocpidev_run_cmd, 
-                    ocpiremote_stop_cmd + ' || true', 
                     ocpiremote_unload_cmd
                 ]
                 ocpi_cmd = ' && '.join(ocpi_cmds)

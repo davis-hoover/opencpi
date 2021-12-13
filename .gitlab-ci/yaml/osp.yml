@@ -1,0 +1,65 @@
+workflow:
+  rules:
+    - when: always
+
+stages:
+  - trigger-opencpi
+  - opencpi
+  - generate
+  - trigger
+
+# Triggers an opencpi pipeline if pipeline is not a release tag or if 
+# told to use a non-develop opencpi base image (must build image for branch)
+opencpi:
+  stage: opencpi
+  trigger:
+    project: opencpi/opencpi
+    branch: '$CI_OCPI_REF_NAME'
+    strategy: depend
+  rules:
+    - if: "$CI_OCPI_PIPELINE != 'new'"
+      when: never
+    - if: "$CI_COMMIT_TAG"
+      when: never
+    - if: "$CI_OCPI_REF_NAME == 'develop'"
+      when: never
+    - when: always
+  variables:
+    CI_OCPI_PLATFORMS: ""
+    CI_OCPI_HOSTS: "$CI_OCPI_HOSTS"
+    CI_OCPI_ROOT_PIPELINE_ID: "$CI_PIPELINE_ID"
+    CI_OCPI_PIPELINE: "$CI_OCPI_PIPELINE"
+
+generate:
+  artifacts:
+    paths:
+    - .gitlab-ci.yml
+  image: centos:7
+  script:
+    - yum install epel-release -y
+    - yum install python36-PyYAML -y
+    - yum install git -y
+    - git clone https://gitlab.com/opencpi/opencpi.git --depth 1
+    - opencpi/.gitlab-ci/scripts/ci_generate_pipeline.py osp
+  stage: generate
+  tags:
+  - docker
+  rules:
+    - if: "$CI_OCPI_PIPELINE != 'new'"
+      when: never
+    - when: on_success
+
+trigger:
+  stage: trigger
+  trigger:
+    include:
+    - artifact: .gitlab-ci.yml
+      job: generate
+    strategy: depend
+  rules:
+    - if: "$CI_OCPI_PIPELINE != 'new'"
+      when: never
+    - if: "$CI_PIPELINE_SOURCE != 'pipeline'"
+      variables:
+        CI_OCPI_ROOT_PIPELINE_ID: "$CI_PIPELINE_ID"
+    - when: on_success
