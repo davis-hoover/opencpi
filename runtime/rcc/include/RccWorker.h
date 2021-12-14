@@ -67,7 +67,7 @@ namespace OCPI {
       // Otherwise it is per-output-port
       inline bool checkEOF() const {
 	return m_version >= 2 && m_firstInput && !m_firstInput->metaPort->m_workerEOF &&
-	  m_firstInput->current.data && m_firstInput->current.eof_;
+	  m_firstInput->input.eof;
       }
     public:
       RCCResult setError(const char *fmt, va_list ap);
