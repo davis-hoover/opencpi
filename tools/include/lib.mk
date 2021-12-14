@@ -224,9 +224,8 @@ CleanModel=$(infox CLEANING MODEL $1)\
           fi;),:)\
 	  rm -r -f lib/$1 gen/$1
 
-
 doc: components
-all: declare $(if $(filter 1,$(OCPI_DOC_ONLY),doc)),workers $(if $(filter 1,$(OCPI_NO_DOC),,doc))
+all: declare $(if $(filter 1,$(OCPI_DOC_ONLY)),doc,workers $(if $(filter 1,$(OCPI_NO_DOC)),,doc))
 workers: $(build_targets)
 
 $(OutDir)lib:

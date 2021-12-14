@@ -79,7 +79,7 @@ ifeq (@,$(AT))
 endif
 
 OcpiToProject=$(subst $(Space),/,$(patsubst %,..,$(subst /, ,$1)))
-MaybeMake=$(call OcpiInfo,MAYBE:$1:$2)\
+MaybeMake=$(callx OcpiInfo,MAYBE:$1:$2)\
   $(if $(wildcard $1),$(strip\
     $(foreach f,$(if $(wildcard $1/Makefile),\
                   Makefile,\
