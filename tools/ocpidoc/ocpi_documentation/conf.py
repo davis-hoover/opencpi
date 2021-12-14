@@ -39,7 +39,7 @@ project = "OpenCPI assets"
 show_authors = False
 
 # Show version like OpenCPI docs, maybe OpenCPI doc build script can update this file
-version = "OpenCPI Release: v2.3.3"
+version = "OpenCPI Release: v2.3.4"
 release = ""
 
 needs_sphinx = "2.4"
