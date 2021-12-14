@@ -105,6 +105,7 @@
 +tools/include/util.mk include/
 +tools/include/package.mk include/
 +tools/include/worker.mk include/
++tools/include/component.mk include/
 +tools/include/xxx-worker.mk include/
 +tools/include/ocpisetup.mk include/
 +tools/include/test.mk include/

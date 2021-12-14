@@ -27,13 +27,13 @@ if ! PORT=`command -v port`; then
     exit 1
   }
 fi
-PKGS="cmake python38 swig3 swig3-python scons coreutils gsed py38-numpy libtool autoconf automake py38-jinja2"
+PKGS="cmake python39 swig3 swig3-python scons coreutils gsed py39-numpy libtool autoconf automake py39-jinja2"
 # no sphinxcontrib_spelling
-PKGS+=" py38-sphinx py38-sphinx_rtd_theme py38-scipy"
+PKGS+=" py39-sphinx py39-sphinx_rtd_theme py39-scipy"
 echo Using $PORT to install packages required by OpenCPI for $OCPI_TOOL_PLATFORM: $PKGS
 set -evx
 sudo $PORT install $PKGS
-sudo port select --set python3 python38
+sudo port select --set python3 python39
 sudo port select --set python python27
 sudo port select --set python2 python27
 # FIXME: somehow automate the required path additions?

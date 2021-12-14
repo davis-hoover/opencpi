@@ -728,7 +728,7 @@ OcpiGetRelevantProjectImport=$(strip $(infox OGRPI:$1:$2)\
 # $(call OcpiRelPathToContainingProject,<path>)
 OcpiRelPathToContainingProject=$(strip $(infox ORPTCP:$1)\
   $(call OcpiCacheFunctionOnPath,OcpiRelPathToContainingProjectX,$(call OcpiAbsPath,$(or $1,.))))
-OcpiRelPathToContainingProjectX=$(infox ORPTCPX:$1:$2)$(strip \
+OcpiRelPathToContainingProjectX=$(callx OcpiInfo,ORPTCPX:$1:$2)$(strip \
   $(if $(filter project,$(call OcpiGetDirType,$1)),\
     $(or $2,.),\
     $(if $(call OcpiExists,$1),\
@@ -1047,17 +1047,22 @@ ifdef NEVER
 endif
 # Look into a directory in $1 and determine which type of directory it is
 # Return null if there is no type to be found
-OcpiGetDirType=$(strip\
-  $(foreach t,$(call OcpiCacheFunctionOnPath,OcpiGetDirTypeX,$1),$(infox GDTr:$1:$t)$t))
-OcpiGetDirTypeX=$(strip $(infox GDT1:$1)\
-  $(foreach t,$(call OcpiCallPythonUtil,print(ocpiutil.get_dirtype("$1"))),\
-     $(infox GDT1: found type: $t for $1)$t))
+OcpiGetDirType=$(callx OcpiInfo,OGDT:$1)$(strip\
+  $(foreach t,\
+    $(word 1,$(subst :, ,$(call OcpiCacheFunctionOnPath,OcpiGetDirInfoX,$1))),\
+    $(callx OcpiInfo,GDTr:$1:$t)$t))
+OcpiGetDirInfoX=$(strip $(callx OcpiInfo,GDT1:$1)\
+  $(foreach t,$(call OcpiCallPythonUtil,print(ocpiutil.get_dir_info_for_make("$1"))),\
+     $(infox GDDI1: found info: $t for $1)$t))
 
 # Get the directory type of arg1, and return the portion after the last dash.
 # E.g. in an hdl-platform directory, this will return platform
-OcpiGetShortenedDirType=$(infox OGSDT:$1)$(strip \
+OcpiGetShortenedDirType=$(callx OcpiInfo,OGSDT:$1)$(strip \
   $(foreach t,$(call OcpiGetDirType,$1),\
     $(if $(filter hdl-lib% hdl-core,$t),primitive,$(lastword $(subst -, ,$t)))))
+
+OcpiGetDirInfo=$(callx OcpiInfo,GDI:$1)$(strip\
+  $(foreach t,$(call OcpiCacheFunctionOnPath,OcpiGetDirInfoX,$1),$(infox GDIr:$1:$t)$t))
 
 ###############################################################################
 # Functions for including an asset and its parents
@@ -1091,7 +1096,7 @@ OcpiIncludeProject=$(infox OIP:$1:$2:$(MAKECMDGOALS):$(OCPI_PROJECT_PACKAGE):$(O
 # So, for library, first check if this is a platform's devices library.
 # If so, include the parent (../) with type Platform so it can
 # find Platform.mk if it exists. Otherwise, the parent is just the project
-OcpiIncludeParentAsset_library=\
+OcpiIncludeParentAsset_library=$(callx OcpiInfo,OIPA:$1)\
   $(if $(filter devices cards,$(notdir $(realpath $1))),\
     $(eval ComponentLibraries+=devices))\
   $(if $(filter %-platform application,$(call OcpiGetDirType,$(and $1,$1/)..)),\
@@ -1158,6 +1163,8 @@ define OcpiSetAsset
   # Worker is handled specially inParamShell
   else ifeq ($2,Worker)
     $$(infox Not including worker XML directly for make variables)
+  else ifeq ($2,Component)
+    $$(infox Not including component XML directly for make variables)
   else ifeq ($2,Platform)
     $$(infox Not including platform worker XML directly for make variables)
   else ifeq ($2,Test)
@@ -1237,7 +1244,7 @@ endef
 #   Arg1 = reference directory (optional) - defaults to '.' in subcalls
 #   Arg2 = authoring model prefix (optional) - <parent>.<auth>.<package-name>
 #   Arg3 = error/warning/info mode (optional)
-OcpiIncludeAssetAndParentX=$(infox OIAAPX:$1:$2:$3:$(realpath $1))$(strip \
+OcpiIncludeAssetAndParentX=$(callx OcpiInfo,OIAAPX:$1:$2:$3:$(realpath $1))$(strip \
   $(foreach t,$(call OcpiGetDirType,$1),\
     $(foreach s,$(if $(filter hdl-lib% hdl-core,$t),primitive,$(lastword $(subst -, ,$t))),\
       $(foreach c,$(call Capitalize,$s),$(infox OIAAPXi:$t:$s:$c:$(ParentPackage))\
@@ -1276,7 +1283,7 @@ OcpiIncludeAssetAndParent=\
 ###############################################################################
 
 # Find the subdirectories that make a Makefile that includes something
-OcpiFindSubdirs=$(foreach a,$(wildcard *),$(and $(filter $1,$(call OcpiGetDirType,$a)),$a))
+OcpiFindSubdirs=$(callx OcpiInfo,OFSD,$1)$(foreach a,$(wildcard *),$(and $(filter $1,$(call OcpiGetDirType,$a)),$a))
 
 OcpiHavePrereq=$(realpath $(OCPI_PREREQUISITES_DIR)/$1)
 OcpiPrereqDir=$(call OcpiHavePrereq,$1)
@@ -1334,7 +1341,7 @@ $(eval override XmlIncludeDirsInternal:=\
     $(XmlIncludeDirs) \
     $(XmlIncludeDirsInternal) \
     $(comment this is unreliable: Models:%=../lib/%) ../lib\
-    ../specs \
+    ../specs ../lib \
     $(comment we are out of the component library so look in projects, including ours) \
     $(comment we let c++ add the Xml ComponentLibraries)))
 endef
@@ -1587,5 +1594,11 @@ OcpiProjectFromPlatformDir=$(infox OPFPD:$1:$2)$(strip\
         $(foreach proj,$(patsubst %/$2/platforms/$(notdir $(path)),%,$(path)),\
           $(infox OPFPDr:$(proj))$(proj))))),\
     $(error Platform directory $1 does not exist)))
+
+# Warn/info to stderr without the makefile references etc.
+# Note all args will have white space stripped
+# So to allow commas in warnings, we add spaces between args
+OcpiWarn=$(shell echo Warning:' ' $(strip $1 $2 $3 $4 $5 $6 $7 $8 $9) >&2)
+OcpiInfo=$(shell echo $(strip $1 $2 $3 $4 $5 $6 $7 $8 $9) >&2)
 
 endif # ifndef __UTIL_MK__

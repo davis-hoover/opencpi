@@ -184,7 +184,7 @@ protected:
   virtual RCCResult start_config(unsigned config) = 0;
   virtual RCCResult stop_config(unsigned config) = 0;
   virtual RCCResult release_config(unsigned /*config*/) = 0;
-  virtual RCCResult status_config(unsigned /*config*/) { return RCC_OK; };
+  virtual RCCResult status_config(unsigned /*config*/) { return RCC_OK; }
 };
 } // DRC
 } // OCPI

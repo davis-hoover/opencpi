@@ -444,8 +444,15 @@ emitImplSignals(FILE *) {
 }
 
 void DataPort::
-emitXML(std::string &out) {
-  OM::Port::emitXml(out);
+emitXmlAttrs(std::string &out, bool verbose) const {
+  ::Port::emitXmlAttrs(out, verbose);
+  OM::Port::emitXmlAttrs(out, verbose);
+}
+
+void DataPort::
+emitXmlElements(std::string &out, bool verbose) const {
+  ::Port::emitXmlElements(out, verbose);
+  OM::Port::emitXmlElements(out, verbose);
 }
 
 const char *DataPort::

@@ -43,6 +43,9 @@ unexport Workers
 ifeq ($(origin Implementations),undefined)
 Implementations=$(filter-out $(ExcludeWorkers),$(foreach m,$(Models),$(wildcard *.$m)))
 endif
+ifeq ($(origin Components),undefined)
+  Components=$(filter-out $(ExcludeComponents),$(wildcard *.comp))
+endif
 ifeq ($(filter clean%,$(MAKECMDGOALS)),)
 $(shell mkdir -p lib; \
         workers_content="$(filter-out %.test, $(Implementations))"; \
@@ -200,6 +203,16 @@ $(AT)set -e;\
       $(call BuildImplementation,$(1),$i,$2) \
     fi;)\
 
+BuildComponents=\
+$(AT)set -e;\
+  $(foreach i,$(Components),\
+    if test ! -d $i; then \
+      echo Component \"$i\" has no directory here.; \
+      exit 1; \
+    else \
+      $(call BuildImplementation,$(1),$i,$2) \
+    fi;)\
+
 CleanModel=$(infox CLEANING MODEL $1)\
   $(AT)$(if $($(call Capitalize,$1)Implementations), \
 	 $(foreach i,$($(call Capitalize,$1)Implementations),\
@@ -211,7 +224,9 @@ CleanModel=$(infox CLEANING MODEL $1)\
           fi;),:)\
 	  rm -r -f lib/$1 gen/$1
 
-all: declare workers
+
+doc: components
+all: declare $(if $(filter 1,$(OCPI_DOC_ONLY),doc)),workers $(if $(filter 1,$(OCPI_NO_DOC),,doc))
 workers: $(build_targets)
 
 $(OutDir)lib:

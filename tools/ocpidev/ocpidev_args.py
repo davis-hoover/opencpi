@@ -431,6 +431,11 @@ verbs = {
                     'hdl_platform': options['hdl_platform'],
                     'library': options['library']
                 }
+            },
+            'component': {
+                'options': {
+                    'library': options['library']
+                }
             }
         }
     },
@@ -521,6 +526,11 @@ verbs = {
                     'rcc_platform': options['rcc_platform'],
                     'hdl_target': options['hdl_target'],
                     'hdl_platform': options['hdl_platform'],
+                    'library': options['library']
+                }
+            },
+            'component': {
+                'options': {
                     'library': options['library']
                 }
             }

@@ -297,6 +297,7 @@ class DevSignalsPort : public Port {
   void emitExtAssignment(FILE *f, bool int2ext, const std::string &extName,
 			 const std::string &intName, const Attachment &extAt,
 			 const Attachment &intAt, size_t count) const;
+  void emitXmlElements(std::string &out, bool verbose) const;
 };
 
 class LocalMemory {

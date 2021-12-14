@@ -29,7 +29,8 @@ from glob import glob
 from pathlib import Path
 import re
 import xml.etree.ElementTree as xt
-from _opencpi.util import cd, set_vars_from_make, OCPIException
+from _opencpi.util import cd, set_vars_from_make, OCPIException, logging
+import subprocess
 
 def get_make_vars_rcc_targets():
     """
@@ -64,7 +65,7 @@ def get_makefile(directory, type=None):
     if os.path.exists(directory + "/Makefile"):
         mkf="Makefile"
     else:
-        hdl = "hdl/" if type.startswith("hdl-") else ""
+        hdl = "hdl/" if type and type.startswith("hdl-") else ""
         mkf = os.environ["OCPI_CDK_DIR"] + "/include/" + hdl + type + ".mk"
     return mkf,directory
 
@@ -93,10 +94,12 @@ def get_maketype(directory):
 
 def get_dir_info(directory=".", careful=False):
     """
-    Determine a directory's attributes in a tuple:  make-type, asset-type
+    Determine a directory's attributes in a tuple:  make-type, asset-type, directory, xml_file
     The primary technique is to look at an XML file that is the same name as the directory name with
     a matching/appropriate top-level xml element
     """
+    # print("GETDIRINFO:"+directory+":"+os.getcwd(),file=sys.stderr)
+    # print("ENV:"+repr(os.environ.get("OCPI_XML_INCLUDE_PATH")), file=sys.stderr)
     models = ["hdl", "rcc", "ocl"] # should be static elsewhere
     in_lib  = models + [ "test", "comp" ]
     directory = directory.rstrip('/')
@@ -114,21 +117,23 @@ def get_dir_info(directory=".", careful=False):
     make_type = None
     asset_type = None # will be set to make_type if not set
     top_xml_elements = None
-    xml_file = directory + "/" + parts[0] + ".xml"
-    if (os.path.isfile(directory + "/Project.mk") or
-        os.path.isfile(directory + "/Project.xml") or
-        os.path.isfile(directory + "/project-package-id")):
+    xml_name = directory + "/" + name
+    xml_file = xml_name + ".xml"
+    has_project_file = (os.path.isfile(directory + "/Project.mk") or
+                        os.path.isfile(directory + "/Project.xml"))
+    if has_project_file or os.path.isfile(directory + "/project-package-id"):
         # Do we need to check for project-package-id file in exports?
         make_type = asset_type = "project"
+        xml_name = "Project" if has_project_file else None
     elif len(parts) > 1:
         if parts[-1] == "test":
-            name += "-test"
+            xml_name += "-test"
             top_xml_elements = ["tests"]
             make_type = asset_type = "test"
         elif parts[-1] == "comp":
-            name += "-spec"
+            xml_name += "-spec"
             top_xml_elements = ["componentspec"]
-            asset_type = "component"
+            make_type = asset_type = "component"
         elif parts[-1] in [ "hdl", "rcc", "ocl" ]:
             top_xml_elements = [ parts[-1] + "worker" ]
             make_type = "worker"
@@ -140,7 +145,7 @@ def get_dir_info(directory=".", careful=False):
         make_type = asset_type = get_maketype(directory);
         if make_type:
             pass # library or libraries
-        elif os.path.exists(directory + "/components.xml"):
+        elif os.path.exists(xml_file):
             make_type = asset_type = xt.parse(xml_file).getroot().tag.lower()
         else: # no Makefile, no xml file
             make_type = 'libraries'
@@ -150,7 +155,7 @@ def get_dir_info(directory=".", careful=False):
             for entry in os.scandir(directory):
                 if entry.is_dir():
                     dparts = entry.name.split('.')
-                    if name == "specs" or (len(dparts) > 1 and dparts[-1] in in_lib):
+                    if entry.name == "specs" or (len(dparts) > 1 and dparts[-1] in in_lib):
                         make_type = asset_type = 'library'
                         break
     elif name in ["platforms", "primitives", "cards", "devices", "adapters", "assemblies" ]:
@@ -160,7 +165,7 @@ def get_dir_info(directory=".", careful=False):
         parent = os.path.basename(os.path.dirname(directory))
         if parent == "rcc" and name == "platforms":
             pass # no make type and not an asset...
-        elif parent in ["hdl"]: # someday models, at least for primitives
+        elif parent in ["hdl"]: # someday models, at least for primitives (e.g. rcc primitives)
             if name in ["cards", "devices", "adapters"]:
                 make_type = asset_type = "library"
             else:
@@ -175,6 +180,13 @@ def get_dir_info(directory=".", careful=False):
     elif name == "assemblies":
         # what is left: specs (not a thing), cards, devices, adapters
         make_type = "hdl-assemblies"
+    elif name == "specs":
+        make_type = None
+        asset_type = "specs"
+        xml_name = None
+    elif os.path.isfile(xml_name + "-app.xml"):
+        make_type = asset_type = "application"
+        xml_name += "-app"
     elif os.path.isfile(xml_file):
         # a platform, an assembly, a library, a primitive
         tag = xt.parse(xml_file).getroot().tag.lower()
@@ -185,7 +197,7 @@ def get_dir_info(directory=".", careful=False):
         elif tag == "application":
             make_type = asset_type = "application"
     else: # could be library or platform or assembly or application
-        if directory.startswith(name): # incure absolutizing penalty
+        if directory.startswith(name): # incur absolutizing penalty
             directory = os.path.realpath(directory)
         parent = os.path.basename(os.path.dirname(directory))
         if parent == "components":
@@ -208,10 +220,17 @@ def get_dir_info(directory=".", careful=False):
         if match and match != make_type:
             raise OCPIException("When determining the directory type of \"" + str(directory) + "\", "\
                                 "apparent type is \"" + make_type + "\" but Makefile has \"" + match + "\"")
-    r = make_type, asset_type, directory;
+    r = make_type, asset_type, directory, xml_name + ".xml" if xml_name else None, name
     # if make_type:
-    #     print(repr(r))
+    # print("GETDIRINFOr:"+repr(r),file=sys.stderr)
     return r
+
+def get_dir_info_for_make(directory="."):
+    info = list(get_dir_info(directory));
+    for i in range(0, len(info)):
+        if not info[i]:
+            info[i] = ""
+    return ":".join(info)
 
 def get_subdirs_of_type(dirtype, directory="."):
     """
@@ -1155,6 +1174,34 @@ def get_platform_make_dictionary():
            get_platform_make_dictionary.dict[var] = value.split(' ')
    return get_platform_make_dictionary.dict
 get_platform_make_dictionary.dict=None
+
+# Note this was moved from tools/ocpidev/assets/component.py
+# It is assumed to be called in a project context, which means if it is not
+# at the project level, higher level attributes are in the environment, which will be
+# used by ocpigen
+def get_xml_string(directory='.'):
+    """
+    Ask ocpigen (the code generator) to parse the worker(OWD) or component(OCS) xml file and
+    spit out an artifact xml that this function parses into class variables.
+      property_list - list of every property, each property in this list will be a dictionary of
+                      all the xml attributes associated with it from the artifact xml
+      port_list     - list of every port each port in this list will be a dictionary of
+                      all the xml attributes associated with it from the artifact xml some of
+                      which are unused
+      slave_list    - list of every slave worker's name expected to be blank for an OCS
+
+    Function attributes:
+      xml_file - the file to have ocpigen parse
+    """
+    make_type, asset_type, directory, xml_name,_ = get_dir_info(directory)
+    ocpigen_cmd = ["make", "-r", "--no-print-directory", "-C", directory, "-f", get_makefile(directory, make_type)[0], "xml" ]
+    logging.debug("running ocpigen command: " + str(ocpigen_cmd))
+    old_log_level = os.environ.get("OCPI_LOG_LEVEL", "0")
+    os.environ["OCPI_LOG_LEVEL"] = "0"
+    xml = subprocess.Popen(ocpigen_cmd, stdout=subprocess.PIPE).communicate()[0]
+    os.environ["OCPI_LOG_LEVEL"] = old_log_level
+    logging.debug("Asset XML from ocpigen: \n" + str(xml))
+    return xml.decode(), xml_name
 
 if __name__ == "__main__":
     import doctest

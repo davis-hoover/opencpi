@@ -1147,6 +1147,9 @@ Worker(ezxml_t xml, const char *xfile, const std::string &parentFile,
         }
     }
   }
+  const char *env = getenv("OCPI_XML_INCLUDE_PATH");
+  for (OU::TokenIter ti(env, ": "); ti.token(); ti.next())
+    addInclude(ti.token());
   // These next two attributes are necessary to parse this worker since they exist
   // to provide places to look for XML that this OWD refers to.
   bool isDir;
@@ -1169,6 +1172,8 @@ Worker(ezxml_t xml, const char *xfile, const std::string &parentFile,
   if ((err = getComponentLibraries(ezxml_cattr(xml, "componentlibraries"), m_modelString, true,
 				   dirs)))
     return;
+  for (OU::TokenIter ti(". gen ../specs ../lib"); ti.token(); ti.next())
+    addInclude(ti.token());
   for (auto it = dirs.begin(); it != dirs.end(); ++it)
     addInclude(*it);
   err = m_build.parse(xml);

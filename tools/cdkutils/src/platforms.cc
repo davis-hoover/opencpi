@@ -183,16 +183,19 @@ getProjectRelDir(std::string &dir) {
   else {
     OF::FileId dot, dotdot;
     std::string up;
-    for (up = "./"; !OF::exists(up + PROJECT_MK) && !OF::exists(up + PROJECT_XML); up += "../")
+    for (up = "./"; !OF::exists(up + PROJECT_MK) && !OF::exists(up + PROJECT_XML);
+	 up += "../")
       if (!OF::exists(up + ".", NULL, NULL, NULL, &dot) ||
 	  !OF::exists(up + "..", NULL, NULL, NULL, &dotdot) ||
 	  dot == dotdot) {
 	return OU::esprintf("Could not find containing project directory (i.e. count not find \"%s\""
 			    " nor \"%s\" in any parent directory", PROJECT_MK, PROJECT_XML);
       }
-    env = up == "./" ? up.c_str() : up.c_str() + 2;
-    ocpiCheck(setenv(PROJECT_REL_DIR_ENV, env, 1) == 0);
-    dir = env;
+    up.resize(up.length() - 1); // nuke trailing slash
+    if (up != ".")
+      up.erase(0, 2); // nuke leading ./
+    ocpiCheck(setenv(PROJECT_REL_DIR_ENV, up.c_str(), 1) == 0);
+    dir = up;
   }
   return NULL;
 }

@@ -87,7 +87,7 @@ def checkBuilt (primDir):
     fileList = os.listdir(primDir)
     targets = []
     for fileName in fileList:
-        if fileName.startswith("target"):
+        if fileName.startswith("target-"):
             fileName = fileName.split('-')
             if len(fileName) == 2 :
                 targets.append(fileName[1])
@@ -99,7 +99,7 @@ def checkBuiltWorker (workerDir):
     targets = []
     configs = []
     for fileName in fileList:
-        if fileName.startswith("target"):
+        if fileName.startswith("target-"):
             fileName = fileName.split('-')
             if len(fileName) == 5 :
                 targets.append(fileName[3])
@@ -226,6 +226,12 @@ def indent(elem, level=0):
         if level and (not elem.tail or not elem.tail.strip()):
             elem.tail = i
 
+def skipDir(dirs):
+    for dir in dirs:
+       if dir in ["exports", "gen", "lib", "imports"] or fnmatch.fnmatch(dir, 'target-*'):
+           return True
+    return False
+
 def main(project_dir=None):
     
     if not project_dir and len(sys.argv) < 2 :
@@ -276,8 +282,8 @@ def main(project_dir=None):
             addXmlApplications(apps, only_files, mydir + "/applications")
 
         for dirName, subdirList, fileList in os.walk(mydir):
-            if "exports" in dirName or "imports" in dirName:
-                continue
+            if skipDir(dirName.split("/")):
+               continue
             elif dirName == mydir + "/components":
                 if ocpiutil.get_dirtype(dirName) == "library":
                     addLibs(comps, ["components"])

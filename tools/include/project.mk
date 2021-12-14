@@ -79,12 +79,14 @@ ifeq (@,$(AT))
 endif
 
 OcpiToProject=$(subst $(Space),/,$(patsubst %,..,$(subst /, ,$1)))
-MaybeMake=$(infox MAYBE:$1:$2)\
-  $(foreach f,$(if $(wildcard $1/Makefile),Makefile,\
-                $(foreach t,$(call OcpiGetDirType,$1),$(infox DT:$1:$t)\
-                  $$OCPI_CDK_DIR/include/$(and $(filter hdl-%,$t),hdl/)$t.mk)),\
-     if [ -d $1 ] ; then \
-       $(MAKE) -f $f --no-print-directory -r -C $1 OCPI_PROJECT_REL_DIR=$(call OcpiToProject,$1) $2; fi)
+MaybeMake=$(call OcpiInfo,MAYBE:$1:$2)\
+  $(if $(wildcard $1),$(strip\
+    $(foreach f,$(if $(wildcard $1/Makefile),\
+                  Makefile,\
+                  $(foreach t,$(call OcpiGetDirType,$1),$(call OcpiInfo DT:$1:$t)\
+                    $$OCPI_CDK_DIR/include/$(and $(filter hdl-%,$t),hdl/)$t.mk)),\
+      $(MAKE) -f $f --no-print-directory -r -C $1 OCPI_PROJECT_REL_DIR=$(call OcpiToProject,$1) $2)),\
+      :)
 
 # Three parameters - $1 is before platform, $2 is after platform, $3 is call to $(MAKE)
 MaybeMakePlatforms=\

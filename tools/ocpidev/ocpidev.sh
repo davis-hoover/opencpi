@@ -2246,6 +2246,8 @@ while [[ "${argv[0]}" != "" ]] ; do
       (--generate) generate=1;;     # for building tests, do the "generate" subset of build
       (--simulation) simulation=1;; # for cleaning tests, clean the simulation directories
       (--execute) execute=1;;       # for cleaning tests, clean the execution/run directories
+      (--no-doc) export OCPI_NO_DOC=1;
+      (--doc-only) export OCPI_DOC_ONLY=1;
       (*)
         error_msg="unknown option: ${argv[0]}"
         if [ -n "$verb" ]; then

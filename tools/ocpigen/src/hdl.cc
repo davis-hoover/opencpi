@@ -440,6 +440,26 @@ parseSignals(ezxml_t xml, const std::string &parent, Signals &signals, SigMap &s
   return err;
 }
 
+// verbose assumed
+void Signal::
+emitXml(std::string &out) const {
+  OU::formatAdd(out, "      <signal name='%s' direction='%s'", cname(),
+		m_directionExpr.empty() ? directions[m_direction] : m_directionExpr.c_str());
+  if (!m_widthExpr.empty())
+    OU::formatAdd(out, " width='%s'", m_widthExpr.c_str());
+  else if (m_width)
+    OU::formatAdd(out, " width='%zu'", m_width);
+  OE::emitBoolAttr(out, "pin", m_pin, true);
+  OE::emitBoolAttr(out, "differential", m_differential, true);
+  out += "/>\n";
+}
+
+void Signal::
+emitSignals(const Signals &signals, std::string &out) {
+  for (SignalsIter si = signals.begin(); si != signals.end(); si++)
+    (**si).emitXml(out);
+}
+
 const Signal *Signal::
 find(const SigMap &sigmap, const char *name) {
   SigMap::const_iterator si = sigmap.find(name);

@@ -93,10 +93,10 @@ if [ -r $userenv ] && grep -q '^ *export' $userenv; then
   if [ "$version" != "$defaultversion" ]; then
     echo The user-edited environment setup file \"$userenv\", is out of date.
     echo It should be re-edited based on a copy of the updated default version in \"$defaultuserenv\".
- fi
+  fi
 elif [ -r $userenv ]; then
   if cmp -s $userenv $defaultuserenv; then
-    [ -n "$verbose" ] && echo Preserving user environment script \"$userenv\" since it is the default one.
+    [ -n "$verbose" ] && echo Using existing user environment script \"$userenv\" since it is the default one.
   else
     [ -n "$verbose" ] && echo "Replacing user environment script \"$userenv\" with current default, since it has no exports and is different from the (presumably newer) default one."
     cp $defaultuserenv $userenv

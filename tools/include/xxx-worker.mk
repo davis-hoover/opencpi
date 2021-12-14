@@ -61,12 +61,19 @@ skeleton:  $(ImplHeaderFiles) $(SkelFiles)
 
 ifeq ($(filter rcc,$(Model))$(filter clean%,$(MAKECMDGOALS))$(HdlActualTargets),)
   ifneq ($(MAKECMDGOALS),declare)
-    $(info This $(UCModel) worker $(Worker) not built since no $(UCModel) targets or platforms specified)
+    $(call OcpiInfo, This $(UCModel) worker $(Worker) not built since no $(UCModel) targets or platforms specified.)
+#    $(shell echo This $(UCModel) worker $(Worker) not built since no $(UCModel) targets or platforms specified. >&2)
   endif
   all: liblinks
 else
-  all: skeleton links
+  # All worker-derived assets (worker, platform, assembly, config, container etc.)
+  # might have doc
+  doc:
+	$(AT)ocpidoc build
+  all: skeleton links $(if $(OCPI_NO_DOC),,doc)
 endif
+  xml:
+	$(AT)$(OcpiGenEnv) ocpigen -G $(Worker_$(Worker)_xml)
 
 $(SkelFiles): $(GeneratedDir)/%$(SkelSuffix) : $$(Worker_%_xml) | $(GeneratedDir)
 	$(AT)$(OcpiRemoveSkeletons)
