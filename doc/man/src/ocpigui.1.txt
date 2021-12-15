@@ -1,0 +1,155 @@
+OCPIGUI(1)
+=========
+
+
+NAME
+----
+ocpigui - command-line tool for managing the OpenCPI GUI
+
+
+SYNOPSIS
+--------
+*`ocpigui`* ['<options>'] '<verb>'
+
+
+DESCRIPTION
+-----------
+
+*Note*: this command is not currently implemented, but will be in a future release.
+
+The *`ocpigui(1)`* command-line tool is used to start the OpenCPI
+graphical user interface (GUI) for managing OpenCPI assets.
+
+The OpenCPI GUI is a front end to *`ocpidev(1)`* that can perform most, but not all, of the
+development tasks that *`ocpidev`* can perform from within a graphical user interface.
+
+Installing OpenCPI GUI
+~~~~~~~~~~~~~~~~~~~~~~
+OpenCPI GUI is an optional OpenCPI development tool; the 'OpenCPI Installation Guide' provides
+instructions on how to install it.
+
+Using OpenCPI GUI
+~~~~~~~~~~~~~~~~~
+The 'OpenCPI GUI User Guide' describes the GUI's menus and dialogs. The OpenCPI
+tutorials demonstrate how to use the OpenCPI GUI to perform OpenCPI development
+tasks.
+
+VERBS
+-----
+*Note*: These descriptions are placeholders. This functionality is not currently implemented.
+
+The verbs supported by *`ocpigui`* are:
+
+*`desktop`*::
+    Add a selection for starting OpenCPI GUI
+    to the Applications > Programming menu bar on a CentOS7 development host [???Can it be any development host???].
+
+
+*`remove`*::
+    Remove the selection for the OpenCPI GUI
+    from the Applications > Programming menu bar on a CentOS7 development host. [???Any development host???]
+
+
+*`run`*::
+    Start the OpenCPI GUI from a *`bash`* shell.
+
+*`view`*::
+    Display the current OpenCPI installation directory and enabled user environment settings.
+    [??? Probably an option, not a verb]
+
+
+NOUNS
+-----
+*Note*: These descriptions are placeholders. This functionality is not currently implemented.
+
+None.
+
+OPTIONS
+-------
+*Note*: These descriptions are placeholders. This functionality is not currently implemented.
+
+*`--help`*, *`-h`*::
+    Display usage information about the command-line tool.
+
+*`--opencpi-path`*, *`-o`*::
+    Specify the path to the OpenCPI installation directory. The OpenCPI GUI requires
+    this information when it is started for the first time.
+
+*`--project-path`*, *`-p`*::
+    Specify the path to the directory that is displayed
+    in the OpenCPI GUI's Project Explorer panel. If this option
+    is not specified, the path is set to *`~/User_OpenCPI_Projects`*.
+
+
+FILES/DIRECTORIES
+-----------------
+*Note*: These descriptions are placeholders. This functionality is not currently implemented.
+
+The following files and directories are relevant to OpenCPI GUI operation:
+
+*`gui.desktop`*::
+    The file that adds a menu selection for the OpenCPI GUI
+    tool to the Applications > Programming desktop environment
+    menu bar on a CentOS7 development host. This file is created
+    by the *`ocpigui desktop`* operation in the CentOS7 user's
+    home directory in the subdirectory *`local/share/applications/`*.
+    [???Can this be genericized to support ubuntu as well as centos7?]
+
+*`~/User_OpenCPI_Projects/`*::
+    The subdirectory within the user's home directory that contains
+    the default workspace for the OpenCPI GUI.
+
+EXAMPLES
+--------
+*Note*: These examples are placeholders. The functionality is not currently implemented.
+
+. Start the OpenCPI GUI:
++
+-----------
+ocpigui run
+-----------
++
+. Start the OpenCPI GUI and specify the paths to the OpenCPI installation
+  and user project directories on the command-line instead of in the GUI:
++
+------------------------------------------------------------------------
+ocpigui --project-path=/home/MyProjects --opencpi-path=/home/opencpi run
+------------------------------------------------------------------------
++
+. Add a menu selection for starting the OpenCPI GUI
+from the CentOS7 desktop environment:
++
+--------------
+ocpigui desktop
+--------------
++
+. Remove the menu selection for the OpenCPI
+GUI from the CentOS7 desktop environment:
++
+-------------
+ocpigui remove
+-------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-project.1.html[ocpidev-project(1)]
+link:ocpidev-registry.1.html[ocpidev-registry(1)]
+
+COPYING
+-------
+Copyright \(C) 2022 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+

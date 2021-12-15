@@ -144,6 +144,7 @@ namespace OCPI {
 	if (&m_rccPort.current == &buffer) {
 	  m_buffer = NULL;
 	  m_rccPort.current.data = NULL;
+	  m_rccPort.input.eof = false;
 	}
 	try {
 	  buffer.portBuffer->release();
@@ -160,6 +161,7 @@ namespace OCPI {
 
 	newBuffer = m_rccPort.current; // copy the structure
 	m_rccPort.current.data = NULL;
+	m_rccPort.input.eof = false;
 	m_buffer->take(); // tell lower levels to move on, but not release
 	m_buffer = NULL;
 	if (oldBuffer) {

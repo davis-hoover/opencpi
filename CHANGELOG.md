@@ -1,3 +1,21 @@
+# [v2.3.4](https://gitlab.com/opencpi/opencpi/-/compare/v2.3.3...v2.3.4) (2021-12-14)
+
+Changes/additions since [OpenCPI Release v2.3.3](https://gitlab.com/opencpi/opencpi/-/releases/v2.3.3)
+
+### Enhancements
+- **doc**: add ocpigui.1.txt to doc/man/src. (!766)(afff0d43)
+
+### Bug Fixes
+- **doc**: remove AV GUI references and replace with OpenCPI references in Installation Guide and User Guide. (!751)(fdf0e160)
+- **doc**: add adrv9361 and picoevb system and platform information to systems.fodt (shared doc file). (!751)(fdf0e160)
+- **doc**: update "how to document assets" chapter in User Guide to describe current ocpidoc functionality. (!751)(fdf0e160)
+- **doc**: remove references to "mode" option and replace with "phase" option in ocpidev-run.1.txt and ocpidev-test.1.txt. (!751)(fdf0e160)
+- **doc**: remove references to "RCC_DONE" and replace with "RCC_FINISHED" in Briefing 6, "OpenCPI RCC Development". (!751)(fdf0e160)
+- **doc**: remove ocpiav.1.txt from doc/man/src. (!766)(afff0d43)
+- **doc**: modify opencpi.1.txt to link to ocpigui, not ocpiav. (!766)(afff0d43)
+- **doc**: remove obsolete data_sink_qdac(csts), data_src_qadc(csts) LaTeX files from projects/platform/hdl/devices/*.test/doc/. (!766)(afff0d43)
+- **tools**: fix `generate_clk_gen_ip.sh` error reporting. (!771)(7c7fc0ad)
+
 # [v2.3.3](https://gitlab.com/opencpi/opencpi/-/compare/v2.3.2...v2.3.3) (2021-11-30)
 
 Changes/additions since [OpenCPI Release v2.3.2](https://gitlab.com/opencpi/opencpi/-/releases/v2.3.2)
