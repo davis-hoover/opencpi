@@ -44,8 +44,10 @@ ifeq ($(origin Implementations),undefined)
 Implementations=$(filter-out $(ExcludeWorkers),$(foreach m,$(Models),$(wildcard *.$m)))
 endif
 ifeq ($(origin Components),undefined)
-  Components=$(filter-out $(ExcludeComponents),$(wildcard *.comp))
+  Components:=$(filter-out $(ExcludeComponents),$(wildcard *.comp))
 endif
+CompImplementations=$(Components)
+
 ifeq ($(filter clean%,$(MAKECMDGOALS)),)
 $(shell mkdir -p lib; \
         workers_content="$(filter-out %.test, $(Implementations))"; \
@@ -175,15 +177,19 @@ RccLibrariesCommand=$(call OcpiAdjustLibraries,$(RccLibraries))
 TestTargets:=$(call Unique,$(HdlPlatforms) $(HdlTargets) $(RccTargets))
 # set the directory flag to make, and use the desired Makefile
 GoWorker=$(infox GW:$1:$(wildcard $1/Makefile))-C $1 $(if $(wildcard $1/Makefile),,\
-                 -f $(OCPI_CDK_DIR)/include/$(if $(filter %.test,$(notdir $1)),test,worker).mk)
+                 -f $(OCPI_CDK_DIR)/include/$(strip $(foreach d,$(notdir $1),\
+                                                      $(if $(filter %.test,$d),test,\
+                                                        $(if $(filter %.comp,$d),component,worker)).mk)))
 BuildImplementation=$(infox BI:$1:$2:$(call HdlLibrariesCommand):$(call GoWorker,$2)::)\
     set -e; \
     if [ $1 = hdl -a  -z "$3$(HdlTarget)$(HdlTargets)$(HdlPlatform)$(HdlPlatforms)" ] ; then \
       echo "=============Skipping building $2 since no HDL targets or platforms specified."; exit 0; fi; \
     t="$(foreach t,$(or $($(call Capitalize,$1)Target),$($(call Capitalize,$1)Targets)),\
          $(call $(call Capitalize,$1)TargetDirTail,$t))";\
-    $(ECHO) =============$(if $3,Performing \"$3\" for,Building) $(call ToUpper,$(1)) implementation $(2) for target'(s)': $$t; \
-    $(MyMake) $(call GoWorker,$2) OCPI_CDK_DIR=$(call AdjustRelative,$(OCPI_CDK_DIR)) \
+    $(ECHO) $(strip $(if $(filter comp,$1),\
+	  =============Building documentation in component directory $2,\
+	  =============$(if $3,Performing \"$3\" for,Building) $(call ToUpper,$(1)) implementation $(2) for target'(s)': $$t)); \
+    $(MyMake) $(call GoWorker,$2) \
 	       LibDir=$(call AdjustRelative,$(LibDir)/$(1)) \
 	       GenDir=$(call AdjustRelative,$(GenDir)/$(1)) \
 	       $(PassOutDir) \
@@ -203,15 +209,6 @@ $(AT)set -e;\
       $(call BuildImplementation,$(1),$i,$2) \
     fi;)\
 
-BuildComponents=\
-$(AT)set -e;\
-  $(foreach i,$(Components),\
-    if test ! -d $i; then \
-      echo Component \"$i\" has no directory here.; \
-      exit 1; \
-    else \
-      $(call BuildImplementation,$(1),$i,$2) \
-    fi;)\
 
 CleanModel=$(infox CLEANING MODEL $1)\
   $(AT)$(if $($(call Capitalize,$1)Implementations), \
@@ -219,13 +216,32 @@ CleanModel=$(infox CLEANING MODEL $1)\
 	   if test -d $$i; then \
 	     tn="$(call Capitalize,$1)Targets"; \
 	     t="$(or $(CleanTarget),$($(call Capitalize,$1)Targets))"; \
-             $(ECHO) Cleaning $(call ToUpper,$1) implementation $i for targets: $$t; \
+	    $(ECHO) $(strip $(if $(filter comp,$1),\
+	     =============Cleaning documentation in component directory $i,\
+             =============Cleaning $(call ToUpper,$1) implementation $i for targets: $$t)); \
 	     $(MyMake) $(call GoWorker,$i) $(PassOutDir) $$tn="$$t" clean; \
           fi;),:)\
 	  rm -r -f lib/$1 gen/$1
 
-doc: components
-all: declare $(if $(filter 1,$(OCPI_DOC_ONLY)),doc,workers $(if $(filter 1,$(OCPI_NO_DOC)),,doc))
+# This is the doc that will not be build anyway as a side-effect of building elsewhere, i.e. workers
+comp:
+	$(AT)set -e;\
+	  $(foreach i,$(Components),$(call OcpiInfo,COMPIS:$i)\
+	    if test ! -d $i; then \
+	      echo Component \"$i\" has no directory here.; \
+	      exit 1; \
+	    else \
+	      $(call BuildImplementation,comp,$i) \
+	    fi;)\
+
+# This is the doc that will not be build anyway as a side-effect of building elsewhere, i.e. workers
+cleancomp:
+	$(call CleanModel,comp)
+
+all: declare workers $(if $(filter 1,$(OCPI_NO_DOC)),,comp doc)
+doc:
+	$(AT)ocpidoc build
+
 workers: $(build_targets)
 
 $(OutDir)lib:
@@ -282,7 +298,7 @@ cleanhdl:
 
 clean:: cleanocl
 
-clean:: cleanxm cleanrcc cleanhdl cleantest
+clean:: cleanxm cleanrcc cleanhdl cleantest cleancomp
 	$(AT)echo Cleaning \"$(CwdName)\" component library directory for all targets.
 	$(AT)find . -depth -name gen -exec rm -r -f "{}" ";"
 	$(AT)find . -depth -name "target-*" -exec rm -r -f "{}" ";"

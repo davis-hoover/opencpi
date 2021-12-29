@@ -95,7 +95,7 @@ $(foreach l,$(call Unique,\
               $(- first process explicitly supplied libraries)\
               $(foreach p,$(HdlExplicitLibraries),\
                 $(if $(findstring /,$p),\
-                  $(info Warning:  HDL primitive libraries specified with pathnames is deprecated:$p)\
+                  $(call OcpiInfo,Warning:  HDL primitive libraries specified with pathnames is deprecated:$p)\
                   $(or $(and $(call HdlExists,$p),$p:$(notdir $p)),\
                        $(error Primitive library $p (from HdlLibraries or Libraries) not found.)),\
                   $(call HdlSearchPrimitivePath,$p,,HPLHLI)))\
@@ -134,7 +134,7 @@ ifneq ($(xxfilter platform container,$(HdlMode)),)
   HdlPlatform:=$(or $(HdlMyPlatform),$(CwdName))
   ifdef HdlPlatforms
     ifeq ($(filter $(HdlPlatform),$(HdlPlatforms)),)
-      $(info Skipping this platform ($(HdlPlatform)) since it is not in HdlPlatforms ($(HdlPlatforms)))
+      $(call OcpiInfo,Skipping this platform ($(HdlPlatform)) since it is not in HdlPlatforms ($(HdlPlatforms)))
       HdlSkip:=1
     endif
   endif
@@ -272,7 +272,7 @@ else ifeq ($(HdlToolSets)$(filter skeleton,$(MAKECMDGOALS)),)
 $(call OcpiDbg,=============No tool sets at all, skipping)
 ifneq ($(MAKECMDGOALS),clean)
   ifdef HdlPreExcludeTargets
-    $(info Not building $(HdlMode) for these filtered (only/excluded) HDL targets: $(HdlPreExcludeTargets))
+    $(call OcpiInfo,Not building $(HdlMode) for these filtered (only/excluded) HDL targets: $(HdlPreExcludeTargets))
   else
     $(infox No HDL targets to build for.  Perhaps you want to set OCPI_HDL_PLATFORM for a default?)
   endif

@@ -22,6 +22,7 @@
 
 
 import pathlib
+import os
 
 import docutils
 import docutils.parsers.rst
@@ -85,7 +86,7 @@ class OcpiDocumentationImplementations(docutils.parsers.rst.Directive):
             model = implementation.parent.suffix[1:]
 
             worker_link = sphinx.addnodes.pending_xref(
-                "", refdoc=self.state.document.settings.env.docname,
+                "", refdoc=str(implementation),
                 refdomain="std", refexplicit="True",
                 reftarget=f"{name}-{model}-worker", reftype="ref",
                 refwarn=True)
@@ -155,6 +156,13 @@ class OcpiDocumentationImplementations(docutils.parsers.rst.Directive):
 
         line_number_rst = self.lineno + 5
         for worker_directory in self.arguments:
+            # The hack below allows relative ../ pathnames to work properly by
+            # creating a symlink instead
+            if worker_directory.startswith("../"):
+                symlink = "gen/" + worker_directory[3:]
+                if not pathlib.Path(symlink).is_symlink():
+                    os.symlink("../" + worker_directory, symlink)
+                worker_directory = symlink
             toctree_rst.append(f"   {worker_directory}/{name}-worker",
                                file_path, line_number_rst)
             line_number_rst = line_number_rst + 1

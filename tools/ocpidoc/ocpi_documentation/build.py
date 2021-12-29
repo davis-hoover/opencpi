@@ -23,11 +23,11 @@
 
 import pathlib
 import os
-
+import sys
 import sphinx.cmd.build
-
+import _opencpi.util as ocpiutil
 from .conf import BUILD_FOLDER
-
+from ocpi_documentation.create import _template_to_specific
 
 def build(directory, build_only=False, mathjax=None, config_options=[],
           **kwargs):
@@ -52,33 +52,73 @@ def build(directory, build_only=False, mathjax=None, config_options=[],
     build_directory = source_directory.joinpath("gen/" + BUILD_FOLDER)
     conf_directory = pathlib.Path(__file__).resolve().absolute().parent
 
-    build_options = [str(source_directory), str(build_directory),
-                     "-c", str(conf_directory)]
-
     # As the name of the main / top level documentation file will depend on the
     # type of source documentation this needs to be set at build time. Due to
     # how conf.py is called this cannot be set in conf.py, so pass as a build
     # option
-    if source_directory.suffix == ".comp":
-        master_doc = f"{source_directory.stem}-index"
-    elif source_directory.suffix in [".hdl", ".rcc", ".ocl"]:
-        master_doc = f"{source_directory.stem}-worker"
-    elif len(list(source_directory.glob("*-library.rst"))) == 1:
-        master_doc = list(source_directory.glob("*-library.rst"))[0].stem
-    elif len(list(source_directory.glob("specs.rst"))) == 1:
-        master_doc = list(source_directory.glob("specs.rst"))[0].stem
-    elif len(list(source_directory.glob("*.rst"))) == 1:
-        # If nothing else matches and there is a single rst file in the
-        # directory use that
-        master_doc = list(source_directory.glob("*.rst"))[0].stem
-    else:
-        # Use Sphinx default, as best case guess in this case
-        master_doc = "index"
-    if not os.path.isfile(str(directory) + "/" + master_doc + ".rst"):
-        print("Error:  In directory " + str(directory) +
-              " there is no file " + master_doc + ".rst, use: ocpidoc create?")
-        return 1
 
+    # Let the generic "dir_info" function determine the default name for the
+    # primary RST file, but also look for some backward compatible names
+    # and sphinx defaults
+
+    _,asset_type,_,xml_file,asset_name = ocpiutil.get_dir_info(str(source_directory))
+    stem = source_directory.stem
+    # If there is no possible primary XML file, use the stem, e.g. "specs".
+    default_rst_file_name = (pathlib.PurePath(xml_file).stem if xml_file
+                             else stem) + ".rst"
+    default_rst_path = source_directory.joinpath(default_rst_file_name)
+    master_doc = None
+    if default_rst_path.is_file():
+        master_doc = default_rst_path.stem # leave it local relative to source dir w/o .rst
+    elif source_directory.joinpath("gen", default_rst_file_name).is_file():
+        master_doc = default_rst_path.stem
+        # Note that the default files will not need to access any other files
+        source_directory = source_directory.joinpath("gen");
+    else:
+        # Non-default names for legacy (names that do not match the primary XML file)
+        if asset_type == "component":
+            master_doc = f"{stem}-index"
+        elif asset_type == "worker":
+            master_doc = f"{stem}-worker"
+        elif asset_type == "library":
+            master_doc = f"{stem}-library"
+        else:
+            rst_files = list(source_directory.glob("*.rst"))
+            if len(rst_files) == 1:
+                # If nothing else matches and there is a single rst file in the
+                # directory use that
+                master_doc = rst_files[0].stem
+            elif "index" in map(lambda f: f.stem, rst_files):
+                # Use Sphinx default, as best case guess in this case
+                master_doc = "index"
+        if not master_doc or not source_directory.joinpath(master_doc).is_file():
+            # Try using the default template in the gen/ subdir
+            empty_template_path = pathlib.Path(__file__).parent.joinpath("rst_templates",
+                                                                         "default-" + asset_type + ".rst")
+            xml_path = pathlib.Path(xml_file)
+            if empty_template_path.is_file(): # note xml_file does not have to exist
+                with open(empty_template_path, "r") as empty_template_file:
+                    template = empty_template_file.read()
+                    source_directory = source_directory.joinpath("gen")
+                    generated_rst_file = source_directory.joinpath(xml_path.stem + ".rst")
+                    generated_rst_file.parent.mkdir(parents=True,exist_ok=True)
+                    with open(generated_rst_file,"w") as rst_file:
+                        rst_file.write(_template_to_specific(template, asset_name,
+                                                             source_directory.suffix,
+                                                             None,
+                                                             None))
+                        master_doc = generated_rst_file.stem
+        else:
+            print("Warning:  when building docs in directory " + str(directory) +
+                  f" there is no \"{default_rst_file_name}\" or \"{xml_path.name}\" file present.",
+                  file=sys.stderr)
+            return 0
+    if not os.path.isfile(str(source_directory) + "/" + master_doc + ".rst"):
+        print("Error:  In directory " + str(directory) +
+              " there is no file " + master_doc + ".rst, use: ocpidoc create?", file=sys.stderr)
+        return 1
+    build_options = [str(source_directory), str(build_directory),
+                     "-c", str(conf_directory)]
     build_options = build_options + ["-D", f"master_doc={master_doc}"]
 
     for option in config_options:
@@ -101,6 +141,6 @@ def build(directory, build_only=False, mathjax=None, config_options=[],
 
     if return_value == 0:
         home_page = build_directory.joinpath(f"{master_doc}.html")
-        print(f"Home page at: {home_page}")
+        print(f"Primary HTML file for this asset is: {home_page}")
     # No error message as Sphinx will have printed this
     return return_value

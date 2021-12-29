@@ -383,7 +383,7 @@ main(int argc, const char **argv) {
           case NoModel:            ;
           }
         } else if (doCompArt && (err = w->emitToolArtXML()))
-	  err = OU::esprintf("%s: Error generating json file for ocpidev: %s", *ap, err);
+	  err = OU::esprintf("%s: Error generating XML file: %s", *ap, err);
         delete w;
       } catch (std::string &e) {
 	fprintf(stderr, "Exception thrown: %s\n", e.c_str());

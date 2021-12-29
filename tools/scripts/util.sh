@@ -205,10 +205,10 @@ function ocpiReadLinkE {
   [ -f $1 -o -d $1 ] && python3 -c 'import os; print(os.path.realpath("'$1'"))'
 }
 
+# It is a fatal error if this is called on a non-existent directory
 function ocpiDirType {
-  local type=$(python3 -c "import _opencpi.util as ou; print(ou.get_dirtype(\"$1\"))")
-  rc=$?
-  [ $rc = 0 ] && echo $type
+  python3 -c "import _opencpi.util as ou; print(ou.get_dirtype(\"$1\"))" ||
+    bad Failed call to python3 for dirtype of directory: $1
 }
 
 OcpiEcho=/bin/echo

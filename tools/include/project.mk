@@ -41,7 +41,7 @@ doimports=$(shell $(OcpiExportVars) $(MAKE) $(PMF) imports NoExports=1)
 ifeq ($(HdlPlatform)$(HdlPlatforms),)
   ifeq ($(filter clean%,$(MAKECMDGOALS))$(filter imports projectpackage,$(MAKECMDGOALS)),)
     $(infox $(doimports))
-    ifeq ($(findstring export,$(MAKECMDGOALS))$(findstring import,$(MAKECMDGOALS)),)
+    ifeq ($(findstring export,$(MAKECMDGOALS))$(findstring import,$(MAKECMDGOALS))$(filter $(OCPI_DOC_ONLY),1),)
       include $(OCPI_CDK_DIR)/include/hdl/hdl-targets.mk
       $(info No HDL platforms specified.  No HDL assets will be targeted.)
       $(info Possible HdlPlatforms are: $(sort $(HdlAllPlatforms)).)
@@ -79,11 +79,11 @@ ifeq (@,$(AT))
 endif
 
 OcpiToProject=$(subst $(Space),/,$(patsubst %,..,$(subst /, ,$1)))
-MaybeMake=$(callx OcpiInfo,MAYBE:$1:$2)\
+MaybeMake=$(callx OcpiInfo,MAYBE in $(CWD):$1:$2)\
   $(if $(wildcard $1),$(strip\
     $(foreach f,$(if $(wildcard $1/Makefile),\
                   Makefile,\
-                  $(foreach t,$(call OcpiGetDirType,$1),$(call OcpiInfo DT:$1:$t)\
+                  $(foreach t,$(call OcpiGetDirType,$1),$(callx OcpiInfo,DT:$1:$t)\
                     $$OCPI_CDK_DIR/include/$(and $(filter hdl-%,$t),hdl/)$t.mk)),\
       $(MAKE) -f $f --no-print-directory -r -C $1 OCPI_PROJECT_REL_DIR=$(call OcpiToProject,$1) $2)),\
       :)
@@ -94,9 +94,15 @@ $(foreach p,$(HdlPlatform) $(HdlPlatforms),\
    echo =============Building platform $p/$2 for $3 &&\
    $(call MaybeMake,$1/$p/$2,$3) &&) true
 
-.PHONY: all applications clean imports exports components cleanhdl $(OcpiTestGoals) projectpackage projectdeps projectincludes
-.PHONY: hdl hdlassemblies hdlprimitives hdlcomponents hdldevices hdladapters hdlplatforms hdlassemblies hdlportable
-all: applications
+.PHONY: all applications clean imports exports components cleanhdl $(OcpiTestGoals) projectpackage
+.PHONY: projectdeps projectincludes hdl hdlassemblies hdlprimitives hdlcomponents hdldevices
+.PHONY: hdladapters hdlplatforms hdlassemblies hdlportable declare comp rcc hdl ocl
+
+# The default is to simply run without spell checking
+doc:
+	$(AT)ocpidoc build -b
+
+all: $(if $(filter 1,$(OCPI_DOC_ONLY)),doc,applications $(if $(filter 1,$(OCPI_NO_DOC)),,doc))
 
 # Package issue - if we have a top level specs directory, we must make the
 # associate package name available to anything that includes it, both within the
@@ -218,20 +224,29 @@ hdl: hdlassemblies
 # FIXME: cleaning should not depend on imports.  Fix *that* - see below
 cleanhdl cleanrcc cleanocl cleancomponents cleanapplications: imports
 
+# Clean hdl stuff where ever it is, but not components
 cleanhdl:
-	$(call MaybeMake,components,cleanhdl)
 	$(foreach d,primitives devices adapters cards platforms assemblies,\
 	  $(call MaybeMake,hdl/$d,clean) &&): \
 
 rcc ocl hdl: imports exports
 
-# rcc proxies may need to see rcc or hdl slaves
-rcc:
+# rcc proxies may need to see rcc or hdl slaves so then need this first
+declare:
 	$(call MaybeMake,components,declare)
 	$(call MaybeMake,hdl/devices,declare)
 	$(call MaybeMake,hdl/cards,declare)
 	$(call MaybeMake,hdl/adapters,declare)
 	$(call MaybeMake,hdl/platforms,declare)
+
+# components do not depend on other workers so this does not depend on "declare"
+comp:
+	$(call MaybeMake,components,comp)
+	$(call MaybeMake,hdl/devices,comp)
+	$(call MaybeMake,hdl/cards,comp)
+	$(call MaybeMakePlatforms,hdl/platforms,devices,comp)
+
+rcc: declare
 	$(call MaybeMake,components,rcc)
 	$(call MaybeMake,hdl/devices,rcc)
 	$(call MaybeMake,hdl/cards,rcc)
@@ -240,6 +255,7 @@ rcc:
 cleanrcc:
 	$(call MaybeMake,components,cleanrcc)
 	$(call MaybeMake,hdl/devices,cleanrcc)
+	$(call MaybeMake,hdl/cards,rcc)
 	$(call MaybeMakePlatforms,hdl/platforms,devices,cleanrcc)
 
 ocl:
@@ -272,7 +288,7 @@ cleanapplications:
 # Note that imports must be cleaned last because the host rcc platform directory
 # needs to be accessible via imports for projects other than core
 # (e.g. for cleaning rcc) FIXME: cleaning should not depend on imports.  Fix *that*
-clean: cleanapplications cleanrcc cleanhdl cleanocl cleanexports cleanimports
+clean: cleanapplications cleanhdl cleanexports cleanimports
 	$(call MaybeMake,components,clean)
 	rm -r -f artifacts project-metadata.xml
 

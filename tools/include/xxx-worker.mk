@@ -62,17 +62,16 @@ skeleton:  $(ImplHeaderFiles) $(SkelFiles)
 ifeq ($(filter rcc,$(Model))$(filter clean%,$(MAKECMDGOALS))$(HdlActualTargets),)
   ifneq ($(MAKECMDGOALS),declare)
     $(call OcpiInfo, This $(UCModel) worker $(Worker) not built since no $(UCModel) targets or platforms specified.)
-#    $(shell echo This $(UCModel) worker $(Worker) not built since no $(UCModel) targets or platforms specified. >&2)
   endif
-  all: liblinks
+  all: liblinks $(if $(filter 1,$(OCPI_NO_DOC)),,doc)
 else
   # All worker-derived assets (worker, platform, assembly, config, container etc.)
   # might have doc
-  doc:
-	$(AT)ocpidoc build
-  all: skeleton links $(if $(OCPI_NO_DOC),,doc)
+  all: skeleton links $(if $(filter 1,$(OCPI_NO_DOC)),,doc)
 endif
-  xml:
+doc:
+	$(AT)$(if $(wildcard *.rst),ocpidoc build,:) # temporary
+xml:
 	$(AT)$(OcpiGenEnv) ocpigen -G $(Worker_$(Worker)_xml)
 
 $(SkelFiles): $(GeneratedDir)/%$(SkelSuffix) : $$(Worker_%_xml) | $(GeneratedDir)
@@ -348,9 +347,6 @@ endef
 $(foreach x,$(ImplXmlFiles),$(eval $(call doImplLink,$x)))
 
 endif
-
-
-
 
 # For now, restrict to HDL
 ifeq ($(Model),hdl)

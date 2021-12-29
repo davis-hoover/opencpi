@@ -109,6 +109,8 @@ def get_dir_info(directory=".", careful=False):
         directory = os.path.realpath(directory)
         base = os.path.basename(directory)
     if not os.path.isdir(directory):
+       print("Warning:  no directory type when requesting it for a non-directory:  " + directory,
+             file=sys.stderr)
        return None # be relaxed about non-dirs so callers can use them from "make"
        #raise OCPIException("When determining the directory type of \"" + str(directory) + "\", "\
         #                   "it is not a directory at all")
@@ -1194,11 +1196,18 @@ def get_xml_string(directory='.'):
       xml_file - the file to have ocpigen parse
     """
     make_type, asset_type, directory, xml_name,_ = get_dir_info(directory)
-    ocpigen_cmd = ["make", "-r", "--no-print-directory", "-C", directory, "-f", get_makefile(directory, make_type)[0], "xml" ]
-    logging.debug("running ocpigen command: " + str(ocpigen_cmd))
+    cmd = ["make", "-r", "--no-print-directory", "-C", directory, "-f", get_makefile(directory, make_type)[0], "xml" ]
+    logging.debug("running command: " + str(cmd))
     old_log_level = os.environ.get("OCPI_LOG_LEVEL", "0")
     os.environ["OCPI_LOG_LEVEL"] = "0"
-    xml = subprocess.Popen(ocpigen_cmd, stdout=subprocess.PIPE).communicate()[0]
+    env = os.environ
+    if "OCPI_PROJECT_REL_DIR" in env:
+        env.pop("OCPI_PROJECT_REL_DIR")
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, env=env)
+    if p.returncode:
+        logging.bad("XML parsing failure in directory: " + directory)
+        sys.exit(p.returncode)
+    xml = p.communicate()[0]
     os.environ["OCPI_LOG_LEVEL"] = old_log_level
     logging.debug("Asset XML from ocpigen: \n" + str(xml))
     return xml.decode(), xml_name

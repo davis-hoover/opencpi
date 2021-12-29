@@ -426,8 +426,12 @@ OcpiCallPythonFunc=\
 
 # Import the ocpiutil module and run the python code in $1
 # Usage: $(call OcpiCallPythonUtil,ocpiutil.utility_function(arg1, arg2))
-OcpiCallPythonUtil=$(infox OPYTHON:$1)\
-  $(shell PYTHONPATH=$(PYTHONPATH) python3 -c 'import _opencpi.util as ocpiutil;$1')
+OcpiCallPythonUtil=$(infox OPYTHON:$1)$(strip\
+  $(if $(call DoShell,PYTHONPATH=$(PYTHONPATH) python3 -c "import _opencpi.util as ocpiutil;$1",OcpiPythonOut),\
+       $(error Failed python call for $1: $(OcpiPythonOut)),\
+       $(OcpiPythonOut)))
+
+#  $(shell PYTHONPATH=$(PYTHONPATH) python3 -c 'import _opencpi.util as ocpiutil;$1')
 
 # Like the builtin "dir", but without the trailing slash
 OcpiDir=$(foreach d,$1,$(patsubst %/,%,$(dir $1)))
@@ -1052,7 +1056,7 @@ OcpiGetDirType=$(callx OcpiInfo,OGDT:$1)$(strip\
     $(word 1,$(subst :, ,$(call OcpiCacheFunctionOnPath,OcpiGetDirInfoX,$1))),\
     $(callx OcpiInfo,GDTr:$1:$t)$t))
 OcpiGetDirInfoX=$(strip $(callx OcpiInfo,GDT1:$1)\
-  $(foreach t,$(call OcpiCallPythonUtil,print(ocpiutil.get_dir_info_for_make("$1"))),\
+  $(foreach t,$(call OcpiCallPythonUtil,print(ocpiutil.get_dir_info_for_make(\"$1\"))),\
      $(infox GDDI1: found info: $t for $1)$t))
 
 # Get the directory type of arg1, and return the portion after the last dash.
@@ -1069,7 +1073,7 @@ OcpiGetDirInfo=$(callx OcpiInfo,GDI:$1)$(strip\
 ###############################################################################
 
 # Recursive
-OcpiIncludeProjectX=$(infox OIPX:$1:$2:$3)\
+OcpiIncludeProjectX=$(callx OcpiInfo,OIPX:$1:$2:$3)\
   $(if $(wildcard $1/Project.mk)$(wildcard $1/Project.xml),\
     $(eval $(call OcpiSetProject,$1))\
     $(infox PROJECT:$(OCPI_PROJECT_PACKAGE):$(PackagePrefix):$(ProjectPackage)=$(Package)),\
@@ -1078,8 +1082,8 @@ OcpiIncludeProjectX=$(infox OIPX:$1:$2:$3)\
       $(call $2,$2: no Project.<mk|xml> was found here ($3) or in any parent directory)))
 
 # One arg is what to do if not found: error, warning, nothing
-OcpiIncludeProject=$(infox OIP:$1:$2:$(MAKECMDGOALS):$(OCPI_PROJECT_PACKAGE):$(OCPI_PROJECT_REL_DIR))\
-  $(if $(or $(filter clean%,$(MAKECMDGOALS)),$(OCPI_PROJECT_PACKAGE)),$(infox OIPSKIPPED),\
+OcpiIncludeProject=$(callx OcpiInfo,OIP:$1:$2:$(MAKECMDGOALS):$(OCPI_PROJECT_PACKAGE):$(OCPI_PROJECT_REL_DIR))\
+  $(if $(or $(filter clean%,$(MAKECMDGOALS)),$(OCPI_PROJECT_REL_DIR)),$(callx OcpiInfo,OIPSKIPPED),\
     $(call OcpiIncludeProjectX,$(or $(OCPI_PROJECT_REL_DIR),.),$1,$(call OcpiAbsDir,.)))\
   $(eval ComponentLibraries+=$(OCPI_PROJECT_COMPONENT_LIBRARIES))
 
@@ -1107,7 +1111,7 @@ OcpiIncludeParentAsset_library=$(callx OcpiInfo,OIPA:$1)\
 # We provide it with type Platforms so it can find the Platforms.mk
 # file if it exists. If the platform is not inside a platforms directory,
 # then it is not in a project at all and does not have a parent.
-OcpiIncludeParentAsset_platform=\
+OcpiIncludeParentAsset_platform=$(callx OcpiInfo,OIPA_p:$1)\
   $(if $(filter %-platforms,$(call OcpiGetDirType,$(and $(filter-out .,$1),$1/)..)),\
     $(call OcpiIncludeAssetAndParentX,$(and $(filter-out .,$1),$1/)..,$2,$3))
 
@@ -1270,7 +1274,7 @@ OcpiIncludeAssetAndParent=\
     $(foreach d,$(or $1,.),\
       $(foreach x,$(wildcard $d/$(CwdName).xml $d/$(CwdName).*.xml $d/$(CwdName)-test.xml $d/$(CwdName)-app.xml),\
 	$(infox FOUND XML:$x)\
-        $(eval CleanFiles:=$(shell $(ToolsDir)/ocpixml -a '?cleanfiles' parse $x))\
+        $(eval CleanFiles:=$(and $(wildcard $(ToolsDir)/ocpixml),$(shell $(ToolsDir)/ocpixml -a '?cleanfiles' parse $x)))\
 	$(infox FOUND CLEANFILES:$(CleanFiles)))),\
     $(- here is when we are not cleaning)\
     $(eval ParentPackage:=)\
@@ -1282,8 +1286,10 @@ OcpiIncludeAssetAndParent=\
 
 ###############################################################################
 
-# Find the subdirectories that make a Makefile that includes something
-OcpiFindSubdirs=$(callx OcpiInfo,OFSD,$1)$(foreach a,$(wildcard *),$(and $(filter $1,$(call OcpiGetDirType,$a)),$a))
+# Find the subdirectories of a given type
+OcpiFindSubdirs=$(callx OcpiInfo,OFSD,$1)$(strip\
+  $(foreach a,$(sort $(subst %/,%,$(dir $(wildcard */Makefile */*.xml)))),\
+    $(and $(filter $1,$(call OcpiGetDirType,$a)),$a)))
 
 OcpiHavePrereq=$(realpath $(OCPI_PREREQUISITES_DIR)/$1)
 OcpiPrereqDir=$(call OcpiHavePrereq,$1)
@@ -1598,7 +1604,7 @@ OcpiProjectFromPlatformDir=$(infox OPFPD:$1:$2)$(strip\
 # Warn/info to stderr without the makefile references etc.
 # Note all args will have white space stripped
 # So to allow commas in warnings, we add spaces between args
-OcpiWarn=$(shell echo Warning:' ' $(strip $1 $2 $3 $4 $5 $6 $7 $8 $9) >&2)
-OcpiInfo=$(shell echo $(strip $1 $2 $3 $4 $5 $6 $7 $8 $9) >&2)
+OcpiWarn=$(shell echo Warning:'  $(strip $1 $2 $3 $4 $5 $6 $7 $8 $9)' >&2)
+OcpiInfo=$(shell echo '$(strip $1 $2 $3 $4 $5 $6 $7 $8 $9)' >&2)
 
 endif # ifndef __UTIL_MK__
