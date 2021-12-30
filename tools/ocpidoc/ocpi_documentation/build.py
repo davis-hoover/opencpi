@@ -108,9 +108,10 @@ def build(directory, build_only=False, mathjax=None, config_options=[],
                                                              None,
                                                              None))
                         master_doc = generated_rst_file.stem
-        else:
+        if not master_doc:
             print("Warning:  when building docs in directory " + str(directory) +
-                  f" there is no \"{default_rst_file_name}\" or \"{xml_path.name}\" file present.",
+                  f" there is no \"{default_rst_file_name}\" or \"{xml_path.name}\" or " +
+                  "\"index.rst\" file present.",
                   file=sys.stderr)
             return 0
     if not os.path.isfile(str(source_directory) + "/" + master_doc + ".rst"):
