@@ -107,7 +107,7 @@ def addApplications(root, applicationsDirPath):
         else:
             if len(applicationDirPath.suffixes) != 0:
                 if applicationDirPath.suffixes[-1] == ".xml":
-                    ET.SubElement(root, "application", {"name": applicationDirPath.stem})
+                    ET.SubElement(root, "application", {"name": applicationDirPath.name})
 
 
 def addPlatforms(root, hdlPlatformsDirPath):
