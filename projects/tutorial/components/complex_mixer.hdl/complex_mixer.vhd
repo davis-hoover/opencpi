@@ -91,8 +91,8 @@ begin
   --    Input data (DATA_SELECT=0) or
   --    NCO data   (DATA_SELECT=1)
   -----------------------------------------------------------------------------
-  out_out.data <= s_complx_mult_imag(32 downto 17) & s_complx_mult_real(32 downto 17) --TODO
-                  when (props_in.enable = '1') --TODO
+  out_out.data <= s_complx_mult_imag(32 downto 17) & s_complx_mult_real(32 downto 17) 
+                  when (props_in.enable = '1') 
                   -- ENABLE=0, DATA_SELECT=0 (BYPASS)
                   else in_in.data when (props_in.data_select = '0')
                   -- ENABLE=0, DATA_SELECT=1 (BYPASS, NCO output)
@@ -101,34 +101,34 @@ begin
   -----------------------------------------------------------------------------
   -- Enable circuitry when Control State is_operating and up/downstream Workers ready
   -----------------------------------------------------------------------------
-  s_enable <= ctl_in.is_operating and in_in.ready and out_in.ready; --TODO
+  s_enable <= ctl_in.is_operating and in_in.ready and out_in.ready; 
 
   -----------------------------------------------------------------------------
   -- Data input valid when enabled (state, up/down workers are ready) and input valid
   -----------------------------------------------------------------------------
-  s_data_vld_i <= s_enable and in_in.valid; --TODO
+  s_data_vld_i <= s_enable and in_in.valid; 
 
   -- 's_reset_n_i' is the negation of 'ctl_in.reset' for use with Vivado cores
-  s_reset_n_i <= not(ctl_in.reset); --TODO
+  s_reset_n_i <= not(ctl_in.reset); 
 
   -----------------------------------------------------------------------------
   -- Xilinx Vivado IP: Complex Multiplier instance
   -----------------------------------------------------------------------------
 
   -- Simple but INCLUDES transient data. True whenever the input data is valid
-  s_complx_mult_ce_i <= s_data_vld_i; --TODO
+  s_complx_mult_ce_i <= s_data_vld_i; 
 
   -- Data input to the Complex_Multiplier
-  s_complx_mult_d_a_i <= in_in.data; --TODO
+  s_complx_mult_d_a_i <= in_in.data; 
 
   -- Output of NCO (swapping I/Q) assigned to input "B" of complex multiplier
-  s_complx_mult_d_b_i <= s_dds_real & s_dds_imag; --TODO
+  s_complx_mult_d_b_i <= s_dds_real & s_dds_imag; 
 
   inst_ComplexMult : component complex_multiplier
     port map (
-      aclk               => ctl_in.clk,--TODO, --control plane clock
-      aclken             => s_data_vld_i,--TODO, --Data input valid
-      aresetn            => s_reset_n_i,--TODO, --negation of control plane reset
+      aclk               => ctl_in.clk,--control plane clock
+      aclken             => s_data_vld_i,--Data input valid
+      aresetn            => s_reset_n_i,--negation of control plane reset
       s_axis_a_tvalid    => s_complx_mult_ce_i,
       s_axis_a_tdata     => s_complx_mult_d_a_i,
       s_axis_b_tvalid    => s_complx_mult_ce_i,
@@ -168,9 +168,9 @@ begin
   -- contained 'stale' data after an application execution
   inst_DDS : component dds_compiler
     port map (
-      aclk                => ctl_in.clk,--TODO, --control plane clock
-      aresetn             => s_reset_n_i,--TODO, --negation of control plane reset
-      s_axis_phase_tvalid => s_dds_ce_i,--TODO, --DDS chip enable
+      aclk                => ctl_in.clk, --control plane clock
+      aresetn             => s_reset_n_i, --negation of control plane reset
+      s_axis_phase_tvalid => s_dds_ce_i, --DDS chip enable
       s_axis_phase_tdata  => std_logic_vector(props_in.phs_inc),
       m_axis_data_tvalid  => open,
       m_axis_data_tdata   => s_dds_sine_cosine_o
