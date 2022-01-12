@@ -21,6 +21,6 @@ PackageName=tutorial
 PackagePrefix=ocpi
 
 # ocpi.platform was added due to OSP indirect dependencies.  this works around a known issue
-ProjectDependencies=ocpi.assets ocpi.platform
+ProjectDependencies=ocpi.assets ocpi.platform ocpi.tutorial ocpi.core ocpi.assets
 
-ComponentLibraries+=util_comps
+ComponentLibraries+=util_comps dsp_comps
