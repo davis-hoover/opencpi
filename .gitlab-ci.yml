@@ -12,7 +12,6 @@ workflow:
     - when: always # Run for all other conditions
 
 include: 
-- .gitlab-ci/yaml/verify-pipeline.yml
 - .gitlab-ci/yaml/docs.yml
 
 stages:
@@ -81,7 +80,7 @@ trigger:
       job: generate
     strategy: depend
   variables:
-    CI_OCPI_ROOT_PIPELINE_ID: "$CI_PIPELINE_ID"
+    CI_OCPI_ROOT_PIPELINE_ID: "${CI_OCPI_ROOT_PIPELINE_ID:-$CI_PIPELINE_ID}"
   rules:
     - if: "$CI_OCPI_PIPELINE == 'new'"
       when: on_success
