@@ -3,7 +3,7 @@ formatted as a set of slides so that it can be presented to others.
 OpenCPI briefings provide background information about OpenCPI concepts
 and processes. 
 
-OpenCPI briefings Include:
+OpenCPI briefings include:
 
 Briefing 1: Introduction to OpenCPI. This briefing gives a high-level description
 of OpenCPI technology, its goals, history, concepts and processes and associated
@@ -40,7 +40,7 @@ application worker.
 Briefing 9: HDL Assemblies. This briefing describes HDL assembly concepts,
 elements and build process.
 
-Briefing_10: HDL Primitives. This briefing describes HDL primitives concepts
+Briefing 10: HDL Primitives. This briefing describes HDL primitives concepts
 and elements.
 
 Briefing 11: Introduction to OpenCPI Platform_Development. This briefing
@@ -58,6 +58,13 @@ case study of an OpenCPI FPGA platform implementation.
 Briefing 14: Digital Radio Controller (DRC) Introduction. This briefing
 describes the Digital Radio Controller (DRC) model and APIs for controlling
 and configuring RF I/O in OpenCPI systems that are “radios” (SDRs).
+
+Briefing 15: OpenCPI Application Control Interface (ACI). This briefing
+describes the launch and control API for executing XML-based OpenCPI
+applications within C++ or Python programs.
+
+Briefing 16: OpenCPI Debugging Tools. This briefing describes how to
+use OpenCPI tools to debug OpenCPI workers.
 
 The Template directory contains the template to be used to create
 new briefings.
