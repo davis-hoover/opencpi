@@ -173,7 +173,7 @@ fi
 unset ocpi_bootstrap
 
 [ -n "$ocpi_install" ] && { 
-  evars=`env | grep OCPI_ | grep -v -e PREREQ -e LOG | sort`
+  evars=`env | grep ^OCPI_ | grep -v -e PREREQ -e LOG | sort`
   [ -n "$evars" ] && [ -n "$ocpi_verbose" ] && echo Unsetting the following OpenCPI variables during installation:
   for ocpi_v in $evars 
   do
