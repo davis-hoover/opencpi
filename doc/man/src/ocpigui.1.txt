@@ -9,18 +9,16 @@ ocpigui - command-line tool for managing the OpenCPI GUI
 
 SYNOPSIS
 --------
-*`ocpigui`* ['<options>'] '<verb>'
+*`ocpigui`* ['<options>']
 
 
 DESCRIPTION
 -----------
 
-*Note*: this command is not currently implemented, but will be in a future release.
-
 The *`ocpigui(1)`* command-line tool is used to start the OpenCPI
 graphical user interface (GUI) for managing OpenCPI assets.
 
-The OpenCPI GUI is a front end to *`ocpidev(1)`* that can perform most, but not all, of the
+The OpenCPI GUI is a front end to link:ocpidev.1.html[ocpidev(1)] that can perform most, but not all, of the
 development tasks that *`ocpidev`* can perform from within a graphical user interface.
 
 Installing OpenCPI GUI
@@ -36,64 +34,30 @@ tasks.
 
 VERBS
 -----
-*Note*: These descriptions are placeholders. This functionality is not currently implemented.
-
-The verbs supported by *`ocpigui`* are:
-
-*`desktop`*::
-    Add a selection for starting OpenCPI GUI
-    to the Applications > Programming menu bar on a CentOS7 development host [???Can it be any development host???].
-
-
-*`remove`*::
-    Remove the selection for the OpenCPI GUI
-    from the Applications > Programming menu bar on a CentOS7 development host. [???Any development host???]
-
-
-*`run`*::
-    Start the OpenCPI GUI from a *`bash`* shell.
-
-*`view`*::
-    Display the current OpenCPI installation directory and enabled user environment settings.
-    [??? Probably an option, not a verb]
-
+None.
 
 NOUNS
 -----
-*Note*: These descriptions are placeholders. This functionality is not currently implemented.
-
 None.
 
 OPTIONS
 -------
-*Note*: These descriptions are placeholders. This functionality is not currently implemented.
+In addition to the options common to all OpenCPI tools (see link:opencpi.1.html[opencpi(1)]),
+the following options can be specified:
 
-*`--help`*, *`-h`*::
-    Display usage information about the command-line tool.
-
-*`--opencpi-path`*, *`-o`*::
+*`--ocpi-path`* '<opencpi-install-directory>'::
     Specify the path to the OpenCPI installation directory. The OpenCPI GUI requires
     this information when it is started for the first time.
 
-*`--project-path`*, *`-p`*::
-    Specify the path to the directory that is displayed
-    in the OpenCPI GUI's Project Explorer panel. If this option
-    is not specified, the path is set to *`~/User_OpenCPI_Projects`*.
-
+*`--projects-path`* '<top-level-projects-directory>'::
+    Specify the path to the top-level directory of OpenCPI projects.
+    The OpenCPI GUI displays the projects and assets contained
+    in this directory in the OpenCPI GUI's Project Explorer panel.
+    If this option is not specified, the path is set to *`~/User_OpenCPI_Projects`*.
 
 FILES/DIRECTORIES
 -----------------
-*Note*: These descriptions are placeholders. This functionality is not currently implemented.
-
 The following files and directories are relevant to OpenCPI GUI operation:
-
-*`gui.desktop`*::
-    The file that adds a menu selection for the OpenCPI GUI
-    tool to the Applications > Programming desktop environment
-    menu bar on a CentOS7 development host. This file is created
-    by the *`ocpigui desktop`* operation in the CentOS7 user's
-    home directory in the subdirectory *`local/share/applications/`*.
-    [???Can this be genericized to support ubuntu as well as centos7?]
 
 *`~/User_OpenCPI_Projects/`*::
     The subdirectory within the user's home directory that contains
@@ -101,34 +65,19 @@ The following files and directories are relevant to OpenCPI GUI operation:
 
 EXAMPLES
 --------
-*Note*: These examples are placeholders. The functionality is not currently implemented.
-
 . Start the OpenCPI GUI:
 +
------------
-ocpigui run
------------
+-------
+ocpigui
+-------
 +
 . Start the OpenCPI GUI and specify the paths to the OpenCPI installation
-  and user project directories on the command-line instead of in the GUI:
+  and top-level project directories:
 +
-------------------------------------------------------------------------
-ocpigui --project-path=/home/MyProjects --opencpi-path=/home/opencpi run
-------------------------------------------------------------------------
-+
-. Add a menu selection for starting the OpenCPI GUI
-from the CentOS7 desktop environment:
-+
---------------
-ocpigui desktop
---------------
-+
-. Remove the menu selection for the OpenCPI
-GUI from the CentOS7 desktop environment:
-+
--------------
-ocpigui remove
--------------
+------------------------------------------------------------------
+ocpigui --projects-path /home/MyProjects --ocpi-path /home/opencpi
+------------------------------------------------------------------
+
 
 BUGS
 ----
@@ -143,7 +92,7 @@ SEE ALSO
 --------
 link:ocpidev.1.html[ocpidev(1)]
 link:ocpidev-project.1.html[ocpidev-project(1)]
-link:ocpidev-registry.1.html[ocpidev-registry(1)]
+link:opencpi.1.html[opencpi(1)]
 
 COPYING
 -------

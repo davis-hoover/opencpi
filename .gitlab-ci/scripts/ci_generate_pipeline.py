@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import asyncio
-from typing import List, Tuple
+from typing import List
 import json
 from pathlib import Path
 from os import environ, getenv
@@ -36,22 +36,24 @@ def _set_env():
     environ['CI_PIPELINE_SOURCE'] = 'parent_pipeline'
     environ['CI_OCPI_HOSTS'] = 'centos7'
     environ['CI_OCPI_HOST'] = 'centos7'
-    environ['CI_OCPI_PLATFORMS'] = 'plutosdr:adi_plutosdr0_32'
-    environ['CI_OCPI_PLATFORM'] = 'plutosdr'
-    environ['CI_OCPI_OTHER_PLATFORM'] = 'adi_plutosdr0_32'
-    environ['CI_OCPI_PROJECTS'] = 'ocpi.comp.sdr osp/ocpi.osp.plutosdr'
+    environ['CI_OCPI_PLATFORMS'] = 'xsim'
+    environ['CI_OCPI_PLATFORM'] = 'xsim'
+    environ['CI_OCPI_OTHER_PLATFORM'] = ''
+    environ['CI_OCPI_PROJECTS'] = 'ocpi.comp.sdr'
     environ['CI_OCPI_ROOT_PIPELINE_ID'] = '123456789'
     environ['CI_PIPELINE_ID'] = '234567890'
     environ['CI_JOB_ID'] = '987654321'
     environ['CI_OCPI_CONTAINER_REGISTRY'] = 'dummy-registry'
     environ['CI_PROJECT_DIR'] = '/home/gitlab-runner/builds/x/opencpi/opencpi'
-    environ['CI_OCPI_CONTAINER_REPO'] = 'centos7/plutosdr/adi_plutosdr0_32'
+    environ['CI_OCPI_CONTAINER_REPO'] = 'centos7/xsim'
     environ['CI_OCPI_HDL_HWIL'] = 'True'
     environ['CI_OCPI_RCC_HWIL'] = 'False'
+    environ['CI_OCPI_ASSEMBLIES'] = 'True'
     # environ['CI_COMMIT_TAG'] = 'v2.4.0'
     environ['CI_COMMIT_REF_NAME'] = 'develop'
     environ['CI_OCPI_REF_NAME'] = 'develop'
-    environ['CI_PROJECT_NAME'] = 'ocpi.osp.plutosdr'
+    environ['CI_PROJECT_NAME'] = 'opencpi'
+    environ['CI_PROJECT_NAMESPACE'] = 'opencpi/opencpi'
 
 
 def _get_builder(builder_type: str, dump_path: Path, config: dict=None):
@@ -63,6 +65,7 @@ def _get_builder(builder_type: str, dump_path: Path, config: dict=None):
         'platform': _make_platform_pipeline, 
         'assembly': _make_assembly_pipeline,
         'osp': _make_osp_pipeline,
+        'comp': _make_comp_pipeline
     }
     if config is None:
         config = {}
@@ -83,7 +86,9 @@ def _make_platform_pipeline(dump_path: Path,
         pipeline_id = environ['CI_PIPELINE_ID']
     container_registry = getenv('CI_OCPI_CONTAINER_REGISTRY', '')
     hosts = re.split(r'\s|,\s|,', getenv('CI_OCPI_HOSTS', ''))
-    platforms = _parse_platforms_directive()
+    whitelist = _get_platforms(do_ocpishow=False, do_model_split=False)
+    platforms = _parse_platforms_directive(whitelist=whitelist, 
+        whitelist_mode='and')
     projects = _parse_projects_directive()
     image_tag = base_image_tag = getenv('CI_COMMIT_TAG', None)
     if image_tag is None:
@@ -95,9 +100,11 @@ def _make_platform_pipeline(dump_path: Path,
     image_tags = [image_tag]
     if base_image_tag is None:
         base_image_tag = pipeline_id
+    do_assemblies = getenv('CI_OCPI_ASSEMBLIES', 'True')
+    do_assemblies = do_assemblies.lower() in ['t', 'y', 'true', 'yes', '1']
     pipeline_builder = PlatformPipelineBuilder(pipeline_id, container_registry,
         base_image_tag, hosts, platforms, projects, dump_path, config, 
-        image_tags=image_tags)
+        image_tags=image_tags, do_assemblies=do_assemblies)
 
     return pipeline_builder
 
@@ -126,14 +133,39 @@ def _make_osp_pipeline(dump_path: Path,
         image_tags.append(image_tag)
     container_registry = getenv('CI_OCPI_CONTAINER_REGISTRY', '')
     hosts = re.split(r'\s|,\s|,', getenv('CI_OCPI_HOSTS', ''))
+    whitelist = _get_platforms(do_ocpishow=False, do_model_split=False)
+    platforms = _parse_platforms_directive(whitelist=whitelist, 
+        whitelist_mode='or')
+    projects = _parse_projects_directive()
+    project = getenv('CI_PROJECT_NAME', '')
+    do_assemblies = getenv('CI_OCPI_ASSEMBLIES', 'True')
+    do_assemblies = do_assemblies.lower() in ['t', 'y', 'true', 'yes', '1']
+    pipeline_builder = OspPipelineBuilder(pipeline_id, container_registry,
+        base_image_tag, hosts, platforms, projects, project, dump_path, 
+        config, image_tags=image_tags, do_assemblies=do_assemblies)
+
+    return pipeline_builder
+
+
+def _make_comp_pipeline(dump_path: Path, 
+    config: str=None) -> CompPipelineBuilder:
+    """Initialize and return a CompPipelineBuilder"""
+    try:
+        pipeline_id = base_image_tag = environ['CI_OCPI_ROOT_PIPELINE_ID']
+    except KeyError:
+        pipeline_id = base_image_tag = environ['CI_PIPELINE_ID']
+    hosts = re.split(r'\s|,\s|,', getenv('CI_OCPI_HOSTS', ''))
     platforms = _parse_platforms_directive()
     projects = _parse_projects_directive()
     project = getenv('CI_PROJECT_NAME', '')
-    pipeline_builder = OspPipelineBuilder(pipeline_id, container_registry,
-        base_image_tag, hosts, platforms, projects, project, dump_path, 
-        config, image_tags=image_tags)
+    container_registry = getenv('CI_OCPI_CONTAINER_REGISTRY')
+    do_assemblies = getenv('CI_OCPI_ASSEMBLIES', 'True')
+    do_assemblies = do_assemblies.lower() in ['t', 'y', 'true', 'yes', '1']
+    pipeline_builder = CompPipelineBuilder(pipeline_id, container_registry, 
+        base_image_tag, hosts, project, platforms, projects, dump_path, 
+        config=config, do_assemblies=do_assemblies)
 
-    return pipeline_builder
+    return pipeline_builder  
 
 
 def _make_assembly_pipeline(dump_path: Path, 
@@ -146,7 +178,10 @@ def _make_assembly_pipeline(dump_path: Path,
     platform = getenv('CI_OCPI_PLATFORM')
     host = getenv('CI_OCPI_HOST')
     other_platform = getenv('CI_OCPI_OTHER_PLATFORM')
-    project_dirs = _get_projects()
+    project_group = environ['CI_PROJECT_NAMESPACE'].split('/', 1)[-1]
+    project_name = environ['CI_PROJECT_NAME']
+    whitelist = [project_name] if project_group == 'comp' else None
+    project_dirs = _get_projects(whitelist=whitelist)
     assembly_dirs = _get_assemblies(project_dirs)
     test_dirs = _get_tests(project_dirs)
     container_registry = getenv('CI_OCPI_CONTAINER_REGISTRY')
@@ -179,7 +214,6 @@ def _get_platform_model(platform: str) -> str:
         return 'rcc'
     if platform in hdl_platforms:
         return 'hdl'
-
     sys.exit('Error: Unknown platform "{}"'.format(platform))
 
 
@@ -202,13 +236,19 @@ def _parse_projects_directive() -> dict:
     return projects
 
 
-def _parse_platforms_directive() -> dict:
+def _parse_platforms_directive(whitelist: List[str]=None, 
+    whitelist_mode: str='and') -> dict:
     """
     Parses CI_OCPI_PLATFORMS env var to determine platforms to build for
     as well as any associated platforms to build ontop of it
 
     env var is expected to be in the form of:
         platform1:platform_2,...,platform_n
+
+    If whitelist mode is 'and', platforms will be allowed only if all
+    platforms on both sides of a ':' are in whitelist.
+    If whitelist mode is 'or', all platforms on both side of ':' will
+    be allowed as long as any platform is in whitelist.
     """
     platforms = {}
     platforms_directive = getenv('CI_OCPI_PLATFORMS')
@@ -227,11 +267,32 @@ def _parse_platforms_directive() -> dict:
             platforms[left_platform] += right_platforms
         else:
             platforms[left_platform] = right_platforms
+    
+    if whitelist is None or whitelist_mode not in ['and', 'or']:
+        return platforms
 
-    return platforms
+    filtered_platforms = {}
+    if whitelist_mode == 'and':
+    # Only allow platforms if all platforms on either side of ':' are in
+    # whitelist
+        for left_platform,right_platforms in platforms.items():
+            if left_platform not in whitelist:
+                continue
+            if all([platform in whitelist for platform in right_platforms]):
+                filtered_platforms[left_platform] = right_platforms
+    else:
+    # Only allow platforms if a platform on either side of ':' are in whitelist
+        for left_platform,right_platforms in platforms.items():
+            if left_platform not in whitelist:
+                if not any([platform in whitelist 
+                            for platform in right_platforms]):
+                    continue
+            filtered_platforms[left_platform] = right_platforms
+
+    return filtered_platforms
 
 
-async def _ocpidev_show(noun, directory='.', scope=None) -> dict:
+async def _ocpidev_show(noun: str, directory: str='.', scope=None) -> dict:
     """
     Call ocpidev show with provided arguments
     
@@ -257,27 +318,53 @@ async def _ocpidev_show(noun, directory='.', scope=None) -> dict:
     return json.loads(stdout)
 
 
-def _get_projects() -> List[str]:
+def _get_projects(whitelist: List[str]=None) -> List[str]:
     """Returns opencpi registered project directories"""
     loop = asyncio.get_event_loop()
     projects = loop.run_until_complete(_ocpidev_show('projects'))['projects']
-    projects = [project['real_path'] for project in projects.values() 
-                if project != 'tutorial']
+    projects = [project['real_path'] for project in projects.values()]
+    if whitelist is not None:
+        projects = [project for project in projects
+                    if Path(project).name in whitelist]
 
     return projects
 
 
-def _get_platforms() -> List[str]:
-    """Returns opencpi platforms"""
-    loop = asyncio.get_event_loop()
-    platforms = loop.run_until_complete(_ocpidev_show('platforms'))
-    rcc_platforms = [platform for platform in platforms['rcc'].keys()]
-    hdl_platforms = [platform for platform in platforms['hdl'].keys()]
+def _get_platforms(do_ocpishow=True, do_model_split=True) -> List[str]:
+    """Returns opencpi platforms
+    
+    If do_ocpishow is True, will use ocpidev show to get platforms;
+    otherwise, will search for platforms in file structure.
 
-    return {'rcc': rcc_platforms, 'hdl': hdl_platforms}
+    If do_model_split is True, will return a dict of 'rcc' and 'hdl'
+    platforms; otherwise, will return a list of all platforms.
+    """
+    platforms = {'rcc': [], 'hdl': []}
+    if do_ocpishow:
+        loop = asyncio.get_event_loop()
+        platforms = loop.run_until_complete(_ocpidev_show('platforms'))
+        platforms['rcc'] = [platform for platform in platforms['rcc'].keys()]
+        platforms['hdl'] = [platform for platform in platforms['hdl'].keys()]
+    else:
+        projects_path = Path('projects')
+        if projects_path.exists():
+            project_paths = projects_path.glob('*')
+        else:
+            project_paths = [Path.cwd()]
+        for project_path in project_paths:
+            for model in ['rcc', 'hdl']:
+                platforms_path = Path(project_path, model, 'platforms')
+                project_platforms = [platform.name for platform 
+                                    in platforms_path.glob('*') 
+                                    if platform.is_dir()]
+                platforms[model] += project_platforms
+
+    if not do_model_split:
+        platforms = platforms['rcc'] + platforms['hdl']
+    return platforms
 
 
-def _get_assemblies(project_dirs) -> List[str]:
+def _get_assemblies(project_dirs: List[str]) -> List[str]:
     """Returns directories of opencpi assemblies"""
     assemblies = []
     for project_dir in project_dirs:
@@ -288,18 +375,14 @@ def _get_assemblies(project_dirs) -> List[str]:
             for assembly_path in assemblies_path.glob('*'):
                 if not assembly_path.is_dir():
                     continue
-                try:
-                    relative_path = assembly_path.relative_to(
-                        environ['OCPI_ROOT_DIR'])
-                except:
-                    relative_path = assembly_path.relative_to(
-                        environ['CI_PROJECT_DIR'])
+                relative_path = assembly_path.relative_to(
+                    environ['OCPI_ROOT_DIR'])
                 assemblies.append(str(relative_path))
 
     return assemblies
 
 
-def _get_tests(project_dirs) -> List[str]:
+def _get_tests(project_dirs: List[str]) -> List[str]:
     """Returns directories of opencpi tests"""
     tests = []
     futures = asyncio.gather(

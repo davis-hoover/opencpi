@@ -1,17 +1,33 @@
 {
     "rules": [
-        {
-            "rulePriority": 1,
-            "description": "Expire images older than 7 days",
-            "selection": {
-                "tagStatus": "any",
-                "countType": "sinceImagePushed",
-                "countUnit": "days",
-                "countNumber": 7
-            },
-            "action": {
-                "type": "expire"
-            }
+      {
+        "action": {
+          "type": "expire"
+        },
+        "selection": {
+          "countType": "imageCountMoreThan",
+          "countNumber": 10,
+          "tagStatus": "tagged",
+          "tagPrefixList": [
+            "develop",
+            "v"
+          ]
+        },
+        "description": "Keep develop and release images",
+        "rulePriority": 1
+      },
+      {
+        "rulePriority": 2,
+        "description": "Expire non-develop and non-release images older than 7 days",
+        "selection": {
+          "tagStatus": "any",
+          "countType": "sinceImagePushed",
+          "countUnit": "days",
+          "countNumber": 7
+        },
+        "action": {
+          "type": "expire"
         }
+      }
     ]
-}
+  }
