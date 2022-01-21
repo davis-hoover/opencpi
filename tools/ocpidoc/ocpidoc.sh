@@ -26,9 +26,7 @@
 # If the python3 virtual environment does not exist,
 # create it and install the needed "sphinx" modules.
 #
-# [ -d "$OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/venv" ] || {
-{
-  rmdir -r -f "$OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/venv"
+[ -d "$OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/venv" ] || {
   echo "WARNING: one-time setup of \"ocpidoc\" execution environment in progress..."
   #
   # python3 version must be >= 3.6.0 for "ocpidoc".
@@ -54,5 +52,11 @@
   deactivate ;
 }
 
+# Patch the activate script to replace the existing value of VIRTUAL_ENV
+# with our current location based on the current OCPI_CDK_DIR value.
+# This is necessary when the whole tree has been moved or copied (like in a pipeline)
+VENV_DIR="$OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/venv"
+sed -e 's,^\(VIRTUAL_ENV=\).*,\1\"$OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/venv\",g' $VENV_DIR/bin/activate > $VENV_DIR/bin/activate.new
+mv $VENV_DIR/bin/activate.new $VENV_DIR/bin/activate
 source $OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/venv/bin/activate
 $OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/ocpidoc.py $@
