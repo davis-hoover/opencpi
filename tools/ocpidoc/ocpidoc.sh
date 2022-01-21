@@ -26,7 +26,9 @@
 # If the python3 virtual environment does not exist,
 # create it and install the needed "sphinx" modules.
 #
-[ -d "$OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/venv" ] || {
+# [ -d "$OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/venv" ] || {
+{
+  rmdir -r -f "$OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/venv"
   echo "WARNING: one-time setup of \"ocpidoc\" execution environment in progress..."
   #
   # python3 version must be >= 3.6.0 for "ocpidoc".
