@@ -76,6 +76,7 @@ ocpi_cdk_dir=cdk
 ocpi_root_dir=root
 # The egrep of the beginning of variables to clean out, e.g. derived rather than user specified
 ocpi_cleaned_vars="OCPI_(PREREQUISITES_DIR|TARGET_|TOOL_|CDK_|ROOT_)"
+ocpi_icleaned_vars="OCPI_(LIBRARY_)"
 [ -z "$BASH_VERSION" -o -z "$ocpi_me" ] && {
   echo Error:  You can only use the $ocpi_name script with the bash shell. >&2
   return 1
@@ -117,7 +118,7 @@ esac
 	 --ensure or -e:    do nothing if OpenCPI is already set up, otherwise like --set
 	 --set or -s:       setup the environment for OpenCPI when it is not yet set up
 	 --optimize:        enable the currently running host platform to use optimized code
-	 --install or -i:   unset all OpenCPI environment vars not needed for installation
+	 --install or -i:   unset all OpenCPI environment vars not needed for framework installation
 	When --set or --reset is used, the OpenCPI CDK location is inferred from the location
 	of this file, where sourced.  E.g. issuing the command "source a/b/c/opencpi-setup.sh -s"
 	will setup the CDK as found in a/b/c.
@@ -172,18 +173,7 @@ if [ -z "$ocpi_bootstrap" ]; then
 fi
 unset ocpi_bootstrap
 
-[ -n "$ocpi_install" ] && { 
-  evars=`env | grep OCPI_ | grep -v -e PREREQ -e LOG | sort`
-  [ -n "$evars" ] && [ -n "$ocpi_verbose" ] && echo Unsetting the following OpenCPI variables during installation:
-  for ocpi_v in $evars 
-  do
-    [ -n "$ocpi_verbose" ] && echo "   $ocpi_v"
-    unset `echo $ocpi_v | cut -f1 -d=`
-  done
-  return 0
-}
-
-[ -n "$ocpi_clean" ] && {
+[ -n "$ocpi_install" -o -n "$ocpi_clean" ] && {
   [ -n "$OCPI_CDK_DIR" ] && {
     ocpi_cleaned=$(echo "$PATH" | sed "s=$OCPI_CDK_DIR/[^:/]*/bin[^:]*:==g")
     [ "$ocpi_cleaned" != "$PATH" ] && {
@@ -203,13 +193,26 @@ unset ocpi_bootstrap
       MANPATH="$ocpi_cleaned"
     }
   }
-  [ -n "$ocpi_verbose" ] && echo Unsetting all OpenCPI environment variables.
+  [ -n "$ocpi_verbose" ] && echo Unsetting OpenCPI environment variables.
   for ocpi_v in $(env | egrep "^$ocpi_cleaned_vars" | sort | cut -f1 -d=)
   do
     unset $ocpi_v
   done
+  [ -n "$ocpi_install" ] && {
+    # Needed additional cleaning for framework installs on a local
+    # RCC development platform.  Cannot simply unset all variables
+    # beginning with "OCPI_", as some are used to configure aspects
+    # of standalone/offline installation.
+    [ -n "$ocpi_verbose" ] && \
+      echo Unsetting additional OpenCPI environment variables prior to installation.
+    for ocpi_v in $(env | egrep "^$ocpi_icleaned_vars" | sort | cut -f1 -d=)
+    do
+      unset $ocpi_v
+    done
+  }
   return 0
 }
+
 [ -n "$ocpi_list" ] && {
   [ -n "$ocpi_verbose" ] && echo Listing OpenCPI environment and the PATH variables.
   env | grep OCPI >&2
@@ -246,6 +249,7 @@ unset ocpi_bootstrap
     unset $ocpi_v
   done
 }
+
 # Make the file name of this script absolute if it isn't already
 # But leave it user friendly (don't do readlink etc.)
 [[ "$ocpi_me" = /* ]] || ocpi_me=`pwd`/$ocpi_me
