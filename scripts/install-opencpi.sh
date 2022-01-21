@@ -66,8 +66,21 @@ unset PARAMS
 echo "Initializing OpenCPI CDK" in $(pwd -P)
 source ./scripts/init-opencpi.sh
 
+#
+# At this point, if the first positional parameter is either not
+# set or is set and NULL, we may safely assume this is a framework
+# installation on a local RCC development platform.  In a probably
+# futile attempt to protect users from themselves, try to unset
+# "OCPI_*" environment variables that may negatively affect the
+# installation process.
+#
+if [ -z "$1" ]; then
+  echo "Target platform not specified: assuming framework installation on local RCC development platform"
+  echo "Cleaning OpenCPI environment..."
+  source ./cdk/opencpi-setup.sh -i -v
+fi
+
 # Ensure CDK and TOOL variables
-OCPI_ESTABLISH_ENV="$(pwd)/cdk/opencpi-setup.sh"; source "$OCPI_ESTABLISH_ENV" -i -v
 OCPI_BOOTSTRAP="$(pwd)/cdk/scripts/ocpibootstrap.sh"; source "$OCPI_BOOTSTRAP"
 
 source $OCPI_CDK_DIR/scripts/util.sh
