@@ -442,7 +442,7 @@ emitImplSignals(FILE *f) {
 	    "  signal %s_opcode      : %s_OpCode_t;\n"
 	    "  -- The weakly typed temporary signals\n"
 	    "  signal %s_opcode_temp : std_logic_vector(%zu downto 0);\n"
-	    "  signal %s_opcode_pos  : integer;\n",
+	    "  signal %s_opcode_pos  : natural;\n",
 	    cname(), operations() ?
 	    OM::Protocol::m_name.c_str() : cname(), cname(), ocp.MReqInfo.width - 1, cname());
   }
