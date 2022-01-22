@@ -47,6 +47,14 @@
   fi
 
   $PYCMD -m venv $OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/venv
+  #
+  # Patch the activate script to replace the hard-coded
+  # value of VIRTUAL_ENV with the string used to create
+  # the virtual environment.
+  #
+  VENV_DIR="$OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/venv"
+  sed -e 's,^\(VIRTUAL_ENV=\).*,\1\"$OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/venv\",g' $VENV_DIR/bin/activate > $VENV_DIR/bin/activate.new
+  mv $VENV_DIR/bin/activate.new $VENV_DIR/bin/activate
   source $OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/venv/bin/activate
   pip3 install docutils==0.16 sphinx sphinx_rtd_theme sphinxcontrib_spelling
   deactivate ;
