@@ -71,8 +71,9 @@ else
 endif
 doc:
 	$(AT)$(if $(wildcard *.rst),ocpidoc build,:) # temporary
+# This echoing is to allow the AT= construct to work without polluting stdout
 xml:
-	$(AT)$(OcpiGenEnv) ocpigen -G $(Worker_$(Worker)_xml)
+	@$(if $(AT),,set -v;) $(OcpiGenEnv) ocpigen -G $(Worker_$(Worker)_xml)
 
 $(SkelFiles): $(GeneratedDir)/%$(SkelSuffix) : $$(Worker_%_xml) | $(GeneratedDir)
 	$(AT)$(OcpiRemoveSkeletons)

@@ -1181,6 +1181,9 @@ get_platform_make_dictionary.dict=None
 # It is assumed to be called in a project context, which means if it is not
 # at the project level, higher level attributes are in the environment, which will be
 # used by ocpigen
+# Note also that the directory is "resolved" to make sure that it is under a project
+# at the correct level regardles of any permament or temporary symlinks
+# (like when sphinx has to find worker dirs UNDERNEATH comp dirs and so symlinks are used)
 def get_xml_string(directory='.'):
     """
     Ask ocpigen (the code generator) to parse the worker(OWD) or component(OCS) xml file and
@@ -1195,14 +1198,17 @@ def get_xml_string(directory='.'):
     Function attributes:
       xml_file - the file to have ocpigen parse
     """
-    make_type, asset_type, directory, xml_name,_ = get_dir_info(directory)
+    make_type, asset_type, directory, xml_name,_ = get_dir_info(str(Path(directory).resolve(True)))
     cmd = ["make", "-r", "--no-print-directory", "-C", directory, "-f", get_makefile(directory, make_type)[0], "xml" ]
     logging.debug("running command: " + str(cmd))
     old_log_level = os.environ.get("OCPI_LOG_LEVEL", "0")
     os.environ["OCPI_LOG_LEVEL"] = "0"
     env = os.environ
-    if "OCPI_PROJECT_REL_DIR" in env:
-        env.pop("OCPI_PROJECT_REL_DIR")
+    # Force the recomputation of the project dir and cause "make" to think it is the top level invocation
+    env.pop("OCPI_PROJECT_REL_DIR",None)
+    env.pop("MAKEFLAGS",None)
+    env.pop("MAKELEVEL",None)
+    env.pop("MAKEOVERRIDES",None)
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, env=env)
     if p.returncode:
         logging.bad("XML parsing failure in directory: " + directory)
