@@ -216,14 +216,14 @@ CleanModel=$(infox CLEANING MODEL $1)\
 	   if test -d $$i; then \
 	     tn="$(call Capitalize,$1)Targets"; \
 	     t="$(or $(CleanTarget),$($(call Capitalize,$1)Targets))"; \
-	    $(ECHO) $(strip $(if $(filter comp,$1),\
+	     $(ECHO) $(strip $(if $(filter comp,$1),\
 	     =============Cleaning documentation in component directory $i,\
              =============Cleaning $(call ToUpper,$1) implementation $i for targets: $$t)); \
 	     $(MyMake) $(call GoWorker,$i) $(PassOutDir) $$tn="$$t" clean; \
           fi;),:)\
 	  rm -r -f lib/$1 gen/$1
 
-# This is the doc that will not be build anyway as a side-effect of building elsewhere, i.e. workers
+# This is the docs that will not be built as a side-effect of building workers or tests
 comp:
 	$(AT)set -e;\
 	  $(foreach i,$(Components),$(call OcpiInfo,COMPIS:$i)\

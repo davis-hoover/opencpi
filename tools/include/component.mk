@@ -53,41 +53,4 @@ endif
 clean::
 	$(AT)rm -r -f $(GeneratedDir)
 all:
-	$(AT) ocpidoc build
-
-ifneq (,)
-ocpidoc needs to be supplied with the XML include paths per platform.cc.
-That function needs variables set in the project in the makefiles (projectreldir)
-So the python world of ocpidev does not have them.
-So we need "make", when building, to get the right path and then call ocpidoc.
-
-So the toctree stuff needs to use symlinks in gen subdirs?
-
-The HTML has refs to the rst files.
-
-So if we generate, e.g. componpents/gen/components.rst, then it will generate components/gen/components.html etc.
-
-But all the existing files do stuff.
-So for any given level, we have a prefix file (or not),
-and then as add the toctree to it in the gen dir.
-So it is our automation that generates the toc tree.
-So each level does it:
-
-projects:
-   components/components
-   hdl/primitives/primitives
-   specs/specs
-   CHANGELOG
-components:
-   */*-library
-componentlibraries:
-   *.comp/*-index
-primitives:
-   */*-library
-primitivelibraries:
-   */*-primitive
-
-
-But we need a depth-first algorithm to build the intermediate things, in gen dirs.
-
-endif
+	$(AT)ocpidoc build
