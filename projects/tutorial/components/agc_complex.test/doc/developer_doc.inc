@@ -30,7 +30,7 @@
 \def\workertype{Application}
 \def\version{\ocpiversion}
 \def\releasedate{06/2019}
-\def\componentlibrary{ocpi.training.components}
+\def\componentlibrary{ocpi.tutorial.components}
 \def\workers{\comp{}.hdl}
 \def\testedplatforms{Ettus E310(PL), isim, Matchstiq-Z1(PL)(Vivado 2017.1 and ISE 14.7), xsim}
 \input{\snippetpath/component_summary_table}
@@ -90,18 +90,18 @@ The circuit is based upon Richard G. Lyons' ``Understanding Digital Signal Proce
 %\subsection*{\comp.rcc}
 \subsection*{\comp.hdl}
 \begin{itemize}
-	\item training\_project/hdl/primitives/prims/prims\_pkg.vhd
-		\subitem training\_project/hdl/primitives/prims/agc/src/agc.vhd
+	\item tutorial/hdl/primitives/prims/prims\_pkg.vhd
+		\subitem tutorial/hdl/primitives/prims/agc/src/agc.vhd
 \end{itemize}
 
 \begin{landscape}
-  %\input{component_spec_properties.inc} % it is recommended to NOT remove this line
+  \input{component_spec_properties.inc} % it is recommended to NOT remove this line
 
-  %\input{worker_properties.inc} % it is recommended to NOT remove this line
+  \input{worker_properties.inc} % it is recommended to NOT remove this line
 
-  %\input{component_ports.inc} % it is recommended to NOT remove this line
+  \input{component_ports.inc} % it is recommended to NOT remove this line
 
-  %\input{worker_interfaces.inc} % it is recommended to NOT remove this line
+  \input{worker_interfaces.inc} % it is recommended to NOT remove this line
 \end{landscape}
 
 \section*{Control Timing and Signals}
