@@ -495,6 +495,7 @@ verbs = {
             },
             'project': {
                 'options': {
+                    'clean_all': options['clean_all'],
                     'hdl_assembly': options['hdl_assembly'],
                     'no_assemblies': options['no_assemblies'],
                     'hdl': options['hdl'],

@@ -290,7 +290,7 @@ cleanapplications:
 # (e.g. for cleaning rcc) FIXME: cleaning should not depend on imports.  Fix *that*
 clean: cleanapplications cleanhdl cleanexports cleanimports
 	$(call MaybeMake,components,clean)
-	rm -r -f artifacts project-metadata.xml
+	rm -r -f artifacts project-metadata.xml gen imports exports
 
 # Remove the imports link only if it is the default or it is broken
 cleanimports:

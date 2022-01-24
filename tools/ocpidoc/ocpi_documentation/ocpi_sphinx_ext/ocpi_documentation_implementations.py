@@ -161,6 +161,7 @@ class OcpiDocumentationImplementations(docutils.parsers.rst.Directive):
             if worker_directory.startswith("../"):
                 symlink = "gen/" + worker_directory[3:]
                 if not pathlib.Path(symlink).is_symlink():
+                    os.makedirs("gen", exist_ok=True)
                     os.symlink("../" + worker_directory, symlink)
                 worker_directory = symlink
             toctree_rst.append(f"   {worker_directory}/{name}-worker",
