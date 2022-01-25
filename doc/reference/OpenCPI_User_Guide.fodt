@@ -6242,7 +6242,7 @@
    <text:p text:style-name="P513"><text:bookmark-start text:name="__DdeLink__6167_3484681333"/><text:bookmark-start text:name="__DdeLink__15612_1276242887"/>OpenCPI<text:line-break/><text:span text:style-name="T4">User</text:span> Guide</text:p>
    <text:section text:style-name="Sect1" text:name="Section1" text:protected="true">
     <text:section-source xlink:href="shared/release.fodt" text:filter-name="OpenDocument Text Flat XML"/>
-    <text:p text:style-name="ReleaseSubtitle">OpenCPI Release: develop</text:p>
+    <text:p text:style-name="ReleaseSubtitle">OpenCPI Release:  develop</text:p>
    </text:section>
    <text:p text:style-name="P288"><text:bookmark-end text:name="__DdeLink__15612_1276242887"/>Revision History</text:p>
    <table:table table:name="Table2" table:style-name="Table2">
@@ -9361,7 +9361,7 @@
      <text:p text:style-name="List_20_Bullet">Applications</text:p>
     </text:list-item>
    </text:list>
-   <text:p text:style-name="Body">There is also an <text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Glossary.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="FirstEmphasis">OpenCPI Glossary</text:span></text:a> that provides definitions for <text:span text:style-name="T373">OpenCPI terms and</text:span> industry terms used in OpenCPI. <text:s/><text:span text:style-name="T373">The glossary is available both as a stand-alone document and as the last chapter of each reference document </text:span><text:span text:style-name="T389">(including this one).</text:span></text:p>
+   <text:p text:style-name="Body">There is also an <text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Glossary.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="FirstEmphasis">OpenCPI Glossary</text:span></text:a> that provides definitions for <text:span text:style-name="T373">OpenCPI terms and</text:span> industry terms used in OpenCPI. <text:s/><text:span text:style-name="T373">The glossary is available both as a stand-alone document and as the last chapter of each reference document </text:span><text:span text:style-name="T389">(including this one).</text:span></text:p>
    <text:p text:style-name="Body">On the next page is a graphical diagram showing OpenCPI documentation and how users are expected to use it:</text:p>
    <text:p text:style-name="P265"><text:soft-page-break/><draw:g text:anchor-type="as-char" draw:z-index="1" draw:name="Shape1" draw:style-name="gr1"><draw:custom-shape draw:name="Text Box 3" draw:style-name="gr2" draw:text-style-name="P587" svg:width="1.0335in" svg:height="0.3996in" svg:x="0.8311in" svg:y="0in">
       <text:p text:style-name="P586"><text:span text:style-name="T177">Possible First</text:span><text:span text:style-name="T177"><text:line-break/></text:span><text:span text:style-name="T177">Landings</text:span></text:p>
