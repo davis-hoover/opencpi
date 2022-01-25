@@ -23,5 +23,39 @@ design process for an RCC worker implementation.
 Tutorial 4: Using Third-party Libraries in RCC Workers. This tutorial
 demonstrates how to integrate a third-party library into an RCC worker.
 
+Tutorial 5: Using Multiple Opcodes in RCC Workers.  This tutorial
+demonstrates how to use multiple opcodes in an RCC worker by creating,
+building, and running a "time demux" RCC worker.
+
+Tutorial 6: Creating a Simple HDL Worker.  This tutorial demonstrates
+the design process for a simple HDL worker implementation.
+
+Tutorial 6hw: Creating a Simple HDL Worker (hardware version).
+This tutorial is the same as Tutorial 6, but it demonstrates
+how to build and run the HDL worker on both simulator and
+hardware platforms.
+
+Tutorial 7: Using HDL Primitives.  This tutorial demonstrates the
+how to create and use an HDL primitive library in an HDL worker.
+
+Tutorial 7hw: Using HDL Primitives (hardware version).  This tutorial
+is the same as Tutorial 7, but it demonstrates how to build and run
+the HDL worker on both simulator and hardware platforms.
+
+Tutorial 8: Using Third-Party HDL Primitive Cores.  This tutorial
+demonstrates how to create an HDL worker that uses HDL primitive
+cores imported from a third party.
+
+Tutorial 8hw: Using Third-Party HDL Primitive Cores (hardware version).
+This tutorial is the same as Tutorial 8, but it demonstrates how
+to build and run the HDL worker on both simulator and hardware platforms.
+
+Tutorial 9: Debugging an HDL Worker on a Hardware Platform.  This tutorial
+demonstrates how to use OpenCPI tools to debug an HDL worker on a
+hardware platform.
+
+Tutorial 10: Introduction to OpenCPI Application Development.  This
+tutorial demonstrates the design process for an OpenCPI application.
+
 These tutorials are meant to be run in sequence.
 

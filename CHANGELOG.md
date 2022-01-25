@@ -1,3 +1,60 @@
+# [v2.3.4](https://gitlab.com/opencpi/opencpi/-/compare/v2.3.3...v2.3.4) (2021-12-17)
+
+Changes/additions since [OpenCPI Release v2.3.3](https://gitlab.com/opencpi/opencpi/-/releases/v2.3.3)
+
+### Enhancements
+- **doc**: add ocpigui.1.txt to doc/man/src. (!766)(afff0d43)
+
+### Bug Fixes
+- **doc**: remove AV GUI references and replace with OpenCPI references in Installation Guide and User Guide. (!751)(fdf0e160)
+- **doc**: add adrv9361 and picoevb system and platform information to systems.fodt (shared doc file). (!751)(fdf0e160)
+- **doc**: update "how to document assets" chapter in User Guide to describe current ocpidoc functionality. (!751)(fdf0e160)
+- **doc**: remove references to "mode" option and replace with "phase" option in ocpidev-run.1.txt and ocpidev-test.1.txt. (!751)(fdf0e160)
+- **doc**: remove references to "RCC_DONE" and replace with "RCC_FINISHED" in Briefing 6, "OpenCPI RCC Development". (!751)(fdf0e160)
+- **doc**: remove ocpiav.1.txt from doc/man/src. (!766)(afff0d43)
+- **doc**: modify opencpi.1.txt to link to ocpigui, not ocpiav. (!766)(afff0d43)
+- **doc**: remove obsolete data_sink_qdac(csts), data_src_qadc(csts) LaTeX files from projects/platform/hdl/devices/*.test/doc/. (!766)(afff0d43)
+- **tools**: fix `generate_clk_gen_ip.sh` error reporting. (!771)(7c7fc0ad)
+
+# [v2.3.3](https://gitlab.com/opencpi/opencpi/-/compare/v2.3.2...v2.3.3) (2021-11-30)
+
+Changes/additions since [OpenCPI Release v2.3.2](https://gitlab.com/opencpi/opencpi/-/releases/v2.3.2)
+
+### Enhancements
+- **tools**: add `ie-gui/doc` to document processing scripts. (!763)(7946be52)
+
+### Bug Fixes
+- **tests**: fix to `ocpi_testing` and `ocpi_protocols` for ocpi.comp.sdr unit tests. (!760)(28e30a6d)
+- **tools**: genDocumentation.sh: skip non-existent directories in default search path. (!765)(396a781d)
+- **tools**: build-pages.py: don't try to patch non-existent man page source docs. (!768)(6eff2030)
+
+### Miscellaneous
+- **doc**: delete user guide for Eclipse-based GUI. (!764)(30795061)
+
+# [v2.3.2](https://gitlab.com/opencpi/opencpi/-/compare/v2.3.1...v2.3.2) (2021-11-08)
+
+Changes/additions since [OpenCPI Release v2.3.1](https://gitlab.com/opencpi/opencpi/-/releases/v2.3.1)
+
+### Enhancements
+- **tools**: add `ocpidev show prerequisites` command. (!744)(321aa8cc)
+
+### Bug Fixes
+- **comp**: undo a `file_write.c` change to fix timestamper_scdcd unit test. (!732)(c1e0a68b)
+- **devops,tools**: build-pages.py: fix detached HEAD processing. (!741)(963d24b8)
+- **runtime**: disable data on a rcc port if there is EOF. (!754)(0416e081)
+- **tests,tools**: fix failing test in `tests/pytests/show_prereqs_test.py`. (!750)(b72e4dfb)
+- **tools**: do not clear OCPI_PREREQUISITE_* envars that lead to install/build errors. (!736)(a3e2c459)
+- **tools**: update path in scripts to prioritize local xilinx version of dumpimage. (!738)(30c8f46f)
+- **tools**: detect empty SAMPLES messages and report the error rather than dump a stack frame. (!739)(d00d2536)
+- **tools**: add missing JPEG development package to `centos7-packages.sh`. (!749)(ae88e3dc)
+- **tools**: add missing error check for pip3 package installation. (!749)(ae88e3dc)
+- **tools**: fix unsorted output issue for `ocpidev show prerequisites --table`. (!750)(b72e4dfb)
+- **tools**: fix makeless issues in unit tests and HDL assemblies. (!753)(3102e9ae)
+- **tools**: createXilinxLinuxKernelHeaders.sh: fix broken handling of `uconfig` for `aarch64`. (!759)(0559eaf1)
+
+### Miscellaneous
+- **tests**: enable previously disabled test platforms that have been fixed. (!747)(1e15ee14)
+
 # [v2.3.1](https://gitlab.com/opencpi/opencpi/-/compare/v2.3.0...v2.3.1) (2021-10-13)
 
 Changes/additions since [OpenCPI Release v2.3.0](https://gitlab.com/opencpi/opencpi/-/releases/v2.3.0)

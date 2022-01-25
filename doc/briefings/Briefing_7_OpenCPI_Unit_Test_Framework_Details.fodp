@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<office:document xmlns:officeooo="http://openoffice.org/2009/office" xmlns:anim="urn:oasis:names:tc:opendocument:xmlns:animation:1.0" xmlns:smil="urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0" xmlns:presentation="urn:oasis:names:tc:opendocument:xmlns:presentation:1.0" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:drawooo="http://openoffice.org/2010/draw" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:css3t="http://www.w3.org/TR/css3-text/" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:rpt="http://openoffice.org/2005/report" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0" xmlns:ooo="http://openoffice.org/2004/office" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.presentation">
- <office:meta><meta:editing-cycles>62</meta:editing-cycles><meta:creation-date>2019-10-31T17:16:04.204409951</meta:creation-date><meta:editing-duration>P1DT4H2M52S</meta:editing-duration><meta:generator>LibreOffice/6.4.7.2$MacOSX_X86_64 LibreOffice_project/639b8ac485750d5696d7590a72ef1b496725cfb5</meta:generator><dc:title>Briefing_Template</dc:title><meta:initial-creator>Lisa Zahn</meta:initial-creator><dc:date>2021-10-11T14:05:55.779508875</dc:date><dc:creator>Lisa Zahn</dc:creator><meta:printed-by>Lisa Zahn</meta:printed-by><meta:print-date>2021-10-06T14:25:20.742600529</meta:print-date><meta:document-statistic meta:object-count="170"/><meta:user-defined meta:name="AppVersion">14.0000</meta:user-defined><meta:user-defined meta:name="HiddenSlides" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="HyperlinksChanged" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="LinksUpToDate" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="MMClips" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="Notes" meta:value-type="float">17</meta:user-defined><meta:user-defined meta:name="PresentationFormat" meta:value-type="string">Letter Paper (8.5x11 in)</meta:user-defined><meta:user-defined meta:name="ScaleCrop" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ShareDoc" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="Slides" meta:value-type="float">34</meta:user-defined><meta:user-defined meta:name="_NewReviewCycle" meta:value-type="string"/><meta:template xlink:type="simple" xlink:actuate="onRequest" xlink:title="Briefing_Template" xlink:href="../../../../../Library/Application%20Support/LibreOffice/4/user/template/Briefing_Template.otp" meta:date="2019-10-31T17:16:04.079359752"/></office:meta>
+<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:presentation="urn:oasis:names:tc:opendocument:xmlns:presentation:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0" xmlns:ooo="http://openoffice.org/2004/office" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:smil="urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0" xmlns:anim="urn:oasis:names:tc:opendocument:xmlns:animation:1.0" xmlns:rpt="http://openoffice.org/2005/report" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:officeooo="http://openoffice.org/2009/office" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:drawooo="http://openoffice.org/2010/draw" xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:css3t="http://www.w3.org/TR/css3-text/" office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.presentation">
+ <office:meta><meta:editing-cycles>62</meta:editing-cycles><meta:creation-date>2019-10-31T17:16:04.204409951</meta:creation-date><meta:editing-duration>P1DT4H2M52S</meta:editing-duration><meta:generator>LibreOffice/5.3.6.1$Linux_X86_64 LibreOffice_project/30$Build-1</meta:generator><dc:title>Briefing_Template</dc:title><meta:initial-creator>Lisa Zahn</meta:initial-creator><dc:date>2021-10-11T14:05:55.779508875</dc:date><dc:creator>Lisa Zahn</dc:creator><meta:printed-by>Lisa Zahn</meta:printed-by><meta:print-date>2021-10-06T14:25:20.742600529</meta:print-date><meta:document-statistic meta:object-count="170"/><meta:user-defined meta:name="AppVersion">14.0000</meta:user-defined><meta:user-defined meta:name="HiddenSlides" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="HyperlinksChanged" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="LinksUpToDate" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="MMClips" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="Notes" meta:value-type="float">17</meta:user-defined><meta:user-defined meta:name="PresentationFormat" meta:value-type="string">Letter Paper (8.5x11 in)</meta:user-defined><meta:user-defined meta:name="ScaleCrop" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ShareDoc" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="Slides" meta:value-type="float">34</meta:user-defined><meta:user-defined meta:name="_NewReviewCycle" meta:value-type="string"/><meta:template xlink:type="simple" xlink:actuate="onRequest" xlink:title="Briefing_Template" xlink:href="../../../../../Library/Application%20Support/LibreOffice/4/user/template/Briefing_Template.otp" meta:date="2019-10-31T17:16:04.079359752"/></office:meta>
  <office:settings>
   <config:config-item-set config:name="ooo:view-settings">
-   <config:config-item config:name="VisibleAreaTop" config:type="int">-1872</config:config-item>
-   <config:config-item config:name="VisibleAreaLeft" config:type="int">-2087</config:config-item>
-   <config:config-item config:name="VisibleAreaWidth" config:type="int">26238</config:config-item>
-   <config:config-item config:name="VisibleAreaHeight" config:type="int">19978</config:config-item>
+   <config:config-item config:name="VisibleAreaTop" config:type="int">-273</config:config-item>
+   <config:config-item config:name="VisibleAreaLeft" config:type="int">-2094</config:config-item>
+   <config:config-item config:name="VisibleAreaWidth" config:type="int">29831</config:config-item>
+   <config:config-item config:name="VisibleAreaHeight" config:type="int">19756</config:config-item>
    <config:config-item-map-indexed config:name="Views">
     <config:config-item-map-entry>
      <config:config-item config:name="ViewId" config:type="string">view1</config:config-item>
@@ -22,8 +22,8 @@
      <config:config-item config:name="IsFrameDragSingles" config:type="boolean">true</config:config-item>
      <config:config-item config:name="EliminatePolyPointLimitAngle" config:type="int">1500</config:config-item>
      <config:config-item config:name="IsEliminatePolyPoints" config:type="boolean">false</config:config-item>
-     <config:config-item config:name="VisibleLayers" config:type="base64Binary">Hw==</config:config-item>
-     <config:config-item config:name="PrintableLayers" config:type="base64Binary">Hw==</config:config-item>
+     <config:config-item config:name="VisibleLayers" config:type="base64Binary">//////////////////////////////////////////8=</config:config-item>
+     <config:config-item config:name="PrintableLayers" config:type="base64Binary">//////////////////////////////////////////8=</config:config-item>
      <config:config-item config:name="LockedLayers" config:type="base64Binary"/>
      <config:config-item config:name="NoAttribs" config:type="boolean">false</config:config-item>
      <config:config-item config:name="NoColors" config:type="boolean">true</config:config-item>
@@ -35,18 +35,18 @@
      <config:config-item config:name="IsClickChangeRotation" config:type="boolean">true</config:config-item>
      <config:config-item config:name="SlidesPerRow" config:type="short">4</config:config-item>
      <config:config-item config:name="EditMode" config:type="int">0</config:config-item>
-     <config:config-item config:name="VisibleAreaTop" config:type="int">-1872</config:config-item>
-     <config:config-item config:name="VisibleAreaLeft" config:type="int">-2087</config:config-item>
-     <config:config-item config:name="VisibleAreaWidth" config:type="int">26239</config:config-item>
-     <config:config-item config:name="VisibleAreaHeight" config:type="int">19979</config:config-item>
+     <config:config-item config:name="VisibleAreaTop" config:type="int">-529</config:config-item>
+     <config:config-item config:name="VisibleAreaLeft" config:type="int">-397</config:config-item>
+     <config:config-item config:name="VisibleAreaWidth" config:type="int">26261</config:config-item>
+     <config:config-item config:name="VisibleAreaHeight" config:type="int">20175</config:config-item>
      <config:config-item config:name="GridCoarseWidth" config:type="int">2540</config:config-item>
      <config:config-item config:name="GridCoarseHeight" config:type="int">2540</config:config-item>
      <config:config-item config:name="GridFineWidth" config:type="int">254</config:config-item>
      <config:config-item config:name="GridFineHeight" config:type="int">254</config:config-item>
-     <config:config-item config:name="GridSnapWidthXNumerator" config:type="int">2540</config:config-item>
-     <config:config-item config:name="GridSnapWidthXDenominator" config:type="int">10</config:config-item>
-     <config:config-item config:name="GridSnapWidthYNumerator" config:type="int">2540</config:config-item>
-     <config:config-item config:name="GridSnapWidthYDenominator" config:type="int">10</config:config-item>
+     <config:config-item config:name="GridSnapWidthXNumerator" config:type="int">254</config:config-item>
+     <config:config-item config:name="GridSnapWidthXDenominator" config:type="int">1</config:config-item>
+     <config:config-item config:name="GridSnapWidthYNumerator" config:type="int">254</config:config-item>
+     <config:config-item config:name="GridSnapWidthYDenominator" config:type="int">1</config:config-item>
      <config:config-item config:name="IsAngleSnapEnabled" config:type="boolean">false</config:config-item>
      <config:config-item config:name="SnapAngle" config:type="int">1500</config:config-item>
      <config:config-item config:name="ZoomOnPage" config:type="boolean">true</config:config-item>
@@ -56,16 +56,12 @@
   </config:config-item-set>
   <config:config-item-set config:name="ooo:configuration-settings">
    <config:config-item config:name="ApplyUserData" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="BitmapTableURL" config:type="string">$(inst)/Resources/palette%3B$(user)/config/standard.sob</config:config-item>
+   <config:config-item config:name="BitmapTableURL" config:type="string">$(inst)/share/palette%3B$(user)/config/standard.sob</config:config-item>
    <config:config-item config:name="CharacterCompressionType" config:type="short">0</config:config-item>
-   <config:config-item config:name="ColorTableURL" config:type="string">$(inst)/Resources/palette%3B$(user)/config/standard.soc</config:config-item>
-   <config:config-item config:name="DashTableURL" config:type="string">$(inst)/Resources/palette%3B$(user)/config/standard.sod</config:config-item>
+   <config:config-item config:name="ColorTableURL" config:type="string">$(inst)/share/palette%3B$(user)/config/standard.soc</config:config-item>
+   <config:config-item config:name="DashTableURL" config:type="string">$(inst)/share/palette%3B$(user)/config/standard.sod</config:config-item>
    <config:config-item config:name="DefaultTabStop" config:type="int">1270</config:config-item>
-   <config:config-item config:name="EmbedAsianScriptFonts" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="EmbedComplexScriptFonts" config:type="boolean">true</config:config-item>
    <config:config-item config:name="EmbedFonts" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="EmbedLatinScriptFonts" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="EmbedOnlyUsedFonts" config:type="boolean">false</config:config-item>
    <config:config-item-map-indexed config:name="ForbiddenCharacters">
     <config:config-item-map-entry>
      <config:config-item config:name="Language" config:type="string">en</config:config-item>
@@ -75,9 +71,9 @@
      <config:config-item config:name="EndLine" config:type="string"/>
     </config:config-item-map-entry>
    </config:config-item-map-indexed>
-   <config:config-item config:name="GradientTableURL" config:type="string">$(inst)/Resources/palette%3B$(user)/config/standard.sog</config:config-item>
+   <config:config-item config:name="GradientTableURL" config:type="string">$(inst)/share/palette%3B$(user)/config/standard.sog</config:config-item>
    <config:config-item config:name="HandoutsHorizontal" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="HatchTableURL" config:type="string">$(inst)/Resources/palette%3B$(user)/config/standard.soh</config:config-item>
+   <config:config-item config:name="HatchTableURL" config:type="string">$(inst)/share/palette%3B$(user)/config/standard.soh</config:config-item>
    <config:config-item config:name="IsKernAsianPunctuation" config:type="boolean">false</config:config-item>
    <config:config-item config:name="IsPrintBooklet" config:type="boolean">false</config:config-item>
    <config:config-item config:name="IsPrintBookletBack" config:type="boolean">true</config:config-item>
@@ -92,16 +88,14 @@
    <config:config-item config:name="IsPrintPageName" config:type="boolean">false</config:config-item>
    <config:config-item config:name="IsPrintTilePage" config:type="boolean">false</config:config-item>
    <config:config-item config:name="IsPrintTime" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="LineEndTableURL" config:type="string">$(inst)/Resources/palette%3B$(user)/config/standard.soe</config:config-item>
+   <config:config-item config:name="LineEndTableURL" config:type="string">$(inst)/share/palette%3B$(user)/config/standard.soe</config:config-item>
    <config:config-item config:name="LoadReadonly" config:type="boolean">false</config:config-item>
    <config:config-item config:name="PageNumberFormat" config:type="int">4</config:config-item>
    <config:config-item config:name="ParagraphSummation" config:type="boolean">true</config:config-item>
    <config:config-item config:name="PrintQuality" config:type="int">0</config:config-item>
    <config:config-item config:name="PrinterIndependentLayout" config:type="string">low-resolution</config:config-item>
-   <config:config-item config:name="PrinterName" config:type="string">HP OfficeJet Pro 9010 series</config:config-item>
-   <config:config-item config:name="PrinterPaperFromSetup" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="PrinterSetup" config:type="base64Binary">5wD+/0hQIE9mZmljZUpldCBQcm8gOTAxMCBzZXJpZXMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASFAgT2ZmaWNlSmV0IFBybyA5MDEwIHNlcmllcy1BaQAWAAQABAAAAAAAAAAIAFJUAAAkbQAAAAAAABIAQ09NUEFUX0RVUExFWF9NT0RFEwBEdXBsZXhNb2RlOjpVbmtub3du</config:config-item>
-   <config:config-item config:name="SaveThumbnail" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="PrinterName" config:type="string">Brother_MFC-L2750DW_series_-_Fax</config:config-item>
+   <config:config-item config:name="PrinterSetup" config:type="base64Binary">qAH+/0Jyb3RoZXJfTUZDLUwyNzUwRFdfc2VyaWVzXy1fRmF4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ1VQUzpCcm90aGVyX01GQy1MMjc1MERXX3NlcmllcwAWAAMAyQAAAAAAAAAIAFZUAAAkbQAASm9iRGF0YSAxCnByaW50ZXI9QnJvdGhlcl9NRkMtTDI3NTBEV19zZXJpZXNfLV9GYXgKb3JpZW50YXRpb249UG9ydHJhaXQKY29waWVzPTEKY29sbGF0ZT1mYWxzZQptYXJnaW5kYWp1c3RtZW50PTAsMCwwLDAKY29sb3JkZXB0aD0yNApwc2xldmVsPTAKcGRmZGV2aWNlPTEKY29sb3JkZXZpY2U9MApQUERDb250ZXhEYXRhClBhZ2VTaXplOkxldHRlcgAAEgBDT01QQVRfRFVQTEVYX01PREUPAER1cGxleE1vZGU6Ok9mZg==</config:config-item>
    <config:config-item config:name="SaveVersionOnClose" config:type="boolean">false</config:config-item>
    <config:config-item config:name="SlidesPerHandout" config:type="short">6</config:config-item>
    <config:config-item config:name="UpdateFromTemplate" config:type="boolean">true</config:config-item>
@@ -109,41 +103,24 @@
  </office:settings>
  <office:scripts>
   <office:script script:language="ooo:Basic">
-   <ooo:libraries xmlns:ooo="http://openoffice.org/2004/office" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <ooo:library-embedded ooo:name="Standard"/>
-   </ooo:libraries>
+   <ooo:libraries xmlns:ooo="http://openoffice.org/2004/office" xmlns:xlink="http://www.w3.org/1999/xlink"/>
   </office:script>
  </office:scripts>
  <office:font-face-decls>
   <style:font-face style:name="Arial" svg:font-family="Arial"/>
-  <style:font-face style:name="Liberation Sans1" svg:font-family="&apos;Liberation Sans&apos;"/>
   <style:font-face style:name="Tahoma" svg:font-family="Tahoma"/>
   <style:font-face style:name="ＭＳ Ｐゴシック" svg:font-family="&apos;ＭＳ Ｐゴシック&apos;"/>
-  <style:font-face style:name="Courier New1" svg:font-family="&apos;Courier New&apos;" style:font-family-generic="modern"/>
-  <style:font-face style:name="Tahoma2" svg:font-family="Tahoma" style:font-family-generic="modern"/>
-  <style:font-face style:name="Arial2" svg:font-family="Arial" style:font-family-generic="swiss"/>
-  <style:font-face style:name="Tahoma3" svg:font-family="Tahoma" style:font-family-generic="swiss"/>
-  <style:font-face style:name="ＭＳ Ｐゴシック3" svg:font-family="&apos;ＭＳ Ｐゴシック&apos;" style:font-family-generic="swiss"/>
-  <style:font-face style:name="Arial1" svg:font-family="Arial" style:font-pitch="variable"/>
-  <style:font-face style:name="Arial Unicode MS1" svg:font-family="&apos;Arial Unicode MS&apos;" style:font-pitch="variable"/>
-  <style:font-face style:name="Liberation Sans" svg:font-family="&apos;Liberation Sans&apos;" style:font-pitch="variable"/>
-  <style:font-face style:name="Liberation Serif1" svg:font-family="&apos;Liberation Serif&apos;" style:font-pitch="variable"/>
-  <style:font-face style:name="Lucida Sans" svg:font-family="&apos;Lucida Sans&apos;" style:font-pitch="variable"/>
-  <style:font-face style:name="PingFang SC" svg:font-family="&apos;PingFang SC&apos;" style:font-pitch="variable"/>
-  <style:font-face style:name="Tahoma1" svg:font-family="Tahoma" style:font-pitch="variable"/>
-  <style:font-face style:name="ＭＳ Ｐゴシック1" svg:font-family="&apos;ＭＳ Ｐゴシック&apos;" style:font-pitch="variable"/>
+  <style:font-face style:name="Liberation Sans1" svg:font-family="&apos;Liberation Sans&apos;" style:font-pitch="variable"/>
   <style:font-face style:name="Courier New" svg:font-family="&apos;Courier New&apos;" style:font-family-generic="modern" style:font-pitch="variable"/>
-  <style:font-face style:name="Liberation Sans2" svg:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable"/>
+  <style:font-face style:name="Liberation Sans" svg:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable"/>
   <style:font-face style:name="Liberation Serif" svg:font-family="&apos;Liberation Serif&apos;" style:font-family-generic="roman" style:font-pitch="variable"/>
-  <style:font-face style:name="Noto Sans" svg:font-family="&apos;Noto Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable"/>
-  <style:font-face style:name="Tahoma5" svg:font-family="Tahoma" style:font-family-generic="roman" style:font-pitch="variable"/>
-  <style:font-face style:name="Arial3" svg:font-family="Arial" style:font-family-generic="swiss" style:font-pitch="variable"/>
-  <style:font-face style:name="Tahoma4" svg:font-family="Tahoma" style:font-family-generic="swiss" style:font-pitch="variable"/>
-  <style:font-face style:name="Arial Unicode MS" svg:font-family="&apos;Arial Unicode MS&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
-  <style:font-face style:name="Lucida Sans1" svg:font-family="&apos;Lucida Sans&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
-  <style:font-face style:name="PingFang SC1" svg:font-family="&apos;PingFang SC&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
-  <style:font-face style:name="Tahoma6" svg:font-family="Tahoma" style:font-family-generic="system" style:font-pitch="variable"/>
-  <style:font-face style:name="ＭＳ Ｐゴシック2" svg:font-family="&apos;ＭＳ Ｐゴシック&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
+  <style:font-face style:name="Arial1" svg:font-family="Arial" style:font-family-generic="swiss" style:font-pitch="variable"/>
+  <style:font-face style:name="Tahoma1" svg:font-family="Tahoma" style:font-family-generic="swiss" style:font-pitch="variable"/>
+  <style:font-face style:name="Lohit Devanagari" svg:font-family="&apos;Lohit Devanagari&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
+  <style:font-face style:name="Lucida Sans" svg:font-family="&apos;Lucida Sans&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
+  <style:font-face style:name="PingFang SC" svg:font-family="&apos;PingFang SC&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
+  <style:font-face style:name="Tahoma2" svg:font-family="Tahoma" style:font-family-generic="system" style:font-pitch="variable"/>
+  <style:font-face style:name="WenQuanYi Zen Hei Sharp" svg:font-family="&apos;WenQuanYi Zen Hei Sharp&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
  </office:font-face-decls>
  <office:styles>
   <draw:gradient draw:name="Filled" draw:style="linear" draw:start-color="#ffffff" draw:end-color="#cccccc" draw:start-intensity="100%" draw:end-intensity="100%" draw:angle="300" draw:border="0%"/>
@@ -155,10 +132,10 @@
   <draw:marker draw:name="Arrow" svg:viewBox="0 0 20 30" svg:d="M10 0l-10 30h20z"/>
   <style:default-style style:family="graphic">
    <style:graphic-properties svg:stroke-color="#3465a4" draw:fill-color="#729fcf" fo:wrap-option="no-wrap"/>
-   <style:paragraph-properties style:text-autospace="ideograph-alpha" style:punctuation-wrap="simple" style:line-break="strict" style:font-independent-line-spacing="false">
+   <style:paragraph-properties style:text-autospace="ideograph-alpha" style:punctuation-wrap="simple" style:line-break="strict" style:writing-mode="lr-tb" style:font-independent-line-spacing="false">
     <style:tab-stops/>
    </style:paragraph-properties>
-   <style:text-properties style:use-window-font-color="true" style:font-name="Liberation Serif" fo:font-size="24pt" fo:language="en" fo:country="US" style:font-name-asian="Tahoma6" style:font-size-asian="24pt" style:language-asian="zh" style:country-asian="CN" style:font-name-complex="Tahoma6" style:font-size-complex="24pt" style:language-complex="hi" style:country-complex="IN"/>
+   <style:text-properties style:use-window-font-color="true" style:font-name="Liberation Serif" fo:font-size="24pt" fo:language="en" fo:country="US" style:font-name-asian="Tahoma2" style:font-size-asian="24pt" style:language-asian="zh" style:country-asian="CN" style:font-name-complex="Tahoma2" style:font-size-complex="24pt" style:language-complex="hi" style:country-complex="IN"/>
   </style:default-style>
   <style:style style:name="standard" style:family="graphic">
    <style:graphic-properties draw:stroke="solid" svg:stroke-width="0cm" svg:stroke-color="#3465a4" draw:marker-start-width="0.2cm" draw:marker-start-center="false" draw:marker-end-width="0.2cm" draw:marker-end-center="false" draw:fill="solid" draw:fill-color="#729fcf" draw:textarea-horizontal-align="justify" fo:padding-top="0.125cm" fo:padding-bottom="0.125cm" fo:padding-left="0.25cm" fo:padding-right="0.25cm" draw:shadow="hidden" draw:shadow-offset-x="0.2cm" draw:shadow-offset-y="0.2cm" draw:shadow-color="#808080">
@@ -206,17 +183,67 @@
     </text:list-style>
    </style:graphic-properties>
    <style:paragraph-properties fo:margin-left="0cm" fo:margin-right="0cm" fo:margin-top="0cm" fo:margin-bottom="0cm" fo:line-height="100%" fo:text-indent="0cm"/>
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans2" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="18pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" style:font-name-asian="PingFang SC1" style:font-family-asian="&apos;PingFang SC&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="18pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Lucida Sans1" style:font-family-complex="&apos;Lucida Sans&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="18pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="18pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" style:font-name-asian="PingFang SC" style:font-family-asian="&apos;PingFang SC&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="18pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Lucida Sans" style:font-family-complex="&apos;Lucida Sans&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="18pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
+  </style:style>
+  <style:style style:name="objectwitharrow" style:family="graphic" style:parent-style-name="standard">
+   <style:graphic-properties draw:stroke="solid" svg:stroke-width="0.15cm" svg:stroke-color="#000000" draw:marker-start="Arrow" draw:marker-start-width="0.7cm" draw:marker-start-center="true" draw:marker-end-width="0.3cm"/>
+  </style:style>
+  <style:style style:name="objectwithshadow" style:family="graphic" style:parent-style-name="standard">
+   <style:graphic-properties draw:shadow="visible" draw:shadow-offset-x="0.2cm" draw:shadow-offset-y="0.2cm" draw:shadow-color="#808080"/>
   </style:style>
   <style:style style:name="objectwithoutfill" style:family="graphic" style:parent-style-name="standard"/>
   <style:style style:name="Object_20_with_20_no_20_fill_20_and_20_no_20_line" style:display-name="Object with no fill and no line" style:family="graphic" style:parent-style-name="standard">
    <style:graphic-properties draw:stroke="none" draw:fill="none"/>
   </style:style>
-  <style:style style:name="Text" style:family="graphic">
-   <style:graphic-properties draw:stroke="solid" svg:stroke-color="#cccccc" draw:fill="solid" draw:fill-color="#eeeeee"/>
-   <style:text-properties style:font-name="Noto Sans" fo:font-family="&apos;Noto Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable"/>
+  <style:style style:name="text" style:family="graphic" style:parent-style-name="standard">
+   <style:graphic-properties draw:stroke="none" draw:fill="none"/>
   </style:style>
-  <style:style style:name="A4" style:family="graphic" style:parent-style-name="Text">
+  <style:style style:name="textbody" style:family="graphic" style:parent-style-name="standard">
+   <style:graphic-properties draw:stroke="none" draw:fill="none"/>
+   <style:text-properties fo:font-size="16pt"/>
+  </style:style>
+  <style:style style:name="textbodyjustfied" style:family="graphic" style:parent-style-name="standard">
+   <style:graphic-properties draw:stroke="none" draw:fill="none"/>
+   <style:paragraph-properties fo:text-align="justify"/>
+  </style:style>
+  <style:style style:name="textbodyindent" style:family="graphic" style:parent-style-name="standard">
+   <style:graphic-properties draw:stroke="none" draw:fill="none"/>
+   <style:paragraph-properties fo:margin-left="0cm" fo:margin-right="0cm" fo:text-indent="0.6cm"/>
+  </style:style>
+  <style:style style:name="title" style:family="graphic" style:parent-style-name="standard">
+   <style:graphic-properties draw:stroke="none" draw:fill="none"/>
+   <style:text-properties fo:font-size="44pt"/>
+  </style:style>
+  <style:style style:name="title1" style:family="graphic" style:parent-style-name="standard">
+   <style:graphic-properties draw:stroke="none" draw:fill="solid" draw:fill-color="#008080" draw:shadow="visible" draw:shadow-offset-x="0.2cm" draw:shadow-offset-y="0.2cm" draw:shadow-color="#808080"/>
+   <style:paragraph-properties fo:text-align="center"/>
+   <style:text-properties fo:font-size="24pt"/>
+  </style:style>
+  <style:style style:name="title2" style:family="graphic" style:parent-style-name="standard">
+   <style:graphic-properties svg:stroke-width="0.05cm" draw:fill-color="#ffcc99" draw:shadow="visible" draw:shadow-offset-x="0.2cm" draw:shadow-offset-y="0.2cm" draw:shadow-color="#808080"/>
+   <style:paragraph-properties fo:margin-left="0cm" fo:margin-right="0.2cm" fo:margin-top="0.1cm" fo:margin-bottom="0.1cm" fo:text-align="center" fo:text-indent="0cm"/>
+   <style:text-properties fo:font-size="36pt"/>
+  </style:style>
+  <style:style style:name="headline" style:family="graphic" style:parent-style-name="standard">
+   <style:graphic-properties draw:stroke="none" draw:fill="none"/>
+   <style:paragraph-properties fo:margin-top="0.42cm" fo:margin-bottom="0.21cm"/>
+   <style:text-properties fo:font-size="24pt"/>
+  </style:style>
+  <style:style style:name="headline1" style:family="graphic" style:parent-style-name="standard">
+   <style:graphic-properties draw:stroke="none" draw:fill="none"/>
+   <style:paragraph-properties fo:margin-top="0.42cm" fo:margin-bottom="0.21cm"/>
+   <style:text-properties fo:font-size="18pt" fo:font-weight="bold"/>
+  </style:style>
+  <style:style style:name="headline2" style:family="graphic" style:parent-style-name="standard">
+   <style:graphic-properties draw:stroke="none" draw:fill="none"/>
+   <style:paragraph-properties fo:margin-top="0.42cm" fo:margin-bottom="0.21cm"/>
+   <style:text-properties fo:font-size="14pt" fo:font-style="italic" fo:font-weight="bold"/>
+  </style:style>
+  <style:style style:name="measure" style:family="graphic" style:parent-style-name="standard">
+   <style:graphic-properties draw:stroke="solid" svg:stroke-color="#000000" draw:marker-start="Arrow" draw:marker-start-width="0.2cm" draw:marker-end="Arrow" draw:marker-end-width="0.2cm" draw:fill="none" draw:show-unit="true"/>
+   <style:text-properties fo:font-size="12pt"/>
+  </style:style>
+  <style:style style:name="A4" style:family="graphic">
    <style:graphic-properties draw:fill="none"/>
    <style:text-properties fo:font-size="18pt"/>
   </style:style>
@@ -231,10 +258,6 @@
   <style:style style:name="Text_20_A4" style:display-name="Text A4" style:family="graphic" style:parent-style-name="A4">
    <style:graphic-properties draw:stroke="none"/>
   </style:style>
-  <style:style style:name="A4" style:family="graphic" style:parent-style-name="Text">
-   <style:graphic-properties draw:fill="none"/>
-   <style:text-properties fo:font-size="18pt"/>
-  </style:style>
   <style:style style:name="Title_20_A0" style:display-name="Title A0" style:family="graphic" style:parent-style-name="A4">
    <style:graphic-properties draw:stroke="none"/>
    <style:text-properties fo:font-size="96pt"/>
@@ -248,7 +271,7 @@
   </style:style>
   <style:style style:name="Graphic" style:family="graphic">
    <style:graphic-properties draw:fill="solid" draw:fill-color="#ffffff"/>
-   <style:text-properties style:font-name="Liberation Sans2" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="18pt"/>
+   <style:text-properties style:font-name="Liberation Sans" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="18pt"/>
   </style:style>
   <style:style style:name="Shapes" style:family="graphic" style:parent-style-name="Graphic">
    <style:graphic-properties draw:stroke="none" draw:fill="gradient" draw:fill-gradient-name="Shapes"/>
@@ -263,7 +286,7 @@
   </style:style>
   <style:style style:name="Filled_20_Green" style:display-name="Filled Green" style:family="graphic" style:parent-style-name="Filled">
    <style:graphic-properties draw:fill-gradient-name="Filled_20_Green"/>
-   <style:text-properties fo:color="#ffffff" style:font-name="Liberation Sans2" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable"/>
+   <style:text-properties fo:color="#ffffff" style:font-name="Liberation Sans" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable"/>
   </style:style>
   <style:style style:name="Filled_20_Red" style:display-name="Filled Red" style:family="graphic" style:parent-style-name="Filled">
    <style:graphic-properties draw:fill-gradient-name="Filled_20_Red"/>
@@ -347,7 +370,7 @@
     </text:list-style>
    </style:graphic-properties>
    <style:paragraph-properties fo:margin-left="0cm" fo:margin-right="0cm" fo:margin-top="0cm" fo:margin-bottom="0cm" fo:line-height="100%" fo:text-indent="0cm"/>
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans2" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="18pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" style:font-name-asian="PingFang SC1" style:font-family-asian="&apos;PingFang SC&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="18pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Lucida Sans1" style:font-family-complex="&apos;Lucida Sans&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="18pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="18pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" style:font-name-asian="PingFang SC" style:font-family-asian="&apos;PingFang SC&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="18pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Lucida Sans" style:font-family-complex="&apos;Lucida Sans&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="18pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
   <style:style style:name="Title_2b_Content_2b_Picture-background" style:display-name="Title+Content+Picture-background" style:family="presentation">
    <style:graphic-properties draw:stroke="none" draw:fill="solid" draw:fill-color="#ffffff"/>
@@ -360,7 +383,7 @@
   <style:style style:name="Title_2b_Content_2b_Picture-notes" style:display-name="Title+Content+Picture-notes" style:family="presentation">
    <style:graphic-properties draw:stroke="none" draw:fill="none"/>
    <style:paragraph-properties fo:margin-left="0.6cm" fo:margin-right="0cm" fo:text-indent="-0.6cm"/>
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans2" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="20pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="PingFang SC1" style:font-family-asian="&apos;PingFang SC&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="20pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Lucida Sans1" style:font-family-complex="&apos;Lucida Sans&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="20pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="20pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="PingFang SC" style:font-family-asian="&apos;PingFang SC&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="20pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Lucida Sans" style:font-family-complex="&apos;Lucida Sans&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="20pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
   <style:style style:name="Title_2b_Content_2b_Picture-outline1" style:display-name="Title+Content+Picture-outline1" style:family="presentation">
    <style:graphic-properties draw:stroke="none" draw:fill="none" draw:auto-grow-height="false" draw:fit-to-size="shrink-to-fit" style:shrink-to-fit="true">
@@ -488,7 +511,7 @@
     </text:list-style>
    </style:graphic-properties>
    <style:paragraph-properties fo:margin-left="0cm" fo:margin-right="0cm" fo:text-align="center" fo:text-indent="0cm"/>
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans2" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="32pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="PingFang SC1" style:font-family-asian="&apos;PingFang SC&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="32pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Lucida Sans1" style:font-family-complex="&apos;Lucida Sans&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="32pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="32pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="PingFang SC" style:font-family-asian="&apos;PingFang SC&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="32pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Lucida Sans" style:font-family-complex="&apos;Lucida Sans&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="32pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
   <style:style style:name="Title_2b_Content_2b_Picture-title" style:display-name="Title+Content+Picture-title" style:family="presentation">
    <style:graphic-properties draw:stroke="none" draw:fill="none" draw:textarea-vertical-align="middle">
@@ -549,7 +572,7 @@
   <style:style style:name="Title_20_and_20_Content-notes" style:display-name="Title and Content-notes" style:family="presentation">
    <style:graphic-properties draw:stroke="none" draw:fill="none"/>
    <style:paragraph-properties fo:margin-left="0.6cm" fo:margin-right="0cm" fo:text-indent="-0.6cm"/>
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans2" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="20pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="PingFang SC1" style:font-family-asian="&apos;PingFang SC&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="20pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Lucida Sans1" style:font-family-complex="&apos;Lucida Sans&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="20pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="20pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="PingFang SC" style:font-family-asian="&apos;PingFang SC&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="20pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Lucida Sans" style:font-family-complex="&apos;Lucida Sans&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="20pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
   <style:style style:name="Title_20_and_20_Content-outline1" style:display-name="Title and Content-outline1" style:family="presentation">
    <style:graphic-properties draw:stroke="none" draw:fill="none" draw:auto-grow-height="false" draw:fit-to-size="shrink-to-fit" style:shrink-to-fit="true">
@@ -677,7 +700,7 @@
     </text:list-style>
    </style:graphic-properties>
    <style:paragraph-properties fo:margin-left="0cm" fo:margin-right="0cm" fo:text-align="center" fo:text-indent="0cm"/>
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans2" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="32pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="PingFang SC1" style:font-family-asian="&apos;PingFang SC&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="32pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Lucida Sans1" style:font-family-complex="&apos;Lucida Sans&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="32pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="32pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="PingFang SC" style:font-family-asian="&apos;PingFang SC&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="32pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Lucida Sans" style:font-family-complex="&apos;Lucida Sans&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="32pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
   <style:style style:name="Title_20_and_20_Content-title" style:display-name="Title and Content-title" style:family="presentation">
    <style:graphic-properties draw:stroke="none" draw:fill="none" draw:textarea-vertical-align="middle">
@@ -738,7 +761,7 @@
   <style:style style:name="Blank-notes" style:family="presentation">
    <style:graphic-properties draw:stroke="none" draw:fill="none"/>
    <style:paragraph-properties fo:margin-left="0.6cm" fo:margin-right="0cm" fo:text-indent="-0.6cm"/>
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans2" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="20pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="PingFang SC1" style:font-family-asian="&apos;PingFang SC&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="20pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Lucida Sans1" style:font-family-complex="&apos;Lucida Sans&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="20pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="20pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="PingFang SC" style:font-family-asian="&apos;PingFang SC&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="20pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Lucida Sans" style:font-family-complex="&apos;Lucida Sans&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="20pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
   <style:style style:name="Blank-outline1" style:family="presentation">
    <style:graphic-properties draw:stroke="none" draw:fill="none" draw:auto-grow-height="false" draw:fit-to-size="shrink-to-fit" style:shrink-to-fit="true">
@@ -866,7 +889,7 @@
     </text:list-style>
    </style:graphic-properties>
    <style:paragraph-properties fo:margin-left="0cm" fo:margin-right="0cm" fo:text-align="center" fo:text-indent="0cm"/>
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans2" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="32pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="PingFang SC1" style:font-family-asian="&apos;PingFang SC&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="32pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Lucida Sans1" style:font-family-complex="&apos;Lucida Sans&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="32pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="32pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="PingFang SC" style:font-family-asian="&apos;PingFang SC&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="32pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Lucida Sans" style:font-family-complex="&apos;Lucida Sans&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="32pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
   <style:style style:name="Blank-title" style:family="presentation">
    <style:graphic-properties draw:stroke="none" draw:fill="none" draw:textarea-vertical-align="middle">
@@ -927,7 +950,7 @@
   <style:style style:name="Title_2b_Content_2b_Picture_5f_-notes" style:display-name="Title+Content+Picture_-notes" style:family="presentation">
    <style:graphic-properties draw:stroke="none" draw:fill="none"/>
    <style:paragraph-properties fo:margin-left="0.6cm" fo:margin-right="0cm" fo:text-indent="-0.6cm"/>
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans2" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="20pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="PingFang SC1" style:font-family-asian="&apos;PingFang SC&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="20pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Lucida Sans1" style:font-family-complex="&apos;Lucida Sans&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="20pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="20pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="PingFang SC" style:font-family-asian="&apos;PingFang SC&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="20pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Lucida Sans" style:font-family-complex="&apos;Lucida Sans&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="20pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
   <style:style style:name="Title_2b_Content_2b_Picture_5f_-outline1" style:display-name="Title+Content+Picture_-outline1" style:family="presentation">
    <style:graphic-properties draw:stroke="none" draw:fill="none" draw:auto-grow-height="false" draw:fit-to-size="shrink-to-fit" style:shrink-to-fit="true">
@@ -1055,7 +1078,7 @@
     </text:list-style>
    </style:graphic-properties>
    <style:paragraph-properties fo:margin-left="0cm" fo:margin-right="0cm" fo:text-align="center" fo:text-indent="0cm"/>
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans2" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="32pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="PingFang SC1" style:font-family-asian="&apos;PingFang SC&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="32pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Lucida Sans1" style:font-family-complex="&apos;Lucida Sans&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="32pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="32pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="PingFang SC" style:font-family-asian="&apos;PingFang SC&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="32pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Lucida Sans" style:font-family-complex="&apos;Lucida Sans&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="32pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
   <style:style style:name="Title_2b_Content_2b_Picture_5f_-title" style:display-name="Title+Content+Picture_-title" style:family="presentation">
    <style:graphic-properties draw:stroke="none" draw:fill="none" draw:textarea-vertical-align="middle">
@@ -1116,7 +1139,7 @@
   <style:style style:name="Title_20_and_20_Content_5f_-notes" style:display-name="Title and Content_-notes" style:family="presentation">
    <style:graphic-properties draw:stroke="none" draw:fill="none"/>
    <style:paragraph-properties fo:margin-left="0.6cm" fo:margin-right="0cm" fo:text-indent="-0.6cm"/>
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans2" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="20pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="PingFang SC1" style:font-family-asian="&apos;PingFang SC&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="20pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Lucida Sans1" style:font-family-complex="&apos;Lucida Sans&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="20pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="20pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="PingFang SC" style:font-family-asian="&apos;PingFang SC&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="20pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Lucida Sans" style:font-family-complex="&apos;Lucida Sans&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="20pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
   <style:style style:name="Title_20_and_20_Content_5f_-outline1" style:display-name="Title and Content_-outline1" style:family="presentation">
    <style:graphic-properties draw:stroke="none" draw:fill="none" draw:auto-grow-height="false" draw:fit-to-size="shrink-to-fit" style:shrink-to-fit="true">
@@ -1244,7 +1267,7 @@
     </text:list-style>
    </style:graphic-properties>
    <style:paragraph-properties fo:margin-left="0cm" fo:margin-right="0cm" fo:text-align="center" fo:text-indent="0cm"/>
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans2" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="32pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="PingFang SC1" style:font-family-asian="&apos;PingFang SC&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="32pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Lucida Sans1" style:font-family-complex="&apos;Lucida Sans&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="32pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="32pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="PingFang SC" style:font-family-asian="&apos;PingFang SC&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="32pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Lucida Sans" style:font-family-complex="&apos;Lucida Sans&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="32pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
   <style:style style:name="Title_20_and_20_Content_5f_-title" style:display-name="Title and Content_-title" style:family="presentation">
    <style:graphic-properties draw:stroke="none" draw:fill="none" draw:textarea-vertical-align="middle">
@@ -1331,18 +1354,15 @@
   </style:style>
   <style:style style:name="gr1" style:family="graphic" style:parent-style-name="standard">
    <style:graphic-properties draw:stroke="none" draw:fill="none" draw:fill-color="#ffffff" draw:auto-grow-height="false" fo:min-height="1.397cm"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="gr2" style:family="graphic" style:parent-style-name="standard">
    <style:graphic-properties draw:stroke="none" draw:fill="none" draw:fill-color="#ffffff" draw:textarea-vertical-align="bottom" draw:auto-grow-height="false" fo:min-height="1.397cm"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="gr3" style:family="graphic" style:parent-style-name="standard">
    <style:graphic-properties draw:stroke="solid" svg:stroke-width="0.079cm" svg:stroke-color="#2560a1" draw:stroke-linejoin="round" draw:fill="none" draw:textarea-horizontal-align="center" draw:textarea-vertical-align="top" draw:auto-grow-height="false" draw:fit-to-size="false" style:shrink-to-fit="false" fo:padding-top="0.127cm" fo:padding-bottom="0.127cm" fo:padding-left="0.254cm" fo:padding-right="0.254cm" fo:wrap-option="wrap"/>
   </style:style>
   <style:style style:name="gr4" style:family="graphic" style:parent-style-name="standard">
    <style:graphic-properties draw:stroke="none" svg:stroke-width="0cm" draw:fill="none" draw:textarea-vertical-align="top" draw:auto-grow-height="true" draw:fit-to-size="false" style:shrink-to-fit="false" fo:min-height="0cm" fo:min-width="0cm" fo:padding-top="0.127cm" fo:padding-bottom="0.127cm" fo:padding-left="0.254cm" fo:padding-right="0.254cm" fo:wrap-option="wrap"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="gr5" style:family="graphic" style:parent-style-name="standard">
    <style:graphic-properties draw:stroke="solid" svg:stroke-width="0.106cm" svg:stroke-color="#2560a1" draw:stroke-linejoin="round" draw:fill="solid" draw:fill-color="#99ccff" draw:textarea-horizontal-align="center" draw:textarea-vertical-align="top" draw:auto-grow-height="false" fo:padding-top="0.125cm" fo:padding-bottom="0.125cm" fo:padding-left="0.25cm" fo:padding-right="0.25cm" fo:wrap-option="wrap"/>
@@ -1355,7 +1375,6 @@
   </style:style>
   <style:style style:name="gr8" style:family="graphic" style:parent-style-name="Default_5f_1">
    <style:graphic-properties draw:stroke="none" svg:stroke-width="0cm" draw:fill="none" draw:textarea-vertical-align="top" draw:auto-grow-height="true" draw:fit-to-size="false" style:shrink-to-fit="false" fo:min-height="0cm" fo:min-width="0cm" fo:padding-top="0.127cm" fo:padding-bottom="0.127cm" fo:padding-left="0.254cm" fo:padding-right="0.254cm" fo:wrap-option="wrap"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="gr9" style:family="graphic" style:parent-style-name="Object_20_with_20_no_20_fill_20_and_20_no_20_line">
    <style:graphic-properties draw:stroke="none" svg:stroke-width="0cm" draw:fill="none" draw:textarea-horizontal-align="center" draw:textarea-vertical-align="top" draw:auto-grow-height="false" fo:padding-top="0.125cm" fo:padding-bottom="0.125cm" fo:padding-left="0.25cm" fo:padding-right="0.25cm" fo:wrap-option="wrap" draw:color-mode="standard" draw:luminance="0%" draw:contrast="0%" draw:gamma="100%" draw:red="0%" draw:green="0%" draw:blue="0%" fo:clip="rect(0cm, 0cm, 0cm, 0cm)" draw:image-opacity="100%" style:mirror="none"/>
@@ -1371,139 +1390,105 @@
   </style:style>
   <style:style style:name="pr1" style:family="presentation" style:parent-style-name="Title_2b_Content_2b_Picture-title">
    <style:graphic-properties draw:stroke="none" svg:stroke-width="0cm" draw:fill="none" draw:textarea-vertical-align="top" draw:auto-grow-height="false" draw:fit-to-size="false" style:shrink-to-fit="false" fo:min-height="3.181cm" fo:padding-top="0.127cm" fo:padding-bottom="0.127cm" fo:padding-left="0.254cm" fo:padding-right="0.254cm" fo:wrap-option="wrap"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr2" style:family="presentation" style:parent-style-name="Title_2b_Content_2b_Picture-outline1">
    <style:graphic-properties draw:stroke="none" svg:stroke-width="0cm" draw:fill="none" draw:textarea-vertical-align="top" draw:auto-grow-height="false" draw:fit-to-size="shrink-to-fit" style:shrink-to-fit="true" fo:min-height="11.049cm" fo:padding-top="0.127cm" fo:padding-bottom="0.127cm" fo:padding-left="0.254cm" fo:padding-right="0.254cm" fo:wrap-option="wrap"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr3" style:family="presentation" style:parent-style-name="Title_2b_Content_2b_Picture-outline1">
    <style:graphic-properties draw:stroke="none" svg:stroke-width="0cm" draw:fill="none" draw:textarea-vertical-align="top" draw:auto-grow-height="false" draw:fit-to-size="false" style:shrink-to-fit="false" fo:min-height="11.049cm" fo:padding-top="0.127cm" fo:padding-bottom="0.127cm" fo:padding-left="0.254cm" fo:padding-right="0.254cm" fo:wrap-option="wrap"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr4" style:family="presentation" style:parent-style-name="Title_2b_Content_2b_Picture-backgroundobjects">
    <style:graphic-properties draw:stroke="none" draw:fill="none" draw:fill-color="#ffffff" draw:auto-grow-height="false" fo:min-height="1.397cm"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr5" style:family="presentation" style:parent-style-name="Title_2b_Content_2b_Picture-backgroundobjects">
    <style:graphic-properties draw:stroke="none" draw:fill="none" draw:fill-color="#ffffff" draw:textarea-vertical-align="bottom" draw:auto-grow-height="false" fo:min-height="1.397cm"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr6" style:family="presentation" style:parent-style-name="Title_20_and_20_Content-title">
    <style:graphic-properties draw:stroke="none" svg:stroke-width="0.026cm" draw:stroke-linejoin="miter" draw:fill="none" draw:textarea-vertical-align="top" draw:auto-grow-height="false" draw:fit-to-size="false" style:shrink-to-fit="false" fo:min-height="3.181cm" fo:padding-top="0.127cm" fo:padding-bottom="0.127cm" fo:padding-left="0.254cm" fo:padding-right="0.254cm" fo:wrap-option="wrap"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr7" style:family="presentation" style:parent-style-name="Title_20_and_20_Content-outline1">
    <style:graphic-properties draw:stroke="none" svg:stroke-width="0cm" draw:fill="none" draw:textarea-vertical-align="top" draw:auto-grow-height="false" draw:fit-to-size="false" style:shrink-to-fit="false" fo:min-height="11.049cm" fo:padding-top="0.127cm" fo:padding-bottom="0.127cm" fo:padding-left="0.254cm" fo:padding-right="0.254cm" fo:wrap-option="wrap"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr8" style:family="presentation" style:parent-style-name="Title_20_and_20_Content-backgroundobjects">
    <style:graphic-properties draw:stroke="none" draw:fill="none" draw:fill-color="#ffffff" draw:auto-grow-height="false" fo:min-height="1.397cm"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr9" style:family="presentation" style:parent-style-name="Title_20_and_20_Content-backgroundobjects">
    <style:graphic-properties draw:stroke="none" draw:fill="none" draw:fill-color="#ffffff" draw:textarea-vertical-align="bottom" draw:auto-grow-height="false" fo:min-height="1.397cm"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr10" style:family="presentation" style:parent-style-name="Blank-backgroundobjects">
    <style:graphic-properties draw:stroke="none" draw:fill="none" draw:fill-color="#ffffff" draw:auto-grow-height="false" fo:min-height="1.397cm"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr11" style:family="presentation" style:parent-style-name="Blank-backgroundobjects">
    <style:graphic-properties draw:stroke="none" draw:fill="none" draw:fill-color="#ffffff" draw:textarea-vertical-align="bottom" draw:auto-grow-height="false" fo:min-height="1.397cm"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr12" style:family="presentation" style:parent-style-name="Title_2b_Content_2b_Picture_5f_-title">
    <style:graphic-properties draw:stroke="none" svg:stroke-width="0cm" draw:fill="none" draw:textarea-vertical-align="top" draw:auto-grow-height="false" draw:fit-to-size="false" style:shrink-to-fit="false" fo:min-height="3.181cm" fo:padding-top="0.127cm" fo:padding-bottom="0.127cm" fo:padding-left="0.254cm" fo:padding-right="0.254cm" fo:wrap-option="wrap"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr13" style:family="presentation" style:parent-style-name="Title_2b_Content_2b_Picture_5f_-outline1">
    <style:graphic-properties draw:stroke="none" svg:stroke-width="0cm" draw:fill="none" draw:textarea-vertical-align="top" draw:auto-grow-height="false" draw:fit-to-size="shrink-to-fit" style:shrink-to-fit="true" fo:min-height="11.049cm" fo:padding-top="0.127cm" fo:padding-bottom="0.127cm" fo:padding-left="0.254cm" fo:padding-right="0.254cm" fo:wrap-option="wrap"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr14" style:family="presentation" style:parent-style-name="Title_2b_Content_2b_Picture_5f_-outline1">
    <style:graphic-properties draw:stroke="none" svg:stroke-width="0cm" draw:fill="none" draw:textarea-vertical-align="top" draw:auto-grow-height="false" draw:fit-to-size="false" style:shrink-to-fit="false" fo:min-height="11.049cm" fo:padding-top="0.127cm" fo:padding-bottom="0.127cm" fo:padding-left="0.254cm" fo:padding-right="0.254cm" fo:wrap-option="wrap"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr15" style:family="presentation" style:parent-style-name="Title_2b_Content_2b_Picture_5f_-backgroundobjects">
    <style:graphic-properties draw:stroke="none" draw:fill="none" draw:fill-color="#ffffff" draw:auto-grow-height="false" fo:min-height="1.397cm"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr16" style:family="presentation" style:parent-style-name="Title_2b_Content_2b_Picture_5f_-backgroundobjects">
    <style:graphic-properties draw:stroke="none" draw:fill="none" draw:fill-color="#ffffff" draw:textarea-vertical-align="bottom" draw:auto-grow-height="false" fo:min-height="1.397cm"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr17" style:family="presentation" style:parent-style-name="Title_20_and_20_Content_5f_-title">
    <style:graphic-properties draw:stroke="none" svg:stroke-width="0.026cm" draw:stroke-linejoin="miter" draw:fill="none" draw:textarea-vertical-align="top" draw:auto-grow-height="false" draw:fit-to-size="false" style:shrink-to-fit="false" fo:min-height="3.181cm" fo:padding-top="0.127cm" fo:padding-bottom="0.127cm" fo:padding-left="0.254cm" fo:padding-right="0.254cm" fo:wrap-option="wrap"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr18" style:family="presentation" style:parent-style-name="Title_20_and_20_Content_5f_-outline1">
    <style:graphic-properties draw:stroke="none" svg:stroke-width="0cm" draw:fill="none" draw:textarea-vertical-align="top" draw:auto-grow-height="false" draw:fit-to-size="false" style:shrink-to-fit="false" fo:min-height="11.049cm" fo:padding-top="0.127cm" fo:padding-bottom="0.127cm" fo:padding-left="0.254cm" fo:padding-right="0.254cm" fo:wrap-option="wrap"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr19" style:family="presentation" style:parent-style-name="Title_20_and_20_Content_5f_-backgroundobjects">
    <style:graphic-properties draw:stroke="none" draw:fill="none" draw:fill-color="#ffffff" draw:auto-grow-height="false" fo:min-height="1.397cm"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr20" style:family="presentation" style:parent-style-name="Title_20_and_20_Content_5f_-backgroundobjects">
    <style:graphic-properties draw:stroke="none" draw:fill="none" draw:fill-color="#ffffff" draw:textarea-vertical-align="bottom" draw:auto-grow-height="false" fo:min-height="1.397cm"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr21" style:family="presentation" style:parent-style-name="Title_20_and_20_Content-notes">
    <style:graphic-properties draw:fill-color="#ffffff" draw:auto-grow-height="true" fo:min-height="12.572cm"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr22" style:family="presentation" style:parent-style-name="Title_20_and_20_Content_5f_-outline1">
    <style:graphic-properties draw:auto-grow-height="false" fo:min-height="10.798cm"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr23" style:family="presentation" style:parent-style-name="Title_20_and_20_Content_5f_-backgroundobjects">
    <style:graphic-properties draw:stroke="none" svg:stroke-width="0.026cm" draw:stroke-linejoin="miter" draw:fill="none" draw:fill-color="#ffffff" draw:textarea-vertical-align="bottom" draw:auto-grow-height="false" draw:fit-to-size="false" style:shrink-to-fit="false" fo:min-height="11.588cm" fo:padding-top="0.127cm" fo:padding-bottom="0.127cm" fo:padding-left="0.254cm" fo:padding-right="0.254cm" fo:wrap-option="wrap"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr24" style:family="presentation" style:parent-style-name="Title_20_and_20_Content_5f_-notes" style:list-style-name="L10">
    <style:graphic-properties draw:stroke="solid" svg:stroke-width="0.026cm" svg:stroke-color="#000000" draw:stroke-linejoin="miter" draw:fill="solid" draw:fill-color="#ffffff" draw:textarea-vertical-align="top" draw:auto-grow-height="false" draw:fit-to-size="false" style:shrink-to-fit="false" fo:min-height="11.588cm" fo:padding-top="0.127cm" fo:padding-bottom="0.127cm" fo:padding-left="0.253cm" fo:padding-right="0.253cm" fo:wrap-option="wrap"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr25" style:family="presentation" style:parent-style-name="Title_20_and_20_Content_5f_-outline1" style:list-style-name="L9">
    <style:graphic-properties draw:auto-grow-height="false" fo:min-height="10.798cm"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr26" style:family="presentation" style:parent-style-name="Title_20_and_20_Content_5f_-notes" style:list-style-name="L10">
    <style:graphic-properties draw:stroke="solid" svg:stroke-width="0.026cm" svg:stroke-color="#000000" draw:stroke-linejoin="miter" draw:fill="solid" draw:fill-color="#ffffff" draw:textarea-vertical-align="top" draw:auto-grow-height="false" draw:fit-to-size="false" style:shrink-to-fit="false" fo:min-height="11.588cm" fo:padding-top="0.127cm" fo:padding-bottom="0.127cm" fo:padding-left="0.253cm" fo:padding-right="0.253cm" fo:wrap-option="wrap"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr27" style:family="presentation" style:parent-style-name="Title_20_and_20_Content_5f_-notes" style:list-style-name="L10">
    <style:graphic-properties draw:stroke="solid" svg:stroke-width="0.026cm" svg:stroke-color="#000000" draw:stroke-linejoin="miter" draw:fill="solid" draw:fill-color="#ffffff" draw:textarea-vertical-align="top" draw:auto-grow-height="false" draw:fit-to-size="false" style:shrink-to-fit="false" fo:min-height="11.588cm" fo:padding-top="0.127cm" fo:padding-bottom="0.127cm" fo:padding-left="0.253cm" fo:padding-right="0.253cm" fo:wrap-option="wrap"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr28" style:family="presentation" style:parent-style-name="Title_20_and_20_Content_5f_-notes" style:list-style-name="L10">
    <style:graphic-properties draw:stroke="solid" svg:stroke-width="0.026cm" svg:stroke-color="#000000" draw:stroke-linejoin="miter" draw:fill="solid" draw:fill-color="#ffffff" draw:textarea-vertical-align="top" draw:auto-grow-height="false" draw:fit-to-size="false" style:shrink-to-fit="false" fo:min-height="11.588cm" fo:padding-top="0.127cm" fo:padding-bottom="0.127cm" fo:padding-left="0.253cm" fo:padding-right="0.253cm" fo:wrap-option="wrap"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr29" style:family="presentation" style:parent-style-name="Title_20_and_20_Content_5f_-notes" style:list-style-name="L10">
    <style:graphic-properties draw:stroke="solid" svg:stroke-width="0.026cm" svg:stroke-color="#000000" draw:stroke-linejoin="miter" draw:fill="solid" draw:fill-color="#ffffff" draw:textarea-vertical-align="top" draw:auto-grow-height="false" draw:fit-to-size="false" style:shrink-to-fit="false" fo:min-height="11.588cm" fo:padding-top="0.127cm" fo:padding-bottom="0.127cm" fo:padding-left="0.253cm" fo:padding-right="0.253cm" fo:wrap-option="wrap"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr30" style:family="presentation" style:parent-style-name="Title_20_and_20_Content_5f_-notes" style:list-style-name="L10">
    <style:graphic-properties draw:stroke="solid" svg:stroke-width="0.026cm" svg:stroke-color="#000000" draw:stroke-linejoin="miter" draw:fill="solid" draw:fill-color="#ffffff" draw:textarea-vertical-align="top" draw:auto-grow-height="false" draw:fit-to-size="false" style:shrink-to-fit="false" fo:min-height="11.588cm" fo:padding-top="0.127cm" fo:padding-bottom="0.127cm" fo:padding-left="0.253cm" fo:padding-right="0.253cm" fo:wrap-option="wrap"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr31" style:family="presentation" style:parent-style-name="Title_20_and_20_Content_5f_-notes" style:list-style-name="L10">
    <style:graphic-properties draw:stroke="solid" svg:stroke-width="0.026cm" svg:stroke-color="#000000" draw:stroke-linejoin="miter" draw:fill="solid" draw:fill-color="#ffffff" draw:textarea-vertical-align="top" draw:auto-grow-height="false" draw:fit-to-size="false" style:shrink-to-fit="false" fo:min-height="11.588cm" fo:padding-top="0.127cm" fo:padding-bottom="0.127cm" fo:padding-left="0.253cm" fo:padding-right="0.253cm" fo:wrap-option="wrap"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr32" style:family="presentation" style:parent-style-name="Title_20_and_20_Content_5f_-notes" style:list-style-name="L10">
    <style:graphic-properties draw:stroke="solid" svg:stroke-width="0.026cm" svg:stroke-color="#000000" draw:stroke-linejoin="miter" draw:fill="solid" draw:fill-color="#ffffff" draw:textarea-vertical-align="top" draw:auto-grow-height="false" draw:fit-to-size="false" style:shrink-to-fit="false" fo:min-height="11.588cm" fo:padding-top="0.127cm" fo:padding-bottom="0.127cm" fo:padding-left="0.253cm" fo:padding-right="0.253cm" fo:wrap-option="wrap"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr33" style:family="presentation" style:parent-style-name="Title_20_and_20_Content_5f_-notes">
    <style:graphic-properties draw:fill-color="#ffffff" fo:min-height="12.572cm"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="pr34" style:family="presentation" style:parent-style-name="Title_20_and_20_Content_5f_-outline1">
    <style:graphic-properties draw:stroke="none" svg:stroke-width="0cm" draw:fill="none" draw:textarea-vertical-align="top" draw:auto-grow-height="false" draw:fit-to-size="false" style:shrink-to-fit="false" fo:min-height="10.798cm" fo:padding-top="0.127cm" fo:padding-bottom="0.127cm" fo:padding-left="0.254cm" fo:padding-right="0.254cm" fo:wrap-option="wrap"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="P1" style:family="paragraph">
    <style:paragraph-properties style:writing-mode="lr-tb"/>
@@ -1613,7 +1598,7 @@
   </style:style>
   <style:style style:name="P25" style:family="paragraph">
    <style:paragraph-properties style:writing-mode="lr-tb"/>
-   <style:text-properties style:font-name="Tahoma4" fo:font-size="24pt" style:font-size-asian="24pt" style:font-size-complex="24pt"/>
+   <style:text-properties style:font-name="Tahoma1" fo:font-size="24pt" style:font-size-asian="24pt" style:font-size-complex="24pt"/>
   </style:style>
   <style:style style:name="P26" style:family="paragraph">
    <style:paragraph-properties fo:margin-top="0cm" fo:margin-bottom="0cm" fo:line-height="100%" fo:text-align="end" style:writing-mode="lr-tb"/>
@@ -1639,21 +1624,21 @@
   </style:style>
   <style:style style:name="P31" style:family="paragraph">
    <style:paragraph-properties style:writing-mode="lr-tb"/>
-   <style:text-properties style:font-name="Tahoma4"/>
+   <style:text-properties style:font-name="Tahoma1"/>
   </style:style>
   <style:style style:name="P32" style:family="paragraph">
    <style:paragraph-properties fo:margin-top="0.5cm" fo:margin-bottom="0cm" fo:line-height="100%" fo:text-align="start" style:punctuation-wrap="simple"/>
   </style:style>
   <style:style style:name="P33" style:family="paragraph">
    <style:paragraph-properties style:writing-mode="lr-tb"/>
-   <style:text-properties style:font-name="Tahoma4" fo:font-size="22pt"/>
+   <style:text-properties style:font-name="Tahoma1" fo:font-size="22pt"/>
   </style:style>
   <style:style style:name="P34" style:family="paragraph">
    <style:paragraph-properties fo:margin-top="0.254cm" fo:margin-bottom="0cm"/>
   </style:style>
   <style:style style:name="P35" style:family="paragraph">
    <style:paragraph-properties style:writing-mode="lr-tb"/>
-   <style:text-properties style:font-name="Tahoma4" fo:font-size="18pt"/>
+   <style:text-properties style:font-name="Tahoma1" fo:font-size="18pt"/>
   </style:style>
   <style:style style:name="P36" style:family="paragraph">
    <loext:graphic-properties draw:fill="none"/>
@@ -1672,7 +1657,7 @@
   </style:style>
   <style:style style:name="P39" style:family="paragraph">
    <style:paragraph-properties style:writing-mode="lr-tb"/>
-   <style:text-properties style:use-window-font-color="true" style:font-name="Tahoma4"/>
+   <style:text-properties style:use-window-font-color="true" style:font-name="Tahoma1"/>
   </style:style>
   <style:style style:name="P40" style:family="paragraph">
    <loext:graphic-properties draw:fill="none"/>
@@ -1694,7 +1679,7 @@
      <style:tab-stop style:position="0cm"/>
     </style:tab-stops>
    </style:paragraph-properties>
-   <style:text-properties style:font-name="Tahoma4" fo:font-size="12pt" style:font-size-asian="12pt" style:font-size-complex="12pt" fo:hyphenate="false"/>
+   <style:text-properties style:font-name="Tahoma1" fo:font-size="12pt" style:font-size-asian="12pt" style:font-size-complex="12pt" fo:hyphenate="false"/>
   </style:style>
   <style:style style:name="P43" style:family="paragraph">
    <loext:graphic-properties draw:fill="none"/>
@@ -1703,7 +1688,7 @@
      <style:tab-stop style:position="0cm"/>
     </style:tab-stops>
    </style:paragraph-properties>
-   <style:text-properties style:font-name="Tahoma4" fo:font-size="13pt" fo:hyphenate="false"/>
+   <style:text-properties style:font-name="Tahoma1" fo:font-size="13pt" fo:hyphenate="false"/>
   </style:style>
   <style:style style:name="P44" style:family="paragraph">
    <loext:graphic-properties draw:fill="none"/>
@@ -1712,7 +1697,7 @@
      <style:tab-stop style:position="0cm"/>
     </style:tab-stops>
    </style:paragraph-properties>
-   <style:text-properties style:font-name="Tahoma4" fo:font-size="18pt" fo:hyphenate="false"/>
+   <style:text-properties style:font-name="Tahoma1" fo:font-size="18pt" fo:hyphenate="false"/>
   </style:style>
   <style:style style:name="P45" style:family="paragraph">
    <loext:graphic-properties draw:fill="none"/>
@@ -1721,7 +1706,7 @@
      <style:tab-stop style:position="0cm"/>
     </style:tab-stops>
    </style:paragraph-properties>
-   <style:text-properties style:font-name="Tahoma4" fo:font-size="11pt" style:font-size-asian="11pt" style:font-size-complex="11pt" fo:hyphenate="false"/>
+   <style:text-properties style:font-name="Tahoma1" fo:font-size="11pt" style:font-size-asian="11pt" style:font-size-complex="11pt" fo:hyphenate="false"/>
   </style:style>
   <style:style style:name="P46" style:family="paragraph">
    <loext:graphic-properties draw:fill="none"/>
@@ -1743,7 +1728,7 @@
      <style:tab-stop style:position="0cm"/>
     </style:tab-stops>
    </style:paragraph-properties>
-   <style:text-properties style:font-name="Tahoma4" fo:font-size="10pt" fo:hyphenate="false"/>
+   <style:text-properties style:font-name="Tahoma1" fo:font-size="10pt" fo:hyphenate="false"/>
   </style:style>
   <style:style style:name="T1" style:family="text">
    <style:text-properties fo:font-size="14pt" style:font-size-asian="14pt" style:font-size-complex="14pt"/>
@@ -1782,10 +1767,10 @@
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#152b62" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma" fo:font-size="20pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="bold" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="20pt" style:font-style-asian="normal" style:font-weight-asian="bold" style:font-name-complex="ＭＳ Ｐゴシック" style:font-size-complex="20pt" style:font-style-complex="normal" style:font-weight-complex="bold"/>
   </style:style>
   <style:style style:name="T13" style:family="text">
-   <style:text-properties style:font-name="Tahoma4" fo:font-size="24pt" style:font-size-asian="24pt" style:font-size-complex="24pt"/>
+   <style:text-properties style:font-name="Tahoma1" fo:font-size="24pt" style:font-size-asian="24pt" style:font-size-complex="24pt"/>
   </style:style>
   <style:style style:name="T14" style:family="text">
-   <style:text-properties style:font-name="Tahoma4" fo:font-size="24pt" fo:font-style="italic" style:font-size-asian="24pt" style:font-style-asian="italic" style:font-size-complex="24pt" style:font-style-complex="italic"/>
+   <style:text-properties style:font-name="Tahoma1" fo:font-size="24pt" fo:font-style="italic" style:font-size-asian="24pt" style:font-style-asian="italic" style:font-size-complex="24pt" style:font-style-complex="italic"/>
   </style:style>
   <style:style style:name="T15" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Arial" fo:font-size="12pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="normal" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="12pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="ＭＳ Ｐゴシック" style:font-size-complex="12pt" style:font-style-complex="normal" style:font-weight-complex="normal"/>
@@ -1794,106 +1779,106 @@
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#152b62" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma" fo:font-size="28pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="bold" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="28pt" style:font-style-asian="normal" style:font-weight-asian="bold" style:font-name-complex="ＭＳ Ｐゴシック" style:font-size-complex="28pt" style:font-style-complex="normal" style:font-weight-complex="bold"/>
   </style:style>
   <style:style style:name="T17" style:family="text">
-   <style:text-properties style:font-name="Tahoma4" fo:font-size="20pt" style:font-size-asian="20pt" style:font-size-complex="20pt"/>
+   <style:text-properties style:font-name="Tahoma1" fo:font-size="20pt" style:font-size-asian="20pt" style:font-size-complex="20pt"/>
   </style:style>
   <style:style style:name="T18" style:family="text">
    <style:text-properties style:font-name="Courier New" fo:font-size="20pt" fo:font-weight="bold" style:font-size-asian="20pt" style:font-weight-asian="bold" style:font-size-complex="20pt" style:font-weight-complex="bold"/>
   </style:style>
   <style:style style:name="T19" style:family="text">
-   <style:text-properties style:font-name="Tahoma4"/>
+   <style:text-properties style:font-name="Tahoma1"/>
   </style:style>
   <style:style style:name="T20" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Courier New" fo:font-size="16pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="bold" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="16pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="bold" style:font-name-complex="ＭＳ Ｐゴシック" style:font-size-complex="16pt" style:language-complex="en" style:country-complex="US" style:font-style-complex="normal" style:font-weight-complex="bold" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
   <style:style style:name="T21" style:family="text">
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma4" fo:font-size="16pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="16pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="ＭＳ Ｐゴシック" style:font-size-complex="16pt" style:language-complex="en" style:country-complex="US" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma1" fo:font-size="16pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="16pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="ＭＳ Ｐゴシック" style:font-size-complex="16pt" style:language-complex="en" style:country-complex="US" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
   <style:style style:name="T22" style:family="text">
-   <style:text-properties style:font-name="Tahoma4" fo:font-size="16pt" style:font-size-asian="16pt" style:font-size-complex="16pt"/>
+   <style:text-properties style:font-name="Tahoma1" fo:font-size="16pt" style:font-size-asian="16pt" style:font-size-complex="16pt"/>
   </style:style>
   <style:style style:name="T23" style:family="text">
    <style:text-properties style:font-name="Courier New" fo:font-weight="bold" style:font-weight-asian="bold" style:font-weight-complex="bold"/>
   </style:style>
   <style:style style:name="T24" style:family="text">
-   <style:text-properties style:font-name="Tahoma4" fo:font-size="20pt" fo:font-weight="bold" style:font-size-asian="20pt" style:font-weight-asian="bold" style:font-size-complex="20pt" style:font-weight-complex="bold"/>
+   <style:text-properties style:font-name="Tahoma1" fo:font-size="20pt" fo:font-weight="bold" style:font-size-asian="20pt" style:font-weight-asian="bold" style:font-size-complex="20pt" style:font-weight-complex="bold"/>
   </style:style>
   <style:style style:name="T25" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#152b62" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma" fo:font-size="28pt" fo:letter-spacing="normal" fo:font-style="italic" style:text-underline-style="none" fo:font-weight="bold" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="28pt" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-name-complex="ＭＳ Ｐゴシック" style:font-size-complex="28pt" style:font-style-complex="italic" style:font-weight-complex="bold"/>
   </style:style>
   <style:style style:name="T26" style:family="text">
-   <style:text-properties style:font-name="Tahoma4" fo:font-size="22pt" fo:font-style="normal" fo:font-weight="normal" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-style-complex="normal" style:font-weight-complex="normal"/>
+   <style:text-properties style:font-name="Tahoma1" fo:font-size="22pt" fo:font-style="normal" fo:font-weight="normal" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-style-complex="normal" style:font-weight-complex="normal"/>
   </style:style>
   <style:style style:name="T27" style:family="text">
-   <style:text-properties style:font-name="Tahoma4" fo:font-size="22pt" fo:font-style="normal" fo:font-weight="bold" style:font-style-asian="normal" style:font-weight-asian="bold" style:font-style-complex="normal" style:font-weight-complex="bold"/>
+   <style:text-properties style:font-name="Tahoma1" fo:font-size="22pt" fo:font-style="normal" fo:font-weight="bold" style:font-style-asian="normal" style:font-weight-asian="bold" style:font-style-complex="normal" style:font-weight-complex="bold"/>
   </style:style>
   <style:style style:name="T28" style:family="text">
    <style:text-properties style:font-name="Courier New" fo:font-size="22pt" fo:font-style="normal" fo:font-weight="bold" style:font-style-asian="normal" style:font-weight-asian="bold" style:font-style-complex="normal" style:font-weight-complex="bold"/>
   </style:style>
   <style:style style:name="T29" style:family="text">
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma4" fo:font-size="22pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="22pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="ＭＳ Ｐゴシック" style:font-size-complex="22pt" style:language-complex="en" style:country-complex="US" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma1" fo:font-size="22pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="22pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="ＭＳ Ｐゴシック" style:font-size-complex="22pt" style:language-complex="en" style:country-complex="US" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
   <style:style style:name="T30" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Courier New" fo:font-size="22pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="bold" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="22pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="bold" style:font-name-complex="ＭＳ Ｐゴシック" style:font-size-complex="22pt" style:language-complex="en" style:country-complex="US" style:font-style-complex="normal" style:font-weight-complex="bold" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
   <style:style style:name="T31" style:family="text">
-   <style:text-properties style:font-name="Tahoma4" fo:font-size="22pt"/>
+   <style:text-properties style:font-name="Tahoma1" fo:font-size="22pt"/>
   </style:style>
   <style:style style:name="T32" style:family="text">
-   <style:text-properties style:font-name="Tahoma4" fo:font-style="normal" fo:font-weight="bold" style:font-style-asian="normal" style:font-weight-asian="bold" style:font-style-complex="normal" style:font-weight-complex="bold"/>
+   <style:text-properties style:font-name="Tahoma1" fo:font-style="normal" fo:font-weight="bold" style:font-style-asian="normal" style:font-weight-asian="bold" style:font-style-complex="normal" style:font-weight-complex="bold"/>
   </style:style>
   <style:style style:name="T33" style:family="text">
-   <style:text-properties style:font-name="Tahoma4" style:text-underline-style="solid" style:text-underline-width="auto" style:text-underline-color="font-color"/>
+   <style:text-properties style:font-name="Tahoma1" style:text-underline-style="solid" style:text-underline-width="auto" style:text-underline-color="font-color"/>
   </style:style>
   <style:style style:name="T34" style:family="text">
-   <style:text-properties style:font-name="Tahoma4" fo:font-style="italic" style:text-underline-style="none" style:font-style-asian="italic" style:font-style-complex="italic"/>
+   <style:text-properties style:font-name="Tahoma1" fo:font-style="italic" style:text-underline-style="none" style:font-style-asian="italic" style:font-style-complex="italic"/>
   </style:style>
   <style:style style:name="T35" style:family="text">
-   <style:text-properties style:font-name="Tahoma4" fo:font-size="18pt" style:font-size-asian="24pt" style:font-size-complex="24pt"/>
+   <style:text-properties style:font-name="Tahoma1" fo:font-size="18pt" style:font-size-asian="24pt" style:font-size-complex="24pt"/>
   </style:style>
   <style:style style:name="T36" style:family="text">
-   <style:text-properties style:font-name="Tahoma4" fo:font-size="18pt" style:text-underline-style="solid" style:text-underline-width="auto" style:text-underline-color="font-color" style:font-size-asian="24pt" style:font-size-complex="24pt"/>
+   <style:text-properties style:font-name="Tahoma1" fo:font-size="18pt" style:text-underline-style="solid" style:text-underline-width="auto" style:text-underline-color="font-color" style:font-size-asian="24pt" style:font-size-complex="24pt"/>
   </style:style>
   <style:style style:name="T37" style:family="text">
-   <style:text-properties style:font-name="Tahoma4" fo:font-size="18pt" fo:font-weight="bold" style:font-size-asian="24pt" style:font-weight-asian="bold" style:font-size-complex="24pt" style:font-weight-complex="bold"/>
+   <style:text-properties style:font-name="Tahoma1" fo:font-size="18pt" fo:font-weight="bold" style:font-size-asian="24pt" style:font-weight-asian="bold" style:font-size-complex="24pt" style:font-weight-complex="bold"/>
   </style:style>
   <style:style style:name="T38" style:family="text">
-   <style:text-properties style:font-name="Tahoma4" fo:font-size="18pt" style:text-underline-style="solid" style:text-underline-width="auto" style:text-underline-color="font-color" fo:font-weight="normal" style:font-size-asian="24pt" style:font-weight-asian="normal" style:font-size-complex="24pt" style:font-weight-complex="normal"/>
+   <style:text-properties style:font-name="Tahoma1" fo:font-size="18pt" style:text-underline-style="solid" style:text-underline-width="auto" style:text-underline-color="font-color" fo:font-weight="normal" style:font-size-asian="24pt" style:font-weight-asian="normal" style:font-size-complex="24pt" style:font-weight-complex="normal"/>
   </style:style>
   <style:style style:name="T39" style:family="text">
-   <style:text-properties style:font-name="Tahoma4" fo:font-size="18pt" style:text-underline-style="solid" style:text-underline-width="auto" style:text-underline-color="font-color" fo:font-weight="bold" style:font-size-asian="24pt" style:font-weight-asian="bold" style:font-size-complex="24pt" style:font-weight-complex="bold"/>
+   <style:text-properties style:font-name="Tahoma1" fo:font-size="18pt" style:text-underline-style="solid" style:text-underline-width="auto" style:text-underline-color="font-color" fo:font-weight="bold" style:font-size-asian="24pt" style:font-weight-asian="bold" style:font-size-complex="24pt" style:font-weight-complex="bold"/>
   </style:style>
   <style:style style:name="T40" style:family="text">
-   <style:text-properties style:font-name="Tahoma4" fo:font-size="18pt"/>
+   <style:text-properties style:font-name="Tahoma1" fo:font-size="18pt"/>
   </style:style>
   <style:style style:name="T41" style:family="text">
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma4" fo:font-size="15pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="bold" style:font-size-asian="15pt" style:font-style-asian="normal" style:font-weight-asian="bold" style:font-name-complex="Arial3" style:font-size-complex="15pt" style:font-style-complex="normal" style:font-weight-complex="bold"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma1" fo:font-size="15pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="bold" style:font-size-asian="15pt" style:font-style-asian="normal" style:font-weight-asian="bold" style:font-name-complex="Arial1" style:font-size-complex="15pt" style:font-style-complex="normal" style:font-weight-complex="bold"/>
   </style:style>
   <style:style style:name="T42" style:family="text">
-   <style:text-properties style:use-window-font-color="true" style:font-name="Tahoma4" fo:font-size="18pt" style:font-size-asian="18pt" style:font-size-complex="18pt"/>
+   <style:text-properties style:use-window-font-color="true" style:font-name="Tahoma1" fo:font-size="18pt" style:font-size-asian="18pt" style:font-size-complex="18pt"/>
   </style:style>
   <style:style style:name="T43" style:family="text">
-   <style:text-properties style:use-window-font-color="true" style:font-name="Tahoma4"/>
+   <style:text-properties style:use-window-font-color="true" style:font-name="Tahoma1"/>
   </style:style>
   <style:style style:name="T44" style:family="text">
-   <style:text-properties fo:color="#000000" style:font-name="Tahoma4"/>
+   <style:text-properties fo:color="#000000" style:font-name="Tahoma1"/>
   </style:style>
   <style:style style:name="T45" style:family="text">
-   <style:text-properties style:use-window-font-color="true" style:font-name="Tahoma4" fo:font-style="italic" style:font-style-asian="italic" style:font-style-complex="italic"/>
+   <style:text-properties style:use-window-font-color="true" style:font-name="Tahoma1" fo:font-style="italic" style:font-style-asian="italic" style:font-style-complex="italic"/>
   </style:style>
   <style:style style:name="T46" style:family="text">
-   <style:text-properties style:use-window-font-color="true" style:font-name="Tahoma4" fo:font-style="normal" style:font-style-asian="normal" style:font-style-complex="normal"/>
+   <style:text-properties style:use-window-font-color="true" style:font-name="Tahoma1" fo:font-style="normal" style:font-style-asian="normal" style:font-style-complex="normal"/>
   </style:style>
   <style:style style:name="T47" style:family="text">
-   <style:text-properties fo:color="#000000" style:font-name="Tahoma4" fo:font-style="normal" style:font-style-asian="normal" style:font-style-complex="normal"/>
+   <style:text-properties fo:color="#000000" style:font-name="Tahoma1" fo:font-style="normal" style:font-style-asian="normal" style:font-style-complex="normal"/>
   </style:style>
   <style:style style:name="T48" style:family="text">
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma4" fo:font-size="18pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="18pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="ＭＳ Ｐゴシック" style:font-size-complex="18pt" style:language-complex="en" style:country-complex="US" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma1" fo:font-size="18pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="18pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="ＭＳ Ｐゴシック" style:font-size-complex="18pt" style:language-complex="en" style:country-complex="US" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
   <style:style style:name="T49" style:family="text">
-   <style:text-properties fo:color="#000000" style:font-name="Tahoma4" fo:font-size="18pt" style:font-size-asian="18pt" style:font-size-complex="18pt"/>
+   <style:text-properties fo:color="#000000" style:font-name="Tahoma1" fo:font-size="18pt" style:font-size-asian="18pt" style:font-size-complex="18pt"/>
   </style:style>
   <style:style style:name="T50" style:family="text">
-   <style:text-properties fo:color="#000000" style:font-name="Tahoma4" fo:font-style="italic" style:font-style-asian="italic" style:font-style-complex="italic"/>
+   <style:text-properties fo:color="#000000" style:font-name="Tahoma1" fo:font-style="italic" style:font-style-asian="italic" style:font-style-complex="italic"/>
   </style:style>
   <style:style style:name="T51" style:family="text">
    <style:text-properties fo:color="#000000" style:font-name="Courier New" fo:font-weight="bold" style:font-weight-asian="bold" style:font-weight-complex="bold"/>
@@ -1908,22 +1893,22 @@
    <style:text-properties style:use-window-font-color="true" style:font-name="Courier New" fo:font-size="18pt" fo:font-weight="bold" style:font-size-asian="18pt" style:font-weight-asian="bold" style:font-size-complex="18pt" style:font-weight-complex="bold"/>
   </style:style>
   <style:style style:name="T55" style:family="text">
-   <style:text-properties style:use-window-font-color="true" style:font-name="Tahoma4" fo:font-size="18pt" fo:font-weight="bold" style:font-size-asian="18pt" style:font-weight-asian="bold" style:font-size-complex="18pt" style:font-weight-complex="bold"/>
+   <style:text-properties style:use-window-font-color="true" style:font-name="Tahoma1" fo:font-size="18pt" fo:font-weight="bold" style:font-size-asian="18pt" style:font-weight-asian="bold" style:font-size-complex="18pt" style:font-weight-complex="bold"/>
   </style:style>
   <style:style style:name="T56" style:family="text">
-   <style:text-properties fo:color="#000000" style:font-name="Tahoma4" fo:font-size="16pt" fo:font-style="normal" style:font-size-asian="16pt" style:font-style-asian="normal" style:font-size-complex="16pt" style:font-style-complex="normal"/>
+   <style:text-properties fo:color="#000000" style:font-name="Tahoma1" fo:font-size="16pt" fo:font-style="normal" style:font-size-asian="16pt" style:font-style-asian="normal" style:font-size-complex="16pt" style:font-style-complex="normal"/>
   </style:style>
   <style:style style:name="T57" style:family="text">
-   <style:text-properties style:font-name="Tahoma4" fo:font-size="18pt" style:font-size-asian="18pt" style:font-size-complex="18pt"/>
+   <style:text-properties style:font-name="Tahoma1" fo:font-size="18pt" style:font-size-asian="18pt" style:font-size-complex="18pt"/>
   </style:style>
   <style:style style:name="T58" style:family="text">
    <style:text-properties style:font-name="Courier New" fo:font-size="18pt" fo:font-weight="bold" style:font-size-asian="18pt" style:font-weight-asian="bold" style:font-size-complex="18pt" style:font-weight-complex="bold"/>
   </style:style>
   <style:style style:name="T59" style:family="text">
-   <style:text-properties style:font-name="Tahoma4" fo:font-size="14pt" style:font-size-asian="14pt" style:font-size-complex="14pt"/>
+   <style:text-properties style:font-name="Tahoma1" fo:font-size="14pt" style:font-size-asian="14pt" style:font-size-complex="14pt"/>
   </style:style>
   <style:style style:name="T60" style:family="text">
-   <style:text-properties style:font-name="Tahoma4" fo:font-weight="bold" style:font-weight-asian="bold" style:font-weight-complex="bold"/>
+   <style:text-properties style:font-name="Tahoma1" fo:font-weight="bold" style:font-weight-asian="bold" style:font-weight-complex="bold"/>
   </style:style>
   <style:style style:name="T61" style:family="text">
    <style:text-properties style:font-name="Courier New" fo:font-size="24pt" fo:font-weight="bold" style:font-size-asian="24pt" style:font-weight-asian="bold" style:font-size-complex="24pt" style:font-weight-complex="bold"/>
@@ -1932,25 +1917,25 @@
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#152b62" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma" fo:font-size="26pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="bold" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="26pt" style:font-style-asian="normal" style:font-weight-asian="bold" style:font-name-complex="ＭＳ Ｐゴシック" style:font-size-complex="26pt" style:font-style-complex="normal" style:font-weight-complex="bold"/>
   </style:style>
   <style:style style:name="T63" style:family="text">
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma4" fo:font-size="12pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="normal" style:font-size-asian="12pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-size-complex="12pt" style:font-style-complex="normal" style:font-weight-complex="normal"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma1" fo:font-size="12pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="normal" style:font-size-asian="12pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-size-complex="12pt" style:font-style-complex="normal" style:font-weight-complex="normal"/>
   </style:style>
   <style:style style:name="T64" style:family="text">
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma4" fo:font-size="13pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="normal" style:font-size-asian="12pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-size-complex="12pt" style:font-style-complex="normal" style:font-weight-complex="normal"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma1" fo:font-size="13pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="normal" style:font-size-asian="12pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-size-complex="12pt" style:font-style-complex="normal" style:font-weight-complex="normal"/>
   </style:style>
   <style:style style:name="T65" style:family="text">
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma4" fo:font-size="18pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="normal" style:font-size-asian="14pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-size-complex="14pt" style:font-style-complex="normal" style:font-weight-complex="normal"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma1" fo:font-size="18pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="normal" style:font-size-asian="14pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-size-complex="14pt" style:font-style-complex="normal" style:font-weight-complex="normal"/>
   </style:style>
   <style:style style:name="T66" style:family="text">
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma4" fo:font-size="11pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="normal" style:font-size-asian="11pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-size-complex="11pt" style:font-style-complex="normal" style:font-weight-complex="normal"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma1" fo:font-size="11pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="normal" style:font-size-asian="11pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-size-complex="11pt" style:font-style-complex="normal" style:font-weight-complex="normal"/>
   </style:style>
   <style:style style:name="T67" style:family="text">
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Liberation Sans" fo:font-size="14pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="normal" style:font-size-asian="14pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-size-complex="14pt" style:font-style-complex="normal" style:font-weight-complex="normal"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Liberation Sans1" fo:font-size="14pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="normal" style:font-size-asian="14pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-size-complex="14pt" style:font-style-complex="normal" style:font-weight-complex="normal"/>
   </style:style>
   <style:style style:name="T68" style:family="text">
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma4" fo:font-size="10pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="normal" style:font-size-asian="14pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-size-complex="14pt" style:font-style-complex="normal" style:font-weight-complex="normal"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma1" fo:font-size="10pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="normal" style:font-size-asian="14pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-size-complex="14pt" style:font-style-complex="normal" style:font-weight-complex="normal"/>
   </style:style>
   <style:style style:name="T69" style:family="text">
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma4" fo:font-size="10pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="normal" style:font-size-asian="13pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-size-complex="13pt" style:font-style-complex="normal" style:font-weight-complex="normal"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma1" fo:font-size="10pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="normal" style:font-size-asian="13pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-size-complex="13pt" style:font-style-complex="normal" style:font-weight-complex="normal"/>
   </style:style>
   <text:list-style style:name="L1">
    <text:list-level-style-bullet text:level="1" text:bullet-char="●">
@@ -2410,7 +2395,6 @@
    </draw:frame>
   </style:handout-master>
   <style:master-page style:name="Title_2b_Content_2b_Picture" style:display-name="Title+Content+Picture" style:page-layout-name="PM1" draw:style-name="dp1">
-   <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
    <draw:line draw:name="Line 19" draw:style-name="gr3" draw:text-style-name="P5" draw:layer="backgroundobjects" svg:x1="0.723cm" svg:y1="18.37cm" svg:x2="25.4cm" svg:y2="18.37cm">
     <text:p/>
    </draw:line>
@@ -2427,7 +2411,7 @@
     <text:p/>
    </draw:line>
    <draw:frame draw:name="Picture 23" draw:style-name="gr6" draw:text-style-name="P9" draw:layer="backgroundobjects" svg:width="2.71cm" svg:height="1.614cm" svg:x="22.627cm" svg:y="0.153cm">
-    <draw:image loext:mime-type="image/png">
+    <draw:image xlink:href="">
      <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAr8AAAGJCAIAAAAMsMyUAAAABGdBTUEAANkDQtZPoQAACjZp
       Q0NQc1JHQiBJRUM2MTk2Ni0yLjEAAHicnZZ3VFTXFofPvXd6oc0wFClD770NIL03qdJEYZgZ
       YCgDDjM0sSGiAhFFRAQVQYIiBoyGIrEiioWAYMEekCCgxGAUUVF5M7JWdOXlvZeX3x9nfWuf
@@ -3014,7 +2998,7 @@
     </draw:text-box>
    </draw:frame>
    <draw:frame draw:style-name="gr7" draw:text-style-name="P16" draw:layer="backgroundobjects" svg:width="0.792cm" svg:height="19.049cm" svg:x="0cm" svg:y="0cm">
-    <draw:image loext:mime-type="image/png">
+    <draw:image xlink:href="">
      <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAC4AAARQCAYAAACS3mOVAAAACXBIWXMAABYoAAAWJQH1zDcu
       AABymklEQVR4nMW9zZbzurYdtlCXD+C4bXd98/4Pk+HrXoadXkau00rLhWyJmH+LVJVUpZK0
       z/mKIjGxgPU3ARCktv/7//3/Zv3zmXPWGKPmP/+Nf/7D53Jx2HWU/eeLlXo9fvu3//7v18KX
@@ -3592,7 +3576,6 @@
    </presentation:notes>
   </style:master-page>
   <style:master-page style:name="Title_20_and_20_Content" style:display-name="Title and Content" style:page-layout-name="PM1" draw:style-name="dp1">
-   <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
    <draw:line draw:name="Line 19" draw:style-name="gr3" draw:text-style-name="P5" draw:layer="backgroundobjects" svg:x1="0.723cm" svg:y1="18.37cm" svg:x2="25.4cm" svg:y2="18.37cm">
     <text:p/>
    </draw:line>
@@ -3609,7 +3592,7 @@
     <text:p/>
    </draw:line>
    <draw:frame draw:name="Picture 23" draw:style-name="gr6" draw:text-style-name="P9" draw:layer="backgroundobjects" svg:width="2.71cm" svg:height="1.614cm" svg:x="22.627cm" svg:y="0.153cm">
-    <draw:image loext:mime-type="image/png">
+    <draw:image xlink:href="">
      <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAr8AAAGJCAIAAAAMsMyUAAAABGdBTUEAANkDQtZPoQAACjZp
       Q0NQc1JHQiBJRUM2MTk2Ni0yLjEAAHicnZZ3VFTXFofPvXd6oc0wFClD770NIL03qdJEYZgZ
       YCgDDjM0sSGiAhFFRAQVQYIiBoyGIrEiioWAYMEekCCgxGAUUVF5M7JWdOXlvZeX3x9nfWuf
@@ -4138,7 +4121,7 @@
     </draw:text-box>
    </draw:frame>
    <draw:frame draw:style-name="gr7" draw:text-style-name="P16" draw:layer="backgroundobjects" svg:width="0.792cm" svg:height="19.049cm" svg:x="0cm" svg:y="0.001cm">
-    <draw:image loext:mime-type="image/png">
+    <draw:image xlink:href="">
      <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAC4AAARQCAYAAACS3mOVAAAACXBIWXMAABYoAAAWJQH1zDcu
       AABymklEQVR4nMW9zZbzurYdtlCXD+C4bXd98/4Pk+HrXoadXkau00rLhWyJmH+LVJVUpZK0
       z/mKIjGxgPU3ARCktv/7//3/Zv3zmXPWGKPmP/+Nf/7D53Jx2HWU/eeLlXo9fvu3//7v18KX
@@ -4725,7 +4708,6 @@
    </presentation:notes>
   </style:master-page>
   <style:master-page style:name="Blank" style:page-layout-name="PM1" draw:style-name="dp1">
-   <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
    <draw:line draw:name="Line 19" draw:style-name="gr3" draw:text-style-name="P5" draw:layer="backgroundobjects" svg:x1="0.723cm" svg:y1="18.37cm" svg:x2="25.4cm" svg:y2="18.37cm">
     <text:p/>
    </draw:line>
@@ -4742,7 +4724,7 @@
     <text:p/>
    </draw:line>
    <draw:frame draw:name="Picture 23" draw:style-name="gr6" draw:text-style-name="P9" draw:layer="backgroundobjects" svg:width="2.71cm" svg:height="1.614cm" svg:x="22.627cm" svg:y="0.153cm">
-    <draw:image loext:mime-type="image/png">
+    <draw:image xlink:href="">
      <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAr8AAAGJCAIAAAAMsMyUAAAABGdBTUEAANkDQtZPoQAACjZp
       Q0NQc1JHQiBJRUM2MTk2Ni0yLjEAAHicnZZ3VFTXFofPvXd6oc0wFClD770NIL03qdJEYZgZ
       YCgDDjM0sSGiAhFFRAQVQYIiBoyGIrEiioWAYMEekCCgxGAUUVF5M7JWdOXlvZeX3x9nfWuf
@@ -5243,7 +5225,7 @@
     <draw:text-box/>
    </draw:frame>
    <draw:frame draw:style-name="gr7" draw:text-style-name="P16" draw:layer="backgroundobjects" svg:width="0.792cm" svg:height="19.049cm" svg:x="0cm" svg:y="0.001cm">
-    <draw:image loext:mime-type="image/png">
+    <draw:image xlink:href="">
      <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAC4AAARQCAYAAACS3mOVAAAACXBIWXMAABYoAAAWJQH1zDcu
       AABymklEQVR4nMW9zZbzurYdtlCXD+C4bXd98/4Pk+HrXoadXkau00rLhWyJmH+LVJVUpZK0
       z/mKIjGxgPU3ARCktv/7//3/Zv3zmXPWGKPmP/+Nf/7D53Jx2HWU/eeLlXo9fvu3//7v18KX
@@ -5830,7 +5812,6 @@
    </presentation:notes>
   </style:master-page>
   <style:master-page style:name="Title_2b_Content_2b_Picture_5f_" style:display-name="Title+Content+Picture_" style:page-layout-name="PM1" draw:style-name="dp1">
-   <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
    <draw:line draw:name="Line 19" draw:style-name="gr3" draw:text-style-name="P5" draw:layer="backgroundobjects" svg:x1="0.723cm" svg:y1="18.37cm" svg:x2="25.4cm" svg:y2="18.37cm">
     <text:p/>
    </draw:line>
@@ -5847,7 +5828,7 @@
     <text:p/>
    </draw:line>
    <draw:frame draw:name="Picture 23" draw:style-name="gr6" draw:text-style-name="P9" draw:layer="backgroundobjects" svg:width="2.71cm" svg:height="1.614cm" svg:x="22.627cm" svg:y="0.153cm">
-    <draw:image loext:mime-type="image/png">
+    <draw:image xlink:href="">
      <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAr8AAAGJCAIAAAAMsMyUAAAABGdBTUEAANkDQtZPoQAACjZp
       Q0NQc1JHQiBJRUM2MTk2Ni0yLjEAAHicnZZ3VFTXFofPvXd6oc0wFClD770NIL03qdJEYZgZ
       YCgDDjM0sSGiAhFFRAQVQYIiBoyGIrEiioWAYMEekCCgxGAUUVF5M7JWdOXlvZeX3x9nfWuf
@@ -6357,7 +6338,11 @@
    </draw:frame>
    <draw:frame draw:name="Picture Placeholder 8" presentation:style-name="pr13" draw:text-style-name="P7" draw:layer="backgroundobjects" svg:width="21.904cm" svg:height="10.159cm" svg:x="1.746cm" svg:y="7.58cm" presentation:class="outline" presentation:user-transformed="true">
     <draw:text-box>
-     <text:p text:style-name="P12"><text:span text:style-name="T5">Click icon to add picture</text:span></text:p>
+     <text:list text:style-name="L2">
+      <text:list-item>
+       <text:p text:style-name="P12"><text:span text:style-name="T5">Click icon to add picture</text:span></text:p>
+      </text:list-item>
+     </text:list>
     </draw:text-box>
    </draw:frame>
    <draw:frame draw:name="Text Placeholder 6" presentation:style-name="pr14" draw:text-style-name="P15" draw:layer="backgroundobjects" svg:width="21.986cm" svg:height="5.133cm" svg:x="1.746cm" svg:y="2.09cm" presentation:class="outline" presentation:user-transformed="true">
@@ -6430,7 +6415,7 @@
     </draw:text-box>
    </draw:frame>
    <draw:frame draw:style-name="gr7" draw:text-style-name="P16" draw:layer="backgroundobjects" svg:width="0.792cm" svg:height="19.049cm" svg:x="0cm" svg:y="0cm">
-    <draw:image loext:mime-type="image/png">
+    <draw:image xlink:href="">
      <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAC4AAARQCAYAAACS3mOVAAAACXBIWXMAABYoAAAWJQH1zDcu
       AABymklEQVR4nMW9zZbzurYdtlCXD+C4bXd98/4Pk+HrXoadXkau00rLhWyJmH+LVJVUpZK0
       z/mKIjGxgPU3ARCktv/7//3/Zv3zmXPWGKPmP/+Nf/7D53Jx2HWU/eeLlXo9fvu3//7v18KX
@@ -7008,7 +6993,6 @@
    </presentation:notes>
   </style:master-page>
   <style:master-page style:name="Title_20_and_20_Content_5f_" style:display-name="Title and Content_" style:page-layout-name="PM1" draw:style-name="dp1">
-   <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
    <draw:line draw:name="Line 19" draw:style-name="gr3" draw:text-style-name="P5" draw:layer="backgroundobjects" svg:x1="0.723cm" svg:y1="18.37cm" svg:x2="25.4cm" svg:y2="18.37cm">
     <text:p/>
    </draw:line>
@@ -7025,7 +7009,7 @@
     <text:p/>
    </draw:line>
    <draw:frame draw:name="Picture 23" draw:style-name="gr6" draw:text-style-name="P9" draw:layer="backgroundobjects" svg:width="2.71cm" svg:height="1.614cm" svg:x="22.627cm" svg:y="0.153cm">
-    <draw:image loext:mime-type="image/png">
+    <draw:image xlink:href="">
      <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAr8AAAGJCAIAAAAMsMyUAAAABGdBTUEAANkDQtZPoQAACjZp
       Q0NQc1JHQiBJRUM2MTk2Ni0yLjEAAHicnZZ3VFTXFofPvXd6oc0wFClD770NIL03qdJEYZgZ
       YCgDDjM0sSGiAhFFRAQVQYIiBoyGIrEiioWAYMEekCCgxGAUUVF5M7JWdOXlvZeX3x9nfWuf
@@ -7526,58 +7510,18 @@
    </draw:frame>
    <draw:frame draw:name="Text Placeholder 6" presentation:style-name="pr18" draw:text-style-name="P15" draw:layer="backgroundobjects" svg:width="21.986cm" svg:height="15.186cm" svg:x="1.746cm" svg:y="2.09cm" presentation:class="outline" presentation:user-transformed="true">
     <draw:text-box>
-     <text:list text:style-name="L3">
+     <text:list text:style-name="L2">
       <text:list-item>
        <text:p text:style-name="P14"><text:span text:style-name="T6">Click to edit Master text styles</text:span></text:p>
-      </text:list-item>
-     </text:list>
-     <text:list text:style-name="L4">
-      <text:list-item>
        <text:list>
         <text:list-item>
          <text:p text:style-name="P14"><text:span text:style-name="T7">Second level</text:span></text:p>
-        </text:list-item>
-       </text:list>
-      </text:list-item>
-     </text:list>
-     <text:list text:style-name="L5">
-      <text:list-item>
-       <text:list>
-        <text:list-item>
          <text:list>
           <text:list-item>
            <text:p text:style-name="P14"><text:span text:style-name="T8">Third level</text:span></text:p>
-          </text:list-item>
-         </text:list>
-        </text:list-item>
-       </text:list>
-      </text:list-item>
-     </text:list>
-     <text:list text:style-name="L6">
-      <text:list-item>
-       <text:list>
-        <text:list-item>
-         <text:list>
-          <text:list-item>
            <text:list>
             <text:list-item>
              <text:p text:style-name="P14"><text:span text:style-name="T9">Fourth level</text:span></text:p>
-            </text:list-item>
-           </text:list>
-          </text:list-item>
-         </text:list>
-        </text:list-item>
-       </text:list>
-      </text:list-item>
-     </text:list>
-     <text:list text:style-name="L7">
-      <text:list-item>
-       <text:list>
-        <text:list-item>
-         <text:list>
-          <text:list-item>
-           <text:list>
-            <text:list-item>
              <text:list>
               <text:list-item>
                <text:p text:style-name="P14"><text:span text:style-name="T10">Fifth level</text:span></text:p>
@@ -7594,7 +7538,7 @@
     </draw:text-box>
    </draw:frame>
    <draw:frame draw:style-name="gr7" draw:text-style-name="P16" draw:layer="backgroundobjects" svg:width="0.792cm" svg:height="19.049cm" svg:x="0cm" svg:y="0.001cm">
-    <draw:image loext:mime-type="image/png">
+    <draw:image xlink:href="">
      <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAC4AAARQCAYAAACS3mOVAAAACXBIWXMAABYoAAAWJQH1zDcu
       AABymklEQVR4nMW9zZbzurYdtlCXD+C4bXd98/4Pk+HrXoadXkau00rLhWyJmH+LVJVUpZK0
       z/mKIjGxgPU3ARCktv/7//3/Zv3zmXPWGKPmP/+Nf/7D53Jx2HWU/eeLlXo9fvu3//7v18KX
@@ -8195,7 +8139,7 @@
      </draw:enhanced-geometry>
     </draw:custom-shape>
     <draw:frame draw:name="Picture 3" draw:style-name="gr9" draw:text-style-name="P9" draw:layer="layout" svg:width="7.716cm" svg:height="4.292cm" svg:x="17.683cm" svg:y="0.078cm">
-     <draw:image loext:mime-type="image/png">
+     <draw:image xlink:href="">
       <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAWsAAADLCAIAAAAnTyV1AAAAAXNSR0IArs4c6QAAAARnQU1B
        AACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAA
        AAlwSFlzAAAh1QAAIdUBBJy0nQAAP3xJREFUeF7tfQd4XNWZNiQbSCF1U0gCG7KbZLNZdjeb
@@ -8618,7 +8562,7 @@
       </text:list>
       <text:list text:style-name="L2">
        <text:list-item>
-        <text:p><text:span text:style-name="T17">For details as to how file I/O is typically performed in OpenCPI applications, see the </text:span><text:span text:style-name="T17"><text:a xlink:href="https://opencpi.gitlab.io/releases/v2.3.0/rst/core/components/file_read.comp/file_read-index.html" xlink:type="simple">ocpi.core.file_read</text:a></text:span><text:span text:style-name="T17"><text:s/>and </text:span><text:span text:style-name="T17"><text:a xlink:href="https://opencpi.gitlab.io/releases/v2.3.0/rst/core/components/file_write.comp/file_write-index.html" xlink:type="simple">ocpi.core.file_write</text:a></text:span><text:span text:style-name="T17"><text:s/>data sheets</text:span></text:p>
+        <text:p><text:span text:style-name="T17">For details as to how file I/O is typically performed in OpenCPI applications, see the </text:span><text:span text:style-name="T17"><text:a xlink:href="https://opencpi.gitlab.io/releases/v2.3.0/rst/core/components/file_read.comp/file_read-index.html" xlink:type="simple">ocpi.core.file_read</text:a></text:span><text:span text:style-name="T17"> and </text:span><text:span text:style-name="T17"><text:a xlink:href="https://opencpi.gitlab.io/releases/v2.3.0/rst/core/components/file_write.comp/file_write-index.html" xlink:type="simple">ocpi.core.file_write</text:a></text:span><text:span text:style-name="T17"> data sheets</text:span></text:p>
        </text:list-item>
       </text:list>
      </draw:text-box>
@@ -8672,7 +8616,7 @@
      </draw:text-box>
     </draw:frame>
     <draw:frame draw:style-name="gr11" draw:text-style-name="P16" draw:layer="layout" svg:width="24.158cm" svg:height="2.656cm" svg:x="0.988cm" svg:y="12.33cm">
-     <draw:image loext:mime-type="image/x-wmf">
+     <draw:image xlink:href="">
       <office:binary-data>AQAAAGwAAAAAAAAAAAAAACUCAAA8AAAAAAAAAAAAAADoOAAATwYAACBFTUYAAAEATDUAAOYB
        AAAHAAAAAAAAAAAAAAAAAAAAkAYAABoEAAC9AQAAFgEAAAAAAAAAAAAAAAAAAFTIBgA0PQQA
        RgAAACwAAAAgAAAARU1GKwFAAQAcAAAAEAAAAAIQwNsBAAAAYAAAAGAAAABGAAAAXAAAAFAA
@@ -8929,173 +8873,6 @@
       </office:binary-data>
       <text:p/>
      </draw:image>
-     <draw:image loext:mime-type="image/png">
-      <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAhUAAAA7CAYAAADM3XgRAAAiSElEQVR4nO2dCXxN1/bH16sp
-       MpFZjBnEPNYsiJnWi7airZTXSU2vD1W8xqOe4Wmplr+iTYylaNQ8xFAaFCEV0lJE5shAJCHE
-       rOV/fus6103cKcm5V9y7v5/P/dx7zz1n33P23mvvtddee6/yvXv3fkQS9+7dI4FAIBAIBIKS
-       Uh7KxI4dOxRNdOTIkTR69Ghq3LixIulFRUXR+vXracGCBYqk9zxwMvY0hYWF0qwFS02S/n2p
-       3McNe4sWr95kkvSLMmrIq7Ro1SYqV66cWf7P0pk6fhS9+uY/6MW2HZ/1rTyX5F7OotlTJ9Cq
-       VasUT3vQoEG0cuVKqly5suJpa+Pdd9+lWbNmUY0aNczyf+ZmzNhx1CswiNp37qZYmgnn/6AV
-       38yjzxeuUCxNTUa+9QqFrttmkrTLMnju8qZIODMzU/E0k5OTFU/z+vXrtG3bNnJ0dKRXX31V
-       8fRLy6XMdJOmf+f2LZOmr8m9u3fN9l+6uHE9n/ZFbCUHB0fqHTjgWd9OqchIS3mm/28JeXn1
-       6lWTpHvrlvnkCuTl5ZXq+rLeDqYkJ5ok3exLWSZJF9y/b3rLf1mUQTy3SZSK5wUI04YNG8jT
-       01MxYYJCFR0dTf369aNKlSopkqZAGQpuXKeIzeHkXs1TMSHMzsqkUyeiqEff/lTRispb5KXl
-       YIp2UGB6TCGDSmDVSoUp2L59O+3atYu6desmlAorYF/EForcu5M6dukhOsJSIvJSIHj+sRql
-       4v79+3TmzBnWyuvWrUu1a9cu9Pu1a9fo3LlzPA/avHnzQnP/MJMmJCTQo0ePyNfXl9zc3Kig
-       oICSkpLIy8uLzZ2JiYnk5+fHaQCc7+rqSj4+PmZ9ToGKB1J5x509LWnz+VTHx49q1KpT6Pfr
-       16QyjTtLNpVtqWHTFoXKO/9aHqUmJdDDhw/Jy6cuObu6062bBZSWnEg1a3vRndu3KTU5nrx8
-       61G8lAZITU4gJ2dXqu3ta9bnNAciL60Tbe0euHv3LsXFxbEPx9/+9jf6448/qEqVKtSsWTMu
-       +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
-      </office:binary-data>
-     </draw:image>
     </draw:frame>
     <presentation:notes draw:style-name="dp4">
      <draw:frame draw:name="Rectangle 7" presentation:style-name="pr23" draw:text-style-name="P27" draw:layer="layout" svg:width="8.408cm" svg:height="1.287cm" svg:x="10.989cm" svg:y="24.461cm" presentation:class="page-number" presentation:user-transformed="true">
@@ -9244,7 +9021,6 @@
     </presentation:notes>
    </draw:page>
    <draw:page draw:name="Protocol Buffer Size 3" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content_5f_">
-    <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Rectangle 2" presentation:style-name="pr17" draw:text-style-name="P29" draw:layer="layout" svg:width="23.706cm" svg:height="1.253cm" svg:x="1.517cm" svg:y="0.344cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
       <text:p text:style-name="P23"><text:span text:style-name="T16">Protocol Buffer Size (Continued)</text:span></text:p>
@@ -9282,7 +9058,6 @@
     </presentation:notes>
    </draw:page>
    <draw:page draw:name="Two HDL Test Assemblies" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content_5f_">
-    <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Rectangle 2" presentation:style-name="pr17" draw:text-style-name="P29" draw:layer="layout" svg:width="23.282cm" svg:height="1.395cm" svg:x="1.693cm" svg:y="0.45cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
       <text:p text:style-name="P23"><text:span text:style-name="T16">Two HDL Test Assemblies</text:span></text:p>
@@ -9352,7 +9127,6 @@
     </presentation:notes>
    </draw:page>
    <draw:page draw:name="Data Flow Configurations" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content_5f_">
-    <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Title 1" presentation:style-name="pr17" draw:text-style-name="P24" draw:layer="layout" svg:width="23.282cm" svg:height="1.452cm" svg:x="1.693cm" svg:y="0.33cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
       <text:p text:style-name="P12"><text:span text:style-name="T4">Test XML Attributes for Data Flow Configuration</text:span></text:p>
@@ -9410,7 +9184,6 @@
     </presentation:notes>
    </draw:page>
    <draw:page draw:name="Unit Test Suite Debug" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content_5f_">
-    <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Title 1" presentation:style-name="pr17" draw:text-style-name="P13" draw:layer="layout" svg:width="23.282cm" svg:height="1.452cm" svg:x="1.693cm" svg:y="0.33cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
       <text:p text:style-name="P12"><text:span text:style-name="T16">Unit Test Suite Debug</text:span></text:p>
@@ -9442,7 +9215,6 @@
     </presentation:notes>
    </draw:page>
    <draw:page draw:name="Unit Test Suite Simulation" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content_5f_">
-    <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Title 1" presentation:style-name="pr17" draw:text-style-name="P13" draw:layer="layout" svg:width="23.282cm" svg:height="1.452cm" svg:x="1.693cm" svg:y="0.33cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
       <text:p text:style-name="P12"><text:span text:style-name="T16">Unit Test Suite Simulation</text:span></text:p>
@@ -9472,7 +9244,6 @@
     </presentation:notes>
    </draw:page>
    <draw:page draw:name="Two Examples of cases.xml" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content_5f_">
-    <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Title 1" presentation:style-name="pr17" draw:text-style-name="P13" draw:layer="layout" svg:width="23.282cm" svg:height="1.452cm" svg:x="1.693cm" svg:y="0.33cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
       <text:p text:style-name="P12"><text:span text:style-name="T16">Two Examples of cases.xml</text:span></text:p>
@@ -9498,7 +9269,6 @@
     </presentation:notes>
    </draw:page>
    <draw:page draw:name="complex_mixer cases.txt Example 1" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content_5f_">
-    <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Title 1" presentation:style-name="pr17" draw:text-style-name="P40" draw:layer="layout" svg:width="23.282cm" svg:height="1.452cm" svg:x="1.693cm" svg:y="0.33cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
       <text:p text:style-name="P12"><text:span text:style-name="T62">complex_mixer cases.txt Example 1</text:span></text:p>
@@ -9560,7 +9330,6 @@
     </presentation:notes>
    </draw:page>
    <draw:page draw:name="Unit Test Suite cases.xml Example 1" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content_5f_">
-    <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Title 1" presentation:style-name="pr17" draw:text-style-name="P40" draw:layer="layout" svg:width="23.282cm" svg:height="1.452cm" svg:x="1.693cm" svg:y="0.33cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
       <text:p text:style-name="P12"><text:span text:style-name="T62">Unit Test Suite cases.xml Example 1</text:span></text:p>
@@ -9596,7 +9365,6 @@
     </presentation:notes>
    </draw:page>
    <draw:page draw:name="complex_mixer cases.txt Example 2" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content_5f_">
-    <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Title 1" presentation:style-name="pr17" draw:text-style-name="P40" draw:layer="layout" svg:width="23.282cm" svg:height="1.452cm" svg:x="1.693cm" svg:y="0.33cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
       <text:p text:style-name="P12"><text:span text:style-name="T62">complex_mixer cases.txt Example 2</text:span></text:p>
@@ -9672,7 +9440,6 @@
     </presentation:notes>
    </draw:page>
    <draw:page draw:name="Unit Suite Test cases.xml Example 2" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content_5f_">
-    <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Title 1" presentation:style-name="pr17" draw:text-style-name="P40" draw:layer="layout" svg:width="23.282cm" svg:height="1.452cm" svg:x="1.693cm" svg:y="0.33cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
       <text:p text:style-name="P12"><text:span text:style-name="T62">Unit Test Suite cases.xml Example 2</text:span></text:p>

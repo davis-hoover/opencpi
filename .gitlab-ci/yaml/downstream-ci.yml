@@ -1,10 +1,10 @@
-workflow:
-  rules:
-    - when: always
-
 stages:
   - trigger-opencpi
+  - opencpi
+  - generate
+  - trigger
 
+# Old Pipeline
 .bridge:
   stage: trigger-opencpi
   variables:
@@ -21,6 +21,8 @@ trigger-opencpi:
     branch: '$CI_OCPI_REF_NAME'
     strategy: depend
   rules:
+    - if: "$CI_OCPI_PIPELINE == 'new'"
+      when: never
     - if: '$CI_COMMIT_TAG'
       when: never
     - when: always
@@ -33,6 +35,69 @@ trigger-opencpi-tag:
     branch: '$CI_COMMIT_TAG'
     strategy: depend
   rules:
+    - if: "$CI_OCPI_PIPELINE == 'new'"
+      when: never
     - if: '$CI_COMMIT_TAG'
       when: always
     - when: never
+
+# New Pipeline
+# Triggers an opencpi pipeline if pipeline is not a release tag or if 
+# told to use a non-develop opencpi base image (must build image for branch)
+opencpi:
+  stage: opencpi
+  trigger:
+    project: opencpi/opencpi
+    branch: '$CI_OCPI_REF_NAME'
+    strategy: depend
+  rules:
+    - if: "$CI_OCPI_PIPELINE != 'new'"
+      when: never # Don't trigger if old pipeline
+    - if: "$CI_COMMIT_TAG"
+      when: never # Don't trigger if a tag pipeline
+    - if: "$CI_OCPI_REF_NAME == 'develop'"
+      when: never # Don't trigger if branch is develop
+    - if: "$CI_PIPELINE_SOURCE == 'pipeline'"
+      when: never # Don't trigger if pipeline was itself triggered
+    - when: always
+  variables:
+    CI_OCPI_HOSTS: "$CI_OCPI_HOSTS"
+    CI_OCPI_ROOT_PIPELINE_ID: "$CI_PIPELINE_ID"
+    CI_OCPI_PIPELINE: "$CI_OCPI_PIPELINE"
+    CI_OCPI_PLATFORMS: "$CI_OCPI_PLATFORMS"
+    CI_OCPI_ASSEMBLIES: "False"
+  allow_failure: true
+
+generate:
+  artifacts:
+    paths:
+    - .gitlab-ci.yml
+  image: centos:7
+  script:
+    - yum install epel-release -y
+    - yum install python36-PyYAML -y
+    - yum install git -y
+    - git clone https://gitlab.com/opencpi/opencpi.git --depth 1 --branch ${CI_OCPI_REF_NAME:-develop}
+    - opencpi/.gitlab-ci/scripts/ci_generate_pipeline.py ${CI_PROJECT_NAMESPACE#opencpi/} # Pass subgroup name as arg
+  stage: generate
+  tags:
+  - docker
+  rules:
+    - if: "$CI_OCPI_PIPELINE != 'new'"
+      when: never
+    - when: on_success
+
+trigger:
+  stage: trigger
+  trigger:
+    include:
+    - artifact: .gitlab-ci.yml
+      job: generate
+    strategy: depend
+  rules:
+    - if: "$CI_OCPI_PIPELINE != 'new'"
+      when: never
+    - if: "$CI_PIPELINE_SOURCE != 'pipeline'"
+      variables:
+        CI_OCPI_ROOT_PIPELINE_ID: "$CI_PIPELINE_ID"
+    - when: on_success

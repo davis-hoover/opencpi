@@ -50,7 +50,7 @@
 
   <Instance component='ocpi.platform.devices.data_sink_qdac_csts'
             model='hdl'
-            selection='DAC_OUTPUT_IS_LSB_OF_IN_PORT == false && IN_PORT_DATA_WIDTH == 32 && DAC_WIDTH_BITS == 12'/>
+            selection='DAC_OUTPUT_IS_LSB_OF_IN_PORT == false &amp; IN_PORT_DATA_WIDTH == 32 &amp; DAC_WIDTH_BITS == 12'/>
   <!-- Because:
        1) this worker has a port in a clock domain of a device-supplied clock,
        2) that clock does not start ticking until a device proxy reaches
@@ -64,5 +64,5 @@
   <Instance component='ocpi.platform.devices.data_src_qadc_csts'
             model='hdl'
             connect='csts_to_iqstream'
-            selection='ADC_INPUT_IS_LSB_OF_OUT_PORT == true && OUT_PORT_DATA_WIDTH == 32 && ADC_WIDTH_BITS == 12'/>
+            selection='ADC_INPUT_IS_LSB_OF_OUT_PORT == true &amp; OUT_PORT_DATA_WIDTH == 32 &amp; ADC_WIDTH_BITS == 12'/>
 </Application>

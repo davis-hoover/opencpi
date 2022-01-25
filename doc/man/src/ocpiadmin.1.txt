@@ -69,7 +69,8 @@ The nouns supported by *`ocpiadmin`* are:
 
 OPTIONS
 -------
-The following options can be specified for the *`install`* verb only:
+In addition to the options common to all OpenCPI tools (see link:opencpi.1.html[opencpi(1)]),
+the following options can be specified for the *`install`* verb only:
 
 *`--git-revision=`*'<git-rev>', *`-g`* '<git-rev>'::
     Specifies the branch, tag or other valid *`git`* revision to check out after
@@ -78,6 +79,16 @@ The following options can be specified for the *`install`* verb only:
     to install a different *`git`* revision of a project from the one currently checked out.
     If this option is not used, the *`git`* revision for the specified package-ID defaults
     to the *`git`* revision of the OpenCPI framework repository.
+
+*`--minimal`*::
+    Specifies a minimized installation process that does not pre-build HDL workers or run
+    any installation tests.
+
+*`--optimize`*::
+    For RCC (software) platforms only, specifies that the framework software and software workers
+    should be built with optimization enabled.
+    If this option is not used, the default is to build with optimization disabled,
+    which is perhaps better suited for debugging.
 
 *`--package-id=`*'<package-id>', *`-p`* '<package-id>'::
     Specifies the OpenCPI package-ID of the project that provides the support
@@ -97,9 +108,6 @@ The following options can be specified for the *`install`* verb only:
     For example, if '<package-id>' is *`ocpi.osp.e3xx`*, the URL is
     *`https://gitlab.com/opencpi/osps/ocpi.osps.e3xx.git`*.
 
-*`--minimal=`*::
-    Specifies a minimized installation process that does not pre-build HDL workers, not run
-    any installation tests.
 
 OPERATIONS
 ----------
@@ -133,24 +141,24 @@ Keywords for specifying platform names are given in tables in the
 
 EXAMPLES
 --------
-. Build the Xilinx Xsim (*`xsim`*) HDL simulator platform for OpenCPI:
+. Build a minimal Xilinx Xsim (*`xsim`*) HDL simulator platform for OpenCPI:
 +
--------------------------------
-ocpiadmin install platform xsim
--------------------------------
+-----------------------------------------
+ocpiadmin --minimal install platform xsim
+-----------------------------------------
 +
 . Download and build the Ettus USRP E310 (*`e31x`*) HDL platform for OpenCPI:
 +
-------------------------------------------------------------
- ocpiadmin --package-id=ocpi.osp.e3xx install platform e31x
-------------------------------------------------------------
+-------------------------------------------------------------
+ ocpiadmin  --package-id=ocpi.osp.e3xx install platform e31x
+-------------------------------------------------------------
 +
-. Download and build the Analog Devices Pluto Linux 0.32 (*`adi_plutosdr0_32`*)
+. Download and build an optimized version of the Analog Devices Pluto Linux 0.32 (*`adi_plutosdr0_32`*)
 embedded software (RCC) platform for OpenCPI:
 +
---------------------------------------------------------------------------
-ocpiadmin --package-id=ocpi.osp.plutosdr install platform adi_plutosdr0_32
---------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+ocpiadmin --package-id=ocpi.osp.plutosdr --optimize install platform adi_plutosdr0_32
+-------------------------------------------------------------------------------------
 +
 . Build the Analog Devices ADALM-PLUTO (*`plutosdr`*) platform
 (you have already downloaded the OSP that supports this platform if you performed the previous example):
@@ -199,10 +207,11 @@ link:ocpidev.1.html[ocpidev(1)]
 link:ocpidev-platform.1.html[ocpidev-platform(1)]
 link:ocpidev-project.1.html[ocpidev-project(1)]
 link:ocpidev-worker.1.html[ocpidev-worker(1)]
+link:opencpi.1.html[opencpi(1)]
 
 COPYING
 -------
-Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2022 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your

@@ -40,7 +40,7 @@
   <Instance component='ocpi.platform.devices.data_src_qadc'
             model='hdl'
             connect='cswm_to_iqstream'
-            selection='ADC_INPUT_IS_LSB_OF_OUT_PORT == true && OUT_PORT_DATA_WIDTH == 32 && ADC_WIDTH_BITS == 12'>
+            selection='ADC_INPUT_IS_LSB_OF_OUT_PORT == true &amp; OUT_PORT_DATA_WIDTH == 32 &amp; ADC_WIDTH_BITS == 12'>
   </Instance>
 
 </Application>
