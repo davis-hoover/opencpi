@@ -103,7 +103,8 @@ doc:
 	$(AT)ocpidoc build -b
 
 all: $(if $(filter 1,$(OCPI_DOC_ONLY)),doc,applications $(if $(filter 1,$(OCPI_NO_DOC)),,doc))
-
+override export OCPI_NO_DOC=1
+override export OCPI_DOC_ONLY=
 # Package issue - if we have a top level specs directory, we must make the
 # associate package name available to anything that includes it, both within the
 # project and outside it (when this project is accessed via OCPI_PROJECT_PATH)
@@ -290,7 +291,8 @@ cleanapplications:
 # (e.g. for cleaning rcc) FIXME: cleaning should not depend on imports.  Fix *that*
 clean: cleanapplications cleanhdl cleanexports cleanimports
 	$(call MaybeMake,components,clean)
-	rm -r -f artifacts project-metadata.xml gen imports exports
+	# We do not clean imports since "set registry" would be trashed
+	rm -r -f artifacts project-metadata.xml gen exports
 
 # Remove the imports link only if it is the default or it is broken
 cleanimports:
