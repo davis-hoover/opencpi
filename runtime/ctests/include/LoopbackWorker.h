@@ -22,7 +22,7 @@
 #define LOOPBACK_WORKER_H
 
 
-#include <RCC_Worker.h>
+#include "RCC_Worker.hh"
 
 
 #ifdef RAND_MAX

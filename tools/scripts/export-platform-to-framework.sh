@@ -120,7 +120,7 @@ while read path opts; do
     unset options[0]
     options=(${options[*]})
   done
-  programs=`find -H $path $exclude -name "[a-zA-Z]*_main.cxx"|sed 's=.*src/\(.*\)_main.c.*$=\1='`
+  programs=`find -H $path $exclude -name "[a-zA-Z]*_main.cxx" -o -name "[a-zA-Z]*_main.cc" |sed 's=.*src/\(.*\)_main.c.*$=\1='`
   swig=`find -H $path $exclude -path "*/src/*.i"`
   api_incs=`find -H $path $exclude \( -path "*/include/*Api.h" -o -path "*/include/*Api.hh" \)`
   [ -n "$driver" ] && drivers+=" $(basename $path)"
@@ -210,8 +210,8 @@ done
 
 # Ensure driver list is exported
 mkdir -p exports/runtime/$platform/lib exports/$platform/lib
-echo $drivers>exports/runtime/$platform/lib/driver-list
-echo $drivers>exports/$platform/lib/driver-list
+echo $drivers>exports/runtime/$platform/lib/plugin-list
+echo $drivers>exports/$platform/lib/plugin-list
 
 # Enable prerequisite libraries to be found/exported in our lib directory
 function liblink {

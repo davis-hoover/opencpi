@@ -22,8 +22,8 @@
 #define HDL_SLOT_H
 #include <string>
 #include <map>
-#include "OcpiUtilMisc.h"
-#include "OcpiUtilEzxml.h"
+#include "UtilMisc.hh"
+#include "UtilEzxml.hh"
 #include "ocpigen.h"
 
 // A slot type is really just a set of signals

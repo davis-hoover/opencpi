@@ -30,7 +30,7 @@
 #include <unistd.h> // usleep()
 #include "ad9361_config_ts_proxy-worker.hh"
 #include "AD9361ConfigProxy.hh" // AD9361ConfigProxy class
-#include "OcpiOsDebugApi.hh" // OCPI_LOG_DEBUG
+#include "OcpiDebugApi.hh" // OCPI_LOG_DEBUG
 
 extern "C" {
 #include "config.h" // ALTERA_PLATFORM

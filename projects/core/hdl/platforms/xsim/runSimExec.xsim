@@ -45,6 +45,10 @@ function bad {
   xsimout=$(xsim probe.exe < /dev/null 2>&1)
   version=$(echo $xsimout |  sed -n '/^.*Vivado Simulator v*\([0-9\.]\+\).*$/s//\1/p')
   invalidlic=$(echo $xsimout |  grep -E "ERROR.*A valid license was not found for simulation")
+  # additional version check added to compensate for changes to xilinx tools newer than 2021.1+ versions
+  [ -z "$version" ] && {
+     version=$(echo $xsimout | sed -n '/^.* xsim v*\([0-9\.]\+\).*$/s//\1/p') 
+  }
   [ -z "$invalidlic" -a -n "$version" ] && {
     [ -n "$verbose" ] && echo Found a licensed Vivado Simulator with version: $version. 1>&2
     exit 0

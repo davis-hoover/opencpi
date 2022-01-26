@@ -3,7 +3,7 @@
   <!-- The GPO device worker is tested by controlling the GPIO pins via the mask_data property and data port.
   They are all tested invidually in their own test case and the data port is the only test case that has input data generated.
 
-  For the mask_data property and the data port, the tests that are done are: setting data bits high but not setting masks,
+  For the mask_data property and the data port, the tests that are finished are: setting data bits high but not setting masks,
   setting data bits high and setting the appropriate mask bits high, and clearing data bits. -->
 
   <property name='testCase' test='true'/>

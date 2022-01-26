@@ -96,7 +96,7 @@ else
   nfiles=${#files[@]}
   if test $nfiles == 0; then
     if [ -d simulations ]; then
-      exec sh $0 simulations
+      exec bash $0 simulations
     fi
     echo No simulation files \(xsim.wdb, isim.wdb or vsim.wlf\) nor simulation directories \(*.*sim.\<date\>\) found.
     exit 1
@@ -105,7 +105,7 @@ else
   nfiles=${#files[@]}
   last=${files[$nfiles-1]}
   if test -f $last/isim.wdb -o -f $last/vsim.wlf -o -f $last/xsim.wdb; then
-    exec sh $0 $last
+    exec bash $0 $last
   fi
   echo Although a simulation directory was found \($last\), no sim files were found \($last /xsim.wdb or $last/isim.wdb or $last/vsim.wlf\)
   exit 1

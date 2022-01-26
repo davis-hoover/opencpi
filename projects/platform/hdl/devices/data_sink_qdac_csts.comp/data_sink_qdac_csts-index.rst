@@ -107,4 +107,6 @@ from ``1e6`` to ``200e6`` Hz which are forwarded to the ``dev`` port of the unit
 The unit test checks that the input file and output file
 match and that no expected underruns occurred during the test.
 
+.. ocpi_documentation_test_platforms::
+
 .. ocpi_documentation_test_result_summary::

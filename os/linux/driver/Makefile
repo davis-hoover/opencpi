@@ -152,7 +152,7 @@ MyDir:=$(dir $(realpath $(ThisMake)))
 MyTargetDir?=target-$(OCPI_TARGET_DIR)
 MyIncs?= \
          -I$(realpath $(MyDir)/../../../runtime/hdl/include) \
-         -I$(realpath $(MyDir)/../../interfaces/include)
+         -I$(realpath $(MyDir)/../../include)
 MyLib:=$(realpath $(OCPI_CDK_DIR)/$(OCPI_TARGET_DIR)/lib)
 $(infox x:$(MyTargetDir) $(MyDir))
 # This is what works with RHEL5

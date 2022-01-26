@@ -119,6 +119,7 @@ endef
 
 ################################################################################
 # Target processing.
+ifeq ($(filter clean%,$(MAKECMDGOALS)),)
 $(call OcpiDbgVar,HdlTarget)
 $(call OcpiDbgVar,HdlTargets)
 $(call OcpiDbgVar,HdlPlatform)
@@ -167,7 +168,7 @@ HdlOnlyTargets:=$(strip \
   $(call Unique,\
      $(foreach t,\
                $(or $(OnlyTargets),all),\
-               $(if $(findstring $(t),all)$(findstring $(t),$(HdlTopTargets)),\
+               $(if $(filter $t,all)$(filter $t,$(HdlTopTargets)),\
                     $(call HdlGetFamily,$(t),x),\
                     $(t)))))
 $(call OcpiDbgVar,HdlOnlyTargets)
@@ -214,7 +215,6 @@ $(call OcpiDbgVar,HdlActualTargets,After exclusion: )
 override HdlTargets:=$(HdlActualTargets)
 
 endif # End of else of platform-specific modes
-
 ifndef HdlSkip
 HdlFamilies=$(call HdlGetFamilies,$(HdlActualTargets))
 $(call OcpiDbgVar,HdlFamilies)
@@ -298,7 +298,8 @@ HdlSimTool=yes
 endif
 endif # we have a tool set
 endif # for multiple tool sets.
-
+endif
+endif # top level skip
 ################################################################################
 # These are rules for both recursive and non-recursive cases.
 clean:: cleanfirst
@@ -313,4 +314,3 @@ cleanimports::
 ImportsDir=imports
 
 endif # include this once
-endif # top level skip

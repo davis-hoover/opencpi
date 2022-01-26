@@ -69,7 +69,7 @@
 #include "rp_cordic_for_fskapp-worker.hh"
 #include <cmath>
 #include <deque>
-#include "OcpiOsDebugApi.hh" // OCPI_LOG_INFO
+#include "OcpiDebugApi.hh" // OCPI_LOG_INFO
 
 using namespace OCPI::RCC; // for easy access to RCC data types and constants
 using namespace Rp_cordic_for_fskappWorkerTypes;

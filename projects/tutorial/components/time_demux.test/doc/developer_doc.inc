@@ -6,7 +6,7 @@
 \def\workertype{Application}
 \def\version{\ocpiversion}
 \def\releasedate{04/2019}
-\def\componentlibrary{ocpi.training.components}
+\def\componentlibrary{ocpi.tutorial.components}
 \def\workers{\comp{}.rcc}
 \def\testedplatforms{c7-x86\_{}64, linux-zynq-arm}
 \input{\snippetpath/component_summary_table}
@@ -59,18 +59,18 @@ The incoming \verb+iqstream_with_sync+ supports three opcodes: \verb+iq+, \verb+
 \section*{Source Dependencies}
 \subsection*{\comp.rcc}
         \begin{itemize}
-		\item training/components/time\_demux.rcc/time\_demux.cc
+		\item tutorial/components/time\_demux.rcc/time\_demux.cc
 	\end{itemize}
 %\subsection*{\comp.hdl}
 
 \begin{landscape}
-  %\input{component_spec_properties.inc} % it is recommended to NOT remove this line
+  \input{component_spec_properties.inc} % it is recommended to NOT remove this line
 
-  %\input{worker_properties.inc} % it is recommended to NOT remove this line
+  \input{worker_properties.inc} % it is recommended to NOT remove this line
 
-  %\input{component_ports.inc} % it is recommended to NOT remove this line
+  \input{component_ports.inc} % it is recommended to NOT remove this line
 
-  %\input{worker_interfaces.inc} % it is recommended to NOT remove this line
+  \input{worker_interfaces.inc} % it is recommended to NOT remove this line
 \end{landscape}
 
 %\section*{Control Timing and Signals}
@@ -106,7 +106,7 @@ Locally: make verify
 \medskip
 \fi
 \subsection*{Advanced / Detailed Theory of Operation}
-\textbf{This section is not essential to understand to perform the training lab.}\\
+\textbf{Understanding this section is not essential to work through the tutorials.}\\
 
 Testing of the Time Demux component consists of a C++ program (\textit{test\_data\_generator.cxx}) used to generate input data and expected ``golden'' outputs (Figure \ref{fig:generator}).\medskip
 

@@ -21,7 +21,7 @@ IncludeDirs+=\
   ../../../../runtime/util/misc/include \
   ../../../../runtime/util/property/include \
   ../../../../runtime/util/ezxml/include \
-  ../../../../os/interfaces/include
+  ../../../../os/include
 
 include $(OCPI_CDK_DIR)/include/application.mk
 

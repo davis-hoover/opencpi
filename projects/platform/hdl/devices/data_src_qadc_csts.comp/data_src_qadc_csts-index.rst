@@ -90,4 +90,6 @@ Testing
 -------
 This component does not have a component unit test suite.  However, an application (which is *not* a unit test) exists for testing purposes.  See ``platform/applications/data_src_adc_ext.test_app``.
 
+.. ocpi_documentation_test_platforms::
+
 .. ocpi_documentation_test_result_summary::

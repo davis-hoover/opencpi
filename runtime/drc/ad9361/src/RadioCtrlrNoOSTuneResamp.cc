@@ -28,7 +28,7 @@
 #include "UtilValidRanges.hh" // Util::Range, Util::ValidRanges
 #include "RadioCtrlrNoOSTuneResamp.hh"
 #include "read_ad9361.h"
-#include "OcpiOsDebugApi.hh"
+#include "OcpiDebugApi.hh"
 
 extern "C" {
 #include "ad9361.h" // (from No-OS) struct ad9361_rf_phy

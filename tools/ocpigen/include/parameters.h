@@ -23,8 +23,9 @@
 #include <vector>
 #include <set>
 #include <string>
-#include "OcpiUtilValue.h"
-#include "OcpiUtilProperty.h"
+#include <unordered_set>
+#include "BaseValue.hh"
+#include "MetadataProperty.hh"
 #include "cdkutils.h"
 #include "ocpigen.h"
 
@@ -39,15 +40,15 @@ typedef std::vector<std::string> Values;
 typedef std::set<std::string> Strings;
 typedef Strings::const_iterator StringsIter;
 
-class Worker;
+class Assembly;
 #define PARAM_ATTRS "name", "value", "values", "valueFile", "valuesFile"
 struct Param {
   std::string                 m_name;       // if spec, same as m_param->m_name, if impl worker.model.property
-  OCPI::Util::Value           m_value;      // value for the current config, perhaps the default
+  OCPI::Base::Value           m_value;      // value for the current config, perhaps the default
   std::string                 m_uValue;     // unparsed value: the canonical value for comparison
-  OCPI::Util::Member         *m_valuesType; // the type (a sequence of these values).
+  OCPI::Base::Member         *m_valuesType; // the type (a sequence of these values).
   Values                      m_uValues;    // *Either* parsed from XML or captured from raw
-  const OCPI::Util::Property *m_param;      // the property that is a parameter
+  const OCPI::Metadata::Property *m_param;      // the property that is a parameter
   bool                        m_isDefault;  // is m_value from property default?
   const Worker               *m_worker;     // worker of param when the paramconfig spans impls
   bool                        m_isTest;
@@ -65,13 +66,13 @@ struct Param {
     Attributes() : m_onlyExcluded(false) {}
   };
   std::vector<Attributes>     m_attributes;
-  static void fullName(const OCPI::Util::Property &prop, const Worker *wkr, std::string &name);
+  static void fullName(const OCPI::Metadata::Property &prop, const Worker *wkr, std::string &name);
   Param();
-  void setProperty(const OCPI::Util::Property *prop, const Worker *w);
+  void setProperty(const OCPI::Metadata::Property *prop, const Worker *w);
   const char 
     // only one of w and wkrs should be set
-    *parseValue(const OCPI::Util::Property &prop, const char *value),
-    *parse(ezxml_t px, const OCPI::Util::Property *prop, const Worker *w = NULL, bool global = false),
+    *parseValue(const OCPI::Metadata::Property &prop, const char *value),
+    *parse(ezxml_t px, const OCPI::Metadata::Property *prop, const Worker *w = NULL, bool global = false),
     *excludeValue(std::string &uValue, Attributes *&attrs, const char *platform),
     *addValue(std::string &uValue, Attributes *&attrs, const char *platform),
     *onlyValue(std::string &uValue, Attributes *&attrs, const char *platform);
@@ -82,9 +83,18 @@ class ParamConfig;
 // This must be pointers since it has a reference member which can't be copied,
 // and we're not using c++11 yet, with "emplace".
 typedef std::vector<ParamConfig*> ParamConfigs;
-class ParamConfig : public OCPI::Util::IdentResolver {
+class ParamConfig : public OCPI::Base::IdentResolver {
   Worker &m_worker;
  public:
+  char *m_slavesString;
+  ezxml_t m_slavesXml;
+  Assembly *m_slavesAssembly; // per-config slave assembly if worker is a proxy with a slave assembly
+  // map of slave worker objects mapped by a string of the name of the slave either from name
+  // attribute or auto generated
+  std::list<std::pair<std::string, Worker*>> m_slaves; // maintain order
+  std::unordered_set<std::string> m_slaveNames; // for duplicate checking
+  std::vector<std::string> m_slaveTypes; // type namespace per slave
+  std::vector<const char **> m_slaveBaseTypes; // saved temporarily
   std::vector<Param> params;
   std::string id;
   size_t nConfig; // ordinal
@@ -93,6 +103,8 @@ class ParamConfig : public OCPI::Util::IdentResolver {
   ParamConfig(const ParamConfig &);
   ParamConfig &operator=(const ParamConfig * p);
   void clone(const ParamConfig &other);
+  ~ParamConfig();
+  const char *addSlavesConfig(ezxml_t slaves);
   const char *parse(ezxml_t cx, const ParamConfigs &configs);
   const char *doDefaults(bool missingOK);
   void write(FILE *xf, FILE *mf);
@@ -100,8 +112,8 @@ class ParamConfig : public OCPI::Util::IdentResolver {
   // Is the given configuration the same as this one?
   bool equal(ParamConfig &other);
   // The callback when evaluating expressions for data types (e.g. array length).
-  const char *getValue(const char *sym, OCPI::Util::ExprValue &val) const;
-  const char *getParamValue(const char *sym, const OCPI::Util::Value *&v) const;
+  const char *getValue(const char *sym, OCPI::Base::ExprValue &val) const;
+  const char *getParamValue(const char *sym, const OCPI::Base::Value *&v) const;
   const Worker &worker() const { return m_worker; }
 };
 

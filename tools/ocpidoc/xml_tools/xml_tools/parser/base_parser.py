@@ -23,7 +23,6 @@
 import re
 import xml.etree.ElementTree as ET
 import os.path
-import textwrap
 
 
 class BaseParser():
@@ -396,8 +395,6 @@ class BaseParser():
                 version_pattern, "", xml_include_string)
             # Use a regex to repace the full xi:include element with the
             # contents of the specified file (minus the XML version tag).
-            indent = include.split("<xi")[0]
-            xml_include_string = textwrap.indent(xml_include_string, indent)
             xml_string = re.sub(include, xml_include_string, xml_string)
             # If no file could be found in the search path, then just remove
             # the XML include statement and show a warning.
@@ -420,11 +417,15 @@ class BaseParser():
 
         Returns:
             List containing a string for all xi:include elements found within
-            the input XML data, including indentation.
+            the input XML data.
         """
+        # Removes all comments from the xml, specifically so commented out
+        # xi includes are removed and nested comments are avoided
+        xml_string_clean = re.sub(r"(?sm)<!--.*?-->", "", xml_string)
+
         # NB. includes arguments other than just href.
         include_files = re.findall(
-            r".*<xi:include +href *= *[\"'][^>]*[\"'] */>", xml_string)
+            r"<xi:include +href *= *[\"'][^>]*[\"'] */>", xml_string_clean)
         return include_files
 
     def _get_xml_include_filename(self, xi_include_string):

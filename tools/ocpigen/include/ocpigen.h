@@ -28,7 +28,19 @@
 #include <vector>
 #include <map>
 #include <ezxml.h>
-#include <OcpiUtilMisc.h>
+#include "UtilMisc.hh"
+#include "OsFileSystem.hh"
+#include "LibraryAssembly.hh"
+#include "MetadataWorker.hh"
+
+namespace OE = OCPI::Util::EzXml;
+namespace OU = OCPI::Util;
+namespace OB = OCPI::Base;
+namespace OM = OCPI::Metadata;
+namespace OA = OCPI::API;
+namespace OS = OCPI::OS;
+namespace OF = OCPI::OS::FileSystem;
+namespace OL = OCPI::Library;
 
 enum Language {
   NoLanguage,
@@ -64,7 +76,7 @@ class SigMap : public SigMap_ {
 // This container provides processing in the original order (user friendly)
 typedef std::list<Signal *> Signals;
 typedef Signals::const_iterator SignalsIter;
-namespace OCPI { namespace Util { struct IdentResolver; }}
+namespace OCPI { namespace Base { struct IdentResolver; }}
 struct Signal {
   std::string m_name;
   // The NONE is used in contexts where you are saying do not deal with direction
@@ -85,9 +97,8 @@ struct Signal {
   const char *m_type;
   Signal();
   const char *parseDirection(const char *direction, std::string *expr,
-			     OCPI::Util::IdentResolver &ir);
-  const char *parseWidth(const char *width, std::string *expr,
-   			     OCPI::Util::IdentResolver &ir);
+			     OB::IdentResolver &ir);
+  const char *parseWidth(const char *width, std::string *expr, OB::IdentResolver &ir);
   const char *parse(ezxml_t, Worker *w);
   const char *cname() const { return m_name.c_str(); }
   Signal *reverse();

@@ -21,7 +21,7 @@
 #ifndef OCPILOGGERTESTMESSAGEKEEPER_H__
 #define OCPILOGGERTESTMESSAGEKEEPER_H__
 
-#include <OcpiLoggerLogger.h>
+#include "UtilLogger.hh"
 #include <string>
 
 /*

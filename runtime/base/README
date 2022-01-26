@@ -1,0 +1,22 @@
+This library/layer contains core infrastructure modules for OpenCPI that are widely used and
+widely depended on by all upper layers of OpenCPI.
+The functionality is fairly unique to OpenCPI and is thus not part of the more
+utilitarian libraries and layers below here.
+
+The layers below this one contain OS abstraction, imported/foreign code, and
+code that provides broadly common utility functions.
+
+So code that is very generic should probably go in the util layer below this, while
+code that should be considered OpenCPI core infrastructure should be here.
+
+Functionality found here includes code for:
+
+- The plugin system (user mode drivers loaded as needed etc.)
+- Managing data types for properties, protocols, command options, and PValues.
+- Data-typed runtime values (the Value class)
+- Variable length, data typed, function/method arguments (the PValue class)
+- Artifact files that contain embedded XML metadata to describe what is inside them
+
+Basically this includes functionality that is not really big enough to deserve its own library.
+
+

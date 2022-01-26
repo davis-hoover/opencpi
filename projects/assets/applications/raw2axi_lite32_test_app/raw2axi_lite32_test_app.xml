@@ -1,0 +1,4 @@
+<!-- The raw2axi_lite32_test_app application xml file -->
+<Application>
+  <Instance Component='ocpi.assets.misc_comps.raw2axi_lite32_tester' Name='register_map'/>
+</Application>

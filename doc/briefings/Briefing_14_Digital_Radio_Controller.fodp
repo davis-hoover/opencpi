@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:presentation="urn:oasis:names:tc:opendocument:xmlns:presentation:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0" xmlns:ooo="http://openoffice.org/2004/office" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:smil="urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0" xmlns:anim="urn:oasis:names:tc:opendocument:xmlns:animation:1.0" xmlns:rpt="http://openoffice.org/2005/report" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:officeooo="http://openoffice.org/2009/office" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:drawooo="http://openoffice.org/2010/draw" xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:css3t="http://www.w3.org/TR/css3-text/" office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.presentation">
- <office:meta><meta:editing-cycles>92</meta:editing-cycles><meta:creation-date>2019-10-31T15:39:36.003476316</meta:creation-date><meta:editing-duration>P1DT4H24M43S</meta:editing-duration><meta:generator>LibreOffice/5.3.6.1$Linux_X86_64 LibreOffice_project/30$Build-1</meta:generator><dc:title>Briefing_Template</dc:title><meta:initial-creator>Lisa Zahn</meta:initial-creator><dc:date>2021-01-09T10:32:51.046884968</dc:date><dc:creator>James Kulp</dc:creator><meta:document-statistic meta:object-count="367"/><meta:user-defined meta:name="AppVersion">14.0000</meta:user-defined><meta:user-defined meta:name="HiddenSlides" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="HyperlinksChanged" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="LinksUpToDate" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="MMClips" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="Notes" meta:value-type="float">17</meta:user-defined><meta:user-defined meta:name="PresentationFormat" meta:value-type="string">Letter Paper (8.5x11 in)</meta:user-defined><meta:user-defined meta:name="ScaleCrop" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ShareDoc" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="Slides" meta:value-type="float">34</meta:user-defined><meta:user-defined meta:name="_NewReviewCycle" meta:value-type="string"/><meta:template xlink:type="simple" xlink:actuate="onRequest" xlink:title="Briefing_Template" xlink:href="../../../dualchan/doc/briefings/Briefing_Template.otp" meta:date="2019-11-08T17:24:52.327236596"/></office:meta>
+ <office:meta><meta:editing-cycles>98</meta:editing-cycles><meta:creation-date>2019-10-31T15:39:36.003476316</meta:creation-date><meta:editing-duration>P1DT4H32M32S</meta:editing-duration><meta:generator>LibreOffice/5.3.6.1$Linux_X86_64 LibreOffice_project/30$Build-1</meta:generator><dc:title>Briefing_Template</dc:title><meta:initial-creator>Lisa Zahn</meta:initial-creator><dc:date>2021-10-11T14:36:17.023775034</dc:date><dc:creator>Lisa Zahn</dc:creator><meta:document-statistic meta:object-count="367"/><meta:user-defined meta:name="AppVersion">14.0000</meta:user-defined><meta:user-defined meta:name="HiddenSlides" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="HyperlinksChanged" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="LinksUpToDate" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="MMClips" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="Notes" meta:value-type="float">17</meta:user-defined><meta:user-defined meta:name="PresentationFormat" meta:value-type="string">Letter Paper (8.5x11 in)</meta:user-defined><meta:user-defined meta:name="ScaleCrop" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ShareDoc" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="Slides" meta:value-type="float">34</meta:user-defined><meta:user-defined meta:name="_NewReviewCycle" meta:value-type="string"/><meta:template xlink:type="simple" xlink:actuate="onRequest" xlink:title="Briefing_Template" xlink:href="../../../dualchan/doc/briefings/Briefing_Template.otp" meta:date="2019-11-08T17:24:52.327236596"/></office:meta>
  <office:settings>
   <config:config-item-set config:name="ooo:view-settings">
-   <config:config-item config:name="VisibleAreaTop" config:type="int">-427</config:config-item>
-   <config:config-item config:name="VisibleAreaLeft" config:type="int">-394</config:config-item>
-   <config:config-item config:name="VisibleAreaWidth" config:type="int">26253</config:config-item>
-   <config:config-item config:name="VisibleAreaHeight" config:type="int">19952</config:config-item>
+   <config:config-item config:name="VisibleAreaTop" config:type="int">-283</config:config-item>
+   <config:config-item config:name="VisibleAreaLeft" config:type="int">-2323</config:config-item>
+   <config:config-item config:name="VisibleAreaWidth" config:type="int">30043</config:config-item>
+   <config:config-item config:name="VisibleAreaHeight" config:type="int">19621</config:config-item>
    <config:config-item-map-indexed config:name="Views">
     <config:config-item-map-entry>
      <config:config-item config:name="ViewId" config:type="string">view1</config:config-item>
@@ -29,16 +29,16 @@
      <config:config-item config:name="NoColors" config:type="boolean">true</config:config-item>
      <config:config-item config:name="RulerIsVisible" config:type="boolean">true</config:config-item>
      <config:config-item config:name="PageKind" config:type="short">0</config:config-item>
-     <config:config-item config:name="SelectedPage" config:type="short">1</config:config-item>
+     <config:config-item config:name="SelectedPage" config:type="short">0</config:config-item>
      <config:config-item config:name="IsLayerMode" config:type="boolean">false</config:config-item>
      <config:config-item config:name="IsDoubleClickTextEdit" config:type="boolean">true</config:config-item>
      <config:config-item config:name="IsClickChangeRotation" config:type="boolean">true</config:config-item>
      <config:config-item config:name="SlidesPerRow" config:type="short">6</config:config-item>
      <config:config-item config:name="EditMode" config:type="int">0</config:config-item>
-     <config:config-item config:name="VisibleAreaTop" config:type="int">-282</config:config-item>
-     <config:config-item config:name="VisibleAreaLeft" config:type="int">-13685</config:config-item>
-     <config:config-item config:name="VisibleAreaWidth" config:type="int">53178</config:config-item>
-     <config:config-item config:name="VisibleAreaHeight" config:type="int">19758</config:config-item>
+     <config:config-item config:name="VisibleAreaTop" config:type="int">-447</config:config-item>
+     <config:config-item config:name="VisibleAreaLeft" config:type="int">-378</config:config-item>
+     <config:config-item config:name="VisibleAreaWidth" config:type="int">26459</config:config-item>
+     <config:config-item config:name="VisibleAreaHeight" config:type="int">20137</config:config-item>
      <config:config-item config:name="GridCoarseWidth" config:type="int">2540</config:config-item>
      <config:config-item config:name="GridCoarseHeight" config:type="int">2540</config:config-item>
      <config:config-item config:name="GridFineWidth" config:type="int">254</config:config-item>
@@ -94,8 +94,8 @@
    <config:config-item config:name="ParagraphSummation" config:type="boolean">true</config:config-item>
    <config:config-item config:name="PrintQuality" config:type="int">0</config:config-item>
    <config:config-item config:name="PrinterIndependentLayout" config:type="string">low-resolution</config:config-item>
-   <config:config-item config:name="PrinterName" config:type="string">Generic Printer</config:config-item>
-   <config:config-item config:name="PrinterSetup" config:type="base64Binary">iQH+/0dlbmVyaWMgUHJpbnRlcgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAU0dFTlBSVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWAAMAqgAAAAAAAAAIAFZUAAAkbQAASm9iRGF0YSAxCnByaW50ZXI9R2VuZXJpYyBQcmludGVyCm9yaWVudGF0aW9uPVBvcnRyYWl0CmNvcGllcz0xCm1hcmdpbmRhanVzdG1lbnQ9MCwwLDAsMApjb2xvcmRlcHRoPTI0CnBzbGV2ZWw9MApwZGZkZXZpY2U9MApjb2xvcmRldmljZT0wClBQRENvbnRleERhdGEKUGFnZVNpemU6TGV0dGVyAAASAENPTVBBVF9EVVBMRVhfTU9ERQ8ARHVwbGV4TW9kZTo6T2Zm</config:config-item>
+   <config:config-item config:name="PrinterName" config:type="string">Brother_MFC-L2750DW_series_-_Fax</config:config-item>
+   <config:config-item config:name="PrinterSetup" config:type="base64Binary">qAH+/0Jyb3RoZXJfTUZDLUwyNzUwRFdfc2VyaWVzXy1fRmF4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ1VQUzpCcm90aGVyX01GQy1MMjc1MERXX3NlcmllcwAWAAMAyQAAAAAAAAAIAFZUAAAkbQAASm9iRGF0YSAxCnByaW50ZXI9QnJvdGhlcl9NRkMtTDI3NTBEV19zZXJpZXNfLV9GYXgKb3JpZW50YXRpb249UG9ydHJhaXQKY29waWVzPTEKY29sbGF0ZT1mYWxzZQptYXJnaW5kYWp1c3RtZW50PTAsMCwwLDAKY29sb3JkZXB0aD0yNApwc2xldmVsPTAKcGRmZGV2aWNlPTEKY29sb3JkZXZpY2U9MApQUERDb250ZXhEYXRhClBhZ2VTaXplOkxldHRlcgAAEgBDT01QQVRfRFVQTEVYX01PREUPAER1cGxleE1vZGU6Ok9mZg==</config:config-item>
    <config:config-item config:name="SaveVersionOnClose" config:type="boolean">false</config:config-item>
    <config:config-item config:name="SlidesPerHandout" config:type="short">6</config:config-item>
    <config:config-item config:name="UpdateFromTemplate" config:type="boolean">true</config:config-item>
@@ -115,7 +115,7 @@
   <style:font-face style:name="Times New Roman" svg:font-family="&apos;Times New Roman&apos;"/>
   <style:font-face style:name="ＭＳ Ｐゴシック" svg:font-family="&apos;ＭＳ Ｐゴシック&apos;"/>
   <style:font-face style:name="Courier New" svg:font-family="&apos;Courier New&apos;" style:font-family-generic="modern" style:font-pitch="fixed"/>
-  <style:font-face style:name="Tahoma3" svg:font-family="Tahoma" style:font-family-generic="modern" style:font-pitch="fixed"/>
+  <style:font-face style:name="Tahoma2" svg:font-family="Tahoma" style:font-family-generic="modern" style:font-pitch="fixed"/>
   <style:font-face style:name="Courier New1" svg:font-family="&apos;Courier New&apos;" style:font-family-generic="modern" style:font-pitch="variable"/>
   <style:font-face style:name="Liberation Sans" svg:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="roman" style:font-pitch="variable"/>
   <style:font-face style:name="Liberation Serif" svg:font-family="&apos;Liberation Serif&apos;" style:font-family-generic="roman" style:font-pitch="variable"/>
@@ -124,7 +124,8 @@
   <style:font-face style:name="Lohit Devanagari" svg:font-family="&apos;Lohit Devanagari&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
   <style:font-face style:name="Lucida Sans" svg:font-family="&apos;Lucida Sans&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
   <style:font-face style:name="PingFang SC" svg:font-family="&apos;PingFang SC&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
-  <style:font-face style:name="Tahoma2" svg:font-family="Tahoma" style:font-family-generic="system" style:font-pitch="variable"/>
+  <style:font-face style:name="Tahoma3" svg:font-family="Tahoma" style:font-family-generic="system" style:font-pitch="variable"/>
+  <style:font-face style:name="WenQuanYi Zen Hei Sharp" svg:font-family="&apos;WenQuanYi Zen Hei Sharp&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
  </office:font-face-decls>
  <office:styles>
   <draw:gradient draw:name="Filled" draw:style="linear" draw:start-color="#ffffff" draw:end-color="#cccccc" draw:start-intensity="100%" draw:end-intensity="100%" draw:angle="300" draw:border="0%"/>
@@ -142,7 +143,7 @@
    <style:paragraph-properties style:text-autospace="ideograph-alpha" style:punctuation-wrap="simple" style:line-break="strict" style:writing-mode="lr-tb" style:font-independent-line-spacing="false">
     <style:tab-stops/>
    </style:paragraph-properties>
-   <style:text-properties style:use-window-font-color="true" style:font-name="Liberation Serif" fo:font-size="24pt" fo:language="en" fo:country="US" style:font-name-asian="Tahoma2" style:font-size-asian="24pt" style:language-asian="zh" style:country-asian="CN" style:font-name-complex="Tahoma2" style:font-size-complex="24pt" style:language-complex="hi" style:country-complex="IN"/>
+   <style:text-properties style:use-window-font-color="true" style:font-name="Liberation Serif" fo:font-size="24pt" fo:language="en" fo:country="US" style:font-name-asian="Tahoma3" style:font-size-asian="24pt" style:language-asian="zh" style:country-asian="CN" style:font-name-complex="Tahoma3" style:font-size-complex="24pt" style:language-complex="hi" style:country-complex="IN"/>
   </style:default-style>
   <style:style style:name="standard" style:family="graphic">
    <style:graphic-properties draw:stroke="solid" svg:stroke-width="0cm" svg:stroke-color="#3465a4" draw:marker-start-width="0.2cm" draw:marker-start-center="false" draw:marker-end-width="0.2cm" draw:marker-end-center="false" draw:fill="solid" draw:fill-color="#729fcf" draw:textarea-horizontal-align="justify" fo:padding-top="0.125cm" fo:padding-bottom="0.125cm" fo:padding-left="0.25cm" fo:padding-right="0.25cm" draw:shadow="hidden" draw:shadow-offset-x="0.2cm" draw:shadow-offset-y="0.2cm" draw:shadow-color="#808080">
@@ -3035,144 +3036,141 @@
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#0070c0" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma" fo:font-size="18pt" fo:letter-spacing="normal" fo:font-style="italic" style:text-underline-style="none" fo:font-weight="bold" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="18pt" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-name-complex="DejaVu Sans" style:font-size-complex="18pt" style:font-style-complex="italic" style:font-weight-complex="bold"/>
   </style:style>
   <style:style style:name="T58" style:family="text">
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma1" fo:font-size="16pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="normal" style:font-name-asian="Tahoma3" style:font-size-asian="16pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Tahoma1" style:font-size-complex="16pt" style:font-style-complex="normal" style:font-weight-complex="normal"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma1" fo:font-size="16pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="normal" style:font-name-asian="Tahoma2" style:font-size-asian="16pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Tahoma1" style:font-size-complex="16pt" style:font-style-complex="normal" style:font-weight-complex="normal"/>
   </style:style>
   <style:style style:name="T59" style:family="text">
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#0070c0" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma1" fo:font-size="16pt" fo:letter-spacing="normal" fo:font-style="italic" style:text-underline-style="none" fo:font-weight="bold" style:font-name-asian="Tahoma3" style:font-size-asian="16pt" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-name-complex="Tahoma1" style:font-size-complex="16pt" style:font-style-complex="italic" style:font-weight-complex="bold"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#0070c0" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma1" fo:font-size="16pt" fo:letter-spacing="normal" fo:font-style="italic" style:text-underline-style="none" fo:font-weight="bold" style:font-name-asian="Tahoma2" style:font-size-asian="16pt" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-name-complex="Tahoma1" style:font-size-complex="16pt" style:font-style-complex="italic" style:font-weight-complex="bold"/>
   </style:style>
   <style:style style:name="T60" style:family="text">
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Courier New" fo:font-size="16pt" fo:letter-spacing="normal" fo:font-style="italic" style:text-underline-style="none" fo:font-weight="bold" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="16pt" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-name-complex="Courier New" style:font-size-complex="16pt" style:font-style-complex="italic" style:font-weight-complex="bold"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma1" fo:font-size="16pt" fo:letter-spacing="normal" fo:font-style="italic" style:text-underline-style="none" fo:font-weight="normal" style:font-name-asian="Tahoma2" style:font-size-asian="16pt" style:font-style-asian="italic" style:font-weight-asian="normal" style:font-name-complex="Tahoma1" style:font-size-complex="16pt" style:font-style-complex="italic" style:font-weight-complex="normal"/>
   </style:style>
   <style:style style:name="T61" style:family="text">
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma1" fo:font-size="16pt" fo:letter-spacing="normal" fo:font-style="italic" style:text-underline-style="none" fo:font-weight="normal" style:font-name-asian="Tahoma3" style:font-size-asian="16pt" style:font-style-asian="italic" style:font-weight-asian="normal" style:font-name-complex="Tahoma1" style:font-size-complex="16pt" style:font-style-complex="italic" style:font-weight-complex="normal"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma1" fo:font-size="18pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="normal" style:font-name-asian="Tahoma2" style:font-size-asian="18pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Tahoma1" style:font-size-complex="18pt" style:font-style-complex="normal" style:font-weight-complex="normal"/>
   </style:style>
   <style:style style:name="T62" style:family="text">
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma1" fo:font-size="18pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="normal" style:font-name-asian="Tahoma3" style:font-size-asian="18pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Tahoma1" style:font-size-complex="18pt" style:font-style-complex="normal" style:font-weight-complex="normal"/>
-  </style:style>
-  <style:style style:name="T63" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Courier New" fo:font-size="15pt" fo:letter-spacing="normal" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="bold" style:letter-kerning="true" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="15pt" style:font-style-asian="normal" style:font-weight-asian="bold" style:font-name-complex="Courier New" style:font-size-complex="15pt" style:font-style-complex="normal" style:font-weight-complex="bold" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
-  <style:style style:name="T64" style:family="text">
+  <style:style style:name="T63" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Courier New" fo:font-size="15pt" fo:letter-spacing="normal" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="bold" style:letter-kerning="true" style:font-name-asian="Courier New" style:font-size-asian="15pt" style:font-style-asian="normal" style:font-weight-asian="bold" style:font-name-complex="Courier New" style:font-size-complex="15pt" style:font-style-complex="normal" style:font-weight-complex="bold" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
-  <style:style style:name="T65" style:family="text">
+  <style:style style:name="T64" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#0070c0" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Arial" fo:font-size="15pt" fo:letter-spacing="normal" fo:font-style="italic" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="bold" style:letter-kerning="true" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="15pt" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-name-complex="Courier New" style:font-size-complex="15pt" style:font-style-complex="italic" style:font-weight-complex="bold" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
-  <style:style style:name="T66" style:family="text">
+  <style:style style:name="T65" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#3399ff" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Arial1" fo:font-size="15pt" fo:letter-spacing="normal" fo:font-style="italic" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="bold" style:letter-kerning="true" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="15pt" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-name-complex="Courier New" style:font-size-complex="15pt" style:font-style-complex="italic" style:font-weight-complex="bold" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
-  <style:style style:name="T67" style:family="text">
+  <style:style style:name="T66" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Courier New" fo:font-size="15pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="bold" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="15pt" style:font-style-asian="normal" style:font-weight-asian="bold" style:font-name-complex="Courier New" style:font-size-complex="15pt" style:font-style-complex="normal" style:font-weight-complex="bold"/>
   </style:style>
-  <style:style style:name="T68" style:family="text">
+  <style:style style:name="T67" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#0070c0" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Arial" fo:font-size="15pt" fo:letter-spacing="normal" fo:font-style="italic" style:text-underline-style="none" fo:font-weight="bold" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="15pt" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-name-complex="Courier New" style:font-size-complex="15pt" style:font-style-complex="italic" style:font-weight-complex="bold"/>
   </style:style>
-  <style:style style:name="T69" style:family="text">
+  <style:style style:name="T68" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#ff0000" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Courier New" fo:font-size="15pt" fo:letter-spacing="normal" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="bold" style:letter-kerning="true" style:font-name-asian="Courier New" style:font-size-asian="15pt" style:font-style-asian="normal" style:font-weight-asian="bold" style:font-name-complex="Courier New" style:font-size-complex="15pt" style:font-style-complex="normal" style:font-weight-complex="bold" style:text-emphasize="none" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
-  <style:style style:name="T70" style:family="text">
+  <style:style style:name="T69" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#ff0000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Courier New" fo:font-size="15pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="bold" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="15pt" style:font-style-asian="normal" style:font-weight-asian="bold" style:font-name-complex="Courier New" style:font-size-complex="15pt" style:font-style-complex="normal" style:font-weight-complex="bold"/>
   </style:style>
-  <style:style style:name="T71" style:family="text">
+  <style:style style:name="T70" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#ff420e" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Courier New" fo:font-size="15pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="bold" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="15pt" style:font-style-asian="normal" style:font-weight-asian="bold" style:font-name-complex="Courier New" style:font-size-complex="15pt" style:font-style-complex="normal" style:font-weight-complex="bold"/>
   </style:style>
-  <style:style style:name="T72" style:family="text">
+  <style:style style:name="T71" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma" fo:font-size="22pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="normal" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="22pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="DejaVu Sans" style:font-size-complex="22pt" style:font-style-complex="normal" style:font-weight-complex="normal"/>
   </style:style>
-  <style:style style:name="T73" style:family="text">
+  <style:style style:name="T72" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Courier New1" fo:font-size="22pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="bold" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="22pt" style:font-style-asian="normal" style:font-weight-asian="bold" style:font-name-complex="DejaVu Sans" style:font-size-complex="22pt" style:font-style-complex="normal" style:font-weight-complex="bold"/>
   </style:style>
-  <style:style style:name="T74" style:family="text">
+  <style:style style:name="T73" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma" fo:font-size="22pt" fo:letter-spacing="normal" fo:font-style="italic" style:text-underline-style="none" fo:font-weight="bold" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="22pt" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-name-complex="DejaVu Sans" style:font-size-complex="22pt" style:font-style-complex="italic" style:font-weight-complex="bold"/>
   </style:style>
-  <style:style style:name="T75" style:family="text">
+  <style:style style:name="T74" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma" fo:font-size="20pt" fo:letter-spacing="normal" fo:font-style="italic" style:text-underline-style="none" fo:font-weight="normal" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="20pt" style:font-style-asian="italic" style:font-weight-asian="normal" style:font-name-complex="DejaVu Sans" style:font-size-complex="20pt" style:font-style-complex="italic" style:font-weight-complex="normal"/>
   </style:style>
-  <style:style style:name="T76" style:family="text">
+  <style:style style:name="T75" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Courier New1" fo:font-size="23pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="bold" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="23pt" style:font-style-asian="normal" style:font-weight-asian="bold" style:font-name-complex="DejaVu Sans" style:font-size-complex="23pt" style:font-style-complex="normal" style:font-weight-complex="bold"/>
   </style:style>
-  <style:style style:name="T77" style:family="text">
+  <style:style style:name="T76" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Courier New" fo:font-size="20pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="bold" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="20pt" style:font-style-asian="normal" style:font-weight-asian="bold" style:font-name-complex="Courier New" style:font-size-complex="20pt" style:font-style-complex="normal" style:font-weight-complex="bold"/>
   </style:style>
-  <style:style style:name="T78" style:family="text">
+  <style:style style:name="T77" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#0000ff" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma" fo:font-size="18pt" fo:letter-spacing="normal" fo:font-style="italic" style:text-underline-style="none" fo:font-weight="bold" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="18pt" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-name-complex="DejaVu Sans" style:font-size-complex="18pt" style:font-style-complex="italic" style:font-weight-complex="bold"/>
   </style:style>
-  <style:style style:name="T79" style:family="text">
+  <style:style style:name="T78" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#006600" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma" fo:font-size="14pt" fo:letter-spacing="normal" fo:font-style="italic" style:text-underline-style="none" fo:font-weight="bold" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="14pt" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-name-complex="DejaVu Sans" style:font-size-complex="14pt" style:font-style-complex="italic" style:font-weight-complex="bold"/>
   </style:style>
-  <style:style style:name="T80" style:family="text">
+  <style:style style:name="T79" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma" fo:font-size="14pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="normal" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="14pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="DejaVu Sans" style:font-size-complex="14pt" style:font-style-complex="normal" style:font-weight-complex="normal"/>
   </style:style>
-  <style:style style:name="T81" style:family="text">
+  <style:style style:name="T80" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#0000ff" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma" fo:font-size="14pt" fo:letter-spacing="normal" fo:font-style="italic" style:text-underline-style="none" fo:font-weight="bold" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="14pt" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-name-complex="DejaVu Sans" style:font-size-complex="14pt" style:font-style-complex="italic" style:font-weight-complex="bold"/>
   </style:style>
-  <style:style style:name="T82" style:family="text">
+  <style:style style:name="T81" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma" fo:font-size="18pt" fo:letter-spacing="normal" fo:font-style="italic" style:text-underline-style="none" fo:font-weight="bold" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="18pt" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-name-complex="DejaVu Sans" style:font-size-complex="18pt" style:font-style-complex="italic" style:font-weight-complex="bold"/>
   </style:style>
-  <style:style style:name="T83" style:family="text">
+  <style:style style:name="T82" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#006600" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma" fo:font-size="18pt" fo:letter-spacing="normal" fo:font-style="italic" style:text-underline-style="none" fo:font-weight="bold" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="18pt" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-name-complex="DejaVu Sans" style:font-size-complex="18pt" style:font-style-complex="italic" style:font-weight-complex="bold"/>
   </style:style>
-  <style:style style:name="T84" style:family="text">
+  <style:style style:name="T83" style:family="text">
    <style:text-properties fo:color="#000000" style:font-name="Tahoma" fo:font-size="18pt" fo:letter-spacing="normal" fo:font-weight="normal" style:font-name-asian="Tahoma" style:font-size-asian="18pt" style:font-weight-asian="normal" style:font-name-complex="Tahoma" style:font-size-complex="18pt" style:font-weight-complex="normal"/>
   </style:style>
-  <style:style style:name="T85" style:family="text">
+  <style:style style:name="T84" style:family="text">
    <style:text-properties fo:color="#0000ff" style:font-name="Tahoma" fo:font-size="18pt" fo:letter-spacing="normal" fo:font-style="italic" fo:font-weight="bold" style:font-name-asian="Tahoma" style:font-size-asian="18pt" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-name-complex="Tahoma" style:font-size-complex="18pt" style:font-style-complex="italic" style:font-weight-complex="bold"/>
   </style:style>
-  <style:style style:name="T86" style:family="text">
+  <style:style style:name="T85" style:family="text">
    <style:text-properties fo:color="#006600" style:font-name="Tahoma" fo:font-size="18pt" fo:letter-spacing="normal" fo:font-style="italic" fo:font-weight="bold" style:font-name-asian="Tahoma" style:font-size-asian="18pt" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-name-complex="Tahoma" style:font-size-complex="18pt" style:font-style-complex="italic" style:font-weight-complex="bold"/>
   </style:style>
-  <style:style style:name="T87" style:family="text">
+  <style:style style:name="T86" style:family="text">
    <style:text-properties fo:color="#006600" style:font-name="Tahoma" fo:font-size="14pt" fo:font-style="italic" fo:font-weight="bold" style:font-name-asian="Tahoma" style:font-size-asian="14pt" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-name-complex="Tahoma" style:font-size-complex="14pt" style:font-style-complex="italic" style:font-weight-complex="bold"/>
   </style:style>
-  <style:style style:name="T88" style:family="text">
+  <style:style style:name="T87" style:family="text">
    <style:text-properties fo:color="#000000" style:font-name="Tahoma" fo:font-size="14pt" fo:font-style="normal" fo:font-weight="normal" style:font-name-asian="Tahoma" style:font-size-asian="14pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Tahoma" style:font-size-complex="14pt" style:font-style-complex="normal" style:font-weight-complex="normal"/>
   </style:style>
-  <style:style style:name="T89" style:family="text">
+  <style:style style:name="T88" style:family="text">
    <style:text-properties fo:color="#000000" style:font-name="Tahoma" fo:font-size="14pt" fo:font-style="normal" fo:font-weight="bold" style:font-name-asian="Tahoma" style:font-size-asian="14pt" style:font-style-asian="normal" style:font-weight-asian="bold" style:font-name-complex="Tahoma" style:font-size-complex="14pt" style:font-style-complex="normal" style:font-weight-complex="bold"/>
   </style:style>
-  <style:style style:name="T90" style:family="text">
+  <style:style style:name="T89" style:family="text">
    <style:text-properties fo:color="#000000" style:font-name="Tahoma" fo:font-size="12pt" fo:font-style="normal" fo:font-weight="normal" style:font-name-asian="Tahoma" style:font-size-asian="12pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Tahoma" style:font-size-complex="12pt" style:font-style-complex="normal" style:font-weight-complex="normal"/>
   </style:style>
-  <style:style style:name="T91" style:family="text">
+  <style:style style:name="T90" style:family="text">
    <style:text-properties fo:color="#000000" style:font-name="Tahoma" fo:font-size="18pt" fo:font-style="normal" fo:font-weight="normal" style:font-name-asian="Tahoma" style:font-size-asian="18pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Tahoma" style:font-size-complex="18pt" style:font-style-complex="normal" style:font-weight-complex="normal"/>
   </style:style>
-  <style:style style:name="T92" style:family="text">
+  <style:style style:name="T91" style:family="text">
    <style:text-properties fo:color="#006600" style:font-name="Tahoma" fo:font-size="16pt" fo:font-style="italic" fo:font-weight="bold" style:font-name-asian="Tahoma" style:font-size-asian="16pt" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-name-complex="Tahoma" style:font-size-complex="16pt" style:font-style-complex="italic" style:font-weight-complex="bold"/>
   </style:style>
-  <style:style style:name="T93" style:family="text">
+  <style:style style:name="T92" style:family="text">
    <style:text-properties fo:color="#000000" style:font-name="Tahoma" fo:font-size="16pt" fo:font-style="normal" fo:font-weight="normal" style:font-name-asian="Tahoma" style:font-size-asian="16pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Tahoma" style:font-size-complex="16pt" style:font-style-complex="normal" style:font-weight-complex="normal"/>
   </style:style>
-  <style:style style:name="T94" style:family="text">
+  <style:style style:name="T93" style:family="text">
    <style:text-properties fo:color="#0000ff" style:font-name="Tahoma" fo:font-size="16pt" fo:font-style="italic" fo:font-weight="bold" style:font-name-asian="Tahoma" style:font-size-asian="16pt" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-name-complex="Tahoma" style:font-size-complex="16pt" style:font-style-complex="italic" style:font-weight-complex="bold"/>
   </style:style>
-  <style:style style:name="T95" style:family="text">
+  <style:style style:name="T94" style:family="text">
    <style:text-properties fo:color="#ffffff" fo:font-size="16pt" fo:font-style="italic" fo:font-weight="bold" style:font-size-asian="16pt" style:font-size-complex="16pt"/>
   </style:style>
-  <style:style style:name="T96" style:family="text">
+  <style:style style:name="T95" style:family="text">
    <style:text-properties fo:color="#006600" fo:font-size="14pt" fo:font-weight="bold" style:font-size-asian="16pt" style:font-size-complex="16pt"/>
   </style:style>
-  <style:style style:name="T97" style:family="text">
+  <style:style style:name="T96" style:family="text">
    <style:text-properties fo:color="#000000" fo:font-size="14pt" fo:font-weight="bold" style:font-size-asian="16pt" style:font-size-complex="16pt"/>
   </style:style>
-  <style:style style:name="T98" style:family="text">
+  <style:style style:name="T97" style:family="text">
    <style:text-properties fo:color="#0000ff" fo:font-size="14pt" fo:font-weight="bold" style:font-size-asian="16pt" style:font-size-complex="16pt"/>
   </style:style>
-  <style:style style:name="T99" style:family="text">
+  <style:style style:name="T98" style:family="text">
    <style:text-properties fo:color="#006600" fo:font-size="14pt" fo:font-style="italic" fo:font-weight="bold" style:font-size-asian="16pt" style:font-size-complex="16pt"/>
   </style:style>
-  <style:style style:name="T100" style:family="text">
+  <style:style style:name="T99" style:family="text">
    <style:text-properties fo:color="#006600" fo:font-size="14pt" fo:font-style="italic" fo:font-weight="bold" style:font-size-asian="15pt" style:font-size-complex="15pt"/>
   </style:style>
-  <style:style style:name="T101" style:family="text">
+  <style:style style:name="T100" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#0070c0" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma" fo:font-size="20pt" fo:letter-spacing="normal" fo:font-style="italic" style:text-underline-style="none" fo:font-weight="bold" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="20pt" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-name-complex="DejaVu Sans" style:font-size-complex="20pt" style:font-style-complex="italic" style:font-weight-complex="bold"/>
   </style:style>
-  <style:style style:name="T102" style:family="text">
+  <style:style style:name="T101" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Arial" fo:font-size="18pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="normal" style:font-name-asian="DejaVu Sans" style:font-size-asian="18pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="DejaVu Sans" style:font-size-complex="18pt" style:font-style-complex="normal" style:font-weight-complex="normal"/>
   </style:style>
-  <style:style style:name="T103" style:family="text">
+  <style:style style:name="T102" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#ff0000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Tahoma" fo:font-size="20pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="bold" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="20pt" style:font-style-asian="normal" style:font-weight-asian="bold" style:font-name-complex="DejaVu Sans" style:font-size-complex="20pt" style:font-style-complex="normal" style:font-weight-complex="bold"/>
   </style:style>
-  <style:style style:name="T104" style:family="text">
+  <style:style style:name="T103" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Courier New1" fo:font-size="20pt" fo:letter-spacing="normal" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="bold" style:font-name-asian="ＭＳ Ｐゴシック" style:font-size-asian="20pt" style:font-style-asian="normal" style:font-weight-asian="bold" style:font-name-complex="DejaVu Sans" style:font-size-complex="20pt" style:font-style-complex="normal" style:font-weight-complex="bold"/>
   </style:style>
   <text:list-style style:name="L1">
@@ -4561,7 +4559,7 @@
     <text:p/>
    </draw:line>
    <draw:custom-shape draw:name="Text Box 18" draw:style-name="gr4" draw:text-style-name="P7" draw:layer="backgroundobjects" svg:width="6.654cm" svg:height="0.636cm" svg:x="18.602cm" svg:y="18.358cm">
-    <text:p text:style-name="P6"><text:span text:style-name="T2">2020</text:span></text:p>
+    <text:p text:style-name="P6"><text:span text:style-name="T2">2022</text:span></text:p>
     <draw:enhanced-geometry draw:mirror-horizontal="false" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 0 ?f3 ?f2" draw:type="ooxml-rect" draw:enhanced-path="M 0 0 L ?f3 0 ?f3 ?f2 0 ?f2 Z N">
      <draw:equation draw:name="f0" draw:formula="logwidth/2"/>
      <draw:equation draw:name="f1" draw:formula="logheight/2"/>
@@ -11395,7 +11393,7 @@
     <text:p/>
    </draw:line>
    <draw:custom-shape draw:name="CustomShape 2" draw:style-name="gr9" draw:text-style-name="P22" draw:layer="backgroundobjects" svg:width="6.653cm" svg:height="0.632cm" svg:x="18.602cm" svg:y="18.358cm">
-    <text:p text:style-name="P21"><text:span text:style-name="T11">2020</text:span></text:p>
+    <text:p text:style-name="P21"><text:span text:style-name="T11">2022</text:span></text:p>
     <draw:enhanced-geometry draw:mirror-horizontal="false" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 0 ?f3 ?f2" draw:type="ooxml-rect" draw:enhanced-path="M 0 0 L ?f3 0 ?f3 ?f2 0 ?f2 Z N">
      <draw:equation draw:name="f0" draw:formula="logwidth/2"/>
      <draw:equation draw:name="f1" draw:formula="logheight/2"/>
@@ -11892,7 +11890,7 @@
      <text:p/>
     </draw:image>
    </draw:frame>
-   <draw:custom-shape draw:name="CustomShape 4" draw:style-name="gr11" draw:text-style-name="P24" draw:layer="backgroundobjects" svg:width="1.063cm" svg:height="0.632cm" draw:transform="rotate (-3.14159265358979) translate (0.879cm 19.042cm)">
+   <draw:custom-shape draw:name="CustomShape 4" draw:style-name="gr11" draw:text-style-name="P24" draw:layer="backgroundobjects" svg:width="1.063cm" svg:height="0.632cm" draw:transform="rotate (-3.14159265358979) translate (0.873cm 19.042cm)">
     <text:p text:style-name="P23"><text:span text:style-name="T12"><text:page-number>&lt;number&gt;</text:page-number></text:span></text:p>
     <draw:enhanced-geometry draw:mirror-horizontal="true" draw:mirror-vertical="true" svg:viewBox="0 0 0 0" draw:text-areas="0 0 ?f3 ?f2" draw:type="ooxml-rect" draw:enhanced-path="M 0 0 L ?f3 0 ?f3 ?f2 0 ?f2 Z N">
      <draw:equation draw:name="f0" draw:formula="logwidth/2"/>
@@ -12508,7 +12506,7 @@
   <office:presentation>
    <draw:page draw:name="page1" draw:style-name="dp3" draw:master-page-name="Title_2b_Content_2b_Picture" presentation:presentation-page-layout-name="AL1T0">
     <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
-    <draw:custom-shape draw:name="Title 5" draw:style-name="gr4" draw:text-style-name="P13" draw:layer="layout" svg:width="16.262cm" svg:height="6.522cm" svg:x="4.647cm" svg:y="4.37cm">
+    <draw:custom-shape draw:name="Title 5" draw:style-name="gr4" draw:text-style-name="P13" draw:layer="layout" svg:width="16.262cm" svg:height="7.367cm" svg:x="4.647cm" svg:y="4.37cm">
      <text:p text:style-name="P27"><text:span text:style-name="T13">OpenCPI - </text:span><text:span text:style-name="T14">Open</text:span><text:span text:style-name="T13"> </text:span><text:span text:style-name="T14">C</text:span><text:span text:style-name="T13">omponent </text:span><text:span text:style-name="T14">P</text:span><text:span text:style-name="T13">ortability </text:span><text:span text:style-name="T14">I</text:span><text:span text:style-name="T13">nfrastructure </text:span><text:span text:style-name="T15"><text:line-break/></text:span><text:span text:style-name="T15"><text:line-break/></text:span><text:span text:style-name="T16">An Introduction to the</text:span><text:span text:style-name="T16"><text:line-break/></text:span><text:span text:style-name="T16">Digital Radio Controller (DRC) model and APIs, for Controlling and Configuring RF I/O in OpenCPI Systems that are “radios” (SDRs)</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="false" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 0 ?f3 ?f2" draw:type="ooxml-rect" draw:enhanced-path="M 0 0 L ?f3 0 ?f3 ?f2 0 ?f2 Z N">
       <draw:equation draw:name="f0" draw:formula="logwidth/2"/>
@@ -13119,7 +13117,7 @@
      </draw:frame>
      <draw:frame draw:name="Slide Number Placeholder 3" presentation:style-name="pr27" draw:text-style-name="P37" draw:layer="layout" svg:width="9.368cm" svg:height="1.395cm" svg:x="12.22cm" svg:y="26.543cm" presentation:class="page-number" presentation:user-transformed="true">
       <draw:text-box>
-       <text:p text:style-name="P36"><text:span text:style-name="T23"><text:page-number>&lt;number&gt;</text:page-number></text:span></text:p>
+       <text:p text:style-name="P36"><text:span text:style-name="T23"><text:page-number>2</text:page-number></text:span></text:p>
       </draw:text-box>
      </draw:frame>
     </presentation:notes>
@@ -13818,7 +13816,7 @@
     <draw:custom-shape draw:name="TextShape 2" draw:style-name="gr48" draw:text-style-name="P39" draw:layer="layout" svg:width="24.437cm" svg:height="1.484cm" svg:x="0.962cm" svg:y="1.75cm">
      <text:list text:style-name="L12">
       <text:list-item>
-       <text:p text:style-name="P38"><text:span text:style-name="T24">The DRC proxy worker (software) </text:span><text:span text:style-name="T29">for a radio</text:span><text:span text:style-name="T24"> uses a collection of radio-specific “slave” workers to get its job done:</text:span></text:p>
+       <text:p text:style-name="P38"><text:span text:style-name="T24">The DRC device proxy worker (software) </text:span><text:span text:style-name="T29">for a radio</text:span><text:span text:style-name="T24"> uses a collection of radio-specific “slave” workers to get its job done:</text:span></text:p>
       </text:list-item>
      </text:list>
      <draw:enhanced-geometry draw:mirror-horizontal="false" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 0 ?f3 ?f2" draw:type="ooxml-rect" draw:enhanced-path="M 0 0 L ?f3 0 ?f3 ?f2 0 ?f2 Z N">
@@ -14711,7 +14709,7 @@
      </draw:enhanced-geometry>
     </draw:custom-shape>
     <draw:custom-shape draw:name="TextBox 43" draw:style-name="gr88" draw:text-style-name="P24" draw:layer="layout" svg:width="12.153cm" svg:height="1.603cm" svg:x="5.762cm" svg:y="9.241cm">
-     <text:p text:style-name="P23"><text:span text:style-name="T35">DRC Proxy Configures its slave workers</text:span><text:span text:style-name="T35"><text:line-break/></text:span><text:span text:style-name="T35">based on requested channel configurations</text:span></text:p>
+     <text:p text:style-name="P23"><text:span text:style-name="T35">DRC Proxy configures its slave workers</text:span><text:span text:style-name="T35"><text:line-break/></text:span><text:span text:style-name="T35">based on requested channel configurations</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="false" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 0 ?f3 ?f2" draw:type="ooxml-rect" draw:enhanced-path="M 0 0 L ?f3 0 ?f3 ?f2 0 ?f2 Z N">
       <draw:equation draw:name="f0" draw:formula="logwidth/2"/>
       <draw:equation draw:name="f1" draw:formula="logheight/2"/>
@@ -15116,7 +15114,7 @@
       <draw:handle draw:handle-position="$0 $1" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="21600" draw:handle-range-y-minimum="0" draw:handle-range-y-maximum="10800"/>
      </draw:enhanced-geometry>
     </draw:custom-shape>
-    <draw:custom-shape draw:style-name="gr101" draw:text-style-name="P64" draw:layer="layout" svg:width="20.767cm" svg:height="1.253cm" svg:x="1.517cm" svg:y="16.273cm">
+    <draw:custom-shape draw:style-name="gr101" draw:text-style-name="P64" draw:layer="layout" svg:width="20.767cm" svg:height="1.253cm" svg:x="1.511cm" svg:y="16.273cm">
      <text:p text:style-name="P63">TX Channel</text:p>
      <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:mirror-horizontal="true" draw:text-areas="0 ?f0 ?f5 ?f2" draw:type="right-arrow" draw:modifiers="18773.1124807396 5115.78947368421" draw:enhanced-path="M 0 ?f0 L ?f1 ?f0 ?f1 0 21600 10800 ?f1 21600 ?f1 ?f2 0 ?f2 Z N">
       <draw:equation draw:name="f0" draw:formula="$1 "/>
@@ -15210,7 +15208,7 @@
      </draw:frame>
      <draw:frame draw:name="Slide Number Placeholder 3" presentation:style-name="pr27" draw:text-style-name="P37" draw:layer="layout" svg:width="9.368cm" svg:height="1.395cm" svg:x="12.22cm" svg:y="26.543cm" presentation:class="page-number" presentation:user-transformed="true">
       <draw:text-box>
-       <text:p text:style-name="P36"><text:span text:style-name="T23"><text:page-number>&lt;number&gt;</text:page-number></text:span></text:p>
+       <text:p text:style-name="P36"><text:span text:style-name="T23"><text:page-number>2</text:page-number></text:span></text:p>
       </draw:text-box>
      </draw:frame>
     </presentation:notes>
@@ -15284,12 +15282,12 @@
            <text:p text:style-name="P67"><text:span text:style-name="T48">Is sufficient for static channel configurations</text:span></text:p>
           </text:list-item>
           <text:list-item>
-           <text:p text:style-name="P67"><text:span text:style-name="T48">Allows the application to be pure XML using </text:span><text:span text:style-name="T60">ocpirun</text:span></text:p>
+           <text:p text:style-name="P67"><text:span text:style-name="T48">Allows the application to be pure XML using </text:span><text:span text:style-name="T50">ocpirun</text:span></text:p>
           </text:list-item>
          </text:list>
         </text:list-item>
         <text:list-item>
-         <text:p text:style-name="P67"><text:span text:style-name="T58">Configurations can also be specified/enabled/disabled at </text:span><text:span text:style-name="T61">runtime</text:span></text:p>
+         <text:p text:style-name="P67"><text:span text:style-name="T58">Configurations can also be specified/enabled/disabled at </text:span><text:span text:style-name="T60">runtime</text:span></text:p>
          <text:list>
           <text:list-item>
            <text:p text:style-name="P67"><text:span text:style-name="T58">Using the normal property access methods in the OpenCPI ACI</text:span></text:p>
@@ -15299,10 +15297,10 @@
        </text:list>
       </text:list-item>
      </text:list>
-     <text:p text:style-name="P67"><text:span text:style-name="T62"/></text:p>
+     <text:p text:style-name="P67"><text:span text:style-name="T61"/></text:p>
      <text:list text:continue-numbering="true" text:style-name="L16">
       <text:list-item>
-       <text:p text:style-name="P67"><text:span text:style-name="T62">Channel configurations are for receive or transmit, and:</text:span></text:p>
+       <text:p text:style-name="P67"><text:span text:style-name="T61">Channel configurations are for receive or transmit, and:</text:span></text:p>
        <text:list>
         <text:list-item>
          <text:p text:style-name="P67"><text:span text:style-name="T58">Have tuning frequency, bandwidth@3db, sampling rate, gain, etc.</text:span></text:p>
@@ -15330,13 +15328,12 @@
      </draw:frame>
      <draw:frame draw:name="Slide Number Placeholder 3" presentation:style-name="pr27" draw:text-style-name="P37" draw:layer="layout" svg:width="9.368cm" svg:height="1.395cm" svg:x="12.22cm" svg:y="26.543cm" presentation:class="page-number" presentation:user-transformed="true">
       <draw:text-box>
-       <text:p text:style-name="P36"><text:span text:style-name="T23"><text:page-number>&lt;number&gt;</text:page-number></text:span></text:p>
+       <text:p text:style-name="P36"><text:span text:style-name="T23"><text:page-number>2</text:page-number></text:span></text:p>
       </draw:text-box>
      </draw:frame>
     </presentation:notes>
    </draw:page>
    <draw:page draw:name="page8" draw:style-name="dp3" draw:master-page-name="Blank_20_Slide">
-    <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:custom-shape draw:name="TextShape 1" draw:style-name="gr106" draw:text-style-name="P26" draw:layer="layout" svg:width="23.281cm" svg:height="1.28cm" svg:x="0.996cm" svg:y="0.295cm">
      <text:p text:style-name="P25"><text:span text:style-name="T17">DRC “Channels”</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="false" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 0 ?f3 ?f2" draw:type="ooxml-rect" draw:enhanced-path="M 0 0 L ?f3 0 ?f3 ?f2 0 ?f2 Z N">
@@ -15435,7 +15432,6 @@
     </presentation:notes>
    </draw:page>
    <draw:page draw:name="page9" draw:style-name="dp3" draw:master-page-name="Blank_20_Slide">
-    <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:custom-shape draw:name="TextShape 1" draw:style-name="gr108" draw:text-style-name="P26" draw:layer="layout" svg:width="23.281cm" svg:height="1.28cm" svg:x="0.996cm" svg:y="0.295cm">
      <text:p text:style-name="P25"><text:span text:style-name="T17">DRC App Interface: static XML Example</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="false" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 0 ?f3 ?f2" draw:type="ooxml-rect" draw:enhanced-path="M 0 0 L ?f3 0 ?f3 ?f2 0 ?f2 Z N">
@@ -15446,7 +15442,7 @@
      </draw:enhanced-geometry>
     </draw:custom-shape>
     <draw:custom-shape draw:name="TextShape 2" draw:style-name="gr109" draw:text-style-name="P72" draw:layer="layout" svg:width="24.774cm" svg:height="16.491cm" svg:x="0.625cm" svg:y="1.782cm">
-     <text:p text:style-name="P71"><text:span text:style-name="T63">&lt;Application&gt;</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s/>&lt;Instance component=</text:span><text:span text:style-name="T64">&apos;</text:span><text:span text:style-name="T63">drc</text:span><text:span text:style-name="T64">&apos;</text:span><text:span text:style-name="T63">&gt;</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="3"/>&lt;property name=</text:span><text:span text:style-name="T64">&apos;</text:span><text:span text:style-name="T63">configurations</text:span><text:span text:style-name="T64">&apos;</text:span><text:span text:style-name="T63"> </text:span><text:span text:style-name="T65">define one configuration with two channels</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="13"/>value=</text:span><text:span text:style-name="T64">&apos;</text:span><text:span text:style-name="T63">{description My static radio channels,</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="21"/>channels { </text:span><text:span text:style-name="T66">define two channels, one rx, one tx</text:span><text:span text:style-name="T63"> </text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="22"/>{rx true,</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="23"/>tuning_freq_mhz 2450,</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="23"/>bandwidth_3db_mhz 0.24,</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="23"/>sampling_rate_Msps 0.25,</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="23"/>samples_are_complex true,</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="23"/>tolerance_tuning_freq_mhz 0.01,</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="23"/>tolerance_sampling_rate_msps 0.01,</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="23"/>tolerance_gain_db 1},</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="22"/>{rx false,</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="23"/>tuning_freq_mhz 2450,</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="23"/>bandwidth_3db_mhz 0.24,</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="23"/>sampling_rate_Msps 0.25,</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="23"/>samples_are_complex true,</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="23"/>gain_db -25,</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="23"/>tolerance_tuning_freq_mhz 0.01,</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="23"/>tolerance_sampling_rate_msps 0.01,</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="23"/>tolerance_gain_db 1}}</text:span><text:span text:style-name="T64">&apos;</text:span><text:span text:style-name="T63">/&gt;</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="4"/>&lt;property name=</text:span><text:span text:style-name="T64">&apos;</text:span><text:span text:style-name="T63">start</text:span><text:span text:style-name="T64">&apos;</text:span><text:span text:style-name="T63"> value=</text:span><text:span text:style-name="T64">&apos;</text:span><text:span text:style-name="T63">0</text:span><text:span text:style-name="T64">&apos;</text:span><text:span text:style-name="T67">/&gt; <text:s text:c="2"/></text:span><text:span text:style-name="T68">start first radio config when app starts</text:span><text:span text:style-name="T67"><text:line-break/></text:span><text:span text:style-name="T67"> <text:s text:c="2"/>&lt;/Instance&gt;</text:span><text:span text:style-name="T67"><text:line-break/></text:span><text:span text:style-name="T67"> <text:s text:c="2"/>... other component instances in the app and connections to app ports ...</text:span><text:span text:style-name="T67"><text:line-break/></text:span><text:span text:style-name="T67">&lt;/Application&gt;</text:span><text:span text:style-name="T50"><text:line-break/></text:span><text:span text:style-name="T50"><text:line-break/></text:span><text:span text:style-name="T50"><text:line-break/></text:span><text:span text:style-name="T50"> <text:s/></text:span></text:p>
+     <text:p text:style-name="P71"><text:span text:style-name="T62">&lt;Application&gt;</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s/>&lt;Instance component=</text:span><text:span text:style-name="T63">&apos;</text:span><text:span text:style-name="T62">drc</text:span><text:span text:style-name="T63">&apos;</text:span><text:span text:style-name="T62">&gt;</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="3"/>&lt;property name=</text:span><text:span text:style-name="T63">&apos;</text:span><text:span text:style-name="T62">configurations</text:span><text:span text:style-name="T63">&apos;</text:span><text:span text:style-name="T62"> </text:span><text:span text:style-name="T64">define one configuration with two channels</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="13"/>value=</text:span><text:span text:style-name="T63">&apos;</text:span><text:span text:style-name="T62">{description My static radio channels,</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="21"/>channels { </text:span><text:span text:style-name="T65">define two channels, one rx, one tx</text:span><text:span text:style-name="T62"> </text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="22"/>{rx true,</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="23"/>tuning_freq_mhz 2450,</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="23"/>bandwidth_3db_mhz 0.24,</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="23"/>sampling_rate_Msps 0.25,</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="23"/>samples_are_complex true,</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="23"/>tolerance_tuning_freq_mhz 0.01,</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="23"/>tolerance_sampling_rate_msps 0.01,</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="23"/>tolerance_gain_db 1},</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="22"/>{rx false,</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="23"/>tuning_freq_mhz 2450,</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="23"/>bandwidth_3db_mhz 0.24,</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="23"/>sampling_rate_Msps 0.25,</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="23"/>samples_are_complex true,</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="23"/>gain_db -25,</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="23"/>tolerance_tuning_freq_mhz 0.01,</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="23"/>tolerance_sampling_rate_msps 0.01,</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="23"/>tolerance_gain_db 1}}</text:span><text:span text:style-name="T63">&apos;</text:span><text:span text:style-name="T62">/&gt;</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="4"/>&lt;property name=</text:span><text:span text:style-name="T63">&apos;</text:span><text:span text:style-name="T62">start</text:span><text:span text:style-name="T63">&apos;</text:span><text:span text:style-name="T62"> value=</text:span><text:span text:style-name="T63">&apos;</text:span><text:span text:style-name="T62">0</text:span><text:span text:style-name="T63">&apos;</text:span><text:span text:style-name="T66">/&gt; <text:s text:c="2"/></text:span><text:span text:style-name="T67">start first radio config when app starts</text:span><text:span text:style-name="T66"><text:line-break/></text:span><text:span text:style-name="T66"> <text:s text:c="2"/>&lt;/Instance&gt;</text:span><text:span text:style-name="T66"><text:line-break/></text:span><text:span text:style-name="T66"> <text:s text:c="2"/>... other component instances in the app and connections to app ports ...</text:span><text:span text:style-name="T66"><text:line-break/></text:span><text:span text:style-name="T66">&lt;/Application&gt;</text:span><text:span text:style-name="T50"><text:line-break/></text:span><text:span text:style-name="T50"><text:line-break/></text:span><text:span text:style-name="T50"><text:line-break/></text:span><text:span text:style-name="T50"> <text:s/></text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="false" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 0 ?f3 ?f2" draw:type="ooxml-rect" draw:enhanced-path="M 0 0 L ?f3 0 ?f3 ?f2 0 ?f2 Z N">
       <draw:equation draw:name="f0" draw:formula="logwidth/2"/>
       <draw:equation draw:name="f1" draw:formula="logheight/2"/>
@@ -15477,8 +15473,8 @@
      </draw:enhanced-geometry>
     </draw:custom-shape>
     <draw:custom-shape draw:name="TextShape 2" draw:style-name="gr111" draw:text-style-name="P72" draw:layer="layout" svg:width="24.774cm" svg:height="16.491cm" svg:x="0.625cm" svg:y="1.782cm">
-     <text:p text:style-name="P71"><text:span text:style-name="T63">&lt;Application&gt;</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s/>&lt;Instance component=</text:span><text:span text:style-name="T64">&apos;</text:span><text:span text:style-name="T63">drc</text:span><text:span text:style-name="T64">&apos;</text:span><text:span text:style-name="T69"> connect=&apos;my_rx_processing&apos;</text:span><text:span text:style-name="T63">&gt;</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="3"/>&lt;property name=</text:span><text:span text:style-name="T64">&apos;</text:span><text:span text:style-name="T63">configurations</text:span><text:span text:style-name="T64">&apos;</text:span><text:span text:style-name="T63"> </text:span><text:span text:style-name="T65">define one configuration with two channels</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="13"/>value=</text:span><text:span text:style-name="T64">&apos;</text:span><text:span text:style-name="T63">{description My static radio channels,</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="21"/>channels {</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="22"/>{rx true,</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="23"/>...</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="23"/>tolerance_gain_db 1},</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="22"/>{rx false,</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="23"/>...</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="23"/>tolerance_gain_db 1}}</text:span><text:span text:style-name="T64">&apos;</text:span><text:span text:style-name="T63">/&gt;</text:span><text:span text:style-name="T63"><text:line-break/></text:span><text:span text:style-name="T63"> <text:s text:c="4"/>&lt;property name=</text:span><text:span text:style-name="T64">&apos;</text:span><text:span text:style-name="T63">start</text:span><text:span text:style-name="T64">&apos;</text:span><text:span text:style-name="T63"> value=</text:span><text:span text:style-name="T64">&apos;</text:span><text:span text:style-name="T63">0</text:span><text:span text:style-name="T64">&apos;</text:span><text:span text:style-name="T67">/&gt; <text:s text:c="2"/></text:span><text:span text:style-name="T68">start first radio config when app starts</text:span><text:span text:style-name="T67"><text:line-break/></text:span><text:span text:style-name="T67"> <text:s text:c="2"/>&lt;/Instance&gt;</text:span><text:span text:style-name="T67"><text:line-break/></text:span><text:span text:style-name="T67"> <text:s text:c="2"/>&lt;Instance component=&apos;my_tx_processing&apos; </text:span><text:span text:style-name="T70">connect=&apos;drc&apos;</text:span><text:span text:style-name="T67">/&gt;</text:span></text:p>
-     <text:p text:style-name="P71"><text:span text:style-name="T67"><text:s text:c="3"/></text:span><text:span text:style-name="T67">&lt;Instance component=&apos;my_rx_processing&apos;/&gt;</text:span><text:span text:style-name="T67"><text:line-break/></text:span><text:span text:style-name="T67">---OR---</text:span><text:span text:style-name="T67"><text:line-break/></text:span><text:span text:style-name="T67"> <text:s text:c="2"/></text:span><text:span text:style-name="T71">&lt;connection&gt;</text:span><text:span text:style-name="T71"><text:line-break/></text:span><text:span text:style-name="T71"> <text:s text:c="5"/>&lt;port name=&apos;rx&apos; instance=&apos;drc&apos;/&gt;</text:span><text:span text:style-name="T71"><text:line-break/></text:span><text:span text:style-name="T71"> <text:s text:c="5"/>&lt;port name=&apos;in&apos; instance=&apos;my_rx_processing/&gt;</text:span><text:span text:style-name="T71"><text:line-break/></text:span><text:span text:style-name="T71"> <text:s text:c="2"/>&lt;/connection&gt;</text:span><text:span text:style-name="T71"><text:line-break/></text:span><text:span text:style-name="T71"> <text:s text:c="2"/>&lt;connection&gt;</text:span><text:span text:style-name="T71"><text:line-break/></text:span><text:span text:style-name="T71"> <text:s text:c="5"/>&lt;port name=&apos;tx&apos; instance=&apos;drc&apos;/&gt;</text:span><text:span text:style-name="T71"><text:line-break/></text:span><text:span text:style-name="T71"> <text:s text:c="5"/>&lt;port name=&apos;out&apos; instance=&apos;my_tx_processing&apos;/&gt;</text:span><text:span text:style-name="T71"><text:line-break/></text:span><text:span text:style-name="T71"> <text:s text:c="2"/>&lt;/connection&gt;</text:span><text:span text:style-name="T67"><text:line-break/></text:span><text:span text:style-name="T67">&lt;/Application&gt;</text:span></text:p>
+     <text:p text:style-name="P71"><text:span text:style-name="T62">&lt;Application&gt;</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s/>&lt;Instance component=</text:span><text:span text:style-name="T63">&apos;</text:span><text:span text:style-name="T62">drc</text:span><text:span text:style-name="T63">&apos;</text:span><text:span text:style-name="T68"> connect=&apos;my_rx_processing&apos;</text:span><text:span text:style-name="T62">&gt;</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="3"/>&lt;property name=</text:span><text:span text:style-name="T63">&apos;</text:span><text:span text:style-name="T62">configurations</text:span><text:span text:style-name="T63">&apos;</text:span><text:span text:style-name="T62"> </text:span><text:span text:style-name="T64">define one configuration with two channels</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="13"/>value=</text:span><text:span text:style-name="T63">&apos;</text:span><text:span text:style-name="T62">{description My static radio channels,</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="21"/>channels {</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="22"/>{rx true,</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="23"/>...</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="23"/>tolerance_gain_db 1},</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="22"/>{rx false,</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="23"/>...</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="23"/>tolerance_gain_db 1}}</text:span><text:span text:style-name="T63">&apos;</text:span><text:span text:style-name="T62">/&gt;</text:span><text:span text:style-name="T62"><text:line-break/></text:span><text:span text:style-name="T62"> <text:s text:c="4"/>&lt;property name=</text:span><text:span text:style-name="T63">&apos;</text:span><text:span text:style-name="T62">start</text:span><text:span text:style-name="T63">&apos;</text:span><text:span text:style-name="T62"> value=</text:span><text:span text:style-name="T63">&apos;</text:span><text:span text:style-name="T62">0</text:span><text:span text:style-name="T63">&apos;</text:span><text:span text:style-name="T66">/&gt; <text:s text:c="2"/></text:span><text:span text:style-name="T67">start first radio config when app starts</text:span><text:span text:style-name="T66"><text:line-break/></text:span><text:span text:style-name="T66"> <text:s text:c="2"/>&lt;/Instance&gt;</text:span><text:span text:style-name="T66"><text:line-break/></text:span><text:span text:style-name="T66"> <text:s text:c="2"/>&lt;Instance component=&apos;my_tx_processing&apos; </text:span><text:span text:style-name="T69">connect=&apos;drc&apos;</text:span><text:span text:style-name="T66">/&gt;</text:span></text:p>
+     <text:p text:style-name="P71"><text:span text:style-name="T66"><text:s text:c="3"/></text:span><text:span text:style-name="T66">&lt;Instance component=&apos;my_rx_processing&apos;/&gt;</text:span><text:span text:style-name="T66"><text:line-break/></text:span><text:span text:style-name="T66">---OR---</text:span><text:span text:style-name="T66"><text:line-break/></text:span><text:span text:style-name="T66"> <text:s text:c="2"/></text:span><text:span text:style-name="T70">&lt;connection&gt;</text:span><text:span text:style-name="T70"><text:line-break/></text:span><text:span text:style-name="T70"> <text:s text:c="5"/>&lt;port name=&apos;rx&apos; instance=&apos;drc&apos;/&gt;</text:span><text:span text:style-name="T70"><text:line-break/></text:span><text:span text:style-name="T70"> <text:s text:c="5"/>&lt;port name=&apos;in&apos; instance=&apos;my_rx_processing/&gt;</text:span><text:span text:style-name="T70"><text:line-break/></text:span><text:span text:style-name="T70"> <text:s text:c="2"/>&lt;/connection&gt;</text:span><text:span text:style-name="T70"><text:line-break/></text:span><text:span text:style-name="T70"> <text:s text:c="2"/>&lt;connection&gt;</text:span><text:span text:style-name="T70"><text:line-break/></text:span><text:span text:style-name="T70"> <text:s text:c="5"/>&lt;port name=&apos;tx&apos; instance=&apos;drc&apos;/&gt;</text:span><text:span text:style-name="T70"><text:line-break/></text:span><text:span text:style-name="T70"> <text:s text:c="5"/>&lt;port name=&apos;out&apos; instance=&apos;my_tx_processing&apos;/&gt;</text:span><text:span text:style-name="T70"><text:line-break/></text:span><text:span text:style-name="T70"> <text:s text:c="2"/>&lt;/connection&gt;</text:span><text:span text:style-name="T66"><text:line-break/></text:span><text:span text:style-name="T66">&lt;/Application&gt;</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="false" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 0 ?f3 ?f2" draw:type="ooxml-rect" draw:enhanced-path="M 0 0 L ?f3 0 ?f3 ?f2 0 ?f2 Z N">
       <draw:equation draw:name="f0" draw:formula="logwidth/2"/>
       <draw:equation draw:name="f1" draw:formula="logheight/2"/>
@@ -15511,31 +15507,31 @@
     <draw:custom-shape draw:name="TextShape 2" draw:style-name="gr113" draw:text-style-name="P70" draw:layer="layout" svg:width="24.774cm" svg:height="15.041cm" svg:x="0.625cm" svg:y="1.853cm">
      <text:list text:style-name="L12">
       <text:list-item>
-       <text:p text:style-name="P69"><text:span text:style-name="T72">Static XML Radio Configuration</text:span></text:p>
+       <text:p text:style-name="P69"><text:span text:style-name="T71">Static XML Radio Configuration</text:span></text:p>
       </text:list-item>
      </text:list>
      <text:list text:style-name="L13">
       <text:list-item>
        <text:list>
         <text:list-item>
-         <text:p text:style-name="P69"><text:span text:style-name="T72">The application’s radio configuration is in the Application XML</text:span></text:p>
+         <text:p text:style-name="P69"><text:span text:style-name="T71">The application’s radio configuration is in the Application XML</text:span></text:p>
         </text:list-item>
         <text:list-item>
-         <text:p text:style-name="P69"><text:span text:style-name="T72">One XML-based configuration can be enabled at app startup</text:span></text:p>
+         <text:p text:style-name="P69"><text:span text:style-name="T71">One XML-based configuration can be enabled at app startup</text:span></text:p>
         </text:list-item>
         <text:list-item>
-         <text:p text:style-name="P69"><text:span text:style-name="T72">This does not preclude dynamic changes later via ACI.</text:span></text:p>
+         <text:p text:style-name="P69"><text:span text:style-name="T71">This does not preclude dynamic changes later via ACI.</text:span></text:p>
         </text:list-item>
        </text:list>
       </text:list-item>
      </text:list>
-     <text:p text:style-name="P73"><text:span text:style-name="T72"/></text:p>
+     <text:p text:style-name="P73"><text:span text:style-name="T71"/></text:p>
      <text:list text:continue-numbering="true" text:style-name="L13">
       <text:list-item>
-       <text:p text:style-name="P69"><text:span text:style-name="T72">Dynamic Configurations (possibly more than one)</text:span></text:p>
+       <text:p text:style-name="P69"><text:span text:style-name="T71">Dynamic Configurations (possibly more than one)</text:span></text:p>
        <text:list>
         <text:list-item>
-         <text:p text:style-name="P69"><text:span text:style-name="T72">May still be specified in application XML</text:span></text:p>
+         <text:p text:style-name="P69"><text:span text:style-name="T71">May still be specified in application XML</text:span></text:p>
         </text:list-item>
        </text:list>
       </text:list-item>
@@ -15546,26 +15542,26 @@
         <text:list-item>
          <text:list>
           <text:list-item>
-           <text:p text:style-name="P69"><text:span text:style-name="T72">But are not initially enabled</text:span></text:p>
+           <text:p text:style-name="P69"><text:span text:style-name="T71">But are not initially enabled</text:span></text:p>
           </text:list-item>
           <text:list-item>
-           <text:p text:style-name="P69"><text:span text:style-name="T72">Are allowed to conflict since they are enabled separately</text:span></text:p>
+           <text:p text:style-name="P69"><text:span text:style-name="T71">Are allowed to conflict since they are enabled separately</text:span></text:p>
           </text:list-item>
          </text:list>
         </text:list-item>
         <text:list-item>
-         <text:p text:style-name="P69"><text:span text:style-name="T72">May also be entirely dynamically specified in ACI/C++ code</text:span></text:p>
+         <text:p text:style-name="P69"><text:span text:style-name="T71">May also be entirely dynamically specified in ACI/C++ code</text:span></text:p>
         </text:list-item>
         <text:list-item>
-         <text:p text:style-name="P69"><text:span text:style-name="T72">Enabled/disabled dynamically ACI/C++ code.</text:span></text:p>
+         <text:p text:style-name="P69"><text:span text:style-name="T71">Enabled/disabled dynamically ACI/C++ code.</text:span></text:p>
         </text:list-item>
        </text:list>
       </text:list-item>
      </text:list>
-     <text:p text:style-name="P69"><text:span text:style-name="T72"/></text:p>
+     <text:p text:style-name="P69"><text:span text:style-name="T71"/></text:p>
      <text:list text:continue-numbering="true" text:style-name="L16">
       <text:list-item>
-       <text:p text:style-name="P69"><text:span text:style-name="T72">An app may configure some channels statically (on one configuration) and others dynamically (in other configurations)</text:span></text:p>
+       <text:p text:style-name="P69"><text:span text:style-name="T71">An app may configure some channels statically (on one configuration) and others dynamically (in other configurations)</text:span></text:p>
       </text:list-item>
      </text:list>
      <draw:enhanced-geometry draw:mirror-horizontal="false" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 0 ?f3 ?f2" draw:type="ooxml-rect" draw:enhanced-path="M 0 0 L ?f3 0 ?f3 ?f2 0 ?f2 Z N">
@@ -15600,45 +15596,45 @@
     <draw:custom-shape draw:name="TextShape 2" draw:style-name="gr115" draw:text-style-name="P70" draw:layer="layout" svg:width="24.774cm" svg:height="15.041cm" svg:x="0.625cm" svg:y="1.853cm">
      <text:list text:style-name="L1">
       <text:list-item>
-       <text:p text:style-name="P69"><text:span text:style-name="T72">ACI is based on reading and writing properties.</text:span></text:p>
+       <text:p text:style-name="P69"><text:span text:style-name="T71">ACI is based on reading and writing properties.</text:span></text:p>
       </text:list-item>
      </text:list>
      <text:list text:style-name="L13">
       <text:list-item>
        <text:list>
         <text:list-item>
-         <text:p text:style-name="P69"><text:span text:style-name="T72">Set </text:span><text:span text:style-name="T73">configurations</text:span><text:span text:style-name="T72"> (when not already specified in app XML)</text:span></text:p>
+         <text:p text:style-name="P69"><text:span text:style-name="T71">Set </text:span><text:span text:style-name="T72">configurations</text:span><text:span text:style-name="T71"> (when not already specified in app XML)</text:span></text:p>
         </text:list-item>
         <text:list-item>
-         <text:p text:style-name="P69"><text:span text:style-name="T72">Enable/disable configurations</text:span></text:p>
+         <text:p text:style-name="P69"><text:span text:style-name="T71">Enable/disable configurations</text:span></text:p>
         </text:list-item>
         <text:list-item>
-         <text:p text:style-name="P69"><text:span text:style-name="T72">Check status of configurations (enabled, disabled, error)</text:span></text:p>
+         <text:p text:style-name="P69"><text:span text:style-name="T71">Check status of configurations (enabled, disabled, error)</text:span></text:p>
         </text:list-item>
        </text:list>
       </text:list-item>
      </text:list>
-     <text:p text:style-name="P69"><text:span text:style-name="T72"/></text:p>
+     <text:p text:style-name="P69"><text:span text:style-name="T71"/></text:p>
      <text:list text:continue-numbering="true" text:style-name="L13">
       <text:list-item>
-       <text:p text:style-name="P69"><text:span text:style-name="T72">ACI can query the DRC for constraints and request configurations that may determined based on what is possible/available.</text:span></text:p>
+       <text:p text:style-name="P69"><text:span text:style-name="T71">ACI can query the DRC for constraints and request configurations that may determined based on what is possible/available.</text:span></text:p>
       </text:list-item>
      </text:list>
-     <text:p text:style-name="P69"><text:span text:style-name="T72"/></text:p>
+     <text:p text:style-name="P69"><text:span text:style-name="T71"/></text:p>
      <text:list text:continue-numbering="true" text:style-name="L13">
       <text:list-item>
-       <text:p text:style-name="P69"><text:span text:style-name="T72">ACI may change channel configurations during execution</text:span></text:p>
+       <text:p text:style-name="P69"><text:span text:style-name="T71">ACI may change channel configurations during execution</text:span></text:p>
        <text:list>
         <text:list-item>
-         <text:p text:style-name="P69"><text:span text:style-name="T72">Change frequency/bandwidth/sampling rate/gain etc.</text:span></text:p>
+         <text:p text:style-name="P69"><text:span text:style-name="T71">Change frequency/bandwidth/sampling rate/gain etc.</text:span></text:p>
         </text:list-item>
        </text:list>
       </text:list-item>
      </text:list>
-     <text:p text:style-name="P69"><text:span text:style-name="T72"/></text:p>
+     <text:p text:style-name="P69"><text:span text:style-name="T71"/></text:p>
      <text:list text:continue-numbering="true" text:style-name="L13">
       <text:list-item>
-       <text:p text:style-name="P69"><text:span text:style-name="T72">ACI may change which channels are doing what</text:span></text:p>
+       <text:p text:style-name="P69"><text:span text:style-name="T71">ACI may change which channels are doing what</text:span></text:p>
       </text:list-item>
      </text:list>
      <draw:enhanced-geometry draw:mirror-horizontal="false" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 0 ?f3 ?f2" draw:type="ooxml-rect" draw:enhanced-path="M 0 0 L ?f3 0 ?f3 ?f2 0 ?f2 Z N">
@@ -15673,14 +15669,14 @@
     <draw:custom-shape draw:name="TextShape 2" draw:style-name="gr117" draw:text-style-name="P70" draw:layer="layout" svg:width="24.774cm" svg:height="16.45cm" svg:x="0.625cm" svg:y="1.853cm">
      <text:list text:style-name="L20">
       <text:list-item>
-       <text:p text:style-name="P69"><text:span text:style-name="T74">Configurations: </text:span><text:span text:style-name="T72"><text:s/>a sequence of radio configurations</text:span></text:p>
+       <text:p text:style-name="P69"><text:span text:style-name="T73">Configurations: </text:span><text:span text:style-name="T71"><text:s/>a sequence of radio configurations</text:span></text:p>
       </text:list-item>
      </text:list>
      <text:list text:style-name="L21">
       <text:list-item>
        <text:list>
         <text:list-item>
-         <text:p text:style-name="P69"><text:span text:style-name="T18">Each </text:span><text:span text:style-name="T75">radio</text:span><text:span text:style-name="T18"> configuration is a sequence of </text:span><text:span text:style-name="T75">channel</text:span><text:span text:style-name="T18"> configurations:</text:span></text:p>
+         <text:p text:style-name="P69"><text:span text:style-name="T18">Each </text:span><text:span text:style-name="T74">radio</text:span><text:span text:style-name="T18"> configuration is a sequence of </text:span><text:span text:style-name="T74">channel</text:span><text:span text:style-name="T18"> configurations:</text:span></text:p>
         </text:list-item>
        </text:list>
       </text:list-item>
@@ -15707,7 +15703,7 @@
      <text:p text:style-name="P73"><text:span text:style-name="T18"/></text:p>
      <text:list text:style-name="L23">
       <text:list-item>
-       <text:p text:style-name="P69"><text:span text:style-name="T74">Status: </text:span><text:span text:style-name="T72"><text:s/>dynamic/volatile information about configurations</text:span></text:p>
+       <text:p text:style-name="P69"><text:span text:style-name="T73">Status: </text:span><text:span text:style-name="T71"><text:s/>dynamic/volatile information about configurations</text:span></text:p>
       </text:list-item>
      </text:list>
      <text:list text:style-name="L24">
@@ -15738,10 +15734,10 @@
        </text:list>
       </text:list-item>
      </text:list>
-     <text:p text:style-name="P71"><text:span text:style-name="T74"/></text:p>
+     <text:p text:style-name="P71"><text:span text:style-name="T73"/></text:p>
      <text:list text:continue-numbering="true" text:style-name="L25">
       <text:list-item>
-       <text:p text:style-name="P69"><text:span text:style-name="T74">Constraints:</text:span><text:span text:style-name="T72"> <text:s/>ranges of attribute values</text:span></text:p>
+       <text:p text:style-name="P69"><text:span text:style-name="T73">Constraints:</text:span><text:span text:style-name="T71"> <text:s/>ranges of attribute values</text:span></text:p>
       </text:list-item>
      </text:list>
      <text:list text:style-name="L26">
@@ -15785,17 +15781,17 @@
     <draw:custom-shape draw:name="TextShape 2" draw:style-name="gr119" draw:text-style-name="P70" draw:layer="layout" svg:width="24.774cm" svg:height="16.45cm" svg:x="0.625cm" svg:y="1.853cm">
      <text:list text:style-name="L27">
       <text:list-item>
-       <text:p text:style-name="P69"><text:span text:style-name="T74">Separate properties for each action on a configuration</text:span></text:p>
+       <text:p text:style-name="P69"><text:span text:style-name="T73">Separate properties for each action on a configuration</text:span></text:p>
       </text:list-item>
       <text:list-item>
-       <text:p text:style-name="P69"><text:span text:style-name="T72">Actions (and thus properties) are:</text:span></text:p>
+       <text:p text:style-name="P69"><text:span text:style-name="T71">Actions (and thus properties) are:</text:span></text:p>
       </text:list-item>
      </text:list>
      <text:list text:style-name="L28">
       <text:list-item>
        <text:list>
         <text:list-item>
-         <text:p text:style-name="P69"><text:span text:style-name="T76">Prepare</text:span><text:span text:style-name="T72"> – validate/preprocess configuration</text:span></text:p>
+         <text:p text:style-name="P69"><text:span text:style-name="T75">Prepare</text:span><text:span text:style-name="T71"> – validate/preprocess configuration</text:span></text:p>
         </text:list-item>
        </text:list>
       </text:list-item>
@@ -15806,32 +15802,32 @@
         <text:list-item>
          <text:list>
           <text:list-item>
-           <text:p text:style-name="P69"><text:span text:style-name="T72">Perhaps allocating resources</text:span></text:p>
+           <text:p text:style-name="P69"><text:span text:style-name="T71">Perhaps allocating resources</text:span></text:p>
           </text:list-item>
           <text:list-item>
-           <text:p text:style-name="P69"><text:span text:style-name="T72">Minimizing “start” latency when started/switched later</text:span></text:p>
+           <text:p text:style-name="P69"><text:span text:style-name="T71">Minimizing “start” latency when started/switched later</text:span></text:p>
           </text:list-item>
          </text:list>
         </text:list-item>
         <text:list-item>
-         <text:p text:style-name="P69"><text:span text:style-name="T76">Start</text:span><text:span text:style-name="T72"> – make operational</text:span></text:p>
+         <text:p text:style-name="P69"><text:span text:style-name="T75">Start</text:span><text:span text:style-name="T71"> – make operational</text:span></text:p>
         </text:list-item>
         <text:list-item>
-         <text:p text:style-name="P69"><text:span text:style-name="T76">Stop</text:span><text:span text:style-name="T72"> – suspend operation of the configuration</text:span></text:p>
+         <text:p text:style-name="P69"><text:span text:style-name="T75">Stop</text:span><text:span text:style-name="T71"> – suspend operation of the configuration</text:span></text:p>
         </text:list-item>
         <text:list-item>
-         <text:p text:style-name="P69"><text:span text:style-name="T76">Release</text:span><text:span text:style-name="T72"> — release any resources, make “inactive”.</text:span></text:p>
+         <text:p text:style-name="P69"><text:span text:style-name="T75">Release</text:span><text:span text:style-name="T71"> — release any resources, make “inactive”.</text:span></text:p>
         </text:list-item>
        </text:list>
       </text:list-item>
       <text:list-item>
-       <text:p text:style-name="P69"><text:span text:style-name="T72">Action properties are set with the configuration ordinal as value</text:span></text:p>
+       <text:p text:style-name="P69"><text:span text:style-name="T71">Action properties are set with the configuration ordinal as value</text:span></text:p>
       </text:list-item>
       <text:list-item>
        <text:p text:style-name="P69"><text:span text:style-name="T18">Static starting in app XML is just (for starting configuration 0):</text:span></text:p>
        <text:list>
         <text:list-item>
-         <text:p text:style-name="P69"><text:span text:style-name="T77">&lt;property name=‘start’ value=‘0’/&gt;</text:span></text:p>
+         <text:p text:style-name="P69"><text:span text:style-name="T76">&lt;property name=‘start’ value=‘0’/&gt;</text:span></text:p>
         </text:list-item>
        </text:list>
       </text:list-item>
@@ -15839,7 +15835,7 @@
        <text:p text:style-name="P69"><text:span text:style-name="T18">Dynamic code example:</text:span></text:p>
        <text:list>
         <text:list-item>
-         <text:p text:style-name="P69"><text:span text:style-name="T77">OA::Property start(app, “drc”, “start”);</text:span><text:span text:style-name="T77"><text:line-break/></text:span><text:span text:style-name="T77">…</text:span><text:span text:style-name="T77"><text:line-break/></text:span><text:span text:style-name="T77">start.setValue(1); // start configuration 1</text:span></text:p>
+         <text:p text:style-name="P69"><text:span text:style-name="T76">OA::Property start(app, “drc”, “start”);</text:span><text:span text:style-name="T76"><text:line-break/></text:span><text:span text:style-name="T76">…</text:span><text:span text:style-name="T76"><text:line-break/></text:span><text:span text:style-name="T76">start.setValue(1); // start configuration 1</text:span></text:p>
         </text:list-item>
        </text:list>
       </text:list-item>
@@ -15882,48 +15878,48 @@
        <text:p text:style-name="P74"><text:span text:style-name="T20">Configurations can be modified in any state; changes do not take immediate effect.</text:span></text:p>
       </text:list-item>
       <text:list-item>
-       <text:p text:style-name="P74"><text:span text:style-name="T20">Initial state is </text:span><text:span text:style-name="T78">inactive</text:span><text:span text:style-name="T20">, allowed operations are:</text:span></text:p>
+       <text:p text:style-name="P74"><text:span text:style-name="T20">Initial state is </text:span><text:span text:style-name="T77">inactive</text:span><text:span text:style-name="T20">, allowed operations are:</text:span></text:p>
        <text:list>
         <text:list-item>
          <text:list>
           <text:list-item>
-           <text:p text:style-name="P74"><text:span text:style-name="T79">prepare</text:span><text:span text:style-name="T80">: verify configuration, allocate resources, get ready to start</text:span></text:p>
+           <text:p text:style-name="P74"><text:span text:style-name="T78">prepare</text:span><text:span text:style-name="T79">: verify configuration, allocate resources, get ready to start</text:span></text:p>
           </text:list-item>
           <text:list-item>
-           <text:p text:style-name="P74"><text:span text:style-name="T79">start</text:span><text:span text:style-name="T80">: (implies </text:span><text:span text:style-name="T79">prepare</text:span><text:span text:style-name="T80"> when state is </text:span><text:span text:style-name="T81">inactive</text:span><text:span text:style-name="T80">) make the configuration operational</text:span></text:p>
-           <text:p text:style-name="P74"><text:span text:style-name="T80"/></text:p>
+           <text:p text:style-name="P74"><text:span text:style-name="T78">start</text:span><text:span text:style-name="T79">: (implies </text:span><text:span text:style-name="T78">prepare</text:span><text:span text:style-name="T79"> when state is </text:span><text:span text:style-name="T80">inactive</text:span><text:span text:style-name="T79">) make the configuration operational</text:span></text:p>
+           <text:p text:style-name="P74"><text:span text:style-name="T79"/></text:p>
           </text:list-item>
          </text:list>
         </text:list-item>
        </text:list>
       </text:list-item>
       <text:list-item>
-       <text:p text:style-name="P74"><text:span text:style-name="T20">Next state is </text:span><text:span text:style-name="T78">prepared</text:span><text:span text:style-name="T82">: <text:s/></text:span><text:span text:style-name="T20">ready to be (quickly) </text:span><text:span text:style-name="T83">started</text:span><text:span text:style-name="T20">, allowed operations are:</text:span></text:p>
+       <text:p text:style-name="P74"><text:span text:style-name="T20">Next state is </text:span><text:span text:style-name="T77">prepared</text:span><text:span text:style-name="T81">: <text:s/></text:span><text:span text:style-name="T20">ready to be (quickly) </text:span><text:span text:style-name="T82">started</text:span><text:span text:style-name="T20">, allowed operations are:</text:span></text:p>
        <text:list>
         <text:list-item>
          <text:list>
           <text:list-item>
-           <text:p text:style-name="P74"><text:span text:style-name="T79">start</text:span><text:span text:style-name="T80">: <text:s/>make the configuration operational, </text:span><text:span text:style-name="T81">operating</text:span></text:p>
+           <text:p text:style-name="P74"><text:span text:style-name="T78">start</text:span><text:span text:style-name="T79">: <text:s/>make the configuration operational, </text:span><text:span text:style-name="T80">operating</text:span></text:p>
           </text:list-item>
           <text:list-item>
-           <text:p text:style-name="P74"><text:span text:style-name="T79">release</text:span><text:span text:style-name="T80">: <text:s/>revert to </text:span><text:span text:style-name="T81">inactive</text:span><text:span text:style-name="T80">, releasing any resources</text:span></text:p>
-           <text:p text:style-name="P74"><text:span text:style-name="T80"/></text:p>
+           <text:p text:style-name="P74"><text:span text:style-name="T78">release</text:span><text:span text:style-name="T79">: <text:s/>revert to </text:span><text:span text:style-name="T80">inactive</text:span><text:span text:style-name="T79">, releasing any resources</text:span></text:p>
+           <text:p text:style-name="P74"><text:span text:style-name="T79"/></text:p>
           </text:list-item>
          </text:list>
         </text:list-item>
        </text:list>
       </text:list-item>
       <text:list-item>
-       <text:p text:style-name="P74"><text:span text:style-name="T20">Next state is </text:span><text:span text:style-name="T78">operating</text:span><text:span text:style-name="T20">: <text:s/>channels are active as requested, allowed operations are:</text:span></text:p>
+       <text:p text:style-name="P74"><text:span text:style-name="T20">Next state is </text:span><text:span text:style-name="T77">operating</text:span><text:span text:style-name="T20">: <text:s/>channels are active as requested, allowed operations are:</text:span></text:p>
        <text:list>
         <text:list-item>
          <text:list>
           <text:list-item>
-           <text:p text:style-name="P74"><text:span text:style-name="T79">stop</text:span><text:span text:style-name="T80">: <text:s/>revert to </text:span><text:span text:style-name="T81">prepared</text:span><text:span text:style-name="T80"> state</text:span></text:p>
+           <text:p text:style-name="P74"><text:span text:style-name="T78">stop</text:span><text:span text:style-name="T79">: <text:s/>revert to </text:span><text:span text:style-name="T80">prepared</text:span><text:span text:style-name="T79"> state</text:span></text:p>
           </text:list-item>
           <text:list-item>
-           <text:p text:style-name="P74"><text:span text:style-name="T79">release</text:span><text:span text:style-name="T80">: <text:s/>revert to </text:span><text:span text:style-name="T81">inactive</text:span><text:span text:style-name="T80">, releasing any resources</text:span></text:p>
-           <text:p text:style-name="P74"><text:span text:style-name="T80"/></text:p>
+           <text:p text:style-name="P74"><text:span text:style-name="T78">release</text:span><text:span text:style-name="T79">: <text:s/>revert to </text:span><text:span text:style-name="T80">inactive</text:span><text:span text:style-name="T79">, releasing any resources</text:span></text:p>
+           <text:p text:style-name="P74"><text:span text:style-name="T79"/></text:p>
           </text:list-item>
          </text:list>
         </text:list-item>
@@ -15932,25 +15928,25 @@
      </text:list>
      <text:list text:style-name="L1">
       <text:list-item>
-       <text:p text:style-name="P74"><text:span text:style-name="T84"><text:s text:c="2"/></text:span><text:span text:style-name="T84">Error state is </text:span><text:span text:style-name="T85">error</text:span><text:span text:style-name="T84">: <text:s/></text:span><text:span text:style-name="T86">prepare</text:span><text:span text:style-name="T84"> or </text:span><text:span text:style-name="T86">start</text:span><text:span text:style-name="T84"> failed,</text:span><text:span text:style-name="T84"><text:line-break/></text:span><text:span text:style-name="T84"> <text:s/>allowed operations are:</text:span></text:p>
+       <text:p text:style-name="P74"><text:span text:style-name="T83"><text:s text:c="2"/></text:span><text:span text:style-name="T83">Error state is </text:span><text:span text:style-name="T84">error</text:span><text:span text:style-name="T83">: <text:s/></text:span><text:span text:style-name="T85">prepare</text:span><text:span text:style-name="T83"> or </text:span><text:span text:style-name="T85">start</text:span><text:span text:style-name="T83"> failed,</text:span><text:span text:style-name="T83"><text:line-break/></text:span><text:span text:style-name="T83"> <text:s/>allowed operations are:</text:span></text:p>
        <text:list>
         <text:list-item>
          <text:list>
           <text:list-item>
-           <text:p text:style-name="P74"><text:span text:style-name="T87">prepare, start </text:span><text:span text:style-name="T88">or</text:span><text:span text:style-name="T89"> </text:span><text:span text:style-name="T87">release</text:span></text:p>
+           <text:p text:style-name="P74"><text:span text:style-name="T86">prepare, start </text:span><text:span text:style-name="T87">or</text:span><text:span text:style-name="T88"> </text:span><text:span text:style-name="T86">release</text:span></text:p>
           </text:list-item>
          </text:list>
         </text:list-item>
        </text:list>
-       <text:p text:style-name="P74"><text:span text:style-name="T90"/></text:p>
+       <text:p text:style-name="P74"><text:span text:style-name="T89"/></text:p>
       </text:list-item>
       <text:list-item>
-       <text:p text:style-name="P74"><text:span text:style-name="T91"><text:s text:c="2"/></text:span><text:span text:style-name="T91">Configurations are independent</text:span></text:p>
+       <text:p text:style-name="P74"><text:span text:style-name="T90"><text:s text:c="2"/></text:span><text:span text:style-name="T90">Configurations are independent</text:span></text:p>
        <text:list>
         <text:list-item>
          <text:list>
           <text:list-item>
-           <text:p text:style-name="P74"><text:span text:style-name="T92">prepare</text:span><text:span text:style-name="T93"> or </text:span><text:span text:style-name="T92">start</text:span><text:span text:style-name="T93"> will fail if other </text:span><text:span text:style-name="T94">operating</text:span><text:span text:style-name="T93"><text:line-break/></text:span><text:span text:style-name="T93">configurations cannot be maintained</text:span></text:p>
+           <text:p text:style-name="P74"><text:span text:style-name="T91">prepare</text:span><text:span text:style-name="T92"> or </text:span><text:span text:style-name="T91">start</text:span><text:span text:style-name="T92"> will fail if other </text:span><text:span text:style-name="T93">operating</text:span><text:span text:style-name="T92"><text:line-break/></text:span><text:span text:style-name="T92">configurations cannot be maintained</text:span></text:p>
           </text:list-item>
          </text:list>
         </text:list-item>
@@ -15970,7 +15966,7 @@
      </draw:text-box>
     </draw:frame>
     <draw:custom-shape draw:style-name="gr123" draw:text-style-name="P78" draw:layer="layout" svg:width="2.794cm" svg:height="1.27cm" svg:x="18.288cm" svg:y="10.674cm">
-     <text:p text:style-name="P77"><text:span text:style-name="T95">inactive</text:span></text:p>
+     <text:p text:style-name="P77"><text:span text:style-name="T94">inactive</text:span></text:p>
      <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:path-stretchpoint-x="10800" draw:path-stretchpoint-y="10800" draw:text-areas="?f3 ?f4 ?f5 ?f6" draw:type="round-rectangle" draw:modifiers="3600" draw:enhanced-path="M ?f7 0 X 0 ?f8 L 0 ?f9 Y ?f7 21600 L ?f10 21600 X 21600 ?f9 L 21600 ?f8 Y ?f10 0 Z N">
       <draw:equation draw:name="f0" draw:formula="45"/>
       <draw:equation draw:name="f1" draw:formula="$0 *sin(?f0 *(pi/180))"/>
@@ -15987,7 +15983,7 @@
      </draw:enhanced-geometry>
     </draw:custom-shape>
     <draw:custom-shape draw:style-name="gr124" draw:text-style-name="P78" draw:layer="layout" svg:width="2.74cm" svg:height="1.27cm" svg:x="15.24cm" svg:y="12.968cm">
-     <text:p text:style-name="P77"><text:span text:style-name="T95">prepared</text:span></text:p>
+     <text:p text:style-name="P77"><text:span text:style-name="T94">prepared</text:span></text:p>
      <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:path-stretchpoint-x="10800" draw:path-stretchpoint-y="10800" draw:text-areas="?f3 ?f4 ?f5 ?f6" draw:type="round-rectangle" draw:modifiers="3600" draw:enhanced-path="M ?f7 0 X 0 ?f8 L 0 ?f9 Y ?f7 21600 L ?f10 21600 X 21600 ?f9 L 21600 ?f8 Y ?f10 0 Z N">
       <draw:equation draw:name="f0" draw:formula="45"/>
       <draw:equation draw:name="f1" draw:formula="$0 *sin(?f0 *(pi/180))"/>
@@ -16004,7 +16000,7 @@
      </draw:enhanced-geometry>
     </draw:custom-shape>
     <draw:custom-shape draw:style-name="gr124" draw:text-style-name="P78" draw:layer="layout" svg:width="2.74cm" svg:height="1.27cm" svg:x="21.028cm" svg:y="13.068cm">
-     <text:p text:style-name="P77"><text:span text:style-name="T95">operating</text:span></text:p>
+     <text:p text:style-name="P77"><text:span text:style-name="T94">operating</text:span></text:p>
      <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:path-stretchpoint-x="10800" draw:path-stretchpoint-y="10800" draw:text-areas="?f3 ?f4 ?f5 ?f6" draw:type="round-rectangle" draw:modifiers="3600" draw:enhanced-path="M ?f7 0 X 0 ?f8 L 0 ?f9 Y ?f7 21600 L ?f10 21600 X 21600 ?f9 L 21600 ?f8 Y ?f10 0 Z N">
       <draw:equation draw:name="f0" draw:formula="45"/>
       <draw:equation draw:name="f1" draw:formula="$0 *sin(?f0 *(pi/180))"/>
@@ -16021,7 +16017,7 @@
      </draw:enhanced-geometry>
     </draw:custom-shape>
     <draw:custom-shape draw:style-name="gr125" draw:text-style-name="P78" draw:layer="layout" svg:width="2.286cm" svg:height="1.27cm" svg:x="18.588cm" svg:y="15.578cm">
-     <text:p text:style-name="P77"><text:span text:style-name="T95">error</text:span></text:p>
+     <text:p text:style-name="P77"><text:span text:style-name="T94">error</text:span></text:p>
      <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:path-stretchpoint-x="10800" draw:path-stretchpoint-y="10800" draw:text-areas="?f3 ?f4 ?f5 ?f6" draw:type="round-rectangle" draw:modifiers="3600" draw:enhanced-path="M ?f7 0 X 0 ?f8 L 0 ?f9 Y ?f7 21600 L ?f10 21600 X 21600 ?f9 L 21600 ?f8 Y ?f10 0 Z N">
       <draw:equation draw:name="f0" draw:formula="45"/>
       <draw:equation draw:name="f1" draw:formula="$0 *sin(?f0 *(pi/180))"/>
@@ -16054,34 +16050,34 @@
     </draw:line>
     <draw:frame draw:style-name="gr127" draw:text-style-name="P80" draw:layer="layout" svg:width="10.361cm" svg:height="1.916cm" svg:x="14.678cm" svg:y="16.878cm">
      <draw:text-box>
-      <text:p><text:span text:style-name="T96">release: </text:span><text:span text:style-name="T97"><text:s/>from all states to</text:span><text:span text:style-name="T96"> </text:span><text:span text:style-name="T98">inactive</text:span></text:p>
-      <text:p><text:span text:style-name="T97">failure of </text:span><text:span text:style-name="T96">prepare</text:span><text:span text:style-name="T97"> or </text:span><text:span text:style-name="T96">start</text:span><text:span text:style-name="T98"> </text:span><text:span text:style-name="T97">goes to </text:span><text:span text:style-name="T98">error</text:span></text:p>
-      <text:p><text:span text:style-name="T98"/></text:p>
+      <text:p><text:span text:style-name="T95">release: </text:span><text:span text:style-name="T96"><text:s/>from all states to</text:span><text:span text:style-name="T95"> </text:span><text:span text:style-name="T97">inactive</text:span></text:p>
+      <text:p><text:span text:style-name="T96">failure of </text:span><text:span text:style-name="T95">prepare</text:span><text:span text:style-name="T96"> or </text:span><text:span text:style-name="T95">start</text:span><text:span text:style-name="T97"> </text:span><text:span text:style-name="T96">goes to </text:span><text:span text:style-name="T97">error</text:span></text:p>
+      <text:p><text:span text:style-name="T97"/></text:p>
      </draw:text-box>
     </draw:frame>
     <draw:frame draw:style-name="gr128" draw:text-style-name="P81" draw:layer="layout" svg:width="2.286cm" svg:height="0.806cm" svg:x="17.98cm" svg:y="12.798cm">
      <draw:text-box>
-      <text:p><text:span text:style-name="T99">start</text:span></text:p>
+      <text:p><text:span text:style-name="T98">start</text:span></text:p>
      </draw:text-box>
     </draw:frame>
     <draw:frame draw:style-name="gr128" draw:text-style-name="P81" draw:layer="layout" svg:width="2.286cm" svg:height="0.806cm" svg:x="21.282cm" svg:y="15.238cm">
      <draw:text-box>
-      <text:p><text:span text:style-name="T99">start</text:span></text:p>
+      <text:p><text:span text:style-name="T98">start</text:span></text:p>
      </draw:text-box>
     </draw:frame>
     <draw:frame draw:style-name="gr129" draw:text-style-name="P81" draw:layer="layout" svg:width="2.694cm" svg:height="1.505cm" svg:x="15.194cm" svg:y="11.374cm">
      <draw:text-box>
-      <text:p><text:span text:style-name="T99">prepare</text:span></text:p>
+      <text:p><text:span text:style-name="T98">prepare</text:span></text:p>
      </draw:text-box>
     </draw:frame>
     <draw:frame draw:style-name="gr129" draw:text-style-name="P81" draw:layer="layout" svg:width="2.694cm" svg:height="1.505cm" svg:x="15.54cm" svg:y="15.354cm">
      <draw:text-box>
-      <text:p><text:span text:style-name="T100">pre</text:span><text:span text:style-name="T99">pare</text:span></text:p>
+      <text:p><text:span text:style-name="T99">pre</text:span><text:span text:style-name="T98">pare</text:span></text:p>
      </draw:text-box>
     </draw:frame>
     <draw:frame draw:style-name="gr128" draw:text-style-name="P81" draw:layer="layout" svg:width="2.286cm" svg:height="0.806cm" svg:x="22.298cm" svg:y="11.798cm">
      <draw:text-box>
-      <text:p><text:span text:style-name="T99">start</text:span></text:p>
+      <text:p><text:span text:style-name="T98">start</text:span></text:p>
      </draw:text-box>
     </draw:frame>
     <presentation:notes draw:style-name="dp4">
@@ -16109,46 +16105,46 @@
     <draw:custom-shape draw:name="TextShape 2" draw:style-name="gr131" draw:text-style-name="P83" draw:layer="layout" svg:width="24.774cm" svg:height="16.45cm" svg:x="0.625cm" svg:y="1.853cm">
      <text:list text:style-name="L27">
       <text:list-item>
-       <text:p text:style-name="P82"><text:span text:style-name="T72">If the system is a “radio”, the DRC proxy is part of the OSP</text:span></text:p>
-       <text:p text:style-name="P82"><text:span text:style-name="T72"/></text:p>
+       <text:p text:style-name="P82"><text:span text:style-name="T20">If the system is a “radio”, the DRC proxy is part of the OSP</text:span></text:p>
+       <text:p text:style-name="P82"><text:span text:style-name="T20"/></text:p>
       </text:list-item>
       <text:list-item>
-       <text:p text:style-name="P82"><text:span text:style-name="T72">The DRC proxy manages device workers related to RF I/O</text:span></text:p>
-       <text:p text:style-name="P82"><text:span text:style-name="T72"/></text:p>
+       <text:p text:style-name="P82"><text:span text:style-name="T20">The DRC proxy manages device workers related to RF I/O</text:span></text:p>
+       <text:p text:style-name="P82"><text:span text:style-name="T20"/></text:p>
       </text:list-item>
       <text:list-item>
-       <text:p text:style-name="P82"><text:span text:style-name="T72">The DRC translates channel configurations into device-level settings</text:span></text:p>
+       <text:p text:style-name="P82"><text:span text:style-name="T20">The DRC translates channel configurations into device-level settings</text:span></text:p>
        <text:list>
         <text:list-item>
-         <text:p text:style-name="P82"><text:span text:style-name="T72">Clock generation</text:span></text:p>
+         <text:p text:style-name="P82"><text:span text:style-name="T20">Clock generation</text:span></text:p>
         </text:list-item>
         <text:list-item>
-         <text:p text:style-name="P82"><text:span text:style-name="T72">RF muxing and switching</text:span></text:p>
+         <text:p text:style-name="P82"><text:span text:style-name="T20">RF muxing and switching</text:span></text:p>
         </text:list-item>
         <text:list-item>
-         <text:p text:style-name="P82"><text:span text:style-name="T72">Hardware-based RF filtering</text:span></text:p>
+         <text:p text:style-name="P82"><text:span text:style-name="T20">Hardware-based RF filtering</text:span></text:p>
         </text:list-item>
         <text:list-item>
-         <text:p text:style-name="P82"><text:span text:style-name="T72">Hardware-based tuning and resampling</text:span></text:p>
-         <text:p text:style-name="P82"><text:span text:style-name="T72"/></text:p>
+         <text:p text:style-name="P82"><text:span text:style-name="T20">Hardware-based tuning and resampling</text:span></text:p>
+         <text:p text:style-name="P82"><text:span text:style-name="T20"/></text:p>
         </text:list-item>
        </text:list>
       </text:list-item>
       <text:list-item>
-       <text:p text:style-name="P82"><text:span text:style-name="T72">When possible, it manages and detects conflicts between settings</text:span></text:p>
+       <text:p text:style-name="P82"><text:span text:style-name="T20">When possible, it manages and detects conflicts between settings</text:span></text:p>
        <text:list>
         <text:list-item>
-         <text:p text:style-name="P82"><text:span text:style-name="T72">I.e. if channel 1 is programmed for X, channel 2 cannot be Y</text:span></text:p>
-         <text:p text:style-name="P82"><text:span text:style-name="T72"/></text:p>
+         <text:p text:style-name="P82"><text:span text:style-name="T20">I.e. if channel 1 is programmed for X, channel 2 cannot be Y</text:span></text:p>
+         <text:p text:style-name="P82"><text:span text:style-name="T20"/></text:p>
         </text:list-item>
        </text:list>
       </text:list-item>
       <text:list-item>
-       <text:p text:style-name="P82"><text:span text:style-name="T72">When needed, uses DSP workers for tuning/resampling</text:span></text:p>
-       <text:p text:style-name="P82"><text:span text:style-name="T72"/></text:p>
+       <text:p text:style-name="P82"><text:span text:style-name="T20">When needed, uses DSP workers for tuning/resampling</text:span></text:p>
+       <text:p text:style-name="P82"><text:span text:style-name="T20"/></text:p>
       </text:list-item>
       <text:list-item>
-       <text:p text:style-name="P82"><text:span text:style-name="T72">See section in the </text:span><text:span text:style-name="T74">OpenCPI Platform Developement Guide</text:span></text:p>
+       <text:p text:style-name="P82"><text:span text:style-name="T20">See the section “Supporting the Digital Radio Controller (DRC) Component Specification” in the </text:span><text:span text:style-name="T81"><text:a xlink:href="https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Platform_Development_Guide.pdf" xlink:type="simple">OpenCPI Platform Development Guide</text:a></text:span></text:p>
       </text:list-item>
      </text:list>
      <draw:enhanced-geometry draw:mirror-horizontal="false" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 0 ?f3 ?f2" draw:type="ooxml-rect" draw:enhanced-path="M 0 0 L ?f3 0 ?f3 ?f2 0 ?f2 Z N">
@@ -16183,7 +16179,7 @@
     <draw:custom-shape draw:name="TextShape 2" draw:style-name="gr133" draw:text-style-name="P86" draw:layer="layout" svg:width="23.652cm" svg:height="1.478cm" svg:x="0.625cm" svg:y="1.853cm">
      <text:list text:style-name="L12">
       <text:list-item>
-       <text:p text:style-name="P85"><text:span text:style-name="T101">How the DRC is implemented for a radio (notionally).</text:span></text:p>
+       <text:p text:style-name="P85"><text:span text:style-name="T100">How the DRC is implemented for a radio (notionally).</text:span></text:p>
       </text:list-item>
       <text:list-item>
        <text:p text:style-name="P85"><text:span text:style-name="T18">App XML has DRC instance</text:span></text:p>
@@ -16355,7 +16351,7 @@
      </draw:enhanced-geometry>
     </draw:custom-shape>
     <draw:custom-shape draw:name="Rounded Rectangle 11" draw:style-name="gr139" draw:text-style-name="P89" draw:layer="layout" svg:width="12.699cm" svg:height="0.874cm" svg:x="12.072cm" svg:y="10.436cm">
-     <text:p text:style-name="P23"><text:span text:style-name="T102">Transceiver Vendor Library (C)</text:span></text:p>
+     <text:p text:style-name="P23"><text:span text:style-name="T101">Transceiver Vendor Library (C)</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="false" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="?f5 ?f5 ?f6 ?f7" draw:type="ooxml-roundRect" draw:modifiers="16667" draw:enhanced-path="M 0 ?f2 L ?f3 0 L ?f11 ?f4 L ?f2 ?f10 Z N" drawooo:enhanced-path="M 0 ?f2 G ?f2 ?f2 ?f12 ?f13 L ?f3 0 G ?f2 ?f2 ?f14 ?f15 L ?f11 ?f4 G ?f2 ?f2 ?f16 ?f17 L ?f2 ?f10 G ?f2 ?f2 ?f18 ?f19 Z N">
       <draw:equation draw:name="f0" draw:formula="if(0-$0 ,0,if(50000-$0 ,$0 ,50000))"/>
       <draw:equation draw:name="f1" draw:formula="min(logwidth,logheight)"/>
@@ -16459,7 +16455,7 @@
      </draw:enhanced-geometry>
     </draw:custom-shape>
     <draw:custom-shape draw:name="Rounded Rectangle 15" draw:style-name="gr143" draw:text-style-name="P89" draw:layer="layout" svg:width="12.699cm" svg:height="0.874cm" svg:x="12.072cm" svg:y="16.02cm">
-     <text:p text:style-name="P23"><text:span text:style-name="T102">Transceiver Device</text:span></text:p>
+     <text:p text:style-name="P23"><text:span text:style-name="T101">Transceiver Device</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="false" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="?f5 ?f5 ?f6 ?f7" draw:type="ooxml-roundRect" draw:modifiers="16667" draw:enhanced-path="M 0 ?f2 L ?f3 0 L ?f11 ?f4 L ?f2 ?f10 Z N" drawooo:enhanced-path="M 0 ?f2 G ?f2 ?f2 ?f12 ?f13 L ?f3 0 G ?f2 ?f2 ?f14 ?f15 L ?f11 ?f4 G ?f2 ?f2 ?f16 ?f17 L ?f2 ?f10 G ?f2 ?f2 ?f18 ?f19 Z N">
       <draw:equation draw:name="f0" draw:formula="if(0-$0 ,0,if(50000-$0 ,$0 ,50000))"/>
       <draw:equation draw:name="f1" draw:formula="min(logwidth,logheight)"/>
@@ -16485,7 +16481,7 @@
      </draw:enhanced-geometry>
     </draw:custom-shape>
     <draw:custom-shape draw:name="Rounded Rectangle 16" draw:style-name="gr144" draw:text-style-name="P89" draw:layer="layout" svg:width="5.292cm" svg:height="0.874cm" svg:x="19.858cm" svg:y="17.446cm">
-     <text:p text:style-name="P23"><text:span text:style-name="T102">Vendor Supplied</text:span></text:p>
+     <text:p text:style-name="P23"><text:span text:style-name="T101">Vendor Supplied</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="false" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="?f5 ?f5 ?f6 ?f7" draw:type="ooxml-roundRect" draw:modifiers="16667" draw:enhanced-path="M 0 ?f2 L ?f3 0 L ?f11 ?f4 L ?f2 ?f10 Z N" drawooo:enhanced-path="M 0 ?f2 G ?f2 ?f2 ?f12 ?f13 L ?f3 0 G ?f2 ?f2 ?f14 ?f15 L ?f11 ?f4 G ?f2 ?f2 ?f16 ?f17 L ?f2 ?f10 G ?f2 ?f2 ?f18 ?f19 Z N">
       <draw:equation draw:name="f0" draw:formula="if(0-$0 ,0,if(50000-$0 ,$0 ,50000))"/>
       <draw:equation draw:name="f1" draw:formula="min(logwidth,logheight)"/>
@@ -16608,7 +16604,7 @@
     <draw:custom-shape draw:name="TextShape 2" draw:style-name="gr149" draw:text-style-name="P86" draw:layer="layout" svg:width="23.652cm" svg:height="1.478cm" svg:x="0.625cm" svg:y="1.853cm">
      <text:list text:style-name="L12">
       <text:list-item>
-       <text:p text:style-name="P85"><text:span text:style-name="T101">How the DRC is implemented for a radio.</text:span></text:p>
+       <text:p text:style-name="P85"><text:span text:style-name="T100">How the DRC is implemented for a radio.</text:span></text:p>
       </text:list-item>
       <text:list-item>
        <text:p text:style-name="P85"><text:span text:style-name="T18">App XML has DRC instance</text:span></text:p>
@@ -16617,13 +16613,13 @@
        <text:p text:style-name="P85"><text:span text:style-name="T18">App deployment finds DRC proxy</text:span></text:p>
       </text:list-item>
       <text:list-item>
-       <text:p text:style-name="P85"><text:span text:style-name="T103">DRC proxy written for radio</text:span></text:p>
+       <text:p text:style-name="P85"><text:span text:style-name="T102">DRC proxy written for radio</text:span></text:p>
       </text:list-item>
       <text:list-item>
        <text:p text:style-name="P85"><text:span text:style-name="T18">DRC generic proxy helper code</text:span></text:p>
       </text:list-item>
       <text:list-item>
-       <text:p text:style-name="P85"><text:span text:style-name="T103">DRC proxy helper: Xcvr/HW</text:span></text:p>
+       <text:p text:style-name="P85"><text:span text:style-name="T102">DRC proxy helper: Xcvr/HW</text:span></text:p>
       </text:list-item>
       <text:list-item>
        <text:p text:style-name="P85"><text:span text:style-name="T18">E.g. AD9361 NO-OS helper library</text:span></text:p>
@@ -16632,7 +16628,7 @@
        <text:p text:style-name="P85"><text:span text:style-name="T18">Control plane to access HW</text:span></text:p>
       </text:list-item>
       <text:list-item>
-       <text:p text:style-name="P85"><text:span text:style-name="T103">Device worker for Xcvr</text:span></text:p>
+       <text:p text:style-name="P85"><text:span text:style-name="T102">Device worker for Xcvr</text:span></text:p>
       </text:list-item>
       <text:list-item>
        <text:p text:style-name="P85"><text:span text:style-name="T18">Generic SPI/I2C support</text:span></text:p>
@@ -16780,7 +16776,7 @@
      </draw:enhanced-geometry>
     </draw:custom-shape>
     <draw:custom-shape draw:name="Rounded Rectangle 11" draw:style-name="gr155" draw:text-style-name="P89" draw:layer="layout" svg:width="12.699cm" svg:height="0.874cm" svg:x="12.072cm" svg:y="10.436cm">
-     <text:p text:style-name="P23"><text:span text:style-name="T102">Transceiver Vendor Library (C)</text:span></text:p>
+     <text:p text:style-name="P23"><text:span text:style-name="T101">Transceiver Vendor Library (C)</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="false" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="?f5 ?f5 ?f6 ?f7" draw:type="ooxml-roundRect" draw:modifiers="16667" draw:enhanced-path="M 0 ?f2 L ?f3 0 L ?f11 ?f4 L ?f2 ?f10 Z N" drawooo:enhanced-path="M 0 ?f2 G ?f2 ?f2 ?f12 ?f13 L ?f3 0 G ?f2 ?f2 ?f14 ?f15 L ?f11 ?f4 G ?f2 ?f2 ?f16 ?f17 L ?f2 ?f10 G ?f2 ?f2 ?f18 ?f19 Z N">
       <draw:equation draw:name="f0" draw:formula="if(0-$0 ,0,if(50000-$0 ,$0 ,50000))"/>
       <draw:equation draw:name="f1" draw:formula="min(logwidth,logheight)"/>
@@ -16884,7 +16880,7 @@
      </draw:enhanced-geometry>
     </draw:custom-shape>
     <draw:custom-shape draw:name="Rounded Rectangle 15" draw:style-name="gr159" draw:text-style-name="P89" draw:layer="layout" svg:width="12.699cm" svg:height="0.874cm" svg:x="12.072cm" svg:y="16.02cm">
-     <text:p text:style-name="P23"><text:span text:style-name="T102">Transceiver Device</text:span></text:p>
+     <text:p text:style-name="P23"><text:span text:style-name="T101">Transceiver Device</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="false" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="?f5 ?f5 ?f6 ?f7" draw:type="ooxml-roundRect" draw:modifiers="16667" draw:enhanced-path="M 0 ?f2 L ?f3 0 L ?f11 ?f4 L ?f2 ?f10 Z N" drawooo:enhanced-path="M 0 ?f2 G ?f2 ?f2 ?f12 ?f13 L ?f3 0 G ?f2 ?f2 ?f14 ?f15 L ?f11 ?f4 G ?f2 ?f2 ?f16 ?f17 L ?f2 ?f10 G ?f2 ?f2 ?f18 ?f19 Z N">
       <draw:equation draw:name="f0" draw:formula="if(0-$0 ,0,if(50000-$0 ,$0 ,50000))"/>
       <draw:equation draw:name="f1" draw:formula="min(logwidth,logheight)"/>
@@ -16910,7 +16906,7 @@
      </draw:enhanced-geometry>
     </draw:custom-shape>
     <draw:custom-shape draw:name="Rounded Rectangle 16" draw:style-name="gr160" draw:text-style-name="P89" draw:layer="layout" svg:width="5.292cm" svg:height="0.874cm" svg:x="19.858cm" svg:y="17.446cm">
-     <text:p text:style-name="P23"><text:span text:style-name="T102">Vendor Supplied</text:span></text:p>
+     <text:p text:style-name="P23"><text:span text:style-name="T101">Vendor Supplied</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="false" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="?f5 ?f5 ?f6 ?f7" draw:type="ooxml-roundRect" draw:modifiers="16667" draw:enhanced-path="M 0 ?f2 L ?f3 0 L ?f11 ?f4 L ?f2 ?f10 Z N" drawooo:enhanced-path="M 0 ?f2 G ?f2 ?f2 ?f12 ?f13 L ?f3 0 G ?f2 ?f2 ?f14 ?f15 L ?f11 ?f4 G ?f2 ?f2 ?f16 ?f17 L ?f2 ?f10 G ?f2 ?f2 ?f18 ?f19 Z N">
       <draw:equation draw:name="f0" draw:formula="if(0-$0 ,0,if(50000-$0 ,$0 ,50000))"/>
       <draw:equation draw:name="f1" draw:formula="min(logwidth,logheight)"/>
@@ -17038,7 +17034,7 @@
      </draw:enhanced-geometry>
     </draw:custom-shape>
     <draw:custom-shape draw:name="TextBox 3" draw:style-name="gr165" draw:text-style-name="P26" draw:layer="layout" svg:width="3.266cm" svg:height="1.775cm" svg:x="21.294cm" svg:y="14.255cm">
-     <text:p text:style-name="P25"><text:span text:style-name="T102">Digital</text:span><text:span text:style-name="T102"><text:line-break/></text:span><text:span text:style-name="T102">Datapath</text:span></text:p>
+     <text:p text:style-name="P25"><text:span text:style-name="T101">Digital</text:span><text:span text:style-name="T101"><text:line-break/></text:span><text:span text:style-name="T101">Datapath</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="false" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 0 ?f3 ?f2" draw:type="ooxml-rect" draw:enhanced-path="M 0 0 L ?f3 0 ?f3 ?f2 0 ?f2 Z N">
       <draw:equation draw:name="f0" draw:formula="logwidth/2"/>
       <draw:equation draw:name="f1" draw:formula="logheight/2"/>
@@ -17066,17 +17062,17 @@
     <draw:custom-shape draw:name="TextShape 2" draw:style-name="gr167" draw:text-style-name="P91" draw:layer="layout" svg:width="24.774cm" svg:height="15.041cm" svg:x="0.625cm" svg:y="1.853cm">
      <text:list text:style-name="L30">
       <text:list-item>
-       <text:p text:style-name="P90"><text:span text:style-name="T72">Device workers developed and tested without/before DRC support</text:span></text:p>
+       <text:p text:style-name="P90"><text:span text:style-name="T71">Device workers developed and tested without/before DRC support</text:span></text:p>
       </text:list-item>
      </text:list>
      <text:list text:style-name="L31">
       <text:list-item>
        <text:list>
         <text:list-item>
-         <text:p text:style-name="P90"><text:span text:style-name="T72">Using direct/explicit configuration properties</text:span></text:p>
+         <text:p text:style-name="P90"><text:span text:style-name="T71">Using direct/explicit configuration properties</text:span></text:p>
         </text:list-item>
         <text:list-item>
-         <text:p text:style-name="P90"><text:span text:style-name="T72">Should be developed and tested first</text:span></text:p>
+         <text:p text:style-name="P90"><text:span text:style-name="T71">Should be developed and tested first</text:span></text:p>
         </text:list-item>
        </text:list>
       </text:list-item>
@@ -17084,13 +17080,13 @@
      <text:p text:style-name="P90"><text:span text:style-name="T24"/></text:p>
      <text:list text:style-name="L13">
       <text:list-item>
-       <text:p text:style-name="P90"><text:span text:style-name="T72">Use OpenCPI Helper Device workers for digital data path</text:span></text:p>
+       <text:p text:style-name="P90"><text:span text:style-name="T71">Use OpenCPI Helper Device workers for digital data path</text:span></text:p>
        <text:list>
         <text:list-item>
-         <text:p text:style-name="P90"><text:span text:style-name="T72">Attached to data_{src,sink}_{q}{adc,dac}</text:span></text:p>
+         <text:p text:style-name="P90"><text:span text:style-name="T71">Attached to data_{src,sink}_{q}{adc,dac}</text:span></text:p>
         </text:list-item>
         <text:list-item>
-         <text:p text:style-name="P90"><text:span text:style-name="T72">Timestamper, timegate</text:span></text:p>
+         <text:p text:style-name="P90"><text:span text:style-name="T71">Timestamper, timegate</text:span></text:p>
         </text:list-item>
        </text:list>
       </text:list-item>
@@ -17098,20 +17094,20 @@
      <text:p text:style-name="P90"><text:span text:style-name="T24"/></text:p>
      <text:list text:continue-numbering="true" text:style-name="L13">
       <text:list-item>
-       <text:p text:style-name="P90"><text:span text:style-name="T72">Device workers for configuring transceivers (register access)</text:span></text:p>
+       <text:p text:style-name="P90"><text:span text:style-name="T71">Device workers for configuring transceivers (register access)</text:span></text:p>
       </text:list-item>
      </text:list>
      <text:p text:style-name="P90"><text:span text:style-name="T24"/></text:p>
      <text:list text:continue-numbering="true" text:style-name="L13">
       <text:list-item>
-       <text:p text:style-name="P90"><text:span text:style-name="T72">Device workers for external clock generators etc.</text:span></text:p>
-       <text:p text:style-name="P90"><text:span text:style-name="T72"/></text:p>
+       <text:p text:style-name="P90"><text:span text:style-name="T71">Device workers for external clock generators etc.</text:span></text:p>
+       <text:p text:style-name="P90"><text:span text:style-name="T71"/></text:p>
       </text:list-item>
       <text:list-item>
-       <text:p text:style-name="P90"><text:span text:style-name="T72">Then the DRC proxy XML specifies a slave assembly:</text:span></text:p>
+       <text:p text:style-name="P90"><text:span text:style-name="T71">Then the DRC proxy XML specifies a slave assembly:</text:span></text:p>
        <text:list>
         <text:list-item>
-         <text:p text:style-name="P90"><text:span text:style-name="T72">Which workers, which properties, how they are connected</text:span></text:p>
+         <text:p text:style-name="P90"><text:span text:style-name="T71">Which workers, which properties, how they are connected</text:span></text:p>
         </text:list-item>
        </text:list>
       </text:list-item>
@@ -17169,7 +17165,7 @@
        <text:p text:style-name="P92"><text:span text:style-name="T18">There is a helper header file and class for all DRC proxies:</text:span></text:p>
        <text:list>
         <text:list-item>
-         <text:p text:style-name="P92"><text:span text:style-name="T104">#include “OcpiDrcProxy.hh”</text:span></text:p>
+         <text:p text:style-name="P92"><text:span text:style-name="T103">#include “OcpiDrcProxy.hh”</text:span></text:p>
         </text:list-item>
         <text:list-item>
          <text:p text:style-name="P92"><text:span text:style-name="T18">See drc_plutosdr.rcc as an example</text:span></text:p>
@@ -17238,24 +17234,24 @@
     <draw:custom-shape draw:name="TextShape 2" draw:style-name="gr171" draw:text-style-name="P96" draw:layer="layout" svg:width="24.774cm" svg:height="15.041cm" svg:x="0.625cm" svg:y="2.553cm">
      <text:list text:style-name="L12">
       <text:list-item>
-       <text:p text:style-name="P95"><text:span text:style-name="T72">DRC is a component, with a component specification</text:span></text:p>
+       <text:p text:style-name="P95"><text:span text:style-name="T71">DRC is a component, with a component specification</text:span></text:p>
        <text:p text:style-name="P95"><text:span text:style-name="T18"/></text:p>
       </text:list-item>
       <text:list-item>
-       <text:p text:style-name="P95"><text:span text:style-name="T72">Provides applications access to radio hardware, with ports and properties.</text:span></text:p>
+       <text:p text:style-name="P95"><text:span text:style-name="T71">Provides applications access to radio hardware, with ports and properties.</text:span></text:p>
        <text:p text:style-name="P95"><text:span text:style-name="T18"/></text:p>
       </text:list-item>
       <text:list-item>
-       <text:p text:style-name="P95"><text:span text:style-name="T72">Implements channels between RF ports and App ports.</text:span></text:p>
+       <text:p text:style-name="P95"><text:span text:style-name="T71">Implements channels between RF ports and App ports.</text:span></text:p>
        <text:p text:style-name="P95"><text:span text:style-name="T18"/></text:p>
       </text:list-item>
       <text:list-item>
-       <text:p text:style-name="P95"><text:span text:style-name="T72">DRC implementations are proxies that use underlying workers to access and control various hardware and DSP elements</text:span></text:p>
+       <text:p text:style-name="P95"><text:span text:style-name="T71">DRC implementations are proxies that use underlying workers to access and control various hardware and DSP elements</text:span></text:p>
        <text:p text:style-name="P95"><text:span text:style-name="T18"/></text:p>
       </text:list-item>
       <text:list-item>
-       <text:p text:style-name="P95"><text:span text:style-name="T72">Platform developers create DRC proxies as part of OSPs for radios</text:span></text:p>
-       <text:p text:style-name="P95"><text:span text:style-name="T72"/></text:p>
+       <text:p text:style-name="P95"><text:span text:style-name="T71">Platform developers create DRC proxies as part of OSPs for radios</text:span></text:p>
+       <text:p text:style-name="P95"><text:span text:style-name="T71"/></text:p>
       </text:list-item>
      </text:list>
      <draw:enhanced-geometry draw:mirror-horizontal="false" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 0 ?f3 ?f2" draw:type="ooxml-rect" draw:enhanced-path="M 0 0 L ?f3 0 ?f3 ?f2 0 ?f2 Z N">

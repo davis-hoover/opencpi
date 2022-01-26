@@ -31,7 +31,7 @@
 #ifndef UT_ZEROCOPY_IO_WORKERS_H
 #define UT_ZEROCOPY_IO_WORKERS_H
 
-#include <RCC_Worker.h>
+#include "RCC_Worker.hh"
 
 #ifdef __cplusplus
 using namespace OCPI::RCC;

@@ -37,8 +37,8 @@ import sys; sys.path.insert(0,\"$OCPI_CDK_DIR/scripts/\");
 import ocpiassets; print(ocpiassets.Registry.get_registry_dir());"
   elif [ -n "$OCPI_PROJECT_REGISTRY_DIR" ]; then
     echo $OCPI_PROJECT_REGISTRY_DIR
-  elif [ -n "$OCPI_CDK_DIR" ]; then
-    # Return default registry relative to CDK
+  elif [ -n "$OCPI_ROOT_DIR" ]; then
+    # Return default registry relative to ROOT
     echo $OCPI_ROOT_DIR/project-registry
   else
     # Return default global registry installation location
@@ -266,6 +266,21 @@ function checkAssetName {
   elif [[ "$aname" =~ ^_ || "$aname" =~ ^[0-9] ]]; then
     bad asset name \"$aname\" begins with an illegal character
   fi
+}
+
+function getSoName {
+    if [ "$(uname -s)" = Darwin ]; then
+      otool -D -X $1 | sed 's=.*/=='
+    else
+      patchelf --print-soname $1
+    fi
+}
+function setSoName {
+    if [ "$(uname -s)" = Darwin ]; then
+      install_name_tool -id $1 $2
+    else
+      patchelf --set-soname $1 $2
+    fi
 }
 
 if [ "$1" = __test__ ] ; then

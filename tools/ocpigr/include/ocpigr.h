@@ -1,22 +1,23 @@
 #ifndef OCPIGR_H
 #define OCPIGR_H
 
-// OCPI headers
-#include "OcpiDriverManager.h"   // OCPI::Driver::ManagerManager::suppressDiscovery
-#include "OcpiLibraryManager.h"  // OL::* stuff
+// System headers
+#include <string>          // std::string
+#include <vector>          // std::vector
 
 // 3rd party headers
 #include <yaml-cpp/yaml.h> // YAML::Emitter
 
-// System headers
-#include <string>          // std::string
-#include <vector>          // std::vector
+// OCPI headers
+#include "BasePluginManager.hh"   // OCPI::Driver::ManagerManager::suppressDiscovery
+#include "LibraryManager.hh"  // OL::* stuff
 
 
 namespace OA = OCPI::API;
 namespace OL = OCPI::Library;
 namespace OS = OCPI::OS;
 namespace OU = OCPI::Util;
+namespace OM = OCPI::Metadata;
 
 typedef std::set<std::string> StringSet;
 typedef StringSet::const_iterator StringSetIter;
@@ -35,7 +36,7 @@ class OcpigrObj {
     int numWorkers;
     std::map<std::string, StringSet> specToPlatforms;
     std::map<std::string, std::string> platformToModel;
-    std::map<std::string, std::map<std::string, std::set<OU::Property *>>> workerSpecificProperties;
+    std::map<std::string, std::map<std::string, std::set<OM::Property *>>> workerSpecificProperties;
     StringSet specs;
 
     // Private functions for genPlatformBlocks
@@ -43,13 +44,13 @@ class OcpigrObj {
   
     // Private functions for genOcpiBlockTree
     std::vector<std::string> splitString(std::string, std::string);
-    int compareBlockVectors(std::vector<std::string>&, std::vector<std::string>&);
-    void createTreeSeq(YAML::Emitter&, std::vector<std::string>&, int&);
-    void endTreeSeq(YAML::Emitter&, int&);
+    size_t compareBlockVectors(std::vector<std::string>&, std::vector<std::string>&);
+    void createTreeSeq(YAML::Emitter&, std::vector<std::string>&, size_t&);
+    void endTreeSeq(YAML::Emitter&, size_t&);
 
     // Private functions for genWorkerBlocks
-    void addProperty(YAML::Emitter&, OU::Worker&, OU::Property*);
-    const char* incompatibleType(OU::Worker&, const char*, const char*);
+    void addProperty(YAML::Emitter&, OM::Worker&, OM::Property*);
+    const char* incompatibleType(OM::Worker&, const char*, const char*);
 
   public:
     // Constructor
@@ -62,7 +63,7 @@ class OcpigrObj {
     { }
 
     // Public Functions for mymain
-    void genWorkerBlocks(OU::Worker&);
+    void genWorkerBlocks(OM::Worker&);
     void genOcpiBlockTree(void);
     void genContainerBlock(void);  
 };

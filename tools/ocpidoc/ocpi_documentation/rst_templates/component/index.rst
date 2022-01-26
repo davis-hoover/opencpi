@@ -97,4 +97,6 @@ Limitations of ``%%NAME-CODE%%`` are:
 
 Testing
 -------
+.. ocpi_documentation_test_platforms::
+
 .. ocpi_documentation_test_result_summary::

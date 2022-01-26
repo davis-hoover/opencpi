@@ -169,7 +169,7 @@
 }
 %typemap(typecheck) const OCPI::API::PValue * {
 }
-%typemap(in) const OCPI::API::PValue * (OU::PValueList temppv) {
+%typemap(in) const OCPI::API::PValue * (OB::PValueList temppv) {
   if ($input != Py_None) {
     SWIG_contract_assert(PyDict_Check($input),
 			 "const OCPI::API::PValue* arguments must be python dictionaries");
@@ -179,7 +179,7 @@
       SWIG_contract_assert(PyUnicode_Check(key),
 			   "const OCPI::API::PValue* dictionary keys must be strings");
       const char *name = PyUnicode_AsUTF8(key);
-      const OCPI::Util::PValue *pv = OU::find(OU::allPVParams, name);
+      const OCPI::Base::PValue *pv = OB::find(OB::allPVParams, name);
       std::string msg;
       if (!pv) {
 	OU::format(msg, "unknown PValue name: \"%s\"", name);
@@ -219,13 +219,14 @@
 
 %{
 #include <climits>
-#include "OcpiApi.h"
-#include "OcpiPValue.h"
-#include "OcpiUtilMisc.h"
+#include "OcpiApi.hh"
+#include "BasePValue.hh"
+#include "UtilMisc.hh"
   namespace OA=OCPI::API;
   namespace OU=OCPI::Util;
+  namespace OB=OCPI::Base;
   // Convert python type to PV given, return true on error
-  bool python2PValue(const char *name, OA::BaseType type, PyObject *value, OU::PValueList &list) {
+  bool python2PValue(const char *name, OA::BaseType type, PyObject *value, OB::PValueList &list) {
     int check;
     switch (type) {
     case OA::OCPI_Bool:
@@ -361,11 +362,11 @@
 // swig doesn't try to create a setter for it
 %immutable OCPI::API::Property::m_info;
 
-%include "OcpiUtilDataTypesApi.h"
-%include "OcpiPValueApi.h"
-%include "OcpiUtilPropertyApi.h"
-%include "OcpiUtilExceptionApi.h"
-%include "OcpiLibraryApi.h"
-%include "OcpiContainerApi.h"
-%include "OcpiApplicationApi.h"
-%include "OcpiApi.h"
+%include "OcpiDataTypesApi.hh"
+%include "OcpiPValueApi.hh"
+%include "OcpiPropertyApi.hh"
+%include "OcpiExceptionApi.hh"
+%include "OcpiLibraryApi.hh"
+%include "OcpiContainerApi.hh"
+%include "OcpiApplicationApi.hh"
+%include "OcpiApi.hh"

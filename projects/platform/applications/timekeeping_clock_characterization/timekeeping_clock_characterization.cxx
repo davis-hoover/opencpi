@@ -25,8 +25,8 @@
 //TODO: These are internal headers which should not be included directly
 //      Anything from them exposed to the ACI should be in Ocpi*Api.h files
 //      https://gitlab.com/opencpi/opencpi/issues/887
-#include "OcpiDriverManager.h"
-#include "OcpiUtilEzxml.h"
+#include "BasePluginManager.hh"
+#include "UtilEzxml.hh"
 
 const char *APP_NAME = "ocpi.platform.timekeeping_clock_characterization";
 //to prevent hanging application
@@ -44,8 +44,8 @@ int main(/*int argc, char **argv*/) {
   try {
 
     //Check if system is setup to run test
-    OCPI::Driver::ManagerManager::getManagerManager().configure();
-    ezxml_t system_xml = OCPI::Driver::ManagerManager::getManagerManager().getXML();
+    OCPI::Base::Plugin::ManagerManager::getManagerManager().configure();
+    ezxml_t system_xml = OCPI::Base::Plugin::ManagerManager::getManagerManager().getXML();
     ezxml_t applications_xml = ezxml_child(system_xml, "applications");
     ezxml_t application_xml = OX::findChildWithAttr(applications_xml, "application", "name", APP_NAME); 
     ezxml_t freqstd_xml, freqcounter_xml, gpsfreqref_xml;

@@ -27,7 +27,7 @@
  */
 
 #include "tx_event_ctrlr-worker.hh"
-#include "OcpiOsDebugApi.hh" // OCPI_LOG_INFO
+#include "OcpiDebugApi.hh" // OCPI_LOG_INFO
 
 using namespace OCPI::RCC; // for easy access to RCC data types and constants
 using namespace Tx_event_ctrlrWorkerTypes;

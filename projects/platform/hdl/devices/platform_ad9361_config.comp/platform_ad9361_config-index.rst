@@ -124,4 +124,6 @@ There is currently no unit test for this component.
 However, the ``platform_ad9361_data_sub`` component unit test includes validation
 of a subset of this HDL subdevice worker implementation's functionality (for LVDS only).
 
+.. ocpi_documentation_test_platforms::
+
 .. ocpi_documentation_test_result_summary::

@@ -27,6 +27,7 @@
 # -- The core of application.mk when the app is C++ (not XML-only).
 # -- When a unit test dir needs to build C++ apps for generator/verifier/view scripts
 # !!!!!!!!!!!!!! It is not yet considered "external" to be used in user Makefiles
+.PHONY: aciapps
 
 ifdef OcpiApps
 OcpiAppsCC:=$(foreach a,$(OcpiApps),\
@@ -98,11 +99,9 @@ endef
 ifeq ($(filter clean%,$(MAKECMDGOALS)),)
 $(foreach p,$(RccPlatforms),$(foreach a,$(OcpiAppsCC),$(infox App=$a Platform=$p)$(eval $(call DoBuildAci,$p,$a))))
 endif
-aciapps:
-	$(AT)touch aciapps
 
 # This endif is for OcpiApps
 endif
 
 clean::
-	$(AT)rm -r -f target-* *~ aciapps
+	$(AT)rm -r -f target-* *~

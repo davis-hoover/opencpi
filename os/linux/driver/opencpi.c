@@ -92,10 +92,10 @@
 #define VM_RESERVED (VM_DONTEXPAND | VM_DONTDUMP)
 #endif
 
-#include "HdlOCCP.h"
-#include "HdlPciDriver.h"
-#include "HdlNetDefs.h"
-#include "KernelDriver.h"                    // includes shared with user mode
+#include "HdlOCCP.hh"
+#include "HdlPciDriver.hh"
+#include "HdlNetDefs.hh"
+#include "OsKernelDriver.h"                    // includes shared with user mode
 
 //#define _SCIF_ 1
 #ifdef _SCIF_
@@ -1320,6 +1320,7 @@ probe_pci(struct pci_dev *pcidev, const struct pci_device_id *id) {
       log_pci_err(pcidev, err, "pci_enable_device failed");
       break;
     }
+    pci_set_master(pcidev);   // set pci device as bus master
     mydev->pcidev = pcidev;   // record that we have enabled
     check(pcidev, "before request");
     if ((err = pci_request_region(pcidev, 0, DRIVER_NAME))) {

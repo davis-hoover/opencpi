@@ -43,7 +43,7 @@ endif
 
 all: $(HdlMyPlatforms)
 
-ifneq ($(filter declarehdl,$(MAKECMDGOALS)),)
+ifneq ($(filter declare,$(MAKECMDGOALS)),)
   HdlGoal=declare
   HdlMessage=Declaring (make usable in proxies)
   MAKEOVERRIDES+=HdlPlatforms= HdlPlatform= 
@@ -51,7 +51,7 @@ else
   HdlGoal=
   HdlMessage=Building
 endif
-declarehdl: $(HdlMyPlatforms)
+declare: $(HdlMyPlatforms)
 
 PF=$(if $(wildcard $1/Makefile),,-f $(OCPI_CDK_DIR)/include/hdl/hdl-platform.mk)
 $(HdlMyPlatforms):

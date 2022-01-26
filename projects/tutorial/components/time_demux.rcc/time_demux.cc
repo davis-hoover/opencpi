@@ -49,7 +49,7 @@ class Time_demuxWorker : public Time_demuxWorkerBase {
 	if (Mux_In.eof()) {
 	  Data_Out.setEOF();
 	  Time_Out.setEOF();
-	  return RCC_DONE;
+	  return RCC_FINISHED;
 	}
     // Determine opcode
     switch (Mux_In.opCode()) {

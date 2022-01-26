@@ -113,4 +113,6 @@ The test outlined in the
 component description (see ``ocpi.assets.devices``)
 includes validation of this worker’s functionality (for LVDS mode and CMOS Single Port Full Duplex DDR mode).
 
+.. ocpi_documentation_test_platforms::
+
 .. ocpi_documentation_test_result_summary::

@@ -180,7 +180,7 @@ class OcpPort : public Port {
   void getClockSignal(const InstancePort &ip, Language lang, std::string &s);
   const char *doPatterns(unsigned nWip, size_t &maxPortTypeName);
   const char *deriveOCP();
-  const char *resolveExpressions(OCPI::Util::IdentResolver &ir);
+  const char *resolveExpressions(OB::IdentResolver &ir);
   const char *adjustConnection(Connection &c, bool isProducer, OcpAdapt *myAdapt, bool &myHasExpr,
 			       ::Port &otherPort, OcpAdapt *otherAdapt, bool &otherHasExpr,
 			       Language lang, size_t &unused);

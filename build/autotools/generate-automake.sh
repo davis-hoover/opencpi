@@ -301,9 +301,9 @@ while read path opts; do
   includes="$(for i in $includes; do echo @srcdir@/$i; done)"
   sources=$(find -H $path $exclude -not -name "*_main.c*" -a -not -name "*_[sS]tubs.c*" -a \
                          \( -name "[^.#]*.cxx" -o -name "[^.#]*.cc" -o -name "[^.#]*.c" \))
-  stubs=$(find -H $path $exclude -name "[^.#]*_[sS]tubs.c" -o -name "[^.#]*_[sS]tubs.cxx")
+  stubs=$(find -H $path $exclude -name "[^.#]*_[sS]tubs.c" -o -name "[^.#]*_[sS]tubs.cxx" -o -name "[^.#]*_[sS]tubs.cc")
   swig=$(find -H $path $exclude -path "*/src/[^.#]*.i")
-  programs=$(find -H $path $exclude -name "[^.#]*_main.cxx")
+  programs=$(find -H $path $exclude -name "[^.#]*_main.cc" -o -name "[^.#]*_main.cxx")
   [ -n "$verbose" ] && echo for $path sources are \"$sources\"  >&2
   lname=${library//-/_}
   ldadd=$libs

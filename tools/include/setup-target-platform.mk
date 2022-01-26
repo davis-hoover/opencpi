@@ -75,7 +75,7 @@ $(info OCPI_LIB_DIR=$(OCPI_CDK_DIR)/$(OCPI_TARGET_DIR)/lib;)
 # This assumes the external program is linked against our static libs
 $(info OCPI_EXPORT_DYNAMIC=$(OcpiStaticProgramFlags);)
 # This should be shared with RccInternalLibraries in rcc-workers.mk FIXME
-$(info OCPI_API_LIBS=application remote_support container library transport xfer util msg_driver_interface foreign os;)
+$(info OCPI_API_LIBS=application remote_support container library  msg_driver_interface metadata transport xfer util foreign os;)
 $(info OCPI_SYSTEM_LIBS=$(OcpiExtraLibs);)
 $(info OCPI_PREREQUISITES_LIBS=$(OCPI_PREREQUISITES_LIBS);)
 endif

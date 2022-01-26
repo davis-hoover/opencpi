@@ -26,6 +26,7 @@
  * This file contains the implementation skeleton for the proxy1 worker in C++
  */
 
+#include <iostream>
 #include "proxy1-worker.hh"
 //#include "temp_worker.hh"
 

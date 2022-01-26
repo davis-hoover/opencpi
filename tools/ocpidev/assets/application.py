@@ -224,6 +224,10 @@ class ApplicationsCollection(RunnableAsset, RCCBuildableAsset):
             run_arg (list) - Arguments to insert immediately after the ACI executable or ocpirun
         """
         self.check_dirtype("applications", directory)
+        # This overrides the default behavior where the directory becomes the parent.
+        # basically all plurals should have this behavior
+        if not name:
+            name = "applications"
         super().__init__(directory, name, **kwargs)
 
         self.apps_list = None

@@ -27,13 +27,13 @@ dnl ============================================================================
 dnl 0. Set constants for the software, and autoconf (not auto-discovered values)
 dnl ================================================================================
 dnl If changing version number here, also get minor/patchlevel below:
-AC_INIT([opencpi],[2.3.4],[discuss@lists.opencpi.org])
+AC_INIT([opencpi],[2.4.0-develop],[discuss@lists.opencpi.org])
 dnl This version is what comes with ubuntu16_04, which is as far back as we want to go.
 AC_PREREQ([2.69])
 AC_DEFINE([VERSION_MAJOR],2,[Major version])
-AC_DEFINE([VERSION_MINOR],3,[Minor version])
-AC_DEFINE([VERSION_PATCHLEVEL],4,[Patchlevel version])
-AC_DEFINE([VERSION_EXTRA],,[Extra version])
+AC_DEFINE([VERSION_MINOR],4,[Minor version])
+AC_DEFINE([VERSION_PATCHLEVEL],0,[Patchlevel version])
+AC_DEFINE([VERSION_EXTRA],develop,[Extra version])
 dnl Note that this is renamed by AX_PREFIX_CONFIG below
 AC_CONFIG_HEADERS([config.h])
 dnl Define the fixed prefix for the macros and the file name
@@ -41,7 +41,7 @@ AX_PREFIX_CONFIG_H(ocpi-config.h,OCPI,config.h)
 AC_CONFIG_MACRO_DIR([acinclude])
 AC_CONFIG_AUX_DIR([build-aux])
 dnl This is a pathname that must be present so you know you are executing in the right place.
-AC_CONFIG_SRCDIR([runtime/rcc/src/RccContainer.cxx])
+AC_CONFIG_SRCDIR([runtime/rcc/src/RccContainer.cc])
 dnl ============================================================================================
 dnl 1. Import the OpenCPI platform variable values and set libtool variables
 dnl    all for substitutions in Makefile.am, ocpi-config.h, or ocpi-platform-config.h

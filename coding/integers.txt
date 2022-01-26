@@ -6,7 +6,8 @@ falls somewhere in the middle.
 In general, we use unsigned types when there is no need for negative
 values.  A few exceptions are using signed types for "bit flags",
 which is probably wrong.  Occasionally we use signed types simply to
-have a sentinel (-1) along with an unsigned value.
+have a sentinel (-1) along with an unsigned value, but using a MAX value
+for a sentinel is preferred.
 
 We use size_t as a convenient unsigned type a lot since it is
 consistent with many standard library calls (from strlen to STL size
@@ -20,7 +21,7 @@ to be consistent standard library and system APIs.  So size_t is
 "sticky" if we use an API that returns it, we let the type size_t
 propagate through code.  (e.g. strlen or size/length methods in STL)
 
-In using STL we sometimes use std::streamsize, but size_t is the same.
+If using STL we sometimes use std::streamsize, but that is signed and a mess.
 
 Whenever we truly need to know the size of integers we use stdint.h
 and its sized types, as well as intptr_t as needed.  But when there is

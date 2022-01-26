@@ -31,16 +31,16 @@
 #include <signal.h>
 #include <sstream>
 #include <list>
-#include "OcpiOsMisc.h"
-#include "OcpiOsAssert.h"
-#include "OcpiTimeEmit.h"
-#include "OcpiRDTInterface.h"
-#include "OcpiThread.h"
-#include "OcpiPValue.h"
-#include "Container.h"
-#include "ContainerWorker.h"
-#include "ContainerPort.h"
-#include "RCC_Worker.h"
+#include "OsMisc.hh"
+#include "OsAssert.hh"
+#include "TimeEmit.hh"
+#include "TransportRDTInterface.hh"
+#include "UtilThread.hh"
+#include "BasePValue.hh"
+#include "Container.hh"
+#include "ContainerWorker.hh"
+#include "ContainerPort.hh"
+#include "RCC_Worker.hh"
 
 extern bool g_testUtilVerbose;
 // #define TUPRINTF if(g_testUtilVerbose) printf
@@ -102,17 +102,17 @@ struct CWorker {
     ConData() : worker(NULL), pid(0) {}
   };
   struct Pdata {
-    OCPI::Util::PValue            *props;
+    OCPI::Base::PValue            *props;
     bool                          input;
     size_t                        bufferCount;
     OCPI::Container::Port *       port;
     ConData                       down_stream_connection;
     Pdata():props(NULL),bufferCount(2),port(NULL) {}
   };
-  int sPortCount;
-  int tPortCount;
+  unsigned sPortCount;
+  unsigned tPortCount;
   Pdata                  pdata[32];
-CWorker(int tports, int sports):sPortCount(sports), tPortCount(tports){};
+CWorker(unsigned tports, unsigned sports):sPortCount(sports), tPortCount(tports){};
   size_t operator=(size_t i)
   {
     worker=0; cid=i; return i;
@@ -202,15 +202,15 @@ namespace OCPI {
     void createPorts( std::vector<CApp>& ca, std::vector<CWorker*>& workers );
     void connectWorkers(std::vector<CApp>& ca, std::vector<CWorker*>& workers );
     std::vector<CApp> createContainers( std::vector<const char*>& eps, 
-                                        DataTransfer::EventManager*& event_manager, bool use_polling );
+                                        OCPI::Xfer::EventManager*& event_manager, bool use_polling );
 
     std::vector<CApp> createContainers( std::vector<ContainerDesc>& eps, 
-                                        DataTransfer::EventManager*& event_manager, bool use_polling );
+                                        OCPI::Xfer::EventManager*& event_manager, bool use_polling );
 
     struct DThreadData {
       bool run;
       std::vector<CApp> containers;
-      DataTransfer::EventManager* event_manager;
+      OCPI::Xfer::EventManager* event_manager;
     };
     OCPI::Util::Thread* runTestDispatch( DThreadData& tdata );
 

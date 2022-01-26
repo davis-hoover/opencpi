@@ -42,7 +42,7 @@ necessarily the "part ordering number" in data sheets etc.
     <family name='modelsim' toolset='modelsim'/>
   </vendor>
   <vendor name='xilinx'>
-    <family name='artix7' toolset='vivado' parts='xc7a50t'/>
+    <family name='artix7' toolset='vivado' parts='xc7a50t xc7a100t xc7a200t'/>
     <family name='isim' toolset='isim'/>
     <family name='spartan3adsp' toolset='xst' parts='xc3sd3400a'/>
     <family name='spartan6' toolset='xst' parts='xc6slx45'/>

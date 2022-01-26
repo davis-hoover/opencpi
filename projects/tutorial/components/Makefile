@@ -26,10 +26,13 @@
 # Any variable definitions that should apply for each individual worker/test
 # in this library belong in Library.mk
 
-# These exclusions are due to a naming collision between the counter worker and a counter primitive in the
-# core project.  When an assembly is built, the search path puts primitive libraries before other workers
-# and so when building the test assemblies for the counter worker, the assembly file (verilog) tries
-# to instantiate the counter worker but gets the counter primitive instead.  FIXME
-ExcludeWorkers=counter.hdl
-ExcludeTests=counter.test
+#ExcludeWorkers=counter.hdl
+#ExcludeTests=counter.test
+# These exclusions were needed due to a naming collision between the
+# "counter" worker and a "counter" primitive in the core project.
+# When an assembly is built, the search path puts primitive libraries
+# before other workers, and so when building the test assemblies for
+# the "counter" worker, the assembly file (verilog) tried to instantiate
+# the "counter" worker but got the "counter" primitive instead.  Renamed
+# "counter" to "tcounter" to avoid the namespace collision.
 include $(OCPI_CDK_DIR)/include/library.mk

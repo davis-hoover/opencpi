@@ -1,0 +1,155 @@
+OCPITEST(1)
+===========
+
+
+NAME
+----
+ocpitest - command-line tool for running tests from the OpenCPI test suite
+
+
+SYNOPSIS
+--------
+*`ocpitest`* ['<options>'] ['<test>'...]
+
+
+DESCRIPTION
+-----------
+The *`ocpitest(1)`* command-line tool is used to run all or specific tests in the OpenCPI test suite.
+The tests in the OpenCPI test suite run automatically during OpenCPI installation to
+verify that all parts of OpenCPI are properly installed and function as expected.
+Running these tests individually can also be useful for troubleshooting an OpenCPI installation.
+
+The *`ocpitest`* command can be run in three different contexts that correspond to the
+modes of operation for OpenCPI on embedded systems:
+
+- On a development system to test that system.
+
+- On an embedded system with network access to a development system.
+
+- On a standalone embedded system without any network access to a development system.
+
+The second and third contexts correspond to the "network" and "standalone" modes of operation for OpenCPI
+on embedded systems. See the section "Installation Steps for Systems after their Platforms are Installed" in
+the 'OpenCPI Installation Guide' for more details on these modes of operation.
+
+The *`ocpitest`* command runs the tests appropriate for the context in which it runs unless
+specific tests are specified on the command line.
+
+To run one or more specific tests, specify the test name(s) listed below as '<test>' argument(s).
+
+Standalone Tests
+~~~~~~~~~~~~~~~~
+
+*`driver`*::
+    Loads the OpenCPI Linux kernel driver. During OpenCPI installation, this test is
+    skipped if it is not supported on the target platform, the *`ocpitest`* command is running
+    in a docker container, or the test is disabled with the *`--no-kernel`* option.
+
+*`os`*::
+    Run the tests in the '<location-of-opencpi>'*/cdk/*'<target-platform-directory>'*/bin/* directory
+    that test the OpenCPI framework's operating system abstraction layer.
+
+*`datatype`*::
+    Run the datatype/protocol tests.
+
+*`load-plugins`*::
+    Load all OpenCPI plugins.
+
+*`container`*::
+    Run the set of tests that exercise various features of software containers.
+
+Network Access Tests
+~~~~~~~~~~~~~~~~~~~~
+    
+*`assets`*::
+    Run the applications in the built-in *`assets`* project.
+
+Development System Tests
+~~~~~~~~~~~~~~~~~~~~~~~~
+    
+*`swig`*::
+    Test the python interfaces that correspond to the C++ ACI.
+    
+*`python`*::
+    Run the Python utility tests in the *`tests/pytests/project/`* directory.
+    
+*`project`*::
+    Run the tests in the "test" project ( *`projects/test/`*).
+    
+*`ocpidev`*::
+    Run the *`ocpidev`* tests.
+
+*`core`*::
+    Run the unit tests for components in the built-in *`core`* project (*`projects/core/`*).
+
+*`inactive`*::
+    Run the application tests in the built-in *`inactive`* project (*`projects/inactive/`*).
+
+OPTIONS
+-------
+In addition to the options common to all OpenCPI tools (see link:opencpi.1.html[opencpi(1)]),
+the following options can be specified:
+
+*`--no-hdl`*::
+    Suppress building and testing of HDL assets (HDL platform discovery is not performed).
+    
+*`--no-kernel`*::
+    Suppress running the *`driver`* test when it might otherwise be run.
+    This option is specified when *`ocpitest`* is run by *`install-opencpi.sh`*
+    and the *`--no-kernel`* option is passed to *`install-opencpi.sh`*.
+
+*`--showtests`*::
+    List the tests available to run with *`ocpitest`*.
+
+
+EXAMPLES
+--------
+. List the tests that can be run with *`ocpitest`*:
++
+---------------------
+ocpitest --showtests
+---------------------
++
+. Run the network mode tests without building and running any HDL assets:
++
+------------------------
+ocpitest --no-hdl assets
+------------------------
++
+. Run all tests except for the *`driver`* test:
++
+---------------------
+ocpitest --no-kernel
+---------------------
++
+. Run the *`swig`* and *`python`* tests:
++
+--------------------
+ocpitest swig python
+--------------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-platform.1.html[ocpidev-platform(1)]
+link:ocpidev-project.1.html[ocpidev-project(1)]
+link:ocpidriver.1.html[ocpidriver(1)]
+link:opencpi.1.html[opencpi(1)]
+
+COPYING
+-------
+Copyright \(C) 2022 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+

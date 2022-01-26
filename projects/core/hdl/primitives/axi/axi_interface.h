@@ -261,9 +261,9 @@ package NAME is
     port(clk     : in std_logic;
          reset   : in bool_t;
          raw_in  : in ocpi.wci.raw_in_t;
-         raw_out : in ocpi.wci.raw_out_t;
-         axi_in  : in  axi_m2s_t;
-         axi_out : out axi_s2m_t);
+         raw_out : out ocpi.wci.raw_out_t;
+         axi_in  : in  axi_s2m_t;
+         axi_out : out axi_m2s_t);
   end component RAW_NAME;
 end package NAME;
 

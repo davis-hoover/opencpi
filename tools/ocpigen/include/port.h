@@ -24,8 +24,8 @@
 #include <cstddef>
 #include <string>
 #include <cassert>
-#include "OcpiUtilEzxml.h"
-#include "OcpiUtilAssembly.h"
+#include "UtilEzxml.hh"
+#include "MetadataAssembly.hh"
 #include "ocpigen.h"
 
 // FIXME: this will not be needed when we fully migrate to classes...
@@ -92,7 +92,7 @@ public:
   Port(const Port &other, Worker &w, std::string &name, size_t count, const char *&err);
   // Virtual constructor - every derived class must have one
   virtual Port &clone(Worker &w, std::string &name, size_t count,
-		      OCPI::Util::Assembly::Role *role, const char *&err) const;
+		      OCPI::Metadata::Assembly::Role *role, const char *&err) const;
   virtual ~Port();
   // count whether an array or not
   size_t count() const { return m_arrayCount ? m_arrayCount : 1; }
@@ -100,7 +100,7 @@ public:
   Worker &worker() const { return *m_worker; }
   const char *parseClock(ezxml_t);
   virtual const char *parse();    // second pass parsing for ports referring to each other
-  virtual const char *resolveExpressions(OCPI::Util::IdentResolver &ir);
+  virtual const char *resolveExpressions(OB::IdentResolver &ir);
   virtual bool masterIn() const;  // Are master signals inputs at this port?
   Clock &addMyClock(bool output);
   const char *addMyClock(const char *direction);
@@ -130,7 +130,7 @@ public:
   virtual bool matchesDataProducer(bool /*isProducer*/) const { return false; }
   virtual void emitPortDescription(FILE *f, Language lang) const;
   virtual const char *deriveOCP();
-  virtual void initRole(OCPI::Util::Assembly::Role &role);
+  virtual void initRole(OCPI::Metadata::Assembly::Role &role);
   // Does this port imply the need for a control clock/reset in this worker?
   virtual bool needsControlClock() const;
   virtual void emitVhdlShell(FILE *f, Port *wci);
@@ -166,7 +166,7 @@ public:
   virtual void emitPortSignal(std::string *pmaps, bool any, const char *indent, const std::string &fName,
 			      const std::string &aName, const std::string &fIndex, const std::string &aIndex,
 			      size_t count, bool output, const Port *signalPort, bool external);
-  virtual const char *fixDataConnectionRole(OCPI::Util::Assembly::Role &role);
+  virtual const char *fixDataConnectionRole(OCPI::Metadata::Assembly::Role &role);
   virtual const char *doPatterns(unsigned nWip, size_t &maxPortTypeName);
   virtual void emitXML(std::string &out);
   virtual const char *finalizeRccDataPort();

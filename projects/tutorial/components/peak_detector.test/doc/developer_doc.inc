@@ -24,7 +24,7 @@
 \newpage
 
 % These are needed by component summary table
-\def\componentlibrary{ocpi.training.components}
+\def\componentlibrary{ocpi.tutorial.components}
 \def\name{\comp}
 \def\releasedate{07/2020}
 \def\testedplatforms{c7-x86\_{}64, Ettus E310(PL), isim, linux-x13\_{}3-arm, linux-x13\_{}4-arm, Matchstiq-Z1(PL)(Vivado 2017.1 and ISE 14.7), xsim}

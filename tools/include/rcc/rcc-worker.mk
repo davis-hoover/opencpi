@@ -75,8 +75,8 @@ ifdef OcpiBuildingACI
   RccSpecificLinkOptions=\
     $(call RccPrioritize,MainLinkOptions,$(OcpiLanguage),$(RccTarget),$(RccRealPlatform))
   override RccLibrariesInternal+=\
-    application remote_support container library transport xfer drc drc_ad9361 util \
-    msg_driver_interface foreign os   
+    application remote_support container library msg metadata transport xfer drc \
+    drc_ad9361 base util foreign os
 else
   RccSpecificLinkOptions=\
     $(call RccPrioritize,DynamicLinkOptions,$(OcpiLanguage),$(RccTarget),$(RccRealPlatform)) \
@@ -143,6 +143,7 @@ $(foreach v,$(filter ExtraCompilerOptionsCC_%,$(.VARIABLES)),\
 	 $(eval RccExtraCompileOptionsCC_$p=$($v))))))
 # Prepare the parameters for compile-command-line injection into the worker compilation
 RccParams=\
+  '-DOCPI_PARAM_CONFIG()=$(ParamConfig)' \
   $(foreach n,$(WorkerParamNames),\
 	     '-DOCPI_PARAM_$n()=$(Param_$(ParamConfig)_$n)')
 
