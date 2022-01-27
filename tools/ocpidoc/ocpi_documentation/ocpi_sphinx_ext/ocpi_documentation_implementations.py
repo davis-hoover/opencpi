@@ -55,6 +55,10 @@ class OcpiDocumentationImplementations(docutils.parsers.rst.Directive):
         source_path = pathlib.Path(self.state.document.attributes["source"])
         source_dir = source_path.parent
         for argument in self.arguments:
+            if argument.startswith("../"):
+                link = "gen/" + argument[2:]
+                if source_dir.joinpath(link).exists():
+                    argument = link
             worker_directory = source_dir.joinpath(argument)
             worker_name = worker_directory.stem
             found = None
@@ -64,7 +68,7 @@ class OcpiDocumentationImplementations(docutils.parsers.rst.Directive):
                 doc = worker_directory.joinpath(doc_name + ".rst")
                 if doc.exists():
                     implementations.append(doc)
-                    found = True
+                    found = doc
                     break
             if not found:
                 self.state_machine.reporter.warning(
@@ -158,8 +162,8 @@ class OcpiDocumentationImplementations(docutils.parsers.rst.Directive):
             # prepare a path acceptable to toctree, eliminating any ".." and making it
             # relative to the top level "project"" directory, with leading /
             # (called "absolute" in the toctree documentation)
-            toctree_docname = "/"+str(
-                implementation.resolve().
+            toctree_docname = "/" + str(
+                implementation.
                 relative_to(pathlib.Path(self.state.document.settings.env.project.srcdir)).
                 with_suffix(""))
             toctree_rst.append(f"   {toctree_docname}", source_path, line_number_rst)

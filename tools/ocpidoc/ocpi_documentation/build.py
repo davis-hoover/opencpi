@@ -93,12 +93,12 @@ def build(directory, build_only=False, mathjax=None, config_options=[],
                 master_doc = "index"
         if not master_doc or not source_directory.joinpath(master_doc).is_file():
             # Try using the default template in the gen/ subdir
-            empty_template_path = pathlib.Path(__file__).parent.joinpath("rst_templates",
+            default_template_path = pathlib.Path(__file__).parent.joinpath("rst_templates",
                                                                          "default-" + asset_type + ".rst")
             xml_path = pathlib.Path(xml_file)
-            if empty_template_path.is_file(): # note xml_file does not have to exist
-                with open(empty_template_path, "r") as empty_template_file:
-                    template = empty_template_file.read()
+            if default_template_path.is_file(): # note xml_file does not have to exist
+                with open(default_template_path, "r") as default_template_file:
+                    template = default_template_file.read()
                     source_directory = source_directory.joinpath("gen")
                     generated_rst_file = source_directory.joinpath(xml_path.stem + ".rst")
                     generated_rst_file.parent.mkdir(parents=True,exist_ok=True)
@@ -114,10 +114,24 @@ def build(directory, build_only=False, mathjax=None, config_options=[],
                   "\"index.rst\" file present.",
                   file=sys.stderr)
             return 0
-    if not os.path.isfile(str(source_directory) + "/" + master_doc + ".rst"):
+    source_path = source_directory.joinpath(master_doc + ".rst")
+    if not source_path.exists():
         print("Error:  In directory " + str(directory) +
               " there is no file " + master_doc + ".rst, use: ocpidoc create?", file=sys.stderr)
         return 1
+    # Due to sphinx toctree limitations (no .. paths supported, many requests to fix it),
+    # create symlinks if we are in a component directory and the rst file uses
+    # ocpi_documentation_implementations directive with .. paths
+    if asset_type == 'component':
+        with open(source_path, 'r') as f:
+            for line in f:
+                if line.startswith(".. ocpi_documentation_implementations::"):
+                    for impl in line.split()[2:]:
+                        if impl.startswith("../"):
+                            source_directory.joinpath("gen").mkdir(exist_ok=True)
+                            link = source_directory.joinpath("gen", impl[3:])
+                            if not link.exists():
+                                link.symlink_to(pathlib.Path("../" + impl))
     build_options = [str(source_directory), str(build_directory),
                      "-c", str(conf_directory)]
     build_options = build_options + ["-D", f"master_doc={master_doc}"]
