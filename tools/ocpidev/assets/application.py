@@ -66,8 +66,10 @@ class Application(RunnableAsset, RCCBuildableAsset):
             directory = str(Path(self.directory, self.name))
             type="application"
         makefile = ocpiutil.get_makefile(directory, type)[0]
-        return ocpiutil.execute_cmd(self.get_settings(), directory, 
-                                    args, makefile)
+        return ocpiutil.execute_cmd(self.get_settings(),
+                                    directory,
+                                    args,
+                                    makefile)
 
     def clean(self, verbose=False):
         """
@@ -81,8 +83,11 @@ class Application(RunnableAsset, RCCBuildableAsset):
             type="application"
         makefile = ocpiutil.get_makefile(directory, type)[0]
         #Clean
-        ocpiutil.file.execute_cmd(
-                {}, directory, action=['clean'], file=makefile, verbose=verbose)
+        ocpiutil.execute_cmd({},
+                             directory,
+                             ['clean'],
+                             makefile,
+                             verbose)
 
     def build(self, verbose=False, optimize=False, dynamic=False,
         workers_as_needed=False, rcc_platform=None, hdl_rcc_platform=None):
@@ -121,8 +126,11 @@ class Application(RunnableAsset, RCCBuildableAsset):
             type="application"
         makefile = ocpiutil.get_makefile(directory, type)[0]
         #Build
-        ocpiutil.file.execute_cmd(
-                settings, directory, file=makefile, verbose=verbose)
+        ocpiutil.execute_cmd(settings,
+                             directory,
+                             [],
+                             makefile,
+                             verbose)
 
     @staticmethod
     def get_working_dir(name, ensure_exists=True, **kwargs):
@@ -255,7 +263,8 @@ class ApplicationsCollection(RunnableAsset, RCCBuildableAsset):
         ApplicationsCollection
         """
         return ocpiutil.execute_cmd(self.get_settings(),
-                                    self.directory, ["run"],
+                                    self.directory,
+                                    ["run"],
                                     ocpiutil.get_makefile(self.directory, "applications")[0])
 
     def clean(self, verbose=False):
@@ -264,8 +273,11 @@ class ApplicationsCollection(RunnableAsset, RCCBuildableAsset):
         """
         make_file = ocpiutil.get_makefile(self.directory, "applications")[0]
         #Clean
-        ocpiutil.file.execute_cmd(
-                {}, self.directory, action=['clean'], file=make_file, verbose=verbose)
+        ocpiutil.execute_cmd({},
+                             self.directory,
+                             ['clean'],
+                             make_file,
+                             verbose)
 
     def build(self, verbose=False, optimize=False, dynamic=False,
         workers_as_needed=False, rcc_platform=None, hdl_rcc_platform=None):
@@ -298,8 +310,11 @@ class ApplicationsCollection(RunnableAsset, RCCBuildableAsset):
             settings['hdl_rcc_platform'] = hdl_rcc_platform
         make_file = ocpiutil.get_makefile(self.directory, "applications")[0]
         #Build
-        ocpiutil.file.execute_cmd(
-                settings, self.directory, file=make_file, verbose=verbose)
+        ocpiutil.execute_cmd(settings,
+                             self.directory,
+                             [],
+                             make_file,
+                             verbose)
 
     @staticmethod
     def get_working_dir(name, ensure_exists=True, **kwargs):

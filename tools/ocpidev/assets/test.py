@@ -130,7 +130,7 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         return ocpiutil.execute_cmd(self.get_settings(),
                                     directory,
                                     goal,
-                                    file=make_file)
+                                    make_file)
 
     def clean(self, verbose=False, simulation=False, execute=False):
         """
@@ -149,8 +149,11 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         location = self.directory + '/' + self.name
         make_file = ocpiutil.get_makefile(location, "test")[0]
         #Clean
-        ocpiutil.file.execute_cmd(
-            settings, location, action=action, file=make_file, verbose=verbose)
+        ocpiutil.execute_cmd(settings,
+                             location,
+                             action,
+                             make_file,
+                             verbose)
 
     def build(self, verbose=False, no_assemblies=None, workers_as_needed=False,
         optimize=False, dynamic=False, hdl_target=None, hdl_platform=None,
@@ -196,8 +199,11 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         location = self.directory + '/' + self.name
         make_file = ocpiutil.get_makefile(location, "test")[0]
         #Build
-        ocpiutil.file.execute_cmd(
-            settings, location, action=action, file=make_file, verbose=verbose)
+        ocpiutil.execute_cmd(settings,
+                             location,
+                             action,
+                             make_file,
+                             verbose)
 
     @staticmethod
     def get_working_dir(name, ensure_exists=True, **kwargs):
@@ -360,8 +366,11 @@ class TestsCollection(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         dirtype = ocpiutil.get_dirtype(location)
         make_file = ocpiutil.get_makefile(location, dirtype)[0]
         #Clean
-        ocpiutil.file.execute_cmd(
-            settings, location, action=action, file=make_file, verbose=verbose)
+        ocpiutil.execute_cmd(settings,
+                             location,
+                             action,
+                             make_file,
+                             verbose)
 
     def build(self, verbose=False, no_assemblies=None, workers_as_needed=False,
         optimize=False, dynamic=False, hdl_target=None, hdl_platform=None,
@@ -408,5 +417,8 @@ class TestsCollection(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         dirtype = ocpiutil.get_dirtype(location)
         make_file = ocpiutil.get_makefile(location, dirtype)[0]
         #Build
-        ocpiutil.file.execute_cmd(
-            settings, location, action=action, file=make_file, verbose=verbose)
+        ocpiutil.execute_cmd(settings, 
+                             location,
+                             action,
+                             make_file,
+                             verbose)
