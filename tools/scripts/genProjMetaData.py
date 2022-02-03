@@ -203,7 +203,8 @@ def main(project_dir=None):
         return
 
     # Get the project name, add it as an attribute in the project element.
-    full_proj_name = ocpiutil.get_project_package(mydir)
+    name = mydir.split('/')[-1]
+    full_proj_name = '.'.join([ocpiutil.get_project_package(mydir), name])
     root = ET.Element("project", {"name": full_proj_name})
 
     rcc = ET.SubElement(root, "rcc")
