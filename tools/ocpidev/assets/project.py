@@ -1257,16 +1257,17 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
                 "registry",
                 Registry.get_registry_dir()).add(str(path), True)
 
+        make_file=str(Path(environ['OCPI_CDK_DIR'], 'include', 'project.mk')
         rc = ocpiutil.execute_cmd({},
                                   str(path),
-                                  action=[ "imports" ],
-                                  file=os.environ["OCPI_CDK_DIR"] + "/include/project.mk")
+                                  action=['imports'],
+                                  file=make_file)
         if rc != 0:
             logging.warning("Failed to import project at " + str(path))
         rc = ocpiutil.execute_cmd({},
                                   str(path),
-                                  action=[ "exports" ],
-                                  file=os.environ["OCPI_CDK_DIR"] + "/include/project.mk")
+                                  action=['exports'],
+                                  file=make_file)
         if rc != 0:
             logging.warning("Failed to export project at " + str(path))
 

@@ -68,8 +68,8 @@ class Application(RunnableAsset, RCCBuildableAsset):
         makefile = ocpiutil.get_makefile(directory, type)[0]
         return ocpiutil.execute_cmd(self.get_settings(),
                                     directory,
-                                    args,
-                                    makefile)
+                                    action=args,
+                                    file=makefile)
 
     def clean(self, verbose=False):
         """
@@ -261,10 +261,11 @@ class ApplicationsCollection(RunnableAsset, RCCBuildableAsset):
         ApplicationsCollection will run all the applications that are contained in the
         ApplicationsCollection
         """
+        make_file=ocpiutil.get_makefile(self.directory, "applications")[0]
         return ocpiutil.execute_cmd(self.get_settings(),
                                     self.directory,
-                                    ["run"],
-                                    ocpiutil.get_makefile(self.directory, "applications")[0])
+                                    action=['run'],
+                                    file=make_file)
 
     def clean(self, verbose=False):
         """
