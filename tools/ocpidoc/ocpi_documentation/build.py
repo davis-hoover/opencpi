@@ -24,7 +24,6 @@
 import pathlib
 import os
 import sys
-import sphinx.cmd.build
 import _opencpi.util as ocpiutil
 from .conf import BUILD_FOLDER
 from .create import _template_to_specific
@@ -62,6 +61,8 @@ def build(directory, build_only=False, mathjax=None, config_options=[],
     # and sphinx defaults
 
     _,asset_type,_,xml_file,asset_name = ocpiutil.get_dir_info(str(source_directory))
+    if not asset_type:
+        return
     stem = source_directory.stem
     # If there is no possible primary XML file, use the stem, e.g. "specs".
     default_rst_file_name = (pathlib.PurePath(xml_file).stem if xml_file
@@ -94,7 +95,7 @@ def build(directory, build_only=False, mathjax=None, config_options=[],
         if not master_doc or not source_directory.joinpath(master_doc + ".rst").is_file():
             # Try using the default template in the gen/ subdir
             default_template_path = pathlib.Path(__file__).parent.joinpath("rst_templates",
-                                                                         "default-" + asset_type + ".rst")
+                                                                           "default-" + asset_type + ".rst")
             xml_path = pathlib.Path(xml_file)
             if default_template_path.is_file(): # note xml_file does not have to exist
                 with open(default_template_path, "r") as default_template_file:
@@ -153,6 +154,9 @@ def build(directory, build_only=False, mathjax=None, config_options=[],
         else:
             raise NotADirectoryError(f"{mathjax} is not a directory")
 
+    # Do this import at runtime so that external callers to this module (dir) do not have to import
+    # sphinx unless they are doing building
+    import sphinx.cmd.build
     return_value = sphinx.cmd.build.main(build_options)
 
     if build_only is False:
