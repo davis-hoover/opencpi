@@ -1288,7 +1288,7 @@ OcpiIncludeAssetAndParent=\
 
 # Find the subdirectories of a given type
 OcpiFindSubdirs=$(callx OcpiInfo,OFSD,$1)$(strip\
-  $(foreach a,$(sort $(subst %/,%,$(dir $(wildcard */Makefile */*.xml)))),\
+  $(foreach a,$(sort $(patsubst %/,%,$(dir $(wildcard */Makefile */*.xml)))),\
     $(and $(filter $1,$(call OcpiGetDirType,$a)),$a)))
 
 OcpiHavePrereq=$(realpath $(OCPI_PREREQUISITES_DIR)/$1)

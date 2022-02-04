@@ -60,17 +60,17 @@ skeleton:  $(ImplHeaderFiles) $(SkelFiles)
 	      make -r --no-print-directory $(OcpiLibraryMakefile) -C $(DirContainingLib) workersfile speclinks)
 
 ifeq ($(filter rcc,$(Model))$(filter clean%,$(MAKECMDGOALS))$(HdlActualTargets),)
-  ifneq ($(MAKECMDGOALS),declare)
+  ifeq ($(filter xml declare,$(MAKECMDGOALS)),)
     $(call OcpiInfo, This $(UCModel) worker $(Worker) not built since no $(UCModel) targets or platforms specified.)
   endif
-  all: liblinks $(if $(filter 1,$(OCPI_NO_DOC)),,doc)
+  all: $(if $(filter 1,$(OCPI_DOC_ONLY)),doc,liblinks $(if $(filter 1,$(OCPI_NO_DOC)),,doc))
 else
   # All worker-derived assets (worker, platform, assembly, config, container etc.)
   # might have doc
-  all: skeleton links $(if $(filter 1,$(OCPI_NO_DOC)),,doc)
+  all: $(if $(filter 1,$(OCPI_DOC_ONLY)),doc,skeleton links $(if $(filter 1,$(OCPI_NO_DOC)),,doc))
 endif
 doc:
-	$(AT)$(if $(wildcard *.rst),ocpidoc build,:) # temporary
+	$(AT)ocpidoc build
 # This echoing is to allow the AT= construct to work without polluting stdout
 xml:
 	@$(if $(AT),,set -v;) $(OcpiGenEnv) ocpigen -G $(Worker_$(Worker)_xml)

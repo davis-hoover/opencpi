@@ -27,7 +27,7 @@ import sys
 import sphinx.cmd.build
 import _opencpi.util as ocpiutil
 from .conf import BUILD_FOLDER
-from ocpi_documentation.create import _template_to_specific
+from .create import _template_to_specific
 
 def build(directory, build_only=False, mathjax=None, config_options=[],
           **kwargs):
@@ -91,7 +91,7 @@ def build(directory, build_only=False, mathjax=None, config_options=[],
             elif "index" in map(lambda f: f.stem, rst_files):
                 # Use Sphinx default, as best case guess in this case
                 master_doc = "index"
-        if not master_doc or not source_directory.joinpath(master_doc).is_file():
+        if not master_doc or not source_directory.joinpath(master_doc + ".rst").is_file():
             # Try using the default template in the gen/ subdir
             default_template_path = pathlib.Path(__file__).parent.joinpath("rst_templates",
                                                                          "default-" + asset_type + ".rst")
@@ -119,19 +119,23 @@ def build(directory, build_only=False, mathjax=None, config_options=[],
         print("Error:  In directory " + str(directory) +
               " there is no file " + master_doc + ".rst, use: ocpidoc create?", file=sys.stderr)
         return 1
-    # Due to sphinx toctree limitations (no .. paths supported, many requests to fix it),
-    # create symlinks if we are in a component directory and the rst file uses
-    # ocpi_documentation_implementations directive with .. paths
+    # Due to sphinx toctree limitations (no ../ paths supported, many requests to fix it),
+    # create symlinks to other directories in the same library if we are in a component directory.
+    # Without fully parsing all reachable rst files, we don't know what subset of dirs we must
+    # symlink to...
+    # We must remove the links after sphinx build runs otherwise they will be seen as duplicates
+    # when docs are built higher up the directory structure (e.g. at the library or project level)
+    # please someone figure out a better way to do this!
+    links=[]
     if asset_type == 'component':
-        with open(source_path, 'r') as f:
-            for line in f:
-                if line.startswith(".. ocpi_documentation_implementations::"):
-                    for impl in line.split()[2:]:
-                        if impl.startswith("../"):
-                            source_directory.joinpath("gen").mkdir(exist_ok=True)
-                            link = source_directory.joinpath("gen", impl[3:])
-                            if not link.exists():
-                                link.symlink_to(pathlib.Path("../" + impl))
+        source_directory.joinpath("gen").mkdir(exist_ok=True)
+        for entry in source_directory.parent.iterdir():
+            if entry.is_dir() and entry.name != source_directory.name and entry.suffix != "":
+                link = source_directory.joinpath("gen", entry.name)
+                if not link.exists():
+                    link.symlink_to(pathlib.Path("../../" + entry.name))
+                    links.append(link)
+
     build_options = [str(source_directory), str(build_directory),
                      "-c", str(conf_directory)]
     build_options = build_options + ["-D", f"master_doc={master_doc}"]
@@ -154,8 +158,11 @@ def build(directory, build_only=False, mathjax=None, config_options=[],
     if build_only is False:
         sphinx.cmd.build.main(build_options + ["-b", "spelling"])
 
+    # remove the links we created temporarily for component docs
+    for link in links: link.unlink()
+
     if return_value == 0:
         home_page = build_directory.joinpath(f"{master_doc}.html")
-        print(f"Primary HTML file for this asset is: {home_page}")
+        print(f'The primary HTML file for this "{asset_type}" asset is: {home_page}')
     # No error message as Sphinx will have printed this
     return return_value

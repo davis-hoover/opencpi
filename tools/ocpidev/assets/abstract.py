@@ -108,6 +108,8 @@ class Asset(metaclass=ABCMeta):
         """
         Remove the Asset from disk.  Any additional cleanup on a per asset basis can be done in
         the child implementations of this function
+
+        Return True if deletion actually took place
         """
         path = Path(self.directory)
         if path.name != self.name:
@@ -128,10 +130,12 @@ class Asset(metaclass=ABCMeta):
                 msg = "Successfully deleted {} '{}'".format(
                     simple_noun if simple_noun else str(path), basic_name)
                 print(msg)
+                return True
             except Exception as e:
-                err_msg = 'Failed to delete {}\n{}'.format(
+                err_msg = 'Failed to delete {}\n{}'.forma
                     noun if noun else str(path), e)
                 logging.error(err_msg)
+        return False
 
     def get_valid_components(self):
         """
@@ -147,6 +151,13 @@ class Asset(metaclass=ABCMeta):
             for comp in files:
                 if Component.is_component_spec_file(self.directory + "/specs/" + comp):
                     ret_val.append(self.directory + "/specs/" + comp)
+        # in libraries, spec files can be in .comp directories
+        if ocpiutil.get_dirtype(self.directory) == "library":
+            for entry in pathlib.Path(self.directory).iterdir():
+                if entry.suffix == ".comp" and entry.is_dir():
+                    spec_file = entry.joinpath(entry.stem + "-spec.xml")
+                    if spec_file.exists():
+                        ret_val.append(spec_file)
         return ret_val
 
 

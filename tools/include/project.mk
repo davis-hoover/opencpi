@@ -96,13 +96,14 @@ $(foreach p,$(HdlPlatform) $(HdlPlatforms),\
 
 .PHONY: all applications clean imports exports components cleanhdl $(OcpiTestGoals) projectpackage
 .PHONY: projectdeps projectincludes hdl hdlassemblies hdlprimitives hdlcomponents hdldevices
-.PHONY: hdladapters hdlplatforms hdlassemblies hdlportable declare comp rcc hdl ocl
+.PHONY: hdladapters hdlplatforms hdlassemblies hdlportable declare comp rcc hdl ocl docs
 
 # The default is to simply run without spell checking
-doc:
+docs:
 	$(AT)ocpidoc build -b
 
-all: $(if $(filter 1,$(OCPI_DOC_ONLY)),doc,applications $(if $(filter 1,$(OCPI_NO_DOC)),,doc))
+all: $(if $(filter 1,$(OCPI_DOC_ONLY)),docs,applications $(if $(filter 1,$(OCPI_NO_DOC)),,docs))
+# these ensure that recursive makes do not build docs at lower levels
 override export OCPI_NO_DOC=1
 override export OCPI_DOC_ONLY=
 # Package issue - if we have a top level specs directory, we must make the
@@ -227,6 +228,7 @@ cleanhdl cleanrcc cleanocl cleancomponents cleanapplications: imports
 
 # Clean hdl stuff where ever it is, but not components
 cleanhdl:
+	$(AT)echo Cleaning all HDL assets
 	$(foreach d,primitives devices adapters cards platforms assemblies,\
 	  $(call MaybeMake,hdl/$d,clean) &&): \
 
@@ -281,9 +283,11 @@ runonly:
 	$(call MaybeMake,applications,run)
 
 cleancomponents:
+	$(AT)echo Cleaning all component libraries
 	$(call MaybeMake,components,clean)
 
 cleanapplications:
+	$(AT)echo Cleaning all applications
 	$(call MaybeMake,applications,clean)
 
 # Note that imports must be cleaned last because the host rcc platform directory

@@ -109,11 +109,9 @@ def get_dir_info(directory=".", careful=False):
         directory = os.path.realpath(directory)
         base = os.path.basename(directory)
     if not os.path.isdir(directory):
-       print("Warning:  no directory type when requesting it for a non-directory:  " + directory,
-             file=sys.stderr)
-       return None # be relaxed about non-dirs so callers can use them from "make"
-       #raise OCPIException("When determining the directory type of \"" + str(directory) + "\", "\
-        #                   "it is not a directory at all")
+        print("Warning:  no directory type when requesting it for a non-directory:  " + directory,
+              file=sys.stderr)
+        return None # be relaxed about non-dirs so callers can use them from "make"
     parts = base.split('.') # perhaps there is an authoring model suffix
     name = parts[0]
     make_type = None

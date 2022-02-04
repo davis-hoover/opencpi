@@ -26,6 +26,7 @@ import pathlib
 import sys
 
 import _opencpi.util as ocpiutil
+import ocpidoc
 import ocpi_documentation
 
 
