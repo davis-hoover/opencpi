@@ -132,7 +132,7 @@ class Asset(metaclass=ABCMeta):
                 print(msg)
                 return True
             except Exception as e:
-                err_msg = 'Failed to delete {}\n{}'.forma
+                err_msg = 'Failed to delete {}\n{}'.format(
                     noun if noun else str(path), e)
                 logging.error(err_msg)
         return False
