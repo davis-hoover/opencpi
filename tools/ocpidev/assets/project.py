@@ -1257,7 +1257,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
                 "registry",
                 Registry.get_registry_dir()).add(str(path), True)
 
-        make_file=str(os.Path(environ['OCPI_CDK_DIR'], 'include', 'project.mk')
+        make_file=str(Path(os.environ['OCPI_CDK_DIR'], 'include', 'project.mk'))
         rc = ocpiutil.execute_cmd({},
                                   str(path),
                                   action=['imports'],
