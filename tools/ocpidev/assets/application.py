@@ -85,9 +85,9 @@ class Application(RunnableAsset, RCCBuildableAsset):
         #Clean
         ocpiutil.execute_cmd({},
                              directory,
-                             ['clean'],
-                             makefile,
-                             verbose)
+                             action=['clean'],
+                             file=makefile,
+                             verbose=verbose)
 
     def build(self, verbose=False, optimize=False, dynamic=False,
         workers_as_needed=False, rcc_platform=None, hdl_rcc_platform=None):
@@ -128,9 +128,8 @@ class Application(RunnableAsset, RCCBuildableAsset):
         #Build
         ocpiutil.execute_cmd(settings,
                              directory,
-                             [],
-                             makefile,
-                             verbose)
+                             file=makefile,
+                             verbose=verbose)
 
     @staticmethod
     def get_working_dir(name, ensure_exists=True, **kwargs):
@@ -275,9 +274,9 @@ class ApplicationsCollection(RunnableAsset, RCCBuildableAsset):
         #Clean
         ocpiutil.execute_cmd({},
                              self.directory,
-                             ['clean'],
-                             make_file,
-                             verbose)
+                             action=['clean'],
+                             file=make_file,
+                             verbose=verbose)
 
     def build(self, verbose=False, optimize=False, dynamic=False,
         workers_as_needed=False, rcc_platform=None, hdl_rcc_platform=None):
@@ -312,9 +311,8 @@ class ApplicationsCollection(RunnableAsset, RCCBuildableAsset):
         #Build
         ocpiutil.execute_cmd(settings,
                              self.directory,
-                             [],
-                             make_file,
-                             verbose)
+                             file=make_file,
+                             verbose=verbose)
 
     @staticmethod
     def get_working_dir(name, ensure_exists=True, **kwargs):

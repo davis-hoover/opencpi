@@ -271,20 +271,20 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         #Clean
         ocpiutil.execute_cmd(settings,
                              self.directory,
-                             action,
-                             make_file,
-                             verbose)
+                             action=action,
+                             file=make_file,
+                             verbose=verbose)
         if not clean_all:
             ocpiutil.execute_cmd({},
                                  self.directory,
-                                 ['imports'],
-                                 make_file,
-                                 verbose)
+                                 action=['imports'],
+                                 file=make_file,
+                                 verbose=verbose)
             ocpiutil.execute_cmd({},
                                  self.directory,
-                                 ['exports'],
-                                 make_file,
-                                 verbose)
+                                 action=['exports'],
+                                 file=make_file,
+                                 verbose=verbose)
 
     def build(self, verbose=False, rcc=False, hdl=False, optimize=False, dynamic=False,
         worker=None, no_assemblies=None, hdl_assembly=None, hdl_platform=None,
@@ -336,14 +336,14 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         #Build
         ocpiutil.execute_cmd({},
                              self.directory,
-                             ['imports'],
-                             make_file,
-                             verbose)
+                             action=['imports'],
+                             file=make_file,
+                             verbose=verbose)
         ocpiutil.execute_cmd(settings,
                              self.directory,
-                             action,
-                             make_file,
-                             verbose)
+                             action=action,
+                             file=make_file,
+                             verbose=verbose)
 
     def get_show_test_dict(self):
         """
@@ -1259,14 +1259,14 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
 
         rc = ocpiutil.execute_cmd({},
                                   str(path),
-                                  [ "imports" ],
-                                  os.environ["OCPI_CDK_DIR"] + "/include/project.mk")
+                                  action=[ "imports" ],
+                                  file=os.environ["OCPI_CDK_DIR"] + "/include/project.mk")
         if rc != 0:
             logging.warning("Failed to import project at " + str(path))
         rc = ocpiutil.execute_cmd({},
                                   str(path),
-                                  [ "exports" ],
-                                  os.environ["OCPI_CDK_DIR"] + "/include/project.mk")
+                                  action=[ "exports" ],
+                                  file=os.environ["OCPI_CDK_DIR"] + "/include/project.mk")
         if rc != 0:
             logging.warning("Failed to export project at " + str(path))
 
@@ -1284,9 +1284,9 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
             make_file = ocpiutil.get_makefile(self.directory, "project")[0]
             rc = ocpiutil.execute_cmd({},
                                       self.directory,
-                                      ['exports'],
-                                      make_file,
-                                      verbose)
+                                      action=['exports'],
+                                      file=make_file,
+                                      verbose=verbose)
             if rc:
                 msg = ' '.join(['Could not export project "{}".'.format(self.name), 
                                 'You may not have write permissions on this project.',

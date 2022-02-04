@@ -207,9 +207,9 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         #Clean
         ocpiutil.execute_cmd(settings,
                              self.directory,
-                             action,
-                             make_file,
-                             verbose)
+                             action=action,
+                             file=make_file,
+                             verbose=verbose)
 
     def build(self, verbose=False, rcc=False, hdl=False, optimize=False,
         dynamic=False, worker=None, hdl_platform=None, workers_as_needed=False, 
@@ -258,9 +258,9 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         #Build
         ocpiutil.execute_cmd(settings,
                              self.directory,
-                             action,
-                             make_file,
-                             verbose)
+                             action=action,
+                             file=make_file,
+                             verbose=verbose)
 
     @staticmethod
     def get_working_dir(name, ensure_exists=True, **kwargs):

@@ -130,7 +130,7 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         return ocpiutil.execute_cmd(self.get_settings(),
                                     directory,
                                     goal,
-                                    make_file)
+                                    file=make_file)
 
     def clean(self, verbose=False, simulation=False, execute=False):
         """
@@ -151,9 +151,9 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         #Clean
         ocpiutil.execute_cmd(settings,
                              location,
-                             action,
-                             make_file,
-                             verbose)
+                             action=action,
+                             file=make_file,
+                             verbose=verbose)
 
     def build(self, verbose=False, no_assemblies=None, workers_as_needed=False,
         optimize=False, dynamic=False, hdl_target=None, hdl_platform=None,
@@ -201,9 +201,9 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         #Build
         ocpiutil.execute_cmd(settings,
                              location,
-                             action,
-                             make_file,
-                             verbose)
+                             action=action,
+                             file=make_file,
+                             verbose=verbose)
 
     @staticmethod
     def get_working_dir(name, ensure_exists=True, **kwargs):
@@ -368,9 +368,9 @@ class TestsCollection(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         #Clean
         ocpiutil.execute_cmd(settings,
                              location,
-                             action,
-                             make_file,
-                             verbose)
+                             action=action,
+                             file=make_file,
+                             verbose=verbose)
 
     def build(self, verbose=False, no_assemblies=None, workers_as_needed=False,
         optimize=False, dynamic=False, hdl_target=None, hdl_platform=None,
@@ -419,6 +419,6 @@ class TestsCollection(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         #Build
         ocpiutil.execute_cmd(settings, 
                              location,
-                             action,
-                             make_file,
-                             verbose)
+                             action=action,
+                             file=make_file,
+                             verbose=verbose)
