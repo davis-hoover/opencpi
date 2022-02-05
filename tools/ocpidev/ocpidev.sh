@@ -953,6 +953,8 @@ function get_spec {
       elif [ -e $subdir/specs/${1}_spec.xml -o \
              "$odirtype" == project -a -e specs/${1}_spec.xml ]; then
 	s=${1}_spec
+      elif [ -e $subdir/${1}.comp/${1}-spec.xml ]; then
+	s=${1}-spec
       elif [ -n "$Emulate" ] ; then
         s=emulator-spec
       elif [ "$odirtype" == project ]; then

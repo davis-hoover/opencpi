@@ -554,7 +554,7 @@ class Component(ShowableComponent):
             template = jinja2.Template(ocpitemplate.COMPONENT_SPEC_XML, trim_blocks=True)
             ocpiutil.write_file_from_string(specfile, template.render(**template_dict))
 
-        spec_file_only = kwargs.get('spec_file_only')
+        spec_file_only = kwargs.get('spec_file_only') or kwargs.get('project')
         if (proj or dirtype == "project"):
             if not os.path.isfile("package-id"):
                 ocpiutil.write_file_from_string("package-id", pkg_id + "\n")
@@ -744,6 +744,13 @@ class Protocol(Component):
         if verbose:
             print("Protocol '" + name + "' was created at " + protfile)
 
+    def delete(self, force=False, **kwargs):
+        """
+        Delete the Protocol
+        """
+        # bad inheritance hierarchy, should not inherit "component"
+        return ShowableComponent.delete(self, 'protocol', force) # delete protocol file
+
 
 class Slot(Component):
     """
@@ -803,6 +810,13 @@ class Slot(Component):
         Component.add_link(name, parent_dir)
         if verbose:
             print("HDL slot '" + name + "' was created at " + slotfile)
+
+    def delete(self, force=False, **kwargs):
+        """
+        Delete the Slot
+        """
+        # bad inheritance hierarchy, should not inherit "component"
+        return ShowableComponent.delete(self, 'hdl-slot', force) # delete spec file
 
 class Card(Slot):
     """

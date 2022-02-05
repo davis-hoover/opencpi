@@ -153,7 +153,7 @@ class Asset(metaclass=ABCMeta):
                     ret_val.append(self.directory + "/specs/" + comp)
         # in libraries, spec files can be in .comp directories
         if ocpiutil.get_dirtype(self.directory) == "library":
-            for entry in pathlib.Path(self.directory).iterdir():
+            for entry in Path(self.directory).iterdir():
                 if entry.suffix == ".comp" and entry.is_dir():
                     spec_file = entry.joinpath(entry.stem + "-spec.xml")
                     if spec_file.exists():

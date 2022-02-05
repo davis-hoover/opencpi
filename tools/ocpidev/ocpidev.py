@@ -161,6 +161,7 @@ def postprocess_args(args):
         sys.exit(1)
     if args.noun == 'spec':
         args.noun = 'component'
+        args.spec_file_only = True
     if hasattr(args, 'rcc-noun'):
         args.model = 'rcc'
     elif args.noun == 'worker':
