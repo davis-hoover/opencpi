@@ -264,18 +264,21 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
             if isinstance(worker, HdlWorker):
                 worker.show_utilization()
 
-    def clean(self, **kwargs):
+    def clean(self, verbose=False, hdl=False, rcc=False,
+        worker=None, hdl_platform=None, hdl_target=None):
         """
         Cleans the library by handing over the user specifications
         to execute command.
         """
-        do_clean("library", self.directory, kwargs)
+        do_clean("library", self.directory, locals())
 
-    def build(self, **kwargs):
+    def build(self, verbose=False, rcc=False, hdl=False, optimize=False,
+        dynamic=False, worker=None, hdl_platform=None, workers_as_needed=False, 
+        hdl_target=None, rcc_platform=None, hdl_rcc_platform=None):
         """
         Builds the library by using the common build function for libraries or library collections
         """
-        do_build('library', self.directory, kwargs)
+        do_build('library', self.directory, locals())
 
     @staticmethod
     def get_working_dir(name, ensure_exists=True, **kwargs):
@@ -447,14 +450,20 @@ class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, Rep
         for lib in self.library_list:
             lib.show_utilization()
 
-    def clean(self, **kwargs):
-        do_clean("libraries", self.directory, kwargs)
+    def clean(self, verbose=False, hdl=False, rcc=False,
+        worker=None, hdl_platform=None, hdl_target=None):
+        """
+        Cleans the libraries
+        """
+        do_clean("libraries", self.directory, locals())
 
-    def build(self, **kwargs):
+    def build(self, verbose=False, rcc=False, hdl=False, optimize=False,
+        dynamic=False, worker=None, hdl_platform=None, workers_as_needed=False, 
+        hdl_target=None, rcc_platform=None, hdl_rcc_platform=None):
         """
         Builds the library by using the common build function for libraries or library collections
         """
-        do_build('libraries', self.directory, kwargs)
+        do_build('libraries', self.directory, locals())
 
     def delete_all(self):
         projdir = Path(ocpiutil.get_path_to_project_top())

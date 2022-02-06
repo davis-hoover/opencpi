@@ -112,12 +112,12 @@ def main():
         # call verb method with collected args
             asset_method = getattr(asset, args.verb)
             do_ocpidev_sh = False
-            # sig = signature(asset_method)
-            # method_args = {}
-            # for param in sig.parameters:
-            #     method_args[param] = getattr(args, param, '')
+            sig = signature(asset_method)
+            method_args = {}
+            for param in sig.parameters:
+                method_args[param] = getattr(args, param, '')
             print_cmd(args, asset.directory)
-            asset_method(**vars(args))
+            asset_method(**method_args)
             metadata(verb, noun)
         except ocpiutil.OCPIException as e:
         # Verb failed in an expected way; don't fall back to ocpidev.sh
