@@ -439,7 +439,10 @@ class PlatformPipelineBuilder(PipelineBuilder):
         else:
         # Create 'docker run' cmd
             if stage == 'install-platform':
-                volumes = ['/opt/Xilinx:/opt/Xilinx']
+                volumes = [
+                    '/opt/Xilinx:/opt/Xilinx',
+                    '/opt/Mentor:/opt/Mentor'    
+                ]
             else:
                 volumes = None
             base_image = self._build_base_image_name(host, stage, 
@@ -752,7 +755,10 @@ class OspPipelineBuilder(PlatformPipelineBuilder):
                 platform=platform, base_platform=base_platform,
                 other_platform=other_platform)
             ocpi_cmd = self._build_ocpi_cmd(stage, platform, base_platform)
-            volumes = ['/opt/Xilinx:/opt/Xilinx']
+            volumes = [
+                '/opt/Xilinx:/opt/Xilinx',
+                '/opt/Mentor:/opt/Mentor'
+            ]
             docker_create_cmd = self._build_docker_cmd('create', base_image, 
                 stage, ocpi_cmd=ocpi_cmd, volumes=volumes)
             source = '.'
@@ -876,7 +882,10 @@ class CompPipelineBuilder(PlatformPipelineBuilder):
                 platform, base_platform=base_platform, 
                 other_platform=other_platform)
             ocpi_cmd = self._build_ocpi_cmd(stage, platform, base_platform)
-            volumes = ['/opt/Xilinx:/opt/Xilinx']
+            volumes = [
+                '/opt/Xilinx:/opt/Xilinx',
+                '/opt/Mentor:/opt/Mentor'
+            ]
             docker_create_cmd = self._build_docker_cmd('create', base_image, 
                 stage, ocpi_cmd=ocpi_cmd, volumes=volumes)
             source = '.'
@@ -955,21 +964,27 @@ class CompPipelineBuilder(PlatformPipelineBuilder):
                 'ocpidev register project -d',
                 'projects/comps/{}'.format(self.project)
             ])
-            get_model_cmd = ' '.join([
-                'if ocpidev show hdl platforms | grep {};'.format(platform),
-                'then export MODEL=hdl;',
-                'elif ocpidev show rcc platforms | grep {};'.format(platform), 
-                'then export MODEL=rcc; fi > /dev/null',
-            ])
-            build_cmd = ' '.join([
-                'ocpidev build -d projects/comps/{}'.format(self.project),
-                '--\$MODEL-platform={}'.format(platform)
-            ])
+            # get_model_cmd = ' '.join([
+            #     'if ocpidev show hdl platforms | grep {};'.format(platform),
+            #     'then export MODEL=hdl;',
+            #     'elif ocpidev show rcc platforms | grep {};'.format(platform), 
+            #     'then export MODEL=rcc; fi > /dev/null',
+            # ])
+            # ocpi_cmd = ''
+            # for build_platform in [platform, base_platform]:
+            #     if build_platform is None:
+            #         continue
+                # build_cmd = ' '.join([
+                #     'ocpidev build -d projects/comps/{}'.format(self.project),
+                #     '--\$MODEL-platform={}'.format(build_platform)
+                # ])
+            build_cmd = 'ocpidev build -d projects/comps/{}'.format(
+                self.project)
             ocpi_cmd = ' && '.join([
                 mv_project_cmd,
                 register_cmd,
-                get_model_cmd,
-                'echo model=\$MODEL',
+                # get_model_cmd,
+                # 'echo model=\$MODEL',
                 build_cmd
             ])
         else:
@@ -1078,7 +1093,10 @@ class AssemblyPipelineBuilder(PipelineBuilder):
         """Build a job's script"""
         ocpi_cmd = self._build_ocpi_cmd(stage, asset)
         base_image = self._build_base_image_name(stage)
-        volumes = ['/opt/Xilinx:/opt/Xilinx']
+        volumes = [
+            '/opt/Xilinx:/opt/Xilinx',
+            '/opt/Mentor:/opt/Mentor'
+        ]
         if stage == 'run-unit_tests':
         # Create "docker create" cmd, copy artifacts to container, and create
         # "docker start" cmd
