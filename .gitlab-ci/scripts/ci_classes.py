@@ -227,9 +227,9 @@ class PipelineBuilder(ABC):
                 'docker {}'.format(cmd),
                 '--net=host',
                 '--env-file=/dev/stdin --name=${CI_JOB_ID}',
-                '-v ' + '-v '.join(volumes) if volumes else '',
-                '--device ' + '--device '.join(devices) if devices else '',
-                '--cap-add ' + '--cap-add '.join(caps) if caps else '',
+                '-v ' + ' -v '.join(volumes) if volumes else '',
+                '--device ' + ' --device '.join(devices) if devices else '',
+                '--cap-add ' + ' --cap-add '.join(caps) if caps else '',
                 image,
                 '"{}"'.format(ocpi_cmd)
             ])
