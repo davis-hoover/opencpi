@@ -32,7 +32,7 @@ package clocking is
         M                      : real;  -- The multiply factor for a phase-locked loop
         N                      : integer; -- The divide factor for a phase-locked loop. Xilinx calls it D and Intel calls it N
         O                      : real; -- For phase-locked loops with muitlple outputs, this is the output divide factor. Xilinx calls it O and Intel calls it C
-        CLK_OUT_PHASE_DEGREES  : real;
+        CLK_OUT_PHASE_DEGREES  : real := 0.0;
         PHASE_SHIFT0_PICO_SECS : string_t := to_string("0 ps", 32); -- Altera/Intel uses strings for setting this unfortunately
         CLK_OUT_DUTY_CYCLE     : real);
       port(

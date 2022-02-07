@@ -42,11 +42,17 @@ def main():
     ocpi_server_addresses = os.environ.get('OCPI_SERVER_ADDRESSES')
     ip = None
     port = None
+    env_args = None
     if ocpi_server_addresses:
-      # server addresses separated by comma or spaces
-      ocpi_server_addresses = ocpi_server_addresses.replace(',', ' ').split()
+      # server addresses separated by comma
+      ocpi_server_addresses = ocpi_server_addresses.split(",")
       if ':' in ocpi_server_addresses[0]:
-        ip,port = ocpi_server_addresses[0].split(':')
+        server = ocpi_server_addresses[0].split(':')
+        print("SERVERFIELDS:"+str(server),file=sys.stderr)
+        ip = server[0]
+        port= server[1]
+        if len(server) > 2:
+            env_args = server[2].split()
       else:
         ip = ocpi_server_addresses[0]
 
@@ -128,7 +134,7 @@ def main():
 
     common_options = [option_user, option_password, option_ip,
                       option_ssh_opts, option_scp_opts, option_verbose,
-                      option_remote_dir]
+                      option_remote_dir, option_bitstream, option_environment]
 
     commands = []
     commands.append(make_subcommand(
@@ -147,13 +153,11 @@ def main():
     commands.append(make_subcommand(
         'start', start,
         'start server on remote device',
-        [option_log_level, option_valgrind, option_bitstream, option_memory, 
-         option_environment]))
+        [option_log_level, option_valgrind, option_memory]))
     commands.append(make_subcommand(
         'restart', restart,
         'stop and then start server on remote device',
-        [option_log_level, option_valgrind, option_bitstream, option_memory, 
-         option_environment]))
+        [option_log_level, option_valgrind, option_memory]))
     commands.append(make_subcommand(
         'status', status,
         'get status of server on remote device'))
@@ -179,7 +183,7 @@ def main():
          option_sw_platform]))
 
     parser = make_parser(commands, common_options)
-    preprocessed_args = preprocess_args(commands)
+    preprocessed_args = preprocess_args(commands,env_args)
     args = parser.parse_args(preprocessed_args)
 
     # If a subcommand was passed, call it. Else print help message
@@ -194,7 +198,7 @@ def main():
         parser.print_help()
 
 
-def preprocess_args(commands):
+def preprocess_args(commands, env_args):
     """ Preprocessed user args
 
         Moves options appearing on the left side of the subcommand
@@ -206,7 +210,7 @@ def preprocess_args(commands):
     Returns:
         string of preprocessed user args
     """
-    user_args = sys.argv[1:]
+    user_args = env_args + sys.argv[1:]
     left_options = []
     processed_args = []
     verbs = [command.name for command in commands]
