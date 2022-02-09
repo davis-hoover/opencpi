@@ -65,7 +65,7 @@ class Complex_mixerWorker : public Complex_mixerWorkerBase
     const size_t num_of_elements = in.iq().data().size(); // size in IqstreamIqData units
     out.iq().data().resize(num_of_elements);
 
-    // set each time so that if the conatiner changes it gets updated
+    // set each time so that if the container changes it gets updated
     // might be better to put this into a write sync function but this is for training
     float phase_inc = properties().phs_inc * ((2*M_PI)/(SHRT_MAX * 2));
     nco_crcf_set_frequency(q,phase_inc);

@@ -269,13 +269,22 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
             settings['worker'] = worker
         make_file = ocpiutil.get_makefile(self.directory, "project")[0]
         #Clean
-        ocpiutil.file.execute_cmd(
-            settings, self.directory, action=action, file=make_file, verbose=verbose)
+        ocpiutil.execute_cmd(settings,
+                             self.directory,
+                             action=action,
+                             file=make_file,
+                             verbose=verbose)
         if not clean_all:
-            ocpiutil.file.execute_cmd(
-                {}, self.directory, action=['imports'], file=make_file, verbose=verbose)
-            ocpiutil.file.execute_cmd(
-                {}, self.directory, action=['exports'], file=make_file, verbose=verbose)
+            ocpiutil.execute_cmd({},
+                                 self.directory,
+                                 action=['imports'],
+                                 file=make_file,
+                                 verbose=verbose)
+            ocpiutil.execute_cmd({},
+                                 self.directory,
+                                 action=['exports'],
+                                 file=make_file,
+                                 verbose=verbose)
 
     def build(self, verbose=False, rcc=False, hdl=False, optimize=False, dynamic=False,
         worker=None, no_assemblies=None, hdl_assembly=None, hdl_platform=None,
@@ -325,10 +334,16 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
             settings['worker'] = worker
         make_file = ocpiutil.get_makefile(self.directory, "project")[0]
         #Build
-        ocpiutil.file.execute_cmd(
-                {}, self.directory, action=['imports'], file=make_file, verbose=verbose)
-        ocpiutil.file.execute_cmd(
-                settings, self.directory, action=action, file=make_file, verbose=verbose)
+        ocpiutil.execute_cmd({},
+                             self.directory,
+                             action=['imports'],
+                             file=make_file,
+                             verbose=verbose)
+        ocpiutil.execute_cmd(settings,
+                             self.directory,
+                             action=action,
+                             file=make_file,
+                             verbose=verbose)
 
     def get_show_test_dict(self):
         """
@@ -1242,12 +1257,17 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
                 "registry",
                 Registry.get_registry_dir()).add(str(path), True)
 
-        rc = ocpiutil.execute_cmd({}, str(path), action=[ "imports" ],
-                                  file=os.environ["OCPI_CDK_DIR"] + "/include/project.mk")
+        make_file=str(Path(os.environ['OCPI_CDK_DIR'], 'include', 'project.mk'))
+        rc = ocpiutil.execute_cmd({},
+                                  str(path),
+                                  action=['imports'],
+                                  file=make_file)
         if rc != 0:
             logging.warning("Failed to import project at " + str(path))
-        rc = ocpiutil.execute_cmd({}, str(path), action=[ "exports" ],
-                                  file=os.environ["OCPI_CDK_DIR"] + "/include/project.mk")
+        rc = ocpiutil.execute_cmd({},
+                                  str(path),
+                                  action=['exports'],
+                                  file=make_file)
         if rc != 0:
             logging.warning("Failed to export project at " + str(path))
 
@@ -1263,8 +1283,11 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         is_exported = ocpiutil.is_path_in_exported_project(self.directory)
         if not is_exported:
             make_file = ocpiutil.get_makefile(self.directory, "project")[0]
-            rc = ocpiutil.file.execute_cmd(
-                {}, self.directory, action=['exports'], file=make_file, verbose=verbose)
+            rc = ocpiutil.execute_cmd({},
+                                      self.directory,
+                                      action=['exports'],
+                                      file=make_file,
+                                      verbose=verbose)
             if rc:
                 msg = ' '.join(['Could not export project "{}".'.format(self.name), 
                                 'You may not have write permissions on this project.',
