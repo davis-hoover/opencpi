@@ -964,27 +964,27 @@ class CompPipelineBuilder(PlatformPipelineBuilder):
                 'ocpidev register project -d',
                 'projects/comps/{}'.format(self.project)
             ])
-            # get_model_cmd = ' '.join([
-            #     'if ocpidev show hdl platforms | grep {};'.format(platform),
-            #     'then export MODEL=hdl;',
-            #     'elif ocpidev show rcc platforms | grep {};'.format(platform), 
-            #     'then export MODEL=rcc; fi > /dev/null',
-            # ])
-            # ocpi_cmd = ''
-            # for build_platform in [platform, base_platform]:
-            #     if build_platform is None:
-            #         continue
-                # build_cmd = ' '.join([
-                #     'ocpidev build -d projects/comps/{}'.format(self.project),
-                #     '--\$MODEL-platform={}'.format(build_platform)
-                # ])
-            build_cmd = 'ocpidev build -d projects/comps/{}'.format(
-                self.project)
+            # Need to find the models of platform and base_platform.
+            # Try to discover using 'ocpidev show'
+            get_model_cmd = ' '.join([
+                'if ocpidev show hdl platforms | grep {};'.format(platform),
+                'then export MODEL=hdl && export OTHER_MODEL=rcc;',
+                'elif ocpidev show rcc platforms | grep {};'.format(platform), 
+                'then export MODEL=rcc && export OTHER_MODEL=hdl;',
+                'fi > /dev/null',
+            ])
+            build_cmd = ' '.join([
+                'ocpidev build -d projects/comps/{}'.format(self.project),
+                '--\$(MODEL)-model {}'.format(platform)
+            ])
+            if base_platform:
+                build_cmd += ' --\$(OTHER_MODEL)-model {}'.format(
+                    base_platform)
             ocpi_cmd = ' && '.join([
                 mv_project_cmd,
                 register_cmd,
-                # get_model_cmd,
-                # 'echo model=\$MODEL',
+                get_model_cmd,
+                'echo model=\$MODEL && echo other_model=\$OTHER_MODEL',
                 build_cmd
             ])
         else:
