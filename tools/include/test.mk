@@ -139,7 +139,7 @@ runonly: prepare runnoprepare
 runverify:
 	$(AT)echo ======== Running and verifying test outputs on available platforms for $(CwdName):
 	$(AT)if [ -d gen/applications ]; then \
-	       ./run/runtests.sh run verify $(and $(View),view); \
+	       ./run/runtests.sh run verify; \
 	     else \
 	       echo No tests generated here so none run.; \
 	     fi
@@ -179,7 +179,7 @@ verify:
 		   echo ============ No test case executions to verify for platform $$d; \
 		 else \
 	           echo ============ Verifying test cases for platform $$d && \
-	           ./run.sh verify $(and $(View),view); \
+	           ./run.sh verify; \
 		 fi); \
 	     done
 

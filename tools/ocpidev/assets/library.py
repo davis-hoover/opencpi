@@ -112,8 +112,8 @@ def do_clean(asset_type, directory, kwargs):
         settings['worker'] = worker
     make_file = ocpiutil.get_makefile(directory, asset_type)[0]
     #Clean
-    ocpiutil.file.execute_cmd(
-        settings, directory, action=action, file=make_file, verbose=kwargs.get('verbose'))
+    ocpiutil.file.execute_cmd(settings, directory, action=action, file=make_file,
+                              verbose=kwargs.get('verbose'))
 
 class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAsset):
     """
