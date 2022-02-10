@@ -6,7 +6,7 @@
 
 ``%%NAME-CODE%%`` %%AUTHORING_MODEL%% Worker
 ============================================
-This document is generated from the worker's metadata and not from an authored documentation file.
+This document is generated from this RCC worker's metadata and not from an authored documentation file.
 
 Detail
 ------

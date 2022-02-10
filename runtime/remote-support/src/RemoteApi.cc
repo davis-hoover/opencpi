@@ -67,7 +67,7 @@ namespace OCPI {
       if ((server = getenv("OCPI_SERVER_ADDRESS")))
 	OR::probeServer(driver, server, verbose);
       if ((server = getenv("OCPI_SERVER_ADDRESSES")))
-	for (OU::TokenIter li(server); li.token(); li.next())
+	for (OU::TokenIter li(server, ","); li.token(); li.next())
 	  OR::probeServer(driver, li.token(), verbose);
       if ((server = getenv("OCPI_SERVER_ADDRESS_FILE"))) {
 	std::string addrs;

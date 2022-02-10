@@ -603,8 +603,8 @@ parseHdlAssy() {
 	    // If the worker clock is not global, then it must be another port's clock
 	    if (!workerClk.m_exported)
 	      continue;
-	    std::string name;
-	    clk = &addClock(OU::format(name, "%s_%s",
+	    std::string l_name;
+	    clk = &addClock(OU::format(l_name, "%s_%s",
 				       anyNotClockInput->m_instance->cname(), workerClk.cname()));
 	    anyNotClockInput->m_instance->m_clocks[workerClk.m_ordinal] = clk;
 	  } else

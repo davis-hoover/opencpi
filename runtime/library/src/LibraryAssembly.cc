@@ -20,6 +20,7 @@
 
 #include <inttypes.h>
 #include <strings.h>
+#include <cstring>
 #include <iostream>
 #include "LibraryAssembly.hh"
 #include "BaseValue.hh"
@@ -413,21 +414,40 @@ namespace OCPI {
 	       impl.m_staticInstance ? ezxml_cattr(impl.m_staticInstance, "name") : "",
 	       impl.m_artifact.name().c_str());
       // Check for worker name match
+      // Note that the worker name in the artifact has a config suffix.
+      // The worker attribute can be just the name, the name and model, or the package and name and model
+      // And in all three cases it might also include the config suffix.
+      // So in each of the three cases we need to do two comparisons, one with the config suffix removed
+      // Remove the configuration suffix from the worker's name
+      const char *dash =  strchr(impl.m_metadataImpl.cname(), '-');
+      std::string worker(impl.m_metadataImpl.cname(),
+			 dash ? OCPI_SIZE_T_DIFF(dash, impl.m_metadataImpl.cname()) :
+			 impl.m_metadataImpl.name().size());
       std::string fullWorker;
       if (m_utilInstance.m_implName.size() &&
-	  // Just the worker name without model - no dots
+	  // Name without model, but maybe with config suffix
 	  strcasecmp(m_utilInstance.m_implName.c_str(), impl.m_metadataImpl.cname()) &&
-	  // Just the worker name with model - one dot
+	  // Name without model, matching impl's name without suffix
+	  strcasecmp(m_utilInstance.m_implName.c_str(), worker.c_str()) &&
+	  // Name with model, matching impl's name maybe with suffix
 	  strcasecmp(m_utilInstance.m_implName.c_str(),
 		     OU::format(fullWorker, "%s.%s",
 				impl.m_metadataImpl.cname(), impl.m_metadataImpl.model().c_str())) &&
-	  // The fully qualified name
+	  // Name with model, matching impl's name maybe without suffix
+	  strcasecmp(m_utilInstance.m_implName.c_str(),
+		     OU::format(fullWorker, "%s.%s",
+				worker.c_str(), impl.m_metadataImpl.model().c_str())) &&
+	  // The fully qualified name matching impl's FQN maybe with suffix
 	  strcasecmp(m_utilInstance.m_implName.c_str(),
 		     OU::format(fullWorker, "%s.%s.%s", impl.m_metadataImpl.package().c_str(),
-				impl.m_metadataImpl.cname(), impl.m_metadataImpl.model().c_str()))) {
-	ocpiInfo("    Rejected: worker name is \"%s.%s\", while requested worker name is \"%s\"",
+				impl.m_metadataImpl.cname(), impl.m_metadataImpl.model().c_str())) &&
+	  // The fully qualified name matching impl's FQN maybe without suffix
+	  strcasecmp(m_utilInstance.m_implName.c_str(),
+		     OU::format(fullWorker, "%s.%s.%s", impl.m_metadataImpl.package().c_str(),
+				worker.c_str(), impl.m_metadataImpl.model().c_str()))) {
+	ocpiInfo("    Rejected: worker name is \"%s.%s\", while requested worker name is \"%s\":%s",
 		 impl.m_metadataImpl.cname(), impl.m_metadataImpl.model().c_str(),
-		 m_utilInstance.m_implName.c_str());
+		 m_utilInstance.m_implName.c_str(), fullWorker.c_str());
 	return false;
       }
       // Check for model and platform matches

@@ -54,11 +54,13 @@ class Application(RunnableAsset, RCCBuildableAsset):
         self.run_after = kwargs.get("run_after", None)
         self.run_arg = kwargs.get("run_arg", None)
 
-    def run(self):
+    def run(self, verbose=False):
         """
         Runs the Application with the settings specified in the object
         """
         args=["run", "Applications="+self.name]
+        if verbose:
+            args.append("OcpiVerbose=1")
         if self.name.endswith(".xml"):
             directory = self.directory
             type="applications"
@@ -66,8 +68,7 @@ class Application(RunnableAsset, RCCBuildableAsset):
             directory = str(Path(self.directory, self.name))
             type="application"
         makefile = ocpiutil.get_makefile(directory, type)[0]
-        return ocpiutil.execute_cmd(self.get_settings(), directory, 
-                                    args, makefile)
+        return ocpiutil.execute_cmd(self.get_settings(), directory, args, makefile, verbose=verbose)
 
     def clean(self, verbose=False):
         """

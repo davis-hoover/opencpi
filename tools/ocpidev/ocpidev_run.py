@@ -232,8 +232,8 @@ def main():
                                                              hdl_library=args['hdl_library'],
                                                              platform=args['hdl_plat_dir'])
             if args['noun'] not in ['project', 'registry', 'library']:
-                name = Path(directory).name
-                directory = str(Path(directory).parent)
+                name = Path(directory).absolute().name
+                directory = str(Path(directory).absolute().parent)
             if (name is None) and (dir_type in [n for n in NOUNS if n != "tests"]):
                 name = os.path.basename(os.path.realpath('.'))
             del args['name']
@@ -252,7 +252,7 @@ def main():
                                    "\nargs: " + str(args))
             my_asset = ocpifactory.AssetFactory.factory(args['noun'], directory,
                                                         name, **args)
-            sys.exit(my_asset.run())
+            sys.exit(my_asset.run(verbose=args['verbose']))
     except ocpiutil.OCPIException as ex:
         ocpiutil.logging.error(ex)
         if args['noun'] is not None:

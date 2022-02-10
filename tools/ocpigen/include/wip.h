@@ -427,12 +427,12 @@ class Worker : public OM::Worker {
   const Ports &ports() const { return m_ports; }
   const char *parseClocks();
   const char *addClock(ezxml_t);
-  const char *addClock(const char *name, const char *direction, Clock *&clk);
-  Clock &addClock(const char *name, bool output = false);
-  Clock &addClock(const std::string &name, bool output = false) { return addClock(name.c_str(), output); }
+  const char *addClock(const char *a_name, const char *direction, Clock *&clk);
+  Clock &addClock(const char *a_name, bool output = false);
+  Clock &addClock(const std::string &a_name, bool output = false) { return addClock(a_name.c_str(), output); }
   Clock &addWciClockReset();
   // FIXME: inconsistency between get/find on this worker class and vs. OM::worker's methods
-  OM::Property *findProperty(const char *name) const;
+  OM::Property *findProperty(const char *a_name) const;
   OM::Port *findMetaPort(const char *id, const OM::Port *except) const;
   const char *parseSlaves();
   std::string print_map();
@@ -441,7 +441,7 @@ class Worker : public OM::Worker {
   virtual OM::Port &metaPort(unsigned long which) const;
   const char
     *addBuiltinProperties(),
-    *getPort(const char *name, Port *&p, Port *except = NULL) const,
+    *getPort(const char *a_name, Port *&p, Port *except = NULL) const,
     *getValue(const char *sym, OB::ExprValue &val) const,
     *getNumber(ezxml_t x, const char *attr, size_t *np, bool *found = NULL,
 	       size_t defaultValue = 0, bool setDefault = true) const,

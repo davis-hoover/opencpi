@@ -167,6 +167,7 @@ namespace OCPI {
     }
     void ApplicationI::clear() {
       m_assembly--;
+      release();
       ezxml_free(m_deployXml);
       ezxml_free(m_appXml);
       delete [] m_copy;
@@ -1257,8 +1258,7 @@ it is really per actual worker config...
               ctime_r(&bd, tbuf);
               fprintf(stderr,
                       "  Instance %2u %s (spec %s) on %s container %u: %s, using %s%s%s in %s dated %s",
-                      n, m_assembly.instance(n).name().c_str(),
-                      m_assembly.instance(n).specName().c_str(),
+                      n, d->m_name.c_str(), impl.m_metadataImpl.specName().c_str(),
                       c.m_model.c_str(), c.ordinal(), c.name().c_str(),
                       impl.m_metadataImpl.cname(),
                       impl.m_staticInstance ? "/" : "",
@@ -1747,6 +1747,17 @@ it is really per actual worker config...
       ocpiDebug("Stopping workers that are not masters.");
       for (unsigned n = 0; n < m_nContainers; n++)
         m_containerApps[n]->stop(false, false); // stop non-masters
+    }
+    void ApplicationI::release() {
+      ocpiDebug("Releasing master workers that are not slaves.");
+      for (unsigned n = 0; n < m_nContainers; n++)
+        m_containerApps[n]->release(true, false); // stop masters that are not slaves
+      ocpiDebug("Releasing master workers that are also slaves.");
+      for (unsigned n = 0; n < m_nContainers; n++)
+        m_containerApps[n]->release(true, true);  // stop masters that are slaves
+      ocpiDebug("Releasing workers that are not masters.");
+      for (unsigned n = 0; n < m_nContainers; n++)
+        m_containerApps[n]->release(false, false); // stop non-masters
     }
     void ApplicationI::
     setDelayedProperties() {

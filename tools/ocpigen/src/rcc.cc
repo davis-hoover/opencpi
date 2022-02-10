@@ -710,7 +710,7 @@ emitImplSlavesConfig(FILE *f, unsigned pc) {
   // for each slave declare the slave class which extends RCCUserSlave and is named generically
   // Slave1, Slave2 ... etc
   for (auto it = paramConfig.m_slaves.begin(); it != paramConfig.m_slaves.end(); ++it) {
-    const char *name = (*it).first.c_str();
+    const char *l_name = (*it).first.c_str();
     // This worker is a proxy.  Give it access to each of its slaves
     fprintf(f,
 	    "  /*\n"
@@ -779,7 +779,7 @@ emitImplSlavesConfig(FILE *f, unsigned pc) {
 		"      m_worker->getProperty(%uu, val, list, options, attrs);\n"
 		"      return val.c_str();\n"
 		"    }\n",
-		p.cname(), name, p.m_ordinal);
+		p.cname(), l_name, p.m_ordinal);
 	// expose the faster/typed non-string based interface if it exists
 	if (p.m_baseType == OA::OCPI_String && !p.m_isSequence)
 	  fprintf(f,
@@ -797,9 +797,9 @@ emitImplSlavesConfig(FILE *f, unsigned pc) {
 		  "      delete [] buf;\n"
 		  "      return s;\n"
 		  "   }\n",
-		  p.m_name.c_str(), dims.c_str(), comma, name, pretty.c_str(),
+		  p.m_name.c_str(), dims.c_str(), comma, l_name, pretty.c_str(),
 		  p.m_isParameter ? "Parameter" : "PropertyOrd", p.m_ordinal, comma,
-		  offset.c_str(), p.m_name.c_str(), dims.c_str(), comma, name, p.m_name.c_str(),
+		  offset.c_str(), p.m_name.c_str(), dims.c_str(), comma, l_name, p.m_name.c_str(),
 		  pretty.c_str(), p.m_isParameter ? "Parameter" : "PropertyOrd", p.m_ordinal,
 		  comma, offset.c_str());
 	else if (p.m_baseType != OA::OCPI_Struct && !p.m_isSequence)
@@ -808,7 +808,7 @@ emitImplSlavesConfig(FILE *f, unsigned pc) {
 		  "      checkSlave(\"%s\");\n"
 		  "      return %sm_worker->get%s%s(%u%s%s);\n"
 		  "    }\n",
-		  type.c_str(), p.m_name.c_str(), dims.c_str(), name,
+		  type.c_str(), p.m_name.c_str(), dims.c_str(), l_name,
 		  cast.c_str(),  // if val needs to be cast in the case of an enum
 		  pretty.c_str(), p.m_isParameter ? "Parameter" : "PropertyOrd", p.m_ordinal,
 		  comma, offset.c_str());
@@ -820,7 +820,7 @@ emitImplSlavesConfig(FILE *f, unsigned pc) {
 		"= OCPI::API::emptyList) {\n"
 		"      checkSlave(\"%s\");\n"
 		"      m_worker->setProperty(\"%s\", val, list);\n",
-		p.cname(), name, p.cname());
+		p.cname(), l_name, p.cname());
 	fprintf(f,
 		"#if !defined(NDEBUG)\n"
 		"      debugLog(\"Setting slave.setProperty_%s",
@@ -840,7 +840,7 @@ emitImplSlavesConfig(FILE *f, unsigned pc) {
 	  fprintf(f,
 		  "    inline void set_%s(%s%s%s val) {\n"
 		  "      checkSlave(\"%s\");\n",
-		  p.m_name.c_str(), dims.c_str(), comma, type.c_str(), name);
+		  p.m_name.c_str(), dims.c_str(), comma, type.c_str(), l_name);
 	  if (p.m_arrayRank) {
 	    fprintf(f,
 		    "      unsigned idx = %s;\n"
@@ -872,7 +872,7 @@ emitImplSlavesConfig(FILE *f, unsigned pc) {
 		  "      checkSlave(\"%s\");\n"
 		  "      m_worker->setStringPropertyOrd(%u, val.c_str()%s%s);\n"
 		  "    }\n",
-		  p.m_name.c_str(), dims.c_str(), comma, name, p.m_ordinal, comma, offset.c_str());
+		  p.m_name.c_str(), dims.c_str(), comma, l_name, p.m_ordinal, comma, offset.c_str());
       }
     } // for iterate over m_ctl.properties
     fprintf(f,
@@ -1446,15 +1446,15 @@ parseSlaves() {
 	    return err;
 	  const char
 	    *worker = ezxml_cattr(slave, "worker"),
-	    *name = ezxml_cattr(slave, "name");
+	    *l_name = ezxml_cattr(slave, "name");
 	  bool optional = false;
 	  if ((err = OE::getBoolean(slave, "optional", &optional)))
 	    return err;
 	  if (!worker)
 	    return OU::esprintf("Missing \"worker\" attribute in <slave> element");
 	  OU::formatAdd(xml, "\n  <instance worker='%s'", worker);
-	  if (name)
-	      OU::formatAdd(xml, " name='%s'", name);
+	  if (l_name)
+	      OU::formatAdd(xml, " name='%s'", l_name);
 	  if (optional)
 	    OU::formatAdd(xml, " optional='true'");
 	  xml += "/>";

@@ -176,11 +176,11 @@ OcpiAbsPathX=$(strip \
           $(call OcpiAbsDir,.)/$1)))),$(abspath $p)))
 
 define OcpiParseXml
-  $$(infox PARSE:$1:$2)
+  $$(callx OcpiInfo,$0: $1:$2)
   $$(if $$(call DoShell,set -o pipefail && $$(ToolsDir)/ocpigen -R $1/$2.xml|tr "\n" "@"|tr " " "~",OcpiProps),\
     $$(error ocpigen failed),\
     $$(foreach var,$$(subst @, ,$$(OcpiProps)),$$(eval $$(subst ~, ,$$(var)))))
-  $$(infox $0: OcpiProps is $$(subst @, ,$$(OcpiProps)))
+  $$(callx OcpiInfo,$0: OcpiProps is $$(subst @, ,$$(OcpiProps)))
 endef
 
 # Call a function ($1) with a single path argument ($2).
@@ -1144,7 +1144,7 @@ OcpiIncludeParentAsset_platform=$(callx OcpiInfo,OIPA_p:$1)\
 #            e.g. Library, Platform, Platforms, Worker
 define OcpiSetAsset
   OcpiAssetName:=$$(notdir $$(realpath $1))
-  $$(infox SETASSET:$1:$2:$$(OcpiAssetName):$$(CURDIR):$$(wildcard $1/$$(OcpiAssetName).xml))
+  $$(callx OcpiInfo,SETASSET:$1:$2:$$(OcpiAssetName):$$(CURDIR):$$(wildcard $1/$$(OcpiAssetName).xml))
   Package:=
   PackageID:=
   PackagePrefix:=
@@ -1176,8 +1176,8 @@ define OcpiSetAsset
   else ifneq ($(filter-out Platforms Primitive Primitives Applications Application,$2),)
     $$(error Unexpected asset type: $2)
   else ifeq ($2,Application)
-    ifneq ($$(wildcard $1/$$(OcpiAssetName).xml),)
-      $$(eval $$(call OcpiParseXml,$1,$$(OcpiAssetName)))
+    ifneq ($$(wildcard $1/$$(OcpiAssetName)-app.xml),)
+      $$(eval $$(call OcpiParseXml,$1,$$(OcpiAssetName)-app))
     endif
   else ifeq ($2,Primitives)
     # We are overloading the Libraries and Cores variables.
@@ -1271,11 +1271,13 @@ OcpiIncludeAssetAndParentX=$(callx OcpiInfo,OIAAPX:$1:$2:$3:$(realpath $1))$(str
 OcpiIncludeAssetAndParent=\
   $(if $(filter clean%,$(MAKECMDGOALS)),\
     $(- here is when we are cleaning - just look for cleanfiles attribute by itself)\
+    $(eval CleanFiles:=)\
     $(foreach d,$(or $1,.),\
       $(foreach x,$(wildcard $d/$(CwdName).xml $d/$(CwdName).*.xml $d/$(CwdName)-test.xml $d/$(CwdName)-app.xml),\
-	$(infox FOUND XML:$x)\
-        $(eval CleanFiles:=$(and $(wildcard $(ToolsDir)/ocpixml),$(shell $(ToolsDir)/ocpixml -a '?cleanfiles' parse $x)))\
-	$(infox FOUND CLEANFILES:$(CleanFiles)))),\
+	$(callx OcpiInfo,FOUND XML:$x)\
+        $(eval CleanFiles+=$(and $(wildcard $(ToolsDir)/ocpixml),$(shell $(ToolsDir)/ocpixml -a '?cleanfiles' parse $x)))\
+	$(callx OcpiInfo,FOUND CLEANFILES:$(CleanFiles))))\
+    $(callx OcpiInfo,FINAL CLEANFILES:$(CleanFiles)),\
     $(- here is when we are not cleaning)\
     $(eval ParentPackage:=)\
     $(eval Package:=)\
@@ -1429,6 +1431,7 @@ ParamShell=\
     $(call OcpiGenTool, -D $(GeneratedDir) $(and $(Package),-p $(Package))\
       $(and $(Platform),-P $(Platform)) \
       $(and $(PlatformDir), -F $(PlatformDir)) \
+      $(and $(OCPI_AUTO_BUILD_WORKERS),-U) \
       $(HdlVhdlLibraries) \
       $(and $(Assembly),-S $(Assembly)) \
       -b $(Worker_$(Worker)_xml))) || echo 1;\
@@ -1439,7 +1442,8 @@ ParamShell=\
       $(call OcpiGenTool, -D $(GeneratedDir) $(and $(Package),-p $(Package))\
         $(and $(Platform),-P $(Platform)) \
         $(and $(PlatformDir), -F $(PlatformDir)) \
-        $(HdlVhdlLibraries) \
+	$(and $(OCPI_AUTO_BUILD_WORKERS),-U) \
+	$(HdlVhdlLibraries) \
         $(and $(Assembly),-S $(Assembly)) \
         -r $(Worker_$w_xml) || (echo 1 && exit 1));)\
   fi

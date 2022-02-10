@@ -63,12 +63,13 @@ ifeq ($(filter rcc,$(Model))$(filter clean%,$(MAKECMDGOALS))$(HdlActualTargets),
   ifeq ($(filter xml declare,$(MAKECMDGOALS)),)
     $(call OcpiInfo, This $(UCModel) worker $(Worker) not built since no $(UCModel) targets or platforms specified.)
   endif
-  all: $(if $(filter 1,$(OCPI_DOC_ONLY)),doc,liblinks $(if $(filter 1,$(OCPI_NO_DOC)),,doc))
+  all: $(if $(filter 1,$(OCPI_DOC_ONLY)),docs,liblinks $(if $(filter 1,$(OCPI_NO_DOC)),,docs))
 else
   # All worker-derived assets (worker, platform, assembly, config, container etc.)
   # might have doc
-  all: $(if $(filter 1,$(OCPI_DOC_ONLY)),doc,skeleton links $(if $(filter 1,$(OCPI_NO_DOC)),,doc))
+  all: $(if $(filter 1,$(OCPI_DOC_ONLY)),docs,skeleton links $(if $(filter 1,$(OCPI_NO_DOC)),,docs))
 endif
+docs:  $(and $(if $(HdlMode),$(filter $(HdlMode),worker),1),doc)
 doc:
 	$(AT)ocpidoc build
 # This echoing is to allow the AT= construct to work without polluting stdout

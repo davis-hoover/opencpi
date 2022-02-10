@@ -48,7 +48,6 @@ def main():
       ocpi_server_addresses = ocpi_server_addresses.split(",")
       if ':' in ocpi_server_addresses[0]:
         server = ocpi_server_addresses[0].split(':')
-        print("SERVERFIELDS:"+str(server),file=sys.stderr)
         ip = server[0]
         port= server[1]
         if len(server) > 2:
@@ -243,7 +242,7 @@ def test(args):
     if args.verbose:
         print("Successfully reached remote system with ping at address " + args.ip_addr)
     cmd = 'echo "hello world" > /dev/null'
-    command = make_command(cmd, args, stderr=True)
+    command = make_command(cmd, args)
     rc = execute_command(command, args)
 
     if rc == 255:
@@ -425,7 +424,7 @@ def execute_commands(commands, args):
     return 0
 
 
-def execute_command(command, args, stdin=subprocess.PIPE, stdout=subprocess.PIPE):
+def execute_command(command, args, stdin=None, stdout=None):
     """ Executes a command on the remote device using a subprocess
 
     Args:
@@ -437,6 +436,8 @@ def execute_command(command, args, stdin=subprocess.PIPE, stdout=subprocess.PIPE
     Returns:
         The subprocess's return code, stdout, and stderr
     """
+    if args.verbose:
+        print("Executing remote command: " + command.cmd, file=sys.stderr)
     with tempfile.TemporaryDirectory() as tmpdir:
         with tempfile.NamedTemporaryFile(dir=tmpdir, mode='w+b',
                                          buffering=0, delete=False) as passwd_file:
@@ -448,30 +449,22 @@ def execute_command(command, args, stdin=subprocess.PIPE, stdout=subprocess.PIPE
             env = os.environ
             env['SSH_ASKPASS'] = passwd_file_path
             env['DISPLAY'] = 'DUMMY'
+        rc=1
         try:
-            stderr=''
             with subprocess.Popen(
                     command.cmd.split(),
                     env=env,
                     start_new_session=True,
                     stdin=stdin,
                     stdout=stdout,
-                    stderr=subprocess.PIPE,
+                    stderr=None if command.stderr else subprocess.DEVNULL,
                     universal_newlines=True) as process:
-                if process.stdout:
-                    for stdout_str in process.stdout:
-                        print(stdout_str, end='')
-                if process.stderr:
-                    stderr = process.stderr.read().strip()
-
+                rc = process.wait()
         except Exception as e:
             raise ocpiutil.OCPIException(
                 'SSH/SCP call failed in a way we cannot handle; quitting. {}'.format(e))
 
-        if stderr and command.stderr:
-            print(stderr)
-        
-        return process.returncode
+        return rc
 
 
 def load(args):
@@ -699,11 +692,10 @@ def unload(args):
     if status(args, stderr=False) == 0:
       if stop(args) != 0:
           return 1
-    
+
     command = 'if [[ -e {} ]]; then true; else false; fi'.format(args.remote_dir)
     command = make_command(command, args)
     rc = execute_command(command, args)
- 
     if rc == 0:
       command = 'rm -r {}'.format(args.remote_dir)
       command = make_command(command, args)
@@ -788,10 +780,11 @@ def status(args, stderr=True):
     if rc not in command.rc:
         err_msg = 'Error: Unable to find remote directory "{}"'.format(
             args.remote_dir)
-        sys.exit(err_msg)
+        print(err_msg, file=sys.stderr)
+        return 1
     elif args.verbose:
         print('Discovered remote directory "{}"'.format(args.remote_dir))
-        
+
     command = make_command('status', args, ocpiserver=True, stderr=stderr)
     rc = execute_command(command, args)
 
