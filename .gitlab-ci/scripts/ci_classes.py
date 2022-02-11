@@ -975,10 +975,10 @@ class CompPipelineBuilder(PlatformPipelineBuilder):
             ])
             build_cmd = ' '.join([
                 'ocpidev build -d projects/comps/{}'.format(self.project),
-                '--\$(MODEL)-model {}'.format(platform)
+                '--\$MODEL-model {}'.format(platform)
             ])
             if base_platform:
-                build_cmd += ' --\$(OTHER_MODEL)-model {}'.format(
+                build_cmd += ' --\$OTHER_MODEL-model {}'.format(
                     base_platform)
             ocpi_cmd = ' && '.join([
                 mv_project_cmd,
