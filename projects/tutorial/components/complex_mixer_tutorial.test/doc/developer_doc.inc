@@ -70,6 +70,24 @@ The Complex Mixer consists of a Numerically Controlled Oscillator (NCO) and a co
 
 	In conjunction with the \textit{enable}(or bypass) control property, the HDL worker provides the ability to select different (\textit{data\_select}) data to output in bypass mode: input or output of the NCO.\medskip
 \end{flushleft}
+\subsection*{\comp.rcc}
+\begin{flushleft}
+	The RCC worker leverages liquid-dsp v1.2 and its \textit{nco} class to generate the internal NCO used in the algorithm. More information on this liquid-dsp module can be seen in the online documentation: \href{http://liquidsdr.org/doc/nco/}{liquid-dsp}.  \\
+	In the RCC version of this component the samples are converted from fixed point to floating point numbers in order to do that math on a GPP. This conversion introduces a small amount of error in the output data and should be accounted for when it is used in an application.  The conversion equations are as follows:
+
+	\begin{equation} \label{eq:iq_float}
+  		iq\_float = \frac{iq\_fixed}{2^{15} -1}
+	\end{equation}
+
+    \begin{equation} \label{eq:iq_fixed}
+  		iq\_fixed = {iq\_float}*(2^{15} -1)
+	\end{equation}
+
+	In the RCC worker a conversion needs to be done for the phase increment to adhere to the way the HDL phase increment is implemented.  The conversion was done in the RCC version of this component because the division operation is very resource intensive in HDL.  The conversion from the component property to the liquid-dsp interface input property is as follows:
+	\begin{equation} \label{eq:rcc_phase_inc}
+  		liquid\_phs\_inc = phs\_inc*\frac{2\pi}{0x7FFF*2}
+	\end{equation}
+\end{flushleft}
 \end{flushleft}
 
 \section*{Theory}
@@ -116,6 +134,10 @@ The Complex Mixer worker inputs complex signed samples and performs a complex mu
 %\end{flushleft}
 
 \section*{Source Dependencies}
+\subsection*{\comp.rcc}
+   \begin{itemize}
+      \item Liquid DSP (provided with \path{opencpi} RPMs)
+   \end{itemize}
 \subsection*{\comp.hdl}
 	\begin{itemize}
 		\item training\_project/components/complex\_mixer.hdl/vivado\_ip/complex\_multiplier\_stub.vhd
@@ -138,13 +160,13 @@ training\_project/components/complex\_mixer.hdl/vivado\_ip/dds\_compiler.edf
 	\end{itemize}
 
 \begin{landscape}
-  %\input{component_spec_properties.inc} % it is recommended to NOT remove this line
+  \input{component_spec_properties.inc} % it is recommended to NOT remove this line
 
-  %\input{worker_properties.inc} % it is recommended to NOT remove this line
+  \input{worker_properties.inc} % it is recommended to NOT remove this line
 
-  %\input{component_ports.inc} % it is recommended to NOT remove this line
+  \input{component_ports.inc} % it is recommended to NOT remove this line
 
-  %\input{worker_interfaces.inc} % it is recommended to NOT remove this line
+  \input{worker_interfaces.inc} % it is recommended to NOT remove this line
 \end{landscape}
 
 \section*{Control Timing and Signals}
@@ -170,11 +192,11 @@ The Complex Mixer HDL worker uses the clock from the Control Plane and standard 
 
 \section*{Test and Verification}
 \begin{flushleft}
-Test cases are derived from the number of properties, and their respective values, as listed in the complex\_mixer-test.xml. Specifically, the \comp.hdl implementation is tested, as follows:
+Test cases are derived from the number of properties, and their respective values, as listed in the complex\_mixer-test.xml.
 
 	\begin{itemize}
-		\item[1)] Bypass (HDL): The input data is forwarded to the output port. For 				verification of this case, the output file is byte-wise compared to the input file.
-		\item[2)] Normal mode (HDL): The NCO is configured to tune the input signal to 		baseband. For verification, an FFT of the output data is performed and the max value 			of the FFT is checked to be at DC (0 Hz).
+		\item[1)] Bypass (RCC \& HDL): The input data is forwarded to the output port. For 				verification of this case, the output file is byte-wise compared to the input file.
+		\item[2)] Normal mode (RCC \& HDL): The NCO is configured to tune the input signal to 		baseband. For verification, an FFT of the output data is performed and the max value 			of the FFT is checked to be at DC (0 Hz).
 		%	\item[3)] Bypass mode/data_select=1 : NCO output is captured (HDL)
 	\end{itemize}
 
