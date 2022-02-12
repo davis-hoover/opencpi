@@ -276,7 +276,7 @@ class RunnableAsset(Asset):
         super().__init__(directory, name, **kwargs)
 
     @abstractmethod
-    def run(self):
+    def run(self, verbose=False):
         """
         This function will run the asset must be implemented by the child class
         """

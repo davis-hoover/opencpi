@@ -241,7 +241,7 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
                 workers.append(name + " ")
         return (workers)
 
-    def run(self):
+    def run(self, verbose=False):
         """
         Runs the Library with the settings specified in the object.  Throws an exception if the
         tests were not initialized by using the init_tests variable at initialization.  Running a
@@ -252,7 +252,7 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
             raise ocpiutil.OCPIException("For a Library to be run \"init_tests\" must be set to " +
                                          "True when the object is constructed")
         for test in self.test_list:
-            run_val = test.run()
+            run_val = test.run(verbose=verbose)
             ret_val = ret_val + run_val
         return ret_val
 
@@ -431,7 +431,7 @@ class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, Rep
 
         return str(working_path)
 
-    def run(self):
+    def run(self, verbose=False):
         """
         Runs the Library with the settings specified in the object.  Throws an exception if the
         tests were not initialized by using the init_tests variable at initialization.  Running a
@@ -439,7 +439,7 @@ class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, Rep
         """
         ret_val = 0
         for lib in self.library_list:
-            run_val = lib.run()
+            run_val = lib.run(verbose=verbose)
             ret_val = ret_val + run_val
         return ret_val
 

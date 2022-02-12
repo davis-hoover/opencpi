@@ -167,7 +167,8 @@ namespace OCPI {
     }
     void ApplicationI::clear() {
       m_assembly--;
-      release();
+      if (m_containerApps)
+	release();
       ezxml_free(m_deployXml);
       ezxml_free(m_appXml);
       delete [] m_copy;
