@@ -218,7 +218,9 @@ def main():
     name = None
     try:
         cur_dir = args['cur_dir']
+        print("PWD:"+str(Path(os.path.curdir).absolute())+":"+str(Path(cur_dir).absolute()))
         with ocpiutil.cd(cur_dir):
+            print("PWD1:"+str(Path(os.path.curdir).absolute())+":"+str(Path(cur_dir).absolute()))
             dir_type = ocpiutil.get_dirtype()
             # args['name'] could be None if no name is provided at the command line
             name = args['name']
@@ -231,12 +233,7 @@ def main():
                                                              library=args['library'],
                                                              hdl_library=args['hdl_library'],
                                                              platform=args['hdl_plat_dir'])
-            if args['noun'] not in ['project', 'registry', 'library']:
-                name = Path(directory).absolute().name
-                directory = str(Path(directory).absolute().parent)
-            if (name is None) and (dir_type in [n for n in NOUNS if n != "tests"]):
-                name = os.path.basename(os.path.realpath('.'))
-            del args['name']
+            print("PWD2:"+str(Path(os.path.curdir).absolute())+":"+str(Path(directory).absolute())+":"+str(args['noun'])+":"+str(dir_type))
             if args['noun'] is None:
                 if dir_type in [n for n in NOUNS if n != "tests"]:
                     args['noun'] = dir_type
@@ -244,6 +241,12 @@ def main():
                     raise ocpiutil.OCPIException("Invalid directory type \"" + str(dir_type) +
                                                  "\" Valid directory types are: " +
                                                  ", ".join([n for n in NOUNS if n != "tests"]))
+            if args['noun'] not in ['project', 'registry', 'library', 'tests', 'applications', 'libraries']:
+                name = Path(directory).absolute().name
+                directory = str(Path(directory).absolute().parent)
+            if (name is None) and (dir_type in [n for n in NOUNS if n != "tests"]):
+                name = os.path.basename(os.path.realpath('.'))
+            del args['name']
             if ocpiutil.get_dirtype(directory) == "libraries" and args['noun'] == "library":
                 args['noun'] = "libraries"
             set_init_values(args, dir_type)
