@@ -145,7 +145,10 @@ namespace OCPI {
 	 prefix += m_package;
        m_package = prefix;
       }
-      for (ezxml_t ix = ezxml_cchild(ax, "Instance"); ix; ix = ezxml_cnext(ix))
+      ezxml_t ix = ezxml_cchild(ax, "Instance");
+      if (!ix)
+	return OU::esprintf("This assembly has no instances, which is invalid");
+      for (; ix; ix = ezxml_cnext(ix))
         if ((err = addInstance(ix, extraInstAttrs, params)))
           return err;
       const char *finished = ezxml_cattr(ax, "finished");
@@ -178,7 +181,7 @@ namespace OCPI {
           return err;
       }
       n = 0;
-      for (ezxml_t ix = ezxml_cchild(ax, "Instance"); ix; ix = ezxml_cnext(ix), n++)
+      for (ix = ezxml_cchild(ax, "Instance"); ix; ix = ezxml_cnext(ix), n++)
         if ((err = m_instances[n]->parseConnection(ix, *this, params)))
           return err;
       // Check instance parameters that don't name instances properly
