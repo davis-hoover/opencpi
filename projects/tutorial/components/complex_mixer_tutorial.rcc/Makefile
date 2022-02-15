@@ -16,13 +16,4 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-REPO_PATH=../../../../../
-
-${REPO_PATH}/doc/av/tex/docGen.py \
-    ${REPO_PATH}/projects/tutorial/components/specs/complex_mixer_tutorial-spec.xml \
-    -owd \
-    ${REPO_PATH}/projects/tutorial/components/complex_mixer_tutorial.hdl/complex_mixer_tutorial.xml \
-    -owd \
-    ${REPO_PATH}/projects/tutorial/components/complex_mixer_tutorial.rcc/complex_mixer_tutorial.xml \
-    --no-prompt
-
+include $(OCPI_CDK_DIR)/include/worker.mk
