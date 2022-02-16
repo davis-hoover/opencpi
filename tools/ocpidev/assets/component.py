@@ -565,7 +565,7 @@ class Component(ShowableComponent):
             workers = str(Component.get_workers(parent_dir))[1:-1]
             logging.debug("Workers: " + workers)
         if not kwargs.get('spec_file_only') and os.environ.get('OCPI_NO_DOC') != '1':
-            ocpi_doc.create(str(dirpath.parent), "component", dirpath.stem)
+            ocpi_doc.create(str(dir_path.parent), "component", dir_path.stem)
         if verbose:
             print("Component '" + name + "' was created at " + spec_file)
 
