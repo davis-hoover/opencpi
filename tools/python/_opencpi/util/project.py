@@ -1180,7 +1180,7 @@ get_platform_make_dictionary.dict=None
 # at the project level, higher level attributes are in the environment, which will be
 # used by ocpigen
 # Note also that the directory is "resolved" to make sure that it is under a project
-# at the correct level regardles of any permament or temporary symlinks
+# at the correct level regardless of any permament or temporary symlinks
 # (like when sphinx has to find worker dirs UNDERNEATH comp dirs and so symlinks are used)
 def get_xml_string(directory='.'):
     """

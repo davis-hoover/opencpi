@@ -51,7 +51,7 @@ OCPIRUN=$OCPIBIN/ocpirun
 if [ -z "$HDL_PLATFORM" ] ; then
   HDL_PLATFORM=xsim
   HDL_TARGET=xsim
-  if (env|grep 'HdlPlatforms=$') || ! $OCPIRUN -v -C --only-platforms | grep '[^a-zA-Z]isim$'; then
+  if (env|grep 'HdlPlatforms=$') || ! $OCPIRUN -v -C --only-platforms | grep '[^a-zA-Z]xsim$'; then
     HDL_NO_BUILD=1
     echo No HDL tests will be performed.
     RCC=--rcc

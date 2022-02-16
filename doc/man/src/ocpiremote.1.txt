@@ -215,15 +215,15 @@ ENVIRONMENT VARIABLES
 The following OpenCPI environment variables affect *`ocpiremote`* execution:
 
 *`OCPI_SERVER_ADDRESSES`*::
-    A comma- or space-separated list of IP addresses/TCP ports of remote systems to contact, where
-    each IP/TCP address is in the format '<ip-address>'*`:`*'<tcp-port>'. For example,
-    192.168.1.102:12345. When *`ocpiserve`* with the *`--verbose`* option is started, it prints its
-    IP addresses/TCP ports in the log.
+    A comma-separated list of IP addresses/TCP ports of remote systems to contact, where
+    each IP/TCP address is in the format '<ip-address>'*`:`*'<tcp-port>[:<ocpiremote-args>]'. For example,
+    *`192.168.1.102:12345`* or *`192.168.1.102:12345:-p analog -b`*.  When *`ocpiserve`* with the *`--verbose`*
+    option is started, it prints its IP addresses/TCP ports in the log.
 
 *`OCPI_SERVER_ADDRESSES_FILE`*::
     The name of a file that contains remote system IP addresses/TCP ports, one per line. Each
-    IP address is in the format '<ip-address>'*`:`*'<tcp-port>'. For example,
-    192.168.1.102:12345.
+    IP address is in the format '<ip-address>'*`:`*'<tcp-port>[:<ocpiremote-args>]'. For example,
+    *`192.168.1.102:12345`*.
 
 The chapter "Using Remote Containers: Network-Connected Processors" in
 the 'OpenCPI Application Development Guide' provides more information

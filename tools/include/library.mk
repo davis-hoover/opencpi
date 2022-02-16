@@ -18,10 +18,10 @@
 
 # The makefile fragment for component libraries
 
-# A component library, consisting of different workers built for different targets
-# The library might have a <libname>.xml file for library-level attributes
+# A component library, consisting of different workers built for different targets.
+# The library might have a <libname>.xml file for library-level attributes.
 # Components are defined by a spec file in the specs subdir or a *.comp
-# dir containing the spec file, or both (where the spec file is *not* in the *.comp dir)
+# dir containing the spec file, or both (where the spec file is *not* in the *.comp dir).
 # The Workers, ExcludeWorkers, Tests, ExcludeTests variables
 # (and XML attributes) can control which workers, tests, and components are built.
 # The name of an implementation subdirectory includes its authoring model as the
@@ -237,7 +237,7 @@ comp:
 	      $(call BuildImplementation,comp,$i) \
 	    fi;)\
 
-# This is the doc that will not be build anyway as a side-effect of building elsewhere, i.e. workers
+# This is the doc that will not be built anyway as a side-effect of building elsewhere, i.e. workers
 cleancomp:
 	$(call CleanModel,comp)
 

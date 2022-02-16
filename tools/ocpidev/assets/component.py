@@ -467,9 +467,8 @@ class Component(ShowableComponent):
         if ensure_exists: # not creating - where is the spec file?
             if len(list(component_dir.glob(name+"[-_]spec.xml"))) == 0:
                 component_dir = Path(working_path, "specs")
-        else:
-            if kwargs.get('spec_file_only'):
-                component_dir = Path(working_path, "specs")
+        elif kwargs.get('spec_file_only'):
+            component_dir = Path(working_path, "specs")
         return Component.get_filename(str(component_dir), name, project, ensure_exists)
 
     @staticmethod
@@ -544,33 +543,31 @@ class Component(ShowableComponent):
             template = jinja2.Template(ocpitemplate.COMPONENT_HDL_LIB_XML, trim_blocks=True)
             ocpiutil.write_file_from_string(hdlfile, template.render(**template_dict))
         os.chdir(directory)
-        specfile = os.getcwd() + "/" + name
-        if os.path.isfile(specfile):
-            raise ocpiutil.OCPIException(specfile + " already exists")
+        spec_file = os.getcwd() + "/" + name
+        if os.path.isfile(spec_file):
+            raise ocpiutil.OCPIException(spec_file + " already exists")
         if kwargs.get("no_control", None) == True:
             template = jinja2.Template(ocpitemplate.COMPONENT_SPEC_NO_CTRL_XML, trim_blocks=True)
-            ocpiutil.write_file_from_string(specfile, template.render(**template_dict))
+            ocpiutil.write_file_from_string(spec_file, template.render(**template_dict))
         else:
             template = jinja2.Template(ocpitemplate.COMPONENT_SPEC_XML, trim_blocks=True)
-            ocpiutil.write_file_from_string(specfile, template.render(**template_dict))
-
+            ocpiutil.write_file_from_string(spec_file, template.render(**template_dict))
         spec_file_only = kwargs.get('spec_file_only') or kwargs.get('project')
-        if (proj or dirtype == "project"):
+        if proj or dirtype == "project":
             if not os.path.isfile("package-id"):
                 ocpiutil.write_file_from_string("package-id", pkg_id + "\n")
         else:
             # ensure the spec is visible in the lib subdir
-            dirpath = Path(directory)
-            specpath = Path(specfile) 
-            libpath = Path(dirpath.parent).joinpath("lib")
-            libpath.mkdir(exist_ok = True)
-            libpath.joinpath(specpath.name).symlink_to("../" + dirpath.name + "/" + specpath.name)
+            spec_path = Path(spec_file) 
+            lib_path = Path(dir_path.parent).joinpath("lib")
+            lib_path.mkdir(exist_ok = True)
+            lib_path.joinpath(spec_path.name).symlink_to("../" + dir_path.name + "/" + spec_path.name)
             workers = str(Component.get_workers(parent_dir))[1:-1]
             logging.debug("Workers: " + workers)
         if not kwargs.get('spec_file_only') and os.environ.get('OCPI_NO_DOC') != '1':
             ocpi_doc.create(str(dirpath.parent), "component", dirpath.stem)
         if verbose:
-            print("Component '" + name + "' was created at " + specfile)
+            print("Component '" + name + "' was created at " + spec_file)
 
     def delete(self, force=False, **kwargs):
         """

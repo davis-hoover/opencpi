@@ -268,7 +268,7 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
             are saved (within each named port dictionary) with the attribute
             name as the key and the attribute value as the string value.
         """
-        # Get dictionary of from the OWD, which contains the spec information too
+        # Get dictionary from the OWD, which contains the spec information too
         worker = self.get_dictionary()
         return worker
 
