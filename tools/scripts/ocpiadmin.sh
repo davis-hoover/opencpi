@@ -120,7 +120,7 @@ function getvars {
 	model=HDL
 	v=HdlPlatformDir_$platform
     fi
-    platform_dir=`echo ${!v} | sed 's=^.*/projects/=./projects/='`
+    platform_dir=`echo ${!v} | sed "s=^${OCPI_ROOT_DIR}/projects/=./projects/="`
     return 0
   fi
   return 1
