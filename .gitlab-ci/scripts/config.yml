@@ -54,6 +54,9 @@ e31x:
 matchstiq_z1:
   ip: 10.1.0.203
   port: 1000
+picoevb:
+  ip:
+  port:
 plutosdr:
   ip: 10.1.0.102
   port: 1000
