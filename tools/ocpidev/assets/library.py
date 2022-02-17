@@ -32,6 +32,89 @@ from .abstract import RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, Repor
 from .factory import AssetFactory
 from .worker import Worker, HdlWorker
 
+def do_build(asset_type, directory, kwargs):
+    """
+    Function common to build libraries and library collections
+    """
+    action=[]
+    if kwargs.get('rcc'):
+        action.append('rcc')
+    if kwargs.get('hdl'):
+        action.append('hdl')
+    if kwargs.get('workers_as_needed'):
+        os.environ['OCPI_AUTO_BUILD_WORKERS'] = '1'
+
+    dynamic = kwargs.get('dynamic')
+    optimize = kwargs.get('optimize')
+    hdl_platform = kwargs.get('hdl_platform')
+    hdl_rcc_platform = kwargs.get('hdl_rcc_platform')
+    hdl_target = kwargs.get('hdl_target')
+    rcc_platform = kwargs.get('rcc_platform')
+    worker = kwargs.get('worker')
+
+    build_suffix = '-'
+    if dynamic:
+        build_suffix += 'd'
+    if optimize:
+        build_suffix += 'o'
+    if optimize or dynamic:
+        if rcc_platform:
+            if any("-" in s for s in rcc_platform):
+                raise ocpiutil.OCPIException("You cannot use the --optimize build option and "
+                + "also specify build options in a platform name (in this case: ",
+                rcc_platform, ")")
+            else:
+                new_list = [s + build_suffix for s in rcc_platform]
+                rcc_platform = new_list
+        else:
+            rcc_platform = [os.environ['OCPI_TOOL_PLATFORM'] + build_suffix]
+    #Pass settings
+    settings = {}
+    if hdl_platform:
+        settings['hdl_plat_strs'] = hdl_platform
+    if hdl_target:
+        settings['hdl_target'] = hdl_target
+    if rcc_platform:
+        settings['rcc_platform'] = rcc_platform
+    if hdl_rcc_platform:
+        settings['hdl_rcc_platform'] = hdl_rcc_platform
+    if asset_type == 'library' and worker:
+        settings['worker'] = worker
+    make_file = ocpiutil.get_makefile(directory, asset_type)[0]
+    #Build
+    ocpiutil.file.execute_cmd(settings, directory, action="", file=make_file,
+                              verbose=kwargs.get('verbose'))
+
+def do_clean(asset_type, directory, kwargs):
+    """
+    Function common to clean libraries and library collections
+    """
+    #Specify what to clean
+    action=[]
+    rcc = kwargs.get('rcc')
+    hdl = kwargs.get('hdl')
+    hdl_platform = kwargs.get('hdl_platform')
+    hdl_target = kwargs.get('hdl_target')
+    worker = kwargs.get('worker')
+    if not rcc and not hdl:
+        action.append('clean')
+    else:
+        if rcc:
+            action.append('cleanrcc')
+        if hdl:
+            action.append('cleanhdl')
+    settings = {}
+    if hdl_platform:
+        settings['hdl_plat_strs'] = hdl_platform
+    if hdl_target:
+        settings['hdl_target'] = hdl_target
+    if worker:
+        settings['worker'] = worker
+    make_file = ocpiutil.get_makefile(directory, asset_type)[0]
+    #Clean
+    ocpiutil.file.execute_cmd(settings, directory, action=action, file=make_file,
+                              verbose=kwargs.get('verbose'))
+
 class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAsset):
     """
     This class represents an OpenCPI Library.  Contains a list of the tests that are in this
@@ -158,7 +241,7 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
                 workers.append(name + " ")
         return (workers)
 
-    def run(self):
+    def run(self, verbose=False):
         """
         Runs the Library with the settings specified in the object.  Throws an exception if the
         tests were not initialized by using the init_tests variable at initialization.  Running a
@@ -169,7 +252,7 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
             raise ocpiutil.OCPIException("For a Library to be run \"init_tests\" must be set to " +
                                          "True when the object is constructed")
         for test in self.test_list:
-            run_val = test.run()
+            run_val = test.run(verbose=verbose)
             ret_val = ret_val + run_val
         return ret_val
 
@@ -187,80 +270,15 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         Cleans the library by handing over the user specifications
         to execute command.
         """
-        #Specify what to clean
-        action=[]
-        if not rcc and not hdl:
-            action.append('clean')
-        else:
-            if rcc:
-                action.append('cleanrcc')
-            if hdl:
-                action.append('cleanhdl')
-        settings = {}
-        if hdl_platform:
-            settings['hdl_plat_strs'] = hdl_platform
-        if hdl_target:
-            settings['hdl_target'] = hdl_target
-        if worker:
-            settings['worker'] = worker
-        make_file = ocpiutil.get_makefile(self.directory, "library")[0]
-        #Clean
-        ocpiutil.execute_cmd(settings,
-                             self.directory,
-                             action=action,
-                             file=make_file,
-                             verbose=verbose)
+        do_clean("library", self.directory, locals())
 
     def build(self, verbose=False, rcc=False, hdl=False, optimize=False,
         dynamic=False, worker=None, hdl_platform=None, workers_as_needed=False, 
         hdl_target=None, rcc_platform=None, hdl_rcc_platform=None):
         """
-        Builds the library by handing over the user specifications
-        to execute command.
+        Builds the library by using the common build function for libraries or library collections
         """
-        #Specify what to build
-        action=[]
-        if rcc:
-            action.append('rcc')
-        if hdl:
-            action.append('hdl')
-        if workers_as_needed:
-            os.environ['OCPI_AUTO_BUILD_WORKERS'] = '1'
-        build_suffix = '-'
-        if dynamic:
-            build_suffix += 'd'
-        if optimize:
-            build_suffix += 'o'
-        if optimize or dynamic:
-            if rcc_platform:
-                if any("-" in s for s in rcc_platform):
-                    raise ocpiutil.OCPIException("You cannot use the --optimize build option and "
-                    + "also specify build options in a platform name (in this case: ",
-                    rcc_platform, ")")
-                else:
-                    new_list = [s + build_suffix for s in rcc_platform]
-                    rcc_platform = new_list
-            else:
-                rcc_platform = [os.environ['OCPI_TOOL_PLATFORM'] + build_suffix]
-        #Pass settings
-        settings = {}
-        if hdl_platform:
-            settings['hdl_plat_strs'] = hdl_platform
-        if hdl_target:
-            settings['hdl_target'] = hdl_target
-        if rcc_platform:
-            settings['rcc_platform'] = rcc_platform
-        if hdl_rcc_platform:
-            settings['hdl_rcc_platform'] = hdl_rcc_platform
-        if worker:
-            settings['worker'] = worker
-        make_file = ocpiutil.get_makefile(self.directory, "library")[0]
-        #Build
-        ocpiutil.execute_cmd(settings,
-                             self.directory,
-                             action=action,
-                             file=make_file,
-                             verbose=verbose)
+        do_build('library', self.directory, locals())
 
     @staticmethod
     def get_working_dir(name, ensure_exists=True, **kwargs):
@@ -365,7 +383,7 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         logging.debug("Workers: " + workers + "Package_ID: " + package_id)
         if verbose:
             print("Created library '" + name + "' at " + str(lib_path))
-        
+
 
 class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAsset):
     """
@@ -413,7 +431,7 @@ class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, Rep
 
         return str(working_path)
 
-    def run(self):
+    def run(self, verbose=False):
         """
         Runs the Library with the settings specified in the object.  Throws an exception if the
         tests were not initialized by using the init_tests variable at initialization.  Running a
@@ -421,7 +439,7 @@ class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, Rep
         """
         ret_val = 0
         for lib in self.library_list:
-            run_val = lib.run()
+            run_val = lib.run(verbose=verbose)
             ret_val = ret_val + run_val
         return ret_val
 
@@ -435,24 +453,17 @@ class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, Rep
     def clean(self, verbose=False, hdl=False, rcc=False,
         worker=None, hdl_platform=None, hdl_target=None):
         """
-        Cleans the libraries by handing over the user specifications
-        to each library.
+        Cleans the libraries
         """
-        for lib in self.library_list:
-            lib.clean(verbose, hdl, rcc,
-                      worker, hdl_platform, hdl_target)
+        do_clean("libraries", self.directory, locals())
 
     def build(self, verbose=False, rcc=False, hdl=False, optimize=False,
         dynamic=False, worker=None, hdl_platform=None, workers_as_needed=False, 
         hdl_target=None, rcc_platform=None, hdl_rcc_platform=None):
         """
-        Builds the libraries by handing over the user specifications
-        to each library.
+        Builds the library by using the common build function for libraries or library collections
         """
-        for lib in self.library_list:
-            lib.build(verbose, rcc, hdl, optimize,
-                      dynamic, worker, hdl_platform, workers_as_needed, 
-                      hdl_target, rcc_platform, hdl_rcc_platform)
+        do_build('libraries', self.directory, locals())
 
     def delete_all(self):
         projdir = Path(ocpiutil.get_path_to_project_top())

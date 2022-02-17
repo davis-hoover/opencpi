@@ -92,7 +92,7 @@ namespace OCPI {
 	container().loadArtifact(art).createWorker(*this, appInstName, impl, inst, slaves,
 						   hasMaster, member, crewSize, wParams);
     }
-    // If not master, then we ignore slave, so there are three cases
+    // If not master, then we ignore isSlave, so there are three cases
     void Application::
     startMasterSlave(bool isMaster, bool isSlave, bool isSource) {
       for (Worker *w = firstWorker(); w; w = w->nextWorker())
@@ -106,7 +106,7 @@ namespace OCPI {
 	  w->start();
 	}
     }
-    // If not master, then we ignore slave, so there are three cases
+    // If not master, then we ignore isSlave, so there are three cases
     void Application::
     stop(bool isMaster, bool isSlave) {
       for (Worker *w = firstWorker(); w; w = w->nextWorker())
@@ -118,14 +118,17 @@ namespace OCPI {
 	  w->stop();
 	}
     }
-    // If not master, then we ignore slave, so there are three cases
+    // If not master, then we ignore isSlave, so there are three cases
     void Application::
     release(bool isMaster, bool isSlave) {
       for (Worker *w = firstWorker(); w; w = w->nextWorker())
 	if ((isMaster && w->slaves().size() &&
 	     ((isSlave && w->hasMaster()) || (!isSlave && !w->hasMaster()))) ||
-	    (!isMaster && w->slaves().empty()))
-	w->release();
+	    (!isMaster && w->slaves().empty())) {
+	  ocpiInfo("Releasing worker: %s in container %s from %s/%s", w->name().c_str(),
+		   container().name().c_str(), w->implTag().c_str(), w->instTag().c_str());
+	  w->release();
+	}
     }
     bool Application::
     isDone() {

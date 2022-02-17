@@ -116,9 +116,9 @@ Worker::
   try {
     if (enabled) {
       enabled = false;
-      controlOperation(OM::Worker::OpStop);
+      controlOp(OM::Worker::OpStop); // call base class that filters the op
     }
-    controlOperation(OM::Worker::OpRelease);
+    controlOp(OM::Worker::OpRelease); // call base class that filters the op
   } catch(...) {
   }
 #ifdef EM_PORT_COMPLETE
@@ -458,8 +458,8 @@ rccTake(RCCPort *rccPort, RCCBuffer *oldBuffer, RCCBuffer *newBuffer)
  void Worker::
  portError(std::string &error) {
    enabled = false;
-   controlOperation(OM::Worker::OpStop);
-   controlOperation(OM::Worker::OpRelease);
+   controlOp(OM::Worker::OpStop);
+   controlOp(OM::Worker::OpRelease);
    setControlState(OM::Worker::UNUSABLE);
    ocpiBad("Worker \"%s\" received port error: %s", name().c_str(), error.c_str());
  }

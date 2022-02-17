@@ -69,6 +69,10 @@ def main():
     noun = args.orig_noun = args.noun
     kwargs = {}
 
+    if args.no_doc:
+        os.environ["OCPI_NO_DOC"] = "1"
+    if args.doc_only:
+        os.environ["OCPI_DOC_ONLY"] = "1"
     do_ocpidev_sh = True
     try:
         if args.verb == 'create':
@@ -157,6 +161,7 @@ def postprocess_args(args):
         sys.exit(1)
     if args.noun == 'spec':
         args.noun = 'component'
+        args.spec_file_only = True
     if hasattr(args, 'rcc-noun'):
         args.model = 'rcc'
     elif args.noun == 'worker':

@@ -24,6 +24,13 @@ include $(OCPI_CDK_DIR)/include/util.mk
 
 ifeq ($(filter speclinks workersfile,$(MAKECMDGOALS)),)
 $(OcpiIncludeAssetAndParent)
+ifdef OcpiRunArgs
+  ifeq ($(word 1,$(OcpiRunArgs)),-+)
+    override OcpiRunArgs:=$(OcpiRunArgsXml) $(wordlist 2,$(words $(OcpiRunArgs)),$(OcpiRunArgs))
+  endif
+else
+  OcpiRunArgs:=$(OcpiRunArgsXml)
+endif
 # If library path is unset, provide a default
 ifeq ($(filter clean%,$(MAKECMDGOALS)),)
   $(eval $(OcpiEnsureToolPlatform))
@@ -69,7 +76,8 @@ else ifneq ($(wildcard $(OcpiApp).xml),)
                  $(OcpiRunAfter)
     endif
     run: all
-	$(AT)echo Executing the $(OcpiApp).xml application.
+	$(AT)$(if $(OcpiVerbose),\
+               echo 'Executing the $(OcpiApp).xml application: $(call OcpiRunXML,$(OcpiApp).xml)',:)
 	$(AT)$(call OcpiRunXML,$(OcpiApp).xml)
   endif
 else

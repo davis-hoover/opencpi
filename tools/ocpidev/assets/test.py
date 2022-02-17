@@ -117,7 +117,7 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         self.mode_dict['all']             = ["all", "run"]
         # pylint:enable=bad-whitespace
 
-    def run(self):
+    def run(self, verbose=False):
         """
         Runs the Test with the settings specified in the object
         """
@@ -130,7 +130,8 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         return ocpiutil.execute_cmd(self.get_settings(),
                                     directory,
                                     goal,
-                                    file=make_file)
+                                    file=make_file,
+                                    verbose=verbose)
 
     def clean(self, verbose=False, simulation=False, execute=False):
         """
@@ -337,14 +338,14 @@ class TestsCollection(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         """
         return ocpiutil.get_subdirs_of_type("test", self.directory)
 
-    def run(self):
+    def run(self, verbose=False):
         """
         Runs the tests by handing over the user specifications
         to run each test.
         """
         ret_val = 0
         for test in self.test_list:
-            run_val = test.run()
+            run_val = test.run(verbose=verbose)
             ret_val = ret_val + run_val
         return ret_val
 

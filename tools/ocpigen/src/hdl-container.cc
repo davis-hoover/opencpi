@@ -551,12 +551,12 @@ HdlContainer(HdlConfig &config, HdlAssembly &appAssembly, ezxml_t xml, const cha
 	      }
 	    }
 	  } else {
-	    std::string name;
-	    OU::format(name, "%s_%s", (*di)->m_name.c_str(), (*si)->m_name.c_str());
-	    if (m_sigmap.find(name.c_str()) == m_sigmap.end()) {
+	    std::string l_name;
+	    OU::format(l_name, "%s_%s", (*di)->m_name.c_str(), (*si)->m_name.c_str());
+	    if (m_sigmap.find(l_name.c_str()) == m_sigmap.end()) {
 	      // No mapping - the device signal has the default mapping - clone the device signal
 	      cs = new Signal(**si);
-	      cs->m_name = name;
+	      cs->m_name = l_name;
 	    }
 	  }
 	  if (cs) {
@@ -1068,7 +1068,6 @@ recordSignalConnection(Signal &s, const char *from) {
 }
 void HdlContainer::
 emitDeviceSignalMapping(FILE *f, std::string &last, Signal &s, const char *prefix) {
-  std::string name;
   if (s.m_direction == Signal::INOUT)
     fprintf(f, "%s      %s => %s", last.c_str(), s.m_name.c_str(), s.m_name.c_str());
   else

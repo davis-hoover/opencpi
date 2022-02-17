@@ -104,12 +104,15 @@ struct Signal {
   Signal *reverse();
   void emitConnectionSignal(FILE *f, const char *iname, const char *pattern, bool single,
 			    Language lang);
+  void emitSignal(std::string &out) const;
+  void emitXml(std::string &out) const;
   //  static void emitConnectionSignals(FILE *f, const char *iname, Signals &signals);
   static const char *parseSignals(ezxml_t x, const std::string &parent, Signals &signals,
 				  SigMap &sigmap, Worker *w);
   static void deleteSignals(Signals &signals);
   static const Signal *find(const SigMap &signals, const char *name);
   static const char *directions[];
+  static void emitSignals(const Signals &signals, std::string &out);
 };
 // This container provides lookup by name
 typedef std::map<const char *,

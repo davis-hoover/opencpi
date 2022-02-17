@@ -220,3 +220,8 @@ emitExtAssignment(FILE *f, bool int2ext, const std::string &extName, const std::
 	      int2ext ? theirs.c_str() : ours.c_str(), (*si)->cname());
   }
 }
+void DevSignalsPort::
+emitXmlElements(std::string &out, bool verbose) const {
+  Port::emitXmlElements(out, verbose);
+  Signal::emitSignals(m_signals, out);
+}

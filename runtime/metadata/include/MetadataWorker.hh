@@ -169,7 +169,7 @@ namespace OCPI {
       inline const std::string &model() const { return m_model; }
       inline const std::string &package() const { return m_package; }
       inline const std::string &specName() const { return m_specName; }
-      //      inline const std::string &name() const { return m_name; }
+      inline const std::string &name() const { return m_name; }
       inline const char *cname() const { return m_name.c_str(); }
       inline bool isEmulator() const { return m_isEmulator; }
       inline const Attributes &attributes() const { return *m_attributes; }

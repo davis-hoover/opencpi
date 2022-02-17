@@ -54,11 +54,13 @@ class Application(RunnableAsset, RCCBuildableAsset):
         self.run_after = kwargs.get("run_after", None)
         self.run_arg = kwargs.get("run_arg", None)
 
-    def run(self):
+    def run(self, verbose=False):
         """
         Runs the Application with the settings specified in the object
         """
         args=["run", "Applications="+self.name]
+        if verbose:
+            args.append("OcpiVerbose=1")
         if self.name.endswith(".xml"):
             directory = self.directory
             type="applications"
@@ -69,7 +71,8 @@ class Application(RunnableAsset, RCCBuildableAsset):
         return ocpiutil.execute_cmd(self.get_settings(),
                                     directory,
                                     action=args,
-                                    file=makefile)
+                                    file=makefile,
+                                    verbose=verbose)
 
     def clean(self, verbose=False):
         """
@@ -255,7 +258,7 @@ class ApplicationsCollection(RunnableAsset, RCCBuildableAsset):
         """
         return ocpiutil.get_subdirs_of_type("application", self.directory)
 
-    def run(self):
+    def run(self, verbose=False):
         """
         Runs the ApplicationsCollection with the settings specified in the object.  Running a
         ApplicationsCollection will run all the applications that are contained in the
@@ -265,7 +268,8 @@ class ApplicationsCollection(RunnableAsset, RCCBuildableAsset):
         return ocpiutil.execute_cmd(self.get_settings(),
                                     self.directory,
                                     action=['run'],
-                                    file=make_file)
+                                    file=make_file,
+                                    verbose=verbose)
 
     def clean(self, verbose=False):
         """
