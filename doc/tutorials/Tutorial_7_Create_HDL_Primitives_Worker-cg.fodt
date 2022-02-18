@@ -4336,7 +4336,7 @@
    <text:p text:style-name="P121">OpenCPI<text:span text:style-name="T25"><text:variable-set text:name="AVGUI" text:display="none" text:formula="ooow:2" office:value-type="float" office:value="2" style:data-style-name="N0"/></text:span><text:line-break/><text:span text:style-name="T26">Tutorial 7: Using HDL Primitive Libraries</text:span></text:p>
    <text:section text:style-name="Sect1" text:name="Section1" text:protected="true">
     <text:section-source xlink:href="../reference/shared/release.fodt" text:filter-name="OpenDocument Text Flat XML"/>
-    <text:p text:style-name="ReleaseSubtitle">OpenCPI Release: develop</text:p>
+    <text:p text:style-name="ReleaseSubtitle">OpenCPI Release:  develop</text:p>
    </text:section>
    <text:p text:style-name="P90">Revision History</text:p>
    <table:table table:name="Table1" table:style-name="Table1">
@@ -4912,13 +4912,13 @@
    <text:p text:style-name="P6"><text:span text:style-name="T219">W</text:span>e recommend reading the following briefings <text:span text:style-name="T220">and guides before getting started with this tutorial</text:span>:</text:p>
    <text:list xml:id="list153359455487270" text:continue-list="list153359549951814" text:style-name="WWNum32">
     <text:list-item>
-     <text:p text:style-name="P7"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/latest/docs/briefings/Briefing_9_HDL_Assemblies.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link">Briefing 9, “HDL Assemblies”</text:a>. <text:span text:style-name="T221">This briefing introduces HDL assembly concepts and terminology. </text:span></text:p>
+     <text:p text:style-name="P7"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/briefings/Briefing_9_HDL_Assemblies.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link">Briefing 9, “HDL Assemblies”</text:a>. <text:span text:style-name="T221">This briefing introduces HDL assembly concepts and terminology. </text:span></text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P7"><text:s/><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/latest/docs/briefings/Briefing_10_HDL_Primitives.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T221">Briefing 10, “HDL Primitives”</text:span></text:a><text:span text:style-name="T221">. This briefing introduces HDL primitives concepts and terminology. </text:span></text:p>
+     <text:p text:style-name="P7"><text:s/><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/briefings/Briefing_10_HDL_Primitives.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T221">Briefing 10, “HDL Primitives”</text:span></text:a><text:span text:style-name="T221">. This briefing introduces HDL primitives concepts and terminology. </text:span></text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P38"><text:span text:style-name="T212">The “HDL Primitives” section in the </text:span><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_HDL_Development_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="FirstEmphasis">OpenCPI HDL Development Guide</text:span></text:a><text:span text:style-name="T212">.</text:span><text:bookmark-end text:name="__DdeLink__103100_2365706890"/></text:p>
+     <text:p text:style-name="P38"><text:span text:style-name="T212">The “HDL Primitives” section in the </text:span><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_HDL_Development_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="FirstEmphasis">OpenCPI HDL Development Guide</text:span></text:a><text:span text:style-name="T212">.</text:span><text:bookmark-end text:name="__DdeLink__103100_2365706890"/></text:p>
     </text:list-item>
    </text:list>
    <text:h text:style-name="P39" text:outline-level="2"><text:bookmark-start text:name="_Toc245388431"/><text:bookmark-start text:name="__DdeLink__33729_4114161630"/><text:bookmark-start text:name="_Toc224890089"/><text:bookmark-start text:name="_Toc141318608"/><text:bookmark-start text:name="__RefHeading___Toc49755_880543453"/><text:bookmark-start text:name="_Toc141837257"/>D<text:bookmark-end text:name="_Toc245388431"/><text:bookmark-end text:name="_Toc224890089"/><text:bookmark-end text:name="_Toc141318608"/><text:bookmark-end text:name="_Toc141837257"/>ocumentation References<text:bookmark-end text:name="__RefHeading___Toc49755_880543453"/></text:h>
@@ -4947,7 +4947,7 @@
       <text:p text:style-name="P89"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T8">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table2.C2" office:value-type="string">
-      <text:p text:style-name="P89"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_User_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T9">https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_User.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P89"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_User_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T9">https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_User.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row table:style-name="Table2.1">
@@ -4958,7 +4958,7 @@
       <text:p text:style-name="P89"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T8">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table2.C3" office:value-type="string">
-      <text:p text:style-name="P89"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Application_Development_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T9">https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Application_Development_Guide.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P89"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Application_Development_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T9">https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Application_Development_Guide.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row table:style-name="Table2.1">
@@ -4969,7 +4969,7 @@
       <text:p text:style-name="P89"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T8">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table2.C4" office:value-type="string">
-      <text:p text:style-name="P89"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Component_Development_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T9">https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Component_Development_Guide.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P89"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Component_Development_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T9">https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Component_Development_Guide.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row table:style-name="Table2.1">
@@ -4980,7 +4980,7 @@
       <text:p text:style-name="P89"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T8">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table2.C5" office:value-type="string">
-      <text:p text:style-name="P89"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_HDL_Development_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T9">https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_HDL_Development_Guide.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P89"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_HDL_Development_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T9">https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_HDL_Development_Guide.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row table:style-name="Table2.1">
@@ -4991,7 +4991,7 @@
       <text:p text:style-name="P89"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T8">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table2.C6" office:value-type="string">
-      <text:p text:style-name="P89"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_RCC_Development_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T9">https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_RCC_Development_Guide.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P89"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_RCC_Development_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T9">https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_RCC_Development_Guide.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
    </table:table>
@@ -13754,7 +13754,7 @@
    <text:p text:style-name="P25"><text:span text:style-name="T20">Note:</text:span><text:span text:style-name="T6"> <text:s/>In order to view simulation waveforms, you m</text:span>ust have checked &quot;keep simulations&quot; <text:span text:style-name="T22">in the OpenCPI GUI </text:span>or <text:span text:style-name="T6">have used the --</text:span><text:span text:style-name="T24">keep-simulations</text:span><text:span text:style-name="T6"> option on the </text:span><text:span text:style-name="T24">ocpidev</text:span><text:span text:style-name="T6"> command line.</text:span></text:p>
    <text:p text:style-name="P25">In a terminal window, browse to <text:span text:style-name="Code">agc_complex.test/ </text:span>and execute <text:span text:style-name="T22">the following command:</text:span></text:p>
    <text:p text:style-name="P88"><text:bookmark text:name="LC64"/>ocpiview run/xsim/case00.00.agc_complex.hdl.simulation/ &amp;</text:p>
-   <text:p text:style-name="P70">You’ll want to expand <text:span text:style-name="T181">agc_complex_0_frw_0_xsim_base</text:span><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T11"> </text:span></text:span><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T226">by </text:span></text:span><text:span text:style-name="T91">using the arrow to the left then right-clicking </text:span><text:span text:style-name="Code"><text:span text:style-name="T270">pfconfig_i</text:span></text:span><text:span text:style-name="T91">. <text:s/>Click on </text:span><text:span text:style-name="T104">Add to Wave Window</text:span><text:span text:style-name="T91">. <text:s/></text:span><text:span text:style-name="T100">For more information on using </text:span><text:span text:style-name="T198">ocpiview</text:span><text:span text:style-name="T100">, refer to </text:span><text:span text:style-name="T101">the section “Navigating the Simulator” in </text:span><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.0/docs/tutorials/Tutorial_6_Create_Simple_HDL_Worker_GUI.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T100">Tutorial 6</text:span></text:a><text:span text:style-name="T100">.</text:span></text:p>
+   <text:p text:style-name="P70">You’ll want to expand <text:span text:style-name="T181">agc_complex_0_frw_0_xsim_base</text:span><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T11"> </text:span></text:span><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T226">by </text:span></text:span><text:span text:style-name="T91">using the arrow to the left then right-clicking </text:span><text:span text:style-name="Code"><text:span text:style-name="T270">pfconfig_i</text:span></text:span><text:span text:style-name="T91">. <text:s/>Click on </text:span><text:span text:style-name="T104">Add to Wave Window</text:span><text:span text:style-name="T91">. <text:s/></text:span><text:span text:style-name="T100">For more information on using </text:span><text:span text:style-name="T198">ocpiview</text:span><text:span text:style-name="T100">, refer to </text:span><text:span text:style-name="T101">the section “Navigating the Simulator” in </text:span><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/tutorials/Tutorial_6_Create_Simple_HDL_Worker_GUI.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T100">Tutorial 6</text:span></text:a><text:span text:style-name="T100">.</text:span></text:p>
    <text:p text:style-name="P34">You should see the following output:</text:p>
    <text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image10" text:anchor-type="as-char" svg:width="6.5in" svg:height="2.4516in" draw:z-index="1"><draw:image draw:mime-type="image/png">
       <office:binary-data>iVBORw0KGgoAAAANSUhEUgAACXkAAAJWCAYAAAAH0hYGAAHhK0lEQVR4nOzdB9yNdR/H8Z+9

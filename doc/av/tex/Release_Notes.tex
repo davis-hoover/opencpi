@@ -93,6 +93,8 @@ The Release Notes from previous releases are included here as reference for stil
 			\hline
 			v2.3.0 & Updates for 2.3.0 release & 09/2021 \\
 			\hline
+			v2.4.0 & Updates for 2.4.0 release & 10/2021 \\
+			\hline
 		\end{tabularx}
 	\end{table}
 \end{center}
@@ -126,6 +128,66 @@ The Appendices (beginning on page \pageref{old_releases}) contain the Release No
 
 %\origsection{Release XXX}
 \def\ocpiversion{latest}  % Need to redefine so doc links are correct
+\section{Enhancements}
+
+\subsection{Training Improvements}
+\label{sec:24_training}
+This release provides updates to Tutorials 1 through 4 to demonstrate the use of the OpenCPI GUI and to bring the tutorials up to OpenCPI ``best practices''. This release also adds several new tutorials, both ``software only'' (running on the xsim simulator) and ``hardware'' (running on the plutosdr platform).  The OpenCPI briefings have also been updated to OpenCPI best practices and two additional briefings have been added (one for an overview of the Application Control Interface, and one to introduce tools and techniques for debugging).\\
+
+\subsection{Instructional Video Links Added}
+\label{sec:24_video_links}
+Links to instructional OpenCPI videos on YouTube have been added to opencpi.gitlab.io web page.\\
+
+\subsection{Air-gapped Installation Section Added}
+\label{sec:24_air-gap_install}
+The OpenCPI Installation Guide provides instructions for performing an air-gapped installation.\\
+
+\subsection{New \code{triggered\_sampler} Components}
+\label{sec:24_sdr_triggered_sampler}
+Adds new \code{triggered\_sampler} components allowing for applications to gate a settable number samples upon a trigger event, which can be either a write to a property, input data on the optional input port, or a metadata message on the primary input. The following protocols are supported: bool, char, float, long, short, uchar, ulong, ushort, complex char, and complex short.\\
+
+\section{Changes and Notes}
+
+\subsection{\code{complex\_mixer} Component Moved}
+\label{sec:24_complex_mixer_moved}
+Applications in the tutorial project now utilize the \code{complex\_mixer} component in ``\code{opencpi/projects/assets/components/dsp\_comps}''.\\
+
+\subsection{Updates to Runtime C++ Files}
+\label{sec:24_runtime_c++}
+Geared towards developers moreso than users, there have been updates made to the c++ runtime code base. The focus of these changes is reorganization for the sake of consistency in file and namespace naming conventions. \\
+
+\subsection{GUI Changes}
+\label{sec:24_ie_gui}
+The following changes have been made to the new GUI since the previous release:
+\begin{itemize}
+\setlength\itemsep{0em} %tighten
+\item The user now has the ability to run a single test case when running unit tests.
+\item When using ocpiadmin install users are now able to specify the minimal install.
+\item The user now has the ability to run the install script for the GUI and it will create an ocpigui command for the user to use to launch the GUI.
+\item With the \code{ocpigui} command, users can now use \code{--project-path} to specify the project path for the project explorer to use and
+\code{--ocpi-path} to specify the path to the built opencpi project.
+\end{itemize}
+
+\section{Major Known Deficiencies}
+\label{sec:24_bugs}
+
+\subsection{Previously Documented Deficiencies}
+The following deficiencies are still present in 2.4:
+\begin{itemize}
+\setlength\itemsep{0em} %tighten
+\item \bugref{693}
+\item \bugref{1035}
+\item \bugref{1392}
+\item \bugref{2477}
+\item \bugref{3783}
+\item \bugref{2811}
+\end{itemize}
+
+% === End of 2.4.0
+
+\beginoldnotes
+\origsection{Release 2.3.0}
+\def\ocpiversion{v2.3.0}
 \section{Enhancements}
 
 \subsection{PicoEVB HDL Platform}
@@ -238,7 +300,6 @@ The following deficiencies are still present in 2.3:
 
 % === End of 2.3.0
 
-\beginoldnotes
 \origsection{Release 2.2.0}
 \def\ocpiversion{v2.2.0}
 \section{Enhancements}
