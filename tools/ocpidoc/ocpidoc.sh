@@ -21,12 +21,28 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 [ -n "$OCPI_CDK_DIR" ] || { echo "Error: OCPI_CDK_DIR not set" && exit 1; }
+VENV_DIR="$OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/venv"
+
+#
+# If there is an existing python3 virtual environment,
+# check to see if it was created on *this* system.  If
+# not, remove it before continuing.
+#
+if [ -d $VENV_DIR ]
+then
+  C_VENV_DIR=`egrep '^VIRTUAL_ENV=' $VENV_DIR/bin/activate | cut -f2 -d'=' | tr -d '"'`
+  if [ $VENV_DIR != $C_VENV_DIR ]
+  then
+    echo "WARNING: python3 virtual environment is not where it was originally created: removing..."
+    rm -rf $VENV_DIR
+  fi
+fi
 
 #
 # If the python3 virtual environment does not exist,
 # create it and install the needed "sphinx" modules.
 #
-[ -d "$OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/venv" ] || {
+[ -d $VENV_DIR ] || {
   echo "WARNING: one-time setup of \"ocpidoc\" execution environment in progress..."
   #
   # python3 version must be >= 3.6.0 for "ocpidoc".
@@ -46,17 +62,11 @@
     PYCMD=python3.6
   fi
 
-  $PYCMD -m venv $OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/venv
-  source $OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/venv/bin/activate
+  $PYCMD -m venv $VENV_DIR
+  source $VENV_DIR/bin/activate
   pip3 install docutils==0.16 sphinx sphinx_rtd_theme sphinxcontrib_spelling
   deactivate ;
 }
 
-# Patch the activate script to replace the existing value of VIRTUAL_ENV
-# with our current location based on the current OCPI_CDK_DIR value.
-# This is necessary when the whole tree has been moved or copied (like in a pipeline)
-VENV_DIR="$OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/venv"
-sed -e 's,^\(VIRTUAL_ENV=\).*,\1\"$OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/venv\",g' $VENV_DIR/bin/activate > $VENV_DIR/bin/activate.new
-mv $VENV_DIR/bin/activate.new $VENV_DIR/bin/activate
-source $OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/venv/bin/activate
+source $VENV_DIR/bin/activate
 $OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/ocpidoc.py $@
