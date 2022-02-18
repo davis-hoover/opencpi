@@ -60,7 +60,29 @@ if python3 -c "import sys; sys.exit(0 if sys.hexversion < 0x030600f0 else 1)"; t
   done
 fi
 
-cd ../..
+#
+# This next patch is required on systems where the python3 version
+# is >= 3.10.0.  It will be unnecessary for asciidoc3 version 3.2.3
+# and later, but support for python3.6 got dropped in version 3.2.3.
+# The "patch" command treats ".." as dangerous and will not honor it
+# as a path prefix: need to "cd" up one level before patching.
+#
+cd ..
+patch -p1 <<'EOF'
+--- a/asciidoc3.py	2020-12-30 15:57:23.000000000 -0600
++++ b/asciidoc3.py	2022-02-14 13:50:50.567618983 -0600
+@@ -5286,7 +5286,7 @@
+         directory.
+         cmd is the asciidoc3 command or asciidoc3.py path.
+         """
+-        if float(sys.version[:3]) < float(MIN_PYTHON_VERSION):
++        if sys.hexversion < 0x030600f0:
+             message.stderr('FAILED: Python %s or better required' %
+                            MIN_PYTHON_VERSION)
+             sys.exit(1)
+EOF
+
+cd ..
 
 # So uses of this use $OCPI_PREREQUISITES_DIR/asciidoc3/ad3/<whatever>
 relative_link ad3 "$OcpiInstallDir" # each platform creates this same link
