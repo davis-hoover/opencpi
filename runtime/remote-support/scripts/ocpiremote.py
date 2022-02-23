@@ -42,7 +42,7 @@ def main():
     ocpi_server_addresses = os.environ.get('OCPI_SERVER_ADDRESSES')
     ip = None
     port = None
-    env_args = None
+    env_args = []
     if ocpi_server_addresses:
       # server addresses separated by comma
       ocpi_server_addresses = ocpi_server_addresses.split(",")
@@ -182,7 +182,7 @@ def main():
          option_sw_platform]))
 
     parser = make_parser(commands, common_options)
-    preprocessed_args = preprocess_args(commands,env_args)
+    preprocessed_args = preprocess_args(commands, env_args)
     args = parser.parse_args(preprocessed_args)
 
     # If a subcommand was passed, call it. Else print help message
