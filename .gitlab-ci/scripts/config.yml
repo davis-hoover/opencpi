@@ -57,8 +57,8 @@ matchstiq_z1:
   ip: 10.1.0.203
   port: 1000
 picoevb:
-  ip:
-  port:
+  ip: []
+  port: 1000
 plutosdr:
   ip: 
    - 10.1.0.101
