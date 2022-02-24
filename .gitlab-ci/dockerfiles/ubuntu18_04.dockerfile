@@ -3,7 +3,7 @@ FROM ubuntu:18.04
 ENV DEBIAN_FRONTEND=noninteractive
 ADD . /opencpi
 WORKDIR /opencpi
-ENTRYPOINT ["/bin/bash", "-lc"]
+ENTRYPOINT ["/bin/bash", "-cli"]
 RUN groupadd gitlab-runner -g 994
 RUN usermod -g gitlab-runner root
 RUN echo "umask 002" >> ~/.bashrc
