@@ -7,6 +7,7 @@ from typing import List
 import re
 import sys
 import yaml
+import random
 
 
 class Job():
@@ -1043,6 +1044,12 @@ class AssemblyPipelineBuilder(PipelineBuilder):
             'build-unit_tests', 
             'run-unit_tests'
         ]
+        
+    def _build_ip(self):
+        """Create ip"""
+        ip_idx = self.ip
+        ip = random.choice(ip_idx)
+        return ip
 
     def _build_jobs(self) -> List[Job]:
         """Create jobs for host platforms"""
@@ -1075,6 +1082,7 @@ class AssemblyPipelineBuilder(PipelineBuilder):
         asset_project = asset_path.relative_to('projects').parts[0]
         name = self._build_name(asset_project, asset_name, stage)
         tags = self._build_tags(stage)
+        ip = self._build_ip()
         script = self._build_script(stage, asset)
         needs = self._build_needs(stage, asset_name, asset_project)
         before_script = self._build_before_script(stage)
@@ -1156,7 +1164,10 @@ class AssemblyPipelineBuilder(PipelineBuilder):
 
     def _build_tags(self, stage: str) -> List[str]:
         """Constructs and returns a job's tags as a list of strings"""
-        tags = ['opencpi', 'shell']
+        tags = []
+        tags.append('{}-{}'.format(self.platform, self.ip[1]))
+        tags.append('opencpi')
+        tags.append('shell')
         if stage == 'run-unit_tests' and self.do_hwil:
             if self.model == 'hdl':
                 tags.append(self.platform)

@@ -37,9 +37,9 @@ def _set_env():
     environ['CI_OCPI_HOSTS'] = 'centos7'
     environ['CI_OCPI_HOST'] = 'centos7'
     environ['CI_OCPI_PLATFORMS'] = '"zed:xilinx19_2_aarch32,xsim"'
-    environ['CI_OCPI_PLATFORM'] = 'xsim'
-    environ['CI_OCPI_OTHER_PLATFORM'] = ''
-    environ['CI_OCPI_PROJECTS'] = '"ocpi.comp.sdr,ocpi.osp.plutosdr"'
+    environ['CI_OCPI_PLATFORM'] = 'zed'
+    environ['CI_OCPI_OTHER_PLATFORM'] = 'xilinx19_2_aarch32'
+    environ['CI_OCPI_PROJECTS'] = ' '
     environ['CI_OCPI_ROOT_PIPELINE_ID'] = '123456789'
     environ['CI_PIPELINE_ID'] = '234567890'
     environ['CI_JOB_ID'] = '987654321'
@@ -54,7 +54,6 @@ def _set_env():
     environ['CI_OCPI_REF_NAME'] = 'develop'
     environ['CI_PROJECT_NAME'] = 'ocpi.comp.sdr'
     environ['CI_PROJECT_NAMESPACE'] = 'opencpi/ocpi.comp.sdr'
-
 
 def _get_builder(builder_type: str, dump_path: Path, 
     config: dict=None) -> PipelineBuilder:

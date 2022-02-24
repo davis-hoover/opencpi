@@ -49,7 +49,9 @@ adrv9361:
     variables:
       OCPI_XILINX_LICENSE_FILE: '2100@sembach.opencpi.net'
 e31x:
-  ip: 10.1.0.42
+  ip: 
+    - 10.1.0.42
+    - 10.1.0.240
   port: 1000
 matchstiq_z1:
   ip: 10.1.0.203
@@ -58,7 +60,10 @@ picoevb:
   ip:
   port:
 plutosdr:
-  ip: 10.1.0.102
+  ip: 
+   - 10.1.0.101
+   - 10.1.0.102
+   - 10.1.0.103
   port: 1000
   password: analog
   deploy: False # deprecated
@@ -78,7 +83,10 @@ zcu104:
   ip: 10.1.0.208
   port: 1000
 zed:
-  ip: 10.1.0.242
+  ip: 
+   - 10.1.0.242
+   - 10.1.0.207
+   - 10.1.0.239
   port: 1000
 zed_ise:
   variables:
