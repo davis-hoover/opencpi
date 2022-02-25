@@ -56,8 +56,14 @@ e31x:
 matchstiq_z1:
   ip: 10.1.0.203
   port: 1000
+microzed:
+  ip: 10.1.0.209
+  port: 1000
 picoevb:
   ip: []
+  port: 1000
+picozed:
+  ip: 10.1.0.210
   port: 1000
 plutosdr:
   ip: 
@@ -79,6 +85,9 @@ plutosdr:
     build-tests:centos7:assets_ts:components:plutosdr:
       variables:
         OCPI_PROJECT_PATH: '$CI_PROJECT_DIR/projects/assets:$CI_PROJECT_DIR/projects/platform'
+zcu102:
+  ip: 10.1.0.212
+  port: 1000
 zcu104:
   ip: 10.1.0.208
   port: 1000
