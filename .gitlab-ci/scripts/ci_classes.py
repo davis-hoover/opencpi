@@ -1159,14 +1159,20 @@ class AssemblyPipelineBuilder(PipelineBuilder):
     def _build_tags(self, stage: str, ip: str=None) -> List[str]:
         """Constructs and returns a job's tags as a list of strings"""
         tags = []
-        tags.append('{}-{}'.format(self.platform, ip))
         tags.append('opencpi')
         tags.append('shell')
         if stage == 'run-unit_tests' and self.do_hwil:
             if self.model == 'hdl':
-                tags.append(self.platform)
+                platform = self.platform
             elif self.model == 'rcc':
-                tags.append(self.other_platform)
+                platform = self.other_platform
+            if ip:
+            # If more than one device, find device index to use for tag
+                ip_idx = self.ip.index(ip)
+                ip_id = str(ip_idx + 1).zfill(2)
+                tags.append('{}-{}'.format(self.platform, ip_id))
+            else:
+                tags.append(platform)
         else:
             tags.append('aws')
 
