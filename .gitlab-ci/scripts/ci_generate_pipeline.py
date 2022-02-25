@@ -55,6 +55,7 @@ def _set_env():
     environ['CI_PROJECT_NAME'] = 'ocpi.comp.sdr'
     environ['CI_PROJECT_NAMESPACE'] = 'opencpi/ocpi.comp.sdr'
 
+
 def _get_builder(builder_type: str, dump_path: Path, 
     config: dict=None) -> PipelineBuilder:
     """

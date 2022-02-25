@@ -43,30 +43,42 @@ modelsim:
 
 # hdl
 adrv9361:
+  ip: 10.1.0.232
+  ip_addresses:
+    - 10.1.0.232
   variables:
     OCPI_XILINX_LICENSE_FILE: '2100@sembach.opencpi.net'
   overrides: # deprecated; use 'variables'
     variables:
       OCPI_XILINX_LICENSE_FILE: '2100@sembach.opencpi.net'
 e31x:
-  ip: 
+  ip: 10.1.0.42 # deprecated; use 'ip_addresses'
+  ip_addresses:
     - 10.1.0.42
     - 10.1.0.240
   port: 1000
 matchstiq_z1:
-  ip: 10.1.0.203
+  ip: 10.1.0.203 # deprecated; use 'ip_addresses'
+  ip_addresses:
+    - 10.1.0.203 
   port: 1000
 microzed:
-  ip: 10.1.0.209
+  ip: 10.1.0.209 # deprecated; use 'ip_addresses'
+  ip_addresses:
+    - 10.1.0.209
   port: 1000
 picoevb:
-  ip: []
+  ip: # deprecated; use 'ip_addresses'
+  ip_addresses: []
   port: 1000
 picozed:
-  ip: 10.1.0.210
+  ip: 10.1.0.210 # deprecated; use 'ip_addresses'
+  ip_addresses:
+    - 10.1.0.210
   port: 1000
 plutosdr:
-  ip: 
+  ip: 10.1.0.101 # deprecated; use 'ip_addresses'
+  ip_addresses: 
    - 10.1.0.101
    - 10.1.0.102
    - 10.1.0.103
@@ -86,13 +98,18 @@ plutosdr:
       variables:
         OCPI_PROJECT_PATH: '$CI_PROJECT_DIR/projects/assets:$CI_PROJECT_DIR/projects/platform'
 zcu102:
-  ip: 10.1.0.212
+  ip: 10.1.0.212 # deprecated; use 'ip_addresses'
+  ip_addresses:
+    - 10.1.0.212
   port: 1000
 zcu104:
-  ip: 10.1.0.208
+  ip: 10.1.0.208 # deprecated; use 'ip_addresses'
+  ip_addresses:
+    - 10.1.0.208
   port: 1000
 zed:
-  ip: 
+  ip: 10.1.0.242 # deprecated; use 'ip_addresses'
+  ip_addresses: 
    - 10.1.0.242
    - 10.1.0.207
    - 10.1.0.239

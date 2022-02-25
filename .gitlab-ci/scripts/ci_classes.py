@@ -1031,10 +1031,10 @@ class AssemblyPipelineBuilder(PipelineBuilder):
         self.other_platform = other_platform
         self.do_hwil = do_hwil
         self.user = self.password = 'root'
-        self.ip = self.port = None
+        self.ip_addresses = self.port = None
         self.runners = runners
         if config:
-            for key in ['ip', 'port', 'user', 'password']:
+            for key in ['ip_addresses', 'port', 'user', 'password']:
                 if key in config:
                     self.__dict__[key] = config[key]
         self.stages = []
@@ -1168,8 +1168,8 @@ class AssemblyPipelineBuilder(PipelineBuilder):
                 platform = self.other_platform
             if ip:
             # If more than one device, find device index to use for tag
-                ip_idx = self.ip.index(ip)
-                ip_id = str(ip_idx + 1).zfill(2)
+                ip_idx = self.ip_addresses.index(ip)
+                ip_id = str(ip_idx + 1).zfill(2) # Pad leading 0 if necessary
                 tags.append('{}-{}'.format(self.platform, ip_id))
             else:
                 tags.append(platform)
@@ -1230,8 +1230,8 @@ class AssemblyPipelineBuilder(PipelineBuilder):
         return resource_group
 
     def _build_ip(self):
-        """Selects a random ip from the list of ips in self.ip"""
-        ip = random.choice(self.ip) if self.ip else None
+        """Selects a random ip from self.ip_addresses"""
+        ip = random.choice(self.ip_addresses) if self.ip_addresses else None
 
         return ip
 
@@ -1252,7 +1252,8 @@ class AssemblyPipelineBuilder(PipelineBuilder):
             if ip:
                 ocpiremote_load_cmd = self._build_ocpiremote_cmd('load', ip)
                 ocpiremote_start_cmd = self._build_ocpiremote_cmd('start', ip)
-                ocpiremote_unload_cmd = self._build_ocpiremote_cmd('unload', ip)
+                ocpiremote_unload_cmd = self._build_ocpiremote_cmd('unload', 
+                                                                   ip)
                 ocpi_cmds = [
                     ocpiremote_unload_cmd + ' || true',
                     ocpiremote_load_cmd, 
