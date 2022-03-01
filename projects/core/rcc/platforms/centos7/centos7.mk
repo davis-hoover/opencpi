@@ -37,6 +37,6 @@ OcpiPlatformArch=x86_64
 OcpiKernelDir:=\
 $(strip $(foreach krel,$(shell uname -r),\
   $(foreach hver,$(word 1, $(shell rpm -q --qf=%{version}-%{release}.%{arch} kernel-headers)),\
-    $(if $(filter $(krel),$(hver)),,$(info Warning: probable running kernel vs. installed kernel mismatch detected: the OpenCPI kernel driver will be built for kernel version $(hver).  The detected mismatch usually means the kernel has been updated recently, but the system has not been rebooted since the update.  Please reboot your system if you have not already done so.))\
+    $(if $(filter $(krel),$(hver)),,$(call OcpiInfo,Warning: probable running kernel vs. installed kernel mismatch detected: the OpenCPI kernel driver will be built for kernel version $(hver).  The detected mismatch usually means the kernel has been updated recently but the system has not been rebooted since the update.  Please reboot your system if you have not already done so.))\
     $(foreach kdir,/usr/src/kernels/$(hver),\
-      $(or $(wildcard $(kdir)),$(info Warning: no kernel headers directory found))))))
+      $(or $(wildcard $(kdir)),$(call OcpiInfo,Warning: no kernel headers directory found))))))
