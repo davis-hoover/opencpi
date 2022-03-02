@@ -30,60 +30,87 @@ config_key_t sc = config_key_samples_are_complex;
 config_key_t gm = config_key_gain_mode;
 config_key_t gn = config_key_gain_dB;
 
-bool res;
-#define TEST(ds,cfg,val,dot,tol,expected) \
-  res = dot ? uut.lock_config(ds,cfg,val,tol) : uut.lock_config(ds,cfg,val); \
-  std::cout << (res == expected ? "[INFO] PASS" : "[ERROR] FAIL"); \
-  std::cout << " ds,cfg,val,dot,tol,expected="; \
-  std::cout << ds << "," << cfg << "," << val << "," << dot << "," << tol << "," << expected << "\n"; \
-  if(res != expected) { \
+bool result;
+//dot = do_include_tolerance
+//tol = tolerance
+#define TEST(data_stream,cfg,val,dot,tol,expected) \
+  result = dot ? uut.lock_config(data_stream,cfg,val,tol) : uut.lock_config(data_stream,cfg,val); \
+  std::cout << (result == expected ? "[INFO] PASS" : "[ERROR] FAIL"); \
+  std::cout << " data_stream,cfg,val,dot,tol,expected="; \
+  std::cout << data_stream << "," << cfg << "," << val << "," << dot << "," << tol << "," << expected << "\n"; \
+  if(result != expected) { \
     throw std::string("[ERROR] FAIL\n"); \
   }
 
 int test_AD9361Configurator() {
+  // RX CHANNEL
   int ret = 0;
   AD9361Configurator uut;
   try {
-    std::vector<const char*> ds_rx;
-    ds_rx.push_back("rx1");
-    ds_rx.push_back("rx2");
-    for(auto it=ds_rx.begin (); it!=ds_rx.end(); ++it) {
+    std::vector<const char*> data_stream_rx;
+    data_stream_rx.push_back("rx1");
+    data_stream_rx.push_back("rx2");
+    for(auto it=data_stream_rx.begin (); it!=data_stream_rx.end(); ++it) {
+      // Tuning Freq (MHz) [2.4 GHz - 6.0 GHz]
+      // ================================================
+      // LOWER BOUNDS
       TEST(*it, fc, 69.99   , true, 0.000001, false)
       uut.unlock_all();
       TEST(*it, fc, 70.     , true, 0.000001, true )
       uut.unlock_all();
+      // MEDIAN BOUND
       TEST(*it, fc, 3000.   , true, 0.000001, true )
       uut.unlock_all();
+      // UPPER BOUNDS
       TEST(*it, fc, 6000.   , true, 0.000001, true )
       uut.unlock_all();
       TEST(*it, fc, 6001.01 , true, 0.000001, false)
       uut.unlock_all();
+      // Bandwidth (MHz)
+      // @TODO Check Values
+      // - Does NOT match Data sheet
+      // - Datasheet: <200 KHz - 56 MHz
+      // - Not sure where 400 KHz comes from
+      // ================================================
+      //  LOWER BOUNDS
       TEST(*it, bw, 0.39    , true, 0.000001, false)
       uut.unlock_all();
       TEST(*it, bw, 0.4     , true, 0.000001, true )
       uut.unlock_all();
+      // MEDIAN BOUND
       TEST(*it, bw, 30.     , true, 0.000001, true )
       uut.unlock_all();
+      // UPPER BOUNDS
       TEST(*it, bw, 56.     , true, 0.000001, true )
       uut.unlock_all();
       TEST(*it, bw, 56.01   , true, 0.000001, false)
       uut.unlock_all();
+      // Sampling rate (Msps)
+      // @TODO Check Values
+      // ================================================
+      // LOWER BOUNDS
       TEST(*it, fs, 2.08    , true, 0.000001, false)
       uut.unlock_all();
       TEST(*it, fs, 2.083334, true, 0.000001, true )
       uut.unlock_all();
+      // MEDIAN BOUND
       TEST(*it, fs, 32.     , true, 0.000001, true )
       uut.unlock_all();
+      // UPPER BOUND
       TEST(*it, fs, 61.44   , true, 0.000001, true )
       uut.unlock_all();
       TEST(*it, fs, 61.45   , true, 0.000001, false)
       uut.unlock_all();
+      // Samples are complex
+      // ================================================
       TEST(*it, sc, 0       , false,0.000001, false)
       uut.unlock_all();
       TEST(*it, sc, 1       , false,0.000001, true )
       uut.unlock_all();
       TEST(*it, sc, 2       , false,0.000001, false)
       uut.unlock_all();
+      // Gain Mode
+      // ================================================
       TEST(*it, gm, -1      , false,0.000001, false)
       uut.unlock_all();
       TEST(*it, gm, 0       , false,0.000001, true )
@@ -92,6 +119,10 @@ int test_AD9361Configurator() {
       uut.unlock_all();
       TEST(*it, gm, 2       , false,0.000001, false)
       uut.unlock_all();
+      // Gain dB
+      // ================================================
+      // Unconditional Constraints
+      // ------------------------------------------------
       TEST(*it, gn, -11.    , true ,0.000001, false)
       uut.unlock_all();
       TEST(*it, gn, -10.    , true ,0.000001, true )
@@ -116,58 +147,193 @@ int test_AD9361Configurator() {
       uut.unlock_all();
       TEST(*it, gn, 78.     , true ,0.000001, false)
       uut.unlock_all();
-      /// @TODO test gain conditional constraints
+      // Conditional Constraints
+      // If fc [70 - 1300]; Possible Gain: -1 - 73 dB
+      // LOWER BOUNDS
+      // ------------------------------------------------
+      TEST(*it, fc, 70.01    , true, 0.000001, true )
+      TEST(*it, gn, -2.      , true ,0.000001, false)
+      uut.unlock_all();
+      TEST(*it, fc, 1299.01  , true, 0.000001, true )
+      TEST(*it, gn, -2.      , true ,0.000001, false)
+      uut.unlock_all();
+      TEST(*it, fc, 70.01   , true, 0.000001, true )
+      TEST(*it, gn, -1.     , true ,0.000001, true )
+      uut.unlock_all();
+      TEST(*it, fc, 1299.01 , true, 0.000001, true )
+      TEST(*it, gn, -1.     , true ,0.000001, true )
+      uut.unlock_all();
+      // MEDIAN BOUND
+      // ------------------------------------------------
+      TEST(*it, fc, 70.01   , true, 0.000001, true )
+      TEST(*it, gn, 50.     , true ,0.000001, true )
+      uut.unlock_all();
+      TEST(*it, fc, 1299.01 , true, 0.000001, true )
+      TEST(*it, gn, 50.     , true ,0.000001, true )
+      // UPPER BOUNDS
+      // ------------------------------------------------
+      TEST(*it, fc, 70.01   , true, 0.000001, true )
+      TEST(*it, gn, 73.     , true ,0.000001, true )
+      uut.unlock_all();
+      TEST(*it, fc, 1299.01 , true, 0.000001, true )
+      TEST(*it, gn, 73.     , true ,0.000001, true )
+      uut.unlock_all();
+      TEST(*it, fc, 70.01   , true, 0.000001, true )
+      TEST(*it, gn, 74.     , true ,0.000001, false)
+      uut.unlock_all();
+      TEST(*it, fc, 1299.01 , true, 0.000001, true )
+      TEST(*it, gn, 74.     , true ,0.000001, false)
+      uut.unlock_all();
+      // If fc [1300 - 4000); Possible Gain: -3 - 71 dB
+      // LOWER BOUNDS
+      // ------------------------------------------------
+      TEST(*it, fc, 1300.01 , true, 0.000001, true )
+      TEST(*it, gn, -4      , true ,0.000001, false)
+      uut.unlock_all();
+      TEST(*it, fc, 3999.01 , true, 0.000001, true )
+      TEST(*it, gn, -4      , true ,0.000001, false)
+      uut.unlock_all();
+      TEST(*it, fc, 1300.01 , true, 0.000001, true )
+      TEST(*it, gn, -3.     , true ,0.000001, true )
+      uut.unlock_all();
+      TEST(*it, fc, 3999.01 , true, 0.000001, true )
+      TEST(*it, gn, -3.     , true ,0.000001, true )
+      uut.unlock_all();
+      // MEDIAN BOUND
+      // ------------------------------------------------
+      TEST(*it, fc, 1300.01 , true, 0.000001, true )
+      TEST(*it, gn, 50.     , true ,0.000001, true )
+      uut.unlock_all();
+      TEST(*it, fc, 3999.01 , true, 0.000001, true )
+      TEST(*it, gn, 50.     , true ,0.000001, true )
+      // UPPER BOUNDS
+      // ------------------------------------------------
+      TEST(*it, fc, 1300.01 , true, 0.000001, true )
+      TEST(*it, gn, 71.     , true ,0.000001, true )
+      uut.unlock_all();
+      TEST(*it, fc, 3999.01 , true, 0.000001, true )
+      TEST(*it, gn, 71.     , true ,0.000001, true )
+      uut.unlock_all();
+      TEST(*it, fc, 1300.01 , true, 0.000001, true )
+      TEST(*it, gn, 72.     , true ,0.000001, false)
+      uut.unlock_all();
+      TEST(*it, fc, 3999.01 , true, 0.000001, true )
+      TEST(*it, gn, 72.     , true ,0.000001, false)
+      uut.unlock_all();
+      // If fc [4000 - 6000]; Possible Gain: -10 - 62 dB
+      // LOWER BOUNDS
+      // ------------------------------------------------
+      TEST(*it, fc, 4000.01 , true, 0.000001, true )
+      TEST(*it, gn, -11.    , true ,0.000001, false)
+      uut.unlock_all();
+      TEST(*it, fc, 5999.01 , true, 0.000001, true )
+      TEST(*it, gn, -11.    , true ,0.000001, false)
+      uut.unlock_all();
+      TEST(*it, fc, 4000.01 , true, 0.000001, true )
+      TEST(*it, gn, -10.    , true ,0.000001, true )
+      uut.unlock_all();
+      TEST(*it, fc, 5999.01 , true, 0.000001, true )
+      TEST(*it, gn, -10.    , true ,0.000001, true )
+      uut.unlock_all();
+      // MEDIAN BOUND
+      // ------------------------------------------------
+      TEST(*it, fc, 4000.01 , true, 0.000001, true )
+      TEST(*it, gn, 50.     , true ,0.000001, true )
+      uut.unlock_all();
+      TEST(*it, fc, 5999.01 , true, 0.000001, true )
+      TEST(*it, gn, 50.     , true ,0.000001, true )
+      // UPPER BOUNDS
+      // ------------------------------------------------
+      TEST(*it, fc, 4000.01 , true, 0.000001, true )
+      TEST(*it, gn, 62.     , true ,0.000001, true )
+      uut.unlock_all();
+      TEST(*it, fc, 5999.01 , true, 0.000001, true )
+      TEST(*it, gn, 62.     , true ,0.000001, true )
+      uut.unlock_all();
+      TEST(*it, fc, 4000.01 , true, 0.000001, true )
+      TEST(*it, gn, 63.     , true ,0.000001, false)
+      uut.unlock_all();
+      TEST(*it, fc, 5999.01 , true, 0.000001, true )
+      TEST(*it, gn, 63.     , true ,0.000001, false)
+      uut.unlock_all();
     }
-    std::vector<const char*> ds_tx;
-    ds_tx.push_back("tx1");
-    ds_tx.push_back("tx2");
-    for(auto it=ds_tx.begin (); it!=ds_tx.end(); ++it) {
+    // TX CHANNEL
+    std::vector<const char*> data_stream_tx;
+    data_stream_tx.push_back("tx1");
+    data_stream_tx.push_back("tx2");
+    for(auto it=data_stream_tx.begin (); it!=data_stream_tx.end(); ++it) {
+      // Tuning Freq (MHz) (70 MHz - 6.0 GHZ)
+      // ================================================
+      //  LOWER BOUNDS
       TEST(*it, fc, 69.99   , true, 0.000001, false)
       uut.unlock_all();
       TEST(*it, fc, 70.     , true, 0.000001, true )
       uut.unlock_all();
+      // MEDIAN BOUND
       TEST(*it, fc, 3000.   , true, 0.000001, true )
       uut.unlock_all();
+      // UPPER BOUNDS
       TEST(*it, fc, 6000.   , true, 0.000001, true )
       uut.unlock_all();
       TEST(*it, fc, 6001.01 , true, 0.000001, false)
       uut.unlock_all();
+      // Bandwidth (MHz)
+      // @TODO Check Values
+      // ================================================
+      //  LOWER BOUNDS
       TEST(*it, bw, 1.24    , true, 0.000001, false)
       uut.unlock_all();
       TEST(*it, bw, 1.25    , true, 0.000001, true )
       uut.unlock_all();
+      // MEDIAN BOUND
       TEST(*it, bw, 20.     , true, 0.000001, true )
       uut.unlock_all();
+      // UPPER BOUNDS
       TEST(*it, bw, 40.     , true, 0.000001, true )
       uut.unlock_all();
       TEST(*it, bw, 40.01   , true, 0.000001, false)
       uut.unlock_all();
+      //Sampling rate (Msps)
+      // @TODO Check Values
+      // ================================================
+      // LOWER BOUNDS
       TEST(*it, fs, 2.08    , true, 0.000001, false)
       uut.unlock_all();
       TEST(*it, fs, 2.083334, true, 0.000001, true )
       uut.unlock_all();
+      // MEDIAN BOUND
       TEST(*it, fs, 32.     , true, 0.000001, true )
       uut.unlock_all();
+      // UPPER BOUNDS
       TEST(*it, fs, 61.44   , true, 0.000001, true )
       uut.unlock_all();
       TEST(*it, fs, 61.45   , true, 0.000001, false)
       uut.unlock_all();
+      // Samples are complex
+      // ================================================
       TEST(*it, sc, 0       , false,0.000001, false)
       uut.unlock_all();
       TEST(*it, sc, 1       , false,0.000001, true )
       uut.unlock_all();
       TEST(*it, sc, 2       , false,0.000001, false)
       uut.unlock_all();
+      // Gain Mode
+      // ================================================
       TEST(*it, gm, 0       , false,0.000001, false)
       uut.unlock_all();
       TEST(*it, gm, 1       , false,0.000001, true )
       uut.unlock_all();
+      // Gain (dB) (-89.25 - 0)
+      // ================================================
+      // LOWER BOUNDS
       TEST(*it, gn, -89.76  , true, 0.000001, false)
       uut.unlock_all();
       TEST(*it, gn, -89.75  , true, 0.000001, true )
       uut.unlock_all();
+      // MEDIAN BOUND
       TEST(*it, gn, -40.    , true, 0.000001, true )
       uut.unlock_all();
+      // UPPER BOUND
       TEST(*it, gn, 0.      , true, 0.000001, true )
       uut.unlock_all();
       TEST(*it, gn, 0.01    , true, 0.000001, false)
