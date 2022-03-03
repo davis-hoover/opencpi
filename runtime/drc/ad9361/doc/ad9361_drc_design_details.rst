@@ -1,0 +1,116 @@
+.. DRC AD9361 Documentation:
+
+.. This file is protected by Copyright. Please refer to the COPYRIGHT file
+   distributed with this source distribution.
+
+   This file is part of OpenCPI <http://www.opencpi.org>
+
+   OpenCPI is free software: you can redistribute it and/or modify it under the
+   terms of the GNU Lesser General Public License as published by the Free
+   Software Foundation, either version 3 of the License, or (at your option) any
+   later version.
+
+   OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
+   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+   A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+   more details.
+
+   You should have received a copy of the GNU Lesser General Public License
+   along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+.. Company:     Geon Technologies, LLC
+   Author:      Davis Hoover and Joel Palmer
+   Copyright:   (c) 2018 Geon Technologies, LLC. All rights reserved.
+                Dissemination of this information or reproduction of this
+                material is strictly prohibited unless prior written
+                permission is obtained from Geon Technologies, LLC
+
+.. _DRC_AD9361_Documentation:
+
+DRC AD9361 Documentation
+========================
+
+DRC Sequence Diagram: AD9361 rx_gain setting
+--------------------------------------------
+
+::
+
+    +-----------------+ +--------------------+ +-------------------------+ +----------------------+ +-----------------------+   +--------------------+ +--------------------------+ +-------------------+ +------------------+
+    | OpenCPI         | | OpenCPI            | | Analog Devices          | | Analog Devices       | | Analog Devices        |   | Analog Devices     | | Analog Devices           | | OpenCPI           | | OpenCPI          |
+    | DEFINED         | | DEFINED            | | DEFINED                 | | DEFINED              | | DEFINED               |   | DEFINED            | | DEFINE                   | | DEFINED           | | DEFINED          |
+    +-----------------+ +--------------------+ +-------------------------+ +----------------------+ +-----------------------+   +--------------------+ +--------------------------+ +-------------------+ +------------------+ +-----------+
+    | DRC             | | DRC                | | No-OS (2018_R2)         | | No-OS (2018_R2)      | | No-OS                 |   | No-OS (2018_R2)    | | No-OS (2018_R2           | | HARDWARE PLATFORM | | HARDWARE PLATFORM| | AD9361    |
+    | AD9361DRC       | | AD9361Configurator | | ad9361_set_rx_rf_gain() | | ad9361_set_rx_gain() | | set_full_table_gain() |   | find_table_index() | | full_gain_table_abs_gain | | DRIVER platform.c | | ad9361_config.hdl| | device    |
+    | C++ class       | | C++ class          | |                         | |                      | | [1]                   |   |                    | | static const struct [2]  | |                   | |                  | | registers |
+    +-----------------+ +--------------------+ +-------------------------+ +----------------------+ +-----------------------+   +--------------------+ +--------------------------+ +-------------------+ +------------------+ +-----------+
+         |                                  |                 |                         |                         |                      |                           |                          |                  |                   |
+         | lock_config("rx1","gain_dB",val) |                 |                         |                         |                      |                           |                          |                  |                   |
+         |--------------------------------->|                 |                         |                         |                      |                           |                          |                  |                   |
+         | lock succeed                     |                 |                         |                         |                      |                           |                          |                  |                   |
+         | indication                       |                 |                         |                         |                      |                           |                          |                  |                   |
+         |<---------------------------------|                 |                         |                         |                      |                           |                          |                  |                   |
+         | set_gain_dB("rx1",val)           |                 |                         |                         |                      |                           |                          |                  |                   |
+         |--------------------------------------------------->|                         |                         |                      |                           |                          |                  |                   |
+         |                                  |                 | val                     |                         |                      |                           |                          |                  |                   |
+         |                                  |                 |------------------------>| val                     |                      |                           |                          |                  |                   |
+         |                                  |                 |                         |------------------------>| val                  |                           |                          |                  |                   |
+         |                                  |                 |                         |                         |--------------------->|                    index  |                          |                  |                   |
+         |                                  |                 |                         |                         | index                |<--------------------------|                          |                  |                   |
+         |                                  |                 |                         |                         |<---------------------|                           |                          |                  |                   |
+         |                                  |                 |                         |                         | ad9361_spi_writef(index)                         |                          |                  |                   |
+         |                                  |                 |                         |                         |---------------------------------------------------------------------------->|                  |                   |
+         |                                  |                 |                         |                         |                      |                           |                          |----------------->|set_property(index)|
+         |                                  |                 |                         |                         |                      |                           |                          |                  |------------------>|
+
+AD9361 DRC Mapping
+----------------
+
+..
+
++--------------------------------------+--------+------------------------------+-----------------------------------+-----------------------------------------------------------------------------------------------------+
+| DRC API call                         | Data   | Constraint Satisfaction      | Underlying API call {1}           | Constrained                                                                                         |
+|                                      | Stream | Problem Variable             |                                   | Range(s) {2}                                                                                        |
+|                                      | ID     |                              |                                   |                                                                                                     |
++======================================+========+==============================+===================================+=====================================================================================================+
+| N/A                                  | N/A    | ad9361_rx_rfpll_lo_freq      | N/A                               | [70,6000]                                                                                           |
+| N/A                                  | N/A    | ad9361_tx_rfpll_lo_freq      | N/A                               | [70,6000] {3}                                                                                       |
+| N/A                                  | N/A    | ad9361_rx_rf_bandwidth_meghz | N/A                               | [0.2,56]                                                                                            |
+| N/A                                  | N/A    | ad9361_tx_rf_bandwidth_meghz | N/A                               | [1.25,40]                                                                                           |
+| N/A                                  | N/A    | ad9361_rx_sampl_freq_meghz   | N/A                               | ad9361_tx_sampl_freq_meghz/dac_clk_divider                                                          |
+| N/A                                  | N/A    | ad9361_tx_sampl_freq_meghz   | N/A                               | [2.083334,61.44] {4}                                                                                |
+| N/A                                  | N/A    | dac_clk_divider              | N/A                               | [1..2]                                                                                              |
+| AD9361DRC::set_direction()           | rx1    | ad9361_dir_rx1               | N/A                               | 0 (rx)                                                                                              |
+| AD9361DRC::set_direction()           | rx2    | ad9361_dir_rx2               | N/A                               | 0 (rx)                                                                                              |
+| AD9361DRC::set_direction()           | tx1    | ad9361_dir_tx1               | N/A                               | 1 (tx)                                                                                              |
+| AD9361DRC::set_direction()           | tx2    | ad9361_dir_tx2               | N/A                               | 1 (tx)                                                                                              |
+| AD9361DRC::set_tuning_freq_MHz()     | rx1    | ad9361_fc_meghz_rx1          | ad9361_set_rx_lo_freq()           | ad9361_rx_rfpll_lo_freq_meghz                                                                       |
+| AD9361DRC::set_tuning_freq_MHz()     | rx2    | ad9361_fc_meghz_rx2          | ad9361_set_rx_lo_freq()           | ad9361_rx_rfpll_lo_freq_meghz                                                                       |
+| AD9361DRC::set_tuning_freq_MHz()     | tx1    | ad9361_fc_meghz_tx1          | ad9361_set_tx_lo_freq()           | ad9361_tx_rfpll_lo_freq_meghz                                                                       |
+| AD9361DRC::set_tuning_freq_MHz()     | tx2    | ad9361_fc_meghz_tx2          | ad9361_set_tx_lo_freq()           | ad9361_tx_rfpll_lo_freq_meghz                                                                       |
+| AD9361DRC::set_bandwidth_3dB_MHz()   | rx1    | ad9361_bw_meghz_rx1          | ad9361_set_rx_rf_bandwidth()      | ad9361_rx_rf_bandwidth_meghz                                                                        |
+| AD9361DRC::set_bandwidth_3dB_MHz()   | rx2    | ad9361_bw_meghz_rx2          | ad9361_set_rx_rf_bandwidth()      | ad9361_rx_rf_bandwidth_meghz                                                                        |
+| AD9361DRC::set_bandwidth_3dB_MHz()   | tx1    | ad9361_bw_meghz_tx1          | ad9361_set_tx_rf_bandwidth()      | ad9361_tx_rf_bandwidth_meghz                                                                        |
+| AD9361DRC::set_bandwidth_3dB_MHz()   | tx2    | ad9361_bw_meghz_tx2          | ad9361_set_tx_rf_bandwidth()      | ad9361_tx_rf_bandwidth_meghz                                                                        |
+| AD9361DRC::set_sampling_rate_Msps(   | rx1    | ad9361_fs_megsps_rx1         | ad9361_set_rx_sampling_freq()     | ad9361_rx_sampl_freq_meghz                                                                          |
+| AD9361DRC::set_sampling_rate_Msps(   | rx2    | ad9361_fs_megsps_rx2         | ad9361_set_rx_sampling_freq()     | ad9361_rx_sampl_freq_meghz                                                                          |
+| AD9361DRC::set_sampling_rate_Msps(   | tx1    | ad9361_fs_megsps_tx1         | ad9361_set_tx_sampling_freq()     | ad9361_tx_sampl_freq_meghz                                                                          |
+| AD9361DRC::set_sampling_rate_Msps(   | tx2    | ad9361_fs_megsps_tx2         | ad9361_set_tx_sampling_freq()     | ad9361_tx_sampl_freq_meghz                                                                          |
+| AD9361DRC::set_samples_are_complex() | rx1    | ad9361_samps_comp_rx1        | N/A                               | 1                                                                                                   |
+| AD9361DRC::set_samples_are_complex() | rx2    | ad9361_samps_comp_rx2        | N/A                               | 1                                                                                                   |
+| AD9361DRC::set_samples_are_complex() | tx1    | ad9361_samps_comp_tx1        | N/A                               | 1                                                                                                   |
+| AD9361DRC::set_samples_are_complex() | tx2    | ad9361_samps_comp_tx2        | N/A                               | 1                                                                                                   |
+| AD9361DRC::set_gain_mode()           | rx1    | ad9361_gain_mode_rx1         | ad9361_set_rx_gain_control_mode() | [0..1] (agc..manual)                                                                                |
+| AD9361DRC::set_gain_mode()           | rx2    | ad9361_gain_mode_rx2         | ad9361_set_rx_gain_control_mode() | [0..1] (agc..manual)                                                                                |
+| AD9361DRC::set_gain_mode()           | tx1    | ad9361_gain_mode_tx1         | N/A                               | 1 (manual)                                                                                          |
+| AD9361DRC::set_gain_mode()           | tx2    | ad9361_gain_mode_tx2         | N/A                               | 1 (manual)                                                                                          |
+| AD9361DRC::set_gain_dB()             | rx1    | ad9361_gain_db_rx1           | ad9361_set_rx_rf_gain()           | [-1,73] if 0<=Rx_RFPLL_LO_freq<=1300, [-,71] if 1300<Rx_RFPLL_LO_freq<=4000, [-10,62] otherwise {5} |
+| AD9361DRC::set_gain_dB()             | rx2    | ad9361_gain_db_rx2           | ad9361_set_rx_rf_gain()           | [-1,73] if 0<=Rx_RFPLL_LO_freq<=1300, [-,71] if 1300<Rx_RFPLL_LO_freq<=4000, [-10,62] otherwise {5} |
+| AD9361DRC::set_gain_dB()             | tx1    | ad9361_gain_db_tx1           | ad9361_set_tx_rf_gain()           | [-89.75,0] {6}                                                                                      |
+| AD9361DRC::set_gain_dB()             | tx2    | ad9361_gain_db_tx2           | ad9361_set_tx_rf_gain()           | [-89.75,0] {6}                                                                                      |
++--------------------------------------+--------+------------------------------+-----------------------------------+-----------------------------------------------------------------------------------------------------+
+{1} No-OS API call, unless otherwise noted
+{2} Unless noted, all values are from datasheet https://www.analog.com/media/en/technical-documentation/data-sheets/ad9361.pdf
+{3} https://github.com/analogdevicesinc/no-OS/blob/2018_R2/ad9361/sw/ad9361.c#L929
+{4} OpenCPI/DRC usage of No-OS restricts sampling rates to >= 2.083334 Msps. Lower values have been observed to intermittently fail to be set on Zed/FMCOMMS2/3
+{5} Assumes No-OS 2018_R2 release (earlier releases known to have different values, see https://github.com/analogdevicesinc/no-OS/blob/2018_R2/ad9361/sw/ad9361.c lines 484,601)
+{6} https://github.com/analogdevicesinc/no-OS/blob/2018_R2/ad9361/sw/ad9361.c#L1610
