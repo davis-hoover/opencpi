@@ -23,6 +23,7 @@
 #include <iostream>
 #include "AD9361DRC.hh"
 using namespace DRC;
+config_key_t di = config_key_direction;
 config_key_t fc = config_key_tuning_freq_MHz;
 config_key_t bw = config_key_bandwidth_3dB_MHz;
 config_key_t fs = config_key_sampling_rate_Msps;
@@ -31,8 +32,11 @@ config_key_t gm = config_key_gain_mode;
 config_key_t gn = config_key_gain_dB;
 
 bool res;
+//cfg = config key
+//val = value to lock to
 //dot = do_include_tolerance
-//tol = tolerance
+//tol = tolerance value
+//exp = boolean expected lock success for given config key, value, and tolerance
 #define TEST(data_stream,cfg,val,dot,tol,expected) \
   res = dot ? uut.lock_config(data_stream,cfg,val,tol) : uut.lock_config(data_stream,cfg,val); \
   std::cout << (res == expected ? "[INFO] PASS" : "[ERROR] FAIL"); \
@@ -51,6 +55,12 @@ int test_AD9361Configurator() {
     data_stream_rx.push_back("rx1");
     data_stream_rx.push_back("rx2");
     for(auto it=data_stream_rx.begin (); it!=data_stream_rx.end(); ++it) {
+      // direction
+      // ================================================
+      TEST(*it, di, (int32_t)data_stream_direction_t::rx, false, 0., true);
+      uut.unlock_all();
+      TEST(*it, di, (int32_t)data_stream_direction_t::tx, false, 0., false);
+      uut.unlock_all();
       // Tuning Freq (MHz) [70 MHz - 6.0 GHz]
       // ================================================
       // LOWER BOUNDS
@@ -257,6 +267,12 @@ int test_AD9361Configurator() {
     data_stream_tx.push_back("tx1");
     data_stream_tx.push_back("tx2");
     for(auto it=data_stream_tx.begin (); it!=data_stream_tx.end(); ++it) {
+      // direction
+      // ================================================
+      TEST(*it, di, (int32_t)data_stream_direction_t::rx, false, 0., false);
+      uut.unlock_all();
+      TEST(*it, di, (int32_t)data_stream_direction_t::tx, false, 0., true);
+      uut.unlock_all();
       // Tuning Freq (MHz) (70 MHz - 6.0 GHZ)
       // ================================================
       //  LOWER BOUNDS
@@ -319,7 +335,7 @@ int test_AD9361Configurator() {
       uut.unlock_all();
       TEST(*it, gm, 2       , false,0.000001, false)
       uut.unlock_all();
-      // Gain (dB) (-89.25 - 0)
+      // Gain (dB) (-89.75 - 0)
       // ================================================
       // LOWER BOUNDS
       TEST(*it, gn, -89.76  , true, 0.000001, false)
