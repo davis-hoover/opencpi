@@ -35,7 +35,7 @@ bool result;
 //tol = tolerance
 #define TEST(data_stream,cfg,val,dot,tol,expected) \
   result = dot ? uut.lock_config(data_stream,cfg,val,tol) : uut.lock_config(data_stream,cfg,val); \
-  std::cout << (result == expected ? "[INFO] PASS" : "[ERROR] FAIL"); \
+  std::cout << (res == expected ? "[INFO] PASS" : "[ERROR] FAIL"); \
   std::cout << " data_stream,cfg,val,dot,tol,expected="; \
   std::cout << data_stream << "," << cfg << "," << val << "," << dot << "," << tol << "," << expected << "\n"; \
   if(result != expected) { \
@@ -68,14 +68,12 @@ int test_AD9361Configurator() {
       uut.unlock_all();
       // Bandwidth (MHz)
       // @TODO Check Values
-      // - Does NOT match Data sheet
       // - Datasheet: <200 KHz - 56 MHz
-      // - Not sure where 400 KHz comes from
       // ================================================
       //  LOWER BOUNDS
-      TEST(*it, bw, 0.39    , true, 0.000001, false)
+      TEST(*it, bw, 0.19    , true, 0.000001, false)
       uut.unlock_all();
-      TEST(*it, bw, 0.4     , true, 0.000001, true )
+      TEST(*it, bw, 0.2     , true, 0.000001, true )
       uut.unlock_all();
       // MEDIAN BOUND
       TEST(*it, bw, 30.     , true, 0.000001, true )
@@ -147,15 +145,16 @@ int test_AD9361Configurator() {
       uut.unlock_all();
       TEST(*it, gn, 78.     , true ,0.000001, false)
       uut.unlock_all();
-      // Conditional Constraints
+      // Conditional Constrains
+      // ================================================
       // If fc [70 - 1300]; Possible Gain: -1 - 73 dB
       // LOWER BOUNDS
       // ------------------------------------------------
-      TEST(*it, fc, 70.01    , true, 0.000001, true )
-      TEST(*it, gn, -2.      , true ,0.000001, false)
+      TEST(*it, fc, 70.01   , true, 0.000001, true )
+      TEST(*it, gn, -2.     , true ,0.000001, false)
       uut.unlock_all();
-      TEST(*it, fc, 1299.01  , true, 0.000001, true )
-      TEST(*it, gn, -2.      , true ,0.000001, false)
+      TEST(*it, fc, 1299.01 , true, 0.000001, true )
+      TEST(*it, gn, -2.     , true ,0.000001, false)
       uut.unlock_all();
       TEST(*it, fc, 70.01   , true, 0.000001, true )
       TEST(*it, gn, -1.     , true ,0.000001, true )
@@ -170,6 +169,7 @@ int test_AD9361Configurator() {
       uut.unlock_all();
       TEST(*it, fc, 1299.01 , true, 0.000001, true )
       TEST(*it, gn, 50.     , true ,0.000001, true )
+      uut.unlock_all();
       // UPPER BOUNDS
       // ------------------------------------------------
       TEST(*it, fc, 70.01   , true, 0.000001, true )
@@ -206,6 +206,7 @@ int test_AD9361Configurator() {
       uut.unlock_all();
       TEST(*it, fc, 3999.01 , true, 0.000001, true )
       TEST(*it, gn, 50.     , true ,0.000001, true )
+      uut.unlock_all();
       // UPPER BOUNDS
       // ------------------------------------------------
       TEST(*it, fc, 1300.01 , true, 0.000001, true )
@@ -294,7 +295,6 @@ int test_AD9361Configurator() {
       TEST(*it, bw, 40.01   , true, 0.000001, false)
       uut.unlock_all();
       //Sampling rate (Msps)
-      // @TODO Check Values
       // ================================================
       // LOWER BOUNDS
       TEST(*it, fs, 2.08    , true, 0.000001, false)
@@ -322,6 +322,8 @@ int test_AD9361Configurator() {
       TEST(*it, gm, 0       , false,0.000001, false)
       uut.unlock_all();
       TEST(*it, gm, 1       , false,0.000001, true )
+      uut.unlock_all();
+      TEST(*it, gm, 2       , false,0.000001, false)
       uut.unlock_all();
       // Gain (dB) (-89.25 - 0)
       // ================================================
