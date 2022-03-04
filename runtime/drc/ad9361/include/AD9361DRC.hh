@@ -67,6 +67,7 @@ class AD9361CSP : public CSPBase {
     m_solver.add_var<double>("ad9361_tx_sampl_freq_meghz", dfp_tol);
     m_solver.add_var<double>("ad9361_rx_rf_bandwidth_meghz", dfp_tol);
     m_solver.add_var<double>("ad9361_tx_rf_bandwidth_meghz", dfp_tol);
+    // @TODO  Does ad9361_dac_clk_divider need to be added to the ad9361_drc.rst?
     m_solver.add_var<int32_t>("ad9361_dac_clk_divider");
     m_solver.add_var<int32_t>("ad9361_dir_rx1");
     m_solver.add_var<int32_t>("ad9361_dir_rx2");
@@ -107,7 +108,7 @@ class AD9361CSP : public CSPBase {
     m_solver.add_constr("ad9361_rx_rfpll_lo_freq_meghz", "<=", 6000.);
     m_solver.add_constr("ad9361_tx_rfpll_lo_freq_meghz", ">=", 70.);
     m_solver.add_constr("ad9361_tx_rfpll_lo_freq_meghz", "<=", 6000.);
-    m_solver.add_constr("ad9361_rx_rf_bandwidth_meghz", ">=", 0.4);
+    m_solver.add_constr("ad9361_rx_rf_bandwidth_meghz", ">=", 0.2);
     m_solver.add_constr("ad9361_rx_rf_bandwidth_meghz", "<=", 56.);
     m_solver.add_constr("ad9361_tx_rf_bandwidth_meghz", ">=", 1.25);
     m_solver.add_constr("ad9361_tx_rf_bandwidth_meghz", "<=", 40.);

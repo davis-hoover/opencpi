@@ -143,14 +143,16 @@ AD9361 DRC Mapping
 | AD9361DRC::set_gain_dB()             | tx2    | ad9361_gain_db_tx2           | ad9361_set_tx_rf_gain()           | [-89.75,0] {6}                                                                                       |
 +--------------------------------------+--------+------------------------------+-----------------------------------+------------------------------------------------------------------------------------------------------+
 
-{1} No-OS API call, unless otherwise noted
+References:
 
-{2} Unless noted, all values are from datasheet https://www.analog.com/media/en/technical-documentation/data-sheets/ad9361.pdf
+   #. No-OS API call, unless otherwise noted
 
-{3} https://github.com/analogdevicesinc/no-OS/blob/2018_R2/ad9361/sw/ad9361.c#L929
+   #. Unless noted, all values are from datasheet https://www.analog.com/media/en/technical-documentation/data-sheets/ad9361.pdf
 
-{4} OpenCPI/DRC usage of No-OS restricts sampling rates to >= 2.083334 Msps. Lower values have been observed to intermittently fail to be set on Zed/FMCOMMS2/3
+   #. https://github.com/analogdevicesinc/no-OS/blob/2018_R2/ad9361/sw/ad9361.c#L929
 
-{5} Assumes No-OS 2018_R2 release (earlier releases known to have different values, see https://github.com/analogdevicesinc/no-OS/blob/2018_R2/ad9361/sw/ad9361.c lines 484,601)
+   #. OpenCPI/DRC usage of No-OS restricts sampling rates to >= 2.083334 Msps. Lower values have been observed to intermittently fail to be set on Zed/FMCOMMS2/3
 
-{6} https://github.com/analogdevicesinc/no-OS/blob/2018_R2/ad9361/sw/ad9361.c#L1610
+   #. Assumes No-OS 2018_R2 release (earlier releases known to have different values, see https://github.com/analogdevicesinc/no-OS/blob/2018_R2/ad9361/sw/ad9361.c lines 484,601)
+
+   #. https://github.com/analogdevicesinc/no-OS/blob/2018_R2/ad9361/sw/ad9361.c#L1610

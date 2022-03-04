@@ -30,15 +30,15 @@ config_key_t sc = config_key_samples_are_complex;
 config_key_t gm = config_key_gain_mode;
 config_key_t gn = config_key_gain_dB;
 
-bool result;
+bool res;
 //dot = do_include_tolerance
 //tol = tolerance
 #define TEST(data_stream,cfg,val,dot,tol,expected) \
-  result = dot ? uut.lock_config(data_stream,cfg,val,tol) : uut.lock_config(data_stream,cfg,val); \
+  res = dot ? uut.lock_config(data_stream,cfg,val,tol) : uut.lock_config(data_stream,cfg,val); \
   std::cout << (res == expected ? "[INFO] PASS" : "[ERROR] FAIL"); \
   std::cout << " data_stream,cfg,val,dot,tol,expected="; \
   std::cout << data_stream << "," << cfg << "," << val << "," << dot << "," << tol << "," << expected << "\n"; \
-  if(result != expected) { \
+  if(res != expected) { \
     throw std::string("[ERROR] FAIL\n"); \
   }
 
@@ -51,7 +51,7 @@ int test_AD9361Configurator() {
     data_stream_rx.push_back("rx1");
     data_stream_rx.push_back("rx2");
     for(auto it=data_stream_rx.begin (); it!=data_stream_rx.end(); ++it) {
-      // Tuning Freq (MHz) [2.4 GHz - 6.0 GHz]
+      // Tuning Freq (MHz) [70 MHz - 6.0 GHz]
       // ================================================
       // LOWER BOUNDS
       TEST(*it, fc, 69.99   , true, 0.000001, false)
@@ -83,7 +83,7 @@ int test_AD9361Configurator() {
       uut.unlock_all();
       TEST(*it, bw, 56.01   , true, 0.000001, false)
       uut.unlock_all();
-      // Sampling rate (Msps)
+      // Sampling rate (Msps) 2.083334 - 61.44
       // @TODO Check Values
       // ================================================
       // LOWER BOUNDS
@@ -125,8 +125,6 @@ int test_AD9361Configurator() {
       uut.unlock_all();
       TEST(*it, gn, -10.    , true ,0.000001, true )
       uut.unlock_all();
-      TEST(*it, gn, -4.     , true ,0.000001, true )
-      uut.unlock_all();
       TEST(*it, gn, -3.     , true ,0.000001, true )
       uut.unlock_all();
       TEST(*it, gn, -1.     , true ,0.000001, true )
@@ -135,15 +133,11 @@ int test_AD9361Configurator() {
       uut.unlock_all();
       TEST(*it, gn, 62.     , true ,0.000001, true )
       uut.unlock_all();
-      TEST(*it, gn, 63.     , true ,0.000001, true )
-      uut.unlock_all();
       TEST(*it, gn, 71.     , true ,0.000001, true )
       uut.unlock_all();
-      TEST(*it, gn, 72.     , true ,0.000001, true )
+      TEST(*it, gn, 73.     , true ,0.000001, true )
       uut.unlock_all();
-      TEST(*it, gn, 77.     , true ,0.000001, true )
-      uut.unlock_all();
-      TEST(*it, gn, 78.     , true ,0.000001, false)
+      TEST(*it, gn, 74.     , true ,0.000001, false)
       uut.unlock_all();
       // Conditional Constrains
       // ================================================
