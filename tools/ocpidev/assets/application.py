@@ -179,11 +179,11 @@ class Application(RunnableAsset, RCCBuildableAsset):
         if not apps_path.exists():
             apps_path.mkdir()
         os.chdir(str(apps_path))
-        application_xml_path = Path(apps_path, 'application.xml')
+        application_xml_path = Path(apps_path, 'applications.xml')
         template_dict = Application._get_template_dict(name, directory, **kwargs)
         if not application_xml_path.exists():
             template = jinja2.Template(ocpitemplate.APP_APPLICATION_XML, trim_blocks=True)
-            ocpiutil.write_file_from_string("application.xml", template.render(**template_dict))
+            ocpiutil.write_file_from_string("applications.xml", template.render(**template_dict))
         if app_path.exists():
             raise ocpiutil.OCPIException('application "{}" already exists at {}'.format(
                 name, str(app_path)))
