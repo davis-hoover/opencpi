@@ -39,7 +39,7 @@ $(strip $(foreach krel,$(shell uname -r),\
  $(foreach ktype,$(shell echo $(krel) | cut -f3 -d'-'),\
   $(foreach hver,$(or $(shell dpkg -l | grep 'linux-headers' | cut -f3 -d' ' | sort -t'-' --version-sort -k 3,4 -k 4,5 | egrep '$(ktype)$$' | tail -1),NOPE),\
    $(if $(filter NOPE,$(hver)),\
-    $(info Warning: no kernel headers for "$(ktype)" kernel installed),\
-    $(if $(filter linux-headers-$(krel),$(hver)),,$(info Warning: probable running kernel vs. installed kernel mismatch detected: the OpenCPI kernel driver will be built for kernel version $(subst linux-headers-,,$(hver)).  The detected mismatch usually means the kernel has been updated recently, but the system has not been rebooted since the update.  Please reboot your system if you have not already done so.))\
+    $(call OcpiInfo,Warning: no kernel headers for "$(ktype)" kernel installed),\
+    $(if $(filter linux-headers-$(krel),$(hver)),,$(call OcpiInfo,Warning: probable running kernel vs. installed kernel mismatch detected: the OpenCPI kernel driver will be built for kernel version $(subst linux-headers-,,$(hver)).  The detected mismatch usually means the kernel has been updated recently but the system has not been rebooted since the update.  Please reboot your system if you have not already done so.))\
     $(foreach kdir,/usr/src/$(hver),\
-     $(or $(wildcard $(kdir)),$(info Warning: no kernel headers directory found))))))))
+     $(or $(wildcard $(kdir)),$(call OcpiInfo,Warning: no kernel headers directory found))))))))
