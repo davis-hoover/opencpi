@@ -18,9 +18,9 @@
 
 .PHONY: clean
 
-build/test: base/include/Math.hh base/src/Math.cc base/include/DRC.hh base/src/DRC.cc ad9361/include/AD9361DRC.hh test/test.cc
+build/test: ../../base/include/Math.hh ../../base/src/Math.cc ../../base/include/DRC.hh ../../base/src/DRC.cc ../../ad9361/include/AD9361DRC.hh test.cc ../include/FMCOMMS2_3DRC.hh
 	mkdir -p build
-	g++ --std=c++0x -g -D DISABLE_AD9361 -Ibase/include -Iad9361/include -Ibase/src -Iad9361/src test/test.cc -o build/test
+	g++ --std=c++0x -g -D DISABLE_AD9361 -I../../base/include -I../../ad9361/include -I../include -I../../base/src -I../../ad9361/src test.cc -o build/test
 
 clean:
 	rm -rf build
