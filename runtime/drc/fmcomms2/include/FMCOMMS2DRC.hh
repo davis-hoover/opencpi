@@ -51,238 +51,129 @@ namespace DRC {
 // -----------------------------------------------------------------------------
 
 #ifdef IS_LOCKING
-class FMCOMMS2CSP : public AD9361CSP {
+class FMCOMMS2_3CSP : public AD9361CSP {
   protected:
   typedef CSPSolver::Constr::Cond Cond;
   typedef CSPSolver::Constr::Func Func;
-  /* @brief for the FMCOMMS2,
+  /* @brief for the FMCOMMS2_3,
    *        define variables (X) and their domains (D) for <X,D,C> which
    *        comprises its Constraint Satisfaction Problem (CSP)
    ****************************************************************************/
-  define_x_d_fmcomms2() {
-
-    //// AD9361 Constraint Sub-set of the fmcomms2
-    //// THIS WILL BECOME INHERITED/COMPOSED BY THE FMCOMMS2
-    //// -------------------------------------------------------------------------
-    //// N/A
-    //m_solver.add_var<double>("ad9361_rx_rfpll_lo_freq_meghz", dfp_tol);
-    //m_solver.add_var<double>("ad9361_tx_rfpll_lo_freq_meghz", dfp_tol);
-    //m_solver.add_var<double>("ad9361_rx_sampl_freq_meghz", dfp_tol);
-    //m_solver.add_var<double>("ad9361_tx_sampl_freq_meghz", dfp_tol);
-    //m_solver.add_var<double>("ad9361_rx_rf_bandwidth_meghz", dfp_tol);
-    //m_solver.add_var<double>("ad9361_tx_rf_bandwidth_meghz", dfp_tol);
-    //m_solver.add_var<int32_t>("ad9361_dac_clk_divider");
-    //// direction
-    //m_solver.add_var<int32_t>("ad9361_dir_rx1");
-    //m_solver.add_var<int32_t>("ad9361_dir_rx2");
-    //m_solver.add_var<int32_t>("ad9361_dir_tx1");
-    //m_solver.add_var<int32_t>("ad9361_dir_tx2");
-    ////  tuning_freq_MHz
-    //m_solver.add_var<double>("ad9361_fc_meghz_rx1", dfp_tol);
-    //m_solver.add_var<double>("ad9361_fc_meghz_rx2", dfp_tol);
-    //m_solver.add_var<double>("ad9361_fc_meghz_tx1", dfp_tol);
-    //m_solver.add_var<double>("ad9361_fc_meghz_tx2", dfp_tol);
-    //// bandwidth_3dB_MHz
-    //m_solver.add_var<double>("ad9361_bw_meghz_rx1", dfp_tol);
-    //m_solver.add_var<double>("ad9361_bw_meghz_rx2", dfp_tol);
-    //m_solver.add_var<double>("ad9361_bw_meghz_tx1", dfp_tol);
-    //m_solver.add_var<double>("ad9361_bw_meghz_tx2", dfp_tol);
-    //// sampling_rate_Msps
-    //m_solver.add_var<double>("ad9361_fs_megsps_rx1", dfp_tol);
-    //m_solver.add_var<double>("ad9361_fs_megsps_rx2", dfp_tol);
-    //m_solver.add_var<double>("ad9361_fs_megsps_tx1", dfp_tol);
-    //m_solver.add_var<double>("ad9361_fs_megsps_tx2", dfp_tol);
-    //// samples_are_complex
-    //m_solver.add_var<int32_t>("ad9361_samps_comp_rx1");
-    //m_solver.add_var<int32_t>("ad9361_samps_comp_rx2");
-    //m_solver.add_var<int32_t>("ad9361_samps_comp_tx1");
-    //m_solver.add_var<int32_t>("ad9361_samps_comp_tx2");
-    //// gain_mode
-    //m_solver.add_var<int32_t>("ad9361_gain_mode_rx1");
-    //m_solver.add_var<int32_t>("ad9361_gain_mode_rx2");
-    //m_solver.add_var<int32_t>("ad9361_gain_mode_tx1");
-    //m_solver.add_var<int32_t>("ad9361_gain_mode_tx2");
-    //// gain_dB
-    //m_solver.add_var<double>("ad9361_gain_db_rx1", dfp_tol);
-    //m_solver.add_var<double>("ad9361_gain_db_rx2", dfp_tol);
-    //m_solver.add_var<double>("ad9361_gain_db_tx1", dfp_tol);
-    //m_solver.add_var<double>("ad9361_gain_db_tx2", dfp_tol);
-
-
-    // FMCOMMS2 Constraint set
-    // THIS WILL BE NEW TO THE CLASS
-    // -------------------------------------------------------------------------
+  define_x_d_fmcomms2_3() {
     // N/A
+    m_solver.add_var<int32_t>("fmcomms_num");
     m_solver.add_var<double>("fmcomms2_fc_baluns_meghz");
     // direction
-    m_solver.add_var<int32_t>("fmcomms2_dir_rx1a");
-    m_solver.add_var<int32_t>("fmcomms2_dir_rx2a");
-    m_solver.add_var<int32_t>("fmcomms2_dir_tx1a");
-    m_solver.add_var<int32_t>("fmcomms2_dir_tx2a");
-    // tuning_freq_MHz
+    m_solver.add_var<int32_t>("fmcomms2_3_dir_rx1a");
+    m_solver.add_var<int32_t>("fmcomms2_3_dir_rx2a");
+    m_solver.add_var<int32_t>("fmcomms2_3_dir_tx1a");
+    m_solver.add_var<int32_t>("fmcomms2_3_dir_tx2a");
+    // tuning_freq_MHz (fmcomms2)
     m_solver.add_var<double>("fmcomms2_fc_meghz_rx1a", dfp_tol);
     m_solver.add_var<double>("fmcomms2_fc_meghz_rx2a", dfp_tol);
     m_solver.add_var<double>("fmcomms2_fc_meghz_tx1a", dfp_tol);
     m_solver.add_var<double>("fmcomms2_fc_meghz_tx2a", dfp_tol);
+    // tuning_freq_MHz (fmcomms3)
+    m_solver.add_var<double>("fmcomms3_fc_meghz_rx1a", dfp_tol);
+    m_solver.add_var<double>("fmcomms3_fc_meghz_rx2a", dfp_tol);
+    m_solver.add_var<double>("fmcomms3_fc_meghz_tx1a", dfp_tol);
+    m_solver.add_var<double>("fmcomms3_fc_meghz_tx2a", dfp_tol);
     // bandwidth_3dB_MHz
-    m_solver.add_var<double>("fmcomms2_bw_meghz_rx1a", dfp_tol);
-    m_solver.add_var<double>("fmcomms2_bw_meghz_rx2a", dfp_tol);
-    m_solver.add_var<double>("fmcomms2_bw_meghz_tx1a", dfp_tol);
-    m_solver.add_var<double>("fmcomms2_bw_meghz_tx2a", dfp_tol);
+    m_solver.add_var<double>("fmcomms2_3_bw_meghz_rx1a", dfp_tol);
+    m_solver.add_var<double>("fmcomms2_3_bw_meghz_rx2a", dfp_tol);
+    m_solver.add_var<double>("fmcomms2_3_bw_meghz_tx1a", dfp_tol);
+    m_solver.add_var<double>("fmcomms2_3_bw_meghz_tx2a", dfp_tol);
     // sampling_rate_Msps
-    m_solver.add_var<double>("fmcomms2_fs_megsps_rx1a", dfp_tol);
-    m_solver.add_var<double>("fmcomms2_fs_megsps_rx2a", dfp_tol);
-    m_solver.add_var<double>("fmcomms2_fs_megsps_tx1a", dfp_tol);
-    m_solver.add_var<double>("fmcomms2_fs_megsps_tx2a", dfp_tol);
+    m_solver.add_var<double>("fmcomms2_3_fs_megsps_rx1a", dfp_tol);
+    m_solver.add_var<double>("fmcomms2_3_fs_megsps_rx2a", dfp_tol);
+    m_solver.add_var<double>("fmcomms2_3_fs_megsps_tx1a", dfp_tol);
+    m_solver.add_var<double>("fmcomms2_3_fs_megsps_tx2a", dfp_tol);
     // samples_are_complex
-    m_solver.add_var<int32_t>("fmcomms2_samps_comp_rx1a");
-    m_solver.add_var<int32_t>("fmcomms2_samps_comp_rx2a");
-    m_solver.add_var<int32_t>("fmcomms2_samps_comp_tx1a");
-    m_solver.add_var<int32_t>("fmcomms2_samps_comp_tx2a");
+    m_solver.add_var<int32_t>("fmcomms2_3_samps_comp_rx1a");
+    m_solver.add_var<int32_t>("fmcomms2_3_samps_comp_rx2a");
+    m_solver.add_var<int32_t>("fmcomms2_3_samps_comp_tx1a");
+    m_solver.add_var<int32_t>("fmcomms2_3_samps_comp_tx2a");
     // gain_mode
-    m_solver.add_var<int32_t>("fmcomms2_gain_mode_rx1a");
-    m_solver.add_var<int32_t>("fmcomms2_gain_mode_rx2a");
-    m_solver.add_var<int32_t>("fmcomms2_gain_mode_tx1a");
-    m_solver.add_var<int32_t>("fmcomms2_gain_mode_tx2a");
+    m_solver.add_var<int32_t>("fmcomms2_3_gain_mode_rx1a");
+    m_solver.add_var<int32_t>("fmcomms2_3_gain_mode_rx2a");
+    m_solver.add_var<int32_t>("fmcomms2_3_gain_mode_tx1a");
+    m_solver.add_var<int32_t>("fmcomms2_3_gain_mode_tx2a");
     // gain_dB
-    m_solver.add_var<double>("fmcomms2_gain_db_rx1a", dfp_tol);
-    m_solver.add_var<double>("fmcomms2_gain_db_rx2a", dfp_tol);
-    m_solver.add_var<double>("fmcomms2_gain_db_tx1a", dfp_tol);
-    m_solver.add_var<double>("fmcomms2_gain_db_tx2a", dfp_tol);
+    m_solver.add_var<double>("fmcomms2_3_gain_db_rx1a", dfp_tol);
+    m_solver.add_var<double>("fmcomms2_3_gain_db_rx2a", dfp_tol);
+    m_solver.add_var<double>("fmcomms2_3_gain_db_tx1a", dfp_tol);
+    m_solver.add_var<double>("fmcomms2_3_gain_db_tx2a", dfp_tol);
   }
   /* @brief for the AD9361,
    *        define constraints (C) for <X,D,C> which
    *        comprise its Constraint Satisfaction Problem (CSP)
    ****************************************************************************/
   void
-  define_c_fmcomms2() {
-
-    //// AD9361 Constraint Sub-set of the fmcomms2
-    //// THIS WILL BECOME INHERITED/COMPOSED BY THE FMCOMMS2
-    //// -------------------------------------------------------------------------
-    //// N/A
-    //m_solver.add_constr("ad9361_rx_rfpll_lo_freq_meghz", ">=", 70.);
-    //m_solver.add_constr("ad9361_rx_rfpll_lo_freq_meghz", "<=", 6000.);
-    //m_solver.add_constr("ad9361_tx_rfpll_lo_freq_meghz", ">=", 70.);
-    //m_solver.add_constr("ad9361_tx_rfpll_lo_freq_meghz", "<=", 6000.);
-    //m_solver.add_constr("ad9361_rx_rf_bandwidth_meghz", ">=", 0.4);
-    //m_solver.add_constr("ad9361_rx_rf_bandwidth_meghz", "<=", 56.);
-    //m_solver.add_constr("ad9361_tx_rf_bandwidth_meghz", ">=", 1.25);
-    //m_solver.add_constr("ad9361_tx_rf_bandwidth_meghz", "<=", 40.);
-    //m_solver.add_constr("ad9361_rx_sampl_freq_meghz", ">=", 2.083334);
-    //m_solver.add_constr("ad9361_rx_sampl_freq_meghz", "<=", 61.44);
-    //m_solver.add_constr("ad9361_tx_sampl_freq_meghz", ">=", 2.083334);
-    //m_solver.add_constr("ad9361_tx_sampl_freq_meghz", "<=", 61.44);
-    //m_solver.add_constr("ad9361_dac_clk_divider", ">=", (int32_t)1);
-    //m_solver.add_constr("ad9361_dac_clk_divider", "<=", (int32_t)2);
-    //// direction
-    //m_solver.add_constr("ad9361_dir_rx1", "=", (int32_t)data_stream_direction_t::rx);
-    //m_solver.add_constr("ad9361_dir_rx2", "=", (int32_t)data_stream_direction_t::rx);
-    //m_solver.add_constr("ad9361_dir_tx1", "=", (int32_t)data_stream_direction_t::tx);
-    //m_solver.add_constr("ad9361_dir_tx2", "=", (int32_t)data_stream_direction_t::tx);
-    //// tuning freq_MHz
-    //m_solver.add_constr("ad9361_fc_meghz_rx1", "=", "ad9361_rx_rfpll_lo_freq_meghz");
-    //m_solver.add_constr("ad9361_fc_meghz_rx2", "=", "ad9361_rx_rfpll_lo_freq_meghz");
-    //m_solver.add_constr("ad9361_fc_meghz_tx1", "=", "ad9361_tx_rfpll_lo_freq_meghz");
-    //m_solver.add_constr("ad9361_fc_meghz_tx2", "=", "ad9361_tx_rfpll_lo_freq_meghz");
-    //// bandwidth_3dB
-    //m_solver.add_constr("ad9361_bw_meghz_rx1", "=", "ad9361_rx_rf_bandwidth_meghz");
-    //m_solver.add_constr("ad9361_bw_meghz_rx2", "=", "ad9361_rx_rf_bandwidth_meghz");
-    //m_solver.add_constr("ad9361_bw_meghz_tx1", "=", "ad9361_tx_rf_bandwidth_meghz");
-    //m_solver.add_constr("ad9361_bw_meghz_tx2", "=", "ad9361_tx_rf_bandwidth_meghz");
-    //// sampling_rate_Msps
-    //m_solver.add_constr("ad9361_fs_megsps_rx1", "=", "ad9361_rx_sampl_freq_meghz");
-    //m_solver.add_constr("ad9361_fs_megsps_rx2", "=", "ad9361_rx_sampl_freq_meghz");
-    //m_solver.add_constr("ad9361_fs_megsps_tx1", "=", "ad9361_tx_sampl_freq_meghz");
-    //m_solver.add_constr("ad9361_fs_megsps_tx2", "=", "ad9361_tx_sampl_freq_meghz");
-    //// samples_are_complex
-    //m_solver.add_constr("ad9361_samps_comp_rx1", "=", (int32_t)1);
-    //m_solver.add_constr("ad9361_samps_comp_rx2", "=", (int32_t)1);
-    //m_solver.add_constr("ad9361_samps_comp_tx1", "=", (int32_t)1);
-    //m_solver.add_constr("ad9361_samps_comp_tx2", "=", (int32_t)1);
-    //// gain_mode
-    //m_solver.add_constr("ad9361_gain_mode_rx1", ">=", (int32_t)0); // agc
-    //m_solver.add_constr("ad9361_gain_mode_rx1", "<=", (int32_t)1); // manual
-    //m_solver.add_constr("ad9361_gain_mode_rx2", ">=", (int32_t)0); // agc
-    //m_solver.add_constr("ad9361_gain_mode_rx2", "<=", (int32_t)1); // manual
-    //m_solver.add_constr("ad9361_gain_mode_tx1", "=", (int32_t)1); // manual
-    //m_solver.add_constr("ad9361_gain_mode_tx2", "=", (int32_t)1); // manual
-    ///// @TODO add gain conditional constraints
-    //// gain_dB
-    //m_solver.add_constr("ad9361_gain_db_rx1", ">=", -10.);//, &if_freq_gt_4000);
-    //m_solver.add_constr("ad9361_gain_db_rx1", "<=", 77.);//, &if_freq_le_1300);
-    //m_solver.add_constr("ad9361_gain_db_rx2", ">=", -10.);//, &if_freq_gt_4000);
-    //m_solver.add_constr("ad9361_gain_db_rx2", "<=", 77.);//, &if_freq_le_1300);
-    //m_solver.add_constr("ad9361_gain_db_tx1", ">=", -89.75);
-    //m_solver.add_constr("ad9361_gain_db_tx1", "<=", 0.);
-    //m_solver.add_constr("ad9361_gain_db_tx2", ">=", -89.75);
-    //m_solver.add_constr("ad9361_gain_db_tx2", "<=", 0.);
-
-    // FMCOMMS2 Constraint set (FMCOMMS2 Connected to AD9361)
-    // THIS WILL BE NEW TO THE CLASS
-    // -------------------------------------------------------------------------
+  define_c_fmcomms2_3() {
     // N/A
+    m_solver.add_constr("fmcomms_num", ">=", (int32_t)2);
+    m_solver.add_constr("fmcomms_num", "<=", (int32_t)3);
     m_solver.add_constr("fmcomms2_fc_baluns_meghz", ">=", 2400.);
     m_solver.add_constr("fmcomms2_fc_baluns_meghz", "<=", 2500.);
     // direction
-    m_solver.add_constr("fmcomms2_dir_rx1a", "=", (int32_t)data_stream_direction_t::ad9361_dir_rx1);
-    m_solver.add_constr("fmcomms2_dir_rx2a", "=", (int32_t)data_stream_direction_t::ad9361_dir_rx2);
-    m_solver.add_constr("fmcomms2_dir_tx1a", "=", (int32_t)data_stream_direction_t::ad9361_dir_tx1);
-    m_solver.add_constr("fmcomms2_dir_tx2a", "=", (int32_t)data_stream_direction_t::ad9361_dir_tx2);
-    // tuning_freq_MHz
+    m_solver.add_constr("fmcomms2_3_dir_rx1a", "=", (int32_t)data_stream_direction_t::ad9361_dir_rx1);
+    m_solver.add_constr("fmcomms2_3_dir_rx2a", "=", (int32_t)data_stream_direction_t::ad9361_dir_rx2);
+    m_solver.add_constr("fmcomms2_3_dir_tx1a", "=", (int32_t)data_stream_direction_t::ad9361_dir_tx1);
+    m_solver.add_constr("fmcomms2_3_dir_tx2a", "=", (int32_t)data_stream_direction_t::ad9361_dir_tx2);
+    // tuning_freq_MHz (fmcomms2)
     //  @TODO add 'intersected with' functionality
     m_solver.add_constr("fmcomms2_fc_meghz_rx1a", "=", "ad9361_fc_meghz_rx1");//, intersected with fmcomms2_fc_baluns_meghz
     m_solver.add_constr("fmcomms2_fc_meghz_rx2a", "=", "ad9361_fc_meghz_rx2");//, intersected with fmcomms2_fc_baluns_meghz
     m_solver.add_constr("fmcomms2_fc_meghz_tx1a", "=", "ad9361_fc_meghz_tx1");//, intersected with fmcomms2_fc_baluns_meghz
     m_solver.add_constr("fmcomms2_fc_meghz_tx2a", "=", "ad9361_fc_meghz_tx2");//, intersected with fmcomms2_fc_baluns_meghz
+    // tuning_freq_MHz (fmcomms3)
+    m_solver.add_constr("fmcomms3_fc_meghz_rx1a", "=", "ad9361_fc_meghz_rx1");
+    m_solver.add_constr("fmcomms3_fc_meghz_rx2a", "=", "ad9361_fc_meghz_rx2");
+    m_solver.add_constr("fmcomms3_fc_meghz_tx1a", "=", "ad9361_fc_meghz_tx1");
+    m_solver.add_constr("fmcomms3_fc_meghz_tx2a", "=", "ad9361_fc_meghz_tx2");
     // bandwidth_3dB_MHz
-    m_solver.add_constr("fmcomms2_bw_meghz_rx1a", "=", "ad9361_bw_meghz_rx1");
-    m_solver.add_constr("fmcomms2_bw_meghz_rx2a", "=", "ad9361_bw_meghz_rx2");
-    m_solver.add_constr("fmcomms2_bw_meghz_tx1a", "=", "ad9361_bw_meghz_tx1");
-    m_solver.add_constr("fmcomms2_bw_meghz_tx2a", "=", "ad9361_bw_meghz_tx2");
+    m_solver.add_constr("fmcomms2_3_bw_meghz_rx1a", "=", "ad9361_bw_meghz_rx1");
+    m_solver.add_constr("fmcomms2_3_bw_meghz_rx2a", "=", "ad9361_bw_meghz_rx2");
+    m_solver.add_constr("fmcomms2_3_bw_meghz_tx1a", "=", "ad9361_bw_meghz_tx1");
+    m_solver.add_constr("fmcomms2_3_bw_meghz_tx2a", "=", "ad9361_bw_meghz_tx2");
     // sampling_rate_Msps
-    m_solver.add_constr("fmcomms2_fs_megsps_rx1a", "=", "ad9361_fs_megsps_rx1");
-    m_solver.add_constr("fmcomms2_fs_megsps_rx2a", "=", "ad9361_fs_megsps_rx2");
-    m_solver.add_constr("fmcomms2_fs_megsps_tx1a", "=", "ad9361_fs_megsps_tx1");
-    m_solver.add_constr("fmcomms2_fs_megsps_tx2a", "=", "ad9361_fs_megsps_tx2");
+    m_solver.add_constr("fmcomms2_3_fs_megsps_rx1a", "=", "ad9361_fs_megsps_rx1");
+    m_solver.add_constr("fmcomms2_3_fs_megsps_rx2a", "=", "ad9361_fs_megsps_rx2");
+    m_solver.add_constr("fmcomms2_3_fs_megsps_tx1a", "=", "ad9361_fs_megsps_tx1");
+    m_solver.add_constr("fmcomms2_3_fs_megsps_tx2a", "=", "ad9361_fs_megsps_tx2");
     // samples_are_complex
-    m_solver.add_constr("fmcomms2_samps_comp_rx1a", "=", "ad9361_samps_comp_rx1");
-    m_solver.add_constr("fmcomms2_samps_comp_rx2a", "=", "ad9361_samps_comp_rx2");
-    m_solver.add_constr("fmcomms2_samps_comp_tx1a", "=", "ad9361_samps_comp_tx1");
-    m_solver.add_constr("fmcomms2_samps_comp_tx2a", "=", "ad9361_samps_comp_tx2");
+    m_solver.add_constr("fmcomms2_3_samps_comp_rx1a", "=", "ad9361_samps_comp_rx1");
+    m_solver.add_constr("fmcomms2_3_samps_comp_rx2a", "=", "ad9361_samps_comp_rx2");
+    m_solver.add_constr("fmcomms2_3_samps_comp_tx1a", "=", "ad9361_samps_comp_tx1");
+    m_solver.add_constr("fmcomms2_3_samps_comp_tx2a", "=", "ad9361_samps_comp_tx2");
     // gain_mode
-    m_solver.add_constr("fmcomms2_gain_mode_rx1a", "=", "ad9361_gain_mode_rx1");
-    m_solver.add_constr("fmcomms2_gain_mode_rx2a", "=", "ad9361_gain_mode_rx2");
-    m_solver.add_constr("fmcomms2_gain_mode_tx1a=", "ad9361_gain_mode_tx1");
-    m_solver.add_constr("fmcomms2_gain_mode_tx2a", "=", "ad9361_gain_mode_rx2");
+    m_solver.add_constr("fmcomms2_3_gain_mode_rx1a", "=", "ad9361_gain_mode_rx1");
+    m_solver.add_constr("fmcomms2_3_gain_mode_rx2a", "=", "ad9361_gain_mode_rx2");
+    m_solver.add_constr("fmcomms2_3_gain_mode_tx1a", "=", "ad9361_gain_mode_tx1");
+    m_solver.add_constr("fmcomms2_3_gain_mode_tx2a", "=", "ad9361_gain_mode_rx2");
     // gain_dB
-    m_solver.add_constr("fmcomms2_gain_db_rx1a", "=", "ad9361_gain_db_rx1");
-    m_solver.add_constr("fmcomms2_gain_db_rx2a", "=", "ad9361_gain_db_rx2");
-    m_solver.add_constr("fmcomms2_gain_db_tx1a", "=", "ad9361_gain_db_tx1");
-    m_solver.add_constr("fmcomms2_gain_db_tx2a", "=", "ad9361_gain_db_tx2");
+    m_solver.add_constr("fmcomms2_3_gain_db_rx1a", "=", "ad9361_gain_db_rx1");
+    m_solver.add_constr("fmcomms2_3_gain_db_rx2a", "=", "ad9361_gain_db_rx2");
+    m_solver.add_constr("fmcomms2_3_gain_db_tx1a", "=", "ad9361_gain_db_tx1");
+    m_solver.add_constr("fmcomms2_3_gain_db_tx2a", "=", "ad9361_gain_db_tx2");
   }
   public:
-  //AD9361CSP() : CSPBase() {
-  FMCOMMS2CSP() : AD9361CSP(){
+  FMCOMMS2_3CSP() : AD9361CSP(){
     define();
     //std::cout << "[INFO] " << get_feasible_region_limits() << "\n";
   }
   /* @brief instance AD9361
    *        by defining its Constraint Satisfaction Problem (CSP) as <X,D,C>
    ****************************************************************************/
-  //void instance_ad9361() {
-  void instance_fmcomms2() {
-    //define_x_d_ad9361();
-    define_x_d_fmcomms2();
-    //define_c_ad9361();
-    define_c_fmcomms2();
+  void instance_fmcomms2_3() {
+    define_x_d_fmcomms2_3();
+    define_c_fmcomms2_3();
   }
   /// @brief define Constraint Satisfaction Problem (CSP)
   void define() {
-    //instance_ad9361();
-    instance_fmcomms2();
+    instance_fmcomms2_3();
   }
-}; // class AD9361CSP
+};
 #endif
 
 // -----------------------------------------------------------------------------
@@ -290,73 +181,80 @@ class FMCOMMS2CSP : public AD9361CSP {
 // -----------------------------------------------------------------------------
 
 #ifdef IS_LOCKING
-//class FMCOMMS2Configurator : public Configurator<AD9361CSP> {
-class FMCOMMS2Configurator : public Configurator<FMCOMMS2CSP> {
+class FMCOMMS2_3Configurator : public Configurator<FMCOMMS2_3CSP> {
   public:
-  //FMCOMMS2Configurator() : Configurator<AD9361CSP>() {
-  FMCOMMS2Configurator() : Configurator<FMCOMMS2CSP>() {
+  FMCOMMS2_3Configurator() : Configurator<FMCOMMS2_3CSP>(int32_t fmcomms_num) {
+    m_solver.add_constr("fmcomms_num", "=", (int32_t)fmcomms_num);
     {
       DataStream::CSPVarMap map;
       map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
           "fmcomms2_fc_meghz_rx1a"));
+      map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
+          "fmcomms3_fc_meghz_rx1a"));
       map.insert(std::make_pair(config_key_bandwidth_3dB_MHz.c_str(),
-          "fmcomms2_bw_meghz_rx1a"));
+          "fmcomms2_3_bw_meghz_rx1a"));
       map.insert(std::make_pair(config_key_sampling_rate_Msps.c_str(),
-          "fmcomms2_fs_megsps_rx1a"));
+          "fmcomms2_3_fs_megsps_rx1a"));
       map.insert(std::make_pair(config_key_samples_are_complex.c_str(),
-          "fmcomms2_samps_comp_rx1a"));
+          "fmcomms2_3_samps_comp_rx1a"));
       map.insert(std::make_pair(config_key_gain_mode.c_str(),
-          "fmcomms2_gain_mode_rx1a"));
+          "fmcomms2_3_gain_mode_rx1a"));
       map.insert(std::make_pair(config_key_gain_dB.c_str(),
-          "fmcomms2_gain_db_rx1a"));
+          "fmcomms2_3_gain_db_rx1a"));
       add_data_stream(DataStream("rx1a", true, false, map));
     }
     {
       DataStream::CSPVarMap map;
       map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
           "fmcomms2_fc_meghz_rx2a"));
+      map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
+          "fmcomms3_fc_meghz_rx2a"));
       map.insert(std::make_pair(config_key_bandwidth_3dB_MHz.c_str(),
-          "fmcomms2_bw_meghz_rx2a"));
+          "fmcomms2_3_bw_meghz_rx2a"));
       map.insert(std::make_pair(config_key_sampling_rate_Msps.c_str(),
-          "fmcomms2_fs_megsps_rx2a"));
+          "fmcomms2_3_fs_megsps_rx2a"));
       map.insert(std::make_pair(config_key_samples_are_complex.c_str(),
-          "fmcomms2_samps_comp_rx2a"));
+          "fmcomms2_3_samps_comp_rx2a"));
       map.insert(std::make_pair(config_key_gain_mode.c_str(),
-          "fmcomms2_gain_mode_rx2a"));
+          "fmcomms2_3_gain_mode_rx2a"));
       map.insert(std::make_pair(config_key_gain_dB.c_str(),
-          "fmcomms2_gain_db_rx2a"));
+          "fmcomms2_3_gain_db_rx2a"));
       add_data_stream(DataStream("rx2a", true, false, map));
     }
     {
       DataStream::CSPVarMap map;
       map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
           "fmcomms2_fc_meghz_tx1a"));
+      map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
+          "fmcomms3_fc_meghz_tx1a"));
       map.insert(std::make_pair(config_key_bandwidth_3dB_MHz.c_str(),
-          "fmcomms2_bw_meghz_tx1a"));
+          "fmcomms2_3_bw_meghz_tx1a"));
       map.insert(std::make_pair(config_key_sampling_rate_Msps.c_str(),
-          "fmcomms2_fs_megsps_tx1a"));
+          "fmcomms2_3_fs_megsps_tx1a"));
       map.insert(std::make_pair(config_key_samples_are_complex.c_str(),
-          "fmcomms2_samps_comp_tx1a"));
+          "fmcomms2_3_samps_comp_tx1a"));
       map.insert(std::make_pair(config_key_gain_mode.c_str(),
-          "fmcomms2_gain_mode_tx1a"));
+          "fmcomms2_3_gain_mode_tx1a"));
       map.insert(std::make_pair(config_key_gain_dB.c_str(),
-          "fmcomms2_gain_db_tx1a"));
+          "fmcomms2_3_gain_db_tx1a"));
       add_data_stream(DataStream("tx1a", false, true, map));
     }
     {
       DataStream::CSPVarMap map;
       map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
           "fmcomms2_fc_meghz_tx2a"));
+      map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
+          "fmcomms3_fc_meghz_tx2a"));
       map.insert(std::make_pair(config_key_bandwidth_3dB_MHz.c_str(),
-          "fmcomms2_bw_meghz_tx2a"));
+          "fmcomms2_3_bw_meghz_tx2a"));
       map.insert(std::make_pair(config_key_sampling_rate_Msps.c_str(),
-          "fmcomms2_fs_megsps_tx2a"));
+          "fmcomms2_3_fs_megsps_tx2a"));
       map.insert(std::make_pair(config_key_samples_are_complex.c_str(),
-          "fmcomms2_samps_comp_tx2a"));
+          "fmcomms2_3_samps_comp_tx2a"));
       map.insert(std::make_pair(config_key_gain_mode.c_str(),
-          "fmcomms2_gain_mode_tx2a"));
+          "fmcomms2_3_gain_mode_tx2a"));
       map.insert(std::make_pair(config_key_gain_dB.c_str(),
-          "fmcomms2_gain_db_tx2a"));
+          "fmcomms2_3_gain_db_tx2a"));
       add_data_stream(DataStream("tx2a", false, true, map));
     }
   }
@@ -368,33 +266,33 @@ class FMCOMMS2Configurator : public Configurator<FMCOMMS2CSP> {
 // -----------------------------------------------------------------------------
 
 #ifdef IS_LOCKING
-#define FMCOMMS2_CONFIGURATOR FMCOMMS2Configurator
+#define AD9361_CONFIGURATOR AD9361Configurator
 #else
-#define FMCOMMS2_CONFIGURATOR Configurator<AD9361CSP>
+#define AD9361_CONFIGURATOR Configurator<CSPBase>
 #endif
 
-template<class log_t, class slave_cfg_t, class slave_data_sub_t, class cfgrtr_t = FMCOMMS2_CONFIGURATOR>
-class FMCOMMS2DRC : public AD9361DRC<log_t,cfgrtr_t> {
+template<class log_t, class slave_cfg_t, class slave_data_sub_t, class cfgrtr_t = AD9361_CONFIGURATOR>
+class AD9361DRC : public DRC<log_t,cfgrtr_t> {
   protected:
 #ifndef DISABLE_AD9361
   enum class rx_frame_usage_t {enable, toggle};
   enum class data_bus_index_direction_t {normal, reverse};
   enum class data_rate_config_t {sdr, ddr};
   double                 m_fref_hz;
-  /// @brief No-OS struct used to initialize FMCOMMS2
-  FMCOMMS2_InitParam       m_init_param;
+  /// @brief No-OS struct used to initialize AD9361
+  AD9361_InitParam       m_init_param;
   /// @brief No-OS struct pointer
-  struct fmcomms2_rf_phy*   _fmcomms2_phy;
-  struct fmcomms2_rf_phy*& m_fmcomms2_rf_phy;
-  int32_t                  m_fmcomms2_init_ret;
-  bool                     m_fmcomms2_init_called;
+  struct ad9361_rf_phy*  _ad9361_phy;
+  struct ad9361_rf_phy*& m_ad9361_rf_phy;
+  int32_t                m_ad9361_init_ret;
+  bool                   m_ad9361_init_called;
 #endif
-  /// @brief name of the data stream that corresponds to FMCOMMS2 RX1A channel
-  const char*            m_ds_rx1a;
-  const char*            m_ds_rx2a;
-  const char*            m_ds_tx1a;
-  const char*            m_ds_tx2a;
-  /// @brief fmcomms2_config.hdl slave
+  /// @brief name of the data stream that corresponds to AD9361 RX1 channel
+  const char*            m_ds_rx1;
+  const char*            m_ds_rx2;
+  const char*            m_ds_tx1;
+  const char*            m_ds_tx2;
+  /// @brief ad9361_config.hdl slave
   slave_cfg_t&           m_cfg_slave;
   /// @brief ad9361_data_sub.hdl slave
   slave_data_sub_t&      m_data_sub_slave;
@@ -404,11 +302,11 @@ class FMCOMMS2DRC : public AD9361DRC<log_t,cfgrtr_t> {
   template<typename T> T convert_db_to_milli_db(T val_milli_db) const {
     return val_milli_db*1000;
   }
-#ifndef DISABLE_FMCOMMS2
+#ifndef DISABLE_AD9361
   void init_init_param() {
-    FMCOMMS2_InitParam init_param = {
+    AD9361_InitParam init_param = {
       /* Device selection */
-      ID_FMCOMMS2,	// dev_sel
+      ID_AD9361,	// dev_sel
       /* Identification number */
       0,		//id_no
       /* Reference Clock */
@@ -420,7 +318,7 @@ class FMCOMMS2DRC : public AD9361DRC<log_t,cfgrtr_t> {
       1,		//frequency_division_duplex_mode_enable *** adi,frequency-division-duplex-mode-enable
 
       // frequency_division_duplex_independent_mode_enable=1 required for
-      // fmcomms2_dac.hdl event port to operate as intended
+      // ad9361_dac.hdl event port to operate as intended
       1,		//frequency_division_duplex_independent_mode_enable *** adi,frequency-division-duplex-independent-mode-enable
 
       0,		//tdd_use_dual_synth_mode_enable *** adi,tdd-use-dual-synth-mode-enable
@@ -1207,5 +1105,5 @@ class FMCOMMS2DRC : public AD9361DRC<log_t,cfgrtr_t> {
 }; // class AD9361DRC
 
 } // namespace DRC
-// _AD9361_DRC_HH
-#endif
+
+#endif // _AD9361_DRC_HH
