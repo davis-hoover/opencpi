@@ -61,7 +61,6 @@ do
         do
             printf "Testing divisor $divisor\n"
             if [[ -n $hdl_platform ]] ; then
-                ./run_source_sink $hdl_platform $hdl_platform $message_size 2 2 0 $cache_mode $divisor
                 [[ -n $rcc_platform ]] && {
                     ./run_source_sink $hdl_platform $rcc_platform $message_size 2 2 0 $cache_mode $divisor
                     ./run_source_sink $hdl_platform $rcc_platform $message_size 2 10 0 $cache_mode $divisor
