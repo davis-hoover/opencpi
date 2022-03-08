@@ -68,7 +68,7 @@ Configurator<CSP>::get_config(data_stream_id_t id, config_key_t cfg) const {
       return it->m_csp_map.at(cfg);
     }
   }
-  throw std::string("config not found");
+  throw std::string("invalid data stream id: ")+id;
 }
 
 template<class CSP> config_value_t
