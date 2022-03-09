@@ -53,8 +53,8 @@ int test_FMCOMMS2_3Configurator() {
     for(auto ituut=uuts.begin(); ituut!=uuts.end(); ++ituut) {
       std::vector<const char*> data_stream_rx;
       // RX CHANNEL
-      data_stream_rx.push_back("rx1");
-      data_stream_rx.push_back("rx2");
+      data_stream_rx.push_back("rx1a");
+      data_stream_rx.push_back("rx2a");
       for(auto it=data_stream_rx.begin (); it!=data_stream_rx.end(); ++it) {
         if(*ituut == &uut2) {
           // Tuning Freq (MHz) for FMCOMMS2 [2.4 - 2.5 GHz]
@@ -277,8 +277,8 @@ int test_FMCOMMS2_3Configurator() {
       }
       // TX CHANNEL
       std::vector<const char*> data_stream_tx;
-      data_stream_tx.push_back("tx1");
-      data_stream_tx.push_back("tx2");
+      data_stream_tx.push_back("tx1a");
+      data_stream_tx.push_back("tx2a");
       for(auto it=data_stream_tx.begin (); it!=data_stream_tx.end(); ++it) {
         if(*ituut == &uut2) {
           // Tuning Freq (MHz) for FMCOMMS2 [2.4 - 2.5 GHz]

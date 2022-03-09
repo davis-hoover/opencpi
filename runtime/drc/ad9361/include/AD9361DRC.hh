@@ -145,10 +145,22 @@ class AD9361CSP : public CSPBase {
     m_solver.add_constr("ad9361_gain_mode_tx1", "=", (int32_t)1); // manual
     m_solver.add_constr("ad9361_gain_mode_tx2", "=", (int32_t)1); // manual
     /// @TODO add gain conditional constraints
+    //m_solver.add_constr("ad9361_gain_db_rx1", ">=", -10.);//, &if_freq_gt_4000);
+    //m_solver.add_constr("ad9361_gain_db_rx1", "<=",  62.);//, &if_freq_gt_4000);
+    //m_solver.add_constr("ad9361_gain_db_rx1", ">=",  -3.);//, &if_freq_le_4000);
+    //m_solver.add_constr("ad9361_gain_db_rx1", "<=",  71.);//, &if_freq_le_4000);
+    //m_solver.add_constr("ad9361_gain_db_rx1", ">=",  -1.);//, &if_freq_le_1300);
+    //m_solver.add_constr("ad9361_gain_db_rx1", "<=",  73.);//, &if_freq_le_1300);
+    //m_solver.add_constr("ad9361_gain_db_rx2", ">=", -10.);//, &if_freq_gt_4000);
+    //m_solver.add_constr("ad9361_gain_db_rx2", "<=",  62.);//, &if_freq_gt_4000);
+    //m_solver.add_constr("ad9361_gain_db_rx2", ">=",  -3.);//, &if_freq_le_4000);
+    //m_solver.add_constr("ad9361_gain_db_rx2", "<=",  71.);//, &if_freq_le_4000);
+    //m_solver.add_constr("ad9361_gain_db_rx2", ">=",  -1.);//, &if_freq_le_1300);
+    //m_solver.add_constr("ad9361_gain_db_rx2", "<=",  73.);//, &if_freq_le_1300);
     m_solver.add_constr("ad9361_gain_db_rx1", ">=", -10.);//, &if_freq_gt_4000);
-    m_solver.add_constr("ad9361_gain_db_rx1", "<=", 77.);//, &if_freq_le_1300);
+    m_solver.add_constr("ad9361_gain_db_rx1", "<=", 73.);//, &if_freq_le_1300);
     m_solver.add_constr("ad9361_gain_db_rx2", ">=", -10.);//, &if_freq_gt_4000);
-    m_solver.add_constr("ad9361_gain_db_rx2", "<=", 77.);//, &if_freq_le_1300);
+    m_solver.add_constr("ad9361_gain_db_rx2", "<=", 73.);//, &if_freq_le_1300);
     m_solver.add_constr("ad9361_gain_db_tx1", ">=", -89.75);
     m_solver.add_constr("ad9361_gain_db_tx1", "<=", 0.);
     m_solver.add_constr("ad9361_gain_db_tx2", ">=", -89.75);
