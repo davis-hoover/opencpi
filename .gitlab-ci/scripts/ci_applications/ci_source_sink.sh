@@ -52,7 +52,7 @@ for cache_mode in $cache_modes
 do
     printf "Testing cache mode $cache_mode\n"
     [[ -n $ip ]] && {
-        echo ocpiremote restart -b -m 0x400000 -l8 -e OCPI_DMA_CACHE_MODE=$cache_mode -i $ip -r $port -u $user -p $password
+        ocpiremote restart -b -m 0x400000 -l8 -e OCPI_DMA_CACHE_MODE=$cache_mode -i $ip -r $port -u $user -p $password
     }
     for message_size in $message_sizes
     do
@@ -64,14 +64,18 @@ do
                 [[ -n $rcc_platform ]] && {
                     ./run_source_sink $hdl_platform $rcc_platform $message_size 2 2 0 $cache_mode $divisor
                     ./run_source_sink $hdl_platform $rcc_platform $message_size 2 10 0 $cache_mode $divisor
-                    ./run_source_sink $rcc_platform $hdl_platform $message_size 2 2 0 $cache_mode $divisor
-                    ./run_source_sink $rcc_platform $hdl_platform $message_size 10 2 0 $cache_mode $divisor
+                    [[ $message_size != "32k" ]] && {
+                        ./run_source_sink $rcc_platform $hdl_platform $message_size 2 2 0 $cache_mode $divisor
+                        ./run_source_sink $rcc_platform $hdl_platform $message_size 10 2 0 $cache_mode $divisor
+                    }
                 }
                 [[ -n $host ]] && {
                     ./run_source_sink $hdl_platform $host $message_size 2 2 0 $cache_mode $divisor
                     ./run_source_sink $hdl_platform $host $message_size 2 10 0 $cache_mode $divisor
-                    ./run_source_sink $host $hdl_platform $message_size 2 2 0 $cache_mode $divisor
-                    ./run_source_sink $host $hdl_platform $message_size 10 2 0 $cache_mode $divisor
+                    [[ $message_size != "32k" ]] && {
+                        ./run_source_sink $host $hdl_platform $message_size 2 2 0 $cache_mode $divisor
+                        ./run_source_sink $host $hdl_platform $message_size 10 2 0 $cache_mode $divisor
+                    }
                 }
             else
                 if [[ -n $rcc_platform ]] ; then
