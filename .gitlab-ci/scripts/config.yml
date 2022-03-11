@@ -46,7 +46,7 @@ matchstiq_z1:
   ip_addresses:
     - 10.1.0.203 
   port: 1000
-microzed:
+microzed_20_cc:
   ip: 10.1.0.209 # deprecated; use 'ip_addresses'
   ip_addresses:
     - 10.1.0.209
@@ -55,7 +55,7 @@ picoevb:
   ip: # deprecated; use 'ip_addresses'
   ip_addresses: []
   port: 1000
-picozed:
+picozed_30_cc:
   ip: 10.1.0.210 # deprecated; use 'ip_addresses'
   ip_addresses:
     - 10.1.0.210
