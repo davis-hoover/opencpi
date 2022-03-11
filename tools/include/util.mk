@@ -1173,7 +1173,7 @@ define OcpiSetAsset
     $$(infox Not including platform worker XML directly for make variables)
   else ifeq ($2,Test)
     $$(eval $$(call OcpiParseXml,$1,$$(subst .,-,$$(OcpiAssetName))))
-  else ifneq ($(filter-out Platforms Primitive Primitives Applications Application,$2),)
+  else ifneq ($(filter-out Platforms Primitive Primitives Applications Application Assemblies,$2),)
     $$(error Unexpected asset type: $2)
   else ifeq ($2,Application)
     ifneq ($$(wildcard $1/$$(OcpiAssetName)-app.xml),)
@@ -1608,7 +1608,37 @@ OcpiProjectFromPlatformDir=$(infox OPFPD:$1:$2)$(strip\
 # Warn/info to stderr without the makefile references etc.
 # Note all args will have white space stripped
 # So to allow commas in warnings, we add spaces between args
-OcpiWarn=$(shell echo Warning:'  $(strip $1 $2 $3 $4 $5 $6 $7 $8 $9)' >&2)
+OcpiWarn=$(shell echo Warning:' $(strip $1 $2 $3 $4 $5 $6 $7 $8 $9)' >&2)
 OcpiInfo=$(shell echo '$(strip $1 $2 $3 $4 $5 $6 $7 $8 $9)' >&2)
 
+# Given a platform "family", return the kernel source directory if it exists.
+OcpiGetKernelDir=$(infox OGKD:$(1))$(strip\
+  $(or $(call OcpiGKD$(1)), $(error platform family $(1) not found)))
+
+# non-family-specific warning message emitter
+OcpiKernVerWarn=$(infox OKVW:$(1))$(strip\
+  $(call OcpiWarn,probable running kernel vs. installed kernel mismatch \
+   detected: the OpenCPI kernel driver will be built for kernel version $(1). \
+   The detected mismatch usually means the kernel has been updated recently \
+   but the system has not been rebooted since the update. Please reboot your \
+   system if you have not already done so.))
+
+# family-specific function for "Centos"
+OcpiGKDCentos=$(infox OGKDC:)$(strip\
+  $(foreach krel,$(shell uname -r),\
+    $(foreach hver,$(word 1, $(shell rpm -q --qf=%{version}-%{release}.%{arch} kernel-headers)),\
+      $(if $(filter $(krel),$(hver)),,$(call OcpiKernVerWarn,$(hver)))\
+      $(foreach kdir,/usr/src/kernels/$(hver),\
+        $(or $(wildcard $(kdir)),$(call OcpiWarn,no kernel headers directory found))))))
+
+# family-specific function for "Ubuntu"
+OcpiGKDUbuntu=$(infox OGKDU:)$(strip\
+  $(foreach krel,$(shell uname -r),\
+    $(foreach ktype,$(shell echo $(krel) | cut -f3 -d'-'),\
+      $(foreach hver,$(or $(shell dpkg -l | grep 'linux-headers' | cut -f3 -d' ' | sort -t'-' --version-sort -k 3,4 -k 4,5 | egrep '$(ktype)$$' | tail -1),NOPE),\
+        $(if $(filter NOPE,$(hver)),\
+          $(call OcpiWarn,no kernel headers for "$(ktype)" kernel installed),\
+          $(if $(filter linux-headers-$(krel),$(hver)),,$(call OcpiKernVerWarn,$(subst linux-headers-,,$(hver))))\
+          $(foreach kdir,/usr/src/$(hver),\
+            $(or $(wildcard $(kdir)),$(call OcpiWarn,no kernel headers directory found))))))))
 endif # ifndef __UTIL_MK__

@@ -840,6 +840,20 @@ class OspPipelineBuilder(PlatformPipelineBuilder):
 
         return variables
 
+    def _build_base_image_name(self, host: str, stage: str, platform: str=None,
+        base_platform: str=None, other_platform: str=None, tag=None) -> str:
+        """Constructs a name for a docker base image based on job's stage"""
+        if tag is None:
+            if stage == 'install-platform' and not base_platform:
+                tag = self.base_image_tag
+            else:
+                tag = self.pipeline_id
+        repo = self._build_base_repo_name(host, stage, platform=platform,
+            base_platform=base_platform, other_platform=other_platform)
+        image_name = '{}/{}:{}'.format(self.container_registry, repo, tag)
+
+        return image_name
+
 
 class CompPipelineBuilder(PlatformPipelineBuilder):
     def __init__(self, pipeline_id, container_registry, base_image_tag, hosts, 
@@ -1013,6 +1027,20 @@ class CompPipelineBuilder(PlatformPipelineBuilder):
                 other_platform, self.project)
 
         return base_repo
+
+    def _build_base_image_name(self, host: str, stage: str, platform: str=None,
+        base_platform: str=None, other_platform: str=None, tag=None) -> str:
+        """Constructs a name for a docker base image based on job's stage"""
+        if tag is None:
+            if stage == 'install-project':
+                tag = self.base_image_tag
+            else:
+                tag = self.pipeline_id
+        repo = self._build_base_repo_name(host, stage, platform=platform,
+            base_platform=base_platform, other_platform=other_platform)
+        image_name = '{}/{}:{}'.format(self.container_registry, repo, tag)
+
+        return image_name
 
 
 class AssemblyPipelineBuilder(PipelineBuilder):
@@ -1293,6 +1321,8 @@ class AssemblyPipelineBuilder(PipelineBuilder):
                 '-u {}'.format(self.user),
                 '-p {}'.format(self.password)
             ])
+            if cmd == 'start':
+                ocpiremote_cmd += ' -b'
 
         return ocpiremote_cmd
 
