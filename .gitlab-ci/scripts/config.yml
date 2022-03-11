@@ -5,22 +5,6 @@
 # user: ssh user of device for HWIL
 # variables: extra variables for jobs specific to device
 
-# ci
-ci:
-  runners:
-    1274481: # Centos7-01
-      socket_interface: em2
-    2337867: # Centos7-02
-      socket_interface: ens224
-    2337550: # Centos7-03
-      socket_interface: ens224
-    2938106: # Centos7-04
-      socket_interface: ens224
-    11873118: # Centos7-05
-      socket_interface: ens224
-    11873200: # Centos7-06
-      socket_interface: ens224
-
 # rcc
 centos7:
   overrides: # deprecated

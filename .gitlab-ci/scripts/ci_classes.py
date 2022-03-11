@@ -285,25 +285,6 @@ class PipelineBuilder(ABC):
 
         return ecr_repo_cmd
 
-    @staticmethod
-    def _build_socket_interface_cmd(runners: dict):
-        """Create a cmd to set the OCPI_SOCKET_INFERACE env var
-        
-        A dictionary of runner IDs to socket interface must be provided
-        """
-        interface_cmd = 'declare -A interfaces && interfaces=('
-        for runner_id,runner_configs in runners.items():
-            interface_cmd += ' ["{}"]="{}"'.format(
-                runner_id, runner_configs['socket_interface'])
-        interface_cmd += ')'
-        interface_cmd = ' && '.join([
-            interface_cmd,
-            'export OCPI_SOCKET_INTERFACE="${interfaces[$CI_RUNNER_ID]}"',
-            'echo $OCPI_SOCKET_INTERFACE'
-        ])
-
-        return interface_cmd
-
 
 class PlatformPipelineBuilder(PipelineBuilder):
     def __init__(self, pipeline_id: str, container_registry: str, 
@@ -1046,7 +1027,7 @@ class CompPipelineBuilder(PlatformPipelineBuilder):
 class AssemblyPipelineBuilder(PipelineBuilder):
     def __init__(self, pipeline_id, container_registry, container_repo,
         base_image_tag, host, platform, model, other_platform, assembly_dirs, 
-        test_dirs, dump_path, config=None, runners=list(), do_hwil=False):
+        test_dirs, dump_path, config=None, do_hwil=False):
         """Initializes an AssemblyPipelineBuilder"""
         super().__init__(pipeline_id, container_registry, base_image_tag,
             dump_path, config)
@@ -1060,7 +1041,6 @@ class AssemblyPipelineBuilder(PipelineBuilder):
         self.do_hwil = do_hwil
         self.user = self.password = 'root'
         self.ip_addresses = self.port = None
-        self.runners = runners
         if config:
             for key in ['ip_addresses', 'port', 'user', 'password']:
                 if key in config:
@@ -1135,11 +1115,9 @@ class AssemblyPipelineBuilder(PipelineBuilder):
             caps = None
             if ip:
             # Device is remote; set appropriate env vars
-                socket_interface_cmd = self._build_socket_interface_cmd(
-                    self.runners)
                 addresses_cmd = 'export OCPI_SERVER_ADDRESSES={}:{}'.format(
                     ip, self.port)
-                script += [socket_interface_cmd, addresses_cmd]
+                script.append(addresses_cmd)
             elif self.do_hwil:
             # Device is local to runner; allow container access to /dev/mem
                 devices = ['/dev/mem']

@@ -158,7 +158,6 @@ def _make_assembly_pipeline(dump_path: Path,
     test_dirs = _get_tests(project_dirs, model=model)
     container_registry = getenv('CI_OCPI_CONTAINER_REGISTRY')
     container_repo = getenv('CI_OCPI_CONTAINER_REPO')
-    runners = config['ci']['runners']
     if model == 'hdl' and platform in config:
         config = config[platform]
     elif model == 'rcc' and other_platform and other_platform in config:
@@ -176,8 +175,7 @@ def _make_assembly_pipeline(dump_path: Path,
         do_hwil = do_hwil.lower() in ['t', 'y', 'true', 'yes', '1']
     pipeline_builder = AssemblyPipelineBuilder(pipeline_id, container_registry, 
         container_repo, base_image_tag, host, platform, model, other_platform, 
-        assembly_dirs, test_dirs, dump_path, config=config, runners=runners, 
-        do_hwil=do_hwil)
+        assembly_dirs, test_dirs, dump_path, config=config, do_hwil=do_hwil)
 
     return pipeline_builder
 
