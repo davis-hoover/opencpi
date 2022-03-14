@@ -8,7 +8,6 @@ you currently don't own.
 ### Why you want to add an external project
 (Describe what your project does.)
 
-
 ### Your project's runner registration token
 Your runner's registration token is located at
 https://gitlab.com/**namespace**/**project_name**/-/settings/ci_cd
@@ -23,6 +22,5 @@ The easiest way to find this is to:
 
 **NOTE:** This issue will be marked confidential by default so this runner's
 token is not available to the general public.
-
 
 /confidential
