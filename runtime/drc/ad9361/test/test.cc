@@ -363,7 +363,9 @@ int test_AD9361Configurator() {
 int test_AD9361DDCConfigurator() {
   // RX CHANNEL
   int ret = 0;
-  AD9361Configurator uut;
+/// @TODO replace below line with proper functionality
+#define AD9361DDCConfigurator AD9361Configurator
+  AD9361DDCConfigurator uut;
   try {
     std::vector<const char*> data_stream_rx;
     data_stream_rx.push_back("rx1");
@@ -375,7 +377,7 @@ int test_AD9361DDCConfigurator() {
       uut.unlock_all();
       TEST(*it, di, (int32_t)data_stream_direction_t::tx, false, 0., false);
       uut.unlock_all();
-      // Tuning Freq (MHz) [39.28 - 6039.28 MHz]
+      // Tuning Freq (MHz) [39.28 - 6030.7190625 MHz]
       // ================================================
       // LOWER BOUNDS
       TEST(*it, fc, 39.27   , true, 0.000001, false)
@@ -386,36 +388,36 @@ int test_AD9361DDCConfigurator() {
       TEST(*it, fc, 3000.   , true, 0.000001, true )
       uut.unlock_all();
       // UPPER BOUNDS
-      TEST(*it, fc, 6039.28 , true, 0.000001, true )
+      TEST(*it, fc, 6030.7190625 , true, 0.000001, true )
       uut.unlock_all();
-      TEST(*it, fc, 6039.29 , true, 0.000001, false)
+      TEST(*it, fc, 6039.71907, true, 0.000001, false)
       uut.unlock_all();
-      // Bandwidth (MHz) [0.000024 - 14 MHz]
+      // Bandwidth (MHz) [0.000024140625 - 14 MHz]
       // @TODO Check Values
       // ================================================
       //  LOWER BOUNDS
       TEST(*it, bw, 0.000023, true, 0.000001, false)
       uut.unlock_all();
-      TEST(*it, bw, 0.000024, true, 0.000001, true )
+      TEST(*it, bw, 0.000024140625, true, 0.000001, true )
       uut.unlock_all();
       // MEDIAN BOUND
-      TEST(*it, bw, 30.     , true, 0.000001, true )
+      TEST(*it, bw, 10.     , true, 0.000001, true )
       uut.unlock_all();
       // UPPER BOUNDS
       TEST(*it, bw, 14.     , true, 0.000001, true )
       uut.unlock_all();
       TEST(*it, bw, 14.01   , true, 0.000001, false)
       uut.unlock_all();
-      // Sampling rate (Msps) [0.000254 - 15.36 Msps]
+      // Sampling rate (Msps) [~0.000255 - 15.36 Msps]
       // @TODO Check Values
       // ================================================
       // LOWER BOUNDS
       TEST(*it, fs, 0.000253, true, 0.000001, false)
       uut.unlock_all();
-      TEST(*it, fs, 0.000254, true, 0.000001, true )
+      TEST(*it, fs, 0.000255, true, 0.000001, true )
       uut.unlock_all();
       // MEDIAN BOUND
-      TEST(*it, fs, 32.     , true, 0.000001, true )
+      TEST(*it, fs, 10.     , true, 0.000001, true )
       uut.unlock_all();
       // UPPER BOUND
       TEST(*it, fs, 15.36   , true, 0.000001, true )
@@ -601,29 +603,29 @@ int test_AD9361DDCConfigurator() {
       uut.unlock_all();
       TEST(*it, fc, 6001.01 , true, 0.000001, false)
       uut.unlock_all();
-      // Bandwidth (MHz) [0.000024 - 14 MHz]
+      // Bandwidth (MHz) [0.000024140625 - 14 MHz]
       // @TODO Check Values
       // ================================================
       //  LOWER BOUNDS
       TEST(*it, bw, 0.000023, true, 0.000001, false)
       uut.unlock_all();
-      TEST(*it, bw, 0.000024, true, 0.000001, true )
+      TEST(*it, bw, 0.000024140625, true, 0.000001, true )
       uut.unlock_all();
       // MEDIAN BOUND
-      TEST(*it, bw, 30.     , true, 0.000001, true )
+      TEST(*it, bw, 14.     , true, 0.000001, true )
       uut.unlock_all();
       // UPPER BOUNDS
       TEST(*it, bw, 14.     , true, 0.000001, true )
       uut.unlock_all();
       TEST(*it, bw, 14.01   , true, 0.000001, false)
       uut.unlock_all();
-      // Sampling rate (Msps) [0.000254 - 15.36 Msps]
+      // Sampling rate (Msps) [~0.000255 - 15.36 Msps]
       // @TODO Check Values
       // ================================================
       // LOWER BOUNDS
       TEST(*it, fs, 0.000253, true, 0.000001, false)
       uut.unlock_all();
-      TEST(*it, fs, 0.000254, true, 0.000001, true )
+      TEST(*it, fs, 0.000255, true, 0.000001, true )
       uut.unlock_all();
       // MEDIAN BOUND
       TEST(*it, fs, 32.     , true, 0.000001, true )
@@ -716,11 +718,11 @@ class SlaveDummy {
 
 int main() {
   int ret0 = test_AD9361Configurator();
-  int ret1 = test_AD9361DDCConfigurator();
   if(ret0 != 0) {
     std::cout << "[ERROR]\n";
     return ret0;
   }
+  int ret1 = test_AD9361DDCConfigurator();
   if(ret1 != 0) {
     std::cout << "[ERROR]\n";
     return ret1;
