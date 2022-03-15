@@ -273,7 +273,7 @@ int test_AD9361Configurator() {
       uut.unlock_all();
       TEST(*it, di, (int32_t)data_stream_direction_t::tx, false, 0., true);
       uut.unlock_all();
-      // Tuning Freq (MHz) (70 MHz - 6.0 GHZ)
+      // Tuning Freq [70 MHz - 6000 MHz]
       // ================================================
       //  LOWER BOUNDS
       TEST(*it, fc, 69.99   , true, 0.000001, false)
@@ -288,7 +288,7 @@ int test_AD9361Configurator() {
       uut.unlock_all();
       TEST(*it, fc, 6001.01 , true, 0.000001, false)
       uut.unlock_all();
-      // Bandwidth (MHz)
+      // Bandwidth [1.25 - 40 MHz]
       // @TODO Check Values
       // ================================================
       //  LOWER BOUNDS
@@ -304,7 +304,7 @@ int test_AD9361Configurator() {
       uut.unlock_all();
       TEST(*it, bw, 40.01   , true, 0.000001, false)
       uut.unlock_all();
-      //Sampling rate (Msps)
+      //Sampling rate [2.08334 - 61.44 Msps]
       // ================================================
       // LOWER BOUNDS
       TEST(*it, fs, 2.08    , true, 0.000001, false)
@@ -375,7 +375,7 @@ int test_AD9361DDCConfigurator() {
       uut.unlock_all();
       TEST(*it, di, (int32_t)data_stream_direction_t::tx, false, 0., false);
       uut.unlock_all();
-      // Tuning Freq (MHz) [39.28 - 6039.28 GHz]
+      // Tuning Freq (MHz) [39.28 - 6039.28 MHz]
       // ================================================
       // LOWER BOUNDS
       TEST(*it, fc, 39.27   , true, 0.000001, false)
@@ -586,7 +586,7 @@ int test_AD9361DDCConfigurator() {
       uut.unlock_all();
       TEST(*it, di, (int32_t)data_stream_direction_t::tx, false, 0., true);
       uut.unlock_all();
-      // Tuning Freq (MHz) (70 MHz - 6.0 GHZ)
+      // Tuning Freq (70 MHz - 6000 MHz)
       // ================================================
       //  LOWER BOUNDS
       TEST(*it, fc, 69.99   , true, 0.000001, false)
@@ -601,36 +601,37 @@ int test_AD9361DDCConfigurator() {
       uut.unlock_all();
       TEST(*it, fc, 6001.01 , true, 0.000001, false)
       uut.unlock_all();
-      // Bandwidth (MHz)
+      // Bandwidth (MHz) [0.000024 - 14 MHz]
       // @TODO Check Values
       // ================================================
       //  LOWER BOUNDS
-      TEST(*it, bw, 1.24    , true, 0.000001, false)
+      TEST(*it, bw, 0.000023, true, 0.000001, false)
       uut.unlock_all();
-      TEST(*it, bw, 1.25    , true, 0.000001, true )
+      TEST(*it, bw, 0.000024, true, 0.000001, true )
       uut.unlock_all();
       // MEDIAN BOUND
-      TEST(*it, bw, 20.     , true, 0.000001, true )
+      TEST(*it, bw, 30.     , true, 0.000001, true )
       uut.unlock_all();
       // UPPER BOUNDS
-      TEST(*it, bw, 40.     , true, 0.000001, true )
+      TEST(*it, bw, 14.     , true, 0.000001, true )
       uut.unlock_all();
-      TEST(*it, bw, 40.01   , true, 0.000001, false)
+      TEST(*it, bw, 14.01   , true, 0.000001, false)
       uut.unlock_all();
-      //Sampling rate (Msps)
+      // Sampling rate (Msps) [0.000254 - 15.36 Msps]
+      // @TODO Check Values
       // ================================================
       // LOWER BOUNDS
-      TEST(*it, fs, 2.08    , true, 0.000001, false)
+      TEST(*it, fs, 0.000253, true, 0.000001, false)
       uut.unlock_all();
-      TEST(*it, fs, 2.083334, true, 0.000001, true )
+      TEST(*it, fs, 0.000254, true, 0.000001, true )
       uut.unlock_all();
       // MEDIAN BOUND
       TEST(*it, fs, 32.     , true, 0.000001, true )
       uut.unlock_all();
-      // UPPER BOUNDS
-      TEST(*it, fs, 61.44   , true, 0.000001, true )
+      // UPPER BOUND
+      TEST(*it, fs, 15.36   , true, 0.000001, true )
       uut.unlock_all();
-      TEST(*it, fs, 61.45   , true, 0.000001, false)
+      TEST(*it, fs, 15.37   , true, 0.000001, false)
       uut.unlock_all();
       // Samples are complex
       // ================================================
