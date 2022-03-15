@@ -4,3 +4,5 @@ not concrete. Discussions are not about specific defects or capabilities.)
 
 ### Links/references
 
+### Acceptance criteria
+(What would it take for you to feel this issue can be closed?)

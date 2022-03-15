@@ -15,9 +15,4 @@ feature?)
 ### Links/references
 
 ### Acceptance criteria
-(Basically a "definition of done" with supporting evidence (job log excerpts,
-screenshots, etc.) as appropriate.  Some people prefer to use checkboxes:
-- [ ] first objective
-- [ ] second objective
-- [ ] (etc.)
-and provide evidence in the issue comments instead of in this section.)
+(What would it take for you to feel this issue can be closed?)

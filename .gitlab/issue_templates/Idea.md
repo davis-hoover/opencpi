@@ -8,3 +8,5 @@ enough to make a feature or enhancement request.)
 
 ### Links/references
 
+### Acceptance criteria
+(What would it take for you to feel this issue can be closed?)

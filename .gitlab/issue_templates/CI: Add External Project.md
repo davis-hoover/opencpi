@@ -23,4 +23,7 @@ The easiest way to find this is to:
 **NOTE:** This issue will be marked confidential by default so this runner's
 token is not available to the general public.
 
+### Acceptance criteria
+(What would it take for you to feel this issue can be closed?)
+
 /confidential
