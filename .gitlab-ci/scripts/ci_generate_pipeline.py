@@ -25,7 +25,7 @@ def main(pipeline_type: str) -> None:
     pipeline_builder: PipelineBuilder = _get_builder(
         pipeline_type, dump_path, config)
     pipeline: Pipeline = pipeline_builder.build()
-    print('Dumping pipeline yaml to: {}'.format(pipeline.dump_path))
+    print('Dumping pipeline yaml to: {}'.format(pipeline.dump_path.resolve()))
     pipeline.dump()
     executionTime = (time.time() - startTime)
     print('Execution time in seconds: ' + str(executionTime))
@@ -86,7 +86,6 @@ def _make_platform_pipeline(dump_path: Path,
     image_tags = _get_image_tags()
     container_registry = getenv('CI_OCPI_CONTAINER_REGISTRY', '')
     hosts = re.split(r'\s|,\s|,', getenv('CI_OCPI_HOSTS', '').strip('"'))
-    print(hosts)
     whitelist = _get_platforms(do_ocpishow=False, do_model_split=False)
     platforms = _parse_platforms_directive(whitelist=whitelist, 
         whitelist_mode='and')
@@ -146,8 +145,9 @@ def _make_assembly_pipeline(dump_path: Path,
     config: str=None) -> AssemblyPipelineBuilder:
     """Initialize and return an AssemblyPipelineBuilder"""
     pipeline_id = _get_pipeline_id()
-    base_image_tag = _get_base_image_tag(pipeline_id=pipeline_id)
+    base_image_tag = pipeline_id
     platform = getenv('CI_OCPI_PLATFORM')
+    model = _get_platform_model(platform)
     host = getenv('CI_OCPI_HOST')
     other_platform = getenv('CI_OCPI_OTHER_PLATFORM')
     project_group = environ['CI_PROJECT_NAMESPACE'].split('/', 1)[-1]
@@ -155,11 +155,9 @@ def _make_assembly_pipeline(dump_path: Path,
     whitelist = [project_name] if project_group == 'comp' else None
     project_dirs = _get_projects(whitelist=whitelist, blacklist=['tutorial'])
     assembly_dirs = _get_assemblies(project_dirs)
-    test_dirs = _get_tests(project_dirs)
+    test_dirs = _get_tests(project_dirs, model=model)
     container_registry = getenv('CI_OCPI_CONTAINER_REGISTRY')
     container_repo = getenv('CI_OCPI_CONTAINER_REPO')
-    model = _get_platform_model(platform)
-    runners = config['ci']['runners']
     if model == 'hdl' and platform in config:
         config = config[platform]
     elif model == 'rcc' and other_platform and other_platform in config:
@@ -177,8 +175,7 @@ def _make_assembly_pipeline(dump_path: Path,
         do_hwil = do_hwil.lower() in ['t', 'y', 'true', 'yes', '1']
     pipeline_builder = AssemblyPipelineBuilder(pipeline_id, container_registry, 
         container_repo, base_image_tag, host, platform, model, other_platform, 
-        assembly_dirs, test_dirs, dump_path, config=config, runners=runners, 
-        do_hwil=do_hwil)
+        assembly_dirs, test_dirs, dump_path, config=config, do_hwil=do_hwil)
 
     return pipeline_builder
 
@@ -425,12 +422,24 @@ def _get_assemblies(project_dirs: List[str]) -> List[str]:
     return assemblies
 
 
-def _get_tests(project_dirs: List[str]) -> List[str]:
+def _get_tests(project_dirs: List[str], model=None) -> List[str]:
     """Returns directories of opencpi tests"""
     tests = []
+    workers = None
+    if model:
+    # Gather workers of specified models
+        futures = asyncio.gather(
+            *[_ocpidev_show('workers', project_dir, 'local') 
+              for project_dir in project_dirs])
+        results = asyncio.get_event_loop().run_until_complete(futures)
+        results = [list(val['workers'].values()) 
+                   for value in results for val in value.values()]
+        workers = [Path(worker).with_suffix('') for workers in results 
+                   for worker in workers 
+                   if Path(worker).suffix[1:] == model]
     futures = asyncio.gather(
         *[_ocpidev_show('tests', project_dir, 'local') 
-            for project_dir in project_dirs])
+          for project_dir in project_dirs])
     results = asyncio.get_event_loop().run_until_complete(futures)
     for result in results:
         libraries = result['project']['libraries']
@@ -438,6 +447,10 @@ def _get_tests(project_dirs: List[str]) -> List[str]:
             library_tests = libraries[library]['tests']
             for library_test in library_tests:
                 library_path = Path(library_tests[library_test])
+                if workers is not None:
+                # If no worker of specified model for unit test, continue
+                    if library_path.with_suffix('') not in workers:
+                        continue
                 try:
                     relative_path = library_path.relative_to(
                         environ['OCPI_ROOT_DIR'])
