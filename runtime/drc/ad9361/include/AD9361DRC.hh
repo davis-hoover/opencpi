@@ -195,6 +195,8 @@ class AD9361Configurator : public Configurator<AD9361CSP> {
   AD9361Configurator() : Configurator<AD9361CSP>() {
     {
       DataStream::CSPVarMap map;
+      map.insert(std::make_pair(config_key_direction.c_str(),
+          "ad9361_dir_rx1"));
       map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
           "ad9361_fc_meghz_rx1"));
       map.insert(std::make_pair(config_key_bandwidth_3dB_MHz.c_str(),
@@ -211,6 +213,8 @@ class AD9361Configurator : public Configurator<AD9361CSP> {
     }
     {
       DataStream::CSPVarMap map;
+      map.insert(std::make_pair(config_key_direction.c_str(),
+          "ad9361_dir_rx2"));
       map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
           "ad9361_fc_meghz_rx2"));
       map.insert(std::make_pair(config_key_bandwidth_3dB_MHz.c_str(),
@@ -227,6 +231,8 @@ class AD9361Configurator : public Configurator<AD9361CSP> {
     }
     {
       DataStream::CSPVarMap map;
+      map.insert(std::make_pair(config_key_direction.c_str(),
+          "ad9361_dir_tx1"));
       map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
           "ad9361_fc_meghz_tx1"));
       map.insert(std::make_pair(config_key_bandwidth_3dB_MHz.c_str(),
@@ -243,6 +249,8 @@ class AD9361Configurator : public Configurator<AD9361CSP> {
     }
     {
       DataStream::CSPVarMap map;
+      map.insert(std::make_pair(config_key_direction.c_str(),
+          "ad9361_dir_tx2"));
       map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
           "ad9361_fc_meghz_tx2"));
       map.insert(std::make_pair(config_key_bandwidth_3dB_MHz.c_str(),
