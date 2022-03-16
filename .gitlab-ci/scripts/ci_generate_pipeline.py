@@ -158,6 +158,7 @@ def _make_assembly_pipeline(dump_path: Path,
     test_dirs = _get_tests(project_dirs, model=model)
     container_registry = getenv('CI_OCPI_CONTAINER_REGISTRY')
     container_repo = getenv('CI_OCPI_CONTAINER_REPO')
+    applications = _get_applications()
     if model == 'hdl' and platform in config:
         config = config[platform]
     elif model == 'rcc' and other_platform and other_platform in config:
@@ -175,7 +176,8 @@ def _make_assembly_pipeline(dump_path: Path,
         do_hwil = do_hwil.lower() in ['t', 'y', 'true', 'yes', '1']
     pipeline_builder = AssemblyPipelineBuilder(pipeline_id, container_registry, 
         container_repo, base_image_tag, host, platform, model, other_platform, 
-        assembly_dirs, test_dirs, dump_path, config=config, do_hwil=do_hwil)
+        assembly_dirs, test_dirs, applications, dump_path, config=config, 
+        do_hwil=do_hwil)
 
     return pipeline_builder
 
@@ -460,6 +462,22 @@ def _get_tests(project_dirs: List[str], model=None) -> List[str]:
                 tests.append(str(relative_path))
 
     return tests
+
+
+def _get_applications() -> dict():
+    """Returns a dictionary of applications
+    
+    Key of dictionary is application name, and value of dictionary is
+    a list of needed assemblies.
+    """
+    applications = {
+        'source_sink': [
+            'projects/assets/hdl/assemblies/test_source_assy',
+            'projects/assets/hdl/assemblies/test_sink_assy'
+        ]
+    }
+
+    return applications
 
 
 if __name__ == '__main__':

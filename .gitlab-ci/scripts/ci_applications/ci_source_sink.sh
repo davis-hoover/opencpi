@@ -1,5 +1,5 @@
 #!/bin/bash
-[ $# -lt 2 ] && echo "Usage: $0 [--hdl-platform platform] [--rcc-platform platform] [--host platform] [-i ip] [-r port] [-u user] [-p password]" && exit 1
+[ $# -lt 2 ] && echo "Usage: $0 [--hdl-platform platform] [--rcc-platform platform] [--host platform] [-i ip] [-u user] [-p password]" && exit 1
 set -e
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -17,10 +17,6 @@ while [ $# -gt 0 ]; do
             ;;
         -i|--ip)
             ip="$2"
-            shift 2
-            ;;
-        -r|--port)
-            port="$2"
             shift 2
             ;;
         -u|--user)
@@ -52,7 +48,7 @@ for cache_mode in $cache_modes
 do
     printf "Testing cache mode $cache_mode\n"
     [[ -n $ip ]] && {
-        ocpiremote restart -b -m 0x400000 -l8 -e OCPI_DMA_CACHE_MODE=$cache_mode -i $ip -r $port -u $user -p $password
+        ocpiremote restart -b -m 0x400000 -e OCPI_DMA_CACHE_MODE=$cache_mode -i $ip -u $user -p $password
     }
     for message_size in $message_sizes
     do
