@@ -1178,6 +1178,8 @@ define OcpiSetAsset
   else ifeq ($2,Application)
     ifneq ($$(wildcard $1/$$(OcpiAssetName)-app.xml),)
       $$(eval $$(call OcpiParseXml,$1,$$(OcpiAssetName)-app))
+    else ifneq ($$(wildcard $1/$$(OcpiAssetName).xml),)
+      $$(eval $$(call OcpiParseXml,$1,$$(OcpiAssetName)))
     endif
   else ifeq ($2,Primitives)
     # We are overloading the Libraries and Cores variables.
