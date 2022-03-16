@@ -1091,11 +1091,9 @@ class AssemblyPipelineBuilder(PipelineBuilder):
         after_script = self._build_after_script(stage)
         artifacts = self._build_artifacts(stage, asset)
         variables = self._build_variables(stage)
-        resource_group = self._build_resource_group(stage)
         job = ScriptJob(name, stage, script, tags=tags, needs=needs, 
                         before_script=before_script, after_script=after_script, 
-                        artifacts=artifacts, variables=variables,
-                        resource_group=resource_group)
+                        artifacts=artifacts, variables=variables)
 
         return job
 
@@ -1176,7 +1174,7 @@ class AssemblyPipelineBuilder(PipelineBuilder):
             # If more than one device, find device index to use for tag
                 ip_idx = self.ip_addresses.index(ip)
                 ip_id = str(ip_idx + 1).zfill(2) # Pad leading 0 if necessary
-                tags.append('{}-{}'.format(self.platform, ip_id))
+                tags.append('{}-{}'.format(platform, ip_id))
             else:
                 tags.append(platform)
         else:
@@ -1222,18 +1220,6 @@ class AssemblyPipelineBuilder(PipelineBuilder):
         variables['GIT_STRATEGY'] = 'none'
 
         return variables
-
-    def _build_resource_group(self, stage: str) -> str:
-        """Builds a reource group for a job"""
-        if stage == 'run-unit_tests' and not self.platform.endswith('sim'):
-            if self.model == 'hdl':
-                resource_group = self.platform
-            else:
-                resource_group = self.other_platform
-        else:
-            resource_group = None
-
-        return resource_group
 
     def _build_ip(self):
         """Selects a random ip from self.ip_addresses"""
