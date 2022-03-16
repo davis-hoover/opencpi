@@ -22,10 +22,12 @@ Definition of Componnet and ShowableComponent classes
 import os
 import re
 import sys
+import pathlib
 import subprocess
 import logging
 import json
 import jinja2
+import ocpidoc.ocpi_documentation as ocpi_doc
 import _opencpi.assets.template as ocpitemplate
 from os.path import dirname
 from pathlib import Path
@@ -405,7 +407,7 @@ class Component(ShowableComponent):
             specfile = "../specs/" + filename
             os.symlink(specfile, lnkfile)
         os.chdir(savepath)
-        
+
     @staticmethod
     def get_workers(directory="."):
         workers = []
@@ -461,13 +463,13 @@ class Component(ShowableComponent):
             if not working_path.exists():
                 print("OCPI:ERROR: The 'components' library does not exist")
                 exit(1)
- 
-        specs_path = Path(working_path, 'specs')
-        if not specs_path.exists() and not ensure_exists:
-            os.makedirs(str(specs_path))
-        working_dir = Component.get_filename(
-            str(specs_path), name, project, ensure_exists)
-        return working_dir
+        component_dir = Path(working_path, name + ".comp")
+        if ensure_exists: # not creating - where is the spec file?
+            if len(list(component_dir.glob(name+"[-_]spec.xml"))) == 0:
+                component_dir = Path(working_path, "specs")
+        elif kwargs.get('spec_file_only'):
+            component_dir = Path(working_path, "specs")
+        return Component.get_filename(str(component_dir), name, project, ensure_exists)
 
     @staticmethod
     def get_filename(directory, name, project, ensure_exists=True):
@@ -522,6 +524,8 @@ class Component(ShowableComponent):
         sub_lib = kwargs.get("library", None)
         hdl_lib = kwargs.get("hdl_library", None)
         proj = kwargs.get("project", True)
+        dir_path = Path(directory)
+        dir_path.mkdir(parents=True, exist_ok=True)
         dirtype = ocpiutil.get_dirtype(directory)
         pkg_id = Component.get_package_id(directory)
         logging.debug("Package_ID: " + pkg_id)
@@ -539,26 +543,60 @@ class Component(ShowableComponent):
             template = jinja2.Template(ocpitemplate.COMPONENT_HDL_LIB_XML, trim_blocks=True)
             ocpiutil.write_file_from_string(hdlfile, template.render(**template_dict))
         os.chdir(directory)
-        specfile = os.getcwd() + "/" + name
-        if os.path.isfile(specfile):
-            raise ocpiutil.OCPIException(specfile + " already exists")
+        spec_file = os.getcwd() + "/" + name
+        if os.path.isfile(spec_file):
+            raise ocpiutil.OCPIException(spec_file + " already exists")
         if kwargs.get("no_control", None) == True:
             template = jinja2.Template(ocpitemplate.COMPONENT_SPEC_NO_CTRL_XML, trim_blocks=True)
-            ocpiutil.write_file_from_string(specfile, template.render(**template_dict))
+            ocpiutil.write_file_from_string(spec_file, template.render(**template_dict))
         else:
             template = jinja2.Template(ocpitemplate.COMPONENT_SPEC_XML, trim_blocks=True)
-            ocpiutil.write_file_from_string(specfile, template.render(**template_dict))
-
-        if (proj or dirtype == "project"):
+            ocpiutil.write_file_from_string(spec_file, template.render(**template_dict))
+        spec_file_only = kwargs.get('spec_file_only') or kwargs.get('project')
+        if proj or dirtype == "project":
             if not os.path.isfile("package-id"):
                 ocpiutil.write_file_from_string("package-id", pkg_id + "\n")
         else:
-            Component.add_link(name, str(Path(directory).parent))
+            # ensure the spec is visible in the lib subdir
+            spec_path = Path(spec_file) 
+            lib_path = Path(dir_path.parent).joinpath("lib")
+            lib_path.mkdir(exist_ok = True)
+            lib_path.joinpath(spec_path.name).symlink_to("../" + dir_path.name + "/" + spec_path.name)
             workers = str(Component.get_workers(parent_dir))[1:-1]
             logging.debug("Workers: " + workers)
+        if not kwargs.get('spec_file_only') and os.environ.get('OCPI_NO_DOC') != '1':
+            ocpi_doc.create(str(dir_path.parent), "component", dir_path.stem)
         if verbose:
-            print("Component '" + name + "' was created at " + specfile)
+            print("Component '" + name + "' was created at " + spec_file)
 
+    def delete(self, force=False, **kwargs):
+        """
+        Delete the component, which might mean:
+        1. If there is only a spec file, delete it
+        2. If there is only a .comp directory (with a spec file inside it), delete it
+        3. If there is a spec in specs, and a .comp directory (without a spec), delete both
+        The super class method will not do both, so we use it for the directory case.
+        """
+        file_path = Path(self.name)
+        if not file_path.match("*[-_]spec.xml"):
+            raise ocpiutil.OCPIException(f'unexpected component file not ending in [-_]spec.xml: {self.name}')
+        name = file_path.name[:-9]
+        dir_path = Path(self.directory)
+        # First remove the symlink that might be there, without asking (since building will recreate it).
+        link = list(dir_path.parent.joinpath("lib").glob(name + "[-_]spec.xml"))
+        if len(link) == 1:
+            link[0].unlink()
+        # Since the user will be asked (if !force), ask about the .comp directory first, if it applies:
+        if dir_path.name == "specs":
+            if not super().delete('component', force): # delete spec file in specs
+                return False
+            dir_path = dir_path.parent.joinpath(name + ".comp")
+            if not dir_path.exists():
+                return True
+            self.directory = str(dir_path)
+        # Now we remove the .comp dir
+        self.name = dir_path.name # force a directory deletion in the superclass method
+        return super().delete('component', force) # delete spec file
 
 class Protocol(Component):
     """
@@ -613,7 +651,7 @@ class Protocol(Component):
             if not working_path.exists():
                 print("OCPI:ERROR: The 'components' library does not exist")
                 exit(1)
-        
+
         specs_path = Path(working_path, 'specs')
         if not specs_path.exists() and not ensure_exists:
             os.makedirs(specs_path)
@@ -703,6 +741,13 @@ class Protocol(Component):
         if verbose:
             print("Protocol '" + name + "' was created at " + protfile)
 
+    def delete(self, force=False, **kwargs):
+        """
+        Delete the Protocol
+        """
+        # bad inheritance hierarchy, should not inherit "component"
+        return ShowableComponent.delete(self, 'protocol', force) # delete protocol file
+
 
 class Slot(Component):
     """
@@ -762,6 +807,13 @@ class Slot(Component):
         Component.add_link(name, parent_dir)
         if verbose:
             print("HDL slot '" + name + "' was created at " + slotfile)
+
+    def delete(self, force=False, **kwargs):
+        """
+        Delete the Slot
+        """
+        # bad inheritance hierarchy, should not inherit "component"
+        return ShowableComponent.delete(self, 'hdl-slot', force) # delete spec file
 
 class Card(Slot):
     """

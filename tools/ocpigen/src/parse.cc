@@ -27,6 +27,7 @@
 #include <assert.h>
 #include <strings.h>
 #include <ctype.h>
+#include <cstring>
 #include "ocpi-config.h"
 #include "OsFileSystem.hh"
 #include "UtilMisc.hh"
@@ -1147,6 +1148,9 @@ Worker(ezxml_t xml, const char *xfile, const std::string &parentFile,
         }
     }
   }
+  const char *env = getenv("OCPI_XML_INCLUDE_PATH");
+  for (OU::TokenIter ti(env, ": "); ti.token(); ti.next())
+    addInclude(ti.token());
   // These next two attributes are necessary to parse this worker since they exist
   // to provide places to look for XML that this OWD refers to.
   bool isDir;
@@ -1169,6 +1173,24 @@ Worker(ezxml_t xml, const char *xfile, const std::string &parentFile,
   if ((err = getComponentLibraries(ezxml_cattr(xml, "componentlibraries"), m_modelString, true,
 				   dirs)))
     return;
+ for (OU::TokenIter ti(". gen ../specs ../lib"); ti.token(); ti.next())
+    addInclude(ti.token());
+  // we need to look at a spec attribute in advance so that we can search the component's
+  // *.comp directory in the case where the library has never been built and thus
+  // the links to *.comp/*-spec files are not yet in the ../lib directory.
+  const char *specAttr = ezxml_cattr(xml, "spec");
+  if (specAttr && !strchr(specAttr, '/')) {
+      std::string spec(specAttr);
+      const char *dot = strrchr(specAttr, '.');
+      if (dot)
+	spec.resize(OCPI_SIZE_T_DIFF(dot, specAttr)); // strip dot suffix (presumably xml)
+      const char *suffix = spec.c_str() + spec.length() - 5; // -spec or _spec
+      if (spec.length() > 5 && (!strcasecmp(suffix, "_spec") || !strcasecmp(suffix, "-spec")))
+	spec.resize(spec.length() - 5); // strip -spec or _spec suffix
+      std::string search;
+      OU::format(search, "../%s.comp", spec.c_str());
+      addInclude(search);
+  }
   for (auto it = dirs.begin(); it != dirs.end(); ++it)
     addInclude(*it);
   err = m_build.parse(xml);

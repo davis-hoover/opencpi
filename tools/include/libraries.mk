@@ -20,6 +20,9 @@
 
 include $(OCPI_CDK_DIR)/include/util.mk
 
+ifndef OCPI_PROJECT_REL_DIR
+  $(eval $(call OcpiSetProject,..))
+endif
 ifndef Libraries
   Libraries=$(call OcpiFindSubdirs,library)
 endif
@@ -27,14 +30,29 @@ endif
 DoLibGoal=$(AT)\
   set -e; \
   $(foreach l,$(Libraries),\
-    echo ====== Entering library $l for goal: $@; \
+    echo ====== Entering library $l for goal: $(or $2,$@); \
     $(MAKE) -C $l $(if $(wildcard $l/Makefile),,-f $(OCPI_CDK_DIR)/include/library.mk) \
-            OCPI_PROJECT_REL_DIR=../$(OCPI_PROJECT_REL_DIR) $@ &&):
+            OCPI_PROJECT_REL_DIR=../$(OCPI_PROJECT_REL_DIR) $(or $2,$@) &&):
 
-Goals=run all declare clean $(Models) $(Models:%=clean%) $(OcpiTestGoals)
+Goals=run declare $(Models) comp $(Models:%=clean%) cleancomp $(OcpiTestGoals)
 
-.PHONY: $(Goals)
+.PHONY: $(Goals) allx docs clean
 
 $(Goals):
 	$(call DoLibGoal,$(MAKE))
 
+docs:
+	$(AT)ocpidoc build -b
+
+allx:
+	$(AT)$(call DoLibGoal,$(MAKE),all)
+
+all: $(if $(filter 1,$(OCPI_DOC_ONLY)),docs,allx $(if $(filter 1,$(OCPI_NO_DOC)),,docs))
+
+clean:
+	$(AT)$(call DoLibGoal,$(MAKE),clean)
+	$(AT)rm -r -f gen
+
+# these ensure that recursive makes do not build docs
+override export OCPI_NO_DOC=1
+override export OCPI_DOC_ONLY=

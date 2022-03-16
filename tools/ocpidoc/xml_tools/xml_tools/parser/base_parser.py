@@ -23,7 +23,7 @@
 import re
 import xml.etree.ElementTree as ET
 import os.path
-
+import _opencpi
 
 class BaseParser():
     """ Class for all XML parsers to inherit from.
@@ -101,9 +101,12 @@ class BaseParser():
                 XML parsing. When false the case of XML tags and attributes is
                 preserved.
         """
-        # Read XML file into a string
-        with open(self._filename, "r") as open_file:
-            file_xml_string = open_file.read()
+        if self._filename:
+            # Read XML file into a string - this probably should become an error - is it needed anymore?
+            with open(self._filename, "r") as open_file:
+                file_xml_string = open_file.read()
+        else:
+            file_xml_string, self._filename = _opencpi.util.get_xml_string(self._include_filepaths[0])
 
         # Locate any <xi:include href="<file>"/> statements. Search for the
         # specified file within self._include_filepaths, and if found insert

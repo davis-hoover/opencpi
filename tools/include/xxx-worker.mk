@@ -60,13 +60,21 @@ skeleton:  $(ImplHeaderFiles) $(SkelFiles)
 	      make -r --no-print-directory $(OcpiLibraryMakefile) -C $(DirContainingLib) workersfile speclinks)
 
 ifeq ($(filter rcc,$(Model))$(filter clean%,$(MAKECMDGOALS))$(HdlActualTargets),)
-  ifneq ($(MAKECMDGOALS),declare)
-    $(info This $(UCModel) worker $(Worker) not built since no $(UCModel) targets or platforms specified)
+  ifeq ($(filter xml declare,$(MAKECMDGOALS)),)
+    $(call OcpiInfo, This $(UCModel) worker $(Worker) not built since no $(UCModel) targets or platforms specified.)
   endif
-  all: liblinks
+  all: $(if $(filter 1,$(OCPI_DOC_ONLY)),docs,liblinks $(if $(filter 1,$(OCPI_NO_DOC)),,docs))
 else
-  all: skeleton links
+  # All worker-derived assets (worker, platform, assembly, config, container etc.)
+  # might have doc
+  all: $(if $(filter 1,$(OCPI_DOC_ONLY)),docs,skeleton links $(if $(filter 1,$(OCPI_NO_DOC)),,docs))
 endif
+docs:  $(and $(if $(HdlMode),$(filter $(HdlMode),worker),1),doc)
+doc:
+	$(AT)ocpidoc build
+# This echoing is to allow the AT= construct to work without polluting stdout
+xml:
+	@$(if $(AT),,set -v;) $(OcpiGenEnv) ocpigen -G $(Worker_$(Worker)_xml)
 
 $(SkelFiles): $(GeneratedDir)/%$(SkelSuffix) : $$(Worker_%_xml) | $(GeneratedDir)
 	$(AT)$(OcpiRemoveSkeletons)
@@ -341,9 +349,6 @@ endef
 $(foreach x,$(ImplXmlFiles),$(eval $(call doImplLink,$x)))
 
 endif
-
-
-
 
 # For now, restrict to HDL
 ifeq ($(Model),hdl)

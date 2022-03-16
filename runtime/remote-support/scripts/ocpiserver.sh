@@ -162,7 +162,7 @@ log)
   done
   if [ -f ocpiserve.pid ]; then
     pid=$(cat ocpiserve.pid)
-    if kill -s CONT $(cat ocpiserve.pid); then
+    if kill -s CONT $pid; then
       echo Log is $last, pid is $pid >&2
       tail +0 -f $last
     fi

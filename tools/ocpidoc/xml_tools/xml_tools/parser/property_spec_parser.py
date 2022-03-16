@@ -154,6 +154,7 @@ class PropertySpecParser(base_parser.BaseParser):
             property_[name]["default"] = self._get_attribute(
                 element=property_element, attribute="default",
                 default=None, optional=True)
+            property_[name]["worker_property"] = self._is_true(property_element, "isimpl")
             return property_
         else:
             return None
@@ -196,11 +197,11 @@ class PropertySpecParser(base_parser.BaseParser):
              "members": [{"name": "<member_name>,
                           "type": {"data_type": "ulong"}]}``
         """
-        # Get type attribute. If not present default to ulong
+        # Get type attribute. If not present default to ulong, and make lower case
         type_ = self._get_attribute(
             element=property_element, attribute="type",
-            default="ulong", optional=True)
-        type_dict = {"data_type": type_.lower().strip()}
+            default="ulong", optional=True).lower().strip()
+        type_dict = {"data_type": type_}
 
         # Handle special property types
         if type_ == "struct":

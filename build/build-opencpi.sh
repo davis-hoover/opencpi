@@ -85,6 +85,7 @@ function domake {
   make -C "$dir" $mkf $@
 }
 domake "$project" exports
+echo "Export of platform '$OCPI_TARGET_PLATFORM' completed."
 
 # Build the framework
 echo "Now we will build the OpenCPI framework libraries and utilities for $OCPI_TARGET_DIR"

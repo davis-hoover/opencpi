@@ -45,21 +45,10 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
         Returns:
             An initialized WorkerSpecParser instance.
         """
-        super().__init__(filename=filename,
-                         include_filepaths=include_filepaths)
-        self.name = os.path.splitext(os.path.basename(filename))[0]
-
-        # Check root tag
-        file_root_tag = self._get_root_tag()
-        if file_root_tag == "rccworker":
-            self.authoring_model = "rcc"
-        elif file_root_tag == "hdlworker" or file_root_tag == "hdldevice":
-            self.authoring_model = "hdl"
-        elif file_root_tag == "oclworker":
-            self.authoring_model = "ocl"
-        else:
-            raise ValueError(
-                f"Invalid root XML tag: {file_root_tag}")
+        super().__init__(filename=filename, include_filepaths=include_filepaths)
+        # Capture the name determined by the base class init
+        self.name = os.path.splitext(os.path.basename(self._filename))[0]
+        self.authoring_model = self._xml_root.attrib["model"]
 
     def get_dictionary(self):
         """ Gets a dictionary containing OpenCPI worker information.
@@ -146,27 +135,47 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
             dictionary["name"] = self.name
 
         dictionary["authoring_model"] = self.authoring_model
-
+        dictionary["path"] = self._filename
         # Get all worker attributes
         for key, value in self._xml_root.attrib.items():
             if key == "name":
                 continue
             else:
                 dictionary[key] = value
-
-        if self.authoring_model == "hdl":
-            dictionary["ports"] = self.get_ports(
-                port_type=["streaminterface",
-                           "timeinterface",
-                           "rawprop",
-                           "signal",
-                           "devsignal"])
-        else:
-            dictionary["ports"] = self.get_ports()
-
+        # Get ports, and add to "inputs", "outputs" and other lists
+        port_list = {}
+        # The other sphinx extension code never tests for non-existent dictionary entries...
+        dictionary["inputs"] = {}
+        dictionary["outputs"] = {}
+        dictionary["time"] = {}
+        dictionary["signals"] = {}
+        dictionary["interfaces"] = {}
+        dictionary["other_interfaces"] = {}
+        for port in self._xml_root.iter("port"):
+            name = self._get_attribute(element=port, attribute="name", optional=False)
+            type = port.get("type")
+            port_list[name] = {"type": type}
+            # Get all port attributes
+            for key, value in port.items():
+                if key != "name":
+                    port_list[name][key] = value
+            producer = self._is_true(port, "producer", None, True)
+            if producer != None:
+                protocol = port.find("protocol")
+                if protocol:
+                    protocol_name = protocol.get("name")
+                else:
+                    protocol_name = "None"
+                dictionary["outputs" if producer else "inputs"][name] = {
+                    "protocol" : protocol_name,
+                    "optional" : self._is_true(port, "optional", False, True)
+                }
+            elif type in ["devsignal", "rawprop"]:
+                dictionary["interfaces"][name] = port_list
+        dictionary["ports"] = port_list
         dictionary["properties"] = self.get_properties()
         dictionary["specproperties"] = self.get_spec_properties()
-
+        dictionary["supports"] = self.get_supports()
         return dictionary
 
     def get_combined_dictionary(self, component_spec_file=None):
@@ -259,95 +268,9 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
             are saved (within each named port dictionary) with the attribute
             name as the key and the attribute value as the string value.
         """
-        # Get dictionary of just the information from the OWD file.
+        # Get dictionary from the OWD, which contains the spec information too
         worker = self.get_dictionary()
-
-        # Get dictionary of just the information from the OCS file.
-        component = self.get_component_dictionary(component_spec_file)
-
-        # Add all OWD access flags to OCS properties. This means all
-        # access attributes will always exist, stopping the user from
-        # having to test for existence first.
-        for name, property_ in component["properties"].items():
-            for attrib in self._access_values:
-                if attrib not in \
-                        component["properties"][name]["access"].keys():
-                    component["properties"][name]["access"][attrib] = False
-
-        # Copy the component dict as a starting point for the combined dict.
-        combined_dictionary = copy.deepcopy(component)
-        combined_dictionary["time"] = {}
-        combined_dictionary["signals"] = {}
-        combined_dictionary["interfaces"] = {}
-        combined_dictionary["other_interfaces"] = {}
-
-        # Copy all basic attributes from worker into combined dict
-        for name, property_ in worker.items():
-            if name not in ["ports", "properties", "specproperties"]:
-                combined_dictionary[name] = property_
-
-        # Add all worker properties into the combined dict
-        combined_dictionary["properties"].update(worker["properties"])
-
-        # Add a flag to all properties unique to the OWD so that they can be
-        # differentiated from those defined in the OCS
-        for name, property_ in combined_dictionary["properties"].items():
-            if name in worker["specproperties"].keys() or \
-                (name in worker["properties"].keys() and
-                 name not in component["properties"].keys()):
-                combined_dictionary[
-                    "properties"][name]["worker_property"] = True
-            else:
-                combined_dictionary[
-                    "properties"][name]["worker_property"] = False
-
-        # Apply specproperties to properties
-        for name, property_ in worker["specproperties"].items():
-            if name not in combined_dictionary["properties"].keys():
-                # Ignore specproperties that refer to properties that are not
-                # in the OCS.
-                continue
-
-            # Update  access values from the specproperty element.
-            for value in self._spec_property_access_values:
-                # This will override both access properties with both a
-                # true or a false value set in a specproperty element.
-                # Typically OpenCPI only allows changing a false to a true
-                # value, but this is not enforced here.
-                if property_["access"][value] is not None:
-                    combined_dictionary["properties"][name]["access"][value] =\
-                        property_["access"][value]
-
-            # Set the value/default attributes.
-            if combined_dictionary["properties"][name]["value"] is None:
-                if property_["value"] is not None:
-                    combined_dictionary["properties"][name]["value"] =\
-                        property_["value"]
-                    combined_dictionary["properties"][name]["default"] = None
-                elif property_["default"] is not None:
-                    combined_dictionary["properties"][name]["default"] =\
-                        property_["default"]
-
-        # Apply worker port settings to component ports
-        for name, property_ in worker["ports"].items():
-            if name in combined_dictionary["inputs"].keys():
-                combined_dictionary["inputs"][name].update(property_)
-            elif name in combined_dictionary["outputs"].keys():
-                combined_dictionary["outputs"][name].update(property_)
-            else:
-                # Store other interfaces like the time interface that are not
-                # specified in the OCS file.
-                if property_["type"] == "timeinterface":
-                    combined_dictionary["time"][name] = property_
-                elif property_["type"] == "signal":
-                    combined_dictionary["signals"][name] = property_
-                elif property_["type"] == "rawprop" or \
-                        property_["type"] == "devsignal":
-                    combined_dictionary["interfaces"][name] = property_
-                else:
-                    combined_dictionary["other_interfaces"][name] = property_
-
-        return combined_dictionary
+        return worker
 
     def get_component_dictionary(self, component_spec_file=None):
         """ Get dictionary containing component specification.
@@ -377,12 +300,13 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
                           "outputs": {}}
             return empty_spec
 
-    def get_ports(self, port_type=["port"]):
+    def get_ports(self, port_types=None):
         """ Gets a dictionary of all ports and associated arguments.
 
         Args:
-            port_type (``list``): List of strings containing the names of
-                the port elements to search for in the XML file.
+            port_types (``list``): List of strings containing the types of
+                the port elements to search for in the XML file.  If None,
+                take all ports
         Returns:
             Python dict containing port names, types and associated
             attributes. E.g.
@@ -393,6 +317,15 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
                 {'time':{'type': 'timeinterface', "secondswidth": "32"}}
         """
         port_list = {}
+        for port in self._xml_root.iter("port"):
+            name = self._get_attribute(element=port, attribute="name", optional=False)
+            port_list[name] = {"type": tag}
+            # Get all port attributes
+            for key, value in port.items():
+                if key != "name":
+                    port_list[name][key] = value
+
+
         for tag in port_type:
             for port in self._xml_root.iter(tag):
                 name = self._get_attribute(
@@ -403,18 +336,6 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
                 else:
                     name.strip()
                 port_list[name] = {"type": tag}
-
-                # Add attributes and their default values here to ensure
-                # they are displayed in the generated documentation if
-                # they are left unspecified
-                if port.tag == "rawprop":
-                    port_list[name].update({"master": "false"})
-                if port.tag == "devsignal":
-                    port_list[name].update({"count": "1",
-                                            "optional": "false",
-                                            "master": "false",
-                                            "signals": "unspecified"})
-
                 # Get all port attributes
                 for key, value in port.items():
                     if key == "name":
@@ -423,3 +344,17 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
                         port_list[name][key] = value
 
         return port_list
+
+    def get_supports(self):
+        """ Gets a dictionary of all supports relationships.
+        The key is the worker, and the value is a dictionary of connections
+        The connection dictionary's key is the worker's port, and the value is
+        a tuple of supported worker port and index
+        """
+        supports_list = {}
+        for supports in self._xml_root.iter("supports"):
+            connections = {}
+            for connect in supports.iter("connect"):
+                connections[connect.attrib["port"]] = connect.attrib["to"], connect.attrib["index"]
+            supports_list[supports.attrib["worker"]] = connections
+        return supports_list

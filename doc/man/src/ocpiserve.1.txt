@@ -74,7 +74,7 @@ that it can be specified more than once on the command line.
 *`--addresses=`*'<file>', *`-a`* '<file>'::
     Specify a file to which *`ocpiserve`* should write all its TCP/IP
     addresses. See the description of the OCPI_SERVER_ADDRESSES_FILE
-    in the 'OpenCPI Application Development Guide' for details.
+    in the 'OpenCPI Application Development Guide' or *`ocpiremote`* man page for details.
 
 *`--directory=`* '<directory-name>', *`-D`* '<directory-name>'::
     Specify the name of a directory to use for caching downloaded

@@ -27,9 +27,6 @@ import re
 
 import _opencpi.util as ocpiutil
 
-import xml_tools
-
-
 AUTHORING_MODELS = [".rcc", ".hdl", ".ocl"]
 
 
@@ -123,28 +120,6 @@ def create(directory, documentation_type, name=None, **kwargs):
     project = None
     project_prefix = None
     project_path = ocpiutil.get_path_to_project_top(str(directory))
-    if project_path is not None:
-        project_path = pathlib.Path(project_path).resolve()
-        # Check for Project.mk
-        if project_path.joinpath("Project.mk").is_file():
-                with open(project_path.joinpath("Project.mk"),
-                          "r") as project_file:
-                    for line in project_file:
-                        if line.startswith("PackagePrefix="):
-                            project_prefix = line[14:].strip()
-                        if line.startswith("PackageName="):
-                            project = line[12:].strip()
-        # Check for Project.xml
-        if project_path.joinpath("Project.xml").is_file():
-            with xml_tools.parser.BaseParser(
-                    project_path.joinpath("Project.xml")
-            ) as file_parser:
-                owd_xml_root = file_parser.getroot()
-                if owd_xml_root.tag == "project":
-                    if "packageprefix" in owd_xml_root.attrib:
-                        project_prefix = owd_xml_root.attrib["packageprefix"]
-                    if "packagename" in owd_xml_root.attrib:
-                        project = owd_xml_root.attrib["packagename"]
 
     # Determine if within a library and if so get the library name so can be
     # used to replace placeholder in template. For loop limited to 2 to allow

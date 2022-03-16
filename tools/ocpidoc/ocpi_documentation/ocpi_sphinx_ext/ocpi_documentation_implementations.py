@@ -22,6 +22,7 @@
 
 
 import pathlib
+import os
 
 import docutils
 import docutils.parsers.rst
@@ -50,27 +51,30 @@ class OcpiDocumentationImplementations(docutils.parsers.rst.Directive):
         # Variable to add the resulting output to
         content = []
 
-        implementations = []
+        implementations = [] # actual paths of worker doc primary rst files
+        source_path = pathlib.Path(self.state.document.attributes["source"])
+        source_dir = source_path.parent
         for argument in self.arguments:
-            file_path = self.state.document.attributes["source"]
-            worker_directory = pathlib.Path(
-                file_path).parent.joinpath(argument)
-
-            if len(list(worker_directory.glob("*-worker.rst"))) == 1:
-                implementations.append(
-                    list(worker_directory.glob("*-worker.rst"))[0])
-            elif len(list(worker_directory.glob("*-worker.rst"))) == 0:
+            if argument.startswith("../"):
+                link = "gen/" + argument[2:]
+                if source_dir.joinpath(link).exists():
+                    argument = link
+            worker_directory = source_dir.joinpath(argument)
+            worker_name = worker_directory.stem
+            found = None
+            # try {worker_name}-worker.rst for legacy, {worker_name}.rst, then index.rst
+            # {worker_name}.rst for consistency with {worker_name}.xml, as doc'd
+            for doc_name in [ f'{worker_name}-worker', worker_name, "index" ]:
+                doc = worker_directory.joinpath(doc_name + ".rst")
+                if doc.exists():
+                    implementations.append(doc)
+                    found = doc
+                    break
+            if not found:
                 self.state_machine.reporter.warning(
                     f"Implementation argument {argument} gives directory "
                     + f"{worker_directory} which does not contain a "
-                    + "*-worker.rst file",
-                    line=self.lineno)
-            else:
-                self.state_machine.reporter.warning(
-                    f"Implementation argument {argument} gives directory "
-                    + f"{worker_directory} which does contain more than one "
-                    + "*-worker.rst file, so cannot uniquely determine main "
-                    + "worker documentation page",
+                    + f"{worker_name}.rst (preferred) or {worker_name}-worker.rst or index.rst file",
                     line=self.lineno)
 
         if not implementations:
@@ -85,7 +89,7 @@ class OcpiDocumentationImplementations(docutils.parsers.rst.Directive):
             model = implementation.parent.suffix[1:]
 
             worker_link = sphinx.addnodes.pending_xref(
-                "", refdoc=self.state.document.settings.env.docname,
+                implementation.relative_to(source_dir).with_suffix(""),
                 refdomain="std", refexplicit="True",
                 reftarget=f"{name}-{model}-worker", reftype="ref",
                 refwarn=True)
@@ -148,15 +152,21 @@ class OcpiDocumentationImplementations(docutils.parsers.rst.Directive):
         # which enables, for example, figure and equation numbering to be
         # displayed in the generated worker documentation pages.
         toctree_rst = docutils.statemachine.ViewList()
-        toctree_rst.append(".. toctree::", file_path, self.lineno + 1)
-        toctree_rst.append("   :hidden:", file_path, self.lineno + 2)
-        toctree_rst.append("   :glob:", file_path, self.lineno + 3)
-        toctree_rst.append("", file_path, self.lineno + 4)
+        toctree_rst.append(".. toctree::", source_path, self.lineno + 1)
+        toctree_rst.append("   :hidden:", source_path, self.lineno + 2)
+        toctree_rst.append("   :glob:", source_path, self.lineno + 3)
+        toctree_rst.append("", source_path, self.lineno + 4)
 
         line_number_rst = self.lineno + 5
-        for worker_directory in self.arguments:
-            toctree_rst.append(f"   {worker_directory}/{name}-worker",
-                               file_path, line_number_rst)
+        for implementation in implementations:
+            # prepare a path acceptable to toctree, eliminating any ".." and making it
+            # relative to the top level "project"" directory, with leading /
+            # (called "absolute" in the toctree documentation)
+            toctree_docname = "/" + str(
+                implementation.
+                relative_to(pathlib.Path(self.state.document.settings.env.project.srcdir)).
+                with_suffix(""))
+            toctree_rst.append(f"   {toctree_docname}", source_path, line_number_rst)
             line_number_rst = line_number_rst + 1
 
         self.state.nested_parse(toctree_rst, 0, implementation_list)

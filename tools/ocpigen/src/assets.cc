@@ -83,17 +83,17 @@ parseApplication(ezxml_t xml) {
   if ((err = OE::checkAttrs(xml, APPLICATION_ATTRS, PROJECT_AND_LIBRARY_ATTRS, NULL)) ||
       (err = OE::checkElements(xml, OCPI_ASSY_ELEMENTS, NULL)))
     return err;
+  const char *runattrs[] = { OCPI_APP_DEV_ATTRS, NULL };
+  for (const char **ap = runattrs; *ap; ++ap)
+    attrMap[*ap] = "";
   // add mappings from attribute names to makefile variables
   attrMap["RunBefore"] = "OcpiRunBefore";
   attrMap["RunAfter"] = "OcpiRunAfter";
-  attrMap["RunArgs"] = "OcpiRunArgs";
+  attrMap["RunArgs"] = "OcpiRunArgsXml";
   attrMap["FileName"] = "OcpiApp";
   attrMap["OtherMains"] = "OcpiApps";
   attrMap["NoRun"] = "OcpiNoRun";
   attrMap["PrereqLibs"] = "OcpiPrereqLibs";
-  const char *runattrs[] = { OCPI_APP_RUN_ATTRS, NULL };
-  for (const char **ap = runattrs; *ap; ++ap)
-    attrMap[*ap] = "";
   return NULL;
 }
 

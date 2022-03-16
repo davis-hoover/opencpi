@@ -260,6 +260,7 @@ namespace OCPI {
 	getOptionalString(ezxml_t x, std::string &s, const char *attr,
 			  const char *def = "");
       extern void
+        emitBoolAttr(std::string &out, const char *name, bool value, bool verbose),
         hoist(bool testValue, ezxml_t node, ezxml_t parent),
 	unindent(std::string &in), // strip common indent of lines in text element
 	getNameWithDefault(ezxml_t x, std::string &s, const char *fmt, unsigned &ord);

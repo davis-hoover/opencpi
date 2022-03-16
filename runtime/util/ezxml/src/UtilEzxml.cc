@@ -885,6 +885,14 @@ namespace OCPI {
 	  str.resize(str.size() - 1);
 	in = str;
       }
+      void
+      emitBoolAttr(std::string &out, const char *name, bool value, bool verbose) {
+	if (verbose)
+	  OU::formatAdd(out, " %s='%s'", name, value ? "true" : "false");
+	else if (value)
+	  OU::formatAdd(out, " %s='1'", name);
+      }
+
       // Hoist children if testValue is true
       void hoist(bool testValue, ezxml_t node, ezxml_t parent) {
         ocpiDebug("BEFORE HOIST:\n%s", ezxml_toxml(parent));

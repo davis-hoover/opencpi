@@ -165,7 +165,7 @@ namespace OCPI {
 
     Worker::~Worker()
     {
-      ocpiDebug("In  Container::Worker::~Worker()");
+      ocpiDebug("In  Container::Worker::~Worker(): %s", cname());
       if (m_artifact)
 	m_artifact->removeWorker(*this);
       for (unsigned i = 0; i < m_cache.size(); i++)
@@ -857,12 +857,12 @@ namespace OCPI {
     run Worker::							\
     get##pretty##PropertyOrd(unsigned ordinal, unsigned idx) const {	\
       auto &pi = checkInfo(ordinal);					\
-      return get##pretty##Property(pi, pi, (size_t)0, idx);		\
+      return get##pretty##Cached(pi, pi, (size_t)0, idx);		\
     }									\
     void Worker::							\
     set##pretty##PropertyOrd(unsigned ordinal, run val, unsigned idx) const { \
       auto &pi = checkInfo(ordinal);					\
-      set##pretty##Property(pi, pi, 0, val, idx);			\
+      set##pretty##Cached(pi, pi, 0, val, idx);			\
     }									\
     run Worker::							\
     get##pretty##Parameter(unsigned ordinal, unsigned idx) const {	\
@@ -920,13 +920,13 @@ namespace OCPI {
     void Worker::
     setStringPropertyOrd(unsigned ordinal, const char *s, unsigned idx) const {
       checkInfo(ordinal);
-      setStringProperty(m_properties[ordinal], m_properties[ordinal], 0, s, idx);
+      setStringCached(m_properties[ordinal], m_properties[ordinal], 0, s, idx);
     }
 
     void Worker::
     getStringPropertyOrd(unsigned ordinal, char *str, size_t length, unsigned idx) const {
       checkInfo(ordinal);
-      getStringProperty(m_properties[ordinal], m_properties[ordinal], 0, str, length, idx);
+      getStringCached(m_properties[ordinal], m_properties[ordinal], 0, str, length, idx);
     }
 
     void Worker::

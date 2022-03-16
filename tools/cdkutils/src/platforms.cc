@@ -175,25 +175,38 @@ static const char
   PROJECT_MK[] = "Project.mk",
   PROJECT_XML[] = "Project.xml",
   PROJECT_REL_DIR_ENV[] = "OCPI_PROJECT_REL_DIR";
+
+// Get the relative path of the project we are in.
+// Look in the environment first, but if the environment is wrong, do it manually
+// This accomodation of the environment being wrong is because we do not have
+// control of the directory recursion in sphinx...
 static const char *
 getProjectRelDir(std::string &dir) {
   const char *env = getenv(PROJECT_REL_DIR_ENV);
-  if (env)
+  if (env) {
     dir = env;
-  else {
-    OF::FileId dot, dotdot;
-    std::string up;
-    for (up = "./"; !OF::exists(up + PROJECT_MK) && !OF::exists(up + PROJECT_XML); up += "../")
-      if (!OF::exists(up + ".", NULL, NULL, NULL, &dot) ||
-	  !OF::exists(up + "..", NULL, NULL, NULL, &dotdot) ||
-	  dot == dotdot) {
-	return OU::esprintf("Could not find containing project directory (i.e. count not find \"%s\""
-			    " nor \"%s\" in any parent directory", PROJECT_MK, PROJECT_XML);
-      }
-    env = up == "./" ? up.c_str() : up.c_str() + 2;
-    ocpiCheck(setenv(PROJECT_REL_DIR_ENV, env, 1) == 0);
-    dir = env;
+    bool isDir;
+    if (OF::exists(dir, &isDir) && isDir &&
+	(OF::exists(dir + "/" + PROJECT_MK) || OF::exists(dir + "/" + PROJECT_XML)))
+      return NULL;
+    ocpiInfo("The %s environment setting, \"%s\", is broken and does not point to a project dir",
+	     PROJECT_REL_DIR_ENV, env);
   }
+  OF::FileId dot, dotdot;
+  std::string up;
+  for (up = "./"; !OF::exists(up + PROJECT_MK) && !OF::exists(up + PROJECT_XML);
+       up += "../")
+    if (!OF::exists(up + ".", NULL, NULL, NULL, &dot) ||
+	!OF::exists(up + "..", NULL, NULL, NULL, &dotdot) ||
+	dot == dotdot) {
+      return OU::esprintf("Could not find containing project directory (i.e. count not find \"%s\""
+			  " nor \"%s\" in any parent directory", PROJECT_MK, PROJECT_XML);
+    }
+  up.resize(up.length() - 1); // nuke trailing slash
+  if (up != ".")
+    up.erase(0, 2); // nuke leading ./
+  ocpiCheck(setenv(PROJECT_REL_DIR_ENV, up.c_str(), 1) == 0);
+  dir = up;
   return NULL;
 }
 

@@ -953,6 +953,8 @@ function get_spec {
       elif [ -e $subdir/specs/${1}_spec.xml -o \
              "$odirtype" == project -a -e specs/${1}_spec.xml ]; then
 	s=${1}_spec
+      elif [ -e $subdir/${1}.comp/${1}-spec.xml ]; then
+	s=${1}-spec
       elif [ -n "$Emulate" ] ; then
         s=emulator-spec
       elif [ "$odirtype" == project ]; then
@@ -2246,6 +2248,8 @@ while [[ "${argv[0]}" != "" ]] ; do
       (--generate) generate=1;;     # for building tests, do the "generate" subset of build
       (--simulation) simulation=1;; # for cleaning tests, clean the simulation directories
       (--execute) execute=1;;       # for cleaning tests, clean the execution/run directories
+      (--no-doc) export OCPI_NO_DOC=1;;
+      (--doc-only) export OCPI_DOC_ONLY=1;;
       (*)
         error_msg="unknown option: ${argv[0]}"
         if [ -n "$verb" ]; then

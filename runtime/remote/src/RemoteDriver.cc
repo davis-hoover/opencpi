@@ -446,7 +446,7 @@ useServers(const OB::PValue *params, bool verbose, bool discovery, unsigned &cou
   if (saddr && probeServer(saddr, verbose, NULL, NULL, discovery, count, error))
     return true;
   if ((saddr = getenv("OCPI_SERVER_ADDRESSES")))
-    for (OU::TokenIter li(saddr); li.token(); li.next())
+    for (OU::TokenIter li(saddr, ","); li.token(); li.next())
       if (probeServer(li.token(), verbose, NULL, NULL, discovery, count, error))
 	return true;
   saddr = getenv("OCPI_SERVER_ADDRESSES_FILE"); // This is documented and consistent
@@ -456,7 +456,7 @@ useServers(const OB::PValue *params, bool verbose, bool discovery, unsigned &cou
     if (err)
       throw OU::Error("The file indicated by the OCPI_SERVER_ADDRESS_FILE environment "
 		      "variable, \"%s\", cannot be opened: %s", saddr, err);
-    for (OU::TokenIter li(addrs); li.token(); li.next())
+    for (OU::TokenIter li(addrs,",\n"); li.token(); li.next())
       if (probeServer(li.token(), verbose, NULL, NULL, discovery, count, error))
 	return true;
   }
@@ -493,7 +493,10 @@ probeServer(const char *a_server, bool verbose, const char **exclude, char *cont
   const char *sport = strchr(server, ':');
   if (sport) {
     const char *err;
-    if ((err = OB::Value::parseUShort(sport + 1, NULL, port)))
+    const char
+      *l_port = sport + 1,
+      *end = strchr(l_port, ':'); // allow more colon-delimited fields after port
+    if ((err = OB::Value::parseUShort(l_port, end, port)))
       return OU::eformat(error, "Bad port number in server name: \"%s\"", server);
     host.resize(OCPI_SIZE_T_DIFF(sport, server));
   } else
@@ -516,7 +519,7 @@ probeServer(const char *a_server, bool verbose, const char **exclude, char *cont
 	goto out;
       }
       // Throw an exception here since explicit servers are an error
-      throw OU::Error("Error connecting to server \"%s\": %s", server, e.c_str());
+      throw OU::Error("Error connecting to server \"%s:%u\": %s", host.c_str(), port, e.c_str());
     }
     std::string request("<discover>");
     bool eof;

@@ -28,27 +28,34 @@
 #include "MetadataAssembly.hh"
 #include "ocpigen.h"
 
+// Port types have an enum, a tag, and a description
+#define PORT_TYPES \
+  PORT_TYPE(NoPort,       port,             "no port type")\
+  PORT_TYPE(WCIPort,      WorkerControl,    "worker control")\
+  PORT_TYPE(WSIPort,      StreamInterface,  "HDL streaming data")\
+  PORT_TYPE(WMIPort,      MessageInterface, "HDL messaging data")\
+  PORT_TYPE(WDIPort,      Data,             "Generic data port") \
+  PORT_TYPE(WMemIPort,    Memory,           "memory Access") \
+  PORT_TYPE(WTIPort,      TimeInterface,    "time of day") \
+  PORT_TYPE(CPPort,       MasterControl,    "platform control")\
+  PORT_TYPE(NOCPort,      NOC,              "legacy NOC")\
+  PORT_TYPE(MetadataPort, Metadata,         "container metadata")\
+  PORT_TYPE(TimePort,     TimeService,      "time service output")\
+  PORT_TYPE(TimeBase,     TimeBase,         "time service input from platorm")\
+  PORT_TYPE(PropPort,     RawProp,          "raw property access") \
+  PORT_TYPE(RCCPort,      RCCData,          "RCC data")\
+  PORT_TYPE(DevSigPort,   devsignal,        "Device Signal Bundle") \
+  PORT_TYPE(SDPPort,      sdp,              "Scalable data plane")
+
+
 // FIXME: this will not be needed when we fully migrate to classes...
 enum WIPType {
-  NoPort,
-  WCIPort,
-  WSIPort,
-  WMIPort,
-  WDIPort, // used temporarily
-  WMemIPort,
-  WTIPort,
-  CPPort,       // Control master port, ready to connect to OCCP
-  NOCPort,      // NOC port, ready to support CP and DP
-  MetadataPort, // Metadata to/from platform worker
-  TimePort,     // TimeService port
-  TimeBase,     // TimeBase port - basis for time service
-  PropPort,     // raw property port for shared SPI/I2C
-  RCCPort,      // An RCC port
-  DevSigPort,   // a port between devices
-  SDPPort,
+#define PORT_TYPE(type, name, description) type,
+PORT_TYPES
+#undef PORT_TYPE
   NWIPTypes
 };
-
+extern const char *portTags[];
 class DataPort;
 class Port;
 struct OcpAdapt;
@@ -120,6 +127,7 @@ public:
   virtual bool haveWorkerOutputs() const { return true; }
   virtual const char *typeName() const = 0;
   virtual const char *prefix() const = 0;
+  virtual bool onlyVerboseXML() const { return true; } // only emit XML in verbose mode
   virtual bool isOCP() const { return false; }
   virtual bool isData() const { return false; }
   virtual DataPort *dataPort() { return NULL; }
@@ -168,7 +176,8 @@ public:
 			      size_t count, bool output, const Port *signalPort, bool external);
   virtual const char *fixDataConnectionRole(OCPI::Metadata::Assembly::Role &role);
   virtual const char *doPatterns(unsigned nWip, size_t &maxPortTypeName);
-  virtual void emitXML(std::string &out);
+  virtual void emitXmlAttrs(std::string &out, bool verbose) const;
+  virtual void emitXmlElements(std::string &out, bool verbose) const;
   virtual const char *finalizeRccDataPort();
   virtual const char *finalizeHdlDataPort();
   virtual const char *finalizeOclDataPort();

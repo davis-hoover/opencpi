@@ -122,6 +122,14 @@ COMMON_OPTIONS = {
         'long': '--force',
         'short': '-f',
         'action': 'store_true'
+    },
+    'no_doc': {
+        'long': '--no-doc',
+        'action': 'store_true'
+    },
+    'doc_only': {
+        'long': '--doc-only',
+        'action': 'store_true'
     }
 }
 

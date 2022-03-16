@@ -49,9 +49,9 @@ OCPIRUN=$OCPIBIN/ocpirun
 # The caller needs to set the HDL platform if we are using it at all since they know
 # which tools are installed.
 if [ -z "$HDL_PLATFORM" ] ; then
-  HDL_PLATFORM=isim_pf
-  HDL_TARGET=isim
-  if (env|grep 'HdlPlatforms=$') || ! $OCPIRUN -v -C --only-platforms | grep '[^a-zA-Z]isim$'; then
+  HDL_PLATFORM=xsim
+  HDL_TARGET=xsim
+  if (env|grep 'HdlPlatforms=$') || ! $OCPIRUN -v -C --only-platforms | grep '[^a-zA-Z]xsim$'; then
     HDL_NO_BUILD=1
     echo No HDL tests will be performed.
     RCC=--rcc
@@ -136,7 +136,9 @@ done
 echo "========Creating HDL platforms"
 platnames=(alst4_0 matchstiq_z1_0 ml605_0 picoflexor_0 zed_0)
 for plat in ${platnames[@]} ; do
-  do_ocpidev create hdl platform $plat -g $HDL_PLATFORM -q 200e6
+  #do_ocpidev create hdl platform $plat -g $HDL_PLATFORM -q 200e6
+  # Set a part that we know is in the database
+  do_ocpidev create hdl platform $plat -g xsim -q 200e6
 done
 #sed -ie "s/HdlPart_.*=.*/HdlPart_alst4_0=isim/g" hdl/platforms/alst4_0/alst4_0.mk
 
@@ -373,8 +375,13 @@ if [ -z "$NO_BUILD" ] ; then
   do_ocpidev clean worker comp1.rcc -l dsp_comps --build-rcc-platform $RCC_PLATFORM
   do_ocpidev clean worker comp1.rcc -l dsp_comps --rcc-platform $RCC_PLATFORM
   echo "============OCPIDEVTEST:Building test rcc"
+if [ -z "$HDL_NO_BUILD" ]; then
   do_ocpidev build library dsp_comps $RCC --build-rcc-platform $RCC_PLATFORM --build-hdl-platform $HDL_PLATFORM
   do_ocpidev build library dsp_comps $RCC --rcc-platform $RCC_PLATFORM --hdl-platform $HDL_PLATFORM
+else
+  do_ocpidev build library dsp_comps $RCC --build-rcc-platform $RCC_PLATFORM
+  do_ocpidev build library dsp_comps $RCC --rcc-platform $RCC_PLATFORM
+fi
   do_ocpidev build test comp1.test -l dsp_comps --build-rcc-platform $RCC_PLATFORM
   do_ocpidev build test comp1.test -l dsp_comps --rcc-platform $RCC_PLATFORM
   do_ocpidev clean test comp1.test -l dsp_comps --build-rcc-platform $RCC_PLATFORM
@@ -382,8 +389,13 @@ if [ -z "$NO_BUILD" ] ; then
   do_ocpidev clean library dsp_comps --build-rcc
   do_ocpidev clean library dsp_comps --rcc
   echo "============OCPIDEVTEST:Building tests rcc"
+if [ -z "$HDL_NO_BUILD" ]; then
   do_ocpidev build project . $RCC --build-rcc-platform $RCC_PLATFORM --build-hdl-platform $HDL_PLATFORM
   do_ocpidev build project . $RCC --rcc-platform $RCC_PLATFORM --hdl-platform $HDL_PLATFORM
+else
+  do_ocpidev build project . $RCC --build-rcc-platform $RCC_PLATFORM
+  do_ocpidev build project . $RCC --rcc-platform $RCC_PLATFORM
+fi
   do_ocpidev build tests --build-rcc-platform $RCC_PLATFORM
   do_ocpidev build tests --rcc-platform $RCC_PLATFORM
   echo "============OCPIDEVTEST:Building tests rcc clean"
@@ -426,10 +438,10 @@ if [ -z "$HDL_NO_BUILD" ]; then
   do_ocpidev clean hdl primitives --build-hdl-platform $HDL_TARGET
   do_ocpidev clean hdl primitives --hdl-platform $HDL_TARGET
 fi
+if [ -z "$HDL_NO_BUILD" ]; then
   echo "============OCPIDEVTEST:Building project no assys2 "
   do_ocpidev build project . $RCC --build-hdl-platform $HDL_PLATFORM --build-no-assemblies
   do_ocpidev build project . $RCC --hdl-platform $HDL_PLATFORM --no-assemblies
-if [ -z "$HDL_NO_BUILD" ]; then
   echo "============OCPIDEVTEST:Building assy "
   do_ocpidev build hdl assemblies --build-hdl-platform $HDL_PLATFORM
   do_ocpidev build hdl assemblies --hdl-platform $HDL_PLATFORM
@@ -437,12 +449,19 @@ fi
   echo "============OCPIDEVTEST:Clean "
   do_ocpidev clean
   echo "============OCPIDEVTEST:Building project HP"
+if [ -z "$HDL_NO_BUILD" ]; then
   do_ocpidev -v build project . $RCC --build-hdl-platform $HDL_PLATFORM
   do_ocpidev -v build project . $RCC --hdl-platform $HDL_PLATFORM
+else
+  do_ocpidev -v build project . $RCC
+  do_ocpidev -v build project . $RCC
+fi
   do_ocpidev clean
   echo "============OCPIDEVTEST:Building project HSP/HP"
+if [ -z "$HDL_NO_BUILD" ]; then
   do_ocpidev build project . $RCC --build-hdl-rcc-platform $HDL_PLATFORM --build-hdl-platform $HDL_PLATFORM
   do_ocpidev build project . $RCC --hdl-rcc-platform $HDL_PLATFORM --hdl-platform $HDL_PLATFORM
+fi
   do_ocpidev run tests # note that "ocpidev run libraries" does not work, and "ocpi run library components" should fail!
   do_ocpidev run -d components
   fi
