@@ -38,10 +38,11 @@ Changes/additions since [OpenCPI Release v2.4.0](https://gitlab.com/opencpi/open
 - **doc**: update tutorial 1 content and GUI screenshots. (!824)(964cb480)
 - **doc**: update based on feedback as well as screenshots. (!825)(6b49ce6c)
 - **doc**: update tutorial 2 images and sections. (!835)(82617c30)
-- **doc**: Update images to use new gui, and update multiple sections based on feedback for tutorial 6. (!837)(a1389694)
+- **doc**: update images to use new gui, and update multiple sections based on feedback for tutorial 6. (!837)(a1389694)
 - **doc**: add sentence to reference vivado usage guide. (!839)(ac152ddd)
 - **doc**: tutorial 2 references complex_mixer_tutorial. (!846)(442d8f1e)
 - **doc**: update tutorial 8 hardware version screen shots. (!848)(448e3f34)
+- **doc**: update all of tutorial 10 based on the DRC. (!861)(a77883c0)
 - **tools**: modify `gen-cg-pdfs.sh` to allow use of new section selector variable. (!834)(ae47fe61)
 - **tools**: refactor `OcpiKernelDir` assignment logic for `centos` and `ubuntu` platforms. (!849)(567041c2)
 
