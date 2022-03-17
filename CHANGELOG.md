@@ -1,4 +1,4 @@
-# [v2.4.1](https://gitlab.com/opencpi/opencpi/-/compare/v2.4.0...v2.4.1) (2022-03-16)
+# [v2.4.1](https://gitlab.com/opencpi/opencpi/-/compare/v2.4.0...v2.4.1) (2022-03-17)
 
 Changes/additions since [OpenCPI Release v2.4.0](https://gitlab.com/opencpi/opencpi/-/releases/v2.4.0)
 
@@ -16,6 +16,7 @@ Changes/additions since [OpenCPI Release v2.4.0](https://gitlab.com/opencpi/open
 
 ### Bug Fixes
 - **devops**: fix various issues related to CI/CD overhaul/containerization effort. (!831)(26413dfe)
+- **doc**: update tutorial 5. (!827)(cbb0ade6)
 - **doc**: fix typo in PyQt download, update Xilinx WebPACK installation to current procedure in OpenCPI Installation Guide. (!844)(7a7c4142)
 - **doc**: fix diagram problems in Briefing 2 and Briefing 9. (!852)(a6947c95)
 - **doc**: fix typos in Application Development Guide, RCC Development Guide. (!854)(29d5094e)
@@ -35,6 +36,7 @@ Changes/additions since [OpenCPI Release v2.4.0](https://gitlab.com/opencpi/open
 - **doc**: update Tutorial 4 per received feedback. (!820)(ab088225)
 - **doc**: update Tutorial 4 GUI screenshots. (!822)(845f5bce)
 - **doc**: update tutorial 1 content and GUI screenshots. (!824)(964cb480)
+- **doc**: update based on feedback as well as screenshots. (!825)(6b49ce6c)
 - **doc**: update tutorial 2 images and sections. (!835)(82617c30)
 - **doc**: Update images to use new gui, and update multiple sections based on feedback for tutorial 6. (!837)(a1389694)
 - **doc**: add sentence to reference vivado usage guide. (!839)(ac152ddd)
