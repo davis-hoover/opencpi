@@ -888,7 +888,7 @@ def sort_tags(tags: List[str], reverse: bool = False):
 
 if __name__ == "__main__":
     def _find_root(x: Path):
-        while not x.name.startswith("opencpi") and len(x.parts) != 1:
+        while len(x.parts) != 1 and not x.joinpath("Framework.exports").exists():
             x = x.parent
         return x
 

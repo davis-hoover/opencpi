@@ -48,6 +48,8 @@ tmpfile="$OUTDIR/${CG}_CLI.$SUFF"
 sed \
     -e 's|\(<text:variable-set text:name="AVGUI"[^/>]* text:formula="[^0-9]*\)[0-9]*|\11|' \
     -e 's|\(<text:variable-set text:name="AVGUI"[^/>]* office:value="\)[^"]*|\11|' \
+    -e 's|\(<text:variable-set text:name="OCPIGUI"[^/>]* text:formula="[^0-9]*\)[0-9]*|\11|' \
+    -e 's|\(<text:variable-set text:name="OCPIGUI"[^/>]* office:value="\)[^"]*|\11|' \
     "$INFILE" > "$tmpfile"
 unoconv --output "$OUTDIR/${CG}_CLI.pdf" "$tmpfile"
 rm -f "$tmpfile"
@@ -57,6 +59,8 @@ tmpfile="$OUTDIR/${CG}_GUI.$SUFF"
 sed \
     -e 's|\(<text:variable-set text:name="AVGUI"[^/>]* text:formula="[^0-9]*\)[0-9]*|\12|' \
     -e 's|\(<text:variable-set text:name="AVGUI"[^/>]* office:value="\)[^"]*|\12|' \
+    -e 's|\(<text:variable-set text:name="OCPIGUI"[^/>]* text:formula="[^0-9]*\)[0-9]*|\12|' \
+    -e 's|\(<text:variable-set text:name="OCPIGUI"[^/>]* office:value="\)[^"]*|\12|' \
     "$INFILE" > "$tmpfile"
 unoconv --output "$OUTDIR/${CG}_GUI.pdf" "$tmpfile"
 rm -f "$tmpfile"

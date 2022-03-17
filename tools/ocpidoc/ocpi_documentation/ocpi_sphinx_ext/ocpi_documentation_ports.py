@@ -54,86 +54,13 @@ class OcpiDocumentationPorts(docutils.parsers.rst.Directive):
         """
         # Variable to add the resulting output to
         content = []
-
-        # If component specification path is set as option use this. If not,
-        # check for it in the OWD file looking for the "spec" attribute,
-        # otherwise automatically determine likely path based on standard
-        # file structure and naming.
-        if "component_spec" in self.options:
-            component_specification_path = pathlib.Path(
-                self.state.document.attributes["source"]).joinpath(
-                self.options["component_spec"]).resolve()
-        else:
-            component_name = os.path.splitext(pathlib.Path(
-                self.state.document.attributes["source"]).resolve(
-            ).parent.name)[0]
-
-            # Determine valid OWD file paths
-            owd_search_path = pathlib.Path(
-                self.state.document.attributes["source"]).resolve(
-            ).parent.joinpath(f"../{component_name}.*/{component_name}.xml")
-            owd_search_files = glob.glob(str(owd_search_path))
-            owd_files = []
-            for owd_file in owd_search_files:
-                directory_extension = pathlib.Path(owd_file).parent.suffix
-                if directory_extension in [".rcc", ".hdl", ".ocl"]:
-                    owd_files += [owd_file]
-
-            component_specification_path = None
-            current_directory = pathlib.Path(
-                self.state.document.attributes["source"]).resolve().parent
-            specs_directory = current_directory.joinpath("../specs")
-            for owd_file in owd_files:
-                with xml_tools.parser.WorkerSpecParser(
-                        owd_file,
-                        include_filepaths=[current_directory, specs_directory]
-                ) as file_parser:
-                    owd_xml_root = file_parser.getroot()
-                    if owd_xml_root is None:
-                        continue
-                    # Search for "spec" attribute in OWD
-                    if "spec" in owd_xml_root.attrib:
-                        spec_file_name = owd_xml_root.attrib["spec"]
-                        if not spec_file_name.endswith(".xml"):
-                            spec_file_name = spec_file_name + ".xml"
-                        component_specification_path = pathlib.Path(
-                            self.state.document.attributes["source"]).resolve(
-                        ).parent.joinpath("../specs").joinpath(spec_file_name)
-                        break
-                    # Check for "componentspec" in OWD if there's only one
-                    if len(owd_files) == 1:
-                        if len(owd_xml_root.findall("componentspec")) > 0:
-                            component_specification_path = pathlib.Path(
-                                owd_file)
-                            break
-
-            if component_specification_path is None:
-                component_specification_path = pathlib.Path(
-                    self.state.document.attributes["source"]).resolve(
-                ).parent.joinpath("../specs").joinpath(
-                    f"{component_name}-spec.xml")
-
-                # Added to handle _spec.xml naming
-                if not component_specification_path.is_file():
-                    component_specification_path = pathlib.Path(
-                        self.state.document.attributes["source"]).resolve(
-                    ).parent.joinpath("../specs").joinpath(
-                        f"{component_name}_spec.xml")
-
-        if not component_specification_path.is_file():
-            self.state_machine.reporter.warning(
-                "Port listing cannot find component specification, "
-                + f"{component_specification_path}",
-                line=self.lineno)
-            return content
-
-        with xml_tools.parser.ComponentSpecParser(
-                component_specification_path,
-                include_filepaths=[current_directory, specs_directory]
-        ) as file_parser:
-            component_specification = file_parser.get_dictionary()
-
-        # Get any additional text for any ports
+        component_spec = (
+            docutils_helpers.get_component_spec(self.state.document.attributes["source"],
+                                                self.state_machine.reporter, self.lineno)
+        )
+        if not component_spec:
+            return []
+         # Get any additional text for any ports
         additional_text = {}
         for line in self.content:
             if len(line) > 0:
@@ -141,11 +68,11 @@ class OcpiDocumentationPorts(docutils.parsers.rst.Directive):
                 text = line[line.find(":")+1:].strip()
 
                 # Check a valid name
-                if (port_name not in component_specification["inputs"]) and (
-                        port_name not in component_specification["outputs"]):
+                if (port_name not in component_spec["inputs"]) and (
+                        port_name not in component_spec["outputs"]):
                     self.state_machine.reporter.warning(
                         f"No port called {port_name} defined in component "
-                        + f"specification, {component_specification_path}",
+                        + f"specification:  \"{component_spec['path']}\"",
                         line=self.lineno)
                     continue
 
@@ -155,16 +82,14 @@ class OcpiDocumentationPorts(docutils.parsers.rst.Directive):
 
                 additional_text[port_name] = text
 
-        input_list = self._get_port_list(component_specification["inputs"],
-                                         additional_text)
+        input_list = self._get_port_list(component_spec["inputs"], additional_text)
         content.append(docutils.nodes.paragraph(text="Inputs:"))
         if len(input_list) > 0:
             content.append(input_list)
         else:
             content.append(docutils.nodes.paragraph(text="None."))
 
-        output_list = self._get_port_list(component_specification["outputs"],
-                                          additional_text)
+        output_list = self._get_port_list(component_spec["outputs"], additional_text)
         content.append(docutils.nodes.paragraph(text="Outputs:"))
         if len(output_list) > 0:
             content.append(output_list)

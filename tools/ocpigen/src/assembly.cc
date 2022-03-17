@@ -630,8 +630,8 @@ emitXmlWorker(std::string &out, bool verbose) {
         out += " specparameter='1'";
       if (prop->m_specWritable)
         out += " specwritable='1'";
-      if (prop->m_isVolatile)  // if volitile is set it has to be done in the spec
-        out += " specvolitile='1'";
+      if (prop->m_isVolatile)  // if volatile is set it has to be done in the spec
+        out += " specvolatile='1'";
     }
     if (prop->m_isDebug)
       out += " debug='1'";
@@ -681,8 +681,22 @@ emitXmlWorker(std::string &out, bool verbose) {
     prop->printChildren(out, "property", 2);
   }
   unsigned nn;
-  for (nn = 0; nn < m_ports.size(); nn++)
-    m_ports[nn]->emitXML(out);
+  for (nn = 0; nn < m_ports.size(); nn++) {
+    Port &p = *m_ports[nn];
+    if (!p.onlyVerboseXML() || verbose) {
+      out += "    <port";
+      p.emitXmlAttrs(out, verbose);
+      std::string elements;
+      p.emitXmlElements(elements, verbose);
+      if (elements.empty())
+	out += "/>\n";
+      else {
+	out += ">\n";
+	out += elements;
+	out += "    </port>\n";
+      }
+    }
+  }
   for (nn = 0; nn < m_localMemories.size(); nn++) {
     LocalMemory* m = m_localMemories[nn];
     OU::formatAdd(out, "    <localMemory name=\"%s\" size=\"%zu\"/>\n", m->name, m->sizeOfLocalMemory);

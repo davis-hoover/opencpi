@@ -56,109 +56,27 @@ class OcpiDocumentationWorker(PropertiesDirectiveHandler):
         # Variable to add the resulting output to
         content = []
 
-        # If component specification path is set as option use this. If not,
-        # check for it in the OWD file looking for the "spec" attribute,
-        # otherwise automatically determine likely path based on standard
-        # file structure and naming.
-        if "component_spec" in self.options:
-            component_specification_path = pathlib.Path(
-                self.state.document.attributes["source"]).joinpath(
-                self.options["component_spec"]).resolve()
-        else:
-            component_name = os.path.splitext(pathlib.Path(
-                self.state.document.attributes["source"]).resolve(
-            ).parent.name)[0]
-
-            owd_file = pathlib.Path(
-                self.state.document.attributes["source"]).resolve(
-            ).parent.joinpath(f"{component_name}.xml")
-
-            component_specification_path = None
-            current_directory = pathlib.Path(
-                self.state.document.attributes["source"]).resolve().parent
-            specs_directory = current_directory.joinpath("../specs")
-            with xml_tools.parser.WorkerSpecParser(
-                    owd_file,
-                    include_filepaths=[current_directory, specs_directory]
-            ) as file_parser:
-                owd_xml_root = file_parser.getroot()
-                if owd_xml_root is not None:
-                    # Search for "spec" attribute in OWD
-                    if "spec" in owd_xml_root.attrib:
-                        spec_file_name = owd_xml_root.attrib["spec"]
-                        if not spec_file_name.endswith(".xml"):
-                            spec_file_name = spec_file_name + ".xml"
-                        component_specification_path = pathlib.Path(
-                            self.state.document.attributes["source"]).resolve(
-                        ).parent.joinpath("../specs").joinpath(spec_file_name)
-                    else:
-                        # Check for "componentspec" in OWD
-                        if len(owd_xml_root.findall("componentspec")) > 0:
-                            component_specification_path = pathlib.Path(
-                                owd_file)
-
-            if component_specification_path is None:
-                component_specification_path = pathlib.Path(
-                    self.state.document.attributes["source"]).resolve(
-                ).parent.joinpath("../specs").joinpath(
-                    f"{component_name}-spec.xml")
-
-                # Added to handle _spec.xml naming
-                if not component_specification_path.is_file():
-                    component_specification_path = pathlib.Path(
-                        self.state.document.attributes["source"]).resolve(
-                    ).parent.joinpath("../specs").joinpath(
-                        f"{component_name}_spec.xml")
-
-        if not component_specification_path.is_file():
-            self.state_machine.reporter.warning(
-                "Properties listing cannot find component "
-                + f"specification, {component_specification_path}",
-                line=self.lineno)
-            component_specification_path = None
-
-        # If worker description is not set, determine it
-        if "worker_description" in self.options:
-            worker_description_path = pathlib.Path(
-                self.state.document.attributes["source"]).joinpath(
-                self.options["worker_description"]).resolve()
-        else:
-            worker_name = pathlib.Path(
-                self.state.document.attributes["source"]).resolve().parent.stem
-            worker_description_path = pathlib.Path(
-                self.state.document.attributes["source"]).resolve(
-            ).parent.joinpath(f"{worker_name}.xml")
-
-        if worker_description_path.is_file():
-            with xml_tools.parser.WorkerSpecParser(
-                    worker_description_path,
-                    include_filepaths=[current_directory, specs_directory]
-            ) as file_parser:
-                worker_description = file_parser.get_combined_dictionary(
-                    component_specification_path)
-
-        else:
-            self.state_machine.reporter.warning(
-                f"{worker_description_path} is not a valid file path. Worker "
-                + "description cannot be read. Use directive option "
-                + "'worker_description' to set non-default path.",
-                line=self.lineno)
-            worker_description = None
+        rst_path = pathlib.Path(self.state.document.attributes["source"])
+        worker_dir = rst_path.parent
+        if worker_dir.name == "gen":
+            worker_dir = worker_dir.parent
+        with xml_tools.parser.WorkerSpecParser(None, include_filepaths=[str(worker_dir)]) as file_parser:
+            worker_description = file_parser.get_combined_dictionary()
 
         self._parse_context_to_addition_text()
 
         for name in self.additional_text:
             if name not in itertools.chain(
-                    worker_description["properties"],
-                    worker_description["inputs"],
-                    worker_description["outputs"],
-                    worker_description["time"],
-                    worker_description["signals"],
-                    worker_description["interfaces"],
-                    worker_description["other_interfaces"]):
+                    worker_description.get("properties"),
+                    worker_description.get("inputs"),
+                    worker_description.get("outputs"),
+                    worker_description.get("time"),
+                    worker_description.get("signals"),
+                    worker_description.get("interfaces"),
+                    worker_description.get("other_interfaces")):
                 self.state_machine.reporter.warning(
                     f"No property or port called {name} defined in worker "
-                    + f"description, {worker_description_path}",
+                    + f"description, {worker_description.get('path')}",
                     line=self.lineno)
                 continue
 
@@ -189,7 +107,7 @@ class OcpiDocumentationWorker(PropertiesDirectiveHandler):
                         ("other_interfaces", "Other interfaces:")]
 
         for port_type, port_type_header in port_options:
-            if worker_description[port_type] != {}:
+            if worker_description.get(port_type):
                 port_name = list(worker_description[port_type].keys())[0]
                 port_type_rst = port_type_header
                 port_type_doc = docutils_helpers.rst_string_convert(
@@ -201,41 +119,32 @@ class OcpiDocumentationWorker(PropertiesDirectiveHandler):
 
         # Get subdevice connections from OWD, if available
         subdevice_list = docutils.nodes.bullet_list()
-        with xml_tools.parser.WorkerSpecParser(
-            worker_description_path,
-            include_filepaths=[current_directory, specs_directory]
-        ) as file_parser:
-            owd_xml_root = file_parser.getroot()
-            for supports in owd_xml_root.findall("supports"):
-                supported_item = docutils_helpers.list_item_name_code_value(
-                    "Supported device worker", supports.attrib["worker"])
-                supported_item.append(docutils.nodes.line())
-                supported_item.append(
-                    docutils.nodes.paragraph(text="Connections:"))
-                supported_item.append(docutils.nodes.line())
+        for worker,connections in worker_description["supports"].items():
+            supported_item = docutils_helpers.list_item_name_code_value(
+                "Supported device worker", worker)
+            supported_item.append(docutils.nodes.line())
+            supported_item.append(
+                docutils.nodes.paragraph(text="Connections:"))
+            supported_item.append(docutils.nodes.line())
+            connection_list = docutils.nodes.bullet_list()
+            for port,connect in connections:
                 connection_list = docutils.nodes.bullet_list()
-                for connect in supports.findall("connect"):
-                    connection_list = docutils.nodes.bullet_list()
-                    connection_list.append(
-                        docutils_helpers.list_item_name_code_value(
-                            "Subdevice port", connect.attrib["port"]))
-                    worker_port_item = \
-                        docutils_helpers.list_item_name_code_value(
-                            "Supported worker port", connect.attrib["to"])
-                    supported_port_list = docutils.nodes.bullet_list()
-                    if "index" in connect.attrib:
-                        port_index = connect.attrib["index"]
-                    else:
-                        port_index = ""
-                    supported_port_list.append(
-                        docutils_helpers.list_item_name_code_value(
-                            "Index", port_index))
-                    worker_port_item.append(supported_port_list)
-                    connection_list.append(worker_port_item)
-                    supported_item.append(connection_list)
-                    supported_item.append(docutils.nodes.line())
-
-                subdevice_list.append(supported_item)
+                connection_list.append(
+                    docutils_helpers.list_item_name_code_value(
+                        "Subdevice port", port))
+                worker_port_item = \
+                    docutils_helpers.list_item_name_code_value(
+                        "Supported worker port", connect[0])
+                supported_port_list = docutils.nodes.bullet_list()
+                port_index = connect[1]
+                supported_port_list.append(
+                    docutils_helpers.list_item_name_code_value(
+                        "Index", port_index))
+                worker_port_item.append(supported_port_list)
+                connection_list.append(worker_port_item)
+                supported_item.append(connection_list)
+                supported_item.append(docutils.nodes.line())
+            subdevice_list.append(supported_item)
 
         if len(subdevice_list) > 0:
             subdevice_connections_doc = docutils_helpers.rst_string_convert(

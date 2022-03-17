@@ -22,5 +22,7 @@ ${REPO_PATH}/doc/av/tex/docGen.py \
     ${REPO_PATH}/projects/tutorial/components/specs/complex_mixer_tutorial-spec.xml \
     -owd \
     ${REPO_PATH}/projects/tutorial/components/complex_mixer_tutorial.hdl/complex_mixer_tutorial.xml \
+    -owd \
+    ${REPO_PATH}/projects/tutorial/components/complex_mixer_tutorial.rcc/complex_mixer_tutorial.xml \
     --no-prompt
 

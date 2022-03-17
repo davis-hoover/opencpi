@@ -72,6 +72,10 @@ options = {
         'short': '-n',
         'action': 'store_true'
     },
+    'spec_file_only': {
+        'long': '--spec-file-only',
+        'action': 'store_true'
+    },
     'create_test': {
         'long': '--create-test',
         'short': '-t',
@@ -431,6 +435,11 @@ verbs = {
                     'hdl_platform': options['hdl_platform'],
                     'library': options['library']
                 }
+            },
+            'component': {
+                'options': {
+                    'library': options['library']
+                }
             }
         }
     },
@@ -490,6 +499,7 @@ verbs = {
             },
             'project': {
                 'options': {
+                    'clean_all': options['clean_all'],
                     'hdl_assembly': options['hdl_assembly'],
                     'no_assemblies': options['no_assemblies'],
                     'hdl': options['hdl'],
@@ -523,6 +533,11 @@ verbs = {
                     'hdl_platform': options['hdl_platform'],
                     'library': options['library']
                 }
+            },
+            'component': {
+                'options': {
+                    'library': options['library']
+                }
             }
         }
     },
@@ -542,6 +557,7 @@ verbs = {
             'component': {
                 'options': {
                     'name': None,
+                    'spec_file_only': options['spec_file_only'],
                     'no_control': options['no_control'],
                     'platform': options['platform'],
                     'hdl_library': options['hdl_library'],

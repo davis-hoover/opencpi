@@ -332,7 +332,7 @@ for a in $assets; do
 		      needname=$model
 		  fi
 	      else
-		  if [ -z "$model" ] ; then
+		  if [ -z "$model" -a -d components ] ; then
                      dt=$(ocpiDirType components)
 		     if [ "$dt" = library ]; then
 			 libraries=(components)

@@ -215,7 +215,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
             return [ comps ]
         return ocpiutil.get_subdirs_of_type("library", comps)
 
-    def run(self):
+    def run(self, verbose=False):
         """
         Runs the Project with the settings specified in the object Throws an exception if no
         applications or libraries are initialized using the init_apps or init_libs variables at
@@ -228,11 +228,11 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
                                          "True when the object is constructed")
         if self.apps_col_list is not None:
             for apps in self.apps_col_list:
-                run_val = apps.run()
+                run_val = apps.run(verbose=verbose)
                 ret_val = ret_val + run_val
         if self.lib_list is not None:
             for lib in self.lib_list:
-                run_val = lib.run()
+                run_val = lib.run(verbose=verbose)
                 ret_val = ret_val + run_val
         return ret_val
 

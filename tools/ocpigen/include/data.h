@@ -50,6 +50,7 @@ class DataPort : public OcpPort, public OM::Port {
   bool matchesDataProducer(bool isProducer) const { return m_isProducer == isProducer; }
   // This constructor is used when data port *is* the derived class (WDIPort)
   DataPort(Worker &w, ezxml_t x, int ordinal, const char *&err);
+  bool onlyVerboseXML() const { return false; } // only emit XML in verbose mode
   bool isData() const { return true; }
   DataPort *dataPort() { return this; }
   bool isDataProducer() const { return m_isProducer; } // call isData first
@@ -74,7 +75,8 @@ class DataPort : public OcpPort, public OM::Port {
   void emitRecordOutputs(FILE *f);
   virtual void emitVHDLShellPortMap(FILE *f, std::string &last);
   virtual void emitImplSignals(FILE *f);
-  void emitXML(std::string &out);
+  void emitXmlAttrs(std::string &out, bool verbose) const;
+  void emitXmlElements(std::string &out, bool verbose) const;
   const char *emitRccCppImpl(FILE *f);
   void emitRccCImpl(FILE *f);
   void emitRccCImpl1(FILE *f);

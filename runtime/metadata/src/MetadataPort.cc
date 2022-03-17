@@ -522,10 +522,23 @@ namespace OCPI {
     void Port::
     emitXml(std::string &out, size_t bufferSize) const {
       OU::formatAdd(out, "    <port name=\"%s\"", m_name.c_str());
-      if (m_isBidirectional)
-	OU::formatAdd(out, " bidirectional='1'");
-      else if (m_isProducer)
-	OU::formatAdd(out, " producer='1'");
+      emitXmlAttrs(out, false, bufferSize);
+      out += ">\n";
+      emitXmlElements(out, false);
+      OU::formatAdd(out, "    </port>\n");
+    }
+    // This should not be runtime...
+    void Port::
+    emitXmlAttrs(std::string &out, bool verbose, size_t bufferSize) const {
+      // OU::formatAdd(out, "    <port name=\"%s\"", m_name.c_str());
+      OE::emitBoolAttr(out, "bidirectional", m_isBidirectional, verbose);
+      OE::emitBoolAttr(out, "producer", m_isProducer, verbose);
+      OE::emitBoolAttr(out, "optional", m_isOptional, verbose);
+      OE::emitBoolAttr(out, "internal", m_isInternal, verbose);
+      if (verbose)
+	OE::emitBoolAttr(out, "workerEOF", m_workerEOF || m_worker->m_workerEOF, true);
+      else if (m_workerEOF && !m_worker->m_workerEOF)
+	OU::formatAdd(out, " workerEOF='1'");
       if (m_minBufferCount != 1)
 	OU::formatAdd(out, " minBufferCount=\"%zu\"", m_minBufferCount);
       if (m_defaultBufferCount != SIZE_MAX)
@@ -536,21 +549,16 @@ namespace OCPI {
 	OU::formatAdd(out, " buffersize='%s'", m_worker->metaPort(m_bufferSizePort).cname());
       else if (m_bufferSize != SIZE_MAX && m_bufferSize != m_defaultBufferSize)
 	OU::formatAdd(out, " bufferSize='%zu'", m_bufferSize);
-      if (m_isOptional)
-	OU::formatAdd(out, " optional=\"%u\"", m_isOptional);
-      if (m_isInternal)
-	OU::formatAdd(out, " internal='1'");
-      if (m_workerEOF && !m_worker->m_workerEOF)
-	OU::formatAdd(out, " workerEOF='1'");
 #if 0
       if (m_slave != SIZE_MAX)
 	OU::formatAdd(out, " slave='%zu'", m_slave);
 #endif
       emitScalingAttrs(out);
-      OU::formatAdd(out, ">\n");
+    }
+    void Port::
+    emitXmlElements(std::string &out, bool /*verbose*/) const {
       printXML(out, 3);
       emitScaling(out);
-      OU::formatAdd(out, "    </port>\n");
     }
 
     Port::OpScaling::

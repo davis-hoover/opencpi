@@ -260,6 +260,7 @@ namespace OCPI {
       void startMasterSlave(bool isMaster, bool isSlave, bool isSource);
       void start();
       void stop();
+      void release();
       bool verbose() const { return m_verbose; }
       void setDelayedProperties();
       bool wait(unsigned long timeout_us, bool timeOutIsError);

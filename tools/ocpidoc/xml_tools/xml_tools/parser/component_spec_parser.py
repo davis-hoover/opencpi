@@ -119,6 +119,7 @@ class ComponentSpecParser(property_spec_parser.PropertySpecParser):
         dictionary["inputs"] = self.get_input_ports()
         dictionary["outputs"] = self.get_output_ports()
         dictionary["properties"] = self.get_properties()
+        dictionary["path"] = self._filename
         return dictionary
 
     def get_input_ports(self):
