@@ -145,12 +145,12 @@ AD9361 DRC Mapping
 
 {1} No-OS API call, unless otherwise noted
 
-{2} Unless noted, all values are from datasheet https://www.analog.com/media/en/technical-documentation/data-sheets/ad9361.pdf
+{2} Unless noted, all values are from datasheet https://geontech.com/links/ad9361.pdf
 
-{3} https://github.com/analogdevicesinc/no-OS/blob/2018_R2/ad9361/sw/ad9361.c#L929
+{3} https://geontech.com/links/no-OS/blob/2018_R2/ad9361/sw/ad9361.c#L929
 
 {4} OpenCPI/DRC usage of No-OS restricts sampling rates to >= 2.083334 Msps. Lower values have been observed to intermittently fail to be set on Zed/FMCOMMS2/3
 
-{5} Assumes No-OS 2018_R2 release (earlier releases known to have different values, see https://github.com/analogdevicesinc/no-OS/blob/2018_R2/ad9361/sw/ad9361.c lines 484,601)
+{5} Assumes No-OS 2018_R2 release (earlier releases known to have different values, see https://geontech.com/links/no-OS/blob/2018_R2/ad9361/sw/ad9361.c (lines 484,601)
 
-{6} https://github.com/analogdevicesinc/no-OS/blob/2018_R2/ad9361/sw/ad9361.c#L1610
+{6} https://geontech.com/links/no-OS/blob/2018_R2/ad9361/sw/ad9361.c#L1610
