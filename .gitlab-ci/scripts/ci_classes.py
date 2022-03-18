@@ -1136,12 +1136,14 @@ class AssemblyPipelineBuilder(PipelineBuilder):
                 caps=caps)
             script.append(docker_create_cmd)
             if stage == 'run-unit_tests':
+            # Copy unit test into docker container
                 dest = '$CI_JOB_ID:/opencpi/{}'.format(str(Path(asset).parent))
                 source = Path(asset).name
                 docker_cp_cmd = self._build_docker_cmd('cp', None, stage, 
                     source=source, dest=dest)
                 script.append(docker_cp_cmd)
-            else:
+            elif self.model == 'hdl':
+            # Copy assemblies into docker container
                 for assembly in self.apps_dict[asset]:
                     dest = '$CI_JOB_ID:/opencpi/{}'.format(
                         str(Path(assembly).parent))
@@ -1309,9 +1311,9 @@ class AssemblyPipelineBuilder(PipelineBuilder):
             app_cmd += ' --{}-platform {}'.format(model, self.other_platform)
         app_cmd += ' --host {}'.format(self.host)
         if ip:
-            app_cmd += ' --i {}'.format(ip)
-            app_cmd += ' --p {}'.format(self.password)
-            app_cmd += ' --u {}'.format(self.user)
+            app_cmd += ' -i {}'.format(ip)
+            app_cmd += ' -p {}'.format(self.password)
+            app_cmd += ' -u {}'.format(self.user)
 
         return app_cmd
 
