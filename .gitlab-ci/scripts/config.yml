@@ -6,7 +6,7 @@
 # variables: extra variables for jobs specific to device
 
 # ci
-ci:
+ci: #deprecated
   runners:
     1274481: # Centos7-01
       socket_interface: em2
@@ -43,22 +43,45 @@ modelsim:
 
 # hdl
 adrv9361:
+  ip: 10.1.0.232 # deprecated; use 'ip_addresses'
+  ip_addresses:
+    - 10.1.0.232
   variables:
     OCPI_XILINX_LICENSE_FILE: '2100@sembach.opencpi.net'
   overrides: # deprecated; use 'variables'
     variables:
       OCPI_XILINX_LICENSE_FILE: '2100@sembach.opencpi.net'
 e31x:
-  ip: 10.1.0.42
+  ip: 10.1.0.42 # deprecated; use 'ip_addresses'
+  ip_addresses:
+    - 10.1.0.42
+    - 10.1.0.240
   port: 1000
 matchstiq_z1:
-  ip: 10.1.0.203
+  ip: 10.1.0.203 # deprecated; use 'ip_addresses'
+  ip_addresses:
+    - 10.1.0.203 
+  port: 1000
+microzed_20_cc:
+  ip: 10.1.0.209 # deprecated; use 'ip_addresses'
+  ip_addresses:
+    - 10.1.0.209
   port: 1000
 picoevb:
-  ip:
-  port:
+  ip: # deprecated; use 'ip_addresses'
+  ip_addresses: []
+  port: 1000
+picozed_30_cc:
+  ip: 10.1.0.210 # deprecated; use 'ip_addresses'
+  ip_addresses:
+    - 10.1.0.210
+  port: 1000
 plutosdr:
-  ip: 10.1.0.102
+  ip: 10.1.0.101 # deprecated; use 'ip_addresses'
+  ip_addresses: 
+   - 10.1.0.101
+   - 10.1.0.102
+   - 10.1.0.103
   port: 1000
   password: analog
   deploy: False # deprecated
@@ -74,11 +97,22 @@ plutosdr:
     build-tests:centos7:assets_ts:components:plutosdr:
       variables:
         OCPI_PROJECT_PATH: '$CI_PROJECT_DIR/projects/assets:$CI_PROJECT_DIR/projects/platform'
+zcu102:
+  ip: 10.1.0.212 # deprecated; use 'ip_addresses'
+  ip_addresses:
+    - 10.1.0.212
+  port: 1000
 zcu104:
-  ip: 10.1.0.208
+  ip: 10.1.0.208 # deprecated; use 'ip_addresses'
+  ip_addresses:
+    - 10.1.0.208
   port: 1000
 zed:
-  ip: 10.1.0.242
+  ip: 10.1.0.242 # deprecated; use 'ip_addresses'
+  ip_addresses: 
+   - 10.1.0.242
+   - 10.1.0.207
+   - 10.1.0.239
   port: 1000
 zed_ise:
   variables:

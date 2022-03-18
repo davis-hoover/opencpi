@@ -37,9 +37,9 @@ def _set_env():
     environ['CI_OCPI_HOSTS'] = 'centos7'
     environ['CI_OCPI_HOST'] = 'centos7'
     environ['CI_OCPI_PLATFORMS'] = '"zed:xilinx19_2_aarch32,xsim"'
-    environ['CI_OCPI_PLATFORM'] = 'xsim'
-    environ['CI_OCPI_OTHER_PLATFORM'] = ''
-    environ['CI_OCPI_PROJECTS'] = '"ocpi.comp.sdr,ocpi.osp.plutosdr"'
+    environ['CI_OCPI_PLATFORM'] = 'zed'
+    environ['CI_OCPI_OTHER_PLATFORM'] = 'xilinx19_2_aarch32'
+    environ['CI_OCPI_PROJECTS'] = ' '
     environ['CI_OCPI_ROOT_PIPELINE_ID'] = '123456789'
     environ['CI_PIPELINE_ID'] = '234567890'
     environ['CI_JOB_ID'] = '987654321'
@@ -158,7 +158,6 @@ def _make_assembly_pipeline(dump_path: Path,
     test_dirs = _get_tests(project_dirs, model=model)
     container_registry = getenv('CI_OCPI_CONTAINER_REGISTRY')
     container_repo = getenv('CI_OCPI_CONTAINER_REPO')
-    runners = config['ci']['runners']
     if model == 'hdl' and platform in config:
         config = config[platform]
     elif model == 'rcc' and other_platform and other_platform in config:
@@ -176,8 +175,7 @@ def _make_assembly_pipeline(dump_path: Path,
         do_hwil = do_hwil.lower() in ['t', 'y', 'true', 'yes', '1']
     pipeline_builder = AssemblyPipelineBuilder(pipeline_id, container_registry, 
         container_repo, base_image_tag, host, platform, model, other_platform, 
-        assembly_dirs, test_dirs, dump_path, config=config, runners=runners, 
-        do_hwil=do_hwil)
+        assembly_dirs, test_dirs, dump_path, config=config, do_hwil=do_hwil)
 
     return pipeline_builder
 

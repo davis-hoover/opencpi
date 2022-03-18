@@ -7,6 +7,7 @@ from typing import List
 import re
 import sys
 import yaml
+import random
 
 
 class Job():
@@ -283,25 +284,6 @@ class PipelineBuilder(ABC):
         ])
 
         return ecr_repo_cmd
-
-    @staticmethod
-    def _build_socket_interface_cmd(runners: dict):
-        """Create a cmd to set the OCPI_SOCKET_INFERACE env var
-        
-        A dictionary of runner IDs to socket interface must be provided
-        """
-        interface_cmd = 'declare -A interfaces && interfaces=('
-        for runner_id,runner_configs in runners.items():
-            interface_cmd += ' ["{}"]="{}"'.format(
-                runner_id, runner_configs['socket_interface'])
-        interface_cmd += ')'
-        interface_cmd = ' && '.join([
-            interface_cmd,
-            'export OCPI_SOCKET_INTERFACE="${interfaces[$CI_RUNNER_ID]}"',
-            'echo $OCPI_SOCKET_INTERFACE'
-        ])
-
-        return interface_cmd
 
 
 class PlatformPipelineBuilder(PipelineBuilder):
@@ -1046,7 +1028,7 @@ class CompPipelineBuilder(PlatformPipelineBuilder):
 class AssemblyPipelineBuilder(PipelineBuilder):
     def __init__(self, pipeline_id, container_registry, container_repo,
         base_image_tag, host, platform, model, other_platform, assembly_dirs, 
-        test_dirs, dump_path, config=None, runners=list(), do_hwil=False):
+        test_dirs, dump_path, config=None, do_hwil=False):
         """Initializes an AssemblyPipelineBuilder"""
         super().__init__(pipeline_id, container_registry, base_image_tag,
             dump_path, config)
@@ -1059,10 +1041,9 @@ class AssemblyPipelineBuilder(PipelineBuilder):
         self.other_platform = other_platform
         self.do_hwil = do_hwil
         self.user = self.password = 'root'
-        self.ip = self.port = None
-        self.runners = runners
+        self.ip_addresses = self.port = None
         if config:
-            for key in ['ip', 'port', 'user', 'password']:
+            for key in ['ip_addresses', 'port', 'user', 'password']:
                 if key in config:
                     self.__dict__[key] = config[key]
         self.stages = []
@@ -1103,24 +1084,23 @@ class AssemblyPipelineBuilder(PipelineBuilder):
         asset_name = asset_path.stem
         asset_project = asset_path.relative_to('projects').parts[0]
         name = self._build_name(asset_project, asset_name, stage)
-        tags = self._build_tags(stage)
-        script = self._build_script(stage, asset)
+        ip = self._build_ip()
+        tags = self._build_tags(stage, ip=ip)
+        script = self._build_script(stage, asset, ip=ip)
         needs = self._build_needs(stage, asset_name, asset_project)
         before_script = self._build_before_script(stage)
         after_script = self._build_after_script(stage)
         artifacts = self._build_artifacts(stage, asset)
         variables = self._build_variables(stage)
-        resource_group = self._build_resource_group(stage)
         job = ScriptJob(name, stage, script, tags=tags, needs=needs, 
                         before_script=before_script, after_script=after_script, 
-                        artifacts=artifacts, variables=variables,
-                        resource_group=resource_group)
+                        artifacts=artifacts, variables=variables)
 
         return job
 
-    def _build_script(self, stage: str, asset: str) -> List[str]:
+    def _build_script(self, stage: str, asset: str, ip: str=None) -> List[str]:
         """Build a job's script"""
-        ocpi_cmd = self._build_ocpi_cmd(stage, asset)
+        ocpi_cmd = self._build_ocpi_cmd(stage, asset, ip=ip)
         base_image = self._build_base_image_name(stage)
         volumes = [
             '/opt/Xilinx:/opt/Xilinx',
@@ -1132,13 +1112,11 @@ class AssemblyPipelineBuilder(PipelineBuilder):
             script = []
             devices = None
             caps = None
-            if self.ip:
+            if ip:
             # Device is remote; set appropriate env vars
-                socket_interface_cmd = self._build_socket_interface_cmd(
-                    self.runners)
                 addresses_cmd = 'export OCPI_SERVER_ADDRESSES={}:{}'.format(
-                    self.ip, self.port)
-                script += [socket_interface_cmd, addresses_cmd]
+                    ip, self.port)
+                script.append(addresses_cmd)
             elif self.do_hwil:
             # Device is local to runner; allow container access to /dev/mem
                 devices = ['/dev/mem']
@@ -1183,14 +1161,23 @@ class AssemblyPipelineBuilder(PipelineBuilder):
 
         return script
 
-    def _build_tags(self, stage: str) -> List[str]:
+    def _build_tags(self, stage: str, ip: str=None) -> List[str]:
         """Constructs and returns a job's tags as a list of strings"""
-        tags = ['opencpi', 'shell']
+        tags = []
+        tags.append('opencpi')
+        tags.append('shell')
         if stage == 'run-unit_tests' and self.do_hwil:
             if self.model == 'hdl':
-                tags.append(self.platform)
+                platform = self.platform
             elif self.model == 'rcc':
-                tags.append(self.other_platform)
+                platform = self.other_platform
+            if ip:
+            # If more than one device, find device index to use for tag
+                ip_idx = self.ip_addresses.index(ip)
+                ip_id = str(ip_idx + 1).zfill(2) # Pad leading 0 if necessary
+                tags.append('{}-{}'.format(platform, ip_id))
+            else:
+                tags.append(platform)
         else:
             tags.append('aws')
 
@@ -1235,19 +1222,13 @@ class AssemblyPipelineBuilder(PipelineBuilder):
 
         return variables
 
-    def _build_resource_group(self, stage: str) -> str:
-        """Builds a reource group for a job"""
-        if stage == 'run-unit_tests' and not self.platform.endswith('sim'):
-            if self.model == 'hdl':
-                resource_group = self.platform
-            else:
-                resource_group = self.other_platform
-        else:
-            resource_group = None
+    def _build_ip(self):
+        """Selects a random ip from self.ip_addresses"""
+        ip = random.choice(self.ip_addresses) if self.ip_addresses else None
 
-        return resource_group
+        return ip
 
-    def _build_ocpi_cmd(self, stage: str, asset: str) -> str:
+    def _build_ocpi_cmd(self, stage: str, asset: str, ip: str=None) -> str:
         """Returns an ocpi command based on the job's stage"""
         if stage in ['build-assemblies', 'build-unit_tests']:
             ocpi_cmd = 'ocpidev build -d {} --{}-platform {}'.format(
@@ -1261,10 +1242,11 @@ class AssemblyPipelineBuilder(PipelineBuilder):
                 self.platform,
                 '--mode prep_run_verify'
             ])
-            if self.ip:
-                ocpiremote_load_cmd = self._build_ocpiremote_cmd('load')
-                ocpiremote_start_cmd = self._build_ocpiremote_cmd('start')
-                ocpiremote_unload_cmd = self._build_ocpiremote_cmd('unload')
+            if ip:
+                ocpiremote_load_cmd = self._build_ocpiremote_cmd('load', ip)
+                ocpiremote_start_cmd = self._build_ocpiremote_cmd('start', ip)
+                ocpiremote_unload_cmd = self._build_ocpiremote_cmd(
+                    'unload', ip)
                 ocpi_cmds = [
                     ocpiremote_unload_cmd + ' || true',
                     ocpiremote_load_cmd, 
@@ -1280,7 +1262,7 @@ class AssemblyPipelineBuilder(PipelineBuilder):
 
         return ocpi_cmd
 
-    def _build_ocpiremote_cmd(self, cmd: str):
+    def _build_ocpiremote_cmd(self, cmd: str, ip: str):
         if cmd == 'load':
             if self.model == 'hdl':
                 hdl_platform = self.platform
@@ -1292,7 +1274,7 @@ class AssemblyPipelineBuilder(PipelineBuilder):
                 'ocpiremote load',
                 '--hdl-platform={}'.format(hdl_platform),
                 '--rcc-platform={}'.format(rcc_platform),
-                '-i {}'.format(self.ip),
+                '-i {}'.format(ip),
                 '-r {}'.format(self.port),
                 '-u {}'.format(self.user),
                 '-p {}'.format(self.password)
@@ -1300,7 +1282,7 @@ class AssemblyPipelineBuilder(PipelineBuilder):
         elif cmd in ['start', 'stop', 'unload']:
             ocpiremote_cmd = ' '.join([
                 'ocpiremote {}'.format(cmd),
-                '-i {}'.format(self.ip),
+                '-i {}'.format(ip),
                 '-u {}'.format(self.user),
                 '-p {}'.format(self.password)
             ])
