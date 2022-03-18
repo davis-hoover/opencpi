@@ -1,4 +1,4 @@
-.. DRC cic_dec Documentation:
+.. DRC cic_int Documentation:
 
 .. This file is protected by Copyright. Please refer to the COPYRIGHT file
    distributed with this source distribution.
@@ -25,9 +25,9 @@
                 material is strictly prohibited unless prior written
                 permission is obtained from Geon Technologies, LLC
 
-.. _DRC_cic_dec_Documentation:
+.. _cic_int_Documentation:
 
-cic_dec Constraint Mapping
+cic_int Constraint Mapping
 ==========================
 
 
@@ -37,10 +37,10 @@ cic_dec Constraint Mapping
 |                                      | ID     |                         |                     |                        |
 +--------------------------------------+--------+-------------------------+---------------------+------------------------+
 | N/A                                  | N/A    | r                       | N/A                 | [4..8192]              |
-| N/A                                  | N/A    | cic_dec_fc_meghz_in     | N/A                 |                        |
-| N/A                                  | N/A    | cic_dec_fc_meghz_out    | N/A                 | cic_dec_fc_meghz_in    |
-| N/A                                  | N/A    | cic_dec_bw_meghz_in     | N/A                 |                        |
-| N/A                                  | N/A    | cic_dec_bw_meghz_out    | N/A                 | cic_dec_bw_meghz_in/r  |
-| N/A                                  | N/A    | cic_dec_fs_megsps_in    | N/A                 |                        |
-| N/A                                  | N/A    | cic_dec_fs_megsps_out   | N/A                 | cic_dec_fs_megsps_in/r |
+| N/A                                  | N/A    | cic_int_fc_meghz_in     | N/A                 |                        |
+| N/A                                  | N/A    | cic_int_fc_meghz_out    | N/A                 | cic_int_fc_meghz_in    |
+| N/A                                  | N/A    | cic_int_bw_meghz_in     | N/A                 |                        |
+| N/A                                  | N/A    | cic_int_bw_meghz_out    | N/A                 | cic_int_bw_meghz_in/r  |
+| N/A                                  | N/A    | cic_int_fs_megsps_in    | N/A                 |                        |
+| N/A                                  | N/A    | cic_int_fs_megsps_out   | N/A                 | cic_int_fs_megsps_in/r |
 +--------------------------------------+--------+-------------------------+---------------------+------------------------+
