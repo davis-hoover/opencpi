@@ -1186,7 +1186,7 @@ class AssemblyPipelineBuilder(PipelineBuilder):
         tags = []
         tags.append('opencpi')
         tags.append('shell')
-        if stage == 'run-unit_tests' and self.do_hwil:
+        if self.do_hwil and stage in ['run-unit_tests', 'run-applications']:
             if self.model == 'hdl':
                 platform = self.platform
             elif self.model == 'rcc':
@@ -1212,7 +1212,7 @@ class AssemblyPipelineBuilder(PipelineBuilder):
         if stage == 'run-unit_tests':
             need = self._build_name(asset_project, asset, 'build-unit_tests')
             needs.append(need)
-        elif stage == 'run-applications':
+        elif self.model == 'hdl' and stage == 'run-applications':
             for assembly in self.apps_dict[asset]:
                 assembly_path = Path(assembly)
                 assembly_name = assembly_path.name
