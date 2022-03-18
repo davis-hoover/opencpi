@@ -517,12 +517,13 @@ class PlatformPipelineBuilder(PipelineBuilder):
             docker_rmi_cmd = self._build_docker_cmd('rmi', image, stage)
             script.append(docker_rmi_cmd)
             # Remove any additional created tags
-            for tag in self.image_tags:
-                image = self._build_image_name(host, stage, platform=platform, 
-                    base_platform=base_platform, other_platform=other_platform,
-                    tag=tag)
-                docker_rmi_cmd = self._build_docker_cmd('rmi', image, stage)
-                script.append(docker_rmi_cmd)
+            if stage not in ['packages', 'prereqs']:
+                for tag in self.image_tags:
+                    image = self._build_image_name(host, stage, 
+                        platform=platform, base_platform=base_platform, 
+                        other_platform=other_platform, tag=tag)
+                    docker_rmi_cmd = self._build_docker_cmd('rmi', image, stage)
+                    script.append(docker_rmi_cmd)
 
         return script
 
