@@ -82,7 +82,7 @@ def _make_platform_pipeline(dump_path: Path,
     config: str=None) -> PlatformPipelineBuilder:
     """Initialize and return a HostPipelineBuilder"""
     pipeline_id = _get_pipeline_id()
-    base_image_tag = _get_base_image_tag(pipeline_id=pipeline_id)
+    base_image_tag = pipeline_id
     image_tags = _get_image_tags()
     container_registry = getenv('CI_OCPI_CONTAINER_REGISTRY', '')
     hosts = re.split(r'\s|,\s|,', getenv('CI_OCPI_HOSTS', '').strip('"'))
