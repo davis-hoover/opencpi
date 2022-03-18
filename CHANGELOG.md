@@ -16,6 +16,7 @@ Changes/additions since [OpenCPI Release v2.4.0](https://gitlab.com/opencpi/open
 
 ### Bug Fixes
 - **devops**: fix various issues related to CI/CD overhaul/containerization effort. (!831)(26413dfe)
+- **devops**: fix docker image tags used in release pipeline jobs. (!863)(ad1bd6c1)
 - **doc**: update tutorial 5. (!827)(cbb0ade6)
 - **doc**: fix typo in PyQt download, update Xilinx WebPACK installation to current procedure in OpenCPI Installation Guide. (!844)(7a7c4142)
 - **doc**: fix diagram problems in Briefing 2 and Briefing 9. (!852)(a6947c95)
