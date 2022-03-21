@@ -1,3 +1,52 @@
+# [v2.4.1](https://gitlab.com/opencpi/opencpi/-/compare/v2.4.0...v2.4.1) (2022-03-17)
+
+Changes/additions since [OpenCPI Release v2.4.0](https://gitlab.com/opencpi/opencpi/-/releases/v2.4.0)
+
+### Enhancements
+- **comp**: add RCC worker back to tutorial project. (!826)(601782ec)
+- **doc**: add complex mixer rcc back to documentation in tutorial project. (!826)(601782ec)
+- **doc**: update tutorial 3 based on feedback. (!828)(179e3c58)
+- **doc**: update tutorial 3 gui images. (!828)(179e3c58)
+- **doc**: update tutorial 7 based on feedback. (!829)(849badb1)
+- **doc**: update tutorial 7 gui images. (!829)(849badb1)
+- **doc**: add section that provides information on using conditional slave assemblies. (!832)(c8aaff7f)
+- **doc**: update GUI conditional section variable. (!851)(4c688b60)
+- **doc**: improve description of StringLength attribute in Component Development Guide. (!854)(29d5094e)
+- **hdl base**: add hdl assemblies parser. (!853)(f69a4f29)
+
+### Bug Fixes
+- **devops**: fix various issues related to CI/CD overhaul/containerization effort. (!831)(26413dfe)
+- **devops**: fix docker image tags used in release pipeline jobs. (!863)(ad1bd6c1)
+- **doc**: update tutorial 5. (!827)(cbb0ade6)
+- **doc**: fix typo in PyQt download, update Xilinx WebPACK installation to current procedure in OpenCPI Installation Guide. (!844)(7a7c4142)
+- **doc**: fix diagram problems in Briefing 2 and Briefing 9. (!852)(a6947c95)
+- **doc**: fix typos in Application Development Guide, RCC Development Guide. (!854)(29d5094e)
+- **doc**: correct example application XML in Briefing 14. (!856)(b6533bbd)
+- **doc**: fix diagrams in Briefing 2 that become corrupted when moving between LibreOffice versions and file formats. (!856)(b6533bbd)
+- **tools**: have genprojMetaData.py append the correct name to project-metadata.xml. (!817)(4143d320)
+- **tools**: patch asciidoc3 version 3.2.2 for python3.XX. (!830)(d80532fd)
+- **tools**: ocpiadmin: fix `platform_dir` setting. (!833)(c140f016)
+- **tools**: ocpidoc: make python3 virtual environment portable across runners. (!836)(a4ca5e30)
+- **tools**: ocpiremote: change `env_args` initializer to empty list. (!840)(b6dcde7b)
+- **tools**: rename generated applications.xml. (!845)(b46df5c7)
+- **tools**: replace `"$(info"` with `"$(call OcpiInfo,"` in `"<platform>.mk"`. (!847)(b0c56f92)
+- **tools**: allow ocpidev build to use attributes in applications.xml. (!855)(a9bd63be)
+- **tools**: `ocpidev run`: respect runtime attributes when found in the OAS. (!860)(6436fada)
+
+### Miscellaneous
+- **doc**: update Tutorial 4 per received feedback. (!820)(ab088225)
+- **doc**: update Tutorial 4 GUI screenshots. (!822)(845f5bce)
+- **doc**: update tutorial 1 content and GUI screenshots. (!824)(964cb480)
+- **doc**: update based on feedback as well as screenshots. (!825)(6b49ce6c)
+- **doc**: update tutorial 2 images and sections. (!835)(82617c30)
+- **doc**: update images to use new gui, and update multiple sections based on feedback for tutorial 6. (!837)(a1389694)
+- **doc**: add sentence to reference vivado usage guide. (!839)(ac152ddd)
+- **doc**: tutorial 2 references complex_mixer_tutorial. (!846)(442d8f1e)
+- **doc**: update tutorial 8 hardware version screen shots. (!848)(448e3f34)
+- **doc**: update all of tutorial 10 based on the DRC. (!861)(a77883c0)
+- **tools**: modify `gen-cg-pdfs.sh` to allow use of new section selector variable. (!834)(ae47fe61)
+- **tools**: refactor `OcpiKernelDir` assignment logic for `centos` and `ubuntu` platforms. (!849)(567041c2)
+
 # [v2.4.0](https://gitlab.com/opencpi/opencpi/-/compare/v2.3.4...v2.4.0) (2022-01-28)
 
 Changes/additions since [OpenCPI Release v2.3.4](https://gitlab.com/opencpi/opencpi/-/releases/v2.3.4)
