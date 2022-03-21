@@ -102,6 +102,8 @@ zcu102:
   ip_addresses:
     - 10.1.0.212
   port: 1000
+  variables:
+    OCPI_XILINX_LICENSE_FILE: '2101@sembach.opencpi.net'
 zcu104:
   ip: 10.1.0.208 # deprecated; use 'ip_addresses'
   ip_addresses:
