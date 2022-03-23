@@ -1145,9 +1145,15 @@ class AssemblyPipelineBuilder(PipelineBuilder):
             elif self.model == 'hdl':
             # Copy assemblies into docker container
                 for assembly in self.apps_dict[asset]:
-                    dest = '$CI_JOB_ID:/opencpi/{}'.format(
-                        str(Path(assembly).parent))
-                    source = Path(assembly).name
+                    assembly_path = Path(assembly)
+                    assembly_project = assembly_path.parts[1]
+                    if assembly_project in ['osps', 'comps']:
+                        assembly_project = assembly_path.parts[1:3]
+                    dest = '$CI_JOB_ID:/opencpi/projects/{}/artifacts'.format(
+                        assembly_project)
+                    source = '$(find {} -name {}_{}_base.bitz)'.format(
+                        assembly_path.name, assembly_path.name, self.platform)
+                    print(dest, source, sep='\n')
                     docker_cp_cmd = self._build_docker_cmd('cp', None, stage, 
                         source=source, dest=dest)
                     script.append(docker_cp_cmd)
@@ -1219,9 +1225,9 @@ class AssemblyPipelineBuilder(PipelineBuilder):
             for assembly in self.apps_dict[asset]:
                 assembly_path = Path(assembly)
                 assembly_name = assembly_path.name
-                assembly_project = assembly_path.parts[1]
-                need = self._build_name(
-                    assembly_project, assembly_name, 'build-assemblies')
+                assembly_proj = assembly_path.relative_to('projects').parts[0]
+                need = self._build_name(assembly_proj, assembly_name, 
+                    'build-assemblies')
                 needs.append(need)
 
         return needs
@@ -1306,9 +1312,8 @@ class AssemblyPipelineBuilder(PipelineBuilder):
         apps_path = Path(__file__, '..', 'ci_applications').resolve()
         app_cmd = str(Path('.', apps_path, 'ci_'+app).with_suffix('.sh'))
         app_cmd += ' --{}-platform {}'.format(self.model, self.platform)
-        if self.other_platform:
-            model = 'rcc' if self.model == 'hdl' else 'hdl'
-            app_cmd += ' --{}-platform {}'.format(model, self.other_platform)
+        if self.model == 'hdl' and self.other_platform:
+            app_cmd += ' --rcc-platform {}'.format(self.other_platform)
         app_cmd += ' --host {}'.format(self.host)
         if ip:
             app_cmd += ' -i {}'.format(ip)
