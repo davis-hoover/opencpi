@@ -1270,40 +1270,32 @@ class AssemblyPipelineBuilder(PipelineBuilder):
         if stage in ['build-assemblies', 'build-unit_tests']:
             ocpi_cmd = 'ocpidev build -d {} --{}-platform {}'.format(
                 asset, self.model, self.platform)
-        elif stage == 'run-applications':
-            ocpi_cmds = []
-            if ip:
-                ocpi_load_cmd = self._build_ocpiremote_cmd('load', ip)
-                ocpi_cmds.append(ocpi_load_cmd)
-            app_cmd = self._build_app_cmd(asset, ip=ip)
-            ocpi_cmds.append(app_cmd)
-            ocpi_cmd = ' && '.join(ocpi_cmds)
-        elif stage == 'run-unit_tests':
-            ocpi_cmds = []
-            ocpidev_run_cmd = ' '.join([
-                'ocpidev run -d',
-                asset,
-                '--only-platform',
-                self.platform,
-                '--mode prep_run_verify'
-            ])
-            if ip:
+        elif stage in ['run-applications', 'run-unit_tests']:
+            if stage == 'run-unit_tests':
+                run_cmd = ' '.join([
+                    'ocpidev run -d',
+                    asset,
+                    '--only-platform',
+                    self.platform,
+                    '--mode prep_run_verify'
+                ])
+            else:
+                run_cmd = self._build_app_cmd(asset, ip=ip)
+            if ip: 
                 ocpiremote_load_cmd = self._build_ocpiremote_cmd('load', ip)
                 ocpiremote_start_cmd = self._build_ocpiremote_cmd('start', ip)
                 ocpiremote_unload_cmd = self._build_ocpiremote_cmd(
                     'unload', ip)
                 ocpi_cmds = [
-                    ocpiremote_unload_cmd + ' || true',
-                    ocpiremote_load_cmd, 
-                    ocpiremote_start_cmd,
-                    ocpidev_run_cmd, 
-                    ocpiremote_unload_cmd
+                    ocpiremote_unload_cmd  + ' || true', 
+                    ocpiremote_load_cmd,
                 ]
+                if stage == 'run-unit_tests':
+                    ocpi_cmds.append(ocpiremote_start_cmd)
+                ocpi_cmds += [run_cmd, ocpiremote_unload_cmd]
                 ocpi_cmd = ' && '.join(ocpi_cmds)
             else:
-                ocpi_cmd = ocpidev_run_cmd
-        else:
-            ocpi_cmd = None
+                ocpi_cmd = run_cmd
 
         return ocpi_cmd
 

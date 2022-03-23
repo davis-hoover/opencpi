@@ -57,22 +57,22 @@ do
         do
             printf "Testing divisor $divisor\n"
             if [[ -n $hdl_platform ]] ; then
-                [[ -n $rcc_platform ]] && {
+                if [[ -n $rcc_platform ]] ; then
                     ./run_source_sink $hdl_platform $rcc_platform $message_size 2 2 0 $cache_mode $divisor
                     ./run_source_sink $hdl_platform $rcc_platform $message_size 2 10 0 $cache_mode $divisor
-                    [[ $message_size != "32k" ]] && {
+                    if $message_size != "32k" ]] ; then 
                         ./run_source_sink $rcc_platform $hdl_platform $message_size 2 2 0 $cache_mode $divisor
                         ./run_source_sink $rcc_platform $hdl_platform $message_size 10 2 0 $cache_mode $divisor
-                    }
-                }
-                [[ -n $host ]] && {
+                    fi
+                fi
+                if [[ -n $host ]] ; then
                     ./run_source_sink $hdl_platform $host $message_size 2 2 0 $cache_mode $divisor
                     ./run_source_sink $hdl_platform $host $message_size 2 10 0 $cache_mode $divisor
-                    [[ $message_size != "32k" ]] && {
+                    if [[ $message_size != "32k" ]] ; then
                         ./run_source_sink $host $hdl_platform $message_size 2 2 0 $cache_mode $divisor
                         ./run_source_sink $host $hdl_platform $message_size 10 2 0 $cache_mode $divisor
-                    }
-                }
+                    fi
+                fi
             else
                 if [[ -n $rcc_platform ]] ; then
                     ./run_source_sink $rcc_platform $rcc_platform $message_size 2 2 0 $cache_mode $divisor
@@ -81,12 +81,12 @@ do
                     ./run_source_sink $host $host $message_size 2 2 0 $cache_mode $divisor
                     ./run_source_sink $host $host $message_size 10 10 0 $cache_mode $divisor
                 fi
-                [[ -n $rcc_platform && -n $host ]] && {
+                if [[ -n $rcc_platform && -n $host ]] ; then
                     ./run_source_sink $host $rcc_platform $message_size 2 2 0 $cache_mode $divisor
                     ./run_source_sink $host $rcc_platform $message_size 10 10 0 $cache_mode $divisor
                     ./run_source_sink $rcc_platform $host $message_size 2 2 0 $cache_mode $divisor
                     ./run_source_sink $rcc_platform $host $message_size 10 10 0 $cache_mode $divisor
-                }
+                fi
             fi
         done
     done
