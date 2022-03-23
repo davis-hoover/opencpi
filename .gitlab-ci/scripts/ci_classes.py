@@ -1047,13 +1047,10 @@ class AssemblyPipelineBuilder(PipelineBuilder):
             for key in ['ip_addresses', 'port', 'user', 'password']:
                 if key in config:
                     self.__dict__[key] = config[key]
-        self.stages = [
-            'build-unit_tests', 
-            'run-unit_tests'
-        ]
+        self.stages = ['build-unit_tests']
         if self.model == 'hdl':
             self.stages.append('build-assemblies')
-        self.stages.append('run-applications')
+        self.stages += ['run-unit_tests', 'run-applications']
 
     def _build_jobs(self) -> List[Job]:
         """Create jobs for host platforms"""
