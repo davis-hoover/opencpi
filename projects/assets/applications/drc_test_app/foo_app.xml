@@ -1,0 +1,4 @@
+<!-- The foo_app application xml file -->
+<Application>
+  <Instance Component='local.foo_proj.foo_drc'/>
+</Application>
