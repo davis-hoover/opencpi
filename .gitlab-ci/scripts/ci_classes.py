@@ -1027,8 +1027,9 @@ class CompPipelineBuilder(PlatformPipelineBuilder):
 
 class AssemblyPipelineBuilder(PipelineBuilder):
     def __init__(self, pipeline_id, container_registry, container_repo,
-        base_image_tag, host, platform, model, other_platform, assembly_dirs, 
-        test_dirs, apps_dict, dump_path, config=None, do_hwil=False):
+        base_image_tag, host, platform, model, target, other_platform, 
+        assembly_dirs, test_dirs, apps_dict, dump_path, config=None, 
+        do_hwil=False):
         """Initializes an AssemblyPipelineBuilder"""
         super().__init__(pipeline_id, container_registry, base_image_tag,
             dump_path, config)
@@ -1039,6 +1040,7 @@ class AssemblyPipelineBuilder(PipelineBuilder):
         self.host = host
         self.platform = platform
         self.model = model
+        self.target = target
         self.other_platform = other_platform
         self.do_hwil = do_hwil
         self.user = self.password = 'root'
@@ -1141,7 +1143,7 @@ class AssemblyPipelineBuilder(PipelineBuilder):
                     source=source, dest=dest)
                 script.append(docker_cp_cmd)
             elif self.model == 'hdl':
-            # Copy assemblies into docker container
+            # Copy assemblies .bitz into project artifacts in docker container
                 for assembly in self.apps_dict[asset]:
                     assembly_path = Path(assembly)
                     assembly_project = assembly_path.parts[1]
@@ -1149,9 +1151,12 @@ class AssemblyPipelineBuilder(PipelineBuilder):
                         assembly_project = assembly_path.parts[1:3]
                     dest = '$CI_JOB_ID:/opencpi/projects/{}/artifacts'.format(
                         assembly_project)
-                    source = '$(find {} -name {}_{}_base.bitz)'.format(
-                        assembly_path.name, assembly_path.name, self.platform)
-                    print(dest, source, sep='\n')
+                    bitz = '{}_{}_base.bitz'.format(
+                        assembly_path.name, self.platform)
+                    target = 'target-{}'.format(self.target)
+                    container = 'container-{}_{}_base'.format(
+                        assembly_path.name, self.platform)
+                    source = Path(assembly_path.name, container, target, bitz)
                     docker_cp_cmd = self._build_docker_cmd('cp', None, stage, 
                         source=source, dest=dest)
                     script.append(docker_cp_cmd)
@@ -1313,7 +1318,7 @@ class AssemblyPipelineBuilder(PipelineBuilder):
         return app_cmd
 
     def _build_ocpiremote_cmd(self, cmd: str, ip: str):
-        """Build and ocpiremote command"""
+        """Build an ocpiremote command"""
         if cmd == 'load':
             if self.model == 'hdl':
                 hdl_platform = self.platform

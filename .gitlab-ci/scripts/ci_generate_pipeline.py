@@ -147,7 +147,7 @@ def _make_assembly_pipeline(dump_path: Path,
     pipeline_id = _get_pipeline_id()
     base_image_tag = pipeline_id
     platform = getenv('CI_OCPI_PLATFORM')
-    model = _get_platform_model(platform)
+    model, target = _get_platform_info(platform)
     host = getenv('CI_OCPI_HOST')
     other_platform = getenv('CI_OCPI_OTHER_PLATFORM')
     project_group = environ['CI_PROJECT_NAMESPACE'].split('/', 1)[-1]
@@ -175,9 +175,9 @@ def _make_assembly_pipeline(dump_path: Path,
         do_hwil = getenv('CI_OCPI_{}_HWIL'.format(model.upper()), '')
         do_hwil = do_hwil.lower() in ['t', 'y', 'true', 'yes', '1']
     pipeline_builder = AssemblyPipelineBuilder(pipeline_id, container_registry, 
-        container_repo, base_image_tag, host, platform, model, other_platform, 
-        assembly_dirs, test_dirs, applications, dump_path, config=config, 
-        do_hwil=do_hwil)
+        container_repo, base_image_tag, host, platform, model, target,
+        other_platform, assembly_dirs, test_dirs, applications, dump_path, 
+        config=config, do_hwil=do_hwil)
 
     return pipeline_builder
 
@@ -229,14 +229,18 @@ def _get_image_tags() -> List[str]:
     return image_tags
 
 
-def _get_platform_model(platform: str) -> str:
-    """Returns the model of the given platform"""
-    rcc_platforms,hdl_platforms = _get_platforms().values()
-    if platform in rcc_platforms:
-        return 'rcc'
-    if platform in hdl_platforms:
-        return 'hdl'
-    sys.exit('Error: Unknown platform "{}"'.format(platform))
+def _get_platform_info(platform: str) -> str:
+    """Returns the model and target of a platform"""
+    platforms = _get_platforms()
+    if platform in platforms['rcc']:
+        model = 'rcc'
+    elif platform in platforms['hdl']:
+        model = 'hdl'
+    else:
+        sys.exit('Error: Unknown platform "{}"'.format(platform))
+    target = platforms[model][platform]['target']
+
+    return model, target
 
 
 def _parse_projects_directive() -> dict:
@@ -370,8 +374,6 @@ def _get_platforms(do_ocpishow=True, do_model_split=True) -> List[str]:
     if do_ocpishow:
         loop = asyncio.get_event_loop()
         platforms = loop.run_until_complete(_ocpidev_show('platforms'))
-        platforms['rcc'] = [platform for platform in platforms['rcc'].keys()]
-        platforms['hdl'] = [platform for platform in platforms['hdl'].keys()]
     else:
         projects_path = Path('projects')
         if projects_path.exists():
@@ -385,9 +387,9 @@ def _get_platforms(do_ocpishow=True, do_model_split=True) -> List[str]:
                                     in platforms_path.glob('*') 
                                     if platform.is_dir()]
                 platforms[model] += project_platforms
-
     if not do_model_split:
         platforms = platforms['rcc'] + platforms['hdl']
+
     return platforms
 
 
