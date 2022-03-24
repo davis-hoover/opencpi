@@ -1071,8 +1071,9 @@ class AssemblyPipelineBuilder(PipelineBuilder):
                     job = self._build_job(stage, test)
                     jobs.append(job)
             elif stage == 'run-applications':
+                if not self.do_hwil and not self.platform.endswith('sim'):
+                    continue
                 for application in self.apps_dict:
-                    print(application)
                     job = self._build_job(stage, application)
                     jobs.append(job)
             else:
