@@ -1068,12 +1068,14 @@ class AssemblyPipelineBuilder(PipelineBuilder):
                     jobs.append(job)
             elif stage == 'run-unit_tests':
                 if not self.do_hwil and not self.platform.endswith('sim'):
+                # Don't run if not HWIL unless also on a simulator
                     continue
                 for test in self.test_dirs:
                     job = self._build_job(stage, test)
                     jobs.append(job)
             elif stage == 'run-applications':
-                if not self.do_hwil and not self.platform.endswith('sim'):
+                if not self.do_hwil or self.platform.endswith('sim'):
+                # Don't run on simulators or if not HWIL
                     continue
                 for application in self.apps_dict:
                     job = self._build_job(stage, application)
