@@ -377,12 +377,19 @@ def gen_copy_rst(src_dir: Path, dst_dir: Path):
         # "scripts/install-opencpi.sh --minimal --no-kernel", there does not
         # seem to be a better way to make "ocpidoc" available.
         #
+        # Projects named "ocpi.ptype.name" must now be registered before running
+        # "ocpidoc" because of allowable dependencies on "imports/ocpi.core", so
+        # we have to install the framework anyway to make "ocpidev" available.
+        #
         cmd = ["bash", "-c", fr'cd {src_dir} ; \
 source cdk/opencpi-setup.sh -s ; \
 export LANG=en_US.utf8 ; \
 for pdir in projects/* projects/osps/* ; \
 do if [ -f $pdir/index.rst ] ; \
-then ocpidoc -d $pdir build -b ; \
+then if [[ $pdir == *"/ocpi."* ]] ; \
+then ocpidev -d $pdir register project ; \
+fi ; \
+ocpidoc -d $pdir build -b ; \
 if [ -d $pdir/gen/doc ] ; \
 then ddir=`basename $pdir | sed -e "s/\./_/g" -e "s/ocpi_//"` ; \
 mkdir -p {dst_dir}/$ddir ; \
