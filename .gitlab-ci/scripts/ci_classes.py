@@ -1027,17 +1027,20 @@ class CompPipelineBuilder(PlatformPipelineBuilder):
 
 class AssemblyPipelineBuilder(PipelineBuilder):
     def __init__(self, pipeline_id, container_registry, container_repo,
-        base_image_tag, host, platform, model, other_platform, assembly_dirs, 
-        test_dirs, dump_path, config=None, do_hwil=False):
+        base_image_tag, host, platform, model, target, other_platform, 
+        assembly_dirs, test_dirs, apps_dict, dump_path, config=None, 
+        do_hwil=False):
         """Initializes an AssemblyPipelineBuilder"""
         super().__init__(pipeline_id, container_registry, base_image_tag,
             dump_path, config)
         self.container_repo = container_repo
         self.assembly_dirs = assembly_dirs
         self.test_dirs = test_dirs
+        self.apps_dict = apps_dict
         self.host = host
         self.platform = platform
         self.model = model
+        self.target = target
         self.other_platform = other_platform
         self.do_hwil = do_hwil
         self.user = self.password = 'root'
@@ -1046,13 +1049,10 @@ class AssemblyPipelineBuilder(PipelineBuilder):
             for key in ['ip_addresses', 'port', 'user', 'password']:
                 if key in config:
                     self.__dict__[key] = config[key]
-        self.stages = []
+        self.stages = ['build-unit_tests']
         if self.model == 'hdl':
             self.stages.append('build-assemblies')
-        self.stages += [ 
-            'build-unit_tests', 
-            'run-unit_tests'
-        ]
+        self.stages += ['run-unit_tests', 'run-applications']
 
     def _build_jobs(self) -> List[Job]:
         """Create jobs for host platforms"""
@@ -1068,9 +1068,17 @@ class AssemblyPipelineBuilder(PipelineBuilder):
                     jobs.append(job)
             elif stage == 'run-unit_tests':
                 if not self.do_hwil and not self.platform.endswith('sim'):
+                # Don't run if not HWIL unless also on a simulator
                     continue
                 for test in self.test_dirs:
                     job = self._build_job(stage, test)
+                    jobs.append(job)
+            elif stage == 'run-applications':
+                if not self.do_hwil or self.platform.endswith('sim'):
+                # Don't run on simulators or if not HWIL
+                    continue
+                for application in self.apps_dict:
+                    job = self._build_job(stage, application)
                     jobs.append(job)
             else:
                 job = self._build_job(stage)
@@ -1080,9 +1088,13 @@ class AssemblyPipelineBuilder(PipelineBuilder):
 
     def _build_job(self, stage: str, asset: str):
         """Create a script job"""
-        asset_path = Path(asset)
-        asset_name = asset_path.stem
-        asset_project = asset_path.relative_to('projects').parts[0]
+        if stage != 'run-applications':
+            asset_path = Path(asset)
+            asset_name = asset_path.stem
+            asset_project = asset_path.relative_to('projects').parts[0]
+        else:
+            asset_project = None
+            asset_name = asset
         name = self._build_name(asset_project, asset_name, stage)
         ip = self._build_ip()
         tags = self._build_tags(stage, ip=ip)
@@ -1106,7 +1118,7 @@ class AssemblyPipelineBuilder(PipelineBuilder):
             '/opt/Xilinx:/opt/Xilinx',
             '/opt/Mentor:/opt/Mentor'
         ]
-        if stage == 'run-unit_tests':
+        if stage in ['run-applications', 'run-unit_tests']:
         # Create "docker create" cmd, copy artifacts to container, and create
         # "docker start" cmd
             script = []
@@ -1124,19 +1136,41 @@ class AssemblyPipelineBuilder(PipelineBuilder):
             docker_create_cmd = self._build_docker_cmd('create', base_image, 
                 stage, ocpi_cmd=ocpi_cmd, volumes=volumes, devices=devices, 
                 caps=caps)
-            dest = '$CI_JOB_ID:/opencpi/{}'.format(str(Path(asset).parent))
-            source = Path(asset).name
-            docker_cp_cmd = self._build_docker_cmd('cp', None, stage, 
-                source=source, dest=dest)
+            script.append(docker_create_cmd)
+            if stage == 'run-unit_tests':
+            # Copy unit test into docker container
+                dest = '$CI_JOB_ID:/opencpi/{}'.format(str(Path(asset).parent))
+                source = Path(asset).name
+                docker_cp_cmd = self._build_docker_cmd('cp', None, stage, 
+                    source=source, dest=dest)
+                script.append(docker_cp_cmd)
+            elif self.model == 'hdl':
+            # Copy assemblies .bitz into project artifacts in docker container
+                for assembly in self.apps_dict[asset]:
+                    assembly_path = Path(assembly)
+                    assembly_project = assembly_path.parts[1]
+                    if assembly_project in ['osps', 'comps']:
+                        assembly_project = assembly_path.parts[1:3]
+                    dest = '$CI_JOB_ID:/opencpi/projects/{}/artifacts'.format(
+                        assembly_project)
+                    bitz = '{}_{}_base.bitz'.format(
+                        assembly_path.name, self.platform)
+                    target = 'target-{}'.format(self.target)
+                    container = 'container-{}_{}_base'.format(
+                        assembly_path.name, self.platform)
+                    source = Path(assembly_path.name, container, target, bitz)
+                    docker_cp_cmd = self._build_docker_cmd('cp', None, stage, 
+                        source=source, dest=dest)
+                    script.append(docker_cp_cmd)
             docker_start_cmd = self._build_docker_cmd('start', None, stage)
-            script += [docker_create_cmd, docker_cp_cmd, docker_start_cmd]
+            script.append(docker_start_cmd)
         else:
         # Run opencpi command on container
             docker_run_cmd = self._build_docker_cmd('run', base_image, stage,
                 ocpi_cmd=ocpi_cmd, volumes=volumes)
             script = [docker_run_cmd]
-        if stage == 'build-unit_tests':
-        # Copyfiles from container to upload as artifacts
+        if stage in ['build-assemblies', 'build-unit_tests']:
+        # Copy files from container to upload as artifacts
             source = '$CI_JOB_ID:/opencpi/{}'.format(asset)
             docker_cp_cmd = self._build_docker_cmd('cp', None, stage, 
                 source=source)
@@ -1166,7 +1200,7 @@ class AssemblyPipelineBuilder(PipelineBuilder):
         tags = []
         tags.append('opencpi')
         tags.append('shell')
-        if stage == 'run-unit_tests' and self.do_hwil:
+        if self.do_hwil and stage in ['run-unit_tests', 'run-applications']:
             if self.model == 'hdl':
                 platform = self.platform
             elif self.model == 'rcc':
@@ -1192,12 +1226,20 @@ class AssemblyPipelineBuilder(PipelineBuilder):
         if stage == 'run-unit_tests':
             need = self._build_name(asset_project, asset, 'build-unit_tests')
             needs.append(need)
+        elif self.model == 'hdl' and stage == 'run-applications':
+            for assembly in self.apps_dict[asset]:
+                assembly_path = Path(assembly)
+                assembly_name = assembly_path.name
+                assembly_proj = assembly_path.relative_to('projects').parts[0]
+                need = self._build_name(assembly_proj, assembly_name, 
+                    'build-assemblies')
+                needs.append(need)
 
         return needs
 
     def _build_artifacts(self, stage: str, asset: str) -> str:
         """Constructs and returns a job's artifacts"""
-        if stage == 'build-unit_tests':
+        if stage in ['build-assemblies', 'build-unit_tests']:
             artifacts = {
                 'paths': [
                     str(Path(asset).name)
@@ -1233,36 +1275,52 @@ class AssemblyPipelineBuilder(PipelineBuilder):
         if stage in ['build-assemblies', 'build-unit_tests']:
             ocpi_cmd = 'ocpidev build -d {} --{}-platform {}'.format(
                 asset, self.model, self.platform)
-        elif stage == 'run-unit_tests':
-            ocpi_cmds = []
-            ocpidev_run_cmd = ' '.join([
-                'ocpidev run -d',
-                asset,
-                '--only-platform',
-                self.platform,
-                '--mode prep_run_verify'
-            ])
-            if ip:
+        elif stage in ['run-applications', 'run-unit_tests']:
+            if stage == 'run-unit_tests':
+                run_cmd = ' '.join([
+                    'ocpidev run -d',
+                    asset,
+                    '--only-platform',
+                    self.platform,
+                    '--mode prep_run_verify'
+                ])
+            else:
+                run_cmd = self._build_app_cmd(asset, ip=ip)
+            if ip: 
                 ocpiremote_load_cmd = self._build_ocpiremote_cmd('load', ip)
                 ocpiremote_start_cmd = self._build_ocpiremote_cmd('start', ip)
                 ocpiremote_unload_cmd = self._build_ocpiremote_cmd(
                     'unload', ip)
                 ocpi_cmds = [
-                    ocpiremote_unload_cmd + ' || true',
-                    ocpiremote_load_cmd, 
-                    ocpiremote_start_cmd,
-                    ocpidev_run_cmd, 
-                    ocpiremote_unload_cmd
+                    ocpiremote_unload_cmd  + ' || true', 
+                    ocpiremote_load_cmd,
                 ]
+                if stage == 'run-unit_tests':
+                    ocpi_cmds.append(ocpiremote_start_cmd)
+                ocpi_cmds += [run_cmd, ocpiremote_unload_cmd]
                 ocpi_cmd = ' && '.join(ocpi_cmds)
             else:
-                ocpi_cmd = ocpidev_run_cmd
-        else:
-            ocpi_cmd = None
+                ocpi_cmd = run_cmd
 
         return ocpi_cmd
 
+    def _build_app_cmd(self, app: str, ip: str=None):
+        """Build a command to run an application"""
+        apps_path = Path(__file__, '..', 'ci_applications').resolve()
+        app_cmd = str(Path('.', apps_path, 'ci_'+app).with_suffix('.sh'))
+        app_cmd += ' --{}-platform {}'.format(self.model, self.platform)
+        if self.model == 'hdl' and self.other_platform:
+            app_cmd += ' --rcc-platform {}'.format(self.other_platform)
+        app_cmd += ' --host {}'.format(self.host)
+        if ip:
+            app_cmd += ' -i {}'.format(ip)
+            app_cmd += ' -p {}'.format(self.password)
+            app_cmd += ' -u {}'.format(self.user)
+
+        return app_cmd
+
     def _build_ocpiremote_cmd(self, cmd: str, ip: str):
+        """Build an ocpiremote command"""
         if cmd == 'load':
             if self.model == 'hdl':
                 hdl_platform = self.platform
