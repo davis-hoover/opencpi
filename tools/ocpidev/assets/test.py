@@ -158,7 +158,7 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
 
     def build(self, verbose=False, no_assemblies=None, workers_as_needed=False,
         optimize=False, dynamic=False, hdl_target=None, hdl_platform=None,
-        rcc_platform=None, hdl_rcc_platform=None, generate=False):
+        rcc_platform=None, hdl_rcc_platform=None, generate=False, export=False):
         """
         Builds the test by handing over the user specifications
         to execute command.
@@ -203,6 +203,14 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         ocpiutil.execute_cmd(settings,
                              location,
                              action=action,
+                             file=make_file,
+                             verbose=verbose)
+        if export:
+            location=ocpiutil.get_path_to_project_top()
+            make_file=ocpiutil.get_makefile(location, "project")[0]
+            ocpiutil.execute_cmd({},
+                             location,
+                             action=['exports'],
                              file=make_file,
                              verbose=verbose)
 
@@ -375,7 +383,7 @@ class TestsCollection(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
 
     def build(self, verbose=False, no_assemblies=None, workers_as_needed=False,
         optimize=False, dynamic=False, hdl_target=None, hdl_platform=None,
-        rcc_platform=None, hdl_rcc_platform=None, generate=False):
+        rcc_platform=None, hdl_rcc_platform=None, generate=False, export=False):
         """
         Builds the tests by handing over the user specifications
         to execute command.
@@ -421,5 +429,13 @@ class TestsCollection(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         ocpiutil.execute_cmd(settings, 
                              location,
                              action=action,
+                             file=make_file,
+                             verbose=verbose)
+        if export:
+            location=ocpiutil.get_path_to_project_top()
+            make_file=ocpiutil.get_makefile(location, "project")[0]
+            ocpiutil.execute_cmd({},
+                             location,
+                             action=['exports'],
                              file=make_file,
                              verbose=verbose)

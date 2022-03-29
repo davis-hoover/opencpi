@@ -92,7 +92,7 @@ class Application(RunnableAsset, RCCBuildableAsset):
                              file=makefile,
                              verbose=verbose)
 
-    def build(self, verbose=False, optimize=False, dynamic=False,
+    def build(self, verbose=False, optimize=False, dynamic=False, export=False,
         workers_as_needed=False, rcc_platform=None, hdl_rcc_platform=None):
         """
         Builds the application by handing over the user specifications to execute command
@@ -132,6 +132,14 @@ class Application(RunnableAsset, RCCBuildableAsset):
         ocpiutil.execute_cmd(settings,
                              directory,
                              file=makefile,
+                             verbose=verbose)
+        if export:
+            location=ocpiutil.get_path_to_project_top()
+            make_file=ocpiutil.get_makefile(location, "project")[0]
+            ocpiutil.execute_cmd({},
+                             location,
+                             action=['exports'],
+                             file=make_file,
                              verbose=verbose)
 
     @staticmethod
@@ -283,7 +291,7 @@ class ApplicationsCollection(RunnableAsset, RCCBuildableAsset):
                              file=make_file,
                              verbose=verbose)
 
-    def build(self, verbose=False, optimize=False, dynamic=False,
+    def build(self, verbose=False, optimize=False, dynamic=False, export=False,
         workers_as_needed=False, rcc_platform=None, hdl_rcc_platform=None):
         """
         Builds the applications by handing over the user specifications to execute command
@@ -316,6 +324,14 @@ class ApplicationsCollection(RunnableAsset, RCCBuildableAsset):
         #Build
         ocpiutil.execute_cmd(settings,
                              self.directory,
+                             file=make_file,
+                             verbose=verbose)
+        if export:
+            location=ocpiutil.get_path_to_project_top()
+            make_file=ocpiutil.get_makefile(location, "project")[0]
+            ocpiutil.execute_cmd({},
+                             location,
+                             action=['exports'],
                              file=make_file,
                              verbose=verbose)
 
