@@ -494,6 +494,10 @@ function do_applications {
   if [ "$verb" == build ]; then
       eval domake $subdir applications ${buildClean:+clean} "$(dovars RccPlatforms RccHdlPlatforms)" \
              $OCPI_MAKE_OPTS
+    if [ -n "$ProjectLevelExport" -a -z "$buildClean" ]; then
+      cd $(get_project_top)
+      domake . project exports
+    fi
     return 0
   fi
 }
@@ -896,6 +900,10 @@ function do_library {
     eval domake $subdir library ${cleanTarget:+$cleanTarget} ${buildRcc:+rcc} ${buildHdl:+hdl}\
            "$(dovars HdlPlatforms HdlTargets RccPlatforms RccHdlPlatforms Workers)" \
            $OCPI_MAKE_OPTS
+    if [ -n "$ProjectLevelExport" -a -z "$buildClean" ]; then
+      cd $(get_project_top)
+      domake . project exports
+    fi
     return 0
   fi
   [ -e "$subdir" ] && bad the library \"$one\" \(directory $subdir/\) already exists
@@ -1024,6 +1032,10 @@ function do_worker {
     eval domake $subdir/$1 worker ${buildClean:+clean} \
 	   "$(dovars HdlPlatforms HdlTargets RccPlatforms RccHdlPlatforms)" \
            $OCPI_MAKE_OPTS
+    if [ -n "$ProjectLevelExport" -a -z "$buildClean" ]; then
+      cd $(get_project_top)
+      domake . project exports
+    fi
     return 0
   fi
   words=(${1//./ })
@@ -1278,6 +1290,9 @@ function do_hdl_platforms {
       # Note: If this implementation changes in the future, be sure to add logic to respect
       # missingOK; "make hdlprimitives" returns success even if no hdl/primitives present.
       eval domake . project hdlplatforms "$(dovars HdlPlatforms HdlTargets)" $OCPI_MAKE_OPTS
+      if [ -n "$ProjectLevelExport" ]; then
+        domake . project exports 
+      fi
     fi
     return 0;
   fi
@@ -1297,6 +1312,9 @@ function do_hdl_platform {
   pdir=$subdir$1
   if [ "$verb" ==  build ]; then
     domake $pdir hdl-platform ${buildClean:+clean} $OCPI_MAKE_OPTS
+    if [ -n "$ProjectLevelExport" ]; then
+      domake . project exports 
+    fi
     return 0;
   fi
   if [ "$verb" == delete ]; then
@@ -1446,6 +1464,9 @@ function do_primitives {
       domake hdl/primitives hdl-primitives clean
     else
       eval domake . project hdlprimitives "$(dovars HdlPlatforms HdlTargets)" $OCPI_MAKE_OPTS
+      if [ -n "$ProjectLevelExport" -a -z "$buildClean" ]; then
+        domake . project exports
+      fi
     fi
     return 0
   fi
@@ -1467,6 +1488,10 @@ function do_primitive {
   esac
   if [ "$verb" == build ]; then
     eval domake $dir hdl-$1 ${buildClean:+clean} "$(dovars HdlPlatforms HdlTargets)" $OCPI_MAKE_OPTS
+    if [ -n "$ProjectLevelExport" -a -z "$buildClean" ]; then
+      cd $(get_project_top)
+      domake . project exports
+    fi
     return 0
   fi
   if [ "$verb" == delete ]; then
@@ -1543,6 +1568,9 @@ function do_assemblies {
       domake hdl/assemblies hdl-assemblies clean
     else
       eval domake . project hdlassemblies "$(dovars HdlPlatforms)" $OCPI_MAKE_OPTS
+      if [ -n "$ProjectLevelExport" ]; then
+        domake . project exports
+      fi
     fi
     return 0
   fi
@@ -1592,6 +1620,10 @@ function do_build_here {
       domake . project imports
     fi
   fi
+  if [ -n "$ProjectLevelExport" -a -z "$buildClean" ]; then
+    cd $(get_project_top)
+    domake . project exports
+  fi
 }
 
 # Create an hdl assembly
@@ -1610,6 +1642,10 @@ function do_assembly {
   adir=$subdir$1
   if [ "$verb" == build ]; then
     eval domake $subdir/$1 hdl-assembly ${buildClean:+clean} "$(dovars HdlPlatforms)" $OCPI_MAKE_OPTS
+    if [ -n "$ProjectLevelExport" -a -z "$buildClean" ]; then
+      cd $(get_project_top)
+      domake . project exports
+    fi
     return 0
   fi
   if [ "$verb" == delete ]; then
@@ -2229,6 +2265,7 @@ while [[ "${argv[0]}" != "" ]] ; do
       (--build-hdl|--hdl) buildHdl=1;;
       (--worker) takelist Workers;;
       (--workers-as-needed) export OCPI_AUTO_BUILD_WORKERS=1;;   # A big hammer for now
+      (--export) ProjectLevelExport=1;;
       (--build-no-assemblies|--no-assemblies) buildNoAssemblies=1;;
       (--build-hdl-assembly|--build--assembly|--hdl-assembly) takelist Assemblies;;
       (--build-hdl-target|--hdl-target) takelist HdlTargets;;

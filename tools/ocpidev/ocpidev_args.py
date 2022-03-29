@@ -304,6 +304,10 @@ options = {
         'long': '--workers-as-needed',
         'action': 'store_true'
     },
+        'export': {
+        'long': '--export',
+        'action': 'store_true'
+    }
 }
 
 # Verbs with nouns and options, including options referencing those above
@@ -323,7 +327,8 @@ verbs = {
                     'dynamic': options['dynamic'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
-                    'workers_as_needed' : options['workers_as_needed']
+                    'workers_as_needed' : options['workers_as_needed'],
+                    'export': options['export']
                 }
             },
             'applications': {
@@ -332,14 +337,16 @@ verbs = {
                     'dynamic': options['dynamic'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
-                    'workers_as_needed' : options['workers_as_needed']
+                    'workers_as_needed' : options['workers_as_needed'],
+                    'export': options['export']
                 }
             },
             'hdl': {
                 'options': {
                     'workers_as_needed' : options['workers_as_needed'],
                     'hdl_target': options['hdl_target'],
-                    'hdl_platform': options['hdl_platform']
+                    'hdl_platform': options['hdl_platform'],
+                    'export': options['export']
                 },
                 'nouns': {
                     'assembly': {
@@ -368,7 +375,8 @@ verbs = {
                     'rcc_platform': options['rcc_platform'],
                     'workers_as_needed' : options['workers_as_needed'],
                     'hdl_target': options['hdl_target'],
-                    'hdl_platform': options['hdl_platform']
+                    'hdl_platform': options['hdl_platform'],
+                    'export': options['export']
                 }
             },
             'libraries': {
@@ -382,7 +390,8 @@ verbs = {
                     'rcc_platform': options['rcc_platform'],
                     'workers_as_needed' : options['workers_as_needed'],
                     'hdl_target': options['hdl_target'],
-                    'hdl_platform': options['hdl_platform']
+                    'hdl_platform': options['hdl_platform'],
+                    'export': options['export']
                 }
             },
             'project': {
@@ -411,7 +420,8 @@ verbs = {
                     'rcc_platform': options['rcc_platform'],
                     'hdl_target': options['hdl_target'],
                     'hdl_platform': options['hdl_platform'],
-                    'library': options['library']
+                    'library': options['library'],
+                    'export': options['export']
                 }
             },
             'tests': {
@@ -424,7 +434,8 @@ verbs = {
                     'rcc_platform': options['rcc_platform'],
                     'hdl_target': options['hdl_target'],
                     'hdl_platform': options['hdl_platform'],
-                    'library': options['library']
+                    'library': options['library'],
+                    'export': options['export']
                 }
             },
             'worker': {
@@ -433,12 +444,14 @@ verbs = {
                     'rcc_platform': options['rcc_platform'],
                     'hdl_target': options['hdl_target'],
                     'hdl_platform': options['hdl_platform'],
-                    'library': options['library']
+                    'library': options['library'],
+                    'export': options['export']
                 }
             },
             'component': {
                 'options': {
-                    'library': options['library']
+                    'library': options['library'],
+                    'export': options['export']
                 }
             }
         }
