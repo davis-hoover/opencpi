@@ -63,9 +63,9 @@ int test_FMCOMMS2_3Configurator() {
         // direction
         // ================================================
         TEST(*it, di, (int32_t)data_stream_direction_t::rx, false, 0., true);
-        uut.unlock_all();
+        (*ituut)->unlock_all();
         TEST(*it, di, (int32_t)data_stream_direction_t::tx, false, 0., false);
-        uut.unlock_all();
+        (*ituut)->unlock_all();
         // Tuning Freq for FMCOMMS2 [2400 - 2500 GHz]
         // ================================================
         if(*ituut == &uut2) {
@@ -292,9 +292,9 @@ int test_FMCOMMS2_3Configurator() {
         // direction
         // ================================================
         TEST(*it, di, (int32_t)data_stream_direction_t::rx, false, 0., false);
-        uut.unlock_all();
+        (*ituut)->unlock_all();
         TEST(*it, di, (int32_t)data_stream_direction_t::tx, false, 0., true);
-        uut.unlock_all();
+        (*ituut)->unlock_all();
         // Tuning Freq for FMCOMMS2 [2400 - 2500 MHz]
         // ================================================
         if(*ituut == &uut2) {
@@ -403,6 +403,8 @@ int test_FMCOMMS2_3Configurator() {
 int test_FMCOMMS2_3DDCConfigurator() {
   // RX CHANNEL
   int ret = 0;
+  // @TODO Add FMCOMMS2_3DDCConfigurator
+  #define FMCOMMS2_3DDCConfigurator FMCOMMS2_3Configurator
   FMCOMMS2_3DDCConfigurator uut2(2);
   FMCOMMS2_3DDCConfigurator uut3(3);
   std::vector<FMCOMMS2_3DDCConfigurator*> uuts;
@@ -417,9 +419,9 @@ int test_FMCOMMS2_3DDCConfigurator() {
         // direction
         // ================================================
         TEST(*it, di, (int32_t)data_stream_direction_t::rx, false, 0., true);
-        uut.unlock_all();
+        (*ituut)->unlock_all();
         TEST(*it, di, (int32_t)data_stream_direction_t::tx, false, 0., false);
-        uut.unlock_all();
+        (*ituut)->unlock_all();
         // Tuning Freq for FMCOMMS2 [2369.28 - 2530.72 MHz]
         // ================================================
         if(*ituut == &uut2) {
@@ -441,50 +443,50 @@ int test_FMCOMMS2_3DDCConfigurator() {
         else {
           // LOWER BOUNDS
           TEST(*it, fc, 39.27   , true, 0.000001, false)
-          uut.unlock_all();
+          (*ituut)->unlock_all();
           TEST(*it, fc, 39.28   , true, 0.000001, true )
-          uut.unlock_all();
+          (*ituut)->unlock_all();
           // MEDIAN BOUND
           TEST(*it, fc, 3000.   , true, 0.000001, true )
-          uut.unlock_all();
+          (*ituut)->unlock_all();
           // UPPER BOUNDS
           TEST(*it, fc, 6030.7190625 , true, 0.000001, true )
-          uut.unlock_all();
+          (*ituut)->unlock_all();
           TEST(*it, fc, 6039.71907, true, 0.000001, false)
-          uut.unlock_all();
+          (*ituut)->unlock_all();
         }
         // Bandwidth [0.000024140625 - 14 MHz]
         // @TODO Check Values
         // ================================================
         //  LOWER BOUNDS
         TEST(*it, bw, 0.000023, true, 0.000001, false)
-        uut.unlock_all();
+        (*ituut)->unlock_all();
         TEST(*it, bw, 0.000024140625, true, 0.000001, true )
-        uut.unlock_all();
+        (*ituut)->unlock_all();
         // MEDIAN BOUND
         TEST(*it, bw, 10.     , true, 0.000001, true )
-        uut.unlock_all();
+        (*ituut)->unlock_all();
         // UPPER BOUNDS
         TEST(*it, bw, 14.     , true, 0.000001, true )
-        uut.unlock_all();
+        (*ituut)->unlock_all();
         TEST(*it, bw, 14.01   , true, 0.000001, false)
-        uut.unlock_all();
+        (*ituut)->unlock_all();
         // Sampling rate [~0.000255 - 15.36 Msps]
         // @TODO Check Values
         // ================================================
         // LOWER BOUNDS
         TEST(*it, fs, 0.000253, true, 0.000001, false)
-        uut.unlock_all();
+        (*ituut)->unlock_all();
         TEST(*it, fs, 0.000255, true, 0.000001, true )
-        uut.unlock_all();
+        (*ituut)->unlock_all();
         // MEDIAN BOUND
         TEST(*it, fs, 10.     , true, 0.000001, true )
-        uut.unlock_all();
+        (*ituut)->unlock_all();
         // UPPER BOUND
         TEST(*it, fs, 15.36   , true, 0.000001, true )
-        uut.unlock_all();
+        (*ituut)->unlock_all();
         TEST(*it, fs, 15.37   , true, 0.000001, false)
-        uut.unlock_all();
+        (*ituut)->unlock_all();
         // Samples are complex
         // ================================================
         TEST(*it, sc, 0       , false,0.000001, false)
@@ -646,9 +648,9 @@ int test_FMCOMMS2_3DDCConfigurator() {
         // direction
         // ================================================
         TEST(*it, di, (int32_t)data_stream_direction_t::rx, false, 0., false);
-        uut.unlock_all();
+        (*ituut)->unlock_all();
         TEST(*it, di, (int32_t)data_stream_direction_t::tx, false, 0., true);
-        uut.unlock_all();
+        (*ituut)->unlock_all();
         // Tuning Freq for FMCOMMS2 [2400 - 2500 MHz]
         // ================================================
         if(*ituut == &uut2) {
@@ -687,33 +689,33 @@ int test_FMCOMMS2_3DDCConfigurator() {
         // ================================================
         //  LOWER BOUNDS
         TEST(*it, bw, 0.000023, true, 0.000001, false)
-        uut.unlock_all();
+        (*ituut)->unlock_all();
         TEST(*it, bw, 0.000024140625, true, 0.000001, true )
-        uut.unlock_all();
+        (*ituut)->unlock_all();
         // MEDIAN BOUND
         TEST(*it, bw, 7.      , true, 0.000001, true )
-        uut.unlock_all();
+        (*ituut)->unlock_all();
         // UPPER BOUNDS
         TEST(*it, bw, 14.     , true, 0.000001, true )
-        uut.unlock_all();
+        (*ituut)->unlock_all();
         TEST(*it, bw, 14.01   , true, 0.000001, false)
-        uut.unlock_all();
+        (*ituut)->unlock_all();
         // Sampling rate [~0.000255 - 15.36 Msps]
         // @TODO Check Values
         // ================================================
         // LOWER BOUNDS
         TEST(*it, fs, 0.000253, true, 0.000001, false)
-        uut.unlock_all();
+        (*ituut)->unlock_all();
         TEST(*it, fs, 0.000255, true, 0.000001, true )
-        uut.unlock_all();
+        (*ituut)->unlock_all();
         // MEDIAN BOUND
         TEST(*it, fs, 32.     , true, 0.000001, true )
-        uut.unlock_all();
+        (*ituut)->unlock_all();
         // UPPER BOUND
         TEST(*it, fs, 15.36   , true, 0.000001, true )
-        uut.unlock_all();
+        (*ituut)->unlock_all();
         TEST(*it, fs, 15.37   , true, 0.000001, false)
-        uut.unlock_all();
+        (*ituut)->unlock_all();
         // Samples are complex
         // ================================================
         TEST(*it, sc, 0       , false,0.000001, false)
