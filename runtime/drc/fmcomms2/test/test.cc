@@ -66,7 +66,7 @@ int test_FMCOMMS2_3Configurator() {
         (*ituut)->unlock_all();
         TEST(*it, di, (int32_t)data_stream_direction_t::tx, false, 0., false);
         (*ituut)->unlock_all();
-        // Tuning Freq for FMCOMMS2 [2400 - 2500 GHz]
+        // Tuning Freq for FMCOMMS2 [2400 - 2500 MHz]
         // ================================================
         if(*ituut == &uut2) {
           // LOWER BOUNDS
@@ -75,7 +75,7 @@ int test_FMCOMMS2_3Configurator() {
           TEST(*it, fc, 2400.   , true, 0.000001, true )
           (*ituut)->unlock_all();
           // MEDIAN BOUND
-          TEST(*it, fc, 3000.   , true, 0.000001, true )
+          TEST(*it, fc, 2000.   , true, 0.000001, true )
           (*ituut)->unlock_all();
           // UPPER BOUNDS
           TEST(*it, fc, 2500.   , true, 0.000001, true )
@@ -149,7 +149,7 @@ int test_FMCOMMS2_3Configurator() {
         (*ituut)->unlock_all();
         TEST(*it, gm, 2       , false,0.000001, false)
         (*ituut)->unlock_all();
-        // Gain dB
+        // Gain dB [-10 - 73 dB]
         // ================================================
         // Unconditional Constraints
         // ------------------------------------------------
@@ -172,7 +172,6 @@ int test_FMCOMMS2_3Configurator() {
         TEST(*it, gn, 74.     , true ,0.000001, false)
         (*ituut)->unlock_all();
         // Conditional Constraints
-        // ================================================
         // If fc [70 - 1300 MHz]; Possible Gain: -1 - 73 dB
         // LOWER BOUNDS
         // ------------------------------------------------
@@ -304,7 +303,7 @@ int test_FMCOMMS2_3Configurator() {
           TEST(*it, fc, 2400.   , true, 0.000001, true )
           (*ituut)->unlock_all();
           // MEDIAN BOUND
-          TEST(*it, fc, 3000.   , true, 0.000001, true )
+          TEST(*it, fc, 2000.   , true, 0.000001, true )
           (*ituut)->unlock_all();
           // UPPER BOUNDS
           TEST(*it, fc, 2500.   , true, 0.000001, true )
@@ -312,7 +311,7 @@ int test_FMCOMMS2_3Configurator() {
           TEST(*it, fc, 2500.99 , true, 0.000001, false)
           (*ituut)->unlock_all();
         }
-        // Tuning Freq for FMCOMMS3 [70 MHz - 6.0 GHz]
+        // Tuning Freq for FMCOMMS3 [70 - 6000 MHz]
         else {
           // LOWER BOUNDS
           TEST(*it, fc, 69.99   , true, 0.000001, false)
@@ -337,7 +336,7 @@ int test_FMCOMMS2_3Configurator() {
         TEST(*it, bw, 1.25    , true, 0.000001, true )
         (*ituut)->unlock_all();
         // MEDIAN BOUND
-        TEST(*it, bw, 20.     , true, 0.000001, true )
+        TEST(*it, bw, 30.     , true, 0.000001, true )
         (*ituut)->unlock_all();
         // UPPER BOUNDS
         TEST(*it, bw, 40.     , true, 0.000001, true )
@@ -375,7 +374,7 @@ int test_FMCOMMS2_3Configurator() {
         (*ituut)->unlock_all();
         TEST(*it, gm, 2       , false,0.000001, false)
         (*ituut)->unlock_all();
-        // Gain (-89.25 - 0 dB)
+        // Gain [-89.25 - 0 dB]
         // ================================================
         // LOWER BOUNDS
         TEST(*it, gn, -89.76  , true, 0.000001, false)
@@ -431,7 +430,7 @@ int test_FMCOMMS2_3DDCConfigurator() {
           TEST(*it, fc, 2369.28 , true, 0.000001, true )
           (*ituut)->unlock_all();
           // MEDIAN BOUND
-          TEST(*it, fc, 3000.   , true, 0.000001, true )
+          TEST(*it, fc, 2000.   , true, 0.000001, true )
           (*ituut)->unlock_all();
           // UPPER BOUNDS
           TEST(*it, fc, 2530.72 , true, 0.000001, true )
@@ -439,7 +438,7 @@ int test_FMCOMMS2_3DDCConfigurator() {
           TEST(*it, fc, 2530.73 , true, 0.000001, false)
           (*ituut)->unlock_all();
         }
-        // Tuning Freq [39.28 - 6030.7190625 MHz]
+        // Tuning Freq for FMCOMMS3 [39.28 - 6030.7190625 MHz]
         else {
           // LOWER BOUNDS
           TEST(*it, fc, 39.27   , true, 0.000001, false)
@@ -505,7 +504,7 @@ int test_FMCOMMS2_3DDCConfigurator() {
         (*ituut)->unlock_all();
         TEST(*it, gm, 2       , false,0.000001, false)
         (*ituut)->unlock_all();
-        // Gain dB
+        // Gain dB [-10 - 73]
         // ================================================
         // Unconditional Constraints
         // ------------------------------------------------
@@ -528,7 +527,6 @@ int test_FMCOMMS2_3DDCConfigurator() {
         TEST(*it, gn, 74.     , true ,0.000001, false)
         (*ituut)->unlock_all();
         // Conditional Constraints
-        // ================================================
         // If fc [70 - 1300 MHz]; Possible Gain: -1 - 73 dB
         // LOWER BOUNDS
         // ------------------------------------------------
@@ -660,7 +658,7 @@ int test_FMCOMMS2_3DDCConfigurator() {
           TEST(*it, fc, 2400.   , true, 0.000001, true )
           (*ituut)->unlock_all();
           // MEDIAN BOUND
-          TEST(*it, fc, 3000.   , true, 0.000001, true )
+          TEST(*it, fc, 2000.   , true, 0.000001, true )
           (*ituut)->unlock_all();
           // UPPER BOUNDS
           TEST(*it, fc, 2500.   , true, 0.000001, true )
@@ -693,7 +691,7 @@ int test_FMCOMMS2_3DDCConfigurator() {
         TEST(*it, bw, 0.000024140625, true, 0.000001, true )
         (*ituut)->unlock_all();
         // MEDIAN BOUND
-        TEST(*it, bw, 7.      , true, 0.000001, true )
+        TEST(*it, bw, 10.      , true, 0.000001, true )
         (*ituut)->unlock_all();
         // UPPER BOUNDS
         TEST(*it, bw, 14.     , true, 0.000001, true )
@@ -709,7 +707,7 @@ int test_FMCOMMS2_3DDCConfigurator() {
         TEST(*it, fs, 0.000255, true, 0.000001, true )
         (*ituut)->unlock_all();
         // MEDIAN BOUND
-        TEST(*it, fs, 32.     , true, 0.000001, true )
+        TEST(*it, fs, 10.     , true, 0.000001, true )
         (*ituut)->unlock_all();
         // UPPER BOUND
         TEST(*it, fs, 15.36   , true, 0.000001, true )
@@ -732,7 +730,7 @@ int test_FMCOMMS2_3DDCConfigurator() {
         (*ituut)->unlock_all();
         TEST(*it, gm, 2       , false,0.000001, false)
         (*ituut)->unlock_all();
-        // Gain (-89.25 - 0 dB)
+        // Gain [-89.25 - 0 dB]
         // ================================================
         // LOWER BOUNDS
         TEST(*it, gn, -89.76  , true, 0.000001, false)

@@ -166,6 +166,8 @@ class FMCOMMS2_3Configurator : public Configurator<FMCOMMS2_3CSP> {
     //m_solver.add_constr("fmcomms_num", "=", (int32_t)fmcomms_num);
     {
       DataStream::CSPVarMap map;
+      map.insert(std::make_pair(config_key_direction.c_str(),
+          "fmcomms2_3_dir_rx1a"));
       map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
           "fmcomms2_3_fc_meghz_rx1a"));
       map.insert(std::make_pair(config_key_bandwidth_3dB_MHz.c_str(),
@@ -182,6 +184,8 @@ class FMCOMMS2_3Configurator : public Configurator<FMCOMMS2_3CSP> {
     }
     {
       DataStream::CSPVarMap map;
+      map.insert(std::make_pair(config_key_direction.c_str(),
+          "fmcomms2_3_dir_rx2a"));
       map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
           "fmcomms2_3_fc_meghz_rx2a"));
       map.insert(std::make_pair(config_key_bandwidth_3dB_MHz.c_str(),
@@ -198,6 +202,8 @@ class FMCOMMS2_3Configurator : public Configurator<FMCOMMS2_3CSP> {
     }
     {
       DataStream::CSPVarMap map;
+      map.insert(std::make_pair(config_key_direction.c_str(),
+          "fmcomms2_3_dir_tx1a"));
       map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
           "fmcomms2_3_fc_meghz_tx1a"));
       map.insert(std::make_pair(config_key_bandwidth_3dB_MHz.c_str(),
@@ -214,6 +220,8 @@ class FMCOMMS2_3Configurator : public Configurator<FMCOMMS2_3CSP> {
     }
     {
       DataStream::CSPVarMap map;
+      map.insert(std::make_pair(config_key_direction.c_str(),
+          "fmcomms2_3_dir_tx2a"));
       map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
           "fmcomms2_3_fc_meghz_tx2a"));
       map.insert(std::make_pair(config_key_bandwidth_3dB_MHz.c_str(),
