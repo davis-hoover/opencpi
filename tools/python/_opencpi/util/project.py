@@ -604,7 +604,8 @@ def get_ocpidev_working_dir(noun, name, ensure_exists=True, **kwargs):
     name = "" if name == os.path.basename(os.path.realpath(".")) else name
     cur_dir_not_name = noun == cur_dirtype and not name
     noun_valid_not_name = noun in VALID_PLURAL_NOUNS and not name
-    if (not noun and not name) or cur_dir_not_name or noun_valid_not_name:
+    if not (noun == 'libraries' and cur_dirtype == 'project') and (
+            (not noun and not name) or cur_dir_not_name or noun_valid_not_name):
         return "."
 
     # pylint:disable=no-name-in-module
@@ -771,7 +772,7 @@ def get_project_package_id(realpath, dict):
     package_id = dict.get('package')
     if package_id:
         return package_id
-    package_id = dict.get('packageid')
+    package_id = dict.get('package_id')
     if package_id:
         return package_id
     package_name = dict.get('packagename')
@@ -946,7 +947,7 @@ def get_platform_attributes(project_package_id, directory, name, model):
         return None
     attrs['model'] = model
     attrs['directory'] = directory
-    attrs['packageid'] = project_package_id + "." + name
+    attrs['package_id'] = project_package_id + "." + name
     return attrs
 
 def find_all_projects(directory = None, project_package_id = None):
@@ -1083,7 +1084,7 @@ get_platforms.dict=None
 # And empty string means do not include them in the output for make
 makeVariables={ "directory": "PlatformDir",
                 "osversion" : "",
-                "packageid" : "PlatformPackageID",
+                "package_id" : "PlatformPackageID",
                 "rccplatforms" : "AllRccPlatforms",
                 "part" : "Part",
                 "family":"Target",

@@ -175,7 +175,7 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
         attrs = ocpiutil.get_platforms().get(self.name)
         if not attrs:
             raise ocpiutil.OCPIException("Could not find HDL Platform for its worker:  " + self.name)
-        self.package_id = attrs['packageid']
+        self.package_id = attrs['package_id']
         config_list = attrs.get('configurations')
         if not config_list:
             raise ocpiutil.OCPIException("Could not get list of HDL Platform Configurations for:" +
@@ -607,7 +607,7 @@ class HdlPlatform(Platform):
         self.built = built
         self.dir = ocpiutil.rchop(directory, "/lib")
         if self.dir and not package_id and os.path.exists(self.dir):
-            self.package_id = ocpiutil.get_platforms[name]['packageid']
+            self.package_id = ocpiutil.get_platforms[name]['package_id']
             #self.package_id = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(self.dir, "hdl/hdl-platform"),
             #                                              "ShellHdlPlatformVars=1 showpackage",
             #                                              "verbose")["Package"][0]

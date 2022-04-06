@@ -53,7 +53,7 @@ typedef std::list<Support> Supports;
 typedef Supports::const_iterator SupportsIter;
 
 // XML allowed for the HdlDevice class
-#define HDL_DEVICE_ATTRS HDL_WORKER_ATTRS, "emulate"
+#define HDL_DEVICE_ATTRS HDL_WORKER_ATTRS, "emulate", "emulates"
 // Device workers are allowed to have any of the infrastructure port types
 #define HDL_DEVICE_ELEMS HDL_WORKER_ELEMS, "supports", "signal", "devsignal", "rawprop", "timebase", \
     "devsignals", "sdp", "metadata", "unoc", "timeservice", "cpmaster", "control"

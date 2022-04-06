@@ -484,8 +484,9 @@ configure(ezxml_t xml) {
 bool Driver::
 probeServer(const char *a_server, bool verbose, const char **exclude, char *containers,
 	    bool discovery, unsigned &count, std::string &error) {
-  const char *server = a_server[0] == '?' ? a_server + 1 : a_server;
-  ocpiInfo("Probing remote container server: %s", server);
+  std::string serverString(a_server[0] == '?' ? a_server + 1 : a_server);
+  const char *server = serverString.c_str();
+  ocpiInfo("Probing remote container server specified as: %s", server);
   error.clear();
   OS::Socket *sock = NULL;
   uint16_t port;
@@ -499,6 +500,8 @@ probeServer(const char *a_server, bool verbose, const char **exclude, char *cont
     if ((err = OB::Value::parseUShort(l_port, end, port)))
       return OU::eformat(error, "Bad port number in server name: \"%s\"", server);
     host.resize(OCPI_SIZE_T_DIFF(sport, server));
+    if (end)
+      serverString[OCPI_SIZE_T_DIFF(end, server)] = '\0';
   } else
     port = REMOTE_PORT;
   ezxml_t rx = NULL; // need to explicitly free this below via "bad:" or "out:"

@@ -60,7 +60,9 @@ def execute_cmd(settings, directory, action=None, file=None, verbose=False, igno
                      'run_after'       : "OcpiRunAfter",
                      'run_arg'         : "OcpiRunArgs",
                      'remote_test_sys' : "OCPI_REMOTE_TEST_SYSTEMS",
+                     'application'     : "Applications",
                      'verbose'         : "TestVerbose"}
+    directory = str(directory) # allow paths, leaving this function as-is otherwise
     make_list = ["make", "-r", "-C", directory, "--no-print-directory"]
     debug_string = " ".join(make_list)
     if file:
@@ -85,6 +87,9 @@ def execute_cmd(settings, directory, action=None, file=None, verbose=False, igno
                 debug_string += " " + settings_dict[setting] + '="'  + ' '.join(value) + '"'
             else:
                 debug_string += " " + settings_dict[setting] + '='  + ' '.join(value)
+        elif isinstance(value, int):
+            make_list.append(settings_dict[setting] + '='+str(value))
+            debug_string += " " + settings_dict[setting] + '=' + str(value)
         else:
             # pylint:disable=undefined-variable
             raise OCPIException("Invalid settings data-type passed to execute_cmd().  settings is " +

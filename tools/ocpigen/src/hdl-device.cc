@@ -109,9 +109,14 @@ get(const char *a_name, ezxml_t dtxml, const char *parentFile, Worker *parent, c
     name = a_name;
   // First look for the file assuming we are building a worker and the sought worker is in the
   // same library as we are.
-  std::string file("../" + name + ".hdl/" + name);
+  std::string
+    file("../" + name + ".hdl/" + name),
+    hdlFile(file + "-hdl"),
+    hdlName(name + "-hdl");
   if (!(err = parseFile(file.c_str(), parentFile, NULL, &xml, xfile)) ||
-      !(err = parseFile(name.c_str(), parentFile, NULL, &xml, xfile))) {
+      !(err = parseFile(name.c_str(), parentFile, NULL, &xml, xfile)) ||
+      !(err = parseFile(hdlFile.c_str(), parentFile, NULL, &xml, xfile)) ||
+      !(err = parseFile(hdlName.c_str(), parentFile, NULL, &xml, xfile))) {
     OM::Assembly::Properties instancePVs;
     // Here we parse the configuration settings for this device on this board.
     // These settings are similar to instance property values in an assembly, but are

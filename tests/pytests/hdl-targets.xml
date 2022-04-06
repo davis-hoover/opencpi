@@ -42,21 +42,21 @@
   <toolset name='xst' tool='ISE'/>
   <!-- These platforms are used only for test purposes in tests/python/hdltargets_test.py -->
   <platform name='zed' model='hdl' part='xc7z020-1-clg484' family='zynq'
-	    directory='fake_plat' packageid='fake_plat'/>
+	    directory='fake_plat' package_id='fake_plat'/>
   <platform name='zed_zipper' model='hdl' part='xc7z020-1-clg484' family='zynq'
-	    directory='fake_plat' packageid='fake_plat'/>
+	    directory='fake_plat' package_id='fake_plat'/>
   <platform name='alst4' model='hdl' part='ep4sgx230k-c2-f40' family='stratix4'
-	    directory='fake_plat' packageid='fake_plat'/>
+	    directory='fake_plat' package_id='fake_plat'/>
   <platform name='alst4x' model='hdl'  part='ep4sgx530k-c2-h40' family='stratix4'
-	    directory='fake_plat' packageid='fake_plat'/>
+	    directory='fake_plat' package_id='fake_plat'/>
   <platform name='modelsim' model='hdl' part='modelsim' family='modelsim'
-	    directory='fake_plat' packageid='fake_plat'/>
+	    directory='fake_plat' package_id='fake_plat'/>
   <platform name='isim' model='hdl' part='isim' family='isim'
-	    directory='fake_plat' packageid='fake_plat'/>
+	    directory='fake_plat' package_id='fake_plat'/>
   <platform name='xsim' model='hdl' part='xsim' family='xsim'
-	    directory='fake_plat' packageid='fake_plat'/>
+	    directory='fake_plat' package_id='fake_plat'/>
   <platform name='zed_ise' model='hdl' part='xc7z020_ise_alias-1-clg484' family='zynq_ise'
-	    directory='fake_plat' packageid='fake_plat'/>
+	    directory='fake_plat' package_id='fake_plat'/>
   <platform name='ml605' model='hdl' part='xc6vlx240t-1-ff1156' family='virtex6'
-	    directory='fake_plat' packageid='fake_plat'/>
+	    directory='fake_plat' package_id='fake_plat'/>
 </hdltargets>

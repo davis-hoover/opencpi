@@ -29,7 +29,7 @@ import _opencpi.assets.factory as ocpifactory
 import _opencpi.util as ocpiutil
 
 NOUNS = ["test", "tests", "library", "application", "applications", "project", "libraries"]
-NOUNS_NO_LIBS = ["test", "tests", "library", "application", "applications", "project"]
+NOUNS_NO_LIBS = ["test", "tests", "library", "application", "applications", "project", "libraries"]
 MODES = ["all", "gen", "gen_build", "prep_run_verify", "prep", "run", "prep_run", "verify", "view",
          "clean_all", "clean_run", "clean_sim"]
 PHASES=["prepare", "run", "verify", "view"]
@@ -218,9 +218,7 @@ def main():
     name = None
     try:
         cur_dir = args['cur_dir']
-        print("PWD:"+str(Path(os.path.curdir).absolute())+":"+str(Path(cur_dir).absolute()))
         with ocpiutil.cd(cur_dir):
-            print("PWD1:"+str(Path(os.path.curdir).absolute())+":"+str(Path(cur_dir).absolute()))
             dir_type = ocpiutil.get_dirtype()
             # args['name'] could be None if no name is provided at the command line
             name = args['name']
@@ -233,7 +231,6 @@ def main():
                                                              library=args['library'],
                                                              hdl_library=args['hdl_library'],
                                                              platform=args['hdl_plat_dir'])
-            print("PWD2:"+str(Path(os.path.curdir).absolute())+":"+str(Path(directory).absolute())+":"+str(args['noun'])+":"+str(dir_type))
             if args['noun'] is None:
                 if dir_type in [n for n in NOUNS if n != "tests"]:
                     args['noun'] = dir_type

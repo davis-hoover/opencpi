@@ -90,7 +90,7 @@ override HdlExplicitLibraries:=$(call Unique,$(HdlLibraries) $(Libraries) $(HdlE
 # form <path>:<lib>, where if the library is in the global namespace <lib> is the same as basename
 # <path>, but when the library is in the qualified namespace it is qualified
 override HdlLibrariesInternal=$(infox HLI:$1:$(HdlTarget):$(HdlExplicitLibraries))$(strip \
-$(if $(findstring clean,$(MAKECMDGOALS)),,\
+$(if $(filter clean% xml,$(MAKECMDGOALS)),,\
 $(foreach l,$(call Unique,\
               $(- first process explicitly supplied libraries)\
               $(foreach p,$(HdlExplicitLibraries),\

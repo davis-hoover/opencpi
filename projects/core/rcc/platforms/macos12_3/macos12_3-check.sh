@@ -1,3 +1,4 @@
+#!/bin/sh --noprofile
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -16,33 +17,7 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-$(if $(realpath $(OCPI_CDK_DIR)),,$(error The OCPI_CDK_DIR environment variable is not set correctly.))
-include $(OCPI_CDK_DIR)/include/util.mk
-# In this non-standard Makefile, the minimum is to be exposed to project-level variable settings
-$(OcpiIncludeProject)
-
-.SILENT: show
-.PHONY: run clean show
-
-# build the testbench executable
-run: tests
-
-clean::
-	rm -rf *log
-	rm -rf *out
-
-show:
-	echo "$$showhelp"
-
-tests:
-	./scripts/run_test.sh
-
-define showhelp
-----------------------------------------------------------------------------
-----------------------------------------------------------------------------
-On CentOS run:
-make tests
-On Zedboard/Matchstiq (natively, not remote) run:
-./scripts/run_test.sh
-endef
-export showhelp
+[ "$(uname -s)" = Darwin ] && which -s sw_vers &&
+    vers=`sw_vers -productVersion |
+          sed 's/^\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/' | tr . _` &&
+    [ macos$vers = $(basename $(dirname $0)) ]

@@ -30,9 +30,9 @@
 const char *Worker::
 parseHdl(const char *a_package) {
   const char *err;
-  if (strcmp(m_implName, m_fileName.c_str()))
-    return OU::esprintf("File name (%s) and implementation name in XML (%s) don't match",
-			m_fileName.c_str(), m_implName);
+  if (strcasecmp(m_implName, nsname()))
+    return OU::esprintf("File name without suffix (%s) and implementation name in XML (%s) don't match",
+			nsname(), m_implName);
   m_pattern = ezxml_cattr(m_xml, "Pattern");
   m_portPattern = ezxml_cattr(m_xml, "PortPattern");
   if (!m_pattern)
@@ -124,6 +124,8 @@ parseHdlImpl(const char *a_package) {
   // Since we will steal properties from the device (worker) being emulated,
   // we actually need to know that worker before parsing this one.
   const char *emulate = ezxml_cattr(m_xml, "emulate");
+  if (!emulate)
+    emulate = ezxml_cattr(m_xml, "emulates"); // easier to understand the relationship
   if (emulate) {
     const char *dot = strrchr(emulate, '.');
     if (!dot)

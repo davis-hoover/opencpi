@@ -414,15 +414,16 @@ class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, Rep
         libraries = kwargs.get('library', '')
         hdl_library = kwargs.get('hdl_library', '')
         platform = kwargs.get('platform', '')
-        if len(list(filter(None, [libraries, hdl_library, platform]))) > 1:
+        lib_specs = list(filter(None, [libraries, hdl_library, platform]))
+        if len(lib_specs) > 1:
             ocpiutil.throw_invalid_libs_e()
         ocpiutil.check_no_libs('libraries', libraries, hdl_library, platform)
-        if not name:
+        if not name and len(lib_specs) > 0:
             ocpiutil.throw_not_blank_e('libraries', 'name', True)
 
         working_path = Path(ocpiutil.get_path_to_project_top())
         comp_path = Path(working_path, 'components')
-        if name != 'components':
+        if name and name != 'components':
             if not comp_path.exists() and not ensure_exists:
                 comp_path.mkdir()
             working_path = Path(comp_path, name)

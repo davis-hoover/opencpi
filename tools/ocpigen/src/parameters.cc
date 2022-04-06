@@ -703,8 +703,7 @@ parseBuildXml(ezxml_t x, const std::string &file) {
 const char *Worker::
 startBuildXml(FILE *&f) {
   const char *err;
-  if ((err = openOutput(m_fileName.c_str(), m_outDir, "", "-build", ".xml", NULL,
-			f)))
+  if ((err = openOutput(nsname(), m_outDir, "", "-build", ".xml", NULL, f)))
     return err;
   fprintf(f, "<build>\n");
   return NULL;
@@ -837,7 +836,7 @@ writeParamFiles(FILE *mkFile, FILE *xmlFile) {
   for (size_t n = 0; n < m_paramConfigs.size(); n++)
     if (m_paramConfigs[n] && m_paramConfigs[n]->used)
       fprintf(mkFile, "%s%zu", n ? " " : "", n);
-  fprintf(mkFile, "\nWorkerName_%s:=%s\n", m_fileName.c_str(), m_implName);
+  fprintf(mkFile, "\nWorkerName_%s:=%s\n", nsname(), m_implName);
   for (size_t n = 0; n < m_paramConfigs.size(); n++)
     if (m_paramConfigs[n])
       m_paramConfigs[n]->write(xmlFile, mkFile);
@@ -872,7 +871,7 @@ emitToolParameters() {
   }
   if ((m_paramConfigs.size() == 0 && (err = parseBuildFile(true, NULL, m_parentFile))) ||
       (err = parseRawParams(x)) ||
-      (err = openOutput(m_fileName.c_str(), m_outDir, "", "", ".mk", NULL, mkFile)))
+      (err = openOutput(nsname(), m_outDir, "", "", ".mk", NULL, mkFile)))
     return err;
   ParamConfig info(*this);                          // Current config for generating them
   info.params.resize(m_ctl.nParameters);
@@ -936,7 +935,7 @@ emitMakefile(FILE *xmlFile) {
   const char *err;
   FILE *mkFile;
   if ((!m_emulate && (err = parseBuildFile(false, NULL, m_parentFile))) ||
-      (err = openOutput(m_fileName.c_str(), m_outDir, "", "", ".mk", NULL, mkFile)))
+      (err = openOutput(nsname(), m_outDir, "", "", ".mk", NULL, mkFile)))
     return err;
   for (size_t n = 0; n < m_paramConfigs.size(); n++)
     if (m_paramConfigs[n])
