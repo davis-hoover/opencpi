@@ -209,6 +209,12 @@ Options When Building Projects
     Don't build the HDL assemblies in the project. Building HDL assemblies
     (and their containers) can be slow.
 
+*`--optimize`*::
+    Build RCC/ACI assets with compiler optimization enabled.  This
+    results in a separate set of build outputs that do not conflict
+    with non-optimized (debug) build outputs, since they are placed
+    in a target directory whose name has a "-o" suffix.
+
 *`--rcc`*::
     Limit the assets being built to RCC workers.
 
@@ -218,14 +224,6 @@ Options When Building Projects
     is also not used), the current development software platform
     is used as the single RCC platform used for building.
 
-*`--optimimize`*::
-    Build RCC/ACI assets with compiler optimization enabled.  This
-    results in a separate set of build outputs that do not conflict
-    with non-optimized (debug) build outputs, since they are placed
-    in a target directory whose name has a "-o" suffix.
-
-*`--worker=`*'<worker>'+::
-    Limits the assets being built to the specified worker.
 
 Options When Running Projects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -438,7 +436,7 @@ link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
 
 COPYING
 -------
-Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2022 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your

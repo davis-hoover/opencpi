@@ -359,7 +359,7 @@ struct Instance;
 class Worker : public OM::Worker {
  public:
   ezxml_t m_xml;
-  std::string m_file, m_parentFile, m_fileName;
+  std::string m_file, m_parentFile, m_fileName, m_noSuffName;
   Model m_model;
   const char **m_baseTypes;
   const char *m_modelString;
@@ -425,6 +425,7 @@ class Worker : public OM::Worker {
 	   const char *outDir, Worker *parent, OM::Assembly::Properties *instancePropertyValues,
 	   size_t paramConfig, const char *&err);
   const Ports &ports() const { return m_ports; }
+  const char *nsname() const { return m_noSuffName.c_str(); }
   const char *parseClocks();
   const char *addClock(ezxml_t);
   const char *addClock(const char *a_name, const char *direction, Clock *&clk);

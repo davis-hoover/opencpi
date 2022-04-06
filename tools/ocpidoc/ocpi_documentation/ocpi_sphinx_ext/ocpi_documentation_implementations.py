@@ -56,7 +56,7 @@ class OcpiDocumentationImplementations(docutils.parsers.rst.Directive):
         source_dir = source_path.parent
         for argument in self.arguments:
             if argument.startswith("../"):
-                link = "gen/" + argument[2:]
+                link = "gen/" + argument[3:]
                 if source_dir.joinpath(link).exists():
                     argument = link
             worker_directory = source_dir.joinpath(argument)

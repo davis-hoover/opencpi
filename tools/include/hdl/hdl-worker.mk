@@ -269,7 +269,7 @@ define DoImplConfig
               $$< > $$@
 
 endef
-ifneq ($(MAKECMDGOALS),clean)
+ifeq ($(filter clean xml,$(MAKECMDGOALS)),)
   ifneq ($(MAKECMDGOALS),skeleton)
     $(foreach c,$(ParamConfigurations),\
       $(foreach t,$(HdlActualTargets),\
@@ -391,4 +391,3 @@ $(foreach t,$(HdlTargets),\
 
 endif
 #endif # if not an assembly
-

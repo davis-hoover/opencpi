@@ -242,6 +242,8 @@ addProperty(const char *a_name, OA::BaseType type, bool isDebug, bool isParamete
 // and also *AGAIN* after all expressions are resolved when instanced in an assembly
 const char *DataPort::
 finalize() {
+  if (!m_dataValueWidth && nOperations() && !m_dataWidthFound && worker().m_defaultDataWidth == SIZE_MAX)
+    m_dataWidth = 0; // if no width is specified and the values are zero, force the width to zero
   if (!m_dataValueWidth && !nOperations())
     m_dataValueWidth = m_dataWidth;
   if (m_dataWidth >= m_dataValueWidth) {

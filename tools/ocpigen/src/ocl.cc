@@ -146,7 +146,7 @@ const char *Worker::
 emitImplOCL() {
   const char *err;
   FILE *f;
-  if ((err = openOutput(m_fileName.c_str(), m_outDir, "", OCLIMPL, HEADER, m_implName, f)))
+  if ((err = openOutput(nsname(), m_outDir, "", OCLIMPL, HEADER, m_implName, f)))
     return err;
   fprintf(f, "/*\n");
   printgen(f, " *", m_file.c_str());
@@ -283,7 +283,7 @@ const char* Worker::
 emitSkelOCL() {
   const char *err;
   FILE *f;
-  if ((err = openOutput(m_fileName.c_str(), m_outDir, "", "_skel", ".cl", NULL, f)))
+  if ((err = openOutput(nsname(), m_outDir, "", "_skel", ".cl", NULL, f)))
     return err;
   fprintf(f, "/*\n");
   printgen(f, " *", m_file.c_str(), true);
@@ -352,7 +352,7 @@ const char *Worker::
 emitEntryPointOCL() {
   const char* err;
   FILE* f;
-  if ((err = openOutput(m_fileName.c_str(), m_outDir, "", OCLENTRYPOINT, SOURCE, m_implName, f)))
+  if ((err = openOutput(nsname(), m_outDir, "", OCLENTRYPOINT, SOURCE, m_implName, f)))
     return err;
   unsigned pad = OCPI_UTRUNCATE(unsigned, 18 + strlen(m_implName));
   fprintf(f,

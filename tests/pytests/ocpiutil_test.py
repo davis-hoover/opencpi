@@ -109,7 +109,7 @@ class TestPrintTable(unittest.TestCase):
         expected =  "---------------\n"
         expected += "| Col1 | Col2 |\n"
         expected += "| foo  | bar  |\n"
-        expected += "---------------\n\n"
+        expected += "---------------\n"
         
         self.assertEqual(actual, expected)
 
@@ -122,7 +122,7 @@ class TestPrintTable(unittest.TestCase):
         expected =  "---------------\n"
         expected += "| Col1 | Col2 |\n"
         expected += "| 3    | 4    |\n"
-        expected += "---------------\n\n"
+        expected += "---------------\n"
         
         self.assertEqual(actual, expected)
 
@@ -136,7 +136,7 @@ class TestPrintTable(unittest.TestCase):
         expected += "| Col1 | Col2 |\n"
         expected += "| ---- | ---- |\n"
         expected += "| foo  | bar  |\n"
-        expected += "---------------\n\n"
+        expected += "---------------\n"
         
         self.assertEqual(actual, expected)
 
@@ -151,7 +151,7 @@ class TestPrintTable(unittest.TestCase):
         expected += "| Col1* | Col2 |\n"
         expected += "| foo   | bar  |\n"
         expected += "----------------\n"
-        expected += "*) hello\n\n"
+        expected += "*) hello\n"
 
         self.assertEqual(actual, expected)
 
@@ -168,7 +168,7 @@ class TestPrintTable(unittest.TestCase):
         expected += "| foo   | bar!! |\n"
         expected += "-----------------\n"
         expected += "!) hello\n"
-        expected += "!!) hello again\n\n"
+        expected += "!!) hello again\n"
 
         self.assertEqual(actual, expected)
     def test_print_with_footnotes(self):
@@ -184,7 +184,7 @@ class TestPrintTable(unittest.TestCase):
         expected += "| foo   | bar** |\n"
         expected += "-----------------\n"
         expected += "*) hello\n"
-        expected += "**) hello again\n\n"
+        expected += "**) hello again\n"
 
         self.assertEqual(actual, expected)
 
@@ -200,7 +200,7 @@ class TestPrintTable(unittest.TestCase):
         expected += "| Col1! | Col2 |\n"
         expected += "| foo   | bar! |\n"
         expected += "----------------\n"
-        expected += "!) hello\n\n"
+        expected += "!) hello\n"
 
         self.assertEqual(actual, expected)
     def test_print_with_footnotes_reduced(self):
@@ -215,7 +215,7 @@ class TestPrintTable(unittest.TestCase):
         expected += "| Col1* | Col2 |\n"
         expected += "| foo   | bar* |\n"
         expected += "----------------\n"
-        expected += "*) hello\n\n"
+        expected += "*) hello\n"
 
         self.assertEqual(actual, expected)
 
@@ -231,7 +231,7 @@ class TestPrintTable(unittest.TestCase):
         expected += "! Col1* | Col2 !\n"
         expected += "! foo   | bar* !\n"
         expected += "----------------\n"
-        expected += "*) hello\n\n"
+        expected += "*) hello\n"
 
         self.assertEqual(actual, expected)
     def test_print_with_footnotes_reduced_surr_rows_delim(self):
@@ -246,7 +246,7 @@ class TestPrintTable(unittest.TestCase):
         expected += "| Col1* | Col2 |\n"
         expected += "| foo   | bar* |\n"
         expected += "!!!!!!!!!!!!!!!!\n"
-        expected += "*) hello\n\n"
+        expected += "*) hello\n"
 
         self.assertEqual(actual, expected)
 
@@ -262,7 +262,7 @@ class TestPrintTable(unittest.TestCase):
         expected += "| Col1* ! Col2 |\n"
         expected += "| foo   ! bar* |\n"
         expected += "----------------\n"
-        expected += "*) hello\n\n"
+        expected += "*) hello\n"
 
         self.assertEqual(actual, expected)
 
@@ -280,7 +280,7 @@ class TestPrintTable(unittest.TestCase):
         expected += "| foo   | bar* |\n"
         expected += "!!!!!!!!!!!!!!!!\n"
         expected += "----------------\n"
-        expected += "*) hello\n\n"
+        expected += "*) hello\n"
 
         self.assertEqual(actual, expected)
 

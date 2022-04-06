@@ -21,6 +21,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import re
+import sys
 import xml.etree.ElementTree as ET
 import os.path
 import _opencpi
@@ -106,7 +107,8 @@ class BaseParser():
             with open(self._filename, "r") as open_file:
                 file_xml_string = open_file.read()
         else:
-            file_xml_string, self._filename = _opencpi.util.get_xml_string(self._include_filepaths[0])
+            self._filename = self._include_filepaths[0]
+            file_xml_string = _opencpi.util.get_xml_string(self._filename)[0]
 
         # Locate any <xi:include href="<file>"/> statements. Search for the
         # specified file within self._include_filepaths, and if found insert

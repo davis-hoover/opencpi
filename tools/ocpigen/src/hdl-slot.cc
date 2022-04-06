@@ -28,8 +28,16 @@ SlotType(const char *file, const std::string &parent, const char *&err) {
   ezxml_t xml;
   std::string xfile;
   err = NULL;
-  if ((err = parseFile(file, parent, NULL, &xml, xfile)) ||
-      (err = Signal::parseSignals(xml, parent, m_signals, m_sigmap, NULL)))
+  if ((err = parseFile(file, parent, "slottype", &xml, xfile))) {
+    size_t len = strlen(file);
+    if (len > 5 && !strcasecmp(file + len - 5, "-slot"))
+      return;
+    std::string slot(file);
+    slot += "-slot";
+    if ((err = parseFile(slot.c_str(), parent, "slot", &xml, xfile)))
+      return;
+  }
+  if ((err = Signal::parseSignals(xml, parent, m_signals, m_sigmap, NULL)))
     return;
   OE::getOptionalString(xml, m_name, "name");
   char *cp = strdup(xfile.c_str());

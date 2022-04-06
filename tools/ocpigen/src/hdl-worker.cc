@@ -2497,7 +2497,7 @@ emitImplHDL(bool wrap) {
 const char *Worker::
 openSkelHDL(const char *suff, FILE *&f) {
   const char *err;
-  if ((err = openOutput(m_fileName.c_str(), m_outDir, "", suff, m_language == VHDL ? VHD : VER, NULL, f)))
+  if ((err = openOutput(nsname(), m_outDir, "", suff, m_language == VHDL ? VHD : VER, NULL, f)))
     return err;
   printgen(f, hdlComment(m_language), m_file.c_str(), true);
   return 0;

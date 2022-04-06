@@ -622,7 +622,18 @@ parseSpec(const char *a_package) {
   if (specAttr) {
     if (spec)
       return "Can't have both ComponentSpec element (maybe xi:included) and a 'spec' attribute";
-    if ((err = parseFile(specAttr, m_file, "ComponentSpec", &spec, m_specFile, false)))
+    std::string specString;
+    size_t len = strlen(specAttr);
+    if (!strchr(specAttr, '.') && !strchr(specAttr,'-') &&
+	(len <= 5 || strcasecmp(specAttr + len - 5, "_spec"))) {
+      if (parseFile(OU::format(specString, "%s_spec", specAttr), m_file, "ComponentSpec", &spec,
+		    m_specFile, false) &&
+	  parseFile(OU::format(specString, "%s-spec", specAttr), m_file, "ComponentSpec", &spec,
+		      m_specFile, false) &&
+	  (err = parseFile(OU::format(specString, "%s-comp",specAttr), m_file, "ComponentSpec",
+			   &spec, m_specFile, false)))
+	return err;
+    } else if ((err = parseFile(specAttr, m_file, "ComponentSpec", &spec, m_specFile, false)))
       return err;
   } else if (isSpec)
     spec = m_xml;
@@ -637,7 +648,7 @@ parseSpec(const char *a_package) {
     size_t len = strlen("-spec");
     if (l_name.length() > len) {
       const char *tail = l_name.c_str() + l_name.length() - len;
-      if (!strcasecmp(tail, "-spec") || !strcasecmp(tail, "_spec"))
+      if (!strcasecmp(tail, "-spec") || !strcasecmp(tail, "_spec") || !strcasecmp(tail, "-comp"))
 	l_name.resize(l_name.size() - len);
     }
     m_specName = strdup(l_name.c_str());
@@ -808,8 +819,12 @@ getNames(ezxml_t xml, const char *file, const char *tag, std::string &name,
   if (fileName.empty())
     return OE::getRequiredString(xml, name, "name", ezxml_name(xml));
   OE::getOptionalString(xml, name, "name");
-  if (name.empty())
+  if (name.empty()) {
     name = fileName;
+    const char *dash = strchr(name.c_str(), '-');
+    if (dash)
+      name.resize(OCPI_SIZE_T_DIFF(dash, name.c_str()));
+  }
   return NULL;
 }
 
@@ -853,8 +868,10 @@ create(const char *file, const std::string &parentFile, const char *package, con
        const char *&err) {
   err = NULL;
   // If there are slashes, it is "just a file name", so leave it alone.
-  // otherwise if it ends in .xml or has no dots, also leave it alone.
-  // otherwiseif there are dots, they must include authoring model. more than one dot means a package id
+  // otherwise if it ends in .xml, also leave it alone.
+  // otherwise if there are dots, they must include authoring model.
+  // more than one dot means a package id
+  // no dots means a file for the same model as parent
   const char
     *slash = strrchr(file, '/'),
     *base = slash ? slash + 1 : file,
@@ -887,8 +904,19 @@ create(const char *file, const std::string &parentFile, const char *package, con
   ezxml_t xml;
   std::string xf;
   if ((err = parseFile(fileName.c_str(), parentFile, NULL, &xml, xf, false, true, false,
-		       packagePrefix.empty() ? NULL : skipFile, &packagePrefix)))
-    return NULL;
+		       packagePrefix.empty() ? NULL : skipFile, &packagePrefix))) {
+    if (!strcasecmp(fileName.c_str() + fileName.length() - 4, ".xml") || slash)
+      return NULL;
+    std::string suffixed;
+    OU::format(suffixed, "%s-%s", fileName.c_str(), parent->m_modelString);
+    if ((err = parseFile(suffixed.c_str(), parentFile, NULL, &xml, xf, false, true, false,
+			 packagePrefix.empty() ? NULL : skipFile, &packagePrefix))) {
+      err = OU::esprintf("Cannot find worker using \"%s\" or \"%s\": %s",
+			 suffixed.c_str(), fileName.c_str(), err);
+      return NULL;
+      fileName = suffixed;
+    }
+  }
   const char *xfile = xf.c_str();
   const char *name = ezxml_name(xml);
   if (!name) {
@@ -1088,6 +1116,10 @@ Worker(ezxml_t xml, const char *xfile, const std::string &parentFile,
 {
   if ((err = getNames(xml, xfile, NULL, m_name, m_fileName)))
     return;
+  m_noSuffName = m_fileName;
+  const char *dash = strchr(m_noSuffName.c_str(), '-');
+  if (dash)
+    m_noSuffName.resize(OCPI_SIZE_T_DIFF(dash, m_noSuffName.c_str()));
   m_implName = m_name.c_str();
   const char *l_name = ezxml_name(xml);
   assert(l_name);
@@ -1268,20 +1300,6 @@ emitAttribute(const char *attr) {
   }
   return OU::esprintf("Unknown worker attribute: %s", attr);
 }
-
-#if 0
-Parsed::
-Parsed(ezxml_t xml,        // The xml for this entity
-       const char *file,   // The file with this as top level, possibly NULL
-       const std::string &parent, // The file referencing this entity or file, possibly NULL
-       const char *tag,    // The top level tag for this entity
-       const char *&err)   // Errors detected during construction
-  : m_file(file ? file : ""), m_parentFile(parent), m_xml(xml) {
-  ocpiAssert(xml);
-  err = getNames(xml, file, tag, m_name, m_fileName);
-}
-#endif
-
 
 const char *Worker::
 emitUuid(const OU::Uuid &) {

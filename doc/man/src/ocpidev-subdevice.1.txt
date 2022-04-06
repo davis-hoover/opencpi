@@ -35,19 +35,15 @@ XXXXX TBD - UPDATE ALL BELOW FOR HDL SUBDEVICE WORKER - XXXXXX
 
 *`build`*::
     Compile the worker source code, creating files and directories
-    as required. A single worker implementation generally exists
-    in its own directory and when compiled, results in a single
-    'artifact' (a binary executable compiled from the worker),
-    although some authoring models (for example, RCC) allow
-    multiple workers to be built as a single artifact.
-    
+    as required.
+
 *`clean`*::
     Remove all generated and compiled files for the worker.
 
 *`create`*::
     Create the named worker, creating files and directories as required.
     The worker is created in a directory '<name>'*`.`*'<authoring-model-suffix>'
-    under the current working directory where *`ocpidev`* 
+    under the current working directory where *`ocpidev`*
     is executed. The general-purpose option *`-d`* '<directory>'
     can be used to create the worker under a different directory.
     Note that multiple workers that implement the same component must
@@ -56,7 +52,7 @@ XXXXX TBD - UPDATE ALL BELOW FOR HDL SUBDEVICE WORKER - XXXXXX
 
 *`delete`*::
     Remove all directories and files associated with the named worker.
-    
+
 *`show`*::
     Display information about the worker.
 
@@ -139,7 +135,7 @@ Options That Apply to All Operations (Verbs) on Workers
 *`-d`* '<directory>'::
     Specify the directory in which the command should be run.
     Analogous to the *-C* option in the POSIX *make* command.
-    
+
 *`-v`*, *`--verbose`*::
     Describe what is happening in command execution in more detail.
 
@@ -188,7 +184,7 @@ Options When Creating Workers
     of the library or project (or libraries specified with the *`-y`*
     option or other projects specified by the *`-D`* option when the
     project that contains the worker was created).
-   
+
 *`-T`* '<target>'+::
     Only build the worker for the specified architecture. See also the
     description of the *`OnlyTargets`* OWD attribute in the 'OpenCPI
@@ -197,7 +193,7 @@ Options When Creating Workers
 *`-Y`* '<primitive-library>'+::
     Specify a primitive library on which the worker
     depends.
-   
+
 *`-Z`* '<target>'+::
     Do not build the worker for the specified architecture. See also
     the description of the *`ExcludeTargets`* OWD attribute in
@@ -212,26 +208,6 @@ Options When Creating Workers
    Specify a component library to search for workers, devices
    and/or specs that this worker references.
 
-Options When Creating RCC Workers
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*`-R`* '<prereq-library>'+::
-    Specify a library on which the worker depends and
-    to which it should be statically linked.
-
-*`-W`* '<worker>'+::
-    Specify one of multiple workers implemented in this RCC
-    worker's directory when a single RCC worker directory
-    is creating a multi-worker artifact. This option is
-    supported but is rarely required or used.
-
-*`-V`* '<worker>'::
-    Specify a slave worker for which the worker being
-    created is a proxy.
-
-*`-r`* '<prereq-library>'+::
-    Specify a library on which the worker depends and
-    to which it should be dynamically linked.
-
 Options When Creating HDL Workers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`-C`* '<core>'+::
@@ -244,27 +220,13 @@ Options When Deleting Workers
     Force deletion: do not ask for confirmation when deleting
     a worker. Normally, you are asked to confirm a deletion.
 
-Options When Building RCC Workers
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*`--hdl-rcc-platform=`*'<platform>'+::
-    Build RCC/ACI assets for the RCC platforms associated with the
-    specified HDL platform. If this option is not used (and *`--rcc-platform`*
-    '<platform>' is also not used), the current development software
-    platform is used as the single RCC platform used for building.
-
-*`--rcc-platform=`*'<platform>'+::
-    Build RCC/ACI assets for the specified RCC platform. If this
-    option is not used (and *`--hdl-rcc-platform`* '<platform>'
-    is also not used), the current development software platform
-    is used as the single RCC platform used for building.
-
 Options When Showing Workers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`--global-scope`*::
     Show workers from all registered projects and the
     current project if applicable.
     This is the default scope used if *`-local-scope`* is not used.
-    
+
 *`--json`*::
     Format the output in JavaScript Object Notation (JSON) format
     for integration with other software.
@@ -274,7 +236,7 @@ Options When Showing Workers
 
 *`--simple`*::
     Format the output as simply as possible.
-  
+
 *`--table`*::
     Display the output in an easy-to-read table.
     This is the default display format
@@ -291,15 +253,15 @@ Options When Using Utilization on HDL Workers
     Specifying *`latex`* bypasses *`stdout`* and writes all output to
     *`utilization.inc`* files in the directories for the assets on
     which it operates.
-    
+
 *`--hdl-platform=`*'<platform>'+::
     Specify the buildable HDL platform for which to
     display FPGA resource usage information for the worker(s).
-    
+
 *`--hdl-target=`*'<target>'+::
     Specify the buildable HDL architecture for which to
     display FPGA resource usage information for the worker(s).
-    
+
 *`-P`* '<hdl-platform-directory>'::
     Specify the HDL platform subdirectory in which
     to operate on the worker(s).

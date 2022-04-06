@@ -79,8 +79,7 @@ class ApplicationsCollectionsTest(unittest.TestCase):
         create a ApplicationCollection in the default way
         """
         my_asset = factory.AssetFactory.factory(self.asset_type,
-                                                  "../av-test/applications",
-                                                  self.asset_type)
+                                                  "../av-test/applications")
 
         assert my_asset.run() == 0
 

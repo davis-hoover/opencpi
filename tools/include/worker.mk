@@ -40,10 +40,9 @@ else
 endif
 $(call OcpiDbgVar,Worker)
 $(call OcpiDbgVar,Workers)
-# Now we must figure out the language since so many other things depend on it.
-# But we want to keep the language in the XML and not in the Makefile
-ImplXmlFiles:=$(Workers:%=%.xml)
-$(foreach w,$(Workers),$(eval Worker_$w_xml:=$w.xml))
+
+$(foreach w,$(Workers),$(eval Worker_$w_xml:=$(or $(wildcard $w-$(Model).xml),$w.xml)))
+ImplXmlFiles:=$(foreach w,$(Workers),$(Worker_$w_xml))
 
 ifeq ($(MAKECMDGOALS),clean)
 # Clean default OWD files when they are the default

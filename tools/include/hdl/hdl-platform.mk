@@ -67,7 +67,7 @@ ifeq ($(origin HdlPlatforms),undefined)
  override HdlPlatforms:=$(HdlPlatform)
 endif
 # Before we really do any "worker" or "config" stuff we must recurse into the device directory
-ifneq ($(MAKECMDGOALS),clean)
+ifeq ($(filter clean xml,$(MAKECMDGOALS)),)
   ifneq ($(wildcard devices),)
   # No reason to enter devices library if just printing out vars to shell
   ifndef ShellHdlPlatformVars
