@@ -3,18 +3,20 @@ import _opencpi.util as ocpiutil
 
 def get_noun():
     """
-    Get noun from call to opencpi utility function get_dirtype().
+    Get noun from call to opencpi utility function get_dir_info().
     Format returned dirtype as needed.
     """
-    dirtype = ocpiutil.get_dirtype()
-    if dirtype:
-        if dirtype in ['hdl-core', 'hdl-library']:
-        # Command line expects 'hdl-primitive-core' or 'hdl-primitive-library'
-            index = dirtype.find('-')
-            dirtype = dirtype[:index] + '-primitive' + dirtype[index:]
-        dirtype = dirtype.split('-')
-    
-    return dirtype
+    make_type, asset_type, _, _, _ = ocpiutil.get_dir_info()
+    if asset_type:
+        if asset_type.endswith('-worker'):
+            asset_type = 'worker'
+        if asset_type in ['hdl-core', 'hdl-library']:
+            # Command line expects 'hdl-primitive-core' or 'hdl-primitive-library' as a list
+            asset_type = 'hdl-primitive-' + asset_type[4:]
+        asset_type = asset_type.split('-')
+    else:
+        asset_type = make_type
+    return asset_type
 
 """Dicts of args to be used by ocpidev.py"""
 
@@ -43,13 +45,13 @@ options = {
         'short': '-I',
         'action': 'append'
     },
-    'comp_lib': {
-        'long': '--comp-lib',
+    'component_library': {
+        'long': ['--component-library','--comp-lib'],
         'short': '-y',
         'action': 'append'
     },
-    'prim_lib': {
-        'long': '--prim-lib',
+    'primitive_library': {
+        'long': ['--primitive-library', '--prim-lib'],
         'short': '-Y',
         'action': 'append'
     },
@@ -72,8 +74,8 @@ options = {
         'short': '-n',
         'action': 'store_true'
     },
-    'spec_file_only': {
-        'long': '--spec-file-only',
+    'file_only': {
+        'long': '--file-only',
         'action': 'store_true'
     },
     'create_test': {
@@ -104,34 +106,35 @@ options = {
         'action': 'store_true'
     },
     'spec': {
-        'long': '--spec',
+        'long': ['--spec', '--component'],
         'short': '-S'
     },
     'platform': {
         'long': '--platform',
-        'short': '-P'
+        'short': '-P',
+        'mut_exc_group': 'project'
     },
     'language': {
         'long': '--language',
         'short': '-L'
     },
     'other': {
-        'long': '--other',
+        'long': ['--other', '--other-source-file'],
         'short': '-O',
         'action': 'append'
     },
     'core': {
-        'long': '--core',
+        'long': ['--core', '--primitive-core'],
         'short': '-C',
         'action': 'append'
     },
     'rcc_static_prereq': {
-        'long': '--rcc-static-prereq',
+        'long': ['--rcc-static-prereq', '--static-prereq'],
         'short': '-R',
         'action': 'append'
     },
     'rcc_dynamic_prereq': {
-        'long': '--rcc-dynamic-prereq',
+        'long': ['--rcc-dynamic-prereq', '--dynamic-prereq'],
         'short': '-r',
         'action': 'append'
     },
@@ -143,7 +146,7 @@ options = {
     'emulates': {
         'long': '--emulates',
         'short': '-E',
-        'action': 'append'
+        'action': 'store'
     },
     'supports': {
         'long': '--supports',
@@ -183,12 +186,12 @@ options = {
         'short': '-Q',
         'action': 'append'
     },
-    'module': {
-        'long': '--module',
+    'top_module': {
+        'long': ['--top-module','--module'],
         'short': '-M'
     },
-    'prebuilt': {
-        'long': '--prebuilt',
+    'prebuilt_core': {
+        'long': ['--prebuilt-core','--prebuilt'],
         'short': '-B'
     },
     'xml_app': {
@@ -203,8 +206,8 @@ options = {
         'action': 'store_true',
         'mut_exc_group': 'xml_app'
     },
-    'no_depend': {
-        'long': '--no-depend',
+    'no_libraries': {
+        'long': ['--no-libraries','--no-depend'],
         'short': '-H',
         'action': 'store_true'
     },
@@ -253,8 +256,8 @@ options = {
         'long': '--simulation',
         'action': 'store_true'
     },
-    'execute': {
-        'long': '--execute',
+    'execution': {
+        'long': ['--execution', '--execute'],
         'action': 'store_true'
     },
     'optimize': {
@@ -304,7 +307,80 @@ options = {
         'long': '--workers-as-needed',
         'action': 'store_true'
     },
-        'export': {
+    'phase': {
+        'long': '--phase',
+        'choices': ["prepare", "run", "verify", "view"],
+        'action': 'append'
+    },
+    'mode': {
+        'long': '--mode',
+        'choices': ["all", "gen", "gen_build", "prep_run_verify", "prep", "run", "prep_run",
+                    "verify", "view", "clean_all", "clean_run", "clean_sim"],
+    },
+    'keep_simulations': {
+        'long': '--keep-simulations',
+        'action': 'store_true',
+    },
+    'accumulate_errors': {
+        'long': '--accumulate-errors',
+        'action': 'store_true',
+    },
+    'view': {
+        'long': '--view',
+        'action': 'store_true',
+    },
+    'case': {
+        'long': '--case',
+        'action': 'append'
+    },
+    'run_arg': {
+        'long': '--run-arg',
+        'action': 'append'
+    },
+    'run_before': {
+        'long': ['--run-before', '--before'],
+        'action': 'append'
+    },
+    'run_after': {
+        'long': ['--run-after', '--after'],
+        'action': 'append'
+    },
+    'remotes': {
+        'long': '--remotes',
+        'action': 'append'
+    },
+    'table': {
+        'long': '--table',
+        'action' : 'store_true',
+        'mut_exc_group' : 'format',
+     },
+    'json': {
+        'long': '--json',
+        'action' : 'store_true',
+        'mut_exc_group' : 'format',
+     },
+    'simple': {
+        'long': '--simple',
+        'action' : 'store_true',
+        'mut_exc_group' : 'format',
+     },
+    'local_scope': {
+        'long': '--local-scope',
+        'action' : 'store_true',
+        'mut_exc_group' : 'scope',
+     },
+    'global_scope': {
+        'long': '--global_scope',
+        'action' : 'store_true',
+        'mut_exc_group' : 'scope',
+     },
+    'format': {
+        'long': '--format',
+        # latex is legacy and only applies to utilization
+        'choices': [ 'simple', 'table', 'json', 'latex'],
+        'mut_exc_group' : 'format',
+     },
+    'export': {
         'long': '--export',
         'action': 'store_true'
     }
@@ -316,7 +392,6 @@ verbs = {
         'options': {
             'name': {
                 'nargs': '?',
-                'default': lambda: Path.cwd().name
             }
         },
         'nouns': {
@@ -328,6 +403,8 @@ verbs = {
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
                     'workers_as_needed' : options['workers_as_needed'],
+                    'xml_app': options['xml_app'],
+                    'xml_dir_app': options['xml_dir_app'],
                     'export': options['export']
                 }
             },
@@ -368,7 +445,6 @@ verbs = {
                 'options': {
                     'hdl': options['hdl'],
                     'rcc': options['rcc'],
-                    'worker': options['worker'],
                     'optimize': options['optimize'],
                     'dynamic': options['dynamic'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
@@ -383,7 +459,6 @@ verbs = {
                 'options': {
                     'hdl': options['hdl'],
                     'rcc': options['rcc'],
-                    'worker': options['worker'],
                     'optimize': options['optimize'],
                     'dynamic': options['dynamic'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
@@ -400,7 +475,6 @@ verbs = {
                     'no_assemblies': options['no_assemblies'],
                     'hdl': options['hdl'],
                     'rcc': options['rcc'],
-                    'worker': options['worker'],
                     'optimize': options['optimize'],
                     'dynamic': options['dynamic'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
@@ -421,6 +495,8 @@ verbs = {
                     'hdl_target': options['hdl_target'],
                     'hdl_platform': options['hdl_platform'],
                     'library': options['library'],
+                    'hdl_library': options['hdl_library'],
+                    'platform': options['platform'],
                     'export': options['export']
                 }
             },
@@ -435,6 +511,8 @@ verbs = {
                     'hdl_target': options['hdl_target'],
                     'hdl_platform': options['hdl_platform'],
                     'library': options['library'],
+                    'hdl_library': options['hdl_library'],
+                    'platform': options['platform'],
                     'export': options['export']
                 }
             },
@@ -460,13 +538,15 @@ verbs = {
         'options': {
             'name': {
                 'nargs': '?',
-                'default': lambda: Path.cwd().name
             }
         },
         'nouns': {
             'default': get_noun,
             'application': {
-                'options': {}
+                'options': {
+                    'xml_app': options['xml_app'],
+                    'xml_dir_app': options['xml_dir_app']
+                }
             },
             'applications': {
                 'options': {}
@@ -475,7 +555,8 @@ verbs = {
                 'options': {
                     'workers_as_needed' : options['workers_as_needed'],
                     'hdl_target': options['hdl_target'],
-                    'hdl_platform': options['hdl_platform']
+                    'hdl_platform': options['hdl_platform'],
+                    'platform': options['platform']
                 },
                 'nouns': {
                     'assembly': None,
@@ -496,7 +577,6 @@ verbs = {
                 'options': {
                     'hdl': options['hdl'],
                     'rcc': options['rcc'],
-                    'worker': options['worker'],
                     'hdl_target': options['hdl_target'],
                     'hdl_platform': options['hdl_platform']
                 }
@@ -505,7 +585,6 @@ verbs = {
                 'options': {
                     'hdl': options['hdl'],
                     'rcc': options['rcc'],
-                    'worker': options['worker'],
                     'hdl_target': options['hdl_target'],
                     'hdl_platform': options['hdl_platform']
                 }
@@ -517,7 +596,6 @@ verbs = {
                     'no_assemblies': options['no_assemblies'],
                     'hdl': options['hdl'],
                     'rcc': options['rcc'],
-                    'worker': options['worker'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
                     'hdl_target': options['hdl_target'],
@@ -526,16 +604,28 @@ verbs = {
             },
             'test': {
                 'options': {
+                    'hdl_rcc_platform': options['hdl_rcc_platform'],
+                    'rcc_platform': options['rcc_platform'],
+                    'hdl_target': options['hdl_target'],
+                    'hdl_platform': options['hdl_platform'],
                     'simulation': options['simulation'],
-                    'execute': options['execute'],
-                    'library': options['library']
+                    'execution': options['execution'],
+                    'library': options['library'],
+                    'hdl_library': options['hdl_library'],
+                    'platform': options['platform']
                 }
             },
             'tests': {
                 'options': {
+                    'hdl_rcc_platform': options['hdl_rcc_platform'],
+                    'rcc_platform': options['rcc_platform'],
+                    'hdl_target': options['hdl_target'],
+                    'hdl_platform': options['hdl_platform'],
                     'simulation': options['simulation'],
-                    'execute': options['execute'],
-                    'library': options['library']
+                    'execution': options['execution'],
+                    'library': options['library'],
+                    'hdl_library': options['hdl_library'],
+                    'platform': options['platform']
                 }
             },
             'worker': {
@@ -570,7 +660,7 @@ verbs = {
             'component': {
                 'options': {
                     'name': None,
-                    'spec_file_only': options['spec_file_only'],
+                    'file_only': options['file_only'],
                     'no_control': options['no_control'],
                     'platform': options['platform'],
                     'hdl_library': options['hdl_library'],
@@ -585,8 +675,8 @@ verbs = {
                     'pkg_name': options['pkg_name'],
                     'xml_include': options['xml_include'],
                     'include_dir': options['include_dir'],
-                    'comp_lib': options['comp_lib'],
-                    'prim_lib': options['prim_lib']
+                    'component_library': options['component_library'],
+                    'primitive_library': options['primitive_library']
                 }
             },
             'hdl': {
@@ -599,13 +689,17 @@ verbs = {
                             'exclude_target': options['exclude_target']
                         }
                     },
-                    'card': None,
+                    'card': {
+                        'options' : {
+                            'platform': options['platform']
+                        }
+                    },
                     'device': {
                         'options': {
                             'xml_include': options['xml_include'],
                             'include_dir': options['include_dir'],
-                            'comp_lib': options['comp_lib'],
-                            'prim_lib': options['prim_lib'],
+                            'component_library': options['component_library'],
+                            'primitive_library': options['primitive_library'],
                             'hdl_library': options['hdl_library'],
                             'library': options['library'],
                             'core': options['core'],
@@ -614,15 +708,17 @@ verbs = {
                             'exclude_platform': options['exclude_platform'],
                             'only_platform': options['only_platform'],
                             'only_target': options['only_target'],
-                            'exclude_target': options['exclude_target']
+                            'exclude_target': options['exclude_target'],
+                            'spec': options['spec'],
+                            'platform': options['platform']
                         }
                     },
                     'platform': {
                         'options': {
                             'xml_include': options['xml_include'],
                             'include_dir': options['include_dir'],
-                            'comp_lib': options['comp_lib'],
-                            'prim_lib': options['prim_lib'],
+                            'component_library': options['component_library'],
+                            'primitive_library': options['primitive_library'],
                             'core': options['core'],
                             'hdl_part': options['hdl_part'],
                             'time_freq': options['time_freq'],
@@ -635,23 +731,30 @@ verbs = {
                             'only_platform': options['only_platform'],
                             'only_target': options['only_target'],
                             'exclude_target': options['exclude_target'],
+                            'include_dir': options['include_dir'],
                         },
                         'nouns': {
                             'core': {
                                 'options': {
-                                    'prebuilt': options['prebuilt'],
-                                    'module': options['module']
+                                    'no_libraries': options['no_libraries'],
+                                    'prebuilt_core': options['prebuilt_core'],
+                                    'top_module': options['top_module']
                                 }
                             },
                             'library': {
                                 'options': {
-                                    'no_depend': options['no_depend'],
+                                    'no_libraries': options['no_libraries'],
                                     'no_elaborate': options['no_elaborate']
                                 }
                             }
                         }
                     },
-                    'slot': None
+                    'slot': {
+                        'options' : {
+                            'platform': options['platform'], # for a particular platform
+                            'project': options['project']    # project level definition
+                        }
+                    }
                 }
             },
             'project': {
@@ -663,8 +766,8 @@ verbs = {
                     'pkg_name': options['pkg_name'],
                     'xml_include': options['xml_include'],
                     'include_dir': options['include_dir'],
-                    'comp_lib': options['comp_lib'],
-                    'prim_lib': options['prim_lib']
+                    'component_library': options['component_library'],
+                    'primitive_library': options['primitive_library']
                 }
             },
             'protocol': {
@@ -698,8 +801,8 @@ verbs = {
                 'options': {
                     'xml_include': options['xml_include'],
                     'include_dir': options['include_dir'],
-                    'comp_lib': options['comp_lib'],
-                    'prim_lib': options['prim_lib'],
+                    'component_library': options['component_library'],
+                    'primitive_library': options['primitive_library'],
                     'hdl_library': options['hdl_library'],
                     'library': options['library'],
                     'rcc_static_prereq': options['rcc_static_prereq'],
@@ -723,12 +826,16 @@ verbs = {
         'options': {
             'name': {
                 'nargs': '?',
-                'default': lambda: Path.cwd().name
             }
         },
         'nouns': {
             'default': get_noun,
-            'application': None,
+            'application': {
+                'options': {
+                    'xml_app': options['xml_app'],
+                    'xml_dir_app': options['xml_dir_app']
+                }
+            },
             'component': {
                 'project': options['project'],
                 'hdl_library': options['hdl_library'],
@@ -742,7 +849,8 @@ verbs = {
                     'device': {
                         'options': {
                             'hdl_library': options['hdl_library'],
-                            'library': options['library']
+                            'library': options['library'],
+                            'platform': options['platform']
                         }
                     },
                     'platform': None,
@@ -752,7 +860,12 @@ verbs = {
                             'library': None
                         }
                     },
-                    'slot': None
+                    'slot': {
+                        'options': {
+                            'hdl_library': options['hdl_library'],
+                            'platform': options['platform']
+                        }
+                    }
                 }
             },
             'library': None,
@@ -776,12 +889,15 @@ verbs = {
             },
             'test': {
                 'options': {
-                    'library': options['library']
+                    'library': options['library'],
+                    'hdl_library': options['hdl_library'],
+                    'platform': options['platform']
                 }
             },
             'worker': {
                 'options': {
                     'hdl_library': options['hdl_library'],
+                    'platform': options['platform'],
                     'library': {
                         'long': '--library',
                         'short': '-l'
@@ -794,7 +910,6 @@ verbs = {
         'options': {
             'name': {
                 'nargs': '?',
-                'default': lambda: Path.cwd().name
             }
         },
         'nouns': {
@@ -806,7 +921,6 @@ verbs = {
         'options': {
             'name': {
                 'nargs': '?',
-                'default': lambda: Path.cwd().name
             }
         },
         'nouns': {
@@ -815,28 +929,231 @@ verbs = {
         }
     },
     'run': {
-        'nouns': None
-    },
-    'set': {
         'options': {
-            'registry_directory': {
+            'name': {
                 'nargs': '?',
-                'metavar': 'registry-directory'
-            }
+            },
         },
         'nouns': {
             'default': get_noun,
+            'application': {
+                'options': {
+                    'run_arg': options['run_arg'],
+                    'run_before': options['run_before'],
+                    'run_after': options['run_after'],
+                    'xml_app': options['xml_app'],
+                    'xml_dir_app': options['xml_dir_app']
+                }
+            },
+            'applications': {
+            },
+            'library': {
+                'options': {
+                    'phase': options['phase'],
+                    'mode': options['mode'],
+                    'accumulate_errors': options['accumulate_errors'],
+                    'keep_simulations': options['keep_simulations'],
+                    'only_platform': options['only_platform'],
+                    'exclude_platform': options['exclude_platform']
+                },
+            },
+            'libraries': {
+                'options': {
+                    'phase': options['phase'],
+                    'mode': options['mode'],
+                    'accumulate_errors': options['accumulate_errors'],
+                    'keep_simulations': options['keep_simulations'],
+                    'only_platform': options['only_platform'],
+                    'exclude_platform': options['exclude_platform']
+                },
+            },
+            'project': {
+                'options': {
+                    'phase': options['phase'],
+                    'mode': options['mode'],
+                    'accumulate_errors': options['accumulate_errors'],
+                    'keep_simulations': options['keep_simulations'],
+                    'only_platform': options['only_platform'],
+                    'exclude_platform': options['exclude_platform']
+                }
+            },
+            'test': {
+                'options': {
+                    'library': options['library'],
+                    'platform': options['platform'],
+                    'hdl_library': options['hdl_library'],
+                    'phase': options['phase'],
+                    'mode': options['mode'],
+                    'case': options['case'],
+                    'accumulate_errors': options['accumulate_errors'],
+                    'keep_simulations': options['keep_simulations'],
+                    'only_platform': options['only_platform'],
+                    'exclude_platform': options['exclude_platform']
+                }
+            },
+            'tests': {
+                'options': {
+                    'library': options['library'],
+                    'platform': options['platform'],
+                    'hdl_library': options['hdl_library'],
+                    'phase': options['phase'],
+                    'mode': options['mode'],
+                    'accumulate_errors': options['accumulate_errors'],
+                    'keep_simulations': options['keep_simulations'],
+                    'only_platform': options['only_platform'],
+                    'exclude_platform': options['exclude_platform'],
+                },
+            },
+        },
+    },
+    'set': {
+        'options': {
+            # This is not the name of the noun, but the registry directory
+            'name': {
+                'nargs': '?',
+            }
+        },
+        'nouns': {
             'registry': None
         }
     },
     'show': {
-        'nouns': None
+        'options': {
+            'name': {
+                'nargs': '?',
+            },
+            'table' : options['table'],
+            'json' : options['json'],
+            'simple' : options['simple'],
+            'format' : options['format'],
+            'local_scope' : options['local_scope'],
+            'global_scope' : options['global_scope'],
+        },
+        'nouns': {
+            'default': get_noun,
+            'application': {
+                'options': {
+                    'xml_app': options['xml_app'],
+                    'xml_dir_app': options['xml_dir_app']
+                }
+            },
+            'component': {
+                'options' : {
+                    'project': options['project'],
+                    'hdl_library': options['hdl_library'],
+                    'library': options['library'],
+                    'platform': options['platform'],
+                    'file_only': options['file_only'],
+                }
+            },
+            'components': {
+                'options' : {
+                    'project': options['project'],
+                    'local_scope': options['local_scope'],
+                    'global_scope': options['global_scope'],
+                    'hdl_library': options['hdl_library'],
+                    'library': options['library'],
+                    'platform': options['platform']
+                }
+            },
+            'hdl': {
+                'nouns': {
+                    'assembly': None,
+                    'card': None,
+                    'device': {
+                        'options': {
+                            'hdl_library': options['hdl_library'],
+                            'library': options['library']
+                        }
+                    },
+                    'platform': None,
+                    'platforms': None,
+                    'primitive': {
+                        'nouns': {
+                            'core': None,
+                            'library': None
+                        }
+                    },
+                    'slot': None,
+                    'targets': None,
+                    'worker': None,
+                    'workers': None,
+                }
+            },
+            'library': None,
+            'libraries': {
+                'options' : {
+                    'local_scope': options['local_scope'],
+                    'global_scope': options['global_scope'],
+                }
+            },
+            'platforms': None,
+            'prerequisites': None,
+            'project': None,
+            'projects': None,
+            'protocol': {
+                'options': {
+                    'project': options['project'],
+                    'hdl_library': options['hdl_library'],
+                    'library': options['library']
+                }
+            },
+            'rcc': {
+                'nouns': {
+                    'platforms': None,
+                    'targets': None,
+                    'worker': None,
+                    'workers': None,
+                }
+            },
+            'registry': None,
+            'spec': {
+                'options': {
+                    'project': options['project'],
+                    'hdl_library': options['hdl_library'],
+                    'library': options['library'],
+                    'platform': options['platform']
+                }
+            },
+            'targets': None,
+            'test': {
+                'options': {
+                    'library': options['library'],
+                    'hdl_library': options['hdl_library'],
+                    'platform': options['platform']
+                }
+            },
+            'tests': {
+                'options' : {
+                    'local_scope': options['local_scope'],
+                    'global_scope': options['global_scope'],
+                    'hdl_library': options['hdl_library'],
+                    'library': options['library'],
+                    'platform': options['platform']
+                }
+            },
+            'worker': {
+                'options': {
+                    'hdl_library': options['hdl_library'],
+                    'platform': options['platform'],
+                    'library': options['library'],
+                }
+            },
+            'workers': {
+                'options' : {
+                    'hdl_library': options['hdl_library'],
+                    'platform': options['platform'],
+                    'library': options['library'],
+                    'local_scope': options['local_scope'],
+                    'global_scope': options['global_scope'],
+                }
+            },
+        }
     },
     'unregister': {
         'options': {
             'name': {
                 'nargs': '?',
-                'default': lambda: Path.cwd().name
             }
         },
         'nouns': {
@@ -851,8 +1168,49 @@ verbs = {
         }
     },
     'utilization': {
-        'nouns': None
-    }
+        'options': {
+            'name': {
+                'nargs': '?',
+            },
+            'format' : options['format'],
+            'hdl_platform' : options['hdl_platform'],
+            'hdl_target' : options['hdl_target'],
+        },
+        'nouns': {
+            'default': get_noun,
+            'hdl': {
+                'nouns': {
+                    'assembly': None,
+                    'assemblies': None,
+                    'device': {
+                        'options': {
+                            'hdl_library': options['hdl_library'],
+                            'library': options['library']
+                        }
+                    },
+                    'platform': None,
+                    'platforms': None,
+                }
+            },
+            'library': None,
+            'libraries': None,
+            'project': None,
+            'projects': None,
+            'worker': {
+                'options': {
+                    'hdl_library': options['hdl_library'],
+                    'platform': options['platform'],
+                    'library': options['library'],
+                }
+            },
+            'workers': {
+                'options' : {
+                    'local_scope': options['local_scope'],
+                    'global_scope': options['global_scope'],
+                }
+            },
+        }
+    },
 }
 
 # Collection of options, common options, and verbs to be imported by ocpidev

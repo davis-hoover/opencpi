@@ -43,7 +43,7 @@ class LibraryTest(unittest.TestCase):
         """
         my_asset = factory.AssetFactory.factory(self.asset_type,
                                                   "../av-test/components",
-                                                  init_tests=True)
+                                                  verb='run')
         assert my_asset.run() == 0
 
     def test_lib_no_init(self):
@@ -51,8 +51,7 @@ class LibraryTest(unittest.TestCase):
         create a library and forget to initialize the test objects and a exception is thrown
         """
         my_asset = factory.AssetFactory.factory(self.asset_type,
-                                                   "../av-test/components",
-                                                   "components")
+                                                   "../av-test/components")
 
         self.assertRaises(ocpiutil.OCPIException, my_asset.run)
 
@@ -62,8 +61,7 @@ class LibraryTest(unittest.TestCase):
         """
         my_asset = factory.AssetFactory.factory(self.asset_type,
                                                   "../av-test/components",
-                                                  "components",
-                                                  init_tests=True)
+                                                  verb='run')
         assert my_asset.run() == 0
 
 if __name__ == '__main__':

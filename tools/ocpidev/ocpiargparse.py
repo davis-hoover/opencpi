@@ -111,7 +111,8 @@ COMMON_OPTIONS = {
     'verbose': {
         'long': '--verbose',
         'short': '-v',
-        'action': 'store_true'
+        'action': 'count',
+        'default': 0
     },
     'directory': {
         'long': '--directory',
@@ -153,7 +154,7 @@ def parse_args(args_dict, prog=None):
     """
     args = _preprocess_args(args_dict)
     parser = _make_parser(args_dict, prog=prog)
-    args,_ = parser.parse_known_args(args)
+    args = parser.parse_args(args)
     args = _postprocess_args(args)
 
     return args
@@ -192,6 +193,7 @@ def _make_subparsers(parser, subparser_dict, parent_options_dict,
     _make_options() once no more subnouns are left to add.
     """
     subparsers = parser.add_subparsers(dest=dest)
+    subparsers.required = True
     subparser_dict.pop('default', None)
 
     for key,val in subparser_dict.items():
@@ -300,7 +302,7 @@ def _preprocess_args(args_dict, args=None):
 
     if not noun:
     # Noun not supplied, so try to get default
-        try: 
+        try:
             noun = args_dict['verbs'][verb]['nouns']['default']
         except (TypeError, KeyError):
             pass
@@ -316,8 +318,16 @@ def _preprocess_args(args_dict, args=None):
     args = []
     for arg,val in args_dict:
         arg = arg.replace('_', '-')
-        if isinstance(val,bool):
-            arg = arg = '--{}'.format(arg)
+        if arg in ['simple', 'table', 'json']:
+            arg = '--format='+arg
+        elif isinstance(val,bool):
+            arg = '--{}'.format(arg)
+        elif arg == 'verbose': # action is count
+            if not val:
+                continue
+            arg = '-'
+            for i in range(val):
+                arg += 'v'
         else:
             arg = '--{}={}'.format(arg,val)
         args.append(arg)

@@ -159,7 +159,7 @@ PROJ_GUI_PROJECT = ("""<?xml version="1.0" encoding="UTF-8"?>
 </projectDescription>
 \n""")
 
-PROJ_PROJECT_XML_LEGACY = ("""<project
+PROJ_PROJECT_XML = ("""<project
 {%if package_name: %}
        PackageName='{{package_name}}'
 {% endif %}
@@ -185,58 +185,6 @@ PROJ_PROJECT_XML_LEGACY = ("""<project
        ComponentLibraries='{{comp_lib}}'
 {% endif %}
 />
-\n""")
-
-PROJ_PROJECT_XML = ("""<project>
-{%if package_name: %}
-       <OcpiProperty>
-               <name>PackageName</name>
-               <value>{{package_name}}</value>
-       </OcpiProperty>
-{% endif %}
-{%if package_prefix: %}
-       <OcpiProperty>
-               <name>PackagePrefix</name>
-               <value>{{package_prefix}}</value>
-       </OcpiProperty>
-{% endif %}
-{%if package_id: %}
-       <OcpiProperty>
-               <name>Package</name>
-               <value>{{package_id}}</value>
-       </OcpiProperty>
-{% endif %}
-{%if depend: %}
-       <OcpiProperty>
-               <name>ProjectDependencies</name>
-               <value>{{depend}}</value>
-       </OcpiProperty>
-{% endif %}
-{%if prim_lib: %}
-       <OcpiProperty>
-               <name>Libraries</name>
-               <value>{{prim_lib}}</value>
-       </OcpiProperty>
-{% endif %}
-{%if include_dir: %}
-       <OcpiProperty>
-               <name>IncludeDirs</name>
-               <value>{{include_dir}}</value>
-       </OcpiProperty>
-{% endif %}
-{%if xml_include: %}
-       <OcpiProperty>
-               <name>XmlIncludeDirs</name>
-               <value>{{xml_include}}</value>
-       </OcpiProperty>
-{% endif %}
-{%if comp_lib: %}
-       <OcpiProperty>
-               <name>ComponentLibraries</name>
-               <value>{{comp_lib}}</value>
-       </OcpiProperty>
-{% endif %}
-</project>
 \n""")
 
 LIBRARIES_XML = ("""<!-- This is the XML file for the components directory when there are multiple
@@ -269,7 +217,7 @@ LIB_DIR_XML = ("""<library
 />
 \n""")
 
-APP_APPLICATION_XML = ("""<applications>
+APP_APPLICATIONS_XML = ("""<applications>
     <!-- To restrict the applications that are built or run, you can set the Applications
     attribute to the specific list of which ones you want to build and run, e.g.:
     <libraries Applications='app1 app3'/>
@@ -309,7 +257,12 @@ int main(/*int argc, char **argv*/) {
 }
 \n""")
 
-APP_APPLICATION_APP_XML = ("""<!-- The {{app}} application xml file -->
+APP_APPLICATION_XML = ("""<!-- The {{app}} application xml file defining the application -->
+<Application>
+  <Instance Component='ocpi.core.nothing' Name='nothing'/>
+</Application>
+\n""")
+APP_APPLICATION_ATTR_XML = ("""<!-- The xml file defining run/build/clean attributes of the {{app}} application -->
 <Application>
   <Instance Component='ocpi.core.nothing' Name='nothing'/>
 </Application>
@@ -333,18 +286,18 @@ COMPONENT_SPEC_NO_CTRL_XML = ("""<!-- This is the spec file (OCS) for: {{compone
 </ComponentSpec>
 \n""")
 
-COMPONENT_HDL_LIB_XML = ("""<!-- This is the XML file for the hdl/{{hdl_lib}} library
-     All workers created here in *.<model> directories will be built automatically
-     All tests created here in *.test directories will be built/run automatically
-     To limit the workers that actually get built, set the Workers= attribute
-     To limit the tests that actually get built/run, set the Tests= attribute
+# COMPONENT_HDL_LIB_XML = ("""<!-- This is the XML file for the hdl/{{hdl_lib}} library
+#      All workers created here in *.<model> directories will be built automatically
+#      All tests created here in *.test directories will be built/run automatically
+#      To limit the workers that actually get built, set the Workers= attribute
+#      To limit the tests that actually get built/run, set the Tests= attribute
 
-     Any attribute definitions that should apply to all individual worker/test
-     in this library belong in this xml file-->
-<library>
-  <!-- Add items here -->
-</library>
-\n""")
+#      Any attribute definitions that should apply to all individual worker/test
+#      in this library belong in this xml file-->
+# <library>
+#   <!-- Add items here -->
+# </library>
+# \n""")
 
 PROTOCOL_SPEC_XML = ("""<!-- This is the spec file (OPS) for protocol: {{protocol}}
      Add <operation> elements for message types.
@@ -442,20 +395,20 @@ HDL_ASSEMBLIES_XML = ("""<!-- This is the XML file for the hdl/assemblies direct
 </assemblies>
 \n""")
 
-HDL_ASSEMBLY_XML = ("""<!-- This is the HDL XML Makefile for assembly: {{assembly}}
+HDL_ASSEMBLY_XML = ("""<!-- This is the HDL XML for assembly: {{assembly}}
      The file '{{assembly}}.xml' defines the assembly.
      The default container for all assemblies is one that connects all external ports to
-     the devices interconnect to communicate with software workers or other FPGAs.
-     Limit this assembly to certain platforms or targets with
+     the platform's interconnect to communicate with software workers or other FPGAs.
+     Limit this assembly to build for certain platforms or targets with
      Exclude/Only and Targets/Platforms ie:
         OnlyTargets=
         ExcludeTargets=
         OnlyPlatforms=
         ExcludePlatforms=
      If you want to connect external ports of the assembly to local devices on the platform,
-     you must define container XML files, and mention them in a "Containers" variable here, e.g.:
+     you must define container XML files, and mention them in a "Containers" attribute here, e.g.:
      Containers='take_input_from_local_ADC' -->
-<HdlAssembly>
+<HdlAssembly
 {%if only_target: %}
      OnlyTargets='{{only_target}}'
 {% endif %}
@@ -468,20 +421,9 @@ HDL_ASSEMBLY_XML = ("""<!-- This is the HDL XML Makefile for assembly: {{assembl
 {%if exclude_platform: %}
      ExcludePlatforms='{{exclude_platform}}'
 {% endif %}
+  >
+  <Instance Worker='nothing' name='nothing'/>
 </HdlAssembly>
-\n""")
-
-HDL_CARDS_XML = ("""<!-- This is the XML file for the hdl/cards library
-     All workers created here in *.<model> directories will be built automatically
-     All tests created here in *.test directories will be built/run automatically
-     To limit the workers that actually get built, set the Workers= attribute
-     To limit the tests that actually get built/run, set the Tests= attribute
-
-     Any attribute definitions that should apply to all individual worker/test
-     in this library belong in this xml file-->
-<library
->
-</library>
 \n""")
 
 HDL_SLOT_XML = ("""<!-- This is the slot definition file for slots of type: {{hdl_slot}}

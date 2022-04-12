@@ -24,6 +24,8 @@
 import pathlib
 import os
 import sys
+import re
+import xml.etree.ElementTree as xt
 import _opencpi.util as ocpiutil
 from .conf import BUILD_FOLDER
 from .create import _template_to_specific
@@ -100,15 +102,40 @@ def build(directory, build_only=False, mathjax=None, config_options=[],
             if default_template_path.is_file(): # note xml_file does not have to exist
                 with open(default_template_path, "r") as default_template_file:
                     template = default_template_file.read()
-                    source_directory = source_directory.joinpath("gen")
-                    generated_rst_file = source_directory.joinpath(xml_path.stem + ".rst")
+                    # source_directory = source_directory.joinpath("gen")
+                    generated_rst_file = source_directory.joinpath('gen', xml_path.stem + ".rst")
                     generated_rst_file.parent.mkdir(parents=True,exist_ok=True)
+                    toc = None
+                    if asset_type == 'library': # put this elsewhere of course for recursion etc.
+                        toc = ('   ../*.comp/*-comp\n'+
+                               '   ../*.comp/*-index\n')
+                        for dir in source_directory.iterdir():
+                            if dir.is_dir() and dir.suffix != '' and dir.suffix != '.test':
+                                xml = dir.joinpath(dir.stem + ".xml")
+                                if not xml.exists():
+                                    xml = dir.joinpath(dir.name.replace('.','-') + ".xml")
+                                    if not xml.exists():
+                                        continue
+                                worker_xml = xt.fromstring(xml.read_text().replace('xi:include','xiinclude'))
+                                for child in list(worker_xml):
+                                    if child.tag.lower() == 'componentspec':
+                                        rst = dir.joinpath(dir.stem + ".rst")
+                                        if not rst.exists():
+                                            rst = dir.joinpath(dir.stem + "-worker.rst")
+                                            if not rst.exists():
+                                                rst = dir.joinpath(dir.name.replace('.','-') + ".rst")
+                                                if not rst.exists():
+                                                    continue
+                                        toc += f'   ../{dir.name}/{rst.stem}\n'
+                                        break
                     with open(generated_rst_file,"w") as rst_file:
+                        model = source_directory.suffix.lstrip('.')
+                        if model == '':
+                            model = None
                         rst_file.write(_template_to_specific(template, asset_name,
-                                                             source_directory.suffix,
-                                                             None,
-                                                             None))
-                        master_doc = generated_rst_file.stem
+                                                             authoring_model=model,
+                                                             toc=toc))
+                        master_doc = 'gen/'+generated_rst_file.stem
         if not master_doc:
             print("Warning:  when building docs in directory " + str(directory) +
                   f" there is no \"{default_rst_file_name}\" or \"{xml_path.name}\" or " +
@@ -120,22 +147,29 @@ def build(directory, build_only=False, mathjax=None, config_options=[],
         print("Error:  In directory " + str(directory) +
               " there is no file " + master_doc + ".rst, use: ocpidoc create?", file=sys.stderr)
         return 1
-    # Due to sphinx toctree limitations (no ../ paths supported, many requests to fix it),
-    # create symlinks to other directories in the same library if we are in a component directory.
-    # Without fully parsing all reachable rst files, we don't know what subset of dirs we must
-    # symlink to...
-    # We must remove the links after sphinx build runs otherwise they will be seen as duplicates
-    # when docs are built higher up the directory structure (e.g. at the library or project level)
-    # please someone figure out a better way to do this!
     links=[]
-    if asset_type == 'component':
+    if asset_type in ['component', 'worker', 'test']:
+        # Due to sphinx toctree limitations (no ../ paths supported, many requests to fix it),
+        # create symlinks to other directories or files in the same library if we are using them
+        # in some known directives.
+        # We must remove the links after the sphinx build runs, otherwise they will be seen as duplicates
+        # when docs are built higher up the directory structure (e.g. at the library or project level).
+        # Please someone figure out a better way to do this!
         source_directory.joinpath("gen").mkdir(exist_ok=True)
-        for entry in source_directory.parent.iterdir():
-            if entry.is_dir() and entry.name != source_directory.name and entry.suffix != "":
-                link = source_directory.joinpath("gen", entry.name)
-                if not link.exists():
-                    link.symlink_to(pathlib.Path("../../" + entry.name))
-                    links.append(link)
+        with open(source_path) as file:
+            for line in file:
+                for directive in ['ocpi_documentation_implementations', 'figure']:
+                    result = re.match(f"^\\.\\.\\s{directive}::(.*)", line)
+                    if result:
+                        words = result.group(1).split()
+                        for word in words:
+                            components = word.split('/')
+                            if components[0] == '..':
+                                target = components[1]
+                                link = source_directory.joinpath("gen/", target)
+                                if not link.exists():
+                                    link.symlink_to(pathlib.Path("../../" + target))
+                                    links.append(link)
 
     build_options = [str(source_directory), str(build_directory),
                      "-c", str(conf_directory)]

@@ -60,6 +60,7 @@ def get_makefile(directory, type=None):
     Return a tuple consisting of the appropriate makefile as well as the directory
     to call "make" in
     """
+    directory = str(directory) # allow paths as input
     if not type:
         type = get_dirtype(directory)
     if os.path.exists(directory + "/Makefile"):
@@ -98,6 +99,7 @@ def get_dir_info(directory=".", careful=False):
     The primary technique is to look at an XML file that is the same name as the directory name with
     a matching/appropriate top-level xml element
     """
+    directory = str(directory) # allow pathlib arg
     # print("GETDIRINFO:"+directory+":"+os.getcwd(),file=sys.stderr)
     # print("ENV:"+repr(os.environ.get("OCPI_XML_INCLUDE_PATH")), file=sys.stderr)
     models = ["hdl", "rcc", "ocl"] # should be static elsewhere
@@ -124,22 +126,26 @@ def get_dir_info(directory=".", careful=False):
     if has_project_file or os.path.isfile(directory + "/project-package-id"):
         # Do we need to check for project-package-id file in exports?
         make_type = asset_type = "project"
-        xml_name = "Project" if has_project_file else None
+        xml_name = directory + "/Project" if has_project_file else None
     elif len(parts) > 1:
         if parts[-1] == "test":
             xml_name += "-test"
-            top_xml_elements = ["tests"]
             make_type = asset_type = "test"
         elif parts[-1] == "comp":
             xml_name += "-spec"
-            top_xml_elements = ["componentspec"]
             make_type = asset_type = "component"
         elif parts[-1] in [ "hdl", "rcc", "ocl" ]:
-            top_xml_elements = [ parts[-1] + "worker" ]
             make_type = "worker"
-            asset_type = parts[-1] + "-worker"
+            asset_type = parts[-1] + '-worker'
+            xml_path = Path(xml_file)
+            if not xml_path.exists():
+                xml_path = xml_path.parent.joinpath(name + '-' + parts[-1] + '.xml')
             if parts[-1] == "hdl":
-                top_xml_elements += [ "hdldevice", "hdlimplementation" ]
+                xml = xml_path.read_text().lower()
+                for tag in ['device', 'implementation']:
+                    if re.search(f'< *hdl{tag}[^a-z_]', xml):
+                        asset_type = 'hdl-device'
+                        break
     elif name == "components":
         # ambiguous: if there are worker dirs
         make_type = asset_type = get_maketype(directory);
@@ -164,7 +170,7 @@ def get_dir_info(directory=".", careful=False):
             directory = os.path.realpath(directory)
         parent = os.path.basename(os.path.dirname(directory))
         if parent == "rcc" and name == "platforms":
-            pass # no make type and not an asset...
+            make_type = parent + '-platforms'
         elif parent in ["hdl"]: # someday models, at least for primitives (e.g. rcc primitives)
             if name in ["cards", "devices", "adapters"]:
                 make_type = asset_type = "library"
@@ -199,14 +205,16 @@ def get_dir_info(directory=".", careful=False):
     else: # could be library or platform or assembly or application
         if directory.startswith(name): # incur absolutizing penalty
             directory = os.path.realpath(directory)
-        parent = os.path.basename(os.path.dirname(directory))
+        parent_path = Path(directory).parent
+        parent = parent_path.name
         if parent == "components":
             if os.path.isfile(directory + "/Library.xml") or get_maketype(directory) == "library":
                 make_type = asset_type = "library"
         elif parent == "assemblies":
             make_type = asset_type = "hdl-assembly"
         elif parent == "platforms":
-            make_type = asset_type = "hdl-platform"
+            model = parent_path.parent.name
+            make_type = asset_type = model + "-platform"
         elif parent == "applications":
             make_type = asset_type = "application"
         elif parent == "primitives":
@@ -222,7 +230,7 @@ def get_dir_info(directory=".", careful=False):
                                 "apparent type is \"" + make_type + "\" but Makefile has \"" + match + "\"")
     r = make_type, asset_type, directory, xml_name + ".xml" if xml_name else None, name
     # if make_type:
-    # print("GETDIRINFOr:"+repr(r),file=sys.stderr)
+    #     print("GETDIRINFOr:"+repr(r),file=sys.stderr)
     return r
 
 def get_dir_info_for_make(directory="."):
@@ -271,13 +279,16 @@ def is_path_in_project(origin_path=".",):
     """
     Determine whether a path is inside a project
     """
-    if os.path.exists(origin_path):
-        abs_path = os.path.abspath(origin_path)
-        if get_dirtype(origin_path) == "project":
-            return True
-        elif abs_path != "/":
-            return is_path_in_project(os.path.dirname(abs_path))
-    return False
+    try:
+        dir_path = Path(origin_path).resolve()
+        while dir_path.name != '':
+            for file in ['Project.xml', 'Project.mk', 'project-package-id']:
+                if dir_path.joinpath(file).exists():
+                    return dir_path
+            dir_path = dir_path.parent
+    except:
+        pass
+    return None
 
 # Get the path to the project containing 'origin_path'
 # relative_mode : default=False
@@ -571,93 +582,8 @@ def get_all_projects():
     return projects
 
 ###############################################################################
-# Utility functions for use with ocpidev driver files such as
-# ocpidev_run.py, ocpidev_utilization.py. In other words, these functions are
-# for use in the code very close to the command-line parsing.
+# Utility functions for use by ocpidev code close to the CLI
 ###############################################################################
-
-VALID_PLURAL_NOUNS = ["tests", "libraries", "workers"]
-def get_ocpidev_working_dir(noun, name, ensure_exists=True, **kwargs):
-    """
-    TODO
-    notes:
-        - maybe this function shoud return noun and dir based on options does this even help
-        - can only use from outside of a project for global show stuff and when specifying a
-            project or registry
-        - need to validate when you can leave name/noun blank and stuff too
-        - should this be a class on its own instead of a utility function?
-        - should they be static method on all thier respective asset classes ?
-        -
-    """
-    # what about showing of global things is this function even called in that case? isnt the object
-    # that is created always the current registry?
-    if not is_path_in_project(".") and not (name and is_path_in_project(name)):
-        if noun == 'project':
-        # Check if project ID passed as a name
-            project_registry = get_project_registry_dir()[1]
-            project_path = Path(project_registry, name).absolute()
-            if is_path_in_project(str(project_path)):
-                return str(project_path)
-        raise OCPIException("Path \"" + os.path.realpath(".") + "\" is not in a project, " +
-                            "so this command is invalid.")
-    cur_dirtype = get_dirtype() if get_dirtype() != "libraries" else "library"
-    name = "" if name == os.path.basename(os.path.realpath(".")) else name
-    cur_dir_not_name = noun == cur_dirtype and not name
-    noun_valid_not_name = noun in VALID_PLURAL_NOUNS and not name
-    if not (noun == 'libraries' and cur_dirtype == 'project') and (
-            (not noun and not name) or cur_dir_not_name or noun_valid_not_name):
-        return "."
-
-    # pylint:disable=no-name-in-module
-    # pylint:disable=import-error
-    import _opencpi.assets.application
-    import _opencpi.assets.test
-    import _opencpi.assets.worker
-    import _opencpi.assets.platform
-    import _opencpi.assets.assembly
-    import _opencpi.assets.library
-    import _opencpi.assets.project
-    import _opencpi.assets.registry
-    import _opencpi.assets.component
-
-    # pylint:enable=no-name-in-module
-    # pylint:enable=import-error
-
-    # pylint:disable=no-member
-    working_dir_dict = {
-        "application"    : _opencpi.assets.application.Application.get_working_dir,
-        "applications"   : _opencpi.assets.application.ApplicationsCollection.get_working_dir,
-        "project"        : _opencpi.assets.project.Project.get_working_dir,
-        "library"        : _opencpi.assets.library.Library.get_working_dir,
-        "libraries"      : _opencpi.assets.library.LibraryCollection.get_working_dir,
-        "test"           : _opencpi.assets.test.Test.get_working_dir,
-        "component"      : _opencpi.assets.component.Component.get_working_dir,
-        "protocol"       : _opencpi.assets.component.Protocol.get_working_dir,
-        "hdl-slot"       : _opencpi.assets.component.Slot.get_working_dir,
-        "hdl-card"       : _opencpi.assets.component.Slot.get_working_dir,
-        "worker"         : _opencpi.assets.worker.Worker.get_working_dir,
-        "hdl-platform"   : _opencpi.assets.platform.HdlPlatformWorker.get_working_dir,
-        "hdl-platforms"  : _opencpi.assets.platform.HdlPlatformsCollection.get_working_dir,
-        "hdl-assembly"   : _opencpi.assets.assembly.HdlApplicationAssembly.get_working_dir,
-        "hdl-assemblies" : _opencpi.assets.assembly.HdlAssembliesCollection.get_working_dir,
-        }
-    # pylint:enable=no-member
-
-    if noun in working_dir_dict:
-        asset_dir = working_dir_dict[noun](name, ensure_exists=ensure_exists, **kwargs)
-    else:
-        raise OCPIException("Invalid noun \"" + noun + "\" .  Valid nouns are: " +
-                            ' '.join(working_dir_dict.keys()))
-
-    # ensure existence and return
-    if ensure_exists and not os.path.exists(asset_dir):
-        # pylint:disable=undefined-variable
-        err_msg = ' '.join(['Determined working directory of "{}"'.format(asset_dir),
-                            'that does not exist'])
-        raise OCPIException(err_msg)
-        # pylint:enable=undefined-variable
-
-    return str(Path(asset_dir).absolute())
 
 def throw_not_valid_dirtype_e(valid_loc):
     """
@@ -716,23 +642,25 @@ def get_component_filename(library, name):
             return basename + ending
     return basename
 
-def get_package_id_from_vars(package_id, package_prefix, package_name, directory="." ):
+def get_package_id_from_vars(package_id, package_prefix, package_name, name):
     """
-    >>> get_package_id_from_vars("package_id", "package_prefix", "package_name")
+    >>> get_package_id_from_vars("package_id", "package_prefix", "package_name", None)
     'package_id'
-    >>> get_package_id_from_vars(None, "package_prefix", "package_name")
+    >>> get_package_id_from_vars(None, "package_prefix", "package_name",None)
     'package_prefix.package_name'
-    >>> get_package_id_from_vars(None, None, "package_name")
+    >>> get_package_id_from_vars(None, None, "package_name",None)
     'local.package_name'
-    >>> get_package_id_from_vars(None, None, None, "/etc")
+    >>> get_package_id_from_vars(None, None, None, "etc")
     'local.etc'
     """
     if package_id:
         return package_id
-    if not package_prefix:
+    if package_prefix:
+        package_prefix = package_prefix.rstrip('.')
+    else:
         package_prefix = "local"
     if not package_name:
-        package_name = os.path.basename(os.path.realpath(directory))
+        package_name = name
     return package_prefix + "." + package_name
 
 
@@ -769,26 +697,22 @@ def get_project_package_id(realpath, dict):
     """
     Returns the full package id based on variables or attributes
     """
-    package_id = dict.get('package')
-    if package_id:
-        return package_id
     package_id = dict.get('package_id')
+    if not package_id:
+        package_id = dict.get('package')
     if package_id:
         return package_id
     package_name = dict.get('packagename')
     if not package_name:
         package_name = os.path.basename(realpath)
-    package_prefix = dict.get('packageprefix')
-    if package_prefix:
-        package_prefix.rstrip('.')
-    else:
-        package_prefix = 'local'
-    return package_prefix + "." + package_name
+    return get_package_id_from_vars(package_id, dict.get('packageprefix'), dict.get('packagename'),
+                                    os.path.basename(realpath))
 
 def get_project_attributes(directory, xml_file = None, mk_file = None):
     """
     Return a dictionary of a project's attributes
     """
+    directory = str(directory) # Allow path args
     if not xml_file and not mk_file:
         xml_file = directory + "/Project.xml"
         if not os.path.exists(xml_file):
@@ -824,36 +748,42 @@ def get_hdl_builtins():
   """
   Return an XML root for the builtin HDL targets database
    """
+  global hdl_builtins
   if not hdl_builtins:
       builtins = xt.parse(get_cdk_dir() + "/include/hdl/hdl-targets.xml").getroot()
       # Some families are not used by any platform so we get them here
       for e in builtins.iter('family'):
           family = e.get('name')
-          dict={}
-          parts = e.get('parts')
-          dict['parts'] = set(parts.split()) if parts else set()
+          family_dict={}
+          parts_list = e.get('parts')
+          family_dict['parts'] = \
+              dict(map(lambda x:(x,None),parts_list.split())) if parts_list else dict()
           toolset = e.get('toolset')
           if toolset:
-              dict['toolset'] = toolset
+              family_dict['toolset'] = toolset
           default_part = e.get('default')
           if default_part:
-              dict['default'] = default_part
-          hdl_families[family] = dict
-          if parts:
-              for part in parts.split():
+              family_dict['default'] = default_part
+          hdl_families[family] = family_dict
+          if parts_list:
+              for part in parts_list.split():
                   hdl_parts[part] = family
           else:
               hdl_parts[family] = family
       for v in builtins.iter('vendor'):
           families=[]
+          vendor = v.get('name')
           for f in v.iter('family'):
-              families.append(f.get('name'))
-          hdl_vendors[v.get('name')] = families
+              family = f.get('name')
+              families.append(family)
+              hdl_families[family]['vendor'] = vendor
+          hdl_vendors[vendor] = families
       for t in builtins.iter('toolset'):
           hdl_tools[t.get('name')] = { 'simulator': t.get('simulator') == 'true',
                                        'tool' : t.get('tool') }
       for p in builtins.iter('platform'):
           hdl_fake_platforms[p.get('name')] = p.attrib
+      hdl_builtins=hdl_vendors,hdl_families,hdl_tools,hdl_parts
   return hdl_builtins
 
 def get_platform_attributes(project_package_id, directory, name, model):
@@ -911,6 +841,17 @@ def get_platform_attributes(project_package_id, directory, name, model):
             if not family:
                 family = name;
             attrs['family'] = family
+        vendor = attrs.get('vendor')
+        if not vendor:
+            for vendor,families in hdl_vendors.items():
+                if family in families:
+                    attrs['vendor'] = vendor
+                    break
+        toolset = attrs.get('toolset')
+        if not toolset:
+            toolset = hdl_families[family]['toolset']
+            attrs['toolset'] = toolset
+            attrs['tool'] = hdl_tools[toolset]['tool']
         # attrs['target'] = family
         # Update global database from this platform
         family_dict = hdl_families.get(family)
@@ -918,10 +859,13 @@ def get_platform_attributes(project_package_id, directory, name, model):
             family_dict = {}
             family_dict['parts'] = set()
             hdl_families[family] = family_dict
-        family_dict['parts'].add(part.split('-')[0])
+        family_dict['parts'][part.split('-')[0]] = None
+
         if directory.endswith("/xml"):
             directory = os.path.normpath(directory + "/../" + name) # may not exist
-        attrs['built'] = os.path.isdir(directory + "/hdl/" + family)
+        attrs['built'] = (os.path.isdir(directory + "/hdl/" + family) or
+                          os.path.isdir(directory + "/lib/hdl/" + family))
+        attrs['target'] = attrs['family'] # "target" is generic, family is an HDL thing
     elif model == "rcc":
         file = directory + "/" + name + ".mk"
         try:
@@ -936,6 +880,7 @@ def get_platform_attributes(project_package_id, directory, name, model):
                             if var in [ 'os', 'osversion', 'arch']:
                                 attrs[var] = match.group(2)
             attrs['target'] = attrs['os'] + '-' + attrs['osversion'] + '-' + attrs['arch']
+            attrs['built'] = os.path.isdir(os.environ["OCPI_CDK_DIR"] + '/' + name)
         except:
             print("Failed to process RCC file: " + file, file=sys.stderr)
             return None
@@ -1015,6 +960,9 @@ def find_all_projects(directory = None, project_package_id = None):
 
     # Now process the registry
     # This os.open is to enable dir_fd since the scandir iterator provide an fd until python 3.7
+    if not Path(registry_dir).is_dir():
+        raise OCPIException(f'The specified project registry directory "{registry_dir}" is '+
+                            f'not a directory.')
     fd = os.open(registry_dir, os.O_RDONLY)
     with os.scandir(registry_dir) as it:
         for entry in it:
@@ -1025,6 +973,10 @@ def find_all_projects(directory = None, project_package_id = None):
                     #dir = os.readlink(entry.name, dir_fd = fd);
                     #projects[entry.name] = os.path.realpath(dir if dir.startswith("/")
                     #                                        else registry_dir + "/" + dir)
+            else: # might be dead symlink
+                print(f'Warning:  the registry at "{registry_dir}" contains an invalid file/link: '+
+                      f'"{str(entry.name)}"',file=sys.stderr)
+                continue
     os.close(fd)
     return projects
 
@@ -1151,7 +1103,7 @@ def get_platform_variables(shell, only_model=None):
         for key,value in hdl_families.items():
             parts=value.get('parts')
             if parts:
-                parts=list(parts)
+                parts=list(parts.keys())
                 parts.sort()
                 out+=("HdlTargets_" + key + "=" + quote + ' '.join(parts) + end)
             out+=("HdlToolSet_" + key + "=" + quote + value.get('toolset') + end)
@@ -1198,8 +1150,18 @@ def get_xml_string(directory='.'):
       xml_file - the file to have ocpigen parse
     """
     make_type, asset_type, directory, xml_name,_ = get_dir_info(str(Path(directory).resolve(True)))
-    cmd = ["make", "-r", "--no-print-directory", "-C", directory, "-f", get_makefile(directory, make_type)[0], "xml" ]
-    logging.debug("running command: " + str(cmd))
+    return get_xml_string_from_file(make_type, directory, xml_name)
+
+def get_xml_string_from_file(make_type, directory, xml_file):
+    """
+    Caller knows where to execute the request, the make type, and the xml file name, which can be None
+    The "make" machinery knows how to do the correct search rules.
+    """
+    directory = str(directory)
+    cmd = ["make", "-r", "--no-print-directory", "-C", directory,
+           "-f", get_makefile(directory, make_type)[0],
+           "XmlFile="+(str(xml_file) if xml_file else ''), "xml" ]
+    logging.info("running command: " + str(cmd))
     old_log_level = os.environ.get("OCPI_LOG_LEVEL", "0")
     os.environ["OCPI_LOG_LEVEL"] = "0"
     env = os.environ
@@ -1215,7 +1177,7 @@ def get_xml_string(directory='.'):
     xml = p.communicate()[0]
     os.environ["OCPI_LOG_LEVEL"] = old_log_level
     logging.debug("Asset XML from ocpigen: \n" + str(xml))
-    return xml.decode(), xml_name
+    return xml.decode()
 
 if __name__ == "__main__":
     import doctest

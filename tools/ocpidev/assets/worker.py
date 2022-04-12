@@ -16,19 +16,21 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 """
-Defintion of rcc and hdl workers and related classes
+Definition of rcc and hdl workers and related classes
 """
 
 import os
 import sys
+import re
 import logging
 import json
+import jinja2
 from abc import abstractmethod
 from pathlib import Path
 from xml.etree import ElementTree as ET
 import _opencpi.hdltargets as hdltargets
 import _opencpi.util as ocpiutil
-from .abstract import HDLBuildableAsset, ReportableAsset
+from .abstract import HDLBuildableAsset, ReportableAsset, RCCBuildableAsset, ShowableAsset, Asset
 from .component import ShowableComponent
 
 class Worker(ShowableComponent):
@@ -37,31 +39,103 @@ class Worker(ShowableComponent):
     type. In general, something is a worker if it has an OWD (OpenCPI Worker Description File),
     and implements an OCS (OpenCPI Component Specification).
     """
-    def __init__(self, directory, name=None, **kwargs):
-        if not name:
-            name = str(Path(directory).name)
-        name_stem = Path(name).stem
-        self.ocpigen_xml = str(Path(directory, name_stem)) + '.xml'
+    def __init__(self, directory, name=None, model=None, **kwargs):
         super().__init__(directory, name, **kwargs)
+        if not self.asset_type:
+            self.asset_type = 'worker'
+        if not self.make_type:
+            self.make_type = 'worker'
+        self.model = model if model else self.name.split('.')[1]
+        self.make_type = 'worker'
+        package_id = kwargs.get("package_id")
+        self.package_id = package_id if package_id else self._init_package_id()
+        super().init_metadata(self.make_type, Path(self.directory),
+                              Path(self.name.split('.')[0]+'.xml'), kwargs)
+        self.build_configs = {}
+        self.init_build_configs(**kwargs)
+
+    all_worker_xml_attrs = (
+        """
+        {% if args.spec != 'none': %}
+            {% if args.spec: %}
+            Spec='{{args.spec}}'
+            {% elif args.emulates: %}
+            Spec='emulator'
+            {% else: %}
+            Spec='{{args.name.split('.')[0]}}'
+            {% endif %}
+        {% endif %}
+        {% if args.xml_include: %}
+            XmlIncludeDirs='{{' '.join(args.xml_include)}}'
+        {% endif %}
+        {% if args.include_dir: %}
+            IncludeDirs='{{' '.join(args.include_dir)}}'
+        {% endif %}
+        {% if args.comp_lib: %}
+            ComponentLibraries='{{' '.join(args.comp_lib)}}'
+        {% endif %}
+        {% if args.prim_lib: %}
+            Libraries='{{' '.join(args.prim_lib)}}'
+        {% endif %}
+        {% if args.other: %}
+            SourceFiles='{{' '.join(args.other)}}'
+        {% endif %}
+        {% if args.only_target: %}
+            OnlyTargets='{{' '.join(args.only_target)}}'
+        {% endif %}
+        {% if args.exclude_target: %}
+            ExcludeTargets='{{' '.join(args.exclude_target)}}'
+        {% endif %}
+        {% if args.only_platform: %}
+            OnlyPlatforms='{{' '.join(args.only_platform)}}'
+        {% endif %}
+        {% if args.exclude_platform: %}
+            ExcludePlatforms='{{' '.join(args.exclude_platform)}}'
+        {% endif %}"""
+        )
+    all_worker_xml_elems = (
+        """
+        {% if args.spec == 'none': %}
+            <componentspec/>
+            <!-- Enter any worker properties here -->
+            <!-- Enter any worker ports here -->
+        {% else: %}
+            <!-- Enter any augmentation of spec properties using <specproperty> elements here -->
+            <!-- Enter any worker-specific properties using <property> elements here -->
+        {% endif %}"""
+    )
+
+    @staticmethod
+    def do_create(name, directory, pretty_type, asset_type, template, verbose=None, **kwargs):
+        """
+        Create a worker - called by each derived class
+        """
+        dir_path, kwargs['name'], parent_path = \
+            Asset.start_creation(directory, name, pretty_type, kwargs)
+        # This assertion is not valid for hdl/devices etc. at least for now.
+        # assert parent_path.exists() # library must exist before worker is created
+        dir_path.mkdir(parents=True)
+        ocpiutil.write_file_from_string(dir_path.joinpath(name.replace('.','-') + ".xml"),
+                                        Asset.process_template(template).render({'args' : kwargs}))
+        Asset.finish_creation(asset_type, name, dir_path, verbose)
 
     @staticmethod
     def get_authoring_model(directory):
         """
         Each worker has an Authoring Model. Given a worker directory, return its Authoring Model.
         """
-        # Worker directories end in ".<authoring-model>", so use splitext to get the
-        # directories extension
-        _, ext = os.path.splitext(os.path.realpath(ocpiutil.rchop(directory, '/')))
-        # Return the extension/model without the leading period
-        return ext[1:]
+        dir_path = Path(directory)
+        if '.' not in dir_path.name:
+            dir_path = dir_path.resolve() #expensive
+        return dir_path.parts[-1]
 
-    def show(self, details, verbose, **kwargs):
+    def show(self, format, verbose, **kwargs):
         """
         Print out the ports, properties, and slaves of a given worker in the format that is
         provided by the caller
 
         Function attributes:
-          details    - the mode to print out the information in table or simple are the only valid
+          format     - the mode to print out the information in table or simple are the only valid
                        options
           verbose    - integer for verbosity level 0 is default and lowest and anything above 1
                        shows struct internals and hidden properties
@@ -85,10 +159,10 @@ class Worker(ShowableComponent):
             slave_dict[slave] = {"name": slave}
         json_dict["slaves"] = slave_dict
 
-        if details == "simple" or details == "table":
-            print("Component: " + json_dict["name"] + " Package ID: " + json_dict["package_id"])
-            print("Directory: " + json_dict["directory"])
-            self._show_ports_props(json_dict, details, verbose, True)
+        if format == "simple" or format == "table":
+            print("Worker: " + json_dict["name"] + " Package ID: " + json_dict["package_id"])
+            print("Worker directory: " + json_dict["directory"])
+            self._show_ports_props(json_dict, format, verbose, True)
             if json_dict.get("slaves"):
                 rows = [["Slave Name"]]
                 for slave in json_dict["slaves"]:
@@ -98,143 +172,7 @@ class Worker(ShowableComponent):
             json.dump(json_dict, sys.stdout)
             print()
 
-    @staticmethod
-    def get_working_dir(name, ensure_exists=True, **kwargs):
-        """
-        return the directory of a Worker given the name (name) and
-        library specifiers (library, hdl_library, hdl_platform)
-        """
-        # if more then one of the library location variable are not None it is an error
-        cur_dirtype = ocpiutil.get_dirtype()
-        valid_dirtypes = ["project", "libraries", "library", 
-                          "test", "worker", "hdl-platform"]
-        library = kwargs.get('library', '')
-        hdl_library = kwargs.get('hdl_library', '')
-        platform = kwargs.get('platform', '')
-        working_path = Path.cwd()
-        if len(list(filter(None, [library, hdl_library, platform]))) > 1:
-            ocpiutil.throw_invalid_libs_e()
-        if cur_dirtype not in valid_dirtypes:
-            ocpiutil.throw_not_valid_dirtype_e(valid_dirtypes)
-        if not name:
-            ocpiutil.throw_not_blank_e("test", "name", True)
-
-        project_path = Path(ocpiutil.get_path_to_project_top())
-        if library:
-            if not library.startswith("components"):
-                library = "components/" + library
-            working_path = Path(project_path, library)
-        elif hdl_library:
-            working_path = Path(project_path, hdl_library)
-        elif platform:
-            working_path = Path(
-                project_path, 'hdl', 'platforms', platform, 'devices')
-        elif cur_dirtype == "hdl-platform":
-            working_path = Path(working_path, 'devices')
-        elif cur_dirtype == "project":
-            if ocpiutil.get_dirtype("components") == "libraries":
-                ocpiutil.throw_specify_lib_e()
-            working_path = Path(working_path, 'components')
-        
-        working_path = Path(working_path, name)
-
-        return str(working_path)
-
-# Placeholder class
-class RccWorker(Worker):
-    """
-    This class represents a RCC worker.
-    """
-    def __init__(self, directory, name=None, **kwargs):
-        super().__init__(directory, name, **kwargs)
-
-class HdlCore(HDLBuildableAsset):
-    """
-    This represents any build-able HDL Asset that is core-like (i.e. is not a primitive library).
-
-    For synthesis tools, compilation of a HdlCore generally results in a netlist.
-        Note: for simulation tools, this criteria generally cannot be used because netlists
-              are not commonly used for compilation targeting simulation
-    """
-    def __init__(self, directory, name=None, **kwargs):
-        super().__init__(directory, name, **kwargs)
-
-    #placeholder function
-    def build(self):
-        """
-        This function will build the asset, must be implemented by the child class
-        """
-        raise NotImplementedError("HdlCore.build() is not implemented")
-
-# TODO There was a design mistake here when implementing HdlWorker, HdlLibraryWorker
-#      and HdlPlatformWorker. HdlWorker should represent the most basic HDL worker
-#      (e.g. an application worker that might be in a library), and HdlPlatformWorker
-#      should inherit from HdlWorker. All assets that inherit from HdlWorker should
-#      support build configurations. This includes HdlPlatformWorker, but note that
-#      a Platform Configuration is NOT a build configuration of the Platform Worker.
-#      this is somewhat confusing terminology, but a Platform Configuration is just
-#      an assembly containing the Platform Worker that happens to live in the Platform
-#      worker directory. That being said, a Platform Worker should ALSO be able to
-#      support plain old BUILD configurations (e.g. where you would have target-1-*
-#      at the top level of the Platform Worker directory). So, HdlWorker should have
-#      an init_build_configs() function, and HdlPlatformWorker should inherit that
-#      function from HdlWorker while ALSO implementing a init_platform_configs().
-#      other asset-types should also probably inherit from HdlWorker such as
-#      hdlAssembly, HdlContainer....
-#      TLDR TODO: Merge HdlWorker and HdlLibraryWorker classes, rename init_configs()
-#                 to init_build_configs(), rename HdlPlatformWorker's init_configs()
-#                 to init_platform_configs() since it now inherits init_build_configs().
-#                 Have HdlAssembly and/or its sub-classes inherit from HdlWorker.
-
-# pylint:disable=too-many-ancestors
-class HdlWorker(Worker, HdlCore):
-    """
-    This class represents a HDL worker.
-    Examples are HDL Library Worker, HDL Platform Worker ....
-    """
-    def __init__(self, directory, name=None, **kwargs):
-        if not name:
-            name = str(Path(directory).name)
-        super().__init__(directory, name, **kwargs)
-
-    @abstractmethod
-    def init_configs(self):
-        """
-        This function initializes the configurations of an HDL worker
-        This must be implemented by the child class
-            (e.g. HdlLibraryWorker and HdlPlatformWorker)
-        """
-        raise NotImplementedError("HdlWorker.init_configs() is not implemented")
-# pylint:enable=too-many-ancestors
-
-# pylint:disable=too-many-ancestors
-class HdlLibraryWorker(HdlWorker, ReportableAsset):
-    """
-    An HDL Library worker is any HDL Worker that lives in a component/worker library.
-    In general, this is any HDL Worker that is not an HDL Platform Worker.
-    This is not a perfect name for this asset-type, but it is accurate. This is any
-    HDL worker that lives in a library.
-
-    HdlLibraryWorker instances have configurations stored in "configs" which maps configuration
-    index to HdlLibraryWorkerConfig instance.
-    """
-    def __init__(self, directory, name=None, **kwargs):
-        """
-        Construct HdlLibraryWorker instance, and initialize configurations of this worker.
-        Forward kwargs to configuration initialization.
-        """
-        self.check_dirtype('worker', directory)
-        super().__init__(directory, name, **kwargs)
-        self.configs = {}
-        self.init_configs(**kwargs)
-
-    def build(self):
-        """
-        This function will build the asset, must be implemented by the child class
-        """
-        raise NotImplementedError("HdlLibraryWorker.build() is not implemented")
-
-    def init_configs(self, **kwargs):
+    def init_build_configs(self, **kwargs):
         """
         Parse this worker's build XML and populate its "configs" dictionary
         with mappings of <config-index> -> <config-instance>
@@ -247,8 +185,8 @@ class HdlLibraryWorker(HdlWorker, ReportableAsset):
         else:
             # If neither is found, there is no build XML and so we assume there is only one config
             # and assign it index 0
-            self.configs[0] = HdlLibraryWorkerConfig(directory=self.directory, name=self.name,
-                                                     config_index=0, **kwargs)
+            self.build_configs[0] = WorkerConfig(directory=self.directory, name=self.name,
+                                                 config_index=0, **kwargs)
             return
 
         # Begin parsing the build XML
@@ -256,7 +194,7 @@ class HdlLibraryWorker(HdlWorker, ReportableAsset):
         #TODO confirm root.tag is build?
 
         # Find each build configuration, get the ID, get all parameters (place in dict),
-        # construct the HdlLibraryWorkerConfig instance, and add it to the "configs" dict
+        # construct the HdlWorkerConfig instance, and add it to the "configs" dict
         for config in root.findall("configuration"):
             config_id = config.get("id")
             # Confirm the ID is an integer
@@ -275,11 +213,11 @@ class HdlLibraryWorker(HdlWorker, ReportableAsset):
             # Initialize the config instance with this worker's directory and name, and the
             # configuration's ID and parameter dictionary
             if config_id:
-                self.configs[int(config_id)] = HdlLibraryWorkerConfig(directory=self.directory,
-                                                                      name=self.name,
-                                                                      config_index=int(config_id),
-                                                                      config_params=param_dict,
-                                                                      **kwargs)
+                self.build_configs[int(config_id)] = WorkerConfig(directory=self.directory,
+                                                                  name=self.name,
+                                                                  config_index=int(config_id),
+                                                                  config_params=param_dict,
+                                                                  **kwargs)
 
     def get_config_params_report(self):
         """
@@ -291,11 +229,11 @@ class HdlLibraryWorker(HdlWorker, ReportableAsset):
         """
         # Initialize a report with headers matching "Configuration" and the parameter names
         report = ocpiutil.Report(ordered_headers=["Configuration"] +
-                                 list(self.configs[0].param_dict.keys()))
+                                 list(self.build_configs[0].param_dict.keys()))
 
         # For each configuration, construct a data-point with Configuration=index
         # and entries for each parameter key/value (just copy param_dict)
-        for idx, config in self.configs.items():
+        for idx, config in self.build_configs.items():
             params = config.param_dict.copy()
             params["Configuration"] = idx
             # Append this data-point to the report
@@ -316,11 +254,11 @@ class HdlLibraryWorker(HdlWorker, ReportableAsset):
         # TODO should this function and its output modes be moved into a super-class?
         dirtype = ocpiutil.get_dirtype(self.directory)
         caption = "Table of Worker Configurations for " + str(dirtype) + ": " + str(self.name)
-        if self.output_format == "table":
+        if self.format == "table":
             print(caption)
             # Print the resulting Report as a table
             self.get_config_params_report().print_table()
-        elif self.output_format == "latex":
+        elif self.format == "latex":
             logging.info("Generating " + caption)
             # Record the report in LaTeX in a configurations.inc file for this asset
             util_file_path = self.directory + "/configurations.inc"
@@ -335,8 +273,134 @@ class HdlLibraryWorker(HdlWorker, ReportableAsset):
         else:
             raise ocpiutil.OCPIException("Valid formats for showing worker configurations are \"" +
                                          ", ".join(self.valid_formats) + "\", but \"" +
-                                         self.output_format + "\" was chosen.")
+                                         str(self.format) + "\" was chosen.")
 
+# Placeholder class
+class RccWorker(Worker,RCCBuildableAsset):
+    """
+    This class represents a RCC worker.
+    """
+    def __init__(self, directory, name=None, **kwargs):
+        self.asset_type = 'rcc-worker'
+        self.make_type = None
+        super().__init__(directory, name, **kwargs)
+        self.check_dirtype('rcc-worker', self.directory)
+
+    template_xml = (
+        """
+        <!-- This file defines the {{args.name}} RCC worker. -->
+        <RccWorker
+            Language='{{args.language if args.language else "c++"}}'
+            Version='{{args.version if args.version else '2'}}'"""+Worker.all_worker_xml_attrs+
+        """
+        {% if args.rcc_static_prereq: %}
+            StaticPrereqLibs='{{' '.join(args.rcc_static_prereq)}}'
+        {% endif %}
+        {% if args.rcc_dynamic_prereq: %}
+            DynamicPrereqLibs='{{' '.join(args.rcc_dynamic_prereq)}}'
+        {% endif %}
+            >"""+Worker.all_worker_xml_elems+
+        """
+        </RccWorker>
+        """)
+
+    @staticmethod
+    def create(name, directory, verbose=None, **kwargs):
+        """
+        Create an RCC worker
+        """
+        Worker.do_create(name, directory, 'RCC Worker', 'rcc-worker', __class__.template_xml,
+                         **kwargs)
+
+class HdlCore(HDLBuildableAsset):
+    """
+    This represents any build-able HDL Asset that is core-like (i.e. is not a primitive library).
+
+    For synthesis tools, compilation of a HdlCore generally results in a netlist.
+        Note: for simulation tools, this criteria generally cannot be used because netlists
+              are not commonly used for compilation targeting simulation
+    """
+    def __init__(self, directory, name=None, **kwargs):
+        super().__init__(directory, name, **kwargs)
+
+#THIS IS A PLACEHOLDER - to ultimately check the spec across project and library dependencies
+def get_spec(parent_path, name, spec):
+    if spec == None:
+        spec = name
+    project_path = is_path_to_project(parent_path)
+    # First check whether there is a spec in the same library
+    if (parent_path.joinpath("specs", name + '-spec.xml').exists() or
+        parent_path.joinpath("specs", name + '_spec.xml').exists() or
+        parent_path.joinpath(name + ".comp", name + "-spec.xml").exists()):
+        return name
+    if (project_path.joinpath("specs", name + '-spec.xml').exists() or
+        project_path.joinpath("specs", name + '_spec.xml').exists()):
+        return name
+    print(f'Warning:  no spec option was specified and no component spec was found with the '+
+          f'name "{name}" in this "{parent_path.name}" library or this project',
+          file=sys.stderr)
+    print(f'          this will fail to build unless the component spec is found in another '+
+          f'library or another project',
+          file=sys.stderr)
+    return name
+
+# pylint:disable=too-many-ancestors
+class HdlWorker(Worker, HdlCore):
+    """
+    This class represents a HDL worker.
+    Examples are HDL Library Worker, HDL Platform Worker ....
+    """
+    def __init__(self, directory, name=None, **kwargs):
+        kwargs['model'] = 'hdl'
+        super().__init__(directory, name, **kwargs)
+        if not self.asset_type:
+            self.asset_type = 'hdl-worker'
+        if not self.make_type:
+            self.make_type = None
+
+# pylint:enable=too-many-ancestors
+
+# pylint:disable=too-many-ancestors
+class HdlLibraryWorker(HdlWorker, ReportableAsset):
+    """
+    An HDL Library worker is any HDL Worker that lives in a component/worker library.
+    In general, this is any HDL Worker that is not an HDL Platform or Device Worker.
+    This is not a perfect name for this asset-type, but it is accurate. This is any
+    HDL worker that lives in a library.
+
+    HdlLibraryWorker instances have configurations stored in "configs" which map configuration
+    indices to HdlLibraryWorkerConfig instance.
+    """
+    def __init__(self, directory, name=None, **kwargs):
+        """
+        Construct HdlLibraryWorker instance, and initialize configurations of this worker.
+        Forward kwargs to configuration initialization.
+        """
+        super().__init__(directory, name, **kwargs)
+        self.check_dirtype('hdl-worker', self.directory)
+
+    template_xml = (
+        """
+        <!-- This file defines the {{args.name}} HDL application worker. -->
+        <HdlWorker
+            Language='{{args.language if args.language else "vhdl"}}'
+            Version='{{args.version if args.version else '2'}}'"""+Worker.all_worker_xml_attrs+
+        """
+        {% if args.core: %}
+            Cores='{{' '.join(args.core)}}'
+        {% endif %}
+            >"""+Worker.all_worker_xml_elems+
+        """
+        </HdlWorker>
+        """)
+
+    @staticmethod
+    def create(name, directory, verbose=None, **kwargs):
+        """
+        Create an HDL library worker
+        """
+        Worker.do_create(name, directory, 'HDL Worker', 'hdl-worker', __class__.template_xml,
+                         **kwargs)
 
     def get_utilization(self):
         """
@@ -352,12 +416,12 @@ class HdlLibraryWorker(HdlWorker, ReportableAsset):
         # Initialize an empty data-set with these default headers
         util_report = ocpiutil.Report(ordered_headers=ordered_headers, sort_priority=sort_priority)
         # Sort based on configuration name
-        for cfg_name in sorted(self.configs):
+        for cfg_name in sorted(self.build_configs):
             # Get the dictionaries of utilization report items for this Platform Worker.
             # Each dictionary returned corresponds to one implementation of this
             # container, and serves as a single data-point/row.
             # Add all data-points for this container to the running list
-            sub_report = self.configs[cfg_name].get_utilization()
+            sub_report = self.build_configs[cfg_name].get_utilization()
             if sub_report:
                 # We want to add the container name as a report element
                 # Add this data-set to the list of utilization dictionaries. It will serve
@@ -366,23 +430,23 @@ class HdlLibraryWorker(HdlWorker, ReportableAsset):
                 util_report += sub_report
         return util_report
 
-    def show_utilization(self):
+    def show_utilization(self, **kwargs):
         """
         Show this worker's configurations with their parameter settings.
         Also show this worker's utilization report.
         """
         self.show_config_params_report()
-        super().show_utilization()
+        super().show_utilization(**kwargs)
 # pylint:enable=too-many-ancestors
 
 #TODO should implement HdlBuildableAsset
-class HdlLibraryWorkerConfig(HdlCore, ReportableAsset):
+class WorkerConfig(ReportableAsset):
     """
     A configuration of an HdlLibraryWorker. An instance
     of this class represents one combination of an HDL worker's
     build-time parameters.
     """
-    def __init__(self, directory, name=None, **kwargs):
+    def __init__(self, directory, name=None, config_index=0, config_params={}, **kwargs):
         """
         Initializes HdlLibraryWorkerConfig member data and calls the super class __init__.
         valid kwargs handled at this level are:
@@ -393,7 +457,7 @@ class HdlLibraryWorkerConfig(HdlCore, ReportableAsset):
         super().__init__(directory, name, **kwargs)
         # We expect the config_index to be passed in via kwargs
         # These are generally defined in the worker build XML
-        self.index = kwargs.get("config_index", 0)
+        self.index = config_index
         # The worker sub-directory starts with 'target'.
         # It is then followed by the configuration index,
         # unless the index is 0.
@@ -403,9 +467,9 @@ class HdlLibraryWorkerConfig(HdlCore, ReportableAsset):
             self.subdir_prefix = directory + "/target-" + str(self.index) + "-"
         # The config_params will contain build parameters for this configuration
         # in the form: parameter-name -> value
-        self.param_dict = kwargs.get("config_params", {})
+        self.param_dict = config_params
 
-    def build(self):
+    def build(self, **kwargs):
         """
         This function will build the asset, must be implemented by the child class
         """
@@ -431,3 +495,110 @@ class HdlLibraryWorkerConfig(HdlCore, ReportableAsset):
                 util_report += tgt.toolset.construct_report_item(directory=tgtdir, target=tgt,
                                                                  mode="synth")
         return util_report
+
+class HdlDeviceWorker(HdlWorker, ReportableAsset):
+    """
+    An HDL device worker is a specialized HdlLibraryWorker
+    The only difference is some create options and the XML tag
+    """
+    def __init__(self, directory, name=None, **kwargs):
+        """
+        Construct HdlLibraryWorker instance, and initialize configurations of this worker.
+        Forward kwargs to configuration initialization.
+        """
+        self.asset_type = 'hdl-device'
+        super().__init__(directory, name, **kwargs)
+        self.check_dirtype('hdl-device', self.directory)
+
+    template_xml = (
+        """
+        <!-- This file defines the {{args.name}} HDL application worker. -->
+        <HdlDevice
+            Language='{{args.language if args.language else "vhdl"}}'
+            Version='{{args.version if args.version else '2'}}'"""+Worker.all_worker_xml_attrs+
+        """
+        {% if args.core: %}
+            Cores='{{' '.join(args.core)}}'
+        {% endif %}
+        {% if args.emulates: %}
+            Emulates='{{args.emulates}}'
+        {% endif %}
+            >
+        {% if args.supports: %}
+          {% for s in args.supports: %}
+          <Supports Worker='{{s}}'>
+            <!-- Add connections between this subdevice and the supported device,e.g.
+            <Connect Port='rawprops' To='rprops' Index='0'/>
+              -->
+          </Supports>
+          <!-- If this subdevice is sharing raw properties, include the line below.
+               The count is the number of device workers that may share this subdevice
+               The optional attribute is whether all the devices must be present
+
+                  <rawprop name='rprops' count='2' optional='true'/>
+
+               For each device worker this subdevice supports, include lines like these:
+               Note the index is relative to the rawprops counted above
+               <supports worker='lime_tx'>
+                 <connect port='rawprops' to='rprops' index='1'/>
+               </supports>
+            -->
+          {% endfor %}
+        {% endif %}
+        """+Worker.all_worker_xml_elems+
+        """
+            <!-- Enter any signal definitions using <signal> elements -->
+        </HdlDevice>
+        """)
+
+    @staticmethod
+    def create(name, directory, verbose=None, **kwargs):
+        """
+        Create an HDL library worker
+        """
+        Worker.do_create(name, directory, 'HDL Device Worker', 'hdl-device', __class__.template_xml,
+                         **kwargs)
+
+class WorkersCollection(ShowableAsset):
+    """
+    Collection of workers of any type
+    """
+    valid_settings = []
+    def __init__(self, directory=None, name=None, assets=None, **kwargs):
+        if assets != None:
+            self.out_of_project = True
+        super().__init__(directory, name, **kwargs)
+        self.workers = []
+        if assets != None:
+            for worker_dir,parent_package_id in assets:
+                worker_name = Path(worker_dir).name
+                self.workers.append(Worker(worker_dir, None,
+                                           package_id=parent_package_id + '.' + worker_name))
+        else:
+            self.check_dirtype('library', self.directory)
+            for subdir in Path(self.directory).iterdir():
+                if subdir.is_dir() and subdir.name != 'specs':
+                    dirtype = ocpiutil.get_dirtype(subdir)
+                    if dirtype and dirtype.endswith("worker"):
+                        self.workers.append(Worker(str(subdir), None, **kwargs))
+
+    def show(self, format=None, **kwargs):
+        """
+        Show all the components in all the projects in the registry
+        """
+        if format == "simple":
+            for wkr in self.workers:
+                print(wkr.name + " ", end="")
+            print()
+        elif format == "table":
+            rows = [['Worker', 'Library Package ID', 'Directory']]
+            for wkr in self.workers:
+                rows.append([wkr.name, wkr.package_id, wkr.directory])
+            ocpiutil.print_table(rows, underline="-")
+        elif format == "json":
+            worker_dict = {}
+            for wkr in self.workers:
+                worker_dict[wkr.package_id] = { 'name' : wkr.name, 'package_id' : wkr.package_id,
+                                                'model' : wkr.model, 'directory' : wkr.directory }
+            json.dump(worker_dict, sys.stdout)
+            print()

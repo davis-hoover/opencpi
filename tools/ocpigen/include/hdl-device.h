@@ -63,7 +63,7 @@ public:
   //  static DeviceTypes s_types;
   bool               m_interconnect;  // Can this type of device be used for an interconnect?
   bool               m_canControl;    // Can this interconnect worker provide control?
-  Supports           m_supports;      // what subdevices are supported?
+  Supports           m_supports;      // what devices are supported?
   std::map<std::string, unsigned> m_countPerSupportedWorkerType; // how many of type do we support?
   static HdlDevice *
     get(const char *name, ezxml_t xml, const char *parentFile, Worker *parent, const char *&err);
@@ -75,6 +75,7 @@ public:
   const char *cname() const;
   const char *parseDeviceProperties(ezxml_t x, OM::Assembly::Properties &iPVs);
   const char *resolveExpressions(OB::IdentResolver &ir);
+  void emitXmlSupports(std::string &out) const;
 };
 typedef HdlDevice DeviceType;
 struct Board;

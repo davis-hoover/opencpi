@@ -20,6 +20,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import sys
 import pathlib
 import docutils
 import xml_tools
@@ -140,7 +141,7 @@ def get_component_spec(source, reporter, line):
     source_dir = pathlib.Path(source).resolve().parent;
     library_specs_dir = source_dir.joinpath("../specs")
     # The documentation for a component must be in the same project as its spec, and the spec is
-    # either in the .comp directory, the ../specs directory or in the project's  specs directory
+    # either in the .comp directory, the ../specs directory or in the project's specs directory
     library_dir = source_dir.parent
     project_specs_dir = (library_dir.parent
                          if library_dir.name == 'components'
@@ -148,9 +149,9 @@ def get_component_spec(source, reporter, line):
     component_name = source_dir.stem
     component_spec_path = None
     for dir in [ source_dir, library_specs_dir, project_specs_dir ]:
-        for suffix in [ "-spec.xml", "_spec.xml" ]:
+        for suffix in [ "-comp.xml", "-spec.xml", "_spec.xml" ]:
             path = dir.joinpath(component_name + suffix)
-            if path.is_file():
+            if path.exists(): # might be symlink
                 component_spec_path = path
                 break
         if component_spec_path:
@@ -160,7 +161,7 @@ def get_component_spec(source, reporter, line):
             return file_parser.get_dictionary()
     reporter.warning(
         ("Directive on this line cannot find the expected component specification file, "
-         f"\"{component_name}[-_]spec.xml\" in either the component directory, "
+         f"\"{component_name}[-spec|_spec|-comp].xml\" in either the component directory, "
          f"\"{source_dir}\", the library's specs directory \"{library_specs_dir}\" or "
          f"the project's specs directory \"{project_specs_dir}\"."),
         line=line)

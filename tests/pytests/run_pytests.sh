@@ -48,6 +48,7 @@ else
   pyrun_command="coverage3 run --append "
 fi
 for i in *_test.py; do
+  [ $i != utilization_test.py ] || continue
   echo "Running: $pyrun_command$i"
   $pyrun_command$i
 done

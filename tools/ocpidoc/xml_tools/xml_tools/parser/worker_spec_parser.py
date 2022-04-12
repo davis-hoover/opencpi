@@ -21,6 +21,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import sys
 import xml.etree.ElementTree as ET
 import copy
 
@@ -47,7 +48,7 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
         """
         super().__init__(filename=filename, include_filepaths=include_filepaths)
         # Capture the name determined by the base class init
-        self.name = os.path.splitext(os.path.basename(self._filename))[0]
+        self.name = self._xml_root.attrib["name"]
         self.authoring_model = self._xml_root.attrib["model"]
 
     def get_dictionary(self):
@@ -56,6 +57,9 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
         Parses an OpenCPI worker description (OWD) XML file.
         Stores the information within a dictionary.
 
+        FIXME: this format is just another format for the basic metadata about
+        a worker.  It is unnecessary and redundant and should be retired so that
+        the existing metadata for a worker is used, based on the XML
         Returns:
             Python dictionary containing information about the ports and
             properties specified in the parsed OWD XML file. Within the dict
@@ -125,23 +129,12 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
         """
         dictionary = {}
 
-        # Check for name attribute, otherwise set name to filename.
-        name = self._get_attribute(
-            element=self._xml_root, attribute="name",
-            optional=True, default=None)
-        if name:
-            dictionary["name"] = name.strip()
-        else:
-            dictionary["name"] = self.name
-
-        dictionary["authoring_model"] = self.authoring_model
+        # FIXME: expunge this 'authoring_model' since "model" is in attributes already
+        dictionary["authoring_model"] = self.authoring_model # FIXME redundant with 'model' attribute
         dictionary["path"] = self._filename
         # Get all worker attributes
         for key, value in self._xml_root.attrib.items():
-            if key == "name":
-                continue
-            else:
-                dictionary[key] = value
+            dictionary[key.lower()] = value
         # Get ports, and add to "inputs", "outputs" and other lists
         port_list = {}
         # The other sphinx extension code never tests for non-existent dictionary entries...
@@ -150,17 +143,17 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
         dictionary["time"] = {}
         dictionary["signals"] = {}
         dictionary["interfaces"] = {}
-        dictionary["other_interfaces"] = {}
+        dictionary["other_interfaces"] = {} # needed ?
+        dictionary["signals"] = {}
+        dictionary["ports"] = {} # needed?
         for port in self._xml_root.iter("port"):
-            name = self._get_attribute(element=port, attribute="name", optional=False)
-            type = port.get("type")
-            port_list[name] = {"type": type}
             # Get all port attributes
+            port_dict={}
             for key, value in port.items():
-                if key != "name":
-                    port_list[name][key] = value
+                port_dict[key.lower()] = value
+            name = port_dict['name']
             producer = self._is_true(port, "producer", None, True)
-            if producer != None:
+            if producer != None: # this is a data port
                 protocol = port.find("protocol")
                 if protocol:
                     protocol_name = protocol.get("name")
@@ -170,9 +163,16 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
                     "protocol" : protocol_name,
                     "optional" : self._is_true(port, "optional", False, True)
                 }
-            elif type in ["devsignal", "rawprop"]:
-                dictionary["interfaces"][name] = port_list
-        dictionary["ports"] = port_list
+            elif port_dict['type'] in ["devsignal", "rawprop", "timeinterface"]:
+                dictionary["interfaces"][name] = { 'type' : port_dict['type'] }
+            else:
+                pass # print("OTHER:",port_dict,file=sys.stderr)
+            dictionary["ports"][name] = port_dict # generic for all port types
+        for signal in self._xml_root.iter("signal"):
+            signal_dict = {}
+            for key, value in signal.items():
+                signal_dict[key.lower()] = value
+            dictionary['signals'][signal_dict['name']] = signal_dict
         dictionary["properties"] = self.get_properties()
         dictionary["specproperties"] = self.get_spec_properties()
         dictionary["supports"] = self.get_supports()
@@ -322,8 +322,8 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
             port_list[name] = {"type": tag}
             # Get all port attributes
             for key, value in port.items():
-                if key != "name":
-                    port_list[name][key] = value
+                if key.lower() != "name":
+                    port_list[name][key.lower()] = value
 
 
         for tag in port_type:
@@ -338,10 +338,10 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
                 port_list[name] = {"type": tag}
                 # Get all port attributes
                 for key, value in port.items():
-                    if key == "name":
+                    if key.lower() == "name":
                         continue
                     else:
-                        port_list[name][key] = value
+                        port_list[name][key.lower()] = value
 
         return port_list
 
@@ -355,6 +355,6 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
         for supports in self._xml_root.iter("supports"):
             connections = {}
             for connect in supports.iter("connect"):
-                connections[connect.attrib["port"]] = connect.attrib["to"], connect.attrib["index"]
+                connections[connect.attrib["port"]] = connect.attrib["to"], connect.attrib.get("index")
             supports_list[supports.attrib["worker"]] = connections
         return supports_list

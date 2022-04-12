@@ -334,7 +334,7 @@ async def _ocpidev_show(noun: str, directory: str='.', scope=None) -> dict:
         stdout=subprocess.PIPE, 
         stdin=subprocess.PIPE,
         stderr=subprocess.PIPE, 
-        encoding='utf-8',
+        encoding='utf-8', # FIXME: why? this must be None on MacOS at least
         cwd=directory)
     stdout, stderr = await process.communicate()
     stdout = stdout.decode().rstrip()
@@ -436,33 +436,25 @@ def _get_tests(project_dirs: List[str], model=None) -> List[str]:
             *[_ocpidev_show('workers', project_dir, 'local') 
               for project_dir in project_dirs])
         results = asyncio.get_event_loop().run_until_complete(futures)
-        results = [list(val['workers'].values()) 
-                   for value in results for val in value.values()]
-        workers = [Path(worker).with_suffix('') for workers in results 
-                   for worker in workers 
-                   if Path(worker).suffix[1:] == model]
+        workers= [worker['name'].split('.')[0]
+                  for result in results for worker in result.values() if worker['model'] == model]
     futures = asyncio.gather(
         *[_ocpidev_show('tests', project_dir, 'local') 
           for project_dir in project_dirs])
     results = asyncio.get_event_loop().run_until_complete(futures)
     for result in results:
-        libraries = result['project']['libraries']
-        for library in libraries:
-            library_tests = libraries[library]['tests']
-            for library_test in library_tests:
-                library_path = Path(library_tests[library_test])
-                if workers is not None:
+        for test in result.values():
+            path = Path(test['path'])
+            if workers is not None:
                 # If no worker of specified model for unit test, continue
-                    if library_path.with_suffix('') not in workers:
-                        continue
-                try:
-                    relative_path = library_path.relative_to(
-                        environ['OCPI_ROOT_DIR'])
-                except:
-                    relative_path = library_path.relative_to(
-                        environ['CI_PROJECT_DIR'])
-                tests.append(str(relative_path))
-
+                # FIXME: worker names are not necessarily component names with suffixes
+                if path.stem not in workers:
+                    continue
+            try:
+                relative_path = path.relative_to(environ['OCPI_ROOT_DIR'])
+            except:
+                relative_path = path.relative_to(environ['CI_PROJECT_DIR'])
+            tests.append(str(relative_path))
     return tests
 
 

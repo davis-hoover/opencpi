@@ -59,7 +59,7 @@ class ComponentTest(unittest.TestCase):
         my_asset = factory.AssetFactory.factory(self.asset_type,
                                                   "../av-test/components/specs/",
                                                   "test_worker-spec.xml",
-                                                  init_ocpigen_details=True)
+                                                  verb='show')
         my_asset.show("simple", 0)
 
     def test_component_good_show_table(self):
@@ -69,7 +69,7 @@ class ComponentTest(unittest.TestCase):
         my_asset = factory.AssetFactory.factory(self.asset_type,
                                                   "../av-test/components/specs/",
                                                   "test_worker-spec.xml",
-                                                  init_ocpigen_details=True)
+                                                  verb='show')
         my_asset.show("table", 0)
 
     def test_component_good_show_json(self):
@@ -79,7 +79,7 @@ class ComponentTest(unittest.TestCase):
         my_asset = factory.AssetFactory.factory(self.asset_type,
                                                   "../av-test/components/specs/",
                                                   "test_worker-spec.xml",
-                                                  init_ocpigen_details=True)
+                                                  verb='show')
         my_asset.show("json", 0)
 
     def test_component_good_show_verbose(self):
@@ -89,7 +89,7 @@ class ComponentTest(unittest.TestCase):
         my_asset = factory.AssetFactory.factory(self.asset_type,
                                                   "../av-test/components/specs/",
                                                   "test_worker-spec.xml",
-                                                  init_ocpigen_details=True)
+                                                  verb='show')
         my_asset.show("json", 1)
 
 class WorkerTest(unittest.TestCase):
@@ -115,17 +115,15 @@ class WorkerTest(unittest.TestCase):
         create a Worker in the default way
         """
         my_asset = factory.AssetFactory.factory(self.asset_type,
-                                                  "../av-test/components/proxy1.rcc",
-                                                  "proxy1.xml")
+                                                  "../av-test/components", "proxy1.rcc")
 
     def test_component_good_extra_info(self):
         """
         create a Worker with all the port and property information
         """
         my_asset = factory.AssetFactory.factory(self.asset_type,
-                                                  "../av-test/components/proxy1.rcc/",
-                                                  "proxy1",
-                                                  init_ocpigen_details=True)
+                                                  "../av-test/components", "proxy1.rcc",
+                                                  verb='show')
         my_asset.show("simple", 0)
 
     def test_component_good_show_table(self):
@@ -133,9 +131,8 @@ class WorkerTest(unittest.TestCase):
         create a Worker with all the port and property information
         """
         my_asset = factory.AssetFactory.factory(self.asset_type,
-                                                  "../av-test/components/proxy1.rcc",
-                                                  "proxy1",
-                                                  init_ocpigen_details=True)
+                                                  "../av-test/components", "proxy1.rcc",
+                                                  verb='show')
         my_asset.show("table", 0)
 
     def test_component_good_show_json(self):
@@ -143,9 +140,8 @@ class WorkerTest(unittest.TestCase):
         create a Worker with all the port and property information
         """
         my_asset = factory.AssetFactory.factory(self.asset_type,
-                                                  "../av-test/components/proxy1.rcc",
-                                                  "proxy1",
-                                                  init_ocpigen_details=True)
+                                                "../av-test/components", "proxy1.rcc",
+                                                verb='show')
         my_asset.show("json", 0)
 
     def test_component_good_show_verbose(self):
@@ -153,9 +149,8 @@ class WorkerTest(unittest.TestCase):
         create a Worker with all the port and property information
         """
         my_asset = factory.AssetFactory.factory(self.asset_type,
-                                                  "../av-test/components/proxy1.rcc",
-                                                  "proxy1",
-                                                  init_ocpigen_details=True)
+                                                "../av-test/components", "proxy1.rcc",
+                                                verb='show')
         my_asset.show("json", 1)
 
 if __name__ == '__main__':

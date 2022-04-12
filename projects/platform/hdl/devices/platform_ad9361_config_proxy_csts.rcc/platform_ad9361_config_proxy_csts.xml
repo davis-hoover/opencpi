@@ -11,7 +11,7 @@
 <!-- | platform_ad9361_config.hdl |                                          -->
 <!-- +____________________________+                                          -->
 <!--                                                                         -->
-<rccworker language="c++" slave='platform_ad9361_config_csts.hdl' spec='ad9361_config_proxy-spec'
+<rccworker language="c++" slave='platform_ad9361_config_csts.hdl' spec='platform_ad9361_config_proxy-spec'
 	   controloperations='initialize'
            componentlibraries='devices'
            includedirs='../../../../../runtime/drc/ad9361/include'

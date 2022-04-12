@@ -58,7 +58,7 @@ A block diagram representation of the implementation is given in :numref:`platfo
 
 Interface
 ---------
-.. literalinclude:: ../specs/ad9361_config_proxy-spec.xml
+.. literalinclude:: ../specs/platform_ad9361_config_proxy-spec.xml
    :language: xml
 
 Properties

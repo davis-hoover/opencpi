@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 """
-Defintion of Registery class
+Definition of Registry class
 """
 
 import os
@@ -38,23 +38,47 @@ class Registry(ShowableAsset):
     registry instances contain dictionaries mapping package-ID to project instances.
     Projects can be added or removed from a registry
     """
-
+    instances_should_be_cached = True
     def __init__(self, directory, name=None, **kwargs):
-        if not name:
-            name = str(Path(directory).name)
+        self.out_of_project = True
         super().__init__(directory, name, **kwargs)
-        
+
         # Each registry instance has a list of projects registered within it.
         # Initialize this list by probing the file-system for links that exist
         # in the registry directory.
         # __projects maps package-ID --> project instance
         self.__projects = {}
-        for path in Path(directory).glob('*'):
-            if not path.exists():
+        # use global scope for now
+        #for path in Path(self.directory).iterdir():
+        for pid,dir in ocpiutil.find_all_projects().items():
+            path = Path(dir)
+            if not path.exists() or not path.is_symlink(): # might be dead symlink
+                print(f'Warning:  the registry at "{self.directory}" contains an invalid file/link: '+
+                      f'{path}',file=sys.stderr)
                 continue
             pid = path.name
             project_dir = str(path.resolve())
-            self.__projects[pid] = AssetFactory.factory("project", project_dir, **kwargs)
+            self.__projects[pid] = AssetFactory.get_instance("project", project_dir, None, **kwargs)
+
+    def add_assets(self, asset_type, assets, **kwargs):
+        """
+        Add to the "assets" list the assets from projects in the project path and this registry
+        I.e. the registry is virtually extended by the project path
+        """
+        projects = []
+
+        if asset_type == 'hdl-targets':
+            # Since hdl-targets are not really assets they have no pathname
+            # so the returned list is not a path, but a triple of
+            # name, vendor, toolset, and part list
+            _,families,_,_ = ocpiutil.get_hdl_builtins()
+            assets.extend(list(families.items()))
+        for _,project in self.__projects.items():
+            if asset_type == 'projects':
+                assets.append(project.directory)
+            else:
+                # Pass in assets to allow the project to see what is already there
+                project.add_assets(asset_type, assets, **kwargs)
 
     def contains(self, package_id=None, directory=None):
         """
@@ -88,63 +112,68 @@ class Registry(ShowableAsset):
             return True
         return False
 
-    def add(self, directory=".", force=False):
+    def add(self, package_id, path, force=None, creating=None, verbose=None):
         """
-        Given a project, get its package-ID, create the corresponding link in the project registry,
+        Given a package ID and project path, create the corresponding link in the project registry,
         and add it to this Registry instance's __projects dictionary.
         If a project with the same package-ID already exists in the registry, fail.
         """
-        if not ocpiutil.is_path_in_project(directory):
-            raise ocpiutil.OCPIException("Failure to register project.  Project \"" + directory +
-                                         "\" in location: " + os.getcwd() + " is not in a " +
-                                         "project or does not exist.")
-        project = AssetFactory.factory("project", directory)
-        pid = project.package_id
-
-        if pid == "local":
-            raise ocpiutil.OCPIException("Failure to register project. Cannot register a " +
-                                         "project with package-ID 'local'.\nSet the  " +
-                                         "PackageName, PackagePrefix and/or Package " +
-                                         "variables in your Project.mk.")
-        if pid in self.__projects and self.__projects[pid] is not None:
+        if not ocpiutil.is_path_in_project(path):
+            raise ocpiutil.OCPIException(f'Failure to register project. The pathname "{path}" '+
+                                         f'is not in a project or does not exist.')
+        if package_id == "local":
+            if creating:
+                raise ocpiutil.OCPIException(f'Failure to register a new project at "{path}".  '+
+                                             f'Cannot register a project with the (default) '+
+                                             f'package ID of "local".  Either specify a '+
+                                             f'non-local package ID as a "create" option or do '+
+                                             f'not request this new project to be registered')
+            else:
+                raise ocpiutil.OCPIException(f'Failure to register a project at "{path}".  '+
+                                             f'Cannot register a project with the (default) '+
+                                             f'package ID of "local".  Either specify a '+
+                                             f'non-local package ID in the Project.xml file or '+
+                                             f'do not request this project to be registered')
+        project = self.__projects.get(package_id, None)
+        if project:
             # If the project is already registered and is the same
-            if self.__projects[pid].directory == project.directory:
-                logging.debug("Project link is already in the registry. Proceeding...")
-                print("Successfully registered the " + project.package_id + " project: " +
-                      os.path.realpath(project.directory) + "\nInto the registry: " +
-                      os.path.realpath(self.directory) + "\n")
+            if project.directory == str(path):
+                logging.debug('Project link is already in the registry. Proceeding...')
+                print(f'Successfully registered the "{package_id}" project at ' +
+                      f'"{path}" in the registry at "{self.directory}".')
                 return
             if not force:
-                raise ocpiutil.OCPIException("Failure to register project with package '" + pid +
-                                             "'.\nA project/link with that package qualifier " +
-                                             "already exists and is registered in '" +
-                                             self.directory + "'.\nThe old registration is not " +
-                                             "being overwitten. To unregister the original " +
-                                             "project, call: 'ocpidev unregister project " +
-                                             self.__projects[pid].directory +
-                                             "'.\nThen, run the command: 'ocpidev -d " +
-                                             project.directory + " register project' or use the " +
-                                             "'force' option")
+                raise ocpiutil.OCPIException(f'Failure to register the project with package id '+
+                                             f'"{package_id}", since a project/link with that '+
+                                             f'package ID is already registered in '+
+                                             f'the registry (at "{self.directory}").\n'+
+                                             f'The old registration is not being overwritten.\n'+
+                                             f'You can unregister the original project by using '+
+                                             f'"ocpidev unregister project {project.directory}"\n' +
+                                             f'Then, run the command: "ocpidev -d {path} register" '+
+                                             f'or use the "--force" option')
             else:
-                self.remove(package_id=pid)
+                self.remove(package_id=package_id)
 
         # link will be created at <registry>/<package-ID>
-        project_link = self.directory + "/" + pid
+        project_link = self.directory + "/" + package_id
 
         # if this statement is reached and the link exists, it is a broken link
         if os.path.lexists(project_link):
             # remove the broken link that would conflict
-            self.remove_link(pid)
+            self.remove_link(package_id)
 
         # Perform the actual registration: create the symlink to the project in this registry
         # directory
-        self.create_link(project)
-        # Add the project to this registry's projects dictionary
-        self.__projects[project.package_id] = project
+        self.create_link(package_id, path)
+        # Add the project to this registry's projects dictionary if we are not creating the project
+        if not creating:
+            self.__projects[package_id] = AssetFactory.get_instance("project", path, verbose=verbose)
 
-        print("Successfully registered the " + project.package_id + " project: " +
-              os.path.realpath(project.directory) + "\nInto the registry: " +
-              os.path.realpath(self.directory) + "\n")
+        if verbose:
+            print(f'Successfully registered the project at "{path}" under the package ID '+
+                  f'"{package_id}",\ninto the registry at "{self.directory}".',
+                  file=sys.stderr)
 
     def remove(self, package_id=None, directory=None):
         """
@@ -194,33 +223,22 @@ class Registry(ShowableAsset):
         self.__projects.pop(package_id)
         print("Successfully unregistered the " + package_id + " project: " +
               os.path.realpath(directory) + "\nFrom the registry: " +
-              os.path.realpath(self.directory) + "\n")
+              os.path.realpath(self.directory) + "\n" + str(self.__projects))
 
-    def create_link(self, project):
+    def create_link(self, package_id, path):
         """
         Create a link to the provided project in this registry
         """
-        # Try to make the path relative. This helps with environments involving mounted directories
-        # Find the path that is common to the project and registry
-        common_prefix = os.path.commonprefix([project.directory, self.directory])
-        # If the two paths contain no common directory except root,
-        #     use the path as-is
-        # Otherwise, use the relative path from the registry to the project
-        if common_prefix == '/' or common_prefix == '':
-            project_to_reg = os.path.normpath(project.directory)
-        else:
-            project_to_reg = os.path.relpath(os.path.normpath(project.directory), self.directory)
-
-        project_link = self.directory + "/" + project.package_id
+        registry_path = Path(self.directory).resolve()
+        # rel_path = path.resolve().relative_to(registry_path)
+        rel_path = Path(os.path.relpath(path, registry_path))
+        registration_path = registry_path.joinpath(package_id)
         try:
-            os.symlink(project_to_reg, project_link)
-        except OSError:
-            raise ocpiutil.OCPIException("Failure to register project link: " +  project_link +
-                                         " --> " + project_to_reg + "\nCommand attempted: " +
-                                         "'ln -s " + project_to_reg + " " + project_link +
-                                         "'.\nTo (un)register projects in " +
-                                         "/opt/opencpi/project-registry, you need to be a " +
-                                         "member of the opencpi group.")
+            registration_path.symlink_to(rel_path)
+        except Exception as e:
+            raise ocpiutil.OCPIException(f'Failure to register project at directory "{path}".'+
+                                         f'with package ID "{package_id}".  Error was "{e}".\n'+
+                                         f'The registry is at "{self.directory}".')
 
     def remove_link(self, package_id):
         """
@@ -247,13 +265,13 @@ class Registry(ShowableAsset):
         return self.__projects[package_id]
 
     @staticmethod
-    def create(asset_dir="."):
+    def create(name=None, directory=None, **kwargs):
         """
         Create a registry (which is essentially a folder) at the location specified by asset_dir
         """
+        asset_dir = directory + "/" + name
         print("making: " + asset_dir)
         os.mkdir(asset_dir)
-        return AssetFactory.factory("registry", asset_dir)
 
     @staticmethod
     def get_default_registry_dir():
@@ -269,39 +287,15 @@ class Registry(ShowableAsset):
                 project_registry_dir = os.path.realpath(project_registry_dir)
             else:
                 project_registry_dir = "/opt/opencpi/project-registry"
+        path = Path(project_registry_dir)
+        if not path.is_dir():
+            raise ocpiutil.OCPIException(f'The default registry directory is "{path}", but it is '+
+                                         f'not a directory')
         return project_registry_dir
 
-    @classmethod
-    def get_registry_dir(cls, directory="."):
-        """
-        Determine the project registry directory. If in a project, check for the imports link.
-        Otherwise, get the default registry from the environment setup:
-            OCPI_PROJECT_REGISTRY_DIR, OCPI_ROOT_DIR/project-registry or
-            /opt/opencpi/project-registry
-
-        Determine whether the resulting path exists.
-
-        Return the exists Boolean and the path to the project registry directory.
-        """
-        if (ocpiutil.is_path_in_project(directory) and
-                os.path.isdir(ocpiutil.get_path_to_project_top(directory) + "/imports")):
-            #allow imports to be a link OR a directory (needed for deep copies of exported projects)
-            project_registry_dir = os.path.realpath(ocpiutil.get_path_to_project_top(directory) +
-                                                    "/imports")
-        else:
-            project_registry_dir = cls.get_default_registry_dir()
-
-        exists = os.path.exists(project_registry_dir)
-        if not exists:
-            raise ocpiutil.OCPIException("The project registry directory '" + project_registry_dir +
-                                         "' does not exist.\nCorrect " +
-                                         "'OCPI_PROJECT_REGISTRY_DIR' or run: " +
-                                         "'ocpidev create registry " + project_registry_dir + "'")
-        elif not os.path.isdir(project_registry_dir):
-            raise ocpiutil.OCPIException("The current project registry '" + project_registry_dir +
-                                         "' exists but is not a directory.\nCorrect " +
-                                         "'OCPI_PROJECT_REGISTRY_DIR'")
-        return project_registry_dir
+    @staticmethod
+    def get_default_registry_path():
+        return Path(__class__.get_default_registry_dir())
 
     def _collect_workers_dict(self):
         """
@@ -380,18 +374,18 @@ class Registry(ShowableAsset):
         return ret_dict
 
     # pylint:disable=unused-argument
-    def show_workers(self, details, verbose, **kwargs):
+    def show_workers(self, format, verbose, **kwargs):
         """
         Show all the workers in all the projects in the registry
         """
         reg_dict = self._collect_workers_dict()
-        if details == "simple":
+        if format == "simple":
             for proj in reg_dict["projects"]:
                 for lib in reg_dict["projects"][proj]["libraries"]:
                     for wkr in reg_dict["projects"][proj]["libraries"][lib]["workers"]:
                         print(wkr + " ", end="")
             print()
-        elif details == "table":
+        elif format == "table":
             rows = [["Project", "Library Directory", "Worker"]]
             for proj in reg_dict["projects"]:
                 for lib in reg_dict["projects"][proj]["libraries"]:
@@ -399,18 +393,18 @@ class Registry(ShowableAsset):
                         lib_dict = reg_dict["projects"][proj]["libraries"][lib]
                         rows.append([proj, lib_dict["directory"], wkr])
             ocpiutil.print_table(rows, underline="-")
-        elif details == "json":
+        elif format == "json":
             json.dump(reg_dict, sys.stdout)
             print()
     # pylint:enable=unused-argument
 
     # pylint:disable=unused-argument
-    def show_components(self, details, verbose, **kwargs):
+    def show_components(self, format, verbose, **kwargs):
         """
         Show all the components in all the projects in the registry
         """
         reg_dict = self._collect_components_dict()
-        if details == "simple":
+        if format == "simple":
             for proj in reg_dict["projects"]:
                 for comp in reg_dict["projects"][proj].get("components", []):
                     print(comp + " ", end="")
@@ -418,7 +412,7 @@ class Registry(ShowableAsset):
                     for comp in reg_dict["projects"][proj]["libraries"][lib]["components"]:
                         print(comp + " ", end="")
             print()
-        elif details == "table":
+        elif format == "table":
             rows = [["Project", "Component Spec Directory", "Component"]]
             for proj in reg_dict["projects"]:
                 for comp in reg_dict["projects"][proj].get("components", []):
@@ -428,7 +422,7 @@ class Registry(ShowableAsset):
                         lib_dict = reg_dict["projects"][proj]["libraries"][lib]
                         rows.append([proj, lib_dict["directory"] + "/specs", comp])
             ocpiutil.print_table(rows, underline="-")
-        elif details == "json":
+        elif format == "json":
             json.dump(reg_dict, sys.stdout)
             print()
     # pylint:enable=unused-argument
@@ -453,15 +447,15 @@ class Registry(ShowableAsset):
         json_dict["projects"] = proj_dict
         return json_dict
 
-    def show(self, details, verbose, **kwargs):
+    def show(self, format, verbose, **kwargs):
         """
-        show information about the registry in the format specified by details
+        show information about the registry in the format specified by format
         (simple, table, or json)
         """
         reg_dict = self.get_dict(False)
-        if details == "simple":
+        if format == "simple":
             print(" ".join(sorted(reg_dict["projects"])))
-        elif details == "table":
+        elif format == "table":
             print("Project registry is located at: " + reg_dict["registry_location"])
             # Table header
             row_1 = ["Project Package-ID", "Path to Project", "Valid/Exists"]
@@ -470,11 +464,11 @@ class Registry(ShowableAsset):
                 rows.append([proj, reg_dict["projects"][proj]["real_path"],
                              reg_dict["projects"][proj]["exists"]])
             ocpiutil.print_table(rows, underline="-")
-        elif details == "json":
+        elif format == "json":
             json.dump(reg_dict, sys.stdout)
             print()
 
-    def delete(self, force=False):
+    def delete(self, force=False, **kwargs):
         """
         Deletes the registry. Prompts the user to confirm if args.force
         is not True. Refuses to delete the default registry or registry

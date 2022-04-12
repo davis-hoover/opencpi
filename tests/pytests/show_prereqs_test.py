@@ -27,14 +27,14 @@ from pathlib import Path
 sys.path.append(os.getenv('OCPI_CDK_DIR') + '/' + os.getenv('OCPI_TOOL_PLATFORM') + '/lib/')
 import _opencpi.util as ocpiutil
 from  _opencpi.assets import factory
-from _opencpi.assets import prerequisite
+from _opencpi.assets.prerequisite import Prerequisite,PrerequisitesCollection
 
 """
 This file contains the unit tests for the prerequisites classes
 """
 class PrereqTest(unittest.TestCase):
     def test_addPlatform(self):
-        uut = prerequisite.Prerequisite(Path("."))
+        uut = Prerequisite(Path("."))
         uut.add_platform("Hello")
         uut.add_platform("World")
 
@@ -44,7 +44,7 @@ class PrereqTest(unittest.TestCase):
         self.assertCountEqual(expected, actual)
 
     def test_location(self):
-        uut = prerequisite.Prerequisite(Path("."))
+        uut = Prerequisite(Path("."))
     
         expected="."
         actual=uut.get_location()
@@ -52,7 +52,7 @@ class PrereqTest(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_getDict(self):
-        uut = prerequisite.Prerequisite(Path("."))
+        uut = Prerequisite(Path("."))
         uut.add_platform("Hello")
     
         expected={"path":".", "platforms":["Hello"]}
@@ -73,6 +73,7 @@ class PrereqDirTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
+        return
         if cls._old_prereq_dir:
             cls.set_prereq_dir(cls._old_prereq_dir)
         if cls._old_cdk_dir:
@@ -89,24 +90,25 @@ class PrereqDirTest(unittest.TestCase):
         os.environ["OCPI_PREREQUISITES_DIR"] = newdir
 
     def test_location(self):
-        uut = prerequisite.Prerequisites(Path("."))
+        uut = PrerequisitesCollection(Path("."))
         expected = "."
         actual = uut.get_location()
         self.assertEqual(expected,actual)
 
     def test_addPrerequisite(self):
-        uut = prerequisite.Prerequisites(Path("."))
+        uut = PrerequisitesCollection(Path("."))
         uut.add_prerequisite("Hello", "World")
         expected = {"Hello": "World"}
         actual = uut.get_prerequisites()
         self.assertDictEqual(expected,actual)
 
     def test_getDict(self):
-        uut = prerequisite.Prerequisites(Path("."))
+        uut = PrerequisitesCollection()
         uut.add_prerequisite("Hello", "World")
         uut.add_prerequisite("Goodbye", "World")
 
-        expected={"prereqs":{"Hello":"World", "Goodbye":"World"},"location":"."}
+        expected={"prereqs":{"Hello":"World", "Goodbye":"World"},
+                  "location":str(PrerequisitesCollection.get_default_location())}
         actual = uut.get_dict()
         self.assertDictEqual(expected, actual)
 
@@ -129,7 +131,7 @@ class PrereqDirTest(unittest.TestCase):
         # Happy path, where OCPI_PREREQS_DIR is set and exists
         self.set_prereq_dir(os.getcwd())
         expected = Path(os.getcwd())
-        actual = prerequisite.Prerequisites.get_default_location()
+        actual = PrerequisitesCollection.get_default_location()
         self.assertEqual(expected, actual)
 
         # PREREQS_DIR doesn't exist 
@@ -138,24 +140,24 @@ class PrereqDirTest(unittest.TestCase):
         self.ensure_removed(newdir)
         self.set_prereq_dir(str(newdir))
         if not fallback.exists():
-            self.assertRaises(ocpiutil.OCPIException, prerequisite.Prerequisites.get_default_location)
+            self.assertRaises(ocpiutil.OCPIException, PrerequisitesCollection.get_default_location)
         else:
-            self.assertEqual(prerequisite.Prerequisites.get_default_location(), fallback)
+            self.assertEqual(PrerequisitesCollection.get_default_location(), fallback)
        
         # Happy path where OCPI_CDK_DIR is set
         del os.environ["OCPI_PREREQUISITES_DIR"]
         self.set_cdk_dir(str(newdir))
         expected = newdir.parent.joinpath("prerequisites")
         Path.mkdir(expected, parents=True)
-        actual = prerequisite.Prerequisites.get_default_location()
+        actual = PrerequisitesCollection.get_default_location()
         self.assertEqual(expected, actual)
 
         #CDK_DIR doesn't exist
         self.ensure_removed(expected)
         if not fallback.exists():
-            self.assertRaises(ocpiutil.OCPIException, prerequisite.Prerequisites.get_default_location)
+            self.assertRaises(ocpiutil.OCPIException, PrerequisitesCollection.get_default_location)
         else:
-            self.assertEqual(prerequisite.Prerequisites.get_default_location(), fallback)
+            self.assertEqual(PrerequisitesCollection.get_default_location(), fallback)
 
         # At this point I am confident that the prereqs loc can be found so I can actually use the env
         self.set_prereq_dir(str(self._newwd))
@@ -168,7 +170,7 @@ class PrereqDirTest(unittest.TestCase):
         platform2 = prereq1.joinpath("xilinx13_4")
         Path.mkdir(platform1)
         Path.mkdir(platform2)
-        prereq1 = prerequisite.Prerequisite(prereq1)
+        prereq1 = Prerequisite(prereq1)
         prereq1.add_platform("centos7")
         prereq1.add_platform("xilinx13_4")
 
@@ -176,9 +178,9 @@ class PrereqDirTest(unittest.TestCase):
         prereq2 = self._newwd.joinpath("prereq2")
         platform3 = prereq2.joinpath("MSDOS")
         Path.mkdir(platform3, parents=True)
-        prereq2 = prerequisite.Prerequisite(prereq2)
+        prereq2 = Prerequisite(prereq2)
 
-        uut = prerequisite.Prerequisites.create()
+        uut = PrerequisitesCollection.create()
         actual = uut.get_dict()
         self.assertDictEqual(actual["prereqs"]["prereq1"].get_dict(), prereq1.get_dict())
         self.assertDictEqual(actual["prereqs"]["prereq2"].get_dict(), prereq2.get_dict())
