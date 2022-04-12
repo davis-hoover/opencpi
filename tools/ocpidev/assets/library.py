@@ -19,101 +19,20 @@
 Definition of Library and Library collection classes
 """
 
-import os
+import os,sys
 import logging
 import _opencpi.util as ocpiutil
 import jinja2
+import json
 from pathlib import Path
 import _opencpi.assets.template as ocpitemplate
-import subprocess
 import _opencpi.util as ocpiutil
 import shutil
 from .abstract import RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAsset, Asset
 from .factory import AssetFactory
 from .worker import Worker, HdlWorker
+from .component import Component
 
-def do_build(asset_type, directory, kwargs):
-    """
-    Function common to build libraries and library collections
-    """
-    action=[]
-    if kwargs.get('rcc'):
-        action.append('rcc')
-    if kwargs.get('hdl'):
-        action.append('hdl')
-    if kwargs.get('workers_as_needed'):
-        os.environ['OCPI_AUTO_BUILD_WORKERS'] = '1'
-
-    dynamic = kwargs.get('dynamic')
-    optimize = kwargs.get('optimize')
-    hdl_platform = kwargs.get('hdl_platform')
-    hdl_rcc_platform = kwargs.get('hdl_rcc_platform')
-    hdl_target = kwargs.get('hdl_target')
-    rcc_platform = kwargs.get('rcc_platform')
-    worker = kwargs.get('worker')
-
-    build_suffix = '-'
-    if dynamic:
-        build_suffix += 'd'
-    if optimize:
-        build_suffix += 'o'
-    if optimize or dynamic:
-        if rcc_platform:
-            if any("-" in s for s in rcc_platform):
-                raise ocpiutil.OCPIException("You cannot use the --optimize build option and "
-                + "also specify build options in a platform name (in this case: ",
-                rcc_platform, ")")
-            else:
-                new_list = [s + build_suffix for s in rcc_platform]
-                rcc_platform = new_list
-        else:
-            rcc_platform = [os.environ['OCPI_TOOL_PLATFORM'] + build_suffix]
-    #Pass settings
-    settings = {}
-    if hdl_platform:
-        settings['hdl_plat_strs'] = hdl_platform
-    if hdl_target:
-        settings['hdl_target'] = hdl_target
-    if rcc_platform:
-        settings['rcc_platform'] = rcc_platform
-    if hdl_rcc_platform:
-        settings['hdl_rcc_platform'] = hdl_rcc_platform
-    if asset_type == 'library' and worker:
-        settings['worker'] = worker
-    make_file = ocpiutil.get_makefile(directory, asset_type)[0]
-    #Build
-    ocpiutil.file.execute_cmd(settings, directory, action="", file=make_file,
-                              verbose=kwargs.get('verbose'))
-
-def do_clean(asset_type, directory, kwargs):
-    """
-    Function common to clean libraries and library collections
-    """
-    #Specify what to clean
-    action=[]
-    rcc = kwargs.get('rcc')
-    hdl = kwargs.get('hdl')
-    hdl_platform = kwargs.get('hdl_platform')
-    hdl_target = kwargs.get('hdl_target')
-    worker = kwargs.get('worker')
-    if not rcc and not hdl:
-        action.append('clean')
-    else:
-        if rcc:
-            action.append('cleanrcc')
-        if hdl:
-            action.append('cleanhdl')
-    settings = {}
-    if hdl_platform:
-        settings['hdl_plat_strs'] = hdl_platform
-    if hdl_target:
-        settings['hdl_target'] = hdl_target
-    if worker:
-        settings['worker'] = worker
-    make_file = ocpiutil.get_makefile(directory, asset_type)[0]
-    #Clean
-    ocpiutil.file.execute_cmd(settings, directory, action=action, file=make_file,
-                              verbose=kwargs.get('verbose'))
 
 class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAsset):
     """
@@ -121,55 +40,93 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
     library and can be initialized or left as None if not needed
     """
     valid_settings = []
-    def __init__(self, directory, name=None, **kwargs):
+    def __init__(self, directory, name=None, verb=None, **kwargs):
         """
         Initializes Library member data  and calls the super class __init__.  Throws an
         exception if the directory passed in is not a valid library directory.
-        valid kwargs handled at this level are:
-            init_tests   (T/F) - Instructs the method whether to construct all test objects
-                                 contained in the library
-            init_workers (T/F) - Instructs the method whether to construct all worker objects
-                                 contained in the library
         """
-        self.check_dirtype("library", directory)
-        if not name:
-            name = str(Path(directory).name)
         super().__init__(directory, name, **kwargs)
+        self.check_dirtype("library", self.directory)
         self.test_list = None
         self.tests_names = None
         self.wkr_names = None
         self.package_id, self.tests_names, self.wkr_names = (
             self.get_package_id_wkrs_tests(self.directory))
-        if kwargs.get("init_tests", False):
+        self.make_type = 'library'
+
+        kwargs["package_id"] = self.package_id
+        if verb in ['show', 'run']:
             self.test_list = []
             logging.debug("Library constructor creating Test Objects")
             for test_directory in self.tests_names:
+                kwargs['name'] = None
+                kwargs['child_path'] = None
                 self.test_list.append(AssetFactory.factory("test", test_directory, **kwargs))
-
-        kwargs["package_id"] = self.package_id
         self.worker_list = None
-        if kwargs.get("init_workers", False):
+        self.comp_list = None
+        kwargs.pop('name', None)
+        kwargs.pop('child_path', None)
+        if verb in ['show', 'utilization']:
             # Collect the list of workers and initialize Worker objects for each worker
             # of a supported authoring model
             self.worker_list = []
             logging.debug("Library constructor creating Worker Objects")
             for worker_directory in self.wkr_names:
+                worker_path = Path(worker_directory)
                 auth = Worker.get_authoring_model(worker_directory)
                 if auth not in Asset.valid_authoring_models:
                     logging.debug("Skipping worker \"" + directory +
                                   "\" with unsupported authoring model \"" + auth + "\"")
                 else:
-                    wkr_name = os.path.splitext(os.path.basename(worker_directory))[0]
-                    self.worker_list.append(AssetFactory.factory("worker", worker_directory,
-                                                                 name=wkr_name,
-                                                                 **kwargs))
-        self.comp_list = None
-        if kwargs.get("init_comps", False):
+                    asset_type = ocpiutil.get_dir_info(worker_path)[1]
+                    self.worker_list.append(AssetFactory.factory(asset_type,
+                                                                 str(worker_path.parent),
+                                                                 name=worker_path.name, **kwargs))
             self.comp_list = []
             for comp_directory in self.get_valid_components():
                 comp_name = ocpiutil.rchop(os.path.basename(comp_directory), "spec.xml")[:-1]
-                self.comp_list.append(AssetFactory.factory("component", comp_directory,
-                                                           name=comp_name, **kwargs))
+                self.comp_list.append(AssetFactory.factory("component", comp_directory, **kwargs))
+
+
+    @classmethod
+    def resolve_child(cls, parent_path, asset_type, args):
+        """
+        Resolve the actual relative path and name for a child asset as needed
+        Here is the knowledge of where various assets live inside a library
+        """
+        assert asset_type.endswith('worker') or asset_type in ['component', 'protocol', 'hdl-slot',
+                                                               'hdl-card', 'hdl-device', 'test']
+        name = args.name
+        args.child_path = Path(name) # default is asset name is dir name
+        if asset_type in ['component', 'protocol', 'hdl-slot', 'hdl-card']: # file-based assets
+            if name.endswith(".xml"):
+                name = name[:-4]
+            suffixes = {'component':['_spec','-spec'],
+                        'protocol': ['_prot', '-prot']}.get(asset_type)
+            if suffixes and name[-5:] in suffixes:
+                args.child_path = Path("specs", name + ".xml")
+                name = name[:-5]
+            elif asset_type == 'component':
+                if Path(parent_path, 'specs', name + '_spec.xml').exists():
+                    args.child_path = Path('specs', name + '_spec.xml')
+                elif Path(parent_path, 'specs', name + '-spec.xml').exists() or args.file_only:
+                    args.child_path = Path("specs", name + '-spec.xml')
+                else:
+                    args.child_path = Path(name + '.comp')
+            elif asset_type == 'protocol':
+                if Path(parent_path, 'specs', name + '_prot.xml').exists():
+                    args.child_path = Path('specs', name + '_prot.xml')
+                else:
+                    args.child_path = Path('specs', name + '-prot.xml')
+            else: # slots and cards have no suffix
+                args.child_path = Path('specs', name + '.xml')
+        elif asset_type.endswith('worker') or asset_type == 'hdl-device':
+            pass
+        elif asset_type == 'test':
+            if name.endswith('.test'):
+                name = name[:-5]
+            args.child_path = Path(name + '.test')
+        args.name = name
 
     @staticmethod
     def get_package_id(directory='.'):
@@ -241,18 +198,18 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
                 workers.append(name + " ")
         return (workers)
 
-    def run(self, verbose=False):
+    def run(self, **kwargs):
         """
         Runs the Library with the settings specified in the object.  Throws an exception if the
-        tests were not initialized by using the init_tests variable at initialization.  Running a
+        tests were not initialized at initialization.  Running a
         Library will run all the component unit tests that are contained in the Library
         """
         ret_val = 0
         if self.test_list is None:
-            raise ocpiutil.OCPIException("For a Library to be run \"init_tests\" must be set to " +
-                                         "True when the object is constructed")
+            raise ocpiutil.OCPIException('For a Library to be run it must use the "run" verb ' +
+                                         'when the object is constructed')
         for test in self.test_list:
-            run_val = test.run(verbose=verbose)
+            run_val = test.run(**kwargs)
             ret_val = ret_val + run_val
         return ret_val
 
@@ -263,50 +220,6 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         for worker in self.worker_list:
             if isinstance(worker, HdlWorker):
                 worker.show_utilization()
-
-    def clean(self, verbose=False, hdl=False, rcc=False,
-        worker=None, hdl_platform=None, hdl_target=None):
-        """
-        Cleans the library by handing over the user specifications
-        to execute command.
-        """
-        do_clean("library", self.directory, locals())
-
-    def build(self, verbose=False, rcc=False, hdl=False, optimize=False,
-        dynamic=False, worker=None, hdl_platform=None, workers_as_needed=False, 
-        hdl_target=None, rcc_platform=None, hdl_rcc_platform=None):
-        """
-        Builds the library by using the common build function for libraries or library collections
-        """
-        do_build('library', self.directory, locals())
-
-    @staticmethod
-    def get_working_dir(name, ensure_exists=True, **kwargs):
-        """
-        return the directory of a Library given the name (name) and
-        library specifiers (library, hdl_library, hdl_platform)
-        """
-        # if more then one of the library location variables are not None it is an error.
-        # a length of 0 means that a name is required and a default location of components/
-        library = kwargs.get('library', '')
-        hdl_library = kwargs.get('hdl_library', '')
-        platform = kwargs.get('platform', '')
-        if len(list(filter(None, [library, hdl_library, platform]))) > 1:
-            ocpiutil.throw_invalid_libs_e()
-        ocpiutil.check_no_libs('library', library, hdl_library, platform)
-        if not name:
-            ocpiutil.throw_not_blank_e("library", "name", True)
-
-        working_path = Path(ocpiutil.get_path_to_project_top())
-        comp_path = Path(working_path, 'components')
-        if name != 'components':
-            if not comp_path.exists() and not ensure_exists:
-                comp_path.mkdir()
-            working_path = Path(comp_path, name)
-        else:
-            working_path = comp_path
-
-        return str(working_path)
 
     def _get_template_dict(name, directory, **kwargs):
         """
@@ -348,99 +261,119 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
                         "package_id" : package_id,
                         "package_name" : package_name,
                         "package_prefix" : package_prefix,
-                        "determined_package_id" : ocpiutil.get_package_id_from_vars(package_id,
-                                                                                    package_prefix,
-                                                                                    package_name, directory)
+                        "determined_package_id" :
+                          ocpiutil.get_package_id_from_vars(package_id, package_prefix,
+                                                            package_name, name)
                         }
         return template_dict
 
     @staticmethod
-    def create(name, directory, **kwargs):
+    def create(name, directory, verbose=None, **kwargs):
         """
         Create library asset
         """
-        verbose = kwargs.get("verbose", None)
-        lib_path = Path(directory, name)
-        if lib_path.exists():
-            err_msg = 'library "{}" already exists at "{}"'.format(name, str(lib_path))
-            raise ocpiutil.OCPIException(err_msg)
-
+        lib_path, name, parent_path = Asset.start_creation(directory, name, 'library', kwargs)
+        if name != 'components' and not lib_path.parent.exists():
+            libs_path = lib_path.parent
+            libs_path.mkdir(parents=True)
+            template = jinja2.Template(ocpitemplate.LIBRARIES_XML, trim_blocks=True)
+            ocpiutil.write_file_from_string(libs_path.joinpath(libs_path.name + '.xml'),
+                                                               template.render({}))
+        lib_path.mkdir(parents=True)
         template_dict = Library._get_template_dict(name, directory, **kwargs)
-        compdir = Path(ocpiutil.get_path_to_project_top(), "components")
-        if not compdir.exists():
-            compdir.mkdir()
-        os.chdir(str(compdir))
-        template = jinja2.Template(ocpitemplate.LIBRARIES_XML, trim_blocks=True)
-        ocpiutil.write_file_from_string("components.xml", template.render(**template_dict))
-
-        if not lib_path.exists():
-            lib_path.mkdir()
-        os.chdir(str(lib_path))
         template = jinja2.Template(ocpitemplate.LIB_DIR_XML, trim_blocks=True)
-        ocpiutil.write_file_from_string(name + ".xml", template.render(**template_dict))
-        workers = str(Library.get_workers())[1:-1] + "\n"
-        package_id = Library.get_package_id() + "." + name
-        logging.debug("Workers: " + workers + "Package_ID: " + package_id)
-        if verbose:
-            print("Created library '" + name + "' at " + str(lib_path))
+        ocpiutil.write_file_from_string(lib_path.joinpath(name + ".xml"),
+                                        template.render(**template_dict))
+        subdir_path = lib_path.joinpath('lib')
+        subdir_path.mkdir()
+        ocpiutil.write_file_from_string(subdir_path.joinpath('package-id'),
+                                        __class__.get_package_id(lib_path))
+        ocpiutil.write_file_from_string(subdir_path.joinpath("workers"), '\n')
+        Asset.finish_creation('library', name, lib_path, verbose)
 
+    def add_assets(self, asset_type, assets, **kwargs):
+        """
+        Add to the "assets" list for assets in this library
+        """
+        my_path = Path(self.directory)
+        if asset_type == 'components':
+            specs_path = my_path.joinpath("specs")
+            if specs_path.exists():
+                for spec in specs_path.iterdir():
+                    name = Component.get_component_spec_file(str(spec))
+                    if name:
+                        assets.append((self.directory, name, 'specs/' + spec.name))
+            for comp in my_path.glob('*.comp'):
+                spec_path = comp.joinpath(comp.stem + '-spec.xml')
+                if spec_path.exists():
+                    assets.append((self.directory, comp.name.split('.')[0], comp.name))
+        elif asset_type == 'workers':
+            for wkr in self.wkr_names:
+                assets.append((wkr,self.package_id))
+        elif asset_type == 'tests':
+            for test in self.tests_names:
+                assets.append((test, self.package_id)) # test directory and library package_id
 
-class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAsset):
+class LibrariesCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAsset):
     """
     This class represents an OpenCPI Library Collection.  Contains a list of the libraries that
     are in this library collection and can be initialized or left as None if not needed
     """
-    def __init__(self, directory, name=None, **kwargs):
-        self.check_dirtype("libraries", directory)
+    def __init__(self, directory, name=None, orig_noun=None, verb=None, verbose=None,
+                 assets=None, **kwargs):
+        if assets != None:
+            self.out_of_project = True
         super().__init__(directory, name, **kwargs)
-        self.verbose = kwargs.get("verbose", None)
-        self.orig_noun = kwargs.get("orig_noun", None)
-        self.library_list = None
-        if kwargs.get("init_libs_col", False):
-            self.library_list = []
-            logging.debug("LibraryCollection constructor creating Library Objects")
-            for lib in next(os.walk(directory))[1]:
-                lib_directory = directory + "/" + lib
-                self.library_list.append(AssetFactory.factory("library", lib_directory, **kwargs))
+        self.make_type = 'libraries'
+        self.orig_noun = orig_noun
+        self.libraries = None
+        if assets:
+            self.libraries = []
+            for library in assets:
+                self.libraries.append(Library(library, verb=verb, verbose=verbose))
+        else:
+            self.check_dirtype("libraries", self.directory)
+            if verb in ['run', 'utilization', 'show']:
+                self.libraries = []
+                logging.debug("LibrariesCollection constructor creating Library Objects")
+                for subdir in Path(self.directory).iterdir():
+                    if subdir.is_dir() and ocpiutil.get_dirtype(subdir) == 'library':
+                        self.libraries.append(Library(str(subdir), verb=verb,
+                                                      verbose=verbose, **kwargs))
 
     @staticmethod
-    def get_working_dir(name, ensure_exists=True, **kwargs):
+    def create(name, directory, verbose=None, **kwargs):
         """
-        return the directory of the Libraries given the name (name) and
-        libraries specifiers (library, hdl_library, hdl_platform)
+        Create library collection (directory of libraries)
         """
-        # if more then one of the library location variables are not None it is an error.
-        # a length of 0 means that a name is required and a default location of components/
-        libraries = kwargs.get('library', '')
-        hdl_library = kwargs.get('hdl_library', '')
-        platform = kwargs.get('platform', '')
-        lib_specs = list(filter(None, [libraries, hdl_library, platform]))
-        if len(lib_specs) > 1:
-            ocpiutil.throw_invalid_libs_e()
-        ocpiutil.check_no_libs('libraries', libraries, hdl_library, platform)
-        if not name and len(lib_specs) > 0:
-            ocpiutil.throw_not_blank_e('libraries', 'name', True)
+        libs_path, name, parent_path = Asset.start_creation(directory, name, 'libraries', kwargs)
+        libs_path.mkdir()
+        template = jinja2.Template(ocpitemplate.LIBRARIES_XML, trim_blocks=True)
+        ocpiutil.write_file_from_string(libs_path.joinpath(libs_path.name + '.xml'),
+                                        template.render({}))
+        Asset.finish_creation('libraries', name, libs_path, verbose)
 
-        working_path = Path(ocpiutil.get_path_to_project_top())
-        comp_path = Path(working_path, 'components')
-        if name and name != 'components':
-            if not comp_path.exists() and not ensure_exists:
-                comp_path.mkdir()
-            working_path = Path(comp_path, name)
-        else:
-            working_path = comp_path
+    def add_assets(self, asset_type, assets, **kwargs):
+        """
+        Add to the "assets" list for the given asset type
+        For assets in libraries, add the assets for all libraries in the collection.
+        """
+        assert asset_type in ['library','components', 'workers', 'tests']
+        for lib in self.libraries:
+            if asset_type == 'library':
+                assets.append(Path(lib.directory))
+            else:
+                lib.add_assets(asset_type, assets, **kwargs)
 
-        return str(working_path)
-
-    def run(self, verbose=False):
+    def run(self, **kwargs):
         """
         Runs the Library with the settings specified in the object.  Throws an exception if the
         tests were not initialized by using the init_tests variable at initialization.  Running a
         Library will run all the component unit tests that are contained in the Library
         """
         ret_val = 0
-        for lib in self.library_list:
-            run_val = lib.run(verbose=verbose)
+        for lib in self.libraries:
+            run_val = lib.run(**kwargs)
             ret_val = ret_val + run_val
         return ret_val
 
@@ -448,23 +381,52 @@ class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, Rep
         """
         Show utilization separately for each library
         """
-        for lib in self.library_list:
+        for lib in self.libraries:
             lib.show_utilization()
 
-    def clean(self, verbose=False, hdl=False, rcc=False,
-        worker=None, hdl_platform=None, hdl_target=None):
+    def show(self, format=None, **kwargs):
         """
-        Cleans the libraries
+        Show all of the libraries in the collection
         """
-        do_clean("libraries", self.directory, locals())
+        """
+        Print out all the libraries that are in this project in the format specified by format
+        (simple, table, or json)
+        """
+        json_dict = {}
+        project_dict = {}
+        libraries_dict = {}
+        if ocpiutil.get_dirtype(self.directory) == 'library':
+            lib_directories = [ self.directory ]
+        else:
+            lib_directories = []
+            my_path = Path(self.directory)
+            for entry in my_path.iterdir():
+                if entry.is_dir() and ocpiutil.get_dirtype(str(entry)) == 'library':
+                    lib_directories.append(str(entry))
+        for lib_directory in lib_directories:
+            lib_dict = {}
+            lib_package = Library.get_package_id(lib_directory)
+            lib_dict["package"] = lib_package
+            lib_dict["directory"] = lib_directory
+            # in case two or more  libraries have the same package id we update the key to end
+            # with a number
+            i = 1
+            while lib_package in libraries_dict:
+                lib_package += ":" + str(i)
+                i += 1
+            libraries_dict[lib_package] = lib_dict
 
-    def build(self, verbose=False, rcc=False, hdl=False, optimize=False,
-        dynamic=False, worker=None, hdl_platform=None, workers_as_needed=False, 
-        hdl_target=None, rcc_platform=None, hdl_rcc_platform=None):
-        """
-        Builds the library by using the common build function for libraries or library collections
-        """
-        do_build('libraries', self.directory, locals())
+        if format == "simple":
+            for lib,dict in libraries_dict.items():
+                print("Library: " + dict["directory"])
+        elif format == "table":
+            rows = [["Library Directories"]]
+            for lib,dict in libraries_dict.items():
+                rows.append([dict["directory"]])
+            ocpiutil.print_table(rows, underline="-")
+        else:
+            json.dump(libraries_dict, sys.stdout)
+            print()
 
     def delete_all(self):
         projdir = Path(ocpiutil.get_path_to_project_top())
@@ -472,26 +434,26 @@ class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, Rep
         shutil.rmtree(self.directory)
         print("Successfully deleted all libraries and directory:", self.directory)
 
-    def delete(self, force=False):
+    def delete(self, force=False, **kwargs):
         if self.orig_noun == "libraries":
-            for lib in self.library_list:
+            for lib in self.libraries:
                lib.delete(self, force)
             if not force:
                 prompt = 'Delete {} at: {}'.format(self.name, str(self.directory))
                 force = ocpiutil.get_ok(prompt=prompt)
             if force:
-                LibraryCollection.delete_all(self)
+                LibrariesCollection.delete_all(self)
             return
 
         libs = []
-        for lib in self.library_list:
+        for lib in self.libraries:
             libs.append(lib.name.strip())
         tense = "library exists:" if len(libs) == 1 else "libraries exist:"
-        if self.orig_noun == "library" and self.library_list and not force:
+        if self.orig_noun == "library" and self.libraries and not force:
             print("OCPI:ERROR: cannot delete 'components' because the following ", end="")
             print(tense, str(libs)[1:-1])
             exit(1)
         if not os.path.isdir(self.directory):
             print("OCPI:ERROR: no such directory:", self.directory)
             exit(1)
-        LibraryCollection.delete_all(self)
+        LibrariesCollection.delete_all(self)

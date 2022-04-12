@@ -17,21 +17,20 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import os
-from copy import copy
-from inspect import signature
-from pathlib import Path
-from subprocess import call
+# This file is the CLI to the various operations that can be performed on assets
+# It uses the underlying OO API, currently in the assets/ subdir
+
 import sys
-import _opencpi.assets as ocpiassets
+import traceback
+import os
+from pathlib import Path
+import _opencpi.assets.factory as ocpifactory
+import _opencpi.assets.registry as ocpiregistry
+import _opencpi.assets.library as ocpilibrary
 import _opencpi.util as ocpiutil
 import ocpiargparse
 from ocpidev_args import args_dict
-from _opencpi.assets import application
-from _opencpi.assets import test
-import ocpidev_utilization
-import ocpishow 
-import ocpidev_run
+# FIXME:  nuke these 2 lines when we confirm no real usage of getProjMetaData
 sys.path.append(os.getenv('OCPI_CDK_DIR') + '/scripts/')
 import genProjMetaData
 
@@ -39,117 +38,103 @@ def main():
     """
     Calls ocpiargparser.py to parse command line arguments and calls
     appropriate function or method for the noun/verb combination,
-    falling back to ocpidev.sh when necessary.
-    TODO: There are a lot of try/except statements to fall back to 
-    ocpidev.sh when needed. As more code gets updated to python, these
-    try/excepts can and should be removed.
     """
-    orig_dir = str(Path.cwd())
-    cdk_dir = ocpiutil.get_cdk_dir() # Check cdk path exists and is valid
     args = ocpiargparse.parse_args(args_dict, prog='ocpidev')
-    # This is not strictly correct if verb happens to be the value an option 
-    # that precedes positional verb.
-    sys.argv.remove(args.verb)
-    sys.argv[0] = args.verb
-    # If verb is handled by another python script or function, hand off to it.
-    # TODO: change argparsers in these scripts to use ocpiargs.py
-    if args.verb in ['show', 'utilization', 'run']:
-        ocpiutil.change_dir(orig_dir)
-        if args.verb == 'show':
-            rc = ocpishow.main()
-            sys.exit(rc)
-        elif args.verb == 'utilization':
-            rc = ocpidev_utilization.main()
-            sys.exit(rc)
-        elif args.verb == 'run':
-            rc = ocpidev_run.main()
+    assert args.noun # we expect the parser to determine this
+    # The CWD is now the directory indicated by the --directory option, if supplied.
+    # A missing "noun" has been determined by the arg parser based on this CWD because
+    # lots of validation in the arg parser depends on knowing the noun
 
-    args = postprocess_args(args)
-    verb = args.verb
-    noun = args.orig_noun = args.noun
-    kwargs = {}
-
-    if args.no_doc:
-        os.environ["OCPI_NO_DOC"] = "1"
-    if args.doc_only:
-        os.environ["OCPI_DOC_ONLY"] = "1"
-    do_ocpidev_sh = True
     try:
+        # 1. do stuff that cannot handled by the generic parser
+        args = postprocess_args(args)
+
+        # 2. collect all the info about the CWD, after --directory option handling
+        # note that the CWD cannot imply an asset that is just a file (like a protocol)
+        make_type, asset_type, directory, _, _ = ocpiutil.get_dir_info()
+        if args.verbose > 1:
+            print(f'Executing in the current directory of type:  {asset_type}')
+
+        # 3. Based on a) where we are (cwd), b) the noun we are targeting, and c) options,
+        #    find out these things:
+        #    - the targeted asset's parent's path
+        #    - the parent's type
+        #      (which *might* be a *subdir* of the parent's own dir)
+        #    - the actual asset type (noun) of the target (perhaps changed from CLI original)
+        #    - the name of the targeted asset (might be changed here)
+        #    - whether the parent needs to supply/find assets for a collection
+        parent_path, parent_type, args.noun, args.name, parent_collects = \
+            get_parent(args, Path(directory), asset_type if asset_type else make_type,
+                       ensure_exists=args.verb!='create')
+        if args.verbose > 1:
+            print(f'The parent asset of this "{args.noun}" asset is a "{parent_type}" asset',
+                  file=sys.stderr)
+        args.directory = parent_dir = str(parent_path)
+
+        # 3. Get more info about parent and ask it to do a few things:
+        if not parent_type.startswith('unknown'):
+            parent_class = \
+                ocpifactory.AssetFactory.get_class_from_asset_type(parent_type, parent_path.name)
+            if parent_collects and parent_path.exists():
+                # 3a. If the parent needs to collect the targeted (plural) assets for a collection,
+                # ask it to, and stash the list of (usually) asset paths in the args structure
+                # as a sort of option for when the collection object is constructed
+                args.assets = []
+                parent = parent_class(parent_dir, None, verb=args.verb, verbose=args.verbose)
+                parent.add_assets(args.noun, **vars(args)) # args.assets will be appended
+                args.name = None
+            elif args.name:
+                # 3b. Let the parent resolve further the identity of the target, in particular figuring
+                # out its relative pathname from its parent and putting it in args.child_path
+                # This is a static method since the parent might not exist in some cases
+                parent_class.resolve_child(parent_path, args.noun, args)
+
+        # 4. Determine the class of the target object that will be operated on
+        # and check for the class's existence (i.e. whether it is supported)
+        asset_class = ocpifactory.AssetFactory.get_class_from_asset_type(args.noun, args.name)
+
+        # 5. Determine the method (and object) to call to perform the verb
         if args.verb == 'create':
-            ocpicreate(args)
-        elif args.verb in ['set', 'unset']:
-            ocpi_set_unset(args)
-
-        directory,name = get_working_dir(args)
-
-        #TODO: This check will be redundant when falling back to bash is
-        # removed and this check can be removed at the same time
-        if noun == 'test':
-            dirtype = ocpiutil.get_dirtype(directory + '/' + name)
-            if dirtype != 'test':
-                print("Expected directory of type '" + noun + "' but found type '"
-                      + dirtype + "' at " + directory + '/' + name)
-                sys.exit(1)
-
-        elif noun in ['libraries', 'library']:
-            kwargs['init_libs_col'] = True
-            kwargs["verbose"] = args.verbose
-            kwargs["orig_noun"] = args.orig_noun
-            #TODO: This check will be redundant when falling back to bash is
-            # removed and this check can be removed at the same time
-            dirtype = ocpiutil.get_dirtype(directory)
-            if noun != dirtype:
-                print("Expected directory of type '" + noun + "' but found type '"
-                      + dirtype + "' at " + directory)
-                sys.exit(1)
-
-        # Try to instantiate the appropriate asset from noun
-        asset_factory = ocpiassets.factory.AssetFactory()
-        asset = asset_factory.factory(args.noun, directory, name, **kwargs)
-
-        try:
-        # Get verb method parameters, collect them from args, and try to
-        # call verb method with collected args
-            asset_method = getattr(asset, args.verb)
-            do_ocpidev_sh = False
-            sig = signature(asset_method)
-            method_args = {}
-            for param in sig.parameters:
-                method_args[param] = getattr(args, param, '')
-            print_cmd(args, asset.directory)
-            asset_method(**method_args)
-            metadata(verb, noun)
-        except ocpiutil.OCPIException as e:
-        # Verb failed in an expected way; don't fall back to ocpidev.sh
-            do_ocpidev_sh = False
-            raise ocpiutil.OCPIException(e)
-        except NotImplementedError as e:
-        # Verb exists but is not implemented; fall back to ocpidev.sh
-            do_ocpidev_sh = True
-            raise ocpiutil.OCPIException(e)
-        except Exception as e:
-        # Verb failed in an unexpected way;
-            raise ocpiutil.OCPIException(e)
-    except ocpiutil.OCPIException as e:
-        if do_ocpidev_sh:
-            ocpidev_sh(cdk_dir, orig_dir)
-        ocpiutil.logging.error(e)
+            # Creation uses static methods and not constructors (not yet anyway)
+            asset_method = getattr(asset_class, 'create', None)
+            if parent_type == 'library':
+                # CLI says that libraries may be auto-created when you create something inside them
+                maybe_autocreate_library(parent_path, args.verbose)
+            elif parent_type == 'libraries':
+                # CLI says that a "libraries" directory/asset may be auto-created when you create
+                # a library
+                maybe_autocreate_libraries(parent_path, args.verbose)
+        else:
+            asset = ocpifactory.AssetFactory.get_instance(asset_class, **vars(args))
+            asset_method = getattr(asset, args.verb, None)      # get the method bound to the object
+        if not asset_method:
+            raise NotImplementedError
+        if args.verbose > 1:
+            print(f'Executing command "{args.verb} {args.orig_noun.replace("-"," ")} '+
+                  f'in directory: {directory}', file=sys.stderr)
+        asset_method(**vars(args))
+        # This is horrible and should be nuked in favor of ocpidev show
+        if args.verb == "create" or args.verb == "delete" and not args.noun in ["project", "registry"]:
+            projdir = ocpiutil.get_path_to_project_top(parent_dir)
+            if projdir:
+                genProjMetaData.main(projdir)
+    except NotImplementedError as e:
+        print(f'There is no support for for the "{args.verb}" operation on "{args.noun}" assets',
+              file=sys.stderr)
         sys.exit(1)
-
-
-def metadata(verb=None, noun=None):
-    if not verb in ["create", "delete"]:
-       return
-    if verb == "delete" and noun in ["project", "registry"]:
-       return
-    projdir = ocpiutil.get_path_to_project_top()
-    if ocpiutil.get_dirtype(projdir) == "project":
-        genProjMetaData.main(projdir)
-
+    except ocpiutil.OCPIException as e:
+        print(f'Error: {e}',file=sys.stderr)
+        sys.exit(1)
+    except Exception as e:
+        # Verb failed in an unexpected way;
+        traceback.print_exc(file=sys.stderr)
+        ocpiutil.logging.critical(e) # say something
+        sys.exit(1)
+    sys.exit(0)
 
 def postprocess_args(args):
     """
-    Post-processes user arguments
+    Post-processes user arguments - do what the argparser is unable to do for various reasons
     """
     if not 'noun' in args or not args.noun:
         err_msg = ' '.join([
@@ -159,13 +144,14 @@ def postprocess_args(args):
         ])
         ocpiutil.logging.error(err_msg)
         sys.exit(1)
+    args.orig_noun = args.noun # some methods like to know the noun before it is "improved"
     if args.noun == 'spec':
         args.noun = 'component'
-        args.spec_file_only = True
+        args.file_only = True
     if hasattr(args, 'rcc-noun'):
         args.model = 'rcc'
     elif args.noun == 'worker':
-        if 'name' in args:
+        if args.name:
             args.model = Path(args.name).suffix
         else:
             args.model = Path.cwd().suffix
@@ -176,129 +162,430 @@ def postprocess_args(args):
             ])
             ocpiutil.logging.error(err_msg)
             sys.exit(1)
+        args.noun = args.model[1:] + '-worker'
+    elif args.noun == 'hdl-primitive':
+        args.noun = 'hdl-' + args.primitive_noun
+        delattr(args, 'hdl_noun')
+        delattr(args, 'primitive_noun')
+        args.model = 'hdl'
     else:
         args.model = 'hdl'
-
-    if hasattr(args, 'directory'):
-        delattr(args, 'directory')
-
+    if not getattr(args, 'format',None):
+        if getattr(args, 'simple',None):
+            args.format = 'simple'
+        elif getattr(args, 'json',None):
+            args.format = 'json'
+        else:
+            args.format = 'table'
+    # These allow these options to propagated into any "make" execution
+    if args.no_doc:
+        os.environ["OCPI_NO_DOC"] = "1"
+    if args.doc_only:
+        os.environ["OCPI_DOC_ONLY"] = "1"
     return args
 
-
-def ocpi_set_unset(args):
+def maybe_autocreate_library(parent_path, verbose):
     """
-    set and unset the registry of the project
+    Create a library as a side effect of creating something in a library
+    This is a somewhat random CLI "feature": HDL component libraries
+    under "hdl" in a project get autocreated when something is created in them
+    We do not pass any options into this auto-creation other than verbose
     """
-    name = getattr(args, 'name', '')
-    name = name if name else ''
-    directory = str(Path.cwd())
-    print_cmd(args, directory)
+    if parent_path.parent.name == 'hdl' and not parent_path.exists():
+        if not parent_path.parent.exists():
+            ocpilibrary.LibrariesCollection.create(parent_path.parent.name,
+                                                 parent_path.parent.parent, verbose=verbose)
+        ocpilibrary.Library.create(parent_path.name, parent_path.parent, verbose=verbose)
 
-    try:
-        asset_factory = ocpiassets.factory.AssetFactory()
-        project = asset_factory.factory('project', directory, name)
-        if args.verb == 'unset':
-            project.unset_registry()
-            sys.exit()
-        if args.registry_directory:
-            registry_directory = args.registry_directory
-        else:
-            Registry = ocpiassets.registry.Registry
-            registry_directory = Registry.get_default_registry_dir()
-        project.set_registry(registry_directory)
-    except ocpiutil.OCPIException as e:
-        ocpiutil.logging.error(e)
-        sys.exit(1)
-    sys.exit()
-
-
-def ocpicreate(args):
+def maybe_autocreate_libraries(libraries_path, verbose):
     """
-    Gets proper class from noun and calls its create() static method
+    Create a libraries directory as a side effect of creating a library
+    We do not pass any options into this auto-creation other than verbose
     """
-    class_dict = {
-        "project": ocpiassets.project.Project,
-        "library": ocpiassets.library.Library,
-        "application": ocpiassets.application.Application,
-        "component": ocpiassets.component.Component,
-        "protocol": ocpiassets.component.Protocol,
-        "test": ocpiassets.test.Test,
-        "hdl-platform": ocpiassets.platform.HdlPlatformWorker,
-        "hdl-assembly": ocpiassets.assembly.HdlApplicationAssembly,
-        "hdl-slot": ocpiassets.component.Slot,
-        "hdl-card": ocpiassets.component.Card,
-    }
-    if args.noun not in class_dict:
-    # Noun not implemented by this function; fall back to ocpidev.sh
-        raise ocpiutil.OCPIException('noun not implemented for create verb')
-    directory,name = get_working_dir(args, ensure_exists=False)
-    print_cmd(args, directory)
-    delattr(args, 'name')
-    verb = args.verb
-    args = vars(args)
-    noun = args.pop('noun', '')
-    try:
-        class_dict[noun].create(name, directory, **args)
-    except ocpiutil.OCPIException as e:
-        ocpiutil.logging.error(e)
-        sys.exit(1)
-    metadata(verb, None)
-    sys.exit()
+    assert libraries_path.name in ['hdl','components']
+    if not libraries_path.exists():
+        ocpilibrary.LibrariesCollection.create(libraries_path.name, libraries_path.parent,
+                                               verbose=verbose)
+
+# All finders take in the cwd path, the previously-determined asset type of the cwd,
+# the targeted asset type (noun), and optional targeted name
+# Finders then return a tuple of:
+# - the parent path of the targeted asset
+# - the asset type of this parent path
+# - a possible adjusted asset type of the targeted asset
+# - a possibly adjusted (or determined) name of the targeted asset
+# - a boolean indicating whether it is a plural
+# Finders work with "create", where the asset does not exist yet, as well as
+# all other verbs which target an existing asset
+def find_hdl_slot(args, parent_path, cwd_type, noun, name):
+    """ Find where a slot should be:  project-specs, platform devices lib, any specified library"""
+    assert cwd_type in ['project','hdl-platforms','library']
+    parent_type = cwd_type
+    if cwd_type == 'hdl-platforms':
+        if not args.platform:
+            raise ocpiutil.OCPIException(f'when specifying an HDL device when in the hdl/platforms directory, '+
+                                         f'the platform must be specified')
+        parent_path = parent_path.joinpath(args.platform, 'devices', 'specs')
+        parent_type = 'library'
+    elif cwd_type == 'library':
+        if not parent_path.parent.name == 'hdl':
+            raise ocpiutil.OCPIException(f'HDL devices can only be specified in an HDL library '+
+                                         f'under the hdl/ subdirectory of a project')
+        parent_path = parent_path.joinpath('specs')
+    return parent_path, parent_type, noun, name, False
+
+def find_hdl_device(args, target_path, cwd_type, noun, name):
+    """ finder function for HDL devices, cards, and slots """
+    assert cwd_type in ['project','hdl-platforms','library']
+    if cwd_type == 'library':
+        if not target_path.parent.name == 'hdl':
+            raise ocpiutil.OCPIException(f'HDL devices can only be specified in an HDL library '+
+                                         f'under the hdl/ subdirectory of a project')
+    elif cwd_type == 'hdl-platforms':
+        if not args.platform:
+            raise ocpiutil.OCPIException(f'when specifying an HDL device when in the hdl/platforms directory, '+
+                                         f'the platform must be specified')
+        target_path = target_path.joinpath(args.platform, 'devices')
+    # Must be in a project dir
+    elif args.platform:
+        target_path = target_path.joinpath('hdl', 'platforms', args.platform, 'devices')
+    elif getattr(args, 'hdl_library', None):
+        if noun in ['hdl-card', 'hdl-slot']:
+            if args.hdl_library != 'cards':
+                raise ocpiutil.OCPIException(f'HDL cards and slots can only be at the '+
+                                             f'project/specs level or in the hdl/cards library')
+        target_path = target_path.joinpath('hdl', args.hdl_library)
+    elif getattr(args,'project',None) and noun in ['hdl-card', 'hdl-slot']:
+        target_path = target_path.joinpath('specs')
+    elif noun == 'hdl-device': # devices default to the devices library
+        target_path = target_path.joinpath('hdl','devices')
+        if '.' not in name:
+            name += ".hdl"
+    elif noun == 'hdl-card': # cards default to the cards library
+        target_path = target_path.joinpath('hdl','cards')
+    elif noun == 'hdl-slot': # slots default to the cards library
+        target_path = target_path.joinpath('hdl','cards')
+    else:  # project level without saying where it should go
+        raise ocpiutil.OCPIException(f'HDL devices, cards or slots require an indication of '+
+                                     f'where in the project they should be, using the --project, '
+                                     f'--hdl-library, or --platform options')
+    return target_path, "library", noun, name, False
 
 
-def get_working_dir(args, ensure_exists=True):
+def find_library(args, parent_path, parent_type, noun, name):
     """
-    Calls ocpiutil.get_ocpidev_working_dir() to get the appropriate
-    directory for an asset. Splits the directory into name and parent 
-    directory tuple and returns them.
+    Find the library for library-based assets
+    Called assuming some library identifier option is specified
     """
-    kwargs = copy(vars(args))
-    name = kwargs.pop('name', '')
-    name = name if name else ''
-    noun = kwargs.pop('noun', '')
-
-    if noun == 'registry':
-        working_path = Path.cwd()
-        if working_path.name != name:
-            working_path = Path(working_path, name)
-    elif noun == 'project' and args.verb == 'create':
-        working_path = Path(Path.cwd(), name).absolute()
+    assert parent_type in ['project', 'libraries']
+    library = getattr(args, 'library', None)
+    hdl_library = getattr(args, 'hdl_library', None)
+    platform = getattr(args, 'platform', None)
+    if noun == 'library': # must stay a parent of the library
+        assert parent_type == 'project'
+        assert not library and not hdl_library and not platform
+        if name != 'components':
+            parent_path = parent_path.joinpath('components')
+            parent_type = 'libraries'
+        return parent_path, parent_type, noun, name, False
+    # So if noun is not a library, we are looking for things *inside* a library
+    if parent_type == 'libraries':
+        assert library
+        parent_path = parent_path.joinpath(library)
+    elif library:
+        parent_path = parent_path.joinpath('components',
+                                           args.library if args.library != 'components' else '')
+    elif hdl_library:
+        parent_path = parent_path.joinpath('hdl', args.hdl_library)
+    elif platform:
+        parent_path = parent_path.joinpath('hdl', 'platforms', args.platform, 'devices')
     else:
-        working_path = Path(ocpiutil.get_ocpidev_working_dir(
-            noun, name, ensure_exists=ensure_exists, **kwargs)).absolute()
-    if noun not in ['registry', 'library', 'libraries', 'project'] or args.verb == 'create':
-    # Libraries, projects, and registries want the full path as the directory
-        name = working_path.name
-        working_path = str(working_path.parent)
+       parent_path = parent_path.joinpath('components')
+       if not parent_path.is_dir() or ocpiutil.get_dirtype(parent_path) != 'library':
+           raise ocpiutil.OCPIException(f'no library was specified and a single "components" '+
+                                        f'library does not exist')
+    return parent_path, 'library', noun, name, False
 
-    return str(working_path),name
-
-
-def print_cmd(args, directory):
+def find_library_or_project(args, target_path, cwd_type, noun, name):
     """
-    If verbose, print message detailing command to be executed
+    For navigating to a library or at the project level, when at the project level
     """
-    if getattr(args, 'verbose', False):
-        simple_noun = args.orig_noun.replace("-"," ")
-        msg = ' '.join([
-            'Executing command "{} {}"'.format(args.verb, simple_noun), 
-            'in directory: {}'.format(directory)
-        ])
-        print(msg)
+    assert cwd_type == 'project'
+    if args.project:
+        return target_path, "project", noun, name, False
+    return find_library(args, target_path, cwd_type, noun, name)
 
+def find_library_or_libraries(args, cwd_path, cwd_type, noun, name):
+    """
+    For navigating to a library or libraries in a project when you are looking
+    for assets that live in libraries
+    """
+    assert not name
+    assert cwd_type in ['project', 'libraries']
+    if cwd_type == 'libraries':
+        if args.library:
+            return find_library(args, cwd_path, cwd_type, noun, name)
+    elif cwd_type == 'project':
+        if args.library or args.hdl_library or args.platform:
+            return find_library(args, cwd_path, cwd_type, noun, name)
+    return cwd_path, cwd_type, noun, name, True
 
-def ocpidev_sh(cdk_dir=None, orig_dir=None):
-    """Calls ocpidev.sh and exits"""
-    if orig_dir:
-        ocpiutil.change_dir(orig_dir)
-    if not cdk_dir:
-        cdk_dir = ocpiutil.get_cdk_dir()
-    ocpidev_sh_path = str(Path(cdk_dir, 'scripts', 'ocpidev.sh'))
-    cmd = sys.argv
-    cmd.insert(0, ocpidev_sh_path)
-    rc = call(cmd)
-    sys.exit(rc)
+def find_registry_or_project(args, cwd_path, cwd_type, noun, name):
+    """
+    Deal with the nasty special case of the "set" and "unset" verbs which mention the noun
+    "registry" while actually operating on the project.
+    FIXME:  come up with a clean verb to associate a registry with a project
+    or perhaps simply make "set-registry" and "unset-registry" verbs in the CLI
+    """
+    assert noun == 'registry'
+    if args.verb in ['set','unset']:
+        if cwd_type != 'project':
+            raise ocpiutil.OCPIException(f'The "set registry" command can only be issued in a '+
+                                         f'project\'s directory')
+        args.verb = args.verb + "_registry" # verbs that operate on projects
+        args.registry = name # possibly relative path to project
+        return cwd_path, cwd_type, "project", None, False
+    # so we are actually operating on a registry in which case the returned
+    # parent is the CWD since the documentation says the registry is simply named.
+    if name:
+        # the registry is named, which means it independent of the project
+        registry_path = cwd_path.joinpath(name) # name might be a path (absolute or relative)
+    elif args.local_scope:
+        registry_path = ocpiregistry.Registry.get_registry_path_from_project(cwd_path)
+    else:
+        registry_path = ocpiregistry.Registry.get_default_registry_path()
+    return registry_path.parent, 'unknown-outside-project', noun, registry_path.name, False
 
+def get_parent(args, cwd, cwd_asset_type, ensure_exists=True):
+    """
+    Taking as input:
+    -- where we are (CWD after -d)
+    -- the asset_type or make_type of this initial CWD
+    -- the user-specified verb and noun and name (in args)
+    Determine the parent asset (its asset type and directory and name) of the
+    targeted asset (noun and name), and possibly adjust the target object's
+    type and noun and name
+    Note that a parent asset MUST be a directory so the returned directory
+    is unambiguously the directory of the parent assset.
+
+    Return the tuple of (parent-dir, parent-type, target noun, parent-name, whether-to-collect)
+
+    "Whether-to-collect" means that the parent must be queried for some plural noun, which can
+    never happen when the target asset type is the type of the CWD.
+    """
+
+    if cwd_asset_type == args.noun:
+        if args.name and args.name != '.' and args.name != cwd.name:
+            raise ocpiutil.OCPIException(f'When in a "{cwd_asset_type}" directory for the asset '+
+                                         f'"{cwd.name}", the given name "{args.name}" is wrong.')
+        return cwd.parent, 'unknown', args.noun, cwd.name, False
+    # Dictionary to map the pair of [CWD asset type, target asset type (noun) ] to
+    # information that helps determine the ultimate parent of the targeted asset
+    parent_dict = {
+        'project': {
+            # How to get from a project to the identified noun and maybe name
+            # First element is dirs to append.  Some assets cannot be referenced from the project level,
+            # e.g. containers. (since we don't have --assembly yet)
+            # This map is all asset types and plurals, just for documentation/completeness.
+            # Invalid ones have 'None'
+            'application':             { 'name' : True, 'append' : 'applications',
+                                         'parent' : 'applications'},
+            'applications':            { 'name' : False, 'append' : 'applications',
+                                         'optional' : True},
+            'component':               { 'name' : True, 'finder' : find_library_or_project},
+            'components':              { 'name' : False, 'plural': True },
+            'hdl-assemblies':          { 'name' : 'assemblies', 'append' : 'hdl',
+                                         'optional' : True},
+            'hdl-assembly':            { 'name' : True, 'append' : 'hdl/assemblies',
+                                         'parent':'hdl-assemblies'},
+            'hdl-card':                { 'name' : True, 'append' : 'hdl/cards',
+                                         'parent' : 'library' },
+            'hdl-cards':               { 'name' : True, 'append' : 'hdl/card/specs',
+                                         'optional' : True},
+            "hdl-container":           None,
+            "hdl-containers":          None,
+            'hdl-core':                { 'name' : True, 'append' : 'hdl/primitives',
+                                         'parent' : 'hdl-primitives'},
+            'hdl-device':              { 'name' : True, 'finder' : find_hdl_device},
+            'hdl-devices':             { 'name' : True, 'finder' : find_hdl_device,
+                                         'optional' : True},
+            'hdl-library':             { 'name' : True, 'append' : 'hdl/primitives',
+                                         'parent' : 'hdl-primitives'},
+            'hdl-platform':            { 'name' : True, 'append': 'hdl/platforms',
+                                         'parent': 'hdl-platforms'},
+            'hdl-platforms':           { 'name' : False, 'plural' : True},
+            'hdl-primitives':          { 'name' : False, 'append' : 'hdl/primitives', 'optional' : True},
+            'hdl-slot':                { 'name' : True, 'finder' : find_hdl_device},
+            'hdl-slots':               { 'name' : False, 'finder' : find_hdl_slot},
+            'hdl-targets':             { 'name' : False, 'plural' : True},
+            'hdl-worker':              { 'name' : True, 'finder' : find_library},
+            'libraries':               { 'name' : False, 'plural' : True},
+            'library':                 { 'name' : True, 'finder' : find_library},
+            'platforms':               { 'name' : False, 'plural' : True},
+            'prerequisite':            { 'name' : True},
+            'prerequisites':           {},
+            "project":                 None,
+            "projects":                { 'name' : False, 'registry' : True,
+                                         'plural': True},
+            'protocol':                { 'name' : True, 'finder' : find_library_or_project},
+            'protocols':               { 'name' : True, 'finder' : find_library_or_project,
+                                         'optional' : True},
+            "rcc-platform":            { 'name' : True, 'append' : 'rcc/platforms' },
+            'rcc-platforms':           { 'name' : False, 'append' : 'rcc/platforms',
+                                         'parent' : 'hdl-platforms', 'optional' : True},
+            'rcc-worker':              { 'name' : True, 'finder' : find_library},
+            'registry':                { 'finder' : find_registry_or_project },
+            'test':                    { 'name' : True, 'finder' : find_library},
+            'tests':                   { 'name' : False, 'finder' : find_library_or_libraries},
+            'worker':                  { 'name' : True, 'finder' : find_library},
+            'workers':                 { 'name' : False, 'finder' : find_library_or_libraries,
+                                         'optional' : True},
+            },
+        'applications': {
+            'application' :            { 'name' : True},
+            'applications':            { 'name' : 'applications'},
+        },
+        'hdl-assemblies': {
+            'hdl-assemblies':          { 'name' : 'assemblies', 'append' : 'hdl'},
+            'hdl-assembly' :           { 'name' : True},
+        },
+        'hdl-assembly': {
+            "hdl-container":           { 'name' : True }
+        },
+        'hdl-platform': {
+            'component' :              { 'name' : True, 'append' : 'devices'},
+            'components' :             { 'name' : False, 'append' : 'devices', 'optional' : True},
+            'protocol':                { 'name' : True, 'append' : 'devices'},
+            'protocols':               { 'name' : False, 'append' : 'devices', 'optional' : True},
+            'test' :                   { 'name' : True, 'append' : 'devices'},
+            'tests':                   { 'name' : False, 'append' : 'devices', 'optional' : True},
+            'worker':                  { 'name' : True,  'append' : 'devices'},
+            'workers':                 { 'name' : False, 'append' : 'devices', 'optional' : True},
+        },
+        'hdl-platforms': {
+            'hdl-platform' :           { 'name' : True, 'append': 'hdl/platforms'},
+        },
+        'hdl-primitives': {
+            'hdl-primitive-libraries': { 'name' : False, 'append' : 'hdl/primitives'},
+            'hdl-primitive-library':   { 'name' : True, 'append' : 'hdl/primitives'},
+            'hdl-primitive-core':      { 'name' : True, 'append' : 'hdl/primitives'},
+            'hdl-primitive-cores':     { 'name' : False, 'append' : 'hdl/primitives'},
+            'hdl-primitives':          { 'name' : False, 'append' : 'hdl', 'name' : 'primitives'},
+        },
+        'libraries': {
+            'component':               { 'name' : True, 'finder' : find_library},
+            'components':              { 'name' : False, 'finder' : find_library_or_libraries},
+            'hdl-worker':              { 'name' : True, 'finder' : find_library},
+            'library':                 { 'name' : True},
+            'protocol':                { 'name' : True, 'finder' : find_library},
+            'protocols':               { 'name' : False, 'finder' : find_library_or_libraries},
+            'rcc-worker':              { 'name' : True, 'finder' : find_library},
+            'test':                    { 'name' : True, 'finder' : find_library},
+            'tests':                   { 'name' : False, 'finder' : find_library_or_libraries},
+            'worker':                  { 'name' : True, 'finder' : find_library},
+            'workers':                 { 'name' : False, 'finder' : find_library_or_libraries},
+        },
+        'library': {
+            'component':               { 'name' : True},
+            'components':              { 'name' : False},
+            'hdl-worker':              { 'name' : True},
+            'protocol':                { 'name' : True},
+            'protocols':               { 'name' : False},
+            'rcc-worker':              { 'name' : True},
+            'test':                    { 'name' : True},
+            'tests':                   { 'name' : False},
+            'worker':                  { 'name' : True},
+            'workers':                 { 'name' : False},
+        },
+        'prerequisites': {
+            'prerequisite':            { 'name' : True, 'append': 'prerequisites'},
+        },
+        'rcc-worker' : {
+            'worker' : { 'noun' : 'rcc-worker', 'name' : 'none-or-same'},
+        },
+        'unknown-outside-project': {
+            'components':              { 'name' : False, 'registry' : True,
+                                         'plural' : True}, # for global scope
+            'hdl-platforms':           { 'name' : False, 'registry' : True,
+                                         'plural' : True}, # for global scope
+            'hdl-targets':             { 'name' : False, 'registry' : True,
+                                         'plural' : True}, # for global scope
+            'project':                 { 'name' : True},
+            'projects':                { 'name' : False, 'registry' : True,
+                                         'plural': True},
+            'rcc-platforms':           { 'name' : False, 'registry' : True,
+                                         'plural' : True}, # for global scope
+            'rcc-targets':             { 'name' : False, 'registry' : True,
+                                         'plural' : True}, # for global scope
+            'registry':                {},
+            'platforms':               { 'name' : False, 'registry' : True,
+                                         'plural' : True},
+            'prerequisites':           {},
+            'targets':                 { 'name' : False, 'registry' : True,
+                                         'plural' : True},
+            'workers':                 { 'name' : False, 'registry' : True,
+                                         'plural' : True},
+        },
+        'unknown-in-project': {
+            "registry":                { 'name' : True},
+        }
+     }
+
+    if not cwd_asset_type:
+        cwd_asset_type = \
+            'unknown-in-project' if ocpiutil.get_path_to_project_top(str(cwd)) else \
+            'unknown-outside-project'
+    noun = args.noun
+    name = args.name
+    parent_path = cwd
+    parent_type = cwd_asset_type
+    pmap = parent_dict.get(cwd_asset_type)
+    assert pmap
+    pmap = pmap.get(noun)
+    if pmap == None:
+        raise ocpiutil.OCPIException(f'When in a "{cwd_asset_type}" directory, operating on a '+
+                                     f'"{noun}" is invalid')
+    map_name = pmap.get('name')
+    if map_name == False:
+        if name:
+            raise ocpiutil.OCPIException(f'When in a "{cwd_asset_type}" type directory, '+
+                                         f'providing the name "{name}" is invalid')
+    elif map_name == True:
+        if not name:
+            raise ocpiutil.OCPIException(f'When in a "{cwd_asset_type}" type directory, '+
+                                         f'the "{noun}" must be named')
+    elif map_name == 'none-or-same':
+        if name and name != Path(args.directory).name:
+            raise ocpiutil.OCPIException(f'When in a "{cwd_asset_type}" type directory, '+
+                                         f'the "{noun}" must be same name or not mentioned')
+        name = None
+    elif map_name != None:
+        name = map_name
+    map_noun = pmap.get('noun')
+    if map_noun: # map is forcing the noun
+        noun = map_noun
+    append = pmap.get('append')
+    if append: # map is appending to CWD to get parent dir
+        parent_path = parent_path.joinpath(append)
+    if pmap.get('parent'):
+        parent_type = pmap.get('parent')
+    if pmap.get('registry'):
+        parent_path = Path(ocpiregistry.Registry.get_default_registry_dir())
+        parent_type = 'registry'
+    collect = pmap.get('plural')
+    finder = pmap.get('finder')
+    if finder:
+        parent_path, parent_type, noun, name, collect = \
+            finder(args, parent_path, parent_type, noun, name)
+    if ensure_exists and not pmap.get('optional'):
+        if  not parent_path.exists():
+            raise ocpiutil.OCPIException(f'The directory "{parent_path}" does not exist where a '+
+                                         f'"{noun}" directory with name "{name}" is expected.')
+        if name and not parent_path.joinpath(name).exists():
+            ocpiutil.OCPIException(f'The "{noun}" named "{name}" in directory "{parent_path}" '+
+                                   f'does not exist')
+
+    return parent_path, parent_type, noun, name, collect
 
 if __name__ == '__main__':
     main()

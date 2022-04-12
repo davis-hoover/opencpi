@@ -20,8 +20,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-
 import os
+import sys
 import pathlib
 import glob
 import itertools
@@ -70,7 +70,6 @@ class OcpiDocumentationWorker(PropertiesDirectiveHandler):
                     worker_description.get("properties"),
                     worker_description.get("inputs"),
                     worker_description.get("outputs"),
-                    worker_description.get("time"),
                     worker_description.get("signals"),
                     worker_description.get("interfaces"),
                     worker_description.get("other_interfaces")):
@@ -83,7 +82,7 @@ class OcpiDocumentationWorker(PropertiesDirectiveHandler):
         # Add property detail from the worker description
         property_list = docutils.nodes.bullet_list()
         for name, detail in worker_description["properties"].items():
-            if detail["worker_property"] is True:
+            if detail["isimpl"] is True:
                 list_item = self._property_summary(name, detail)
                 property_list.append(list_item)
 
@@ -102,8 +101,7 @@ class OcpiDocumentationWorker(PropertiesDirectiveHandler):
         port_options = [("inputs", "Inputs:"),
                         ("outputs", "Outputs:"),
                         ("time", "Time:"),
-                        ("signals", "Signals:"),
-                        ("interfaces", "Interfaces:"),
+                        ("interfaces", "Interfaces (other than data I/O ports):"),
                         ("other_interfaces", "Other interfaces:")]
 
         for port_type, port_type_header in port_options:
@@ -117,6 +115,14 @@ class OcpiDocumentationWorker(PropertiesDirectiveHandler):
                     list_item = self._port_summary(name, detail)
                     port_list.append(list_item)
 
+        # Add signal detail from the worker description
+        signal_list = docutils.nodes.bullet_list()
+        signal_dict = worker_description.get('signals')
+        if signal_dict:
+            for name, detail in signal_dict.items():
+                list_item = self._port_summary(name, detail)
+                signal_list.append(list_item)
+
         # Get subdevice connections from OWD, if available
         subdevice_list = docutils.nodes.bullet_list()
         for worker,connections in worker_description["supports"].items():
@@ -127,7 +133,7 @@ class OcpiDocumentationWorker(PropertiesDirectiveHandler):
                 docutils.nodes.paragraph(text="Connections:"))
             supported_item.append(docutils.nodes.line())
             connection_list = docutils.nodes.bullet_list()
-            for port,connect in connections:
+            for port,connect in connections.items():
                 connection_list = docutils.nodes.bullet_list()
                 connection_list.append(
                     docutils_helpers.list_item_name_code_value(
@@ -159,6 +165,14 @@ class OcpiDocumentationWorker(PropertiesDirectiveHandler):
                 docutils.nodes.title(text="Worker Ports"))
             port_section.append(port_list)
             content.append(port_section)
+
+        if len(signal_list) > 0:
+            signal_section = docutils.nodes.section(
+                ids=["worker-signals"], names=["worker signals"])
+            signal_section.append(
+                docutils.nodes.title(text="Worker Signals"))
+            signal_section.append(signal_list)
+            content.append(signal_section)
 
         # If build file path not set determine, otherwise use set value
         if "build_file" in self.options:
@@ -268,8 +282,13 @@ class OcpiDocumentationWorker(PropertiesDirectiveHandler):
                            ("optional", "Optional"),
                            ("signals", "Signals"),
                            ("input", "Input"),
-                           ("output", "Output")]
-
+                           ("output", "Output"),
+                           # These are signal attributes, not port attributes
+                           ("direction", "Direction"),
+                           ("width", "Width"),
+                           ("differential", "Differential"),
+                           ("pin", "Pin"),
+                           ]
         for attribute, text in port_attributes:
             if attribute in detail:
                 # Include "devsignal" information contained in another xml

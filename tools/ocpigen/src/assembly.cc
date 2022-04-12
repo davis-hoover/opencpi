@@ -697,6 +697,11 @@ emitXmlWorker(std::string &out, bool verbose) {
       }
     }
   }
+  if (verbose) {
+    emitXmlSupports(out);
+    for (auto it = m_signals.begin(); it != m_signals.end(); ++it)
+      (**it).emitXml(out);
+  }
   for (nn = 0; nn < m_localMemories.size(); nn++) {
     LocalMemory* m = m_localMemories[nn];
     OU::formatAdd(out, "    <localMemory name=\"%s\" size=\"%zu\"/>\n", m->name, m->sizeOfLocalMemory);

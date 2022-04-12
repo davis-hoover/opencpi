@@ -21,12 +21,16 @@ Abstract classes that are used in other places within the assets module are defi
 
 from abc import ABCMeta, abstractmethod
 import os
+import sys
 import logging
+import re
+import jinja2
 from pathlib import Path
 import copy
 import shutil
 import _opencpi.hdltargets as hdltargets
 import _opencpi.util as ocpiutil
+import ocpidoc.ocpi_documentation as ocpi_doc
 
 class Asset(metaclass=ABCMeta):
     """
@@ -36,6 +40,7 @@ class Asset(metaclass=ABCMeta):
     """
     valid_authoring_models = ["rcc", "hdl"]
     valid_settings = []
+    instances_should_be_cached = False
 
     def __init__(self, directory, name=None, **kwargs):
         """
@@ -46,13 +51,73 @@ class Asset(metaclass=ABCMeta):
             directory - The location on the file system of the asset that is being constructed.
                         both relative and global file paths are valid.
         """
+        directory = str(directory)
         if not name:
             self.name = os.path.basename(directory)
             directory = os.path.dirname(directory)
         else:
             self.name = name
-        self.directory = os.path.realpath(directory)
-        self.verbose = kwargs.get("verbose", False)
+        self.parent = Path(directory).resolve() # This is the parent
+        self.verbose = kwargs.get('verbose')
+        # Derived classes are expected to set this, but intermediate classes
+        # might test for it being set or not to detect whether the intermediate
+        # class is actually the instantiated one
+        if not getattr(self, 'asset_type', None):
+            self.asset_type = None
+        if not getattr(self, 'make_type', None):
+            self.make_type = None
+        # Location is the file *or* directory that represents the asset
+        child_path = kwargs.get('child_path')
+        self.path = self.parent.joinpath(str(child_path) if child_path else self.name)
+        self.directory = str(self.path) # for old code
+        if not getattr(self,'out_of_project',None):
+            if not ocpiutil.is_path_in_project(self.directory):
+                raise ocpiutil.OCPIException(f'Requested asset directory "{directory}" is not in '+
+                                             f'a project')
+
+    @classmethod
+    def resolve_child(cls, path, child_asset_type, args):
+        """ Resolve the actual path for a child asset if needed """
+
+    @staticmethod
+    def get_asset_path(directory, name, args):
+        """
+        Determine actual asset path and return the triple: path, name, parent
+        This is common code for both creation and construction.
+        """
+        parent_path = Path(directory).resolve()
+        if not name:
+           name = parent_path.name
+           parent_path = parent_path.parent
+        child_path = args.get('child_path')
+        return parent_path.joinpath(child_path if child_path else name), name, parent_path
+
+    @staticmethod
+    def process_template(template):
+        """ Convert our indented templates into a jinja template """
+        template = template.lstrip('\n')
+        spaces = re.match(" *", template)
+        if spaces:
+            spaces = spaces.group(0)
+            new_template=''
+            for line in template.split('\n'):
+                if re.match(spaces, line):
+                    line = line[len(spaces):]
+                new_template+=line+'\n'
+            template = new_template
+        return jinja2.Template(template, trim_blocks=True,lstrip_blocks=True)
+
+    @staticmethod
+    def start_creation(directory, name, asset_type, args):
+        """
+        For asset creation, do the basic figuring of the actual asset path and
+        existence check
+        Return the triple:  asset_path, asset_name, parent_path
+        """
+        path, name, parent = Asset.get_asset_path(directory, name, args)
+        if path.exists():
+            raise ocpiutil.OCPIException(f'{asset_type} "{name}" already exists at "{str(path)}"')
+        return path, name, parent
 
     @classmethod
     def get_valid_settings(cls):
@@ -92,10 +157,12 @@ class Asset(metaclass=ABCMeta):
         Validate the directory and dirtype, otherwise raise an exception
         """
         if not os.path.isdir(directory):
-            err_msg = 'location does not exist at: {}'.format(directory)
+            err_msg = 'location does not exist at: "{}" when looking for {}'.format(directory, dirtype)
             raise ocpiutil.OCPIException(err_msg)
 
-        true_dirtype = ocpiutil.get_dirtype(directory)
+        make_type,asset_type,_,_,_ = ocpiutil.get_dir_info(directory)
+        # Asset_type is more specific than make_type
+        true_dirtype = asset_type if asset_type else make_type
         if not true_dirtype:
             true_dirtype = 'unknown'
         if true_dirtype != dirtype:
@@ -104,7 +171,7 @@ class Asset(metaclass=ABCMeta):
                                 "for directory {}".format(directory)])
             raise ocpiutil.OCPIException(err_msg)
 
-    def delete(self, noun='asset', force=False):
+    def delete(self, noun='asset', force=False, **kwargs):
         """
         Remove the Asset from disk.  Any additional cleanup on a per asset basis can be done in
         the child implementations of this function
@@ -112,10 +179,6 @@ class Asset(metaclass=ABCMeta):
         Return True if deletion actually took place
         """
         path = Path(self.directory)
-        if path.name != self.name:
-            path = Path(path, self.name)
-        if not type(noun) == str:
-            noun = self.__module__.split(".")[-1]
         if not force:
             prompt = 'Delete {} at: {}'.format(noun, str(path))
             force = ocpiutil.get_ok(prompt=prompt)
@@ -137,6 +200,16 @@ class Asset(metaclass=ABCMeta):
                 logging.error(err_msg)
         return False
 
+    @classmethod
+    def get_component_spec_file(cls, file):
+        """
+        Determines if a provided xml file contains a component spec and returns the component name
+        FIXME: this should not be here, but is called from here...
+        """
+        file=Path(file).name
+        return file[:-9] \
+            if file.endswith("_spec.xml") or file.endswith("-spec.xml") else None
+
     def get_valid_components(self):
         """
         this is function is used by both projects and libraries  to find the component specs that
@@ -149,7 +222,7 @@ class Asset(metaclass=ABCMeta):
             files = [dir for dir in os.listdir(self.directory + "/specs")
                      if os.path.isfile(os.path.join(self.directory + "/specs", dir))]
             for comp in files:
-                if Component.is_component_spec_file(self.directory + "/specs/" + comp):
+                if __class__.get_component_spec_file(self.directory + "/specs/" + comp):
                     ret_val.append(self.directory + "/specs/" + comp)
         # in libraries, spec files can be in .comp directories
         if ocpiutil.get_dirtype(self.directory) == "library":
@@ -157,9 +230,104 @@ class Asset(metaclass=ABCMeta):
                 if entry.suffix == ".comp" and entry.is_dir():
                     spec_file = entry.joinpath(entry.stem + "-spec.xml")
                     if spec_file.exists():
-                        ret_val.append(spec_file)
+                        ret_val.append(entry)
         return ret_val
 
+    @staticmethod
+    def create_file_asset(asset_type, suffix, directory, name, ocpitemplate, get_template_dict,
+                          project_package_id, args, dir_suffix=None):
+        """
+        Common static method for creating file-based assets in "specs" directories.
+        With support for a mode that has a unique directory, i.e. components with *.comp
+        I.e. dir_suffix says: this dir_suffix will be created for this file asset
+        """
+        dir_path = Path(directory)
+        file_only = not dir_suffix or args.get('file_only')
+
+        if file_only:
+            dir_path = dir_path.joinpath('specs')
+        else:
+            assert dir_suffix
+            dir_path = dir_path.joinpath(name + dir_suffix)
+        if suffix and name.endswith('-' + suffix): # backward
+            file_name = name
+        elif '-' in name or '.' in name:
+            raise ocpiutil.OCPIException(f'internal: unexpected name for {asset_type} creation:  '+
+                                         f'{name}')
+        elif suffix:
+            file_name = name + '-' + suffix
+        else:
+            file_name = name
+        file_path = dir_path.joinpath(file_name + '.xml') # name is actual xml file here
+        if file_only: # we rely on this being set to imply file_only
+            if file_path.exists():
+                raise ocpiutil.OCPIException(f'file for {asset_type} creation already exists: '+
+                                             f'"{file_path}".')
+            if dir_suffix:
+                suffixed_path = Path(directory).joinpath(name + dir_suffix)
+                if suffixed_path.exists():
+                    raise ocpiutil.OCPIException(f'{asset_type} directory "{suffixed_path}" exists '+
+                                                 f' when trying to create: "{file_path}" ')
+        elif dir_suffix:
+            if not dir_path.name.endswith(dir_suffix):
+                raise ocpiutil.OCPIException(f'internal: unexpected directory for {asset_type} '
+                                             f'creation not ending in "{dir_suffix}":  "{directory}".')
+            elif dir_path.exists():
+                raise ocpiutil.OCPIException(f'directory for {asset_type} creation: "{directory}" '+
+                                             f'already exists.')
+            specs_path = dir_path.parent.joinpath('specs', file_path.name)
+            if specs_path.exists():
+                raise ocpiutil.OCPIException(f'file for {asset_type} creation: "{specs_path}" '+
+                                             f'already exists.')
+        else:
+            raise ocpiutil.OCPIException(f'internal: unexpected non-specs directory for {asset_type} '
+                                             f'creation:  "{directory}".')
+        # done error checking, create required directories
+        dir_path.mkdir(parents=True, exist_ok=True) # specs dir or *dir_suffix dir
+        # write XML file from template
+        template = jinja2.Template(ocpitemplate, trim_blocks=True)
+        template_dict = get_template_dict(name, directory, **args)
+        ocpiutil.write_file_from_string(str(file_path), template.render(**template_dict))
+        if project_package_id: # project level specs dir must have a package-id file for the project
+            package_id_path = dir_path.joinpath('package-id')
+            if not package_id_path.exists():
+                package_id_path.write_text(project_package_id + '\n')
+        else: # ensure the asset is visible in the lib subdir
+            lib_path = Path(dir_path.parent).joinpath("lib")
+            lib_path.mkdir(exist_ok = True)
+            lib_path.joinpath(file_path.name).\
+                symlink_to("../" + dir_path.name + "/" + file_path.name)
+        Asset.finish_creation(asset_type, name, file_path if file_only else dir_path,
+                              args.get('verbose'))
+
+    @staticmethod
+    def finish_creation(asset_type, name, path, verbose):
+        """
+        Do the common tasks at the end of creating an asset.
+        This is a static method because the create static method for the different
+        asset classes does not in fact create an object, but just creates
+        files and directories in the file system.
+        The 'path' argument is the asset, which is a file or a directory
+        """
+        if os.environ.get('OCPI_NO_DOC') != '1':
+            if path.is_dir():
+                # FIXME:  all asset types should have an attribute which is their
+                # xml file name.
+                # For file-based assets, that attribute is the same as path
+                if asset_type == 'project':
+                    file_name = 'Project'
+                else:
+                    file_name = path.name.replace('.', '-')
+            else:
+                file_name = path.name
+                if file_name.endswith('.xml'):
+                    file_name = file_name[:-4]
+            ocpi_doc.create(str(path if path.is_dir() else path.parent), # where to put it
+                            asset_type=asset_type, name=name, file_name=file_name,
+                            file_only=not path.is_dir(), verbose=verbose)
+        if verbose:
+            print(f'The {asset_type} "{name}" was created as the '+
+                  f'{"directory" if path.is_dir() else "file"} {path}".', file=sys.stderr)
 
 class BuildableAsset(Asset):
     """
@@ -178,12 +346,116 @@ class BuildableAsset(Asset):
         self.ex_plats = kwargs.get("ex_plats", None)
         self.only_plats = kwargs.get("only_plats", None)
 
-    @abstractmethod
-    def build(self):
+    def build(self, verbose=None, **kwargs):
         """
-        This function will build the asset, must be implemented by the child class
+        This method will build the asset, and is the base class default implentation
         """
-        raise NotImplementedError("BuildableAsset.build() is not implemented")
+        project_path = ocpiutil.is_path_in_project(self.path)
+        assert project_path
+        if not project_path.joinpath('imports').is_dir():
+            ocpiutil.execute_cmd({},
+                                 project_path,
+                                 action=['imports'],
+                                 file=os.environ['OCPI_CDK_DIR']+"/include/project.mk",
+                                 verbose=verbose)
+        action=[]
+        if kwargs.get('rcc'):
+            action.append('rcc')
+        if kwargs.get('hdl'):
+            action.append('hdl')
+        if kwargs.get('workers_as_needed'):
+            os.environ['OCPI_AUTO_BUILD_WORKERS'] = '1'
+        if kwargs.get('generate'):
+            action.append('generate')
+        if kwargs.get('no_assemblies'):
+            action.append('Assemblies=')
+        dynamic = kwargs.get('dynamic')
+        optimize = kwargs.get('optimize')
+        hdl_platform = kwargs.get('hdl_platform')
+        hdl_rcc_platform = kwargs.get('hdl_rcc_platform')
+        hdl_target = kwargs.get('hdl_target')
+        rcc_platform = kwargs.get('rcc_platform')
+        worker = kwargs.get('worker')
+        export = kwargs.get('export')
+
+        build_suffix = '-'
+        if dynamic:
+            build_suffix += 'd'
+        if optimize:
+            build_suffix += 'o'
+        if optimize or dynamic:
+            if rcc_platform:
+                if any("-" in s for s in rcc_platform):
+                    raise ocpiutil.OCPIException("You cannot use the --optimize build option and "
+                    + "also specify build options in a platform name (in this case: ",
+                    rcc_platform, ")")
+                else:
+                    new_list = [s + build_suffix for s in rcc_platform]
+                    rcc_platform = new_list
+            else:
+                rcc_platform = [os.environ['OCPI_TOOL_PLATFORM'] + build_suffix]
+        #Pass settings
+        settings = {}
+        if hdl_platform:
+            settings['hdl_plat_strs'] = hdl_platform
+        if hdl_target:
+            settings['hdl_target'] = hdl_target
+        if rcc_platform:
+            settings['rcc_platform'] = rcc_platform
+        if hdl_rcc_platform:
+            settings['hdl_rcc_platform'] = hdl_rcc_platform
+        if worker:
+            settings['worker'] = worker
+        make_file = ocpiutil.get_makefile(self.directory, self.make_type)[0]
+        #Build
+        if kwargs.get('orig_noun') == 'tests':
+            action.append('test')
+        ocpiutil.file.execute_cmd(settings, self.directory, action=action,
+                                  file=make_file, verbose=kwargs.get('verbose'))
+        if export:
+            location=ocpiutil.get_path_to_project_top()
+            make_file=ocpiutil.get_makefile(location, "project")[0]
+            ocpiutil.execute_cmd({},
+                             location,
+                             action=['exports'],
+                             file=make_file,
+                             verbose=verbose)
+
+    def clean(self, **kwargs):
+        """
+        This method will clean the asset, and is the base class default implentation
+        """
+        #Specify what to clean
+        action=[]
+        rcc = kwargs.get('rcc')
+        hdl = kwargs.get('hdl')
+        simulation = kwargs.get('simulation')
+        execution = kwargs.get('execution')
+        hdl_platform = kwargs.get('hdl_platform')
+        hdl_target = kwargs.get('hdl_target')
+        worker = kwargs.get('worker')
+        # if any clean types are mentioned, do them all but not the big "clean"
+        if rcc:
+            action.append('cleanrcc')
+        if hdl:
+            action.append('cleanhdl')
+        if simulation:
+            action.append('cleansim')
+        if execution:
+            action.append('cleanrun')
+        if not (rcc or hdl or simulation or execution):
+            action.append('clean')
+        settings = {}
+        if hdl_platform:
+            settings['hdl_plat_strs'] = hdl_platform
+        if hdl_target:
+            settings['hdl_target'] = hdl_target
+        if worker:
+            settings['worker'] = worker
+        make_file = ocpiutil.get_makefile(self.directory, self.make_type)[0]
+        #Clean
+        ocpiutil.file.execute_cmd(settings, self.directory, action=action, file=make_file,
+                                  verbose=kwargs.get('verbose'))
 
 class HDLBuildableAsset(BuildableAsset):
     """
@@ -233,13 +505,6 @@ class HDLBuildableAsset(BuildableAsset):
                     self.hdl_platforms.add(plat)
                     self.hdl_targets.add(plat.target)
 
-    @abstractmethod
-    def build(self):
-        """
-        This function will build the asset, must be implemented by the child class
-        """
-        raise NotImplementedError("BuildableAsset.build() is not implemented")
-
 class RCCBuildableAsset(BuildableAsset):
     """
     Virtual class that requires that any child classes implement a build method.  Contains settings
@@ -254,13 +519,6 @@ class RCCBuildableAsset(BuildableAsset):
         """
         super().__init__(directory, name, **kwargs)
         self.rcc_plats = kwargs.get("rcc_plats", None)
-
-    @abstractmethod
-    def build(self):
-        """
-        This function will build the asset, must be implemented by the child class
-        """
-        raise NotImplementedError("BuildableAsset.build() is not implemented")
 
 class RunnableAsset(Asset):
     """
@@ -286,8 +544,11 @@ class ShowableAsset(Asset):
     """
     Virtual class that requires that any child classes implement a show function
     """
+    def __init__(self, directory, name=None, **kwargs):
+        super().__init__(directory, name, **kwargs)
+
     @abstractmethod
-    def show(self, details, verbose, **kwargs):
+    def show(self, format, verbose, **kwargs):
         """
         This function will show this asset must be implemented by the child class
         """
@@ -303,16 +564,16 @@ class ReportableAsset(Asset):
     of OpenCPI assets (e.g. ones where show_utilization is called for children assets).
     """
     valid_formats = ["table", "latex"]
-    def __init__(self, directory, name=None, **kwargs):
+    def __init__(self, directory, name=None, format='table', **kwargs):
         """
         Initializes ReportableAsset member data  and calls the super class __init__
         valid kwargs handled at this level are:
-            output_format (str) - mode to output utilization info (table, latex)
-                                  output_formats not yet implemented: simple, json, csv
+            format (str) - mode to output utilization info (table, latex)
+                                  formats not yet implemented: simple, json, csv
         """
         super().__init__(directory, name, **kwargs)
 
-        self.output_format = kwargs.get("output_format", "table")
+        self.format = format
 
     def get_utilization(self):
         """
@@ -326,6 +587,9 @@ class ReportableAsset(Asset):
         various formats.
         """
         raise NotImplementedError("ReportableAsset.get_utilization() is not implemented")
+
+    def utilization(self, **kwargs):
+        self.show_utilization()
 
     def show_utilization(self):
         """
@@ -352,16 +616,16 @@ class ReportableAsset(Asset):
                 logging.warning("Skipping " + caption + " because the report is empty")
             return
 
-        if self.output_format not in self.valid_formats:
+        if self.format not in self.valid_formats:
             raise ocpiutil.OCPIException("Valid formats for showing utilization are \"" +
                                          ", ".join(self.valid_formats) + "\", but \"" +
-                                         self.output_format + "\" was chosen.")
-        if self.output_format == "table":
+                                         str(self.format) + "\" was chosen.")
+        if self.format == "table":
             print(caption)
             # Maybe Report.print_table() should accept caption as well?
             # print the Report as a table
             util_report.print_table()
-        if self.output_format == "latex":
+        if self.format == "latex":
             logging.info("Generating " + caption)
             # Record the utilization in LaTeX in a utilization.inc file for this asset
             util_file_path = self.directory + "/utilization.inc"
@@ -373,7 +637,3 @@ class ReportableAsset(Asset):
                     util_file.write(latex_table)
                     logging.info("  LaTeX Utilization Table was written to: " + util_file_path +
                                  "\n")
-# TODO is this required ?
-# pylint:disable=wrong-import-position
-from .component import Component
-# pylint:disable=wrong-import-position

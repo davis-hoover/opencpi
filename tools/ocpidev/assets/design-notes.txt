@@ -1,0 +1,275 @@
+The modules in this directory implement python classes for OpenCPI assets,
+and implement an internal (so far) python API for development operations on assets.
+
+Each code file contains classes related to one type of asset, with the "platform" and "worker" files
+containing classes for multiple types of platforms or workers, respectively.
+
+The files also contain "collection" classes for a group of assets of a common type.
+
+All class names are camel-case, like the C++ ones in OpenCPI.
+All collection classes are named:  <Plural>Collection, e.g. LibrariesCollection.
+
+All contructors take a parent asset's directory and a name as the first 2 arguments.
+If the "name" is None/False, then the basename of the directory is taken as the asset name
+and the dirname (parent) directory is taken as the parent directory of the asset.
+
+Since the file or directory name of an asset is not always an immediate child of
+the parent asset's directory (i.e. a protocol asset in the specs/ subdirectory), the
+parent class is asked to "resolve" the relative path of the asset's file or directory
+inside the parent's directory prior to the call to the constructor or create method of the
+(child) asset.  So in fact the "parent directory" and "name of child asset" is
+augmented by the parent's "resolution" by creating a "child_path", which is the
+relative pathname of the child asset's actual file or directory relative to the parent.
+This the "name" is pure (just a name), while the child_path is "fully baked", like:
+specs/<comp>-spec.xml for the component whose name is <comp>.
+
+Collection classes have two different flavors:
+- Some correspond to specific directories in the project hierarchy
+  -- like RccPlatformsCollection may correspond to the rcc/platforms directory when the context
+     is a project, but does not correspond to a directory if the context is above a project
+     like global or registry scope
+- Some have no correspondence to a particular directory at all, like "components".
+
+When a collection class is used for assets beyond the scope of any one directory, (e.g.
+hdl-platforms at registry scope), the args.assets argument to the constructor is a list of pathnames
+of assets to be placed in the collection.
+When a collection class is used for assets in a particular directory, the constructor
+itself finds the underlying assets, and the "arg.assets" argument is None.
+So a collection knows at construction which mode it is in.
+
+An asset type (class) knows how to find child assets inside it and can be queried
+to find child assets of a given type.  This is the *add_assets* method, which is
+called on an object (like a registry or project or library), to add to the list of
+a particular type of child that lives in that asset.  All add_assets methods
+take an asset type as the main argument, and also an asset list to add to (the arg.assets argument).
+Normally the asset list is just paths, but there are special cases for some asset types
+when the "asset_type" is not file based at all (like HDL targets/families).
+I.e. the elements in the "assets" list are type-specific and can be simple paths or custom tuples.
+The "arg.assets" is thus created by a parent object and used by a collection object.
+
+Similarly, asset types that contain other assets have a "resolve_child" *class* method that
+determines the exact relative pathname to the child asset, and saves it in args.child_path.
+This deals with the complexities of component specs being in different places, and also
+allows the "names" of the child assets to handle suffixes or not.  I.e. a component might be
+named "foo", "foo_spec", "foo-spec.xml", even "foo.comp".
+
+Every asset type has a method for each verb that applies to that asset type.
+I.e.:  create, delete, build, run, clean, show.
+(Most of which are simply inherited from base classes)
+
+Since the class is queried (using getattr) for the verb method by the caller (ocpidev),
+no stub method is required for each class for unimplemented verbs.
+If a class truly wants to make a verb invalid, rather than unimplemented,
+it can have a stub that raises an exception that is not NotImplementedError.
+
+The "create" method in each class is a *static method* that DOES NOT CONSTRUCT an object,
+but simply performs operations in the file system directory structure.  Thus the "create" method
+does not call any constructors (this should probably change, since creation vs. construction
+is confusing).
+
+Some asset-specific code still lives in the "ocpiutil" modules(s), but more of that
+functionality should migrate into these asset classes, and ultimately the asset classes
+will be more part of a core library and not considered only part of ocpidev.
+
+The "abstract" module contains base classes and some utility functionality, and
+has default method implementations (hence is not precisely 100% abstract).
+
+The "factory" module is used to map asset types to classes, and does instance caching
+so that the get_instance method says get an instance of a class if already cached,
+or construct one and if the class indicates that it wants caching (using the
+instances_should_be_cached class variable), the constructed instance is cached.
+
+TODO:
+
+The code is still not object oriented in that issues relating to certian asset types
+are still widely spread over unrelated modules.  All instances in the code of things like:
+if asset_type in [.....], is probably a smoking gun.
+The "from/to" get_parent stuff in ocpidev.py should query the class for the mapping,
+although it is sometimes nice to "see it all in one place".
+
+creation vs. construction should be made more consistent, and perhaps creation should
+call the constructor and return the asset object.
+
+Lots of dead code can be removed.  A coverage tool should show methods that are not called.
+
+Lots of code to convert to "pathlib", although lots of recent changes have done more of this.
+
+More uniformity in parents constructing children so we can pickle-dump everything easily.
+Perhaps parents should always be constructed to help in creating children.
+Some parents are instantiated on-demand (like hdl/primitives or components/ or hdl/platforms).
+I.e. the plural classes that represent directories in a project are created on demand to
+reduce directory clutter and thus would need to be autocreated by asking the child's class
+or something.
+
+Stamp out all remaining vestiges of "get subdir of type" and os.walk etc.  They are horribly slow.
+
+Cache get_dir_info, although it is done way too often and caching would just hide that.
+
+Scrub imports in each file, and write down a policy in the coding directory for python imports.
+
+Actually measure performance to simply initialize the hierarchy completely with the
+goal to pickle/shelve projects and nuke the other metadata file.
+
+The "self.directory" member should be nuked in favor of using self.path
+For file-based assets, self.directory holds the file name and is not a directory...
+
+Note the difference between using the factory() method, using the direct class constructor method,
+and get_instance.
+
+Some places should probably use get_instance when they are currently using factories or direct
+access to the constructor.  Similarly change the centralized cache dictionary to a per-class one
+managed by the base class.  I.e. make policy as to when to use the three construction methods and
+follow it.
+
+Projects should use get_instance.
+Actually, everything should use get_instance unless otherwise justified.
+
+Delete methods may now be simplified since self.directory always points at the thing to delete.
+Projects are the only asset where something points to them (from a registry)
+Objects should probably have a reference to parent objects and those parent objects should be
+told about deletion so that deletion is not just a file system operation but also
+changes the parent's lists of children.
+
+Similarly, how parents keep track of children is not consistent enough and should
+probably be a dictionary of { '<child-asset-type>' : <list of children of that type> }
+Then lots of parent/child management could be common code.
+
+There is a layering problem when a parent needs to know about the creation of a child.
+This is a problem where the Project class needs to import the Registry class.
+(currently solved by an absolute import).
+Perhaps we could ultimately remove the requirement that a parent class knows what type
+its parent is, but still has a reference to the parent.  Then the child asset module would
+not have to import its parent's class and thus the layering could remain strictly top-down.
+
+In all cases where a method of one asset type creates an asset of other type, it is suspect,
+especially since the kwargs ends up applying to both constructors, which is at least
+partially wrong.  Some policy about what happens in kwargs in this case needs to be determined
+and enforced in some general way.  But it's also a nightmare to have every layer know what
+keywords apply to other layers. So, some sort of policy like:  if you are creating anything,
+do some sort of standard filtering of the kwargs before passing them.
+
+Messages that are not errors:
+- Should only happen when "verbose"
+- Now that verbose is a level, the make subcomment dumps should be for -v -v
+- Should go to stderr to not interfere with any stdout output
+- Perhaps be like lots of other folks and always prefix "info" vs "warning" vs "error"
+
+Eliminate all chdirs that can "pollute the environment".  Even the temporary "with"
+chdirs are somewhat suspect and usually unnecessary.
+
+Child resolution should somehow become part of the factory.
+Probably by simply requiring a clean parent asset path and type as an argument.
+Basically this is part of making this a proper API, not just a support library for ocpidev
+
+Re-evaluate verb-based "optimizations" (i.e. when constructors find children based on verb).
+I.e. don't find your children if you are just doing "delete".
+The issue is whether the API wants to operate persistently where more than one verb will
+be applied to an asset.  Perhaps more construction stuff should in fact be done in
+verb methods "on-demand".
+
+Verbose is set to "none" in argument lists to discover where the original setting
+is not being passed down correctly.  While this is good for catching this, it is clumsy,
+and highlights the issue of "passing down global arguments" through layers.
+pytests is testing the "API", while ocpidev is the primary caller, and sets argument options.
+The top-level API entry points should clearly default the options and not require them explicitly.
+Now every method that wants to see "verbose" needs to explicitly pass it down.
+
+logging vs. ocpiutil.logging should be resolved better so that log output is
+consistent and uniform across C++ and python.
+
+Perhaps add_assets should generically record the parent.
+
+Sort out HdlPlatform vs. HdlPlatformWorker - do we need two classes?
+
+Look for "exits" and "chdir" in all asset/API code.
+
+Doc generalities that we would *like* to see (not currently there):
+
+ocpidev is sensitive to the current working directory (CWD) in which it is run:
+-- E.g., like "make" always looks for the default "Makefile" in the CWD.
+-- So in an assets's directory, the "noun" and "name" default to directory's asset and thus are
+   unnecessary, although they will be accepted if they match the asset type and name implied by the
+   CWD.
+-- Operating on asset types (nouns) is scoped-by/limited-to those assets that are contained under the CWD's asset.
+---- I.e. if you are in a library's directory, operations on workers or components or tests is
+---- restricted to and assumed to be those in that library
+-- This scoping also applies when the CWD is a "plural" directory like "applications" or "hdl/primitives" etc.
+-- The "components" directory, when there are libraries below it, is a plural directory for those libraries.
+-- Thus the "scope" of the execution of ocpidev is the asset of the CWD and any assets "below it", "contained by it"
+-- There are several ways to override this "scope", using the --scope option.
+-- The "project" scope essentially runs the command in the project directory above the CWD.
+----- It is a shorthand for --directory <project-dir-above-me>
+-- The "registry" scope means the registry of the current project if the CWD is indeed in a project
+---- otherwise, it implies the current default registry
+---- this also includes any projects indicated by the OCPI_PROJECT_PATH
+-- The "global" scope means the default registry, including the OCPI_PROJECT_PATH
+---- this is different from the "registry" scope when a project uses a non-default registry
+-- The "dependencies" scope means the current project and any projects in its registry
+   that it depends on
+
+Make sure to actually generate workers upon creation, or at least the generate phase.
+This tests dependencies.
+
+Check for options using "action='append' when they should not allow more than one and thus should use "action" of "store".
+
+HdlAssembly should inherit HdlWorker (probably platform configuration and containers too).
+
+Output formats from "show" - consistent rules
+
+Verbose level is "depth", default is one level with no children
+Format does not change with scope
+Simple is package_ids - regardless of scope
+Table first column is package_id (perhaps option someday of scoped name only --brief?)
+json dict key is package_id
+json dict values are dictionary of attributes
+json depth (from verbose) for children is plural key with value being a dict as if it was
+shown directly, namely a dict keyed by package id
+Generic attributes:
+-- 'parent' the path of the parent asset
+-- 'package_id' (redundant with key)
+-- 'name' (redundant derivable from the package id)
+-- 'path' which is the path of the asset, maybe directory, maybe file
+
+Things that do not have package ids (HDL targets) use keys that are the same as the name
+
+We should probably support "<model> worker foo" as well as "worker foo.<model>".
+
+The new default normal way that a component is defined is to have a directory
+representing the component, and have that directory contain both its documentation
+as well as its specification.
+
+-- standalone
+
+So now we have simpler rules:
+
+If an asset is implemented as a directory, its XML description file has the name of the
+directory with periods replaced by hyphens, and an ".xml" extension.
+The single exception is projects, whose XML file is "Project.xml".
+-- This exception means that projects can be easily copied with no
+   internal file name changes, and only the possibility of changing the package prefix
+   in this Project.xml file if not the default of "local".
+-- This specific name is used to find the top-level directory of a project, much like
+   the ".git" directory is used to find the top-level directory of a git repo.
+
+If an asset is NOT implemented as a directory, its XML file has a suffix after the hyphen
+indicating its purpose and asset type.
+
+File-based Asset   Xml file extension
+----------------   ------------------
+Protocol            -prot.xml (also _prot.xml for backward compatibility)
+Component Spec      -spec.xml (also _spec.xml for backward compatibility)
+HDL Card            -card.xml (also no suffix for backward compatibility)
+HDL Slot            -slot.xml (also no suffix for backward compatibility)
+
+
+
+
+The first OO step is to move the top-level map elements into the class of the CWD.
+Some of the finder functions would be moved into those classes, but there is also a CLI vs. API issue here.
+Keeping the classes clean while implementing CLI option processing here in the CLI wrapper has advantages.
+I.e. some finder functions are pure CLI things that are used for different asset types.
+I wanted to initially centralize this "parent" processing in one place to "see the whole picture".
+
+The "verb" argument to constructors is just a crutch so that certain actions are not taken when they will not be needed.  A better solution is to "keep the verb out of it", and do whatever is being avoided as needed.
+
+Look for "smart setters and getters" that could use the @property decorator.

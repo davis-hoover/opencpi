@@ -24,6 +24,7 @@
 import datetime
 import pathlib
 import re
+import sys
 
 import _opencpi.util as ocpiutil
 
@@ -31,7 +32,7 @@ AUTHORING_MODELS = [".rcc", ".hdl", ".ocl"]
 
 
 def _template_to_specific(template, name, authoring_model=None,
-                          project_prefix=None, project=None, library=None):
+                          project_prefix=None, project=None, library=None, toc=None):
     """ Replace template placeholder text with specific instance text
 
     Args:
@@ -73,6 +74,9 @@ def _template_to_specific(template, name, authoring_model=None,
     if library is not None:
         template = template.replace("%%LIBRARY%%", library.lower())
 
+    if toc is not None:
+        template = template.replace("%%TOC%%", toc)
+
     # Regex finds all underlined titles and replaces underline to allign
     # the number of characters to the title
     regex = ".+\n(=+|-+|~+)\n"
@@ -86,24 +90,45 @@ def _template_to_specific(template, name, authoring_model=None,
     return template
 
 
-def create(directory, documentation_type, name=None, **kwargs):
+# for now map asset types to doc types, but templates could be make
+# consistent with asset types and make this simpler
+asset_type_to_doc_type = {
+    '.*-worker' : 'worker',
+    'applications' : 'applications-directory',
+    'library' : 'component-library',
+    'hdl-library' : 'primitive-library',
+    'hdl-core' : 'primitive-core',
+    'libraries' : 'components-directory',
+    'hdl-primitives' : 'primitives-directory',
+}
+
+def create(directory, documentation_type=None, asset_type=None, file_name=None, name=None,
+           verbose=None, file_only=None, **kwargs):
     """ Copy template documentation files into place
 
     Args:
-        directory (``str``): Path documentation template is to be save to.
+        directory (``str``): Directory documentation template is to be save in.
         documentation_type (``str``): Documentation type, set based on the
             available types in the ``rst_templates`` directory.
+            If None, it will be determined from asset_type
         name (``str``, optional): Name of the new documentation item. Must be
             provided when ``documentation_type`` is ``component``,
             ``primitive``, ``protocol``, ``worker``, ``component-library`` or
             ``primitive-library``. Will override default is used for anything
             else.
+        file_name:  The name to be used for the primary RST file, if supplied
         kwargs (optional): Other keyword arguments, provided for compatibility
             interfacing. Values not used.
     """
-    directory = pathlib.Path(directory)
-    documentation_type = documentation_type
 
+    if asset_type:
+        if documentation_type:
+            raise ValueError(f"Only one of asset_type and documentation_type is allowed")
+        documentation_type = asset_type
+        for key, type in asset_type_to_doc_type.items():
+            if re.match(key, asset_type):
+                documentation_type = type
+    directory = pathlib.Path(directory) # allow str or path
     directory_templates = []
     for path in pathlib.Path(__file__).parent.joinpath("rst_templates").glob(
             "*"):
@@ -117,32 +142,42 @@ def create(directory, documentation_type, name=None, **kwargs):
 
     # Determine if within an OpenCPI project and if so get the project name and
     # prefix so can be used to replace placeholder in template.
-    project = None
-    project_prefix = None
-    project_path = ocpiutil.get_path_to_project_top(str(directory))
-
+    project_path = ocpiutil.is_path_in_project(directory)
+    if project_path:
+        attrs = ocpiutil.get_project_attributes(project_path)
+        package_id = ocpiutil.get_project_package_id(project_path, attrs)
+        parts = package_id.split('.')
+        project = parts[-1]
+        project_prefix = '.'.join(parts[:-1])
+    else:
+        raise ValueError(f"Directory {directory} for {documentation_type} documentation, "+
+                         f"is not in a project")
     # Determine if within a library and if so get the library name so can be
     # used to replace placeholder in template. For loop limited to 2 to allow
     # documentation directory is a worker or component directory
     library_search_directory = directory
     library = None
     for _ in range(2):
-        if library_search_directory.joinpath("Library.mk").is_file():
+        if ocpiutil.get_dirtype(library_search_directory) == 'library':
             library = library_search_directory.name
             break
         else:
             library_search_directory = library_search_directory.parent
 
-    # Directory templates
-    if documentation_type in directory_templates:
+    # Directory templates - use them if the asset itself has/is a directory
+    if not file_only and documentation_type in directory_templates:
         if name is None:
             raise ValueError(f"For {documentation_type} a name must be given")
-        destination_path = pathlib.Path(
-            directory).resolve().absolute().joinpath(
-            f"{name}.{documentation_type[0:4]}")
+        # This is a hack. The templates should *always* be placed in the provided
+        # directory whether the template is a directory or not
+        if asset_type: # if we were called with the true path of the asset...
+            destination_path = directory
+        else:
+            destination_path = pathlib.Path(
+                directory).resolve().absolute().joinpath(
+                    f"{name}.{documentation_type[0:4]}")
         if not destination_path.exists():
             destination_path.mkdir()
-
         templates = list(pathlib.Path(__file__).parent.joinpath(
             "rst_templates").joinpath(f"{documentation_type}").glob("*"))
         for file in templates:
@@ -150,24 +185,27 @@ def create(directory, documentation_type, name=None, **kwargs):
                 file_name = f"{name}-{file.stem}.rst"
             else:
                 file_name = file.name
-            if destination_path.joinpath(file_name).is_file():
-                print(
-                    f"File {destination_path.joinpath(file_name)} already "
-                    + "exists")
+            file_path = destination_path.joinpath(file_name)
+            if file_name.endswith('.rst') and file.stem == destination_path.name.split('.')[-1]:
+                primary_path = file_path
+            if file_path.is_file():
+                print(f'File "{file_path}" already exists')
             else:
                 with open(file, "r") as template_file:
                     template = template_file.read()
 
-                with open(destination_path.joinpath(file_name),
-                          "w+") as documentation_file:
+                with open(file_path, "w+") as documentation_file:
                     documentation_file.write(_template_to_specific(
                         template, name, authoring_model, project_prefix,
                         project, library))
 
     # Single page templates
     else:
-        destination_path = pathlib.Path(directory).resolve().absolute()
-        if documentation_type[-8:] == "-library":
+        destination_path = directory.resolve().absolute()
+        primary_path = destination_path
+        if file_name:
+            destination_path = destination_path.joinpath(f"{file_name}.rst")
+        elif documentation_type[-8:] == "-library":
             if name is None:
                 raise ValueError(
                     f"For {documentation_type} a name must be given")
@@ -194,11 +232,15 @@ def create(directory, documentation_type, name=None, **kwargs):
 
         template_path = pathlib.Path(__file__).parent.joinpath(
             "rst_templates").joinpath(f"{documentation_type}.rst")
+        if not template_path.exists():
+            print(f'Warning: no documentation template for asset type "{documentation_type}" so '+
+                  f'no documentation files are generated')
+            return
         with open(template_path, "r") as template_file:
             template = template_file.read()
         with open(destination_path, "w+") as documentation_file:
             documentation_file.write(_template_to_specific(
                 template, name, authoring_model, project_prefix,
                 project, library))
-
-    print("Template initialized at:", destination_path)
+    if verbose:
+        print("Documentation template initialized at:", primary_path, file=sys.stderr)

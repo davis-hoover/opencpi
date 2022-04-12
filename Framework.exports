@@ -74,10 +74,6 @@
 +tools/ocpidev/ocpidev.py <target>/bin/ocpidev
 +tools/ocpidev/ocpidev_args.py scripts/
 +tools/ocpidev/ocpiargparse.py scripts/
-+tools/ocpidev/ocpidev.sh scripts/
-+tools/ocpidev/ocpidev_run.py scripts/
-+tools/ocpidev/ocpishow.py scripts/
-+tools/ocpidev/ocpidev_utilization.py scripts/
 +tools/ocpidoc/doc <target>/lib/ocpidoc/
 +tools/ocpidoc/ocpidoc.py <target>/lib/ocpidoc/
 +tools/ocpidoc/ocpi_documentation <target>/lib/ocpidoc/

@@ -27,7 +27,7 @@ ONLY_CREATE_BUILD=1 skips delete
 NO_BUILD=1 skips build/clean"
 exit
 fi
-set -e
+set -evx
 
 # ocpidev verbosity
 #V=" -v"
@@ -323,13 +323,11 @@ do_ocpidev show libraries --local-scope
 echo "ocpidev show libraries --local-scope --simple"
 do_ocpidev show libraries --local-scope --simple
 echo "ocpidev show component top_comp1-spec.xml --simple"
-do_ocpidev show component top_comp1-spec.xml --simple
+do_ocpidev show component -p top_comp1-spec.xml --simple
 echo "ocpidev show component top_comp1-spec.xml --table"
-do_ocpidev show component top_comp1-spec.xml --table
+do_ocpidev show component -p top_comp1-spec.xml --table
 echo "ocpidev show component top_comp1-spec.xml --json"
-do_ocpidev show component top_comp1-spec.xml --json
-echo "ocpidev show component top_comp1-spec.xml --simple"
-do_ocpidev show component top_comp1-spec.xml --simple
+do_ocpidev show component -p top_comp1-spec.xml --json
 echo "ocpidev show component --hdl-library devices comp1-spec.xml --simple"
 do_ocpidev show component --hdl-library devices comp1-spec.xml --simple
 echo "ocpidev show component -p matchstiq_z1_0 comp1-spec.xml --simple"

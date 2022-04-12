@@ -18,8 +18,9 @@
 """
 definitions for utility functions that have to do with the utilization reports
 """
-
 import os
+import sys
+import io
 import logging
 import datetime
 from functools import reduce
@@ -107,12 +108,10 @@ def snip_widest_column(rows, forced_screen_width=None):
         screen_width = forced_screen_width
     else:
         try:
-            curses.initscr()
-            # pylint:disable=no-member
-            screen_width = curses.COLS
-            # pylint:enable=no-member
-            curses.endwin()
-        except curses.error as ex:
+            # Do not use curses.initscr()/curses.endwin() here since that produces output!
+            curses.setupterm(term=os.environ.get("TERM", "unknown"))
+            screen_width = curses.tigetnum('cols')
+        except (curses.error,io.UnsupportedOperation) as ex:
             logging.info(ex)
             return rows
 

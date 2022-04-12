@@ -28,6 +28,7 @@ ex_ocpidev(){
 }
 
 OCPIDEV="$OCPI_CDK_DIR/$OCPI_TOOL_DIR/bin/ocpidev $VERB -d $OCPI_WD"
+set -x
 rm -r -f temp_proj
 ocpidev create project temp_proj
 cd temp_proj

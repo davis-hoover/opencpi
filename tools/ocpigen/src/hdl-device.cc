@@ -160,6 +160,24 @@ resolveExpressions(OB::IdentResolver &ir) {
   return NULL;
 }
 
+void HdlDevice::
+emitXmlSupports(std::string &out) const {
+  for (auto sit = m_supports.begin(); sit != m_supports.end(); ++sit) {
+    OU::formatAdd(out, "  <supports worker='%s'%s\n",
+		  (*sit).m_type.cname(), (*sit).m_connections.size() ? ">" : "/>");
+    for (auto cit = (*sit).m_connections.begin(); cit != (*sit).m_connections.end(); ++cit) {
+      const SupportConnection &c = *cit;
+      OU::formatAdd(out, "    <connect port='%s' to='%s'",
+		    c.m_port->pname(), c.m_sup_port->pname());
+      if (c.m_indexed)
+	OU::formatAdd(out, " index='%zu'", c.m_index);
+      out += "/>\n";
+    }
+    if ((*sit).m_connections.size())
+      out += "  </supports>\n";
+  }
+}
+
 const char *DeviceType::
 cname() const {
   return m_implName;

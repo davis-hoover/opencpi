@@ -17,7 +17,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Defintion of HDL assembly and related classes
+Definition of HDL assembly and related classes
 """
 
 import os
@@ -28,7 +28,7 @@ from pathlib import Path
 import _opencpi.util as ocpiutil
 import _opencpi.hdltargets as hdltargets
 from .factory import AssetFactory
-from .abstract import HDLBuildableAsset, ReportableAsset
+from .abstract import HDLBuildableAsset, ReportableAsset, Asset
 from .worker import HdlCore
 
 class HdlAssembly(HdlCore):
@@ -40,16 +40,8 @@ class HdlAssembly(HdlCore):
                      HdlContainer[Implementation]
     """
     def __init__(self, directory, name=None, **kwargs):
-        if not name:
-            name = str(Path(directory).name)
         super().__init__(directory, name, **kwargs)
         # TODO Collect list of included HdlCores
-
-    def build(self):
-        """
-        Function to build the HdlAssembly
-        """
-        raise NotImplementedError("build() is not implemented")
 
 class HdlApplicationAssembly(HdlAssembly, ReportableAsset):
     """
@@ -59,15 +51,10 @@ class HdlApplicationAssembly(HdlAssembly, ReportableAsset):
     """
 
     def __init__(self, directory, name=None, **kwargs):
+        self.asset_type = 'hdl-assembly'
         super().__init__(directory, name, **kwargs)
         # container maps container name/XML to HdlContainer object
         self.containers = {}
-
-    def build(self):
-        """
-        Function to build the HdlApplicationAssembly
-        """
-        raise NotImplementedError("build() is not implemented")
 
     # TODO: Should we just init for all platforms in constructor, or wait for
     # user to call some function that requires containers and enforce that they
@@ -187,29 +174,6 @@ class HdlApplicationAssembly(HdlAssembly, ReportableAsset):
             util_report += self.containers[cname].get_utilization()
         return util_report
 
-    @staticmethod
-    def get_working_dir(name, ensure_exists=True, **kwargs):
-        """
-        return the directory of a HDL Assembly given the name (name) and
-        library specifiers (library, hdl_library, hdl_platform)
-        """
-        library = kwargs.get('library', '')
-        hdl_library = kwargs.get('hdl_library', '')
-        platform = kwargs.get('platform', '')
-        ocpiutil.check_no_libs("hdl-assembly", library, hdl_library, platform)
-        if not name: 
-            ocpiutil.throw_not_blank_e("hdl-assembly", "name", True)
-        if ocpiutil.get_dirtype() not in ["project", "hdl-assemblies", "hdl-assembly"]:
-            ocpiutil.throw_not_valid_dirtype_e(["project", "hdl-assemblies", "hdl-assembly"])
-
-        working_path = Path(ocpiutil.get_path_to_project_top())
-        hdl_path = Path(working_path, 'hdl')
-        if not hdl_path.exists() and not ensure_exists:
-            hdl_path.mkdir()
-        working_path = Path(hdl_path, 'assemblies', name)
-        
-        return str(working_path)
-
     def _get_template_dict(name, directory, **kwargs):
         """
         used by the create function/verb to generate the dictionary of viabales to send to the
@@ -243,26 +207,25 @@ class HdlApplicationAssembly(HdlAssembly, ReportableAsset):
         return template_dict
 
     @staticmethod
-    def create(name, directory, **kwargs):
+    def create(name, directory, verbose=None, **kwargs):
         """
         Create an HDL assembly asset
         """
-        verbose = kwargs.get("verbose", None)
-        assembly_path = Path(directory, name)
-        assembly_file = str(assembly_path) + "/" + name + ".xml"
-        if not os.path.exists(str(assembly_path)):
-            os.makedirs(str(assembly_path))
-        os.chdir(directory)
-        if os.path.exists(assembly_file):
-            err = "HdlAssembly '{}' already exists at {}".format(name, assembly_file)
-            raise ocpiutil.OCPIException(err)
+        assemblies_path = Path(directory)
+        assembly_path = assemblies_path.joinpath(name)
+        assembly_file_path = assembly_path.joinpath(name + ".xml")
+        if assembly_path.exists():
+            raise ocpiutil.OCPIException(f'HdlAssembly "{name}" already exists at "{assembly_path}"')
+        if not assemblies_path.exists():
+            assemblies_path.mkdir(parents=True)
+            template = jinja2.Template(ocpitemplate.HDL_ASSEMBLIES_XML, trim_blocks=True)
+            ocpiutil.write_file_from_string(assemblies_path.joinpath("assemblies.xml"),
+                                            template.render({}))
+        assembly_path.mkdir()
         template_dict = HdlApplicationAssembly._get_template_dict(name, directory, **kwargs)
-        template = jinja2.Template(ocpitemplate.HDL_ASSEMBLIES_XML, trim_blocks=True)
-        ocpiutil.write_file_from_string("assemblies.xml", template.render(**template_dict))
         template = jinja2.Template(ocpitemplate.HDL_ASSEMBLY_XML, trim_blocks=True)
-        ocpiutil.write_file_from_string(assembly_file, template.render(**template_dict))
-        if verbose:
-            print("HDL Assembly '" + name + ".xml' was created at", assembly_path)
+        ocpiutil.write_file_from_string(assembly_file_path, template.render(**template_dict))
+        Asset.finish_creation('HDL assembly', name, assembly_path, verbose)
 
 
 class HdlAssembliesCollection(HDLBuildableAsset, ReportableAsset):
@@ -271,7 +234,7 @@ class HdlAssembliesCollection(HDLBuildableAsset, ReportableAsset):
     Instances of this class can contain a list of contained assemblies in "assembly_list"
     """
 
-    def __init__(self, directory, name=None, **kwargs):
+    def __init__(self, directory, name=None, verb=None, verbose=None, **kwargs):
         """
         Initializes assemblies collection member data and calls the super class __init__. Throws
         an exception if the directory passed in is not a valid  hdl-assemblies directory.
@@ -279,10 +242,10 @@ class HdlAssembliesCollection(HDLBuildableAsset, ReportableAsset):
             init_hdl_assembs (T/F) - Instructs the method whether to construct all
                                      HdlApplicationAssembly objects contained in the project
         """
-        self.check_dirtype("hdl-assemblies", directory)
-        super().__init__(directory, name if name else "hdlassemblies", **kwargs)
+        super().__init__(directory, name, **kwargs)
+        self.check_dirtype("hdl-assemblies", self.directory)
         self.assembly_list = []
-        if kwargs.get("init_hdlassembs", False):
+        if verb == 'utilization' or verb == 'show':
             logging.debug("HdlAssembliesCollection constructor creating HdlApplicationAssembly " +
                           "Objects")
             for assemb_directory in self.get_valid_assemblies():
@@ -313,29 +276,6 @@ class HdlAssembliesCollection(HDLBuildableAsset, ReportableAsset):
         for assembly in self.assembly_list:
             assembly.show_utilization()
 
-
-    #placeholder function
-    def build(self):
-        """
-        This is a placeholder function will be the function that builds this Asset
-        """
-        raise NotImplementedError("HdlAssembliesCollection.build() is not implemented")
-
-    @staticmethod
-    def get_working_dir(name, ensure_exists=True, **kwargs):
-        """
-        return the directory of a HDL Assembly Collection given the name (name) and
-        library specifiers (library, hdl_library, hdl_platform)
-        """
-        library = kwargs.get('library', '')
-        hdl_library = kwargs.get('hdl_library', '')
-        platform = kwargs.get('platform', '')
-        ocpiutil.check_no_libs("hdl-assembly", library, hdl_library, platform)
-        if name: ocpiutil.throw_not_blank_e("applications", "name", False)
-        if ocpiutil.get_dirtype() not in ["project", "hdl-assemblies"]:
-            ocpiutil.throw_not_valid_dirtype_e(["project", "hdl-assemblies"])
-        return ocpiutil.get_path_to_project_top() + "/hdl/assemblies"
-
 class HdlContainer(HdlAssembly, ReportableAsset):
     """
     Instances of this class represent HDL Containers, which are specified in XML
@@ -349,7 +289,7 @@ class HdlContainer(HdlAssembly, ReportableAsset):
     HDL Container Implementation name to HdlContainerImplementation instance.
     """
 
-    def __init__(self, directory, name=None, **kwargs):
+    def __init__(self, directory, name=None, container_impls={}, **kwargs):
         """
         Initializes HdlContainer member data and calls the super class __init__.
         valid kwargs handled at this level are:
@@ -363,17 +303,10 @@ class HdlContainer(HdlAssembly, ReportableAsset):
         self.implementations = {}
         # We expect to see a 'container_impls' argument that is a dictionary mapping
         # full container implementation names to the platforms they support
-        for impl_name, plat in kwargs.get("container_impls", {}).items():
-            impl_dir = self.directory + "/container-" + impl_name
+        for impl_name, plat in container_impls.items():
+            impl_dir = self.parent + "/container-" + impl_name
             self.implementations[impl_name] = HdlContainerImplementation(directory=impl_dir,
-                                                                         name=impl_name,
                                                                          platform=plat)
-
-    def build(self):
-        """
-        Function to build the HdlContainer
-        """
-        raise NotImplementedError("build() is not implemented")
 
     def get_utilization(self):
         """
@@ -411,23 +344,17 @@ class HdlContainerImplementation(HdlAssembly):
     Platform Configuration
     """
     #TODO map to a platform configuration? At least get name from make
-    def __init__(self, directory, name, **kwargs):
+    def __init__(self, directory, name=None, platform=None, **kwargs):
         """
         Initializes HdlContainerImplementation member data and calls the super class __init__.
         valid kwargs handled at this level are:
             platform (HdlPlatform) - The HdlPlatform object that is bound to this implementation.
         """
         super().__init__(directory, name, **kwargs)
-        self.platform = kwargs.get("platform", None)
+        self.platform = platform
         # The sub-directory where target-specific artifacts will be made for this
         # container implementation
         self.target_subdir = self.directory + "/target-" + self.platform.target.name
-
-    def build(self):
-        """
-        Function to build the HdlContainerImplementation
-        """
-        raise NotImplementedError("build() is not implemented")
 
     def get_utilization(self):
         """

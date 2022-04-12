@@ -33,7 +33,7 @@ class AssetTest(unittest.TestCase):
         """
         create an asset of an invalid type and an exception is thrown
         """
-        self.assertRaises(ocpiutil.OCPIException,
+        self.assertRaises(NotImplementedError,
                           factory.AssetFactory.factory,
                           "bad",
                           "../av-test")

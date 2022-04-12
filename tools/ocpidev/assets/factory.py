@@ -21,9 +21,10 @@ Defines the AssetFactory class
 
 
 from functools import partial
-import os
+import os,sys
 from pathlib import Path
 import _opencpi.util as ocpiutil
+from .abstract import Asset
 
 class AssetFactory():
     """
@@ -39,6 +40,79 @@ class AssetFactory():
     #                        }
     # }
     __assets = {}
+    __asset_type_to_class_map = None
+
+    @classmethod
+    def get_class_from_asset_type(cls, asset_type, name):
+        """"
+        Return the class object corresponding to the asset type
+        """
+        if not cls.__asset_type_to_class_map:
+            import _opencpi.assets.application
+            import _opencpi.assets.test
+            import _opencpi.assets.worker
+            import _opencpi.assets.platform
+            import _opencpi.assets.assembly
+            import _opencpi.assets.library
+            import _opencpi.assets.primitive
+            import _opencpi.assets.project
+            import _opencpi.assets.registry
+            import _opencpi.assets.component
+            import _opencpi.assets.prerequisite
+            # alphabetical order and include plurals
+            # THIS LIST SHOULD CORRESPOND TO ALL ALLOWABLE NOUNS IN OCPIDEV
+            # But there will be ones here that are not (yet) available from ocpidev
+            # And some do not yet have plurals/collections
+            cls.__asset_type_to_class_map =  {
+                'application':             _opencpi.assets.application.Application,
+                'applications':            _opencpi.assets.application.ApplicationsCollection,
+                'component':               _opencpi.assets.component.Component,
+                'components':              _opencpi.assets.component.ComponentsCollection,
+                'hdl-assemblies':          _opencpi.assets.assembly.HdlAssembliesCollection,
+                'hdl-assembly':            _opencpi.assets.assembly.HdlApplicationAssembly,
+                'hdl-card':                _opencpi.assets.component.HdlCard,
+                'hdl-cards':               None,
+                'hdl-container':           _opencpi.assets.assembly.HdlContainer,
+                'hdl-containers':          None,
+                'hdl-core':                _opencpi.assets.primitive.HdlPrimitiveCore,
+                'hdl-device':              _opencpi.assets.worker.HdlDeviceWorker,
+                'hdl-devices':             None,
+                'hdl-library':             _opencpi.assets.primitive.HdlPrimitiveLibrary,
+                'hdl-platform':            _opencpi.assets.platform.HdlPlatformWorker,
+                'hdl-platforms':           _opencpi.assets.platform.HdlPlatformsCollection,
+                'hdl-primitives':          _opencpi.assets.primitive.HdlPrimitivesCollection,
+                'hdl-slot':                _opencpi.assets.component.HdlSlot,
+                'hdl-slots':               None,
+                'hdl-targets':             _opencpi.assets.platform.HdlTargetsCollection,
+                'hdl-worker':              _opencpi.assets.worker.HdlLibraryWorker,
+                'libraries':               _opencpi.assets.library.LibrariesCollection,
+                'library':                 _opencpi.assets.library.Library,
+                'platforms':               _opencpi.assets.platform.PlatformsCollection,
+                'prerequisite':            _opencpi.assets.prerequisite.Prerequisite,
+                'prerequisites':           _opencpi.assets.prerequisite.PrerequisitesCollection,
+                'project':                 _opencpi.assets.project.Project,
+                'projects':                _opencpi.assets.project.ProjectsCollection,
+                'protocol':                _opencpi.assets.component.Protocol,
+                'protocols':               None,
+                'rcc-platform':            _opencpi.assets.platform.RccPlatform,
+                'rcc-platforms':           _opencpi.assets.platform.RccPlatformsCollection,
+                'rcc-worker':              _opencpi.assets.worker.RccWorker,
+                'registry':                _opencpi.assets.registry.Registry,
+                'test':                    _opencpi.assets.test.Test,
+                'tests':                   _opencpi.assets.test.TestsCollection,
+                'worker':                  None,
+                'workers':                 _opencpi.assets.worker.WorkersCollection,
+            }
+
+        if asset_type == 'worker':
+            words = name.split('.')
+            if len(words) != 2:
+                raise ocpiutil.OCPIException(f'Bad worker name "{name}", does not have model suffix')
+            asset_type = words[1] + "-worker"
+        asset_class = cls.__asset_type_to_class_map.get(asset_type)
+        if not asset_class:
+            raise NotImplementedError(f'Bad asset type, "{asset_type}" not supported')
+        return asset_class
 
     @classmethod
     def factory(cls, asset_type, directory, name=None, **kwargs):
@@ -56,69 +130,10 @@ class AssetFactory():
             raise ocpiutil.OCPIException("directory passed to  AssetFactory is None.  Pass a " +
                                          "valid directory to the factory")
         directory = str(Path(directory).resolve())
-        # actions maps asset_type string to the function that creates objects of that type
-        # Some types will use plain constructors,
-        # and some will use __get_or_create with asset_cls set accordingly
-        import _opencpi.assets.application
-        import _opencpi.assets.test
-        import _opencpi.assets.worker
-        import _opencpi.assets.platform
-        import _opencpi.assets.assembly
-        import _opencpi.assets.library
-        import _opencpi.assets.project
-        import _opencpi.assets.registry
-        import _opencpi.assets.component
-        import _opencpi.assets.prerequisite
-        actions = {"worker":         cls.__worker_with_model,
-                   "hdl-assemblies":_opencpi.assets.assembly.HdlAssembliesCollection,
-                   "hdl-assembly":  _opencpi.assets.assembly.HdlApplicationAssembly,
-                   "hdl-platforms": _opencpi.assets.platform.HdlPlatformsCollection,
-                   "hdl-platform":  _opencpi.assets.platform.HdlPlatformWorker,
-                   "hdl-container": _opencpi.assets.assembly.HdlContainer,
-                   "rcc-platforms": _opencpi.assets.platform.RccPlatformsCollection,
-                   "rcc-platform":  _opencpi.assets.platform.RccPlatform,
-                   "test":          _opencpi.assets.test.Test,
-                   "tests":         _opencpi.assets.test.TestsCollection,
-                   "component":     _opencpi.assets.component.Component,
-                   "application":   _opencpi.assets.application.Application,
-                   "applications":  _opencpi.assets.application.ApplicationsCollection,
-                   "library":       _opencpi.assets.library.Library,
-                   "libraries":     _opencpi.assets.library.LibraryCollection,
-                   "multi-lib":     _opencpi.assets.library.LibraryCollection,
-                   "protocol":      _opencpi.assets.component.Protocol,
-                   "hdl-slot":      _opencpi.assets.component.Slot,
-                   "hdl-card":      _opencpi.assets.component.Card,
-                   "project":       partial(cls.__get_or_create, _opencpi.assets.project.Project),
-                   "registry":      partial(cls.__get_or_create, _opencpi.assets.registry.Registry),
-                   "prerequisite":  partial(cls.__get_or_create, _opencpi.assets.prerequisite.Prerequisites)
-                   }
-        
-        if asset_type not in actions.keys():
-            if not asset_type:
-                asset_type = "unknown"
-            raise ocpiutil.OCPIException("Bad asset creation, \"" + asset_type + "\" not supported")
-
         # Call the action for this type and hand it the arguments provided
-        return actions[asset_type](directory, name, **kwargs)
-
-    @classmethod
-    def __worker_with_model(cls, directory, name=None, **kwargs):
-        """
-        Construct Worker subclass based on authoring model of worker
-        (e.g. RccWorker or HdlLibraryWorker)
-        """
-        import _opencpi.assets.worker
-        model = Path(directory).suffix
-        if model is not None and model not in ['.rcc', '.hdl'] and name:
-            model = Path(name).suffix
-        if model == '.hdl':
-            return _opencpi.assets.worker.HdlLibraryWorker(directory, name, **kwargs)
-        elif model == '.rcc':
-            return _opencpi.assets.worker.RccWorker(directory, name, **kwargs)
-        else:
-            err_msg = 'Unsupported authoring model "{}" for worker located at "{}"'.format(
-                model, directory)
-            raise ocpiutil.OCPIException(err_msg)
+        asset_name = name if name else os.path.basename(directory)
+        asset_class = AssetFactory.get_class_from_asset_type(asset_type, asset_name)
+        return asset_class(directory, name, **kwargs)
 
     @classmethod
     def remove_all(cls):
@@ -149,22 +164,30 @@ class AssetFactory():
                                          "and instance are None.")
 
     @classmethod
-    def __get_or_create(cls, asset_cls, directory, name, **kwargs):
+    def get_instance(cls, asset_cls, directory=None, name=None, **kwargs):
         """
-        Given an asset subclass type, check whether an instance of the
-        subclass already exists for the provided directory. If so, return
-        that instance. Otherwise, call the subclass constructor and return
+        Ask the asset class whether instances should be cached.
+        If the asset class says no, simply construct the asset and return it.
+        Otherwise, check whether an instance of the
+        asset class already exists for the provided directory. If so, return
+        that instance. Otherwise, call the asset class constructor and return
         the new instance.
         """
-        # Determine the sub-dictionary in __assets corresponding to the provided class (asset_cls)
-        if asset_cls not in cls.__assets:
-            cls.__assets[asset_cls] = {}
-        asset_inst_dict = cls.__assets[asset_cls]
+        if isinstance(asset_cls,str):
+            asset_cls = AssetFactory.get_class_from_asset_type(asset_cls,name)
 
-        # Does an instance of the asset_cls subclass exist with a directory matching the provided
-        # "dictionary" parameter? If so, just return that instance.
-        real_dir = os.path.realpath(directory)
-        if real_dir not in asset_inst_dict:
-            # If not, construct a new one, add it to the dictionary, and return it
-            asset_inst_dict[real_dir] = asset_cls(directory, name, **kwargs)
-        return asset_inst_dict[real_dir]
+        if asset_cls.instances_should_be_cached:
+            # If instances should be cached, determine the sub-dictionary in __assets
+            # corresponding to the provided class (asset_cls)
+            if asset_cls not in cls.__assets:
+                cls.__assets[asset_cls] = {}
+            asset_inst_dict = cls.__assets[asset_cls]
+            asset_path, asset_name, asset_parent = Asset.get_asset_path(directory, name, kwargs)
+
+            real_dir = str(asset_path)
+            asset = asset_inst_dict.get(real_dir)
+            if not asset:
+                asset = asset_inst_dict[real_dir] = asset_cls(directory, name, **kwargs)
+        else:
+            asset = asset_cls(directory, name, **kwargs)
+        return asset

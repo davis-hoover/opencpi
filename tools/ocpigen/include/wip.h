@@ -538,6 +538,7 @@ class Worker : public OM::Worker {
     emitXmlWorkers(FILE *f),
     emitXmlInstances(FILE *f),
     emitXmlConnections(FILE *f);
+  virtual void emitXmlSupports(std::string &) const {}
   void
     emitVhdlLibraries(FILE *f),
     emitCppTypesNamespace(FILE *f, std::string &nsName, const std::string &slaveName=""),
