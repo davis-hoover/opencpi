@@ -316,6 +316,9 @@ clone(const ParamConfig &other) {
   id = other.id;
   nConfig = other.nConfig;
   used = other.used;
+  m_slavesAssembly = other.m_slavesAssembly;
+  m_slavesString = ezxml_toxml(other.m_slavesXml);  
+  m_slavesXml = ezxml_parse_str(m_slavesString, strlen(m_slavesString));
 }
 
 ParamConfig::
