@@ -43,51 +43,50 @@ modelsim:
 
 # hdl
 adrv9361:
-  ip: 10.1.0.232 # deprecated; use 'ip_addresses'
-  ip_addresses:
-    - 10.1.0.232
+  ip: 10.1.0.232 # deprecated
+  do_hwil: True
+  do_ocpiremote: True
+  port: 1000 # deprecated
   variables:
     OCPI_XILINX_LICENSE_FILE: '2100@sembach.opencpi.net'
   overrides: # deprecated; use 'variables'
     variables:
       OCPI_XILINX_LICENSE_FILE: '2100@sembach.opencpi.net'
 e31x:
-  ip: 10.1.0.42 # deprecated; use 'ip_addresses'
-  ip_addresses:
-    - 10.1.0.42
-    - 10.1.0.240
-  port: 1000
+  ip: 10.1.0.42 # deprecated
+  do_hwil: True
+  do_ocpiremote: True
+  port: 1000 # deprecated
 matchstiq_z1:
-  ip: 10.1.0.203 # deprecated; use 'ip_addresses'
-  ip_addresses:
-    - 10.1.0.203 
-  port: 1000
+  ip: 10.1.0.203 # deprecated
+  do_hwil: True
+  do_ocpiremote: True
+  port: 1000 # deprecated
 microzed_20_cc:
-  ip: 10.1.0.209 # deprecated; use 'ip_addresses'
-  ip_addresses:
-    - 10.1.0.209
-  port: 1000
+  ip: 10.1.0.209 # deprecated
+  do_hwil: True
+  do_ocpiremote: True
+  port: 1000 # deprecated
 picoevb:
-  ip: # deprecated; use 'ip_addresses'
-  ip_addresses: []
+  ip: # deprecated
+  do_hwil: True
+  do_ocpiremote: False
   port: 1000
 picozed_30_cc:
-  ip: 10.1.0.210 # deprecated; use 'ip_addresses'
-  ip_addresses:
-    - 10.1.0.210
-  port: 1000
+  ip: 10.1.0.210 # deprecated
+  do_hwil: True
+  do_ocpiremote: True
+  port: 1000 # deprecated
 plutosdr:
-  ip: 10.1.0.101 # deprecated; use 'ip_addresses'
-  ip_addresses: 
-   - 10.1.0.101
-   - 10.1.0.102
-   - 10.1.0.103
-  port: 1000
+  ip: 10.1.0.101 # deprecated
+  do_hwil: True
+  do_ocpiremote: True
+  port: 1000 # deprecated
   password: analog
   deploy: False # deprecated
   variables:
     OCPI_PROJECT_PATH: '/opencpi/projects/assets:/opencpi/projects/platform'
-  overrides: # deprecated; use 'variables'
+  overrides: # deprecated
     build-assemblies:centos7:assets_ts:assemblies:plutosdr:
       variables:
         OCPI_PROJECT_PATH: '$CI_PROJECT_DIR/projects/assets:$CI_PROJECT_DIR/projects/platform'
@@ -98,27 +97,27 @@ plutosdr:
       variables:
         OCPI_PROJECT_PATH: '$CI_PROJECT_DIR/projects/assets:$CI_PROJECT_DIR/projects/platform'
 zcu102:
-  ip: 10.1.0.212 # deprecated; use 'ip_addresses'
-  ip_addresses:
-    - 10.1.0.212
-  port: 1000
+  ip: 10.1.0.212 # deprecated
+  do_hwil: True
+  do_ocpiremote: True
+  port: 1000 # deprecated
   variables:
     OCPI_XILINX_LICENSE_FILE: '2101@sembach.opencpi.net'
 zcu104:
-  ip: 10.1.0.208 # deprecated; use 'ip_addresses'
-  ip_addresses:
-    - 10.1.0.208
+  ip: 10.1.0.208 # deprecated
+  do_hwil: True
+  do_ocpiremote: True
   port: 1000
 zed:
-  ip: 10.1.0.242 # deprecated; use 'ip_addresses'
-  ip_addresses: 
-   - 10.1.0.242
-   - 10.1.0.207
-   - 10.1.0.239
-  port: 1000
+  ip: 10.1.0.242 # deprecated
+  do_hwil: True
+  do_ocpiremote: True
+  port: 1000 # deprecated
 zed_ise:
+  do_hwil: False
+  do_ocpiremote: False
   variables:
     OCPI_XILINX_LICENSE_FILE: '2101@sembach.opencpi.net'
-  overrides: # deprecated; use 'variables'
+  overrides: # deprecated
     variables:
       OCPI_XILINX_LICENSE_FILE: '2101@sembach.opencpi.net'

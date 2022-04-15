@@ -4,10 +4,8 @@ from abc import ABC, abstractmethod
 from os import environ
 from pathlib import Path
 from typing import List
-import re
 import sys
 import yaml
-import random
 
 
 class Job():
@@ -1028,7 +1026,8 @@ class CompPipelineBuilder(PlatformPipelineBuilder):
 class AssemblyPipelineBuilder(PipelineBuilder):
     def __init__(self, pipeline_id, container_registry, container_repo,
         base_image_tag, host, platform, model, target, other_platform, 
-        assembly_dirs, test_dirs, apps_dict, dump_path, config=None, 
+        assembly_dirs, test_dirs, apps_dict, dump_path, hostname=None, 
+        user=None, password=None, config=None, do_ocpiremote=False, 
         do_hwil=False):
         """Initializes an AssemblyPipelineBuilder"""
         super().__init__(pipeline_id, container_registry, base_image_tag,
@@ -1042,13 +1041,11 @@ class AssemblyPipelineBuilder(PipelineBuilder):
         self.model = model
         self.target = target
         self.other_platform = other_platform
+        self.user = user
+        self.password = password
+        self.hostname = hostname
+        self.do_ocpiremote = do_ocpiremote
         self.do_hwil = do_hwil
-        self.user = self.password = 'root'
-        self.ip_addresses = self.port = None
-        if config:
-            for key in ['ip_addresses', 'port', 'user', 'password']:
-                if key in config:
-                    self.__dict__[key] = config[key]
         self.stages = ['build-unit_tests']
         if self.model == 'hdl':
             self.stages.append('build-assemblies')
@@ -1096,9 +1093,8 @@ class AssemblyPipelineBuilder(PipelineBuilder):
             asset_project = None
             asset_name = asset
         name = self._build_name(asset_project, asset_name, stage)
-        ip = self._build_ip()
-        tags = self._build_tags(stage, ip=ip)
-        script = self._build_script(stage, asset, ip=ip)
+        tags = self._build_tags(stage)
+        script = self._build_script(stage, asset)
         needs = self._build_needs(stage, asset_name, asset_project)
         before_script = self._build_before_script(stage)
         after_script = self._build_after_script(stage)
@@ -1110,9 +1106,9 @@ class AssemblyPipelineBuilder(PipelineBuilder):
 
         return job
 
-    def _build_script(self, stage: str, asset: str, ip: str=None) -> List[str]:
+    def _build_script(self, stage: str, asset: str) -> List[str]:
         """Build a job's script"""
-        ocpi_cmd = self._build_ocpi_cmd(stage, asset, ip=ip)
+        ocpi_cmd = self._build_ocpi_cmd(stage, asset)
         base_image = self._build_base_image_name(stage)
         volumes = [
             '/opt/Xilinx:/opt/Xilinx',
@@ -1124,10 +1120,10 @@ class AssemblyPipelineBuilder(PipelineBuilder):
             script = []
             devices = None
             caps = None
-            if ip:
+            if self.do_ocpiremote:
             # Device is remote; set appropriate env vars
                 addresses_cmd = 'export OCPI_SERVER_ADDRESSES={}:{}'.format(
-                    ip, self.port)
+                    "$CI_OCPI_DEVICE_HOSTNAME", "1000")
                 script.append(addresses_cmd)
             elif self.do_hwil:
             # Device is local to runner; allow container access to /dev/mem
@@ -1195,7 +1191,7 @@ class AssemblyPipelineBuilder(PipelineBuilder):
 
         return script
 
-    def _build_tags(self, stage: str, ip: str=None) -> List[str]:
+    def _build_tags(self, stage: str) -> List[str]:
         """Constructs and returns a job's tags as a list of strings"""
         tags = []
         tags.append('opencpi')
@@ -1205,13 +1201,7 @@ class AssemblyPipelineBuilder(PipelineBuilder):
                 platform = self.platform
             elif self.model == 'rcc':
                 platform = self.other_platform
-            if ip:
-            # If more than one device, find device index to use for tag
-                ip_idx = self.ip_addresses.index(ip)
-                ip_id = str(ip_idx + 1).zfill(2) # Pad leading 0 if necessary
-                tags.append('{}-{}'.format(platform, ip_id))
-            else:
-                tags.append(platform)
+            tags.append(platform)
         else:
             tags.append('aws')
 
@@ -1264,13 +1254,7 @@ class AssemblyPipelineBuilder(PipelineBuilder):
 
         return variables
 
-    def _build_ip(self):
-        """Selects a random ip from self.ip_addresses"""
-        ip = random.choice(self.ip_addresses) if self.ip_addresses else None
-
-        return ip
-
-    def _build_ocpi_cmd(self, stage: str, asset: str, ip: str=None) -> str:
+    def _build_ocpi_cmd(self, stage: str, asset: str) -> str:
         """Returns an ocpi command based on the job's stage"""
         if stage in ['build-assemblies', 'build-unit_tests']:
             ocpi_cmd = 'ocpidev build -d {} --{}-platform {}'.format(
@@ -1285,12 +1269,11 @@ class AssemblyPipelineBuilder(PipelineBuilder):
                     '--mode prep_run_verify'
                 ])
             else:
-                run_cmd = self._build_app_cmd(asset, ip=ip)
-            if ip: 
-                ocpiremote_load_cmd = self._build_ocpiremote_cmd('load', ip)
-                ocpiremote_start_cmd = self._build_ocpiremote_cmd('start', ip)
-                ocpiremote_unload_cmd = self._build_ocpiremote_cmd(
-                    'unload', ip)
+                run_cmd = self._build_app_cmd(asset)
+            if self.do_ocpiremote: 
+                ocpiremote_load_cmd = self._build_ocpiremote_cmd('load')
+                ocpiremote_start_cmd = self._build_ocpiremote_cmd('start')
+                ocpiremote_unload_cmd = self._build_ocpiremote_cmd('unload')
                 ocpi_cmds = [
                     ocpiremote_unload_cmd  + ' || true', 
                     ocpiremote_load_cmd,
@@ -1304,7 +1287,7 @@ class AssemblyPipelineBuilder(PipelineBuilder):
 
         return ocpi_cmd
 
-    def _build_app_cmd(self, app: str, ip: str=None):
+    def _build_app_cmd(self, app: str):
         """Build a command to run an application"""
         apps_path = Path(__file__, '..', 'ci_applications').resolve()
         app_cmd = str(Path('.', apps_path, 'ci_'+app).with_suffix('.sh'))
@@ -1312,14 +1295,14 @@ class AssemblyPipelineBuilder(PipelineBuilder):
         if self.model == 'hdl' and self.other_platform:
             app_cmd += ' --rcc-platform {}'.format(self.other_platform)
         app_cmd += ' --host {}'.format(self.host)
-        if ip:
-            app_cmd += ' -i {}'.format(ip)
+        if self.do_ocpiremote:
+            app_cmd += ' -i {}'.format(self.hostname)
             app_cmd += ' -p {}'.format(self.password)
             app_cmd += ' -u {}'.format(self.user)
 
         return app_cmd
 
-    def _build_ocpiremote_cmd(self, cmd: str, ip: str):
+    def _build_ocpiremote_cmd(self, cmd: str):
         """Build an ocpiremote command"""
         if cmd == 'load':
             if self.model == 'hdl':
@@ -1332,15 +1315,15 @@ class AssemblyPipelineBuilder(PipelineBuilder):
                 'ocpiremote load',
                 '--hdl-platform={}'.format(hdl_platform),
                 '--rcc-platform={}'.format(rcc_platform),
-                '-i {}'.format(ip),
-                '-r {}'.format(self.port),
+                '-i {}'.format(self.hostname),
+                '-r {}'.format("1000"),
                 '-u {}'.format(self.user),
                 '-p {}'.format(self.password)
             ])
         elif cmd in ['start', 'stop', 'unload']:
             ocpiremote_cmd = ' '.join([
                 'ocpiremote {}'.format(cmd),
-                '-i {}'.format(ip),
+                '-i {}'.format(self.hostname),
                 '-u {}'.format(self.user),
                 '-p {}'.format(self.password)
             ])
