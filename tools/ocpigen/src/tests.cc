@@ -766,7 +766,8 @@ namespace {
 	  found = wfound;
         if (!found)
           return OU::esprintf("Property name \"%s\" not a spec or test property (worker-specific "
-			      "properties must be prefixed by worker name and model, e.g. wkr1.rcc.prop1)",
+			      "properties must be declared by building the component library and be prefixed by "
+			      "worker name and model, e.g. wkr1.rcc.prop1)",
 			      name.c_str());
 	// poor man's: any xml attributes? e.g. if not only "set" element?
 	if (px->attr && px->attr[0] &&
