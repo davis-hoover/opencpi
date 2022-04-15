@@ -159,25 +159,30 @@ def _make_assembly_pipeline(dump_path: Path,
     container_registry = getenv('CI_OCPI_CONTAINER_REGISTRY')
     container_repo = getenv('CI_OCPI_CONTAINER_REPO')
     applications = _get_applications()
+    # Set to literal strings. Runner for the HWIL job will evaluate
+    hostname = '$CI_OCPI_DEVICE_HOSTNAME'
+    user = '$CI_OCPI_DEVICE_USER'
+    password = '$CI_OCPI_DEVICE_PWD'
     if model == 'hdl' and platform in config:
         config = config[platform]
     elif model == 'rcc' and other_platform and other_platform in config:
         config = config[other_platform]
     else:
         config = None
-    if platform.endswith('sim'):
-    # Don't do HWIL for simulators
-        do_hwil = False
-    elif not config or 'ip' not in config:
-    # Don't do HWIL for platforms without a device to run on
-        do_hwil = False
+    if not config:
+        do_hwil = do_ocpiremote = False
     else:
-        do_hwil = getenv('CI_OCPI_{}_HWIL'.format(model.upper()), '')
-        do_hwil = do_hwil.lower() in ['t', 'y', 'true', 'yes', '1']
+        do_ocpiremote = config.get('do_ocpiremote', False)
+        do_hwil = config.get('do_hwil', False)
+        if do_hwil:
+        # HWIL must be specified when launching pipeline
+            do_hwil = getenv('CI_OCPI_{}_HWIL'.format(model.upper()), '')
+            do_hwil = do_hwil.lower() in ['t', 'y', 'true', 'yes', '1']
     pipeline_builder = AssemblyPipelineBuilder(pipeline_id, container_registry, 
         container_repo, base_image_tag, host, platform, model, target,
         other_platform, assembly_dirs, test_dirs, applications, dump_path, 
-        config=config, do_hwil=do_hwil)
+        hostname=hostname, user=user, password=password, config=config, 
+        do_ocpiremote=do_ocpiremote, do_hwil=do_hwil)
 
     return pipeline_builder
 
@@ -381,6 +386,8 @@ def _get_platforms(do_ocpishow=True, do_model_split=True) -> List[str]:
         else:
             project_paths = [Path.cwd()]
         for project_path in project_paths:
+            if project_path.name == 'inactive':
+                continue
             for model in ['rcc', 'hdl']:
                 platforms_path = Path(project_path, model, 'platforms')
                 project_platforms = [platform.name for platform 
@@ -464,11 +471,14 @@ def _get_applications() -> dict():
     Key of dictionary is application name, and value of dictionary is
     a list of needed assemblies.
     """
+    if getenv('CI_PROJECT_NAME', '') != 'opencpi':
+        return {}
     applications = {
         'source_sink': [
             'projects/assets/hdl/assemblies/test_source_assy',
             'projects/assets/hdl/assemblies/test_sink_assy'
-        ]
+        ],
+        'testbias': []
     }
 
     return applications
