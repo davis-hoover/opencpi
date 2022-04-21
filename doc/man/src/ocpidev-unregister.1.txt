@@ -25,7 +25,7 @@ Asset types to be specified in the '<noun>' argument are:
 
 OPTIONS
 -------
-The general purpose options (*`-v`* and *`-d`* '<directory>') can be used.
+The general purpose options *`--verbose`* (*`-v`*) and *`-d`* '<directory>' can be used.
 In particular, the *`-d`* '<directory>' option can be used to specify
 the pathname of the project being unregistered.
 There are no verb-specific options.
@@ -34,9 +34,9 @@ EXAMPLES
 --------
 . Unregister the current project from its registry:
 +
-----------------------
+-------------------------
 ocpidev unregister project
-----------------------
+-------------------------
 
 BUGS
 ----
@@ -53,6 +53,7 @@ link:ocpidev-build.1.html[ocpidev-build(1)]
 link:ocpidev-clean.1.html[ocpidev-clean(1)]
 link:ocpidev-create.1.html[ocpidev-create(1)]
 link:ocpidev-delete.1.html[ocpidev-delete(1)]
+link:ocpidev-project.1.html[ocpidev-project(1)]
 link:ocpidev-refresh.1.html[ocpidev-refresh(1)]
 link:ocpidev-register.1.html[ocpidev-register(1)]
 link:ocpidev-run.1.html[ocpidev-run(1)]
@@ -63,7 +64,7 @@ link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
 
 COPYING
 -------
-Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2022 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your
