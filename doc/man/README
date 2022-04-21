@@ -1,22 +1,23 @@
-OPENCPI MAN PAGES - STATUS 9/4/20
+OPENCPI MAN PAGES - STATUS 4/20/22
 ----------------------------------
 
 ocpiadmin - ready for review
-ocpiav - ready for review
-ocpidriver - ready for review
+ocpidriver - reviewed, updates since
 ocpigr - ready for review
+ocpigui - reviewed, updates since
 ocpihdl - ready for review
-ocpiremote - ready for review
-ocpirun - ready for review
-ocpiserve - ready for review
-ocpiview - ready for review
-ocpixml - ready for review
+ocpiremote - reviewed, updates since
+ocpirun - reviewed
+ocpiserve - reviewed, updates since
+ocpiview - reviewed, updates since
+ocpitest - reviewed
+ocpixml - reviewed
 ocpizynq - ready for review
-opencpi - ready for review
+opencpi - reviewed, updates since
 
 ocpidev Man Pages
 -----------------
-ocpidev - reviewed once, updates since
+ocpidev - reviewed, updates since
 
 ocpidev Nouns
 -------------
@@ -30,30 +31,26 @@ platform - ready for review, has embedded questions
 primitive - ready for review
 project - reviewed once, updates since
 protocol - ready for review
-registry - ready for review
+registry - reviewed, updates since
 slot - ready for review
 test - ready for review
 worker - reviewed once, updates since
 
 ocpidev Verbs
 --------------
-ocpidev-build - ready for review
-ocpidev-clean - ready for review
-ocpidev-create - ready for review
-ocpidev-delete - ready for review
+ocpidev-build - reviewed, updates since
+ocpidev-clean - reviewed, updates since
+ocpidev-create - reviewed, updates since
+ocpidev-delete - reviewed, updates since
 ocpidev-refresh - ready for review
-ocpidev-register - ready for review
-ocpidev-run - ready for review
-ocpidev-set - ready for review
-ocpidev-show - ready for review
-ocpidev-unregister - ready for review
-ocpidev-unset - ready for review
+ocpidev-register - reviewed, updates since
+ocpidev-run - reviewed, updates since
+ocpidev-set - reviewed, updates since
+ocpidev-show - reviewed, updates since
+ocpidev-unregister - reviewed, updates since
+ocpidev-unset - reviewed, updates since
 ocpidev-utilization - ready for review
------------------------------
 
-Man pages to be created:
-
-ocpitest
 
 
 
