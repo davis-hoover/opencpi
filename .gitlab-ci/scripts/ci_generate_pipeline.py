@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import asyncio
 from typing import List
 import json
 from pathlib import Path
@@ -25,7 +24,7 @@ def main(pipeline_type: str) -> None:
     pipeline_builder: PipelineBuilder = _get_builder(
         pipeline_type, dump_path, config)
     pipeline: Pipeline = pipeline_builder.build()
-    print('Dumping pipeline yaml to: {}'.format(pipeline.dump_path))
+    print('Dumping pipeline yaml to: {}'.format(pipeline.dump_path.resolve()))
     pipeline.dump()
     executionTime = (time.time() - startTime)
     print('Execution time in seconds: ' + str(executionTime))
@@ -37,9 +36,9 @@ def _set_env():
     environ['CI_OCPI_HOSTS'] = 'centos7'
     environ['CI_OCPI_HOST'] = 'centos7'
     environ['CI_OCPI_PLATFORMS'] = '"zed:xilinx19_2_aarch32,xsim"'
-    environ['CI_OCPI_PLATFORM'] = 'xsim'
-    environ['CI_OCPI_OTHER_PLATFORM'] = ''
-    environ['CI_OCPI_PROJECTS'] = '"ocpi.comp.sdr,ocpi.osp.plutosdr"'
+    environ['CI_OCPI_PLATFORM'] = 'zed'
+    environ['CI_OCPI_OTHER_PLATFORM'] = 'xilinx19_2_aarch32'
+    environ['CI_OCPI_PROJECTS'] = ' '
     environ['CI_OCPI_ROOT_PIPELINE_ID'] = '123456789'
     environ['CI_PIPELINE_ID'] = '234567890'
     environ['CI_JOB_ID'] = '987654321'
@@ -86,7 +85,6 @@ def _make_platform_pipeline(dump_path: Path,
     image_tags = _get_image_tags()
     container_registry = getenv('CI_OCPI_CONTAINER_REGISTRY', '')
     hosts = re.split(r'\s|,\s|,', getenv('CI_OCPI_HOSTS', '').strip('"'))
-    print(hosts)
     whitelist = _get_platforms(do_ocpishow=False, do_model_split=False)
     platforms = _parse_platforms_directive(whitelist=whitelist, 
         whitelist_mode='and')
@@ -146,8 +144,9 @@ def _make_assembly_pipeline(dump_path: Path,
     config: str=None) -> AssemblyPipelineBuilder:
     """Initialize and return an AssemblyPipelineBuilder"""
     pipeline_id = _get_pipeline_id()
-    base_image_tag = _get_base_image_tag(pipeline_id=pipeline_id)
+    base_image_tag = pipeline_id
     platform = getenv('CI_OCPI_PLATFORM')
+    model, target = _get_platform_info(platform)
     host = getenv('CI_OCPI_HOST')
     other_platform = getenv('CI_OCPI_OTHER_PLATFORM')
     project_group = environ['CI_PROJECT_NAMESPACE'].split('/', 1)[-1]
@@ -155,30 +154,34 @@ def _make_assembly_pipeline(dump_path: Path,
     whitelist = [project_name] if project_group == 'comp' else None
     project_dirs = _get_projects(whitelist=whitelist, blacklist=['tutorial'])
     assembly_dirs = _get_assemblies(project_dirs)
-    test_dirs = _get_tests(project_dirs)
+    test_dirs = _get_tests(project_dirs, model=model)
     container_registry = getenv('CI_OCPI_CONTAINER_REGISTRY')
     container_repo = getenv('CI_OCPI_CONTAINER_REPO')
-    model = _get_platform_model(platform)
-    runners = config['ci']['runners']
+    applications = _get_applications()
+    # Set to literal strings. Runner for the HWIL job will evaluate
+    hostname = '$CI_OCPI_DEVICE_HOSTNAME'
+    user = '$CI_OCPI_DEVICE_USER'
+    password = '$CI_OCPI_DEVICE_PWD'
     if model == 'hdl' and platform in config:
         config = config[platform]
     elif model == 'rcc' and other_platform and other_platform in config:
         config = config[other_platform]
     else:
         config = None
-    if platform.endswith('sim'):
-    # Don't do HWIL for simulators
-        do_hwil = False
-    elif not config or 'ip' not in config:
-    # Don't do HWIL for platforms without a device to run on
-        do_hwil = False
+    if not config:
+        do_hwil = do_ocpiremote = False
     else:
-        do_hwil = getenv('CI_OCPI_{}_HWIL'.format(model.upper()), '')
-        do_hwil = do_hwil.lower() in ['t', 'y', 'true', 'yes', '1']
+        do_ocpiremote = config.get('do_ocpiremote', False)
+        do_hwil = config.get('do_hwil', False)
+        if do_hwil:
+        # HWIL must be specified when launching pipeline
+            do_hwil = getenv('CI_OCPI_{}_HWIL'.format(model.upper()), '')
+            do_hwil = do_hwil.lower() in ['t', 'y', 'true', 'yes', '1']
     pipeline_builder = AssemblyPipelineBuilder(pipeline_id, container_registry, 
-        container_repo, base_image_tag, host, platform, model, other_platform, 
-        assembly_dirs, test_dirs, dump_path, config=config, runners=runners, 
-        do_hwil=do_hwil)
+        container_repo, base_image_tag, host, platform, model, target,
+        other_platform, assembly_dirs, test_dirs, applications, dump_path, 
+        hostname=hostname, user=user, password=password, config=config, 
+        do_ocpiremote=do_ocpiremote, do_hwil=do_hwil)
 
     return pipeline_builder
 
@@ -230,14 +233,18 @@ def _get_image_tags() -> List[str]:
     return image_tags
 
 
-def _get_platform_model(platform: str) -> str:
-    """Returns the model of the given platform"""
-    rcc_platforms,hdl_platforms = _get_platforms().values()
-    if platform in rcc_platforms:
-        return 'rcc'
-    if platform in hdl_platforms:
-        return 'hdl'
-    sys.exit('Error: Unknown platform "{}"'.format(platform))
+def _get_platform_info(platform: str) -> str:
+    """Returns the model and target of a platform"""
+    platforms = _get_platforms()
+    if platform in platforms['rcc']:
+        model = 'rcc'
+    elif platform in platforms['hdl']:
+        model = 'hdl'
+    else:
+        sys.exit('Error: Unknown platform "{}"'.format(platform))
+    target = platforms[model][platform]['target']
+
+    return model, target
 
 
 def _parse_projects_directive() -> dict:
@@ -316,37 +323,32 @@ def _parse_platforms_directive(whitelist: List[str]=None,
     return filtered_platforms
 
 
-async def _ocpidev_show(noun: str, directory: str='.', scope=None) -> dict:
+def _ocpidev_show(noun: str, directory: str='.', scope=None) -> dict:
     """
     Call ocpidev show with provided arguments
     
-    Loads json into a dictionary to return. Runs asynchronously to make
-    up for "ocpidev show" being slow.
+    Loads json into a dictionary to return.
     """
-    cmd = ' '.join(['ocpidev', 'show', noun, '--json'])
+    cmd = ['ocpidev', 'show', noun, '--json']
     if scope:
-        cmd += ' --{}-scope'.format(scope)
-    process = await asyncio.create_subprocess_shell(
+        cmd.append('--{}-scope'.format(scope))
+    process = subprocess.run(
         cmd, 
         stdout=subprocess.PIPE, 
         stdin=subprocess.PIPE,
-        stderr=subprocess.PIPE, 
-        encoding='utf-8',
+        stderr=subprocess.PIPE,
+        universal_newlines=True,
         cwd=directory)
-    stdout, stderr = await process.communicate()
-    stdout = stdout.decode().rstrip()
-    stderr = stderr.decode().rstrip()
-    if stderr:
-        sys.exit('Error: {}'.format(stderr))
+    if process.returncode:
+        sys.exit(process.stderr)
 
-    return json.loads(stdout)
+    return json.loads(process.stdout)
 
 
 def _get_projects(whitelist: List[str]=None, 
     blacklist: List[str]=None) -> List[str]:
     """Returns opencpi registered project directories"""
-    loop = asyncio.get_event_loop()
-    projects = loop.run_until_complete(_ocpidev_show('projects'))['projects']
+    projects = _ocpidev_show('projects')['projects']
     projects = [project['real_path'] for project in projects.values()]
     if whitelist is not None:
         projects = [project for project in projects
@@ -369,10 +371,7 @@ def _get_platforms(do_ocpishow=True, do_model_split=True) -> List[str]:
     """
     platforms = {'rcc': [], 'hdl': []}
     if do_ocpishow:
-        loop = asyncio.get_event_loop()
-        platforms = loop.run_until_complete(_ocpidev_show('platforms'))
-        platforms['rcc'] = [platform for platform in platforms['rcc'].keys()]
-        platforms['hdl'] = [platform for platform in platforms['hdl'].keys()]
+        platforms = _ocpidev_show('platforms')
     else:
         projects_path = Path('projects')
         if projects_path.exists():
@@ -380,15 +379,17 @@ def _get_platforms(do_ocpishow=True, do_model_split=True) -> List[str]:
         else:
             project_paths = [Path.cwd()]
         for project_path in project_paths:
+            if project_path.name == 'inactive':
+                continue
             for model in ['rcc', 'hdl']:
                 platforms_path = Path(project_path, model, 'platforms')
                 project_platforms = [platform.name for platform 
                                     in platforms_path.glob('*') 
                                     if platform.is_dir()]
                 platforms[model] += project_platforms
-
     if not do_model_split:
         platforms = platforms['rcc'] + platforms['hdl']
+
     return platforms
 
 
@@ -425,28 +426,54 @@ def _get_assemblies(project_dirs: List[str]) -> List[str]:
     return assemblies
 
 
-def _get_tests(project_dirs: List[str]) -> List[str]:
+def _get_tests(project_dirs: List[str], model=None) -> List[str]:
     """Returns directories of opencpi tests"""
     tests = []
-    futures = asyncio.gather(
-        *[_ocpidev_show('tests', project_dir, 'local') 
-            for project_dir in project_dirs])
-    results = asyncio.get_event_loop().run_until_complete(futures)
-    for result in results:
-        libraries = result['project']['libraries']
-        for library in libraries:
-            library_tests = libraries[library]['tests']
-            for library_test in library_tests:
-                library_path = Path(library_tests[library_test])
-                try:
-                    relative_path = library_path.relative_to(
-                        environ['OCPI_ROOT_DIR'])
-                except:
-                    relative_path = library_path.relative_to(
-                        environ['CI_PROJECT_DIR'])
-                tests.append(str(relative_path))
+    results = {}
+    workers = None
+    if model:
+    # Gather workers of specified models
+        workers = {}
+        for project_dir in project_dirs:
+            workers.update(_ocpidev_show('workers', project_dir, 'local'))
+        workers = [worker["name"].split('.')[0] 
+                   for worker in workers.values() 
+                   if worker["model"] == model]
+    for project_dir in project_dirs:
+        results.update(_ocpidev_show('tests', project_dir, 'local'))
+    for result in results.values():
+        path = Path(result['path'])
+        if workers is not None:
+            # If no worker of specified model for unit test, continue
+            # FIXME: worker names are not necessarily component names with suffixes
+            if path.stem not in workers:
+                continue
+        try:
+            relative_path = path.relative_to(environ['OCPI_ROOT_DIR'])
+        except:
+            relative_path = path.relative_to(environ['CI_PROJECT_DIR'])
+        tests.append(str(relative_path))
 
     return tests
+
+
+def _get_applications() -> dict():
+    """Returns a dictionary of applications
+    
+    Key of dictionary is application name, and value of dictionary is
+    a list of needed assemblies.
+    """
+    if getenv('CI_PROJECT_NAME', '') != 'opencpi':
+        return {}
+    applications = {
+        'source_sink': [
+            'projects/assets/hdl/assemblies/test_source_assy',
+            'projects/assets/hdl/assemblies/test_sink_assy'
+        ],
+        'testbias': []
+    }
+
+    return applications
 
 
 if __name__ == '__main__':
