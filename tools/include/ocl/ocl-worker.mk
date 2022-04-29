@@ -27,12 +27,12 @@ OclImplSuffix=-worker.h
 OclSkelSuffix=_skel.cl
 OclSourceSuffix=.cl
 ifeq ($(shell uname),Linux)
-BF=.so
+OcpiBF=.so
 SOEXT=.so
 AREXT=.a
 else
 ifeq ($(shell uname),Darwin)
-BF=.dylib
+OcpiBF=.dylib
 SOEXT=.dylib
 AREXT=.a
 endif
