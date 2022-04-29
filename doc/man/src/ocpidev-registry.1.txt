@@ -66,14 +66,9 @@ Options That Apply to All Operations (Verbs) on Registries
     Specify the directory in which the command should be run.
     Analogous to the *-C* option in the POSIX *make* command.
     
-*`-v`*, *`--verbose`*::
+ *`--verbose`*, *`-v`*::
     Describe what is happening in command execution in more detail.
-
-Options When Creating and Setting Registries
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*`-d`* '<directory>'::
-    Specify the path to the registry being created or set.
-    
+  
 Options When Deleting Registries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`-f`*::
@@ -83,7 +78,7 @@ Options When Deleting Registries
 Options When Showing Registries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`--json`*::
-    Format the output in Javascript Object Notation (JSON) format
+    Format the output in JavaScript Object Notation (JSON) format
     for integration with other software.
 
 *`--global-scope`*::
@@ -160,7 +155,7 @@ link:ocpidev-unset.1.html[ocpidev-unset(1)]
 
 COPYING
 -------
-Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2022 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your
