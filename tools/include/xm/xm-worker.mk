@@ -46,14 +46,14 @@ OBJ:=.o
 IncludeDirs += $(OCPI_CDK_DIR)/include/xm
 
 ifeq ($(shell uname),Linux)
-BF=.so
+OcpiBF=.so
 SOEXT=.so
 AREXT=.a
 SharedLibLinkOptions=-shared
 SharedLibCompileOptions=-fPIC
 else
 ifeq ($(shell uname),Darwin)
-BF=.dylib
+OcpiBF=.dylib
 SOEXT=.dylib
 AREXT=.a
 SharedLibLinkOptions=-dynamiclib

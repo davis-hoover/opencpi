@@ -152,7 +152,7 @@ all: $(ModelSpecificBuildHook)
 WkrTargetDirWild=$(OutDir)target-*$1
 
 # Function to generate final binary from target: $(call WkrBinary,target,config)
-WkrBinary=$(call WkrTargetDir,$1,$2)/$(WkrBinaryName)$(call BF,$1,$2)
+WkrBinary=$(call WkrTargetDir,$1,$2)/$(WkrBinaryName)$(call OcpiBF,$1,$2)
 # Function to generate object file name from source: $(call WkrObject,src,target,config)
 WkrObject=$(call WkrTargetDir,$2,$3)/$(basename $(notdir $1))$(call OBJ,$3)
 
@@ -249,7 +249,7 @@ endif
 # Export support - what we put into the (export) library above us
 
 ifndef WkrExportNames
-WkrExportNames+=$(WkrBinaryName)$(call BF,$1)
+WkrExportNames+=$(WkrBinaryName)$(call OcpiBF,$1)
 endif
 
 # If LibDir is unset, but the parent directory is a library

@@ -52,13 +52,14 @@ RccIncludeDirsActual=$(RccIncludeDirsInternal)\
    $(OCPI_PREREQUISITES_DIR)/$l/$(RccPlatform)/include\
    $(OCPI_PREREQUISITES_DIR)/$l/include)
 
-# FIXME: change this variable name someday (used by xxx-worker.mk)
-# This variable is the BINARY FILE suffix, used across all authoring models.
-BF=$(strip\
-  $(if $1,,$(error internal: BF w/o arg))\
-  $(foreach p,$(or $(call RccStripOptions,$(call RccGetPlatform,$1)),$(error internal: no platform for BF: $1)),\
+# This variable is the BINARY FILE suffix, used by xxx-worker.mk, and
+# used across all authoring models.  Was "BF": added "Ocpi" prefix to
+# avoid namespace collisions (AV-4199).
+OcpiBF=$(strip\
+  $(if $1,,$(error internal: OcpiBF w/o arg))\
+  $(foreach p,$(or $(call RccStripOptions,$(call RccGetPlatform,$1)),$(error internal: no platform for OcpiBF: $1)),\
     $(foreach s,$(or $(OcpiDynamicLibrarySuffix_$p),$(error internal: no suffix for: $p/$1)),\
-      $(infox BFr:$1->$p->$s)$s)))
+      $(infox OcpiBFr:$1->$p->$s)$s)))
 RccLinkOptions=$(OcpiRccLDFlags_$(RccRealPlatform))
 # This is for backward compatibility
 ifdef SharedLibLinkOptions
