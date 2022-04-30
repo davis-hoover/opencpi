@@ -28,6 +28,20 @@ component ROM
            ADDR     : in  std_logic_vector(ocpi.util.width_for_max(size-1)-1 downto 0);
            DO       : out std_logic_vector(WIDTH-1 downto 0));
 end component ROM;
+
+component BRAM1
+  generic (PIPELINED  : natural;
+           ADDR_WIDTH : natural;
+           DATA_WIDTH : natural;
+           MEMSIZE    : natural);
+    port  (CLK        : in  std_logic;
+           EN         : in  std_logic;
+           WE         : in  std_logic;
+           ADDR       : in  std_logic_vector(ADDR_WIDTH-1 downto 0);
+           DI         : in  std_logic_vector(DATA_WIDTH-1 downto 0);
+           DO         : out std_logic_vector(DATA_WIDTH-1 downto 0));
+end component BRAM1;
+
 component BRAM2
   generic (PIPELINED  : natural;
            ADDR_WIDTH : natural;
