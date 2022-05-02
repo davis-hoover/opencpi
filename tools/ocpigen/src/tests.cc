@@ -496,6 +496,7 @@ namespace {
 
   struct Case {
     std::string m_name;
+    std::unordered_set <uint32_t> m_validBuildConfigs;
     Strings m_onlyPlatforms, m_excludePlatforms; // can only apply these at runtime
     Workers m_workers; // the inclusion/exclusion happens at parse time
     WorkerConfigs m_configs;
@@ -892,6 +893,28 @@ namespace {
                       p.m_param->cname(), m_name.c_str(), s, p.m_param->cname());
           }
         }
+      }
+    }
+
+    void 
+    validateBuildConfigs (unsigned c, ParamConfig &pc) {
+      for (unsigned mm = 0; mm < m_subCases.size(); mm++) {
+        std::unordered_set <uint32_t> config_invalid;
+        for (unsigned n = 0; n < pc.params.size(); n++) {
+          Param &p = pc.params[n];
+          for (unsigned nn = 0; nn < m_subCases[mm]->params.size(); nn++) {
+            Param &sp = m_subCases[mm]->params[nn];
+            if (p.m_name == sp.m_name) {
+              if (p.m_uValue == sp.m_uValue)
+                break;
+              else
+                config_invalid.insert(nn);
+                break;              
+            }
+          }
+        }
+        if (config_invalid.empty())
+          m_validBuildConfigs.insert(c);
       }
     }
 
@@ -2183,7 +2206,7 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
   for (unsigned n = 0; n < cases.size(); n++) {
     cases[n]->m_subCases.push_back(new ParamConfig(cases[n]->m_settings)); 
     cases[n]->doProp(0); 
-    if ((err = cases[n]->pruneSubCases())) // or here 
+    if ((err = cases[n]->pruneSubCases()))
       return err;
     cases[n]->print(out);
   }
@@ -2208,62 +2231,12 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
       for (unsigned c = 0; c < w.m_paramConfigs.size(); ++c) {
         ParamConfig &pc = *w.m_paramConfigs[c];
         // Make sure the configuration is in the test matrix (e.g. globals)
-        std::unordered_set <uint32_t> case_match;
-        std::unordered_set <uint32_t> subcase_match;
+        std::unordered_set <uint32_t> valid_configs;
         for (unsigned j = 0; j < cases.size(); j++) {
-          bool allOk = true;
-          for (unsigned mm = 0; mm < cases[j]->m_subCases.size(); mm++) {
-            std::unordered_set <uint32_t> subcase_invalid;
-            unsigned sIsOk = 0;
-            unsigned ms = 0;
-            for (unsigned n = 0; n < pc.params.size(); n++) {
-              Param &p = pc.params[n];
-              for (unsigned nn = 0; nn < cases[j]->m_subCases[mm]->params.size(); nn++) {
-                Param &sp = cases[j]->m_subCases[mm]->params[nn];
-                if (p.m_name == sp.m_name) {
-                  ms++;
-                  if (p.m_uValue == sp.m_uValue) {
-                    sIsOk++;
-                    break;
-                  }
-                  else {
-                    subcase_invalid.insert(nn);
-                    break;
-                  }
-                }
-              }
-              for (unsigned q = 0; q < cases[j]->m_settings.params.size(); q++) {
-                Param &cp = cases[j]->m_settings.params[q];
-                if ((p.m_name == cp.m_name) && p.m_param) {
-                  bool gIsOk = false;
-                  bool cIsOk = false;
-                  for (unsigned nn = 0; nn < globals.params.size(); nn++) { // check if this is in the global matrix (is this still necessary?)
-                    Param &gp = globals.params[nn];
-                    if (gp.m_param && !strcasecmp(p.m_param->cname(), gp.m_param->cname()))
-                      for (unsigned v = 0; v < gp.m_uValues.size(); v++)
-                        if (p.m_uValue == gp.m_uValues[v]) {
-                          gIsOk = true;
-                          break;
-                        }
-                  }
-                  if (!gIsOk)
-                    goto NO_MATCH;
-                  if (p.m_uValue == cp.m_uValue) {
-                    cIsOk = true;
-                  }
-                  if (!cIsOk) {
-                    allOk = false;
-                    goto NO_MATCH;
-                  }
-                }
-              }
-              if (allOk)
-                case_match.insert(c);
-              NO_MATCH:continue;   
-            }
-            if (subcase_invalid.empty())
-              subcase_match.insert(c);
-          }
+          cases[j]->validateBuildConfigs(c, pc);
+          valid_configs.insert(cases[j]->m_validBuildConfigs.begin(), cases[j]->m_validBuildConfigs.end());
+          if (valid_configs.empty())
+            continue;
         }
         if (!seenHDL) {
           OS::FileSystem::mkdir(assemblies, true);
@@ -2295,7 +2268,7 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
             unconnected += "ports_unconnected_";
           else if (ucp == 1)
             unconnected += "port_unconnected_";
-          if (subcase_match.find(c) != subcase_match.end())
+          if (valid_configs.find(c) != valid_configs.end())
             if (bitmap_processed.insert(bitmask).second) {
               if ((err = generateHdlAssemblies(w, c, dir + unconnected + temp.str(),
               name + unconnected + temp.str(), false, assyDirs, cases[n]->m_ports)))
