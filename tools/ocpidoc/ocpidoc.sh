@@ -64,7 +64,7 @@ fi
 
   $PYCMD -m venv $VENV_DIR
   source $VENV_DIR/bin/activate
-  pip3 install docutils==0.16 sphinx sphinx_rtd_theme sphinxcontrib_spelling
+  pip3 install docutils "sphinx>=4.3.0" "sphinx-rtd-theme>=0.5.1" sphinxcontrib-spelling
   deactivate ;
 }
 
