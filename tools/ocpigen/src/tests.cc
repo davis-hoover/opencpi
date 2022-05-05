@@ -896,7 +896,7 @@ namespace {
       }
     }
 
-    void 
+    void
     validateBuildConfigs (unsigned c, ParamConfig &pc) {
       for (unsigned mm = 0; mm < m_subCases.size(); mm++) {
         std::unordered_set <uint32_t> config_invalid;
@@ -905,11 +905,9 @@ namespace {
           for (unsigned nn = 0; nn < m_subCases[mm]->params.size(); nn++) {
             Param &sp = m_subCases[mm]->params[nn];
             if (p.m_name == sp.m_name) {
-              if (p.m_uValue == sp.m_uValue)
-                break;
-              else
+              if (p.m_uValue != sp.m_uValue)
                 config_invalid.insert(nn);
-                break;              
+              break;
             }
           }
         }
