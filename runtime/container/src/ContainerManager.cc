@@ -21,6 +21,7 @@
 #include "lzma.h"                   // just for linkage hooks
 #include "zlib.h"                   // just for linkage hooks
 #include "pthread_workqueue.h"      // just for linkage hooks
+#include "gpsd_config.h"            // just for linkage hooks
 #include "gpsd.h"                   // just for linkage hooks
 #include "ocpi-config.h"
 #include "OsSocket.hh"           // just for linkage hooks
@@ -253,7 +254,7 @@ namespace OCPI {
       OS::Semaphore sem;
       gzerror(NULL, (int*)0);
       // p.applyConnectParams(NULL, NULL);
-      ((Application*)0)->createWorker(NULL, NULL, NULL, NULL, NULL, NULL);
+      ((Application*)linkme)->createWorker(NULL, NULL, NULL, NULL, NULL, NULL);
       pthread_workqueue_create_np(NULL, NULL);
       pthread_workqueue_additem_np(NULL, NULL, NULL, NULL, NULL);
       // DRC support

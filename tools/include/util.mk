@@ -1614,9 +1614,13 @@ OcpiProjectFromPlatformDir=$(infox OPFPD:$1:$2)$(strip\
 OcpiWarn=$(shell echo Warning:' $(strip $1 $2 $3 $4 $5 $6 $7 $8 $9)' >&2)
 OcpiInfo=$(shell echo '$(strip $1 $2 $3 $4 $5 $6 $7 $8 $9)' >&2)
 
+# Special rules apply if we are running in a container.
+OcpiIsContainer=$(or $(wildcard /.dockerenv),$(wildcard /run/.containerenv))
+
 # Given a platform "family", return the kernel source directory if it exists.
 OcpiGetKernelDir=$(infox OGKD:$(1))$(strip\
-  $(or $(call OcpiGKD$(1)), $(error platform family $(1) not found)))
+  $(if $(call OcpiIsContainer), $(callx OcpiInfo,OGKD: container environment detected),\
+  $(or $(call OcpiGKD$(1)), $(error platform family $(1) not found))))
 
 # non-family-specific warning message emitter
 OcpiKernVerWarn=$(infox OKVW:$(1))$(strip\
@@ -1635,10 +1639,12 @@ OcpiGKDCentos=$(infox OGKDC:)$(strip\
         $(or $(wildcard $(kdir)),$(call OcpiWarn,no kernel headers directory found))))))
 
 # family-specific function for "Ubuntu"
+# Beginning with ubuntu20_04, must ignore "linux-headers-generic" package,
+# i.e., only interested in "linux-headers-<kern_version>-generic" packages.
 OcpiGKDUbuntu=$(infox OGKDU:)$(strip\
   $(foreach krel,$(shell uname -r),\
     $(foreach ktype,$(shell echo $(krel) | cut -f3 -d'-'),\
-      $(foreach hver,$(or $(shell dpkg -l | grep 'linux-headers' | cut -f3 -d' ' | sort -t'-' --version-sort -k 3,4 -k 4,5 | egrep '$(ktype)$$' | tail -1),NOPE),\
+      $(foreach hver,$(or $(shell dpkg -l | grep 'linux-headers' | cut -f3 -d' ' | sort -t'-' --version-sort -k 3,4 -k 4,5 | egrep '$(ktype)$$' | egrep '.*[0-9]+' | tail -1),NOPE),\
         $(if $(filter NOPE,$(hver)),\
           $(call OcpiWarn,no kernel headers for "$(ktype)" kernel installed),\
           $(if $(filter linux-headers-$(krel),$(hver)),,$(call OcpiKernVerWarn,$(subst linux-headers-,,$(hver))))\
