@@ -27,6 +27,7 @@
 #include "ContainerManager.hh"
 #include "HdlContainer.hh"
 #include "HdlDriver.hh"
+#include <gpsd_config.h>
 #include <gpsd.h>
 
 bool OCPI::HDL::Driver::m_gpsdTimeout = false;
@@ -356,7 +357,7 @@ namespace OCPI {
       }
       if (m_gpsdp->m_session.gpsdata.fix.mode >= MODE_2D)
 	// Only use seconds
-        return OS::Time((uint32_t)lround(m_gpsdp->m_session.gpsdata.fix.time), 0);
+        return OS::Time((uint32_t)m_gpsdp->m_session.gpsdata.fix.time.tv_sec, 0);
       else
         isGps = false;
       ocpiInfo("HDL Driver: GPS fix not acquired");

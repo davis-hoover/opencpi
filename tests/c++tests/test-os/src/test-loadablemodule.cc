@@ -33,8 +33,8 @@ namespace {
       std::string sym_to_load, library_to_load;
       void SetUp() /* override */ {
 #if  defined(OCPI_OS_linux)
-        library_to_load = "librt.";
-        sym_to_load = "clock_gettime";
+        library_to_load = "libz.";
+        sym_to_load = "crc32";
 #elif   defined(OCPI_OS_macos)
         library_to_load = "libm.";
         sym_to_load = "atan";

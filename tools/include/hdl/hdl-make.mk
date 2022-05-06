@@ -825,7 +825,7 @@ define HdlPrepareAssembly
   WorkerSourceFiles=$$(ImplFile)
   # 5. Set the workers-required variables from the generated AssyWorkersFile, target independent
   HdlInstances:=$$(and $$(AssyWorkersFile),$$(strip\
-                   $$(foreach i,$$(shell grep -h -v '\\\#' $$(AssyWorkersFile)),\
+                   $$(foreach i,$$(shell grep -h -v '^\#' $$(AssyWorkersFile)),\
 	              $$(if $$(filter $$(call HdlInstanceWkr,$$i),$$(HdlPlatformWorkers)),,$$i))))
   HdlWorkers:=$$(call Unique,$$(foreach i,$$(HdlInstances),$$(call HdlInstanceWkrCfg,$$i)))
 
