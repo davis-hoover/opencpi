@@ -549,7 +549,7 @@ echo "========Deleting component libraries"
 for lib in ${complibs[@]} ; do
   do_ocpidev delete -f worker "comp_$lib".hdl -l $lib
   for c in ${compseq1[@]}; do
-    do_ocpidev delete -f spec $c -l $lib
+    do_ocpidev delete -f component $c -l $lib
     do_ocpidev delete -f test $c -l $lib
     do_ocpidev delete -f worker "$c".hdl -l $lib
   done

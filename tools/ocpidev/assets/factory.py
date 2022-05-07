@@ -24,7 +24,7 @@ from functools import partial
 import os,sys
 from pathlib import Path
 import _opencpi.util as ocpiutil
-from .abstract import Asset
+import _opencpi.assets.abstract as ocpiabstract
 
 class AssetFactory():
     """
@@ -87,6 +87,7 @@ class AssetFactory():
                 'hdl-worker':              _opencpi.assets.worker.HdlLibraryWorker,
                 'libraries':               _opencpi.assets.library.LibrariesCollection,
                 'library':                 _opencpi.assets.library.Library,
+                'ocl-worker':              _opencpi.assets.worker.OclWorker,
                 'platforms':               _opencpi.assets.platform.PlatformsCollection,
                 'prerequisite':            _opencpi.assets.prerequisite.Prerequisite,
                 'prerequisites':           _opencpi.assets.prerequisite.PrerequisitesCollection,
@@ -182,7 +183,8 @@ class AssetFactory():
             if asset_cls not in cls.__assets:
                 cls.__assets[asset_cls] = {}
             asset_inst_dict = cls.__assets[asset_cls]
-            asset_path, asset_name, asset_parent = Asset.get_asset_path(directory, name, kwargs)
+            asset_path, asset_name, asset_parent =\
+                ocpiabstract.Asset.get_asset_path(directory, name, kwargs)
 
             real_dir = str(asset_path)
             asset = asset_inst_dict.get(real_dir)

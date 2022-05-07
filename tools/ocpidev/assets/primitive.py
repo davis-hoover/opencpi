@@ -53,7 +53,7 @@ class Primitive(BuildableAsset):
     all_primitive_xml_elems = ''
 
     @staticmethod
-    def do_create(name, directory, pretty_type, asset_type, template, parent_class, verbose=None,
+    def do_create(name, directory, pretty_type, asset_type, template, verbose=None,
                   **kwargs):
         """
         Create a primitive - called by each derived class
@@ -62,7 +62,8 @@ class Primitive(BuildableAsset):
             Asset.start_creation(directory, name, pretty_type, kwargs)
         if not parent_path.exists():
             kwargs.pop('name',None)
-            parent_class.create(None, parent_path, verbose=verbose, **kwargs)
+            HdlPrimitivesCollection.create(parent_path.name, parent_path.parent, verbose=verbose,
+                                           **kwargs)
         dir_path.mkdir(parents=True)
         ocpiutil.write_file_from_string(dir_path.joinpath(name.split('.')[0] + ".xml"),
                                         Asset.process_template(template).render({'name' : name,
@@ -97,6 +98,7 @@ class HdlPrimitiveLibrary(HdlPrimitive):
         Construct HdlPrimitiveLibrary instance, and initialize configurations of this worker.
         Forward kwargs to configuration initialization.
         """
+        self.asset_type = 'hdl-library'
         super().__init__(directory, name, **kwargs)
         self.check_dirtype('hdl-library', self.directory)
 
@@ -120,7 +122,7 @@ class HdlPrimitiveLibrary(HdlPrimitive):
         Create an HDL library worker
         """
         Primitive.do_create(name, directory, 'HDL primitive library', 'hdl-library',
-                            __class__.template_xml, HdlPrimitivesCollection, **kwargs)
+                            __class__.template_xml, **kwargs)
 
 class HdlPrimitiveCore(HdlPrimitive):
     """
@@ -131,6 +133,7 @@ class HdlPrimitiveCore(HdlPrimitive):
         Construct HdlPrimitiveLibrary instance, and initialize configurations of this worker.
         Forward kwargs to configuration initialization.
         """
+        self.asset_type = 'hdl-core'
         super().__init__(directory, name, **kwargs)
         self.check_dirtype('hdl-core', self.directory)
 
@@ -155,7 +158,7 @@ class HdlPrimitiveCore(HdlPrimitive):
         """
         assert kwargs.get('model')
         HdlPrimitive.do_create(name, directory, 'HDL primitive core', 'hdl-core',
-                               __class__.template_xml, HdlPrimitivesCollection, **kwargs)
+                               __class__.template_xml, **kwargs)
 
 class PrimitivesCollection(ShowableAsset):
 
@@ -167,7 +170,7 @@ class PrimitivesCollection(ShowableAsset):
         assert model and template_xml
         dir_path, name, parent_path = \
             Asset.start_creation(directory, name, f'{model.upper()} Primitives', kwargs)
-        assert dir_path.name == 'primitives'
+        assert name == 'primitives'
         dir_path.mkdir(parents=True)
         template = jinja2.Template(template_xml, trim_blocks=True)
         ocpiutil.write_file_from_string(dir_path.joinpath('primitives.xml'),

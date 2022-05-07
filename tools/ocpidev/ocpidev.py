@@ -27,6 +27,7 @@ from pathlib import Path
 import _opencpi.assets.factory as ocpifactory
 import _opencpi.assets.registry as ocpiregistry
 import _opencpi.assets.library as ocpilibrary
+import _opencpi.assets.abstract as ocpiabstract
 import _opencpi.util as ocpiutil
 import ocpiargparse
 from ocpidev_args import args_dict
@@ -117,9 +118,10 @@ def main():
         if args.verb == "create" or args.verb == "delete" and not args.noun in ["project", "registry"]:
             projdir = ocpiutil.get_path_to_project_top(parent_dir)
             if projdir:
+                os.chdir(projdir)
                 genProjMetaData.main(projdir)
     except NotImplementedError as e:
-        print(f'There is no support for for the "{args.verb}" operation on "{args.noun}" assets',
+        print(f'There is no support for the "{args.verb}" operation on "{args.noun}" assets',
               file=sys.stderr)
         sys.exit(1)
     except ocpiutil.OCPIException as e:
@@ -135,41 +137,76 @@ def main():
 def postprocess_args(args):
     """
     Post-processes user arguments - do what the argparser is unable to do for various reasons
+    including some backward compatibility hacks like accepting suffixes in names.
+    Also, remove CLI accomodations to common user mistyping before using the API
     """
     if not 'noun' in args or not args.noun:
-        err_msg = ' '.join([
-            'Unable to determine asset type from directory',
-            '"{}"'.format(str(Path().cwd())),
-            '\nPlease provide asset type as "noun" argument'
-        ])
-        ocpiutil.logging.error(err_msg)
+        ocpiutil.logging.error(f'Unable to determine asset type from directory '+
+                               f'"{Path().cwd()}":  provide asset type as "noun" argument')
         sys.exit(1)
     args.orig_noun = args.noun # some methods like to know the noun before it is "improved"
+    if args.name == '.':
+        args.name = None
     if args.noun == 'spec':
         args.noun = 'component'
         args.file_only = True
-    if hasattr(args, 'rcc-noun'):
-        args.model = 'rcc'
-    elif args.noun == 'worker':
-        if args.name:
-            args.model = Path(args.name).suffix
-        else:
-            args.model = Path.cwd().suffix
-        if not args.model:
-            err_msg = ' '.join([
-                'Unsupported authoring model "{}"'.format(args.model), 
-                'for worker located at "{}"'.format(args.directory)
-            ])
-            ocpiutil.logging.error(err_msg)
+        print('Warning:  The "spec" noun is deprecated, use "component" instead.\n'+
+              'Warning:  Use the --file-only option to force a single spec file in the "specs"\n'+
+              'Warning:  subdirectory.  The newer default behavior is to create a "<name>.comp"\n'+
+              'Warning:  subdirectory for the component with a <name>-comp.xml file containing\n'+
+              'Warning:  the component specification XML.',
+              file=sys.stderr)
+    # The CLI currently allows for lots of unclean asset names.
+    # Here we scrub this cruft before using the API
+    if args.noun == 'component' and args.name:
+        if args.name.endswith('.xml'):
+            args.name = args.name[:-4]
+        if args.name.endswith('-spec') or args.name.endswith('-comp'):
+            args.name = args.name[:-5]
+    if args.noun == 'protocol' and args.name:
+        if args.name.endswith('.xml'):
+            args.name = args.name[:-4]
+        if args.name.endswith('-prot'):
+            args.name = args.name[:-5]
+    if args.noun in ['hdl-card', 'hdl-slot'] and args.name:
+        if args.name.endswith('.xml'):
+            args.name = args.name[:-4]
+        if args.name.endswith('-' + args.noun[4:]):
+            args.name = args.name[:-5]
+    for model in ocpiabstract.Asset.valid_authoring_models:
+        if hasattr(args, model + '_noun'):
+            args.model = 'model'
+    if args.noun == 'worker':
+        # exceptional case where special characters are valid in asset names
+        name = args.name if args.name else Path.cwd().name
+        split = name.split('.')
+        if len(split) != 2 or split[0] == '' or split[1] == '':
+            ocpiutil.logging.error(f'the name "{name}" for a worker must include the '+
+                                   f'authoring model after a period')
             sys.exit(1)
-        args.noun = args.model[1:] + '-worker'
+        args.name = split[0]
+        args.model = split[1]
+        if args.model not in ocpiabstract.Asset.valid_authoring_models:
+            ocpiutil.logging.error(f'"{args.model}" is an invalid authoring model.  Valid ones '+
+                                   f'are "{ocpiabstract.Asset.valid_authoring_models}"')
+            sys.exit(1)
+        args.noun = args.model + '-worker'
     elif args.noun == 'hdl-primitive':
         args.noun = 'hdl-' + args.primitive_noun
         delattr(args, 'hdl_noun')
         delattr(args, 'primitive_noun')
         args.model = 'hdl'
-    else:
+    elif args.noun == 'hdl-device':
+        if args.name and args.name.endswith('.hdl'):
+            args.name = args.name[:-4]
         args.model = 'hdl'
+    elif args.noun == 'test':
+        if args.name and args.name.endswith('.test'):
+            args.name = args.name.split('.')[0]
+    if args.noun not in ['registry', 'project'] and args.name and (not args.name.isidentifier() or
+                                                                   args.name[0] == '_'):
+        ocpiutil.logging.error(f'"{args.name}" is an invalid asset name.')
+        sys.exit(1)
     if not getattr(args, 'format',None):
         if getattr(args, 'simple',None):
             args.format = 'simple'
@@ -259,8 +296,6 @@ def find_hdl_device(args, target_path, cwd_type, noun, name):
         target_path = target_path.joinpath('specs')
     elif noun == 'hdl-device': # devices default to the devices library
         target_path = target_path.joinpath('hdl','devices')
-        if '.' not in name:
-            name += ".hdl"
     elif noun == 'hdl-card': # cards default to the cards library
         target_path = target_path.joinpath('hdl','cards')
     elif noun == 'hdl-slot': # slots default to the cards library
@@ -290,7 +325,8 @@ def find_library(args, parent_path, parent_type, noun, name):
         return parent_path, parent_type, noun, name, False
     # So if noun is not a library, we are looking for things *inside* a library
     if parent_type == 'libraries':
-        assert library
+        if not library:
+           raise ocpiutil.OCPIException(f'no library was specified in a "libraries" directory')
         parent_path = parent_path.joinpath(library)
     elif library:
         parent_path = parent_path.joinpath('components',
@@ -304,6 +340,8 @@ def find_library(args, parent_path, parent_type, noun, name):
        if not parent_path.is_dir() or ocpiutil.get_dirtype(parent_path) != 'library':
            raise ocpiutil.OCPIException(f'no library was specified and a single "components" '+
                                         f'library does not exist')
+    if args.ensure_exists and not parent_path.is_dir():
+        raise ocpiutil.OCPIException(f'no library exists at "{parent_path}"')
     return parent_path, 'library', noun, name, False
 
 def find_library_or_project(args, target_path, cwd_type, noun, name):
@@ -373,12 +411,22 @@ def get_parent(args, cwd, cwd_asset_type, ensure_exists=True):
     "Whether-to-collect" means that the parent must be queried for some plural noun, which can
     never happen when the target asset type is the type of the CWD.
     """
-
-    if cwd_asset_type == args.noun:
-        if args.name and args.name != '.' and args.name != cwd.name:
-            raise ocpiutil.OCPIException(f'When in a "{cwd_asset_type}" directory for the asset '+
-                                         f'"{cwd.name}", the given name "{args.name}" is wrong.')
-        return cwd.parent, 'unknown', args.noun, cwd.name, False
+    if cwd_asset_type == args.noun:        # shortcut if we are in the right dirtype already
+        if args.name: # if a name is supplied make sure it matches the cwd
+            # If name is provided, make sure it is consistent with CWD
+            # Note post processing of args.name has already stripped any suffixes
+            # FIXME:  make this test O-O based on asset type, not here in the CLI
+            name = args.name
+            if args.noun.endswith('worker'):
+                name += '.' + args.model
+            elif args.noun == 'component':
+                name += '.comp'
+            elif args.noun == 'test':
+                name += '.test'
+            if name != cwd.name:
+                raise ocpiutil.OCPIException(f'When in the "{cwd_asset_type}" directory "{cwd}", '+
+                                             f'the given name "{args.name}" is wrong.')
+        return cwd.parent, 'unknown', args.noun, cwd.stem, False
     # Dictionary to map the pair of [CWD asset type, target asset type (noun) ] to
     # information that helps determine the ultimate parent of the targeted asset
     parent_dict = {
@@ -421,6 +469,7 @@ def get_parent(args, cwd, cwd_asset_type, ensure_exists=True):
             'hdl-worker':              { 'name' : True, 'finder' : find_library},
             'libraries':               { 'name' : False, 'plural' : True},
             'library':                 { 'name' : True, 'finder' : find_library},
+            'ocl-worker':              { 'name' : True, 'finder' : find_library},
             'platforms':               { 'name' : False, 'plural' : True},
             'prerequisite':            { 'name' : True},
             'prerequisites':           {},
@@ -489,6 +538,7 @@ def get_parent(args, cwd, cwd_asset_type, ensure_exists=True):
             'component':               { 'name' : True},
             'components':              { 'name' : False},
             'hdl-worker':              { 'name' : True},
+            'ocl-worker':              { 'name' : True},
             'protocol':                { 'name' : True},
             'protocols':               { 'name' : False},
             'rcc-worker':              { 'name' : True},
@@ -543,8 +593,9 @@ def get_parent(args, cwd, cwd_asset_type, ensure_exists=True):
     assert pmap
     pmap = pmap.get(noun)
     if pmap == None:
-        raise ocpiutil.OCPIException(f'When in a "{cwd_asset_type}" directory, operating on a '+
-                                     f'"{noun}" is invalid')
+        raise ocpiutil.OCPIException(f'When in a "{cwd_asset_type}" directory, operating on '+
+                                     f'{"" if noun.endswith("s") else "a "}'+
+                                     f'{noun} is invalid')
     map_name = pmap.get('name')
     if map_name == False:
         if name:
@@ -575,6 +626,7 @@ def get_parent(args, cwd, cwd_asset_type, ensure_exists=True):
     collect = pmap.get('plural')
     finder = pmap.get('finder')
     if finder:
+        args.ensure_exists = ensure_exists
         parent_path, parent_type, noun, name, collect = \
             finder(args, parent_path, parent_type, noun, name)
     if ensure_exists and not pmap.get('optional'):

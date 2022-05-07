@@ -41,6 +41,7 @@ class Application(RunnableAsset, RCCBuildableAsset):
         valid kwargs handled at this level are:
             None
         """
+        self.asset_type = 'application'
         super().__init__(directory, name, **kwargs)
         if name:
             if fnmatch.fnmatch(name, '*.xml'): # explicit .xml implies non-dir app
@@ -147,6 +148,7 @@ class ApplicationsCollection(RunnableAsset, RCCBuildableAsset):
             run_after (list) - Arguments to insert at the end of the execution command line A
             run_arg (list) - Arguments to insert immediately after the ACI executable or ocpirun
         """
+        self.asset_type = 'applications'
         super().__init__(directory, name, **kwargs)
         self.check_dirtype("applications", self.directory)
         self.applications = kwargs.get('assets')
@@ -161,14 +163,15 @@ class ApplicationsCollection(RunnableAsset, RCCBuildableAsset):
     @classmethod
     def resolve_child(cls, parent_path, asset_type, args):
         assert asset_type == 'application'
+        xml_app = getattr(args, 'xml_all', None)
         if args.name.endswith('.xml'):
             args.name = args.name[:-4]
             xml_only = True
             args.xml_app = True
             args.xml_dir_app = False
-        elif args.xml_app:
+        elif xml_app:
             xml_only = True
-        elif parent_path.joinpath(args.name + '.xml').exists() and verb != 'create':
+        elif parent_path.joinpath(args.name + '.xml').exists() and args.verb != 'create':
             xml_only = True
         else:
             xml_only = False

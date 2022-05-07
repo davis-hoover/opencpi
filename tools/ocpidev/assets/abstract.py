@@ -24,6 +24,7 @@ import os
 import sys
 import logging
 import re
+import types
 import jinja2
 from pathlib import Path
 import copy
@@ -38,7 +39,7 @@ class Asset(metaclass=ABCMeta):
     Not officially a virtual class but objects of this class are not intended to be directly
     created.
     """
-    valid_authoring_models = ["rcc", "hdl"]
+    valid_authoring_models = ['rcc', 'hdl', 'ocl']
     valid_settings = []
     instances_should_be_cached = False
 
@@ -52,13 +53,36 @@ class Asset(metaclass=ABCMeta):
                         both relative and global file paths are valid.
         """
         directory = str(directory)
-        if not name:
-            self.name = os.path.basename(directory)
-            directory = os.path.dirname(directory)
-        else:
-            self.name = name
+        child_path = kwargs.get('child_path')
         self.parent = Path(directory).resolve() # This is the parent
         self.verbose = kwargs.get('verbose')
+        self.name = name
+        if not name:
+            # If name not specified, caller is implicitly saying that the
+            # asset is of a type where the basename is indeed the asset name
+            # FIXME: make this illegal for the API
+            self.name = self.parent.name
+            self.parent = self.parent.parent
+        elif not child_path:
+            # The API has been called without a separate resolve_child being done
+            # so we do it now.  This also assumes that the directory argument is indeed
+            # the parent of the asset
+            # FIXME:  the parent should be an object in all cases...
+            # FIXME:  this is in fact where resolve_child should *always* be done
+            parent_type = ocpiutil.get_dirtype(self.parent)
+            if parent_type:
+                # FIXME: This is a layering violation that can be fixed by merging
+                # the factory stuff here in this "base class" file.
+                from  _opencpi.assets.factory import AssetFactory
+                parent_class = AssetFactory.get_class_from_asset_type(parent_type,
+                                                                      self.parent.name)
+                args = types.SimpleNamespace(**kwargs)
+                args.name = name
+                parent_class.resolve_child(self.parent, self.asset_type, args)
+                child_path = args.child_path
+            else:
+                # No asset type means we are not in projects
+                child_path = name
         # Derived classes are expected to set this, but intermediate classes
         # might test for it being set or not to detect whether the intermediate
         # class is actually the instantiated one
@@ -67,17 +91,20 @@ class Asset(metaclass=ABCMeta):
         if not getattr(self, 'make_type', None):
             self.make_type = None
         # Location is the file *or* directory that represents the asset
-        child_path = kwargs.get('child_path')
         self.path = self.parent.joinpath(str(child_path) if child_path else self.name)
         self.directory = str(self.path) # for old code
+        if not kwargs.get('non_existent_ok') and not self.path.exists():
+            raise ocpiutil.OCPIException(f'Requested {self.asset_type} at "{self.path}" does not '+
+                                         f'exist')
         if not getattr(self,'out_of_project',None):
-            if not ocpiutil.is_path_in_project(self.directory):
+            if not ocpiutil.is_path_in_project(self.path):
                 raise ocpiutil.OCPIException(f'Requested asset directory "{directory}" is not in '+
                                              f'a project')
 
     @classmethod
     def resolve_child(cls, path, child_asset_type, args):
         """ Resolve the actual path for a child asset if needed """
+        args.child_path = args.name
 
     @staticmethod
     def get_asset_path(directory, name, args):
@@ -171,33 +198,29 @@ class Asset(metaclass=ABCMeta):
                                 "for directory {}".format(directory)])
             raise ocpiutil.OCPIException(err_msg)
 
-    def delete(self, noun='asset', force=False, **kwargs):
+    def delete(self, force=False, verbose=None, **kwargs):
         """
-        Remove the Asset from disk.  Any additional cleanup on a per asset basis can be done in
-        the child implementations of this function
+        Remove the asset from the file system.  Any additional cleanup on a per asset basis can be done in
+        the derived class method after calling this base class method
 
         Return True if deletion actually took place
         """
-        path = Path(self.directory)
-        if not force:
-            prompt = 'Delete {} at: {}'.format(noun, str(path))
-            force = ocpiutil.get_ok(prompt=prompt)
-        if force:
+        message = f'the {self.asset_type.replace("-", " ")} named "{self.name}" at {self.path}'
+        if force or ocpiutil.get_ok(prompt=f'Delete {message}', default=None):
             try:
-                if path.is_dir():
-                    shutil.rmtree(str(path))
-                else:
-                    path.unlink()
-                simple_noun = noun.replace("-", " ")
-                basic_name = self.name.split(".")[0]
-                msg = "Successfully deleted {} '{}'".format(
-                    simple_noun if simple_noun else str(path), basic_name)
-                print(msg)
+                if self.path.is_dir():
+                    shutil.rmtree(self.path)
+                else: # a file based asset in specs, maybe with rst, maybe with lib/symlink
+                    self.path.unlink()
+                    rst_path = self.path.with_suffix('.rst')
+                    if rst_path.exists(): rst_path.unlink() # use missing_ok=True in python 3.8
+                    lib_path = self.path.parent.parent.joinpath("lib", self.path.name)
+                    if lib_path.is_symlink(): lib_path.unlink() # use missing_ok=True in python 3.8
+                if verbose or not force:
+                    print(f'Successfully deleted {message}')
                 return True
             except Exception as e:
-                err_msg = 'Failed to delete {}\n{}'.format(
-                    noun if noun else str(path), e)
-                logging.error(err_msg)
+                logging.error(f'Failed to delete {message}')
         return False
 
     @classmethod
@@ -252,8 +275,8 @@ class Asset(metaclass=ABCMeta):
         if suffix and name.endswith('-' + suffix): # backward
             file_name = name
         elif '-' in name or '.' in name:
-            raise ocpiutil.OCPIException(f'internal: unexpected name for {asset_type} creation:  '+
-                                         f'{name}')
+            raise ocpiutil.OCPIException(f'invalid name for {asset_type} creation '+
+                                         f'contains periods or bad suffix after hyphen: "{name}"')
         elif suffix:
             file_name = name + '-' + suffix
         else:

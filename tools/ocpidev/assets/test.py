@@ -47,6 +47,7 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
             mode (list) - Specify which phases of the unit test to run
             remote_test_sys (list) - Specify remote systems to run the test(s)
         """
+        self.asset_type = 'test'
         super().__init__(directory, name, **kwargs)
         if not kwargs.get('child_path') and not self.directory.endswith('.test'):
             self.directory += '.test'
@@ -162,6 +163,7 @@ class TestsCollection(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
     def __init__(self, directory, name=None, assets=None, **kwargs):
         if assets != None:
             self.out_of_project = True
+        self.asset_type = 'tests'
         super().__init__(directory, name, **kwargs)
         self.tests = []
         if assets != None:

@@ -51,7 +51,12 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         Initializes Project member data  and calls the super class __init__.  Throws an
         exception if the directory passed in is not a valid project directory.
         """
+        self.asset_type = 'project'
+        # This next line is saying that that there is no resolution from a parent.
+        # FIXME: stop callers using name==None ever
+        kwargs['child_path'] = name if name else Path(directory).name
         super().__init__(directory, name, **kwargs)
+        kwargs.pop('child_path', None) # ugh.
         self.check_dirtype("project", self.directory)
         self.lib_list = None
         self.apps_col_list = None
@@ -96,7 +101,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         Resolve the actual relative path and name for a child asset as needed
         Here is the knowledge of where various assets live inside a project
         """
-        assert asset_type in ['library', 'component', 'protocol', 'hdl-slot']
+        assert asset_type in ['library', 'component', 'protocol', 'hdl-slot', 'applications', 'libraries']
         name = args.name
         if asset_type == 'library':
             if name == 'components':
@@ -104,21 +109,11 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
             else:
                 args.child_path = Path("components", name)
         elif asset_type in ['component', 'protocol', 'hdl-slot']:
-            if name.endswith(".xml"):
-                name = name[:-4]
-            suffixes = {'component':['_spec','-spec'],
-                        'protocol': ['_prot', '-prot']}.get(asset_type)
-            if suffixes and name[-5:] in suffixes:
-                args.child_path = Path("specs", name + ".xml")
-                args.name = name[:-5]
-            else: # Raw/clean name
-                if suffixes:
-                    for s in suffixes: # note last suffix is used if nothing found
-                        args.child_path = Path("specs", name + s + ".xml")
-                        if path.joinpath(args.child_path).exists():
-                            break
-                else:
-                    args.child_path = Path("specs", name + ".xml")
+            args.name, args.child_path = Library.resolve_file_child(asset_type, path, args)
+        elif asset_type == 'applications':
+            args.child_path = 'applications'
+        elif asset_type == 'libraries':
+            args.child_path = 'components'
 
     def _initialize_platforms(self, verb=None, verbose=None, **kwargs):
         """
@@ -1311,6 +1306,7 @@ class ProjectsCollection(ShowableAsset):
 
     def __init__(self, directory, name=None, verb=None, assets=None, **kwargs):
         self.out_of_project = True
+        self.asset_type = 'projects'
         super().__init__(directory, name, **kwargs)
         assert assets != None
         self.projects = []

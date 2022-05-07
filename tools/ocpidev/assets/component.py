@@ -297,6 +297,8 @@ class Component(ShowableComponent,BuildableAsset):
         elif dir_path.parts[-2] == 'specs':
             name = dir_path.parts[-1]
             directory = str(dir_path.parent.parent)
+        if not getattr(self, 'asset_type', None):
+            self.asset_type = 'component'
         super().__init__(directory, name, **kwargs)
         package_id = kwargs.get("package_id")
         self.package_id = package_id if package_id else self._init_package_id()
@@ -341,22 +343,6 @@ class Component(ShowableComponent,BuildableAsset):
         else:
             json.dump(json_dict, sys.stdout)
             print()
-
-    def add_link(filename, directory="."):
-        libdir = Path(directory, "lib")
-        if not libdir.exists():
-            os.mkdir(libdir)
-        specdir = Path(directory, "specs")
-        if not specdir.exists():
-            os.mkdir(specdir)
-        # Symlinks must have relative paths
-        savepath = os.getcwd()
-        os.chdir(directory)
-        lnkfile = "lib/" + filename
-        if not os.path.exists(lnkfile):
-            specfile = "../specs/" + filename
-            os.symlink(specfile, lnkfile)
-        os.chdir(savepath)
 
     @staticmethod
     def get_workers(directory="."):
@@ -421,39 +407,33 @@ class Component(ShowableComponent,BuildableAsset):
                                 kwargs,
                                 dir_suffix=None if file_only else '.comp')
 
-    def delete(self, force=False, **kwargs):
+    def delete(self, **kwargs):
         """
-        Delete the component, which might mean:
-        1. If there is only a spec file, delete it
-        2. If there is only a .comp directory (with a spec file inside it), delete it
-        3. If there is a spec in specs, and a .comp directory (without a spec), delete both
-        The super class method will not do both, so we use it for the directory case.
+        Delete the component, whether file-based or directory-based
         """
-        file_path = Path(self.directory)
-        if not self.directory.endswith('spec.xml') and not self.directory.endswith('.comp'):
-            raise ocpiutil.OCPIException(f'unexpected component file not ending in [-_]spec.xml or .comp: {self.directory}')
-        name = file_path.name[:-9]
-        dir_path = Path(self.directory)
-        # First remove the symlink that might be there, without asking (since building will recreate it).
-        link = list(dir_path.parent.joinpath("lib").glob(name + "[-_]spec.xml"))
-        if len(link) == 1:
-            link[0].unlink()
-        # Since the user will be asked (if !force), ask about the .comp directory first, if it applies:
-        if dir_path.name == "specs":
-            if not super().delete('component', force): # delete spec file in specs
-                return False
-            dir_path = dir_path.parent.joinpath(name + ".comp")
-            if not dir_path.exists():
-                return True
-            self.directory = str(dir_path)
-        # Now we remove the .comp dir
-        self.name = dir_path.name # force a directory deletion in the superclass method
-        return super().delete('component', force) # delete spec file
+
+        was_dir = self.path.is_dir()
+        if not super().delete(**kwargs):
+            return False # user declined to delete, file or directory
+        if was_dir:
+            # When the component is a directory, the base class method does not deal with
+            # the symlink in lib/ nor the possibility that there is still a spec file in specs.
+            for suffix in ['_spec', '-spec', '-comp']:
+                name = self.name + suffix + '.xml'
+                path = self.path.parent.joinpath('lib', name)
+                if path.is_symlink():  path.unlink()
+                path = self.path.parent.joinpath('specs', name)
+                if path.exists(): path.unlink()
+        return True
 
 class Protocol(Component):
     """
     Any OpenCPI Protocol.
     """
+    def __init__(self, directory, name=None, **kwargs):
+        self.asset_type = 'protocol'
+        super().__init__(directory, name, **kwargs)
+
     @classmethod
     def is_component_prot_file(cls, file):
         """
@@ -517,18 +497,14 @@ class Protocol(Component):
                                 __class__._get_template_dict,
                                 __class__._get_project_package_id(parent_path, **kwargs), kwargs)
 
-    def delete(self, force=False, **kwargs):
-        """
-        Delete the Protocol
-        """
-        # bad inheritance hierarchy, should not inherit "component"
-        return ShowableComponent.delete(self, 'protocol', force) # delete protocol file
-
-
 class HdlSlot(Component):
     """
     Any OpenCPI HDL Slot
     """
+
+    def __init__(self, directory, name=None, **kwargs):
+        self.asset_type = 'hdl-slot'
+        super().__init__(directory, name, **kwargs)
 
     @staticmethod
     def _get_template_dict(name, directory, **kwargs):
@@ -554,13 +530,6 @@ class HdlSlot(Component):
                                 __class__._get_template_dict,
                                 __class__._get_project_package_id(parent_path, **kwargs),
                                 kwargs)
-
-    def delete(self, force=False, **kwargs):
-        """
-        Delete the Slot
-        """
-        # bad inheritance hierarchy, should not inherit "component"
-        return ShowableComponent.delete(self, 'hdl-slot', force) # delete spec file
 
 class HdlCard(HdlSlot):
     """
@@ -599,6 +568,7 @@ class ComponentsCollection(ShowableAsset):
     def __init__(self, directory=None, name=None, assets=None, **kwargs):
         if assets != None:
             self.out_of_project = True
+        self.asset_type = 'components'
         super().__init__(directory, name, **kwargs)
         self.components = []
         if assets != None:

@@ -367,7 +367,7 @@ class TestPathFunctions(unittest.TestCase):
             # Manually remove mypj8 because it is not in PROJECT_PACKAGES since only
             # its exported version is used
             ocpidev_command += OCPIDEV_CMD + " -f delete project mypj8; "
-            ocpidev_command += OCPIDEV_CMD + " -f unregister project ocpi.core; "
+            ocpidev_command += "rm project-registry/ocpi.core;" # it is here because we hacked the link
             ocpidev_command += OCPIDEV_CMD + " -f delete registry project-registry; "
             process = subprocess.Popen(ocpidev_command, stdout=subprocess.PIPE, shell=True)
             if process.communicate()[1] or process.returncode != 0:
