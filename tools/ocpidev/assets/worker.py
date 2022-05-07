@@ -39,13 +39,8 @@ class Worker(ShowableComponent):
     type. In general, something is a worker if it has an OWD (OpenCPI Worker Description File),
     and implements an OCS (OpenCPI Component Specification).
     """
-    def __init__(self, directory, name=None, model=None, **kwargs):
+    def __init__(self, directory, name=None, **kwargs):
         super().__init__(directory, name, **kwargs)
-        if not self.asset_type:
-            self.asset_type = 'worker'
-        if not self.make_type:
-            self.make_type = 'worker'
-        self.model = model if model else self.name.split('.')[1]
         self.make_type = 'worker'
         package_id = kwargs.get("package_id")
         self.package_id = package_id if package_id else self._init_package_id()
@@ -110,6 +105,8 @@ class Worker(ShowableComponent):
         """
         Create a worker - called by each derived class
         """
+        if name and '.' not in name and not asset_type.endswith("platform"):
+            name += '.' + kwargs['model']
         dir_path, kwargs['name'], parent_path = \
             Asset.start_creation(directory, name, pretty_type, kwargs)
         # This assertion is not valid for hdl/devices etc. at least for now.
@@ -177,6 +174,8 @@ class Worker(ShowableComponent):
         Parse this worker's build XML and populate its "configs" dictionary
         with mappings of <config-index> -> <config-instance>
         """
+        args = kwargs
+        args['non_existent_ok'] = True
         # Determine if the build XML is named .build or -build.xml
         if os.path.exists(self.directory + "/" + os.path.basename(self.name) + "-build.xml"):
             build_xml = self.directory + "/" + self.name + "-build.xml"
@@ -186,7 +185,7 @@ class Worker(ShowableComponent):
             # If neither is found, there is no build XML and so we assume there is only one config
             # and assign it index 0
             self.build_configs[0] = WorkerConfig(directory=self.directory, name=self.name,
-                                                 config_index=0, **kwargs)
+                                                 config_index=0, **args)
             return
 
         # Begin parsing the build XML
@@ -217,7 +216,7 @@ class Worker(ShowableComponent):
                                                                   name=self.name,
                                                                   config_index=int(config_id),
                                                                   config_params=param_dict,
-                                                                  **kwargs)
+                                                                  **args)
 
     def get_config_params_report(self):
         """
@@ -282,6 +281,7 @@ class RccWorker(Worker,RCCBuildableAsset):
     """
     def __init__(self, directory, name=None, **kwargs):
         self.asset_type = 'rcc-worker'
+        self.model = 'rcc'
         self.make_type = None
         super().__init__(directory, name, **kwargs)
         self.check_dirtype('rcc-worker', self.directory)
@@ -310,6 +310,38 @@ class RccWorker(Worker,RCCBuildableAsset):
         Create an RCC worker
         """
         Worker.do_create(name, directory, 'RCC Worker', 'rcc-worker', __class__.template_xml,
+                         **kwargs)
+
+# Placeholder class
+class OclWorker(Worker,RCCBuildableAsset):
+    """
+    This class represents an OCL worker.
+    """
+    def __init__(self, directory, name=None, **kwargs):
+        self.asset_type = 'ocl-worker'
+        self.model = 'ocl'
+        self.make_type = None
+        super().__init__(directory, name, **kwargs)
+        self.check_dirtype('ocl-worker', self.directory)
+
+    template_xml = (
+        """
+        <!-- This file defines the {{args.name}} OCL worker. -->
+        <OclWorker
+            Language='{{args.language if args.language else "ocl"}}'
+            Version='{{args.version if args.version else '2'}}'"""+Worker.all_worker_xml_attrs+
+        """
+            >"""+Worker.all_worker_xml_elems+
+        """
+        </OclWorker>
+        """)
+
+    @staticmethod
+    def create(name, directory, verbose=None, **kwargs):
+        """
+        Create an OCL worker
+        """
+        Worker.do_create(name, directory, 'OCL Worker', 'ocl-worker', __class__.template_xml,
                          **kwargs)
 
 class HdlCore(HDLBuildableAsset):
@@ -351,12 +383,11 @@ class HdlWorker(Worker, HdlCore):
     Examples are HDL Library Worker, HDL Platform Worker ....
     """
     def __init__(self, directory, name=None, **kwargs):
-        kwargs['model'] = 'hdl'
-        super().__init__(directory, name, **kwargs)
-        if not self.asset_type:
+        if not getattr(self, 'asset_type', None):
             self.asset_type = 'hdl-worker'
-        if not self.make_type:
-            self.make_type = None
+        self.model = 'hdl'
+        kwargs['model'] = 'hdl' # needed?
+        super().__init__(directory, name, **kwargs)
 
 # pylint:enable=too-many-ancestors
 
@@ -454,6 +485,7 @@ class WorkerConfig(ReportableAsset):
                                  configuration's generated files will live and which build
                                  parameters map to this configuration.
         """
+        self.asset_type = 'worker-config'
         super().__init__(directory, name, **kwargs)
         # We expect the config_index to be passed in via kwargs
         # These are generally defined in the worker build XML
@@ -564,34 +596,46 @@ class WorkersCollection(ShowableAsset):
     Collection of workers of any type
     """
     valid_settings = []
+
+    @staticmethod
+    def make_worker(worker_dir, parent_package_id, args):
+        worker_path = Path(worker_dir)
+        worker_name = worker_path.stem
+        worker_model = worker_path.suffix[1:]
+        worker_class = vars(sys.modules[__class__.__module__])[worker_model.title() + 'Worker']
+        return worker_class(worker_path.parent, worker_name,
+                            package_id=parent_package_id + '.' + worker_path.name,
+                            verb=args['verb'])
+
     def __init__(self, directory=None, name=None, assets=None, **kwargs):
         if assets != None:
             self.out_of_project = True
+        self.asset_type = 'workers'
         super().__init__(directory, name, **kwargs)
         self.workers = []
         if assets != None:
-            for worker_dir,parent_package_id in assets:
-                worker_name = Path(worker_dir).name
-                self.workers.append(Worker(worker_dir, None,
-                                           package_id=parent_package_id + '.' + worker_name))
+            for worker_dir, parent_package_id in assets:
+                self.workers.append(__class__.make_worker(worker_dir, parent_package_id, kwargs))
         else:
             self.check_dirtype('library', self.directory)
+            import _opencpi.assets.library as ocpilibrary # accomodate python3.6
+            parent_package_id = ocpilibrary.Library.get_package_id(self.directory)
             for subdir in Path(self.directory).iterdir():
                 if subdir.is_dir() and subdir.name != 'specs':
                     dirtype = ocpiutil.get_dirtype(subdir)
                     if dirtype and dirtype.endswith("worker"):
-                        self.workers.append(Worker(str(subdir), None, **kwargs))
+                        self.workers.append(__class__.make_worker(subdir, parent_package_id, kwargs))
 
     def show(self, format=None, **kwargs):
         """
-        Show all the components in all the projects in the registry
+        Show the workers in the collection
         """
         if format == "simple":
             for wkr in self.workers:
-                print(wkr.name + " ", end="")
+                print(wkr.name + '.' + wkr.model + ' ', end="")
             print()
         elif format == "table":
-            rows = [['Worker', 'Library Package ID', 'Directory']]
+            rows = [['Worker', 'Package ID', 'Directory']]
             for wkr in self.workers:
                 rows.append([wkr.name, wkr.package_id, wkr.directory])
             ocpiutil.print_table(rows, underline="-")

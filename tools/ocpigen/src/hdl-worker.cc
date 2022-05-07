@@ -676,38 +676,38 @@ emitParameters(FILE *f, Language lang, bool useDefaults, bool convert) {
 // Default may be overridden
 void Worker::
 emitDeviceSignal(FILE *f, Language lang, std::string &last, Signal &s, const char *prefix) {
-  std::string name;
+  std::string l_name;
   if (s.m_differential) {
-    OU::format(name, s.m_pos.c_str(), s.m_name.c_str());
-    emitSignal(name.c_str(), f, lang, s.m_direction, last,
+    OU::format(l_name, s.m_pos.c_str(), s.m_name.c_str());
+    emitSignal(l_name.c_str(), f, lang, s.m_direction, last,
 	       s.m_width ? (int)s.m_width : -1, 0, "", s.m_type);
     last += prefix;
-    OU::format(name, s.m_neg.c_str(), s.m_name.c_str());
-    emitSignal(name.c_str(), f, lang, s.m_direction, last,
+    OU::format(l_name, s.m_neg.c_str(), s.m_name.c_str());
+    emitSignal(l_name.c_str(), f, lang, s.m_direction, last,
 	       s.m_width ? (int)s.m_width : -1, 0, "", s.m_type);
   } else if (s.m_direction == Signal::INOUT && !s.m_pin) {
-    OU::format(name, s.m_in.c_str(), s.m_name.c_str());
-    emitSignal(name.c_str(), f, lang, Signal::IN, last,
+    OU::format(l_name, s.m_in.c_str(), s.m_name.c_str());
+    emitSignal(l_name.c_str(), f, lang, Signal::IN, last,
 	       s.m_width ? (int)s.m_width : -1, 0, "", s.m_type);
     last += prefix;
-    OU::format(name, s.m_out.c_str(), s.m_name.c_str());
-    emitSignal(name.c_str(), f, lang, Signal::OUT, last,
+    OU::format(l_name, s.m_out.c_str(), s.m_name.c_str());
+    emitSignal(l_name.c_str(), f, lang, Signal::OUT, last,
 	       s.m_width ? (int)s.m_width : -1, 0, "", s.m_type);
     last += prefix;
-    OU::format(name, s.m_oe.c_str(), s.m_name.c_str());
-    emitSignal(name.c_str(), f, lang, Signal::OUT, last, -1, 0, "", s.m_type);
+    OU::format(l_name, s.m_oe.c_str(), s.m_name.c_str());
+    emitSignal(l_name.c_str(), f, lang, Signal::OUT, last, -1, 0, "", s.m_type);
   } else if (s.m_direction == Signal::OUTIN) {
     assert(!s.m_pin);
-    OU::format(name, s.m_in.c_str(), s.m_name.c_str());
-    emitSignal(name.c_str(), f, lang, Signal::OUT, last,
+    OU::format(l_name, s.m_in.c_str(), s.m_name.c_str());
+    emitSignal(l_name.c_str(), f, lang, Signal::OUT, last,
 	       s.m_width ? (int)s.m_width : -1, 0, "", s.m_type);
     last += prefix;
-    OU::format(name, s.m_out.c_str(), s.m_name.c_str());
-    emitSignal(name.c_str(), f, lang, Signal::IN, last,
+    OU::format(l_name, s.m_out.c_str(), s.m_name.c_str());
+    emitSignal(l_name.c_str(), f, lang, Signal::IN, last,
 	       s.m_width ? (int)s.m_width : -1, 0, "", s.m_type);
     last += prefix;
-    OU::format(name, s.m_oe.c_str(), s.m_name.c_str());
-    emitSignal(name.c_str(), f, lang, Signal::IN, last, -1, 0, "", s.m_type);
+    OU::format(l_name, s.m_oe.c_str(), s.m_name.c_str());
+    emitSignal(l_name.c_str(), f, lang, Signal::IN, last, -1, 0, "", s.m_type);
   }
 #if 0
   else if (s.m_pin && s.m_directionExpr.size())
@@ -1276,44 +1276,44 @@ emitDefsHDL(bool wrap) {
 	const char *dir =
 	  s->m_direction == Signal::IN ? "input" :
 	  (s->m_direction == Signal::OUT ? "output    " : "inout");
-	std::string name;
+	std::string l_name;
 	if (s->m_differential) {
-	  OU::format(name, s->m_pos.c_str(), s->m_name.c_str());
+	  OU::format(l_name, s->m_pos.c_str(), s->m_name.c_str());
 	  if (s->m_width)
-	    fprintf(f, "  %s [%3zu:0] %s;\n", dir, s->m_width - 1, name.c_str());
+	    fprintf(f, "  %s [%3zu:0] %s;\n", dir, s->m_width - 1, l_name.c_str());
 	  else
-	    fprintf(f, "  %s         %s;\n", dir, name.c_str());
-	  OU::format(name, s->m_neg.c_str(), s->m_name.c_str());
+	    fprintf(f, "  %s         %s;\n", dir, l_name.c_str());
+	  OU::format(l_name, s->m_neg.c_str(), s->m_name.c_str());
 	  if (s->m_width)
-	    fprintf(f, "  %s [%3zu:0] %s;\n", dir, s->m_width - 1, name.c_str());
+	    fprintf(f, "  %s [%3zu:0] %s;\n", dir, s->m_width - 1, l_name.c_str());
 	  else
-	    fprintf(f, "  %s         %s;\n", dir, name.c_str());
+	    fprintf(f, "  %s         %s;\n", dir, l_name.c_str());
 	} else if (s->m_direction == Signal::INOUT && !s->m_pin) {
-	  OU::format(name, s->m_in.c_str(), s->m_name.c_str());
+	  OU::format(l_name, s->m_in.c_str(), s->m_name.c_str());
 	  if (s->m_width)
-	    fprintf(f, "  input [%3zu:0] %s;\n", s->m_width - 1, name.c_str());
+	    fprintf(f, "  input [%3zu:0] %s;\n", s->m_width - 1, l_name.c_str());
 	  else
-	    fprintf(f, "  input         %s;\n", name.c_str());
-	  OU::format(name, s->m_out.c_str(), s->m_name.c_str());
+	    fprintf(f, "  input         %s;\n", l_name.c_str());
+	  OU::format(l_name, s->m_out.c_str(), s->m_name.c_str());
 	  if (s->m_width)
-	    fprintf(f, "  output [%3zu:0] %s;\n", s->m_width - 1, name.c_str());
+	    fprintf(f, "  output [%3zu:0] %s;\n", s->m_width - 1, l_name.c_str());
 	  else
-	    fprintf(f, "  output         %s;\n", name.c_str());
-	  OU::format(name, s->m_oe.c_str(), s->m_name.c_str());
-	  fprintf(f, "  output         %s;\n", name.c_str());
+	    fprintf(f, "  output         %s;\n", l_name.c_str());
+	  OU::format(l_name, s->m_oe.c_str(), s->m_name.c_str());
+	  fprintf(f, "  output         %s;\n", l_name.c_str());
 	} else if (s->m_direction == Signal::OUTIN) {
-	  OU::format(name, s->m_in.c_str(), s->m_name.c_str());
+	  OU::format(l_name, s->m_in.c_str(), s->m_name.c_str());
 	  if (s->m_width)
-	    fprintf(f, "  output [%3zu:0] %s;\n", s->m_width - 1, name.c_str());
+	    fprintf(f, "  output [%3zu:0] %s;\n", s->m_width - 1, l_name.c_str());
 	  else
-	    fprintf(f, "  output         %s;\n", name.c_str());
-	  OU::format(name, s->m_out.c_str(), s->m_name.c_str());
+	    fprintf(f, "  output         %s;\n", l_name.c_str());
+	  OU::format(l_name, s->m_out.c_str(), s->m_name.c_str());
 	  if (s->m_width)
-	    fprintf(f, "  input [%3zu:0] %s;\n", s->m_width - 1, name.c_str());
+	    fprintf(f, "  input [%3zu:0] %s;\n", s->m_width - 1, l_name.c_str());
 	  else
-	    fprintf(f, "  input         %s;\n", name.c_str());
-	  OU::format(name, s->m_oe.c_str(), s->m_name.c_str());
-	  fprintf(f, "  input         %s;\n", name.c_str());
+	    fprintf(f, "  input         %s;\n", l_name.c_str());
+	  OU::format(l_name, s->m_oe.c_str(), s->m_name.c_str());
+	  fprintf(f, "  input         %s;\n", l_name.c_str());
 	} else if (s->m_width)
 	  fprintf(f, "  %s [%3zu:0] %s;\n", dir, s->m_width - 1, s->m_name.c_str());
 	else
@@ -1544,21 +1544,21 @@ emitVhdlShell(FILE *f) {
 void Worker::
 emitDeviceSignalMapping(FILE *f, std::string &last, Signal &s, const char *prefix) {
   assert(m_paramConfig);
-  std::string name;
+  std::string l_name;
   if (s.m_direction == Signal::UNUSED && m_type != Container)
     return;
   if (s.m_differential) {
-    OU::format(name, s.m_pos.c_str(), s.m_name.c_str());
-    fprintf(f, "%s%s      %s => %s,\n", last.c_str(), prefix, name.c_str(), name.c_str());
-    OU::format(name, s.m_neg.c_str(), s.m_name.c_str());
-    fprintf(f, "%s      %s => %s", prefix, name.c_str(), name.c_str());
+    OU::format(l_name, s.m_pos.c_str(), s.m_name.c_str());
+    fprintf(f, "%s%s      %s => %s,\n", last.c_str(), prefix, l_name.c_str(), l_name.c_str());
+    OU::format(l_name, s.m_neg.c_str(), s.m_name.c_str());
+    fprintf(f, "%s      %s => %s", prefix, l_name.c_str(), l_name.c_str());
   } else if (!s.m_pin && (s.m_direction == Signal::INOUT || s.m_direction == Signal::OUTIN)) {
-    OU::format(name, s.m_in.c_str(), s.m_name.c_str());
-    fprintf(f, "%s%s      %s => %s,\n", last.c_str(), prefix, name.c_str(), name.c_str());
-    OU::format(name, s.m_out.c_str(), s.m_name.c_str());
-    fprintf(f, "%s      %s => %s,\n", prefix, name.c_str(), name.c_str());
-    OU::format(name, s.m_oe.c_str(), s.m_name.c_str());
-    fprintf(f, "%s      %s => %s", prefix, name.c_str(), name.c_str());
+    OU::format(l_name, s.m_in.c_str(), s.m_name.c_str());
+    fprintf(f, "%s%s      %s => %s,\n", last.c_str(), prefix, l_name.c_str(), l_name.c_str());
+    OU::format(l_name, s.m_out.c_str(), s.m_name.c_str());
+    fprintf(f, "%s      %s => %s,\n", prefix, l_name.c_str(), l_name.c_str());
+    OU::format(l_name, s.m_oe.c_str(), s.m_name.c_str());
+    fprintf(f, "%s      %s => %s", prefix, l_name.c_str(), l_name.c_str());
   } else
     fprintf(f, "%s%s      %s => %s", last.c_str(), prefix, s.m_name.c_str(), s.m_name.c_str());
   last = ",\n";
@@ -2197,24 +2197,24 @@ emitImplHDL(bool wrap) {
 	OM::Property &pr = **pi;
 	if (pr.m_isRaw)
 	  continue;
-	const char *name = pr.m_name.c_str();
+	const char *l_name = pr.m_name.c_str();
 	bool isStringArray = pr.m_baseType == OA::OCPI_String && (pr.m_isSequence || pr.m_arrayRank);
 	if (pr.m_isParameter) {
 #if 1
 	  std::string constValue, val;
-	  OU::format(constValue, "work.%s_constants.%s", m_implName, name);
-	  fprintf(f, "  props_to_worker.%s <= %s;\n", name, constValue.c_str());
+	  OU::format(constValue, "work.%s_constants.%s", m_implName, l_name);
+	  fprintf(f, "  props_to_worker.%s <= %s;\n", l_name, constValue.c_str());
 	  if (pr.m_isReadable) {
 	    vhdlConstant2Readback(pr, constValue, val);
-	    fprintf(f, "  my_%s_value <= %s;\n", name, val.c_str());
+	    fprintf(f, "  my_%s_value <= %s;\n", l_name, val.c_str());
 	  } else
 	    continue;
 #else
 	  if (pr.m_isReadable) {
 	    std::string constValue, val;
-	    OU::format(constValue, "work.%s_constants.%s", m_implName, name);
+	    OU::format(constValue, "work.%s_constants.%s", m_implName, l_name);
 	    vhdlConstant2Readback(pr, constValue, val);
-	    fprintf(f, "  my_%s_value <= %s;\n", name, val.c_str());
+	    fprintf(f, "  my_%s_value <= %s;\n", l_name, val.c_str());
 	  } else
 	    continue;
 #endif
@@ -2223,7 +2223,7 @@ emitImplHDL(bool wrap) {
 	    size_t len = OU::roundUp(pr.m_stringLength+4, 4);
 	    std::string out;
 	    OU::format(out, "%s%s%s", pr.m_isReadable ? "my_" : "props_to_worker.",
-		       name, pr.m_isReadable ? "_value" : "");
+		       l_name, pr.m_isReadable ? "_value" : "");
 	    fprintf(f,
 		    "  -- String arrays require wrapper to convert to the string_array_t\n"
 		    "  %s_property_write_wrapper : block\n"
@@ -2246,14 +2246,14 @@ emitImplHDL(bool wrap) {
 		    "        %s(i)(j) <= sa_temp(i,j);\n"
 		    "      end generate g1;\n"
 		    "    end generate g0;\n",
-		    name, name, len, name, len, name, pr.m_stringLength+1, name, name,
+		    l_name, l_name, len, l_name, len, l_name, pr.m_stringLength+1, l_name, l_name,
 		    pr.m_stringLength+1, out.c_str());
 	  }
 	  fprintf(f,
 		  "  %s_property : component ocpi.props.%s%s_property\n"
 		  "    generic map(worker       => work.%s_worker_defs.worker,\n"
 		  "                property     => work.%s_worker_defs.properties(%u)",
-		  name, OB::baseTypeNames[pr.m_baseType == OA::OCPI_Enum ?
+		  l_name, OB::baseTypeNames[pr.m_baseType == OA::OCPI_Enum ?
 					  OA::OCPI_ULong : pr.m_baseType],
 		  pr.m_arrayRank || pr.m_isSequence ? "_array" : "",
 		  m_implName, m_implName, n);
@@ -2293,13 +2293,13 @@ emitImplHDL(bool wrap) {
 	  if (isStringArray)
 	    fprintf(f, "sa_temp,\n");
 	  else if ((pr.m_isReadable && !pr.m_isVolatile) || pr.m_baseType == OA::OCPI_Enum)
-	    fprintf(f, "my_%s_value, -- for readback and worker\n", name);
+	    fprintf(f, "my_%s_value, -- for readback and worker\n", l_name);
 	  else
-	    fprintf(f, "props_to_worker.%s,\n", name);
+	    fprintf(f, "props_to_worker.%s,\n", l_name);
 	  if (pr.m_isInitial)
 	    fprintf(f, "                written      => open");
 	  else
-	    fprintf(f, "                written      => props_to_worker.%s_written", name);
+	    fprintf(f, "                written      => props_to_worker.%s_written", l_name);
 	  if (pr.m_arrayRank || pr.m_isSequence || pr.m_baseType == OA::OCPI_String)
 	    fprintf(f, ",\n"
 		    "                offset        => offsets(%u)(width_for_max(work.%s_worker_defs.properties(%u).bytes_1)-1 downto 0)",
@@ -2315,7 +2315,7 @@ emitImplHDL(bool wrap) {
 		      "                any_written  => open");
 	    else
 	      fprintf(f, ",\n"
-		      "                any_written  => props_to_worker.%s_any_written", name);
+		      "                any_written  => props_to_worker.%s_any_written", l_name);
 	    if (pr.m_baseType != OA::OCPI_String &&
 		pr.m_nBits != 64)
 	      fprintf(f, ",\n"
@@ -2341,7 +2341,7 @@ emitImplHDL(bool wrap) {
 		    "  -- work.%%s_constants.%%s_t'val(to_integer(my_%%s_value));\n"
 		    // "  with to_integer(my_%s_value) select props_to_worker.%s <= \n",
 		    "  with my_%s_value(%zu-1 downto 0) select props_to_worker.%s <= \n",
-		    name, bits, name);
+		    l_name, bits, l_name);
 	    for (unsigned nn = 0; nn < pr.m_nEnums; nn++) {
 	      std::string val;
 	      for (unsigned b = 0; b < bits; b++)
@@ -2350,17 +2350,17 @@ emitImplHDL(bool wrap) {
 	    }
 	    fprintf(f, "    %s_e when others;\n", pr.m_enums[0]);
 	  } else if (pr.m_isReadable && !pr.m_isVolatile)
-	    fprintf(f, "  props_to_worker.%s <= my_%s_value;\n", name, name);
+	    fprintf(f, "  props_to_worker.%s <= my_%s_value;\n", l_name, l_name);
 	}
 	if (pr.m_isReadable) {
 	  std::string var; // the value fed into the readback
 	  if (pr.m_baseType == OA::OCPI_Enum && !pr.m_isParameter &&
 	      (pr.m_isVolatile || !pr.m_isWritable))
-	    OU::format(var, "my_volatile_%s_value", name);
+	    OU::format(var, "my_volatile_%s_value", l_name);
 	  else if (pr.m_isParameter || (!pr.m_isVolatile && pr.m_isWritable))
-	    OU::format(var, "my_%s_value", name);
+	    OU::format(var, "my_%s_value", l_name);
 	  else if (pr.m_isVolatile || !pr.m_isWritable)
-	    OU::format(var, "props_from_worker.%s", name);
+	    OU::format(var, "props_from_worker.%s", l_name);
 	  if (isStringArray)
 	    fprintf(f,
 		    "  -- String arrays require wrapper to convert to the generic string_array_t\n"
@@ -2373,7 +2373,7 @@ emitImplHDL(bool wrap) {
 		    "        sa_temp(i,j) <= %s(i)(j);\n"
 		    "      end generate g1;\n"
 		    "    end generate g0;\n",
-		    name, name, OU::roundUp(pr.m_stringLength+1, 4), name, pr.m_stringLength+1,
+		    l_name, l_name, OU::roundUp(pr.m_stringLength+1, 4), l_name, pr.m_stringLength+1,
 		    var.c_str());
 	  fprintf(f,
 		  "  %s_readback : component ocpi.props.%s_read%s_property\n"
@@ -2439,26 +2439,26 @@ emitImplHDL(bool wrap) {
 		fprintf(f,
 			"gen_volatile_%s:\n"
 			"  for i in 0 to %zu-1 generate\n",
-			name, pr.m_sequenceLength);
+			l_name, pr.m_sequenceLength);
 #if 0 // this is what is sensible, but does not work on isim
 	      fprintf(f,
 		      "    my_volatile_%s_value(i) <=\n"
 		      "      to_ulong(work.%s_constants.%s_t'pos(props_from_worker.%s(i)));\n",
-		      name, m_implName, name, name);
+		      l_name, m_implName, l_name, l_name);
 #else
 	      fprintf(f,
 		      "    with props_from_worker.%s(i) select my_volatile_%s_value(i) <=\n",
-		      name, name);
+		      l_name, l_name);
 	      for (unsigned nn = 0; nn < pr.m_nEnums; nn++)
 		fprintf(f, "   to_ulong(%u)  when %s_e,\n", nn, pr.m_enums[nn]);
 	      fprintf(f, "   to_ulong(0) when others;\n");
 #endif
-	      fprintf(f, "  end generate gen_volatile_%s;\n", name);
+	      fprintf(f, "  end generate gen_volatile_%s;\n", l_name);
 	      }
 	    } else if (pr.m_baseType == OA::OCPI_Enum)
 	      fprintf(f, "  my_volatile_%s_value    <= "
 		      "to_ulong(work.%s_constants.%s_t'pos(props_from_worker.%s));\n",
-		      name, m_implName, name, name);
+		      l_name, m_implName, l_name, l_name);
 	  }
 	  if (isStringArray)
 	    // String arrays require a wrapper to convert to the generic string_array_t
@@ -2537,23 +2537,23 @@ emitSkelHDL() {
 	for (SignalsIter si = m_signals.begin(); si != m_signals.end(); si++) {
 	  Signal &s = **si;
 	  const char *val = s.m_width ? "(others => '0')" : "'0'";
-	  std::string name;
+	  std::string l_name;
 	  if (s.m_direction == Signal::OUT)
 	    if (s.m_differential) {
-	      OU::format(name, s.m_pos.c_str(), s.m_name.c_str());
-	      fprintf(f, "  %s <= %s;\n", name.c_str(), val);
-	      OU::format(name, s.m_neg.c_str(), s.m_name.c_str());
-	      fprintf(f, "  %s <= %s;\n", name.c_str(), val);
+	      OU::format(l_name, s.m_pos.c_str(), s.m_name.c_str());
+	      fprintf(f, "  %s <= %s;\n", l_name.c_str(), val);
+	      OU::format(l_name, s.m_neg.c_str(), s.m_name.c_str());
+	      fprintf(f, "  %s <= %s;\n", l_name.c_str(), val);
 	    } else
 	      fprintf(f, "  %s <= %s;\n", s.m_name.c_str(), val);
 	  else if (s.m_direction == Signal::INOUT) {
-	      OU::format(name, s.m_out.c_str(), s.m_name.c_str());
-	      fprintf(f, "  %s <= %s;\n", name.c_str(), val);
-	      OU::format(name, s.m_oe.c_str(), s.m_name.c_str());
-	      fprintf(f, "  %s <= '0';\n", name.c_str());
+	      OU::format(l_name, s.m_out.c_str(), s.m_name.c_str());
+	      fprintf(f, "  %s <= %s;\n", l_name.c_str(), val);
+	      OU::format(l_name, s.m_oe.c_str(), s.m_name.c_str());
+	      fprintf(f, "  %s <= '0';\n", l_name.c_str());
 	  } else if (s.m_direction == Signal::OUTIN) {
-	      OU::format(name, s.m_in.c_str(), s.m_name.c_str());
-	      fprintf(f, "  %s <= %s;\n", name.c_str(), val);
+	      OU::format(l_name, s.m_in.c_str(), s.m_name.c_str());
+	      fprintf(f, "  %s <= %s;\n", l_name.c_str(), val);
 	  }
 	}
       fprintf(f,

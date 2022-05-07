@@ -45,7 +45,9 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         Initializes Library member data  and calls the super class __init__.  Throws an
         exception if the directory passed in is not a valid library directory.
         """
+        self.asset_type = 'library'
         super().__init__(directory, name, **kwargs)
+        kwargs.pop('child_path',None) # ugh.
         self.check_dirtype("library", self.directory)
         self.test_list = None
         self.tests_names = None
@@ -83,10 +85,48 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
                                                                  str(worker_path.parent),
                                                                  name=worker_path.name, **kwargs))
             self.comp_list = []
-            for comp_directory in self.get_valid_components():
-                comp_name = ocpiutil.rchop(os.path.basename(comp_directory), "spec.xml")[:-1]
-                self.comp_list.append(AssetFactory.factory("component", comp_directory, **kwargs))
+            specs = self.path.joinpath("specs")
+            if specs.exists():
+                for file in specs.iterdir():
+                    if file.name.endswith('_spec.xml') or file.name.endswith('-spec.xml'):
+                        self.comp_list.append(Component(self.path, file.name[:-9],
+                                                        child_path=Path('specs', file.name)))
+            for dir in self.path.iterdir():
+                if dir.is_dir() and dir.name.endswith('.comp'):
+                    self.comp_list.append(Component(self.path, dir.name[:-5],
+                                                    child_path=Path(dir.name)))
 
+    @staticmethod
+    def resolve_file_child(asset_type, parent_path, args):
+        # These are file-based assets, although components may also be directory-based
+        # We have to deal with the nasty legacy problem of "_spec" suffixes on
+        # some older component specs.  Basically if the _spec.xml exists, we use that
+        # otherwise we uniformly add the -spec suffix to file-only specs, which thus
+        # results in the (new) file being called foo_spec-spec.xml
+        name = args.name
+        if name.endswith(".xml"):
+            name = name[:-4]
+        if asset_type == 'component':
+            if name.endswith('_spec') and Path(parent_path, 'specs', name + '.xml').exists():
+                # legacy: if _spec.xml exists, we do not add -spec
+                child_path = Path('specs', name + '.xml')
+            elif Path(parent_path, 'specs', name + '-spec.xml').exists() or \
+                 getattr(args, 'file_only', None):
+                child_path = Path("specs", name + '-spec.xml')
+            else:
+                child_path = Path(name + '.comp')
+        elif asset_type == 'protocol':
+            if (name.endswith('_prot') or name.endswith('_protocol')) and \
+               Path(parent_path, 'specs', name + '.xml').exists():
+                # legacy: if _prot.xml or _protocol.xml exists, we do not add -prot
+                child_path = Path('specs', name + '.xml')
+            else:
+                child_path = Path('specs', name + '-prot.xml')
+        else: # slots and cards previously had no suffix, but now they do
+            child_path = Path('specs', name + '.xml')
+            if not Path(parent_path, args.child_path).exists():
+                child_path = Path('specs', name + '-' + asset_type[4:] + '.xml')
+        return name, child_path
 
     @classmethod
     def resolve_child(cls, parent_path, asset_type, args):
@@ -99,29 +139,9 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         name = args.name
         args.child_path = Path(name) # default is asset name is dir name
         if asset_type in ['component', 'protocol', 'hdl-slot', 'hdl-card']: # file-based assets
-            if name.endswith(".xml"):
-                name = name[:-4]
-            suffixes = {'component':['_spec','-spec'],
-                        'protocol': ['_prot', '-prot']}.get(asset_type)
-            if suffixes and name[-5:] in suffixes:
-                args.child_path = Path("specs", name + ".xml")
-                name = name[:-5]
-            elif asset_type == 'component':
-                if Path(parent_path, 'specs', name + '_spec.xml').exists():
-                    args.child_path = Path('specs', name + '_spec.xml')
-                elif Path(parent_path, 'specs', name + '-spec.xml').exists() or args.file_only:
-                    args.child_path = Path("specs", name + '-spec.xml')
-                else:
-                    args.child_path = Path(name + '.comp')
-            elif asset_type == 'protocol':
-                if Path(parent_path, 'specs', name + '_prot.xml').exists():
-                    args.child_path = Path('specs', name + '_prot.xml')
-                else:
-                    args.child_path = Path('specs', name + '-prot.xml')
-            else: # slots and cards have no suffix
-                args.child_path = Path('specs', name + '.xml')
+            name, args.child_path = __class__.resolve_file_child(asset_type, parent_path, args)
         elif asset_type.endswith('worker') or asset_type == 'hdl-device':
-            pass
+            args.child_path = Path(name + '.' + asset_type[0:3]) # special case asset name
         elif asset_type == 'test':
             if name.endswith('.test'):
                 name = name[:-5]
@@ -323,6 +343,7 @@ class LibrariesCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, R
                  assets=None, **kwargs):
         if assets != None:
             self.out_of_project = True
+        self.asset_type = 'libraries'
         super().__init__(directory, name, **kwargs)
         self.make_type = 'libraries'
         self.orig_noun = orig_noun
@@ -403,19 +424,9 @@ class LibrariesCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, R
             for entry in my_path.iterdir():
                 if entry.is_dir() and ocpiutil.get_dirtype(str(entry)) == 'library':
                     lib_directories.append(str(entry))
-        for lib_directory in lib_directories:
-            lib_dict = {}
-            lib_package = Library.get_package_id(lib_directory)
-            lib_dict["package"] = lib_package
-            lib_dict["directory"] = lib_directory
-            # in case two or more  libraries have the same package id we update the key to end
-            # with a number
-            i = 1
-            while lib_package in libraries_dict:
-                lib_package += ":" + str(i)
-                i += 1
-            libraries_dict[lib_package] = lib_dict
-
+        for lib in self.libraries:
+            libraries_dict[lib.package_id] = { 'package_id' : lib.package_id,
+                                               'directory' : str(lib.path)}
         if format == "simple":
             for lib,dict in libraries_dict.items():
                 print("Library: " + dict["directory"])

@@ -492,7 +492,7 @@ def get_ok(prompt="", default=False):
             return True
         if ok_input.lower() in ['n', 'no', 'nope']:
             return False
-        if ok_input.lower() == '':
+        if default != None and ok_input.lower() == '':
             return default
 def rchop(thestring, ending):
     """

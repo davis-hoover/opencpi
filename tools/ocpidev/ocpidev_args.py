@@ -837,10 +837,13 @@ verbs = {
                 }
             },
             'component': {
-                'project': options['project'],
-                'hdl_library': options['hdl_library'],
-                'library': options['library'],
-                'platform': options['platform']
+                'options': {
+                    'file_only': options['file_only'],
+                    'project': options['project'],
+                    'hdl_library': options['hdl_library'],
+                    'library': options['library'],
+                    'platform': options['platform']
+                }
             },
             'hdl': {
                 'nouns': {

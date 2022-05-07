@@ -43,6 +43,8 @@ class RccPlatformsCollection(ShowableAsset):
     def __init__(self, directory, name=None, verb=None, assets=None, **kwargs):
         if assets != None:
             self.out_of_project = True
+        self.asset_type = 'rcc-platforms'
+        kwargs['non_existent_ok'] = True
         super().__init__(directory, name, **kwargs)
         self.platforms = []
         dir_path = Path(self.directory)
@@ -88,6 +90,7 @@ class HdlPlatformsCollection(HDLBuildableAsset, ReportableAsset):
         """
         if assets != None:
             self.out_of_project = True
+        self.asset_type = 'hdl-platforms'
         super().__init__(directory, name, **kwargs)
         self.platforms = []
         if assets != None: # we're being handed a list of paths
@@ -206,13 +209,14 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
         Construct an HdlPlatformWorkerConfig for each and add to the self.platform_configs map.
         """
         # Directory for each config is <platform-worker-directory>/config-<configuration>
-        cfg_prefix = self.directory + "/config-"
         for config_name in config_list:
             # Construct the Config instance and add to map
             self.platform_configs[config_name] = \
-                HdlPlatformWorkerConfig(directory=cfg_prefix + config_name,
+                HdlPlatformWorkerConfig(directory=self.directory,
                                         name=config_name,
-                                        platform=self)
+                                        platform=self,
+                                        child_path='config-' + config_name,
+                                        non_existent_ok=True)
 
     def get_utilization(self):
         """
@@ -319,6 +323,7 @@ class HdlPlatformWorkerConfig(HdlAssembly):
         valid kwargs handled at this level are:
             platform (HdlPlatform) - The HdlPlatform object that is bound to this configuration.
         """
+        self.asset_type = 'hdl-platform-config'
         super().__init__(directory, name, **kwargs)
         self.platform = platform
         if self.platform is None:
@@ -427,6 +432,7 @@ class RccPlatform(Platform):
         """
         Constructor for RccPlatform no extra values from kwargs processed in this constructor
         """
+        self.asset_type = 'rcc-platform'
         super().__init__(directory, name, **kwargs)
         self.check_dirtype("rcc-platform", directory)
         project_dir = ocpiutil.get_path_to_project_top(self.directory)
@@ -571,16 +577,14 @@ class HdlPlatform(Platform):
         HdlPlatform constructor
         """
         self.out_of_project = True
-        super().__init__(directory, name)
+        self.asset_type = 'hdl-platform' # redundant with HdlPlatformWorker
+        super().__init__(directory, name, non_existent_ok=True) # not a real file system asset
         self.target = target
         self.exactpart = exactpart
         self.built = built
         self.dir = ocpiutil.rchop(directory, "/lib")
         if self.dir and not package_id and os.path.exists(self.dir):
             self.package_id = ocpiutil.get_platforms[name]['package_id']
-            #self.package_id = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(self.dir, "hdl/hdl-platform"),
-            #                                              "ShellHdlPlatformVars=1 showpackage",
-            #                                              "verbose")["Package"][0]
         else:
             self.package_id = ""
 
@@ -757,6 +761,7 @@ class PlatformsCollection(ShowableAsset):
     def __init__(self, directory, name=None, verb=None, assets=None, **kwargs):
         if assets != None:
             self.out_of_project = True
+        self.asset_type = 'platforms'
         super().__init__(directory, name, **kwargs)
         self.platforms = []
         dir_path = Path(self.directory)
@@ -800,6 +805,7 @@ class HdlTargetsCollection(ShowableAsset):
 
     def __init__(self, directory, name=None, verb=None, assets=None, **kwargs):
         self.out_of_project = True
+        self.asset_type = 'hdl-targets'
         super().__init__(directory, name, **kwargs)
         dir_path = Path(self.directory)
         assert assets != None

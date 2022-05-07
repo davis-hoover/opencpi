@@ -41,6 +41,7 @@ class Registry(ShowableAsset):
     instances_should_be_cached = True
     def __init__(self, directory, name=None, **kwargs):
         self.out_of_project = True
+        self.asset_type = 'registry'
         super().__init__(directory, name, **kwargs)
 
         # Each registry instance has a list of projects registered within it.
@@ -491,4 +492,4 @@ class Registry(ShowableAsset):
                     'environment variable. Unset variable before attempting to delete'])
         if err_msg:
             raise ocpiutil.OCPIException(err_msg)
-        super().delete('project registry', force=force)
+        super().delete(force=force, **kwargs)
