@@ -295,15 +295,15 @@ namespace OCPI {
     // doesn't look like an empty sequence when you have a sequence of strings
     // with one empty string in it.
     const char *Value::
-    parseString(const char*cp, const char *end, OA::CharP &vp) {
+    parseString(const char *cp, const char *end, OA::CharP &vp) {
       // Check length if string is bounded
-      
-      char *start = m_stringNext;
       bool quoted = false;
       if (*cp == '"') {
 	quoted = true;
 	cp++;
       }
+      reserveStringSpace(OCPI_SIZE_T_DIFF(end, cp));
+      char *start = m_stringNext;
       // !!! There is a very similar loop in doElement
       for (unsigned len = 0; cp < end; len++)
 	if (quoted && *cp == '"') {
@@ -530,19 +530,26 @@ namespace OCPI {
     }
 
     void Value::
-    reserveStringSpace(size_t len, bool add) {
+    reserveStringSpace(size_t len) {
       char *old = m_stringSpace;
       size_t oldLength = m_stringSpaceLength;
-      // the space required will never be larger than the input...
-      m_stringSpaceLength = len + 1 + (add ? m_stringSpaceLength : 0);
+      // The space required will never be larger than the input.
+      m_stringSpaceLength = len + 1 + m_stringSpaceLength;
       m_stringNext = m_stringSpace = new char[m_stringSpaceLength];
-      if (add) {
+      //
+      // No need to do any of the following if "oldLength == 0",
+      // because there's nothing to relocate from old to new.
+      //
+      if (oldLength) {
 	assert(m_vt->m_isSequence || m_vt->m_arrayRank);
-	// Do the realloc of the string space, and adjust
+	//
+	// Adjust m_stringNext to what will be the first unused
+	// position in new m_stringSpace, and copy old into new.
+	//
 	m_stringNext += oldLength;
 	memcpy(m_stringSpace, old, oldLength);
-	// Relocate string pointers
-	for (unsigned n = 0; n < m_nElements; n++)
+	// Relocate string pointers.
+	for (unsigned n = 0; n < m_nTotal; n++)
 	  if (m_pString[n])
 	    m_pString[n] = m_stringSpace + (m_pString[n] - old);
       }
@@ -560,8 +567,6 @@ namespace OCPI {
 	stop = unparsed + strlen(unparsed);
       if (!add)
 	clear();
-      if (m_vt->m_baseType == OA::OCPI_String)
-	reserveStringSpace(OCPI_SIZE_T_DIFF(stop, unparsed), add);
       if (add)
 	m_nElements++;
       else {
@@ -673,7 +678,7 @@ namespace OCPI {
 	  if (value.m_vt->m_baseType == OA::OCPI_Enum)
 	    for (size_t n = 0; n < value.m_vt->m_nEnums; n++)
 	      if (!strcasecmp(value.m_vt->m_enums[n], sym)) {
-		val.setNumber((unsigned)n); // caste to avoid int64_t test
+		val.setNumber((unsigned)n); // cast to avoid int64_t test
 		return NULL;
 	      }
 	  if (resolver && resolver->resolver) {
@@ -1113,7 +1118,7 @@ void Value::generate() {
     m_nTotal *= m_nElements;
   }
   if (m_vt->m_baseType == OA::OCPI_String)
-    reserveStringSpace(m_nTotal * (testMaxStringLength + 1), false);
+    reserveStringSpace(m_nTotal * (testMaxStringLength + 1));
   ocpiCheck(allocate() == 0);
   if (m_vt->m_isSequence)
     // Now we have allocated the appropriate sequence array, so we can parse elements
