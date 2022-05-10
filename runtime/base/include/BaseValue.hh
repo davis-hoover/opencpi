@@ -137,7 +137,7 @@ namespace OCPI {
       bool needsCommaDimension() const { return m_vt->needsCommaDimension(); };
       bool needsCommaElement() const { return m_vt->needsCommaElement(); };
       void
-        reserveStringSpace(size_t len, bool add),
+        reserveStringSpace(size_t len),
 	generate(),
 	generateElement(unsigned nSeq),
 	generateDimension(unsigned nseq, size_t dim, size_t offset, size_t nItems),
