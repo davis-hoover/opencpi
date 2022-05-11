@@ -1093,6 +1093,7 @@ class AssemblyPipelineBuilder(PipelineBuilder):
             asset_project = None
             asset_name = asset
         name = self._build_name(asset_project, asset_name, stage)
+        name = self._build_name(self.platform, name, delimiter=':')
         tags = self._build_tags(stage)
         script = self._build_script(stage, asset)
         needs = self._build_needs(stage, asset_name, asset_project)
@@ -1215,6 +1216,7 @@ class AssemblyPipelineBuilder(PipelineBuilder):
             return needs
         if stage == 'run-unit_tests':
             need = self._build_name(asset_project, asset, 'build-unit_tests')
+            need = self._build_name(self.platform, need, delimiter=':')
             needs.append(need)
         elif self.model == 'hdl' and stage == 'run-applications':
             for assembly in self.apps_dict[asset]:
@@ -1223,6 +1225,7 @@ class AssemblyPipelineBuilder(PipelineBuilder):
                 assembly_proj = assembly_path.relative_to('projects').parts[0]
                 need = self._build_name(assembly_proj, assembly_name, 
                     'build-assemblies')
+                need = self._build_name(self.platform, need, delimiter=':')
                 needs.append(need)
 
         return needs

@@ -13,6 +13,7 @@ workflow:
 
 include: 
 - .gitlab-ci/yaml/docs.yml
+- .gitlab-ci/yaml/report.yml
 
 stages:
 - .pre
@@ -22,6 +23,7 @@ stages:
 - trigger
 - build
 - deploy
+- report
 
 # Old pipeline. Runs when the env var 'CI_OCPI_PIPELINE' is not set to "new"
 generate-children:
