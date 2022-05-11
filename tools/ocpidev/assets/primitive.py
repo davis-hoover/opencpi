@@ -201,6 +201,8 @@ class HdlPrimitivesCollection(HDLBuildableAsset, PrimitivesCollection):
         """
         if assets != None:
             self.out_of_project = True
+        self.asset_type = 'hdl-primitives'
+        kwargs['non_existent_ok'] = True
         super().__init__(directory, name, **kwargs)
         self.make_type = 'hdl-primitives'
         self.primitives = None
