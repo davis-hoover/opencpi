@@ -224,7 +224,7 @@ class Registry(ShowableAsset):
         self.__projects.pop(package_id)
         print("Successfully unregistered the " + package_id + " project: " +
               os.path.realpath(directory) + "\nFrom the registry: " +
-              os.path.realpath(self.directory) + "\n" + str(self.__projects))
+              os.path.realpath(self.directory))
 
     def create_link(self, package_id, path):
         """

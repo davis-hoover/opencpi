@@ -426,7 +426,8 @@ def get_parent(args, cwd, cwd_asset_type, ensure_exists=True):
             if name != cwd.name:
                 raise ocpiutil.OCPIException(f'When in the "{cwd_asset_type}" directory "{cwd}", '+
                                              f'the given name "{args.name}" is wrong.')
-        return cwd.parent, 'unknown', args.noun, cwd.stem, False
+        return cwd.parent, 'unknown', args.noun, \
+            cwd.name if cwd_asset_type == 'project' else cwd.stem, False
     # Dictionary to map the pair of [CWD asset type, target asset type (noun) ] to
     # information that helps determine the ultimate parent of the targeted asset
     parent_dict = {
