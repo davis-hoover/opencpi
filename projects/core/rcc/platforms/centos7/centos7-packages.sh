@@ -85,6 +85,8 @@ PKGS_D+=(openssl-devel)
 PKGS_D+=(docbook-style-xsl)
 #    for sphinxcontrib.spelling extension (RST doc support)
 PKGS_D+=(enchant)
+#    for xilinx tool installation script
+PKGS_D+=(expect)
 
 ##########################################################################################
 # S. yum-installed and but not rpm-required - conveniences or required for source environment
