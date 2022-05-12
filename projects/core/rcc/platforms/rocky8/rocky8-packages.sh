@@ -82,6 +82,8 @@ PKGS_D+=(bison flex)
 PKGS_D+=(docbook-style-xsl libxslt)
 #    for sphinxcontrib.spelling extension (RST doc support)
 PKGS_D+=(enchant2)
+#    for xilinx tool installation script
+PKGS_D+=(expect)
 
 
 ##########################################################################################
