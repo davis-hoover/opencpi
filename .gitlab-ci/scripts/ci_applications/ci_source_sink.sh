@@ -6,8 +6,10 @@ if [[ -z $hdl_platform && -z $rcc_platform && -z $host ]] ; then
     echo Error: Must provide at least one of hdl-platform, rcc-platform, or host
     exit 1
 fi
-
-cd $OCPI_ROOT_DIR/projects/assets/applications/
+if [[ -z $application_dir ]] ; then
+    application_dir=$OCPI_ROOT_DIR/projects/assets/applications
+fi
+cd $application_dir
 message_sizes="8k 16k 32k"
 cache_modes="0 1"
 divisors="1 2 5"

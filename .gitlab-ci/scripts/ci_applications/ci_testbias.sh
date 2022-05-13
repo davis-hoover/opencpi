@@ -18,9 +18,12 @@ fi
 export OCPI_LIBRARY_PATH="$OCPI_ROOT_DIR/projects/assets/artifacts:\
 $OCPI_ROOT_DIR/projects/platform/artifacts:\
 $OCPI_ROOT_DIR/projects/core/artifacts"
-
-cd $OCPI_ROOT_DIR/projects/assets/applications
+if [[ -z $application_dir ]] ; then
+    application_dir=$OCPI_ROOT_DIR/projects/assets/applications
+fi
+cd $application_dir
 if [[ -n $ip ]] ; then
     ocpiremote restart -b -i $ip -u $user -p $password
 fi
+
 ocpirun -v -d -m bias=$model -P file_read=$host -P file_write=$host -P bias=$platform testbias.xml -t 10
