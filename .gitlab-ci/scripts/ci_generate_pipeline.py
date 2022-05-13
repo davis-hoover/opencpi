@@ -36,9 +36,9 @@ def _set_env():
     environ['CI_OCPI_HOSTS'] = 'centos7'
     environ['CI_OCPI_HOST'] = 'centos7'
     environ['CI_OCPI_PLATFORMS'] = '"zed:xilinx19_2_aarch32,xsim"'
-    environ['CI_OCPI_PLATFORM'] = 'zed'
+    environ['CI_OCPI_PLATFORM'] = 'plutosdr'
     environ['CI_OCPI_OTHER_PLATFORM'] = 'xilinx19_2_aarch32'
-    environ['CI_OCPI_PROJECTS'] = ' '
+    environ['CI_OCPI_PROJECTS'] = ''
     environ['CI_OCPI_ROOT_PIPELINE_ID'] = '123456789'
     environ['CI_PIPELINE_ID'] = '234567890'
     environ['CI_JOB_ID'] = '987654321'
@@ -51,8 +51,8 @@ def _set_env():
     # environ['CI_COMMIT_TAG'] = 'v2.4.0'
     environ['CI_COMMIT_REF_NAME'] = 'develop'
     environ['CI_OCPI_REF_NAME'] = 'develop'
-    environ['CI_PROJECT_NAME'] = 'ocpi.comp.sdr'
-    environ['CI_PROJECT_NAMESPACE'] = 'opencpi/ocpi.comp.sdr'
+    environ['CI_PROJECT_NAME'] = 'ocpi.osp.plutosdr'
+    environ['CI_PROJECT_NAMESPACE'] = 'opencpi/osp'
 
 
 def _get_builder(builder_type: str, dump_path: Path, 
@@ -146,7 +146,7 @@ def _make_assembly_pipeline(dump_path: Path,
     pipeline_id = _get_pipeline_id()
     base_image_tag = pipeline_id
     platform = getenv('CI_OCPI_PLATFORM')
-    model, target = _get_platform_info(platform)
+    model, target, project = _get_platform_info(platform)
     host = getenv('CI_OCPI_HOST')
     other_platform = getenv('CI_OCPI_OTHER_PLATFORM')
     project_group = environ['CI_PROJECT_NAMESPACE'].split('/', 1)[-1]
@@ -157,7 +157,7 @@ def _make_assembly_pipeline(dump_path: Path,
     test_dirs = _get_tests(project_dirs, model=model)
     container_registry = getenv('CI_OCPI_CONTAINER_REGISTRY')
     container_repo = getenv('CI_OCPI_CONTAINER_REPO')
-    applications = _get_applications()
+    applications = _get_applications(model)
     # Set to literal strings. Runner for the HWIL job will evaluate
     hostname = '$CI_OCPI_DEVICE_HOSTNAME'
     user = '$CI_OCPI_DEVICE_USER'
@@ -178,7 +178,7 @@ def _make_assembly_pipeline(dump_path: Path,
             do_hwil = getenv('CI_OCPI_{}_HWIL'.format(model.upper()), '')
             do_hwil = do_hwil.lower() in ['t', 'y', 'true', 'yes', '1']
     pipeline_builder = AssemblyPipelineBuilder(pipeline_id, container_registry, 
-        container_repo, base_image_tag, host, platform, model, target,
+        container_repo, base_image_tag, host, platform, model, target, project,
         other_platform, assembly_dirs, test_dirs, applications, dump_path, 
         hostname=hostname, user=user, password=password, config=config, 
         do_ocpiremote=do_ocpiremote, do_hwil=do_hwil)
@@ -243,8 +243,13 @@ def _get_platform_info(platform: str) -> str:
     else:
         sys.exit('Error: Unknown platform "{}"'.format(platform))
     target = platforms[model][platform]['target']
+    package_id = platforms[model][platform]['package_id'].split('.')
+    if package_id[1] == 'osp':
+        project = str(Path('osps', '.'.join(package_id[:-1])))
+    else:
+        project = package_id[1]
 
-    return model, target
+    return model, target, project
 
 
 def _parse_projects_directive() -> dict:
@@ -329,6 +334,8 @@ def _ocpidev_show(noun: str, directory: str='.', scope=None) -> dict:
     
     Loads json into a dictionary to return.
     """
+    # work around ocpidev show bug with this env var set 
+    ocpi_project_path = environ.pop('OCPI_PROJECT_PATH', '')
     cmd = ['ocpidev', 'show', noun, '--json']
     if scope:
         cmd.append('--{}-scope'.format(scope))
@@ -341,6 +348,8 @@ def _ocpidev_show(noun: str, directory: str='.', scope=None) -> dict:
         cwd=directory)
     if process.returncode:
         sys.exit(process.stderr)
+
+    environ['OCPI_PROJECT_PATH'] = ocpi_project_path
 
     return json.loads(process.stdout)
 
@@ -457,21 +466,32 @@ def _get_tests(project_dirs: List[str], model=None) -> List[str]:
     return tests
 
 
-def _get_applications() -> dict():
+def _get_applications(model: str) -> dict():
     """Returns a dictionary of applications
     
     Key of dictionary is application name, and value of dictionary is
     a list of needed assemblies.
     """
-    if getenv('CI_PROJECT_NAME', '') != 'opencpi':
+    if getenv('CI_PROJECT_NAMESPACE', '').split('/')[-1] == 'osp':
+        project_name = str(Path('osps', getenv('CI_PROJECT_NAME', '')))
+    elif getenv('CI_PROJECT_NAME', '') == 'opencpi':
+        project_name = None
+    else:
         return {}
     applications = {
         'source_sink': [
             'projects/assets/hdl/assemblies/test_source_assy',
             'projects/assets/hdl/assemblies/test_sink_assy'
         ],
-        'testbias': []
+        'testbias': [],
     }
+    if model == 'hdl':
+        applications.update({
+            'fsk_dig_radio_ctrlr': [
+                'projects/{}/hdl/assemblies/fsk_modem'.format(
+                    project_name if project_name else 'assets')
+            ]
+        })
 
     return applications
 

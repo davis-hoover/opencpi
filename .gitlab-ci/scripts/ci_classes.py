@@ -1025,10 +1025,10 @@ class CompPipelineBuilder(PlatformPipelineBuilder):
 
 class AssemblyPipelineBuilder(PipelineBuilder):
     def __init__(self, pipeline_id, container_registry, container_repo,
-        base_image_tag, host, platform, model, target, other_platform, 
-        assembly_dirs, test_dirs, apps_dict, dump_path, hostname=None, 
-        user=None, password=None, config=None, do_ocpiremote=False, 
-        do_hwil=False):
+        base_image_tag, host, platform, model, target, project,
+        other_platform, assembly_dirs, test_dirs, apps_dict, dump_path, 
+        hostname=None, user=None, password=None, config=None, 
+        do_ocpiremote=False, do_hwil=False):
         """Initializes an AssemblyPipelineBuilder"""
         super().__init__(pipeline_id, container_registry, base_image_tag,
             dump_path, config)
@@ -1040,6 +1040,7 @@ class AssemblyPipelineBuilder(PipelineBuilder):
         self.platform = platform
         self.model = model
         self.target = target
+        self.project = project
         self.other_platform = other_platform
         self.user = user
         self.password = password
@@ -1142,20 +1143,18 @@ class AssemblyPipelineBuilder(PipelineBuilder):
                     source=source, dest=dest)
                 script.append(docker_cp_cmd)
             elif self.model == 'hdl':
-            # Copy assemblies .bitz into project artifacts in docker container
+            # Copy project artifacts into docker container
                 for assembly in self.apps_dict[asset]:
-                    assembly_path = Path(assembly)
-                    assembly_project = assembly_path.parts[1]
-                    if assembly_project in ['osps', 'comps']:
-                        assembly_project = assembly_path.parts[1:3]
+                    asset_proj = Path(assembly).parts[1]
+                    if asset_proj in ['osps', 'comps']:
+                        asset_proj = '/'.join(Path(assembly).parts[1:3])
                     dest = '$CI_JOB_ID:/opencpi/projects/{}/artifacts'.format(
-                        assembly_project)
-                    bitz = '{}_{}_base.bitz'.format(
-                        assembly_path.name, self.platform)
-                    target = 'target-{}'.format(self.target)
-                    container = 'container-{}_{}_base'.format(
-                        assembly_path.name, self.platform)
-                    source = Path(assembly_path.name, container, target, bitz)
+                        asset_proj)
+                    source='$(find {}/container* -name *{}_{}*.bitz)'.format(
+                        Path(assembly).name,
+                        Path(assembly).name,
+                        self.platform
+                    )
                     docker_cp_cmd = self._build_docker_cmd('cp', None, stage, 
                         source=source, dest=dest)
                     script.append(docker_cp_cmd)
@@ -1168,7 +1167,8 @@ class AssemblyPipelineBuilder(PipelineBuilder):
             script = [docker_run_cmd]
         if stage in ['build-assemblies', 'build-unit_tests']:
         # Copy files from container to upload as artifacts
-            source = '$CI_JOB_ID:/opencpi/{}'.format(asset)
+            asset_path = Path(asset)
+            source = '$CI_JOB_ID:/opencpi/{}'.format(str(asset_path))
             docker_cp_cmd = self._build_docker_cmd('cp', None, stage, 
                 source=source)
             script.append(docker_cp_cmd)
@@ -1232,11 +1232,16 @@ class AssemblyPipelineBuilder(PipelineBuilder):
 
     def _build_artifacts(self, stage: str, asset: str) -> str:
         """Constructs and returns a job's artifacts"""
-        if stage in ['build-assemblies', 'build-unit_tests']:
+        if stage == 'build-unit_tests':
             artifacts = {
                 'paths': [
                     str(Path(asset).name)
                 ],
+                'expire_in': '1 week'
+            }
+        elif stage == 'build-assemblies':
+            artifacts = {
+                'paths': [Path(asset).name],
                 'expire_in': '1 week'
             }
         else:
@@ -1302,6 +1307,11 @@ class AssemblyPipelineBuilder(PipelineBuilder):
             app_cmd += ' -i {}'.format(self.hostname)
             app_cmd += ' -p {}'.format(self.password)
             app_cmd += ' -u {}'.format(self.user)
+        ocpi_root_dir = environ['OCPI_ROOT_DIR']
+        apps_dir = Path(ocpi_root_dir, 'projects', self.project, 'applications')
+        app_dir = apps_dir.joinpath(app)
+        if app_dir.exists() or app_dir.with_suffix('.xml').exists():
+            app_cmd += ' -a {}'.format(apps_dir)
 
         return app_cmd
 
