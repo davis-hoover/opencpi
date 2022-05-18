@@ -163,14 +163,13 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         Remove the project from the registry if it is registered anywhere and remove the project
         from disk
         """
-        try:
-            registry = self.registry()
-            if registry:
+        registry = self.registry()
+        if super().delete(**kwargs) and registry:
+            try:
                 registry.remove(package_id=self.package_id)
-        except ocpiutil.OCPIException:
-            # do nothing it's ok if the unregistering fails
-            pass
-        super().delete(**kwargs)
+            except ocpiutil.OCPIException:
+                # do nothing it's ok if the unregistering fails
+                pass
 
     @staticmethod
     def get_package_id(directory):
