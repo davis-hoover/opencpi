@@ -101,7 +101,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         Resolve the actual relative path and name for a child asset as needed
         Here is the knowledge of where various assets live inside a project
         """
-        assert asset_type in ['library', 'component', 'protocol', 'hdl-slot', 'applications', 'libraries']
+        assert asset_type in ['library', 'component', 'protocol', 'hdl-slot', 'hdl-assemblies', 'applications', 'libraries']
         name = args.name
         if asset_type == 'library':
             if name == 'components':
