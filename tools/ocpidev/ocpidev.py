@@ -517,8 +517,8 @@ def get_parent(args, cwd, cwd_asset_type, ensure_exists=True):
         },
         'hdl-primitives': {
             'hdl-primitive-libraries': { 'name' : False, 'append' : 'hdl/primitives'},
-            'hdl-primitive-library':   { 'name' : True, 'append' : 'hdl/primitives'},
-            'hdl-primitive-core':      { 'name' : True, 'append' : 'hdl/primitives'},
+            'hdl-library':   { 'name' : True},
+            'hdl-core':      { 'name' : True},
             'hdl-primitive-cores':     { 'name' : False, 'append' : 'hdl/primitives'},
             'hdl-primitives':          { 'name' : False, 'append' : 'hdl', 'name' : 'primitives'},
         },
