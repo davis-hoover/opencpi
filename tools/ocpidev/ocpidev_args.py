@@ -13,9 +13,10 @@ def get_noun():
         if asset_type in ['hdl-core', 'hdl-library']:
             # Command line expects 'hdl-primitive-core' or 'hdl-primitive-library' as a list
             asset_type = 'hdl-primitive-' + asset_type[4:]
-        asset_type = asset_type.split('-')
     else:
         asset_type = make_type
+    if asset_type is not None:
+        asset_type = asset_type.split('-')
     return asset_type
 
 """Dicts of args to be used by ocpidev.py"""
