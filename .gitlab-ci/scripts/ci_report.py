@@ -102,7 +102,7 @@ def dump(failed_jobs: List[dict], file_name: str):
                     job['web_url'], 
                     job['failure_reason'], 
                     job['duration'], 
-                    job['runner']['description'],
+                    job['runner']['description'] if job['runner'] else ''
                 ])
         
 
