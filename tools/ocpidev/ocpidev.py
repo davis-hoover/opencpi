@@ -134,6 +134,7 @@ def main():
         sys.exit(1)
     sys.exit(0)
 
+
 def postprocess_args(args):
     """
     Post-processes user arguments - do what the argparser is unable to do for various reasons
@@ -221,6 +222,7 @@ def postprocess_args(args):
         os.environ["OCPI_DOC_ONLY"] = "1"
     return args
 
+
 def maybe_autocreate_library(parent_path, verbose):
     """
     Create a library as a side effect of creating something in a library
@@ -234,6 +236,7 @@ def maybe_autocreate_library(parent_path, verbose):
                                                  parent_path.parent.parent, verbose=verbose)
         ocpilibrary.Library.create(parent_path.name, parent_path.parent, verbose=verbose)
 
+
 def maybe_autocreate_libraries(libraries_path, verbose):
     """
     Create a libraries directory as a side effect of creating a library
@@ -243,6 +246,7 @@ def maybe_autocreate_libraries(libraries_path, verbose):
     if not libraries_path.exists():
         ocpilibrary.LibrariesCollection.create(libraries_path.name, libraries_path.parent,
                                                verbose=verbose)
+
 
 # All finders take in the cwd path, the previously-determined asset type of the cwd,
 # the targeted asset type (noun), and optional targeted name
@@ -270,6 +274,7 @@ def find_hdl_slot(args, parent_path, cwd_type, noun, name):
                                          f'under the hdl/ subdirectory of a project')
         parent_path = parent_path.joinpath('specs')
     return parent_path, parent_type, noun, name, False
+
 
 def find_hdl_device(args, target_path, cwd_type, noun, name):
     """ finder function for HDL devices, cards, and slots """
@@ -344,6 +349,7 @@ def find_library(args, parent_path, parent_type, noun, name):
         raise ocpiutil.OCPIException(f'no library exists at "{parent_path}"')
     return parent_path, 'library', noun, name, False
 
+
 def find_library_or_project(args, target_path, cwd_type, noun, name):
     """
     For navigating to a library or at the project level, when at the project level
@@ -352,6 +358,7 @@ def find_library_or_project(args, target_path, cwd_type, noun, name):
     if args.project:
         return target_path, "project", noun, name, False
     return find_library(args, target_path, cwd_type, noun, name)
+
 
 def find_library_or_libraries(args, cwd_path, cwd_type, noun, name):
     """
@@ -367,6 +374,7 @@ def find_library_or_libraries(args, cwd_path, cwd_type, noun, name):
         if args.library or args.hdl_library or args.platform:
             return find_library(args, cwd_path, cwd_type, noun, name)
     return cwd_path, cwd_type, noun, name, True
+
 
 def find_registry_or_project(args, cwd_path, cwd_type, noun, name):
     """
@@ -393,6 +401,7 @@ def find_registry_or_project(args, cwd_path, cwd_type, noun, name):
     else:
         registry_path = ocpiregistry.Registry.get_default_registry_path()
     return registry_path.parent, 'unknown-outside-project', noun, registry_path.name, False
+
 
 def get_parent(args, cwd, cwd_asset_type, ensure_exists=True):
     """
@@ -437,148 +446,150 @@ def get_parent(args, cwd, cwd_asset_type, ensure_exists=True):
             # e.g. containers. (since we don't have --assembly yet)
             # This map is all asset types and plurals, just for documentation/completeness.
             # Invalid ones have 'None'
-            'application':             { 'name' : True, 'append' : 'applications',
-                                         'parent' : 'applications'},
-            'applications':            { 'name' : False, 'append' : 'applications',
-                                         'optional' : True},
-            'component':               { 'name' : True, 'finder' : find_library_or_project},
-            'components':              { 'name' : False, 'plural': True },
-            'hdl-assemblies':          { 'name' : 'assemblies', 'append' : 'hdl',
-                                         'optional' : True},
-            'hdl-assembly':            { 'name' : True, 'append' : 'hdl/assemblies',
+            'application':            {'name': True, 'append': 'applications',
+                                         'parent': 'applications'},
+            'applications':           {'name': False, 'append': 'applications',
+                                         'optional': True},
+            'component':              {'name': True, 'finder': find_library_or_project},
+            'components':             {'name': False, 'plural': True},
+            'hdl-assemblies':         {'name': 'assemblies', 'append': 'hdl',
+                                         'optional': True},
+            'hdl-assembly':           {'name': True, 'append': 'hdl/assemblies',
                                          'parent':'hdl-assemblies'},
-            'hdl-card':                { 'name' : True, 'append' : 'hdl/cards',
-                                         'parent' : 'library' },
-            'hdl-cards':               { 'name' : True, 'append' : 'hdl/card/specs',
-                                         'optional' : True},
+            'hdl-card':               {'name': True, 'append': 'hdl/cards',
+                                         'parent': 'library'},
+            'hdl-cards':              {'name': True, 'append': 'hdl/card/specs',
+                                         'optional': True},
             "hdl-container":           None,
             "hdl-containers":          None,
-            'hdl-core':                { 'name' : True, 'append' : 'hdl/primitives',
-                                         'parent' : 'hdl-primitives'},
-            'hdl-device':              { 'name' : True, 'finder' : find_hdl_device},
-            'hdl-devices':             { 'name' : True, 'finder' : find_hdl_device,
-                                         'optional' : True},
-            'hdl-library':             { 'name' : True, 'append' : 'hdl/primitives',
-                                         'parent' : 'hdl-primitives'},
-            'hdl-platform':            { 'name' : True, 'append': 'hdl/platforms',
+            'hdl-core':               {'name': True, 'append': 'hdl/primitives',
+                                         'parent': 'hdl-primitives'},
+            'hdl-device':             {'name': True, 'finder': find_hdl_device},
+            'hdl-devices':            {'name': True, 'finder': find_hdl_device,
+                                         'optional': True},
+            'hdl-library':            {'name': True, 'append': 'hdl/primitives',
+                                         'parent': 'hdl-primitives'},
+            'hdl-platform':           {'name': True, 'append': 'hdl/platforms',
                                          'parent': 'hdl-platforms'},
-            'hdl-platforms':           { 'name' : False, 'plural' : True},
-            'hdl-primitives':          { 'name' : False, 'append' : 'hdl/primitives', 'optional' : True},
-            'hdl-slot':                { 'name' : True, 'finder' : find_hdl_device},
-            'hdl-slots':               { 'name' : False, 'finder' : find_hdl_slot},
-            'hdl-targets':             { 'name' : False, 'plural' : True},
-            'hdl-worker':              { 'name' : True, 'finder' : find_library},
-            'libraries':               { 'name' : False, 'plural' : True},
-            'library':                 { 'name' : True, 'finder' : find_library},
-            'ocl-worker':              { 'name' : True, 'finder' : find_library},
-            'platforms':               { 'name' : False, 'plural' : True},
-            'prerequisite':            { 'name' : True},
-            'prerequisites':           {},
+            'hdl-platforms':          {'name': False, 'plural': True},
+            'hdl-primitives':         {'name': False, 'append': 'hdl/primitives', 
+                                        'optional': True},
+            'hdl-slot':               {'name': True, 'finder': find_hdl_device},
+            'hdl-slots':              {'name': False, 'finder': find_hdl_slot},
+            'hdl-targets':            {'name': False, 'plural': True},
+            'hdl-worker':             {'name': True, 'finder': find_library},
+            'libraries':              {'name': False, 'plural': True},
+            'library':                {'name': True, 'finder': find_library},
+            'ocl-worker':             {'name': True, 'finder': find_library},
+            'platforms':              {'name': False, 'plural': True},
+            'prerequisite':           {'name': True},
+            'prerequisites':          {},
             "project":                 None,
-            "projects":                { 'name' : False, 'registry' : True,
+            "projects":               {'name': False, 'registry': True,
                                          'plural': True},
-            'protocol':                { 'name' : True, 'finder' : find_library_or_project},
-            'protocols':               { 'name' : True, 'finder' : find_library_or_project,
-                                         'optional' : True},
-            "rcc-platform":            { 'name' : True, 'append' : 'rcc/platforms' },
-            'rcc-platforms':           { 'name' : False, 'append' : 'rcc/platforms',
-                                         'parent' : 'hdl-platforms', 'optional' : True},
-            'rcc-worker':              { 'name' : True, 'finder' : find_library},
-            'registry':                { 'finder' : find_registry_or_project },
-            'test':                    { 'name' : True, 'finder' : find_library},
-            'tests':                   { 'name' : False, 'finder' : find_library_or_libraries},
-            'worker':                  { 'name' : True, 'finder' : find_library},
-            'workers':                 { 'name' : False, 'finder' : find_library_or_libraries,
-                                         'optional' : True},
+            'protocol':               {'name': True, 'finder': find_library_or_project},
+            'protocols':              {'name': True, 'finder': find_library_or_project,
+                                         'optional': True},
+            "rcc-platform":           {'name': True, 'append': 'rcc/platforms'},
+            'rcc-platforms':          {'name': False, 'append': 'rcc/platforms',
+                                         'parent': 'hdl-platforms', 'optional': True},
+            'rcc-worker':             {'name': True, 'finder': find_library},
+            'registry':               {'finder': find_registry_or_project},
+            'test':                   {'name': True, 'finder': find_library},
+            'tests':                  {'name': False, 'finder': find_library_or_libraries},
+            'worker':                 {'name': True, 'finder': find_library},
+            'workers':                {'name': False, 'finder': find_library_or_libraries,
+                                         'optional': True},
             },
         'applications': {
-            'application' :            { 'name' : True},
-            'applications':            { 'name' : 'applications'},
+            'application':            {'name': True},
+            'applications':           {'name': 'applications'},
         },
         'hdl-assemblies': {
-            'hdl-assemblies':          { 'name' : 'assemblies', 'append' : 'hdl'},
-            'hdl-assembly' :           { 'name' : True},
+            'hdl-assemblies':         {'name': 'assemblies', 'append': 'hdl'},
+            'hdl-assembly':           {'name': True},
         },
         'hdl-assembly': {
-            "hdl-container":           { 'name' : True }
+            "hdl-container":          {'name': True }
         },
         'hdl-platform': {
-            'component' :              { 'name' : True, 'append' : 'devices'},
-            'components' :             { 'name' : False, 'append' : 'devices', 'optional' : True},
-            'protocol':                { 'name' : True, 'append' : 'devices'},
-            'protocols':               { 'name' : False, 'append' : 'devices', 'optional' : True},
-            'test' :                   { 'name' : True, 'append' : 'devices'},
-            'tests':                   { 'name' : False, 'append' : 'devices', 'optional' : True},
-            'worker':                  { 'name' : True,  'append' : 'devices'},
-            'workers':                 { 'name' : False, 'append' : 'devices', 'optional' : True},
+            'component':              {'name': True, 'append': 'devices'},
+            'components':             {'name': False, 'append': 'devices', 'optional': True},
+            'protocol':               {'name': True, 'append': 'devices'},
+            'protocols':              {'name': False, 'append': 'devices', 'optional': True},
+            'test':                   {'name': True, 'append': 'devices'},
+            'tests':                  {'name': False, 'append': 'devices', 'optional': True},
+            'worker':                 {'name': True,  'append': 'devices'},
+            'workers':                {'name': False, 'append': 'devices', 'optional': True},
         },
         'hdl-platforms': {
-            'hdl-platform' :           { 'name' : True, 'append': 'hdl/platforms'},
+            'hdl-platform':           {'name': True},
         },
         'hdl-primitives': {
-            'hdl-primitive-libraries': { 'name' : False, 'append' : 'hdl/primitives'},
-            'hdl-library':   { 'name' : True},
-            'hdl-core':      { 'name' : True},
-            'hdl-primitive-cores':     { 'name' : False, 'append' : 'hdl/primitives'},
-            'hdl-primitives':          { 'name' : False, 'append' : 'hdl', 'name' : 'primitives'},
+            'hdl-primitive-libraries':{'name': False, 'append': 'hdl/primitives'},
+            'hdl-library':            {'name': True},
+            'hdl-core':               {'name': True},
+            'hdl-primitive-cores':    {'name': False, 'append': 'hdl/primitives'},
+            'hdl-primitives':         {'name': False, 'append': 'hdl', 'name': 'primitives'},
         },
         'libraries': {
-            'component':               { 'name' : True, 'finder' : find_library},
-            'components':              { 'name' : False, 'finder' : find_library_or_libraries},
-            'hdl-worker':              { 'name' : True, 'finder' : find_library},
-            'library':                 { 'name' : True},
-            'protocol':                { 'name' : True, 'finder' : find_library},
-            'protocols':               { 'name' : False, 'finder' : find_library_or_libraries},
-            'rcc-worker':              { 'name' : True, 'finder' : find_library},
-            'test':                    { 'name' : True, 'finder' : find_library},
-            'tests':                   { 'name' : False, 'finder' : find_library_or_libraries},
-            'worker':                  { 'name' : True, 'finder' : find_library},
-            'workers':                 { 'name' : False, 'finder' : find_library_or_libraries},
+            'component':              {'name': True, 'finder': find_library},
+            'components':             {'name': False, 'finder': find_library_or_libraries},
+            'hdl-worker':             {'name': True, 'finder': find_library},
+            'library':                {'name': True},
+            'protocol':               {'name': True, 'finder': find_library},
+            'protocols':              {'name': False, 'finder': find_library_or_libraries},
+            'rcc-worker':             {'name': True, 'finder': find_library},
+            'test':                   {'name': True, 'finder': find_library},
+            'tests':                  {'name': False, 'finder': find_library_or_libraries},
+            'worker':                 {'name': True, 'finder': find_library},
+            'workers':                {'name': False, 'finder': find_library_or_libraries},
         },
         'library': {
-            'component':               { 'name' : True},
-            'components':              { 'name' : False},
-            'hdl-worker':              { 'name' : True},
-            'ocl-worker':              { 'name' : True},
-            'protocol':                { 'name' : True},
-            'protocols':               { 'name' : False},
-            'rcc-worker':              { 'name' : True},
-            'test':                    { 'name' : True},
-            'tests':                   { 'name' : False},
-            'worker':                  { 'name' : True},
-            'workers':                 { 'name' : False},
+            'component':              {'name': True},
+            'components':             {'name': False},
+            'hdl-worker':             {'name': True},
+            'ocl-worker':             {'name': True},
+            'protocol':               {'name': True},
+            'protocols':              {'name': False},
+            'rcc-worker':             {'name': True},
+            'test':                   {'name': True},
+            'tests':                  {'name': False},
+            'worker':                 {'name': True},
+            'workers':                {'name': False},
         },
         'prerequisites': {
-            'prerequisite':            { 'name' : True, 'append': 'prerequisites'},
+            'prerequisite':           {'name': True, 'append': 'prerequisites'},
         },
-        'rcc-worker' : {
-            'worker' : { 'noun' : 'rcc-worker', 'name' : 'none-or-same'},
+        'rcc-worker': {
+            'worker':                 {'noun': 'rcc-worker', 
+                                         'name': 'none-or-same'},
         },
         'unknown-outside-project': {
-            'components':              { 'name' : False, 'registry' : True,
-                                         'plural' : True}, # for global scope
-            'hdl-platforms':           { 'name' : False, 'registry' : True,
-                                         'plural' : True}, # for global scope
-            'hdl-targets':             { 'name' : False, 'registry' : True,
-                                         'plural' : True}, # for global scope
-            'project':                 { 'name' : True},
-            'projects':                { 'name' : False, 'registry' : True,
+            'components':             {'name': False, 'registry': True,
+                                         'plural': True}, # for global scope
+            'hdl-platforms':          {'name': False, 'registry': True,
+                                         'plural': True}, # for global scope
+            'hdl-targets':            {'name': False, 'registry': True,
+                                         'plural': True}, # for global scope
+            'project':                {'name': True},
+            'projects':               {'name': False, 'registry': True,
                                          'plural': True},
-            'rcc-platforms':           { 'name' : False, 'registry' : True,
-                                         'plural' : True}, # for global scope
-            'rcc-targets':             { 'name' : False, 'registry' : True,
-                                         'plural' : True}, # for global scope
-            'registry':                {},
-            'platforms':               { 'name' : False, 'registry' : True,
-                                         'plural' : True},
-            'prerequisites':           {},
-            'targets':                 { 'name' : False, 'registry' : True,
-                                         'plural' : True},
-            'workers':                 { 'name' : False, 'registry' : True,
-                                         'plural' : True},
+            'rcc-platforms':          {'name': False, 'registry': True,
+                                         'plural': True}, # for global scope
+            'rcc-targets':            {'name': False, 'registry': True,
+                                         'plural': True}, # for global scope
+            'registry':               {},
+            'platforms':              {'name': False, 'registry': True,
+                                         'plural': True},
+            'prerequisites':          {},
+            'targets':                {'name': False, 'registry': True,
+                                         'plural': True},
+            'workers':                {'name': False, 'registry': True,
+                                         'plural': True},
         },
         'unknown-in-project': {
-            "registry":                { 'name' : True},
+            "registry":               {'name': True},
         }
      }
 
@@ -639,6 +650,7 @@ def get_parent(args, cwd, cwd_asset_type, ensure_exists=True):
                                    f'does not exist')
 
     return parent_path, parent_type, noun, name, collect
+
 
 if __name__ == '__main__':
     main()

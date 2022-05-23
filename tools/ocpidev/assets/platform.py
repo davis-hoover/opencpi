@@ -163,9 +163,9 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
         valid kwargs handled at this level are:
             None
         """
+        super().__init__(directory, name, **kwargs)
         self.asset_type = 'hdl-platform' #?
         self.make_type = 'hdl-platform' #?
-        super().__init__(directory, name, **kwargs)
         self.check_dirtype("hdl-platform", self.directory)
         project_dir = ocpiutil.get_path_to_project_top(self.directory)
         project_package_id = ocpiutil.get_project_package(project_dir)
