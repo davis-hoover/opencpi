@@ -171,11 +171,11 @@ class PrimitivesCollection(ShowableAsset):
         dir_path, name, parent_path = \
             Asset.start_creation(directory, name, f'{model.upper()} Primitives', kwargs)
         assert name == 'primitives'
-        dir_path.mkdir(parents=True)
+        directory.joinpath(name).mkdir(parents=True)
         template = jinja2.Template(template_xml, trim_blocks=True)
-        ocpiutil.write_file_from_string(dir_path.joinpath('primitives.xml'),
+        ocpiutil.write_file_from_string(directory.joinpath(name).joinpath('primitives.xml'),
                                         template.render(**{}))
-        Asset.finish_creation(f'{model}-primitives', name, dir_path, verbose)
+        Asset.finish_creation(f'{model}-primitives', name, directory.joinpath(name), verbose)
 
 class HdlPrimitivesCollection(HDLBuildableAsset, PrimitivesCollection):
     """
