@@ -59,15 +59,17 @@ class Application(RunnableAsset, RCCBuildableAsset):
         """
         Runs the Application with the settings specified in the object
         """
-        args=["run", "Applications="+self.name]
-        if verbose:
-            args.append("OcpiVerbose=1")
-        if self.name.endswith(".xml"):
+        if Path(self.directory).suffix == '.xml':
             directory = self.parent
-            type="applications"
+            name = self.name+'.xml'
+            type = "applications"
         else:
             directory = self.directory
-            type="application"
+            name = self.name
+            type = "application"
+        args = ["run", "Applications="+name]
+        if verbose:
+            args.append("OcpiVerbose=1")
         makefile = ocpiutil.get_makefile(directory, type)[0]
         return ocpiutil.execute_cmd(self.get_settings(),
                                     directory,
