@@ -1,0 +1,5 @@
+<!-- This is the test xml for testing component "timegate_csts" -->
+<Tests UseHDLFileIo='true' duration='10'>
+  <Input Port='in' Script='generate.py' MessagesInFile='true'/>
+  <Output Port='out' Script='verify.py'/>
+</Tests>
