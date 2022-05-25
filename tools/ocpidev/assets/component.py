@@ -76,7 +76,8 @@ class ShowableComponent(ShowableAsset):
             port_details = port.attrib
             for child in port:
                 if child.tag == "protocol":
-                    port_details["protocol"] = child.attrib.get("padding", "N/A")
+                    port_details["protocol"] = child.attrib.get("name", "N/A")
+                    break
             self.port_list.append(port_details)
         #set up self.slave_list from the xml
         for slave in parsed_xml.findall("slave"):
