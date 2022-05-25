@@ -204,8 +204,7 @@ def postprocess_args(args):
     elif args.noun == 'test':
         if args.name and args.name.endswith('.test'):
             args.name = args.name.split('.')[0]
-    if args.noun not in ['registry', 'project'] and args.name and (not args.name.isidentifier() or
-                                                                   args.name[0] == '_'):
+    if not verify_asset_name(args.name, args.noun):
         ocpiutil.logging.error(f'"{args.name}" is an invalid asset name.')
         sys.exit(1)
     if not getattr(args, 'format',None):
@@ -221,6 +220,22 @@ def postprocess_args(args):
     if args.doc_only:
         os.environ["OCPI_DOC_ONLY"] = "1"
     return args
+
+
+def verify_asset_name(name: str, noun: str) -> bool:
+    """Verifies an asset's name"""
+    if noun in ['registry', 'project']:
+        return True
+    if not name:
+        return True
+    if name.startswith('_'):
+        return False
+    if noun == 'application' and name.endswith('.xml'):
+        name = name[:-4]
+    if not name.isidentifier():
+        return False
+
+    return True
 
 
 def maybe_autocreate_library(parent_path, verbose):
