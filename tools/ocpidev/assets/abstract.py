@@ -366,8 +366,8 @@ class BuildableAsset(Asset):
             only_plats (list) - list of the only platforms(strings) to build for
         """
         super().__init__(directory, name, **kwargs)
-        self.ex_plats = kwargs.get("ex_plats", None)
-        self.only_plats = kwargs.get("only_plats", None)
+        self.ex_plats = kwargs.get("exclude_platform", None)
+        self.only_plats = kwargs.get("only_platform", None)
 
     def build(self, verbose=None, **kwargs):
         """
