@@ -26,6 +26,14 @@
 
 set -e
 
+#
+# Adding tools that this script can install is not quite a drop-in
+# operation yet.  Some tools require specifying an installer file.
+# Edit "ifile_required" as necessary: the tool names are separated
+# by '|'.
+#
+ifile_required="vivado"
+
 if [ "x$OCPI_CDK_DIR" = x ]
 then
   #
@@ -160,7 +168,7 @@ while (( "$#" )); do
         bad "Argument for \"$1\" is missing"
       fi
       ;;
-    -u|--url)
+    -u|--url|--url=*)
       if [[ "$1" == "--url="* ]]; then
 	URL=${1#*=}
 	shift
@@ -181,7 +189,52 @@ while (( "$#" )); do
       ;;
 
     # Undocumented flags
-    -d|--distro)
+    --tool-options|--tool-options=*)
+      if [[ "$1" == "--tool-options="* ]]; then
+        TOPTS=${1#*=}
+        shift
+      elif [ -n "$2" ]; then
+        #
+        # "--long-option value" is a problematic syntax for
+        # this option because the value can begin with a '-',
+        # i.e., must omit the normal [ ${2:0:1} != "-" ] test.
+        #
+        TOPTS="$2"
+        shift 2
+      else
+        bad "Argument for \"$1\" is missing"
+      fi
+      ;;
+    --installer-file|--installer-file=*)
+      if [[ "$1" == "--installer-file="* ]]; then
+        IFILE=${1#*=}
+        shift
+      elif [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+        IFILE=$2
+        shift 2
+      else
+        bad "Argument for \"$1\" is missing"
+      fi
+      ;;
+    -d|--directory|--directory=*)
+      #
+      # A little sleight of hand here: as long as the tool
+      # installer script interprets the associated option
+      # value for '-d' as the installation directory, the
+      # corresponding long-format option does not have to
+      # be '--directory' in the installer script.
+      #
+      if [[ "$1" == "--directory="* ]]; then
+        TOPTS+=" -d ${1#*=}"
+        shift
+      elif [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+        TOPTS+=" -d $2"
+        shift 2
+      else
+        bad "Argument for \"$1\" is missing"
+      fi
+      ;;
+    --distro)
       export OCPI_DISTRO_BUILD=1
       shift
       ;;
@@ -219,38 +272,92 @@ unset PARAMS
 # The <verb> argument.
 action=$1
 
+#
 # Needs to be after $action is set as a different usage message is printed
 # based on the action. Also, at least 3 positional arguments are required.
+#
 if [[ -n "$HELP" || $# -lt 3 ]]; then
   usage
 fi
 
-# $2 is always 'platform' for now
+#
+# What follows is going to be a clumsy first attempt
+# to add the "install tool" functionality.  Other
+# scripts support <verb>+<noun> combinations better.
+#
+# $2 must be either 'platform' or 'tool'
+#
 noun=$2
-if [ "$noun" != platform ]; then
-  bad "Unknown $action noun: '$noun'"
-fi
-if [ "$action" = install ]; then
-  platform=${3%-*}
-  platform_target_dir=$3
-  if [ -z "$platform" ]; then
-    bad 'Missing platform to install'
-  fi
-  # Check to ensure "PKG_ID" is non-null if either
-  # "--url" or "--git-revision" were specified.
-  if [[ ("$URL" || "$GIT_REV") && -z "$PKG_ID" ]]
-  then
-    bad 'PKG_ID is required if a URL or GIT_REV is specified'
-  fi
-elif [ "$action" = deploy ]; then
-  rcc_platform=$3
-  hdl_platform=$4
-  if [ -z "$hdl_platform" ]; then
-    bad 'Cannot deploy platform, missing required rcc and/or hdl platform'
-  fi
-else
-  bad "Unknown action: '$action'"
-fi
+case "$noun" in
+  platform)
+    if [ "$action" = install ]
+    then
+      platform=${3%-*}
+      platform_target_dir=$3
+      if [ -z "$platform" ]
+      then
+        bad 'Missing platform to install'
+      fi
+      # Check to ensure "PKG_ID" is non-null if either
+      # "--url" or "--git-revision" were specified.
+      if [[ ("$URL" || "$GIT_REV") && -z "$PKG_ID" ]]
+      then
+        bad 'PKG_ID is required if a URL or GIT_REV is specified'
+      fi
+    elif [ "$action" = deploy ]
+    then
+      rcc_platform=$3
+      hdl_platform=$4
+      if [ -z "$hdl_platform" ]
+      then
+        bad 'Cannot deploy platform, missing required rcc and/or hdl platform'
+      fi
+    else
+      bad "Unknown action: '$action'"
+    fi
+    ;;
+  tool)
+    if [ "$action" = install ]
+    then
+      tool=$3
+      if [ -z "$tool" ]
+      then
+        bad 'Missing tool to install'
+      fi
+      case $tool in
+        $ifile_required)
+          #
+          # A mandatory option?  Unless a sensible
+          # default value for it can be determined,
+          # this is unavoidable.
+          #
+          if [ -z "$IFILE" ]
+          then
+            bad "Tool '$tool' requires '--installer-file' option"
+          fi
+          ;;
+      esac
+      ISCRIPT="$OCPI_CDK_DIR/scripts/*/$action-$tool.sh"
+      if [ ! -f $ISCRIPT ]
+      then
+        bad "Missing script: $ISCRIPT"
+      fi
+      installer_argv=($TOPTS)
+      exec $ISCRIPT ${installer_argv[@]} $IFILE
+
+      #
+      # The next statement is unreachable
+      # unless execfail is set/enabled.
+      #
+      bad "exec failed: $ISCRIPT ${installer_argv[@]} $IFILE"
+    else
+      bad "Unknown action: '$action'"
+    fi
+    ;;
+  *)
+    bad "Unknown $action noun: '$noun'"
+    ;;
+esac
 
 # End parsing and validation of positional args
 
