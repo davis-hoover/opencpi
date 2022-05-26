@@ -20,7 +20,6 @@ Changes/additions since [OpenCPI Release v2.4.1](https://gitlab.com/opencpi/open
 - **tools**: build-pages.py: register OSPs and COMPs. (!868)(186765d3)
 - **tools**: rename `BF` to `OcpiBF` in framework makefiles to avoid namespace collisions. (!881)(fb68e20b)
 - **tools**: ocpiadmin: fix broken long-format option parsing. (!897)(9d25285b)
-- **tools**: fix ocpidev delete project to only unregister if it deletes. (!898)(abce881e)
 - **tools**: fix timegate_csts to accept CSTS timestamps. (!908)(65984e93)
 
 # [v2.4.1](https://gitlab.com/opencpi/opencpi/-/compare/v2.4.0...v2.4.1) (2022-03-17)
