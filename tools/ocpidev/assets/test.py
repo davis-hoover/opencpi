@@ -85,9 +85,9 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
             elif prepare and run and verify:
                 self.mode = "prep_run_verify"
             else:
-                raise ocpiutil.OCPIException("Invalid phases: " + " ".join(phases))
+                raise ocpiutil.OCPIException("Invalid phases: " + " ".join(self.phases))
         self.remote_test_sys = remote_test_sys
-
+    
         # using the make target "all" instead of "build" so that old style unit tests wont blow up
         # "all" and "build" will evaluate to the functionality
         self.mode_dict = {}
@@ -113,12 +113,13 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         """
         Runs the Test with the settings specified in the object
         """
-        goal=self.mode_dict[self.mode]
+        goal = self.mode_dict[self.mode]
         if self.mode != "view" and (self.view or "view" in self.phases):
             goal.append("view")
         directory = str(Path(self.directory))
         make_file = ocpiutil.get_makefile(directory, "test")[0]
         make_file = str(Path(directory, make_file).resolve())
+        
         return ocpiutil.execute_cmd(self.get_settings(),
                                     directory,
                                     goal,
