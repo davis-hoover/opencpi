@@ -320,16 +320,20 @@ def _preprocess_args(args_dict, args=None):
         arg = arg.replace('_', '-')
         if arg in ['simple', 'table', 'json']:
             arg = '--format='+arg
-        elif isinstance(val,bool):
+        elif isinstance(val, bool):
             arg = '--{}'.format(arg)
         elif arg == 'verbose': # action is count
             if not val:
                 continue
-            arg = '-'
-            for i in range(val):
-                arg += 'v'
+            arg = '-' + 'v' * val
+        elif isinstance(val, list):
+        # Separate list for main parser
+            for v in val:
+                a = '--{}={}'.format(arg, v)
+                args.append(a)
+            continue
         else:
-            arg = '--{}={}'.format(arg,val)
+            arg = '--{}={}'.format(arg, val)
         args.append(arg)
 
     return extra+args
@@ -339,7 +343,6 @@ def _postprocess_args(args):
     """
     Post-processes args after they have been parsed.
     """
-
     if hasattr(args, 'noun'):
         subnoun_key = '{}_noun'.format(args.noun)
         if hasattr(args, subnoun_key):
@@ -351,10 +354,6 @@ def _postprocess_args(args):
         if hasattr(val, '__call__'):
         # If value is a function, call it
             val = val()
-        if isinstance(val, list):
-        # Format lists
-            val = [re.sub('[\[\]\s\'\']', '', sub) for elem in val 
-                   for sub in elem.split(',')]
         setattr(args, arg, val)
 
     return args
