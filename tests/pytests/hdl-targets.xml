@@ -15,6 +15,9 @@
   <vendor name='modelsim'>
     <family name='modelsim' toolset='modelsim'/>
   </vendor>
+  <vendor name='riviera'>
+    <family name='riviera' toolset='riviera'/>
+  </vendor>
   <vendor name='xilinx'>
     <family name='isim' toolset='isim'/>
     <family name='spartan3adsp' toolset='xst' parts='xc3sd3400a'/>
@@ -35,6 +38,7 @@
   <!-- currently the only attribute per tool set is whether it is a simulator -->
   <toolset name='isim' tool='ISE' simulator='true'/>
   <toolset name='modelsim' tool='Modelsim' simulator='true'/>
+  <toolset name='riviera' tool='Riviera' simulator='true'/>
   <toolset name='xsim' tool='Vivado' simulator='true'/>
   <toolset name='quartus' tool='Quartus'/>
   <toolset name='quartus_pro' tool='QuartusPro'/>
@@ -50,6 +54,8 @@
   <platform name='alst4x' model='hdl'  part='ep4sgx530k-c2-h40' family='stratix4'
 	    directory='fake_plat' package_id='fake_plat'/>
   <platform name='modelsim' model='hdl' part='modelsim' family='modelsim'
+	    directory='fake_plat' package_id='fake_plat'/>
+  <platform name='riviera' model='hdl' part='riviera' family='riviera'
 	    directory='fake_plat' package_id='fake_plat'/>
   <platform name='isim' model='hdl' part='isim' family='isim'
 	    directory='fake_plat' package_id='fake_plat'/>

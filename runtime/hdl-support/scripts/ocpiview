@@ -91,6 +91,9 @@ elif test -f xsim.wdb; then
   # a session with the OTHER WDB file. Then we use the open_wave_database TCL command
   # in view.tcl to open the correct Wave Database file.
   exec xsim -gui $(echo *_x*sim_*.wdb | cut -f 1 -d '.') -tclbatch view.tcl
+elif test -f dataset.asdb; then
+  export ALDEC_LICENSE_FILE=$OCPI_RIVIERA_LICENSE_FILE
+  exec $OCPI_RIVIERA_DIR/bin/riviera -do ocpiview.do
 else
   files=(`shopt -s nullglob; echo *.*sim.20*[0-9]`)
   nfiles=${#files[@]}
@@ -98,15 +101,15 @@ else
     if [ -d simulations ]; then
       exec bash $0 simulations
     fi
-    echo No simulation files \(xsim.wdb, isim.wdb or vsim.wlf\) nor simulation directories \(*.*sim.\<date\>\) found.
+    echo No simulation files \(xsim.wdb, isim.wdb, dataset.asdb or vsim.wlf\) nor simulation directories \(*.*sim.\<date\>\) found.
     exit 1
   fi
   files=(`ls -dtr ${files[*]}`)
   nfiles=${#files[@]}
   last=${files[$nfiles-1]}
-  if test -f $last/isim.wdb -o -f $last/vsim.wlf -o -f $last/xsim.wdb; then
+  if test -f $last/isim.wdb -o -f $last/vsim.wlf -o -f $last/dataset.asdb -o -f $last/xsim.wdb; then
     exec bash $0 $last
   fi
-  echo Although a simulation directory was found \($last\), no sim files were found \($last /xsim.wdb or $last/isim.wdb or $last/vsim.wlf\)
+  echo Although a simulation directory was found \($last\), no sim files were found \($last /xsim.wdb or $last/isim.wdb or $last/dataset.asdb or $last/vsim.wlf\)
   exit 1
 fi

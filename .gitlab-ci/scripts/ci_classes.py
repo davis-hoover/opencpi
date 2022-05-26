@@ -183,6 +183,17 @@ class PipelineBuilder(ABC):
 
         return trigger
 
+    def _build_resource_group(self, stage: str, platform: str) -> str:
+        """Builds a resource group for a job"""
+        if stage == 'install-platform' and platform.startswith('xilinx'):
+            resource_group = 'xilinx'
+        elif platform == 'riviera':
+            resource_group = platform
+        else:
+            resource_group = None
+
+        return resource_group
+
     def _build_retry(self) -> dict:
         """
         Constructs and returns a dictionary for a job's retry setting
@@ -310,6 +321,11 @@ class PlatformPipelineBuilder(PipelineBuilder):
         # Build job for each stage
             if stage in ['osp', 'comp']:
             # Build bridge job for each project
+                if (stage == 'comp' and len(self.platforms) == 1 
+                    and 'riviera' in self.platforms):
+                # Due to license and resource_group limitations, Don't 
+                # trigger comp pipeline if only platform is riviera 
+                    continue
                 projects = self.projects[stage]
                 for project in projects:
                     job = self._build_job(stage, None, project=project)
@@ -421,7 +437,8 @@ class PlatformPipelineBuilder(PipelineBuilder):
             if stage == 'install-platform':
                 volumes = [
                     '/opt/Xilinx:/opt/Xilinx',
-                    '/opt/Mentor:/opt/Mentor'    
+                    '/opt/Mentor:/opt/Mentor',
+                    '/opt/ALDEC:/opt/ALDEC'
                 ]
             else:
                 volumes = None
@@ -506,15 +523,6 @@ class PlatformPipelineBuilder(PipelineBuilder):
                     script.append(docker_rmi_cmd)
 
         return script
-
-    def _build_resource_group(self, stage: str, platform: str) -> str:
-        """Builds a reource group for a job"""
-        if stage == 'install-platform' and platform.startswith('xilinx'):
-            resource_group = 'xilinx'
-        else:
-            resource_group = None
-
-        return resource_group
 
     def _build_variables(self, stage: str, host: str, platform: str=None, 
         base_platform: str=None, other_platform: str=None,
@@ -738,7 +746,8 @@ class OspPipelineBuilder(PlatformPipelineBuilder):
             ocpi_cmd = self._build_ocpi_cmd(stage, platform, base_platform)
             volumes = [
                 '/opt/Xilinx:/opt/Xilinx',
-                '/opt/Mentor:/opt/Mentor'
+                '/opt/Mentor:/opt/Mentor',
+                '/opt/ALDEC:/opt/ALDEC'
             ]
             docker_create_cmd = self._build_docker_cmd('create', base_image, 
                 stage, ocpi_cmd=ocpi_cmd, volumes=volumes)
@@ -879,7 +888,8 @@ class CompPipelineBuilder(PlatformPipelineBuilder):
             ocpi_cmd = self._build_ocpi_cmd(stage, platform, base_platform)
             volumes = [
                 '/opt/Xilinx:/opt/Xilinx',
-                '/opt/Mentor:/opt/Mentor'
+                '/opt/Mentor:/opt/Mentor',
+                '/opt/ALDEC:/opt/ALDEC'
             ]
             docker_create_cmd = self._build_docker_cmd('create', base_image, 
                 stage, ocpi_cmd=ocpi_cmd, volumes=volumes)
@@ -1102,9 +1112,11 @@ class AssemblyPipelineBuilder(PipelineBuilder):
         after_script = self._build_after_script(stage)
         artifacts = self._build_artifacts(stage, asset)
         variables = self._build_variables(stage)
+        resource_group = self._build_resource_group(stage, self.platform)
         job = ScriptJob(name, stage, script, tags=tags, needs=needs, 
                         before_script=before_script, after_script=after_script, 
-                        artifacts=artifacts, variables=variables)
+                        artifacts=artifacts, variables=variables, 
+                        resource_group=resource_group)
 
         return job
 
@@ -1114,7 +1126,8 @@ class AssemblyPipelineBuilder(PipelineBuilder):
         base_image = self._build_base_image_name(stage)
         volumes = [
             '/opt/Xilinx:/opt/Xilinx',
-            '/opt/Mentor:/opt/Mentor'
+            '/opt/Mentor:/opt/Mentor',
+            '/opt/ALDEC:/opt/ALDEC'
         ]
         if stage in ['run-applications', 'run-unit_tests']:
         # Create "docker create" cmd, copy artifacts to container, and create

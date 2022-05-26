@@ -41,6 +41,15 @@ modelsim:
       OCPI_MODELSIM_DIR: '/opt/Mentor/modelsim_dlx'
       OCPI_MODELSIM_LICENSE_FILE: '2103@sembach.opencpi.net'
 
+riviera:
+  variables:
+    OCPI_RIVIERA_DIR: '/opt/ALDEC'
+    OCPI_RIVIERA_LICENSE_FILE: '9393@sembach.opencpi.net'
+  overrides: # deprecated; use 'variables'
+    variables:
+      OCPI_RIVIERA_DIR: '/opt/ALDEC'
+      OCPI_RIVIERA_LICENSE_FILE: '9393@sembach.opencpi.net'
+
 # hdl
 adrv9361:
   ip: 10.1.0.232 # deprecated

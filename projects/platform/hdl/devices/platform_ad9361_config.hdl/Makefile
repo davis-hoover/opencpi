@@ -32,6 +32,6 @@ HdlExactPart=\
 SourceFiles=signals.vhd
 Libraries=platform
 
-ExcludeTargets=modelsim altera
+ExcludeTargets=modelsim altera riviera
 
 include $(OCPI_CDK_DIR)/include/worker.mk
