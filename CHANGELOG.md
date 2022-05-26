@@ -1,3 +1,28 @@
+# [v2.4.2](https://gitlab.com/opencpi/opencpi/-/compare/v2.4.1...v2.4.2) (2022-05-26)
+
+Changes/additions since [OpenCPI Release v2.4.1](https://gitlab.com/opencpi/opencpi/-/releases/v2.4.1)
+
+### Enhancements
+- **devops**: make pipeline ignore warnings from ocpidev. (!880)(ad9c8552)
+- **doc**: update message payload descriptions in reference docs. (!879)(e08292fe)
+- **doc**: add timing diagram examples to HDL Development Guide. (!879)(e08292fe)
+- **doc**: update raw property interface description in Briefing 8. (!879)(e08292fe)
+- **doc**: update project and component directory diagrams in Briefing 5, 8, 11, HDL Development Guide. (!879)(e08292fe)
+- **doc**: update doc/man/src/README to current man page status. (!879)(e08292fe)
+
+### Bug Fixes
+- **comp**: fix CMOS ad9361 ADC frame alignment for 1r1t. (!912)(84966277)
+- **doc**: remove duplicate -d option from ocpidev-registry man page. (!879)(e08292fe)
+- **doc**: add hyperlink to ocpidev-project in ocpidev-unregister man page. (!879)(e08292fe)
+- **doc**: remove unnecessary ocpidev-subdevice man page. (!879)(e08292fe)
+- **hdl base**: Add BRAM1 into util library. (!888)(d8b87b73)
+- **tests,tools**: use `pip3` to install `scipy` on `centos7`. (!866)(3dae6f2d)
+- **tools**: build-pages.py: register OSPs and COMPs. (!868)(186765d3)
+- **tools**: rename `BF` to `OcpiBF` in framework makefiles to avoid namespace collisions. (!881)(fb68e20b)
+- **tools**: ocpiadmin: fix broken long-format option parsing. (!897)(9d25285b)
+- **tools**: fix ocpidev delete project to only unregister if it deletes. (!898)(abce881e)
+- **tools**: fix timegate_csts to accept CSTS timestamps. (!908)(65984e93)
+
 # [v2.4.1](https://gitlab.com/opencpi/opencpi/-/compare/v2.4.0...v2.4.1) (2022-03-17)
 
 Changes/additions since [OpenCPI Release v2.4.0](https://gitlab.com/opencpi/opencpi/-/releases/v2.4.0)
