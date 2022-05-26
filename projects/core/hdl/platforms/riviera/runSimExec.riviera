@@ -1,0 +1,135 @@
+#!/bin/bash
+# This file is protected by Copyright. Please refer to the COPYRIGHT file
+# distributed with this source distribution.
+#
+# This file is part of OpenCPI <http://www.opencpi.org>
+#
+# OpenCPI is free software: you can redistribute it and/or modify it under the
+# terms of the GNU Lesser General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Lesser General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
+source $OCPI_CDK_DIR/scripts/util.sh
+
+function bad {
+  [ -n "$verbose" ] && echo $* 1>&2 && echo Probe for Riviera-PRO failed. 1>&2
+  exit 1
+}
+
+[ "$1" = -v ] && {
+  verbose = 1
+  shift
+}
+
+vsim="$OCPI_RIVIERA_DIR/bin/vsim"
+vmap="$OCPI_RIVIERA_DIR/bin/vmap"
+
+
+# Choose Rivier-PRO operation mode GUI/batch
+# GUI
+# riv_exe="$OCPI_RIVIERA_DIR/bin/riviera"
+# batch
+riv_exe="$OCPI_RIVIERA_DIR/bin/vsimsa"
+
+echo "$@" 1>&2
+
+[ "$1" = probe ] && {
+  [ -z "$OCPI_RIVIERA_DIR" ] &&
+    bad The OCPI_RIVIERA_DIR environment variable is not set.
+  [ -z "$OCPI_RIVIERA_LICENSE_FILE" ] &&
+    bad The OCPI_RIVIERA_LICENSE_FILE environment variable is not set.
+  [ -d "$OCPI_RIVIERA_DIR" ] ||
+    bad The OCPI_RIVIERA_DIR directory $OCPI_RIVIERA_DIR does not exist as a directory.
+  [ -x "$OCPI_RIVIERA_DIR/bin/vsim" ] ||
+    bad No Riviera-PRO executable found at \"$OCPI_RIVIERA_DIR/bin/vsim\".
+  probefile=$(cd $(dirname $0); pwd)/probe.tgz
+  [ -f "$probefile" ] ||
+    bad Missing Riviera-PRO probe support file \"$probefile\".
+  tmpdir=`mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdirXXX'` # stackoverflow 30091
+  cd $tmpdir
+  tar xzf $probefile
+  divert="2>&1"
+  [ -n "$verbose" ] && {
+    echo Attempting to run Riviera-PRO/vsim with license file \"$OCPI_RIVIERA_LICENSE_FILE\". 1>&2
+    divert=
+  }
+  # eval LM_LICENSE_FILE=$OCPI_RIVIERA_LICENSE_FILE $vsim -c work.probe < /dev/null > /dev/null $divert
+  echo $divert 1>&2
+  pwd 1>&2
+  eval LM_LICENSE_FILE=$OCPI_RIVIERA_LICENSE_FILE $vsim -c work.probe < /dev/null > /dev/null $divert
+  if [ $? = 0 ] ; then
+    [ -n "$verbose" ] && echo Riviera-PRO is available and licensed. 1>&2
+    exit 0
+  fi
+  [ -n "$verbose" ] && echo Riviera-PRO/vsim command failed. 1>&2
+  exit 1
+}
+if [[ $OCPI_RIVIERA_DIR == "" ]]; then
+   echo "The OCPI_RIVIERA_DIR environment variable is not set, and is required for Riviera-PRO executables." 1>&2
+   exit 1
+fi
+if [[ $OCPI_RIVIERA_LICENSE_FILE == "" ]]; then
+   echo "The OCPI_RIVIERA_LICENSE_FILE environment variable is not set, and is required for Riviera-PRO executables." 1>&2
+   exit 1
+fi
+
+echo Filename: $1 1>&2
+read assyname contname<<EOF
+`echo $1 | sed 's/^.*://' | sed 's/^\(.*\)_riviera.*$/\1 &/'`
+EOF
+libname=${contname##*.}
+assybase=${assyname##*.}
+echo Assembly: $assyname  Container: $contname  Libname: $libname 1>&2
+
+shift
+
+# Set licnese for Riviera-PRO
+export ALDEC_LICENSE_FILE=$OCPI_RIVIERA_LICENSE_FILE
+
+for i in $*; do echo for $i; plusargs="$plusargs +$i"; done
+
+libname=${contname##*.}
+
+# Get library location
+riv_libpath=$(find ${OCPI_PROJECT_DIR} -type d -name ${libname})
+
+# Using library mappings from compilation step
+$vmap -link ${riv_libpath}/..
+
+dataset=${libname}
+
+# Simulation script
+echo "# OCPI Simulation script" > sim.do
+# error handling
+echo "onerror {" >> sim.do
+echo "    quit -code 1 -force" >> sim.do
+echo "}" >> sim.do
+# diagnostics log
+echo "transcript file ocpi_riviera_sim.log" >> sim.do
+# suppressing redundant messages -> -ieee_nowarn
+echo "asim -dbg -ieee_nowarn +access +r -datasetname {${dataset}} -lib ${libname} -f vsim.args ${plusargs} ${libname}.${libname}" >> sim.do
+echo "log -verbose -rec *" >> sim.do
+echo "run 1000ms" >> sim.do
+echo "endsim" >> sim.do
+echo "quit" >> sim.do
+
+# Wave view script (postsimulation view) - allows for observing selected signals
+echo "# OCPI Postcosim wave view" > ocpiview.do
+echo "dv.view.activate" >> ocpiview.do
+echo "dv.add dataset.asdb" >> ocpiview.do
+echo "hv.view.activate" >> ocpiview.do
+echo "ov.view.activate" >> ocpiview.do
+echo "system.open -wave" >> ocpiview.do
+echo "echo Select desired signals for examining using Hierarchy and Objects windows"
+
+# Start simulation
+$riv_exe -do sim.do
+

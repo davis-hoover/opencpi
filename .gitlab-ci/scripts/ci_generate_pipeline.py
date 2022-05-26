@@ -128,6 +128,8 @@ def _make_comp_pipeline(dump_path: Path,
     image_tags = _get_image_tags()
     hosts = re.split(r'\s|,\s|,', getenv('CI_OCPI_HOSTS', '').strip('"'))
     platforms = _parse_platforms_directive()
+    # Due to license limitations, don't run comp projects for riviera
+    platforms.pop('riviera', None) 
     projects = _parse_projects_directive()
     project = getenv('CI_PROJECT_NAME', '')
     container_registry = getenv('CI_OCPI_CONTAINER_REGISTRY')
