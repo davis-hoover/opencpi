@@ -289,7 +289,7 @@ def _preprocess_args(args_dict, args=None):
     options_dict.update(COMMON_OPTIONS)
     options_dict.pop('help', None)
     parser = _make_options(parser, options_dict)
-    args,extra = parser.parse_known_args(args)
+    args, extra = parser.parse_known_args(args)
 
     try:
         ocpiutil.change_dir(args.directory)
@@ -297,8 +297,10 @@ def _preprocess_args(args_dict, args=None):
         ocpiutil.logging.error(e)
         sys.exit(1)
 
-    verb = extra[0] if len(extra) > 0 else None
-    noun = extra[1] if len(extra) > 1 else None
+    # Get verb and noun
+    positionals = [x for x in extra if not x.startswith('-')]
+    verb = positionals[0] if len(positionals) > 0 else None
+    noun = positionals[1] if len(positionals) > 1 else None
 
     if not noun:
     # Noun not supplied, so try to get default
@@ -316,7 +318,7 @@ def _preprocess_args(args_dict, args=None):
 
     args_dict = vars(args).items()
     args = []
-    for arg,val in args_dict:
+    for arg, val in args_dict:
         arg = arg.replace('_', '-')
         if arg in ['simple', 'table', 'json']:
             arg = '--format='+arg
