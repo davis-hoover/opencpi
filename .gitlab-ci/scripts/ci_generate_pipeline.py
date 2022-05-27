@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import asyncio
 from typing import List
 import json
 from pathlib import Path
@@ -323,32 +324,37 @@ def _parse_platforms_directive(whitelist: List[str]=None,
     return filtered_platforms
 
 
-def _ocpidev_show(noun: str, directory: str='.', scope=None) -> dict:
+async def _ocpidev_show(noun: str, directory: str='.', scope=None) -> dict:
     """
     Call ocpidev show with provided arguments
     
-    Loads json into a dictionary to return.
+    Loads json into a dictionary to return. Runs asynchronously to make
+    up for "ocpidev show" being slow.
     """
-    cmd = ['ocpidev', 'show', noun, '--json']
+    cmd = ' '.join(['ocpidev', 'show', noun, '--json'])
     if scope:
-        cmd.append('--{}-scope'.format(scope))
-    process = subprocess.run(
+        cmd += ' --{}-scope'.format(scope)
+    process = await asyncio.create_subprocess_shell(
         cmd, 
         stdout=subprocess.PIPE, 
         stdin=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        universal_newlines=True,
+        stderr=subprocess.PIPE, 
+        encoding='utf-8', # FIXME: why? this must be None on MacOS at least
         cwd=directory)
-    if process.returncode:
-        sys.exit(process.stderr)
+    stdout, stderr = await process.communicate()
+    stdout = stdout.decode().rstrip()
+    stderr = stderr.decode().rstrip()
+    if stderr:
+        sys.exit('Error: {}'.format(stderr))
 
-    return json.loads(process.stdout)
+    return json.loads(stdout)
 
 
 def _get_projects(whitelist: List[str]=None, 
     blacklist: List[str]=None) -> List[str]:
     """Returns opencpi registered project directories"""
-    projects = _ocpidev_show('projects')['projects']
+    loop = asyncio.get_event_loop()
+    projects = loop.run_until_complete(_ocpidev_show('projects'))['projects']
     projects = [project['real_path'] for project in projects.values()]
     if whitelist is not None:
         projects = [project for project in projects
@@ -371,7 +377,8 @@ def _get_platforms(do_ocpishow=True, do_model_split=True) -> List[str]:
     """
     platforms = {'rcc': [], 'hdl': []}
     if do_ocpishow:
-        platforms = _ocpidev_show('platforms')
+        loop = asyncio.get_event_loop()
+        platforms = loop.run_until_complete(_ocpidev_show('platforms'))
     else:
         projects_path = Path('projects')
         if projects_path.exists():
@@ -429,31 +436,32 @@ def _get_assemblies(project_dirs: List[str]) -> List[str]:
 def _get_tests(project_dirs: List[str], model=None) -> List[str]:
     """Returns directories of opencpi tests"""
     tests = []
-    results = {}
     workers = None
     if model:
     # Gather workers of specified models
-        workers = {}
-        for project_dir in project_dirs:
-            workers.update(_ocpidev_show('workers', project_dir, 'local'))
-        workers = [worker["name"].split('.')[0] 
-                   for worker in workers.values() 
-                   if worker["model"] == model]
-    for project_dir in project_dirs:
-        results.update(_ocpidev_show('tests', project_dir, 'local'))
-    for result in results.values():
-        path = Path(result['path'])
-        if workers is not None:
-            # If no worker of specified model for unit test, continue
-            # FIXME: worker names are not necessarily component names with suffixes
-            if path.stem not in workers:
-                continue
-        try:
-            relative_path = path.relative_to(environ['OCPI_ROOT_DIR'])
-        except:
-            relative_path = path.relative_to(environ['CI_PROJECT_DIR'])
-        tests.append(str(relative_path))
-
+        futures = asyncio.gather(
+            *[_ocpidev_show('workers', project_dir, 'local') 
+              for project_dir in project_dirs])
+        results = asyncio.get_event_loop().run_until_complete(futures)
+        workers= [worker['name'].split('.')[0]
+                  for result in results for worker in result.values() if worker['model'] == model]
+    futures = asyncio.gather(
+        *[_ocpidev_show('tests', project_dir, 'local') 
+          for project_dir in project_dirs])
+    results = asyncio.get_event_loop().run_until_complete(futures)
+    for result in results:
+        for test in result.values():
+            path = Path(test['path'])
+            if workers is not None:
+                # If no worker of specified model for unit test, continue
+                # FIXME: worker names are not necessarily component names with suffixes
+                if path.stem not in workers:
+                    continue
+            try:
+                relative_path = path.relative_to(environ['OCPI_ROOT_DIR'])
+            except:
+                relative_path = path.relative_to(environ['CI_PROJECT_DIR'])
+            tests.append(str(relative_path))
     return tests
 
 
