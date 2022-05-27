@@ -3,7 +3,6 @@
 Changes/additions since [OpenCPI Release v2.4.1](https://gitlab.com/opencpi/opencpi/-/releases/v2.4.1)
 
 ### Enhancements
-- **devops**: make pipeline ignore warnings from ocpidev. (!880)(ad9c8552)
 - **doc**: update message payload descriptions in reference docs. (!879)(e08292fe)
 - **doc**: add timing diagram examples to HDL Development Guide. (!879)(e08292fe)
 - **doc**: update raw property interface description in Briefing 8. (!879)(e08292fe)
