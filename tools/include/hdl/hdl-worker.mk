@@ -35,7 +35,7 @@ endif
 Compile=$(HdlCompile)
 $(call OcpiDbgVar,HdlBin)
 $(infox LANGUAGE:$(HdlLanguage))
-BF=$(call OBJ,$2)
+OcpiBF=$(call OBJ,$2)
 #BF=$(HdlBin)
 #BF=$(if $(filter vhdl,$(HdlLanguage)),_rv)$(HdlBin)
 # This object suffix must include the paramconfig name because, at least for
@@ -99,7 +99,7 @@ Core=$(Worker)
 endif
 
 ifdef HdlToolRealCore
-WkrExportNames=$(Tops:%=%$(call BF,0))
+WkrExportNames=$(Tops:%=%$(call OcpiBF,0))
 endif
 $(call OcpiDbgVar,Top)
 $(call OcpiDbgVar,Tops)
