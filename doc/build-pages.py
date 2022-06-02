@@ -118,7 +118,15 @@ def main():
     # Download supported OSPs
     for osp in OSPS:
         download_osp(osp)
-        OSP_TAGS[osp] = get_tags(OCPI_OSPDIR / osp / ".git")
+        #
+        # FIXME: remove the following "if" when v2.4.3 gets
+        # released.  DO NOT ATTEMPT TO PROCESS v2.4.2 LaTeX
+        # docs for these two OSPs!!
+        #
+        if osp == "ocpi.osp.avnet" or osp == "ocpi.osp.xilinx":
+            OSP_TAGS[osp] = []
+        else:
+            OSP_TAGS[osp] = get_tags(OCPI_OSPDIR / osp / ".git")
         OSP_TAGS[osp].append("develop")  # develop will always be a valid git revision
 
     # Download supported COMPs
@@ -785,7 +793,10 @@ def find_files(search_dir, extension=None, recursive=True) -> List[Path]:
 
 
 def get_tags(git_dir: Path) -> List[str]:
-    cmd = ["git", "--git-dir", str(git_dir.resolve()), "tag", "-l", "v*"]
+    # Can no longer build "all" in less than 3 hours,
+    # so ignore tags corresponding to early releases.
+    # cmd = ["git", "--git-dir", str(git_dir.resolve()), "tag", "-l", "v*"]
+    cmd = ["git", "--git-dir", str(git_dir.resolve()), "tag", "-l", "v1.7*", "v2.*"]
     logging.debug(f"Executing cmd: {cmd}")
     tags = subprocess.check_output(cmd).decode().strip("\n").split("\n")
     if not tags[0]:
