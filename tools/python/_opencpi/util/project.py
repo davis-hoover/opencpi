@@ -895,18 +895,21 @@ def get_platform_attributes(project_package_id, directory, name, model):
     attrs['package_id'] = project_package_id + "." + name
     return attrs
 
-def find_all_projects(directory = None, project_package_id = None):
-    """
-    Find all projects (packageids and realpaths), returning an ORDERED dict of package-id->realpath.
+
+def find_all_projects(directory=None, project_package_id=None):
+    """Find all projects (packageids and realpaths).
+    
+    Returns an ORDERED dict of package-id->realpath.
     This function does not navigate into the exports subdir of a project
-    Optional argument is simply a directory that we think might be *in* a project and thus should be
-    used to find the registry.
-    If the package_id argument is supplied it means we know the directory is a project and we know
-    its package_id
+    Optional argument is simply a directory that we think might be *in* 
+    a project and thus should be used to find the registry.
+    If the package_id argument is supplied it means we know the 
+    directory is a project and we know its package_id/
     OCPI_PROJECT_PATH is also used as a source of projects.
-    The ordered dict returned is suitable for project searching: *this* project, projectpath, registry
-    Note a small amount of extra effort is done to always have the package_id even though
-    in some contexts it is not needed.
+    The ordered dict returned is suitable for project searching: 
+        *this* project, projectpath, registry
+    Note a small amount of extra effort is done to always have the 
+    package_id even though in some contexts it is not needed.
     Minimize file system touches
     """
     xml_file = None
@@ -916,69 +919,63 @@ def find_all_projects(directory = None, project_package_id = None):
         project_dir = directory
     elif directory:
         while not project_dir:
-            # We just test for existence (as opposed to opening the file)
-            # Since if it is registered we won't need it, and it probably is registered
-            xml_file = directory + "/Project.xml"
-            mk_file = directory + "/Project.mk"
-            if os.path.exists(xml_file):
+            # We just test for existence (as opposed to opening file)
+            # Since if it is registered we won't need it, and it 
+            # probably is registered
+            xml_file = str(Path(directory, "Project.xml"))
+            mk_file = str(Path(directory, "Project.mk"))
+            if Path(xml_file).exists():
                 project_dir = directory
                 mk_file = None
-            elif os.path.exists(mk_file):
+            elif Path(mk_file).exists():
                 project_dir = directory
                 xml_file = None
             else:
-                parent = ".." if directory == '.' or directory == "./" else directory + "/.."
-                if os.path.samefile(directory, parent): # root
+                parent = Path(directory).resolve().parent
+                if parent.samefile(directory): # root
                     break
-                directory = parent
-    if project_dir and os.path.isdir(project_dir + "/imports"):
-        registry_dir = project_dir + "/imports"
+                directory = str(parent)
+    if project_dir and Path(project_dir, "imports").is_dir():
+        registry_dir = str(Path(project_dir, "imports"))
     else:
-        # either no OCPI_PROJECT_DIR, or directory arg not in a project or project_dir has no imports
+        # either no OCPI_PROJECT_DIR, directory arg not in a project,
+        # or project_dir has no imports
         registry_dir = os.getenv('OCPI_PROJECT_REGISTRY_DIR')
         if not registry_dir:
-            registry_dir = get_root_dir() + "/project-registry"
-    projects=collections.OrderedDict()
+            registry_dir = str(Path(get_root_dir(), "project-registry"))
+    projects = collections.OrderedDict()
     # check for the directory we are in, that might *not* be registered
-    if project_dir: # from environment or from cwd: add it if not there already
+    if project_dir: # from environment or from cwd: add it if not there
+        realpath = Path(project_dir).resolve()
         if project_package_id:
-            projects[project_package_id] = os.path.realpath(project_dir)
+            projects[project_package_id] = str(realpath)
         else:
-            # no project ID handy, so use realpath
-            realpath = os.path.realpath(project_dir)
+        # no project ID handy, so use realpath
             if realpath not in projects.values():
                 attrs = get_project_attributes(realpath, xml_file, mk_file)
                 project_package_id = get_project_package_id(realpath, attrs)
-            projects[project_package_id] = realpath
-    path = os.getenv('OCPI_PROJECT_PATH')
-    for dir in path.split(':') if path else []:
-        realpath = os.path.realpath(dir)
+                projects[project_package_id] = str(realpath)
+    dirs = [dir for dir in os.getenv('OCPI_PROJECT_PATH', '').split(':') if dir]
+    for dir in dirs:
+        realpath = str(Path(dir).resolve())
         if realpath not in projects.values():
             attrs = get_project_attributes(realpath)
-            if realpath not in projects.values():
-                projects[get_project_package_id(realpath, get_project_attributes(realpath))] = realpath
-
+            pid = get_project_package_id(realpath, attrs)
+            projects[pid] = str(realpath)
     # Now process the registry
-    # This os.open is to enable dir_fd since the scandir iterator provide an fd until python 3.7
     if not Path(registry_dir).is_dir():
         raise OCPIException(f'The specified project registry directory "{registry_dir}" is '+
                             f'not a directory.')
-    fd = os.open(registry_dir, os.O_RDONLY)
-    with os.scandir(registry_dir) as it:
-        for entry in it:
-            if entry.is_symlink():
-                # Since there is no way to get a directory descriptor from a scandir iterator
-                if not projects.get(entry.name):
-                    projects[entry.name] = registry_dir + "/" + entry.name
-                    #dir = os.readlink(entry.name, dir_fd = fd);
-                    #projects[entry.name] = os.path.realpath(dir if dir.startswith("/")
-                    #                                        else registry_dir + "/" + dir)
-            else: # might be dead symlink
-                print(f'Warning:  the registry at "{registry_dir}" contains an invalid file/link: '+
-                      f'"{str(entry.name)}"',file=sys.stderr)
-                continue
-    os.close(fd)
+    for path in Path(registry_dir).iterdir():
+        if path.is_symlink() and path.exists():
+            if not projects.get(path.name):
+                projects[path.name] = str(Path(registry_dir, path.name))
+        else:
+            print(f'Warning: the registry at "{registry_dir}" contains an invalid file/link: '+
+                  f'"{path.name}"', file=sys.stderr)
+            continue
     return projects
+
 
 def get_platforms():
     """
