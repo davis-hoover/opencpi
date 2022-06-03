@@ -24,7 +24,6 @@ import sys
 import json
 from glob import glob
 import logging
-import shutil
 from pathlib import Path
 import _opencpi.util as ocpiutil
 from .abstract import ShowableAsset
@@ -32,34 +31,24 @@ from .factory import AssetFactory
 
 # TODO: Should also extend CreatableAsset, ShowableAsset
 class Registry(ShowableAsset):
-    """
-    The Registry class represents an OpenCPI project registry. As an OpenCPI
-    registry contains project-package-ID named symlinks to project directories,
-    registry instances contain dictionaries mapping package-ID to project instances.
-    Projects can be added or removed from a registry
+    """The Registry class represents an OpenCPI project registry. 
+    
+    As an OpenCPI registry contains project-package-ID named symlinks to 
+    project directories, registry instances contain dictionaries mapping 
+    package-ID to project instances. Projects can be added or removed 
+    from a registry.
     """
     instances_should_be_cached = True
     def __init__(self, directory, name=None, **kwargs):
         self.out_of_project = True
         self.asset_type = 'registry'
         super().__init__(directory, name, **kwargs)
-
-        # Each registry instance has a list of projects registered within it.
-        # Initialize this list by probing the file-system for links that exist
-        # in the registry directory.
-        # __projects maps package-ID --> project instance
-        self.__projects = {}
-        # use global scope for now
-        #for path in Path(self.directory).iterdir():
-        for pid,dir in ocpiutil.find_all_projects().items():
+        self.__projects = {} # maps package-ID --> project instance
+        for pid, dir in ocpiutil.find_all_projects().items():
             path = Path(dir)
-            if not path.exists() or not path.is_symlink(): # might be dead symlink
-                print(f'Warning:  the registry at "{self.directory}" contains an invalid file/link: '+
-                      f'{path}',file=sys.stderr)
-                continue
             pid = path.name
             project_dir = str(path.resolve())
-            self.__projects[pid] = AssetFactory.get_instance("project", project_dir, None, **kwargs)
+            self.__projects[pid] = AssetFactory.get_instance("project", project_dir, **kwargs)
 
     def add_assets(self, asset_type, assets, **kwargs):
         """
