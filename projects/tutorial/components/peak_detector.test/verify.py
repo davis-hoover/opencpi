@@ -58,17 +58,16 @@ def validation(argv):
 
     min_peak=max_peak=None
 
+    max_peak_re = re.compile("Property +\d+: peak_detector\.max_peak = \"(-?\d+)\".*")
+    min_peak_re = re.compile("Property +\d+: peak_detector\.min_peak = \"(-?\d+)\".*")
     with open(logname, 'r') as log:
         for line in log:
-            max_obj = re.search("Property \d+: peak_detector.max_peak = \"(-?\d+)\".*", line)
+            max_obj = max_peak_re.search(line)
             if max_obj: #max_obj[1]:
                 max_peak = int(max_obj.group(1))
-            min_obj = re.search("Property \d+: peak_detector.min_peak = \"(-?\d+)\".*", line)
+            min_obj = min_peak_re.search(line)
             if min_obj: #[1]:
                 min_peak = int(min_obj.group(1))
-    if not min_peak or not max_peak:
-        print("Exit: log file does not contain max/min peak final values")
-        return
 
     #Read all of input data file as complex int16
     print ('File to validate: ', argv[2])
@@ -106,7 +105,7 @@ def validation(argv):
     print ('*** End validation ***\n')
 
 def main():
-    print ("\n","*"*80)
+    print ("\n"+"*"*80)
     print ("*** Python: Peak Detector ***")
     validation(sys.argv)
 
