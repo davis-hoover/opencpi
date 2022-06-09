@@ -28,7 +28,7 @@ from typing import Dict, List, Union
 from jinja2 import Environment, FileSystemLoader
 
 # Supported OSPs
-OSPS = ["ocpi.osp.analog", "ocpi.osp.e3xx", "ocpi.osp.plutosdr", "ocpi.osp.ettus"]
+OSPS = ["ocpi.osp.analog", "ocpi.osp.e3xx", "ocpi.osp.plutosdr", "ocpi.osp.ettus", "ocpi.osp.avnet", "ocpi.osp.xilinx"]
 OSP_TAGS = dict()  # Will be filled in later
 
 # Supported COMPs
@@ -568,6 +568,10 @@ def gen_release_index(tag: str, is_latest=False):
                     section_title = "PlutoSDR OSP Documentation"
                 elif section_name == "ettus":
                     section_title = "Ettus OSP Documentation"
+                elif section_name == "avnet":
+                    section_title = "Avnet Engineering OSP Documentation"
+                elif section_name == "xilinx":
+                    section_title = "Xilinx OSP Documentation"
                 else:
                     section_title = section_title[4:] + " OSP Documentation"
                 if Path(f"{rst_dir}/osp_{section_name}/index.html").exists():
@@ -784,6 +788,10 @@ def get_tags(git_dir: Path) -> List[str]:
     cmd = ["git", "--git-dir", str(git_dir.resolve()), "tag", "-l", "v*"]
     logging.debug(f"Executing cmd: {cmd}")
     tags = subprocess.check_output(cmd).decode().strip("\n").split("\n")
+    if not tags[0]:
+        # no tags: unreleased project
+        logging.debug("no tags found")
+        return tags
     tags = sort_tags(tags, reverse=True)  # reverse required for proper filtering later
     logging.debug(f"sorted tags: {tags}")
 
