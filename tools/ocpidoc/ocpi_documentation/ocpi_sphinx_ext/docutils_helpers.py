@@ -130,15 +130,18 @@ def list_members(name, members):
 
 # If there was a base class for the directives that called this, then
 # this would be a method with no arguments
-def get_component_spec(source, reporter, line):
+def get_component_spec(source, reporter, line, component_spec_path = None):
     """ Get the component spec's dictionary based on where the source doc is
 
     Args:
         source (str): The pathname of the primary source document
+        reporter (LoggingReporter): Class used to log
+        line(int): The line in the primary source document
+        component_spec_path (optional, str): The spec path given in the "component_spec" option, if present.
     Returns:
         the dictionary version of the component specification (XML) or None if there isn't one
     """
-    source_dir = pathlib.Path(source).resolve().parent;
+    source_dir = pathlib.Path(source).resolve().parent
     library_specs_dir = source_dir.joinpath("../specs")
     # The documentation for a component must be in the same project as its spec, and the spec is
     # either in the .comp directory, the ../specs directory or in the project's specs directory
@@ -147,15 +150,29 @@ def get_component_spec(source, reporter, line):
                          if library_dir.name == 'components'
                          else library_dir.parent.parent).joinpath("specs")
     component_name = source_dir.stem
-    component_spec_path = None
-    for dir in [ source_dir, library_specs_dir, project_specs_dir ]:
-        for suffix in [ "-comp.xml", "-spec.xml", "_spec.xml" ]:
-            path = dir.joinpath(component_name + suffix)
-            if path.exists(): # might be symlink
-                component_spec_path = path
+    if component_spec_path is not None:
+        path = pathlib.Path(component_spec_path)
+        if path.exists(): # might be symlink
+            component_spec_path = path
+        else:
+            reporter.warning(
+                ("Directive on this line cannot find the given component "
+                 f"specification file: \"{component_spec_path}\". "
+                 f"Will look for \"{component_name}[-_]spec.xml\" in either "
+                 f"the component directory, \"{source_dir}\", the library's "
+                 f"specs directory \"{library_specs_dir}\" or the project's "
+                 f"specs directory \"{project_specs_dir}\"."),
+                line=line)
+            component_spec_path = None
+    if component_spec_path is None:
+        for dir in [ source_dir, library_specs_dir, project_specs_dir ]:
+            for suffix in [ "-comp.xml", "-spec.xml", "_spec.xml" ]:
+                path = dir.joinpath(component_name + suffix)
+                if path.exists(): # might be symlink
+                    component_spec_path = path
+                    break
+            if component_spec_path:
                 break
-        if component_spec_path:
-            break
     if component_spec_path:
         with xml_tools.parser.ComponentSpecParser(component_spec_path) as file_parser:
             return file_parser.get_dictionary()
