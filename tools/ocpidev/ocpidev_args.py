@@ -1,4 +1,3 @@
-from pathlib import Path
 import _opencpi.util as ocpiutil
 
 def get_noun():
@@ -11,7 +10,8 @@ def get_noun():
         if asset_type.endswith('-worker'):
             asset_type = 'worker'
         if asset_type in ['hdl-core', 'hdl-library']:
-            # Command line expects 'hdl-primitive-core' or 'hdl-primitive-library' as a list
+            # Command line expects 'hdl-primitive-core' or 
+            # 'hdl-primitive-library' as a list
             asset_type = 'hdl-primitive-' + asset_type[4:]
     else:
         asset_type = make_type
@@ -955,6 +955,7 @@ verbs = {
                 'options': {
                     'phase': options['phase'],
                     'mode': options['mode'],
+                    'view': options['view'],
                     'accumulate_errors': options['accumulate_errors'],
                     'keep_simulations': options['keep_simulations'],
                     'only_platform': options['only_platform'],
@@ -965,6 +966,7 @@ verbs = {
                 'options': {
                     'phase': options['phase'],
                     'mode': options['mode'],
+                    'view': options['view'],
                     'accumulate_errors': options['accumulate_errors'],
                     'keep_simulations': options['keep_simulations'],
                     'only_platform': options['only_platform'],
@@ -975,6 +977,7 @@ verbs = {
                 'options': {
                     'phase': options['phase'],
                     'mode': options['mode'],
+                    'view': options['view'],
                     'accumulate_errors': options['accumulate_errors'],
                     'keep_simulations': options['keep_simulations'],
                     'only_platform': options['only_platform'],
@@ -988,6 +991,7 @@ verbs = {
                     'hdl_library': options['hdl_library'],
                     'phase': options['phase'],
                     'mode': options['mode'],
+                    'view': options['view'],
                     'case': options['case'],
                     'accumulate_errors': options['accumulate_errors'],
                     'keep_simulations': options['keep_simulations'],
@@ -1002,6 +1006,7 @@ verbs = {
                     'hdl_library': options['hdl_library'],
                     'phase': options['phase'],
                     'mode': options['mode'],
+                    'view': options['view'],
                     'accumulate_errors': options['accumulate_errors'],
                     'keep_simulations': options['keep_simulations'],
                     'only_platform': options['only_platform'],
