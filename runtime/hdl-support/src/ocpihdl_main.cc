@@ -1759,11 +1759,14 @@ getxml(const char **ap) {
 
 static ezxml_t
 getmeta() {
+  static ezxml_t x; // we will never do this for more than one device
+  if (x)
+    return x;
   static std::vector<char> xml;
   std::string err;
   if (dev->getMetadata(xml, err))
     bad(err.c_str());
-  ezxml_t x = ezxml_parse_str(&xml[0], xml.size());
+  x = ezxml_parse_str(&xml[0], xml.size());
   if (x && ezxml_error(x)[0])
     bad("XML Parsing error: %s", ezxml_error(x));
   if (!x || !x->name)

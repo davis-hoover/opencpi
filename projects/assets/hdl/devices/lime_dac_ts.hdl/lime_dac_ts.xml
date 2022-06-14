@@ -1,5 +1,5 @@
 <!-- Lime DAC TimeStamped worker -->
-<HdlDevice language="vhdl" spec='qdac_ts-spec'>
+<HdlDevice language="vhdl" spec='qdac_ts-spec' libraries='util misc_prims'>
   <!-- Other included XML -->
   <xi:include href='lime-iq-properties.xml'/>
 

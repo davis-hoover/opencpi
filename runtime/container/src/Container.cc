@@ -226,7 +226,8 @@ namespace OCPI {
     }
     // This will be called inside a separate thread for this container.
     void Container::thread() {
-      while (m_enabled && runInternal())	;
+      while (m_enabled && runInternal())
+	;
       ocpiInfo("Container background thread for \"%s\" (%p) exited", name().c_str(), this);
       m_enabled = false; // container's thread is done - a self-disable
     }

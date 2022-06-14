@@ -1,5 +1,5 @@
 <!-- Lime ADC worker -->
-<HdlDevice language="vhdl" spec='qadc-spec'>
+<HdlDevice language="vhdl" spec='qadc-spec' libraries='util'>
   <!-- Other included XML -->
   <xi:include href='lime-iq-properties.xml'/>
 

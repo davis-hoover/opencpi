@@ -2,7 +2,7 @@
      two raw property ports, one for rx (always 0), and one for tx (always 1),
      with a shared reset
      -->
-<HdlDevice language="vhdl">
+<HdlDevice language="vhdl" libraries='util'>
   <ComponentSpec nocontrol='true'>
     <!-- CLK_FREQ_p is divided by the desired SPI clock rate, in this case 3.125 MHz, 
 	 to produce a clock cycle count value, which is an input to the SPI module -->

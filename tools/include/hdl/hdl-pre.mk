@@ -247,17 +247,19 @@ install: $(HdlToolSets:%=install_%)
 stublibrary: $(HdlToolSets:%=stublibrary_%)
 define HdlDoToolSet
 $(1):
-	$(AT)$(MAKE) -L --no-print-directory \
+	$(AT)$(MAKE) -L --no-print-directory -f $(firstword $(MAKEFILE_LIST))\
 	   HdlPlatforms="$(call HdlGetTargetsForToolSet,$(1),$(HdlPlatforms))" HdlTarget= \
            HdlTargets="$(call HdlGetTargetsForToolSet,$(1),$(HdlActualTargets))"
 
 stublibrary_$(1):
 	$(AT)$(MAKE) -L --no-print-directory HdlPlatforms= HdlTarget= \
+	   -f $(firstword $(MAKEFILE_LIST)) \
            HdlTargets="$(call HdlGetTargetsForToolSet,$(1),$(HdlActualTargets))" \
 	   stublibrary
 
 install_$(1):
 	$(AT)$(MAKE) -L --no-print-directory HdlPlatforms= HdlTarget= \
+	   -f $(firstword $(MAKEFILE_LIST)) \
            HdlTargets="$(call HdlGetTargetsForToolSet,$(1),$(HdlActualTargets))" \
            install
 endef
