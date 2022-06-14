@@ -185,7 +185,7 @@ public:
 	size_t copy_len;
 	for (uint8_t *bp = &buf[0]; n; n -= copy_len, bp += copy_len) {
 	  copy_len = std::min(n, bytes_left);
-	  ocpiDebug("Copying socket data to %p, size = %zu, in header %d, left %zu, first %x",
+	  ocpiLog(9, "Copying socket data to %p, size = %zu, in header %d, left %zu, first %x",
 		    current_ptr, copy_len, in_header, bytes_left, *(uint32_t *)bp);
 	  if (current_ptr) {
 	    memcpy(current_ptr, bp, copy_len );
@@ -197,10 +197,10 @@ public:
 	  if (!(bytes_left -= copy_len)) { // finishing header or data
 	    if (in_header) {
 	      size_t dataLength = XF::FlagMeta::getLengthInFlag(header.flagValue);
-	      ocpiDebug("Received Header: len %zu dataOff 0x%" PRIx32 " flagOff 0x%" PRIx32
-			"flag 0x%" PRIx32,
+	      ocpiLog(9,"Received Header socketIO: len %zu dataOff 0x%" PRIx32 " flagOff 0x%" PRIx32
+			" flag 0x%" PRIx32,
 			dataLength, header.dataOffset, header.flagOffset, header.flagValue);
-	      if (dataLength) {
+	      if (dataLength && header.dataOffset) {
 		bytes_left = dataLength;
 		in_header = false;
 		current_ptr =
@@ -216,8 +216,11 @@ public:
 	      if (m_sep.receiver())
 		m_sep.receiver()->receive(header.flagOffset, (uint8_t*)&header.flagValue,
 					  sizeof(uint32_t));
-	      else
-		*(uint32_t *)m_smem.map(header.flagOffset, sizeof(uint32_t)) = header.flagValue;
+	      else {
+		uint32_t *p32 = (uint32_t *)m_smem.map(header.flagOffset, sizeof(uint32_t));
+		*p32 = header.flagValue;
+		ocpiLog(9,"Received Flag socketIO: %p", p32);
+	      }
 	    }
 	    current_ptr = (uint8_t*)&header;
 	    bytes_left = sizeof(header); // packed
@@ -372,13 +375,14 @@ protected:
     header.flagOffset = 0;
     header.flagValue = XF::FlagMeta::packFlag(nbytes, 0, 0);
     header.timeStamp = 0;
-    ocpiDebug("Sending IP header %zu %" DTOSDATATYPES_OFFSET_PRIx" %" PRIx32,
-	      sizeof(header), header.dataOffset, header.flagValue);
     OS::IOVec sendVec[2]; // this may be modified in the send call
     sendVec[0].iov_base = &header;
     sendVec[0].iov_len = sizeof(header); // packed
     sendVec[1].iov_base = data;
     sendVec[1].iov_len = nbytes;
+    ocpiLog(9, "Sending socketIO0 %" DTOSDATATYPES_OFFSET_PRIx " %"
+	    DTOSDATATYPES_OFFSET_PRIx" %" PRIx32 " %zu",
+	    header.dataOffset, header.flagOffset, header.flagValue, nbytes);
     m_socket.send(&sendVec[0], 2);
   }
 };
@@ -423,13 +427,15 @@ private:
     assert(m_flagAddr);
     m_sendHeader.flagValue = *m_flagAddr;
     size_t dataLength = XF::FlagMeta::getLengthInFlag(m_sendHeader.flagValue);
-    assert(!dataLength || m_dataAddr);
     OS::IOVec sendVec[2]; // this may be modified in the send call
     sendVec[0].iov_base = &m_sendHeader;
     sendVec[0].iov_len = sizeof(m_sendHeader); // packed
     sendVec[1].iov_base = m_dataAddr;
     sendVec[1].iov_len = dataLength;
-    parent().m_socket.send(&sendVec[0], dataLength ? 2 : 1);
+    ocpiLog(9, "Sending socketIO1 %" DTOSDATATYPES_OFFSET_PRIx " %"
+	    DTOSDATATYPES_OFFSET_PRIx" %" PRIx32 " %zu",
+	    m_sendHeader.dataOffset, m_sendHeader.flagOffset, m_sendHeader.flagValue, dataLength);
+    parent().m_socket.send(&sendVec[0], m_dataAddr ? 2 : 1);
   }
 };
 

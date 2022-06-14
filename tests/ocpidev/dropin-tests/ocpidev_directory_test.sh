@@ -101,7 +101,6 @@ ex_ocpidev "library -l components --hdl-libary adapters -P my_plat" && fail
 echo "Running Failure Test 13"
 ex_ocpidev "library -l components my_lib_name" && fail
 echo "Running Failure Test 14"
-# This test used to fail, but now is supported.
 ex_ocpidev "library" && fail
 OCPI_WD="temp_proj"
 echo "Running Failure Test 15"

@@ -16,163 +16,88 @@
 -- You should have received a copy of the GNU Lesser General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
--- THIS FILE WAS ORIGINALLY GENERATED ON Wed Jul 18 16:21:43 2018 EDT
--- BASED ON THE FILE: iqstream_max_calculator.xml
--- YOU *ARE* EXPECTED TO EDIT IT
--- This file initially contains the architecture skeleton for worker: iqstream_max_calculator
-
-library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
+library IEEE; use IEEE.std_logic_1164.all, ieee.numeric_std.all;
 library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
 architecture rtl of worker is
 
-  -- all max values will take this value upon reset
-  constant RESET_VAL_c : integer := -32768;
-
-  -- mandatory input port logic
-  signal ready_for_in_port_data : std_logic := '0';
-
-  -- mandatory output port logic
-  signal data_ready_for_out_port : std_logic := '0';
-  signal out_meta_is_reserved    : std_logic := '0';
-  signal out_som                 : std_logic := '0';
-  signal out_eom                 : std_logic := '0';
-  signal out_valid               : std_logic := '0';
-
-  signal out_port_connected_n : std_logic := '0';
-  signal in_I    : signed((in_in.data'length/2)-1 downto 0) := (others => '0');
-  signal tmp     : std_logic_vector((in_in.data'length/2)-1 downto 0) := (others => '0');
-  signal in_Q    : signed((in_in.data'length/2)-1 downto 0) := (others => '0');
-  signal max_I   : signed((in_in.data'length/2)-1 downto 0) := to_signed(RESET_VAL_c,in_in.data'length/2);
-  signal max_Q   : signed((in_in.data'length/2)-1 downto 0) := to_signed(RESET_VAL_c,in_in.data'length/2);
-  signal max_I_r : signed((in_in.data'length/2)-1 downto 0) := to_signed(RESET_VAL_c,in_in.data'length/2);
-  signal max_Q_r : signed((in_in.data'length/2)-1 downto 0) := to_signed(RESET_VAL_c,in_in.data'length/2);
-  signal max_I_is_valid   : std_logic := '0';
-  signal max_Q_is_valid   : std_logic := '0';
-  signal max_I_is_valid_r : std_logic := '0';
-  signal max_Q_is_valid_r : std_logic := '0';
+  -- We are locking the data type to the property types in the spec: short_t
+  subtype value_t is short_t;
+  -- all max values will take this value upon reset - minimum negative value
+  constant RESET_VAL_c    : value_t := short_min;
+  signal in_I             : value_t := (others => '0');
+  signal in_Q             : value_t := (others => '0');
+  signal taking_data      : bool_t;
+  signal taking_eom       : bool_t; -- unusual EOM-preserving behavior of this worker
+  -- registers for volatile properties
+  signal max_I_r          : value_t := RESET_VAL_c;
+  signal max_Q_r          : value_t := RESET_VAL_c;
+  signal max_I_is_valid_r : bool_t  := bfalse;
+  signal max_Q_is_valid_r : bool_t  := bfalse;
+  -- convert values in the (variable width) data path to our property types
+  function to_value(s: std_logic_vector) return value_t is
+    variable v : std_logic_vector(value_t'range);
+  begin
+    if s'length >= value_t'length then
+      v := s(s'left downto s'left - (value_t'length - 1));
+    else
+      v := s & ocpi.util.slv0(value_t'length);
+    end if;
+    return signed(v);
+  end to_value;
 begin
+  --- property outputs
+  props_out.max_I          <= max_I_r;
+  props_out.max_Q          <= max_Q_r;
+  props_out.max_I_is_valid <= max_I_is_valid_r;
+  props_out.max_Q_is_valid <= max_Q_is_valid_r;
+  ---------------------------------------------------------------------------------------------
+  -- input: take when data is present and either output can be produced or output not connected
+  ---------------------------------------------------------------------------------------------
+  taking_data <= in_in.valid and (out_in.ready or out_in.reset);
+  taking_eom  <= not in_in.valid and in_in.eom and in_in.ready and (out_in.ready or out_in.reset);
+  in_out.take <= taking_data or taking_eom;
+  -- I is first (and thus LSBs when little endian).  Q is MSBs
+  in_I        <= to_value(in_in.data(in_in.data'length/2-1 downto 0));
+  in_Q        <= to_value(in_in.data(in_in.data'left downto in_in.data'length/2));
 
   ------------------------------------------------------------------------------
-  -- in port
+  -- output: give when taking data and output is connected
   ------------------------------------------------------------------------------
-
-  -- mandatory input port logic, (note that
-  -- ready_for_in_port_data MUST have the same clock latency as the latency
-  -- between in port's data and any associated output port's data)
-  in_out.take <= ctl_in.is_operating and in_in.ready and
-                 ready_for_in_port_data; -- this applies backpressure
-
-  -- out port is optional
-  ready_for_in_port_data <= out_in.ready or out_port_connected_n;
-  out_port_connected_n <= out_in.reset;
-
-  idata_width_32 : if IDATA_WIDTH_p = 32 generate
-
-    -- iqstream w/ DataWidth=32 formats Q in most significant bits, I in least
-    -- significant (see OpenCPI_HDL_Development section on Message Payloads vs.
-    -- Physical Data Width on Data Interfaces)
-    in_Q <= signed(in_in.data(in_in.data'length-1 downto
-                              in_in.data'length - in_Q'length));
-    in_I <= signed(in_in.data(in_I'length-1 downto 0));
-
-  end generate idata_width_32;
-
-  ------------------------------------------------------------------------------
-  -- out port
-  ------------------------------------------------------------------------------
-
-  -- mandatory output port logic, (note that
-  -- data_ready_for_out_port MUST be clock-aligned with out_out.data)
-  -- (note that reserved messages will be DROPPED ON THE FLOOR)
-  out_out.give <= ctl_in.is_operating and out_in.ready and
-                  (not out_meta_is_reserved) and data_ready_for_out_port;
-  out_meta_is_reserved <= (not out_som) and (not out_valid) and (not out_eom);
-  out_out.som   <= out_som;
-  out_out.eom   <= out_eom;
-  out_out.valid <= out_valid;
-
-  data_ready_for_out_port <= in_in.ready;
-
-  odata_width_32 : if ODATA_WIDTH_p = 32 generate
-
-    -- iqstream w/ DataWidth=32 formats Q in most significant bits, I in least
-    -- significant (see OpenCPI_HDL_Development section on Message Payloads vs.
-    -- Physical Data Width on Data Interfaces)
-    out_out.data <= std_logic_vector(in_Q) & std_logic_vector(in_I);
-
-  end generate odata_width_32;
-
-  out_som             <= in_in.som;
-  out_eom             <= in_in.eom;
-  out_valid           <= in_in.valid;
+  out_out.eom         <= taking_eom;
+  out_out.give        <= taking_eom and not out_in.reset;
+  out_out.valid       <= taking_data and not out_in.reset;
+  out_out.data        <= in_in.data;
   out_out.byte_enable <= in_in.byte_enable;
 
   ------------------------------------------------------------------------------
-  -- max_I , max_Q properties
+  -- record max_I , max_Q properties and reset them when read
   ------------------------------------------------------------------------------
-
-  max_calc : process(ctl_in.is_operating, in_in.ready,
-                     ready_for_in_port_data, in_I, max_I_r, in_Q, max_Q_r)
-  begin
-    if ctl_in.reset = '1' then
-      max_I <= to_signed(RESET_VAL_c, max_I'length);
-      max_Q <= to_signed(RESET_VAL_c, max_Q'length);
-    elsif (ctl_in.is_operating = '1') and (in_in.ready = '1') and
-        (in_in.valid = '1') and (ready_for_in_port_data = '1') then
-      if props_in.max_I_read = '1' then
-        max_I <= to_signed(RESET_VAL_c, max_I'length);
-      elsif in_I > max_I_r then
-        max_I <= in_I;
-      end if;
-      if props_in.max_Q_read = '1' then
-        max_Q <= to_signed(RESET_VAL_c, max_Q'length);
-      elsif in_Q > max_Q_r then
-        max_Q <= in_Q;
-      end if;
-    end if;
-  end process;
-
-  max_regs : process(ctl_in.clk)
+  max_calc : process(ctl_in.clk)
   begin
     if rising_edge(ctl_in.clk) then
       if ctl_in.reset = '1' then
-        max_I_r <= to_signed(RESET_VAL_c, max_I'length);
-        max_Q_r <= to_signed(RESET_VAL_c, max_Q'length);
-      elsif ctl_in.is_operating = '1' then
-        max_I_r <= max_I;
-        max_Q_r <= max_Q;
+        max_I_r          <= RESET_VAL_c;
+        max_I_is_valid_r <= bfalse;
+        max_Q_r          <= RESET_VAL_c;
+        max_Q_is_valid_r <= bfalse;
+        --debug
+      elsif its(taking_data) then
+        -- Do not drop a value even if reading the max
+        if props_in.max_I_read = '1' or in_I > max_I_r then
+          max_I_r <= in_I;
+          max_I_is_valid_r <= btrue;
+        end if;
+        if props_in.max_Q_read = '1' or in_Q > max_Q_r then
+          max_Q_r <= in_Q;
+          max_Q_is_valid_r <= btrue;
+        end if;
+      elsif props_in.max_I_read = '1' then -- reading while not taking
+        max_I_r          <= RESET_VAL_c;
+        max_I_is_valid_r <= bfalse;
+      elsif props_in.max_Q_read = '1' then
+        max_Q_r          <= RESET_VAL_c;
+        max_Q_is_valid_r <= bfalse;
       end if;
     end if;
   end process;
-
-  props_out.max_I <= max_I;
-  props_out.max_Q <= max_Q;
-
-  ------------------------------------------------------------------------------
-  -- max_I_is_valid, max_Q_is_valid properties
-  ------------------------------------------------------------------------------
-
-  max_I_is_valid <= (max_I_is_valid_r or
-                    (in_in.ready and in_in.valid and ready_for_in_port_data))
-                    and not (ctl_in.reset or props_in.max_I_read);
-  max_Q_is_valid <= (max_Q_is_valid_r or
-                    (in_in.ready and in_in.valid and ready_for_in_port_data))
-                    and not (ctl_in.reset or props_in.max_Q_read);
-
-  is_valid_regs : process(ctl_in.clk)
-  begin
-    if rising_edge(ctl_in.clk) then
-      if ctl_in.reset = '1' then
-        max_I_is_valid_r <= '0';
-        max_Q_is_valid_r <= '0';
-      elsif ctl_in.is_operating = '1' then
-        max_I_is_valid_r <= max_I_is_valid;
-        max_Q_is_valid_r <= max_Q_is_valid;
-      end if;
-    end if;
-  end process;
-
-  props_out.max_I_is_valid <= to_bool(max_I_is_valid);
-  props_out.max_Q_is_valid <= to_bool(max_Q_is_valid);
-
 end rtl;

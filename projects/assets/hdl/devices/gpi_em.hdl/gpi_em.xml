@@ -1,4 +1,4 @@
-<HdlDevice Language="vhdl" Spec="gpi_em-spec" Emulate="gpi.hdl" Version="2">
+<HdlDevice Language="vhdl" Spec="gpi_em-spec" Emulate="gpi.hdl" Version="2" libraries='util_prims'>
 
   <Property Name="numClockCycles" Type="uShort" Writable="true" Description="Number of clock cycles to wait to accept data and write GPIO pins.
   This is needed because the device emulator doesn't know when the gpi device worker has been started. So it will wait a certain number of clock cycles

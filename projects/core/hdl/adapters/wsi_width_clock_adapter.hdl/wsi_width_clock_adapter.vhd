@@ -37,7 +37,7 @@ architecture rtl of worker is
   signal fifo_enq, fifo_deq : bool_t;
   signal fifo_not_full, fifo_not_empty, fifo_out_eof : bool_t;
   signal fifo_in, fifo_out : std_logic_vector(fifo_width_c-1 downto 0);
-  signal fifo_reset        : std_logic;
+  signal either_reset      : std_logic; -- reset from either port
   signal out_reset_for_in  : std_logic; -- reset from output port in input port's clock domain
 begin
   -- use single clock domain width adapter attached to input port
@@ -45,7 +45,7 @@ begin
     generic map(width_in         => to_integer(width_in),
                 width_out        => width_out_c)
        port map(clk              => in_in.clk,
-                reset            => in_in.reset,
+                reset            => either_reset,
                 in_som           => in_in.som,
                 in_valid         => in_in.valid,
                 in_eom           => in_in.eom,
@@ -85,7 +85,7 @@ begin
     generic map (width       => fifo_width_c,
                  depth       => 16)
     port map (   src_CLK     => in_in.clk,
-                 src_RST     => fifo_reset,
+                 src_RST     => either_reset,
                  src_ENQ     => fifo_enq,
                  src_in      => fifo_in,
                  src_FULL_N  => fifo_not_full,
@@ -98,5 +98,5 @@ begin
     port map(src_rst => out_in.reset,
              dst_clk => in_in.clk,
              dst_rst => out_reset_for_in);
-  fifo_reset <= out_reset_for_in or in_in.reset;
+  either_reset <= out_reset_for_in or in_in.reset;
 end rtl;

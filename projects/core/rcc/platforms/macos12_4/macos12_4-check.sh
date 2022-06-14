@@ -1,3 +1,4 @@
+#!/bin/sh --noprofile
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -16,4 +17,7 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-HdlLibraries+=misc_prims util_prims dsp_prims comms_prims
+[ "$(uname -s)" = Darwin ] && which -s sw_vers &&
+    vers=`sw_vers -productVersion |
+          sed 's/^\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/' | tr . _` &&
+    [ macos$vers = $(basename $(dirname $0)) ]

@@ -140,26 +140,17 @@ architecture rtl of worker is
   --signal status      : ulong_t;
   --signal status_dma  : ulong_t;
 begin
-  --props_out.status_dma <= status_dma;
-  --trace : component util.util.trace_buffer_ulong
-  --  generic map(depth => traceLength)
-  --  port map(clk => ctl_in.clk,
-  --           reset => ctl_in.reset,
-  --           input => trace_value,
-  --           give  => trace_give,
-  --           rawin => props_in.raw,
-  --           rawout => props_out.raw);
-  --trace_give  <= sdp_in.sdp.valid and status_dma(3);
-  --trace_value <= from_ulong(status_dma);
-  --props_out.status <= to_ulong(
-  --                             slv(md_out.length(15 downto 0)) & -- 16
-  --                             std_logic_vector(status(7 downto 0)) & -- 8
-  --                             slv0(3) &
-  --                             slv(out_in.ready) &
-  --                             slv(avail_not_empty) &
-  --                             avail_out_slv &
-  --                             slv(md_not_empty) &
-  --                             from_bool(to_bool(wsi_dws_left = 0)));
+  -- props_out.status <= to_ulong(
+  --                              slv(md_out.ndws_left(15 downto 0)) & -- 16
+  --                              slv0(8) & -- 8
+  --                              "1" &
+  --                              slv(out_in.reset) &
+  --                              slv(md_out.eof and md_not_empty) & 
+  --                              slv(out_in.ready) &
+  --                              slv(avail_not_empty) &
+  --                              avail_out_slv &
+  --                              slv(md_not_empty) &
+  --                              from_bool(to_bool(wsi_dws_left = 0)));
   --------------------------------------------------------------------------------
   -- modules instantiated for synchronization between the SDP and the WSI
   --------------------------------------------------------------------------------
@@ -203,7 +194,7 @@ g0: for i in 0 to sdp_width_c-1 generate
   md_in_slv   <= msginfo2slv(md_in);
   md_out      <= slv2msginfo(md_out_slv);
   md_enq      <= props_in.remote_doorbell_any_written;
-  md_deq      <= will_give and last_give;
+  md_deq      <= will_give and last_give and not md_out.eof; -- eof is sticky here
   md_in_raw   <= slv2meta(slv(props_in.remote_doorbell(0)));
   avail_deq   <= md_deq;
   -- Length fifo enqueued from doorbell for active message/pull mode, dequeued on the SDP side
@@ -341,7 +332,6 @@ g0: for i in 0 to sdp_width_c-1 generate
         operating_r        <= bfalse;
         faults_r           <= (others => '0');
         wsi_starting_r     <= btrue;
---        status             <= (others => '0');
       elsif not operating_r then
         -- initialization on first transition to operating.  poor man's "start".
         if its(out_in.ready) then
@@ -352,9 +342,6 @@ g0: for i in 0 to sdp_width_c-1 generate
           end if;
         end if;
       else
-        --if its(buffer_consumed) then
-        --  status <= status + 1;
-        --end if;
         if md_enq and not its(md_not_full) then
           faults_r(2) <= btrue;
         elsif length_enq and not its(length_not_full) then

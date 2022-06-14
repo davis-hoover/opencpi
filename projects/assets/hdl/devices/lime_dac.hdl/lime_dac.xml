@@ -1,5 +1,5 @@
 <!-- Lime DAC worker -->
-<HdlDevice language="vhdl" spec='qdac-spec'>
+<HdlDevice language="vhdl" spec='qdac-spec' libraries='util misc_prims'>
   <!-- Other included XML -->
   <xi:include href='lime-iq-properties.xml'/>
 

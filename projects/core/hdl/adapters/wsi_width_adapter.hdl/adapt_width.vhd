@@ -221,7 +221,7 @@ begin
           last_r      <= (others => '0');
           som_r       <= bfalse;
           eom_r       <= bfalse;
-          eom_taken_r <= bfalse;
+          eom_taken_r <= btrue;
           opcode_r    <= (others => '0');
         else
           -- Capture everything when we can, whether its there or not

@@ -110,9 +110,9 @@ namespace OCPI {
       };
 #undef OCPI_DATA_TYPE_S
 #define OCPI_DATA_TYPE_S(sca,corba,letter,bits,run,pretty,store) \
-      const char *parse##pretty(const char*cp, const char *end, run &vp);
+      const char *parse##pretty(const char *cp, const char *end, run &vp);
 #define OCPI_DATA_TYPE(sca,corba,letter,bits,run,pretty,store) \
-      static const char *parse##pretty(const char*cp, const char *end, run &vp);
+      static const char *parse##pretty(const char *cp, const char *end, run &vp);
 	OCPI_PROPERTY_DATA_TYPES
 
         OCPI_DATA_TYPE_S(sca,corba,letter,bits,StructValue,Struct,store)

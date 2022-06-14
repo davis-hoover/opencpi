@@ -111,9 +111,12 @@ bool test_range_of_I_Q(const std::string& file_str) {
 }
 
 void run_app(const std::string& app_xml_str, const std::string& file_str,
-    bool no_file_write = false) {
+	     bool no_file_write = false, bool a_sleep = false) {
 
-  OA::PValue pvs[] = { OA::PVBool("verbose", true), OA::PVBool("dump", false), OA::PVEnd };
+  std::cout << "Running: " << app_xml_str << " " << file_str << std::endl;
+  OA::PValue pvs[] = {
+    OA::PVBool("verbose", true), OA::PVBool("dump", false), OA::PVBool("hex", true), OA::PVEnd 
+  };
   OA::Application app(app_xml_str, pvs);
   app.initialize(); // all resources have been allocated
 
@@ -129,8 +132,8 @@ void run_app(const std::string& app_xml_str, const std::string& file_str,
 
   app.start();
 
-  if(no_file_write or (file_str.compare("10_ZLM_passthrough.bin") == 0)) {
-    sleep(3);
+  if(no_file_write or a_sleep) {
+    sleep(10);
     app.stop();
   }
   else {
@@ -281,6 +284,7 @@ int main(int, char **) {
 	}
       }
 
+#if 1
     std::cout << "TEST: file_read->RCC worker->file_write\n";
     run_app("iqstream_max_calculator_test_rcc.xml", "max_I_0_Q_0.bin");
     run_app("iqstream_max_calculator_test_rcc.xml", "max_I_0_Q_1024.bin");
@@ -294,46 +298,42 @@ int main(int, char **) {
     run_app("iqstream_max_calculator_test_no_file_write_rcc.xml", "max_I_1024_Q_1024.bin", true);
     run_app("iqstream_max_calculator_test_no_file_write_rcc.xml", "max_I_is_valid_false_max_Q_is_valid_false.bin", true);
     std::cout << "TEST: RCC worker 10 ZLM passthrough\n";
-    run_app("iqstream_max_calculator_test_zlm_passthrough_rcc.xml", "10_ZLM_passthrough.bin");
-
-#if 0
-    const char *env = getenv("OCPI_TEST_IQSTREAM_MAX_CALCULATOR_RCCONLY");
-    if (env && env[0] == '1') {
-      std::cout << "DONE: OCPI_TEST_IQSTREAM_MAX_CALCULATOR_RCCONLY explicitly stops application at this point\n";
-      return 0;
-    }
-
-    if (!hdl) {
-      std::cout << "ERROR: test could not be completed because no HDL containers were found\n";
-      return EXIT__TEST_COULD_NOT_COMPLETE;
-    }
-#else
-    if (!hdl) {
-      std::cerr << "WARNING: some test cases could not be completed because no HDL containers were found\n";
-    } else {
+    run_app("iqstream_max_calculator_test_zlm_passthrough_rcc.xml", "10_ZLM_passthrough.bin",
+	    false, true); // no EOF
+    run_app("iqstream_max_calculator_test_zlm_passthrough_rcc_eof.xml", "10_ZLM_passthrough.bin");
 #endif
+
+    if (!hdl)
+      std::cerr << "WARNING: some test cases could not be completed because no HDL containers were found\n";
+    else {
     std::cout << "TEST: file_read->HDL worker->file_write\n";
+#if 1
     run_app("iqstream_max_calculator_test_hdl.xml", "max_I_0_Q_0.bin");
     run_app("iqstream_max_calculator_test_hdl.xml", "max_I_0_Q_1024.bin");
     run_app("iqstream_max_calculator_test_hdl.xml", "max_I_1024_Q_0.bin");
     run_app("iqstream_max_calculator_test_hdl.xml", "max_I_1024_Q_1024.bin");
     run_app("iqstream_max_calculator_test_hdl.xml", "max_I_is_valid_false_max_Q_is_valid_false.bin");
+#endif
+#if 1
     std::cout << "TEST: file_read->HDL worker\n";
     run_app("iqstream_max_calculator_test_no_file_write_hdl.xml", "max_I_0_Q_0.bin", true);
     run_app("iqstream_max_calculator_test_no_file_write_hdl.xml", "max_I_0_Q_1024.bin", true);
     run_app("iqstream_max_calculator_test_no_file_write_hdl.xml", "max_I_1024_Q_0.bin", true);
     run_app("iqstream_max_calculator_test_no_file_write_hdl.xml", "max_I_1024_Q_1024.bin", true);
     run_app("iqstream_max_calculator_test_no_file_write_hdl.xml", "max_I_is_valid_false_max_Q_is_valid_false.bin", true);
-
+#endif
+#if 1
     // This test ensures that ZLMs are passed through the worker without being
     // dropped.
     ///@todo / FIXME - figure out why this test fails
-    /*std::cout << "TEST: HDL worker 10 ZLM passthrough\n";
-    run_app("iqstream_max_calculator_test_zlm_passthrough_hdl.xml", "10_ZLM_passthrough.bin");*/
+    std::cout << "TEST: HDL worker 10 ZLM passthrough\n";
+    run_app("iqstream_max_calculator_test_zlm_passthrough_hdl.xml", "10_ZLM_passthrough.bin",
+    	    false, true);
+    run_app("iqstream_max_calculator_test_zlm_passthrough_hdl_eof.xml", "10_ZLM_passthrough.bin");
 
     ///@todo / FIXME - figure out why this test fails
-    /*std::cout << "TEST: file_read->RCC->RCC->file_write\n";
-    run_app("iqstream_max_calculator_test_rcc_rcc.xml", "max_I_0_Q_1024.bin");*/
+    std::cout << "TEST: file_read->RCC->RCC->file_write\n";
+    run_app("iqstream_max_calculator_test_rcc_rcc.xml", "max_I_0_Q_1024.bin");
 
     std::cout << "TEST: file_read->RCC->HDL->RCC->file_write\n";
     run_app("iqstream_max_calculator_test_rcc_hdl_rcc.xml", "max_I_0_Q_1024.bin");
@@ -342,11 +342,12 @@ int main(int, char **) {
     run_app("iqstream_max_calculator_test_rcc_hdl_rcc.xml", "max_I_1024_Q_0.bin");
     run_app("iqstream_max_calculator_test_rcc_hdl_rcc.xml", "max_I_1024_Q_1024.bin");
     run_app("iqstream_max_calculator_test_rcc_hdl_rcc.xml", "max_I_is_valid_false_max_Q_is_valid_false.bin");
+#endif
     }
   } catch (std::string &e) {
     std::cerr << "app failed: " << e << std::endl;
     return EXIT_FAILURE;
   }
-  std::cout << "PASSED\n";
+  std::cout << "ALL TESTS PASSED\n";
   return EXIT_SUCCESS;
 }

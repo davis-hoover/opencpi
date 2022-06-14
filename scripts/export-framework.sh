@@ -113,7 +113,7 @@ if [ "$OCPI_TOOL_DIR" = "$platform" ]; then
   py=python3
   command -v $py &> /dev/null || py=/opt/local/bin/$py
   dirs=
-  for d in `find exports -name "*.py"|sed 's=/[^/]*$=='|sort -u`; do
+  for d in `find exports/$platform -name "*.py"|sed 's=/[^/]*$=='|sort -u`; do
     $py -m compileall -q $d
     $py -O -m compileall -q $d
   done

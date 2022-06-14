@@ -998,16 +998,6 @@ namespace OCPI {
     // Step 4: release, API level on a particular buffer - perhaps not the current one
     void ExternalBuffer::
     release() {
-#if 0
-      if (!m_port.m_lastInBuffer)
-	throw
-	  OU::Error("release called on input port \"%s\" without releasing previous buffer",
-		    m_port.name().c_str());
-      if (this != m_port.m_lastInBuffer)
-	throw
-	  OU::Error("release called on input port \"%s\" with the wrong buffer",
-		    m_port.name().c_str());
-#endif
       m_port.releaseBuffer(*this);
     }
 
