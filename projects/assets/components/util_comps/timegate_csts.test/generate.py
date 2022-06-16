@@ -65,19 +65,20 @@ if __name__ == '__main__':
     for x in complex_short_vals:
         complex_short_samp += x.to_bytes(4, byteorder=byteorder, signed=True)
 
+
     # Generate timestamp
     # if the gate reaches internal error state aka locking up, samples would not flow 
     seconds=0x0
-    fraction_40=0xFFFFFFFFFF00000
+    fraction_40=0x0FFFFFFFFF00000
     csts_ts = fraction_40.to_bytes(8, byteorder=byteorder, signed=False) + \
               seconds.to_bytes(4, byteorder=byteorder, signed=False) 
 
     # Add Message Headers
-    random_data   = add_message_header(0, complex_short_samp)
+    random_data = add_message_header(0, complex_short_samp)
     valid_csts_ts = add_message_header(1, csts_ts)
 
-    # Create message stream
-    valid_csts_msgs = [valid_csts_ts, random_data]
+    # Create message stream with four timestamps
+    valid_csts_msgs = [random_data, valid_csts_ts, random_data, valid_csts_ts, random_data, valid_csts_ts, random_data, valid_csts_ts, random_data]
 
     # Write to file
     to_file(filename, valid_csts_msgs)
