@@ -221,15 +221,17 @@ begin
         elsif its(fifo_empty_n)  then
           if its(props_in.ignore_time_stamps) then -- Set the state back to open_e if any other
             state_r <= open_e;                 -- state than open_e
-          elsif its(fifo_out_is_time) then -- time opcode
+          elsif its(fifo_out_is_time) and its(fifo_deq) then -- time opcode
             if state_r = open_e or state_r = time_waiting_e then
               time_chunks_r(0) <= unsigned(fifo_out_data);
               state_r <= time_coming_e;
               time_chunk_idx_r <= to_unsigned(1, time_chunk_idx_r'length);
             elsif state_r = time_coming_e then -- never will happen if width >= time_width
-              if time_chunk_idx_r = to_unsigned(nchunks_c - 1, time_chunk_idx_r'length) then
+	      if time_chunk_idx_r = to_unsigned(nchunks_c - 1, time_chunk_idx_r'length) then
                 time_to_transmit_r <= (unsigned(fifo_out_data) & time_chunks) - shift_left(props_in.time_correction,8); 
                 state_r <= time_waiting_e;
+		time_chunk_idx_r <= (others => '0');
+                time_chunks_r <= (others => (others => '0'));
               else
                 time_chunks_r(to_integer(time_chunk_idx_r)) <= unsigned(fifo_out_data);
                 time_chunk_idx_r <= time_chunk_idx_r + 1;
