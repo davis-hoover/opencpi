@@ -27,13 +27,13 @@
 #include <netdb.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
-#include <sys/sysctl.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <algorithm>
 #include <vector>
 #include "ocpi-config.h"
 #ifdef OCPI_OS_macos
+#include <sys/sysctl.h>
 #include <arpa/inet.h>
 #include <net/ethernet.h>
 #include <net/if.h>

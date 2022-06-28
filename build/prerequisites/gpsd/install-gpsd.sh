@@ -25,9 +25,9 @@
 
 target_platform="$1"
 name=gpsd
-version=3.18 # NOTE: when updating gpsd version, "${OcpiCrossCompile}ar"
-             # command below may be affected
-#version=3.21  # latest as of 09/02/2020
+# NOTE: when updating gpsd version, "${OcpiCrossCompile}ar"
+# command below may be affected.
+version=3.23.1  # latest as of 09/21/2021
 pkg_name="$name-$version"
 description='GPS (Global Positioning System) daemon'
 dl_url="http://download-mirror.savannah.gnu.org/releases/$name/${pkg_name}.tar.gz"
@@ -52,14 +52,6 @@ echo "Making a copy of gpsd for platform $platform because gpsd does not yet \
 support separate build directories."
 (cd ..; for i in *; do [[ "$i" != ocpi-build-* ]] && cp -Rp "$i" "$here"; done)
 
-patchfile=compiler.patch
-patch -p0 < "$OcpiThisPrerequisiteDir/$patchfile" || {
-  echo '*******************************************************' >&2
-  echo "ERROR: patch applied by $patchfile failed!!" >&2
-  echo '*******************************************************' >&2
-  exit 1
-}
-
 # Framework will error out w/ "recompile with -fPIC" if these aren't included
 export CFLAGS="-fPIC"
 export CXXFLAGS="-fPIC"
@@ -67,7 +59,7 @@ export CXXFLAGS="-fPIC"
 # For more info on scons options see SConstruct file in gpsd.git.
 # shared=False is necessary because framework prerequisites must be statically
 #              linkable.
-# nostrip=True is necessary to avoid frameworker error during build: "error
+# nostrip=True is necessary to avoid framework error during build: "error
 #              adding symbols: Archive has no index; run ranlib to add one".
 echo "OcpiCrossCompile=$OcpiCrossCompile"
 echo "OcpiCrossHost=$OcpiCrossHost"
@@ -95,23 +87,36 @@ fi
 # archive is manually constructed. The arguments to pass to ar were determined
 # by: 1) run scons build, 2) observe two ar commands sent to stdout, 3) combine
 # ar commands into one, 4) replace all *.a with a single libtmp.a
-"${OcpiCrossCompile}ar" rc libtmp.a ais_json.o bits.o gpsdclient.o \
-    gps_maskdump.o gpsutils.o \
-    hex.o json.o libgps_core.o libgps_dbus.o libgps_json.o \
-    libgps_shm.o libgps_sock.o netlib.o os_compat.o \
-    rtcm2_json.o rtcm3_json.o shared_json.o bsd_base64.o \
-    crc24q.o \
-    driver_ais.o driver_evermore.o driver_garmin.o driver_garmin_txt.o \
-    driver_geostar.o driver_greis.o driver_greis_checksum.o \
-    driver_italk.o driver_navcom.o driver_nmea0183.o \
-    driver_nmea2000.o driver_oncore.o driver_rtcm2.o driver_rtcm3.o \
-    drivers.o driver_sirf.o \
-    driver_skytraq.o driver_superstar2.o driver_tsip.o driver_ubx.o \
-    driver_zodiac.o \
-    geoid.o gpsd_json.o isgps.o libgpsd_core.o matrix.o net_dgpsip.o \
-    net_gnss_dispatch.o net_ntrip.o ntpshmread.o ntpshmwrite.o packet.o \
-    ppsthread.o pseudoais.o pseudonmea.o serial.o subframe.o timebase.o \
-    timespec_str.o
+"${OcpiCrossCompile}ar" rc libtmp.a \
+    ${pkg_name}/libgps/ais_json.o ${pkg_name}/libgps/bits.o \
+    ${pkg_name}/libgps/gpsdclient.o ${pkg_name}/libgps/gps_maskdump.o \
+    ${pkg_name}/libgps/gpsutils.o ${pkg_name}/libgps/hex.o \
+    ${pkg_name}/libgps/json.o ${pkg_name}/libgps/libgps_core.o \
+    ${pkg_name}/libgps/libgps_dbus.o ${pkg_name}/libgps/libgps_json.o \
+    ${pkg_name}/libgps/libgps_shm.o ${pkg_name}/libgps/libgps_sock.o \
+    ${pkg_name}/libgps/netlib.o ${pkg_name}/libgps/os_compat.o \
+    ${pkg_name}/libgps/rtcm2_json.o ${pkg_name}/libgps/rtcm3_json.o \
+    ${pkg_name}/libgps/shared_json.o ${pkg_name}/libgps/timespec_str.o \
+    ${pkg_name}/gpsd/bsd_base64.o ${pkg_name}/gpsd/crc24q.o \
+    ${pkg_name}/drivers/driver_ais.o ${pkg_name}/drivers/driver_evermore.o \
+    ${pkg_name}/drivers/driver_garmin.o ${pkg_name}/drivers/driver_garmin_txt.o \
+    ${pkg_name}/drivers/driver_geostar.o ${pkg_name}/drivers/driver_greis.o \
+    ${pkg_name}/drivers/driver_greis_checksum.o ${pkg_name}/drivers/driver_italk.o \
+    ${pkg_name}/drivers/driver_navcom.o ${pkg_name}/drivers/driver_nmea0183.o \
+    ${pkg_name}/drivers/driver_nmea2000.o ${pkg_name}/drivers/driver_oncore.o \
+    ${pkg_name}/drivers/driver_rtcm2.o ${pkg_name}/drivers/driver_rtcm3.o \
+    ${pkg_name}/drivers/drivers.o ${pkg_name}/drivers/driver_sirf.o \
+    ${pkg_name}/drivers/driver_skytraq.o ${pkg_name}/drivers/driver_superstar2.o \
+    ${pkg_name}/drivers/driver_tsip.o ${pkg_name}/drivers/driver_ubx.o \
+    ${pkg_name}/drivers/driver_zodiac.o ${pkg_name}/gpsd/geoid.o \
+    ${pkg_name}/gpsd/gpsd_json.o ${pkg_name}/gpsd/isgps.o \
+    ${pkg_name}/gpsd/libgpsd_core.o ${pkg_name}/gpsd/matrix.o \
+    ${pkg_name}/gpsd/net_dgpsip.o ${pkg_name}/gpsd/net_gnss_dispatch.o \
+    ${pkg_name}/gpsd/net_ntrip.o ${pkg_name}/gpsd/ntpshmread.o \
+    ${pkg_name}/gpsd/ntpshmwrite.o ${pkg_name}/gpsd/packet.o \
+    ${pkg_name}/gpsd/ppsthread.o ${pkg_name}/gpsd/pseudoais.o \
+    ${pkg_name}/gpsd/pseudonmea.o ${pkg_name}/gpsd/serial.o \
+    ${pkg_name}/gpsd/subframe.o ${pkg_name}/gpsd/timebase.o
 "${OcpiCrossCompile}ranlib" libtmp.a
 
 rm -rf "${OcpiInstallExecDir:?}/lib/*"
@@ -119,7 +124,9 @@ cp libtmp.a "$OcpiInstallExecDir/lib/libgpsd.a"
 
 echo 'copying lower level headers which are necessary for use of libgpsd \
 directly...'
-headers=(gpsd.h compiler.h gpsd_config.h gps.h ppsthread.h os_compat.h)
+# FIXME: header list sufficiency not tested for 3.23.1.
+headers=(include/gpsd.h include/compiler.h ${pkg_name}/include/gpsd_config.h \
+  include/gps.h include/ppsthread.h include/os_compat.h include/timespec.h)
 for header in "${headers[@]}"; do
   echo "...copying $header to $OcpiInstallExecDir/include/"
   cp "$header" "$OcpiInstallExecDir/include/"
