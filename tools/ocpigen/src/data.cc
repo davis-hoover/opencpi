@@ -41,7 +41,7 @@ DataPort(Worker &w, ezxml_t x, DataPort *sp, int ordinal, WIPType type, const ch
        // Adding optionality in the impl xml is only relevant to devices.
        (err = OE::getBoolean(x, "Optional", &m_isOptional, true))))
     return;
-  // Note buffer sizes are all determined in the OU::Util::Port.  FIXME allow parameterized?
+  // Note buffer sizes are all determined in the OU::Metadata::Port.  FIXME allow parameterized?
   // Data width can be unspecified, specified explicitly, or specified with an expression
   if (!m_dataWidthFound) {
     if (w.m_defaultDataWidth != SIZE_MAX)
@@ -258,6 +258,8 @@ finalize() {
   if (granuleWidth >= m_dataWidth &&
       (m_dataWidth == 0 || (granuleWidth % m_dataWidth) == 0))
     m_byteWidth = m_dataWidth;
+  else if (granuleWidth < m_dataWidth)
+    m_byteWidth = granuleWidth;
   else
     m_byteWidth = m_dataValueWidth;
   if (m_byteWidth != 0 && m_dataWidth % m_byteWidth)
