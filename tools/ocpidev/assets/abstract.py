@@ -434,7 +434,7 @@ class BuildableAsset(Asset):
         if kwargs.get('orig_noun') == 'tests':
             action.append('test')
         ocpiutil.file.execute_cmd(settings, self.directory, action=action,
-                                  file=make_file, verbose=kwargs.get('verbose'))
+                                  file=make_file, verbose=verbose)
         if export:
             location=ocpiutil.get_path_to_project_top()
             make_file=ocpiutil.get_makefile(location, "project")[0]

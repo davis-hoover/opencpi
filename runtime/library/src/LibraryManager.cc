@@ -399,11 +399,11 @@ namespace OCPI {
 	throw OU::Error("Error processing metadata from artifact file [manager]: %s: %s", a_name, err);
     }
 
+    // Get artifact implementation by original XML ordinal/position
     const Implementation *Artifact::
     getImplementation(unsigned n) const {
-      unsigned nn = 0;
-      for (WorkerIter wi = m_workers.begin(); wi != m_workers.end(); ++wi, ++nn)
-	if (nn == n)
+      for (WorkerIter wi = m_workers.begin(); wi != m_workers.end(); ++wi)
+	if (wi->second->m_ordinal == n)
 	  return wi->second;
       return NULL;
     }
@@ -494,6 +494,21 @@ namespace OCPI {
 	  throw OU::Error("Error processing implementation metadata for %s: %s",
 			  name().c_str(), err);
 	bool haveInstances = false;
+#if 1
+	for (ezxml_t i = m_xml ? m_xml->child : NULL; i; i = i->ordered) {
+	  // Everything but inserted adapters
+	  // This is a hack in that it avoids having the XML actually indicate the type
+	  // At some point this instance tag will be made a runtime thing...
+	  static const char *instanceTags[] = { "instance", "io", "interconnect", NULL };
+	  for (auto tag = instanceTags; *tag; ++tag)
+	    if (!strcasecmp(i->name, *tag) &&
+		!strcasecmp(metaImpl->cname(), ezxml_cattr(i, "worker"))) {
+	      haveInstances = true;
+	      instances[ezxml_cattr(i, "name")] = addImplementation(*metaImpl, i);
+	      break;
+	    }
+	}
+#else
 	for (ezxml_t i = ezxml_cchild(m_xml, "instance"); i; i = ezxml_cnext(i))
 	  if (!strcasecmp(metaImpl->cname(), ezxml_cattr(i, "worker"))) {
 	    haveInstances = true;
@@ -504,6 +519,7 @@ namespace OCPI {
 	    haveInstances = true;
 	    instances[ezxml_cattr(i, "name")] = addImplementation(*metaImpl, i);
 	  }
+#endif
 	if (!haveInstances)
 	  (void)addImplementation(*metaImpl, NULL);
       }
@@ -535,25 +551,26 @@ namespace OCPI {
 	  toImpl->setConnection(*toP);
       }
       // Now that all the local instances are connected in the artifact, make a pass that
-      // removes any inserted adapters.
+      // removes any inserted adapters or interconnects
       for (InstanceIter ii = instances.begin(); ii != instances.end(); ++ii) {
 	Implementation &i = *ii->second;
 	if (i.m_staticInstance)
 	  for (unsigned nn = 0; nn < i.m_metadataImpl.nPorts(); ++nn)
 	    if (i.m_internals & (1u<<nn)) {
 	      Implementation &otherImpl = *i.m_connections[nn].impl;
-	      if (otherImpl.m_inserted) {
+	      if (!i.m_inserted && otherImpl.m_inserted) {
 		// Big assumption that adapters only have two ports
 		unsigned other = i.m_connections[nn].port->m_ordinal ? 0 : 1;
-		if (otherImpl.m_internals & (1u << other)) {
+		if (otherImpl.m_internals & (1u << other)) { // this fails on interconnects
 		  i.m_connections[nn] = otherImpl.m_connections[other];
 		  otherImpl.m_connections[other].impl = &i;
 		  otherImpl.m_connections[other].port = &i.m_metadataImpl.getPorts()[nn];
-		} else {
-		  // other side of the adapter is external so this is external
-		  i.m_internals &= ~(1u << nn);
-		  i.m_externals |= 1u << nn;
+		  if (!i.m_connections[nn].impl->m_inserted)
+		    continue;
 		}
+		// other side of the adapter is external so this is external
+		i.m_internals &= ~(1u << nn);
+		i.m_externals |= 1u << nn;
 	      }
 	    }
       }

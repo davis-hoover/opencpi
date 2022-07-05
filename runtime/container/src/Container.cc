@@ -39,12 +39,11 @@ namespace XF = OCPI::Xfer;
 namespace OCPI {
   namespace Container {
 
-    Container::Container(const char *a_name, const ezxml_t config,
-			 const OB::PValue *params)
-      : //m_ourUID(mkUID()),
-      OCPI::Time::Emit("Container", a_name ),
-      m_enabled(false), m_ownThread(true), m_verbose(false), m_thread(NULL),
-      m_transport(*new OT::Transport(&Manager::getTransportManager(params), false, this))
+    Container::
+    Container(const char *a_name, const ezxml_t config, const OB::PValue *params)
+      : OCPI::Time::Emit("Container", a_name),
+	m_enabled(false), m_ownThread(true), m_verbose(false), m_xml(config), m_thread(NULL),
+	m_transport(*new OT::Transport(&Manager::getTransportManager(params), false, this))
     {
       OB::findBool(params, "verbose", m_verbose);
       OU::SelfAutoMutex guard (this);
@@ -59,7 +58,6 @@ namespace OCPI {
 	Manager::s_maxContainer += 10;
       }
       Manager::s_containers[m_ordinal] = this;
-      (void)config; // nothing to parse (yet)
       // FIXME:  this should really be in a baseclass inherited by software containers
       // It works because stuff can be overriden and no threads are created until
       // "start", which is
@@ -72,7 +70,8 @@ namespace OCPI {
       m_arch = OCPI_CPP_STRINGIFY(OCPI_ARCH);
     }
 
-    bool Container::supportsImplementation(OM::Worker &i) {
+    bool Container::
+    supportsImplementation(OM::Worker &i) {
       static const char *opencpiVersion; // AV-2453
       static bool allowVersionMismatch = false;
 
@@ -116,19 +115,7 @@ namespace OCPI {
       return ok;
     }
 
-    Artifact & Container::
-    loadArtifact(const char *url, const OA::PValue *artifactParams) {
-      // First check if it is loaded on in this container
-      // FIXME: canonicalize the URL here?
-      Artifact *art = findLoadedArtifact(url);
-
-      if (art)
-	return *art;
-      // If it is not loaded, let's get it from the library system,
-      // and load it ourselves.
-      return createArtifact(OL::Manager::getArtifact(url, artifactParams), artifactParams);
-    }
-    Artifact & Container::
+    Artifact &Container::
     loadArtifact(OL::Artifact &libArt, const OA::PValue *artifactParams) {
       // First check if it is loaded on in this container
       // FIXME: canonicalize the URL here?
@@ -176,15 +163,6 @@ namespace OCPI {
     {
       return Container::DispatchNoMore;
     }
-#if 0
-    bool Container::run(uint32_t usecs) {
-      if (m_ownThread)
-	throw OU::EmbeddedException( OU::CONTAINER_HAS_OWN_THREAD,
-				     "Can't use container->run when container has own thread",
-				     OU::ApplicationRecoverable);
-      return runInternal(usecs);
-    }
-#endif
     bool Container::runInternal(uint32_t usecs) {
       if (!m_enabled)
 	return false;

@@ -404,6 +404,60 @@ namespace OCPI {
       return false; // we never terminate the search among possibilities...
     }
 
+    // This matching is a subset of what apps need, but is what we need when we are
+    // matching static configuration information provided in a container's XML (in system.xml)
+    bool instanceMatchesImpl(OM::Worker &impl, ezxml_t staticInstance,
+			     const char *instImplAttr, const char *instDevAttr) {
+      // Check for worker name match
+      // Note that the worker name in the artifact has a config suffix.
+      // The worker attribute can be just the name, the name and model, or the package and name and model
+      // And in all three cases it might also include the config suffix.
+      // So in each of the three cases we need to do two comparisons, one with the config suffix removed
+      // Remove the configuration suffix from the worker's name
+      const char *dash =  strchr(impl.cname(), '-');
+      std::string worker(impl.cname(),
+			 dash ? OCPI_SIZE_T_DIFF(dash, impl.cname()) : impl.name().size());
+      std::string fullWorker;
+      if (instImplAttr &&
+	  // Name without model, but maybe with config suffix
+	  strcasecmp(instImplAttr, impl.cname()) &&
+	  // Name without model, matching impl's name without suffix
+	  strcasecmp(instImplAttr, worker.c_str()) &&
+	  // Name with model, matching impl's name maybe with suffix
+	  strcasecmp(instImplAttr,
+		     OU::format(fullWorker, "%s.%s",
+				impl.cname(), impl.model().c_str())) &&
+	  // Name with model, matching impl's name maybe without suffix
+	  strcasecmp(instImplAttr,
+		     OU::format(fullWorker, "%s.%s",
+				worker.c_str(), impl.model().c_str())) &&
+	  // The fully qualified name matching impl's FQN maybe with suffix
+	  strcasecmp(instImplAttr,
+		     OU::format(fullWorker, "%s.%s.%s", impl.package().c_str(),
+				impl.cname(), impl.model().c_str())) &&
+	  // The fully qualified name matching impl's FQN maybe without suffix
+	  strcasecmp(instImplAttr,
+		     OU::format(fullWorker, "%s.%s.%s", impl.package().c_str(),
+				worker.c_str(), impl.model().c_str()))) {
+	ocpiInfo("    Rejected: worker name is \"%s.%s\", while requested worker name is \"%s\":%s",
+		 impl.cname(), impl.model().c_str(), instImplAttr, fullWorker.c_str());
+	return false;
+      }
+      // Check for device suitability.
+      if (instDevAttr) {
+	const char *implDevice;
+	if (!staticInstance || !(implDevice = ezxml_cattr(staticInstance, "device"))) {
+	  ocpiInfo("    Rejected: requested device is %s, artifact has none", instDevAttr);
+	  return false;
+	}
+	if (strcasecmp(implDevice, instDevAttr)) {
+	  ocpiInfo("    Rejected: requested device is %s, artifact device is %s",
+		   instDevAttr, implDevice);
+	  return false;
+	}
+      }
+      return true;
+    }
     // The library assembly instance has a candidate implementation.
     // Check it out, and maybe accept it as a candidate
     bool Assembly::Instance::
@@ -413,43 +467,10 @@ namespace OCPI {
 	       impl.m_staticInstance ? "/" : "",
 	       impl.m_staticInstance ? ezxml_cattr(impl.m_staticInstance, "name") : "",
 	       impl.m_artifact.name().c_str());
-      // Check for worker name match
-      // Note that the worker name in the artifact has a config suffix.
-      // The worker attribute can be just the name, the name and model, or the package and name and model
-      // And in all three cases it might also include the config suffix.
-      // So in each of the three cases we need to do two comparisons, one with the config suffix removed
-      // Remove the configuration suffix from the worker's name
-      const char *dash =  strchr(impl.m_metadataImpl.cname(), '-');
-      std::string worker(impl.m_metadataImpl.cname(),
-			 dash ? OCPI_SIZE_T_DIFF(dash, impl.m_metadataImpl.cname()) :
-			 impl.m_metadataImpl.name().size());
-      std::string fullWorker;
-      if (m_utilInstance.m_implName.size() &&
-	  // Name without model, but maybe with config suffix
-	  strcasecmp(m_utilInstance.m_implName.c_str(), impl.m_metadataImpl.cname()) &&
-	  // Name without model, matching impl's name without suffix
-	  strcasecmp(m_utilInstance.m_implName.c_str(), worker.c_str()) &&
-	  // Name with model, matching impl's name maybe with suffix
-	  strcasecmp(m_utilInstance.m_implName.c_str(),
-		     OU::format(fullWorker, "%s.%s",
-				impl.m_metadataImpl.cname(), impl.m_metadataImpl.model().c_str())) &&
-	  // Name with model, matching impl's name maybe without suffix
-	  strcasecmp(m_utilInstance.m_implName.c_str(),
-		     OU::format(fullWorker, "%s.%s",
-				worker.c_str(), impl.m_metadataImpl.model().c_str())) &&
-	  // The fully qualified name matching impl's FQN maybe with suffix
-	  strcasecmp(m_utilInstance.m_implName.c_str(),
-		     OU::format(fullWorker, "%s.%s.%s", impl.m_metadataImpl.package().c_str(),
-				impl.m_metadataImpl.cname(), impl.m_metadataImpl.model().c_str())) &&
-	  // The fully qualified name matching impl's FQN maybe without suffix
-	  strcasecmp(m_utilInstance.m_implName.c_str(),
-		     OU::format(fullWorker, "%s.%s.%s", impl.m_metadataImpl.package().c_str(),
-				worker.c_str(), impl.m_metadataImpl.model().c_str()))) {
-	ocpiInfo("    Rejected: worker name is \"%s.%s\", while requested worker name is \"%s\":%s",
-		 impl.m_metadataImpl.cname(), impl.m_metadataImpl.model().c_str(),
-		 m_utilInstance.m_implName.c_str(), fullWorker.c_str());
+      if (!instanceMatchesImpl(impl.m_metadataImpl, impl.m_staticInstance,
+			       m_utilInstance.m_implName.size() ? m_utilInstance.m_implName.c_str() : NULL,
+			       m_device.size() ? m_device.c_str() : NULL))
 	return false;
-      }
       // Check for model and platform matches
       if (model.size() && strcasecmp(model.c_str(), impl.m_metadataImpl.model().c_str())) {
 	ocpiInfo("    Rejected: model requested is \"%s\", but the model for this implementation is \"%s\"",
@@ -482,21 +503,6 @@ namespace OCPI {
       if (impl.m_metadataImpl.m_scaling.check(m_scale, error)) {
 	ocpiInfo("    Rejected: %s", error.c_str());
 	return false;
-      }
-      // Check for device suitability.
-      if (m_device.size()) {
-	const char *device;
-	if (impl.m_staticInstance && (device = ezxml_cattr(impl.m_staticInstance, "device"))) {
-	  if (strcasecmp(device, m_device.c_str())) {
-	    ocpiInfo("    Rejected: requested device is %s, artifact device is %s",
-		     m_device.c_str(), device);
-	    return false;
-	  }
-	} else {
-	    ocpiInfo("    Rejected: requested device is %s, artifact has none",
-		     m_device.c_str());
-	    return false;
-	}
       }
       strip_pf(platform);
 
@@ -734,6 +740,22 @@ namespace OCPI {
 	ocpiInfo("      other %u \"%s\"  m_internals %x, other internals %x", otherPort.m_ordinal,
 		 otherPort.cname(), thisImpl.m_internals, otherImpl.m_internals);
 	ocpiInfo("      me port ordinal %u port \"%s\"", thisPort.m_ordinal, thisPort.cname());
+	return true;
+      } else if (otherImpl.m_staticInstance &&
+		 !(otherImpl.m_externals & (1u << otherPort.m_ordinal))) {
+	// other side is not connected at all in a static instance
+	ocpiInfo("    Port \"%s\" of \"%s\" is external; the other port is not connected: we're incompatible",
+		 thisPort.cname(), thisImpl.m_metadataImpl.cname());
+	ocpiInfo("      other port is ordinal %u name \"%s\"", otherPort.m_ordinal, otherPort.cname());
+	ocpiInfo("      this port is ordinal %u name \"%s\"", thisPort.m_ordinal, thisPort.cname());
+	return true;
+      } else if (thisImpl.m_staticInstance &&
+		 !(thisImpl.m_externals & (1u << thisPort.m_ordinal))) {
+	// our side is not connected at all in a static instance
+	ocpiInfo("    Port \"%s\" of \"%s\" is external; and is not connected: we're incompatible",
+		 thisPort.cname(), thisImpl.m_metadataImpl.cname());
+	ocpiInfo("      other port is ordinal %u name \"%s\"", otherPort.m_ordinal, otherPort.cname());
+	ocpiInfo("      this port is ordinal %u name \"%s\"", thisPort.m_ordinal, thisPort.cname());
 	return true;
       }
       return false;

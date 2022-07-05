@@ -370,6 +370,7 @@ namespace OCPI {
 	ocpiDebug("Avoiding configuration of device that is not alive: %s", name().c_str());
 	return false;
       }
+      // This is probably unnecessary since configure is only called on valid devices.
       uint64_t magic = m_cAccess.get64Register(magic, OccpAdminRegisters);
       // Shuffle endianness here
       if (magic != OCCP_MAGIC) {

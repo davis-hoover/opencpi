@@ -88,9 +88,9 @@ struct ContainerDesc {
 };
 
 struct CApp {
-  OCPI::API::Container*         container;
+  OCPI::Container::Container*         container;
   OCPI::Container::Worker*      worker;
-  OCPI::API::ContainerApplication *      app;
+  OCPI::Container::Application *      app;
 };
 
 struct CWorker {
@@ -215,7 +215,7 @@ namespace OCPI {
     OCPI::Util::Thread* runTestDispatch( DThreadData& tdata );
 
     OCPI::Container::Worker *createWorker(CApp &capp, OCPI::RCC::RCCDispatch *rccd);
-    OCPI::Container::Worker *createWorker(OCPI::API::ContainerApplication *app,
+    OCPI::Container::Worker *createWorker(OCPI::Container::Application *app,
 					  OCPI::RCC::RCCDispatch *rccd);
   }
 

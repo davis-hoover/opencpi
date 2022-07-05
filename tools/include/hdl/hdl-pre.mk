@@ -51,34 +51,8 @@ endif
 $(call OcpiDbgVar,Worker)
 #$(call OcpiDbgVar,Worker_$(Worker)_xml)
 
-################################################################################
-# Determine the language and suffix, which might mean looking in the xml file
-#
-HdlVerilogSuffix:=.v
-HdlVerilogIncSuffix:=.vh
-HdlVHDLSuffix:=.vhd
-HdlVHDLIncSuffix:=.vhd
-
-#ifndef OcpiLanguage
-#  $(error NO LANGUAGE)
-#endif # HdlLanguage not initially defined (probably true)
-
-HdlLanguage:=$(OcpiLanguage)
-$(call OcpiDbgVar,HdlLanguage)
-ifeq ($(HdlLanguage),verilog)
-HdlSourceSuffix:=$(HdlVerilogSuffix)
-HdlIncSuffix:=$(HdlVerilogIncSuffix)
-HdlOtherSourceSuffix:=$(HdlVHDLSuffix)
-HdlOtherIncSuffix:=$(HdlVHDLIncSuffix)
-HdlOtherLanguage:=vhdl
-else
-HdlSourceSuffix:=$(HdlVHDLSuffix)
-HdlIncSuffix:=$(HdlVHDLIncSuffix)
-HdlOtherSourceSuffix:=$(HdlVerilogSuffix)
-HdlOtherIncSuffix:=$(HdlVerilogIncSuffix)
-HdlOtherLanguage:=verilog
-endif
-$(call OcpiDbgVar,HdlSourceSuffix)
+# preprocess language variables in case it is not already done
+include $(OCPI_CDK_DIR)/include/hdl/hdl-language.mk
 
 # This is redundant with what is in worker.mk, when that file is included, but sometimes it isn't
 override HdlExplicitLibraries:=$(call Unique,$(HdlLibraries) $(Libraries) $(HdlExplicitLibraries))
