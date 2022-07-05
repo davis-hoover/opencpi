@@ -53,6 +53,7 @@ initHDL(::Assembly &assy) {
 	return "Container workers cannot be both IO and Interconnect";
       m_attach = ic;
       m_iType = Instance::Interconnect;
+      m_inserted = true;
     } else if (io) {
       m_attach = io;
       assert(m_iType == Instance::Device);

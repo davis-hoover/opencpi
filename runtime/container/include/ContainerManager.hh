@@ -78,6 +78,9 @@ namespace OCPI {
       Application *firstApplication() const {
 	return Parent<App>::firstChild();
       }
+      Art *firstArtifact() const {
+	return Parent<Art>::firstChild();
+      }
       Container *nextContainer() { return OCPI::Base::Plugin::DeviceBase<Dri,Con>::nextDevice(); }
     public:
       const std::string &name() const {
@@ -112,7 +115,7 @@ namespace OCPI {
       ArtifactBase<Con,Art>(Con &con, Art &art, OCPI::Library::Artifact &lart, const OCPI::Base::PValue *props)
       : Child<Con, Art, artifact>(con, art, lart.name().c_str()), Artifact(lart, props) {}
     public:
-      inline Con &container() { return Child<Con,Art,artifact>::parent(); }
+      inline Container &container() { return Child<Con,Art,artifact>::parent(); }
       inline const std::string &name() const { return Child<Con, Art, artifact>::name(); }
     };
 

@@ -79,6 +79,7 @@ namespace OCPI {
       bool m_enabled;
       bool m_ownThread;
       bool m_verbose;
+      ezxml_t m_xml; // capture the configuration XML for this container (device)
       OCPI::OS::ThreadManager *m_thread;
       // This is not an embedded member to potentially control lifecycle better...
       OCPI::Transport::Transport &m_transport;
@@ -104,9 +105,10 @@ namespace OCPI {
       bool optimized() const { return m_optimized; }
       virtual bool portsInProcess() = 0;
       bool dynamic() const { return m_dynamic; }
+      ezxml_t myXml() const { return m_xml; }
       virtual Container *nextContainer() = 0;
       virtual bool supportsImplementation(OCPI::Metadata::Worker &);
-      virtual OCPI::API::ContainerApplication *
+      virtual Application *
       createApplication(const char *name = NULL, const OCPI::Base::PValue *props = NULL) = 0;
       virtual void dump(bool /*before*/, bool /*hex*/) {}
       OCPI::Base::PValue *getProperties();
@@ -116,7 +118,7 @@ namespace OCPI {
 	This is the method that gets called by the creator to provide thread time to the
 	container.  If this method returns "true" the caller must continue to call this
 	method.  If the return is "false" the method no longer needs to be called.
-	
+
 	@param [ in ] event_manager
 	Event Manager object that is associated with this container.  This parameter can be
 	NULL if the container is being used in polled mode.
@@ -125,12 +127,9 @@ namespace OCPI {
       //      bool run(uint32_t usecs = 0);
       void thread();
       virtual bool needThread() = 0;
-      // Load from url
-      Artifact & loadArtifact(const char *url,
-			      const OCPI::Base::PValue *artifactParams = NULL);
       // Load from library artifact
-      Artifact & loadArtifact(OCPI::Library::Artifact &art,
-			      const OCPI::Base::PValue *artifactParams = NULL);
+      Artifact &loadArtifact(OCPI::Library::Artifact &art,
+			     const OCPI::Base::PValue *artifactParams = NULL);
       virtual Artifact *findLoadedArtifact(const char *url) = 0;
       virtual Artifact *findLoadedArtifact(const OCPI::Library::Artifact &a) = 0;
       virtual Artifact &createArtifact(OCPI::Library::Artifact &,

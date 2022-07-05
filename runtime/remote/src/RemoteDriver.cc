@@ -63,12 +63,12 @@ class Artifact : public OC::ArtifactBase<Container,Artifact> {
     : OC::ArtifactBase<Container,Artifact>(c, *this, lart, props) {
   }
   virtual ~Artifact() {}
+  void configure() {} // do not configure anything on the client side
 };
-class ExternalPort;
 class Worker;
-class Port : public OC::PortBase<Worker, Port, OCPI::API::ExternalPort> {
+class Port : public OC::PortBase<Worker, Port> {
   Port( Worker& w, const OM::Port & pmd, const OB::PValue *params)
-    :  OC::PortBase<Worker, Port, OCPI::API::ExternalPort> (w, *this, pmd, params) {
+    :  OC::PortBase<Worker, Port> (w, *this, pmd, params) {
   }
 
   ~Port() {
@@ -298,8 +298,7 @@ class Application
 	       const OC::Workers &slaves, bool hasMaster, size_t member, size_t crewSize,
 	       const OB::PValue *wParams) {
     uint32_t remoteInstance;
-    if (!OB::findULong(wParams, "remoteInstance", remoteInstance))
-      throw OU::Error("Remote ContainerApplication expects remoteInstance parameter");
+    ocpiCheck(OB::findULong(wParams, "remoteInstance", remoteInstance));
     return *new Worker(*this, art ? static_cast<Artifact*>(art) : NULL,
 		       appInstName ? appInstName : "unnamed-worker", impl, inst, slaves,
 		       hasMaster, member, crewSize, wParams, remoteInstance);
@@ -394,7 +393,7 @@ public:
   OC::Launcher &launcher() const {
     return m_client;
   }
-  OA::ContainerApplication*
+  OC::Application *
   createApplication(const char *a_name, const OB::PValue *props) {
     return new Application(*this, a_name, props);
   }

@@ -280,7 +280,7 @@ dispatch(XF::EventManager* event_manager)
 /**********************************
  * Creates an application 
  *********************************/
-OA::ContainerApplication * Container::
+OC::Application *Container::
 createApplication(const char *a_name, const OB::PValue *props)
 {
   TRACE( "OCPI::RCC::Container::createApplication()");

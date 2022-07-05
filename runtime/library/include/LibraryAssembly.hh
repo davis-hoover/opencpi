@@ -74,6 +74,9 @@ namespace OCPI {
     typedef std::vector<Candidate> Candidates;   // a set of candidates for an instance
     typedef Candidates::iterator CandidatesIter;
 
+    // Utility function shared between container runtime and application deployment
+    bool instanceMatchesImpl(OCPI::Metadata::Worker &impl, ezxml_t staticInstance,
+			     const char *instImplAttr, const char *instDevAttr);
     // A library::assembly adds value to the underlying/inherited util::assembly
     // By finding candidate implementations in the available artifact libraries,
     // and perhaps adding proxy slave instances

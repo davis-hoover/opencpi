@@ -27,7 +27,7 @@ if ! PORT=`command -v port`; then
     exit 1
   }
 fi
-PKGS="cmake python39 swig3 swig3-python scons coreutils gsed py39-numpy libtool autoconf automake py39-jinja2"
+PKGS="cmake python39 swig3 swig3-python swig-python scons coreutils gsed py39-numpy libtool autoconf automake py39-jinja2"
 # no sphinxcontrib_spelling
 PKGS+=" py39-sphinx py39-sphinx_rtd_theme py39-scipy"
 echo Using $PORT to install packages required by OpenCPI for $OCPI_TOOL_PLATFORM: $PKGS

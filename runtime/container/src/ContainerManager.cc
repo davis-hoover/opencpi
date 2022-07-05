@@ -31,6 +31,7 @@
 #include "UtilThread.hh"             // just for linkage hooks
 #include "UtilPci.hh"            // just for linkage hooks
 #include "ContainerPort.hh"          // just for linkage hooks
+#include "ContainerApplication.hh"   // just for linkage hooks
 #if 1
 #include "UtilLogPrefix.hh"         // just for linkage hooks
 #include "RadioCtrlr.hh"            // just for linkage hooks
@@ -90,23 +91,6 @@ namespace OCPI {
       return **tpg;
     }
 
-#if 0
-    // The manager of all container drivers gets the "containers" element
-    void Manager::configure(ezxml_t x, bool debug) {
-      // So by this time all drivers will be loaded and registered.
-      // Find elements that match the container types.
-      for (ezxml_t dx = x->child; dx; dx = dx->sibling) {
-	for (DriverBase *d = firstChild(); d; d = d->nextChild())
-	  if (!strcasecmp(d->name(), dx->name))
-	    break;
-	if (d)
-	  d->configure(dx);
-	else
-	  OP::ManagerManager::
-	    configError(x, "element '%s' doesn't match any loaded container driver");
-      }
-    }
-#endif
     // Make sure we cleanup first since we are "on top"
     unsigned Manager::cleanupPosition() { return 0; }
     // FIXME: allow the caller to get errors. Perhaps another overloaded version
@@ -235,7 +219,11 @@ namespace OCPI {
       ((XF::Access *)linkme)->closeAccess();
       ((OA::RunCondition *)linkme)->setPortMasks((OA::OcpiPortMask *)NULL);
       ((Container*)linkme)->start();
-      ((XF::XferServices*)linkme)->XF::XferServices::send(0, NULL, 0);
+      // This is pretty aweful, but I could not come up with a better way.
+      auto ptr = &OCPI::Container::Application::wait;
+      ((XF::XferServices*)linkme)->XF::XferServices::send(0, (uint8_t*)&ptr, 0);
+      auto ptr1 = &OCPI::Xfer::XferRequest::action_transfer;
+      ((XF::XferServices*)linkme)->XF::XferServices::send(0, (uint8_t*)&ptr1, 0);
       ((XF::EndPoint*)linkme)->XF::EndPoint::createResourceServices();
       ((OU::Thread*)linkme)->join();
       OU::Uuid uuid;
@@ -254,7 +242,7 @@ namespace OCPI {
       OS::Semaphore sem;
       gzerror(NULL, (int*)0);
       // p.applyConnectParams(NULL, NULL);
-      ((Application*)linkme)->createWorker(NULL, NULL, NULL, NULL, NULL, NULL);
+      //((Application*)0)->createWorker(NULL, NULL, NULL, NULL, NULL, NULL);
       pthread_workqueue_create_np(NULL, NULL);
       pthread_workqueue_additem_np(NULL, NULL, NULL, NULL, NULL);
       // DRC support

@@ -53,8 +53,7 @@ namespace OCPI {
     class Worker;
     class ExternalPort;
     class Application :
-      public OCPI::Util::Parent<ExternalPort>,
-      public OCPI::API::ContainerApplication {
+      public OCPI::Util::Parent<ExternalPort> {
       friend class Container;
       friend class Artifact;
       std::string m_package;
@@ -62,34 +61,15 @@ namespace OCPI {
     protected:
       Application(const OCPI::Base::PValue *props = NULL);
     public:
+      virtual ~Application();
       void setApplication(OCPI::API::Application *app) { m_apiApplication = app; }
       OCPI::API::Application *getApplication() { return m_apiApplication; }
       virtual Container &container() = 0;
+      Application &containerApplication() { return *this; }
       virtual Worker &createWorker(Artifact *, const char *appInstName,
 				   ezxml_t impl, ezxml_t inst, const Workers &slaves,
 				   bool hasMaster, size_t member, size_t crewSize,
 				   const OCPI::Base::PValue *wparams) = 0;
-      virtual ~Application();
-
-      // This the API method using explicit artifact file names
-      OCPI::API::Worker & createWorker(const char *url,
-				       const OCPI::API::PValue *aparams,
-				       const char *appInstName,
-				       const char *implName,
-				       const char *preInstName,
-				       const OCPI::Base::PValue *wprops,
-				       const OCPI::API::PValue *wparams,
-				       const char *selectCriteria = NULL);
-      // This is the API method to create a worker from libraries
-      OCPI::API::Worker &createWorker(const char *appInstName, const char *specName,
-				      const OCPI::API::PValue *wParams = NULL,
-				      const OCPI::Base::PValue *wprops = NULL,
-				      const char *selectCriteria = NULL,
-				      const OCPI::API::Connection *connections = NULL);
-      Worker &createWorker(OCPI::Library::Artifact &art, const char *appInstName, 
-			   ezxml_t impl, ezxml_t inst, const Workers &slaves,
-			   bool hasMaster, size_t member, size_t crewSize,
-			   const OCPI::Base::PValue *wparams = NULL);
       virtual Worker *firstWorker() const = 0;
       //      void start();
       // If not master, then we ignore slave, so there are three cases
@@ -98,7 +78,7 @@ namespace OCPI {
       void release(bool isMaster, bool isSlave);
       bool isDone();
       // This method should block until all the workers in the application are "done".
-      virtual bool wait(OCPI::OS::Timer *timer = NULL);
+      bool wait(OCPI::OS::Timer *timer = NULL);
     };
   } // Container
 } // OCPI
