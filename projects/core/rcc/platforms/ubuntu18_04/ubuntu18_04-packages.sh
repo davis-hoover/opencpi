@@ -100,6 +100,8 @@ PKGS_D+=(xsltproc docbook-xml docbook-xsl)
 PKGS_D+=(enchant)
 #    for xilinx tool installation script
 PKGS_D+=(expect)
+#    for kernel module tests (runtime libs already present)
+PKGS_D+=(zlib1g-dev)
 
 
 ##########################################################################################
