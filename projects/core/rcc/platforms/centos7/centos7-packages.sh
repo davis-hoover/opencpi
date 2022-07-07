@@ -223,8 +223,12 @@ $SUDO $YUM install $(ypkgs PKGS_E)
 # SWIG is a special case on CentOS 7
 install_swig3
 
-# And finally, install the remaining python3 packages
-$SUDO pip3 install ${PKGS_P[*]}
+#
+# Finally, install the remaining python3 packages.  The "-U"
+# option is needed to force a "scipy" update to be installed
+# if "python36-scipy" is already installed on the system.
+#
+$SUDO pip3 install -U ${PKGS_P[*]}
 [ $? -ne 0 ] && bad "Installing pip3 packages failed"
 
 exit 0
