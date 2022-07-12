@@ -38,8 +38,9 @@ namespace OCPI {
 
     // The instance attributes relevant to app assemblies - we don't really deal with "container" here
     // FIXME: It should be in the upper level
-    static const char *instAttrs[] = { COLLOCATION_POLICY_ATTRS,
-				       "model", "platform", "container", NULL};
+    static const char *instAttrs[] = {
+      COLLOCATION_POLICY_ATTRS, "model", "platform", "container", "device", NULL
+    };
 
     Assembly::Assembly(ezxml_t a_xml, const char *a_name, const OB::PValue *params)
       : OM::Assembly(a_xml, a_name, false, assyAttrs, instAttrs, params), m_refCount(1) {
