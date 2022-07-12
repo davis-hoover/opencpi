@@ -32,7 +32,7 @@ Properties:
   <property name='messagesToSend'    volatile='true' writable='true' default='1'/>
   <property name='pad0' arraylength='2' padding='true'/>
   <!-- Status and configurationbits.
-       [31:28]  4’hA (the hex nibble 0xA)
+       [31:28]  4'hA (the hex nibble 0xA)
        27       0
        26       0
        25       0 
