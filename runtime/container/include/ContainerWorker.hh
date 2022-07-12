@@ -127,6 +127,7 @@ namespace OCPI {
       size_t m_member, m_crewSize;
       PortMask m_connectedPorts, m_optionalPorts, m_outputPorts, m_inputPorts; // spcm?
       mutable std::vector<Cache *> m_cache; // per property write cache, when needed
+      std::string m_description; // for error/info messages
       bool beforeStart() const;
     protected:
       void connectPort(OCPI::Metadata::PortOrdinal ordinal);
@@ -144,6 +145,7 @@ namespace OCPI {
       bool isSource() const {
 	return (m_outputPorts & m_connectedPorts) && !(m_inputPorts & m_connectedPorts);
       }
+      const char *workerDescription();
     protected:
       inline ezxml_t myXml() const { return m_xml; }
       inline ezxml_t myInstXml() const { return m_instXml; }

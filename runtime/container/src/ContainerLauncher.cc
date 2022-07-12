@@ -75,26 +75,26 @@ bool LocalLauncher::
 launch(Launcher::Members &instances, Launcher::Connections &connections) {
   m_more = false;
   Launcher::Member *i = &instances[0];
-  // So slaves first.  I think the reason for this is that there were non-compliant legacy
-  // proxies which tried to touch slaves too early (before start).  But this backward
-  // compatibility does no harm
   for (unsigned n = 0; n < instances.size(); n++, i++)
-    if (&i->m_container->launcher() == this && i->m_hasMaster)
+    if (&i->m_container->launcher() == this && i->m_hasMaster && i->m_slaves.empty())
       createWorker(*i);
   i = &instances[0];
   for (unsigned n = 0; n < instances.size(); n++, i++)
-    if (&i->m_container->launcher() == this && !i->m_hasMaster) {
-      bool needSlave = false;
-      for (unsigned nn = 0; nn < i->m_slaves.size(); ++nn)
-	// We allow the proxy to not have all of its slaves present in the app
-	if (i->m_slaves[nn] && !(i->m_slaveWorkers[nn] = i->m_slaves[nn]->m_worker)) {
-	  needSlave = true;
-	  break;
-	}
-      if (needSlave)
-	m_more = true; // instance is local, but a slave is remote
-      else
-	createWorker(*i);
+    if (&i->m_container->launcher() == this) {
+      if (!i->m_slaves.empty()) {
+        bool needSlave = false;
+        for (unsigned nn = 0; nn < i->m_slaves.size(); ++nn)
+          // We allow the proxy to not have all of its slaves present in the app
+          if (i->m_slaves[nn] && !(i->m_slaveWorkers[nn] = i->m_slaves[nn]->m_worker)) {
+            needSlave = true;
+            break;
+          }
+        if (needSlave)
+          m_more = true; // instance is local, but a slave is remote
+        else
+          createWorker(*i);
+      } else if (!i->m_hasMaster) // if not a local slave
+        createWorker(*i);
     }
   for (unsigned n = 0; n < connections.size(); n++) {
     Launcher::Connection &c = connections[n];
@@ -131,7 +131,7 @@ work(Launcher::Members &instances, Launcher::Connections &connections) {
   m_more = false;
   Launcher::Member *i = &instances[0];
   for (unsigned n = 0; n < instances.size(); n++, i++)
-    if (&i->m_container->launcher() == this && !i->m_hasMaster && !i->m_worker) {
+    if (&i->m_container->launcher() == this && !i->m_slaves.empty() && !i->m_worker) {
       bool needSlave = false;
       for (unsigned nn = 0; nn < i->m_slaves.size(); ++nn)
 	if (i->m_slaves[nn] && !(i->m_slaveWorkers[nn] = i->m_slaves[nn]->m_worker)) {
