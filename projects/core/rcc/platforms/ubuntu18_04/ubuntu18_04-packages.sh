@@ -44,7 +44,7 @@
 # R. runtime - minimal
 #    linux basics for general runtime scripts
 #    no initscripts package for ubuntu18_04: identify replacement if needed
-PKGS_R+=(util-linux coreutils ed findutils curl)
+PKGS_R+=(util-linux coreutils ed findutils curl inetutils-ping)
 #    for JTAG loading of FPGA bitstreams
 #    AV-3053 libusb.so is required to communicate with Xilinx programming dongle
 #    For some reason, that is only in the libusb development package
@@ -98,6 +98,10 @@ PKGS_D+=(fakeroot)
 PKGS_D+=(xsltproc docbook-xml docbook-xsl)
 #    for sphinxcontrib.spelling extension (RST doc support)
 PKGS_D+=(enchant)
+#    for xilinx tool installation script
+PKGS_D+=(expect)
+#    for kernel module tests (runtime libs already present)
+PKGS_D+=(zlib1g-dev)
 
 
 ##########################################################################################
