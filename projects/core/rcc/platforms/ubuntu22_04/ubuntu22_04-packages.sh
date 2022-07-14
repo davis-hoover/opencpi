@@ -23,10 +23,10 @@
 # of package categories being "runtime", "development", "source_env", and "extra"
 # is potentially useful on non-CentOS systems.  *ubuntu distros customarily have
 # at least one "extras" repo (partner) that is not enabled by default.  Note that
-# "bash" is required: "/bin/sh" points to "dash" on *ubuntu 18.04 LTS systems.
+# "bash" is required: "/bin/sh" points to "dash" on *ubuntu 22.04 LTS systems.
 #
 ##########################################################################################
-# Install or list required and available packages for *ubuntu 18.04 LTS
+# Install or list required and available packages for *ubuntu 22.04 LTS
 #
 # The packages are really in four categories (and in 4 variables PKGS_{R,D,S,E})
 # R. Simply required packages for runtime
@@ -43,7 +43,7 @@
 ##########################################################################################
 # R. runtime - minimal
 #    linux basics for general runtime scripts
-#    no initscripts package for ubuntu18_04: identify replacement if needed
+#    no initscripts package for ubuntu22_04: identify replacement if needed
 PKGS_R+=(util-linux coreutils ed findutils curl)
 #    for JTAG loading of FPGA bitstreams
 #    AV-3053 libusb.so is required to communicate with Xilinx programming dongle
@@ -74,10 +74,10 @@ PKGS_D+=(time)
 #         ncurses-libs.i686=/usr/lib/libncurses.so.5
 #         libXft.i686=/usr/lib/libXft.so.2
 #         libXext.i686=/usr/lib/libXext.so.6)
-#    for *ubuntu 18_04 LTS, installing "lsb" covers most of what we need
-PKGS_D+=(lsb lib32ncurses5 libxft2:i386 libxext6:i386)
+#    for *ubuntu 22_04 LTS, installing "lsb" covers most of what we need
+PKGS_D+=(lsb lib32ncurses6 libxft2:i386 libxext6:i386)
 #    for Quartus Pro 17 (AV-4318), we need specifically the 1.2 version of libpng
-#    N.B.: "libpng12-0" is not available on *ubuntu 18.04 LTS.  Will substitute
+#    N.B.: "libpng12-0" is not available on *ubuntu 22.04 LTS.  Will substitute
 #    "libpng16-16" for now, pending confirmation we really need "libpng12-0".
 PKGS_D+=(libpng16-16)
 #    to cleanup multiple copies of Linux kernel, etc. (AV-4802)
@@ -97,14 +97,11 @@ PKGS_D+=(fakeroot)
 #    for asciidoc3 man page generation (asciidoc3 is a prereq)
 PKGS_D+=(xsltproc docbook-xml docbook-xsl)
 #    for sphinxcontrib.spelling extension (RST doc support)
-PKGS_D+=(enchant)
-<<<<<<< HEAD
-=======
+PKGS_D+=(enchant-2)
 #    for xilinx tool installation script
 PKGS_D+=(expect)
 #    for kernel module tests (runtime libs already present)
 PKGS_D+=(zlib1g-dev)
->>>>>>> 87a1ec6... Merge branch '3093-update-ubuntu-package-list' into 'develop'
 
 
 ##########################################################################################
@@ -128,8 +125,8 @@ PKGS_S+=(rpm)
 PKGS_S+=(nfs-common nfs-kernel-server)
 #    for the inode64 prerequisite build (from source)
 PKGS_S+=(libc6-dev-i386)
-#    for the AV GUI installation and tutorials
-PKGS_S+=(oxygen5-icon-theme openjdk-8-jre openjdk-8-jre-headless tree)
+#    for the tutorials
+PKGS_S+=(tree)
 #    for serial console terminal emulation
 PKGS_S+=(screen)
 #    Needed to generate gitlab-ci yaml
@@ -138,13 +135,13 @@ PKGS_S+=(python3-yaml)
 ##########################################################################################
 # E. installations that have to happen after we run "apt-get install" once, and also
 #    install the required "devel" packages.  At this point, we rely on any extra
-#    repos that are needed being enabled.  With respect to Python 3, it would seem
-#    the minimum required version is 3.4.  For *ubuntu 18.04 LTS, "python3" maps to
-#    "python3.6" by default as of June 2020.
+#    repos that are needed being enabled.  With respect to Python 3, the minimum
+#    required version is 3.6 these days.  For *ubuntu 22.04 LTS, "python3" maps to
+#    "python3.10" by default as of April 2022.
 #
 #    for creating swig
-#    N.B.: "swig" is a meta-package that installs SWIG v3.0.12,
-#    and has "swig3.0" as a dependency.
+#    N.B.: "swig" is a meta-package that installs SWIG v4.0.2,
+#    and has "swig4.0" as a dependency.
 PKGS_E+=(swig)
 #    for ocpidev
 PKGS_E+=(python3 python3-dev python3-jinja2)
@@ -160,10 +157,10 @@ PKGS_E+=(libssl-dev device-tree-compiler)
 PKGS_E+=(chrpath diffstat texinfo)
 #    For ocpidoc documentation builder
 #
-#    Distro-provided "python3-sphinx", "python3-sphinx-rtd-theme",
-#    and "python3-sphinxcontrib.spelling" packages are too old, so
-#    will handle installation via "pip3" inside a python3 virtual
-#    environment as part of the "ocpidoc" installation.
+#    Distro-provided "python3-sphinx", "python3-sphinx-rtd-theme", and
+#    "python3-sphinxcontrib.spelling" packages have historically been
+#    too old, so will handle installation via "pip3" inside a python3
+#    virtual environment as part of the "ocpidoc" installation.
 PKGS_E+=(python3-venv)
 
 #
@@ -175,10 +172,8 @@ PKGS_E+=(python3-venv)
 # "shift" to get to the parameters beyond the 9th.  Likewise,
 # there were no convenient built-in methods of performing string
 # operations (matching, substring extraction, substitution, etc.).
-# For our purposes, ASSuming "/bin/sh" is "bash" or compatible
-# with "bash" is probably safe: one source claims we left the
-# dark ages behind when Solaris 11 was released, at which time
-# "/bin/sh" became POSIX sh.
+# ASSuming "/bin/sh" is "bash" or compatible gets one into trouble
+# on *ubuntu.
 #
 # functions to deal with arrays with <pkg>=<file> syntax
 function rpkgs {
