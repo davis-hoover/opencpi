@@ -28,6 +28,7 @@ namespace OA = OCPI::API;
 namespace OL = OCPI::Library;
 namespace OB = OCPI::Base;
 namespace OM = OCPI::Metadata;
+namespace OU = OCPI::Util;
 
 namespace OCPI {
   namespace Container {
@@ -98,13 +99,8 @@ namespace OCPI {
       for (Worker *w = firstWorker(); w; w = w->nextWorker())
 	if (isSource == w->isSource() &&
 	    isMaster == (w->slaves().size() != 0 || w->isEmulator()) &&
-	    isSlave == w->hasMaster()) {
-	  assert(w->getState() == OM::Worker::INITIALIZED || 
-		 w->getState() == OM::Worker::SUSPENDED);
-	  ocpiInfo("Starting worker: %s in container %s from %s/%s", w->name().c_str(),
-		   container().name().c_str(), w->implTag().c_str(), w->instTag().c_str());
+	    isSlave == w->hasMaster())
 	  w->start();
-	}
     }
     // If not master, then we ignore isSlave, so there are three cases
     void Application::
@@ -112,11 +108,8 @@ namespace OCPI {
       for (Worker *w = firstWorker(); w; w = w->nextWorker())
 	if ((isMaster && w->slaves().size() &&
 	     ((isSlave && w->hasMaster()) || (!isSlave && !w->hasMaster()))) ||
-	    (!isMaster && w->slaves().empty())) {
-	  ocpiInfo("Stopping worker: %s in container %s from %s/%s", w->name().c_str(),
-		   container().name().c_str(), w->implTag().c_str(), w->instTag().c_str());
+	    (!isMaster && w->slaves().empty()))
 	  w->stop();
-	}
     }
     // If not master, then we ignore isSlave, so there are three cases
     void Application::
@@ -124,11 +117,8 @@ namespace OCPI {
       for (Worker *w = firstWorker(); w; w = w->nextWorker())
 	if ((isMaster && w->slaves().size() &&
 	     ((isSlave && w->hasMaster()) || (!isSlave && !w->hasMaster()))) ||
-	    (!isMaster && w->slaves().empty())) {
-	  ocpiInfo("Releasing worker: %s in container %s from %s/%s", w->name().c_str(),
-		   container().name().c_str(), w->implTag().c_str(), w->instTag().c_str());
+	    (!isMaster && w->slaves().empty()))
 	  w->release();
-	}
     }
     bool Application::
     isDone() {

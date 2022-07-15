@@ -26,21 +26,20 @@
  * This file contains the implementation skeleton for the proxy worker in C++
  */
 
-#include "proxy-worker.hh"
+#include "proxy0-worker.hh"
 
 using namespace OCPI::RCC; // for easy access to RCC data types and constants
-using namespace ProxyWorkerTypes;
+using namespace Proxy0WorkerTypes;
 
-class ProxyWorker : public ProxyWorkerBase {
+class Proxy0Worker : public Proxy0WorkerBase {
   RunCondition m_aRunCondition;
 public:
-  ProxyWorker() : m_aRunCondition(RCC_NO_PORTS) {
+  Proxy0Worker() : m_aRunCondition(RCC_NO_PORTS) {
     //Run function should never be called
     setRunCondition(&m_aRunCondition);
   }
 private:
   RCCResult start() {
-    slave.set_biasValue(m_properties.proxybias);
     slave.start();
     return RCC_OK;
   }
@@ -49,7 +48,7 @@ private:
   }
 };
 
-PROXY_START_INFO
+PROXY0_START_INFO
 // Insert any static info assignments here (memSize, memSizes, portInfo)
 // e.g.: info.memSize = sizeof(MyMemoryStruct);
-PROXY_END_INFO
+PROXY0_END_INFO

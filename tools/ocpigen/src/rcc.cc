@@ -1366,7 +1366,6 @@ addSlavesConfig(ezxml_t a_slaves) {
   if ((err = OB::parseConditionals(m_slavesXml, *this)))
     return OU::esprintf("Error processing conditional slave assembly: %s", err);
   ocpiInfo("===After processing:\n%s", ezxml_toxml(m_slavesXml));
-  //cout << ezxml_toxml(m_xml);
   m_slavesAssembly = new ::Assembly(m_worker);
   static const char *instAttrs[] = {INST_ATTRS, "optional"};
   if ((err = m_slavesAssembly->parseAssy(m_slavesXml, NULL, instAttrs)))
@@ -1437,9 +1436,15 @@ parseSlaves() {
       // Make fake assemblies out of the non-assembly attribute or elements
       std::string xml("<slaves>");
       if (attr) {
-	std::string instanceName = l_slave.substr(0, l_slave.find(".", 0));
+	std::string instanceName(l_slave); // default if no dots
+	const char *last = strrchr(l_slave.c_str(), '.');
+	if (last) {
+	  instanceName.resize(OCPI_SIZE_T_DIFF(last, l_slave.c_str())); // trim model
+	  if ((last = strrchr(instanceName.c_str(), '.')))
+	    instanceName.erase(0, OCPI_SIZE_T_DIFF(last + 1, instanceName.c_str()));
+	}
 	OU::formatAdd(xml, "<instance name='%s' worker='%s'/>",
-		      l_slave.substr(0, l_slave.find(".", 0)).c_str(), l_slave.c_str());
+		      instanceName.c_str(), l_slave.c_str());
       } else {
 	for (ezxml_t slave = ezxml_cchild(m_xml, "slave"); slave; slave = ezxml_cnext(slave)) {
 	  if ((err = OE::checkAttrs(slave, "name", "worker", "optional", NULL)))

@@ -757,6 +757,15 @@ namespace OCPI {
       }
     }
 
+    const char *Worker::workerDescription() {
+      if (m_description.empty())
+	OU::format(m_description, "worker \"%s\" in container %s from artifact worker %s%s%s%s",
+		   cname(), application() ? application()->container().name().c_str() : "<unknown>",
+		   implTag().c_str(), model().c_str(), instTag().length() ? "/" : "",
+		   instTag().c_str());
+      return m_description.c_str();
+    }
+
     bool Worker::controlOp(OM::Worker::ControlOperation op) {
       // sched_yield does not work with the default
       // Linux scheduler: SCHED_OTHER, and it requires special permission/capability to use
@@ -771,12 +780,19 @@ namespace OCPI {
       ControlState cs = getControlState();
       ControlTransition ct = controlTransitions[op];
       // Special case starting and stopping after finished
-      if (cs == OM::Worker::FINISHED && (op == OM::Worker::OpStop || op == OM::Worker::OpStart))
+      if (cs == OM::Worker::FINISHED && (op == OM::Worker::OpStop || op == OM::Worker::OpStart)) {
+	ocpiInfo("Ignoring the stop or start control operation since worker is finished: %s",
+		 workerDescription());
 	return true;
+      }
       // If we are already in the desired state, just ignore it so that
       // Neither workers nor containers need to deal with this
-      if (ct.next != OM::Worker::NONE && cs == ct.next)
+      if (ct.next != OM::Worker::NONE && cs == ct.next) {
+	ocpiInfo("Ignoring the %s control operation since worker is in the %s state: %s",
+		 OM::Worker::s_controlOpNames[op], OM::Worker::s_controlStateNames[cs],
+		 workerDescription());
 	return true;
+      }
       if (cs == ct.valid[0] ||
 	  (ct.valid[1] != NONE && cs == ct.valid[1]) ||
 	  (ct.valid[2] != NONE && cs == ct.valid[2]) ||
@@ -797,18 +813,17 @@ namespace OCPI {
 	controlOperation(op);
 	if (ct.next != NONE)
 	  setControlState(ct.next);
+	ocpiInfo("Worker \"%s\" control operation succeeded, now in state \"%s\": %s",
+		 OM::Worker::s_controlOpNames[op],
+		 OM::Worker::s_controlStateNames[getControlState()], workerDescription());
       } else
 	throw
-	  OU::Error("Control operation '%s' failed on worker '%s%s%s' in state: '%s'",
-		    OM::Worker::s_controlOpNames[op], implTag().c_str(),
-		    instTag().empty() ? "" : "/", instTag().c_str(),
-		    OM::Worker::s_controlStateNames[cs]);
+	  OU::Error("Control operation \"%s\" failed in state \"%s\": %s",
+		    OM::Worker::s_controlOpNames[op],
+		    OM::Worker::s_controlStateNames[cs], workerDescription());
       Application *a = application();
-      if (a && op == OM::Worker::OpStart) {
-	ocpiInfo("After starting worker %s, starting container %s",
-		 cname(), a->container().cname());
+      if (a && op == OM::Worker::OpStart)
 	a->container().start();
-      }
       return false;
     }
 
