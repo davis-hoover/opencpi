@@ -224,10 +224,6 @@ namespace OCPI {
       // Other convenience methods for get/set properties
       void setProperties(const char *props[][2]);
       void setProperties(const OCPI::API::PValue *props);
-#if 0
-      virtual void getPropertyValue(const OCPI::API::PropertyInfo &p, std::string &value, bool hex,
-				    bool add, bool uncached) const;
-#endif
       bool getProperty(unsigned ordinal, std::string &name, std::string &value,
 		       bool *unreadablep = NULL, bool hex = false, bool *cachedp = NULL,
 		       bool uncached = false, bool *hiddenp = NULL);
@@ -244,7 +240,7 @@ namespace OCPI {
       // Generic setting method
 
       virtual ~Worker();
-      OCPI::API::Port &getPort(const char *name, const OCPI::API::PValue *params = NULL);
+      Port &getPort(const char *name, const OCPI::API::PValue *params = NULL);
       Port &getPort(const char *name, size_t nOthers, const OCPI::API::PValue *params = NULL);
       // backward compatibility for ctests
       virtual Port

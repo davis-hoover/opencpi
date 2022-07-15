@@ -48,13 +48,6 @@ namespace OCPI {
   namespace Container {}
   namespace HDL {
 
-    //    static inline unsigned max(unsigned a,unsigned b) { return a > b ? a : b;}
-    // This is the alignment constraint of DMA buffers in the processor's memory.
-    // It could be a cache line or a malloc granule...
-    // It should come from somewhere else.  FIXME
-    //    static const unsigned LOCAL_BUFFER_ALIGN = 32;
-
-
     static OTM::Emit::Time getTicksFunc(OTM::Emit::TimeSource *ts) {
       return ts ? static_cast<Container *>(ts)->getMyTicks() : 0; // null-ptr warning
     }
@@ -236,6 +229,15 @@ namespace OCPI {
 	fprintf(stderr, "  No artifact loaded.\n");
     }
 
+    uint64_t Container::
+    getMyTicks() {
+      Access *ts = m_device.timeServer();
+      return
+	m_device.isAlive() && !m_device.isFailed() && ts ? 
+	(m_lastTick = swap32(ts->get64RegisterOffset(0)) + hdlDevice().m_timeCorrection) :
+	m_lastTick;
+    }
+
     // We know we have not already loaded it, but it still might be loaded on the device.
     OC::Artifact & Container::
     createArtifact(OCPI::Library::Artifact &lart, const OA::PValue *artifactParams)
@@ -253,7 +255,7 @@ namespace OCPI {
 			        size_t member, size_t crewSize, const OB::PValue *wParams);
     };
 
-    OA::ContainerApplication *Container::
+    OC::Application *Container::
     createApplication(const char *a_name, const OB::PValue *props) {
       return new Application(*this, a_name, props);
     };
@@ -261,7 +263,6 @@ namespace OCPI {
     class Worker : public OC::WorkerBase<Application, Worker, Port>, public WciControl {
       friend class Application;
       friend class Port;
-      friend class ExternalPort;
       Container &m_container;
       Worker(Application &app, OC::Artifact *art, const char *a_name, ezxml_t implXml,
 	     ezxml_t instXml, const OC::Workers &a_slaves, bool a_hasMaster, size_t a_member,
@@ -370,12 +371,9 @@ OCPI_DATA_TYPES
     // So this class takes care of all 4 cases, since the differences are so
     // minor as to not be worth (re)factoring (currently).
     // The inheritance of WciControl is for the external case
-    class ExternalPort;
-    class Port : public OC::PortBase<OH::Worker,OH::Port,OH::ExternalPort>, WciControl {
+    class Port : public OC::PortBase<OH::Worker,OH::Port>, WciControl {
       friend class Container;
       friend class Worker;
-      friend class ExternalPort;
-      ezxml_t m_connection;
       // These are for external-to-FPGA ports
       // Which would be in a different class if we separate them
       bool m_sdp;
@@ -389,17 +387,15 @@ OCPI_DATA_TYPES
       Port(OCPI::HDL::Worker &w,
 	   const OA::PValue *params,
            const OM::Port &mPort, // the parsed port metadata
-           ezxml_t connXml, // the xml connection for this port
+           ezxml_t /*connXml*/, // the xml connection for this port
            ezxml_t icwXml,  // the xml interconnect/infrastructure worker attached to this port if any
            ezxml_t icXml,   // the xml interconnect instance attached to this port if any
            ezxml_t adwXml,  // the xml adapter/infrastructure worker attached to this port if any
            ezxml_t adXml) :   // the xml adapter instance attached to this port if any
-        OC::PortBase<OH::Worker,OH::Port,OH::ExternalPort>
-	(w, *this, mPort, params),
+        OC::PortBase<OH::Worker,OH::Port>(w, *this, mPort, params),
 	// The WCI will control the interconnect worker.
 	// If there is no such worker, usable will fail.
-        WciControl(w.m_container.hdlDevice(), icwXml, icXml, NULL),
-        m_connection(connXml), m_sdp(false), m_memorySize(0),
+        WciControl(w.m_container.hdlDevice(), icwXml, icXml, NULL), m_sdp(false), m_memorySize(0),
 	m_adapter(adwXml ? new WciControl(w.m_container.hdlDevice(), adwXml, adXml, NULL) : 0),
 	m_hasAdapterConfig(false),
 	m_adapterConfig(0),
@@ -748,35 +744,16 @@ OCPI_DATA_TYPES
 	portIsConnected();
 	return isProvider() ? NULL : &getData().data;
       }
-      OC::ExternalPort &createExternal(const char *extName, bool isProvider,
-				       const OB::PValue *extParams, const OB::PValue *connParams);
     };
     // Connection between two ports inside this container
     // We know they must be in the same artifact, and have a metadata-defined connection
     bool Container::
     connectInside(OC::BasicPort &in, OC::BasicPort &out) {
-      
-
-      Port 
+      Port
 	&pport = static_cast<Port&>(in.isProvider() ? in : out),
 	&uport = static_cast<Port&>(out.isProvider() ? in : out);
       assert(!pport.m_canBeExternal && !uport.m_canBeExternal);
       return true;
-#if 0
-      bool done;
-      OT::Descriptors dummy;
-      pport.startConnect(NULL, dummy, done);
-      // We're both in the same runtime artifact object, so we know the port class
-      if (uport.m_connection != pport.m_connection)
-	throw OU::Error("Ports %s (instance %s) and %s (instance %s) are both local in "
-			"bitstream/artifact %s, but are not connected (%p %p)",
-			uport.name().c_str(), uport.parent().name().c_str(),
-			pport.name().c_str(), pport.parent().name().c_str(),
-			pport.parent().artifact() ?
-			pport.parent().artifact()->name().c_str() : "<none>",
-			uport.m_connection, pport.m_connection);
-      return true;
-#endif
     }
     int Port::dumpFd = -1;
 

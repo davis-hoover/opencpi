@@ -65,13 +65,8 @@ namespace OCPI {
       const OCPI::Library::Artifact &libArtifact() const { return m_libArtifact; }
       virtual const std::string &name() const = 0;
       bool hasArtifact(const void *art);
-      Worker &createWorker(Application &a,  const char *instName,
-			   const char *impltag, const char *instTag,
-			   const OCPI::Base::PValue *props = NULL,
-			   const OCPI::Base::PValue *params = NULL);
-      Worker &createWorker(Application &app,
-			   const char *appInstName,
-			   ezxml_t impl, ezxml_t inst, const OCPI::Container::Workers &slaves,
+      Worker &createWorker(Application &app, const OCPI::Library::Implementation &impl,
+			   const char *appInstName, const OCPI::Container::Workers &slaves,
 			   bool hasMaster, size_t member, size_t crewSize,
 			   const OCPI::Base::PValue *wparams = NULL);
     protected:

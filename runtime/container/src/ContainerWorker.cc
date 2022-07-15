@@ -62,12 +62,6 @@ namespace OCPI {
 	memset(m_dirty, 0, nWords * sizeof(Word));
       }
       ~Cache() { delete [] m_data; delete [] m_dirty; }
-#if 0
-      bool anySet(size_t start, size_t n) {
-	(void)start;(void)n;
-	return false;
-      }
-#endif
       bool allSet(size_t start, size_t n) {
 	assert(m_dirty);
 	Word *p = m_dirty + (start >> c_shift);
@@ -166,6 +160,7 @@ namespace OCPI {
     Worker::~Worker()
     {
       ocpiDebug("In  Container::Worker::~Worker(): %s", cname());
+      // We are a child of our container application, but we need to tell our artifact too
       if (m_artifact)
 	m_artifact->removeWorker(*this);
       for (unsigned i = 0; i < m_cache.size(); i++)
@@ -201,7 +196,7 @@ namespace OCPI {
       return newP;
     }
 
-    OA::Port &Worker::
+    Port &Worker::
     getPort(const char *a_name, const OA::PValue *params ) {
       return getPort(a_name, 0, params);
     }
@@ -214,11 +209,6 @@ namespace OCPI {
 	throw OU::Error("For setting debug property \"%s\": worker \"%s\" is not in debug mode",
 			prop.cname(), cname());
 
-#if 0 // not readable is not possible given caching
-      if (!prop.m_isReadable && !prop.m_isWritable && !prop.m_isParameter)
-	throw OU::Error("Property '%s' of worker '%s' is neither readable nor writable",
-			pname, name().c_str());
-#endif
       if (!prop.m_isParameter)
 	prepareProperty(prop, m_writeVaddr, m_readVaddr);
       return prop;

@@ -45,54 +45,6 @@ namespace OCPI {
       ocpiDebug("In  Container::Application::~Application()");
     }
 
-    OA::Worker &Application::
-    createWorker(const char *url, const OA::PValue *aParams, const char *instName,
-		 const char *implName, const char *preInstName,
-		 const OA::PValue *wProps, const OA::PValue *wParams,
-		 const char * /* selectCriteria */ ) {
-      if (url)
-	return container().loadArtifact(url, aParams).createWorker(*this, instName,
-								   implName, preInstName,
-								   wProps, wParams);
-      // This is for passing in a dispatch table for RCC workers.
-      else {
-	Worker &w = createWorker(NULL, instName, (ezxml_t)NULL, (ezxml_t)NULL, NoWorkers, false,
-				 0, 1, aParams);
-	w.initialize();
-	return w;
-      }
-    }
-    OA::Worker &Application::
-    createWorker(const char *instName, const char *specName,
-		 const OA::PValue *wProps,
-		 const OA::PValue *wParams,
-		 const char *selectCriteria, 
-		 const OA::Connection *connections) {
-      // Find an artifact (and instance within the artifact), for this worker
-      std::string spec;
-      const char *dot = strchr(specName, '.');
-      if (dot)
-	spec = specName;
-      else {
-	spec = m_package;
-	spec += specName;
-      }
-      const char *artInst = NULL;
-      OL::Artifact &a =
-	OL::Manager::findArtifact(container(), spec.c_str(), wParams, selectCriteria,  connections, artInst);
-      // Load the artifact and create the worker
-      return
-	container().loadArtifact(a).createWorker(*this, instName, spec.c_str(), artInst, wProps, wParams);
-    }
-    Worker &Application::
-    createWorker(OCPI::Library::Artifact &art, const char *appInstName, 
-		 ezxml_t impl, ezxml_t inst, const Workers &slaves, bool hasMaster,
-		 size_t member, size_t crewSize, const OB::PValue *wParams) {
-      // Load the artifact and create the worker
-      return
-	container().loadArtifact(art).createWorker(*this, appInstName, impl, inst, slaves,
-						   hasMaster, member, crewSize, wParams);
-    }
     // If not master, then we ignore isSlave, so there are three cases
     void Application::
     startMasterSlave(bool isMaster, bool isSlave, bool isSource) {
@@ -134,16 +86,5 @@ namespace OCPI {
 	  return true;
       return false;
     }
-#if 0 // let's see if anyone uses this
-    void Application::
-    start() {
-      startMasterSlave(true, false); // start masters that are not slaves
-      startMasterSlave(true, true);  // start masters that are slaves
-      startMasterSlave(false, false); // start non-masters
-    }
-#endif
-  }
-  namespace API {
-    ContainerApplication::~ContainerApplication(){}
   }
 }

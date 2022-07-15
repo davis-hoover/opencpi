@@ -91,9 +91,12 @@ namespace OCPI {
 			 OCPI::Metadata::Port *otherPort = NULL);
     };
 
-    // Note due to xml persistence we don't need strings in the map
+    // Note due to xml persistence we don't need std::strings in the map
+    // The "worker" terminology here is really a static thing in the artifact that can be
+    // used as the basis for a runtime instance of the worker.  Probably should be
+    // called something else.  "Instance Template" is ugly and confusing and accurate
     typedef std::multimap<const char *, Implementation *, OCPI::Util::ConstCharComp > WorkerMap;
-    typedef std::pair< const char*, Implementation *> WorkerMapPair;
+    typedef std::pair<const char*, Implementation *> WorkerMapPair;
     typedef WorkerMap::const_iterator WorkerIter;
     typedef std::pair<WorkerIter,WorkerIter> WorkerRange;
     class Library;
@@ -108,7 +111,7 @@ namespace OCPI {
       unsigned m_nImplementations;
       OCPI::Metadata::Worker *m_metaImplementations; // this array 
       // A map for implementations (*including* static instances) in this artifact
-      // Used for artifact-by-artifact searches (FIXME: obsolete?)
+      // Implicitly assigned an ordinal to them
       WorkerMap m_workers;      // Map from spec name to implementations
       // A count of static instances added to the worker map (m_workers)
       unsigned m_nWorkers;
@@ -123,6 +126,7 @@ namespace OCPI {
       const char *setFileMetadata(const char *name, char *metadata, std::time_t mtime,
 				  uint64_t length, size_t metaLength);
     public:
+      unsigned nWorkers() const { return m_nWorkers; }
       void configure(ezxml_t x = NULL);
       // Can this artifact run on something with these capabilities?
       bool meetsCapabilities(const Capabilities &caps);

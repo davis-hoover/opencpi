@@ -23,12 +23,14 @@
 #include "ContainerPort.hh"
 #include "ContainerWorker.hh"
 #include "ContainerApplication.hh"
+#include "ContainerArtifact.hh"
 #include "ContainerLauncher.hh"
 
 namespace OM = OCPI::Metadata;
 namespace OB = OCPI::Base;
 namespace OT = OCPI::Transport;
 namespace XF = OCPI::Xfer;
+namespace OU = OCPI::Util;
 namespace OCPI {
   namespace Container {
 
@@ -36,19 +38,18 @@ LocalLauncher::~LocalLauncher() {}
 
 void LocalLauncher::
 createWorker(Launcher::Member &i) {
-  i.m_worker = &i.m_containerApp->createWorker(i.m_impl->m_artifact,
-					       i.m_name.c_str(),
-					       i.m_impl->m_metadataImpl.m_xml,
-					       i.m_impl->m_staticInstance,
-					       i.m_slaveWorkers,
-					       i.m_hasMaster,
-					       i.m_member, i.m_crew ? i.m_crew->m_size : 1);
+  i.m_worker = &i.m_container->loadArtifact(i.m_impl->m_artifact).
+    createWorker(*i.m_containerApp, *i.m_impl, i.m_name.c_str(), i.m_slaveWorkers, i.m_hasMaster,
+		 i.m_member, i.m_crew ? i.m_crew->m_size : 1);
   // Now we need to set the initial properties - either from instance or from defaults
   for (unsigned p = 0; p < i.m_crew->m_propValues.size(); p++) {
+    unsigned ordinal = i.m_crew->m_propOrdinals[p];
+    OM::Property &prop = i.m_impl->m_metadataImpl.properties()[ordinal];
     ocpiDebug("Setting the initial specified value of property '%s' of instance '%s'",
-	      i.m_impl->m_metadataImpl.properties()[i.m_crew->m_propOrdinals[p]].cname(),
-	      i.m_name.c_str());
-    i.m_worker->setProperty(i.m_crew->m_propOrdinals[p], i.m_crew->m_propValues[p]);
+	      prop.cname(), i.m_name.c_str());
+    if (i.m_worker->application() != i.m_containerApp && !prop.m_isWritable)
+      throw OU::Error("Properties set from applications on loadtime workers must be writable");
+    i.m_worker->setProperty(ordinal, i.m_crew->m_propValues[p]);
   }
   unsigned nProps = i.m_impl->m_metadataImpl.nProperties();
   OM::Property *prop = i.m_impl->m_metadataImpl.properties();
