@@ -16,9 +16,6 @@
   <Property Name="messageSize" Type="ushort" Writable="true" Default="8192"
 	    Description="Number of bytes in output message"/>
 
-  <Property Name="enable" Type="bool" Writable="true" Default="true"
-	    Description="Enable/bypass control"/>
-
   <Port Name="in"  Protocol="iqstream_protocol.xml"/>
   <Port Name="out" Protocol="rstream_protocol.xml" Producer="true"/>
 
