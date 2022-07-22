@@ -52,6 +52,14 @@ namespace Plugin {
 	d->configure(found);
       }
     }
+  unsigned Manager::discover(const PValue *params, bool discoveryOnly) {
+      parent().configureOnce();
+      unsigned found  = 0;
+      if (!m_doNotDiscover)
+	for (auto *dd = firstDriverBase(); dd; dd = dd->nextDriverBase())
+	  found += dd->discover(params, discoveryOnly);
+      return found;
+    }
     unsigned Manager::cleanupPosition() { return 1; }
     // Get the singleton ManagerManager, possibly constructing it.
     ManagerManager &ManagerManager::getManagerManager() {
@@ -232,7 +240,8 @@ namespace Plugin {
 			configFile.c_str(), err.c_str());
       // Now perform the configuration process, where managers and their children can do
       // things they would not do earlier, at static construction time.
-      ocpiInfo("Configuring the driver managers");
+      // Note that configuring a manager configures its drivers, but not its devices.
+      ocpiInfo("Configuring the plugin managers");
       for (Manager *m = firstChild(); m; m = m->nextChild()) {
 	ocpiInfo("Configuring the %s manager", m->name().c_str());
 	m->configure(m_xml ? ezxml_cchild(m_xml, m->name().c_str()) : NULL);
@@ -287,12 +296,27 @@ namespace Plugin {
 	}
       }
     } staticCleanup;
-    Driver::Driver() : m_config(NULL), m_doNotDiscover(false) {}
+    Driver::Driver() : m_config(NULL), m_discovery(ALL) {}
+    Driver::~Driver(){}
+
     // Default implementation for a driver is to configure devices that exist
     // at configuration time.
     void Driver::configure(ezxml_t xml) {
       if (xml) {
 	m_config = xml;
+	const char *l_discovery = ezxml_cattr(xml, "discovery");
+	if (!l_discovery || !strcasecmp(l_discovery, "all"))
+	  m_discovery = ALL;
+	else if (!strcasecmp(l_discovery, "none"))
+	  m_discovery = NONE;
+	else if (!strcasecmp(l_discovery, "static"))
+	  m_discovery = STATIC;
+	else if (!strcasecmp(l_discovery, "dynamic"))
+	  m_discovery = DYNAMIC;
+	else
+	  ocpiBad("Invalid \"discovery\" attribute for the %s driver \"%s\":  %s.  "
+		  "Valid values are:  all, none, static, dynamic",
+		  managerBase().name().c_str(), name().c_str(), l_discovery);
 	for (ezxml_t dx = ezxml_cchild(xml, "device"); dx; dx = ezxml_cnext(dx))
 	  for (Device *d = firstDeviceBase(); d; d = d->nextDeviceBase())
 	    if (d->name() == ezxml_name(dx))
@@ -308,16 +332,92 @@ namespace Plugin {
       }
       return NULL;
     }
-    Driver::~Driver(){}
+    // This non-virtual method is for doing what "search" would do for devices that are not
+    // discoverable and thus statically defined in system.xml.
+    unsigned Driver::
+    createStaticDevices(const PValue *params, std::vector<const char *> &excludes,
+                        bool discoveryOnly, Discovery discoveryMode) {
+      unsigned found = 0;
+      for (ezxml_t x = ezxml_cchild(m_config, "device"); x; x = ezxml_cnext(x)) {
+	bool isStatic, isDisabled;
+	const char *err;
+	if ((err = OX::getBoolean(x, "static", &isStatic, true, true)) ||
+	    (err = OX::getBoolean(x, "disable", &isDisabled, false, true)))
+	  throw OU::Error("Error in system configuration file for \"static\" or \"disable\""
+			  " attributes:  %s", err);
+	if (discoveryMode != DYNAMIC && isStatic && !isDisabled) {
+	  std::string l_name;
+	  if ((err = OX::getRequiredString(x, l_name, "name")))
+	    throw OU::Error("Error processing system configuration file:  %s", err);
+	  for (auto ei = excludes.begin(); ei != excludes.end(); ++ei)
+	    if (!strcasecmp(*ei, l_name.c_str()))
+	      goto cont2;
+	  // There is nothing more we can do generically here.  The driver can look at
+	  // device's name and  XML.
+	  createStaticDevice(l_name.c_str(), x, params, discoveryOnly);
+	  found++;
+	cont2:;
+	}
+	if (isStatic)
+	  excludes.push_back(ezxml_cattr(x, "name"));
+      }
+      return found;
+    }
+    void Driver::
+    createStaticDevice(const char *a_name, ezxml_t /*x*/, const PValue */*params*/,
+                       bool /*discoveryOnly*/) {
+      throw OU::Error("Error in system configuration file, driver %s does not support static "
+                      "device(s): %s", name().c_str(), a_name);
+    }
+
+    // Per driver discovery routine to create devices that are dynamically found,
+    // excluding the ones named in the "exclude" list.
+    unsigned Driver::
+    search(const PValue */*props*/, const char **/*exclude*/, bool /*discoveryOnly*/) {
+      return 0;
+    }
+    // Probe for a particular device and return it if found, and creating it
+    // if not yet created. Return NULL if it is not found.
+    // This would typically be called by something that had a configuration file
+    // and didn't want "discovery" via search.
+    // If "which" is null, return any one that matches props, otherwise
+    // request a specific one.
+    Device *Driver::
+    probe(const char */*which*/, bool /*verbose*/, bool /*discovery*/, const char **/*exclude*/,
+          const PValue */*params*/, std::string &/*err*/) {
+      return NULL;
+    }
+
+    // Non-virtual driver discovery
+    unsigned Driver::
+    discover(const PValue *params, bool discoveryOnly) {
+      // e.g. when drivers are specifically discovers like ocpihdl search
+      ManagerManager::getManagerManager().configureOnce();
+      unsigned found = 0;
+      if (m_discovery != Discovery::NONE) {
+	ocpiInfo("Performing discovery for the \"%s\" \"%s\" driver",
+		 name().c_str(), managerBase().name().c_str());
+	std::vector<const char *> excludes;
+	found += createStaticDevices(params, excludes, discoveryOnly, m_discovery);
+	if (m_discovery != Discovery::STATIC) {
+	  excludes.push_back(NULL);
+	  found += search(params, &excludes[0], discoveryOnly);
+	}
+      } else
+	ocpiDebug("Discovery for %s driver %s suppressed",
+		  managerBase().name().c_str(), name().c_str());
+      return found;
+    }
+
     const char *device = "device"; // template argument
     void Device::configure(ezxml_t xml) { (void)xml;}
     Device::~Device(){}
-  }
+
 } // Plugin
+} // Base
   namespace API {
     void PluginManager::configure(const char *cf) {
       OCPI::Base::Plugin::ManagerManager::configure(cf);
     }
-
-} // Base
+  }
 } // OCPI

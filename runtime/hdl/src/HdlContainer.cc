@@ -123,9 +123,11 @@ namespace OCPI {
     class Worker;
     class Artifact : public OC::ArtifactBase<Container,Artifact> {
       friend class Container;
+      Access *m_timeServer, *m_platformWorker; // access workers in this artifact
 
       Artifact(Container &c, OCPI::Library::Artifact &lart, const OA::PValue *artifactParams) :
-	OC::ArtifactBase<Container,Artifact>(c, *this, lart, artifactParams) {
+	OC::ArtifactBase<Container,Artifact>(c, *this, lart, artifactParams),
+	m_timeServer(NULL), m_platformWorker(NULL) {
 	ensureLoaded();
       }
       ~Artifact() {}
@@ -150,23 +152,9 @@ namespace OCPI {
 	    throw OU::Error("After loading %s on HDL device %s, uuid is wrong.  Wanted: %s",
 			    name().c_str(), c.name().c_str(),
 			    lart.uuid().c_str());
-	  // make sure inserted adapters are started.
-	  const OL::Implementation *i;
-	  for (unsigned n = 0; (i = lart.getImplementation(n)); n++)
-	    if (i->m_inserted) {
-	      WciControl wci(parent().hdlDevice(), i->m_metadataImpl.m_xml, i->m_staticInstance,
-			     NULL);
-	      wci.controlOperation(OM::Worker::OpInitialize);
-	      wci.controlOperation(OM::Worker::OpStart);
-	    }
-	  // attempts to sync time_server.hdl time_now to GPS
-	  bool isGPS;
-	  c.hdlDevice().enableTimeNowUpdatesFromPPS();
-	  OS::Time time = c.hdlDevice().now(isGPS);
-	  ocpiInfo("For HDL container %s: time_server.hdl time_now was initialized to %s 0x%" PRIx64,
-	           c.name().c_str(), (isGPS ? "GPS time" : "non-GPS time"), time.bits());
 	}
       }
+      void configure(); // needs Worker class defined, so implementation is below outside the class
     };
 
     static void doWorkers(Device &device, ezxml_t top, char letter, bool hex) {
@@ -231,7 +219,7 @@ namespace OCPI {
 
     uint64_t Container::
     getMyTicks() {
-      Access *ts = m_device.timeServer();
+      Access *ts = firstArtifact()->m_timeServer;
       return
 	m_device.isAlive() && !m_device.isFailed() && ts ? 
 	(m_lastTick = swap32(ts->get64RegisterOffset(0)) + hdlDevice().m_timeCorrection) :
@@ -242,6 +230,13 @@ namespace OCPI {
     OC::Artifact & Container::
     createArtifact(OCPI::Library::Artifact &lart, const OA::PValue *artifactParams)
     {
+      // HDL containers can only have one artifact at a time.
+      // So this constructor must destroy any existing artifact.
+      Artifact *art = firstArtifact();
+      if (art) {
+	art->unload();
+	delete art;
+      }
       return *new Artifact(*this, lart, artifactParams);
     }
 
@@ -365,6 +360,35 @@ OCPI_DATA_TYPES
       return *new Worker(*this, art, appInstName, impl, inst, slaves, hasMaster, member, crewSize,
 			 wParams);
     }
+
+    // The HDL work of configuring the artifact
+    // First create our own builtin workers, and then call the generic method
+    void Artifact::
+    configure() {
+      const OL::Implementation *i;
+      for (unsigned n = 0; (i = libArtifact().getImplementation(n)); n++) {
+	ezxml_t x = i->m_staticInstance;
+	ocpiAssert(x);
+	size_t index;
+	bool found = false;
+	const char *err;
+	if ((err = OE::getNumber(x, "occpIndex", &index, &found)))
+	  throw OU::Error("Unexpected occpIndex error: %s", err);
+	if (found && index < 2)
+	  (index ? m_timeServer : m_platformWorker) =
+	    &static_cast<Worker*>(&addLoadTimeWorker(*i, n))->propertyAccess();
+      }
+      OC::Artifact::configure();
+      Container &c = parent();
+      // attempts to sync time_server.hdl time_now to GPS
+      // note any system.xml properties have been applied to the time server here
+      bool isGPS;
+      c.hdlDevice().enableTimeNowUpdatesFromPPS(*m_timeServer);
+      OS::Time time = c.hdlDevice().now(*m_timeServer, isGPS);
+      ocpiInfo("For HDL container %s: time_server.hdl time_now was initialized to %s 0x%" PRIx64,
+	       c.name().c_str(), (isGPS ? "GPS time" : "non-GPS time"), time.bits());
+    }
+
     // This port class really has two cases: externally connected ports and
     // internally connected ports.
     // Also ports are either user or provider.
@@ -599,8 +623,11 @@ OCPI_DATA_TYPES
 	  m_properties.set8Register(buffer_count, SDP::Properties,
 				    OCPI_UTRUNCATE(uint8_t, myDesc.nBuffers));
 	  m_properties.set32Register(buffer_size, SDP::Properties, myDesc.dataBufferPitch);
+	  auto options = getData().data.options;
 	  m_properties.set8Register(readsAllowed, SDP::Properties,
-				    getData().data.options & (1<<OT::FlagIsMeta) ? 1 : 0);
+				    OCPI_UTRUNCATE(uint8_t,
+						   (options & (1<<OT::FlagIsMeta) ? 1 : 0) |
+						   (options & (1<<OT::PrefixMetadata) ? 2 : 0)));
 	} else {
 	  // Here is where we can setup the OCDP producer/user
 	  ocpiAssert(m_properties.get32Register(foodFace, OcdpProperties) == 0xf00dface);

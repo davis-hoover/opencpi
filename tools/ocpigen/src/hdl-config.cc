@@ -43,6 +43,8 @@ void DevInstance::
 emit(std::string &assy, bool emulated, bool content) const {
   OU::formatAdd(assy, "  <instance name='%s' worker='%s'%s",
 		cname(), device.deviceType().cname(), emulated ? " emulated='1'" : "");
+  if (device.m_loadTime)
+    assy += " loadtime='1'";
   if (device.deviceType().m_type == Worker::Device) { // it might be a platform...
     assy += " device='";
     if (card) {

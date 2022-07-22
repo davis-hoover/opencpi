@@ -65,6 +65,8 @@ namespace OCPI {
       FlagIsMeta,                // Flag is compressed metadata
       FlagIsCounting,            // Flag is an incrementing counter
       FlagIsMetaOptional,        // This mode is optional: FIXME have a more general scheme
+      PrefixMetadata,            // HDL port must be configured to prepend doorbell address and
+                                 // data to message contents
       MaxOption
     };
     

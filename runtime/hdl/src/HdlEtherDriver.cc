@@ -33,8 +33,9 @@ namespace OCPI {
 	friend class Driver;
       protected:
 	Device(Driver &driver, OS::Ether::Interface &ifc, std::string &a_name,
-	       OE::Address &a_addr, bool discovery, const OB::PValue *params, std::string &error)
-	  : Net::Device(driver, ifc, a_name, a_addr, discovery, "ocpi-ether-rdma", 0,
+	       OE::Address &a_addr, bool discovery, bool forLoad, const OB::PValue *params,
+	       std::string &error)
+	  : Net::Device(driver, ifc, a_name, a_addr, discovery, forLoad, "ocpi-ether-rdma", 0,
 			(uint64_t)1 << 32, ((uint64_t)1 << 32) - sizeof(OccpSpace), 0, params,
 			error) {
 	}
@@ -42,11 +43,11 @@ namespace OCPI {
 	~Device() {
 	}
 	// Load a bitstream via jtag
-	bool load(const char *, std::string &error) {
-	  return OU::eformat(error, "Can't load bitstreams for ethernet devices yet");
+	bool load(const char *fileName, std::string &error) {
+	  return loadJtag(fileName, error);
 	}
 	bool unload(std::string &error) {
-	  return OU::eformat(error, "Can't unload bitstreams for ethernet devices yet");
+	  return unloadJtag(error);
 	}
       };
       Driver::
@@ -54,9 +55,9 @@ namespace OCPI {
       }
       Net::Device *Driver::
       createDevice(OS::Ether::Interface &ifc, OS::Ether::Address &addr, bool discovery,
-		   const OB::PValue *params, std::string &error) {
+		   bool forLoad, const OB::PValue *params, std::string &error) {
 	std::string name("Ether:" + ifc.name + "/" + addr.pretty());
-	Device *d = new Device(*this, ifc, name, addr, discovery, params, error);
+	Device *d = new Device(*this, ifc, name, addr, discovery, forLoad, params, error);
 	if (error.empty())
 	  return d;
 	delete d;

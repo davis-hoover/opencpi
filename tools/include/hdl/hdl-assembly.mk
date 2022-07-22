@@ -38,10 +38,14 @@ override Worker:=$(Workers)
 Worker_$(Worker)_xml:=$(Worker).xml
 Worker_xml:=$(Worker).xml
 # Not good, but we default the language differently here for compatibility.
+# Also, since we are deferring include of hdl-pre.mk until after we process containers
+# (and thus determine actual usable platforms), we need to set language variables
+# here, calling hdl-language.mk "early"
 OcpiLanguage:=$(call OcpiGetLanguage,$(Worker_xml))
 ifndef OcpiLanguage
   OcpiLanguage:=verilog
 endif
+include $(OCPI_CDK_DIR)/include/hdl/hdl-language.mk
 override LibDir=lib/hdl
 # If HdlPlatforms is explicitly defined to nothing, then don't build containers.
 ifeq ($(HdlPlatform)$(HdlPlatforms),)
@@ -69,7 +73,6 @@ ifeq ($(ShellHdlAssemblyVars)$(filter clean%,$(MAKECMDGOALS)),)
   override ComponentLibraries+= $(ComponentLibrariesInternal) components adapters
   override XmlIncludeDirsInternal:=$(XmlIncludeDirs) $(XmlIncludeDirsInternal)
 endif
-include $(OCPI_CDK_DIR)/include/hdl/hdl-pre.mk
 ifdef Container
   ifndef Containers
     Containers:=$(Container)
@@ -106,20 +109,7 @@ ifneq ($(MAKECMDGOALS),clean)
       HdlPlatform_$$(ContName):=$2
       HdlTarget_$$(ContName):=$$(call HdlGetFamily,$$(HdlPart_$2))
       HdlConfig_$$(ContName):=$3
-      ifeq ($4,-)
-        # If the container does not mention a constraints file, get it from the pf config
-        HdlConstraints_$$(ContName):=$$(strip\
-          $$(foreach c,$$(call getConfigConstraints,$1,$2,$3),\
-             $$(HdlPlatformDir_$2)/$$c))
-      else
-        # If the container mentions a constraints file, it, may be local to the 
-        # container file (in the assembly dir), or under the platform directory
-        HdlConstraints_$$(ContName):=$$(strip \
-          $$(foreach c,$$(call HdlGetConstraintsFile,$4,$2),\
-	     $$(or $$(wildcard $$c),$$(strip\
-                   $$(and $$(filter-out /%,$c),$$(wildcard $$(HdlPlatformDir_$2)/$$c))),\
-                   $$(error Constraints file $$c not found for container $$(ContName)))))
-      endif
+      HdlConstraints_$$(ContName):=$4
       HdlContXml_$$(ContName):=$$(call HdlContOutDir,$$(ContName))/gen/$$(ContName).xml
       $$(shell mkdir -p $$(call HdlContOutDir,$$(ContName))/gen; \
                if ! test -e  $$(HdlContXml_$$(ContName)); then \
@@ -205,6 +195,8 @@ ifdef HdlContainers
     include $(OCPI_CDK_DIR)/include/hdl/hdl-worker.mk
   endif
 endif
+# This is delayed until here since we are modifying platform variables based on containers etc.
+include $(OCPI_CDK_DIR)/include/hdl/hdl-pre.mk
 # Due to our filtering, we might have no targets to build
 ifeq ($(filter $(or $(OnlyPlatforms),$(HdlAllPlatforms)),$(filter-out $(ExcludePlatforms),$(HdlPlatforms)))$(filter skeleton,$(MAKECMDGOALS)),)
   $(and $(HdlPlatforms),$(info Not building assembly $(Worker) for platform(s): $(HdlPlatforms) in "$(shell pwd)"))
@@ -224,15 +216,29 @@ else
       # We already build the directories for default containers, and we already
       # did a first pass parse of the container XML for these containers
       HdlContResult=$(call HdlContOutDir,$1)/target-$(HdlTarget_$1)/$1.bitz
+      # $(call HdlGetContainerConstraints,<container>,<platform>,<config>,<constraints>)
+      # If the container does not mention a constraints file, get it from the pf config
+      # If the container mentions a constraints file, it, may be local to the
+      # container file (in the assembly dir), or under the platform directory
+      HdlGetContainerConstraintsFiles=$(infox HGCC:$1:$2:$3:$4)$(strip\
+        $(comment figure out the contraints now that hdl-pre.mk has been run for toolsets etc.)\
+        $(if $(filter -,$(HdlConstraints_$1)),\
+          $(foreach c,$(call getConfigConstraints,$1,$2,$3),$(HdlPlatformDir_$2)/$c),\
+          $(foreach c,$(call HdlGetConstraintsFile,$(HdlConstraints_$1),$2),\
+             $(or $(wildcard $c),\
+                $(and $(filter-out /%,$c),$(wildcard $(HdlPlatformDir_$2)/$c)),\
+                $(error Constraints file $c not found for container $1)))))
+      HdlGetContainerConstraints=$(strip \
+        $(call HdlGetContainerConstraintsFiles,$1,$(HdlPlatform_$1),$(HdlConfig_$1),$(HdlConstraints_$1)))
       define doContainer
-         .PHONY: $(call HdlContOutDir,$1)
-         all: $(call HdlContResult,$1)$(infox DEPEND:$(call HdlContResult,$1))
+        .PHONY: $(call HdlContOutDir,$1)
+        all: $(call HdlContResult,$1)$(infox DEPEND:$(call HdlContResult,$1))
         $(call HdlContResult,$1): links
 	  $(AT)mkdir -p $(call HdlContOutDir,$1)
 	  $(AT)$(MAKE) -C $(call HdlContOutDir,$1) -f $(OCPI_CDK_DIR)/include/hdl/hdl-container.mk \
 	       $(and $(OCPI_PROJECT_REL_DIR),OCPI_PROJECT_REL_DIR=../$(OCPI_PROJECT_REL_DIR)) \
                HdlAssembly=../../$(CwdName)  HdlConfig=$(HdlConfig_$1) \
-               HdlConstraints=$(call AdjustRelative,$(HdlConstraints_$1)) \
+               HdlConstraints=$(call AdjustRelative,$(call HdlGetContainerConstraints,$1)) \
                HdlPlatforms=$(HdlPlatform_$1) HdlPlatform=$(HdlPlatform_$1) \
 	       ComponentLibrariesInternal="$(call OcpiAdjustLibraries,$(ComponentLibraries))" \
 	       HdlExplicitLibraries="$(call OcpiAdjustLibraries,$(HdlExplicitLibraries))" \

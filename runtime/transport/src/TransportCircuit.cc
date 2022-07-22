@@ -695,7 +695,6 @@ checkIOZCopyQ() {
     }
 }
 
-
 void 
 Circuit::
 QInputToWaitForOutput( 

@@ -18,27 +18,25 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef HDLSIMDRIVER_H
-#define HDLSIMDRIVER_H
-#include "HdlNetDriver.hh"
+#ifndef Xfer_Config_H_
+#define Xfer_Config_H_
 
 namespace OCPI {
-  namespace HDL {
-    namespace Sim {
-      const char
-	TMPDIR[] = "/tmp",
-	SIMDIR[] = "ocpi",
-	SIMPREF[] =  "sim";
-      class Device;
-      class Driver : public OCPI::HDL::Net::Driver {
-	friend class Device;
-      protected:
-	virtual ~Driver();
-	virtual Net::Device *createDevice(OS::Ether::Interface &ifc, OS::Ether::Address &addr,
-					  bool discovery, bool forLoad, const OCPI::Base::PValue *params,
-					  std::string &error);
-      };
-    }
-  }
+namespace Xfer {
+
+// This is the base class for a factory configuration sheet
+// that is common to the manager, drivers, and devices
+class FactoryConfig {
+public:
+  // These are arguments to allow different defaults
+  FactoryConfig(size_t smbSize = 0, size_t retryCount = 0);
+  void parse(FactoryConfig *p, ezxml_t config );
+  size_t getSMBSize() const { return m_SMBSize; }
+  size_t m_SMBSize;
+  size_t m_retryCount;
+  ezxml_t  m_xml; // the element that these attributes were parsed from
+};
+
+}
 }
 #endif

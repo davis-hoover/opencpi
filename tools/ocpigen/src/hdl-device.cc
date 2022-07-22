@@ -209,7 +209,7 @@ decodeSignal(std::string &name, std::string &base, size_t &index, bool &hasIndex
 Device::
 Device(Board &b, DeviceType &dt, const std::string &a_wname, ezxml_t xml, bool single,
        unsigned ordinal, SlotType *stype, const char *&err)
-  : m_board(b), m_deviceType(dt), m_ordinal(ordinal) {
+  : m_board(b), m_deviceType(dt), m_ordinal(ordinal), m_loadTime(false) {
   std::string wname(a_wname);
   const char *cp = strchr(wname.c_str(), '.');
   if (cp)
@@ -420,6 +420,14 @@ parse(ezxml_t xml, Board &b, SlotType *stype) {
   if (m_supportedDevices.size() && m_supportedDevices.size() != supportsCount)
     return OU::esprintf("For device \"%s\", there are not enough <supported> elements, should be %zu",
 			m_name.c_str(), supportsCount);
+  // So the loadtime attribute of the instance comes from the worker or the device
+  if (m_deviceType.isLoadTime()) { // instance defaults from worker
+    if (ezxml_cattr(xml, "loadtime"))
+      return OU::esprintf("for device \"%s\", worker \"%s\" is already specified as load time",
+			  cname(), m_deviceType.cname());
+    m_loadTime = true;  // propagate from the worker to the device
+  } else if ((err = OE::getBoolean(xml, "loadtime", &m_loadTime)))
+    return err;
   return parseSignalMappings(xml, b, stype);
 }
 
@@ -591,6 +599,8 @@ const char *Worker::
 parseInstance(Worker &parent, Instance &i, ezxml_t x) {
   const char *err;
   OE::getOptionalString(x, i.m_device, "device");
+  if ((err = OE::getBoolean(x, "loadtime", &i.m_loadTime, true)))
+    return err;
   for (ezxml_t sx = ezxml_cchild(x, "signal"); sx; sx = ezxml_cnext(sx)) {
     std::string l_name, base, external;
     size_t index;

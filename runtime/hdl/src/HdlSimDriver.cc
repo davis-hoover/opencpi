@@ -42,8 +42,9 @@ namespace OCPI {
 	bool m_sdpConnected;
       protected:
 	Device(Driver &driver, OS::Ether::Interface &ifc, std::string &a_name,
-	       OE::Address a_addr, bool discovery, const OB::PValue *params, std::string &error)
-	  : Net::Device(driver, ifc, a_name, a_addr, discovery, "ocpi-udp-rdma", 10000,
+	       OE::Address a_addr, bool discovery, bool forLoad, const OB::PValue *params,
+	       std::string &error)
+	  : Net::Device(driver, ifc, a_name, a_addr, discovery, forLoad, "ocpi-udp-rdma", 10000,
 			OH::SDP::Header::max_addressable_bytes * OH::SDP::Header::max_nodes,
 			0, OH::SDP::Header::max_addressable_bytes, params, error),
 	    m_sdpConnected(false) {
@@ -155,7 +156,7 @@ namespace OCPI {
 	      }
 	    }
 	  }
-	  return error.empty() ? init(error) : false;
+	  return error.empty() ? init(error) : true;
 	}
 	void
 	sdpRequest(bool read, uint64_t a_address, size_t length, uint8_t *data,
@@ -285,10 +286,10 @@ namespace OCPI {
       }
       Net::Device *Driver::
       createDevice(OS::Ether::Interface &ifc, OS::Ether::Address &addr, bool discovery,
-		   const OB::PValue *params, std::string &error) {
+		   bool forLoad, const OB::PValue *params, std::string &error) {
 	std::string name("sim:");
 	name += addr.pretty();
-	Device *d = new Device(*this, ifc, name, addr, discovery, params, error);
+	Device *d = new Device(*this, ifc, name, addr, discovery, forLoad, params, error);
 	if (error.empty())
 	  return d;
 	delete d;
