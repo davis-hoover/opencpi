@@ -1341,6 +1341,8 @@ emitHdl(FILE *f, const char *prefix, size_t &index)
     fprintf(f, " configure=\"%#lx\"", (unsigned long)m_config);
   if (m_inserted)
     fprintf(f, " inserted=\"1\"");
+  if (m_loadTime)
+    fprintf(f, " loadtime=\"1\"");
   if (m_device.size())
     fprintf(f, " device=\"%s\"", m_device.c_str());
   fprintf(f, "/>\n");

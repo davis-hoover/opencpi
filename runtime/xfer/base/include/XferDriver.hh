@@ -26,6 +26,7 @@
 
 #include "BasePluginManager.hh"
 #include "XferFactory.hh"
+#include "XferManager.hh"
 
 namespace OCPI {
 namespace Xfer {
@@ -79,14 +80,14 @@ namespace Xfer {
       Base(OCPI::Util::Singleton<ConcDri>::getSingleton(), source, target)
     {}
   };
-    template <class ConcConn, class ConcXfer, class Base = XferRequest>
+  template <class ConcConn, class ConcXfer, class Base = XferRequest>
   class TransferBase :
     public Base,
     public OCPI::Util::Child<ConcConn, ConcXfer>
   {
   protected:
-    TransferBase<ConcConn, ConcXfer, Base>(ConcConn &conn, ConcXfer &xfer, XFTemplate *temp = NULL)
-    : Base(temp), OCPI::Util::Child<ConcConn,ConcXfer>(conn, xfer) {}
+    TransferBase<ConcConn, ConcXfer, Base>(ConcConn &conn, ConcXfer &a_xfer, XFTemplate *temp = NULL)
+    : Base(temp), OCPI::Util::Child<ConcConn,ConcXfer>(conn, a_xfer) {}
     // Allow the base class to get at the derived parent
     // To do that it needs to declare a pure virtual method
     ConcConn &parent() { return OCPI::Util::Child<ConcConn,ConcXfer>::parent(); }

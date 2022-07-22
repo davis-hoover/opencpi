@@ -125,7 +125,9 @@ namespace OCPI {
 	return *art;
       // If it is not loaded, let's get it from the library system,
       // and load it ourselves.
-      return createArtifact(libArt, artifactParams);
+      art = &createArtifact(libArt, artifactParams);
+      art->configure();
+      return *art;
     }
 
     // Ultimately there would be a set of "base class" generic properties

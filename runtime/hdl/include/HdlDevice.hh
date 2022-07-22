@@ -62,7 +62,6 @@ namespace OCPI {
       Access m_dAccess;
       uint64_t m_endpointSize;
       bool m_isAlive;
-      WciControl *m_pfWorker, *m_tsWorker;
       bool m_isFailed; // protection during shutdown
       bool m_verbose;
     public:
@@ -75,15 +74,11 @@ namespace OCPI {
 	     const OCPI::Base::PValue *params = NULL);
     public:
       virtual ~Device();
-      bool getPPSIsOkay(useconds_t timeout, useconds_t sleepTime);
-      bool getUsingPPS();
-      void enableTimeNowUpdatesFromPPS();
-      OCPI::OS::Time now(bool &isGps);
+      bool getPPSIsOkay(Access &timeServer, useconds_t timeout, useconds_t sleepTime);
+      bool getUsingPPS(Access &timeServer);
+      void enableTimeNowUpdatesFromPPS(Access &timeServer);
+      OCPI::OS::Time now(Access &timeServer, bool &isGps);
       virtual bool init(std::string &error);
-      inline Access &properties() const { return m_pfWorker->m_properties; }
-      inline Access *timeServer() const {
-	return m_tsWorker ? &m_tsWorker->m_properties : NULL;
-      }
       inline const char *protocol() const { return m_protocol.c_str(); }
       inline const std::string &name() const { return m_name; }
       inline const std::string &platform() const { return m_platform; }
@@ -97,8 +92,7 @@ namespace OCPI {
       inline bool isAlive() { return m_isAlive; }
       inline bool isFailed() { return m_isFailed; }
       virtual bool isLoadedUUID(const std::string &uuid); // Allow device to do extra checking
-      void getUUID();
-      RomWord getRomWord(uint16_t n);
+      RomWord getRomWord(Access &access, uint16_t n);
       virtual bool getMetadata(std::vector<char> &xml, std::string &err);
       virtual bool load(const char *name, std::string &err) = 0;
       virtual bool unload(std::string &err) = 0;
@@ -126,6 +120,9 @@ namespace OCPI {
       // Return true on error
       virtual bool configure(ezxml_t config, std::string &err);
       virtual void print();
+      // Utility for devices that have associated jtag loading
+      bool loadJtag(const char *fileName, std::string &error);
+      bool unloadJtag(std::string &error);
     };
   }
 }

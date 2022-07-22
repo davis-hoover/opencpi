@@ -399,9 +399,10 @@ const char *Worker::
 parseImplControl(ezxml_t &xctl) {
   // Now we do the rest of the control interface
   const char *err;
-    // An emulator must have the same version as the device worker
-    if ((err = OE::getNumber8(m_xml, "version", &m_version)))
-      return err;
+  // An emulator must have the same version as the device worker
+  if ((err = OE::getNumber8(m_xml, "version", &m_version)) ||
+      (err = OE::getBoolean(m_xml, "loadtime", &m_isLoadTime)))
+    return err;
   if (!m_emulate) {
     std::string vp;
     OU::format(vp, "<property name='ocpi_version' hidden='1' type='uchar' parameter='true' default='%u'/>",

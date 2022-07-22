@@ -64,6 +64,8 @@ namespace OCPI {
       bool configure_gpsd_if_enabled();
       OCPI::OS::Time now(bool &isGps);
       void print(const char *name, Access &access);
+      void createStaticDevice(const char *a_name, ezxml_t x, const OCPI::Base::PValue *params,
+			      bool discoveryOnly);
       // This driver method is called when container-discovery happens, to see if there
       // are any container devices supported by this driver
       // It uses a generic PCI scanner to find candidates, and when found, calls the
@@ -73,8 +75,11 @@ namespace OCPI {
       // Probe a specific container
       OCPI::Container::Container *probeContainer(const char *which, std::string &error,
 						 const OCPI::API::PValue *props);
-      virtual OCPI::HDL::Device * open(const char *which, bool discovery, bool forLoad,
-				       const OCPI::API::PValue *params, std::string &err);
+      // This is virtual NOT because it might be overridden by a base class, but because
+      // it is called as an entry point to the plugin, so must be indirectly called
+      virtual OCPI::HDL::Device *open(const char *which, bool discovery, bool forLoad,
+				      bool isStatic, const OCPI::API::PValue *params,
+				      std::string &err);
       void close();
 
       // Create an actual container.

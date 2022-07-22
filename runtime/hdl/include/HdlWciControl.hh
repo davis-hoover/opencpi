@@ -55,6 +55,7 @@ namespace OCPI {
 		 bool doInit = true);
       virtual ~WciControl();
       inline size_t index() const { return m_occpIndex; }
+      inline Access &propertyAccess() { return m_properties; }
     protected:
       // This is shadowed by real application workers, but is used when this is
       // standalone.

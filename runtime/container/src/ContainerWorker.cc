@@ -23,6 +23,7 @@
 #include "BaseValue.hh"
 #include "BaseValueReader.hh"
 #include "BaseValueWriter.hh"
+#include "LibraryAssembly.hh"
 #include "Container.hh"
 #include "ContainerPort.hh"
 #include "ContainerApplication.hh"
@@ -33,6 +34,8 @@ namespace OA = OCPI::API;
 namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 namespace OB = OCPI::Base;
+namespace OX = OCPI::Util::EzXml;
+namespace OL = OCPI::Library;
 namespace OCPI {
   namespace Container {
     Controllable::Controllable()
@@ -140,7 +143,7 @@ namespace OCPI {
         m_artifact(art), m_xml(impl), m_instXml(inst), m_workerMutex(true),
 	m_controlOpPending(false), m_slaves(a_slaves), m_hasMaster(a_hasMaster),
         m_member(a_member), m_crewSize(a_crewSize), m_connectedPorts(0), m_optionalPorts(0),
-        m_outputPorts(0), m_inputPorts(0) {
+        m_outputPorts(0), m_inputPorts(0), m_inserted(false) {
       if (impl) {
 	const char *err = parse(impl);
 	if (err)
@@ -148,8 +151,10 @@ namespace OCPI {
 	setControlOperations(ezxml_cattr(impl, "controlOperations"));
 	m_implTag = ezxml_cattr(impl, "name");
       }
-      if (inst)
+      if (inst) {
+	OX::getBoolean(inst, "inserted", &m_inserted);
 	m_instTag = ezxml_cattr(inst, "name");
+      }
       for (unsigned n = 0; n < m_nPorts; n++) {
 	if (metaPort(n).m_isOptional)
 	  m_optionalPorts |= 1u << n;
@@ -208,7 +213,6 @@ namespace OCPI {
       if (prop.m_isDebug && !isDebug())
 	throw OU::Error("For setting debug property \"%s\": worker \"%s\" is not in debug mode",
 			prop.cname(), cname());
-
       if (!prop.m_isParameter)
 	prepareProperty(prop, m_writeVaddr, m_readVaddr);
       return prop;
@@ -413,6 +417,15 @@ namespace OCPI {
       setProperty(p, v, p, 0);
     }
 
+    // Test to see if this property has been written ever by looking at the cache
+    bool Worker::
+    isPropertyWritten(const OA::PropertyInfo &info) const {
+      Cache *cache;
+      if (info.m_ordinal >= m_cache.size() || !(cache = m_cache[info.m_ordinal]))
+	return false;
+      return cache->allSet(0, info.m_isSequence || info.m_baseType == OA::OCPI_String ?
+			   sizeof(uint32_t) : info.m_nBytes); // note same logic in getCache below
+    }
     // dirty != NULL means for reading rather than writing
     Cache *Worker::
     getCache(const OA::PropertyInfo &info, size_t offset, const OB::Member &m, bool *dirty,
@@ -433,7 +446,7 @@ namespace OCPI {
 	cache = m_cache[info.m_ordinal] = new Cache(info.m_nBytes);
       else if (dirty) {
 	if (cache->allSet(offset, m.m_isSequence || m.m_baseType == OA::OCPI_String ?
-			  sizeof(uint32_t) : m.m_nBytes)) {
+			  sizeof(uint32_t) : m.m_nBytes)) { // note same logic in isWritten above
 	  if (a_attributes)
 	    a_attributes->isCached = true;
 	  *dirty = true;
@@ -785,7 +798,7 @@ namespace OCPI {
 	  (ct.valid[1] != NONE && cs == ct.valid[1]) ||
 	  (ct.valid[2] != NONE && cs == ct.valid[2]) ||
 	  (ct.valid[3] != NONE && cs == ct.valid[3])) {
-	if (op == OM::Worker::OpStart) {
+	if (op == OM::Worker::OpStart && !m_inserted) {
 	  // If a worker gets started before all of its required ports are created: error
 	  PortMask mandatory = ~(~0u << m_nPorts) & ~optionalPorts();
 	  PortMask bad = mandatory & ~connectedPorts();
@@ -845,6 +858,28 @@ namespace OCPI {
       return false;
     }
 
+    // Configure this worker based on the container's configuration (from system.xml)
+    // This happens *before* any properties are set from the application XML
+    // Properties to set are matched from the container configuration XML using
+    // a subset of the rules for matching instances in an application.
+    // The container's XML looks for "instance" element, and matches against these attributes:
+    // component:  fully qualified spec of instance named in the application
+    // worker: worker (with or without build config suffix)
+    // device:  device name (within platform)
+    void Worker::
+    configure(ezxml_t x) {
+      for (ezxml_t p = ezxml_cchild(x, "property"); p; p = ezxml_cnext(p)) {
+	const char
+	  *l_name = ezxml_cattr(p, "name"),
+	  *value = ezxml_cattr(p, "value");
+	if (!l_name || !value)
+	  throw OU::Error("Invalid property in container configuration XML for container "
+			  "\"%s\", worker \"%s\"", application()->container().cname(), cname());
+	ocpiInfo("Setting the \"%s\" property of the \"%s\" instance of the \"%s\" worker to \"%s\"",
+		 l_name, m_instTag.c_str(), m_implTag.c_str(), value);
+	setProperty(l_name, value);
+      }
+    }
     const OA::PropertyInfo &
     Worker::checkInfo(unsigned ordinal) const {
       const OA::PropertyInfo &pi = m_properties[ordinal];
