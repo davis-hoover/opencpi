@@ -149,6 +149,16 @@ function setStartTime {
   eval $var=$(date -u +%s)
 }
 
+## Print something to console after some time
+function printToConsole {
+  local COUNTER=0
+  while true; do
+    sleep 1800
+    let COUNTER=COUNTER+30
+    echo '('It has been $COUNTER minutes since this test started')'
+  done
+}
+
 # Print elapsed time on stdout in %T (HH:MM:SS) format
 # optional argument is variable name of start time set with setStartTime
 function getElapsedTime {

@@ -115,6 +115,8 @@ function docase {
         out=/dev/null
     fi
     setStartTime
+    printToConsole &
+    local PID=$!
     if [ -z "$remote" -a -x runremote.sh ]; then
         # We are local, running interleaved run/verify and platform is remote
         # Remote execution is simply ocpirun
@@ -150,6 +152,8 @@ function docase {
       failed=1
       return 0
     fi
+    kill $PID
+    wait $PID 2>/dev/null
   }
   [ -z "$view" -a -z "$verify" ] ||
     if [ "$r" = 0 ]; then
