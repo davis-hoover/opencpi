@@ -100,7 +100,7 @@ namespace OCPI {
 	  addLoadTimeWorker(*i, n);
       }
       // Configure loadtime workers
-      for (ezxml_t x = ezxml_cchild(container().myXml(), "instance"); x; x = ezxml_cnext(x)) {
+      for (ezxml_t x = ezxml_cchild(container().configXml(), "instance"); x; x = ezxml_cnext(x)) {
 	const char
 	  *spec = ezxml_cattr(x, "component"),
 	  *l_worker = ezxml_cattr(x, "worker"), // match the worker
@@ -129,7 +129,7 @@ namespace OCPI {
 	// the app of the first argument.
 	return *m_loadTimeWorkers[impl.m_ordinal];
       ezxml_t configXml = NULL;
-      for (ezxml_t x = ezxml_cchild(container().myXml(), "instance"); x; x = ezxml_cnext(x)) {
+      for (ezxml_t x = ezxml_cchild(container().configXml(), "instance"); x; x = ezxml_cnext(x)) {
 	const char
 	  *spec = ezxml_cattr(x, "component"),
 	  *worker = ezxml_cattr(x, "worker"), // match the worker
@@ -145,7 +145,7 @@ namespace OCPI {
       return w;
     }
 
-    // The (container) application is telling us that this worker us going away.
+    // The (container) application is telling us that this worker is going away.
     void Artifact::removeWorker(Worker &w) {
       ocpiDebug("Removing worker %s instance %s from artifact %s",
 		w.implTag().c_str(), w.instTag().c_str(), name().c_str());

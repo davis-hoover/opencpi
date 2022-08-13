@@ -47,7 +47,6 @@ ifndef OCPI_PREREQUISITES
   # All prerequisites we need to build and use
   export OCPI_PREREQUISITES:=$(OCPI_PREREQUISITES_LIBS) gtest patchelf ad9361
 endif
-OCPI_DEBUG_MAKE=
 ifneq (,)
 define OcpiDoInclude
 ifndef OcpiThisFile
@@ -66,6 +65,9 @@ $(warning Debug: $(1))
 endef
 define OcpiDbgVar
 $(call OcpiDbg,$(2)$(1) is <$(call $(1))> origin $(origin $(1)))
+endef
+define OcpiDbgInfo
+$(call OcpiInfo,$1)
 endef
 endif
 
@@ -377,8 +379,9 @@ OcpiGenEnv=\
     OCPI_ALL_OCL_TARGETS="$(OCPI_ALL_OCL_TARGETS)" \
     OCPI_AUTO_BUILD_WORKERS="$(OCPI_AUTO_BUILD_WORKERS)"
 
-OcpiGenTool=$(OcpiGenEnv) $(OCPI_VALGRIND) $(ToolsDir)/ocpigen \
+OcpiGenToolX=$(OcpiGenEnv) $(OCPI_VALGRIND) $(ToolsDir)/ocpigen \
   $(call OcpiFixPathArgs,$(patsubst %,-I%,$(XmlIncludeDirsInternal)) $1)
+OcpiGenTool=$(call OcpiDbgInfo,$(call OcpiGenToolX,$1))$(call OcpiGenToolX,$1)
 # Given a collection of arguments, fix each path in the argument
 # that starts with '/' or '-I/' for use with ocpigen or compilation.
 # This will prevent absolute paths whenever possible and instead compute

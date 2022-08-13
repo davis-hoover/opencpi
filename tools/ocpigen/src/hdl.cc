@@ -148,10 +148,11 @@ parseHdlImpl(const char *a_package) {
     }
     // roughly a copy-constructor that replaces the worker reference
     m_paramConfigs.resize(m_emulate->m_paramConfigs.size());
-    for (unsigned n = 0; n < m_paramConfigs.size(); n++) {
-      m_paramConfigs[n] = new ParamConfig(*this);
-      m_paramConfigs[n]->clone(*m_emulate->m_paramConfigs[n]);
-    }
+    for (unsigned n = 0; n < m_paramConfigs.size(); n++)
+      if (m_emulate->m_paramConfigs[n]) {
+	m_paramConfigs[n] = new ParamConfig(*this);
+	m_paramConfigs[n]->clone(*m_emulate->m_paramConfigs[n]);
+      }
   }
   // This must be here so that when the properties are parsed,
   // the first raw one is properly aligned.

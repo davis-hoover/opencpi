@@ -17,7 +17,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 ##########################################################################################
-# This file defines the macos11_2 software platform.
+# This file defines this macos software platform.
 # It sets platform variables as necessary to override the defaults in the file:
 #   include/platform-defaults.mk file.
 # See that file for a description of valid variables and their defaults.

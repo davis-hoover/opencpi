@@ -41,7 +41,7 @@ namespace OCPI {
       friend class Port;
       friend class Artifact;
     protected:
-      Container(OCPI::HDL::Device &device, ezxml_t config = NULL, const OCPI::API::PValue *params = NULL);
+      Container(OCPI::HDL::Device &device, const OCPI::API::PValue *params = NULL);
     public:
       virtual ~Container();
       bool portsInProcess() { return false; }

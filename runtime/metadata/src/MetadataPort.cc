@@ -186,7 +186,7 @@ namespace OCPI {
 				&providerFound)) ||
 	  // Be sure we don't clobber a spec that has set optional,
 	  // but impls can have optional ports in devices...
-	  (err = OE::getBoolean(m_xml, "optional", &m_isOptional, true)) ||
+	  (err = OE::getBoolean(m_xml, "optional", &m_isOptional, true, false)) ||
 	  (err = OE::getBoolean(m_xml, "workerEOF", &m_workerEOF, true)) ||
 	  (err = OE::getNumber(m_xml, "minBufferCount", &m_minBufferCount, 0, 1)) ||
 	  (err = OE::getNumber(m_xml, "bufferCount", &m_defaultBufferCount, NULL, 0, false)) ||

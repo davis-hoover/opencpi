@@ -724,8 +724,9 @@ emitDeviceSignalMappings(FILE *f, std::string &last) {
   bool anyExpr = false;
   for (SignalsIter si = m_signals.begin(); si != m_signals.end(); si++) {
     Signal &s = **si;
-    ocpiDebug("DeviceSignalMappings %s: %zu %u %d",
-	      s.cname(), m_paramConfig->nConfig, s.m_direction, m_type == Container);
+    ocpiDebug("DeviceSignalMappings %s: %zd %u %d",
+	      s.cname(), m_paramConfig ? m_paramConfig->nConfig : 99,
+	      s.m_direction, m_type == Container);
     if ((s.m_directionExpr.size() || s.m_widthExpr.size()) && m_type != Container)
       anyExpr = true;
     else
@@ -1543,7 +1544,6 @@ emitVhdlShell(FILE *f) {
 
 void Worker::
 emitDeviceSignalMapping(FILE *f, std::string &last, Signal &s, const char *prefix) {
-  assert(m_paramConfig);
   std::string l_name;
   if (s.m_direction == Signal::UNUSED && m_type != Container)
     return;
