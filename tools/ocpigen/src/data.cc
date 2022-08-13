@@ -39,7 +39,7 @@ DataPort(Worker &w, ezxml_t x, DataPort *sp, int ordinal, WIPType type, const ch
   if (x &&
       ((err = OM::Port::parse()) || // parse protocol etc. first, then override here
        // Adding optionality in the impl xml is only relevant to devices.
-       (err = OE::getBoolean(x, "Optional", &m_isOptional, true))))
+       (err = OE::getBoolean(x, "Optional", &m_isOptional, true, false))))
     return;
   // Note buffer sizes are all determined in the OU::Metadata::Port.  FIXME allow parameterized?
   // Data width can be unspecified, specified explicitly, or specified with an expression

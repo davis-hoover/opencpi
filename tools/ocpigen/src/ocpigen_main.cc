@@ -331,7 +331,7 @@ main(int argc, const char **argv) {
 	if (options.parameters() || options.build())
 	  parent = "Makefile";
         Worker *w = Worker::create(*ap, parent, package, outDir, NULL, NULL,
-                                   doGenerics >= 0 ? (unsigned)doGenerics : 0, err);
+                                   doGenerics >= 0 ? (unsigned)doGenerics : SIZE_MAX, err);
 
         if (err)
           err = OU::esprintf("For file %s: %s", *ap, err);

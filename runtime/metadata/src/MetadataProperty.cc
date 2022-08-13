@@ -34,7 +34,7 @@
   "Writable", "Volatile", "Initial", "Parameter", "Padding", "Readable", "Readback"
 
 #define PROPERTY_ATTRIBUTES \
-  OCPI_UTIL_MEMBER_ATTRS, ACCESS_ATTRIBUTES, "IsTest", "Default", "Hidden", "Debug", "Value", "raw"
+  OCPI_UTIL_MEMBER_ATTRS, ACCESS_ATTRIBUTES, "IsTest", "Default", "Hidden", "Debug", "Value"
 
 #define IMPL_ATTRIBUTES \
   ACCESS_ATTRIBUTES, \
@@ -48,7 +48,8 @@
   "PadBefore",     /* impl is supplying padding bytes */	\
   "ReadScalable",  /* property has scalable read behavior */	\
   "Raw",           /* property access is raw in the implementation */ \
-  "isimpl"
+  "IsImpl",        /* property was introduced in the OWD, not the OCS */ \
+  "IsDefault"      /* parameter property value is the OCS default */
 
 namespace OCPI {
   namespace API {
@@ -68,7 +69,7 @@ namespace OCPI {
       : m_smallest(0), m_granularity(0), m_isSub32(false),
 	m_isPadding(false), m_isRaw(false), m_rawSet(false), m_isTest(false),
 	m_isUsed(false), m_isReadback(false), m_isIndirect(false), m_isBuiltin(false),
-	m_specParameter(false), m_specWritable(false), m_specInitial(false),
+	m_isDefault(false), m_specParameter(false), m_specWritable(false), m_specInitial(false),
 	m_specReadable(false), m_padBefore(0), m_indirectAddr(0), m_dataOffset(0),
 	m_paramOrdinal(0), m_hasValue(false), m_readBarrier(false), m_writeBarrier(false),
 	m_reduction(None) {
@@ -426,6 +427,7 @@ namespace OCPI {
 	  (err = OE::getBoolean(prop, "Test", &m_isTest)) ||
 	  (err = OE::getBoolean(prop, "Raw", &m_isRaw, false, true, &m_rawSet)) ||
 	  (err = OE::getBoolean(prop, "Debug", &m_isDebug)) ||
+	  (err = OE::getBoolean(prop, "IsDefault", &m_isDefault)) ||
 	  // FIXME: consider allowing this only for HDL somehow.
 	  (err = OE::getNumber(prop, "Indirect", &m_indirectAddr, &m_isIndirect, 0, true)))
 	return err;

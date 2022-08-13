@@ -39,7 +39,8 @@ OcpiCanRemoveNeeded=0
 # -install_name @rpath/$(notdir $@)
 # MacOS uses CLANG/LLVM
 OcpiCXX=c++
-OcpiCXXFlags+=-I/opt/local/include -Wl,-L/opt/local/lib
+OcpiCXXFlags+=-I/opt/local/include
+#-Wl,-L/opt/local/lib
 OcpiCFlags+=-D_DARWIN_C_SOURCE=900000L
 OcpiCXXLD=c++
 OcpiExtraLibs:=
@@ -48,7 +49,7 @@ OcpiAsNeeded=
 OcpiUnknownWarningsError=-Werror=unknown-warning-option
 OcpiStaticProgramFlags=-Xlinker -export_dynamic -Wl,-no_pie
 #export OCPI_OPENCL_LIB=/System/Library/Frameworks/OpenCL.framework/Versions/A/OpenCL
-OcpiSWIG=$(wildcard /opt/local/bin/swig3)
+OcpiSWIG=$(wildcard /opt/local/bin/swig)
 OcpiPlatformOs=macos
-OcpiPlatformOsVersion=11_5
+OcpiPlatformOsVersion=12_5
 OcpiPlatformArch=x86_64

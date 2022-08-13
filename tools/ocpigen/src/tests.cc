@@ -297,7 +297,7 @@ namespace {
       }
     }
     const char *err;
-    Worker *w = Worker::create(file.c_str(), testFile, argPackage, NULL, NULL, NULL, 0, err);
+    Worker *w = Worker::create(file.c_str(), testFile, argPackage, NULL, NULL, NULL, SIZE_MAX, err);
     bool missing;
     if (!err && (matchSpec ? w->m_specName == matchName :
                  w->m_emulate && w->m_emulate->m_implName == matchName) &&

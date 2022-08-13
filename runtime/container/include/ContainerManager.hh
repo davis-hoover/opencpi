@@ -62,10 +62,10 @@ namespace OCPI {
     {
     protected:
       ContainerBase<Dri, Con, App, Art>(Con &con, const char *a_name,
-					const ezxml_t config = NULL,
 					const OCPI::Base::PValue *props = NULL)
-	: OCPI::Base::Plugin::DeviceBase<Dri,Con>(a_name, con), Container(a_name, config, props) {}
+	: OCPI::Base::Plugin::DeviceBase<Dri,Con>(a_name, con), Container(a_name, props) {}
       inline Driver &driver() { return OCPI::Base::Plugin::DeviceBase<Dri,Con>::parent(); }
+      ezxml_t configXml() const { return OCPI::Base::Plugin::Device::configXml(); }
       Artifact *findLoadedArtifact(const char *a_name) {
 	return Parent<Art>::findChildByName(a_name);
       }

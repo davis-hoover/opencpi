@@ -352,9 +352,11 @@ doDefaults(bool missingOk) {
 	    // If the default is an expression, reevaluate it with the current parameter values.
 	    params[n].m_value.setType(p);    // blank default value
 	    params[n].m_value.parse(p.m_defaultExpr.c_str(), NULL, false, this, NULL);
-	    params[n].m_isDefault = false;
-	  } else
+	    // params[n].m_isDefault = false;
+	  } else {
 	    params[n].m_value = *p.m_default; // assignment operator to copy the value
+	    // params[n].m_isDefault = true;
+	  }
 	} else if (missingOk)
 	  params[n].m_value.setType(p);       // blank default value
 	else
@@ -401,7 +403,7 @@ parse(ezxml_t cx, const ParamConfigs &configs) { // , bool includeInitial) {
 }
 
 const char *ParamConfig::
-getParamValue(const char *sym, const OB::Value *&v) const {
+getParamValue(const char *sym, const OB::Value *&v, OM::Property **a_prop) const {
   OM::Property *prop;
   size_t nParam; // FIXME not needed since properties have m_paramOrdinal?
   const char *err;
@@ -415,11 +417,14 @@ getParamValue(const char *sym, const OB::Value *&v) const {
     v = &param.m_value;
   } else if (!(v = prop->m_default))
     return OU::esprintf("The parameter \"%s\" has no default or specified value", sym);
+  if (a_prop)
+    *a_prop = prop;
   return NULL;
 }
 
 const char *ParamConfig::
 getValue(const char *sym, OB::ExprValue &val) const {
+#if 0
   OM::Property *prop;
   size_t nParam; // FIXME not needed since properties have m_paramOrdinal?
   const char *err;
@@ -434,8 +439,11 @@ getValue(const char *sym, OB::ExprValue &val) const {
     v = &param.m_value;
   } else if (!(v = prop->m_default))
     return OU::esprintf("The parameter \"%s\" has no default or specified value", sym);
-  return (err = getParamValue(sym, v)) ? err :
-    extractExprValue(*prop, *v, val);
+#endif
+  OM::Property *prop;
+  const OB::Value *v;
+  const char *err = getParamValue(sym, v, &prop);
+  return err ? err : extractExprValue(*prop, *v, val);
 }
 
 const char *Worker::
@@ -503,8 +511,12 @@ write(FILE *xf, FILE *mf) {
       fputs("'/>\n", xf);
     }
   }
-  if (xf && nonDefault)
-    fputs("  </configuration>\n", xf);
+  if (xf) {
+    if (nonDefault)
+      fputs("  </configuration>\n", xf);
+    else if (nConfig == 0)
+      fputs("  <configuration/>\n", xf);
+  }
 }
 
 void ParamConfig::
@@ -770,6 +782,10 @@ doParam(ParamConfig &info, PropertiesIter pi, bool fromXml, unsigned nParam) {
 	  (err = prop.parseValue(p.m_uValues[n].c_str(), p.m_value, NULL, &info)))
 	return err;
       p.m_value.unparse(p.m_uValue); // make the specific value for this configuration
+      OB::Value emptyValue(prop), *defValue = prop.m_default ? prop.m_default : &emptyValue;
+      std::string defString;
+      defValue->unparse(defString);
+      p.m_isDefault = p.m_uValue == defString;
       if ((err = doParam(info, pi, fromXml, nParam))) // recurse for later parameters
 	return err;
     }
@@ -1024,26 +1040,29 @@ writeAutoBuildFile(const char *file, ParamConfigs &paramConfigs, size_t low) {
 // Given assembly instance properties or a parameter configuration,
 // establish the parameter values for this worker.
 // Note this worker will then be parameter-value-specific.
-// If instancePVs is NULL, use paramconfig
+// If instancePVs is NULL, use paramconfig, which is SIZE_MAX if unspecified
 const char *Worker::
 setParamConfig(const OM::Assembly::Properties *instancePVs, size_t paramConfig,
 	       const std::string &parent) {
-  // This method can in fact be called more than once, but this should be FIXME.
+  // This method can in fact be called more than once, but this should be FIXMEd.
   // HdlDevice::create and Device::parse both call this...
   // assert(!m_paramConfig);
+  assert((paramConfig != SIZE_MAX && !instancePVs) || paramConfig == SIZE_MAX);
   const char *err;
   // So we have parameter configurations
   // FIXME: we could cache this parsing in one place, but workers can still be
   // parameterized by xml attribute values, so it can't simply be cached in a Worker object.
-  if ((err = parseBuildFile(paramConfig == 0, NULL, parent)))
+  if ((err = parseBuildFile(paramConfig == SIZE_MAX || paramConfig == 0, NULL, parent)))
     return err;
-  if (m_paramConfigs.size() == 0) {
-    // FIXME: check whether it is ever possible to have no paramconfigs any more...
-    // No parameter configurations, so we just do error checking
-    if (paramConfig != 0)
-      return OU::esprintf("Worker '%s' has no parameter configurations, but config %zu specified",
+  if (m_paramConfigs.size() == 0) { // build file not there
+    if (paramConfig != SIZE_MAX && paramConfig != 0)
+      return OU::esprintf("Worker '%s' has no build configurations, but config %zu specified",
 			  m_implName, paramConfig);
-    if (instancePVs && instancePVs->size()) {
+    if (paramConfig == 0) { // paramconfig 0 is defaults, which is equivalent to an empty build file
+      std::string xfile;
+      ocpiCheck(parseBuildXml(NULL, xfile) == NULL);
+    }
+    if (instancePVs && instancePVs->size()) { // error check any supplied values
       const OM::Assembly::Property *ap = &(*instancePVs)[0];
       for (unsigned nn = 0; nn < instancePVs->size(); nn++, ap++)
 	if (ap->m_hasValue) {
@@ -1071,13 +1090,16 @@ setParamConfig(const OM::Assembly::Properties *instancePVs, size_t paramConfig,
     }
     return NULL;
   }
-  if (paramConfig < m_paramConfigs.size()) {
-    if (!instancePVs || instancePVs->size() == 0) {
-      m_paramConfig = m_paramConfigs[paramConfig];
-      return NULL;
-    }
+  // If no property values and an explicit valid configuration, just use it
+  if ((!instancePVs || instancePVs->size() == 0) && paramConfig != SIZE_MAX &&
+      paramConfig < m_paramConfigs.size()) {
+    m_paramConfig = m_paramConfigs[paramConfig];
+    return NULL;
+  }
+  // Here either there are property values or the paramconfig is not explicit or valid
+  if (instancePVs) {
     size_t low, high;
-    if (paramConfig)
+    if (paramConfig != SIZE_MAX)
       low = high = paramConfig;
     else
       low = 0, high = m_paramConfigs.size() - 1;
@@ -1105,10 +1127,18 @@ setParamConfig(const OM::Assembly::Properties *instancePVs, size_t paramConfig,
       m_paramConfigs.push_back(pc);
     }
   }
-  if (paramConfig >= m_paramConfigs.size())
+  if (paramConfig != SIZE_MAX && paramConfig >= m_paramConfigs.size())
     return OU::esprintf("Parameter configuration %zu exceeds available configurations (%zu)",
 			paramConfig, m_paramConfigs.size());
   if (!instancePVs || instancePVs->size() == 0) {
+    if (paramConfig == SIZE_MAX) {
+      if (m_paramConfigs[0])
+	paramConfig = 0;
+      else {
+	m_paramConfig = NULL;
+	return NULL; // Parameter configuration unspecified and no default exists
+      }
+    }
     m_paramConfig = m_paramConfigs[paramConfig];
     return NULL;
   }

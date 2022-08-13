@@ -125,8 +125,8 @@ class Driver {
 protected:
   Driver();
   virtual ~Driver();
-  ezxml_t getDeviceConfig(const char *name);
 public:
+  ezxml_t getDeviceConfig(const char *name);
   inline bool shouldDiscover() const { return m_discovery != NONE; }
   inline void suppressDiscovery() { m_discovery = NONE; }
   inline void enableDiscovery() { m_discovery = ALL; } // no way here to set dynamic vs. static yet
@@ -190,7 +190,10 @@ public:
 class Device {
   friend class Driver;
   virtual Device *nextDeviceBase() = 0;
+  ezxml_t m_configXml; // this device's config xml from system config file
 protected:
+  void setConfigXml(ezxml_t xml) { m_configXml = xml; }
+  virtual ezxml_t configXml() const { return m_configXml; }
   virtual void configure(ezxml_t x);
   virtual ~Device();
 public:
@@ -291,7 +294,9 @@ public:
 protected:
   DeviceBase<Dri, Dev>(const char *childName, Dev &dev)
     : Child<Dri, Dev, device>(OCPI::Util::Singleton<Dri>::getSingleton(), dev, childName)
-  {}
+  {
+    Device::setConfigXml(OCPI::Util::Singleton<Dri>::getSingleton().getDeviceConfig(childName));
+  }
 };
 
 } // Plugin
