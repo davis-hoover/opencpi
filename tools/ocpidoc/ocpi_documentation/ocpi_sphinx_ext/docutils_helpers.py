@@ -96,12 +96,12 @@ def list_item_name_code_value(name, value):
 
 
 def list_members(name, members):
-    """ Prepare a docutils list item using a dictonary of members
+    """ Prepare a docutils list item using a dictionary of members
 
     Args:
         name (str): The name (first part of the list item text) to be included
             on the list item, in standard font and before a ":".
-        members (dir): a hierarcical dictionary of members.
+        members (dir): a hierarchical dictionary of members.
     Returns:
         docutils item.
     """
@@ -157,7 +157,7 @@ def get_component_spec(source, reporter, line, component_spec_path = None):
             reporter.warning(
                 ("Directive on this line cannot find the given component "
                  f"specification file: \"{component_spec_path}\". "
-                 f"Will look for \"{component_name}[-_]spec.xml\" in either "
+                 f"Will look for \"{component_name}[-comp|-spec|_spec].xml\" in either "
                  f"the component directory, \"{source_dir}\", the library's "
                  f"specs directory \"{library_specs_dir}\" or the project's "
                  f"specs directory \"{project_specs_dir}\"."),
