@@ -74,7 +74,7 @@ def build(directory, build_only=False, mathjax=None, config_options=[],
     elif source_directory.joinpath("gen", default_rst_file_name).is_file():
         master_doc = default_rst_path.stem
         # Note that the default files will not need to access any other files
-        source_directory = source_directory.joinpath("gen");
+        source_directory = source_directory.joinpath("gen")
     else:
         # Non-default names for legacy (names that do not match the primary XML file)
         if asset_type == "component":
@@ -140,6 +140,47 @@ def build(directory, build_only=False, mathjax=None, config_options=[],
     build_options = [str(source_directory), str(build_directory),
                      "-c", str(conf_directory)]
     build_options = build_options + ["-D", f"master_doc={master_doc}"]
+
+    language = "en_US"  # Default to US English
+    dictionaries = []
+    if not build_only:
+        # Build up spelling options
+        # Look for the common tools dictionary
+        common_dictionary = conf_directory.joinpath("dictionary.txt").resolve()
+        if not common_dictionary.is_file():
+            print("OpenCPI common word list NOT FOUND:", common_dictionary)
+        else:
+            print(f"Using OpenCPI common word list: {common_dictionary}")
+            dictionaries.append(str(common_dictionary))
+
+        # Look for a dictionary.txt in project top dir
+        project_path = ocpiutil.get_path_to_project_top(str(source_directory))
+        project_dictionary = pathlib.Path(project_path).joinpath("dictionary.txt")
+        if not project_dictionary.is_file():
+            print("Project custom word list not found:", project_dictionary)
+        else:
+            print(f"Using project custom word list: {project_dictionary}")
+            dictionaries.append(str(project_dictionary))
+            # Read language from first line
+            with open(project_dictionary, "r") as d:
+                project_language = d.readline().strip()
+            # Validate language is acceptable.
+            # Do this import at runtime so that external callers to this module (dir) do not
+            # have to import enchant unless they are doing building with spellcheck
+            import enchant
+            if enchant.dict_exists(project_language):
+                language = project_language
+                print(f"Setting language ({language}) from first line of project custom word list.")
+            else:
+                print(f"Failed to set language from first line of project custom word list."
+                    f" Language ({project_language}) not installed,"
+                    f" falling back to default ({language}) instead.")
+
+    # Override language and dictionary settings via build options
+    if len(dictionaries) > 0:
+        dictionaries = ",".join(dictionaries)
+        build_options += ["-D", f"spelling_word_list_filename={dictionaries}"]
+    build_options += ["-D", f"spelling_lang={language}"]
 
     for option in config_options:
         build_options = build_options + ["-D", option]
