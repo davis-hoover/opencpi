@@ -24,107 +24,9 @@
 import pathlib
 import os
 import sys
-import re
-import xml.etree.ElementTree as xt
-import tempfile
 import _opencpi.util as ocpiutil
 from .conf import BUILD_FOLDER
 from .create import _template_to_specific
-
-def _get_spelling_options(conf_directory, source_directory, build_directory):
-    """ Look for ocpidoc.dict and Project.dict files in the config directory
-        and project top directory, respectively, and if present use them as
-        custom dictionaries. Also look for a project language and set sphinx
-        to use that if present.
-
-    Args:
-        conf_directory (``pathlib.Path``): The configuration directory.
-        source_directory (``pathlib.Path``): The documentation source directory.
-        build_directory (``pathlib.Path``): The documentation build directory.
-
-    Returns:
-        List of Sphinx options, each item a string in name=value format.
-    """
-
-    language = "en_US"          # Default to US English
-    project_language = None  # Project specific language
-    dictionaries = []
-
-    # Look for the common tools dictionary
-    common_dictionary = conf_directory.joinpath("ocpidoc.dict").resolve()
-    if not common_dictionary.is_file():
-        print("OpenCPI common word list NOT FOUND:", common_dictionary)
-    else:
-        print(f"Using OpenCPI common word list: {common_dictionary}")
-        dictionaries.append(str(common_dictionary))
-
-    # Look for a Project.dict in project top dir
-    project_path = ocpiutil.get_path_to_project_top(str(source_directory))
-    project_dictionary = pathlib.Path(project_path).joinpath("Project.dict")
-    if not project_dictionary.is_file():
-        print("Project custom word list not found:", project_dictionary)
-    else:
-        print(f"Using project custom word list: {project_dictionary}")
-
-        # Read in project dictionary, without newline chars
-        with open(project_dictionary, "r") as d:
-            dictionary_lines = d.read().splitlines()
-
-        # Will read language from a comment line in the format "# lang: <project language>"
-        expected_format="# lang: <project language>"
-        project_language = None
-        non_empty_dictionary_lines = []
-        for line in dictionary_lines:
-
-            if line.startswith("#"):
-                # Line is a comment
-                # Is this line defining the language to spell check in?
-                tokens = line[1:].strip().split() # Get tokens after the first # character
-                if len(tokens) > 1 and tokens[0] =="lang:":
-                    if project_language is None:
-                        project_language = tokens[1]
-                    else:
-                        raise RuntimeError(f"Project language defined one than once in file: {project_dictionary}")
-            elif len(line) > 0:
-                # Non-empty, non-comment line
-                non_empty_dictionary_lines.append(line)
-
-        if len(non_empty_dictionary_lines) == len(dictionary_lines):
-            # No blank or comment lines, use file as is
-            dictionaries.append(str(project_dictionary))
-        else:
-            # Create temporary file with only the words, no comments or spaces
-            if not os.path.exists(build_directory):
-                os.makedirs(build_directory)
-            word_list = os.path.join(build_directory, 'project_wordlist.dict')
-
-            with open(word_list, "w", encoding="UTF-8") as outfile:
-                outfile.write("\n".join(non_empty_dictionary_lines))
-            dictionaries.append(str(word_list))
-
-        if project_language is None:
-            print(f"Using default language ({language}) as project custom word list does not define language in format \"{expected_format}\".")
-        else:
-            # Validate language is acceptable.
-            # Do this import at runtime so that external callers to this module (dir) do not
-            # have to import enchant unless they are doing building with spellcheck
-            import enchant
-            if enchant.dict_exists(project_language):
-                language = project_language
-                print(f"Setting language ({language}) from lang: comment in project custom word list.")
-            else:
-                print(
-                    f"WARNING: Failed to set language from lang: comment in project custom word list."
-                    f" Language ({project_language}) not installed,"
-                    f" falling back to default ({language}) instead.")
-
-    # Override language and dictionary settings via build options
-    spelling_options = [f"spelling_lang={language}"]
-    if len(dictionaries) > 0:
-        dictionaries = ",".join(dictionaries)
-        spelling_options.append(f"spelling_word_list_filename={dictionaries}")
-    print("GCS: spelling_options",spelling_options)
-    return spelling_options
 
 def build(directory, build_only=False, mathjax=None, config_options=[],
           **kwargs):
@@ -139,7 +41,7 @@ def build(directory, build_only=False, mathjax=None, config_options=[],
         config_options (``list``): Sphinx options to override those set in
             ``conf.py``, each item in the list should be a string in name=value
             format.
-        kwargs (optional): Other keyword arguments, provided for compatibility
+        kwards (optional): Other keyword arguments, provided for compatibility
             interfacing. Values not used.
 
     Returns:
@@ -198,40 +100,15 @@ def build(directory, build_only=False, mathjax=None, config_options=[],
             if default_template_path.is_file(): # note xml_file does not have to exist
                 with open(default_template_path, "r") as default_template_file:
                     template = default_template_file.read()
-                    # source_directory = source_directory.joinpath("gen")
-                    generated_rst_file = source_directory.joinpath('gen', xml_path.stem + ".rst")
+                    source_directory = source_directory.joinpath("gen")
+                    generated_rst_file = source_directory.joinpath(xml_path.stem + ".rst")
                     generated_rst_file.parent.mkdir(parents=True,exist_ok=True)
-                    toc = None
-                    if asset_type == 'library': # put this elsewhere of course for recursion etc.
-                        toc = ('   ../*.comp/*-comp\n'+
-                               '   ../*.comp/*-index\n')
-                        for dir in source_directory.iterdir():
-                            if dir.is_dir() and dir.suffix != '' and dir.suffix != '.test':
-                                xml = dir.joinpath(dir.stem + ".xml")
-                                if not xml.exists():
-                                    xml = dir.joinpath(dir.name.replace('.','-') + ".xml")
-                                    if not xml.exists():
-                                        continue
-                                worker_xml = xt.fromstring(xml.read_text().replace('xi:include','xiinclude'))
-                                for child in list(worker_xml):
-                                    if child.tag.lower() == 'componentspec':
-                                        rst = dir.joinpath(dir.stem + ".rst")
-                                        if not rst.exists():
-                                            rst = dir.joinpath(dir.stem + "-worker.rst")
-                                            if not rst.exists():
-                                                rst = dir.joinpath(dir.name.replace('.','-') + ".rst")
-                                                if not rst.exists():
-                                                    continue
-                                        toc += f'   ../{dir.name}/{rst.stem}\n'
-                                        break
                     with open(generated_rst_file,"w") as rst_file:
-                        model = source_directory.suffix.lstrip('.')
-                        if model == '':
-                            model = None
                         rst_file.write(_template_to_specific(template, asset_name,
-                                                             authoring_model=model,
-                                                             toc=toc))
-                        master_doc = 'gen/'+generated_rst_file.stem
+                                                             source_directory.suffix,
+                                                             None,
+                                                             None))
+                        master_doc = generated_rst_file.stem
         if not master_doc:
             print("Warning:  when building docs in directory " + str(directory) +
                   f" there is no \"{default_rst_file_name}\" or \"{xml_path.name}\" or " +
@@ -243,38 +120,67 @@ def build(directory, build_only=False, mathjax=None, config_options=[],
         print("Error:  In directory " + str(directory) +
               " there is no file " + master_doc + ".rst, use: ocpidoc create?", file=sys.stderr)
         return 1
+    # Due to sphinx toctree limitations (no ../ paths supported, many requests to fix it),
+    # create symlinks to other directories in the same library if we are in a component directory.
+    # Without fully parsing all reachable rst files, we don't know what subset of dirs we must
+    # symlink to...
+    # We must remove the links after sphinx build runs otherwise they will be seen as duplicates
+    # when docs are built higher up the directory structure (e.g. at the library or project level)
+    # please someone figure out a better way to do this!
     links=[]
-    if asset_type in ['component', 'worker', 'test']:
-        # Due to sphinx toctree limitations (no ../ paths supported, many requests to fix it),
-        # create symlinks to other directories or files in the same library if we are using them
-        # in some known directives.
-        # We must remove the links after the sphinx build runs, otherwise they will be seen as duplicates
-        # when docs are built higher up the directory structure (e.g. at the library or project level).
-        # Please someone figure out a better way to do this!
+    if asset_type == 'component':
         source_directory.joinpath("gen").mkdir(exist_ok=True)
-        with open(source_path) as file:
-            for line in file:
-                for directive in ['ocpi_documentation_implementations', 'figure']:
-                    result = re.match(f"^\\.\\.\\s{directive}::(.*)", line)
-                    if result:
-                        words = result.group(1).split()
-                        for word in words:
-                            components = word.split('/')
-                            if components[0] == '..':
-                                target = components[1]
-                                link = source_directory.joinpath("gen/", target)
-                                if not link.exists():
-                                    link.symlink_to(pathlib.Path("../../" + target))
-                                    links.append(link)
+        for entry in source_directory.parent.iterdir():
+            if entry.is_dir() and entry.name != source_directory.name and entry.suffix != "":
+                link = source_directory.joinpath("gen", entry.name)
+                if not link.exists():
+                    link.symlink_to(pathlib.Path("../../" + entry.name))
+                    links.append(link)
 
     build_options = [str(source_directory), str(build_directory),
                      "-c", str(conf_directory)]
     build_options = build_options + ["-D", f"master_doc={master_doc}"]
 
+    language = "en_US"  # Default to US English
+    dictionaries = []
     if not build_only:
         # Build up spelling options
-        for option in _get_spelling_options(conf_directory, source_directory, build_directory):
-            build_options = build_options + ["-D", option]
+        # Look for the common tools dictionary
+        common_dictionary = conf_directory.joinpath("dictionary.txt").resolve()
+        if not common_dictionary.is_file():
+            print("OpenCPI common word list NOT FOUND:", common_dictionary)
+        else:
+            print(f"Using OpenCPI common word list: {common_dictionary}")
+            dictionaries.append(str(common_dictionary))
+
+        # Look for a dictionary.txt in project top dir
+        project_path = ocpiutil.get_path_to_project_top(str(source_directory))
+        project_dictionary = pathlib.Path(project_path).joinpath("dictionary.txt")
+        if not project_dictionary.is_file():
+            print("Project custom word list not found:", project_dictionary)
+        else:
+            print(f"Using project custom word list: {project_dictionary}")
+            dictionaries.append(str(project_dictionary))
+            # Read language from first line
+            with open(project_dictionary, "r") as d:
+                project_language = d.readline().strip()
+            # Validate language is acceptable.
+            # Do this import at runtime so that external callers to this module (dir) do not
+            # have to import enchant unless they are doing building with spellcheck
+            import enchant
+            if enchant.dict_exists(project_language):
+                language = project_language
+                print(f"Setting language ({language}) from first line of project custom word list.")
+            else:
+                print(f"Failed to set language from first line of project custom word list."
+                    f" Language ({project_language}) not installed,"
+                    f" falling back to default ({language}) instead.")
+
+    # Override language and dictionary settings via build options
+    if len(dictionaries) > 0:
+        dictionaries = ",".join(dictionaries)
+        build_options += ["-D", f"spelling_word_list_filename={dictionaries}"]
+    build_options += ["-D", f"spelling_lang={language}"]
 
     for option in config_options:
         build_options = build_options + ["-D", option]
