@@ -179,20 +179,9 @@ class OcpiDocumentationProperties(PropertiesDirectiveHandler):
         # Variable to add the resulting output to
         content = []
 
-        # If component specification path is set as option use this. If not,
-        # check for it in a OWD file looking for the "spec" attribute,
-        # otherwise automatically determine likely path based on standard
-        # file structure and naming.
-        if "component_spec" in self.options:
-            component_spec_path = pathlib.Path(
-                self.state.document.attributes["source"]).resolve().parent.joinpath(
-                self.options["component_spec"]).resolve()
-        else:
-            component_spec_path = None
         component_spec = (
             docutils_helpers.get_component_spec(self.state.document.attributes["source"],
-                                                self.state_machine.reporter, self.lineno,
-                                                component_spec_path)
+                                                self.state_machine.reporter, self.lineno)
             )
         if not component_spec:
             return []
