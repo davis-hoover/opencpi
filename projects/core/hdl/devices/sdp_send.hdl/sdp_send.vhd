@@ -100,6 +100,7 @@ architecture rtl of worker is
   -- ndws is rounded up so needs ONE fewer bits, not TWO
   signal md_out_ndws       : unsigned(meta_length_width_c-2 downto 0);
   signal eof_sent_r        : bool_t; -- input eof indication conveyed/enqueued
+  signal zlm_r             : bool_t; -- indicate that we are sending a ZLM
 
   -- SDP back side --
   signal sdp_my_reset           : std_logic; -- reset from EITHER sdp_reset or in_in.reset
@@ -116,7 +117,7 @@ architecture rtl of worker is
   signal sdp_next_msg_addr      : bram_addr_t;
   signal sdp_msg_addr_r         : bram_addr_t;
   -- State that changes for each remote
-  type sdp_phase_t is (idle_e, wait_e, data_e, meta_e, flag_e, between_remotes_e);
+  type sdp_phase_t is (idle_e, wait_e, prepend_meta_e, prepend_meta1_e, data_e, meta_e, flag_e, between_remotes_e);
   signal sdp_remote_phase_r     : sdp_phase_t;
   subtype meta_dw_count_t is unsigned(meta_length_width_c-2 downto 0);
   signal sdp_msg_dws_left_r     : meta_dw_count_t;
@@ -126,6 +127,7 @@ architecture rtl of worker is
   signal sdp_segment_addr_r     : whole_addr_t;
   signal sdp_whole_addr         : whole_addr_t;
   signal sdp_segment_dws_left_r : meta_dw_count_t;
+  signal sdp_op_r               : op_t;
 
   ---- Global state
   signal buffer_size_fault_r : bool_t;
@@ -147,6 +149,10 @@ architecture rtl of worker is
     end loop;
     return to_unsigned(be'length, nbytes_width_c);
   end be2bytes;
+
+  ---- Runtime setttings
+  signal flag_is_meta     : bool_t;
+  signal prepend_metadata : bool_t;
 begin
   bram_addr          <= buffer_addr_r + buffer_offset_r;
   bram_addr_actual   <= bram_addr(addr_width_c-1 downto 0);
@@ -340,9 +346,14 @@ begin
   sdp_last_remote     <= resize(props_in.remote_count -1, remote_idx_t'length);
   md_out              <= slv2meta(md_out_slv);
   md_out_ndws         <= resize((md_out.length + dword_bytes - 1) srl 2, md_out_ndws'length);
-  md_deq              <= operating and md_not_empty and sdp_in.sdp.ready and
-                         to_bool(sdp_remote_phase_r = flag_e) and
-                         to_bool(sdp_remote_idx_r = sdp_last_remote);
+  md_deq              <= operating and md_not_empty and sdp_in.sdp.ready and (
+                         ((zlm_r or not prepend_metadata) and
+                          to_bool(sdp_remote_phase_r = flag_e) and
+                          to_bool(sdp_remote_idx_r = sdp_last_remote)) or
+                         (prepend_metadata and
+                          to_bool(sdp_remote_phase_r = data_e) and
+                          to_bool(sdp_segment_dws_left_r = 0) and
+                          to_bool(sdp_remote_idx_r = sdp_last_remote)));
   sdp_last_in_segment <= to_bool(sdp_segment_dws_left_r = 0);
   -- What is the address of the next message in BRAM
   sdp_next_msg_addr   <= sdp_msg_addr_r when sdp_remote_idx_r /= sdp_last_remote else
@@ -350,33 +361,41 @@ begin
                                               resize(props_in.buffer_count - 1, sdp_msg_idx_r'length) else
                          sdp_msg_addr_r + props_in.buffer_size(bram_addr_t'left + addr_shift_c
                                                                downto addr_shift_c);
-  -- The BRAM address must be pipelined (early).
-  bramb_addr          <= sdp_next_msg_addr when sdp_remote_phase_r /= data_e else
---                       sdp_msg_addr_r when sdp_last_in_segment and sdp_msg_dws_left_r = 0 else
+  -- The BRAM address must be pipelined (early, in any phase that proceeds data_e)
+  bramb_addr           <= sdp_next_msg_addr
+                         when
+                         sdp_remote_phase_r = idle_e or sdp_remote_phase_r = wait_e or
+                         sdp_remote_phase_r = flag_e
+                         else
                          bramb_addr_r;
   -- Drive SDP outputs
-  sdp_out.sdp.header.op    <= sdp.sdp.write_e;          -- we are only writing
+  sdp_out.sdp.header.op    <= sdp_op_r;
   sdp_out.sdp.header.xid   <= (others => '0');  -- since we are writing, no xid necessary
   sdp_out.sdp.header.lead  <= (others => '0');  -- we are always aligned on a DW
   sdp_out.sdp.header.trail <= (others => '0');  -- we always send whole DWs
   sdp_out.sdp.header.node  <= (others => '0');
   sdp_out.sdp.header.count <= sdp_segment_count_r;
   with sdp_remote_phase_r select sdp_whole_addr <=
-    sdp_segment_addr_r                                  when data_e,
+    sdp_segment_addr_r                                  when data_e | prepend_meta_e | prepend_meta1_e,
     sdp_remotes(to_integer(sdp_remote_idx_r)).meta_addr when meta_e,
     sdp_remotes(to_integer(sdp_remote_idx_r)).flag_addr when flag_e | idle_e | between_remotes_e | wait_e;
 
   sdp_out.sdp.header.addr    <= sdp_whole_addr(sdp.sdp.addr_width-1 downto 0);
   sdp_out.sdp.header.extaddr <= sdp_whole_addr(whole_addr_bits_c-1 downto sdp.sdp.addr_width);
-  sdp_out.sdp.eop            <= sdp_last_in_segment;
+  sdp_out.sdp.eop            <= sdp_last_in_segment and to_bool(sdp_remote_phase_r /= prepend_meta_e and sdp_remote_phase_r /= prepend_meta1_e);
   sdp_out.sdp.valid          <= to_bool(sdp_remote_phase_r /= idle_e and sdp_remote_phase_r /= wait_e);
   sdp_out.sdp.ready          <= bfalse;   -- we are write-only, never accepting an inbound frame
   sdp_out.dropCount          <= (others => '0');
+  sdp_out.metaData           <= (others => '0');
+  sdp_out.isNode             <= bfalse;
 g0: for i in 0 to sdp_width_c-1 generate
     sdp_out_data(i) <= sdp_out_r((i+1)*dword_size-1 downto i*dword_size)
                        when its(sdp_out_valid_r) else
                        bramb_out((i+1)*dword_size-1 downto i*dword_size);
   end generate g0;
+
+  flag_is_meta     <= to_bool(props_in.readsAllowed(0));
+  prepend_metadata <= to_bool(props_in.readsAllowed(1));
 
   --props_out.rem_idx   <= resize(sdp_remote_idx_r, uchar_t'length);
   --props_out.rem_bidx  <= resize(sdp_remotes(0).index, uchar_t'length);
@@ -425,7 +444,7 @@ g0: for i in 0 to sdp_width_c-1 generate
         := slv(slv(md_out.truncate),8) & slv(slv(md_out.eof),8) & md_out.opcode &
         std_logic_vector(resize(md_out.length, 32));
     begin
-      if props_in.readsAllowed(0) = '1' then
+      if its(flag_is_meta) then
         begin_flag(meta2slv(md_out));
       else
         sdp_remote_phase_r <= meta_e;
@@ -474,17 +493,61 @@ g0: for i in 0 to sdp_width_c-1 generate
       else
         sdp_msg_idx_r    <= sdp_msg_idx_r + 1;
       end if;
-      if md_out_ndws = 0 then
-        begin_meta;
-        sdp_segment_addr_r <= meta_addr;
-      else
-        sdp_remote_phase_r <= data_e;
-        sdp_segment_addr_r <= data_addr;
-        sdp_out_r          <= bramb_out;
-        sdp_out_valid_r    <= btrue;
-        begin_segment(md_out_ndws);
+
+      if not its(prepend_metadata) then
+        sdp_op_r             <= write_e;
+        if md_out_ndws = 0 then
+          zlm_r              <= btrue;
+          begin_meta;
+          sdp_segment_addr_r <= meta_addr;
+        else
+          zlm_r              <= bfalse;
+          sdp_remote_phase_r <= data_e;
+          sdp_segment_addr_r <= data_addr;
+          sdp_out_r          <= bramb_out;
+          sdp_out_valid_r    <= btrue;
+          begin_segment(md_out_ndws);
+        end if;
+      else  -- prepend_metadata
+        if md_out_ndws = 0 then
+          -- ZLM: just send flag as a regular write_e transfer
+          zlm_r              <= btrue;
+          sdp_op_r           <= write_e;
+          begin_flag(meta2slv(md_out));
+        else
+          -- Send 2 DWORDS of metadata followed by payload data as usual
+          zlm_r              <= bfalse;
+          sdp_op_r           <= write_with_metadata_e;
+          sdp_segment_addr_r <= data_addr;
+          begin_segment(md_out_ndws);
+          sdp_out_r <= std_logic_vector(resize(unsigned(meta2slv(md_out)) & unsigned(flag_addr(29 downto 0)) & unsigned'("00"), sdp_out_r'length));
+          sdp_out_valid_r    <= btrue;
+          if sdp_width_c = 1 then
+            sdp_remote_phase_r      <= prepend_meta1_e;
+          else
+            sdp_remote_phase_r      <= prepend_meta_e;
+          end if;
+        end if;
       end if;
     end procedure begin_remote;
+
+    procedure end_remote is
+    begin
+      if r = sdp_last_remote then
+        sdp_remote_phase_r <= idle_e; -- our one idle cycle per message
+        sdp_remote_idx_r   <= (others => '0');
+      else
+        -- move on to the next remote with the same message
+        r := r + 1;
+        bramb_addr_r <= sdp_msg_addr_r + 1;
+        if remote_is_ready(r) then
+          begin_remote;
+        else
+          sdp_remote_idx_r   <= to_unsigned(r, sdp_remote_idx_r'length);
+          sdp_remote_phase_r <= between_remotes_e;
+        end if;
+      end if;
+    end procedure end_remote;
   begin
     if rising_edge(sdp_clk) then
       r              := to_integer(sdp_remote_idx_r);
@@ -499,6 +562,7 @@ g0: for i in 0 to sdp_width_c-1 generate
         sdp_msg_addr_r     <= (others => '0');
         bramb_addr_r       <= (others => '0');
         sdp_out_valid_r    <= bfalse;
+        sdp_op_r           <= write_e;
       elsif not operating then
         -- reset state that depends on properties
         for r in 0 to max_remotes_c - 1 loop
@@ -513,12 +577,29 @@ g0: for i in 0 to sdp_width_c-1 generate
             if remote_is_ready(0) then
               -- We are starting to send a message to all remotes.  bram addr was already valid
               sdp_msg_addr_r <= sdp_next_msg_addr;
-              bramb_addr_r   <= sdp_next_msg_addr + 1;
+              -- Advance address to move next beat of data into BRAM pipeline register (except when
+              -- prepending metadata; in this case, we need to hold the beat until we are ready for it)
+              if its(prepend_metadata) then
+                bramb_addr_r <= sdp_next_msg_addr;
+              else
+                bramb_addr_r <= sdp_next_msg_addr + 1;
+              end if;
               begin_remote;
             end if;
           elsif sdp_remote_phase_r = between_remotes_e then
             if remote_is_ready(r) then
               begin_remote;
+            end if;
+          elsif sdp_remote_phase_r = prepend_meta1_e then -- only when sdp_width_c = 1
+            if its(sdp_in.sdp.ready) then
+              sdp_out_r(31 downto 0) <= meta2slv(md_out);  -- flag value
+              sdp_remote_phase_r <= prepend_meta_e;
+            end if;
+          elsif sdp_remote_phase_r = prepend_meta_e then -- last beat of prepended metadata
+            if its(sdp_in.sdp.ready) then
+              sdp_out_r          <= bramb_out;
+              sdp_remote_phase_r <= data_e;
+              bramb_addr_r       <= bramb_addr + 1;
             end if;
           elsif its(sdp_in.sdp.ready) then
             if sdp_segment_dws_left_r /= 0 then
@@ -539,32 +620,24 @@ g0: for i in 0 to sdp_width_c-1 generate
               -- end the segment
               case sdp_remote_phase_r is
                 when data_e =>
-                  if sdp_msg_dws_left_r /= 0 then
-                    sdp_segment_addr_r <= sdp_segment_addr_r + max_seg_dws_c;
-                    bramb_addr_r       <= bramb_addr + 1;
-                    sdp_out_valid_r    <= bfalse;
-                    begin_segment(sdp_msg_dws_left_r);
+                  if its(prepend_metadata) then
+                    -- transfer fragmentation is not supported in this mode - we are done
+                    end_remote;
                   else
-                    begin_meta;
+                    if sdp_msg_dws_left_r /= 0 then
+                      sdp_segment_addr_r <= sdp_segment_addr_r + max_seg_dws_c;
+                      bramb_addr_r       <= bramb_addr + 1;
+                      sdp_out_valid_r    <= bfalse;
+                      begin_segment(sdp_msg_dws_left_r);
+                    else
+                      begin_meta;
+                    end if;
                   end if;
                 when meta_e =>
                   begin_flag(slv1(dword_t'length));
                 when flag_e =>
                   -- end of transferring a message to a remote
-                  if r = sdp_last_remote then
-                    sdp_remote_phase_r <= idle_e; -- our one idle cycle per message
-                    sdp_remote_idx_r   <= (others => '0');
-                  else
-                    -- move on to the next remote with the same message
-                    r := r + 1;
-                    bramb_addr_r <= sdp_msg_addr_r + 1;
-                    if remote_is_ready(r) then
-                      begin_remote;
-                    else
-                      sdp_remote_idx_r   <= to_unsigned(r, sdp_remote_idx_r'length);
-                      sdp_remote_phase_r <= between_remotes_e;
-                    end if;
-                  end if;
+                  end_remote;
                 when others => null;
               end case;
             end if; -- if/else end of segment

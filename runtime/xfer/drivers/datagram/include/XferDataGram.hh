@@ -64,8 +64,9 @@ struct Transaction;
   uint16_t ACKStart;
   uint8_t  ACKCount;
   uint8_t  flags;
-  uint16_t  pad0; // pad to 32 bits
+  uint16_t  pad0; // pad to 32 bits - note does not appear on-wire in Ethernet frame
 };
+#define FRAME_HEADER_SIZE 10  // size in bytes excluding the padding bytes at the end of the structure
 #define FRAME_FLAG_HAS_MESSAGES 1
 
 // Not an official base class, just a convenience mix-in

@@ -28,6 +28,8 @@ begin
   up_out.sdp.ready    <= up_in.sdp.valid;
   up_out.sdp.header   <= dws2header((others => (others => '0')));
   up_out.dropCount    <= count_r;
+  up_out.metaData     <= (others => '0');
+  up_out.isNode       <= bfalse;
   process (up_in.clk) is
   begin
     if rising_edge(up_in.clk) then

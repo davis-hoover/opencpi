@@ -134,8 +134,9 @@ addClient(std::string &assy, bool control, const char *client, const char *port)
 	OU::formatAdd(assy,
 		      "  <instance name='%s' worker='sdp_node'>\n"
 		      "    <property name='sdp_width' value='%zu'/>\n"
+          "    <property name='sdp_arb'   value='%zu'/>\n"
 		      "  </instance>\n",
-		      node.c_str(), m_width);
+		      node.c_str(), m_width, m_arb);
       else {
 	assert(unc.m_control || pos);
 	OU::formatAdd(assy,
@@ -169,8 +170,8 @@ addClient(std::string &assy, bool control, const char *client, const char *port)
 		    "    <port instance='%s' %s/>\n"
 		    "    <port instance='%s' name='%s'/>\n"
 		    "  </connection>\n",
-		    prevInstance.c_str(), prevPort.c_str(), unc.m_client.c_str(),
-		    unc.m_port.c_str());
+		    prevInstance.c_str(), prevPort.c_str(),
+        unc.m_client.c_str(), unc.m_port.c_str());
     }
   }
   // if !client then terminate the channel
@@ -275,7 +276,7 @@ HdlContainer(HdlConfig &config, HdlAssembly &appAssembly, ezxml_t xml, const cha
 #endif
 	uNocs.insert(std::make_pair(p.pname(),
 				    UNoc(p.pname(), p.m_type, m_config.sdpWidth(),
-					 m_config.sdpLength(), p.count())));
+					 m_config.sdpLength(), p.count(), m_config.sdpArb())));
       }
     }
   }

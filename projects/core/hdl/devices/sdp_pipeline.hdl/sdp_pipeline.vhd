@@ -92,6 +92,8 @@ begin
   -- First the flow-through signals not subject to pipelining
   down_out.id         <= up_in.id;
   up_out.dropCount    <= down_in.dropCount;
+  up_out.metaData     <= down_in.metaData;
+  up_out.isNode       <= down_in.isNode;
 
   up_enq              <= down_in.sdp.valid and not up_full;
   up: component util.util.srl_fifo

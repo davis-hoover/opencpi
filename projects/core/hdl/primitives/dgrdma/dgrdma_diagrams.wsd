@@ -1,0 +1,546 @@
+@startuml ActiveMessage write
+title ActiveMessage write
+participant SourceWorker as SW
+participant SourcePort as SP
+participant DestPort as DP
+participant DestWorker as DW
+
+note over SP: **ActiveMessage**
+note over DP
+**ActiveFlowControl**
+
+""parameter rn := number of remote buffers""
+""let ri := rn (remote buffer index)""
+""let re := rn (remote empty buffer count)""
+[Initially all buffers empty]
+end note
+
+== Output Message ==
+
+SW -> SP: message available
+group while ""re == 0""
+note over SP: wait for remote buffer...
+end
+SP -> SW: take message
+
+note over SP
+""Inc ri (mod rn)""
+""Dec re""
+end note
+SP -> DP: Message data to ""remote[ri]"" (seg 1)
+...
+SP -> DP: Message data to ""remote[ri]"" (seg n)
+
+alt FlagIsMeta
+SP -> DP: Doorbell (flag) message to ""remote[ri]"" (32b compressed metadata)
+else !FlagIsMeta
+SP -> DP: 64b metadata message to ""remote[ri]""
+SP -> DP: Doorbell (flag) message to ""remote[ri]"" (no content)
+end
+
+DP -> DW: Port ready
+
+== Input Message ==
+DW -> DP: Advance (take message)
+DP -> SP: Doorbell
+note over SP: ""Inc re"" [remote buffer available]
+@enduml
+
+@startuml ActiveMessage read
+title ActiveMessage read
+participant SourceWorker as SW
+participant SourcePort as SP
+participant DestPort as DP
+participant DestWorker as DW
+
+note over SP: **ActiveFlowControl**
+note over DP: **ActiveMessage**
+
+== Output Message ==
+
+SW -> SP: message available
+group while ""re == 0""
+note over SP: wait for remote buffer...
+end
+SP -> SW: take message
+
+alt FlagIsMeta
+SP -> DP: doorbell (32b compressed metadata)
+else !FlagIsMeta
+note over DP: This does not seem to be supported\nby ""sdp_receive_dma.vhd""
+end
+note over SP: ""Dec re""
+DP -> SP: Read request for data from ""remote[ri]""
+SP -> DP: Read response
+
+DP -> DW: message available
+
+== Input Message ==
+DW -> DP: Advance (take message)
+DP -> SP: doorbell to ""remote[ri]"" (no content)
+note over SP: ""Inc re"" [remote buffer available]
+@enduml
+
+@startuml RCC -> HDL transfer
+title RCC -> HDL transfer
+
+participant RCC
+participant HDL
+
+RCC -> HDL: ""src_id""=A; ""dst_id""=B; ""seq""=1; payload data
+RCC -> HDL: ""src_id""=A; ""dst_id""=B; ""seq""=2; payload data
+RCC -> HDL: ""src_id""=A; ""dst_id""=B; ""seq""=3; payload data; flag=metadata
+HDL -> RCC: ""src_id""=B; ""dst_id""=A; ""seq""=1; ack=1-3; doorbell
+@enduml
+
+@startuml HDL -> RCC transfer
+title HDL -> RCC transfer
+
+participant HDL
+participant RCC
+
+HDL -> RCC: ""src_id""=A; ""dst_id""=0; ""seq""=1; payload data
+HDL -> RCC: ""src_id""=A; ""dst_id""=0; ""seq""=2; payload data
+HDL -> RCC: ""src_id""=A; ""dst_id""=0; ""seq""=3; payload data
+HDL -> RCC: ""src_id""=A; ""dst_id""=0; ""seq""=4; payload flag/metadata
+note over RCC: doorbell sent via DCP\nproperty write
+RCC -> HDL: ""src_id""=?; ""dst_id""=A; ""seq""=1; ack=1-4
+note over HDL: ack-only message ignored
+@enduml
+
+@startuml SDP_WIDTH=1
+title SDP_WIDTH=1
+clock clk with period 1
+binary "som" as som
+binary "eom" as eom
+binary "valid" as valid
+concise op
+concise count
+concise data
+
+@0
+som is 0
+eom is 0
+valid is 0
+op is {-}
+count is {-}
+data is {-}
+
+@1
+som is 1
+valid is 1
+op is "write_e"
+count is 4
+data is "D(0)"
+@2
+som is 0
+data is "D(1)"
+@3
+data is "D(2)"
+@4
+data is "D(3)"
+@5
+data is "D(4)"
+eom is 1
+@6
+eom is 0
+valid is 0
+op is {-}
+count is {-}
+data is {-}
+
+@7
+som is 1
+valid is 1
+op is "write_with_metadata_e"
+count is 4
+data is "FLAG\nADDR"
+@8
+som is 0
+data is "FLAG\nDATA"
+@9
+data is "D(0)"
+@10
+data is "D(1)"
+@11
+data is "D(2)"
+@12
+data is "D(3)"
+@13
+data is "D(4)"
+eom is 1
+@14
+eom is 0
+valid is 0
+op is {-}
+count is {-}
+data is {-}
+@enduml
+
+@startuml SDP_WIDTH=2
+title SDP_WIDTH=2
+clock clk with period 1
+binary "som" as som
+binary "eom" as eom
+binary "valid" as valid
+concise op
+concise count
+concise "data(0)" as data0
+concise "data(1)" as data1
+
+@0
+som is 0
+eom is 0
+valid is 0
+op is {-}
+count is {-}
+data0 is {-}
+data1 is {-}
+
+@1
+som is 1
+valid is 1
+op is "write_e"
+count is 4
+data0 is "D(0)"
+data1 is "D(1)"
+@2
+som is 0
+data0 is "D(2)"
+data1 is "D(3)"
+@3
+data0 is "D(4)"
+data1 is {-}
+eom is 1
+@4
+eom is 0
+valid is 0
+op is {-}
+count is {-}
+data0 is {-}
+data1 is {-}
+
+@5
+som is 1
+valid is 1
+op is "write_with_metadata_e"
+count is 4
+data0 is "FLAG\nADDR"
+data1 is "FLAG\nDATA"
+@6
+som is 0
+data0 is "D(0)"
+data1 is "D(1)"
+@7
+data0 is "D(2)"
+data1 is "D(3)"
+@8
+data0 is "D(4)"
+data1 is {-}
+eom is 1
+@9
+eom is 0
+valid is 0
+op is {-}
+count is {-}
+data0 is {-}
+data1 is {-}
+@enduml
+
+@startuml SDP_WIDTH=4
+title SDP_WIDTH=4
+clock clk with period 1
+binary "som" as som
+binary "eom" as eom
+binary "valid" as valid
+concise op
+concise count
+concise "data(0)" as data0
+concise "data(1)" as data1
+concise "data(2)" as data2
+concise "data(3)" as data3
+
+@0
+som is 0
+eom is 0
+valid is 0
+op is {-}
+count is {-}
+data0 is {-}
+data1 is {-}
+data2 is {-}
+data3 is {-}
+
+@1
+som is 1
+valid is 1
+op is "write_e"
+count is 4
+data0 is "D(0)"
+data1 is "D(1)"
+data2 is "D(2)"
+data3 is "D(3)"
+@2
+som is 0
+data0 is "D(4)"
+data1 is {-}
+data2 is {-}
+data3 is {-}
+eom is 1
+@3
+eom is 0
+valid is 0
+op is {-}
+count is {-}
+data0 is {-}
+data1 is {-}
+data2 is {-}
+data3 is {-}
+
+@4
+som is 1
+valid is 1
+op is "write_with_metadata_e"
+count is 4
+data0 is "FLAG\nADDR"
+data1 is "FLAG\nDATA"
+data2 is 0
+data3 is 0
+@5
+som is 0
+data0 is "D(0)"
+data1 is "D(1)"
+data2 is "D(2)"
+data3 is "D(3)"
+@6
+som is 0
+data0 is "D(4)"
+data1 is {-}
+data2 is {-}
+data3 is {-}
+eom is 1
+@7
+eom is 0
+valid is 0
+op is {-}
+count is {-}
+data0 is {-}
+data1 is {-}
+data2 is {-}
+data3 is {-}
+@enduml
+
+@startuml Fragmentation SM
+title Fragmentation State Machine
+
+[*] --> FRAG_IDLE
+
+FRAG_IDLE --> FRAG_WAIT_START
+FRAG_IDLE        : **Reset all state**
+FRAG_IDLE        : (except for ""txn_id"")
+
+FRAG_WAIT_START  : **New DG-RDMA transaction**
+FRAG_WAIT_START  : * If transaction needs to be fragmented, start
+FRAG_WAIT_START  :   integer divider which calculates # messages and
+FRAG_WAIT_START  :   set ""div_required""
+FRAG_WAIT_START  : * Calculate message length in DWORDS
+FRAG_WAIT_START  :   (""sdp_init_count + 1"")
+FRAG_WAIT_START  : * set address and txn_id from SDP
+FRAG_WAIT_START  : * if ""write_e"": flagaddr, flagdata := 0xffffffff
+FRAG_WAIT_START --> FRAG_CALC1_FIRSTMSG : ""sdp_init_valid""
+
+FRAG_CALC1_FIRSTMSG : **Calculate first message length
+FRAG_CALC1_FIRSTMSG : (new or continuing frame, new transaction)
+FRAG_CALC1_FIRSTMSG : * If the whole transaction does not fit into the
+FRAG_CALC1_FIRSTMSG :   current frame, start divider and set ""div_required""
+FRAG_CALC1_FIRSTMSG : * Update ""remaining_frame_capacity_bytes""
+FRAG_CALC1_FIRSTMSG --> FRAG_CALC2
+
+FRAG_CALC1       : **Calculate subsequent message length**
+FRAG_CACL1       : (new frame, continuing transaction)
+FRAG_CALC1       : * Determine how many words of data go into the current frame
+FRAG_CALC1       : * Update ""remaining_frame_capacity_bytes""
+FRAG_CALC1       : Retains ""num_msgs_in_transaction"" (does not start divider)
+FRAG_CALC1 --> FRAG_CALC2
+
+FRAG_CALC2       : **Determine whether this is the last message in the frame**
+FRAG_CALC2       : If ""remaining_frame_capacity_bytes"" is less than 24 + databus
+FRAG_CALC2       : width (a minimum-length message), set ""last_in_frame""
+FRAG_CALC2 --> FRAG_PAYLOAD : ""sdp_init_op = write_e""
+FRAG_CALC2 --> FRAG_META1 : ""sdp_init_op = write_with_metadata_e""
+
+FRAG_META1       : **Handle first beat of metadata**
+FRAG_META1       : Set flag address/data fields for message header
+FRAG_META1       : For ""SDP_WIDTH > 1"" this is all metadata
+FRAG_META1       : For ""SDP_WIDTH = 1"" this is just ""FLAGADDR""
+FRAG_META1 --> FRAG_META2 : ""sdp_init_valid and""\n""SDP_WIDTH = 1""
+FRAG_META1 --> FRAG_PAYLOAD : ""sdp_init_valid and""\n""SDP_WIDTH /= 1""
+
+FRAG_META2 --> FRAG_PAYLOAD : ""sdp_init_valid""
+FRAG_META2       : **Handle second beat of metadata (""SDP_WIDTH = 1"" only)**
+FRAG_META2       : Set flag data field for message header
+
+FRAG_PAYLOAD     : **Stream SDP data into message buffer**
+FRAG_PAYLOAD --> FRAG_WAIT_DIVIDE : ""div_required""
+FRAG_PAYLOAD --> FRAG_WAIT_SDP    : ""not div_required""
+
+FRAG_PAYLOAD --> FRAG_WAIT_DIVIDE : message payload complete and\n""div_complete""
+FRAG_PAYLOAD --> FRAG_WAIT_TX : message payload complete and\n""not div_complete""
+
+FRAG_WAIT_DIVIDE : **Wait for divider to complete**
+FRAG_WAIT_DIVIDE : Set number of messages in transaction
+FRAG_WAIT_DIVIDE --> FRAG_WAIT_SDP : ""div_complete or div_complete_hold""
+
+FRAG_WAIT_SDP    : **Hold message until another transfer or timeout**
+FRAG_WAIT_SDP    : If ""last_in_frame"" was set above, leave this state
+FRAG_WAIT_SDP    : immediately. Otherwise, wait until:
+FRAG_WAIT_SDP    : * ""sdp_init_valid""
+FRAG_WAIT_SDP    : * timeout
+FRAG_WAIT_SDP    : * ""tx_ack_req_urg""
+FRAG_WAIT_SDP    : If a timeout of urgent ACK request occurs, set
+FRAG_WAIT_SDP    : ""last_in_frame"" *on the current message* to send it
+FRAG_WAIT_SDP    : immediately.
+FRAG_WAIT_SDP --> FRAG_WAIT_TX
+
+FRAG_WAIT_TX     : **Wait for TX state machine to pick up header**
+FRAG_WAIT_TX --> FRAG_IDLE : Transaction complete, ""last_in_frame""
+FRAG_WAIT_TX --> FRAG_WAIT_START : Transaction complete, ""not last_in_frame""
+FRAG_WAIT_TX --> FRAG_CALC1 : Transaction not complete
+@enduml
+
+@startuml TX state machine
+[*] --> TX_IDLE
+
+TX_IDLE : **Reset all state**
+TX_IDLE : (except for ""tx_frameseq"")
+TX_IDLE --> TX_WAIT_START
+
+TX_WAIT_START : **Wait until we have a message OR must send an ack**
+TX_WAIT_START : If ""tx_ack_req_urg and not nextmsg_valid"",
+TX_WAIT_START : set ""tx_hasmsg = false""
+TX_WAIT_START --> TX_FRAME_HDR : ""nextmsg_valid"" or ""tx_ack_req_urg""
+
+TX_FRAME_HDR : **Send frame header**
+TX_FRAME_HDR : Read frame header beats from ""tx_frame_hdr_reg""
+TX_FRAME_HDR --> TX_MSG_HDR : Header complete, ""tx_hasmsg""
+TX_FRAME_HDR --> TX_WAIT_LAST : Header complete, ""not tx_hasmsg""
+
+TX_SHORT_MSG : **Pipeline state for short message**
+TX_SHORT_MSG : ""SDP_WIDTH = 4"" only
+TX_SHORT_MSG --> TX_WAIT_MSG : ""m_axis_tready""
+
+TX_WAIT_MSG : **Wait for next message from SDP**
+TX_WAIT_MSG --> TX_MSG_HDR : ""nextmsg_valid""
+
+TX_MSG_HDR : **Send message header**
+TX_MSG_HDR : Read header beats from ""tx_msg_hdr_reg""
+TX_MSG_HDR :
+TX_MSG_HDR : For ""SDP_WIDTH = 4"": there are two possible alignments
+TX_MSG_HDR : of the message; header can start at (0 mod 4) or (2 mod 4).
+TX_MSG_HDR : If header starts at (0 mod 4), the last beat of the header
+TX_MSG_HDR : contains the first 2 DWORDS of payload data. If length <= 2,
+TX_MSG_HDR : this completes the message
+TX_MSG_HDR --> TX_MSG_PAYLOAD : Header complete
+TX_MSG_HDR --> TX_WAIT_LAST : Header and payload complete\nno more messages
+TX_MSG_HDR --> TX_SHORT_MSG : Header and payload complete\nmore messages in frame
+
+TX_MSG_PAYLOAD : **Stream data from message buffer to AXI**
+TX_MSG_PAYLOAD : For ""SDP_WIDTH = 4"": if message payload starts at
+TX_MSG_PAYLOAD : (2 mod 4), 128-bit data from message buffer must be
+TX_MSG_PAYLOAD : realigned: each beat of AXI data is high 2 DWORDS of
+TX_MSG_PAYLOAD : previous buffer output and low 2 DWORDS of current
+TX_MSG_PAYLOAD : buffer output
+TX_MSG_PAYLOAD --> TX_WAIT_LAST : Payload complete\nno more messages
+TX_MSG_PAYLOAD --> TX_WAIT_MSG : Payload complete\nmore messages in frame
+TX_MSG_PAYLOAD --> TX_MSG_PAD : Payload complete\nmore messages in frame\npadding required
+
+TX_MSG_PAD : **Insert padding to align next message to 64-bit boundary**
+TX_MSG_PAD : ""SDP_WIDTH = 1"" only
+TX_MSG_PAD --> TX_WAIT_MSG : ""m_axis_tready""
+
+TX_WAIT_LAST : **Wait for last beat of packet to be accepted**
+TX_WAIT_LAST --> TX_IDLE : ""m_axis_tready""
+@enduml
+
+@startuml RX state machine
+[*] --> RX_IDLE
+
+RX_IDLE : **Reset all state**
+RX_IDLE : (except for ""rx_frameseq"" and ""is_first_frame"")
+RX_IDLE --> RX_FRAME_HDR
+
+RX_FRAME_HDR : **Parse frame header**
+RX_FRAME_HDR : Load incoming data beats into ""rx_frame_hdr_reg""
+RX_FRAME_HDR : Send request to ack tracker to determine whether to
+RX_FRAME_HDR : process this frame
+RX_FRAME_HDR --> RX_WAIT_ACK_TRACKER : Header complete
+
+RX_WAIT_ACK_TRACKER : **Wait for accept/reject decision from ack tracker**
+RX_WAIT_ACK_TRACKER --> RX_ERROR_WAIT_TLAST : reject\n""rx_hasmsg""
+RX_WAIT_ACK_TRACKER --> RX_MSG_HDR : accept\n""rx_hasmsg""
+RX_WAIT_ACK_TRACKER --> RX_GEN_ACK : accept\n""not rx_hasmsg""
+
+RX_MSG_HDR : **Parse message header**
+RX_MSG_HDR : Load incoming data beats into ""rx_msg_hdr_reg""
+RX_MSG_HDR --> RX_PARSE_MSG_HDR : Header complete
+
+RX_PARSE_MSG_HDR : **Calculate message length**
+RX_PARSE_MSG_HDR : For ""SDP_WIDTH = 4"": there are two possible alignments
+RX_PARSE_MSG_HDR : of the message; header can start at (0 mod 4) or (2 mod 4).
+RX_PARSE_MSG_HDR : If header starts at (0 mod 4), the last beat of the header
+RX_PARSE_MSG_HDR : contains the first 2 DWORDS of payload data. If length <= 2,
+RX_PARSE_MSG_HDR : this completes the message
+RX_PARSE_MSG_HDR --> RX_FLAG : No messages (doorbell-only)
+RX_PARSE_MSG_HDR --> RX_SHORT_MSG : Payload data included in last header beat
+RX_PARSE_MSG_HDR --> RX_MSG_PAYLOAD : At least one payload beat to follow
+RX_PARSE_MSG_HDR --> RX_ERROR_WAIT_TLAST : Length invalid
+
+RX_SHORT_MSG : **Handle data included in last header beat**
+RX_SHORT_MSG : ""SDP_WIDTH = 4"" only
+RX_SHORT_MSG --> RX_MSG_PAYLOAD_LAST
+
+RX_MSG_PAYLOAD : **Stream data from AXI to SDP**
+RX_MSG_PAYLOAD : For ""SDP_WIDTH = 4"": if message payload starts at
+RX_MSG_PAYLOAD : (2 mod 4), 128-bit data from AXI must be
+RX_MSG_PAYLOAD : realigned: each beat of SDP data is high 2 DWORDS of
+RX_MSG_PAYLOAD : previous buffer output and low 2 DWORDS of current
+RX_MSG_PAYLOAD : AXI input. The last valid beat of AXI data is saved
+RX_MSG_PAYLOAD : in ""prev_tdata"" to do this
+RX_MSG_PAYLOAD --> RX_MSG_PAYLOAD_LAST : Payload complete
+RX_MSG_PAYLOAD --> RX_MSG_PAYLOAD_LAST_ALIGN : SDP_WIDTH = 4,\nmessage data misaligned, and\n<= 2 words of payload remaining
+
+RX_MSG_PAYLOAD_LAST_ALIGN : **Send last beat of payload data with realignment**
+RX_MSG_PAYLOAD_LAST_ALIGN : This is only used when ""SDP_WIDTH = 4""; if ""msg_start_alignment = 1""
+RX_MSG_PAYLOAD_LAST_ALIGN : (so we are realigning data from AXI to SDP) **and** ""msg_end_alignment = 1""
+RX_MSG_PAYLOAD_LAST_ALIGN : (so we must get the last 1 or 2 DWORDS from the previous AXI beat without
+RX_MSG_PAYLOAD_LAST_ALIGN : accepting another AXI beat (so note that ""s_axis_tready"" is low in this state)
+RX_MSG_PAYLOAD_LAST_ALIGN --> RX_MSG_PAYLOAD_LAST
+
+RX_MSG_PAYLOAD_LAST : **Wait for last beat of data to be accepted by SDP**
+RX_MSG_PAYLOAD_LAST --> RX_FLAG : ""sdp_targ_ready""
+
+RX_FLAG : **Send doorbell write if required**
+RX_FLAG : Record this message in txn_record
+RX_FLAG --> RX_WAIT_TLAST : no more messages
+RX_FLAG --> RX_MSG_HDR : another message follows
+RX_FLAG --> RX_INTER_MSG_PADDING : another message follows;\nalignment correction required
+
+RX_INTER_MSG_PADDING : **Consume padding word**
+RX_INTER_MSG_PADDING : Only applicable to ""SDP_WIDTH = 1""
+RX_INTER_MSG_PADDING : If there is another message **and** end of previous
+RX_INTER_MSG_PADDING : message data does not fall on a 64-bit boundary, consume
+RX_INTER_MSG_PADDING : the padding word (which should be zero)
+RX_INTER_MSG_PADDING --> RX_MSG_HDR : ""s_axis_tvalid""
+
+RX_WAIT_TLAST : **Wait for end of Ethernet frame**
+RX_WAIT_TLAST : Consume padding inserted by sending MAC at end of frame
+RX_WAIT_TLAST --> RX_GEN_ACK : ""s_axis_tlast""
+
+RX_GEN_ACK : **Update ACK request status to frame generator**
+RX_GEN_ACK : (this will change with new ack_tracker component)
+RX_GEN_ACK --> RX_IDLE
+
+RX_ERROR_WAIT_TLAST : **Parse error or rejected frame; ignore**
+RX_ERROR_WAIT_TLAST --> RX_IDLE : ""s_axis_tlast"""
+
+@enduml
