@@ -1,0 +1,112 @@
+diff -ruN rtl/rgmii_phy_if.v rtl/rgmii_phy_if.v
+--- rtl/rgmii_phy_if.v	2022-05-09 15:33:25.979412139 +0100
++++ rtl/rgmii_phy_if.v	2022-05-09 15:29:45.875183748 +0100
+@@ -111,56 +111,58 @@
+ reg rgmii_tx_clk_rise = 1'b1;
+ reg rgmii_tx_clk_fall = 1'b1;
+ 
+-reg [5:0] count_reg = 6'd0, count_next;
+-
+-always @(posedge clk) begin
+-    if (rst) begin
+-        rgmii_tx_clk_1 <= 1'b1;
+-        rgmii_tx_clk_2 <= 1'b0;
+-        rgmii_tx_clk_rise <= 1'b1;
+-        rgmii_tx_clk_fall <= 1'b1;
+-        count_reg <= 0;
+-    end else begin
+-        rgmii_tx_clk_1 <= rgmii_tx_clk_2;
+-
+-        if (speed == 2'b00) begin
+-            // 10M
+-            count_reg <= count_reg + 1;
+-            rgmii_tx_clk_rise <= 1'b0;
+-            rgmii_tx_clk_fall <= 1'b0;
+-            if (count_reg == 24) begin
+-                rgmii_tx_clk_1 <= 1'b1;
+-                rgmii_tx_clk_2 <= 1'b1;
+-                rgmii_tx_clk_rise <= 1'b1;
+-            end else if (count_reg >= 49) begin
+-                rgmii_tx_clk_1 <= 1'b0;
+-                rgmii_tx_clk_2 <= 1'b0;
+-                rgmii_tx_clk_fall <= 1'b1;
+-                count_reg <= 0;
+-            end
+-        end else if (speed == 2'b01) begin
+-            // 100M
+-            count_reg <= count_reg + 1;
+-            rgmii_tx_clk_rise <= 1'b0;
+-            rgmii_tx_clk_fall <= 1'b0;
+-            if (count_reg == 2) begin
+-                rgmii_tx_clk_1 <= 1'b1;
+-                rgmii_tx_clk_2 <= 1'b1;
+-                rgmii_tx_clk_rise <= 1'b1;
+-            end else if (count_reg >= 4) begin
+-                rgmii_tx_clk_2 <= 1'b0;
+-                rgmii_tx_clk_fall <= 1'b1;
+-                count_reg <= 0;
+-            end
+-        end else begin
+-            // 1000M
+-            rgmii_tx_clk_1 <= 1'b1;
+-            rgmii_tx_clk_2 <= 1'b0;
+-            rgmii_tx_clk_rise <= 1'b1;
+-            rgmii_tx_clk_fall <= 1'b1;
+-        end
+-    end
+-end
++// FIXME: removed 10M and 100M capability to avoid tight timing constraint between clk and clk90
++// A better approach might be to add one or two pipeline registers for rgmii_tx_clk_1 and _2 in the clk90 domain
++// reg [5:0] count_reg = 6'd0, count_next;
++
++// always @(posedge clk) begin
++//     if (rst) begin
++//         rgmii_tx_clk_1 <= 1'b1;
++//         rgmii_tx_clk_2 <= 1'b0;
++//         rgmii_tx_clk_rise <= 1'b1;
++//         rgmii_tx_clk_fall <= 1'b1;
++//         count_reg <= 0;
++//     end else begin
++//         rgmii_tx_clk_1 <= rgmii_tx_clk_2;
++
++//         if (speed == 2'b00) begin
++//             // 10M
++//             count_reg <= count_reg + 1;
++//             rgmii_tx_clk_rise <= 1'b0;
++//             rgmii_tx_clk_fall <= 1'b0;
++//             if (count_reg == 24) begin
++//                 rgmii_tx_clk_1 <= 1'b1;
++//                 rgmii_tx_clk_2 <= 1'b1;
++//                 rgmii_tx_clk_rise <= 1'b1;
++//             end else if (count_reg >= 49) begin
++//                 rgmii_tx_clk_1 <= 1'b0;
++//                 rgmii_tx_clk_2 <= 1'b0;
++//                 rgmii_tx_clk_fall <= 1'b1;
++//                 count_reg <= 0;
++//             end
++//         end else if (speed == 2'b01) begin
++//             // 100M
++//             count_reg <= count_reg + 1;
++//             rgmii_tx_clk_rise <= 1'b0;
++//             rgmii_tx_clk_fall <= 1'b0;
++//             if (count_reg == 2) begin
++//                 rgmii_tx_clk_1 <= 1'b1;
++//                 rgmii_tx_clk_2 <= 1'b1;
++//                 rgmii_tx_clk_rise <= 1'b1;
++//             end else if (count_reg >= 4) begin
++//                 rgmii_tx_clk_2 <= 1'b0;
++//                 rgmii_tx_clk_fall <= 1'b1;
++//                 count_reg <= 0;
++//             end
++//         end else begin
++//             // 1000M
++//             rgmii_tx_clk_1 <= 1'b1;
++//             rgmii_tx_clk_2 <= 1'b0;
++//             rgmii_tx_clk_rise <= 1'b1;
++//             rgmii_tx_clk_fall <= 1'b1;
++//         end
++//     end
++// end
+ 
+ reg [3:0] rgmii_txd_1 = 0;
+ reg [3:0] rgmii_txd_2 = 0;

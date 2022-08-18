@@ -285,6 +285,8 @@ parseHdlAssy() {
 			 "default='1'/>", true)) ||
        (err = addProperty("<property name='sdp_length' type='ushort' parameter='true' "
 			  "default='32'/>", true)) ||
+       (err = addProperty("<property name='sdp_arb' type='uchar' parameter='true' "
+			  "default='0'/>", true)) ||
        // This parameter is in fact patched at the last moment when containers are built
        (m_type == Container &&
 	(err = addProperty("<property name='rom_words' type='ushort' parameter='true' "

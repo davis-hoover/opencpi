@@ -82,6 +82,7 @@ switch -regex $hdl_mode {
     # encryption, it will remain plain text.
     set post_synth "$post_synth write_edif -force $artifact $edif_opts -security_mode all ;"
     set post_synth "$post_synth report_utilization ;"
+    set post_synth "$post_synth report_utilization -hierarchical ;"
     set post_synth "$post_synth report_timing ;"
     set post_synth "$post_synth report_clock_networks ;"
     set post_synth "$post_synth report_design_analysis ;"
