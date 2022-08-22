@@ -115,7 +115,9 @@ class Worker(ShowableComponent):
         ocpiutil.write_file_from_string(dir_path.joinpath(name.replace('.','-') + ".xml"),
                                         Asset.process_template(template).render({'args' : kwargs}))
         Asset.finish_creation(asset_type, name, dir_path, verbose)
-
+        make_file = ocpiutil.get_makefile(dir_path, type="worker")[0]
+        ocpiutil.execute_cmd({}, dir_path, action=['skeleton'], file=make_file, verbose=True)
+        
     @staticmethod
     def get_authoring_model(directory):
         """
