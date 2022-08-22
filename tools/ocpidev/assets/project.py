@@ -1143,6 +1143,9 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
                          creating=True)
         Asset.finish_creation("project", name, path, verbose)
 
+        make_file = ocpiutil.get_makefile(path, type="project")[0]
+        ocpiutil.execute_cmd({}, path, action=['imports'], file=make_file, verbose=True)
+        
     def register(self, force=False, verbose=False, **kwargs):
         """
         Register project to registry. Export project if possible.
