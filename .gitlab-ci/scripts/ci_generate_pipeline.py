@@ -53,7 +53,9 @@ def _set_env():
     environ['CI_OCPI_REF_NAME'] = 'develop'
     environ['CI_PROJECT_NAME'] = 'ocpi.osp.plutosdr'
     environ['CI_PROJECT_NAMESPACE'] = 'opencpi/osp'
-
+    environ['CI_GITLAB_CONTAINER_REGISTRY'] = 'dummy-gitlab-registry'
+    environ['CI_REGISTRY_TOKEN'] = 'dummy-token'
+    environ['CI_REGISTRY_USER'] = 'dummy-user'
 
 def _get_builder(builder_type: str, dump_path: Path, 
     config: dict=None) -> PipelineBuilder:
@@ -81,6 +83,7 @@ def _make_platform_pipeline(dump_path: Path,
     config: str=None) -> PlatformPipelineBuilder:
     """Initialize and return a HostPipelineBuilder"""
     pipeline_id = _get_pipeline_id()
+    gitlab_container_registry = getenv('CI_GITLAB_CONTAINER_REGISTRY', '')
     base_image_tag = pipeline_id
     image_tags = _get_image_tags()
     container_registry = getenv('CI_OCPI_CONTAINER_REGISTRY', '')
@@ -91,9 +94,9 @@ def _make_platform_pipeline(dump_path: Path,
     projects = _parse_projects_directive()
     do_assemblies = getenv('CI_OCPI_ASSEMBLIES', 'True')
     do_assemblies = do_assemblies.lower() in ['t', 'y', 'true', 'yes', '1']
-    pipeline_builder = PlatformPipelineBuilder(pipeline_id, container_registry,
+    pipeline_builder = PlatformPipelineBuilder(pipeline_id, container_registry, 
         base_image_tag, hosts, platforms, projects, dump_path, config, 
-        image_tags=image_tags, do_assemblies=do_assemblies)
+        gitlab_container_registry, image_tags=image_tags, do_assemblies=do_assemblies)
 
     return pipeline_builder
 
