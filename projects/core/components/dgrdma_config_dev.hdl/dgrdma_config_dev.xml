@@ -1,0 +1,27 @@
+<HdlDevice Language="vhdl" Libraries="sdp platform util" spec='dgrdma_config_dev-spec' SourceFiles="dgrdma_config_dev.vhd" >
+
+  <specproperty Name='enable_d'                           Readback='true' />
+  <specproperty Name='remote_mac_addr_d'                  Readback='true' />
+  <specproperty Name='remote_dst_id_d'                    Readback='true' />
+  <specproperty Name='local_src_id_d'                     Readback='true' />
+  <specproperty Name='interface_mtu_d'                    Readback='true' />
+  <specproperty Name='ack_wait_d'                         Readback='true' />
+  <specproperty Name='max_acks_outstanding_d'             Readback='true' />
+  <specproperty Name='coalesce_wait_d'                    Readback='true' />
+  <specproperty Name='dual_ethernet_d'                    Readback='true' />
+  <specproperty Name='ack_tracker_rej_ack_d'              Volatile='true' />
+  <specproperty Name='ack_tracker_bitfield_d'             Volatile='true' />
+  <specproperty Name='ack_tracker_base_seqno_d'           Volatile='true' />
+  <specproperty Name='ack_tracker_rej_seqno_d'            Volatile='true' />
+  <specproperty Name='ack_tracker_total_acks_sent_d'      Volatile='true' />
+  <specproperty Name='ack_tracker_tx_acks_sent_d'         Volatile='true' />
+  <specproperty Name='ack_tracker_pkts_enqueued_d'        Volatile='true' />
+  <specproperty Name='ack_tracker_reject_out_of_range_d'  Volatile='true' />
+  <specproperty Name='ack_tracker_reject_already_set_d'   Volatile='true' />
+  <specproperty Name='ack_tracker_accepted_by_peek_d'     Volatile='true' />
+  <specproperty Name='ack_tracker_high_watermark_d'       Volatile='true' />
+  <specproperty Name='frame_parser_reject_d'              Volatile='true' />
+
+  <devsignal master='true' signals='dgrdma_config_dev-signals' count='1'/>
+
+</HdlDevice>

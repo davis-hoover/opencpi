@@ -1306,6 +1306,7 @@ createInputOffsets()
       ocpiDebug("**** Alloc Port %p for createInputOffsets local buffers 0x%" OCPI_UTIL_RESADDR_PRIx,
 		this, boffset);
       if ( rc != 0 ) {
+        ocpiBad("Failed to allocate port buffer: you may need to increase smbsize in sytem.xml");
         throw OCPI::Util::EmbeddedException( 
                                            NO_MORE_BUFFER_AVAILABLE, m_data->m_real_location->name().c_str() );
       }
@@ -1320,10 +1321,11 @@ createInputOffsets()
       // Allocate the meta-data structure
       rc = res_mgr->alloc( sizeof(BufferMetaData) * MAX_PCONTRIBS * bCount, 
                            BUF_ALIGNMENT, &moffset);
-      ocpiDebug("**** Alloc Port %p for createInputffsets local metadata 0x%" OCPI_UTIL_RESADDR_PRIx,
+      ocpiDebug("**** Alloc Port %p for createInputOffsets local metadata 0x%" OCPI_UTIL_RESADDR_PRIx,
 		this, moffset);
       if ( rc != 0 ) {
         res_mgr->free( boffset,  m_data->m_portSetMd->getBufferLength() * bCount );
+        ocpiBad("Failed to allocate port buffer: you may need to increase smbsize in sytem.xml");
         throw OCPI::Util::EmbeddedException(  NO_MORE_BUFFER_AVAILABLE, m_data->m_real_location->name().c_str() );
       }
       for ( index=0; index<bCount; index++ ) {
@@ -1333,9 +1335,10 @@ createInputOffsets()
                 
       // Allocate the local state(s)
       rc = res_mgr->alloc(sizeof(BufferState) * MAX_PCONTRIBS * bCount * 2, BUF_ALIGNMENT, &soffset, true);
-      ocpiDebug("**** Alloc Port %p for createInputffsets local state 0x%" OCPI_UTIL_RESADDR_PRIx,
+      ocpiDebug("**** Alloc Port %p for createInputOffsets local state 0x%" OCPI_UTIL_RESADDR_PRIx,
 		this, soffset);
       if ( rc != 0 ) {
+        ocpiBad("Failed to allocate port buffer: you may need to increase smbsize in sytem.xml");
         res_mgr->free( moffset,  sizeof(BufferMetaData) * MAX_PCONTRIBS * bCount );
         res_mgr->free( boffset,  m_data->m_portSetMd->getBufferLength() * bCount );
         throw OCPI::Util::EmbeddedException(  NO_MORE_BUFFER_AVAILABLE, m_data->m_real_location->name().c_str() );
@@ -1351,8 +1354,9 @@ createInputOffsets()
       res_mgr = &getShadowEndPoint().resourceMgr();
       ocpiAssert( res_mgr );
       rc = res_mgr->alloc( sizeof(BufferState) * bCount , BUF_ALIGNMENT, &soffset, true);
-      ocpiDebug("**** Alloc Port %p for createInputffsets shadow state 0x%x", this, soffset);
+      ocpiDebug("**** Alloc Port %p for createInputOffsets shadow state 0x%x", this, soffset);
       if ( rc != 0 ) {
+        ocpiBad("Failed to allocate port buffer: you may need to increase smbsize in sytem.xml");
         throw OCPI::Util::EmbeddedException(
                                            NO_MORE_BUFFER_AVAILABLE, m_data->m_shadow_location->name().c_str());
       }

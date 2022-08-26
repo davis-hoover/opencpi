@@ -43,7 +43,7 @@ constant max_pkt_dws            : natural := max_message_units;
 type op_t is (read_e,
               write_e,
               response_e,
-              reserved_e);
+              write_with_metadata_e);
 constant op_width : natural := width_for_max(op_t'pos(op_t'high));
 subtype id_t is unsigned(node_width-1 downto 0);
 subtype xid_t is unsigned(xid_width-1 downto 0);
@@ -88,6 +88,8 @@ type m2s_array_t is array(natural range <>) of m2s_t;
 type s2m_t is record
   sdp       : sdp_t;
   dropCount : uchar_t;
+  metaData  : unsigned(15 downto 0);
+  isNode    : bool_t;
 end record s2m_t;
 type s2m_array_t is array(natural range <>) of s2m_t;
 type data_array_t is array(natural range <>, natural range<>) of dword_t;

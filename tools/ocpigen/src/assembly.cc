@@ -179,7 +179,7 @@ parseConnection(OM::Assembly::Connection &aConn) {
 Instance::
 Instance()
   : m_worker(NULL), m_clocks(NULL), m_iType(Application), m_attach(NULL), m_hasConfig(false),
-    m_config(0), m_emulated(false), m_inserted(false) {
+    m_config(0), m_emulated(false), m_inserted(false), m_loadTime(false) {
 }
 
 // When evaluating an expression for an instance's property value, allow use of assembly-provided values

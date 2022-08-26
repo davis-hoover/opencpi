@@ -53,7 +53,7 @@ typedef std::list<Support> Supports;
 typedef Supports::const_iterator SupportsIter;
 
 // XML allowed for the HdlDevice class
-#define HDL_DEVICE_ATTRS HDL_WORKER_ATTRS, "emulate"
+#define HDL_DEVICE_ATTRS HDL_WORKER_ATTRS, "emulate", "emulates", "loadtime"
 // Device workers are allowed to have any of the infrastructure port types
 #define HDL_DEVICE_ELEMS HDL_WORKER_ELEMS, "supports", "signal", "devsignal", "rawprop", "timebase", \
     "devsignals", "sdp", "metadata", "unoc", "timeservice", "cpmaster", "control"
@@ -63,7 +63,7 @@ public:
   //  static DeviceTypes s_types;
   bool               m_interconnect;  // Can this type of device be used for an interconnect?
   bool               m_canControl;    // Can this interconnect worker provide control?
-  Supports           m_supports;      // what subdevices are supported?
+  Supports           m_supports;      // what devices are supported?
   std::map<std::string, unsigned> m_countPerSupportedWorkerType; // how many of type do we support?
   static HdlDevice *
     get(const char *name, ezxml_t xml, const char *parentFile, Worker *parent, const char *&err);
@@ -75,13 +75,14 @@ public:
   const char *cname() const;
   const char *parseDeviceProperties(ezxml_t x, OM::Assembly::Properties &iPVs);
   const char *resolveExpressions(OB::IdentResolver &ir);
+  void emitXmlSupports(std::string &out) const;
 };
 typedef HdlDevice DeviceType;
 struct Board;
 struct SlotType;
 
 // XML that is allowed for the Device class, for <device> and overloaded for <hdlplatform>
-#define DEVICE_ATTRS "worker", "name"
+#define DEVICE_ATTRS "worker", "name", "loadtime"
 #define DEVICE_ELEMS "supported", "property", "signal"
 
 struct Device {
@@ -93,6 +94,7 @@ struct Device {
   std::list<std::string> m_strings; // storage management since sigmaps don't hold strings
   std::list<std::string> m_supportedDevices; // temporary between pass 1 and pass2 parsing
   std::vector<const Device *> m_supportsMap; // using the same order as the underlying device worker's "supports"
+  bool m_loadTime;             // should this device worker, when used on this board, be load time?
   Device(Board &b, DeviceType &dt, const std::string &wname, ezxml_t xml, bool single,
 	 unsigned ordinal, SlotType *stype, const char *&err);
   static Device *

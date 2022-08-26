@@ -1,3 +1,4 @@
 <build>
   <parameter name='sdp_width' values='1,2,4'/>
+  <parameter name='sdp_arb'   values='0,16'/>
 </build>

@@ -90,6 +90,7 @@ class HdlConfig : public Worker, public HdlHasDevInstances {
   Plugged      m_plugged;      // what card is in each slot in this configuration
   uint8_t      m_sdpWidth;
   uint16_t     m_sdpLength;
+  uint8_t      m_sdpArb;
 public:
   static HdlConfig *
     create(ezxml_t xml, const char *knownPlatform, const char *xfile, const std::string &parentFile,
@@ -100,6 +101,7 @@ public:
 
   size_t sdpWidth() { return m_sdpWidth; }
   size_t sdpLength() { return m_sdpLength; }
+  size_t sdpArb() { return m_sdpArb; }
   const HdlPlatform &platform() { return m_platform; }
   const char
     *addControlConnection(std::string &assy),

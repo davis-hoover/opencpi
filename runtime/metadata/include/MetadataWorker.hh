@@ -159,6 +159,7 @@ namespace OCPI {
       ezxml_t m_slaveAssembly; // assembly of slaves for this (proxy) worker
       bool m_isEmulator;
     public:
+      bool m_isLoadTime;
       // Scalability
       std::string m_validScaling; // Expression for error checking overall scaling
       Port::Scaling m_scaling;
@@ -172,6 +173,7 @@ namespace OCPI {
       inline const std::string &name() const { return m_name; }
       inline const char *cname() const { return m_name.c_str(); }
       inline bool isEmulator() const { return m_isEmulator; }
+      inline bool isLoadTime() const { return m_isLoadTime; }
       inline const Attributes &attributes() const { return *m_attributes; }
       // inline bool isSource() const { return m_isSource; }
       inline bool isDebug() const { return m_isDebug; }

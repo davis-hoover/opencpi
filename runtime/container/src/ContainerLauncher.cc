@@ -54,7 +54,7 @@ createWorker(Launcher::Member &i) {
   unsigned nProps = i.m_impl->m_metadataImpl.nProperties();
   OM::Property *prop = i.m_impl->m_metadataImpl.properties();
   for (unsigned nn = 0; nn < nProps; nn++, prop++)
-    if (prop->m_default && !prop->m_isParameter) {
+    if (prop->m_default && !prop->m_isParameter && !i.m_worker->isPropertyWritten(*prop)) {
       bool found = false;
       for (unsigned m = 0; m < i.m_crew->m_propValues.size(); m++)
 	if (i.m_crew->m_propOrdinals[m] == prop->m_ordinal) {
