@@ -95,10 +95,10 @@ def parse_cl_vars():
     parser.add_argument("--view", dest="view", action="store_true",
                         help="When set the view script (view.sh) for this test is run at the " +
                         "conclusion of the test's execution.  Not valid for Application")
-    parser.add_argument("-G", "--only-platform", metavar="ONLY_PLAT", dest="only_plats",
+    parser.add_argument("-G", "--only-platform", metavar="ONLY_PLAT", dest="only_platform",
                         action="append", help="Specify which platforms to use with a unit test " +
                         "from the list of runtime platforms.")
-    parser.add_argument("-Q", "--exclude-platform ", metavar="EXCLUDE_PLAT", dest="ex_plats",
+    parser.add_argument("-Q", "--exclude-platform ", metavar="EXCLUDE_PLAT", dest="exclude_platform",
                         action="append", help="Specify which platforms not to use with a unit " +
                         "test from the list of runtime platforms.")
     parser.add_argument("--rcc-platform", metavar="RCC_PLAT", dest="rcc_plats", action="append",
