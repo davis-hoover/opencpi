@@ -23,7 +23,7 @@
 #include <map>
 #include <list>
 #include <set>
-#include "hdl-config.h"
+#include "hdl-config.hh"
 
 // Container connections (user oriented high level)
 struct ContConnect {
@@ -44,6 +44,7 @@ struct UNocChannel {
   unsigned m_currentNode;
   bool m_control; // control attribute of deferred previous node
   std::string m_client, m_port; // remember the previous client for deferred connection
+  bool m_pipeline; // was previous client pipelined?
   UNocChannel() : m_currentNode(0) {}
 };
 // The bookkeepping class for a unoc
@@ -54,17 +55,18 @@ struct UNoc {
   unsigned m_currentChannel;
   std::vector<UNocChannel> m_channels;
   size_t m_arb;
-  UNoc(const char *name, WIPType type, size_t width, size_t length, size_t channels, size_t arb)
+  std::vector<bool> &m_pipelineOptions;
+  UNoc(const char *name, WIPType type, size_t width, size_t length, size_t channels, size_t arb,
+       std::vector<bool> &pipelineOptions)
     : m_name(name), m_type(type), m_width(width), m_length(length), m_currentChannel(0),
-      m_channels(channels), m_arb(arb) {}
-  void addClient(std::string &assy, bool control, const char *client, const char *port);
+      m_channels(channels), m_arb(arb), m_pipelineOptions(pipelineOptions) {}
+  void addClient(std::string &assy, bool control, const char *client, const char *port,
+		 bool pipeline);
   void terminate(std::string &assy);
 };
-// A UNoc is actually an array of interconnect "channels" all of the same type.
-// The value of the map is a pair of:
-//    the current channel
-//    the vector of number of nodes on a given channel
-typedef std::map<const char *, UNoc, OU::ConstCharComp> UNocs;
+// A UNoc is actually a named array of interconnect "channels" all of the same type.
+// Its name is the port name from the platform config
+typedef std::map<const char *, UNoc, OU::ConstCharCaseComp> UNocs;
 typedef UNocs::iterator UNocsIter;
 
 // A container builds on a platform configuration and an assembly
@@ -75,12 +77,30 @@ typedef UNocs::iterator UNocsIter;
 // <connection external="foo" device="dev" [port="bar"]/>
 // <device foo>
 #define HDL_CONTAINER_ATTRS \
-  "platform", "config", "configuration", "assembly", "default", "constraints"
+  "platform", "config", "configuration", "assembly", "default", "constraints", "pipeline"
 #define HDL_CONTAINER_ELEMS "connection", "device"
+
+// Define pipeline options for indices and strings
+#define HDL_PIPELINE_OPTIONS \
+  HDL_PIPELINE(ALL) \
+  HDL_PIPELINE(DATA) \
+  HDL_PIPELINE(CONTROL) \
+  HDL_PIPELINE(NODE) \
+  HDL_PIPELINE(NONE) \
+
 class HdlAssembly;
 class HdlContainer : public Worker, public HdlHasDevInstances {
+public:
+  enum PipelineOption {
+#define HDL_PIPELINE(s) s,
+    HDL_PIPELINE_OPTIONS
+    LIMIT
+#undef HDL_PIPELINE
+  };
+private:
   HdlAssembly &m_appAssembly;
   HdlConfig   &m_config;
+  std::vector<bool> m_pipelineOptions;
   // This maps top level signals to the instance signal it is mapped from.
   typedef std::map<Signal*,std::string> ConnectedSignals;
   ConnectedSignals m_connectedSignals;

@@ -22,7 +22,7 @@
 #define HDL_CARD_H
 #include <string>
 #include <map>
-#include "hdl-slot.h"
+#include "hdl-slot.hh"
 
 // A card is really a "type of card".  There is no object that represents
 // an instance of a type of card.  When a card is plugged into a slot it is

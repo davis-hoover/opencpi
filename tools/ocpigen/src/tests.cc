@@ -31,9 +31,9 @@
 #include "UtilMisc.hh"
 #include "UtilEzxml.hh"
 #include "LibraryManager.hh"
-#include "wip.h"
-#include "data.h"
-#include "hdl-device.h"
+#include "wip.hh"
+#include "data.hh"
+#include "hdl-device.hh"
 
 #define TESTS "-tests.xml"
 #define MS_CONFIG "bypass", "metadata", "throttle", "full"

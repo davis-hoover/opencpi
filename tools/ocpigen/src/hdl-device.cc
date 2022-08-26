@@ -19,11 +19,11 @@
  */
 
 #include <errno.h>
-#include "wip.h"
-#include "hdl.h"
-#include "hdl-device.h"
-#include "hdl-slot.h"
-#include "assembly.h"
+#include "wip.hh"
+#include "hdl.hh"
+#include "hdl-device.hh"
+#include "hdl-slot.hh"
+#include "assembly.hh"
 
 //DeviceTypes DeviceType::s_types;
 

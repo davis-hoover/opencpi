@@ -23,8 +23,8 @@
 #include <assert.h>
 #include <vector>
 #include <list>
-#include "hdl-platform.h"
-#include "hdl-card.h"
+#include "hdl-platform.hh"
+#include "hdl-card.hh"
 
 
 struct DevInstance {

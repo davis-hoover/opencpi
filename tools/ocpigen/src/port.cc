@@ -22,8 +22,8 @@
 #include <climits>
 #include <array>
 #include <algorithm>
-#include "hdl.h"
-#include "assembly.h"
+#include "hdl.hh"
+#include "assembly.hh"
 
 const char *portTags[] = {
 #define PORT_TYPE(type, tag, description) #tag,

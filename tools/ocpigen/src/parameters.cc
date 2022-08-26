@@ -24,11 +24,11 @@
 #include <strings.h>
 #include <fnmatch.h>
 #include "OsFileSystem.hh"
-#include "parameters.h"
-#include "wip.h"
-#include "hdl.h"
-#include "hdl-device.h"
-#include "assembly.h"
+#include "parameters.hh"
+#include "wip.hh"
+#include "hdl.hh"
+#include "hdl-device.hh"
+#include "assembly.hh"
 
 const char *Worker::
 addParamConfigSuffix(std::string &s) {
