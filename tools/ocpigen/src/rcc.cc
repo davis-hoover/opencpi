@@ -24,9 +24,9 @@
 
 #include "OsFileSystem.hh"
 
-#include "assembly.hh"
-#include "data.hh"
-#include "rcc.hh"
+#include "assembly.h"
+#include "data.h"
+#include "rcc.h"
 
 // Generate the readonly implementation file.
 // What implementations must explicitly (verilog) or implicitly (VHDL) include.

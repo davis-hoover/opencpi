@@ -21,8 +21,7 @@
 #ifndef OCP_H
 #define OCP_H
 #include <string>
-#include "port.hh"
-
+#include "port.h"
 #define OCP_SIGNALS \
   OCP_SIGNAL_MS(Clk) \
   OCP_SIGNAL_MVR(MAddr, 0) \

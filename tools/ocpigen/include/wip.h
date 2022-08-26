@@ -36,11 +36,11 @@
 #include "MetadataAssembly.hh"
 #include "OcpiUuid.h"
 #include "ezxml.h"
-#include "cdkutils.hh"
-#include "parameters.hh"
-#include "port.hh"
-#include "ocp.hh"
-#include "clock.hh"
+#include "cdkutils.h"
+#include "parameters.h"
+#include "port.h"
+#include "ocp.h"
+#include "clock.h"
 
 class Port;
 

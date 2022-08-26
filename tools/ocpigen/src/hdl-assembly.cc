@@ -25,10 +25,10 @@
 #include <cstring>
 #include <cassert>
 #include "UtilMisc.hh"
-#include "data.hh"
-#include "assembly.hh"
-#include "hdl.hh"
-#include "hdl-platform.hh"
+#include "data.h"
+#include "assembly.h"
+#include "hdl.h"
+#include "hdl-platform.h"
 
 const char *Instance::
 initHDL(::Assembly &assy) {

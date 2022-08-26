@@ -20,8 +20,8 @@
 
 #include "UtilUUID.hh"
 #include "Application.hh"
-#include "cdkutils.hh"
-#include "utils.hh"
+#include "cdkutils.h"
+#include "utils.h"
 
 namespace OCPI {
   namespace API {

@@ -22,8 +22,8 @@
 #define HDL_PLATFORM_H
 #include <assert.h>
 #include <string>
-#include "hdl-device.hh"
-#include "hdl-slot.hh"
+#include "hdl-device.h"
+#include "hdl-slot.h"
 
 // XML that is allowed for the <HdlDevice> class and overloaded with <device> attributes
 #define HDL_PLATFORM_ATTRS HDL_DEVICE_ATTRS, DEVICE_ATTRS, "control", "part", "configurations"

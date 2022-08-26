@@ -24,8 +24,8 @@
 #include <climits>
 
 #include "UtilMisc.hh"
-#include "hdl.hh"
-#include "assembly.hh"
+#include "hdl.h"
+#include "assembly.h"
 
 void
 emitSignal(const char *signal, FILE *f, Language lang, Signal::Direction dir,
@@ -725,8 +725,7 @@ emitDeviceSignalMappings(FILE *f, std::string &last) {
   for (SignalsIter si = m_signals.begin(); si != m_signals.end(); si++) {
     Signal &s = **si;
     ocpiDebug("DeviceSignalMappings %s: %zu %u %d",
-	      s.cname(), m_paramConfig ? m_paramConfig->nConfig : 99, // 99 for debugging
- 	      s.m_direction, m_type == Container);
+	      s.cname(), m_paramConfig->nConfig, s.m_direction, m_type == Container);
     if ((s.m_directionExpr.size() || s.m_widthExpr.size()) && m_type != Container)
       anyExpr = true;
     else

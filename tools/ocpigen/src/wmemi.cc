@@ -18,9 +18,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "assembly.hh"
-#include "hdl.hh"
-
+#include "assembly.h"
+#include "hdl.h"
 WmemiPort::
 WmemiPort(Worker &w, ezxml_t x, Port *sp, int ordinal, const char *&err)
   : OcpPort(w, x, sp, ordinal, WMemIPort, "mem", err) {

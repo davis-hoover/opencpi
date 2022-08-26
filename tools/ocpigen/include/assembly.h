@@ -22,9 +22,9 @@
 #define ASSEMBLY_H
 
 #include "MetadataAssembly.hh"
-#include "wip.hh"
-#include "ocp.hh"
-#include "hdl.hh"
+#include "wip.h"
+#include "ocp.h"
+#include "hdl.h"
 #define INST_ATTRS "paramconfig"
 
 struct InstancePort;

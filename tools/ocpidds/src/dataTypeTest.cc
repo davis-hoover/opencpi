@@ -25,7 +25,7 @@
 #include "BaseValueWriter.hh"
 #include "MetadataProtocol.hh"
 #include "BaseValue.hh"
-#include "ocpidds.hh"
+#include "ocpidds.h"
 
 namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;

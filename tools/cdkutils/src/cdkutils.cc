@@ -30,7 +30,7 @@
 #include <fstream>
 
 #include "UtilMisc.hh"
-#include "cdkutils.hh"
+#include "cdkutils.h"
 
 namespace OU = OCPI::Util;
 static std::vector<std::string> includes; // our included files

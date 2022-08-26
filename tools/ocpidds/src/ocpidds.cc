@@ -49,8 +49,8 @@
 #include "BaseDataTypes.hh"
 #include "MetadataProtocol.hh"
 #include "UtilMisc.hh"
-#include "cdkutils.hh"
-#include "ocpidds.hh"
+#include "cdkutils.h"
+#include "ocpidds.h"
 
 namespace OS = OCPI::OS;
 namespace OA = OCPI::API;

@@ -34,11 +34,11 @@
 #include "UtilEzxml.hh"
 #include "MetadataAssembly.hh"
 #include "UtilCppMacros.hh"
-#include "wip.hh"
-#include "hdl.hh"
-#include "rcc.hh"
-#include "hdl-platform.hh"
-#include "hdl-container.hh"
+#include "wip.h"
+#include "hdl.h"
+#include "rcc.h"
+#include "hdl-platform.h"
+#include "hdl-container.h"
 /*
  * Todo:
  *  property values in assembly instances?

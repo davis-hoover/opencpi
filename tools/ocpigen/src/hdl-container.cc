@@ -22,9 +22,9 @@
 #include "UtilMisc.hh"
 #include "UtilEzxml.hh"
 #include "HdlOCCP.hh"
-#include "assembly.hh"
-#include "hdl.hh"
-#include "hdl-container.hh"
+#include "assembly.h"
+#include "hdl.h"
+#include "hdl-container.h"
 static void
 emitTimeClient(std::string &assy, const char *instance, const char *portName, Port *port = NULL) {
   OU::formatAdd(assy,
@@ -109,7 +109,7 @@ create(ezxml_t xml, const char *xfile, const std::string &parentFile, const char
 // So this method actually is providing the split/join for the previous client if there is one
 // If the current client is NULL, the current channel is terminated.
 void UNoc::
-addClient(std::string &assy, bool control, const char *client, const char *port, bool pipeline) {
+addClient(std::string &assy, bool control, const char *client, const char *port) {
   UNocChannel &unc = m_channels[m_currentChannel];
   std::string prevInstance, prevPort, node;
   // The choices are:
@@ -126,52 +126,18 @@ addClient(std::string &assy, bool control, const char *client, const char *port,
       OU::format(prevInstance, "%s_unoc%u_%u", m_name, m_currentChannel, pos - 1);
       prevPort = "name='down'";
     }
-    OU::format(node,  "%s_unoc%u_%u", m_name, m_currentChannel, pos);
-    const char *clientName, *clientPort, *upName;
-    std::string clientPipeline, nodePipeline;
-    if (unc.m_pipeline) { // if client was specified as pipelined, add it
-      OU::format(clientPipeline,  "%s_client_pipeline_%u_%u", m_name, m_currentChannel, pos);
-      OU::formatAdd(assy,
-		    "  <instance name='%s' worker='sdp_pipeline'>\n"
-		    "    <property name='sdp_width' value='%zu'/>\n"
-		    "  </instance>\n"
-		    "  <connection>\n"
-		    "    <port instance='%s' name='down'/>\n"
-		    "    <port instance='%s' name='sdp'/>\n"
-		    "  </connection>\n",
-		    clientPipeline.c_str(), m_width, clientPipeline.c_str(), unc.m_client.c_str());
-      clientName = clientPipeline.c_str();
-      clientPort = "up";
-    } else {
-      clientName = unc.m_client.c_str(),
-      clientPort = unc.m_port.c_str();
-    }
     if (client || m_type != SDPPort) {
       // If the channel we are using has a previous node or we are not SDP, then
       // instance its split/join node, and connect it upstream
-      upName = node.c_str();
-      if (m_type == SDPPort) {
+      OU::format(node,  "%s_unoc%u_%u", m_name, m_currentChannel, pos);
+      if (m_type == SDPPort)
 	OU::formatAdd(assy,
 		      "  <instance name='%s' worker='sdp_node'>\n"
 		      "    <property name='sdp_width' value='%zu'/>\n"
-		      "    <property name='sdp_arb'   value='%zu'/>\n"
+          "    <property name='sdp_arb'   value='%zu'/>\n"
 		      "  </instance>\n",
 		      node.c_str(), m_width, m_arb);
-	// If nodes are pipelined, add it here
-	if (m_pipelineOptions[HdlContainer::NODE]) {
-	  OU::format(nodePipeline,  "%s_node_pipeline_%u_%u", m_name, m_currentChannel, pos);
-	  OU::formatAdd(assy,
-			"  <instance name='%s' worker='sdp_pipeline'>\n"
-			"    <property name='sdp_width' value='%zu'/>\n"
-			"  </instance>\n"
-			"  <connection>\n"
-			"    <port instance='%s' name='down'/>\n"
-			"    <port instance='%s' name='up'/>\n"
-			"  </connection>\n",
-			nodePipeline.c_str(), m_width, nodePipeline.c_str(), node.c_str());
-	  upName = nodePipeline.c_str();
-	}
-      } else {
+      else {
 	assert(unc.m_control || pos);
 	OU::formatAdd(assy,
 		      "  <instance name='%s' worker='unoc_node'>\n"
@@ -179,7 +145,7 @@ addClient(std::string &assy, bool control, const char *client, const char *port,
 		      "    <property name='position' value='%u'/>\n"
 		      "  </instance>\n",
 		      // We are assuming there is always an initial control node on unocs
-		      node.c_str(), unc.m_control ? "true" : "false",
+		      node.c_str(), unc.m_control ? "true" : "false", 
 		      unc.m_control ? 0 : pos - 1);
       }
       // Connect the inserted node to its upstream master and its client.
@@ -192,8 +158,8 @@ addClient(std::string &assy, bool control, const char *client, const char *port,
 		    "    <port instance='%s' name='client'/>\n"
 		    "    <port instance='%s' name='%s'/>\n"
 		    "  </connection>\n",
-		    prevInstance.c_str(), prevPort.c_str(), upName, node.c_str(), clientName,
-		    clientPort);
+		  prevInstance.c_str(), prevPort.c_str(), node.c_str(),
+		  node.c_str(), unc.m_client.c_str(), unc.m_port.c_str());
     } else {
       // The previous client is the last client, and we are SDP.
       // Terminate the SDP channel by using the last client as the termination.
@@ -205,7 +171,7 @@ addClient(std::string &assy, bool control, const char *client, const char *port,
 		    "    <port instance='%s' name='%s'/>\n"
 		    "  </connection>\n",
 		    prevInstance.c_str(), prevPort.c_str(),
-		    clientName, clientPort);
+        unc.m_client.c_str(), unc.m_port.c_str());
     }
   }
   // if !client then terminate the channel
@@ -213,7 +179,6 @@ addClient(std::string &assy, bool control, const char *client, const char *port,
     unc.m_control = control;
     unc.m_client = client;
     unc.m_port = port;
-    unc.m_pipeline = m_type == SDPPort ? pipeline : false;
     unc.m_currentNode++;
     m_currentChannel = (m_currentChannel + 1) % (unsigned)m_channels.size();
   } else if (m_type != SDPPort || unc.m_currentNode == 0) {
@@ -248,7 +213,7 @@ void UNoc::
 terminate(std::string &assy) {
   for (unsigned c = 0; c < m_channels.size(); c++) {
       m_currentChannel = c;
-      addClient(assy, false, NULL, NULL, false);
+      addClient(assy, false, NULL, NULL);
   }
 }
 
@@ -278,36 +243,6 @@ HdlContainer(HdlConfig &config, HdlAssembly &appAssembly, ezxml_t xml, const cha
 		       endians[m_endian]);
     return;
   }
-  static std::map<const char *, PipelineOption, OU::ConstCharCaseComp> options = {
-#define HDL_PIPELINE(name) { #name, name },
-    HDL_PIPELINE_OPTIONS
-  };
-  // Parse the pipelining option
-  m_pipelineOptions.resize(LIMIT);
-  const char *pipeline = ezxml_cattr(xml, "pipeline");
-  if (!pipeline)
-    pipeline = getenv("OCPI_HDL_CONTAINER_PIPELINE");
-  if (pipeline)
-    for (OU::TokenIter li(pipeline); li.token(); li.next()) {
-      auto it = options.find(li.token());
-      if (it == options.end()) {
-	err = OU::esprintf("Invalid value for pipeline attribute:  \"%s\"", li.token());
-	return;
-      }
-      switch (it->second) {
-      case ALL:
-	for (unsigned n = 0; n < LIMIT; ++n)
-	  if (n != ALL and n != NONE)
-	    m_pipelineOptions[n] = true;
-	break;
-      case NONE:
-	break;
-      default:
-	m_pipelineOptions[it->second] = true;
-      }
-    }
-  else
-    m_pipelineOptions[DATA] = true;
   // Set the fixed elements that would normally be parsed
   m_noControl = true;
   // Prepare to build (and terminate) the uNocs for interconnects
@@ -325,17 +260,51 @@ HdlContainer(HdlConfig &config, HdlAssembly &appAssembly, ezxml_t xml, const cha
 	cp = &p;
       else if (p.m_type == SDPPort || p.m_type == NOCPort) {
 	icp = &p;
+#if 0
+	size_t len = p.m_name.length();
+
+	Port *slave = NULL;
+	for (PortsIter si = m_config.m_ports.begin(); si != m_config.m_ports.end(); si++) {
+	  Port &sp = **si;
+	  if (!sp.m_master && (sp.m_type == NOCPort || sp.m_type == SDPPort) &&
+	      !strncasecmp(p.pname(), sp.pname(), len) && !strcasecmp(sp.pname() + len, "_slave")) {
+	    assert(!slave);
+	    slave = &sp;
+	  }
+	}
+	ocpiAssert(p.m_type == SDPPort || slave);
+#endif
 	uNocs.insert(std::make_pair(p.pname(),
 				    UNoc(p.pname(), p.m_type, m_config.sdpWidth(),
-					 m_config.sdpLength(), p.count(),
-					 m_config.sdpArb(), m_pipelineOptions)));
+					 m_config.sdpLength(), p.count(), m_config.sdpArb())));
       }
     }
   }
   // Preinstall device instances.  These may be devices in the platform OR may be
   // random devices that are just standalone workers.
+#if 1
   if ((err = parseDevInstances(m_xml, xfile, this, &m_config.devInstances())))
     return;
+#else
+  for (ezxml_t dx = ezxml_cchild(m_xml, "device"); dx; dx = ezxml_cnext(dx)) {
+    bool floating = false;
+    if ((err = OE::getBoolean(dx, "floating", &floating)))
+      return;
+    std::string name;
+    if (floating) {
+      // This device is not part of the platform.
+      // FIXME:  bad coding practice
+      // Fixing would involve allowing containers to own devices...
+      HdlPlatform &pf = *(HdlPlatform *)&m_platform;
+      err = pf.addFloatingDevice(dx, xfile, this, name);
+    } else
+      err = OE::getRequiredString(dx, name, "name");
+    // We have a device to add to the container that exists on the platform or on a card
+    if (err || (err = parseDevInstance(name.c_str(), dx, m_file.c_str(), this, false,
+				       &m_config.devInstances(), NULL, NULL)))
+      return;
+  }
+#endif
   // Establish connections, WHICH MAY ALSO IMPLICITLY CREATE DEVICE INSTANCES
   ContConnects connections;
   for (ezxml_t cx = ezxml_cchild(m_xml, "connection"); cx; cx = ezxml_cnext(cx)) {
@@ -405,7 +374,7 @@ HdlContainer(HdlConfig &config, HdlAssembly &appAssembly, ezxml_t xml, const cha
 		  "    <port instance='ocscp' name='cp'/>\n"
 		  "  </connection>\n",
 		  client.c_str());
-    unoc.addClient(assy, true, client.c_str(), icPort, m_pipelineOptions[CONTROL]);
+    unoc.addClient(assy, true, client.c_str(), icPort);
   } else
     // Connect it to the pf config's cpmaster
     for (PortsIter ii = m_config.m_ports.begin(); ii != m_config.m_ports.end(); ii++) {
@@ -747,13 +716,14 @@ emitUNocConnection(std::string &assy, UNocs &uNocs, size_t &index, const ContCon
 			port->pname(), iname,
 			c.external ? "assembly" : "device",
 			c.external ? "" : c.devInstance->device.cname());
-  std::string dma, sma;
+  std::string dma, sma, ctl;
   const char *unocPort;
   if (c.interconnect->m_type == SDPPort) {
-    const char *direction = port->isDataProducer() ? "send" : "receive";
     unocPort = "sdp";
-    OU::format(dma, "%s_sdp_%s%u_%u", iname, direction, unoc.m_currentChannel, unc.m_currentNode);
+    OU::format(dma, "%s_sdp_%s%u_%u", iname, port->isDataProducer() ? "send" : "receive",
+	       unoc.m_currentChannel, unc.m_currentNode);
     sma = dma;
+    ctl = dma;
     // Create a sender or receiver DP/DMA module to stream to/from another place on the
     // interconnect.
     OU::formatAdd(assy,
@@ -761,7 +731,24 @@ emitUNocConnection(std::string &assy, UNocs &uNocs, size_t &index, const ContCon
 		  "    <property name='sdp_width' value='%zu'/>\n"
 		  "    <property name='sdp_length' value='%zu'/>\n"
 		  "  </instance>\n",
-		  dma.c_str(), direction, iname, m_config.sdpWidth(), m_config.sdpLength());
+		  dma.c_str(), port->isDataProducer() ? "send" : "receive", iname,
+		  m_config.sdpWidth(), m_config.sdpLength());
+    // Instance a pipeline node upstream and connect it to the dma module
+    // FIXME make this conditional
+    std::string pipeline;
+    OU::format(pipeline, "%s_sdp_pipeline%u_%u",
+	       iname, unoc.m_currentChannel, unc.m_currentNode);
+    unocPort = "up";
+    OU::formatAdd(assy,
+		  "  <instance name='%s' worker='sdp_pipeline'>\n"
+		  "    <property name='sdp_width' value='%zu'/>\n"
+		  "  </instance>\n"
+		  "  <connection>\n"
+		  "    <port instance='%s' name='down'/>\n"
+		  "    <port instance='%s' name='sdp'/>\n"
+		  "  </connection>\n",
+		  pipeline.c_str(), m_config.sdpWidth(), pipeline.c_str(), dma.c_str());
+    dma = pipeline;
   } else {
     OU::format(dma, "%s_ocdp%u_%u", iname, unoc.m_currentChannel, unc.m_currentNode);
     OU::format(sma, "%s_sma%u_%u",  iname, unoc.m_currentChannel, unc.m_currentNode);
@@ -796,6 +783,7 @@ emitUNocConnection(std::string &assy, UNocs &uNocs, size_t &index, const ContCon
 		  sma.c_str(), port->isDataProducer() ? "from" : "to");
     // Add time client to OCDP's WTI port
     emitTimeClient(assy, dma.c_str(), "wti");
+    ctl = dma;
   }
   // Connect the dma to the wci, incrementing the WCI count
   OU::formatAdd(assy,
@@ -803,8 +791,8 @@ emitUNocConnection(std::string &assy, UNocs &uNocs, size_t &index, const ContCon
 		"    <port instance='%s' name='ctl'/>\n"
 		"    <port instance='ocscp' name='wci' index='%zu'/>\n"
 		"  </connection>\n",
-		dma.c_str(), index++);
-  // Connect to the data port to talk to the app port or device workers
+		ctl.c_str(), index++);
+  // Connect to the port
   std::string other;
   if (c.devInConfig)
     OU::format(other, "%s_%s", c.devInstance->cname(), port->pname());
@@ -822,7 +810,7 @@ emitUNocConnection(std::string &assy, UNocs &uNocs, size_t &index, const ContCon
 		(c.devInConfig ? "pfconfig" : c.devInstance->cname()),
 		port->isDataProducer() ? "from" : "to",
 		other.c_str());
-  unoc.addClient(assy, false, dma.c_str(), unocPort, m_pipelineOptions[DATA]);
+  unoc.addClient(assy, false, dma.c_str(), unocPort);
   return NULL;
 }
 

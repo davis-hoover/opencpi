@@ -18,9 +18,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "cdkutils.hh"
-#include "hdl-device.hh"
-#include "hdl-card.hh"
+#include "cdkutils.h"
+#include "hdl-device.h"
+#include "hdl-card.h"
 
 Cards Card::s_cards;        // registry of card types
 

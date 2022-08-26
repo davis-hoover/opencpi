@@ -22,7 +22,7 @@
 #include <cstdio>
 #include "UtilMisc.hh"
 #include "UtilException.hh"
-#include "utils.hh"
+#include "utils.h"
 
 namespace OU = OCPI::Util;
 namespace OCPI {

@@ -19,7 +19,7 @@
  */
 
 #include <assert.h>
-#include "hdl.hh"
+#include "hdl.h"
 
 // Property handling is not implemented here, but is still a worker-level issue.
 // FIXME: move properties into the realm of WCI (big)

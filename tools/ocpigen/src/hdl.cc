@@ -20,9 +20,9 @@
 
 #include <assert.h>
 #include <ctype.h>
-#include "data.hh"
-#include "hdl.hh"
-#include "hdl-device.hh"
+#include "data.h"
+#include "hdl.h"
+#include "hdl-device.h"
 
 //bool hdlAssy = false;
 

@@ -18,8 +18,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "data.hh"
-#include "hdl.hh"
+#include "data.h"
+#include "hdl.h"
 
 WmiPort::
 WmiPort(Worker &w, ezxml_t x, DataPort *sp, int ordinal, const char *&err)

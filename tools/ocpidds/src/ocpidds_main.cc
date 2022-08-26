@@ -25,8 +25,8 @@
 #include <unistd.h>
 #include <sys/uio.h>
 #include <vector>
-#include "cdkutils.hh"
-#include "ocpidds.hh"
+#include "cdkutils.h"
+#include "ocpidds.h"
 #include "MetadataProtocol.hh"
 #include "UtilMisc.hh"
 #include "BaseValueReader.hh"

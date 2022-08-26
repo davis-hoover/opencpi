@@ -20,8 +20,8 @@
 
 #ifndef OCL_H
 #define OCL_H
-#include "wip.hh"
-#include "data.hh"
+#include "wip.h"
+#include "data.h"
 
 #if 0
 #define RCC_ASSEMBLY_ATTRS "platform", "config", "configuration"

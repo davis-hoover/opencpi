@@ -28,7 +28,7 @@
 #include "OsFileSystem.hh"
 #include "UtilCppMacros.hh"
 #include "UtilMisc.hh"
-#include "cdkutils.hh"
+#include "cdkutils.h"
 
 namespace OS = OCPI::OS;
 namespace OU = OCPI::Util;

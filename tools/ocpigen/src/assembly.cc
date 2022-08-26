@@ -20,7 +20,7 @@
 
 #include <assert.h>
 #include <unordered_set>
-#include "assembly.hh"
+#include "assembly.h"
 // Generic (actually non-HDL) assembly support
 // This isn't as purely generic as it should be  FIXME
 

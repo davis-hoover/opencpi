@@ -22,8 +22,8 @@
 
 #include <cassert>
 #include <climits>
-#include "assembly.hh"
-#include "data.hh"
+#include "assembly.h"
+#include "data.h"
 
 // Constructor when creating a derived impl port either from a spec port
 // (based on an existing spec port (sp)), or just an impl-only data port

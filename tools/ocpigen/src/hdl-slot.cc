@@ -18,8 +18,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "cdkutils.hh"
-#include "hdl-slot.hh"
+#include "cdkutils.h"
+#include "hdl-slot.h"
 
 SlotTypes SlotType::s_slotTypes;
 

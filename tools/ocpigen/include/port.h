@@ -26,7 +26,7 @@
 #include <cassert>
 #include "UtilEzxml.hh"
 #include "MetadataAssembly.hh"
-#include "ocpigen.hh"
+#include "ocpigen.h"
 
 // Port types have an enum, a tag, and a description
 #define PORT_TYPES \
