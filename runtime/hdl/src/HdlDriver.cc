@@ -74,7 +74,7 @@ namespace OCPI {
     }
 
     OCPI::HDL::Device *Driver::
-    open(const char *a_name, bool discovery, bool forLoad, const OA::PValue *params,
+    open(const char *a_name, bool discovery, bool forLoad, bool isStatic, const OA::PValue *params,
 	 std::string &err) {
       parent().parent().configureOnce();
       lock();
@@ -111,13 +111,16 @@ namespace OCPI {
       Device *dev =
 	pci ? PCI::Driver::open(which, params, err) : 
 	bus ? Zynq::Driver::open(which, forLoad, params, err) : 
-	ether ? Ether::Driver::open(which, discovery, params, err) :
-	sim ? Sim::Driver::open(which, discovery, params, err) : 
+	ether ? Ether::Driver::open(which, discovery, forLoad, params, err) :
+	sim ? Sim::Driver::open(which, discovery, false, params, err) : 
 	lsim ? LSim::Driver::open(which, params, err) : NULL;
       ezxml_t config;
+      // don't call setup() when just doing FPGA programming on Zynq
+      // the same isn't true of ether devices as these need parameters
+      // parsed out of the system config
       if (forLoad && bus)
 	return dev;
-      if (dev && !setup(*dev, config, err))
+      if (dev && (isStatic || !setup(*dev, config, err)))
 	return dev;
       delete dev;
       return NULL;
@@ -159,7 +162,18 @@ namespace OCPI {
     out:
       delete &dev;
       return true;
-    } 
+    }
+
+    void Driver::
+    createStaticDevice(const char *a_name, ezxml_t /*x*/, const OB::PValue *params,
+		       bool discoveryOnly) {
+      std::string err;
+      m_params = params; // FIXME: better to supply params to the "found" method?
+      Device *d = open(a_name, discoveryOnly, false, true, params, err);
+      if (!d)
+	throw OU::Error("Error creating static device \"%s\": %s", a_name, err.c_str());
+      found(*d, NULL, discoveryOnly, err);
+    }
 
     unsigned Driver::
     search(const OA::PValue *params, const char **exclude, bool discoveryOnly) {
@@ -199,21 +213,16 @@ namespace OCPI {
       }
       return count;
     }
-    
+
     OC::Container *Driver::
     probeContainer(const char *which, std::string &error, const OA::PValue *params) {
       Device *dev;
-      ezxml_t config;
-      if ((dev = open(which, false, false, params, error))) {
-	if (setup(*dev, config, error))
-	  delete dev;
-	else
-	  return createContainer(*dev, config, params);
-      }
+      if ((dev = open(which, false, false, false, params, error)))
+	return createContainer(*dev, getDeviceConfig(which), params);
       if (error.size())
 	ocpiBad("While probing %s: %s", which, error.c_str());
       return NULL;
-    }      
+    }
     // use libgpsd interface to configure gps
     // (ref https://www.systutorials.com/docs/linux/man/3-libgpsd/)
     // see https://gitlab.com/gpsd/gpsd/blob/release-3.14/gpsctl.c
@@ -280,7 +289,7 @@ namespace OCPI {
       // First, do the generic configuration, which configures discovered devices for this driver
       OP::Driver::configure(xml);
       ezxml_t xx;
-      if (!xml || !(xx = ezxml_cchild(xml, "gpsd"))) return;
+      if (!(xx = ezxml_cchild(xml, "gpsd"))) return;
       m_doGpsd = true;
       auto sp = ezxml_cattr(xx, "serialport"); // mandatory
       if (sp)

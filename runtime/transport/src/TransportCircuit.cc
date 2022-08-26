@@ -683,32 +683,17 @@ ready() {
   return true;
 }
 
-void 
-Circuit::
-checkIOZCopyQ()
-{
-  unsigned total = 0;
-
-
-  for (unsigned n = 0; n<m_maxPortOrd; n++) {
-
-    unsigned n_queued = m_queuedInputOutputTransfers[n].getElementCount();
-    total += n_queued;
-
-    if ( n_queued == 0 ) {
-      continue;
+void Circuit::
+checkIOZCopyQ() {
+  for (unsigned n = 0; n < m_maxPortOrd; n++)
+    if (m_queuedInputOutputTransfers[n].getElementCount()) {
+      Buffer *input_buffer = static_cast<Buffer*>(m_queuedInputOutputTransfers[n].getEntry(0));
+      if (input_buffer->m_zCopyPort->hasEmptyOutputBuffer()) {
+	QInputToOutput(input_buffer->m_zCopyPort, input_buffer, input_buffer->getLength());
+	m_queuedInputOutputTransfers[n].remove(input_buffer);
+      }
     }
-
-    Buffer* input_buffer = 
-      static_cast<Buffer*>(m_queuedInputOutputTransfers[n].getEntry(0));
-
-    if( input_buffer->m_zCopyPort->hasEmptyOutputBuffer() ) {
-      QInputToOutput( input_buffer->m_zCopyPort, input_buffer, input_buffer->getLength() );
-      m_queuedInputOutputTransfers[n].remove( input_buffer );
-    }
-  }
 }
-
 
 void 
 Circuit::

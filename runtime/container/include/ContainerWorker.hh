@@ -126,6 +126,7 @@ namespace OCPI {
       bool m_hasMaster;
       size_t m_member, m_crewSize;
       PortMask m_connectedPorts, m_optionalPorts, m_outputPorts, m_inputPorts; // spcm?
+      bool m_inserted;
       mutable std::vector<Cache *> m_cache; // per property write cache, when needed
       std::string m_description; // for error/info messages
       bool beforeStart() const;
@@ -227,6 +228,7 @@ namespace OCPI {
       bool getProperty(unsigned ordinal, std::string &name, std::string &value,
 		       bool *unreadablep = NULL, bool hex = false, bool *cachedp = NULL,
 		       bool uncached = false, bool *hiddenp = NULL);
+      bool isPropertyWritten(const OCPI::API::PropertyInfo &info) const;
       // Return true when ignored due to "ignored due to existing state"
       bool controlOp(OCPI::Metadata::Worker::ControlOperation);
       virtual const std::string &name() const = 0;
@@ -258,6 +260,7 @@ namespace OCPI {
     OCPI_CONTROL_OPS
 #undef CONTROL_OP
       virtual bool wait(OCPI::OS::Timer *t = NULL);
+      void configure(ezxml_t x); // configure the worker after it is initialized
       bool isDone();
 
     private:

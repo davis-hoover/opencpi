@@ -1,0 +1,23 @@
+<signals>
+  <signal name='RESET'                                       direction='out'/>
+  <signal name='REMOTE_MAC_ADDR'                  width='64' direction='out'/>
+  <signal name='REMOTE_DST_ID'                    width='16' direction='out'/>
+  <signal name='LOCAL_SRC_ID'                     width='16' direction='out'/>
+  <signal name='INTERFACE_MTU'                    width='16' direction='out'/>
+  <signal name='ACK_WAIT'                         width='32' direction='out'/>
+  <signal name='MAX_ACKS_OUTSTANDING'             width='8'  direction='out'/>
+  <signal name='COALESCE_WAIT'                    width='32' direction='out'/>
+  <signal name='DUAL_ETHERNET'                               direction='out'/>
+  <signal name='ACK_TRACKER_REJ_ACK'                         direction='in'/>
+  <signal name='ACK_TRACKER_BITFIELD'             width='32' direction='in'/>
+  <signal name='ACK_TRACKER_BASE_SEQNO'           width='16' direction='in'/>
+  <signal name='ACK_TRACKER_REJ_SEQNO'            width='16' direction='in'/>
+  <signal name='ACK_TRACKER_TOTAL_ACKS_SENT'      width='32' direction='in'/>
+  <signal name='ACK_TRACKER_TX_ACKS_SENT'         width='32' direction='in'/>
+  <signal name='ACK_TRACKER_PKTS_ENQUEUED'        width='32' direction='in'/>
+  <signal name='ACK_TRACKER_REJECT_OUT_OF_RANGE'  width='32' direction='in'/>
+  <signal name='ACK_TRACKER_REJECT_ALREADY_SET'   width='32' direction='in'/>
+  <signal name='ACK_TRACKER_ACCEPTED_BY_PEEK'     width='32' direction='in'/>
+  <signal name='ACK_TRACKER_HIGH_WATERMARK'       width='16' direction='in'/>
+  <signal name='FRAME_PARSER_REJECT'              width='32' direction='in'/>
+</signals>

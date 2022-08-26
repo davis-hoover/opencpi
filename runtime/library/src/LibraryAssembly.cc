@@ -440,7 +440,8 @@ namespace OCPI {
 	  strcasecmp(instImplAttr,
 		     OU::format(fullWorker, "%s.%s.%s", impl.package().c_str(),
 				worker.c_str(), impl.model().c_str()))) {
-	ocpiInfo("    Rejected: worker name is \"%s.%s\", while requested worker name is \"%s\":%s",
+	// This is not "info" since we are simply filtering workers by name...
+	ocpiDebug("    Rejected: worker name is \"%s.%s\", while requested worker name is \"%s\":%s",
 		 impl.cname(), impl.model().c_str(), instImplAttr, fullWorker.c_str());
 	return false;
       }

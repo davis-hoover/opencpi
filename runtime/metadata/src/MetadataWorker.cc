@@ -41,7 +41,7 @@ namespace OCPI {
       : m_attributes(NULL), m_ports(NULL), m_memories(NULL), m_nPorts(0), m_nMemories(0),
 	m_version(0), m_workerEOF(false), m_totalPropertySize(0),// m_isSource(false),
 	m_isDebug(false), m_nProperties(0), m_properties(NULL), m_firstRaw(NULL), m_xml(NULL),
-        m_ordinal(0), m_slaveAssembly(NULL), m_isEmulator(false) {
+        m_ordinal(0), m_slaveAssembly(NULL), m_isEmulator(false), m_isLoadTime(false) {
     }
 
     Worker::~Worker() {
@@ -141,6 +141,7 @@ namespace OCPI {
 	  (err = OE::getNumber8(xml, "version", &m_version)) ||
 	  (err = OE::getBoolean(xml, "workerEOF", &m_workerEOF)) ||
 	  (err = OE::getBoolean(xml, "emulator", &m_isEmulator)) ||
+	  (err = OE::getBoolean(xml, "loadTime", &m_isLoadTime)) ||
 	  (err = OE::getRequiredString(xml, m_package, "package", "worker")) ||
 	  (err = OE::getRequiredString(xml, m_model, "model", "worker")))
 	return err;

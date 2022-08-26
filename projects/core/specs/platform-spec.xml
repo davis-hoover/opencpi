@@ -22,6 +22,8 @@
       New platforms shoud use "unknown" before they are registered.
     </description>
   </property>
+  <property name='sdp_arb' type='uchar' parameter='1' default='0'
+	    description='width of the sdp arbitration counter'/>
   <!-- ======================================================
        === 2. Required first non-parameters - fixed/known in bootstrapping code -->
   <!-- UUID of this platform: MUST BE FIRST for bootstrapping purposes ========= -->

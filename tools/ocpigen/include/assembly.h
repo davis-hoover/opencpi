@@ -88,6 +88,7 @@ struct Instance : public OB::IdentResolver {
   ExtMap m_extmap;     // map for externals. FIXME: have HdlInstance class...
   bool   m_emulated;   // is this an instance of a device worker with an emulator?
   bool   m_inserted;   // was this instance auto-inserted?
+  bool   m_loadTime;   // is this designated as loadtime?
   Instance();
   const char *cname() const { return m_name.c_str(); }
   const char *init(OM::Assembly::Instance *ai, ::Assembly &assy, const char *outDir);

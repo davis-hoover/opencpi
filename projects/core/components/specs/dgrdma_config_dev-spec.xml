@@ -1,0 +1,23 @@
+<ComponentSpec>
+    <Property Name='enable_d'                 Writable='true'  type='bool'   default='false'/>
+    <Property Name='remote_mac_addr_d'        Writable='true'  type='ulonglong' />
+    <Property Name='remote_dst_id_d'          Writable='true'  type='ushort' default='1'/>
+    <Property Name='local_src_id_d'           Writable='true'  type='ushort' default='1'/>
+    <Property Name='interface_mtu_d'          Writable='true'  type='ushort' default='1500'/>
+    <Property Name='ack_wait_d'               Writable='true'  type='ulong'  default='187500'/>
+    <Property Name='max_acks_outstanding_d'   Writable='true'  type='uchar'  default='8'/>
+    <Property Name='coalesce_wait_d'          Writable='true'  type='ulong'  default='125000'/>
+    <Property Name='dual_ethernet_d'          Writable='true'  type='uchar'  default='0'/>
+    <Property Name='ack_tracker_rej_ack_d'                     type='uchar'  />
+    <Property Name='ack_tracker_bitfield_d'                    type='ulong'  />
+    <Property Name='ack_tracker_base_seqno_d'                  type='ushort' />
+    <Property Name='ack_tracker_rej_seqno_d'                   type='ushort' />
+    <Property Name='ack_tracker_total_acks_sent_d'             type='ulong'  />
+    <Property Name='ack_tracker_tx_acks_sent_d'                type='ulong'  />
+    <Property Name='ack_tracker_pkts_enqueued_d'               type='ulong'  />
+    <Property Name='ack_tracker_reject_out_of_range_d'         type='ulong'  />
+    <Property Name='ack_tracker_reject_already_set_d'          type='ulong'  />
+    <Property Name='ack_tracker_accepted_by_peek_d'            type='ulong'  />
+    <Property Name='ack_tracker_high_watermark_d'              type='ushort' />
+    <Property Name='frame_parser_reject_d'                     type='ulong'  />
+</ComponentSpec>

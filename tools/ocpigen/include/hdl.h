@@ -72,23 +72,25 @@ extern const char *endians[];
 // These are for implementaitons that you write (e.g. not generated assemblies), not devices
 #define HDL_WORKER_ATTRS  IMPL_ATTRS, HDL_TOP_ATTRS, "outer", "endian", "Pattern", "PortPattern", \
                           "DataWidth", "library"
-#define HDL_WORKER_ELEMS IMPL_ELEMS, "timeinterface", "memoryinterface", "streaminterface", "clock", \
-    "messageinterface"
+#define HDL_WORKER_ELEMS IMPL_ELEMS, "timeinterface", "memoryinterface", "streaminterface", \
+        "clock", "messageinterface"
 
 // All types of assemblies currently do not introduce any special elements
 // so there is no "extra" elements for any of them, only top attrs, and instance attrs
 
 // XML for HDL assemblies, that are not configurations or containers
-#define HDL_ASSEMBLY_EXTRA_TOP_ATTRS BUILD_ATTRS, HDL_TOP_ATTRS, "language", "containers", "defaultcontainers",
+#define HDL_ASSEMBLY_EXTRA_TOP_ATTRS BUILD_ATTRS, HDL_TOP_ATTRS, "language", "containers", \
+        "defaultcontainers",
 #define HDL_ASSEMBLY_EXTRA_INST_ATTRS "paramconfig",
 
 // XML for HDL platform configuration assemblies (not the config xml files)
 #define HDL_CONFIG_ASSEMBLY_EXTRA_TOP_ATTRS HDL_ASSEMBLY_EXTRA_TOP_ATTRS
-#define HDL_CONFIG_ASSEMBLY_EXTRA_INST_ATTRS HDL_ASSEMBLY_EXTRA_INST_ATTRS "device",
+#define HDL_CONFIG_ASSEMBLY_EXTRA_INST_ATTRS HDL_ASSEMBLY_EXTRA_INST_ATTRS "device", "loadtime",
 
 // XML for HDL platform configuration assemblies (not the config xml files)
 #define HDL_CONTAINER_ASSEMBLY_EXTRA_TOP_ATTRS HDL_CONFIG_ASSEMBLY_EXTRA_TOP_ATTRS
-#define HDL_CONTAINER_ASSEMBLY_EXTRA_INST_ATTRS HDL_CONFIG_ASSEMBLY_EXTRA_INST_ATTRS "adapter", "interconnect", "configure",
+#define HDL_CONTAINER_ASSEMBLY_EXTRA_INST_ATTRS HDL_CONFIG_ASSEMBLY_EXTRA_INST_ATTRS \
+  "adapter", "interconnect", "configure",
 
 class HdlAssembly : public Worker {
 public:

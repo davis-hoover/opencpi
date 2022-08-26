@@ -50,7 +50,7 @@ namespace OCPI {
 	typedef std::map<const std::string, OCPI::OS::Ether::Socket *> Sockets;
 	typedef Sockets::iterator SocketsIter;
 	typedef std::pair<std::string, OCPI::OS::Ether::Socket*> SocketPair;
-	typedef std::pair<OCPI::OS::Ether::Address,OCPI::OS::Ether::Interface *> MacPair;
+	typedef std::pair<OCPI::OS::Ether::Address,OCPI::OS::Ether::Interface> MacPair;
 	// The string keys for a server are a string of mac-address/pid
 	typedef std::pair<std::string, MacPair> MacInsert;
 	typedef std::map<std::string, MacPair> Macs;
@@ -71,7 +71,7 @@ namespace OCPI {
 	virtual ~Driver();
 	// device constructor
 	virtual Device *createDevice(OS::Ether::Interface &ifc, OS::Ether::Address &addr,
-				     bool discovery, const OCPI::Base::PValue *params,
+				     bool discovery, bool forLoad, const OCPI::Base::PValue *params,
 				     std::string &error) = 0;
       public:
 	// Find the discovery socket for this interface
@@ -81,7 +81,7 @@ namespace OCPI {
 	search(const OCPI::Base::PValue *props, const char **exclude, bool discoveryOnly,
 	       bool udp, std::string &error);
 	OCPI::HDL::Device *
-	open(const char *etherName, bool discovery, const OCPI::Base::PValue *params,
+	open(const char *etherName, bool discovery, bool forLoad, const OCPI::Base::PValue *params,
 	     std::string &err);
 	// Callback when found
 	virtual bool found(OCPI::HDL::Device &dev, const char **excludes, bool discoveryOnly,
@@ -99,7 +99,7 @@ namespace OCPI {
 	unsigned m_delayms;
       protected:
 	Device(Driver &driver, OCPI::OS::Ether::Interface &ifc, std::string &name,
-	       OCPI::OS::Ether::Address &devAddr, bool discovery, const char *data_proto,
+	       OCPI::OS::Ether::Address &devAddr, bool discovery, bool forLoad, const char *data_proto,
 	       unsigned delayms,  uint64_t ep_size, uint64_t controlOffset, uint64_t dataOffset,
 	       const OCPI::Base::PValue *params, std::string &);
       public:

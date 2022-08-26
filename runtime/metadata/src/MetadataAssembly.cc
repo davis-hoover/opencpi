@@ -723,7 +723,7 @@ namespace OCPI {
       // Now check for additional or override values from parameters
       return m_parameters.parse(ix, "name", "component", "worker", "selection", "connect", "buffersize",
                                 "external", "from", "to", "externals", "slave", "transport", "optional",
-                                "connectInput", NULL);
+                                "connectInput", "loadtime", NULL);
     }
 
     // Get the port from the instance, creating it if needed.

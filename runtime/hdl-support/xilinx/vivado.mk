@@ -663,7 +663,8 @@ DoVivado=$(call DoXilinx,vivado -mode batch -source $(OCPI_CDK_DIR)/include/hdl/
 HdlConstraintsSuffix_vivado=.xdc
 VivadoConstraints_default=$(HdlPlatformDir_$1)/$1$(HdlConstraintsSuffix_vivado)
 VivadoConstraints=$(or $(HdlConstraints),$(VivadoConstraints_default))
-
+VivadoPreOptHook_default=$(HdlPlatformDir_$1)/$1_pre_opt_hook.tcl
+VivadoPreOptHook=$(or $(HdlPreOptHook),$(VivadoPreOptHook_default))
 HdlVivadoPart=$(foreach p,$(HdlChoosePart),$(infox HVP:$p)$(call HdlFullPart_vivado,$p))
 
 # For synth rule: load dcp files of platform and app workers.
@@ -677,6 +678,7 @@ $(call OptName,$1,$3): $(call SynthName,$1,$3) $(call VivadoConstraints,$5)
 		part=$(HdlVivadoPart) \
 		edif_file=$(notdir $(call SynthName,$1,$3)) \
 		constraints='$(foreach u,$(call VivadoConstraints,$5),$(call AdjustRelative,$u))' \
+    pre_opt_hook='$(foreach u,$(call VivadoPreOptHook,$5),$(call AdjustRelative,$u))' \
 		impl_opts='$(call VivadoOptions,opt)' \
 		power_opt=$(if $(VivadoPowerOpt),true,false) \
 		,opt)

@@ -43,6 +43,8 @@ void DevInstance::
 emit(std::string &assy, bool emulated, bool content) const {
   OU::formatAdd(assy, "  <instance name='%s' worker='%s'%s",
 		cname(), device.deviceType().cname(), emulated ? " emulated='1'" : "");
+  if (device.m_loadTime)
+    assy += " loadtime='1'";
   if (device.deviceType().m_type == Worker::Device) { // it might be a platform...
     assy += " device='";
     if (card) {
@@ -464,7 +466,7 @@ HdlConfig(HdlPlatform &pf, ezxml_t xml, const char *xfile, const std::string &pa
 	  Worker *parent, const char *&err)
   : Worker(xml, xfile, parentFile, Worker::Configuration, parent, NULL, err),
     HdlHasDevInstances(pf, m_plugged, *this),
-    m_platform(pf), m_sdpWidth(1), m_sdpLength(32) { // 32 is for backward compatibility (zynq w/64 bit AXI)
+    m_platform(pf), m_sdpWidth(1), m_sdpLength(32), m_sdpArb(0) { // 32 is for backward compatibility (zynq w/64 bit AXI)
   if (err ||
       (err = OE::checkAttrs(xml, HDL_CONFIG_ATTRS, (void*)0)) ||
       (err = OE::checkElements(xml, HDL_CONFIG_ELEMS, (void*)0)))
@@ -483,11 +485,15 @@ HdlConfig(HdlPlatform &pf, ezxml_t xml, const char *xfile, const std::string &pa
   const DevInstance *pfdi;
   const HdlPlatform &cpf = pf;
   const OB::Value *v;
+  const OB::Value *arb;
   if ((err = addDevInstance(cpf, NULL, NULL, control, NULL, NULL, xml, pfdi)) ||
       (err = pf.parseSignalMappings(xml, pf, NULL)) ||
-      (err = pfdi->m_worker->m_paramConfig->getParamValue("sdp_width", v)))
+      (err = pfdi->m_worker->m_paramConfig->getParamValue("sdp_width", v)) ||
+      (err = pfdi->m_worker->m_paramConfig->getParamValue("sdp_arb", arb)))
     return;
+
   m_sdpWidth = v->m_UChar; // capture this after param config of platform worker is chosen
+  m_sdpArb = arb->m_UChar;
   if ((err = pfdi->m_worker->m_paramConfig->getParamValue("sdp_length", v)))
     return;
   m_sdpLength = v->m_UShort; // FIXME: error check that pf config value is not > than pf's value
@@ -611,6 +617,9 @@ HdlConfig(HdlPlatform &pf, ezxml_t xml, const char *xfile, const std::string &pa
   // Set the sdp values for the config to the values from the platform
   findProperty("sdp_width")->m_default->m_UChar = m_sdpWidth;
   findProperty("sdp_length")->m_default->m_UShort = m_sdpLength;
+  findProperty("sdp_arb")->m_default->m_UShort = m_sdpArb;
+
+
   // Externalize all the device signals, and cross-reference device instances to assy instances
   unsigned n = 0;
   for (Instance *i = &m_assembly->m_instances[0]; n < m_assembly->m_instances.size(); i++, n++) {

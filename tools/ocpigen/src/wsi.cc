@@ -193,18 +193,12 @@ emitVhdlShell(FILE *f, ::Port */*wci*/) {
 		  nn ? " else\n" : "", OM::Protocol::cname(), op->cname(), pname(), nn);
 	// If the protocol opcodes do not fill the space, fill it
 	if (nn < m_nOpcodes)
-#if 1 // fix inferred latch warning
-	  for (unsigned o = 0; nn < m_nOpcodes; nn++, o++) {
-	    fprintf(f, " else\n    op%u_e", nn);
-	    if (nn != m_nOpcodes-1)
-	      fprintf(f, "  when to_integer(unsigned(%s_opcode_temp)) = %u", cname(), nn);
-	  }
-#else
 	  for (unsigned o = 0; nn < m_nOpcodes; nn++, o++)
-	    fprintf(f, " else\n    op%u _e when to_integer(unsigned(%s_opcode_temp)) = %u",
+	    fprintf(f, " else\n    op%u_e  when to_integer(unsigned(%s_opcode_temp)) = %u",
 		    nn, cname(), nn);
-#endif
-	fprintf(f, ";\n");
+
+	// Provide default to avoid latch inference
+	fprintf(f, " else\n    %s_%s_op_e;\n", OM::Protocol::cname(), operations()->cname());
 #endif
       } else {
 	fprintf(f,

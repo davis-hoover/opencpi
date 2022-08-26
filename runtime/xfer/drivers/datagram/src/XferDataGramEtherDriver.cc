@@ -31,8 +31,10 @@
 #include "OsEther.hh"
 #include "UtilException.hh"
 #include "UtilMisc.hh"
+#include "UtilEzxml.hh"
 #include "XferException.hh"
 #include "XferDataGram.hh"
+#include "BaseValue.hh"
 
 namespace OCPI {
 namespace Xfer {
@@ -43,6 +45,7 @@ namespace Xfer {
     namespace OE = OCPI::OS::Ether;
     namespace OU = OCPI::Util;
     namespace OB = OCPI::Base;
+    namespace OX = OCPI::Util::EzXml;
 
 #define OCPI_ETHER_RDMA "ocpi-ether-rdma"
 #define DATAGRAM_PAYLOAD_SIZE OE::MaxPacketSize;
@@ -60,11 +63,16 @@ namespace Xfer {
       EndPoint(XF::XferFactory &a_factory, const char *protoInfo, const char *eps,
 	       const char *other, bool a_local, size_t a_size, const OB::PValue *params)
 	: DG::DGEndPoint(a_factory, eps, other, a_local, a_size, params) { 
+	const char *ether_prefix = "Ether:";
 	if (protoInfo) {
 	  m_protoInfo = protoInfo;
 	  const char *cp = strchr(protoInfo, '/');
 	  if (cp) {
 	    m_ifname.assign(protoInfo, OCPI_SIZE_T_DIFF(cp, protoInfo));
+	    // Strip "Ether:" prefix from protoInfo before assigning to m_ifname
+	    if (strncmp(protoInfo, ether_prefix, strlen(ether_prefix)) == 0) {
+	      protoInfo += strlen(ether_prefix);
+	    }
 	    protoInfo = cp + 1;
 	  }
 	  m_addr.setString(protoInfo);
@@ -75,6 +83,10 @@ namespace Xfer {
 	} else {
 	  if (0) { // if (other) {
 	    const char *sp = strchr(other, '/');
+	    // Strip "Ether:" prefix from protoInfo before assigning to m_ifname
+	    if (strncmp(other, ether_prefix, strlen(ether_prefix)) == 0) {
+	      other += strlen(ether_prefix);
+	    }
 	    m_ifname.assign(other, OCPI_SIZE_T_DIFF(sp, other));
 	  } else {
 	    const char *l_name;
@@ -82,7 +94,8 @@ namespace Xfer {
 	      l_name = getenv("OCPI_ETHER_INTERFACE");
 	    if (!l_name)
 	      throw OU::Error(OCPI_ETHER_RDMA ": no interface specified");
-	    m_ifname = l_name;
+	    // take copy
+	    m_ifname.assign(l_name, strlen(l_name));
 	  }
 	  // FIXME: use first/only interface if there is one?
 	  std::string error;
@@ -102,10 +115,33 @@ namespace Xfer {
 	const char *sp;
 	if (!remote || !(sp = strchr(remote, '/')))
 	  return true;
+
+	const char *ether_prefix = "Ether:";
+	// Strip "Ether:" prefix from remote before comparing to to m_ifname
+	if (strncmp(remote, ether_prefix, strlen(ether_prefix)) == 0) {
+	  remote += strlen(ether_prefix);
+	}
+
 	interface.assign(remote, OCPI_SIZE_T_DIFF(sp, remote));
 	return m_ifname == interface;
       }
-      uint16_t maxPayloadSize() { return DATAGRAM_PAYLOAD_SIZE; }
+      uint16_t maxPayloadSize() {
+	static uint16_t mp;
+	if (!mp) {
+	  // Default value...
+	  mp = DATAGRAM_PAYLOAD_SIZE;
+
+	  // Check if the default is overriden by an environment variable
+	  const char *env = getenv("OCPI_MAX_ETHER_PAYLOAD_SIZE");
+	  const char *err;
+	  if (env && (err = OB::Value::parseUShort(env, NULL, mp))) {
+	    ocpiBad("Invalid Ether RDMA payload maximum size: %s: %s", env, err);
+	  }
+
+	  ocpiInfo("Ether RDMA payload maximum size: %u", mp);
+	}
+	return mp;
+      }
     };
 
     class Socket : public DG::Socket {
