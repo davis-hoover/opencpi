@@ -1,0 +1,98 @@
+A quick disclaimer: the scripts in this directory are primarily for the
+use of people who cut releases and/or prepare distributions of OpenCPI.
+
+General instructions:
+
+(1) These scripts should be executed *only* on clean "opencpi" project
+    trees, i.e., no build artifacts of any kind should be present.
+
+(2) OSPs, component libraries, and other projects (like "ie-gui") can
+    be handled by these scripts, but see below for more information.
+
+check_copyright.sh:
+    This script generates a report on files that do NOT contain a
+    proper copyright header and are not exempted/mentioned in the
+    "whitelist" file.
+
+    It can be executed either from within the "scripts/copyright"
+    directory, or in the root directory of the opencpi project.
+    N.B.: The root directory of the opencpi project is hard-coded
+    as "../.." relative to where this file is located.
+
+    If you want to scan OSPs and other projects (including component
+    library projects and "ie-gui"), they have to be present in the
+    "opencpi" tree and in their expected/normal locations because all
+    files in the whitelist are specified relative to the opencpi root
+    directory.
+
+    Suggested usage (from the opencpi root directory):
+    $ scripts/copyright/check_copyright.sh 2>&1 | tee /var/tmp/check_copyright.out
+
+    Saving the output as indicated is probably optional, but easier
+    to go through than the logfiles created by the scanner in the
+    opencpi root directory.  Whatever works best for you would be
+    the right thing to do.
+
+copyright.py:
+    This is the workhorse script.  It's primary purpose when invoked
+    directly is to add or replace (if necessary) copyright information
+    in the optionally-specified files or directories.  It is invoked
+    indirectly by the "check_copyright.sh" script to scan files for
+    copyright information.  The "--help" option is valid and provides
+    useful information.
+
+    When invoked directly in a terminal session having "TERM=xterm-256color"
+    or some other terminal type that supports color (using standard ANSI
+    escape sequences), the output is likely to be far more readable and
+    usable (maybe even "pleasant"?) than when a "monochrome" terminal type
+    like "vt100" is used.
+
+    The first run of this script in the opencpi root directory after
+    many moons have passed is likely to be extremely painful, so running
+    this regularly (perhaps as a release is being prepared) is probably
+    "a really good idea".
+
+    Various directories and file extensions are automatically skipped.
+    Unfortunately, changing the "skip" list requires editing of the script.
+    If editing is appropriate and/or necessary, please do so via the normal
+    MR mechanism.
+
+    NO WHITELIST PROCESSING IS PERFORMED!!  The whitelist is only
+    used by the "check_copyright.sh" script as described above.
+
+    Usage examples:
+
+    (1) From any directory:
+	$ /path/to/copyright.py
+
+	Recursively scans files in the current working directory and
+	subdirectories, prompting for whether copyright information
+	should be added.  If the script does not recognize the file type,
+	it prompts the user to select one of the known types, and "skip"
+	is a valid choice if the correct one cannot be determined.
+
+	N.B: This invocation example allows processing of standalone
+        OSPs, component library projects, "ie-gui", etc.
+
+    (2) From any directory:
+        $ /path/to/copyright.py [file_or_dir [file_or_dir] [...]]
+
+	As above, but limits the scanning to the specified files and/or
+	directories.
+
+    (3) From any directory:
+	$ /path/to/copyright.py -v [file_or_dir [file_or_dir] [...]]
+
+	The "-v" ("--verify") option with optional files and/or directories
+	basically does what "check_copyright.sh" does, but without whitelist
+	processing.  Results are not printed to the screen: refer to the
+	"copyright.log" file generated in the current working directory.
+
+	Recommendation: don't do this.  If you want to scan files for
+	copyright info, use the "check_copyright.sh" script.  It's quick
+	and efficient.
+
+whitelist:
+    Used only by "check_copyright.sh".  Files in "whitelist" are specified
+    relative to the opencpi root directory, and are ignored by the scanner.
+    See the file for examples.
