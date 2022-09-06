@@ -45,6 +45,13 @@ Build Configuration Notes:
     <parameter name='R' value='16'/>
     <parameter name='ACC_WIDTH' value='28'/>
   </configuration>
+<!--
+  These configurations are included for now for all builds
+  and selectivly removed in the unit test xml file until
+  the framework worker build xml file supports the ability to
+  selectively build specific configurations for specific platforms.
+  In these cases, build only for hardware platforms, not simulation platforms.
+
   <configuration id='6'>
     <parameter name='N' value='3'/>
     <parameter name='M' value='1'/>
@@ -64,13 +71,7 @@ Build Configuration Notes:
     <parameter name='ACC_WIDTH' value='60'/>
   </configuration>
 
-<!--
-  These configurations are included for now for all builds
-  and selectivly removed in the unit test xml file until
-  the framework worker build xml file supports the ability to
-  selectively build specific configurations for specific platforms.
-  In these cases, build only for hardware platforms, not simulation platforms.
--->
+
   <configuration id='9'>
     <parameter name='N' value='3'/>
     <parameter name='M' value='1'/>
@@ -95,5 +96,5 @@ Build Configuration Notes:
     <parameter name='R' value='8192'/>
     <parameter name='ACC_WIDTH' value='58'/>
   </configuration>
-
+-->
 </build>
