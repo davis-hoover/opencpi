@@ -5,53 +5,46 @@ OCPIDRIVER(1)
 NAME
 ----
 ocpidriver - command-line utility for managing the OpenCPI
-loadable Linux kernel module driver
+loadable OpenCPI Linux kernel driver module
 
 
 SYNOPSIS
 --------
 *`ocpidriver`* '<verb>'
 
-
 DESCRIPTION
 -----------
-The *`ocpidriver(1)`* tool controls the OpenCPI Linux kernel module driver
-on an 'OpenCPI system':
-a collection of processors that can be used together as resources for
-running OpenCPI applications. Whether or not the Linux kernel module
-driver is required depends on the 'platforms' (processors and their
-directly-connected hardware) enabled for use by OpenCPI during
-application execution and the 'interconnect' technology that wires them
-together: the driver is necessary for access by OpenCPI to platforms
-connected to a system bus (such as PCI-Express or
-the Zynq FPGA subsystem) but is not needed on systems that do
-not have such a bus or fabric. Developers use the *`ocpidriver`* tool
-to load and control the driver when it is required for running OpenCPI on a system.
+The *`ocpidriver(1)`* tool controls the OpenCPI Linux kernel device driver
+module on an 'OpenCPI system': a collection of processors that can be used together
+as resources for running OpenCPI applications. Systems with platforms
+connected to a system bus, such as PCI Express or the Xilinx Zynq AXI
+interfaces between the CPU (PS) and the FPGA (PL) parts of the SoC,
+require the device driver when the bus or fabric is used for communication
+between the host CPU platform and another platform.  Systems that do not
+require this type of communication do not need the driver. See the section
+on the OpenCPI Linux kernel device driver in the *OpenCPI User Guide* for details.
+The *`ocpidriver`* tool is used to load and control the driver
+when it is required for platform communication on a system.
 
-The OpenCPI Linux kernel module driver uses DMA memory for communication
-with platforms via the system bus. By default, Linux allocates
-128KB of DMA memory for the OpenCPI Linux kernel module driver.
-The OpenCPI "getting started guides" for the relevant platforms
-attached to the system bus (for example,
-the 'ML605 Getting Started Guide' and the 'Alst4 Getting Started Guide')
-describe how to reserve additional DMA memory for the driver
-when OpenCPI applications require it.
+Some systems and kernels support the "Secure Boot" feature.
+If the OpenCPI Linux kernel device driver is needed for these
+systems, be sure to disable the "Secure Boot" feature if it has been enabled.
 
 VERBS
 -----
 The verbs supported by *`ocpidriver`* are:
 
 *`load`*::
-    Load an OpenCPI Linux kernel module driver to a system.
+    Load an OpenCPI Linux kernel device driver to a system.
     
 *`reload`*::
-    Remove an OpenCPI Linux kernel module driver from a system and then load it.
+    Remove an OpenCPI Linux kernel device driver from a system and then load it.
 
 *`status`*::
-    Get the status of an OpenCPI Linux kernel module driver on a system.
+    Get the status of an OpenCPI Linux kernel device driver on a system.
 
 *`unload`*::
-    Remove an OpenCPI Linux kernel module driver from a system.
+    Remove an OpenCPI Linux kernel device driver from a system.
 
 Performing these operations requires *`root`*/*`sudo`* privileges.
 
@@ -65,8 +58,8 @@ None.
 
 EXAMPLES
 --------
-. Using the *`root`* account, load the OpenCPI Linux kernel module driver
-on a system that has the Altera Stratix IV (*`alst4`*) and Xilinx (*`ml605`*) PCI-Express
+. Using the *`root`* account, load the OpenCPI Linux kernel device driver
+on a system that has the Intel/Altera Stratix IV (*`alst4`*) and Xilinx (*`ml605`*) PCI Express
 platforms installed and which has reserved an additional 128KB of DMA memory for the driver:
 +
 ---------------
@@ -97,7 +90,7 @@ Available containers:
    2  rcc   centos7    linux c7           x86_64 rcc0
 -------------------------------------------------------
 +
-. Unload the OpenCPI Linux kernel module driver:
+. Unload the OpenCPI Linux kernel device driver:
 +
 ------------------
 ocpidriver unload
@@ -129,12 +122,8 @@ link:ocpirun.1.html[ocpirun(1)]
 
 COPYING
 -------
-Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2022 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your
 option) any later version.
-
-
-
-

@@ -84,6 +84,12 @@ the following options can be specified for the *`install`* verb only:
     Specifies a minimized installation process that does not pre-build HDL workers or run
     any installation tests.
 
+*`--no-kernel`*::
+    Specifies to skip building the OpenCPI Linux kernel device driver
+    when the OpenCPI framework is built for the platform. Use this option
+    when secure boot is required for the system or the driver is otherwise
+    not required.
+
 *`--optimize`*::
     For RCC (software) platforms only, specifies that the framework software and software workers
     should be built with optimization enabled.
@@ -207,6 +213,7 @@ link:ocpidev.1.html[ocpidev(1)]
 link:ocpidev-platform.1.html[ocpidev-platform(1)]
 link:ocpidev-project.1.html[ocpidev-project(1)]
 link:ocpidev-worker.1.html[ocpidev-worker(1)]
+link:ocpidriver.1.html[ocpidriver(1)]
 link:opencpi.1.html[opencpi(1)]
 
 COPYING
