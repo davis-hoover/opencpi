@@ -164,7 +164,8 @@ emitPortSignalsDir(FILE *f, bool output, const char *indent, bool &any, std::str
 	  OU::format(myindex, "(%zu)", n);
 	std::string otherName = conn;
 	if (other) {
-	  if (other->m_instPort.m_port->count() > count() || m_arrayCount)
+	  Port &otherPort = *other->m_instPort.m_port;
+	  if (otherPort.count() > count() || m_arrayCount || otherPort.m_arrayCount)
 	    OU::formatAdd(otherName, "(%zu)", n + other->m_index);
 	  OU::formatAdd(otherName, ".%s", (*si)->m_name.c_str());
 	} else
