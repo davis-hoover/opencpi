@@ -897,38 +897,47 @@ emitXmlConnections(FILE *f) {
   // The only internal data connections in a container might be between
   // an adapter and a device worker or conceivably between two adapters.
   emitInternalConnections(f, "c");
-  // What is left is data connections that go through the container to the app.
+  // What is left is data connections that go through the container.
   // 1. pf config to container (e.g. to an adapter in the container).
   // 2. pf config to app (e.g. to a dev wkr in the pf config)
   // 3. container to app (e.g. a dev wkr or adapter in the container)
+  // 4. pf config to pf config (e.g. two dev workers in the pfconfig)
   for (ConnectionsIter cci = m_assembly->m_connections.begin();
        cci != m_assembly->m_connections.end(); cci++) {
     Connection &cc = **cci;
     if (cc.m_attachments.front()->m_instPort.m_port->isData()) {
-      InstancePort *ap = NULL, *pp = NULL, *ip = NULL; // instance ports for the app, for pf, for internal
+      InstancePort *producer = NULL, *consumer = NULL;
+      char producerChar, consumerChar;
       for (AttachmentsIter ai = cc.m_attachments.begin(); ai != cc.m_attachments.end(); ai++) {
 	Attachment &a = **ai;
-	(!strcasecmp(a.m_instPort.m_port->worker().m_implName, m_appAssembly.m_implName) ? ap :
-	 !strcasecmp(a.m_instPort.m_port->worker().m_implName, m_config.m_implName) ? pp : ip)
-	  = &a.m_instPort;
+	InstancePort *ip;
+	char c;
+	if (!strcasecmp(a.m_instPort.m_port->worker().m_implName, m_appAssembly.m_implName)) {
+	  c = 'a';
+	  ip = m_appAssembly.m_assembly->findInstancePort(a.m_instPort.m_port->pname());
+	} else if (!strcasecmp(a.m_instPort.m_port->worker().m_implName, m_config.m_implName)) {
+	  c = 'p';
+	  ip = m_config.m_assembly->findInstancePort(a.m_instPort.m_port->pname());
+	} else {
+	  c = 'c';
+	  ip = &a.m_instPort;
+	}
+	if (a.m_instPort.m_port->isDataProducer()) {
+	  assert(!producer);
+	  producer = ip;
+	  producerChar = c;
+	} else {
+	  assert(!consumer);
+	  consumer = ip;
+	  consumerChar = c;
+	}
       }
-      assert(ap || pp || ip);
-      if (!ap && !pp)
-	continue; // internal connection already dealt with
-      // find the corresponding instport inside each side.
-      InstancePort
-	*aap = ap ? m_appAssembly.m_assembly->findInstancePort(ap->m_port->pname()) : NULL,
-        *ppp = pp ? m_config.m_assembly->findInstancePort(pp->m_port->pname()) : NULL,
-	*producer = (aap && aap->m_port->isDataProducer() ? aap :
-		     ppp && ppp->m_port->isDataProducer() ? ppp : ip),
-	*consumer = (aap && !aap->m_port->isDataProducer() ? aap :
-		     ppp && !ppp->m_port->isDataProducer() ? ppp : ip);
-      // Application is producing to an external consumer
-      fprintf(f, "<connection from=\"%s/%s\" out=\"%s\" to=\"%s/%s\" in=\"%s\"/>\n",
-	      producer == ip ? "c" : producer == aap ? "a" : "p",
-	      producer->m_instance->cname(), producer->m_port->pname(),
-	      consumer == ip ? "c" : consumer == aap ? "a" : "p",
-	      consumer->m_instance->cname(), consumer->m_port->pname());
+      assert(producer && consumer);
+      if (consumerChar == 'c' && producerChar == 'c')
+	continue; // internal connection in the container already dealt with
+      fprintf(f, "<connection from=\"%c/%s\" out=\"%s\" to=\"%c/%s\" in=\"%s\"/>\n",
+	      producerChar, producer->m_instance->cname(), producer->m_port->pname(),
+	      consumerChar, consumer->m_instance->cname(), consumer->m_port->pname());
     }
   }
 }
