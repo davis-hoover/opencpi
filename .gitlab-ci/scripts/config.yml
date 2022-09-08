@@ -117,6 +117,13 @@ zcu104:
   do_hwil: True
   do_ocpiremote: True
   port: 1000
+zcu111:
+  ip: 10.1.0.220 # deprecated
+  do_hwil: True
+  do_ocpiremote: True
+  port: 1000
+  variables:
+    OCPI_XILINX_LICENSE_FILE: '2101@sembach.opencpi.net'  
 zed:
   ip: 10.1.0.242 # deprecated
   do_hwil: True
