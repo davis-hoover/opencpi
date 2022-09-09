@@ -108,6 +108,7 @@ addDevInstance(const Device &dev, const Card *card, const Slot *slot,
   return err;
 }
 
+// Device names can include slashes to indicate a slot/card/device or card/device
 const char *HdlHasDevInstances::
 parseDevInstance(const char *device, ezxml_t x, const char *parentFile, Worker *parent,
 		 bool control, DevInstances *baseInstances, const DevInstance **result,
@@ -122,6 +123,24 @@ parseDevInstance(const char *device, ezxml_t x, const char *parentFile, Worker *
   if (OE::getOptionalString(x, s, "card") &&
       !(card = Card::get(s.c_str(), parentFile, parent, err)))
     return err;
+  const char *slash = strchr(device, '/'); // slot/card/dev or card/dev
+  if (slash) {
+    if (card || slot)
+      return OU::esprintf("Cannot specify a card or slot attribute when device name has slashes: "
+			  "\"%s\"", device);
+    const char *slash2 = strchr(slash + 1, '/');
+    if (slash2) {
+      s.assign(device, OCPI_SIZE_T_DIFF(slash, device));
+      if (!(slot = m_platform.findSlot(s.c_str(), err)))
+	return err;
+      device = slash + 1;
+      slash = slash2;
+    }
+    s.assign(device, OCPI_SIZE_T_DIFF(slash, device));
+    if (!(card = Card::get(s.c_str(), parentFile, parent, err)))
+      return err;
+    device = slash + 1;
+  }
   // Card and slots have been checked individually)
   if (slot) {
     const Card *plug = m_plugged[slot->m_ordinal];
@@ -292,7 +311,7 @@ parseDevInstances(ezxml_t xml, const char *parentFile, Worker *parent,
   // we auto-instantiate devices that support the ones we have
   for (DevInstancesIter dii = m_devInstances.begin(); dii != m_devInstances.end(); dii++) {
     const DevInstance &di = *dii;
-    // See which (sub)devices on the same board support this added device, 
+    // See which (sub)devices on the same board support this added device,
     // and make sure they are present.
     const Board &bd =
       di.card ? static_cast<const Board&>(*di.card) : static_cast<const Board&>(m_platform);
@@ -311,97 +330,99 @@ parseDevInstances(ezxml_t xml, const char *parentFile, Worker *parent,
   return NULL;
 }
 
+// For a device instance and another existing instance that may be a subdevice supporting it,
+// emit any appropriate connections
+static void
+emitSubdeviceInstanceConnections(std::string &assy, const DevInstance &devInstance,
+				 const DevInstance &subInstance, bool inConfig) {
+  const Device
+    &d = devInstance.device,
+    &s = subInstance.device;
+  unsigned n = 0;
+  for (auto si = s.m_deviceType.m_supports.begin(); si != s.m_deviceType.m_supports.end();
+       ++si, ++n) {
+    const Support &sup = *si;
+    if (strcasecmp(sup.m_type.m_implName, d.m_deviceType.m_implName))
+      continue;
+    // The device type of this supports element matches the device type of the
+    // devinstance (di).  Now we see if it is for this PARTICULAR devinstance.
+    // If there are no mapping entries, then we use the implicit ordinal of the
+    // supports element among supports elements for that device type
+    if (s.m_supportsMap.empty()) {
+      auto pair = s.m_deviceType.m_countPerSupportedWorkerType.find(d.m_deviceType.m_implName);
+      // Here we know:
+      // 1. how many of this type this subdevice supports:  pair.second
+      //    i.e. how many <supports> elements refer to the same worker
+      // 2. which of that number is *this* <supports> relationship: sup->m_ordinal
+      // 3. what is the ordinal of this subdevice on platform/card: s.m_ordinal
+      // 4. what is the ordinal of the device we might be supporting: d.m_ordinal
+      if (s.m_ordinal * pair->second + sup.m_ordinal != d.m_ordinal)
+	continue;
+    } else if (s.m_supportsMap[n] != &d)
+      continue;
+    // So this subdevice *instance* does support this device *instance*
+    for (auto sci = sup.m_connections.begin(); sci != sup.m_connections.end(); sci++) {
+      Port &supPort = *(*sci).m_sup_port;
+      // A port connection between the supporting device and this device instance (*dii)
+      OU::formatAdd(assy,
+		    "  <connection>\n"
+		    "    <port instance='%s' name='%s'/>\n"
+		    "    <port instance='%s' name='%s%s%s'",
+		    devInstance.cname(), (*sci).m_port->pname(),
+		    inConfig ? "pfconfig" : subInstance.cname(),
+		    inConfig ? subInstance.cname() : "", inConfig ? "_" : "",
+		    supPort.pname());
+      // If this <connect> element expresses an index, make sure to account for
+      size_t supOrdinal = supPort.m_ordinal;
+      if ((*sci).m_indexed) { // <supports><connect> connection has an index
+	size_t
+	  supIndex = (*sci).m_index,
+	  unconnected = 0,
+	  index = supIndex;
+	if (inConfig) {
+	  // If we are in a container and the subdevice is in the config,
+	  // we may need to index relative to what is NOT connected in the config,
+	  // and thus externalized.
+	  // We ASSUME that the indices in the config are contiguous and start at 0
+	  // FIXME:  remove this constraint
+	  for (size_t i = 0; i < supPort.count(); i++)
+	    if (subInstance.m_connected[supOrdinal] & (1u << i)) {
+	      assert(i != supIndex);
+	      if (i < supIndex)
+		index--;
+	    } else
+	      unconnected++; // count how many were unconnected in the config
+	  assert(unconnected > 0 && index < unconnected);
+	} else // the subdevice is where the device is, so record the connection
+	  subInstance.m_connected[supOrdinal] |= 1u << supIndex;
+	OU::formatAdd(assy, " index='%zu'", index);
+      } else if (!inConfig) {
+	// supporting connection is not indexed, and is local,which means it is connected whole
+	uint64_t mask = ~(UINT64_MAX << supPort.count());
+	assert(!(subInstance.m_connected[supOrdinal] & mask));
+	subInstance.m_connected[supOrdinal] |= mask;
+	assert(supPort.count() == (*sci).m_port->count());
+	devInstance.m_connected[(*sci).m_port->m_ordinal] |= mask;
+      }
+      OU::formatAdd(assy,
+		    "/>\n"
+		    "  </connection>\n");
+    }
+  }
+}
+// For all device instances in this assembly (container or config),
+// emit all the "supports" connections.
 void HdlHasDevInstances::
 emitSubdeviceConnections(std::string &assy,  DevInstances *baseInstances) {
   // Connect top down.  For any device that is supported, connect to the support modules
   for (DevInstancesIter dii = m_devInstances.begin(); dii != m_devInstances.end(); dii++) {
-    const Device &d = (*dii).device;
-    // Search for other instances that support this device instance
-    for (DevInstancesIter sii = m_devInstances.begin(); sii != m_devInstances.end(); sii++) {
-      bool inConfig;
-      const Device &s = (*sii).device;
-      const DevInstance *sdi = NULL;
-      const Support *sup = NULL;
-      if (&*sii != &*dii) {
-	unsigned n = 0;
-	for (auto si = s.m_deviceType.m_supports.begin();
-	     si != s.m_deviceType.m_supports.end(); ++si, ++n) {
-	  if (strcasecmp((*si).m_type.m_implName, d.m_deviceType.m_implName))
-	    continue;
-	  // The device type of this supports element matches the device type of the
-	  // devinstance (*dii).  Now we see if it is for this PARTICULAR devinstance.
-	  // If there are no mapping entries, then we use the implicit ordinal of the
-	  // supports element among supports elements for that device type
-	  if (s.m_supportsMap.empty()) {
-	    auto pair = s.m_deviceType.m_countPerSupportedWorkerType.find(d.m_deviceType.m_implName);
-	    // Here we know:
-	    // 1. how many of this type this subdevice supports:  pair.second
-            //    i.e. how many <supports> elements refer to the same worker
-	    // 2. which of that number is *this* <supports> relationship: sup->m_ordinal
-	    // 3. what is the ordinal of this subdevice on platform/card: s.m_ordinal
-	    // 4. what is the ordinal of the device we might be supporting: d.m_ordinal
-	    if (s.m_ordinal * pair->second + (*si).m_ordinal != d.m_ordinal)
-	      continue;
-	  } else if (s.m_supportsMap[n] != &d)
-	    continue;
-	  // Find whether it is in the platform config or not.
-	  sdi = findDevInstance(s, (*dii).card, (*dii).slot, baseInstances, &inConfig);
-	  assert(sdi);
-	  sup = &*si;
-	  break;
-	}
-      }
-      if (!sup)
-	continue; // this (sub)dev instance does not support this device;
-      for (SupportConnectionsIter sci = sup->m_connections.begin();
-	   sci != sup->m_connections.end(); sci++) {
-	Port &supPort = *(*sci).m_sup_port;
-	// A port connection between the supporting device and this device instance (*dii)
-	OU::formatAdd(assy,
-		      "  <connection>\n"
-		      "    <port instance='%s' name='%s'/>\n"
-		      "    <port instance='%s' name='%s%s%s'",
-		      (*dii).cname(), (*sci).m_port->pname(),
-		      inConfig ? "pfconfig" : sdi->cname(),
-		      inConfig ? sdi->cname() : "", inConfig ? "_" : "",
-		      supPort.pname());
-	// If this <connect> element expresses an index, make sure to account for
-	size_t supOrdinal = supPort.m_ordinal;
-	if ((*sci).m_indexed) { // <supports><connect> connection has an index
-	  size_t
-	    supIndex = (*sci).m_index,
-	    unconnected = 0,
-	    index = supIndex;
-	  if (inConfig) { // 
-	    // If we are in a container and the subdevice is in the config,
-	    // we may need to index relative to what is NOT connected in the config,
-	    // and thus externalized.
-	    // We ASSUME that the indices in the config are contiguous and start at 0
-	    // FIXME:  remove this constraint
-	    for (size_t i = 0; i < supPort.count(); i++)
-	      if (sdi->m_connected[supOrdinal] & (1u << i)) {
-		assert(i != supIndex);
-		if (i < supIndex)
-		  index--;
-	      } else
-		unconnected++; // count how many were unconnected in the config
-	    assert(unconnected > 0 && index < unconnected);
-	  } else // the subdevice is where the device is, so record the connection
-	    sdi->m_connected[supOrdinal] |= 1u << supIndex;
-	  OU::formatAdd(assy, " index='%zu'", index);
-	} else if (!inConfig) {
-	  // supporting connection is not indexed, and is local,which means it is connected whole
-	  uint64_t mask = ~(UINT64_MAX << supPort.count());
-	  assert(!(sdi->m_connected[supOrdinal] & mask));
-	  sdi->m_connected[supOrdinal] |= mask;
-	  assert(supPort.count() == (*sci).m_port->count());
-          (*dii).m_connected[(*sci).m_port->m_ordinal] |= mask;
-	}
-	OU::formatAdd(assy,
-		      "/>\n"
-		      "  </connection>\n");
-      }
-    }
+    if (baseInstances)
+      for (auto sii = baseInstances->begin(); sii != baseInstances->end(); sii++)
+	if (&*sii != &*dii)
+	  emitSubdeviceInstanceConnections(assy, *dii, *sii, true);
+    for (auto sii = m_devInstances.begin(); sii != m_devInstances.end(); sii++)
+      if (&*sii != &*dii)
+	emitSubdeviceInstanceConnections(assy, *dii, *sii, false);
   }
 }
 
@@ -425,27 +446,6 @@ create(ezxml_t xml, const char *knownPlatform, const char *xfile, const std::str
 	return NULL;
     }
   }
-#if 0
-    else {
-      const char *slash = xfile ? strrchr(xfile, '/') : NULL;
-      if (slash) {
-	std::string pfdir(xfile, slash - xfile);
-	const char *sl2 = strrchr(pfdir.c_str(), '/');
-	if (sl2)
-	  if (!strcmp(sl2 + 1, "gen")) {
-	    pfdir.resize(sl2 - pfdir.c_str());
-	    sl2 = strrchr(pfdir.c_str(), '/');
-	    myPlatform = sl2 ? sl2 + 1 : pfdir.c_str();
-	    myPlatform += "/";
-	    myPlatform += sl2 ? sl2 + 1 : pfdir.c_str();
-	  } else
-	    myPlatform = sl2 + 1;
-      } else {
-	err = "No platform specified in HdlConfig nor on command line";
-	return NULL;
-      }
-    }
-#endif
   std::string pfile;
   ezxml_t pxml;
   HdlPlatform *pf;
@@ -652,16 +652,6 @@ addControlConnection(std::string &assy) {
   const char *cpInstanceName = NULL, *cpPortName = NULL;
   unsigned nCpPorts = 0;
   bool multiple = false;
-#if 0 // platform is not just a device
-  for (PortsIter pi = m_platform.m_ports.begin(); pi != m_platform.m_ports.end(); pi++)
-    if ((*pi)->type == CPPort) {
-      cpInstanceName = m_platform.cname();
-      cpPortName = (*pi)->pname();
-      if (m_platform.m_control)
-	nCpPorts++;
-      break;
-    }
-#endif
   for (DevInstancesIter dii = m_devInstances.begin(); dii != m_devInstances.end(); dii++) {
     const ::Device &d = (*dii).device;
     for (PortsIter pi = d.m_deviceType.ports().begin(); pi != d.m_deviceType.ports().end(); pi++)
@@ -674,7 +664,7 @@ addControlConnection(std::string &assy) {
 	}
 	if ((*dii).m_control)
 	  nCpPorts++;
-      }  
+      }
   }
   if (multiple)
     if (nCpPorts  > 1)

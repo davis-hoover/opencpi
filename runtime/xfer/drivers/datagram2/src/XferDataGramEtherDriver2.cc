@@ -18,6 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef OCPI_OS_linux
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
@@ -1187,3 +1188,4 @@ static std::string hexdump(uint8_t *data, size_t length, size_t max) {
 } // namespace Ether2
 } // namespace Xfer
 } // namespace OCPI
+#endif

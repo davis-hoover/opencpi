@@ -141,7 +141,7 @@ copy(Offset srcoffs, Offset dstoffs, size_t nbytes, XferRequest::Flags flags) {
   //   - improve the VHDL to accept unaligned transfers
   //   - add an endpoint negotation where the alignment is determined based on requirements
   // ***********************************************************************************************
-  maxpl &= ~0xf;
+  maxpl &= ~0xfu;
 
   ocpiDebug("DGRAM: MAXPL: %zu", maxpl);
   if (!init())
@@ -446,7 +446,7 @@ processFrame(FrameHeader *header) {
     m_acks.push_back(header->frameSeq); // retransmnit ack
     return;
   }
-  for (unsigned i = 0; i < header->ACKCount; i++) {
+  for (uint16_t i = 0; i < header->ACKCount; i++) {
     uint16_t seq = header->ACKStart + i;
     Frame &f = m_freeFrames[seq & (MAX_FRAME_HISTORY-1)];
     if (!f.is_free && f.frameHdr.frameSeq == seq)
