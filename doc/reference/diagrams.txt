@@ -1,3 +1,7 @@
+Note: the information in this file is for older versions of PowerPoint and LibreOffice.
+See the document OpenCPI_Documentation_Writer_Guide.fodt for the latest instructions
+on working with PowerPoint diagrams.
+
 This note defines how to use diagrams drawn in PowerPoint as diagrams in the OpenCPI
 LibreOffice ODT documents.
 
