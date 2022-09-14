@@ -146,7 +146,7 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
         dictionary["other_interfaces"] = {} # needed ?
         dictionary["signals"] = {}
         dictionary["ports"] = {} # needed?
-        for port in self._xml_root.iter("port"):
+        for port in self._xml_root.findall("port"):
             # Get all port attributes
             port_dict={}
             for key, value in port.items():

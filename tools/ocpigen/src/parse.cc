@@ -34,11 +34,11 @@
 #include "UtilEzxml.hh"
 #include "MetadataAssembly.hh"
 #include "UtilCppMacros.hh"
-#include "wip.h"
-#include "hdl.h"
-#include "rcc.h"
-#include "hdl-platform.h"
-#include "hdl-container.h"
+#include "wip.hh"
+#include "hdl.hh"
+#include "rcc.hh"
+#include "hdl-platform.hh"
+#include "hdl-container.hh"
 /*
  * Todo:
  *  property values in assembly instances?
@@ -1110,7 +1110,7 @@ Worker(ezxml_t xml, const char *xfile, const std::string &parentFile,
     m_endian(NoEndian), m_needsEndian(false), m_pattern(NULL), m_portPattern(NULL),
     m_staticPattern(NULL), m_defaultDataWidth(SIZE_MAX), m_language(NoLanguage), m_assembly(NULL),
     m_emulate(NULL), m_emulator(NULL), m_library(NULL), m_outer(false),
-    m_debugProp(NULL), m_mkFile(NULL), m_xmlFile(NULL), m_outDir(NULL), m_build(*this),
+    m_debugProp(NULL), m_mkFile(NULL), m_xmlFile(NULL), m_outDir(NULL), m_autoConfigs(false), m_build(*this),
     m_paramConfig(NULL), m_parent(parent), m_scalable(false), m_requiredWorkGroupSize(0),
     m_maxLevel(0), m_dynamic(false), m_optimized(false), m_isSlave(false), m_isOptional(false),
     m_slavePort(NULL), m_proxyPort(NULL), m_proxyPortIndex(SIZE_MAX)
