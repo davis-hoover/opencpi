@@ -1,7 +1,7 @@
 // methods about clocks, including methods of the Clock class itself.
 
-#include "wip.h"
-#include "clock.h"
+#include "wip.hh"
+#include "clock.hh"
 
 const char *Worker::
 parseClocks() {

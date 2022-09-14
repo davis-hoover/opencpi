@@ -20,9 +20,9 @@
 
 #include <assert.h>
 #include "UtilMisc.hh"
-#include "ocp.h"
-#include "hdl.h"
-#include "assembly.h"
+#include "ocp.hh"
+#include "hdl.hh"
+#include "assembly.hh"
 
 #undef OCP_SIGNAL_MT
 #define OCP_SIGNAL_MT(n, w) {#n, true, true, w, true, false, OCP_##n},

@@ -25,8 +25,8 @@
 #include "OsFileSystem.hh"
 #include "BasePluginManager.hh"
 #include "LibraryManager.hh"
-#include "wip.h"
-#include "hdl-container.h"
+#include "wip.hh"
+#include "hdl-container.hh"
 /*
  * Notes:  For verilog, for consistency, we generate a module definition that is "included"
  * in the skeleton file so it is readonly, and can be regenerated after there is code added

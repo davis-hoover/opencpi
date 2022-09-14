@@ -20,7 +20,7 @@
 
 #ifndef CLOCK_H
 #define CLOCK_H
-#include "ocpigen.h"
+#include "ocpigen.hh"
 
 struct Clock {
   Worker &m_worker;

@@ -24,11 +24,11 @@
 #include <strings.h>
 #include <fnmatch.h>
 #include "OsFileSystem.hh"
-#include "parameters.h"
-#include "wip.h"
-#include "hdl.h"
-#include "hdl-device.h"
-#include "assembly.h"
+#include "parameters.hh"
+#include "wip.hh"
+#include "hdl.hh"
+#include "hdl-device.hh"
+#include "assembly.hh"
 
 const char *Worker::
 addParamConfigSuffix(std::string &s) {
@@ -1025,7 +1025,7 @@ writeAutoBuildFile(const char *file, ParamConfigs &paramConfigs, size_t low) {
     for (size_t nn = 0; nn < pc->params.size(); ++nn) {
       Param &p = pc->params[nn];
       if (!p.m_isDefault)
-	OE::addChild(cx, "parameter", 2, NULL, "name", p.m_name.c_str(), "value", p.m_uValue.c_str());
+	OE::addChild(cx, "parameter", 2, NULL, "name", p.m_param->cname(), "value", p.m_uValue.c_str());
     }
   }
   const char *test = ezxml_toxml(root);
@@ -1115,7 +1115,9 @@ setParamConfig(const OM::Assembly::Properties *instancePVs, size_t paramConfig,
   ezxml_t xml;
   size_t staticSize = m_paramConfigs.size();
   std::string fname;
-  if (!(err = autoBuildFile(m_file.c_str(), parent, m_implName, fname, xml)) && xml) {
+  if (!m_autoConfigs &&
+      !(err = autoBuildFile(m_file.c_str(), parent, m_implName, fname, xml)) && xml) {
+    m_autoConfigs = true; // avoid parsing this twice
     size_t id = staticSize;
     for (ezxml_t cx = ezxml_cchild(xml, "configuration"); cx; cx = ezxml_cnext(cx), ++id) {
       ParamConfig *pc = new ParamConfig(*this);

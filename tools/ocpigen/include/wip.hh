@@ -36,11 +36,11 @@
 #include "MetadataAssembly.hh"
 #include "OcpiUuid.h"
 #include "ezxml.h"
-#include "cdkutils.h"
-#include "parameters.h"
-#include "port.h"
-#include "ocp.h"
-#include "clock.h"
+#include "cdkutils.hh"
+#include "parameters.hh"
+#include "port.hh"
+#include "ocp.hh"
+#include "clock.hh"
 
 class Port;
 
@@ -402,6 +402,7 @@ class Worker : public OM::Worker {
   FILE *m_mkFile, *m_xmlFile;       // state during parameter processing
   const char *m_outDir;             // state during parameter processing
   ParamConfigs m_paramConfigs;      // the parsed file of all configs
+  bool m_autoConfigs;               // has the auto-config file been found and parsed already?
   Build m_build;                    // build info not needed for code gen or artifact
   ParamConfig  *m_paramConfig;      // the config for this Worker.
   Worker *m_parent;           // If this worker is part of an upper level assembly

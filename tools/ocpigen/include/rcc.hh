@@ -20,8 +20,8 @@
 
 #ifndef RCC_H
 #define RCC_H
-#include "wip.h"
-#include "data.h"
+#include "wip.hh"
+#include "data.hh"
 
 // These are for implementaitons that you write (e.g. not generated assemblies)
 #define RCC_IMPL_ATTRS IMPL_ATTRS, \

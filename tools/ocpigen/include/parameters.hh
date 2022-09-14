@@ -26,8 +26,8 @@
 #include <unordered_set>
 #include "BaseValue.hh"
 #include "MetadataProperty.hh"
-#include "cdkutils.h"
-#include "ocpigen.h"
+#include "cdkutils.hh"
+#include "ocpigen.hh"
 
 // These structures capture what is in or will be put in
 // the build configuration file.

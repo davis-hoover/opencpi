@@ -23,7 +23,7 @@
 
 #include "MetadataPort.hh"
 #include "MetadataAssembly.hh"
-#include "ocp.h"
+#include "ocp.hh"
 
 #define SPEC_DATA_PORT_ATTRS \
   "Name", "Producer", "Count", "Optional", "Protocol", "buffersize", \

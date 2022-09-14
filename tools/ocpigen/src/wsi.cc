@@ -19,8 +19,8 @@
  */
 
 #include <algorithm>
-#include "data.h"
-#include "hdl.h"
+#include "data.hh"
+#include "hdl.hh"
 
 WsiPort::
 WsiPort(Worker &w, ezxml_t x, DataPort *sp, int ordinal, const char *&err)

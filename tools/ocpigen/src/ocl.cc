@@ -30,10 +30,10 @@
 #include "UtilCppMacros.hh"
 #include "MetadataWorker.hh"
 #include "UtilMisc.hh"
-#include "wip.h"
-#include "assembly.h"
-#include "data.h"
-#include "rcc.h"
+#include "wip.hh"
+#include "assembly.hh"
+#include "data.hh"
+#include "rcc.hh"
 
 // Generate the readonly implementation file.
 // What implementations must explicitly (verilog) or implicitly (VHDL) include.

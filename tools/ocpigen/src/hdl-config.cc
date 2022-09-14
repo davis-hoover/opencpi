@@ -22,9 +22,9 @@
 #include <stdint.h>
 #include "UtilMisc.hh"
 #include "UtilEzxml.hh"
-#include "assembly.h"
-#include "hdl-config.h"
-#include "hdl.h"
+#include "assembly.hh"
+#include "hdl-config.hh"
+#include "hdl.hh"
 
 DevInstance::
 DevInstance(const Device &d, const Card *c, const Slot *s, bool control,
