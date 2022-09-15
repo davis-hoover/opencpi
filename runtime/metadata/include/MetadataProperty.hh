@@ -81,6 +81,7 @@ namespace OCPI {
         m_isReadback,      // the (settable) property has a readback path for reading what was written
 	m_isIndirect,      // the property's address is not based on accumulating offsets
 	m_isBuiltin,       // the value is produced by infrastructure, not worker
+	m_isDefault,       // the parameter value is the OCS default value
 	// These below represent what was in the spec before potentially being modified by the OWD
 	// m_specReadable is for legacy/deprecatred only since it is not valid in specs
 	m_specParameter,   // AV-5137 these 4 members should be moved to a class that extends this one

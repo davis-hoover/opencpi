@@ -66,7 +66,7 @@ workersfile:
 	$(AT): # nothing - just suppress message
 speclinks:
 	$(AT)mkdir -p $(OutDir)lib
-	$(AT)$(foreach f,$(wildcard specs/*.xml *.comp/*-spec.xml),$(call MakeSymLink,$f,lib);)
+	$(AT)$(foreach f,$(wildcard specs/*.xml *.comp/*-comp.xml),$(call MakeSymLink,$f,lib);)
 else
 HdlInstallDir=lib
 include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk
@@ -266,7 +266,7 @@ xm: speclinks $(XmImplementations)
 
 rcc: speclinks $(RccImplementations)
 
-test: speclinks $(TestImplementations)
+test tests: speclinks $(TestImplementations)
 
 checkocl:
 	$(AT)if ! test -x $(ToolsDir)/ocpiocltest || ! $(ToolsDir)/ocpiocltest test; then echo Error: OpenCL is not available; exit 1; fi
@@ -331,141 +331,6 @@ $(AssyImplementations): | $(OutDir)lib/assy
 
 .PHONY: $(XmImplementations) $(RccImplementations) $(TestImplementations) $(OclImplementations) $(HdlImplementations) $(AssyImplementations) speclinks hdl
 
-# Worker should only be specified when the target is "new".
-ifeq ($(origin Device),command line)
-  ifdef Worker
-    $(error You can not set both the Worker and the Device variables.)
-  endif
-  Worker:=$(Device)
-else
-  ifdef Worker
-    ifneq ($(origin Worker),command line)
-      $(error Worker definition is invalid: it can only be on the command line with "new")
-    endif
-  endif
-endif
-ifdef Worker
-  ifneq ($(MAKECMDGOALS),new)
-    $(error You cannot set the "Worker" variable unless the make goal/target is "new")
-  endif
-  Words:=$(subst ., ,$(Worker))
-  $(if $(or $(word 3,$(Words)),$(strip \
-            $(if $(word 2,$(Words)),,ok))), \
-     $(error The Worker must be of the form "Worker=name.model"))
-  Model:=$(call ToLower,$(word 2,$(Words)))
-  ifeq ($(findstring $(Model),$(Models)),)
-    $(error The suffix of "$(Worker)", which is "$(Model)" does not match any known model.)
-  endif
-  ifneq ($(wildcard $(Worker)),)
-    $(error The worker "$(Worker)" already exists)
-  endif
-  Name:=$(word 1,$(Words))
-  UCModel=$(call ToUpper,$(Model))
-  ifeq ($(origin SpecFile),command line)
-    ifdef Emulate
-      $(error Cannot specify Emulate= variable with SpecFile);
-    endif
-    ifeq ($(SpecFile),none)
-      OcpiSpecFile:=
-    else
-      ifeq ($(filter %.xml,$(SpecFile)),)
-        override SpecFile:=$(SpecFile).xml
-      endif
-      ifeq ($(wildcard $(SpecFile)),)
-        ifneq ($(if $(filter /%,$(SpecFile)),,$(wildcard specs/$(SpecFile))),)
-          override SpecFile:=specs/$(SpecFile)
-        else
-          $(error The indicated spec file for the new worker: "$(SpecFile)" does not exist.)
-        endif
-      endif
-      ifneq ($(filter specs/$(Name)-spec.xml specs/$(Name)_spec.xml $(Name)-spec.xml $(Name)_spec.xml,$(SpecFile)),)
-        OcpiSpecFile:=$(notdir $(SpecFile))
-      else
-        ifeq ($(dir $(SpecFile)),specs/)
-          OcpiSpecFile:=$(notdir $(SpecFile))
-        else
-          ifeq ($(wildcard $(dir $(SpecFile))../lib/package-id),)
-            $(error The given spec file, "$(SpecFile)" must be in a built component library)
-          endif
-          OcpiSpecFile:=$(call AdjustRelative,$(SpecFile))
-        endif
-      endif
-    endif
-  else ifdef Emulate
-    ifeq ($(wildcard $(Emulate)),)
-      $(error There is no worker named '$(Emulate)' as specified in the Emulate variable.)
-    endif
-    ifndef Device
-      Device:=$(Worker)
-    endif
-    OcpiSpecFile:=emulator-spec
-  else
-    # the default will be using an underscore or hypen, whichever exists
-    MySpecFile:=$(or $(wildcard specs/$(Name)_spec.xml),specs/$(Name)-spec.xml)
-    ifeq ($(wildcard $(MySpecFile)),)
-      $(error The spec file: specs/$(Name)-spec.xml does not exist. Create it or use SpecFile=<file>)
-    endif
-    OcpiSpecFile:=$(notdir $(MySpecFile))
-  endif
-  OcpiLanguage:=
-  ifdef Language
-    OcpiLanguage:=$(call ToLower,$(Language))
-    ifndef Suffix_$(Model)_$(OcpiLanguage)
-      $(error Language "$(Language)" not supported for the $(Model) model.)
-    endif
-    ifeq ($(OcpiLanguage),$(Language_$(Model)))
-      ifeq ($(Languages_$(Model)),)
-        OcpiLanguage:=
-      endif
-    endif
-  else
-    ifeq ($(Languages_$(Model)),)
-      OcpiLanguage:=$(Language_$(Model))
-    else
-      $(error Must specify Language=<lang> for worker using the $(Model) model.  Choices are: $(Languages_$(Model)))
-    endif
-  endif
-  ifdef OcpiLanguage
-    LangAttr:=language="$(OcpiLanguage)"
-  endif
-else ifdef Worker
-  $(error Worker definition is invalid: it can only be on the command line with "new")
-endif
-
-# On creating a worker, the OWD is automatically generated here
-# if it has non-default content: a non-default spec file or
-# a non-default language.  Otherwise it is NOT created,
-# which means it acts like the skeleton does:
-# - A default version is created in the gen directory under "make skeleton"
-# - This version is copied up to the top level (like the code skeleton)
-# - This version is nuked upon make clean.
-
-new:
-	$(AT)$(if $(Worker),,\
-	       $(error The "Worker=" or "Device=" variable must be specified when "new" is specified.)) \
-	     echo Creating worker subdirectory named $(Worker).
-	$(AT)mkdir -p $(Worker) && \
-	     (\
-              echo \# Put Makefile customizations for worker $(Worker) here:; \
-              echo;\
-	      echo include '$$(OCPI_CDK_DIR)/include/worker.mk' \
-	     ) > $(Worker)/Makefile
-	$(AT)$(and $(OcpiSpecFile)$(OcpiLanguage)$(Device)$(Emulate), \
-	     (\
-	      echo '<$(if $(Device),HdlDevice,$(CapModel)Worker)$(and $(LangAttr),'' $(LangAttr))$(and $(OcpiSpecFile),'' spec="$(OcpiSpecFile)")$(and $(Emulate),'' emulate="$(Emulate)" spec="emulator")>'; \
-	      $(if $(OcpiSpecFile),,echo '  <componentspec$(and $(Emulate),'' nocontrol="1")/>';) \
-              echo '  <!-- Insert any other implementation-specific information here -->'; \
-              echo '</$(if $(Device),HdlDevice,$(CapModel)Worker)>' \
-	     ) > $(Worker)/$(Name).xml)
-	$(AT)echo Running \"make skeleton\" to make initial skeleton in $(Worker)/$(Name).$(Suffix_$(Model)_$(or $(OcpiLanguage),$(Language_$(Model))))
-	$(AT)$(MAKE) --no-print-directory -C $(Worker) \
-		OCPI_CDK_DIR=$(call AdjustRelative,$(OCPI_CDK_DIR)) \
-                XmlIncludeDirsInternal="$(call AdjustRelative,$(XmlIncludeDirs)) ../lib/hdl"\
-		Worker= Workers= \
-		skeleton; \
-	     if test $$? != 0; then echo You should probably do: rm -r -f $(Worker); fi
-
-
 cleanall:
 	$(AT)find . -depth -name gen -exec rm -r -f "{}" ";"
 	$(AT)find . -depth -name "target-*" -exec rm -r -f "{}" ";"
@@ -488,6 +353,14 @@ generate:
 	$(call BuildModel,ocl,generate)
 	$(call BuildModel,rcc,generate)
 	$(call BuildModel,test,generate)
+
+# In order to generate preprocessed XML from specs in a library (that are not in a *.comp directory),
+# we need a goal that does it, and respects the XML search rules for the library (and project)
+# The spec file is specified in the XmlFile variable
+# This is related to the XML goal in the xxx-worker.mk file
+xml:
+	@$(if $(XmlFile),,$(error missing XmlFile variable))\
+         $(if $(AT),,set -x;) $(OcpiGenEnv) ocpigen -G specs/$(XmlFile)
 
 # declare all HDL workers in the library
 # suppress all targets, mostly for printing what is going on

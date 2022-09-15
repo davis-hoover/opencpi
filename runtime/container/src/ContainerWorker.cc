@@ -621,7 +621,6 @@ namespace OCPI {
 	v.m_nTotal = m.m_nItems;
 	// Even though the "writer" below deals with this length, we need to precalculate
 	// The length of the marshalling buffer
-	size_t offset = mOffset;
 	if (m.m_isSequence) {
 	  uint32_t nElements;
 	  uint8_t *data = (uint8_t *)&nElements;
@@ -630,7 +629,6 @@ namespace OCPI {
 	    throw OU::Error("Worker's %s property has invalid sequence length: %zu",
 			    info.cname(), v.m_nElements);
 	  v.m_nTotal *= v.m_nElements;
-	  offset += m.m_align;
 	}
 	size_t nBytes = v.m_nTotal * m.m_elementBytes; // allow seq of zero items
 	if (nBytes) { // if its a zero-length sequence, we do nothing at all.

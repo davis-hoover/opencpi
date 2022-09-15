@@ -118,8 +118,9 @@ launch(Launcher::Members &instances, Launcher::Connections &connections) {
     }
     if (c.m_in.m_launcher == this && c.m_in.m_port && c.m_in.m_port->initialConnect(c))
       m_more = true;
-    if (c.m_out.m_launcher == this && c.m_out.m_port && !c.m_out.m_done &&
-	c.m_out.m_port->initialConnect(c))
+    // We cannot initialconnect outputs since our negotiation sequence currently
+    // requires inputs to go first.  It could be more symmetric, but not yet
+    if (c.m_out.m_launcher == this && c.m_out.m_port && !c.m_out.m_done)
       m_more = true;
   }
   return m_more;
@@ -155,10 +156,13 @@ work(Launcher::Members &instances, Launcher::Connections &connections) {
 	m_more = true;
     }
     if (c.m_out.m_port) {
-      if (c.m_in.m_initial.length() || c.m_in.m_final.length()) {
-	if (c.m_out.m_port->finalConnect(c))
+      if (c.m_in.m_initial.length()) {
+	if (c.m_out.m_port->initialConnect(c))
 	  m_more = true;
 	c.m_in.m_initial.clear();
+      } else if (c.m_in.m_final.length()) {
+	if (c.m_out.m_port->finalConnect(c))
+	  m_more = true;
 	c.m_in.m_final.clear();
       }
       if (!c.m_out.m_done)

@@ -50,6 +50,10 @@ ifeq ($(filter clean%,$(MAKECMDGOALS)),)
   endif
 endif
 
+# This echoing is to allow the AT= construct to work without polluting stdout
+xml:
+	@$(if $(AT),,set -x;) shopt -s nullglob; $(OcpiGenEnv) ocpigen -G *[-_]spec.xml *-comp.xml
+
 clean::
 	$(AT)rm -r -f $(GeneratedDir)
 all:

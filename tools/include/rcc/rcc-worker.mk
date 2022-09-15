@@ -225,9 +225,10 @@ $(call DispatchSourceFile,$1,$2): $$(ImplHeaderFiles) | $$(call WkrTargetDir,$1,
 	 ) > $$@
 
 $(call RccAssemblyFile,$1,$2): | $(call WkrTargetDir,$1,$2)
-	$(AT)(echo "<RccAssembly>"; \
-	  for w in $$(Workers); do echo "<Instance worker=\"$$$$w.xml\" paramconfig=\"$2\"/>"; done; \
-	  echo "</RccAssembly>") > $$@
+	$(AT)(echo "<RccAssembly>" \
+	  $$(foreach w,$$(Workers),\
+	    &&echo "<Instance worker=\"$$(Worker_$$w_xml)\" paramconfig=\"$2\"/>")\
+	  &&echo "</RccAssembly>") > $$@
 
 # Different since it is in the targetdir
 # note the dependency on the object files so that there will be a new UUID

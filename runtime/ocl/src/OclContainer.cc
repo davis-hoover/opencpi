@@ -555,9 +555,9 @@ namespace OCPI {
     };
 
     Container::
-    Container(OCPI::OCL::Device &a_device, const ezxml_t config, const OB::PValue* params)
+    Container(OCPI::OCL::Device &a_device, const OB::PValue* params)
       : OC::ContainerBase<Driver,Container,Application,Artifact>
-	(*this, a_device.name().c_str(), config, params),
+	(*this, a_device.name().c_str(), params),
 	m_device(a_device) {
       m_model = "ocl";
       m_os = "opencl";
@@ -758,7 +758,7 @@ namespace OCPI {
       Device *dev = open(which, false, false, error);
       if (!dev)
 	return NULL;
-      return new Container(*dev, NULL, params);
+      return new Container(*dev, params);
     }
 
     OC::Artifact& Container::

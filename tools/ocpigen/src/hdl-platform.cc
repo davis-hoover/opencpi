@@ -22,9 +22,9 @@
 #include <map>
 #include "UtilMisc.hh"
 #include "UtilEzxml.hh"
-#include "assembly.h"
-#include "hdl.h"
-#include "hdl-platform.h"
+#include "assembly.hh"
+#include "hdl.hh"
+#include "hdl-platform.hh"
 
 HdlPlatform *HdlPlatform::
 create(ezxml_t xml, const char *xfile, const std::string &parentFile, Worker *parent, const char *&err) {

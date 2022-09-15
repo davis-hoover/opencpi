@@ -44,8 +44,7 @@ namespace OCPI {
       OCPI::OCL::Device& m_device; // owned by the container
 
     protected:
-      Container(OCPI::OCL::Device &device, const ezxml_t config = NULL,
-		const OCPI::Base::PValue *params = NULL);
+      Container(OCPI::OCL::Device &device, const OCPI::Base::PValue *params = NULL);
     public:
       ~Container();
 

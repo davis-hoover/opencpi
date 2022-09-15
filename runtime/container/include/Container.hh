@@ -79,15 +79,13 @@ namespace OCPI {
       bool m_enabled;
       bool m_ownThread;
       bool m_verbose;
-      ezxml_t m_xml; // capture the configuration XML for this container (device)
       OCPI::OS::ThreadManager *m_thread;
       // This is not an embedded member to potentially control lifecycle better...
       OCPI::Transport::Transport &m_transport;
       // This vector will be filled in by derived classes
       Transports m_transports;  // terminology clash is unfortunate....
       BridgedPorts m_bridgedPorts;
-      Container(const char *name, const ezxml_t config = NULL,
-		const OCPI::Base::PValue* params = NULL);
+      Container(const char *name, const OCPI::Base::PValue* params = NULL);
     public:
       virtual ~Container();
     private:
@@ -96,6 +94,7 @@ namespace OCPI {
       bool enabled() const { return m_enabled; }
       virtual Driver &driver() = 0;
       virtual const std::string &name() const = 0;
+      virtual ezxml_t configXml() const = 0;
       const char *cname() const { return name().c_str(); }
       const std::string &platform() const { return m_platform; }
       const std::string &model() const { return m_model; }
@@ -105,7 +104,6 @@ namespace OCPI {
       bool optimized() const { return m_optimized; }
       virtual bool portsInProcess() = 0;
       bool dynamic() const { return m_dynamic; }
-      ezxml_t myXml() const { return m_xml; }
       virtual Container *nextContainer() = 0;
       virtual bool supportsImplementation(OCPI::Metadata::Worker &);
       virtual Application *

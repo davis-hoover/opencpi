@@ -19,11 +19,11 @@
  */
 
 #include <errno.h>
-#include "wip.h"
-#include "hdl.h"
-#include "hdl-device.h"
-#include "hdl-slot.h"
-#include "assembly.h"
+#include "wip.hh"
+#include "hdl.hh"
+#include "hdl-device.hh"
+#include "hdl-slot.hh"
+#include "assembly.hh"
 
 //DeviceTypes DeviceType::s_types;
 
@@ -35,7 +35,7 @@ create(ezxml_t xml, const char *xfile, const std::string &parentFile, Worker *pa
       (err = OE::checkTag(xml, "HdlDevice", "Expected 'HdlDevice' as tag in '%s'", xfile)) ||
       (err = OE::checkAttrs(xml, HDL_DEVICE_ATTRS, (void*)0)) ||
       (err = OE::checkElements(xml, HDL_DEVICE_ELEMS, (void*)0)) ||
-      (err = hd->setParamConfig(instancePVs, 0, parentFile))) {
+      (err = hd->setParamConfig(instancePVs, SIZE_MAX, parentFile))) {
     delete hd;
     hd = NULL;
   }
@@ -403,7 +403,8 @@ parse(ezxml_t xml, Board &b, SlotType *stype) {
     return OU::esprintf("Duplicate device name \"%s\" for platform/card", m_name.c_str());
   // Do the stuff in Worker::create - can we share more?
   if (m_deviceType.m_type != Worker::Platform &&
-      ((err = m_deviceType.setParamConfig(&m_deviceType.m_instancePVs, 0, m_deviceType.m_parentFile)) ||
+      ((err = m_deviceType.setParamConfig(&m_deviceType.m_instancePVs, SIZE_MAX,
+					  m_deviceType.m_parentFile)) ||
        (err = m_deviceType.resolveExpressions(m_deviceType)) ||
        (err = m_deviceType.finalizeProperties()) ||
        (err = m_deviceType.finalizeHDL())))

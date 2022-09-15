@@ -52,9 +52,9 @@ namespace OCPI {
       return ts ? static_cast<Container *>(ts)->getMyTicks() : 0; // null-ptr warning
     }
     Container::
-    Container(OCPI::HDL::Device &device, ezxml_t config, const OB::PValue *params) 
+    Container(OCPI::HDL::Device &device, const OB::PValue *params) 
       : OC::ContainerBase<Driver,Container,Application,Artifact>
-	(*this, device.name().c_str(), config, params),
+	(*this, device.name().c_str(), params),
 	Access(device.cAccess()), OTM::Emit::TimeSource(getTicksFunc),
 	m_device(device), m_hwEvents(this, *this, "FPGA Events")
     {
@@ -117,8 +117,8 @@ namespace OCPI {
 
     // This simply insulates the driver code from needing the container class implementation decl.
     OC::Container *Driver::
-    createContainer(OCPI::HDL::Device &dev, ezxml_t config, const OB::PValue *params)  {
-      return new Container(dev, config, params);
+    createContainer(OCPI::HDL::Device &dev, const OB::PValue *params)  {
+      return new Container(dev, params);
     }
     class Worker;
     class Artifact : public OC::ArtifactBase<Container,Artifact> {

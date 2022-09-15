@@ -40,9 +40,9 @@ namespace OCPI {
   namespace Container {
 
     Container::
-    Container(const char *a_name, const ezxml_t config, const OB::PValue *params)
+    Container(const char *a_name, const OB::PValue *params)
       : OCPI::Time::Emit("Container", a_name),
-	m_enabled(false), m_ownThread(true), m_verbose(false), m_xml(config), m_thread(NULL),
+	m_enabled(false), m_ownThread(true), m_verbose(false), m_thread(NULL),
 	m_transport(*new OT::Transport(&Manager::getTransportManager(params), false, this))
     {
       OB::findBool(params, "verbose", m_verbose);
@@ -206,7 +206,8 @@ namespace OCPI {
     }
     // This will be called inside a separate thread for this container.
     void Container::thread() {
-      while (m_enabled && runInternal())	;
+      while (m_enabled && runInternal())
+	;
       ocpiInfo("Container background thread for \"%s\" (%p) exited", name().c_str(), this);
       m_enabled = false; // container's thread is done - a self-disable
     }
