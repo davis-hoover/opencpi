@@ -24,7 +24,7 @@
 #include <map>
 #include "UtilMisc.hh"
 #include "UtilEzxml.hh"
-#include "ocpigen.h"
+#include "ocpigen.hh"
 
 // A slot type is really just a set of signals
 // The direction is all from the perspective of the motherboard (a.k.a. carrier).

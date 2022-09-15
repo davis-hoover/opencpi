@@ -64,7 +64,7 @@ override HdlExplicitLibraries:=$(call Unique,$(HdlLibraries) $(Libraries) $(HdlE
 # form <path>:<lib>, where if the library is in the global namespace <lib> is the same as basename
 # <path>, but when the library is in the qualified namespace it is qualified
 override HdlLibrariesInternal=$(infox HLI:$1:$(HdlTarget):$(HdlExplicitLibraries))$(strip \
-$(if $(findstring clean,$(MAKECMDGOALS)),,\
+$(if $(filter clean% xml,$(MAKECMDGOALS)),,\
 $(foreach l,$(call Unique,\
               $(- first process explicitly supplied libraries)\
               $(foreach p,$(HdlExplicitLibraries),\
@@ -221,17 +221,19 @@ install: $(HdlToolSets:%=install_%)
 stublibrary: $(HdlToolSets:%=stublibrary_%)
 define HdlDoToolSet
 $(1):
-	$(AT)$(MAKE) -L --no-print-directory \
+	$(AT)$(MAKE) -L --no-print-directory -f $(firstword $(MAKEFILE_LIST))\
 	   HdlPlatforms="$(call HdlGetTargetsForToolSet,$(1),$(HdlPlatforms))" HdlTarget= \
            HdlTargets="$(call HdlGetTargetsForToolSet,$(1),$(HdlActualTargets))"
 
 stublibrary_$(1):
 	$(AT)$(MAKE) -L --no-print-directory HdlPlatforms= HdlTarget= \
+	   -f $(firstword $(MAKEFILE_LIST)) \
            HdlTargets="$(call HdlGetTargetsForToolSet,$(1),$(HdlActualTargets))" \
 	   stublibrary
 
 install_$(1):
 	$(AT)$(MAKE) -L --no-print-directory HdlPlatforms= HdlTarget= \
+	   -f $(firstword $(MAKEFILE_LIST)) \
            HdlTargets="$(call HdlGetTargetsForToolSet,$(1),$(HdlActualTargets))" \
            install
 endef

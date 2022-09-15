@@ -43,8 +43,8 @@ ifeq ($(HdlPlatform)$(HdlPlatforms),)
     $(infox $(doimports))
     ifeq ($(findstring export,$(MAKECMDGOALS))$(findstring import,$(MAKECMDGOALS))$(filter $(OCPI_DOC_ONLY),1),)
       include $(OCPI_CDK_DIR)/include/hdl/hdl-targets.mk
-      $(info No HDL platforms specified.  No HDL assets will be targeted.)
-      $(info Possible HdlPlatforms are: $(sort $(HdlAllPlatforms)).)
+      $(call OcpiInfo, No HDL platforms specified.  No HDL assets will be targeted.)
+      $(call OcpiInfo, Possible HdlPlatforms are: $(sort $(HdlAllPlatforms)).)
     endif
   endif
 endif
@@ -214,9 +214,9 @@ hdlplatforms: hdldevices hdlcards hdladapters
 	$(MAKE) $(PMF) exports
 
 hdlassemblies: hdlcomponents hdlplatforms hdlcards hdladapters
-	$(MAKE) $(PMF) imports
-	$(call MaybeMake,hdl/assemblies)
-	$(MAKE) $(PMF) exports
+	$(AT)$(MAKE) $(PMF) imports
+	$(AT)$(call MaybeMake,hdl/assemblies)
+	$(AT)$(MAKE) $(PMF) exports
 
 # Everything that does not need platforms
 hdlportable: hdlcomponents hdladapters hdldevices hdlcards
@@ -281,6 +281,14 @@ run: all test
 runonly:
 	$(call MaybeMake,components,run)
 	$(call MaybeMake,applications,run)
+
+# In order to generate preprocessed XML from specs in a project's specs subdirlibrary,
+# we need a goal that does it, and respects the XML search rules for the project
+# The spec file is specified in the XmlFile variable
+# This is related to the XML goal in the xxx-worker.mk file
+xml:
+	@$(if $(XmlFile),,$(error missing XmlFile variable))\
+         $(if $(AT),,set -v;) $(OcpiGenEnv) ocpigen -G specs/$(XmlFile)
 
 cleancomponents:
 	$(AT)echo Cleaning all component libraries

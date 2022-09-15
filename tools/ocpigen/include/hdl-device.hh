@@ -22,8 +22,8 @@
 #define HDL_DEVICE_H
 #include <assert.h>
 #include <map>
-#include "ocpigen.h"
-#include "hdl.h"
+#include "ocpigen.hh"
+#include "hdl.hh"
 
 // A device type is the common information about a set of devices that can use
 // the same device worker implementation.

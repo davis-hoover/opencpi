@@ -523,6 +523,7 @@ namespace OCPI {
       // Mentioned Property values have to be initial, and if parameters, they must match
       // values.
       const OM::Assembly::Properties &aProps = m_utilInstance.m_properties;
+      std::vector<bool> mentioned(impl.m_metadataImpl.nProperties());
       for (unsigned ap = 0; ap < aProps.size(); ap++) {
 	const char
 	  *apName = aProps[ap].m_name.c_str(),
@@ -563,6 +564,20 @@ namespace OCPI {
 	  }
 	  ocpiDebug("    Requested '%s' parameter value '%s' matched compiled value '%s'",
 		    apName, apValue, pStr.c_str());
+	}
+	mentioned[uProp.m_ordinal] = true;  //value was requested for this property
+      }
+      // Make sure that properties that were not mentioned in the instance
+      // have default values in the implementation
+      for (unsigned n = 0; n < impl.m_metadataImpl.nProperties(); ++n) {
+	OM::Property &p = impl.m_metadataImpl.property(n);
+	if (!mentioned[p.m_ordinal] && p.m_isParameter && !p.m_isDefault) {
+	  std::string pStr;
+	  p.m_default->unparse(pStr);
+	  ocpiInfo("    Rejected the \"%s\" parameter value \"%s\" because it is not the default "
+		   "and the instance provided no value",
+		   p.cname(), pStr.c_str());
+	  return false;
 	}
       }
       if (m_utilInstance.slaveInstances().size() && !impl.m_metadataImpl.slaveAssy()) {

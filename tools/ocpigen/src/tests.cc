@@ -31,9 +31,9 @@
 #include "UtilMisc.hh"
 #include "UtilEzxml.hh"
 #include "LibraryManager.hh"
-#include "wip.h"
-#include "data.h"
-#include "hdl-device.h"
+#include "wip.hh"
+#include "data.hh"
+#include "hdl-device.hh"
 
 #define TESTS "-tests.xml"
 #define MS_CONFIG "bypass", "metadata", "throttle", "full"
@@ -110,7 +110,7 @@ namespace {
   bool verbose;
   Strings excludeWorkers, excludeWorkersTmp;
   // If the spec in/out arg may be set in advance if it is inline or xi:included
-  // FIXME: share this with the one in parse.cxx
+  // FIXME: share this with the one in parse.cc
   const char *
   getSpec(ezxml_t xml, const std::string &parent, const char *a_package, ezxml_t &spec,
           std::string &specFile, std::string &a_specName) {
@@ -121,89 +121,111 @@ namespace {
     if ((err = tryOneChildInclude(xml, parent, "ComponentSpec", &spec, specFile, true)))
       return err;
     const char *specAttr = ezxml_cattr(xml, "spec");
-    if (specAttr) {
+    if (!specAttr)
+      specAttr = ezxml_cattr(xml, "component");
+    static const char *suffixes[] = { "-spec", "-comp", "_spec", NULL };
+    if (specAttr) { // explicit spec for tests, normally not done
       if (spec)
-        return "Can't have both ComponentSpec element (maybe xi:included) and a 'spec' attribute";
+        return "Can't have both ComponentSpec element and a \"spec\" or \"component\" attribute";
       size_t len = strlen(specAttr);
-      file = specAttr;
-      // If the file is suffixed, try it as is.
-      if (!strcasecmp(specAttr + len - 4, ".xml") ||
-          !strcasecmp(specAttr + len - 5, "-spec") ||
-          !strcasecmp(specAttr + len - 5, "_spec"))
+      // See if the spec attribute can be used directly as a file name
+      if (!strcasecmp(specAttr + len - 4, ".xml"))
+	file = specAttr;
+      else
+	for (const char **cp = suffixes; *cp; ++cp)
+          if (!strcasecmp(specAttr + len - 5, *cp)) {
+	    file = specAttr;
+	    break;
+	  }
+      if (!file.empty())
         err = parseFile(specAttr, parent, "ComponentSpec", &spec, specFile, false);
       else {
-        // If not suffixed, try it, and then with suffixes.
-        if ((err = parseFile(specAttr, parent, "ComponentSpec", &spec, specFile, false))) {
-          file = specAttr;
-          // Try the two suffixes
-          file += "-spec";
-          if ((err = parseFile(file.c_str(), parent, "ComponentSpec", &spec, specFile, false))) {
-            file = specAttr;
-            file += "_spec";
-            if ((err = parseFile(file.c_str(), parent, "ComponentSpec", &spec, specFile, false)))
-              return OU::esprintf("After trying \"-spec\" and \"_spec\" suffixes: %s", err);
-          }
-        }
+        // If attribute not suffixed at all, try them all
+	std::string tries;
+	for (const char **cp = suffixes; *cp; ++cp) {
+	  file = specAttr;
+	  file += *cp;
+	  if (!(err = parseFile(file.c_str(), parent, "ComponentSpec", &spec, specFile, false)))
+	    break;
+	  tries += " " + file;
+	}
+	if (err)
+	  err = OU::esprintf("No component spec file found after trying: %s", tries.c_str());
       }
+      if (err)
+	return err;
     } else {
       if (parent.size()) {
-        // No spec mentioned at all, try using the name of the parent file with suffixes
+        // No spec mentioned at all, try using the name of the parent -test.xml file with suffixes
         OU::baseName(parent.c_str(), name);
         const char *dash = strrchr(name.c_str(), '-');
         if (dash)
           name.resize(OCPI_SIZE_T_DIFF(dash, name.c_str()));
       } else {
+	// How can this happen?
+	assert("Unexpected embedded unit test XML???" == NULL);
         OU::baseName(OS::FileSystem::cwd().c_str(), name);
         const char *dot = strrchr(name.c_str(), '.');
         if (dot)
           name.resize(OCPI_SIZE_T_DIFF(dot, name.c_str()));
       }
-      // Try the two suffixes
-      file = name + "-spec";
-      if ((err = parseFile(file.c_str(), parent, "ComponentSpec", &spec, specFile, false))) {
-        file =  name + "_spec";
-        const char *err1 = parseFile(file.c_str(), parent, "ComponentSpec", &spec, specFile, false);
-        if (err1) {
-          // No spec files are found, how about a worker with the same name?
-          // (if no spec, must be a single worker with embedded spec?)
-          bool found = false;
-          for (OS::FileIterator iter("../", name + ".*"); !iter.end(); iter.next()) {
-            std::string wname;
-            const char *suffix = strrchr(iter.relativeName(wname), '.') + 1;
-            if (strcmp(suffix, "test")) {
-              OU::format(file, "../%s/%s.xml", wname.c_str(), name.c_str());
-              if ((err1 =
-                   parseFile(file.c_str(), parent, NULL, &spec, specFile, false, false, false))) {
-                ocpiInfo("When trying to open and parse \"%s\":  %s", file.c_str(), err1);
-                continue;
-              }
-              if (!ezxml_cchild(spec, "componentspec")) {
-                ocpiInfo("When trying to parse \"%s\":  no embedded ComponentSpec element found",
-                         file.c_str());
-                continue;
-              }
-              if (found)
-                return OU::esprintf("When looking for workers matching \"%s\" with embedded "
-                                    "specs, found more than one", name.c_str());
-              found = true;
-              specName = name; // package?
-            }
-          }
-          if (!found)
-            return OU::esprintf("After trying \"-spec\" and \"_spec\" suffixes, no spec found");
-        }
+      std::string tries;
+      for (const char **cp = suffixes; *cp; ++cp) {
+	file = name + *cp;
+	if (!(err = parseFile(file.c_str(), parent, "ComponentSpec", &spec, specFile, false)))
+	  break;
+	tries += " " + file;
+      }
+      if (err) {
+	// No spec files are found, how about a worker with the same name?
+	// (if no spec, must be a single worker with embedded spec?)
+	bool found = false;
+	for (OS::FileIterator iter("../", name + ".*"); !iter.end(); iter.next()) {
+	  std::string wname;
+	  const char *suffix = strrchr(iter.relativeName(wname), '.') + 1;
+	  if (!strcmp(suffix, "test"))
+	    continue;
+	  OU::format(file, "../%s/%s-%s.xml", wname.c_str(), name.c_str(), suffix);
+	  if ((err =
+	       parseFile(file.c_str(), parent, NULL, &spec, specFile, false, false, false))) {
+	    ocpiInfo("When trying to open and parse \"%s\":  %s", file.c_str(), err);
+	  }
+	  OU::format(file, "../%s/%s.xml", wname.c_str(), name.c_str());
+	  if ((err =
+	       parseFile(file.c_str(), parent, NULL, &spec, specFile, false, false, false))) {
+	    ocpiInfo("When trying to open and parse \"%s\":  %s", file.c_str(), err);
+	    continue;
+	  }
+	  if (!ezxml_cchild(spec, "componentspec")) {
+	    ocpiInfo("When trying to parse \"%s\":  no embedded ComponentSpec element found",
+		     file.c_str());
+	    continue;
+	  }
+	  if (found)
+	    return OU::esprintf("When looking for workers matching \"%s\" with embedded "
+				"specs, found more than one", name.c_str());
+	  found = true;
+	  specName = name; // package?
+	}
+	if (!found)
+	  return OU::esprintf("After looking for component spec files (%s), and even workers "
+			      "with embedded component specs, nothing was found based on "
+			      "the name \"%s\"", tries.c_str(), name.c_str());
       }
     }
     std::string fileName;
     // This is a component spec file or a worker OWD that contains a componentspec element
+    // We have found the spec XML
     if ((err = getNames(spec, specFile.c_str(), NULL, name, fileName)))
       return err;
     // If name is file name, strip suffixes for name.
     if (name == fileName) {
       size_t len = name.length();
-      if (len > 5 && (!strcasecmp(name.c_str() + len - 5, "-spec") ||
-                      !strcasecmp(name.c_str() + len - 5, "_spec")))
-        name.resize(len - 5);
+      for (const char **cp = suffixes; *cp; ++cp)
+	if (!strcasecmp(name.c_str() + len - 5, *cp)) {
+	  name.resize(len - 5);
+	  break;
+	}
     }
     // Find the package even though the spec package might be specified already
     argPackage = a_package;
@@ -265,14 +287,17 @@ namespace {
     // the actual platform-specific build is easily relative to the OWD here
     OU::format(file, "../lib/%s/%s.xml", dot+1, name.c_str());
     if (!OS::FileSystem::exists(file)) {
-      if (matchSpec && specific)
-        return OU::esprintf("For worker \"%s\", cannot open file \"%s\"", wname, file.c_str());
-      if (verbose)
-        fprintf(stderr, "Skipping worker \"%s\" since \"%s\" not found.\n", wname, file.c_str());
-      return NULL;
+      OU::format(file, "../lib/%s/%s-%s.xml", dot+1, name.c_str(), dot+1);
+      if (!OS::FileSystem::exists(file)) {
+	if (matchSpec && specific)
+	  return OU::esprintf("For worker \"%s\", cannot open file \"%s\"", wname, file.c_str());
+	if (verbose)
+	  fprintf(stderr, "Skipping worker \"%s\" since \"%s\" not found.\n", wname, file.c_str());
+	return NULL;
+      }
     }
     const char *err;
-    Worker *w = Worker::create(file.c_str(), testFile, argPackage, NULL, NULL, NULL, 0, err);
+    Worker *w = Worker::create(file.c_str(), testFile, argPackage, NULL, NULL, NULL, SIZE_MAX, err);
     bool missing;
     if (!err && (matchSpec ? w->m_specName == matchName :
                  w->m_emulate && w->m_emulate->m_implName == matchName) &&
@@ -471,6 +496,7 @@ namespace {
 
   struct Case {
     std::string m_name;
+    std::unordered_set <uint32_t> m_validBuildConfigs;
     Strings m_onlyPlatforms, m_excludePlatforms; // can only apply these at runtime
     Workers m_workers; // the inclusion/exclusion happens at parse time
     WorkerConfigs m_configs;
@@ -741,7 +767,8 @@ namespace {
 	  found = wfound;
         if (!found)
           return OU::esprintf("Property name \"%s\" not a spec or test property (worker-specific "
-			      "properties must be prefixed by worker name and model, e.g. wkr1.rcc.prop1)",
+			      "properties must be declared by building the component library and be prefixed by "
+			      "worker name and model, e.g. wkr1.rcc.prop1)",
 			      name.c_str());
 	// poor man's: any xml attributes? e.g. if not only "set" element?
 	if (px->attr && px->attr[0] &&
@@ -866,6 +893,26 @@ namespace {
                       p.m_param->cname(), m_name.c_str(), s, p.m_param->cname());
           }
         }
+      }
+    }
+
+    void
+    validateBuildConfigs (unsigned c, ParamConfig &pc) {
+      for (unsigned mm = 0; mm < m_subCases.size(); mm++) {
+        std::unordered_set <uint32_t> config_invalid;
+        for (unsigned n = 0; n < pc.params.size(); n++) {
+          Param &p = pc.params[n];
+          for (unsigned nn = 0; nn < m_subCases[mm]->params.size(); nn++) {
+            Param &sp = m_subCases[mm]->params[nn];
+            if (p.m_name == sp.m_name) {
+              if (p.m_uValue != sp.m_uValue)
+                config_invalid.insert(nn);
+              break;
+            }
+          }
+        }
+        if (config_invalid.empty())
+          m_validBuildConfigs.insert(c);
       }
     }
 
@@ -2157,7 +2204,7 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
   for (unsigned n = 0; n < cases.size(); n++) {
     cases[n]->m_subCases.push_back(new ParamConfig(cases[n]->m_settings)); 
     cases[n]->doProp(0); 
-    if ((err = cases[n]->pruneSubCases())) // or here 
+    if ((err = cases[n]->pruneSubCases()))
       return err;
     cases[n]->print(out);
   }
@@ -2182,62 +2229,12 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
       for (unsigned c = 0; c < w.m_paramConfigs.size(); ++c) {
         ParamConfig &pc = *w.m_paramConfigs[c];
         // Make sure the configuration is in the test matrix (e.g. globals)
-        std::unordered_set <uint32_t> case_match;
-        std::unordered_set <uint32_t> subcase_match;
+        std::unordered_set <uint32_t> valid_configs;
         for (unsigned j = 0; j < cases.size(); j++) {
-          bool allOk = true;
-          for (unsigned mm = 0; mm < cases[j]->m_subCases.size(); mm++) {
-            std::unordered_set <uint32_t> subcase_invalid;
-            unsigned sIsOk = 0;
-            unsigned ms = 0;
-            for (unsigned n = 0; n < pc.params.size(); n++) {
-              Param &p = pc.params[n];
-              for (unsigned nn = 0; nn < cases[j]->m_subCases[mm]->params.size(); nn++) {
-                Param &sp = cases[j]->m_subCases[mm]->params[nn];
-                if (p.m_name == sp.m_name) {
-                  ms++;
-                  if (p.m_uValue == sp.m_uValue) {
-                    sIsOk++;
-                    break;
-                  }
-                  else {
-                    subcase_invalid.insert(nn);
-                    break;
-                  }
-                }
-              }
-              for (unsigned q = 0; q < cases[j]->m_settings.params.size(); q++) {
-                Param &cp = cases[j]->m_settings.params[q];
-                if ((p.m_name == cp.m_name) && p.m_param) {
-                  bool gIsOk = false;
-                  bool cIsOk = false;
-                  for (unsigned nn = 0; nn < globals.params.size(); nn++) { // check if this is in the global matrix (is this still necessary?)
-                    Param &gp = globals.params[nn];
-                    if (gp.m_param && !strcasecmp(p.m_param->cname(), gp.m_param->cname()))
-                      for (unsigned v = 0; v < gp.m_uValues.size(); v++)
-                        if (p.m_uValue == gp.m_uValues[v]) {
-                          gIsOk = true;
-                          break;
-                        }
-                  }
-                  if (!gIsOk)
-                    goto NO_MATCH;
-                  if (p.m_uValue == cp.m_uValue) {
-                    cIsOk = true;
-                  }
-                  if (!cIsOk) {
-                    allOk = false;
-                    goto NO_MATCH;
-                  }
-                }
-              }
-              if (allOk)
-                case_match.insert(c);
-              NO_MATCH:continue;   
-            }
-            if (subcase_invalid.empty())
-              subcase_match.insert(c);
-          }
+          cases[j]->validateBuildConfigs(c, pc);
+          valid_configs.insert(cases[j]->m_validBuildConfigs.begin(), cases[j]->m_validBuildConfigs.end());
+          if (valid_configs.empty())
+            continue;
         }
         if (!seenHDL) {
           OS::FileSystem::mkdir(assemblies, true);
@@ -2269,7 +2266,7 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
             unconnected += "ports_unconnected_";
           else if (ucp == 1)
             unconnected += "port_unconnected_";
-          if (subcase_match.find(c) != subcase_match.end())
+          if (valid_configs.find(c) != valid_configs.end())
             if (bitmap_processed.insert(bitmask).second) {
               if ((err = generateHdlAssemblies(w, c, dir + unconnected + temp.str(),
               name + unconnected + temp.str(), false, assyDirs, cases[n]->m_ports)))

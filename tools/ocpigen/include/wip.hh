@@ -36,11 +36,11 @@
 #include "MetadataAssembly.hh"
 #include "OcpiUuid.h"
 #include "ezxml.h"
-#include "cdkutils.h"
-#include "parameters.h"
-#include "port.h"
-#include "ocp.h"
-#include "clock.h"
+#include "cdkutils.hh"
+#include "parameters.hh"
+#include "port.hh"
+#include "ocp.hh"
+#include "clock.hh"
 
 class Port;
 
@@ -359,7 +359,7 @@ struct Instance;
 class Worker : public OM::Worker {
  public:
   ezxml_t m_xml;
-  std::string m_file, m_parentFile, m_fileName;
+  std::string m_file, m_parentFile, m_fileName, m_noSuffName;
   Model m_model;
   const char **m_baseTypes;
   const char *m_modelString;
@@ -425,6 +425,7 @@ class Worker : public OM::Worker {
 	   const char *outDir, Worker *parent, OM::Assembly::Properties *instancePropertyValues,
 	   size_t paramConfig, const char *&err);
   const Ports &ports() const { return m_ports; }
+  const char *nsname() const { return m_noSuffName.c_str(); }
   const char *parseClocks();
   const char *addClock(ezxml_t);
   const char *addClock(const char *a_name, const char *direction, Clock *&clk);
@@ -537,6 +538,7 @@ class Worker : public OM::Worker {
     emitXmlWorkers(FILE *f),
     emitXmlInstances(FILE *f),
     emitXmlConnections(FILE *f);
+  virtual void emitXmlSupports(std::string &) const {}
   void
     emitVhdlLibraries(FILE *f),
     emitCppTypesNamespace(FILE *f, std::string &nsName, const std::string &slaveName=""),

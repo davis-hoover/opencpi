@@ -28,6 +28,7 @@ namespace OC = OCPI::Container;
 namespace OU = OCPI::Util;
 namespace OX = OCPI::Util::EzXml;
 namespace OA = OCPI::API;
+namespace OP = OCPI::Base::Plugin;
 namespace OCPI {
   namespace RCC {
     const char *rcc = "rcc";
@@ -61,6 +62,7 @@ namespace OCPI {
     }
     void Driver::
     configure(ezxml_t x) {
+      OP::Driver::configure(x);
       OX::getOptionalString(x, m_platform, "platform");
       if (m_platform.size())
 	ocpiDebug("RCC Driver platform set to %s", m_platform.c_str());

@@ -18,9 +18,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "cdkutils.h"
-#include "hdl-device.h"
-#include "hdl-card.h"
+#include "cdkutils.hh"
+#include "hdl-device.hh"
+#include "hdl-card.hh"
 
 Cards Card::s_cards;        // registry of card types
 
@@ -83,8 +83,15 @@ Card *Card::
 get(const char *file, const char *parentFile, Worker *parent, const char *&err) {
   ezxml_t xml;
   std::string xfile;
-  if ((err = parseFile(file, parentFile, NULL, &xml, xfile)))
-    return NULL;
+  if ((err = parseFile(file, parentFile, "card", &xml, xfile))) {
+    size_t len = strlen(file);
+    if (len > 5 && !strcasecmp(file + len - 5, "-card"))
+      return NULL;
+    std::string card(file);
+    card += "-card";
+    if ((err = parseFile(card.c_str(), parentFile, "card", &xml, xfile)))
+      return NULL;
+  }
   std::string name;
   OE::getOptionalString(xml, name, "name");
   std::string base;

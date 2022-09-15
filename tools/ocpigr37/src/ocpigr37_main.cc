@@ -27,7 +27,7 @@
 #include "UtilException.hh"
 #include "LibraryManager.hh"
 #include "BasePluginManager.hh"
-#include "cdkutils.h"
+#include "cdkutils.hh"
 namespace OA = OCPI::API;
 namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;

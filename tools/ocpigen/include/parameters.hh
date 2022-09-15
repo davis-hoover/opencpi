@@ -26,8 +26,8 @@
 #include <unordered_set>
 #include "BaseValue.hh"
 #include "MetadataProperty.hh"
-#include "cdkutils.h"
-#include "ocpigen.h"
+#include "cdkutils.hh"
+#include "ocpigen.hh"
 
 // These structures capture what is in or will be put in
 // the build configuration file.
@@ -113,7 +113,8 @@ class ParamConfig : public OCPI::Base::IdentResolver {
   bool equal(ParamConfig &other);
   // The callback when evaluating expressions for data types (e.g. array length).
   const char *getValue(const char *sym, OCPI::Base::ExprValue &val) const;
-  const char *getParamValue(const char *sym, const OCPI::Base::Value *&v) const;
+  const char *getParamValue(const char *sym, const OCPI::Base::Value *&v,
+			    OCPI::Metadata::Property **prop = NULL) const;
   const Worker &worker() const { return m_worker; }
 };
 

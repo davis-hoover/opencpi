@@ -22,9 +22,9 @@
 #include <stdint.h>
 #include "UtilMisc.hh"
 #include "UtilEzxml.hh"
-#include "assembly.h"
-#include "hdl-config.h"
-#include "hdl.h"
+#include "assembly.hh"
+#include "hdl-config.hh"
+#include "hdl.hh"
 
 DevInstance::
 DevInstance(const Device &d, const Card *c, const Slot *s, bool control,
@@ -104,7 +104,7 @@ addDevInstance(const Device &dev, const Card *card, const Slot *slot,
   // Now that we have the instancePVs, we can create a worker that is parameterized for this
   // device instance;
   di.m_worker = Worker::create(dev.m_deviceType.m_file.c_str(), m_parent.m_file.c_str(), NULL, NULL, &m_parent,
-			       &di.m_instancePVs, 0, err);
+			       &di.m_instancePVs, SIZE_MAX, err);
   return err;
 }
 

@@ -852,9 +852,14 @@ define HdlPreprocessTargets
     override HdlPlatforms:=$$(HdlAllPlatforms)
   else ifdef HdlPlatforms
     # Leave it alone if it was specifically defined as nothing
+    HdlPreExcludePlatforms:=$$(HdlPlatforms)
     override HdlPlatforms:=$$(filter-out $$(ExcludePlatforms),$$(HdlPlatforms))
     ifdef OnlyPlatforms
      override HdlPlatforms:=$$(filter $$(OnlyPlatforms),$$(HdlPlatforms))
+    endif
+    HdlExcludedPlatforms:=$$(filter-out $$(HdlPlatforms),$$(HdlPreExcludePlatforms))
+    ifneq ($$(words $$(HdlExcludedPlatforms)),0)
+      $$(call OcpiInfo,Not building $$(HdlMode) for these filtered (only/excluded) HDL platforms: $$(HdlExcludedPlatforms))
     endif
   endif
   ifndef HdlTargets

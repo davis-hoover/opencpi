@@ -24,9 +24,9 @@
 
 #include "OsFileSystem.hh"
 
-#include "assembly.h"
-#include "data.h"
-#include "rcc.h"
+#include "assembly.hh"
+#include "data.hh"
+#include "rcc.hh"
 
 // Generate the readonly implementation file.
 // What implementations must explicitly (verilog) or implicitly (VHDL) include.
@@ -650,7 +650,7 @@ emitImplSlaveTypes(FILE *parent) {
           m_implName, RCC_CC_SLAVETYPES, RCC_CC_HEADER);
   FILE *f;
   const char *err;
-  if (!(err = openOutput(m_fileName.c_str(), m_outDir, "", RCC_CC_SLAVETYPES, RCC_CC_HEADER, NULL, f))) {
+  if (!(err = openOutput(cname(), m_outDir, "", RCC_CC_SLAVETYPES, RCC_CC_HEADER, NULL, f))) {
     for (unsigned n = 0; n < m_paramConfigs.size(); ++n)
       if (m_paramConfigs[n]) {
 	fprintf(f, "#if OCPI_PARAM_CONFIG() == %u\n", n);
@@ -674,7 +674,7 @@ emitImplSlaves(FILE *parent) {
           m_implName, RCC_CC_SLAVES, RCC_CC_HEADER);
   FILE *f;
   const char *err;
-  if (!(err = openOutput(m_fileName.c_str(), m_outDir, "", RCC_CC_SLAVES, RCC_CC_HEADER, NULL, f))) {
+  if (!(err = openOutput(cname(), m_outDir, "", RCC_CC_SLAVES, RCC_CC_HEADER, NULL, f))) {
     for (unsigned n = 0; n < m_paramConfigs.size(); ++n)
       if (m_paramConfigs[n]) {
 	fprintf(f, "#if OCPI_PARAM_CONFIG() == %u\n", n);
@@ -911,7 +911,7 @@ const char *Worker::
 emitImplRCC() {
   const char *err;
   FILE *f;
-  if ((err = openOutput(m_fileName.c_str(), m_outDir, "",
+  if ((err = openOutput(cname(), m_outDir, "",
                         m_language == C ? RCC_C_IMPL : RCC_CC_IMPL,
                         m_language == C ? RCC_C_HEADER : RCC_CC_HEADER, m_implName, f))) {
     return err;
@@ -1224,10 +1224,10 @@ emitImplRCC() {
   }
   fprintf(f, "#endif /* ifndef OCPI_RCC_WORKER_%s_H__ */\n", upper);
   fclose(f);
-  if ((err = openOutput(m_fileName.c_str(), m_outDir, "", RCCMAP, RCC_C_HEADER, NULL, f)))
+  if ((err = openOutput(nsname(), m_outDir, "", RCCMAP, RCC_C_HEADER, NULL, f)))
     return err;
-  fprintf(f, "#define RCC_FILE_WORKER_%s %s\n", m_fileName.c_str(), m_implName);
-  fprintf(f, "#define RCC_FILE_WORKER_ENTRY_%s %s%s\n", m_fileName.c_str(),
+  fprintf(f, "#define RCC_FILE_WORKER_%s %s\n", nsname(), m_implName);
+  fprintf(f, "#define RCC_FILE_WORKER_ENTRY_%s %s%s\n", nsname(),
           m_language == C ? "" : "ocpi_", m_implName);
   fclose(f);
   return 0;
@@ -1237,7 +1237,7 @@ const char *Worker::
 emitSkelRCC() {
   const char *err;
   FILE *f;
-  if ((err = openOutput(m_fileName.c_str(), m_outDir, "", "-skel",
+  if ((err = openOutput(cname(), m_outDir, "", "-skel",
                         m_language == C ? ".c" : ".cc", NULL, f)))
     return err;
   fprintf(f, "/*\n");

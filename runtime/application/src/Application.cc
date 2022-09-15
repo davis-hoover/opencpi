@@ -100,6 +100,8 @@ namespace OCPI {
       deployXml = NULL;
       copy = NULL;
       appXml = NULL;
+      bool verbose = false;
+      OB::findBool(params, "verbose", verbose);
       do {
         const char *err;
         const char *cp = appFile.c_str();
@@ -118,6 +120,8 @@ namespace OCPI {
               throw OU::Error("Error: application file %s (or %s) does not exist\n", file,
                               appFile.c_str());
           }
+	  if (verbose)
+	    fprintf(stderr, "Creating an application based on file:  \"%s\"\n", appFile.c_str());
           if ((err = OE::ezxml_parse_file(appFile.c_str(), appXml)))
             throw OU::Error("Can't parse application XML file \"%s\": %s", appFile.c_str(), err);
         }

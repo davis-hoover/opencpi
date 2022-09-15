@@ -29,8 +29,8 @@
 #include "UtilMisc.hh"
 #include "MetadataAssembly.hh"
 #include "LibraryAssembly.hh"
-#include "cdkutils.h"
-#include "ocpigen.h"
+#include "cdkutils.hh"
+#include "ocpigen.hh"
 
 	  // These are documented, although they may be deprecated...
 #define HDL_TARGET_ATTRS "HdlTargets", "HdlPlatforms"

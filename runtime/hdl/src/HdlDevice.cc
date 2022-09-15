@@ -240,7 +240,7 @@ namespace OCPI {
 						       sizeof(HdlUUID), 8);
       // Fix the endianness
       for (unsigned n = 0; n < sizeof(HdlUUID); n++)
-        ((uint8_t*)&m_UUID)[n] = ((uint8_t *)&myUUIDtmp)[(n & ~3u) + (3u - (n&3u))];
+        ((uint8_t *)&m_UUID)[n] = ((uint8_t *)&myUUIDtmp)[(n & ~3u) + (3u - (n&3u))];
       memcpy(&m_loadedUUID, m_UUID.uuid, sizeof(m_loadedUUID));
       m_isAlive = true;
       if (configure(NULL, err))

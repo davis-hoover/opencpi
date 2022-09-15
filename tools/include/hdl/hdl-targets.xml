@@ -41,6 +41,9 @@ necessarily the "part ordering number" in data sheets etc.
   <vendor name='modelsim'>
     <family name='modelsim' toolset='modelsim'/>
   </vendor>
+  <vendor name='riviera'>
+    <family name='riviera' toolset='riviera'/>
+  </vendor>
   <vendor name='xilinx'>
     <family name='artix7' toolset='vivado' parts='xc7a50t xc7a100t xc7a200t'/>
     <family name='kintex7' toolset='vivado' parts='xc7k410t'/>
@@ -71,6 +74,7 @@ necessarily the "part ordering number" in data sheets etc.
   <!-- currently the only attribute per tool set is whether it is a simulator -->
   <toolset name='isim' tool='ISE' simulator='true'/>
   <toolset name='modelsim' tool='Modelsim' simulator='true'/>
+  <toolset name='riviera' tool='Riviera-PRO' simulator='true'/>
   <toolset name='xsim' tool='Vivado' simulator='true'/>
   <toolset name='quartus' tool='Quartus'/>
   <toolset name='quartus_pro' tool='QuartusPro'/>

@@ -22,8 +22,8 @@
 
 #include <cassert>
 #include <climits>
-#include "assembly.h"
-#include "data.h"
+#include "assembly.hh"
+#include "data.hh"
 
 // Constructor when creating a derived impl port either from a spec port
 // (based on an existing spec port (sp)), or just an impl-only data port
@@ -39,7 +39,7 @@ DataPort(Worker &w, ezxml_t x, DataPort *sp, int ordinal, WIPType type, const ch
   if (x &&
       ((err = OM::Port::parse()) || // parse protocol etc. first, then override here
        // Adding optionality in the impl xml is only relevant to devices.
-       (err = OE::getBoolean(x, "Optional", &m_isOptional, true))))
+       (err = OE::getBoolean(x, "Optional", &m_isOptional, true, false))))
     return;
   // Note buffer sizes are all determined in the OU::Metadata::Port.  FIXME allow parameterized?
   // Data width can be unspecified, specified explicitly, or specified with an expression
@@ -242,6 +242,8 @@ addProperty(const char *a_name, OA::BaseType type, bool isDebug, bool isParamete
 // and also *AGAIN* after all expressions are resolved when instanced in an assembly
 const char *DataPort::
 finalize() {
+  if (!m_dataValueWidth && nOperations() && !m_dataWidthFound && worker().m_defaultDataWidth == SIZE_MAX)
+    m_dataWidth = 0; // if no width is specified and the values are zero, force the width to zero
   if (!m_dataValueWidth && !nOperations())
     m_dataValueWidth = m_dataWidth;
   if (m_dataWidth >= m_dataValueWidth) {

@@ -27,7 +27,7 @@ ONLY_CREATE_BUILD=1 skips delete
 NO_BUILD=1 skips build/clean"
 exit
 fi
-set -e
+set -evx
 
 # ocpidev verbosity
 #V=" -v"
@@ -124,12 +124,12 @@ for lib in ${complibs[@]} ; do
 
   do_ocpidev create worker "comp_$lib".hdl -l $lib -S none
   for c in ${compseq1[@]}; do
-    do_ocpidev create spec $c -l $lib
+    do_ocpidev create component $c -l $lib
     do_ocpidev create test $c -l $lib
     do_ocpidev create worker "$c".hdl -l $lib
   done
   for c in ${compseq1[@]}; do
-    do_ocpidev create worker "$c".rcc -l $lib -S comp1-spec
+    do_ocpidev create worker "$c".rcc -l $lib -S comp1
   done
 done
 
@@ -208,11 +208,9 @@ for lib in ${platnames[@]} ; do
     do_ocpidev create hdl device "$c"_em.hdl -P $lib -E "$c".hdl
     Workers+=" $c"_em.hdl
   done
-  set -x
   cp /dev/null hdl/platforms/$lib/devices/Makefile
   echo "Workers= $Workers" >> hdl/platforms/$lib/devices/Makefile
   echo "include \$(OCPI_CDK_DIR)/include/library.mk" >> hdl/platforms/$lib/devices/Makefile
-  set +x
 done
 
 echo "========Creating assemblies"
@@ -234,7 +232,7 @@ for app in ${applications[@]} ; do
   do_ocpidev create application "$app"_x -x
   [ -n "$NO_BUILD" ] || [ -n "$ONLY_CREATE" ] || ocpidev -d applications/"$app"_x build --rcc-platform=$RCC_PLATFORM
   [ -n "$NO_BUILD" ] || [ -n "$ONLY_CREATE" ] || ocpidev -d applications/"$app"_x clean
-  do_ocpidev create application $app -X
+  do_ocpidev create application ${app}_xml -X
   [ -n "$NO_BUILD" ] || [ -n "$ONLY_CREATE" ] || ocpidev -d applications build --rcc-platform=$RCC_PLATFORM
   [ -n "$NO_BUILD" ] || [ -n "$ONLY_CREATE" ] || ocpidev -d applications clean
 done
@@ -274,12 +272,12 @@ echo "ocpidev show platforms --simple"
 do_ocpidev show platforms --simple
 echo "ocpidev show platforms --json"
 do_ocpidev show platforms --json
-echo "ocpidev show rcc targets"
-do_ocpidev show rcc targets
-echo "ocpidev show rcc targets --simple"
-do_ocpidev show rcc targets --simple
-echo "ocpidev show rcc targets --json"
-do_ocpidev show rcc targets --json
+#echo "ocpidev show rcc targets"
+#do_ocpidev show rcc targets
+#echo "ocpidev show rcc targets --simple"
+#do_ocpidev show rcc targets --simple
+#echo "ocpidev show rcc targets --json"
+#do_ocpidev show rcc targets --json
 echo "ocpidev show hdl targets"
 do_ocpidev show hdl targets
 echo "ocpidev show hdl targets --simple"
@@ -330,11 +328,9 @@ echo "ocpidev show component top_comp1-spec.xml --table"
 do_ocpidev show component top_comp1-spec.xml --table
 echo "ocpidev show component top_comp1-spec.xml --json"
 do_ocpidev show component top_comp1-spec.xml --json
-echo "ocpidev show component top_comp1-spec.xml --simple"
-do_ocpidev show component top_comp1-spec.xml --simple
 echo "ocpidev show component --hdl-library devices comp1-spec.xml --simple"
 do_ocpidev show component --hdl-library devices comp1-spec.xml --simple
-echo "ocpidev show component -p matchstiq_z1_0 comp1-spec.xml --simple"
+echo "ocpidev show component matchstiq_z1_0 comp1-spec.xml --simple"
 do_ocpidev show component -P matchstiq_z1_0 comp1-spec.xml --simple
 echo "ocpidev show worker -l dsp_comps comp1.rcc --simple"
 do_ocpidev show worker -l dsp_comps comp1.rcc --simple
@@ -362,7 +358,9 @@ if [ -z "$NO_BUILD" ] ; then
   do_ocpidev build library dsp_comps --rcc
   do_ocpidev clean library dsp_comps --build-rcc
   do_ocpidev clean library dsp_comps --rcc
-  do_ocpidev build library dsp_comps --rcc  --worker comp1.rcc
+  # --worker is broken and wrong in any case
+  # do_ocpidev build library dsp_comps --rcc  --worker comp1.rcc
+  do_ocpidev build -l dsp_comps worker comp1.rcc
   do_ocpidev clean library dsp_comps --rcc
   echo "============OCPIDEVTEST:Building components hdl"
   do_ocpidev build library dsp_comps --build-hdl
@@ -480,7 +478,7 @@ echo "========Deleting applications"
 for app in ${applications[@]} ; do
   do_ocpidev delete -f application $app
   do_ocpidev delete -f application "$app"_x
-  do_ocpidev delete -f application $app -X
+  do_ocpidev delete -f application "$app"_xml -X
 done
 confirm_empty applications
 
