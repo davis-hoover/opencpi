@@ -725,7 +725,7 @@ emitDeviceSignalMappings(FILE *f, std::string &last) {
   for (SignalsIter si = m_signals.begin(); si != m_signals.end(); si++) {
     Signal &s = **si;
     ocpiDebug("DeviceSignalMappings %s: %zd %u %d",
-	      s.cname(), m_paramConfig ? m_paramConfig->nConfig : 99, // 99 for debugging
+	      s.cname(), m_paramConfig ? m_paramConfig->nConfig : 99,
 	      s.m_direction, m_type == Container);
     if ((s.m_directionExpr.size() || s.m_widthExpr.size()) && m_type != Container)
       anyExpr = true;
