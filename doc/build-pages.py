@@ -283,7 +283,7 @@ def build(tag: str) -> None:
 
         # Generate and copy RST docs to release dir
         logging.info(f"Generating and copying RST docs for release: {tag}")
-        gen_copy_rst(tmprepo, release_dir / "rst")
+        gen_copy_rst(tmprepo, release_dir / "rst", tag)
 
 
 def build_docs(repo_dir: Path):
@@ -354,7 +354,7 @@ scripts/install-opencpi.sh --minimal --no-kernel']
         shutil.copy2(str(f), str(dst))
 
 
-def gen_copy_rst(src_dir: Path, dst_dir: Path):
+def gen_copy_rst(src_dir: Path, dst_dir: Path, tag: str):
     """
     Generate HTML renderings of RST document sources and copy
     them to project-specific subdirectories under the specified
@@ -389,6 +389,12 @@ def gen_copy_rst(src_dir: Path, dst_dir: Path):
         # "ocpidoc" because of allowable dependencies on "imports/ocpi.core", so
         # we have to install the framework anyway to make "ocpidev" available.
         #
+        # "ocpi.comp.sdr" must be built using "ocpidev build" instead of using
+        # "ocpidoc".  This may have to be extended to cover all COMPS and OSPS
+        # eventually.  Potential issue if "ocpidev" is not new enough to have
+        # the "ocpidoc" functionality integrated: that integration happened in
+        # v2.4.X, and "ocpi.comp.sdr" did not exist prior to v2.3.X.
+        #
         cmd = ["bash", "-c", fr'cd {src_dir} ; \
 source cdk/opencpi-setup.sh -s ; \
 export LANG=en_US.utf8 ; \
@@ -397,7 +403,10 @@ do if [ -f $pdir/index.rst ] ; \
 then if [[ $pdir == *"/ocpi."* ]] ; \
 then ocpidev -d $pdir register project ; \
 fi ; \
-ocpidoc -d $pdir build -b ; \
+if [[ $pdir == *"/ocpi.comp.sdr" && {tag} != "v2.3"* ]] ; \
+then ocpidev -d $pdir build ; \
+else ocpidoc -d $pdir build -b ; \
+fi ; \
 if [ -d $pdir/gen/doc ] ; \
 then ddir=`basename $pdir | sed -e "s/\./_/g" -e "s/ocpi_//"` ; \
 mkdir -p {dst_dir}/$ddir ; \
