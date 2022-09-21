@@ -89,13 +89,13 @@ begin
         s_full  <= '1';
         s_empty <= '0';
       else
-        if (CLR = '1') then
+        if CLR = '1' then
           s_full  <= '1';
           s_empty <= '0';
-        elsif (ENQ = '1') then
+        elsif ENQ = '1' and DEQ = '0' then
           s_full  <= not s_empty;
           s_empty <= '1';
-        elsif (DEQ = '1') then
+        elsif DEQ = '1' and ENQ = '0' then
           s_full  <= '1';
           s_empty <= not s_full;
         end if;

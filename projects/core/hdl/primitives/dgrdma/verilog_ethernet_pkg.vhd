@@ -253,4 +253,81 @@ package verilog_ethernet is
     );
   end component eth_mac_10g_fifo;
 
+  component axis_pipeline_register is
+    generic (
+      DATA_WIDTH    : natural := 8;
+      KEEP_ENABLE   : boolean := false;
+      KEEP_WIDTH    : natural := 1;
+      LAST_ENABLE   : natural := 1;
+      ID_ENABLE     : natural := 0;
+      ID_WIDTH      : natural := 8;
+      DEST_ENABLE   : natural := 0;
+      DEST_WIDTH    : natural := 8;
+      USER_ENABLE   : natural := 1;
+      USER_WIDTH    : natural := 1;
+      REG_TYPE      : natural := 2;
+      LENGTH        : natural := 2
+    );
+    port (
+      clk             : in std_logic;
+      rst             : in std_logic;
+
+      s_axis_tdata    : in std_logic_vector(DATA_WIDTH-1 downto 0);
+      s_axis_tkeep    : in std_logic_vector(KEEP_WIDTH-1 downto 0);
+      s_axis_tvalid   : in std_logic;
+      s_axis_tready   : out std_logic;
+      s_axis_tlast    : in std_logic;
+      s_axis_tid      : in std_logic_vector(ID_WIDTH-1 downto 0);
+      s_axis_tdest    : in std_logic_vector(DEST_WIDTH-1 downto 0);
+      s_axis_tuser    : in std_logic_vector(USER_WIDTH-1 downto 0);
+
+      m_axis_tdata    : out std_logic_vector(DATA_WIDTH-1 downto 0);
+      m_axis_tkeep    : out std_logic_vector(KEEP_WIDTH-1 downto 0);
+      m_axis_tvalid   : out std_logic;
+      m_axis_tready   : in std_logic;
+      m_axis_tlast    : out std_logic;
+      m_axis_tid      : out std_logic_vector(ID_WIDTH-1 downto 0);
+      m_axis_tdest    : out std_logic_vector(DEST_WIDTH-1 downto 0);
+      m_axis_tuser    : out std_logic_vector(USER_WIDTH-1 downto 0)
+    );
+  end component axis_pipeline_register;
+
+  component axis_register is
+    generic (
+      DATA_WIDTH    : natural := 8;
+      KEEP_ENABLE   : boolean := false;
+      KEEP_WIDTH    : natural := 1;
+      LAST_ENABLE   : natural := 1;
+      ID_ENABLE     : natural := 0;
+      ID_WIDTH      : natural := 8;
+      DEST_ENABLE   : natural := 0;
+      DEST_WIDTH    : natural := 8;
+      USER_ENABLE   : natural := 1;
+      USER_WIDTH    : natural := 1;
+      REG_TYPE      : natural := 2
+    );
+    port (
+      clk             : in std_logic;
+      rst             : in std_logic;
+
+      s_axis_tdata    : in std_logic_vector(DATA_WIDTH-1 downto 0);
+      s_axis_tkeep    : in std_logic_vector(KEEP_WIDTH-1 downto 0);
+      s_axis_tvalid   : in std_logic;
+      s_axis_tready   : out std_logic;
+      s_axis_tlast    : in std_logic;
+      s_axis_tid      : in std_logic_vector(ID_WIDTH-1 downto 0);
+      s_axis_tdest    : in std_logic_vector(DEST_WIDTH-1 downto 0);
+      s_axis_tuser    : in std_logic_vector(USER_WIDTH-1 downto 0);
+
+      m_axis_tdata    : out std_logic_vector(DATA_WIDTH-1 downto 0);
+      m_axis_tkeep    : out std_logic_vector(KEEP_WIDTH-1 downto 0);
+      m_axis_tvalid   : out std_logic;
+      m_axis_tready   : in std_logic;
+      m_axis_tlast    : out std_logic;
+      m_axis_tid      : out std_logic_vector(ID_WIDTH-1 downto 0);
+      m_axis_tdest    : out std_logic_vector(DEST_WIDTH-1 downto 0);
+      m_axis_tuser    : out std_logic_vector(USER_WIDTH-1 downto 0)
+    );
+  end component axis_register;
+
 end package verilog_ethernet;

@@ -104,8 +104,8 @@ begin
     up_from_client <= up_from_client_r when its(up_active_r) else
                     client_in.sdp.valid and (not down_in.sdp.valid or not up_from_client_r);
 
-     -- pass the metadata through from the selected interface
-    up_out.metaData <= client_in.metaData  when its(up_from_client) else down_in.metaData;
+    -- metadata is not used if we are not arbitrating
+    up_out.metaData <= (others => '0');
 
   end generate arbitrate_lru;
 

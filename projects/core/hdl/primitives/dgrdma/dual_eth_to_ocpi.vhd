@@ -122,6 +122,21 @@ architecture rtl of dual_eth_to_ocpi is
   signal tx_eth_tlast  : std_logic;
   signal tx_eth_tuser  : std_logic;
 
+  -- Dual ethernet interface pipelining
+  signal rx_eth_tdata_r  : std_logic_vector((DATA_WIDTH - 1) downto 0);
+  signal rx_eth_tkeep_r  : std_logic_vector((KEEP_WIDTH - 1) downto 0);
+  signal rx_eth_tvalid_r : std_logic;
+  signal rx_eth_tready_r : std_logic;
+  signal rx_eth_tlast_r  : std_logic;
+  signal rx_eth_tuser_r  : std_logic_vector(0 downto 0);
+
+  signal tx_eth_tdata_r  : std_logic_vector((DATA_WIDTH - 1) downto 0);
+  signal tx_eth_tkeep_r  : std_logic_vector((KEEP_WIDTH - 1) downto 0);
+  signal tx_eth_tvalid_r : std_logic;
+  signal tx_eth_tready_r : std_logic;
+  signal tx_eth_tlast_r  : std_logic;
+  signal tx_eth_tuser_r  : std_logic_vector(0 downto 0);
+
   -- Receive packets without Ethernet header
   signal rx_hdr_dest_mac : std_logic_vector(47 downto 0);
   signal rx_hdr_type     : std_logic_vector(15 downto 0);
@@ -214,6 +229,68 @@ begin
     );
 
   -- ---------------------------------------------------
+  -- Receive path pipeline to break up long paths
+  rx_pipeline_inst : dgrdma.verilog_ethernet.axis_pipeline_register
+    generic map (
+      DATA_WIDTH => DATA_WIDTH,
+      KEEP_ENABLE => true,
+      KEEP_WIDTH => KEEP_WIDTH
+    )
+    port map (
+      clk             => clk,
+      rst             => reset,
+
+      -- AXI input
+      s_axis_tdata    => rx_eth_tdata,
+      s_axis_tkeep    => rx_eth_tkeep,
+      s_axis_tvalid   => rx_eth_tvalid,
+      s_axis_tready   => rx_eth_tready,
+      s_axis_tlast    => rx_eth_tlast,
+      s_axis_tid      => (others => '0'),
+      s_axis_tdest    => (others => '0'),
+      s_axis_tuser    => (0 => rx_eth_tuser),
+
+      -- AXI output
+      m_axis_tdata    => rx_eth_tdata_r,
+      m_axis_tkeep    => rx_eth_tkeep_r,
+      m_axis_tvalid   => rx_eth_tvalid_r,
+      m_axis_tready   => rx_eth_tready_r,
+      m_axis_tlast    => rx_eth_tlast_r,
+      m_axis_tuser    => rx_eth_tuser_r
+    );
+
+  -- ---------------------------------------------------
+  -- Transmit path pipeline to break up long paths
+  tx_pipeline_inst : dgrdma.verilog_ethernet.axis_pipeline_register
+    generic map (
+      DATA_WIDTH => DATA_WIDTH,
+      KEEP_ENABLE => true,
+      KEEP_WIDTH => KEEP_WIDTH
+    )
+    port map (
+      clk             => clk,
+      rst             => reset,
+
+      -- AXI input
+      s_axis_tdata    => tx_eth_tdata,
+      s_axis_tkeep    => tx_eth_tkeep,
+      s_axis_tvalid   => tx_eth_tvalid,
+      s_axis_tready   => tx_eth_tready,
+      s_axis_tlast    => tx_eth_tlast,
+      s_axis_tid      => (others => '0'),
+      s_axis_tdest    => (others => '0'),
+      s_axis_tuser    => (0 => tx_eth_tuser),
+
+      -- AXI output
+      m_axis_tdata    => tx_eth_tdata_r,
+      m_axis_tkeep    => tx_eth_tkeep_r,
+      m_axis_tvalid   => tx_eth_tvalid_r,
+      m_axis_tready   => tx_eth_tready_r,
+      m_axis_tlast    => tx_eth_tlast_r,
+      m_axis_tuser    => tx_eth_tuser_r
+    );
+
+  -- ---------------------------------------------------
   -- DUAL ETHERNET TRANSMIT MUX
   eth_tx_mux_inst : entity work.dgrdma_tx_mux
   generic map (
@@ -228,12 +305,12 @@ begin
       -- state of the dual-ethernet property
       enable => dual_ethernet,
 
-      s_axis_tdata    => tx_eth_tdata,
-      s_axis_tkeep    => tx_eth_tkeep,
-      s_axis_tvalid   => tx_eth_tvalid,
-      s_axis_tlast    => tx_eth_tlast,
-      s_axis_tuser    => tx_eth_tuser,
-      s_axis_tready   => tx_eth_tready,
+      s_axis_tdata    => tx_eth_tdata_r,
+      s_axis_tkeep    => tx_eth_tkeep_r,
+      s_axis_tvalid   => tx_eth_tvalid_r,
+      s_axis_tlast    => tx_eth_tlast_r,
+      s_axis_tuser    => tx_eth_tuser_r(0),
+      s_axis_tready   => tx_eth_tready_r,
 
       m_axis_tdata_a  => tx_eth_tdata_a,
       m_axis_tkeep_a  => tx_eth_tkeep_a,
@@ -261,12 +338,12 @@ begin
       clk   => clk,
       reset => reset,
 
-      s_rx_eth_tdata  => rx_eth_tdata,
-      s_rx_eth_tkeep  => rx_eth_tkeep,
-      s_rx_eth_tvalid => rx_eth_tvalid,
-      s_rx_eth_tready => rx_eth_tready,
-      s_rx_eth_tlast  => rx_eth_tlast,
-      s_rx_eth_tuser  => rx_eth_tuser,
+      s_rx_eth_tdata  => rx_eth_tdata_r,
+      s_rx_eth_tkeep  => rx_eth_tkeep_r,
+      s_rx_eth_tvalid => rx_eth_tvalid_r,
+      s_rx_eth_tready => rx_eth_tready_r,
+      s_rx_eth_tlast  => rx_eth_tlast_r,
+      s_rx_eth_tuser  => rx_eth_tuser_r(0),
 
       m_rx_axis_tdata  => rx_axis_tdata,
       m_rx_axis_tkeep  => rx_axis_tkeep,

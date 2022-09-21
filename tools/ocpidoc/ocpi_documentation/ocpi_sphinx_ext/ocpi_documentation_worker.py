@@ -127,7 +127,7 @@ class OcpiDocumentationWorker(PropertiesDirectiveHandler):
                 docutils.nodes.paragraph(text="Connections:"))
             supported_item.append(docutils.nodes.line())
             connection_list = docutils.nodes.bullet_list()
-            for port,connect in connections:
+            for port,connect in connections.items():
                 connection_list = docutils.nodes.bullet_list()
                 connection_list.append(
                     docutils_helpers.list_item_name_code_value(
