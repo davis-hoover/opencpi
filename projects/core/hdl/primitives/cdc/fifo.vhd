@@ -236,10 +236,18 @@ begin
       if ((dNotEmptyReg = '0' or dst_DEQ = '1') and dNextNotEmpty = '1') then
         dGDeqPtr     <= dGDeqPtr1;
         dGDeqPtr1    <= f_incrGrayP(dGDeqPtr1);
-        dDoutReg     <= fifoMem(to_integer(unsigned(dDeqPtrIndx)));
         dNotEmptyReg <= '1';
       elsif (dst_DEQ = '1' and dNextNotEmpty = '0') then
         dNotEmptyReg <= '0';
+      end if;
+    end if;
+  end process;
+
+  process (dst_CLK)
+  begin
+    if rising_edge(dst_CLK) then
+      if ((dNotEmptyReg = '0' or dst_DEQ = '1') and dNextNotEmpty = '1') then
+        dDoutReg <= fifoMem(to_integer(unsigned(dDeqPtrIndx)));
       end if;
     end if;
   end process;

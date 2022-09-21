@@ -101,7 +101,7 @@ begin
   up_full             <= not up_full_n; -- FIXED when these fifos move to util
   up_empty            <= not up_empty_n; -- FIXED when these fifos move to util
   up_enq              <= down_in.sdp.valid and not up_full;
-  up: component sync.sync.sync_fifo_1xn
+  up: component sync.sync.sync_fifo_2xn
     generic map(width  => width_c)
     port map   (clk    => sdp_clk,
                 rst    => sdp_reset,
@@ -116,7 +116,7 @@ begin
   down_full             <= not down_full_n;  -- FIXED when these fifos move to util
   down_empty            <= not down_empty_n;  -- FIXED when these fifos move to util
   down_enq           <= up_in.sdp.valid and not down_full;
-  down: component sync.sync.sync_fifo_1xn
+  down: component sync.sync.sync_fifo_2xn
     generic map(width  => width_c)
     port map   (clk    => sdp_clk,
                 rst    => sdp_reset,

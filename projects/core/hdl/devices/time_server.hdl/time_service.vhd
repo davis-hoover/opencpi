@@ -144,9 +144,6 @@ architecture rtl of time_service is
   signal s_nowInCC_sD_IN                       : std_logic_vector(63 downto 0);
   signal s_nowInCC_sRDY                        : std_logic;
   --
-  signal s_nowInCC_sReg1                       : std_logic_vector(63 downto 0);
-  signal s_nowInCC_dReg1                       : std_logic_vector(63 downto 0);
-  --
   signal s_nowTC                               : std_logic_vector(63 downto 0);
   --
   signal s_ppsDisablePPS_dD_OUT                : std_logic;
@@ -284,7 +281,7 @@ begin
   outReg_deltaTime : process(CLK)
   begin
     if(rising_edge(CLK)) then
-      if (timeRST = '1') then
+      if (RST = '1') then
         timeDeltaOut <= (others => '0');
       else
         if (timeDelta_written = '1') then
@@ -427,25 +424,25 @@ begin
   -----------------------------------------------------------------------------
   -- Time to Control clk domain: Seconds and Fraction
   -- The exact SAME Sec/Frac value as reported in the Time clock domain
-  --
-  -- TODO: Replace with appropriate CDC (bus-based) module
+  -- This is just used for property output so the extra latency of a bits
+  -- feedback is not an issue.
   -----------------------------------------------------------------------------
   s_nowInCC_sD_IN <= s_refSecCount & s1_fracSeconds(47 downto 16);
-  s_nowInCC_sRDY  <= '1';
-  -- Purely sampling the time clock to cross the clock domain
-  reg_nowInCC1 : process(timeCLK)
-  begin
-    if(rising_edge(timeCLK)) then
-      s_nowInCC_sReg1 <= s_nowInCC_sD_IN;
-    end if;
-  end process;
-  reg_nowInCC2 : process(CLK)
-  begin
-    if(rising_edge(CLK)) then
-      s_nowInCC_dReg1  <= s_nowInCC_sReg1;
-      s_nowInCC_dD_OUT <= s_nowInCC_dReg1;
-    end if;
-  end process;
+
+  s_nowInCC_bits_inst: cdc.cdc.bits_feedback
+    generic map (
+      WIDTH => 64
+    )
+    port map (
+      src_clk => timeCLK,
+      src_rst => timeRST,
+      src_in => s_nowInCC_sD_In,
+      dst_clk => CLK,
+      dst_rst => RST,
+      dst_out => s_nowInCC_dD_OUT,
+      src_rdy => s_nowInCC_sRDY,
+      src_en => s_nowInCC_sRDY
+    );
 
   -----------------------------------------------------------------------------
   -- Register Second and Fraction counts in the Time clock domain

@@ -49,6 +49,22 @@ namespace OCPI {
 	bool unload(std::string &error) {
 	  return unloadJtag(error);
 	}
+
+	bool configure(ezxml_t config, std::string &err) {
+	  if (!m_isAlive) {
+	    // similar to code in HDL::Device::configure which relies on
+	    // reading m_platform and m_part from the hardware
+	    // this is necessary in the case when forLoad is set
+	    // so that the load() function above finds these set
+	    OU::EzXml::getOptionalString(config, m_esn, "esn");
+	    OU::EzXml::getOptionalString(config, m_platform, "platform");
+	    OU::EzXml::getOptionalString(config, m_part, "device");
+	    OU::EzXml::getOptionalString(config, m_position, "position");
+          }
+
+	  return OCPI::HDL::Device::configure(config, err);
+        }
+
       };
       Driver::
       ~Driver() {
