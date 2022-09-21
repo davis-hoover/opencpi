@@ -581,7 +581,7 @@ emitXmlWorker(std::string &out, bool verbose) {
       for (auto it = i->m_xmlProperties.begin(); it != i->m_xmlProperties.end(); ++it) {
 	const OM::Property *p = i->m_worker->findProperty(it->m_name.c_str());
 	assert(p);
-	if (!p->m_isParameter) {
+	/* if (!p->m_isParameter) */ {
 	  if (!any)
 	    out += ">\n";
 	  any = true;
@@ -667,17 +667,17 @@ emitXmlWorker(std::string &out, bool verbose) {
       bool isDefault =
 	!m_paramConfig || prop->m_paramOrdinal >= m_paramConfig->params.size() ||
 	m_paramConfig->params[prop->m_paramOrdinal].m_isDefault;
-      OB::Value *v = isDefault ? prop->m_default : &m_paramConfig->params[prop->m_paramOrdinal].m_value;
-      if (v) {
-	std::string value;
-	v->unparse(value);
-	// FIXME: this code is in three places..
-	out += " value='";  // may or may not be the default
-	std::string xml;
-	OU::encodeXmlAttrSingle(value, xml);
-	out += xml;
-	out += "'";
-      }
+      OB::Value zeroValue(*prop);
+      OB::Value	&v = isDefault ? (prop->m_default ? *prop->m_default : zeroValue) :
+	m_paramConfig->params[prop->m_paramOrdinal].m_value;
+      std::string value;
+      v.unparse(value);
+      // FIXME: this code is in three places..
+      out += " value='";  // may or may not be the default
+      std::string xml;
+      OU::encodeXmlAttrSingle(value, xml);
+      out += xml;
+      out += "'";
       if (isDefault)
 	out += " isDefault='1'"; // indicate that the parameter's value is the default
     }
