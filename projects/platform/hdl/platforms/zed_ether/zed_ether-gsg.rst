@@ -339,8 +339,8 @@ below, assuming that:
       <container>
          <rcc load='1'/>
          <hdl load='1' discovery='static'>
-            <device name="Ether:bond0/80:1f:12:7c:79:04" device="xc7z020" platform="zed_ether" esn="210248B1880E">
-              <instance worker='dgrdma_config_dev'
+            <device name="Ether:bond0/80:1f:12:7c:79:04" device="xc7z020" platform="zed_ether" esn="210248B1880E" static="true">
+              <instance worker='dgrdma_config_dev'>
                <property name="remote_mac_addr_d" value="0x00e04c70dee2"/>
                <property name="interface_mtu_d" value="8192"/>
                <property name="dual_ethernet_d" value="1"/>

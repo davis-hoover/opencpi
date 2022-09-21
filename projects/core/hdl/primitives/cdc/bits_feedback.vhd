@@ -132,7 +132,7 @@ begin
   dest_oreg : process(dst_clk)
   begin
     if (rising_edge(dst_clk)) then
-      if (src_rst = '1') then
+      if (dst_rst = '1') then
         dst_out <= (others => '0');
       elsif (s_dest_load_en = '1') then
         dst_out <= s_src_data;
