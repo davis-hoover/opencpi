@@ -389,11 +389,13 @@ def gen_copy_rst(src_dir: Path, dst_dir: Path, tag: str):
         # "ocpidoc" because of allowable dependencies on "imports/ocpi.core", so
         # we have to install the framework anyway to make "ocpidev" available.
         #
-        # "ocpi.comp.sdr" must be built using "ocpidev build" instead of using
-        # "ocpidoc".  This may have to be extended to cover all COMPS and OSPS
-        # eventually.  Potential issue if "ocpidev" is not new enough to have
-        # the "ocpidoc" functionality integrated: that integration happened in
-        # v2.4.X, and "ocpi.comp.sdr" did not exist prior to v2.3.X.
+        # External projects (COMPS, OSPS) now require additional preprocessing
+        # for versions 2.4.X and later because of possible dependencies on other
+        # projects.  The "declare" target for "make" is available as of v2.4.1:
+        #
+        #   "make -C <project-dir> -f $OCPI_CDK_DIR/include/project.mk declare"
+        #
+        # Per Jim, "ocpidev build --doc-only" will do this for us someday.
         #
         cmd = ["bash", "-c", fr'cd {src_dir} ; \
 source cdk/opencpi-setup.sh -s ; \
@@ -402,16 +404,17 @@ for pdir in projects/* projects/osps/* ; \
 do if [ -f $pdir/index.rst ] ; \
 then if [[ $pdir == *"/ocpi."* ]] ; \
 then ocpidev -d $pdir register project ; \
+case {tag} in v1.7*|v2.[0-3]*) \
+;; \
+*) make -C $pdir -f $OCPI_CDK_DIR/include/project.mk declare ;; \
+esac ; \
 fi ; \
-if [[ $pdir == *"/ocpi.comp.sdr" && {tag} != "v2.3"* ]] ; \
-then ocpidev -d $pdir build ; \
-else ocpidoc -d $pdir build -b ; \
+ocpidoc -d $pdir build -b ; \
 fi ; \
 if [ -d $pdir/gen/doc ] ; \
 then ddir=`basename $pdir | sed -e "s/\./_/g" -e "s/ocpi_//"` ; \
 mkdir -p {dst_dir}/$ddir ; \
 ( cd $pdir/gen/doc ; cp -pr . {dst_dir}/$ddir ) ; \
-fi ; \
 fi ; \
 done']
         logging.debug(f'Executing "{cmd}" in directory "{src_dir}"')
