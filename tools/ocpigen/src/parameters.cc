@@ -186,14 +186,14 @@ parseValue(const OM::Property &prop, const char *value) {
     return err;
   m_isDefault = false;
   newValue.unparse(m_uValue);
-  if (prop.m_default) {
-    std::string defValue;
-    prop.m_default->unparse(defValue);
-    if (defValue == m_uValue) {
-      m_isDefault = true;
-      m_value = *prop.m_default; // copy
-    } else
-      m_value = newValue; // copy
+  // Check supplied value against explicit or implicit default
+  OB::Value zeroValue(prop); // zero value of the right type
+  OB::Value &defValue = prop.m_default ? *prop.m_default : zeroValue;
+  std::string defString;
+  defValue.unparse(defString);
+  if (defString == m_uValue) {
+    m_isDefault = true;
+    m_value = defValue; // copy
   } else
     m_value = newValue; // copy
   return NULL;
