@@ -163,6 +163,8 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
                     "protocol" : protocol_name,
                     "optional" : self._is_true(port, "optional", False, True)
                 }
+            elif "type" not in port_dict:
+                pass # Ignore port if type not defined
             elif port_dict['type'] in ["devsignal", "rawprop", "timeinterface"]:
                 dictionary["interfaces"][name] = { 'type' : port_dict['type'] }
             else:

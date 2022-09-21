@@ -126,7 +126,7 @@ architecture rtl of dgrdma_frame_generator is
 
   -- NEXT MESSAGE HEADER
   type msg_hdr_t is record
-  last_in_frame : std_logic;
+    last_in_frame : std_logic;
     txn_id : unsigned(31 downto 0);
     msgs_in_txn : unsigned(12 downto 0);
     seq : unsigned(15 downto 0);
@@ -277,7 +277,7 @@ begin
             frag_state <= FRAG_CALC2;
 
             -- Can this transfer be sent as a single message in the current frame?
-            if round_up(txn_len_bytes,8) <= remaining_frame_capacity_bytes then
+            if round_up(txn_len_bytes, 8) <= remaining_frame_capacity_bytes then
               -- next message (if any) must start on an 8-byte boundary per DG-RDMA spec
               remaining_frame_capacity_bytes <= remaining_frame_capacity_bytes - round_up(txn_len_bytes, 8);
 
@@ -310,7 +310,7 @@ begin
             nextmsg.seq <= nextmsg.seq + 1;
 
             -- Can this transfer be sent as a single message in the current frame?
-            if txn_len_bytes <= remaining_frame_capacity_bytes then
+            if round_up(txn_len_bytes, 8) <= remaining_frame_capacity_bytes then
               -- next message (if any) must start on an 8-byte boundary per DG-RDMA spec
               remaining_frame_capacity_bytes <= remaining_frame_capacity_bytes - round_up(txn_len_bytes, 8);
 
