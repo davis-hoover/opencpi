@@ -96,6 +96,21 @@
   <Property Name="is_supported_tx_samples_real"    Type="bool"
             Description="True if real samples are supported by any TX channel"/>
 
+  <!-- These radio values determine if optional slave workers are enabled / disabled -->
+  <Property Name="enable_rx_resampling" Type="bool" Parameter="true" Default="false"
+            Description="True if resampling on RX channels are enabled"/>
+  <Property Name="enable_rx_digital_tuning" Type="bool" Parameter="true" Default="false"
+            Description="True if digital tuning on RX channels are enabled"/>
+  <Property Name="enable_rx_timestamping" Type="bool" Parameter="true" Default="false"
+            Description="True if timestamping on RX channels are enabled"/>
+
+  <Property Name="enable_tx_resampling" Type="bool" Parameter="true" Default="false"
+            Description="True if resampling on TX channels are enabled"/>
+  <Property Name="enable_tx_digital_tuning" Type="bool" Parameter="true" Default="false"
+            Description="True if digital tuning on TX channels are enabled"/>  
+  <Property Name="enable_tx_timegating" Type="bool" Parameter="true" Default="false"
+            Description="True if timegating on TX channels are enabled"/>
+
   <!-- =========================================================================================
        The writable property specifying radio configurations which consist of channel
        configurations
