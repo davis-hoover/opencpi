@@ -574,10 +574,22 @@ namespace OCPI {
 	if (!mentioned[p.m_ordinal] && p.m_isParameter && !p.m_isDefault) {
 	  std::string pStr;
 	  p.m_default->unparse(pStr);
-	  ocpiInfo("    Rejected the \"%s\" parameter value \"%s\" because it is not the default "
-		   "and the instance provided no value",
-		   p.cname(), pStr.c_str());
-	  return false;
+	  const char *env = getenv("OCPI_ENABLE_DEFAULT_PARAMETER_ERROR_CHECK");
+	  if (env && env[0] == '1') {
+	    ocpiInfo("    Rejected the \"%s\" parameter value \"%s\" because it is not the default "
+		     "and the instance provided no value",
+		     p.cname(), pStr.c_str());
+	    return false;
+	  }
+	  ocpiBad("WARNING:  When considering implementation \"%s%s%s\" from artifact \"%s\"...",
+		  impl.m_metadataImpl.cname(),
+		  impl.m_staticInstance ? "/" : "",
+		  impl.m_staticInstance ? ezxml_cattr(impl.m_staticInstance, "name") : "",
+		  impl.m_artifact.name().c_str());
+	  ocpiBad("WARNING:  The \"%s\" parameter value \"%s\" in this candidate is suspicious "
+		  "because it is not the default and the instance in the slave assembly or "
+		  "application requested no value",
+		  p.cname(), pStr.c_str());
 	}
       }
       if (m_utilInstance.slaveInstances().size() && !impl.m_metadataImpl.slaveAssy()) {
