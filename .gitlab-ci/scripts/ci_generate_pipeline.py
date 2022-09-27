@@ -54,7 +54,7 @@ def _set_env():
     environ['CI_OCPI_REF_NAME'] = 'develop'
     environ['CI_PROJECT_NAME'] = 'ocpi.comp.sdr'
     environ['CI_PROJECT_NAMESPACE'] = 'opencpi/ocpi.comp.sdr'
-    environ['CI_GITLAB_CONTAINER_REGISTRY'] = 'dummy-gitlab-registry'
+    environ['CI_REGISTRY'] = 'dummy-gitlab-registry'
 
 
 def _get_builder(builder_type: str, dump_path: Path, 
@@ -83,7 +83,7 @@ def _make_platform_pipeline(dump_path: Path,
     config: str=None) -> PlatformPipelineBuilder:
     """Initialize and return a HostPipelineBuilder"""
     pipeline_id = _get_pipeline_id()
-    gitlab_container_registry = getenv('CI_GITLAB_CONTAINER_REGISTRY', '')
+    gitlab_container_registry = getenv('CI_REGISTRY', '')
     base_image_tag = pipeline_id
     image_tags = _get_image_tags()
     container_registry = getenv('CI_OCPI_CONTAINER_REGISTRY', '')
