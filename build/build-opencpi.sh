@@ -115,7 +115,7 @@ else
 fi
 
 if [ -n "$minimal" ]; then
-  Projects="core platform assets"
+  Projects="core platform assets assets_ts"
 else
   Projects="core platform assets assets_ts inactive tutorial"
 fi
