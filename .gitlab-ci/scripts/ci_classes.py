@@ -253,7 +253,7 @@ class PipelineBuilder(ABC):
                 raise Exception('docker cmd "tag" requires a tag')
             docker_cmd = 'docker tag {} {}'.format(image, tag)
         elif cmd == 'login':
-            docker_cmd = 'docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN'
+            docker_cmd = 'docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_TOKEN'
         else:
             docker_cmd = None
 
