@@ -263,7 +263,7 @@ class PipelineBuilder(ABC):
                 raise Exception('docker cmd "tag" requires a tag')
             docker_cmd = 'docker tag {} {}'.format(image, tag)
         elif cmd == 'login':
-            docker_cmd = 'docker login $CI_GITLAB_REGISTRY -u $CI_GITLAB_USER -p $CI_REGISTRY_TOKEN'
+            docker_cmd = 'docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN'
         else:
             docker_cmd = None
 
@@ -534,8 +534,8 @@ class PlatformPipelineBuilder(PipelineBuilder):
                     script.append(docker_rmi_cmd)
                     if stage == 'build':
                         gitlab_image = self._build_image_name(host, stage,  
-                        platform=platform, container_registry=self.gitlab_container_registry,   
-                        base_platform=base_platform, other_platform=other_platform,tag=tag)
+                            platform=platform, container_registry=self.gitlab_container_registry, 
+                            base_platform=base_platform, other_platform=other_platform,tag=tag)
                         gitlab_rmi_cmd = self._build_docker_cmd('rmi', gitlab_image, stage)
                         script.append(gitlab_rmi_cmd)
 
