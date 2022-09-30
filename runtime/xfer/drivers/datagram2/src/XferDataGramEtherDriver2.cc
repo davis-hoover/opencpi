@@ -18,6 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ocpi-config.h"
 #ifdef OCPI_OS_linux
 #include <unistd.h>
 #include <sys/socket.h>

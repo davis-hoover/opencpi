@@ -306,7 +306,7 @@ for a in $assets; do
 		  }
 		  [ -n "$allhdl" ] && {
 		      for p in $allhdl; do
-			  warn=`checkfiles hdl/platforms/$p '$f.xml' '$f.vhd'`
+			  warn=`checkfiles hdl/platforms/$p '$f.xml'`
 			  if [ -n "$warn" ]; then
 			      warn_check "Warning:  cannot export HDL platform $p: $warn"
 			  else
