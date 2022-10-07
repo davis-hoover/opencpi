@@ -14,7 +14,7 @@ Properties:
        bit 1 is to indicate that there are multpiple message payloads, not one.
        Future: bit 0 will be nuked soon
   -->
-  <property name='control'           readable='true' writable='true' default='1'/> 
+  <property name='control'           writable='true' default='1'/> 
 
   <!-- The register that indicates how many metadata records there are.
        Initialized to 1.
@@ -44,7 +44,7 @@ Properties:
   -->
   <property name='status'            volatile='true'/>
   <!-- Memory for metadata records. -->
-  <property name='metadata' arraydimensions='4,4' initial='true' readable='true'/>
+  <property name='metadata' arraydimensions='4,4' initial='true'/>
   <!-- Memory for data words. -->
-  <property name='data' arraylength='16' initial='true' readable='true'/>
+  <property name='data' arraylength='16' initial='true'/>
 </ComponentSpec>

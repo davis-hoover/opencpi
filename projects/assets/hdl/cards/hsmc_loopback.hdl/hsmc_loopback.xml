@@ -4,98 +4,98 @@
 <hdldevice language="vhdl" OnlyTargets='stratix4'>
   <componentspec>
     <!-- bank 1  -->
-    <!--property name="xcvr_txp_7_0"         type="bool" readable="1" writable="1"              arraylength="8" /-->
+    <!--property name="xcvr_txp_7_0"         type="bool" writable="1"              arraylength="8" /-->
     <!--property name="xcvr_rxp_7_0"         type="bool"                           volatile="1" arraylength="8" /-->
     <property name="sda"                  type="bool"                           volatile="1"                 />
-    <property name="scl"                  type="bool" readable="1" writable="1"                              />
-    <property name="clkout0"              type="bool" readable="1" writable="1"                              />
+    <property name="scl"                  type="bool" writable="1"                              />
+    <property name="clkout0"              type="bool" writable="1"                              />
     <property name="clkin0"               type="bool"                           volatile="1"                 />
 
     <!-- bank 2  -->
-    <property name="d0_d1_pin_directions"    type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d2_d3_pin_directions"    type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d4_d5_pin_directions"    type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d6_d7_pin_directions"    type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d8_d9_pin_directions"    type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d10_d11_pin_directions"  type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d12_d13_pin_directions"  type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d14_d15_pin_directions"  type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d16_d17_pin_directions"  type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d18_d19_pin_directions"  type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d20_d21_pin_directions"  type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d22_d23_pin_directions"  type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d24_d25_pin_directions"  type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d26_d27_pin_directions"  type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d28_d29_pin_directions"  type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d30_d31_pin_directions"  type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d32_d33_pin_directions"  type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d34_d35_pin_directions"  type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
+    <property name="d0_d1_pin_directions"    type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d2_d3_pin_directions"    type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d4_d5_pin_directions"    type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d6_d7_pin_directions"    type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d8_d9_pin_directions"    type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d10_d11_pin_directions"  type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d12_d13_pin_directions"  type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d14_d15_pin_directions"  type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d16_d17_pin_directions"  type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d18_d19_pin_directions"  type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d20_d21_pin_directions"  type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d22_d23_pin_directions"  type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d24_d25_pin_directions"  type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d26_d27_pin_directions"  type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d28_d29_pin_directions"  type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d30_d31_pin_directions"  type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d32_d33_pin_directions"  type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d34_d35_pin_directions"  type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
     <property name="d_0_35"                  type="bool"                          volatile="1" arraylength="36" />
 
-    <property name="d0_d1_output_voltage"    type="bool" readable="1" writable="1"                                         />
-    <property name="d2_d3_output_voltage"    type="bool" readable="1" writable="1"                                         />
-    <property name="d4_d5_output_voltage"    type="bool" readable="1" writable="1"                                         />
-    <property name="d6_d7_output_voltage"    type="bool" readable="1" writable="1"                                         />
-    <property name="d8_d9_output_voltage"    type="bool" readable="1" writable="1"                                         />
-    <property name="d10_d11_output_voltage"  type="bool" readable="1" writable="1"                                         />
-    <property name="d12_d13_output_voltage"  type="bool" readable="1" writable="1"                                         />
-    <property name="d14_d15_output_voltage"  type="bool" readable="1" writable="1"                                         />
-    <property name="d16_d17_output_voltage"  type="bool" readable="1" writable="1"                                         />
-    <property name="d18_d19_output_voltage"  type="bool" readable="1" writable="1"                                         />
-    <property name="d20_d21_output_voltage"  type="bool" readable="1" writable="1"                                         />
-    <property name="d22_d23_output_voltage"  type="bool" readable="1" writable="1"                                         />
-    <property name="d24_d25_output_voltage"  type="bool" readable="1" writable="1"                                         />
-    <property name="d26_d27_output_voltage"  type="bool" readable="1" writable="1"                                         />
-    <property name="d28_d29_output_voltage"  type="bool" readable="1" writable="1"                                         />
-    <property name="d30_d31_output_voltage"  type="bool" readable="1" writable="1"                                         />
-    <property name="d32_d33_output_voltage"  type="bool" readable="1" writable="1"                                         />
-    <property name="d34_d35_output_voltage"  type="bool" readable="1" writable="1"                                         />
+    <property name="d0_d1_output_voltage"    type="bool" writable="1"                                         />
+    <property name="d2_d3_output_voltage"    type="bool" writable="1"                                         />
+    <property name="d4_d5_output_voltage"    type="bool" writable="1"                                         />
+    <property name="d6_d7_output_voltage"    type="bool" writable="1"                                         />
+    <property name="d8_d9_output_voltage"    type="bool" writable="1"                                         />
+    <property name="d10_d11_output_voltage"  type="bool" writable="1"                                         />
+    <property name="d12_d13_output_voltage"  type="bool" writable="1"                                         />
+    <property name="d14_d15_output_voltage"  type="bool" writable="1"                                         />
+    <property name="d16_d17_output_voltage"  type="bool" writable="1"                                         />
+    <property name="d18_d19_output_voltage"  type="bool" writable="1"                                         />
+    <property name="d20_d21_output_voltage"  type="bool" writable="1"                                         />
+    <property name="d22_d23_output_voltage"  type="bool" writable="1"                                         />
+    <property name="d24_d25_output_voltage"  type="bool" writable="1"                                         />
+    <property name="d26_d27_output_voltage"  type="bool" writable="1"                                         />
+    <property name="d28_d29_output_voltage"  type="bool" writable="1"                                         />
+    <property name="d30_d31_output_voltage"  type="bool" writable="1"                                         />
+    <property name="d32_d33_output_voltage"  type="bool" writable="1"                                         />
+    <property name="d34_d35_output_voltage"  type="bool" writable="1"                                         />
     <property name="num_clkout1p_rising_edges"  type="ushort"                     volatile="1"        />
     <property name="num_clkout1n_rising_edges"  type="ushort"                     volatile="1"        />
 
     <!-- bank 3  -->
-    <property name="d40_d41_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d42_d43_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d44_d45_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d46_d47_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d48_d49_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d50_d51_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d52_d53_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d54_d55_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d56_d57_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d58_d59_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d60_d61_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d62_d63_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d64_d65_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d66_d67_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d68_d69_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d70_d71_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d72_d73_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d74_d75_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d76_d77_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
-    <property name="d78_d79_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" readable="1" writable="1" />
+    <property name="d40_d41_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d42_d43_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d44_d45_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d46_d47_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d48_d49_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d50_d51_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d52_d53_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d54_d55_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d56_d57_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d58_d59_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d60_d61_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d62_d63_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d64_d65_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d66_d67_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d68_d69_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d70_d71_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d72_d73_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d74_d75_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d76_d77_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
+    <property name="d78_d79_pin_directions" type="enum" enums="even_d_to_odd_d,odd_d_to_even_d" writable="1" />
     <property name="d_40_79"                type="bool"                          volatile="1" arraylength="40" />
 
-    <property name="d40_d41_output_voltage" type="bool" readable="1" writable="1"                                         />
-    <property name="d42_d43_output_voltage" type="bool" readable="1" writable="1"                                         />
-    <property name="d44_d45_output_voltage" type="bool" readable="1" writable="1"                                         />
-    <property name="d46_d47_output_voltage" type="bool" readable="1" writable="1"                                         />
-    <property name="d48_d49_output_voltage" type="bool" readable="1" writable="1"                                         />
-    <property name="d50_d51_output_voltage" type="bool" readable="1" writable="1"                                         />
-    <property name="d52_d53_output_voltage" type="bool" readable="1" writable="1"                                         />
-    <property name="d54_d55_output_voltage" type="bool" readable="1" writable="1"                                         />
-    <property name="d56_d57_output_voltage" type="bool" readable="1" writable="1"                                         />
-    <property name="d58_d59_output_voltage" type="bool" readable="1" writable="1"                                         />
-    <property name="d60_d61_output_voltage" type="bool" readable="1" writable="1"                                         />
-    <property name="d62_d63_output_voltage" type="bool" readable="1" writable="1"                                         />
-    <property name="d64_d65_output_voltage" type="bool" readable="1" writable="1"                                         />
-    <property name="d66_d67_output_voltage" type="bool" readable="1" writable="1"                                         />
-    <property name="d68_d69_output_voltage" type="bool" readable="1" writable="1"                                         />
-    <property name="d70_d71_output_voltage" type="bool" readable="1" writable="1"                                         />
-    <property name="d72_d73_output_voltage" type="bool" readable="1" writable="1"                                         />
-    <property name="d74_d75_output_voltage" type="bool" readable="1" writable="1"                                         />
-    <property name="d76_d77_output_voltage" type="bool" readable="1" writable="1"                                         />
-    <property name="d78_d79_output_voltage" type="bool" readable="1" writable="1"                                         />
+    <property name="d40_d41_output_voltage" type="bool" writable="1"                                         />
+    <property name="d42_d43_output_voltage" type="bool" writable="1"                                         />
+    <property name="d44_d45_output_voltage" type="bool" writable="1"                                         />
+    <property name="d46_d47_output_voltage" type="bool" writable="1"                                         />
+    <property name="d48_d49_output_voltage" type="bool" writable="1"                                         />
+    <property name="d50_d51_output_voltage" type="bool" writable="1"                                         />
+    <property name="d52_d53_output_voltage" type="bool" writable="1"                                         />
+    <property name="d54_d55_output_voltage" type="bool" writable="1"                                         />
+    <property name="d56_d57_output_voltage" type="bool" writable="1"                                         />
+    <property name="d58_d59_output_voltage" type="bool" writable="1"                                         />
+    <property name="d60_d61_output_voltage" type="bool" writable="1"                                         />
+    <property name="d62_d63_output_voltage" type="bool" writable="1"                                         />
+    <property name="d64_d65_output_voltage" type="bool" writable="1"                                         />
+    <property name="d66_d67_output_voltage" type="bool" writable="1"                                         />
+    <property name="d68_d69_output_voltage" type="bool" writable="1"                                         />
+    <property name="d70_d71_output_voltage" type="bool" writable="1"                                         />
+    <property name="d72_d73_output_voltage" type="bool" writable="1"                                         />
+    <property name="d74_d75_output_voltage" type="bool" writable="1"                                         />
+    <property name="d76_d77_output_voltage" type="bool" writable="1"                                         />
+    <property name="d78_d79_output_voltage" type="bool" writable="1"                                         />
     <property name="psntn"                  type="bool"                           volatile="1"                  />
 
   </componentspec>

@@ -1,9 +1,9 @@
 <HdlDevice language='vhdl' spec='lime_dac_ts_em-spec.xml' emulate='lime_dac_ts.hdl' libraries='util'>
   <!-- Assumes this is an integer value for the TX clock rate -->
-  <Property Name="tx_clk_rate" Type="ulong" Default="100000000" Readable="true" Writable="true"/>
-  <Property Name="messageSize" Type="ulong" Readable="true" Writable="true" Default="8192"/>
+  <Property Name="tx_clk_rate" Type="ulong" Default="100000000" Writable="true"/>
+  <Property Name="messageSize" Type="ulong" Writable="true" Default="8192"/>
   <!-- Number of output samples is used to inject a ZLM after this number of samples -->
-  <Property Name='numOutputSamples' Type="ulong" Readable="true" Writable="true"/>
+  <Property Name='numOutputSamples' Type="ulong" Writable="true"/>
   <!-- Underrun happens dynamically, but can be reset -->
   <Property Name="overrun" Type="Bool" Volatile="true" Writable='true'/>
 

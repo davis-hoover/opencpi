@@ -83,7 +83,7 @@ namespace OCPI {
 	m_isBuiltin,       // the value is produced by infrastructure, not worker
 	m_isDefault,       // the parameter value is the OCS default value
 	// These below represent what was in the spec before potentially being modified by the OWD
-	// m_specReadable is for legacy/deprecatred only since it is not valid in specs
+	// m_specReadable is for legacy/deprecated only since it is not valid in specs
 	m_specParameter,   // AV-5137 these 4 members should be moved to a class that extends this one
 	m_specWritable,
 	m_specInitial,

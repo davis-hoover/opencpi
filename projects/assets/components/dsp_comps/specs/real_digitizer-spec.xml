@@ -4,7 +4,7 @@
      Add port elements for i/o ports -->
 <ComponentSpec>
 
-  <Property Name='need_sync' Type='Bool' Readable='true' Default='true' Initial='true'/>
+  <Property Name='need_sync' Type='Bool' Default='true' Initial='true'/>
 
   <DataInterfaceSpec Name="in" Producer="false" Protocol="rstream_protocol.xml"/>
   <DataInterfaceSpec Name="out" Producer="true" Protocol="rstream_protocol.xml"/>

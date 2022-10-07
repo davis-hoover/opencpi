@@ -1,29 +1,29 @@
 <RccWorker language='c++' spec='ptest_spec.xml' controloperations='initialize'>
-  <Property Name="sap0" Type="Bool" Readable="true" Writable="true" arraylength="1" sequenceLength="11"/>
+  <Property Name="sap0" Type="Bool" Writable="true" arraylength="1" sequenceLength="11"/>
   <Property Name="sap1" Type="Char" Volatile="true" Writable="true" arraylength="2" sequenceLength="10"/>
-  <Property Name="sap2" Type="Double" Readable="true" Writable="true" arraylength="3" sequenceLength="9"/>
+  <Property Name="sap2" Type="Double" Writable="true" arraylength="3" sequenceLength="9"/>
   <Property Name="sap3" Type="Float" Volatile="true" Writable="true" arraylength="4" sequenceLength="8"/>
-  <Property Name="sap4" Type="Short" Readable="true" Writable="true" arraylength="5" sequenceLength="7"/>
+  <Property Name="sap4" Type="Short" Writable="true" arraylength="5" sequenceLength="7"/>
   <Property Name="sap5" Type="Long" Volatile="true" Writable="true" arraylength="6" sequenceLength="6"/>
-  <Property Name="sap6" Type="UChar" Readable="true" Writable="true" arraylength="7" sequenceLength="5"/>
+  <Property Name="sap6" Type="UChar" Writable="true" arraylength="7" sequenceLength="5"/>
   <Property Name="sap7" Type="ULong" Volatile="true" Writable="true" arraylength="8" sequenceLength="4"/>
-  <Property Name="sap8" Type="UShort" Readable="true" Writable="true" arraylength="9" sequenceLength="3"/>
-  <Property Name="sap9" Type="LongLong"  Volatile="true" Writable="true" arraylength="10" sequenceLength="2"/>
-  <Property Name="sap10" Type="ULongLong" Readable="true" Writable="true" arraylength="11" sequenceLength="12"/>
+  <Property Name="sap8" Type="UShort" Writable="true" arraylength="9" sequenceLength="3"/>
+  <Property Name="sap9" Type="LongLong" Volatile="true" Writable="true" arraylength="10" sequenceLength="2"/>
+  <Property Name="sap10" Type="ULongLong" Writable="true" arraylength="11" sequenceLength="12"/>
   <Property Name="sap11" Type="String" StringLength="10" Volatile="true" Writable="true" arraylength="12" sequenceLength="3"/>
-  <property name='stest' type='struct' writable='1' readable='1'>
+  <property name='stest' type='struct' writable='1'>
     <member name='flt' type='float'/>
     <member name='boola' type='bool' arraylength='3'/>
     <member name='str' type='string' stringlength='10'/>
     <member name='seq' sequencelength='4'/>
   </property>
-  <property name='stestp' type='struct' writable='1' readable='1' arraylength='nchannels'>
+  <property name='stestp' type='struct' writable='1' arraylength='nchannels'>
     <member name='flt' type='float'/>
     <member name='boola' type='bool' arraylength='3'/>
     <member name='str' type='string' stringlength='10'/>
     <member name='seq' sequencelength='4'/>
   </property>
-  <Property name="Pattern" type="Struct" readable="true" initial="true" sequenceLength="7">
+  <Property name="Pattern" type="Struct" initial="true" sequenceLength="7">
     <Member name='Opcode' type='uChar' default='0'/>
     <Member name='Bytes' type='uChar' default='0' sequenceLength="2048"/>
   </Property>
@@ -31,7 +31,7 @@
     <member name='sss' type='string' stringlength='param+1' sequencelength='param &lt; 2 ? 3 : 5' arraydimensions='1,param+2,param==3 ? 4 : 5'/>
   </property>
   <!-- these do not work for HDL yet -->
-  <Property name="outFile" type="Struct" readable="true" writable="true">
+  <Property name="outFile" type="Struct" writable="true">
     <Member name='prefix' type='string' stringLength='1024'/>
     <Member name='digits' type='uChar' default='1'/>
     <Member name='suffix' type='string' stringLength='1024' default='.bin'/>

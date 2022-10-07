@@ -6,10 +6,10 @@
   <!-- Properties -->
   <Property Name="flush" Type="Bool" Writable='true' Default='false'/>
   <Property Name="missed_event" Type="Bool" Volatile='true'/>
-  <Property Name="FLUSH_DEPTH_p" Type="uchar" Readable='true' Parameter='true' Default='16'/>
-  <Property Name="TX_CLK_INV_p" Type="bool" Readable='true' Parameter='true' Default='true'/>
-  <Property Name="FIFO_DEPTH_p" Type="ulong" Parameter="true" Readable="true" Default="64"/>
-  <Property Name='min_num_cp_clks_per_txen_events' Type='ushort' Initial='true' Readable='true' Default='938' Description='event_in backpressure will be held for this many clock cycles in order to ensure tx events are properly synchronized to the DAC CLK. Set to ceil(1.5 * control plane clock rate / DAC CLK rate [use lowest expected DAC CLK rate for your scenario])'/>
+  <Property Name="FLUSH_DEPTH_p" Type="uchar" Parameter='true' Default='16'/>
+  <Property Name="TX_CLK_INV_p" Type="bool" Parameter='true' Default='true'/>
+  <Property Name="FIFO_DEPTH_p" Type="ulong" Parameter="true" Default="64"/>
+  <Property Name='min_num_cp_clks_per_txen_events' Type='ushort' Initial='true' Default='938' Description='event_in backpressure will be held for this many clock cycles in order to ensure tx events are properly synchronized to the DAC CLK. Set to ceil(1.5 * control plane clock rate / DAC CLK rate [use lowest expected DAC CLK rate for your scenario])'/>
 
   <!-- Ports -->
   <StreamInterface Name="IN" DataWidth="32" optional='1'/>
@@ -32,7 +32,7 @@
   <Signal Output="TXD" width="12"/>
 
   <!-- Time Client Interface -->
-  <Property Name="SECONDS_WIDTH_p"  Type="uchar" Parameter="true" Readable="true" Default="32"/>
-  <Property Name="FRACTION_WIDTH_p" Type="uchar" Parameter="true" Readable="true" Default="32"/>
+  <Property Name="SECONDS_WIDTH_p"  Type="uchar" Parameter="true" Default="32"/>
+  <Property Name="FRACTION_WIDTH_p" Type="uchar" Parameter="true" Default="32"/>
   <TimeInterface Name="time" SecondsWidth="SECONDS_WIDTH_p" FractionWidth="FRACTION_WIDTH_p"/>
 </HdlDevice>
