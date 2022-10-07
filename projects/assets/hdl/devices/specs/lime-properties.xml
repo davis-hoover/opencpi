@@ -4,7 +4,7 @@
   <property name='rccal_lpfcal' type='uchar' volatile='true'/>                  <!-- 1-->
   <property name='dc_cntval'    type='uchar' writable='true' volatile='true'/>  <!-- 2-->
   <property name='dc_addr'      type='uchar' writable='true' volatile='true'/>  <!-- 3-->
-  <property name='version'      type='uchar' readable='true'/>                  <!-- 4-->
+  <property name='version'      type='uchar'/>                  <!-- 4-->
   <property name='top_ctl0'     type='uchar' writable='true' volatile='true'/>  <!-- 5-->
   <property name='top_ctl1'     type='uchar' writable='true' volatile='true'/>  <!-- 6-->
   <property name='top_ctl2'     type='uchar' writable='true' volatile='true'/>  <!-- 7-->

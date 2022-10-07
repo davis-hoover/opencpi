@@ -16,7 +16,7 @@
                                        = ceil(1.5*125e6/(200e3))
                                        = ceil(937.5) = 938
   -->
-  <Property name='min_num_cp_clks_per_txen_events' type='ushort' initial='true' readable='true' default='938' description='event_in backpressure will be held for this many clock cycles in order to ensure tx events are properly synchronized to the DAC CLK. Set to ceil(1.5 * control plane clock rate / DAC CLK rate [use lowest expected DAC CLK rate for your scenario])'/>
+  <Property name='min_num_cp_clks_per_txen_events' type='ushort' initial='true' default='938' description='event_in backpressure will be held for this many clock cycles in order to ensure tx events are properly synchronized to the DAC CLK. Set to ceil(1.5 * control plane clock rate / DAC CLK rate [use lowest expected DAC CLK rate for your scenario])'/>
 
   <!-- Ports -->
   <StreamInterface Name="IN" DataWidth="32" optional='1'/>

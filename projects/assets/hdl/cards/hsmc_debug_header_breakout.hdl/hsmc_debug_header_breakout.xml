@@ -1,16 +1,16 @@
 <hdldevice language="vhdl" onlytargets='stratix4'>
   <componentspec>
     <!-- bank 1  -->
-    <property name="clkout0"               type="bool" readable="1" writable="1"                               />
-    <property name="clkin0"                type="bool"                           volatile="1"                  />
+    <property name="clkout0"               type="bool" writable="1"/>
+    <property name="clkin0"                type="bool" volatile="1"/>
 
     <!-- bank 2  -->
-    <property name="d_0_37_direction_is_out" type="bool"              writable="1" volatile="1" arraylength="38"/>
-    <property name="d_0_37"                  type="bool"              writable="1" volatile="1" arraylength="38"/>
+    <property name="d_0_37_direction_is_out" type="bool" writable="1" volatile="1" arraylength="38"/>
+    <property name="d_0_37"                  type="bool" writable="1" volatile="1" arraylength="38"/>
 
     <!-- bank 3  -->
-    <property name="d_40_79"               type="bool" readable="1" writable="1"              arraylength="40" />
-    <property name="psntn"                 type="bool"                           volatile="1"                  />
+    <property name="d_40_79"               type="bool" writable="1" arraylength="40"/>
+    <property name="psntn"                 type="bool" volatile="1"/>
 
   </componentspec>
 

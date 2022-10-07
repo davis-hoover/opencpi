@@ -3,7 +3,7 @@
  -->
 <properties>
   <!-- Is the other side present? -->
-  <property name='other_present' type='bool' readable='true'/>
+  <property name='other_present' type='bool'/>
   <!-- The common supported clocking options are 3 binary options and a divisor. -->
   <!-- 1. Are we driving the lime's data clock? -->
   <property name='DRIVE_CLK_p' type='bool' parameter='1' default='1'/>
