@@ -8,7 +8,6 @@
   <!--Property name='overrange' type='bool' volatile='1' writable='1' description='This property reads the value of a sticky bit internal to the HDL device which goes high once the maximum amplitude ADC value (on high or low side) is read, indicating that clipping occured at the ADC sample boundary. Writing false will clear the sticky bit.'/--> <!-- TODO / FIXME - add overrange -->
   <Property name='time_correction' type='longlong'
                                    writable='true'
-                                   readable='true'
                                    description="Signed Q31.32 time correction
                                      value which is subtracted from time
                                      interface port's time."/>

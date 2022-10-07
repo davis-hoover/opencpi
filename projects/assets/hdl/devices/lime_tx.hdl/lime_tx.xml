@@ -1,7 +1,7 @@
 <HdlDevice language='vhdl' spec='rf_tx-spec' FirstRawProperty='dc_regval'>
   <ControlInterface Timeout='1024'/>
-  <property name='txen_pin_control_p' type='bool' parameter='1' readable='1' description='When true, worker controls TXEN pin to enable/disable transmitter. When false, worker uses SPI.'/>
-  <property name='other_present' type='bool' readable='1' description='Value is true if raw property port is connected.'/>
+  <property name='txen_pin_control_p' type='bool' parameter='1' description='When true, worker controls TXEN pin to enable/disable transmitter. When false, worker uses SPI.'/>
+  <property name='other_present' type='bool' description='Value is true if raw property port is connected.'/>
   <property name='event_port_connected' type='bool' volatile='1' description='Value is true if event_in port of dac is connected.'/>
   <!--lime-properties.xml describes the registers of the Lime IC per the datasheet-->
   <xi:include href='lime-properties.xml'/>

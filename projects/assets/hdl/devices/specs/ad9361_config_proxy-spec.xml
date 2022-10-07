@@ -141,7 +141,7 @@
   <property name='rx_rf_bandwidth'                       type='ulong'     volatile='1' writable='1' default='18e6'            description='Get/set the RX RF bandwidth. The bandwidth is in Hz.'/>
   <property name='rx_sampling_freq'                      type='ulong'     volatile='1' writable='1'                           description='Get/set the RX sampling frequency. The frequency is in Hz.'/>
   <property name='rx_lo_freq'                            type='ulonglong' volatile='1' writable='1' default='2.4e9'           description='Get/set the RX LO frequency. The frequency is in Hz.'/>
-  <property name='rx_lo_int_ext'                         type='uchar'     readable='1' writable='1' default='INT_LO'          description='Switch between the internal and external LO. The RX LO is affected.'/>
+  <property name='rx_lo_int_ext'                         type='uchar'     writable='1' default='INT_LO'          description='Switch between the internal and external LO. The RX LO is affected.'/>
   <property name='rx_rssi'               arraylength='rx_nchannels' type='struct'    volatile='1'                             description='Get the RSSI for the selected channel.'>
     <member name='ant'                                   type='ulong' description='Antenna number for which RSSI is reported.'/>
     <member name='symbol'                                type='ulong' description='Runtime RSSI.'/>
@@ -189,7 +189,7 @@
   <property name='tx_rf_bandwidth'                       type='ulong'     volatile='1' writable='1' default='18e6'            description='Get/set the TX RF bandwidth. The bandwidth is in Hz.'/>
   <property name='tx_sampling_freq'                      type='ulong'     volatile='1' writable='1'                           description='Get/set the TX sampling frequency. The frequency is in Hz.'/>
   <property name='tx_lo_freq'                            type='ulonglong' volatile='1' writable='1' default='2.4e9'           description='Get/set the TX LO frequency. The frequency is in Hz.'/>
-  <property name='tx_lo_int_ext'                         type='uchar'     readable='1' writable='1' default='INT_LO'          description='Switch between the internal and external LO. The TX LO is affected.'/>
+  <property name='tx_lo_int_ext'                         type='uchar'     writable='1' default='INT_LO'          description='Switch between the internal and external LO. The TX LO is affected.'/>
   <property name='tx_fir_config_write'                   type='struct'  default='tx 0x03,tx_gain 0,tx_int 1,tx_coef {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},tx_coef_size 128'             writable='1'            >
     <member name='tx'                                    type='ulong' />
     <member name='tx_gain'                               type='long'  />

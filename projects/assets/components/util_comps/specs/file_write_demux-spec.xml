@@ -3,7 +3,7 @@
   <Port Name="out" numberofopcodes='256' optional='true' producer='true'/>
 
   <!-- File name to write to -->
-  <Property name="outFile" type="Struct" readable="true" writable="true">
+  <Property name="outFile" type="Struct" writable="true">
     <Member name='prefix' type='string' stringLength='1024'/>
     <Member name='digits' type='uChar' default='1'/>
     <Member name='suffix' type='string' stringLength='1024' default='.bin'/>
@@ -22,7 +22,7 @@
     </Member>
   </Property>
 
-  <Property name="stopOn" type="Struct" readable="true" writable="true">
+  <Property name="stopOn" type="Struct" writable="true">
     <!-- Stop on TOTAL bytes/messages  -->
     <Member name="Total" type="Struct">
       <Member name="bytes" type="ULongLong"/>

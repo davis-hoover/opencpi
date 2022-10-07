@@ -1073,7 +1073,7 @@ emitVhdlWorkerPackage(FILE *f, unsigned maxPropName) {
     fprintf(f,
 	    "  end record worker_props_in_t;\n");
   }
-  if (m_ctl.nonRawReadbacks || m_ctl.rawReadables) {
+  if (m_ctl.nonRawReadbacks || m_ctl.rawProperties) {
     fprintf(f,"\n"
 	    "  -- The following record is for the readable properties of worker \"%s\"\n"
 	    "  type worker_props_out_t is record\n",
@@ -1087,7 +1087,7 @@ emitVhdlWorkerPackage(FILE *f, unsigned maxPropName) {
     fprintf(f,
 	    "  end record worker_props_out_t;\n");
   }
-  if (m_ctl.nonRawReadbacks || m_ctl.rawReadables || m_ctl.builtinReadbacks) {
+  if (m_ctl.nonRawReadbacks || m_ctl.rawProperties || m_ctl.builtinReadbacks) {
     fprintf(f,"-- internal props_out combining internal and from-worker\n"
 	    "  type internal_props_out_t is record\n");
     for (PropertiesIter pi = m_ctl.properties.begin(); pi != m_ctl.properties.end(); pi++)
@@ -1435,7 +1435,7 @@ emitVhdlShell(FILE *f) {
 		}
 	}
 
-    if (m_ctl.nonRawReadbacks || m_ctl.builtinReadbacks || m_ctl.rawReadables) {
+    if (m_ctl.nonRawReadbacks || m_ctl.builtinReadbacks || m_ctl.rawProperties) {
       fprintf(f, "  internal_props_out <=\n    (");
       // Assign all members
       const char *last = "";
@@ -1535,7 +1535,7 @@ emitVhdlShell(FILE *f) {
   //  if (m_ctl.nonRawWritables || m_ctl.nonRawReadables || m_ctl.rawProperties)
   if (!m_noControl)
     fprintf(f, ",\n    props_in => props_to_worker");
-  if (m_ctl.nonRawReadbacks || m_ctl.rawReadables)
+  if (m_ctl.nonRawReadbacks || m_ctl.rawProperties)
     fprintf(f, ",\n    props_out => props_from_worker");
   emitDeviceSignalMappings(f, last);
   fprintf(f, ");\n");
@@ -1936,7 +1936,7 @@ emitImplHDL(bool wrap) {
 	      );
       // Record for property-related inputs to the worker - writable values and strobes,
       // readable strobes
-      if (m_ctl.nonRawReadbacks || m_ctl.builtinReadbacks || m_ctl.rawReadables)
+      if (m_ctl.nonRawReadbacks || m_ctl.builtinReadbacks || m_ctl.rawProperties)
 	fprintf(f, "    props_from_worker  : in  internal_props_out_t;\n");
 #if 1
       fprintf(f, "    props_to_worker    : out worker_props_in_t");
