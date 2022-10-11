@@ -92,8 +92,10 @@ template<class CSP>
 class Configurator {
   protected:
   struct LockParam {
-    CSPSolver::Constr& m_constr_lo;
-    CSPSolver::Constr& m_constr_hi;
+    // intentionallity not reference, due to changing vector entry which this is referring to
+    CSPSolver::Constr m_constr_lo;
+    // intentionallity not reference, due to changing vector entry which this is referring to
+    CSPSolver::Constr m_constr_hi;
     //int32_t m_lock_val_int32;
     //double  m_lock_val_double;
     //int32_t m_lock_val_is_int32;

@@ -68,7 +68,7 @@ Configurator<CSP>::get_config(data_stream_id_t id, config_key_t cfg) const {
       return it->m_csp_map.at(cfg);
     }
   }
-  throw std::string("invalid data stream id: ")+id;
+  throw std::string("config not found");
 }
 
 template<class CSP> config_value_t
@@ -114,9 +114,9 @@ template<class CSP> bool
 Configurator<CSP>::lock_config(const char* config, config_value_t val,
     config_value_t tolerance) {
   // attempt a lock
-  CSPSolver::Constr& clo = m_solver.m_solver.add_constr(config, ">=", val-tolerance);
+  const CSPSolver::Constr& clo = m_solver.m_solver.add_constr(config, ">=", val-tolerance);
   //std::cout << "[DEBUG] lock " << config << get_feasible_region_limits() << "\n";
-  CSPSolver::Constr& chi = m_solver.m_solver.add_constr(config, "<=", val+tolerance);
+  const CSPSolver::Constr& chi = m_solver.m_solver.add_constr(config, "<=", val+tolerance);
   //std::cout << "[DEBUG] lock " << config << get_feasible_region_limits() << "\n";
   // test whether the lock was successful:
   // if we overconstrained such the feasible region contains an empty set for
@@ -149,9 +149,11 @@ template<class CSP> void
 Configurator<CSP>::unlock_config(const char* config) {
   if(get_config_is_locked(config)) {
     auto& tmp = m_locked_params.at(config);
-    m_solver.m_solver.remove_constr(tmp.m_constr_lo);
-    if(tmp.m_constr_hi_used) {
-      m_solver.m_solver.remove_constr(tmp.m_constr_hi);
+    // intentionallity not reference, due to changing vector entry which this is referring to
+    auto chi = tmp.m_constr_hi;
+    m_solver.m_solver.remove_constr(m_locked_params.at(config).m_constr_lo);
+    if(m_locked_params.at(config).m_constr_hi_used) {
+      m_solver.m_solver.remove_constr(chi);
     }
     m_locked_params.erase(m_locked_params.find(config));
   }
@@ -163,8 +165,10 @@ Configurator<CSP>::unlock_config(const char* config) {
 
 template<class CSP> void
 Configurator<CSP>::unlock_all() {
-  for(auto it=m_locked_params.begin(); it!=m_locked_params.end(); ++it) {
+  auto it = m_locked_params.begin();
+  while(it != m_locked_params.end()) {
     unlock_config(it->first);
+    it = m_locked_params.begin();
   }
 }
 

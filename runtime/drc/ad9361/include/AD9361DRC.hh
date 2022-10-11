@@ -63,43 +63,35 @@ class AD9361CSP : public CSPBase {
   define_x_d_ad9361() {
     m_solver.add_var<double>("ad9361_rx_rfpll_lo_freq_meghz", dfp_tol);
     m_solver.add_var<double>("ad9361_tx_rfpll_lo_freq_meghz", dfp_tol);
-    m_solver.add_var<double>("ad9361_rx_rf_bandwidth_meghz", dfp_tol);
-    m_solver.add_var<double>("ad9361_tx_rf_bandwidth_meghz", dfp_tol);
     m_solver.add_var<double>("ad9361_rx_sampl_freq_meghz", dfp_tol);
     m_solver.add_var<double>("ad9361_tx_sampl_freq_meghz", dfp_tol);
-    // @TODO  Does ad9361_dac_clk_divider need to be added to the ad9361_drc.rst?
-    m_solver.add_var<int32_t>("ad9361_dac_clk_divider");
-    // direction
+    m_solver.add_var<double>("ad9361_rx_rf_bandwidth_meghz", dfp_tol);
+    m_solver.add_var<double>("ad9361_tx_rf_bandwidth_meghz", dfp_tol);
+    //m_solver.add_var<int32_t>("ad9361_dac_clk_divider");
     m_solver.add_var<int32_t>("ad9361_dir_rx1");
     m_solver.add_var<int32_t>("ad9361_dir_rx2");
     m_solver.add_var<int32_t>("ad9361_dir_tx1");
     m_solver.add_var<int32_t>("ad9361_dir_tx2");
-    // tuning_freq_MHz
     m_solver.add_var<double>("ad9361_fc_meghz_rx1", dfp_tol);
     m_solver.add_var<double>("ad9361_fc_meghz_rx2", dfp_tol);
     m_solver.add_var<double>("ad9361_fc_meghz_tx1", dfp_tol);
     m_solver.add_var<double>("ad9361_fc_meghz_tx2", dfp_tol);
-    // bandwidth_3dB_MHz
     m_solver.add_var<double>("ad9361_bw_meghz_rx1", dfp_tol);
     m_solver.add_var<double>("ad9361_bw_meghz_rx2", dfp_tol);
     m_solver.add_var<double>("ad9361_bw_meghz_tx1", dfp_tol);
     m_solver.add_var<double>("ad9361_bw_meghz_tx2", dfp_tol);
-    // sampling_rate_Msps
     m_solver.add_var<double>("ad9361_fs_megsps_rx1", dfp_tol);
     m_solver.add_var<double>("ad9361_fs_megsps_rx2", dfp_tol);
     m_solver.add_var<double>("ad9361_fs_megsps_tx1", dfp_tol);
     m_solver.add_var<double>("ad9361_fs_megsps_tx2", dfp_tol);
-    // samples_are_complex
     m_solver.add_var<int32_t>("ad9361_samps_comp_rx1");
     m_solver.add_var<int32_t>("ad9361_samps_comp_rx2");
     m_solver.add_var<int32_t>("ad9361_samps_comp_tx1");
     m_solver.add_var<int32_t>("ad9361_samps_comp_tx2");
-    // gain_mode
     m_solver.add_var<int32_t>("ad9361_gain_mode_rx1");
     m_solver.add_var<int32_t>("ad9361_gain_mode_rx2");
     m_solver.add_var<int32_t>("ad9361_gain_mode_tx1");
     m_solver.add_var<int32_t>("ad9361_gain_mode_tx2");
-    // gain_dB
     m_solver.add_var<double>("ad9361_gain_db_rx1", dfp_tol);
     m_solver.add_var<double>("ad9361_gain_db_rx2", dfp_tol);
     m_solver.add_var<double>("ad9361_gain_db_tx1", dfp_tol);
@@ -115,7 +107,7 @@ class AD9361CSP : public CSPBase {
     m_solver.add_constr("ad9361_rx_rfpll_lo_freq_meghz", "<=", 6000.);
     m_solver.add_constr("ad9361_tx_rfpll_lo_freq_meghz", ">=", 70.);
     m_solver.add_constr("ad9361_tx_rfpll_lo_freq_meghz", "<=", 6000.);
-    m_solver.add_constr("ad9361_rx_rf_bandwidth_meghz", ">=", 0.2);
+    m_solver.add_constr("ad9361_rx_rf_bandwidth_meghz", ">=", 0.4);
     m_solver.add_constr("ad9361_rx_rf_bandwidth_meghz", "<=", 56.);
     m_solver.add_constr("ad9361_tx_rf_bandwidth_meghz", ">=", 1.25);
     m_solver.add_constr("ad9361_tx_rf_bandwidth_meghz", "<=", 40.);
@@ -123,58 +115,39 @@ class AD9361CSP : public CSPBase {
     m_solver.add_constr("ad9361_rx_sampl_freq_meghz", "<=", 61.44);
     m_solver.add_constr("ad9361_tx_sampl_freq_meghz", ">=", 2.083334);
     m_solver.add_constr("ad9361_tx_sampl_freq_meghz", "<=", 61.44);
-    m_solver.add_constr("ad9361_dac_clk_divider", ">=", (int32_t)1);
-    m_solver.add_constr("ad9361_dac_clk_divider", "<=", (int32_t)2);
-    // direction
+    //m_solver.add_constr("ad9361_dac_clk_divider", ">=", (int32_t)1);
+    //m_solver.add_constr("ad9361_dac_clk_divider", "<=", (int32_t)2);
     m_solver.add_constr("ad9361_dir_rx1", "=", (int32_t)data_stream_direction_t::rx);
     m_solver.add_constr("ad9361_dir_rx2", "=", (int32_t)data_stream_direction_t::rx);
     m_solver.add_constr("ad9361_dir_tx1", "=", (int32_t)data_stream_direction_t::tx);
     m_solver.add_constr("ad9361_dir_tx2", "=", (int32_t)data_stream_direction_t::tx);
-    // tuning_freq_MHz
     m_solver.add_constr("ad9361_fc_meghz_rx1", "=", "ad9361_rx_rfpll_lo_freq_meghz");
     m_solver.add_constr("ad9361_fc_meghz_rx2", "=", "ad9361_rx_rfpll_lo_freq_meghz");
     m_solver.add_constr("ad9361_fc_meghz_tx1", "=", "ad9361_tx_rfpll_lo_freq_meghz");
     m_solver.add_constr("ad9361_fc_meghz_tx2", "=", "ad9361_tx_rfpll_lo_freq_meghz");
-    // bandwidth_3dB_MHz
     m_solver.add_constr("ad9361_bw_meghz_rx1", "=", "ad9361_rx_rf_bandwidth_meghz");
     m_solver.add_constr("ad9361_bw_meghz_rx2", "=", "ad9361_rx_rf_bandwidth_meghz");
     m_solver.add_constr("ad9361_bw_meghz_tx1", "=", "ad9361_tx_rf_bandwidth_meghz");
     m_solver.add_constr("ad9361_bw_meghz_tx2", "=", "ad9361_tx_rf_bandwidth_meghz");
-    // sampling_rate_Msps
     m_solver.add_constr("ad9361_fs_megsps_rx1", "=", "ad9361_rx_sampl_freq_meghz");
     m_solver.add_constr("ad9361_fs_megsps_rx2", "=", "ad9361_rx_sampl_freq_meghz");
     m_solver.add_constr("ad9361_fs_megsps_tx1", "=", "ad9361_tx_sampl_freq_meghz");
     m_solver.add_constr("ad9361_fs_megsps_tx2", "=", "ad9361_tx_sampl_freq_meghz");
-    // samples_are_complex
     m_solver.add_constr("ad9361_samps_comp_rx1", "=", (int32_t)1);
     m_solver.add_constr("ad9361_samps_comp_rx2", "=", (int32_t)1);
     m_solver.add_constr("ad9361_samps_comp_tx1", "=", (int32_t)1);
     m_solver.add_constr("ad9361_samps_comp_tx2", "=", (int32_t)1);
-    // gain_mode
     m_solver.add_constr("ad9361_gain_mode_rx1", ">=", (int32_t)0); // agc
     m_solver.add_constr("ad9361_gain_mode_rx1", "<=", (int32_t)1); // manual
     m_solver.add_constr("ad9361_gain_mode_rx2", ">=", (int32_t)0); // agc
     m_solver.add_constr("ad9361_gain_mode_rx2", "<=", (int32_t)1); // manual
     m_solver.add_constr("ad9361_gain_mode_tx1", "=", (int32_t)1); // manual
     m_solver.add_constr("ad9361_gain_mode_tx2", "=", (int32_t)1); // manual
-    // gain_dB
     /// @TODO add gain conditional constraints
-    //m_solver.add_constr("ad9361_gain_db_rx1", ">=", -10.);//, &if_freq_gt_4000);
-    //m_solver.add_constr("ad9361_gain_db_rx1", "<=",  62.);//, &if_freq_gt_4000);
-    //m_solver.add_constr("ad9361_gain_db_rx1", ">=",  -3.);//, &if_freq_le_4000);
-    //m_solver.add_constr("ad9361_gain_db_rx1", "<=",  71.);//, &if_freq_le_4000);
-    //m_solver.add_constr("ad9361_gain_db_rx1", ">=",  -1.);//, &if_freq_le_1300);
-    //m_solver.add_constr("ad9361_gain_db_rx1", "<=",  73.);//, &if_freq_le_1300);
-    //m_solver.add_constr("ad9361_gain_db_rx2", ">=", -10.);//, &if_freq_gt_4000);
-    //m_solver.add_constr("ad9361_gain_db_rx2", "<=",  62.);//, &if_freq_gt_4000);
-    //m_solver.add_constr("ad9361_gain_db_rx2", ">=",  -3.);//, &if_freq_le_4000);
-    //m_solver.add_constr("ad9361_gain_db_rx2", "<=",  71.);//, &if_freq_le_4000);
-    //m_solver.add_constr("ad9361_gain_db_rx2", ">=",  -1.);//, &if_freq_le_1300);
-    //m_solver.add_constr("ad9361_gain_db_rx2", "<=",  73.);//, &if_freq_le_1300);
-    m_solver.add_constr("ad9361_gain_db_rx1", ">=", -10.);//, &if_freq_gt_4000);
-    m_solver.add_constr("ad9361_gain_db_rx1", "<=", 73.);//, &if_freq_le_1300);
-    m_solver.add_constr("ad9361_gain_db_rx2", ">=", -10.);//, &if_freq_gt_4000);
-    m_solver.add_constr("ad9361_gain_db_rx2", "<=", 73.);//, &if_freq_le_1300);
+    m_solver.add_constr("ad9361_gain_db_rx1", ">=", -1.);
+    m_solver.add_constr("ad9361_gain_db_rx1", "<=", 62.);
+    m_solver.add_constr("ad9361_gain_db_rx2", ">=", -1.);
+    m_solver.add_constr("ad9361_gain_db_rx2", "<=", 62.);
     m_solver.add_constr("ad9361_gain_db_tx1", ">=", -89.75);
     m_solver.add_constr("ad9361_gain_db_tx1", "<=", 0.);
     m_solver.add_constr("ad9361_gain_db_tx2", ">=", -89.75);
@@ -209,8 +182,6 @@ class AD9361Configurator : public Configurator<AD9361CSP> {
   AD9361Configurator() : Configurator<AD9361CSP>() {
     {
       DataStream::CSPVarMap map;
-      map.insert(std::make_pair(config_key_direction.c_str(),
-          "ad9361_dir_rx1"));
       map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
           "ad9361_fc_meghz_rx1"));
       map.insert(std::make_pair(config_key_bandwidth_3dB_MHz.c_str(),
@@ -227,8 +198,6 @@ class AD9361Configurator : public Configurator<AD9361CSP> {
     }
     {
       DataStream::CSPVarMap map;
-      map.insert(std::make_pair(config_key_direction.c_str(),
-          "ad9361_dir_rx2"));
       map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
           "ad9361_fc_meghz_rx2"));
       map.insert(std::make_pair(config_key_bandwidth_3dB_MHz.c_str(),
@@ -245,8 +214,6 @@ class AD9361Configurator : public Configurator<AD9361CSP> {
     }
     {
       DataStream::CSPVarMap map;
-      map.insert(std::make_pair(config_key_direction.c_str(),
-          "ad9361_dir_tx1"));
       map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
           "ad9361_fc_meghz_tx1"));
       map.insert(std::make_pair(config_key_bandwidth_3dB_MHz.c_str(),
@@ -263,8 +230,6 @@ class AD9361Configurator : public Configurator<AD9361CSP> {
     }
     {
       DataStream::CSPVarMap map;
-      map.insert(std::make_pair(config_key_direction.c_str(),
-          "ad9361_dir_tx2"));
       map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
           "ad9361_fc_meghz_tx2"));
       map.insert(std::make_pair(config_key_bandwidth_3dB_MHz.c_str(),

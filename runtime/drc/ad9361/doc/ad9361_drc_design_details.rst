@@ -145,14 +145,14 @@ AD9361 DRC Mapping
 
 References:
 
-   #. No-OS API call, unless otherwise noted
+   1. No-OS API call, unless otherwise noted
 
-   #. Unless noted, all values are from datasheet https://geontech.com/links/no-OS/blob/2018_R2/ad9361/sw/ad9361.c
+   2. Unless noted, all values are from datasheet https://geontech.com/links/no-OS/blob/2018_R2/ad9361/sw/ad9361.c
 
-   #. https://geontech.com/links/no-OS/blob/2018_R2/ad9361/sw/ad9361.c#L929
+   3. https://geontech.com/links/no-OS/blob/2018_R2/ad9361/sw/ad9361.c#L929
 
-   #. OpenCPI/DRC usage of No-OS restricts sampling rates to >= 2.083334 Msps. Lower values have been observed to intermittently fail to be set on Zed/FMCOMMS2/3
+   4. OpenCPI/DRC usage of No-OS restricts sampling rates to >= 2.083334 Msps. Lower values have been observed to intermittently fail to be set on Zed/FMCOMMS2/3
 
-   #. Assumes No-OS 2018_R2 release (earlier releases known to have different values, see https://geontech.com/links/no-OS/blob/2018_R2/ad9361/sw/ad9361.c lines 484,601)
+   5. Assumes No-OS 2018_R2 release (earlier releases known to have different values, see https://geontech.com/links/no-OS/blob/2018_R2/ad9361/sw/ad9361.c lines 484,601)
 
-   #. https://geontech.com/links/no-OS/blob/2018_R2/ad9361/sw/ad9361.c#L1610
+   6. https://geontech.com/links/no-OS/blob/2018_R2/ad9361/sw/ad9361.c#L1610

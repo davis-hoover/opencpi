@@ -132,8 +132,8 @@ class Set : public SetBase {
     std::vector<Interval<T> > m_intervals;
 }; // class Set
 
-/*! @brief Constr Satisfaction Problem Solver.
- *         (https://en.wikipedia.org/wiki/Constr_satisfaction_problem)
+/*! @brief Constraint Satisfaction Problem Solver.
+ *         (https://en.wikipedia.org/wiki/Constraint_satisfaction_problem)
  ******************************************************************************/
 class CSPSolver {
   protected:
@@ -155,38 +155,46 @@ class CSPSolver {
     };
     /// @brief Constraint.
     struct Constr : public Func<const char*> {
-      /*! @brief A constraint's condition is formulated the same as a
-       *         condition-less constraint.
-       ************************************************************************/
-      typedef Constr Cond;
-      typedef Func<const char*> Func;
-      /// @brief left hand side variable name
-      int32_t m_rhs_int32_const; /// @TODO make const
-      double  m_rhs_double_const; /// @TODO make const
-      /// @brief right hand side variable name
-      Func*   m_rhs_func;
-      bool    m_rhs_is_var; /// @TODO make const
-      bool    m_rhs_is_int32_const; /// @TODO make const
-      bool    m_rhs_is_double_const; /// @TODO make const
-      bool    m_rhs_is_func; /// @TODO make const
-      /// @brief Will be null if constraint has no condition.
-      Cond*   m_p_cond; /// @TODO make const
-      /* @brief Indicates constraint is to be applied for the "otherwise"
-       * condition in an if .. if .. otherwise scenario. Overrides m_p_cond.
-       ************************************************************************/
-      //const bool    m_cond_is_otherwise;
-      Constr(const char* lhs, const char* type, const int32_t rhs,
-          Cond* p_cond = 0);
-      Constr(const char* lhs, const char* type, const double rhs,
-          Cond* p_cond = 0);
-      Constr(const char* lhs, const char* type, const char* rhs,
-          Cond* p_cond = 0);
-      Constr(const char* lhs, const char* type, Func* rhs,
-          Cond* p_cond = 0);
-      //Constr(bool cond_is_otherwise = false);
-      void throw_invalid_argument_if_constraint_not_supported();
-      bool operator==(const Constr& rhs) const;
+      //public:
+        /* @brief A condition is represented as a (condition-less) constraint, as
+         *        a constraint is already conveniently represented by an equality
+         *        function, which is preciely how conditions are specified.
+         **********************************************************************/
+        typedef Constr Cond;
+        Constr(const char* lhs, const char* type, const int32_t rhs,
+            int32_t idx_cond = 0);
+        Constr(const char* lhs, const char* type, const double rhs,
+            int32_t idx_cond = 0);
+        Constr(const char* lhs, const char* type, const char* rhs,
+            int32_t idx_cond = 0);
+        Constr(const char* lhs, const char* type, Func* rhs,
+            int32_t idx_cond = 0);
+        bool operator==(const Constr& rhs) const;
+      //protected:
+        typedef Func<const char*> Func;
+        /// @brief left hand side variable name
+        int32_t    m_rhs_int32_const; /// @TODO make const?
+        double     m_rhs_double_const; /// @TODO make const?
+        /// @brief right hand side variable name
+        Func*      m_rhs_func;
+        bool       m_rhs_is_var; /// @TODO make const
+        bool       m_rhs_is_int32_const; /// @TODO make const?
+        bool       m_rhs_is_double_const; /// @TODO make const?
+        bool       m_rhs_is_func; /// @TODO make const?
+        /// @brief Will be null if constraint has no condition.
+        //Cond*      m_p_cond; /// @TODO make const?
+        int32_t    m_idx_cond; /// @TODO make const?
+        /* @brief Indicates constraint is to be applied for the "otherwise"
+         * condition in an if .. if .. otherwise scenario. Overrides m_p_cond.
+         **********************************************************************/
+        bool m_cond_is_otherwise;
+        Constr(bool cond_is_otherwise = false);
+        void throw_invalid_argument_if_constraint_not_supported();
     }; // struct Constr
+    struct OtherwiseCond : public Constr {
+      public:
+      OtherwiseCond();
+    }; // struct OtherwiseCond
     /*! @brief A constraint's condition is formulated the same as a
      *         condition-less constraint.
      ************************************************************************/
@@ -215,11 +223,14 @@ class CSPSolver {
         bool contains(Interval<double> interval);
         bool get_is_empty();
       }; // struct Var
+      typedef std::map<const char*, Var> VarMap;
+      VarMap m_vars;
       Interval<int32_t> get_int32_interval_limits();
       Interval<double> get_double_interval_limits(double tol);
       void set_var_limits_to_type_limits(
           std::pair<const char* const, FeasibleRegionLimits::Var>& var);
-      std::map<const char*, Var> m_vars;
+      void set_var_limits_to_empty_set(
+          std::pair<const char* const, FeasibleRegionLimits::Var>& var);
       bool operator==(const FeasibleRegionLimits& rhs) const;
       bool operator!=(const FeasibleRegionLimits& rhs) const;
     }; // struct FeasibleRegionLimits
@@ -238,19 +249,23 @@ class CSPSolver {
      **************************************************************************/
     template<typename T> void add_var(const char* var_key, T fp_comparison_tol);
     /*! @brief Constrain variable. Left-hand side of equation
-     *         contains only the variable being constrained, e.g. x1 >= 5 would
+     *         contains only the variable being constrained, e.g.
      *         e.g. x1 >= 5 if x2 > 9 would
      *         be implemented as add_constr("x1", ">=", 5, Constr("x2", ">", 9).
-     *  @param[in] constr_key  One of: ">="
-     w                                 ">"
-     *                                 "<="
-     *                                 "<"
-     *                                 "="
+     m  @param[in] type One of: ">=" ">" "<=" "<" "="
+     **************************************************************************/
+    template<typename T> Constr& add_constr(
+        const char* lhs, const char* type, const T rhs);
+    /*! @brief Conditionally constrain variable. Left-hand side of equation
+     *         contains only the variable being constrained, e.g.
+     *         e.g. x1 >= 5 if x2 > 9 would
+     *         be implemented as add_constr("x1", ">=", 5, Constr("x2", ">", 9).
+     m  @param[in] type One of: ">=" ">" "<=" "<" "="
      **************************************************************************/
     template<typename T> Constr& add_constr(
         const char* lhs, const char* type, const T rhs,
-        Constr::Cond* p_cond = 0);
-    void remove_constr(Constr& contr);
+        const Constr::Cond& cond);
+    void remove_constr(const Constr& contr);
     const std::vector<Constr>& get_constr() const;
     /// @brief https://en.wikipedia.org/wiki/Feasible_region
     const FeasibleRegionLimits& get_feasible_region_limits() const;
@@ -264,8 +279,9 @@ class CSPSolver {
     template<typename T> bool val_is_within_var_feasible_region(T val,
         const char* var_key) const;
   protected:
-    size_t               m_max_num_constr_prop_loop_iter;
-    std::vector<Constr>  m_constr;
+    size_t                    m_max_num_constr_prop_loop_iter;
+    std::vector<Constr>       m_constr;
+    std::vector<Constr::Cond> m_cond;
     FeasibleRegionLimits m_feasible_region_limits;
 
     Interval<int32_t> get_interval_for_constr(Constr constr);
@@ -280,10 +296,12 @@ class CSPSolver {
         Interval<double>& iv);
     void propagate_constr_rhs_const(
         std::pair<const char* const, FeasibleRegionLimits::Var>& ivar,
-        Constr& constr, const std::vector<CSPSolver::CondConstr>& cc);
+        Constr& constr, /*const std::vector<CSPSolver::CondConstr>& cc*/
+        bool do_dilate);
     void propagate_constr_rhs_var(
         std::pair<const char* const, FeasibleRegionLimits::Var>& ivar,
-        Constr& constr, const std::vector<CSPSolver::CondConstr>& cc);
+        Constr& constr, /*const std::vector<CSPSolver::CondConstr>& cc*/
+        bool do_dilate);
     /// @return vector of names for variables (X) constrained conditionally
     std::vector<CondConstr> find_cond_constr();
     void assign_set_to_domain_limits(Set<int32_t>& set, int32_t tol);
