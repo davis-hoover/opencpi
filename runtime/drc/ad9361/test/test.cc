@@ -149,6 +149,7 @@ int test_AD9361Configurator() {
       TEST(*it, gn, 74.     , true ,0.000001, false)
       uut.unlock_all();
       // Conditional Constraints
+      // ================================================
       // If fc [70 - 1300 MHz]; Possible Gain: -1 - 73 dB
       // LOWER BOUNDS
       // ------------------------------------------------
@@ -333,7 +334,7 @@ int test_AD9361Configurator() {
       uut.unlock_all();
       TEST(*it, gm, 2       , false,0.000001, false)
       uut.unlock_all();
-      // Gain (-89.75 - 0 dB)
+      // Gain [-89.75 - 0 dB]
       // ================================================
       // LOWER BOUNDS
       TEST(*it, gn, -89.76  , true, 0.000001, false)
@@ -462,6 +463,7 @@ int test_AD9361DDCConfigurator() {
       TEST(*it, gn, 74.     , true ,0.000001, false)
       uut.unlock_all();
       // Conditional Constraints
+      // ================================================
       // If fc [70 - 1300 MHz]; Possible Gain: -1 - 73 dB
       // LOWER BOUNDS
       // ------------------------------------------------
