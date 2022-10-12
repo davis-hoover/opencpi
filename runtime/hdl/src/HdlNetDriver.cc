@@ -43,7 +43,7 @@ namespace OCPI {
       };
       Device::
       Device(Driver &driver, OE::Interface &ifc, std::string &a_name,
-	     OS::Ether::Address &devAddr, bool discovery, const char *data_proto,
+	     OS::Ether::Address &devAddr, bool discovery, bool forLoad, const char *data_proto,
 	     unsigned delayms, uint64_t ep_size, uint64_t controlOffset, uint64_t dataOffset,
 	     const OB::PValue *params, std::string &error)
 	: OCPI::HDL::Device(a_name, data_proto, params),
@@ -63,17 +63,22 @@ namespace OCPI {
 	m_endpointSize = ep_size;
 	cAccess().setAccess(NULL, this, OCPI_UTRUNCATE(RegisterOffset, controlOffset));
 	dAccess().setAccess(NULL, this, OCPI_UTRUNCATE(RegisterOffset, dataOffset));
-	init(error);
+	if (forLoad)
+	  m_isAlive = false;
+	else
+	  init(error);
       }
       Device::
       ~Device() {
 	if (!m_devAddr.isEther() || OE::haveDriver())
 	  delete m_socket;
       }
-      // Networks only push.
+      // Networks only push.  FPGA only supports FlagIsMeta
       uint32_t Device::
       dmaOptions(ezxml_t /*icImplXml*/, ezxml_t /*icInstXml*/, bool isProvider) {
-	return 1u << (isProvider ? OT::ActiveFlowControl : OT::ActiveMessage);
+	return isProvider ?
+	  (1u << OT::ActiveFlowControl) | (1u << OT::FlagIsMeta) :
+	  (1u << OT::ActiveMessage) | (1u << OT::FlagIsMeta) | (1u << OT::PrefixMetadata);
       }
       void Device::
       request(EtherControlMessageType type, RegisterOffset offset,
@@ -166,7 +171,7 @@ namespace OCPI {
       get(RegisterOffset offset, size_t bytes, uint32_t *status) {
 	ocpiDebug("Accessor read for offset 0x%zx of %zu bytes", offset, bytes);
 	EtherControlRead &ecr =  *(EtherControlRead *)(m_request.payload);
-	ecr.address = htonl((offset & 0xffffff) & ~3u);
+	ecr.address = htonl((offset & 0x3ffffff) & ~3u);
 	ecr.header.length = htons((uint16_t)(sizeof(ecr)-2u));
 	OS::Ether::Packet recvFrame;
 	request(OCCP_READ, offset, bytes, recvFrame, status);
@@ -180,7 +185,7 @@ namespace OCPI {
       set(RegisterOffset offset, size_t bytes, uint32_t data, uint32_t *status) {
 	ocpiDebug("Accessor write for offset 0x%zx of %zu bytes", offset, bytes);
 	EtherControlWrite &ecw =  *(EtherControlWrite *)(m_request.payload);
-	ecw.address = htonl((offset & 0xffffff) & ~3u);
+	ecw.address = htonl((offset & 0x3ffffff) & ~3u);
 	ecw.data = htonl(data << ((offset & 3u) * 8));
 	ecw.header.length = htons((uint16_t)(sizeof(ecw)-2u));
 	OS::Ether::Packet recvFrame;
@@ -362,7 +367,8 @@ namespace OCPI {
 		if (mi == macs.end()) {
 		  ocpiInfo("Discovered MAC %s from address %s for the first time",
 			   server.c_str(), devAddr.pretty());
-		  macs.insert(MacInsert(server, MacPair(devAddr, &ifc)));
+		  // take a copy of the interface object
+		  macs.insert(MacInsert(server, MacPair(devAddr, ifc)));
 		} else {
 		  ocpiInfo("Discovered server %s from address %s after seeing it before (from %s)",
 			   server.c_str(), devAddr.pretty(), mi->second.first.pretty());
@@ -370,13 +376,14 @@ namespace OCPI {
 		    ocpiInfo("New address %s is loopback, so deleting previous one %s",
 			     devAddr.pretty(), mi->second.first.pretty());
 		    macs.erase(mi);
-		    macs.insert(MacInsert(server, MacPair(devAddr, &ifc)));
+		    // take a copy of the interface object
+		    macs.insert(MacInsert(server, MacPair(devAddr, ifc)));
 		  }
 		}
 	      } else {
 		// We were probing a single address
 		Device *d;
-		if ((d = createDevice(ifc, devAddr, discovery, params, error))) {
+		if ((d = createDevice(ifc, devAddr, discovery, false, params, error))) {
 		  assert(dev); // should be set if not broadcasting
 		  *dev = d;
 		  return 1;
@@ -431,7 +438,7 @@ namespace OCPI {
       }
 
       OCPI::HDL::Device *Driver::
-      open(const char *name, bool discovery, const OB::PValue *params, std::string &error) {
+      open(const char *name, bool discovery, bool forLoad, const OB::PValue *params, std::string &error) {
 	const char *slash = strchr(name, '/');
 	std::string iName;
 	if (slash) {
@@ -453,6 +460,14 @@ namespace OCPI {
 	    while (ifs.getNext(eif, error, iName.size() ? iName.c_str() : NULL))
 	      if (eif.up && eif.connected) {
 		Device *dev;
+		// sanity check for programming-only case that both interface and address are specified
+		if (forLoad && iName.size() && !addr.isBroadcast()) {
+		  ocpiDebug("Opening device for loading only");
+		  //programming happens over USB so device does not need to be found during probing
+		  dev = createDevice(eif, addr, discovery, forLoad, params, error);
+		  assert(dev);
+		  return dev;
+		}
 		if (tryIface(eif, addr, NULL, &dev, discovery, NULL, params, error) == 1)
 		  return dev;
 		else
@@ -511,9 +526,9 @@ namespace OCPI {
 	  ocpiInfo("Processing discovery for %s from network address %s",
 		   mi->first.c_str(), mi->second.first.pretty());
 	  std::string err;
-	  Device *dev = createDevice(*mi->second.second, mi->second.first, discoveryOnly, params,
-				     err);
-	  if (dev && !found(*dev, excludes, discoveryOnly, err)) {
+	  Device *dev = createDevice(mi->second.second, mi->second.first, discoveryOnly, false,
+				     params, err);
+	  if (dev && found(*dev, excludes, discoveryOnly, err)) {
 	    ocpiInfo("error creating device for %s (MAC %s): %s", mi->second.first.pretty(),
 		     mi->first.c_str(), error.c_str());
 	    count++;

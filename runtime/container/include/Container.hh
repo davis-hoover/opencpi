@@ -85,8 +85,7 @@ namespace OCPI {
       // This vector will be filled in by derived classes
       Transports m_transports;  // terminology clash is unfortunate....
       BridgedPorts m_bridgedPorts;
-      Container(const char *name, const ezxml_t config = NULL,
-		const OCPI::Base::PValue* params = NULL);
+      Container(const char *name, const OCPI::Base::PValue* params = NULL);
     public:
       virtual ~Container();
     private:
@@ -95,6 +94,7 @@ namespace OCPI {
       bool enabled() const { return m_enabled; }
       virtual Driver &driver() = 0;
       virtual const std::string &name() const = 0;
+      virtual ezxml_t configXml() const = 0;
       const char *cname() const { return name().c_str(); }
       const std::string &platform() const { return m_platform; }
       const std::string &model() const { return m_model; }
@@ -106,7 +106,7 @@ namespace OCPI {
       bool dynamic() const { return m_dynamic; }
       virtual Container *nextContainer() = 0;
       virtual bool supportsImplementation(OCPI::Metadata::Worker &);
-      virtual OCPI::API::ContainerApplication *
+      virtual Application *
       createApplication(const char *name = NULL, const OCPI::Base::PValue *props = NULL) = 0;
       virtual void dump(bool /*before*/, bool /*hex*/) {}
       OCPI::Base::PValue *getProperties();
@@ -116,7 +116,7 @@ namespace OCPI {
 	This is the method that gets called by the creator to provide thread time to the
 	container.  If this method returns "true" the caller must continue to call this
 	method.  If the return is "false" the method no longer needs to be called.
-	
+
 	@param [ in ] event_manager
 	Event Manager object that is associated with this container.  This parameter can be
 	NULL if the container is being used in polled mode.
@@ -125,12 +125,9 @@ namespace OCPI {
       //      bool run(uint32_t usecs = 0);
       void thread();
       virtual bool needThread() = 0;
-      // Load from url
-      Artifact & loadArtifact(const char *url,
-			      const OCPI::Base::PValue *artifactParams = NULL);
       // Load from library artifact
-      Artifact & loadArtifact(OCPI::Library::Artifact &art,
-			      const OCPI::Base::PValue *artifactParams = NULL);
+      Artifact &loadArtifact(OCPI::Library::Artifact &art,
+			     const OCPI::Base::PValue *artifactParams = NULL);
       virtual Artifact *findLoadedArtifact(const char *url) = 0;
       virtual Artifact *findLoadedArtifact(const OCPI::Library::Artifact &a) = 0;
       virtual Artifact &createArtifact(OCPI::Library::Artifact &,

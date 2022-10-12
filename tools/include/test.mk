@@ -201,22 +201,22 @@ clean:: cleanrun
 # Help
 define help
 The make command is used with the following goals to invoke the phases:
-  build — (the default goal if none is specified) build locally generated HDL
+  build - (the default goal if none is specified) build locally generated HDL
            assemblies, implies generate if needed
-  run   — perform execution and verification, interleaved per subcase
-  clean — clean all generated, built and execution directories and files
+  run   - perform execution and verification, interleaved per subcase
+  clean - clean all generated, built and execution directories and files
 
 The following goals control the process at a finer granularity:
-  generate     — perform all offline generation tasks: scripted input data and property
+  generate     - perform all offline generation tasks: scripted input data and property
                  values, applications, HDL assemblies, generation report
-  prepare      — discover platforms and artifacts and generate execution scripts per
+  prepare      - discover platforms and artifacts and generate execution scripts per
                  platform, assumes required artifacts are built
-  runnoprepare — execute tests assuming a previous prepare was done
-  runonly      — prepare and execute tests, but do not perform any verification
-  verify       — perform verification for whatever platforms have been executed
-  view         — run the view scripts and put the results in separate windows
-  cleanrun     — clean all run results
-  cleansim     — clean all simulation output (but not run results)
+  runnoprepare - execute tests assuming a previous prepare was done
+  runonly      - prepare and execute tests, but do not perform any verification
+  verify       - perform verification for whatever platforms have been executed
+  view         - run the view scripts and put the results in separate windows
+  cleanrun     - clean all run results
+  cleansim     - clean all simulation output (but not run results)
 
 The following variables can be set, usually on the command line:
   Verbose              - set to 1 for putting the execution logs on the console

@@ -88,6 +88,7 @@ runtime/drc/ad9361 -l drc_ad9361
 runtime/xfer/base -l xfer
 runtime/xfer/tests -n -d internal -l xfer_tests
 runtime/xfer/drivers/datagram -v
+runtime/xfer/drivers/datagram2 -v
 runtime/xfer/drivers/dma -v
 runtime/xfer/drivers/ofed -v
 runtime/xfer/drivers/pio -v

@@ -338,6 +338,21 @@ ocpidev run tests
 ocpidev show tests --local-scope
 ---------------------------------
 
+NOTES
+-----
+
+Be aware that a view script (e.g., *`view.sh`*) invoked by the *`--view`* option
+may be designed such that it runs a program in a background process to
+produce a pop-up window that displays a plot or other data representation
+for a test case.  When a test suite has multiple test cases, multiple
+display windows are created (one for each test case) and persist until
+the user explicitly closes them. In this scenario, test suites with a
+large number of test cases will result in a large number of background
+processes simultaneously running display windows, which can significantly
+degrade system performance. The workaround in this scenario is to refrain
+from using the *`--view`* option.
+
+
 BUGS
 ----
 See https://www.opencpi.org/report-defects

@@ -25,10 +25,10 @@
 #include <cstring>
 #include <cassert>
 #include "UtilMisc.hh"
-#include "data.h"
-#include "assembly.h"
-#include "hdl.h"
-#include "hdl-platform.h"
+#include "data.hh"
+#include "assembly.hh"
+#include "hdl.hh"
+#include "hdl-platform.hh"
 
 const char *Instance::
 initHDL(::Assembly &assy) {
@@ -53,6 +53,7 @@ initHDL(::Assembly &assy) {
 	return "Container workers cannot be both IO and Interconnect";
       m_attach = ic;
       m_iType = Instance::Interconnect;
+      m_inserted = true;
     } else if (io) {
       m_attach = io;
       assert(m_iType == Instance::Device);
@@ -284,6 +285,8 @@ parseHdlAssy() {
 			 "default='1'/>", true)) ||
        (err = addProperty("<property name='sdp_length' type='ushort' parameter='true' "
 			  "default='32'/>", true)) ||
+       (err = addProperty("<property name='sdp_arb' type='uchar' parameter='true' "
+			  "default='0'/>", true)) ||
        // This parameter is in fact patched at the last moment when containers are built
        (m_type == Container &&
 	(err = addProperty("<property name='rom_words' type='ushort' parameter='true' "
@@ -1340,6 +1343,8 @@ emitHdl(FILE *f, const char *prefix, size_t &index)
     fprintf(f, " configure=\"%#lx\"", (unsigned long)m_config);
   if (m_inserted)
     fprintf(f, " inserted=\"1\"");
+  if (m_loadTime)
+    fprintf(f, " loadtime=\"1\"");
   if (m_device.size())
     fprintf(f, " device=\"%s\"", m_device.c_str());
   fprintf(f, "/>\n");

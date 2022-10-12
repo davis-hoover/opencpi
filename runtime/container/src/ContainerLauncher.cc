@@ -23,12 +23,14 @@
 #include "ContainerPort.hh"
 #include "ContainerWorker.hh"
 #include "ContainerApplication.hh"
+#include "ContainerArtifact.hh"
 #include "ContainerLauncher.hh"
 
 namespace OM = OCPI::Metadata;
 namespace OB = OCPI::Base;
 namespace OT = OCPI::Transport;
 namespace XF = OCPI::Xfer;
+namespace OU = OCPI::Util;
 namespace OCPI {
   namespace Container {
 
@@ -36,24 +38,23 @@ LocalLauncher::~LocalLauncher() {}
 
 void LocalLauncher::
 createWorker(Launcher::Member &i) {
-  i.m_worker = &i.m_containerApp->createWorker(i.m_impl->m_artifact,
-					       i.m_name.c_str(),
-					       i.m_impl->m_metadataImpl.m_xml,
-					       i.m_impl->m_staticInstance,
-					       i.m_slaveWorkers,
-					       i.m_hasMaster,
-					       i.m_member, i.m_crew ? i.m_crew->m_size : 1);
+  i.m_worker = &i.m_container->loadArtifact(i.m_impl->m_artifact).
+    createWorker(*i.m_containerApp, *i.m_impl, i.m_name.c_str(), i.m_slaveWorkers, i.m_hasMaster,
+		 i.m_member, i.m_crew ? i.m_crew->m_size : 1);
   // Now we need to set the initial properties - either from instance or from defaults
   for (unsigned p = 0; p < i.m_crew->m_propValues.size(); p++) {
+    unsigned ordinal = i.m_crew->m_propOrdinals[p];
+    OM::Property &prop = i.m_impl->m_metadataImpl.properties()[ordinal];
     ocpiDebug("Setting the initial specified value of property '%s' of instance '%s'",
-	      i.m_impl->m_metadataImpl.properties()[i.m_crew->m_propOrdinals[p]].cname(),
-	      i.m_name.c_str());
-    i.m_worker->setProperty(i.m_crew->m_propOrdinals[p], i.m_crew->m_propValues[p]);
+	      prop.cname(), i.m_name.c_str());
+    if (i.m_worker->application() != i.m_containerApp && !prop.m_isWritable)
+      throw OU::Error("Properties set from applications on loadtime workers must be writable");
+    i.m_worker->setProperty(ordinal, i.m_crew->m_propValues[p]);
   }
   unsigned nProps = i.m_impl->m_metadataImpl.nProperties();
   OM::Property *prop = i.m_impl->m_metadataImpl.properties();
   for (unsigned nn = 0; nn < nProps; nn++, prop++)
-    if (prop->m_default && !prop->m_isParameter) {
+    if (prop->m_default && !prop->m_isParameter && !i.m_worker->isPropertyWritten(*prop)) {
       bool found = false;
       for (unsigned m = 0; m < i.m_crew->m_propValues.size(); m++)
 	if (i.m_crew->m_propOrdinals[m] == prop->m_ordinal) {
@@ -74,26 +75,26 @@ bool LocalLauncher::
 launch(Launcher::Members &instances, Launcher::Connections &connections) {
   m_more = false;
   Launcher::Member *i = &instances[0];
-  // So slaves first.  I think the reason for this is that there were non-compliant legacy
-  // proxies which tried to touch slaves too early (before start).  But this backward
-  // compatibility does no harm
   for (unsigned n = 0; n < instances.size(); n++, i++)
-    if (&i->m_container->launcher() == this && i->m_hasMaster)
+    if (&i->m_container->launcher() == this && i->m_hasMaster && i->m_slaves.empty())
       createWorker(*i);
   i = &instances[0];
   for (unsigned n = 0; n < instances.size(); n++, i++)
-    if (&i->m_container->launcher() == this && !i->m_hasMaster) {
-      bool needSlave = false;
-      for (unsigned nn = 0; nn < i->m_slaves.size(); ++nn)
-	// We allow the proxy to not have all of its slaves present in the app
-	if (i->m_slaves[nn] && !(i->m_slaveWorkers[nn] = i->m_slaves[nn]->m_worker)) {
-	  needSlave = true;
-	  break;
-	}
-      if (needSlave)
-	m_more = true; // instance is local, but a slave is remote
-      else
-	createWorker(*i);
+    if (&i->m_container->launcher() == this) {
+      if (!i->m_slaves.empty()) {
+        bool needSlave = false;
+        for (unsigned nn = 0; nn < i->m_slaves.size(); ++nn)
+          // We allow the proxy to not have all of its slaves present in the app
+          if (i->m_slaves[nn] && !(i->m_slaveWorkers[nn] = i->m_slaves[nn]->m_worker)) {
+            needSlave = true;
+            break;
+          }
+        if (needSlave)
+          m_more = true; // instance is local, but a slave is remote
+        else
+          createWorker(*i);
+      } else if (!i->m_hasMaster) // if not a local slave
+        createWorker(*i);
     }
   for (unsigned n = 0; n < connections.size(); n++) {
     Launcher::Connection &c = connections[n];
@@ -117,8 +118,9 @@ launch(Launcher::Members &instances, Launcher::Connections &connections) {
     }
     if (c.m_in.m_launcher == this && c.m_in.m_port && c.m_in.m_port->initialConnect(c))
       m_more = true;
-    if (c.m_out.m_launcher == this && c.m_out.m_port && !c.m_out.m_done &&
-	c.m_out.m_port->initialConnect(c))
+    // We cannot initialconnect outputs since our negotiation sequence currently
+    // requires inputs to go first.  It could be more symmetric, but not yet
+    if (c.m_out.m_launcher == this && c.m_out.m_port && !c.m_out.m_done)
       m_more = true;
   }
   return m_more;
@@ -129,7 +131,7 @@ work(Launcher::Members &instances, Launcher::Connections &connections) {
   m_more = false;
   Launcher::Member *i = &instances[0];
   for (unsigned n = 0; n < instances.size(); n++, i++)
-    if (&i->m_container->launcher() == this && !i->m_hasMaster && !i->m_worker) {
+    if (&i->m_container->launcher() == this && !i->m_slaves.empty() && !i->m_worker) {
       bool needSlave = false;
       for (unsigned nn = 0; nn < i->m_slaves.size(); ++nn)
 	if (i->m_slaves[nn] && !(i->m_slaveWorkers[nn] = i->m_slaves[nn]->m_worker)) {
@@ -154,10 +156,13 @@ work(Launcher::Members &instances, Launcher::Connections &connections) {
 	m_more = true;
     }
     if (c.m_out.m_port) {
-      if (c.m_in.m_initial.length() || c.m_in.m_final.length()) {
-	if (c.m_out.m_port->finalConnect(c))
+      if (c.m_in.m_initial.length()) {
+	if (c.m_out.m_port->initialConnect(c))
 	  m_more = true;
 	c.m_in.m_initial.clear();
+      } else if (c.m_in.m_final.length()) {
+	if (c.m_out.m_port->finalConnect(c))
+	  m_more = true;
 	c.m_in.m_final.clear();
       }
       if (!c.m_out.m_done)

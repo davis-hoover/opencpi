@@ -17,4 +17,4 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 PackageName=platform
 PackagePrefix=ocpi
-ProjectDependencies=
+ProjectDependencies=ocpi.assets

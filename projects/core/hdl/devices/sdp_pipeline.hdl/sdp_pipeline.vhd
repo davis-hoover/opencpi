@@ -33,16 +33,16 @@
 -- addr 10 + 14
 -- extaddr 10: total is 61 + 32 + 1 is 0 to 93
 
-library IEEE, ocpi, sdp, util;
+library IEEE, ocpi, sdp, util, sync;
 use IEEE.std_logic_1164.all, ieee.numeric_std.all, ocpi.types.all, sdp.sdp.all;
 architecture rtl of sdp_pipeline_worker is
   constant sdp_width_c : positive := to_integer(sdp_width);
   constant width_c : positive := sdp_width_c * dword_size + sdp_header_ndws*32 + 1;
-  subtype data_t is std_logic_vector(width_c-1 downto 0);
+  subtype data_t is std_logic_vector(width_c-1 downto 0); -- values in up and down fifos
   signal up_enq, up_deq, up_full, up_empty : bool_t;
-  signal up_data_in, up_data_out : data_t;
   signal down_enq, down_deq, down_full, down_empty : bool_t;
-  signal down_data_in, down_data_out : data_t;
+  signal down_in_slv, up_out_slv, up_in_slv, down_out_slv : data_t;
+  signal up_full_n, up_empty_n, down_full_n, down_empty_n : bool_t; -- for sync.fifo modules - ick
   function sdp2slv(dws : dword_array_t; sdp : sdp_t) return data_t is
     variable v : data_t;
   begin
@@ -77,100 +77,55 @@ architecture rtl of sdp_pipeline_worker is
     return sdp;
   end slv2sdp;
 begin
-  -- data path conversions between bits (for fifo) and dwords
-  up_data_in  <= sdp2slv(down_in_data, down_in.sdp);
-  up_out_data <= slv2sdp_data(up_data_out);
-  up_out.sdp  <= slv2sdp(up_data_out, up_empty, down_enq);
+  -- data path conversions between slv bits (for fifo) and sdp records and data
 
-  down_data_in  <= sdp2slv(up_in_data, up_in.sdp);
-  down_out_data <= slv2sdp_data(down_data_out);
-  down_out.sdp  <= slv2sdp(down_data_out, down_empty, up_enq);
+  -- flowing from down_in to up_out
+  down_in_slv <= sdp2slv(down_in_data, down_in.sdp);
+  up_out_data <= slv2sdp_data(up_out_slv);
+  up_out.sdp  <= slv2sdp(up_out_slv, up_empty, down_enq);
+
+  -- flowing from up_in to down_out
+  up_in_slv  <= sdp2slv(up_in_data, up_in.sdp);
+  down_out_data <= slv2sdp_data(down_out_slv);
+  down_out.sdp  <= slv2sdp(down_out_slv, down_empty, up_enq);
 
   -- the unfortunate part of this is that we can't assign whole records because
   -- the take/ready signals are in the opposite directions for other reasons
 
-  -- First the flow-through signals not subject to pipelining
-  down_out.id         <= up_in.id;
-  up_out.dropCount    <= down_in.dropCount;
+  -- The flow-through signals not subject to pipelining
+  down_out.id         <= up_in.id;           -- totally static value
+  up_out.dropCount    <= down_in.dropCount;  -- nearly static value for debug
+  up_out.isNode       <= down_in.isNode;     -- totally static value
+  up_out.metadata     <= down_in.metadata;   -- dynamic value changing when fifo is not
 
+  up_full             <= not up_full_n; -- FIXED when these fifos move to util
+  up_empty            <= not up_empty_n; -- FIXED when these fifos move to util
   up_enq              <= down_in.sdp.valid and not up_full;
-  up: component util.util.srl_fifo
+  up: component sync.sync.sync_fifo_2xn
     generic map(width  => width_c)
     port map   (clk    => sdp_clk,
-                reset  => sdp_reset,
+                rst    => sdp_reset,
+                clr    => '0',
                 enq    => up_enq,
                 deq    => up_in.sdp.ready,
-                input  => up_data_in,
-                full   => up_full,
-                empty  => up_empty,
-                output => up_data_out);
+                d_in   => down_in_slv,
+                full_n => up_full_n,
+                empty_n=> up_empty_n,
+                d_out  => up_out_slv);
 
+  down_full             <= not down_full_n;  -- FIXED when these fifos move to util
+  down_empty            <= not down_empty_n;  -- FIXED when these fifos move to util
   down_enq           <= up_in.sdp.valid and not down_full;
-  down: component util.util.srl_fifo
+  down: component sync.sync.sync_fifo_2xn
     generic map(width  => width_c)
     port map   (clk    => sdp_clk,
-                reset  => sdp_reset,
+                rst    => sdp_reset,
+                clr    => '0',
                 enq    => down_enq,
                 deq    => down_in.sdp.ready,
-                input  => down_data_in,
-                full   => down_full,
-                empty  => down_empty,
-                output => down_data_out);
+                d_in   => up_in_slv,
+                full_n => down_full_n,
+                empty_n=> down_empty_n,
+                d_out  => down_out_slv);
 
-  ---- downstream handshake up to accept a transfer into the downstream pipeline register
-  --load_down           <= up_in.sdp.valid and (not down_r.valid or
-  --                                            (down_r.valid and down_in.sdp.ready));
-  --up_out.sdp.ready    <= load_down;
-  --down_out.sdp.header <= down_r.header;
-  --down_out.sdp.eop    <= down_r.eop;
-  --down_out.sdp.valid  <= down_r.valid;
-  --down_out_data       <= down_data_r;
-  ---- upstream handshake up to accept a transfer into the upstream pipeline register
-  --load_up             <= down_in.sdp.valid and (not up_r.valid or
-  --                                              (up_r.valid and up_in.sdp.ready));
-  --down_out.sdp.ready  <= load_up;
-  --up_out.sdp.header   <= up_r.header;
-  --up_out.sdp.eop      <= up_r.eop;
-  --up_out.sdp.valid    <= up_r.valid;
-  --up_out_data         <= up_data_r;
-  --process (up_in.clk) is
-  --begin
-  --  if rising_edge(up_in.clk) then
-  --    if its(up_in.reset) then
-  --      down_r.valid <= bfalse;
-  --      up_r.valid  <= bfalse;
-  --    else
-  --      -- The downstream signals, conditionally set.
-  --      if its(load_down) then
-  --        -- load downstream pipeline register
-  --        down_r.header <= up_in.sdp.header;
-  --        down_r.eop    <= up_in.sdp.eop;  
-  --        down_r.valid  <= btrue;
-  --        down_data_r   <= up_in_data;
-  --      elsif down_r.valid and down_in.sdp.ready then
-  --        down_r.valid  <= bfalse;
-  --      end if;
-  --      if its(load_up) then
-  --        -- load downstream pipeline register
-  --        up_r.header <= down_in.sdp.header;
-  --        up_r.eop    <= down_in.sdp.eop;  
-  --        up_r.valid  <= btrue;
-  --        up_data_r   <= down_in_data;
-  --      elsif up_r.valid and up_in.sdp.ready then
-  --        up_r.valid  <= bfalse;
-  --      end if;
-  --    end if; -- end of not reset
-  --  end if; -- end of rising edge
-  --end process;
-  --up : component FIFO2 is
-  --  generic map(width => sdp_width * dword_bits)
-  --  port map(CLK =>,
-  --           RST =>,
-  --           D_IN =>,
-  --           ENQ =>,
-  --           FULL_N =>,
-  --           D_OUT =>,
-  --           DEQ =>,
-  --           EMPTY_N =>,
-  --           CLR =>);
 end rtl;

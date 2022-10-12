@@ -130,6 +130,19 @@ copy(Offset srcoffs, Offset dstoffs, size_t nbytes, XferRequest::Flags flags) {
   // We ask the underlying transmission layer for the max frame payload size.
   size_t maxpl =
     parent().maxPayloadSize() - (sizeof(MsgHeader) + sizeof(FrameHeader) + 8);
+  // Ensure maximum payload is a multiple of 16 bytes
+  // this is for 128-bit bus alignment in the VHDL in second
+  // and subsequent messages in the same transaction
+  //
+  // *** FIXME *************************************************************************************
+  // The requirement for 16-byte alignment is a limitation of the current VHDL implementation.
+  //
+  // This limitation should be addressed. Possible options include:
+  //   - improve the VHDL to accept unaligned transfers
+  //   - add an endpoint negotation where the alignment is determined based on requirements
+  // ***********************************************************************************************
+  maxpl &= ~0xfu;
+
   ocpiDebug("DGRAM: MAXPL: %zu", maxpl);
   if (!init())
     // conservative estimate, but it still might be exceeded
@@ -155,7 +168,7 @@ msghdr(std::string &s, FrameHeader &hdr, const char *io) {
   OU::format(s, "DGRAM FRAME %s: d %4u s %4u fs %4u a %4u c %4u fl %4u m:",
 	     io, hdr.destId, hdr.srcId, hdr.frameSeq, hdr.ACKStart, hdr.ACKCount, hdr.flags);
   if (hdr.flags & FRAME_FLAG_HAS_MESSAGES) {
-    MsgHeader *m = reinterpret_cast<MsgHeader*>(&hdr + 1);
+    MsgHeader *m = reinterpret_cast<MsgHeader*>(reinterpret_cast<char*>(&hdr) + FRAME_HEADER_SIZE);
     for (bool next = true; next; ) {
       OU::formatAdd(s, " id %4u fa %8x fv %8x n %4u ms %4u da %8x dl %4u t %u",
 		    m->transactionId, m->flagAddr, m->flagValue, m->numMsgsInTransaction,
@@ -222,41 +235,54 @@ getFrame() {
   return frame;
 }
 
+volatile static uint32_t g_txId;
+static uint32_t getNextId() {
+  g_txId++;
+  return g_txId;
+}
+
 void XferRequest::
 post() {
   m_nMessagesRx = 0;
   Message *m = &m_messages[0];
   uint32_t flag = *m_localFlagAddr; // retrieve the possibly dynamic flag value for this message
-  for (unsigned nMsgs = 0; nMsgs < m_nMessagesTx; ) {
-    Frame &frame = parent().getFrame();
-    frame.transaction = this;
-    frame.msg_start = OCPI_UTRUNCATE(uint16_t, nMsgs);
-    OS::IOVec *iov = &frame.iov[frame.iovlen];
-    for (size_t msg_bytes;
-	 nMsgs < m_nMessagesTx &&
-	   frame.bytes_left >= (msg_bytes = sizeof(MsgHeader) + ((m->hdr.dataLen + 7u) & ~7u));
-	 frame.bytes_left -= msg_bytes, m++, nMsgs++, frame.msg_count++) {
-      m->hdr.nextMsg = true;
-      m->hdr.flagValue = flag;
 
-      iov->iov_base = (void *)&m->hdr;
-      iov->iov_len = sizeof(MsgHeader);
-      ++iov;
+  // Allocate a transaction ID for this transfer
+  uint32_t txn_id = getNextId();
 
-      iov->iov_base = m->src_adr;
-      iov->iov_len = msg_bytes - sizeof(MsgHeader);
-      ++iov;
-    }
-    frame.iovlen = OCPI_UTRUNCATE(unsigned, OCPI_SIZE_T_DIFF(iov, frame.iov));
-    m[-1].hdr.nextMsg = false;
-    parent().post(frame);
+  // allocation of the next frame sequence number (by function getFrame) up to
+  // the call to send the frame must be atomic. otherwise it is possible for the
+  // SmemServices thread to pre-empt causing frames to be sent out of order
+  // use the parent (XferServices) mutex
+  {
+	OCPI::Util::SelfAutoMutex guard(&parent());
+
+	for (unsigned nMsgs = 0; nMsgs < m_nMessagesTx; ) {
+	  Frame &frame = parent().getFrame();
+	  frame.transaction = this;
+	  frame.msg_start = OCPI_UTRUNCATE(uint16_t, nMsgs);
+	  OS::IOVec *iov = &frame.iov[frame.iovlen];
+	  for (size_t msg_bytes;
+		 nMsgs < m_nMessagesTx &&
+		   frame.bytes_left >= (msg_bytes = sizeof(MsgHeader) + ((m->hdr.dataLen + 7u) & ~7u));
+		 frame.bytes_left -= msg_bytes, m++, nMsgs++, frame.msg_count++) {
+	    m->hdr.nextMsg = true;
+	    m->hdr.flagValue = flag;
+	    m->hdr.transactionId = txn_id;
+
+	    iov->iov_base = (void *)&m->hdr;
+	    iov->iov_len = sizeof(MsgHeader);
+	    ++iov;
+
+	    iov->iov_base = m->src_adr;
+	    iov->iov_len = msg_bytes - sizeof(MsgHeader);
+	    ++iov;
+	  }
+	  frame.iovlen = OCPI_UTRUNCATE(unsigned, OCPI_SIZE_T_DIFF(iov, frame.iov));
+	  m[-1].hdr.nextMsg = false;
+	  parent().post(frame);
+	}
   }
-}
-
-volatile static uint32_t g_txId;
-static uint32_t getNextId() {
-  g_txId++;
-  return g_txId;
 }
 
 void Transaction::
@@ -264,7 +290,6 @@ init(size_t nMsgs) {
   ocpiAssert( ! m_init );
   m_nMessagesTx = 0;
   m_messages.reserve(nMsgs ? nMsgs : 1);
-  m_tid = getNextId();
   m_init = true;
 }
 
@@ -421,7 +446,8 @@ processFrame(FrameHeader *header) {
     m_acks.push_back(header->frameSeq); // retransmnit ack
     return;
   }
-  for (unsigned count = header->ACKCount, seq = header->ACKStart; count; --count, ++seq) {
+  for (uint16_t i = 0; i < header->ACKCount; i++) {
+    uint16_t seq = header->ACKStart + i;
     Frame &f = m_freeFrames[seq & (MAX_FRAME_HISTORY-1)];
     if (!f.is_free && f.frameHdr.frameSeq == seq)
       f.release();
@@ -435,7 +461,9 @@ processFrame(FrameHeader *header) {
   seqRecord.seq = header->frameSeq;
   m_acks.push_back(header->frameSeq);  // ack for the first time
 
-  for (MsgHeader *msg = reinterpret_cast<MsgHeader*>(&header[1]); msg;
+  // Advance to the byte after the frame header (ignoring the padding found in the FrameHeader
+  // struct which does not appear on-wire
+  for (MsgHeader *msg = reinterpret_cast<MsgHeader*>(reinterpret_cast<char*>(header) + FRAME_HEADER_SIZE); msg;
        msg = msg->nextMsg ? (MsgHeader *)((uint8_t *)(msg + 1) + ((msg->dataLen + 7) & ~7)) : NULL) {
     MsgTransactionRecord &tr = m_msgTransactionRecord[msg->transactionId & (MAX_TRANSACTION_HISTORY-1)];
     if (!tr.in_use) {
@@ -457,7 +485,11 @@ processFrame(FrameHeader *header) {
     if (tr.msgsProcessed == tr.numMsgsInTransaction) { // transaction is done
       ocpiDebug("Finalizing datagram transaction %u, addr = 0x%x, value = 0x%x",
 		msg->transactionId, msg->flagAddr, msg->flagValue);
-      *(uint32_t *)m_from.sMemServices().map(msg->flagAddr, sizeof(uint32_t)) = msg->flagValue;
+      // doorbell from HDL to RCC to release buffers does not have a completion write
+      // as there is a separate write flag transaction
+      if (msg->flagAddr != 0xffffffff || msg->flagValue != 0xffffffff) {
+        *(uint32_t *)m_from.sMemServices().map(msg->flagAddr, sizeof(uint32_t)) = msg->flagValue;
+      }
       tr.in_use = false;
       m_transactions_in_play--;
     }
@@ -506,9 +538,9 @@ prepare(uint16_t seq, size_t payload) {
   iov[0].iov_base = (void *)&frameHdr;
   iov[0].iov_len = 2;
   iov[1].iov_base = (void *)&frameHdr;
-  iov[1].iov_len = sizeof(frameHdr);
+  iov[1].iov_len = FRAME_HEADER_SIZE;
   iovlen = 2;
-  bytes_left -=  sizeof(frameHdr) + 2;
+  bytes_left -= FRAME_HEADER_SIZE + 2;
 }
 
 void Frame::

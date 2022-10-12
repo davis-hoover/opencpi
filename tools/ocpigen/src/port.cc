@@ -20,10 +20,11 @@
 
 #include <cassert>
 #include <climits>
+#include <cctype>
 #include <array>
 #include <algorithm>
-#include "hdl.h"
-#include "assembly.h"
+#include "hdl.hh"
+#include "assembly.hh"
 
 const char *portTags[] = {
 #define PORT_TYPE(type, tag, description) #tag,
@@ -646,7 +647,10 @@ emitPortSignal(std::string *pmaps, bool /*any*/, const char *indent, const std::
 
 void Port::
 emitXmlAttrs(std::string &out, bool verbose) const {
-  OU::formatAdd(out, " name='%s' type='%s'", pname(), portTags[m_type]);
+  std::string type(portTags[m_type]);
+  for (unsigned i = 0; i < type.size(); ++i)
+    type[i] = (char)std::tolower(type[i]);
+  OU::formatAdd(out, " name='%s' type='%s'", pname(), type.c_str());
   if (!isData()) // data uses producer attr, not master attr
     OE::emitBoolAttr(out, "master", m_master, verbose);
   if (m_arrayCount) {

@@ -160,6 +160,7 @@ def construct_asset(mode):
         logging.debug("Constructing " + mode + " with args: " + str(kwargs))
         return AssetFactory.factory(asset_type=mode,
                                     directory=DIRS[mode],
+                                    verb='utilization',
                                     **kwargs)
 
 class TestUtilization(unittest.TestCase):

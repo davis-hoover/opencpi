@@ -41,6 +41,7 @@ public:
 private:
   RCCResult start() {
     slave.set_biasValue(m_properties.proxybias);
+    slave.start();
     return RCC_OK;
   }
   RCCResult run(bool /*timedout*/) {

@@ -48,20 +48,13 @@ namespace OCPI {
   namespace Container {}
   namespace HDL {
 
-    //    static inline unsigned max(unsigned a,unsigned b) { return a > b ? a : b;}
-    // This is the alignment constraint of DMA buffers in the processor's memory.
-    // It could be a cache line or a malloc granule...
-    // It should come from somewhere else.  FIXME
-    //    static const unsigned LOCAL_BUFFER_ALIGN = 32;
-
-
     static OTM::Emit::Time getTicksFunc(OTM::Emit::TimeSource *ts) {
       return ts ? static_cast<Container *>(ts)->getMyTicks() : 0; // null-ptr warning
     }
     Container::
-    Container(OCPI::HDL::Device &device, ezxml_t config, const OB::PValue *params) 
+    Container(OCPI::HDL::Device &device, const OB::PValue *params) 
       : OC::ContainerBase<Driver,Container,Application,Artifact>
-	(*this, device.name().c_str(), config, params),
+	(*this, device.name().c_str(), params),
 	Access(device.cAccess()), OTM::Emit::TimeSource(getTicksFunc),
 	m_device(device), m_hwEvents(this, *this, "FPGA Events")
     {
@@ -124,15 +117,17 @@ namespace OCPI {
 
     // This simply insulates the driver code from needing the container class implementation decl.
     OC::Container *Driver::
-    createContainer(OCPI::HDL::Device &dev, ezxml_t config, const OB::PValue *params)  {
-      return new Container(dev, config, params);
+    createContainer(OCPI::HDL::Device &dev, const OB::PValue *params)  {
+      return new Container(dev, params);
     }
     class Worker;
     class Artifact : public OC::ArtifactBase<Container,Artifact> {
       friend class Container;
+      Access *m_timeServer, *m_platformWorker; // access workers in this artifact
 
       Artifact(Container &c, OCPI::Library::Artifact &lart, const OA::PValue *artifactParams) :
-	OC::ArtifactBase<Container,Artifact>(c, *this, lart, artifactParams) {
+	OC::ArtifactBase<Container,Artifact>(c, *this, lart, artifactParams),
+	m_timeServer(NULL), m_platformWorker(NULL) {
 	ensureLoaded();
       }
       ~Artifact() {}
@@ -157,23 +152,9 @@ namespace OCPI {
 	    throw OU::Error("After loading %s on HDL device %s, uuid is wrong.  Wanted: %s",
 			    name().c_str(), c.name().c_str(),
 			    lart.uuid().c_str());
-	  // make sure inserted adapters are started.
-	  const OL::Implementation *i;
-	  for (unsigned n = 0; (i = lart.getImplementation(n)); n++)
-	    if (i->m_inserted) {
-	      WciControl wci(parent().hdlDevice(), i->m_metadataImpl.m_xml, i->m_staticInstance,
-			     NULL);
-	      wci.controlOperation(OM::Worker::OpInitialize);
-	      wci.controlOperation(OM::Worker::OpStart);
-	    }
-	  // attempts to sync time_server.hdl time_now to GPS
-	  bool isGPS;
-	  c.hdlDevice().enableTimeNowUpdatesFromPPS();
-	  OS::Time time = c.hdlDevice().now(isGPS);
-	  ocpiInfo("For HDL container %s: time_server.hdl time_now was initialized to %s 0x%" PRIx64,
-	           c.name().c_str(), (isGPS ? "GPS time" : "non-GPS time"), time.bits());
 	}
       }
+      void configure(); // needs Worker class defined, so implementation is below outside the class
     };
 
     static void doWorkers(Device &device, ezxml_t top, char letter, bool hex) {
@@ -236,10 +217,26 @@ namespace OCPI {
 	fprintf(stderr, "  No artifact loaded.\n");
     }
 
+    uint64_t Container::
+    getMyTicks() {
+      Access *ts = firstArtifact()->m_timeServer;
+      return
+	m_device.isAlive() && !m_device.isFailed() && ts ? 
+	(m_lastTick = swap32(ts->get64RegisterOffset(0)) + hdlDevice().m_timeCorrection) :
+	m_lastTick;
+    }
+
     // We know we have not already loaded it, but it still might be loaded on the device.
     OC::Artifact & Container::
     createArtifact(OCPI::Library::Artifact &lart, const OA::PValue *artifactParams)
     {
+      // HDL containers can only have one artifact at a time.
+      // So this constructor must destroy any existing artifact.
+      Artifact *art = firstArtifact();
+      if (art) {
+	art->unload();
+	delete art;
+      }
       return *new Artifact(*this, lart, artifactParams);
     }
 
@@ -253,7 +250,7 @@ namespace OCPI {
 			        size_t member, size_t crewSize, const OB::PValue *wParams);
     };
 
-    OA::ContainerApplication *Container::
+    OC::Application *Container::
     createApplication(const char *a_name, const OB::PValue *props) {
       return new Application(*this, a_name, props);
     };
@@ -261,7 +258,6 @@ namespace OCPI {
     class Worker : public OC::WorkerBase<Application, Worker, Port>, public WciControl {
       friend class Application;
       friend class Port;
-      friend class ExternalPort;
       Container &m_container;
       Worker(Application &app, OC::Artifact *art, const char *a_name, ezxml_t implXml,
 	     ezxml_t instXml, const OC::Workers &a_slaves, bool a_hasMaster, size_t a_member,
@@ -364,18 +360,44 @@ OCPI_DATA_TYPES
       return *new Worker(*this, art, appInstName, impl, inst, slaves, hasMaster, member, crewSize,
 			 wParams);
     }
+
+    // The HDL work of configuring the artifact
+    // First create our own builtin workers, and then call the generic method
+    void Artifact::
+    configure() {
+      const OL::Implementation *i;
+      for (unsigned n = 0; (i = libArtifact().getImplementation(n)); n++) {
+	ezxml_t x = i->m_staticInstance;
+	ocpiAssert(x);
+	size_t index;
+	bool found = false;
+	const char *err;
+	if ((err = OE::getNumber(x, "occpIndex", &index, &found)))
+	  throw OU::Error("Unexpected occpIndex error: %s", err);
+	if (found && index < 2)
+	  (index ? m_timeServer : m_platformWorker) =
+	    &static_cast<Worker*>(&addLoadTimeWorker(*i, n))->propertyAccess();
+      }
+      OC::Artifact::configure();
+      Container &c = parent();
+      // attempts to sync time_server.hdl time_now to GPS
+      // note any system.xml properties have been applied to the time server here
+      bool isGPS;
+      c.hdlDevice().enableTimeNowUpdatesFromPPS(*m_timeServer);
+      OS::Time time = c.hdlDevice().now(*m_timeServer, isGPS);
+      ocpiInfo("For HDL container %s: time_server.hdl time_now was initialized to %s 0x%" PRIx64,
+	       c.name().c_str(), (isGPS ? "GPS time" : "non-GPS time"), time.bits());
+    }
+
     // This port class really has two cases: externally connected ports and
     // internally connected ports.
     // Also ports are either user or provider.
     // So this class takes care of all 4 cases, since the differences are so
     // minor as to not be worth (re)factoring (currently).
     // The inheritance of WciControl is for the external case
-    class ExternalPort;
-    class Port : public OC::PortBase<OH::Worker,OH::Port,OH::ExternalPort>, WciControl {
+    class Port : public OC::PortBase<OH::Worker,OH::Port>, WciControl {
       friend class Container;
       friend class Worker;
-      friend class ExternalPort;
-      ezxml_t m_connection;
       // These are for external-to-FPGA ports
       // Which would be in a different class if we separate them
       bool m_sdp;
@@ -389,17 +411,15 @@ OCPI_DATA_TYPES
       Port(OCPI::HDL::Worker &w,
 	   const OA::PValue *params,
            const OM::Port &mPort, // the parsed port metadata
-           ezxml_t connXml, // the xml connection for this port
+           ezxml_t /*connXml*/, // the xml connection for this port
            ezxml_t icwXml,  // the xml interconnect/infrastructure worker attached to this port if any
            ezxml_t icXml,   // the xml interconnect instance attached to this port if any
            ezxml_t adwXml,  // the xml adapter/infrastructure worker attached to this port if any
            ezxml_t adXml) :   // the xml adapter instance attached to this port if any
-        OC::PortBase<OH::Worker,OH::Port,OH::ExternalPort>
-	(w, *this, mPort, params),
+        OC::PortBase<OH::Worker,OH::Port>(w, *this, mPort, params),
 	// The WCI will control the interconnect worker.
 	// If there is no such worker, usable will fail.
-        WciControl(w.m_container.hdlDevice(), icwXml, icXml, NULL),
-        m_connection(connXml), m_sdp(false), m_memorySize(0),
+        WciControl(w.m_container.hdlDevice(), icwXml, icXml, NULL), m_sdp(false), m_memorySize(0),
 	m_adapter(adwXml ? new WciControl(w.m_container.hdlDevice(), adwXml, adXml, NULL) : 0),
 	m_hasAdapterConfig(false),
 	m_adapterConfig(0),
@@ -603,8 +623,11 @@ OCPI_DATA_TYPES
 	  m_properties.set8Register(buffer_count, SDP::Properties,
 				    OCPI_UTRUNCATE(uint8_t, myDesc.nBuffers));
 	  m_properties.set32Register(buffer_size, SDP::Properties, myDesc.dataBufferPitch);
+	  auto options = getData().data.options;
 	  m_properties.set8Register(readsAllowed, SDP::Properties,
-				    getData().data.options & (1<<OT::FlagIsMeta) ? 1 : 0);
+				    OCPI_UTRUNCATE(uint8_t,
+						   (options & (1<<OT::FlagIsMeta) ? 1 : 0) |
+						   (options & (1<<OT::PrefixMetadata) ? 2 : 0)));
 	} else {
 	  // Here is where we can setup the OCDP producer/user
 	  ocpiAssert(m_properties.get32Register(foodFace, OcdpProperties) == 0xf00dface);
@@ -748,35 +771,16 @@ OCPI_DATA_TYPES
 	portIsConnected();
 	return isProvider() ? NULL : &getData().data;
       }
-      OC::ExternalPort &createExternal(const char *extName, bool isProvider,
-				       const OB::PValue *extParams, const OB::PValue *connParams);
     };
     // Connection between two ports inside this container
     // We know they must be in the same artifact, and have a metadata-defined connection
     bool Container::
     connectInside(OC::BasicPort &in, OC::BasicPort &out) {
-      
-
-      Port 
+      Port
 	&pport = static_cast<Port&>(in.isProvider() ? in : out),
 	&uport = static_cast<Port&>(out.isProvider() ? in : out);
       assert(!pport.m_canBeExternal && !uport.m_canBeExternal);
       return true;
-#if 0
-      bool done;
-      OT::Descriptors dummy;
-      pport.startConnect(NULL, dummy, done);
-      // We're both in the same runtime artifact object, so we know the port class
-      if (uport.m_connection != pport.m_connection)
-	throw OU::Error("Ports %s (instance %s) and %s (instance %s) are both local in "
-			"bitstream/artifact %s, but are not connected (%p %p)",
-			uport.name().c_str(), uport.parent().name().c_str(),
-			pport.name().c_str(), pport.parent().name().c_str(),
-			pport.parent().artifact() ?
-			pport.parent().artifact()->name().c_str() : "<none>",
-			uport.m_connection, pport.m_connection);
-      return true;
-#endif
     }
     int Port::dumpFd = -1;
 

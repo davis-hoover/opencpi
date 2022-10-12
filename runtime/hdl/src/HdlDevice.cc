@@ -26,9 +26,6 @@
 #include "XferManager.hh"
 #include "HdlDevice.hh"
 #include "HdlDriver.hh"
-#include "HdlContainer.hh"
-/// @todo / FIXME - figure out problems w/ gpsd functionality commented out here
-//#include <libgpsmm.h>
 
 #define USE_LZMA 1
 namespace OCPI {
@@ -78,7 +75,7 @@ namespace OCPI {
     Device::
     Device(const std::string &a_name, const char *a_protocol, const OB::PValue *params)
       : m_metadata(NULL), m_implXml(NULL), m_old(false), m_name(a_name), m_protocol(a_protocol),
-        m_isAlive(true), m_pfWorker(NULL), m_tsWorker(NULL), m_isFailed(false), m_verbose(false),
+        m_isAlive(true), m_isFailed(false), m_verbose(false),
         m_timeCorrection(0), m_endPoint(NULL) {
       OB::findBool(params, "verbose", m_verbose);
       memset((void*)&m_UUID, 0, sizeof(m_UUID));
@@ -87,8 +84,6 @@ namespace OCPI {
     ~Device() {
       if (m_endPoint)
 	m_endPoint->release();
-      delete m_pfWorker;
-      delete m_tsWorker;
       if (m_implXml)
         ezxml_free(m_implXml);
       if (m_metadata)
@@ -99,61 +94,42 @@ namespace OCPI {
     static void catchBusError(int) { siglongjmp(jmpbuf, 1); }
     /// @todo / FIXME - document justification for default timeout value
     bool Device::
-    getPPSIsOkay(useconds_t timeout=2100e3, useconds_t sleepTime=100e3) {
-      bool ret = false;
-      useconds_t elapsed = 0;
-      Access *ts = timeServer();
+    getPPSIsOkay(Access &timeServer, useconds_t timeout=2100e3, useconds_t sleepTime=100e3) {
       ocpiInfo("HDL Device '%s': waiting up to %i usec for time_server.hdl PPS_ok...",
                m_name.c_str(), (int)timeout);
-      while (elapsed < timeout) {
+      for (useconds_t elapsed = 0; elapsed < timeout; elapsed += sleepTime) {
         usleep(sleepTime);
-        elapsed += sleepTime;
-        if (ts) {
-          ret = ts->get8RegisterOffset(offsetof(TimeService, PPS_ok));
-          if (ret) {
-            ocpiInfo("HDL Device '%s': time_server.hdl PPS_ok is true", m_name.c_str());
-            break;
-          }
+	if (timeServer.get8RegisterOffset(offsetof(TimeService, PPS_ok))) {
+	  ocpiInfo("HDL Device '%s': time_server.hdl PPS_ok is true", m_name.c_str());
+	  return true;
         }
       }
-      return ret;
+      return false;
     }
     bool Device::
-    getUsingPPS() {
-      bool ret = false;
-      Access *ts = timeServer();
-      if (ts) {
-        ret = ts->get8RegisterOffset(offsetof(TimeService, using_PPS));
-        if (ret) {
-          ocpiInfo("HDL Device '%s': time_server.hdl using_PPS is true", m_name.c_str());
-        }
-      }
+    getUsingPPS(Access &timeServer) {
+      bool ret = timeServer.get8RegisterOffset(offsetof(TimeService, using_PPS));
+      if (ret)
+	ocpiInfo("HDL Device '%s': time_server.hdl using_PPS is true", m_name.c_str());
       return ret;
     }
     void Device::
-    enableTimeNowUpdatesFromPPS() {
-      Access *ts = timeServer();
-      size_t os = 0;
-      if (ts) {
-        if (getUsingPPS()) {
-          os = offsetof(TimeService, enable_time_now_updates_from_PPS);
-          ts->set8RegisterOffset(os, 1);
-          ocpiInfo("HDL Device '%s': Using PPS from PPS source and enabling time now updates from PPS", m_name.c_str());
-        }
+    enableTimeNowUpdatesFromPPS(Access &timeServer) {
+      if (getUsingPPS(timeServer)) {
+	timeServer.set8RegisterOffset(offsetof(TimeService, enable_time_now_updates_from_PPS), 1);
+	ocpiInfo("HDL Device '%s': Using PPS from PPS source and enabling time now PPS updates",
+		 m_name.c_str());
       }
     }
     OS::Time Device::
-    now(bool &isGps) {
+    now(Access &timeServer, bool &isGps) {
       OS::Time ret;
       OS::Time current_time;
-      Access *ts = timeServer();
       isGps = true;
-      if (!ts)
-        isGps = false;
       if (isGps)
         isGps = Driver::getSingleton().configure_gpsd_if_enabled(); // PPS pin init'd for PPS_ok
       if (isGps) {
-        isGps = getPPSIsOkay();
+        isGps = getPPSIsOkay(timeServer);
         if (!isGps)
           ocpiInfo("HDL Device '%s': time_server.hdl PPS_ok is false, forcing GPS time to be "
                    "ignored", m_name.c_str());
@@ -165,17 +141,17 @@ namespace OCPI {
         // if system.xml has gpsd tag, WTI time valid=1 means time came from
         // successful gps fix
         auto os = offsetof(TimeService, valid_requires_write_to_time_now);
-        ts->set8RegisterOffset(os, 1);
+        timeServer.set8RegisterOffset(os, 1);
         os = offsetof(TimeService, time_now);
         // write integer portion only (most significant 32 bits) from
         // libgpsd-provided time from HDL::Driver to HTS
-        ts->set64RegisterOffset(os, current_time.bits());
+        timeServer.set64RegisterOffset(os, current_time.bits());
         // read current Q32.32 time from HTS now that HTS is fully sync'd to GPS
-        ret = ts->get64RegisterOffset(os);
+        ret = timeServer.get64RegisterOffset(os);
       } else {
 	// no GPS time avalable, use system time and set the time server to it.
         ret = OS::Time::now();
-	ts->set64RegisterOffset(offsetof(TimeService, time_now), ret.bits());
+	timeServer.set64RegisterOffset(offsetof(TimeService, time_now), ret.bits());
       }
       return ret;
     }
@@ -184,6 +160,7 @@ namespace OCPI {
     bool Device::
     init(std::string &err) {
       m_isAlive = false;
+      m_isFailed = false; // could be trying after previous failure
       sig_t old = signal(SIGBUS, catchBusError); // FIXME: we could make this thread safe
       volatile uint64_t magic = 0x0BAD1BADDEADBEEF;
       try {
@@ -231,7 +208,7 @@ namespace OCPI {
           err = "bus error on probe";
         }
       } catch (std::string &e) {
-        ocpiBad("HDL Device '%s' gets error '%s' on probe: ", e.c_str(), m_name.c_str());
+        ocpiBad("HDL Device '%s' gets error '%s' on probe: ", m_name.c_str(), e.c_str());
         err = "access exception on probe";
       } catch (...) {
         ocpiBad("HDL Device '%s' gets access exception on probe: ", m_name.c_str());
@@ -247,47 +224,36 @@ namespace OCPI {
         err = "Magic numbers in admin space do not match when accessing 64 bit words";
         return true;
       }
-      if (!m_pfWorker) {
-        ocpiDebug("HDL::Device::init: platform worker does not exist, first access in process");
-        m_pfWorker = new WciControl(*this, "platform", "pf_i", 0, true);
-        m_tsWorker = new WciControl(*this, "time_server", "ts_i", 1, true);
+      // Get temporary access to the platform worker to get the UUID
+      WciControl pfWorker(*this, "platform", "pf_i", 0, true);
+
+      if (pfWorker.isReset()) {
+        ocpiDebug("Platform worker is in reset, initialize it so we can read properties");
+        pfWorker.init(true, true); // take out of reset, set timeout
+	// Initialize so that property access is valid.
+        if (pfWorker.controlOperation(OM::Worker::OpInitialize, err))
+	  return true;
       }
-      if (m_pfWorker->isReset()) {
-        ocpiDebug("Platform worker is in reset, initializing it (unreset, initialize, start)");
-        m_old = false;
-        m_pfWorker->init(true, true);
-        m_tsWorker->init(true, true);
-        if ((m_pfWorker->controlOperation(OM::Worker::OpInitialize, err)) ||
-            (m_tsWorker->controlOperation(OM::Worker::OpInitialize, err)) ||
-            (m_pfWorker->controlOperation(OM::Worker::OpStart, err)) ||
-            (m_tsWorker->controlOperation(OM::Worker::OpStart, err)))
-          return true;
-      }
+      // Get UUID from properties
+      HdlUUID myUUIDtmp;
+      pfWorker.propertyAccess().getBytesRegisterOffset(0, (uint8_t *)&myUUIDtmp,
+						       sizeof(HdlUUID), 8);
+      // Fix the endianness
+      for (unsigned n = 0; n < sizeof(HdlUUID); n++)
+        ((uint8_t *)&m_UUID)[n] = ((uint8_t *)&myUUIDtmp)[(n & ~3u) + (3u - (n&3u))];
+      memcpy(&m_loadedUUID, m_UUID.uuid, sizeof(m_loadedUUID));
       m_isAlive = true;
       if (configure(NULL, err))
         return true;
       return false;
     }
-    void Device::
-    getUUID() {
-      HdlUUID myUUIDtmp;
-      if (m_old)
-        m_cAccess.getRegisterBytes(admin.uuid, &myUUIDtmp, OccpSpace, 8, false);
-      else
-        m_pfWorker->m_properties.getBytesRegisterOffset(0, (uint8_t *)&myUUIDtmp,
-                                                        sizeof(HdlUUID), 8);
-      // Fix the endianness
-      for (unsigned n = 0; n < sizeof(HdlUUID); n++)
-        ((uint8_t*)&m_UUID)[n] = ((uint8_t *)&myUUIDtmp)[(n & ~3u) + (3u - (n&3u))];
-      memcpy(&m_loadedUUID, m_UUID.uuid, sizeof(m_loadedUUID));
-    }
+
     RomWord Device::
-    getRomWord(uint16_t n) {
-      m_pfWorker->m_properties.set16RegisterOffset(sizeof(HdlUUID) + sizeof(uint64_t), n);
-      return OCPI_UTRUNCATE(RomWord,
-                            m_pfWorker->m_properties.get32RegisterOffset(sizeof(HdlUUID) +
-                                                                         sizeof(uint64_t) +
-                                                                         sizeof(uint32_t)));
+    getRomWord(Access &access, uint16_t n) {
+      access.set16RegisterOffset(sizeof(HdlUUID) + sizeof(uint64_t), n);
+      return OCPI_UTRUNCATE(RomWord, access.get32RegisterOffset(sizeof(HdlUUID) +
+								sizeof(uint64_t) +
+								sizeof(uint32_t)));
     }
     static const unsigned MAXXMLBYTES = ROM_NBYTES * 16;
 #ifndef USE_LZMA
@@ -298,21 +264,27 @@ namespace OCPI {
       free(data);
     }
 #endif
+    // This is only called after the device is initialized
     bool Device::
     getMetadata(std::vector<char> &xml, std::string &err) {
+      // Get temporary access to the platform worker to get the UUID
+      WciControl pfWorker(*this, "platform", "pf_i", 0, true);
+
+      assert(!pfWorker.isReset());
+      Access &access = pfWorker.propertyAccess();
       RomWord rom[ROM_NWORDS];
-      if ((rom[0] = getRomWord(0)) != 1 ||
-          (rom[1] = getRomWord(1)) >= ROM_NBYTES ||
-          (rom[2] = getRomWord(2)) >= MAXXMLBYTES) {
+      if ((rom[0] = getRomWord(access, 0)) != 1 ||
+          (rom[1] = getRomWord(access, 1)) >= ROM_NBYTES ||
+          (rom[2] = getRomWord(access, 2)) >= MAXXMLBYTES) {
         OU::format(err, "Metadata ROM appears corrupted: 0x%x 0x%x 0x%x",
                    rom[0], rom[1], rom[2]);
         return true;
       }
       xml.resize(rom[2]);
-      rom[3] = getRomWord(3);
+      rom[3] = getRomWord(access, 3);
       uint16_t nWords = OCPI_UTRUNCATE(uint16_t, (rom[1] + sizeof(RomWord) - 1)/sizeof(RomWord));
       for (uint16_t n = ROM_HEADER_WORDS; n < ROM_HEADER_WORDS + nWords; n++)
-        rom[n] = getRomWord(n);
+        rom[n] = getRomWord(access, n);
 #if USE_LZMA
       lzma_ret lr;
       uint64_t memlimit = UINT64_MAX;
@@ -370,6 +342,7 @@ namespace OCPI {
 	ocpiDebug("Avoiding configuration of device that is not alive: %s", name().c_str());
 	return false;
       }
+      // This is probably unnecessary since configure is only called on valid devices.
       uint64_t magic = m_cAccess.get64Register(magic, OccpAdminRegisters);
       // Shuffle endianness here
       if (magic != OCCP_MAGIC) {
@@ -378,7 +351,6 @@ namespace OCPI {
         error = "Magic numbers in admin space do not match";
         return true;
       }
-      getUUID();
       // Some generic initialization.
       time_t bd = (time_t)m_UUID.birthday;
       char tbuf[30];
@@ -416,7 +388,7 @@ namespace OCPI {
         OE::getOptionalString(config, m_esn, "esn");
         std::string myPlatform, device;
         OE::getOptionalString(config, myPlatform, "platform");
-        OE::getOptionalString(config, myPlatform, "device");
+        OE::getOptionalString(config, device, "device");
         if (!myPlatform.empty() && myPlatform != m_platform) {
           OU::formatString(error, "Discovered platform (%s) doesn't match configured platform (%s)",
                   m_platform.c_str(), myPlatform.c_str());
@@ -527,6 +499,47 @@ namespace OCPI {
       strcpy(temp.dna, "\001\002\003\004\005\006\007");
       for (unsigned n = 0; n < sizeof(HdlUUID); n++)
         ((uint8_t *)&hdlUuid)[n] = ((uint8_t *)&temp)[(n & ~3u) + (3u - (n & 3u))];
+    }
+    bool Device::
+    loadJtag(const char *fileName, std::string &error) {
+      error.clear();
+      // FIXME: there should be a utility to run a script in this way
+      char *command;
+      int aslen =
+	asprintf(&command,
+		 "%s/scripts/loadBitStream \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\"",
+		 OU::getCDK().c_str(), fileName, name().c_str(), m_platform.c_str(),
+		 m_part.c_str(), m_esn.c_str(), m_position.c_str());
+      ocpiAssert(aslen > 0);
+      ocpiInfo("Executing command to load bit stream for device %s: \"%s\"\n",
+	       fileName, command);
+      int rc = system(command);
+      switch (rc) {
+      case 127:
+	error = "Couldn't execute bitstream loading command.  Bad OCPI_CDK_DIR environment variable?";
+	break;
+      case -1:
+	OU::format(error,
+		   "Unknown system error (errno %d) while executing bitstream loading command: %s",
+		   errno, command);
+	break;
+      case 0:
+	ocpiInfo("Successfully loaded bitstream file: \"%s\" on HDL device \"%s\"\n",
+		 fileName, name().c_str());
+	break;
+      default:
+	OU::format(error, "Bitstream loading error (%s%s: %d) loading \"%s\" on HDL device"
+		   " \"%s\" with command: %s",
+		   WIFEXITED(rc) ? "exit code" : "signal ",
+		   WIFEXITED(rc) ? "" : strsignal(WTERMSIG(rc)),
+		   WIFEXITED(rc) ? WEXITSTATUS(rc) : WTERMSIG(rc),
+		   fileName, name().c_str(), command);
+      }
+      return error.empty() ? init(error) : true;
+    }
+    bool Device::
+    unloadJtag(std::string &error) {
+      return OU::eformat(error, "Can't unload bitstreams for JTAG devices yet");
     }
   }
 }

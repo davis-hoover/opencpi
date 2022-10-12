@@ -131,21 +131,18 @@ namespace OCPI {
 #endif
 #endif
     }
-	void initTime() {
+	void initTime(Access &timeServer) {
 	  unsigned n;
 	  uint32_t delta[100];
 	  uint32_t sum = 0;
-	  Access *ts = timeServer();
   
-	  if (!ts)
-	    return;
 	  // Take a hundred samples of round trip time, and sort
 	  for (n = 0; n < 100; n++) {
 	    // Read the FPGA's time, and set its delta register
-	    ts->set64RegisterOffset(sizeof(uint64_t), ts->get64RegisterOffset(0));
+	    timeServer.set64RegisterOffset(sizeof(uint64_t), timeServer.get64RegisterOffset(0));
 	    // occp->admin.timeDelta = occp->admin.time;
 	    // Read the (incorrect endian) delta register
-	    delta[n] = (uint32_t)swap32(ts->get64RegisterOffset(sizeof(uint64_t)));
+	    delta[n] = (uint32_t)swap32(timeServer.get64RegisterOffset(sizeof(uint64_t)));
 	  }
 	  qsort(delta, 100, sizeof(uint32_t), compu32);
   
@@ -162,17 +159,17 @@ namespace OCPI {
 	  uint64_t nw1 = now();
 	  uint64_t nw1a = nw1 + sum;
 	  uint64_t nw1as = swap32(nw1a);
-	  ts->set64RegisterOffset(0, nw1as);
+	  timeServer.set64RegisterOffset(0, nw1as);
 	  // set32Register(admin.scratch20, OccpSpace, nw1as>>32);
 	  // set32Register(admin.scratch24, OccpSpace, (nw1as&0xffffffff));
 	  //uint64_t nw1b = 0; // get64Register(admin.time, OccpSpace);
 	  //      uint64_t nw1bs = swap32(nw1b);
 	  uint64_t nw2 = 0; // now();
 	  uint64_t nw2s = swap32(nw2);
-	  ts->set64RegisterOffset(sizeof(uint64_t), nw1as);
-	  uint64_t nw1b = ts->get64RegisterOffset(0);
+	  timeServer.set64RegisterOffset(sizeof(uint64_t), nw1as);
+	  uint64_t nw1b = timeServer.get64RegisterOffset(0);
 	  uint64_t nw1bs = swap32(nw1b);
-	  uint64_t dt = ts->get64RegisterOffset(sizeof(uint64_t));
+	  uint64_t dt = timeServer.get64RegisterOffset(sizeof(uint64_t));
 	  ocpiDebug("Now delta is: %" PRIi64 "ns "
 		    "(dt 0x%" PRIx64 " dtsw 0x%" PRIx64 " nw1 0x%" PRIx64 " nw1a 0x%" PRIx64 " nw1as 0x%" PRIx64
 		    " nw1b 0x%" PRIx64 " nw1bs 0x%" PRIx64 " nw2 0x%" PRIx64 " nw2s 0x%" PRIx64 " t 0x%lx)",
@@ -188,44 +185,11 @@ namespace OCPI {
 	}
 	// Load a bitstream via jtag
 	bool load(const char *fileName, std::string &error) {
-	  error.clear();
-	  // FIXME: there should be a utility to run a script in this way
-	  char *command;
-	  int aslen =
-	    asprintf(&command,
-		     "%s/scripts/loadBitStream \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\"",
-		     OU::getCDK().c_str(), fileName, name().c_str(), m_platform.c_str(),
-		     m_part.c_str(), m_esn.c_str(), m_position.c_str());
-          ocpiAssert(aslen > 0);
-	  ocpiInfo("Executing command to load bit stream for device %s: \"%s\"\n",
-		   fileName, command);
-	  int rc = system(command);
-	  switch (rc) {
-	  case 127:
-	    error = "Couldn't execute bitstream loading command.  Bad OCPI_CDK_DIR environment variable?";
-	    break;
-	  case -1:
-	    OU::format(error,
-		       "Unknown system error (errno %d) while executing bitstream loading command: %s",
-		       errno, command);
-	    break;
-	  case 0:
-	    ocpiInfo("Successfully loaded bitstream file: \"%s\" on HDL device \"%s\"\n",
-		     fileName, name().c_str());
-	    break;
-	  default:
-	    OU::format(error, "Bitstream loading error (%s%s: %d) loading \"%s\" on HDL device"
-		       " \"%s\" with command: %s",
-		       WIFEXITED(rc) ? "exit code" : "signal ",
-		       WIFEXITED(rc) ? "" : strsignal(WTERMSIG(rc)),
-		       WIFEXITED(rc) ? WEXITSTATUS(rc) : WTERMSIG(rc),
-		       fileName, name().c_str(), command);
-	  }
-	  return error.empty() ? init(error) : true;
+	  return loadJtag(fileName, error);
 	}
 	bool
 	unload(std::string &error) {
-	  return OU::eformat(error, "Can't unload bitstreams for PCI/JTAG devices yet");
+	  return unloadJtag(error);
 	}
       };
 
@@ -267,7 +231,7 @@ namespace OCPI {
 #endif
 	return count;
       }
-      
+
       OCPI::HDL::Device *Driver::
       open(const char *pciName, const OB::PValue *params, std::string &error) {
 	const char *cp;

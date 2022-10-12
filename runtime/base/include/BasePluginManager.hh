@@ -102,6 +102,7 @@ protected:
     (OCPI::Util::Singleton<ManagerManager>::getSingleton(), *this, mname),
       m_doNotDiscover(false)
   {}
+  virtual ~Manager();
   // Configure the manager. X is the node whose name is the name of the manager
   // The default implementation just configures any drivers
   virtual void configure(ezxml_t x);
@@ -110,30 +111,49 @@ protected:
   virtual unsigned cleanupPosition();
   bool shouldDiscover() const { return !m_doNotDiscover; }
 public:
-  virtual unsigned discover(const PValue *params = NULL) = 0;
   virtual Driver *findDriver(const char *name) = 0;
   inline void suppressDiscovery() { m_doNotDiscover = true; }
   inline void enableDiscovery() { m_doNotDiscover = false; }
-  virtual ~Manager();
+  unsigned discover(const PValue *params = NULL, bool discoveryOnly = false);
 };
 
 class Device;
 // The base class for all (singleton) drivers.
 class Driver {
   ezxml_t m_config;
+  enum Discovery { ALL, NONE, STATIC, DYNAMIC } m_discovery;
 protected:
-  bool m_doNotDiscover;
   Driver();
   virtual ~Driver();
-  ezxml_t getDeviceConfig(const char *name);
 public:
-  inline bool shouldDiscover() const { return !m_doNotDiscover; }
-  inline void suppressDiscovery() { m_doNotDiscover = true; }
-  inline void enableDiscovery() { m_doNotDiscover = false; }
+  ezxml_t getDeviceConfig(const char *name);
+  inline bool shouldDiscover() const { return m_discovery != NONE; }
+  inline void suppressDiscovery() { m_discovery = NONE; }
+  inline void enableDiscovery() { m_discovery = ALL; } // no way here to set dynamic vs. static yet
   virtual const std::string &name() const = 0;
+  virtual Manager &managerBase() = 0;
   virtual Driver *nextDriverBase() = 0;
   virtual void configure(ezxml_t);
   virtual Device *firstDeviceBase() = 0;
+  // This non-virtual method is for doing what "search" would do for devices that are not
+  // discoverable and thus statically defined in system.xml
+  unsigned createStaticDevices(const PValue *params, std::vector<const char *> &excludes,
+			       bool discoveryOnly = false, Discovery mode = ALL);
+  // Ask the driver to create a static device found in its configuration
+  virtual void createStaticDevice(const char *name, ezxml_t x, const PValue *params, bool discoveryOnly);
+  // Per driver discovery routine to create devices that are found,
+  // excluding the ones named in the "exclude" list.
+  virtual unsigned search(const PValue* props = NULL, const char **exclude = NULL,
+			  bool discoveryOnly = false);
+  // Probe for a particular device and return it if found, and creating it
+  // if not yet created. Return NULL if it is not found.
+  // This would typically be called by something that had a configuration file
+  // and didn't want "discovery" via search.
+  // If "which" is null, return any one that matches props, otherwise
+  // request a specific one.
+  virtual Device *probe(const char */*which*/, bool /*verbose*/, bool /*discovery*/,
+			const char **/*exclude*/, const PValue */*params*/, std::string &/*err*/);
+  unsigned discover(const PValue *params = NULL, bool discoveryOnly = false);
 };
 
 // The template class inherited by concrete managers, with the template
@@ -163,21 +183,6 @@ public:
   Driver *findDriver(const char *a_name) {
     return Parent<DerivedDriver>::findChildByName(a_name);
   }
-  unsigned discover(const PValue *params) {
-    parent().configureOnce();
-    unsigned found  = 0;
-    if (!m_doNotDiscover)
-      for (DerivedDriver *dd = firstDriver(); dd; dd = dd->nextDriver()) {
-	if (dd->shouldDiscover()) {
-	  ocpiInfo("Performing discovery for the \"%s\" \"%s\" driver",
-		   dd->name().c_str(), name().c_str());
-	  dd->search(params, NULL, false);
-	} else
-	  ocpiDebug("Discovery for %s driver %s suppressed",
-		    name().c_str(), dd->name().c_str());
-      }
-    return found;
-  }
 };
 
 // This class is virtually inherited, so the constructor can't take args,
@@ -185,7 +190,10 @@ public:
 class Device {
   friend class Driver;
   virtual Device *nextDeviceBase() = 0;
+  ezxml_t m_configXml; // this device's config xml from system config file
 protected:
+  void setConfigXml(ezxml_t xml) { m_configXml = xml; }
+  virtual ezxml_t configXml() const { return m_configXml; }
   virtual void configure(ezxml_t x);
   virtual ~Device();
 public:
@@ -208,26 +216,7 @@ protected:
 	     Child<DriMgr,DriBase>::parent().name().c_str(), a_name);
   }
 public:
-  // Configure from system configuration XML
-  //      virtual void configure(ezxml_t );//{}
-  // Per driver discovery routine to create devices that are found,
-  // excluding the ones named in the "exclude" list.
-  virtual unsigned search(const PValue* props = NULL, const char **exclude = NULL,
-			  bool discoveryOnly = false) {
-    (void) props; (void) exclude; (void) discoveryOnly;
-    return 0;
-  }
-  // Probe for a particular device and return it if found, and creating it
-  // if not yet created. Return NULL if it is not found.
-  // This would typically be called by something that had a configuration file
-  // and didn't want "discovery" via search.
-  // If "which" is null, return any one that matches props, otherwise
-  // request a specific one.
-  virtual Device *probe(const char */*which*/, bool /*verbose*/, bool /*discovery*/,
-			const char **/*exclude*/, const PValue */*params*/,
-			std::string &/*err*/) {
-    return NULL;
-  };
+  inline Manager &managerBase() { return this->Child<DriMgr,DriBase>::parent(); }
   DriBase *nextDriver() { return Sibling<DriBase>::nextChild(); }
   inline Driver *nextDriverBase() { return nextDriver(); }
   inline const std::string &name() const {
@@ -250,7 +239,7 @@ class DriverBase
   : public Parent<Dev>,
     public OCPI::Util::Singleton<ConcDri>,
     public DriBase { // destroy this class BEFORE children
-    public:
+public:
   // to access a specific driver
   inline static ConcDri &getDriver() {
     return OCPI::Util::Singleton<ConcDri>::getSingleton();
@@ -305,7 +294,9 @@ public:
 protected:
   DeviceBase<Dri, Dev>(const char *childName, Dev &dev)
     : Child<Dri, Dev, device>(OCPI::Util::Singleton<Dri>::getSingleton(), dev, childName)
-  {}
+  {
+    Device::setConfigXml(OCPI::Util::Singleton<Dri>::getSingleton().getDeviceConfig(childName));
+  }
 };
 
 } // Plugin

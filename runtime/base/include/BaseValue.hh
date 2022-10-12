@@ -110,9 +110,9 @@ namespace OCPI {
       };
 #undef OCPI_DATA_TYPE_S
 #define OCPI_DATA_TYPE_S(sca,corba,letter,bits,run,pretty,store) \
-      const char *parse##pretty(const char*cp, const char *end, run &vp);
+      const char *parse##pretty(const char *cp, const char *end, run &vp);
 #define OCPI_DATA_TYPE(sca,corba,letter,bits,run,pretty,store) \
-      static const char *parse##pretty(const char*cp, const char *end, run &vp);
+      static const char *parse##pretty(const char *cp, const char *end, run &vp);
 	OCPI_PROPERTY_DATA_TYPES
 
         OCPI_DATA_TYPE_S(sca,corba,letter,bits,StructValue,Struct,store)
@@ -137,7 +137,7 @@ namespace OCPI {
       bool needsCommaDimension() const { return m_vt->needsCommaDimension(); };
       bool needsCommaElement() const { return m_vt->needsCommaElement(); };
       void
-        reserveStringSpace(size_t len, bool add),
+        reserveStringSpace(size_t len),
 	generate(),
 	generateElement(unsigned nSeq),
 	generateDimension(unsigned nseq, size_t dim, size_t offset, size_t nItems),

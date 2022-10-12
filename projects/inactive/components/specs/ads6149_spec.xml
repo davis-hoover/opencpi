@@ -1,6 +1,6 @@
 <ComponentSpec>
   <Properties>
-    <Property Name="Base" Type="ULong" ArraySize="1K"/>
+    <Property Name="Base" Type="ULong" ArrayLength="1K"/>
     <xi:include href="ads61xxbt_props.xml"/>
   </Properties>
   <DataInterfaceSpec Name="samples">

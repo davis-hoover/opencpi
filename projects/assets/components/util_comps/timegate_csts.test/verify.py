@@ -36,7 +36,7 @@ odata = np.fromfile(OFILENAME, dtype=np.uint32, count=-1)
 OFILENAME.close()
 
 # test that odata has the expected length 
-if len(odata) != 8:
+if len(odata) != 40:
     print("    FAILED: Output file length is unexpected")
     print("Did not receive expected samples at the output port")
     sys.exit(1)

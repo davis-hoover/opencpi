@@ -100,6 +100,8 @@ namespace OCPI {
       deployXml = NULL;
       copy = NULL;
       appXml = NULL;
+      bool verbose = false;
+      OB::findBool(params, "verbose", verbose);
       do {
         const char *err;
         const char *cp = appFile.c_str();
@@ -118,6 +120,8 @@ namespace OCPI {
               throw OU::Error("Error: application file %s (or %s) does not exist\n", file,
                               appFile.c_str());
           }
+	  if (verbose)
+	    fprintf(stderr, "Creating an application based on file:  \"%s\"\n", appFile.c_str());
           if ((err = OE::ezxml_parse_file(appFile.c_str(), appXml)))
             throw OU::Error("Can't parse application XML file \"%s\": %s", appFile.c_str(), err);
         }
@@ -1719,14 +1723,14 @@ it is really per actual worker config...
         for (unsigned n = 0; n < m_nContainers; n++)
           m_containers[n]->dump(true, m_hex);
       ocpiInfo("Using %d containers to support the application", m_nContainers );
-      ocpiInfo("Starting master workers that are not slaves.");
+      ocpiInfo("Starting proxy workers that are not slaves.");
       startMasterSlave(true, false, false);  // 4
       startMasterSlave(true, false, true);   // 5
-      ocpiInfo("Starting master workers that are also slaves, but not sources.");
+      ocpiInfo("Starting proxy workers that are also slaves, but not sources.");
       startMasterSlave(true, true, false);   // 6
-      ocpiInfo("Starting master workers that are also slaves and are sources.");
+      ocpiInfo("Starting proxy workers that are also slaves and are sources.");
       startMasterSlave(true, true, true);    // 7
-      ocpiInfo("Starting workers that are not masters and not sources.");
+      ocpiInfo("Starting workers that are not proxies and not sources.");
       startMasterSlave(false, false, false); // 0
       startMasterSlave(false, true, false);  // 2
       ocpiInfo("Starting workers that are sources.");

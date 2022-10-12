@@ -24,7 +24,7 @@
 
 library IEEE; use IEEE.std_logic_1164.all, IEEE.numeric_std.all;
 library ocpi; use ocpi.all, ocpi.types.all;
-library platform, cdc;
+library platform, cdc, util;
 entity sdp2cp_clk_rv is
   generic(
     sdp_width   : in   uchar_t := to_uchar(1));
@@ -265,7 +265,8 @@ g0: for i in 0 to to_integer(sdp_width)-1 generate
     cp_out.byte_en <= fifo2cp_out(byte_en_lsb_c + cp_out.byte_en'length-1 downto byte_en_lsb_c);
     cp_out.is_read <= fifo2cp_out(0);
     cp_out.valid   <= fifo2cp_not_empty;
-    cp_out.clk     <= ctl_clk; -- delta FIXME
+    in2out_cp_clk: util.util.in2out port map(in_port => ctl_clk, out_port => cp_out.clk);
+    -- cp_out.clk     <= ctl_clk; -- delta FIXME
     cp_out.reset   <= ctl_reset;
     fifo2cp_deq    <= cp_in.take and fifo2cp_not_empty;
     fifo2cp: cdc.cdc.fifo

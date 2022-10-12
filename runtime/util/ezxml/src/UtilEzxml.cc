@@ -348,7 +348,7 @@ namespace OCPI {
       const char *
       checkAttrs(ezxml_t x, ...) {
 	va_list ap;
-	if (!x->attr)
+	if (!x || !x->attr)
 	  return 0;
 	for (char **a = x->attr; *a; a += 2) {
 	  va_start(ap, x);
@@ -365,7 +365,7 @@ namespace OCPI {
 
       const char *
       checkAttrsVV(ezxml_t x, ...) {
-	if (!x->attr)
+	if (!x || !x->attr)
 	  return 0;
 	for (char **a = x->attr; *a; a += 2) {
 	  va_list ap;
@@ -385,7 +385,7 @@ namespace OCPI {
 
       const char *
       checkAttrsV(ezxml_t x, const char **attrs) {
-	if (!x->attr)
+	if (!x || !x->attr)
 	  return 0;
 	for (char **a = x->attr; *a; a += 2) {
 	  const char **va;
@@ -599,7 +599,7 @@ namespace OCPI {
 	    *found = true;
 	  *b = val;
 	} else {
-	  if (!trueOnly && setDefault)
+	  if (setDefault)
 	    *b = false;
 	  if (found)
 	    *found = false;

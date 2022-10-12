@@ -34,16 +34,17 @@
 #include "OsMisc.hh"
 #include "OsAssert.hh"
 #include "TransportRDTInterface.hh"
-#include <test_utilities.h>
+#include "test_utilities.h"
 #include "UtilCommandLineConfiguration.hh"
-#include <UtZeroCopyIOWorkers.h>
+#include "UtZeroCopyIOWorkers.h"
 #include "TimeEmit.hh"
-
 #include "UtilThread.hh"
+#include "OcpiApplicationApi.hh"
 
 using namespace OCPI::Container;
 using namespace OCPI;
 using namespace OCPI::CONTAINER_TEST;
+namespace OA=OCPI::API;
 
 
 class OcpiRccBinderConfigurator
@@ -104,17 +105,12 @@ void sig_handler( int signum )
 }
 
 
-#ifdef NO_MAIN
-int test_ap_main( int argc, char** argv)
-#else
-int  main( int argc, char** argv)
-#endif
-{
+int  main(int argc, char** argv) {
 
   SignalHandler sh(sig_handler);
 
   int test_rc = 1;
-  OCPI::Xfer::EventManager* event_manager;
+  //  OCPI::Xfer::EventManager* event_manager;
   //int cmap[3];
 
   try {
@@ -131,124 +127,66 @@ int  main( int argc, char** argv)
   g_testUtilVerbose = config.verbose;
   //cmap[0] = 0; cmap[1] = 1; cmap[2] = 2;
 
-  std::vector<const char*> endpoints;
-  std::vector<CApp> ca;
   try {
-    ca =
-      createContainers(endpoints, event_manager, (bool)1);
-  }
-  catch( OCPI::Util::EmbeddedException& ex ) {
-    printf("Create containers failed with exception. errorno = %d, aux = %s\n",
-           ex.getErrorCode(), ex.getAuxInfo() );
-    exit(-1);
-  }
-  catch( std::string& err ) {
-    printf("Got a string exception while creating containers = %s\n", err.c_str() );
-    exit(-1);
-  }
-  catch( ... ) {
-    printf("Got an unknown exception while creating containers\n");
-    exit(-1);
-  }
+    OA::Application app("<application>"
+			"  <instance name='testProducer' component='ocpi.core.Producer' "
+			"            connect='testConsumer'/>"
+			"  <instance name='testConsumer' component='ocpi.core.Consumer'/>"
+			"</application>");
+    app.initialize();
+    OCPI::API::Property
+      doubleT(app, "testConsumer", "doubleT"),
+      passFail(app, "testConsumer", "passfail"),
+      boolT(app, "testConsumer", "boolT"),
+      run2BufferCount(app, "testConsumer", "run2BufferCount"),
+      longlongT(app, "testConsumer", "longlongT"),
+      buffersProcessed(app, "testConsumer", "buffersProcessed"),
+      floatST(app, "testConsumer", "floatST"),
+      droppedBuffers(app, "testConsumer", "droppedBuffers"),
+      bytesProcessed(app, "testConsumer", "bytesProcessed"),
+      transferMode(app, "testConsumer", "transferMode"),
+      Prun2BufferCount(app, "testProducer", "run2BufferCount"),
+      PbuffersProcessed(app, "testProducer", "buffersProcessed"),
+      PbytesProcessed(app, "testProducer", "bytesProcessed"),
+      PtransferMode(app, "testProducer", "transferMode");
 
-  // Create a dispatch thread
-#if 0
-  DThreadData tdata;
-  tdata.run =1;
-  tdata.containers = ca;
-  tdata.event_manager = event_manager;
-  OCPI::Util::Thread* t = runTestDispatch(tdata);
-#endif
+    // Extra for test case only
+    doubleT.setDoubleValue( 167.82 );
+    boolT.setBoolValue( 1 );
+    longlongT.setLongLongValue( 1234567890 );
+    float fv[] = {1.1f, 2.2f ,3.3f, 4.4f, 5.5f, 6.6f};
+    floatST.setFloatSequenceValue( fv, 6 );
 
-  try {
-  // New library-based components
-  OCPI::API::Worker
-    & consumer = ca[0].app->createWorker("testConsumer", "ocpi.core.Consumer" ),
-    & producer = ca[0].app->createWorker("testProducer", "ocpi.core.Producer" );
-  OCPI::API::Port & pout = producer.getPort( "Out" );
-  OCPI::API::Port & cin = consumer.getPort( "In" );
+    // Set consumer properties
+    passFail.setULongValue( 1 );
+    droppedBuffers.setULongValue( 0 );
+    run2BufferCount.setULongValue( 250  );
+    buffersProcessed.setULongValue( 0 );
+    bytesProcessed.setULongValue( 0 );
+    transferMode.setULongValue( ConsumerConsume );
 
+    // Set producer properties
+    Prun2BufferCount.setULongValue( 250 );
+    PbuffersProcessed.setULongValue( 0 );
+    PbytesProcessed.setULongValue( 0 );
 
-  //  std::string p = cin.getInitialProviderInfo() ;
-  //  std::string flowc = pout.setFinalProviderInfo( p );
-  //  cin.setFinalUserInfo( flowc );
+    app.start();
 
-  static OCPI::API::PValue props[] = {OCPI::Base::PVString("protocol","ocpi-smb-pio"),
-				       OCPI::Base::PVEnd };
-  
-  cin.connect( pout, props );
+    // Let test run for a while
+    int count = 5;
+    do {
+      uint32_t bp = buffersProcessed.getULongValue();
+      if ( bp == 250 ) {
+	printf(" Test: PASSED\n");
+	break;
+      }
+      OCPI::OS::sleep( 1000 );
+    } while ( count-- );
 
-  OCPI::API::Property doubleT ( consumer, "doubleT" );
-  OCPI::API::Property passFail ( consumer, "passfail" );
-  OCPI::API::Property boolT ( consumer, "boolT" );
-  OCPI::API::Property run2BufferCount ( consumer, "run2BufferCount" );
-  OCPI::API::Property longlongT ( consumer, "longlongT" );
-  OCPI::API::Property buffersProcessed ( consumer, "buffersProcessed" );
-  OCPI::API::Property floatST ( consumer, "floatST" );
-  OCPI::API::Property droppedBuffers ( consumer, "droppedBuffers" );
-  OCPI::API::Property bytesProcessed ( consumer, "bytesProcessed" );
-  OCPI::API::Property transferMode ( consumer, "transferMode" );
-
-
-  OCPI::API::Property Prun2BufferCount ( producer, "run2BufferCount" );
-  OCPI::API::Property PbuffersProcessed ( producer, "buffersProcessed" );
-  OCPI::API::Property PbytesProcessed ( producer, "bytesProcessed" );
-  OCPI::API::Property PtransferMode ( producer, "transferMode" );
-
-
-  // Extra for test case only
-  doubleT.setDoubleValue( 167.82 );
-  boolT.setBoolValue( 1 );
-  longlongT.setLongLongValue( 1234567890 );
-  float fv[] = {1.1f, 2.2f ,3.3f, 4.4f, 5.5f, 6.6f};
-  floatST.setFloatSequenceValue( fv, 6 );
-
-  // Set consumer properties
-  passFail.setULongValue( 1 );
-  droppedBuffers.setULongValue( 0 );
-  run2BufferCount.setULongValue( 250  );
-  buffersProcessed.setULongValue( 0 );
-  bytesProcessed.setULongValue( 0 );
-  transferMode.setULongValue( ConsumerConsume );
-  consumer.afterConfigure();
-
-
-  // Set producer properties
-  Prun2BufferCount.setULongValue( 250 );
-  PbuffersProcessed.setULongValue( 0 );
-  PbytesProcessed.setULongValue( 0 );
-  producer.afterConfigure();
-
-
-  //  consumer.initialize();
-  consumer.start();
-  //  producer.initialize();
-  producer.start();
-
-
-  // Let test run for a while
-  int count = 5;
-  do {
-    uint32_t bp = buffersProcessed.getULongValue();
-    if ( bp == 250 ) {
-      printf(" Test: PASSED\n");
-      break;
+    uint32_t tbp = buffersProcessed.getULongValue();
+    if ( tbp != 250 ) {
+      printf("Test: FAILED!!, tried to process 250 buffers, only processed %d buffers\n", tbp );
     }
-    OCPI::OS::sleep( 1000 );
-  } while ( count-- );
-
-  uint32_t tbp = buffersProcessed.getULongValue();
-  if ( tbp != 250 ) {
-    printf("Test: FAILED!!, tried to process 250 buffers, only processed %d buffers\n", tbp );
-  }
-
-
-#if 0
-  tdata.run=0;
-  t->join();
-  delete t;
-#endif
-
   } catch (std::string & oops) {
     std::cout << "Error: " << oops << std::endl;
     return 1;

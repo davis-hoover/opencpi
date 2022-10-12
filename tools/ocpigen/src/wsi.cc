@@ -19,8 +19,8 @@
  */
 
 #include <algorithm>
-#include "data.h"
-#include "hdl.h"
+#include "data.hh"
+#include "hdl.hh"
 
 WsiPort::
 WsiPort(Worker &w, ezxml_t x, DataPort *sp, int ordinal, const char *&err)
@@ -193,18 +193,12 @@ emitVhdlShell(FILE *f, ::Port */*wci*/) {
 		  nn ? " else\n" : "", OM::Protocol::cname(), op->cname(), pname(), nn);
 	// If the protocol opcodes do not fill the space, fill it
 	if (nn < m_nOpcodes)
-#if 1 // fix inferred latch warning
-	  for (unsigned o = 0; nn < m_nOpcodes; nn++, o++) {
-	    fprintf(f, " else\n    op%u_e", nn);
-	    if (nn != m_nOpcodes-1)
-	      fprintf(f, "  when to_integer(unsigned(%s_opcode_temp)) = %u", cname(), nn);
-	  }
-#else
 	  for (unsigned o = 0; nn < m_nOpcodes; nn++, o++)
-	    fprintf(f, " else\n    op%u _e when to_integer(unsigned(%s_opcode_temp)) = %u",
+	    fprintf(f, " else\n    op%u_e  when to_integer(unsigned(%s_opcode_temp)) = %u",
 		    nn, cname(), nn);
-#endif
-	fprintf(f, ";\n");
+
+	// Provide default to avoid latch inference
+	fprintf(f, " else\n    %s_%s_op_e;\n", OM::Protocol::cname(), operations()->cname());
 #endif
       } else {
 	fprintf(f,
@@ -442,7 +436,7 @@ emitImplSignals(FILE *f) {
 	    "  signal %s_opcode      : %s_OpCode_t;\n"
 	    "  -- The weakly typed temporary signals\n"
 	    "  signal %s_opcode_temp : std_logic_vector(%zu downto 0);\n"
-	    "  signal %s_opcode_pos  : integer;\n",
+	    "  signal %s_opcode_pos  : natural;\n",
 	    cname(), operations() ?
 	    OM::Protocol::m_name.c_str() : cname(), cname(), ocp.MReqInfo.width - 1, cname());
   }

@@ -47,7 +47,6 @@ ifndef OCPI_PREREQUISITES
   # All prerequisites we need to build and use
   export OCPI_PREREQUISITES:=$(OCPI_PREREQUISITES_LIBS) gtest patchelf ad9361
 endif
-OCPI_DEBUG_MAKE=
 ifneq (,)
 define OcpiDoInclude
 ifndef OcpiThisFile
@@ -66,6 +65,9 @@ $(warning Debug: $(1))
 endef
 define OcpiDbgVar
 $(call OcpiDbg,$(2)$(1) is <$(call $(1))> origin $(origin $(1)))
+endef
+define OcpiDbgInfo
+$(call OcpiInfo,$1)
 endef
 endif
 
@@ -377,8 +379,9 @@ OcpiGenEnv=\
     OCPI_ALL_OCL_TARGETS="$(OCPI_ALL_OCL_TARGETS)" \
     OCPI_AUTO_BUILD_WORKERS="$(OCPI_AUTO_BUILD_WORKERS)"
 
-OcpiGenTool=$(OcpiGenEnv) $(OCPI_VALGRIND) $(ToolsDir)/ocpigen \
+OcpiGenToolX=$(OcpiGenEnv) $(OCPI_VALGRIND) $(ToolsDir)/ocpigen \
   $(call OcpiFixPathArgs,$(patsubst %,-I%,$(XmlIncludeDirsInternal)) $1)
+OcpiGenTool=$(call OcpiDbgInfo,$(call OcpiGenToolX,$1))$(call OcpiGenToolX,$1)
 # Given a collection of arguments, fix each path in the argument
 # that starts with '/' or '-I/' for use with ocpigen or compilation.
 # This will prevent absolute paths whenever possible and instead compute
@@ -1359,7 +1362,8 @@ endef
 # Used wherever test goals are processed.  runtests is for compatibility
 # These are goals that *only* apply to testing.
 # .test directories also support more generic targets, in particular "clean" and "cleanrun"
-OcpiTestGoals=test cleantest runtest verifytest cleansim runtests runonlytest cleanrun
+# "test" and "tests" are both here.  ocpidev uses "tests" as a nice plural.
+OcpiTestGoals=test tests cleantest runtest verifytest cleansim runtests runonlytest cleanrun
 # Used globally when building executables
 OcpiPrereqLibs=lzma gmp gpsd
 
@@ -1613,9 +1617,13 @@ OcpiProjectFromPlatformDir=$(infox OPFPD:$1:$2)$(strip\
 OcpiWarn=$(shell echo Warning:' $(strip $1 $2 $3 $4 $5 $6 $7 $8 $9)' >&2)
 OcpiInfo=$(shell echo '$(strip $1 $2 $3 $4 $5 $6 $7 $8 $9)' >&2)
 
+# Special rules apply if we are running in a container.
+OcpiIsContainer=$(or $(wildcard /.dockerenv),$(wildcard /run/.containerenv))
+
 # Given a platform "family", return the kernel source directory if it exists.
 OcpiGetKernelDir=$(infox OGKD:$(1))$(strip\
-  $(or $(call OcpiGKD$(1)), $(error platform family $(1) not found)))
+  $(if $(call OcpiIsContainer), $(callx OcpiInfo,OGKD: container environment detected),\
+  $(or $(call OcpiGKD$(1)), $(error platform family $(1) not found))))
 
 # non-family-specific warning message emitter
 OcpiKernVerWarn=$(infox OKVW:$(1))$(strip\
@@ -1634,10 +1642,12 @@ OcpiGKDCentos=$(infox OGKDC:)$(strip\
         $(or $(wildcard $(kdir)),$(call OcpiWarn,no kernel headers directory found))))))
 
 # family-specific function for "Ubuntu"
+# Beginning with ubuntu20_04, must ignore "linux-headers-generic" package,
+# i.e., only interested in "linux-headers-<kern_version>-generic" packages.
 OcpiGKDUbuntu=$(infox OGKDU:)$(strip\
   $(foreach krel,$(shell uname -r),\
     $(foreach ktype,$(shell echo $(krel) | cut -f3 -d'-'),\
-      $(foreach hver,$(or $(shell dpkg -l | grep 'linux-headers' | cut -f3 -d' ' | sort -t'-' --version-sort -k 3,4 -k 4,5 | egrep '$(ktype)$$' | tail -1),NOPE),\
+      $(foreach hver,$(or $(shell dpkg -l | grep 'linux-headers' | cut -f3 -d' ' | sort -t'-' --version-sort -k 3,4 -k 4,5 | egrep '$(ktype)$$' | egrep '.*[0-9]+' | tail -1),NOPE),\
         $(if $(filter NOPE,$(hver)),\
           $(call OcpiWarn,no kernel headers for "$(ktype)" kernel installed),\
           $(if $(filter linux-headers-$(krel),$(hver)),,$(call OcpiKernVerWarn,$(subst linux-headers-,,$(hver))))\

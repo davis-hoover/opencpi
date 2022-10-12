@@ -61,23 +61,25 @@ architecture rtl of pulse is
   signal s_dest_reg0  : std_logic;
   signal s_dest_reg1  : std_logic;
   signal s_src_rdy    : std_logic;
-
+  signal dst_rst_r    : std_logic;  -- so we know when it goes high
 begin
 
   -- Indicates when circuit is 'ready' to accept new input
-  s_src_rdy <= s_src_ack xnor s_src_toggle;
+  s_src_rdy <= s_src_ack xnor s_src_toggle; -- ready when they are the same
   src_rdy <= s_src_rdy;
   -- Level detection used to generate output
-  dst_out <= s_dest_reg0 xor s_dest_reg1;
+  dst_out <= s_dest_reg0 xor s_dest_reg1; -- output pulse when they are different
 
   input_enabled_toggle : process(src_clk)
   begin
-    if (rising_edge(src_clk)) then
-      if (src_rst = '1') then
+    if rising_edge(src_clk) then
+      if src_rst = '1' then
         s_src_toggle <= '0';
-      elsif (src_in = '1') then
+      elsif src_in = '1' then
         -- the user is violating the rules
         assert s_src_rdy = '1' severity failure;
+        -- invert when input is high and not in progress
+        -- input is a single clock pulse, so each inversion represents a "request for output pulse"
         s_src_toggle <= not s_src_toggle;
       end if;
     end if;
@@ -98,9 +100,12 @@ begin
 
   level_detection_prep_reg : process(dst_clk)
   begin
-    if (rising_edge(dst_clk)) then
-      if (dst_rst = '1') then
-        s_dest_reg1 <= '0';
+    if rising_edge(dst_clk) then
+      dst_rst_r <= dst_rst;
+      if dst_rst = '1' then
+        if dst_rst_r = '0' then
+          s_dest_reg1 <= s_dest_reg0;
+        end if;
       else
         s_dest_reg1 <= s_dest_reg0;
       end if;

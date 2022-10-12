@@ -30,7 +30,20 @@ if [ ! -d scripts/copyright ]; then
 fi
 
 function cleanup() {
-  rm -rf copyright.log missing.log missing_diff.log
+  #
+  # This function gets called automatically on exit, regardless
+  # of the argument passed to "exit" (contrary to what is implied
+  # by the "bash" man page).  Check the value passed to "exit" if
+  # the intent is to do different things depending on that value.
+  #
+  rv=$?
+  if [[ $rv -eq 0 ]]
+  then
+    rm -rf copyright.log missing.log missing_diff.log
+  else
+    echo -e "\nLogfiles (*.log) are available in `pwd`"
+    echo "These should be removed before pushing any commits!!"
+  fi
 }
 
 trap cleanup EXIT

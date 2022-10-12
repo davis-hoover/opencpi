@@ -63,12 +63,12 @@ class Artifact : public OC::ArtifactBase<Container,Artifact> {
     : OC::ArtifactBase<Container,Artifact>(c, *this, lart, props) {
   }
   virtual ~Artifact() {}
+  void configure() {} // do not configure anything on the client side
 };
-class ExternalPort;
 class Worker;
-class Port : public OC::PortBase<Worker, Port, OCPI::API::ExternalPort> {
+class Port : public OC::PortBase<Worker, Port> {
   Port( Worker& w, const OM::Port & pmd, const OB::PValue *params)
-    :  OC::PortBase<Worker, Port, OCPI::API::ExternalPort> (w, *this, pmd, params) {
+    :  OC::PortBase<Worker, Port> (w, *this, pmd, params) {
   }
 
   ~Port() {
@@ -298,8 +298,7 @@ class Application
 	       const OC::Workers &slaves, bool hasMaster, size_t member, size_t crewSize,
 	       const OB::PValue *wParams) {
     uint32_t remoteInstance;
-    if (!OB::findULong(wParams, "remoteInstance", remoteInstance))
-      throw OU::Error("Remote ContainerApplication expects remoteInstance parameter");
+    ocpiCheck(OB::findULong(wParams, "remoteInstance", remoteInstance));
     return *new Worker(*this, art ? static_cast<Artifact*>(art) : NULL,
 		       appInstName ? appInstName : "unnamed-worker", impl, inst, slaves,
 		       hasMaster, member, crewSize, wParams, remoteInstance);
@@ -394,7 +393,7 @@ public:
   OC::Launcher &launcher() const {
     return m_client;
   }
-  OA::ContainerApplication*
+  OC::Application *
   createApplication(const char *a_name, const OB::PValue *props) {
     return new Application(*this, a_name, props);
   }
@@ -484,8 +483,9 @@ configure(ezxml_t xml) {
 bool Driver::
 probeServer(const char *a_server, bool verbose, const char **exclude, char *containers,
 	    bool discovery, unsigned &count, std::string &error) {
-  const char *server = a_server[0] == '?' ? a_server + 1 : a_server;
-  ocpiInfo("Probing remote container server: %s", server);
+  std::string serverString(a_server[0] == '?' ? a_server + 1 : a_server);
+  const char *server = serverString.c_str();
+  ocpiInfo("Probing remote container server specified as: %s", server);
   error.clear();
   OS::Socket *sock = NULL;
   uint16_t port;
@@ -499,6 +499,8 @@ probeServer(const char *a_server, bool verbose, const char **exclude, char *cont
     if ((err = OB::Value::parseUShort(l_port, end, port)))
       return OU::eformat(error, "Bad port number in server name: \"%s\"", server);
     host.resize(OCPI_SIZE_T_DIFF(sport, server));
+    if (end)
+      serverString[OCPI_SIZE_T_DIFF(end, server)] = '\0';
   } else
     port = REMOTE_PORT;
   ezxml_t rx = NULL; // need to explicitly free this below via "bad:" or "out:"

@@ -36,6 +36,7 @@
 #include "TransportRDTInterface.hh"
 #include "BasePValue.hh"
 #include "ContainerWorker.hh"
+#include "ContainerApplication.hh"
 #include "ContainerPort.hh"
 #include "test_utilities.h"
 
@@ -281,7 +282,7 @@ std::vector<CApp> OCPI::CONTAINER_TEST::createContainers( std::vector<const char
       OCPI::API::Container *c = OCPI::API::ContainerManager::find("rcc", name.c_str(), cprops);
       if ( ! c )
 	throw OCPI::Util::EmbeddedException("No Containers found\n");
-      ca.container = c;
+      ca.container = dynamic_cast<OCPI::Container::Container*>(c);
       ca.worker = dynamic_cast<OCPI::Container::Worker*>(ca.container);
       ca.app = ca.container->createApplication();
       containers.push_back(ca);
@@ -366,9 +367,12 @@ void OCPI::CONTAINER_TEST::disableWorkers( std::vector<CApp>& ca, std::vector<CW
   }
 }
 OCPI::Container::Worker *OCPI::CONTAINER_TEST::
-createWorker(OCPI::API::ContainerApplication *app, OCPI::RCC::RCCDispatch *rccd) {
-  OCPI::API::Worker &w = app->createWorker(NULL, NULL, (const char *)rccd, NULL, NULL, NULL);
-  return static_cast<OCPI::Container::Worker *>(&w);
+createWorker(OCPI::Container::Application *app, OCPI::RCC::RCCDispatch *rccd) {
+  //OCPI::API::Worker &w = app->createWorker(NULL, NULL, (const char *)rccd, NULL, NULL, NULL);
+  OCPI::Container::Worker &w = app->createWorker(NULL, (const char *)rccd, (ezxml_t)NULL, (ezxml_t)NULL,
+					   OCPI::Container::NoWorkers, false, 0, 1, NULL);
+  w.initialize();
+  return &w;
 }
 
 OCPI::Container::Worker *OCPI::CONTAINER_TEST::

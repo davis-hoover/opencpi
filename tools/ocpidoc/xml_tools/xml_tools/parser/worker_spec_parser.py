@@ -355,6 +355,6 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
         for supports in self._xml_root.iter("supports"):
             connections = {}
             for connect in supports.iter("connect"):
-                connections[connect.attrib["port"]] = connect.attrib["to"], connect.attrib["index"]
+                connections[connect.attrib["port"]] = connect.attrib["to"], connect.attrib.get("index")
             supports_list[supports.attrib["worker"]] = connections
         return supports_list

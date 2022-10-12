@@ -387,13 +387,13 @@ else
     # Since the build-opencpi.sh does an "rcc" build per project, and that implicitly
     # does "declare" on projects, that is sufficient for on-demand hdl worker builds
     if [ -n "$minimal" ]; then
-      ocpidev -d projects/core build hdl primitives library --hdl-platform=$platform
-      ocpidev -d projects/platform build hdl primitives library --hdl-platform=$platform
+      ocpidev -d projects/core build hdl primitives --hdl-platform=$platform
+      ocpidev -d projects/platform build hdl primitives --hdl-platform=$platform
       # REMOVE THIS WHEN THE ASSETS PROJECT IS CLEANED UP
       # But ultimately we need to get the platform's project's dependencies from the platform's project
       # and build primitives for all of them
-      ocpidev -d projects/assets build hdl primitives library --hdl-platform=$platform
-      ocpidev -d projects/assets_ts build hdl primitives library --hdl-platform=$platform
+      ocpidev -d projects/assets build hdl primitives --hdl-platform=$platform
+      ocpidev -d projects/assets_ts build hdl primitives --hdl-platform=$platform
     else
       ocpidev -d projects/core build --hdl --hdl-platform=$platform
       ocpidev -d projects/platform build --hdl --hdl-platform=$platform --no-assemblies
@@ -410,17 +410,17 @@ else
           && "$platform_dir" != *"/projects/assets/"* ]]
     then
         if [ -n "$minimal" ]; then
-          ocpidev -d $project_dir build hdl primitives library --hdl-platform=$platform
+          ocpidev -d $project_dir build hdl primitives --hdl-platform=$platform
           # the rcc build ensures all workers are visible to build the platform
           # we don't have a verb to do that.
           ocpidev -d $project_dir build --rcc
           ocpidev -d $project_dir build hdl --workers-as-needed platform $platform
-          # Since there is no project-level build, no exports were done
-          # The best fix would be to add an --export-project option to ocpidev
-          make -C $project_dir -f $OCPI_CDK_DIR/include/project.mk exports
         else
           ocpidev -d $project_dir build --hdl --hdl-platform=$platform --no-assemblies
         fi
+        # Since there is no project-level build, no exports were done
+        # The best fix would be to add an --export-project option to ocpidev
+        make -C $project_dir -f $OCPI_CDK_DIR/include/project.mk exports
         echo "HDL platform \"$platform\" built and exported for OSP in $project_dir."
     elif [ -n "$minimal" ]; then
         # core project: build the platform in its project

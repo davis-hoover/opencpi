@@ -28,6 +28,7 @@
 #include "BasePluginManager.hh"
 #include "XferException.hh"
 #include "XferFactory.hh"
+#include "XferConfig.hh"
 
 namespace OCPI {
 namespace Xfer {

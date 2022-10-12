@@ -44,8 +44,7 @@ namespace OCPI {
       OCPI::OCL::Device& m_device; // owned by the container
 
     protected:
-      Container(OCPI::OCL::Device &device, const ezxml_t config = NULL,
-		const OCPI::Base::PValue *params = NULL);
+      Container(OCPI::OCL::Device &device, const OCPI::Base::PValue *params = NULL);
     public:
       ~Container();
 
@@ -54,7 +53,7 @@ namespace OCPI {
 
       OCPI::Container::Artifact &
 	createArtifact(OCPI::Library::Artifact &lart, const OCPI::API::PValue *artifactParams);
-      OCPI::API::ContainerApplication *
+      OCPI::Container::Application *
         createApplication(const char *name, const OCPI::Base::PValue *props);
 
       bool needThread() { return true; }
@@ -68,7 +67,6 @@ namespace OCPI {
     }; // End: class Container
     extern const char *ocl;
     class Driver : public OCPI::Container::DriverBase<Driver, Container, ocl> {
-      friend class ExternalPort;
 
     public:
       Driver();

@@ -121,6 +121,8 @@ begin
                                  (a_state_r = a_first_e and cp_in.take) or
                                  a_state_r = a_last_wanted_e));
   sdp_out.dropCount  <= (others => '0');
+  sdp_out.metaData <= (others => '0');
+  sdp_out.isNode <= bfalse;
 g0: for i in 0 to to_integer(sdp_width)-1 generate
   sdp_out_data(i) <= cp_in.data when tag_startdw(cp_in.tag) = i else (others => '0');
   end generate g0;

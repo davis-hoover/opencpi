@@ -480,11 +480,13 @@ namespace OCPI {
 		   mh.msg_flags & MSG_TRUNC ? ": truncated" : "");
 	  return false;
 	}
-	if (mh.msg_namelen < alen) {
+	// This test is really testing whether the OS is overrunning the supplied buffer?
+	if (mh.msg_namelen > alen) {
 	  ocpiDebug("received sockaddr len is %d, should be %u", mh.msg_namelen, alen);
-	  setError(error, "received sockaddr len is %d, should be %u", alen, sizeof(sa));
+	  setError(error, "received sockaddr len is %d, should be %u", mh.msg_namelen, alen);
 	  return false;
-	}
+	} else if (mh.msg_namelen < alen)
+	  ocpiDebug("received sockaddr len is %d, expected %u", mh.msg_namelen, alen);
 	// Figure out actual payload length and ifindex
 	unsigned int ifindex = 0;
 	if (m_ifAddr.isEther()) {
@@ -573,6 +575,7 @@ namespace OCPI {
 	msg.msg_controllen = 0;
 	msg.msg_flags = 0; // FIXME: checkfor MSG_TRUNC
 	char cbuf[CMSG_SPACE(sizeof(struct in_pktinfo))]; // keep in scope in case it is used.
+	Header header;
 
 	// FIXME: see if we really need this in raw sockets at all, since it is redundant 
 	if (m_ifAddr.isEther() && addr.isEther()) {
@@ -600,7 +603,9 @@ namespace OCPI {
 	    sa.ll.sll_ifindex = (int)m_ifIndex;
 	    msg.msg_namelen = (socklen_t)sizeof(sa.ll);
 #endif
-	    Header header;
+	    memcpy(header.source, m_ifAddr.addr(), sizeof(header.source));
+	    memcpy(header.destination, addr.addr(), sizeof(header.destination));
+	    header.type = htons(m_type);
 	    myiov[0].iov_base = &header;
 	    myiov[0].iov_len = sizeof(header);
 	    if (iov[0].iov_len > 2) {
@@ -614,9 +619,6 @@ namespace OCPI {
 	    }
 	    iov = myiov;
 	    iovlen++;
-	    memcpy(header.source, m_ifAddr.addr(), sizeof(header.source));
-	    memcpy(header.destination, addr.addr(), sizeof(header.destination));
-	    header.type = htons(m_type);
 	  }
 	} else {
 #ifdef OCPI_OS_macos
@@ -666,6 +668,7 @@ namespace OCPI {
 #else
 	msg.msg_iovlen = iovlen;
 #endif
+	errno = 0;
 	ssize_t rlen = sendmsg(m_fd, &msg, 0);
 	ocpiDebug("Send packet length %zd, to %s/%s via %u(%s), port %u returned %zd errno %u (%s) fd %u",
 		  len, inet_ntoa(sa.in.sin_addr), addr.pretty(), ifc ? ifc->index : 0,
@@ -995,26 +998,29 @@ namespace OCPI {
 		  err = "can't open socket for interface addresses";
 		  return false;
 		}
+		i.name = ifnames[v_index].second;
+		i.index = ifnames[v_index].first;
+		i.up = (flags & IFF_UP) != 0;
+		i.connected = carrier != 0;
+		bool accepted = false;
 		struct ifreq ifr;
 		strncpy(ifr.ifr_name, ifnames[v_index].second.c_str(), IFNAMSIZ);
 		if (ioctl(fd, SIOCGIFADDR, &ifr) == 0) {
 		  i.ipAddr.set(0, ((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr.s_addr);
 		  if (ioctl(fd, SIOCGIFBRDADDR, &ifr) == 0) {
 		    i.brdAddr.set(0, ((struct sockaddr_in *)&ifr.ifr_broadaddr)->sin_addr.s_addr);
-		    i.name = ifnames[v_index].second;
-		    i.index = ifnames[v_index].first;
-		    i.up = (flags & IFF_UP) != 0;
-		    i.connected = carrier != 0;
-		    ocpiDebug("found ether interface '%s' which is %s, %s, at address %s",
-			      i.name.c_str(), i.up ? "up" : "down",
-			      i.connected ? "connected" : "disconnected", i.addr.pretty());
-		    ::close(fd);
-		    return true;
+		    accepted = true;
 		  }
-		} else {
-		  ocpiDebug("ioctl(%d, SIOCGIFADDR) call failed for '%s'", fd, ifr.ifr_name);
+		} else if (ioctl(fd, SIOCGIFHWADDR, &ifr) == 0) {  // allow use of interface with no IP address
+		  accepted = true;
 		}
 		::close(fd);
+		if (accepted) {
+		  ocpiDebug("found ether interface '%s' which is %s, %s, at address %s",
+			i.name.c_str(), i.up ? "up" : "down",
+			i.connected ? "connected" : "disconnected", i.addr.pretty());
+		  return true;
+		}
 	      } else {
 		ocpiDebug("Unknown parsing error for '%s'", ifnames[v_index].second.c_str());
 	      }

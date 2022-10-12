@@ -20,8 +20,21 @@
 include $(OCPI_CDK_DIR)/include/util.mk
 # Plain workers do not have their own package-id file
 # They inherit the containing library's package-id
+undefine OcpiWorkers
+ifneq ($(origin Workers),undefined)
+  # Save the worker's Makefile definition if defined by worker's Makefile
+  # Note the "multi-workers" feature for RCC workers is not supported for makeless yet,in any case
+  OcpiWorkers:=$(Workers)
+endif
 ifeq ($(filter clean%,$(MAKECMDGOALS)),)
 $(call OcpiIncludeAssetAndParent)
+endif
+# Restore the Workers variable if set by worker's Makefile
+ifeq ($(origin OcpiWorkers),undefined)
+  # Clobber any definition based on including parent Makefiles
+  override undefine Workers
+else
+  override Workers:=$(OcpiWorkers)
 endif
 ifndef Model
   $(error This directory named $(CwdName) does not end in any of: $(Models))
@@ -32,7 +45,7 @@ ifdef Worker
   else
     override Workers:=$(Worker)
   endif
-else ifeq ($(origin Workers),file)
+else ifdef Workers
   override Worker:=$(firstword $(Workers))
 else
   override Worker:=$(CwdName)
@@ -40,10 +53,9 @@ else
 endif
 $(call OcpiDbgVar,Worker)
 $(call OcpiDbgVar,Workers)
-# Now we must figure out the language since so many other things depend on it.
-# But we want to keep the language in the XML and not in the Makefile
-ImplXmlFiles:=$(Workers:%=%.xml)
-$(foreach w,$(Workers),$(eval Worker_$w_xml:=$w.xml))
+
+$(foreach w,$(Workers),$(eval Worker_$w_xml:=$(or $(wildcard $w-$(Model).xml),$w.xml)))
+ImplXmlFiles:=$(foreach w,$(Workers),$(Worker_$w_xml))
 
 ifeq ($(MAKECMDGOALS),clean)
 # Clean default OWD files when they are the default

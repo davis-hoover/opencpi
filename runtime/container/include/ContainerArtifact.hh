@@ -50,30 +50,40 @@ namespace OCPI {
       friend class Application;
       friend class Interface;
       friend class Worker;
-      // This list is to remember which workers (which are owned by their container apps),
-      // are using the artifact.
-      typedef std::list<Worker*> Workers;
-      typedef Workers::const_iterator WorkersIter;
-      Workers m_workers; // what workers exist created based on this loaded artifact
+      // This map is to remember which workers (which are owned by their container apps),
+      // are using the artifact, and mapping the worker object address to its ordinal in the artifact
+      std::map<Worker *, unsigned> m_workers; // what workers exist created based on this loaded artifact
       OCPI::Library::Artifact &m_libArtifact;
+      // Artifacts contain (maybe reentrant) implementations and static instances.
+      // Most of these are dormant after artifact loading until they are used for app workers
+      // Reentrant implementations can support multiple workers at a time.
+      // Non-reentrant implementations can support only one worker at a time.
+      // Static instances of implementations can support one worker at a time.
+      // So we have both implementations and static instances.
+      std::vector<size_t> m_instanceInUse; // record count of usage of instance
+      std::vector<Worker *> m_loadTimeWorkers; // Workers that were established upon load
+      Application *m_application; // a container app to own workers created at load time
     protected:
       Artifact(OCPI::Library::Artifact &lart, const OCPI::Base::PValue *props = NULL);
       void removeWorker(Worker &);
     public:
       // Make sure this is loaded and ready to execute in case it was unloaded
       virtual void ensureLoaded() {}
+      virtual void unload(); // Any override must call this base class method too
       const OCPI::Library::Artifact &libArtifact() const { return m_libArtifact; }
       virtual const std::string &name() const = 0;
       bool hasArtifact(const void *art);
-      Worker &createWorker(Application &a,  const char *instName,
-			   const char *impltag, const char *instTag,
-			   const OCPI::Base::PValue *props = NULL,
-			   const OCPI::Base::PValue *params = NULL);
-      Worker &createWorker(Application &app,
-			   const char *appInstName,
-			   ezxml_t impl, ezxml_t inst, const OCPI::Container::Workers &slaves,
+      virtual Container &container() = 0;
+      Worker &createWorker(Application &app, const OCPI::Library::Implementation &impl,
+			   const char *appInstName, const OCPI::Container::Workers &slaves,
 			   bool hasMaster, size_t member, size_t crewSize,
 			   const OCPI::Base::PValue *wparams = NULL);
+      Worker &addWorker(Application &app, const char *instName,
+			const OCPI::Library::Implementation &impl,
+			const OCPI::Container::Workers &slaves, bool hasMaster, size_t member,
+			size_t crewSize, const OCPI::Base::PValue *wParams);
+      Worker &addLoadTimeWorker(const OCPI::Library::Implementation &i, unsigned n);
+      virtual void configure();
     protected:
       virtual ~Artifact();
     };

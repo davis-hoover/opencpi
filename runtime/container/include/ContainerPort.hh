@@ -41,7 +41,7 @@ namespace OCPI {
     class Launcher;
 
     // A worker member port managed in this process
-    class Port : public LocalPort, public OCPI::API::Port {
+    class Port : public LocalPort {
       friend class ExternalPort;
       friend class BridgePort;
     protected:
@@ -75,19 +75,18 @@ namespace OCPI {
       bool hasName(const char *name);
     public:
       // Local (possibly among different containers) connection: 1 step operation on the user port
-      void connect(OCPI::API::Port &other, const OCPI::API::PValue *myParams = NULL,
+      void connect(Port &other, const OCPI::API::PValue *myParams = NULL,
 		   const OCPI::API::PValue *otherParams = NULL);
     };
 
     extern const char *portBase;
-    template<class Wrk, class Prt, class Ext>
+    template<class Wrk, class Prt>
     class PortBase
       : public OCPI::Util::Child<Wrk, Prt, portBase>,
-	public OCPI::Util::Parent<Ext>,
         public Port {
     protected:
-      PortBase<Wrk,Prt,Ext>(Wrk &a_worker, Prt &prt, const OCPI::Metadata::Port &mport,
-			    const OCPI::Base::PValue *params)
+      PortBase<Wrk,Prt>(Wrk &a_worker, Prt &prt, const OCPI::Metadata::Port &mport,
+			const OCPI::Base::PValue *params)
       : OCPI::Util::Child<Wrk,Prt,portBase>(a_worker, prt, mport.m_name.c_str()),
 	Port(a_worker.parent().container(), mport, params) {}
       inline Worker &worker() const { return OCPI::Util::Child<Wrk,Prt,portBase>::parent(); }

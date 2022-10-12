@@ -20,7 +20,7 @@
 
 #include <assert.h>
 #include <unordered_set>
-#include "assembly.h"
+#include "assembly.hh"
 // Generic (actually non-HDL) assembly support
 // This isn't as purely generic as it should be  FIXME
 
@@ -179,7 +179,7 @@ parseConnection(OM::Assembly::Connection &aConn) {
 Instance::
 Instance()
   : m_worker(NULL), m_clocks(NULL), m_iType(Application), m_attach(NULL), m_hasConfig(false),
-    m_config(0), m_emulated(false), m_inserted(false) {
+    m_config(0), m_emulated(false), m_inserted(false), m_loadTime(false) {
 }
 
 // When evaluating an expression for an instance's property value, allow use of assembly-provided values
@@ -336,7 +336,8 @@ init(::Assembly &assy, const char *iName, const char *wName, ezxml_t ix,
   if (!w || m_xmlProperties.size() || paramConfig) {
     if (!(w = Worker::create(m_wName.c_str(), assy.m_assyWorker.m_file, NULL,
 			     assy.m_assyWorker.m_outDir, &assy.m_assyWorker,
-			     hasConfig ? NULL : &m_xmlProperties, paramConfig, err)))
+			     hasConfig ? NULL : &m_xmlProperties,
+			     hasConfig ? paramConfig : SIZE_MAX, err)))
       return OU::esprintf("for worker %s: %s", m_wName.c_str(), err);
     assy.m_workers.push_back(w); // preserve order
   }
@@ -580,7 +581,7 @@ emitXmlWorker(std::string &out, bool verbose) {
       for (auto it = i->m_xmlProperties.begin(); it != i->m_xmlProperties.end(); ++it) {
 	const OM::Property *p = i->m_worker->findProperty(it->m_name.c_str());
 	assert(p);
-	if (!p->m_isParameter) {
+	/* if (!p->m_isParameter) */ {
 	  if (!any)
 	    out += ">\n";
 	  any = true;
@@ -663,20 +664,22 @@ emitXmlWorker(std::string &out, bool verbose) {
       OU::formatAdd(out, " indirect=\"%zu\"", prop->m_indirectAddr);
     if (prop->m_isParameter) {
       out += " parameter='1'";
-      OB::Value *v =
-	m_paramConfig && prop->m_paramOrdinal < m_paramConfig->params.size() &&
-	!m_paramConfig->params[prop->m_paramOrdinal].m_isDefault ?
-	&m_paramConfig->params[prop->m_paramOrdinal].m_value : prop->m_default;
-      if (v) {
-	std::string value;
-	v->unparse(value);
-	// FIXME: this code is in three places..
-	out += " default='";
-	std::string xml;
-	OU::encodeXmlAttrSingle(value, xml);
-	out += xml;
-	out += "'";
-      }
+      bool isDefault =
+	!m_paramConfig || prop->m_paramOrdinal >= m_paramConfig->params.size() ||
+	m_paramConfig->params[prop->m_paramOrdinal].m_isDefault;
+      OB::Value zeroValue(*prop);
+      OB::Value	&v = isDefault ? (prop->m_default ? *prop->m_default : zeroValue) :
+	m_paramConfig->params[prop->m_paramOrdinal].m_value;
+      std::string value;
+      v.unparse(value);
+      // FIXME: this code is in three places..
+      out += " value='";  // may or may not be the default
+      std::string xml;
+      OU::encodeXmlAttrSingle(value, xml);
+      out += xml;
+      out += "'";
+      if (isDefault)
+	out += " isDefault='1'"; // indicate that the parameter's value is the default
     }
     prop->printChildren(out, "property", 2);
   }
@@ -696,6 +699,11 @@ emitXmlWorker(std::string &out, bool verbose) {
 	out += "    </port>\n";
       }
     }
+  }
+  if (verbose) {
+    emitXmlSupports(out);
+    for (auto it = m_signals.begin(); it != m_signals.end(); ++it)
+      (**it).emitXml(out);
   }
   for (nn = 0; nn < m_localMemories.size(); nn++) {
     LocalMemory* m = m_localMemories[nn];

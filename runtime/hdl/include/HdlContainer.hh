@@ -41,17 +41,11 @@ namespace OCPI {
       friend class Port;
       friend class Artifact;
     protected:
-      Container(OCPI::HDL::Device &device, ezxml_t config = NULL, const OCPI::API::PValue *params = NULL);
+      Container(OCPI::HDL::Device &device, const OCPI::API::PValue *params = NULL);
     public:
       virtual ~Container();
       bool portsInProcess() { return false; }
-      inline uint64_t getMyTicks() {
-	Access *ts = m_device.timeServer();
-	return
-	  m_device.isAlive() && !m_device.isFailed() && ts ? 
-	  (m_lastTick = swap32(ts->get64RegisterOffset(0)) + hdlDevice().m_timeCorrection) :
-	  m_lastTick;
-      }
+      uint64_t getMyTicks();
     protected:
       inline HDL::Device &hdlDevice() const { return m_device; }
     public:
@@ -60,7 +54,7 @@ namespace OCPI {
       // void stop();
       OCPI::Container::Artifact &
 	createArtifact(OCPI::Library::Artifact &lart, const OCPI::API::PValue *artifactParams);
-      OCPI::API::ContainerApplication *
+      OCPI::Container::Application *
         createApplication(const char *name, const OCPI::Base::PValue *props);
       bool needThread();
       Container::DispatchRetCode dispatch(OCPI::Xfer::EventManager*);

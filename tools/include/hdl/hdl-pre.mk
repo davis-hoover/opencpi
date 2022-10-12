@@ -51,34 +51,8 @@ endif
 $(call OcpiDbgVar,Worker)
 #$(call OcpiDbgVar,Worker_$(Worker)_xml)
 
-################################################################################
-# Determine the language and suffix, which might mean looking in the xml file
-#
-HdlVerilogSuffix:=.v
-HdlVerilogIncSuffix:=.vh
-HdlVHDLSuffix:=.vhd
-HdlVHDLIncSuffix:=.vhd
-
-#ifndef OcpiLanguage
-#  $(error NO LANGUAGE)
-#endif # HdlLanguage not initially defined (probably true)
-
-HdlLanguage:=$(OcpiLanguage)
-$(call OcpiDbgVar,HdlLanguage)
-ifeq ($(HdlLanguage),verilog)
-HdlSourceSuffix:=$(HdlVerilogSuffix)
-HdlIncSuffix:=$(HdlVerilogIncSuffix)
-HdlOtherSourceSuffix:=$(HdlVHDLSuffix)
-HdlOtherIncSuffix:=$(HdlVHDLIncSuffix)
-HdlOtherLanguage:=vhdl
-else
-HdlSourceSuffix:=$(HdlVHDLSuffix)
-HdlIncSuffix:=$(HdlVHDLIncSuffix)
-HdlOtherSourceSuffix:=$(HdlVerilogSuffix)
-HdlOtherIncSuffix:=$(HdlVerilogIncSuffix)
-HdlOtherLanguage:=verilog
-endif
-$(call OcpiDbgVar,HdlSourceSuffix)
+# preprocess language variables in case it is not already done
+include $(OCPI_CDK_DIR)/include/hdl/hdl-language.mk
 
 # This is redundant with what is in worker.mk, when that file is included, but sometimes it isn't
 override HdlExplicitLibraries:=$(call Unique,$(HdlLibraries) $(Libraries) $(HdlExplicitLibraries))
@@ -90,7 +64,7 @@ override HdlExplicitLibraries:=$(call Unique,$(HdlLibraries) $(Libraries) $(HdlE
 # form <path>:<lib>, where if the library is in the global namespace <lib> is the same as basename
 # <path>, but when the library is in the qualified namespace it is qualified
 override HdlLibrariesInternal=$(infox HLI:$1:$(HdlTarget):$(HdlExplicitLibraries))$(strip \
-$(if $(findstring clean,$(MAKECMDGOALS)),,\
+$(if $(filter clean% xml,$(MAKECMDGOALS)),,\
 $(foreach l,$(call Unique,\
               $(- first process explicitly supplied libraries)\
               $(foreach p,$(HdlExplicitLibraries),\
@@ -247,17 +221,19 @@ install: $(HdlToolSets:%=install_%)
 stublibrary: $(HdlToolSets:%=stublibrary_%)
 define HdlDoToolSet
 $(1):
-	$(AT)$(MAKE) -L --no-print-directory \
+	$(AT)$(MAKE) -L --no-print-directory -f $(firstword $(MAKEFILE_LIST))\
 	   HdlPlatforms="$(call HdlGetTargetsForToolSet,$(1),$(HdlPlatforms))" HdlTarget= \
            HdlTargets="$(call HdlGetTargetsForToolSet,$(1),$(HdlActualTargets))"
 
 stublibrary_$(1):
 	$(AT)$(MAKE) -L --no-print-directory HdlPlatforms= HdlTarget= \
+	   -f $(firstword $(MAKEFILE_LIST)) \
            HdlTargets="$(call HdlGetTargetsForToolSet,$(1),$(HdlActualTargets))" \
 	   stublibrary
 
 install_$(1):
 	$(AT)$(MAKE) -L --no-print-directory HdlPlatforms= HdlTarget= \
+	   -f $(firstword $(MAKEFILE_LIST)) \
            HdlTargets="$(call HdlGetTargetsForToolSet,$(1),$(HdlActualTargets))" \
            install
 endef

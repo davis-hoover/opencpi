@@ -36,6 +36,7 @@ namespace OCPI {
     class Port;
     class Worker;
     class LocalLauncher;
+    class Application;
   }
   namespace Remote {
     class RemoteLauncher;
@@ -94,17 +95,6 @@ namespace OCPI {
       // Return OA::OCPI_None if opcode is out of range of known protocol information
       // Note nbytes for string "scalars" is max bytes per string
       virtual OCPI::API::BaseType getOperationInfo(uint8_t opCode, size_t &nbytes) = 0;
-    };
-    class Port {
-      friend class OCPI::Container::LocalLauncher;
-      friend class OCPI::Container::Port;
-      friend class OCPI::Remote::RemoteLauncher;
-    protected:
-      virtual ~Port();
-      virtual OCPI::Container::Port &containerPort() = 0;
-    public:
-      virtual void connect(Port &other, const PValue *myParams = NULL,
-			   const PValue *otherParams = NULL) = 0;
     };
     class Property;
     class PropertyInfo;
@@ -165,7 +155,6 @@ namespace OCPI {
     protected:
       virtual ~Worker();
     public:
-      virtual Port &getPort(const char *name, const PValue *props = NULL) = 0;
       virtual bool isOperating() const = 0;
       virtual void start() = 0;
       virtual void stop() = 0;
@@ -261,50 +250,9 @@ namespace OCPI {
       virtual void setRawPropertyBytes(size_t offset, const uint8_t *buf, size_t count) = 0;
     };
 
-    // This class is used when the application is being constructed using
-    // API calls placing specific workers on specific containers.
-    // When the ContainerApplication is deleted, all the workers placed on it
-    // are destroyed together.
-    class ContainerApplication {
-    public:
-      virtual ~ContainerApplication();
-      // Create an application from an explicit artifact url
-      // specifying lots of details, including a particular implementation and
-      // possibly a particular pre-existing instance:
-      //
-      // file - name of artifact file
-      // artifactParams - artifact loading parameters
-      // instName - instance name within the application
-      // implName - implementation name within the artifact (e.g. which worker)
-      // preInstName - name of the pre-existing instance within the artifact (if it has them)
-      // wProps - initial values of worker properties
-      // wParams - extensible parameters for worker creation
-      // selectCriteria - implementation selection criteria
-      virtual Worker &createWorker(const char *file, const PValue *artifactParams,
-				   const char *instName, const char *implName,
-				   const char *preInstName = NULL,
-				   const PValue *wProps = NULL,
-				   const PValue *wParams = NULL,
-				   const char *selectCriteria = NULL) = 0;
-      // Simpler method to create a worker by its spec name (name provided in the spec file),
-      // with the artifact found from looking at libraries in the library path, finding
-      // what implementation will run on the container of this container-app.
-      // Since some implementations might have connectivity contraints,
-      // we also pass in a simple list of other workers destined for
-      // the same container and how they are connected to this one.
-      // The list is terminated with the "port" member == NULL
-      virtual Worker &createWorker(const char *instName, const char *specName,
-				   const PValue *wProps = NULL,
-				   const PValue *wParams = NULL,
-				   const char *selectCriteria = NULL,
-				   const Connection *connections = NULL) = 0;
-      //      virtual void start() = 0;
-    };
     class Container {
     public:
       virtual ~Container();
-      virtual ContainerApplication *createApplication(const char *name = NULL,
-						      const PValue *props = NULL) = 0;
       // Do some work for this container
       // Return true if there is more to do.
       // Argument is yield time for blocking

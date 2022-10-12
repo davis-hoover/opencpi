@@ -93,7 +93,7 @@ code.
 
 #### Obtaining Sources via Downloading a tar File.
 To download the tar file associated with a release, select the release on the
-OpenCPI repository releases[releases] page and select the tar file to download.
+OpenCPI repository [releases][releases] page and select the tar file to download.
 When the tar file is extracted it will create a directory called
 <code>opencpi-<em>\<release-tag\></em></code>, which you should `cd` into.
 Some browsers will automatically extract the file, but the first command below

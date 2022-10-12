@@ -19,11 +19,11 @@
  */
 
 #include <errno.h>
-#include "wip.h"
-#include "hdl.h"
-#include "hdl-device.h"
-#include "hdl-slot.h"
-#include "assembly.h"
+#include "wip.hh"
+#include "hdl.hh"
+#include "hdl-device.hh"
+#include "hdl-slot.hh"
+#include "assembly.hh"
 
 //DeviceTypes DeviceType::s_types;
 
@@ -35,7 +35,7 @@ create(ezxml_t xml, const char *xfile, const std::string &parentFile, Worker *pa
       (err = OE::checkTag(xml, "HdlDevice", "Expected 'HdlDevice' as tag in '%s'", xfile)) ||
       (err = OE::checkAttrs(xml, HDL_DEVICE_ATTRS, (void*)0)) ||
       (err = OE::checkElements(xml, HDL_DEVICE_ELEMS, (void*)0)) ||
-      (err = hd->setParamConfig(instancePVs, 0, parentFile))) {
+      (err = hd->setParamConfig(instancePVs, SIZE_MAX, parentFile))) {
     delete hd;
     hd = NULL;
   }
@@ -109,9 +109,14 @@ get(const char *a_name, ezxml_t dtxml, const char *parentFile, Worker *parent, c
     name = a_name;
   // First look for the file assuming we are building a worker and the sought worker is in the
   // same library as we are.
-  std::string file("../" + name + ".hdl/" + name);
+  std::string
+    file("../" + name + ".hdl/" + name),
+    hdlFile(file + "-hdl"),
+    hdlName(name + "-hdl");
   if (!(err = parseFile(file.c_str(), parentFile, NULL, &xml, xfile)) ||
-      !(err = parseFile(name.c_str(), parentFile, NULL, &xml, xfile))) {
+      !(err = parseFile(name.c_str(), parentFile, NULL, &xml, xfile)) ||
+      !(err = parseFile(hdlFile.c_str(), parentFile, NULL, &xml, xfile)) ||
+      !(err = parseFile(hdlName.c_str(), parentFile, NULL, &xml, xfile))) {
     OM::Assembly::Properties instancePVs;
     // Here we parse the configuration settings for this device on this board.
     // These settings are similar to instance property values in an assembly, but are
@@ -155,6 +160,24 @@ resolveExpressions(OB::IdentResolver &ir) {
   return NULL;
 }
 
+void HdlDevice::
+emitXmlSupports(std::string &out) const {
+  for (auto sit = m_supports.begin(); sit != m_supports.end(); ++sit) {
+    OU::formatAdd(out, "  <supports worker='%s'%s\n",
+		  (*sit).m_type.cname(), (*sit).m_connections.size() ? ">" : "/>");
+    for (auto cit = (*sit).m_connections.begin(); cit != (*sit).m_connections.end(); ++cit) {
+      const SupportConnection &c = *cit;
+      OU::formatAdd(out, "    <connect port='%s' to='%s'",
+		    c.m_port->pname(), c.m_sup_port->pname());
+      if (c.m_indexed)
+	OU::formatAdd(out, " index='%zu'", c.m_index);
+      out += "/>\n";
+    }
+    if ((*sit).m_connections.size())
+      out += "  </supports>\n";
+  }
+}
+
 const char *DeviceType::
 cname() const {
   return m_implName;
@@ -186,7 +209,7 @@ decodeSignal(std::string &name, std::string &base, size_t &index, bool &hasIndex
 Device::
 Device(Board &b, DeviceType &dt, const std::string &a_wname, ezxml_t xml, bool single,
        unsigned ordinal, SlotType *stype, const char *&err)
-  : m_board(b), m_deviceType(dt), m_ordinal(ordinal) {
+  : m_board(b), m_deviceType(dt), m_ordinal(ordinal), m_loadTime(false) {
   std::string wname(a_wname);
   const char *cp = strchr(wname.c_str(), '.');
   if (cp)
@@ -380,7 +403,8 @@ parse(ezxml_t xml, Board &b, SlotType *stype) {
     return OU::esprintf("Duplicate device name \"%s\" for platform/card", m_name.c_str());
   // Do the stuff in Worker::create - can we share more?
   if (m_deviceType.m_type != Worker::Platform &&
-      ((err = m_deviceType.setParamConfig(&m_deviceType.m_instancePVs, 0, m_deviceType.m_parentFile)) ||
+      ((err = m_deviceType.setParamConfig(&m_deviceType.m_instancePVs, SIZE_MAX,
+					  m_deviceType.m_parentFile)) ||
        (err = m_deviceType.resolveExpressions(m_deviceType)) ||
        (err = m_deviceType.finalizeProperties()) ||
        (err = m_deviceType.finalizeHDL())))
@@ -397,6 +421,14 @@ parse(ezxml_t xml, Board &b, SlotType *stype) {
   if (m_supportedDevices.size() && m_supportedDevices.size() != supportsCount)
     return OU::esprintf("For device \"%s\", there are not enough <supported> elements, should be %zu",
 			m_name.c_str(), supportsCount);
+  // So the loadtime attribute of the instance comes from the worker or the device
+  if (m_deviceType.isLoadTime()) { // instance defaults from worker
+    if (ezxml_cattr(xml, "loadtime"))
+      return OU::esprintf("for device \"%s\", worker \"%s\" is already specified as load time",
+			  cname(), m_deviceType.cname());
+    m_loadTime = true;  // propagate from the worker to the device
+  } else if ((err = OE::getBoolean(xml, "loadtime", &m_loadTime)))
+    return err;
   return parseSignalMappings(xml, b, stype);
 }
 
@@ -568,6 +600,8 @@ const char *Worker::
 parseInstance(Worker &parent, Instance &i, ezxml_t x) {
   const char *err;
   OE::getOptionalString(x, i.m_device, "device");
+  if ((err = OE::getBoolean(x, "loadtime", &i.m_loadTime, true)))
+    return err;
   for (ezxml_t sx = ezxml_cchild(x, "signal"); sx; sx = ezxml_cnext(sx)) {
     std::string l_name, base, external;
     size_t index;
