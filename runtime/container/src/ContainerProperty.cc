@@ -98,7 +98,7 @@ namespace OCPI {
     BaseType Property::baseType() const {return m_info.m_baseType;}
     size_t Property::stringBufferLength() const {
       if (m_info.m_baseType != OCPI_String)
-	throw "cannot use stringBufferLength() on properties that are not strings";
+	throwError("cannot use stringBufferLength() on properties that are not strings");
       return m_info.m_stringLength + 1;
     }
     size_t Property::
