@@ -304,7 +304,10 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
         ocpiutil.write_file_from_string(dir_path.joinpath(name + ".xml"), template.render(**template_dict))
         Asset.finish_creation('HDL platform', name, dir_path, verbose)
 
-
+        if (os.getenv('OCPI_ENABLE_HDL_DISCOVERY') == None):
+            make_file = ocpiutil.get_makefile(dir_path)[0]
+            ocpiutil.execute_cmd({}, dir_path, action=['skeleton'], file=make_file, verbose=True)
+        
 # pylint:enable=too-many-ancestors
 
 class HdlPlatformWorkerConfig(HdlAssembly):
