@@ -132,6 +132,14 @@ function docase {
     fi
     r=$?
     set +o pipefail
+    #
+    # No longer need the background "printToConsole" process.
+    #
+    kill $PID
+    wait $PID 2>/dev/null
+    #
+    # Now deal with the exit status of the test.
+    #
     if [ $r = 0 ]; then
       $tput setaf 2 2>/dev/null
        echo '    'Execution succeeded, time was $(getElapsedTime).
@@ -152,8 +160,6 @@ function docase {
       failed=1
       return 0
     fi
-    kill $PID
-    wait $PID 2>/dev/null
   }
   [ -z "$view" -a -z "$verify" ] ||
     if [ "$r" = 0 ]; then
