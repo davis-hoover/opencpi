@@ -118,15 +118,7 @@ def main():
     # Download supported OSPs
     for osp in OSPS:
         download_osp(osp)
-        #
-        # FIXME: remove the following "if" when v2.4.3 gets
-        # released.  DO NOT ATTEMPT TO PROCESS v2.4.2 LaTeX
-        # docs for these two OSPs!!
-        #
-        if osp == "ocpi.osp.avnet" or osp == "ocpi.osp.xilinx":
-            OSP_TAGS[osp] = []
-        else:
-            OSP_TAGS[osp] = get_tags(OCPI_OSPDIR / osp / ".git")
+        OSP_TAGS[osp] = get_tags(OCPI_OSPDIR / osp / ".git")
         OSP_TAGS[osp].append("develop")  # develop will always be a valid git revision
 
     # Download supported COMPs
