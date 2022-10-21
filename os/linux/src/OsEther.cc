@@ -75,6 +75,7 @@ namespace OCPI {
 	m_addr64 = s_broadcast.m_addr64;
 	m_pretty[0] = 0;
       }
+
       void Address::
       set(const void *x) {
 	m_isEther = true;
@@ -90,6 +91,7 @@ namespace OCPI {
 	    break;
 	  }
       }
+
       void Address::
       set(uint16_t port, uint32_t addr_in) {
 	m_isEther = false;
@@ -140,6 +142,7 @@ namespace OCPI {
 	struct in_addr x = {m_udp.addr};
 	return inet_ntoa(x);
       }
+
       const char *Address::pretty() {
 	if (!m_pretty[0]) {
 	  if (m_isEther)
@@ -154,6 +157,7 @@ namespace OCPI {
 	}
 	return m_pretty;
       }
+
       bool Address::isLoopback() const {
 	return !m_isEther && m_udp.addr == ntohl(INADDR_LOOPBACK);
       }
@@ -179,6 +183,7 @@ namespace OCPI {
 	return false;
 #endif
       }
+
       // Pick the "primary" address
       in_addr_t
       myAddress() {
@@ -201,6 +206,7 @@ namespace OCPI {
 	}
 	return addr;
       }
+
       Socket::
       Socket(Interface &i, ocpi_role_t role, Address *remote, uint16_t endpoint, std::string &error)
 	: m_ifIndex(i.index), m_ifAddr(i.addr), m_brdAddr(i.brdAddr),
@@ -383,6 +389,7 @@ namespace OCPI {
 	  ::close(m_fd);
 	}
       }
+
       Socket::
       ~Socket() {
 	ocpiDebug("Closing OsEther Socket fd %d", m_fd);
@@ -398,6 +405,7 @@ namespace OCPI {
 	ocpiAssert(offset == offsetof(Packet, payload));
 	return b;
       }
+
       bool Socket::
       receive(uint8_t *buffer, size_t &offset, size_t &payLoadLength, unsigned timeoutms,
 	      Address &addr, std::string &error, unsigned *indexp) {
@@ -552,6 +560,7 @@ namespace OCPI {
 	iov[0].iov_len = payLoadLength;
 	return send(iov, 1, addr, timeoutms, ifc, error);
       }
+
       bool Socket::
       send(IOVec *iov, unsigned iovlen, Address &addr, unsigned /*timeoutms*/,
 	   Interface *ifc, std::string &error) {
@@ -680,6 +689,7 @@ namespace OCPI {
 	}
 	return true;
       }
+
       // status of interface scanning
       struct Opaque {
 #ifdef OCPI_OS_macos
@@ -698,8 +708,10 @@ namespace OCPI {
 	ipAddr.clear();
 	if (error.empty())
 	  while (ifs.getNext(eif, error))
-	    if (eif.connected && eif.up && !eif.loopback && eif.addr.isEther() &&
-		eif.ipAddr.addrInAddr()) {
+	    // For eif.ptp == true, eif.addr.isEther() == false
+	    // and vice-versa.  Both will never be true.
+	    if (eif.connected && eif.up && !eif.loopback &&
+		(eif.addr.isEther() || eif.ptp) && eif.ipAddr.addrInAddr()) {
 	      if (interface && strcasecmp(eif.name.c_str(), interface))
 		  continue;
 	      ipAddr = eif.ipAddr.prettyInAddr();
@@ -715,6 +727,7 @@ namespace OCPI {
 	}
 	return !error.empty();
       }
+
       IfScanner::IfScanner(std::string &err)
 	: m_init(false), m_index(0) {
 	ocpiAssert((compileTimeSizeCheck<sizeof (m_opaque), sizeof (Opaque)> ()));
@@ -726,6 +739,7 @@ namespace OCPI {
 #endif
 	err.clear();
       }
+
       IfScanner::
       ~IfScanner() {
         Opaque *o = (Opaque *)m_opaque;
@@ -867,6 +881,7 @@ namespace OCPI {
 	    }
 	  }
       }
+
       static bool
       doIfInfo(struct if_msghdr *ifm, const char *end, const char *only, Interface &i) {
 	char *extra = (char *)(ifm + 1);
@@ -924,7 +939,6 @@ namespace OCPI {
 	  }
 	return false;
       }
-
 #endif // MacOS Only
 
       bool IfScanner::
@@ -973,7 +987,7 @@ namespace OCPI {
 	if (!found && only)
 	  err = "the requested interface was not found";
 	return found;
-#else
+#else // !OCPI_OS_macos
         Opaque::ifnames_t &ifnames = *o.ifnames; // Alias
 	while (m_index < ifnames.size()) {
           const size_t v_index = m_index++;
@@ -982,15 +996,21 @@ namespace OCPI {
 	    s += '/';
 	    s += ifnames[v_index].second;
 	    long nval, carrier, flags;
-	    if (getValue(s, "type", &nval) && (nval == ARPHRD_ETHER || nval == ARPHRD_LOOPBACK) &&
+	    if (getValue(s, "type", &nval) &&
+		(nval == ARPHRD_ETHER || nval == ARPHRD_LOOPBACK || nval == ARPHRD_NONE) &&
 		getValue(s, "address", NULL, &addr) &&
 		getValue(s, "carrier", &carrier) &&
 		getValue(s, "flags", &flags)) {
 	      if (nval == ARPHRD_ETHER) {
 		i.addr.setString(addr.c_str());
 	      } else {
-		i.addr.set(0,0); // loop back is not an ether interface
-		i.loopback = true;
+		i.addr.set(0, 0); // not an ether interface
+		if (nval == ARPHRD_LOOPBACK)
+		  i.loopback = true;
+		else {
+		  if (flags & IFF_POINTOPOINT)
+		    i.ptp = true;
+		}
 	      }
 	      if (!i.addr.hasError()) {
 		int fd = socket(PF_INET, SOCK_DGRAM, 0);
@@ -1016,7 +1036,7 @@ namespace OCPI {
 		}
 		::close(fd);
 		if (accepted) {
-		  ocpiDebug("found ether interface '%s' which is %s, %s, at address %s",
+		  ocpiDebug("found interface '%s' which is %s, %s, at address %s",
 			i.name.c_str(), i.up ? "up" : "down",
 			i.connected ? "connected" : "disconnected", i.addr.pretty());
 		  return true;
@@ -1060,20 +1080,23 @@ namespace OCPI {
 	  }
 	} while(i.index < 10);
 	return false;
-#endif
-#endif
+#endif // old sudo-required way
+#endif // !OCPI_OS_macos
       }
+
       Interface::Interface() {
 	init();
       }
+
       void Interface::init() {
 	index = 0;
 	name.clear();
 	addr.set(0);
 	ipAddr.set(0);
 	brdAddr.set(0);
-	up = connected = loopback = false;
+	up = connected = loopback = ptp = false;
       }
+
       Interface::Interface(const char *name_in, std::string &error) {
 	IfScanner ifs(error);
 	while (error.empty() && ifs.getNext(*this, error, name_in))
