@@ -27,6 +27,7 @@
 #include <iostream>
 #include <unistd.h> // usleep()
 #include <cinttypes> // PRI...
+#include <cmath> // std::round
 #include "DRC.hh"
 #include "LogForwarder.hh"
 #ifndef DISABLE_AD9361
@@ -182,6 +183,8 @@ class AD9361Configurator : public Configurator<AD9361CSP> {
   AD9361Configurator() : Configurator<AD9361CSP>() {
     {
       DataStream::CSPVarMap map;
+      map.insert(std::make_pair(config_key_direction.c_str(),
+          "ad9361_dir_rx1"));
       map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
           "ad9361_fc_meghz_rx1"));
       map.insert(std::make_pair(config_key_bandwidth_3dB_MHz.c_str(),
@@ -198,6 +201,8 @@ class AD9361Configurator : public Configurator<AD9361CSP> {
     }
     {
       DataStream::CSPVarMap map;
+      map.insert(std::make_pair(config_key_direction.c_str(),
+          "ad9361_dir_rx2"));
       map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
           "ad9361_fc_meghz_rx2"));
       map.insert(std::make_pair(config_key_bandwidth_3dB_MHz.c_str(),
@@ -214,6 +219,8 @@ class AD9361Configurator : public Configurator<AD9361CSP> {
     }
     {
       DataStream::CSPVarMap map;
+      map.insert(std::make_pair(config_key_direction.c_str(),
+          "ad9361_dir_tx1"));
       map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
           "ad9361_fc_meghz_tx1"));
       map.insert(std::make_pair(config_key_bandwidth_3dB_MHz.c_str(),
@@ -230,6 +237,8 @@ class AD9361Configurator : public Configurator<AD9361CSP> {
     }
     {
       DataStream::CSPVarMap map;
+      map.insert(std::make_pair(config_key_direction.c_str(),
+          "ad9361_dir_tx2"));
       map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
           "ad9361_fc_meghz_tx2"));
       map.insert(std::make_pair(config_key_bandwidth_3dB_MHz.c_str(),
@@ -556,7 +565,7 @@ class AD9361DRC : public DRC<log_t,cfgrtr_t> {
     // that the No-OS opencpi platform driver knows to drive the force_reset
     // property of the sub-device
     m_init_param.gpio_resetb = GPIO_RESET_PIN;
-    m_init_param.reference_clk_rate = (uint32_t) round(m_fref_hz);
+    m_init_param.reference_clk_rate = (uint32_t) std::round(m_fref_hz);
     // here is where we enforce the ad9361_config OWD comment
     // "[the force_two_r_two_t_timing] property is expected to correspond to the
     // D2 bit of the Parallel Port Configuration 1 register at SPI address 0x010
@@ -641,8 +650,9 @@ class AD9361DRC : public DRC<log_t,cfgrtr_t> {
     bool is_2r1t_or_1r2t_or_2r2t =
         m_cfg_slave.get_qadc1_is_present() or
         m_cfg_slave.get_qdac1_is_present();
+    ///@TODO investigate Platform_ad9361_configWorkerTypes::DATA_RATE_CONFIG_SDR;
     bool mode_is_sdr = m_cfg_slave.get_data_rate_config() == 
-        Platform_ad9361_configWorkerTypes::DATA_RATE_CONFIG_SDR;
+        true;//Platform_ad9361_configWorkerTypes::DATA_RATE_CONFIG_SDR;
     m_init_param.rx_frame_pulse_mode_enable =
         (int)m_cfg_slave.get_rx_frame_usage() ? 1 : 0;
     m_init_param.invert_data_bus_enable =
@@ -1082,6 +1092,13 @@ class AD9361DRC : public DRC<log_t,cfgrtr_t> {
         (uint32_t)std::round(convert_db_to_milli_db(val)));
     throw_if_no_os_api_call_returns_non_zero(res);
 #endif
+  }
+  bool shutdown() {
+    bool ret = false;
+#ifndef DISABLE_AD9361
+    ret = ad9361_set_en_state_machine_mode(m_ad9361_rf_phy, ENSM_MODE_ALERT);
+#endif
+    return ret;
   }
   ~AD9361DRC() {
 #ifndef DISABLE_AD9361

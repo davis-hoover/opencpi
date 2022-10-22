@@ -124,7 +124,7 @@ class FMCOMMS2_3CSP : public AD9361CSP {
     m_solver.add_constr("fmcomms2_3_gain_mode_rx1a", "=", "ad9361_gain_mode_rx1");
     m_solver.add_constr("fmcomms2_3_gain_mode_rx2a", "=", "ad9361_gain_mode_rx2");
     m_solver.add_constr("fmcomms2_3_gain_mode_tx1a", "=", "ad9361_gain_mode_tx1");
-    m_solver.add_constr("fmcomms2_3_gain_mode_tx2a", "=", "ad9361_gain_mode_rx2");
+    m_solver.add_constr("fmcomms2_3_gain_mode_tx2a", "=", "ad9361_gain_mode_tx2");
     // gain_dB
     m_solver.add_constr("fmcomms2_3_gain_db_rx1a", "=", "ad9361_gain_db_rx1");
     m_solver.add_constr("fmcomms2_3_gain_db_rx2a", "=", "ad9361_gain_db_rx2");
@@ -326,6 +326,9 @@ class FMCOMMS2_3DRC : public AD9361DRC<log_t,s_cfg_t,s_ds_t,cfgrtr_t> {
   void set_gain_dB(data_stream_id_t data_stream_id,
       config_value_t val) {
     return AD9361DRC<log_t,s_cfg_t,s_ds_t,cfgrtr_t>::set_gain_dB(get_ad9361_ds_id(data_stream_id),val);
+  }
+  bool shutdown() {
+    return AD9361DRC<log_t,s_cfg_t,s_ds_t,cfgrtr_t>::shutdown();
   }
 }; // class FMCOMMS2_3DRC
 
