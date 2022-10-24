@@ -20,13 +20,16 @@
   <signal  input='fmc_prsnt'/> <!-- just to make it easier to re-use zed VHD file here -->
   <!-- Make believe these are directly attached rather than a card plugged into the FMC slot -->
   <device worker='lime_adc'>
-    <property name='use_clk_in_p' value='1'/>
     <property name='use_clk_out_p' value='0'/>
+    <property name='use_clk_in_p' value='1'/>
     <property name='use_ctl_clk_p' value='0'/>
+    <property name='drive_clk_p'  value='0'/>
     <signal name='rx_clk' platform=''/>
     <signal name='rx_clk_out' platform=''/>
   </device>
   <device worker='lime_dac'>
+    <property name='USE_CLK_IN_p'  value='1'/>
+    <property name='USE_CTL_CLK_p'  value='0'/>
     <signal name='tx_clk_in' platform='lime_adc_rx_clk_in'/>
     <signal name='tx_clk' platform=''/>
   </device>

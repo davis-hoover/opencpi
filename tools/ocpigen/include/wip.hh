@@ -359,7 +359,7 @@ struct Instance;
 class Worker : public OM::Worker {
  public:
   ezxml_t m_xml;
-  std::string m_file, m_parentFile, m_fileName, m_noSuffName;
+  std::string m_file, m_parentFile, m_fileName, m_noSuffName, m_buildFile;
   Model m_model;
   const char **m_baseTypes;
   const char *m_modelString;
@@ -405,10 +405,10 @@ class Worker : public OM::Worker {
   bool m_autoConfigs;               // has the auto-config file been found and parsed already?
   Build m_build;                    // build info not needed for code gen or artifact
   ParamConfig  *m_paramConfig;      // the config for this Worker.
-  Worker *m_parent;           // If this worker is part of an upper level assembly
+  Worker *m_parent;                 // If this worker is part of an upper level assembly
   bool m_scalable;
   size_t m_requiredWorkGroupSize;    // FIXME: belongs in OclWorker class!
-                                    // FIXME: derive from compiled code
+                                     // FIXME: derive from compiled code
   unsigned m_maxLevel;        // when data type processing
   bool m_dynamic;
   bool m_optimized;
@@ -438,8 +438,10 @@ class Worker : public OM::Worker {
   OM::Port *findMetaPort(const char *id, const OM::Port *except) const;
   const char *parseSlaves();
   std::string print_map();
+#if 0
   const char *addSlave(ezxml_t slave, const std::string &workerName, const std::string &slaveName);
   const char *addSlaves(ezxml_t slaves);
+#endif
   virtual OM::Port &metaPort(unsigned long which) const;
   const char
     *addBuiltinProperties(),
@@ -513,8 +515,7 @@ class Worker : public OM::Worker {
     *emitImplOCL(),
     *emitEntryPointOCL(),
     *paramValue(const OB::Member &param, OB::Value &v, std::string &value),
-    *findParamConfig(size_t low, size_t high, const OCPI::Metadata::Assembly::Properties &ipvs,
-		     ParamConfig *&pc),
+    *findParamConfig(size_t low, size_t high, const OCPI::Metadata::Assembly::Properties &ipvs),
     *rccBaseValue(OB::Value &v, std::string &value, const OB::Member *param = NULL),
     *rccValue(OB::Value &v, std::string &value, const OB::Member &param),
     *rccPropValue(OM::Property &p, std::string &value),
@@ -560,6 +561,11 @@ class Worker : public OM::Worker {
     emitParameters(FILE *f, Language lang, bool useDefaults = true, bool convert = false),
     emitSignals(FILE *f, Language lang, bool records, bool inPackage, bool inWorker,
 		bool convert = false),
+    vhdlType(const OM::Property &dt, std::string &decl, std::string &type,
+	     bool convert = false, bool finalized = false),
+    vhdlArrayType(const OM::Property &dt, std::string &decl, std::string &type, bool convert,
+		  bool finalized),
+    vhdlConstant2Readback(const OM::Property &pr, const std::string &val, std::string &out),
     rccEmitDimension(size_t numeric, const std::string &expr, const char *surround,
 		     std::string &out),
     rccArray(std::string &type, OB::Member &m, bool isFixed, bool &isLast, bool topSeq, bool end),
@@ -627,8 +633,6 @@ extern const char
 extern bool g_dynamic, g_optimized, g_multipleWorkers, g_autoAddParamConfig;
 extern void
   doPrev(FILE *f, std::string &last, std::string &comment, const char *myComment),
-  vhdlType(const OM::Property &dt, std::string &typeDecl, std::string &type,
-	   bool convert = false, bool finalized = false),
   emitConstant(FILE *f, const std::string &prefix, const char *name, size_t val, Language lang, bool ieee = false),
   emitVhdlLibraries(FILE *f),
   emitLastSignal(FILE *f, std::string &last, Language lang, bool end);

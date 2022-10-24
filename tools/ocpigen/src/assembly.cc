@@ -257,13 +257,12 @@ addParameters(const OM::Assembly::Properties &aiprops, InstanceProperty *&ipv) {
     ipv->value.setType(*p); // in case we are reusing it
     if ((err = ipv->property->parseValue(ap->m_value.c_str(), ipv->value, NULL, this)))
       return err;
-    if (p->m_default) {
-      std::string defValue, newValue;
-      p->m_default->unparse(defValue);
-      ipv->value.unparse(newValue);
-      if (defValue == newValue)
-	continue;
-    }
+    OB::Value zeroValue(*p);
+    std::string defValue, newValue;
+    (p->m_default ? *p->m_default : zeroValue ).unparse(defValue);
+    ipv->value.unparse(newValue);
+    if (defValue == newValue)
+      continue;
     ipv++;
   }
   return NULL;
@@ -283,6 +282,12 @@ addParamConfigParameters(const ParamConfig &pc, const OM::Assembly::Properties &
 	break;
     if (n == 0) {
       // a setting in the param config is not mentioned explicitly
+      OB::Value zeroValue(*p->m_param);
+      std::string defValue, paramValue;
+      (p->m_param->m_default ? *p->m_param->m_default : zeroValue).unparse(defValue);
+      p->m_value.unparse(paramValue);
+      if (defValue == paramValue)
+	continue;
       ipv->property = p->m_param;
       ipv->value = p->m_value;
       ipv++;
@@ -302,9 +307,11 @@ init(::Assembly &assy, const char *iName, const char *wName, ezxml_t ix,
   Worker *w = NULL;
   if (m_wName.empty())
     return OU::esprintf("instance %s has no worker", cname());
+#if 0 // do not reuse workers here
   for (Instance *ii = &assy.m_instances[0]; ii < this; ii++)
     if (!strcmp(m_wName.c_str(), ii->m_wName.c_str()))
       w = ii->m_worker;
+#endif
   // There are two instance attributes that we use when considering workers
   // in our worker assembly:
   // 1.  Whether the instance is reentrant, which means one "instance" here can actually
@@ -312,10 +319,9 @@ init(::Assembly &assy, const char *iName, const char *wName, ezxml_t ix,
   //     This implies there will be no hard connections to its ports.
   // 2.  Which configuration of parameters it is built with.
   // FIXME: better modularity would be a core worker, a parameterized worker, etc.
-  size_t paramConfig; // zero is with default parameter values
-  bool hasConfig;
+  size_t paramConfig;
   const char *err;
-  if ((err = OE::getNumber(m_xml, "paramConfig", &paramConfig, &hasConfig, 0)))
+  if ((err = OE::getNumber(m_xml, "paramConfig", &paramConfig, NULL, SIZE_MAX)))
     return err;
   // We consider the property values in two places.
   // Here we are saying that a worker can't be shared if it has explicit properties,
@@ -328,19 +334,16 @@ init(::Assembly &assy, const char *iName, const char *wName, ezxml_t ix,
   // FIXME: we basically are forcing replication of workers...
 
   // Initialize this instance's explicit xml property/parameter values from the assembly XML.
-  m_xmlProperties = xmlProperties;
+  m_xmlProperties = xmlProperties; // copy
   // Add any assembly-level parameters that also need to be applied to the instance
   // and used during worker and paramconfig selection
   if (assy.m_assyWorker.m_paramConfig && (err = assy.addAssemblyParameters(m_xmlProperties)))
     return err;
-  if (!w || m_xmlProperties.size() || paramConfig) {
-    if (!(w = Worker::create(m_wName.c_str(), assy.m_assyWorker.m_file, NULL,
-			     assy.m_assyWorker.m_outDir, &assy.m_assyWorker,
-			     hasConfig ? NULL : &m_xmlProperties,
-			     hasConfig ? paramConfig : SIZE_MAX, err)))
-      return OU::esprintf("for worker %s: %s", m_wName.c_str(), err);
-    assy.m_workers.push_back(w); // preserve order
-  }
+  if (!(w = Worker::create(m_wName.c_str(), assy.m_assyWorker.m_file, NULL,
+			   assy.m_assyWorker.m_outDir, &assy.m_assyWorker, &m_xmlProperties,
+			   paramConfig, err)))
+    return OU::esprintf("for worker %s: %s", m_wName.c_str(), err);
+  assy.m_workers.push_back(w); // preserve order
   m_worker = w;
   // Determine instance type as far as we can now
   switch (w->m_type) {
@@ -572,8 +575,7 @@ emitXmlWorker(std::string &out, bool verbose) {
       OU::formatAdd(out, "      <instance name='%s' component='%s' worker='%.*s",
 		    i->cname(), i->m_worker->m_specName, (int)(dot - i->m_wName.c_str()),
 		    i->m_wName.c_str());
-      assert(i->m_worker->m_paramConfig);
-      if (i->m_worker->m_paramConfig->nConfig)
+      if (i->m_worker->m_paramConfig && i->m_worker->m_paramConfig->nConfig)
 	OU::formatAdd(out, "-%zu", i->m_worker->m_paramConfig->nConfig);
       out += dot;
       out += '\'';
@@ -581,13 +583,11 @@ emitXmlWorker(std::string &out, bool verbose) {
       for (auto it = i->m_xmlProperties.begin(); it != i->m_xmlProperties.end(); ++it) {
 	const OM::Property *p = i->m_worker->findProperty(it->m_name.c_str());
 	assert(p);
-	/* if (!p->m_isParameter) */ {
-	  if (!any)
-	    out += ">\n";
-	  any = true;
-	  OU::formatAdd(out, "        <property name='%s' value='%s'/>\n",
-			p->cname(), it->m_value.c_str());
-	}
+	if (!any)
+	  out += ">\n";
+	any = true;
+	OU::formatAdd(out, "        <property name='%s' value='%s'/>\n",
+		      p->cname(), it->m_value.c_str());
       }
       out += any ? "      </instance>\n" : "/>\n";
     }

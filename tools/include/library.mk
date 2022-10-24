@@ -58,15 +58,16 @@ $(shell mkdir -p lib; \
           echo $$workers_content > lib/workers; \
         fi)
 endif
+
+speclinks:
+	$(AT)$(call OcpiSpecLinks,.,$(OutDir)lib)
+
 ifneq ($(filter speclinks workersfile,$(MAKECMDGOALS)),)
 # We define this empty make rule so that workers can generate the "workers" file
 # by calling "make workersfile -C ../". Doing so will trigger the code block above
 # which is executed for all make rules except clean%
 workersfile:
 	$(AT): # nothing - just suppress message
-speclinks:
-	$(AT)mkdir -p $(OutDir)lib
-	$(AT)$(foreach f,$(wildcard specs/*.xml *.comp/*-comp.xml),$(call MakeSymLink,$f,lib);)
 else
 HdlInstallDir=lib
 include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk
@@ -211,7 +212,6 @@ $(AT)set -e;\
     else \
       $(call BuildImplementation,$(1),$i,$2) \
     fi;)\
-
 
 CleanModel=$(infox CLEANING MODEL $1)\
   $(AT)$(if $($(call Capitalize,$1)Implementations), \
@@ -371,7 +371,8 @@ ifneq ($(filter declare,$(MAKECMDGOALS)),)
   override HdlTargets=
   override HdlTarget=
 endif
-declare:
+
+declare: speclinks
 	$(call BuildModel,hdl,declare)
 	$(call BuildModel,ocl,declare)
 	$(call BuildModel,rcc,declare)

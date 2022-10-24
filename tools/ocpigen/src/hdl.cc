@@ -130,6 +130,7 @@ parseHdlImpl(const char *a_package) {
     const char *dot = strrchr(emulate, '.');
     if (!dot)
       return OU::esprintf("'emulate' attribute: '%s' has no authoring model suffix", emulate);
+    // The NULL argument to "get" means we don't care about parameter configurations
     if (!(m_emulate = HdlDevice::get(emulate, NULL, m_file.c_str(), this, err)))
       return OU::esprintf("for emulated device worker %s: %s", emulate, err);
     for (PropertiesIter pi = m_emulate->m_ctl.properties.begin();
