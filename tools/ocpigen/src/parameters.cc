@@ -317,7 +317,7 @@ clone(const ParamConfig &other) {
   nConfig = other.nConfig;
   used = other.used;
   m_slavesAssembly = other.m_slavesAssembly;
-  m_slavesString = ezxml_toxml(other.m_slavesXml);  
+  m_slavesString = ezxml_toxml(other.m_slavesXml);
   m_slavesXml = ezxml_parse_str(m_slavesString, strlen(m_slavesString));
 }
 
@@ -335,7 +335,7 @@ ParamConfig::
 
 // Fill in unspecified parameters with their single default value
 const char *ParamConfig::
-doDefaults(bool missingOk) {
+doDefaults() {
   params.resize(m_worker.m_ctl.nParameters); // in case parameter properties were added recently
   size_t n = 0;
   for (PropertiesIter pi = m_worker.m_ctl.properties.begin();
@@ -352,16 +352,11 @@ doDefaults(bool missingOk) {
 	    // If the default is an expression, reevaluate it with the current parameter values.
 	    params[n].m_value.setType(p);    // blank default value
 	    params[n].m_value.parse(p.m_defaultExpr.c_str(), NULL, false, this, NULL);
-	    // params[n].m_isDefault = false;
 	  } else {
 	    params[n].m_value = *p.m_default; // assignment operator to copy the value
-	    // params[n].m_isDefault = true;
 	  }
-	} else if (missingOk)
-	  params[n].m_value.setType(p);       // blank default value
-	else
-	  return OU::esprintf("The parameter property '%s' has no build value and no default value",
-			      p.cname());
+	} else
+	  params[n].m_value.setType(p);       // blank/zero default value
 	params[n].m_value.unparse(params[n].m_uValue);
 	params[n].m_uValues.push_back(params[n].m_uValue);
 	params[n].m_attributes.resize(params[n].m_attributes.size() + 1);
@@ -514,7 +509,7 @@ write(FILE *xf, FILE *mf) {
   if (xf) {
     if (nonDefault)
       fputs("  </configuration>\n", xf);
-    else if (nConfig == 0)
+    else
       fputs("  <configuration/>\n", xf);
   }
 }
@@ -545,7 +540,7 @@ writeConstants(FILE *gf, Language lang) {
 	pr.m_stringLength = p.m_value.maxStringLength();
       }
       std::string typeDecl, type;
-      vhdlType(pr, typeDecl, type, false, true); // true for asserting all constants are known
+      m_worker.vhdlType(pr, typeDecl, type, false, true); // true for asserting all constants are known
       m_worker.hdlValue(pr.m_name, p.m_value, value, false, VHDL, true); // ditto
       fprintf(gf, "  constant %s : %s := %s;\n",
 	      p.m_param->m_name.c_str(), type.c_str(), value.c_str());
@@ -613,31 +608,30 @@ parseBuildFile(bool optional, bool *missing, const std::string &parent) {
   if (slash)
     dir.assign(m_file.c_str(), OCPI_SIZE_T_DIFF(slash + 1, m_file.c_str()));
   // First look for the build file next to the OWD
-  OU::format(fname, "%s%s.build", dir.c_str(), m_implName);
+  OU::format(fname, "%s%s.build", dir.c_str(), nsname());
   if (!OS::FileSystem::exists(fname)) {
-    OU::format(fname, "%s%s-build.xml", dir.c_str(), m_implName);
+    OU::format(fname, "%s%s-build.xml", dir.c_str(), nsname());
     if (!OS::FileSystem::exists(fname)) {
       // Next look for it in the gen/ below the OWD
-      OU::format(fname, "%sgen/%s-build.xml", dir.c_str(), m_implName);
+      OU::format(fname, "%sgen/%s-build.xml", dir.c_str(), nsname());
       if (!OS::FileSystem::exists(fname)) {
 	// Finally look in the local gen subdir
-	OU::format(fname, "gen/%s-build.xml", m_implName);
+	OU::format(fname, "gen/%s-build.xml", nsname());
 	if (!OS::FileSystem::exists(fname)) {
 	  if (missing)
 	    *missing = true;
 	  return optional ? NULL :
 	    OU::esprintf("Cannot find %s.build or %s-build.xml in worker directory or \"gen\" "
-			 "subdirectory (%s)", m_implName, m_implName, dir.c_str());
+			 "subdirectory (%s)", nsname(), nsname(), dir.c_str());
 	}
       }
     }
   }
   ezxml_t x;
-  std::string xfile;
-  if ((err = parseFile(fname.c_str(), parent, "build", &x, xfile, false, true, optional)))
+  if ((err = parseFile(fname.c_str(), parent, "build", &x, m_buildFile, false, true, optional)))
     return err;
-  if ((err = parseBuildXml(x, xfile)))
-    return OU::esprintf("when processing build file \"%s\": %s", xfile.c_str(), err);
+  if ((err = parseBuildXml(x, m_buildFile)))
+    return OU::esprintf("when processing build file \"%s\": %s", m_buildFile.c_str(), err);
   return NULL;
 }
 
@@ -663,7 +657,7 @@ parseBuildXml(ezxml_t x, const std::string &file) {
       return err;
     assert(nParam == p->m_paramOrdinal); // FIXME: get rid of nParam someday
   }
-  if ((err = m_build.m_globalParams.doDefaults(true))) // set unmentioned params to default values
+  if ((err = m_build.m_globalParams.doDefaults())) // set unmentioned params to default values
     return err;
   // There are three cases for configurations here:
   // 1. With IDs, which are defaulted against the property's default value when not specified.
@@ -688,7 +682,7 @@ parseBuildXml(ezxml_t x, const std::string &file) {
     if ((err = pc->parse(cx, m_paramConfigs)))
       return err;
     pc->nConfig = id++;
-    if ((err = pc->doDefaults(false))) // configs with id have defaults filled in
+    if ((err = pc->doDefaults())) // configs with id have defaults filled in
       return err;
     if (id > m_paramConfigs.size())
       m_paramConfigs.resize(id);
@@ -939,9 +933,9 @@ emitToolParameters() {
   // in the same position.
   if ((err = doParam(info, m_ctl.properties.begin(), false, 0)))
     return err;
-  // Force an empty build file
-  //  if (!m_xmlFile && m_paramConfigs.size() == 0 && (err = startBuildXml(m_xmlFile)))
-  //    return err;
+  // Force a build file if none has been read
+  if (m_buildFile.empty() && (err = startBuildXml(m_xmlFile)))
+    return err;
   err = writeParamFiles(mkFile, m_xmlFile);
   m_xmlFile = NULL;
   return err;
@@ -982,14 +976,17 @@ emitHDLConstants(size_t config, bool other) {
 
 // Return NULL if none found that match inputs
 const char *Worker::
-findParamConfig(size_t low, size_t high, const OM::Assembly::Properties &instancePVs,
-		ParamConfig *&paramConfig) {
-  paramConfig = NULL;
+findParamConfig(size_t low, size_t high, const OM::Assembly::Properties &instancePVs) {
+  // assert(m_paramConfig == NULL); FIXME: why is this called more than once?
+  // can we just return if m_paramConfig is set?  Or are the instancePVs different
+  // when it called a second time?
+  m_paramConfig = NULL;
   for (size_t n = low; n <= high; n++) {
     ParamConfig *pc = m_paramConfigs[n];
     if (!pc)
       continue;
     const OM::Assembly::Property *ap = &instancePVs[0];
+    std::vector<bool> seen(pc->params.size()); // record properties with values
     for (unsigned nn = 0; nn < instancePVs.size(); nn++, ap++)
       if (ap->m_hasValue) {
 	Param *p = &pc->params[0];
@@ -999,14 +996,24 @@ findParamConfig(size_t low, size_t high, const OM::Assembly::Properties &instanc
 	    const char *err;
 	    if ((err = p->m_param->parseValue(ap->m_value.c_str(), apValue)))
 	      return err;
+	    seen[nnn] = true;
 	    std::string apString;
 	    apValue.unparse(apString); // to get canonicalized value of APV
 	    if (apString != p->m_uValue)
 	      goto nextConfig;
+	    // The value in param config matches.  Inherit defaultness from IPV
+	    // I.e. if we find a match and the IPV says it is default, that is the platform
+	    // value overriding the device worker's own default
+	    // This is ok since that only happens for platform-specific device workers.
+	    if (ap->m_isDefault)
+	      p->m_isDefault = true; // don't clobber true to false.
 	    break;
 	  }
       }
-    paramConfig = pc;
+    for (unsigned nn = 0; nn < pc->params.size(); ++nn)
+      if (!seen[nn] && !pc->params[nn].m_isDefault)
+	goto nextConfig;
+    m_paramConfig = pc;
     break;
   nextConfig:;
   }
@@ -1040,77 +1047,74 @@ writeAutoBuildFile(const char *file, ParamConfigs &paramConfigs, size_t low) {
 // Given assembly instance properties or a parameter configuration,
 // establish the parameter values for this worker.
 // Note this worker will then be parameter-value-specific.
-// If instancePVs is NULL, use paramconfig, which is SIZE_MAX if unspecified
+// If instancePVs is NULL and paramConfig == SIZE_MAX we are not really interested
+// in a particular parameter configuration at all
 const char *Worker::
-setParamConfig(const OM::Assembly::Properties *instancePVs, size_t paramConfig,
+setParamConfig(const OM::Assembly::Properties *a_instancePVs, size_t paramConfig,
 	       const std::string &parent) {
+  const OM::Assembly::Properties
+    empty,
+    &instancePVs = a_instancePVs ? *a_instancePVs : empty;
+  m_paramConfig = NULL;
   // This method can in fact be called more than once, but this should be FIXMEd.
   // HdlDevice::create and Device::parse both call this...
-  // assert(!m_paramConfig);
-  assert((paramConfig != SIZE_MAX && !instancePVs) || paramConfig == SIZE_MAX);
+  // Possibly somehow with different parameter values
+  assert((paramConfig != SIZE_MAX && instancePVs.empty()) || paramConfig == SIZE_MAX);
   const char *err;
   // So we have parameter configurations
   // FIXME: we could cache this parsing in one place, but workers can still be
   // parameterized by xml attribute values, so it can't simply be cached in a Worker object.
-  if ((err = parseBuildFile(paramConfig == SIZE_MAX || paramConfig == 0, NULL, parent)))
+  // The build file must exist of we are specifying a config
+  if ((err = parseBuildFile(paramConfig == SIZE_MAX, NULL, parent)))
     return err;
-  if (m_paramConfigs.size() == 0) { // build file not there
-    if (paramConfig != SIZE_MAX && paramConfig != 0)
-      return OU::esprintf("Worker '%s' has no build configurations, but config %zu specified",
-			  m_implName, paramConfig);
-    if (paramConfig == 0) { // paramconfig 0 is defaults, which is equivalent to an empty build file
-      std::string xfile;
-      ocpiCheck(parseBuildXml(NULL, xfile) == NULL);
-    }
-    if (instancePVs && instancePVs->size()) { // error check any supplied values
-      const OM::Assembly::Property *ap = &(*instancePVs)[0];
-      for (unsigned nn = 0; nn < instancePVs->size(); nn++, ap++)
-	if (ap->m_hasValue) {
-	  OM::Property *p = findProperty(ap->m_name.c_str());
-	  if (!p || !p->m_isParameter)
-	    return OU::esprintf("Worker \"%s\" has no parameter property named \"%s\"",
-				m_implName, ap->m_name.c_str());
-	  if (p->m_default) {
-	    std::string defValue, newValue;
-	    p->m_default->unparse(defValue);
-	    OB::Value ipv;
-	    ipv.setType(*p);
-	    if (!(err = ipv.parse(ap->m_value.c_str()))) {
-	      ipv.unparse(newValue);
-	      if (defValue != newValue)
-		err = "value doesn't match default, and no other choices exist";
-	    }
-	    if (err)
-	      return OU::esprintf("Bad value \"%s\" (default is \"%s\", new is \"%s\") for "
-				  "parameter \"%s\" for worker \"%s\": %s",
-				  ap->m_value.c_str(), defValue.c_str(), newValue.c_str(),
-				  p->m_name.c_str(), m_implName, err);
-	  }
-	}
-    }
-    return NULL;
+  // We currently have no attribute for these non-built workers that are
+  // configured in the final container build
+  bool noBuild =
+    !strcasecmp(m_implName, "ocscp") ||
+    !strcasecmp(m_implName, "metadata") ||
+    !strcasecmp(m_implName, "time_client_co") ||
+    !strcasecmp(m_implName, "time_client");
+
+  if (m_paramConfigs.size() == 0 && !noBuild) {
+    // build file not there and thus paramConfig unspecified (is SIZE_MAX)
+    // so make sure there is a build config for the defaults, which is achieved by
+    // parsing an empty file.  No conflict with user since no build file.
+    std::string xfile;
+    ocpiCheck(parseBuildXml(NULL, xfile) == NULL);
+    assert(m_paramConfigs.size() == 1 && m_paramConfigs[0]->nConfig == 0);
   }
-  // If no property values and an explicit valid configuration, just use it
-  if ((!instancePVs || instancePVs->size() == 0) && paramConfig != SIZE_MAX &&
-      paramConfig < m_paramConfigs.size()) {
+  if (!a_instancePVs && paramConfig == SIZE_MAX)
+    return NULL;
+  if (instancePVs.size()) {
+    // Do a pre-check on parameter names
+    const OM::Assembly::Property *ap = &instancePVs[0];
+    for (unsigned nn = 0; nn < instancePVs.size(); nn++, ap++)
+      if (ap->m_hasValue) {
+	OM::Property *p = findProperty(ap->m_name.c_str());
+	// Slaves can have runtime propertoes
+	if (!p || (!m_isSlave && !p->m_isParameter))
+	  return OU::esprintf("Worker \"%s\" has no parameter property named \"%s\"",
+			      m_implName, ap->m_name.c_str());
+      }
+  } else if (paramConfig != SIZE_MAX) {
+    if (paramConfig >= m_paramConfigs.size())
+      return OU::esprintf("For worker \"%s\", build configuration %zu is not valid",
+			  m_implName, paramConfig);
     m_paramConfig = m_paramConfigs[paramConfig];
     return NULL;
   }
-  // Here either there are property values or the paramconfig is not explicit or valid
-  if (instancePVs) {
-    size_t low, high;
-    if (paramConfig != SIZE_MAX)
-      low = high = paramConfig;
-    else
-      low = 0, high = m_paramConfigs.size() - 1;
-    // At this point we know we have configurations and values to match against them
-    // Scan the configs until one matches. FIXME: use scoring via selection expression...
-    if ((err = findParamConfig(low, high, *instancePVs, m_paramConfig)))
-      return err;
-    if (m_paramConfig)
-      return NULL;
-  }
-  // So there are no build configs that match in the static build config file.
+  // If this worker is a slave and a device, the default values are determined by the platform
+  // which means we cannot and should not determine the param config here since we don't know
+  // what the default values are for parameters.
+  if (m_isDevice && m_isSlave)
+    return NULL;
+  // Not an explicit paramConfig.  Look for one that matches.
+  if (m_paramConfigs.size() &&
+      (err = findParamConfig(0, m_paramConfigs.size() - 1, instancePVs)))
+    return err;
+  if (m_paramConfig)
+    return NULL;
+  // So there are no build configs that match in the static build config file (or defaults)
   // Look at the dynamic build config file.
   ezxml_t xml;
   size_t staticSize = m_paramConfigs.size();
@@ -1123,44 +1127,34 @@ setParamConfig(const OM::Assembly::Properties *instancePVs, size_t paramConfig,
       ParamConfig *pc = new ParamConfig(*this);
       if ((err = pc->parse(cx, m_paramConfigs)))
 	return err;
-      pc->nConfig = id;
-      if ((err = pc->doDefaults(false))) // configs with id have defaults filled in
+      pc->nConfig = id; // no id attributes will be in this file
+      if ((err = pc->doDefaults())) // configs without id attrs have defaults filled in
 	return err;
       m_paramConfigs.push_back(pc);
     }
   }
-  if (paramConfig != SIZE_MAX && paramConfig >= m_paramConfigs.size())
-    return OU::esprintf("Parameter configuration %zu exceeds available configurations (%zu)",
-			paramConfig, m_paramConfigs.size());
-  if (!instancePVs || instancePVs->size() == 0) {
-    if (paramConfig == SIZE_MAX) {
-      if (m_paramConfigs[0])
-	paramConfig = 0;
-      else {
-	m_paramConfig = NULL;
-	return NULL; // Parameter configuration unspecified and no default exists
-      }
-    }
-    m_paramConfig = m_paramConfigs[paramConfig];
-    return NULL;
-  }
   // See if any dynamic build configs match, and use it if so
-  if ((err = findParamConfig(staticSize, m_paramConfigs.size()-1, *instancePVs, m_paramConfig)))
+  if (m_paramConfigs.size() &&
+      (err = findParamConfig(staticSize, m_paramConfigs.size()-1, instancePVs)))
     return err;
-  if (m_paramConfig)
+  // We're done if we find a match or we are not really looking for one
+  if (m_paramConfig || (paramConfig == SIZE_MAX && !a_instancePVs))
     return NULL;
-  if (!g_autoAddParamConfig) {
+  if (!g_autoAddParamConfig && !noBuild && m_parent) {
     std::string bad;
-    const OM::Assembly::Property *ap = &(*instancePVs)[0];
-    for (unsigned nn = 0; nn < instancePVs->size(); nn++, ap++)
+    const OM::Assembly::Property *ap =  &instancePVs[0];
+    for (unsigned nn = 0; nn < instancePVs.size(); nn++, ap++)
       if (ap->m_hasValue)
 	OU::formatAdd(bad, "%s%s=\"%s\"", nn ? ", " : "", ap->m_name.c_str(), ap->m_value.c_str());
-    return OU::esprintf("No built parameter configuration for worker \"%s\" matches requested "
-			"parameter values: %s", cname(), bad.c_str());
+    return OU::esprintf("No build parameter configuration for worker \"%s\" matches requested "
+			"(non-default) parameter values: %s", cname(),
+			bad.empty() ?
+			"none specified - requesting all default values" : bad.c_str());
   }
+  // So no param configs match, add one that does
   ParamConfig *pc = new ParamConfig(*this);
-  const OM::Assembly::Property *ap = &(*instancePVs)[0];
-  for (unsigned nn = 0; nn < instancePVs->size(); nn++, ap++)
+  const OM::Assembly::Property *ap = &instancePVs[0];
+  for (unsigned nn = 0; nn < instancePVs.size(); nn++, ap++)
     if (ap->m_hasValue) {
       size_t nParam;
       OM::Property *p;
@@ -1171,13 +1165,19 @@ setParamConfig(const OM::Assembly::Properties *instancePVs, size_t paramConfig,
       param.setProperty(p, this);  // possibly overwriting
       if ((err = param.parseValue(*p, ap->m_value.c_str())))
 	return err;
+      if (ap->m_isDefault)
+	// Defaultness overriding the device worker's own default
+	// This is ok since that only happens for platform-specific device workers.
+	param.m_isDefault = true;
     }
   pc->nConfig = m_paramConfigs.size();
-  if ((err = pc->doDefaults(false)))
+  if ((err = pc->doDefaults()))
     return err;
   m_paramConfigs.push_back(pc);
   m_paramConfig = pc;
-  return writeAutoBuildFile(fname.c_str(), m_paramConfigs, staticSize);
+  if (noBuild || (!m_parent && instancePVs.empty()))
+    return NULL;
+  return  writeAutoBuildFile(fname.c_str(), m_paramConfigs, staticSize);
 }
 
 // There is probably a more clever way to do this, but we need decent warnings.

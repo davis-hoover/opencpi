@@ -58,8 +58,10 @@ emit(std::string &assy, bool emulated, bool content) const {
   if (m_instancePVs.size()) {
     const OM::Assembly::Property *ap = &m_instancePVs[0];
     for (size_t n = m_instancePVs.size(); n; n--, ap++)
-      OU::formatAdd(assy, "    <property name='%s' value='%s'/>\n",
-		    ap->m_name.c_str(), ap->m_value.c_str());
+      OU::formatAdd(assy, "    <property name='%s' value='%s'%s/>\n",
+		    ap->m_name.c_str(), ap->m_value.c_str(),
+		    // record whether the value comes from the device declaration to use as default
+		    ap->m_isDefault ? " isDefault='1'" : "");
     if (!content)
       OU::formatAdd(assy, "  </instance>\n");
   }
@@ -259,7 +261,9 @@ parseDeviceProperties(ezxml_t x, OM::Assembly::Properties &iPVs) {
       // for the device, copy it to the instance.
       for (unsigned i = 0; i < m_instancePVs.size(); i++)
 	if (!strcasecmp(p.m_name.c_str(), m_instancePVs[i].m_name.c_str())) {
-	  iPVs[nPVs++] = m_instancePVs[i];
+	  iPVs[nPVs] = m_instancePVs[i];
+	  // The device on the board declares this value, Use as the default on this platform.
+	  iPVs[nPVs++].m_isDefault = true;
 	  break;
 	}
     nextParam:;

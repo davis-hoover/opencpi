@@ -53,12 +53,17 @@
   <device worker="si5338">
     <property name="CLKIN_PRESENT_p" value="1"/>
     <property name="CLKIN_FREQ_p" value="30.72e6"/>
+    <property name="OUTPUTS_PRESENT_p" value="1,0"/>
   </device>
   <device worker="matchstiq_z1_avr"/>
   <device worker="pca9534"/>
   <device worker="pca9535"/>
   <device worker="tmp100"/>
-  <device worker="matchstiq_z1_i2c"/>
+  <device worker="matchstiq_z1_i2c">
+    <property name='NUSERS_p' value='5'/>
+    <property name='SLAVE_ADDRESS_p' value='69,113,72,33,32'/>
+    <property name='CLK_FREQ_p' value='1e+08'/>
+  </device>
   <!-- Clocking signals -->
   <signal input="SI5338_CLK0A"/>
   <signal input="SI5338_CLK0B"/>

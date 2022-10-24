@@ -60,7 +60,7 @@ In general, header files should be camelcase named:
 
 API headers should have a Ocpi prefix, and generally one per namespace:
 
-Ocpi<namespace>Api.h
+Ocpi<namespace>Api.hh
 
 Headers should use forward class declarations rather than including other files
 when the classes are in the same namespace and the implementation of the class is

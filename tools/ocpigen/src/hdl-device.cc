@@ -27,6 +27,8 @@
 
 //DeviceTypes DeviceType::s_types;
 
+// The instancePVs argument is a pointer so that, when NULL, it indicates that
+// no build/param configuration of the device is required
 HdlDevice *HdlDevice::
 create(ezxml_t xml, const char *xfile, const std::string &parentFile, Worker *parent,
        OM::Assembly::Properties *instancePVs, const char *&err) {
@@ -64,7 +66,15 @@ HdlDevice(ezxml_t xml, const char *file, const std::string &parentFile, Worker *
     auto pair = m_countPerSupportedWorkerType.insert(std::make_pair(worker, 0));
     if (!pair.second)
       pair.first->second++;
-    DeviceType *dt = get(worker.c_str(), spx, file, parent, err);
+    // Since the "supports" relationship is not necessarily platform specific, the supported
+    // worker is not associated with any build configuration or instance parameters in this XML.
+    // A future feature could be that: any parameters mentioned in the <supports> XML
+    // could be seen as constraints on the platform-specific build configuration
+    // for the supported worker, both as an error check and as additional parameter settings.
+    // So here we "get" this worker without regard to any build parameters or build configuration
+    // The NULL argument to "get" means we don't care about parameter configurations, and this
+    // supports XML does not affect finding/checking the supported worker.
+    DeviceType *dt = get(worker.c_str(), NULL, file, parent, err);
     if (err) {
       err = OU::esprintf("for supported worker %s: %s", worker.c_str(), err);
       return;
@@ -92,6 +102,10 @@ HdlDevice(ezxml_t xml, const char *file, const std::string &parentFile, Worker *
 // since each device on a board maybe parameterized/configured for that board.
 // So now this method simply creates a new device-type-worker each time it is called.
 // The name argument can be a file name.
+
+// If the XML argument (dtxml) is NULL it means that the worker is requested without regard
+// to build parameters or build/param configurations.
+// (examples are emulates and supports relationships).
 HdlDevice *HdlDevice::
 get(const char *a_name, ezxml_t dtxml, const char *parentFile, Worker *parent, const char *&err) {
   // New device type, which must be a file.
@@ -118,21 +132,24 @@ get(const char *a_name, ezxml_t dtxml, const char *parentFile, Worker *parent, c
       !(err = parseFile(hdlFile.c_str(), parentFile, NULL, &xml, xfile)) ||
       !(err = parseFile(hdlName.c_str(), parentFile, NULL, &xml, xfile))) {
     OM::Assembly::Properties instancePVs;
-    // Here we parse the configuration settings for this device on this board.
-    // These settings are similar to instance property values in an assembly, but are
-    // applied wherever the device is instanced.
-    instancePVs.resize(OE::countChildren(dtxml, "Property"));
-    if (instancePVs.size()) {
-      OM::Assembly::Property *pv = &instancePVs[0];
-      for (ezxml_t px = ezxml_cchild(dtxml, "Property"); px; px = ezxml_cnext(px), pv++) {
-	std::string value;
-	if ((err = OE::checkAttrs(px, "name", "value", "valuefile", NULL)) ||
-	    (err = OE::getRequiredString(px, pv->m_name, "name", "property")) ||
-	    (err = pv->setValue(px)))
-	  return NULL;
+    if (dtxml) {
+          // Here we parse the configuration settings for this device on this board.
+      // These settings are similar to instance property values in an assembly, but are
+      // applied wherever the device is instanced.
+      instancePVs.resize(OE::countChildren(dtxml, "Property"));
+      if (instancePVs.size()) {
+	OM::Assembly::Property *pv = &instancePVs[0];
+	for (ezxml_t px = ezxml_cchild(dtxml, "Property"); px; px = ezxml_cnext(px), pv++) {
+	  std::string value;
+	  if ((err = OE::checkAttrs(px, "name", "value", "valuefile", NULL)) ||
+	      (err = OE::getRequiredString(px, pv->m_name, "name", "property")) ||
+	      (err = pv->setValue(px)))
+	    return NULL;
+	}
       }
     }
-    return HdlDevice::create(xml, xfile.c_str(), parentFile, parent, &instancePVs, err);
+    return HdlDevice::create(xml, xfile.c_str(), parentFile, parent, dtxml ? &instancePVs : NULL,
+			     err);
   }
   return NULL;
 }

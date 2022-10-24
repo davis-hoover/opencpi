@@ -524,7 +524,7 @@ finalizeProperties() {
 #endif
   // Ensure all parameters are in all paramConfigs, since some may have been added.
   for (unsigned n = 0; n < m_paramConfigs.size(); n++)
-    if (m_paramConfigs[n] && (err = m_paramConfigs[n]->doDefaults(false)))
+    if (m_paramConfigs[n] && (err = m_paramConfigs[n]->doDefaults()))
       return err;
   return NULL;
 }
@@ -1112,7 +1112,8 @@ Worker(ezxml_t xml, const char *xfile, const std::string &parentFile,
     m_emulate(NULL), m_emulator(NULL), m_library(NULL), m_outer(false),
     m_debugProp(NULL), m_mkFile(NULL), m_xmlFile(NULL), m_outDir(NULL), m_autoConfigs(false), m_build(*this),
     m_paramConfig(NULL), m_parent(parent), m_scalable(false), m_requiredWorkGroupSize(0),
-    m_maxLevel(0), m_dynamic(false), m_optimized(false), m_isSlave(false), m_isOptional(false),
+    m_maxLevel(0), m_dynamic(false), m_optimized(false),
+    m_isSlave(parent && parent->m_type == Worker::Application), m_isOptional(false),
     m_slavePort(NULL), m_proxyPort(NULL), m_proxyPortIndex(SIZE_MAX)
 {
   if ((err = getNames(xml, xfile, NULL, m_name, m_fileName)))

@@ -1581,7 +1581,7 @@ endef
 # Return CPP sources from list in $1
 OcpiCPPSources=$(strip $(foreach f,$1,$(and $(filter .cpp_%,$(suffix $f)),$f)))
 
-OcpiSpecLinks=mkdir -p $2;$(foreach f,$(wildcard $1/specs/*.xml),$(call MakeSymLink,$f,$2);)
+OcpiSpecLinks=mkdir -p $2;$(foreach f,$(wildcard $1/specs/*.xml $1/*.comp/*-comp.xml),$(call MakeSymLink,$f,$2);)
 
 # Return the list of project dependencies given the project dir
 # Deal with old Project.mk vs newer Project.xml vs. exported project

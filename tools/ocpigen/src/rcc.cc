@@ -990,8 +990,12 @@ emitImplRCC() {
       }
     }
   }
+  bool hasSlaves = false;
+  for (unsigned n = 0; n < m_paramConfigs.size(); ++n)
+    if (m_paramConfigs[n] && m_paramConfigs[n]->m_slaves.size())
+      hasSlaves = true;
   if (m_language == CC) {
-    if (!m_paramConfig->m_slaves.empty() && (err = emitImplSlaveTypes(f)))
+    if (hasSlaves && (err = emitImplSlaveTypes(f)))
       return err;
     std::string myTypes;
     emitCppTypesNamespace(f, myTypes);
@@ -1013,7 +1017,7 @@ emitImplRCC() {
               );
     }
     // Note we assume that if the first paramconfig has slaves, they all do
-    if (m_paramConfig->m_slaves.empty())
+    if (!hasSlaves)
       fprintf(f, "%s()", s.c_str());
     else if ((err = emitImplSlaves(f)))
       return err;
@@ -1386,7 +1390,7 @@ addSlavesConfig(ezxml_t a_slaves) {
 	  break;
 	}
     Worker &wkr = *i->m_worker;
-    wkr.m_isSlave = true;
+    assert(wkr.m_isSlave);
     if ((err = OE::getBoolean(i->m_xml, "optional", &wkr.m_isOptional)))
       return err;
     wkr.m_slavePort = slavePort; // an external connection to this port

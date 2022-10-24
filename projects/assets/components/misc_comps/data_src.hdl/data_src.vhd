@@ -136,7 +136,8 @@ begin
     data <= data_count           when count_e,
             data_walking         when walking_e,
             data_lfsr_ordered    when lfsr_e,
-            std_logic_vector(props_in.fixed_value) when others;
+            std_logic_vector(props_in.fixed_value(props_in.fixed_value'left downto
+                                                  props_in.fixed_value'length - WIDTH)) when others;
 
   ------------------------------------------------------------------------------
   -- LFSR_bit_reverse property

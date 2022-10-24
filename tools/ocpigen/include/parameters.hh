@@ -106,7 +106,7 @@ class ParamConfig : public OCPI::Base::IdentResolver {
   ~ParamConfig();
   const char *addSlavesConfig(ezxml_t slaves);
   const char *parse(ezxml_t cx, const ParamConfigs &configs);
-  const char *doDefaults(bool missingOK);
+  const char *doDefaults();
   void write(FILE *xf, FILE *mf);
   void writeConstants(FILE *gf, Language lang);
   // Is the given configuration the same as this one?
