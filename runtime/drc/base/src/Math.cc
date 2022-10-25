@@ -555,7 +555,14 @@ intersection_of(const Interval<T>& first, const Interval<T>& second) {
     Interval<T> interval(min, max);;
     set_intervals.push_back(interval);
   }
-  return Set<T>(set_intervals);
+  auto ret = Set<T>(set_intervals);
+  if(first.get_is_empty()) {
+    ret.set_is_empty(true);
+  }
+  if(second.get_is_empty()) {
+    ret.set_is_empty(true);
+  }
+  return ret;
 }
 
 /// @brief https://en.wikipedia.org/wiki/Intersection_(set_theory)
@@ -1164,10 +1171,13 @@ CSPSolver::propagate_constr_rhs_var(
   //bool dilation = false;
   bool cond_possible = false;
   // forward constraint (constrain the lhs var by the rhs var)
-  if(not rhs.get_is_empty()) {
-    if(rhs.m_type_is_double) {
-      double min, max;
-      auto& set = rhs.m_double_set; // rhs set
+  if(rhs.m_type_is_double) {
+    double min, max;
+    auto& set = rhs.m_double_set; // rhs set
+    if(set.get_is_empty()) {
+      ivar.second.m_double_set.set_is_empty(true);
+    }
+    else {
       if(std::string(constr.m_type) == ">=") {
         min = set.get_min();
         max = std::numeric_limits<double>::max();
@@ -1204,9 +1214,14 @@ CSPSolver::propagate_constr_rhs_var(
       //std::cout << "forward constraint: intersecting " << ivar.first << " with " << iv << "\n";
       lhs_set = intersection_of(lhs_set, iv);
     }
+  }
+  else {
+    int32_t min, max;
+    auto& set = rhs.m_int32_set; // rhs set
+    if(set.get_is_empty()) {
+      ivar.second.m_int32_set.set_is_empty(true);
+    }
     else {
-      int32_t min, max;
-      auto& set = rhs.m_int32_set; // rhs set
       if(std::string(constr.m_type) == ">=") {
         min = set.get_min();
         max = std::numeric_limits<int32_t>::max();
@@ -1243,10 +1258,13 @@ CSPSolver::propagate_constr_rhs_var(
     }
   }
   // reverse constraint (constrain the rhs var by the lhs var)
-  if(not ivar.second.get_is_empty()) {
-    if(ivar.second.m_type_is_double) {
-      double min, max;
-      auto& set = ivar.second.m_double_set; // lhs set
+  if(ivar.second.m_type_is_double) {
+    double min, max;
+    auto& set = ivar.second.m_double_set; // lhs set
+    if(set.get_is_empty()) {
+      rhs.m_double_set.set_is_empty(true);
+    }
+    else {
       if(std::string(constr.m_type) == ">=") {
         min = set.get_min();
         max = std::numeric_limits<double>::max();
@@ -1283,9 +1301,14 @@ CSPSolver::propagate_constr_rhs_var(
       //std::cout << "reverse constraint: intersecting " << constr.m_rhs << " with " << iv << "\n";
       rhs_set = intersection_of(rhs_set, iv);
     }
+  }
+  else {
+    int32_t min, max;
+    auto& set = ivar.second.m_int32_set; // lhs set
+    if(set.get_is_empty()) {
+      rhs.m_int32_set.set_is_empty(true);
+    }
     else {
-      int32_t min, max;
-      auto& set = ivar.second.m_int32_set; // lhs set
       if(std::string(constr.m_type) == ">=") {
         min = set.get_min();
         max = std::numeric_limits<int32_t>::max();
@@ -1382,9 +1405,9 @@ void
 CSPSolver::propagate_constraints() {
   // step 1: for all variables, initialize feasibility region to full set
   //         for the respective variable type
-  auto itvs = m_feasible_region_limits.m_vars.begin(); 
-  for(; itvs != m_feasible_region_limits.m_vars.end(); ++itvs) {
-    m_feasible_region_limits.set_var_limits_to_type_limits(*itvs);
+  auto _itvs = m_feasible_region_limits.m_vars.begin();
+  for(; _itvs != m_feasible_region_limits.m_vars.end(); ++_itvs) {
+    m_feasible_region_limits.set_var_limits_to_type_limits(*_itvs);
   }
   std::vector<CSPSolver::CondConstr> vars_constr_cond = find_cond_constrs();
   // propagation_loop:
@@ -1498,7 +1521,7 @@ operator<<(std::ostream& os, const CSPSolver& rhs) {
         os << ",";
       }
       first_var = false;
-      os << it->m_rhs << it->m_type;
+      os << it->m_lhs << it->m_type;
       if(it->m_rhs_is_int32_const) {
         os << it->m_rhs_int32_const;
       }
