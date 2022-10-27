@@ -63,5 +63,6 @@ Criteria for content to exist in this OpenCPI project is as follows:
    specs/specs
    hdl/platforms/zed/doc/zed-gsg
    hdl/platforms/picoevb/doc/picoevb-gsg
+   hdl/platforms/zed_ether/zed_ether-gsg
 ..    components/components
 ..    hdl/primitives/primitives
