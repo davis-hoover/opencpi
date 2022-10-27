@@ -352,7 +352,7 @@ protected:
     OU::format(cmd,
 	       "D=\"%s\" && exec %s %s %s "
 	       "\"sw2sim=${D}%s\" \"sim2sw=${D}%s\" \"ctl=${D}%s\" \"ack=${D}%s\" \"cwd=%s\"",
-	       dir.c_str(), m_script.c_str(), OS::logGetLevel() >= 8 ? "-v" : "", m_file.c_str(),
+	       dir.c_str(), m_script.c_str(), OS::Log::getLevel() >= 8 ? "-v" : "", m_file.c_str(),
 	       m_req.m_name.c_str(), m_resp.m_name.c_str(), m_ctl.m_name.c_str(),
 	       m_ack.m_name.c_str(), cwd.c_str());
     if (m_dump)
@@ -1215,7 +1215,7 @@ search(const OB::PValue *params, const char **excludes, bool discoveryOnly, std:
 
       std::string cmd;
       OU::format(cmd, "bash %s/runSimExec.%s %s probe", sims[n].c_str(), name,
-		 OS::logGetLevel() >= 8 ? "-v" : "");
+		 OS::Log::getLevel() >= 8 ? "-v" : "");
       ocpiInfo("Checking whether the %s simulator is available and licensed", name);
       //  FIXME: make this more of a utility
       int rc = system(cmd.c_str());

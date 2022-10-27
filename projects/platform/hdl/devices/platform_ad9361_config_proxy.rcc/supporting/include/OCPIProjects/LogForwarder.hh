@@ -116,9 +116,9 @@ public    : void clear_forwarding_callback_log_error();
  *         custom logging API.
  *         Example use with the OpenCPI logging API:
  *         LogForwarder<void (*)(unsigned, const char*, va_list)> forwarder;
- *         forwarder.set_forwarding_callback_log_info(OCPI::OS::logPrintV);
+ *         forwarder.set_forwarding_callback_log_info(OCPI::OS::Log::printV);
  *         forwarder.set_arg0_log_info(OCPI_LOG_INFO);
- *         forwarder.set_forwarding_callback_log_debug(OCPI::OS::logPrintV);
+ *         forwarder.set_forwarding_callback_log_debug(OCPI::OS::Log::printV);
  *         forwarder.set_arg0_log_debug(OCPI_LOG_DEBUG);
  *         forwarder.log_info("************** TEST LOG TEST LOG %i\n", 5);
  *         forwarder.log_debug("************** TEST LOG TEST LOG %i\n", 55);

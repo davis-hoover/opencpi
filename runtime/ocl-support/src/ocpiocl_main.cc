@@ -63,7 +63,7 @@ namespace OD = OCPI::Base::Plugin;
 const char *defaultLib = OCPI_CPP_STRINGIFY(OCPI_OPENCL_LIB);
 
 static int mymain(const char **ap) {
-  OCPI::OS::logSetLevel(options.loglevel());
+  OCPI::OS::Log::setLevel(options.loglevel());
   OCPI::Base::Plugin::ManagerManager::suppressDiscovery();
   const char *env = getenv("OCPI_OPENCL_LIB");
   const char *lib = env && env[0] ? env : defaultLib;

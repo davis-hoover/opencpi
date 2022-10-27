@@ -181,7 +181,7 @@ rccLog(unsigned level, const char *fmt, ...) {
 }
 static bool
 rccWillLog(unsigned level) {
-  return OS::logWillLog(level); // maybe worker-specific someday
+  return OS::Log::willLog(level); // maybe worker-specific someday
 }
 
 static void
@@ -1137,12 +1137,12 @@ OCPI_CONTROL_OPS
    RCCResult RCCUserWorker::beforeQuery() { return RCC_OK;}
    RCCResult RCCUserWorker::afterConfigure() { return RCC_OK;}
    uint8_t *RCCUserWorker::rawProperties(size_t &size) const { size = 0; return NULL; }
-   bool RCCUserWorker::willLog(unsigned level) const { return OS::logWillLog(level); }
+   bool RCCUserWorker::willLog(unsigned level) const { return OS::Log::willLog(level); }
    void Worker::log(unsigned level, const char *fmt, va_list ap) {
-     if (OS::logWillLog(level)) {
+     if (OS::Log::willLog(level)) {
        std::string myfmt;
        OU::format(myfmt,"%s: %s", name().c_str(), fmt);
-       OS::logPrintV(level, myfmt.c_str(), ap);
+       OS::Log::printV(level, myfmt.c_str(), ap);
      }
    }
   void RCCUserWorker::log(unsigned level, const char *fmt, ...) {
@@ -1460,7 +1460,7 @@ RCCResult RCCUserWorker::run(bool /*timeout*/) {
   }
   void RCCUserSlave::
   debugLog(const char *fmt, ...) {
-    if (OS::logWillLog(OCPI_LOG_DEBUG)) {
+    if (OS::Log::willLog(OCPI_LOG_DEBUG)) {
        va_list ap;
        va_start(ap, fmt);
        ((Worker *)pthread_getspecific(Driver::s_threadKey))->log(OCPI_LOG_DEBUG, fmt, ap);

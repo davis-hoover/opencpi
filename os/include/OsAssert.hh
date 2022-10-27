@@ -118,6 +118,7 @@ inline void ocpiAbort(const char *err) { ::OCPI::OS::assertionFailed(err, __FILE
 #define ocpiWeird(...) ocpiLog(OCPI_LOG_WEIRD, __VA_ARGS__)
 #define ocpiInfo(...) ocpiLog(OCPI_LOG_INFO, __VA_ARGS__)
 #define ocpiBad(...) ocpiLog(OCPI_LOG_BAD, __VA_ARGS__)
+
 #if defined(NDEBUG)
 #define ocpiAssert(cond) ((void)0)
 #define ocpiCheck(cond) ((void)(cond))
@@ -125,15 +126,15 @@ inline void ocpiAbort(const char *err) { ::OCPI::OS::assertionFailed(err, __FILE
 #define ocpiDebug1(fmt, ...) ((void)0)
 #define ocpiDebug2(fmt, ...) ((void)0)
 #define ocpiDebug3(fmt, ...) ((void)0)
-#define ocpiLog(n, ...) ((n) > OCPI_LOG_DEBUG_MIN ? 0 : (::OCPI::OS::logPrint(n, __VA_ARGS__),0))
+#define ocpiLog(n, ...) ((n) > OCPI_LOG_DEBUG_MIN ? 0 : (OS::Log::print(n, __VA_ARGS__),0))
 #else
 #define ocpiAssert(cond) ((::OCPI::OS::testAssertion ((cond) ? true : false)) || ::OCPI::OS::assertionFailed (#cond, __FILE__, __LINE__))
 #define ocpiCheck(cond) ocpiAssert(cond)
-#define ocpiDebug(...) ::OCPI::OS::logPrint(OCPI_LOG_DEBUG_MIN, __VA_ARGS__)
-#define ocpiDebug1(fmt, ...) ::OCPI::OS::logPrint(OCPI_LOG_DEBUG_MIN+1, (fmt), __VA_ARGS__)
-#define ocpiDebug2(fmt, ...) ::OCPI::OS::logPrint(OCPI_LOG_DEBUG_MIN+2, (fmt), __VA_ARGS__)
-#define ocpiDebug3(fmt, ...) ::OCPI::OS::logPrint(OCPI_LOG_DEBUG_MIN+3, (fmt), __VA_ARGS__)
-#define ocpiLog(n, ...) ::OCPI::OS::logPrint(n, __VA_ARGS__)
+#define ocpiDebug(...) ::OCPI::OS::Log::print(OCPI_LOG_DEBUG_MIN, __VA_ARGS__)
+#define ocpiDebug1(fmt, ...) ::OCPI::OS::Log::print(OCPI_LOG_DEBUG_MIN+1, (fmt), __VA_ARGS__)
+#define ocpiDebug2(fmt, ...) ::OCPI::OS::Log::print(OCPI_LOG_DEBUG_MIN+2, (fmt), __VA_ARGS__)
+#define ocpiDebug3(fmt, ...) ::OCPI::OS::Log::print(OCPI_LOG_DEBUG_MIN+3, (fmt), __VA_ARGS__)
+#define ocpiLog(n, ...) ::OCPI::OS::Log::print(n, __VA_ARGS__)
 #endif
 
 #endif

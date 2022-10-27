@@ -224,7 +224,7 @@ namespace OCPI {
       }
       OE::unindent(m_description);
       // ocpiLog(10, "Description of property %s: \"%s\"", cname(), m_description.c_str());
-      if (OS::logWillLog(10))
+      if (OS::Log::willLog(10))
 	for (OU::TokenIter ti(m_description, "\n"); ti.token(); ti.next())
 	  ocpiLog(10, "|%s|", ti.token());
       OE::getOptionalString(xm, m_format, "Format");

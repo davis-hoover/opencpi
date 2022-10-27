@@ -51,7 +51,7 @@ extern "C" {
 #include "ad9361_api.h"
 #include "ad9361_platform.h" // ours
 }
-#include "OcpiDebugApi.hh" // OCPI::OS::logPrint(), OCPI_LOG_DEBUG
+#include "OcpiDebugApi.hh" // OCPI::OS::Log::print(), OCPI_LOG_DEBUG
 
 // get the thread key for different callers to share this library
 // if ad9361_get_opencpi_key() has been called, use that callback
@@ -91,7 +91,7 @@ void ocpiDebug(const char* format, ...)
   char buffer[256]; // size arbitarily chosen
   vsprintf(buffer, format, args);
   va_end(args);
-  OCPI::OS::logPrint(OCPI_LOG_DEBUG, "%s%s", str.c_str(), buffer);
+  OCPI::OS::Log::print(OCPI_LOG_DEBUG, "%s%s", str.c_str(), buffer);
 };
 
 void do_slave_get_raw_property_byte(uint8_t id_no, uint16_t AD9361_register_addr, uint8_t* buf) {

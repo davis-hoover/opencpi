@@ -47,7 +47,7 @@
 
 namespace OCPI {
   namespace OS {
-
+     
     /**
      * Writes a stack trace of the current thread (similar to the "bt"
      * command in gdb) to the stream. The operation returns, and the
@@ -91,11 +91,15 @@ namespace OCPI {
 
     void debugBreak ();
 
-    void logSetLevel(unsigned n);
-    unsigned logGetLevel();
-    bool logWillLog(unsigned n);
-    void logPrint(unsigned n, const char *fmt, ...)__attribute__((format(printf, 2, 3)));
-    void logPrintV(unsigned n, const char *fmt, va_list ap);
+    namespace Log {
+    
+      void setLevel(unsigned n);
+      unsigned getLevel();
+      bool willLog(unsigned n);
+      void print(unsigned n, const char *fmt, ...)__attribute__((format(printf, 2, 3)));
+      void printV(unsigned n, const char *fmt, va_list ap);
+   
+    }
   }
 }
 

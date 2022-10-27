@@ -94,7 +94,7 @@ namespace OCPI {
       startRequest(int sendFd, uint8_t *data, size_t &length, std::string &error) {
 	ocpiDebug("Start request %p is:    op %u count %zu xid %u node %u lead %u trail %u",
 		  this, get_op(), get_count(), get_xid(), get_node(), get_lead(), get_trail());
-        if (OS::logGetLevel() >= OCPI_LOG_DEBUG) {
+        if (OS::Log::getLevel() >= OCPI_LOG_DEBUG) {
 	  fprintf(stderr, "Sending header: ");
 	  for (unsigned n = 0; n < header_ndws; n++)
 	    fprintf(stderr, " 0x%08x", ((uint32_t*)m_header)[n]);
@@ -117,7 +117,7 @@ namespace OCPI {
 	      return true;
 	    length += get_trail();
 	  }
-	  if (OS::logGetLevel() >= OCPI_LOG_DEBUG) {
+	  if (OS::Log::getLevel() >= OCPI_LOG_DEBUG) {
 	    fprintf(stderr, "Sending %p Write Data: ", this);
 	    for (unsigned n = 0; n < m_actualByteLength; n++)
 	      fprintf(stderr, " %02x", data[n]);
@@ -132,7 +132,7 @@ namespace OCPI {
 	set_op(ResponseOp);
 	ocpiDebug("Start response %p is:    op %u count %zu xid %u node %u lead %u trail %u",
 		  this, get_op(), get_count(), get_xid(), get_node(), get_lead(), get_trail());
-        if (OS::logGetLevel() >= OCPI_LOG_DEBUG) {
+        if (OS::Log::getLevel() >= OCPI_LOG_DEBUG) {
 	  fprintf(stderr, "Sending response header: ");
 	  for (unsigned n = 0; n < header_ndws; n++)
 	    fprintf(stderr, " 0x%08x", ((uint32_t*)m_header)[n]);
@@ -154,7 +154,7 @@ namespace OCPI {
 	    return true;
 	  length += get_trail();
 	}
-	if (OS::logGetLevel() >= OCPI_LOG_DEBUG) {
+	if (OS::Log::getLevel() >= OCPI_LOG_DEBUG) {
 	  fprintf(stderr, "Sending %p response Data: ", this);
 	  for (unsigned n = 0; n < m_actualByteLength; n++)
 	    fprintf(stderr, " %02x", data[n]);
@@ -204,7 +204,7 @@ namespace OCPI {
 	  return OU::eformat(error, "Bad SDP response padding to read request: %s", err.c_str());
 	if (read(recvFd, data, m_actualByteLength, err))
 	  return OU::eformat(error, "Bad SDP response data to read request: %s", err.c_str());
-	if (OS::logGetLevel() >= OCPI_LOG_DEBUG) {
+	if (OS::Log::getLevel() >= OCPI_LOG_DEBUG) {
 	  fprintf(stderr, "Received Data (%zu): ", m_actualByteLength);
 	  for (unsigned n = 0; n < m_actualByteLength; n++)
 	    fprintf(stderr, " %02x", data[n]);

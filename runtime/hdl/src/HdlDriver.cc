@@ -232,7 +232,7 @@ namespace OCPI {
       if (m_gpsdp->m_configured)
         return true;
       gps_context_init(&m_gpsdp->m_context, "opencpi-gpsd");
-      if (OS::logWillLog(OCPI_LOG_INFO))
+      if (OS::Log::willLog(OCPI_LOG_INFO))
         m_gpsdp->m_context.errout.debug = LOG_IO;
       else
         m_gpsdp->m_context.errout.debug = LOG_ERROR;

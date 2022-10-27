@@ -87,10 +87,10 @@ static int mymain(const char ** /*ap*/) {
 
   // Set verbosity level if user requested via CLI
   if (options.verbose()) {
-    OS::logSetLevel(OCPI_LOG_INFO);
+    OS::Log::setLevel(OCPI_LOG_INFO);
   }
   if (options.debug()) {
-    OS::logSetLevel(OCPI_LOG_DEBUG);
+    OS::Log::setLevel(OCPI_LOG_DEBUG);
   }
 
   // If OCPI_LIBRARY_PATH is not set, use project-registry

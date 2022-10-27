@@ -113,7 +113,7 @@ main(int argc, const char **argv) {
   if (options.setArgv(argv))
     return 1;
   if (options.log_level())
-    OCPI::OS::logSetLevel(options.log_level());
+    OCPI::OS::Log::setLevel(options.log_level());
   const char *outDir = NULL, *wksFile = NULL, *package = NULL;
   bool
     doDefs = false, doEnts = false, doImpl = false, doSkel = false, doAssy = false, doWrap = false,

@@ -30,17 +30,17 @@ namespace OCPI {
 LogPrefix::
 LogPrefix(const char *prefix)
   : m_prefix(prefix ? prefix : ""),
-    m_debug(OS::logWillLog(OCPI_LOG_DEBUG)),
-    m_info(OS::logWillLog(OCPI_LOG_INFO)),
-    m_warn(OS::logWillLog(OCPI_LOG_INFO)),
-    m_error(OS::logWillLog(OCPI_LOG_BAD))
+    m_debug(OS::Log::willLog(OCPI_LOG_DEBUG)),
+    m_info(OS::Log::willLog(OCPI_LOG_INFO)),
+    m_warn(OS::Log::willLog(OCPI_LOG_INFO)),
+    m_error(OS::Log::willLog(OCPI_LOG_BAD))
     {}
 LogPrefix::
 LogPrefix(const std::string &prefix) : m_prefix(prefix) {}
 
 void LogPrefix::
 log_prefix(unsigned level, const char *msg, va_list ap) const {
-  OCPI::OS::logPrintV(level, msg, ap);
+  OCPI::OS::Log::printV(level, msg, ap);
 }
 void LogPrefix::
 log_info(const char* msg, ...) const {

@@ -50,9 +50,9 @@ const char *defaultLib =
 static int
 mymain(const char **/*ap*/) {
   if (options.loglevel())
-    OS::logSetLevel(options.loglevel());
-  if (options.verbose() && !OCPI::OS::logWillLog(8))
-    OS::logSetLevel(8);
+    OS::Log::setLevel(options.loglevel());
+  if (options.verbose() && !OS::Log::willLog(8))
+    OS::Log::setLevel(8);
   OCPI::Base::Plugin::ManagerManager::suppressDiscovery();
   const char *env = getenv("OCPI_HAVE_OPENCL");
   if (!env || env[0] != '1') {
@@ -65,39 +65,39 @@ mymain(const char **/*ap*/) {
 
   try {
     OS::LoadableModule lm(lib, true);
-    if (options.verbose() || OCPI::OS::logWillLog(8))
+    if (options.verbose() || OS::Log::willLog(8))
       ocpiLog(8, "Successfully loaded OpenCL library: \"%s\" with OCPI_OPENCL_LIB=%s",
 	      lib, env && env[0] ? env : "<none>");
     void *p;
     try {
       p = lm.getSymbol ("clGetPlatformIDs");
     } catch (const std::string &s) {
-      if (options.verbose() || OCPI::OS::logWillLog(8))
+      if (options.verbose() || OS::Log::willLog(8))
 	ocpiLog(8, "Failed to find symbol in OpenCL library: %s", s.c_str());
       return 1;
     } catch (...) {
-      if (options.verbose() || OCPI::OS::logWillLog(8))
+      if (options.verbose() || OS::Log::willLog(8))
 	ocpiLog(8, "Failed to find symbol in OpenCL library \"%s\": unknown exception", lib);
       return 1;
     }
     cl_uint np;
     cl_int rc = (*(decltype(clGetPlatformIDs) *)p)(0, 0, &np);
     if (rc || np == 0) {
-      if (options.verbose() || OCPI::OS::logWillLog(8)) {
+      if (options.verbose() || OS::Log::willLog(8)) {
 	if (rc && rc != CL_PLATFORM_NOT_FOUND_KHR)
 	  ocpiLog(8, "OpenCL clGetPlatformIDs query returned error: %d", rc);
 	else
 	  ocpiLog(8, "OpenCL clGetPlatformIDs query returned no available platforms");
       }
       return 1;
-    } else if (options.verbose() || OCPI::OS::logWillLog(8))
+    } else if (options.verbose() || OS::Log::willLog(8))
       ocpiLog(8, "Found %zu OpenCL platform%s", (size_t)np, np == 1 ? "" : "s");
   } catch (const std::string &s) {
-    if (options.verbose() || OCPI::OS::logWillLog(8))
+    if (options.verbose() || OS::Log::willLog(8))
       ocpiLog(8, "Failed to load OpenCL library: %s", s.c_str());
     return 1;
   } catch (...) {
-    if (options.verbose() || OCPI::OS::logWillLog(8))
+    if (options.verbose() || OS::Log::willLog(8))
       options.bad("Missing/invalid OpenCL support library, tried  \"%s\"; unknown exception",
 		  lib);
     return 1;

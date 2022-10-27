@@ -299,7 +299,7 @@ static int mymain(const char **ap) {
   }
   signal(SIGPIPE, SIG_IGN);
   if (options.log_level())
-    OCPI::OS::logSetLevel(options.log_level());
+    OCPI::OS::Log::setLevel(options.log_level());
   if (!*ap && !options.list() && !options.artifacts())
     return options.usage();
   if (options.verbose())

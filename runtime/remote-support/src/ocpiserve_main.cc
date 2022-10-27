@@ -152,7 +152,7 @@ static int mymain(const char **) {
   // Cause the normal library discovery process to only use the one directory
   // that will also act as a cache.
   // The directory is not created until it is needed.
-  OCPI::OS::logSetLevel(options.loglevel());
+  OCPI::OS::Log::setLevel(options.loglevel());
   setenv("OCPI_LIBRARY_PATH", options.directory(), 1);
   // Catch signals in order to delete the artifact cache
   // Catch SIGINT all the time to make valgrind happe

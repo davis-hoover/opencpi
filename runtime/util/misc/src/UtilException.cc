@@ -65,7 +65,7 @@ namespace OCPI {
       va_start(ap, err);
       setFormatV(err, ap);
       va_end(ap);
-      OS::logPrint(level, "Error Exception: %s", this->c_str());
+      OS::Log::print(level, "Error Exception: %s", this->c_str());
     }
 
     void Error::setConcatenateV(const char *err, va_list ap) {

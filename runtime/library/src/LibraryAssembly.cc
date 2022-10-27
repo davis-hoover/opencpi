@@ -313,7 +313,7 @@ namespace OCPI {
 
     static bool reject(const Assembly::Instance &/*inst*/, const Implementation &impl,
 		       const char *fmt, ...) {
-      if (OS::logWillLog(OCPI_LOG_INFO)) {
+      if (OS::Log::willLog(OCPI_LOG_INFO)) {
 	std::string reason;
 	va_list ap;
 	va_start(ap, fmt);

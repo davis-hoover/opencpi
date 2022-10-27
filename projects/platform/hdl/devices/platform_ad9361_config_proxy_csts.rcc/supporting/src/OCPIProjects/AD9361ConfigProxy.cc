@@ -19,7 +19,7 @@
  */
 
 #include <cmath> // pow()
-#include "OcpiDebugApi.hh" // OCPI_LOG_..., OCPI::OS::logPrintV()
+#include "OcpiDebugApi.hh" // OCPI_LOG_..., OCPI::OS::Log::printV()
 #include "AD9361ConfigProxy.hh" // AD9361ConfigProxy class, AD9361 class
 
 extern "C" {
@@ -287,13 +287,13 @@ bool AD9361ConfigProxy<ad9361_config_slave_t>::get_rx_ch_is_enabled(uint8_t rx_c
 template<class ad9361_config_slave_t>
 void AD9361ConfigProxy<ad9361_config_slave_t>::register_OpenCPI_logging_API() {
   // register OpenCPI logging API with the configurator
-  set_forwarding_callback_log_info(OCPI::OS::logPrintV);
+  set_forwarding_callback_log_info(OCPI::OS::Log::printV);
   set_arg0_log_info(OCPI_LOG_INFO);
-  set_forwarding_callback_log_debug(OCPI::OS::logPrintV);
+  set_forwarding_callback_log_debug(OCPI::OS::Log::printV);
   set_arg0_log_debug(OCPI_LOG_DEBUG);
-  set_forwarding_callback_log_warn(OCPI::OS::logPrintV);
+  set_forwarding_callback_log_warn(OCPI::OS::Log::printV);
   set_arg0_log_warn(OCPI_LOG_INFO); // not sure if warn->info is best...
-  set_forwarding_callback_log_error(OCPI::OS::logPrintV);
+  set_forwarding_callback_log_error(OCPI::OS::Log::printV);
   set_arg0_log_error(OCPI_LOG_BAD);
 }
 

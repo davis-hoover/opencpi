@@ -2136,7 +2136,7 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
     return err;
   // ================= 9. Report what we found globally (not specific to any case)
   // So now we can generate cases based on existing configs and globals.
-  if (OS::logGetLevel() >= OCPI_LOG_INFO) {
+  if (OS::Log::getLevel() >= OCPI_LOG_INFO) {
     fprintf(stderr,
             "Spec is %s, in file %s, %zu workers, %zu configs\n"
             "Configurations are:\n",
