@@ -58,7 +58,8 @@ protected:
     log(8, "STOPPING DRC PROXY CONFIGURATION: %u", config);
     switch (m_properties.status.data[config].state) {
       case STATUS_STATE_INACTIVE:
-        return RCC_OK;
+        log(2, "Error: DRC proxy stopped a configuration in inactive mode.");
+        return RCC_ERROR;
       case STATUS_STATE_PREPARED:
 	return RCC_OK;
       case STATUS_STATE_OPERATING:
@@ -120,8 +121,8 @@ protected:
 		      config, OCPI_DRC_MAX_CONFIGURATIONS - 1);
     init_status(config);
     RCCResult rc = prepare_config(config);
-    if (rc == RCC_OK)
-      m_properties.status.data[config].state = STATUS_STATE_PREPARED;
+     m_properties.status.data[m_properties.stop].state =
+      rc == RCC_OK ? STATUS_STATE_PREPARED : STATUS_STATE_ERROR;
     return rc;
   }
   // notification that start property has been written, indicating which config to start.
