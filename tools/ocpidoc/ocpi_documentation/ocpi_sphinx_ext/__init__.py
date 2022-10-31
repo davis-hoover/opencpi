@@ -24,6 +24,7 @@
 from .ocpi_documentation_dependencies import OcpiDocumentationDependencies
 from .ocpi_documentation_implementations import \
     OcpiDocumentationImplementations
+from .ocpi_documentation_include import OcpiDocumentationInclude
 from .ocpi_documentation_ports import OcpiDocumentationPorts
 from .ocpi_documentation_properties import OcpiDocumentationProperties
 from .ocpi_documentation_test_detail import OcpiDocumentationTestDetail
@@ -41,6 +42,9 @@ def setup(app):
 
     Args:
         app: The Sphinx instance to add the directives to.
+
+    Returns:
+        None
     """
     app.add_directive("ocpi_documentation_dependencies",
                       OcpiDocumentationDependencies)
@@ -56,5 +60,6 @@ def setup(app):
     app.add_directive("ocpi_documentation_utilization",
                       OcpiDocumentationUtilization)
     app.add_directive("ocpi_documentation_worker", OcpiDocumentationWorker)
+    app.add_directive("ocpi_documentation_include", OcpiDocumentationInclude)
     app.add_directive("ocpi_documentation_test_platforms", 
                       OcpiDocumentationTestPlatforms)
