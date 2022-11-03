@@ -213,6 +213,7 @@ namespace OCPI {
       extern const char
 	*ezxml_parse_file(const char *file, ezxml_t &xml),
 	*ezxml_parse_str(char *string, size_t len, ezxml_t &xml),
+  *ezxml_parse_fd(int fd, ezxml_t &xml),
 	*ezxml_tag(ezxml_t xml),
 	*checkTag(ezxml_t xml, const char *tag, const char *fmt, ...)
 	__attribute__((format(printf, 3, 4))),

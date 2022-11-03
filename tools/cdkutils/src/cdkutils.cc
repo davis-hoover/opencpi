@@ -31,8 +31,10 @@
 
 #include "UtilMisc.hh"
 #include "cdkutils.hh"
-
+#include "UtilEzxml.hh"
 namespace OU = OCPI::Util;
+namespace OE = OCPI::Util::EzXml;
+
 static std::vector<std::string> includes; // our included files
 typedef std::vector<std::string>::const_iterator IncludesIter;
 // For anybody who used the old "includes" (only ocpidds that I am aware of)
@@ -138,7 +140,10 @@ parseFile(const char *file, const std::string &parent, const char *element, ezxm
 	break;
       }
     }
-    ezxml_t x = ezxml_parse_fd(fd);
+
+    ezxml_t x;
+    err = OE::ezxml_parse_fd(fd, x);
+    
     if (x && ezxml_error(x)[0]) {
       err = OU::esprintf("XML Parsing error in file \"%s\": %s", cp, ezxml_error(x));
       break;

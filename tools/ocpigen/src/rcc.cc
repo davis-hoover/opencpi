@@ -1356,10 +1356,11 @@ emitSkelRCC() {
 
 const char *ParamConfig::
 addSlavesConfig(ezxml_t a_slaves) {
-  m_slavesString = ezxml_toxml(a_slaves);
-  m_slavesXml = ezxml_parse_str(m_slavesString, strlen(m_slavesString));
-  assert(m_slavesXml);
   const char *err;
+  m_slavesString = ezxml_toxml(a_slaves);
+  if ((err = OE::ezxml_parse_str(m_slavesString, strlen(m_slavesString), m_slavesXml)))
+    return err;
+  assert(m_slavesXml);
   ocpiInfo("For config %zu, slave before conditional is:"
 	   "\n===Original:\n%s\n===Copy:\n%s",
 	   nConfig, ezxml_toxml(a_slaves), ezxml_toxml(m_slavesXml));
@@ -1413,6 +1414,7 @@ addSlavesConfig(ezxml_t a_slaves) {
  */
 const char* Worker::
 parseSlaves() {
+
   const char *err;
   std::string l_slave;
   bool attr = OE::getOptionalString(m_xml, l_slave, "slave");
@@ -1464,16 +1466,18 @@ parseSlaves() {
 	    OU::formatAdd(xml, " optional='true'");
 	  xml += "/>";
 	}
-	xml += "</slaves>";
       }
-      l_slaves = ezxml_parse_str(strdup(xml.c_str()), xml.size()); // leak
+      xml += "</slaves>";
+      if ((err = OE::ezxml_parse_str(strdup(xml.c_str()), xml.size(), l_slaves)))
+        return err;
       assert(l_slaves);
-    }
+  }
     if ((err = m_paramConfigs[n]->addSlavesConfig(l_slaves)))
       return OU::esprintf("slave processing error: %s", err);
   }
   return NULL;
 }
+
 
 /*
  * What implementation-specific attributes does an RCC worker have?
@@ -1533,7 +1537,9 @@ parseRccImpl(const char *a_package) {
         return err;
       // The original XML has been patched to become the input side XML.
       // Now we need to clone it (NOT share it) to become the output side XML
-      ezxml_t ox = ezxml_parse_str(copy, strlen(copy));
+      ezxml_t ox;
+      if ((err = OE::ezxml_parse_str(copy, strlen(copy), ox)))
+        return err;        
       ezxml_set_attr(ox, "producer", "1");
       ezxml_set_attr(ox, "implname", output);
       if (!dist && outDist)
