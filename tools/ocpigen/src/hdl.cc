@@ -244,7 +244,9 @@ parseHdlImpl(const char *a_package) {
 	bool master = false;
 	ocpiCheck(!OE::getBoolean(p.m_xml, "master", &master));
 	char *copy = ezxml_toxml(p.m_xml);
-	ezxml_t nx = ezxml_parse_str(copy, strlen(copy));
+	ezxml_t nx; 
+  if ((err = OE::ezxml_parse_str(copy, strlen(copy), nx)))
+    return err;
 	ezxml_set_attr_d(nx, "master", master ? "0" : "1");
 	if (!ezxml_cattr(nx, "name"))
 	  ezxml_set_attr_d(nx, "name", p.pname());

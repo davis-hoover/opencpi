@@ -645,14 +645,14 @@ namespace OCPI {
 	return NULL;
       }
       // Note that this sets the output string to empty if it is not found
-      bool
-      getOptionalString(ezxml_t x, std::string &s, const char *attr, const char *def) {
-	const char *cp = ezxml_cattr(x, attr);
-	s = cp ? cp : def;
-	return cp != NULL;
-      }
-      bool
-      inList(const char *item, const char *list) {
+    bool getOptionalString(ezxml_t x, std::string &s, const char *attr, const char *def) {
+		
+		const char *cp = ezxml_cattr(x, attr);
+		s = cp ? cp : def;
+		return cp != NULL;
+    }
+    
+	bool inList(const char *item, const char *list) {
 	if (list) {
 	  char
 	    *mylist = strdup(list),
@@ -736,31 +736,64 @@ namespace OCPI {
 	  return NULL;
 	va_start(ap, fmt);
 	return evsprintf(fmt, ap);
-      }
-      const char *
-      ezxml_parse_file(const char *file, ezxml_t &xml) {
-	if (!(xml = ::ezxml_parse_file(file)))
-	  return OU::esprintf("could not parse xml file: '%s'", file);
-	else if (ezxml_error(xml)[0])
-	  return OU::esprintf("error parsing xml file '%s': %s", file, ezxml_error(xml));
-	return NULL;
-      }
-      const char *
-      ezxml_parse_str(char *string, size_t len, ezxml_t &xml) {
-	if (!len)
-	  len = strlen(string);
-	if (!(xml = ::ezxml_parse_str(string, len)))
-	  return "Could not parse xml string";
-	else if (ezxml_error(xml)[0]) {
-	  const char *err = OU::esprintf("error parsing xml string': %s", ezxml_error(xml));
-	  ::ezxml_free(xml);
-	  xml = NULL;
-	  return err;
+    }
+
+    const char * ezxml_parse_file(const char *file, ezxml_t &xml) {
+		if (!(xml = ::ezxml_parse_file(file)))
+	  		return OU::esprintf("could not parse xml file: '%s'", file);
+		else if (ezxml_error(xml)[0])
+	  		return OU::esprintf("error parsing xml file '%s': %s", file, ezxml_error(xml));	
+		// check for duplicate attributes
+		std::set<std::string> new_set;
+  		for (char **a = xml->attr; *a; a += 2){ 
+    		if (new_set.insert(*a).second == false)
+      			return OU::esprintf("Duplicate attributes are not allowed");
+    		new_set.insert(ezxml_attr(xml, *a));
+  		}
+		return NULL;
+    }
+
+    const char * ezxml_parse_str(char *string, size_t len, ezxml_t &xml) {
+
+		if (!len)
+	  		len = strlen(string);
+		if (!(xml = ::ezxml_parse_str(string, len)))
+	  		return "Could not parse xml string";
+		else if (ezxml_error(xml)[0]) {
+	  		const char *err = OU::esprintf("error parsing xml string': %s", ezxml_error(xml));
+	  		::ezxml_free(xml);
+	  		xml = NULL;
+	  		return err;
+		}
+		// check for duplicate attributes
+		std::set<std::string> new_set;
+  		for (char **a = xml->attr; *a; a += 2){ 
+    		if (new_set.insert(*a).second == false)
+      			return OU::esprintf("Duplicate attributes are not allowed");
+    		new_set.insert(ezxml_attr(xml, *a));
+  		}
+		return NULL;
+    }
+
+	const char * ezxml_parse_fd(int fd, ezxml_t &xml){
+		if (fd < 0)
+			return NULL;
+		if (!(xml = ::ezxml_parse_fd(fd)))
+			return "Could not parse xml file";
+		else if (ezxml_error(xml)[0]){
+			return OU::esprintf("Error parsing xml file': %s", ezxml_error(xml));
+		}
+		// check for duplicate attributes
+		std::set<std::string> new_set;
+  		for (char **a = xml->attr; *a; a += 2){ 
+    		if (new_set.insert(*a).second == false)
+      			return OU::esprintf("Duplicate attributes are not allowed");
+    		new_set.insert(ezxml_attr(xml, *a));
+  		}
+		return NULL;
 	}
-	return NULL;
-      }
-      bool
-      receiveXml(int fd, ezxml_t &rx, std::vector<char> &buf, bool &eof, std::string &error) {
+    
+	bool receiveXml(int fd, ezxml_t &rx, std::vector<char> &buf, bool &eof, std::string &error) {
 	ezxml_free(rx);
 	rx = NULL;
 	uint32_t len = 0;
