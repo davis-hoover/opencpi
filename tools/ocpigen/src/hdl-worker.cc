@@ -177,7 +177,7 @@ vhdlArrayType(const OM::Property &dt, std::string &decl, std::string &type, bool
 	       rawBitWidthCstr(dt, finalized));
     return;
   }
-  // Single dimensional arrays when type is neither enum nor string us built-in array types
+  // Single dimensional arrays when type is neither enum nor string built-in array types
   if (!dt.m_isSequence && dt.m_arrayRank == 1 && dt.m_baseType != OA::OCPI_String &&
       dt.m_baseType != OA::OCPI_Enum) {
     for (const char *cp = OB::baseTypeNames[dt.m_baseType]; *cp; cp++)

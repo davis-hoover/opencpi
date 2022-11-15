@@ -22,10 +22,22 @@
   </device>
   <device worker='platform_ad9361_data_sub'>
     <property name='LVDS_p' value='true'/>
-    <property name='DATA_CLK_Delay' value='3'/>
+    <!-- These properties are defaults for all platforms we might plug into.
+         This is an example where the parameters are specific to the COMBINATION of
+         the card and the platform it is plugged into.  By putting them here in one
+         place, it keeps them out of containers and platform configs.
+         The implication is that when a card is validated for a new platform,
+         you may need to add platform-specific values here.
+         The baseline is the various zedboard platforms.
+         Any other platforms probably deserve specifically different values-->
     <property name='RX_Data_Delay' value='0'/>
-    <property name='FB_CLK_Delay' value='7'/>
     <property name='TX_Data_Delay' value='0'/>
+    <property name='DATA_CLK_Delay' value='3'/>
+    <property name='FB_CLK_Delay' value='7'/>
+    <!-- Overrides for zcu104 -->
+    <Property name='DATA_CLK_Delay' value='4' platform='zcu104'/>
+    <Property name='FB_CLK_Delay'   value='7' platform='zcu104'/>
+
     <Signal name='DATA_CLK_P'  slot='LA00_P_CC'/> <!--  G11  -->
     <Signal name='DATA_CLK_N'  slot='LA00_N_CC'/> <!--  H11  -->
     <Signal name='P0_D_5_0(0)'     slot='LA11_N'/>    <!--  H17  TX_D0_N -->

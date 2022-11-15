@@ -88,7 +88,7 @@ ifneq ($(MAKECMDGOALS),clean)
     $(eval $(HdlPrepareAssembly))
   endif
   # default the container names
-  $(foreach c,$(Containers),$(eval HdlContXml_$c:=$c))
+  $(foreach c,$(Containers),$(eval HdlContXml_$(notdir $c):=$c))
   # $(call doConfigConstraints,<container>,<platform>,<config>)
   getConfigConstraints=$(strip\
      $(if $(call DoShell,$(call OcpiGenTool) -Y $(HdlPlatformDir_$2)/hdl/$3,HdlConfConstraints),\
@@ -104,8 +104,9 @@ ifneq ($(MAKECMDGOALS),clean)
         $$(error Platform for container $1, $2, is not defined))
       $$(call OcpiDbg,HdlPart_$2:$$(HdlPart_$2))
       HdlMyTargets+=$$(call HdlGetFamily,$$(HdlPart_$2))
-      ContName:=$(Worker)_$2_$3_$1
-      HdlContainerImpls_$1+= $$(ContName)
+      ContFile:=$(notdir $1)
+      ContName:=$(Worker)_$2_$3_$$(ContFile)
+      HdlContainerImpls_$$(ContFile)+= $$(ContName)
       HdlPlatform_$$(ContName):=$2
       HdlTarget_$$(ContName):=$$(call HdlGetFamily,$$(HdlPart_$2))
       HdlConfig_$$(ContName):=$3

@@ -872,7 +872,7 @@ emitAssyInstance(FILE *f, Instance *i) { // , unsigned nControlInstances) {
     unsigned n = 0;
     // Emit the compile-time properties (a.k.a. parameter properties).
     for (InstanceProperty *pv = &i->m_properties[0]; n < i->m_properties.size(); n++, pv++) {
-      const OM::Property *pr = pv->property;
+      const OM::Property *pr = pv->m_property;
       if (pr->m_isParameter) {
 	std::string value;
 	if (lang == VHDL) {
@@ -880,7 +880,7 @@ emitAssyInstance(FILE *f, Instance *i) { // , unsigned nControlInstances) {
 	  fprintf(f, "%s => %s", pr->m_name.c_str(),
 		  vhdlValue(!strcasecmp(pr->m_name.c_str(), "ocpi_endian") ?
 			    "ocpi.types" : tpkg.c_str(),
-			    pr->m_name, pv->value, value, false, true));
+			    pr->m_name, pv->m_value, value, false, true));
 	} else {
 	  fprintf(f, "%s", any ? ", " : " #(");
 #if 0
@@ -888,7 +888,7 @@ emitAssyInstance(FILE *f, Instance *i) { // , unsigned nControlInstances) {
 	  switch (pr->m_baseType) {
 #define OCPI_DATA_TYPE(s,c,u,b,run,pretty,storage)	\
 	    case OA::OCPI_##pretty:			\
-	      i64 = (int64_t)pv->value.m_##pretty;	\
+	      i64 = (int64_t)pv->m_value.m_##pretty;	\
 	      break;
 	    OCPI_PROPERTY_DATA_TYPES
 #undef OCPI_DATA_TYPE
@@ -901,7 +901,7 @@ emitAssyInstance(FILE *f, Instance *i) { // , unsigned nControlInstances) {
 		  pr->m_name.c_str(), bits, (long long)i64);
 #endif
 	  fprintf(f, ".%s(%s)",
-		  pr->m_name.c_str(), verilogValue(pv->value, value, true));
+		  pr->m_name.c_str(), verilogValue(pv->m_value, value, true));
 	}
 	any = true;
       }

@@ -24,6 +24,9 @@
 #include <map>
 #include "ocpigen.hh"
 #include "hdl.hh"
+#include "assembly.hh" // for InstanceProperties
+#include "hdl-slot.hh"
+
 
 // A device type is the common information about a set of devices that can use
 // the same device worker implementation.
@@ -58,6 +61,7 @@ typedef Supports::const_iterator SupportsIter;
 #define HDL_DEVICE_ELEMS HDL_WORKER_ELEMS, "supports", "signal", "devsignal", "rawprop", "timebase", \
     "devsignals", "sdp", "metadata", "unoc", "timeservice", "cpmaster", "control"
 
+struct Device;
 class HdlDevice : public Worker {
 public:
   //  static DeviceTypes s_types;
@@ -65,15 +69,13 @@ public:
   bool               m_canControl;    // Can this interconnect worker provide control?
   Supports           m_supports;      // what devices are supported?
   std::map<std::string, unsigned> m_countPerSupportedWorkerType; // how many of type do we support?
-  static HdlDevice *
-    get(const char *name, ezxml_t xml, const char *parentFile, Worker *parent, const char *&err);
+  static HdlDevice *get(const char *name, const char *parentFile, Worker *parent, const char *&err);
   static HdlDevice *create(ezxml_t xml, const char *file, const std::string &parentFile, Worker *parent,
 			   OM::Assembly::Properties *instancePVs, const char *&err);
   HdlDevice(ezxml_t xml, const char *file, const std::string &parentFile, Worker *parent,
 	    Worker::WType type, OM::Assembly::Properties *instancePVs, const char *&err);
   virtual ~HdlDevice() {}
   const char *cname() const;
-  const char *parseDeviceProperties(ezxml_t x, OM::Assembly::Properties &iPVs);
   const char *resolveExpressions(OB::IdentResolver &ir);
   void emitXmlSupports(std::string &out) const;
 };
@@ -95,11 +97,13 @@ struct Device {
   std::list<std::string> m_supportedDevices; // temporary between pass 1 and pass2 parsing
   std::vector<const Device *> m_supportsMap; // using the same order as the underlying device worker's "supports"
   bool m_loadTime;             // should this device worker, when used on this board, be load time?
+  InstanceProperties m_parameters; // note this is not OM::Assembly::Properties
   Device(Board &b, DeviceType &dt, const std::string &wname, ezxml_t xml, bool single,
 	 unsigned ordinal, SlotType *stype, const char *&err);
-  static Device *
-  create(Board &b, ezxml_t xml, const char *parentFile, Worker *parent, bool single,
+  static Device *\
+  create(Board &b, ezxml_t xml, const std::string &parentFile, Worker *parent, bool single,
 	 unsigned ordinal, SlotType *stype, const char *&err);
+  const char *parseProperties(ezxml_t x, const SlotType *stype);
   const char *parse(ezxml_t x, Board &b, SlotType *stype);
   const char *parseSignalMappings(ezxml_t x, Board &b, SlotType *stype);
   const DeviceType &deviceType() const { return m_deviceType; }
@@ -126,7 +130,7 @@ struct Board {
     return Device::find(name, m_devices);
   }
   const char
-  *parseDevices(ezxml_t xml, SlotType *stype, const char *parentFile, Worker *parent),
+  *parseDevices(ezxml_t xml, SlotType *stype, const std::string &parentFile, Worker *parent),
   *addFloatingDevice(ezxml_t xml, const char *parentFile, Worker *parent, std::string &name);
 };
 
