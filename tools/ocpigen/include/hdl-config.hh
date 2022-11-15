@@ -40,6 +40,7 @@ struct DevInstance {
   DevInstance(const Device &d, const Card *c, const Slot *s, bool control,
 	      const DevInstance *parent);
   const char *cname() const { return m_name.c_str(); }
+  const char *parseProperties(ezxml_t xml, const HdlPlatform &platform);
   // content arg means there is extra content so suppress the end tag
   void emit(std::string &assy, bool emulated, bool content) const;
 };

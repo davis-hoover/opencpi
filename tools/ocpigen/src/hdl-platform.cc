@@ -47,7 +47,7 @@ HdlPlatform(ezxml_t xml, const char *xfile, const std::string &parentFile, Worke
   if (err ||
       (err = OE::checkAttrs(xml, HDL_PLATFORM_ATTRS, (void*)0)) ||
       (err = OE::checkElements(xml, HDL_PLATFORM_ELEMS, (void*)0)) ||
-      (err = parseDevices(xml, NULL, xfile, this)))
+      (err = parseDevices(xml, NULL, m_file, this)))
     return;
   unsigned n = 0;
   for (ezxml_t xs = ezxml_cchild(xml, "slot"); xs; xs = ezxml_cnext(xs), n++) {

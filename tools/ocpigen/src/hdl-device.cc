@@ -32,17 +32,18 @@
 HdlDevice *HdlDevice::
 create(ezxml_t xml, const char *xfile, const std::string &parentFile, Worker *parent,
        OM::Assembly::Properties *instancePVs, const char *&err) {
-  HdlDevice *hd = new HdlDevice(xml, xfile, parentFile, parent, Worker::Device, instancePVs, err);
-  if (err ||
-      (err = OE::checkTag(xml, "HdlDevice", "Expected 'HdlDevice' as tag in '%s'", xfile)) ||
+  if ((err = OE::checkTag(xml, "HdlDevice", "Expected 'HdlDevice' as tag in '%s'", xfile)) ||
       (err = OE::checkAttrs(xml, HDL_DEVICE_ATTRS, (void*)0)) ||
-      (err = OE::checkElements(xml, HDL_DEVICE_ELEMS, (void*)0)) ||
-      (err = hd->setParamConfig(instancePVs, SIZE_MAX, parentFile))) {
+      (err = OE::checkElements(xml, HDL_DEVICE_ELEMS, (void*)0)))
+    return NULL;
+  HdlDevice *hd = new HdlDevice(xml, xfile, parentFile, parent, Worker::Device, instancePVs, err);
+  if (err) {
     delete hd;
     hd = NULL;
   }
   return hd;
 }
+
 HdlDevice::
 HdlDevice(ezxml_t xml, const char *file, const std::string &parentFile, Worker *parent,
 	  Worker::WType type, OM::Assembly::Properties *instancePVs, const char *&err)
@@ -72,9 +73,7 @@ HdlDevice(ezxml_t xml, const char *file, const std::string &parentFile, Worker *
     // could be seen as constraints on the platform-specific build configuration
     // for the supported worker, both as an error check and as additional parameter settings.
     // So here we "get" this worker without regard to any build parameters or build configuration
-    // The NULL argument to "get" means we don't care about parameter configurations, and this
-    // supports XML does not affect finding/checking the supported worker.
-    DeviceType *dt = get(worker.c_str(), NULL, file, parent, err);
+    DeviceType *dt = get(worker.c_str(), file, parent, err);
     if (err) {
       err = OU::esprintf("for supported worker %s: %s", worker.c_str(), err);
       return;
@@ -102,12 +101,8 @@ HdlDevice(ezxml_t xml, const char *file, const std::string &parentFile, Worker *
 // since each device on a board maybe parameterized/configured for that board.
 // So now this method simply creates a new device-type-worker each time it is called.
 // The name argument can be a file name.
-
-// If the XML argument (dtxml) is NULL it means that the worker is requested without regard
-// to build parameters or build/param configurations.
-// (examples are emulates and supports relationships).
 HdlDevice *HdlDevice::
-get(const char *a_name, ezxml_t dtxml, const char *parentFile, Worker *parent, const char *&err) {
+get(const char *a_name, const char *parentFile, Worker *parent, const char *&err) {
   // New device type, which must be a file.
   ezxml_t xml;
   std::string xfile;
@@ -130,27 +125,8 @@ get(const char *a_name, ezxml_t dtxml, const char *parentFile, Worker *parent, c
   if (!(err = parseFile(file.c_str(), parentFile, NULL, &xml, xfile)) ||
       !(err = parseFile(name.c_str(), parentFile, NULL, &xml, xfile)) ||
       !(err = parseFile(hdlFile.c_str(), parentFile, NULL, &xml, xfile)) ||
-      !(err = parseFile(hdlName.c_str(), parentFile, NULL, &xml, xfile))) {
-    OM::Assembly::Properties instancePVs;
-    if (dtxml) {
-          // Here we parse the configuration settings for this device on this board.
-      // These settings are similar to instance property values in an assembly, but are
-      // applied wherever the device is instanced.
-      instancePVs.resize(OE::countChildren(dtxml, "Property"));
-      if (instancePVs.size()) {
-	OM::Assembly::Property *pv = &instancePVs[0];
-	for (ezxml_t px = ezxml_cchild(dtxml, "Property"); px; px = ezxml_cnext(px), pv++) {
-	  std::string value;
-	  if ((err = OE::checkAttrs(px, "name", "value", "valuefile", NULL)) ||
-	      (err = OE::getRequiredString(px, pv->m_name, "name", "property")) ||
-	      (err = pv->setValue(px)))
-	    return NULL;
-	}
-      }
-    }
-    return HdlDevice::create(xml, xfile.c_str(), parentFile, parent, dtxml ? &instancePVs : NULL,
-			     err);
-  }
+      !(err = parseFile(hdlName.c_str(), parentFile, NULL, &xml, xfile)))
+    return HdlDevice::create(xml, xfile.c_str(), parentFile, parent, NULL, err);
   return NULL;
 }
 const char *HdlDevice::
@@ -239,19 +215,26 @@ Device(Board &b, DeviceType &dt, const std::string &a_wname, ezxml_t xml, bool s
 }
 
 Device *Device::
-create(Board &b, ezxml_t xml, const char *parentFile, Worker *parent, bool single,
+create(Board &b, ezxml_t xml, const std::string &parentFile, Worker *parent, bool single,
        unsigned ordinal, SlotType *stype, const char *&err) {
-  std::string wname;
-  DeviceType *dt;
-  if ((err = OE::getRequiredString(xml, wname, "worker")) ||
-      !(dt = DeviceType::get(wname.c_str(), xml, parentFile, parent, err)))
+  std::string wName;
+  if ((err = OE::getRequiredString(xml, wName, "worker")))
     return NULL;
-  Device *d = new Device(b, *dt, wname, xml, single, ordinal, stype, err);
-  if (err) {
-    delete d;
-    d = NULL;
+  // We do not apply any device parameters to this worker at this time since it is not necessarily
+  // a valid, instanced, configuration yet.
+  Worker *w = Worker::create(wName.c_str(), parentFile, NULL, parent->m_outDir, parent, NULL,
+			     SIZE_MAX, err);
+  if (!w) {
+    err = OU::esprintf("for device worker %s in platform/card %s: %s", wName.c_str(),
+		       parent->cname(), err);
+    return NULL;
   }
-  return d;
+  Device *dev = new Device(b, *static_cast<HdlDevice *>(w), wName, xml, single, ordinal, stype, err);
+  if (err) {
+    delete dev;
+    dev = NULL;
+  }
+  return dev;
 }
 
 // A separate method because it is also called when a platform is instanced in a pf config
@@ -412,20 +395,68 @@ parseSignalMappings(ezxml_t xml, Board &b, SlotType *stype) {
   }
   return NULL;
 }
+
+
+// sType != NULL means the device is on a card
+// Property values are parsed and validated and canonicalized.
+const char *Device::
+parseProperties(ezxml_t x, const SlotType *sType) {
+  const char *err;
+  for (ezxml_t px = ezxml_cchild(x, "Property"); px; px = ezxml_cnext(px)) {
+    std::string l_name;
+    size_t nDummy;
+    OM::Property *prop;
+
+    if ((err = OE::checkAttrs(px, "name", "value", "valueFile", "default", "defaultFile",
+			      "platform", NULL)) ||
+	(err = OE::getRequiredString(px, l_name, "name", "property")) ||
+	(err = m_deviceType.findParamProperty(l_name.c_str(), prop, nDummy)))
+      return err;
+    const char // valid attrs are filtered by caller provide allowable ones
+      *value = ezxml_cattr(px, "value"),
+      *valueFile = ezxml_cattr(px, "valueFile"),
+      *defaultValue = ezxml_cattr(px, "default"),
+      *defaultFile = ezxml_cattr(px, "defaultFile"),
+      *platform = ezxml_cattr(px, "platform");
+    if (platform && !sType)
+      return OU::esprintf("the platform attribute for a device property is only valid for card devices");
+
+    switch (!!value + !!valueFile + !!defaultValue + !!defaultFile) {
+    case 0:
+      return OU::esprintf("the property element for a device must have a one of these "
+			  "attributes: \"value\", \"default\", \"valueFile\" or \"defaultFile\"");
+    default:
+      return
+	OU::esprintf("the property element for a platform or card device must have only one of "
+		     "these attributes: \"value\", \"default\", \"valueFile\" or \"defaultFile\"");
+    case 1:;
+    }
+    InstanceProperty param;
+    param.m_property = prop;
+    param.m_value.setType(*prop);
+    param.m_platform = platform ? platform : "";
+    param.m_isFixed = value || valueFile;
+    std::string sValue;
+    const char *file = valueFile ? valueFile : defaultFile;
+    if (file) {
+      if ((err = OU::file2String(sValue, file, ',')))
+	return err;
+    } else
+      sValue = value ? value : defaultValue;
+    if ((err = param.m_value.parse(sValue.c_str())))
+      return err;
+    param.m_value.unparse(param.m_uValue); // canonical/unparsed value
+    m_parameters.push_back(param);
+  }
+  return NULL;
+}
+
 const char *Device::
 parse(ezxml_t xml, Board &b, SlotType *stype) {
   const char *err;
   // This might happen in floating devices in containers.
   if (b.findDevice(m_name))
     return OU::esprintf("Duplicate device name \"%s\" for platform/card", m_name.c_str());
-  // Do the stuff in Worker::create - can we share more?
-  if (m_deviceType.m_type != Worker::Platform &&
-      ((err = m_deviceType.setParamConfig(&m_deviceType.m_instancePVs, SIZE_MAX,
-					  m_deviceType.m_parentFile)) ||
-       (err = m_deviceType.resolveExpressions(m_deviceType)) ||
-       (err = m_deviceType.finalizeProperties()) ||
-       (err = m_deviceType.finalizeHDL())))
-    return err;
   // In pass 1 we don't know all devices on the platform so just record the strings
   for (ezxml_t xs = ezxml_cchild(xml, "supported"); xs; xs = ezxml_cnext(xs)) {
     std::string device;
@@ -445,6 +476,10 @@ parse(ezxml_t xml, Board &b, SlotType *stype) {
 			  cname(), m_deviceType.cname());
     m_loadTime = true;  // propagate from the worker to the device
   } else if ((err = OE::getBoolean(xml, "loadtime", &m_loadTime)))
+    return err;
+  // Save the parsed and validated properties in the Device object for application to
+  // platform configurations and containers later.  stype indicates a card if not NULL
+  if (m_deviceType.m_type != Worker::Platform && (err = parseProperties(xml, stype)))
     return err;
   return parseSignalMappings(xml, b, stype);
 }
@@ -471,8 +506,8 @@ addFloatingDevice(ezxml_t xs, const char *parentFile, Worker *parent, std::strin
 
 // Add all the devices for a board - static
 const char *Board::
-parseDevices(ezxml_t xml, SlotType *stype, const char *parentFile, Worker *parent) {
-  // These devices are declaring that they are part of the board.
+parseDevices(ezxml_t xml, SlotType *stype, const std::string &parentFile, Worker *parent) {
+  // These device declarations are saying which devices are part of the board (platform or card)
   for (ezxml_t xs = ezxml_cchild(xml, "Device"); xs; xs = ezxml_cnext(xs)) {
     const char *err;
     if ((err = OE::checkElements(xs, DEVICE_ELEMS, NULL)) ||

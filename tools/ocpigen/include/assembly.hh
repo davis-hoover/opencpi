@@ -48,9 +48,16 @@ struct Connection {
 typedef std::list<Connection*> Connections;
 typedef Connections::const_iterator ConnectionsIter;
 
+// Used for our assembly instances as well as devices and devInstances
+// Note this is higher level and more "added value" than OM::Assembly::Instance, which is
+// not validated against a worker, and has no notion of platforms or whether it is "fixed" etc.
 struct InstanceProperty {
-  const OM::Property *property;
-  OB::Value value;
+  const OM::Property *m_property; // the worker property
+  OB::Value m_value;              // the parsed and validated value
+  std::string m_platform;         // the platform for platform-specific values
+  bool        m_isFixed;          // is it illegal to try and override this value?
+  std::string m_uValue;           // unparsed value for canonical comparison
+  bool        m_isDefault;        // is this value the default?
   InstanceProperty();
 };
 typedef std::vector<InstanceProperty> InstanceProperties;

@@ -40,7 +40,7 @@ deleteAssy() {
 }
 
 InstanceProperty::
-InstanceProperty() : property(NULL) {
+InstanceProperty() : m_property(NULL), m_isFixed(false), m_isDefault(false) {
 }
 
 // Find the OM::Assembly::Instance's port in the instance's worker
@@ -190,8 +190,8 @@ getValue(const char *sym, OB::ExprValue &val) const {
     return m_assy->m_assyWorker.getValue(++sym, val);
   const InstanceProperty *ipv = &m_properties[0];
   for (unsigned n = 0; n < m_properties.size(); n++, ipv++)
-    if (!strcasecmp(ipv->property->cname(), sym))
-      return extractExprValue(*ipv->property, ipv->value, val);
+    if (!strcasecmp(ipv->m_property->cname(), sym))
+      return extractExprValue(*ipv->m_property, ipv->m_value, val);
   return m_worker->getValue(sym, val);
 }
 
@@ -253,14 +253,14 @@ addParameters(const OM::Assembly::Properties &aiprops, InstanceProperty *&ipv) {
       return OU::esprintf("property '%s' is not a parameter property of worker '%s'",
 			  ap->m_name.c_str(), w.m_implName);
     // set up the ipv and parse the value
-    ipv->property = p;
-    ipv->value.setType(*p); // in case we are reusing it
-    if ((err = ipv->property->parseValue(ap->m_value.c_str(), ipv->value, NULL, this)))
+    ipv->m_property = p;
+    ipv->m_value.setType(*p); // in case we are reusing it
+    if ((err = ipv->m_property->parseValue(ap->m_value.c_str(), ipv->m_value, NULL, this)))
       return err;
     OB::Value zeroValue(*p);
     std::string defValue, newValue;
     (p->m_default ? *p->m_default : zeroValue ).unparse(defValue);
-    ipv->value.unparse(newValue);
+    ipv->m_value.unparse(newValue);
     if (defValue == newValue)
       continue;
     ipv++;
@@ -288,8 +288,8 @@ addParamConfigParameters(const ParamConfig &pc, const OM::Assembly::Properties &
       p->m_value.unparse(paramValue);
       if (defValue == paramValue)
 	continue;
-      ipv->property = p->m_param;
-      ipv->value = p->m_value;
+      ipv->m_property = p->m_param;
+      ipv->m_value = p->m_value;
       ipv++;
     }
   }
@@ -307,11 +307,6 @@ init(::Assembly &assy, const char *iName, const char *wName, ezxml_t ix,
   Worker *w = NULL;
   if (m_wName.empty())
     return OU::esprintf("instance %s has no worker", cname());
-#if 0 // do not reuse workers here
-  for (Instance *ii = &assy.m_instances[0]; ii < this; ii++)
-    if (!strcmp(m_wName.c_str(), ii->m_wName.c_str()))
-      w = ii->m_worker;
-#endif
   // There are two instance attributes that we use when considering workers
   // in our worker assembly:
   // 1.  Whether the instance is reentrant, which means one "instance" here can actually

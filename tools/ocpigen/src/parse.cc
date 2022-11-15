@@ -741,15 +741,6 @@ getNumber(ezxml_t x, const char *attr, size_t *np, bool *found, size_t defaultVa
   return err;
 }
 
-#if 0
-const char *Worker::
-getBoolean(ezxml_t x, const char *name, bool *b, bool trueOnly) {
-  if (!m_instancePVs.size())
-    return OE::getBoolean(x, name, b, trueOnly);
-  return NULL;
-}
-#endif
-
 const char*
 extractExprValue(const OM::Property &p, const OB::Value &v, OB::ExprValue &val) {
   const char *err = val.setFromTypedValue(v);
