@@ -17,10 +17,6 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# This server is unavailable:       https://ftp.gnu.org/gnu/gmp
-# Since we don't look at multiple URLs/mirrors (yet)
-# The one below is one of the advertised mirrors
-
 [ -z "$OCPI_CDK_DIR" ] && echo 'Environment variable OCPI_CDK_DIR not set' && exit 1
 
 target_platform="$1"
