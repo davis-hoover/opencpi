@@ -797,10 +797,11 @@ def find_files(search_dir, extension=None, recursive=True) -> List[Path]:
 
 
 def get_tags(git_dir: Path) -> List[str]:
-    # Can no longer build "all" in less than 3 hours,
-    # so ignore tags corresponding to early releases.
+    # Building "all" must take less than 3 hours, and the
+    # total size of generated artifacts must be less than
+    # 1 GB, so ignore tags corresponding to early releases.
     # cmd = ["git", "--git-dir", str(git_dir.resolve()), "tag", "-l", "v*"]
-    cmd = ["git", "--git-dir", str(git_dir.resolve()), "tag", "-l", "v1.7*", "v2.*"]
+    cmd = ["git", "--git-dir", str(git_dir.resolve()), "tag", "-l", "v2.[!0-1]*"]
     logging.debug(f"Executing cmd: {cmd}")
     tags = subprocess.check_output(cmd).decode().strip("\n").split("\n")
     if not tags[0]:
