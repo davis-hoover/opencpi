@@ -11,3 +11,7 @@ Skeleton outline: Component library description and outline of scope to go here.
    :caption: %%NAME-PROPER%% components
 
    *.comp/*-index
+   *.comp/*-comp
+
+..
+   "*.comp/*-index" is for backward compatibility with older component document naming schemes.
