@@ -14,11 +14,11 @@ SKELETON NAME (``%%NAME-CODE%%``)
 =================================
 Skeleton outline: Single line description.
 
-Design
-------
-Skeleton outline: Functional description of **what** the component achieves (not **how** it is implemented, as that belongs in primitive documentation).
+Function
+--------
+Skeleton outline: The functionality of the component: how it should produce outputs and volatile property values based on inputs and parameter/initial/writable property values (not **how** it is implemented, as that belongs in worker documentation).
 
-The mathematical representation of the implementation is given in :eq:`%%NAME-CODE%%-equation`.
+The mathematical representation of the component function is given in :eq:`%%NAME-CODE%%-equation`.
 
 .. math::
    :label: %%NAME-CODE%%-equation
@@ -34,7 +34,7 @@ In :eq:`%%NAME-CODE%%-equation`:
 
  * Skeleton, etc.,
 
-A block diagram representation of the implementation is given in :numref:`%%NAME-CODE%%-diagram`.
+A block diagram representation of the component function is given in :numref:`%%NAME-CODE%%-diagram`.
 
 .. _%%NAME-CODE%%-diagram:
 
@@ -49,7 +49,7 @@ Interface
 .. literalinclude:: ../specs/%%NAME-CODE%%-spec.xml
    :language: xml
 
-Opcode handling
+Opcode Handling
 ~~~~~~~~~~~~~~~
 Skeleton outline: Description of how the non-stream opcodes are handled.
 
@@ -99,4 +99,4 @@ Testing
 -------
 .. ocpi_documentation_test_platforms::
 
-.. ocpi_documentation_test_result_summary::
+.. Removed ocpi_documentation_test_result_summary directive until it is functional
