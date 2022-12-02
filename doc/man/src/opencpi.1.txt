@@ -229,6 +229,7 @@ See https://www.opencpi.org/report-defects
 
 SEE ALSO
 --------
+link:install-opencpi.1.html[install-opencpi(1)]
 link:ocpiadmin.1.html[ocpiadmin(1)]
 link:ocpidev.1.html[ocpidev(1)]
 link:ocpidriver.1.html[ocpidriver(1)]
