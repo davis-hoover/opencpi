@@ -1128,6 +1128,9 @@ OcpiIncludeParentAsset_platform=$(callx OcpiInfo,OIPA_p:$1)\
  OcpiIncludeParentAsset_primitives=$(infox PRIMITIVES:$(Model))\
    $(call OcpiIncludeAssetAndParentX,$(and $(filter-out .,$1),$1/)../..,,$3)
 
+ OcpiIncludeParentAsset_assembly=$(infox ASSEMBLY:$(Model))\
+   $(call OcpiIncludeAssetAndParentX,$(and $(filter-out .,$1),$1/)..,,$3)
+
  OcpiIncludeParentAsset_worker=$(infox WORKER:$(Model))\
    $(call OcpiIncludeAssetAndParentX,$(and $(filter-out .,$1),$1/)..,,$3)
 
@@ -1174,6 +1177,8 @@ define OcpiSetAsset
     $$(infox Not including component XML directly for make variables)
   else ifeq ($2,Platform)
     $$(infox Not including platform worker XML directly for make variables)
+  else ifeq ($2,Assembly)
+    $$(infox Not including HDL assembly XML directly for make variables)
   else ifeq ($2,Test)
     $$(eval $$(call OcpiParseXml,$1,$$(subst .,-,$$(OcpiAssetName))))
   else ifneq ($(filter-out Platforms Primitive Primitives Applications Application Assemblies,$2),)
@@ -1227,7 +1232,7 @@ define OcpiSetAsset
     endif
     undefine HdlLibraries
   else ifneq ($$(wildcard $1/$$(OcpiAssetName).xml),)
-    # Platforms, Primitive, Applications
+    # Platforms, Primitive, Applications, Assemblies
     $$(eval $$(call OcpiParseXml,$1,$$(OcpiAssetName)))
   else
     $$(infox MAKEFILE:$1:$2:$$(HdlLibraries):$$(Libraries))

@@ -242,6 +242,13 @@ unset ocpi_bootstrap
 	EOF
     return 1
   }
+  # This runs *before* any other cleanup because it runs *after* the last setup
+  ocpi_os_setup="$OCPI_TOOL_PLATFORM_DIR/${OCPI_TOOL_PLATFORM}-setup.sh"
+  [ ! -e "$ocpi_os_setup" ] || {
+    [ -z "$ocpi_verbose" ] ||
+      echo Sourcing OS-specific environment script for cleanup:  $ocpi_os_setup... >&2
+    source $ocpi_os_setup clean $ocpi_verbose
+  }
   [ -n "$ocpi_verbose" ] &&
       echo Clearing all OpenCPI environment variables before setting anything >&2
   for ocpi_v in $(env | egrep "^$ocpi_cleaned_vars" | sort | cut -f1 -d=)
@@ -335,6 +342,7 @@ else
   }
   [ "$ocpi_verbose" = 1 ] &&
     echo "Software prerequisites are located at $OCPI_PREREQUISITES_DIR" >&2
+  ocpi_os_setup="$v5/$v4-setup.sh"
 fi
 
 # Clean out any previous instances in the path
@@ -368,6 +376,15 @@ ocpi_user_env=$OCPI_ROOT_DIR/user-env.sh
 	echo The user environment setting script \"$ocpi_user_env\" contains no export commands so it is ignored. >&2
   fi
 }
+# This happens LAST after all the other (generic) setup are taken, so the os-specific hook can
+# adjust anything that this generic script might do
+# Note that means the "clean" hook runs *first* to be symmetrical
+[ -e "$ocpi_os_setup" ] && {
+  [ "$ocpi_verbose" != 1 ] ||
+    echo "Sourcing the OS-specific setup script \"$ocpi_os_setup\"..." >&2
+  source "$ocpi_os_setup" set $ocpi_verbose
+}
+
 [ "$ocpi_verbose" = 1 ] && {
   echo "Below are all OCPI_* environment variables now set:" >&2
   env | grep OCPI | sort >&2

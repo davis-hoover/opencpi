@@ -276,9 +276,9 @@ options = {
     },
     'hdl_rcc_platform': {
         'long': [
+            '--hdl-rcc-platform',
             '--rcc-hdl-platform',
             '--build-rcc-hdl-platform',
-            '--hdl-rcc-platform',
             '--build-hdl-rcc-platform'
         ],
         'action': 'append'
