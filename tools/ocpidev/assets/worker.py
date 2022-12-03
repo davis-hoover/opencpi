@@ -41,7 +41,8 @@ class Worker(ShowableComponent):
     """
     def __init__(self, directory, name=None, **kwargs):
         super().__init__(directory, name, **kwargs)
-        self.make_type = 'worker'
+        if not self.make_type:
+            self.make_type = 'worker'
         package_id = kwargs.get("package_id")
         self.package_id = package_id if package_id else self._init_package_id()
         super().init_metadata(self.make_type, Path(self.directory),

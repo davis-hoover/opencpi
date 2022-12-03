@@ -808,6 +808,9 @@ def get_platform_attributes(project_package_id, directory, name, model):
             attrs[key.lower()] = value
             attrs["rccplatforms"] = ""
         part = attrs.get('part')
+        rcc_platform = attrs.get('rccplatform')
+        if rcc_platform:
+            attrs['rcc_platform'] = rcc_platform
         # Backward compatibility:  if there is no part attribute look in <plat>.mk
         if not part:
             prog = re.compile('^\s*(\w+):?=\s*([^#\n]*).*$', re.ASCII)
@@ -819,6 +822,8 @@ def get_platform_attributes(project_package_id, directory, name, model):
                             if match:
                                 if match.group(1) == "HdlPart_" + name:
                                     part = attrs["part"] = match.group(2)
+                                elif match.group(1) == "HdlRccPlatform_" + name:
+                                    attrs["rcc_platform"] = match.group(2)
                                 elif match.group(1) == "HdlRccPlatforms_" + name:
                                     attrs["rccplatforms"] = match.group(2).split()
                     break
@@ -1036,6 +1041,7 @@ makeVariables={ "directory": "PlatformDir",
                 "package_id" : "PlatformPackageID",
                 "rccplatforms" : "AllRccPlatforms",
                 "part" : "Part",
+                "rcc_platform" : "RccPlatform",
                 "family":"Target",
                 "model":"", "spec":"", "libraries":"","language":"", "version":"",
                 "configurations":""}

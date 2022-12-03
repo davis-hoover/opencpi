@@ -154,7 +154,7 @@ parseHdlPlatforms(ezxml_t xml) {
   return NULL;
 }
 
-#define HDL_ASSEMBLY_ATTRS  "Containers", "DefaultContainers"
+#define HDL_ASSEMBLY_ATTRS  "Containers", "DefaultContainers", "componentlibraries"
 static const char *
 parseHdlAssembly(ezxml_t xml) {
   // this function should not be called.  we're just leaving in the check for now
@@ -167,7 +167,7 @@ parseHdlAssembly(ezxml_t xml) {
   return NULL;
 }
 
-#define HDL_ASSEMBLIES_ATTRS "Assemblies", "ExcludeAssemblies"
+#define HDL_ASSEMBLIES_ATTRS "Assemblies", "ExcludeAssemblies","ComponentLibraries"
 static const char *
 parseAssemblies(ezxml_t xml) {
   const char *err;

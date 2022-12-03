@@ -61,7 +61,6 @@ typedef Supports::const_iterator SupportsIter;
 #define HDL_DEVICE_ELEMS HDL_WORKER_ELEMS, "supports", "signal", "devsignal", "rawprop", "timebase", \
     "devsignals", "sdp", "metadata", "unoc", "timeservice", "cpmaster", "control"
 
-struct Device;
 class HdlDevice : public Worker {
 public:
   //  static DeviceTypes s_types;

@@ -68,7 +68,10 @@ fi
 # as a path prefix: need to "cd" up one level before patching.
 #
 cd ..
-patch -p1 <<'EOF'
+
+# Since we are not using the build directory, we need to avoid patching twice
+if [ ! -e opencpi-patched ]; then
+   patch -p1 <<'EOF'
 --- a/asciidoc3.py	2020-12-30 15:57:23.000000000 -0600
 +++ b/asciidoc3.py	2022-02-14 13:50:50.567618983 -0600
 @@ -5286,7 +5286,7 @@
@@ -81,7 +84,8 @@ patch -p1 <<'EOF'
                             MIN_PYTHON_VERSION)
              sys.exit(1)
 EOF
-
+  touch opencpi-patched
+fi
 cd ..
 
 # So uses of this use $OCPI_PREREQUISITES_DIR/asciidoc3/ad3/<whatever>

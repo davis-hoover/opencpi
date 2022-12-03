@@ -23,7 +23,7 @@ Model:=hdl
 include $(OCPI_CDK_DIR)/include/util.mk
 $(if $(call DoShell,! echo $(CwdName) | grep -s '[A-Z]',Var1),\
   $(error "This HDL assembly, $(CwdName), has upper case letters in its name, which is not supported due to limitations of some tools."))
-$(OcpiIncludeProject)
+$(OcpiIncludeAssetAndParent)
 ComponentLibraries+=$(OCPI_PROJECT_COMPONENT_LIBRARIES)
 include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk
 
@@ -61,16 +61,16 @@ endif
 # sets ComponentLibraries in its Makefile.
 # But it will need to be done again *after* the build/OWD files are processes in case
 # the build/OWD XML file sets ComponentLibraries
-override ComponentLibraries+= $(ComponentLibrariesInternal) components adapters
 # Override since they may be passed in from assemblies level
 override XmlIncludeDirsInternal:=$(XmlIncludeDirs) $(XmlIncludeDirsInternal)
 # Make sure the build and OWD files are processed early because there are make variables
 # that will affect target processing in hdl-pre.mk
 # For assemblies, these are generated from the OWD XML
 ifeq ($(ShellHdlAssemblyVars)$(filter clean%,$(MAKECMDGOALS)),)
+  override ComponentLibrariesInternal+=components adapters
   $(eval $(OcpiProcessBuildFiles))
   # These are done here (again) in case the build files or OWD mentions component libraries in XML
-  override ComponentLibraries+= $(ComponentLibrariesInternal) components adapters
+  override ComponentLibraries+= $(ComponentLibrariesInternal)
   override XmlIncludeDirsInternal:=$(XmlIncludeDirs) $(XmlIncludeDirsInternal)
 endif
 ifdef Container
