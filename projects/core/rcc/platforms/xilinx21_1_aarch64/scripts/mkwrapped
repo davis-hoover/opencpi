@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Create a set of wrappers to execute tools in the yocto sdk environment
+# args are:<cross-compile-tool-prefix> <yocto_sdk_dir> <opencpi_bin_dir>
+
+for i in ar:AR gcc:CC g++:CXX ld:LD ranlib:RANLIB as:AS nm:NM; do
+  file=$3/$(dirname $1)/$(basename $1)${i%%:*}
+  cat <<-EOF > $file
+	#!/bin/bash
+	unset LD_LIBRARY_PATH
+	BIN_DIR="\$( cd "\$( dirname "\${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+	source \$BIN_DIR/../sdk/environment-setup*
+	\$BIN_DIR/../../scripts/verifySDK.sh
+	source \$BIN_DIR/../sdk/environment-setup*
+	exec \$${i##*:} "\$@"
+	EOF
+  chmod a+x $file
+done

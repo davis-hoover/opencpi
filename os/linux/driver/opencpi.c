@@ -248,7 +248,7 @@ static unsigned long dma_attrs =
   // DMA_ATTR_NON_CONSISTENT    |
 
   // Used on arm (not arm64), xtensa/pci-dma.  We could use this since we do not need kernel mappings
-  // DMA_ATTR_NO_KERNEL_MAPPING | // we only care about user space.  doc says use dma_mmap_attrs
+  DMA_ATTR_NO_KERNEL_MAPPING | // we only care about user space.  doc says use dma_mmap_attrs
 
   // Used on arm and arm64, could be useful when there are multiple devices - i.e. broadcast?
   // DMA_ATTR_SKIP_CPU_SYNC |     // for multiple device consumers and producers
@@ -268,7 +268,7 @@ static void init_dma(void) {
   // dma_set_attr(DMA_ATTR_WEAK_ORDERING, dma_attrs);
   // dma_set_attr(DMA_ATTR_WRITE_COMBINE, dma_attrs);
   // dma_set_attr(DMA_ATTR_NON_CONSISTENT, dma_attrs);
-  // dma_set_attr(DMA_ATTR_NO_KERNEL_MAPPING, dma_attrs);
+  dma_set_attr(DMA_ATTR_NO_KERNEL_MAPPING, dma_attrs);
   // dma_set_attr(DMA_ATTR_SKIP_CPU_SYNC, dma_attrs);
   dma_set_attr(DMA_ATTR_FORCE_CONTIGUOUS, dma_attrs);
   // dma_set_attr(DMA_ATTR_ALLOC_SINGLE_PASS, dma_attrs);
@@ -621,7 +621,7 @@ get_dma_memory(ocpi_request_t *request, unsigned minor) {
   }
   log_debug("dma_alloc_attrs: %zu %zu %llx map %lx\n", sizeof(dma_handle_alloc),
 	    sizeof(virtual_addr), (unsigned long long)dma_handle_alloc, (unsigned long)virtual_addr);
-  dma_handle_map = dma_map_single(dev, virtual_addr, request->actual, dma_direction);
+  dma_handle_map = dma_map_single_attrs(dev, virtual_addr, request->actual, dma_direction, dma_attrs);
   if (dma_mapping_error(dev, dma_handle_map)) {
     dma_free_attrs(dev, request->actual, virtual_addr, request->bus_addr, dma_attrs);
     log_err("dma_map_single failed\n");
@@ -1124,9 +1124,10 @@ opencpi_io_mmap(struct file * file, struct vm_area_struct * vma) {
       err = io_remap_pfn_range(vma, vma->vm_start, pfn, size, vma->vm_page_prot);
     } else
       err = remap_pfn_range(vma, vma->vm_start, pfn, size, vma->vm_page_prot);
-#if 0
-    if (block->type == ocpi_dma)
-    err = dma_mmap_attrs(mydev->fsdev, vma, block->virt_addr, block->bus_addr, block->size, dma_attrs);
+#if 1
+    if (!err && block->type == ocpi_dma)
+      err = dma_mmap_attrs(mydev->fsdev, vma, block->virt_addr, block->bus_addr, block->size,
+			   dma_attrs);
 #endif
   }
   if (err)

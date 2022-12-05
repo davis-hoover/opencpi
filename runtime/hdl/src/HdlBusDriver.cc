@@ -55,7 +55,8 @@
          fpgaMgrState[]  = "/sys/class/fpga_manager/fpga0/state",
        // fpgaMgrFlags[]  = "/sys/class/fpga_manager/fpga0/flags",
 #if defined(OCPI_ARCH_aarch64)
-       	 fpgaMgrDevice[] = "/pcap", // from /sys/firmware/devicetree/base/...
+	 fpgaMgrDevice[] = "/firmware/zynqmp-firmware/pcap", // from /sys/firmware/devicetree/base/...
+
 #else
        	 fpgaMgrDevice[] = "/amba/devcfg@f8007000", // from /sys/firmware/devicetree/base/...
 #endif
