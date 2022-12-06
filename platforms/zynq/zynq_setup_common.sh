@@ -2,7 +2,7 @@
 # make sure that the release text file is also present
 set_tool_platform() { 
   if test "$OCPI_TOOL_PLATFORM" == ""; then
-    for m in /mnt/card /run/media/mmcblk0p1; do
+    for m in /mnt/card /run/media/mmcblk0p1 /media/sd-mmcblk0p1; do
       [ -d $m/opencpi ] && export OCPI_LOCAL_DIR=$m/opencpi
     done
     if test -f release; then  # checks to see what is being ran
