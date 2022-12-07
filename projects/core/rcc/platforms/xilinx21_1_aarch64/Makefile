@@ -23,6 +23,11 @@ ALL=exports
 $(if $(wildcard $(OCPI_CDK_DIR)),,$(error OCPI_CDK_DIR not set or non-existent. This file requires it.))
 
 include $(notdir $(CURDIR)).mk
+
+OcpiXilinxDir=$(strip $(foreach t,$(or $(OCPI_XILINX_DIR),$(wildcard /opt/Xilinx),/tools/Xilinx),$(infox TT is $t)\
+	                       $(if $(shell test -d $t && echo 1),$t,\
+			                           $(call $(or $1,error), Directory $(if $(OCPI_XILINX_DIR),"$t" from OCPI_XILINX_DIR,/opt/Xilinx or /tools/Xilinx) not found))))
+
 local_repo:=$(or $(OCPI_XILINX_GIT_REPOSITORY),$(call OcpiXilinxDir)/git)
 xilinx_releases:=$(or $(OCPI_XILINX_ZYNQ_RELEASE_DIR),$(call OcpiXilinxDir,warning)/ZynqReleases)
 exports_file:=$(notdir $(CURDIR)).exports
