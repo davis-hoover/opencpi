@@ -78,7 +78,7 @@ microzed_20_cc:
   port: 1000 # deprecated
 picoevb:
   ip: # deprecated
-  do_hwil: True
+  do_hwil: False
   do_ocpiremote: False
   port: 1000
 picozed_30_cc:
@@ -105,9 +105,17 @@ plutosdr:
     build-tests:centos7:assets_ts:components:plutosdr:
       variables:
         OCPI_PROJECT_PATH: '$CI_PROJECT_DIR/projects/assets:$CI_PROJECT_DIR/projects/platform'
+x310:
+  do_hwil: False
+  do_ocpiremote: True
+  variable:
+    OCPI_XILINX_LICENSE_FILE: '2101@sembach.opencpi.net'
+z3u:
+  do_hwil: True
+  do_ocpiremote: True
 zcu102:
   ip: 10.1.0.212 # deprecated
-  do_hwil: True
+  do_hwil: False
   do_ocpiremote: True
   port: 1000 # deprecated
   variables:
