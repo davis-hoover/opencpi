@@ -28,6 +28,9 @@ OcpiXilinxDir=$(strip $(foreach t,$(or $(OCPI_XILINX_DIR),$(wildcard /opt/Xilinx
 	                       $(if $(shell test -d $t && echo 1),$t,\
 			                           $(call $(or $1,error), Directory $(if $(OCPI_XILINX_DIR),"$t" from OCPI_XILINX_DIR,/opt/Xilinx or /tools/Xilinx) not found))))
 
+
+xilinx_version_tag:=2021.1
+
 local_repo:=$(or $(OCPI_XILINX_GIT_REPOSITORY),$(call OcpiXilinxDir)/git)
 xilinx_releases:=$(or $(OCPI_XILINX_ZYNQ_RELEASE_DIR),$(call OcpiXilinxDir,warning)/ZynqReleases)
 exports_file:=$(notdir $(CURDIR)).exports
