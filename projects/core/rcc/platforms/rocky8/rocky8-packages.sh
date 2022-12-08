@@ -108,7 +108,11 @@ PKGS_S+=(tree)
 ##########################################################################################
 # E. installations that have to happen after we run yum-install once, and also rpm-required
 #    for devel.  For RPM installations we somehow rely on the user pre-installing epel.
-#
+# NOTE: "rocky8" supports python36, python38, and python39, but only the first and second
+# are *fully* supported from an OpenCPI perspective (required add-on packages).  Specifying
+# "python3" gets you version 3.6.8, and we want at least python 3.8.X for OpenCPI v3.0.0+.
+# Use ${python3_ver} to get the needed packages.
+python3_ver=python38
 #    for serial console terminal emulation
 PKGS_E+=(screen)
 #    for the OpenCPI GUI installation and tutorials (still needed?)
@@ -116,9 +120,9 @@ PKGS_E+=(oxygen-icon-theme)
 #    for creating swig
 PKGS_E+=(swig)
 #    for ocpidev
-PKGS_E+=(python3 python3-devel python3-jinja2)
+PKGS_E+=(${python3_ver} ${python3_ver}-devel ${python3_ver}-jinja2)
 #    for various testing scripts
-PKGS_E+=(python3-numpy python3-scipy python3-tkinter python3-matplotlib)
+PKGS_E+=(${python3_ver}-numpy ${python3_ver}-scipy ${python3_ver}-tkinter python3-matplotlib)
 #    for building init root file systems for embedded systems (enabled in devel?)
 PKGS_E+=(fakeroot)
 #    for OpenCL support (the switch for different actual drivers that are not installed here)
@@ -151,9 +155,22 @@ function bad {
 [ "$1" = yumlist ] && ypkgs PKGS_R && ypkgs PKGS_D && ypkgs PKGS_S && ypkgs PKGS_E && exit 0
 
 # Docker doesn't have sudo installed by default and we run as root inside
-# a container anyway
+# a container anyway.  If we are NOT running as root AND the local python3
+# version is NOT 3.8.X, ask permission before installing 3.8.X and making
+# that the system default python3.
 SUDO=
 if [ "$(whoami)" != root ]; then
+  # Check python3 version: looking for 3.8.X.
+  echo "Checking python3 version..."
+  if python3 -c "\
+import sys; \
+sys.exit(0 if sys.hexversion < 0x030800f0 or sys.hexversion >= 0x030900f0 else 1)\
+"; then
+    read -p "OK to install Python 3.8.X as system default python3 (Y/n)? " P_AUTH
+    [ "$P_AUTH" = "n" ] && exit 1 || true
+  else
+    echo "python3 is version 3.8.X"
+  fi
   SUDO=$(command -v sudo)
   [ $? -ne 0 ] && bad "\
 Could not find 'sudo' and you are not root. Installing packages requires root
@@ -176,5 +193,10 @@ $SUDO dnf --allowerasing -y install $(ypkgs PKGS_R) $(ypkgs PKGS_D) $(ypkgs PKGS
 # Now those that depend on epel
 $SUDO dnf -y install $(ypkgs PKGS_E)
 [ $? -ne 0 ] && bad "Installing EPEL packages failed"
+
+# A distasteful thing to do, but needed in case python 3.6.8
+# was installed before this script was executed, i.e., python3
+# must point to python3.8.
+$SUDO alternatives --set python3 /usr/bin/python3.8
 
 exit 0
