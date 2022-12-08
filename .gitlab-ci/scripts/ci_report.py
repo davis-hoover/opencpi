@@ -53,7 +53,9 @@ def get_failed_jobs(bridges: List[dict]) -> List[dict]:
         bridge_request = request.Request(bridge_cmd, headers=HEADERS)
         bridge_responses = urlopen(bridge_request)
         failed_jobs[project_name] += job_responses
-        failed_jobs.update(get_failed_jobs(bridge_responses))
+        failed_bridges = get_failed_jobs(bridge_responses)
+        for key, val in failed_bridges.items():
+            failed_jobs[key] += val
 
     return failed_jobs
 
