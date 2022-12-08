@@ -79,4 +79,4 @@ exports: kernel-artifacts release-artifacts mod-release-artifacts
              fi
 
 clean: 
-	rm -r -f gen
+	rm -r -f gen lib
