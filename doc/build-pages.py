@@ -451,7 +451,8 @@ def gen_releases_index():
     example.com/releases/latest/index.html
     """
     template = jinja_env.get_template("releases.index.html")
-    index = template.render(url="latest")  # always latest until someone has a "better" idea
+    # index = template.render(url="latest")  # always latest until someone has a "better" idea
+    index = template.render(url="all")  # mgmt requested the release list as the home page
     with open(args.outputdir / "index.html", "w") as fd:
         fd.write(index)
 
