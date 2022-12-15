@@ -324,7 +324,7 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
                     if name:
                         assets.append((self.directory, name, 'specs/' + spec.name))
             for comp in my_path.glob('*.comp'):
-                spec_path = comp.joinpath(comp.stem + '-spec.xml')
+                spec_path = comp.joinpath(comp.stem + '-comp.xml')
                 if spec_path.exists():
                     assets.append((self.directory, comp.name.split('.')[0], comp.name))
         elif asset_type == 'workers':
