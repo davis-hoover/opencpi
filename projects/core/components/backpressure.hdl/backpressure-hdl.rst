@@ -55,8 +55,8 @@ to the worker that is upstream within the application.
 
 The following figure shows a block diagram representation of the HDL implementation:
 
-.. figure:: ../backpressure.test/doc/figures/backpressure_top_level.svg
-   :alt: Back Pressure Top-level Block Diagram
+.. figure:: backpressure_worker_block.svg
+   :alt: Back Pressure HDL Worker Block Diagram
    :align: center
 
    Back Pressure HDL Worker Block Diagram

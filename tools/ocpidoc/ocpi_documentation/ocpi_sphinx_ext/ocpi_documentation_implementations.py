@@ -64,7 +64,8 @@ class OcpiDocumentationImplementations(docutils.parsers.rst.Directive):
             found = None
             # try {worker_name}-worker.rst for legacy, {worker_name}.rst, then index.rst
             # {worker_name}.rst for consistency with {worker_name}.xml, as doc'd
-            for doc_name in [ f'{worker_name}-worker', worker_name, "index" ]:
+            for doc_name in [ f'{worker_name}-worker', worker_name,
+                              worker_directory.name.replace('.','-'), "index" ]:
                 doc = worker_directory.joinpath(doc_name + ".rst")
                 if doc.exists():
                     implementations.append(doc)

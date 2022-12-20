@@ -27,4 +27,6 @@ Available components and component libraries.
    :maxdepth: 2
    :glob:
 
+   *.comp/*-comp
    *.comp/*-index
+

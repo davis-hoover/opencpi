@@ -31,8 +31,8 @@ Tested platforms include
 ``centos7``, ``isim``, ``modelsim``, ``xilinx13_3``, ``xilinx13_4``, and ``xsim``.
 
 
-Design
-------
+Function
+--------
 The file read component injects file-based data into an application. To use it, specify
 a ``file_read`` component instance and connect its output port to an input port of the
 component that is to process the data first. Use the ``fileName`` property to specify
@@ -42,12 +42,12 @@ This component has one output port whose name is ``out``,
 which carries the messages conveying data read from the file. There is no protocol associated with the port:
 it is agnostic as to the protocol of the file data and the connected input port.
 
-Operating modes
+Operating Modes
 ~~~~~~~~~~~~~~~
 
 The file read component has two modes of operation: data streaming and messaging.
 
-Data-streaming mode
+Data-streaming Mode
 ^^^^^^^^^^^^^^^^^^^
 In data-streaming mode, the contents of the file become the payloads of a stream of messages,
 each carrying a fixed number of bytes of file data (until the last) and all with the same opcode.
@@ -100,7 +100,7 @@ The messaging file field layout is shown in :numref:`message-layout-diagram`
 
 .. _message-layout-diagram:
 
-.. figure:: ../file_read.test/doc/figures/MessageMode.png
+.. figure:: MessageMode.png
    :alt: Messaging File Field Layout
    :align: center
 
@@ -198,8 +198,11 @@ Limitations of ``file_read`` are:
 Testing
 -------
 All test benches use the worker implementation as part of the verification process.
-This component does not have a unit test suite.
+This component does not have a component unit test suite.
 
-.. ocpi_documentation_test_platforms::
+.. commenting out these two directives for now. First one works
+   but is not yet target desired usage, second one doesn't work yet.
 
-.. ocpi_documentation_test_result_summary::
+   ocpi_documentation_test_platforms::
+
+   ocpi_documentation_test_result_summary::
