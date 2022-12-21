@@ -61,8 +61,12 @@ Criteria for content to exist in this OpenCPI project is as follows:
 
    hdl/devices/devices
    specs/specs
-   hdl/platforms/zed/doc/zed-gsg
-   hdl/platforms/picoevb/doc/picoevb-gsg
-   hdl/platforms/zed_ether/zed_ether-gsg
+   hdl/platforms/*/doc/*-gsg
+   hdl/platforms/*/*-gsg
+
 ..    components/components
 ..    hdl/primitives/primitives
+
+.. The path "hdl/platforms/*/doc/*-gsg" is for backward compatibility
+   with older directory schemes for getting started guides. Getting started guides
+   are currently co-located with the platform asset they describe.
