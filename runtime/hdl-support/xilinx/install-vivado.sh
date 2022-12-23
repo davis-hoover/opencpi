@@ -251,9 +251,9 @@ fi
 XVER=`basename $XIF | cut -f3 -d'_'`
 
 #
-# Versions of Xilinx prior to 2021.1 also require "WebTalkTerms".
+# Versions of Xilinx prior to 2021.2 also require "WebTalkTerms".
 #
-if (( $(echo "$XVER < 2021.1" | bc -l) ))
+if (( $(echo "$XVER < 2021.2" | bc -l) ))
 then
     AGREE="XilinxEULA,3rdPartyEULA,WebTalkTerms"
 else
