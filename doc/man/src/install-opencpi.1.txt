@@ -1,0 +1,79 @@
+INSTALL-OPENCPI(1)
+================
+
+
+NAME
+----
+install-opencpi - command-line tool for installing the OpenCPI framework
+
+
+SYNOPSIS
+--------
+*`./scripts/install-opencpi.sh`* ['<options>']
+
+
+DESCRIPTION
+-----------
+The *`install-opencpi`* tool builds/installs the OpenCPI framework on the local
+RCC development platform and runs a series of tests to verify the installation.
+The tool is intended to be run from the top level (root directory) of the OpenCPI
+source tree, and will emit an error message if run from any other directory.
+Upon successful completion, the OpenCPI framework is ready for use in developing
+and/or running various OpenCPI components and applications.
+
+OPTIONS
+-------
+*`--minimal`*::
+    Performs a standard installation except the tests are not run. 
+    Suppressing the generation and running of tests saves time in cases where framework
+    testing is obviously unnecessary, e.g., reinstalling the same version of the framework on a host.
+
+*`--no-kernel`*::
+    Prevents building of the OpenCPI Linux kernel driver module. See the link:ocpidriver.1.html[ocpidriver(1)]
+    man page and the 'OpenCPI User Guide' for details on when this driver module is required.
+
+EXAMPLES
+--------
+. Install OpenCPI from the root directory of the OpenCPI source tree.
++
+----------
+./scripts/install-opencpi.sh
+----------
+. Install OpenCPI without running the installation tests.
++
+----------
+./scripts/install-opencpi.sh --minimal
+----------
+. Install OpenCPI without running the installation tests and without building the OpenCPI Linux kernel driver module.
++
+----------
+./scripts/install-opencpi.sh --minimal --no-kernel
+----------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+RESOURCES
+---------
+See the 'OpenCPI Installation Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Installation_Guide.pdf
+
+See the 'OpenCPI User Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_User_Guide.pdf
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidriver.1.html[ocpidriver(1)]
+link:ocpiview.1.html[ocpiview(1)]
+link:ocpirun.1.html[ocpirun(1)]
+
+
+COPYING
+-------
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
