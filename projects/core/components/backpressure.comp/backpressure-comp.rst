@@ -32,8 +32,8 @@ Tested platforms include
 ``alst4``, ``centos7``, ``isim``, ``matchstiq-z1`` (PL), ``ml605``, ``modelsim``, ``xilinx13_3``, ``xsim``,  and Zedboard(PL).
 
 
-Design
-------
+Function
+--------
 The back pressure component provides the ability to emulate the "back pressure" (resistance or force
 opposing the desired flow of data through an application) that is present in a system.
 It is primarily used during the development of an HDL worker, specifically during unit test simulations.
@@ -45,7 +45,7 @@ A block diagram representation of the implementation is given in :numref:`backpr
 
 .. _backpressure-diagram:
 
-.. figure:: ../backpressure.test/doc/figures/backpressure_comp_block.svg
+.. figure:: backpressure_comp_block.svg
    :alt:
    :align: center
 
@@ -113,6 +113,8 @@ other tests, a binary data file is generated containing complex signed 16-bit sa
 a tone at a configurable center frequency and sample frequency. Plotting of the I/O data
 is available, via ``View=1``, if desired.
 
-.. ocpi_documentation_test_platforms::
+.. commenting out the directives below for now...
 
-.. ocpi_documentation_test_result_summary::
+.. This directive works but isn't useful yet: ocpi_documentation_test_platforms::
+
+.. This directive doesn't work yet: ocpi_documentation_test_result_summary::

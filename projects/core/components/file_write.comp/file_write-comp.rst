@@ -31,8 +31,8 @@ Tested platforms include
 ``centos7``, ``isim``, ``modelsim``, ``xilinx13_3``, ``xilinx13_4``, and ``xsim``.
 
 
-Design
-------
+Function
+--------
 The file write component writes application data to a file. To use it, specify
 an instance of it and connect its input port to an output port of the component
 that produces the data. Use the ``fileName property`` to specify the name of the file
@@ -145,8 +145,11 @@ Limitations of ``file_write`` are:
 
 Testing
 -------
-All test benches use the worker implementation as part of the verification process. This component does not have a unit test suite.
+All test benches use the worker implementation as part of the verification process. This component does not have a component unit test suite.
 
-.. ocpi_documentation_test_platforms::
+.. commenting out these two directives for now. First one works
+   but is not yet target desired usage, second one doesn't work yet.
 
-.. ocpi_documentation_test_result_summary::
+   ocpi_documentation_test_platforms::
+
+   ocpi_documentation_test_result_summary::

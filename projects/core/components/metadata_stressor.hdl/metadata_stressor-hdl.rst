@@ -69,8 +69,8 @@ will preclude the expression of the other.
 
 The following figure shows a block diagram representation of the HDL implementation:
 
-.. figure:: ../metadata_stressor.test/doc/figures/metadata_stressor_block_diagram.svg
-   :alt: Metadata Stressor Block Diagram
+.. figure:: metadata_stressor_worker_block.svg
+   :alt: Metadata Stressor HDL Worker Block Diagram
    :align: center
 
    Metadata Stressor HDL Worker Block Diagram
@@ -86,11 +86,11 @@ Finite State Machine
 The following figure shows an abbreviated representation of
 the primary finite state machine implemented in the HDL version of the metadata stressor component.
 
-.. figure:: ../metadata_stressor.test/doc/figures/ms_fsm_abrv.png
-   :alt: Metadata Stressor Finite State Machine
+.. figure:: ms_fsm_abrv.png
+   :alt: Metadata Stressor HDL Worker Finite State Machine
    :align: center
 
-   Finite state machine of metadata stressor HDL implementation.
+   Metadata Stressor HDL Worker Finite State Machine
 
 Control Timing and Signals
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

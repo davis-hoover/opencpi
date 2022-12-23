@@ -30,8 +30,8 @@ Implementations include the
 Tested platforms include
 ``alst4``, ``centos7``, ``isim``, ``matchstiq-z1`` (PL), ``ml605``, ``modelsim``, ``xilinx13_3``, ``xsim`` and Zedboard(PL).
 
-Design
-------
+Function
+--------
 The metadata stressor component tests an HDL worker’s robustness during development as part of the OpenCPI unit test suite.
 An HDL worker is expected to accept all valid combinations of metadata without failure, though some are unlikely to
 be encountered in normal operation. It also may starve the unit under test of data and insert delays between messages.
@@ -43,7 +43,7 @@ A block diagram representation of the implementation is given in :numref:`metada
 
 .. _metadata_stressor-diagram:
 
-.. figure:: ../metadata_stressor.test/doc/figures/metadata_stressor_comp_block_diagram.svg
+.. figure:: metadata_stressor_comp_block.svg
    :alt: Metadata Stressor Component Block Diagram
    :align: center
 
@@ -193,6 +193,9 @@ Case 13 - Tests the RCC version of this component, which is nothing but a placeh
 In all test cases, the data is simply passed through the component and the tests
 are determined to be successful by comparing the input and output files.
 
-.. ocpi_documentation_test_platforms::
+.. commenting out these two directives for now. First one works
+   but is not yet target desired usage, second one doesn't work yet.
 
-.. ocpi_documentation_test_result_summary::
+   ocpi_documentation_test_platforms::
+
+   ocpi_documentation_test_result_summary::
