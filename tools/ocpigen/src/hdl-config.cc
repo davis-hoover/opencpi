@@ -207,7 +207,7 @@ parseDevInstance(const char *device, ezxml_t x, const char *parentFile, Worker *
     return err;
   const Card *card = NULL;
   if (OE::getOptionalString(x, s, "card") &&
-      !(card = Card::get(s.c_str(), parentFile, parent, err)))
+      !(card = Card::get(s.c_str(), parentFile, parent, platform(), err)))
     return err;
   const char *slash = strchr(device, '/'); // slot/card/dev or card/dev
   if (slash) {
@@ -223,7 +223,7 @@ parseDevInstance(const char *device, ezxml_t x, const char *parentFile, Worker *
       slash = slash2;
     }
     s.assign(device, OCPI_SIZE_T_DIFF(slash, device));
-    if (!(card = Card::get(s.c_str(), parentFile, parent, err)))
+    if (!(card = Card::get(s.c_str(), parentFile, parent, platform(), err)))
       return err;
     device = slash + 1;
   }
@@ -496,7 +496,7 @@ HdlConfig(HdlPlatform &pf, ezxml_t xml, const char *xfile, const std::string &pa
 	  Worker *parent, const char *&err)
   : Worker(xml, xfile, parentFile, Worker::Configuration, parent, NULL, err),
     HdlHasDevInstances(pf, m_plugged, *this),
-    m_platform(pf), m_sdpWidth(1), m_sdpLength(32), m_sdpArb(0) { // 32 is for backward compatibility (zynq w/64 bit AXI)
+    m_sdpWidth(1), m_sdpLength(32), m_sdpArb(0) { // 32 is for backward compatibility (zynq w/64 bit AXI)
   if (err ||
       (err = OE::checkAttrs(xml, HDL_CONFIG_ATTRS, (void*)0)) ||
       (err = OE::checkElements(xml, HDL_CONFIG_ELEMS, (void*)0)))
@@ -657,7 +657,7 @@ HdlConfig(HdlPlatform &pf, ezxml_t xml, const char *xfile, const std::string &pa
     for (SignalsIter si = w.m_signals.begin(); si != w.m_signals.end(); si++) {
       if ((**si).m_direction == Signal::UNUSED)
 	continue;
-      Signal *s = new Signal(**si);
+      Signal *s = (**si).clone(true); // remove expressions
       if (w.m_type != Worker::Platform)
 	OU::format(s->m_name, "%s_%s", i->cname(), (**si).m_name.c_str());
       m_signals.push_back(s);

@@ -1360,11 +1360,27 @@ parse(ezxml_t x, const char *buildFile) {
   }
   bool isDir;
   // xmlincludedirs is handled specially in owd parsing for bootstrap reasons
+  // and also leading environment variables are expanded
   for (OU::TokenIter ti(ezxml_cattr(x, "includedirs")); ti.token(); ti.next()) {
-    if (OS::FileSystem::exists(ti.token(), &isDir) && isDir)
-      m_includeDirs.push_back(ti.token());
+    std::string dir(ti.token());
+    const char *cp = ti.token();
+    if (*cp == '$') {
+      while (*++cp && (isalnum(*cp) || *cp == '_'))
+	;
+      if (cp > ti.token() + 1) {
+	std::string var(ti.token() + 1, OCPI_SIZE_T_DIFF(cp, (ti.token() + 1)));
+	const char *env = getenv(var.c_str());
+	if (!env)
+	  return OU::esprintf("For the include directory: \"%s\", \"%s\" is undefined",
+			      ti.token(), var.c_str());
+	dir = env;
+	dir += cp;
+      }
+    }
+    if (OS::FileSystem::exists(dir, &isDir) && isDir)
+      m_includeDirs.push_back(dir);
     else
-      return OU::esprintf("The include directory: \"%s\" is not a directory", ti.token());
+      return OU::esprintf("The include directory: \"%s\" is not a directory", dir.c_str());
   }
   if ((err = getComponentLibraries(ezxml_cattr(x, "componentlibraries"), NULL, false,
 				   m_componentLibraries)))

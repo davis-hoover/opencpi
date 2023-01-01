@@ -30,36 +30,43 @@ struct Device;
 typedef std::list<Device *>     Devices;
 typedef Devices::const_iterator DevicesIter;
 
+// A mapping from a (possibly indexed) internal signal object to a
+// (possibly indexed) external signal name
 struct ExtTuple {
-  Signal *signal;
-  size_t index;
-  std::string ext;
-  bool single; // mapping is for a single signal in a vector
-ExtTuple(Signal *arg_signal, size_t arg_index, const std::string &arg_ext, bool arg_single)
-: signal(arg_signal), index(arg_index), ext(arg_ext), single(arg_single) {
+  Signal *signal; // internal signal object
+  size_t index;   // SIZE_MAX means no index
+  std::string ext; // external signal name
+  size_t extIndex; // SIZE_MAX means no external index
+  ExtTuple(Signal *a_signal, size_t a_index, const std::string &a_ext, size_t a_extIndex)
+    : signal(a_signal), index(a_index), ext(a_ext), extIndex(a_extIndex) {
   }
 };
 typedef std::list<ExtTuple> ExtMap_;
 class ExtMap : public ExtMap_ {
  public:
-  Signal *findSignal(const std::string &s, size_t &n) {
+  Signal *findSignal(const std::string &s, size_t n, size_t &mappedIndex) const {
     for (ExtMap_::const_iterator i = begin(); i != end(); i++)
-      if (!strcasecmp((*i).ext.c_str(), s.c_str())) {
-	n = (*i).index;
+      if (!strcasecmp((*i).ext.c_str(), s.c_str()) && n == (*i).extIndex) {
+	mappedIndex = (*i).index;
 	return (*i).signal;
       }
     return NULL;
   }
-  const char *findSignal(Signal &s, size_t n, bool &isSingle) const {
+  // Find a mapping for this signal with this index (n, which will be a number or SIZE_MAX)
+  // Return the name of the external targeted signal, and an index of the external signal (or SIZE_MAX)
+  // isWhole is set to true if this mapping is for the whole internal signal,
+  // whether it is a vector or not.
+  const char *findSignal(Signal &s, size_t n, bool &isWhole, size_t &extIndex) const {
     for (ExtMap_::const_iterator i = begin(); i != end(); i++)
-      if ((*i).signal == &s && (*i).index == n) {
-	isSingle = (*i).single;
+      if ((*i).signal == &s && ((*i).index == n || (n == 0 && (*i).index == SIZE_MAX))) {
+	isWhole = (*i).index == SIZE_MAX; // is mapping for the whole signal?
+	extIndex = (*i).extIndex;
 	return (*i).ext.c_str();
       }
     return NULL;
   }
-  void push_back(Signal *s, size_t n, const std::string &e, bool single) {
-    ExtMap_::push_back(ExtTuple(s, n, e, single));
+  void push_back(Signal *s, size_t n, const std::string &e, size_t extIndex) {
+    ExtMap_::push_back(ExtTuple(s, n, e, extIndex));
   }
 };
 

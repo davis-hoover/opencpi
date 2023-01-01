@@ -670,7 +670,7 @@ HdlVivadoPart=$(foreach p,$(HdlChoosePart),$(infox HVP:$p)$(call HdlFullPart_viv
 # For synth rule: load dcp files of platform and app workers.
 define HdlToolDoPlatform_vivado
 
-$(call OptName,$1,$3): $(call SynthName,$1,$3) $(call VivadoConstraints,$5)
+$(call OptName,$1,$3): $(call SynthName,$1,$3) $(word 1,$(subst ?, ,$(call VivadoConstraints,$5)))
 	$(AT)echo -n For $2 on $5 using config $4: creating optimized DCP file using '"opt_design"'.
 	$(AT)$(call DoVivado,vivado-impl.tcl,$1,-tclargs \
 		stage=opt \
@@ -678,7 +678,7 @@ $(call OptName,$1,$3): $(call SynthName,$1,$3) $(call VivadoConstraints,$5)
 		part=$(HdlVivadoPart) \
 		edif_file=$(notdir $(call SynthName,$1,$3)) \
 		constraints='$(foreach u,$(call VivadoConstraints,$5),$(call AdjustRelative,$u))' \
-    pre_opt_hook='$(foreach u,$(call VivadoPreOptHook,$5),$(call AdjustRelative,$u))' \
+	        pre_opt_hook='$(foreach u,$(call VivadoPreOptHook,$5),$(call AdjustRelative,$u))' \
 		impl_opts='$(call VivadoOptions,opt)' \
 		power_opt=$(if $(VivadoPowerOpt),true,false) \
 		,opt)

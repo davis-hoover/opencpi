@@ -80,7 +80,7 @@
 // ExternalBuffer *getBuffer(uint8_t *&data, size_t &length, uint8_t &opCode, bool &endOfData)
 // Typemaps to adapt the c++ return by reference calls into return values.
 // Allows for data to be read FROM an external port.
-%typemap(in, numinputs=0) (uint8_t *&data, size_t &length, uint8_t &opCode, bool &endOfData) (uint8_t *tdata, size_t tlength, uint8_t topCode, bool tendOfData) {
+%typemap(in, numinputs=0) (uint8_t *&data, size_t &length, uint8_t &opCode, bool &end) (uint8_t *tdata, size_t tlength, uint8_t topCode, bool tendOfData) {
     tdata = NULL;
     tlength = 0;
     topCode = 0;
@@ -91,11 +91,13 @@
     $4 = &tendOfData;
 }
 
-%typemap(argout) (uint8_t *&data, size_t &length, uint8_t &opCode, bool &endOfData) {
+%typemap(argout) (uint8_t *&data, size_t &length, uint8_t &opCode, bool &end) {
   if (!result) {
-    PyObject *none= PyTuple_New(5);
-    for (unsigned i = 0; i < 5; ++i)
+    PyObject *none = PyTuple_New(5);
+    for (unsigned i = 0; i < 5; ++i) {
+      Py_INCREF(Py_None);
       PyTuple_SetItem(none, i, Py_None);
+    }
     %append_output(none);
   } else {
     %append_output(PyMemoryView_FromMemory((char *)tdata$argnum, result ? tlength$argnum : 0,
@@ -120,8 +122,10 @@
 %typemap(argout) (uint8_t *&data, size_t &length) {
   if (!result) {
     PyObject *none= PyTuple_New(3);
-    for (unsigned i = 0; i < 3; ++i)
+    for (unsigned i = 0; i < 3; ++i) {
+      Py_INCREF(Py_None);
       PyTuple_SetItem(none, i, Py_None);
+    }
     %append_output(none);
   } else {
     %append_output(PyMemoryView_FromMemory((char *)tdata$argnum, result ? tlength$argnum : 0,
