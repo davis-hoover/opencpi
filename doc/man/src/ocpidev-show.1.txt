@@ -9,7 +9,7 @@ ocpidev-show - displays information about OpenCPI assets.
 
 SYNOPSIS
 --------
-*ocpidev*  *show* ['<options>'] '<noun>'
+*`ocpidev`*  *`show`* ['<options>'] '<noun>'
 
 
 DESCRIPTION
@@ -26,46 +26,45 @@ command in just the current project.
 
 Asset types to be specified in the '<noun>' argument are:
 
-*component*::
+*`component`*::
     Display information on the specified component.
     
-*components*::
+*`components`*::
     Display all components in registered projects.
 
-*libraries*::
+*`libraries`*::
     Display information on all the libraries in the current scope.
 
-*platforms*::
+*`platforms`*::
     Display all platforms that assets can be built for.
 
-*project*::
+*`project`*::
     Display information about a project.
 
-*projects*::
+*`projects`*::
     Display all registered projects.
 
-*registry*::
+*`registry`*::
     Display information on the registry.
 
-*targets*::
+*`targets`*::
     Display all targets that assets can be built for.
 
-*tests*::
+*`tests`*::
     Display information on the unit tests in the current
     scope.
 
-*worker*::
+*`worker`*::
     Display information on the specified worker.
 
-*workers*::
+*`workers`*::
     Display all workers in registered projects.
 
-*prerequisites*::
+*`prerequisites`*::
     Show installed prerequisites.
 
-
 Use the keywords *`rcc`* and *`hdl`* to scope what is displayed
-for the *platforms* and *targets* nouns. For example, the command:
+for the *`platforms`* and *`targets`* nouns. For example, the command:
 
 --------------------------
 ocpidev show hdl platforms
@@ -81,46 +80,44 @@ the platform is built.
 
 OPTIONS
 -------
-In the option descriptions below, a plus sign (+) indicates that
-the option can be specified more than once on the command line.
+In addition to the options common to all OpenCPI tools
+(see link:opencpi.1.html[opencpi(1)]),
+the options described below can be specified for *`show`* operations.
+In the following descriptions,
+a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.
 
-*`--simple`*::
-    Format the output as simply as possible.
-    
-*`--json`*::
-    Format the output in JSON format for integration with
-    other software.
+*`-P`* '<hdl-platform-directory>', *`--platform=`*'<hdl-platform-directory>'::
+    Specify the HDL platform subdirectory in which to operate.
 
-*`--global-scope`*::
-   Show assets from all registered projects and the current project
-   if applicable. This is the default scope used if *`-local-scope`*
-   is not used.
-
-*--hdl-library=*'<hdl-library>'::
-    Specify the HDL library in which this operation
-    will be performed.
-
-*--library=*'<library>', *-l* '<library>'::
+*`-l`* '<library>', *`--library=`*'<library>'::
     Specify the component library in which this operation
     will be performed.
 
-*--local-scope*::
-   Only show assets in the local project.
+*`--global-scope`*::
+    Show assets from all registered projects and the current project
+    if applicable. This is the default scope used if *`-local-scope`*
+    is not used.
+
+*`--hdl-library=`*'<hdl-library>'::
+    Specify the HDL library in which this operation
+    will be performed.
+
+*`--json`*::
+    Format the output in Javascript Object Notation (JSON) format
+    for integration with other software.
+
+*`--local-scope`*::
+    Only show assets in the local project.
+
+*`--simple`*::
+    Format the output as simply as possible.
 
 *`--table`*::
     Display the output in an easy-to-read table.
     This is the default display format
     used if *`--simple`* or *`--json`* are not used.
     
-*--very-verbose*::
-    Be very verbose with output.
-    
-*--very-very-verbose*::
-    Be very, very verbose with output.
-
-*`-P`* '<hdl-platform-directory>'::
-    Specify the HDL platform subdirectory in which to operate.
-	
 EXAMPLES
 --------
 . List all RCC and HDL platforms that assets can be built for:
@@ -156,6 +153,10 @@ RESOURCES
 ---------
 See the main web site: https://www.opencpi.org
 
+See the 'OpenCPI Component Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Component_Development_Guide.pdf
+
+
 SEE ALSO
 --------
 link:ocpidev.1.html[ocpidev(1)]
@@ -173,7 +174,7 @@ link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
 
 COPYING
 -------
-Copyright \(C) 2021 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your

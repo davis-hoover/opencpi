@@ -112,14 +112,30 @@ that are specific to or can only be used on cards,
 rather than those that are generally useful on
 different platforms and cards.
 
+An OpenCPI HDL device worker asset document can also be created for
+an HDL assembly to facilitate documenting the HDL device worker during
+the overall HDL device worker development process.
+In a project, an HDL device worker asset document resides in
+the same directory and has the same name as the HDL device worker's
+OWD but with the suffix *`.rst`* instead of *`.xml`*. Unless suppressed
+by options, building the HDL device worker or the asset that contains
+it builds viewable HTML output of the HDL device worker asset document
+and cleaning the HDL device worker removes the generated HTML.
+The section "Documenting OpenCPI Assets" in the
+'OpenCPI Documentation Writer Guide' provides more information about
+this feature and describes how to create an OpenCPI HDL device worker asset document.
+
 Verbs that can operate on an HDL device worker are:
 
 *`build`*::
-    Compile the HDL device worker source code, creating files and directories
-    as required.
+    Compile the HDL device worker source code and asset document,
+    creating files and directories as required. Use the *`--doc-only`*
+    and *`--no-doc`* options to control the asset document building function.
     
 *`clean`*::
     Remove all generated and compiled files for the HDL device worker.
+    Use the *`--doc-only`* and *`--no-doc`* options to control
+    the asset document cleaning function.
 
 *`create`*::
     Create the named HDL device worker, creating files and directories as required.
@@ -139,7 +155,8 @@ worker implementation.
 
 The *`ocpidev build`* operation for an HDL device worker creates additional
 files in the worker's directory, such as architecture-independent source code
-and XML files, in a directory named *`gen`* and architecture-specific object
+and XML files, in a directory named *`gen`*, viewable HTML output from the
+HDL device worker document, in the subdirectory *`gen/doc`*, and architecture-specific object
 and binary files for the compilation target being built, in a directory named
 *`target-`*'<hdl-platform>'; for example, *`target-zed`* or *`target-xsim`*.
 These are the files that the *`ocpidev clean`* operation removes.
@@ -151,7 +168,10 @@ name when you issue the *`ocpidev`* command from inside the HDL device worker di
 
 OPTIONS
 -------
-In the descriptions below, a plus sign (+) after the option indicates
+In addition to the options common to all OpenCPI tools
+(see link:opencpi.1.html[opencpi(1)]),
+the options described below can be specified for operations on HDL device workers.
+In the following descriptions, a plus sign (+) after the option indicates
 that it can be specified more than once on the command line.
 
 Keywords for platforms supported by OpenCPI that can be
@@ -160,89 +180,81 @@ can be found in the tables of supported platforms in the 'OpenCPI User Guide'.
 
 Keywords for architectures supported by OpenCPI that can be specified
 in the '<target>' argument to an option include *`isim`*, *`modelsim`*,
-*`xsim`*, *`stratix4`*, *`stratix5`*, *`virtex5`*, *`virtex6`*, *`zynq`*,
-*`zynq_is`*, *`spartan3adsp`*.
+*`xsim`*, , *`zynq`*, *`zynq_ultra`*, *`zynq_ise`*, *`spartan3adsp`*.
 
 Options That Apply to All Operations (Verbs) on HDL Device Workers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*`--hdl-library=`*'<hdl-library>', *`-h`* '<hdl-library>'::
+*`-h`* '<hdl-library>', *`--hdl-library=`*'<hdl-library>'::
     Specify the HDL library under the *`hdl/`* directory of the project
     in which to operate on the HDL device worker.
     Valid values are only one of: *`devices`*, *`cards`*, *`adapters`*.
 
-*`-d`* '<directory>'::
-    Specify the directory in which the command should be run.
-    Analogous to the *-C* option in the POSIX *make* command.
-    
-*`-v`*, *`--verbose`*::
-    Describe what is happening in command execution in more detail.
-
 Options When Creating HDL Device Workers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*`--exclude-platform=`*'<platform>', *`-Q`* '<platform>'+::
-    Do not build the HDL device worker for the specified platform. See
-    also the description of the *`ExcludePlatforms=`* OWD attribute
-    in the 'OpenCPI Component Development Guide'.
+*`-A`* '<directory>', *`--xml-include=`*'<directory>'+::
+    Specify a directory to search for XML include files.
 
-*`--only-platform=`*'<platform>', *`-G`* '<platform>'+::
+*`-C`* '<core>', *`--core=`*'<core>'+::
+    Specify an HDL primitive core on which the HDL device
+    worker depends and with which it should be built.
+
+*`-E`* '<hdl-device>', *`--emulates=`*'<hdl-device>'::
+   Specify that the HDL device worker being created is an emulator
+   worker for the specified HDL device worker.
+
+*`-G`* '<platform>', *`--only-platform=`*'<platform>'+::
     Only build the HDL device worker for the specified platform. See also
     the description of the *`OnlyPlatforms`* OWD attribute in
     the 'OpenCPI Component Development Guide'.
 
-*`-A`* '<directory>'+::
-    Specify a directory to search for XML include files.
-
-*`-C`* '<core>'+::
-    Specify an HDL primitive core on which the HDL device
-    worker depends and with which it should be built.
-
-*`-E`* '<hdl-device>'::
-   Specify that the HDL device worker being created is an emulator
-   worker for the specified HDL device worker.
-
-*`-I`* '<directory>'+::
+*`-I`* '<directory>', *`--include-dir=`*'<directory>'+::
     Specify a directory to search for include files (C, C++,
     Verilog).
 
-*`-O`* '<file>'+::
+*-`O`* '<file>', *`--other=`*'<file>'+::
     Specify a source code file to compile when building the
     HDL device worker that is not included by default; that is, in
     addition to the '<name>'*`.vhd`* file.
 
-*`-P`* '<hdl-platform>'::
+*-`P`* '<hdl-platform>', *`--platform=`*'<hdl-platform>'::
     Specify that the worker being created is a platform-specific
     HDL device worker or device proxy to be created in the *`devices/`*
     library for the specified HDL platform in the project.
 
-*`-S`* '<component-spec>'::
+*`-Q`* '<platform>', *`--exclude-platform=`*'<platform>'+::
+    Do not build the HDL device worker for the specified platform. See
+    also the description of the *`ExcludePlatforms=`* OWD attribute
+    in the 'OpenCPI Component Development Guide'.
+
+*`-S`* '<spec>', *`--spec=`*'<spec>'::
     Specify the component specification (OCS) that the HDL device worker implements.
    
-*`-T`* '<target>'+::
-    Only build the HDL device worker for the specified
+*`-T`* '<target>', *`--only-target=`*'<target>'+::
+    Only build the HDL device worker for the specified HDL
     architecture. See also the
     description of the *`OnlyTargets`* OWD attribute in the 'OpenCPI
     Component Development Guide'.
 
-*`-U`* '<hdl-device>'+::
+*`-U`* '<hdl-device>', *`--supports=`*'<hdl-device>'+::
     Specify that the HDL device worker being created is an HDL subdevice
     worker that supports the specified HDL device worker.
 
-*`-Y`* '<primitive-library>'+::
+*`-Y`* '<primitive-library>', *`--prim-lib=`*'<primitive-library>'+::
     Specify an HDL primitive library on which the HDL device worker
     depends.
    
-*`-Z`* '<target>'+::
+*`-Z`* '<target>', *`--exclude-target=`*'<target>'+::
     Do not build the HDL device worker for the specified
     architecture. See also
     the description of the *`ExcludeTargets`* OWD attribute in
     the 'OpenCPI Component Development Guide'.
 
-*`-k`*::
+*`-k`*, *`--keep`*::
     Keep files and directories created after an HDL device worker creation
     fails. Normally, all such files and directories are removed
     on any failure.
 
-*`-y`* '<component-library>'+::
+*`-y`* '<component-library>', *`--comp-lib=`*'<component-library>'+::
    Specify a component library to search for workers, devices
    and/or specs referenced by the HDL device worker being created.
 
@@ -252,13 +264,24 @@ Options When Deleting HDL Device Workers
     Force deletion: do not ask for confirmation when deleting
     a worker. Normally, you are asked to confirm a deletion.
 
+Options When Building and Cleaning HDL Device Workers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--doc-only`*::
+   Only operate on the HDL device worker's asset document and not on the other
+   HDL device worker asset files.
+   
+*`--no-doc`*::
+   Only operate on the HDL device worker's asset files and not on the
+   HDL device worker's asset document.
+
 Options When Building HDL Device Workers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--hdl-platform=`*'<hdl-platform>'+::
+    Build the HDL device worker for the specified HDL platform.
+
 *`--hdl-target=`*'<target>'+::
     Build the HDL device worker for the specified HDL architecture.
 
-*`--hdl-platform=`*'<hdl-platform>'+::
-    Build the HDL device worker for the specified HDL platform.
 
 EXAMPLES
 --------
@@ -279,9 +302,9 @@ named *`mydevcomp`* that implements the *`mydevcomp`* OCS.
 The HDL device worker directory
 *`mydevcomp.hdl`* is created in the HDL library *`hdl/devices/`*:
 +
---------------------------------------------------------------------------------
-ocpidev create hdl device mydevcomp.hdl --hdl-library=devices
---------------------------------------------------------------------------------
+---------------------------------------------------
+ocpidev create hdl device mydevcomp.hdl -h devices
+---------------------------------------------------
 +
 . Inside the project's *`hdl/devices/`* directory, create a platform-independent
 HDL emulator device worker named *`myemulator`* to support the HDL device
@@ -307,29 +330,30 @@ ocpidev build hdl device
 +
 . Inside the *`hdl/devices/`* directory in the project, compile
 the source code for the HDL device worker
-named *`mydevice`* for the *`zed`* and *`xsim`* platforms:
+named *`mydevice`* for the *`zed`* and *`xsim`* platforms but
+do not build its asset document:
 +
------------------------------------------------------------------------
-ocpidev build device mydevice.hdl --hdl-platform=zed --hdl-platform=xsim
------------------------------------------------------------------------
+------------------------------------------------------------------------------
+ocpidev build --no-doc device mydevice.hdl --hdl-platform=zed --hdl-platform=xsim
+------------------------------------------------------------------------------
 +
 . Inside the directory for the HDL device worker
 named *`mydevice`* for the *`myplatform`* platform
 (*`hdl/platforms/myplatform/devices/mydevice.hdl/`*),
 compile the device worker's source code for
-for the Zynq HDL architecture:
+for the Zynq HDL architecture and its asset document:
 +
 -------------------------------------------------------
 ocpidev build hdl device mydevice.hdl --hdl-target=zynq
 -------------------------------------------------------
 +
 . Inside the HDL device worker's directory, remove the compiled
-source code for the HDL device worker named *`mydevice`*:
+asset document but not the compiled source code for the
+HDL device worker named *`mydevice`*:
 +
-------------------------
-ocpidev clean hdl device
-------------------------
-
+-----------------------------------
+ocpidev clean hdl device --doc-only
+-----------------------------------
 
 BUGS
 ----
@@ -340,6 +364,20 @@ RESOURCES
 ---------
 See the main web site: https://www.opencpi.org
 
+See the 'OpenCPI Component Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Component_Development_Guide.pdf
+
+See the 'OpenCPI HDL Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_HDL_Development_Guide.pdf
+
+See the 'OpenCPI Platform Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Platform_Development_Guide.pdf
+
+See the 'OpenCPI RCC Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_RCC_Development_Guide.pdf
+
+See the 'OpenCPI Documentation Writer Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Documentation_Writer_Guide.pdf
 
 SEE ALSO
 --------
@@ -362,7 +400,7 @@ link:ocpidev-worker.1.html[ocpidev-worker(1)]
 
 COPYING
 -------
-Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your

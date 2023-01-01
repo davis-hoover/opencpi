@@ -23,7 +23,18 @@ Control Interface (ACI). The 'OpenCPI Application Development Guide'
 provides details on the structure, syntax and development process
 for OpenCPI applications.
 
+A skeleton OpenCPI application asset document is also created along with
+the OAS to allow for application documentation development to occur during
+the overall application development process. Unless suppressed by an
+option, building the application (ACI only) or the asset (e.g., project, library)
+that contains the application (XML) also generates viewable HTML output
+of its asset document.
+The chapter "Documenting OpenCPI Assets" in the 'OpenCPI Documentation
+Writer Guide' provides more information about this feature and how to write an
+application asset document.
+
 In a project, an application resides in the *`applications/`* directory
+along with its application asset document
 and is either an XML application or an ACI application.
 XML applications reside either directly in the *`applications/`* directory
 or in their own directory underneath the *`applications/`* directory.
@@ -33,14 +44,18 @@ ACI applications always reside in their own directory within the
 Verbs that can operate on an application are:
 
 *`build`*::
-    Build the application. The build operation
+    Build the application and its asset document. The build operation
     applies only to an ACI application: it builds the C++
-    files into an executable.
+    files into an executable and builds readable documentation
+    from the asset document. Use the *`--doc-only`* and *`--no-doc`*
+    options to control the asset document building function.
 
 *`clean`*::
     Remove all the generated and compiled files for the
     application, including any cleaning specfied by
     the *`cleanFiles`* attribute in the XML file.
+    Use the *`--doc-only`* and *`--no-doc`* options to control
+    the asset document cleaning function.
 
 *`create`*::
     Create the named application in the *`applications/`* directory of
@@ -83,54 +98,68 @@ The verbs that can be performed on the *`applications`* noun are:
 
 OPTIONS
 -------
-In the descriptions below, a plus sign (+) after the option indicates
+In addition to the options common to all OpenCPI tools
+(see link:opencpi.1.html[opencpi(1)]),
+the options described below can be specified for operations on workers.
+In the following descriptions, a plus sign (+) after the option indicates
 that it can be specified more than once on the command line.
 
-Options That Apply to All Operations (Verbs) on Applications
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*`-d`* '<directory>'::
-    Specify the directory in which the command should be run.
-    Analogous to the *-C* option in the POSIX *make* command.
+Keywords for platforms supported by OpenCPI that can be
+specified in the '<platform>' argument to an option
+can be found in the tables of supported platforms in the 'OpenCPI User Guide'.
 
-*`-v`*, *`--verbose`*::
-    Describe what is happening in command execution in more detail.
+Keywords for HDL architectures supported by OpenCPI that can be specified
+in the '<target>' argument to an option include *`isim`*, *`modelsim`*,
+*`xsim`*, *`zynq`*, *`zynq_ultra`*, *`spartan3adsp`*.
 
 Options When Creating Applications
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*`--exclude-platform=`*'<platform>', *`-Q`* '<platform>'+::
-   Do not build the application for the specified platform.
-
-*`--only-platform=`*'<platform>', *-G* '<platform>'+::
+*`-G`* '<platform>', *`--only-platform=`*'<platform>'+::
    Only build the application for the specified platform.
 
-*`-T`* '<target>'+::
-   Only build the application for the specified architecture.
+*`-Q`* '<platform>', *`--exclude-platform=`*'<platform>'+::
+   Do not build the application for the specified platform.
 
-*`-X`*::
-    Create a simple XML OAS file named '<name>'*.xml*
+*`-T`* '<target>', *`--only-target=`*'<target>'+::
+   Only build the application for the specified HDL architecture.
+
+*`-X`*, *`--xml-app`*::
+    Create a simple XML OAS file named '<name>'*`.xml`*
+    and a skeleton application asset document named '<name>'*`.rst`*
     in the *`applications/`* directory of the project.
     The default (no *`-X`* or *`-x`* option specified) is to
     create an ACI application in a file named '<name>'*`.cc`*
     that contains the main program in the '<name>' directory
     underneath the *`applications/`* directory.
 
-*-Z* '<target>'+::
-   Do not build the application for the specified architecture.
+*`-Z`* '<target>', *`--exclude-target=`*'<target>'+::
+   Do not build the application for the specified HDL architecture.
 
-*-k*::
+*`-k`*, *`--keep`*::
     Keep files and directories created after an application creation
     fails. Normally, all such files and directories are removed
     on any failure.
 
-*-x*::
-    Create a simple XML OAS file named '<name>'*`.xml`* in
-    the '<name>' directory under *`applications/`*.
+*`-x`*, *`xml-dir-app`*::
+    Create a simple XML OAS file named '<name>'*`.xml`*
+    and a skeleton application asset document named '<name>'*`.rst`*
+    in the '<name>' directory under *`applications/`*.
 
 Options When Deleting Applications
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *-f*::
     Force deletion: do not ask for confirmation when deleting
     an application. Normally, you are asked to confirm a deletion.
+
+Options When Building and Cleaning ACI Applications
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--doc-only`*::
+   Only operate on the application's asset document and not on the other
+   application asset files.
+   
+*`--no-doc`*::
+   Only operate on the application's asset files and not on the application's
+   asset document.
 
 Options When Building ACI Applications
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -141,17 +170,17 @@ Options When Building ACI Applications
     the current development software platform is used as
     the single RCC platform used for building.
 
+*`--optimize`*::
+    Build RCC/ACI assets with compiler optimization enabled.  This
+    results in a separate set of build outputs that do not conflict
+    with non-optimized (debug) build outputs, since they are placed
+    in a target directory whose name has a "-o" suffix.
+
 *`--rcc-platform=`*'<platform>'+::
     Build ACI assets for the specified RCC platform. If this
     option is not used (and *`--hdl-rcc-platform`* '<platform>'
     is also not used), the current development software platform
     is used as the single RCC platform used for building.
-
-*`--optimimize`*::
-    Build RCC/ACI assets with compiler optimization enabled.  This
-    results in a separate set of build outputs that do not conflict
-    with non-optimized (debug) build outputs, since they are placed
-    in a target directory whose name has a "-o" suffix.
 
 Options When Running ACI Applications
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
@@ -196,7 +225,8 @@ EXAMPLES
 --------
 . From the project's *`applications/`* directory, create
 an ACI application with the name *`MyApp`*. The ACI application
-*`MyApp.cc`* will be created in the *`applications/MyApp`*
+*`MyApp.cc`* and skeleton asset document  *`MyApp.rst`*
+are created in the *`applications/MyApp`*
 subdirectory of the project.
 +
 -------------------------------
@@ -205,7 +235,8 @@ ocpidev create application MyApp
 +
 . From the project's top-level directory, create an XML
 application named *`MyApp`*. The XML application
-(empty OAS file) *`MyApp.xml`* will be created in
+(empty OAS file) *`MyApp.xml`* and a skeleton application
+asset document *`MyApp.rst`* are created in
 the *`applications/`* subdirectory of the project.
 +
 -------------------------------------
@@ -213,27 +244,30 @@ ocpidev -X create application MyApp
 -------------------------------------
 +
 . From the project's top-level directory, delete the
-XML application named *`MyApp`*:
+asset document but not the XML application for the
+application named *`MyApp`*:
 +
--------------------------------
-ocpidev delete application MyApp
--------------------------------
+------------------------------------------
+ocpidev delete application MyApp --doc-only
+------------------------------------------
 +
-. Build the application *`MyApp`* from inside its own directory.
+. Build the application *`MyApp`* and its asset document
+from inside its own directory.
 Since no target platform is specified, the application is built
-to run on the development system platform; for example, CentOS 7.
+to run on the development system platform; for example, CentOS 7
+(*`centos7`*).
 +
 --------------
 ocpidev build
 --------------
 +
 . From inside an ACI application's directory, build the
-ACI application for the Avnet Zedboard *`xilinx13_4`* embedded
-RCC platform:
+ACI application for the *`xilinx19_2_aarch32`* embedded RCC platform
+but do not build the application asset document:
 +
---------------------------------------
-ocpidev --rcc-platform xilinx13_4 build
---------------------------------------
+-------------------------------------------------------
+ocpidev --no-doc --rcc-platform xilinx19_2_aarch32 build
+-------------------------------------------------------
 +
 . From the *`applications/`* directory, run the application
 named *`MyApp`* that exists in that directory:
@@ -270,6 +304,11 @@ RESOURCES
 ---------
 See the main web site: https://www.opencpi.org
 
+See the 'OpenCPI Application Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Application_Development_Guide.pdf
+
+See the 'OpenCPI Documentation Writer Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Documentation_Writer_Guide.pdf
 
 SEE ALSO
 --------
@@ -285,7 +324,7 @@ link:ocpidev-run.1.html[ocpidev-run(1)]
 
 COPYING
 -------
-Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your

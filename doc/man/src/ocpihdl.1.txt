@@ -42,6 +42,11 @@ OpenCPI HDL development process, including how to develop HDL workers, HDL primi
 HDl assemblies and bitstreams to support the execution of OpenCPI
 applications on FPGAs.
 
+For convenience, options can occur anywhere in the *`ocpihdl`* command.
+The general usage concept is: perform the '<verb>' operation on the
+'<noun>' asset type whose name is '<name>'.
+When invoked without verbs and options, *`ocpihdl`* displays help information.
+
 VERBS
 -----
 The verbs for general operations supported by *`ocpihdl`* are:
@@ -148,32 +153,27 @@ None.
 
 OPTIONS
 -------
-The options described below can be used with many *`ocpihdl`* operations.
+In addition to the general-purpose options common
+to all OpenCPI tools (see link:opencpi.1.html[opencpi(1)]),
+the options described below can be used with many *`ocpihdl`* operations.
 An option's effect on an individual *`ocpihdl`* operation is described
 in that operation's description in OPERATIONS.
 
+*`-P`*::
+    Produce parseable output for *`ocpihdl`* operations that read registers.
+
 *`-d`* '<hdl-device>'::
     Specify the name of an HDL device on which to operate.
-    The OCPI_HDL_DEVICE environment variable can
+    The *`OCPI_HDL_DEVICE`* environment variable can
     be used to set a default value for this option.
 
 *`-i`* '<network-interface>'::
     Specify the name of the network interface on which to operate.
     Examples: *`en0`*, *`eth0`*.
 
-*`-l`* '<log-level>'::
-    Specify the OpenCPI log level to be applied during execution.
-    See the description of the OCPI_LOG_LEVEL environment variable
-    in the 'OpenCPI User Guide' or *`opencpi(1)`* for a description of possible values.
-    Using this option overrides the level set in the OCPI_LOG_LEVEL
-    environment variable.
-
-*`-P`*::
-    Produce parseable output for *`ocpihdl`* operations that read registers.
-
 *`-p`* '<hdl-platform>'::
     Specify the identifier of the HDL platform on which to operate.
-    Examples: *`ml605`*, *`alst4`*, *`zed`*, *`e31x`*. See the
+    Examples: *`e31x`*, *`plutosdr`*, *`zed`*. See the
     'OpenCPI User Guide' for a list of supported HDL platforms and their identifiers.
 
 *`-x`*::
@@ -413,7 +413,7 @@ ENVIRONMENT VARIABLES
 ---------------------
 The following environment variables affect the *`ocpihdl`* tool:
 
-OCPI_DEFAULT_HDL_DEVICE::
+*`OCPI_DEFAULT_HDL_DEVICE`*::
     Sets a default value for the *`-d`* '<device>' option.
 
 
@@ -509,6 +509,13 @@ RESOURCES
 ---------
 See the main web site: https://www.opencpi.org
 
+See the 'OpenCPI HDL Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_HDL_Development_Guide.pdf
+
+See the 'OpenCPI User Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_User_Guide.pdf
+
+
 SEE ALSO
 --------
 link:ocpidev.1.html[ocpidev(1)]
@@ -522,7 +529,7 @@ link:ocpixml.1.html[ocpixml(1)]
 
 COPYING
 -------
-Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your

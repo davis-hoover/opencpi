@@ -26,7 +26,7 @@ the worker instances, any properties and parameter settings, connections
 between workers and external ports for any data flowing into or out of
 the assembly. For information about the OHAD's XML structure,
 see the section "The HDL Assembly XML File" in the 'OpenCPI HDL
-Development Guide'
+Development Guide'.
 
 In a project, an HDL assembly resides in its own directory '<name>'
 under an *`assemblies/`* subdirectory in the project's *`hdl/`* directory.
@@ -49,15 +49,30 @@ For information on how to develop an HDL assembly,
 see the chapter "HDL Assemblies for Creating Bitstreams/Executables"
 in the 'OpenCPI HDL Development Guide'.
 
+An OpenCPI HDL assembly asset document can also be created for
+an HDL assembly to facilitate documenting the HDL assembly during
+the overall assembly development process.
+In a project, an HDL assembly asset document resides in
+the same directory and has the same name as the HDL assembly's OHAD
+but with the suffix *`.rst`* instead of *`.xml`*. Unless suppressed
+by options, building the HDL assembly or the asset that
+contains it (e.g., project, library) builds viewable HTML output of
+the asset document and cleaning the HDL assembly removes the generated
+HTML. The section "Documenting OpenCPI Assets" in the
+'OpenCPI Documentation Writer Guide' provides more information about
+this feature and describes how to create an OpenCPI HDL assembly asset document.
+
 Verbs that can operate on an HDL assembly are:
 
 *`build`*::
-    Build the HDL assembly, creating directories and files
-    as required.
+    Build the HDL assembly and its asset document, creating directories and files
+    as required. Use the *`--doc-only`* and *`--no-doc`* options to control
+    the asset document building function.
 
 *`clean`*::
     Remove all the generated and compiled files for all assets
-    in the HDL assembly.
+    in the HDL assembly. Use the *`--doc-only`* and *`--no-doc`* options to control
+    the asset document cleaning function.
     
 *`create`*::
     Create the named HDL assembly, creating files and directories as required.
@@ -82,21 +97,28 @@ The syntax is:
 The verbs that can be performed on the *`hdl assemblies`* noun are:
 
 *`build`*::
-    Build all of the HDL assemblies in the project or the *`/hdl`*
-    subdirectory of the project, creating directories and files as required.
+    Build all the HDL assemblies and their asset documents in the project
+    or in the *`hdl/`* subdirectory of the project, creating directories
+    and files as required. Use the *`--doc-only`* and *`--no-doc`* options
+    to control the asset document building function.
     
 *`clean`*::
     Remove all the generated and compiled files in all HDL assemblies
-    in the project or the *`/hdl`* subdirectory of the project.
+    in the project or the *`hdl/`* subdirectory of the project.
+    Use the *`--doc-only`* and *`--no-doc`* options to control
+    the asset document cleaning function.
     
 *`utilization`*::
     Display FPGA resource usage information for all built HDL assemblies
-    in the project. The general-pupose options and the *`utilization`*
+    in the project. The general-purpose options and the *`utilization`*
     options can be specified.
 
 OPTIONS
 -------
-In the descriptions below, a plus sign (+) after the option indicates
+In addition to the options common to all OpenCPI tools
+(see link:opencpi.1.html[opencpi(1)]), the options described
+below can be specified for operations on HDL assemblies.
+In the following descriptions, a plus sign (+) after the option indicates
 that it can be specified more than once on the command line.
 
 Keywords for platforms supported by OpenCPI that can be
@@ -105,33 +127,23 @@ can be found in the tables of supported platforms in the 'OpenCPI User Guide'.
 
 Keywords for architectures supported by OpenCPI that can be specified
 in the '<target>' argument to an option include *`isim`*, *`modelsim`*,
-*`xsim`*, *`stratix4`*, *`stratix5`*, *`virtex5`*, *`virtex6`*, *`zynq`*,
-*`zynq_is`*, *`spartan3adsp`*.
-
-Options That Apply to All Operations (Verbs) on HDL Assemblies
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*-d <directory>*::
-    Specify the directory in which the command should be run.
-    Analogous to the *-C* option in the POSIX *make* command.
-    
-*-v, --verbose*::
-    Describe what is happening in command execution in more detail.
+*`xsim`*, *`zynq`*, *`zynq_ultra`*, *`zynq_ise`*, *`spartan3adsp`*.
 
 Options When Creating HDL Assemblies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*`--exclude-platform=`*'<platform>', *`-Q`* '<platform>'+::
+*`-G`* '<platform>', *`--only-platform=`*'<platform>'+::
+    Only build the HDL assembly for the specified HDL platform.
+
+*`-Q`* '<platform>', *`--exclude-platform=`*'<platform>'+::
     Do not build the HDL assembly for the specified HDL platform.
    
-*`--only-platform=`*'<platform>', *-G* '<platform>'+::
-    Only build the HDL assembly for the specified HDL platform.
-   
-*-T* '<target>'+::
+*`-T`* '<target>', *`--only-target=`*'<target>'+::
     Only build the HDL assembly for the specified HDL architecture.
    
-*-Z* '<target>'+::
+*`-Z`* '<target>', *`--exclude-target=`*'<target>'+::
     Do not build the HDL assembly for the specified HDL architecture.
    
-*-k*::
+*`-k`*, *`--keep`*::
     Keep files and directories created after an HDL assembly creation
     fails. Normally, all such files and directories are removed
     on any failure.
@@ -141,6 +153,16 @@ Options When Deleting HDL Assemblies
 *-f*::
     Force deletion: do not ask for confirmation when deleting
     an HDL assembly. Normally, you are asked to confirm a deletion.
+
+Options When Building and Cleaning HDL Assemblies
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--doc-only`*::
+   Only operate on the HDL assembly's asset document and not on the other
+   HDL assembly asset files.
+   
+*`--no-doc`*::
+   Only operate on the HDL assembly's asset files and not on the
+   assembly's asset document.
 
 Options When Building HDL Assemblies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -154,6 +176,14 @@ Options When Building HDL Assemblies
 
 Options When Using Utilization on HDL Assemblies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-P`* '<hdl-platform>', *`--platform=`*'<hdl-platform>'::
+    Display information about FPGA resource use by the built
+    HDL assemblies on the specified HDL platform.
+
+*`-l`* '<library>', *`--library=`*'<library>'::
+    Display information about FPGA resource use by the built
+    HDL assemblies in the specified component library.
+
 *`--format=`*{*`table`*|*`latex`*}::
     Specify the format in which to output the FPGA resource usage information.
     Specifying *`table`* sends the information to stdout in tabular format.
@@ -169,19 +199,11 @@ Options When Using Utilization on HDL Assemblies
     Display information about FPGA resource use by the built
     HDL assemblies in the specified HDL primitive library.
 
-*`--library=`*'<library>', *`-l`* '<library>'::
-    Display information about FPGA resource use by the built
-    HDL assemblies in the specified component library.
-
-*`-P`* '<hdl-platform>'::
-    Display information about FPGA resource use by the built
-    HDL assemblies on the specified HDL platform.
-
 EXAMPLES
 --------
 . Inside the project (at the top level), create the
 HDL assembly *`myassy`*. The directory *`myassy`*
-is created in the *`hdl/assemblies`* directory
+is created in the *`hdl/assemblies/`* directory
 (which is also created if it doesn't exist):
 +
 ----------------------------------
@@ -192,17 +214,17 @@ ocpidev create hdl assembly myassy
 HDL assembly *`myassy`*, specifying that it can
 only be built for the *`zed`* HDL platform:
 +
------------------------------------------------------
-ocpidev create hdl assembly myassy --only-platform=zed
------------------------------------------------------
+------------------------------------------
+ocpidev create hdl assembly myassy -G=zed
+------------------------------------------
 +
 . Inside the project (at the top level), create the
 HDL assembly *`myassy`*, specifying that it can
 only be built for the *`zynq`* HDL chip architecture:
 +
------------------------------------------------------
+------------------------------------------
 ocpidev create hdl assembly myassy -T zynq
------------------------------------------------------
+------------------------------------------
 +
 . Inside the project (from the top level or the
 *`hdl/assemblies`* directory), delete
@@ -213,26 +235,34 @@ ocpidev delete hdl assembly myassy
 ----------------------------------
 +
 . Inside the *`myassy`* HDL assembly's directory, build
-the *`myassy`* assembly for the *`xsim`* HDL platform:
+the *`myassy`* assembly and asset document for the *`xsim`* HDL platform:
 +
 ---------------------------------
 ocpidev build --hdl-platform=xsim
 ---------------------------------
 +
+. Inside the *`myassy`* HDL assembly's directory, build
+only the asset document for the *`myassy`* assembly :
++
+------------------------
+ocpidev build --doc-only
+------------------------
++
 . Inside the project (from the top level or the
 *`hdl/assemblies`* directory), build all existing
-HDL assemblies:
+HDL assemblies but not their asset documents:
 +
----------------------------
-ocpidev build hdl assemblies
----------------------------
+------------------------------------
+ocpidev build hdl assemblies --no-doc
+------------------------------------
 +
 . Inside the *`myassy`* HDL assembly's directory,
-built the *`myassy`* assembly for the *zynq* HDL chip architecture:
+built the *`myassy`* assembly for the *`zynq_ultra`* HDL chip architecture
+and build the asset document:
 +
--------------------------------
-ocpidev build --hdl-target=zynq
--------------------------------
+-----------------------------------
+ocpidev build --hdl-target=zynq_ultra
+-----------------------------------
 +
 . Inside the project (from the top level of the
 *`hdl/assemblies`* directory) display information
@@ -259,6 +289,15 @@ RESOURCES
 ---------
 See the main web site: https://www.opencpi.org
 
+See the 'OpenCPI Component Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Component_Development_Guide.pdf
+
+See the 'OpenCPI HDL Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_HDL_Development_Guide.pdf
+
+See the 'OpenCPI Documentation Writer Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Documentation_Writer_Guide.pdf
+
 
 SEE ALSO
 --------
@@ -276,7 +315,7 @@ link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
 
 COPYING
 -------
-Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your

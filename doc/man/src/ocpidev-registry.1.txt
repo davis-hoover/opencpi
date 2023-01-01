@@ -25,7 +25,7 @@ Projects are not initially registered; the *`ocpidev register`* operation
 for a project can be used to register them.
 
 The OpenCPI installation provides a default project registry at
-$OCPI_ROOT_DIR/project-registry. However, in some project development
+*`$OCPI_ROOT_DIR/project-registry`*. However, in some project development
 environments, it can be useful to have additional separate project
 registries for use as an alternative to the OpenCPI default.
 
@@ -57,18 +57,11 @@ Verbs that can operate on a project registry are:
 
 OPTIONS
 -------
-In the descriptions below, a plus sign (+) after the option indicates
+In addition to the options common to all OpenCPI tools (see link:opencpi.1.html[opencpi(1)]),
+the options described below can be specified for operations on registries.
+In the following descriptions, a plus sign (+) after the option indicates
 that it can be specified more than once on the command line.
 
-Options That Apply to All Operations (Verbs) on Registries
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*`-d`* '<directory>'::
-    Specify the directory in which the command should be run.
-    Analogous to the *-C* option in the POSIX *make* command.
-    
- *`--verbose`*, *`-v`*::
-    Describe what is happening in command execution in more detail.
-  
 Options When Deleting Registries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`-f`*::
@@ -77,13 +70,13 @@ Options When Deleting Registries
 
 Options When Showing Registries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*`--json`*::
-    Format the output in JavaScript Object Notation (JSON) format
-    for integration with other software.
-
 *`--global-scope`*::
     Display information about all project registries.
     This is the default scope used if *`-local-scope`* is not used.
+
+*`--json`*::
+    Format the output in JavaScript Object Notation (JSON) format
+    for integration with other software.
 
 *`--local-scope`*:: 
     Only display information about the local project registry.
@@ -94,7 +87,7 @@ Options When Showing Registries
 *`--table`*::
     Display the output in an easy-to-read table.
     This is the default display format
-    used if *--simple* or *--json* are not used.
+    used if *`--simple`* or *`--json`* are not used.
 
 EXAMPLES
 --------
@@ -118,7 +111,7 @@ ocpidev show registry
 ocpidev set registry
 --------------------
 . Inside the project, associate the project with the registry named
-*`my-registry`* located at ~/workspace/:
+*`my-registry`* located at *`~/workspace/`*:
 +
 -----------------------------------------------
 ocpidev -d ~/workspace set registry my-registry
@@ -141,6 +134,9 @@ RESOURCES
 ---------
 See the main web site: https://www.opencpi.org
 
+See the 'OpenCPI Component Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Component_Development_Guide.pdf
+
 
 SEE ALSO
 --------
@@ -155,7 +151,7 @@ link:ocpidev-unset.1.html[ocpidev-unset(1)]
 
 COPYING
 -------
-Copyright \(C) 2022 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your
