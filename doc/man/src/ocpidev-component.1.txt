@@ -24,21 +24,29 @@ which is an XML file that defines the component's properties and ports
 and usually references one or more OpenCPI Protocol Specifications (OPS)
 in the port definitions. An OCS is also referred to as a "component spec" or "spec file".
 The OCS establishes the interface requirements for all worker implementations
-of the component in any authoring model. At present, a component consists
-of only the OCS XML file. For more information about a component's XML
-structure, see the chapter "Component Specifications" in the
+of the component in any authoring model. For more information about the
+structure of an OCS, see the chapter "Component Specifications" in the
 'OpenCPI Component Development Guide'.
 
-In a project, a component resides in a *`specs/`* directory located
-either in a component library or at the top level of a project and
- is named '<component-name>'*`-spec.xml`*.
-Note that components with an older naming format '<name>'*`_spec.xml`* also exist;
-for example, some of the components in the built-in OpenCPI projects *`assets`* and *`core`*.
+A skeleton OpenCPI component asset document is also created along
+with the component specification to allow for component documentation development
+to occur during the overall component development process. Unless suppressed
+by an option, building the component or the asset that contains it
+builds viewable HTML output of the component asset document. The chapter
+"Documenting OpenCPI Assets" in the 'OpenCPI Documentation Writer Guide'
+provides more information about this feature and how to write a
+component asset document.
+
+In a project, a component and its asset document reside in
+a '<name>'*`.comp`* directory located in a component library.
+The component spec is named '<name>'*`-comp.xml`*.
+The component asset document has the same name as the component spec
+but with the *`.rst`* suffix instead of *`.xml`*.
 
 In general, the workers that implement the component
-and any unit tests created for the component reside in the same library
-as the component, although a component's worker implementations
-can be created in different libraries or even different projects.
+and any component unit test suites created for the component reside
+in the same library as the component, although a component's worker
+implementations can be created in different libraries or even different projects.
 
 Verbs that can operate on a component are:
 
@@ -63,49 +71,36 @@ are *`-d`* '<directory>' and the *`show`* verb options.
 
 OPTIONS
 -------
-In the descriptions below, a plus sign (+) after the option indicates
+In addition to the options common to all OpenCPI tools (see link:opencpi.1.html[opencpi(1)]),
+the options described below can be specified for operations on components.
+In the following descriptions, a plus sign (+) after the option indicates
 that it can be specified more than once on the command line.
 
 Options That Apply to All Operations (Verbs) on Components
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*`--hdl-library=`*'<hdl-library>'::
-    Specify the HDL library in which to operate on the
-    component. HDL libraries exist underneath the *`hdl/`*
-    directory located at the top level of a project.
+*`-h`* '<hdl-library>', *`--hdl-library=`*'<hdl-library>'::
+    Specify the HDL library in which to operate on the component.
+    HDL libraries exist underneath the *`hdl`*
+    directory located at the top level of a project. Valid values
+    are one of: *`devices`*, *`cards`*, *`adapters`*.
+    See link:ocpidev-device.1.html[ocpidev-device(1)]
+    for more information about this option.
 
-*`--library=`*'<component-library>', *`-l`* '<component-library>'::
+*`-l`* '<component-library>', *`--library=`*'<component-library>'::
     Specify the component library in which to operate on the component.
     When a project contains multiple component libraries, this option
     can be used to specify one of them. Multiple component
     libraries are located underneath the *`components`* directory
     at the top level of a project.
-
-*`-d`* '<directory>'::
-    Specify the directory in which the command should be run.
-    Analogous to the *-C* option in the POSIX *make* command.
-
-*-v, --verbose*::
-    Describe what is happening in command execution in more detail.
-    
-Options When Creating and Deleting Components
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*-p*::
-    Specify that the component is to be created in or
-    deleted from the *`specs`* directory of the project
-    instead of the *`specs`* directory of a component library.
-    The *`-l`* and *`-p`* options specify the location
-    of the component. When neither one of these options
-    is used, the location is the *`components`* library
-    and thus is an error if other component libraries exist.
-
+   
 Options When Creating Components
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-*-k*::
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-k`*, *`--keep`*::
     Keep files and directories created after a component creation
     fails. Normally, all such files and directories are removed
     on any failure.
 
-*`-n`*::
+*`-n`*, *`--no-control`*::
    Specify that the component has no control interface. This option
    is rarely used or recommended, but is required for certain
    infrastructure components. It applies only to components
@@ -119,10 +114,13 @@ Options When Deleting Components
 
 Options When Showing Components
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-P`* '<hdl-platform-directory>', *`--platform=`*'<hdl-platform-directory>'::
+    Specify the HDL platform subdirectory in which to operate.
+
 *--`global-scope`*::
     Show components from all registered projects and the
     current project if applicable.
-    This is the default scope used if *-local-scope* is not used.
+    This is the default scope used if *`--local-scope`* is not used.
 
 *`--json`*::
     Format the output in JavaScript Object Notation (JSON) format
@@ -137,51 +135,50 @@ Options When Showing Components
 *`--table`*::
     Display the output in an easy-to-read table.
     This is the default display format
-    used if *--simple* or *--json* are not used.
-
-*`-P`* '<hdl-platform-directory>'::
-    Specify the HDL platform subdirectory in which to operate.
+    used if *`--simple`* or *`--json`* are not used.
     
 EXAMPLES
 --------
-. Create a component with the name *`mycomp`*. The component
-specification will be placed in the default location *`components/specs/`*:
+. Create a skeleton component specification and component asset document for a
+component named *`mycomp`*. The component specification and component asset document
+are placed in the default location *`components/mycomp.comp/`*.
 +
 --------------------------------
 ocpidev create component mycomp
 --------------------------------
 +
-. Create a component named *`mycomp`* in the library named
-*`myutilcomps`*. The component specification will be placed in
-the *`specs`* directory in *`myutilcomps`* sublibrary
-within the *`components`* library (*`components/myutilcomps/specs/`*):
+. Create a skeleton component specification and component asset document
+named *`mycomp`* in the library named
+*`myutilcomps`*. The component specification and the component asset document
+are placed in the *`mycomp.comp`* directory in the *`myutilcomps`* sublibrary
+within the *`components`* library (*`components/myutilcomps/mycomp.comp/`*):
 +
 -----------------------------------------------
 ocpidev create component mycomp -l myutilcomps
 -----------------------------------------------
 +
-. Delete a component named *`mydevcomp`* from the
-*`devices`* library underneath the project's *`hdl`* library
-(deletes it from *`hdl/devices/specs/`*):
+. Delete all files for a component named *`mydevcomp`*
+from the *`devices`* library underneath the project's *`hdl`* library
+(deletes the directory *`hdl/devices/mydevcomp.comp/`*):
++
+---------------------------------------------
+ocpidev delete component mydevcomp -h devices
+---------------------------------------------
++
+. Inside the *`MyProject`* project, display information about
+the component named *`mycomp`* in the 
+*`myutilcomps`* sublibrary in the *`components`* library:
 +
 --------------------------------------------------------
-ocpidev delete component mydevcomp --hdl-library=devices
+ocpidev show component mycomp -l components/myutilcomps
 --------------------------------------------------------
 +
 . Inside the *`assets`* project, display information about
-the component named *`capture`* in the *`specs`* directory
-of the *`base_comps`* library in the *`components`* library:
-+
---------------------------------------------------------
-ocpidev show component capture -l components/base_comps
---------------------------------------------------------
-+
-. Inside the *`assets`* project, display information about
-the component named *`qadc`* in the *`specs`* directory
-of the *`devices`* library in the *`hdl`* library:
+the component named *`mydevcomp`* in the *`devices`* library
+in the *`hdl`* library:
 +
 -------------------------------------------------
-ocpidev show component qadc --hdl-library=devices
+ocpidev show component mycomp -h devices
 -------------------------------------------------
 +
 . Inside the *`assets`* project, display information about
@@ -198,6 +195,23 @@ to the project *`/home/workspace/MyProject`*:
 ocpidev show components --local-scope  -d /home/workspace/MyProject
 ------------------------------------------------------------------
 
+NOTES
+-----
+Component specifications created in earlier OpenCPI releases
+reside in a *`specs/`* directory located either in a component library
+or at the top level of a project and are named
+'<name>'*`-spec.xml`* or '<name>'*`_spec.xml`*.
+
+The following option to the *`ocpidev create`* operation for a component is
+provided for backward compatibility with the component spec structure used
+in earlier OpenCPI releases:
+
+*`ocpidev create component`* '<name>' *`--file-only`*
+
+The *`--file-only`* option directs *`ocpidev`* to create a component spec named
+'<name>'*`-spec.xml`* in a *`specs/`* directory in a component library.
+No component asset document is created.
+
 BUGS
 ----
 See https://www.opencpi.org/report-defects
@@ -206,6 +220,12 @@ See https://www.opencpi.org/report-defects
 RESOURCES
 ---------
 See the main web site: https://www.opencpi.org
+
+See the 'OpenCPI Component Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Component_Development_Guide.pdf
+
+See the 'OpenCPI Documentation Writer Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Documentation_Writer_Guide.pdf
 
 
 SEE ALSO
@@ -222,7 +242,7 @@ link:ocpidev-worker.1.html[ocpidev-worker(1)]
 
 COPYING
 -------
-Copyright \(C) 2021 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your

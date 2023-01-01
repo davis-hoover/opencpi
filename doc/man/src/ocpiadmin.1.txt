@@ -40,6 +40,7 @@ For more information about these tasks and how they
 relate to enabling OpenCPI development on embedded systems,
 see the 'OpenCPI Installation Guide'.
 
+For convenience, options can occur anywhere in the command.
 The general usage concept for *`ocpiadmin`* is:
 perform the '<verb>' operation on the
 '<noun>' whose name is '<name>'.
@@ -70,15 +71,38 @@ The nouns supported by *`ocpiadmin`* are:
 OPTIONS
 -------
 In addition to the options common to all OpenCPI tools (see link:opencpi.1.html[opencpi(1)]),
-the following options can be specified for the *`install`* verb only:
+the following options can be specified for the *`install`* verb only.
+In the descriptions below, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.
+Arguments to word-form options are preceded by an equal sign (=)
+(as shown in the following descriptions) or a space. Arguments to
+letter options are preceded by a space.
 
-*`--git-revision=`*'<git-rev>', *`-g`* '<git-rev>'::
+*`-g`* '<git-rev>', *`--git-revision=`*'<git-rev>'::
     Specifies the branch, tag or other valid *`git`* revision to check out after
     downloading/cloning the project specified in the *`--package-id`* (*`-p`*) option (described below).
-    This option can be used with the *`--package-id`* option
+    This option can be used with the *`-p`* (*`--package-id`*) option
     to install a different *`git`* revision of a project from the one currently checked out.
     If this option is not used, the *`git`* revision for the specified package-ID defaults
     to the *`git`* revision of the OpenCPI framework repository.
+
+*`-p`* '<package-id>', *`--package-id=`*'<package-id>'::
+    Specifies the OpenCPI package-ID of the project that provides the support
+    for the platform. This option is only required when support for
+    the platform is provided in an 'OSP' ('OpenCPI System support Project')
+    instead of in a built-in OpenCPI project.
+    The default format for a package-ID is '<package-prefix>'*.*'<package-name>';
+    for example, *`ocpi.osp.e3xx`*, *`ocpi.osp.plutosdr`*. See the chapter on package-IDs in the 'OpenCPI
+    Component Development Guide' for details.
+
+*`-u`* '<url>', *`--url=`*'<url>'::
+    Specifies the internet URL where the project resides. This option can be
+    used with the *`-p`* (*`--package-id`*) option (described above) to specify the location of
+    a project that is not hosted on the OpenCPI Gitlab site. If this option
+    is not used, the URL defaults to *`https://gitlab.com/opencpi/osps/`*'<package-id>'*`.git`*,
+    where '<package-id>' is the one specified in the *`--package-id=`* option.
+    For example, if '<package-id>' is *`ocpi.osp.e3xx`*, the URL is
+    *`https://gitlab.com/opencpi/osps/ocpi.osps.e3xx.git`*.
 
 *`--minimal`*::
     Specifies a minimized installation process that does not pre-build HDL workers or run
@@ -95,25 +119,6 @@ the following options can be specified for the *`install`* verb only:
     should be built with optimization enabled.
     If this option is not used, the default is to build with optimization disabled,
     which is perhaps better suited for debugging.
-
-*`--package-id=`*'<package-id>', *`-p`* '<package-id>'::
-    Specifies the OpenCPI package-ID of the project that provides the support
-    for the platform. This option is only required when support for
-    the platform is provided in an 'OSP' ('OpenCPI System support Platform')
-    instead of in a built-in OpenCPI project.
-    The default format for a package-ID is '<package-prefix>'*.*'<package-name>';
-    for example, *`ocpi.osp.e3xx`*, *`ocpi.osp.plutosdr`*. See the chapter on package-IDs in the 'OpenCPI
-    Component Development Guide' for details.
-
-*`--url=`*'<url>', *`-u`* '<url>'::
-    Specifies the internet URL where the project resides. This option can be
-    used with the *`--package-id`* (*`-p`*) option (described above) to specify the location of
-    a project that is not hosted on the OpenCPI Gitlab site. If this option
-    is not used, the URL defaults to *`https://gitlab.com/opencpi/osps/`*'<package-id>'*`.git`*,
-    where '<package-id>' is the one specified in the *`--package-id=`* option.
-    For example, if '<package-id>' is *`ocpi.osp.e3xx`*, the URL is
-    *`https://gitlab.com/opencpi/osps/ocpi.osps.e3xx.git`*.
-
 
 OPERATIONS
 ----------
@@ -207,6 +212,13 @@ RESOURCES
 ---------
 See the main web site: https://www.opencpi.org
 
+See the 'OpenCPI Component Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Component_Development_Guide.pdf
+
+See the 'OpenCPI Installation Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Installation_Guide.pdf
+
+
 SEE ALSO
 --------
 link:ocpidev.1.html[ocpidev(1)]
@@ -218,7 +230,7 @@ link:opencpi.1.html[opencpi(1)]
 
 COPYING
 -------
-Copyright \(C) 2022 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your

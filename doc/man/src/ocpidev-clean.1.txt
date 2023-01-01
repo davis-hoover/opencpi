@@ -9,60 +9,78 @@ ocpidev-clean - cleans OpenCPI assets
 
 SYNOPSIS
 --------
-*ocpidev* ['<options>'] *clean* ['<noun>' ['<name>' ]]
+*`ocpidev`* ['<options>'] *`clean`* ['<noun>' ['<name>' ]]
 
 
 DESCRIPTION
 -----------
-The *clean* verb cleans the OpenCPI assets specified by the noun used
-in the command. If no nouns are provided, *ocpidev* cleans the current
+The *`clean`* verb cleans the OpenCPI assets specified by the noun used
+in the command. If no nouns are provided, *`ocpidev`* cleans the current
 directory. When the plural version of the nouns are used, no name is
 specified and all assets of that type are cleaned.
 
+The *`clean`* operation cleans the results of a *`build`* operation,
+including any generated/built document files. The operation also cleans
+the execution results of a *`run`* operation.
+
 Asset types to be specified in the '<noun>' argument are:
 
-*application*(*s*)::
+*`application`*(*`s`*)::
     Clean all applications or a specific ACI application.
 
-*hdl*::
+*`hdl`*::
     A prefix to indicate an HDL asset in the *hdl* subdirectory of a project.
     Possible HDL assets are:
 
-        *assembly*|*ies*;;
+        *`assembl`*(*`y`*|*`ies`*);;
 	Clean all or a specified HDL assembly.
 	
-	*device*;;
+	*`device`*;;
 	Clean an HDL device worker in a
 	specified library.
 	
-	*platform*(*s*);;
+	*`platform`*(*`s`*);;
 	Clean all or a specified HDL platform.
 	
-	*primitive*(*s*);;
+	*`primitive`*(*`s`*);;
 	Clean all or a specified HDL primitive of a specified type.
-	Possible HDL primitive types are:
+	For a specified HDL primitive, possible HDL primitive types are:
 	
-	    *library*:::
+	    *`library`*:::
 	    Clean a primitive that results in a library of modules.
 	    
-	    *core*:::
+	    *`core`*:::
 	    Clean a primitive that results in a synthesized
 	    core/netlist.
 
-*library*::
-    Clean the specified component library.
+*`librar`*(*`y`*|*`ies`*)::
+    Clean all or the specified component library.
 
-*project*::
+*`project`*::
     Clean all assets in a project.
 
-*worker*::
-    Clean the specified worker.
-    
-*test*::
-    Clean but do not run the specified component unit test.
+*`test`*(*`s`*)::
+    Clean all or a specified component unit test but do not run.
+
+*`worker`*(*`s`*)::
+    Clean all or the specified worker.  
+
+Unless suppressed by options, the *`clean`* verb removes
+both the built assets and their built OpenCPI asset documents from the project.
+See the 'OpenCPI Documentation Writer Guide' for details on OpenCPI asset documents.
 
 OPTIONS
 -------
+In addition to the options common to all OpenCPI tools (see link:opencpi.1.html[opencpi(1)]),
+the following options can be specified for the *`clean`* verb.
+
+Options When Cleaning Any Asset
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--doc-only`*::
+   Only clean the asset's documentation and not the asset itself.
+
+*`--no-doc`*::
+   Only clean the asset and not the asset's documentation.
 
 Options When Cleaning Tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -75,25 +93,26 @@ Options When Cleaning Tests
 
 EXAMPLES
 --------
-. Clean the current asset or directory and the assets underneath it.
+. Clean the asset represented by the current directory and all the assets underneath it.
 +
 ----------
 ocpidev clean
 ----------
 +
-. Clean the *`assets`* project. Omit the name *`assets`* if
+. Clean only the asset documents in the *`assets`* project. Omit the name *`assets`* if
 inside the *`assets`* project.
 +
---------------------------------------------
-ocpidev clean project assets
--------------------------------------------
+---------------------------------------
+ocpidev clean project assets --doc-only
+---------------------------------------
 +			 
-. Inside the *`assets`* project, clean the *`dsp_comps`* library
-located at *`components/dsp_comps`*.
+. Clean the *`dsp_comps`* library
+located at *`components/dsp_comps`* in the project
+implied by the current directory.
 +
---------------------------------------------------
+-------------------------------
 ocpidev clean library dsp_comps
---------------------------------------------------
+-------------------------------
 
 BUGS
 ----
@@ -102,6 +121,24 @@ See https://www.opencpi.org/report-defects
 RESOURCES
 ---------
 See the main web site: https://www.opencpi.org
+
+See the 'OpenCPI Application Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Application_Development_Guide.pdf
+
+See the 'OpenCPI Component Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Component_Development_Guide.pdf
+
+See the 'OpenCPI HDL Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_HDL_Development_Guide.pdf
+
+See the 'OpenCPI Platform Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Platform_Development_Guide.pdf
+
+See the 'OpenCPI RCC Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_RCC_Development_Guide.pdf
+
+See the 'OpenCPI Documentation Writer Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Documentation_Writer_Guide.pdf
 
 SEE ALSO
 --------
@@ -121,7 +158,7 @@ link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
 
 COPYING
 -------
-Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your

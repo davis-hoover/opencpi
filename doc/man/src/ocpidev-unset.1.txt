@@ -9,7 +9,7 @@ ocpidev-unset - manually disassociate a project from a registry.
 
 SYNOPSIS
 --------
-*ocpidev* ['<options>'] *unset registry*
+*`ocpidev`* ['<options>'] *`unset registry`*
 
 
 DESCRIPTION
@@ -17,7 +17,7 @@ DESCRIPTION
 Projects are automatically associated with the current
 registry when they are created or used. A project can
 be manually associated with or disassociated
-from a particular registry. Use the *ocpidev unset registry*
+from a particular registry. Use the *`ocpidev unset registry`*
 command to remove an association between a project
 and a registry.
 
@@ -25,7 +25,7 @@ You must run this command from within a project.
 
 Asset types to be specified in the '<noun>' argument are:
 
-*registry*::
+*`registry`*::
     Unset the registry for the project.
 
 OPTIONS
@@ -34,6 +34,8 @@ You can use the general-purpose options *`-v`* and *`-d`* '<directory>'
 with this command. In particular, you can use the *`-d`* '<directory>'
 option to specify the pathname of the project whose registry should
 be unset. If this option is not specified, the current project is used.
+See the link:opencpi.1.html[opencpi(1)] man page
+for descriptions of these general-purpose options.
 
 There are no verb-specific options.
 
@@ -60,6 +62,10 @@ RESOURCES
 ---------
 See the main web site: https://www.opencpi.org
 
+See the 'OpenCPI Component Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Component_Development_Guide.pdf
+
+
 SEE ALSO
 --------
 link:ocpidev.1.html[ocpidev(1)]
@@ -77,7 +83,7 @@ link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
 
 COPYING
 -------
-Copyright \(C) 2021 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your

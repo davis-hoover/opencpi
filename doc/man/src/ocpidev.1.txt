@@ -14,14 +14,14 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-The *`ocpidev(1)`* command-line tool is used to perform various development-
-related tasks inside projects as well as retrieve information about
-the environment. When used in projects, it can be invoked at the top
+The *`ocpidev(1)`* command-line tool is used to perform various
+development-related tasks inside projects as well as retrieve information
+about the environment. When used in projects, it can be invoked at the top
 level of the project or in lower-level directories of the project as
 appropriate to the particular command being used. The *`ocpidev`* command
 has full tab completion for its options and arguments.
 
-Options can occur anywhere in the command for the user's convenience.
+For convenience, options can occur anywhere in the command.
 The general usage concept is: perform the '<verb>' operation on the
 '<noun>' asset type whose name is '<name>'.
 
@@ -35,7 +35,7 @@ The verbs supported by *`ocpidev`* are:
 
 *`build`*::
     Build the asset(s), running appropriate tools to create
-    the binary files.
+    the binary files and viewable documentation.
 
 *`clean`*::
     Remove all the generated and compiled files for the assets.
@@ -47,18 +47,16 @@ The verbs supported by *`ocpidev`* are:
 *`delete`*::
     Remove all directories and files associated with the named asset.
 
-*`refresh`*::
-    Manually regenerate the metadata associated with the project.
-
 *`run`*::
-    Execute the unit test or application.
+    Execute a component unit test or application.
 
 *`show`*::
     Display information about assets in registered projects
+    or below the current directory 
     and the current build environment (preliminary).  
     
 *`register`*, *`unregister`*::
-    Register/unregister a project in its registry.
+    Register/unregister a project in a registry.
 
 *`set`*, *`unset`*::
     Set/unset the registry used by the project.
@@ -74,14 +72,17 @@ The assets (nouns) supported by *`ocpidev`* are:
     A component application, specified in either XML or C++.
 
 *`applications`*::
-    All applications in a project's *applications* directory.
+    All applications in a project (in its *`applications/`* directory.
 
 *`component`*::
-    A component specification XML file (OCS) at a project or
-    a library level.
+    A component specification XML file (OCS) and associated documentation
+    at a project or a library level.
 
 *`library`*::
     A component library.
+
+*`libraries`*::
+    A set of component libraries.
 
 *`project`*::
     A project containing all other asset types.
@@ -94,7 +95,7 @@ The assets (nouns) supported by *`ocpidev`* are:
     a library level.
 
 *`registry`*::
-    A registry for projects to import/export dependencies from/to.
+    A registry where projects can make themselves visible to other projects.
 
 *`test`*::
     A unit test suite for a component specification.
@@ -103,11 +104,11 @@ The assets (nouns) supported by *`ocpidev`* are:
     A worker that implements a component specification.
 
 Note that the assets *`application`*, *`applications`*, *`library`*,
-*`project`* and *`registry`* do not reside in libraries. The assets
-*`properties`*, *`protocol`*, *`component`*, *`test`* and *`worker`*
-reside in libraries.
+*`libraries`*, *`project`* and *`registry`* do not reside in component libraries.
+The assets *`properties`*, *`protocol`*, *`component`*, *`test`* and
+*`worker`* reside in component libraries.
 
-The HDL-specific assets (located under the *`hdl/`* subdirectory
+The HDL-specific assets (located under the *`hdl/`* subdirectory)
 supported by *`ocpidev`* are:
 
 *`hdl assembly`*::
@@ -119,7 +120,7 @@ supported by *`ocpidev`* are:
 
 *`hdl card`*::
     A card specification XML file at a project level or
-    an HDL library level.
+    an HDL component library, usually in *`hdl/cards/`*.
 
 *`hdl device`*::
     An HDL device worker in an HDL component library
@@ -135,7 +136,7 @@ supported by *`ocpidev`* are:
     *`hdl/platforms/`* directory.
 
 *`hdl primitive core`*::
-    An HDL primitive core in a project or in a project's
+    An HDL primitive core in a project's
     *`hdl/primitives/`* directory.
 
 *`hdl primitive library`*::
@@ -145,19 +146,11 @@ supported by *`ocpidev`* are:
 *`hdl primitives`*::
     All HDL primitives (cores or libraries) in a project.
 
-*hdl signals*::
-    A signals specification XML file at a project level or
-    an HDL library level.
-
 *`hdl slot`*::
     A slot type definition XML file at the project level or
     the HDL library level.
     
-*`hdl subdevice`*::
-    An HDL subdevice worker in an HDL devices library that
-    supports other HDL device workers.
-
-Note that the HDL assets *`card`*, *`device`* and *`subdevice`* reside
+Note that the HDL assets *`card`* and *`device`* reside
 in one of the fixed HDL libraries in a project (*`hdl/adapters/`*,
 *`hdl/cards/`*, and *`hdl/devices/`*) or the *`devices/`* library
 within an HDL platform's directory. The remaining HDL assets
@@ -168,22 +161,16 @@ OPTIONS
 -------
 Options are either single letters following one hyphen or complete
 words or acronyms following two hyphens and separated by hyphens.
-Most options are only valid for specific verbs or nouns. The
-general-purpose options are:
+In option descriptions, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.
+Arguments to word-form options are preceded by an equal sign (=)
+(as shown in the descriptions) or a space. Arguments to
+letter options are preceded by a space.
 
-*`-d`* '<directory>'::
-    Specify the directory in which this command should be run.
-    Analogous to the *-C* option in the POSIX *make* command.
-    This option can be specified more than once on the command line.
-
-*`--help`*::
-    Display help information. This option can be used in conjunction with
-    a verb to display verb-specific information. For example:
-    *`ocpidev --help show`*.
-
-*`--verbose`*, *`-v`*::
-    Describe what is happening in command execution in more detail.
-
+Most options are only valid for specific verbs or nouns and are
+described in the individual verb and noun man pages.
+See the link:opencpi.1.html[opencpi(1)] man page
+for the general-purpose options that apply to all OpenCPI tools.
 
 BUGS
 ----
@@ -193,6 +180,13 @@ See https://www.opencpi.org/report-defects
 RESOURCES
 ---------
 See the main web site: https://www.opencpi.org
+
+See the 'OpenCPI Component Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Component_Development_Guide.pdf
+
+See the 'OpenCPI User Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_User_Guide.pdf
+
 
 SEE ALSO
 --------
@@ -210,7 +204,6 @@ link:ocpidev-platform.1.html[ocpidev-platform(1)]
 link:ocpidev-primitive.1.html[ocpidev-primitive(1)]
 link:ocpidev-project.1.html[ocpidev-project(1)]
 link:ocpidev-protocol.1.html[ocpidev-protocol(1)]
-link:ocpidev-refresh.1.html[ocpidev-refresh(1)]
 link:ocpidev-register.1.html[ocpidev-register(1)]
 link:ocpidev-registry.1.html[ocpidev-registry(1)]
 link:ocpidev-run.1.html[ocpidev-run(1)]
@@ -225,7 +218,7 @@ link:ocpidev-worker.1.html[ocpidev-worker(1)]
 
 COPYING
 -------
-Copyright \(C) 2021 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your

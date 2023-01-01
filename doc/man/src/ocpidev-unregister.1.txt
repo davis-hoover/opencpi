@@ -9,25 +9,29 @@ ocpidev-unregister - remove a project from a project registry.
 
 SYNOPSIS
 --------
-*ocpidev* ['<options>'] *unregister project*
+*`ocpidev`* ['<options>'] *`unregister project`*
 
 
 DESCRIPTION
 -----------
-The *ocpidev unregister* command removes the current project from its registry.
+The *`ocpidev unregister`* command removes the current project from its registry.
 Registering a project makes its exports visible and usable to other projects
 using the same registry. Unregistering a project removes this visiblity.
 
 Asset types to be specified in the '<noun>' argument are:
 
-*project*::
+*`project`*::
     Register the project in a registry.
 
 OPTIONS
 -------
-The general purpose options *`--verbose`* (*`-v`*) and *`-d`* '<directory>' can be used.
+The general-purpose options *`-d`* '<directory>'
+and *`-v`* (*`--verbose`*) can be used.
 In particular, the *`-d`* '<directory>' option can be used to specify
 the pathname of the project being unregistered.
+See the link:opencpi.1.html[opencpi(1)] man page
+for descriptions of these general-purpose options.
+
 There are no verb-specific options.
 
 EXAMPLES
@@ -45,6 +49,10 @@ See https://www.opencpi.org/report-defects
 RESOURCES
 ---------
 See the main web site: https://www.opencpi.org
+
+See the 'OpenCPI Component Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Component_Development_Guide.pdf
+
 
 SEE ALSO
 --------
@@ -64,7 +72,7 @@ link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
 
 COPYING
 -------
-Copyright \(C) 2022 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your

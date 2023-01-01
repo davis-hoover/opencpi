@@ -39,7 +39,7 @@ GRC-structured worker ('<worker-id>'*`.block.yml`*), worker tree (*`ocpi.tree.ym
 per-platform domain (*`ocpi_`*'<platform-id>'*`.block.yml`*), and container
 (*`ocpi_container.yml`*) block files in the
 current directory or the directory specified in
-the *`--directory`* (*`-D`*) option.
+the *`-D`* (*`--directory`*) option.
 
 VERBS
 -----
@@ -51,22 +51,22 @@ None.
 
 OPTIONS
 ------
-Options are either single letters following one
-hyphen or hyphen-separated words or acronyms following two hyphens.
-When invoked without options, *`ocpigr`* displays help information.
+In addition to the general-purpose options common
+to all OpenCPI tools (see link:opencpi.1.html[opencpi(1)]),
+the options described below can be specified for *`ocpigr`* operations.
+For convenience, options can occur anywhere in the command.
+When invoked without any options, *`ocpigr`* displays help information.
 
-*`--directory=`*'<output-dir>', *`-D`* '<output-dir>'::
+In the following descriptions, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.
+Arguments to word-form options are preceded by an equal sign (=)
+(as shown in the following descriptions) or a space. Arguments to
+letter options are preceded by a space.
+
+*`-D`* '<output-dir>', *`--directory=`*'<output-dir>'::
     Specify the directory in which to place the generated GRC block files.
     If this option is not used, *`ocpigr`* places the
     generated block files into the directory in which it runs.
-
-*`--help`*, *`-h`*::
-    Display usage information about the tool.
-
-*`--verbose`*, *`-v`*::
-    Describe what is happening during command
-    execution in more detail.
-
 
 ENVIRONMENT VARIABLES
 ---------------------
@@ -113,7 +113,7 @@ link:ocpidev-worker.1.html[ocpidev-registry(1)]
 
 COPYING
 -------
-Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your

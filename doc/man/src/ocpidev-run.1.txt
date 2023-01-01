@@ -66,6 +66,8 @@ no noun or name arguments are required.
 
 OPTIONS
 -------
+In addition to the options common to all OpenCPI tools (see link:opencpi.1.html[opencpi(1)]),
+the following options can be specified for the *`run`* verb.
 In the option descriptions below, a plus sign (+) indicates that
 the option can be specified more than once on the command line.
 
@@ -77,18 +79,18 @@ Options That Apply to Applications and Unit Tests
 
 Options That Apply to Applications Only
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--after`* '<args>'+::
+    Specify the argument(s) to insert at the end of the execution command line.
+
 *`--before`* '<args>'+::
     Specify the argument(s) to insert before the ACI executable or
     the *`ocpirun`* command; for example, environment settings or prefix commands.
-
-*`--after`* '<args>'+::
-    Specify the argument(s) to insert at the end of the execution command line.
 
 *`--run-arg`* '<args>'+::
     Specify the argument(s) to insert immediately after the ACI executable or
     the *`ocpirun`* command.
 
-You can also add run-arg arguments after the application '<name>';
+You can also add *`run-arg`* arguments after the application '<name>';
 for example, to specify options to *`ocpirun`* for XML applications.
 Preface these arguments with the double hyphen (*`--`*) notation
 to indicate that they are not options to the *`ocpidev`* command
@@ -109,10 +111,20 @@ For an XML application, these command lines perform the command:
 For more information on how to use these options, see the section "Applications
 in Projects" in the 'OpenCPI Application Development Guide'.
 
-Options That Apply to Unit Tests Only
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*`-l`* '<library>'::
-    Run the unit test in the specified library.
+Options That Apply to Component Unit Tests Only
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-G`* '<platform>', *`--only-platform=`*'<platform>'+::
+    Specify the runtime platform to use with a unit test.
+   
+*`-Q`* '<platform>', *`--exclude-platform=`*'<platform>'+::
+    Specify the runtime platform to omit from a component unit test.
+
+*`-l`* '<library>', *`--library=`*'<library>'::
+    Run the component unit test suite in the specified library.
+
+*`--accumulate-errors`*::
+    Report execution or verification errors as they occur rather
+    than ending the test on the first failure detected.
 
 *`--case=`*'<case-name>'[*,*'<case-name>'[*,*'<case-name>'...]]::
     Specify the test case(s) to be executed/verified. If this option is not used,
@@ -120,24 +132,14 @@ Options That Apply to Unit Tests Only
     in '<case-name>'. To specify a subcase, use the notation
     '<case-name>'*.*'<subcase-number>'. Examples: case*., case0.0*, case00.01
 
-*`--accumulate-errors`*::
-    Report execution or verification errors as they occur rather
-    than ending the test on the first failure detected.
-
-*`--exclude-platform=`*'<platform>', *-Q* '<platform>'+::
-    Specify the runtime platform to omit from a unit test.
-
 *`--hdl-platform=`*'<platform>'+::
-    Specify the HDL platform to use with the unit test. This option is only
+    Specify the HDL platform to use with the component unit test. This option is only
     valid in generate and build phases.
 
 *`--keep-simulations`*::
     Keep HDL simulation files regardless of verification results.
     By default, simulation files are removed if the verification
     is successful. Warning: Simulation files can become large!
-
-*`--only-platform=`*'<platform>', *-G* '<platform>'+::
-    Specify the runtime platform to use with a unit test.
 
 *`--phase=`*'<phase>'+::
     Specify which non-building phase(s) of unit testing to run.
@@ -152,7 +154,7 @@ Options That Apply to Unit Tests Only
     in the 'OpenCPI Component Development Guide' for more information.
 
 *`--view`*::
-    Run the view script (view.sh) for the test at the conclusion of the
+    Run the view script (*`view.sh`*) for the test at the conclusion of the
     test's execution.
 
 ENVIRONMENT VARIABLES
@@ -209,6 +211,13 @@ RESOURCES
 ---------
 See the main web site: https://www.opencpi.org
 
+See the 'OpenCPI Application Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Application_Development_Guide.pdf
+
+See the 'OpenCPI Component Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Component_Development_Guide.pdf
+
+
 SEE ALSO
 --------
 link:ocpidev.1.html[ocpidev(1)]
@@ -227,7 +236,7 @@ link:ocpirun.1.html[ocpirun(1)]
 
 COPYING
 -------
-Copyright \(C) 2022 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your
