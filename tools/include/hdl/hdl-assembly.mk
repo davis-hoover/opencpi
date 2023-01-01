@@ -89,8 +89,8 @@ ifneq ($(MAKECMDGOALS),clean)
   endif
   # default the container names
   $(foreach c,$(Containers),$(eval HdlContXml_$(notdir $c):=$c))
-  # $(call doConfigConstraints,<container>,<platform>,<config>)
-  getConfigConstraints=$(strip\
+  # $(call HdlConfigConstraints,<container>,<platform>,<config>)
+  HdlConfigConstraints=$(strip\
      $(if $(call DoShell,$(call OcpiGenTool) -Y $(HdlPlatformDir_$2)/hdl/$3,HdlConfConstraints),\
           $(error Processing platform configuration XML "$3" for platform "$2" for container "$1"),\
 	  $(call HdlGetConstraintsFile,$(HdlConfConstraints),$2)))
@@ -223,12 +223,13 @@ else
       # container file (in the assembly dir), or under the platform directory
       HdlGetContainerConstraintsFiles=$(infox HGCC:$1:$2:$3:$4)$(strip\
         $(comment figure out the contraints now that hdl-pre.mk has been run for toolsets etc.)\
-        $(if $(filter -,$(HdlConstraints_$1)),\
-          $(foreach c,$(call getConfigConstraints,$1,$2,$3),$(HdlPlatformDir_$2)/$c),\
-          $(foreach c,$(call HdlGetConstraintsFile,$(HdlConstraints_$1),$2),\
-             $(or $(wildcard $c),\
-                $(and $(filter-out /%,$c),$(wildcard $(HdlPlatformDir_$2)/$c)),\
-                $(error Constraints file $c not found for container $1)))))
+	$(foreach c,$(if $(filter -,$4),\
+                       $(HdlPlatformDir_$2)/$(call HdlConfigConstraints,$1,$2,$3),\
+                       $(call HdlGetConstraintsFile,$4,$2)),$(call OcpiInfox,CCC:$c)\
+          $(foreach f,$(word 1,$(subst ?, ,$c)),\
+            $(or $(wildcard $f),$(strip \
+                 $(and $(filter-out /%,$f),$(wildcard $(HdlPlatformDir_$2)/$f))),\
+              $(error Constraints file $f not found for container $1))$(foreach e,$(word 2,$(subst ?, ,$c)),?$e))))
       HdlGetContainerConstraints=$(strip \
         $(call HdlGetContainerConstraintsFiles,$1,$(HdlPlatform_$1),$(HdlConfig_$1),$(HdlConstraints_$1)))
       define doContainer
@@ -239,7 +240,7 @@ else
 	  $(AT)$(MAKE) -C $(call HdlContOutDir,$1) -f $(OCPI_CDK_DIR)/include/hdl/hdl-container.mk \
 	       $(and $(OCPI_PROJECT_REL_DIR),OCPI_PROJECT_REL_DIR=../$(OCPI_PROJECT_REL_DIR)) \
                HdlAssembly=../../$(CwdName)  HdlConfig=$(HdlConfig_$1) \
-               HdlConstraints=$(call AdjustRelative,$(call HdlGetContainerConstraints,$1)) \
+               HdlConstraints='$(call AdjustRelative,$(call HdlGetContainerConstraints,$1))' \
                HdlPlatforms=$(HdlPlatform_$1) HdlPlatform=$(HdlPlatform_$1) \
 	       ComponentLibrariesInternal="$(call OcpiAdjustLibraries,$(ComponentLibraries))" \
 	       HdlExplicitLibraries="$(call OcpiAdjustLibraries,$(HdlExplicitLibraries))" \

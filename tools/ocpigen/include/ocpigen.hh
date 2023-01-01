@@ -59,7 +59,7 @@ typedef Workers::iterator WorkersIter;
 
 struct Signal;
 // This container provides lookup by name
-typedef std::map<const char *, Signal *, OCPI::Util::ConstCharCaseComp> SigMap_;
+typedef std::map<std::string, Signal *, OCPI::Util::ConstStringCaseComp> SigMap_;
 class SigMap : public SigMap_ {
  public:
   Signal *findSignal(const std::string &name, std::string *suffixed = NULL) const {
@@ -95,7 +95,9 @@ struct Signal {
   std::string m_out; // pattern for out of tristate if not %s_o
   std::string m_oe;  // pattern for output enable of tristate if not %s_oe
   const char *m_type;
+  static const char *decodeSignal(const std::string &name, std::string &base, size_t &index);
   Signal();
+  Signal *clone(bool clearExprs = false) const;
   const char *parseDirection(const char *direction, std::string *expr,
 			     OB::IdentResolver &ir);
   const char *parseWidth(const char *width, std::string *expr, OB::IdentResolver &ir);
@@ -133,7 +135,7 @@ class SigMapIdx : public SigMapIdx_ {
     idx = i->second.second;
     return i->second.first;
   }
-  const char*findSignal(Signal *sig, size_t idx) const;
+  const char *findSignal(Signal *sig, size_t idx) const;
   void insert(const char *name, Signal *s, size_t idx) {
     (*this)[name] = std::pair<Signal *,size_t>(s, idx);
   }

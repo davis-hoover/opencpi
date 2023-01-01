@@ -1281,6 +1281,9 @@ OcpiIncludeAssetAndParentX=$(callx OcpiInfo,OIAAPX:$1:$2:$3:$(realpath $1))$(str
 OcpiIncludeAssetAndParent=\
   $(if $(filter clean%,$(MAKECMDGOALS)),\
     $(- here is when we are cleaning - just look for cleanfiles attribute by itself)\
+    $(- FIXME: plural assets or libraries should also include other attributes like "ExcludeApplications")\
+    $(- FIXME: so this "cleaning" bypass is not really the right solution here since the right)\
+    $(- FIXME: cleaning attributes are asset-specific - so it should be done elsewhere)\
     $(eval CleanFiles:=)\
     $(foreach d,$(or $1,.),\
       $(foreach x,$(wildcard $d/$(CwdName).xml $d/$(CwdName).*.xml $d/$(CwdName)-test.xml $d/$(CwdName)-app.xml),\

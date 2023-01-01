@@ -132,7 +132,7 @@ def get_dir_info(directory=".", careful=False):
             xml_name += "-test"
             make_type = asset_type = "test"
         elif parts[-1] == "comp":
-            xml_name += "-spec"
+            xml_name += "-spec" if Path(xml_name + "-spec.xml").exists() else "-comp"
             make_type = asset_type = "component"
         elif parts[-1] in [ "hdl", "rcc", "ocl" ]:
             make_type = "worker"
@@ -838,13 +838,14 @@ def get_platform_attributes(project_package_id, directory, name, model):
         if attrs.get('configurations') == None: # not empty string is ok
             attrs['configurations'] = ['base']
         if not part:
-            print("Error: no part variable or attribute when parsing platform:  ", name, file=sys.stderr)
+            print("Error: No part variable or attribute when parsing platform:  ", name, file=sys.stderr)
             return None
         family = attrs.get('family')
         if not family:
             family = hdl_parts.get(part.split('-')[0])
             if not family:
-                family = name;
+                print("Error: No HDL part family is defined for part: ", part, file=sys.stderr)
+                return None
             attrs['family'] = family
         vendor = attrs.get('vendor')
         if not vendor:
@@ -852,19 +853,51 @@ def get_platform_attributes(project_package_id, directory, name, model):
                 if family in families:
                     attrs['vendor'] = vendor
                     break
-        toolset = attrs.get('toolset')
-        if not toolset:
-            toolset = hdl_families[family]['toolset']
-            attrs['toolset'] = toolset
-            attrs['tool'] = hdl_tools[toolset]['tool']
-        # attrs['target'] = family
         # Update global database from this platform
         family_dict = hdl_families.get(family)
+        toolset = attrs.get('toolset')
+        if toolset and not hdl_tools.get(toolset):
+            print(f'Error:  The specified HDL toolset "{toolset}" for platform "{name}" is not a known toolset',
+                  file=sys.stderr)
+            return None
+        vendor = attrs.get('vendor')
+        if vendor and not hdl_vendors.get(vendor):
+            print(f'Error:  The specified HDL vendor \"{vendor}\" for platform \"{name}\" is not a known vendor',
+                  file=sys.stderr)
+            return None
+        if family_dict and toolset and toolset != family_dict.get('toolset'):
+            print(f'Error:  The specified HDL toolset for family "{family}", "{toolset}", '
+                  'is inconsistent with previously defined toolset: "{family_dict.get("toolset")}',
+                  file=sys.stderr)
+            return None
+        if family_dict and vendor and vendor != family_dict.get('vendor'):
+            print(f'Error:  The specified HDL vendor for family "{family}", "{vendor}", '
+                  'is inconsistent with previously defined vendor: "{family_dict.get("vendor")}',
+                  file=sys.stderr)
+            return None
         if not family_dict:
+            # This platform is specifying its own family in case it is not globally defined yet
+            if not toolset:
+                print(f'Error: No HDL toolset is specified for the HDL family: "{family}"',
+                  file=sys.stderr)
+                return None
+            if not vendor:
+                print(f'Error: No HDL vendor is specified for the HDL family: "{family}"',
+                  file=sys.stderr)
+                return None
+            print(f'Note:  The HDL part family "{family}" with toolset "{toolset}" and vendor '
+                  f'"{vendor}" is being defined by the "{name}" platform', file=sys.stderr)
             family_dict = {}
-            family_dict['parts'] = set()
+            family_dict['parts'] = dict()
+            family_dict['toolset'] = toolset
+            family_dict['vendor'] = vendor
             hdl_families[family] = family_dict
+            hdl_vendors[vendor].append(family)
         family_dict['parts'][part.split('-')[0]] = None
+        if not toolset:
+            toolset = hdl_families[family]['toolset']
+        attrs['toolset'] = toolset
+        attrs['tool'] = hdl_tools[toolset]['tool']
 
         if directory.endswith("/xml"):
             directory = os.path.normpath(directory + "/../" + name) # may not exist

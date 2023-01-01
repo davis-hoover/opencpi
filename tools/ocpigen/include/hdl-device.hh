@@ -113,14 +113,18 @@ struct Device {
 
 // common behavior for platforms and cards
 
+class HdlPlatform;
 struct Board {
-  Devices     m_devices;     // physical devices on this type of board
-  SigMapIdx   m_bd2dev;      // map from board/slot signal name to device signal + index
-  SigMap      m_extmap;      // map from board signal name to platform/slot signal
-  Signals     m_extsignals;  // board/slot signals
-  Board(SigMap &sigmap, Signals &signals);
+  Devices     m_devices;      // physical devices on this type of board
+  SigMapIdx   m_bd2dev;       // map from board/slot signal name to device signal + index
+  SigMap      m_boardSigMap;  // map from board signal name to signal objects
+                              // signal objects may have different names for "slot signals"
+  Signals     m_boardSignals; // board signals that should match constraints files
+  const HdlPlatform &m_platform;
+  Board(const HdlPlatform &a_platform) : m_platform(a_platform) {}
   virtual ~Board() {}
   virtual const char *cname() const = 0;
+  const HdlPlatform &platform() const { return m_platform; }
   const Devices &devices() const { return m_devices; }
   const Device *findDevice(const char *name) const;
   const Device *findDevice(const std::string &name) const { return findDevice(name.c_str()); }

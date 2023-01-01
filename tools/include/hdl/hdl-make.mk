@@ -348,9 +348,15 @@ HdlGetConstraintsSuffix=$(strip \
 ################################################################################
 # $(call HdlGetConstraintsFile,<file,platform>)
 # Return the constraints file name adding suffix if not present
-HdlGetConstraintsFile=$(strip $(and $1,\
+# If there are URL parameters at the end, put them after the suffix
+# If there are URL parameters and no name, use the platform as the default
+HdlGetConstraintsFile=$(strip\
   $(foreach s,$(call HdlGetConstraintsSuffix,$2),\
-    $1$(if $(filter %$s,$1),,$s))))
+    $(if $1,\
+      $(foreach f,$(if $(filter ?%,$1),$2,$(word 1,$(subst ?, ,$1))),\
+         $f$(if $(filter %$s,$f),,$s)$(strip \
+             $(if $(filter ?%,$1),$1,$(foreach p,$(word 2,$(subst ?, ,$1)),?$p)))),\
+	$2$s)))
 
 # In the platform and post-platform stages, get the part from the <platform>.mk
 # In other stages, use the HdlExactPart if set, or the Default part if set,

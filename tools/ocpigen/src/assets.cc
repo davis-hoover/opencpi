@@ -97,7 +97,7 @@ parseApplication(ezxml_t xml) {
   return NULL;
 }
 
-#define APPLICATIONS_ONLY_ATTRS "Applications"
+#define APPLICATIONS_ONLY_ATTRS "Applications", "ExcludeApplications"
 static const char *
 parseApplications(ezxml_t xml) {
   const char *err;

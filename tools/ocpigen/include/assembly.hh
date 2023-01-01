@@ -90,9 +90,9 @@ struct Instance : public OB::IdentResolver {
   const char *m_attach;  // external platform port instance is attached to for io or interconnect
   OM::Assembly::Properties m_xmlProperties; // explicit unparsed values for the instance
   InstanceProperties m_properties;                  // fully parsed w/ full knowledge of worker
-  bool m_hasConfig;      // for adapter configuration FIXME make normal properties
+  bool m_hasConfig;    // for adapter configuration FIXME make normal properties
   size_t m_config;
-  ExtMap m_extmap;     // map for externals. FIXME: have HdlInstance class...
+  ExtMap m_inst2ext;   // map from an instance's signals to externals of the assembly, both indexed
   bool   m_emulated;   // is this an instance of a device worker with an emulator?
   bool   m_inserted;   // was this instance auto-inserted?
   bool   m_loadTime;   // is this designated as loadtime?

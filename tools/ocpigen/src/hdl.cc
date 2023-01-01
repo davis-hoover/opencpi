@@ -273,7 +273,18 @@ Signal()
   : m_direction(NONE), m_width(0), m_differential(false), m_pin(false), m_type(NULL) {
 }
 
-Signal * Signal::
+// constructor that optionally clears out the expressions (leaving the result unparameterized)
+Signal *Signal::
+clone(bool clearExprs) const {
+  Signal *s = new Signal(*this);
+  if (clearExprs) {
+    s->m_widthExpr.clear();
+    s->m_directionExpr.clear();
+  }
+  return s;
+}
+
+Signal *Signal::
 reverse() {
   Signal *s = new Signal(*this);
   switch(m_direction) {
@@ -519,7 +530,7 @@ const char *SigMap::
 findSignal(Signal *s) {
   for (SigMap_::const_iterator si = begin(); si != end(); si++)
     if ((*si).second == s)
-      return (*si).first;
+      return (*si).first.c_str();
   return NULL;
 }
 

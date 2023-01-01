@@ -173,7 +173,7 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
         self.attrs = ocpiutil.get_platform_attributes(project_package_id, self.directory,
                                                       self.name, "hdl")
         if not self.attrs:
-            raise ocpiutil.OCPIException("Could not find HDL Platform for its worker:  " + self.name)
+            raise ocpiutil.OCPIException("Could not find valid HDL Platform for its worker:  " + self.name)
         self.package_id = self.attrs['package_id']
         config_list = self.attrs.get('configurations')
         if not config_list:

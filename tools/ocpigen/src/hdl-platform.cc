@@ -39,9 +39,13 @@ create(ezxml_t xml, const char *xfile, const std::string &parentFile, Worker *pa
 
 HdlPlatform::
 HdlPlatform(ezxml_t xml, const char *xfile, const std::string &parentFile, Worker *parent, const char *&err)
-  : HdlDevice(xml, xfile, parentFile, parent, Worker::Platform, NULL, err), Board(m_sigmap, m_signals),
+  : HdlDevice(xml, xfile, parentFile, parent, Worker::Platform, NULL, err),
+    Board(*this),
     ::Device(*this, *this, cname(), xml, true, 0, NULL, err),
     m_control(false) {
+  // The board signals are initialized from the platform worker's signals, and augmented by devices
+  Board::m_boardSigMap = m_sigmap;
+  Board::m_boardSignals = m_signals;
   m_isDevice = true;
   // Platforms are overloaded:  they are a device worker, but they also are a device *on* that platform.
   if (err ||

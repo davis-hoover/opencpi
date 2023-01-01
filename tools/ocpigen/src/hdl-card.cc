@@ -26,13 +26,15 @@ Cards Card::s_cards;        // registry of card types
 
 // A slot may have a default mapping to the external platform's signals,
 // ie. <slot-name>_signal.
+// Note the card (type)'s signals are initialized from the slot type.
 Card::
 Card(ezxml_t xml, const char *name, SlotType &a_type, const char *parentFile, Worker *parent,
-     const char *&err)
-  : Board(a_type.m_sigmap, a_type.m_signals), m_name(name), m_type(a_type)
+     const HdlPlatform &a_platform, const char *&err)
+  : Board(a_platform), m_name(name), m_type(a_type)
 {
-  // Initialize a card's signals from the slot type, overriding those that are 
+  // Initialize a card's signals from the slot type, overriding those that are
   // mapped, and removing those that are not present on the card
+  // Note that the board's constructor has already take the slot's signals
   for (SignalsIter si = m_type.m_signals.begin(); si != m_type.m_signals.end(); si++) {
     std::string slot, card;
     for (ezxml_t xs = ezxml_cchild(xml, "Signal"); xs; xs = ezxml_cnext(xs)) {
@@ -45,30 +47,11 @@ Card(ezxml_t xml, const char *name, SlotType &a_type, const char *parentFile, Wo
     if (!slot.empty() && card.empty())
       continue; // slot signal does not exist on this card
     // map from card's signal name to underlying slot type signal
-    m_extmap[card.empty() ? (*si)->cname() : card.c_str()] = *si;
-    m_extsignals.push_back(*si);
+    m_boardSigMap[card.empty() ? (*si)->cname() : card.c_str()] = *si;
+    m_boardSignals.push_back(*si);
   }
-#if 0
-  // process non-default signals: slot=pfsig, platform=dddd
-  for (ezxml_t xs = ezxml_cchild(xml, "Signal"); xs; xs = ezxml_cnext(xs)) {
-    std::string slot, card;
-    if ((err = OE::getRequiredString(xs, slot, "slot")) ||
-	(err = OE::getRequiredString(xs, card, "card")))
-      break;
-    const Signal *s = Signal::find(m_type.m_signals, slot.c_str());
-    if (!s) {
-      err = OU::esprintf("Slot signal '%s' does not exist for slot type '%s'",
-			 slot.c_str(), m_type.m_name.c_str());
-      break;
-    } else if (m_sigmap.find(s) != m_sigmap.end()) {
-      err = OU::esprintf("Duplicate slot signal: %s", slot.c_str());
-      break;
-    } else
-      m_signals[s] = card;
-  }
-#endif
   if (!err)
-    err = parseDevices(xml, &m_type, parentFile, parent);
+    err = parseDevices(xml, &m_type, parentFile, parent); // might add board signals
   if (err)
     err = OU::esprintf("Error for card '%s': %s", m_name.c_str(), err);
 }
@@ -80,7 +63,8 @@ Card::
 // Cards are interned, and we want the type to be a reference.
 // Hence we check the type first.
 Card *Card::
-get(const char *file, const char *parentFile, Worker *parent, const char *&err) {
+get(const char *file, const char *parentFile, Worker *parent, const HdlPlatform &platform,
+    const char *&err) {
   ezxml_t xml;
   std::string xfile;
   if ((err = parseFile(file, parentFile, "card", &xml, xfile))) {
@@ -112,7 +96,7 @@ get(const char *file, const char *parentFile, Worker *parent, const char *&err) 
   SlotType *st = SlotType::get(type.c_str(), parentFile, err);
   if (!st)
     return NULL;
-  c = new Card(xml, name.c_str(), *st, parentFile, parent, err);
+  c = new Card(xml, name.c_str(), *st, parentFile, parent, platform, err);
   if (err) {
     delete c;
     return NULL;
