@@ -135,7 +135,10 @@ function docase {
     #
     # No longer need the background "printToConsole" process.
     #
-    kill $PID
+    # The associated child "sleep 1800" process does not die
+    # with "printToConsole": it must be killed separately.
+    #
+    kill `ps -e -o pid,ppid | egrep "^ *$PID +| +$PID$" | sed 's/ *\([0-9]*\) .*/\1/'`
     wait $PID 2>/dev/null
     #
     # Now deal with the exit status of the test.
