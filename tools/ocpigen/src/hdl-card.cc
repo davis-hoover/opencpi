@@ -32,9 +32,8 @@ Card(ezxml_t xml, const char *name, SlotType &a_type, const char *parentFile, Wo
      const HdlPlatform &a_platform, const char *&err)
   : Board(a_platform), m_name(name), m_type(a_type)
 {
-  // Initialize a card's signals from the slot type, overriding those that are
-  // mapped, and removing those that are not present on the card
-  // Note that the board's constructor has already take the slot's signals
+  // Initialize a card's signals from the slot type,
+  // except for those that are not present on the card (card attr is present and empty)
   for (SignalsIter si = m_type.m_signals.begin(); si != m_type.m_signals.end(); si++) {
     std::string slot, card;
     for (ezxml_t xs = ezxml_cchild(xml, "Signal"); xs; xs = ezxml_cnext(xs)) {
@@ -43,6 +42,8 @@ Card(ezxml_t xml, const char *name, SlotType &a_type, const char *parentFile, Wo
 	return;
       if (!strcasecmp(slot.c_str(), (*si)->cname()))
 	break;
+      slot.clear();
+      card.clear();
     }
     if (!slot.empty() && card.empty())
       continue; // slot signal does not exist on this card
@@ -60,8 +61,7 @@ Card::
 ~Card() {
 }
 
-// Cards are interned, and we want the type to be a reference.
-// Hence we check the type first.
+// Cards are cached.  Once we know the actual name, we check the cache in the find method.
 Card *Card::
 get(const char *file, const char *parentFile, Worker *parent, const HdlPlatform &platform,
     const char *&err) {

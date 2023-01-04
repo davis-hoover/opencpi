@@ -831,8 +831,6 @@ doPrev(FILE *f, std::string &last, std::string &comment, const char *myComment) 
   comment = "";
 }
 
-// single means that this is a signal that is not a vector at all.
-// isSingle means that the signal is mapped an individual part of a vector.
 static void
 mapOneSignal(FILE *f, Signal &s, size_t index, const char *mapped, size_t mappedIndex,
 	     const char *indent, const char *pattern) {
