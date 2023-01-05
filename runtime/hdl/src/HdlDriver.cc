@@ -27,6 +27,7 @@
 #include "ContainerManager.hh"
 #include "HdlContainer.hh"
 #include "HdlDriver.hh"
+#include <gpsd_config.h>
 #include <gpsd.h>
 
 bool OCPI::HDL::Driver::m_gpsdTimeout = false;
@@ -73,7 +74,7 @@ namespace OCPI {
     }
 
     OCPI::HDL::Device *Driver::
-    open(const char *a_name, bool discovery, bool forLoad, const OA::PValue *params,
+    open(const char *a_name, bool discovery, bool forLoad, bool isStatic, const OA::PValue *params,
 	 std::string &err) {
       parent().parent().configureOnce();
       lock();
@@ -110,13 +111,15 @@ namespace OCPI {
       Device *dev =
 	pci ? PCI::Driver::open(which, params, err) : 
 	bus ? Zynq::Driver::open(which, forLoad, params, err) : 
-	ether ? Ether::Driver::open(which, discovery, params, err) :
-	sim ? Sim::Driver::open(which, discovery, params, err) : 
+	ether ? Ether::Driver::open(which, discovery, forLoad, params, err) :
+	sim ? Sim::Driver::open(which, discovery, false, params, err) : 
 	lsim ? LSim::Driver::open(which, params, err) : NULL;
-      ezxml_t config;
+      // don't call setup() when just doing FPGA programming on Zynq
+      // the same isn't true of ether devices as these need parameters
+      // parsed out of the system config
       if (forLoad && bus)
 	return dev;
-      if (dev && !setup(*dev, config, err))
+      if (dev && (isStatic || !setup(*dev, err)))
 	return dev;
       delete dev;
       return NULL;
@@ -135,13 +138,12 @@ namespace OCPI {
     // record the first error seen.
     bool Driver::
     found(Device &dev, const char **excludes, bool discoveryOnly, std::string &error) {
-      ezxml_t config;
       error.clear();
       if (excludes)
 	for (const char **ap = excludes; *ap; ap++)
 	  if (!strcasecmp(*ap, dev.name().c_str()))
 	    goto out;
-      if (!setup(dev, config, error)) {
+      if (!setup(dev, error)) {
 	bool printOnly = false;
 	if ((OB::findBool(m_params, "printOnly", printOnly) && printOnly))
 	  dev.print(); // fall through to delete
@@ -151,14 +153,25 @@ namespace OCPI {
 	    dev.print();
 #endif
 	  if (!discoveryOnly)
-	    createContainer(dev, config, m_params); // no errors?
+	    createContainer(dev, m_params); // no errors?
 	  return false;
 	}
       }
     out:
       delete &dev;
       return true;
-    } 
+    }
+
+    void Driver::
+    createStaticDevice(const char *a_name, ezxml_t /*x*/, const OB::PValue *params,
+		       bool discoveryOnly) {
+      std::string err;
+      m_params = params; // FIXME: better to supply params to the "found" method?
+      Device *d = open(a_name, discoveryOnly, false, true, params, err);
+      if (!d)
+	throw OU::Error("Error creating static device \"%s\": %s", a_name, err.c_str());
+      found(*d, NULL, discoveryOnly, err);
+    }
 
     unsigned Driver::
     search(const OA::PValue *params, const char **exclude, bool discoveryOnly) {
@@ -198,21 +211,16 @@ namespace OCPI {
       }
       return count;
     }
-    
+
     OC::Container *Driver::
     probeContainer(const char *which, std::string &error, const OA::PValue *params) {
       Device *dev;
-      ezxml_t config;
-      if ((dev = open(which, false, false, params, error))) {
-	if (setup(*dev, config, error))
-	  delete dev;
-	else
-	  return createContainer(*dev, config, params);
-      }
+      if ((dev = open(which, false, false, false, params, error)))
+	return createContainer(*dev, params);
       if (error.size())
 	ocpiBad("While probing %s: %s", which, error.c_str());
       return NULL;
-    }      
+    }
     // use libgpsd interface to configure gps
     // (ref https://www.systutorials.com/docs/linux/man/3-libgpsd/)
     // see https://gitlab.com/gpsd/gpsd/blob/release-3.14/gpsctl.c
@@ -279,7 +287,7 @@ namespace OCPI {
       // First, do the generic configuration, which configures discovered devices for this driver
       OP::Driver::configure(xml);
       ezxml_t xx;
-      if (!xml || !(xx = ezxml_cchild(xml, "gpsd"))) return;
+      if (!(xx = ezxml_cchild(xml, "gpsd"))) return;
       m_doGpsd = true;
       auto sp = ezxml_cattr(xx, "serialport"); // mandatory
       if (sp)
@@ -356,7 +364,7 @@ namespace OCPI {
       }
       if (m_gpsdp->m_session.gpsdata.fix.mode >= MODE_2D)
 	// Only use seconds
-        return OS::Time((uint32_t)lround(m_gpsdp->m_session.gpsdata.fix.time), 0);
+        return OS::Time((uint32_t)m_gpsdp->m_session.gpsdata.fix.time.tv_sec, 0);
       else
         isGps = false;
       ocpiInfo("HDL Driver: GPS fix not acquired");
@@ -365,10 +373,10 @@ namespace OCPI {
     // Internal method common to "open" and "found"
     // Return true on error
     bool Driver::
-    setup(Device &dev, ezxml_t &config, std::string &err) {
+    setup(Device &dev, std::string &err) {
       // Get any specific configuration information for this device
       const char *l_name = dev.name().c_str();
-      config = getDeviceConfig(l_name);
+      ezxml_t config = getDeviceConfig(l_name);
       if (!config && !strncmp("PCI:", l_name, 4)) // compatibility
 	config = getDeviceConfig(l_name + 4);
       // Configure the device

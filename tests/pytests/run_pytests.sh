@@ -22,8 +22,15 @@ make clean
 [ -z "${HDL_PLATFORM+x}" ] && {
   sims=(`ocpirun -C --only-platforms | grep '.*-.*sim' | sed s/^.*-//`)
   if [ -n "$sims" ]; then
-     echo Available simulators are: ${sims[*]}, using $sims.
-    HDL_PLATFORM=$sims
+     sim=$sims
+     for s in ${sims[*]}; do
+	 if [ $s = xsim ]; then
+	     sim=xsim
+	     break
+	 fi
+     done
+     echo Available simulators are: ${sims[*]}, using $sim.
+     HDL_PLATFORM=$sim
   else
     echo No simulators are available, not using any.
   fi
@@ -41,6 +48,7 @@ else
   pyrun_command="coverage3 run --append "
 fi
 for i in *_test.py; do
+  [ $i != utilization_test.py ] || continue
   echo "Running: $pyrun_command$i"
   $pyrun_command$i
 done

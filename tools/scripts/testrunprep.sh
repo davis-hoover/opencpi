@@ -43,6 +43,19 @@ if [ -z "${localplatforms[0]}" ]; then
   exit 1
 fi
 echo '  Local platforms are: '${localplatforms[@]}
+if [ "$OnlyPlatforms" ]; then
+  only_platform_found=true
+  for plat in $OnlyPlatforms; do
+    [[ " ${localplatforms[*]} " == " "*-*-"$plat "* ]] || {
+      echo "Error: platform \"$plat\" not found while probing!" >&2
+      only_platform_found=false
+    }
+  done
+  if [[ "$only_platform_found" == "false" ]]; then
+    echo 'Error: at least one required platform was not found -- aborting!' >&2
+    exit 1
+  fi  
+fi    
 # TODO use testutil.sh to parse
 if [ -n "${OCPI_REMOTE_TEST_SYSTEMS}" ]; then
   remotesystems=(${OCPI_REMOTE_TEST_SYSTEMS//:/ })

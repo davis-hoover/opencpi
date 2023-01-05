@@ -86,7 +86,7 @@ namespace OCPI {
       bool portsInProcess() { return true; }
       OCPI::Container::Container::DispatchRetCode
       dispatch(OCPI::Xfer::EventManager *event_manager = NULL);
-      OCPI::API::ContainerApplication*
+      OCPI::Container::Application*
       createApplication(const char *name, const OCPI::Base::PValue *params);
       OCPI::Container::Artifact &
       createArtifact(OCPI::Library::Artifact &lart, const OCPI::API::PValue *artifactParams);

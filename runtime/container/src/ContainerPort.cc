@@ -60,11 +60,10 @@ namespace OCPI {
     }
 
     // Older API for compatibility with ctests
-    void Port::connect(OA::Port &other, const OA::PValue */*myParams*/,
+    void Port::connect(Port &other, const OA::PValue */*myParams*/,
 		       const OA::PValue */*otherParams*/) {
       Launcher::Connection c;
-      c.m_in.m_port = isProvider() ? this : &other.containerPort(),
-      c.m_out.m_port = isProvider() ? &other.containerPort() : this;
+      c.m_in.m_port = isProvider() ? this : &other, c.m_out.m_port = isProvider() ? &other : this;
       assert(c.m_in.m_port->m_metaPort.m_bufferSizePort == SIZE_MAX &&
 	     c.m_out.m_port->m_metaPort.m_bufferSizePort == SIZE_MAX);
       c.m_bufferSize = OM::Port::determineBufferSize(&c.m_in.m_port->m_metaPort, NULL, SIZE_MAX,
@@ -94,6 +93,7 @@ namespace OCPI {
       } while (more);
       assert(c.m_in.m_done && c.m_out.m_done);
     }
+
     void Port::connectURL(const char*, const OB::PValue *, const OB::PValue *) {
       ocpiDebug("connectURL not allowed on this container !!");
       ocpiAssert( 0 );
@@ -129,6 +129,5 @@ namespace OCPI {
   namespace API {
     ExternalBuffer::~ExternalBuffer(){}
     ExternalPort::~ExternalPort(){}
-    Port::~Port() {}
   }
 }

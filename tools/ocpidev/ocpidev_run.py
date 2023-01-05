@@ -95,10 +95,10 @@ def parse_cl_vars():
     parser.add_argument("--view", dest="view", action="store_true",
                         help="When set the view script (view.sh) for this test is run at the " +
                         "conclusion of the test's execution.  Not valid for Application")
-    parser.add_argument("-G", "--only-platform", metavar="ONLY_PLAT", dest="only_plats",
+    parser.add_argument("-G", "--only-platform", metavar="ONLY_PLAT", dest="only_platform",
                         action="append", help="Specify which platforms to use with a unit test " +
                         "from the list of runtime platforms.")
-    parser.add_argument("-Q", "--exclude-platform ", metavar="EXCLUDE_PLAT", dest="ex_plats",
+    parser.add_argument("-Q", "--exclude-platform ", metavar="EXCLUDE_PLAT", dest="exclude_platform",
                         action="append", help="Specify which platforms not to use with a unit " +
                         "test from the list of runtime platforms.")
     parser.add_argument("--rcc-platform", metavar="RCC_PLAT", dest="rcc_plats", action="append",
@@ -218,7 +218,9 @@ def main():
     name = None
     try:
         cur_dir = args['cur_dir']
+        print("PWD:"+str(Path(os.path.curdir).absolute())+":"+str(Path(cur_dir).absolute()))
         with ocpiutil.cd(cur_dir):
+            print("PWD1:"+str(Path(os.path.curdir).absolute())+":"+str(Path(cur_dir).absolute()))
             dir_type = ocpiutil.get_dirtype()
             # args['name'] could be None if no name is provided at the command line
             name = args['name']
@@ -231,12 +233,7 @@ def main():
                                                              library=args['library'],
                                                              hdl_library=args['hdl_library'],
                                                              platform=args['hdl_plat_dir'])
-            if args['noun'] not in ['project', 'registry', 'library']:
-                name = Path(directory).name
-                directory = str(Path(directory).parent)
-            if (name is None) and (dir_type in [n for n in NOUNS if n != "tests"]):
-                name = os.path.basename(os.path.realpath('.'))
-            del args['name']
+            print("PWD2:"+str(Path(os.path.curdir).absolute())+":"+str(Path(directory).absolute())+":"+str(args['noun'])+":"+str(dir_type))
             if args['noun'] is None:
                 if dir_type in [n for n in NOUNS if n != "tests"]:
                     args['noun'] = dir_type
@@ -244,6 +241,12 @@ def main():
                     raise ocpiutil.OCPIException("Invalid directory type \"" + str(dir_type) +
                                                  "\" Valid directory types are: " +
                                                  ", ".join([n for n in NOUNS if n != "tests"]))
+            if args['noun'] not in ['project', 'registry', 'library', 'tests', 'applications', 'libraries']:
+                name = Path(directory).absolute().name
+                directory = str(Path(directory).absolute().parent)
+            if (name is None) and (dir_type in [n for n in NOUNS if n != "tests"]):
+                name = os.path.basename(os.path.realpath('.'))
+            del args['name']
             if ocpiutil.get_dirtype(directory) == "libraries" and args['noun'] == "library":
                 args['noun'] = "libraries"
             set_init_values(args, dir_type)
@@ -252,7 +255,7 @@ def main():
                                    "\nargs: " + str(args))
             my_asset = ocpifactory.AssetFactory.factory(args['noun'], directory,
                                                         name, **args)
-            sys.exit(my_asset.run())
+            sys.exit(my_asset.run(verbose=args['verbose']))
     except ocpiutil.OCPIException as ex:
         ocpiutil.logging.error(ex)
         if args['noun'] is not None:

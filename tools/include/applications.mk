@@ -18,7 +18,7 @@
 
 include $(OCPI_CDK_DIR)/include/util.mk
 
-$(OcpiIncludeProject)
+$(OcpiIncludeAssetAndParent)
 
 ifeq ($(origin Applications),undefined)
   Applications:=$(call OcpiFindSubdirs,application) $(filter-out applications.xml,$(wildcard *.xml))

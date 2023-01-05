@@ -24,9 +24,9 @@
 
 #include "OsFileSystem.hh"
 
-#include "assembly.h"
-#include "data.h"
-#include "rcc.h"
+#include "assembly.hh"
+#include "data.hh"
+#include "rcc.hh"
 
 // Generate the readonly implementation file.
 // What implementations must explicitly (verilog) or implicitly (VHDL) include.
@@ -650,7 +650,7 @@ emitImplSlaveTypes(FILE *parent) {
           m_implName, RCC_CC_SLAVETYPES, RCC_CC_HEADER);
   FILE *f;
   const char *err;
-  if (!(err = openOutput(m_fileName.c_str(), m_outDir, "", RCC_CC_SLAVETYPES, RCC_CC_HEADER, NULL, f))) {
+  if (!(err = openOutput(cname(), m_outDir, "", RCC_CC_SLAVETYPES, RCC_CC_HEADER, NULL, f))) {
     for (unsigned n = 0; n < m_paramConfigs.size(); ++n)
       if (m_paramConfigs[n]) {
 	fprintf(f, "#if OCPI_PARAM_CONFIG() == %u\n", n);
@@ -674,7 +674,7 @@ emitImplSlaves(FILE *parent) {
           m_implName, RCC_CC_SLAVES, RCC_CC_HEADER);
   FILE *f;
   const char *err;
-  if (!(err = openOutput(m_fileName.c_str(), m_outDir, "", RCC_CC_SLAVES, RCC_CC_HEADER, NULL, f))) {
+  if (!(err = openOutput(cname(), m_outDir, "", RCC_CC_SLAVES, RCC_CC_HEADER, NULL, f))) {
     for (unsigned n = 0; n < m_paramConfigs.size(); ++n)
       if (m_paramConfigs[n]) {
 	fprintf(f, "#if OCPI_PARAM_CONFIG() == %u\n", n);
@@ -710,7 +710,7 @@ emitImplSlavesConfig(FILE *f, unsigned pc) {
   // for each slave declare the slave class which extends RCCUserSlave and is named generically
   // Slave1, Slave2 ... etc
   for (auto it = paramConfig.m_slaves.begin(); it != paramConfig.m_slaves.end(); ++it) {
-    const char *name = (*it).first.c_str();
+    const char *l_name = (*it).first.c_str();
     // This worker is a proxy.  Give it access to each of its slaves
     fprintf(f,
 	    "  /*\n"
@@ -779,7 +779,7 @@ emitImplSlavesConfig(FILE *f, unsigned pc) {
 		"      m_worker->getProperty(%uu, val, list, options, attrs);\n"
 		"      return val.c_str();\n"
 		"    }\n",
-		p.cname(), name, p.m_ordinal);
+		p.cname(), l_name, p.m_ordinal);
 	// expose the faster/typed non-string based interface if it exists
 	if (p.m_baseType == OA::OCPI_String && !p.m_isSequence)
 	  fprintf(f,
@@ -797,9 +797,9 @@ emitImplSlavesConfig(FILE *f, unsigned pc) {
 		  "      delete [] buf;\n"
 		  "      return s;\n"
 		  "   }\n",
-		  p.m_name.c_str(), dims.c_str(), comma, name, pretty.c_str(),
+		  p.m_name.c_str(), dims.c_str(), comma, l_name, pretty.c_str(),
 		  p.m_isParameter ? "Parameter" : "PropertyOrd", p.m_ordinal, comma,
-		  offset.c_str(), p.m_name.c_str(), dims.c_str(), comma, name, p.m_name.c_str(),
+		  offset.c_str(), p.m_name.c_str(), dims.c_str(), comma, l_name, p.m_name.c_str(),
 		  pretty.c_str(), p.m_isParameter ? "Parameter" : "PropertyOrd", p.m_ordinal,
 		  comma, offset.c_str());
 	else if (p.m_baseType != OA::OCPI_Struct && !p.m_isSequence)
@@ -808,7 +808,7 @@ emitImplSlavesConfig(FILE *f, unsigned pc) {
 		  "      checkSlave(\"%s\");\n"
 		  "      return %sm_worker->get%s%s(%u%s%s);\n"
 		  "    }\n",
-		  type.c_str(), p.m_name.c_str(), dims.c_str(), name,
+		  type.c_str(), p.m_name.c_str(), dims.c_str(), l_name,
 		  cast.c_str(),  // if val needs to be cast in the case of an enum
 		  pretty.c_str(), p.m_isParameter ? "Parameter" : "PropertyOrd", p.m_ordinal,
 		  comma, offset.c_str());
@@ -820,7 +820,7 @@ emitImplSlavesConfig(FILE *f, unsigned pc) {
 		"= OCPI::API::emptyList) {\n"
 		"      checkSlave(\"%s\");\n"
 		"      m_worker->setProperty(\"%s\", val, list);\n",
-		p.cname(), name, p.cname());
+		p.cname(), l_name, p.cname());
 	fprintf(f,
 		"#if !defined(NDEBUG)\n"
 		"      debugLog(\"Setting slave.setProperty_%s",
@@ -840,7 +840,7 @@ emitImplSlavesConfig(FILE *f, unsigned pc) {
 	  fprintf(f,
 		  "    inline void set_%s(%s%s%s val) {\n"
 		  "      checkSlave(\"%s\");\n",
-		  p.m_name.c_str(), dims.c_str(), comma, type.c_str(), name);
+		  p.m_name.c_str(), dims.c_str(), comma, type.c_str(), l_name);
 	  if (p.m_arrayRank) {
 	    fprintf(f,
 		    "      unsigned idx = %s;\n"
@@ -872,7 +872,7 @@ emitImplSlavesConfig(FILE *f, unsigned pc) {
 		  "      checkSlave(\"%s\");\n"
 		  "      m_worker->setStringPropertyOrd(%u, val.c_str()%s%s);\n"
 		  "    }\n",
-		  p.m_name.c_str(), dims.c_str(), comma, name, p.m_ordinal, comma, offset.c_str());
+		  p.m_name.c_str(), dims.c_str(), comma, l_name, p.m_ordinal, comma, offset.c_str());
       }
     } // for iterate over m_ctl.properties
     fprintf(f,
@@ -911,7 +911,7 @@ const char *Worker::
 emitImplRCC() {
   const char *err;
   FILE *f;
-  if ((err = openOutput(m_fileName.c_str(), m_outDir, "",
+  if ((err = openOutput(cname(), m_outDir, "",
                         m_language == C ? RCC_C_IMPL : RCC_CC_IMPL,
                         m_language == C ? RCC_C_HEADER : RCC_CC_HEADER, m_implName, f))) {
     return err;
@@ -1224,10 +1224,10 @@ emitImplRCC() {
   }
   fprintf(f, "#endif /* ifndef OCPI_RCC_WORKER_%s_H__ */\n", upper);
   fclose(f);
-  if ((err = openOutput(m_fileName.c_str(), m_outDir, "", RCCMAP, RCC_C_HEADER, NULL, f)))
+  if ((err = openOutput(nsname(), m_outDir, "", RCCMAP, RCC_C_HEADER, NULL, f)))
     return err;
-  fprintf(f, "#define RCC_FILE_WORKER_%s %s\n", m_fileName.c_str(), m_implName);
-  fprintf(f, "#define RCC_FILE_WORKER_ENTRY_%s %s%s\n", m_fileName.c_str(),
+  fprintf(f, "#define RCC_FILE_WORKER_%s %s\n", nsname(), m_implName);
+  fprintf(f, "#define RCC_FILE_WORKER_ENTRY_%s %s%s\n", nsname(),
           m_language == C ? "" : "ocpi_", m_implName);
   fclose(f);
   return 0;
@@ -1237,7 +1237,7 @@ const char *Worker::
 emitSkelRCC() {
   const char *err;
   FILE *f;
-  if ((err = openOutput(m_fileName.c_str(), m_outDir, "", "-skel",
+  if ((err = openOutput(cname(), m_outDir, "", "-skel",
                         m_language == C ? ".c" : ".cc", NULL, f)))
     return err;
   fprintf(f, "/*\n");
@@ -1366,7 +1366,6 @@ addSlavesConfig(ezxml_t a_slaves) {
   if ((err = OB::parseConditionals(m_slavesXml, *this)))
     return OU::esprintf("Error processing conditional slave assembly: %s", err);
   ocpiInfo("===After processing:\n%s", ezxml_toxml(m_slavesXml));
-  //cout << ezxml_toxml(m_xml);
   m_slavesAssembly = new ::Assembly(m_worker);
   static const char *instAttrs[] = {INST_ATTRS, "optional"};
   if ((err = m_slavesAssembly->parseAssy(m_slavesXml, NULL, instAttrs)))
@@ -1437,24 +1436,30 @@ parseSlaves() {
       // Make fake assemblies out of the non-assembly attribute or elements
       std::string xml("<slaves>");
       if (attr) {
-	std::string instanceName = l_slave.substr(0, l_slave.find(".", 0));
+	std::string instanceName(l_slave); // default if no dots
+	const char *last = strrchr(l_slave.c_str(), '.');
+	if (last) {
+	  instanceName.resize(OCPI_SIZE_T_DIFF(last, l_slave.c_str())); // trim model
+	  if ((last = strrchr(instanceName.c_str(), '.')))
+	    instanceName.erase(0, OCPI_SIZE_T_DIFF(last + 1, instanceName.c_str()));
+	}
 	OU::formatAdd(xml, "<instance name='%s' worker='%s'/>",
-		      l_slave.substr(0, l_slave.find(".", 0)).c_str(), l_slave.c_str());
+		      instanceName.c_str(), l_slave.c_str());
       } else {
 	for (ezxml_t slave = ezxml_cchild(m_xml, "slave"); slave; slave = ezxml_cnext(slave)) {
 	  if ((err = OE::checkAttrs(slave, "name", "worker", "optional", NULL)))
 	    return err;
 	  const char
 	    *worker = ezxml_cattr(slave, "worker"),
-	    *name = ezxml_cattr(slave, "name");
+	    *l_name = ezxml_cattr(slave, "name");
 	  bool optional = false;
 	  if ((err = OE::getBoolean(slave, "optional", &optional)))
 	    return err;
 	  if (!worker)
 	    return OU::esprintf("Missing \"worker\" attribute in <slave> element");
 	  OU::formatAdd(xml, "\n  <instance worker='%s'", worker);
-	  if (name)
-	      OU::formatAdd(xml, " name='%s'", name);
+	  if (l_name)
+	      OU::formatAdd(xml, " name='%s'", l_name);
 	  if (optional)
 	    OU::formatAdd(xml, " optional='true'");
 	  xml += "/>";

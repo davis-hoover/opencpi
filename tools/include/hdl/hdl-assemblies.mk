@@ -20,7 +20,7 @@
 
 # Capture whatever is in the current file, allowing more to be reset in the project file
 include $(OCPI_CDK_DIR)/include/util.mk
-$(OcpiIncludeProject)
+$(OcpiIncludeAssetAndParent)
 include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk
 
 ifndef

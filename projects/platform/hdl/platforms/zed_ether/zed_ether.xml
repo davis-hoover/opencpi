@@ -1,0 +1,95 @@
+<!-- This file is protected by Copyright. Please refer to the COPYRIGHT file
+     distributed with this source distribution.
+
+     This file is part of OpenCPI <http://www.opencpi.org>
+
+     OpenCPI is free software: you can redistribute it and/or modify it under
+     the terms of the GNU Lesser General Public License as published by the Free
+     Software Foundation, either version 3 of the License, or (at your option)
+     any later version.
+
+     OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
+     WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+     FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+     more details.
+
+     You should have received a copy of the GNU Lesser General Public License
+     along with this program. If not, see <http://www.gnu.org/licenses/>. -->
+<!-- This file defines the zed_ether HDL platform -->
+<HdlPlatform Language="VHDL" Spec="platform-spec" configurations="base dgrdma_dev" 
+             ComponentLibraries="components" Libraries="sdp platform cdc dgrdma i2c"
+             SourceFiles="clock_gen.vhd i2c_macaddr_eeprom.vhd zed_ether.vhd"
+             Part="xc7z020-1-clg484">
+
+  <SpecProperty Name="platform" Value="zed_ether"/>
+  <!-- These next two lines must be present in all platforms -->
+  <MetaData Master="true"/>
+  <TimeBase Master="true"/>
+  <cpmaster master="true"/>
+
+  <SDP Name="ether" Master="true"/>
+  
+  <specproperty name="sdp_width" value="2"/>
+  <specproperty name="sdp_length" value="4096"/>
+  <specproperty name="sdp_arb"    value="16"/>
+  
+  <!-- Set your time server frequency -->
+  <Device Worker="time_server">
+    <Property Name="frequency" Value="125e6"/>
+  </Device>
+
+  <Device Worker="dgrdma_config_dev">
+  </Device>
+
+  <devsignal master="false" signals="dgrdma_config_dev-signals" count="1"/>
+  <supports worker="dgrdma_config_dev">
+    <connect port="dev" to="dev" index="0"/>
+  </supports>
+
+  <!-- Put any additional platform-specific properties here using <Property> -->
+  <property name="ack_tracker_bitfield_width" type="ulong" parameter="1" default="32"
+    description="Width of the window of sequence numbers the ack_tracker can track"/>
+  <property name="ack_tracker_max_ack_count" type="uchar" parameter="1" default="12"
+    description="Maximum number of ack sent in a DGRDMA frame from the fpga"/>
+  
+  <!-- Put any built-in (always present) devices here using <device> -->
+  <!-- Put any card slots here using <slot> -->
+  <!-- Put ad hoc signals here using <signal> -->
+
+  <!-- Zedboard signals -->
+  <signal input="btnu"/>
+  <signal input="btnl"/>
+  <signal input="btnd"/>
+  <signal input="btnr"/>
+  <signal input="btnc"/>
+  <signal input="sw" width="8"/>
+  <signal output="led" width="8"/>
+
+  <!-- FMC card signals -->
+  <!-- 125MHz LVDS oscillator -->
+  <signal input="clk_125mhz_p"/>
+  <signal input="clk_125mhz_n"/>
+  <signal output="clk_125mhz_en"/>
+
+  <!-- Ethernet PHY (port 1) -->
+  <signal output="phy_reset_n_1"/>
+  <signal input="phy_rx_clk_1"/>
+  <signal input="phy_rx_ctl_1"/>
+  <signal input="phy_rxd_1" width="4"/>
+  <signal output="phy_tx_clk_1"/>
+  <signal output="phy_tx_ctl_1"/>
+  <signal output="phy_txd_1" width="4"/>
+
+  <!-- Ethernet PHY (port 2) -->
+  <signal output="phy_reset_n_2"/>
+  <signal input="phy_rx_clk_2"/>
+  <signal input="phy_rx_ctl_2"/>
+  <signal input="phy_rxd_2" width="4"/>
+  <signal output="phy_tx_clk_2"/>
+  <signal output="phy_tx_ctl_2"/>
+  <signal output="phy_txd_2" width="4"/>
+
+  <!-- MAC address EEPROM (port 1) -->
+  <signal bidirectional="mac_eeprom_scl"/>
+  <signal bidirectional="mac_eeprom_sda"/>
+</HdlPlatform>

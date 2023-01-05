@@ -145,7 +145,10 @@ namespace OCPI {
 	 prefix += m_package;
        m_package = prefix;
       }
-      for (ezxml_t ix = ezxml_cchild(ax, "Instance"); ix; ix = ezxml_cnext(ix))
+      ezxml_t ix = ezxml_cchild(ax, "Instance");
+      if (!ix)
+	return OU::esprintf("This assembly has no instances, which is invalid");
+      for (; ix; ix = ezxml_cnext(ix))
         if ((err = addInstance(ix, extraInstAttrs, params)))
           return err;
       const char *finished = ezxml_cattr(ax, "finished");
@@ -178,7 +181,7 @@ namespace OCPI {
           return err;
       }
       n = 0;
-      for (ezxml_t ix = ezxml_cchild(ax, "Instance"); ix; ix = ezxml_cnext(ix), n++)
+      for (ix = ezxml_cchild(ax, "Instance"); ix; ix = ezxml_cnext(ix), n++)
         if ((err = m_instances[n]->parseConnection(ix, *this, params)))
           return err;
       // Check instance parameters that don't name instances properly
@@ -696,7 +699,7 @@ namespace OCPI {
       if (!OB::findAssign(params, "selection", m_name.c_str(), m_selection) &&
 	  !OB::findAssign(params, "selection", m_specName.c_str(), m_selection))
         OE::getOptionalString(ix, m_selection, "selection");
-      ocpiInfo("Component %2d: %s name: %s impl: %s spec: %s selection: %s", ordinal,
+      ocpiInfo("Component %2u: %s name: %s impl: %s spec: %s selection: %s", ordinal,
                 component.c_str(), m_name.c_str(), m_implName.c_str(), m_specName.c_str(),
                 m_selection.c_str());
       for (ezxml_t px = ezxml_cchild(ix, "property"); px; px = ezxml_cnext(px)) {
@@ -720,7 +723,7 @@ namespace OCPI {
       // Now check for additional or override values from parameters
       return m_parameters.parse(ix, "name", "component", "worker", "selection", "connect", "buffersize",
                                 "external", "from", "to", "externals", "slave", "transport", "optional",
-                                "connectInput", NULL);
+                                "connectInput", "loadtime", NULL);
     }
 
     // Get the port from the instance, creating it if needed.

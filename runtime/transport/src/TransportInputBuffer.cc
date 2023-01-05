@@ -265,7 +265,7 @@ volatile BufferState* InputBuffer::getState()
 #ifdef DEBUG_L2
     ocpiDebug("Getting load factor of %d", m_state[0]->pad );
 #endif
-    m_tState.bufferIsFull = m_state[0][m_pid].bufferIsFull;
+    m_tState.bufferIsFull = __atomic_load_n(&m_state[0][m_pid].bufferIsFull, __ATOMIC_ACQUIRE);
 
 #ifdef LEAST_BUSY
     m_tState.pad = m_state[0][m_pid].pad;
@@ -286,11 +286,12 @@ volatile BufferState* InputBuffer::getState()
       //      ocpiDebug("input %p getstate m_pid: %u s: %u n %u  m_state[0][n].bufferFull %u",
       //      		this, m_pid, m_tState.bufferIsFull, n, m_state[0][n].bufferIsFull);
       //fflush(stderr); fflush(stdout);
-      uint32_t full = m_state[0][n].bufferIsFull & FF_MASK;
+      uint32_t bufferIsFull = __atomic_load_n(&m_state[0][n].bufferIsFull, __ATOMIC_ACQUIRE);
+      uint32_t full = bufferIsFull & FF_MASK;
       ocpiAssert(full == FF_EMPTY_VALUE ||
 		 full == FF_FULL_VALUE);
       if (full != FF_EMPTY_VALUE) {
-        m_tState.bufferIsFull = m_state[0][n].bufferIsFull;
+        m_tState.bufferIsFull = bufferIsFull;
 
 
 	ocpiDebug("&&&&&&&&   found state value at %d", n );
@@ -338,16 +339,19 @@ void InputBuffer::markBufferFull()
 
   if ( ! this->getPort()->isShadow() ) {
     // This can happen when in the same container
-    uint32_t full = m_state[0][0].bufferIsFull & FF_MASK;
+    uint32_t bufferIsFull = __atomic_load_n(&m_state[0][0].bufferIsFull, __ATOMIC_ACQUIRE);
+    uint32_t full = bufferIsFull & FF_MASK;
     ocpiAssert(full == FF_EMPTY_VALUE || full == FF_FULL_VALUE);
     m_state[0][0].bufferIsFull = FF_FULL_VALUE;
   }
   else {
     // This flag is being set locally with the expectation that the other side will write back to it
     // to tell us it has become empty
-    ocpiDebug("empty value: %x", m_myShadowsRemoteStates[getPort()->getMailbox()]->bufferIsEmpty);
-    ocpiAssert(m_myShadowsRemoteStates[getPort()->getMailbox()]->bufferIsEmpty == EF_EMPTY_VALUE ||
-	       m_myShadowsRemoteStates[getPort()->getMailbox()]->bufferIsEmpty == EF_FULL_VALUE);
+    uint32_t empty = m_myShadowsRemoteStates[getPort()->getMailbox()]->bufferIsEmpty & EF_MASK;
+
+    ocpiDebug("empty value: %x", empty);
+    ocpiAssert(empty == EF_EMPTY_VALUE || empty == EF_FULL_VALUE);
+
     m_myShadowsRemoteStates[getPort()->getMailbox()]->bufferIsEmpty = EF_FULL_VALUE;
   }
 
@@ -362,7 +366,8 @@ void InputBuffer::markBufferEmpty()
   OCPI_EMIT_CAT_("Mark Input Buffer Empty",OCPI_EMIT_CAT_WORKER_DEV, OCPI_EMIT_CAT_WORKER_DEV_BUFFER_FLOW);
   if ( ! this->getPort()->isShadow() ) {
     for ( unsigned int n=0; n<MAX_PCONTRIBS; n++ ) {
-      uint32_t full = m_state[0][n].bufferIsFull & FF_MASK;
+      uint32_t bufferIsFull = __atomic_load_n(&m_state[0][n].bufferIsFull, __ATOMIC_ACQUIRE);
+      uint32_t full = bufferIsFull & FF_MASK;
       ocpiAssert(full == FF_EMPTY_VALUE || full == FF_FULL_VALUE);
       m_state[0][n].bufferIsFull =  FF_EMPTY_VALUE;
     }
@@ -493,7 +498,8 @@ volatile BufferMetaData* InputBuffer::getMetaData()
   ocpiAssert(!isShadow());
   for ( OCPI::OS::uint32_t n=0; n<m_outputPortCount; n++ ) {
     PortOrdinal id = s_port->getPortFromIndex(n)->getPortId();
-    uint32_t full = m_state[0][id].bufferIsFull & FF_MASK;
+    uint32_t bufferIsFull = __atomic_load_n(&m_state[0][id].bufferIsFull, __ATOMIC_ACQUIRE);
+    uint32_t full = bufferIsFull & FF_MASK;
     ocpiAssert(full == FF_EMPTY_VALUE || full == FF_FULL_VALUE);
     if (full != FF_EMPTY_VALUE) {
       return &m_sbMd[0][id];

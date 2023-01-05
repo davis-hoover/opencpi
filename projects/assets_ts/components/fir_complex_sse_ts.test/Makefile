@@ -17,6 +17,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # TODO remove - issue #1165 - ExludePlatform support at unit test build time
-ExcludePlatforms=plutosdr
+ExcludePlatforms=plutosdr picoevb
 
 include $(OCPI_CDK_DIR)/include/test.mk

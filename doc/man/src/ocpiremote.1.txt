@@ -69,7 +69,7 @@ The verbs supported by *`ocpiremote`* are:
 *`log`*::
     Interactively view *`ocpiserve`* container server logging. If the server is not running,
     the log is displayed and the command finishes.  If the server is running the log is displayed
-    continuously while the server is running, similar to the `*-f*` option to the *`tail*` command.
+    continuously while the server is running, similar to the *`-f`* option to the *`tail`* command.
 
 *`reboot`*::
     Reboot the remote system, usually used after the *`deploy`* operation.
@@ -82,7 +82,7 @@ The verbs supported by *`ocpiremote`* are:
 
 *`start`*::
     Start an *`ocpiserve`* container server on a remote system, which includes reloading
-    any required kernel drivers and FPGA bitstreams (when the *`--bitstream--`* is specified.
+    any required kernel drivers and FPGA bitstreams (when the *`--bitstream`* option is specified).
 
 *`status`*::
     Get the status of an *`ocpiserve`* container server on a remote system.
@@ -215,15 +215,15 @@ ENVIRONMENT VARIABLES
 The following OpenCPI environment variables affect *`ocpiremote`* execution:
 
 *`OCPI_SERVER_ADDRESSES`*::
-    A comma- or space-separated list of IP addresses/TCP ports of remote systems to contact, where
-    each IP/TCP address is in the format '<ip-address>'*`:`*'<tcp-port>'. For example,
-    192.168.1.102:12345. When *`ocpiserve`* with the *`--verbose`* option is started, it prints its
-    IP addresses/TCP ports in the log.
+    A comma-separated list of IP addresses/TCP ports of remote systems to contact, where
+    each IP/TCP address is in the format '<ip-address>'*`:`*'<tcp-port>[:<ocpiremote-args>]'. For example,
+    *`192.168.1.102:12345`* or *`192.168.1.102:12345:-p analog -b`*.  When *`ocpiserve`* with the *`--verbose`*
+    option is started, it prints its IP addresses/TCP ports in the log.
 
 *`OCPI_SERVER_ADDRESSES_FILE`*::
     The name of a file that contains remote system IP addresses/TCP ports, one per line. Each
-    IP address is in the format '<ip-address>'*`:`*'<tcp-port>'. For example,
-    192.168.1.102:12345.
+    IP address is in the format '<ip-address>'*`:`*'<tcp-port>[:<ocpiremote-args>]'. For example,
+    *`192.168.1.102:12345`*.
 
 The chapter "Using Remote Containers: Network-Connected Processors" in
 the 'OpenCPI Application Development Guide' provides more information
@@ -240,16 +240,29 @@ ocpiremote --ip-addr=192.168.1.102 load
 -----------------------------------------
 +
 . Load and start an *`ocpiserve`* container server
-on the remote system with IP address 192.168.1.102 and port 12345
-using the environment variable that will apply to all *`ocpiremote`* commands.
+on a remote Ettus E310 system with IP address 192.168.1.102 and TCP port 12345,
+specified with the OCPI_SERVER_ADDRESSES environment variable to apply them to all subsequent *`ocpiremote`* commands.
 Before starting the server, establish 4 megabytes of DMA memory, and load an OpenCPI bitstream
-on top of whatever is currently loaded.
+on top of whatever is currently loaded. Since the required RCC platform is not specified as
+an option to the *`load`* verb, it defaults to *`xilinx19_2_aarch32`*, which is the desired
+RCC platform for the E310.
 +
------------------------------------------
+-----------------------------------------------
 export OCPI_SERVER_ADDRESSES=192.168.1.102:12345
-ocpiremote load --rcc-platform=xilinx19_2_aarch32 --hdl-platform=e31x
-ocpiremote start --bitstream --memory 0x400000
------------------------------------------
+ocpiremote --hdl-platform=e31x load
+ocpiremote --bitstream --memory 0x400000 start
+-----------------------------------------------
++
+. Load and start an *`ocpiserve`* container server
+on a remote ADALM-PLUTO system with IP address 192.168.1.2 and TCP port 12345,
+specified with the OCPI_SERVER_ADDRESSES environment variable to apply them to all subsequent *`ocpiremote`* commands.
+Supply the server login password as an option to the *`load`* and *`start`* verbs.
++
+-----------------------------------------------
+export OCPI_SERVER_ADDRESSES=192.168.2.1:12345
+ocpiremote --rcc-platform=adi_plutosdr0_32 --hdl-platform=plutosdr --password=analog load
+ocpiremote --password=analog start
+-----------------------------------------------
 +
 . Stop the *`ocpiserve`* container server on the remote system
 with IP address 192.168.1.102:
@@ -302,7 +315,7 @@ link:ocpirun.1.html[ocpirun(1)]
 
 COPYING
 -------
-Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2022 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your

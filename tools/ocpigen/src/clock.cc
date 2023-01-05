@@ -1,7 +1,7 @@
 // methods about clocks, including methods of the Clock class itself.
 
-#include "wip.h"
-#include "clock.h"
+#include "wip.hh"
+#include "clock.hh"
 
 const char *Worker::
 parseClocks() {
@@ -11,13 +11,13 @@ parseClocks() {
     if ((err = OE::checkAttrs(xc, "Name", "Signal", "Home", "direction", "frequency", (void*)0)))
       return err;
     const char
-      *name = ezxml_cattr(xc, "Name"),
+      *l_name = ezxml_cattr(xc, "Name"),
       *direction = ezxml_cattr(xc, "direction"),
       *signal = ezxml_cattr(xc, "signal");
-    if (!name)
+    if (!l_name)
       return "Missing Name attribute in Clock subelement of HdlWorker";
     Clock *c;
-    if ((err = addClock(name, direction, c)))
+    if ((err = addClock(l_name, direction, c)))
       return err;
     c->m_exported = true;  // If you mention it here at the top level, exporting is implied
     c->m_signal = signal ? signal : "";
@@ -33,21 +33,21 @@ addClock(ezxml_t x) {
   if ((err = OE::checkAttrs(x, "Name", "Signal", "direction", (void*)0)))
     return err;
   const char
-    *name = ezxml_cattr(x, "name"),
+    *l_name = ezxml_cattr(x, "name"),
     *direction = ezxml_cattr(x, "direction"),
     *signal = ezxml_cattr(x, "Signal");
   Clock *c;
-  if (!(err = addClock(name, direction, c)))
+  if (!(err = addClock(l_name, direction, c)))
     c->m_signal = signal? signal : "";
   return err;
 }
 
 const char *Worker::
-addClock(const char *name, const char *direction, Clock *&clk) {
-  if (!name)
+addClock(const char *a_name, const char *direction, Clock *&clk) {
+  if (!a_name)
     return OU::esprintf("Missing \"name\" attribute for clock");
-  if (findClock(name))
-    return OU::esprintf("Duplicate clock \"%s\" for worker \"%s\"", name, m_implName);
+  if (findClock(a_name))
+    return OU::esprintf("Duplicate clock \"%s\" for worker \"%s\"", a_name, m_implName);
   bool output = false;
   if (direction) {
     if (!strcasecmp(direction, "out"))
@@ -55,21 +55,21 @@ addClock(const char *name, const char *direction, Clock *&clk) {
     else if (strcasecmp(direction, "in"))
       return OU::esprintf("Signal direction \"%s\" is not valid for clocks", direction);
   }
-  clk = &addClock(name, output);
+  clk = &addClock(a_name, output);
   return NULL;
 }
 
 Clock &Worker::
-addClock(const char *name, bool output) {
+addClock(const char *a_name, bool output) {
   Clock &c = *new Clock(*this);
   c.m_ordinal = m_clocks.size();
-  if (name) {
-    ocpiCheck(!findClock(name));
-    c.m_name = name;
+  if (a_name) {
+    ocpiCheck(!findClock(a_name));
+    c.m_name = a_name;
   }
   m_clocks.push_back(&c);
   c.m_output = output;
-  OU::format(c.m_signal, "%s_Clk", name);
+  OU::format(c.m_signal, "%s_Clk", a_name);
   return c;
 }
 

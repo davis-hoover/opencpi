@@ -184,91 +184,30 @@ class OcpiDocumentationProperties(PropertiesDirectiveHandler):
         # otherwise automatically determine likely path based on standard
         # file structure and naming.
         if "component_spec" in self.options:
-            component_specification_path = pathlib.Path(
-                self.state.document.attributes["source"]).joinpath(
+            component_spec_path = pathlib.Path(
+                self.state.document.attributes["source"]).resolve().parent.joinpath(
                 self.options["component_spec"]).resolve()
         else:
-            component_name = os.path.splitext(pathlib.Path(
-                self.state.document.attributes["source"]).resolve(
-            ).parent.name)[0]
-
-            # Determine valid OWD file paths
-            owd_search_path = pathlib.Path(
-                self.state.document.attributes["source"]).resolve(
-            ).parent.joinpath(f"../{component_name}.*/{component_name}.xml")
-            owd_search_files = glob.glob(str(owd_search_path))
-            owd_files = []
-            for owd_file in owd_search_files:
-                directory_extension = pathlib.Path(owd_file).parent.suffix
-                if directory_extension in [".rcc", ".hdl", ".ocl"]:
-                    owd_files += [owd_file]
-
-            component_specification_path = None
-            current_directory = pathlib.Path(
-                self.state.document.attributes["source"]).resolve().parent
-            specs_directory = current_directory.joinpath("../specs")
-            for owd_file in owd_files:
-                with xml_tools.parser.WorkerSpecParser(
-                        owd_file,
-                        include_filepaths=[current_directory, specs_directory]
-                ) as file_parser:
-                    owd_xml_root = file_parser.getroot()
-                    if owd_xml_root is None:
-                        continue
-                    # Search for "spec" attribute in OWD
-                    if "spec" in owd_xml_root.attrib:
-                        spec_file_name = owd_xml_root.attrib["spec"]
-                        if not spec_file_name.endswith(".xml"):
-                            spec_file_name = spec_file_name + ".xml"
-                        component_specification_path = pathlib.Path(
-                            self.state.document.attributes["source"]).resolve(
-                        ).parent.joinpath("../specs").joinpath(spec_file_name)
-                        break
-                    # Check for "componentspec" in OWD if there's only one
-                    if len(owd_files) == 1:
-                        if len(owd_xml_root.findall("componentspec")) > 0:
-                            component_specification_path = pathlib.Path(
-                                owd_file)
-                            break
-
-            if component_specification_path is None:
-                component_specification_path = pathlib.Path(
-                    self.state.document.attributes["source"]).resolve(
-                ).parent.joinpath("../specs").joinpath(
-                    f"{component_name}-spec.xml")
-
-                # Added to handle _spec.xml naming
-                if not component_specification_path.is_file():
-                    component_specification_path = pathlib.Path(
-                        self.state.document.attributes["source"]).resolve(
-                    ).parent.joinpath("../specs").joinpath(
-                        f"{component_name}_spec.xml")
-
-        if not component_specification_path.is_file():
-            self.state_machine.reporter.warning(
-                "Properties listing cannot find component "
-                + f"specification, {component_specification_path}",
-                line=self.lineno)
-            return content
-
-        with xml_tools.parser.ComponentSpecParser(
-                component_specification_path,
-                include_filepaths=[current_directory, specs_directory]
-        ) as file_parser:
-            component_specification = file_parser.get_dictionary()
-
+            component_spec_path = None
+        component_spec = (
+            docutils_helpers.get_component_spec(self.state.document.attributes["source"],
+                                                self.state_machine.reporter, self.lineno,
+                                                component_spec_path)
+            )
+        if not component_spec:
+            return []
         self._parse_context_to_addition_text()
         for property_name in self.additional_text:
             # Check a valid name
-            if property_name not in component_specification["properties"]:
+            if property_name not in component_spec["properties"]:
                 self.state_machine.reporter.warning(
                     f"No property called {property_name} defined in component "
-                    + f"specification, {component_specification_path}",
+                    + f"specification:  \"{component_spec['path']}\"",
                     line=self.lineno)
                 continue
 
         bullet_point_list = docutils.nodes.bullet_list()
-        for name, detail in component_specification["properties"].items():
+        for name, detail in component_spec["properties"].items():
             bullet_point_list.append(self._property_summary(name, detail))
 
         if len(bullet_point_list) > 0:

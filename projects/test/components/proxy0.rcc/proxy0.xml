@@ -1,0 +1,5 @@
+<RccWorker language="c++" slave="ocpi.core.proxy.rcc" controloperations='start' componentlibraries='components'>
+  <componentspec/>
+  <property name='proxybias' initial='true'/>
+  <!-- Insert any other implementation-specific information here -->
+</RccWorker>

@@ -1,0 +1,64 @@
+<!-- This is the XML file for the primitive library: dgrdma -->
+<HdlLibrary
+    Libraries='ocpi platform sdp'
+    ExcludeTargets='xsim isim modelsim'
+    SourceFiles='
+    dgrdma_pkg.vhd
+    dgrdma_util_pkg.vhd
+    verilog_ethernet_pkg.vhd
+    verilog-ethernet/rtl/iddr.v
+    verilog-ethernet/rtl/oddr.v
+    verilog-ethernet/rtl/oddr.v
+    verilog-ethernet/rtl/ssio_ddr_in.v
+    verilog-ethernet/rtl/rgmii_phy_if.v
+    verilog-ethernet/rtl/eth_mac_1g_rgmii_fifo.v
+    verilog-ethernet/rtl/eth_mac_1g_rgmii.v
+    verilog-ethernet/rtl/eth_mac_1g.v
+    verilog-ethernet/rtl/axis_gmii_rx.v
+    verilog-ethernet/rtl/axis_gmii_tx.v
+    verilog-ethernet/rtl/eth_axis_rx.v
+    verilog-ethernet/rtl/eth_axis_tx.v
+    verilog-ethernet/rtl/eth_mac_10g_fifo.v
+    verilog-ethernet/rtl/eth_mac_10g.v
+    verilog-ethernet/rtl/axis_xgmii_rx_64.v
+    verilog-ethernet/rtl/axis_xgmii_tx_64.v
+    verilog-ethernet/rtl/axis_xgmii_rx_32.v
+    verilog-ethernet/rtl/axis_xgmii_tx_32.v
+    verilog-ethernet/rtl/lfsr.v
+    verilog-ethernet/lib/axis/rtl/axis_fifo.v
+    verilog-ethernet/lib/axis/rtl/axis_async_fifo.v
+    verilog-ethernet/lib/axis/rtl/axis_adapter.v
+    verilog-ethernet/lib/axis/rtl/axis_async_fifo_adapter.v
+    verilog-ethernet/lib/axis/rtl/axis_pipeline_register.v
+    verilog-ethernet/lib/axis/rtl/axis_register.v
+    dgrdma_txn_record.vhd
+    divide.vhd
+    dgrdma_frame_parser.vhd
+    dgrdma_frame_generator.vhd
+    dgrdma_rx_mux.vhd
+    dgrdma_tx_mux.vhd
+    dgrdma_ack_tracker.vhd
+    axis_to_sdp.vhd
+    axis_to_cp.vhd
+    axis_to_cp8.vhd
+    axis_width_widen.vhd
+    axis_width_narrow.vhd
+    eth_frame_generator.vhd
+    eth_frame_generator32.vhd
+    eth_frame_generator64.vhd
+    eth_frame_generator128.vhd
+    eth_frame_parser.vhd
+    eth_frame_parser32.vhd
+    eth_frame_parser64.vhd
+    eth_frame_parser128.vhd
+    eth_frame_router.vhd
+    eth_frame_arbiter.vhd
+    eth_to_ocpi.vhd
+    dual_eth_to_ocpi.vhd
+    rgmii_mac_wrapper.vhd
+    xgmii_mac_wrapper.vhd
+    rgmii_to_ocpi.vhd
+    dual_rgmii_to_ocpi.vhd
+    xgmii_to_ocpi.vhd
+    dual_xgmii_to_ocpi.vhd'
+/>

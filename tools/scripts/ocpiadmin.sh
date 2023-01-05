@@ -45,12 +45,11 @@ cd $OCPI_ROOT_DIR
 # Provides `setVarsFromMake`
 source $OCPI_CDK_DIR/scripts/util.sh
 
-
 function usage {
   if [ "$action" != install ]; then
     cat <<-EOF
 To install a platform (by downloading it, if necessary, and building it):
-  $(basename $0) install platform <platform> [-p PKG_ID [-u URL] [-g GIT_REV]]
+  $(basename $0) [-p PKG_ID [-u URL] [-g GIT_REV]] [--minimal] [--optimize] install platform <platform>
 To deploy a platform:
   $(basename $0) deploy platform <rcc_platform> <hdl_platform>
 EOF
@@ -62,41 +61,42 @@ EOF
 
 function install_usage {
   cat <<-EOF
-Usage: $(basename $0) install platform <platform> [-p PKG_ID [-u URL] [-g GIT_REV]]
+Usage: $(basename $0) [-p PKG_ID [-u URL] [-g GIT_REV]] [--minimal] [--optimize] install platform <platform>
 
 Download, build, and register the built-in or remote OpenCPI RCC or HDL platform.
 
 Required args:
-  platform  Name of platform to install
+  <platform>                    name of platform to install
 
 Optional args:
   The -u and -g flags are only valid if the -p flag is specified as well. If
   the PKG_ID has already been downloaded and is detected, then PKG_ID can be
-  omitted and just the PLATFORM name is required.
+  omitted and just <platform> is required.
 
-  -g GIT_REV, --git-revision GIT_REV
-                        The branch, tag, or other valid git revision to checkout
-                        after cloning the default git repo determined by PKG_ID.
-                        GIT_REV defaults to the currently checked out OpenCPI
-                        git revision.
-  -p PKG_ID, --package-id PKG_ID
-                        The OpenCPI Package ID that provides PLATFORM
-  -u URL, --url URL     Use this URL when cloning the remote or local git repo
-                        instead of the default url determined by PKG_ID
-  --optimize            Use this option to install a software platform built with optimization,
-                        at the expense of debugging.
-  -u URL, --url URL     Use this URL when cloning the remote or local git repo
-                        instead of the default url determined by PKG_ID
+  -p, --package-id=PKG_ID       OpenCPI package ID that provides <platform>
+  -u, --url=URL                 the URL to use when cloning the remote or local
+                                  git repo; default is determined by PKG_ID
+  -g, --git-revision=GIT_REV    branch, tag, or other valid git revision to
+                                  checkout after cloning the default git repo
+                                  determined by PKG_ID; default value is the
+                                  currently checked out OpenCPI git revision
+  --minimal                     specifies a minimized installation process that
+                                  does not pre-build HDL workers or run any
+                                  installation tests; default is "false"
+  --optimize                    for RCC (software) platforms only, specifies that
+                                  the framework software and software workers be
+                                  built w/optimization enabled; default is "false"
+
 Examples:
   # xsim
   ocpiadmin install platform xsim
 
   # E31x
-  ocpiadmin install platform e31x -p ocpi.osp.e3xx
+  ocpiadmin -p ocpi.osp.e3xx install platform e31x
 
   # PlutoSDR
   # PKG_ID not needed for second command as it has already been downloaded
-  ocpiadmin install platform adi_plutosdr0_32 -p ocpi.osp.plutosdr
+  ocpiadmin -p ocpi.osp.plutosdr install platform adi_plutosdr0_32
   ocpiadmin install platform plutosdr
 EOF
   exit 1
@@ -120,7 +120,7 @@ function getvars {
 	model=HDL
 	v=HdlPlatformDir_$platform
     fi
-    platform_dir=`echo ${!v} | sed 's=^.*/projects/=./projects/='`
+    platform_dir=`echo ${!v} | sed "s=^${OCPI_ROOT_DIR}/projects/=./projects/="`
     return 0
   fi
   return 1
@@ -131,7 +131,6 @@ function bad {
   exit 1
 }
 
-
 #
 # Quick and dirty argument parsing:
 # getopt(s) overhead not required.
@@ -139,16 +138,22 @@ function bad {
 PARAMS=""
 while (( "$#" )); do
   case "$1" in
-    -g|--git-revision)
-      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+    -g|--git-revision|--git-revision=*)
+      if [[ "$1" == "--git-revision="* ]]; then
+	GIT_REV=${1#*=}
+	shift
+      elif [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
         GIT_REV=$2
         shift 2
       else
         bad "Argument for \"$1\" is missing"
       fi
       ;;
-    -p|--package-id)
-      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+    -p|--package-id|--package-id=*)
+      if [[ "$1" == "--package-id="* ]]; then
+	PKG_ID=${1#*=}
+	shift
+      elif [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
         PKG_ID=$2
         shift 2
       else
@@ -156,12 +161,23 @@ while (( "$#" )); do
       fi
       ;;
     -u|--url)
-      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+      if [[ "$1" == "--url="* ]]; then
+	URL=${1#*=}
+	shift
+      elif [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
         URL=$2
         shift 2
       else
         bad "Argument for \"$1\" is missing"
       fi
+      ;;
+    --minimal)
+      minimal=1 # use ${minimal:+whatever}
+      shift
+      ;;
+    --optimize)
+      optimize=1
+      shift
       ;;
 
     # Undocumented flags
@@ -173,22 +189,15 @@ while (( "$#" )); do
       verbose=-v
       shift
       ;;
-    --optimize)
-      optimize=1
-      shift
-      ;;
     --dynamic)
       dynamic=1
-      shift
-      ;;
-    --minimal)
-      minimal=1 # use ${minimal:+whatever}
       shift
       ;;
    --no-kernel)
       nokernel=1 # use ${nokernel:+whatever}
       shift
       ;;
+
     # Unsupported flags
     -*)
       HELP=1  # can't print usage yet as usage message is based on other args
@@ -207,7 +216,7 @@ done  # end parsing optional args and flags
 eval set -- "$PARAMS"
 unset PARAMS
 
-# Parse and validate positional args.
+# The <verb> argument.
 action=$1
 
 # Needs to be after $action is set as a different usage message is printed
@@ -378,13 +387,13 @@ else
     # Since the build-opencpi.sh does an "rcc" build per project, and that implicitly
     # does "declare" on projects, that is sufficient for on-demand hdl worker builds
     if [ -n "$minimal" ]; then
-      ocpidev -d projects/core build hdl primitives library --hdl-platform=$platform
-      ocpidev -d projects/platform build hdl primitives library --hdl-platform=$platform
+      ocpidev -d projects/core build hdl primitives --hdl-platform=$platform
+      ocpidev -d projects/platform build hdl primitives --hdl-platform=$platform
       # REMOVE THIS WHEN THE ASSETS PROJECT IS CLEANED UP
       # But ultimately we need to get the platform's project's dependencies from the platform's project
       # and build primitives for all of them
-      ocpidev -d projects/assets build hdl primitives library --hdl-platform=$platform
-      ocpidev -d projects/assets_ts build hdl primitives library --hdl-platform=$platform
+      ocpidev -d projects/assets build hdl primitives --hdl-platform=$platform
+      ocpidev -d projects/assets_ts build hdl primitives --hdl-platform=$platform
     else
       ocpidev -d projects/core build --hdl --hdl-platform=$platform
       ocpidev -d projects/platform build --hdl --hdl-platform=$platform --no-assemblies
@@ -401,17 +410,17 @@ else
           && "$platform_dir" != *"/projects/assets/"* ]]
     then
         if [ -n "$minimal" ]; then
-          ocpidev -d $project_dir build hdl primitives library --hdl-platform=$platform
+          ocpidev -d $project_dir build hdl primitives --hdl-platform=$platform
           # the rcc build ensures all workers are visible to build the platform
           # we don't have a verb to do that.
           ocpidev -d $project_dir build --rcc
           ocpidev -d $project_dir build hdl --workers-as-needed platform $platform
-          # Since there is no project-level build, no exports were done
-          # The best fix would be to add an --export-project option to ocpidev
-          make -C $project_dir -f $OCPI_CDK_DIR/include/project.mk exports
         else
           ocpidev -d $project_dir build --hdl --hdl-platform=$platform --no-assemblies
         fi
+        # Since there is no project-level build, no exports were done
+        # The best fix would be to add an --export-project option to ocpidev
+        make -C $project_dir -f $OCPI_CDK_DIR/include/project.mk exports
         echo "HDL platform \"$platform\" built and exported for OSP in $project_dir."
     elif [ -n "$minimal" ]; then
         # core project: build the platform in its project

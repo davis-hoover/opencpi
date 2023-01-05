@@ -249,7 +249,7 @@ static OH::Driver &getDriver() {
 static void setupDevice(bool discovery) {
   if (!device)
     bad("a device option is required with this command");
-  if (!(dev = getDriver().open(device, discovery, false, NULL, error)))
+  if (!(dev = getDriver().open(device, discovery, false, false, NULL, error)))
     bad("error opening device %s", device);
   cAccess = &dev->cAccess();
   dAccess = &dev->dAccess();
@@ -425,7 +425,7 @@ static void search(const char **) {
       vals[n++] = OA::PVString("interface", interface);
     vals[n++] = OA::PVEnd;
 #endif
-    getDriver().search(vals, NULL, true);
+    getDriver().discover(vals, true);
 }
 static void probe(const char **) {
   dev->print();
@@ -1759,11 +1759,14 @@ getxml(const char **ap) {
 
 static ezxml_t
 getmeta() {
+  static ezxml_t x; // we will never do this for more than one device
+  if (x)
+    return x;
   static std::vector<char> xml;
   std::string err;
   if (dev->getMetadata(xml, err))
     bad(err.c_str());
-  ezxml_t x = ezxml_parse_str(&xml[0], xml.size());
+  x = ezxml_parse_str(&xml[0], xml.size());
   if (x && ezxml_error(x)[0])
     bad("XML Parsing error: %s", ezxml_error(x));
   if (!x || !x->name)
@@ -1960,7 +1963,7 @@ load(const char **ap) {
     bad("a device option is required with this command");
   if (!ap[0])
     bad("No input filename specified for loading");
-  if (!(dev = getDriver().open(device, false, true, NULL, error)))
+  if (!(dev = getDriver().open(device, false, true, false, NULL, error)))
     bad("error opening device %s", device);
   if (dev->load(ap[0], error))
     bad("error loading device %s", device);
@@ -1972,7 +1975,7 @@ unload(const char **) {
   if (!device &&
       !(device = getenv("OCPI_DEFAULT_HDL_DEVICE")))
     bad("a device option is required with this command");
-  if (!(dev = getDriver().open(device, false, true, NULL, error)))
+  if (!(dev = getDriver().open(device, false, true, false, NULL, error)))
     bad("error opening device %s", device);
   if (dev->unload(error))
     bad("error unloading device %s after load", device);

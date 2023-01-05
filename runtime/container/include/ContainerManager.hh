@@ -62,10 +62,10 @@ namespace OCPI {
     {
     protected:
       ContainerBase<Dri, Con, App, Art>(Con &con, const char *a_name,
-					const ezxml_t config = NULL,
 					const OCPI::Base::PValue *props = NULL)
-	: OCPI::Base::Plugin::DeviceBase<Dri,Con>(a_name, con), Container(a_name, config, props) {}
+	: OCPI::Base::Plugin::DeviceBase<Dri,Con>(a_name, con), Container(a_name, props) {}
       inline Driver &driver() { return OCPI::Base::Plugin::DeviceBase<Dri,Con>::parent(); }
+      ezxml_t configXml() const { return OCPI::Base::Plugin::Device::configXml(); }
       Artifact *findLoadedArtifact(const char *a_name) {
 	return Parent<Art>::findChildByName(a_name);
       }
@@ -77,6 +77,9 @@ namespace OCPI {
       }
       Application *firstApplication() const {
 	return Parent<App>::firstChild();
+      }
+      Art *firstArtifact() const {
+	return Parent<Art>::firstChild();
       }
       Container *nextContainer() { return OCPI::Base::Plugin::DeviceBase<Dri,Con>::nextDevice(); }
     public:
@@ -112,7 +115,7 @@ namespace OCPI {
       ArtifactBase<Con,Art>(Con &con, Art &art, OCPI::Library::Artifact &lart, const OCPI::Base::PValue *props)
       : Child<Con, Art, artifact>(con, art, lart.name().c_str()), Artifact(lart, props) {}
     public:
-      inline Con &container() { return Child<Con,Art,artifact>::parent(); }
+      inline Container &container() { return Child<Con,Art,artifact>::parent(); }
       inline const std::string &name() const { return Child<Con, Art, artifact>::name(); }
     };
 

@@ -21,12 +21,28 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 [ -n "$OCPI_CDK_DIR" ] || { echo "Error: OCPI_CDK_DIR not set" && exit 1; }
+VENV_DIR="$OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/venv"
+
+#
+# If there is an existing python3 virtual environment,
+# check to see if it was created on *this* system.  If
+# not, remove it before continuing.
+#
+if [ -d "$VENV_DIR" ]
+then
+  C_VENV_DIR=$(grep -E '^VIRTUAL_ENV=' "$VENV_DIR/bin/activate" | cut -f2 -d'=' | tr -d '"')
+  if [ "$VENV_DIR" != "$C_VENV_DIR" ]
+  then
+    echo "WARNING: python3 virtual environment is not where it was originally created: removing..."
+    rm -rf "$VENV_DIR"
+  fi
+fi
 
 #
 # If the python3 virtual environment does not exist,
 # create it and install the needed "sphinx" modules.
 #
-[ -d "$OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/venv" ] || {
+[ -d "$VENV_DIR" ] || {
   echo "WARNING: one-time setup of \"ocpidoc\" execution environment in progress..."
   #
   # python3 version must be >= 3.6.0 for "ocpidoc".
@@ -46,11 +62,11 @@
     PYCMD=python3.6
   fi
 
-  $PYCMD -m venv $OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/venv
-  source $OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/venv/bin/activate
-  pip3 install docutils==0.16 sphinx sphinx_rtd_theme sphinxcontrib_spelling
+  $PYCMD -m venv "$VENV_DIR"
+  source "$VENV_DIR/bin/activate"
+  pip3 install "docutils>=0.17,<0.18" "sphinx>=4.3.0" "sphinx-rtd-theme>=0.5.1" "sphinxcontrib-spelling>=7.5.0"
   deactivate ;
 }
 
-source $OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/venv/bin/activate
-$OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/ocpidoc/ocpidoc.py $@
+source "$VENV_DIR/bin/activate"
+"$OCPI_CDK_DIR/$OCPI_TOOL_DIR"/lib/ocpidoc/ocpidoc.py "$@"

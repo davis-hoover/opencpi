@@ -28,7 +28,7 @@ from typing import Dict, List, Union
 from jinja2 import Environment, FileSystemLoader
 
 # Supported OSPs
-OSPS = ["ocpi.osp.analog", "ocpi.osp.e3xx", "ocpi.osp.plutosdr", "ocpi.osp.ettus"]
+OSPS = ["ocpi.osp.analog", "ocpi.osp.e3xx", "ocpi.osp.plutosdr", "ocpi.osp.ettus", "ocpi.osp.avnet", "ocpi.osp.xilinx"]
 OSP_TAGS = dict()  # Will be filled in later
 
 # Supported COMPs
@@ -118,7 +118,15 @@ def main():
     # Download supported OSPs
     for osp in OSPS:
         download_osp(osp)
-        OSP_TAGS[osp] = get_tags(OCPI_OSPDIR / osp / ".git")
+        #
+        # FIXME: remove the following "if" when v2.4.3 gets
+        # released.  DO NOT ATTEMPT TO PROCESS v2.4.2 LaTeX
+        # docs for these two OSPs!!
+        #
+        if osp == "ocpi.osp.avnet" or osp == "ocpi.osp.xilinx":
+            OSP_TAGS[osp] = []
+        else:
+            OSP_TAGS[osp] = get_tags(OCPI_OSPDIR / osp / ".git")
         OSP_TAGS[osp].append("develop")  # develop will always be a valid git revision
 
     # Download supported COMPs
@@ -275,7 +283,7 @@ def build(tag: str) -> None:
 
         # Generate and copy RST docs to release dir
         logging.info(f"Generating and copying RST docs for release: {tag}")
-        gen_copy_rst(tmprepo, release_dir / "rst")
+        gen_copy_rst(tmprepo, release_dir / "rst", tag)
 
 
 def build_docs(repo_dir: Path):
@@ -346,7 +354,7 @@ scripts/install-opencpi.sh --minimal --no-kernel']
         shutil.copy2(str(f), str(dst))
 
 
-def gen_copy_rst(src_dir: Path, dst_dir: Path):
+def gen_copy_rst(src_dir: Path, dst_dir: Path, tag: str):
     """
     Generate HTML renderings of RST document sources and copy
     them to project-specific subdirectories under the specified
@@ -377,17 +385,36 @@ def gen_copy_rst(src_dir: Path, dst_dir: Path):
         # "scripts/install-opencpi.sh --minimal --no-kernel", there does not
         # seem to be a better way to make "ocpidoc" available.
         #
+        # Projects named "ocpi.ptype.name" must now be registered before running
+        # "ocpidoc" because of allowable dependencies on "imports/ocpi.core", so
+        # we have to install the framework anyway to make "ocpidev" available.
+        #
+        # External projects (COMPS, OSPS) now require additional preprocessing
+        # for versions 2.4.X and later because of possible dependencies on other
+        # projects.  The "declare" target for "make" is available as of v2.4.1:
+        #
+        #   "make -C <project-dir> -f $OCPI_CDK_DIR/include/project.mk declare"
+        #
+        # Per Jim, "ocpidev build --doc-only" will do this for us someday.
+        #
         cmd = ["bash", "-c", fr'cd {src_dir} ; \
 source cdk/opencpi-setup.sh -s ; \
 export LANG=en_US.utf8 ; \
 for pdir in projects/* projects/osps/* ; \
 do if [ -f $pdir/index.rst ] ; \
-then ocpidoc -d $pdir build -b ; \
+then if [[ $pdir == *"/ocpi."* ]] ; \
+then ocpidev -d $pdir register project ; \
+case {tag} in v1.7*|v2.[0-3]*) \
+;; \
+*) make -C $pdir -f $OCPI_CDK_DIR/include/project.mk declare ;; \
+esac ; \
+fi ; \
+ocpidoc -d $pdir build -b ; \
+fi ; \
 if [ -d $pdir/gen/doc ] ; \
 then ddir=`basename $pdir | sed -e "s/\./_/g" -e "s/ocpi_//"` ; \
 mkdir -p {dst_dir}/$ddir ; \
 ( cd $pdir/gen/doc ; cp -pr . {dst_dir}/$ddir ) ; \
-fi ; \
 fi ; \
 done']
         logging.debug(f'Executing "{cmd}" in directory "{src_dir}"')
@@ -561,6 +588,10 @@ def gen_release_index(tag: str, is_latest=False):
                     section_title = "PlutoSDR OSP Documentation"
                 elif section_name == "ettus":
                     section_title = "Ettus OSP Documentation"
+                elif section_name == "avnet":
+                    section_title = "Avnet Engineering OSP Documentation"
+                elif section_name == "xilinx":
+                    section_title = "Xilinx OSP Documentation"
                 else:
                     section_title = section_title[4:] + " OSP Documentation"
                 if Path(f"{rst_dir}/osp_{section_name}/index.html").exists():
@@ -774,9 +805,16 @@ def find_files(search_dir, extension=None, recursive=True) -> List[Path]:
 
 
 def get_tags(git_dir: Path) -> List[str]:
-    cmd = ["git", "--git-dir", str(git_dir.resolve()), "tag", "-l", "v*"]
+    # Can no longer build "all" in less than 3 hours,
+    # so ignore tags corresponding to early releases.
+    # cmd = ["git", "--git-dir", str(git_dir.resolve()), "tag", "-l", "v*"]
+    cmd = ["git", "--git-dir", str(git_dir.resolve()), "tag", "-l", "v1.7*", "v2.*"]
     logging.debug(f"Executing cmd: {cmd}")
     tags = subprocess.check_output(cmd).decode().strip("\n").split("\n")
+    if not tags[0]:
+        # no tags: unreleased project
+        logging.debug("no tags found")
+        return tags
     tags = sort_tags(tags, reverse=True)  # reverse required for proper filtering later
     logging.debug(f"sorted tags: {tags}")
 
@@ -888,7 +926,7 @@ def sort_tags(tags: List[str], reverse: bool = False):
 
 if __name__ == "__main__":
     def _find_root(x: Path):
-        while not x.name.startswith("opencpi") and len(x.parts) != 1:
+        while len(x.parts) != 1 and not x.joinpath("Framework.exports").exists():
             x = x.parent
         return x
 

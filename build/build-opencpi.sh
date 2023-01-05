@@ -85,6 +85,7 @@ function domake {
   make -C "$dir" $mkf $@
 }
 domake "$project" exports
+echo "Export of platform '$OCPI_TARGET_PLATFORM' completed."
 
 # Build the framework
 echo "Now we will build the OpenCPI framework libraries and utilities for $OCPI_TARGET_DIR"
@@ -114,7 +115,7 @@ else
 fi
 
 if [ -n "$minimal" ]; then
-  Projects="core platform assets"
+  Projects="core platform assets assets_ts"
 else
   Projects="core platform assets assets_ts inactive tutorial"
 fi

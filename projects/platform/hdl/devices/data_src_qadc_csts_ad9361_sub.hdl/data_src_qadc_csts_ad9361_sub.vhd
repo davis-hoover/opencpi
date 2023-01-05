@@ -80,7 +80,6 @@ architecture rtl of worker is
   type state_t is (R1_11_6, R1_5_0,
                    R2_11_6, R2_5_0);
   signal state : state_t := R1_11_6;
-
   -- internal signals
   signal dual_port   : std_logic := '0';
   signal full_duplex : std_logic := '0';
@@ -106,6 +105,7 @@ architecture rtl of worker is
   signal adc_rx_data_buf_ordered : std_logic_vector(data_width_from_pins-1 downto 0) := (others => '0');
   signal adc_ddr_out_rising_rr   : std_logic_vector(data_width_from_pins-1 downto 0) := (others => '0');
   signal adc_ddr_out_falling_rr  : std_logic_vector(data_width_from_pins-1 downto 0) := (others => '0');
+  signal adc_ddr_out_falling_rrr  : std_logic_vector(data_width_from_pins-1 downto 0) := (others => '0');
   signal adc_r1_i_h_rrr : std_logic_vector((adc_width/2)-1 downto 0) := (others => '0');
   signal adc_r1_q_h_rrr : std_logic_vector((adc_width/2)-1 downto 0) := (others => '0');
   signal adc_r1_i_rrrr  : std_logic_vector(adc_width-1     downto 0) := (others => '0');
@@ -314,8 +314,15 @@ begin
       end if;
     end process;
 
-    -- simultaneously handles both possible 1R1T and 2R2T timing diagrams from
-    -- AD9361_Reference_Manual_UG-570.pdf Figure 79.
+      -- Delay falling edge signal to account for the case where frame signal
+    -- changes on the rising edge of adc_clk when in DDR mode.
+    delay_adc_ddr_out_falling_rr_p : process(adc_clk)
+    begin
+      if rising_edge(adc_clk) then
+        adc_ddr_out_falling_rrr <= adc_ddr_out_falling_rr;
+      end if;
+    end process;
+
     data_ingest_fsm : process(adc_clk)
     begin
       if rising_edge(adc_clk) then
@@ -323,28 +330,46 @@ begin
           when R1_11_6 =>
             adc_r1_give_rrrr <= '0';
             adc_r2_give_rrrr <= '0';
-            -- this is why we set rx_frame_usage_is_toggle to btrue above
-            if(adc_rx_frame_p_buf_falling_rr = '1') then
+            -- Detect alignment of frame signal to the clock
+            if (adc_rx_frame_p_buf_rising_rr = '1' and adc_rx_frame_p_buf_falling_rr = '0') then
+              -- Note: In this alignment, rising edge data is Q
+              adc_r1_q_h_rrr <= adc_ddr_out_rising_rr;
+              -- Note: In this alignment, falling edge data is I
+              -- Note: Using a version of the falling edge data signal delayed by an extra clock
+              --       See attached wave diagram for reasoning.
+              adc_r1_i_h_rrr <= adc_ddr_out_falling_rrr;
+              state <= R1_5_0;
+            -- This alignment was already supported
+            elsif (adc_rx_frame_p_buf_rising_rr = '1') then
               adc_r1_i_h_rrr <= adc_ddr_out_rising_rr;
               adc_r1_q_h_rrr <= adc_ddr_out_falling_rr;
               state <= R1_5_0;
             end if;
           when R1_5_0 =>
-            adc_r1_i_rrrr <= adc_r1_i_h_rrr & adc_ddr_out_rising_rr;
-            adc_r1_q_rrrr <= adc_r1_q_h_rrr & adc_ddr_out_falling_rr;
 
+            if (adc_rx_frame_p_buf_rising_rr = '0' and adc_rx_frame_p_buf_falling_rr = '1') then
+              adc_r1_q_rrrr <= adc_r1_q_h_rrr & adc_ddr_out_rising_rr;
+              adc_r1_i_rrrr <= adc_r1_i_h_rrr & adc_ddr_out_falling_rrr;
+            else
+              adc_r1_i_rrrr <= adc_r1_i_h_rrr & adc_ddr_out_rising_rr;
+              adc_r1_q_rrrr <= adc_r1_q_h_rrr & adc_ddr_out_falling_rr;
+            end if;
+            state <= R1_11_6;
             adc_r1_give_rrrr <= r1_worker_present;
 
             -- if valid first channel samples are received but there is no
             -- qadc worker to ingest them, detect the error
             adc_r1_samps_dropped <= not r1_worker_present;
+            
 
+            ------------- This breaks 2r2t for LVDS, but re-enabling this causes failures for CMOS ------ FIXME Re-enable this and fix 2r2t 
             -- this is why we set rx_frame_usage_is_toggle to btrue above
-            if(adc_rx_frame_p_buf_falling_rr = '1') then
-              state <= R2_11_6;
-            else
-              state <= R1_11_6;
-            end if;
+          --  if(dev_cfg_data_in.config_is_two_r = '1') then
+          --    state <= R2_11_6;
+          --  else
+          --    state <= R1_11_6;
+          --  end if;
+
           when R2_11_6 =>
             adc_r2_i_h_rrr <= adc_ddr_out_rising_rr;
             adc_r2_q_h_rrr <= adc_ddr_out_falling_rr;

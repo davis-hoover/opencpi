@@ -1,7 +1,12 @@
 <HdlDevice language='vhdl' Libraries='sdp platform'>
+
   <ComponentSpec name='sdp_node' nocontrol='true'/>
+
   <property name='sdp_width' parameter='true' type='uchar' default='1'/>
+  <property name='sdp_arb'   parameter='true' type='uchar' default='0'/>
+
   <sdp name="up"/>
   <sdp name="client" master='true'/>
-  <sdp name="down" master='true'/>
+  <sdp name="down"   master='true'/>
+
 </HdlDevice>

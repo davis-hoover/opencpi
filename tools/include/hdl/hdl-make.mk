@@ -825,7 +825,7 @@ define HdlPrepareAssembly
   WorkerSourceFiles=$$(ImplFile)
   # 5. Set the workers-required variables from the generated AssyWorkersFile, target independent
   HdlInstances:=$$(and $$(AssyWorkersFile),$$(strip\
-                   $$(foreach i,$$(shell grep -h -v '\\\#' $$(AssyWorkersFile)),\
+                   $$(foreach i,$$(shell grep -h -v '^\#' $$(AssyWorkersFile)),\
 	              $$(if $$(filter $$(call HdlInstanceWkr,$$i),$$(HdlPlatformWorkers)),,$$i))))
   HdlWorkers:=$$(call Unique,$$(foreach i,$$(HdlInstances),$$(call HdlInstanceWkrCfg,$$i)))
 
@@ -852,9 +852,14 @@ define HdlPreprocessTargets
     override HdlPlatforms:=$$(HdlAllPlatforms)
   else ifdef HdlPlatforms
     # Leave it alone if it was specifically defined as nothing
+    HdlPreExcludePlatforms:=$$(HdlPlatforms)
     override HdlPlatforms:=$$(filter-out $$(ExcludePlatforms),$$(HdlPlatforms))
     ifdef OnlyPlatforms
      override HdlPlatforms:=$$(filter $$(OnlyPlatforms),$$(HdlPlatforms))
+    endif
+    HdlExcludedPlatforms:=$$(filter-out $$(HdlPlatforms),$$(HdlPreExcludePlatforms))
+    ifneq ($$(words $$(HdlExcludedPlatforms)),0)
+      $$(call OcpiInfo,Not building $$(HdlMode) for these filtered (only/excluded) HDL platforms: $$(HdlExcludedPlatforms))
     endif
   endif
   ifndef HdlTargets

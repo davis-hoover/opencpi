@@ -20,9 +20,9 @@
 
 #include <assert.h>
 #include <ctype.h>
-#include "data.h"
-#include "hdl.h"
-#include "hdl-device.h"
+#include "data.hh"
+#include "hdl.hh"
+#include "hdl-device.hh"
 
 //bool hdlAssy = false;
 
@@ -30,9 +30,9 @@
 const char *Worker::
 parseHdl(const char *a_package) {
   const char *err;
-  if (strcmp(m_implName, m_fileName.c_str()))
-    return OU::esprintf("File name (%s) and implementation name in XML (%s) don't match",
-			m_fileName.c_str(), m_implName);
+  if (strcasecmp(m_implName, nsname()))
+    return OU::esprintf("File name without suffix (%s) and implementation name in XML (%s) don't match",
+			nsname(), m_implName);
   m_pattern = ezxml_cattr(m_xml, "Pattern");
   m_portPattern = ezxml_cattr(m_xml, "PortPattern");
   if (!m_pattern)
@@ -124,6 +124,8 @@ parseHdlImpl(const char *a_package) {
   // Since we will steal properties from the device (worker) being emulated,
   // we actually need to know that worker before parsing this one.
   const char *emulate = ezxml_cattr(m_xml, "emulate");
+  if (!emulate)
+    emulate = ezxml_cattr(m_xml, "emulates"); // easier to understand the relationship
   if (emulate) {
     const char *dot = strrchr(emulate, '.');
     if (!dot)
@@ -146,10 +148,11 @@ parseHdlImpl(const char *a_package) {
     }
     // roughly a copy-constructor that replaces the worker reference
     m_paramConfigs.resize(m_emulate->m_paramConfigs.size());
-    for (unsigned n = 0; n < m_paramConfigs.size(); n++) {
-      m_paramConfigs[n] = new ParamConfig(*this);
-      m_paramConfigs[n]->clone(*m_emulate->m_paramConfigs[n]);
-    }
+    for (unsigned n = 0; n < m_paramConfigs.size(); n++)
+      if (m_emulate->m_paramConfigs[n]) {
+	m_paramConfigs[n] = new ParamConfig(*this);
+	m_paramConfigs[n]->clone(*m_emulate->m_paramConfigs[n]);
+      }
   }
   // This must be here so that when the properties are parsed,
   // the first raw one is properly aligned.
@@ -438,6 +441,26 @@ parseSignals(ezxml_t xml, const std::string &parent, Signals &signals, SigMap &s
     }
   }
   return err;
+}
+
+// verbose assumed
+void Signal::
+emitXml(std::string &out) const {
+  OU::formatAdd(out, "      <signal name='%s' direction='%s'", cname(),
+		m_directionExpr.empty() ? directions[m_direction] : m_directionExpr.c_str());
+  if (!m_widthExpr.empty())
+    OU::formatAdd(out, " width='%s'", m_widthExpr.c_str());
+  else if (m_width)
+    OU::formatAdd(out, " width='%zu'", m_width);
+  OE::emitBoolAttr(out, "pin", m_pin, true);
+  OE::emitBoolAttr(out, "differential", m_differential, true);
+  out += "/>\n";
+}
+
+void Signal::
+emitSignals(const Signals &signals, std::string &out) {
+  for (SignalsIter si = signals.begin(); si != signals.end(); si++)
+    (**si).emitXml(out);
 }
 
 const Signal *Signal::

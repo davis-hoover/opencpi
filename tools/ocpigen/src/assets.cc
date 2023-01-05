@@ -29,8 +29,8 @@
 #include "UtilMisc.hh"
 #include "MetadataAssembly.hh"
 #include "LibraryAssembly.hh"
-#include "cdkutils.h"
-#include "ocpigen.h"
+#include "cdkutils.hh"
+#include "ocpigen.hh"
 
 	  // These are documented, although they may be deprecated...
 #define HDL_TARGET_ATTRS "HdlTargets", "HdlPlatforms"
@@ -83,17 +83,17 @@ parseApplication(ezxml_t xml) {
   if ((err = OE::checkAttrs(xml, APPLICATION_ATTRS, PROJECT_AND_LIBRARY_ATTRS, NULL)) ||
       (err = OE::checkElements(xml, OCPI_ASSY_ELEMENTS, NULL)))
     return err;
+  const char *runattrs[] = { OCPI_APP_DEV_ATTRS, NULL };
+  for (const char **ap = runattrs; *ap; ++ap)
+    attrMap[*ap] = "";
   // add mappings from attribute names to makefile variables
   attrMap["RunBefore"] = "OcpiRunBefore";
   attrMap["RunAfter"] = "OcpiRunAfter";
-  attrMap["RunArgs"] = "OcpiRunArgs";
+  attrMap["RunArgs"] = "OcpiRunArgsXml";
   attrMap["FileName"] = "OcpiApp";
   attrMap["OtherMains"] = "OcpiApps";
   attrMap["NoRun"] = "OcpiNoRun";
   attrMap["PrereqLibs"] = "OcpiPrereqLibs";
-  const char *runattrs[] = { OCPI_APP_RUN_ATTRS, NULL };
-  for (const char **ap = runattrs; *ap; ++ap)
-    attrMap[*ap] = "";
   return NULL;
 }
 
@@ -167,6 +167,16 @@ parseHdlAssembly(ezxml_t xml) {
   return NULL;
 }
 
+#define HDL_ASSEMBLIES_ATTRS "Assemblies", "ExcludeAssemblies"
+static const char *
+parseAssemblies(ezxml_t xml) {
+  const char *err;
+  if ((err = OE::checkAttrs(xml, TARGET_ATTRS, HDL_ASSEMBLIES_ATTRS, NULL)) ||
+      (err = OE::checkElements(xml, NULL)))
+    return err;
+  return NULL;
+}
+
 // FIXME this is redundant with what is in tests.cc
 #define TEST_ATTRS "spec", "timeout", "duration", "onlyWorkers", \
                    "excludeWorkers", "useHDLFileIo", "mode", "onlyPlatforms", \
@@ -184,7 +194,7 @@ parseTests(ezxml_t xml) {
   HDL_TARGET_ATTRS, TARGET_ATTRS, PACKAGE_ATTRS, PROJECT_AND_LIBRARY_ATTRS, PROJECT_ONLY_ATTRS, \
   LIBRARY_ONLY_ATTRS, APPLICATION_ATTRS, APPLICATIONS_ONLY_ATTRS, \
   HDL_LIBRARY_AND_CORE_ATTRS, HDL_LIBRARY_ONLY_ATTRS, HDL_CORE_ONLY_ATTRS, \
-  HDL_PRIMITIVES_ONLY_ATTRS, TEST_MAKE_ATTRS
+  HDL_PRIMITIVES_ONLY_ATTRS, HDL_ASSEMBLIES_ATTRS, TEST_MAKE_ATTRS
 
 // The argument is [<expected-asset-type>:]<xml-file>
 const char *
@@ -201,6 +211,7 @@ parseAsset(const char *file, const char *topElement) {
        !strcasecmp(xml->name, "hdlassembly") ? parseHdlAssembly(xml) :
        !strcasecmp(xml->name, "hdlprimitives") ? parseHdlPrimitives(xml) :
        !strcasecmp(xml->name, "hdlplatforms") ? parseHdlPlatforms(xml) :
+       !strcasecmp(xml->name, "assemblies") ? parseAssemblies(xml) :
        !strcasecmp(xml->name, "libraries") ? parseLibraries(xml) :
        !strcasecmp(xml->name, "applications") ? parseApplications(xml) :
        !strcasecmp(xml->name, "application") ? parseApplication(xml) :

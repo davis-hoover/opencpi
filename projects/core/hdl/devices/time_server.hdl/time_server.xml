@@ -12,7 +12,7 @@
        The value is the time delta between when Step one occurred at the time service (t0),
        and when step 2 occurred at the time service (t1). -->
   <Property Name="delta" Type="ulonglong" Writable="true" Volatile="true"
-	    Description="Difference between last-written value and time_now (now – written value)."/>
+	    Description="Difference between last-written value and time_now (now - written value)."/>
   <Property Name="PPS_ok" Type="bool" Volatile="true"
            Description="PPS fell within the valid window in the last second."/>
   <Property Name="enable_time_now_updates_from_PPS" Type="bool" Writable="true"

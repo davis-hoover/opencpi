@@ -51,7 +51,7 @@ namespace OCPI {
 	virtual protected OCPI::Util::SelfMutex
     {
       const OCPI::Base::PValue *m_params; // a temporary during discovery
-      bool setup(Device &dev, ezxml_t &config, std::string &err);
+      bool setup(Device &dev, std::string &err);
       struct GPSDParams* m_gpsdp;
     protected:
       bool m_doGpsd;
@@ -64,6 +64,8 @@ namespace OCPI {
       bool configure_gpsd_if_enabled();
       OCPI::OS::Time now(bool &isGps);
       void print(const char *name, Access &access);
+      void createStaticDevice(const char *a_name, ezxml_t x, const OCPI::Base::PValue *params,
+			      bool discoveryOnly);
       // This driver method is called when container-discovery happens, to see if there
       // are any container devices supported by this driver
       // It uses a generic PCI scanner to find candidates, and when found, calls the
@@ -73,14 +75,16 @@ namespace OCPI {
       // Probe a specific container
       OCPI::Container::Container *probeContainer(const char *which, std::string &error,
 						 const OCPI::API::PValue *props);
-      virtual OCPI::HDL::Device * open(const char *which, bool discovery, bool forLoad,
-				       const OCPI::API::PValue *params, std::string &err);
+      // This is virtual NOT because it might be overridden by a base class, but because
+      // it is called as an entry point to the plugin, so must be indirectly called
+      virtual OCPI::HDL::Device *open(const char *which, bool discovery, bool forLoad,
+				      bool isStatic, const OCPI::API::PValue *params,
+				      std::string &err);
       void close();
 
       // Create an actual container.
       static OCPI::Container::Container *
-      createContainer(Device &dev, ezxml_t config = NULL,
-		      const OCPI::Base::PValue *params = NULL);
+      createContainer(Device &dev, const OCPI::Base::PValue *params = NULL);
       // Create a dummy worker. - virtual due to driver access
       virtual DirectWorker *
       createDirectWorker(Device &dev, const Access &cAccess, Access &wAccess, ezxml_t impl,

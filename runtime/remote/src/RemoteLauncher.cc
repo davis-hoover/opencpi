@@ -30,6 +30,7 @@
 #include "UtilMisc.hh"
 #include "Container.hh"
 #include "ContainerApplication.hh"
+#include "ContainerArtifact.hh"
 #include "RemoteLauncher.hh"
 namespace OA = OCPI::API;
 namespace OC = OCPI::Container;
@@ -404,14 +405,9 @@ work(Launcher::Members &instances, Launcher::Connections &connections) {
       for (unsigned n = 0; n < instances.size(); n++, i++)
 	if (&i->m_container->launcher() == this && !i->m_worker) {
 	  OB::PValue pv[] = { OB::PVULong("remoteInstance", m_instanceMap[n]), OB::PVEnd };
-	  i->m_worker =
-	    &i->m_containerApp->createWorker(i->m_impl->m_artifact, i->m_name.c_str(),
-					     i->m_impl->m_metadataImpl.m_xml,
-					     i->m_impl->m_staticInstance,
-					     i->m_slaveWorkers,
-					     i->m_hasMaster,
-					     i->m_member, i->m_crew ? i->m_crew->m_size : 1,
-					     pv);
+	  i->m_worker = &i->m_container->loadArtifact(i->m_impl->m_artifact).
+	    createWorker(*i->m_containerApp, *i->m_impl, i->m_name.c_str(), i->m_slaveWorkers,
+			 i->m_hasMaster, i->m_member, i->m_crew ? i->m_crew->m_size : 1, pv);
 	}
     }
     m_sending = true;

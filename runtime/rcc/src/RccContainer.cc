@@ -82,9 +82,9 @@ Container(const char *a_name, const OA::PValue* /* params */)
   addTransport("ocpi-udp-rdma", NULL, OT::ActiveFlowControl, OT::ActiveMessage,
 	       (1 << OT::ActiveFlowControl) | (1 << OT::FlagIsMeta),
 	       (1 << OT::ActiveMessage) | (1 << OT::FlagIsMeta)),
-  addTransport("ocpi-ether-rdma", NULL, OT::ActiveFlowControl, OT::ActiveMessage,
-	       (1 << OT::ActiveFlowControl) | (1 << OT::FlagIsMeta),
-	       (1 << OT::ActiveMessage) | (1 << OT::FlagIsMeta));
+  addTransport("ocpi-ether-rdma", system, OT::ActiveFlowControl, OT::ActiveMessage,
+	       (1 << OT::ActiveFlowControl) | (1 << OT::FlagIsMetaOptional),
+	       (1 << OT::ActiveMessage) | (1 << OT::FlagIsMetaOptional));
   // We inherit these attribute from the core framework build, although since the RCC container driver
   // is itself a loadable plugin, it could theoretically have its own attributes
   m_dynamic = OC::Manager::dynamic();
@@ -280,7 +280,7 @@ dispatch(XF::EventManager* event_manager)
 /**********************************
  * Creates an application 
  *********************************/
-OA::ContainerApplication * Container::
+OC::Application *Container::
 createApplication(const char *a_name, const OB::PValue *props)
 {
   TRACE( "OCPI::RCC::Container::createApplication()");

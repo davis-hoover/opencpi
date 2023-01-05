@@ -1,8 +1,8 @@
 <!-- This is the test xml for testing component "time_demux" -->
 <tests useHDLFileIo='false'>
   <input port='Mux_In' script='test_data_generator' messagesInFile='true'/>
-  <output port='Data_Out' script='verify.sh' view='view_data.sh'/>
-  <output port='Time_Out' script='verify.sh' view='view_time.sh'/>
+  <output port='Data_Out' script='verify.sh'/>
+  <output port='Time_Out' script='verify.sh'/>
   <property test='true' name='START' value='0'/>
   <property test='true' name='SAMPLES' value='256'/>
   <property test='true' name='IFILE' type="String" value='gen/mytestdata'/>

@@ -108,7 +108,7 @@ class Pipeline():
 class PipelineBuilder(ABC):
     """Abstract class for building a pipeline
     
-    Sublcasses must implement the following methods:
+    Subclasses must implement the following methods:
         _build_jobs()
     """
     def __init__(self, pipeline_id: str, container_registry: str, 
@@ -227,9 +227,9 @@ class PipelineBuilder(ABC):
                 'docker {}'.format(cmd),
                 '--net=host',
                 '--env-file=/dev/stdin --name=${CI_JOB_ID}',
-                '-v ' + '-v '.join(volumes) if volumes else '',
-                '--device ' + '--device '.join(devices) if devices else '',
-                '--cap-add ' + '--cap-add '.join(caps) if caps else '',
+                '-v ' + ' -v '.join(volumes) if volumes else '',
+                '--device ' + ' --device '.join(devices) if devices else '',
+                '--cap-add ' + ' --cap-add '.join(caps) if caps else '',
                 image,
                 '"{}"'.format(ocpi_cmd)
             ])
@@ -252,6 +252,8 @@ class PipelineBuilder(ABC):
             if not tag:
                 raise Exception('docker cmd "tag" requires a tag')
             docker_cmd = 'docker tag {} {}'.format(image, tag)
+        elif cmd == 'login':
+            docker_cmd = 'docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN'
         else:
             docker_cmd = None
 
@@ -308,8 +310,8 @@ class PlatformPipelineBuilder(PipelineBuilder):
     def __init__(self, pipeline_id: str, container_registry: str, 
         base_image_tag: str, hosts: List[str], platforms: List[str], 
         projects: List[str], dump_path: Path, config: dict, 
-        image_tags: List[str]=list(), do_assemblies: bool=True, 
-        do_hosts: bool=True):
+        gitlab_container_registry: str, image_tags: List[str]=list(), 
+        do_assemblies: bool=True, do_hosts: bool=True):
         """Initializes a PlatformPipelineBuilder"""
         super().__init__(pipeline_id, container_registry, base_image_tag, 
             dump_path, config, image_tags)
@@ -322,6 +324,7 @@ class PlatformPipelineBuilder(PipelineBuilder):
         self.hosts = hosts
         self.platforms = platforms
         self.projects = projects
+        self.gitlab_container_registry = gitlab_container_registry
 
     def _build_jobs(self) -> List[Job]:
         """Create jobs for installing platforms"""
@@ -439,7 +442,10 @@ class PlatformPipelineBuilder(PipelineBuilder):
         else:
         # Create 'docker run' cmd
             if stage == 'install-platform':
-                volumes = ['/opt/Xilinx:/opt/Xilinx']
+                volumes = [
+                    '/opt/Xilinx:/opt/Xilinx',
+                    '/opt/Mentor:/opt/Mentor'    
+                ]
             else:
                 volumes = None
             base_image = self._build_base_image_name(host, stage, 
@@ -471,12 +477,20 @@ class PlatformPipelineBuilder(PipelineBuilder):
         if stage in ['build', 'install-platform']:
         # Add additional tags to image and push
             for tag in self.image_tags:
+                gitlab_tag = self._build_image_name(host, stage, platform=platform, 
+                     container_registry=self.gitlab_container_registry, 
+                     base_platform=base_platform, tag=tag) 
                 tag = self._build_image_name(host, stage, platform=platform, 
                     base_platform=base_platform, tag=tag)
                 docker_tag_cmd = self._build_docker_cmd('tag', image, stage,
                     tag=tag)
                 docker_push_cmd = self._build_docker_cmd('push', tag, stage)
                 script += [docker_tag_cmd, docker_push_cmd]
+                if stage == 'build':
+                    docker_login_cmd = self._build_docker_cmd('login', image, stage)
+                    docker_retag_cmd = self._build_docker_cmd('tag', tag, stage, tag=gitlab_tag)
+                    docker_repush_cmd = self._build_docker_cmd('push', gitlab_tag, stage)
+                    script += [docker_login_cmd, docker_retag_cmd, docker_repush_cmd]
 
         return script
 
@@ -514,12 +528,19 @@ class PlatformPipelineBuilder(PipelineBuilder):
             docker_rmi_cmd = self._build_docker_cmd('rmi', image, stage)
             script.append(docker_rmi_cmd)
             # Remove any additional created tags
-            for tag in self.image_tags:
-                image = self._build_image_name(host, stage, platform=platform, 
-                    base_platform=base_platform, other_platform=other_platform,
-                    tag=tag)
-                docker_rmi_cmd = self._build_docker_cmd('rmi', image, stage)
-                script.append(docker_rmi_cmd)
+            if stage not in ['packages', 'prereqs']:
+                for tag in self.image_tags:
+                    image = self._build_image_name(host, stage, 
+                        platform=platform, base_platform=base_platform, 
+                        other_platform=other_platform, tag=tag)
+                    docker_rmi_cmd = self._build_docker_cmd('rmi', image, stage)
+                    script.append(docker_rmi_cmd)
+                    if stage == 'build':
+                        gitlab_image = self._build_image_name(host, stage, platform=platform, 
+                            container_registry=self.gitlab_container_registry, 
+                            base_platform=base_platform, other_platform=other_platform,tag=tag)
+                        gitlab_rmi_cmd = self._build_docker_cmd('rmi', gitlab_image, stage)
+                        script.append(gitlab_rmi_cmd)
 
         return script
 
@@ -711,12 +732,16 @@ class PlatformPipelineBuilder(PipelineBuilder):
         return base_repo
 
     def _build_image_name(self, host: str, stage: str, platform: str=None,
-        base_platform: str=None, other_platform: str=None, tag=None) -> str:
-        """Constructs a name for a docker image base on job's stage"""
+        container_registry: str=None, base_platform: str=None, 
+        other_platform: str=None, tag=None) -> str:
+        """Constructs a name for a docker image base on a job's stage"""
         tag = self.pipeline_id if tag == None else tag
         repo = self._build_repo_name(host, stage, platform=platform, 
             base_platform=base_platform, other_platform=other_platform)
         image_name = '{}/{}:{}'.format(self.container_registry, repo, tag)
+        if container_registry is None:
+            container_registry = self.container_registry
+        image_name = '{}/{}:{}'.format(container_registry, repo, tag)
 
         return image_name
 
@@ -752,7 +777,10 @@ class OspPipelineBuilder(PlatformPipelineBuilder):
                 platform=platform, base_platform=base_platform,
                 other_platform=other_platform)
             ocpi_cmd = self._build_ocpi_cmd(stage, platform, base_platform)
-            volumes = ['/opt/Xilinx:/opt/Xilinx']
+            volumes = [
+                '/opt/Xilinx:/opt/Xilinx',
+                '/opt/Mentor:/opt/Mentor'
+            ]
             docker_create_cmd = self._build_docker_cmd('create', base_image, 
                 stage, ocpi_cmd=ocpi_cmd, volumes=volumes)
             source = '.'
@@ -876,7 +904,10 @@ class CompPipelineBuilder(PlatformPipelineBuilder):
                 platform, base_platform=base_platform, 
                 other_platform=other_platform)
             ocpi_cmd = self._build_ocpi_cmd(stage, platform, base_platform)
-            volumes = ['/opt/Xilinx:/opt/Xilinx']
+            volumes = [
+                '/opt/Xilinx:/opt/Xilinx',
+                '/opt/Mentor:/opt/Mentor'
+            ]
             docker_create_cmd = self._build_docker_cmd('create', base_image, 
                 stage, ocpi_cmd=ocpi_cmd, volumes=volumes)
             source = '.'
@@ -955,21 +986,27 @@ class CompPipelineBuilder(PlatformPipelineBuilder):
                 'ocpidev register project -d',
                 'projects/comps/{}'.format(self.project)
             ])
+            # Need to find the models of platform and base_platform.
+            # Try to discover using 'ocpidev show'
             get_model_cmd = ' '.join([
                 'if ocpidev show hdl platforms | grep {};'.format(platform),
-                'then export MODEL=hdl;',
+                'then export MODEL=hdl && export OTHER_MODEL=rcc;',
                 'elif ocpidev show rcc platforms | grep {};'.format(platform), 
-                'then export MODEL=rcc; fi > /dev/null',
+                'then export MODEL=rcc && export OTHER_MODEL=hdl;',
+                'fi > /dev/null',
             ])
             build_cmd = ' '.join([
                 'ocpidev build -d projects/comps/{}'.format(self.project),
-                '--\$MODEL-platform={}'.format(platform)
+                '--\$MODEL-platform {}'.format(platform)
             ])
+            if base_platform:
+                build_cmd += ' --\$OTHER_MODEL-platform {}'.format(
+                    base_platform)
             ocpi_cmd = ' && '.join([
                 mv_project_cmd,
                 register_cmd,
                 get_model_cmd,
-                'echo model=\$MODEL',
+                'echo model=\$MODEL && echo other_model=\$OTHER_MODEL',
                 build_cmd
             ])
         else:
@@ -1078,7 +1115,10 @@ class AssemblyPipelineBuilder(PipelineBuilder):
         """Build a job's script"""
         ocpi_cmd = self._build_ocpi_cmd(stage, asset)
         base_image = self._build_base_image_name(stage)
-        volumes = ['/opt/Xilinx:/opt/Xilinx']
+        volumes = [
+            '/opt/Xilinx:/opt/Xilinx',
+            '/opt/Mentor:/opt/Mentor'
+        ]
         if stage == 'run-unit_tests':
         # Create "docker create" cmd, copy artifacts to container, and create
         # "docker start" cmd

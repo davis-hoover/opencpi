@@ -18,8 +18,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "assembly.h"
-#include "hdl.h"
+#include "assembly.hh"
+#include "hdl.hh"
 
 DevSignalsPort::
 DevSignalsPort(Worker &w, ezxml_t x, Port *sp, int ordinal, const char *&err)
@@ -164,7 +164,8 @@ emitPortSignalsDir(FILE *f, bool output, const char *indent, bool &any, std::str
 	  OU::format(myindex, "(%zu)", n);
 	std::string otherName = conn;
 	if (other) {
-	  if (other->m_instPort.m_port->count() > count() || m_arrayCount)
+	  Port &otherPort = *other->m_instPort.m_port;
+	  if (otherPort.count() > count() || m_arrayCount || otherPort.m_arrayCount)
 	    OU::formatAdd(otherName, "(%zu)", n + other->m_index);
 	  OU::formatAdd(otherName, ".%s", (*si)->m_name.c_str());
 	} else
@@ -219,4 +220,9 @@ emitExtAssignment(FILE *f, bool int2ext, const std::string &extName, const std::
 	      int2ext ? ours.c_str() : theirs.c_str(), (*si)->cname(),
 	      int2ext ? theirs.c_str() : ours.c_str(), (*si)->cname());
   }
+}
+void DevSignalsPort::
+emitXmlElements(std::string &out, bool verbose) const {
+  Port::emitXmlElements(out, verbose);
+  Signal::emitSignals(m_signals, out);
 }

@@ -434,9 +434,6 @@ namespace OCPI {
       OCL(clReleaseContext(m_context));
     }
 
-
-    class ExternalPort;
-
     const char *ocl = "ocl";
 
     OC::RegisterContainerDriver<Driver> driver;
@@ -558,9 +555,9 @@ namespace OCPI {
     };
 
     Container::
-    Container(OCPI::OCL::Device &a_device, const ezxml_t config, const OB::PValue* params)
+    Container(OCPI::OCL::Device &a_device, const OB::PValue* params)
       : OC::ContainerBase<Driver,Container,Application,Artifact>
-	(*this, a_device.name().c_str(), config, params),
+	(*this, a_device.name().c_str(), params),
 	m_device(a_device) {
       m_model = "ocl";
       m_os = "opencl";
@@ -761,7 +758,7 @@ namespace OCPI {
       Device *dev = open(which, false, false, error);
       if (!dev)
 	return NULL;
-      return new Container(*dev, NULL, params);
+      return new Container(*dev, params);
     }
 
     OC::Artifact& Container::
@@ -796,7 +793,7 @@ namespace OCPI {
       run(XF::EventManager* event_manager, bool& more_to_do);
     }; // End: class Application
 
-    OA::ContainerApplication* Container::
+    OC::Application* Container::
     createApplication (const char *a_name, const OB::PValue *params) {
       return new Application(*this, a_name, params);
     }
@@ -820,7 +817,6 @@ namespace OCPI {
       friend class Port;
       friend class Artifact;
       friend class Application;
-      friend class ExternalPort;
       friend class ExternalBuffer;
 
       uint8_t        *m_persistent;
@@ -1189,13 +1185,13 @@ namespace OCPI {
         w->run(more_to_do);
     }
 
-    class Port : public OC::PortBase<Worker,Port,ExternalPort> {
+    class Port : public OC::PortBase<Worker,Port> {
       friend class Worker;
       cl_mem m_clBuffers;
 
     protected:
       Port(Worker& w, const OA::PValue* params, const OM::Port& mPort)
-	: OC::PortBase<OO::Worker,OO::Port,OO::ExternalPort> (w, *this, mPort, params),
+	: OC::PortBase<OO::Worker,OO::Port> (w, *this, mPort, params),
 	  m_clBuffers(NULL) {
       }
 

@@ -117,7 +117,8 @@ python3_ver=python36
 #    for ocpidev
 PKGS_E+=(python3 python3-devel ${python3_ver}-jinja2)
 #    for various testing scripts
-PKGS_E+=(${python3_ver}-numpy ${python3_ver}-scipy python3-tkinter python3-pip)
+#    omit ${python3_ver}-scipy here (too old): install using pip3
+PKGS_E+=(${python3_ver}-numpy python3-tkinter python3-pip)
 #    for building yaml-cpp
 PKGS_E+=(cmake3)
 #    for building init root file systems for embedded systems (enabled in devel?)
@@ -145,7 +146,7 @@ PKGS_E+=(libjpeg-turbo-devel)
 #    not be an issue for CentOS 7 as long as we have python36 installed.  For
 #    now, assume the justification for a package in this category is the same
 #    as for its python2 counterpart as given above.
-PKGS_P+=(matplotlib)
+PKGS_P+=(matplotlib scipy)
 #    These next packages will be installed in a python36
 #    virtual environment for "ocpidoc" vs. "system-wide".
 #PKGS_P+=(sphinx sphinx_rtd_theme sphinxcontrib_spelling)
@@ -220,8 +221,12 @@ $SUDO $YUM install $(ypkgs PKGS_E)
 # SWIG is a special case on CentOS 7
 install_swig3
 
-# And finally, install the remaining python3 packages
-$SUDO pip3 install ${PKGS_P[*]}
+#
+# Finally, install the remaining python3 packages.  The "-U"
+# option is needed to force a "scipy" update to be installed
+# if "python36-scipy" is already installed on the system.
+#
+$SUDO pip3 install -U ${PKGS_P[*]}
 [ $? -ne 0 ] && bad "Installing pip3 packages failed"
 
 exit 0

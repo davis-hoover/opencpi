@@ -23,6 +23,7 @@
 #include "BaseValue.hh"
 #include "BaseValueReader.hh"
 #include "BaseValueWriter.hh"
+#include "LibraryAssembly.hh"
 #include "Container.hh"
 #include "ContainerPort.hh"
 #include "ContainerApplication.hh"
@@ -33,6 +34,8 @@ namespace OA = OCPI::API;
 namespace OM = OCPI::Metadata;
 namespace OU = OCPI::Util;
 namespace OB = OCPI::Base;
+namespace OX = OCPI::Util::EzXml;
+namespace OL = OCPI::Library;
 namespace OCPI {
   namespace Container {
     Controllable::Controllable()
@@ -62,12 +65,6 @@ namespace OCPI {
 	memset(m_dirty, 0, nWords * sizeof(Word));
       }
       ~Cache() { delete [] m_data; delete [] m_dirty; }
-#if 0
-      bool anySet(size_t start, size_t n) {
-	(void)start;(void)n;
-	return false;
-      }
-#endif
       bool allSet(size_t start, size_t n) {
 	assert(m_dirty);
 	Word *p = m_dirty + (start >> c_shift);
@@ -146,7 +143,7 @@ namespace OCPI {
         m_artifact(art), m_xml(impl), m_instXml(inst), m_workerMutex(true),
 	m_controlOpPending(false), m_slaves(a_slaves), m_hasMaster(a_hasMaster),
         m_member(a_member), m_crewSize(a_crewSize), m_connectedPorts(0), m_optionalPorts(0),
-        m_outputPorts(0), m_inputPorts(0) {
+        m_outputPorts(0), m_inputPorts(0), m_inserted(false) {
       if (impl) {
 	const char *err = parse(impl);
 	if (err)
@@ -154,8 +151,10 @@ namespace OCPI {
 	setControlOperations(ezxml_cattr(impl, "controlOperations"));
 	m_implTag = ezxml_cattr(impl, "name");
       }
-      if (inst)
+      if (inst) {
+	OX::getBoolean(inst, "inserted", &m_inserted);
 	m_instTag = ezxml_cattr(inst, "name");
+      }
       for (unsigned n = 0; n < m_nPorts; n++) {
 	if (metaPort(n).m_isOptional)
 	  m_optionalPorts |= 1u << n;
@@ -165,7 +164,8 @@ namespace OCPI {
 
     Worker::~Worker()
     {
-      ocpiDebug("In  Container::Worker::~Worker()");
+      ocpiDebug("In  Container::Worker::~Worker(): %s", cname());
+      // We are a child of our container application, but we need to tell our artifact too
       if (m_artifact)
 	m_artifact->removeWorker(*this);
       for (unsigned i = 0; i < m_cache.size(); i++)
@@ -201,7 +201,7 @@ namespace OCPI {
       return newP;
     }
 
-    OA::Port &Worker::
+    Port &Worker::
     getPort(const char *a_name, const OA::PValue *params ) {
       return getPort(a_name, 0, params);
     }
@@ -213,12 +213,6 @@ namespace OCPI {
       if (prop.m_isDebug && !isDebug())
 	throw OU::Error("For setting debug property \"%s\": worker \"%s\" is not in debug mode",
 			prop.cname(), cname());
-
-#if 0 // not readable is not possible given caching
-      if (!prop.m_isReadable && !prop.m_isWritable && !prop.m_isParameter)
-	throw OU::Error("Property '%s' of worker '%s' is neither readable nor writable",
-			pname, name().c_str());
-#endif
       if (!prop.m_isParameter)
 	prepareProperty(prop, m_writeVaddr, m_readVaddr);
       return prop;
@@ -423,6 +417,15 @@ namespace OCPI {
       setProperty(p, v, p, 0);
     }
 
+    // Test to see if this property has been written ever by looking at the cache
+    bool Worker::
+    isPropertyWritten(const OA::PropertyInfo &info) const {
+      Cache *cache;
+      if (info.m_ordinal >= m_cache.size() || !(cache = m_cache[info.m_ordinal]))
+	return false;
+      return cache->allSet(0, info.m_isSequence || info.m_baseType == OA::OCPI_String ?
+			   sizeof(uint32_t) : info.m_nBytes); // note same logic in getCache below
+    }
     // dirty != NULL means for reading rather than writing
     Cache *Worker::
     getCache(const OA::PropertyInfo &info, size_t offset, const OB::Member &m, bool *dirty,
@@ -443,7 +446,7 @@ namespace OCPI {
 	cache = m_cache[info.m_ordinal] = new Cache(info.m_nBytes);
       else if (dirty) {
 	if (cache->allSet(offset, m.m_isSequence || m.m_baseType == OA::OCPI_String ?
-			  sizeof(uint32_t) : m.m_nBytes)) {
+			  sizeof(uint32_t) : m.m_nBytes)) { // note same logic in isWritten above
 	  if (a_attributes)
 	    a_attributes->isCached = true;
 	  *dirty = true;
@@ -618,7 +621,6 @@ namespace OCPI {
 	v.m_nTotal = m.m_nItems;
 	// Even though the "writer" below deals with this length, we need to precalculate
 	// The length of the marshalling buffer
-	size_t offset = mOffset;
 	if (m.m_isSequence) {
 	  uint32_t nElements;
 	  uint8_t *data = (uint8_t *)&nElements;
@@ -627,7 +629,6 @@ namespace OCPI {
 	    throw OU::Error("Worker's %s property has invalid sequence length: %zu",
 			    info.cname(), v.m_nElements);
 	  v.m_nTotal *= v.m_nElements;
-	  offset += m.m_align;
 	}
 	size_t nBytes = v.m_nTotal * m.m_elementBytes; // allow seq of zero items
 	if (nBytes) { // if its a zero-length sequence, we do nothing at all.
@@ -757,6 +758,15 @@ namespace OCPI {
       }
     }
 
+    const char *Worker::workerDescription() {
+      if (m_description.empty())
+	OU::format(m_description, "worker \"%s\" in container %s from artifact worker %s%s%s%s",
+		   cname(), application() ? application()->container().name().c_str() : "<unknown>",
+		   implTag().c_str(), model().c_str(), instTag().length() ? "/" : "",
+		   instTag().c_str());
+      return m_description.c_str();
+    }
+
     bool Worker::controlOp(OM::Worker::ControlOperation op) {
       // sched_yield does not work with the default
       // Linux scheduler: SCHED_OTHER, and it requires special permission/capability to use
@@ -771,17 +781,24 @@ namespace OCPI {
       ControlState cs = getControlState();
       ControlTransition ct = controlTransitions[op];
       // Special case starting and stopping after finished
-      if (cs == OM::Worker::FINISHED && (op == OM::Worker::OpStop || op == OM::Worker::OpStart))
+      if (cs == OM::Worker::FINISHED && (op == OM::Worker::OpStop || op == OM::Worker::OpStart)) {
+	ocpiInfo("Ignoring the stop or start control operation since worker is finished: %s",
+		 workerDescription());
 	return true;
+      }
       // If we are already in the desired state, just ignore it so that
       // Neither workers nor containers need to deal with this
-      if (ct.next != OM::Worker::NONE && cs == ct.next)
+      if (ct.next != OM::Worker::NONE && cs == ct.next) {
+	ocpiInfo("Ignoring the %s control operation since worker is in the %s state: %s",
+		 OM::Worker::s_controlOpNames[op], OM::Worker::s_controlStateNames[cs],
+		 workerDescription());
 	return true;
+      }
       if (cs == ct.valid[0] ||
 	  (ct.valid[1] != NONE && cs == ct.valid[1]) ||
 	  (ct.valid[2] != NONE && cs == ct.valid[2]) ||
 	  (ct.valid[3] != NONE && cs == ct.valid[3])) {
-	if (op == OM::Worker::OpStart) {
+	if (op == OM::Worker::OpStart && !m_inserted) {
 	  // If a worker gets started before all of its required ports are created: error
 	  PortMask mandatory = ~(~0u << m_nPorts) & ~optionalPorts();
 	  PortMask bad = mandatory & ~connectedPorts();
@@ -797,18 +814,17 @@ namespace OCPI {
 	controlOperation(op);
 	if (ct.next != NONE)
 	  setControlState(ct.next);
+	ocpiInfo("Worker \"%s\" control operation succeeded, now in state \"%s\": %s",
+		 OM::Worker::s_controlOpNames[op],
+		 OM::Worker::s_controlStateNames[getControlState()], workerDescription());
       } else
 	throw
-	  OU::Error("Control operation '%s' failed on worker '%s%s%s' in state: '%s'",
-		    OM::Worker::s_controlOpNames[op], implTag().c_str(),
-		    instTag().empty() ? "" : "/", instTag().c_str(),
-		    OM::Worker::s_controlStateNames[cs]);
+	  OU::Error("Control operation \"%s\" failed in state \"%s\": %s",
+		    OM::Worker::s_controlOpNames[op],
+		    OM::Worker::s_controlStateNames[cs], workerDescription());
       Application *a = application();
-      if (a && op == OM::Worker::OpStart) {
-	ocpiInfo("After starting worker %s, starting container %s",
-		 cname(), a->container().cname());
+      if (a && op == OM::Worker::OpStart)
 	a->container().start();
-      }
       return false;
     }
 
@@ -842,6 +858,28 @@ namespace OCPI {
       return false;
     }
 
+    // Configure this worker based on the container's configuration (from system.xml)
+    // This happens *before* any properties are set from the application XML
+    // Properties to set are matched from the container configuration XML using
+    // a subset of the rules for matching instances in an application.
+    // The container's XML looks for "instance" element, and matches against these attributes:
+    // component:  fully qualified spec of instance named in the application
+    // worker: worker (with or without build config suffix)
+    // device:  device name (within platform)
+    void Worker::
+    configure(ezxml_t x) {
+      for (ezxml_t p = ezxml_cchild(x, "property"); p; p = ezxml_cnext(p)) {
+	const char
+	  *l_name = ezxml_cattr(p, "name"),
+	  *value = ezxml_cattr(p, "value");
+	if (!l_name || !value)
+	  throw OU::Error("Invalid property in container configuration XML for container "
+			  "\"%s\", worker \"%s\"", application()->container().cname(), cname());
+	ocpiInfo("Setting the \"%s\" property of the \"%s\" instance of the \"%s\" worker to \"%s\"",
+		 l_name, m_instTag.c_str(), m_implTag.c_str(), value);
+	setProperty(l_name, value);
+      }
+    }
     const OA::PropertyInfo &
     Worker::checkInfo(unsigned ordinal) const {
       const OA::PropertyInfo &pi = m_properties[ordinal];
@@ -857,12 +895,12 @@ namespace OCPI {
     run Worker::							\
     get##pretty##PropertyOrd(unsigned ordinal, unsigned idx) const {	\
       auto &pi = checkInfo(ordinal);					\
-      return get##pretty##Property(pi, pi, (size_t)0, idx);		\
+      return get##pretty##Cached(pi, pi, (size_t)0, idx);		\
     }									\
     void Worker::							\
     set##pretty##PropertyOrd(unsigned ordinal, run val, unsigned idx) const { \
       auto &pi = checkInfo(ordinal);					\
-      set##pretty##Property(pi, pi, 0, val, idx);			\
+      set##pretty##Cached(pi, pi, 0, val, idx);			\
     }									\
     run Worker::							\
     get##pretty##Parameter(unsigned ordinal, unsigned idx) const {	\
@@ -920,13 +958,13 @@ namespace OCPI {
     void Worker::
     setStringPropertyOrd(unsigned ordinal, const char *s, unsigned idx) const {
       checkInfo(ordinal);
-      setStringProperty(m_properties[ordinal], m_properties[ordinal], 0, s, idx);
+      setStringCached(m_properties[ordinal], m_properties[ordinal], 0, s, idx);
     }
 
     void Worker::
     getStringPropertyOrd(unsigned ordinal, char *str, size_t length, unsigned idx) const {
       checkInfo(ordinal);
-      getStringProperty(m_properties[ordinal], m_properties[ordinal], 0, str, length, idx);
+      getStringCached(m_properties[ordinal], m_properties[ordinal], 0, str, length, idx);
     }
 
     void Worker::

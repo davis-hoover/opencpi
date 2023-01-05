@@ -18,126 +18,142 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "LibraryAssembly.hh"
+#include "OcpiContainerApi.hh"
 #include "ContainerWorker.hh"
 #include "ContainerApplication.hh"
 #include "ContainerArtifact.hh"
+#include "Container.hh"
 
 namespace OL = OCPI::Library;
 namespace OA = OCPI::API;
 namespace OU = OCPI::Util;
 namespace OB = OCPI::Base;
 namespace OC = OCPI::Container;
+namespace OX = OCPI::Util::EzXml;
 
 namespace OCPI {
   namespace Container {
-    Artifact::Artifact(OL::Artifact &lart, const OB::PValue *) 
-      : m_libArtifact(lart) {
+    Artifact::Artifact(OL::Artifact &lart, const OB::PValue *)
+      : m_libArtifact(lart), m_application(NULL) {
+      m_instanceInUse.resize(lart.nWorkers(), 0);
+      m_loadTimeWorkers.resize(lart.nWorkers(), NULL);
       // FIXME: ref count loads from library artifact?
     }
-    Artifact::~Artifact() {};
-#if 0
-    bool Artifact::hasUrl(const char *url) {
-      return strcmp(url, myUrl) == 0;
+    Artifact::~Artifact() {
     }
-#endif
-      // Return the value of a boolean attribute that defaults to false
-    static bool boolAttrValue(ezxml_t x, const char *attr) {
-      const char *val = ezxml_attr(x, attr);
-      if (val) {
-        if (!strcmp("true", val) || !strcmp("TRUE", val) || !strcmp("1", val))
-          return true;
-        if (strcmp("false", val) && strcmp("FALSE", val) && strcmp("0", val) &&
-            val[0] != 0)
-          throw OU::ApiError("Boolean attribute \"", attr, "\" has bad value \"",
-                         val, "\"", NULL);
-      }
-      return false;
-    }
-    static bool hasAttrEq(ezxml_t x, const char *attrName, const char *val) {
-      const char *attr = ezxml_attr(x, attrName);
-      return attr && !strcmp(attr, val);
-    }
-    static ezxml_t findChildWithAttr(ezxml_t x, const char *cName, const char *aName,
-                                     const char *value)
-    {
-      for (ezxml_t c = ezxml_child(x, cName); c; c = ezxml_cnext(c))
-        if (hasAttrEq(c, aName, value))
-          return c;
-      return 0;
-    }
-    // We want an instance from an implementation, and optionally,
-    // a specifically identified instance of that implementation,
-    // when the artifact would contain such a thing.  Here are the cases:
-    // Instance tag supplied, no instances in the artifact: error
-    // Instance tag supplied, instance not in artifact: error
-    // Instance tag supplied, instance already used: error
-    // No instance tag supplied, no instances in artifact: ok
-    // No instance tag supplied, instances in artifact, all used: error
-    // No instance tag supplied, instances in artifact, one is available: ok
-    Worker & Artifact::
-    createWorker(Application &app, const char *appInstName,
-		 const char *implTag, const char *instTag,
-		 const OA::PValue* wProps,
-		 const OA::PValue* wParams) {
-      ezxml_t impl, inst, xml = m_libArtifact.xml();
-
-      if (!implTag ||
-          (!(impl = findChildWithAttr(xml, "worker", "specname", implTag)) &&
-          !(impl = findChildWithAttr(xml, "worker", "name", implTag)))) {
-	throw OU::ApiError("No implementation found for \"", implTag, "\"", NULL);
-      }
-
-      if (instTag) {
-        inst = findChildWithAttr(xml, "instance", "name", instTag);
-        if (!inst)
-          throw OU::ApiError("no worker instance named \"", instTag,
-                             "\" found in this artifact", NULL);
-        if (!implTag || !hasAttrEq(inst, "worker", implTag))
-          throw OU::ApiError("worker instance named \"", instTag,
-                             "\" is not a \"", implTag ? implTag : "<null>",
-                             "\" worker", NULL);
-	// Is any other worker in the whole container using this implementation instance
-	// in this artifact?
-	for (WorkersIter wi = m_workers.begin(); wi != m_workers.end(); wi++)
-	  if (!strcmp((*wi)->instTag().c_str(), instTag))
-	    throw OU::ApiError("worker instance named \"", instTag,
-			   "\" already used", NULL);
-      } else {
-        inst = 0;
-        // I didn't specify an instance, so I must want a floating
-        // implementation.  Find one.
-        if (boolAttrValue(impl, "connected"))
-          throw OU::ApiError("specified implementation \"", implTag,
-                             "\", is already connected", NULL);
-
-#ifdef JK_LOOK_AT_ME
-        ALSO ALLOW NO INSTANCE TAG WHEN THERE IS ONLY ONE ANYWAY
-        if (!boolAttrValue(impl, "reusable"))
-	  for (WorkersIter wi = m_workers.begin(); wi != m_workers.end(); wi++)
-	    if (!strcmp((*wi)->implTag().c_str(), implTag))
-	      throw OU::ApiError("non-reusable worker named \"", implTag,
-                             "\" already used", NULL);
-#endif
-
-      }
-      Worker &w = createWorker(app, appInstName, impl, inst, OC::NoWorkers, false, 0, 1, wParams);
-      if (wProps)
-	w.setProperties(wProps);
-      return w;
+    // This deletion is not done during overall shutdown so we know that the m_application is not
+    // destroyed by the parent/child container/artifact shutdown process
+    void Artifact::unload() {
+      delete m_application; // will delete loadtime workers
+      m_application = NULL;
     }
 
-    Worker & Artifact::createWorker(Application &app, const char *appInstName, ezxml_t impl,
-				    ezxml_t inst, const OC::Workers &slaves, bool hasMaster,
-				    size_t member, size_t crewSize,
-				    const OCPI::Base::PValue *wParams) {
-      Worker &w = app.createWorker(this, appInstName, impl, inst, slaves, hasMaster, member,
-				   crewSize, wParams);
-      m_workers.push_back(&w);
+    // Shared method between load time and app time.  Construct and initialize
+    Worker &Artifact::
+    addWorker(Application &app, const char *instName, const OL::Implementation &impl,
+	      const OC::Workers &slaves, bool hasMaster, size_t member, size_t crewSize,
+	      const OCPI::Base::PValue *wParams) {
+      if (impl.m_staticInstance && m_instanceInUse[impl.m_ordinal])
+	throw OU::Error("Worker instance named \"%s\" for worker \"%s\" in artifact \"%s\" "
+			"is already in use?",
+			instName ? instName : "<dynamic>", impl.m_metadataImpl.cname(),
+			impl.m_artifact.name().c_str());
+      // Call the method in the derived class
+      Worker &w = app.createWorker(this, instName, impl.m_metadataImpl.m_xml, impl.m_staticInstance,
+				   slaves, hasMaster, member, crewSize, wParams);
+      m_instanceInUse[impl.m_ordinal]++;
       w.initialize();
+      m_workers[&w] = impl.m_ordinal;  // remember that this worker uses this artifact
       return w;
     }
+
+    Worker &Artifact::
+    addLoadTimeWorker(const OL::Implementation &impl, unsigned n) {
+      if (!m_application)
+	m_application = &container().createApplication("__whenLoaded")->containerApplication();
+      std::string instName;
+      OU::format(instName, "whenLoaded_%s_%s%s%u", impl.m_metadataImpl.cname(),
+		 impl.m_staticInstance ? ezxml_cattr(impl.m_staticInstance, "name") : "",
+		 impl.m_staticInstance ? "_" : "", n);
+      static OC::Workers noSlaves;
+      Worker &w = addWorker(*m_application, instName.c_str(), impl, noSlaves, false, 0, 1, NULL);
+      m_loadTimeWorkers[n] = &w;
+      return w;
+    }
+
+    void Artifact::
+    configure() {
+      // Create the loadtime workers
+      const OL::Implementation *i;
+      for (unsigned n = 0; (i = libArtifact().getImplementation(n)); n++) {
+	bool loadTime = false;
+	const char *err;
+	if ((err = OX::getBoolean(i->m_staticInstance, "loadtime", &loadTime, true))) {
+	  ocpiBad("Invalid \"loadTime\" attribute in system.xml for container \"%s\": %s",
+		  container().cname(), err);
+	  continue;
+	}
+	// Add adapters and devices, but not interconnects
+	if (loadTime || (i->m_inserted && i->m_staticInstance &&
+			 strcmp(i->m_staticInstance->name, "interconnect")))
+	  addLoadTimeWorker(*i, n);
+      }
+      // Configure loadtime workers
+      for (ezxml_t x = ezxml_cchild(container().configXml(), "instance"); x; x = ezxml_cnext(x)) {
+	const char
+	  *spec = ezxml_cattr(x, "component"),
+	  *l_worker = ezxml_cattr(x, "worker"), // match the worker
+	  *device = ezxml_cattr(x, "device"); // match the device (device instance)
+	for (unsigned n = 0; (i = libArtifact().getImplementation(n)); n++) {
+	  // for instances in the artifact
+	  if (!m_loadTimeWorkers[n] ||
+	      (spec && strcasecmp(spec, i->m_metadataImpl.specName().c_str())) ||
+	      !OL::instanceMatchesImpl(i->m_metadataImpl, i->m_staticInstance, l_worker, device))
+	    continue;
+	  m_loadTimeWorkers[n]->configure(x);
+	}
+      }
+      // Start loadtime workers whether configured or not
+      for (auto it = m_loadTimeWorkers.begin(); it != m_loadTimeWorkers.end(); ++it)
+	if (*it)
+	  (*it)->start();
+    }
+
+    Worker &Artifact::
+    createWorker(Application &app, const OL::Implementation &impl, const char *appInstName,
+		 const OC::Workers &slaves, bool hasMaster, size_t member, size_t crewSize,
+		 const OCPI::Base::PValue *wParams) {
+      if (m_loadTimeWorkers[impl.m_ordinal])
+	// This worker instance is a load-time one and will persist, and its parent is *not*
+	// the app of the first argument.
+	return *m_loadTimeWorkers[impl.m_ordinal];
+      ezxml_t configXml = NULL;
+      for (ezxml_t x = ezxml_cchild(container().configXml(), "instance"); x; x = ezxml_cnext(x)) {
+	const char
+	  *spec = ezxml_cattr(x, "component"),
+	  *worker = ezxml_cattr(x, "worker"), // match the worker
+	  *device = ezxml_cattr(x, "device"); // match the device (device instance)
+	if (!(spec && strcasecmp(spec, impl.m_metadataImpl.specName().c_str())) &&
+	    OL::instanceMatchesImpl(impl.m_metadataImpl, impl.m_staticInstance, worker, device)) {
+	  configXml = x;
+	  break;
+	}
+      }
+      Worker &w = addWorker(app, appInstName, impl, slaves, hasMaster, member, crewSize, wParams);
+      w.configure(configXml);
+      return w;
+    }
+
+    // The (container) application is telling us that this worker is going away.
     void Artifact::removeWorker(Worker &w) {
-      m_workers.remove(&w);
+      ocpiDebug("Removing worker %s instance %s from artifact %s",
+		w.implTag().c_str(), w.instTag().c_str(), name().c_str());
+      auto found = m_workers.find(&w);
+      assert(found != m_workers.end());
+      assert(m_instanceInUse[found->second]);
+      if (!--m_instanceInUse[found->second] && !m_loadTimeWorkers[found->second])
+	m_workers.erase(found);
     }
     bool Artifact::hasArtifact(const void *art) {
       return (OL::Artifact *)(art) == &m_libArtifact;

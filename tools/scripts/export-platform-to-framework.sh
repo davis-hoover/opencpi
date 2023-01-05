@@ -79,6 +79,7 @@ if [ $model = hdl ]; then
   tbz=projects/assets/exports/artifacts/ocpi.assets.testbias_${platform}_base.hdl.0.${platform}.bitz
   if [ -f $tbz ]; then
     make_relative_link $tbz exports/$platform/$(basename $tbz)
+    make_relative_link $tbz exports/runtime/$platform/$(basename $tbz)
   else
     echo The file \"$tbz\" is not present, which is a failure for hdl platforms.
     exit 1

@@ -57,11 +57,10 @@ namespace OCPI {
 
     class Application;
     class Worker;
-    class ExternalPort;
     class ExternalBuffer;
 
     class Port :
-      public OCPI::Container::PortBase<OCPI::RCC::Worker, OCPI::RCC::Port, OCPI::RCC::ExternalPort> {
+      public OCPI::Container::PortBase<OCPI::RCC::Worker, OCPI::RCC::Port> {
       Port *                                m_localOther; // a connected local (same container) port.
       RCCPort                              &m_rccPort;    // The RCC port of this port
       OCPI::API::ExternalBuffer            *m_buffer;     // A buffer in use by this port
@@ -82,12 +81,6 @@ namespace OCPI {
       void disconnectInternal();
       void disconnect();
       void error(std::string &e);
-    protected:
-      // These next methods are required by or override the OCPI::Container::Port implementation
-      OCPI::Container::ExternalPort &
-      createExternal(const char *extName, bool provider,
-		     const OCPI::Base::PValue *extParams,
-		     const OCPI::Base::PValue *connParams);
     public:
       // These methods are called in one place from the worker from C, hence public and inline
       bool requestRcc(size_t max = 0) {

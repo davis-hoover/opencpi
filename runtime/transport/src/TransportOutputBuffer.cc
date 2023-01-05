@@ -246,8 +246,9 @@ bool OutputBuffer::isEmpty()
     //    ocpiDebug("Not Slave port, manually setting DMA complete flag");
 
     if ( n_pending == 0 ) {
-      ocpiAssert(m_state[0][m_pid].bufferIsEmpty == EF_EMPTY_VALUE ||
-		 m_state[0][m_pid].bufferIsEmpty == EF_FULL_VALUE);
+      //
+      uint32_t empty = m_state[0][m_pid].bufferIsEmpty & EF_MASK;
+      ocpiAssert(empty == EF_EMPTY_VALUE ||	empty == EF_FULL_VALUE);
       m_state[0][m_pid].bufferIsEmpty = EF_EMPTY_VALUE;
     }
   }

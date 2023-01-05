@@ -9,7 +9,7 @@ import subprocess
 from ci_classes import *
 import time
 
-def main(pipeline_type: str):
+def main(pipeline_type: str) -> None:
     """Create Pipeline of provided type and dump to yaml file"""
     startTime = time.time()
     for key,val in sorted(environ.items()):
@@ -49,14 +49,16 @@ def _set_env():
     environ['CI_OCPI_HDL_HWIL'] = 'True'
     environ['CI_OCPI_RCC_HWIL'] = 'False'
     environ['CI_OCPI_ASSEMBLIES'] = 'True'
-    # environ['CI_COMMIT_TAG'] = 'v2.4.0'
+    environ['CI_COMMIT_TAG'] = 'v2.4.0'
     environ['CI_COMMIT_REF_NAME'] = 'develop'
     environ['CI_OCPI_REF_NAME'] = 'develop'
     environ['CI_PROJECT_NAME'] = 'ocpi.comp.sdr'
     environ['CI_PROJECT_NAMESPACE'] = 'opencpi/ocpi.comp.sdr'
+    environ['CI_REGISTRY_IMAGE'] = 'dummy-gitlab-registry'
 
 
-def _get_builder(builder_type: str, dump_path: Path, config: dict=None):
+def _get_builder(builder_type: str, dump_path: Path, 
+    config: dict=None) -> PipelineBuilder:
     """
     Calls appropriate function to initialize a PipelineBuilder based on
     the provided builder_type
@@ -81,7 +83,8 @@ def _make_platform_pipeline(dump_path: Path,
     config: str=None) -> PlatformPipelineBuilder:
     """Initialize and return a HostPipelineBuilder"""
     pipeline_id = _get_pipeline_id()
-    base_image_tag = _get_base_image_tag(pipeline_id=pipeline_id)
+    gitlab_container_registry = getenv('CI_REGISTRY_IMAGE', '')
+    base_image_tag = pipeline_id
     image_tags = _get_image_tags()
     container_registry = getenv('CI_OCPI_CONTAINER_REGISTRY', '')
     hosts = re.split(r'\s|,\s|,', getenv('CI_OCPI_HOSTS', '').strip('"'))
@@ -94,7 +97,7 @@ def _make_platform_pipeline(dump_path: Path,
     do_assemblies = do_assemblies.lower() in ['t', 'y', 'true', 'yes', '1']
     pipeline_builder = PlatformPipelineBuilder(pipeline_id, container_registry,
         base_image_tag, hosts, platforms, projects, dump_path, config, 
-        image_tags=image_tags, do_assemblies=do_assemblies)
+        gitlab_container_registry, image_tags=image_tags, do_assemblies=do_assemblies)
 
     return pipeline_builder
 
@@ -159,17 +162,21 @@ def _make_assembly_pipeline(dump_path: Path,
     container_repo = getenv('CI_OCPI_CONTAINER_REPO')
     model = _get_platform_model(platform)
     runners = config['ci']['runners']
-    if platform.endswith('sim'):
-        do_hwil = False
-    else:
-        do_hwil = getenv('CI_OCPI_{}_HWIL'.format(model.upper()), '')
-        do_hwil = do_hwil.lower() in ['t', 'y', 'true', 'yes', '1']
     if model == 'hdl' and platform in config:
         config = config[platform]
     elif model == 'rcc' and other_platform and other_platform in config:
         config = config[other_platform]
     else:
         config = None
+    if platform.endswith('sim'):
+    # Don't do HWIL for simulators
+        do_hwil = False
+    elif not config or 'ip' not in config:
+    # Don't do HWIL for platforms without a device to run on
+        do_hwil = False
+    else:
+        do_hwil = getenv('CI_OCPI_{}_HWIL'.format(model.upper()), '')
+        do_hwil = do_hwil.lower() in ['t', 'y', 'true', 'yes', '1']
     pipeline_builder = AssemblyPipelineBuilder(pipeline_id, container_registry, 
         container_repo, base_image_tag, host, platform, model, other_platform, 
         assembly_dirs, test_dirs, dump_path, config=config, runners=runners, 
@@ -392,15 +399,30 @@ def _get_assemblies(project_dirs: List[str]) -> List[str]:
     assemblies = []
     for project_dir in project_dirs:
         assemblies_path = Path(project_dir, 'hdl', 'assemblies')
+        if not assemblies_path.exists():
+            continue
+        blacklist = []
+        whitelist = []
+        makefile = Path(assemblies_path, 'Makefile')
+        if makefile.exists():
+            with makefile.open() as f:
+                for line in f.readlines():
+                    m = re.search('^Assemblies=(.*$)', line)
+                    if m:
+                        whitelist = m.group(1).split()
+                    m = re.search('^ExcludeAssemblies=(.*$)', line)
+                    if m:
+                        blacklist = m.group(1).split()
         for assembly_path in assemblies_path.glob('*'):
-            if not assemblies_path.exists():
+            if not assembly_path.is_dir():
                 continue
-            for assembly_path in assemblies_path.glob('*'):
-                if not assembly_path.is_dir():
-                    continue
-                relative_path = assembly_path.relative_to(
-                    environ['OCPI_ROOT_DIR'])
-                assemblies.append(str(relative_path))
+            if whitelist and assembly_path.name not in whitelist:
+                continue
+            if assembly_path.name in blacklist:
+                continue
+            relative_path = assembly_path.relative_to(
+                environ['OCPI_ROOT_DIR'])
+            assemblies.append(str(relative_path))
 
     return assemblies
 

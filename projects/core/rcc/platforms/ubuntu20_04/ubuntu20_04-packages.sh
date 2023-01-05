@@ -98,6 +98,10 @@ PKGS_D+=(fakeroot)
 PKGS_D+=(xsltproc docbook-xml docbook-xsl)
 #    for sphinxcontrib.spelling extension (RST doc support)
 PKGS_D+=(enchant-2)
+#    for xilinx tool installation script
+PKGS_D+=(expect)
+#    for kernel module tests (runtime libs already present)
+PKGS_D+=(zlib1g-dev)
 
 
 ##########################################################################################

@@ -51,34 +51,8 @@ endif
 $(call OcpiDbgVar,Worker)
 #$(call OcpiDbgVar,Worker_$(Worker)_xml)
 
-################################################################################
-# Determine the language and suffix, which might mean looking in the xml file
-#
-HdlVerilogSuffix:=.v
-HdlVerilogIncSuffix:=.vh
-HdlVHDLSuffix:=.vhd
-HdlVHDLIncSuffix:=.vhd
-
-#ifndef OcpiLanguage
-#  $(error NO LANGUAGE)
-#endif # HdlLanguage not initially defined (probably true)
-
-HdlLanguage:=$(OcpiLanguage)
-$(call OcpiDbgVar,HdlLanguage)
-ifeq ($(HdlLanguage),verilog)
-HdlSourceSuffix:=$(HdlVerilogSuffix)
-HdlIncSuffix:=$(HdlVerilogIncSuffix)
-HdlOtherSourceSuffix:=$(HdlVHDLSuffix)
-HdlOtherIncSuffix:=$(HdlVHDLIncSuffix)
-HdlOtherLanguage:=vhdl
-else
-HdlSourceSuffix:=$(HdlVHDLSuffix)
-HdlIncSuffix:=$(HdlVHDLIncSuffix)
-HdlOtherSourceSuffix:=$(HdlVerilogSuffix)
-HdlOtherIncSuffix:=$(HdlVerilogIncSuffix)
-HdlOtherLanguage:=verilog
-endif
-$(call OcpiDbgVar,HdlSourceSuffix)
+# preprocess language variables in case it is not already done
+include $(OCPI_CDK_DIR)/include/hdl/hdl-language.mk
 
 # This is redundant with what is in worker.mk, when that file is included, but sometimes it isn't
 override HdlExplicitLibraries:=$(call Unique,$(HdlLibraries) $(Libraries) $(HdlExplicitLibraries))
@@ -90,12 +64,12 @@ override HdlExplicitLibraries:=$(call Unique,$(HdlLibraries) $(Libraries) $(HdlE
 # form <path>:<lib>, where if the library is in the global namespace <lib> is the same as basename
 # <path>, but when the library is in the qualified namespace it is qualified
 override HdlLibrariesInternal=$(infox HLI:$1:$(HdlTarget):$(HdlExplicitLibraries))$(strip \
-$(if $(findstring clean,$(MAKECMDGOALS)),,\
+$(if $(filter clean% xml,$(MAKECMDGOALS)),,\
 $(foreach l,$(call Unique,\
               $(- first process explicitly supplied libraries)\
               $(foreach p,$(HdlExplicitLibraries),\
                 $(if $(findstring /,$p),\
-                  $(info Warning:  HDL primitive libraries specified with pathnames is deprecated:$p)\
+                  $(call OcpiInfo,Warning:  HDL primitive libraries specified with pathnames is deprecated:$p)\
                   $(or $(and $(call HdlExists,$p),$p:$(notdir $p)),\
                        $(error Primitive library $p (from HdlLibraries or Libraries) not found.)),\
                   $(call HdlSearchPrimitivePath,$p,,HPLHLI)))\
@@ -134,7 +108,7 @@ ifneq ($(xxfilter platform container,$(HdlMode)),)
   HdlPlatform:=$(or $(HdlMyPlatform),$(CwdName))
   ifdef HdlPlatforms
     ifeq ($(filter $(HdlPlatform),$(HdlPlatforms)),)
-      $(info Skipping this platform ($(HdlPlatform)) since it is not in HdlPlatforms ($(HdlPlatforms)))
+      $(call OcpiInfo,Skipping this platform ($(HdlPlatform)) since it is not in HdlPlatforms ($(HdlPlatforms)))
       HdlSkip:=1
     endif
   endif
@@ -247,17 +221,19 @@ install: $(HdlToolSets:%=install_%)
 stublibrary: $(HdlToolSets:%=stublibrary_%)
 define HdlDoToolSet
 $(1):
-	$(AT)$(MAKE) -L --no-print-directory \
+	$(AT)$(MAKE) -L --no-print-directory -f $(firstword $(MAKEFILE_LIST))\
 	   HdlPlatforms="$(call HdlGetTargetsForToolSet,$(1),$(HdlPlatforms))" HdlTarget= \
            HdlTargets="$(call HdlGetTargetsForToolSet,$(1),$(HdlActualTargets))"
 
 stublibrary_$(1):
 	$(AT)$(MAKE) -L --no-print-directory HdlPlatforms= HdlTarget= \
+	   -f $(firstword $(MAKEFILE_LIST)) \
            HdlTargets="$(call HdlGetTargetsForToolSet,$(1),$(HdlActualTargets))" \
 	   stublibrary
 
 install_$(1):
 	$(AT)$(MAKE) -L --no-print-directory HdlPlatforms= HdlTarget= \
+	   -f $(firstword $(MAKEFILE_LIST)) \
            HdlTargets="$(call HdlGetTargetsForToolSet,$(1),$(HdlActualTargets))" \
            install
 endef
@@ -272,7 +248,7 @@ else ifeq ($(HdlToolSets)$(filter skeleton,$(MAKECMDGOALS)),)
 $(call OcpiDbg,=============No tool sets at all, skipping)
 ifneq ($(MAKECMDGOALS),clean)
   ifdef HdlPreExcludeTargets
-    $(info Not building $(HdlMode) for these filtered (only/excluded) HDL targets: $(HdlPreExcludeTargets))
+    $(call OcpiInfo,Not building $(HdlMode) for these filtered (only/excluded) HDL targets: $(HdlPreExcludeTargets))
   else
     $(infox No HDL targets to build for.  Perhaps you want to set OCPI_HDL_PLATFORM for a default?)
   endif

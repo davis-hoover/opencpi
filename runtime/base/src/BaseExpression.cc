@@ -808,13 +808,13 @@ getTypedValue(Value &v, size_t index) const {
     }
     break; // done with integral types
   case OA::OCPI_Bool:
-    (items ? v.m_pBool[index] : v.m_Bool) = 
+    (items ? v.m_pBool[index] : v.m_Bool) =
       isNumber() ? m_internal->m_number != 0 : !m_internal->m_string.empty();
     break;
   case OA::OCPI_String:
     if (isNumber())
       return "A numeric expression cannot be assigned to a string property";
-    v.reserveStringSpace(m_internal->m_string.length(), items); 
+    v.reserveStringSpace(m_internal->m_string.length());
     (items ? v.m_pString[index] : v.m_String) = v.m_stringNext;
     for (const char *cp = m_internal->m_string.c_str(); v.setNextStringChar(*cp); ++cp)      ;
     break;

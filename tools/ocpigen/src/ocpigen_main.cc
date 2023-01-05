@@ -25,8 +25,8 @@
 #include "OsFileSystem.hh"
 #include "BasePluginManager.hh"
 #include "LibraryManager.hh"
-#include "wip.h"
-#include "hdl-container.h"
+#include "wip.hh"
+#include "hdl-container.hh"
 /*
  * Notes:  For verilog, for consistency, we generate a module definition that is "included"
  * in the skeleton file so it is readonly, and can be regenerated after there is code added
@@ -331,7 +331,7 @@ main(int argc, const char **argv) {
 	if (options.parameters() || options.build())
 	  parent = "Makefile";
         Worker *w = Worker::create(*ap, parent, package, outDir, NULL, NULL,
-                                   doGenerics >= 0 ? (unsigned)doGenerics : 0, err);
+                                   doGenerics >= 0 ? (unsigned)doGenerics : SIZE_MAX, err);
 
         if (err)
           err = OU::esprintf("For file %s: %s", *ap, err);
@@ -383,7 +383,7 @@ main(int argc, const char **argv) {
           case NoModel:            ;
           }
         } else if (doCompArt && (err = w->emitToolArtXML()))
-	  err = OU::esprintf("%s: Error generating json file for ocpidev: %s", *ap, err);
+	  err = OU::esprintf("%s: Error generating XML file: %s", *ap, err);
         delete w;
       } catch (std::string &e) {
 	fprintf(stderr, "Exception thrown: %s\n", e.c_str());

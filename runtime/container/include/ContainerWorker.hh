@@ -126,7 +126,9 @@ namespace OCPI {
       bool m_hasMaster;
       size_t m_member, m_crewSize;
       PortMask m_connectedPorts, m_optionalPorts, m_outputPorts, m_inputPorts; // spcm?
+      bool m_inserted;
       mutable std::vector<Cache *> m_cache; // per property write cache, when needed
+      std::string m_description; // for error/info messages
       bool beforeStart() const;
     protected:
       void connectPort(OCPI::Metadata::PortOrdinal ordinal);
@@ -144,6 +146,7 @@ namespace OCPI {
       bool isSource() const {
 	return (m_outputPorts & m_connectedPorts) && !(m_inputPorts & m_connectedPorts);
       }
+      const char *workerDescription();
     protected:
       inline ezxml_t myXml() const { return m_xml; }
       inline ezxml_t myInstXml() const { return m_instXml; }
@@ -222,13 +225,10 @@ namespace OCPI {
       // Other convenience methods for get/set properties
       void setProperties(const char *props[][2]);
       void setProperties(const OCPI::API::PValue *props);
-#if 0
-      virtual void getPropertyValue(const OCPI::API::PropertyInfo &p, std::string &value, bool hex,
-				    bool add, bool uncached) const;
-#endif
       bool getProperty(unsigned ordinal, std::string &name, std::string &value,
 		       bool *unreadablep = NULL, bool hex = false, bool *cachedp = NULL,
 		       bool uncached = false, bool *hiddenp = NULL);
+      bool isPropertyWritten(const OCPI::API::PropertyInfo &info) const;
       // Return true when ignored due to "ignored due to existing state"
       bool controlOp(OCPI::Metadata::Worker::ControlOperation);
       virtual const std::string &name() const = 0;
@@ -242,7 +242,7 @@ namespace OCPI {
       // Generic setting method
 
       virtual ~Worker();
-      OCPI::API::Port &getPort(const char *name, const OCPI::API::PValue *params = NULL);
+      Port &getPort(const char *name, const OCPI::API::PValue *params = NULL);
       Port &getPort(const char *name, size_t nOthers, const OCPI::API::PValue *params = NULL);
       // backward compatibility for ctests
       virtual Port
@@ -260,6 +260,7 @@ namespace OCPI {
     OCPI_CONTROL_OPS
 #undef CONTROL_OP
       virtual bool wait(OCPI::OS::Timer *t = NULL);
+      void configure(ezxml_t x); // configure the worker after it is initialized
       bool isDone();
 
     private:

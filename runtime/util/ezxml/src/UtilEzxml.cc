@@ -348,7 +348,7 @@ namespace OCPI {
       const char *
       checkAttrs(ezxml_t x, ...) {
 	va_list ap;
-	if (!x->attr)
+	if (!x || !x->attr)
 	  return 0;
 	for (char **a = x->attr; *a; a += 2) {
 	  va_start(ap, x);
@@ -365,7 +365,7 @@ namespace OCPI {
 
       const char *
       checkAttrsVV(ezxml_t x, ...) {
-	if (!x->attr)
+	if (!x || !x->attr)
 	  return 0;
 	for (char **a = x->attr; *a; a += 2) {
 	  va_list ap;
@@ -385,7 +385,7 @@ namespace OCPI {
 
       const char *
       checkAttrsV(ezxml_t x, const char **attrs) {
-	if (!x->attr)
+	if (!x || !x->attr)
 	  return 0;
 	for (char **a = x->attr; *a; a += 2) {
 	  const char **va;
@@ -599,7 +599,7 @@ namespace OCPI {
 	    *found = true;
 	  *b = val;
 	} else {
-	  if (!trueOnly && setDefault)
+	  if (setDefault)
 	    *b = false;
 	  if (found)
 	    *found = false;
@@ -885,6 +885,14 @@ namespace OCPI {
 	  str.resize(str.size() - 1);
 	in = str;
       }
+      void
+      emitBoolAttr(std::string &out, const char *name, bool value, bool verbose) {
+	if (verbose)
+	  OU::formatAdd(out, " %s='%s'", name, value ? "true" : "false");
+	else if (value)
+	  OU::formatAdd(out, " %s='1'", name);
+      }
+
       // Hoist children if testValue is true
       void hoist(bool testValue, ezxml_t node, ezxml_t parent) {
         ocpiDebug("BEFORE HOIST:\n%s", ezxml_toxml(parent));

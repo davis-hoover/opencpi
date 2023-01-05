@@ -25,6 +25,7 @@ Usage is: `basename $0` bit_file PCI_device platform part-name esn position
   To find the HDL devices (available containers), use the "ocpihdl search" command.
      With ocpihdl, OpenCPI boards with valid bitstreams look like:
      Found an OpenOCPI FPGA at PCI 0000:04:00.0 ...
+  Ethernet connected devices must have "Ether:" prefix
   Use "probeJtag" to find JTAG cable's USB port names, JTAG cable serial numbers, parts, and JTAG positions.
 EOF
     exit 1
@@ -45,6 +46,11 @@ tbar=$temp.1
 tunzip=$temp.2
 golden=/opt/opencpi/pci-config-snapshots/$device
 pciDevice=`echo $device|sed s/PCI://`
+isPCI=1
+if [[ $device = Ether:* ]]; then
+  isPCI=0
+  etherDevice=`echo $device|sed s/Ether://`
+fi
 if test "$OCPI_CDK_DIR" = ""; then
   echo Error: environment variable OCPI_CDK_DIR is not set.
   exit 1
@@ -54,7 +60,7 @@ if test "$OCPI_TOOL_DIR" = ""; then
   echo Error: environment variable OCPI_TOOL_DIR is not set.
   exit 1
 fi
-if test ! -x /sys/bus/pci/devices/$pciDevice; then
+if test $isPCI = "1" -a ! -x /sys/bus/pci/devices/$pciDevice; then
   echo Trying to load PCI device \"$device\" which does not exist.
   exit 1
 fi
@@ -73,29 +79,31 @@ if test "$esn" = ""; then
 fi
 # Here we have not checked the part or the position yet.
 # Do more generic work that does not depend on the platform-specifics
-echo Checking existing loaded bitstream on OpenCPI HDL device \"$device\"...
-ocf="$OCPI_CDK_DIR/scripts/ocpisudo $OCPI_CDK_DIR/$OCPI_TOOL_DIR/bin/ocfrp_check"
-$ocf $pciDevice
-if test $? != 0; then
-   echo Existing loaded bitstream on device \"$device\" does not appear to be functional.
-   if test ! -f $golden; then
-     echo There is no PCI configuration snapshot in \"$golden\" to restore.  Cannot continue.
-     exit 1
-   fi
-   echo We will use the golden PCI configuration in $golden
-else
-   echo Existing loaded bitstream looks ok, proceeding to snapshot the PCI configuration \(into $tbar\).
-   # This ensures the file is not created under sudo   
-   echo > $tbar
-   sudo cp /sys/bus/pci/devices/$pciDevice/config $tbar
-   sudo chmod a+rw $tbar
-   if test $? != 0; then
-      echo Error: we could not snapshot the PCI configuration before loading.
-      rm $tbar
-      exit 1
-   fi
-#   echo PCI configuration for \"$device\" captured in \"$tbar\".
-   golden=$tbar
+if test $isPCI = "1"; then
+  echo Checking existing loaded bitstream on OpenCPI HDL device \"$device\"...
+  ocf="$OCPI_CDK_DIR/scripts/ocpisudo $OCPI_CDK_DIR/$OCPI_TOOL_DIR/bin/ocfrp_check"
+  $ocf $pciDevice
+  if test $? != 0; then
+     echo Existing loaded bitstream on device \"$device\" does not appear to be functional.
+     if test ! -f $golden; then
+       echo There is no PCI configuration snapshot in \"$golden\" to restore.  Cannot continue.
+       exit 1
+     fi
+     echo We will use the golden PCI configuration in $golden
+  else
+     echo Existing loaded bitstream looks ok, proceeding to snapshot the PCI configuration \(into $tbar\).
+     # This ensures the file is not created under sudo
+     echo > $tbar
+     sudo cp /sys/bus/pci/devices/$pciDevice/config $tbar
+     sudo chmod a+rw $tbar
+     if test $? != 0; then
+        echo Error: we could not snapshot the PCI configuration before loading.
+        rm $tbar
+        exit 1
+     fi
+  #   echo PCI configuration for \"$device\" captured in \"$tbar\".
+     golden=$tbar
+  fi
 fi
 ################################################################################
 # Now we do the platform-specific setup to find cables and serial numbers
@@ -232,22 +240,26 @@ if test $Err != 0; then
   rm -f $tbar
   exit 1
 fi
-echo Bitstream loaded successfully, proceeding to restore PCI config \(from $golden\).
-sleep 2
-sudo cp $golden /sys/bus/pci/devices/$pciDevice/config
-ex=$?
-rm -f $tbar
-if test $ex != 0; then
-  echo Error: Restoration of PCI config failed.
-  echo Error: May need to reset with post-reset PCI config snapshot
-else
-#  echo PCI Configuration restored, checking that new bitstream is ok.
-  $ocf $pciDevice
-  if  test $? = 0; then
-    echo New bitstream is responding.  The loading process was successful.
+if test $isPCI = "1"; then
+  echo Bitstream loaded successfully, proceeding to restore PCI config \(from $golden\).
+  sleep 2
+  sudo cp $golden /sys/bus/pci/devices/$pciDevice/config
+  ex=$?
+  rm -f $tbar
+  if test $ex != 0; then
+    echo Error: Restoration of PCI config failed.
+    echo Error: May need to reset with post-reset PCI config snapshot
   else
-    echo Error: New bitstream is not responding.
-    exit 1
+  #  echo PCI Configuration restored, checking that new bitstream is ok.
+    $ocf $pciDevice
+    if  test $? = 0; then
+      echo New bitstream is responding.  The loading process was successful.
+    else
+      echo Error: New bitstream is not responding.
+      exit 1
+    fi
   fi
+else
+  echo Bitstream loaded successfully.
 fi
 exit 0

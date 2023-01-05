@@ -24,6 +24,7 @@ set checkpoint          ""
 set part                ""
 set edif_file           ""
 set constraints         ""
+set pre_opt_hook        ""
 set impl_opts           ""
 set incr_comp           ""
 set power_opt           ""
@@ -53,6 +54,12 @@ link_design -mode $mode -part $part
 if {[info exists constraints] && [string length $constraints] > 0} {
   puts "Loading XDC: $constraints"
   read_xdc $constraints
+}
+
+# Source platform pre-opt hook, if present
+if {[info exists pre_opt_hook] && [string length $pre_opt_hook] > 0 && [file exist $pre_opt_hook]} {
+  puts "Sourcing platform pre-opt hook: $pre_opt_hook"
+  source $pre_opt_hook
 }
 
 # For each stage, allow loading of checkpoint
@@ -102,6 +109,7 @@ switch $stage {
   }
   bit {
     set command "write_bitstream $target_file $impl_opts ;"
+    set command "$command write_debug_probes -force [regsub {\.bit$} $target_file {.ltx}] ;"
     set command "$command report_utilization ;"
     set command "$command report_clock_networks ;"
     set command "$command report_design_analysis ;"

@@ -24,6 +24,7 @@
 #include "UtilSelfMutex.hh"
 #include "BasePluginManager.hh"
 #include "XferEndPoint.hh"
+#include "XferConfig.hh"
 
 namespace OCPI {
 namespace Xfer {
@@ -36,19 +37,6 @@ namespace Xfer {
   // FIXME unordered someday
   typedef std::map<TemplatePair, XferServices*> TemplateMap;
   typedef TemplateMap::iterator TemplateMapIter;
-
-  // This is the base class for a factory configuration sheet
-  // that is common to the manager, drivers, and devices
-  class FactoryConfig {
-  public:
-    // These are arguments to allow different defaults
-    FactoryConfig(size_t smbSize = 0, size_t retryCount = 0);
-    void parse(FactoryConfig *p, ezxml_t config );
-    size_t getSMBSize() const { return m_SMBSize; }
-    size_t m_SMBSize;
-    size_t m_retryCount;
-    ezxml_t  m_xml; // the element that these attributes were parsed from
-  };
 
   // This class is the transfer driver base class.
   // All drivers indirectly inherit this by using the template class in DtDriver.h

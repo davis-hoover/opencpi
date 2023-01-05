@@ -108,6 +108,8 @@ class Asset(metaclass=ABCMeta):
         """
         Remove the Asset from disk.  Any additional cleanup on a per asset basis can be done in
         the child implementations of this function
+
+        Return True if deletion actually took place
         """
         path = Path(self.directory)
         if path.name != self.name:
@@ -128,10 +130,12 @@ class Asset(metaclass=ABCMeta):
                 msg = "Successfully deleted {} '{}'".format(
                     simple_noun if simple_noun else str(path), basic_name)
                 print(msg)
+                return True
             except Exception as e:
                 err_msg = 'Failed to delete {}\n{}'.format(
                     noun if noun else str(path), e)
                 logging.error(err_msg)
+        return False
 
     def get_valid_components(self):
         """
@@ -147,6 +151,13 @@ class Asset(metaclass=ABCMeta):
             for comp in files:
                 if Component.is_component_spec_file(self.directory + "/specs/" + comp):
                     ret_val.append(self.directory + "/specs/" + comp)
+        # in libraries, spec files can be in .comp directories
+        if ocpiutil.get_dirtype(self.directory) == "library":
+            for entry in Path(self.directory).iterdir():
+                if entry.suffix == ".comp" and entry.is_dir():
+                    spec_file = entry.joinpath(entry.stem + "-spec.xml")
+                    if spec_file.exists():
+                        ret_val.append(spec_file)
         return ret_val
 
 
@@ -164,15 +175,119 @@ class BuildableAsset(Asset):
             only_plats (list) - list of the only platforms(strings) to build for
         """
         super().__init__(directory, name, **kwargs)
-        self.ex_plats = kwargs.get("ex_plats", None)
-        self.only_plats = kwargs.get("only_plats", None)
+        self.ex_plats = kwargs.get("exclude_platform", None)
+        self.only_plats = kwargs.get("only_platform", None)
 
-    @abstractmethod
-    def build(self):
+    def build(self, verbose=None, **kwargs):
         """
-        This function will build the asset, must be implemented by the child class
+        This method will build the asset, and is the base class default implentation
         """
-        raise NotImplementedError("BuildableAsset.build() is not implemented")
+        project_path = ocpiutil.is_path_in_project(self.path)
+        assert project_path
+        if not project_path.joinpath('imports').is_dir():
+            ocpiutil.execute_cmd({},
+                                 project_path,
+                                 action=['imports'],
+                                 file=os.environ['OCPI_CDK_DIR']+"/include/project.mk",
+                                 verbose=verbose)
+        action=[]
+        if kwargs.get('rcc'):
+            action.append('rcc')
+        if kwargs.get('hdl'):
+            action.append('hdl')
+        if kwargs.get('workers_as_needed'):
+            os.environ['OCPI_AUTO_BUILD_WORKERS'] = '1'
+        if kwargs.get('generate'):
+            action.append('generate')
+        if kwargs.get('no_assemblies'):
+            action.append('Assemblies=')
+        dynamic = kwargs.get('dynamic')
+        optimize = kwargs.get('optimize')
+        hdl_platform = kwargs.get('hdl_platform')
+        hdl_rcc_platform = kwargs.get('hdl_rcc_platform')
+        hdl_target = kwargs.get('hdl_target')
+        rcc_platform = kwargs.get('rcc_platform')
+        worker = kwargs.get('worker')
+        export = kwargs.get('export')
+
+        build_suffix = '-'
+        if dynamic:
+            build_suffix += 'd'
+        if optimize:
+            build_suffix += 'o'
+        if optimize or dynamic:
+            if rcc_platform:
+                if any("-" in s for s in rcc_platform):
+                    raise ocpiutil.OCPIException("You cannot use the --optimize build option and "
+                    + "also specify build options in a platform name (in this case: ",
+                    rcc_platform, ")")
+                else:
+                    new_list = [s + build_suffix for s in rcc_platform]
+                    rcc_platform = new_list
+            else:
+                rcc_platform = [os.environ['OCPI_TOOL_PLATFORM'] + build_suffix]
+        #Pass settings
+        settings = {}
+        if hdl_platform:
+            settings['hdl_plat_strs'] = hdl_platform
+        if hdl_target:
+            settings['hdl_target'] = hdl_target
+        if rcc_platform:
+            settings['rcc_platform'] = rcc_platform
+        if hdl_rcc_platform:
+            settings['hdl_rcc_platform'] = hdl_rcc_platform
+        if worker:
+            settings['worker'] = worker
+        make_file = ocpiutil.get_makefile(self.directory, self.make_type)[0]
+        #Build
+        if kwargs.get('orig_noun') == 'tests':
+            action.append('test')
+        ocpiutil.file.execute_cmd(settings, self.directory, action=action,
+                                  file=make_file, verbose=verbose)
+        if export:
+            location=ocpiutil.get_path_to_project_top()
+            make_file=ocpiutil.get_makefile(location, "project")[0]
+            ocpiutil.execute_cmd({},
+                             location,
+                             action=['exports'],
+                             file=make_file,
+                             verbose=verbose)
+
+    def clean(self, **kwargs):
+        """
+        This method will clean the asset, and is the base class default implentation
+        """
+        #Specify what to clean
+        action=[]
+        rcc = kwargs.get('rcc')
+        hdl = kwargs.get('hdl')
+        simulation = kwargs.get('simulation')
+        execution = kwargs.get('execution')
+        hdl_platform = kwargs.get('hdl_platform')
+        hdl_target = kwargs.get('hdl_target')
+        worker = kwargs.get('worker')
+        # if any clean types are mentioned, do them all but not the big "clean"
+        if rcc:
+            action.append('cleanrcc')
+        if hdl:
+            action.append('cleanhdl')
+        if simulation:
+            action.append('cleansim')
+        if execution:
+            action.append('cleanrun')
+        if not (rcc or hdl or simulation or execution):
+            action.append('clean')
+        settings = {}
+        if hdl_platform:
+            settings['hdl_plat_strs'] = hdl_platform
+        if hdl_target:
+            settings['hdl_target'] = hdl_target
+        if worker:
+            settings['worker'] = worker
+        make_file = ocpiutil.get_makefile(self.directory, self.make_type)[0]
+        #Clean
+        ocpiutil.file.execute_cmd(settings, self.directory, action=action, file=make_file,
+                                  verbose=kwargs.get('verbose'))
 
 class HDLBuildableAsset(BuildableAsset):
     """
@@ -265,7 +380,7 @@ class RunnableAsset(Asset):
         super().__init__(directory, name, **kwargs)
 
     @abstractmethod
-    def run(self):
+    def run(self, verbose=False):
         """
         This function will run the asset must be implemented by the child class
         """

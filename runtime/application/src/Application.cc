@@ -100,6 +100,8 @@ namespace OCPI {
       deployXml = NULL;
       copy = NULL;
       appXml = NULL;
+      bool verbose = false;
+      OB::findBool(params, "verbose", verbose);
       do {
         const char *err;
         const char *cp = appFile.c_str();
@@ -118,6 +120,8 @@ namespace OCPI {
               throw OU::Error("Error: application file %s (or %s) does not exist\n", file,
                               appFile.c_str());
           }
+	  if (verbose)
+	    fprintf(stderr, "Creating an application based on file:  \"%s\"\n", appFile.c_str());
           if ((err = OE::ezxml_parse_file(appFile.c_str(), appXml)))
             throw OU::Error("Can't parse application XML file \"%s\": %s", appFile.c_str(), err);
         }
@@ -167,6 +171,8 @@ namespace OCPI {
     }
     void ApplicationI::clear() {
       m_assembly--;
+      if (m_containerApps)
+	release();
       ezxml_free(m_deployXml);
       ezxml_free(m_appXml);
       delete [] m_copy;
@@ -1257,8 +1263,7 @@ it is really per actual worker config...
               ctime_r(&bd, tbuf);
               fprintf(stderr,
                       "  Instance %2u %s (spec %s) on %s container %u: %s, using %s%s%s in %s dated %s",
-                      n, m_assembly.instance(n).name().c_str(),
-                      m_assembly.instance(n).specName().c_str(),
+                      n, d->m_name.c_str(), impl.m_metadataImpl.specName().c_str(),
                       c.m_model.c_str(), c.ordinal(), c.name().c_str(),
                       impl.m_metadataImpl.cname(),
                       impl.m_staticInstance ? "/" : "",
@@ -1718,14 +1723,14 @@ it is really per actual worker config...
         for (unsigned n = 0; n < m_nContainers; n++)
           m_containers[n]->dump(true, m_hex);
       ocpiInfo("Using %d containers to support the application", m_nContainers );
-      ocpiInfo("Starting master workers that are not slaves.");
+      ocpiInfo("Starting proxy workers that are not slaves.");
       startMasterSlave(true, false, false);  // 4
       startMasterSlave(true, false, true);   // 5
-      ocpiInfo("Starting master workers that are also slaves, but not sources.");
+      ocpiInfo("Starting proxy workers that are also slaves, but not sources.");
       startMasterSlave(true, true, false);   // 6
-      ocpiInfo("Starting master workers that are also slaves and are sources.");
+      ocpiInfo("Starting proxy workers that are also slaves and are sources.");
       startMasterSlave(true, true, true);    // 7
-      ocpiInfo("Starting workers that are not masters and not sources.");
+      ocpiInfo("Starting workers that are not proxies and not sources.");
       startMasterSlave(false, false, false); // 0
       startMasterSlave(false, true, false);  // 2
       ocpiInfo("Starting workers that are sources.");
@@ -1747,6 +1752,17 @@ it is really per actual worker config...
       ocpiDebug("Stopping workers that are not masters.");
       for (unsigned n = 0; n < m_nContainers; n++)
         m_containerApps[n]->stop(false, false); // stop non-masters
+    }
+    void ApplicationI::release() {
+      ocpiDebug("Releasing master workers that are not slaves.");
+      for (unsigned n = 0; n < m_nContainers; n++)
+        m_containerApps[n]->release(true, false); // stop masters that are not slaves
+      ocpiDebug("Releasing master workers that are also slaves.");
+      for (unsigned n = 0; n < m_nContainers; n++)
+        m_containerApps[n]->release(true, true);  // stop masters that are slaves
+      ocpiDebug("Releasing workers that are not masters.");
+      for (unsigned n = 0; n < m_nContainers; n++)
+        m_containerApps[n]->release(false, false); // stop non-masters
     }
     void ApplicationI::
     setDelayedProperties() {

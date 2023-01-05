@@ -20,7 +20,7 @@ library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.types.all, ocpi.wci.all, ocpi.util.all;
 library cdc; use cdc.cdc.all;
 architecture rtl of worker is
-  constant time_width_c        : natural := ulonglong_t'length;
+  constant time_width_c        : natural := 96;
   constant nchunks_c           : natural := max(in_in.data'length, time_width_c)/in_in.data'length;
   -- The time gate state machine
   type state_t is (open_e,         -- gate is open, samples are flowing
@@ -42,10 +42,10 @@ architecture rtl of worker is
   signal fifo_out_is_eom       : bool_t;
   signal fifo_out_is_flush     : bool_t;
   -- Timekeepping - mostly reading time in chunks if data port is narrower than time
-  signal time_to_transmit_r    : ulonglong_t; -- the corrected time when transmit should be enabled
+  signal time_to_transmit_r    : unsigned(95 downto 0); -- the corrected time when transmit should be enabled
   signal time_now              : ulonglong_t;
   signal time_chunk_idx_r      : unsigned(width_for_max(nchunks_c-1)-1 downto 0);
-  signal time_chunks           : unsigned(ulonglong_t'length - in_in.data'length-1 downto 0);
+  signal time_chunks           : unsigned(time_width_c - in_in.data'length-1 downto 0);
   function set_array_length(nchunks, in_data_width, time_width : natural) return natural
   is begin
     if in_data_width < time_width then
@@ -205,6 +205,7 @@ begin
     g1: for i in 0 to nchunks_c - 2 generate
       time_chunks((i+1) * in_in.data'length-1 downto i*in_in.data'length) <= time_chunks_r(i);
     end generate;
+
     -- Clocked process in the output port's clock domain
     -- The state machine between getting time, waiting for time, and passing samples
     input_chunked : process(out_in.clk)
@@ -220,15 +221,17 @@ begin
         elsif its(fifo_empty_n)  then
           if its(props_in.ignore_time_stamps) then -- Set the state back to open_e if any other
             state_r <= open_e;                 -- state than open_e
-          elsif its(fifo_out_is_time) then -- time opcode
+          elsif its(fifo_out_is_time) and its(fifo_deq) then -- time opcode
             if state_r = open_e or state_r = time_waiting_e then
               time_chunks_r(0) <= unsigned(fifo_out_data);
               state_r <= time_coming_e;
               time_chunk_idx_r <= to_unsigned(1, time_chunk_idx_r'length);
             elsif state_r = time_coming_e then -- never will happen if width >= time_width
-              if time_chunk_idx_r = to_unsigned(nchunks_c - 1, time_chunk_idx_r'length) then
-                time_to_transmit_r <= (unsigned(fifo_out_data) & time_chunks) - props_in.time_correction;
+	      if time_chunk_idx_r = to_unsigned(nchunks_c - 1, time_chunk_idx_r'length) then
+                time_to_transmit_r <= (unsigned(fifo_out_data) & time_chunks) - shift_left(props_in.time_correction,8); 
                 state_r <= time_waiting_e;
+		time_chunk_idx_r <= (others => '0');
+                time_chunks_r <= (others => (others => '0'));
               else
                 time_chunks_r(to_integer(time_chunk_idx_r)) <= unsigned(fifo_out_data);
                 time_chunk_idx_r <= time_chunk_idx_r + 1;
@@ -236,9 +239,9 @@ begin
             end if;
           elsif state_r = time_coming_e then -- data opcode
             state_r <= error_e; 
-          elsif state_r = time_waiting_e and time_now >= time_to_transmit_r then
+          elsif state_r = time_waiting_e and time_now >= time_to_transmit_r(95 downto 32) then
             state_r <= open_e;
-            time_delta_r <= time_now - time_to_transmit_r;
+            time_delta_r <= time_now - time_to_transmit_r(95 downto 32);
           elsif state_r = error_e then -- non-time opcode when waiting for time chunks
             error_r <= btrue;
           end if;
