@@ -27,3 +27,5 @@ if [[ -n $ip ]] ; then
 fi
 
 ocpirun -v -d -m bias=$model -P file_read=$host -P file_write=$host -P bias=$platform testbias.xml -t 10
+
+python3 app_verify/testbias/testbias_verify.py
