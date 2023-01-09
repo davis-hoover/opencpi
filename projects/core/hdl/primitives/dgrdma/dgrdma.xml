@@ -29,10 +29,10 @@
     verilog-ethernet/lib/axis/rtl/axis_async_fifo.v
     verilog-ethernet/lib/axis/rtl/axis_adapter.v
     verilog-ethernet/lib/axis/rtl/axis_async_fifo_adapter.v
-    verilog-ethernet/lib/axis/rtl/axis_pipeline_register.v
-    verilog-ethernet/lib/axis/rtl/axis_register.v
     dgrdma_txn_record.vhd
     divide.vhd
+    dgrdma_axis_pipeline.vhd
+    dgrdma_axis_register.vhd
     dgrdma_frame_parser.vhd
     dgrdma_frame_generator.vhd
     dgrdma_rx_mux.vhd
