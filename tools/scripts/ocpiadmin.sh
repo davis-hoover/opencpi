@@ -34,8 +34,7 @@ set -e
 #
 ifile_required="vivado"
 
-if [ "x$OCPI_CDK_DIR" = x ]
-then
+if [ "x$OCPI_CDK_DIR" = x ]; then
   #
   # OpenCPI environment not initialized: fatal error.
   #
@@ -44,31 +43,28 @@ then
   exit 1
 fi
 
-#
-# Must be in the OpenCPI base directory, at least until a
-# clean way of dealing with relative paths can be implemented.
-#
-cd $OCPI_ROOT_DIR
-
 # Provides `setVarsFromMake`
 source $OCPI_CDK_DIR/scripts/util.sh
 
-function usage {
-  if [ "$action" != install ]; then
-    cat <<-EOF
+#
+# Emit the help() text for any of the following:
+#   bad or missing <verb>
+#   bad or missing <noun>
+#   bad <verb>+<noun> combos
+#
+function help {
+  cat <<-EOF >&2
 To install a platform (by downloading it, if necessary, and building it):
   $(basename $0) [-p PKG_ID [-u URL] [-g GIT_REV]] [--minimal] [--optimize] install platform <platform>
 To deploy a platform:
   $(basename $0) deploy platform <rcc_platform> <hdl_platform>
+To install a tool:
+  $(basename $0) [-d DIR] [--installer-file=IFILE] [--tool-options="[ARG]..."] install tool <name>
 EOF
-  else
-    install_usage
-  fi
-  exit 1
 }
 
-function install_usage {
-  cat <<-EOF
+function usage_p {
+  cat <<-EOF >&2
 Usage: $(basename $0) [-p PKG_ID [-u URL] [-g GIT_REV]] [--minimal] [--optimize] install platform <platform>
 
 Download, build, and register the built-in or remote OpenCPI RCC or HDL platform.
@@ -107,6 +103,55 @@ Examples:
   ocpiadmin -p ocpi.osp.plutosdr install platform adi_plutosdr0_32
   ocpiadmin install platform plutosdr
 EOF
+}
+
+function usage_t {
+  cat <<-EOF >&2
+Usage: $(basename $0) [-d DIR] [--installer-file=IFILE] [--tool-options="[ARG]..."] install tool <name>
+
+Install the specified tool.
+
+Required args:
+  <name>                        name of tool to install, e.g., "vivado"
+
+Optional args:
+  -d, --directory=DIR           installation directory; default value depends
+                                  on the tool ("/opt/Xilinx" for "vivado") 
+  --installer-file=IFILE        some tools (like "vivado") require this; no
+                                  default value
+  --tool-options="[ARG]..."     options passed to the tool installer script; no
+                                  default value; double-quotes around the value
+                                  are required to ensure proper parsing; legal ARGs
+                                  (typically specified to override the default tool
+                                  installation parameters) are defined by the tool
+                                  installation script (use '--tool-options="--help"'
+                                  to see them) and are space-separated
+
+Example:
+  # vivado
+  ocpiadmin --installer-file=/opt/downloads/Xilinx/Xilinx_Unified_2022.1_0420_0327_Lin64.bin install tool vivado
+EOF
+}
+
+#
+# Top-level "usage" function: calls
+# the help() and usage_*() functions
+# defined above.
+#
+function usage {
+  case "$action" in
+    install)
+      case "$noun" in
+	platform)
+	  usage_p ;;
+	tool)
+	  usage_t ;;
+	*)
+	  help ;;
+      esac ;;
+    *)
+      help ;;
+  esac
   exit 1
 }
 
@@ -114,8 +159,7 @@ function getvars {
   # setVarsFromMake $OCPI_CDK_DIR/include/hdl/hdl-targets.mk ShellHdlTargetsVars=1
   # setVarsFromMake $OCPI_CDK_DIR/include/rcc/rcc-targets.mk ShellRccTargetsVars=1
   eval $(python3 -c "import _opencpi.util as ou; print(ou.get_platform_variables(True))")
-  if [ "$action" = deploy ]
-  then
+  if [ "$action" = deploy ]; then
     export OCPI_ALL_RCC_PLATFORMS="$RccAllPlatforms" OCPI_ALL_HDL_PLATFORMS="$HdlAllPlatforms"
     return 0
   fi
@@ -155,8 +199,7 @@ while (( "$#" )); do
         shift 2
       else
         bad "Argument for \"$1\" is missing"
-      fi
-      ;;
+      fi ;;
     -p|--package-id|--package-id=*)
       if [[ "$1" == "--package-id="* ]]; then
 	PKG_ID=${1#*=}
@@ -166,8 +209,7 @@ while (( "$#" )); do
         shift 2
       else
         bad "Argument for \"$1\" is missing"
-      fi
-      ;;
+      fi ;;
     -u|--url|--url=*)
       if [[ "$1" == "--url="* ]]; then
 	URL=${1#*=}
@@ -177,18 +219,13 @@ while (( "$#" )); do
         shift 2
       else
         bad "Argument for \"$1\" is missing"
-      fi
-      ;;
+      fi ;;
     --minimal)
       minimal=1 # use ${minimal:+whatever}
-      shift
-      ;;
+      shift ;;
     --optimize)
       optimize=1
-      shift
-      ;;
-
-    # Undocumented flags
+      shift ;;
     --tool-options|--tool-options=*)
       if [[ "$1" == "--tool-options="* ]]; then
         TOPTS=${1#*=}
@@ -203,8 +240,7 @@ while (( "$#" )); do
         shift 2
       else
         bad "Argument for \"$1\" is missing"
-      fi
-      ;;
+      fi ;;
     --installer-file|--installer-file=*)
       if [[ "$1" == "--installer-file="* ]]; then
         IFILE=${1#*=}
@@ -214,8 +250,7 @@ while (( "$#" )); do
         shift 2
       else
         bad "Argument for \"$1\" is missing"
-      fi
-      ;;
+      fi ;;
     -d|--directory|--directory=*)
       #
       # A little sleight of hand here: as long as the tool
@@ -232,36 +267,31 @@ while (( "$#" )); do
         shift 2
       else
         bad "Argument for \"$1\" is missing"
-      fi
-      ;;
+      fi ;;
+
+    # Undocumented flags
     --distro)
       export OCPI_DISTRO_BUILD=1
-      shift
-      ;;
+      shift ;;
     -v|--verbose)
       verbose=-v
-      shift
-      ;;
+      shift ;;
     --dynamic)
       dynamic=1
-      shift
-      ;;
+      shift ;;
    --no-kernel)
       nokernel=1 # use ${nokernel:+whatever}
-      shift
-      ;;
+      shift ;;
 
     # Unsupported flags
     -*)
       HELP=1  # can't print usage yet as usage message is based on other args
-      shift
-      ;;
+      shift ;;
 
     # Preserve positional arguments
     *)
       PARAMS="$PARAMS \"$1\""
-      shift
-      ;;
+      shift ;;
   esac
 done  # end parsing optional args and flags
 
@@ -271,10 +301,13 @@ unset PARAMS
 
 # The <verb> argument.
 action=$1
+# The <noun> argument: must be either 'platform' or 'tool'
+noun=$2
 
 #
-# Needs to be after $action is set as a different usage message is printed
-# based on the action. Also, at least 3 positional arguments are required.
+# The following needs to be after $action and $noun are set: a different
+# usage message is emitted based on the "action+noun" combination.  Also,
+# at least 3 positional arguments are required.
 #
 if [[ -n "$HELP" || $# -lt 3 ]]; then
   usage
@@ -285,43 +318,32 @@ fi
 # to add the "install tool" functionality.  Other
 # scripts support <verb>+<noun> combinations better.
 #
-# $2 must be either 'platform' or 'tool'
-#
-noun=$2
 case "$noun" in
   platform)
-    if [ "$action" = install ]
-    then
+    if [ "$action" = install ]; then
       platform=${3%-*}
       platform_target_dir=$3
-      if [ -z "$platform" ]
-      then
+      if [ -z "$platform" ]; then
         bad 'Missing platform to install'
       fi
       # Check to ensure "PKG_ID" is non-null if either
       # "--url" or "--git-revision" were specified.
-      if [[ ("$URL" || "$GIT_REV") && -z "$PKG_ID" ]]
-      then
+      if [[ ("$URL" || "$GIT_REV") && -z "$PKG_ID" ]]; then
         bad 'PKG_ID is required if a URL or GIT_REV is specified'
       fi
-    elif [ "$action" = deploy ]
-    then
+    elif [ "$action" = deploy ]; then
       rcc_platform=$3
       hdl_platform=$4
-      if [ -z "$hdl_platform" ]
-      then
+      if [ -z "$hdl_platform" ]; then
         bad 'Cannot deploy platform, missing required rcc and/or hdl platform'
       fi
     else
       bad "Unknown action: '$action'"
-    fi
-    ;;
+    fi ;;
   tool)
-    if [ "$action" = install ]
-    then
+    if [ "$action" = install ]; then
       tool=$3
-      if [ -z "$tool" ]
-      then
+      if [ -z "$tool" ]; then
         bad 'Missing tool to install'
       fi
       case $tool in
@@ -331,15 +353,12 @@ case "$noun" in
           # default value for it can be determined,
           # this is unavoidable.
           #
-          if [ -z "$IFILE" ]
-          then
+          if [ -z "$IFILE" ]; then
             bad "Tool '$tool' requires '--installer-file' option"
-          fi
-          ;;
+          fi ;;
       esac
       ISCRIPT="$OCPI_CDK_DIR/scripts/*/$action-$tool.sh"
-      if [ ! -f $ISCRIPT ]
-      then
+      if [ ! -f $ISCRIPT ]; then
         bad "Missing script: $ISCRIPT"
       fi
       installer_argv=($TOPTS)
@@ -352,11 +371,9 @@ case "$noun" in
       bad "exec failed: $ISCRIPT ${installer_argv[@]} $IFILE"
     else
       bad "Unknown action: '$action'"
-    fi
-    ;;
+    fi ;;
   *)
-    bad "Unknown $action noun: '$noun'"
-    ;;
+    bad "Unknown $action noun: '$noun'" ;;
 esac
 
 # End parsing and validation of positional args
@@ -366,13 +383,17 @@ esac
 # does the heavy lifting.  Note undocumented "verbose"
 # option: set to "-v" for debugging.
 #
-if [ "$action" = deploy ]
-then
+if [ "$action" = deploy ]; then
   getvars
   $OCPI_CDK_DIR/scripts/deploy-platform.sh $verbose $rcc_platform $hdl_platform
   exit $?
 fi
 
+#
+# From this point on, must be in the OpenCPI base directory, at least
+# until a clean way of dealing with relative paths can be implemented.
+#
+cd $OCPI_ROOT_DIR
 
 if getvars; then
     echo The $model platform \"$platform\" is already defined in this installation, in $platform_dir.
@@ -514,8 +535,7 @@ else
     # If project dir is not one of the core projects, build the platform
     if [[ -n "$platform_dir" && "$platform_dir" != *"/projects/core/"* \
           && "$platform_dir" != *"/projects/platform/"* \
-          && "$platform_dir" != *"/projects/assets/"* ]]
-    then
+          && "$platform_dir" != *"/projects/assets/"* ]]; then
         if [ -n "$minimal" ]; then
           ocpidev -d $project_dir build hdl primitives --hdl-platform=$platform
           # the rcc build ensures all workers are visible to build the platform
