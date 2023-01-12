@@ -228,7 +228,7 @@ while (( "$#" )); do
       shift ;;
     --tool-options|--tool-options=*)
       if [[ "$1" == "--tool-options="* ]]; then
-        TOPTS=${1#*=}
+        [[ "$TOPTS" ]] && TOPTS+=" ${1#*=}" || TOPTS=${1#*=}
         shift
       elif [ -n "$2" ]; then
         #
@@ -236,7 +236,7 @@ while (( "$#" )); do
         # this option because the value can begin with a '-',
         # i.e., must omit the normal [ ${2:0:1} != "-" ] test.
         #
-        TOPTS="$2"
+        [[ "$TOPTS" ]] && TOPTS+=" $2" || TOPTS="$2"
         shift 2
       else
         bad "Argument for \"$1\" is missing"
@@ -260,10 +260,10 @@ while (( "$#" )); do
       # be '--directory' in the installer script.
       #
       if [[ "$1" == "--directory="* ]]; then
-        TOPTS+=" -d ${1#*=}"
+        [[ "$TOPTS" ]] && TOPTS+=" -d ${1#*=}" || TOPTS="-d ${1#*=}"
         shift
       elif [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        TOPTS+=" -d $2"
+        [[ "$TOPTS" ]] && TOPTS+=" -d $2" || TOPTS="-d $2"
         shift 2
       else
         bad "Argument for \"$1\" is missing"
