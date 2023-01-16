@@ -20,7 +20,7 @@
 
 build/test: ../../base/include/Math.hh ../../base/src/Math.cc ../../base/include/DRC.hh ../../base/src/DRC.cc ../../ad9361/include/AD9361DRC.hh test.cc
 	mkdir -p build
-	g++ --std=c++0x -g -D DISABLE_AD9361 -I../../base/include -I../../ad9361/include -I../../base/src -I../../ad9361/src test.cc -o build/test
+	g++ --std=c++0x -g -D DISABLE_AD9361 -D NO_DDC_DUC -I../../base/include -I../../ad9361/include -I../../base/src -I../../ad9361/src test.cc -o build/test
 
 clean:
 	rm -rf build

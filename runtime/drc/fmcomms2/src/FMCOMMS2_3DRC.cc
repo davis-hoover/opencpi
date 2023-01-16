@@ -28,6 +28,10 @@ namespace DRC {
 // -----------------------------------------------------------------------------
 
 #ifdef IS_LOCKING
+/* @brief for the FMCOMMS2_3,
+ *        define variables (X) and their domains (D) for <X,D,C> which
+ *        comprises its Constraint Satisfaction Problem (CSP)
+ ******************************************************************************/
 void
 FMCOMMS2_3CSP::define_x_d_fmcomms2_3() {
   // N/A
@@ -70,6 +74,10 @@ FMCOMMS2_3CSP::define_x_d_fmcomms2_3() {
   m_solver.add_var<double>("fmcomms2_3_gain_db_tx2a", dfp_tol);
 }
 
+/* @brief for the FMCOMMS2_3,
+ *        define constraints (C) for <X,D,C> which
+ *        comprise its Constraint Satisfaction Problem (CSP)
+ ******************************************************************************/
 void
 FMCOMMS2_3CSP::define_c_fmcomms2_3() {
   // N/A
@@ -130,6 +138,9 @@ FMCOMMS2_3CSP::connect_fmcomms2_3_to_ad9361() {
   define_c_fmcomms2_3();
 }
 
+/* @brief instance FMCOMMS2/3
+ *        by defining its Constraint Satisfaction Problem (CSP) as <X,D,C>
+ ******************************************************************************/
 void
 FMCOMMS2_3CSP::instance_fmcomms2_3() {
   instance_ad9361();
@@ -137,6 +148,7 @@ FMCOMMS2_3CSP::instance_fmcomms2_3() {
   connect_fmcomms2_3_to_ad9361();
 }
 
+/// @brief define Constraint Satisfaction Problem (CSP)
 void
 FMCOMMS2_3CSP::define() {
   instance_fmcomms2_3();
@@ -168,7 +180,8 @@ FMCOMMS2_3Configurator::FMCOMMS2_3Configurator(int32_t fmcomms_num) :
         "fmcomms2_3_gain_mode_rx1a"));
     map.insert(std::make_pair(config_key_gain_dB.c_str(),
         "fmcomms2_3_gain_db_rx1a"));
-    add_data_stream(DataStream("rx1a", true, false, map));
+    ///@TODO / FIXME hardcoded mapping in below line
+    add_data_stream(DataStream("Rx0"/*"rx1a"*/, true, false, map));
   }
   {
     DataStream::CSPVarMap map;
@@ -186,7 +199,8 @@ FMCOMMS2_3Configurator::FMCOMMS2_3Configurator(int32_t fmcomms_num) :
         "fmcomms2_3_gain_mode_rx2a"));
     map.insert(std::make_pair(config_key_gain_dB.c_str(),
         "fmcomms2_3_gain_db_rx2a"));
-    add_data_stream(DataStream("rx2a", true, false, map));
+    ///@TODO / FIXME hardcoded mapping in below line
+    add_data_stream(DataStream("Rx1"/*"rx2a"*/, true, false, map));
   }
   {
     DataStream::CSPVarMap map;
@@ -204,7 +218,8 @@ FMCOMMS2_3Configurator::FMCOMMS2_3Configurator(int32_t fmcomms_num) :
         "fmcomms2_3_gain_mode_tx1a"));
     map.insert(std::make_pair(config_key_gain_dB.c_str(),
         "fmcomms2_3_gain_db_tx1a"));
-    add_data_stream(DataStream("tx1a", false, true, map));
+    ///@TODO / FIXME hardcoded mapping in below line
+    add_data_stream(DataStream("Tx0"/*"tx1a"*/, false, true, map));
   }
   {
     DataStream::CSPVarMap map;
@@ -222,7 +237,8 @@ FMCOMMS2_3Configurator::FMCOMMS2_3Configurator(int32_t fmcomms_num) :
         "fmcomms2_3_gain_mode_tx2a"));
     map.insert(std::make_pair(config_key_gain_dB.c_str(),
         "fmcomms2_3_gain_db_tx2a"));
-    add_data_stream(DataStream("tx2a", false, true, map));
+    ///@TODO / FIXME hardcoded mapping in below line
+    add_data_stream(DataStream("Tx1"/*"tx2a"*/, false, true, map));
   }
 }
 #endif // IS_LOCKING
@@ -231,31 +247,32 @@ FMCOMMS2_3Configurator::FMCOMMS2_3Configurator(int32_t fmcomms_num) :
 // STEP 3 - DEFINE DRC (get/set APIs)
 // -----------------------------------------------------------------------------
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t>
-FMCOMMS2_3DRC<log_t,cfg_t,ds_t,cfgrtr_t>::FMCOMMS2_3DRC(cfg_t& slave_cfg,
-    ds_t& slave_data_sub, double fref_hz, int32_t fmcomms_num,
+template<class log_t,class cfgrtr_t>
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::FMCOMMS2_3DRC(unsigned which,
+		AD9361DeviceCallBack &dev, double fref_hz, int32_t fmcomms_num,
     const char* rx1a, const char* rx2a, const char* tx1a, const char* tx2a,
     const char* descriptor) :
-    AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>(slave_cfg,slave_data_sub,fref_hz,rx1a,rx2a,tx1a,tx2a,descriptor),
+    AD9361DRC<log_t,cfgrtr_t>(which,dev,fref_hz,rx1a,rx2a,tx1a,tx2a,descriptor),
     m_ds_rx1a(rx1a), m_ds_rx2a(rx2a), m_ds_tx1a(tx1a), m_ds_tx2a(tx2a) {
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> const char*
-FMCOMMS2_3DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_ad9361_ds_id(
+template<class log_t,class cfgrtr_t> data_stream_id_t
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::get_ad9361_ds_id(
     data_stream_id_t id) const {
-  return id==m_ds_rx1a ? "rx1" :  id==m_ds_rx1a ? "rx2" : id==m_ds_rx1a ? "tx1" :
-      id==m_ds_rx1a ? "tx2" : "rx1"; 
+  //return id==m_ds_rx1a ? "rx1" :  id==m_ds_rx1a ? "rx2" : id==m_ds_rx1a ? "tx1" :
+  //    id==m_ds_rx1a ? "tx2" : "rx1"; 
+  return id;
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> bool
-FMCOMMS2_3DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_data_stream_is_enabled(
+template<class log_t,class cfgrtr_t> bool
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::get_data_stream_is_enabled(
     data_stream_id_t id) {
-  return AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_data_stream_is_enabled(get_ad9361_ds_id(id));
+  return AD9361DRC<log_t,cfgrtr_t>::get_data_stream_is_enabled(get_ad9361_ds_id(id));
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t>
+template<class log_t,class cfgrtr_t>
 data_stream_direction_t 
-FMCOMMS2_3DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_data_stream_direction(
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::get_data_stream_direction(
     data_stream_id_t id) {
   data_stream_direction_t ret = data_stream_direction_t::tx;
   if((id==m_ds_rx1a) or (id==m_ds_rx2a)) {
@@ -264,87 +281,87 @@ FMCOMMS2_3DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_data_stream_direction(
   return ret;
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> config_value_t 
-FMCOMMS2_3DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_tuning_freq_MHz(
+template<class log_t,class cfgrtr_t> config_value_t 
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::get_tuning_freq_MHz(
     data_stream_id_t data_stream_id) {
-  return AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_tuning_freq_MHz(get_ad9361_ds_id(data_stream_id));
+  return AD9361DRC<log_t,cfgrtr_t>::get_tuning_freq_MHz(get_ad9361_ds_id(data_stream_id));
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> config_value_t 
-FMCOMMS2_3DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_bandwidth_3dB_MHz(
+template<class log_t,class cfgrtr_t> config_value_t 
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::get_bandwidth_3dB_MHz(
     data_stream_id_t data_stream_id) {
-  return AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_bandwidth_3dB_MHz(get_ad9361_ds_id(data_stream_id));
+  return AD9361DRC<log_t,cfgrtr_t>::get_bandwidth_3dB_MHz(get_ad9361_ds_id(data_stream_id));
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> config_value_t 
-FMCOMMS2_3DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_sampling_rate_Msps(
+template<class log_t,class cfgrtr_t> config_value_t 
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::get_sampling_rate_Msps(
     data_stream_id_t data_stream_id) {
-  return AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_sampling_rate_Msps(get_ad9361_ds_id(data_stream_id));
+  return AD9361DRC<log_t,cfgrtr_t>::get_sampling_rate_Msps(get_ad9361_ds_id(data_stream_id));
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> bool
-FMCOMMS2_3DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_samples_are_complex(
+template<class log_t,class cfgrtr_t> bool
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::get_samples_are_complex(
     data_stream_id_t data_stream_id) {
-  return AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_samples_are_complex(get_ad9361_ds_id(data_stream_id));
+  return AD9361DRC<log_t,cfgrtr_t>::get_samples_are_complex(get_ad9361_ds_id(data_stream_id));
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> gain_mode_value_t 
-FMCOMMS2_3DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_gain_mode(
+template<class log_t,class cfgrtr_t> gain_mode_value_t 
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::get_gain_mode(
     data_stream_id_t data_stream_id) {
-  return AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_gain_mode(get_ad9361_ds_id(data_stream_id));
+  return AD9361DRC<log_t,cfgrtr_t>::get_gain_mode(get_ad9361_ds_id(data_stream_id));
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> config_value_t 
-FMCOMMS2_3DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_gain_dB(
+template<class log_t,class cfgrtr_t> config_value_t 
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::get_gain_dB(
     data_stream_id_t data_stream_id) {
-  return AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_gain_dB(get_ad9361_ds_id(data_stream_id));
+  return AD9361DRC<log_t,cfgrtr_t>::get_gain_dB(get_ad9361_ds_id(data_stream_id));
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> void
-FMCOMMS2_3DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_data_stream_direction(
+template<class log_t,class cfgrtr_t> void
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::set_data_stream_direction(
     data_stream_id_t data_stream_id, data_stream_direction_t val) {
-  return AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_data_stream_direction(get_ad9361_ds_id(data_stream_id),val);
+  return AD9361DRC<log_t,cfgrtr_t>::set_data_stream_direction(get_ad9361_ds_id(data_stream_id),val);
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> void
-FMCOMMS2_3DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_tuning_freq_MHz(
+template<class log_t,class cfgrtr_t> void
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::set_tuning_freq_MHz(
     data_stream_id_t data_stream_id, config_value_t val) {
-  return AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_tuning_freq_MHz(get_ad9361_ds_id(data_stream_id),val);
+  return AD9361DRC<log_t,cfgrtr_t>::set_tuning_freq_MHz(get_ad9361_ds_id(data_stream_id),val);
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> void
-FMCOMMS2_3DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_bandwidth_3dB_MHz(
+template<class log_t,class cfgrtr_t> void
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::set_bandwidth_3dB_MHz(
     data_stream_id_t data_stream_id, config_value_t val) {
-  return AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_bandwidth_3dB_MHz(get_ad9361_ds_id(data_stream_id),val);
+  return AD9361DRC<log_t,cfgrtr_t>::set_bandwidth_3dB_MHz(get_ad9361_ds_id(data_stream_id),val);
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> void
-FMCOMMS2_3DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_sampling_rate_Msps(
+template<class log_t,class cfgrtr_t> void
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::set_sampling_rate_Msps(
     data_stream_id_t data_stream_id, config_value_t val) {
-  return AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_sampling_rate_Msps(get_ad9361_ds_id(data_stream_id),val);
+  return AD9361DRC<log_t,cfgrtr_t>::set_sampling_rate_Msps(get_ad9361_ds_id(data_stream_id),val);
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> void
-FMCOMMS2_3DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_samples_are_complex(
+template<class log_t,class cfgrtr_t> void
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::set_samples_are_complex(
     data_stream_id_t data_stream_id, bool val) {
-  return AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_samples_are_complex(get_ad9361_ds_id(data_stream_id),val);
+  return AD9361DRC<log_t,cfgrtr_t>::set_samples_are_complex(get_ad9361_ds_id(data_stream_id),val);
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> void
-FMCOMMS2_3DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_gain_mode(
+template<class log_t,class cfgrtr_t> void
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::set_gain_mode(
     data_stream_id_t data_stream_id, gain_mode_value_t val) {
-  return AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_gain_mode(get_ad9361_ds_id(data_stream_id),val);
+  return AD9361DRC<log_t,cfgrtr_t>::set_gain_mode(get_ad9361_ds_id(data_stream_id),val);
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> void
-FMCOMMS2_3DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_gain_dB(
+template<class log_t,class cfgrtr_t> void
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::set_gain_dB(
     data_stream_id_t data_stream_id, config_value_t val) {
-  return AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_gain_dB(get_ad9361_ds_id(data_stream_id),val);
+  return AD9361DRC<log_t,cfgrtr_t>::set_gain_dB(get_ad9361_ds_id(data_stream_id),val);
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> bool
-FMCOMMS2_3DRC<log_t,cfg_t,ds_t,cfgrtr_t>::shutdown() {
-  return AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::shutdown();
+template<class log_t,class cfgrtr_t> bool
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::shutdown() {
+  return AD9361DRC<log_t,cfgrtr_t>::shutdown();
 }
 
 } // namespace DRC

@@ -114,6 +114,8 @@ class Configurator {
   const char*    get_config(data_stream_id_t id, config_key_t cfg) const;
   config_value_t get_config_locked_value(data_stream_id_t id,
       config_key_t cfg) const;
+  template<typename T> std::string get_lock_config_str(data_stream_id_t id,
+      config_key_t cfg, T val, bool succeeded);
   void add_data_stream(DataStream data_stream);
   bool lock_config(data_stream_id_t ds_id, config_key_t cfg, int32_t val);
   bool lock_config(data_stream_id_t ds_id, config_key_t cfg, config_value_t val,
@@ -316,7 +318,7 @@ class ARC : public LogForwarder<log_t> {
       const DataStreamConfigLockRequest& data_stream_config_lock_request) const;
   protected:
   bool lock_config(data_stream_id_t ds_id, config_value_t val,
-      config_key_t cfg, config_value_t tol);
+      config_key_t cfg, bool do_tol, config_value_t tol);
   virtual void set_data_stream_direction(data_stream_id_t id,
       data_stream_direction_t val) = 0;
   /*! @brief  Attempt to set on-hardware value with no guarantee of success.

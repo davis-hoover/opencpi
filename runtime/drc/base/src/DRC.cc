@@ -23,6 +23,8 @@
 #include <sstream>  // std::ostringstream
 #include <cmath>    // std::abs
 #include "DRC.hh"
+///@TODO / FIXME address whether to remove
+#define IS_LOCKING
 
 namespace DRC {
 
@@ -68,7 +70,7 @@ Configurator<CSP>::get_config(data_stream_id_t id, config_key_t cfg) const {
       return it->m_csp_map.at(cfg);
     }
   }
-  throw std::string("config not found");
+  throw std::string("data stream id not found ")+id.c_str();
 }
 
 template<class CSP> config_value_t
@@ -78,11 +80,24 @@ Configurator<CSP>::get_config_locked_value(data_stream_id_t id,
   return m_solver.get_feasible_region_limits_min_double(var);
 }
 
+template<class CSP> template<typename T> std::string
+Configurator<CSP>::get_lock_config_str(data_stream_id_t id, config_key_t cfg,
+    T val, bool succeeded) {
+  std::ostringstream oss;
+  oss << "lock " << (succeeded ? "SUCCEEDED " : "FAILED ");
+  oss << "for data stream: " << id << " for config: " << cfg << " ";
+  oss << "for requested value: " << val;
+  return oss.str();
+}
+
 template<class CSP> bool
 Configurator<CSP>::lock_config(data_stream_id_t id, config_key_t cfg,
     int32_t val) {
   bool ret = lock_config(get_config(id,cfg),val);
   //std::cout << "[DEBUG] " << m_solver.get_feasible_region_limits() << "\n";
+  std::ostringstream oss;
+  oss << get_lock_config_str<int32_t>(id,cfg,val,ret) << "\n";
+  //printf("%s", oss.str().c_str());
   return ret;
 }
 
@@ -91,6 +106,10 @@ Configurator<CSP>::lock_config(data_stream_id_t id, config_key_t cfg,
     config_value_t val, config_value_t tol) {
   bool ret = lock_config(get_config(id,cfg),val,tol);
   //std::cout << "[DEBUG] " << m_solver.get_feasible_region_limits() << "\n";
+  std::ostringstream oss;
+  oss << get_lock_config_str<config_value_t>(id,cfg,val,ret);
+  oss << " w/ tolerance: +/- " << tol << "\n";
+  //printf("%s", oss.str().c_str());
   return ret;
 }
 
@@ -98,12 +117,15 @@ template<class CSP> bool
 Configurator<CSP>::lock_config(const char* config, int32_t val) {
   // attempt a lock
   CSPSolver::Constr& clo = m_solver.m_solver.add_constr(config, "=", val);
+  //std::cout << "attempt a lock: add constraint " << config << "=" << val << "\n";
+  //std::cout << "solver is now: " << m_solver.m_solver << "\n";
   bool successful = not m_solver.m_solver.feasible_region_limits_is_empty_for_var(config);
   if(successful) {
     Configurator<CSP>::LockParam param = {clo, clo, false, val, 0, true, false};
     m_locked_params.insert(std::pair<const char*, LockParam>(config, param));
   }
   else {
+    //std::cout << "[DEBUG] " << get_feasible_region_limits() << "\n";
     m_solver.m_solver.remove_constr(clo);
     //m_solver.m_solver.remove_constr(clo);
   }
@@ -118,6 +140,10 @@ Configurator<CSP>::lock_config(const char* config, config_value_t val,
   //std::cout << "[DEBUG] lock " << config << get_feasible_region_limits() << "\n";
   const CSPSolver::Constr& chi = m_solver.m_solver.add_constr(config, "<=", val+tolerance);
   //std::cout << "[DEBUG] lock " << config << get_feasible_region_limits() << "\n";
+  //std::cout << "attempt a lock: add constraint " << config << ">=" << val-tolerance << "\n";
+  //std::cout << "solver is now: " << m_solver.m_solver << "\n";
+  //std::cout << "attempt a lock: add constraint " << config << "<=" << val+tolerance << "\n";
+  //std::cout << "solver is now: " << m_solver.m_solver << "\n";
   // test whether the lock was successful:
   // if we overconstrained such the feasible region contains an empty set for
   // the variable (config), the lock was unsuccessful we roll back (remove)
@@ -170,6 +196,7 @@ Configurator<CSP>::unlock_all() {
     unlock_config(it->first);
     it = m_locked_params.begin();
   }
+  //std::cout << "[DEBUG] " << m_solver.get_feasible_region_limits() << "\n";
 }
 
 template<class CSP> void
@@ -572,11 +599,13 @@ ARC<L,C>::throw_if_data_stream_lock_request_malformed(
 
 template<class L,class C> bool
 ARC<L,C>::lock_config(data_stream_id_t ds_id, config_value_t val,
-    config_key_t cfg_key, config_value_t tol) {
+    config_key_t cfg_key, bool do_tol, config_value_t tol) {
   // the configurator, which is a software emulation of hardware capabilties,
   // tells us whether a hardware attempt to set value will corrupt
   // any existing locks
-  bool did_lock = this->m_configurator.lock_config(ds_id, cfg_key, val, tol);
+  bool did_lock = do_tol ?
+    this->m_configurator.lock_config(ds_id, cfg_key, val, tol) :
+    this->m_configurator.lock_config(ds_id, cfg_key, val);
   //bool is = false; // is within tolerance
   if(did_lock) {
     config_value_t cfglval; // configurator locked value
@@ -604,23 +633,33 @@ ARC<L,C>::do_min_data_stream_config_locks(
   const DataStreamConfigLockRequest& req = data_stream_config_lock_request;
   throw_if_data_stream_lock_request_malformed(req);
   {
+    auto val = req.get_data_stream_direction();
+    if(not lock_config(data_stream_ID, (int32_t) val, config_key_direction, false, 0)) {
+      //unlock_config(data_stream_ID, config_key_direction);
+      goto unrollandfail;
+    }
+  }
+  {
     const config_value_t& val = req.get_tuning_freq_MHz();
     const config_value_t& tol = req.get_tolerance_tuning_freq_MHz();
-    if(not lock_config(data_stream_ID, val, config_key_tuning_freq_MHz, tol)) {
+    if(not lock_config(data_stream_ID, val, config_key_tuning_freq_MHz, true, tol)) {
+      unlock_config(data_stream_ID, config_key_direction);
+      //unlock_config(data_stream_ID, config_key_tuning_freq_MHz);
       goto unrollandfail;
     }
   }
   {
     const config_value_t& val = req.get_bandwidth_3dB_MHz();
     const config_value_t& tol = req.get_tolerance_bandwidth_3dB_MHz();
-    if(not lock_config(data_stream_ID, val, config_key_bandwidth_3dB_MHz, tol)) {
+    if(not lock_config(data_stream_ID, val, config_key_bandwidth_3dB_MHz, true, tol)) {
+      unlock_config(data_stream_ID, config_key_direction);
+      unlock_config(data_stream_ID, config_key_tuning_freq_MHz);
+      //unlock_config(data_stream_ID, config_key_bandwidth_3dB_MHz);
       goto unrollandfail;
     }
   }
   return true;
   unrollandfail:
-  //unlock_config(data_stream_ID, config_key_tuning_freq_MHz);
-  //unlock_config(data_stream_ID, config_key_bandwidth_3dB_MHz);
   return false;
 }
 
@@ -656,7 +695,7 @@ ARC<L,C>::throw_if_data_stream_disabled_for_write(
 
 template<class L,class C> void
 ARC<L,C>::throw_invalid_data_stream_id(data_stream_id_t data_stream_id) const {
-  throw std::string("invalid data stream id") + data_stream_id;
+  throw std::string("invalid data stream id ") + data_stream_id;
 }
 
 
@@ -710,6 +749,7 @@ DRC<L,C>::request_config_lock(
       found_lock |= do_min_data_stream_config_locks(*it_found_streams, *it);
       const char* ds = it_found_streams->c_str();
       if(found_lock) {
+        //printf("data stream %s met data stream config lock request requirements\n", ds);
         DataStreamConfigLock data_stream_config_lock;
         data_stream_config_lock.m_data_stream_id      = ds;
         data_stream_config_lock.m_tuning_freq_MHz     = it->get_tuning_freq_MHz();
@@ -733,6 +773,7 @@ DRC<L,C>::request_config_lock(
         config_lock.m_data_streams.push_back(data_stream_config_lock);
         break;
       }
+      //printf("data stream %s did not meet data stream config lock request requirements\n", ds);
     }
     if(not found_lock) {
       configurator_config_lock_request_was_successful = false;
@@ -741,6 +782,7 @@ DRC<L,C>::request_config_lock(
     configurator_config_lock_request_was_successful = true;
   }
   if(configurator_config_lock_request_was_successful) {
+    //printf("request config lock %s succeeded\n", config_lock_ID.c_str());
     this->m_config_locks.push_back(config_lock);
     return true;
   }
@@ -793,6 +835,13 @@ DRC<L,C>::lock_config(data_stream_id_t ds_id, config_value_t val,
     this->m_configurator.lock_config(ds_id, cfg, val, tol) :
     this->m_configurator.lock_config(ds_id, cfg, val);
   if(did_lock) {
+#if 0
+    std::ostringstream oss;
+    oss << "configurator: lock succeeded for config " << cfg;
+    oss << " for requested value of " << val << " with tolerance of +/- ";
+    oss << tol << "\n";
+    printf(oss.str().c_str());
+#endif
     config_value_t cfglval;
     cfglval = this->m_configurator.get_config_locked_value(ds_id, cfg);
     if(cfg == config_key_sampling_rate_Msps) {
@@ -811,7 +860,16 @@ DRC<L,C>::lock_config(data_stream_id_t ds_id, config_value_t val,
       set_gain_dB(ds_id, cfglval);
     }
   }
+#if 0
+  else {
+    std::ostringstream oss;
+    oss << "configurator: lock failed for config " << cfg;
+    oss << " for attempted lock value of " << val;
+    oss << " with tolerance of +/- " << tol << "\n";
+    printf(oss.str().c_str());
+  }
 #endif
+#endif // IS_LOCKING
   return did_lock;
 }
 
@@ -834,14 +892,30 @@ DRC<L,C>::do_min_data_stream_config_locks(
   val = req.get_sampling_rate_Msps();
   tol = req.get_tolerance_sampling_rate_Msps();
   if(not lock_config(data_stream_ID, val, config_key_sampling_rate_Msps, true, tol)) {
+    this->unlock_config(data_stream_ID, config_key_direction);
+    this->unlock_config(data_stream_ID, config_key_tuning_freq_MHz);
+    this->unlock_config(data_stream_ID, config_key_bandwidth_3dB_MHz);
+    //this->unlock_config(data_stream_ID, config_key_sampling_rate_Msps);
     goto unrollandfail;
   }
   val = req.get_samples_are_complex();
   if(not lock_config(data_stream_ID, val, config_key_samples_are_complex, false, 0)) {
+    this->unlock_config(data_stream_ID, config_key_direction);
+    this->unlock_config(data_stream_ID, config_key_tuning_freq_MHz);
+    this->unlock_config(data_stream_ID, config_key_bandwidth_3dB_MHz);
+    this->unlock_config(data_stream_ID, config_key_sampling_rate_Msps);
+    //this->unlock_config(data_stream_ID, config_key_samples_are_complex);
     goto unrollandfail;
   }
   if(req.get_including_gain_mode()) {
+    val = req.get_gain_mode() == "agc" ? 0 : 1;
     if(not lock_config(data_stream_ID, val, config_key_gain_mode, false, 0)) {
+      this->unlock_config(data_stream_ID, config_key_direction);
+      this->unlock_config(data_stream_ID, config_key_tuning_freq_MHz);
+      this->unlock_config(data_stream_ID, config_key_bandwidth_3dB_MHz);
+      this->unlock_config(data_stream_ID, config_key_sampling_rate_Msps);
+      this->unlock_config(data_stream_ID, config_key_samples_are_complex);
+      //this->unlock_config(data_stream_ID, config_key_gain_mode);
       goto unrollandfail;
     }
   }
@@ -849,17 +923,18 @@ DRC<L,C>::do_min_data_stream_config_locks(
     val = req.get_gain_dB();
     tol = req.get_tolerance_gain_dB();
     if(not lock_config(data_stream_ID, val, config_key_gain_dB, true, tol)) {
+      this->unlock_config(data_stream_ID, config_key_direction);
+      this->unlock_config(data_stream_ID, config_key_tuning_freq_MHz);
+      this->unlock_config(data_stream_ID, config_key_bandwidth_3dB_MHz);
+      this->unlock_config(data_stream_ID, config_key_sampling_rate_Msps);
+      this->unlock_config(data_stream_ID, config_key_samples_are_complex);
+      this->unlock_config(data_stream_ID, config_key_gain_mode);
+      //this->unlock_config(data_stream_ID, config_key_gain_dB);
       goto unrollandfail;
     }
   }
   return true;
   unrollandfail:
-  //this->unlock_config(data_stream_ID, config_key_tuning_freq_MHz);
-  //this->unlock_config(data_stream_ID, config_key_bandwidth_3dB_MHz);
-  //this->unlock_config(data_stream_ID, config_key_sampling_rate_Msps);
-  //this->unlock_config(data_stream_ID, config_key_samples_are_complex);
-  //this->unlock_config(data_stream_ID, config_key_gain_mode);
-  //this->unlock_config(data_stream_ID, config_key_gain_dB);
   //std::cout << "[INFO] " << m_solver.get_feasible_region_limits() << "\n";
 #endif
   return false;

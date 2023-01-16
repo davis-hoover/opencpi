@@ -40,7 +40,7 @@ class FMCOMMS2_3CSP : public AD9361CSP {
    *        comprises its Constraint Satisfaction Problem (CSP)
    ****************************************************************************/
   void define_x_d_fmcomms2_3();
-  /* @brief for the AD9361,
+  /* @brief for the FMCOMMS2_3,
    *        define constraints (C) for <X,D,C> which
    *        comprise its Constraint Satisfaction Problem (CSP)
    ****************************************************************************/
@@ -69,7 +69,7 @@ class FMCOMMS2_3Configurator : public Configurator<FMCOMMS2_3CSP> {
   public:
   ///@TODO / FIXME - remove default value of fmcomms_num 3
   FMCOMMS2_3Configurator(int32_t fmcomms_num = 3);
-};
+}; // class FMCOMMS2_3Configurator
 #endif
 
 // -----------------------------------------------------------------------------
@@ -82,9 +82,8 @@ class FMCOMMS2_3Configurator : public Configurator<FMCOMMS2_3CSP> {
 #define FMCOMMS2_3_CONFIGURATOR Configurator<CSPBase>
 #endif
 
-template<class log_t,class s_cfg_t,class s_ds_t,
-    class cfgrtr_t = FMCOMMS2_3_CONFIGURATOR>
-class FMCOMMS2_3DRC : public AD9361DRC<log_t,s_cfg_t,s_ds_t,cfgrtr_t> {
+template<class log_t,class cfgrtr_t = FMCOMMS2_3_CONFIGURATOR>
+class FMCOMMS2_3DRC : public AD9361DRC<log_t,cfgrtr_t> {
   protected:
   /// @brief name of the data stream that corresponds to FMCOMMS2/3 RX1A channel
   const char* m_ds_rx1a;
@@ -92,15 +91,15 @@ class FMCOMMS2_3DRC : public AD9361DRC<log_t,s_cfg_t,s_ds_t,cfgrtr_t> {
   const char* m_ds_tx1a;
   const char* m_ds_tx2a;
   public:
-  FMCOMMS2_3DRC<log_t,s_cfg_t,s_ds_t,cfgrtr_t>(s_cfg_t& slave_cfg,
-      s_ds_t& slave_data_sub,double fref_hz,int32_t fmcomms_num,
-      const char* rx1a = "rx1a",const char* rx2a = "rx2a",
-      const char* tx1a = "tx1a",const char* tx2a = "tx2a",
+  FMCOMMS2_3DRC<log_t, cfgrtr_t>(unsigned which,
+      AD9361DeviceCallBack &dev, double fref_hz, int32_t fmcomms_num,
+      const char* rx1a, const char* rx2a,
+      const char* tx1a, const char* tx2a,
       const char* descriptor = "FMCOMMS2_3");
   /* @brief this is what maps, for the DRC, the AD9361 channels to
-   *        the FMCOMMS2/3 channels
+   *         the FMCOMMS2/3 channels
    ****************************************************************************/
-  const char*             get_ad9361_ds_id(          data_stream_id_t id) const;
+  data_stream_id_t        get_ad9361_ds_id(          data_stream_id_t id) const;
   bool                    get_data_stream_is_enabled(data_stream_id_t id);
   data_stream_direction_t get_data_stream_direction( data_stream_id_t id);
   config_value_t          get_tuning_freq_MHz(       data_stream_id_t id);

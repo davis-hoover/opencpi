@@ -24,9 +24,19 @@
 #include <cinttypes> // PRI...
 #include <cmath> // std::round
 
+extern "C" {
+#include "ad9361_platform.h"
+}
+
 namespace DRC {
 
+static std::vector<AD9361DeviceCallBack*> g_devices;
+
 #ifdef IS_LOCKING
+/* @brief for the AD9361,
+ *        define variables (X) and their domains (D) for <X,D,C> which
+ *        comprises its Constraint Satisfaction Problem (CSP)
+ ******************************************************************************/
 void
 AD9361CSP::define_x_d_ad9361() {
   m_solver.add_var<double>("ad9361_rx_rfpll_lo_freq_meghz", dfp_tol);
@@ -66,20 +76,25 @@ AD9361CSP::define_x_d_ad9361() {
   m_solver.add_var<double>("ad9361_gain_db_tx2", dfp_tol);
 }
 
+/* @brief for the AD9361,
+ *        define constraints (C) for <X,D,C> which
+ *        comprise its Constraint Satisfaction Problem (CSP)
+ ******************************************************************************/
 void
 AD9361CSP::define_c_ad9361() {
   m_solver.add_constr("ad9361_rx_rfpll_lo_freq_meghz", ">=", 70.);
   m_solver.add_constr("ad9361_rx_rfpll_lo_freq_meghz", "<=", 6000.);
   m_solver.add_constr("ad9361_tx_rfpll_lo_freq_meghz", ">=", 70.);
   m_solver.add_constr("ad9361_tx_rfpll_lo_freq_meghz", "<=", 6000.);
-  m_solver.add_constr("ad9361_rx_rf_bandwidth_meghz", ">=", 0.4);
-  m_solver.add_constr("ad9361_rx_rf_bandwidth_meghz", "<=", 56.);
-  m_solver.add_constr("ad9361_tx_rf_bandwidth_meghz", ">=", 1.25);
-  m_solver.add_constr("ad9361_tx_rf_bandwidth_meghz", "<=", 40.);
-  m_solver.add_constr("ad9361_rx_sampl_freq_meghz", ">=", 2.083334);
-  m_solver.add_constr("ad9361_rx_sampl_freq_meghz", "<=", 61.44);
-  m_solver.add_constr("ad9361_tx_sampl_freq_meghz", ">=", 2.083334);
-  m_solver.add_constr("ad9361_tx_sampl_freq_meghz", "<=", 61.44);
+  /// @TODO replace divider with proper DDC/DUC classes
+  m_solver.add_constr("ad9361_rx_rf_bandwidth_meghz", ">=", 0.4/m_divider);
+  m_solver.add_constr("ad9361_rx_rf_bandwidth_meghz", "<=", 56./m_divider);
+  m_solver.add_constr("ad9361_tx_rf_bandwidth_meghz", ">=", 1.25/m_divider);
+  m_solver.add_constr("ad9361_tx_rf_bandwidth_meghz", "<=", 40./m_divider);
+  m_solver.add_constr("ad9361_rx_sampl_freq_meghz", ">=", 2.083334/m_divider);
+  m_solver.add_constr("ad9361_rx_sampl_freq_meghz", "<=", 61.44/m_divider);
+  m_solver.add_constr("ad9361_tx_sampl_freq_meghz", ">=", 2.083334/m_divider);
+  m_solver.add_constr("ad9361_tx_sampl_freq_meghz", "<=", 61.44/m_divider);
   //m_solver.add_constr("ad9361_dac_clk_divider", ">=", (int32_t)1);
   //m_solver.add_constr("ad9361_dac_clk_divider", "<=", (int32_t)2);
   m_solver.add_constr("ad9361_dir_rx1", "=", (int32_t)data_stream_direction_t::rx);
@@ -119,17 +134,32 @@ AD9361CSP::define_c_ad9361() {
   m_solver.add_constr("ad9361_gain_db_tx2", "<=", 0.);
 }
 
-AD9361CSP::AD9361CSP() : CSPBase() {
+///@TODO / FIXME handle DDC constants in separate DDC/DUC class
+DDCDUCConstants::DDCDUCConstants() :
+#ifdef NO_DDC_DUC
+    m_divider(1)
+#else
+    m_divider(16)
+#endif
+    {
+}
+
+///@TODO / FIXME handle constants in separate DDC/DUC class
+AD9361CSP::AD9361CSP() : CSPBase(), DDCDUCConstants() {
   define();
   //std::cout << "[INFO] " << get_feasible_region_limits() << "\n";
 }
 
+/* @brief instance AD9361
+ *        by defining its Constraint Satisfaction Problem (CSP) as <X,D,C>
+ ******************************************************************************/
 void
 AD9361CSP::instance_ad9361() {
   define_x_d_ad9361();
   define_c_ad9361();
 }
 
+/// @brief define Constraint Satisfaction Problem (CSP)
 void
 AD9361CSP::define() {
   instance_ad9361();
@@ -213,23 +243,23 @@ AD9361Configurator::AD9361Configurator() : Configurator<AD9361CSP>() {
 }
 #endif // IS_LOCKING
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t>
+template<class log_t,class cfgrtr_t>
 template<typename T> T
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::convert_milli_db_to_db(
+AD9361DRC<log_t,cfgrtr_t>::convert_milli_db_to_db(
     T val_milli_db) const {
   return val_milli_db/1000;
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t>
+template<class log_t,class cfgrtr_t>
 template<typename T> T
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::convert_db_to_milli_db(
+AD9361DRC<log_t,cfgrtr_t>::convert_db_to_milli_db(
     T val_milli_db) const {
   return val_milli_db*1000;
 }
 
 #ifndef DISABLE_AD9361
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> void
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::init_init_param() {
+template<class log_t,class cfgrtr_t> void
+AD9361DRC<log_t,cfgrtr_t>::init_init_param() {
   AD9361_InitParam init_param = {
     /* Device selection */
     ID_AD9361,	// dev_sel
@@ -475,10 +505,43 @@ AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::init_init_param() {
     NULL	//(*ad9361_rfpll_ext_set_rate)()
   };
   m_init_param = init_param;
+  m_init_param .id_no = m_device;
+  // assign m_AD9361_InitParam.gpio_resetb to the arbitrarily defined GPIO_RESET_PIN so
+  // that the No-OS opencpi platform driver knows to drive the force_reset
+  // property of the sub-device
+  m_init_param.gpio_resetb = (m_device << 8) | GPIO_RESET_PIN;
+  g_devices.resize(m_device+1);
+  g_devices[m_device] = &m_callback;
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> void
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::init() {
+// C interface for NoOs Library callbacks to touch the actual device (config slave)
+static void get_byte(uint8_t id_no, uint16_t addr, uint8_t *buf) {
+  g_devices[id_no]->get_byte(id_no, addr, buf);
+}
+
+static void set_byte(uint8_t id_no, uint16_t addr, const uint8_t *buf) {
+  g_devices[id_no]->set_byte(id_no, addr, buf);
+}
+
+static void set_reset(uint8_t id_no, bool on) {
+  g_devices[id_no]->set_reset(id_no, on);
+}
+
+template<class log_t,class cfgrtr_t> bool
+AD9361DRC<log_t,cfgrtr_t>::request_config_lock(
+    const config_lock_id_t id, const ConfigLockRequest& request) {
+  static bool first = true;
+  if(first) {
+    //log(8, "start_config init start");
+    init();
+    //log(8, "start_config init done");
+    first = false;
+  }
+  return DRC<log_t,cfgrtr_t>::request_config_lock(id,request);
+}
+
+template<class log_t,class cfgrtr_t> void
+AD9361DRC<log_t,cfgrtr_t>::init() {
   // only initialize if there are no existing locks which conflict
   if(any_configurator_configs_locked_which_prevent_ad9361_init()) {
     throw std::string("reinit required but configs locked which prevent");
@@ -488,25 +551,39 @@ AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::init() {
     // ...WorkerTypes::...WorkerBase::Slave to
     // OCPI::RCC_RCCUserSlave since the former inherits privately from the
     // latter inside the RCC worker's generated header
-    spi_init(static_cast<OCPI::RCC::RCCUserSlave*>(static_cast<void *>(&m_cfg_slave)));
+    //spi_init(static_cast<OCPI::RCC::RCCUserSlave*>(static_cast<void *>(&m_cfg_slave)));
+    ad9361_opencpi.get_byte = get_byte;
+    ad9361_opencpi.set_byte = set_byte;
+    ad9361_opencpi.set_reset = set_reset;
+    ad9361_opencpi.worker = this->m_descriptor;
   }
-  // initialize No-OS using the No-OS platform_opencpi layer and
-  // ad9361_config.hdl
-  apply_config_to_init_param();
+  /*
+    three phases of callback:
+    1. Before init
+    2. After init success or failure
+    3. After init success
+  */
+
+  // This is our config structure which is then translated into the no-OS library's own init structure
+  Ad9361InitConfig cfg;
+  // Call back to the proxy to fill in or modify this structure further, before acting on it.
+  m_callback.initialConfig(m_device, cfg);
+  // Translate from our config structure to the no-OS library's config structure
+  apply_config_to_init_param(cfg);
   // assign m_AD9361_InitParam.gpio_resetb to the arbitrarily defined GPIO_RESET_PIN so
   // that the No-OS opencpi platform driver knows to drive the force_reset
   // property of the sub-device
-  m_init_param.gpio_resetb = GPIO_RESET_PIN;
-  m_init_param.reference_clk_rate = (uint32_t) std::round(m_fref_hz);
+  //m_init_param.gpio_resetb = GPIO_RESET_PIN;
+  //m_init_param.reference_clk_rate = (uint32_t) std::round(m_fref_hz);
   // here is where we enforce the ad9361_config OWD comment
   // "[the force_two_r_two_t_timing] property is expected to correspond to the
   // D2 bit of the Parallel Port Configuration 1 register at SPI address 0x010
-  m_cfg_slave.set_force_two_r_two_t_timing(m_init_param.two_t_two_r_timing_enable);
+  //m_cfg_slave.set_force_two_r_two_t_timing(m_init_param.two_t_two_r_timing_enable);
   // ADI forum post recommended setting ENABLE/TXNRX pins high *prior to
   // ad9361_init() call* when
   // frequency_division_duplex_independent_mode_enable is set to 1
-  m_cfg_slave.set_ENABLE_force_set(true);
-  m_cfg_slave.set_TXNRX_force_set(true);
+  //m_cfg_slave.set_ENABLE_force_set(true);
+  //m_cfg_slave.set_TXNRX_force_set(true);
   // sleep duration chosen to be relatively small in relation to AD9361
   // initialization duration (which, through observation, appears to be
   // roughly 200 ms), but a long enough pulse that AD9361 is likely
@@ -515,16 +592,11 @@ AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::init() {
   // the below method call allocates memory for ad9361, the address of which is
   // pointed to by m_ad9361_rf_phy once the method returns
   this->log_info("noos ad9361_init");
-  this->log_info("noos 1");
-  struct ad9361_rf_phy** ad9361_phy = &m_ad9361_rf_phy;
-  this->log_info("noos 2");
-  AD9361_InitParam* init_param = &m_init_param;
-  this->log_info("noos 3");
-  m_ad9361_init_ret = ad9361_init(ad9361_phy, init_param);
+  m_ad9361_init_ret = ad9361_init(&m_ad9361_rf_phy,&m_init_param);
+  ad9361_set_tx_fir_en_dis(m_ad9361_rf_phy, 0); // disable tx_fir with the ad9361_api library in all cases
+  m_callback.postConfig(m_device);
   this->log_info("noos exit ad9361_init");
   m_ad9361_init_called = true;
-  m_cfg_slave.set_ENABLE_force_set(false);
-  m_cfg_slave.set_TXNRX_force_set(false);
   if(m_ad9361_init_ret == -ENODEV) {
     throw std::string("AD9361 init failed: SPI could not be established");
   }
@@ -535,15 +607,16 @@ AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::init() {
     throw std::string("AD9361 init failed");
   }
   this->log_info("enforce_ensm_configinit()");
-  enforce_ensm_config();
   //because channel config potentially changed
   this->log_info("set_ad9361_fpga_channel_config()");
-  set_ad9361_fpga_channel_config();
+  //set_ad9361_fpga_channel_config();
+  // Successful Initialization, tell workers about what happened.
+  m_callback.finalConfig(m_device, cfg);
   this->log_info("exiting init()");
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> bool
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::any_configurator_configs_locked_which_prevent_ad9361_init() const {
+template<class log_t,class cfgrtr_t> bool
+AD9361DRC<log_t,cfgrtr_t>::any_configurator_configs_locked_which_prevent_ad9361_init() const {
   std::vector<const char*> data_streams;
   data_streams.push_back((m_ds_rx1));
   data_streams.push_back((m_ds_rx2));
@@ -572,8 +645,8 @@ AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::any_configurator_configs_locked_which_prev
   return false;
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> void
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::throw_if_ad9361_init_failed(
+template<class log_t,class cfgrtr_t> void
+AD9361DRC<log_t,cfgrtr_t>::throw_if_ad9361_init_failed(
     const char* operation) const {
   if(m_ad9361_init_ret != 0) {
     std::ostringstream oss;
@@ -584,23 +657,23 @@ AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::throw_if_ad9361_init_failed(
   }
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> void
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::apply_config_to_init_param() {
+template<class log_t,class cfgrtr_t> void
+AD9361DRC<log_t,cfgrtr_t>::apply_config_to_init_param(const Ad9361InitConfig &config) {
+  m_init_param.xo_disable_use_ext_refclk_enable = config.xo_disable_use_ext_ref_clk;
+  m_fref_hz = config.ext_ref_clk_freq;
+  m_init_param.reference_clk_rate = (uint32_t) round(m_fref_hz);
   bool is_2r1t_or_1r2t_or_2r2t =
-      m_cfg_slave.get_qadc1_is_present() or
-      m_cfg_slave.get_qdac1_is_present();
+      config.qadc1_is_present or config.qdac1_is_present;
   ///@TODO investigate Platform_ad9361_configWorkerTypes::DATA_RATE_CONFIG_SDR;
-  bool mode_is_sdr = m_cfg_slave.get_data_rate_config() == 
-      true;//Platform_ad9361_configWorkerTypes::DATA_RATE_CONFIG_SDR;
   m_init_param.rx_frame_pulse_mode_enable =
-      (int)m_cfg_slave.get_rx_frame_usage() ? 1 : 0;
+      config.rx_frame_toggle ? 1 : 0;
   m_init_param.invert_data_bus_enable =
-      (int)m_cfg_slave.get_data_bus_index_direction() ? 1 : 0;
+      config.data_bus_index_reverse ? 1 : 0;
   m_init_param.invert_data_clk_enable =
-      m_cfg_slave.get_data_clk_is_inverted() ? 1 : 0;
+      config.data_clk_is_inverted ? 1 : 0;
   m_init_param.invert_rx_frame_enable =
-      m_cfg_slave.get_rx_frame_is_inverted() ? 1 : 0;
-  if(m_cfg_slave.get_LVDS())
+      config.rx_frame_is_inverted ? 1 : 0;
+  if(config.LVDS)
   {
     m_init_param.lvds_rx_onchip_termination_enable = 1;
     m_init_param.lvds_mode_enable                  = 1;
@@ -623,54 +696,27 @@ AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::apply_config_to_init_param() {
     m_init_param.lvds_rx_onchip_termination_enable = 0;
     m_init_param.lvds_mode_enable                  = 0;
     m_init_param.swap_ports_enable         =
-        m_cfg_slave.get_swap_ports() ? 1 : 0;
-    bool single_port = m_cfg_slave.get_single_port();
+        config.swap_ports ? 1 : 0;
     m_init_param.single_port_mode_enable   =
-        m_cfg_slave.get_single_port() ? 1 : 0;
+        config.single_port ? 1 : 0;
     m_init_param.fdd_alt_word_order_enable = 0; ///@TODO/FIXME read this value from FPGA?
-    bool half_duplex = m_cfg_slave.get_half_duplex();
-    m_init_param.full_port_enable          = (!half_duplex) and (!m_cfg_slave.get_single_port());
-    m_init_param.half_duplex_mode_enable   = half_duplex ? 1 : 0;
+    m_init_param.full_port_enable          = (!config.half_duplex) and (!config.single_port);
+    m_init_param.half_duplex_mode_enable   = config.half_duplex ? 1 : 0;
     m_init_param.single_data_rate_enable   =
-        m_cfg_slave.get_data_rate_config() == mode_is_sdr ? 1 : 0;
+        config.data_rate_ddr ? 0 : 1;
     m_init_param.full_duplex_swap_bits_enable = 0; ///@TODO / FIXME read this value from FPGA?
   }
   m_init_param.two_rx_two_tx_mode_enable = is_2r1t_or_1r2t_or_2r2t ? 1 : 0;
-  m_init_param.rx_data_clock_delay = m_data_sub_slave.get_DATA_CLK_Delay();
-  m_init_param.rx_data_delay       = m_data_sub_slave.get_RX_Data_Delay();
-  m_init_param.tx_fb_clock_delay   = m_data_sub_slave.get_FB_CLK_Delay();
-  m_init_param.tx_data_delay       = m_data_sub_slave.get_TX_Data_Delay();
+  m_init_param.rx_data_clock_delay = config.DATA_CLK_Delay;
+  m_init_param.rx_data_delay       = config.RX_Data_Delay;
+  m_init_param.tx_fb_clock_delay   = config.FB_CLK_Delay;
+  m_init_param.tx_data_delay       = config.TX_Data_Delay;
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> void
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::enforce_ensm_config() {
-  m_cfg_slave.set_Half_Duplex_Mode(not m_ad9361_rf_phy->pdata->fdd);
-  uint8_t ensm_config_1 = m_cfg_slave.get_ensm_config_1();
-  m_cfg_slave.set_ENSM_Pin_Control((ensm_config_1 & 0x10) == 0x10);
-  m_cfg_slave.set_Level_Mode((ensm_config_1 & 0x08) == 0x08);
-  uint8_t ensm_config_2 = m_cfg_slave.get_ensm_config_2();
-  m_cfg_slave.set_FDD_External_Control_Enable((ensm_config_2 & 0x80) == 0x80);
-}
-
-/* @brief The AD9361 register set determines which channel mode is used (1R1T,
- * 1R2T, 2R1T, or 1R2T). This mode eventually determines which timing diagram
- * the AD9361 is expecting for the TX data path pins. This function
- * tells the FPGA bitstream which channel mode should be assumed when
- * generating the TX data path signals.
- ******************************************************************************/
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> void
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_ad9361_fpga_channel_config() {
-  uint8_t tx_ctrl = m_cfg_slave.get_general_tx_enable_filter_ctrl();
-  bool two_t = TX_CHANNEL_ENABLE(TX_1 | TX_2) == (tx_ctrl & 0xc0);
-  uint8_t rx_ctrl = m_cfg_slave.get_general_rx_enable_filter_ctrl();
-  bool two_r = RX_CHANNEL_ENABLE(RX_1 | RX_2) == (rx_ctrl & 0xc0);
-  m_cfg_slave.set_config_is_two_r(two_r);
-  m_cfg_slave.set_config_is_two_t(two_t);
-}
 #endif // DISABLE_AD9361
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> void
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::init_if_required() {
+template<class log_t,class cfgrtr_t> void
+AD9361DRC<log_t,cfgrtr_t>::init_if_required() {
 #ifndef DISABLE_AD9361
   if(not m_ad9361_init_called) {
     init();
@@ -678,20 +724,21 @@ AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::init_if_required() {
 #endif
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t>
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::AD9361DRC(cfg_t& slave_cfg,
-    ds_t& slave_data_sub, double fref_hz,
+template<class log_t,class cfgrtr_t>
+AD9361DRC<log_t,cfgrtr_t>::AD9361DRC(unsigned which,
+		AD9361DeviceCallBack &dev, double fref_hz,
     const char* rx1, const char* rx2, const char* tx1, const char* tx2,
-    const char* descriptor) : DRC<log_t,cfgrtr_t>(descriptor),
+    const char* descriptor) :
+    DRC<log_t,cfgrtr_t>(descriptor), DDCDUCConstants(),
 #ifndef DISABLE_AD9361
+    m_callback(dev),
+    m_device(which),
     m_fref_hz(fref_hz),
     m_ad9361_rf_phy(_ad9361_phy),
     m_ad9361_init_ret(-1),
     m_ad9361_init_called(false),
 #endif
-    m_ds_rx1(rx1), m_ds_rx2(rx2), m_ds_tx1(tx1), m_ds_tx2(tx2),
-    m_cfg_slave(slave_cfg),
-    m_data_sub_slave(slave_data_sub) {
+    m_ds_rx1(rx1), m_ds_rx2(rx2), m_ds_tx1(tx1), m_ds_tx2(tx2) {
   //std::ostringstream oss;
   //oss << "constructor ";
   //oss << this->m_configurator.get_feasible_region_limits() << "\n";
@@ -702,8 +749,8 @@ AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::AD9361DRC(cfg_t& slave_cfg,
 #endif
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> bool
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_rx_and_throw_if_invalid_ds(
+template<class log_t,class cfgrtr_t> bool
+AD9361DRC<log_t,cfgrtr_t>::get_rx_and_throw_if_invalid_ds(
     data_stream_id_t data_stream_id) const {
   bool do_rx = false;
   if(data_stream_id == m_ds_rx1) {
@@ -724,8 +771,8 @@ AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_rx_and_throw_if_invalid_ds(
   return do_rx;
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> void
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_rx_rf_port_input(uint32_t mode) {
+template<class log_t,class cfgrtr_t> void
+AD9361DRC<log_t,cfgrtr_t>::set_rx_rf_port_input(uint32_t mode) {
   init_if_required();
   this->log_info("noos ad9361_set_rx_rf_port_input %" PRIu32, mode);
 #ifndef DISABLE_AD9361
@@ -735,8 +782,8 @@ AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_rx_rf_port_input(uint32_t mode) {
 #endif
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> void
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_tx_rf_port_output(uint32_t mode) {
+template<class log_t,class cfgrtr_t> void
+AD9361DRC<log_t,cfgrtr_t>::set_tx_rf_port_output(uint32_t mode) {
   init_if_required();
   this->log_info("noos ad9361_set_tx_rf_port_output %" PRIu32, mode);
 #ifndef DISABLE_AD9361
@@ -745,8 +792,8 @@ AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_tx_rf_port_output(uint32_t mode) {
 #endif
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> void
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::throw_if_no_os_api_call_returns_non_zero(
+template<class log_t,class cfgrtr_t> void
+AD9361DRC<log_t,cfgrtr_t>::throw_if_no_os_api_call_returns_non_zero(
     int32_t res) {
   init_if_required();
   if(res != 0) {
@@ -755,8 +802,8 @@ AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::throw_if_no_os_api_call_returns_non_zero(
 }
 
 /// @todo / FIXME - check for existence of qadc/qdac?
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> bool
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_data_stream_is_enabled(
+template<class log_t,class cfgrtr_t> bool
+AD9361DRC<log_t,cfgrtr_t>::get_data_stream_is_enabled(
     data_stream_id_t data_stream_id) {
   bool ret = true;
   get_rx_and_throw_if_invalid_ds(data_stream_id);
@@ -802,16 +849,16 @@ AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_data_stream_is_enabled(
   return ret;
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t>
+template<class log_t,class cfgrtr_t>
 data_stream_direction_t 
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_data_stream_direction(
+AD9361DRC<log_t,cfgrtr_t>::get_data_stream_direction(
     data_stream_id_t id) {
   bool do_rx = get_rx_and_throw_if_invalid_ds(id);
   return do_rx ? data_stream_direction_t::rx : data_stream_direction_t::tx;
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> config_value_t 
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_tuning_freq_MHz(
+template<class log_t,class cfgrtr_t> config_value_t 
+AD9361DRC<log_t,cfgrtr_t>::get_tuning_freq_MHz(
     data_stream_id_t data_stream_id) {
   init_if_required();
   uint64_t val = 0;
@@ -829,8 +876,8 @@ AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_tuning_freq_MHz(
   return (config_value_t)val;
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> config_value_t 
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_bandwidth_3dB_MHz(
+template<class log_t,class cfgrtr_t> config_value_t 
+AD9361DRC<log_t,cfgrtr_t>::get_bandwidth_3dB_MHz(
     data_stream_id_t data_stream_id) {
   init_if_required();
   uint32_t val = 0;
@@ -848,8 +895,8 @@ AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_bandwidth_3dB_MHz(
   return (config_value_t)val;
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> config_value_t 
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_sampling_rate_Msps(
+template<class log_t,class cfgrtr_t> config_value_t 
+AD9361DRC<log_t,cfgrtr_t>::get_sampling_rate_Msps(
     data_stream_id_t data_stream_id) {
   init_if_required();
   uint32_t val = 0;
@@ -867,15 +914,15 @@ AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_sampling_rate_Msps(
   return (config_value_t)val;
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> bool
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_samples_are_complex(
+template<class log_t,class cfgrtr_t> bool
+AD9361DRC<log_t,cfgrtr_t>::get_samples_are_complex(
     data_stream_id_t data_stream_id) {
   get_rx_and_throw_if_invalid_ds(data_stream_id);
   return true;
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> gain_mode_value_t 
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_gain_mode(
+template<class log_t,class cfgrtr_t> gain_mode_value_t 
+AD9361DRC<log_t,cfgrtr_t>::get_gain_mode(
     data_stream_id_t data_stream_id) {
   init_if_required();
   gain_mode_value_t ret = "manual";//gain_mode_value_t::manual;
@@ -930,8 +977,8 @@ AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_gain_mode(
   return ret;
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> config_value_t 
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_gain_dB(
+template<class log_t,class cfgrtr_t> config_value_t 
+AD9361DRC<log_t,cfgrtr_t>::get_gain_dB(
     data_stream_id_t data_stream_id) {
   init_if_required();
   int32_t val_rx = 0;
@@ -965,65 +1012,73 @@ AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::get_gain_dB(
   }
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> void
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_data_stream_direction(
+template<class log_t,class cfgrtr_t> void
+AD9361DRC<log_t,cfgrtr_t>::set_data_stream_direction(
     data_stream_id_t data_stream_id,data_stream_direction_t val) {
   get_rx_and_throw_if_invalid_ds(data_stream_id);
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> void
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_tuning_freq_MHz(
+template<class log_t,class cfgrtr_t> void
+AD9361DRC<log_t,cfgrtr_t>::set_tuning_freq_MHz(
     data_stream_id_t data_stream_id,config_value_t val) {
   init_if_required();
+  uint64_t lo_freq_hz = std::round(val*1000000.);
   bool do_rx = get_rx_and_throw_if_invalid_ds(data_stream_id);
   do_rx ?
-      this->log_info("noos ad9361_set_rx_lo_freq %" PRIu64, (uint64_t)std::round(val*1000000.)) :
-      this->log_info("noos ad9361_set_tx_lo_freq %" PRIu64, (uint64_t)std::round(val*1000000.));
+      this->log_info("noos ad9361_set_rx_lo_freq %" PRIu64, lo_freq_hz) :
+      this->log_info("noos ad9361_set_tx_lo_freq %" PRIu64, lo_freq_hz);
 #ifndef DISABLE_AD9361
   this->throw_if_ad9361_init_failed("No-OS set tuning freq");
+  do_rx ?
+      ad9361_set_rx_rf_port_input(m_ad9361_rf_phy,m_callback.getRfInput(m_device,val)) :
+      ad9361_set_tx_rf_port_output(m_ad9361_rf_phy,m_callback.getRfOutput(m_device,val));
   int32_t res = do_rx ?
-      ad9361_set_rx_lo_freq(m_ad9361_rf_phy, (uint64_t)std::round(val*1000000.)) :
-      ad9361_set_tx_lo_freq(m_ad9361_rf_phy, (uint64_t)std::round(val*1000000.));
+      ad9361_set_rx_lo_freq(m_ad9361_rf_phy, lo_freq_hz) :
+      ad9361_set_tx_lo_freq(m_ad9361_rf_phy, lo_freq_hz);
   throw_if_no_os_api_call_returns_non_zero(res);
 #endif
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> void
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_bandwidth_3dB_MHz(
+template<class log_t,class cfgrtr_t> void
+AD9361DRC<log_t,cfgrtr_t>::set_bandwidth_3dB_MHz(
     data_stream_id_t data_stream_id,config_value_t val) {
   init_if_required();
+  ///@TODO / FIXME handle DDC/DUC divider in separate DDC/DUC class
+  uint32_t bw = (uint32_t)std::round(val*1000000.*m_divider);
   bool do_rx = get_rx_and_throw_if_invalid_ds(data_stream_id);
   do_rx ?
-      this->log_info("noos ad9361_set_rx_rf_bandwidth %" PRIu32, (uint32_t)std::round(val*1000000.)) :
-      this->log_info("noos ad9361_set_tx_rf_bandwidth %" PRIu32, (uint32_t)std::round(val*1000000.));
+      this->log_info("noos ad9361_set_rx_rf_bandwidth %" PRIu32, bw) :
+      this->log_info("noos ad9361_set_tx_rf_bandwidth %" PRIu32, bw);
 #ifndef DISABLE_AD9361
   this->throw_if_ad9361_init_failed("No-OS set bandwidth");
   int32_t res = do_rx ?
-      ad9361_set_rx_rf_bandwidth(m_ad9361_rf_phy, (uint32_t)std::round(val*1000000.)) :
-      ad9361_set_tx_rf_bandwidth(m_ad9361_rf_phy, (uint32_t)std::round(val*1000000.));
+      ad9361_set_rx_rf_bandwidth(m_ad9361_rf_phy, bw) :
+      ad9361_set_tx_rf_bandwidth(m_ad9361_rf_phy, bw);
   throw_if_no_os_api_call_returns_non_zero(res);
 #endif
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> void
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_sampling_rate_Msps(
+template<class log_t,class cfgrtr_t> void
+AD9361DRC<log_t,cfgrtr_t>::set_sampling_rate_Msps(
       data_stream_id_t data_stream_id,config_value_t val) {
   init_if_required();
+  ///@TODO / FIXME handle DDC/DUC divider in separate DDC/DUC class
+  uint32_t fs = (uint32_t)std::round(val*1000000.*m_divider);
   bool do_rx = get_rx_and_throw_if_invalid_ds(data_stream_id);
   do_rx ?
-      this->log_info("noos ad9361_set_rx_sampling_freq %" PRIu32, (uint32_t)std::round(val*1000000.)) :
-      this->log_info("noos ad9361_set_tx_sampling_freq %" PRIu32, (uint32_t)std::round(val*1000000.));
+      this->log_info("noos ad9361_set_rx_sampling_freq %" PRIu32, fs) :
+      this->log_info("noos ad9361_set_tx_sampling_freq %" PRIu32, fs);
 #ifndef DISABLE_AD9361
   this->throw_if_ad9361_init_failed("No-OS set sampling freq");
   int32_t res = do_rx ?
-      ad9361_set_rx_sampling_freq(m_ad9361_rf_phy, (uint32_t)std::round(val*1000000.)) :
-      ad9361_set_tx_sampling_freq(m_ad9361_rf_phy, (uint32_t)std::round(val*1000000.));
+      ad9361_set_rx_sampling_freq(m_ad9361_rf_phy, fs) :
+      ad9361_set_tx_sampling_freq(m_ad9361_rf_phy, fs);
   throw_if_no_os_api_call_returns_non_zero(res);
 #endif
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> void
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_samples_are_complex(
+template<class log_t,class cfgrtr_t> void
+AD9361DRC<log_t,cfgrtr_t>::set_samples_are_complex(
     data_stream_id_t data_stream_id, bool val) {
   // nothing to do on hardware, just validate settings
   if(val == false) {
@@ -1032,8 +1087,8 @@ AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_samples_are_complex(
   get_rx_and_throw_if_invalid_ds(data_stream_id);
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> void
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_gain_mode(
+template<class log_t,class cfgrtr_t> void
+AD9361DRC<log_t,cfgrtr_t>::set_gain_mode(
     data_stream_id_t data_stream_id, gain_mode_value_t val) {
   init_if_required();
   bool do_rx = get_rx_and_throw_if_invalid_ds(data_stream_id);
@@ -1066,8 +1121,8 @@ AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_gain_mode(
 #endif
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> void
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_gain_dB(
+template<class log_t,class cfgrtr_t> void
+AD9361DRC<log_t,cfgrtr_t>::set_gain_dB(
     data_stream_id_t data_stream_id, config_value_t val) {
   init_if_required();
   bool do_rx = get_rx_and_throw_if_invalid_ds(data_stream_id);
@@ -1088,8 +1143,8 @@ AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::set_gain_dB(
 #endif
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t> bool
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::shutdown() {
+template<class log_t,class cfgrtr_t> bool
+AD9361DRC<log_t,cfgrtr_t>::shutdown() {
   bool ret = false;
 #ifndef DISABLE_AD9361
   ret = ad9361_set_en_state_machine_mode(m_ad9361_rf_phy, ENSM_MODE_ALERT);
@@ -1097,8 +1152,8 @@ AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::shutdown() {
   return ret;
 }
 
-template<class log_t,class cfg_t,class ds_t,class cfgrtr_t>
-AD9361DRC<log_t,cfg_t,ds_t,cfgrtr_t>::~AD9361DRC() {
+template<class log_t,class cfgrtr_t>
+AD9361DRC<log_t,cfgrtr_t>::~AD9361DRC() {
 #ifndef DISABLE_AD9361
   // only free internally managed No-OS memory
   ad9361_free(m_ad9361_rf_phy); // this function added in ad9361.patch

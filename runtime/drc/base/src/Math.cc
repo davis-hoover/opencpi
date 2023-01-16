@@ -35,6 +35,57 @@
 
 namespace Math {
 
+std::ostream&
+operator<<(std::ostream& os, const CSPSolver::Constr& rhs) {
+  os << rhs.m_lhs << rhs.m_type;
+  if(rhs.m_rhs_is_int32_const) {
+    os << rhs.m_rhs_int32_const;
+  }
+  else if(rhs.m_rhs_is_double_const) {
+    os << rhs.m_rhs_double_const;
+  }
+  else if(rhs.m_rhs_is_var) {
+    os << rhs.m_rhs;
+  }
+  return os;
+}
+
+std::ostream&
+operator<<(std::ostream& os, const CSPSolver& rhs) {
+  os << "<X,D,C>:=<";
+  os << "X/D:";
+  {
+    bool first_var = true;
+    auto it = rhs.get_feasible_region_limits().m_vars.begin();
+    for(; it != rhs.get_feasible_region_limits().m_vars.end(); ++it) {
+      if(not first_var) {
+        os << ",";
+      }
+      first_var = false;
+      if(it->second.m_type_is_int32) {
+        os << it->first << "/int32";
+      }
+      if(it->second.m_type_is_double) {
+        os << it->first << "/double";
+      }
+    }
+  }
+  os << ",C:";
+  {
+    bool first_var = true;
+    auto it = rhs.get_constr().begin();
+    for(; it != rhs.get_constr().end(); ++it) {
+      if(not first_var) {
+        os << ",";
+      }
+      first_var = false;
+      os << *it;
+    }
+  }
+  os << ">";
+  return os;
+}
+
 SetBase::SetBase() : m_is_empty(true) {
 }
 
@@ -101,7 +152,6 @@ Interval<T>::Interval(T min, T max, T fp_comparison_tol) :
   oss << "specified comparison tolerance";
   throw std::invalid_argument(oss.str());
 }
-
 /*! @brief <B>Exception safety: If min <= max, No-throw guarantee.
  *                              If min > max, Strong guarantee.</B>
  ******************************************************************************/
@@ -896,11 +946,24 @@ void
 CSPSolver::remove_constr(const Constr& constr) {
   for(auto it=m_constr.begin(); it!=m_constr.end(); ++it) {
     if(*it == constr) {
+      /*std::cout << "removing constraint ";
+      std::cout << constr.m_lhs << constr.m_type;
+      if(constr.m_rhs_is_int32_const) {
+        std::cout << constr.m_rhs_int32_const;
+      }
+      else if(constr.m_rhs_is_double_const) {
+        std::cout << constr.m_rhs_double_const;
+      }
+      else if(constr.m_rhs_is_var) {
+        std::cout << constr.m_rhs;
+      }
+      std::cout << "\n";*/
       m_constr.erase(it);
       break;
     }
   }
   propagate_constraints();
+  //std::cout << "solver is now: " << *this << "\n";
 }
 
 const std::vector<CSPSolver::Constr>&
@@ -1490,51 +1553,6 @@ CSPSolver::throw_invalid_argument_if_var_key_has_not_been_added(
     oss << " has not been added)";
     throw std::invalid_argument(oss.str());
   }
-}
-
-std::ostream&
-operator<<(std::ostream& os, const CSPSolver& rhs) {
-  os << "<X,D,C>:=<";
-  os << "X/D:";
-  {
-    bool first_var = true;
-    auto it = rhs.get_feasible_region_limits().m_vars.begin();
-    for(; it != rhs.get_feasible_region_limits().m_vars.end(); ++it) {
-      if(not first_var) {
-        os << ",";
-      }
-      first_var = false;
-      if(it->second.m_type_is_int32) {
-        os << it->first << "/int32";
-      }
-      if(it->second.m_type_is_double) {
-        os << it->first << "/double";
-      }
-    }
-  }
-  os << ",C:";
-  {
-    bool first_var = true;
-    auto it = rhs.get_constr().begin();
-    for(; it != rhs.get_constr().end(); ++it) {
-      if(not first_var) {
-        os << ",";
-      }
-      first_var = false;
-      os << it->m_lhs << it->m_type;
-      if(it->m_rhs_is_int32_const) {
-        os << it->m_rhs_int32_const;
-      }
-      else if(it->m_rhs_is_double_const) {
-        os << it->m_rhs_double_const;
-      }
-      else if(it->m_rhs_is_var) {
-        os << it->m_rhs;
-      }
-    }
-  }
-  os << ">";
-  return os;
 }
 
 } // namespace Math

@@ -337,12 +337,12 @@ void test_FMCOMMS2_3Configurator_channels(
     bool rx) {
   std::vector<const char*> data_streams;
   if(rx) {
-    data_streams.push_back("rx1a");
-    data_streams.push_back("rx2a");
+    data_streams.push_back("Rx0"/*"rx1a"*/);
+    data_streams.push_back("Rx1"/*"rx2a"*/);
   }
   else {
-    data_streams.push_back("tx1a");
-    data_streams.push_back("tx2a");
+    data_streams.push_back("Tx0"/*"tx1a"*/);
+    data_streams.push_back("Tx1"/*"tx2a"*/);
   }
   for(auto it=data_streams.begin(); it!=data_streams.end(); ++it) {
     test_FMCOMMS2_3Configurator_channel(uut,*it,rx);

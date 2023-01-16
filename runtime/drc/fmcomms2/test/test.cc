@@ -20,13 +20,14 @@
 
 #define IS_LOCKING // this is still experimental
 
+//#define DISABLE_AD9361
 #include "test_FMCOMMS2_3DRC.hh"
-#include "test_FMCOMMS2_3DecInt16DRC.hh"
+//#include "test_FMCOMMS2_3DecInt16DRC.hh"
 
 int main() {
   int ret = test_FMCOMMS2_3Configurator();
-  if(ret == 0) {
+  /*if(ret == 0) {
     ret = test_FMCOMMS2_3DecInt16Configurator();
-  }
+  }*/
   return ret;
 }
