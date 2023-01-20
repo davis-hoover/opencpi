@@ -1,7 +1,7 @@
 # Description
 This application performs hardware-in-the-loop testing for any
 drc worker. A radio-specific OAS XML is used by passing its path as an argument.
-A radio-specific CSV file with test cases is used by pass its path as an
+A radio-specific CSV file with test cases is used by passing its path as an
 additional argument. This application is intended to perform basic tests to
 ensure that the ranges of allowable values are properly enforced for sampling
 rate, analog RF bandwidth, tuning frequency, gain, and gain modes (AGC/manual).
@@ -10,8 +10,35 @@ rate, analog RF bandwidth, tuning frequency, gain, and gain modes (AGC/manual).
 This application has been successfully tested with the Zed/FMCOMMS3 hardware
 using assets/hdl/card/drc_fmcomms_2_3.rcc (which is single-configuration only).
 
+# Portability
+This application is portable to any RCC/HDL container. The OCPI_LIBRARY_PATH
+environment variable is intended to be used to enforce use of a particular
+DRC worker. The test values in the CSV file fed
+in the ACI are specific to the FMCOMMS3 transceiver card.
+
+# Dependencies
+The dependencies are specific to whatever OAS XML is used. Refer to the
+documentation associated with the OAS XML. For example, if using
+[../../hdl/cards/drc_fmcomms_2_3.rcc/test/drc_2_3_test.xml](../../hdl/cards/drc_fmcomms_2_3.rcc/test/drc_2_3_test.xml), see 
+[../../hdl/cards/drc_fmcomms_2_3.rcc/test/README.md](../../hdl/cards/drc_fmcomms_2_3.rcc/test/README.md)
+
+# Synopsis
+```console
+drc_test <drc_oas.xml> <hardware_test_cases.csv>
+```
+An example usage for the FMCOMMS2/3 when run from this application directory:
+```console
+export OCPI_LIBRARY_PATH=../../hdl/cards/drc_fmcomms_2_3.rcc/:$OCPI_LIBRARY_PATH
+export APP_OAS=../../hdl/cards/drc_fmcomms_2_3.rcc/test/drc_fmcomms_2_3_test.xml
+export APP_CSV=../../hdl/cards/drc_fmcomms_2_3.rcc/test/drc_fmcomms_2_3_test.csv
+drc_test $APP_OAS $APP_CSV
+```
+
+# Success Criteria
+Application runs and exits with a status of 0.
+
 # CSV Test Case File Format
-The explicit CSV test file requirements are as follows, but example CSVs are also a good starting point (../../hdl/cards/drc_fmcomms_2_3_rx.rcc/test/drc_fmcomms_2_3_rx_test.csv). All fields within the CSV file are concepts that originate from the DRC briefing and component specification.
+The explicit CSV test file requirements are as follows, but example CSVs are also a good starting point [../../hdl/cards/drc_fmcomms_2_3_rx.rcc/test/drc_fmcomms_2_3_rx_test.csv](../../hdl/cards/drc_fmcomms_2_3_rx.rcc/test/drc_fmcomms_2_3_rx_test.csv). All fields within the CSV file are concepts that originate from the DRC briefing and component specification.
    - Must contain comma-separated columns
    - There must be a header line
    - The order of the column values must correspond to the following order: transition,configuration,channel,rx,tuning_freq_MHz,bandwidth_3dB_MHz,sampling_rate_Msps,samples_are_complex,gain_mode,gain_dB,tolerance_tuning_freq_MHz,tolerance_bandwidth_3dB_MHz,tolerance_samplng_rate_Msps,tolerance_gain_dB,rf_port_name,fatal,comment
@@ -69,37 +96,6 @@ transition,configuration,channel,rx,tuning_freq_MHz,bandwidth_3dB_MHz,sampling_r
 ,0,3,true,1000,10,20,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx1,false,request by rf_port_name=Tx1
 start,0,,,,,,,,,,,,,,true,now actually start 
 ```
-
-# Portability
-This application is portable to any RCC/HDL container. The OCPI_LIBRARY_PATH
-environment variable is intended to be used to enforce use of a particular
-DRC worker. The test values in the CSV file fed
-in the ACI are specific to the FMCOMMS3 transceiver card.
-
-# Synopsis
-```console
-drc_test <drc_oas.xml> <hardware_test_cases.csv>
-```
-An example usage for the FMCOMMS2/3 when run from this application directory:
-```console
-export OCPI_LIBRARY_PATH=../../hdl/cards/drc_fmcomms_2_3.rcc/:$OCPI_LIBRARY_PATH
-export APP_OAS=../../hdl/cards/drc_fmcomms_2_3.rcc/test/drc_fmcomms_2_3_test.xml
-export APP_CSV=../../hdl/cards/drc_fmcomms_2_3.rcc/test/drc_fmcomms_2_3_test.csv
-drc_test $APP_OAS $APP_CSV
-```
-
-# Maturity
-Runs and passes on Zed/FMCOMMS3 hardware (tested using xilinx19_2_aarch32 RCC
-platform) using the example synopsis described above.
-
-# Dependencies
-The dependencies are specific to whatever OAS XML is used. Refer to the
-documentation associated with the OAS XML. For example, if using
-../../hdl/cards/drc_fmcomms_2_3.rcc/test/drc_2_3_test.xml, see 
-../../hdl/cards/drc_fmcomms_2_3.rcc/test/README.md
-
-# Success Criteria
-Application runs and exits with a status of 0.
 
 # Example Output
 ```console
