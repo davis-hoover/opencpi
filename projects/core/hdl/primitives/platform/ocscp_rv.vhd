@@ -229,6 +229,8 @@ begin
   cp_out.valid <= to_bool(reading_r and (is_admin_r or response_r /= none_e));
   cp_out.tag   <= workers_out_r.data(cp_out.tag'left downto 0);
 
+
+
   gen0: for i in 0 to nWkrs - 1 generate
     present(i)   <= workers_in(i).present;
     attention(i) <= workers_in(i).attention;
@@ -250,15 +252,23 @@ begin
     wci_out(i).MAddrSpace <= wci_out_r(i).MAddrSpace;
     wci_out(i).MByteEn    <= wci_out_r(i).MByteEn;
     wci_out(i).MData      <= wci_out_r(i).MData;
-    wci_out(i).MFlag      <= wci_out_r(i).MFlag;
-    process(wci_out_i(i).clk)
+    wci_out(i).MFlag      <= wci_out_r(i).MFlag;    
+    process(cp_in.clk)
+    begin
+      if rising_edge(cp_in.clk) then
+        if its(cp_in.reset) then
+          wci_in_r(i).SResp <= (others => '0');
+        else
+          wci_in_r(i) <= wci_in(i);
+        end if;
+      end if;
+    end process;
+    process(wci_out_i(i))
     begin
       if rising_edge(wci_out_i(i).clk) then
         if its(cp_in.reset) then
-          wci_in_r(i).SResp <= (others => '0');
           wci_out_r(i).MCmd <= (others => '0');
         else
-          wci_in_r(i)             <= wci_in(i);
           wci_out_r(i).MCmd       <= wci_out_i(i).MCmd;
           wci_out_r(i).MAddr      <= wci_out_i(i).MAddr;
           wci_out_r(i).MAddrSpace <= wci_out_i(i).MAddrSpace;
@@ -269,6 +279,7 @@ begin
       end if;
     end process;
   end generate gen0;
+
   gen1: for i in nWkrs to worker_max_nworkers - 1 generate
    present(i) <= '0';
    attention(i) <= '1';
