@@ -41,14 +41,14 @@ specific RF port (rf_port_name empty).
 ```console
 transition,configuration,channel,rx,tuning_freq_MHz,bandwidth_3dB_MHz,sampling_rate_Msps,samples_are_complex,gain_mode,gain_dB,tolerance_tuning_freq_MHz,tolerance_bandwidth_3dB_MHz,tolerance_samplng_rate_Msps,tolerance_gain_dB,rf_port_name,fatal,comment
 start,0,0,true,1000,10,20,true,manual,0,1E-06,0.000001,0.000001,0.000001,,false,request by direction=rx
-```console
+```
 
 The following contents exemplify a similar test case but also contraining the
 configuration to a particular RF port named Rx0.
 ```console
 transition,configuration,channel,rx,tuning_freq_MHz,bandwidth_3dB_MHz,sampling_rate_Msps,samples_are_complex,gain_mode,gain_dB,tolerance_tuning_freq_MHz,tolerance_bandwidth_3dB_MHz,tolerance_samplng_rate_Msps,tolerance_gain_dB,rf_port_name,fatal,comment
 start,0,0,true,1000,10,20,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,request by rf_port_name=Rx0
-```console
+```
 
 The following contents exemplify a similar test case but with a tuning frequency
 that is outside of the known valid ranges of the underlying hardware
@@ -57,7 +57,7 @@ resulting in the drc entering the error state instead of operating.
 ```console
 transition,configuration,channel,rx,tuning_freq_MHz,bandwidth_3dB_MHz,sampling_rate_Msps,samples_are_complex,gain_mode,gain_dB,tolerance_tuning_freq_MHz,tolerance_bandwidth_3dB_MHz,tolerance_samplng_rate_Msps,tolerance_gain_dB,rf_port_name,fatal,comment
 start,0,0,true,10000,10,20,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,true,request by rf_port_name=Rx0
-```console
+```
 
 Single configuration, multi-channel configurations are issued by using an empty transition field for multiple subsequent rows with increase channel indices, and then issuing a start.
 ```console
@@ -67,7 +67,7 @@ transition,configuration,channel,rx,tuning_freq_MHz,bandwidth_3dB_MHz,sampling_r
 ,0,2,true,1000,10,20,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx0,false,request by rf_port_name=Tx0
 ,0,3,true,1000,10,20,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx1,false,request by rf_port_name=Tx1
 start,0,,,,,,,,,,,,,,true,now actually start 
-```console
+```
 
 # Portability
 This application is portable to any RCC/HDL container. The OCPI_LIBRARY_PATH
