@@ -593,7 +593,7 @@ class ComponentsCollection(ShowableAsset):
         elif format == "json":
             dict={}
             for comp in self.components:
-                dict.update({comp.name : { 'package_id' : comp.package_id,
+                dict.update({'.'.join([comp.package_id, comp.name]) : { 'package_id' : comp.package_id,
                                            'directory' : comp.directory}})
             json.dump(dict, sys.stdout)
             print()
