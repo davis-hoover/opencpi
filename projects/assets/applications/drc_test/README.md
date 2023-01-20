@@ -19,7 +19,7 @@ in the ACI are specific to the FMCOMMS3 transceiver card.
 # Dependencies
 The dependencies are specific to whatever OAS XML is used. Refer to the
 documentation associated with the OAS XML. For example, if using
-[../../hdl/cards/drc_fmcomms_2_3.rcc/test/drc_2_3_test.xml](../../hdl/cards/drc_fmcomms_2_3.rcc/test/drc_2_3_test.xml), see 
+[../../hdl/cards/drc_fmcomms_2_3.rcc/test/drc_fmcomms_2_3_test.xml](../../hdl/cards/drc_fmcomms_2_3.rcc/test/drc_fmcomms_2_3_test.xml), see 
 [../../hdl/cards/drc_fmcomms_2_3.rcc/test/README.md](../../hdl/cards/drc_fmcomms_2_3.rcc/test/README.md)
 
 # Synopsis
@@ -38,7 +38,7 @@ drc_test $APP_OAS $APP_CSV
 Application runs and exits with a status of 0.
 
 # CSV Test Case File Format
-The explicit CSV test file requirements are as follows, but example CSVs are also a good starting point [../../hdl/cards/drc_fmcomms_2_3_rx.rcc/test/drc_fmcomms_2_3_rx_test.csv](../../hdl/cards/drc_fmcomms_2_3_rx.rcc/test/drc_fmcomms_2_3_rx_test.csv). All fields within the CSV file are concepts that originate from the DRC briefing and component specification.
+The explicit CSV test file requirements are as follows, but example CSVs are also a good starting point [../../hdl/cards/drc_fmcomms_2_3_rx.rcc/test/drc_fmcomms_2_3_test.csv](../../hdl/cards/drc_fmcomms_2_3.rcc/test/drc_fmcomms_2_3_test.csv). All fields within the CSV file are concepts that originate from the DRC briefing and component specification.
    - Must contain comma-separated columns
    - There must be a header line
    - The order of the column values must correspond to the following order: transition,configuration,channel,rx,tuning_freq_MHz,bandwidth_3dB_MHz,sampling_rate_Msps,samples_are_complex,gain_mode,gain_dB,tolerance_tuning_freq_MHz,tolerance_bandwidth_3dB_MHz,tolerance_samplng_rate_Msps,tolerance_gain_dB,rf_port_name,fatal,comment
