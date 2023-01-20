@@ -24,6 +24,7 @@ The explicit CSV test file requirements are as follows, but example CSVs are als
    - The rx, samples_are_complex, and fatal columns (second row or later) must contain either 1) nothing, 2) the string "true", or 3) the string "false".
    - The tuning_freq_MHz, bandwidth_3dB_MHz, sampling_rate_Msps, rx and fatal lines must contain either 1) nothing, 2) the string "true", or 3) the string "false".
    - The comment column is for convenience and its value is not used anywhere
+
 The following CSV contents exemplify a single test case with a
 single configuration (0),
 single channel (0),
