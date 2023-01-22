@@ -14,7 +14,7 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-The *test* noun represents an OpenCPI component unit test suite, which
+The *`test`* noun represents an OpenCPI component unit test suite, which
 is a collection of 'test cases' for testing all workers that implement the
 a single component specification (OCS) across all available platforms for
 which the workers have been built. The workers tested by the component
@@ -132,7 +132,11 @@ The verbs that can be performed on the *`tests`* noun are:
 
 OPTIONS
 -------
-In the descriptions below, a plus sign (+) after the option indicates
+In addition to the options common to all OpenCPI tools
+(see link:opencpi.1.html[opencpi(1)]),
+the options described below can be specified for operations on
+component unit test suites. In the following descriptions,
+a plus sign (+) after the option indicates
 that it can be specified more than once on the command line.
 
 Keywords for platforms supported by OpenCPI that can be
@@ -140,39 +144,36 @@ specified in the '<platform>' argument to an option
 can be found in the tables of supported platforms in the 'OpenCPI User Guide'.
 
 Keywords for architectures supported by OpenCPI that can be specified
-in the '<target>' argument to an option include *`isim`*, *`modelsim`*,
-*`stratix4`*, *`virtex6`*, *`zynq`*.
+in the '<target>' argument include *`isim`*, *`modelsim`*,
+*`xsim`*, *`zynq`*, *`zynq_ultra`*, *`zynq_ise`*, *`spartan3adsp`*.
 
-Options That Apply to All Operations (Verbs) on Test Suites
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*`-d`* '<directory>'::
-    Specify the directory in which the command  should be run.
-    Analogous to the *-C* option in the POSIX *make* command.
+Options When Creating Component Unit Test Suites
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-*`-v`*, *`--verbose`*::
-    Describe what is happening in command execution in more detail.
-
-Options When Creating Unit Test Suites
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*`--exclude-platform=`*'<platform>', *`-Q`* '<platform>'+::
+*`-G`* '<platform>', *`--only-platform=`*'<platform>'+::
+    Only build the component unit test suite for the specified platform.
+    
+*`-Q`* '<platform>', *`--exclude-platform=`*'<platform>'+::
     Do not build the component unit test suite for the specified platform.
 
-*`--only-platform=`*'<platform>', *`-G`* '<platform>'+::
-    Only build the component unit test suite for the specified platform.
+*`-S`* '<spec>'::
+   Specify the component specification (aka "spec") to be
+   implemented by the component unit test suite. By default,
+   the *`ocpidev create`* operation
+   searches for a component spec whose name matches
+   the name of the test suite being created.  Use the *`-S`*
+   option to specify a different component spec name to search for.
+   The operation searches for a component spec in the component
+   directory in the same library as the test suite, in the *`specs`* directory
+   in the same library as the test suite (for backward compatibility with
+   earlier OpenCPI releases), in the top-level *`specs`* directory in the
+   project, and in other projects, if the *`--depend`* (*`-D`*) option
+   was specified when the project containing the test suite was created. 
 
-*`-S`* '<component-spec>'::
-    Specify the component spec (OCS) that the component unit
-    test suite implements.
-    The default is '<name>'*`-spec`* or '<name>'*`_spec`*
-    depending on what *`ocpidev`* finds in the *`specs`* directory
-    of the library or project (or libraries specified with the *`-y`*
-    option or other projects specified by the *`-D`* option when the
-    project that contains the component unit test suite was created).
+*`-T`* '<target>', *`--only-target=`*'<target>'+::
+    Only build the component unit test suite for the specified HDL architecture.
 
-*`-T`* '<target>'+::
-    Only build the component unit test suite for the specified architecture.
-
-*-k*::
+*`-k`*, *`--keep`*::
     Keep files and directories created after a component unit test suite
     creation fails. Normally, all such files and directories are removed
     on any failure.
@@ -208,8 +209,17 @@ Options When Building Component Unit Test Suites with HDL Workers
     If only HDL targets are specified (and no HDL platforms), containers for
     the unit test suite(s) are not built.
 
-Options When Running Component Unit Tests Suites
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
+Options When Running Component Unit Test Suites
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-G`* '<platform>', *`--only-platform=`*'<platform>'+::
+    Specify the runtime platform to use with the component unit test suite(s).
+
+*`-Q`* '<platform>', *`--exclude-platform=`*'<platform>'+::
+    Specify the runtime platform to omit from the component unit test suite(s).
+
+*`-l`* '<library>', *`--library=`*'<library>'::
+    Run the component unit test suite(s) in the specified library.
+
 *`--accumulate-errors`*:: 
     Report execution or verification errors as they occur rather
     than ending the test on the first failure detected.
@@ -217,10 +227,7 @@ Options When Running Component Unit Tests Suites
 *`--case=`*'<test-case>'+::
     Specify the test case(s) to be run and verified. You can use
     the wildcard character in '<test-case>'; for example, case*, case0.0*.
-    
-*`--exclude-platform=`*'<platform>', *`-Q`* '<platform>'+::
-    Specify the runtime platform to omit from the component unit test suite(s).
-    
+  
 *`--hdl-platform=`*'<platform>'+::
     Specify the HDL platform to use with the component unit test suite(s).
     This option is only valid in generate and build phases.
@@ -230,16 +237,10 @@ Options When Running Component Unit Tests Suites
     By default, simulation files are removed if the verification
     is successful. Warning: Simulation files can become large!
 
-*`--library=`*'<library>', *`-l`* '<library>'::
-    Run the component unit test suite(s) in the specified library.  
-   
-*`--only-platform=`*'<platform>', *`-G`* '<platform>'+:: 
-    Specify the runtime platform to use with the component unit test suite(s).
-
 *`--phase=`*'<phase>'+::
     Specify which non-building phase(s) of unit testing to run.
-    Valid phases here are: *`prepare`*, *`execute`*, *`verify`*, and *`view`*.
-    The *`view`* 'phase' is used to run 'only' the view scripts for the unit test,
+    Valid phases are: *`prepare`*, *`execute`*, *`verify`*, and *`view`*.
+    The *`view`* phase is used to run 'only' the view scripts for the unit test,
     without other phases.  The *`--view`* 'option' can be used to add viewing along with other phases.
 
 *`--rcc-platform=`*'<platform>'+:: 
@@ -258,20 +259,20 @@ Options When Running Component Unit Tests Suites
 
 Options When Showing Component Unit Test Suites (plural noun only)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*--json*::
+*`--json`*::
     Format the output in Javascript Object Notation (JSON) format
     for integration with other software.
 
-*--local-scope*:: 
+*`--local-scope`*:: 
     Only display information about the component unit tests in the local library.
 
-*--simple*::
+*`--simple`*::
     Format the output as simply as possible.
 
-*--table*::
+*`--table`*::
     Display the output in an easy-to-read table.
     This is the default display format
-    used if *--simple* or *--json* are not used.
+    used if *`--simple`* or *`--json`* are not used.
 
 EXAMPLES
 --------
@@ -282,12 +283,13 @@ unit test suite for the *`mycomp`* component:
 ocpidev create test mycomp
 --------------------------
 +
-. Inside the *`components`* library, create a unit test suite for the *`mycomp`*
-component that only runs on the *`centos7`* platform:
+. Inside the *`components`* library, create a component unit test
+suite for the *`mycomp`* component that only runs on
+the *`plutosdr`* HDL platform:
 +
--------------------------------------------------
-ocpidev create test mycomp --only-platform=centos7
--------------------------------------------------
+---------------------------------------
+ocpidev create test mycomp -G plutosdr
+---------------------------------------
 +
 . Inside the *`components`* library, create a unit test suite for the *`mycomp`*
 component that only runs on platforms that implement the *`zynq`* architecture:
@@ -297,11 +299,11 @@ ocpidev create test mycomp -T zynq
 ----------------------------------
 +
 . Inside the *`mycomp.test`* directory, build the component unit
-test suite for the *`zed`* HDL platform and *`xilinx13_3`* RCC platform.
+test suite for the *`zed`* HDL platform and *`xilinx19_2_aarch32`* RCC platform.
 +
----------------------------------------------------------------
-ocpidev build test --hdl-platform zed --rcc-platform xilinx13_3
----------------------------------------------------------------
+---------------------------------------------------------------------
+ocpidev build test --hdl-platform zed --rcc-platform xilinx19_2_aarch32
+---------------------------------------------------------------------
 +
 . Inside the *`mycomp.test`* directory, clean the directory:
 +
@@ -321,9 +323,9 @@ ocpidev run test mycomp.test --accumulate_errors --view
 . Inside the *`assets`* project, run the view script only for the timestamper
 component unit test suite in the *`util_comps`* library:
 +
---------------------------------------------------------------------
-ocpidev run test timestamper.test --library=util_comps --phase=view
---------------------------------------------------------------------
+--------------------------------------------------------------
+ocpidev run test timestamper.test -l util_comps --phase=view
+--------------------------------------------------------------
 +
 . Inside the *`components`* library in the current project, run
 all the component unit test suites in the library:
@@ -362,6 +364,8 @@ RESOURCES
 ---------
 See the main web site: https://www.opencpi.org
 
+See the 'OpenCPI Component Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Component_Development_Guide.pdf
 
 SEE ALSO
 --------
@@ -380,7 +384,7 @@ link:ocpidev-worker.1.html[ocpidev-worker(1)]
 
 COPYING
 -------
-Copyright \(C) 2022 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your

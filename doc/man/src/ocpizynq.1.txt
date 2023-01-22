@@ -38,14 +38,25 @@ Specify one of the following keywords as an argument:
 *`spi`*::
     Display how the platform's SPI interfaces are configured.
 
+When invoked without options and arguments, *`ocpizynq`* displays help information.
 
 OPTIONS
 -------
-*`--psclk=`*'<frequency>', *`-p`* '<frequency>'::
+In addition to the general-purpose options common
+to all OpenCPI tools (see link:opencpi.1.html[opencpi(1)]),
+the options described below can be specified for *`ocpizynq`* operations.
+For convenience, options can occur anywhere in the command.
+
+In the descriptions below, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.
+Arguments to word-form options are preceded by an equal sign (=)
+(as shown in the following descriptions) or a space. Arguments to
+letter options are preceded by a space.
+
+*`-p`* '<frequency>', *`--psclk=`*'<frequency>'::
     Specify the external clock rate in MHz into the Zynq platform's PS_CLK clock.
     The external clock rate is board-dependent and is usually 33.3333e6. Use this option
     to specify the clock rate that the Zynq SoC is receiving from its PS_CLK pin.
-
 
 EXAMPLES
 --------
@@ -86,7 +97,7 @@ link:ocpidev-worker.1.html[ocpidev-worker(1)]
 
 COPYING
 -------
-Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your

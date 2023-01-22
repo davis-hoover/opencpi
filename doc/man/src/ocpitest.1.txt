@@ -88,7 +88,7 @@ Development System Tests
 OPTIONS
 -------
 In addition to the options common to all OpenCPI tools (see link:opencpi.1.html[opencpi(1)]),
-the following options can be specified:
+the following options can be specified. For convenience, options can occur anywhere in the command.
 
 *`--no-hdl`*::
     Suppress building and testing of HDL assets (HDL platform discovery is not performed).
@@ -137,8 +137,13 @@ RESOURCES
 ---------
 See the main web site: https://www.opencpi.org
 
+See the 'OpenCPI Installation Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Installation_Guide.pdf
+
+
 SEE ALSO
 --------
+link:install-opencpi.1.html[install-opencpi(1)]
 link:ocpidev.1.html[ocpidev(1)]
 link:ocpidev-platform.1.html[ocpidev-platform(1)]
 link:ocpidev-project.1.html[ocpidev-project(1)]
@@ -147,7 +152,7 @@ link:opencpi.1.html[opencpi(1)]
 
 COPYING
 -------
-Copyright \(C) 2022 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your

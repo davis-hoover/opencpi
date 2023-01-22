@@ -131,7 +131,7 @@ def get_dir_info(directory=".", careful=False):
             top_xml_elements = ["tests"]
             make_type = asset_type = "test"
         elif parts[-1] == "comp":
-            xml_name += "-spec"
+            xml_name += "-spec" if Path(xml_name + "-spec.xml").exists() else "-comp"
             top_xml_elements = ["componentspec"]
             make_type = asset_type = "component"
         elif parts[-1] in [ "hdl", "rcc", "ocl" ]:

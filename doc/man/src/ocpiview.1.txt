@@ -63,12 +63,10 @@ None.
 
 OPTIONS
 -------
-*`-h`*::
-    Display help information about the tool.
-
-*`-v`*::
-    Describe what is happening in command execution in more detail.
-
+The *`-h`* and *`-v`* general-purpose options
+can be used with the *`ocpiview`* command.
+See link:opencpi.1.html[opencpi(1)]).
+For convenience, options can occur anywhere in the command.
 
 EXAMPLES
 --------
@@ -104,6 +102,10 @@ RESOURCES
 ---------
 See the main web site: https://www.opencpi.org
 
+See the 'OpenCPI HDL Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_HDL_Development_Guide.pdf
+
+
 SEE ALSO
 --------
 link:ocpidev.1.html[ocpidev(1)]
@@ -115,7 +117,7 @@ link:ocpirun.1.html[ocpirun(1)]
 
 COPYING
 -------
-Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your

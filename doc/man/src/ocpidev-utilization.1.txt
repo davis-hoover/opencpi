@@ -4,56 +4,75 @@ OCPIDEV-UTILIZATION(1)
 
 NAME
 ----
-ocpidev-utilization - displays or records FPGA resource use for HDL OpenCPI assets.
+ocpidev-utilization - displays or records FPGA resource use for OpenCPI HDL assets.
 
 
 SYNOPSIS
 --------
-*ocpidev* ['<options>'] *utilization* ['<noun>' ['<name>' ]]
+*`ocpidev`* ['<options>'] *`utilization`* ['<noun>' ['<name>' ]]
 
 
 DESCRIPTION
 -----------
 The *`utilization`* verb invokes the OpenCPI tool that
-displays or records FPGA resource use for HDL OpenCPI assets.
+displays or records FPGA resource use for OpenCPI HDL assets.
 In order to display usage information about an HDL asset for
 a given platform, the asset needs to be built for that platform.  
 
 Asset types to be specified in the '<noun>' argument are:
 
-*hdl*::
-    A prefix to indicate an HDL asset in the *hdl* subdirectory of a project.
+*`hdl`*::
+    A prefix to indicate an HDL asset in the *`hdl`* subdirectory of a project.
     Possible HDL assets are:
 
-        *assembly*|*ies*;;
+        *`assembly`*|*`ies`*;;
 	Display usage information for all built assemblies
 	contained in the current project or a for specified built
 	HDL assembly contained in the current project.
 	
-	*platform*|*s*;;
+	*`platform`*|*`s`*;;
 	Display usage information for all built platforms
 	or for a specified built HDL platform contained
 	in the current project.
 	
-*library*::
+*`library`*::
     Display usage information for all built workers
     contained in a component library.
 
-*project*::
+*`project`*::
     Display usage information for all built workers,
-    platforms, and assemblies contained in a project.
+    platforms, and HDL assemblies contained in a project.
 
-*worker*::
+*`worker`*::
     Display usage information for the specified worker.
     
-*workers*::
+*`workers`*::
     Display usage information for all built workers
     contained in the current project.
 
 OPTIONS
 -------
-In the description below, a plus sign (+) after the option indicates
+In addition to the options common to all OpenCPI tools
+(see link:opencpi.1.html[opencpi(1)]),
+the options described below can be specified for *`utilization`* operations.
+In the following descriptions, a plus sign (+) after the option indicates
 that it can be specified more than once on the command line.
+
+Keywords for platforms supported by OpenCPI that can be
+specified in the '<platform>' argument to an option
+can be found in the tables of supported platforms in the 'OpenCPI User Guide'.
+
+Keywords for architectures supported by OpenCPI that can be specified
+in the '<target>' argument include *`isim`*, *`modelsim`*,
+*`xsim`*, *`zynq`*, *`zynq_ultra`*, *`zynq_ise`*, *`spartan3adsp`*.
+
+*`-P`* '<hdl-platform-directory>', *`--platform=`*'<hdl-platform-directory>'::
+    Specify the HDL platform subdirectory in which the
+    utilization operation is to be performed.
+
+*`-l`* '<library>', *`--library=`*'<library>'::
+    Specify the component library in which the utilization operation
+    is to be performed.
 
 *`--format=table`*|*`latex`*::
     Specify how to output the usage information.
@@ -71,23 +90,16 @@ that it can be specified more than once on the command line.
     to display usage information.
     
 *`--hdl-target=`*'<target>'+::
-    Specify the HDL target for which to display
-    worker (not assembly) usage information.
+    Specify the buildable HDL architecture for which to
+    display usage information.
 
- *`--library=`*'<library>', *`-l`* '<library>'::
-    Specify the component library in which the utilization operation
-    is to be performed.
-
-*`-P`* '<hdl-platform-directory>'::
-    Specify the HDL platform subdirectory in which the
-    utilization operation is to be performed.
 
 EXAMPLES
 --------
 . Show usage information for the worker named *`complex_mixer`*
 using build results from all platforms:
 +
---------------------------------
+---------------------------------------
 ocpidev utilization worker complex_mixer
 ---------------------------------------
 +
@@ -105,8 +117,8 @@ location (project, library, etc.):
 ocpidev utilization workers
 ----------------------------
 +
-. Show usage information for the *fir_real_sse* worker
-in the */components/dsp_comps* library:
+. Show usage information for the *`fir_real_sse`* worker
+in the *`components/dsp_comps`* library of the *`assets`* project:
 +
 ---------------------------------------------------
 ocpidev utilization worker fir_real_sse -l dsp_comps
@@ -164,6 +176,15 @@ RESOURCES
 ---------
 See the main web site: https://www.opencpi.org
 
+See the 'OpenCPI Component Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Component_Development_Guide.pdf
+
+See the 'OpenCPI HDL Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_HDL_Development_Guide.pdf
+
+See the 'OpenCPI Platform Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Platform_Development_Guide.pdf
+
 SEE ALSO
 --------
 link:ocpidev.1.html[ocpidev(1)]
@@ -180,7 +201,7 @@ link:ocpidev-unset.1.html[ocpidev-unset(1)]
 
 COPYING
 -------
-Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your
