@@ -4236,7 +4236,7 @@
    <text:p text:style-name="P61"><text:span text:style-name="T14">OpenCPI</text:span><text:line-break/><text:span text:style-name="T15">Ethernet Transport Performance Tuning Guide</text:span></text:p>
    <text:section text:style-name="Sect1" text:name="Section2">
     <text:section-source xlink:href="shared/release.fodt" text:filter-name="OpenDocument Text Flat XML"/>
-    <text:p text:style-name="ReleaseSubtitle">OpenCPI Release: develop</text:p>
+    <text:p text:style-name="ReleaseSubtitle">OpenCPI Release:  v2.4.4</text:p>
    </text:section>
    <text:p text:style-name="P33">Revision History</text:p>
    <table:table table:name="Table1" table:style-name="Table1">
@@ -4436,7 +4436,7 @@
     </text:list-item>
    </text:list>
    <text:h text:style-name="P74" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc3467690_2093603017"/>References<text:bookmark-end text:name="__RefHeading___Toc3467690_2093603017"/></text:h>
-   <text:p text:style-name="P6">The documents listed in the following table provide detailed information about <text:span text:style-name="T66">Linux kernel-related </text:span>subjects discussed in this <text:span text:style-name="T62">guide</text:span>. <text:s/><text:span text:style-name="T65">See the </text:span><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Application_Development_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="FirstEmphasis">OpenCPI Application Development Guide</text:span></text:a><text:span text:style-name="T66"> and the </text:span><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/latest/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T66">OpenCPI developer guides</text:span></text:a><text:span text:style-name="T66"> for details about OpenCPI-related topics discussed in this guide.</text:span></text:p>
+   <text:p text:style-name="P6">The documents listed in the following table provide detailed information about <text:span text:style-name="T66">Linux kernel-related </text:span>subjects discussed in this <text:span text:style-name="T62">guide</text:span>. <text:s/><text:span text:style-name="T65">See the </text:span><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.4/docs/OpenCPI_Application_Development_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="FirstEmphasis">OpenCPI Application Development Guide</text:span></text:a><text:span text:style-name="T66"> and the </text:span><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/latest/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T66">OpenCPI developer guides</text:span></text:a><text:span text:style-name="T66"> for details about OpenCPI-related topics discussed in this guide.</text:span></text:p>
    <text:p text:style-name="P9">Table <text:sequence text:ref-name="refTable0" text:name="Table" text:formula="ooow:1 " style:num-format="1">1</text:sequence>: <text:s/>Table of Reference Documents</text:p>
    <table:table table:name="Table18" table:style-name="Table18">
     <table:table-column table:style-name="Table18.A"/>
