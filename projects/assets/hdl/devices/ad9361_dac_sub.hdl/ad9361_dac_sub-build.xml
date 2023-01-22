@@ -26,16 +26,12 @@
     <parameter name='DATA_RATE_CONFIG_p' value='DDR'/>
   </configuration>-->
   <!--<configuration id='4'>-->
-
-  <!-- this will build and is expected to function correctly but data fidelity
-       problems have been observed -->
   <!--configuration id='2'>
     <parameter name='LVDS_p' value='false'/>
     <parameter name='SINGLE_PORT_p' value='false'/>
     <parameter name='HALF_DUPLEX_p' value='false'/>
     <parameter name='DATA_RATE_CONFIG_p' value='DDR'/>
   </configuration-->
-
   <!--<configuration id='5'>
     <parameter name='LVDS_p' value='false'/>
     <parameter name='SINGLE_PORT_p' value='true'/>

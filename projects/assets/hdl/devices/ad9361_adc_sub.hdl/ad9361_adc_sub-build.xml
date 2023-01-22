@@ -35,7 +35,6 @@
     <parameter name='HALF_DUPLEX_p' value='false'/>
     <parameter name='DATA_RATE_CONFIG_p' value='DDR'/>
   </configuration-->
-
   <!--<configuration id='5'>
     <parameter name='LVDS_p' value='false'/>
     <parameter name='SINGLE_PORT_p' value='true'/>
