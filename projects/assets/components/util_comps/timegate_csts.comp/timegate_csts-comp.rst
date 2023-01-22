@@ -4,7 +4,7 @@
 
 
 Timegate (``timegate``)
-=============================
+=======================
 
 Timed transmit of complex IQ data using complex time sampled protocol. 
 ``timegate_csts`` is an asset in the ``ocpi.assets.util_comps`` component library.
@@ -12,25 +12,26 @@ Implementations include the :ref:`timegate_csts-HDL-worker` (``timegate_csts.hdl
 Tested platforms include
 ``xsim``, ``modelsim``, ``zed``, ``e3xx``. 
 
-Design
-------
+Function
+--------
 Inputs complex short time sampled data and outputs complex short time sample data when the current time 
-exceed the gated time.
+exceeds the gated time.
 
 Current time is provided as an input to the component on the time interface.
 The time gated timestamp is a 96-bit number with the first 32 bits corresponding to seconds
 and the last 40 bits corresponding to fractional seconds. The default state of the the timegate
-is open which means data samples flows between the input and the output ports. 
+is open, which means data samples flow between the input and the output ports. 
 
-When a timestamp opcode is received on the input port that is greater then the current time, the timegate
-stops consuming data from the input port. When the current time exceeds the timestamp the 
+When a timestamp opcode is received on the input port that is greater than the current time, the timegate
+component stops consuming data from the input port. When the current time exceeds the timestamp, the 
 gate is open and starts passing samples through the component. 
 
-The time interface from which the current time is derived from originates from the
+The time interface from which the current time is derived originates from the
 OpenCPI time server, which is instanced as part of the platform worker.
 Furthermore, an additional component (time client) is dynamically instanced
 by the framework for all components that declare time interfaces.
-The time client communicates with the time server and produces the
+The time client communicates with the time server and produces
+the time interface seen by the component.
 
 Interface
 ---------
@@ -67,7 +68,7 @@ Limitations
 -----------
 Limitations of ``timegate_csts`` are:
 
- * The time client only provides a 64-bit interface thus some of the fractional time (40-bits) from
+ * The time client only provides a 64-bit interface, thus some of the fractional time (40 bits) from
    the timestamp gets truncated. 
 
 Testing
