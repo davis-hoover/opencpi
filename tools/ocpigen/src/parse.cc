@@ -93,7 +93,7 @@ checkDataPort(ezxml_t impl, DataPort *&sp) {
   return NULL;
 }
 
-// If the given element is xi:include, then parse it and return the parsed element.
+// If the given element is include, then parse it and return the parsed element.
 // If not, *parsed is set to zero.
 // If not optional then it MUST be the indicated element
 // Also return the file name of the included file.
@@ -102,14 +102,14 @@ tryInclude(ezxml_t x, const std::string &parent, const char *element, ezxml_t *p
            std::string &child, bool optional) {
   *parsed = 0;
   const char *eName = ezxml_name(x);
-  if (!eName || strcasecmp(eName, "xi:include"))
+  if ((!eName || strcasecmp(eName, "xi:include")) && (!eName || strcasecmp(eName, "include")))
     return 0;
   const char *err;
   if ((err = OE::checkAttrs(x, "href", (void*)0)))
     return err;
   const char *incfile = ezxml_cattr(x, "href");
   if (!incfile)
-    return OU::esprintf("xi:include missing an href attribute in file \"%s\"",
+    return OU::esprintf("include missing an href attribute in file \"%s\"",
                         parent.c_str());
   std::string ifile;
   if ((err = parseFile(incfile, parent, element, parsed, ifile, optional)))
@@ -134,7 +134,7 @@ tryChildInclude(ezxml_t x, const std::string &parent, const char *element,
   return 0;
 }
 
-// Find the single instance of a child, which might be xi:included
+// Find the single instance of a child
 const char *
 tryOneChildInclude(ezxml_t top, const std::string &parent, const char *element,
                    ezxml_t *parsed, std::string &childFile, bool optional) {
@@ -170,7 +170,7 @@ tryOneChildInclude(ezxml_t top, const std::string &parent, const char *element,
     }
   }
   if (!*parsed && !optional)
-    return OU::esprintf("no %s element found under %s, whether included via xi:include or not",
+    return OU::esprintf("no %s element found under %s, whether included via include or not",
                         element, ezxml_name(top));
   return err;
 }
@@ -617,7 +617,7 @@ findPackage(ezxml_t spec, const char *a_package) {
 const char *Worker::
 parseSpec(const char *a_package) {
   const char *err;
-  // xi:includes at this level are component specs, nothing else can be included
+  // includes at this level are component specs, nothing else can be included
   ezxml_t spec = NULL;
   if ((err = tryOneChildInclude(m_xml, m_file, "ComponentSpec", &spec, m_specFile, true)))
     return err;

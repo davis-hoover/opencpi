@@ -5,7 +5,7 @@
       <Property Name="Controlbyte" Type="UChar" Readable="true" Writable="true"/>
     </Properties>
     <DataInterfaceSpec Name="in">
-      <xi:include href="stream_protocol.xml"/>
+      <include href="stream_protocol.xml"/>
     </DataInterfaceSpec>
   </ComponentSpec>
   <StreamInterface Name="in" ImpreciseBurst="True" PreciseBurst="true" DataWidth="32"/>

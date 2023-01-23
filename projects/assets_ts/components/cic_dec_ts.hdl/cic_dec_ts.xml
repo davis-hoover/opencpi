@@ -1,7 +1,7 @@
 <HdlWorker Language='vhdl' Spec='cic_dec_ts-spec.xml' version='2' datawidth='32'>
 
   <!-- Other included XML -->
-  <xi:include href='peak-detector-properties.xml'/>
+  <include href='peak-detector-properties.xml'/>
 
   <SpecProperty Name='N' Parameter='true' Default='3'/>
 

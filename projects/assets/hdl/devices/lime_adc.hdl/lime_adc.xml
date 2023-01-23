@@ -1,7 +1,7 @@
 <!-- Lime ADC worker -->
 <HdlDevice language="vhdl" spec='qadc-spec' libraries='util'>
   <!-- Other included XML -->
-  <xi:include href='lime-iq-properties.xml'/>
+  <include href='lime-iq-properties.xml'/>
 
   <!-- Parameters (build properties)-->
   <Property name='USE_CLK_OUT_p' type='bool' parameter='1' default='1'/>   <!-- Should we use the source synchronous lime clock output? -->

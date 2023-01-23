@@ -390,9 +390,8 @@ namespace OCPI {
 			      m_name.c_str())))
 	return err;
       const char *name = ezxml_name(op);
-      // FIXME:  support xi:included protocols
       if (!name || strcasecmp(name, "Operation"))
-	return "Element under Protocol is neither Operation, Protocol or xi:include";
+	return "Element under Protocol is neither Operation, Protocol or include";
       // If this is NULL we're just counting properties.
       if (!m_operations) {
 	m_nOperations++;
@@ -515,7 +514,8 @@ namespace OCPI {
       m_dataValueWidth = 0;
       const char *err;
       if ((err = OE::checkAttrs(prot, "Name", "QualifiedName", OCPI_PROTOCOL_SUMMARY_ATTRS, NULL)) ||
-	  (err = OE::checkElements(prot, "operation", "xi:include", (void*)0)) ||
+        ((err = OE::checkElements(prot, "operation", "include", (void*)0)) &&
+        (err = OE::checkElements(prot, "operation", "xi:include", (void*)0))) ||
 	  (err = OE::ezxml_children(prot, doChild ? doChild : doOperation,
 				    arg ? arg : this)))
 	return err;

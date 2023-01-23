@@ -2,6 +2,6 @@
     <DataInterfaceSpec Name="in" Optional="true"/>
     <DataInterfaceSpec Name="out" Producer="true" Optional="true"/>
     <DataInterfaceSpec Name="message">
-      <xi:include href="stream32_protocol.xml"/>
+      <include href="stream32_protocol.xml"/>
     </DataInterfaceSpec>
   </ComponentSpec>

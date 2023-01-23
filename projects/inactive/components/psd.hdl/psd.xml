@@ -1,5 +1,5 @@
 <HdlWorker Name="psd" Language="Verilog" Pattern="%w%M%0_">
-  <xi:include href="psd_spec.xml"/>
+  <include href="psd_spec.xml"/>
   <!-- force byte enables because shep always uses them -->
   <ControlInterface Sub32BitConfigProperties="true" ControlOperations="initialize">
     <Property Name="dummy0x8" padding='true'/>

@@ -28,5 +28,5 @@
       <member name="imaginary" type="longlong"/>
     </argument>
   </operation>
-  <xi:include href="timed_sample_metadata-prot.xml"/>
+  <include href="timed_sample_metadata-prot.xml"/>
 </protocol>

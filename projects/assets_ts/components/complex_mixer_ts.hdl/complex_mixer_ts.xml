@@ -1,7 +1,7 @@
 <HdlWorker language='vhdl' spec='complex_mixer_ts-spec' DataWidth='32'>
 
   <!-- Other included XML -->
-  <xi:include href='peak-detector-properties.xml'/>
+  <include href='peak-detector-properties.xml'/>
 
   <Property Name='NCO_DATA_WIDTH_p' Type='uchar' Parameter='true' Default='12'
 	    Description='Output data width of NCO'/>

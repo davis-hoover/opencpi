@@ -178,7 +178,7 @@ parseProtocol() {
       return err;
     if (protocolAttr) {
       if (protx)
-	return "can't have both 'protocol' element (maybe xi:included) and 'protocol' attribute";
+	return "can't have both 'protocol' element (maybe included) and 'protocol' attribute";
       if ((err = parseFile(protocolAttr, worker().m_file.c_str(), "protocol", &protx, protFile,
 			   false)))
 	return err;

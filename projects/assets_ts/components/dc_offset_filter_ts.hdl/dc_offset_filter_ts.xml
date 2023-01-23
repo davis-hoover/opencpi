@@ -1,7 +1,7 @@
 <HdlWorker Language="vhdl" Spec="dc_offset_filter_ts-spec.xml" DataWidth="32" Version="2">
 
   <!-- Other included XML -->
-  <xi:include href='peak-detector-properties.xml'/>
+  <include href='peak-detector-properties.xml'/>
 
   <Property Name="LATENCY" Type="ushort" Parameter="true" Default="1"
 	    Description='Number of clock cycles between a valid input and a valid output'/>
