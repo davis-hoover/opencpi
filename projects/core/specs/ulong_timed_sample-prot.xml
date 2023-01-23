@@ -25,5 +25,5 @@
   <operation name="sample">
     <argument name="data" type="ulong" sequencelength="4096"/>
   </operation>
-  <xi:include href="timed_sample_metadata-prot.xml"/>
+  <include href="timed_sample_metadata-prot.xml"/>
 </protocol>

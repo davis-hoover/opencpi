@@ -605,7 +605,7 @@ class Worker : public OM::Worker {
     "componentlibraries", "version", "libraries", "includedirs", "sourcefiles", "language",  \
     "RawProperties", "FirstRawProperty", "language"
 #define IMPL_ELEMS "componentspec", "properties", "property", "specproperty", "propertysummary",\
-    "slave", "xi:include", "controlinterface"
+    "slave", "include", "xi:include", "controlinterface"
 extern const char
   *checkSuffix(const char *str, const char *suff, const char *last),
   *createTests(const char *file, const char *package, const char *outDir, bool verbose),

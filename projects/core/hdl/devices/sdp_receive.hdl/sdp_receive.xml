@@ -1,6 +1,6 @@
 <HdlDevice language="vhdl" version='2' Libraries='platform sdp util' SourceFiles='sdp_receive_dma.vhd'>
   <componentspec/>
-  <xi:include href='sdp-properties.xml'/>
+  <include href='sdp-properties.xml'/>
   <sdp name='sdp'/>
   <!-- the clock for this will be forced to be the (global) SDP clock in the code generator -->
   <streaminterface implname='out' producer='1'

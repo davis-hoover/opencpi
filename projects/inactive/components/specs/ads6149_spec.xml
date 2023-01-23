@@ -1,7 +1,7 @@
 <ComponentSpec>
   <Properties>
     <Property Name="Base" Type="ULong" ArrayLength="1K"/>
-    <xi:include href="ads61xxbt_props.xml"/>
+    <include href="ads61xxbt_props.xml"/>
   </Properties>
   <DataInterfaceSpec Name="samples">
     <ProtocolSummary DataValueWidth="16" MaxMessageValues="4k" NumberOfOpcodes="2"/>

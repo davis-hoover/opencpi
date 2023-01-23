@@ -1,5 +1,5 @@
 <HdlWorker Name="splitter2x2" Language="Verilog" Pattern="%w%M%0_">
-  <xi:include href="splitter2x2_spec.xml"/>
+  <include href="splitter2x2_spec.xml"/>
   <!-- force byte enables because shep always uses them -->
   <ControlInterface Sub32BitConfigProperties="true">
       <Property Name="reserved1" Readable="true" Writable="false" Type="ULong"/>

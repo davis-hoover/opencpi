@@ -1,5 +1,5 @@
 <HdlWorker Name="delay" Language="Verilog" Pattern="%w%M%0_">
-  <xi:include href="delay_spec.xml"/>
+  <include href="delay_spec.xml"/>
   <ControlInterface SizeOfConfigSpace="4g" Sub32BitConfigProperties="true" ControlOperations="start,initialize" Timeout="444" Pattern="%w%M%0_">
     <Property Name="mesgWtCount" Readable="true" Writable="false" Type="ULong"/>
     <Property Name="mesgRdCount" Readable="true" Writable="false" Type="ULong"/>

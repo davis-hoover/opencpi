@@ -81,7 +81,7 @@ class TestBaseParser(unittest.TestCase):
     def test_load_xml_file(self):
         xml_string = \
             "<LEVEL1  >\n" +\
-            "<xi:include href=\"test_base_parser_1.xml\"/>\n" +\
+            "<include href=\"test_base_parser_1.xml\"/>\n" +\
             "<lEvEl1A test=\"Hello, world\" Version=\"2.0\"/>\n" +\
             "  <level2  ATTRIB=\"ImPoRtAnT TEXT\" Version = \"2A\">\n" +\
             "    <leveL2a></leveL2a>" +\
@@ -447,7 +447,12 @@ class TestBaseParser(unittest.TestCase):
                             "<xi:include href='test_base_parser_1.xml'/>",
                             "<xi:include href = \"test_base_parser_1.xml\" />",
                             "<xi:include   href= \"test_base_parser_1.xml\"/>",
-                            "<xi:include href ='test_base_parser_1.xml'  />"]
+                            "<xi:include href ='test_base_parser_1.xml'  />",
+                            "<include href=\"test_base_parser_1.xml\"/>",
+                            "<include href='test_base_parser_1.xml'/>",
+                            "<include href = \"test_base_parser_1.xml\" />",
+                            "<include   href= \"test_base_parser_1.xml\"/>",
+                            "<include href ='test_base_parser_1.xml'  />"]
         file_to_include = \
             "<example_child name=\"child1\" value=\"Hello, World!\"/>"
         expected = \
@@ -476,7 +481,7 @@ class TestBaseParser(unittest.TestCase):
 
         main_xml = \
             "<example>\n" +\
-            "  <xi:include href=\"test_base_parser_1.xml\"/>\n" +\
+            "  <include|xi:include href=\"test_base_parser_1.xml\"/>\n" +\
             "</example>\n"
 
         expected = \
@@ -503,13 +508,18 @@ class TestBaseParser(unittest.TestCase):
                             "<xi:include href='file2.xml'/>",
                             "<xi:include href = \"file3.xml\" />",
                             "<xi:include   href= \"file4\"/>",
-                            "<xi:include href ='file5'  />"]
+                            "<xi:include href ='file5'  />",
+                            "<include href=\"file1.xml\"/>",
+                            "<include href='file2.xml'/>",
+                            "<include href = \"file3.xml\" />",
+                            "<include   href= \"file4\"/>",
+                            "<include href ='file5'  />"]
 
         test_xml_string = \
             f"<example>\n" +\
             f"  {include_variants[0]}\n" +\
             f"  <ex1>{include_variants[1]}</ex1>\n" +\
-            f"  <ex2 attr=\"xi:include\"/>\n" +\
+            f"  <ex2 attr=\"include\"/>\n" +\
             f"  {include_variants[2]}{include_variants[3]}\n" +\
             f"{include_variants[4]}<example>"
         parser = xml_tools.parser.base_parser.BaseParser(filename)
@@ -523,7 +533,12 @@ class TestBaseParser(unittest.TestCase):
                             "<xi:include href='test_base_parser_1.xml'/>",
                             "<xi:include href = \"test_base_parser_1.xml\" />",
                             "<xi:include   href= \"test_base_parser_1.xml\"/>",
-                            "<xi:include href ='test_base_parser_1.xml'  />"]
+                            "<xi:include href ='test_base_parser_1.xml'  />",
+                            "<include href=\"test_base_parser_1.xml\"/>",
+                            "<include href='test_base_parser_1.xml'/>",
+                            "<include href = \"test_base_parser_1.xml\" />",
+                            "<include   href= \"test_base_parser_1.xml\"/>",
+                            "<include href ='test_base_parser_1.xml'  />"]
 
         for variant in include_variants:
             parser = xml_tools.parser.base_parser.BaseParser(filename)

@@ -1,7 +1,7 @@
 <!-- Lime DAC worker -->
 <HdlDevice language="vhdl" spec='qdac-spec' libraries='util misc_prims'>
   <!-- Other included XML -->
-  <xi:include href='lime-iq-properties.xml'/>
+  <include href='lime-iq-properties.xml'/>
 
   <!-- Properties -->
   <Property name='fifo_depth' type='ulong' parameter='1' default='64' description='Depth in number of samples of the control-to-DAC clock domain crossing FIFO.'/> <!-- default depth of 64 has been tested and known to be valid -->

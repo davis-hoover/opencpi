@@ -1,5 +1,5 @@
 <HdlWorker Name="ddc" Language="Verilog" Pattern="%w%M%0_">
-  <xi:include href="ddc_spec.xml"/>
+  <include href="ddc_spec.xml"/>
   <!-- force byte enables because shep always uses them -->
   <ControlInterface Sub32BitConfigProperties="true" controlOperations="initialize">
     <property name="reserved_0x08" arraylength="2" padding='true'/>

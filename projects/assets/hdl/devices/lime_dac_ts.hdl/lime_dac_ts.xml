@@ -1,7 +1,7 @@
 <!-- Lime DAC TimeStamped worker -->
 <HdlDevice language="vhdl" spec='qdac_ts-spec' libraries='util misc_prims'>
   <!-- Other included XML -->
-  <xi:include href='lime-iq-properties.xml'/>
+  <include href='lime-iq-properties.xml'/>
 
   <!-- Properties -->
   <Property Name="flush" Type="Bool" Writable='true' Default='false'/>
