@@ -1,513 +1,765 @@
 transition,configuration,channel,rx,tuning_freq_MHz,bandwidth_3dB_MHz,sampling_rate_Msps,samples_are_complex,gain_mode,gain_dB,tolerance_tuning_freq_MHz,tolerance_bandwidth_3dB_MHz,tolerance_samplng_rate_Msps,tolerance_gain_dB,rf_port_name,fatal,comment
-start,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,,false,request by direction=rx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,69.99,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,,true,tuning freq request by direction=rx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,,false,tuning freq request by direction=rx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,3000,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,,false,tuning freq request by direction=rx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,6000,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,,false,tuning freq request by direction=rx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,6001.01,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,,true,tuning freq request by direction=rx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.024375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,,true,bandwidth request by direction=rx test value is 0.39/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.025,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,,false,bandwidth request by direction=rx - test value is 0.4/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,1.875,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,,false,bandwidth request by direction=rx - test value is 30/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,3.5,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,,false,bandwidth request by direction=rx - test value is 56/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,3.500625,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,,true,bandwidth request by direction=rx - test value is 56.01/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.13,true,manual,0,1E-06,0.000001,0.000001,0.000001,,true,sampling rate request by direction=rx - test value is 2.08/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.13020838,true,manual,0,1E-06,0.000001,0.000001,0.000001,,false,sampling rate request by direction=rx - test value is 2.083334/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,2,true,manual,0,1E-06,0.000001,0.000001,0.000001,,false,sampling rate request by direction=rx - test value is 32/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,3.84,true,manual,0,1E-06,0.000001,0.000001,0.000001,,false,sampling rate request by direction=rx - test value is 61.44/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,3.840625,true,manual,0,1E-06,0.000001,0.000001,0.000001,,true,sampling rate request by direction=rx - test value is 61.45/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.9375,false,manual,0,1E-06,0.000001,0.000001,0.000001,,true,samples are complex request by direction=rx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,,false,samples are complex request by direction=rx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.9375,true,agc,0,1E-06,0.000001,0.000001,0.000001,,false,gain mode request by direction=rx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,,false,gain mode request by direction=rx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.9375,true,manual,-11,1E-06,0.000001,0.000001,0.000001,,true,gain unconditional request by direction=rx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,,false,gain unconditional request by direction=rx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.9375,true,manual,62,1E-06,0.000001,0.000001,0.000001,,false,gain unconditional request by direction=rx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.9375,true,manual,74,1E-06,0.000001,0.000001,0.000001,,true,gain unconditional request by direction=rx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,,false,request by direction=tx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,69.99,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,,true,tuning freq request by direction=tx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,,false,tuning freq request by direction=tx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,3000,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,,false,tuning freq request by direction=tx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,6000,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,,false,tuning freq request by direction=tx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,6001.01,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,,true,tuning freq request by direction=tx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.0775,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,,true,bandwidth request by direction=tx - test value is 1.24/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.078125,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,,false,bandwidth request by direction=tx - test value is 1.25/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,1.875,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,,false,bandwidth request by direction=tx - test value is 30/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,2.5,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,,false,bandwidth request by direction=tx - test value is 40/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,2.500625,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,,true,bandwidth request by direction=tx - test value is 40.01/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.13,true,manual,0,1E-06,0.000001,0.000001,0.000001,,true,sampling rate request by direction=tx - test value is 2.08/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.13020838,true,manual,0,1E-06,0.000001,0.000001,0.000001,,false,sampling rate request by direction=tx - test value is 2.083334/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,2,true,manual,0,1E-06,0.000001,0.000001,0.000001,,false,sampling rate request by direction=tx - test value is 32/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,3.84,true,manual,0,1E-06,0.000001,0.000001,0.000001,,false,sampling rate request by direction=tx - test value is 61.44/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,3.840625,true,manual,0,1E-06,0.000001,0.000001,0.000001,,true,sampling rate request by direction=tx - test value is 61.45/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,false,manual,0,1E-06,0.000001,0.000001,0.000001,,true,samples are complex request by direction=tx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,,false,samples are complex request by direction=tx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,agc,0,1E-06,0.000001,0.000001,0.000001,,true,gain mode request by direction=tx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,,false,gain mode request by direction=tx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,manual,-89.76,1E-06,0.000001,0.000001,0.000001,,true,gain request by direction=tx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,manual,-89.75,1E-06,0.000001,0.000001,0.000001,,false,gain request by direction=tx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,manual,-40,1E-06,0.000001,0.000001,0.000001,,false,gain request by direction=tx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,,false,gain request by direction=tx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,manual,0.01,1E-06,0.000001,0.000001,0.000001,,true,gain request by direction=tx
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,direction request by rf_port_name=Rx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,true,direction request by rf_port_name=Rx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,69.99,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,true,tuning freq request by rf_port_name=Rx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,tuning freq request by rf_port_name=Rx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,3000,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,tuning freq request by rf_port_name=Rx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,6000,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,tuning freq request by rf_port_name=Rx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,6001.01,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,true,tuning freq request by rf_port_name=Rx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.024375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,true,bandwidth request by rf_port_name=Rx0 test value is 0.39/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.025,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,bandwidth request by rf_port_name=Rx0 test value is 0.4/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,1.875,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,bandwidth request by rf_port_name=Rx0 test value is 30/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,3.5,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,bandwidth request by rf_port_name=Rx0 test value is 56/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,3.500625,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,true,bandwidth request by rf_port_name=Rx0 test value is 56.01/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.13,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,true,sampling rate request by rf_port_name=Rx0 test value is 2.08/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.13020838,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,sampling rate request by rf_port_name=Rx0 test value is 2.083334/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,2,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,sampling rate request by rf_port_name=Rx0 test value is 32/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,3.84,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,sampling rate request by rf_port_name=Rx0 test value is 61.44/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,3.840625,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,true,sampling rate request by rf_port_name=Rx0 test value is 61.45/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.9375,false,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,true,samples are complex request by rf_port_name=Rx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,samples are complex request by rf_port_name=Rx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.9375,true,agc,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,gain mode request by rf_port_name=Rx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,gain mode request by rf_port_name=Rx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.9375,true,manual,-11,1E-06,0.000001,0.000001,0.000001,Rx0,true,gain unconditional request by rf_port_name=Rx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,gain unconditional request by rf_port_name=Rx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.9375,true,manual,62,1E-06,0.000001,0.000001,0.000001,Rx0,false,gain unconditional request by rf_port_name=Rx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.9375,true,manual,74,1E-06,0.000001,0.000001,0.000001,Rx0,true,gain unconditional request by rf_port_name=Rx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx1,false,direction request by rf_port_name=Rx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx1,true,direction request by rf_port_name=Rx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,69.99,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx1,true,tuning freq request by rf_port_name=Rx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx1,false,tuning freq request by rf_port_name=Rx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,3000,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx1,false,tuning freq request by rf_port_name=Rx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,6000,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx1,false,tuning freq request by rf_port_name=Rx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,6001.01,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx1,true,tuning freq request by rf_port_name=Rx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.024375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx1,true,bandwidth request by rf_port_name=Rx1 test value is 0.39/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.025,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx1,false,bandwidth request by rf_port_name=Rx1 test value is 0.4/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,1.875,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx1,false,bandwidth request by rf_port_name=Rx1 test value is 30/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,3.5,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx1,false,bandwidth request by rf_port_name=Rx1 test value is 56/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,3.500625,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx1,true,bandwidth request by rf_port_name=Rx1test value is 56.01/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.13,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx1,true,sampling rate request by rf_port_name=Rx1test value is 2.08/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.13020838,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx1,false,sampling rate request by rf_port_name=Rx1est value is 2.083334/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,2,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx1,false,sampling rate request by rf_port_name=Rx1test value is 32/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,3.84,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx1,false,sampling rate request by rf_port_name=Rx1test value is 61.44/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,3.840625,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx1,true,sampling rate request by rf_port_name=Rx1est value is 61.45/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.9375,false,manual,0,1E-06,0.000001,0.000001,0.000001,Rx1,true,samples are complex request by rf_port_name=Rx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx1,false,samples are complex request by rf_port_name=Rx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.9375,true,agc,0,1E-06,0.000001,0.000001,0.000001,Rx1,false,gain mode request by rf_port_name=Rx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx1,false,gain mode request by rf_port_name=Rx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.9375,true,manual,-11,1E-06,0.000001,0.000001,0.000001,Rx1,true,gain unconditional request by rf_port_name=Rx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx1,false,gain unconditional request by rf_port_name=Rx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.9375,true,manual,62,1E-06,0.000001,0.000001,0.000001,Rx1,false,gain unconditional request by rf_port_name=Rx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.9375,true,manual,74,1E-06,0.000001,0.000001,0.000001,Rx1,true,gain unconditional request by rf_port_name=Rx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx0,true,direction request by rf_port_name=Tx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx0,false,direction request by rf_port_name=Tx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,69.99,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx0,true,tuning freq request by rf_port_name=Tx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx0,false,tuning freq request by rf_port_name=Tx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,3000,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx0,false,tuning freq request by rf_port_name=Tx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,6000,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx0,false,tuning freq request by rf_port_name=Tx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,6001.01,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx0,true,tuning freq request by rf_port_name=Tx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.0775,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx0,true,bandwidth request by rf_port_name=Tx0 - test value is 1.24/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.078125,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx0,false,bandwidth request by rf_port_name=Tx0 - test value is 1.25/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,1.875,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx0,false,bandwidth request by rf_port_name=Tx0 - test value is 30/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,2.5,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx0,false,bandwidth request by rf_port_name=Tx0 - test value is 40/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,2.500625,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx0,true,bandwidth request by rf_port_name=Tx0 - test value is 40.01/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.13,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx0,true,sampling rate request by rf_port_name=Tx0 - test value is 2.08/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.13020838,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx0,false,sampling rate request by rf_port_name=Tx0 - test value is 2.083334/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,2,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx0,false,sampling rate request by rf_port_name=Tx0 - test value is 32/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,3.84,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx0,false,sampling rate request by rf_port_name=Tx0 - test value is 61.44/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,3.840625,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx0,true,sampling rate request by rf_port_name=Tx0 -test value is 61.45/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,false,manual,0,1E-06,0.000001,0.000001,0.000001,Tx0,true,samples are complex request by rf_port_name=Tx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx0,false,samples are complex request by rf_port_name=Tx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,agc,0,1E-06,0.000001,0.000001,0.000001,Tx0,true,gain mode request by rf_port_name=Tx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx0,false,gain mode request by rf_port_name=Tx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,manual,-89.76,1E-06,0.000001,0.000001,0.000001,Tx0,true,gain request by rf_port_name=Tx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,manual,-89.75,1E-06,0.000001,0.000001,0.000001,Tx0,false,gain request by rf_port_name=Tx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,manual,-40,1E-06,0.000001,0.000001,0.000001,Tx0,false,gain request by rf_port_name=Tx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx0,false,gain request by rf_port_name=Tx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,manual,0.01,1E-06,0.000001,0.000001,0.000001,Tx0,true,gain request by rf_port_name=Tx0
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx1,true,direction request by rf_port_name=Tx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx1,false,direction request by rf_port_name=Tx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,69.99,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx1,true,tuning freq request by rf_port_name=Tx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx1,false,tuning freq request by rf_port_name=Tx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,3000,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx1,false,tuning freq request by rf_port_name=Tx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,6000,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx1,false,tuning freq request by rf_port_name=Tx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,6001.01,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx1,true,tuning freq
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.0775,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx1,true,bandwidth request by rf_port_name=Tx1 - test value is 1.24/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.078125,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx1,false,bandwidth request by rf_port_name=Tx1 - test value is 1.25/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,1.875,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx1,false,bandwidth request by rf_port_name=Tx1 - test value is 30/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,2.5,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx1,false,bandwidth request by rf_port_name=Tx1 - test value is 40/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,2.500625,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx1,true,bandwidth request by rf_port_name=Tx1 - test value is 40.01/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.13,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx1,true,sampling rate request by rf_port_name=Tx1 - test value is 2.08/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.13020838,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx1,false,sampling rate request by rf_port_name=Tx1 - ttest value is 2.083334/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,2,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx1,false,sampling rate request by rf_port_name=Tx1 - test value is 32/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,3.84,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx1,false,sampling rate request by rf_port_name=Tx1 - test value is 61.44/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,3.840625,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx1,true,sampling rate request by rf_port_name=Tx1 - test value is 61.45/16
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,false,manual,0,1E-06,0.000001,0.000001,0.000001,Tx1,true,samples are complex request by rf_port_name=Tx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx1,false,samples are complex request by rf_port_name=Tx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,agc,0,1E-06,0.000001,0.000001,0.000001,Tx1,true,gain mode request by rf_port_name=Tx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx1,false,gain mode request by rf_port_name=Tx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,manual,-89.76,1E-06,0.000001,0.000001,0.000001,Tx1,true,gain request by rf_port_name=Tx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,manual,-89.75,1E-06,0.000001,0.000001,0.000001,Tx1,false,gain request by rf_port_name=Tx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,manual,-40,1E-06,0.000001,0.000001,0.000001,Tx1,false,gain request by rf_port_name=Tx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Tx1,false,gain request by rf_port_name=Tx1
-release,0,0,,,,,,,,,,,,,,
-start,0,0,false,2450,0.9375,0.9375,true,manual,0.01,1E-06,0.000001,0.000001,0.000001,Tx1,true,gain request by rf_port_name=Tx1
-release,0,0,,,,,,,,,,,,,,
-,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,,max subsequent channels
-,0,1,true,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,,max subsequent channels
-,0,2,true,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,,max subsequent channels
-,0,3,true,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,,max subsequent channels
-start,0,0,,,,,,,,,,,,,false,max subsequent channels
-,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,,max subsequent channels - expected fatal since invalid with other channels fc=2450e6
-,0,1,true,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,,max subsequent channels
-,0,2,true,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,,max subsequent channels
-,0,3,true,2450,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,,max subsequent channels
-start,0,0,,,,,,,,,,,,,true,max subsequent channels
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
-release,0,0,,,,,,,,,,,,,,
-start,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,0.000001,0.000001,0.000001,Rx0,false,rapid retune with same frequency
+,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,request by direction=rx
+start,0,,,,,,,,,,,,,,false,request by direction=rx
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,69.99,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,tuning freq request by direction=rx
+start,0,,,,,,,,,,,,,,true,tuning freq request by direction=rx
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,tuning freq request by direction=rx
+start,0,,,,,,,,,,,,,,false,tuning freq request by direction=rx
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,3000,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,tuning freq request by direction=rx
+start,0,,,,,,,,,,,,,,false,tuning freq request by direction=rx
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,6000,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,tuning freq request by direction=rx
+start,0,,,,,,,,,,,,,,false,tuning freq request by direction=rx
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,6001.01,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,tuning freq request by direction=rx
+start,0,,,,,,,,,,,,,,true,tuning freq request by direction=rx
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.024375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,bandwidth request by direction=rx test value is 0.39/16
+start,0,,,,,,,,,,,,,,true,bandwidth request by direction=rx test value is 0.39/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.025,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,bandwidth request by direction=rx - test value is 0.4/16
+start,0,,,,,,,,,,,,,,false,bandwidth request by direction=rx - test value is 0.4/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,1.875,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,bandwidth request by direction=rx - test value is 30/16
+start,0,,,,,,,,,,,,,,false,bandwidth request by direction=rx - test value is 30/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,3.5,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,bandwidth request by direction=rx - test value is 56/16
+start,0,,,,,,,,,,,,,,false,bandwidth request by direction=rx - test value is 56/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,3.500625,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,bandwidth request by direction=rx - test value is 56.01/16
+start,0,,,,,,,,,,,,,,true,bandwidth request by direction=rx - test value is 56.01/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.13,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,sampling rate request by direction=rx - test value is 2.08/16
+start,0,,,,,,,,,,,,,,true,sampling rate request by direction=rx - test value is 2.08/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.13020838,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,sampling rate request by direction=rx - test value is 2.083334/16
+start,0,,,,,,,,,,,,,,false,sampling rate request by direction=rx - test value is 2.083334/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,2,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,sampling rate request by direction=rx - test value is 32/16
+start,0,,,,,,,,,,,,,,false,sampling rate request by direction=rx - test value is 32/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,3.84,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,sampling rate request by direction=rx - test value is 61.44/16
+start,0,,,,,,,,,,,,,,false,sampling rate request by direction=rx - test value is 61.44/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,3.840625,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,sampling rate request by direction=rx - test value is 61.45/16
+start,0,,,,,,,,,,,,,,true,sampling rate request by direction=rx - test value is 61.45/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,false,manual,0,1E-06,1E-06,1E-06,1E-06,,,samples are complex request by direction=rx
+start,0,,,,,,,,,,,,,,true,samples are complex request by direction=rx
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,samples are complex request by direction=rx
+start,0,,,,,,,,,,,,,,false,samples are complex request by direction=rx
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,true,agc,0,1E-06,1E-06,1E-06,1E-06,,,gain mode request by direction=rx
+start,0,,,,,,,,,,,,,,false,gain mode request by direction=rx
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,gain mode request by direction=rx
+start,0,,,,,,,,,,,,,,false,gain mode request by direction=rx
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,true,manual,-11,1E-06,1E-06,1E-06,1E-06,,,gain unconditional request by direction=rx
+start,0,,,,,,,,,,,,,,true,gain unconditional request by direction=rx
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,gain unconditional request by direction=rx
+start,0,,,,,,,,,,,,,,false,gain unconditional request by direction=rx
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,true,manual,62,1E-06,1E-06,1E-06,1E-06,,,gain unconditional request by direction=rx
+start,0,,,,,,,,,,,,,,false,gain unconditional request by direction=rx
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,true,manual,74,1E-06,1E-06,1E-06,1E-06,,,gain unconditional request by direction=rx
+start,0,,,,,,,,,,,,,,true,gain unconditional request by direction=rx
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,request by direction=tx
+start,0,,,,,,,,,,,,,,false,request by direction=tx
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,69.99,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,tuning freq request by direction=tx
+start,0,,,,,,,,,,,,,,true,tuning freq request by direction=tx
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,tuning freq request by direction=tx
+start,0,,,,,,,,,,,,,,false,tuning freq request by direction=tx
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,3000,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,tuning freq request by direction=tx
+start,0,,,,,,,,,,,,,,false,tuning freq request by direction=tx
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,6000,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,tuning freq request by direction=tx
+start,0,,,,,,,,,,,,,,false,tuning freq request by direction=tx
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,6001.01,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,tuning freq request by direction=tx
+start,0,,,,,,,,,,,,,,true,tuning freq request by direction=tx
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.0775,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,bandwidth request by direction=tx - test value is 1.24/16
+start,0,,,,,,,,,,,,,,true,bandwidth request by direction=tx - test value is 1.24/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.078125,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,bandwidth request by direction=tx - test value is 1.25/16
+start,0,,,,,,,,,,,,,,false,bandwidth request by direction=tx - test value is 1.25/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,1.875,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,bandwidth request by direction=tx - test value is 30/16
+start,0,,,,,,,,,,,,,,false,bandwidth request by direction=tx - test value is 30/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,2.5,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,bandwidth request by direction=tx - test value is 40/16
+start,0,,,,,,,,,,,,,,false,bandwidth request by direction=tx - test value is 40/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,2.500625,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,bandwidth request by direction=tx - test value is 40.01/16
+start,0,,,,,,,,,,,,,,true,bandwidth request by direction=tx - test value is 40.01/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.13,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,sampling rate request by direction=tx - test value is 2.08/16
+start,0,,,,,,,,,,,,,,true,sampling rate request by direction=tx - test value is 2.08/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.13020838,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,sampling rate request by direction=tx - test value is 2.083334/16
+start,0,,,,,,,,,,,,,,false,sampling rate request by direction=tx - test value is 2.083334/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,2,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,sampling rate request by direction=tx - test value is 32/16
+start,0,,,,,,,,,,,,,,false,sampling rate request by direction=tx - test value is 32/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,3.84,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,sampling rate request by direction=tx - test value is 61.44/16
+start,0,,,,,,,,,,,,,,false,sampling rate request by direction=tx - test value is 61.44/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,3.840625,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,sampling rate request by direction=tx - test value is 61.45/16
+start,0,,,,,,,,,,,,,,true,sampling rate request by direction=tx - test value is 61.45/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,false,manual,0,1E-06,1E-06,1E-06,1E-06,,,samples are complex request by direction=tx
+start,0,,,,,,,,,,,,,,true,samples are complex request by direction=tx
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,samples are complex request by direction=tx
+start,0,,,,,,,,,,,,,,false,samples are complex request by direction=tx
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,agc,0,1E-06,1E-06,1E-06,1E-06,,,gain mode request by direction=tx
+start,0,,,,,,,,,,,,,,true,gain mode request by direction=tx
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,gain mode request by direction=tx
+start,0,,,,,,,,,,,,,,false,gain mode request by direction=tx
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,manual,-89.76,1E-06,1E-06,1E-06,1E-06,,,gain request by direction=tx
+start,0,,,,,,,,,,,,,,true,gain request by direction=tx
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,manual,-89.75,1E-06,1E-06,1E-06,1E-06,,,gain request by direction=tx
+start,0,,,,,,,,,,,,,,false,gain request by direction=tx
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,manual,-40,1E-06,1E-06,1E-06,1E-06,,,gain request by direction=tx
+start,0,,,,,,,,,,,,,,false,gain request by direction=tx
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,gain request by direction=tx
+start,0,,,,,,,,,,,,,,false,gain request by direction=tx
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,manual,0.01,1E-06,1E-06,1E-06,1E-06,,,gain request by direction=tx
+start,0,,,,,,,,,,,,,,true,gain request by direction=tx
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,direction request by rf_port_name=Rx0
+start,0,,,,,,,,,,,,,,false,direction request by rf_port_name=Rx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,direction request by rf_port_name=Rx0
+start,0,,,,,,,,,,,,,,true,direction request by rf_port_name=Rx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,69.99,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,tuning freq request by rf_port_name=Rx0
+start,0,,,,,,,,,,,,,,true,tuning freq request by rf_port_name=Rx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,tuning freq request by rf_port_name=Rx0
+start,0,,,,,,,,,,,,,,false,tuning freq request by rf_port_name=Rx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,3000,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,tuning freq request by rf_port_name=Rx0
+start,0,,,,,,,,,,,,,,false,tuning freq request by rf_port_name=Rx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,6000,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,tuning freq request by rf_port_name=Rx0
+start,0,,,,,,,,,,,,,,false,tuning freq request by rf_port_name=Rx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,6001.01,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,tuning freq request by rf_port_name=Rx0
+start,0,,,,,,,,,,,,,,true,tuning freq request by rf_port_name=Rx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.024375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,bandwidth request by rf_port_name=Rx0 test value is 0.39/16
+start,0,,,,,,,,,,,,,,true,bandwidth request by rf_port_name=Rx0 test value is 0.39/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.025,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,bandwidth request by rf_port_name=Rx0 test value is 0.4/16
+start,0,,,,,,,,,,,,,,false,bandwidth request by rf_port_name=Rx0 test value is 0.4/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,1.875,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,bandwidth request by rf_port_name=Rx0 test value is 30/16
+start,0,,,,,,,,,,,,,,false,bandwidth request by rf_port_name=Rx0 test value is 30/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,3.5,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,bandwidth request by rf_port_name=Rx0 test value is 56/16
+start,0,,,,,,,,,,,,,,false,bandwidth request by rf_port_name=Rx0 test value is 56/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,3.500625,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,bandwidth request by rf_port_name=Rx0 test value is 56.01/16
+start,0,,,,,,,,,,,,,,true,bandwidth request by rf_port_name=Rx0 test value is 56.01/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.13,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,sampling rate request by rf_port_name=Rx0 test value is 2.08/16
+start,0,,,,,,,,,,,,,,true,sampling rate request by rf_port_name=Rx0 test value is 2.08/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.13020838,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,sampling rate request by rf_port_name=Rx0 test value is 2.083334/16
+start,0,,,,,,,,,,,,,,false,sampling rate request by rf_port_name=Rx0 test value is 2.083334/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,2,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,sampling rate request by rf_port_name=Rx0 test value is 32/16
+start,0,,,,,,,,,,,,,,false,sampling rate request by rf_port_name=Rx0 test value is 32/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,3.84,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,sampling rate request by rf_port_name=Rx0 test value is 61.44/16
+start,0,,,,,,,,,,,,,,false,sampling rate request by rf_port_name=Rx0 test value is 61.44/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,3.840625,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,sampling rate request by rf_port_name=Rx0 test value is 61.45/16
+start,0,,,,,,,,,,,,,,true,sampling rate request by rf_port_name=Rx0 test value is 61.45/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,false,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,samples are complex request by rf_port_name=Rx0
+start,0,,,,,,,,,,,,,,true,samples are complex request by rf_port_name=Rx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,samples are complex request by rf_port_name=Rx0
+start,0,,,,,,,,,,,,,,false,samples are complex request by rf_port_name=Rx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,true,agc,0,1E-06,1E-06,1E-06,1E-06,Rx0,,gain mode request by rf_port_name=Rx0
+start,0,,,,,,,,,,,,,,false,gain mode request by rf_port_name=Rx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,gain mode request by rf_port_name=Rx0
+start,0,,,,,,,,,,,,,,false,gain mode request by rf_port_name=Rx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,true,manual,-11,1E-06,1E-06,1E-06,1E-06,Rx0,,gain unconditional request by rf_port_name=Rx0
+start,0,,,,,,,,,,,,,,true,gain unconditional request by rf_port_name=Rx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,gain unconditional request by rf_port_name=Rx0
+start,0,,,,,,,,,,,,,,false,gain unconditional request by rf_port_name=Rx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,true,manual,62,1E-06,1E-06,1E-06,1E-06,Rx0,,gain unconditional request by rf_port_name=Rx0
+start,0,,,,,,,,,,,,,,false,gain unconditional request by rf_port_name=Rx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,true,manual,74,1E-06,1E-06,1E-06,1E-06,Rx0,,gain unconditional request by rf_port_name=Rx0
+start,0,,,,,,,,,,,,,,true,gain unconditional request by rf_port_name=Rx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx1,,direction request by rf_port_name=Rx1
+start,0,,,,,,,,,,,,,,false,direction request by rf_port_name=Rx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx1,,direction request by rf_port_name=Rx1
+start,0,,,,,,,,,,,,,,true,direction request by rf_port_name=Rx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,69.99,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx1,,tuning freq request by rf_port_name=Rx1
+start,0,,,,,,,,,,,,,,true,tuning freq request by rf_port_name=Rx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx1,,tuning freq request by rf_port_name=Rx1
+start,0,,,,,,,,,,,,,,false,tuning freq request by rf_port_name=Rx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,3000,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx1,,tuning freq request by rf_port_name=Rx1
+start,0,,,,,,,,,,,,,,false,tuning freq request by rf_port_name=Rx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,6000,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx1,,tuning freq request by rf_port_name=Rx1
+start,0,,,,,,,,,,,,,,false,tuning freq request by rf_port_name=Rx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,6001.01,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx1,,tuning freq request by rf_port_name=Rx1
+start,0,,,,,,,,,,,,,,true,tuning freq request by rf_port_name=Rx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.024375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx1,,bandwidth request by rf_port_name=Rx1 test value is 0.39/16
+start,0,,,,,,,,,,,,,,true,bandwidth request by rf_port_name=Rx1 test value is 0.39/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.025,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx1,,bandwidth request by rf_port_name=Rx1 test value is 0.4/16
+start,0,,,,,,,,,,,,,,false,bandwidth request by rf_port_name=Rx1 test value is 0.4/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,1.875,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx1,,bandwidth request by rf_port_name=Rx1 test value is 30/16
+start,0,,,,,,,,,,,,,,false,bandwidth request by rf_port_name=Rx1 test value is 30/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,3.5,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx1,,bandwidth request by rf_port_name=Rx1 test value is 56/16
+start,0,,,,,,,,,,,,,,false,bandwidth request by rf_port_name=Rx1 test value is 56/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,3.500625,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx1,,bandwidth request by rf_port_name=Rx1test value is 56.01/16
+start,0,,,,,,,,,,,,,,true,bandwidth request by rf_port_name=Rx1test value is 56.01/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.13,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx1,,sampling rate request by rf_port_name=Rx1test value is 2.08/16
+start,0,,,,,,,,,,,,,,true,sampling rate request by rf_port_name=Rx1test value is 2.08/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.13020838,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx1,,sampling rate request by rf_port_name=Rx1est value is 2.083334/16
+start,0,,,,,,,,,,,,,,false,sampling rate request by rf_port_name=Rx1est value is 2.083334/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,2,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx1,,sampling rate request by rf_port_name=Rx1test value is 32/16
+start,0,,,,,,,,,,,,,,false,sampling rate request by rf_port_name=Rx1test value is 32/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,3.84,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx1,,sampling rate request by rf_port_name=Rx1test value is 61.44/16
+start,0,,,,,,,,,,,,,,false,sampling rate request by rf_port_name=Rx1test value is 61.44/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,3.840625,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx1,,sampling rate request by rf_port_name=Rx1est value is 61.45/16
+start,0,,,,,,,,,,,,,,true,sampling rate request by rf_port_name=Rx1est value is 61.45/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,false,manual,0,1E-06,1E-06,1E-06,1E-06,Rx1,,samples are complex request by rf_port_name=Rx1
+start,0,,,,,,,,,,,,,,true,samples are complex request by rf_port_name=Rx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx1,,samples are complex request by rf_port_name=Rx1
+start,0,,,,,,,,,,,,,,false,samples are complex request by rf_port_name=Rx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,true,agc,0,1E-06,1E-06,1E-06,1E-06,Rx1,,gain mode request by rf_port_name=Rx1
+start,0,,,,,,,,,,,,,,false,gain mode request by rf_port_name=Rx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx1,,gain mode request by rf_port_name=Rx1
+start,0,,,,,,,,,,,,,,false,gain mode request by rf_port_name=Rx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,true,manual,-11,1E-06,1E-06,1E-06,1E-06,Rx1,,gain unconditional request by rf_port_name=Rx1
+start,0,,,,,,,,,,,,,,true,gain unconditional request by rf_port_name=Rx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx1,,gain unconditional request by rf_port_name=Rx1
+start,0,,,,,,,,,,,,,,false,gain unconditional request by rf_port_name=Rx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,true,manual,62,1E-06,1E-06,1E-06,1E-06,Rx1,,gain unconditional request by rf_port_name=Rx1
+start,0,,,,,,,,,,,,,,false,gain unconditional request by rf_port_name=Rx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,true,manual,74,1E-06,1E-06,1E-06,1E-06,Rx1,,gain unconditional request by rf_port_name=Rx1
+start,0,,,,,,,,,,,,,,true,gain unconditional request by rf_port_name=Rx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx0,,direction request by rf_port_name=Tx0
+start,0,,,,,,,,,,,,,,true,direction request by rf_port_name=Tx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx0,,direction request by rf_port_name=Tx0
+start,0,,,,,,,,,,,,,,false,direction request by rf_port_name=Tx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,69.99,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx0,,tuning freq request by rf_port_name=Tx0
+start,0,,,,,,,,,,,,,,true,tuning freq request by rf_port_name=Tx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx0,,tuning freq request by rf_port_name=Tx0
+start,0,,,,,,,,,,,,,,false,tuning freq request by rf_port_name=Tx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,3000,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx0,,tuning freq request by rf_port_name=Tx0
+start,0,,,,,,,,,,,,,,false,tuning freq request by rf_port_name=Tx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,6000,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx0,,tuning freq request by rf_port_name=Tx0
+start,0,,,,,,,,,,,,,,false,tuning freq request by rf_port_name=Tx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,6001.01,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx0,,tuning freq request by rf_port_name=Tx0
+start,0,,,,,,,,,,,,,,true,tuning freq request by rf_port_name=Tx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.0775,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx0,,bandwidth request by rf_port_name=Tx0 - test value is 1.24/16
+start,0,,,,,,,,,,,,,,true,bandwidth request by rf_port_name=Tx0 - test value is 1.24/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.078125,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx0,,bandwidth request by rf_port_name=Tx0 - test value is 1.25/16
+start,0,,,,,,,,,,,,,,false,bandwidth request by rf_port_name=Tx0 - test value is 1.25/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,1.875,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx0,,bandwidth request by rf_port_name=Tx0 - test value is 30/16
+start,0,,,,,,,,,,,,,,false,bandwidth request by rf_port_name=Tx0 - test value is 30/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,2.5,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx0,,bandwidth request by rf_port_name=Tx0 - test value is 40/16
+start,0,,,,,,,,,,,,,,false,bandwidth request by rf_port_name=Tx0 - test value is 40/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,2.500625,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx0,,bandwidth request by rf_port_name=Tx0 - test value is 40.01/16
+start,0,,,,,,,,,,,,,,true,bandwidth request by rf_port_name=Tx0 - test value is 40.01/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.13,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx0,,sampling rate request by rf_port_name=Tx0 - test value is 2.08/16
+start,0,,,,,,,,,,,,,,true,sampling rate request by rf_port_name=Tx0 - test value is 2.08/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.13020838,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx0,,sampling rate request by rf_port_name=Tx0 - test value is 2.083334/16
+start,0,,,,,,,,,,,,,,false,sampling rate request by rf_port_name=Tx0 - test value is 2.083334/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,2,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx0,,sampling rate request by rf_port_name=Tx0 - test value is 32/16
+start,0,,,,,,,,,,,,,,false,sampling rate request by rf_port_name=Tx0 - test value is 32/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,3.84,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx0,,sampling rate request by rf_port_name=Tx0 - test value is 61.44/16
+start,0,,,,,,,,,,,,,,false,sampling rate request by rf_port_name=Tx0 - test value is 61.44/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,3.840625,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx0,,sampling rate request by rf_port_name=Tx0 -test value is 61.45/16
+start,0,,,,,,,,,,,,,,true,sampling rate request by rf_port_name=Tx0 -test value is 61.45/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,false,manual,0,1E-06,1E-06,1E-06,1E-06,Tx0,,samples are complex request by rf_port_name=Tx0
+start,0,,,,,,,,,,,,,,true,samples are complex request by rf_port_name=Tx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx0,,samples are complex request by rf_port_name=Tx0
+start,0,,,,,,,,,,,,,,false,samples are complex request by rf_port_name=Tx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,agc,0,1E-06,1E-06,1E-06,1E-06,Tx0,,gain mode request by rf_port_name=Tx0
+start,0,,,,,,,,,,,,,,true,gain mode request by rf_port_name=Tx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx0,,gain mode request by rf_port_name=Tx0
+start,0,,,,,,,,,,,,,,false,gain mode request by rf_port_name=Tx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,manual,-89.76,1E-06,1E-06,1E-06,1E-06,Tx0,,gain request by rf_port_name=Tx0
+start,0,,,,,,,,,,,,,,true,gain request by rf_port_name=Tx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,manual,-89.75,1E-06,1E-06,1E-06,1E-06,Tx0,,gain request by rf_port_name=Tx0
+start,0,,,,,,,,,,,,,,false,gain request by rf_port_name=Tx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,manual,-40,1E-06,1E-06,1E-06,1E-06,Tx0,,gain request by rf_port_name=Tx0
+start,0,,,,,,,,,,,,,,false,gain request by rf_port_name=Tx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx0,,gain request by rf_port_name=Tx0
+start,0,,,,,,,,,,,,,,false,gain request by rf_port_name=Tx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,manual,0.01,1E-06,1E-06,1E-06,1E-06,Tx0,,gain request by rf_port_name=Tx0
+start,0,,,,,,,,,,,,,,true,gain request by rf_port_name=Tx0
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx1,,direction request by rf_port_name=Tx1
+start,0,,,,,,,,,,,,,,true,direction request by rf_port_name=Tx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx1,,direction request by rf_port_name=Tx1
+start,0,,,,,,,,,,,,,,false,direction request by rf_port_name=Tx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,69.99,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx1,,tuning freq request by rf_port_name=Tx1
+start,0,,,,,,,,,,,,,,true,tuning freq request by rf_port_name=Tx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx1,,tuning freq request by rf_port_name=Tx1
+start,0,,,,,,,,,,,,,,false,tuning freq request by rf_port_name=Tx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,3000,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx1,,tuning freq request by rf_port_name=Tx1
+start,0,,,,,,,,,,,,,,false,tuning freq request by rf_port_name=Tx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,6000,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx1,,tuning freq request by rf_port_name=Tx1
+start,0,,,,,,,,,,,,,,false,tuning freq request by rf_port_name=Tx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,6001.01,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx1,,tuning freq
+start,0,,,,,,,,,,,,,,true,tuning freq
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.0775,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx1,,bandwidth request by rf_port_name=Tx1 - test value is 1.24/16
+start,0,,,,,,,,,,,,,,true,bandwidth request by rf_port_name=Tx1 - test value is 1.24/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.078125,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx1,,bandwidth request by rf_port_name=Tx1 - test value is 1.25/16
+start,0,,,,,,,,,,,,,,false,bandwidth request by rf_port_name=Tx1 - test value is 1.25/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,1.875,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx1,,bandwidth request by rf_port_name=Tx1 - test value is 30/16
+start,0,,,,,,,,,,,,,,false,bandwidth request by rf_port_name=Tx1 - test value is 30/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,2.5,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx1,,bandwidth request by rf_port_name=Tx1 - test value is 40/16
+start,0,,,,,,,,,,,,,,false,bandwidth request by rf_port_name=Tx1 - test value is 40/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,2.500625,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx1,,bandwidth request by rf_port_name=Tx1 - test value is 40.01/16
+start,0,,,,,,,,,,,,,,true,bandwidth request by rf_port_name=Tx1 - test value is 40.01/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.13,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx1,,sampling rate request by rf_port_name=Tx1 - test value is 2.08/16
+start,0,,,,,,,,,,,,,,true,sampling rate request by rf_port_name=Tx1 - test value is 2.08/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.13020838,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx1,,sampling rate request by rf_port_name=Tx1 - ttest value is 2.083334/16
+start,0,,,,,,,,,,,,,,false,sampling rate request by rf_port_name=Tx1 - ttest value is 2.083334/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,2,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx1,,sampling rate request by rf_port_name=Tx1 - test value is 32/16
+start,0,,,,,,,,,,,,,,false,sampling rate request by rf_port_name=Tx1 - test value is 32/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,3.84,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx1,,sampling rate request by rf_port_name=Tx1 - test value is 61.44/16
+start,0,,,,,,,,,,,,,,false,sampling rate request by rf_port_name=Tx1 - test value is 61.44/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,3.840625,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx1,,sampling rate request by rf_port_name=Tx1 - test value is 61.45/16
+start,0,,,,,,,,,,,,,,true,sampling rate request by rf_port_name=Tx1 - test value is 61.45/16
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,false,manual,0,1E-06,1E-06,1E-06,1E-06,Tx1,,samples are complex request by rf_port_name=Tx1
+start,0,,,,,,,,,,,,,,true,samples are complex request by rf_port_name=Tx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx1,,samples are complex request by rf_port_name=Tx1
+start,0,,,,,,,,,,,,,,false,samples are complex request by rf_port_name=Tx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,agc,0,1E-06,1E-06,1E-06,1E-06,Tx1,,gain mode request by rf_port_name=Tx1
+start,0,,,,,,,,,,,,,,true,gain mode request by rf_port_name=Tx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx1,,gain mode request by rf_port_name=Tx1
+start,0,,,,,,,,,,,,,,false,gain mode request by rf_port_name=Tx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,manual,-89.76,1E-06,1E-06,1E-06,1E-06,Tx1,,gain request by rf_port_name=Tx1
+start,0,,,,,,,,,,,,,,true,gain request by rf_port_name=Tx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,manual,-89.75,1E-06,1E-06,1E-06,1E-06,Tx1,,gain request by rf_port_name=Tx1
+start,0,,,,,,,,,,,,,,false,gain request by rf_port_name=Tx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,manual,-40,1E-06,1E-06,1E-06,1E-06,Tx1,,gain request by rf_port_name=Tx1
+start,0,,,,,,,,,,,,,,false,gain request by rf_port_name=Tx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx1,,gain request by rf_port_name=Tx1
+start,0,,,,,,,,,,,,,,false,gain request by rf_port_name=Tx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,false,2450,0.9375,0.9375,true,manual,0.01,1E-06,1E-06,1E-06,1E-06,Tx1,,gain request by rf_port_name=Tx1
+start,0,,,,,,,,,,,,,,true,gain request by rf_port_name=Tx1
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,max subsequent channels
+,0,1,true,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx1,,max subsequent channels
+,0,2,false,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx0,,max subsequent channels
+,0,3,false,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx1,,max subsequent channels
+start,0,,,,,,,,,,,,,,false,max subsequent channels
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,max subsequent channels - expected fatal since invalid with other channels fc=2450e6
+,0,1,true,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx1,,max subsequent channels
+,0,2,false,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx0,,max subsequent channels
+,0,3,false,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx1,,max subsequent channels
+start,0,,,,,,,,,,,,,,true,max subsequent channels
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
+release,0,,,,,,,,,,,,,,false,
+,0,0,true,70,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,rapid retune with same frequency
+start,0,,,,,,,,,,,,,,false,rapid retune with same frequency
