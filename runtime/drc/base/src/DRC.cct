@@ -26,7 +26,10 @@
 ///@TODO / FIXME address whether to remove
 #define IS_LOCKING
 
-namespace DRC {
+namespace OCPI {
+
+/// @todo / FIXME - consolidate into DRC namespace
+namespace DRC_PHASE_2 {
 
 const CSPSolver::FeasibleRegionLimits&
 CSPBase::get_feasible_region_limits() const {
@@ -61,6 +64,12 @@ DataStream::get_supports_tx() const {
 template<class CSP> void
 Configurator<CSP>::add_data_stream(DataStream data_stream) {
   m_data_streams.push_back(data_stream);
+  m_data_stream_ids.push_back(data_stream.get_data_stream_id());
+}
+
+template<class CSP> const std::vector<data_stream_id_t>&
+Configurator<CSP>::get_data_stream_ids() const {
+  return m_data_stream_ids;
 }
 
 template<class CSP> const char*
@@ -94,10 +103,10 @@ template<class CSP> bool
 Configurator<CSP>::lock_config(data_stream_id_t id, config_key_t cfg,
     int32_t val) {
   bool ret = lock_config(get_config(id,cfg),val);
+  //std::cout << "[DEBUG] " << m_solver.m_solver << "\n";
   //std::cout << "[DEBUG] " << m_solver.get_feasible_region_limits() << "\n";
-  std::ostringstream oss;
-  oss << get_lock_config_str<int32_t>(id,cfg,val,ret) << "\n";
-  //printf("%s", oss.str().c_str());
+  std::string str = get_lock_config_str<int32_t>(id,cfg,val,ret);
+  this->log_info("%s", str.c_str());
   return ret;
 }
 
@@ -108,26 +117,29 @@ Configurator<CSP>::lock_config(data_stream_id_t id, config_key_t cfg,
   //std::cout << "[DEBUG] " << m_solver.get_feasible_region_limits() << "\n";
   std::ostringstream oss;
   oss << get_lock_config_str<config_value_t>(id,cfg,val,ret);
-  oss << " w/ tolerance: +/- " << tol << "\n";
-  //printf("%s", oss.str().c_str());
+  oss << " w/ tolerance: +/- " << tol;
+  this->log_info("%s", oss.str().c_str());
   return ret;
 }
 
 template<class CSP> bool
 Configurator<CSP>::lock_config(const char* config, int32_t val) {
+  bool successful = false;
   // attempt a lock
-  CSPSolver::Constr& clo = m_solver.m_solver.add_constr(config, "=", val);
-  //std::cout << "attempt a lock: add constraint " << config << "=" << val << "\n";
-  //std::cout << "solver is now: " << m_solver.m_solver << "\n";
-  bool successful = not m_solver.m_solver.feasible_region_limits_is_empty_for_var(config);
-  if(successful) {
-    Configurator<CSP>::LockParam param = {clo, clo, false, val, 0, true, false};
-    m_locked_params.insert(std::pair<const char*, LockParam>(config, param));
-  }
-  else {
-    //std::cout << "[DEBUG] " << get_feasible_region_limits() << "\n";
-    m_solver.m_solver.remove_constr(clo);
-    //m_solver.m_solver.remove_constr(clo);
+  if(!get_config_is_locked(config)) {
+    CSPSolver::Constr& clo = m_solver.m_solver.add_constr(config, "=", val);
+    //std::cout << "attempt a lock: add constraint " << config << "=" << val << "\n";
+    //std::cout << "solver is now: " << m_solver.m_solver << "\n";
+    successful = not m_solver.m_solver.feasible_region_limits_is_empty_for_var(config);
+    if(successful) {
+      Configurator<CSP>::LockParam param = {clo, clo, false, val, 0, true, false};
+      m_locked_params.insert(std::pair<const char*, LockParam>(config, param));
+    }
+    else { // unroll
+      //std::cout << "[DEBUG] " << get_feasible_region_limits() << "\n";
+      m_solver.m_solver.remove_constr(clo);
+      //m_solver.m_solver.remove_constr(clo);
+    }
   }
   return successful;
 }
@@ -159,7 +171,7 @@ Configurator<CSP>::lock_config(const char* config, config_value_t val,
     Configurator<CSP>::LockParam param = {clo, chi, true, 0, val, false, true};
     m_locked_params.insert(std::pair<const char*, LockParam>(config, param));
   }
-  else {
+  else { // unroll
     m_solver.m_solver.remove_constr(clo);
     m_solver.m_solver.remove_constr(chi);
   }
@@ -168,6 +180,7 @@ Configurator<CSP>::lock_config(const char* config, config_value_t val,
 
 template<class CSP> void
 Configurator<CSP>::unlock_config(data_stream_id_t ds_id, config_key_t config) {
+  //std::cout << "drc: Configurator: unlock_config: " << ds_id << " " << config << "\n";
   unlock_config(get_config(ds_id, config));
 }
 
@@ -197,6 +210,7 @@ Configurator<CSP>::unlock_all() {
     it = m_locked_params.begin();
   }
   //std::cout << "[DEBUG] " << m_solver.get_feasible_region_limits() << "\n";
+  //std::cout << "solver is now (unlock): " << m_solver.m_solver << "\n";
 }
 
 template<class CSP> void
@@ -240,7 +254,7 @@ Configurator<CSP>::get_feasible_region_limits_min_double(const char* var) const 
 }
 
 DataStreamConfigLockRequest::DataStreamConfigLockRequest() :
-  m_including_data_stream_direction   (false),
+  m_including_direction          (false),
   m_including_data_stream_id     (false),
   m_including_routing_id         (false),
   m_including_tuning_freq_MHz    (false),
@@ -252,11 +266,11 @@ DataStreamConfigLockRequest::DataStreamConfigLockRequest() :
 }
 
 data_stream_direction_t
-DataStreamConfigLockRequest::get_data_stream_direction() const {
-  if(not m_including_data_stream_direction) {
+DataStreamConfigLockRequest::get_direction() const {
+  if(not m_including_direction) {
     throw_for_invalid_get_call("data_stream_direction");
   }
-  return m_data_stream_direction;
+  return m_direction;
 }
 
 data_stream_id_t
@@ -357,7 +371,7 @@ DataStreamConfigLockRequest::get_tolerance_gain_dB() const {
 
 bool
 DataStreamConfigLockRequest::get_including_data_stream_direction() const {
-  return m_including_data_stream_direction;
+  return m_including_direction;
 }
 
 bool
@@ -402,71 +416,64 @@ DataStreamConfigLockRequest::get_including_gain_dB() const {
 
 void
 DataStreamConfigLockRequest::include_data_stream_direction(
-    const data_stream_direction_t data_stream_direction) {
-  m_data_stream_direction = data_stream_direction;
-  m_including_data_stream_direction = true;
+    const data_stream_direction_t val) {
+  m_direction = val;
+  m_including_direction = true;
 }
 
 void
 DataStreamConfigLockRequest::include_data_stream_id(
-    const data_stream_id_t data_stream_id) {
-  m_data_stream_id = data_stream_id;
+    const data_stream_id_t val) {
+  m_data_stream_id = val;
   m_including_data_stream_id = true;
 }
 
 void
-DataStreamConfigLockRequest::include_routing_id(
-    const routing_id_t routing_id) {
-  m_routing_id = routing_id;
+DataStreamConfigLockRequest::include_routing_id(const routing_id_t val) {
+  m_routing_id = val;
   m_including_routing_id = true;
 }
 
 void
-DataStreamConfigLockRequest::include_tuning_freq_MHz(
-    const config_value_t tuning_freq_MHz,
-    const config_value_t tolerance_tuning_freq_MHz) {
-  m_tuning_freq_MHz           = tuning_freq_MHz;
-  m_tolerance_tuning_freq_MHz = tolerance_tuning_freq_MHz;
+DataStreamConfigLockRequest::include_tuning_freq_MHz(const config_value_t val,
+    const config_value_t tolerance) {
+  m_tuning_freq_MHz           = val;
+  m_tolerance_tuning_freq_MHz = tolerance;
   m_including_tuning_freq_MHz = true;
 }
 
 void
-DataStreamConfigLockRequest::include_bandwidth_3dB_MHz(
-    const config_value_t bandwidth_3dB_MHz,
-    const config_value_t tolerance_bandwidth_3dB_MHz) {
-  m_bandwidth_3dB_MHz           = bandwidth_3dB_MHz;
-  m_tolerance_bandwidth_3dB_MHz = tolerance_bandwidth_3dB_MHz;
+DataStreamConfigLockRequest::include_bandwidth_3dB_MHz(const config_value_t val,
+    const config_value_t tolerance) {
+  m_bandwidth_3dB_MHz           = val;
+  m_tolerance_bandwidth_3dB_MHz = tolerance;
   m_including_bandwidth_3dB_MHz = true;
 }
 
 void
 DataStreamConfigLockRequest::include_sampling_rate_Msps(
-    const config_value_t sampling_rate_Msps,
-    const config_value_t tolerance_sampling_rate_Msps) {
-  m_sampling_rate_Msps           = sampling_rate_Msps;
-  m_tolerance_sampling_rate_Msps = tolerance_sampling_rate_Msps;
+    const config_value_t val, const config_value_t tolerance) {
+  m_sampling_rate_Msps           = val;
+  m_tolerance_sampling_rate_Msps = tolerance;
   m_including_sampling_rate_Msps = true;
 }
 void
-DataStreamConfigLockRequest::include_samples_are_complex(
-    const bool samples_are_complex) {
-  m_samples_are_complex = samples_are_complex;
+DataStreamConfigLockRequest::include_samples_are_complex(const bool val) {
+  m_samples_are_complex = val;
   m_including_samples_are_complex = true;
 }
 
 void
-DataStreamConfigLockRequest::include_gain_mode(
-    const gain_mode_value_t gain_mode) {
-  m_gain_mode = gain_mode;
+DataStreamConfigLockRequest::include_gain_mode(const gain_mode_value_t val) {
+  m_gain_mode = val;
   m_including_gain_mode = true;
 }
 
 void
-DataStreamConfigLockRequest::include_gain_dB(
-    const config_value_t gain_dB,
-    const config_value_t tolerance_gain_dB) {
-  m_gain_dB           = gain_dB;
-  m_tolerance_gain_dB = tolerance_gain_dB;
+DataStreamConfigLockRequest::include_gain_dB(const config_value_t val,
+    const config_value_t tolerance) {
+  m_gain_dB           = val;
+  m_tolerance_gain_dB = tolerance;
   m_including_gain_dB = true;
 }
 
@@ -481,24 +488,39 @@ DataStreamConfigLockRequest::throw_for_invalid_get_call(
   throw oss.str();
 }
 
-template<class L,class C>
-ARC<L,C>::ARC(const char* descriptor) : m_descriptor(descriptor) {
+template<class C>
+ARC<C>::ARC(const char* descriptor) : m_descriptor(descriptor),
+    m_cache_initialized(false) {
 }
 
-template<class L,class C> const std::string&
-ARC<L,C>::get_descriptor() const {
+template<class C> const std::string&
+ARC<C>::get_descriptor() const {
   return m_descriptor;
 }
 
-template<class L,class C> const std::vector<ConfigLock>&
-ARC<L,C>::get_config_locks() const {
+template<class C> const std::vector<ConfigLock>&
+ARC<C>::get_config_locks() const {
   return m_config_locks;
 }
 
-template<class L,class C> bool
-ARC<L,C>::request_config_lock(
+template<class C> void
+ARC<C>::initialize_cache() {
+  auto it = m_configurator.get_data_stream_ids().begin();
+  for(; it!=m_configurator.get_data_stream_ids().end(); ++it) {
+    m_cache_direction[        *it] = get_direction(        *it);
+    m_cache_tuning_freq_MHz[  *it] = get_tuning_freq_MHz(  *it);
+    m_cache_bandwidth_3dB_MHz[*it] = get_bandwidth_3dB_MHz(*it);
+  }
+}
+
+template<class C> bool
+ARC<C>::request_config_lock(
     config_lock_id_t         config_lock_ID,
     const ConfigLockRequest& config_lock_request) {
+  if(!m_cache_initialized) {
+    initialize_cache();
+    m_cache_initialized = true;
+  }
 #ifdef IS_LOCKING
   ConfigLock config_lock;
   config_lock.m_config_lock_ID = config_lock_ID;
@@ -509,10 +531,10 @@ ARC<L,C>::request_config_lock(
     std::vector<data_stream_id_t> data_streams;
     if(it->get_including_data_stream_direction()) {
       this->m_configurator.find_data_streams_which_support_direction(
-          it->get_data_stream_direction(), data_streams);
+          it->get_direction(), data_streams);
       if(data_streams.empty()) {
         // configurator did not have any data streams of the requested data
-        // stream type
+        // stream direction
         return false;
       }
     }
@@ -525,14 +547,16 @@ ARC<L,C>::request_config_lock(
       found_lock |= do_min_data_stream_config_locks(*it_found_streams, *it);
       const char* ds = it_found_streams->c_str();
       if(found_lock) {
-        DataStreamConfigLock data_stream_config_lock;
-        data_stream_config_lock.m_data_stream_id    = ds;
-        data_stream_config_lock.m_tuning_freq_MHz   = it->get_tuning_freq_MHz();
-        data_stream_config_lock.m_bandwidth_3dB_MHz =
-            it->get_bandwidth_3dB_MHz();
-        config_lock.m_data_streams.push_back(data_stream_config_lock);
+        log_info("stream %s met lock request requirements\n", ds);
+        DataStreamConfigLock lock;
+        lock.m_data_stream_id    = ds;
+        lock.m_direction         = it->get_direction();
+        lock.m_tuning_freq_MHz   = it->get_tuning_freq_MHz();
+        lock.m_bandwidth_3dB_MHz = it->get_bandwidth_3dB_MHz();
+        config_lock.m_data_streams.push_back(lock);
         break;
       }
+      log_info("stream %s did not meet lock request requirements\n", ds);
     }
     if(not found_lock) {
       configurator_config_lock_request_was_successful = false;
@@ -542,20 +566,30 @@ ARC<L,C>::request_config_lock(
   }
   if(configurator_config_lock_request_was_successful) {
     m_config_locks.push_back(config_lock);
+    log_info("request lock %s succeeeded", config_lock_ID.c_str());
     return true;
+  }
+  else { // unroll
+    auto itunroll = config_lock.m_data_streams.begin();
+    for(; itunroll != config_lock.m_data_streams.end(); ++itunroll) {
+      unlock_config(itunroll->m_data_stream_id, config_key_direction);
+      unlock_config(itunroll->m_data_stream_id, config_key_tuning_freq_MHz);
+      unlock_config(itunroll->m_data_stream_id, config_key_bandwidth_3dB_MHz);
+    }
   }
 #endif
   return false;
 }
 
-template<class L,class C> void
-ARC<L,C>::unlock_config_lock(const config_lock_id_t config_lock_ID) {
+template<class C> void
+ARC<C>::unlock_config_lock(const config_lock_id_t config_lock_ID) {
   bool found_config_lock = false;
   for(auto itcl = m_config_locks.begin(); itcl != m_config_locks.end(); itcl++){
     if(itcl->m_config_lock_ID.compare(config_lock_ID) == 0) {
       found_config_lock = true;
       auto itds = itcl->m_data_streams.begin();
       for(; itds != itcl->m_data_streams.end(); itds++) {
+        unlock_config(itds->m_data_stream_id, config_key_direction);
         unlock_config(itds->m_data_stream_id, config_key_tuning_freq_MHz);
         unlock_config(itds->m_data_stream_id, config_key_bandwidth_3dB_MHz);
       }
@@ -570,16 +604,16 @@ ARC<L,C>::unlock_config_lock(const config_lock_id_t config_lock_ID) {
   }
 }
 
-template<class L,class C> void
-ARC<L,C>::unlock_all() {
+template<class C> void
+ARC<C>::unlock_all() {
 #ifdef IS_LOCKING
   this->m_configurator.unlock_all();
   m_config_locks.clear();
 #endif
 }
 
-template<class L,class C> void
-ARC<L,C>::throw_if_data_stream_lock_request_malformed(
+template<class C> void
+ARC<C>::throw_if_data_stream_lock_request_malformed(
     const DataStreamConfigLockRequest& data_stream_config_lock_request) const {
   const DataStreamConfigLockRequest& req = data_stream_config_lock_request;
   if(not req.get_including_data_stream_direction() and
@@ -597,8 +631,8 @@ ARC<L,C>::throw_if_data_stream_lock_request_malformed(
   }
 }
 
-template<class L,class C> bool
-ARC<L,C>::lock_config(data_stream_id_t ds_id, config_value_t val,
+template<class C> bool
+ARC<C>::lock_config(data_stream_id_t ds_id, config_value_t val,
     config_key_t cfg_key, bool do_tol, config_value_t tol) {
   // the configurator, which is a software emulation of hardware capabilties,
   // tells us whether a hardware attempt to set value will corrupt
@@ -610,70 +644,79 @@ ARC<L,C>::lock_config(data_stream_id_t ds_id, config_value_t val,
   if(did_lock) {
     config_value_t cfglval; // configurator locked value
     cfglval = this->m_configurator.get_config_locked_value(ds_id, cfg_key);
-    if(cfg_key == config_key_sampling_rate_Msps) {
-      set_tuning_freq_MHz(ds_id, cfglval);
+    if(cfg_key == config_key_direction) {
+      if(m_cache_direction[ds_id] != (data_stream_direction_t)val) {
+        //std::cout << "drc: cache invalid, upating direction\n";
+        set_direction(ds_id, (data_stream_direction_t)cfglval);
+        m_cache_direction[ds_id] = (data_stream_direction_t)val;
+      }
+    }
+    else if(cfg_key == config_key_tuning_freq_MHz) {
+      if(std::abs(m_cache_tuning_freq_MHz[ds_id]-val) > tol) {
+        //std::cout << "drc: cache invalid, upating tuning_freq_MHz\n";
+        set_tuning_freq_MHz(ds_id, cfglval);
+        m_cache_tuning_freq_MHz[ds_id] = cfglval;
+      }
     }
     else if(cfg_key == config_key_bandwidth_3dB_MHz) {
-      set_bandwidth_3dB_MHz(ds_id, cfglval);
+      if(std::abs(m_cache_bandwidth_3dB_MHz[ds_id]-val) > tol) {
+        //std::cout << "drc: cache invalid, upating bandwidth_3dB_MHz\n";
+        set_bandwidth_3dB_MHz(ds_id, cfglval);
+        m_cache_bandwidth_3dB_MHz[ds_id] = cfglval;
+      }
     }
   }
   return did_lock;
 }
 
-template<class L,class C> void
-ARC<L,C>::unlock_config(const data_stream_id_t ds_id,
-    const config_key_t cfg_key) {
-  this->m_configurator.unlock_config(ds_id, cfg_key);
+template<class C> void
+ARC<C>::unlock_config(const data_stream_id_t id,const config_key_t cfg) {
+  log_info("for data stream %s: unlocking config %s", id.c_str(), cfg.c_str());
+  this->m_configurator.unlock_config(id, cfg);
 }
 
-template<class L,class C> bool
-ARC<L,C>::do_min_data_stream_config_locks(
-    const data_stream_id_t data_stream_ID,
-    const DataStreamConfigLockRequest& data_stream_config_lock_request) {
-  const DataStreamConfigLockRequest& req = data_stream_config_lock_request;
+template<class C> bool
+ARC<C>::do_min_data_stream_config_locks(const data_stream_id_t id,
+    const DataStreamConfigLockRequest& req) {
+  bool ret = true;
   throw_if_data_stream_lock_request_malformed(req);
-  {
-    auto val = req.get_data_stream_direction();
-    if(not lock_config(data_stream_ID, (int32_t) val, config_key_direction, false, 0)) {
-      //unlock_config(data_stream_ID, config_key_direction);
-      goto unrollandfail;
-    }
+  if(ret) {
+    auto val = req.get_direction();
+    ret = lock_config(id, (int32_t) val, config_key_direction, false, 0);
   }
-  {
+  if(ret) {
     const config_value_t& val = req.get_tuning_freq_MHz();
     const config_value_t& tol = req.get_tolerance_tuning_freq_MHz();
-    if(not lock_config(data_stream_ID, val, config_key_tuning_freq_MHz, true, tol)) {
-      unlock_config(data_stream_ID, config_key_direction);
-      //unlock_config(data_stream_ID, config_key_tuning_freq_MHz);
-      goto unrollandfail;
+    if(not lock_config(id, val, config_key_tuning_freq_MHz, true, tol)) {
+      // unroll
+      unlock_config(id, config_key_direction);
+      ret = false;
     }
   }
-  {
+  if(ret) {
     const config_value_t& val = req.get_bandwidth_3dB_MHz();
     const config_value_t& tol = req.get_tolerance_bandwidth_3dB_MHz();
-    if(not lock_config(data_stream_ID, val, config_key_bandwidth_3dB_MHz, true, tol)) {
-      unlock_config(data_stream_ID, config_key_direction);
-      unlock_config(data_stream_ID, config_key_tuning_freq_MHz);
-      //unlock_config(data_stream_ID, config_key_bandwidth_3dB_MHz);
-      goto unrollandfail;
+    if(not lock_config(id, val, config_key_bandwidth_3dB_MHz, true, tol)) {
+      // unroll
+      unlock_config(id, config_key_direction);
+      unlock_config(id, config_key_tuning_freq_MHz);
+      ret = false;
     }
   }
-  return true;
-  unrollandfail:
-  return false;
+  return ret;
 }
 
-template<class L,class C> bool
-ARC<L,C>::config_val_is_within_tolerance(config_value_t expected_val,
+template<class C> bool
+ARC<C>::config_val_is_within_tolerance(config_value_t expected_val,
     config_value_t tolerance, config_value_t val) const {
   return std::abs(val - expected_val) <= tolerance;
 }
 
-template<class L,class C> void
-ARC<L,C>::throw_if_data_stream_disabled_for_read(
+template<class C> void
+ARC<C>::throw_if_data_stream_disabled_for_read(
     const data_stream_id_t& ds_id,
     const char* config_description) const {
-  if(not get_data_stream_is_enabled(ds_id)) {
+  if(not get_enabled(ds_id)) {
     std::ostringstream oss;
     oss << "requested read of " << config_description << " for disabled ";
     oss << ds_id << " data stream";
@@ -681,11 +724,11 @@ ARC<L,C>::throw_if_data_stream_disabled_for_read(
   }
 }
 
-template<class L,class C> void
-ARC<L,C>::throw_if_data_stream_disabled_for_write(
+template<class C> void
+ARC<C>::throw_if_data_stream_disabled_for_write(
     const data_stream_id_t& ds_id,
     const char* config_description) const {
-  if(not get_data_stream_is_enabled(ds_id)) {
+  if(not get_enabled(ds_id)) {
     std::ostringstream oss;
     oss << "requested write of " << config_description << " for disabled ";
     oss << ds_id << " data stream";
@@ -693,20 +736,56 @@ ARC<L,C>::throw_if_data_stream_disabled_for_write(
   }
 }
 
-template<class L,class C> void
-ARC<L,C>::throw_invalid_data_stream_id(data_stream_id_t data_stream_id) const {
+template<class C> void
+ARC<C>::throw_invalid_data_stream_id(data_stream_id_t data_stream_id) const {
   throw std::string("invalid data stream id ") + data_stream_id;
 }
 
-
-template<class L,class C>
-DRC<L,C>::DRC(const char* descriptor) : ARC<L,C>(descriptor) {
+template<class C>
+DRC<C>::DRC(const char* descriptor) : ARC<C>(descriptor) {
 }
 
-template<class L,class C> bool
-DRC<L,C>::request_config_lock(
+template<class C> void
+DRC<C>::initialize_cache() {
+  ARC<C>::initialize_cache();
+  auto it = this->m_configurator.get_data_stream_ids().begin();
+  for(; it!=this->m_configurator.get_data_stream_ids().end(); ++it) {
+    m_cache_sampling_rate_Msps[ *it] = get_sampling_rate_Msps( *it);
+    m_cache_samples_are_complex[*it] = get_samples_are_complex(*it);
+    m_cache_gain_mode[          *it] = get_gain_mode(          *it);
+    m_cache_gain_dB[            *it] = get_gain_dB(            *it);
+  }
+  log_debug("drc:    **************** initializing cache");
+  it = this->m_configurator.get_data_stream_ids().begin();
+  for(; it!=this->m_configurator.get_data_stream_ids().end(); ++it) {
+    std::string tmp = "rx";
+    if(this->m_cache_direction[*it] == data_stream_direction_t::tx) {
+      tmp = "tx";
+    }
+    this->log_debug("cache.direction           [%s]=%s",*it,tmp);
+    config_value_t val = this->m_cache_tuning_freq_MHz[    *it]);
+    this->log_debug("cache.tuning_freq_MHz     [%s]=%d",*it,val);
+    val = this->m_cache_bandwidth_3dB_MHz[  *it]);
+    this->log_debug("cache.bandwidth_3dB_MHz   [%s]=%d",*it,val);
+    val = this->m_cache_sampling_rate_Msps[ *it]);
+    this->log_debug("cache.sampling_rate_Msps  [%s]=%d",*it,val);
+    val = this->m_cache_samples_are_complex[*it]);
+    this->log_debug("cache.samples_are_complex [%s]=%d",*it,val);
+    val = this->m_cache_gain_mode[          *it]);
+    this->log_debug("cache.gain_mode           [%s]=%d",*it,val);
+    val = this->m_cache_gain_dB[            *it]);
+    this->log_debug("cache.gain_dB             [%s]=%d",*it,val);
+  }
+}
+
+template<class C> bool
+DRC<C>::request_config_lock(
     const config_lock_id_t   config_lock_ID,
     const ConfigLockRequest& config_lock_request) {
+  if(!this->m_cache_initialized) {
+    initialize_cache();
+    this->m_cache_initialized = true;
+  }
 #ifdef IS_LOCKING
   ///@TODO probably want to add back the readback check for ensuring tolerance requirements are met (e.g. No-OS tx_attenuation)
   ConfigLock config_lock;
@@ -721,8 +800,12 @@ DRC<L,C>::request_config_lock(
         data_streams.push_back(it->get_data_stream_id());
       }
       else {
+        auto id = config_lock_ID;
+        std::string dd = "tx";
+        dd = (it->get_direction() == data_stream_direction_t::rx ? "rx" : dd);
+        this->log_info("request ID: %s direction: %s", id.c_str(), dd.c_str());
         this->m_configurator.find_data_streams_which_support_direction(
-            it->get_data_stream_direction(), data_streams);
+            it->get_direction(), data_streams);
         if(data_streams.empty()) {
           // configurator did not have any data streams of the requested data
           // stream type
@@ -736,7 +819,7 @@ DRC<L,C>::request_config_lock(
     bool found_lock = false;
     auto it_found_streams = data_streams.begin();
     for(; it_found_streams != data_streams.end(); it_found_streams++) {
-      if(not this->get_data_stream_is_enabled(*it_found_streams)) {
+      if(not this->get_enabled(*it_found_streams)) {
         if(it->get_including_data_stream_id()) {
           std::ostringstream oss;
           oss << "requested config lock specifically for data stream ID ";
@@ -749,31 +832,32 @@ DRC<L,C>::request_config_lock(
       found_lock |= do_min_data_stream_config_locks(*it_found_streams, *it);
       const char* ds = it_found_streams->c_str();
       if(found_lock) {
-        //printf("data stream %s met data stream config lock request requirements\n", ds);
-        DataStreamConfigLock data_stream_config_lock;
-        data_stream_config_lock.m_data_stream_id      = ds;
-        data_stream_config_lock.m_tuning_freq_MHz     = it->get_tuning_freq_MHz();
-        data_stream_config_lock.m_bandwidth_3dB_MHz   = it->get_bandwidth_3dB_MHz();
-        data_stream_config_lock.m_sampling_rate_Msps  = it->get_sampling_rate_Msps();
-        data_stream_config_lock.m_samples_are_complex = it->get_samples_are_complex();
+        this->log_info("stream %s met lock request requirements\n", ds);
+        DataStreamConfigLock lock;
+        lock.m_data_stream_id      = ds;
+        lock.m_direction           = it->get_direction();
+        lock.m_tuning_freq_MHz     = it->get_tuning_freq_MHz();
+        lock.m_bandwidth_3dB_MHz   = it->get_bandwidth_3dB_MHz();
+        lock.m_sampling_rate_Msps  = it->get_sampling_rate_Msps();
+        lock.m_samples_are_complex = it->get_samples_are_complex();
         if(it->get_including_gain_mode()) {
-          data_stream_config_lock.m_gain_mode         = it->get_gain_mode();
-          data_stream_config_lock.m_including_gain_mode = true;
+          lock.m_gain_mode         = it->get_gain_mode();
+          lock.m_including_gain_mode = true;
         }
         else {
-          data_stream_config_lock.m_including_gain_mode = false;
+          lock.m_including_gain_mode = false;
         }
         if(it->get_including_gain_dB()) {
-          data_stream_config_lock.m_gain_dB           = it->get_gain_dB();
-          data_stream_config_lock.m_including_gain_dB = true;
+          lock.m_gain_dB           = it->get_gain_dB();
+          lock.m_including_gain_dB = true;
         }
         else {
-          data_stream_config_lock.m_including_gain_dB = false;
+          lock.m_including_gain_dB = false;
         }
-        config_lock.m_data_streams.push_back(data_stream_config_lock);
+        config_lock.m_data_streams.push_back(lock);
         break;
       }
-      //printf("data stream %s did not meet data stream config lock request requirements\n", ds);
+      this->log_info("stream %s did not meet lock request requirements\n", ds);
     }
     if(not found_lock) {
       configurator_config_lock_request_was_successful = false;
@@ -782,24 +866,43 @@ DRC<L,C>::request_config_lock(
     configurator_config_lock_request_was_successful = true;
   }
   if(configurator_config_lock_request_was_successful) {
-    //printf("request config lock %s succeeded\n", config_lock_ID.c_str());
     this->m_config_locks.push_back(config_lock);
+    this->log_info("request lock %s succeeded\n", config_lock_ID.c_str());
     return true;
+  }
+  else { // unroll
+    auto i2 = config_lock.m_data_streams.begin();
+    for(; i2 != config_lock.m_data_streams.end(); ++i2) {
+      this->unlock_config(i2->m_data_stream_id, config_key_direction);
+      this->unlock_config(i2->m_data_stream_id, config_key_tuning_freq_MHz);
+      this->unlock_config(i2->m_data_stream_id, config_key_bandwidth_3dB_MHz);
+      this->unlock_config(i2->m_data_stream_id, config_key_sampling_rate_Msps);
+      this->unlock_config(i2->m_data_stream_id, config_key_samples_are_complex);
+      if(i2->m_including_gain_mode) {
+        this->unlock_config(i2->m_data_stream_id, config_key_gain_mode);
+      }
+      if(i2->m_including_gain_dB) {
+        this->unlock_config(i2->m_data_stream_id, config_key_gain_dB);
+      }
+    }
   }
 #endif
   return false;
 }
 
-template<class L,class C> void
-DRC<L,C>::unlock_config_lock(const config_lock_id_t config_lock_ID) {
+template<class C> void
+DRC<C>::unlock_config_lock(const config_lock_id_t config_lock_ID) {
 #ifdef IS_LOCKING
+  //std::cout << "drc: unlock_config_lock: id=" << config_lock_ID << "\n";
   bool found_config_lock = false;
   auto itcl = this->m_config_locks.begin();
   for(; itcl != this->m_config_locks.end(); itcl++) {
     if(itcl->m_config_lock_ID.compare(config_lock_ID) == 0) {
+      //std::cout << "drc: unlock_config_lock: found id=" << config_lock_ID << "\n";
       found_config_lock = true;
       auto itds = itcl->m_data_streams.begin();
       for(; itds != itcl->m_data_streams.end(); itds++) {
+        this->unlock_config(  itds->m_data_stream_id, config_key_direction);
         this->unlock_config(  itds->m_data_stream_id, config_key_tuning_freq_MHz);
         this->unlock_config(  itds->m_data_stream_id, config_key_bandwidth_3dB_MHz);
         this->unlock_config(  itds->m_data_stream_id, config_key_sampling_rate_Msps);
@@ -811,6 +914,7 @@ DRC<L,C>::unlock_config_lock(const config_lock_id_t config_lock_ID) {
           this->unlock_config(itds->m_data_stream_id, config_key_gain_dB);
         }
       }
+      this->m_config_locks.erase(itcl);
       break;
     }
   }
@@ -823,8 +927,8 @@ DRC<L,C>::unlock_config_lock(const config_lock_id_t config_lock_ID) {
 #endif
 }
 
-template<class L,class C> bool
-DRC<L,C>::lock_config(data_stream_id_t ds_id, config_value_t val,
+template<class C> bool
+DRC<C>::lock_config(data_stream_id_t ds_id, config_value_t val,
     config_key_t cfg, bool do_tol, config_value_t tol) {
   bool did_lock = false;
 #ifdef IS_LOCKING
@@ -845,19 +949,36 @@ DRC<L,C>::lock_config(data_stream_id_t ds_id, config_value_t val,
     config_value_t cfglval;
     cfglval = this->m_configurator.get_config_locked_value(ds_id, cfg);
     if(cfg == config_key_sampling_rate_Msps) {
-      set_sampling_rate_Msps(ds_id, cfglval);
+      if(std::abs(m_cache_sampling_rate_Msps[ds_id]-cfglval) > tol) {
+        //std::cout << "drc: cache invalid, upating sampling_rate_Msps\n";
+        set_sampling_rate_Msps(ds_id, cfglval);
+        m_cache_sampling_rate_Msps[ds_id] = cfglval;
+      }
     }
     else if(cfg == config_key_samples_are_complex) {
-      cfglval = this->m_configurator.get_config_locked_value(ds_id, cfg);
-      set_samples_are_complex(ds_id, ((int32_t)cfglval) == 1);
+      bool tmp = (((int32_t)cfglval) == 1);
+      if(m_cache_samples_are_complex[ds_id] != tmp) {
+        //std::cout << "drc: cache invalid, upating samples_are_complex\n";
+        set_samples_are_complex(ds_id, tmp);
+        m_cache_samples_are_complex[ds_id] = tmp;
+      }
     }
     else if(cfg == config_key_gain_mode) {
       //auto agc = gain_mode_value_t::agc;
       //auto man = gain_mode_value_t::manual;
-      set_gain_mode(ds_id, ((int32_t)cfglval) == 0 ? "agc" : "manual");
+      gain_mode_value_t tmp = (((int32_t)cfglval) == 0 ? "agc" : "manual");
+      if(m_cache_gain_mode[ds_id] != tmp) {
+        //std::cout << "drc: cache invalid, upating gain_mode\n";
+        set_gain_mode(ds_id, tmp);
+        m_cache_gain_mode[ds_id] = tmp;
+      }
     }
     else if(cfg == config_key_gain_dB) {
-      set_gain_dB(ds_id, cfglval);
+      if(std::abs(m_cache_gain_dB[ds_id]-cfglval) > tol) {
+        //std::cout << "drc: cache invalid, upating gain_dB\n";
+        set_gain_dB(ds_id, cfglval);
+        m_cache_gain_dB[ds_id] = cfglval;
+      }
     }
   }
 #if 0
@@ -873,78 +994,70 @@ DRC<L,C>::lock_config(data_stream_id_t ds_id, config_value_t val,
   return did_lock;
 }
 
-template<class L,class C> bool
-DRC<L,C>::do_min_data_stream_config_locks(
-    const data_stream_id_t             data_stream_ID,
-    const DataStreamConfigLockRequest& data_stream_config_lock_request) {
+template<class C> bool
+DRC<C>::do_min_data_stream_config_locks(const data_stream_id_t id,
+    const DataStreamConfigLockRequest& req) {
 #ifdef IS_LOCKING
-  const DataStreamConfigLockRequest& req = data_stream_config_lock_request;
   throw_if_data_stream_lock_request_malformed(req);
   // first perform all the analog-specific config locks
-  {
-    const data_stream_id_t& ds_id = data_stream_ID;
-    if(not ARC<L,C>::do_min_data_stream_config_locks(ds_id, req)) {
-      return false;
-    }
-  }
+  bool ret = ARC<C>::do_min_data_stream_config_locks(id, req);
   // second perform all the digital-specific config locks
-  config_value_t val, tol;
-  val = req.get_sampling_rate_Msps();
-  tol = req.get_tolerance_sampling_rate_Msps();
-  if(not lock_config(data_stream_ID, val, config_key_sampling_rate_Msps, true, tol)) {
-    this->unlock_config(data_stream_ID, config_key_direction);
-    this->unlock_config(data_stream_ID, config_key_tuning_freq_MHz);
-    this->unlock_config(data_stream_ID, config_key_bandwidth_3dB_MHz);
-    //this->unlock_config(data_stream_ID, config_key_sampling_rate_Msps);
-    goto unrollandfail;
-  }
-  val = req.get_samples_are_complex();
-  if(not lock_config(data_stream_ID, val, config_key_samples_are_complex, false, 0)) {
-    this->unlock_config(data_stream_ID, config_key_direction);
-    this->unlock_config(data_stream_ID, config_key_tuning_freq_MHz);
-    this->unlock_config(data_stream_ID, config_key_bandwidth_3dB_MHz);
-    this->unlock_config(data_stream_ID, config_key_sampling_rate_Msps);
-    //this->unlock_config(data_stream_ID, config_key_samples_are_complex);
-    goto unrollandfail;
-  }
-  if(req.get_including_gain_mode()) {
-    val = req.get_gain_mode() == "agc" ? 0 : 1;
-    if(not lock_config(data_stream_ID, val, config_key_gain_mode, false, 0)) {
-      this->unlock_config(data_stream_ID, config_key_direction);
-      this->unlock_config(data_stream_ID, config_key_tuning_freq_MHz);
-      this->unlock_config(data_stream_ID, config_key_bandwidth_3dB_MHz);
-      this->unlock_config(data_stream_ID, config_key_sampling_rate_Msps);
-      this->unlock_config(data_stream_ID, config_key_samples_are_complex);
-      //this->unlock_config(data_stream_ID, config_key_gain_mode);
-      goto unrollandfail;
+  if(ret) {
+    config_value_t val = req.get_sampling_rate_Msps();
+    config_value_t tol = req.get_tolerance_sampling_rate_Msps();
+    if(not lock_config(id, val, config_key_sampling_rate_Msps, true, tol)) {
+      // unroll
+      this->unlock_config(id, config_key_direction);
+      this->unlock_config(id, config_key_tuning_freq_MHz);
+      this->unlock_config(id, config_key_bandwidth_3dB_MHz);
+      ret = false;
     }
   }
-  if(req.get_including_gain_dB()) {
-    val = req.get_gain_dB();
-    tol = req.get_tolerance_gain_dB();
-    if(not lock_config(data_stream_ID, val, config_key_gain_dB, true, tol)) {
-      this->unlock_config(data_stream_ID, config_key_direction);
-      this->unlock_config(data_stream_ID, config_key_tuning_freq_MHz);
-      this->unlock_config(data_stream_ID, config_key_bandwidth_3dB_MHz);
-      this->unlock_config(data_stream_ID, config_key_sampling_rate_Msps);
-      this->unlock_config(data_stream_ID, config_key_samples_are_complex);
-      this->unlock_config(data_stream_ID, config_key_gain_mode);
-      //this->unlock_config(data_stream_ID, config_key_gain_dB);
-      goto unrollandfail;
+  if(ret) {
+    config_value_t val = (config_value_t)req.get_samples_are_complex();
+    if(not lock_config(id, val, config_key_samples_are_complex, false, 0)) {
+      // unroll
+      this->unlock_config(id, config_key_direction);
+      this->unlock_config(id, config_key_tuning_freq_MHz);
+      this->unlock_config(id, config_key_bandwidth_3dB_MHz);
+      this->unlock_config(id, config_key_sampling_rate_Msps);
+      ret = false;
     }
   }
-  return true;
-  unrollandfail:
+  if(ret && req.get_including_gain_mode()) {
+    config_value_t val = req.get_gain_mode() == "agc" ? 0 : 1;
+    if(not lock_config(id, val, config_key_gain_mode, false, 0)) {
+      this->unlock_config(id, config_key_direction);
+      this->unlock_config(id, config_key_tuning_freq_MHz);
+      this->unlock_config(id, config_key_bandwidth_3dB_MHz);
+      this->unlock_config(id, config_key_sampling_rate_Msps);
+      this->unlock_config(id, config_key_samples_are_complex);
+      ret = false;
+    }
+  }
+  if(ret && req.get_including_gain_dB()) {
+    config_value_t val = req.get_gain_dB();
+    config_value_t tol = req.get_tolerance_gain_dB();
+    if(not lock_config(id, val, config_key_gain_dB, true, tol)) {
+      this->unlock_config(id, config_key_direction);
+      this->unlock_config(id, config_key_tuning_freq_MHz);
+      this->unlock_config(id, config_key_bandwidth_3dB_MHz);
+      this->unlock_config(id, config_key_sampling_rate_Msps);
+      this->unlock_config(id, config_key_samples_are_complex);
+      this->unlock_config(id, config_key_gain_mode);
+      ret = false;
+    }
+  }
   //std::cout << "[INFO] " << m_solver.get_feasible_region_limits() << "\n";
 #endif
-  return false;
+  return ret;
 }
 
-template<class L,class C> void
-DRC<L,C>::throw_if_data_stream_lock_request_malformed(
+template<class C> void
+DRC<C>::throw_if_data_stream_lock_request_malformed(
     const DataStreamConfigLockRequest& req) const {
   // first check all the analog-specific config locks
-  ARC<L,C>::throw_if_data_stream_lock_request_malformed(req);
+  ARC<C>::throw_if_data_stream_lock_request_malformed(req);
   // second check all the digital-specific config locks
   if(not req.get_including_sampling_rate_Msps()) {
     throw std::string("DRC request malformed: missing sampling_rate_Msps");
@@ -962,4 +1075,51 @@ DRC<L,C>::throw_if_data_stream_lock_request_malformed(
   }
 }
 
-} // namespace DRC
+template<class C> bool
+DRC<C>::prepare(unsigned config, const ConfigLockRequest& req) {
+  //std::cout << "drc: prepare: config " << config << "\n";
+  bool ret = request_config_lock(std::to_string(config), req);
+  this->m_requests[config] = req;
+  return ret;
+}
+
+template<class C> bool
+DRC<C>::start(unsigned config) {
+  bool ret = true;
+  //std::cout << "drc: start: config " << config << "\n";
+  auto it = this->m_config_locks.begin();
+  for(; it != this->m_config_locks.end(); ++it) {
+    bool prepared = !(it->m_config_lock_ID.compare(std::to_string(config)));
+    if(!prepared) {
+      ret = this->prepare(config, this->m_requests[config]);
+      break;
+    }
+  }
+  //std::cout << "drc: start: config " << config << " ret = " << (ret ? "tt" : "ff") << "\n";
+  return ret;
+}
+
+template<class C> bool
+DRC<C>::stop(unsigned /*config*/) {
+  //std::cout << "drc: stop: config " << config << "\n";
+  return true;
+}
+
+template<class C> bool
+DRC<C>::release(unsigned config) {
+  //std::cout << "drc: release: config " << config << "\n";
+  auto it = this->m_config_locks.begin();
+  for(; it != this->m_config_locks.end(); ++it) {
+    //std::cout << "drc: release: config_lock_ID = " << it->m_config_lock_ID << "\n";
+    bool config_prepared = !(it->m_config_lock_ID.compare(std::to_string(config)));
+    if(config_prepared) {
+      this->unlock_config_lock(std::to_string(config));
+      break;
+    }
+  }
+  return stop(config);
+}
+
+} // namespace DRC_PHASE_2
+
+} // namespace OCPI

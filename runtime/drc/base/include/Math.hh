@@ -25,6 +25,8 @@
 #include <map> // std::map
 #include <sstream> // std::ostringstream
 
+namespace OCPI {
+
 namespace Math {
 
 class SetBase {
@@ -37,15 +39,16 @@ class SetBase {
     void throw_string_if_is_empty() const;
 }; // class SetBase
 
-/* @brief https://en.wikipedia.org/wiki/Interval_(mathematics)
+/* @brief https://en.wikipedia.org/wiki/_Interval_(mathematics)
  *        An empty set is considered an interval, hence the inheritance from SetBase
  *        https://math.stackexchange.com/questions/1228307/why-is-the-empty-set-considered-an-interval
+ * @todo / FIXME remove leading underscore and consolidate
  ******************************************************************************/
 template<class T>
-class Interval : public SetBase {
+class _Interval : public SetBase {
   public:
-    Interval();
-    Interval(T min, T max);
+    _Interval();
+    _Interval(T min, T max);
     /*! @param[in] min               Minimum value for interval.
      *  @param[in] max               Maximum value for interval.
      *  @param[in] fp_comparison_tol Tolerance used for determining equality in
@@ -54,9 +57,9 @@ class Interval : public SetBase {
      *                               Value should be > 0 and only set set for
      *                               floating point template types.
      **************************************************************************/
-    Interval(T min, T max, T fp_comparison_tol);
-    Interval(const Interval<int32_t>& obj);
-    bool operator==(const Interval<T>& rhs) const;
+    _Interval(T min, T max, T fp_comparison_tol);
+    _Interval(const _Interval<int32_t>& obj);
+    bool operator==(const _Interval<T>& rhs) const;
     const T& get_min() const;
     const T& get_max() const;
     bool get_is_fp() const;
@@ -65,9 +68,9 @@ class Interval : public SetBase {
     void set_max(T max);
     //@{ /// @brief https://en.wikipedia.org/wiki/Subset
     bool is_superset_of(T val) const;
-    bool is_superset_of(const Interval<T>& interval) const;
+    bool is_superset_of(const _Interval<T>& interval) const;
     bool is_proper_superset_of(T val) const;
-    bool is_proper_superset_of(const Interval<T>& interval) const;
+    bool is_proper_superset_of(const _Interval<T>& interval) const;
     //@}
   protected:
     T    m_min;
@@ -77,59 +80,27 @@ class Interval : public SetBase {
     /// @brief Comparison tolerance when using floating point template type.
     T    m_fp_comparison_tol;
     void throw_invalid_argument_if_max_gt_min() const;
-}; // class Interval
+}; // class _Interval
 
-/*! @brief <B>Exception safety: If min <= max, No-throw guarantee.
- *                              If min > max, Strong guarantee.</B>
- ******************************************************************************/
 template<>
-Interval<float>::Interval(float min, float max, float fp_comparison_tol) :
-    SetBase(), m_min(min), m_max(max), m_is_fp(true),
-    m_fp_comparison_tol(fp_comparison_tol) {
-
-  if(m_fp_comparison_tol <= 0) {
-    std::ostringstream oss;
-    oss << "Interval object constructed with invalid tolerance comparison ";
-    oss << "value of " << m_fp_comparison_tol;
-    throw std::invalid_argument(oss.str());
-  }
-
-  m_is_empty = false;
-  throw_invalid_argument_if_max_gt_min();
-}
-
-/*! @brief <B>Exception safety: If min <= max, No-throw guarantee.
- *                              If min > max, Strong guarantee.</B>
- ******************************************************************************/
+_Interval<float>::_Interval(float min, float max, float fp_comparison_tol);
 template<>
-Interval<double>::Interval(double min, double max, double fp_comparison_tol) :
-    SetBase(), m_min(min), m_max(max), m_is_fp(true),
-    m_fp_comparison_tol(fp_comparison_tol) {
-
-  if(m_fp_comparison_tol <= 0) {
-    std::ostringstream oss;
-    oss << "Interval object constructed with invalid tolerance comparison ";
-    oss << "value of " << m_fp_comparison_tol;
-    throw std::invalid_argument(oss.str());
-  }
-  m_is_empty = false;
-  throw_invalid_argument_if_max_gt_min();
-}
+_Interval<double>::_Interval(double min, double max, double fp_comparison_tol);
 
 /// @brief https://en.wikipedia.org/wiki/Set_(mathematics)
 template<class T>
 class Set : public SetBase {
   public:
     Set();
-    Set(const Interval<T>& interval);
-    Set(const std::vector<Interval<T> >& intervals);
-    const std::vector<Interval<T> >& get_intervals() const;
+    Set(const _Interval<T>& interval);
+    Set(const std::vector<_Interval<T> >& intervals);
+    const std::vector<_Interval<T> >& get_intervals() const;
     T get_min() const;
     T get_max() const;
     bool operator==(const Set<T>& rhs) const;
     bool operator!=(const Set<T>& rhs) const;
   protected:
-    std::vector<Interval<T> > m_intervals;
+    std::vector<_Interval<T> > m_intervals;
 }; // class Set
 
 /*! @brief Constraint Satisfaction Problem Solver.
@@ -208,25 +179,25 @@ class CSPSolver {
         const bool   m_type_is_int32;
         const bool   m_type_is_double;
         Var(int32_t min, int32_t max) :
-            m_int32_set(Interval<int32_t>(min, max)),
+            m_int32_set(_Interval<int32_t>(min, max)),
             m_double_set(),
             m_fp_comparison_tol(0.),
             m_type_is_int32(true), m_type_is_double(false) {
         }
         Var(double min, double max, double fp_comparison_tol) :
             m_int32_set(),
-            m_double_set(Interval<double>(min, max, fp_comparison_tol)),
+            m_double_set(_Interval<double>(min, max, fp_comparison_tol)),
             m_fp_comparison_tol(fp_comparison_tol),
             m_type_is_int32(false), m_type_is_double(true) {
         }
-        bool contains(Interval<int32_t> interval);
-        bool contains(Interval<double> interval);
+        bool contains(_Interval<int32_t> interval);
+        bool contains(_Interval<double> interval);
         bool get_is_empty();
       }; // struct Var
       typedef std::map<const char*, Var> VarMap;
       VarMap m_vars;
-      Interval<int32_t> get_int32_interval_limits();
-      Interval<double> get_double_interval_limits(double tol);
+      _Interval<int32_t> get_int32_interval_limits();
+      _Interval<double> get_double_interval_limits(double tol);
       void set_var_limits_to_type_limits(
           std::pair<const char* const, FeasibleRegionLimits::Var>& var);
       void set_var_limits_to_empty_set(
@@ -284,16 +255,16 @@ class CSPSolver {
     std::vector<Constr::Cond> m_cond;
     FeasibleRegionLimits m_feasible_region_limits;
 
-    Interval<int32_t> get_interval_for_constr(Constr constr);
-    Interval<double> get_interval_for_constr(Constr constr, double tol);
+    _Interval<int32_t> get_interval_for_constr(Constr constr);
+    _Interval<double> get_interval_for_constr(Constr constr, double tol);
     void dilate(std::pair<const char* const, FeasibleRegionLimits::Var>& var,
-        Interval<int32_t>& iv);
+        _Interval<int32_t>& iv);
     void dilate(std::pair<const char* const, FeasibleRegionLimits::Var>& var,
-        Interval<double>& iv);
+        _Interval<double>& iv);
     void erode(std::pair<const char* const, FeasibleRegionLimits::Var>& var,
-        Interval<int32_t>& iv);
+        _Interval<int32_t>& iv);
     void erode(std::pair<const char* const, FeasibleRegionLimits::Var>& var,
-        Interval<double>& iv);
+        _Interval<double>& iv);
     void propagate_constr_rhs_const(
         std::pair<const char* const, FeasibleRegionLimits::Var>& ivar,
         Constr& constr, /*const std::vector<CSPSolver::CondConstr>& cc*/
@@ -317,6 +288,8 @@ class CSPSolver {
 
 } // namespace Math
 
-#include "Math.cc"
+} // namespace OCPI
+
+#include "../src/Math.cct"
 
 #endif // _MATH_HH

@@ -247,6 +247,8 @@ FMCOMMS2_3Configurator::FMCOMMS2_3Configurator(int32_t /*fmcomms_num*/) :
 // STEP 3 - DEFINE DRC (get/set APIs)
 // -----------------------------------------------------------------------------
 
+typedef AD9361DRC AD9361DRC;
+
 ///@TODO / FIXME - add fmcomms_num
 template<class log_t,class cfgrtr_t>
 FMCOMMS2_3DRC<log_t,cfgrtr_t>::FMCOMMS2_3DRC(unsigned which,
@@ -258,23 +260,22 @@ FMCOMMS2_3DRC<log_t,cfgrtr_t>::FMCOMMS2_3DRC(unsigned which,
 }
 
 template<class log_t,class cfgrtr_t> data_stream_id_t
-FMCOMMS2_3DRC<log_t,cfgrtr_t>::get_ad9361_ds_id(
-    data_stream_id_t id) const {
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::get_ad9361_ds_id(data_stream_id_t id) const {
+  /// @TODO / FIXME figure out why this is commented out
   //return id==m_ds_rx1a ? "rx1" :  id==m_ds_rx1a ? "rx2" : id==m_ds_rx1a ? "tx1" :
   //    id==m_ds_rx1a ? "tx2" : "rx1"; 
   return id;
 }
 
 template<class log_t,class cfgrtr_t> bool
-FMCOMMS2_3DRC<log_t,cfgrtr_t>::get_data_stream_is_enabled(
-    data_stream_id_t id) {
-  return AD9361DRC<log_t,cfgrtr_t>::get_data_stream_is_enabled(get_ad9361_ds_id(id));
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::get_data_stream_is_enabled(data_stream_id_t id) {
+  auto ad_id = get_ad9361_ds_id(id);
+  return AD9361DRC<cfgrtr_t>::get_data_stream_is_enabled(ad_id);
 }
 
 template<class log_t,class cfgrtr_t>
 data_stream_direction_t 
-FMCOMMS2_3DRC<log_t,cfgrtr_t>::get_data_stream_direction(
-    data_stream_id_t id) {
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::get_data_stream_direction(data_stream_id_t id) {
   data_stream_direction_t ret = data_stream_direction_t::tx;
   if((id==m_ds_rx1a) or (id==m_ds_rx2a)) {
     ret = data_stream_direction_t::rx;
@@ -283,81 +284,79 @@ FMCOMMS2_3DRC<log_t,cfgrtr_t>::get_data_stream_direction(
 }
 
 template<class log_t,class cfgrtr_t> config_value_t 
-FMCOMMS2_3DRC<log_t,cfgrtr_t>::get_tuning_freq_MHz(
-    data_stream_id_t data_stream_id) {
-  return AD9361DRC<log_t,cfgrtr_t>::get_tuning_freq_MHz(get_ad9361_ds_id(data_stream_id));
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::get_tuning_freq_MHz(data_stream_id_t id) {
+  return AD9361DRC<log_t,cfgrtr_t>::get_tuning_freq_MHz(get_ad9361_ds_id(id));
 }
 
 template<class log_t,class cfgrtr_t> config_value_t 
-FMCOMMS2_3DRC<log_t,cfgrtr_t>::get_bandwidth_3dB_MHz(
-    data_stream_id_t data_stream_id) {
-  return AD9361DRC<log_t,cfgrtr_t>::get_bandwidth_3dB_MHz(get_ad9361_ds_id(data_stream_id));
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::get_bandwidth_3dB_MHz(data_stream_id_t id) {
+  return AD9361DRC<log_t,cfgrtr_t>::get_bandwidth_3dB_MHz(get_ad9361_ds_id(id));
 }
 
 template<class log_t,class cfgrtr_t> config_value_t 
-FMCOMMS2_3DRC<log_t,cfgrtr_t>::get_sampling_rate_Msps(
-    data_stream_id_t data_stream_id) {
-  return AD9361DRC<log_t,cfgrtr_t>::get_sampling_rate_Msps(get_ad9361_ds_id(data_stream_id));
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::get_sampling_rate_Msps(data_stream_id_t id) {
+  return AD9361DRC<log_t,cfgrtr_t>::get_sampling_rate_Msps(get_ad9361_ds_id(id));
 }
 
 template<class log_t,class cfgrtr_t> bool
-FMCOMMS2_3DRC<log_t,cfgrtr_t>::get_samples_are_complex(
-    data_stream_id_t data_stream_id) {
-  return AD9361DRC<log_t,cfgrtr_t>::get_samples_are_complex(get_ad9361_ds_id(data_stream_id));
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::get_samples_are_complex(data_stream_id_t id) {
+  return AD9361DRC<log_t,cfgrtr_t>::get_samples_are_complex(get_ad9361_ds_id(id));
 }
 
 template<class log_t,class cfgrtr_t> gain_mode_value_t 
-FMCOMMS2_3DRC<log_t,cfgrtr_t>::get_gain_mode(
-    data_stream_id_t data_stream_id) {
-  return AD9361DRC<log_t,cfgrtr_t>::get_gain_mode(get_ad9361_ds_id(data_stream_id));
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::get_gain_mode(data_stream_id_t id) {
+  return AD9361DRC<log_t,cfgrtr_t>::get_gain_mode(get_ad9361_ds_id(id));
 }
 
 template<class log_t,class cfgrtr_t> config_value_t 
-FMCOMMS2_3DRC<log_t,cfgrtr_t>::get_gain_dB(
-    data_stream_id_t data_stream_id) {
-  return AD9361DRC<log_t,cfgrtr_t>::get_gain_dB(get_ad9361_ds_id(data_stream_id));
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::get_gain_dB(data_stream_id_t id) {
+  return AD9361DRC<log_t,cfgrtr_t>::get_gain_dB(get_ad9361_ds_id(id));
 }
 
 template<class log_t,class cfgrtr_t> void
-FMCOMMS2_3DRC<log_t,cfgrtr_t>::set_data_stream_direction(
-    data_stream_id_t data_stream_id, data_stream_direction_t val) {
-  return AD9361DRC<log_t,cfgrtr_t>::set_data_stream_direction(get_ad9361_ds_id(data_stream_id),val);
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::set_data_stream_direction(data_stream_id_t id,
+    data_stream_direction_t val) {
+  auto ad_id = get_ad9361_ds_id(id);
+  return AD9361DRC<log_t,cfgrtr_t>::set_data_stream_direction(ad_id,val);
 }
 
 template<class log_t,class cfgrtr_t> void
-FMCOMMS2_3DRC<log_t,cfgrtr_t>::set_tuning_freq_MHz(
-    data_stream_id_t data_stream_id, config_value_t val) {
-  return AD9361DRC<log_t,cfgrtr_t>::set_tuning_freq_MHz(get_ad9361_ds_id(data_stream_id),val);
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::set_tuning_freq_MHz(data_stream_id_t id,
+    config_value_t val) {
+  return AD9361DRC<log_t,cfgrtr_t>::set_tuning_freq_MHz(get_ad9361_ds_id(id),val);
 }
 
 template<class log_t,class cfgrtr_t> void
-FMCOMMS2_3DRC<log_t,cfgrtr_t>::set_bandwidth_3dB_MHz(
-    data_stream_id_t data_stream_id, config_value_t val) {
-  return AD9361DRC<log_t,cfgrtr_t>::set_bandwidth_3dB_MHz(get_ad9361_ds_id(data_stream_id),val);
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::set_bandwidth_3dB_MHz(data_stream_id_t id,
+    config_value_t val) {
+  auto ad_id = get_ad9361_ds_id(id);
+  return AD9361DRC<log_t,cfgrtr_t>::set_bandwidth_3dB_MHz(ad_id,val);
 }
 
 template<class log_t,class cfgrtr_t> void
-FMCOMMS2_3DRC<log_t,cfgrtr_t>::set_sampling_rate_Msps(
-    data_stream_id_t data_stream_id, config_value_t val) {
-  return AD9361DRC<log_t,cfgrtr_t>::set_sampling_rate_Msps(get_ad9361_ds_id(data_stream_id),val);
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::set_sampling_rate_Msps(data_stream_id_t id,
+    config_value_t val) {
+  auto ad_id = get_ad9361_ds_id(id);
+  return AD9361DRC<log_t,cfgrtr_t>::set_sampling_rate_Msps(ad_id,val);
 }
 
 template<class log_t,class cfgrtr_t> void
-FMCOMMS2_3DRC<log_t,cfgrtr_t>::set_samples_are_complex(
-    data_stream_id_t data_stream_id, bool val) {
-  return AD9361DRC<log_t,cfgrtr_t>::set_samples_are_complex(get_ad9361_ds_id(data_stream_id),val);
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::set_samples_are_complex(data_stream_id_t id,
+    bool val) {
+  auto ad_id = get_ad9361_ds_id(id);
+  return AD9361DRC<log_t,cfgrtr_t>::set_samples_are_complex(ad_id,val);
 }
 
 template<class log_t,class cfgrtr_t> void
-FMCOMMS2_3DRC<log_t,cfgrtr_t>::set_gain_mode(
-    data_stream_id_t data_stream_id, gain_mode_value_t val) {
-  return AD9361DRC<log_t,cfgrtr_t>::set_gain_mode(get_ad9361_ds_id(data_stream_id),val);
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::set_gain_mode(data_stream_id_t id,
+    gain_mode_value_t val) {
+  return AD9361DRC<log_t,cfgrtr_t>::set_gain_mode(get_ad9361_ds_id(id),val);
 }
 
 template<class log_t,class cfgrtr_t> void
-FMCOMMS2_3DRC<log_t,cfgrtr_t>::set_gain_dB(
-    data_stream_id_t data_stream_id, config_value_t val) {
-  return AD9361DRC<log_t,cfgrtr_t>::set_gain_dB(get_ad9361_ds_id(data_stream_id),val);
+FMCOMMS2_3DRC<log_t,cfgrtr_t>::set_gain_dB(data_stream_id_t id,
+    config_value_t val) {
+  return AD9361DRC<log_t,cfgrtr_t>::set_gain_dB(get_ad9361_ds_id(id),val);
 }
 
 template<class log_t,class cfgrtr_t> bool

@@ -25,10 +25,7 @@
 //#define DISABLE_AD9361 // remove hardware actuation, useful for testing
 
 #include "DRC.hh"
-#include "LogForwarder.hh"
-#ifndef DISABLE_AD9361
-#include "RCC_Worker.h" // OCPI::RCC::RCCUserSlave
-#endif
+#include <cstring> // memset
 
 #ifndef DISABLE_AD9361
 extern "C" {
@@ -38,7 +35,10 @@ extern "C" {
 }
 #endif
 
-namespace DRC {
+namespace OCPI {
+
+/// @todo / FIXME - consolidate into DRC namespace
+namespace DRC_PHASE_2 {
 
 // -----------------------------------------------------------------------------
 // STEP 1 - IF IS_LOCKING SUPPORTED,
@@ -52,7 +52,7 @@ class DDCDUCConstants {
   const double m_divider;
 };
 
-#ifdef IS_LOCKING
+//#ifdef IS_LOCKING
 ///@TODO / FIXME handle DDC constant(s) in separate DDC/DUC class
 class AD9361CSP : public CSPBase, public DDCDUCConstants {
   protected:
@@ -77,28 +77,28 @@ class AD9361CSP : public CSPBase, public DDCDUCConstants {
   /// @brief defining Constraint Satisfaction Problem (CSP)
   void define();
 }; // class AD9361CSP
-#endif
+//#endif
 
 // -----------------------------------------------------------------------------
 // STEP 2 - IF IS_LOCKING SUPPORTED, DEFINE CONFIGURATOR THAT UTILIZES THE CSP
 // -----------------------------------------------------------------------------
 
-#ifdef IS_LOCKING
+//#ifdef IS_LOCKING
 class AD9361Configurator : public Configurator<AD9361CSP> {
   public:
   AD9361Configurator();
 };
-#endif
+//#endif
 
 // -----------------------------------------------------------------------------
 // STEP 3 - DEFINE DRC (get/set APIs)
 // -----------------------------------------------------------------------------
 
-#ifdef IS_LOCKING
+//#ifdef IS_LOCKING
 #define AD9361_CONFIGURATOR AD9361Configurator
-#else
-#define AD9361_CONFIGURATOR Configurator<CSPBase>
-#endif
+//#else
+//#define AD9361_CONFIGURATOR Configurator<CSPBase>
+//#endif
 
 /*! @brief ad9361_config worker's props whose purpose is to read back
  *         the static configuration of the FPGA bitstream - reference the OWD.
@@ -230,8 +230,8 @@ ad9361FinalConfig(Config &config, Ad9361InitConfig &/*cfg*/) {
 #endif
 
 ///@TODO / FIXME handle DDC constant(s) in separate DDC/DUC class
-template<class log_t,class cfgrtr_t = AD9361_CONFIGURATOR>
-class AD9361DRC : public DRC<log_t,cfgrtr_t>, public DDCDUCConstants {
+template<class cfgrtr_t = AD9361_CONFIGURATOR>
+class AD9361DRC : public DRC<cfgrtr_t>, public DDCDUCConstants {
   protected:
 #ifndef DISABLE_AD9361
   enum class rx_frame_usage_t {enable, toggle};
@@ -256,16 +256,17 @@ class AD9361DRC : public DRC<log_t,cfgrtr_t>, public DDCDUCConstants {
   template<typename T> T convert_milli_db_to_db(T val_milli_db) const;
   template<typename T> T convert_db_to_milli_db(T val_milli_db) const;
 #ifndef DISABLE_AD9361
-  void init_init_param();
-  bool any_configurator_configs_locked_which_prevent_ad9361_init() const;
-  void throw_if_ad9361_init_failed(const char* operation) const;
-  void apply_config_to_init_param(const Ad9361InitConfig &config);
-  void enforce_ensm_config();
-  void set_ad9361_fpga_channel_config();
+  uint8_t get_ch(data_stream_id_t id);
+  void    set_ad9361_fpga_channel_config();
+  void    init_init_param();
+  bool    any_configurator_configs_locked_which_prevent_ad9361_init() const;
+  void    throw_if_ad9361_init_failed(const char* operation) const;
+  void    apply_config_to_init_param(const Ad9361InitConfig &config);
+  void    enforce_ensm_config();
 #endif
-  void init_if_required();
+  void    init_if_required();
   public:
-  AD9361DRC<log_t, cfgrtr_t>(unsigned which,
+  AD9361DRC<cfgrtr_t>(unsigned which,
       AD9361DeviceCallBack &dev, double fref_hz,
       const char* rx1 = "rx1",const char* rx2 = "rx2",
       const char* tx1 = "tx1",const char* tx2 = "tx2",
@@ -274,15 +275,21 @@ class AD9361DRC : public DRC<log_t,cfgrtr_t>, public DDCDUCConstants {
   void set_rx_rf_port_input(uint32_t mode);
   void set_tx_rf_port_output(uint32_t mode);
   void throw_if_no_os_api_call_returns_non_zero(int32_t res);
-  bool                    get_data_stream_is_enabled(data_stream_id_t id);
-  data_stream_direction_t get_data_stream_direction( data_stream_id_t id);
+  uint64_t                get_noos_tuning_freq(      data_stream_id_t id);
+  uint32_t                get_noos_bandwidth(        data_stream_id_t id);
+  uint32_t                get_noos_sampling_rate(    data_stream_id_t id);
+  uint8_t                 get_noos_gain_mode(        data_stream_id_t id);
+  int32_t                 get_noos_rx_gain(          data_stream_id_t id);
+  uint32_t                get_noos_tx_gain(          data_stream_id_t id);
+  bool                    get_enabled(               data_stream_id_t id);
+  data_stream_direction_t get_direction(             data_stream_id_t id);
   config_value_t          get_tuning_freq_MHz(       data_stream_id_t id);
   config_value_t          get_bandwidth_3dB_MHz(     data_stream_id_t id);
   config_value_t          get_sampling_rate_Msps(    data_stream_id_t id);
   bool                    get_samples_are_complex(   data_stream_id_t id);
   gain_mode_value_t       get_gain_mode(             data_stream_id_t id);
   config_value_t          get_gain_dB(               data_stream_id_t id);
-  void set_data_stream_direction(data_stream_id_t id,data_stream_direction_t v);
+  void set_direction(            data_stream_id_t id,data_stream_direction_t v);
   void set_tuning_freq_MHz(      data_stream_id_t id,config_value_t    val);
   void set_bandwidth_3dB_MHz(    data_stream_id_t id,config_value_t    val);
   void set_sampling_rate_Msps(   data_stream_id_t id,config_value_t    val);
@@ -293,11 +300,15 @@ class AD9361DRC : public DRC<log_t,cfgrtr_t>, public DDCDUCConstants {
       const ConfigLockRequest& request);
   void init();
   bool shutdown();
+  //bool start(unsigned config);
+  bool stop(unsigned config);
   ~AD9361DRC();
 }; // class AD9361DRC
 
-} // namespace DRC
+} // namespace DRC_PHASE_2
 
-#include "AD9361DRC.cc"
+} // namespace OCPI
+
+#include "../src/AD9361DRC.cct"
 
 #endif // _AD9361_DRC_HH

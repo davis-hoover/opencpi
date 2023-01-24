@@ -263,7 +263,7 @@ int main(int argc, char **argv) {
               std::cout << "ERR\n";
             }
             app.setProperty("drc","configurations",cfgsstr.c_str());
-            std::cout << "setting property: configurations: " << cfgsstr << "\n";
+            //std::cout << "setting property: configurations: " << cfgsstr << "\n";
             print_info_configuration_channel(*it);
           }
           else {

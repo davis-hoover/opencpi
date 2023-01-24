@@ -23,14 +23,17 @@
 
 #include "AD9361DRC.hh"
 
-namespace DRC {
+namespace OCPI {
+
+/// @todo / FIXME - consolidate into DRC namespace
+namespace DRC_PHASE_2 {
 
 // -----------------------------------------------------------------------------
 // STEP 1 - IF IS_LOCKING SUPPORTED,
 //          DEFINE Constraint Satisfaction Problem (CSP)
 // -----------------------------------------------------------------------------
 
-#ifdef IS_LOCKING
+//#ifdef IS_LOCKING
 class FMCOMMS2_3CSP : public AD9361CSP {
   protected:
   typedef CSPSolver::Constr::Cond Cond;
@@ -58,32 +61,32 @@ class FMCOMMS2_3CSP : public AD9361CSP {
   /// @brief define Constraint Satisfaction Problem (CSP)
   void define();
 }; // class FMCOMMS2_3CSP
-#endif
+//#endif
 
 // -----------------------------------------------------------------------------
 // STEP 2 - IF IS_LOCKING SUPPORTED, DEFINE CONFIGURATOR THAT UTILIZES THE CSP
 // -----------------------------------------------------------------------------
 
-#ifdef IS_LOCKING
+//#ifdef IS_LOCKING
 class FMCOMMS2_3Configurator : public Configurator<FMCOMMS2_3CSP> {
   public:
   ///@TODO / FIXME - remove default value of fmcomms_num 3
   FMCOMMS2_3Configurator(int32_t fmcomms_num = 3);
 }; // class FMCOMMS2_3Configurator
-#endif
+//#endif
 
 // -----------------------------------------------------------------------------
 // STEP 3 - DEFINE DRC (get/set APIs)
 // -----------------------------------------------------------------------------
 
-#ifdef IS_LOCKING
+//#ifdef IS_LOCKING
 #define FMCOMMS2_3_CONFIGURATOR FMCOMMS2_3Configurator
-#else
-#define FMCOMMS2_3_CONFIGURATOR Configurator<CSPBase>
-#endif
+//#else
+//#define FMCOMMS2_3_CONFIGURATOR Configurator<CSPBase>
+//#endif
 
-template<class log_t,class cfgrtr_t = FMCOMMS2_3_CONFIGURATOR>
-class FMCOMMS2_3DRC : public AD9361DRC<log_t,cfgrtr_t> {
+template<class cfgrtr_t = FMCOMMS2_3_CONFIGURATOR>
+class FMCOMMS2_3DRC : public AD9361DRC<cfgrtr_t> {
   protected:
   /// @brief name of the data stream that corresponds to FMCOMMS2/3 RX1A channel
   const char* m_ds_rx1a;
@@ -91,7 +94,7 @@ class FMCOMMS2_3DRC : public AD9361DRC<log_t,cfgrtr_t> {
   const char* m_ds_tx1a;
   const char* m_ds_tx2a;
   public:
-  FMCOMMS2_3DRC<log_t, cfgrtr_t>(unsigned which,
+  FMCOMMS2_3DRC<cfgrtr_t>(unsigned which,
       AD9361DeviceCallBack &dev, double fref_hz, int32_t fmcomms_num,
       const char* rx1a, const char* rx2a,
       const char* tx1a, const char* tx2a,
@@ -118,8 +121,10 @@ class FMCOMMS2_3DRC : public AD9361DRC<log_t,cfgrtr_t> {
   bool shutdown();
 }; // class FMCOMMS2_3DRC
 
-} // namespace DRC
+} // namespace DRC_PHASE_2
 
-#include "FMCOMMS2_3DRC.cc"
+} // namespace OCPI
+
+#include "../src/FMCOMMS2_3DRC.cct"
 
 #endif // _FMCOMMS2_3_DRC_HH

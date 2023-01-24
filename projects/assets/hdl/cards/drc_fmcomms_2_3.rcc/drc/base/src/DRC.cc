@@ -566,11 +566,11 @@ ARC<L,C>::request_config_lock(
     return true;
   }
   else { // unroll
-    auto it = config_lock.m_data_streams.begin();
-    for(; it != config_lock.m_data_streams.end(); ++it) {
-      unlock_config(it->m_data_stream_id, config_key_direction);
-      unlock_config(it->m_data_stream_id, config_key_tuning_freq_MHz);
-      unlock_config(it->m_data_stream_id, config_key_bandwidth_3dB_MHz);
+    auto itunroll = config_lock.m_data_streams.begin();
+    for(; itunroll != config_lock.m_data_streams.end(); ++itunroll) {
+      unlock_config(itunroll->m_data_stream_id, config_key_direction);
+      unlock_config(itunroll->m_data_stream_id, config_key_tuning_freq_MHz);
+      unlock_config(itunroll->m_data_stream_id, config_key_bandwidth_3dB_MHz);
     }
   }
 #endif
@@ -666,9 +666,8 @@ ARC<L,C>::lock_config(data_stream_id_t ds_id, config_value_t val,
 }
 
 template<class L,class C> void
-ARC<L,C>::unlock_config(const data_stream_id_t ds_id,
-    const config_key_t cfg_key) {
-  this->m_configurator.unlock_config(ds_id, cfg_key);
+ARC<L,C>::unlock_config(const data_stream_id_t id,const config_key_t cfg) {
+  this->m_configurator.unlock_config(id, cfg);
 }
 
 template<class L,class C> bool
@@ -861,18 +860,18 @@ DRC<L,C>::request_config_lock(
     return true;
   }
   else { // unroll
-    auto it = config_lock.m_data_streams.begin();
-    for(; it != config_lock.m_data_streams.end(); ++it) {
-      this->unlock_config(it->m_data_stream_id, config_key_direction);
-      this->unlock_config(it->m_data_stream_id, config_key_tuning_freq_MHz);
-      this->unlock_config(it->m_data_stream_id, config_key_bandwidth_3dB_MHz);
-      this->unlock_config(it->m_data_stream_id, config_key_sampling_rate_Msps);
-      this->unlock_config(it->m_data_stream_id, config_key_samples_are_complex);
-      if(it->m_including_gain_mode) {
-        this->unlock_config(it->m_data_stream_id, config_key_gain_mode);
+    auto i2 = config_lock.m_data_streams.begin();
+    for(; i2 != config_lock.m_data_streams.end(); ++i2) {
+      this->unlock_config(i2->m_data_stream_id, config_key_direction);
+      this->unlock_config(i2->m_data_stream_id, config_key_tuning_freq_MHz);
+      this->unlock_config(i2->m_data_stream_id, config_key_bandwidth_3dB_MHz);
+      this->unlock_config(i2->m_data_stream_id, config_key_sampling_rate_Msps);
+      this->unlock_config(i2->m_data_stream_id, config_key_samples_are_complex);
+      if(i2->m_including_gain_mode) {
+        this->unlock_config(i2->m_data_stream_id, config_key_gain_mode);
       }
-      if(it->m_including_gain_dB) {
-        this->unlock_config(it->m_data_stream_id, config_key_gain_dB);
+      if(i2->m_including_gain_dB) {
+        this->unlock_config(i2->m_data_stream_id, config_key_gain_dB);
       }
     }
   }

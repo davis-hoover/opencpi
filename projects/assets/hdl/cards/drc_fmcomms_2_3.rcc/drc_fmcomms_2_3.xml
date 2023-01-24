@@ -1,8 +1,10 @@
 <RccWorker language='c++' spec='drc-spec' version='2'
 	   controlOperations='start,stop,release'
-	   staticprereqlibs='ad9361'
+	   staticprereqlibs='ad9361'>
+<!-- phase 1
      includeDirs='drc/base/include/,drc/ad9361/include/,drc/fmcomms2/include/,drc/base/src/,drc/ad9361/src/,drc/fmcomms2/src/'
-     sourcefiles='drc/ad9361/src/ad9361_platform.cc'>
+     sourcefiles='drc/ad9361/src/ad9361_platform.cc'
+-->
   <specProperty name='MAX_CONFIGURATIONS_p' value="1"/> <!-- because all channels must be stopped/started simultaneously -->
   <specProperty name='MAX_CHANNELS_p' value="4"/>
   <specProperty name='MAX_RX_CHANNELS_p' value="2"/>

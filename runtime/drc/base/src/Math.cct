@@ -33,6 +33,8 @@
 #include <cassert> /// @TODO/FIXME - remove
 #include "Math.hh"
 
+namespace OCPI {
+
 namespace Math {
 
 std::ostream&
@@ -113,30 +115,67 @@ SetBase::set_is_empty(bool val) {
 /*! @brief <B>Exception safety: No-throw guarantee.</B>
  ******************************************************************************/
 template<class T>
-Interval<T>::Interval() : SetBase(), m_is_fp(false) {
+_Interval<T>::_Interval() : SetBase(), m_is_fp(false) {
 }
 
 /*! @brief <B>Exception safety: If min <= max, No-throw guarantee.
  *                              If min > max, Strong guarantee.</B>
  ******************************************************************************/
 template<class T>
-Interval<T>::Interval(T min, T max) :
+_Interval<T>::_Interval(T min, T max) :
     SetBase(), m_min(min), m_max(max), m_is_fp(false) {
   m_is_empty = false;
   throw_invalid_argument_if_max_gt_min();
 }
 
 template<class T>
-Interval<T>::Interval(const Interval<int32_t>& obj) :
+_Interval<T>::_Interval(const _Interval<int32_t>& obj) :
     SetBase(), m_min(obj.get_min()), m_max(obj.get_max()), m_is_fp(false) {
   m_is_empty = false;
   throw_invalid_argument_if_max_gt_min();
 }
 
+/*! @brief <B>Exception safety: If min <= max, No-throw guarantee.
+ *                              If min > max, Strong guarantee.</B>
+ ******************************************************************************/
 template<>
-Interval<float>::Interval(float min, float max) : m_min(min), m_max(max) {
+_Interval<float>::_Interval(float min, float max, float fp_comparison_tol) :
+    SetBase(), m_min(min), m_max(max), m_is_fp(true),
+    m_fp_comparison_tol(fp_comparison_tol) {
+
+  if(m_fp_comparison_tol <= 0) {
+    std::ostringstream oss;
+    oss << "_Interval object constructed with invalid tolerance comparison ";
+    oss << "value of " << m_fp_comparison_tol;
+    throw std::invalid_argument(oss.str());
+  }
+
+  m_is_empty = false;
+  throw_invalid_argument_if_max_gt_min();
+}
+
+/*! @brief <B>Exception safety: If min <= max, No-throw guarantee.
+ *                              If min > max, Strong guarantee.</B>
+ ******************************************************************************/
+template<>
+_Interval<double>::_Interval(double min, double max, double fp_comparison_tol) :
+    SetBase(), m_min(min), m_max(max), m_is_fp(true),
+    m_fp_comparison_tol(fp_comparison_tol) {
+
+  if(m_fp_comparison_tol <= 0) {
+    std::ostringstream oss;
+    oss << "_Interval object constructed with invalid tolerance comparison ";
+    oss << "value of " << m_fp_comparison_tol;
+    throw std::invalid_argument(oss.str());
+  }
+  m_is_empty = false;
+  throw_invalid_argument_if_max_gt_min();
+}
+
+template<>
+_Interval<float>::_Interval(float min, float max) : m_min(min), m_max(max) {
   std::ostringstream oss;
-  oss << "Interval object constructed for 'float' template type without ";
+  oss << "_Interval object constructed for 'float' template type without ";
   oss << "constructor which sets comparison tolerance";
   throw std::invalid_argument(oss.str());
 }
@@ -144,11 +183,11 @@ Interval<float>::Interval(float min, float max) : m_min(min), m_max(max) {
 /*! @brief <B>Exception safety: Strong guarantee.</B>
  ******************************************************************************/
 template<class T>
-Interval<T>::Interval(T min, T max, T fp_comparison_tol) :
+_Interval<T>::_Interval(T min, T max, T fp_comparison_tol) :
     SetBase(), m_min(min), m_max(max), m_is_fp(false),
     m_fp_comparison_tol(fp_comparison_tol) {
   std::ostringstream oss;
-  oss << "Interval object constructed for non-floating point type but still ";
+  oss << "_Interval object constructed for non-floating point type but still ";
   oss << "specified comparison tolerance";
   throw std::invalid_argument(oss.str());
 }
@@ -156,7 +195,7 @@ Interval<T>::Interval(T min, T max, T fp_comparison_tol) :
  *                              If min > max, Strong guarantee.</B>
  ******************************************************************************/
 template<class T> bool
-Interval<T>::operator==(const Interval<T>& rhs) const {
+_Interval<T>::operator==(const _Interval<T>& rhs) const {
   if(m_is_fp != rhs.get_is_fp()) {
     return false;
   }
@@ -169,12 +208,12 @@ Interval<T>::operator==(const Interval<T>& rhs) const {
   return true;
 }
 
-/*! @brief <B>Exception safety: If Interval(float,float,float) was used,
+/*! @brief <B>Exception safety: If _Interval(float,float,float) was used,
  *                              No-throw guarantee.
  *                              Otherwise, Strong guarantee.</B>
  ******************************************************************************/
 template<> bool
-Interval<float>::operator==(const Interval<float>& rhs) const {
+_Interval<float>::operator==(const _Interval<float>& rhs) const {
   if(m_is_fp != rhs.get_is_fp()) {
     return false;
   }
@@ -188,12 +227,12 @@ Interval<float>::operator==(const Interval<float>& rhs) const {
   return true;
 }
 
-/*! @brief <B>Exception safety: If Interval(double,double,double) was used,
+/*! @brief <B>Exception safety: If _Interval(double,double,double) was used,
  *                              No-throw guarantee.
  *                              Otherwise, Strong guarantee.</B>
  ******************************************************************************/
 template<> bool
-Interval<double>::operator==(const Interval<double>& rhs) const {
+_Interval<double>::operator==(const _Interval<double>& rhs) const {
   if(m_is_fp != rhs.get_is_fp()) {
     return false;
   }
@@ -211,7 +250,7 @@ Interval<double>::operator==(const Interval<double>& rhs) const {
  *                              Otherwise, Strong guarantee.</B>
  ******************************************************************************/
 template<class T> const T&
-Interval<T>::get_min() const {
+_Interval<T>::get_min() const {
   throw_string_if_is_empty();
   return m_min;
 }
@@ -220,7 +259,7 @@ Interval<T>::get_min() const {
  *                              Otherwise, Strong guarantee.</B>
  ******************************************************************************/
 template<class T> const T&
-Interval<T>::get_max() const {
+_Interval<T>::get_max() const {
   throw_string_if_is_empty();
   return m_max;
 }
@@ -228,14 +267,14 @@ Interval<T>::get_max() const {
 /*! @brief <B>Exception safety: Strong guarantee.</B>
  ******************************************************************************/
 template<class T> bool
-Interval<T>::get_is_fp() const {
+_Interval<T>::get_is_fp() const {
   return m_is_fp;
 }
 
 /*! @brief <B>Exception safety: Strong guarantee.</B>
  ******************************************************************************/
 template<class T> T
-Interval<T>::get_fp_comparison_tol() const {
+_Interval<T>::get_fp_comparison_tol() const {
   if(not m_is_fp) {
     std::ostringstream oss;
     oss << "requested floating point comparison tolerance for non-floating ";
@@ -249,7 +288,7 @@ Interval<T>::get_fp_comparison_tol() const {
  *                              Otherwise, Strong guarantee.</B>
  ******************************************************************************/
 template<class T> void
-Interval<T>::set_min(const T min) {
+_Interval<T>::set_min(const T min) {
   m_min = min;
   throw_invalid_argument_if_max_gt_min();
 }
@@ -258,7 +297,7 @@ Interval<T>::set_min(const T min) {
  *                              Otherwise, Strong guarantee.</B>
  ******************************************************************************/
 template<class T> void
-Interval<T>::set_max(const T max) {
+_Interval<T>::set_max(const T max) {
   m_max = max;
   throw_invalid_argument_if_max_gt_min();
 }
@@ -266,7 +305,7 @@ Interval<T>::set_max(const T max) {
 /*! @brief <B>Exception safety: No-throw guarantee.</B>
  ******************************************************************************/
 template<class T> bool
-Interval<T>::is_superset_of(T val) const {
+_Interval<T>::is_superset_of(T val) const {
   bool ret;
   if(this->get_is_empty()) {
     ret = false;
@@ -280,7 +319,7 @@ Interval<T>::is_superset_of(T val) const {
 /*! @brief <B>Exception safety: No-throw guarantee.</B>
  ******************************************************************************/
 template<class T> bool
-Interval<T>::is_superset_of(const Interval& interval) const {
+_Interval<T>::is_superset_of(const _Interval& interval) const {
   bool ret;
   if(this->get_is_empty()) {
     ret = interval.get_is_empty();
@@ -299,7 +338,7 @@ Interval<T>::is_superset_of(const Interval& interval) const {
 /*! @brief <B>Exception safety: No-throw guarantee.</B>
  ******************************************************************************/
 template<class T> bool
-Interval<T>::is_proper_superset_of(T val) const {
+_Interval<T>::is_proper_superset_of(T val) const {
   bool ret;
   if(this->get_is_empty()) {
     ret = false;
@@ -313,7 +352,7 @@ Interval<T>::is_proper_superset_of(T val) const {
 /*! @brief <B>Exception safety: No-throw guarantee.</B>
  ******************************************************************************/
 template<class T> bool
-Interval<T>::is_proper_superset_of(const Interval& interval) const {
+_Interval<T>::is_proper_superset_of(const _Interval& interval) const {
   bool ret;
   if(this->get_is_empty()) {
     ret = interval.get_is_empty();
@@ -330,7 +369,7 @@ Interval<T>::is_proper_superset_of(const Interval& interval) const {
 }
 
 template<class T> void
-Interval<T>::throw_invalid_argument_if_max_gt_min() const {
+_Interval<T>::throw_invalid_argument_if_max_gt_min() const {
   if(m_min > m_max) {
     std::ostringstream oss;
     oss << "min (" << m_min << ") ";
@@ -340,7 +379,7 @@ Interval<T>::throw_invalid_argument_if_max_gt_min() const {
 }
 
 template<typename T> std::ostream&
-operator<<(std::ostream& os, const Interval<T>& rhs) {
+operator<<(std::ostream& os, const _Interval<T>& rhs) {
   if(rhs.get_is_empty() or (rhs.get_min() == rhs.get_max())) {
     os << "{"; // start of empty set or single value
   }
@@ -350,7 +389,7 @@ operator<<(std::ostream& os, const Interval<T>& rhs) {
   if(not rhs.get_is_empty()) {
     os << rhs.get_min();
     if(rhs.get_min() != rhs.get_max()) {
-      // see https://en.wikipedia.org/wiki/Interval_(mathematics)#Integer_intervals
+      // see https://en.wikipedia.org/wiki/_Interval_(mathematics)#Integer_intervals
       os << "..";
       os << rhs.get_max();
     }
@@ -375,7 +414,7 @@ std::ostream& operator<<(std::ostream& os,
 }*/
 
 template<> std::ostream&
-operator<<(std::ostream& os, const Interval<float>& rhs) {
+operator<<(std::ostream& os, const _Interval<float>& rhs) {
   float tol = rhs.get_fp_comparison_tol();
   bool min_equals_max = (std::abs(rhs.get_max() - rhs.get_min()) <= tol);
   if(rhs.get_is_empty() or min_equals_max) {
@@ -402,7 +441,7 @@ operator<<(std::ostream& os, const Interval<float>& rhs) {
 }
 
 template<> std::ostream&
-operator<<(std::ostream& os, const Interval<double>& rhs) {
+operator<<(std::ostream& os, const _Interval<double>& rhs) {
   double tol = rhs.get_fp_comparison_tol();
   bool min_equals_max = (std::abs(rhs.get_max() - rhs.get_min()) <= tol);
   if(rhs.get_is_empty() or min_equals_max) {
@@ -434,7 +473,7 @@ Set<T>::Set() : SetBase() {
 }
 
 template<class T>
-Set<T>::Set(const Interval<T>& interval) : SetBase() {
+Set<T>::Set(const _Interval<T>& interval) : SetBase() {
   if(not interval.get_is_empty()) {
     m_is_empty = false;
   }
@@ -442,7 +481,7 @@ Set<T>::Set(const Interval<T>& interval) : SetBase() {
 }
 
 template<class T>
-Set<T>::Set(const std::vector<Interval<T> >& intervals) : SetBase() {
+Set<T>::Set(const std::vector<_Interval<T> >& intervals) : SetBase() {
   for(auto it=intervals.begin(); it!=intervals.end(); ++it) {
     if(not it->get_is_empty()) {
       m_is_empty = false;
@@ -452,7 +491,7 @@ Set<T>::Set(const std::vector<Interval<T> >& intervals) : SetBase() {
   m_intervals = intervals;
 }
 
-template<class T> const std::vector<Interval<T> >&
+template<class T> const std::vector<_Interval<T> >&
 Set<T>::get_intervals() const {
   return m_intervals;
 }
@@ -513,15 +552,15 @@ operator<<(std::ostream& os, const Set<T>& rhs) {
 
 /// @brief https://en.wikipedia.org/wiki/Union_(set_theory)
 template<typename T> Set<T>
-union_of(const Interval<T>& first, const Interval<T>& second) {
+union_of(const _Interval<T>& first, const _Interval<T>& second) {
   return union_of(Set<T>(first), second);
 }
 
 /// @brief https://en.wikipedia.org/wiki/Union_(set_theory)
 template<typename T> Set<T>
-union_of(const Set<T>& set, const Interval<T>& interval) {
+union_of(const Set<T>& set, const _Interval<T>& interval) {
   bool do_append = true;
-  std::vector<Interval<T> > set_intervals = set.get_intervals();
+  std::vector<_Interval<T> > set_intervals = set.get_intervals();
   for(auto it = set_intervals.begin(); it != set_intervals.end(); ++it) {
     if(interval.get_min() > it->get_max()) {
       // interval                                     *****
@@ -591,8 +630,8 @@ union_of(const Set<T>& set, const Interval<T>& interval) {
 
 /// @brief https://en.wikipedia.org/wiki/Intersection_(set_theory)
 template<typename T> Set<T>
-intersection_of(const Interval<T>& first, const Interval<T>& second) {
-  std::vector<Interval<T> > set_intervals;
+intersection_of(const _Interval<T>& first, const _Interval<T>& second) {
+  std::vector<_Interval<T> > set_intervals;
   if(second.get_max() >= first.get_min()) {
     T min = first.get_min();
     if(second.get_min() > min) {
@@ -602,7 +641,7 @@ intersection_of(const Interval<T>& first, const Interval<T>& second) {
     if(second.get_max() < max) {
       max = second.get_max();
     }
-    Interval<T> interval(min, max);;
+    _Interval<T> interval(min, max);;
     set_intervals.push_back(interval);
   }
   auto ret = Set<T>(set_intervals);
@@ -617,8 +656,8 @@ intersection_of(const Interval<T>& first, const Interval<T>& second) {
 
 /// @brief https://en.wikipedia.org/wiki/Intersection_(set_theory)
 template<typename T> Set<T>
-intersection_of(const Set<T>& set, const Interval<T>& interval) {
-  std::vector<Interval<T> > set_intervals = set.get_intervals();
+intersection_of(const Set<T>& set, const _Interval<T>& interval) {
+  std::vector<_Interval<T> > set_intervals = set.get_intervals();
   auto it = set_intervals.begin();
   while(it != set_intervals.end()) {
     T iv_min = interval.get_min();
@@ -745,20 +784,20 @@ bool CSPSolver::Constr::operator==(const CSPSolver::Constr& rhs) const {
 }
 
 bool
-CSPSolver::FeasibleRegionLimits::Var::contains(Interval<int32_t> interval) {
+CSPSolver::FeasibleRegionLimits::Var::contains(_Interval<int32_t> interval) {
   bool ret = false;
   if(m_type_is_int32) {
     ret = intersection_of(m_int32_set, interval).get_intervals().size() > 0;
   }
   else if(m_type_is_double) {
-    Interval<double> iv_double(interval);
+    _Interval<double> iv_double(interval);
     ret = intersection_of(m_double_set, iv_double).get_intervals().size() > 0;
   }
   return ret;
 }
 
 bool
-CSPSolver::FeasibleRegionLimits::Var::contains(Interval<double> interval) {
+CSPSolver::FeasibleRegionLimits::Var::contains(_Interval<double> interval) {
   bool ret = false;
   if(m_type_is_int32) {
     throw std::string("not a valid thing to do");
@@ -782,18 +821,18 @@ CSPSolver::FeasibleRegionLimits::Var::get_is_empty() {
   return ret;
 }
 
-Interval<int32_t>
+_Interval<int32_t>
 CSPSolver::FeasibleRegionLimits::get_int32_interval_limits() {
   int32_t max = std::numeric_limits<int32_t>::max();
   int32_t min = std::numeric_limits<int32_t>::min();
-  return Interval<int32_t>(min, max);
+  return _Interval<int32_t>(min, max);
 }
 
-Interval<double>
+_Interval<double>
 CSPSolver::FeasibleRegionLimits::get_double_interval_limits(double tol) {
   double max = std::numeric_limits<double>::max();
   double min = -max;
-  return Interval<double>(min, max, tol);
+  return _Interval<double>(min, max, tol);
 }
 
 void
@@ -1020,7 +1059,7 @@ CSPSolver::val_is_within_var_feasible_region(T val, const char* var_key) const {
   return limits.m_vars.find(var_key) != limits.m_vars.end();
 }
 
-Interval<int32_t>
+_Interval<int32_t>
 CSPSolver::get_interval_for_constr(Constr constr) {
   int32_t min, max;
   if(std::string(constr.m_type) == ">=") {
@@ -1043,10 +1082,10 @@ CSPSolver::get_interval_for_constr(Constr constr) {
     min = constr.m_rhs_int32_const;
     max = constr.m_rhs_int32_const;
   }
-  return Interval<int32_t>(min, max);
+  return _Interval<int32_t>(min, max);
 }
 
-Interval<double>
+_Interval<double>
 CSPSolver::get_interval_for_constr(Constr constr, double tol) {
   double min, max;
   if(std::string(constr.m_type) == ">=") {
@@ -1073,13 +1112,13 @@ CSPSolver::get_interval_for_constr(Constr constr, double tol) {
     min = constr.m_rhs_double_const;
     max = constr.m_rhs_double_const;
   }
-  return Interval<double>(min, max, tol);
+  return _Interval<double>(min, max, tol);
 }
 
 void
 CSPSolver::dilate(
     std::pair<const char* const, FeasibleRegionLimits::Var>& var,
-    Interval<int32_t>& iv) {
+    _Interval<int32_t>& iv) {
   if(var.second.m_int32_set.get_is_empty()) {
     var.second.m_int32_set = Set<int32_t>(iv);
   }
@@ -1091,7 +1130,7 @@ CSPSolver::dilate(
 void
 CSPSolver::dilate(
     std::pair<const char* const, FeasibleRegionLimits::Var>& var,
-    Interval<double>& iv) {
+    _Interval<double>& iv) {
   if(var.second.m_double_set.get_is_empty()) {
     var.second.m_double_set = Set<double>(iv);
   }
@@ -1103,14 +1142,14 @@ CSPSolver::dilate(
 void
 CSPSolver::erode(
     std::pair<const char* const, FeasibleRegionLimits::Var>& var,
-    Interval<int32_t>& iv) {
+    _Interval<int32_t>& iv) {
   var.second.m_int32_set = intersection_of(var.second.m_int32_set, iv);
 }
 
 void
 CSPSolver::erode(
     std::pair<const char* const, FeasibleRegionLimits::Var>& var,
-    Interval<double>& iv) {
+    _Interval<double>& iv) {
   var.second.m_double_set = intersection_of(var.second.m_double_set, iv);
 }
 
@@ -1145,13 +1184,13 @@ CSPSolver::propagate_constr_rhs_const(
       else {
         auto& tmp = m_feasible_region_limits.m_vars.at(m_cond[constr.m_idx_cond-1].m_lhs);
         if(m_cond[constr.m_idx_cond-1].m_rhs_is_int32_const/*constr.m_p_cond->m_rhs_is_int32_const*/) {
-          Interval<int32_t> tmp_iv = get_interval_for_constr((Constr)m_cond[constr.m_idx_cond-1]/*constr.m_p_cond*/);
+          _Interval<int32_t> tmp_iv = get_interval_for_constr((Constr)m_cond[constr.m_idx_cond-1]/*constr.m_p_cond*/);
           //cond_possible = cvar->contains(tmp_iv);
           cond_possible = tmp.contains(tmp_iv);
         }
         else if(m_cond[constr.m_idx_cond-1].m_rhs_is_double_const/*constr.m_p_cond->m_rhs_is_double_const*/) {
           double tol = tmp.m_fp_comparison_tol;
-          Interval<double> tmp_iv = get_interval_for_constr((Constr)m_cond[constr.m_idx_cond-1]/*constr.m_p_cond*/, tol);
+          _Interval<double> tmp_iv = get_interval_for_constr((Constr)m_cond[constr.m_idx_cond-1]/*constr.m_p_cond*/, tol);
           //cond_possible = cvar->contains(tmp_iv);
           cond_possible = tmp.contains(tmp_iv);
         }
@@ -1159,16 +1198,16 @@ CSPSolver::propagate_constr_rhs_const(
           throw std::string("this scenario not yet supported");
         }
       }
-      Interval<int32_t> tmp_iv = get_interval_for_constr((Constr)m_cond[constr.m_idx_cond-1]/*constr.m_p_cond*/);
+      //_Interval<int32_t> tmp_iv = get_interval_for_constr((Constr)m_cond[constr.m_idx_cond-1]/*constr.m_p_cond*/);
       if(cond_possible) {
         if(ivar.second.m_type_is_int32) {
-          Interval<int32_t> iv = get_interval_for_constr(constr);
+          _Interval<int32_t> iv = get_interval_for_constr(constr);
           //std::cout << "iv " << iv << "\n";
           cc_set_int32 = intersection_of(cc_set_int32, iv);
         }
         else if(ivar.second.m_type_is_double) {
           double tol = ivar.second.m_fp_comparison_tol;
-          Interval<double> iv = get_interval_for_constr(constr, tol);
+          _Interval<double> iv = get_interval_for_constr(constr, tol);
           //std::cout << "iv " << iv << "\n";
           cc_set_double = intersection_of(cc_set_double, iv);
         }
@@ -1177,7 +1216,7 @@ CSPSolver::propagate_constr_rhs_const(
     //}
     if(ivar.second.m_type_is_int32) {
       // forward interval
-      Interval<int32_t> ivf = get_interval_for_constr(constr);
+      _Interval<int32_t> ivf = get_interval_for_constr(constr);
       /*if(var_is_cond_constr and cond_possible) {
         //std::cout << "dilate " << ivar.first << " by interval " << ivf << "\n";
       }
@@ -1199,7 +1238,7 @@ CSPSolver::propagate_constr_rhs_const(
     else if(ivar.second.m_type_is_double) {
       // forward interval
       double tol = ivar.second.m_fp_comparison_tol;
-      Interval<double> ivf = get_interval_for_constr(constr, tol);
+      _Interval<double> ivf = get_interval_for_constr(constr, tol);
       /*if(var_is_cond_constr and cond_possible) {
         //std::cout << "dilate " << ivar.first << " by interval " << ivf << "\n";
       }
@@ -1232,7 +1271,7 @@ CSPSolver::propagate_constr_rhs_var(
   auto& vars = m_feasible_region_limits.m_vars;
   auto& rhs = vars.at(constr.m_rhs);
   //bool dilation = false;
-  bool cond_possible = false;
+  //bool cond_possible = false;
   // forward constraint (constrain the lhs var by the rhs var)
   if(rhs.m_type_is_double) {
     double min, max;
@@ -1263,7 +1302,7 @@ CSPSolver::propagate_constr_rhs_var(
       }
       auto& lhs_set = ivar.second.m_double_set;
       // forward interval
-      Interval<double> iv(min, max, ivar.second.m_fp_comparison_tol);
+      _Interval<double> iv(min, max, ivar.second.m_fp_comparison_tol);
       /*if(constr.m_p_cond) { // dilation
         assert(false);
         bool cond_is_possible = true; /// @TODO set to appropriate value
@@ -1306,7 +1345,7 @@ CSPSolver::propagate_constr_rhs_var(
         max = set.get_max();
       }
       auto& lhs_set = ivar.second.m_int32_set;
-      Interval<int32_t> iv(min, max); // forward interval
+      _Interval<int32_t> iv(min, max); // forward interval
       /*if(constr.m_p_cond) { // dilation
         assert(false);
         bool cond_is_possible = true; /// @TODO set to appropriate value
@@ -1349,7 +1388,7 @@ CSPSolver::propagate_constr_rhs_var(
         max = set.get_max();
       }
       // reverse interval
-      Interval<double> iv(min, max, ivar.second.m_fp_comparison_tol);
+      _Interval<double> iv(min, max, ivar.second.m_fp_comparison_tol);
       auto& rhs_set = rhs.m_double_set;
       /*if(constr.m_p_cond) { // dilation
         assert(false);
@@ -1392,7 +1431,7 @@ CSPSolver::propagate_constr_rhs_var(
         min = set.get_min();
         max = set.get_max();
       }
-      Interval<int32_t> iv(min, max); // reverse interval
+      _Interval<int32_t> iv(min, max); // reverse interval
       auto& rhs_set = rhs.m_int32_set;
       /*if(constr.m_p_cond) { // dilation
         assert(false);
@@ -1409,11 +1448,12 @@ CSPSolver::propagate_constr_rhs_var(
   }
 }
 
+///@TODO / FIXME - remove tol??
 void
-CSPSolver::assign_set_to_domain_limits(Set<int32_t>& set, int32_t tol) {
+CSPSolver::assign_set_to_domain_limits(Set<int32_t>& set, int32_t /*tol*/) {
   int32_t max = std::numeric_limits<int32_t>::max();
   int32_t min = std::numeric_limits<int32_t>::min();
-  Interval<int32_t> interval(min, max);
+  _Interval<int32_t> interval(min, max);
   set = Set<int32_t>(interval);
 }
 
@@ -1421,7 +1461,7 @@ void
 CSPSolver::assign_set_to_domain_limits(Set<double>& set, double tol) {
   double max = std::numeric_limits<double>::max();
   double min = -max;
-  Interval<double> interval(min, max, tol);
+  _Interval<double> interval(min, max, tol);
   set = Set<double>(interval);
 }
 
@@ -1556,3 +1596,5 @@ CSPSolver::throw_invalid_argument_if_var_key_has_not_been_added(
 }
 
 } // namespace Math
+
+} // namespace OCPI
