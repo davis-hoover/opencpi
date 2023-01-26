@@ -8,6 +8,7 @@
 
 #include "drc_fmcomms_2_3-worker.hh"
 
+/// @todo / FIXME remove IS_LOCKING
 #define IS_LOCKING
 #include "FMCOMMS2_3DRC.hh"
 
@@ -38,13 +39,13 @@ class Drc_fmcomms_2_3Worker : public BASE_CLASS {
     bool isMixerPresent(bool rx, unsigned stream) {
       return stream == 0 && rx ? m_slaves.rx_complex_mixer0.isPresent() : false;
     }
-    OD::config_value_t getDecimation(unsigned /*stream*/) {
+    double getDecimation(unsigned /*stream*/) {
       return m_slaves.rx_cic_dec0.isPresent() ? m_slaves.rx_cic_dec0.get_R() : 1;
     }
-    OD::config_value_t getInterpolation(unsigned /*stream*/) {
+    double getInterpolation(unsigned /*stream*/) {
       return m_slaves.tx_cic_int0.isPresent() ? m_slaves.tx_cic_int0.get_R() : 1;
     }
-    OD::config_value_t getPhaseIncrement(bool rx, unsigned /*stream*/) {
+    double getPhaseIncrement(bool rx, unsigned /*stream*/) {
       return rx ? m_slaves.rx_complex_mixer0.get_phs_inc() : 0;
     }
     void setPhaseIncrement(bool rx, unsigned /*stream*/, int16_t inc) {
@@ -62,8 +63,8 @@ class Drc_fmcomms_2_3Worker : public BASE_CLASS {
       OD::ad9361FinalConfig(m_slaves.config, config);
     }
     // both of these apply to both channels on the 9361
-    unsigned getRfInput(unsigned /*device*/, OD::config_value_t /*tuning_freq_MHz*/) { return 0; }
-    unsigned getRfOutput(unsigned /*device*/, OD::config_value_t /*tuning_freq_MHz*/) { return 0; }
+    unsigned getRfInput(unsigned /*device*/, double /*tuning_freq_MHz*/) { return 0; }
+    unsigned getRfOutput(unsigned /*device*/, double /*tuning_freq_MHz*/) { return 0; }
   } m_doSlave;
   OD::FMCOMMS2_3DRC<OD::FMCOMMS2_3Configurator> m_ctrlr;
 public:
@@ -81,38 +82,47 @@ public:
     // convert the data structure dictated by the drc spec property to the one
     // defined by the older DRC helper class(es)
     auto nChannels = conf.channels.length;
-    req.m_data_streams.resize(nChannels);
+    req.m_rf_ports.resize(nChannels);
     unsigned nRx = 0, nTx = 0;
     for (unsigned n = 0; n < nChannels; ++n) {
       auto &channel = conf.channels.data[n];
-      auto &stream = req.m_data_streams[n];
-      stream = OD::DataStreamConfigLockRequest(); // zero out any previous requests
-      stream.include_data_stream_direction(channel.rx ?
-                                      OD::data_stream_direction_t::rx : OD::data_stream_direction_t::tx);
-      if (!std::string(channel.rf_port_name).empty()) {
-        stream.include_data_stream_id(channel.rf_port_name);
-      }
-      ///@TODO / FIXME - probably need to associate routing_id with app_port_NAME
-      //stream.include_routing_id((channel.rx ? "RX" : "TX") +
-      //                          std::to_string(channel.rx ? nRx : nTx));
+      auto &rf_port = req.m_rf_ports[n];
+      rf_port = OD::RFPortConfigLockRequest(); // zero out any previous requests
+      if(channel.rx)
+        rf_port.include_direction(OD::rf_port_direction_t::rx);
+      else
+        rf_port.include_direction(OD::rf_port_direction_t::tx);
+      if (!std::string(channel.rf_port_name).empty())
+        rf_port.include_rf_port_name(channel.rf_port_name);
+      rf_port.include_routing_id((channel.rx ? "RX" : "TX") + std::to_string(channel.rx ? nRx : nTx));
       ++(channel.rx ? nRx : nTx);
-      stream.include_tuning_freq_MHz(channel.tuning_freq_MHz, channel.tolerance_tuning_freq_MHz);
-      stream.include_bandwidth_3dB_MHz(channel.bandwidth_3dB_MHz, channel.tolerance_bandwidth_3dB_MHz);
-      stream.include_sampling_rate_Msps(channel.sampling_rate_Msps, channel.tolerance_sampling_rate_Msps);
-      stream.include_samples_are_complex(channel.samples_are_complex);
-      stream.include_gain_mode(channel.gain_mode);
-      if (!stream.get_gain_mode().compare("manual")) {
-        stream.include_gain_dB(channel.gain_dB, channel.tolerance_gain_dB);
+      rf_port.include_tuning_freq_MHz(channel.tuning_freq_MHz, channel.tolerance_tuning_freq_MHz);
+      rf_port.include_bandwidth_3dB_MHz(channel.bandwidth_3dB_MHz, channel.tolerance_bandwidth_3dB_MHz);
+      rf_port.include_sampling_rate_Msps(channel.sampling_rate_Msps, channel.tolerance_sampling_rate_Msps);
+      rf_port.include_samples_are_complex(channel.samples_are_complex);
+      rf_port.include_gain_mode(channel.gain_mode);
+      if (!rf_port.get_gain_mode().compare("manual"))
+        rf_port.include_gain_dB(channel.gain_dB, channel.tolerance_gain_dB);
+    }
+    RCCResult rc = RCC_OK;
+    try {
+      if(!m_ctrlr.prepare(config, req))
+        throw std::string("failed");
+    } catch(std::string& err) {
+      std::cout << "err=" << err << "\n";
+      if(conf.recoverable) {
+        std::string ctrlerr = m_ctrlr.get_error().c_str();
+        size_t count = ctrlerr.size();
+        count = std::min(count, (size_t)DRC_FMCOMMS_2_3_MAX_STRING_LENGTH_P);
+        memcpy(&m_properties.status.data[config].error, ctrlerr.c_str(), count);
+        rc = RCC_OK;
+      }
+      else {
+        rc = setError("config prepare request was unsuccessful, set OCPI_LOG_LEVEL to 8 "
+                 "(or higher) for more info");
       }
     }
-    try {
-      return m_ctrlr.prepare(config, req) ? RCC_OK :
-        setError("config prepare request was unsuccessful, set OCPI_LOG_LEVEL to 8 "
-                 "(or higher) for more info");
-    } catch(const char* err) {
-      return setError(err);
-    }
-    return RCC_OK;
+    return rc;
   }
   RCCResult start_config(unsigned config) {
     try {
@@ -148,7 +158,7 @@ public:
       log(8, "operating, so calling");
       RCCResult rc = OCPI::DRC::DrcProxyBase::start_config(config, false);
       if (rc == RCC_OK)
-        m_properties.status.data[config].state = STATUS_STATE_OPERATING;
+	m_properties.status.data[config].state = STATUS_STATE_OPERATING;
       return rc;
     //}
     //else {
@@ -156,6 +166,28 @@ public:
     //}
     // Deferred start
     m_started[m_properties.start] = true;
+    return RCC_OK;
+  }
+  // notification that status property will be read
+  RCCResult status_read() {
+    size_t nConfigs = m_properties.configurations.size();
+    m_properties.status.resize(nConfigs);
+    for (size_t n = 0; n < nConfigs; ++n) {
+      auto &conf = m_properties.configurations.data[n];
+      auto &stat = m_properties.status.data[n];
+      stat.channels.resize(conf.channels.size());
+      // stat.state member is already maintained
+      // stat.error
+      for (size_t nch = 0; nch < conf.channels.size(); ++nch) {
+	auto &confchan = conf.channels.data[nch];
+	auto &statchan = stat.channels.data[nch];
+	statchan.tuning_freq_MHz = confchan.tuning_freq_MHz;
+	statchan.bandwidth_3dB_MHz = confchan.bandwidth_3dB_MHz;
+	statchan.sampling_rate_Msps = confchan.sampling_rate_Msps;
+	statchan.gain_dB = confchan.gain_dB;
+      }
+      status_config(n);
+    }
     return RCC_OK;
   }
   RCCResult release_config(unsigned config) {

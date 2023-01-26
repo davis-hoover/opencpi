@@ -168,7 +168,7 @@ FMCOMMS2_3Configurator::FMCOMMS2_3Configurator(int32_t /*fmcomms_num*/) :
     Configurator<FMCOMMS2_3CSP>() {
   //m_solver.add_constr("fmcomms_num", "=", (int32_t)fmcomms_num);
   {
-    DataStream::CSPVarMap map;
+    RFPort::CSPVarMap map;
     map.insert(std::make_pair(config_key_direction.c_str(),
         "fmcomms2_3_dir_rx1a"));
     map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
@@ -184,10 +184,10 @@ FMCOMMS2_3Configurator::FMCOMMS2_3Configurator(int32_t /*fmcomms_num*/) :
     map.insert(std::make_pair(config_key_gain_dB.c_str(),
         "fmcomms2_3_gain_db_rx1a"));
     ///@TODO / FIXME hardcoded mapping in below line
-    add_data_stream(DataStream("Rx0"/*"rx1a"*/, true, false, map));
+    add_rf_port(RFPort("Rx0"/*"rx1a"*/, true, false, map));
   }
   {
-    DataStream::CSPVarMap map;
+    RFPort::CSPVarMap map;
     map.insert(std::make_pair(config_key_direction.c_str(),
         "fmcomms2_3_dir_rx2a"));
     map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
@@ -203,10 +203,10 @@ FMCOMMS2_3Configurator::FMCOMMS2_3Configurator(int32_t /*fmcomms_num*/) :
     map.insert(std::make_pair(config_key_gain_dB.c_str(),
         "fmcomms2_3_gain_db_rx2a"));
     ///@TODO / FIXME hardcoded mapping in below line
-    add_data_stream(DataStream("Rx1"/*"rx2a"*/, true, false, map));
+    add_rf_port(RFPort("Rx1"/*"rx2a"*/, true, false, map));
   }
   {
-    DataStream::CSPVarMap map;
+    RFPort::CSPVarMap map;
     map.insert(std::make_pair(config_key_direction.c_str(),
         "fmcomms2_3_dir_tx1a"));
     map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
@@ -222,10 +222,10 @@ FMCOMMS2_3Configurator::FMCOMMS2_3Configurator(int32_t /*fmcomms_num*/) :
     map.insert(std::make_pair(config_key_gain_dB.c_str(),
         "fmcomms2_3_gain_db_tx1a"));
     ///@TODO / FIXME hardcoded mapping in below line
-    add_data_stream(DataStream("Tx0"/*"tx1a"*/, false, true, map));
+    add_rf_port(RFPort("Tx0"/*"tx1a"*/, false, true, map));
   }
   {
-    DataStream::CSPVarMap map;
+    RFPort::CSPVarMap map;
     map.insert(std::make_pair(config_key_direction.c_str(),
         "fmcomms2_3_dir_tx2a"));
     map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
@@ -241,7 +241,7 @@ FMCOMMS2_3Configurator::FMCOMMS2_3Configurator(int32_t /*fmcomms_num*/) :
     map.insert(std::make_pair(config_key_gain_dB.c_str(),
         "fmcomms2_3_gain_db_tx2a"));
     ///@TODO / FIXME hardcoded mapping in below line
-    add_data_stream(DataStream("Tx1"/*"tx2a"*/, false, true, map));
+    add_rf_port(RFPort("Tx1"/*"tx2a"*/, false, true, map));
   }
 }
 #endif // IS_LOCKING
@@ -257,104 +257,119 @@ FMCOMMS2_3DRC<cfgrtr_t>::FMCOMMS2_3DRC(unsigned which,
     const char* rx1a, const char* rx2a, const char* tx1a, const char* tx2a,
     const char* descriptor) :
     AD9361DRC<cfgrtr_t>(which,dev,fref_hz,rx1a,rx2a,tx1a,tx2a,descriptor),
-    m_ds_rx1a(rx1a), m_ds_rx2a(rx2a), m_ds_tx1a(tx1a), m_ds_tx2a(tx2a) {
+    m_port_rx1a(rx1a), m_port_rx2a(rx2a), m_port_tx1a(tx1a), m_port_tx2a(tx2a) {
 }
 
-template<class cfgrtr_t> data_stream_id_t
-FMCOMMS2_3DRC<cfgrtr_t>::get_ad9361_ds_id(data_stream_id_t id) const {
+template<class cfgrtr_t> std::string
+FMCOMMS2_3DRC<cfgrtr_t>::get_ad9361_rf_port_name(std::string rf_port_name) const {
   /// @TODO / FIXME figure out why this is commented out
-  //return id==m_ds_rx1a ? "rx1" :  id==m_ds_rx1a ? "rx2" : id==m_ds_rx1a ? "tx1" :
-  //    id==m_ds_rx1a ? "tx2" : "rx1"; 
-  return id;
+  //return rf_port_name==m_port_rx1a ? "rx1" :  rf_port_name==m_port_rx1a ? "rx2" : rf_port_name==m_port_rx1a ? "tx1" :
+  //    rf_port_name==m_port_rx1a ? "tx2" : "rx1"; 
+  return rf_port_name;
 }
 
 template<class cfgrtr_t> bool
-FMCOMMS2_3DRC<cfgrtr_t>::get_data_stream_is_enabled(data_stream_id_t id) {
-  auto ad_id = get_ad9361_ds_id(id);
-  return AD9361DRC<cfgrtr_t>::get_data_stream_is_enabled(ad_id);
+FMCOMMS2_3DRC<cfgrtr_t>::get_enabled(std::string rf_port_name) {
+  auto port = get_ad9361_rf_port_name(rf_port_name);
+  return AD9361DRC<cfgrtr_t>::get_enabled(port);
 }
 
-template<class cfgrtr_t> data_stream_direction_t 
-FMCOMMS2_3DRC<cfgrtr_t>::get_data_stream_direction(data_stream_id_t id) {
-  data_stream_direction_t ret = data_stream_direction_t::tx;
-  if((id==m_ds_rx1a) or (id==m_ds_rx2a)) {
-    ret = data_stream_direction_t::rx;
+template<class cfgrtr_t> rf_port_direction_t 
+FMCOMMS2_3DRC<cfgrtr_t>::get_direction(std::string rf_port_name) {
+  rf_port_direction_t ret = rf_port_direction_t::tx;
+  if((rf_port_name==m_port_rx1a) || (rf_port_name==m_port_rx2a)) {
+    ret = rf_port_direction_t::rx;
   }
   return ret;
 }
 
-template<class cfgrtr_t> config_value_t 
-FMCOMMS2_3DRC<cfgrtr_t>::get_tuning_freq_MHz(data_stream_id_t id) {
-  return AD9361DRC<cfgrtr_t>::get_tuning_freq_MHz(get_ad9361_ds_id(id));
+template<class cfgrtr_t> double 
+FMCOMMS2_3DRC<cfgrtr_t>::get_tuning_freq_MHz(std::string rf_port_name) {
+  auto port = get_ad9361_rf_port_name(rf_port_name);
+  return AD9361DRC<cfgrtr_t>::get_tuning_freq_MHz(port);
 }
 
-template<class cfgrtr_t> config_value_t 
-FMCOMMS2_3DRC<cfgrtr_t>::get_bandwidth_3dB_MHz(data_stream_id_t id) {
-  return AD9361DRC<cfgrtr_t>::get_bandwidth_3dB_MHz(get_ad9361_ds_id(id));
+template<class cfgrtr_t> double 
+FMCOMMS2_3DRC<cfgrtr_t>::get_bandwidth_3dB_MHz(std::string rf_port_name) {
+  auto port = get_ad9361_rf_port_name(rf_port_name);
+  return AD9361DRC<cfgrtr_t>::get_bandwidth_3dB_MHz(port);
 }
 
-template<class cfgrtr_t> config_value_t 
-FMCOMMS2_3DRC<cfgrtr_t>::get_sampling_rate_Msps(data_stream_id_t id) {
-  return AD9361DRC<cfgrtr_t>::get_sampling_rate_Msps(get_ad9361_ds_id(id));
+template<class cfgrtr_t> double 
+FMCOMMS2_3DRC<cfgrtr_t>::get_sampling_rate_Msps(std::string rf_port_name) {
+  auto port = get_ad9361_rf_port_name(rf_port_name);
+  return AD9361DRC<cfgrtr_t>::get_sampling_rate_Msps(port);
 }
 
 template<class cfgrtr_t> bool
-FMCOMMS2_3DRC<cfgrtr_t>::get_samples_are_complex(data_stream_id_t id) {
-  return AD9361DRC<cfgrtr_t>::get_samples_are_complex(get_ad9361_ds_id(id));
+FMCOMMS2_3DRC<cfgrtr_t>::get_samples_are_complex(std::string rf_port_name) {
+  auto port = get_ad9361_rf_port_name(rf_port_name);
+  return AD9361DRC<cfgrtr_t>::get_samples_are_complex(port);
 }
 
-template<class cfgrtr_t> gain_mode_value_t 
-FMCOMMS2_3DRC<cfgrtr_t>::get_gain_mode(data_stream_id_t id) {
-  return AD9361DRC<cfgrtr_t>::get_gain_mode(get_ad9361_ds_id(id));
+template<class cfgrtr_t> std::string
+FMCOMMS2_3DRC<cfgrtr_t>::get_gain_mode(std::string rf_port) {
+  return AD9361DRC<cfgrtr_t>::get_gain_mode(get_ad9361_rf_port_name(rf_port));
 }
 
-template<class cfgrtr_t> config_value_t 
-FMCOMMS2_3DRC<cfgrtr_t>::get_gain_dB(data_stream_id_t id) {
-  return AD9361DRC<cfgrtr_t>::get_gain_dB(get_ad9361_ds_id(id));
-}
-
-template<class cfgrtr_t> void
-FMCOMMS2_3DRC<cfgrtr_t>::set_data_stream_direction(data_stream_id_t id,
-    data_stream_direction_t val) {
-  auto ad_id = get_ad9361_ds_id(id);
-  return AD9361DRC<cfgrtr_t>::set_data_stream_direction(ad_id,val);
+template<class cfgrtr_t> double 
+FMCOMMS2_3DRC<cfgrtr_t>::get_gain_dB(std::string rf_port) {
+  return AD9361DRC<cfgrtr_t>::get_gain_dB(get_ad9361_rf_port_name(rf_port));
 }
 
 template<class cfgrtr_t> void
-FMCOMMS2_3DRC<cfgrtr_t>::set_tuning_freq_MHz(data_stream_id_t id,
-    config_value_t val) {
-  return AD9361DRC<cfgrtr_t>::set_tuning_freq_MHz(get_ad9361_ds_id(id),val);
+FMCOMMS2_3DRC<cfgrtr_t>::set_direction(std::string rf_port_name,
+    rf_port_direction_t val) {
+  auto port = get_ad9361_rf_port_name(rf_port_name);
+  return AD9361DRC<cfgrtr_t>::set_direction(port, val);
 }
 
 template<class cfgrtr_t> void
-FMCOMMS2_3DRC<cfgrtr_t>::set_bandwidth_3dB_MHz(data_stream_id_t id,
-    config_value_t val) {
-  auto ad_id = get_ad9361_ds_id(id);
-  return AD9361DRC<cfgrtr_t>::set_bandwidth_3dB_MHz(ad_id,val);
+FMCOMMS2_3DRC<cfgrtr_t>::set_tuning_freq_MHz(std::string rf_port_name,
+    double val) {
+  auto port = get_ad9361_rf_port_name(rf_port_name);
+  return AD9361DRC<cfgrtr_t>::set_tuning_freq_MHz(port, val);
 }
 
 template<class cfgrtr_t> void
-FMCOMMS2_3DRC<cfgrtr_t>::set_sampling_rate_Msps(data_stream_id_t id,
-    config_value_t val) {
-  auto ad_id = get_ad9361_ds_id(id);
-  return AD9361DRC<cfgrtr_t>::set_sampling_rate_Msps(ad_id,val);
+FMCOMMS2_3DRC<cfgrtr_t>::set_bandwidth_3dB_MHz(std::string rf_port_name,
+    double val) {
+  auto port = get_ad9361_rf_port_name(rf_port_name);
+  return AD9361DRC<cfgrtr_t>::set_bandwidth_3dB_MHz(port, val);
 }
 
 template<class cfgrtr_t> void
-FMCOMMS2_3DRC<cfgrtr_t>::set_samples_are_complex(data_stream_id_t id,
+FMCOMMS2_3DRC<cfgrtr_t>::set_sampling_rate_Msps(std::string rf_port_name,
+    double val) {
+  auto port = get_ad9361_rf_port_name(rf_port_name);
+  return AD9361DRC<cfgrtr_t>::set_sampling_rate_Msps(port, val);
+}
+
+template<class cfgrtr_t> void
+FMCOMMS2_3DRC<cfgrtr_t>::set_samples_are_complex(std::string rf_port_name,
     bool val) {
-  return AD9361DRC<cfgrtr_t>::set_samples_are_complex(get_ad9361_ds_id(id),val);
+  auto port = get_ad9361_rf_port_name(rf_port_name);
+  return AD9361DRC<cfgrtr_t>::set_samples_are_complex(port, val);
 }
 
 template<class cfgrtr_t> void
-FMCOMMS2_3DRC<cfgrtr_t>::set_gain_mode(data_stream_id_t id,
-    gain_mode_value_t val) {
-  return AD9361DRC<cfgrtr_t>::set_gain_mode(get_ad9361_ds_id(id),val);
+FMCOMMS2_3DRC<cfgrtr_t>::set_gain_mode(std::string rf_port_name,
+    std::string val) {
+  auto port = get_ad9361_rf_port_name(rf_port_name);
+  return AD9361DRC<cfgrtr_t>::set_gain_mode(port, val);
 }
 
 template<class cfgrtr_t> void
-FMCOMMS2_3DRC<cfgrtr_t>::set_gain_dB(data_stream_id_t id, config_value_t val) {
-  return AD9361DRC<cfgrtr_t>::set_gain_dB(get_ad9361_ds_id(id),val);
+FMCOMMS2_3DRC<cfgrtr_t>::set_gain_dB(std::string rf_port_name, double val) {
+  auto port = get_ad9361_rf_port_name(rf_port_name);
+  return AD9361DRC<cfgrtr_t>::set_gain_dB(port, val);
+}
+
+template<class cfgrtr_t> void
+FMCOMMS2_3DRC<cfgrtr_t>::set_routing_id(std::string rf_port_name,
+    std::string val) {
+  auto port = get_ad9361_rf_port_name(rf_port_name);
+  return AD9361DRC<cfgrtr_t>::set_routing_id(port, val);
 }
 
 template<class cfgrtr_t> bool

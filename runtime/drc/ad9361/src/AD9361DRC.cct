@@ -100,10 +100,10 @@ AD9361CSP::define_c_ad9361() {
   m_solver.add_constr("ad9361_tx_sampl_freq_meghz", "<=", 61.44/m_divider);
   //m_solver.add_constr("ad9361_dac_clk_divider", ">=", (int32_t)1);
   //m_solver.add_constr("ad9361_dac_clk_divider", "<=", (int32_t)2);
-  m_solver.add_constr("ad9361_dir_rx1", "=", (int32_t)data_stream_direction_t::rx);
-  m_solver.add_constr("ad9361_dir_rx2", "=", (int32_t)data_stream_direction_t::rx);
-  m_solver.add_constr("ad9361_dir_tx1", "=", (int32_t)data_stream_direction_t::tx);
-  m_solver.add_constr("ad9361_dir_tx2", "=", (int32_t)data_stream_direction_t::tx);
+  m_solver.add_constr("ad9361_dir_rx1", "=", (int32_t)rf_port_direction_t::rx);
+  m_solver.add_constr("ad9361_dir_rx2", "=", (int32_t)rf_port_direction_t::rx);
+  m_solver.add_constr("ad9361_dir_tx1", "=", (int32_t)rf_port_direction_t::tx);
+  m_solver.add_constr("ad9361_dir_tx2", "=", (int32_t)rf_port_direction_t::tx);
   m_solver.add_constr("ad9361_fc_meghz_rx1", "=", "ad9361_rx_rfpll_lo_freq_meghz");
   m_solver.add_constr("ad9361_fc_meghz_rx2", "=", "ad9361_rx_rfpll_lo_freq_meghz");
   m_solver.add_constr("ad9361_fc_meghz_tx1", "=", "ad9361_tx_rfpll_lo_freq_meghz");
@@ -172,7 +172,7 @@ AD9361CSP::define() {
 //#ifdef IS_LOCKING
 AD9361Configurator::AD9361Configurator() : Configurator<AD9361CSP>() {
   {
-    DataStream::CSPVarMap map;
+    RFPort::CSPVarMap map;
     map.insert(std::make_pair(config_key_direction.c_str(),
         "ad9361_dir_rx1"));
     map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
@@ -187,10 +187,10 @@ AD9361Configurator::AD9361Configurator() : Configurator<AD9361CSP>() {
         "ad9361_gain_mode_rx1"));
     map.insert(std::make_pair(config_key_gain_dB.c_str(),
         "ad9361_gain_db_rx1"));
-    add_data_stream(DataStream("rx1", true, false, map));
+    add_rf_port(RFPort("rx1", true, false, map));
   }
   {
-    DataStream::CSPVarMap map;
+    RFPort::CSPVarMap map;
     map.insert(std::make_pair(config_key_direction.c_str(),
         "ad9361_dir_rx2"));
     map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
@@ -205,10 +205,10 @@ AD9361Configurator::AD9361Configurator() : Configurator<AD9361CSP>() {
         "ad9361_gain_mode_rx2"));
     map.insert(std::make_pair(config_key_gain_dB.c_str(),
         "ad9361_gain_db_rx2"));
-    add_data_stream(DataStream("rx2", true, false, map));
+    add_rf_port(RFPort("rx2", true, false, map));
   }
   {
-    DataStream::CSPVarMap map;
+    RFPort::CSPVarMap map;
     map.insert(std::make_pair(config_key_direction.c_str(),
         "ad9361_dir_tx1"));
     map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
@@ -223,10 +223,10 @@ AD9361Configurator::AD9361Configurator() : Configurator<AD9361CSP>() {
         "ad9361_gain_mode_tx1"));
     map.insert(std::make_pair(config_key_gain_dB.c_str(),
         "ad9361_gain_db_tx1"));
-    add_data_stream(DataStream("tx1", false, true, map));
+    add_rf_port(RFPort("tx1", false, true, map));
   }
   {
-    DataStream::CSPVarMap map;
+    RFPort::CSPVarMap map;
     map.insert(std::make_pair(config_key_direction.c_str(),
         "ad9361_dir_tx2"));
     map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
@@ -241,34 +241,32 @@ AD9361Configurator::AD9361Configurator() : Configurator<AD9361CSP>() {
         "ad9361_gain_mode_tx2"));
     map.insert(std::make_pair(config_key_gain_dB.c_str(),
         "ad9361_gain_db_tx2"));
-    add_data_stream(DataStream("tx2", false, true, map));
+    add_rf_port(RFPort("tx2", false, true, map));
   }
 }
 //#endif // IS_LOCKING
 
 template<class cfgrtr_t>
 template<typename T> T
-AD9361DRC<cfgrtr_t>::convert_milli_db_to_db(
-    T val_milli_db) const {
+AD9361DRC<cfgrtr_t>::convert_milli_db_to_db(T val_milli_db) const {
   return val_milli_db/1000;
 }
 
 template<class cfgrtr_t>
 template<typename T> T
-AD9361DRC<cfgrtr_t>::convert_db_to_milli_db(
-    T val_milli_db) const {
+AD9361DRC<cfgrtr_t>::convert_db_to_milli_db(T val_milli_db) const {
   return val_milli_db*1000;
 }
 
 #ifndef DISABLE_AD9361
 ///@brief get No-OS-specific "channel" macro (RX1/RX2/TX1/TX2 in ad9361_api.h)
 template<class cfgrtr_t> uint8_t
-AD9361DRC<cfgrtr_t>::get_ch(data_stream_id_t id) {
+AD9361DRC<cfgrtr_t>::get_ch(std::string port) {
   uint8_t res = 
-      (id == m_ds_rx1) ? RX1 :
-      (id == m_ds_rx2) ? (m_ad9361_rf_phy->pdata->rx2tx2 ? RX2 : RX1) :
-      (id == m_ds_tx1) ? TX1 :
-      (id == m_ds_tx2) ? (m_ad9361_rf_phy->pdata->rx2tx2 ? TX2 : TX1) : RX1;
+      (port == m_port_rx1) ? RX1 :
+      (port == m_port_rx2) ? (m_ad9361_rf_phy->pdata->rx2tx2 ? RX2 : RX1) :
+      (port == m_port_tx1) ? TX1 :
+      (port == m_port_tx2) ? (m_ad9361_rf_phy->pdata->rx2tx2 ? TX2 : TX1) : RX1;
   return res;
 }
 
@@ -542,8 +540,8 @@ static void set_reset(uint8_t id_no, bool on) {
 }
 
 template<class cfgrtr_t> bool
-AD9361DRC<cfgrtr_t>::request_config_lock(
-    const config_lock_id_t id, const ConfigLockRequest& request) {
+AD9361DRC<cfgrtr_t>::request_config_lock(std::string id,
+    const ConfigLockRequest& request) {
   static bool first = true;
   if(first) {
     //log(8, "start_config init start");
@@ -628,15 +626,14 @@ AD9361DRC<cfgrtr_t>::init() {
 
 template<class cfgrtr_t> bool
 AD9361DRC<cfgrtr_t>::any_configurator_configs_locked_which_prevent_ad9361_init() const {
-  std::vector<const char*> data_streams;
-  data_streams.push_back((m_ds_rx1));
-  data_streams.push_back((m_ds_rx2));
-  data_streams.push_back((m_ds_tx1));
-  data_streams.push_back((m_ds_tx2));
+  std::vector<const char*> rf_ports;
+  rf_ports.push_back((m_port_rx1));
+  rf_ports.push_back((m_port_rx2));
+  rf_ports.push_back((m_port_tx1));
+  rf_ports.push_back((m_port_tx2));
   // unfortunately necessary to make this function const
   auto configurator_copy = this->m_configurator;
-  auto it = data_streams.begin();
-  for(; it != data_streams.end(); it++) {
+  for(auto it = rf_ports.begin(); it != rf_ports.end(); ++it) {
     if(configurator_copy.get_config_is_locked(configurator_copy.get_config(*it, config_key_tuning_freq_MHz))) {
       return true;
     }
@@ -747,7 +744,7 @@ AD9361DRC<cfgrtr_t>::AD9361DRC(unsigned which,
     m_ad9361_init_ret(-1),
     m_ad9361_init_called(false),
 #endif
-    m_ds_rx1(rx1), m_ds_rx2(rx2), m_ds_tx1(tx1), m_ds_tx2(tx2),
+    m_port_rx1(rx1), m_port_rx2(rx2), m_port_tx1(tx1), m_port_tx2(tx2),
     m_callback(dev),
     m_device(which) {
   //std::ostringstream oss;
@@ -761,23 +758,23 @@ AD9361DRC<cfgrtr_t>::AD9361DRC(unsigned which,
 }
 
 template<class cfgrtr_t> bool
-AD9361DRC<cfgrtr_t>::get_rx_and_throw_if_invalid_ds(
-    data_stream_id_t data_stream_id) const {
+AD9361DRC<cfgrtr_t>::get_rx_and_throw_if_invalid_rf_port_name(
+    std::string rf_port_name) const {
   bool do_rx = false;
-  if(data_stream_id == m_ds_rx1) {
+  if(rf_port_name == m_port_rx1) {
     do_rx = true;
   }
-  else if(data_stream_id == m_ds_rx2) {
+  else if(rf_port_name == m_port_rx2) {
     do_rx = true;
   }
-  else if(data_stream_id == m_ds_tx1) {
+  else if(rf_port_name == m_port_tx1) {
     do_rx = false;
   }
-  else if(data_stream_id == m_ds_tx2) {
+  else if(rf_port_name == m_port_tx2) {
     do_rx = false;
   }
   else {
-    this->throw_invalid_data_stream_id(data_stream_id);
+    this->throw_invalid_rf_port_name(rf_port_name);
   }
   return do_rx;
 }
@@ -814,15 +811,15 @@ AD9361DRC<cfgrtr_t>::throw_if_no_os_api_call_returns_non_zero(
 
 /// @todo / FIXME - check for existence of qadc/qdac?
 template<class cfgrtr_t> bool
-AD9361DRC<cfgrtr_t>::get_enabled(data_stream_id_t id) {
+AD9361DRC<cfgrtr_t>::get_enabled(std::string rf_port_name) {
   bool ret = true;
-  get_rx_and_throw_if_invalid_ds(id);
+  get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
 #ifndef DISABLE_AD9361
   if(not m_ad9361_init_called) {
     ret = false;
   }
   if(ret) {
-    if(id == m_ds_rx1) {
+    if(rf_port_name == m_port_rx1) {
       if(m_init_param.two_rx_two_tx_mode_enable) {
         ret = true;
       }
@@ -830,7 +827,7 @@ AD9361DRC<cfgrtr_t>::get_enabled(data_stream_id_t id) {
         ret = true;
       }
     }
-    else if(id == m_ds_rx2) {
+    else if(rf_port_name == m_port_rx2) {
       if(m_init_param.two_rx_two_tx_mode_enable) {
         ret = true;
       }
@@ -838,7 +835,7 @@ AD9361DRC<cfgrtr_t>::get_enabled(data_stream_id_t id) {
         ret = true;
       }
     }
-    else if(id == m_ds_tx1) {
+    else if(rf_port_name == m_port_tx1) {
       if(m_init_param.two_rx_two_tx_mode_enable) {
         ret = true;
       }
@@ -846,7 +843,7 @@ AD9361DRC<cfgrtr_t>::get_enabled(data_stream_id_t id) {
         ret = true;
       }
     }
-    else if(id == m_ds_tx2) {
+    else if(rf_port_name == m_port_tx2) {
       if(m_init_param.two_rx_two_tx_mode_enable) {
         ret = true;
       }
@@ -860,10 +857,10 @@ AD9361DRC<cfgrtr_t>::get_enabled(data_stream_id_t id) {
 }
 
 template<class cfgrtr_t> uint64_t
-AD9361DRC<cfgrtr_t>::get_noos_tuning_freq(data_stream_id_t id) {
+AD9361DRC<cfgrtr_t>::get_noos_tuning_freq(std::string rf_port_name) {
   init_if_required();
   uint64_t ret = 0;
-  bool do_rx = get_rx_and_throw_if_invalid_ds(id);
+  bool do_rx = get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
   do_rx ?
       this->log_info("noos ad9361_get_rx_lo_freq") :
       this->log_info("noos ad9361_get_tx_lo_freq");
@@ -878,10 +875,10 @@ AD9361DRC<cfgrtr_t>::get_noos_tuning_freq(data_stream_id_t id) {
 }
 
 template<class cfgrtr_t> uint32_t
-AD9361DRC<cfgrtr_t>::get_noos_bandwidth(data_stream_id_t id) {
+AD9361DRC<cfgrtr_t>::get_noos_bandwidth(std::string rf_port_name) {
   init_if_required();
   uint32_t ret = 0;
-  bool do_rx = get_rx_and_throw_if_invalid_ds(id);
+  bool do_rx = get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
   do_rx ?
       this->log_info("noos ad9361_get_rx_rf_bandwidth") :
       this->log_info("noos ad9361_get_tx_rf_bandwidth");
@@ -896,10 +893,10 @@ AD9361DRC<cfgrtr_t>::get_noos_bandwidth(data_stream_id_t id) {
 }
 
 template<class cfgrtr_t> uint32_t
-AD9361DRC<cfgrtr_t>::get_noos_sampling_rate(data_stream_id_t id) {
+AD9361DRC<cfgrtr_t>::get_noos_sampling_rate(std::string rf_port_name) {
   init_if_required();
   uint32_t ret = 0;
-  bool do_rx = get_rx_and_throw_if_invalid_ds(id);
+  bool do_rx = get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
   do_rx ?
       this->log_info("noos ad9361_get_rx_sampling_freq") :
       this->log_info("noos ad9361_get_tx_sampling_freq");
@@ -914,21 +911,21 @@ AD9361DRC<cfgrtr_t>::get_noos_sampling_rate(data_stream_id_t id) {
 }
 
 template<class cfgrtr_t> uint8_t
-AD9361DRC<cfgrtr_t>::get_noos_gain_mode(data_stream_id_t id) {
+AD9361DRC<cfgrtr_t>::get_noos_gain_mode(std::string rf_port_name) {
   init_if_required();
 #ifdef DISABLE_AD9361
   uint8_t ret = 0;
 #else
   uint8_t ret = RF_GAIN_MGC;// emulating tx channel manual only
 #endif
-  bool do_rx = get_rx_and_throw_if_invalid_ds(id);
+  bool do_rx = get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
   if(do_rx) {
     this->log_info("noos ad9361_get_rx_gain_control_mode");
   }
 #ifndef DISABLE_AD9361
   this->throw_if_ad9361_init_failed("No-OS get gain mode");
   if(do_rx) {
-    uint8_t ch = get_ch(id);
+    uint8_t ch = get_ch(rf_port_name);
     int32_t res = ad9361_get_rx_gain_control_mode(m_ad9361_rf_phy, ch, &ret);
     throw_if_no_os_api_call_returns_non_zero(res);
   }
@@ -938,16 +935,16 @@ AD9361DRC<cfgrtr_t>::get_noos_gain_mode(data_stream_id_t id) {
 
 /// @return no-os returned rx gain value, in dB
 template<class cfgrtr_t> int32_t
-AD9361DRC<cfgrtr_t>::get_noos_rx_gain(data_stream_id_t id) {
+AD9361DRC<cfgrtr_t>::get_noos_rx_gain(std::string rf_port_name) {
   init_if_required();
   int32_t ret = 0;
-  if((id != m_ds_rx1) && (id != m_ds_rx2)) { 
-    throw std::string("invalid rx data stream id ") + id;
+  if((rf_port_name != m_port_rx1) && (rf_port_name != m_port_rx2)) { 
+    throw std::string("invalid rx rf_port_name: ") + rf_port_name;
   }
   this->log_info("noos ad9361_get_rx_rf_gain");
 #ifndef DISABLE_AD9361
   this->throw_if_ad9361_init_failed("No-OS get gain");
-  uint8_t ch = get_ch(id);
+  uint8_t ch = get_ch(rf_port_name);
   int32_t res = ad9361_get_rx_rf_gain(m_ad9361_rf_phy, ch, &ret);
   throw_if_no_os_api_call_returns_non_zero(res);
 #endif
@@ -956,16 +953,16 @@ AD9361DRC<cfgrtr_t>::get_noos_rx_gain(data_stream_id_t id) {
 
 /// @return no-os returned tx gain value, in millidB
 template<class cfgrtr_t> uint32_t
-AD9361DRC<cfgrtr_t>::get_noos_tx_gain(data_stream_id_t id) {
+AD9361DRC<cfgrtr_t>::get_noos_tx_gain(std::string rf_port_name) {
   init_if_required();
   uint32_t ret = 0;
-  if((id != m_ds_tx1) && (id != m_ds_tx2)) { 
-    throw std::string("invalid tx data stream id ") + id;
+  if((rf_port_name != m_port_tx1) && (rf_port_name != m_port_tx2)) { 
+    throw std::string("invalid rx rf_port_name: ") + rf_port_name;
   }
   this->log_info("noos ad9361_get_tx_attenuation");
 #ifndef DISABLE_AD9361
   this->throw_if_ad9361_init_failed("No-OS get gain");
-  uint8_t ch = get_ch(id);
+  uint8_t ch = get_ch(rf_port_name);
   int32_t res = ad9361_get_tx_attenuation(m_ad9361_rf_phy, ch, &ret);
   throw_if_no_os_api_call_returns_non_zero(res);
 #endif
@@ -973,48 +970,44 @@ AD9361DRC<cfgrtr_t>::get_noos_tx_gain(data_stream_id_t id) {
 }
 
 template<class cfgrtr_t>
-data_stream_direction_t 
-AD9361DRC<cfgrtr_t>::get_direction(data_stream_id_t id) {
-  bool do_rx = get_rx_and_throw_if_invalid_ds(id);
-  return do_rx ? data_stream_direction_t::rx : data_stream_direction_t::tx;
+rf_port_direction_t 
+AD9361DRC<cfgrtr_t>::get_direction(std::string rf_port_name) {
+  bool do_rx = get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
+  return do_rx ? rf_port_direction_t::rx : rf_port_direction_t::tx;
 }
 
-template<class cfgrtr_t> config_value_t 
-AD9361DRC<cfgrtr_t>::get_tuning_freq_MHz(
-    data_stream_id_t id) {
-  return ((config_value_t)get_noos_tuning_freq(id))/1000000.;
+template<class cfgrtr_t> double 
+AD9361DRC<cfgrtr_t>::get_tuning_freq_MHz(std::string rf_port_name) {
+  return ((double)get_noos_tuning_freq(rf_port_name))/1000000.;
 }
 
-template<class cfgrtr_t> config_value_t 
-AD9361DRC<cfgrtr_t>::get_bandwidth_3dB_MHz(
-    data_stream_id_t id) {
+template<class cfgrtr_t> double 
+AD9361DRC<cfgrtr_t>::get_bandwidth_3dB_MHz(std::string rf_port_name) {
   ///@TODO / FIXME handle DDC/DUC divider in separate DDC/DUC class
-  config_value_t ret = (config_value_t)get_noos_bandwidth(id);
+  double ret = (double)get_noos_bandwidth(rf_port_name);
   ret = ret/1000000./m_divider;
   return ret;
 }
 
-template<class cfgrtr_t> config_value_t 
-AD9361DRC<cfgrtr_t>::get_sampling_rate_Msps(
-    data_stream_id_t data_stream_id) {
+template<class cfgrtr_t> double 
+AD9361DRC<cfgrtr_t>::get_sampling_rate_Msps(std::string rf_port_name) {
   ///@TODO / FIXME handle DDC/DUC divider in separate DDC/DUC class
-  config_value_t ret = (config_value_t)get_noos_sampling_rate(data_stream_id);
+  double ret = (double)get_noos_sampling_rate(rf_port_name);
   ret = ret/1000000./m_divider;
   return ret;
 }
 
 template<class cfgrtr_t> bool
-AD9361DRC<cfgrtr_t>::get_samples_are_complex(
-    data_stream_id_t data_stream_id) {
-  get_rx_and_throw_if_invalid_ds(data_stream_id);
+AD9361DRC<cfgrtr_t>::get_samples_are_complex(std::string rf_port_name) {
+  get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
   return true;
 }
 
-template<class cfgrtr_t> gain_mode_value_t 
-AD9361DRC<cfgrtr_t>::get_gain_mode(data_stream_id_t id) {
+template<class cfgrtr_t> std::string
+AD9361DRC<cfgrtr_t>::get_gain_mode(std::string rf_port_name) {
   std::string ret = "manual";
 #ifndef DISABLE_AD9361
-  uint8_t val = get_noos_gain_mode(id);
+  uint8_t val = get_noos_gain_mode(rf_port_name);
   if(val == RF_GAIN_MGC) {
     ret = "manual";
   }
@@ -1034,29 +1027,28 @@ AD9361DRC<cfgrtr_t>::get_gain_mode(data_stream_id_t id) {
   return ret;
 }
 
-template<class cfgrtr_t> config_value_t 
-AD9361DRC<cfgrtr_t>::get_gain_dB(data_stream_id_t id) {
-  bool do_rx = get_rx_and_throw_if_invalid_ds(id);
+template<class cfgrtr_t> double 
+AD9361DRC<cfgrtr_t>::get_gain_dB(std::string rf_port) {
+  bool do_rx = get_rx_and_throw_if_invalid_rf_port_name(rf_port);
   if(do_rx) {
-    return (config_value_t)get_noos_rx_gain(id);
+    return (double)get_noos_rx_gain(rf_port);
   }
   else {
-    return (config_value_t)convert_milli_db_to_db(get_noos_tx_gain(id));
+    return (double)convert_milli_db_to_db(get_noos_tx_gain(rf_port));
   }
 }
 
 template<class cfgrtr_t> void
-AD9361DRC<cfgrtr_t>::set_direction(data_stream_id_t id,
-    data_stream_direction_t /*val*/) {
-  get_rx_and_throw_if_invalid_ds(id);
+AD9361DRC<cfgrtr_t>::set_direction(std::string rf_port_name,
+    rf_port_direction_t /*val*/) {
+  get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
 }
 
 template<class cfgrtr_t> void
-AD9361DRC<cfgrtr_t>::set_tuning_freq_MHz(
-    data_stream_id_t id,config_value_t val) {
+AD9361DRC<cfgrtr_t>::set_tuning_freq_MHz(std::string rf_port_name, double val) {
   init_if_required();
   uint64_t lo_freq_hz = std::round(val*1000000.);
-  bool do_rx = get_rx_and_throw_if_invalid_ds(id);
+  bool do_rx = get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
   do_rx ?
       this->log_info("noos ad9361_set_rx_lo_freq %" PRIu64, lo_freq_hz) :
       this->log_info("noos ad9361_set_tx_lo_freq %" PRIu64, lo_freq_hz);
@@ -1073,12 +1065,12 @@ AD9361DRC<cfgrtr_t>::set_tuning_freq_MHz(
 }
 
 template<class cfgrtr_t> void
-AD9361DRC<cfgrtr_t>::set_bandwidth_3dB_MHz(data_stream_id_t id,
-    config_value_t val) {
+AD9361DRC<cfgrtr_t>::set_bandwidth_3dB_MHz(std::string rf_port_name,
+    double val) {
   init_if_required();
   ///@TODO / FIXME handle DDC/DUC divider in separate DDC/DUC class
   uint32_t bw = (uint32_t)std::round(val*1000000.*m_divider);
-  bool do_rx = get_rx_and_throw_if_invalid_ds(id);
+  bool do_rx = get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
   do_rx ?
       this->log_info("noos ad9361_set_rx_rf_bandwidth %" PRIu32, bw) :
       this->log_info("noos ad9361_set_tx_rf_bandwidth %" PRIu32, bw);
@@ -1092,12 +1084,12 @@ AD9361DRC<cfgrtr_t>::set_bandwidth_3dB_MHz(data_stream_id_t id,
 }
 
 template<class cfgrtr_t> void
-AD9361DRC<cfgrtr_t>::set_sampling_rate_Msps(
-      data_stream_id_t id,config_value_t val) {
+AD9361DRC<cfgrtr_t>::set_sampling_rate_Msps(std::string rf_port_name,
+    double val) {
   init_if_required();
   ///@TODO / FIXME handle DDC/DUC divider in separate DDC/DUC class
   uint32_t fs = (uint32_t)std::round(val*1000000.*m_divider);
-  bool do_rx = get_rx_and_throw_if_invalid_ds(id);
+  bool do_rx = get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
   do_rx ?
       this->log_info("noos ad9361_set_rx_sampling_freq %" PRIu32, fs) :
       this->log_info("noos ad9361_set_tx_sampling_freq %" PRIu32, fs);
@@ -1111,22 +1103,21 @@ AD9361DRC<cfgrtr_t>::set_sampling_rate_Msps(
 }
 
 template<class cfgrtr_t> void
-AD9361DRC<cfgrtr_t>::set_samples_are_complex(
-    data_stream_id_t id, bool val) {
+AD9361DRC<cfgrtr_t>::set_samples_are_complex(std::string rf_port_name,
+    bool val) {
   // nothing to do on hardware, just validate settings
   if(val == false) {
     throw std::string("samples_are_complex must be set to true");
   }
-  get_rx_and_throw_if_invalid_ds(id);
+  get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
 }
 
 template<class cfgrtr_t> void
-AD9361DRC<cfgrtr_t>::set_gain_mode(
-    data_stream_id_t id, gain_mode_value_t val) {
+AD9361DRC<cfgrtr_t>::set_gain_mode(std::string rf_port_name, std::string val) {
   init_if_required();
-  bool do_rx = get_rx_and_throw_if_invalid_ds(id);
-  if((not do_rx) and val == "agc") {
-    throw std::string("AGC is not a valid setting for TX");
+  bool do_rx = get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
+  if((!do_rx) && val != "manual") {
+    throw std::string("not a valid setting for TX: ") + val.c_str();
   }
 #ifndef DISABLE_AD9361
   this->throw_if_ad9361_init_failed("No-OS set gain mode");
@@ -1138,9 +1129,9 @@ AD9361DRC<cfgrtr_t>::set_gain_mode(
                     (val == "RF_GAIN_FASTATTACK_AGC") ? RF_GAIN_FASTATTACK_AGC :
                     (val == "RF_GAIN_HYBRID_AGC ") ? RF_GAIN_HYBRID_AGC :
                     RF_GAIN_MGC;
-  uint8_t ch = get_ch(id);
+  uint8_t ch = get_ch(rf_port_name);
   if(do_rx) {
-    this->log_info("noos ad9361_set_rx_gain_control_mode %" PRIu32 (uint32_t)gc_mode);
+    this->log_info("noos ad9361_set_rx_gain_control_mode %" PRIu8, gc_mode);
     int32_t res = do_rx ?
         ad9361_set_rx_gain_control_mode(m_ad9361_rf_phy, ch, gc_mode) : 0;
     throw_if_no_os_api_call_returns_non_zero(res);
@@ -1149,10 +1140,9 @@ AD9361DRC<cfgrtr_t>::set_gain_mode(
 }
 
 template<class cfgrtr_t> void
-AD9361DRC<cfgrtr_t>::set_gain_dB(
-    data_stream_id_t id, config_value_t val) {
+AD9361DRC<cfgrtr_t>::set_gain_dB(std::string rf_port_name, double val) {
   init_if_required();
-  bool do_rx = get_rx_and_throw_if_invalid_ds(id);
+  bool do_rx = get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
   // expected type of ad9361_set_rx_rf_gain
   int32_t rx_val = 0;
   // expected type of ad9361_set_tx_attenuation
@@ -1169,12 +1159,17 @@ AD9361DRC<cfgrtr_t>::set_gain_dB(
 #ifndef DISABLE_AD9361
   this->throw_if_ad9361_init_failed("No-OS set get");
   // assign No-OS-specific "channel" macro (RX1/RX2/TX1/TX2 in ad9361_api.h)
-  uint8_t ch = get_ch(id);
+  uint8_t ch = get_ch(rf_port_name);
   int32_t res = do_rx ?
       ad9361_set_rx_rf_gain(m_ad9361_rf_phy, ch, rx_val) :
       ad9361_set_tx_attenuation(m_ad9361_rf_phy, ch, tx_val);
   throw_if_no_os_api_call_returns_non_zero(res);
 #endif
+}
+
+template<class cfgrtr_t> void
+AD9361DRC<cfgrtr_t>::set_routing_id(std::string /*rf_port_name*/,
+    std::string /*val*/) {
 }
 
 ///@TODO / FIXME - does this need to undo ENSM_MODE_ALERT??

@@ -143,17 +143,17 @@ struct AD9361DeviceCallBack {
   virtual void set_reset(uint8_t id_no, bool on) = 0;
   // These are touching the DSP slaves
   virtual bool isMixerPresent(bool rx, unsigned /*stream*/) = 0;
-  virtual config_value_t getDecimation(unsigned /*stream*/) = 0; // return 1 if not present
-  virtual config_value_t getInterpolation(unsigned stream) = 0;  // return 1 if not present
-  virtual config_value_t getPhaseIncrement(bool rx, unsigned stream) = 0; // return 0 if not present
+  virtual double getDecimation(unsigned /*stream*/) = 0; // return 1 if not present
+  virtual double getInterpolation(unsigned stream) = 0;  // return 1 if not present
+  virtual double getPhaseIncrement(bool rx, unsigned stream) = 0; // return 0 if not present
   virtual void setPhaseIncrement(bool rx, unsigned stream, int16_t inc) = 0; // ignore if not present
   // These are three hooks during initial configuration
   virtual void initialConfig(uint8_t id_no, Ad9361InitConfig &config) = 0; // before a config attempt
   virtual void postConfig(uint8_t id_no) = 0;  // after a config attempt, on success or failure
   virtual void finalConfig(uint8_t id_no, Ad9361InitConfig &config) = 0; // after a config attempt, on success
   // These are for both channels
-  virtual unsigned getRfInput(unsigned device, config_value_t tuning_freq_MHz) = 0;
-  virtual unsigned getRfOutput(unsigned device, config_value_t tuning_freq_MHz) = 0;
+  virtual unsigned getRfInput(unsigned device, double tuning_freq_MHz) = 0;
+  virtual unsigned getRfOutput(unsigned device, double tuning_freq_MHz) = 0;
 };
 
 #ifndef DISABLE_AD9361
@@ -246,17 +246,17 @@ class AD9361DRC : public DRC<cfgrtr_t>, public DDCDUCConstants {
   int32_t                m_ad9361_init_ret;
   bool                   m_ad9361_init_called;
 #endif
-  /// @brief name of the data stream that corresponds to AD9361 RX1 channel
-  const char*            m_ds_rx1;
-  const char*            m_ds_rx2;
-  const char*            m_ds_tx1;
-  const char*            m_ds_tx2;
+  /// @brief rf_port_name that corresponds to AD9361 RX1 channel
+  const char*            m_port_rx1;
+  const char*            m_port_rx2;
+  const char*            m_port_tx1;
+  const char*            m_port_tx2;
   AD9361DeviceCallBack   &m_callback;
   unsigned               m_device;
   template<typename T> T convert_milli_db_to_db(T val_milli_db) const;
   template<typename T> T convert_db_to_milli_db(T val_milli_db) const;
 #ifndef DISABLE_AD9361
-  uint8_t get_ch(data_stream_id_t id);
+  uint8_t get_ch(std::string id);
   void    set_ad9361_fpga_channel_config();
   void    init_init_param();
   bool    any_configurator_configs_locked_which_prevent_ad9361_init() const;
@@ -271,33 +271,33 @@ class AD9361DRC : public DRC<cfgrtr_t>, public DDCDUCConstants {
       const char* rx1 = "rx1",const char* rx2 = "rx2",
       const char* tx1 = "tx1",const char* tx2 = "tx2",
       const char* descriptor = "AD9361");
-  bool get_rx_and_throw_if_invalid_ds(data_stream_id_t data_stream_id) const;
+  bool get_rx_and_throw_if_invalid_rf_port_name(std::string rf_port_name) const;
   void set_rx_rf_port_input(uint32_t mode);
   void set_tx_rf_port_output(uint32_t mode);
   void throw_if_no_os_api_call_returns_non_zero(int32_t res);
-  uint64_t                get_noos_tuning_freq(      data_stream_id_t id);
-  uint32_t                get_noos_bandwidth(        data_stream_id_t id);
-  uint32_t                get_noos_sampling_rate(    data_stream_id_t id);
-  uint8_t                 get_noos_gain_mode(        data_stream_id_t id);
-  int32_t                 get_noos_rx_gain(          data_stream_id_t id);
-  uint32_t                get_noos_tx_gain(          data_stream_id_t id);
-  bool                    get_enabled(               data_stream_id_t id);
-  data_stream_direction_t get_direction(             data_stream_id_t id);
-  config_value_t          get_tuning_freq_MHz(       data_stream_id_t id);
-  config_value_t          get_bandwidth_3dB_MHz(     data_stream_id_t id);
-  config_value_t          get_sampling_rate_Msps(    data_stream_id_t id);
-  bool                    get_samples_are_complex(   data_stream_id_t id);
-  gain_mode_value_t       get_gain_mode(             data_stream_id_t id);
-  config_value_t          get_gain_dB(               data_stream_id_t id);
-  void set_direction(            data_stream_id_t id,data_stream_direction_t v);
-  void set_tuning_freq_MHz(      data_stream_id_t id,config_value_t    val);
-  void set_bandwidth_3dB_MHz(    data_stream_id_t id,config_value_t    val);
-  void set_sampling_rate_Msps(   data_stream_id_t id,config_value_t    val);
-  void set_samples_are_complex(  data_stream_id_t id,bool              val);
-  void set_gain_mode(            data_stream_id_t id,gain_mode_value_t val);
-  void set_gain_dB(              data_stream_id_t id,config_value_t    val);
-  bool request_config_lock(const config_lock_id_t id,
-      const ConfigLockRequest& request);
+  uint64_t            get_noos_tuning_freq(   std::string rf_port_name);
+  uint32_t            get_noos_bandwidth(     std::string rf_port_name);
+  uint32_t            get_noos_sampling_rate( std::string rf_port_name);
+  uint8_t             get_noos_gain_mode(     std::string rf_port_name);
+  int32_t             get_noos_rx_gain(       std::string rf_port_name);
+  uint32_t            get_noos_tx_gain(       std::string rf_port_name);
+  bool                get_enabled(            std::string rf_port_name);
+  rf_port_direction_t get_direction(          std::string rf_port_name);
+  double              get_tuning_freq_MHz(    std::string rf_port_name);
+  double              get_bandwidth_3dB_MHz(  std::string rf_port_name);
+  double              get_sampling_rate_Msps( std::string rf_port_name);
+  bool                get_samples_are_complex(std::string rf_port_name);
+  std::string         get_gain_mode(          std::string rf_port_name);
+  double              get_gain_dB(            std::string rf_port_name);
+  void set_direction(std::string rf_port_name, rf_port_direction_t val);
+  void set_tuning_freq_MHz(      std::string rf_port_name, double      val);
+  void set_bandwidth_3dB_MHz(    std::string rf_port_name, double      val);
+  void set_sampling_rate_Msps(   std::string rf_port_name, double      val);
+  void set_samples_are_complex(  std::string rf_port_name, bool        val);
+  void set_gain_mode(            std::string rf_port_name, std::string val);
+  void set_gain_dB(              std::string rf_port_name, double      val);
+  void set_routing_id(std::string rf_port_name, std::string val);
+  bool request_config_lock(std::string id, const ConfigLockRequest& req);
   void init();
   bool shutdown();
   //bool start(unsigned config);

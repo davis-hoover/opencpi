@@ -18,13 +18,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vector>   // std::vector
-#include <string>   // std::string
-#include <sstream>  // std::ostringstream
-#include <cmath>    // std::abs
 #include "DRC.hh"
-///@TODO / FIXME address whether to remove
-#define IS_LOCKING
+#include <vector>
+#include <string>
+#include <sstream>
+#include <cmath> // std::abs
 
 namespace OCPI {
 
@@ -41,165 +39,157 @@ CSPBase::get_feasible_region_limits_min_double(const char* var) const {
   return m_solver.get_feasible_region_limits_min_double(var);
 }
 
-DataStream::DataStream(data_stream_id_t id, bool supports_rx, bool supports_tx,
-      CSPVarMap map) : m_data_stream_id(id), m_supports_rx(supports_rx),
-      m_supports_tx(supports_tx), m_csp_map(map) {
+RFPort::RFPort(std::string name, bool supports_rx, bool supports_tx,
+    CSPVarMap map) : m_csp_map(map), m_name(name),
+    m_supports_rx(supports_rx), m_supports_tx(supports_tx) {
 }
 
-data_stream_id_t
-DataStream::get_data_stream_id() const {
-  return m_data_stream_id;
+std::string
+RFPort::get_name() const {
+  return m_name;
 }
 
 bool
-DataStream::get_supports_rx() const {
+RFPort::get_supports_rx() const {
   return m_supports_rx;
 }
 
 bool
-DataStream::get_supports_tx() const {
+RFPort::get_supports_tx() const {
   return m_supports_tx;
 }
 
 template<class CSP> void
-Configurator<CSP>::add_data_stream(DataStream data_stream) {
-  m_data_streams.push_back(data_stream);
-  m_data_stream_ids.push_back(data_stream.get_data_stream_id());
+Configurator<CSP>::add_rf_port(RFPort rf_port) {
+  m_rf_ports.push_back(rf_port);
+  m_rf_port_names.push_back(rf_port.get_name());
 }
 
-template<class CSP> const std::vector<data_stream_id_t>&
-Configurator<CSP>::get_data_stream_ids() const {
-  return m_data_stream_ids;
+template<class CSP> const std::vector<std::string>&
+Configurator<CSP>::get_rf_port_names() const {
+  return m_rf_port_names;
+}
+
+template<class CSP> const std::string&
+Configurator<CSP>::get_error() const {
+  return m_error;
 }
 
 template<class CSP> const char*
-Configurator<CSP>::get_config(data_stream_id_t id, config_key_t cfg) const {
-  for(auto it=m_data_streams.begin(); it!=m_data_streams.end(); ++it) {
-    if(it->get_data_stream_id() == id) {
+Configurator<CSP>::get_config(std::string rf_port_name,
+    std::string cfg) const {
+  for (auto it=m_rf_ports.begin(); it!=m_rf_ports.end(); ++it)
+    if (it->get_name() == rf_port_name)
       return it->m_csp_map.at(cfg);
-    }
-  }
-  throw std::string("data stream id not found ")+id.c_str();
+  throw std::string("rf_port_name not found ") + rf_port_name.c_str();
 }
 
-template<class CSP> config_value_t
-Configurator<CSP>::get_config_locked_value(data_stream_id_t id,
-    config_key_t cfg) const {
-  auto var = get_config(id, cfg);
+template<class CSP> double
+Configurator<CSP>::get_config_locked_value(std::string rf_port_name,
+    std::string cfg) const {
+  auto var = get_config(rf_port_name, cfg);
   return m_solver.get_feasible_region_limits_min_double(var);
 }
 
 template<class CSP> template<typename T> std::string
-Configurator<CSP>::get_lock_config_str(data_stream_id_t id, config_key_t cfg,
-    T val, bool succeeded) {
+Configurator<CSP>::get_lock_config_str(std::string rf_port_name,
+    std::string cfg, T val, bool succeeded) {
   std::ostringstream oss;
   oss << "lock " << (succeeded ? "SUCCEEDED " : "FAILED ");
-  oss << "for data stream: " << id << " for config: " << cfg << " ";
+  oss << "for rf_port_name: " << rf_port_name << " for config: " << cfg << " ";
   oss << "for requested value: " << val;
   return oss.str();
 }
 
 template<class CSP> bool
-Configurator<CSP>::lock_config(data_stream_id_t id, config_key_t cfg,
+Configurator<CSP>::lock_config(std::string id, std::string cfg,
     int32_t val) {
   bool ret = lock_config(get_config(id,cfg),val);
   //std::cout << "[DEBUG] " << m_solver.m_solver << "\n";
   //std::cout << "[DEBUG] " << m_solver.get_feasible_region_limits() << "\n";
-  std::string str = get_lock_config_str<int32_t>(id,cfg,val,ret);
-  this->log_info("%s", str.c_str());
+  m_error.assign(get_lock_config_str<int32_t>(id,cfg,val,ret));
+  this->log_info("%s", m_error.c_str());
   return ret;
 }
 
 template<class CSP> bool
-Configurator<CSP>::lock_config(data_stream_id_t id, config_key_t cfg,
-    config_value_t val, config_value_t tol) {
+Configurator<CSP>::lock_config(std::string id, std::string cfg,
+    double val, double tol) {
   bool ret = lock_config(get_config(id,cfg),val,tol);
+  //std::cout << "[DEBUG] " << m_solver.m_solver << "\n";
   //std::cout << "[DEBUG] " << m_solver.get_feasible_region_limits() << "\n";
   std::ostringstream oss;
-  oss << get_lock_config_str<config_value_t>(id,cfg,val,ret);
+  oss << get_lock_config_str<double>(id,cfg,val,ret);
   oss << " w/ tolerance: +/- " << tol;
-  this->log_info("%s", oss.str().c_str());
+  m_error.assign(oss.str());
+  this->log_info("%s", m_error.c_str());
   return ret;
 }
 
 template<class CSP> bool
 Configurator<CSP>::lock_config(const char* config, int32_t val) {
-  bool successful = false;
+  bool ret = false;
   // attempt a lock
-  if(!get_config_is_locked(config)) {
+  if (!get_config_is_locked(config)) {
     CSPSolver::Constr& clo = m_solver.m_solver.add_constr(config, "=", val);
-    //std::cout << "attempt a lock: add constraint " << config << "=" << val << "\n";
     //std::cout << "solver is now: " << m_solver.m_solver << "\n";
-    successful = not m_solver.m_solver.feasible_region_limits_is_empty_for_var(config);
-    if(successful) {
-      Configurator<CSP>::LockParam param = {clo, clo, false, val, 0, true, false};
+    ret = !m_solver.m_solver.feasible_region_limits_is_empty_for_var(config);
+    if (ret) {
+      bool fp = false;
+      Configurator<CSP>::LockParam param = {clo, clo, fp, val, 0, true, fp};
       m_locked_params.insert(std::pair<const char*, LockParam>(config, param));
     }
     else { // unroll
       //std::cout << "[DEBUG] " << get_feasible_region_limits() << "\n";
       m_solver.m_solver.remove_constr(clo);
-      //m_solver.m_solver.remove_constr(clo);
     }
   }
-  return successful;
+  return ret;
 }
 
 template<class CSP> bool
-Configurator<CSP>::lock_config(const char* config, config_value_t val,
-    config_value_t tolerance) {
+Configurator<CSP>::lock_config(const char* cfg, double val,
+    double tolerance) {
   // attempt a lock
-  const CSPSolver::Constr& clo = m_solver.m_solver.add_constr(config, ">=", val-tolerance);
-  //std::cout << "[DEBUG] lock " << config << get_feasible_region_limits() << "\n";
-  const CSPSolver::Constr& chi = m_solver.m_solver.add_constr(config, "<=", val+tolerance);
-  //std::cout << "[DEBUG] lock " << config << get_feasible_region_limits() << "\n";
-  //std::cout << "attempt a lock: add constraint " << config << ">=" << val-tolerance << "\n";
-  //std::cout << "solver is now: " << m_solver.m_solver << "\n";
-  //std::cout << "attempt a lock: add constraint " << config << "<=" << val+tolerance << "\n";
-  //std::cout << "solver is now: " << m_solver.m_solver << "\n";
+  double tt = tolerance;
+  const CSPSolver::Constr& lo = m_solver.m_solver.add_constr(cfg, ">=", val-tt);
+  const CSPSolver::Constr& hi = m_solver.m_solver.add_constr(cfg, "<=", val+tt);
   // test whether the lock was successful:
-  // if we overconstrained such the feasible region contains an empty set for
-  // the variable (config), the lock was unsuccessful we roll back (remove)
-  // the constraints to their original values
-  /*if(not m_solver.m_solver.feasible_region_limits_is_empty_for_var(config)) {
-    CSPSolver::Constr& cmi = m_solver.m_solver.add_constr(config, "=", val);
-    if(m_solver.m_solver.feasible_region_limits_is_empty_for_var(config)) {
-      m_solver.m_solver.remove_constr(cmi);
-    }
-  }*/
-  bool successful = not m_solver.m_solver.feasible_region_limits_is_empty_for_var(config);
-  if(successful) {
-    Configurator<CSP>::LockParam param = {clo, chi, true, 0, val, false, true};
-    m_locked_params.insert(std::pair<const char*, LockParam>(config, param));
+  // if overconstrained such that the feasible region contains an empty set for
+  // the variable (cfg), the lock was unsuccessful and the constraints are
+  // therefore rolled back (removed) to their original values
+  bool ret = !m_solver.m_solver.feasible_region_limits_is_empty_for_var(cfg);
+  if (ret) {
+    Configurator<CSP>::LockParam param = {lo, hi, true, 0, val, false, true};
+    m_locked_params.insert(std::pair<const char*, LockParam>(cfg, param));
   }
   else { // unroll
-    m_solver.m_solver.remove_constr(clo);
-    m_solver.m_solver.remove_constr(chi);
+    m_solver.m_solver.remove_constr(lo);
+    m_solver.m_solver.remove_constr(hi);
   }
-  return successful;
+  return ret;
 }
 
 template<class CSP> void
-Configurator<CSP>::unlock_config(data_stream_id_t ds_id, config_key_t config) {
-  //std::cout << "drc: Configurator: unlock_config: " << ds_id << " " << config << "\n";
-  unlock_config(get_config(ds_id, config));
+Configurator<CSP>::unlock_config(std::string id, std::string config) {
+  unlock_config(get_config(id, config));
 }
 
 template<class CSP> void
 Configurator<CSP>::unlock_config(const char* config) {
-  if(get_config_is_locked(config)) {
+  if (get_config_is_locked(config)) {
     auto& tmp = m_locked_params.at(config);
-    // intentionallity not reference, due to changing vector entry which this is referring to
+    // intentionally not a reference, due to changing vector entry which this is
+    // referring to
     auto chi = tmp.m_constr_hi;
     m_solver.m_solver.remove_constr(m_locked_params.at(config).m_constr_lo);
-    if(m_locked_params.at(config).m_constr_hi_used) {
+    if (m_locked_params.at(config).m_constr_hi_used)
       m_solver.m_solver.remove_constr(chi);
-    }
     m_locked_params.erase(m_locked_params.find(config));
   }
   else {
     throw std::string("attempted unlock for config not locked");
   }
-  //std::cout << "[DEBUG] unlock " << m_solver.get_feasible_region_limits() << "\n";
 }
 
 template<class CSP> void
@@ -214,32 +204,28 @@ Configurator<CSP>::unlock_all() {
 }
 
 template<class CSP> void
-Configurator<CSP>::find_data_streams_which_support_direction(
-    const data_stream_direction_t       dir,
-    std::vector<data_stream_id_t>& data_streams) const {
-  auto it=m_data_streams.begin();
-  for(; it != m_data_streams.end(); it++) {
-    if((dir == data_stream_direction_t::rx and it->get_supports_rx()) or
-        (dir == data_stream_direction_t::tx and it->get_supports_tx())) {
-      data_streams.push_back(it->get_data_stream_id());
-    }
+Configurator<CSP>::find_rf_ports_which_support_direction(
+    rf_port_direction_t dir, std::vector<std::string>& rf_ports) const {
+  for (auto it = m_rf_ports.begin(); it != m_rf_ports.end(); it++) {
+    bool rmatch = (dir == rf_port_direction_t::rx && it->get_supports_rx());
+    bool tmatch = (dir == rf_port_direction_t::tx && it->get_supports_tx());
+    if (rmatch || tmatch)
+      rf_ports.push_back(it->get_name());
   }
 }
 
-template<class CSP> config_value_t 
+template<class CSP> double 
 Configurator<CSP>::get_locked_value(const char* config) {
-  if(not get_config_is_locked(config)) {
+  if (!get_config_is_locked(config))
     throw std::string("invalid config");
-  }
   return m_locked_params.at(config).m_lock_val;
 }
 
 template<class CSP> bool
 Configurator<CSP>::get_config_is_locked(const char* config) {
   bool ret = false;
-  if(m_locked_params.find(config) != m_locked_params.end()) {
+  if (m_locked_params.find(config) != m_locked_params.end())
     ret = true;
-  }
   return ret;
 }
 
@@ -249,13 +235,14 @@ Configurator<CSP>::get_feasible_region_limits() const {
 }
 
 template<class CSP> double
-Configurator<CSP>::get_feasible_region_limits_min_double(const char* var) const {
+Configurator<CSP>::get_feasible_region_limits_min_double(
+    const char* var) const {
   return m_solver.get_feasible_region_limits_min_double(var);
 }
 
-DataStreamConfigLockRequest::DataStreamConfigLockRequest() :
+RFPortConfigLockRequest::RFPortConfigLockRequest() :
   m_including_direction          (false),
-  m_including_data_stream_id     (false),
+  m_including_rf_port_name       (false),
   m_including_routing_id         (false),
   m_including_tuning_freq_MHz    (false),
   m_including_bandwidth_3dB_MHz  (false),
@@ -265,220 +252,205 @@ DataStreamConfigLockRequest::DataStreamConfigLockRequest() :
   m_including_gain_dB            (false) {
 }
 
-data_stream_direction_t
-DataStreamConfigLockRequest::get_direction() const {
-  if(not m_including_direction) {
-    throw_for_invalid_get_call("data_stream_direction");
-  }
+rf_port_direction_t
+RFPortConfigLockRequest::get_direction() const {
+  if (!m_including_direction)
+    throw_for_invalid_get_call("rf_port_direction");
   return m_direction;
 }
 
-data_stream_id_t
-DataStreamConfigLockRequest::get_data_stream_id() const {
-  if(not m_including_data_stream_id) {
-    throw_for_invalid_get_call("data_stream_ID");
-  }
-  return m_data_stream_id;
+std::string
+RFPortConfigLockRequest::get_rf_port_name() const {
+  if (!m_including_rf_port_name)
+    throw_for_invalid_get_call("rf_port_name");
+  return m_rf_port_name;
 }
 
-routing_id_t
-DataStreamConfigLockRequest::get_routing_id() const {
-  if(not m_including_routing_id) {
+std::string
+RFPortConfigLockRequest::get_routing_id() const {
+  if (!m_including_routing_id)
     throw_for_invalid_get_call("routing_id");
-  }
   return m_routing_id;
 }
 
-config_value_t
-DataStreamConfigLockRequest::get_tuning_freq_MHz() const {
-  if(not m_including_tuning_freq_MHz) {
+double
+RFPortConfigLockRequest::get_tuning_freq_MHz() const {
+  if (!m_including_tuning_freq_MHz)
     throw_for_invalid_get_call("tuning_freq_MHz");
-  }
   return m_tuning_freq_MHz;
 }
 
-config_value_t
-DataStreamConfigLockRequest::get_bandwidth_3dB_MHz() const {
-  if(not m_including_bandwidth_3dB_MHz) {
+double
+RFPortConfigLockRequest::get_bandwidth_3dB_MHz() const {
+  if (!m_including_bandwidth_3dB_MHz)
     throw_for_invalid_get_call("bandwidth_3dB_MHz");
-  }
   return m_bandwidth_3dB_MHz;
 }
 
-config_value_t
-DataStreamConfigLockRequest::get_sampling_rate_Msps() const {
-  if(not m_including_sampling_rate_Msps) {
+double
+RFPortConfigLockRequest::get_sampling_rate_Msps() const {
+  if (!m_including_sampling_rate_Msps)
     throw_for_invalid_get_call("sampling_rate_Msps");
-  }
   return m_sampling_rate_Msps;
 }
 
 bool
-DataStreamConfigLockRequest::get_samples_are_complex() const {
-  if(not m_including_samples_are_complex) {
+RFPortConfigLockRequest::get_samples_are_complex() const {
+  if (!m_including_samples_are_complex)
     throw_for_invalid_get_call("samples_are_complex");
-  }
   return m_samples_are_complex;
 }
 
-gain_mode_value_t
-DataStreamConfigLockRequest::get_gain_mode() const {
-  if(not m_including_gain_mode) {
+std::string
+RFPortConfigLockRequest::get_gain_mode() const {
+  if (!m_including_gain_mode)
     throw_for_invalid_get_call("gain_mode");
-  }
   return m_gain_mode;
 }
 
-config_value_t
-DataStreamConfigLockRequest::get_gain_dB() const {
-  if(not m_including_gain_dB) {
+double
+RFPortConfigLockRequest::get_gain_dB() const {
+  if (!m_including_gain_dB)
     throw_for_invalid_get_call("gain_dB");
-  }
   return m_gain_dB;
 }
 
-config_value_t
-DataStreamConfigLockRequest::get_tolerance_tuning_freq_MHz() const {
-  if(not m_including_tuning_freq_MHz) {
+double
+RFPortConfigLockRequest::get_tolerance_tuning_freq_MHz() const {
+  if (!m_including_tuning_freq_MHz)
     throw_for_invalid_get_call("tuning_freq_MHz");
-  }
   return m_tolerance_tuning_freq_MHz;
 }
 
-config_value_t
-DataStreamConfigLockRequest::get_tolerance_bandwidth_3dB_MHz() const {
-  if(not m_including_bandwidth_3dB_MHz) {
+double
+RFPortConfigLockRequest::get_tolerance_bandwidth_3dB_MHz() const {
+  if (!m_including_bandwidth_3dB_MHz)
     throw_for_invalid_get_call("bandwidth_3dB_MHz");
-  }
   return m_tolerance_bandwidth_3dB_MHz;
 }
 
-config_value_t
-DataStreamConfigLockRequest::get_tolerance_sampling_rate_Msps() const {
-  if(not m_including_sampling_rate_Msps) {
+double
+RFPortConfigLockRequest::get_tolerance_sampling_rate_Msps() const {
+  if (!m_including_sampling_rate_Msps)
     throw_for_invalid_get_call("sampling_rate_Msps");
-  }
   return m_tolerance_sampling_rate_Msps;
 }
 
-config_value_t
-DataStreamConfigLockRequest::get_tolerance_gain_dB() const {
-  if(not m_including_gain_dB) {
+double
+RFPortConfigLockRequest::get_tolerance_gain_dB() const {
+  if (!m_including_gain_dB)
     throw_for_invalid_get_call("gain_dB");
-  }
   return m_tolerance_gain_dB;
 }
 
 bool
-DataStreamConfigLockRequest::get_including_data_stream_direction() const {
+RFPortConfigLockRequest::get_including_direction() const {
   return m_including_direction;
 }
 
 bool
-DataStreamConfigLockRequest::get_including_data_stream_id() const {
-  return m_including_data_stream_id;
+RFPortConfigLockRequest::get_including_rf_port_name() const {
+  return m_including_rf_port_name;
 }
 
 bool
-DataStreamConfigLockRequest::get_including_routing_id() const {
+RFPortConfigLockRequest::get_including_routing_id() const {
   return m_including_routing_id;
 }
 
 bool
-DataStreamConfigLockRequest::get_including_tuning_freq_MHz() const {
+RFPortConfigLockRequest::get_including_tuning_freq_MHz() const {
   return m_including_tuning_freq_MHz;
 }
 
 bool
-DataStreamConfigLockRequest::get_including_bandwidth_3dB_MHz() const {
+RFPortConfigLockRequest::get_including_bandwidth_3dB_MHz() const {
   return m_including_bandwidth_3dB_MHz;
 }
 
 bool
-DataStreamConfigLockRequest::get_including_sampling_rate_Msps() const {
+RFPortConfigLockRequest::get_including_sampling_rate_Msps() const {
   return m_including_sampling_rate_Msps;
 }
 
 bool
-DataStreamConfigLockRequest::get_including_samples_are_complex() const {
+RFPortConfigLockRequest::get_including_samples_are_complex() const {
   return m_including_samples_are_complex;
 }
 
 bool
-DataStreamConfigLockRequest::get_including_gain_mode() const {
+RFPortConfigLockRequest::get_including_gain_mode() const {
   return m_including_gain_mode;
 }
 
 bool
-DataStreamConfigLockRequest::get_including_gain_dB() const {
+RFPortConfigLockRequest::get_including_gain_dB() const {
   return m_including_gain_dB;
 }
 
 void
-DataStreamConfigLockRequest::include_data_stream_direction(
-    const data_stream_direction_t val) {
+RFPortConfigLockRequest::include_direction(const rf_port_direction_t val) {
   m_direction = val;
   m_including_direction = true;
 }
 
 void
-DataStreamConfigLockRequest::include_data_stream_id(
-    const data_stream_id_t val) {
-  m_data_stream_id = val;
-  m_including_data_stream_id = true;
+RFPortConfigLockRequest::include_rf_port_name(const std::string val) {
+  m_rf_port_name = val;
+  m_including_rf_port_name = true;
 }
 
 void
-DataStreamConfigLockRequest::include_routing_id(const routing_id_t val) {
+RFPortConfigLockRequest::include_routing_id(const std::string val) {
   m_routing_id = val;
   m_including_routing_id = true;
 }
 
 void
-DataStreamConfigLockRequest::include_tuning_freq_MHz(const config_value_t val,
-    const config_value_t tolerance) {
+RFPortConfigLockRequest::include_tuning_freq_MHz(const double val,
+    const double tolerance) {
   m_tuning_freq_MHz           = val;
   m_tolerance_tuning_freq_MHz = tolerance;
   m_including_tuning_freq_MHz = true;
 }
 
 void
-DataStreamConfigLockRequest::include_bandwidth_3dB_MHz(const config_value_t val,
-    const config_value_t tolerance) {
+RFPortConfigLockRequest::include_bandwidth_3dB_MHz(const double val,
+    const double tolerance) {
   m_bandwidth_3dB_MHz           = val;
   m_tolerance_bandwidth_3dB_MHz = tolerance;
   m_including_bandwidth_3dB_MHz = true;
 }
 
 void
-DataStreamConfigLockRequest::include_sampling_rate_Msps(
-    const config_value_t val, const config_value_t tolerance) {
+RFPortConfigLockRequest::include_sampling_rate_Msps(
+    const double val, const double tolerance) {
   m_sampling_rate_Msps           = val;
   m_tolerance_sampling_rate_Msps = tolerance;
   m_including_sampling_rate_Msps = true;
 }
 void
-DataStreamConfigLockRequest::include_samples_are_complex(const bool val) {
+RFPortConfigLockRequest::include_samples_are_complex(const bool val) {
   m_samples_are_complex = val;
   m_including_samples_are_complex = true;
 }
 
 void
-DataStreamConfigLockRequest::include_gain_mode(const gain_mode_value_t val) {
+RFPortConfigLockRequest::include_gain_mode(const std::string val) {
   m_gain_mode = val;
   m_including_gain_mode = true;
 }
 
 void
-DataStreamConfigLockRequest::include_gain_dB(const config_value_t val,
-    const config_value_t tolerance) {
+RFPortConfigLockRequest::include_gain_dB(const double val,
+    const double tolerance) {
   m_gain_dB           = val;
   m_tolerance_gain_dB = tolerance;
   m_including_gain_dB = true;
 }
 
 void
-DataStreamConfigLockRequest::throw_for_invalid_get_call(
+RFPortConfigLockRequest::throw_for_invalid_get_call(
     const char* config) const {
   std::ostringstream oss;
   oss << "attempted to read radio controller's config request data ";
@@ -505,198 +477,184 @@ ARC<C>::get_config_locks() const {
 
 template<class C> void
 ARC<C>::initialize_cache() {
-  auto it = m_configurator.get_data_stream_ids().begin();
-  for(; it!=m_configurator.get_data_stream_ids().end(); ++it) {
+  auto it = m_configurator.get_rf_port_names().begin();
+  for (; it!=m_configurator.get_rf_port_names().end(); ++it) {
     m_cache_direction[        *it] = get_direction(        *it);
     m_cache_tuning_freq_MHz[  *it] = get_tuning_freq_MHz(  *it);
     m_cache_bandwidth_3dB_MHz[*it] = get_bandwidth_3dB_MHz(*it);
   }
 }
 
+/// @todo / FIXME - allow analog radio controllers to include gain/gain mode
 template<class C> bool
-ARC<C>::request_config_lock(
-    config_lock_id_t         config_lock_ID,
-    const ConfigLockRequest& config_lock_request) {
-  if(!m_cache_initialized) {
+ARC<C>::request_config_lock(std::string id,const ConfigLockRequest& req) {
+  if (!m_cache_initialized) {
     initialize_cache();
     m_cache_initialized = true;
   }
-#ifdef IS_LOCKING
   ConfigLock config_lock;
-  config_lock.m_config_lock_ID = config_lock_ID;
+  config_lock.m_config_lock_id = id;
   bool configurator_config_lock_request_was_successful = false;
-  auto it = config_lock_request.m_data_streams.begin();
-  for(; it != config_lock_request.m_data_streams.end(); it++) {
-    throw_if_data_stream_lock_request_malformed(*it);
-    std::vector<data_stream_id_t> data_streams;
-    if(it->get_including_data_stream_direction()) {
-      this->m_configurator.find_data_streams_which_support_direction(
-          it->get_direction(), data_streams);
-      if(data_streams.empty()) {
-        // configurator did not have any data streams of the requested data
-        // stream direction
+  auto it = req.m_rf_ports.begin();
+  for (; it != req.m_rf_ports.end(); ++it) {
+    throw_if_rf_port_lock_request_malformed(*it);
+    std::vector<std::string> ports;
+    if (it->get_including_direction()) {
+      auto dir = it->get_direction();
+      this->m_configurator.find_rf_ports_which_support_direction(dir, ports);
+      // if empty, configurator did not have any RF ports of the requested
+      // direction
+      if (ports.empty())
         return false;
-      }
     }
-    else { // assuming including data stream ID
-      data_streams.push_back(it->get_data_stream_id());
+    else { // assuming including rf_port_name
+      ports.push_back(it->get_rf_port_name());
     }
     bool found_lock = false;
-    auto it_found_streams = data_streams.begin();
-    for(; it_found_streams != data_streams.end(); it_found_streams++) {
-      found_lock |= do_min_data_stream_config_locks(*it_found_streams, *it);
-      const char* ds = it_found_streams->c_str();
-      if(found_lock) {
-        log_info("stream %s met lock request requirements\n", ds);
-        DataStreamConfigLock lock;
-        lock.m_data_stream_id    = ds;
+    auto it_found_ports = ports.begin();
+    for (; it_found_ports != ports.end(); it_found_ports++) {
+      found_lock |= do_min_rf_port_config_locks(*it_found_ports, *it);
+      const char* port = it_found_ports->c_str();
+      if (found_lock) {
+        log_info("rf_port_name %s met lock request requirements\n", port);
+        RFPortConfigLock lock;
+        lock.m_rf_port_name      = port;
         lock.m_direction         = it->get_direction();
         lock.m_tuning_freq_MHz   = it->get_tuning_freq_MHz();
         lock.m_bandwidth_3dB_MHz = it->get_bandwidth_3dB_MHz();
-        config_lock.m_data_streams.push_back(lock);
+        config_lock.m_rf_ports.push_back(lock);
         break;
       }
-      log_info("stream %s did not meet lock request requirements\n", ds);
+      log_info("rf_port_name %s did not meet request requirements\n", port);
     }
-    if(not found_lock) {
+    if (!found_lock) {
       configurator_config_lock_request_was_successful = false;
       break;
     }
     configurator_config_lock_request_was_successful = true;
   }
-  if(configurator_config_lock_request_was_successful) {
+  if (configurator_config_lock_request_was_successful) {
     m_config_locks.push_back(config_lock);
-    log_info("request lock %s succeeeded", config_lock_ID.c_str());
+    log_info("request lock %s succeeded", id.c_str());
     return true;
   }
   else { // unroll
-    auto itunroll = config_lock.m_data_streams.begin();
-    for(; itunroll != config_lock.m_data_streams.end(); ++itunroll) {
-      unlock_config(itunroll->m_data_stream_id, config_key_direction);
-      unlock_config(itunroll->m_data_stream_id, config_key_tuning_freq_MHz);
-      unlock_config(itunroll->m_data_stream_id, config_key_bandwidth_3dB_MHz);
+    auto itunroll = config_lock.m_rf_ports.begin();
+    for (; itunroll != config_lock.m_rf_ports.end(); ++itunroll) {
+      unlock_config(itunroll->m_rf_port_name, config_key_direction);
+      unlock_config(itunroll->m_rf_port_name, config_key_tuning_freq_MHz);
+      unlock_config(itunroll->m_rf_port_name, config_key_bandwidth_3dB_MHz);
     }
   }
-#endif
   return false;
 }
 
 template<class C> void
-ARC<C>::unlock_config_lock(const config_lock_id_t config_lock_ID) {
+ARC<C>::unlock_config_lock(std::string id) {
   bool found_config_lock = false;
-  for(auto itcl = m_config_locks.begin(); itcl != m_config_locks.end(); itcl++){
-    if(itcl->m_config_lock_ID.compare(config_lock_ID) == 0) {
+  for (auto itcl = m_config_locks.begin(); itcl != m_config_locks.end(); itcl++)
+    if (itcl->m_config_lock_id.compare(id) == 0) {
       found_config_lock = true;
-      auto itds = itcl->m_data_streams.begin();
-      for(; itds != itcl->m_data_streams.end(); itds++) {
-        unlock_config(itds->m_data_stream_id, config_key_direction);
-        unlock_config(itds->m_data_stream_id, config_key_tuning_freq_MHz);
-        unlock_config(itds->m_data_stream_id, config_key_bandwidth_3dB_MHz);
+      auto itpt = itcl->m_rf_ports.begin();
+      for (; itpt != itcl->m_rf_ports.end(); itpt++) {
+        unlock_config(itpt->m_rf_port_name, config_key_direction);
+        unlock_config(itpt->m_rf_port_name, config_key_tuning_freq_MHz);
+        unlock_config(itpt->m_rf_port_name, config_key_bandwidth_3dB_MHz);
       }
       break;
     }
-  }
-  if(not found_config_lock) {
+  if (!found_config_lock) {
     std::ostringstream oss;
-    oss << "for config unlock request, config lock ID " << config_lock_ID;
-    oss << " not found";
+    oss << "for config unlock request, config lock ID " << id << " not found";
     throw oss.str();
   }
 }
 
 template<class C> void
 ARC<C>::unlock_all() {
-#ifdef IS_LOCKING
   this->m_configurator.unlock_all();
   m_config_locks.clear();
-#endif
 }
 
 template<class C> void
-ARC<C>::throw_if_data_stream_lock_request_malformed(
-    const DataStreamConfigLockRequest& data_stream_config_lock_request) const {
-  const DataStreamConfigLockRequest& req = data_stream_config_lock_request;
-  if(not req.get_including_data_stream_direction() and
-     not req.get_including_data_stream_id()) {
+ARC<C>::throw_if_rf_port_lock_request_malformed(
+    const RFPortConfigLockRequest& req) const {
+  bool no_dir = !req.get_including_direction();
+  if (no_dir && !req.get_including_rf_port_name())
     throw std::string("request malformed: type/id");
-  }
   // note that including routing ID is not *universally* necessary, so
   // we don't check for it here (it's really only necessary for radio
-  // controllers w/ multiple data streams of the same type)
-  if(not req.get_including_tuning_freq_MHz()) {
+  // controllers w/ multiple RF ports of the same direction)
+  if (!req.get_including_tuning_freq_MHz())
     throw std::string("request malformed: did not include tuning_freq_MHz");
-  }
-  if(not req.get_including_bandwidth_3dB_MHz()) {
+  if (!req.get_including_bandwidth_3dB_MHz())
     throw std::string("request malformed: did not include bandwidth_3dB_MHz");
-  }
 }
 
 template<class C> bool
-ARC<C>::lock_config(data_stream_id_t ds_id, config_value_t val,
-    config_key_t cfg_key, bool do_tol, config_value_t tol) {
-  // the configurator, which is a software emulation of hardware capabilties,
+ARC<C>::lock_config(std::string rf_port, double val,
+    std::string cfg_key, bool do_tol, double tol) {
+  // the configurator, which is a software emulation of hardware capabilities,
   // tells us whether a hardware attempt to set value will corrupt
   // any existing locks
-  bool did_lock = do_tol ?
-    this->m_configurator.lock_config(ds_id, cfg_key, val, tol) :
-    this->m_configurator.lock_config(ds_id, cfg_key, val);
-  //bool is = false; // is within tolerance
-  if(did_lock) {
-    config_value_t cfglval; // configurator locked value
-    cfglval = this->m_configurator.get_config_locked_value(ds_id, cfg_key);
-    if(cfg_key == config_key_direction) {
-      if(m_cache_direction[ds_id] != (data_stream_direction_t)val) {
-        //std::cout << "drc: cache invalid, upating direction\n";
-        set_direction(ds_id, (data_stream_direction_t)cfglval);
-        m_cache_direction[ds_id] = (data_stream_direction_t)val;
+  bool ret;
+  if (do_tol)
+    ret = this->m_configurator.lock_config(rf_port, cfg_key, val, tol);
+  else
+    ret = this->m_configurator.lock_config(rf_port, cfg_key, val);
+  if (ret) {
+    double cfglval; // configurator locked value
+    cfglval = this->m_configurator.get_config_locked_value(rf_port, cfg_key);
+    if (cfg_key == config_key_direction) {
+      if (m_cache_direction[rf_port] != (rf_port_direction_t)val) {
+        set_direction(rf_port, (rf_port_direction_t)cfglval);
+        m_cache_direction[rf_port] = (rf_port_direction_t)val;
       }
     }
-    else if(cfg_key == config_key_tuning_freq_MHz) {
-      if(std::abs(m_cache_tuning_freq_MHz[ds_id]-val) > tol) {
-        //std::cout << "drc: cache invalid, upating tuning_freq_MHz\n";
-        set_tuning_freq_MHz(ds_id, cfglval);
-        m_cache_tuning_freq_MHz[ds_id] = cfglval;
+    else if (cfg_key == config_key_tuning_freq_MHz) {
+      if (std::abs(m_cache_tuning_freq_MHz[rf_port]-val) > tol) {
+        set_tuning_freq_MHz(rf_port, cfglval);
+        m_cache_tuning_freq_MHz[rf_port] = cfglval;
       }
     }
-    else if(cfg_key == config_key_bandwidth_3dB_MHz) {
-      if(std::abs(m_cache_bandwidth_3dB_MHz[ds_id]-val) > tol) {
-        //std::cout << "drc: cache invalid, upating bandwidth_3dB_MHz\n";
-        set_bandwidth_3dB_MHz(ds_id, cfglval);
-        m_cache_bandwidth_3dB_MHz[ds_id] = cfglval;
+    else if (cfg_key == config_key_bandwidth_3dB_MHz) {
+      if (std::abs(m_cache_bandwidth_3dB_MHz[rf_port]-val) > tol) {
+        set_bandwidth_3dB_MHz(rf_port, cfglval);
+        m_cache_bandwidth_3dB_MHz[rf_port] = cfglval;
       }
     }
   }
-  return did_lock;
+  return ret;
 }
 
 template<class C> void
-ARC<C>::unlock_config(const data_stream_id_t id,const config_key_t cfg) {
-  log_info("for data stream %s: unlocking config %s", id.c_str(), cfg.c_str());
-  this->m_configurator.unlock_config(id, cfg);
+ARC<C>::unlock_config(const std::string rf,const std::string cfg) {
+  log_info("for rf_port_name %s: unlocking config %s", rf.c_str(), cfg.c_str());
+  this->m_configurator.unlock_config(rf, cfg);
 }
 
 template<class C> bool
-ARC<C>::do_min_data_stream_config_locks(const data_stream_id_t id,
-    const DataStreamConfigLockRequest& req) {
+ARC<C>::do_min_rf_port_config_locks(const std::string id,
+    const RFPortConfigLockRequest& req) {
   bool ret = true;
-  throw_if_data_stream_lock_request_malformed(req);
-  if(ret) {
+  throw_if_rf_port_lock_request_malformed(req);
+  if (ret) {
     auto val = req.get_direction();
     ret = lock_config(id, (int32_t) val, config_key_direction, false, 0);
   }
-  if(ret) {
-    const config_value_t& val = req.get_tuning_freq_MHz();
-    const config_value_t& tol = req.get_tolerance_tuning_freq_MHz();
-    if(not lock_config(id, val, config_key_tuning_freq_MHz, true, tol)) {
+  if (ret) {
+    const double& val = req.get_tuning_freq_MHz();
+    const double& tol = req.get_tolerance_tuning_freq_MHz();
+    if (!lock_config(id, val, config_key_tuning_freq_MHz, true, tol)) {
       // unroll
       unlock_config(id, config_key_direction);
       ret = false;
     }
   }
-  if(ret) {
-    const config_value_t& val = req.get_bandwidth_3dB_MHz();
-    const config_value_t& tol = req.get_tolerance_bandwidth_3dB_MHz();
-    if(not lock_config(id, val, config_key_bandwidth_3dB_MHz, true, tol)) {
+  if (ret) {
+    const double& val = req.get_bandwidth_3dB_MHz();
+    const double& tol = req.get_tolerance_bandwidth_3dB_MHz();
+    if (!lock_config(id, val, config_key_bandwidth_3dB_MHz, true, tol)) {
       // unroll
       unlock_config(id, config_key_direction);
       unlock_config(id, config_key_tuning_freq_MHz);
@@ -707,305 +665,240 @@ ARC<C>::do_min_data_stream_config_locks(const data_stream_id_t id,
 }
 
 template<class C> bool
-ARC<C>::config_val_is_within_tolerance(config_value_t expected_val,
-    config_value_t tolerance, config_value_t val) const {
+ARC<C>::config_val_is_within_tolerance(double expected_val,
+    double tolerance, double val) const {
   return std::abs(val - expected_val) <= tolerance;
 }
 
 template<class C> void
-ARC<C>::throw_if_data_stream_disabled_for_read(
-    const data_stream_id_t& ds_id,
-    const char* config_description) const {
-  if(not get_enabled(ds_id)) {
-    std::ostringstream oss;
-    oss << "requested read of " << config_description << " for disabled ";
-    oss << ds_id << " data stream";
-    throw oss.str();
-  }
-}
-
-template<class C> void
-ARC<C>::throw_if_data_stream_disabled_for_write(
-    const data_stream_id_t& ds_id,
-    const char* config_description) const {
-  if(not get_enabled(ds_id)) {
-    std::ostringstream oss;
-    oss << "requested write of " << config_description << " for disabled ";
-    oss << ds_id << " data stream";
-    throw oss.str();
-  }
-}
-
-template<class C> void
-ARC<C>::throw_invalid_data_stream_id(data_stream_id_t data_stream_id) const {
-  throw std::string("invalid data stream id ") + data_stream_id;
+ARC<C>::throw_invalid_rf_port_name(std::string rf_port_name) const {
+  throw std::string("invalid rf_port_name: ") + rf_port_name;
 }
 
 template<class C>
 DRC<C>::DRC(const char* descriptor) : ARC<C>(descriptor) {
 }
 
+template<class C> const std::string&
+DRC<C>::get_error() const {
+  return this->m_configurator.get_error();
+}
+
 template<class C> void
 DRC<C>::initialize_cache() {
   ARC<C>::initialize_cache();
-  auto it = this->m_configurator.get_data_stream_ids().begin();
-  for(; it!=this->m_configurator.get_data_stream_ids().end(); ++it) {
+  auto it = this->m_configurator.get_rf_port_names().begin();
+  for (; it!=this->m_configurator.get_rf_port_names().end(); ++it) {
     m_cache_sampling_rate_Msps[ *it] = get_sampling_rate_Msps( *it);
     m_cache_samples_are_complex[*it] = get_samples_are_complex(*it);
     m_cache_gain_mode[          *it] = get_gain_mode(          *it);
     m_cache_gain_dB[            *it] = get_gain_dB(            *it);
   }
-  log_debug("drc:    **************** initializing cache");
-  it = this->m_configurator.get_data_stream_ids().begin();
-  for(; it!=this->m_configurator.get_data_stream_ids().end(); ++it) {
+  this->log_info("initializing cache");
+  it = this->m_configurator.get_rf_port_names().begin();
+  for (; it!=this->m_configurator.get_rf_port_names().end(); ++it) {
     std::string tmp = "rx";
-    if(this->m_cache_direction[*it] == data_stream_direction_t::tx) {
+    if (this->m_cache_direction[*it] == rf_port_direction_t::tx)
       tmp = "tx";
-    }
-    this->log_debug("cache.direction           [%s]=%s",*it,tmp);
-    config_value_t val = this->m_cache_tuning_freq_MHz[    *it]);
-    this->log_debug("cache.tuning_freq_MHz     [%s]=%d",*it,val);
-    val = this->m_cache_bandwidth_3dB_MHz[  *it]);
-    this->log_debug("cache.bandwidth_3dB_MHz   [%s]=%d",*it,val);
-    val = this->m_cache_sampling_rate_Msps[ *it]);
-    this->log_debug("cache.sampling_rate_Msps  [%s]=%d",*it,val);
-    val = this->m_cache_samples_are_complex[*it]);
-    this->log_debug("cache.samples_are_complex [%s]=%d",*it,val);
-    val = this->m_cache_gain_mode[          *it]);
-    this->log_debug("cache.gain_mode           [%s]=%d",*it,val);
-    val = this->m_cache_gain_dB[            *it]);
-    this->log_debug("cache.gain_dB             [%s]=%d",*it,val);
+    this->log_info("cache.direction           [%s]=%s",it->c_str(),tmp.c_str());
+    double val = this->m_cache_tuning_freq_MHz[    *it];
+    this->log_info("cache.tuning_freq_MHz     [%s]=%f",it->c_str(),val);
+    val = this->m_cache_bandwidth_3dB_MHz[  *it];
+    this->log_info("cache.bandwidth_3dB_MHz   [%s]=%f",it->c_str(),val);
+    val = this->m_cache_sampling_rate_Msps[ *it];
+    this->log_info("cache.sampling_rate_Msps  [%s]=%f",it->c_str(),val);
+    int ival = this->m_cache_samples_are_complex[*it] ? 1 : 0;
+    this->log_info("cache.samples_are_complex [%s]=%i",it->c_str(),ival);
+    std::string& str = this->m_cache_gain_mode[   *it];
+    this->log_info("cache.gain_mode           [%s]=%s",it->c_str(),str.c_str());
+    val = this->m_cache_gain_dB[            *it];
+    this->log_info("cache.gain_dB             [%s]=%f",it->c_str(),val);
   }
 }
 
 template<class C> bool
-DRC<C>::request_config_lock(
-    const config_lock_id_t   config_lock_ID,
-    const ConfigLockRequest& config_lock_request) {
-  if(!this->m_cache_initialized) {
+DRC<C>::request_config_lock(std::string id,const ConfigLockRequest& req) {
+  if (!this->m_cache_initialized) {
     initialize_cache();
     this->m_cache_initialized = true;
   }
-#ifdef IS_LOCKING
-  ///@TODO probably want to add back the readback check for ensuring tolerance requirements are met (e.g. No-OS tx_attenuation)
   ConfigLock config_lock;
-  config_lock.m_config_lock_ID = config_lock_ID;
+  config_lock.m_config_lock_id = id;
   bool configurator_config_lock_request_was_successful = false;
-  auto it = config_lock_request.m_data_streams.begin();
-  for(; it != config_lock_request.m_data_streams.end(); it++) {
-    throw_if_data_stream_lock_request_malformed(*it);
-    std::vector<data_stream_id_t> data_streams;
-    if(it->get_including_data_stream_direction()) {
-      if(it->get_including_data_stream_id()) {
-        data_streams.push_back(it->get_data_stream_id());
+  for (auto it = req.m_rf_ports.begin(); it != req.m_rf_ports.end(); ++it) {
+    throw_if_rf_port_lock_request_malformed(*it);
+    std::vector<std::string> rf_ports;
+    if (it->get_including_direction()) {
+      if (it->get_including_rf_port_name()) {
+        rf_ports.push_back(it->get_rf_port_name());
       }
       else {
-        auto id = config_lock_ID;
         std::string dd = "tx";
-        dd = (it->get_direction() == data_stream_direction_t::rx ? "rx" : dd);
+        dd = (it->get_direction() == rf_port_direction_t::rx ? "rx" : dd);
         this->log_info("request ID: %s direction: %s", id.c_str(), dd.c_str());
-        this->m_configurator.find_data_streams_which_support_direction(
-            it->get_direction(), data_streams);
-        if(data_streams.empty()) {
-          // configurator did not have any data streams of the requested data
-          // stream type
+        this->m_configurator.find_rf_ports_which_support_direction(
+            it->get_direction(), rf_ports);
+        // if empty, configurator did not have any RF ports of the requested
+        // direction
+        if (rf_ports.empty())
           return false;
-        }
       }
     }
-    else {
-      data_streams.push_back(it->get_data_stream_id());
-    }
+    else
+      rf_ports.push_back(it->get_rf_port_name());
     bool found_lock = false;
-    auto it_found_streams = data_streams.begin();
-    for(; it_found_streams != data_streams.end(); it_found_streams++) {
-      if(not this->get_enabled(*it_found_streams)) {
-        if(it->get_including_data_stream_id()) {
+    auto it_found_ports = rf_ports.begin();
+    for (; it_found_ports != rf_ports.end(); ++it_found_ports) {
+      if (!this->get_enabled(*it_found_ports)) {
+        if (it->get_including_rf_port_name()) {
           std::ostringstream oss;
-          oss << "requested config lock specifically for data stream ID ";
-          oss << it_found_streams->c_str() << ", which is not currently ";
-          oss << "enabled";
+          oss << "requested config lock specifically for rf_port_name ";
+          oss << *it_found_ports << ", which is not currently enabled";
           throw oss.str();
         }
         continue;
       }
-      found_lock |= do_min_data_stream_config_locks(*it_found_streams, *it);
-      const char* ds = it_found_streams->c_str();
-      if(found_lock) {
-        this->log_info("stream %s met lock request requirements\n", ds);
-        DataStreamConfigLock lock;
-        lock.m_data_stream_id      = ds;
+      found_lock |= do_min_rf_port_config_locks(*it_found_ports, *it);
+      const char* port = it_found_ports->c_str();
+      if (found_lock) {
+        this->log_info("rf_port_name %s met lock requirements\n", port);
+        RFPortConfigLock lock;
+        lock.m_rf_port_name        = port;
         lock.m_direction           = it->get_direction();
         lock.m_tuning_freq_MHz     = it->get_tuning_freq_MHz();
         lock.m_bandwidth_3dB_MHz   = it->get_bandwidth_3dB_MHz();
         lock.m_sampling_rate_Msps  = it->get_sampling_rate_Msps();
         lock.m_samples_are_complex = it->get_samples_are_complex();
-        if(it->get_including_gain_mode()) {
+        if (it->get_including_gain_mode()) {
           lock.m_gain_mode         = it->get_gain_mode();
           lock.m_including_gain_mode = true;
         }
-        else {
+        else
           lock.m_including_gain_mode = false;
-        }
-        if(it->get_including_gain_dB()) {
+        if (it->get_including_gain_dB()) {
           lock.m_gain_dB           = it->get_gain_dB();
           lock.m_including_gain_dB = true;
         }
-        else {
+        else
           lock.m_including_gain_dB = false;
-        }
-        config_lock.m_data_streams.push_back(lock);
+        config_lock.m_rf_ports.push_back(lock);
         break;
       }
-      this->log_info("stream %s did not meet lock request requirements\n", ds);
+      this->log_info("rf_port_name  %s did not meet requirements\n", port);
     }
-    if(not found_lock) {
+    if (!found_lock) {
       configurator_config_lock_request_was_successful = false;
       break;
     }
     configurator_config_lock_request_was_successful = true;
   }
-  if(configurator_config_lock_request_was_successful) {
+  if (configurator_config_lock_request_was_successful) {
     this->m_config_locks.push_back(config_lock);
-    this->log_info("request lock %s succeeded\n", config_lock_ID.c_str());
+    this->log_info("request lock %s succeeded\n", id.c_str());
     return true;
   }
   else { // unroll
-    auto i2 = config_lock.m_data_streams.begin();
-    for(; i2 != config_lock.m_data_streams.end(); ++i2) {
-      this->unlock_config(i2->m_data_stream_id, config_key_direction);
-      this->unlock_config(i2->m_data_stream_id, config_key_tuning_freq_MHz);
-      this->unlock_config(i2->m_data_stream_id, config_key_bandwidth_3dB_MHz);
-      this->unlock_config(i2->m_data_stream_id, config_key_sampling_rate_Msps);
-      this->unlock_config(i2->m_data_stream_id, config_key_samples_are_complex);
-      if(i2->m_including_gain_mode) {
-        this->unlock_config(i2->m_data_stream_id, config_key_gain_mode);
-      }
-      if(i2->m_including_gain_dB) {
-        this->unlock_config(i2->m_data_stream_id, config_key_gain_dB);
-      }
+    auto i2 = config_lock.m_rf_ports.begin();
+    for (; i2 != config_lock.m_rf_ports.end(); ++i2) {
+      this->unlock_config(i2->m_rf_port_name, config_key_direction);
+      this->unlock_config(i2->m_rf_port_name, config_key_tuning_freq_MHz);
+      this->unlock_config(i2->m_rf_port_name, config_key_bandwidth_3dB_MHz);
+      this->unlock_config(i2->m_rf_port_name, config_key_sampling_rate_Msps);
+      this->unlock_config(i2->m_rf_port_name, config_key_samples_are_complex);
+      if (i2->m_including_gain_mode)
+        this->unlock_config(i2->m_rf_port_name, config_key_gain_mode);
+      if (i2->m_including_gain_dB)
+        this->unlock_config(i2->m_rf_port_name, config_key_gain_dB);
     }
   }
-#endif
   return false;
 }
 
 template<class C> void
-DRC<C>::unlock_config_lock(const config_lock_id_t config_lock_ID) {
-#ifdef IS_LOCKING
-  //std::cout << "drc: unlock_config_lock: id=" << config_lock_ID << "\n";
+DRC<C>::unlock_config_lock(std::string id) {
   bool found_config_lock = false;
   auto itcl = this->m_config_locks.begin();
-  for(; itcl != this->m_config_locks.end(); itcl++) {
-    if(itcl->m_config_lock_ID.compare(config_lock_ID) == 0) {
-      //std::cout << "drc: unlock_config_lock: found id=" << config_lock_ID << "\n";
+  for (; itcl != this->m_config_locks.end(); itcl++) {
+    if (itcl->m_config_lock_id.compare(id) == 0) {
       found_config_lock = true;
-      auto itds = itcl->m_data_streams.begin();
-      for(; itds != itcl->m_data_streams.end(); itds++) {
-        this->unlock_config(  itds->m_data_stream_id, config_key_direction);
-        this->unlock_config(  itds->m_data_stream_id, config_key_tuning_freq_MHz);
-        this->unlock_config(  itds->m_data_stream_id, config_key_bandwidth_3dB_MHz);
-        this->unlock_config(  itds->m_data_stream_id, config_key_sampling_rate_Msps);
-        this->unlock_config(  itds->m_data_stream_id, config_key_samples_are_complex);
-        if(itds->m_including_gain_mode) {
-          this->unlock_config(itds->m_data_stream_id, config_key_gain_mode);
-        }
-        if(itds->m_including_gain_dB) {
-          this->unlock_config(itds->m_data_stream_id, config_key_gain_dB);
-        }
+      auto itrf = itcl->m_rf_ports.begin();
+      for (; itrf != itcl->m_rf_ports.end(); itrf++) {
+        auto& itrf_id = itrf->m_rf_port_name;
+        this->unlock_config(  itrf_id, config_key_direction);
+        this->unlock_config(  itrf_id, config_key_tuning_freq_MHz);
+        this->unlock_config(  itrf_id, config_key_bandwidth_3dB_MHz);
+        this->unlock_config(  itrf_id, config_key_sampling_rate_Msps);
+        this->unlock_config(  itrf_id, config_key_samples_are_complex);
+        if (itrf->m_including_gain_mode)
+          this->unlock_config(itrf_id, config_key_gain_mode);
+        if (itrf->m_including_gain_dB)
+          this->unlock_config(itrf_id, config_key_gain_dB);
       }
       this->m_config_locks.erase(itcl);
       break;
     }
   }
-  if(not found_config_lock) {
+  if (!found_config_lock) {
     std::ostringstream oss;
-    oss << "for config unlock request, config lock ID " << config_lock_ID;
-    oss << " not found";
+    oss << "for config unlock request, config lock ID " << id << " not found";
     throw oss.str();
   }
-#endif
 }
 
 template<class C> bool
-DRC<C>::lock_config(data_stream_id_t ds_id, config_value_t val,
-    config_key_t cfg, bool do_tol, config_value_t tol) {
+DRC<C>::lock_config(std::string rf_port_name, double val,
+    std::string cfg, bool do_tol, double tol) {
   bool did_lock = false;
-#ifdef IS_LOCKING
-  // the configurator, which is a software emulation of hardware capabilties,
+  // the configurator, which is a software emulation of hardware capabilities,
   // tells us whether a hardware attempt to set value will corrupt
   // any existing locks
   did_lock = do_tol ?
-    this->m_configurator.lock_config(ds_id, cfg, val, tol) :
-    this->m_configurator.lock_config(ds_id, cfg, val);
-  if(did_lock) {
-#if 0
-    std::ostringstream oss;
-    oss << "configurator: lock succeeded for config " << cfg;
-    oss << " for requested value of " << val << " with tolerance of +/- ";
-    oss << tol << "\n";
-    printf(oss.str().c_str());
-#endif
-    config_value_t cfglval;
-    cfglval = this->m_configurator.get_config_locked_value(ds_id, cfg);
-    if(cfg == config_key_sampling_rate_Msps) {
-      if(std::abs(m_cache_sampling_rate_Msps[ds_id]-cfglval) > tol) {
-        //std::cout << "drc: cache invalid, upating sampling_rate_Msps\n";
-        set_sampling_rate_Msps(ds_id, cfglval);
-        m_cache_sampling_rate_Msps[ds_id] = cfglval;
+    this->m_configurator.lock_config(rf_port_name, cfg, val, tol) :
+    this->m_configurator.lock_config(rf_port_name, cfg, val);
+  if (did_lock) {
+    double cfglval;
+    cfglval = this->m_configurator.get_config_locked_value(rf_port_name, cfg);
+    if (cfg == config_key_sampling_rate_Msps) {
+      if (std::abs(m_cache_sampling_rate_Msps[rf_port_name]-cfglval) > tol) {
+        set_sampling_rate_Msps(rf_port_name, cfglval);
+        m_cache_sampling_rate_Msps[rf_port_name] = cfglval;
       }
     }
-    else if(cfg == config_key_samples_are_complex) {
+    else if (cfg == config_key_samples_are_complex) {
       bool tmp = (((int32_t)cfglval) == 1);
-      if(m_cache_samples_are_complex[ds_id] != tmp) {
-        //std::cout << "drc: cache invalid, upating samples_are_complex\n";
-        set_samples_are_complex(ds_id, tmp);
-        m_cache_samples_are_complex[ds_id] = tmp;
+      if (m_cache_samples_are_complex[rf_port_name] != tmp) {
+        set_samples_are_complex(rf_port_name, tmp);
+        m_cache_samples_are_complex[rf_port_name] = tmp;
       }
     }
-    else if(cfg == config_key_gain_mode) {
-      //auto agc = gain_mode_value_t::agc;
-      //auto man = gain_mode_value_t::manual;
-      gain_mode_value_t tmp = (((int32_t)cfglval) == 0 ? "agc" : "manual");
-      if(m_cache_gain_mode[ds_id] != tmp) {
-        //std::cout << "drc: cache invalid, upating gain_mode\n";
-        set_gain_mode(ds_id, tmp);
-        m_cache_gain_mode[ds_id] = tmp;
+    else if (cfg == config_key_gain_mode) {
+      std::string tmp = (((int32_t)cfglval) == 0 ? "agc" : "manual");
+      if (m_cache_gain_mode[rf_port_name] != tmp) {
+        set_gain_mode(rf_port_name, tmp);
+        m_cache_gain_mode[rf_port_name] = tmp;
       }
     }
-    else if(cfg == config_key_gain_dB) {
-      if(std::abs(m_cache_gain_dB[ds_id]-cfglval) > tol) {
-        //std::cout << "drc: cache invalid, upating gain_dB\n";
-        set_gain_dB(ds_id, cfglval);
-        m_cache_gain_dB[ds_id] = cfglval;
+    else if (cfg == config_key_gain_dB) {
+      if (std::abs(m_cache_gain_dB[rf_port_name]-cfglval) > tol) {
+        set_gain_dB(rf_port_name, cfglval);
+        m_cache_gain_dB[rf_port_name] = cfglval;
       }
     }
   }
-#if 0
-  else {
-    std::ostringstream oss;
-    oss << "configurator: lock failed for config " << cfg;
-    oss << " for attempted lock value of " << val;
-    oss << " with tolerance of +/- " << tol << "\n";
-    printf(oss.str().c_str());
-  }
-#endif
-#endif // IS_LOCKING
   return did_lock;
 }
 
 template<class C> bool
-DRC<C>::do_min_data_stream_config_locks(const data_stream_id_t id,
-    const DataStreamConfigLockRequest& req) {
-#ifdef IS_LOCKING
-  throw_if_data_stream_lock_request_malformed(req);
+DRC<C>::do_min_rf_port_config_locks(const std::string id,
+    const RFPortConfigLockRequest& req) {
+  throw_if_rf_port_lock_request_malformed(req);
   // first perform all the analog-specific config locks
-  bool ret = ARC<C>::do_min_data_stream_config_locks(id, req);
+  bool ret = ARC<C>::do_min_rf_port_config_locks(id, req);
   // second perform all the digital-specific config locks
-  if(ret) {
-    config_value_t val = req.get_sampling_rate_Msps();
-    config_value_t tol = req.get_tolerance_sampling_rate_Msps();
-    if(not lock_config(id, val, config_key_sampling_rate_Msps, true, tol)) {
+  if (ret) {
+    double val = req.get_sampling_rate_Msps();
+    double tol = req.get_tolerance_sampling_rate_Msps();
+    if (!lock_config(id, val, config_key_sampling_rate_Msps, true, tol)) {
       // unroll
       this->unlock_config(id, config_key_direction);
       this->unlock_config(id, config_key_tuning_freq_MHz);
@@ -1013,9 +906,9 @@ DRC<C>::do_min_data_stream_config_locks(const data_stream_id_t id,
       ret = false;
     }
   }
-  if(ret) {
-    config_value_t val = (config_value_t)req.get_samples_are_complex();
-    if(not lock_config(id, val, config_key_samples_are_complex, false, 0)) {
+  if (ret) {
+    double val = (double)req.get_samples_are_complex();
+    if (!lock_config(id, val, config_key_samples_are_complex, false, 0)) {
       // unroll
       this->unlock_config(id, config_key_direction);
       this->unlock_config(id, config_key_tuning_freq_MHz);
@@ -1024,9 +917,9 @@ DRC<C>::do_min_data_stream_config_locks(const data_stream_id_t id,
       ret = false;
     }
   }
-  if(ret && req.get_including_gain_mode()) {
-    config_value_t val = req.get_gain_mode() == "agc" ? 0 : 1;
-    if(not lock_config(id, val, config_key_gain_mode, false, 0)) {
+  if (ret && req.get_including_gain_mode()) {
+    double val = req.get_gain_mode() == "agc" ? 0 : 1;
+    if (!lock_config(id, val, config_key_gain_mode, false, 0)) {
       this->unlock_config(id, config_key_direction);
       this->unlock_config(id, config_key_tuning_freq_MHz);
       this->unlock_config(id, config_key_bandwidth_3dB_MHz);
@@ -1035,10 +928,10 @@ DRC<C>::do_min_data_stream_config_locks(const data_stream_id_t id,
       ret = false;
     }
   }
-  if(ret && req.get_including_gain_dB()) {
-    config_value_t val = req.get_gain_dB();
-    config_value_t tol = req.get_tolerance_gain_dB();
-    if(not lock_config(id, val, config_key_gain_dB, true, tol)) {
+  if (ret && req.get_including_gain_dB()) {
+    double val = req.get_gain_dB();
+    double tol = req.get_tolerance_gain_dB();
+    if (!lock_config(id, val, config_key_gain_dB, true, tol)) {
       this->unlock_config(id, config_key_direction);
       this->unlock_config(id, config_key_tuning_freq_MHz);
       this->unlock_config(id, config_key_bandwidth_3dB_MHz);
@@ -1049,35 +942,30 @@ DRC<C>::do_min_data_stream_config_locks(const data_stream_id_t id,
     }
   }
   //std::cout << "[INFO] " << m_solver.get_feasible_region_limits() << "\n";
-#endif
   return ret;
 }
 
 template<class C> void
-DRC<C>::throw_if_data_stream_lock_request_malformed(
-    const DataStreamConfigLockRequest& req) const {
+DRC<C>::throw_if_rf_port_lock_request_malformed(
+    const RFPortConfigLockRequest& req) const {
   // first check all the analog-specific config locks
-  ARC<C>::throw_if_data_stream_lock_request_malformed(req);
+  ARC<C>::throw_if_rf_port_lock_request_malformed(req);
   // second check all the digital-specific config locks
-  if(not req.get_including_sampling_rate_Msps()) {
+  if (!req.get_including_sampling_rate_Msps())
     throw std::string("DRC request malformed: missing sampling_rate_Msps");
-  }
-  if(not req.get_including_samples_are_complex()) {
+  if (!req.get_including_samples_are_complex())
     throw std::string("DRC request malformed: missing samples_are_complex");
-  }
-  if(req.get_including_gain_dB()) {
-    if(not req.get_including_gain_mode()) {
+  if (req.get_including_gain_dB()) {
+    if (!req.get_including_gain_mode()) {
       throw std::string("DRC request malformed: included gain_dB, not mode");
     }
-    else if(req.get_gain_mode() == "agc") {//gain_mode_value_t::agc)
+    else if (req.get_gain_mode() == "agc")
       throw std::string("DRC request malformed: included gain_dB, not manual");
-    }
   }
 }
 
 template<class C> bool
 DRC<C>::prepare(unsigned config, const ConfigLockRequest& req) {
-  //std::cout << "drc: prepare: config " << config << "\n";
   bool ret = request_config_lock(std::to_string(config), req);
   this->m_requests[config] = req;
   return ret;
@@ -1086,33 +974,28 @@ DRC<C>::prepare(unsigned config, const ConfigLockRequest& req) {
 template<class C> bool
 DRC<C>::start(unsigned config) {
   bool ret = true;
-  //std::cout << "drc: start: config " << config << "\n";
   auto it = this->m_config_locks.begin();
-  for(; it != this->m_config_locks.end(); ++it) {
-    bool prepared = !(it->m_config_lock_ID.compare(std::to_string(config)));
-    if(!prepared) {
+  for (; it != this->m_config_locks.end(); ++it) {
+    bool prepared = !(it->m_config_lock_id.compare(std::to_string(config)));
+    if (!prepared) {
       ret = this->prepare(config, this->m_requests[config]);
       break;
     }
   }
-  //std::cout << "drc: start: config " << config << " ret = " << (ret ? "tt" : "ff") << "\n";
   return ret;
 }
 
 template<class C> bool
 DRC<C>::stop(unsigned /*config*/) {
-  //std::cout << "drc: stop: config " << config << "\n";
   return true;
 }
 
 template<class C> bool
 DRC<C>::release(unsigned config) {
-  //std::cout << "drc: release: config " << config << "\n";
   auto it = this->m_config_locks.begin();
-  for(; it != this->m_config_locks.end(); ++it) {
-    //std::cout << "drc: release: config_lock_ID = " << it->m_config_lock_ID << "\n";
-    bool config_prepared = !(it->m_config_lock_ID.compare(std::to_string(config)));
-    if(config_prepared) {
+  for (; it != this->m_config_locks.end(); ++it) {
+    bool cfg_prepared = !(it->m_config_lock_id.compare(std::to_string(config)));
+    if (cfg_prepared) {
       this->unlock_config_lock(std::to_string(config));
       break;
     }
