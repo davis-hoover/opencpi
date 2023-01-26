@@ -1,0 +1,99 @@
+<!-- This file is protected by Copyright. Please refer to the COPYRIGHT file
+     distributed with this source distribution.
+
+     This file is part of OpenCPI <http://www.opencpi.org>
+
+     OpenCPI is free software: you can redistribute it and/or modify it under
+     the terms of the GNU Lesser General Public License as published by the Free
+     Software Foundation, either version 3 of the License, or (at your option)
+     any later version.
+
+     OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
+     WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+     FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+     more details.
+
+     You should have received a copy of the GNU Lesser General Public License
+     along with this program. If not, see <http://www.gnu.org/licenses/>. -->
+<!-- The calibration_application application xml file -->
+<Application>
+
+  <Instance Component="ocpi.platform.drc">
+    <property name='configurations'
+              Value="{description first,
+                      channels {
+				{rx true,
+                                 tuning_freq_MHz 2450,
+                                 bandwidth_3dB_MHz 4,
+                                 sampling_rate_Msps 4,
+                                 samples_are_complex true,
+                                 gain_mode auto,
+                                 tolerance_tuning_freq_MHz 0.01,
+                                 tolerance_sampling_rate_Msps 0.01,
+                                 tolerance_gain_dB 1},
+                                {rx false,
+                                 tuning_freq_MHz 2450,
+                                 bandwidth_3dB_MHz 4,
+                                 sampling_rate_Msps 4,
+                                 samples_are_complex true,
+                                 gain_mode manual,gain_dB -30,
+                                 tolerance_bandwidth_3dB_MHz 0,
+                                 tolerance_tuning_freq_MHz 0.01,
+                                 tolerance_sampling_rate_Msps 0.01,
+				 tolerance_gain_dB 1},
+	      			{rx true,
+                                 tuning_freq_MHz 2450,
+                                 bandwidth_3dB_MHz 4,
+                                 sampling_rate_Msps 4,
+                                 samples_are_complex true,
+                                 gain_mode auto,
+                                 tolerance_tuning_freq_MHz 0.01,
+                                 tolerance_sampling_rate_Msps 0.01,
+                                 tolerance_gain_dB 1},
+                                {rx false,
+                                 tuning_freq_MHz 2450,
+                                 bandwidth_3dB_MHz 4,
+                                 sampling_rate_Msps 4,
+                                 samples_are_complex true,
+                                 gain_mode manual,gain_dB -30,
+                                 tolerance_bandwidth_3dB_MHz 0,
+                                 tolerance_tuning_freq_MHz 0.01,
+                                 tolerance_sampling_rate_Msps 0.01,
+				 tolerance_gain_dB 1}
+						}
+					}"/>
+    <property name='start' value='0'/>
+  </Instance>
+
+  <Instance Component="ocpi.platform.ad9361_prbs_test_xs" Name="prbs_test0">
+    <property name="time_out" value="500"/>
+  </Instance>
+
+  <Connection>
+    <Port Instance="drc" Name="rx" index="0"/>
+    <Port Instance="prbs_test0" Name="input"/>
+  </Connection> 
+  <Instance Component="ocpi.platform.ad9361_prbs_test_xs" Name="prbs_test1">
+    <property name="time_out" value="500"/>
+  </Instance>
+
+  <Connection>
+    <Port Instance="drc" Name="rx" index="1"/>
+    <Port Instance="prbs_test1" Name="input"/>
+  </Connection> 
+
+  <Instance Component="ocpi.platform.ad9361_prbs_gen_xs" Name="prbs_gen0">
+    <property name="mode" value="1"/>
+  </Instance>
+  <Connection>
+    <Port Instance="drc" Name="tx" index="0"/>
+    <Port Instance="prbs_gen0" Name="output"/>
+  </Connection> 
+  <Instance Component="ocpi.platform.ad9361_prbs_gen_xs" Name="prbs_gen1">
+    <property name="mode" value="1"/>
+  </Instance>
+  <Connection>
+    <Port Instance="drc" Name="tx" index="1"/>
+    <Port Instance="prbs_gen1" Name="output"/>
+  </Connection> 
+</Application>

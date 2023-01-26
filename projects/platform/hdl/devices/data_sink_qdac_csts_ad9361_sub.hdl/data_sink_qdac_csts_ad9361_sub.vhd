@@ -146,6 +146,17 @@ architecture rtl of worker is
   attribute equivalent_register_removal : string;
   attribute equivalent_register_removal of dacd2_processing_ch0 : signal is "no";
   attribute equivalent_register_removal of dacd2_processing_ch0_r : signal is "no";
+
+  -- CMOS only signals
+  signal oddr_tx_frame_rising    : std_logic := '0';
+  signal oddr_tx_frame_falling   : std_logic := '0';
+  signal oddr_data_rising        : std_logic_vector(data_width_from_pins-1 downto 0);
+  signal oddr_data_falling       : std_logic_vector(data_width_from_pins-1 downto 0);
+  signal tx_data_i               : dac_csts.dac_csts.array_data_t(0 to NUM_CHANS-1) := (others=> (others => '0'));
+  signal tx_data_q               : dac_csts.dac_csts.array_data_t(0 to NUM_CHANS-1) := (others=> (others => '0'));
+  signal tx_data_clk             : std_logic;
+
+
 begin
 
   -- these dev signals are used to (eventually) tell higher level proxy(ies)
@@ -249,15 +260,6 @@ begin
       --  end if;
       --end process;
       
-      -- From ADI's UG-570:
-      -- "For a system with a 2R1T or a 1R2T configuration, the clock
-      -- frequencies, bus transfer rates and sample periods, and data
-      -- capture timing are the same as if configured for a 2R2T system.
-      -- However, in the path with only a single channel used, the
-      -- disabled channel’s I-Q pair in each data group is unused."
-      wci_use_two_r_two_t_timing <= dev_cfg_data_in.config_is_two_r or
-                                    dev_cfg_data_tx_in.config_is_two_t or
-                                    dev_cfg_data_tx_in.force_two_r_two_t_timing;
 
       single_port_fdd_ddr_i : entity work.ad9361_dac_sub_cmos_single_port_fdd_ddr
         generic map(
@@ -282,6 +284,118 @@ begin
       dev_data_ch1_in_out.clk <= wsi_clk;
 
     end generate single_port_fdd_ddr;
+
+    -----------------------------------------------
+    --     Begin Dual Port, Full Duplex, DDR     --
+    -----------------------------------------------
+    dual_port_fdd_ddr : if (SINGLE_PORT_p = bfalse) and
+                           (HALF_DUPLEX_p = bfalse) and
+                           (DATA_RATE_CONFIG_p = DDR_e) generate
+
+      -- Process that sets the frame and data correctly
+      -- TODO - add 1rx mode and add wsi_clk driver and check for any other signals that are not driven
+      ODDRProcess : process (dev_data_clk_in.DATA_CLK_P)
+      begin
+         if (rising_edge(dev_data_clk_in.DATA_CLK_P)) then
+            if (wci_use_two_r_two_t_timing = '1') then
+               oddr_tx_frame_rising                <= not(oddr_tx_frame_rising);
+               oddr_tx_frame_falling               <= not(oddr_tx_frame_rising);
+
+               -- Set the data depending on what the tx_frame is going to be the next clock cycle
+               if (oddr_tx_frame_rising = '0') then
+                  oddr_data_falling                <= tx_data_q(0);
+                  oddr_data_rising                 <= tx_data_i(0);
+
+                  -- Create a clock for the wsi data, rising here will assure best timing
+                  tx_data_clk                      <= '1';
+               else
+                  -- Clock in the input data so it is coherent during both clock cycles
+                  -- That way it can change whichever clock cycle on the input and we are good
+                  tx_data_i                        <= wsi_data_i;
+                  tx_data_q                        <= wsi_data_q;
+
+                  oddr_data_falling                <= tx_data_q(1);
+                  oddr_data_rising                 <= tx_data_i(1);
+
+                  -- Lower tx data clock here
+                  tx_data_clk                      <= '0';
+               end if;
+
+            else
+
+               -- Frame is always high for the rising edge, low for the falling
+               oddr_tx_frame_rising                <= '1';
+               oddr_tx_frame_falling               <= '0';
+
+               -- This version is easy, I is on the rising, Q on the falling
+               oddr_data_rising                    <= wsi_data_i(0);
+               oddr_data_falling                   <= wsi_data_q(0);
+
+               -- Tx clock needs to be the same as the data clock
+
+            end if;
+            -- Forward the txen on
+            dev_txen_out.txen                      <= wsi_txen;
+
+         end if;
+      end process;
+
+      tx_frame_ddr : ODDR
+      generic map(
+         DDR_CLK_EDGE => "SAME_EDGE",
+         INIT         => '0',
+         SRTYPE       => "ASYNC")
+      port map(
+         Q  => TX_FRAME_P_s,
+         C  => dev_data_clk_in.DATA_CLK_P,
+         CE => '1',
+         D1  => oddr_tx_frame_rising,
+         D2  => oddr_tx_frame_falling,
+         R  => '0',
+         S  => '0');
+
+      -- I/Q serialization (I rising edge, Q falling edge)
+      buf_data_loop : for idx in (dac_width-1) downto 0 generate
+      begin
+      data_ddr : ODDR
+      generic map(
+         DDR_CLK_EDGE => "SAME_EDGE",
+         INIT         => '0',
+         SRTYPE       => "ASYNC")
+      port map(
+         Q  => dev_data_to_pins_out.data(idx),
+         C  => dev_data_clk_in.DATA_CLK_P,
+         CE => '1',
+         D1  => oddr_data_rising(idx),
+         D2  => oddr_data_falling(idx),
+         R  => '0',
+         S  => '0');
+      end generate;
+
+      -- Select the data clock depending on which mode we are in
+      clock_selector : entity work.clock_selector_with_async_select
+      port map
+      (
+         async_select                           => wci_use_two_r_two_t_timing,
+         clk_in0                                => dev_data_clk_in.DATA_CLK_P,
+         clk_in1                                => tx_data_clk,
+         clk_out                                => wsi_clk
+      );
+
+      dev_data_ch0_in_out.clk <= wsi_clk;
+      dev_data_ch1_in_out.clk <= wsi_clk;
+
+    end generate dual_port_fdd_ddr;
+
+    -- From ADI's UG-570:
+    -- "For a system with a 2R1T or a 1R2T configuration, the clock
+    -- frequencies, bus transfer rates and sample periods, and data
+    -- capture timing are the same as if configured for a 2R2T system.
+    -- However, in the path with only a single channel used, the
+    -- disabled channel’s I-Q pair in each data group is unused."
+    wci_use_two_r_two_t_timing <= dev_cfg_data_in.config_is_two_r or
+                                  dev_cfg_data_tx_in.config_is_two_t or
+                                  dev_cfg_data_tx_in.force_two_r_two_t_timing;
 
   end generate data_mode_cmos;
 
@@ -336,7 +450,7 @@ begin
     port map(
       src_rst => wci_reset,
       dst_clk => dacd2_clk,
-      dst_rst => dacd2_reset); 
+      dst_rst => dacd2_reset);
     
     -- sync (WCI clock domain) -> (DAC clock divided by 2
     -- domain), note that we don't care if WCI clock is much faster and bits are
@@ -517,7 +631,7 @@ begin
       ordy      => '1');
   --on_off0_out.clk <= wsi_clk;
 
-  wsi_in1_opcode <= 
+  wsi_in1_opcode <=
       protocol.tx_event.TXOFF when on_off1_in.opcode = tx_event_txOff_op_e else
       protocol.tx_event.TXON  when on_off1_in.opcode = tx_event_txOn_op_e  else
       protocol.tx_event.TXOFF;

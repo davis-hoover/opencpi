@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!-- This file is protected by Copyright. Please refer to the COPYRIGHT file
+     distributed with this source distribution.
+
+     This file is part of OpenCPI <http://www.opencpi.org>
+
+     OpenCPI is free software: you can redistribute it and/or modify it under
+     the terms of the GNU Lesser General Public License as published by the Free
+     Software Foundation, either version 3 of the License, or (at your option)
+     any later version.
+
+     OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
+     WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+     FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+     more details.
+
+     You should have received a copy of the GNU Lesser General Public License
+     along with this program. If not, see <http://www.gnu.org/licenses/>. -->
+<ComponentSpec>
+  <Property Name="mode"  Type="ushort" Writable="true" Default="0" />
+  <Property Name="time_out"  Type="ulong" Writable="true" Default="500" />
+  <Property Name="test_length"  Type="ulong" Writable="true" Default="1000000" />
+  <Property Name="result"  Type="ulong" Volatile="true" />
+  <Property Name="done" Type="bool" Volatile="true" />
+  <Property Name="go" Type="bool" Writable="true" Default="0" />
+  <Property Name="last_values" Type="ulong" arraylength="8" Volatile="true" />
+  <Property Name="last_values_store" Type="bool" Writable="true" Default="0" />
+  <Property Name="valid_counter" Type="ulong" Volatile="true" />
+  <Property Name="valid_data_counter" Type="ulong" Volatile="true" />
+  <Port Name="input" Producer="false" Protocol="complex_short_timed_sample-prot"/>
+</ComponentSpec>

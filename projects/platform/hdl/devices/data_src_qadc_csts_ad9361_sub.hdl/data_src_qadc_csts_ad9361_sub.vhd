@@ -94,6 +94,13 @@ architecture rtl of worker is
   signal wci_r2_samps_dropped_clear : std_logic := '0';
   signal wci_reset_n                : std_logic := '1';
   signal wci_channels_are_swapped   : std_logic := '0';
+  -- CMOS signals
+  signal adc_data_i1       : std_logic_vector(adc_width-1 downto 0);
+  signal adc_data_i1_r1    : std_logic_vector(adc_width-1 downto 0);
+  signal adc_data_q1       : std_logic_vector(adc_width-1 downto 0);
+  signal adc_data_i2       : std_logic_vector(adc_width-1 downto 0);
+  signal adc_data_q2       : std_logic_vector(adc_width-1 downto 0);
+  signal dual_port_clk     : std_logic;  
   -- AD9361 RX clock domain signals
   signal adc_clk_in   : std_logic := '0';
   signal adc_clk      : std_logic := '0';
@@ -396,77 +403,114 @@ begin
         end case;
       end if;
     end process;
+
+    adc_data_i(0)     <= adc_r1_i_rrrrrr when (adc_channels_are_swapped = bfalse) else adc_r2_i_rrrr;
+    adc_data_i(1)     <= adc_r2_i_rrrr   when (adc_channels_are_swapped = bfalse) else adc_r1_i_rrrrrr;
+    adc_data_q(0)     <= adc_r1_q_rrrrrr when (adc_channels_are_swapped = bfalse) else adc_r2_q_rrrr;
+    adc_data_q(1)     <= adc_r2_q_rrrr   when (adc_channels_are_swapped = bfalse) else adc_r1_q_rrrrrr;
+    adc_data_vld(0)   <= adc_r1_give_rrrrrr when (adc_channels_are_swapped = bfalse) else adc_r2_give_rrrr;
+    adc_data_vld(1)   <= adc_r2_give_rrrr   when (adc_channels_are_swapped = bfalse) else adc_r1_give_rrrrrr;
+
+   sample_clk_gen : entity work.one_sample_clock_per_adc_sample_generator
+    generic map(
+      NUM_CHANS                  => NUM_CHANS,
+      FIRST_DIVIDER_TYPE         => "REGISTER",
+      FIRST_DIVIDER_ROUTABILITY  => "GLOBAL",
+      SECOND_DIVIDER_TYPE        => "REGISTER",
+      SECOND_DIVIDER_ROUTABILITY => "GLOBAL")
+    port map(
+    -- to/from data_interleaver
+    someclk_data_i             => adc_data_i,
+    someclk_data_q             => adc_data_q,
+    someclk_data_vld           => adc_data_vld,
+    -- clock handling
+    adc_clk                    => adc_clk,
+    -- to/from supported worker
+    worker_present             => worker_present,
+    wci_use_two_r_two_t_timing => wci_use_two_r_two_t_timing,
+    sample_clk                 => sample_clk,
+    sample_data_out_i          => sample_data_i,
+    sample_data_out_q          => sample_data_q,
+    sample_data_out_valid      => sample_data_valid);
+
     end generate;
     ---------------------------------------------------------------------------
 
     ---------------------------------------------------------------------------
-    -- For CMOS SP Half duplex, CMOS DP Full Duplex
+    -- For CMOS DP Full Duplex
     -- delay r1 by 1 to align with r2
-    delay_r1_by_1_to_align_with_r2 : if (LVDS_p             = bfalse   and DATA_RATE_CONFIG_p = DDR_e)   and
-                                        ((SINGLE_PORT_p     = btrue    and HALF_DUPLEX_p     = btrue)   or
-                                         (SINGLE_PORT_p     = bfalse   and HALF_DUPLEX_p     = bfalse)) generate
-      delay_r1_by_1 : process(adc_clk)
+    delay_r1_by_1_to_align_with_r2 : if (LVDS_p            = bfalse   and DATA_RATE_CONFIG_p = DDR_e   and
+                                         SINGLE_PORT_p     = bfalse   and HALF_DUPLEX_p     = bfalse) generate
+      -- Convert from the ddr multiplexed data over to a parallel interface						 
+      MultiplexDDR2Parallel : process(adc_clk)
       begin
-        if rising_edge(adc_clk) then
-          -- In this case, rrrrrr is really only registered 5 times (not 6)
-          adc_r1_i_rrrrrr     <= adc_r1_i_rrrr;
-          adc_r1_q_rrrrrr     <= adc_r1_q_rrrr;
-          adc_r1_give_rrrrrr  <= adc_r1_give_rrrr;
-        end if;
+         if (rising_edge(adc_clk)) then
+            -- Proceed differently if 1 or 2 rx path
+            if (dev_cfg_data_in.config_is_two_r = '1') then
+
+               -- At the right time register those values to the current adc values
+               if (adc_rx_frame_p_buf_rising_rr = '1') then
+                  adc_data_q1                <= adc_ddr_out_rising_rr;
+               else
+                  adc_data_q2                <= adc_ddr_out_rising_rr;
+               end if;
+
+               if (adc_rx_frame_p_buf_falling_rr = '1') then
+                  adc_data_i1                <= adc_ddr_out_falling_rr;
+               else
+                  adc_data_i1_r1             <= adc_data_i1;
+                  adc_data_i2                <= adc_ddr_out_falling_rr;
+               end if;
+
+               -- Right after q2 has been registers, clock all values out so they are coherent
+               if (adc_rx_frame_p_buf_rising_rr = '1' and adc_rx_frame_p_buf_falling_rr = '0') then
+                  adc_data_i(0)              <= adc_data_i1_r1;
+                  adc_data_q(0)              <= adc_data_q1;
+                  adc_data_i(1)              <= adc_data_i2;
+                  adc_data_q(1)              <= adc_data_q2;
+               else
+               end if;
+
+               -- Create a data clock for the data that rises in the middle of the data to ensure the best timing
+               if (adc_rx_frame_p_buf_rising_rr = '1') then
+                  dual_port_clk              <= '0';
+               else
+                  dual_port_clk              <= '1';
+               end if;
+
+               sample_data_valid(0)          <= '1';
+               sample_data_valid(1)          <= worker_present(1);
+
+            else
+               -- At the right time register those values to the current adc values
+               adc_data_i1                   <= adc_ddr_out_falling_rr;
+               adc_data_i1_r1                <= adc_data_i1;
+               adc_data_q1                   <= adc_ddr_out_rising_rr;
+
+               -- Right after the second q1 has been clocked in, register all the values out so they are coherent
+               adc_data_i(0)                 <= adc_data_i1_r1;
+               adc_data_q(0)                 <= adc_data_q1;
+
+               sample_data_valid(0)          <= '1';
+               sample_data_valid(1)          <= '0';
+            end if;
+         end if;
       end process;
-      -- simultaneously handles both possible 1R1T and 2R2T timing diagrams from
-      -- AD9361_Reference_Manual_UG-570.pdf Figure 79.
-      data_ingest_fsm : process(adc_clk)
-      begin
-        if rising_edge(adc_clk) then
-          case state is
-            when R1_11_6 | R1_5_0  =>
-              adc_r1_give_rrrr <= '0';
-              adc_r2_give_rrrr <= '0';
 
-              -- this is why we set rx_frame_usage_is_toggle to btrue above
-              if (adc_rx_frame_p_buf_rising_rr = '1') then
-                adc_r1_i_rrrr <= adc_ddr_out_rising_rr;
-                adc_r1_q_rrrr <= adc_ddr_out_falling_rr;
+      -- Select the right clock for the data depending on if in dual rx mode or not
+      clock_selector : entity work.clock_selector_with_async_select
+      port map
+      (
+         async_select                        => dev_cfg_data_in.config_is_two_r,
+         clk_in0                             => adc_clk,
+         clk_in1                             => dual_port_clk,
+         clk_out                             => sample_clk
+      );
 
-                adc_r1_give_rrrr <= r1_worker_present;
+      -- Sample data is equal to the registers adc data
+      sample_data_i                          <= adc_data_i;
+      sample_data_q                          <= adc_data_q;
 
-                -- if valid first channel samples are received but there is no
-                -- qadc worker to ingest them, detect the error
-                adc_r1_samps_dropped <= not r1_worker_present;
-
-              end if;
-
-              -- this is why we set rx_frame_usage_is_toggle to btrue above
-              if (adc_rx_frame_p_buf_falling_rr = '1') then
-                -- if we finish this state in with rx_frame still high, we are not in 1R1T mode
-                --   --> move to R2 state next to handle R2 channel
-                state <= R2_11_6;
-                -- otherwise, we are in 1R1T mode --> stay in R1 state
-              end if;
-
-            when R2_11_6 | R2_5_0 =>
-              adc_r2_i_rrrr <= adc_ddr_out_rising_rr;
-              adc_r2_q_rrrr <= adc_ddr_out_falling_rr;
-              adc_r1_give_rrrr <= '0';
-
-              -- it is possible (when using LVDS and 1R2T mode) for data to be
-              -- received in the R2 channel slot that should be ignored -
-              -- no-OS (via the ad9361_config_proxy) directs us via the
-              -- config_is_two_r signal when to drop the second channel samples
-              -- that should be ignored
-              adc_r2_give_rrrr <= adc_use_two_r_two_t_timing_rr and
-                                  r2_worker_present;
-
-              -- if valid R2 channel samples are received but there is no
-              -- second qadc worker to ingest them, detect the error
-              adc_r2_samps_dropped <= adc_use_two_r_two_t_timing_rr and
-                                      (not r2_worker_present);
-
-              state <= R1_11_6;
-          end case;
-        end if;
-      end process;
     end generate;
     -----------------------------------------------------------------------------
 
@@ -559,7 +603,7 @@ begin
   port map(
     src_rst => ctl_in.reset,
     dst_clk => adc_clk,
-    dst_rst => adc_reset); 
+    dst_rst => adc_reset);
 
   -- sync (WCI clock domain) -> (ADC clock domain)
   -- note that we don't care if WCI clock is much faster and bits are
@@ -580,37 +624,8 @@ begin
   r1_worker_present               <= ch0_worker_present when (adc_channels_are_swapped = bfalse) else ch1_worker_present;
   r2_worker_present               <= ch1_worker_present when (adc_channels_are_swapped = bfalse) else ch0_worker_present;
 
-  adc_data_i(0)     <= adc_r1_i_rrrrrr when (adc_channels_are_swapped = bfalse) else adc_r2_i_rrrr;
-  adc_data_i(1)     <= adc_r2_i_rrrr   when (adc_channels_are_swapped = bfalse) else adc_r1_i_rrrrrr;
-  adc_data_q(0)     <= adc_r1_q_rrrrrr when (adc_channels_are_swapped = bfalse) else adc_r2_q_rrrr;
-  adc_data_q(1)     <= adc_r2_q_rrrr   when (adc_channels_are_swapped = bfalse) else adc_r1_q_rrrrrr;
-  adc_data_vld(0)   <= adc_r1_give_rrrrrr when (adc_channels_are_swapped = bfalse) else adc_r2_give_rrrr;
-  adc_data_vld(1)   <= adc_r2_give_rrrr   when (adc_channels_are_swapped = bfalse) else adc_r1_give_rrrrrr;
   worker_present(0) <= r1_worker_present;
   worker_present(1) <= r2_worker_present;
-
-  sample_clk_gen : entity work.one_sample_clock_per_adc_sample_generator
-    generic map(
-      NUM_CHANS                  => NUM_CHANS,
-      FIRST_DIVIDER_TYPE         => "REGISTER",
-      FIRST_DIVIDER_ROUTABILITY  => "GLOBAL",
-      SECOND_DIVIDER_TYPE        => "REGISTER",
-      SECOND_DIVIDER_ROUTABILITY => "GLOBAL")
-    port map(
-      -- to/from data_interleaver
-      someclk_data_i             => adc_data_i,
-      someclk_data_q             => adc_data_q,
-      someclk_data_vld           => adc_data_vld,
-      -- clock handling
-      adc_clk                    => adc_clk,
-      -- to/from supported worker
-      worker_present             => worker_present,
-      wci_use_two_r_two_t_timing => wci_use_two_r_two_t_timing,
-      sample_clk                 => sample_clk,
-      sample_data_out_i          => sample_data_i,
-      sample_data_out_q          => sample_data_q,
-      sample_data_out_valid      => sample_data_valid);
-
 
   -- From ADI's UG-570:
   -- "For a system with a 2R1T or a 1R2T configuration, the clock
@@ -643,11 +658,10 @@ begin
   -- (data_src_qadc_csts.hdl takes care of justification standardization)
   dev_data_ch0_out_out.data_i(dev_data_ch0_out_out.data_i'left downto
                               dev_data_ch0_out_out.data_i'left-adc_width+1) <= sample_data_i(0);
-
   dev_data_ch0_out_out.data_i(dev_data_ch0_out_out.data_i'left-adc_width downto 0) <= (others => '0');
+
   dev_data_ch0_out_out.data_q(dev_data_ch0_out_out.data_q'left downto
                               dev_data_ch0_out_out.data_q'left-adc_width+1) <= sample_data_q(0);
-
   dev_data_ch0_out_out.data_q(dev_data_ch0_out_out.data_q'left-adc_width downto 0) <= (others => '0');
 
   dev_data_ch1_out_out.clk    <= sample_clk;
@@ -655,11 +669,10 @@ begin
 
   dev_data_ch1_out_out.data_i(dev_data_ch1_out_out.data_i'left downto
                               dev_data_ch1_out_out.data_i'left-adc_width+1) <= sample_data_i(1);
-
   dev_data_ch1_out_out.data_i(dev_data_ch1_out_out.data_i'left-adc_width downto 0) <= (others => '0');
+
   dev_data_ch1_out_out.data_q(dev_data_ch1_out_out.data_q'left downto
                               dev_data_ch1_out_out.data_q'left-adc_width+1) <= sample_data_q(1);
-
   dev_data_ch1_out_out.data_q(dev_data_ch1_out_out.data_q'left-adc_width downto 0) <= (others => '0');
 
   -- if valid R1 channel samples are received but there is no
