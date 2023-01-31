@@ -427,6 +427,8 @@ def _get_assemblies(project_dirs: List[str]) -> List[str]:
         for assembly_path in assemblies_path.glob('*'):
             if not assembly_path.is_dir():
                 continue
+            if not (assembly_path / (assembly_path.name + '.xml')).exists():
+                continue
             if whitelist and assembly_path.name not in whitelist:
                 continue
             if assembly_path.name in blacklist:
