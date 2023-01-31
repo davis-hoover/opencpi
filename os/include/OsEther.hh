@@ -163,7 +163,7 @@ namespace OCPI {
 	unsigned index;
 	std::string name;
 	Address addr, ipAddr, brdAddr;
-	bool up, connected, loopback;
+	bool up, connected, loopback, ptp;
       };
       class IfScanner {
 	uint64_t m_opaque[4];

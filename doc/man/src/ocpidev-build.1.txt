@@ -14,10 +14,11 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-The *`build`* verb compiles the OpenCPI assets specified by the noun used
-in the command. If no nouns are provided, *ocpidev* builds the current
-directory or asset. When the plural version of the nouns are used, no name is
-specified and all assets of that type are built.
+The *`build`* verb compiles (or performs the equivalent operation for the asset)
+the OpenCPI assets specified by the noun used
+in the command. If no nouns are provided, *`ocpidev`* builds the asset
+represented by the current directory. When the plural version of the nouns are used, no name is
+specified and all assets of that type under the current directory are built.
 
 Asset types to be specified in the '<noun>' argument are:
 
@@ -28,7 +29,7 @@ Asset types to be specified in the '<noun>' argument are:
     A prefix to indicate an HDL asset in the *hdl* subdirectory of a project.
     Possible HDL assets are:
 
-        *`assembly`*|*`ies`*;;
+        *`assembl`*(*`y`*|*`ies`*);;
 	Build all or a specified HDL assembly.
 	
 	*`device`*;;
@@ -40,7 +41,8 @@ Asset types to be specified in the '<noun>' argument are:
 	
 	*`primitive`*(*`s`*);;
 	Build all HDL primitives or a specified HDL primitive
-	of a specified type. Possible HDL primitive types are:
+	of a specified type. For a specified HDL primitive,
+	possible HDL primitive types are:
 	
 	    *`core`*:::
 	    Build a primitive that results in a synthesized
@@ -49,36 +51,53 @@ Asset types to be specified in the '<noun>' argument are:
 	    *`library`*:::
 	    Build a primitive that results in a library of modules.
 	    
-*`library`*::
-    Build a component library.
+*`librar`*(*`y`*|*`ies`*)::
+    Build all or a specified component library.
 
 *`project`*::
     Build all assets in a project.
+    
+*`test`*(*`s`*)::
+    Build all or a specified component unit test but do not run.
 
-*`test`*::
-    Build but do not run a component unit test.
+*`worker`*(*`s`*)::
+    Build all or a specified worker.
 
-*`worker`*::
-    Build a worker.
-
+Unless suppressed by options, the *`build`* verb builds
+both the assets and their OpenCPI asset documents.
+See the 'OpenCPI Documentation Writer Guide' for details on OpenCPI asset documents.
 
 OPTIONS
 -------
-The options to the *`build`* verb are primarily used to limit what is built
+In addition to the options common to all OpenCPI tools (see link:opencpi.1.html[opencpi(1)]),
+the options below can be specified for the *`build`* verb. 
+These options are primarily used to limit what is built
 (focus the build process on specific assets of interest), or specify the
 platforms and targets to build the assets for.
 
-In the descriptions that follow, a plus sign (+) after the option indicates
+In the following descriptions, a plus sign (+) after the option indicates
 that it can be specified more than once on the command line.
+
+Options When Building Any Asset
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--doc-only`*::
+   Only build the asset's documentation and not the asset itself.
+   See the 'OpenCPI Documentation Writer Guide' for
+   details on OpenCPI asset documents.
+
+*`--no-doc`*::
+   Only build the asset and not the asset's documentation.
+   See the 'OpenCPI Documentation Writer Guide'
+   for details on OpenCPI asset documents.
 
 Options When Building Projects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`--hdl-assembly=`*'<hdl-assembly>'+::
-    Limit the assemblies being built to the specified assembly. This option
-    can also be used in the *hdl/assemblies* directory.
+    Limit the HDL assemblies being built to the specified assembly. This option
+    can also be used in the *`hdl/assemblies/`* directory.
 
 *`--no-assemblies`*::
-    Don't build the assemblies in the project. Building HDL assemblies
+    Don't build the HDL assemblies in the project. Building HDL assemblies
     (and their containers) can be slow.
 
 Options When Building Projects or Libraries
@@ -123,18 +142,18 @@ Options When Building Projects, Libraries, Tests, RCC Workers or ACI Application
 
 Options When Building Projects, Libraries, Tests with HDL Workers or other HDL Assets
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*`--hdl-target=`*'<target>'+::
-    Build HDL assets for the specified HDL target. If only HDL targets
-    are specified (and no HDL platforms), containers will not be
-    built for assemblies or unit tests.
-
 *`--hdl-platform=`*'<hdl-platform>'+::
     Build HDL assets for the specified HDL platform.
 
+*`--hdl-target=`*'<target>'+::
+    Build HDL assets for the specified HDL architecture. If only HDL targets
+    are specified (and no HDL platforms), containers will not be
+    built for assemblies or unit tests.
+
 Options When Building Workers, Tests and other Assets in Libraries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*`-l`* '<library>'::
-    Build the asset located in the specified library. This option can
+*`-l`* '<library>', *`--library=`*'<library>'::
+    Build the asset located in the specified component library. This option can
     be used to identify a particular library when operating in a
     project with multiple component libraries. It's not needed when
     operating in a project with only a single top-level    
@@ -146,45 +165,44 @@ Options When Building Workers, Tests and other Assets in Libraries
 Options When Building Tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`--generate`*::
-    Only perform the *generate* phase of unit tests, not the *build* phase.
+    Only perform the *`generate`* phase of unit tests, not the *`build`* phase.
+    See the section "Unit Testing of Workers" in the *OpenCPI Component Development Guide*
+    for details on unit test phases.
 
 EXAMPLES
 --------
-. Build the current asset or directory and those underneath it
-for the *`zed`* HDL platform and the *`xilinx13_3`* RCC platform.
+. Build the current asset or directory and those underneath it, both
+assets and asset documents, 
+for the *`zed`* HDL platform and the *`xilinx19_2_aarch32`* RCC platform.
 +
----------------
-ocpidev build --hdl-platform=zed --rcc-platform=xilinx13_3
----------------
+---------------------------
+ocpidev build --hdl-platform=zed --rcc-platform=xilinx19_2_aarch32
+---------------------------
 +
-. Build the *`assets`* project for the *`zed`* HDL platform and
-`*`xilinx13_3`* RCC platform.  Omit the name *`assets`* if
-inside the *`assets`* project.
+. Build only the asset documents the *`assets`* project.
+Omit the name *`assets`* if inside the *`assets`* project.
 +
---------------------------------------------
-ocpidev build project assets --hdl-platform=zed
-                             --rcc-platform=xilinx13_3
--------------------------------------------
+---------------------------------------
+ocpidev build project assets --doc-only
+---------------------------------------
 +
 . Inside the *`assets`* project, build the *`complex_mixer.hdl`*
-worker in the *`dsp_comps`* library for the *`zed`* HDL platform
-and *`xilinx13_3`* RCC platform. You can omit the *`-l dsp_comps`*
-option if operating in a project with only a single top-level
-*`components`* library.
+worker and its asset document in the *`dsp_comps`* library
+and build the worker for the *`zed`* HDL platform.
 +
 ----------------------------------------------
 ocpidev -l dsp_comps build worker complex_mixer.hdl
-                         --hdl-platform=zed
-                         --rcc-platform=xilinx13_3
+                         --hdl-platform=zed                     
 ----------------------------------------------
 +			 
 . Inside the *`assets`* project, build the *`dsp_comps`* library
-located at *`components/dsp_comps`* for the *`zed`* HDL platform
-and *`xilinx13_3 RCC`* platform.
+for the *`zed`* HDL platform and *`xilinx19_2_aarch32 RCC`* platform
+and do not build any asset documents.
 +
 --------------------------------------------------
 ocpidev build library dsp_comps --hdl-platform=zed
-                                --rcc-platform=xilinx13_3
+                                --rcc-platform=xilinx19_2_aarch32
+				--no-doc
 --------------------------------------------------
 +
 . Inside the *`assets`* project, build the *`dsp_comps`* library,
@@ -206,6 +224,24 @@ RESOURCES
 ---------
 See the main web site: <www.opencpi.org>
 
+See the 'OpenCPI Application Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Application_Development_Guide.pdf
+
+See the 'OpenCPI Component Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Component_Development_Guide.pdf
+
+See the 'OpenCPI HDL Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_HDL_Development_Guide.pdf
+
+See the 'OpenCPI Platform Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Platform_Development_Guide.pdf
+
+See the 'OpenCPI RCC Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_RCC_Development_Guide.pdf
+
+See the 'OpenCPI Documentation Writer Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Documentation_Writer_Guide.pdf
+
 SEE ALSO
 --------
 link:ocpidev.1.html[ocpidev(1)]
@@ -223,7 +259,7 @@ link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
 
 COPYING
 -------
-Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your

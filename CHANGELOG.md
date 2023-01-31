@@ -1,3 +1,46 @@
+# [v2.4.4](https://gitlab.com/opencpi/opencpi/-/compare/v2.4.3...v2.4.4) (2023-01-22)
+
+Changes/additions since [OpenCPI Release v2.4.3](https://gitlab.com/opencpi/opencpi/-/releases/v2.4.3)
+
+### Enhancements
+- **doc**: add install-opencpi man page. (!1021)(d179174a)
+- **doc**: add ocpidev asset doc system usage information to relevant man pages. (!1023)(cb54577f)
+- **doc**: fix ordering of options in man pages to be short form first. (!1023)(cb54577f)
+- **doc**: add ethernet transport performance tuning guide. (!1033)(2f8d0d14)
+- **doc**: rename HDL and RCC worker RST files to latest naming scheme. (!1035)(9d2a079f)
+- **doc**: update component RST docs to use latest terminology and template format. (!1035)(9d2a079f)
+- **doc**: update component RST block diagrams (*.odg, *.svg) to be exemplar. (!1035)(9d2a079f)
+- **doc**: update RST files and directories for platform project device workers to use current organization, structure, and naming scheme. (!1036)(594fc672)
+- **doc**: remove deprecated RST files and directories for platform project device workers. (!1036)(594fc672)
+- **doc,tools**: add `ocpi_documentation_include` directive to ocpidoc. (!882)(877eb994)
+- **runtime**: add pipelining to WCI to allow higher clock speed operation. (!1006)(b0005423)
+- **tools**: throws error message when duplicate attributes are used in same xml element tag. (!1009)(3d41b60a)
+- **doc**: add ubuntu20_04 as a supported platform. (!1024)(ddb38000)
+- **doc**: add explanation to tutorials that platforms other than CentOS7 can be used. (!1053)(ac3e543d)
+- **doc**: clarify and update instructions for air-gapped install and installing from source in the Installation Guide. (!1055)(ac19818d)
+- **hdl base**: enable dual port full duplex CMOS mode ad9361 device workers. (!1054)(5d18c28c)
+- **tests**: add ad9361_data_interface_tests. (!1054)(5d18c28c)
+
+### Bug Fixes
+- **doc**: fix typos in timegate_csts-index.rst component document and rename to timegate_csts-comp.rst. (!1038)(bf711640)
+- **doc**: add timegate_csts-hdl.rst HDL worker document. (!1038)(bf711640)
+- **runtime**: eliminate need for OCPI_TRANSFER_IP_ADDRESS with PTP interfaces. (!999)(e1b2bae9)
+- **runtime**: fix order in XferDataGramEtherDriver2 destructor. (!1006)(b0005423)
+- **tools**: adds sdp library to allow for new hdl platform to build without errors. (!988)(c8a1635f)
+- **tools**: update ocpi_documentation_implementations.py to recognize worker docs named *-hdl.rst and *-rcc.rst. (!1035)(9d2a079f
+- **comp**: prepare can handle and enter the error state. (!1005)(6f3c7970)
+- **comp**: a stop on a inactive results in an error. (!1005)(6f3c7970)
+- **doc**: remove references to nonexistent `--hdl-rcc-platform` flag. (!1051)(54646100)
+- **runtime**: fix lock up issue with HDL support for DG-RDMA. (!1047)(e3b3e036)
+
+### Miscellaneous
+- **devops,doc**: update `opencpi.gitlab.io` home page. (!1028)(98041e32)
+- **devops,tools**: disable processing of releases older than v2.2 by `build-pages.py --all`. (!1010)(511fe41b)
+- **doc**: update util_comps-library.rst file to recognize component RST docs named *-comp.rst. (!1038)(bf711640)
+- **doc,tools**: allow `build-pages.py` to process `avnet` and `xilinx` OSP tagged releases. (!998)(94378527)
+- **tools**: update tool python files to use python3 shebang. (!1026)(267c9d84)
+- **doc**: update various guides for next v2.4.X patch release. (!1001)(b73d53a6)
+
 # [v2.4.3](https://gitlab.com/opencpi/opencpi/-/compare/v2.4.2...v2.4.3) (2022-10-11)
 
 Changes/additions since [OpenCPI Release v2.4.2](https://gitlab.com/opencpi/opencpi/-/releases/v2.4.2)

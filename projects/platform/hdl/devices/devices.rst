@@ -1,4 +1,4 @@
-.. Component directory index page
+.. Device directory index page
 
 .. This file is protected by Copyright. Please refer to the COPYRIGHT file
    distributed with this source distribution.
@@ -19,12 +19,15 @@
    along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-Components
-==========
-OpenCPI components for generic HDL device worker implementations.
+Device Workers
+==============
+Available HDL device workers, HDL subdevice workers, RCC device proxy workers.
 
 .. toctree::
    :maxdepth: 2
    :glob:
 
-   *.comp/*-index
+   */*-hdl
+   */*-rcc
+
+

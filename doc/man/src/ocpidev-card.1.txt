@@ -40,6 +40,19 @@ card is platform-independent
 - In the subdirectory *`hdl/platforms/`*'<platform>'*`/devices/specs/`* when
 the HDL card is platform-specific
 
+An OpenCPI HDL card asset document can also be created for
+an HDL card to facilitate documenting the HDL card during
+the overall development process.
+In a project, an HDL card asset document resides in
+the same directory and has the same name as the HDL card's definition
+but with the suffix *`.rst`* instead of *`.xml`*. Unless suppressed
+by options, building asset that contains the HDL card (e.g., project,
+library) builds viewable HTML output of HDL card asset document,
+and cleaning the asset containing the HDL card removes the generated HTML.
+The section "Documenting OpenCPI Assets" in the
+'OpenCPI Documentation Writer Guide' provides more information about
+this feature and describes how to create an OpenCPI HDL card asset document.
+
 Verbs that can operate on an HDL card are:
 
 *`create`*::
@@ -55,26 +68,20 @@ XML file that can be edited as necessary to define the card.
 
 OPTIONS
 -------
-In the descriptions below, a plus sign (+) after the option indicates
+In addition to the options common to all OpenCPI tools
+(see link:opencpi.1.html[opencpi(1)]), the options described
+below can be specified for operations on HDL cards.
+In the following descriptions, a plus sign (+) after the option indicates
 that it can be specified more than once on the command line.
-
-Options That Apply to All Operations (Verbs) on HDL Cards
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*`-d`* '<directory>'::
-    Specify the directory in which the command should be run.
-    Analogous to the *-C* option in the POSIX *make* command.
-
-*-v, --verbose*::
-    Describe what is happening in command execution in more detail.
-    
+ 
 Options When Creating HDL Cards
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*`-P`* '<hdl-platform>'::
+*`-P`* '<hdl-platform>', *`--platform=`*'<hdl-platform>'::
     Specify that the HDL card being created is a platform-specific
     HDL card to be created in the *`devices/specs/`*
     subdirectory in the specified HDL platform in the project.
 
-*-k*::
+*`-k`*, *`--keep`*::
     Keep files and directories created after an HDL card creation
     fails. Normally, all such files and directories are removed
     on any failure.
@@ -121,6 +128,11 @@ RESOURCES
 ---------
 See the main web site: https://www.opencpi.org
 
+See the 'OpenCPI Platform Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Component_Development_Guide.pdf
+
+See the 'OpenCPI Documentation Writer Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Documentation_Writer_Guide.pdf
 
 SEE ALSO
 --------
@@ -134,7 +146,7 @@ link:ocpidev-slot.1.html[ocpidev-slot(1)]
 
 COPYING
 -------
-Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your

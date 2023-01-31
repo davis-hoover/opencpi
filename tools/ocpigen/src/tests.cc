@@ -1858,8 +1858,9 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
   std::string parent, specFile;
   ezxml_t xml, xspec;
   if (!file || !file[0]) {
-    static char x[] = "<tests/>";
-    xml = ezxml_parse_str(x, strlen(x));
+    static char x[] = "<tests/>";    
+    if ((err = OE::ezxml_parse_str(x, strlen(x), xml)))
+      return err;
   } else if ((err = parseFile(file, parent, "tests", &xml, testFile, false, false, false)) ||
              (err = OE::checkAttrs(xml, "spec", "timeout", "duration","onlyWorkers",
                                    "excludeWorkers", "useHDLFileIo", "mode", "onlyPlatforms",
@@ -2129,7 +2130,9 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
   // ================= 8. Parse the specified cases (if any)
   if (!ezxml_cchild(xml, "case")) {
     static char c[] = "<case/>";
-    ezxml_t x = ezxml_parse_str(c, strlen(c));
+    ezxml_t x;
+    if ((err = OE::ezxml_parse_str(c, strlen(c), x)))
+      return err;
     if ((err = Case::doCase(x, &globals)))
       return err;
   } else if ((err = OE::ezxml_children(xml, "case", Case::doCase, &globals)))

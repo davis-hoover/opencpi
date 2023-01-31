@@ -404,12 +404,7 @@ HDLPLATFORM_PLATFORM_XML = ("""<!-- This file defines the {{platform}} HDL platf
     searched automatically, as will "devices" in any projects this project depends on.
     An example might be something like "our_special_devices", which would exist in this or
     other projects.-->
-<HdlPlatform Spec="platform-spec"
-{%if hdl_part: %}
-    Part='{{hdl_part}}'>
-{% else %}
-    Part='xc7z020-1-clg484'>
-{% endif %}
+<HdlPlatform Spec="platform-spec" {%if hdl_part: %} Part='{{hdl_part}}' {% else %} Part='xc7z020-1-clg484'{% endif %} {%if use_sdp: %}libraries='sdp'{% endif %}>
     <SpecProperty Name='platform' Value='{{platform}}'/>
     <!-- These next two lines must be present in all platforms -->
     <MetaData Master="true"/>

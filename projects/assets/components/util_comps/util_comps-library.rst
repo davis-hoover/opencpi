@@ -11,3 +11,4 @@ The utilities (``util_comps``) component library provides useful helper componen
    :caption: Utilities components
 
    *.comp/*-index
+   *.comp/*-comp

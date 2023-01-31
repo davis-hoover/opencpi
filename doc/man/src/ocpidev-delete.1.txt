@@ -9,120 +9,117 @@ ocpidev-delete - delete OpenCPI assets
 
 SYNOPSIS
 --------
-*ocpidev* ['<options>'] *delete* '<noun>' '<name>'
+*`ocpidev`* ['<options>'] *`delete`* '<noun>' '<name>'
 
 
 DESCRIPTION
 -----------
-The *`delete`* verb deletes OpenCPI assets from a
-project specified by the '<noun>' argument that follows the verb.
+The *`delete`* verb deletes from a project the OpenCPI assets and their
+OpenCPI asset documents specified by the '<noun>' and '<name>' arguments that follow the verb.
 
 Asset types to be specified in the '<noun>' argument are:
 
-*application*::
+*`application`*::
     Delete an application.
 
-*hdl*::
-    A prefix to indicate an HDL asset in the *hdl* subdirectory of a project.
+*`component`*::
+    Delete a component in a component library, or, based on options, at the top level of a project.
+
+*`hdl`*::
+    A prefix to indicate an HDL asset in the *`hdl`* subdirectory of a project.
     Possible HDL assets are:
     
-        *assembly*;;
+        *`assembly`*;;
 	Delete an HDL assembly.
 	
-	*card*;;
+	*`card`*;;
 	Delete an HDL card definition.
 	
-	*device*;;
-	Create/delete an HDL device worker, possibly in a
-	specified platform.
+	*`device`*;;
+	Delete an HDL device worker, possibly specific
+	to a platform.
 	
-	*platform*;;
+	*`platform`*;;
 	Delete an HDL platform.
 	
-	*primitive*;;
+	*`primitive`*;;
 	Delete an HDL primitive. Possible primitive types are:
 		    
-	    *core*:::
+	    *`core`*:::
 	    A single primitive module, perhaps presynthesized
-	    (that is, from coregen or megawizard).
+	    (for example, from Xilinx Coregen or Altera Megawizard).
 	    
-	    *library*:::
-	    A set of HDL primitive modules to use in workers as a library.
+	    *`library`*:::
+	    A set of HDL primitive modules to use from workers or other primitive cores or libraries.
 
 	*`slot`*;;
 	Delete an HDL slot definition.    
 
-*library*::
-    Delete a component library.
+*`librar`*(*`y`*|*`ies`*)::
+    Delete all or a specified  component library.
     
-*project*::
+*`project`*::
     Delete a project which holds and organizes OpenCPI assets.
 
-*protocol*::
+*`protocol`*::
     Delete a protocol in a library or project.
 
-*registry*::
+*`registry`*::
     Delete a registry that enables projects to depend on each other.
 
-*spec*::
-    Delete a component specification in a library or project.
-
-*test*::
+*`test`*::
     Delete a component unit test in a library.
 
-*worker*::
+*`worker`*::
     Delete a worker in a library.
-
-All HDL assets should avoid having names that are Verilog or VHDL-
-reserved identifiers, such as `reg`, etc.
 
 OPTIONS
 -------
-The options for *delete* are usually specific to the asset type
-that is being deleted. When deleting an asset, *ocpidev* will
-ask for confirmation. You can override this with the *-f* option
+In addition to the options common to all OpenCPI tools (see link:opencpi.1.html[opencpi(1)]),
+the following options can be specified for the *`delete`* verb.
+These options are usually specific to the asset type
+that is being deleted. When deleting an asset, *`ocpidev`* will
+ask for confirmation. You can override this with the *`-f`* option
 to force deletion without confirmation.
 
-In the option descriptions below, a plus sign (+) indicates that
+In the following option descriptions, a plus sign (+) indicates that
 the option can be specified more than once on the command line.
 
 Option When Deleting Any Asset Type
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*-f*::
+*`-f`*::
     Force deletion: do not ask for confirmation when deleting
     an asset. Normally, you are asked to confirm a deletion.
 
 Option When Deleting Specs or Protocols
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*-p*::
-   Delete the spec or protocol from the *specs*
-   directory of the project, not from a library's
-   *specs* directory.
+*`-p`*, *`--project`*::
+   Delete the component specification or protocol from the *`specs/`*
+   directory of the project. No asset directories or document files are deleted.
 
 Options When Deleting Specs, Protocols, Workers or HDL Devices
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*--hdl-library=*'<hdl-library>'::
-   Delete the asset from the specified library under the
-   *hdl* directory of the project. Valid values for
-   '<hdl-library>' are one of *devices*, *cards* or *adapters*.
+*`-h`* '<hdl-library>', *`--hdl-library=`*'<hdl-library>'::
+   Delete the asset from the specified component library under the
+   *`hdl`* directory of the project. Valid values for
+   '<hdl-library>' are one of *`devices`*, *`cards`* or *`adapters`*.
 
-*-l* '<library>'::
-   Delete the asset from the specified library.
+*`-l`* '<library>', *`--library=`*'<library>'::
+   Delete the asset from the specified component library.
 
 EXAMPLES
 --------
-. Delete the project *my-project*:
+. Delete the project *`my-project`*:
 +
 -------------------------------
 ocpidev delete project my-project
 --------------------------------
 +
-. Delete the worker named *myworker.hdl* from the library named *my-complib*:
+. Delete the worker named *`myworker.hdl`* from the library named *`my-complib`*:
 
 -------------------------------
 ocpidev delete -l my-complib worker myworker.hdl
 ------------------------------
-
 
 BUGS
 ----
@@ -132,6 +129,24 @@ See https://www.opencpi.org/report-defects
 RESOURCES
 ---------
 See the main web site: https://www.opencpi.org
+
+See the 'OpenCPI Application Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Application_Development_Guide.pdf
+
+See the 'OpenCPI Component Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Component_Development_Guide.pdf
+
+See the 'OpenCPI HDL Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_HDL_Development_Guide.pdf
+
+See the 'OpenCPI Platform Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Platform_Development_Guide.pdf
+
+See the 'OpenCPI RCC Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_RCC_Development_Guide.pdf
+
+See the 'OpenCPI Documentation Writer Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Documentation_Writer_Guide.pdf
 
 SEE ALSO
 --------
@@ -151,7 +166,7 @@ link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
 
 COPYING
 -------
-Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your

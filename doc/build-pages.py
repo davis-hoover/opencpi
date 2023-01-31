@@ -118,15 +118,7 @@ def main():
     # Download supported OSPs
     for osp in OSPS:
         download_osp(osp)
-        #
-        # FIXME: remove the following "if" when v2.4.3 gets
-        # released.  DO NOT ATTEMPT TO PROCESS v2.4.2 LaTeX
-        # docs for these two OSPs!!
-        #
-        if osp == "ocpi.osp.avnet" or osp == "ocpi.osp.xilinx":
-            OSP_TAGS[osp] = []
-        else:
-            OSP_TAGS[osp] = get_tags(OCPI_OSPDIR / osp / ".git")
+        OSP_TAGS[osp] = get_tags(OCPI_OSPDIR / osp / ".git")
         OSP_TAGS[osp].append("develop")  # develop will always be a valid git revision
 
     # Download supported COMPs
@@ -459,7 +451,8 @@ def gen_releases_index():
     example.com/releases/latest/index.html
     """
     template = jinja_env.get_template("releases.index.html")
-    index = template.render(url="latest")  # always latest until someone has a "better" idea
+    # index = template.render(url="latest")  # always latest until someone has a "better" idea
+    index = template.render(url="all")  # mgmt requested the release list as the home page
     with open(args.outputdir / "index.html", "w") as fd:
         fd.write(index)
 
@@ -805,10 +798,11 @@ def find_files(search_dir, extension=None, recursive=True) -> List[Path]:
 
 
 def get_tags(git_dir: Path) -> List[str]:
-    # Can no longer build "all" in less than 3 hours,
-    # so ignore tags corresponding to early releases.
+    # Building "all" must take less than 3 hours, and the
+    # total size of generated artifacts must be less than
+    # 1 GB, so ignore tags corresponding to early releases.
     # cmd = ["git", "--git-dir", str(git_dir.resolve()), "tag", "-l", "v*"]
-    cmd = ["git", "--git-dir", str(git_dir.resolve()), "tag", "-l", "v1.7*", "v2.*"]
+    cmd = ["git", "--git-dir", str(git_dir.resolve()), "tag", "-l", "v2.[!0-1]*"]
     logging.debug(f"Executing cmd: {cmd}")
     tags = subprocess.check_output(cmd).decode().strip("\n").split("\n")
     if not tags[0]:

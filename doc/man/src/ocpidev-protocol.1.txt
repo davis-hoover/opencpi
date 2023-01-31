@@ -25,16 +25,27 @@ protocol, as well as some top-level attributes for the protocol.
 while 'argument' elements describe the individual fields of a message.
 A protocol is specified in the 'port' element of a component spec (OCS).
 In a connection between component ports, the specs of both
-ports, in their port elements, refer to the same OPS.
-At present, a protocol consists of only the OPS XML file.
-
+ports, in their port elements, refer to the same OPS. 
 For more information about a protocol's XML structure, see the chapter "Protocol
 Specifications" in the 'OpenCPI Component Development Guide'.
 
-In a project, a protocol resides in a *`specs/`* directory
-located either in a component library or at the top level of a project
-and is named '<name>'*`-prot.xml`*. Note that protocols with older
-naming formats like '<name>'*`_protocol.xml`* and '<name>'*`-protocol.xml`*
+A skeleton OpenCPI protocol asset document is also created along
+with the OPS to allow for protocol documentation development
+to occur during the overall protocol development process. Unless suppressed
+by an option, building the asset (e.g., project, library) that contains the protocol
+also builds viewable HTML output of the asset document. The chapter
+"Documenting OpenCPI Assets" in the 'OpenCPI Documentation Writer Guide'
+provides more information about this feature and how to write a
+protocol asset document.
+
+In a project, a protocol and its asset document reside in
+in a *`specs/`* directory located either in a component library
+or at the top level of a project.
+The OPS is named '<name>'*`-prot.xml`*.
+The protocol asset document has the same name as the OPS
+but with the *`.rst`* suffix instead of *`.xml`*.
+Note that protocols with older naming formats like
+'<name>'*`_protocol.xml`* and '<name>'*`-protocol.xml`*
 also exist; for example, some of the protocols in the built-in
 OpenCPI *`core`* project (*`../projects/core/specs/`*) use these formats.
 
@@ -49,33 +60,28 @@ Verbs that can operate on a protocol are:
 
 OPTIONS
 -------
-In the descriptions below, a plus sign (+) after the option indicates
+In addition to the options common to all OpenCPI tools (see link:opencpi.1.html[opencpi(1)]),
+the options described below can be specified for operations on protocols.
+In the following descriptions, a plus sign (+) after the option indicates
 that it can be specified more than once on the command line.
 
 Options That Apply to All Operations (Verbs) on Protocols
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*`--hdl-library=`*'<hdl-library>'::
+*`-h`* '<hdl-library>', *`--hdl-library=`*'<hdl-library>'::
     Specify the HDL library in which to operate on the 
     protocol. HDL libraries exist underneath the *`hdl/`*
     directory located at the top level of a project.
 
-*`--library=`*'<component-library>', *`-l`* '<component-library>'::
+*`-l`* '<component-library>', *`--library=`*'<component-library>'::
     Specify the component library in which to operate on the protocol.
     When a project contains multiple component libraries, this option
     can be used to specify one of them. Multiple component
     libraries are located underneath the *`components`* directory
     at the top level of a project.
-
-*`-d`* '<directory>'::
-    Specify the directory in which the command should be run.
-    Analogous to the *-C* option in the POSIX *make* command.
-
-*-v, --verbose*::
-    Describe what is happening in command execution in more detail.
     
 Options When Creating and Deleting Protocols
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*-p*::
+*`-p`*, *`--project`*::
     Specify that the protocol is to be created in or
     deleted from the *`specs/`* directory of the project
     instead of the *`specs/`* directory of a component library.
@@ -86,7 +92,7 @@ Options When Creating and Deleting Protocols
 
 Options When Creating Protocols
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-*-k*::
+*`-k`*, *`--keep`*::
     Keep files and directories created after a protocol creation
     fails. Normally, all such files and directories are removed
     on any failure.
@@ -100,36 +106,36 @@ Options When Deleting Protocols
 EXAMPLES
 --------
 . Create a protocol spec with the name *`myprotocol`*. The protocol
-spec will be placed in the default location *`components/specs/`*:
+spec is placed in the default location *`components/specs/`*:
 +
 -------------------------------
 ocpidev create protocol myprotocol
 --------------------------------
 +
 . Create a protocol named *`myprotocol`* in the component library
-named *`myutilcomps`*. The protocol spec will be placed in
-the *`specs`* directory in *`myutilcomps`* sublibrary
+named *`myutilcomps`*. The skeleton protocol spec and asset document are placed in
+the *`specs/`* directory in *`myutilcomps`* sublibrary
 within the *`components`* library (*`components/myutilcomps/specs/`*):
 +
 --------------------------------------------------
 ocpidev create protocol myprotocol -l myutilcomps
 --------------------------------------------------
 +
-. Inside the project *`MyProject`*, create a protocol spec with the
-name *`myprotocol`* in the project's *`specs/`* directory.
-The protocol spec will be placed in *`MyProject/specs/`*:
+. Inside the project *`MyProject`*, create a protocol named
+named *`myprotocol`* in the project's *`specs/`* directory.
+The skeleton protocol spec and asset document are placed in *`MyProject/specs/`*:
 +
 ------------------------------------
 ocpidev create protocol myprotocol -p
 ------------------------------------
 +
 . Delete a protocol named *`MyAdapterProtocol`* from
-a project's *`adapters`* library (deletes it
-from *`hdl/adapters/specs/`*):
+a project's *`adapters`* library (deletes the protocol spec
+and its asset document from *`hdl/adapters/specs/`*):
 +
---------------------------------------------------------
-ocpidev delete protocol MyAdapterProtocol --hdl-library=adapters
---------------------------------------------------------
+------------------------------------------------------
+ocpidev delete protocol MyAdapterProtocol -h adapters
+------------------------------------------------------
 
 BUGS
 ----
@@ -140,6 +146,11 @@ RESOURCES
 ---------
 See the main web site: https://www.opencpi.org
 
+See the 'OpenCPI Component Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Component_Development_Guide.pdf
+
+See the 'OpenCPI Documentation Writer Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Documentation_Writer_Guide.pdf
 
 SEE ALSO
 --------
@@ -154,7 +165,7 @@ link:ocpidev-project.1.html[ocpidev-project(1)]
 
 COPYING
 -------
-Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your

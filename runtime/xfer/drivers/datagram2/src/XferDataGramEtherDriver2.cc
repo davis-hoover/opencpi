@@ -379,12 +379,12 @@ DGEndPoint::DGEndPoint(DGXferFactory &a_factory, const char* protoInfo, const ch
 }
 
 DGEndPoint::~DGEndPoint() {
-    delete m_socket;
-
     if (m_receiver) {
         m_receiver->stop();
         delete m_receiver;
     }
+
+    delete m_socket;
 }
 
 // Extract local interface name and remote MAC address from a protoInfo string

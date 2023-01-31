@@ -17,6 +17,9 @@ OpenCPI provides a set of tools to support the
 development and execution of OpenCPI applications.
 These tools include:
 
+link:install-opencpi.1.html[install-opencpi(1)]::
+    Command-line tool for installing the OpenCPI framework
+  
 link:ocpiadmin.1.html[ocpiadmin(1)]::
     Command-line tool for managing an OpenCPI installation
 
@@ -79,6 +82,9 @@ OPTIONS
 -------
 Options to OpenCPI tools are either single letters following one
 hyphen or hyphen-separated words or acronyms following two hyphens.
+Arguments to word-form options are preceded by an equal sign (=)
+or a space. Arguments to letter options are preceded by a space.
+For convenience, options can occur anywhere in command lines.
 Most options are specific to individual tools and are described
 in the manual pages for these tools. The options common to all tools are:
 
@@ -87,17 +93,17 @@ in the manual pages for these tools. The options common to all tools are:
     Analogous to the *`-C`* option in the POSIX *`make`* command.
     This option can be specified more than once on the command line.
 
-*`--help`*, *`-h`*::
+*`-h`*, *`--help`*::
     Display usage information about the tool.
 
-*`--log-level=`*'<level>', *`-l`* '<level>'::
+*`-l`* '<level>', *`--log-level=`*'<level>'::
     Set the OpenCPI log level to the specified level.
     This option can be used to override the logging level
     set in the *`OCPI_LOG_LEVEL`* environment variable.
     See ENVIRONMENT VARIABLES for a description of possible
     values.
 
-*`--verbose`*, *`-v`*::
+*`-v`*, *`--verbose`*::
     Describe what is happening in tool operation in more detail.
 
 ENVIRONMENT VARIABLES
@@ -229,6 +235,7 @@ See https://www.opencpi.org/report-defects
 
 SEE ALSO
 --------
+link:install-opencpi.1.html[install-opencpi(1)]
 link:ocpiadmin.1.html[ocpiadmin(1)]
 link:ocpidev.1.html[ocpidev(1)]
 link:ocpidriver.1.html[ocpidriver(1)]
@@ -242,3 +249,11 @@ link:ocpitest.1.html[ocpitest(1)]
 link:ocpiview.1.html[ocpiview(1)]
 link:ocpixml.1.html[ocpixml(1)]
 link:ocpizynq.1.html[ocpizynq(1)]
+
+COPYING
+-------
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.

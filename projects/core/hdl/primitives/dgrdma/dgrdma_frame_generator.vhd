@@ -206,6 +206,12 @@ begin
     variable msg_len_beats : unsigned(12 downto 0);
     variable remaining_capacity : unsigned(15 downto 0);
 
+    variable empty_frame_bytes : unsigned(15 downto 0);
+    variable empty_frame_dwords : unsigned(15 downto 0);
+    variable empty_frame_widths_dwords : unsigned(15 downto 0);
+    variable final_frame_dwords : unsigned(15 downto 0);
+    variable non_final_frame_dwords : unsigned(15 downto 0);
+
     procedure reset_state is
     begin
       nextmsg_valid <= '0';
@@ -383,9 +389,23 @@ begin
             if div_complete = '1' then
               frag_state <= FRAG_WAIT_SDP;
               -- Adjust divider output to calculate total messages in transaction
-              -- Note that we have already subtracted the length of the first (current) message
-              -- and if div_rem /= 0 we will need a partial-frame message at the end
-              if div_rem = 0 then
+              -- * We always add 1 because the first fragment was sent in a previous frame
+              --   not taken into account by the dividor.
+              -- * There is an edge case where the final frame of a transaction can contain
+              --   slightly more data than the other, non-final frames.  The dividor, however,
+              --   assumes that all frames are the size of 'non-final' frames (this size is the
+              --   number of SDP_WIDTHs what will fit in a frame).  This discrepancy is handled
+              --   here.
+              -- * In non edge cases do need a partial-frame message at the end, so add 2.
+              empty_frame_bytes := (interface_mtu - FRAME_HEADER_BYTES - MESSAGE_HEADER_BYTES);
+              empty_frame_dwords := empty_frame_bytes / 4;
+              empty_frame_widths_dwords := round_down(empty_frame_dwords, SDP_WIDTH);
+
+              final_frame_dwords := round_down(empty_frame_bytes, 8) / 4;
+              non_final_frame_dwords := empty_frame_widths_dwords;
+
+              if (div_rem = 0 or
+                  (SDP_WIDTH=4 and (div_rem <= (final_frame_dwords - non_final_frame_dwords)))) then
                 nextmsg.msgs_in_txn <= div_q + 1;
               else
                 nextmsg.msgs_in_txn <= div_q + 2;

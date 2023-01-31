@@ -375,10 +375,13 @@ const char *parseControlOp(const char *op, void *arg) {
 const char *Worker::
 addProperty(const char *xml, bool includeImpl, bool isBuiltin) {
   // Add the built-in properties
+  const char *err;
   char *dprop = strdup(xml); // Make the contents persistent
-  ezxml_t dpx = ezxml_parse_str(dprop, strlen(dprop));
+  ezxml_t dpx;
+  if ((err = OE::ezxml_parse_str(dprop, strlen(dprop), dpx)))
+    return err;
   ocpiDebug("Adding ocpi_debug property xml %p", dpx);
-  const char *err = addProperty(dpx, includeImpl, false, false, isBuiltin);
+  err = addProperty(dpx, includeImpl, false, false, isBuiltin);
   ezxml_free(dpx);
   return err;
 }

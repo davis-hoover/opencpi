@@ -8,7 +8,7 @@ ocpidev-library - manage an OpenCPI component library.
 
 
 SYNOPSIS
---------
+-------
 *`ocpidev`* ['<options>'] '<verb>' *`library`* '<name>'
 
 
@@ -19,28 +19,35 @@ single directory in a project that holds a collection of specifications,
 workers and tests that can be built, exported and installed to support
 applications.
 
-A component library is described by its directory structure
-and an options '<name>'.*`.xml`* file.
+A component library is described by its directory structure,
+a '<name>'*`.xml`* file, and an OpenCPI library asset document
+(named '<name>'*`.rst`*) that serves as a description
+of the library and as a directory to the assets documented within it.
 
-In a project, a component library resides in its own directory.
+In a project, a component library resides in its
+own directory along with its library asset document.
 The default configuration is a single component library named
-*`components`* that exists at the top level of a project.
+*`components`* (with an asset document named *`components.rst`*)
+that exists at the top level of a project.
 Multiple-library configurations are also possible; in this configuration,
 the libraries reside in their own directories underneath a
-directory named *`components`* that exists at the top level of the project.
+directory named *`components/`* that exists at the top level of the project.
 Note that none of the sublibraries underneath this directory
 can be named *`components`*.
 
 A component library has the following directory structure:
 
-- Component and protocol specifications exist in a *`specs/`* directory.
+- Component specifications and their asset documents exist
+in individual '<name>'*`.comp/`* directories.
 
-- Workers that implement the component exist in their own directories
+- Protocol specifications and their asset documents exist in a *`specs/`* directory.
+
+- Workers that implement the component and their asset documents exist in their own directories
 named '<worker-name>'*`.`*'<authoring-model-suffix>'; for example, *`MyWorker.rcc`* or *`MyWorker.hdl`*.
 
 - Unit test suites for components in the library exist in
 their own directories named '<component-name>'*`.test/`*; for example,
-*`MyWorker.test`*.
+*`MyComp.test`*.
 
 - When the library is built, links to the built binaries and metadata files
 required to use the components in the library from outside the library exist
@@ -49,15 +56,23 @@ in the *`lib/`* directory.
 For more information on component library directory structure and
 its XML file, see the chapter "Component Libraries"
 in the 'OpenCPI Component Development Guide'.
+For more information on component library asset documents and on OpenCPI
+asset documentation in general, see the chapter "Documenting OpenCPI Assets"
+in the 'OpenCPI Documentation Writer Guide'.
 
 Verbs that can operate on a component library are:
 
 *`build`*::
-    Build all assets in the library, creating files and directories as required.
+    Build all assets and asset documents in the library,
+    creating files and directories as required.
+    Use the *`--doc-only`* and *`--no-doc`* options to control
+    the asset document building function.
     
 *`clean`*::
     Remove all the generated and compiled files for all assets
-    in the library.
+    and asset documents in the library. Use the *`--doc-only`*
+    and *`--no-doc`* options
+    to control the asset document cleaning function.
     
 *`create`*::
     Create the named library, creating files and directories as required.
@@ -66,7 +81,7 @@ Verbs that can operate on a component library are:
     Remove all directories and files associated with the named library.
 
 *`run`*::
-    Run all unit tests in the library, creating files and directories as required.
+    Run all component unit test suites in the library, creating files and directories as required.
     
 *`utilization`*::
     Display information about FPGA resource use for all built workers contained
@@ -92,69 +107,63 @@ the *`--local-scope`* option (or just *`--local`*) to override the default.
 
 OPTIONS
 -------
-In the descriptions below, a plus sign (+) after the option indicates
+In addition to the options common to all OpenCPI tools
+(see link:opencpi.1.html[opencpi(1)]),
+the options described below can be specified for operations on libraries.
+In the following descriptions, a plus sign (+) after the option indicates
 that it can be specified more than once on the command line.
 
 Keywords for platforms supported by OpenCPI that can be
 specified in the '<platform>' argument to an option
 can be found in the tables of supported platforms in the 'OpenCPI User Guide'.
 
-Keywords for architectures supported by OpenCPI that can be specified
+Keywords for HDL architectures supported by OpenCPI that can be specified
 in the '<target>' argument to an option include *`isim`*, *`modelsim`*,
-*`stratix4`*, *`virtex6`*, *`zynq`*.
-
-Options That Apply to All Operations (Verbs) on Libraries
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*-d <directory>*::
-    Specify the directory in which the command should be run.
-    Analogous to the *-C* option in the POSIX *make* command.
-    
-*-v, --verbose*::
-    Describe what is happening in command execution in more detail.
+*`xsim`*, *`zynq`*, *`zynq_ultra`*, *`spartan3adsp`*.
 
 Options When Creating Libraries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*`--exclude-platform=`*'<platform>', *`-Q`* '<platform>'+::
-   Do not build the library for the specified platform.
+*`-A`* '<directory>', *`--xml-include=`*'<directory>'+::
+    Specify a directory to search for XML include files.
    
-*`--only-platform=`*'<platform>', *-G* '<platform>'+::
+*`-G`* '<platform>', *`--only-platform=`*'<platform>'+::
     Only build the library for the specified platform.
 
-*`-A`* '<directory>'+::
-    Specify a directory to search for XML include files.
-
-*`-F`* '<package-prefix>'::
+*`-F`* '<package-prefix>', *`--package-prefix=`*'<package-ID>'::
     Specify the package prefix of the created library. The default
     is '<package-ID-of-project>' for libraries.
 
-*`-I`* '<directory>'+::
+*`-I`* '<directory>', *`--include-dir=`*'<directory>'+::
     Specify a directory to search for include files (C, C++,
     Verilog).
 
-*`-K`* '<package-ID>'::
+*`-K`* '<package-ID>', *`--package-id=`*'<package-ID>'::
     Specify the package-ID directly. The default is
     '<package-prefix>'*.*'<package-name>'.
 
-*`-N`* '<package-name>'::
+*`-N`* '<package-name>', *`--package-name=`*'<package-name>'::
     Specify the package name of the created library. The
-    default is the '<name>' argument given after the *create* verb.
-   
-*`-T`* '<target>'+::
-    Only build the library for the specified architecture.
+    default is the '<name>' argument given after the *`create`* verb.
 
-*`-Y`* '<primitive-library>'+::
+*`-Q`* '<platform>', *`--exclude-platform=`*'<platform>'+::
+   Do not build the library for the specified platform.
+   
+*`-T`* '<target>', *`--only-target=`*'<target>'+::
+    Only build the library for the specified HDL architecture.
+
+*`-Y`* '<primitive-library>', *`--prim-lib=`*'<primitive-library>'+::
     Specify a primitive library on which the library (or assets
     it contains) depends.  
    
-*`-Z`* '<target>'+::
-    Do not build the library for the specified architecture.
+*`-Z`* '<target>', *`--exclude-target=`*'<target>'+::
+    Do not build the library for the specified HDL architecture.
    
-*`-k`*::
+*`-k`*, *`--keep`*::
     Keep files and directories created after a library creation
     fails. Normally, all such files and directories are removed
     on any failure.
 
-*`-y`* '<other-component-library>'+::
+*`-y`* '<component-library>', *`--comp-lib=`*'<component-library>'+::
     Specify a component library to search for workers, devices
     and/or specs referenced by one or more assets in the created library.
 
@@ -163,6 +172,16 @@ Options When Deleting Libraries
 *`-f`*::
     Force deletion: do not ask for confirmation when deleting
     a library. Normally, you are asked to confirm a deletion.
+
+Options When Building and Cleaning Libraries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--doc-only`*::
+   Only operate on the asset documents in the library and not on the other
+   asset files in the library.
+   
+*`--no-doc`*::
+   Only operate on the asset files in the library and not on the
+   asset documents in the library.
 
 Options When Building Libraries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -203,20 +222,26 @@ Options When Building Libraries
     Limit the assets being built to the specified worker.
 
 Options When Running Libraries
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The options described here, when used in an "ocpidev run library"
 command, are applied as appropriate to all of the unit tests
 that reside in the library.
 
+*`-G`* '<platform>', *`--only-platform=`*'<platform>'+::
+    Specify the runtime platform to use with a component unit test suite.
+    
+*`-Q`* '<platform>'*, `--exclude-platform=`*'<platform>' +::
+    Specify the runtime platform to omit from a component unit test suite.
+
+*`-l`* '<library>', *`--library=`*'<library>'::
+    Run the component unit test suite(s) in the specified library.
+    
 *`--accumulate-errors`*:: 
     Report execution or verification errors as they occur rather
     than ending the test on the first failure detected.
     
-*`--exclude-platform=`*'<platform>', *`Q`* '<platform>'+::
-    Specify the runtime platform to omit from a unit test suite.
-    
 *`--hdl-platform=`*'<platform>'+::
-    Specify the HDL platform to use with the unit test suite.
+    Specify the HDL platform to use with the component unit test suite.
     This option is only valid in generate and build phases.
 
 *`--keep-simulations`*:: 
@@ -224,31 +249,17 @@ that reside in the library.
     By default, simulation files are removed if the verification
     is successful. Warning: Simulation files can become large!
 
-*`--library=`*'<library>', *`-l`* '<library>'::
-    Run the unit test suite(s) in the specified library.
-    
-*`--mode=`*'<mode>'[,'<mode>'[,'<mode>'...]]::
-    Specify which phase(s) of the unit test suite to execute. Valid modes are:
-    - *all*:  execute all five phases (the default if *`--mode`* is not used)
-    - *gen*: execute generate phase
-    - *gen_build*: execute generate and build phases
-    - *prep_run_verify*: execute prepare, run, and verify phases
-    - *prep*: execute prepare phase
-    - *run*: execute run phase
-    - *prep_run*: execute prepare and run phases
-    - *verify*: execute verify phase 
-    - *view*: execute the view script (view.sh) on an already executed run  
-    - *clean_all*: clean all generated files
-    - *clean_run*: clean all files generated during the run phase 
-    
-*`--only-platform=`*'<platform>', *`G`* '<platform>'+:: 
-    Specify the runtime platform to use with a unit test suite.
+*`--phase=`*'<phase>'+::
+    Specify which non-building phase(s) of unit testing to run.
+    Valid phases are: *`prepare`*, *`execute`*, *`verify`*, and *`view`*.
+    The *`view`* phase is used to run 'only' the view scripts for the unit test,
+    without other phases.  The *`--view`* 'option' can be used to add viewing along with other phases.
 
 *`--rcc-platform=`*'<platform>'+:: 
-    Specify the RCC platform to use to build and generate the unit tests suite.
+    Specify the RCC platform to use to build and generate the component unit test suite.
 
 *`--remotes=`*'<system>'::
-    Specify the remote system to run the unit test suite(s) by setting the
+    Specify the remote system to run the component unit test suite(s) by setting the
     *`OCPI_REMOTE_TEST_SYS`* variable. See the section
     "Defining Remote Systems for Executing Tests"
     in the 'OpenCPI Component Development Guide' for more information.
@@ -259,26 +270,30 @@ that reside in the library.
 
 Options When Showing Libraries (plural noun only)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*--json*::
+*`--json`*::
     Format the output in Javascript Object Notation (JSON) format
     for integration with other software.
 
-*--local-scope*:: 
+*`--local-scope`*:: 
     Only display information about the local library.
 
-*--simple*::
+*`--simple`*::
     Format the output as simply as possible.
 
-*--table*::
+*`--table`*::
     Display the output in an easy-to-read table.
     This is the default display format
-    used if *--simple* or *--json* are not used.
+    used if *`--simple`* or *`--json`* are not used.
 
 Options When Using Utilization on Libraries
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*`--hdl=`*'<library>'::
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-P`* '<hdl-platform>', *`--platform=`*'<hdl-platform>'::
     Display information about FPGA resource use for the built workers
-    contained in the specified HDL library.
+    in the libaries on the specified HDL platform.
+
+*`-l`* '<library>', *`--library=`*'<library>'::
+    Display information about FPGA resource use for the built workers
+    in the specified library.
 
 *`--format=`*{*`table`*|*`latex`*}::
     Specify the format in which to output the usage information.
@@ -286,18 +301,14 @@ Options When Using Utilization on Libraries
     Specifying *`latex`* bypasses *`stdout`* and writes all output to
     *`utilization.inc`* files in the directories for the assets on
     which it operates.
+
+*`--hdl=`*'<library>'::
+    Display information about FPGA resource use for the built workers
+    contained in the specified HDL library.
     
 *`--hdl-platform=`*'<platform>'+::
     Display information about FPGA resource use for the built workers
     in the libraries on the specified HDL platform.
-
-*`--library=`*'<library>', *`-l`* '<library>'::
-    Display information about FPGA resource use for the built workers
-    in the specified library.
-
-*`-P`* '<hdl-platform>'::
-    Display information about FPGA resource use for the built workers
-    in the libaries on the specified HDL platform.
 
 EXAMPLES
 --------
@@ -308,20 +319,21 @@ ocpidev create library components
 --------------------------------
 +
 . Inside the *`assets`* project, build the *`util_comps`* library
-for the *`zed`* HDL platform and *`xilinx13_3`* RCC platform.
+for the *`zed`* HDL platform and *`xilinx21_2_aarch32`* RCC platform.
 +
 --------------------------------------------
 ocpidev build library util_comps --hdl-platform zed
-                                 --rcc-platform xilinx13_3
+                                 --rcc-platform xilinx21_2_aarch32
 -------------------------------------------
 +
-. Inside the *`assets`* project, clean the *`util_comps`* library:
+. Inside the *`assets`* project, clean the *`util_comps`* library
+for asset documents, but not for the assets themselves:
 +
---------------------------------
-ocpidev clean library util_comps
--------------------------------
+--------------------------------------
+ocpidev clean library util_comps --doc-only
+--------------------------------------
 +
-. Run all the unit tests in the default *`components`* library
+. Run all the component unit test suites in the default *`components`* library
 inside the current project:
 +
 -----------------------------
@@ -345,11 +357,15 @@ BUGS
 ----
 See https://www.opencpi.org/report-defects
 
-
 RESOURCES
 ---------
 See the main web site: https://www.opencpi.org
 
+See the 'OpenCPI Component Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Component_Development_Guide.pdf
+
+See the 'OpenCPI Documentation Writer Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Documentation_Writer_Guide.pdf
 
 SEE ALSO
 --------
@@ -364,10 +380,9 @@ link:ocpidev-run.1.html[ocpidev-run(1)]
 link:ocpidev-show.1.html[ocpidev-show(1)]
 link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
 
-
 COPYING
 -------
-Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your

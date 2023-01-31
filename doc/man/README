@@ -1,19 +1,20 @@
-OPENCPI MAN PAGES - STATUS 4/20/22
-----------------------------------
+OPENCPI MAN PAGES - STATUS 12/24/2022
+-------------------------------------
 
-ocpiadmin - ready for review
+ocpiadmin - reviewed, updates since
 ocpidriver - reviewed, updates since
 ocpigr - ready for review
 ocpigui - reviewed, updates since
 ocpihdl - ready for review
 ocpiremote - reviewed, updates since
-ocpirun - reviewed
+ocpirun - reviewed, updates since
 ocpiserve - reviewed, updates since
 ocpiview - reviewed, updates since
-ocpitest - reviewed
+ocpitest - reviewed, updates since
 ocpixml - reviewed
 ocpizynq - ready for review
 opencpi - reviewed, updates since
+install-opencpi - reviewed
 
 ocpidev Man Pages
 -----------------
