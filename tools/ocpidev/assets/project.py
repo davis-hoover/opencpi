@@ -61,7 +61,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         self.lib_list = None
         self.apps_col_list = None
 
-        # Boolean for whether or the current directory is within this project
+        # Boolean for whether the current directory is within this project
         # TODO: is current_project needed as a field, or can it be a function?
         #self.current_project = ocpiutil.get_path_to_project_top() == self.directory
         self.__registry = None
@@ -69,27 +69,33 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
 
         # NOTE: imports link to registry is NOT initialized in this constructor.
         #       Neither is the __registry Registry object.
-        if verb in ['run','utilization'] or (verb == 'show' and self.verbose > 1):
+        #
+        # FIXME: why would we do this for 'show' if 'verbose' is set and not otherwise?
+        # if verb in ['run','utilization'] or (verb == 'show' and self.verbose > 1):
+        if verb in ['run','utilization']:
             self.lib_list = []
             logging.debug("Project constructor creating Library Objects")
             for lib_directory in self.get_valid_libraries():
                 self.lib_list.append(AssetFactory.factory("library", lib_directory,
                                                           verb=verb, **kwargs))
-        if verb == 'run' or (verb == 'show' and self.verbose):
+        # FIXME: why would we do this for 'show' if 'verbose' is set and not otherwise?
+        # if verb == 'run' or (verb == 'show' and self.verbose):
+        if verb == 'run':
             self.apps_col_list = []
             logging.debug("Project constructor creating ApplicationCollection Objects")
             for app_directory in self.get_valid_apps_col():
                 self.apps_col_list.append(AssetFactory.factory("applications", app_directory,
                                                                verb=verb, **kwargs))
-        if verb == 'show' and self.verbose:
-            self.comp_list = []
-            package_id = None
-            for comp_directory in self.get_valid_components():
-                if package_id:
-                    kwargs["package_id"] = package_id
-                #comp_name = ocpiutil.rchop(os.path.basename(comp_directory), "spec.xml")[:-1]
-                self.comp_list.append(Component(comp_directory, name=None, verb=verb, **kwargs))
-                package_id = self.comp_list[0].package_id
+        # FIXME: why would we do this for 'show' if 'verbose' is set and not otherwise?
+        # if verb == 'show' and self.verbose:
+        #     self.comp_list = []
+        #     package_id = None
+        #     for comp_directory in self.get_valid_components():
+        #         if package_id:
+        #             kwargs["package_id"] = package_id
+        #         #comp_name = ocpiutil.rchop(os.path.basename(comp_directory), "spec.xml")[:-1]
+        #         self.comp_list.append(Component(comp_directory, name=None, verb=verb, **kwargs))
+        #         package_id = self.comp_list[0].package_id
         self.hdlplatforms = None
         self.rccplatforms = None
         self.hdlassemblies = None
@@ -153,7 +159,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         """
         Two projects are equivalent if their directories match
         """
-        #TODO: do we need realpath too? remove the abs/realpaths if we instead call
+        # TODO: do we need realpath too? remove the abs/realpaths if we instead call
         # them in the Asset constructor
         return (other is not None and
                 os.path.realpath(self.directory) == os.path.realpath(other.directory))
@@ -1118,7 +1124,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         handled at this level:
             register (T/F) - if set to true this project is also registered after it is created
         """
-        path, name, parent_path = Asset.start_creation(directory, name, 'project', kwargs)
+        path, name, parent_path = Asset.start_creation(directory, name, 'project', **kwargs)
         path.mkdir()
         template_dict = __class__._get_template_dict(name, directory, **kwargs)
         # Generate all the project files using templates

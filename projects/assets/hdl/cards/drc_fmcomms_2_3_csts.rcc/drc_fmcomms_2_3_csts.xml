@@ -1,4 +1,4 @@
-<RccWorker language='c++' spec='drc-spec' version='2'
+<RccWorker language='c++' spec='drc' version='2'
 	   controlOperations='start,stop,release'
 	   staticprereqlibs='ad9361' >
 

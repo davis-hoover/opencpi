@@ -166,10 +166,10 @@ for lib in ${devlibs[@]} ; do
     Workers+=" $c"_sub.hdl
     do_ocpidev create worker "$c"_proxy.rcc --hdl-library $lib -V "$c".hdl -S "$c"-spec
     Workers+=" $c"_proxy.rcc
-    # This one file is copied so that this entire set of tests can run without depending
+    # This one directory is copied so that this entire set of tests can run without depending
     # on built or exported projects - i.e. these tests can run in a virgin RPM installation
-    [ -f specs/emulator-spec.xml ] ||
-	cp $OCPI_ROOT_DIR/projects/core/specs/emulator-spec.xml specs
+    [ -d components/emulator.comp ] || ( mkdir -p components/emulator.comp &&
+	cp -pr $OCPI_ROOT_DIR/projects/core/components/emulator.comp components )
     do_ocpidev -v create hdl device "$c"_em.hdl $libopt -E "$c".hdl
     Workers+=" $c"_em.hdl
   done

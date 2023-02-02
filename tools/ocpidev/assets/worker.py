@@ -46,7 +46,7 @@ class Worker(ShowableComponent):
         package_id = kwargs.get("package_id")
         self.package_id = package_id if package_id else self._init_package_id()
         super().init_metadata(self.make_type, Path(self.directory),
-                              Path(self.name.split('.')[0]+'.xml'), kwargs)
+                              Path(self.name.split('.')[0]+'.xml'), **kwargs)
         self.build_configs = {}
         self.init_build_configs(**kwargs)
 
@@ -109,7 +109,7 @@ class Worker(ShowableComponent):
         if name and '.' not in name and not asset_type.endswith("platform"):
             name += '.' + kwargs['model']
         dir_path, kwargs['name'], parent_path = \
-            Asset.start_creation(directory, name, pretty_type, kwargs)
+            Asset.start_creation(directory, name, pretty_type, **kwargs)
         # This assertion is not valid for hdl/devices etc. at least for now.
         # assert parent_path.exists() # library must exist before worker is created
         dir_path.mkdir(parents=True)

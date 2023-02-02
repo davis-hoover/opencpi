@@ -293,7 +293,7 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
         """
         Create an HDL platform asset
         """
-        dir_path, name, parent_path = Asset.start_creation(directory, name, 'HDL Platform', kwargs)
+        dir_path, name, parent_path = Asset.start_creation(directory, name, 'HDL Platform', **kwargs)
         dir_path.mkdir(parents=True)
         platforms_path = parent_path.joinpath('platforms.xml')
         if not platforms_path.exists():

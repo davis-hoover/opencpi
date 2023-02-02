@@ -107,7 +107,7 @@ class Asset(metaclass=ABCMeta):
         args.child_path = args.name
 
     @staticmethod
-    def get_asset_path(directory, name, args):
+    def get_asset_path(directory, name, **kwargs):
         """
         Determine actual asset path and return the triple: path, name, parent
         This is common code for both creation and construction.
@@ -116,7 +116,7 @@ class Asset(metaclass=ABCMeta):
         if not name:
            name = parent_path.name
            parent_path = parent_path.parent
-        child_path = args.get('child_path')
+        child_path = kwargs.get('child_path')
         return parent_path.joinpath(child_path if child_path else name), name, parent_path
 
     @staticmethod
@@ -135,13 +135,13 @@ class Asset(metaclass=ABCMeta):
         return jinja2.Template(template, trim_blocks=True,lstrip_blocks=True)
 
     @staticmethod
-    def start_creation(directory, name, asset_type, args):
+    def start_creation(directory, name, asset_type, **kwargs):
         """
         For asset creation, do the basic figuring of the actual asset path and
         existence check
         Return the triple:  asset_path, asset_name, parent_path
         """
-        path, name, parent = Asset.get_asset_path(directory, name, args)
+        path, name, parent = Asset.get_asset_path(directory, name, **kwargs)
         if path.exists():
             raise ocpiutil.OCPIException(f'{asset_type} "{name}" already exists at "{str(path)}"')
         return path, name, parent

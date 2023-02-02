@@ -59,7 +59,7 @@ class Primitive(BuildableAsset):
         Create a primitive - called by each derived class
         """
         dir_path, name, parent_path = \
-            Asset.start_creation(directory, name, pretty_type, kwargs)
+            Asset.start_creation(directory, name, pretty_type, **kwargs)
         if not parent_path.exists():
             kwargs.pop('name',None)
             HdlPrimitivesCollection.create(parent_path.name, parent_path.parent, verbose=verbose,
@@ -169,7 +169,7 @@ class PrimitivesCollection(ShowableAsset):
         """
         assert model and template_xml
         dir_path, name, parent_path = \
-            Asset.start_creation(directory, name, f'{model.upper()} Primitives', kwargs)
+            Asset.start_creation(directory, name, f'{model.upper()} Primitives', **kwargs)
         assert name == 'primitives'
         directory.joinpath(name).mkdir(parents=True)
         template = jinja2.Template(template_xml, trim_blocks=True)

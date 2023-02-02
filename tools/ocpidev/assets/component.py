@@ -42,13 +42,13 @@ class ShowableComponent(ShowableAsset):
     def __init__(self, directory, name=None, **kwargs):
         super().__init__(directory, name, **kwargs)
 
-    def init_metadata(self, make_type, directory, xml_file, args):
+    def init_metadata(self, make_type, directory, xml_file, **kwargs):
         """
         Initialize the metadata for this asset.
         The directory arg in this case is where xml file lives, not necessarily
         the parent directory of this asset (which is self.directory)
         """
-        if args.get('verb') != 'show':
+        if kwargs.get('verb') != 'show':
             return
         xml = ocpiutil.get_xml_string_from_file(make_type, directory, xml_file)
 
@@ -312,7 +312,7 @@ class Component(ShowableComponent,BuildableAsset):
             xml_file = my_path.name
             my_path = self.parent
             make_type = 'library'
-        super().init_metadata(make_type, my_path, xml_file, kwargs)
+        super().init_metadata(make_type, my_path, xml_file, **kwargs)
 
     @classmethod
     def _get_project_package_id(cls, parent_path, project=None, **kwargs):
@@ -394,7 +394,7 @@ class Component(ShowableComponent,BuildableAsset):
         with a *-spec.xml file in that directory, or just a  specs/*-spec.xml file.
         No object is created, only file system operations are performed.
         """
-        path, name, parent_path = Asset.start_creation(directory, name, 'component', kwargs)
+        path, name, parent_path = Asset.start_creation(directory, name, 'component', **kwargs)
         if project:
             file_only = True
         if file_only and not project: #  "specs/* file" special case that does not produce any doc
@@ -492,7 +492,7 @@ class Protocol(Component):
         """
         Static method to create a new Protocol
         """
-        path, name, parent_path = Asset.start_creation(directory, name, 'protocol', kwargs)
+        path, name, parent_path = Asset.start_creation(directory, name, 'protocol', **kwargs)
         Asset.create_file_asset("protocol", "prot", directory, name,
                                 ocpitemplate.PROTOCOL_SPEC_XML,
                                 __class__._get_template_dict,
@@ -526,7 +526,7 @@ class HdlSlot(Component):
         """
         Static method to create a new HDL slot
         """
-        path, name, parent_path = Asset.start_creation(directory, name, 'HDL slot', kwargs)
+        path, name, parent_path = Asset.start_creation(directory, name, 'HDL slot', **kwargs)
         Asset.create_file_asset('slot', 'slot', directory, name, ocpitemplate.HDL_SLOT_XML,
                                 __class__._get_template_dict,
                                 __class__._get_project_package_id(parent_path, **kwargs),
@@ -555,7 +555,7 @@ class HdlCard(HdlSlot):
         """
         Static method to create a new HDL card
         """
-        path, name, parent_path = Asset.start_creation(directory, name, 'HDL card', kwargs)
+        path, name, parent_path = Asset.start_creation(directory, name, 'HDL card', **kwargs)
         Asset.create_file_asset('card', 'card', directory, name, ocpitemplate.HDL_CARD_XML,
                                 __class__._get_template_dict,
                                 __class__._get_project_package_id(parent_path, **kwargs),
