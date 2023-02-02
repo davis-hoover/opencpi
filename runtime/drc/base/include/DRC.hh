@@ -21,8 +21,10 @@
 #ifndef _DRC_HH
 #define _DRC_HH
 
-#include "Math.hh"
+#include "Math.hh" // Constraint Satisfaction Problem (CSP)
+#ifndef DISABLE_LOG
 #include "UtilLogPrefix.hh" // Util::LogPrefix
+#endif
 
 namespace OCPI {
 
@@ -31,300 +33,183 @@ namespace DRC_PHASE_2 {
 
 using namespace Math;
 
-/// @brief Each RF port has an associated direction (either RX or TX).
-enum class rf_port_direction_t {rx, tx};
-/*! @brief We model many (all?) of the radio controller config values as
- *         doubles.
- ******************************************************************************/
-//enum class std::string {agc, manual};
-/*! @brief Each config lock has an associated ID by which it can be referred to
- *         (after a lock occurs you use this ID to keep track of that lock so
- *         that you can specifically delete that lock at a later time).
- ******************************************************************************/
-// standard radio controller RF port configs
-const std::string config_key_direction          ("direction"          );
-const std::string config_key_tuning_freq_MHz    ("tuning_freq_MHz"    );
-const std::string config_key_bandwidth_3dB_MHz  ("bandwidth_3dB_MHz"  );
-const std::string config_key_sampling_rate_Msps ("sampling_rate_Msps" );
-const std::string config_key_samples_are_complex("samples_are_complex");
-const std::string config_key_gain_mode          ("gain_mode"          );
-const std::string config_key_gain_dB            ("gain_dB"            );
-
-class CSPBase {
-  protected:
-  /// @todo / FIXME - pull in these 2 from DRC definition
-  double dfp_tol = 1e-12;
+struct RFPort {
   public:
-  /// @todo / FIXME make protected?
-  CSPSolver m_solver;
-  const CSPSolver::FeasibleRegionLimits& get_feasible_region_limits() const;
-  double get_feasible_region_limits_min_double(
-        const char* var) const;
-}; // CSPBase
-
-// map generic CSP variable names (const char *s) each to a std::string (one
-// of config_key_<name>
-// for all RF ports
-
-class RFPort {
-  public:
-  typedef std::map<std::string, const char*> CSPVarMap;
-  /// @todo / FIXME make protected?
-  CSPVarMap   m_csp_map;
-  RFPort(std::string name, bool supports_rx, bool supports_tx, CSPVarMap map);
-  std::string get_name() const;
-  bool        get_supports_rx() const;
-  bool        get_supports_tx() const;
-  protected:
-  std::string m_name;
-  bool        m_supports_rx;
-  bool        m_supports_tx;
-}; // class RFPort
-
-/*! @brief Software-only emulator of a hardware configuration environment which
- *         provides an API for locking/unlocking range-constrained configs.
- ******************************************************************************/
-template<class CSP>
-class Configurator : public OCPI::Util::LogPrefix {
-  protected:
-  struct LockParam {
-    // intentionallity not reference, due to changing vector entry which this is referring to
-    CSPSolver::Constr m_constr_lo;
-    // intentionallity not reference, due to changing vector entry which this is referring to
-    CSPSolver::Constr m_constr_hi;
-    //int32_t m_lock_val_int32;
-    //double  m_lock_val_double;
-    //int32_t m_lock_val_is_int32;
-    //double  m_lock_val_is_double;
-    bool           m_constr_hi_used;
-    int32_t        m_lock_val_int32;
-    double m_lock_val_double;
-    bool           m_lock_val_is_int32;
-    bool           m_lock_val_is_double;
-  };
-  std::vector<std::string>          m_rf_port_names;
-  std::vector<RFPort>               m_rf_ports;
-  std::map<const char*, LockParam>  m_locked_params;
-  /// @brief a config is mapped to a variable (X) within the CSP <X,D,C>
-  CSP                               m_solver;
-  std::string                       m_error;
-  public:
-  const char* get_config(std::string rf_port_name, std::string cfg) const;
-  double get_config_locked_value(std::string rf_port_name,
-      std::string cfg) const;
-  template<typename T> std::string get_lock_config_str(std::string rf_port_name,
-      std::string cfg, T val, bool succeeded);
-  const std::vector<std::string>& get_rf_port_names() const;
-  const std::string& get_error() const;
-  void add_rf_port(RFPort rf_port);
-  bool lock_config(std::string ds_id, std::string cfg, int32_t val);
-  bool lock_config(std::string ds_id, std::string cfg, double val,
-      double tol);
-  bool lock_config(const char* config, int32_t val);
-  bool lock_config(const char* config, double val,
-      double tolerance);
-  void unlock_config(std::string ds_id, std::string config);
-  void unlock_config(const char* config);
-  void unlock_all();
-  void find_rf_ports_which_support_direction(rf_port_direction_t dir,
-       std::vector<std::string>& rf_ports) const;
-  double get_locked_value(const char* config);
-  bool get_config_is_locked(const char* config);
-  const CSPSolver::FeasibleRegionLimits& get_feasible_region_limits() const;
-  double get_feasible_region_limits_min_double(const char* var) const;
-}; // class Configurator
-
-/*! @brief Intended to represent requested config locks for individual RF
- *         ports, which may or may not succeed.
- ******************************************************************************/
-class RFPortConfigLockRequest {
-  protected:
-  std::string         m_rf_port_name;
-  rf_port_direction_t m_direction;
-  std::string         m_routing_id;
+  enum class direction_t {rx, tx};
+  enum class config_t {
+      direction,
+      tuning_freq_MHz,
+      bandwidth_3dB_MHz,
+      sampling_rate_Msps,
+      samples_are_complex,
+      gain_mode,
+      gain_dB};
+  RFPort::direction_t m_direction;
   double              m_tuning_freq_MHz;
   double              m_bandwidth_3dB_MHz;
   double              m_sampling_rate_Msps;
   bool                m_samples_are_complex;
   std::string         m_gain_mode;
+  /// @brief ignore if m_gain_mode is not "manual"
   double              m_gain_dB;
-  double              m_tolerance_tuning_freq_MHz;
-  double              m_tolerance_bandwidth_3dB_MHz;
-  double              m_tolerance_sampling_rate_Msps;
-  double              m_tolerance_gain_dB;
-  bool                m_including_direction;
-  bool                m_including_rf_port_name;
-  bool                m_including_routing_id;
-  bool                m_including_tuning_freq_MHz;
-  bool                m_including_bandwidth_3dB_MHz;
-  bool                m_including_sampling_rate_Msps;
-  bool                m_including_samples_are_complex;
-  bool                m_including_gain_mode;
-  bool                m_including_gain_dB;
+  RFPort();
+  RFPort(
+    RFPort::direction_t direction,
+    double              tuning_freq_MHz,
+    double              bandwidth_3dB_MHz,
+    double              sampling_rate_Msps,
+    bool                samples_are_complex,
+    const std::string&  gain_mode,
+    double              gain_dB);
+}; // struct RFPort
+
+/*! @brief intentionally separate (does not inherit) from RFPort,
+ *         m_rf_port_name is intended to point to a mapped RFPort entry
+ ******************************************************************************/
+struct RFPortConfigLock {
+  std::string m_rf_port_name;
+  uint8_t     m_rf_port_num;
+  uint8_t     m_app_port_num;
+  RFPortConfigLock(const std::string& rf_port_name, uint8_t rf_port_num,
+      uint8_t app_port_num);
+}; // struct RFPortConfigLock
+
+typedef std::vector<RFPortConfigLock> ConfigLock;
+
+/// @brief constructed once and never changes
+class RFPortConfigLockRequest : protected RFPort, protected RFPortConfigLock {
   public:
-  RFPortConfigLockRequest();
-  rf_port_direction_t get_direction() const;
-  std::string         get_rf_port_name() const;
-  std::string         get_routing_id() const;
+  enum class config_t {
+    rf_port_name, rf_port_num, app_port_num,
+    tolerance_tuning_freq_MHz,
+    tolerance_bandwidth_3dB_MHz,
+    tolerance_sampling_rate_Msps,
+    tolerance_gain_dB
+  };
+  /*! @param[in] gain_mode    "manual" or "agc" (or perhaps something
+   *                          hardware-specific)
+   *  @param[in] rf_port_name specify name to request by port, or leave as "" to
+   *                          request by direction only
+   ****************************************************************************/
+  RFPortConfigLockRequest(
+    RFPort::direction_t direction,
+    double              tuning_freq_MHz,
+    double              bandwidth_3dB_MHz,
+    double              sampling_rate_Msps,
+    bool                samples_are_complex,
+    const std::string&  gain_mode,
+    double              gain_dB,
+    double              tolerance_tuning_freq_MHz,
+    double              tolerance_bandwidth_3dB_MHz,
+    double              tolerance_sampling_rate_Msps,
+    double              tolerance_gain_dB,
+    const std::string&  rf_port_name,
+    uint8_t             rf_port_num,
+    uint8_t             app_port_num);
+  RFPort::direction_t get_direction() const;
   double              get_tuning_freq_MHz() const;
   double              get_bandwidth_3dB_MHz() const;
   double              get_sampling_rate_Msps() const;
   bool                get_samples_are_complex() const;
-  std::string         get_gain_mode() const;
+  const std::string&  get_gain_mode() const;
   double              get_gain_dB() const;
   double              get_tolerance_tuning_freq_MHz() const;
   double              get_tolerance_bandwidth_3dB_MHz() const;
   double              get_tolerance_sampling_rate_Msps() const;
   double              get_tolerance_gain_dB() const;
-  bool                get_including_direction() const;
-  bool                get_including_rf_port_name() const;
-  bool                get_including_routing_id() const;
-  bool                get_including_tuning_freq_MHz() const;
-  bool                get_including_bandwidth_3dB_MHz() const;
-  bool                get_including_sampling_rate_Msps() const;
-  bool                get_including_samples_are_complex() const;
-  bool                get_including_gain_mode() const;
-  bool                get_including_gain_dB() const;
-  /*! @brief This funciton must be called before sending a
-   *         RFPortConfigLockRequest to ARC::request_config_lock or
-   *         DRC::request_config_lock.
-   ******************************************************************************/
-  void include_direction(rf_port_direction_t val);
-  /*! @brief This function is optionally called before sending a
-   *         RFPortConfigLockRequest to ARC::request_config_lock or
-   *         DRC::request_config_lock.
-   ******************************************************************************/
-  void include_rf_port_name(std::string val);
-  /*! @brief This function is optionally called before sending a
-   *         RFPortConfigLockRequest to DRC::request_config_lock.
-   *  @param[in] routing_id Must be a string in the format "RX0", "TX0", "RX1",
-   *                        etc...
-   ******************************************************************************/
-  void include_routing_id(std::string val);
-  /*! @brief This function must be called before sending a
-   *         RFPortConfigLockRequest to ARC::request_config_lock or
-   *         DRC::request_config_lock.
-   ******************************************************************************/
-  void include_tuning_freq_MHz(double val, double tolerance);
-  /*! @brief This function must be called before sending a
-   *         RFPortConfigLockRequest to ARC::request_config_lock or
-   *         DRC::request_config_lock.
-   ******************************************************************************/
-  void include_bandwidth_3dB_MHz(double val, double tolerance);
-  /*! @brief This function must be called before sending a
-   *         RFPortConfigLockRequest to DRC::request_config_lock.
-   ******************************************************************************/
-  void include_sampling_rate_Msps(double val, double tolerance);
-  /*! @brief This function must be called before sending a
-   *         RFPortConfigLockRequest to DRC::request_config_lock.
-   ******************************************************************************/
-  void include_samples_are_complex(bool val);
-  /*! @brief This function is optionally called before sending a
-   *         RFPortConfigLockRequest to  ARC::request_config_lock or
-   *         DRC::request_config_lock. Call this only if request should
-   *         include a desired gain mode value.
-   ******************************************************************************/
-  void include_gain_mode(std::string val);
-  /*! @brief This function is optionally called before sending a
-   *         RFPortConfigLockRequest to  ARC::request_config_lock or
-   *         DRC::request_config_lock. Call this only if request should
-   *         include desired manual gain value.
-   ******************************************************************************/
-  void include_gain_dB(double val, double tolerance);
+  const std::string&  get_rf_port_name() const;
+  uint8_t             get_rf_port_num() const;
+  uint8_t             get_app_port_num() const;
   protected:
-  void throw_for_invalid_get_call(const char* config) const;
+  double m_tolerance_tuning_freq_MHz;
+  double m_tolerance_bandwidth_3dB_MHz;
+  double m_tolerance_sampling_rate_Msps;
+  double m_tolerance_gain_dB;
 }; // class RFPortConfigLockRequest
 
-/*! @brief Intended to represent requested controller config locks.
- *         Locks may or may not succeed.
- ******************************************************************************/
-struct ConfigLockRequest {
-  std::vector<RFPortConfigLockRequest> m_rf_ports;
-}; // struct ConfigLockRequest
+typedef std::vector<RFPortConfigLockRequest> ConfigLockRequest;
+typedef ConfigLockRequest Configuration;
 
-/*! @brief Intended to represent an existing (already locked) lock of a group
- *         of radio controller configs for an individual RF port.
+/* !@brief This is the base class for all CSP classes which will be radio
+ *         specific. It has a CSPSolver which provides a way describing and
+ *         enforcing radio-specific constraints,
+ *         e.g. 70 <= rx1_tuning_freq_MHz <= 6000.
  ******************************************************************************/
-struct RFPortConfigLock {
-  /// @brief Each existing lock is always associated with an RF port
-  std::string         m_rf_port_name;
-  rf_port_direction_t m_direction;
-  /// @todo /FIXME - add routing id and implement corresponding functionality?
-  //std::string         m_routing_id;
-  double              m_tuning_freq_MHz;
-  double              m_bandwidth_3dB_MHz;
-  double              m_sampling_rate_Msps;
-  bool                m_samples_are_complex;
-  std::string         m_gain_mode;
-  double              m_gain_dB;
-  bool                m_including_gain_mode;
-  bool                m_including_gain_dB;
-}; // struct RFPortConfigLock
-
-/*! @brief Intended to represent an existing (already locked) lock of a group
- *         of digital radio controller configs.
- ******************************************************************************/
-struct ConfigLock {
-  std::string                       m_config_lock_id;
-  std::vector<RFPortConfigLock> m_rf_ports;
-}; // struct ConfigLock
-
-/*! @brief Provides an API for controlling/locking analog configs of
- *         a radio. When requesting config locks, a Configurator object is
- *         queried for valid ranges before hardware actuation is performed.
- ******************************************************************************/
-template<class configurator_t>
-class ARC : public OCPI::Util::LogPrefix {
-  public:
-  ARC(const char* descriptor);
-  const std::string&      get_descriptor() const;
-  const std::vector<ConfigLock>& get_config_locks() const;
-  // get_ API calls each retrieve a value as it exists on hardware.
-  /// @brief Determine whether the RF port is powered on and fully active.
-  virtual bool            get_enabled(          std::string rf_port_name) = 0;
-  virtual rf_port_direction_t get_direction(    std::string rf_port_name) = 0;
-  virtual double          get_tuning_freq_MHz(  std::string rf_port_name) = 0;
-  virtual double          get_bandwidth_3dB_MHz(std::string rf_port_name) = 0;
-  // set_ API calls each attempt to set on-hardware value w/ no guarantee of
-  // success
-  virtual void set_direction(std::string rf_port_name,
-      rf_port_direction_t val) = 0;
-  /*! @brief  Attempt to set on-hardware value with no guarantee of success.
-   *  @todo / FIXME - for increased functionality, make public and throw
-   *          exception if value is locked?
-   ******************************************************************************/
-  virtual void set_tuning_freq_MHz(std::string rf_port_name, double val) = 0;
-  /*! @brief  Attempt to set on-hardware value with no guarantee of success.
-   *  @todo / FIXME - for increased functionality, make public and throw
-   *          exception if value is locked?
-   ******************************************************************************/
-  virtual void set_bandwidth_3dB_MHz(std::string rf_port_name, double val) = 0;
-  //protected:
-  virtual bool request_config_lock(std::string id, const ConfigLockRequest& req);
-  virtual void unlock_config_lock(std::string id);
-  virtual void unlock_all();
+class CSPBase {
   protected:
-  const char*                               m_descriptor;
-  ///@brief child class is expected to have a member derived from Configurator
-  configurator_t                            m_configurator;
-  std::vector<ConfigLock>                   m_config_locks;
-  bool                                      m_cache_initialized;
-  std::map<std::string,rf_port_direction_t> m_cache_direction;
-  std::map<std::string,double>              m_cache_tuning_freq_MHz;
-  std::map<std::string,double>              m_cache_bandwidth_3dB_MHz;
-  virtual void initialize_cache();
-  bool lock_config(std::string rf_port_name, double val,
-      std::string cfg, bool do_tol, double tol);
-  void unlock_config(std::string rf_port_name, std::string cfg_key);
-  /// @brief Performs the minimum config locks required per Rf port
-  virtual bool do_min_rf_port_config_locks(std::string rf_port_name,
-    const RFPortConfigLockRequest& req);
-  bool config_val_is_within_tolerance(double expected_val,
-      double tolerance, double val) const;
-  void throw_if_rf_port_lock_request_malformed(
-      const RFPortConfigLockRequest& req) const;
-  void throw_invalid_rf_port_name(std::string rf_port_name) const;
-}; // class ARC
+  /// @todo / FIXME - pull in these 2 from DRC definition
+  /// @brief floating point tolerance used for value comparison
+  double dfp_tol = 1e-12;
+  public:
+  /// @todo / FIXME make protected?
+  CSPSolver m_solver;
+  const CSPSolver::FeasibleRegionLimits& get_feasible_region_limits() const;
+  double get_feasible_region_limits_min_double(const std::string& var) const;
+}; // class CSPBase
+
+/// @brief maps a RFPort::config_t entry to a CSP variable name (string)
+typedef std::map<RFPort::config_t, std::string> CSPVarMap;
+
+/*! @brief Software-only emulator of a hardware configuration environment,
+ *         which provides API for locking/unlocking range-constrained
+ *         descriptors of radio configs, templatized by radio-specific CSP
+ ******************************************************************************/
+template<class CSP>
+#ifdef DISABLE_LOG
+class Configurator
+#else
+class Configurator : public OCPI::Util::LogPrefix
+#endif
+  {
+  public:
+  /*! @brief dictionary to construct and then allow internal methods to look up:
+   *         rf_port_name > tune freq/bandwidth etc  > CSP variable name
+   *         (string)     > CSPVarMap 1st (config_t) > CSPVarMap 2nd (string)
+   ****************************************************************************/
+  std::map<std::string,CSPVarMap> m_dict;
+  /// @brief this just retrieves entries from the dictionary
+  const std::string& get_error() const;
+  double get_config_locked_value(const std::string& rf_port_name,
+      RFPort::config_t cfg) const;
+  template<typename T> std::string get_lock_config_str(
+      const std::string& rf_port_name, RFPort::config_t cfg, T val,
+      bool succeeded);
+  bool get_csp_var_is_locked(const std::string& csp_var) const;
+  const CSPSolver::FeasibleRegionLimits& get_feasible_region_limits() const;
+  double get_feasible_region_limits_min_double(const std::string& var) const;
+  bool lock_config(const std::string& rf_port_name, RFPort::config_t cfg,
+      int32_t val);
+  bool lock_config(const std::string& rf_port_name, RFPort::config_t cfg,
+      double val, double tolerance);
+  void unlock_config(const std::string& rf_port_name, RFPort::config_t cfg);
+  void unlock_all();
+  protected:
+  /*! @brief This is used to keep track of internal CSP var "locks". CSP
+   *  variables aren't exactly locked, but rather their feasible regions
+   *  are manipulated (via constraints) as a result of config lock/unlock,
+   *  and this is used to keep track of said manipulation (constraints)
+   ****************************************************************************/
+  struct CSPVarLockInfo {
+    size_t  m_constr_lo_id;
+    size_t  m_constr_hi_id;
+    int32_t m_lock_val_int32;
+    double  m_lock_val_double;
+    /*! @brief if true, m_lock_val_int32 is ignored, otherwise
+     *         m_lock_val_double ignored
+     **************************************************************************/
+    bool    m_lock_val_is_double;
+  };
+  /// @brief map by var name
+  std::map<std::string,CSPVarLockInfo> m_locked_csp_vars;
+  /// @brief a config is mapped to a variable (X) within the CSP <X,D,C>
+  CSP                                  m_solver;
+  std::string                          m_error;
+  // lock_csp_var() and unlock_csp_var() methods are the primary mechanism
+  // between Configurators and their CSPs
+  bool lock_csp_var(  const std::string& csp_var, int32_t val);
+  bool lock_csp_var(  const std::string& csp_var, double val, double tolerance);
+  void unlock_csp_var(const std::string& csp_var);
+}; // class Configurator
 
 /*! @brief Provides an API for controlling/locking analog and digital configs of
  *         a radio. When preparing (requesting "config locks"), a Configurator
@@ -332,61 +217,104 @@ class ARC : public OCPI::Util::LogPrefix {
  *         performed.
  ******************************************************************************/
 template<class configurator_t>
-class DRC : public ARC<configurator_t> {
+#ifdef DISABLE_LOG
+class DRC
+#else
+class DRC : public OCPI::Util::LogPrefix
+#endif
+  {
   public:
-  DRC(const char* descriptor);
-  virtual bool prepare(unsigned config, const ConfigLockRequest& req);
-  virtual bool start(  unsigned config);
-  virtual bool stop(   unsigned config);
-  virtual bool release(unsigned config);
-  const std::string& get_error() const;
-  // get_ API calls each retrieve a value as it exists on hardware.
-  virtual double get_sampling_rate_Msps( std::string rf_port_name) = 0;
-  virtual bool   get_samples_are_complex(std::string rf_port_name) = 0;
-  virtual std::string get_gain_mode(     std::string rf_port_name) = 0;
-  // set_ API calls each attempt to set on-hardware value w/ no guarantee of
-  // success
-  virtual double get_gain_dB(            std::string rf_port_name) = 0;
-  virtual void   set_sampling_rate_Msps( std::string rf_port_name,
+  DRC(const std::string& descriptor = "");
+  virtual void set_configuration(uint16_t config_idx,
+    const Configuration& req);
+  // child classes may override transition functions w/ hardware-specific
+  // behavior, config_idx refers to a configuration already set via
+  // set_configuration()
+  virtual bool prepare(uint16_t config_idx);
+  virtual bool start(  uint16_t config_idx);
+  virtual bool stop(   uint16_t config_idx);
+  virtual bool release(uint16_t config_idx);
+  void release_all();
+  const std::string&                    get_descriptor() const;
+  /*! @return most recent error which caused config lock failure (empty
+   *          string if there was never a failure)
+   ****************************************************************************/
+  const std::string&                    get_error() const;
+  const std::map<uint16_t, ConfigLock>& get_locks() const;
+  // get_ functions retrieve (by port name) a value as it exists on hardware.
+  /// @brief Determine whether the RF port is powered on and fully active.
+  virtual bool        get_enabled(            const std::string&
+    rf_port_name) = 0;
+  virtual RFPort::direction_t get_direction(  const std::string&
+    rf_port_name) = 0;
+  virtual double      get_tuning_freq_MHz(    const std::string&
+    rf_port_name) = 0;
+  virtual double      get_bandwidth_3dB_MHz(  const std::string&
+    rf_port_name) = 0;
+  virtual double      get_sampling_rate_Msps( const std::string&
+    rf_port_name) = 0;
+  virtual bool        get_samples_are_complex(const std::string&
+    rf_port_name) = 0;
+  virtual std::string get_gain_mode(          const std::string&
+    rf_port_name) = 0;
+  virtual double      get_gain_dB(            const std::string&
+    rf_port_name) = 0;
+  virtual uint8_t     get_app_port_num(       const std::string&
+    rf_port_name) = 0;
+  // set_ functions attempt to set (by port name) on-hardware value, with no
+  // guarantee of success (prior calls to configurator are what make guarantees)
+  virtual void set_direction(          const std::string& rf_port_name,
+      RFPort::direction_t val) = 0;
+  virtual void set_tuning_freq_MHz(    const std::string& rf_port_name,
       double val) = 0;
-  virtual void   set_samples_are_complex(std::string rf_port_name,
+  virtual void set_bandwidth_3dB_MHz(  const std::string& rf_port_name,
+      double val) = 0;
+  virtual void set_sampling_rate_Msps( const std::string& rf_port_name,
+      double val) = 0;
+  virtual void set_samples_are_complex(const std::string& rf_port_name,
       bool val) = 0;
-  virtual void   set_gain_mode(          std::string rf_port_name,
-      std::string val) = 0;
+  virtual void set_gain_mode(          const std::string& rf_port_name,
+      const std::string& val) = 0;
   /*! @brief  Exception is thrown if the gain mode for the requested RF port
-   *          is auto ("agc").
-   ******************************************************************************/
-  virtual void   set_gain_dB(            std::string rf_port_name,
+   *          is currently "agc" (auto).
+   ****************************************************************************/
+  virtual void set_gain_dB(     const std::string& rf_port_name,
       double val) = 0;
-  virtual void   set_routing_id(         std::string rf_port_name,
-      std::string val) = 0;
+  virtual void set_app_port_num(const std::string& rf_port_name,
+      uint8_t val) = 0;
   //protected:
-  virtual bool request_config_lock(std::string rf_port_name,
-      const ConfigLockRequest& req);
-  virtual void unlock_config_lock(std::string rf_port_name);
-  /*! @brief     Requests configurator lock, and if that succeeds, set
-   *             on-hardware value to desired value.
-   *  @param[in] rf_port_name RF port name for which to apply lock
-   *  @param[in] cfg_key      Configuration to lock
-   *  @param[in] val          Desired value to lock to
-   *  @param[in] do_tol       Instructs usage of the tolerance
-   *  @param[in] tol          Tolerance
-   *  @return    Boolean      indicator of success.
-   ******************************************************************************/
-  bool lock_config(std::string rf_port_name, double val, std::string cfg,
-      bool do_tol, double tolerance);
-  /// @brief Performs the minimum config locks required per RF port
-  virtual bool do_min_rf_port_config_locks(std::string id,
-      const RFPortConfigLockRequest& req);
-  void throw_if_rf_port_lock_request_malformed(
-      const RFPortConfigLockRequest& req) const;
+  /*! @param[in] id Zero-based configuration ordinal used to refer to the lock
+   *                request (and the succesful lock, if it suceeds) going
+   *                forward, e.g. for future calls to unlock_config_lock()
+   *  @return       Boolean indicator of success
+   ****************************************************************************/
+  virtual bool request_config_lock(uint16_t config_idx);
+  virtual void unlock_config_lock(uint16_t config_idx);
+  virtual void unlock_all();
   protected:
-  std::map<std::string,double>         m_cache_sampling_rate_Msps;
-  std::map<std::string,bool>           m_cache_samples_are_complex;
-  std::map<std::string,std::string>    m_cache_gain_mode;
-  std::map<std::string,double>         m_cache_gain_dB;
-  std::map<unsigned,ConfigLockRequest> m_requests;
+  /// @brief mainly just for logging "who am I"
+  std::string                          m_descriptor;
+  std::string                          m_error;
+  /*! @brief each DRC child class is expected to associate a configurator_t
+   *         class which is expected to derive from Configurator
+   ****************************************************************************/
+  configurator_t                       m_configurator;
+  /// @brief map locks by uint index from prepare/start/stop/release
+  std::map<uint16_t,ConfigLock>        m_locks;
+  /// @brief map lock requests by uint index from prepare/start/stop/release
+  std::map<uint16_t,Configuration>     m_configurations;
+  std::map<uint16_t,bool>              m_pending_configuration;
+  /// @brief map cache of RF port settings by rf_port_name (string)
+  std::map<std::string,RFPort>         m_cache;
+  bool                                 m_cache_initialized;
   virtual void initialize_cache();
+  bool lock_config(const std::string& rf_port_name, RFPort::config_t cfg,
+    double val, bool do_tolerance, double tolerance);
+  void unlock_config(const std::string& rf_port_name, RFPort::config_t cfg);
+  void unlock_rf_port(const std::string& rf_port_name);
+  virtual bool attempt_rf_port_config_locks(const std::string& rf_port_name,
+      const RFPortConfigLockRequest& req);
+  void throw_invalid_rf_port_name(const std::string& rf_port_name) const;
 }; // class DRC
 
 } // namespace DRC_PHASE_2

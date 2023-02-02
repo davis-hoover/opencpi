@@ -26,11 +26,9 @@ namespace OCPI {
 namespace DRC_PHASE_2 {
 
 // -----------------------------------------------------------------------------
-// STEP 1 - IF IS_LOCKING SUPPORTED,
-//          DEFINE Constraint Satisfaction Problem (CSP)
+// STEP 1 - DEFINE Constraint Satisfaction Problem (CSP)
 // -----------------------------------------------------------------------------
 
-#ifdef IS_LOCKING
 /* @brief for the FMCOMMS2_3,
  *        define variables (X) and their domains (D) for <X,D,C> which
  *        comprises its Constraint Satisfaction Problem (CSP)
@@ -147,7 +145,9 @@ FMCOMMS2_3CSP::connect_fmcomms2_3_to_ad9361() {
 void
 FMCOMMS2_3CSP::instance_fmcomms2_3() {
   instance_ad9361();
+  std::cout << "define";
   define_x_d_fmcomms2_3();
+  std::cout << "define";
   connect_fmcomms2_3_to_ad9361();
 }
 
@@ -156,95 +156,120 @@ void
 FMCOMMS2_3CSP::define() {
   instance_fmcomms2_3();
 }
-#endif
 
 // -----------------------------------------------------------------------------
-// STEP 2 - IF IS_LOCKING SUPPORTED, DEFINE CONFIGURATOR THAT UTILIZES THE CSP
+// STEP 2 - DEFINE CONFIGURATOR THAT UTILIZES THE CSP
 // -----------------------------------------------------------------------------
 
-#ifdef IS_LOCKING
+void
+FMCOMMS2_3Configurator::init_rf_port_rx1a() {
+  // maps each of the DRC-specific RFPort::config_t types to their corresponding CSP
+  // variables names (a CSP is generic and knows nothing about a DRC, this is
+  // what ties the two together)
+  CSPVarMap map;
+  map.insert(std::make_pair(RFPort::config_t::direction,
+      "fmcomms2_3_dir_rx1a"));
+  map.insert(std::make_pair(RFPort::config_t::tuning_freq_MHz,
+      "fmcomms2_3_fc_meghz_rx1a"));
+  map.insert(std::make_pair(RFPort::config_t::bandwidth_3dB_MHz,
+      "fmcomms2_3_bw_meghz_rx1a"));
+  map.insert(std::make_pair(RFPort::config_t::sampling_rate_Msps,
+      "fmcomms2_3_fs_megsps_rx1a"));
+  map.insert(std::make_pair(RFPort::config_t::samples_are_complex,
+      "fmcomms2_3_samps_comp_rx1a"));
+  map.insert(std::make_pair(RFPort::config_t::gain_mode,
+      "fmcomms2_3_gain_mode_rx1a"));
+  map.insert(std::make_pair(RFPort::config_t::gain_dB,
+      "fmcomms2_3_gain_db_rx1a"));
+  // make a dictionary entry which ties the mapping to a particular rf_port_name
+  ///@TODO / FIXME hardcoded mapping in below line
+  m_dict["Rx0"/*"rx1a"*/] = map;
+}
+
+void
+FMCOMMS2_3Configurator::init_rf_port_rx2a() {
+  // maps each of the DRC-specific RFPort::config_t types to their corresponding CSP
+  // variables names (a CSP is generic and knows nothing about a DRC, this is
+  // what ties the two together)
+  CSPVarMap map;
+  map.insert(std::make_pair(RFPort::config_t::direction,
+      "fmcomms2_3_dir_rx2a"));
+  map.insert(std::make_pair(RFPort::config_t::tuning_freq_MHz,
+      "fmcomms2_3_fc_meghz_rx2a"));
+  map.insert(std::make_pair(RFPort::config_t::bandwidth_3dB_MHz,
+      "fmcomms2_3_bw_meghz_rx2a"));
+  map.insert(std::make_pair(RFPort::config_t::sampling_rate_Msps,
+      "fmcomms2_3_fs_megsps_rx2a"));
+  map.insert(std::make_pair(RFPort::config_t::samples_are_complex,
+      "fmcomms2_3_samps_comp_rx2a"));
+  map.insert(std::make_pair(RFPort::config_t::gain_mode,
+      "fmcomms2_3_gain_mode_rx2a"));
+  map.insert(std::make_pair(RFPort::config_t::gain_dB,
+      "fmcomms2_3_gain_db_rx2a"));
+  // make a dictionary entry which ties the mapping to a particular rf_port_name
+  ///@TODO / FIXME hardcoded mapping in below line
+  m_dict["Rx1"/*"rx2a"*/] = map;
+}
+
+void
+FMCOMMS2_3Configurator::init_rf_port_tx1a() {
+  // maps each of the DRC-specific RFPort::config_t types to their corresponding CSP
+  // variables names (a CSP is generic and knows nothing about a DRC, this is
+  // what ties the two together)
+  CSPVarMap map;
+  map.insert(std::make_pair(RFPort::config_t::direction,
+      "fmcomms2_3_dir_tx1a"));
+  map.insert(std::make_pair(RFPort::config_t::tuning_freq_MHz,
+      "fmcomms2_3_fc_meghz_tx1a"));
+  map.insert(std::make_pair(RFPort::config_t::bandwidth_3dB_MHz,
+      "fmcomms2_3_bw_meghz_tx1a"));
+  map.insert(std::make_pair(RFPort::config_t::sampling_rate_Msps,
+      "fmcomms2_3_fs_megsps_tx1a"));
+  map.insert(std::make_pair(RFPort::config_t::samples_are_complex,
+      "fmcomms2_3_samps_comp_tx1a"));
+  map.insert(std::make_pair(RFPort::config_t::gain_mode,
+      "fmcomms2_3_gain_mode_tx1a"));
+  map.insert(std::make_pair(RFPort::config_t::gain_dB,
+      "fmcomms2_3_gain_db_tx1a"));
+  // make a dictionary entry which ties the mapping to a particular rf_port_name
+  ///@TODO / FIXME hardcoded mapping in below line
+  m_dict["Tx0"/*"tx1a"*/] = map;
+}
+
+void
+FMCOMMS2_3Configurator::init_rf_port_tx2a() {
+  // maps each of the DRC-specific RFPort::config_t types to their corresponding CSP
+  // variables names (a CSP is generic and knows nothing about a DRC, this is
+  // what ties the two together)
+  CSPVarMap map;
+  map.insert(std::make_pair(RFPort::config_t::direction,
+      "fmcomms2_3_dir_tx2a"));
+  map.insert(std::make_pair(RFPort::config_t::tuning_freq_MHz,
+      "fmcomms2_3_fc_meghz_tx2a"));
+  map.insert(std::make_pair(RFPort::config_t::bandwidth_3dB_MHz,
+      "fmcomms2_3_bw_meghz_tx2a"));
+  map.insert(std::make_pair(RFPort::config_t::sampling_rate_Msps,
+      "fmcomms2_3_fs_megsps_tx2a"));
+  map.insert(std::make_pair(RFPort::config_t::samples_are_complex,
+      "fmcomms2_3_samps_comp_tx2a"));
+  map.insert(std::make_pair(RFPort::config_t::gain_mode,
+      "fmcomms2_3_gain_mode_tx2a"));
+  map.insert(std::make_pair(RFPort::config_t::gain_dB,
+      "fmcomms2_3_gain_db_tx2a"));
+  // make a dictionary entry which ties the mapping to a particular rf_port_name
+  ///@TODO / FIXME hardcoded mapping in below line
+  m_dict["Tx1"/*"tx2a"*/] = map;
+}
+
 ///@TODO / FIXME - add fmcomms_num
 FMCOMMS2_3Configurator::FMCOMMS2_3Configurator(int32_t /*fmcomms_num*/) :
     Configurator<FMCOMMS2_3CSP>() {
   //m_solver.add_constr("fmcomms_num", "=", (int32_t)fmcomms_num);
-  {
-    RFPort::CSPVarMap map;
-    map.insert(std::make_pair(config_key_direction.c_str(),
-        "fmcomms2_3_dir_rx1a"));
-    map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
-        "fmcomms2_3_fc_meghz_rx1a"));
-    map.insert(std::make_pair(config_key_bandwidth_3dB_MHz.c_str(),
-        "fmcomms2_3_bw_meghz_rx1a"));
-    map.insert(std::make_pair(config_key_sampling_rate_Msps.c_str(),
-        "fmcomms2_3_fs_megsps_rx1a"));
-    map.insert(std::make_pair(config_key_samples_are_complex.c_str(),
-        "fmcomms2_3_samps_comp_rx1a"));
-    map.insert(std::make_pair(config_key_gain_mode.c_str(),
-        "fmcomms2_3_gain_mode_rx1a"));
-    map.insert(std::make_pair(config_key_gain_dB.c_str(),
-        "fmcomms2_3_gain_db_rx1a"));
-    ///@TODO / FIXME hardcoded mapping in below line
-    add_rf_port(RFPort("Rx0"/*"rx1a"*/, true, false, map));
-  }
-  {
-    RFPort::CSPVarMap map;
-    map.insert(std::make_pair(config_key_direction.c_str(),
-        "fmcomms2_3_dir_rx2a"));
-    map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
-        "fmcomms2_3_fc_meghz_rx2a"));
-    map.insert(std::make_pair(config_key_bandwidth_3dB_MHz.c_str(),
-        "fmcomms2_3_bw_meghz_rx2a"));
-    map.insert(std::make_pair(config_key_sampling_rate_Msps.c_str(),
-        "fmcomms2_3_fs_megsps_rx2a"));
-    map.insert(std::make_pair(config_key_samples_are_complex.c_str(),
-        "fmcomms2_3_samps_comp_rx2a"));
-    map.insert(std::make_pair(config_key_gain_mode.c_str(),
-        "fmcomms2_3_gain_mode_rx2a"));
-    map.insert(std::make_pair(config_key_gain_dB.c_str(),
-        "fmcomms2_3_gain_db_rx2a"));
-    ///@TODO / FIXME hardcoded mapping in below line
-    add_rf_port(RFPort("Rx1"/*"rx2a"*/, true, false, map));
-  }
-  {
-    RFPort::CSPVarMap map;
-    map.insert(std::make_pair(config_key_direction.c_str(),
-        "fmcomms2_3_dir_tx1a"));
-    map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
-        "fmcomms2_3_fc_meghz_tx1a"));
-    map.insert(std::make_pair(config_key_bandwidth_3dB_MHz.c_str(),
-        "fmcomms2_3_bw_meghz_tx1a"));
-    map.insert(std::make_pair(config_key_sampling_rate_Msps.c_str(),
-        "fmcomms2_3_fs_megsps_tx1a"));
-    map.insert(std::make_pair(config_key_samples_are_complex.c_str(),
-        "fmcomms2_3_samps_comp_tx1a"));
-    map.insert(std::make_pair(config_key_gain_mode.c_str(),
-        "fmcomms2_3_gain_mode_tx1a"));
-    map.insert(std::make_pair(config_key_gain_dB.c_str(),
-        "fmcomms2_3_gain_db_tx1a"));
-    ///@TODO / FIXME hardcoded mapping in below line
-    add_rf_port(RFPort("Tx0"/*"tx1a"*/, false, true, map));
-  }
-  {
-    RFPort::CSPVarMap map;
-    map.insert(std::make_pair(config_key_direction.c_str(),
-        "fmcomms2_3_dir_tx2a"));
-    map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
-        "fmcomms2_3_fc_meghz_tx2a"));
-    map.insert(std::make_pair(config_key_bandwidth_3dB_MHz.c_str(),
-        "fmcomms2_3_bw_meghz_tx2a"));
-    map.insert(std::make_pair(config_key_sampling_rate_Msps.c_str(),
-        "fmcomms2_3_fs_megsps_tx2a"));
-    map.insert(std::make_pair(config_key_samples_are_complex.c_str(),
-        "fmcomms2_3_samps_comp_tx2a"));
-    map.insert(std::make_pair(config_key_gain_mode.c_str(),
-        "fmcomms2_3_gain_mode_tx2a"));
-    map.insert(std::make_pair(config_key_gain_dB.c_str(),
-        "fmcomms2_3_gain_db_tx2a"));
-    ///@TODO / FIXME hardcoded mapping in below line
-    add_rf_port(RFPort("Tx1"/*"tx2a"*/, false, true, map));
-  }
+  init_rf_port_rx1a();
+  init_rf_port_rx2a();
+  init_rf_port_tx1a();
+  init_rf_port_tx2a();
 }
-#endif // IS_LOCKING
 
 // -----------------------------------------------------------------------------
 // STEP 3 - DEFINE DRC (get/set APIs)
@@ -260,8 +285,8 @@ FMCOMMS2_3DRC<cfgrtr_t>::FMCOMMS2_3DRC(unsigned which,
     m_port_rx1a(rx1a), m_port_rx2a(rx2a), m_port_tx1a(tx1a), m_port_tx2a(tx2a) {
 }
 
-template<class cfgrtr_t> std::string
-FMCOMMS2_3DRC<cfgrtr_t>::get_ad9361_rf_port_name(std::string rf_port_name) const {
+template<class cfgrtr_t> const std::string&
+FMCOMMS2_3DRC<cfgrtr_t>::get_ad9361_rf_port_name(const std::string& rf_port_name) const {
   /// @TODO / FIXME figure out why this is commented out
   //return rf_port_name==m_port_rx1a ? "rx1" :  rf_port_name==m_port_rx1a ? "rx2" : rf_port_name==m_port_rx1a ? "tx1" :
   //    rf_port_name==m_port_rx1a ? "tx2" : "rx1"; 
@@ -269,107 +294,112 @@ FMCOMMS2_3DRC<cfgrtr_t>::get_ad9361_rf_port_name(std::string rf_port_name) const
 }
 
 template<class cfgrtr_t> bool
-FMCOMMS2_3DRC<cfgrtr_t>::get_enabled(std::string rf_port_name) {
+FMCOMMS2_3DRC<cfgrtr_t>::get_enabled(const std::string& rf_port_name) {
   auto port = get_ad9361_rf_port_name(rf_port_name);
   return AD9361DRC<cfgrtr_t>::get_enabled(port);
 }
 
-template<class cfgrtr_t> rf_port_direction_t 
-FMCOMMS2_3DRC<cfgrtr_t>::get_direction(std::string rf_port_name) {
-  rf_port_direction_t ret = rf_port_direction_t::tx;
+template<class cfgrtr_t> RFPort::direction_t 
+FMCOMMS2_3DRC<cfgrtr_t>::get_direction(const std::string& rf_port_name) {
+  RFPort::direction_t ret = RFPort::direction_t::tx;
   if((rf_port_name==m_port_rx1a) || (rf_port_name==m_port_rx2a)) {
-    ret = rf_port_direction_t::rx;
+    ret = RFPort::direction_t::rx;
   }
   return ret;
 }
 
 template<class cfgrtr_t> double 
-FMCOMMS2_3DRC<cfgrtr_t>::get_tuning_freq_MHz(std::string rf_port_name) {
+FMCOMMS2_3DRC<cfgrtr_t>::get_tuning_freq_MHz(const std::string& rf_port_name) {
   auto port = get_ad9361_rf_port_name(rf_port_name);
   return AD9361DRC<cfgrtr_t>::get_tuning_freq_MHz(port);
 }
 
 template<class cfgrtr_t> double 
-FMCOMMS2_3DRC<cfgrtr_t>::get_bandwidth_3dB_MHz(std::string rf_port_name) {
+FMCOMMS2_3DRC<cfgrtr_t>::get_bandwidth_3dB_MHz(const std::string& rf_port_name) {
   auto port = get_ad9361_rf_port_name(rf_port_name);
   return AD9361DRC<cfgrtr_t>::get_bandwidth_3dB_MHz(port);
 }
 
 template<class cfgrtr_t> double 
-FMCOMMS2_3DRC<cfgrtr_t>::get_sampling_rate_Msps(std::string rf_port_name) {
+FMCOMMS2_3DRC<cfgrtr_t>::get_sampling_rate_Msps(const std::string& rf_port_name) {
   auto port = get_ad9361_rf_port_name(rf_port_name);
   return AD9361DRC<cfgrtr_t>::get_sampling_rate_Msps(port);
 }
 
 template<class cfgrtr_t> bool
-FMCOMMS2_3DRC<cfgrtr_t>::get_samples_are_complex(std::string rf_port_name) {
+FMCOMMS2_3DRC<cfgrtr_t>::get_samples_are_complex(const std::string& rf_port_name) {
   auto port = get_ad9361_rf_port_name(rf_port_name);
   return AD9361DRC<cfgrtr_t>::get_samples_are_complex(port);
 }
 
 template<class cfgrtr_t> std::string
-FMCOMMS2_3DRC<cfgrtr_t>::get_gain_mode(std::string rf_port) {
+FMCOMMS2_3DRC<cfgrtr_t>::get_gain_mode(const std::string& rf_port) {
   return AD9361DRC<cfgrtr_t>::get_gain_mode(get_ad9361_rf_port_name(rf_port));
 }
 
 template<class cfgrtr_t> double 
-FMCOMMS2_3DRC<cfgrtr_t>::get_gain_dB(std::string rf_port) {
+FMCOMMS2_3DRC<cfgrtr_t>::get_gain_dB(const std::string& rf_port) {
   return AD9361DRC<cfgrtr_t>::get_gain_dB(get_ad9361_rf_port_name(rf_port));
 }
 
+template<class cfgrtr_t> uint8_t 
+FMCOMMS2_3DRC<cfgrtr_t>::get_app_port_num(const std::string& rf_port) {
+  return AD9361DRC<cfgrtr_t>::get_app_port_num(get_ad9361_rf_port_name(rf_port));
+}
+
 template<class cfgrtr_t> void
-FMCOMMS2_3DRC<cfgrtr_t>::set_direction(std::string rf_port_name,
-    rf_port_direction_t val) {
+FMCOMMS2_3DRC<cfgrtr_t>::set_direction(const std::string& rf_port_name,
+    RFPort::direction_t val) {
   auto port = get_ad9361_rf_port_name(rf_port_name);
   return AD9361DRC<cfgrtr_t>::set_direction(port, val);
 }
 
 template<class cfgrtr_t> void
-FMCOMMS2_3DRC<cfgrtr_t>::set_tuning_freq_MHz(std::string rf_port_name,
+FMCOMMS2_3DRC<cfgrtr_t>::set_tuning_freq_MHz(const std::string& rf_port_name,
     double val) {
   auto port = get_ad9361_rf_port_name(rf_port_name);
   return AD9361DRC<cfgrtr_t>::set_tuning_freq_MHz(port, val);
 }
 
 template<class cfgrtr_t> void
-FMCOMMS2_3DRC<cfgrtr_t>::set_bandwidth_3dB_MHz(std::string rf_port_name,
+FMCOMMS2_3DRC<cfgrtr_t>::set_bandwidth_3dB_MHz(const std::string& rf_port_name,
     double val) {
   auto port = get_ad9361_rf_port_name(rf_port_name);
   return AD9361DRC<cfgrtr_t>::set_bandwidth_3dB_MHz(port, val);
 }
 
 template<class cfgrtr_t> void
-FMCOMMS2_3DRC<cfgrtr_t>::set_sampling_rate_Msps(std::string rf_port_name,
+FMCOMMS2_3DRC<cfgrtr_t>::set_sampling_rate_Msps(const std::string& rf_port_name,
     double val) {
   auto port = get_ad9361_rf_port_name(rf_port_name);
   return AD9361DRC<cfgrtr_t>::set_sampling_rate_Msps(port, val);
 }
 
 template<class cfgrtr_t> void
-FMCOMMS2_3DRC<cfgrtr_t>::set_samples_are_complex(std::string rf_port_name,
+FMCOMMS2_3DRC<cfgrtr_t>::set_samples_are_complex(const std::string& rf_port_name,
     bool val) {
   auto port = get_ad9361_rf_port_name(rf_port_name);
   return AD9361DRC<cfgrtr_t>::set_samples_are_complex(port, val);
 }
 
 template<class cfgrtr_t> void
-FMCOMMS2_3DRC<cfgrtr_t>::set_gain_mode(std::string rf_port_name,
-    std::string val) {
+FMCOMMS2_3DRC<cfgrtr_t>::set_gain_mode(const std::string& rf_port_name,
+    const std::string& val) {
   auto port = get_ad9361_rf_port_name(rf_port_name);
   return AD9361DRC<cfgrtr_t>::set_gain_mode(port, val);
 }
 
 template<class cfgrtr_t> void
-FMCOMMS2_3DRC<cfgrtr_t>::set_gain_dB(std::string rf_port_name, double val) {
+FMCOMMS2_3DRC<cfgrtr_t>::set_gain_dB(const std::string& rf_port_name, double val) {
   auto port = get_ad9361_rf_port_name(rf_port_name);
   return AD9361DRC<cfgrtr_t>::set_gain_dB(port, val);
 }
 
 template<class cfgrtr_t> void
-FMCOMMS2_3DRC<cfgrtr_t>::set_routing_id(std::string rf_port_name,
-    std::string val) {
+FMCOMMS2_3DRC<cfgrtr_t>::set_app_port_num(const std::string& rf_port_name,
+    uint8_t val) {
   auto port = get_ad9361_rf_port_name(rf_port_name);
-  return AD9361DRC<cfgrtr_t>::set_routing_id(port, val);
+  return AD9361DRC<cfgrtr_t>::set_app_port_num(port, val);
 }
 
 template<class cfgrtr_t> bool

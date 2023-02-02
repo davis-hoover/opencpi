@@ -35,7 +35,10 @@ namespace DRC_PHASE_2 {
 
 static std::vector<AD9361DeviceCallBack*> g_devices;
 
-//#ifdef IS_LOCKING
+// -----------------------------------------------------------------------------
+// STEP 1 - DEFINE Constraint Satisfaction Problem (CSP)
+// -----------------------------------------------------------------------------
+
 /* @brief for the AD9361,
  *        define variables (X) and their domains (D) for <X,D,C> which
  *        comprises its Constraint Satisfaction Problem (CSP)
@@ -100,10 +103,10 @@ AD9361CSP::define_c_ad9361() {
   m_solver.add_constr("ad9361_tx_sampl_freq_meghz", "<=", 61.44/m_divider);
   //m_solver.add_constr("ad9361_dac_clk_divider", ">=", (int32_t)1);
   //m_solver.add_constr("ad9361_dac_clk_divider", "<=", (int32_t)2);
-  m_solver.add_constr("ad9361_dir_rx1", "=", (int32_t)rf_port_direction_t::rx);
-  m_solver.add_constr("ad9361_dir_rx2", "=", (int32_t)rf_port_direction_t::rx);
-  m_solver.add_constr("ad9361_dir_tx1", "=", (int32_t)rf_port_direction_t::tx);
-  m_solver.add_constr("ad9361_dir_tx2", "=", (int32_t)rf_port_direction_t::tx);
+  m_solver.add_constr("ad9361_dir_rx1", "=", (int32_t)RFPort::direction_t::rx);
+  m_solver.add_constr("ad9361_dir_rx2", "=", (int32_t)RFPort::direction_t::rx);
+  m_solver.add_constr("ad9361_dir_tx1", "=", (int32_t)RFPort::direction_t::tx);
+  m_solver.add_constr("ad9361_dir_tx2", "=", (int32_t)RFPort::direction_t::tx);
   m_solver.add_constr("ad9361_fc_meghz_rx1", "=", "ad9361_rx_rfpll_lo_freq_meghz");
   m_solver.add_constr("ad9361_fc_meghz_rx2", "=", "ad9361_rx_rfpll_lo_freq_meghz");
   m_solver.add_constr("ad9361_fc_meghz_tx1", "=", "ad9361_tx_rfpll_lo_freq_meghz");
@@ -167,84 +170,113 @@ void
 AD9361CSP::define() {
   instance_ad9361();
 }
-//#endif // IS_LOCKING
 
-//#ifdef IS_LOCKING
+// -----------------------------------------------------------------------------
+// STEP 2 - DEFINE CONFIGURATOR THAT UTILIZES THE CSP
+// -----------------------------------------------------------------------------
+
 AD9361Configurator::AD9361Configurator() : Configurator<AD9361CSP>() {
-  {
-    RFPort::CSPVarMap map;
-    map.insert(std::make_pair(config_key_direction.c_str(),
-        "ad9361_dir_rx1"));
-    map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
-        "ad9361_fc_meghz_rx1"));
-    map.insert(std::make_pair(config_key_bandwidth_3dB_MHz.c_str(),
-        "ad9361_bw_meghz_rx1"));
-    map.insert(std::make_pair(config_key_sampling_rate_Msps.c_str(),
-        "ad9361_fs_megsps_rx1"));
-    map.insert(std::make_pair(config_key_samples_are_complex.c_str(),
-        "ad9361_samps_comp_rx1"));
-    map.insert(std::make_pair(config_key_gain_mode.c_str(),
-        "ad9361_gain_mode_rx1"));
-    map.insert(std::make_pair(config_key_gain_dB.c_str(),
-        "ad9361_gain_db_rx1"));
-    add_rf_port(RFPort("rx1", true, false, map));
-  }
-  {
-    RFPort::CSPVarMap map;
-    map.insert(std::make_pair(config_key_direction.c_str(),
-        "ad9361_dir_rx2"));
-    map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
-        "ad9361_fc_meghz_rx2"));
-    map.insert(std::make_pair(config_key_bandwidth_3dB_MHz.c_str(),
-        "ad9361_bw_meghz_rx2"));
-    map.insert(std::make_pair(config_key_sampling_rate_Msps.c_str(),
-        "ad9361_fs_megsps_rx2"));
-    map.insert(std::make_pair(config_key_samples_are_complex.c_str(),
-        "ad9361_samps_comp_rx2"));
-    map.insert(std::make_pair(config_key_gain_mode.c_str(),
-        "ad9361_gain_mode_rx2"));
-    map.insert(std::make_pair(config_key_gain_dB.c_str(),
-        "ad9361_gain_db_rx2"));
-    add_rf_port(RFPort("rx2", true, false, map));
-  }
-  {
-    RFPort::CSPVarMap map;
-    map.insert(std::make_pair(config_key_direction.c_str(),
-        "ad9361_dir_tx1"));
-    map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
-        "ad9361_fc_meghz_tx1"));
-    map.insert(std::make_pair(config_key_bandwidth_3dB_MHz.c_str(),
-        "ad9361_bw_meghz_tx1"));
-    map.insert(std::make_pair(config_key_sampling_rate_Msps.c_str(),
-        "ad9361_fs_megsps_tx1"));
-    map.insert(std::make_pair(config_key_samples_are_complex.c_str(),
-        "ad9361_samps_comp_tx1"));
-    map.insert(std::make_pair(config_key_gain_mode.c_str(),
-        "ad9361_gain_mode_tx1"));
-    map.insert(std::make_pair(config_key_gain_dB.c_str(),
-        "ad9361_gain_db_tx1"));
-    add_rf_port(RFPort("tx1", false, true, map));
-  }
-  {
-    RFPort::CSPVarMap map;
-    map.insert(std::make_pair(config_key_direction.c_str(),
-        "ad9361_dir_tx2"));
-    map.insert(std::make_pair(config_key_tuning_freq_MHz.c_str(),
-        "ad9361_fc_meghz_tx2"));
-    map.insert(std::make_pair(config_key_bandwidth_3dB_MHz.c_str(),
-        "ad9361_bw_meghz_tx2"));
-    map.insert(std::make_pair(config_key_sampling_rate_Msps.c_str(),
-        "ad9361_fs_megsps_tx2"));
-    map.insert(std::make_pair(config_key_samples_are_complex.c_str(),
-        "ad9361_samps_comp_tx2"));
-    map.insert(std::make_pair(config_key_gain_mode.c_str(),
-        "ad9361_gain_mode_tx2"));
-    map.insert(std::make_pair(config_key_gain_dB.c_str(),
-        "ad9361_gain_db_tx2"));
-    add_rf_port(RFPort("tx2", false, true, map));
-  }
+  init_rf_port_rx1();
+  init_rf_port_rx2();
+  init_rf_port_tx1();
+  init_rf_port_tx2();
 }
-//#endif // IS_LOCKING
+
+void
+AD9361Configurator::init_rf_port_rx1() {
+  // maps each of the DRC-specific RFPort::config_t types to their corresponding CSP
+  // variables names which are specific to this DRC (a CSP is generic and knows
+  // nothing about a DRC, this is what ties the two together)
+  CSPVarMap map;
+  map.insert(std::make_pair(RFPort::config_t::direction,
+      "ad9361_dir_rx1"));
+  map.insert(std::make_pair(RFPort::config_t::tuning_freq_MHz,
+      "ad9361_fc_meghz_rx1"));
+  map.insert(std::make_pair(RFPort::config_t::bandwidth_3dB_MHz,
+      "ad9361_bw_meghz_rx1"));
+  map.insert(std::make_pair(RFPort::config_t::sampling_rate_Msps,
+      "ad9361_fs_megsps_rx1"));
+  map.insert(std::make_pair(RFPort::config_t::samples_are_complex,
+      "ad9361_samps_comp_rx1"));
+  map.insert(std::make_pair(RFPort::config_t::gain_mode,
+      "ad9361_gain_mode_rx1"));
+  map.insert(std::make_pair(RFPort::config_t::gain_dB,
+      "ad9361_gain_db_rx1"));
+  // make a dictionary entry which ties the mapping to a particular rf_port_name
+  m_dict["rx1"] = map;
+}
+
+void
+AD9361Configurator::init_rf_port_rx2() {
+  // maps each of the DRC-specific RFPort::config_t types to their corresponding CSP
+  // variables names which are specific to this DRC (a CSP is generic and knows
+  // nothing about a DRC, this is what ties the two together)
+  CSPVarMap map;
+  map.insert(std::make_pair(RFPort::config_t::direction,
+      "ad9361_dir_rx2"));
+  map.insert(std::make_pair(RFPort::config_t::tuning_freq_MHz,
+      "ad9361_fc_meghz_rx2"));
+  map.insert(std::make_pair(RFPort::config_t::bandwidth_3dB_MHz,
+      "ad9361_bw_meghz_rx2"));
+  map.insert(std::make_pair(RFPort::config_t::sampling_rate_Msps,
+      "ad9361_fs_megsps_rx2"));
+  map.insert(std::make_pair(RFPort::config_t::samples_are_complex,
+      "ad9361_samps_comp_rx2"));
+  map.insert(std::make_pair(RFPort::config_t::gain_mode,
+      "ad9361_gain_mode_rx2"));
+  map.insert(std::make_pair(RFPort::config_t::gain_dB,
+      "ad9361_gain_db_rx2"));
+  // make a dictionary entry which ties the mapping to a particular rf_port_name
+  m_dict["rx2"] = map;
+}
+
+void
+AD9361Configurator::init_rf_port_tx1() {
+  // maps each of the DRC-specific RFPort::config_t types to their corresponding CSP
+  // variables names which are specific to this DRC (a CSP is generic and knows
+  // nothing about a DRC, this is what ties the two together)
+  CSPVarMap map;
+  map.insert(std::make_pair(RFPort::config_t::direction,
+      "ad9361_dir_tx1"));
+  map.insert(std::make_pair(RFPort::config_t::tuning_freq_MHz,
+      "ad9361_fc_meghz_tx1"));
+  map.insert(std::make_pair(RFPort::config_t::bandwidth_3dB_MHz,
+      "ad9361_bw_meghz_tx1"));
+  map.insert(std::make_pair(RFPort::config_t::sampling_rate_Msps,
+      "ad9361_fs_megsps_tx1"));
+  map.insert(std::make_pair(RFPort::config_t::samples_are_complex,
+      "ad9361_samps_comp_tx1"));
+  map.insert(std::make_pair(RFPort::config_t::gain_mode,
+      "ad9361_gain_mode_tx1"));
+  map.insert(std::make_pair(RFPort::config_t::gain_dB,
+      "ad9361_gain_db_tx1"));
+  // make a dictionary entry which ties the mapping to a particular rf_port_name
+  m_dict["tx1"] = map;
+}
+
+void
+AD9361Configurator::init_rf_port_tx2() {
+  // maps each of the DRC-specific RFPort::config_t types to their corresponding CSP
+  // variables names which are specific to this DRC (a CSP is generic and knows
+  // nothing about a DRC, this is what ties the two together)
+  CSPVarMap map;
+  map.insert(std::make_pair(RFPort::config_t::direction,
+      "ad9361_dir_tx2"));
+  map.insert(std::make_pair(RFPort::config_t::tuning_freq_MHz,
+      "ad9361_fc_meghz_tx2"));
+  map.insert(std::make_pair(RFPort::config_t::bandwidth_3dB_MHz,
+      "ad9361_bw_meghz_tx2"));
+  map.insert(std::make_pair(RFPort::config_t::sampling_rate_Msps,
+      "ad9361_fs_megsps_tx2"));
+  map.insert(std::make_pair(RFPort::config_t::samples_are_complex,
+      "ad9361_samps_comp_tx2"));
+  map.insert(std::make_pair(RFPort::config_t::gain_mode,
+      "ad9361_gain_mode_tx2"));
+  map.insert(std::make_pair(RFPort::config_t::gain_dB,
+      "ad9361_gain_db_tx2"));
+  // make a dictionary entry which ties the mapping to a particular rf_port_name
+  m_dict["tx2"] = map;
+}
 
 template<class cfgrtr_t>
 template<typename T> T
@@ -540,15 +572,16 @@ static void set_reset(uint8_t id_no, bool on) {
 }
 
 template<class cfgrtr_t> bool
-AD9361DRC<cfgrtr_t>::request_config_lock(std::string id,
+AD9361DRC<cfgrtr_t>::request_config_lock(uint16_t id,
     const ConfigLockRequest& request) {
   static bool first = true;
   if(first) {
-    //log(8, "start_config init start");
     init();
-    //log(8, "start_config init done");
     first = false;
   }
+  uint32_t mode;
+  ad9361_get_en_state_machine_mode(m_ad9361_rf_phy, &mode);
+  this->log_info("drc: mode = %" PRIu32, mode);
   return DRC<cfgrtr_t>::request_config_lock(id,request);
 }
 
@@ -567,7 +600,7 @@ AD9361DRC<cfgrtr_t>::init() {
     ad9361_opencpi.get_byte = get_byte;
     ad9361_opencpi.set_byte = set_byte;
     ad9361_opencpi.set_reset = set_reset;
-    ad9361_opencpi.worker = this->m_descriptor;
+    ad9361_opencpi.worker = this->m_descriptor.c_str();
   }
   /*
     three phases of callback:
@@ -607,7 +640,6 @@ AD9361DRC<cfgrtr_t>::init() {
   m_ad9361_init_ret = ad9361_init(&m_ad9361_rf_phy,&m_init_param);
   ad9361_set_tx_fir_en_dis(m_ad9361_rf_phy, 0); // disable tx_fir with the ad9361_api library in all cases
   m_callback.postConfig(m_device);
-  this->log_info("noos exit ad9361_init");
   m_ad9361_init_called = true;
   if(m_ad9361_init_ret == -ENODEV) {
     throw std::string("AD9361 init failed: SPI could not be established");
@@ -626,29 +658,25 @@ AD9361DRC<cfgrtr_t>::init() {
 
 template<class cfgrtr_t> bool
 AD9361DRC<cfgrtr_t>::any_configurator_configs_locked_which_prevent_ad9361_init() const {
-  std::vector<const char*> rf_ports;
-  rf_ports.push_back((m_port_rx1));
-  rf_ports.push_back((m_port_rx2));
-  rf_ports.push_back((m_port_tx1));
-  rf_ports.push_back((m_port_tx2));
-  // unfortunately necessary to make this function const
-  auto configurator_copy = this->m_configurator;
-  for(auto it = rf_ports.begin(); it != rf_ports.end(); ++it) {
-    if(configurator_copy.get_config_is_locked(configurator_copy.get_config(*it, config_key_tuning_freq_MHz))) {
-      return true;
-    }
-    if(configurator_copy.get_config_is_locked(configurator_copy.get_config(*it, config_key_bandwidth_3dB_MHz))) {
-      return true;
-    }
-    if(configurator_copy.get_config_is_locked(configurator_copy.get_config(*it, config_key_sampling_rate_Msps))) {
-      return true;
-    }
-    if(configurator_copy.get_config_is_locked(configurator_copy.get_config(*it, config_key_gain_mode))) {
-      return true;
-    }
-    if(configurator_copy.get_config_is_locked(configurator_copy.get_config(*it, config_key_gain_dB))) {
-      return true;
-    }
+  typedef RFPort::config_t cfg_t;
+  std::vector<std::string> rf_port_names;
+  rf_port_names.push_back((m_port_rx1));
+  rf_port_names.push_back((m_port_rx2));
+  rf_port_names.push_back((m_port_tx1));
+  rf_port_names.push_back((m_port_tx2));
+  const auto& configurator = this->m_configurator;
+  for (auto it = rf_port_names.begin(); it != rf_port_names.end(); ++it) {
+    std::vector<std::string> var_names;
+    // direction and samples_are_complex are ignored because they are static
+    // on the AD9361
+    var_names.push_back(configurator.m_dict.at(*it).at(cfg_t::tuning_freq_MHz));
+    var_names.push_back(configurator.m_dict.at(*it).at(cfg_t::bandwidth_3dB_MHz));
+    var_names.push_back(configurator.m_dict.at(*it).at(cfg_t::sampling_rate_Msps));
+    var_names.push_back(configurator.m_dict.at(*it).at(cfg_t::gain_mode));
+    var_names.push_back(configurator.m_dict.at(*it).at(cfg_t::gain_dB));
+    for (auto itv = var_names.begin(); itv != var_names.end(); ++itv)
+      if (configurator.get_csp_var_is_locked(*itv))
+        return true;
   }
   return false;
 }
@@ -811,7 +839,7 @@ AD9361DRC<cfgrtr_t>::throw_if_no_os_api_call_returns_non_zero(
 
 /// @todo / FIXME - check for existence of qadc/qdac?
 template<class cfgrtr_t> bool
-AD9361DRC<cfgrtr_t>::get_enabled(std::string rf_port_name) {
+AD9361DRC<cfgrtr_t>::get_enabled(const std::string& rf_port_name) {
   bool ret = true;
   get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
 #ifndef DISABLE_AD9361
@@ -857,7 +885,7 @@ AD9361DRC<cfgrtr_t>::get_enabled(std::string rf_port_name) {
 }
 
 template<class cfgrtr_t> uint64_t
-AD9361DRC<cfgrtr_t>::get_noos_tuning_freq(std::string rf_port_name) {
+AD9361DRC<cfgrtr_t>::get_noos_tuning_freq(const std::string& rf_port_name) {
   init_if_required();
   uint64_t ret = 0;
   bool do_rx = get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
@@ -875,7 +903,7 @@ AD9361DRC<cfgrtr_t>::get_noos_tuning_freq(std::string rf_port_name) {
 }
 
 template<class cfgrtr_t> uint32_t
-AD9361DRC<cfgrtr_t>::get_noos_bandwidth(std::string rf_port_name) {
+AD9361DRC<cfgrtr_t>::get_noos_bandwidth(const std::string& rf_port_name) {
   init_if_required();
   uint32_t ret = 0;
   bool do_rx = get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
@@ -893,7 +921,7 @@ AD9361DRC<cfgrtr_t>::get_noos_bandwidth(std::string rf_port_name) {
 }
 
 template<class cfgrtr_t> uint32_t
-AD9361DRC<cfgrtr_t>::get_noos_sampling_rate(std::string rf_port_name) {
+AD9361DRC<cfgrtr_t>::get_noos_sampling_rate(const std::string& rf_port_name) {
   init_if_required();
   uint32_t ret = 0;
   bool do_rx = get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
@@ -911,7 +939,7 @@ AD9361DRC<cfgrtr_t>::get_noos_sampling_rate(std::string rf_port_name) {
 }
 
 template<class cfgrtr_t> uint8_t
-AD9361DRC<cfgrtr_t>::get_noos_gain_mode(std::string rf_port_name) {
+AD9361DRC<cfgrtr_t>::get_noos_gain_mode(const std::string& rf_port_name) {
   init_if_required();
 #ifdef DISABLE_AD9361
   uint8_t ret = 0;
@@ -935,7 +963,7 @@ AD9361DRC<cfgrtr_t>::get_noos_gain_mode(std::string rf_port_name) {
 
 /// @return no-os returned rx gain value, in dB
 template<class cfgrtr_t> int32_t
-AD9361DRC<cfgrtr_t>::get_noos_rx_gain(std::string rf_port_name) {
+AD9361DRC<cfgrtr_t>::get_noos_rx_gain(const std::string& rf_port_name) {
   init_if_required();
   int32_t ret = 0;
   if((rf_port_name != m_port_rx1) && (rf_port_name != m_port_rx2)) { 
@@ -953,7 +981,7 @@ AD9361DRC<cfgrtr_t>::get_noos_rx_gain(std::string rf_port_name) {
 
 /// @return no-os returned tx gain value, in millidB
 template<class cfgrtr_t> uint32_t
-AD9361DRC<cfgrtr_t>::get_noos_tx_gain(std::string rf_port_name) {
+AD9361DRC<cfgrtr_t>::get_noos_tx_gain(const std::string& rf_port_name) {
   init_if_required();
   uint32_t ret = 0;
   if((rf_port_name != m_port_tx1) && (rf_port_name != m_port_tx2)) { 
@@ -970,19 +998,19 @@ AD9361DRC<cfgrtr_t>::get_noos_tx_gain(std::string rf_port_name) {
 }
 
 template<class cfgrtr_t>
-rf_port_direction_t 
-AD9361DRC<cfgrtr_t>::get_direction(std::string rf_port_name) {
+RFPort::direction_t 
+AD9361DRC<cfgrtr_t>::get_direction(const std::string& rf_port_name) {
   bool do_rx = get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
-  return do_rx ? rf_port_direction_t::rx : rf_port_direction_t::tx;
+  return do_rx ? RFPort::direction_t::rx : RFPort::direction_t::tx;
 }
 
 template<class cfgrtr_t> double 
-AD9361DRC<cfgrtr_t>::get_tuning_freq_MHz(std::string rf_port_name) {
+AD9361DRC<cfgrtr_t>::get_tuning_freq_MHz(const std::string& rf_port_name) {
   return ((double)get_noos_tuning_freq(rf_port_name))/1000000.;
 }
 
 template<class cfgrtr_t> double 
-AD9361DRC<cfgrtr_t>::get_bandwidth_3dB_MHz(std::string rf_port_name) {
+AD9361DRC<cfgrtr_t>::get_bandwidth_3dB_MHz(const std::string& rf_port_name) {
   ///@TODO / FIXME handle DDC/DUC divider in separate DDC/DUC class
   double ret = (double)get_noos_bandwidth(rf_port_name);
   ret = ret/1000000./m_divider;
@@ -990,7 +1018,7 @@ AD9361DRC<cfgrtr_t>::get_bandwidth_3dB_MHz(std::string rf_port_name) {
 }
 
 template<class cfgrtr_t> double 
-AD9361DRC<cfgrtr_t>::get_sampling_rate_Msps(std::string rf_port_name) {
+AD9361DRC<cfgrtr_t>::get_sampling_rate_Msps(const std::string& rf_port_name) {
   ///@TODO / FIXME handle DDC/DUC divider in separate DDC/DUC class
   double ret = (double)get_noos_sampling_rate(rf_port_name);
   ret = ret/1000000./m_divider;
@@ -998,13 +1026,13 @@ AD9361DRC<cfgrtr_t>::get_sampling_rate_Msps(std::string rf_port_name) {
 }
 
 template<class cfgrtr_t> bool
-AD9361DRC<cfgrtr_t>::get_samples_are_complex(std::string rf_port_name) {
+AD9361DRC<cfgrtr_t>::get_samples_are_complex(const std::string& rf_port_name) {
   get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
   return true;
 }
 
 template<class cfgrtr_t> std::string
-AD9361DRC<cfgrtr_t>::get_gain_mode(std::string rf_port_name) {
+AD9361DRC<cfgrtr_t>::get_gain_mode(const std::string& rf_port_name) {
   std::string ret = "manual";
 #ifndef DISABLE_AD9361
   uint8_t val = get_noos_gain_mode(rf_port_name);
@@ -1028,7 +1056,7 @@ AD9361DRC<cfgrtr_t>::get_gain_mode(std::string rf_port_name) {
 }
 
 template<class cfgrtr_t> double 
-AD9361DRC<cfgrtr_t>::get_gain_dB(std::string rf_port) {
+AD9361DRC<cfgrtr_t>::get_gain_dB(const std::string& rf_port) {
   bool do_rx = get_rx_and_throw_if_invalid_rf_port_name(rf_port);
   if(do_rx) {
     return (double)get_noos_rx_gain(rf_port);
@@ -1039,13 +1067,13 @@ AD9361DRC<cfgrtr_t>::get_gain_dB(std::string rf_port) {
 }
 
 template<class cfgrtr_t> void
-AD9361DRC<cfgrtr_t>::set_direction(std::string rf_port_name,
-    rf_port_direction_t /*val*/) {
+AD9361DRC<cfgrtr_t>::set_direction(const std::string& rf_port_name,
+    RFPort::direction_t /*val*/) {
   get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
 }
 
 template<class cfgrtr_t> void
-AD9361DRC<cfgrtr_t>::set_tuning_freq_MHz(std::string rf_port_name, double val) {
+AD9361DRC<cfgrtr_t>::set_tuning_freq_MHz(const std::string& rf_port_name, double val) {
   init_if_required();
   uint64_t lo_freq_hz = std::round(val*1000000.);
   bool do_rx = get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
@@ -1065,7 +1093,7 @@ AD9361DRC<cfgrtr_t>::set_tuning_freq_MHz(std::string rf_port_name, double val) {
 }
 
 template<class cfgrtr_t> void
-AD9361DRC<cfgrtr_t>::set_bandwidth_3dB_MHz(std::string rf_port_name,
+AD9361DRC<cfgrtr_t>::set_bandwidth_3dB_MHz(const std::string& rf_port_name,
     double val) {
   init_if_required();
   ///@TODO / FIXME handle DDC/DUC divider in separate DDC/DUC class
@@ -1084,7 +1112,7 @@ AD9361DRC<cfgrtr_t>::set_bandwidth_3dB_MHz(std::string rf_port_name,
 }
 
 template<class cfgrtr_t> void
-AD9361DRC<cfgrtr_t>::set_sampling_rate_Msps(std::string rf_port_name,
+AD9361DRC<cfgrtr_t>::set_sampling_rate_Msps(const std::string& rf_port_name,
     double val) {
   init_if_required();
   ///@TODO / FIXME handle DDC/DUC divider in separate DDC/DUC class
@@ -1103,7 +1131,7 @@ AD9361DRC<cfgrtr_t>::set_sampling_rate_Msps(std::string rf_port_name,
 }
 
 template<class cfgrtr_t> void
-AD9361DRC<cfgrtr_t>::set_samples_are_complex(std::string rf_port_name,
+AD9361DRC<cfgrtr_t>::set_samples_are_complex(const std::string& rf_port_name,
     bool val) {
   // nothing to do on hardware, just validate settings
   if(val == false) {
@@ -1113,7 +1141,7 @@ AD9361DRC<cfgrtr_t>::set_samples_are_complex(std::string rf_port_name,
 }
 
 template<class cfgrtr_t> void
-AD9361DRC<cfgrtr_t>::set_gain_mode(std::string rf_port_name, std::string val) {
+AD9361DRC<cfgrtr_t>::set_gain_mode(const std::string& rf_port_name, const std::string& val) {
   init_if_required();
   bool do_rx = get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
   if((!do_rx) && val != "manual") {
@@ -1140,7 +1168,7 @@ AD9361DRC<cfgrtr_t>::set_gain_mode(std::string rf_port_name, std::string val) {
 }
 
 template<class cfgrtr_t> void
-AD9361DRC<cfgrtr_t>::set_gain_dB(std::string rf_port_name, double val) {
+AD9361DRC<cfgrtr_t>::set_gain_dB(const std::string& rf_port_name, double val) {
   init_if_required();
   bool do_rx = get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
   // expected type of ad9361_set_rx_rf_gain
@@ -1167,9 +1195,16 @@ AD9361DRC<cfgrtr_t>::set_gain_dB(std::string rf_port_name, double val) {
 #endif
 }
 
+template<class cfgrtr_t> uint8_t
+AD9361DRC<cfgrtr_t>::get_app_port_num(const std::string& /*rf_port_name*/) {
+  return 0;
+}
+
 template<class cfgrtr_t> void
-AD9361DRC<cfgrtr_t>::set_routing_id(std::string /*rf_port_name*/,
-    std::string /*val*/) {
+AD9361DRC<cfgrtr_t>::set_app_port_num(const std::string& /*rf_port_name*/, uint8_t val) {
+  if(val != 0) {
+    throw std::string("current implementation cannot set non-zero app port num");
+  }
 }
 
 ///@TODO / FIXME - does this need to undo ENSM_MODE_ALERT??
@@ -1177,13 +1212,17 @@ AD9361DRC<cfgrtr_t>::set_routing_id(std::string /*rf_port_name*/,
 //AD9361DRC<cfgrtr_t>::start(unsigned config) {
 //}
 
+  ///@TODO enable me!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11
 template<class cfgrtr_t> bool
 AD9361DRC<cfgrtr_t>::stop(unsigned config) {
   bool ret = true;
+#if 0
 #ifndef DISABLE_AD9361
-  ///@TODO / FIXME - why does this methods set AD9361 to ALERT???
-  ///@TODO / FIXME - ********************************************************************************************************************************************************************************************************************************************************************************************************************comment back in!!!!
-  //ret = ad9361_set_en_state_machine_mode(m_ad9361_rf_phy, ENSM_MODE_ALERT);
+  // From AD9361 datasheet:
+  // FDD is "TX and RX signal chains enabled", but Alert is only "synthesizers enabled"
+  this->log_info("noos ad9361_set_en_state_machine_mode %i" ENSM_MODE_ALERT);
+  ret = ad9361_set_en_state_machine_mode(m_ad9361_rf_phy, ENSM_MODE_ALERT);
+#endif
 #endif
   if(!DRC<cfgrtr_t>::stop(config)) {
     ret = false;

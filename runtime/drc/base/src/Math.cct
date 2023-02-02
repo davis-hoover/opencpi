@@ -81,7 +81,7 @@ operator<<(std::ostream& os, const CSPSolver& rhs) {
         os << ",";
       }
       first_var = false;
-      os << *it;
+      os << it->second;
     }
   }
   os << ">";
@@ -686,7 +686,7 @@ intersection_of(const Set<T>& set, const _Interval<T>& interval) {
   return Set<T>(set_intervals);
 }
 
-CSPSolver::Constr::Constr(const char* lhs, const char* type, const int32_t rhs,
+CSPSolver::Constr::Constr(const std::string& lhs, const char* type, const int32_t rhs,
     //CSPSolver::Constr::Cond* p_cond) : Func(lhs, type, ""),
     int32_t idx_cond) : Func(lhs, type, ""),
     m_rhs_int32_const(rhs),
@@ -702,7 +702,7 @@ CSPSolver::Constr::Constr(const char* lhs, const char* type, const int32_t rhs,
   throw_invalid_argument_if_constraint_not_supported();
 }
 
-CSPSolver::Constr::Constr(const char* lhs, const char* type, const double rhs,
+CSPSolver::Constr::Constr(const std::string& lhs, const char* type, const double rhs,
     //CSPSolver::Constr::Cond* p_cond) : Func(lhs, type, ""),
     int32_t idx_cond) : Func(lhs, type, ""),
     m_rhs_int32_const(0),
@@ -718,7 +718,7 @@ CSPSolver::Constr::Constr(const char* lhs, const char* type, const double rhs,
   throw_invalid_argument_if_constraint_not_supported();
 }
 
-CSPSolver::Constr::Constr(const char* lhs, const char* type, const char* rhs,
+CSPSolver::Constr::Constr(const std::string& lhs, const char* type, const std::string& rhs,
     //CSPSolver::Constr::Cond* p_cond) : Func(lhs, type, rhs),
     int32_t idx_cond) : Func(lhs, type, rhs),
     m_rhs_int32_const(0),
@@ -764,23 +764,6 @@ void CSPSolver::Constr::
     oss << "invalid constraint specified: " << m_type;
     throw std::invalid_argument(oss.str());
   }
-}
-
-bool CSPSolver::Constr::operator==(const CSPSolver::Constr& rhs) const {
-  bool ret = true;
-  ret = (std::string(m_lhs)    != std::string(rhs.m_lhs)) ? false : ret;
-  ret = (std::string(m_type)   != std::string(rhs.m_type)) ? false : ret;
-  ret = (std::string(m_rhs)    != std::string(rhs.m_rhs)) ? false : ret;
-  ret = (m_rhs_int32_const     != rhs.m_rhs_int32_const) ? false : ret;
-  ret = (m_rhs_double_const    != rhs.m_rhs_double_const) ? false : ret;
-  ret = (m_rhs_func            != rhs.m_rhs_func) ? false : ret;
-  ret = (m_rhs_is_var          != rhs.m_rhs_is_var) ? false : ret;
-  ret = (m_rhs_is_int32_const  != rhs.m_rhs_is_int32_const) ? false : ret;
-  ret = (m_rhs_is_double_const != rhs.m_rhs_is_double_const) ? false : ret;
-  ret = (m_rhs_is_func         != rhs.m_rhs_is_func) ? false : ret;
-  //ret = (m_p_cond              != rhs.m_p_cond) ? false : ret;
-  ret = (m_idx_cond            != rhs.m_idx_cond) ? false : ret;
-  return ret;
 }
 
 bool
@@ -837,7 +820,7 @@ CSPSolver::FeasibleRegionLimits::get_double_interval_limits(double tol) {
 
 void
 CSPSolver::FeasibleRegionLimits::set_var_limits_to_type_limits(
-    std::pair<const char* const, FeasibleRegionLimits::Var>& var) {
+    std::pair<const std::string,FeasibleRegionLimits::Var>& var) {
   if(var.second.m_type_is_int32) {
     var.second.m_int32_set = Set<int32_t>(get_int32_interval_limits());
   }
@@ -849,7 +832,7 @@ CSPSolver::FeasibleRegionLimits::set_var_limits_to_type_limits(
 
 void
 CSPSolver::FeasibleRegionLimits::set_var_limits_to_empty_set(
-    std::pair<const char* const, FeasibleRegionLimits::Var>& var) {
+    std::pair<const std::string,FeasibleRegionLimits::Var>& var) {
   if(var.second.m_type_is_int32) {
     var.second.m_int32_set.set_is_empty(true);
   }
@@ -930,11 +913,12 @@ operator<<(std::ostream& os, const CSPSolver::FeasibleRegionLimits& rhs) {
 }
 
 CSPSolver::CSPSolver(size_t max_num_constr_prop_loop_iter) :
-  m_max_num_constr_prop_loop_iter(max_num_constr_prop_loop_iter) {
+    m_max_num_constr_prop_loop_iter(max_num_constr_prop_loop_iter),
+    m_constr_max_id(0) {
 }
 
 template<> void
-CSPSolver::add_var<int32_t> (const char* var_key) {
+CSPSolver::add_var<int32_t> (const std::string& var_key) {
   // step 1: initial dilation
   int32_t hi = std::numeric_limits<int32_t>::max();
   int32_t lo = std::numeric_limits<int32_t>::min();
@@ -943,27 +927,27 @@ CSPSolver::add_var<int32_t> (const char* var_key) {
 }
 
 template<> void
-CSPSolver::add_var<double> (const char* var_key,
+CSPSolver::add_var<double> (const std::string& var_key,
     double fp_comparison_tol) {
   // step 1: initial dilation
   double hi = std::numeric_limits<double>::max();
   double lo = -hi;
   typedef FeasibleRegionLimits::Var Var;
   double tol = fp_comparison_tol;
-  const char*& key = var_key;
+  const std::string& key = var_key;
   m_feasible_region_limits.m_vars.insert(std::make_pair(key, Var(lo, hi, tol)));
 }
 
-template<typename T> CSPSolver::Constr&
-CSPSolver::add_constr(const char* lhs, const char* type, const T rhs) {
+template<typename T> size_t
+CSPSolver::add_constr(const std::string& lhs, const char* type, const T rhs) {
   throw_invalid_argument_if_var_key_has_not_been_added(lhs);
-  m_constr.push_back(Constr(lhs, type, rhs, 0));
+  m_constr[m_constr_max_id] = Constr(lhs, type, rhs, 0);
   propagate_constraints();
-  return m_constr.at(m_constr.size()-1);
+  return m_constr_max_id++;
 }
 
-template<typename T> CSPSolver::Constr&
-CSPSolver::add_constr(const char* lhs, const char* type, const T rhs, const Constr::Cond& cond) {
+template<typename T> size_t
+CSPSolver::add_constr(const std::string& lhs, const char* type, const T rhs, const Constr::Cond& cond) {
   throw_invalid_argument_if_var_key_has_not_been_added(lhs);
   bool cond_exists = false;
   for(auto it=m_cond.begin(); it!=m_cond.end(); ++it) {
@@ -976,38 +960,19 @@ CSPSolver::add_constr(const char* lhs, const char* type, const T rhs, const Cons
     m_cond.push_back(cond);
   }
   //m_constr.push_back(Constr(lhs, type, rhs, &m_cond.back()));
-  m_constr.push_back(Constr(lhs, type, rhs, m_cond.size()));
+  m_constr[m_constr_max_id] = Constr(lhs, type, rhs, m_cond.size());
   propagate_constraints();
-  return m_constr.at(m_constr.size()-1);
+  return m_constr_max_id++;
 }
 
 void
-CSPSolver::remove_constr(const Constr& constr) {
-  for(auto it=m_constr.begin(); it!=m_constr.end(); ++it) {
-    if(*it == constr) {
-      /*std::cout << "removing constraint ";
-      std::cout << constr.m_lhs << constr.m_type;
-      if(constr.m_rhs_is_int32_const) {
-        std::cout << constr.m_rhs_int32_const;
-      }
-      else if(constr.m_rhs_is_double_const) {
-        std::cout << constr.m_rhs_double_const;
-      }
-      else if(constr.m_rhs_is_var) {
-        std::cout << constr.m_rhs;
-      }
-      std::cout << "\n";*/
-      m_constr.erase(it);
-      break;
-    }
+CSPSolver::remove_constr(size_t id) {
+  m_constr.erase(id);
+  if(id == m_constr_max_id-1) {
+    m_constr_max_id--;
   }
   propagate_constraints();
   //std::cout << "solver is now: " << *this << "\n";
-}
-
-const std::vector<CSPSolver::Constr>&
-CSPSolver::get_constr() const {
-  return m_constr;
 }
 
 const CSPSolver::FeasibleRegionLimits&
@@ -1015,8 +980,13 @@ CSPSolver::get_feasible_region_limits() const {
   return m_feasible_region_limits;
 }
 
+const std::map<size_t,CSPSolver::Constr>&
+CSPSolver::get_constr() const {
+  return m_constr;
+}
+
 bool
-CSPSolver::feasible_region_limits_is_empty_for_var(const char* var) const {
+CSPSolver::feasible_region_limits_is_empty_for_var(const std::string& var) const {
   bool ret;
   auto lims = m_feasible_region_limits.m_vars.at(var);
   if(lims.m_type_is_int32) {
@@ -1029,15 +999,19 @@ CSPSolver::feasible_region_limits_is_empty_for_var(const char* var) const {
 }
 
 const CSPSolver::FeasibleRegionLimits::Var&
-CSPSolver::get_feasible_region_limits(const char* var) const {
+CSPSolver::get_feasible_region_limits(const std::string& var) const {
   return m_feasible_region_limits.m_vars.at(var);
 }
 
 /// @return minimum as a double, regardless of whether var is an int32 or not
 double
-CSPSolver::get_feasible_region_limits_min_double(const char* var) const {
+CSPSolver::get_feasible_region_limits_min_double(const std::string& var) const {
   double ret;
+  //std::cout << "gfrl at " << var << "\n";
+  //for (auto it=m_feasible_region_limits.m_vars.begin(); it!=m_feasible_region_limits.m_vars.end(); ++it)
+  //  std::cout << "gfrl first = " << it->first << " " << (it == m_feasible_region_limits.m_vars.find(var) ? "1" : "0") << "\n";
   auto lims = m_feasible_region_limits.m_vars.at(var);
+  //std::cout << "gfrl at " << var << "\n";
   if(lims.m_type_is_int32) {
     ret = (double) lims.m_int32_set.get_min();
   }
@@ -1048,13 +1022,13 @@ CSPSolver::get_feasible_region_limits_min_double(const char* var) const {
 }
 
 bool
-CSPSolver::get_var_has_been_added(const char* var_key) const {
+CSPSolver::get_var_has_been_added(const std::string& var_key) const {
   const FeasibleRegionLimits& limits = m_feasible_region_limits;
   return limits.m_vars.find(var_key) != limits.m_vars.end();
 }
 
 template<typename T> bool
-CSPSolver::val_is_within_var_feasible_region(T val, const char* var_key) const {
+CSPSolver::val_is_within_var_feasible_region(T val, const std::string& var_key) const {
   const FeasibleRegionLimits& limits = m_feasible_region_limits;
   return limits.m_vars.find(var_key) != limits.m_vars.end();
 }
@@ -1117,7 +1091,7 @@ CSPSolver::get_interval_for_constr(Constr constr, double tol) {
 
 void
 CSPSolver::dilate(
-    std::pair<const char* const, FeasibleRegionLimits::Var>& var,
+    std::pair<const std::string,FeasibleRegionLimits::Var>& var,
     _Interval<int32_t>& iv) {
   if(var.second.m_int32_set.get_is_empty()) {
     var.second.m_int32_set = Set<int32_t>(iv);
@@ -1129,7 +1103,7 @@ CSPSolver::dilate(
 
 void
 CSPSolver::dilate(
-    std::pair<const char* const, FeasibleRegionLimits::Var>& var,
+    std::pair<const std::string,FeasibleRegionLimits::Var>& var,
     _Interval<double>& iv) {
   if(var.second.m_double_set.get_is_empty()) {
     var.second.m_double_set = Set<double>(iv);
@@ -1141,21 +1115,21 @@ CSPSolver::dilate(
 
 void
 CSPSolver::erode(
-    std::pair<const char* const, FeasibleRegionLimits::Var>& var,
+    std::pair<const std::string, FeasibleRegionLimits::Var>& var,
     _Interval<int32_t>& iv) {
   var.second.m_int32_set = intersection_of(var.second.m_int32_set, iv);
 }
 
 void
 CSPSolver::erode(
-    std::pair<const char* const, FeasibleRegionLimits::Var>& var,
+    std::pair<const std::string, FeasibleRegionLimits::Var>& var,
     _Interval<double>& iv) {
   var.second.m_double_set = intersection_of(var.second.m_double_set, iv);
 }
 
 void
 CSPSolver::propagate_constr_rhs_const(
-    std::pair<const char* const, FeasibleRegionLimits::Var>& ivar,
+    std::pair<const std::string, FeasibleRegionLimits::Var>& ivar,
     Constr& constr, /*const std::vector<CSPSolver::CondConstr>& cc*/ bool do_dilate) {
   // if lhs var is empty set, then there is nothing to do for forward
   // constraint (can't further constrain an empty set) or reverse constraint
@@ -1261,7 +1235,7 @@ CSPSolver::propagate_constr_rhs_const(
 
 void
 CSPSolver::propagate_constr_rhs_var(
-    std::pair<const char* const, FeasibleRegionLimits::Var>& ivar,
+    std::pair<const std::string, FeasibleRegionLimits::Var>& ivar,
     Constr& constr, /*const std::vector<CSPSolver::CondConstr>& cc*/ bool do_dilate) {
   assert(!do_dilate); /// @TODO / FIXME remove
   /*bool var_is_cond_constr = cc.size() > 0;
@@ -1467,7 +1441,7 @@ CSPSolver::assign_set_to_domain_limits(Set<double>& set, double tol) {
 
 /*void
 CSPSolver::set_var_limits_to_empty_set(
-    std::pair<const char* const, FeasibleRegionLimits::Var>& ivar) {
+    std::pair<const std::string, FeasibleRegionLimits::Var>& ivar) {
   if(ivar.second.m_type_is_int32) {
     ivar.second.m_int32_set = Set<int32_t>();
   }
@@ -1484,18 +1458,18 @@ CSPSolver::find_cond_constrs() {
   for(; itvs != m_feasible_region_limits.m_vars.end(); ++itvs) {
     // iterate over all constraints (C)
     for(auto itcs = m_constr.begin(); itcs != m_constr.end(); ++itcs) {
-      if(itcs->m_lhs == itvs->first) {
+      if(itcs->second.m_lhs == itvs->first) {
         //std::cout << "found var constrained by " << itcs->m_type << itcs->m_rhs << " " << itcs->m_p_cond << "\n";
         // found constraint for current variable
-        if(itcs->m_idx_cond > 0/*itcs->m_p_cond != 0*/) { // found conditional constraint
+        if(itcs->second.m_idx_cond > 0/*itcs->m_p_cond != 0*/) { // found conditional constraint
           //std::cout << "found conditional constraint\n";
           CSPSolver::CondConstr tmp;
           tmp.m_v = itvs->first;
-          if(m_cond[itcs->m_idx_cond-1].m_lhs/*itcs->m_p_cond->m_lhs*/) {
-            if(strcmp(m_cond[itcs->m_idx_cond-1].m_lhs/*itcs->m_p_cond->m_lhs*/, "") != 0) {
-              tmp.m_cv = m_cond[itcs->m_idx_cond-1].m_lhs;//itcs->m_p_cond->m_lhs;
+          if(!m_cond[itcs->second.m_idx_cond-1].m_lhs.empty()) {
+            //if(strcmp(m_cond[itcs->second.m_idx_cond-1].m_lhs/*itcs->second.m_p_cond->m_lhs*/, "") != 0) {
+              tmp.m_cv = m_cond[itcs->second.m_idx_cond-1].m_lhs;//itcs->second.m_p_cond->m_lhs;
               ret.push_back(tmp);
-            }
+            //}
           }
         }
       }
@@ -1547,26 +1521,26 @@ CSPSolver::propagate_constraints() {
         // iterate over all constraints (C)
         for(auto itcs = m_constr.begin(); itcs != m_constr.end(); itcs++) {
           bool dilate = false; // if false, erode
-          bool constraint_is_conditional = itcs->m_idx_cond > 0;//itcs->m_p_cond != 0;
+          bool constraint_is_conditional = itcs->second.m_idx_cond > 0;//itcs->first.m_p_cond != 0;
           if(constraint_is_conditional) {
-            if(itcs->m_idx_cond > max_idx_cond) { // is first time condition is seen
+            if(itcs->second.m_idx_cond > max_idx_cond) { // is first time condition is seen
               dilate = (step == 4);
-              max_idx_cond = itcs->m_idx_cond;
+              max_idx_cond = itcs->second.m_idx_cond;
             }
           }
-          if(itcs->m_lhs == itvs->first) { // constraint is applied to current_var
+          if(itcs->second.m_lhs == itvs->first) { // constraint is applied to current_var
             bool apply = (step == 4 && constraint_is_conditional);
             apply |= (step == 5 && !constraint_is_conditional);
             apply |= (step == 6);
             if(apply) {
-              if(step < 6 && itcs->m_rhs_is_int32_const) {
-                propagate_constr_rhs_const(*itvs, *itcs, /*cond_constrs, */dilate);
+              if(step < 6 && itcs->second.m_rhs_is_int32_const) {
+                propagate_constr_rhs_const(*itvs, itcs->second, /*cond_constrs, */dilate);
               }
-              else if(step < 6 && itcs->m_rhs_is_double_const) {
-                propagate_constr_rhs_const(*itvs, *itcs, /*cond_constrs, */dilate);
+              else if(step < 6 && itcs->second.m_rhs_is_double_const) {
+                propagate_constr_rhs_const(*itvs, itcs->second, /*cond_constrs, */dilate);
               }
-              else if(step == 6 && itcs->m_rhs_is_var) {
-                propagate_constr_rhs_var(  *itvs, *itcs, /*cond_constrs, */dilate);
+              else if(step == 6 && itcs->second.m_rhs_is_var) {
+                propagate_constr_rhs_var(  *itvs, itcs->second, /*cond_constrs, */dilate);
               }
             }
           }
@@ -1586,8 +1560,8 @@ CSPSolver::propagate_constraints() {
 
 void
 CSPSolver::throw_invalid_argument_if_var_key_has_not_been_added(
-    const char* var_key) {
-  if(not get_var_has_been_added(var_key)) {
+    const std::string& var_key) {
+  if(!get_var_has_been_added(var_key)) {
     std::ostringstream oss;
     oss << "invalid constraint specified (variable " << var_key;
     oss << " has not been added)";

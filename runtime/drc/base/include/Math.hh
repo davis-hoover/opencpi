@@ -110,39 +110,39 @@ class CSPSolver {
   protected:
     struct CondConstr {
       /// @brief name of var conditionally constrained
-      const char* m_v;
+      std::string m_v;
       /// @brief name of var for the condition
-      const char* m_cv;
+      std::string m_cv;
     };
   public:
     /// @brief represents a function
     template<class T> struct Func {
-      const char* m_lhs;
+      std::string m_lhs;
       const char* m_type;
       T           m_rhs;
-      Func(const char* lhs, const char* type, T rhs) :
+      Func(const std::string& lhs, const char* type, T rhs) :
           m_lhs(lhs), m_type(type), m_rhs(rhs) {
       }
     };
     /// @brief Constraint.
-    struct Constr : public Func<const char*> {
+    struct Constr : public Func<std::string> {
       //public:
         /* @brief A condition is represented as a (condition-less) constraint, as
          *        a constraint is already conveniently represented by an equality
          *        function, which is preciely how conditions are specified.
          **********************************************************************/
         typedef Constr Cond;
-        Constr(const char* lhs, const char* type, const int32_t rhs,
+        Constr(const std::string& lhs, const char* type, const int32_t rhs,
             int32_t idx_cond = 0);
-        Constr(const char* lhs, const char* type, const double rhs,
+        Constr(const std::string& lhs, const char* type, const double rhs,
             int32_t idx_cond = 0);
-        Constr(const char* lhs, const char* type, const char* rhs,
+        Constr(const std::string& lhs, const char* type, const std::string& rhs,
             int32_t idx_cond = 0);
-        Constr(const char* lhs, const char* type, Func* rhs,
+        Constr(const std::string& lhs, const char* type, Func* rhs,
             int32_t idx_cond = 0);
         bool operator==(const Constr& rhs) const;
       //protected:
-        typedef Func<const char*> Func;
+        typedef Func<std::string> Func;
         /// @brief left hand side variable name
         int32_t    m_rhs_int32_const; /// @TODO make const?
         double     m_rhs_double_const; /// @TODO make const?
@@ -194,14 +194,14 @@ class CSPSolver {
         bool contains(_Interval<double> interval);
         bool get_is_empty();
       }; // struct Var
-      typedef std::map<const char*, Var> VarMap;
+      typedef std::map<std::string, Var> VarMap;
       VarMap m_vars;
       _Interval<int32_t> get_int32_interval_limits();
       _Interval<double> get_double_interval_limits(double tol);
       void set_var_limits_to_type_limits(
-          std::pair<const char* const, FeasibleRegionLimits::Var>& var);
+          std::pair<const std::string,FeasibleRegionLimits::Var>& var);
       void set_var_limits_to_empty_set(
-          std::pair<const char* const, FeasibleRegionLimits::Var>& var);
+          std::pair<const std::string,FeasibleRegionLimits::Var>& var);
       bool operator==(const FeasibleRegionLimits& rhs) const;
       bool operator!=(const FeasibleRegionLimits& rhs) const;
     }; // struct FeasibleRegionLimits
@@ -209,7 +209,7 @@ class CSPSolver {
     /*enum class domain_t {int32};*/
     CSPSolver(size_t max_num_constr_prop_loop_iter = 1024);
     /// @brief Add integer variable in given domain (X in given D for CSP <X,D,C>)
-    template<typename T> void add_var(const char* var_key);
+    template<typename T> void add_var(const std::string& var_key);
     /*! @brief Add floating point variable in given domain (X in given D for CSP <X,D,C>)
      *  @param[in] var_key           C-string key which will be used to refer to
      *  @param[in] fp_comparison_tol Tolerance used for determining equality in
@@ -218,59 +218,61 @@ class CSPSolver {
      *                               Value should be > 0 and only set set for
      *                               floating point template types.
      **************************************************************************/
-    template<typename T> void add_var(const char* var_key, T fp_comparison_tol);
+    template<typename T> void add_var(const std::string& var_key, T fp_comparison_tol);
     /*! @brief Constrain variable. Left-hand side of equation
      *         contains only the variable being constrained, e.g.
      *         e.g. x1 >= 5 if x2 > 9 would
      *         be implemented as add_constr("x1", ">=", 5, Constr("x2", ">", 9).
      m  @param[in] type One of: ">=" ">" "<=" "<" "="
      **************************************************************************/
-    template<typename T> Constr& add_constr(
-        const char* lhs, const char* type, const T rhs);
+    template<typename T> size_t add_constr(
+        const std::string& lhs, const char* type, const T rhs);
     /*! @brief Conditionally constrain variable. Left-hand side of equation
      *         contains only the variable being constrained, e.g.
      *         e.g. x1 >= 5 if x2 > 9 would
      *         be implemented as add_constr("x1", ">=", 5, Constr("x2", ">", 9).
-     m  @param[in] type One of: ">=" ">" "<=" "<" "="
+     *  @param[in] type One of: ">=" ">" "<=" "<" "="
      **************************************************************************/
-    template<typename T> Constr& add_constr(
-        const char* lhs, const char* type, const T rhs,
+    template<typename T> size_t add_constr(
+        const std::string& lhs, const char* type, const T rhs,
         const Constr::Cond& cond);
-    void remove_constr(const Constr& contr);
-    const std::vector<Constr>& get_constr() const;
+    void remove_constr(size_t idx);
+    const std::map<size_t,Constr>& get_constr() const;
+    const CSPSolver::Constr& get_constr(size_t idx) const;
     /// @brief https://en.wikipedia.org/wiki/Feasible_region
     const FeasibleRegionLimits& get_feasible_region_limits() const;
-    bool feasible_region_limits_is_empty_for_var(const char* var_key) const;
+    bool feasible_region_limits_is_empty_for_var(const std::string& var_key) const;
     /// get limits for feasible region for one variable in particular
     const FeasibleRegionLimits::Var& get_feasible_region_limits(
-        const char* var) const;
+        const std::string& var) const;
     double get_feasible_region_limits_min_double(
-        const char* var) const;
-    bool get_var_has_been_added(const char* var_key) const;
+        const std::string& var) const;
+    bool get_var_has_been_added(const std::string& var_key) const;
     template<typename T> bool val_is_within_var_feasible_region(T val,
-        const char* var_key) const;
+        const std::string& var_key) const;
   protected:
     size_t                    m_max_num_constr_prop_loop_iter;
-    std::vector<Constr>       m_constr;
+    std::map<size_t,Constr>   m_constr;
+    size_t                    m_constr_max_id;
     std::vector<Constr::Cond> m_cond;
     FeasibleRegionLimits m_feasible_region_limits;
 
     _Interval<int32_t> get_interval_for_constr(Constr constr);
     _Interval<double> get_interval_for_constr(Constr constr, double tol);
-    void dilate(std::pair<const char* const, FeasibleRegionLimits::Var>& var,
+    void dilate(std::pair<const std::string,FeasibleRegionLimits::Var>& var,
         _Interval<int32_t>& iv);
-    void dilate(std::pair<const char* const, FeasibleRegionLimits::Var>& var,
+    void dilate(std::pair<const std::string,FeasibleRegionLimits::Var>& var,
         _Interval<double>& iv);
-    void erode(std::pair<const char* const, FeasibleRegionLimits::Var>& var,
+    void erode(std::pair<const std::string,FeasibleRegionLimits::Var>& var,
         _Interval<int32_t>& iv);
-    void erode(std::pair<const char* const, FeasibleRegionLimits::Var>& var,
+    void erode(std::pair<const std::string,FeasibleRegionLimits::Var>& var,
         _Interval<double>& iv);
     void propagate_constr_rhs_const(
-        std::pair<const char* const, FeasibleRegionLimits::Var>& ivar,
+        std::pair<const std::string,FeasibleRegionLimits::Var>& ivar,
         Constr& constr, /*const std::vector<CSPSolver::CondConstr>& cc*/
         bool do_dilate);
     void propagate_constr_rhs_var(
-        std::pair<const char* const, FeasibleRegionLimits::Var>& ivar,
+        std::pair<const std::string,FeasibleRegionLimits::Var>& ivar,
         Constr& constr, /*const std::vector<CSPSolver::CondConstr>& cc*/
         bool do_dilate);
     /// @return vector of names for variables (X) constrained conditionally
@@ -278,12 +280,12 @@ class CSPSolver {
     void assign_set_to_domain_limits(Set<int32_t>& set, int32_t tol);
     void assign_set_to_domain_limits(Set<double>& set, double tol);
     void set_var_limits_to_empty_set(
-        std::pair<const char* const, FeasibleRegionLimits::Var>& ivar);
+        std::pair<const std::string, FeasibleRegionLimits::Var>& ivar);
     std::vector<CondConstr> find_cond_constrs();
     /// @brief (https://en.wikipedia.org/wiki/Constr_propagation)
     void propagate_constraints();
     void throw_invalid_argument_if_var_key_has_not_been_added(
-        const char* var_key);
+        const std::string& var_key);
 }; // class CSPSolver
 
 } // namespace Math

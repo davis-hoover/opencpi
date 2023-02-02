@@ -77,39 +77,40 @@ public:
   // These methods interface with the helper 9361 classes etc.
   // ================================================================================================
   RCCResult prepare_config(unsigned config) {
+    ///@TODO / FIXME address app_port_num
+    typedef OD::RFPort::direction_t direction_t;
     auto &conf = m_properties.configurations.data[config];
     OD::ConfigLockRequest req;
     // convert the data structure dictated by the drc spec property to the one
     // defined by the older DRC helper class(es)
     auto nChannels = conf.channels.length;
-    req.m_rf_ports.resize(nChannels);
-    unsigned nRx = 0, nTx = 0;
     for (unsigned n = 0; n < nChannels; ++n) {
       auto &channel = conf.channels.data[n];
-      auto &rf_port = req.m_rf_ports[n];
-      rf_port = OD::RFPortConfigLockRequest(); // zero out any previous requests
-      if(channel.rx)
-        rf_port.include_direction(OD::rf_port_direction_t::rx);
-      else
-        rf_port.include_direction(OD::rf_port_direction_t::tx);
-      if (!std::string(channel.rf_port_name).empty())
-        rf_port.include_rf_port_name(channel.rf_port_name);
-      rf_port.include_routing_id((channel.rx ? "RX" : "TX") + std::to_string(channel.rx ? nRx : nTx));
-      ++(channel.rx ? nRx : nTx);
-      rf_port.include_tuning_freq_MHz(channel.tuning_freq_MHz, channel.tolerance_tuning_freq_MHz);
-      rf_port.include_bandwidth_3dB_MHz(channel.bandwidth_3dB_MHz, channel.tolerance_bandwidth_3dB_MHz);
-      rf_port.include_sampling_rate_Msps(channel.sampling_rate_Msps, channel.tolerance_sampling_rate_Msps);
-      rf_port.include_samples_are_complex(channel.samples_are_complex);
-      rf_port.include_gain_mode(channel.gain_mode);
-      if (!rf_port.get_gain_mode().compare("manual"))
-        rf_port.include_gain_dB(channel.gain_dB, channel.tolerance_gain_dB);
+      direction_t direction = channel.rx ? direction_t::rx : direction_t::tx;
+      OD::RFPortConfigLockRequest rf_port(
+          direction,
+          channel.tuning_freq_MHz,
+          channel.bandwidth_3dB_MHz,
+          channel.sampling_rate_Msps,
+          channel.samples_are_complex,
+          channel.gain_mode,
+          channel.gain_dB,
+          channel.tolerance_tuning_freq_MHz,
+          channel.tolerance_bandwidth_3dB_MHz,
+          channel.tolerance_sampling_rate_Msps,
+          channel.tolerance_gain_dB,
+          channel.rf_port_name,
+          channel.rf_port_num,
+          channel.app_port_num);
+      req.push_back(rf_port);
     }
     RCCResult rc = RCC_OK;
     try {
-      if(!m_ctrlr.prepare(config, req))
-        throw std::string("failed");
-    } catch(std::string& err) {
-      std::cout << "err=" << err << "\n";
+      m_ctrlr.set_configuration((uint16_t)config, req);
+      if (!m_ctrlr.prepare((uint16_t)config))
+        throw std::runtime_error("failed");
+    } catch(std::exception& err) {
+      //std::cout << "err=" << err << "\n";
       if(conf.recoverable) {
         std::string ctrlerr = m_ctrlr.get_error().c_str();
         size_t count = ctrlerr.size();
@@ -126,30 +127,29 @@ public:
   }
   RCCResult start_config(unsigned config) {
     try {
-      return m_ctrlr.start(config) ? RCC_OK :
+      return m_ctrlr.start((uint16_t)config) ? RCC_OK :
         setError("config start was unsuccessful, set OCPI_LOG_LEVEL to 8 "
                  "(or higher) for more info");
-    } catch(const char* err) {
-      return setError(err);
+    } catch(std::exception& err) {
+      return setError(err.what());
     }
     return RCC_OK;
   }
   RCCResult stop_config(unsigned config) { 
     log(8, "DRC: stop_config: %u", config);
     try {
-      return m_ctrlr.stop(config) ? RCC_OK :
+      return m_ctrlr.stop((uint16_t)config) ? RCC_OK :
         setError("config stop was unsuccessful, set OCPI_LOG_LEVEL to 8 "
                  "(or higher) for more info");
-    } catch(const char* err) {
-      return setError(err);
+    } catch(std::exception& err) {
+      return setError(err.what());
     }
     return RCC_OK;
-
   }
   // notification that start property has been written
   RCCResult start_written() {
     log(8, "start config %u %u", m_properties.start, isOperating());
-    unsigned config = m_properties.start;
+    uint16_t config = m_properties.start;
     if (config >= OCPI_DRC_MAX_CONFIGURATIONS)
       return setError("Configuration %u started, but is out of range (0 to %u)",
           config, OCPI_DRC_MAX_CONFIGURATIONS - 1);
@@ -192,7 +192,7 @@ public:
   }
   RCCResult release_config(unsigned config) {
     log(8, "DRC: release_config");
-    return m_ctrlr.release(config) ? RCC_OK :
+    return m_ctrlr.release((uint16_t)config) ? RCC_OK :
       setError("config release was unsuccessful, set OCPI_LOG_LEVEL to 8 "
                "(or higher) for more info");
   }

@@ -53,7 +53,7 @@ release,0,,,,,,,,,,,,,,false,
 ,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,samples are complex request by direction=rx
 start,0,,,,,,,,,,,,,,false,samples are complex request by direction=rx
 release,0,,,,,,,,,,,,,,false,
-,0,0,true,2450,0.9375,0.9375,true,agc,0,1E-06,1E-06,1E-06,1E-06,,,gain mode request by direction=rx
+,0,0,true,2450,0.9375,0.9375,true,auto,0,1E-06,1E-06,1E-06,1E-06,,,gain mode request by direction=rx
 start,0,,,,,,,,,,,,,,false,gain mode request by direction=rx
 release,0,,,,,,,,,,,,,,false,
 ,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,gain mode request by direction=rx
@@ -125,7 +125,7 @@ release,0,,,,,,,,,,,,,,false,
 ,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,samples are complex request by direction=tx
 start,0,,,,,,,,,,,,,,false,samples are complex request by direction=tx
 release,0,,,,,,,,,,,,,,false,
-,0,0,false,2450,0.9375,0.9375,true,agc,0,1E-06,1E-06,1E-06,1E-06,,,gain mode request by direction=tx
+,0,0,false,2450,0.9375,0.9375,true,auto,0,1E-06,1E-06,1E-06,1E-06,,,gain mode request by direction=tx
 start,0,,,,,,,,,,,,,,true,gain mode request by direction=tx
 release,0,,,,,,,,,,,,,,false,
 ,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,,,gain mode request by direction=tx
@@ -203,7 +203,7 @@ release,0,,,,,,,,,,,,,,false,
 ,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,samples are complex request by rf_port_name=Rx0
 start,0,,,,,,,,,,,,,,false,samples are complex request by rf_port_name=Rx0
 release,0,,,,,,,,,,,,,,false,
-,0,0,true,2450,0.9375,0.9375,true,agc,0,1E-06,1E-06,1E-06,1E-06,Rx0,,gain mode request by rf_port_name=Rx0
+,0,0,true,2450,0.9375,0.9375,true,auto,0,1E-06,1E-06,1E-06,1E-06,Rx0,,gain mode request by rf_port_name=Rx0
 start,0,,,,,,,,,,,,,,false,gain mode request by rf_port_name=Rx0
 release,0,,,,,,,,,,,,,,false,
 ,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx0,,gain mode request by rf_port_name=Rx0
@@ -278,7 +278,7 @@ release,0,,,,,,,,,,,,,,false,
 ,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx1,,samples are complex request by rf_port_name=Rx1
 start,0,,,,,,,,,,,,,,false,samples are complex request by rf_port_name=Rx1
 release,0,,,,,,,,,,,,,,false,
-,0,0,true,2450,0.9375,0.9375,true,agc,0,1E-06,1E-06,1E-06,1E-06,Rx1,,gain mode request by rf_port_name=Rx1
+,0,0,true,2450,0.9375,0.9375,true,auto,0,1E-06,1E-06,1E-06,1E-06,Rx1,,gain mode request by rf_port_name=Rx1
 start,0,,,,,,,,,,,,,,false,gain mode request by rf_port_name=Rx1
 release,0,,,,,,,,,,,,,,false,
 ,0,0,true,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Rx1,,gain mode request by rf_port_name=Rx1
@@ -353,7 +353,7 @@ release,0,,,,,,,,,,,,,,false,
 ,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx0,,samples are complex request by rf_port_name=Tx0
 start,0,,,,,,,,,,,,,,false,samples are complex request by rf_port_name=Tx0
 release,0,,,,,,,,,,,,,,false,
-,0,0,false,2450,0.9375,0.9375,true,agc,0,1E-06,1E-06,1E-06,1E-06,Tx0,,gain mode request by rf_port_name=Tx0
+,0,0,false,2450,0.9375,0.9375,true,auto,0,1E-06,1E-06,1E-06,1E-06,Tx0,,gain mode request by rf_port_name=Tx0
 start,0,,,,,,,,,,,,,,true,gain mode request by rf_port_name=Tx0
 release,0,,,,,,,,,,,,,,false,
 ,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx0,,gain mode request by rf_port_name=Tx0
@@ -431,7 +431,7 @@ release,0,,,,,,,,,,,,,,false,
 ,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx1,,samples are complex request by rf_port_name=Tx1
 start,0,,,,,,,,,,,,,,false,samples are complex request by rf_port_name=Tx1
 release,0,,,,,,,,,,,,,,false,
-,0,0,false,2450,0.9375,0.9375,true,agc,0,1E-06,1E-06,1E-06,1E-06,Tx1,,gain mode request by rf_port_name=Tx1
+,0,0,false,2450,0.9375,0.9375,true,auto,0,1E-06,1E-06,1E-06,1E-06,Tx1,,gain mode request by rf_port_name=Tx1
 start,0,,,,,,,,,,,,,,true,gain mode request by rf_port_name=Tx1
 release,0,,,,,,,,,,,,,,false,
 ,0,0,false,2450,0.9375,0.9375,true,manual,0,1E-06,1E-06,1E-06,1E-06,Tx1,,gain mode request by rf_port_name=Tx1

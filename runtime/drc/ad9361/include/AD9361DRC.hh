@@ -41,8 +41,7 @@ namespace OCPI {
 namespace DRC_PHASE_2 {
 
 // -----------------------------------------------------------------------------
-// STEP 1 - IF IS_LOCKING SUPPORTED,
-//          DEFINE Constraint Satisfaction Problem (CSP)
+// STEP 1 - DEFINE Constraint Satisfaction Problem (CSP)
 // -----------------------------------------------------------------------------
 
 ///@TODO / FIXME handle DDC constant(s) in separate DDC/DUC class
@@ -80,13 +79,18 @@ class AD9361CSP : public CSPBase, public DDCDUCConstants {
 //#endif
 
 // -----------------------------------------------------------------------------
-// STEP 2 - IF IS_LOCKING SUPPORTED, DEFINE CONFIGURATOR THAT UTILIZES THE CSP
+// STEP 2 - DEFINE CONFIGURATOR THAT UTILIZES THE CSP
 // -----------------------------------------------------------------------------
 
 //#ifdef IS_LOCKING
 class AD9361Configurator : public Configurator<AD9361CSP> {
   public:
   AD9361Configurator();
+  protected:
+  void init_rf_port_rx1();
+  void init_rf_port_rx2();
+  void init_rf_port_tx1();
+  void init_rf_port_tx2();
 };
 //#endif
 
@@ -275,29 +279,30 @@ class AD9361DRC : public DRC<cfgrtr_t>, public DDCDUCConstants {
   void set_rx_rf_port_input(uint32_t mode);
   void set_tx_rf_port_output(uint32_t mode);
   void throw_if_no_os_api_call_returns_non_zero(int32_t res);
-  uint64_t            get_noos_tuning_freq(   std::string rf_port_name);
-  uint32_t            get_noos_bandwidth(     std::string rf_port_name);
-  uint32_t            get_noos_sampling_rate( std::string rf_port_name);
-  uint8_t             get_noos_gain_mode(     std::string rf_port_name);
-  int32_t             get_noos_rx_gain(       std::string rf_port_name);
-  uint32_t            get_noos_tx_gain(       std::string rf_port_name);
-  bool                get_enabled(            std::string rf_port_name);
-  rf_port_direction_t get_direction(          std::string rf_port_name);
-  double              get_tuning_freq_MHz(    std::string rf_port_name);
-  double              get_bandwidth_3dB_MHz(  std::string rf_port_name);
-  double              get_sampling_rate_Msps( std::string rf_port_name);
-  bool                get_samples_are_complex(std::string rf_port_name);
-  std::string         get_gain_mode(          std::string rf_port_name);
-  double              get_gain_dB(            std::string rf_port_name);
-  void set_direction(std::string rf_port_name, rf_port_direction_t val);
-  void set_tuning_freq_MHz(      std::string rf_port_name, double      val);
-  void set_bandwidth_3dB_MHz(    std::string rf_port_name, double      val);
-  void set_sampling_rate_Msps(   std::string rf_port_name, double      val);
-  void set_samples_are_complex(  std::string rf_port_name, bool        val);
-  void set_gain_mode(            std::string rf_port_name, std::string val);
-  void set_gain_dB(              std::string rf_port_name, double      val);
-  void set_routing_id(std::string rf_port_name, std::string val);
-  bool request_config_lock(std::string id, const ConfigLockRequest& req);
+  uint64_t            get_noos_tuning_freq(   const std::string& rf_port_name);
+  uint32_t            get_noos_bandwidth(     const std::string& rf_port_name);
+  uint32_t            get_noos_sampling_rate( const std::string& rf_port_name);
+  uint8_t             get_noos_gain_mode(     const std::string& rf_port_name);
+  int32_t             get_noos_rx_gain(       const std::string& rf_port_name);
+  uint32_t            get_noos_tx_gain(       const std::string& rf_port_name);
+  bool                get_enabled(            const std::string& rf_port_name);
+  RFPort::direction_t get_direction(          const std::string& rf_port_name);
+  double              get_tuning_freq_MHz(    const std::string& rf_port_name);
+  double              get_bandwidth_3dB_MHz(  const std::string& rf_port_name);
+  double              get_sampling_rate_Msps( const std::string& rf_port_name);
+  bool                get_samples_are_complex(const std::string& rf_port_name);
+  std::string         get_gain_mode(          const std::string& rf_port_name);
+  double              get_gain_dB(            const std::string& rf_port_name);
+  uint8_t             get_app_port_num(       const std::string& rf_port_name);
+  void set_direction(const std::string& rf_port_name, RFPort::direction_t val);
+  void set_tuning_freq_MHz(    const std::string& rf_port_name, double      val);
+  void set_bandwidth_3dB_MHz(  const std::string& rf_port_name, double      val);
+  void set_sampling_rate_Msps( const std::string& rf_port_name, double      val);
+  void set_samples_are_complex(const std::string& rf_port_name, bool        val);
+  void set_gain_mode(          const std::string& rf_port_name, const std::string& val);
+  void set_gain_dB(            const std::string& rf_port_name, double      val);
+  void set_app_port_num(       const std::string& rf_port_name, uint8_t val);
+  bool request_config_lock(uint16_t id, const ConfigLockRequest& req);
   void init();
   bool shutdown();
   //bool start(unsigned config);

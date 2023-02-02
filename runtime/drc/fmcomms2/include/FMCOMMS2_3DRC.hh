@@ -72,6 +72,11 @@ class FMCOMMS2_3Configurator : public Configurator<FMCOMMS2_3CSP> {
   public:
   ///@TODO / FIXME - remove default value of fmcomms_num 3
   FMCOMMS2_3Configurator(int32_t fmcomms_num = 3);
+  protected:
+  void init_rf_port_rx1a();
+  void init_rf_port_rx2a();
+  void init_rf_port_tx1a();
+  void init_rf_port_tx2a();
 }; // class FMCOMMS2_3Configurator
 //#endif
 
@@ -102,23 +107,24 @@ class FMCOMMS2_3DRC : public AD9361DRC<cfgrtr_t> {
   /* @brief this is what maps, for the DRC, the AD9361 channels to
    *         the FMCOMMS2/3 channels
    ****************************************************************************/
-  std::string         get_ad9361_rf_port_name(std::string rf_port_name) const;
-  bool                get_enabled(            std::string rf_port_name);
-  rf_port_direction_t get_direction(          std::string rf_port_name);
-  double              get_tuning_freq_MHz(    std::string rf_port_name);
-  double              get_bandwidth_3dB_MHz(  std::string rf_port_name);
-  double              get_sampling_rate_Msps( std::string rf_port_name);
-  bool                get_samples_are_complex(std::string rf_port_name);
-  std::string         get_gain_mode(          std::string rf_port_name);
-  double              get_gain_dB(            std::string rf_port_name);
-  void set_direction(std::string rf_port_name, rf_port_direction_t val);
-  void set_tuning_freq_MHz(      std::string rf_port_name, double      val);
-  void set_bandwidth_3dB_MHz(    std::string rf_port_name, double      val);
-  void set_sampling_rate_Msps(   std::string rf_port_name, double      val);
-  void set_samples_are_complex(  std::string rf_port_name, bool        val);
-  void set_gain_mode(            std::string rf_port_name, std::string val);
-  void set_gain_dB(              std::string rf_port_name, double      val);
-  void set_routing_id(std::string rf_port_name, std::string val);
+  const std::string&  get_ad9361_rf_port_name(const std::string& rf_port_name) const;
+  bool                get_enabled(            const std::string& rf_port_name);
+  RFPort::direction_t get_direction(          const std::string& rf_port_name);
+  double              get_tuning_freq_MHz(    const std::string& rf_port_name);
+  double              get_bandwidth_3dB_MHz(  const std::string& rf_port_name);
+  double              get_sampling_rate_Msps( const std::string& rf_port_name);
+  bool                get_samples_are_complex(const std::string& rf_port_name);
+  std::string         get_gain_mode(          const std::string& rf_port_name);
+  double              get_gain_dB(            const std::string& rf_port_name);
+  uint8_t             get_app_port_num(       const std::string& rf_port_name);
+  void set_direction(const std::string& rf_port_name, RFPort::direction_t val);
+  void set_tuning_freq_MHz(     const std::string& rf_port_name, double      val);
+  void set_bandwidth_3dB_MHz(   const std::string& rf_port_name, double      val);
+  void set_sampling_rate_Msps(  const std::string& rf_port_name, double      val);
+  void set_samples_are_complex( const std::string& rf_port_name, bool        val);
+  void set_gain_mode(           const std::string& rf_port_name, const std::string& val);
+  void set_gain_dB(             const std::string& rf_port_name, double      val);
+  void set_app_port_num(        const std::string& rf_port_name, uint8_t val);
   bool shutdown();
 }; // class FMCOMMS2_3DRC
 
