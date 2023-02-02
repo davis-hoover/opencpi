@@ -292,7 +292,7 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         """
         Create library asset
         """
-        lib_path, name, parent_path = Asset.start_creation(directory, name, 'library', kwargs)
+        lib_path, name, parent_path = Asset.start_creation(directory, name, 'library', **kwargs)
         if name != 'components' and not lib_path.parent.exists():
             libs_path = lib_path.parent
             libs_path.mkdir(parents=True)
@@ -367,7 +367,7 @@ class LibrariesCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, R
         """
         Create library collection (directory of libraries)
         """
-        libs_path, name, parent_path = Asset.start_creation(directory, name, 'libraries', kwargs)
+        libs_path, name, parent_path = Asset.start_creation(directory, name, 'libraries', **kwargs)
         libs_path.mkdir()
         template = jinja2.Template(ocpitemplate.LIBRARIES_XML, trim_blocks=True)
         ocpiutil.write_file_from_string(libs_path.joinpath(libs_path.name + '.xml'),

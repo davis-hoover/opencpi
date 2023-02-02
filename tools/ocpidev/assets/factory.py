@@ -174,8 +174,8 @@ class AssetFactory():
         that instance. Otherwise, call the asset class constructor and return
         the new instance.
         """
-        if isinstance(asset_cls,str):
-            asset_cls = AssetFactory.get_class_from_asset_type(asset_cls,name)
+        if isinstance(asset_cls, str):
+            asset_cls = AssetFactory.get_class_from_asset_type(asset_cls, name)
 
         if asset_cls.instances_should_be_cached:
             # If instances should be cached, determine the sub-dictionary in __assets
@@ -184,7 +184,7 @@ class AssetFactory():
                 cls.__assets[asset_cls] = {}
             asset_inst_dict = cls.__assets[asset_cls]
             asset_path, asset_name, asset_parent =\
-                ocpiabstract.Asset.get_asset_path(directory, name, kwargs)
+                ocpiabstract.Asset.get_asset_path(directory, name, **kwargs)
 
             real_dir = str(asset_path)
             asset = asset_inst_dict.get(real_dir)
