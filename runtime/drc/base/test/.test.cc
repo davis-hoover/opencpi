@@ -20,6 +20,7 @@
 
 #include ".TestDRC.hh"
 #include <list>
+#include <cassert>
 
 using namespace OCPI::DRC_PHASE_2;
 typedef RFPort::direction_t dir_t;

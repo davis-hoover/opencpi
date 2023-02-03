@@ -36,7 +36,6 @@ namespace DRC_PHASE_2 {
 //#ifdef IS_LOCKING
 class FMCOMMS2_3CSP : public AD9361CSP {
   protected:
-  typedef CSPSolver::Constr::Cond Cond;
   typedef CSPSolver::Constr::Func Func;
   /* @brief for the FMCOMMS2_3,
    *        define variables (X) and their domains (D) for <X,D,C> which

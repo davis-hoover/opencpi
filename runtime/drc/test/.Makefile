@@ -18,9 +18,14 @@
 
 .PHONY: clean
 
-build/test: ../../base/include/Math.hh ../../base/src/Math.cct ../../base/include/DRC.hh ../../base/src/DRC.cct .TestDRC.hh .test.cc
-	mkdir -p build
-	g++ --std=c++0x -g -D DISABLE_LOG -I../../base/include -I../../base/src .test.cc -o build/test
+# intentionally serial build/runs
+all:
+	$(MAKE) -C ../base/test -f .Makefile
+	$(MAKE) -C ../ad9361/test -f .Makefile
+	$(MAKE) -C ../fmcomms2/test -f .Makefile
+	../base/test/build/test && ../ad9361/test/build/test && ../fmcomms2/test/build/test
 
 clean:
-	rm -rf build
+	$(MAKE) -C ../base/test -f .Makefile clean
+	$(MAKE) -C ../ad9361/test -f .Makefile clean
+	$(MAKE) -C ../fmcomms2/test -f .Makefile clean

@@ -55,7 +55,6 @@ class DDCDUCConstants {
 ///@TODO / FIXME handle DDC constant(s) in separate DDC/DUC class
 class AD9361CSP : public CSPBase, public DDCDUCConstants {
   protected:
-  typedef CSPSolver::Constr::Cond Cond;
   typedef CSPSolver::Constr::Func Func;
   /* @brief for the AD9361,
    *        define variables (X) and their domains (D) for <X,D,C> which
