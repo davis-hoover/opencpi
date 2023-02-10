@@ -966,7 +966,13 @@ create(const char *file, const std::string &parentFile, const char *package, con
 	top = top->m_parent;
       std::string lib(w->m_library);
       w->addParamConfigSuffix(lib);
-      top->m_build.m_checkedLibraries.push_back(":" + lib); // no path here
+      // This is recording that the top-level worker depends on a lower level worker.
+      // This is NOT what we want for the case where a platform worker declares that
+      // the platform contains a device, since platform worker code does not touch
+      // device and is just declaring that they *may* be present.  If this was a bit more
+      // OO it would be a method (top->hasWorkerDependencies())....
+      if (top->m_type != Worker::Platform)
+        top->m_build.m_checkedLibraries.push_back(":" + lib); // no path here
     }
   }
   return w;

@@ -337,7 +337,7 @@ begin
       when "00"   => ppsOut <= s_ppsDrive;      -- 90% HI, 10% LO (timeCLK count)
       when "01"   => ppsOut <= s_ppsExtSync_d2; -- ppsIn reg'ed in timeCLK domain
       when "10"   => ppsOut <= s_xo2;           -- Local XO (timeCLK/2)
-      when others => ppsOut <= '0';		-- This was changed from "=>nul*l;" to =>ppsOut<='0';
+      when others => ppsOut <= '0';             -- "others => null": inferred latch
     end case;
   end process;
 
