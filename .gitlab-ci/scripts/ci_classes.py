@@ -746,12 +746,13 @@ class PlatformPipelineBuilder(PipelineBuilder):
 class OspPipelineBuilder(PlatformPipelineBuilder):
     def __init__(self, pipeline_id: str, container_registry: str, 
         base_image_tag: str, hosts: List[str], platforms: List[str], 
-        projects: List[str], project: str, dump_path: Path, config: dict, 
-        image_tags: List[str]=None, do_assemblies: bool=True):
+        projects: List[str], project: str, dump_path: Path, config: dict,
+        gitlab_container_registry, image_tags: List[str]=None, do_assemblies: bool=True):
         """Initialize an OspPipelineBuilder"""
         super().__init__(pipeline_id, container_registry,
             base_image_tag, hosts, platforms, projects, dump_path, config,
-            image_tags, do_assemblies=do_assemblies, do_hosts=False)
+            gitlab_container_registry, image_tags=image_tags, do_assemblies=do_assemblies, 
+            do_hosts=False)
         self.stages.remove('osp')
         self.project = project
 
@@ -866,11 +867,12 @@ class OspPipelineBuilder(PlatformPipelineBuilder):
 
 class CompPipelineBuilder(PlatformPipelineBuilder):
     def __init__(self, pipeline_id, container_registry, base_image_tag, hosts, 
-        project, platforms, projects, dump_path, config=None, 
+        project, platforms, projects, dump_path, gitlab_container_registry, config=None,
         image_tags: List[str]=list(), do_assemblies: bool=True):
         """Initializes an AssemblyPipelineBuilder"""
         super().__init__(pipeline_id, container_registry, base_image_tag,
-            hosts, platforms, projects, dump_path, config, image_tags)
+            hosts, platforms, projects, dump_path, config, gitlab_container_registry,
+            image_tags=image_tags, do_assemblies=do_assemblies)
         self.stages = ['install-project']
         if do_assemblies:
             self.stages += [
