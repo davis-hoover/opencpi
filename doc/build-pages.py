@@ -802,7 +802,7 @@ def get_tags(git_dir: Path) -> List[str]:
     # total size of generated artifacts must be less than
     # 1 GB, so ignore tags corresponding to early releases.
     # cmd = ["git", "--git-dir", str(git_dir.resolve()), "tag", "-l", "v*"]
-    cmd = ["git", "--git-dir", str(git_dir.resolve()), "tag", "-l", "v2.[!0-1]*"]
+    cmd = ["git", "--git-dir", str(git_dir.resolve()), "tag", "-l", "v2.[!0-2]*"]
     logging.debug(f"Executing cmd: {cmd}")
     tags = subprocess.check_output(cmd).decode().strip("\n").split("\n")
     if not tags[0]:
