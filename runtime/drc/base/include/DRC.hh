@@ -145,6 +145,8 @@ class CSPBase {
   CSPSolver m_solver;
   const CSPSolver::FeasibleRegionLimits& get_feasible_region_limits() const;
   double get_feasible_region_limits_min_double(const std::string& var) const;
+  template<typename T> bool val_is_within_var_feasible_region(T val,
+      const std::string& var_key) const;
 }; // class CSPBase
 
 /// @brief maps a RFPort::config_t entry to a CSP variable name (string)
@@ -170,13 +172,17 @@ class Configurator : public OCPI::Util::LogPrefix
   /// @brief this just retrieves entries from the dictionary
   const std::string& get_error() const;
   double get_config_locked_value(const std::string& rf_port_name,
-      RFPort::config_t cfg) const;
+      RFPort::config_t cfg, double attempted_val) const;
   template<typename T> std::string get_lock_config_str(
       const std::string& rf_port_name, RFPort::config_t cfg, T val,
       bool succeeded);
   bool get_csp_var_is_locked(const std::string& csp_var) const;
   const CSPSolver::FeasibleRegionLimits& get_feasible_region_limits() const;
   double get_feasible_region_limits_min_double(const std::string& var) const;
+  double get_val_is_within_feasible_region(const std::string& rf_port_name,
+      RFPort::config_t cfg, double val) const;
+  bool val_is_within_var_feasible_region(double val,
+      const std::string& var) const;
   bool lock_config(const std::string& rf_port_name, RFPort::config_t cfg,
       int32_t val);
   bool lock_config(const std::string& rf_port_name, RFPort::config_t cfg,

@@ -33,7 +33,7 @@ namespace OCPI {
 /// @todo / FIXME - consolidate into DRC namespace
 namespace DRC_PHASE_2 {
 
-static std::vector<AD9361DeviceCallBack*> g_devices;
+static std::vector<AD9361DeviceCallBack*> g_devices_phase2;
 
 // -----------------------------------------------------------------------------
 // STEP 1 - DEFINE Constraint Satisfaction Problem (CSP)
@@ -554,21 +554,23 @@ AD9361DRC<cfgrtr_t>::init_init_param() {
   // that the No-OS opencpi platform driver knows to drive the force_reset
   // property of the sub-device
   m_init_param.gpio_resetb = (m_device << 8) | GPIO_RESET_PIN;
-  g_devices.resize(m_device+1);
-  g_devices[m_device] = &m_callback;
+  if(g_devices_phase2.size() < m_device+1) {
+    g_devices_phase2.resize(m_device+1);
+    g_devices_phase2[m_device] = &m_callback;
+  }
 }
 
 // C interface for NoOs Library callbacks to touch the actual device (config slave)
 static void get_byte(uint8_t id_no, uint16_t addr, uint8_t *buf) {
-  g_devices[id_no]->get_byte(id_no, addr, buf);
+  g_devices_phase2[id_no]->get_byte(id_no, addr, buf);
 }
 
 static void set_byte(uint8_t id_no, uint16_t addr, const uint8_t *buf) {
-  g_devices[id_no]->set_byte(id_no, addr, buf);
+  g_devices_phase2[id_no]->set_byte(id_no, addr, buf);
 }
 
 static void set_reset(uint8_t id_no, bool on) {
-  g_devices[id_no]->set_reset(id_no, on);
+  g_devices_phase2[id_no]->set_reset(id_no, on);
 }
 
 template<class cfgrtr_t> bool
@@ -636,6 +638,10 @@ AD9361DRC<cfgrtr_t>::init() {
   usleep(1000);
   // the below method call allocates memory for ad9361, the address of which is
   // pointed to by m_ad9361_rf_phy once the method returns
+  if(g_devices_phase2.size() < m_device+1) {
+    g_devices_phase2.resize(m_device+1);
+    g_devices_phase2[m_device] = &m_callback;
+  }
   this->log_info("noos ad9361_init");
   m_ad9361_init_ret = ad9361_init(&m_ad9361_rf_phy,&m_init_param);
   ad9361_set_tx_fir_en_dis(m_ad9361_rf_phy, 0); // disable tx_fir with the ad9361_api library in all cases
@@ -1077,6 +1083,11 @@ AD9361DRC<cfgrtr_t>::set_tuning_freq_MHz(const std::string& rf_port_name, double
   init_if_required();
   uint64_t lo_freq_hz = std::round(val*1000000.);
   bool do_rx = get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
+  /// @TODO replace divider with proper DDC/DUC classes
+  unsigned stream = 0;
+  if(m_callback.isMixerPresent(do_rx, stream)) {
+    m_callback.setPhaseIncrement(do_rx, stream, 0);
+  }
   do_rx ?
       this->log_info("noos ad9361_set_rx_lo_freq %" PRIu64, lo_freq_hz) :
       this->log_info("noos ad9361_set_tx_lo_freq %" PRIu64, lo_freq_hz);
@@ -1179,7 +1190,7 @@ AD9361DRC<cfgrtr_t>::set_gain_dB(const std::string& rf_port_name, double val) {
     rx_val = (int32_t)std::round(val);
   }
   else {
-    tx_val = std::round(convert_db_to_milli_db(val));
+    tx_val = std::round(convert_db_to_milli_db(-val));
   }
   do_rx ?
       this->log_info("noos ad9361_set_rx_rf_gain %" PRId32, rx_val) :
@@ -1212,17 +1223,14 @@ AD9361DRC<cfgrtr_t>::set_app_port_num(const std::string& /*rf_port_name*/, uint8
 //AD9361DRC<cfgrtr_t>::start(unsigned config) {
 //}
 
-  ///@TODO enable me!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11
 template<class cfgrtr_t> bool
 AD9361DRC<cfgrtr_t>::stop(unsigned config) {
   bool ret = true;
-#if 0
 #ifndef DISABLE_AD9361
   // From AD9361 datasheet:
   // FDD is "TX and RX signal chains enabled", but Alert is only "synthesizers enabled"
-  this->log_info("noos ad9361_set_en_state_machine_mode %i" ENSM_MODE_ALERT);
-  ret = ad9361_set_en_state_machine_mode(m_ad9361_rf_phy, ENSM_MODE_ALERT);
-#endif
+  this->log_info("noos ad9361_set_en_state_machine_mode %i", ENSM_MODE_ALERT);
+  /*ret = */ad9361_set_en_state_machine_mode(m_ad9361_rf_phy, ENSM_MODE_ALERT);
 #endif
   if(!DRC<cfgrtr_t>::stop(config)) {
     ret = false;

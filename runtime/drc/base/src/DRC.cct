@@ -199,6 +199,12 @@ CSPBase::get_feasible_region_limits_min_double(const std::string& var) const {
   return m_solver.get_feasible_region_limits_min_double(var.c_str());
 }
 
+template<typename T> bool
+CSPBase::val_is_within_var_feasible_region(T val,
+    const std::string& var) const {
+  return m_solver.val_is_within_var_feasible_region(val, var.c_str());
+}
+
 template<class CSP> const std::string&
 Configurator<CSP>::get_error() const {
   return m_error;
@@ -206,9 +212,12 @@ Configurator<CSP>::get_error() const {
 
 template<class CSP> double
 Configurator<CSP>::get_config_locked_value(const std::string& rf_port_name,
-    RFPort::config_t cfg) const {
+    RFPort::config_t cfg, double attempted_val) const {
+  double ret = attempted_val;
   auto var = m_dict.at(rf_port_name).at(cfg);
-  return m_solver.get_feasible_region_limits_min_double(var);
+  if (!m_solver.val_is_within_var_feasible_region(attempted_val, var))
+    ret = m_solver.get_feasible_region_limits_min_double(var);
+  return ret;
 }
 
 template<class CSP> template<typename T> std::string
@@ -235,6 +244,12 @@ template<class CSP> double
 Configurator<CSP>::get_feasible_region_limits_min_double(
     const std::string& var) const {
   return m_solver.get_feasible_region_limits_min_double(var);
+}
+
+template<class CSP> bool
+Configurator<CSP>::val_is_within_var_feasible_region(
+    double val, const std::string& var) const {
+  return m_solver.val_is_within_var_feasible_region(val, var);
 }
 
 template<class CSP> bool
@@ -572,11 +587,11 @@ DRC<C>::lock_config(const std::string& rf_port, RFPort::config_t cfg,
   // if configurator suceeded, handoff to the "controller" hardware actuations
   if (ret) {
     double cfglval;
-    cfglval = m_configurator.get_config_locked_value(rf_port, cfg);
+    cfglval = m_configurator.get_config_locked_value(rf_port, cfg, val);
     if (cfg == RFPort::config_t::direction) {
       if (m_cache[rf_port].m_direction != (RFPort::direction_t)val) {
         set_direction(rf_port, (RFPort::direction_t)cfglval);
-        m_cache[rf_port].m_direction = (RFPort::direction_t)val;
+        m_cache[rf_port].m_direction = (RFPort::direction_t)cfglval;
       }
     }
     else if (cfg == RFPort::config_t::tuning_freq_MHz) {
@@ -587,12 +602,18 @@ DRC<C>::lock_config(const std::string& rf_port, RFPort::config_t cfg,
     }
     else if (cfg == RFPort::config_t::bandwidth_3dB_MHz) {
       if (std::abs(m_cache[rf_port].m_bandwidth_3dB_MHz-val) > tol) {
+#ifndef DISABLE_LOG
+        this->log_debug("drc: request bandwidth %f, set %f", val, cfglval);
+#endif
         set_bandwidth_3dB_MHz(rf_port, cfglval);
         m_cache[rf_port].m_bandwidth_3dB_MHz = cfglval;
       }
     }
     else if (cfg == RFPort::config_t::sampling_rate_Msps) {
-      if (std::abs(m_cache[rf_port].m_sampling_rate_Msps-cfglval) > tol) {
+      if (std::abs(m_cache[rf_port].m_sampling_rate_Msps-val) > tol) {
+#ifndef DISABLE_LOG
+        this->log_debug("drc: request sampling_rate %f, set %f",val, cfglval);
+#endif
         set_sampling_rate_Msps(rf_port, cfglval);
         m_cache[rf_port].m_sampling_rate_Msps = cfglval;
       }
@@ -600,19 +621,28 @@ DRC<C>::lock_config(const std::string& rf_port, RFPort::config_t cfg,
     else if (cfg == RFPort::config_t::samples_are_complex) {
       bool tmp = (((int32_t)cfglval) == 1);
       if (m_cache[rf_port].m_samples_are_complex != tmp) {
+#ifndef DISABLE_LOG
+        this->log_debug("drc: request complex %i, set %i",(int)tmp, (int)tmp);
+#endif
         set_samples_are_complex(rf_port, tmp);
         m_cache[rf_port].m_samples_are_complex = tmp;
       }
     }
     else if (cfg == RFPort::config_t::gain_mode) {
       std::string tmp = (((int32_t)cfglval) == 0 ? "auto" : "manual");
+#ifndef DISABLE_LOG
+      this->log_debug("drc: request complex %s, set %s", tmp, tmp);
+#endif
       if (m_cache[rf_port].m_gain_mode != tmp) {
         set_gain_mode(rf_port, tmp);
         m_cache[rf_port].m_gain_mode = tmp;
       }
     }
     else if (cfg == RFPort::config_t::gain_dB) {
-      if (std::abs(m_cache[rf_port].m_gain_dB-cfglval) > tol) {
+      if (std::abs(m_cache[rf_port].m_gain_dB-val) > tol) {
+#ifndef DISABLE_LOG
+        this->log_debug("drc: request gain %f, set %f",val, cfglval);
+#endif
         set_gain_dB(rf_port, cfglval);
         m_cache[rf_port].m_gain_dB = cfglval;
       }

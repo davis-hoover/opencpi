@@ -789,8 +789,25 @@ CSPSolver::get_var_has_been_added(const std::string& var_key) const {
 template<typename T> bool
 CSPSolver::val_is_within_var_feasible_region(T val,
     const std::string& var_key) const {
-  const FeasibleRegionLimits& limits = m_feasible_region_limits;
-  return limits.m_vars.find(var_key) != limits.m_vars.end();
+  bool ret = false;
+  auto lims = m_feasible_region_limits.m_vars.at(var_key);
+  if (lims.m_type_is_int32) {
+    auto& intervals = lims.m_int32_set.get_intervals();
+    for (auto it = intervals.begin(); it != intervals.end(); ++it)
+      if (it->is_superset_of(val)) {
+        ret = true;
+        break;
+      }
+  }
+  else {
+    auto& intervals = lims.m_double_set.get_intervals();
+    for (auto it = intervals.begin(); it != intervals.end(); ++it)
+      if (it->is_superset_of(val)) {
+        ret = true;
+        break;
+      }
+  }
+  return ret;
 }
 
 _Interval<int32_t>

@@ -154,16 +154,16 @@ public:
       return setError("Configuration %u started, but is out of range (0 to %u)",
           config, OCPI_DRC_MAX_CONFIGURATIONS - 1);
     init_status(config);
-    //if (isOperating()) {
+    if (isOperating()) {
       log(8, "operating, so calling");
       RCCResult rc = OCPI::DRC::DrcProxyBase::start_config(config, false);
       if (rc == RCC_OK)
 	m_properties.status.data[config].state = STATUS_STATE_OPERATING;
       return rc;
-    //}
-    //else {
-    //  log(8, "not operating so not calling");
-    //}
+    }
+    else {
+      log(8, "not operating so not calling");
+    }
     // Deferred start
     m_started[m_properties.start] = true;
     return RCC_OK;
