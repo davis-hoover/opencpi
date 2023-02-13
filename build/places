@@ -85,7 +85,6 @@ runtime/base -d internal -T ocpixml
 runtime/time -d internal
 runtime/drc/base -l drc
 runtime/drc/ad9361 -l drc_ad9361
-runtime/drc/fmcomms2 -l drc_fmcomms2
 runtime/xfer/base -l xfer
 runtime/xfer/tests -n -d internal -l xfer_tests
 runtime/xfer/drivers/datagram -v

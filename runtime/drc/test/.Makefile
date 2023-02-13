@@ -22,10 +22,8 @@
 all:
 	$(MAKE) -C ../base/test -f .Makefile
 	$(MAKE) -C ../ad9361/test -f .Makefile
-	$(MAKE) -C ../fmcomms2/test -f .Makefile
-	../base/test/build/test && ../ad9361/test/build/test && ../fmcomms2/test/build/test
+	../base/test/build/test && ../ad9361/test/build/test
 
 clean:
 	$(MAKE) -C ../base/test -f .Makefile clean
 	$(MAKE) -C ../ad9361/test -f .Makefile clean
-	$(MAKE) -C ../fmcomms2/test -f .Makefile clean
