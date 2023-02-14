@@ -152,7 +152,7 @@ def main():
             print(f"{change_type}: {change}")
 
         # Remove change from file
-        if change_type == "insertion":
+        if change_type == "insertion" or change_type == "format-change":
             # Only need to delete change-start and change-end tags
             # So we need to copy "the stuff in-between" to the out file
             outfile_data += raw_file[read_ndx:end_ndx]
