@@ -1,0 +1,112 @@
+<Application>
+
+  <!-- FSK modulation/TX algorithm workers (will connect to dig_radio_ctrlr
+       routing ID "TX0" workers) -->
+
+  <Instance Component="ocpi.core.file_read" Connect="mfsk_mapper">
+    <Property Name="fileName"       Value="idata/Os.jpeg"/>
+    <Property Name="messagesInFile" Value="false"/>
+    <Property Name="opcode"         Value="1"/>
+    <Property Name="granularity"    Value="1"/>
+  </Instance>
+  <Instance Component="ocpi.assets.comms_comps.mfsk_mapper" Connect="zero_pad">
+    <Property Name="symbols" Value="-32768,32767"/>
+  </Instance>
+  <Instance Component="ocpi.assets.util_comps.zero_pad" Connect="tx_fir_real">
+    <Property Name="num_zeros" Value="38"/>
+  </Instance>
+  <Instance Component="ocpi.assets.dsp_comps.fir_real_sse" Name="tx_fir_real"
+                                                          
+                                                           Connect="phase_to_amp_cordic">
+    <Property Name="taps" ValueFile="idata/tx_rrcos_taps.dat"/>
+  </Instance>
+  <Instance Component="ocpi.assets.dsp_comps.phase_to_amp_cordic" Connect="drc" from='out' to='tx'>
+    <Property Name="magnitude"  Value="20000"/>
+    <Property Name="DATA_WIDTH" Value="16"/>
+    <Property Name="DATA_EXT"   Value="6"/>
+    <Property Name="STAGES"     Value="16"/>
+  </Instance>
+
+  <!-- FSK demodulation/RX algorithm workers (will connect to dig_radio_ctrlr
+       routing ID "RX0" workers) -->
+
+  <Connection>
+    <Port Instance="drc" Name="rx"/>
+    <Port Instance="rp_cordic" Name="in"/>
+  </Connection> 
+
+  <Instance Component="ocpi.assets.dsp_comps.rp_cordic" Model="hdl"
+                                                        Connect="rx_fir_real">
+    <Property Name="DATA_WIDTH" Value="16"/>
+    <Property Name="DATA_EXT"   Value="6"/>
+    <Property Name="STAGES"     Value="16"/>
+  </Instance>
+  <Instance Component="ocpi.assets.dsp_comps.fir_real_sse" Name="rx_fir_real"
+                                                           Model="hdl"
+                                                           Connect="baudTracking">
+    <Property Name="taps" ValueFile="idata/rx_rrcos_taps.dat"/>
+  </Instance>
+  <Instance Component="ocpi.assets.dsp_comps.baudTracking" Connect="real_digitizer">
+    <Property Name="bypass"       Value="false"/>
+    <Property Name="SPB"          Value="39"/> <!-- samples/baud -->
+    <Property Name="BaudAvrCount" Value="10"/>
+  </Instance>
+  <Instance Component="ocpi.assets.dsp_comps.real_digitizer" Connect="file_write">
+    <!-- look for 0xFACE sync pattern -->
+    <Property Name="need_sync" Value="true"/>
+
+    <!-- prints out when 0xFACE sync pattern is found -->
+    <Property Name="enable_printing" Value="true"/>
+  </Instance>
+  <Instance Component="ocpi.core.file_write">
+    <!-- ACI relies on this property being set here in the OAS -->
+    <Property Name="fileName"       Value="fsk_dig_radio_ctrlr_fmcomms_2_3_txrx.bin"/>
+
+    <Property Name="messagesInFile" Value="false"/>
+  </Instance>
+
+  <!--==========================================================================-->
+  <!-- The DRC component, specifying channel configurations -->
+
+  <Instance Component="ocpi.platform.drc">
+  </Instance>
+
+
+  <!--==========================================================================-->
+  <!-- These are the components that are slaves of the DRC -->
+  <!-- They will be inserted automatically in the near future -->
+
+   <!--
+  <Instance Component="ocpi.platform.devices.platform_ad9361_data_sub" Selection="LVDS_p == true"/>
+
+  <Instance Component="ocpi.platform.devices.platform_ad9361_config"/>
+
+  <Instance Component="ocpi.platform.devices.data_src_qadc" connect='cswm_to_iqstream'/>
+  <Instance Component="ocpi.assets.misc_comps.cswm_to_iqstream" connect='complex_mixer'/>
+  <Instance Component="ocpi.assets.dsp_comps.complex_mixer" connect="cic_dec">
+    <Property Name="NCO_DATA_WIDTH_p"   Value="12"/>
+    <Property Name="INPUT_DATA_WIDTH_p" Value="12"/>
+    <Property Name="mag"                Value="1024"/>
+    <Property Name="phs_init"           Value="0"/>
+  </Instance>
+  <Instance Component="ocpi.assets.dsp_comps.cic_dec">
+    <Property Name="N"         Value="3"/>
+    <Property Name="M"         Value="1"/>
+    <Property Name="R"         Value="16"/> 
+    <Property Name="ACC_WIDTH" Value="28"/>
+  </Instance>
+
+
+  <Instance Component="ocpi.assets.dsp_comps.cic_int" connect="iqstream_to_cswm">
+    <Property Name="N"         Value="3"/>
+    <Property Name="M"         Value="1"/>
+    <Property Name="R"         Value="16"/> 
+    <Property Name="ACC_WIDTH" Value="28"/>
+  </Instance>
+  <Instance Component="ocpi.assets.misc_comps.iqstream_to_cswm" connect="data_sink_qdac"/>
+  <Instance Component="ocpi.platform.devices.data_sink_qdac"/>
+
+ 
+  <Instance Component="ocpi.platform.devices.platform_ad9361_spi"/>
+  -->
+</Application>

@@ -40,6 +40,9 @@
 #include "RadioCtrlrConfiguratorAD9361.hh"// just for linkage hooks
 #include "RadioCtrlrNoOSTuneResamp.hh"// just for linkage hooks
 #include "RadioCtrlrConfiguratorTuneResamp.hh"// just for linkage hooks
+#include "DRC.hh"                             // just for linkage hooks
+#include "AD9361DRC.hh"                       // just for linkage hooks
+#include "FMCOMMS2_3DRC.hh"                   // just for linkage hooks
 extern "C" {
 #include "ad9361_platform.h"
 }
@@ -255,6 +258,8 @@ namespace OCPI {
       //      ((OCPI::DRC::ConfiguratorTuneResamp*)linkme)->impose_constraints_single_pass();
       ((OCPI::Util::LogPrefix *)linkme)->log_debug("hello");
       ad9361_opencpi.set_reset(0, 0);
+      ((OCPI::DRC_PHASE_2::AD9361DRC<OCPI::DRC_PHASE_2::AD9361Configurator> *)linkme)->init();
+      ((OCPI::DRC_PHASE_2::FMCOMMS2_3DRC<OCPI::DRC_PHASE_2::FMCOMMS2_3Configurator> *)linkme)->init();
 #endif
       return (intptr_t)&lzma_stream_buffer_decode & (intptr_t)&gpsd_drivers;
     }

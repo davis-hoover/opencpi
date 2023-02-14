@@ -1,5 +1,5 @@
 /*
- * THIS FILE WAS ORIGINALLY GENERATED ON Mon Nov 16 20:26:11 2020 CST
+ * THIS FILE WAS ORIGINALLY GENERATED ON Tue Jan 10 17:47:24 2023 EST
  * BASED ON THE FILE: drc_fmcomms_2_3.xml
  * YOU *ARE* EXPECTED TO EDIT IT
  *
@@ -8,46 +8,19 @@
 
 #include "drc_fmcomms_2_3-worker.hh"
 
-// These are the helper classes for the ad9361 helpers
-#include "RadioCtrlrConfiguratorTuneResamp.hh"
-#include "RadioCtrlrConfiguratorAD9361.hh"
-#include "RadioCtrlrNoOSTuneResamp.hh"
+#include "FMCOMMS2_3DRC.hh"
 
 using namespace OCPI::RCC; // for easy access to RCC data types and constants
 using namespace Drc_fmcomms_2_3WorkerTypes;
 
-//This is for the generic drc helper class
+namespace OD = OCPI::DRC_PHASE_2;
 #include "OcpiDrcProxyApi.hh" // this must be after the "using namespace" of the types namespace
 
-namespace OD = OCPI::DRC;
-
-class Drc_fmcomms_2_3Worker : public OD::DrcProxyBase {
-
-  // ========================================================================
-  // To use the ad9361 DRC helper classes, we need a configurator class that combines the bas ad9361
-  // one with the tuneresamp soft tuning
-  class Fmcomms_2_3_Configurator: public OD::ConfiguratorAD9361, public OD::ConfiguratorTuneResamp {
-  public:
-    Fmcomms_2_3_Configurator()
-      : OD::ConfiguratorAD9361(DRC_FMCOMMS_2_3_RF_PORTS_RX.data[0], NULL,
-		               DRC_FMCOMMS_2_3_RF_PORTS_TX.data[0], NULL), 
-	OD::ConfiguratorTuneResamp(ad9361MaxRxSampleMhz(), ad9361MaxTxSampleMhz()) { 
-    }
-    // All concrete Configurator classes must have this clone method for virtual copying. 
-    OD::Configurator *clone() const { return new Fmcomms_2_3_Configurator(*this); }
-  protected:
-    // The virtual callback to impose all constraints. 
-    void impose_constraints_single_pass() {
-      ConfiguratorAD9361::impose_constraints_single_pass();
-      ConfiguratorTuneResamp::impose_constraints_single_pass();
-      Configurator::impose_constraints_single_pass();
-    }
-  } m_configurator;
-
+class Drc_fmcomms_2_3Worker : public OCPI::DRC::DrcProxyBase {
   // ================================================================================================
   // trampoline between the DRC ad9361 helper classes in the framework library and the slave workers
   // accessible from this worker.  It lets the former call the latter
-  struct DoSlave : OD::DeviceCallBack {
+  struct DoSlave : OD::AD9361DeviceCallBack {
     Slaves &m_slaves;
     DoSlave(Slaves &slaves) : m_slaves(slaves) {}
     void get_byte(uint8_t /*id_no*/, uint16_t addr, uint8_t *buf) {
@@ -62,13 +35,13 @@ class Drc_fmcomms_2_3Worker : public OD::DrcProxyBase {
     bool isMixerPresent(bool rx, unsigned stream) {
       return stream == 0 && rx ? m_slaves.rx_complex_mixer0.isPresent() : false;
     }
-    OD::config_value_t getDecimation(unsigned /*stream*/) {
+    double getDecimation(unsigned /*stream*/) {
       return m_slaves.rx_cic_dec0.isPresent() ? m_slaves.rx_cic_dec0.get_R() : 1;
     }
-    OD::config_value_t getInterpolation(unsigned /*stream*/) {
+    double getInterpolation(unsigned /*stream*/) {
       return m_slaves.tx_cic_int0.isPresent() ? m_slaves.tx_cic_int0.get_R() : 1;
     }
-    OD::config_value_t getPhaseIncrement(bool rx, unsigned /*stream*/) {
+    double getPhaseIncrement(bool rx, unsigned /*stream*/) {
       return rx ? m_slaves.rx_complex_mixer0.get_phs_inc() : 0;
     }
     void setPhaseIncrement(bool rx, unsigned /*stream*/, int16_t inc) {
@@ -76,7 +49,7 @@ class Drc_fmcomms_2_3Worker : public OD::DrcProxyBase {
         m_slaves.rx_complex_mixer0.set_phs_inc(inc);
     }
     void initialConfig(uint8_t /*id_no*/, OD::Ad9361InitConfig &config) {
-      OD::ad9361InitialConfig(m_slaves.config, m_slaves.data_sub, config);
+      ad9361InitialConfig(m_slaves.config, m_slaves.data_sub, config);
       config.xo_disable_use_ext_ref_clk=false;
     }
     void postConfig(uint8_t /*id_no*/) {
@@ -86,76 +59,116 @@ class Drc_fmcomms_2_3Worker : public OD::DrcProxyBase {
       OD::ad9361FinalConfig(m_slaves.config, config);
     }
     // both of these apply to both channels on the 9361
-    unsigned getRfInput(unsigned /*device*/, OD::config_value_t /*tuning_freq_MHz*/) { return 0; }
-    unsigned getRfOutput(unsigned /*device*/, OD::config_value_t /*tuning_freq_MHz*/) { return 0; }
+    unsigned getRfInput(unsigned /*device*/, double /*tuning_freq_MHz*/) { return 0; }
+    unsigned getRfOutput(unsigned /*device*/, double /*tuning_freq_MHz*/) { return 0; }
   } m_doSlave;
-
-  OD::RadioCtrlrNoOSTuneResamp m_ctrlr;
-  OD::ConfigLockRequest m_requests[DRC_FMCOMMS_2_3_MAX_CONFIGURATIONS_P];
-
+  OD::FMCOMMS2_3DRC<OD::FMCOMMS2_3Configurator> m_ctrlr;
 public:
+  ///@TODO / FIXME - replace "3" with FMCOMMS_NUM parameter property
   Drc_fmcomms_2_3Worker()
     : m_doSlave(slaves),
-      m_ctrlr(0, "drc_fmcomms_2_3", m_configurator, m_doSlave) {
+      m_ctrlr(0,m_doSlave,40e6,3,"Rx0","Rx1","Tx0","Tx1") {
   }
   // ================================================================================================
   // These methods interface with the helper 9361 classes etc.
   // ================================================================================================
   RCCResult prepare_config(unsigned config) {
+    typedef OD::RFPort::direction_t direction_t;
     auto &conf = m_properties.configurations.data[config];
-    auto &req = m_requests[config];
-    // So here we basically convert the data structure dictated by the drc spec property to the one
-    // defined by the older DRC/ad9361 helper classes
+    OD::ConfigLockRequest req;
     auto nChannels = conf.channels.length;
-    req.m_data_streams.resize(nChannels);
-    unsigned nRx = 0, nTx = 0;
     for (unsigned n = 0; n < nChannels; ++n) {
       auto &channel = conf.channels.data[n];
-      auto &stream = req.m_data_streams[n];
-      stream.include_data_stream_type(channel.rx ?
-                                      OD::data_stream_type_t::RX : OD::data_stream_type_t::TX);
-      stream.include_data_stream_ID(channel.rx ?
-                                    DRC_FMCOMMS_2_3_RF_PORTS_RX.data[nRx] :
-                                    DRC_FMCOMMS_2_3_RF_PORTS_TX.data[nTx]);
-      stream.include_routing_ID((channel.rx ? "RX" : "TX") +
-                                std::to_string(channel.rx ? nRx : nTx));
-      ++(channel.rx ? nRx : nTx);
-      stream.include_tuning_freq_MHz(channel.tuning_freq_MHz, channel.tolerance_tuning_freq_MHz);
-      stream.include_bandwidth_3dB_MHz(channel.bandwidth_3dB_MHz, channel.tolerance_bandwidth_3dB_MHz);
-      stream.include_sampling_rate_Msps(channel.sampling_rate_Msps, channel.tolerance_sampling_rate_Msps);
-      stream.include_samples_are_complex(channel.samples_are_complex);
-      stream.include_gain_mode(channel.gain_mode);
-      if (!stream.get_gain_mode().compare("manual"))
-        stream.include_gain_dB(channel.gain_dB, channel.tolerance_gain_dB);
+      direction_t direction = channel.rx ? direction_t::rx : direction_t::tx;
+      OD::RFPortConfigLockRequest rf_port(
+          direction,
+          channel.tuning_freq_MHz,
+          channel.bandwidth_3dB_MHz,
+          channel.sampling_rate_Msps,
+          channel.samples_are_complex,
+          channel.gain_mode,
+          channel.gain_dB,
+          channel.tolerance_tuning_freq_MHz,
+          channel.tolerance_bandwidth_3dB_MHz,
+          channel.tolerance_sampling_rate_Msps,
+          channel.tolerance_gain_dB,
+          channel.rf_port_name,
+          channel.rf_port_num,
+          channel.app_port_num);
+      req.push_back(rf_port);
     }
-    // Ideally we would validate them here, but not now.
-    return RCC_OK;
+    RCCResult rc = RCC_OK;
+    try {
+      m_ctrlr.set_configuration((uint16_t)config, req);
+      if (!m_ctrlr.prepare((uint16_t)config))
+        throw std::runtime_error("failed");
+    } catch(std::exception& err) {
+      //std::cout << "err=" << err << "\n";
+      if(conf.recoverable) {
+        std::string ctrlerr = m_ctrlr.get_error().c_str();
+        size_t count = ctrlerr.size();
+        count = std::min(count, (size_t)DRC_FMCOMMS_2_3_MAX_STRING_LENGTH_P);
+        memcpy(&m_properties.status.data[config].error, ctrlerr.c_str(), count);
+        rc = RCC_OK;
+      }
+      else {
+        rc = setError("config prepare request was unsuccessful, set OCPI_LOG_LEVEL to 8 "
+                 "(or higher) for more info");
+      }
+    }
+    return rc;
   }
   RCCResult start_config(unsigned config) {
     try {
-      return m_ctrlr.request_config_lock(std::to_string(config), m_requests[config]) ?
-        RCC_OK :
-        setError("config lock request was unsuccessful, set OCPI_LOG_LEVEL to 8 "
+      return m_ctrlr.start((uint16_t)config) ? RCC_OK :
+        setError("config start was unsuccessful, set OCPI_LOG_LEVEL to 8 "
                  "(or higher) for more info");
-    } catch(const char* err) {
-      return setError(err);
+    } catch(std::exception& err) {
+      return setError(err.what());
     }
     return RCC_OK;
   }
+  /// @todo / FIXME consolidate into OcpiDrcProxyApi.hh
   RCCResult stop_config(unsigned config) { 
     log(8, "DRC: stop_config: %u", config);
-    
-    // Unlock the configurations when stopping the DRC.
-    m_ctrlr.unlock_all();    
-    log(8, "DRC: stop_config -> Issued unlock for all configurations"); 
-
+    try {
+      return m_ctrlr.stop((uint16_t)config) ? RCC_OK :
+        setError("config stop was unsuccessful, set OCPI_LOG_LEVEL to 8 "
+                 "(or higher) for more info");
+    } catch(std::exception& err) {
+      return setError(err.what());
+    }
     return RCC_OK;
   }
-  RCCResult release_config(unsigned /*config*/) {
+  // notification that start property has been written
+  // notification that status property will be read
+  RCCResult status_read() {
+    size_t nConfigs = m_properties.configurations.size();
+    m_properties.status.resize(nConfigs);
+    for (size_t n = 0; n < nConfigs; ++n) {
+      auto &conf = m_properties.configurations.data[n];
+      auto &stat = m_properties.status.data[n];
+      /// @todo / FIXME add below line in OcpiDrcProxyApi.hh
+      stat.channels.resize(conf.channels.size());
+      // stat.state member is already maintained
+      // stat.error
+      for (size_t nch = 0; nch < conf.channels.size(); ++nch) {
+	auto &confchan = conf.channels.data[nch];
+	auto &statchan = stat.channels.data[nch];
+	statchan.tuning_freq_MHz = confchan.tuning_freq_MHz;
+	statchan.bandwidth_3dB_MHz = confchan.bandwidth_3dB_MHz;
+	statchan.sampling_rate_Msps = confchan.sampling_rate_Msps;
+	statchan.gain_dB = confchan.gain_dB;
+      }
+      status_config(n);
+    }
+    return RCC_OK;
+  }
+  RCCResult release_config(unsigned config) {
     log(8, "DRC: release_config");
-    return m_ctrlr.shutdown() ?
-      setError("transceiver shutdown was unsuccessful, set OCPI_LOG_LEVEL to 8 "
-               "(or higher) for more info") : RCC_OK;
+    return m_ctrlr.release((uint16_t)config) ? RCC_OK :
+      setError("config release was unsuccessful, set OCPI_LOG_LEVEL to 8 "
+               "(or higher) for more info");
   }
 };
 
