@@ -103,6 +103,7 @@ def _make_osp_pipeline(dump_path: Path,
     config: str=None) -> OspPipelineBuilder:
     """Initialize and return a OspPipelineBuilder"""
     pipeline_id = _get_pipeline_id()
+    gitlab_container_registry = getenv('CI_REGISTRY_IMAGE', '')
     base_image_tag = _get_base_image_tag(pipeline_id=pipeline_id)
     image_tags = _get_image_tags()
     container_registry = getenv('CI_OCPI_CONTAINER_REGISTRY', '')
@@ -115,8 +116,8 @@ def _make_osp_pipeline(dump_path: Path,
     do_assemblies = getenv('CI_OCPI_ASSEMBLIES', 'True')
     do_assemblies = do_assemblies.lower() in ['t', 'y', 'true', 'yes', '1']
     pipeline_builder = OspPipelineBuilder(pipeline_id, container_registry,
-        base_image_tag, hosts, platforms, projects, project, dump_path, 
-        config, image_tags=image_tags, do_assemblies=do_assemblies)
+        base_image_tag, hosts, platforms, projects, project, dump_path, config,
+        gitlab_container_registry, image_tags=image_tags, do_assemblies=do_assemblies)
 
     return pipeline_builder
 
@@ -125,6 +126,7 @@ def _make_comp_pipeline(dump_path: Path,
     config: str=None) -> CompPipelineBuilder:
     """Initialize and return a CompPipelineBuilder"""
     pipeline_id = _get_pipeline_id()
+    gitlab_container_registry = getenv('CI_REGISTRY_IMAGE', '')
     base_image_tag = _get_base_image_tag(pipeline_id=pipeline_id)
     image_tags = _get_image_tags()
     hosts = re.split(r'\s|,\s|,', getenv('CI_OCPI_HOSTS', '').strip('"'))
@@ -138,7 +140,8 @@ def _make_comp_pipeline(dump_path: Path,
     do_assemblies = do_assemblies.lower() in ['t', 'y', 'true', 'yes', '1']
     pipeline_builder = CompPipelineBuilder(pipeline_id, container_registry, 
         base_image_tag, hosts, project, platforms, projects, dump_path, 
-        config=config, image_tags=image_tags, do_assemblies=do_assemblies)
+        gitlab_container_registry, config=config, image_tags=image_tags, 
+        do_assemblies=do_assemblies)
 
     return pipeline_builder  
 
