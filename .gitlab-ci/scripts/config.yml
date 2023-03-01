@@ -35,20 +35,20 @@ centos7:
 modelsim:
   variables:
     OCPI_MODELSIM_DIR: '/opt/Mentor/modelsim_dlx'
-    OCPI_MODELSIM_LICENSE_FILE: '2103@sembach.opencpi.net'
+    OCPI_MODELSIM_LICENSE_FILE: 2103@$CI_OCPI_LICENSE_SERVER
   overrides: # deprecated; use 'variables'
     variables:
       OCPI_MODELSIM_DIR: '/opt/Mentor/modelsim_dlx'
-      OCPI_MODELSIM_LICENSE_FILE: '2103@sembach.opencpi.net'
+      OCPI_MODELSIM_LICENSE_FILE: 2103@$CI_OCPI_LICENSE_SERVER
 
 riviera:
   variables:
     OCPI_RIVIERA_DIR: '/opt/ALDEC'
-    OCPI_RIVIERA_LICENSE_FILE: '9393@sembach.opencpi.net'
+    OCPI_RIVIERA_LICENSE_FILE: 9393@$CI_OCPI_LICENSE_SERVER
   overrides: # deprecated; use 'variables'
     variables:
       OCPI_RIVIERA_DIR: '/opt/ALDEC'
-      OCPI_RIVIERA_LICENSE_FILE: '9393@sembach.opencpi.net'
+      OCPI_RIVIERA_LICENSE_FILE: 9393@$CI_OCPI_LICENSE_SERVER
 
 # hdl
 adrv9361:
@@ -57,10 +57,10 @@ adrv9361:
   do_ocpiremote: True
   port: 1000 # deprecated
   variables:
-    OCPI_XILINX_LICENSE_FILE: '2100@sembach.opencpi.net'
+    OCPI_XILINX_LICENSE_FILE: 2100@$CI_OCPI_LICENSE_SERVER
   overrides: # deprecated; use 'variables'
     variables:
-      OCPI_XILINX_LICENSE_FILE: '2100@sembach.opencpi.net'
+      OCPI_XILINX_LICENSE_FILE: 2100@$CI_OCPI_LICENSE_SERVER
 e31x:
   ip: 10.1.0.42 # deprecated
   do_hwil: True
@@ -109,7 +109,7 @@ x310:
   do_hwil: False
   do_ocpiremote: True
   variable:
-    OCPI_XILINX_LICENSE_FILE: '2101@sembach.opencpi.net'
+    OCPI_XILINX_LICENSE_FILE: 2101@$CI_OCPI_LICENSE_SERVER
 z3u:
   do_hwil: True
   do_ocpiremote: True
@@ -119,7 +119,7 @@ zcu102:
   do_ocpiremote: True
   port: 1000 # deprecated
   variables:
-    OCPI_XILINX_LICENSE_FILE: '2101@sembach.opencpi.net'
+    OCPI_XILINX_LICENSE_FILE: 2101@$CI_OCPI_LICENSE_SERVER
 zcu104:
   ip: 10.1.0.208 # deprecated
   do_hwil: True
@@ -131,7 +131,7 @@ zcu111:
   do_ocpiremote: True
   port: 1000
   variables:
-    OCPI_XILINX_LICENSE_FILE: '2101@sembach.opencpi.net'  
+    OCPI_XILINX_LICENSE_FILE: 2101@$CI_OCPI_LICENSE_SERVER
 zed:
   ip: 10.1.0.242 # deprecated
   do_hwil: True
@@ -141,7 +141,7 @@ zed_ise:
   do_hwil: False
   do_ocpiremote: False
   variables:
-    OCPI_XILINX_LICENSE_FILE: '2101@sembach.opencpi.net'
+    OCPI_XILINX_LICENSE_FILE: 2101@$CI_OCPI_LICENSE_SERVER
   overrides: # deprecated
     variables:
-      OCPI_XILINX_LICENSE_FILE: '2101@sembach.opencpi.net'
+      OCPI_XILINX_LICENSE_FILE: 2101@$CI_OCPI_LICENSE_SERVER
