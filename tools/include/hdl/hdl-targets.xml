@@ -69,7 +69,7 @@ necessarily the "part ordering number" in data sheets etc.
 	 Zynq UltraScale+ chips require full part to be specified
 	 The default is based on the zcu104 dev board, which is the cheapest, and supported by webpack. -->
     <family name='zynq_ultra' toolset='vivado' default='xczu3cg-2-sbva484e'
-	    parts='xczu28dr xczu9eg xczu7ev xczu3cg'/>
+	    parts='xczu28dr xczu9eg xczu7ev xczu3cg xczu48dr'/>
   </vendor>
   <!-- currently the only attribute per tool set is whether it is a simulator -->
   <toolset name='isim' tool='ISE' simulator='true'/>
