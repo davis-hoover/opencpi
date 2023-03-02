@@ -32,7 +32,6 @@ entity iqstream_demarshaller is
     iready    : in  ocpi.types.Bool_t;
     isom      : in  ocpi.types.Bool_t;
     ieom      : in  ocpi.types.Bool_t;
-    iopcode   : in  protocol.iqstream.opcode_t;
     ieof      : in  ocpi.types.Bool_t;
     itake     : out ocpi.types.Bool_t;
     -- OUTPUT
@@ -69,8 +68,7 @@ begin
     -- this is the heart of the demarshalling functionality
     protocol_s.iq.data.i <= arg_31_0(15 downto 0);
     protocol_s.iq.data.q <= arg_31_0(31 downto 16);
-    protocol_s.iq_vld    <= '1' when (iopcode =
-        protocol.iqstream.IQ) and (ixfer = '1') else '0';
+    protocol_s.iq_vld    <= ixfer;
 
     -- necessary to prevent combinatorial loop, depending an what's connected to
     -- ordy

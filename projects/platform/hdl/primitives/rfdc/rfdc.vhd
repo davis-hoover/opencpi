@@ -17,11 +17,13 @@
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
+library ocpi, axi, cdc;
 
 entity rfdc is
   generic(
-    NUM_RX_CHANS : positive; -- must be 2 for now
-    NUM_TX_CHANS : positive); -- must be 2 for now
+    NUM_RX_CHANS        : positive; -- must be 2 for now
+    NUM_TX_CHANS        : positive; -- must be 2 for now
+    AXI_STREAM_LOOPBACK : boolean := false);
   port(
     -- WCI / raw props
     raw_clk         : in  std_logic;
@@ -46,57 +48,127 @@ entity rfdc is
     s_axis_0_aclk   : out std_logic;
     s_axis_0_tdata  : in  std_logic_vector(32-1 downto 0);
     s_axis_0_tvalid : in  std_logic;
-    s_axis_0_tuser  : in  std_logic_vector(128-1 downto 0);
     s_axis_0_tready : out std_logic;
     s_axis_1_aclk   : out std_logic;
     s_axis_1_tdata  : in  std_logic_vector(32-1 downto 0);
     s_axis_1_tvalid : in  std_logic;
-    s_axis_1_tuser  : in  std_logic_vector(128-1 downto 0);
     s_axis_1_tready : out std_logic;
     -- AXI-Stream ports for complex RX paths, TDATA is Q [31:16], I [15:0]
+    m_axis_0_aclk   : out std_logic;
     m_axis_0_tdata  : out std_logic_vector(32-1 downto 0);
     m_axis_0_tvalid : out std_logic;
-    m_axis_0_tuser  : out std_logic_vector(128-1 downto 0);
     m_axis_0_tready : in  std_logic;
+    m_axis_1_aclk   : out std_logic;
     m_axis_1_tdata  : out std_logic_vector(32-1 downto 0);
     m_axis_1_tvalid : out std_logic;
-    m_axis_1_tuser  : out std_logic_vector(128-1 downto 0);
     m_axis_1_tready : in  std_logic);
 end entity rfdc;
 architecture structural of rfdc is
-  signal rx_clks : std_logic_vector(NUM_RX_CHANS-1 downto 0)
-                 := (others => '0');
-  signal tx_clks : std_logic_vector(NUM_RX_CHANS-1 downto 0)
-                 := (others => '0');
+  signal zeros_32 : std_logic_vector(32-1 downto 0)
+                  := (others => '0');
+  signal zero     : std_logic := '0';
+  -- raw clk domain
+  signal axi_converter_to_rfdc_prim_axi_in : axi.lite32.axi_s2m_t := (
+      aw => (READY => '0'),
+      ar => (READY => '0'),
+      w => (READY => '0'),
+      r => (DATA => (others => '0'), RESP => (others => '0'), VALID => '0'),
+      b => (RESP => (others => '0'), VALID => '0'));
+  signal axi_converter_to_rfdc_prim_axi_out : axi.lite32.axi_m2s_t := (
+      a => (CLK => '0', RESETn => '0'),
+      aw => (ADDR => (others => '0'), VALID => '0', PROT => (others => '0')),
+      ar => (ADDR => (others => '0'), VALID => '0', PROT => (others => '0')),
+      w => (DATA => (others => '0'), STRB => (others => '0'), VALID => '0'),
+      r => (READY => '0'),
+      b => (READY => '0'));
+  -- rx_0 clk domain
+  signal rx_0_clk    : std_logic := '0';
+  signal rx_0_resetn : std_logic := '0';
+  -- rx_1 clk domain
+  signal rx_1_clk    : std_logic := '0';
+  signal rx_1_resetn : std_logic := '0';
+  -- tx_0 clk domain
+  signal tx_0_clk    : std_logic := '0';
+  signal tx_0_resetn : std_logic := '0';
+  -- tx_1 clk domain
+  signal tx_1_clk    : std_logic := '0';
+  signal tx_1_resetn : std_logic := '0';
 begin
 
-  axi_converter : raw2axi_lite32
+  axi_converter : axi.lite32.raw2axi_lite32
     port map(
-      clk     => clk,
-      reset   => reset,
-      raw_in  => props_in.raw,
-      raw_out => props_out.raw,
-      axi_in  => axi_converter_to_ip_axi_in,
-      axi_out => axi_converter_to_ip_axi_out);
+      clk     => raw_clk,
+      reset   => raw_reset,
+      raw_in  => raw_in,
+      raw_out => raw_out,
+      axi_in  => axi_converter_to_rfdc_prim_axi_in,
+      axi_out => axi_converter_to_rfdc_prim_axi_out);
 
-  s_axis_0_aclk <= tx_clks(0);
-  s_axis_1_aclk <= tx_clks(1);
-  m_axis_0_aclk <= rx_clks(0);
-  m_axis_1_aclk <= rx_clks(1);
+  s_axis_0_aclk <= tx_0_clk;
+  s_axis_1_aclk <= tx_1_clk;
+  m_axis_0_aclk <= rx_0_clk;
+  m_axis_1_aclk <= rx_1_clk;
 
-  config_0 : if NUM_RX_CHANS = 2 and NUM_TX_CHANS = 2 generate
-    ip : rfdc_ip
+  axi_stream_loopback_true : if AXI_STREAM_LOOPBACK generate
+    m_axis_0_tdata  <= s_axis_0_tdata;
+    m_axis_0_tvalid <= s_axis_0_tvalid;
+    s_axis_0_tready <= m_axis_0_tready;
+    m_axis_1_tdata  <= s_axis_1_tdata;
+    m_axis_1_tvalid <= s_axis_1_tvalid;
+    s_axis_1_tready <= m_axis_1_tready;
+  end generate;
+
+  rx_2_tx_2 : if (AXI_STREAM_LOOPBACK = false) and NUM_RX_CHANS = 2 and
+      NUM_TX_CHANS = 2 generate
+
+    rx_0_reset_synchronizer : cdc.cdc.reset
+      generic map(
+        SRC_RST_VALUE => '0')
+      port map(
+        src_rst   => raw_reset,
+        dst_clk   => rx_0_clk,
+        dst_rst   => open,
+        dst_rst_n => rx_0_resetn);
+
+    rx_1_reset_synchronizer : cdc.cdc.reset
+      generic map(
+        SRC_RST_VALUE => '0')
+      port map(
+        src_rst   => raw_reset,
+        dst_clk   => rx_1_clk,
+        dst_rst   => open,
+        dst_rst_n => rx_1_resetn);
+
+    tx_0_reset_synchronizer : cdc.cdc.reset
+      generic map(
+        SRC_RST_VALUE => '0')
+      port map(
+        src_rst   => raw_reset,
+        dst_clk   => tx_0_clk,
+        dst_rst   => open,
+        dst_rst_n => tx_0_resetn);
+
+    tx_1_reset_synchronizer : cdc.cdc.reset
+      generic map(
+        SRC_RST_VALUE => '0')
+      port map(
+        src_rst   => raw_reset,
+        dst_clk   => tx_1_clk,
+        dst_rst   => open,
+        dst_rst_n => tx_1_resetn);
+
+    rfdc_prim : rfdc_ip
       port map(
         adc0_clk_p => rx_clks_p(0),
         adc0_clk_n => rx_clks_n(0),
-        clk_adc0 => rx_clks(0),
+        clk_adc0 => rx_0_clk,
         adc2_clk_p => rx_clks_p(1),
         adc2_clk_n => rx_clks_n(1),
-        clk_adc2 => rx_clks(1),
+        clk_adc2 => rx_1_clk,
         dac2_clk_p => tx_clks_p(0),
         dac2_clk_n => tx_clks_n(0),
-        clk_dac2 => tx_clks(0),
-        clk_dac3 => tx_clks(1),
+        clk_dac2 => tx_0_clk,
+        clk_dac3 => tx_1_clk,
         s_axi_aclk => raw_clk,
         s_axi_aresetn => raw_reset,
         s_axi_awaddr  => axi_converter_to_rfdc_prim_axi_out.aw.ADDR,
@@ -133,8 +205,8 @@ begin
         vout30_n => rf_tx_n(0),
         vout32_p => rf_tx_p(1),
         vout32_n => rf_tx_n(1),
-        m0_axis_aresetn => rx_resetn(0),
-        m0_axis_aclk => rx_clks(0),
+        m0_axis_aresetn => rx_0_resetn,
+        m0_axis_aclk => rx_0_clk,
         -- Tile_224 ADC0 I data (Zynq Ulstrascale+ RF Data Converter (2.5) GUI for ZU48DR)
         m00_axis_tdata  => m_axis_0_tdata(16-1 downto 0),
         m00_axis_tvalid => m_axis_0_tvalid,
@@ -143,26 +215,25 @@ begin
         m01_axis_tdata  => m_axis_0_tdata(32-1 downto 16),
         m01_axis_tvalid => m_axis_0_tvalid,
         m01_axis_tready => m_axis_0_tready,
-        m2_axis_aresetn => rx_resetn(1),
-        m2_axis_aclk => rx_clks(1),
+        m2_axis_aresetn => rx_1_resetn,
+        m2_axis_aclk => rx_1_clk,
         -- Tile_224 ADC1 I data (Zynq Ulstrascale+ RF Data Converter (2.5) GUI for ZU48DR)
         m20_axis_tdata => m_axis_1_tdata(16-1 downto 0),
-        m20_axis_tvalid => m_axis_1_tvalid,
-        m20_axis_tready => m_axis_1_tready,
+        m20_axis_tvalid => m_axis_1_tvalid, m20_axis_tready => m_axis_1_tready,
         -- Tile_224 ADC1 Q data (Zynq Ulstrascale+ RF Data Converter (2.5) GUI for ZU48DR)
         m21_axis_tdata => m_axis_1_tdata(32-1 downto 16),
         m21_axis_tvalid => m_axis_1_tvalid,
         m21_axis_tready => m_axis_1_tready,
-        s2_axis_aresetn => tx_resetn(0),
-        s2_axis_aclk => tx_clks(0),
-        s20_axis_tdata => open,
-        s20_axis_tvalid => open,
-        s20_axis_tready => '1',
-        s22_axis_tdata => open,
-        s22_axis_tvalid => open,
-        s22_axis_tready => '1',
-        s3_axis_aresetn => tx_resetn(1),
-        s3_axis_aclk => tx_clks(1),
+        s2_axis_aresetn => tx_0_resetn,
+        s2_axis_aclk => tx_0_clk,
+        s20_axis_tdata => zeros_32,
+        s20_axis_tvalid => zero,
+        s20_axis_tready => open,
+        s22_axis_tdata => zeros_32,
+        s22_axis_tvalid => zero,
+        s22_axis_tready => open,
+        s3_axis_aresetn => tx_1_resetn,
+        s3_axis_aclk => tx_1_clk,
         -- Tile_231 DAC0 data (Zynq Ulstrascale+ RF Data Converter (2.5) GUI for ZU48DR)
         s30_axis_tdata => s_axis_0_tdata,
         s30_axis_tvalid => s_axis_0_tvalid,
@@ -172,11 +243,6 @@ begin
         s32_axis_tvalid => s_axis_1_tvalid,
         s32_axis_tready => s_axis_1_tready);
 
-    s_axis_2_tready <= '0';
-    s_axis_3_tready <= '0';
-    m_axis_0_tuser  <= (others => '0');
-    m_axis_1_tuser  <= (others => '0');
+  end generate rx_2_tx_2;
 
-  end generate config_0;
-
-end rtl;
+end structural;

@@ -17,12 +17,14 @@
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
+library ocpi;
 package rfdc_pkg is
 
-component rfdc_prim is
+component rfdc is
   generic(
-    NUM_RX_CHANS : positive; -- must be 2 for now
-    NUM_TX_CHANS : positive); -- must be 2 for now
+    NUM_RX_CHANS        : positive; -- must be 2 for now
+    NUM_TX_CHANS        : positive; -- must be 2 for now
+    AXI_STREAM_LOOPBACK : boolean := false);
   port(
     -- WCI / raw props
     raw_clk         : in  std_logic;
@@ -47,40 +49,20 @@ component rfdc_prim is
     s_axis_0_aclk   : out std_logic;
     s_axis_0_tdata  : in  std_logic_vector(32-1 downto 0);
     s_axis_0_tvalid : in  std_logic;
-    s_axis_0_tuser  : in  std_logic_vector(128-1 downto 0);
     s_axis_0_tready : out std_logic;
     s_axis_1_aclk   : out std_logic;
     s_axis_1_tdata  : in  std_logic_vector(32-1 downto 0);
     s_axis_1_tvalid : in  std_logic;
-    s_axis_1_tuser  : in  std_logic_vector(128-1 downto 0);
     s_axis_1_tready : out std_logic;
-    s_axis_2_aclk   : out std_logic;
-    s_axis_2_tdata  : in  std_logic_vector(32-1 downto 0);
-    s_axis_2_tvalid : in  std_logic;
-    s_axis_2_tuser  : in  std_logic_vector(128-1 downto 0);
-    s_axis_2_tready : out std_logic;
-    s_axis_3_aclk   : out std_logic;
-    s_axis_3_tdata  : in  std_logic_vector(32-1 downto 0);
-    s_axis_3_tvalid : in  std_logic;
-    s_axis_3_tuser  : in  std_logic_vector(128-1 downto 0);
-    s_axis_3_tready : out std_logic;
     -- AXI-Stream ports for complex RX paths, TDATA is Q [31:16], I [15:0]
+    m_axis_0_aclk   : out std_logic;
     m_axis_0_tdata  : out std_logic_vector(32-1 downto 0);
     m_axis_0_tvalid : out std_logic;
-    m_axis_0_tuser  : out std_logic_vector(128-1 downto 0);
     m_axis_0_tready : in  std_logic;
+    m_axis_1_aclk   : out std_logic;
     m_axis_1_tdata  : out std_logic_vector(32-1 downto 0);
     m_axis_1_tvalid : out std_logic;
-    m_axis_1_tuser  : out std_logic_vector(128-1 downto 0);
-    m_axis_1_tready : in  std_logic;
-    m_axis_2_tdata  : out std_logic_vector(32-1 downto 0);
-    m_axis_2_tvalid : out std_logic;
-    m_axis_2_tuser  : out std_logic_vector(128-1 downto 0);
-    m_axis_2_tready : in  std_logic;
-    m_axis_3_tdata  : out std_logic_vector(32-1 downto 0);
-    m_axis_3_tvalid : out std_logic;
-    m_axis_3_tuser  : out std_logic_vector(128-1 downto 0);
-    m_axis_3_tready : in  std_logic);
+    m_axis_1_tready : in  std_logic);
 end component rfdc_prim;
 
 end package rfdc_pkg;

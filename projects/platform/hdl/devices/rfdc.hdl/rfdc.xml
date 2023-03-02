@@ -1,0 +1,35 @@
+<hdldevice language='vhdl' firstrawproperty='regs' version='2' libraries='protocol rfdc'>
+  <componentspec>
+    <!-- 0x0000 - 0x23fff -->
+    <!-- ref https://docs.xilinx.com/api/khub/maps/w8uumt6t1ussnarj7mwalq/attachments/u_ptvwnpz53cssexydzeua/content?ft-calling-app=ft%2fturnkey-portal&ft-calling-app-version=4.1.11&filename=pg269-rf-data-converter-en-us-2.6.pdf#unique_8 -->
+    <property name='regs' type='uchar' arraylength='147456' writable='1' volatile='1' default='0'/>
+    <property name='num_rx_chans' type='uchar' parameter='true' default='2'/>
+    <property name='num_tx_chans' type='uchar' parameter='true' default='2'/>
+    <property name='port_loopback' type='bool' parameter='true' default='false'/>
+    <property name='config' type='ushort' parameter='true'/>
+    <!-- intentionally use existing iqstream protocols, we can add metadata to
+         new or existing protocols as new rfdc features are added, and when app
+         devs change their mind on what standardized protocols these should
+         connect to, they can write an adapter worker for it... (DO *NOT* COPY
+         THIS WORKER JUST TO CHANGE ITS PROTOCOLS) -->
+    <port name='in0' producer='false' protocol='iqstream_protocol' optional='true'/>
+    <port name='in1' producer='false' protocol='iqstream_protocol' optional='true'/>
+    <port name='out0' producer='true' protocol='iqstream_protocol' optional='true'/>
+    <port name='out1' producer='true' protocol='iqstream_protocol' optional='true'/>
+  </componentspec>
+  <rawprop name='rawprops' master='true'/>
+  <signal name='rx_clks_p' width='NUM_RX_CHANS' direction='in'/>
+  <signal name='rx_clks_n' width='NUM_RX_CHANS' direction='in'/>
+  <signal name='tx_clks_p' width='NUM_TX_CHANS' direction='in'/>
+  <signal name='tx_clks_n' width='NUM_TX_CHANS' direction='in'/>
+  <signal name='sysref_p' direction='in'/>
+  <signal name='sysref_n' direction='in'/>
+  <signal name='rf_rx_p' width='NUM_RX_CHANS' direction='in'/>
+  <signal name='rf_rx_n' width='NUM_RX_CHANS' direction='in'/>
+  <signal name='rf_tx_p' width='NUM_TX_CHANS' direction='out'/>
+  <signal name='rf_tx_n' width='NUM_TX_CHANS' direction='out'/>
+  <streaminterface name='in0' datawidth='32' clockdirection='out'/>
+  <streaminterface name='in1' datawidth='32' clockdirection='out'/>
+  <streaminterface name='out0' datawidth='32' clockdirection='out'/>
+  <streaminterface name='out1' datawidth='32' clockdirection='out'/>
+</hdldevice>

@@ -20,9 +20,6 @@ library ocpi;
 
 package iqstream is
 
-type opcode_t is (
-  IQ);
-
 -- operation iq
 constant OP_IQ_ARG_DATA_SEQUENCE_LENGTH : positive := 2048;
 constant OP_IQ_ARG_DATA_I_BIT_WIDTH     : positive := 16;
@@ -90,7 +87,6 @@ component iqstream_demarshaller is
     iready    : in  ocpi.types.Bool_t;
     isom      : in  ocpi.types.Bool_t;
     ieom      : in  ocpi.types.Bool_t;
-    iopcode   : in  opcode_t;
     ieof      : in  ocpi.types.Bool_t;
     itake     : out ocpi.types.Bool_t;
     -- OUTPUT
