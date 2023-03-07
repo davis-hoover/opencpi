@@ -20,9 +20,6 @@ library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
 library util, protocol; use protocol.complex_short_with_metadata.all;
 architecture rtl of worker is
-  signal in_opcode :
-      protocol.iqstream.opcode_t :=
-      protocol.iqstream.IQ;
   signal in_demarshaller_oprotocol :
       protocol.iqstream.protocol_t :=
       protocol.iqstream.PROTOCOL_ZERO;
@@ -50,7 +47,6 @@ begin
       iready       => in_in.ready,
       isom         => in_in.som,
       ieom         => in_in.eom,
-      iopcode      => in_opcode,
       ieof         => in_in.eof,
       itake        => in_out.take,
       -- OUTPUT

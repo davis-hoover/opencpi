@@ -74,6 +74,15 @@ component iqstream_marshaller is
     oready       : in  ocpi.types.Bool_t);
 end component;
 
+component axis_to_iqstream_converter is
+  port(
+    s_axis_tdata  : in  std_logic_vector(OP_IQ_BIT_WIDTH-1 downto 0);
+    s_axis_tvalid : in  std_logic;
+    s_axis_tready : out std_logic;
+    oprotocol     : out protocol_t;
+    ordy          : in  std_logic);
+end component;
+
 component iqstream_demarshaller is
   generic(
     WSI_DATA_WIDTH : positive := 16); -- 16 is default of codegen, but
@@ -93,6 +102,15 @@ component iqstream_demarshaller is
     oprotocol : out protocol_t;
     oeof      : out ocpi.types.Bool_t;
     ordy      : in  std_logic);
+end component;
+
+component iqstream_to_axis_converter is
+  port(
+    iprotocol     : in  protocol_t;
+    irdy          : out std_logic;
+    m_axis_tdata  : out std_logic_vector(OP_IQ_BIT_WIDTH-1 downto 0);
+    m_axis_tvalid : out std_logic;
+    m_axis_tready : in  std_logic);
 end component;
 
 end package iqstream;

@@ -27,10 +27,10 @@ component rfdc is
     AXI_STREAM_LOOPBACK : boolean := false);
   port(
     -- WCI / raw props
-    raw_clk         : in  std_logic;
-    raw_reset       : in  std_logic;
-    raw_in          : in  ocpi.wci.raw_in_t;
-    raw_out         : out ocpi.wci.raw_out_t;
+    raw_props_clk   : in  std_logic;
+    raw_props_reset : in  std_logic;
+    raw_props_in    : in  ocpi.wci.raw_in_t;
+    raw_props_out   : out ocpi.wci.raw_out_t;
     -- RX path clock inputs
     rx_clks_p       : in  std_logic_vector(NUM_RX_CHANS-1 downto 0);
     rx_clks_n       : in  std_logic_vector(NUM_RX_CHANS-1 downto 0);
@@ -56,10 +56,12 @@ component rfdc is
     s_axis_1_tready : out std_logic;
     -- AXI-Stream ports for complex RX paths, TDATA is Q [31:16], I [15:0]
     m_axis_0_aclk   : out std_logic;
+    m_axis_0_areset : out std_logic; -- active high
     m_axis_0_tdata  : out std_logic_vector(32-1 downto 0);
     m_axis_0_tvalid : out std_logic;
     m_axis_0_tready : in  std_logic;
     m_axis_1_aclk   : out std_logic;
+    m_axis_1_areset : out std_logic; -- active high
     m_axis_1_tdata  : out std_logic_vector(32-1 downto 0);
     m_axis_1_tvalid : out std_logic;
     m_axis_1_tready : in  std_logic);
