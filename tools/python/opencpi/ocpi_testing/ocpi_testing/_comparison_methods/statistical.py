@@ -731,7 +731,7 @@ class Statistical(BasicComparison):
             if self._data_largest is None:
                 self._data_largest = abs(max(values, key=abs))
             else:
-                self._data_largest = max()(self._data_largest,
+                self._data_largest = max(self._data_largest,
                                            abs(max(values, key=abs)))
 
     def __repr__(self):
