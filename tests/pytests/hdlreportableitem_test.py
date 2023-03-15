@@ -35,7 +35,7 @@ import unittest
 import os
 import sys
 import logging
-sys.path.append(os.getenv('OCPI_CDK_DIR') + '/' + os.getenv('OCPI_TOOL_PLATFORM') + '/lib/')
+sys.path.append(os.getenv('OCPI_CDK_DIR') + '/' + os.getenv('OCPI_TOOL_DIR') + '/lib/')
 import _opencpi.util as ocpiutil
 from  _opencpi.hdlreportableitem import ReportableItem
 

@@ -385,7 +385,8 @@ parseHdlAssy() {
     ezxml_t x = ezxml_parse_str(cp, strlen(cp));
     // Create the assy's wci slave port, at the beginning of the list
     wci = createPort<WciPort>(*this, x, NULL, -1, err);
-    assert(wci);
+    if (!wci)
+      return err;
     // Clocks: coalesce all WCI clock and clocks with same reqts, into one wci, all for the assy
     assert(wci->m_clock);
     Clock &clk = *wci->m_clock;
@@ -1413,7 +1414,7 @@ emitInternalConnections(FILE *f, const char *prefix) {
 	  to = bidi;
       }
       assert(from && to);
-      if (!from->m_port->worker().m_assembly && !to->m_port->worker().m_assembly)
+      if (from && to && !from->m_port->worker().m_assembly && !to->m_port->worker().m_assembly)
 	fprintf(f, "<connection from=\"%s/%s\" out=\"%s\" to=\"%s/%s\" in=\"%s\"/>\n",
 		prefix, from->m_instance->cname(), from->m_port->pname(),
 		prefix, to->m_instance->cname(), to->m_port->pname());

@@ -459,7 +459,7 @@ namespace OCPI {
       const char *
       getNumber8(ezxml_t x, const char *attr, uint8_t *np, bool *found,
 		 uint32_t defaultValue, bool setDefault) {
-	size_t n;
+	size_t n = 0; // only to suppress compiler warning
 	const char *err = getNumber(x, attr, &n, found, defaultValue,
 				    setDefault);
 	if (!err)

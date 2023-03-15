@@ -219,7 +219,8 @@ namespace OCPI {
 
     uint64_t Container::
     getMyTicks() {
-      Access *ts = firstArtifact()->m_timeServer;
+      auto art = firstArtifact();
+      Access *ts = art ? art->m_timeServer : NULL;
       return
 	m_device.isAlive() && !m_device.isFailed() && ts ? 
 	(m_lastTick = swap32(ts->get64RegisterOffset(0)) + hdlDevice().m_timeCorrection) :

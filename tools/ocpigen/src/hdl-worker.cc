@@ -216,7 +216,8 @@ vhdlType(const OM::Property &dt, std::string &decl, std::string &type, bool conv
   }
   if (dt.m_isSequence) {
     std::vector<size_t> seqdims(dt.m_arrayRank + 1);
-    seqdims[0] = dt.m_sequenceLength;
+    if (dt.m_sequenceLength) // suppress warning emitted by broken compiler
+      seqdims[0] = dt.m_sequenceLength;
     for (unsigned n = 0; n < dt.m_arrayRank; n++)
       seqdims[n+1] = dt.m_arrayDimensions[n];
     vhdlArrayType(dt, dt.m_arrayRank+2, &seqdims[0], decl, type, convert, finalized);

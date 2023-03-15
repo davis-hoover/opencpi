@@ -71,7 +71,7 @@ make install
 # all this in a subshell to preserve CWD.
 (
   cd $OcpiInstallExecDir/lib
-  PATH=$OcpiInstallExecDir/../../patchelf/$OcpiPlatform/bin:$PATH
+  PATH=$OcpiInstallExecDir/../../patchelf/$OCPI_TOOL_DIR/bin:$PATH
   old=$name
   new=$prereq_name
   for i in *; do

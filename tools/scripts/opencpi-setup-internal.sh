@@ -307,12 +307,13 @@ else
       [ -n "$ocpi_optimize" ] && ocpi_tool_dir+=o
       ocpi_bin_dir=$ocpi_cdk_dir/$ocpi_tool_dir/bin
       [ ! -d "$ocpi_bin_dir" ] && {
-	  echo "$ocpi_name:  Error: the --dynamic or --optimize options were specified, " >&2
+	  # This is ok if we were called by "scripts/install-opencpi.sh --optimize".
+	  echo "$ocpi_name:  Warning: the --dynamic or --optimize options were specified, " >&2
 	  echo "$ocpi_name:  but the host platform has not yet been built with these options." >&2
-	  echo "$ocpi_name:  You need to build for these options before using them." >&2
-	  echo "$ocpi_name:  with the command:" >z&2
-	  echo "$ocpi_name:    ocpiadmin install platform [--dynamic|--optimize]* $4" >&2
-	  return 1
+	  #echo "$ocpi_name:  You need to build for these options before using them." >&2
+	  #echo "$ocpi_name:  Build with the command:" >&2
+	  #echo "$ocpi_name:    ocpiadmin install platform [--dynamic|--optimize]* $4" >&2
+	  #return 1
       }
   }
   # Now we commit the settings of the variables and thus the "pollution" of the user's envronment
