@@ -20,6 +20,7 @@ include $(OCPI_CDK_DIR)/include/hdl/xilinx.mk
 HdlLibraries=ocpi axi cdc
 OnlyTargets=zynq_ultra
 include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk
+XilinxCoreName=usp_rf_data_converter
 ifeq ($(filter clean%,$(MAKECMDGOALS))$(if $(HdlTargets),,z),)  # if not cleaning and building hdl target
   $(info Generating the verilog wrapper for the Xilinx RF Data Converter.)
   $(if $(call DoShell,\
@@ -27,10 +28,10 @@ ifeq ($(filter clean%,$(MAKECMDGOALS))$(if $(HdlTargets),,z),)  # if not cleanin
       (cd tmp && \
       $(call OcpiXilinxVivadoInit) && \
       vivado -mode batch -source ../../vivado-gen-rfdc.tcl \
-      -tclargs xczu48dr-ffve1156-2-i \
+      -tclargs $(XilinxCoreName) xczu48dr-ffvg1517-2-e \
       ) > vivado-gen-rfdc.log && \
       rm -r -f tmp,MyError),\
       $(error $(MyError)))
 endif # if not cleaning
-SourceFiles=rfdc_pkg.vhd gen/rfdc_ip.v gen/rfdc_ip.xdc gen/rfdc_ip_address_decoder.v gen/rfdc_ip_axi_lite_ipif.v gen/rfdc_ip_bgt_fsm.v gen/rfdc_ip_block.v gen/rfdc_ip_clk_detection.v gen/rfdc_ip_clocks.xdc gen/rfdc_ip_constants_config.sv gen/rfdc_ip_counter_f.v gen/rfdc_ip_device_rom.sv gen/rfdc_ip_drp_access_ctrl.v gen/rfdc_ip_drp_arbiter.v gen/rfdc_ip_drp_arbiter_adc.v gen/rfdc_ip_drp_control.v gen/rfdc_ip_drp_control_top.v gen/rfdc_ip_irq_req_ack.v gen/rfdc_ip_irq_sync.v gen/rfdc_ip_ooc.xdc gen/rfdc_ip_overvol_irq.v gen/rfdc_ip_por_fsm.sv gen/rfdc_ip_por_fsm_disabled.sv gen/rfdc_ip_por_fsm_top.sv gen/rfdc_ip_powerup_state_irq.v gen/rfdc_ip_pselect_f.v gen/rfdc_ip_register_decode.v gen/rfdc_ip_rf_wrapper.v gen/rfdc_ip_rst_cnt.v gen/rfdc_ip_slave_attachment.v gen/rfdc_ip_tile_config.sv gen/rfdc_ipbufg_gt_ctrl.v rfdc.vhd
+SourceFiles=rfdc_pkg.vhd rfdc.vhd $(wildcard gen/*.edf)
 include $(OCPI_CDK_DIR)/include/hdl/hdl-library.mk

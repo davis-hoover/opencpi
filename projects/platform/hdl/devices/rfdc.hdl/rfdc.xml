@@ -1,16 +1,19 @@
 <hdldevice language='vhdl' spec='rfdc' firstrawproperty='regs' version='2' libraries='protocol rfdc'>
   <rawprop name='rawprops' master='true'/>
-  <!-- TODO comment back in worker signal connections -->
-  <!--signal name='rx_clks_p' width='NUM_RX_CHANS' direction='in'/>
-  <signal name='rx_clks_n' width='NUM_RX_CHANS' direction='in'/>
-  <signal name='tx_clks_p' width='NUM_TX_CHANS' direction='in'/>
-  <signal name='tx_clks_n' width='NUM_TX_CHANS' direction='in'/>
-  <signal name='sysref_p' direction='in'/>
-  <signal name='sysref_n' direction='in'/>
-  <signal name='rf_rx_p' width='NUM_RX_CHANS' direction='in'/>
-  <signal name='rf_rx_n' width='NUM_RX_CHANS' direction='in'/>
-  <signal name='rf_tx_p' width='NUM_TX_CHANS' direction='out'/>
-  <signal name='rf_tx_n' width='NUM_TX_CHANS' direction='out'/-->
+  <!-- The clks, sysref, and rf signals are generically named so they may be
+       mapped to various data converter generations. The platform config's (or
+       perhaps, container's) constraints file is where the mapping to pins (and
+       therefore, tiles) occurs -->
+  <signal name='rx_clks_p' width='2' pin='true' direction='in'/>
+  <signal name='rx_clks_n' width='2' pin='true' direction='in'/>
+  <signal name='tx_clks_p' width='1' pin='true' direction='in'/>
+  <signal name='tx_clks_n' width='1' pin='true' direction='in'/>
+  <signal name='sysref_p' pin='true' direction='in'/>
+  <signal name='sysref_n' pin='true' direction='in'/>
+  <signal name='rf_rx_p' width='2' pin='true' direction='in'/>
+  <signal name='rf_rx_n' width='2' pin='true' direction='in'/>
+  <signal name='rf_tx_p' width='4' pin='true' direction='out'/>
+  <signal name='rf_tx_n' width='4' pin='true' direction='out'/>
   <streaminterface name='in0' datawidth='32'/>
   <streaminterface name='in1' datawidth='32'/>
   <streaminterface name='out0' datawidth='32'/>

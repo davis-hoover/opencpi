@@ -1,11 +1,7 @@
 <componentspec>
   <!-- 0x0000 - 0x23fff -->
   <!-- ref https://docs.xilinx.com/api/khub/maps/w8uumt6t1ussnarj7mwalq/attachments/u_ptvwnpz53cssexydzeua/content?ft-calling-app=ft%2fturnkey-portal&ft-calling-app-version=4.1.11&filename=pg269-rf-data-converter-en-us-2.6.pdf#unique_8 -->
-  <property name='regs' type='uchar' arraylength='147456' writable='1' volatile='1' default='0'/>
-  <property name='num_rx_chans' type='uchar' parameter='true' default='2'/>
-  <property name='num_tx_chans' type='uchar' parameter='true' default='2'/>
-  <property name='port_loopback' type='bool' parameter='true' default='false'/>
-  <property name='config' type='ushort' parameter='true'/>
+  <property name='regs' type='ulong' arraylength='147456' writable='1' volatile='1' default='0'/>
   <!-- intentionally use existing iqstream protocols, we can add metadata to
        new or existing protocols as new rfdc features are added, and when app
        devs change their mind on what standardized protocols these should

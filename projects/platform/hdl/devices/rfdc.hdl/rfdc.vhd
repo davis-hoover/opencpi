@@ -50,30 +50,26 @@ architecture structural of worker is
   signal ctl_rx_1_converter_to_ctl_1_marshaller_pro   : protocol_t
                                                       := PROTOCOL_ZERO;
   signal ctl_rx_1_converter_to_ctl_1_marshaller_rdy   : std_logic := '0';
-  -- rx_0 clk domain
-  signal rx_0_clk                 : std_logic := '0';
-  signal rx_0_reset               : std_logic := '0';
+  -- rx clk domain
+  signal rx_clk                   : std_logic_vector(2-1 downto 0)
+                                  := (others => '0');
+  signal rx_reset                 : std_logic_vector(2-1 downto 0)
+                                  := (others => '0');
   signal rfdc_to_ctl_0_cdc_tdata  : std_logic_vector(32-1 downto 0)
                                   := (others => '0');
   signal rfdc_to_ctl_0_cdc_tvalid : std_logic := '0';
   signal rfdc_to_ctl_0_cdc_tready : std_logic := '0';
-  -- rx_1 clk domain
-  signal rx_1_clk                 : std_logic := '0';
-  signal rx_1_reset               : std_logic := '0';
   signal rfdc_to_ctl_1_cdc_tdata  : std_logic_vector(32-1 downto 0)
                                   := (others => '0');
   signal rfdc_to_ctl_1_cdc_tvalid : std_logic := '0';
   signal rfdc_to_ctl_1_cdc_tready : std_logic := '0';
-  -- tx_0 clk domain
-  signal tx_0_clk                     : std_logic := '0';
-  signal tx_0_reset                   : std_logic := '0';
+  -- tx clk domain
+  signal tx_clk                       : std_logic_vector(1-1 downto 0)
+                                      := (others => '0');
   signal tx_0_cdc_to_rfdc_prim_tdata  : std_logic_vector(32-1 downto 0)
                                       := (others => '0');
   signal tx_0_cdc_to_rfdc_prim_tvalid : std_logic := '0';
   signal tx_0_cdc_to_rfdc_prim_tready : std_logic := '0';
-  -- tx_1 clk domain
-  signal tx_1_clk                     : std_logic := '0';
-  signal tx_1_reset                   : std_logic := '0';
   signal tx_1_cdc_to_rfdc_prim_tdata  : std_logic_vector(32-1 downto 0)
                                       := (others => '0');
   signal tx_1_cdc_to_rfdc_prim_tvalid : std_logic := '0';
@@ -114,7 +110,7 @@ begin
       src_ENQ     => ctl_tx_0_converter_to_tx_0_cdc_tvalid,
       src_in      => ctl_tx_0_converter_to_tx_0_cdc_tdata,
       src_FULL_N  => ctl_tx_0_converter_to_tx_0_cdc_tready,
-      dst_CLK     => tx_0_clk,
+      dst_CLK     => tx_clk(0),
       dst_DEQ     => tx_0_cdc_to_rfdc_prim_tready,
       dst_out     => tx_0_cdc_to_rfdc_prim_tdata,
       dst_EMPTY_N => tx_0_cdc_to_rfdc_prim_tvalid);
@@ -153,45 +149,38 @@ begin
       src_ENQ     => ctl_tx_1_converter_to_tx_1_cdc_tvalid,
       src_in      => ctl_tx_1_converter_to_tx_1_cdc_tdata,
       src_FULL_N  => ctl_tx_1_converter_to_tx_1_cdc_tready,
-      dst_CLK     => tx_1_clk,
+      dst_CLK     => tx_clk(0),
       dst_DEQ     => tx_1_cdc_to_rfdc_prim_tready,
       dst_out     => tx_1_cdc_to_rfdc_prim_tdata,
       dst_EMPTY_N => tx_1_cdc_to_rfdc_prim_tvalid);
 
   rfdc_prim : rfdc.rfdc_pkg.rfdc
-    generic map(
-      NUM_RX_CHANS        => to_integer(unsigned(NUM_RX_CHANS)),
-      NUM_TX_CHANS        => to_integer(unsigned(NUM_TX_CHANS)),
-      AXI_STREAM_LOOPBACK => PORT_LOOPBACK = '1')
     port map(
       raw_props_clk   => ctl_in.clk,
       raw_props_reset => ctl_in.reset,
       raw_props_in    => props_in.raw,
       raw_props_out   => props_out.raw,
-      -- TODO comment back in worker signal connections
-      rx_clks_p       => (others => '0'),--rx_clks_p,
-      rx_clks_n       => (others => '0'),--rx_clks_n,
-      tx_clks_p       => (others => '0'),--tx_clks_p,
-      tx_clks_n       => (others => '0'),--tx_clks_n,
-      sysref_p        => '0',--sysref_p,
-      sysref_n        => '0',--sysref_n,
-      rf_rx_p         => (others => '0'),--rf_rx_p,
-      rf_rx_n         => (others => '0'),--rf_rx_n,
-      rf_tx_p         => open,--rf_tx_p,
-      rf_tx_n         => open,--rf_tx_n,
-      s_axis_0_aclk   => tx_0_clk,
+      rx_clks_p       => rx_clks_p,
+      rx_clks_n       => rx_clks_n,
+      tx_clks_p       => tx_clks_p,
+      tx_clks_n       => tx_clks_n,
+      sysref_p        => sysref_p,
+      sysref_n        => sysref_n,
+      rf_rx_p         => rf_rx_p,
+      rf_rx_n         => rf_rx_n,
+      rf_tx_p         => rf_tx_p,
+      rf_tx_n         => rf_tx_n,
+      tx_aclk         => tx_clk,
       s_axis_0_tdata  => tx_0_cdc_to_rfdc_prim_tdata,
       s_axis_0_tvalid => tx_0_cdc_to_rfdc_prim_tvalid,
       s_axis_0_tready => tx_0_cdc_to_rfdc_prim_tready,
-      s_axis_1_aclk   => tx_1_clk,
       s_axis_1_tdata  => tx_1_cdc_to_rfdc_prim_tdata,
       s_axis_1_tvalid => tx_1_cdc_to_rfdc_prim_tvalid,
       s_axis_1_tready => tx_1_cdc_to_rfdc_prim_tready,
-      m_axis_0_aclk   => rx_0_clk,
+      rx_aclk         => rx_clk,
       m_axis_0_tdata  => rfdc_to_ctl_0_cdc_tdata,
       m_axis_0_tvalid => rfdc_to_ctl_0_cdc_tvalid,
       m_axis_0_tready => rfdc_to_ctl_0_cdc_tready,
-      m_axis_1_aclk   => rx_1_clk,
       m_axis_1_tdata  => rfdc_to_ctl_1_cdc_tdata,
       m_axis_1_tvalid => rfdc_to_ctl_1_cdc_tvalid,
       m_axis_1_tready => rfdc_to_ctl_1_cdc_tready);
@@ -200,8 +189,8 @@ begin
     generic map(
       WIDTH       => out0_out.data'length)
     port map(
-      src_CLK     => rx_0_clk,
-      src_RST     => rx_0_reset,
+      src_CLK     => rx_clk(0),
+      src_RST     => rx_reset(0),
       src_ENQ     => rfdc_to_ctl_0_cdc_tvalid,
       src_in      => rfdc_to_ctl_0_cdc_tdata,
       src_FULL_N  => rfdc_to_ctl_0_cdc_tready,
@@ -223,8 +212,8 @@ begin
       WSI_DATA_WIDTH    => out0_out.data'length,
       WSI_MBYTEEN_WIDTH => out0_out.byte_enable'length)
     port map(
-      clk          => rx_0_clk,
-      rst          => rx_0_reset,
+      clk          => rx_clk(0),
+      rst          => rx_reset(0),
       iprotocol    => ctl_rx_0_converter_to_ctl_0_marshaller_pro,
       ieof         => bfalse,
       irdy         => ctl_rx_0_converter_to_ctl_0_marshaller_rdy,
@@ -241,8 +230,8 @@ begin
     generic map(
       WIDTH       => out1_out.data'length)
     port map(
-      src_CLK     => rx_1_clk,
-      src_RST     => rx_1_reset,
+      src_CLK     => rx_clk(1),
+      src_RST     => rx_reset(1),
       src_ENQ     => rfdc_to_ctl_1_cdc_tvalid,
       src_in      => rfdc_to_ctl_1_cdc_tdata,
       src_FULL_N  => rfdc_to_ctl_1_cdc_tready,
@@ -264,8 +253,8 @@ begin
       WSI_DATA_WIDTH    => out1_out.data'length,
       WSI_MBYTEEN_WIDTH => out1_out.byte_enable'length)
     port map(
-      clk          => rx_1_clk,
-      rst          => rx_1_reset,
+      clk          => rx_clk(1),
+      rst          => rx_reset(1),
       iprotocol    => ctl_rx_1_converter_to_ctl_1_marshaller_pro,
       ieof         => bfalse,
       irdy         => ctl_rx_1_converter_to_ctl_1_marshaller_rdy,
