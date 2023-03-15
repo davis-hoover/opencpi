@@ -46,6 +46,9 @@ PKGS_R+=(util-linux coreutils ed findutils initscripts)
 PKGS_R+=(libusb-devel)
 #    for bitstream manipulation at least
 PKGS_R+=(unzip)
+#    for Xilinx embeddedsw rfdc
+#    (ref https://xilinx-wiki.atlassian.net/wiki/spaces/A/pages/84378586/Building+RFDC+application+from+git+sources+for+ZCU111)
+PKGS_R+=(sysfsutils libsysfs-devel)
 
 ##########################################################################################
 # D. yum-installed and rpm-required for devel (when users are doing their development).
