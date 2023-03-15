@@ -34,13 +34,16 @@ source "$OCPI_CDK_DIR/scripts/setup-prerequisite.sh" \
        verilog-ethernet \
        0
 
-# Patch the source
-patch -p0 -d .. < $OcpiThisPrerequisiteDir/verilog-ethernet.patch || {
-  echo "*******************************************************" >&2
-  echo "ERROR: patch applied by verilog-ethernet.patch failed!!" >&2
-  echo "*******************************************************" >&2
-  exit 1
-}
+# Patch the source if necessary
+if [[ ! -f ../.opencpi-patched ]]; then
+  patch -p0 -d .. < $OcpiThisPrerequisiteDir/verilog-ethernet.patch || {
+    echo "*******************************************************" >&2
+    echo "ERROR: patch applied by verilog-ethernet.patch failed!!" >&2
+    echo "*******************************************************" >&2
+    exit 1
+  }
+  touch ../.opencpi-patched
+fi
 
 # Link the source into the installation directory
 relative_link ../../verilog-ethernet "$OcpiInstallDir"

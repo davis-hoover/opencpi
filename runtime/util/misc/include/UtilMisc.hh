@@ -105,8 +105,8 @@ namespace OCPI {
     }
 
     inline int64_t struncate(int64_t val, size_t bytes) {
-      (void)bytes;
       int64_t min = (int64_t)(~(uint64_t)0 << (bytes*8-1));
+      (void)bytes; (void)min;	// suppress compiler warnings when optimizing
       ocpiAssert(bytes == sizeof(val) || (val < 0 ? val >= min : val <= ~min));
       return val;
     }

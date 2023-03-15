@@ -177,11 +177,11 @@ static int mymain(const char **argv) {
   if (options.protocol()) {
     size_t n;
     std::vector<const char *> args;
-    for (const char **ap = options.define(n); *ap; ++ap)
+    for (const char **ap = options.define(n); ap && *ap; ++ap)
       args.push_back(*ap);
-    for (const char **ap = options.undefine(n); *ap; ++ap)
+    for (const char **ap = options.undefine(n); ap && *ap; ++ap)
       args.push_back(*ap);
-    for (const char **ap = options.include(n); *ap; ++ap)
+    for (const char **ap = options.include(n); ap && *ap; ++ap)
       args.push_back(*ap);
     args.push_back(NULL);
     if ((err = emitProtocol(&args[0], options.output(), *argv, options.structname())))

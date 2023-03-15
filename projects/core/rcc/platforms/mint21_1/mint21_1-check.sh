@@ -17,11 +17,6 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-MEASUREMENT_FILE=measured.out
-OCPI_LIBRARY_PATH=../:$OCPI_LIBRARY_PATH $OCPI_CDK_DIR/$OCPI_TARGET_DIR/bin/ocpirun -t 1 app.xml > $MEASUREMENT_FILE # no because stderr has warnings: 2>&1
-OCPIRUN_EXIT=$?
-if [ "$OCPIRUN_EXIT" != "0" ]; then
-cat $MEASUREMENT_FILE
-exit 1
-fi
-./scripts/test_measured_mem_offsets.sh $MEASUREMENT_FILE
+[ ! -r /etc/os-release ] && exit 1
+source /etc/os-release
+[[ "${ID}" = "linuxmint" && "${VERSION_ID}" = "21.1" ]] && exit 0 || exit 1

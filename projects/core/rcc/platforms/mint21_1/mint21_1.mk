@@ -1,4 +1,3 @@
-#!/bin/bash
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -17,11 +16,22 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-MEASUREMENT_FILE=measured.out
-OCPI_LIBRARY_PATH=../:$OCPI_LIBRARY_PATH $OCPI_CDK_DIR/$OCPI_TARGET_DIR/bin/ocpirun -t 1 app.xml > $MEASUREMENT_FILE # no because stderr has warnings: 2>&1
-OCPIRUN_EXIT=$?
-if [ "$OCPIRUN_EXIT" != "0" ]; then
-cat $MEASUREMENT_FILE
-exit 1
-fi
-./scripts/test_measured_mem_offsets.sh $MEASUREMENT_FILE
+################################################################################
+# This file defines the mint21_1 software platform.
+# It sets platform variables as necessary to override the defaults in
+#   "tools/include/platform-defaults.mk".
+# See that file for a description of valid variables and their defaults.
+
+OcpiPlatformOs=linux
+OcpiPlatformOsVersion=m21_1
+OcpiPlatformArch=x86_64
+
+# gcc 11.3 is extremely picky
+OcpiCXXFlags+="-Wno-type-limits"
+
+#
+# "OcpiKernelDir" must be set if it is appropriate to build
+# the "opencpi.ko" driver module for this platform.  Mint is
+# part of the Ubuntu family.
+#
+OcpiKernelDir:=$(call OcpiGetKernelDir,Ubuntu)

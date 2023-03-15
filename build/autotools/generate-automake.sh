@@ -81,7 +81,7 @@ ocpi_extra_libs=$(patsubst %,-l%,@OcpiExtraLibs@)
 # are installed in the data phase. WTF?
 install-data-hook:
 	$(AM_V_at)cd staging; V=$V ../../install-hook.sh \
-	     @OcpiDynamicLibrarySuffix@  @ocpi_dynamic@ @platform_target_dir@  $(OcpiThisPlatform) \
+	     @OcpiDynamicLibrarySuffix@  @ocpi_dynamic@ @platform_target_dir@  $(OcpiToolDir) \
 	     "$(ocpi_drivers)" "$(ocpi_swigs)" "$(ocpi_prereqs)" "@prerequisite_dir@"
 EOF
 

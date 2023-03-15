@@ -20,7 +20,7 @@
 import unittest
 import sys
 import os
-sys.path.append(os.getenv('OCPI_CDK_DIR') + '/' + os.getenv('OCPI_TOOL_PLATFORM') + '/lib/')
+sys.path.append(os.getenv('OCPI_CDK_DIR') + '/' + os.getenv('OCPI_TOOL_DIR') + '/lib/')
 import _opencpi.util as ocpiutil
 from  _opencpi.assets.factory import *
 
