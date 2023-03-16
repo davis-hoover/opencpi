@@ -28,7 +28,7 @@ from typing import Dict, List, Union
 from jinja2 import Environment, FileSystemLoader
 
 # Supported OSPs
-OSPS = ["ocpi.osp.analog", "ocpi.osp.e3xx", "ocpi.osp.plutosdr", "ocpi.osp.ettus", "ocpi.osp.avnet", "ocpi.osp.xilinx"]
+OSPS = ["ocpi.osp.analog", "ocpi.osp.e3xx", "ocpi.osp.plutosdr", "ocpi.osp.ettus", "ocpi.osp.avnet", "ocpi.osp.xilinx", "ocpi.osp.n3xx"]
 OSP_TAGS = dict()  # Will be filled in later
 
 # Supported COMPs
@@ -585,6 +585,8 @@ def gen_release_index(tag: str, is_latest=False):
                     section_title = "Avnet Engineering OSP Documentation"
                 elif section_name == "xilinx":
                     section_title = "Xilinx OSP Documentation"
+                elif section_name == "n3xx":
+                    section_title = "N3xx OSP Documentation"
                 else:
                     section_title = section_title[4:] + " OSP Documentation"
                 if Path(f"{rst_dir}/osp_{section_name}/index.html").exists():
