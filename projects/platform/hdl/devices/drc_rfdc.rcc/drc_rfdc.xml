@@ -1,0 +1,2 @@
+<rccworker language='c++' version='2' spec='drc-spec'
+    includedirs='drc/base/include drc/rfdc/include' staticprereqlibs='rfdc'/>

@@ -39,12 +39,41 @@ source $OCPI_CDK_DIR/scripts/setup-prerequisite.sh \
        $OCPI_RFDC_VERSION \
        embeddedsw \
        1
-cp ../XilinxProcessorIPLib/drivers/rfdc/src/* .
+dir=../XilinxProcessorIPLib/drivers/rfdc/src/
+cp $dir/* .
 SRCNAMES=(xrfdc xrfdc_ap xrfdc_clock xrfdc_dp xrfdc_g xrfdc_intr xrfdc_mb xrfdc_mixer xrfdc_mts xrfdc_sinit)
 SRCS=(${SRCNAMES[@]/%/.c})
-$CC -g -fPIC -I$LIBMETAL_INSTALL_LIB_DIR/usr/local/include -I. -c ${SRCS[@]} -L$LIBMETALL_INSTALL_LIB_DIR/user/local/lib -lmetal
+INCS=(xrfdc xrfdc_hw)
+$CC -g -fPIC -I$LIBMETAL_INSTALL_LIB_DIR/usr/local/include -I. -c ${SRCS[@]} -L$LIBMETALL_INSTALL_LIB_DIR/usr/local/lib -lmetal
 $AR -rs librfdc.a ${SRCNAMES[@]/%/.o}
 relative_link librfdc.a $OcpiInstallExecDir/lib
 for i in ${INCS[@]}; do
-  relative_link $i.h $OcpiInstallDir/include
+  relative_link $dir/$i.h $OcpiInstallDir/include
+done
+LIBMETAL_INCS=(alloc assert atomic cache compiler condition config cpu device \
+    dma errno io irq_controller irq list log mutex shmem sleep softirq \
+    spinlock sys time utilities)
+# this directory's existence is assumed by rfdc source code
+metal_dir=$OcpiInstallDir/include/metal
+mkdir -p $metal_dir
+for i in ${LIBMETAL_INCS[@]}; do
+  relative_link $LIBMETAL_INSTALL_LIB_DIR/usr/local/include/metal/$i.h $metal_dir
+done
+LIBMETAL_SYSTEM_INCS=(alloc assert cache condition io irq log mutex sleep sys)
+metal_system_dir=$OcpiInstallDir/include/metal/system/linux/
+mkdir -p $metal_system_dir
+for i in ${LIBMETAL_SYSTEM_INCS[@]}; do
+  relative_link $LIBMETAL_INSTALL_LIB_DIR/usr/local/include/metal/system/linux/$i.h $metal_system_dir
+done
+LIBMETAL_COMPILER_INCS=(atomic compiler)
+metal_compiler_dir=$OcpiInstallDir/include/metal/compiler/gcc/
+mkdir -p $metal_compiler_dir
+for i in ${LIBMETAL_COMPILER_INCS[@]}; do
+  relative_link $LIBMETAL_INSTALL_LIB_DIR/usr/local/include/metal/compiler/gcc/$i.h $metal_compiler_dir
+done
+LIBMETAL_COMPILER_INCS=(atomic cpu)
+metal_compiler_dir=$OcpiInstallDir/include/metal/processor/x86_64/
+mkdir -p $metal_compiler_dir
+for i in ${LIBMETAL_COMPILER_INCS[@]}; do
+  relative_link $LIBMETAL_INSTALL_LIB_DIR/usr/local/include/metal/processor/x86_64/$i.h $metal_compiler_dir
 done
