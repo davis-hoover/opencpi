@@ -18,13 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 ####################################################################################################
-# This internal scripts calls the platform Makefile if it exists 
-# in prepartion of enabling the platform.
-# The first and only argument is platform name to be enabled. 
+# This internal script calls the platform Makefile if it exists
+# in preparation for enabling the platform.
+# The first and only argument is the platform name to be enabled.
 #
 
 # Ensure CDK and TOOL variables
-source ./cdk/opencpi-setup.sh -r
+source ./cdk/opencpi-setup.sh -e
 
 # Ensure TARGET variables
 source "$OCPI_CDK_DIR/scripts/ocpitarget.sh" "$1"

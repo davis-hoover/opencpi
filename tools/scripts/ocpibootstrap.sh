@@ -36,17 +36,17 @@
 # 3. OCPI_TOOL_*
 
 # Determine OCPI_CDK_DIR:
-# If set and it is a directory, assume it is correct
+# If set and it is a directory, assume it is correct.
 # If not set, and if this script lives in a "scripts" or "bin" directory,
 # assume that directory is at the top of the CDK.
 # Otherwise, try the global default place.
 # In all cases do a final sanity check.
 if [ "$OCPI_CDK_DIR" = "" -o ! -d "$OCPI_CDK_DIR" ]; then # and any other sanity checks?
-  [ -z "$OCPI_BOOTSTRAP" ] && echo Error:  ocpibootstrap.sh called without setting OCPI_BOOTSTRAP && exit 1
-  [ ! -r "$OCPI_BOOTSTRAP" ] && echo Error:  ocpibootstrap.sh called with unreadable OCPI_BOOTSTRAP: $OCPI_BOOTSTRAP && exit 1
+  [ -z "$OCPI_BOOTSTRAP" ] && echo Error: ocpibootstrap.sh called without setting OCPI_BOOTSTRAP && exit 1
+  [ ! -r "$OCPI_BOOTSTRAP" ] && echo Error: ocpibootstrap.sh called with unreadable OCPI_BOOTSTRAP: $OCPI_BOOTSTRAP && exit 1
   case $OCPI_BOOTSTRAP in
    /*) ;;
-   *) echo Error:  ocpibootstrap.sh called with OCPI_BOOTSTRAP not absolute: $OCPI_BOOTSTRAP && exit 1 ;;
+   *) echo Error: ocpibootstrap.sh called with OCPI_BOOTSTRAP not absolute: $OCPI_BOOTSTRAP && exit 1 ;;
   esac
   _MYDIR=$(dirname $OCPI_BOOTSTRAP)
   _MYBASE=$(basename $_MYDIR)
@@ -67,7 +67,7 @@ if [ "$OCPI_CDK_DIR" = "" -o ! -d "$OCPI_CDK_DIR" ]; then # and any other sanity
   export OCPI_CDK_DIR=$(cd $OCPI_CDK_DIR; pwd)
   # FIXME: someday better "signature" would be more robust...
   if test ! -f $OCPI_CDK_DIR/scripts/getPlatform.sh; then
-    echo Error:  ocpibootstrap.sh cannot find a valid place to set OCPI_CDK_DIR "(tried $OCPI_CDK_DIR)"
+    echo Error: ocpibootstrap.sh cannot find a valid place to set OCPI_CDK_DIR "(tried $OCPI_CDK_DIR)"
     exit 1
   fi
 fi

@@ -1,4 +1,22 @@
 #!/bin/env python3
+# This file is protected by Copyright. Please refer to the COPYRIGHT file
+# distributed with this source distribution.
+#
+# This file is part of OpenCPI <http://www.opencpi.org>
+#
+# OpenCPI is free software: you can redistribute it and/or modify it under the
+# terms of the GNU Lesser General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Lesser General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 #
 # This script only runs on CentOS 7 so it is safe to use python 3.6 features.
 #
@@ -28,7 +46,7 @@ from typing import Dict, List, Union
 from jinja2 import Environment, FileSystemLoader
 
 # Supported OSPs
-OSPS = ["ocpi.osp.analog", "ocpi.osp.e3xx", "ocpi.osp.plutosdr", "ocpi.osp.ettus", "ocpi.osp.avnet", "ocpi.osp.xilinx"]
+OSPS = ["ocpi.osp.analog", "ocpi.osp.e3xx", "ocpi.osp.plutosdr", "ocpi.osp.ettus", "ocpi.osp.avnet", "ocpi.osp.xilinx", "ocpi.osp.n3xx"]
 OSP_TAGS = dict()  # Will be filled in later
 
 # Supported COMPs
@@ -585,6 +603,8 @@ def gen_release_index(tag: str, is_latest=False):
                     section_title = "Avnet Engineering OSP Documentation"
                 elif section_name == "xilinx":
                     section_title = "Xilinx OSP Documentation"
+                elif section_name == "n3xx":
+                    section_title = "N3xx OSP Documentation"
                 else:
                     section_title = section_title[4:] + " OSP Documentation"
                 if Path(f"{rst_dir}/osp_{section_name}/index.html").exists():
@@ -802,7 +822,7 @@ def get_tags(git_dir: Path) -> List[str]:
     # total size of generated artifacts must be less than
     # 1 GB, so ignore tags corresponding to early releases.
     # cmd = ["git", "--git-dir", str(git_dir.resolve()), "tag", "-l", "v*"]
-    cmd = ["git", "--git-dir", str(git_dir.resolve()), "tag", "-l", "v2.[!0-1]*"]
+    cmd = ["git", "--git-dir", str(git_dir.resolve()), "tag", "-l", "v2.[!0-2]*"]
     logging.debug(f"Executing cmd: {cmd}")
     tags = subprocess.check_output(cmd).decode().strip("\n").split("\n")
     if not tags[0]:

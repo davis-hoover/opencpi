@@ -40,8 +40,16 @@ while (( "$#" )); do
       minimal=1
       shift
       ;;
+    --optimize)
+      optimize=1
+      shift
+      ;;
     --no-kernel)
       nokernel=1 # use ${nokernel:+whatever}
+      shift
+      ;;
+    --use-env)
+      useenv=1
       shift
       ;;
     -*) # unsupported flags
@@ -80,17 +88,40 @@ if [ -z "$1" ]; then
   source ./cdk/opencpi-setup.sh -i -v
 fi
 
-# Ensure CDK and TOOL variables
-OCPI_BOOTSTRAP="$(pwd)/cdk/scripts/ocpibootstrap.sh"; source "$OCPI_BOOTSTRAP"
+#
+# If "--use-env" is specified, the OpenCPI environment is assumed
+# to be set up properly, i.e., do not mess with it by calling the
+# bootstrap script.  "ocpiadmin" installing an RCC platform is the
+# expected use case, i.e., "ocpiadmin" calls this script with the
+# "--use-env" flag.
+#
+if [ -z "$useenv" ]; then
+  # Ensure CDK and TOOL variables
+  OCPI_BOOTSTRAP="$(pwd)/cdk/scripts/ocpibootstrap.sh"; source "$OCPI_BOOTSTRAP"
+
+  #
+  # Because "ocpibootstrap.sh" is a special case in that it cannot contain any
+  # bashisms or be called with arguments (per the comments at the beginning of
+  # that script), OpenCPI environment fixup for the optimized framework install
+  # case must be done afterward.  Problem is "ocpibootstrap.sh" sources
+  # "opencpi-setup.sh -r", and while "opencpi-setup.sh" supports the "--optimize"
+  # flag, cannot pass it into "ocpibootstrap.sh" :-(.
+  #
+  if [ -n "$optimize" ]; then
+    source $OCPI_CDK_DIR/opencpi-setup.sh -r --optimize
+  fi
+fi
 
 source $OCPI_CDK_DIR/scripts/util.sh
-# This will set OCPI_TARGET_* vars
+
+# This will set OCPI_TARGET_* vars.
 echo -n "Finding target platform ... "
 source "$OCPI_CDK_DIR/scripts/ocpitarget.sh" "$1" -
 if [ -z "$OCPI_TARGET_PLATFORM_DIR" ]; then
   echo "Cannot find platform '$1'"
   exit 1
 fi
+
 echo "Found '$OCPI_TARGET_PLATFORM' ($OCPI_TARGET_PLATFORM_DIR)"
 
 [ -n "$1" ] && shift
@@ -98,8 +129,10 @@ if [ -n "$OCPI_TARGET_PLATFORM" -a "$OCPI_TOOL_PLATFORM" != "$OCPI_TARGET_PLATFO
   echo "Assuming development host platform $OCPI_TOOL_PLATFORM is already installed."
 fi
 
-# Allow this to build for platforms defined in the inactive project or in osps
-# that are not already registered
+#
+# Allow this to build for platforms defined in the inactive project or in OSPs
+# that are not already registered.
+#
 [ -z "$OCPI_PROJECT_PATH" ] && export OCPI_PROJECT_PATH="$(pwd)/projects/inactive"
 registry=$(getProjectRegistryDir)
 for i in $(shopt -s nullglob; echo projects/osps/*); do
@@ -110,16 +143,20 @@ for i in $(shopt -s nullglob; echo projects/osps/*); do
   [ -d "$i/rcc/platforms" ] && OCPI_PROJECT_PATH="$OCPI_PROJECT_PATH:$(pwd)/$i"
 done
 
+#
 # Make sure we are running in a mode without any platform exports since this installation phase
-# should *not* depend on platform exports.  This essentially unexports the platform
+# should *not* depend on platform exports.  This essentially unexports the platform.
+#
 OCPI_TARGET_PLATFORM_DIR="${OCPI_TARGET_PLATFORM_DIR%/lib}"
 rm -r -f "${OCPI_TARGET_PLATFORM_DIR:?}/lib"
 
-
 # We assume that install-packages.sh and install-prerequisites.sh do NOT depend on the platform's exports
 ./build/install-packages.sh "$OCPI_TARGET_PLATFORM"
+
 # Export RCC platform
 $OCPI_CDK_DIR/scripts/enable-rcc-platform.sh "$OCPI_TARGET_PLATFORM"
+
+# Now build/install prerequisites.
 ./build/install-prerequisites.sh "$OCPI_TARGET_DIR"
 
 # Build framework and built-in projects for target platform
@@ -130,7 +167,7 @@ if [ -n "$OCPI_TARGET_PLATFORM" -a "$OCPI_TOOL_PLATFORM" != "$OCPI_TARGET_PLATFO
   echo "When building/installing for cross-compiled platform $OCPI_TARGET_DIR, we are skipping tests."
 elif [ -n "$minimal" ]; then
   echo "Avoiding installation tests since the --minimal option was given."
-  echo 'Installation tests may be run at any time using the "ocpitest --nohdl" command.'
+  echo 'Installation tests may be run at any time using the "ocpitest --no-hdl" command.'
 else
   eval $* ./scripts/test-opencpi.sh --no-hdl ${nokernel:+--no-kernel}
 fi

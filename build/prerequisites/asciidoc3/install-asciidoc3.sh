@@ -48,16 +48,18 @@ if python3 -c "import sys; sys.exit(0 if sys.hexversion < 0x030600f0 else 1)"; t
     echo "ERROR: required python3 >= 3.6.0 not found"
     exit 1
   fi
-  for f in `find .. -name "*.py" -print`
-  do
-    echo "Patching \"$f\""
-    # gentle reminder: the '-' strips leading tabs, not generic whitespace.
-    ed $f <<-EOF
+  if [[ ! -f ../.opencpi-patched ]]; then
+    for f in `find .. -name "*.py" -print`
+    do
+      echo "Patching \"$f\""
+      # gentle reminder: the '-' strips leading tabs, not generic whitespace.
+      ed $f <<-EOF
 	1s/python3/python3\.6
 	w
 	q
 	EOF
-  done
+    done
+  fi
 fi
 
 #
@@ -68,7 +70,8 @@ fi
 # as a path prefix: need to "cd" up one level before patching.
 #
 cd ..
-patch -p1 <<'EOF'
+if [[ ! -f .opencpi-patched ]]; then
+  patch -p1 <<'EOF'
 --- a/asciidoc3.py	2020-12-30 15:57:23.000000000 -0600
 +++ b/asciidoc3.py	2022-02-14 13:50:50.567618983 -0600
 @@ -5286,7 +5286,7 @@
@@ -81,6 +84,13 @@ patch -p1 <<'EOF'
                             MIN_PYTHON_VERSION)
              sys.exit(1)
 EOF
+fi
+
+#
+# All patches applied.  Leave a flag so we do
+# not try to apply them again on a rebuild.
+#
+touch .opencpi-patched
 
 cd ..
 

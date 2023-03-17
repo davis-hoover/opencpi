@@ -23,7 +23,7 @@
 # Ensure exports and python
 source ./scripts/init-opencpi.sh
 # Ensure CDK and TOOL variables
-source ./cdk/opencpi-setup.sh -r
+source ./cdk/opencpi-setup.sh -e
 
 while (( "$#" )); do
   case "$1" in
@@ -155,5 +155,5 @@ echo "OpenCPI has been built for $OCPI_TARGET_DIR"
 if [ -n "$minimal" ]; then
     echo Since a minimal build was specified, only the framework and RCC components in these projects have been built: $Projects
 else
-    echo "The framework has been built along with software components, examples for these projects: $projects"
+    echo "The framework has been built along with software components, examples for these projects: $Projects"
 fi

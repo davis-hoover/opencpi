@@ -28,7 +28,7 @@
 # 1: dynamic suffix (including period)
 # 2: ocpi_dynamic (0 or 1)
 # 3: platform target string
-# 4: host platform
+# 4: host platform tool directory
 # 5: plugins
 # 6: swigs
 # 7: prereqs
@@ -57,13 +57,13 @@ is_mac=$(uname -s | grep Darwin)
 dynsuff=$1
 dynamic=$2
 target=$3
-host=$4
+tooldir=$4
 plugins=$5
 swigs=$6
 prereqs=$7
 prereq_inst=$8
 case $prereq_inst in /*);;*)prereq_inst=$(cd ../$prereq_inst; pwd);; esac
-PATCHELF=$prereq_inst/patchelf/$host/bin/patchelf
+PATCHELF=$prereq_inst/patchelf/$tooldir/bin/patchelf
 
 # arg 1: driver file, arg 2: prereqs, arg3: dynamic suffix
 function fix_static_driver {

@@ -783,7 +783,7 @@ namespace OCPI {
 	assert(artifact);
 	Artifact &art = static_cast<Artifact&>(*artifact);
 
-	uint32_t nq = static_cast<Container&>(container()).device().nextQOrd();
+	uint32_t nq = parent().device().nextQOrd();
 
 	return art.createWorker(*this, appInstName, impl, inst, slaves, hasMaster, member,
 				crewSize, params, nq);
