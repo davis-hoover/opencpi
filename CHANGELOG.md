@@ -1,3 +1,28 @@
+# [v2.4.5](https://gitlab.com/opencpi/opencpi/-/compare/v2.4.4...v2.4.5) (2023-03-16)
+
+Changes/additions since [OpenCPI Release v2.4.4](https://gitlab.com/opencpi/opencpi/-/releases/v2.4.4)
+
+### New Features
+- **tools**: add target for the z3u to hdl-targets.xml. (!1070)(52832bb4)
+- **tools**: add xilinx18_3_aarch64 rcc platform. (!1070)(52832bb4)
+
+### Enhancements
+- **devops**: use env var in CI config for setting license file server. (!1071)(bc4ce570)
+- **doc,tools**: allow `:spelling:ignore` role in `ocpidoc`. (!1060)(55bafe4f)
+- **runtime,tests,tools**: add optimized framework build capability. (!1075)(4d44069d)
+
+### Bug Fixes
+- **devops**: fix COMP projects pulling incorrect image tags for release and develop CI/CD pipelines. (!1064)(eb5af875)
+- **doc,tools**: add `format-change` to list of handled tracked change types. (!1066)(21d106fc)
+- **tests**: fix statistical comparison method in `ocpi_testing`. (!1073)(316e2802)
+- **tools**: fix pip3 module version specs in `ocpidoc.sh`. (!1048)(d6ca94cf)
+- **runtime,tests,tools**: fixes for optimized builds of RCC platforms. (!1075)(4d44069d)
+- **tools**: ocpiadmin: fix variable name error in `getvars()` function. (!1075)(4d44069d)
+
+### Miscellaneous
+- **devops,tools**: disable processing of releases older than v2.3 by `build-pages.py --all`. (!1063)(7551c3a1)
+- **devops,tools**: add N3xx OSP to doc processing/publishing machinery. (!1078)(2913475a)
+
 # [v2.4.4](https://gitlab.com/opencpi/opencpi/-/compare/v2.4.3...v2.4.4) (2023-01-22)
 
 Changes/additions since [OpenCPI Release v2.4.3](https://gitlab.com/opencpi/opencpi/-/releases/v2.4.3)
