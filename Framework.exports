@@ -80,6 +80,11 @@
 +tools/ocpidoc/test <target>/lib/ocpidoc/
 +tools/ocpidoc/xml_tools <target>/lib/ocpidoc/
 +tools/ocpidoc/ocpidoc.sh <target>/bin/ocpidoc
++tools/ocpilint/doc <target>/lib/ocpilint/
++tools/ocpilint/ocpi_linter <target>/lib/ocpilint/
++tools/ocpilint/ocpilint.py <target>/lib/ocpilint/
++tools/ocpilint/ocpilint-cfg.yml <target>/lib/ocpilint/
++tools/ocpilint/ocpilint.sh <target>/bin/ocpilint
 +tools/ocpi_protocol_view/ocpi_protocol_view.py <target>/bin/ocpi_protocol_view
 # generic make scripts
 +tools/include/show.mk include/

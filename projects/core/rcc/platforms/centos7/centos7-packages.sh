@@ -87,6 +87,8 @@ PKGS_D+=(docbook-style-xsl)
 PKGS_D+=(enchant)
 #    for xilinx tool installation script
 PKGS_D+=(expect)
+#    for ocpilint
+PKGS_D+=(emacs clang)
 
 ##########################################################################################
 # S. yum-installed and but not rpm-required - conveniences or required for source environment
@@ -139,6 +141,8 @@ PKGS_E+=(chrpath diffstat texinfo)
 PKGS_E+=(python36-PyYAML)
 #    Needed to build pillow >= 8.4.0 dependency for matplotlib
 PKGS_E+=(libjpeg-turbo-devel)
+#    Needed to build ocpilint
+PKGS_E+=(cppcheck)
 
 ##########################################################################################
 # P. python3 packages that must be installed using pip3, which we have available
