@@ -35,7 +35,7 @@ OCPI_RFDC_VERSION=xilinx_v2021.1
     exit 1
 source $OCPI_CDK_DIR/scripts/setup-prerequisite.sh \
        "$1" \
-       sysfsutils \
+       sysfs \
        "sysfs" \
        https://github.com/Distrotech/sysfsutils.git \
        $MASTER_BRANCH_AS_OF_NOW \
