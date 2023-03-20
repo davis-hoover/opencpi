@@ -8,6 +8,7 @@
 
 #include "drc_rfdc-worker.hh"
 
+#include <stdexcept>
 #include "RFDCDRC.hh"
 
 using namespace OCPI::RCC; // for easy access to RCC data types and constants
