@@ -36,7 +36,7 @@ def _set_env():
     environ['CI_OCPI_HOSTS'] = 'centos7'
     environ['CI_OCPI_HOST'] = 'centos7'
     environ['CI_OCPI_PLATFORMS'] = '"zed:xilinx19_2_aarch32,xsim"'
-    environ['CI_OCPI_PLATFORM'] = 'plutosdr'
+    environ['CI_OCPI_PLATFORM'] = 'picozed_30_cc'
     environ['CI_OCPI_OTHER_PLATFORM'] = 'xilinx19_2_aarch32'
     environ['CI_OCPI_PROJECTS'] = ''
     environ['CI_OCPI_ROOT_PIPELINE_ID'] = '123456789'
@@ -51,7 +51,7 @@ def _set_env():
     # environ['CI_COMMIT_TAG'] = 'v2.4.0'
     environ['CI_COMMIT_REF_NAME'] = 'develop'
     environ['CI_OCPI_REF_NAME'] = 'develop'
-    environ['CI_PROJECT_NAME'] = 'ocpi.osp.plutosdr'
+    environ['CI_PROJECT_NAME'] = 'ocpi.osp.avnet'
     environ['CI_PROJECT_NAMESPACE'] = 'opencpi/osp'
     environ['CI_REGISTRY_IMAGE'] = 'dummy-gitlab-registry'
 
@@ -400,7 +400,7 @@ def _get_platforms(do_ocpishow=True, do_model_split=True) -> List[str]:
                 platforms_path = Path(project_path, model, 'platforms')
                 project_platforms = [platform.name for platform 
                                     in platforms_path.glob('*') 
-                                    if platform.is_dir()]
+                                    if platform.is_dir() and platform.name != 'include']
                 platforms[model] += project_platforms
     if not do_model_split:
         platforms = platforms['rcc'] + platforms['hdl']
