@@ -10,6 +10,10 @@ Digital Radio Controller for the Xilinx RF Data Converter
 
 Detail
 ------
+The top-down architecture of the RF Data Converter Architecture using the Digital Radio Controller (DRC) control interface is shown below.
+
+.. figure:: drc_rfdc_architecture.svg
+
 .. ocpi_documentation_worker::
 
 RFDC DRC Mapping

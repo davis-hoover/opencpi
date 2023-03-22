@@ -50,10 +50,7 @@ autoreconf -f -i
 make
 make install
 SYSFS_INCLUDE_DIR=$OcpiInstallDir/include
-echo OcpiInstallDir=$OcpiInstallDir
-echo ls OcpiInstallDir
-tree $OcpiInstallDir
-echo ls OcpiInstallDir
+OPENCPI_LIBMETAL_SYSTEM_DIR=$OcpiThisPrerequisiteDir/opencpi
 source $OCPI_CDK_DIR/scripts/setup-prerequisite.sh \
        "$1" \
        rfdc \
@@ -62,28 +59,28 @@ source $OCPI_CDK_DIR/scripts/setup-prerequisite.sh \
        $OCPI_RFDC_VERSION \
        embeddedsw \
        1
-pushd ../ThirdParty/sw_services/libmetal/src/libmetal
-# -p needed for subsequent builds
+BUILD_DIR=../ThirdParty/sw_services/libmetal/src/libmetal
+ln -fs $OPENCPI_LIBMETAL_SYSTEM_DIR $BUILD_DIR/lib/system/opencpi
+pushd $BUILD_DIR
+# -p needed for builds of subsequent rcc platforms
 mkdir -p build_libm
 pushd build_libm
 TOOLCHAIN=../cmake/platforms/toolchain.cmake
-TMP_INCL=lib/include/metal
-if [ -z $OcpiCrossHost ]; then
-  cmake .. -DCMAKE_INCLUDE_PATH=$SYSFS_INCLUDE_DIR
-else
+TMP_INC=lib/include/metal
+echo "set (CMAKE_SYSTEM_NAME \"Opencpi\" CACHE STRING \"\")" > $TOOLCHAIN
+if [ ! -z $OcpiCrossHost ]; then
   echo "set (CMAKE_SYSTEM_PROCESSOR \"arm\" CACHE STRING \"\")
-  set (MACHINE \"zynqmp_a53\")
-  set (CROSS_PREFIX \"$OcpiCrossHost\" CACHE STRING \"\")
-  set (CMAKE_C_FLAGS \"-O2 -c -g -Wall -Wextra -I$TMP_INCL\" CACHE STRING \"\")
-  set (CMAKE_SYSTEM_NAME \"Generic\" CACHE STRING \"\")
-  include (CMakeForceCompiler)
-  CMAKE_FORCE_C_COMPILER (\"\${CROSS_PREFIX}gcc\" GNU)
-  CMAKE_FORCE_CXX_COMPILER (\"\${CROSS_PREFIX}g++\" GNU)
-  set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER CACHE STRING \"\")
-  set (CMAKE_FIND_ROOT_PATH_MODE_LIBRARY NEVER CACHE STRING \"\")
-  set (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE NEVER CACHE STRING \"\")" > $TOOLCHAIN
-  cmake .. -DCMAKE_INCLUDE_PATH=$SYSFS_INCLUDE_DIR -DCMAKE_TOOLCHAIN_FILE=$TOOLCHAIN
+set (MACHINE \"zynqmp_a53\")
+set (CROSS_PREFIX \"$OcpiCrossHost\" CACHE STRING \"\")
+set (CMAKE_C_FLAGS \"-O2 -c -g -Wall -Wextra -I$TMP_INC\" CACHE STRING \"\")
+include (CMakeForceCompiler)
+CMAKE_FORCE_C_COMPILER (\"\${CROSS_PREFIX}gcc\" GNU)
+CMAKE_FORCE_CXX_COMPILER (\"\${CROSS_PREFIX}g++\" GNU)
+set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER CACHE STRING \"\")
+set (CMAKE_FIND_ROOT_PATH_MODE_LIBRARY NEVER CACHE STRING \"\")
+set (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE NEVER CACHE STRING \"\")" > $TOOLCHAIN
 fi
+cmake .. -DCMAKE_INCLUDE_PATH=$SYSFS_INCLUDE_DIR -DCMAKE_TOOLCHAIN_FILE=$TOOLCHAIN
 popd
 popd
 cp ../XilinxProcessorIPLib/drivers/rfdc/src/* .
@@ -106,9 +103,9 @@ dir=$OcpiInstallDir/include/metal
 mkdir -p $dir
 make_include_links $dir $METAL_INC_DIR/metal "${INCS[@]}"
 INCS=(alloc assert cache condition io irq log mutex sleep sys)
-dir=$OcpiInstallDir/include/metal/system/linux
+dir=$OcpiInstallDir/include/metal/system/opencpi
 mkdir -p $dir
-make_include_links $dir $METAL_INC_DIR/metal/system/linux "${INCS[@]}"
+make_include_links $dir $METAL_INC_DIR/metal/system/opencpi "${INCS[@]}"
 INCS=(atomic compiler)
 dir=$OcpiInstallDir/include/metal/compiler/gcc
 mkdir -p $dir

@@ -22,42 +22,48 @@ package rfdc_pkg is
 
 component rfdc is
   port(
-    -- WCI / raw props
-    raw_props_clk   : in  std_logic;
-    raw_props_reset : in  std_logic;
-    raw_props_in    : in  ocpi.wci.raw_in_t;
-    raw_props_out   : out ocpi.wci.raw_out_t;
+    -- rfdc AXI-Lite
+    rfdc_clk         : in  std_logic;
+    rfdc_reset       : in  std_logic;
+    rfdc_axi_in      : in  axi_s2m_t;
+    rfdc_axi_out     : out axi_m2s_t;
+    -- rfdc_adc AXI-Lite
+    rfdc_adc_axi_in  : in  axi_s2m_t;
+    rfdc_adc_axi_out : out axi_m2s_t;
+    -- rfdc_dac AXI-Lite
+    rfdc_dac_axi_in  : in  axi_s2m_t;
+    rfdc_dac_axi_out : out axi_m2s_t;
     -- RX path clock inputs
-    rx_clks_p       : in  std_logic_vector(2-1 downto 0);
-    rx_clks_n       : in  std_logic_vector(2-1 downto 0);
+    rx_clks_p        : in  std_logic_vector(2-1 downto 0);
+    rx_clks_n        : in  std_logic_vector(2-1 downto 0);
     -- TX path clock inputs
-    tx_clks_p       : in  std_logic_vector(1-1 downto 0);
-    tx_clks_n       : in  std_logic_vector(1-1 downto 0);
+    tx_clks_p        : in  std_logic_vector(1-1 downto 0);
+    tx_clks_n        : in  std_logic_vector(1-1 downto 0);
     -- sysref clock input pair
-    sysref_p        : in  std_logic;
-    sysref_n        : in  std_logic;
+    sysref_p         : in  std_logic;
+    sysref_n         : in  std_logic;
     -- RF inputs
-    rf_rx_p         : in  std_logic_vector(2-1 downto 0);
-    rf_rx_n         : in  std_logic_vector(2-1 downto 0);
-    rf_tx_p         : out std_logic_vector(4-1 downto 0);
-    rf_tx_n         : out std_logic_vector(4-1 downto 0);
+    rf_rxs_p         : in  std_logic_vector(2-1 downto 0);
+    rf_rxs_n         : in  std_logic_vector(2-1 downto 0);
+    rf_txs_p         : out std_logic_vector(4-1 downto 0);
+    rf_txs_n         : out std_logic_vector(4-1 downto 0);
     -- AXI-Stream ports for complex TX paths, TDATA is Q [31:16], I [15:0]
-    tx_aclk         : out std_logic_vector(1-1 downto 0); -- associated with all s_axis
-    s_axis_0_tdata  : in  std_logic_vector(32-1 downto 0);
-    s_axis_0_tvalid : in  std_logic;
-    s_axis_0_tready : out std_logic;
-    s_axis_1_tdata  : in  std_logic_vector(32-1 downto 0);
-    s_axis_1_tvalid : in  std_logic;
-    s_axis_1_tready : out std_logic;
+    tx_aclks         : out std_logic_vector(1-1 downto 0); -- associated with all s_axis
+    s_axis_0_tdata   : in  std_logic_vector(32-1 downto 0);
+    s_axis_0_tvalid  : in  std_logic;
+    s_axis_0_tready  : out std_logic;
+    s_axis_1_tdata   : in  std_logic_vector(32-1 downto 0);
+    s_axis_1_tvalid  : in  std_logic;
+    s_axis_1_tready  : out std_logic;
     -- AXI-Stream ports for complex RX paths, TDATA is Q [31:16], I [15:0]
-    rx_aclk         : out std_logic_vector(2-1 downto 0); -- associated with all m_axis
-    rx_areset       : out std_logic_vector(2-1 downto 0); -- active-high, associated with all m_axis
-    m_axis_0_tdata  : out std_logic_vector(32-1 downto 0);
-    m_axis_0_tvalid : out std_logic;
-    m_axis_0_tready : in  std_logic;
-    m_axis_1_tdata  : out std_logic_vector(32-1 downto 0);
-    m_axis_1_tvalid : out std_logic;
-    m_axis_1_tready : in  std_logic);
+    rx_aclks         : out std_logic_vector(2-1 downto 0); -- associated with all m_axis
+    rx_aresets       : out std_logic_vector(2-1 downto 0); -- active-high, associated with all m_axis
+    m_axis_0_tdata   : out std_logic_vector(32-1 downto 0);
+    m_axis_0_tvalid  : out std_logic;
+    m_axis_0_tready  : in  std_logic;
+    m_axis_1_tdata   : out std_logic_vector(32-1 downto 0);
+    m_axis_1_tvalid  : out std_logic;
+    m_axis_1_tready  : in  std_logic);
 end component rfdc;
 
 end package rfdc_pkg;
