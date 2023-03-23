@@ -149,6 +149,16 @@ class HdlApplicationAssembly(HdlAssembly, ReportableAsset):
                     container_impl_dict["base"][cname] = plat_obj
 
         return container_impl_dict
+    
+    def clean(self):
+        """
+        Override the super method to fix directory and make_type
+        attributes before calling super method. This is a hotfix for 
+        v2.4 and is unnecessary in v2.5. 
+        """
+        self.directory = str(Path(self.directory, self.name))
+        self.make_type = 'hdl-assemblies'
+        super().clean()
 
     def init_containers(self, platforms):
         """
