@@ -1,9 +1,14 @@
-<hdldevice language='vhdl' spec='rfdc' firstrawproperty='regs' version='2' libraries='protocol rfdc'>
+<hdldevice language='vhdl' spec='rfdc' firstrawproperty='regs' version='2'
+    libraries='axi protocol rfdc'>
   <!-- AXI4-Lite Address Range 0x0000 - 0x03FFF (14 bits of address) -->
   <!-- ref https://docs.xilinx.com/api/khub/maps/w8uumt6t1ussnarj7mwalq/attachments/u_ptvwnpz53cssexydzeua/content?ft-calling-app=ft%2fturnkey-portal&ft-calling-app-version=4.1.11&filename=pg269-rf-data-converter-en-us-2.6.pdf#unique_8 -->
-  <property name='regs' type='ulong' arraylength='16384' writable='1' volatile='1' default='0'
-      description='Xilinx RF Data Converter IP Common Control and Status registers'/>
+  <property name='regs' type='ulong' arraylength='16384' writable='1'
+      volatile='1' default='0'
+      description='Xilinx RF Data Converter IP Common Control and Status
+      registers'/>
   <rawprop name='rawprops' master='true'/>
-  <devsignal name='rfdc_adc' signals='rfdc_to_adc_signals.xml' master='true'/>
-  <devsignal name='rfdc_dac' signals='rfdc_to_dac_signals.xml' master='true'/>
+  <devsignal name='rfdc_adc' signals='rfdc_to_adc_signals.xml' master='true'
+      optional='false'/>
+  <devsignal name='rfdc_dac' signals='rfdc_to_dac_signals.xml' master='true'
+      optional='false'/>
 </hdldevice>

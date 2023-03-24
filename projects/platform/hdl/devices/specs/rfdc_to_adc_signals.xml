@@ -1,31 +1,29 @@
 <signals>
-  <signal name='axi_a_clk' direction='out'/>
-  <signal name='axi_a_resetn' direction='out'/>
-  <signal name='axi_aw_addr' direction='out'/>
-  <signal name='axi_aw_valid' direction='out'/>
-  <signal name='axi_aw_prot' direction='out'/>
-  <signal name='axi_aw_ready' direction='in'/>
-  <signal name='axi_ar_addr' direction='out'/>
-  <signal name='axi_ar_valid' direction='out'/>
-  <signal name='axi_ar_prot' direction='out'/>
-  <signal name='axi_ar_ready' direction='in'/>
-  <signal name='axi_w_data' direction='out'/>
-  <signal name='axi_w_strb' direction='out'/>
-  <signal name='axi_w_valid' direction='out'/>
-  <signal name='axi_w_ready' direction='in'/>
-  <signal name='axi_r_data' direction='in'/>
-  <signal name='axi_r_resp' direction='in'/>
-  <signal name='axi_r_valid' direction='in'/>
-  <signal name='axi_r_ready' direction='out'/>
-  <signal name='axi_b_resp' direction='in'/>
-  <signal name='axi_b_valid' direction='in'/>
-  <signal name='axi_b_ready' direction='out'/>
-  <signal name='rx_clks_p' direction='out' width='2'/>
-  <signal name='rx_clks_n' direction='out' width='2'/>
-  <signal name='rf_rx_p' direction='out' width='2'/>
-  <signal name='rf_rx_n' direction='out' width='2'/>
-  <signal name='rx_aclks' direction='out' width='2'/>
-  <signal name='rx_aresets' direction='out' width='2'/>
+  <signal name='axi_aw_addr' direction='in' width='32'/>
+  <signal name='axi_aw_valid' direction='in'/>
+  <signal name='axi_aw_prot' direction='in' width='3'/>
+  <signal name='axi_aw_ready' direction='out'/>
+  <signal name='axi_ar_addr' direction='in' width='32'/>
+  <signal name='axi_ar_valid' direction='in'/>
+  <signal name='axi_ar_prot' direction='in' width='3'/>
+  <signal name='axi_ar_ready' direction='out'/>
+  <signal name='axi_w_data' direction='in' width='32'/>
+  <signal name='axi_w_strb' direction='in' width='4'/>
+  <signal name='axi_w_valid' direction='in'/>
+  <signal name='axi_w_ready' direction='out'/>
+  <signal name='axi_r_data' direction='out' width='32'/>
+  <signal name='axi_r_resp' direction='out' width='2'/>
+  <signal name='axi_r_valid' direction='out'/>
+  <signal name='axi_r_ready' direction='in'/>
+  <signal name='axi_b_resp' direction='out' width='2'/>
+  <signal name='axi_b_valid' direction='out'/>
+  <signal name='axi_b_ready' direction='in'/>
+  <signal name='clks_p' direction='in' width='2'/>
+  <signal name='clks_n' direction='in' width='2'/>
+  <signal name='rfs_p' direction='in' width='2'/>
+  <signal name='rfs_n' direction='in' width='2'/>
+  <signal name='aclks' direction='out' width='2'/>
+  <signal name='aresets' direction='out' width='2'/>
   <signal name='m_axis_0_tdata' direction='out' width='32'/>
   <signal name='m_axis_0_tvalid' direction='out'/>
   <signal name='m_axis_0_tready' direction='in'/>

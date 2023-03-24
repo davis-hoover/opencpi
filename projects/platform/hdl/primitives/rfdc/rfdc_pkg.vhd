@@ -17,22 +17,20 @@
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
-library ocpi;
+library axi, ocpi;
 package rfdc_pkg is
 
 component rfdc is
   port(
     -- rfdc AXI-Lite
-    rfdc_clk         : in  std_logic;
-    rfdc_reset       : in  std_logic;
-    rfdc_axi_in      : in  axi_s2m_t;
-    rfdc_axi_out     : out axi_m2s_t;
+    rfdc_axi_in      : in  axi.lite32.axi_m2s_t;
+    rfdc_axi_out     : out axi.lite32.axi_s2m_t;
     -- rfdc_adc AXI-Lite
-    rfdc_adc_axi_in  : in  axi_s2m_t;
-    rfdc_adc_axi_out : out axi_m2s_t;
+    rfdc_adc_axi_in  : in  axi.lite32.axi_m2s_t;
+    rfdc_adc_axi_out : out axi.lite32.axi_s2m_t;
     -- rfdc_dac AXI-Lite
-    rfdc_dac_axi_in  : in  axi_s2m_t;
-    rfdc_dac_axi_out : out axi_m2s_t;
+    rfdc_dac_axi_in  : in  axi.lite32.axi_m2s_t;
+    rfdc_dac_axi_out : out axi.lite32.axi_s2m_t;
     -- RX path clock inputs
     rx_clks_p        : in  std_logic_vector(2-1 downto 0);
     rx_clks_n        : in  std_logic_vector(2-1 downto 0);
@@ -65,5 +63,17 @@ component rfdc is
     m_axis_1_tvalid  : out std_logic;
     m_axis_1_tready  : in  std_logic);
 end component rfdc;
+
+component axi_interconnect is
+  port(
+    rfdc_axi_in      : in  axi.lite32.axi_m2s_t;
+    rfdc_axi_out     : out axi.lite32.axi_s2m_t;
+    rfdc_adc_axi_in  : in  axi.lite32.axi_m2s_t;
+    rfdc_adc_axi_out : out axi.lite32.axi_s2m_t;
+    rfdc_dac_axi_in  : in  axi.lite32.axi_m2s_t;
+    rfdc_dac_axi_out : out axi.lite32.axi_s2m_t;
+    axi_in           : in  axi.lite32.axi_s2m_t;
+    axi_out          : out axi.lite32.axi_m2s_t);
+end component axi_interconnect;
 
 end package rfdc_pkg;

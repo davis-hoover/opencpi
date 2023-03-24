@@ -33,5 +33,5 @@ ifeq ($(filter clean%,$(MAKECMDGOALS))$(if $(HdlTargets),,z),)  # if not cleanin
       rm -r -f tmp,MyError),\
       $(error $(MyError)))
 endif # if not cleaning
-SourceFiles=rfdc_pkg.vhd rfdc.vhd $(wildcard gen/*.edf)
+SourceFiles=rfdc_pkg.vhd axi_interconnect.vhd rfdc.vhd $(wildcard gen/*.edf)
 include $(OCPI_CDK_DIR)/include/hdl/hdl-library.mk

@@ -20,9 +20,22 @@
 
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
-library protocol; use protocol.iqstream.all;
+library axi, protocol; use protocol.iqstream.all;
 architecture structural of worker is
   -- ctl clk domain
+  signal ctl_axi_converter_to_rfdc_in : axi.lite32.axi_m2s_t := (
+      a => (CLK => '0', RESETn => '0'),
+      aw => (ADDR => (others => '0'), VALID => '0', PROT => (others => '0')),
+      ar => (ADDR => (others => '0'), VALID => '0', PROT => (others => '0')),
+      w => (DATA => (others => '0'), STRB => (others => '0'), VALID => '0'),
+      r => (READY => '0'),
+      b => (READY => '0'));
+  signal ctl_axi_converter_to_rfdc_out : axi.lite32.axi_s2m_t := (
+      aw => (READY => '0'),
+      ar => (READY => '0'),
+      w => (READY => '0'),
+      r => (DATA => (others => '0'), RESP => (others => '0'), VALID => '0'),
+      b => (RESP => (others => '0'), VALID => '0'));
   signal ctl_0_demarshaller_to_ctl_tx_0_converter_pro : protocol_t
                                                       := PROTOCOL_ZERO;
   signal ctl_0_demarshaller_to_ctl_tx_0_converter_rdy : std_logic := '0';
@@ -39,36 +52,34 @@ architecture structural of worker is
   signal ctl_tx_1_converter_to_tx_1_cdc_tready        : std_logic := '0';
 begin
 
-  axi_converter : axi.lite32.raw2axi_lite32
+  ctl_axi_converter : axi.lite32.raw2axi_lite32
     port map(
       clk     => ctl_in.clk,
       reset   => ctl_in.reset,
       raw_in  => props_in.raw,
       raw_out => props_out.raw,
-      axi_in  => axi_in,
-      axi_out => axi_out);
+      axi_in  => ctl_axi_converter_to_rfdc_out,
+      axi_out => ctl_axi_converter_to_rfdc_in);
 
-  rfdc.axi_a_clk    <= axi_out.a.clk;
-  rfdc.axi_a_resetn <= axi_out.a.resetn;
-  rfdc.axi_aw_addr  <= axi_out.aw.addr;
-  rfdc.axi_aw_valid <= axi_out.aw.valid;
-  rfdc.axi_aw_prot  <= axi_out.aw.prot;
-  rfdc.axi_aw_ready <= axi_in.aw.ready;
-  rfdc.axi_ar_addr  <= axi_out.aw.addr;
-  rfdc.axi_ar_valid <= axi_out.aw.valid;
-  rfdc.axi_ar_prot  <= axi_out.aw.prot;
-  rfdc.axi_ar_ready <= axi_in.ar.ready;
-  rfdc.axi_w_data   <= axi_out.w.data;
-  rfdc.axi_w_strb   <= axi_out.w.strb;
-  rfdc.axi_w_valid  <= axi_out.w.valid;
-  rfdc.axi_w_ready  <= axi_in.w.ready;
-  rfdc.axi_r_data   <= axi_in.r.data;
-  rfdc.axi_r_resp   <= axi_in.r.resp;
-  rfdc.axi_r_valid  <= axi_in.r.valid;
-  rfdc.axi_r_ready  <= axi_out.r.ready;
-  rfdc.axi_b_resp   <= axi_in.b.resp;
-  rfdc.axi_b_valid  <= axi_in.b.valid;
-  rfdc.axi_b_ready  <= axi_out.b.ready;
+  rfdc_out.axi_aw_addr  <= ctl_axi_converter_to_rfdc_in.aw.addr;
+  rfdc_out.axi_aw_valid <= ctl_axi_converter_to_rfdc_in.aw.valid;
+  rfdc_out.axi_aw_prot  <= ctl_axi_converter_to_rfdc_in.aw.prot;
+  ctl_axi_converter_to_rfdc_out.aw.ready <= rfdc_in.axi_aw_ready;
+  rfdc_out.axi_ar_addr  <= ctl_axi_converter_to_rfdc_in.ar.addr;
+  rfdc_out.axi_ar_valid <= ctl_axi_converter_to_rfdc_in.ar.valid;
+  rfdc_out.axi_ar_prot  <= ctl_axi_converter_to_rfdc_in.ar.prot;
+  ctl_axi_converter_to_rfdc_out.ar.ready <= rfdc_in.axi_ar_ready;
+  rfdc_out.axi_w_data   <= ctl_axi_converter_to_rfdc_in.w.data;
+  rfdc_out.axi_w_strb   <= ctl_axi_converter_to_rfdc_in.w.strb;
+  rfdc_out.axi_w_valid  <= ctl_axi_converter_to_rfdc_in.w.valid;
+  ctl_axi_converter_to_rfdc_out.w.ready  <= rfdc_in.axi_w_ready;
+  ctl_axi_converter_to_rfdc_out.r.data   <= rfdc_in.axi_r_data;
+  ctl_axi_converter_to_rfdc_out.r.resp   <= rfdc_in.axi_r_resp;
+  ctl_axi_converter_to_rfdc_out.r.valid  <= rfdc_in.axi_r_valid;
+  rfdc_out.axi_r_ready  <= ctl_axi_converter_to_rfdc_in.r.ready;
+  ctl_axi_converter_to_rfdc_out.b.resp   <= rfdc_in.axi_b_resp;
+  ctl_axi_converter_to_rfdc_out.b.valid  <= rfdc_in.axi_b_valid;
+  rfdc_out.axi_b_ready  <= ctl_axi_converter_to_rfdc_in.b.ready;
 
   ctl_0_demarshaller : iqstream_demarshaller
     generic map(
@@ -97,17 +108,17 @@ begin
 
   tx_0_cdc : cdc.cdc.fifo
     generic map(
-      WIDTH       => out0_out.data'length)
+      WIDTH       => in0_in.data'length)
     port map(
       src_CLK     => ctl_in.clk,
       src_RST     => ctl_in.reset,
       src_ENQ     => ctl_tx_0_converter_to_tx_0_cdc_tvalid,
       src_in      => ctl_tx_0_converter_to_tx_0_cdc_tdata,
       src_FULL_N  => ctl_tx_0_converter_to_tx_0_cdc_tready,
-      dst_CLK     => rfdc.tx_aclks(0),
-      dst_DEQ     => rfdc.s_axis_0_tready,
-      dst_out     => rfdc.s_axis_0_tdata,
-      dst_EMPTY_N => rfdc.s_axis_0_tvalid);
+      dst_CLK     => rfdc_in.aclks(0),
+      dst_DEQ     => rfdc_in.s_axis_0_tready,
+      dst_out     => rfdc_out.s_axis_0_tdata,
+      dst_EMPTY_N => rfdc_out.s_axis_0_tvalid);
 
   ctl_1_demarshaller : iqstream_demarshaller
     generic map(
@@ -136,16 +147,16 @@ begin
 
   tx_1_cdc : cdc.cdc.fifo
     generic map(
-      WIDTH       => out1_out.data'length)
+      WIDTH       => in1_in.data'length)
     port map(
       src_CLK     => ctl_in.clk,
       src_RST     => ctl_in.reset,
       src_ENQ     => ctl_tx_1_converter_to_tx_1_cdc_tvalid,
       src_in      => ctl_tx_1_converter_to_tx_1_cdc_tdata,
       src_FULL_N  => ctl_tx_1_converter_to_tx_1_cdc_tready,
-      dst_CLK     => rfdc.tx_aclks(0),
-      dst_DEQ     => rfdc.s_axis_1_tready,
-      dst_out     => rfdc.s_axis_1_tdata,
-      dst_EMPTY_N => rfdc.s_axis_1_tvalid);
+      dst_CLK     => rfdc_in.aclks(0),
+      dst_DEQ     => rfdc_in.s_axis_1_tready,
+      dst_out     => rfdc_out.s_axis_1_tdata,
+      dst_EMPTY_N => rfdc_out.s_axis_1_tvalid);
 
 end structural;

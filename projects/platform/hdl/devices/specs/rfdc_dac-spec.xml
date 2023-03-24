@@ -4,6 +4,8 @@
        devs change their mind on what standardized protocols these should
        connect to, they can write an adapter worker for it... (DO *NOT* COPY
        THIS WORKER JUST TO CHANGE ITS PROTOCOLS) -->
-  <port name='in0' producer='false' protocol='iqstream_protocol' optional='true'/>
-  <port name='in1' producer='false' protocol='iqstream_protocol' optional='true'/>
+  <port name='in0' producer='false' protocol='iqstream_protocol'
+      optional='true'/>
+  <port name='in1' producer='false' protocol='iqstream_protocol'
+      optional='true'/>
 </componentspec>
