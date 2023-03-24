@@ -23,11 +23,15 @@ library ocpi_core_bsv; use ocpi_core_bsv.all;
 
 entity rfdc is
   port(
-    -- WCI / raw props
-    raw_props_clk   : in  std_logic;
-    raw_props_reset : in  std_logic;
-    raw_props_in    : in  ocpi.wci.raw_in_t;
-    raw_props_out   : out ocpi.wci.raw_out_t;
+    -- rfdc AXI-Lite
+    rfdc_axi_in      : in  axi.lite32.axi_m2s_t;
+    rfdc_axi_out     : out axi.lite32.axi_s2m_t;
+    -- rfdc_adc AXI-Lite
+    rfdc_adc_axi_in  : in  axi.lite32.axi_m2s_t;
+    rfdc_adc_axi_out : out axi.lite32.axi_s2m_t;
+    -- rfdc_dac AXI-Lite
+    rfdc_dac_axi_in  : in  axi.lite32.axi_m2s_t;
+    rfdc_dac_axi_out : out axi.lite32.axi_s2m_t;
     -- RX path clock inputs
     rx_clks_p       : in  std_logic_vector(2-1 downto 0);
     rx_clks_n       : in  std_logic_vector(2-1 downto 0);
@@ -38,12 +42,12 @@ entity rfdc is
     sysref_p        : in  std_logic;
     sysref_n        : in  std_logic;
     -- RF inputs
-    rf_rx_p         : in  std_logic_vector(2-1 downto 0);
-    rf_rx_n         : in  std_logic_vector(2-1 downto 0);
-    rf_tx_p         : out std_logic_vector(4-1 downto 0);
-    rf_tx_n         : out std_logic_vector(4-1 downto 0);
+    rf_rxs_p        : in  std_logic_vector(2-1 downto 0);
+    rf_rxs_n        : in  std_logic_vector(2-1 downto 0);
+    rf_txs_p        : out std_logic_vector(4-1 downto 0);
+    rf_txs_n        : out std_logic_vector(4-1 downto 0);
     -- AXI-Stream ports for complex TX paths, TDATA is Q [31:16], I [15:0]
-    tx_aclk         : out std_logic_vector(1-1 downto 0); -- associated with all s_axis
+    tx_aclks        : out std_logic_vector(1-1 downto 0); -- associated with all s_axis
     s_axis_0_tdata  : in  std_logic_vector(32-1 downto 0);
     s_axis_0_tvalid : in  std_logic;
     s_axis_0_tready : out std_logic;
@@ -51,8 +55,8 @@ entity rfdc is
     s_axis_1_tvalid : in  std_logic;
     s_axis_1_tready : out std_logic;
     -- AXI-Stream ports for complex RX paths, TDATA is Q [31:16], I [15:0]
-    rx_aclk         : out std_logic_vector(2-1 downto 0); -- associated with all m_axis
-    rx_areset       : out std_logic_vector(2-1 downto 0); -- active-high, associated with all m_axis
+    rx_aclks        : out std_logic_vector(2-1 downto 0); -- associated with all m_axis
+    rx_aresets      : out std_logic_vector(2-1 downto 0); -- active-high, associated with all m_axis
     m_axis_0_tdata  : out std_logic_vector(32-1 downto 0);
     m_axis_0_tvalid : out std_logic;
     m_axis_0_tready : in  std_logic;
@@ -61,6 +65,7 @@ entity rfdc is
     m_axis_1_tready : in  std_logic);
 end entity rfdc;
 architecture structural of rfdc is
+
   COMPONENT usp_rf_data_converter_0
     PORT (
       adc0_clk_p : IN STD_LOGIC;
@@ -142,19 +147,30 @@ architecture structural of rfdc is
     );
   END COMPONENT;
 
+  component axi_interconnect is
+    port(
+      rfdc_axi_in      : in  axi.lite32.axi_m2s_t;
+      rfdc_axi_out     : out axi.lite32.axi_s2m_t;
+      rfdc_adc_axi_in  : in  axi.lite32.axi_m2s_t;
+      rfdc_adc_axi_out : out axi.lite32.axi_s2m_t;
+      rfdc_dac_axi_in  : in  axi.lite32.axi_m2s_t;
+      rfdc_dac_axi_out : out axi.lite32.axi_s2m_t;
+      axi_in           : in  axi.lite32.axi_s2m_t;
+      axi_out          : out axi.lite32.axi_m2s_t);
+  end component axi_interconnect;
+
   constant FIFO_DEPTH : positive := 16;
   signal zeros_32 : std_logic_vector(32-1 downto 0)
                   := (others => '0');
   signal zero     : std_logic := '0';
   -- raw clk domain
-  signal raw_props_resetn : std_logic := '0';
-  signal axi_converter_to_xilinx_rfdc_ip_axi_in : axi.lite32.axi_s2m_t := (
+  signal interconnect_to_xilinx_rfdc_ip_axi_in : axi.lite32.axi_s2m_t := (
       aw => (READY => '0'),
       ar => (READY => '0'),
       w => (READY => '0'),
       r => (DATA => (others => '0'), RESP => (others => '0'), VALID => '0'),
       b => (RESP => (others => '0'), VALID => '0'));
-  signal axi_converter_to_xilinx_rfdc_ip_axi_out : axi.lite32.axi_m2s_t := (
+  signal interconnect_to_xilinx_rfdc_ip_axi_out : axi.lite32.axi_m2s_t := (
       a => (CLK => '0', RESETn => '0'),
       aw => (ADDR => (others => '0'), VALID => '0', PROT => (others => '0')),
       ar => (ADDR => (others => '0'), VALID => '0', PROT => (others => '0')),
@@ -199,26 +215,28 @@ architecture structural of rfdc is
   signal tx_0_resetn : std_logic := '0';
 begin
 
-  axi_converter : axi.lite32.raw2axi_lite32
+  interconnect : axi_interconnect
     port map(
-      clk     => raw_props_clk,
-      reset   => raw_props_reset,
-      raw_in  => raw_props_in,
-      raw_out => raw_props_out,
-      axi_in  => axi_converter_to_xilinx_rfdc_ip_axi_in,
-      axi_out => axi_converter_to_xilinx_rfdc_ip_axi_out);
+      rfdc_axi_in      => rfdc_axi_in,
+      rfdc_axi_out     => rfdc_axi_out,
+      rfdc_adc_axi_in  => rfdc_adc_axi_in,
+      rfdc_adc_axi_out => rfdc_adc_axi_out,
+      rfdc_dac_axi_in  => rfdc_dac_axi_in,
+      rfdc_dac_axi_out => rfdc_dac_axi_out,
+      axi_in           => interconnect_to_xilinx_rfdc_ip_axi_in,
+      axi_out          => interconnect_to_xilinx_rfdc_ip_axi_out);
 
-  tx_aclk(0)   <= tx_0_clk;
-  rx_aclk(0)   <= rx_0_clk;
-  rx_aclk(1)   <= rx_1_clk;
-  rx_areset(0) <= rx_0_reset;
-  rx_areset(1) <= rx_1_reset;
+  tx_aclks(0)   <= tx_0_clk;
+  rx_aclks(0)   <= rx_0_clk;
+  rx_aclks(1)   <= rx_1_clk;
+  rx_aresets(0) <= rx_0_reset;
+  rx_aresets(1) <= rx_1_reset;
 
   rx_0_reset_synchronizer : cdc.cdc.reset
     generic map(
       SRC_RST_VALUE => '0')
     port map(
-      src_rst   => raw_props_reset,
+      src_rst   => rfdc_axi_in.a.resetn,
       dst_clk   => rx_0_clk,
       dst_rst   => rx_0_reset,
       dst_rst_n => rx_0_resetn);
@@ -227,7 +245,7 @@ begin
     generic map(
       SRC_RST_VALUE => '0')
     port map(
-      src_rst   => raw_props_reset,
+      src_rst   => rfdc_axi_in.a.resetn,
       dst_clk   => rx_1_clk,
       dst_rst   => rx_1_reset,
       dst_rst_n => rx_1_resetn);
@@ -236,12 +254,10 @@ begin
     generic map(
       SRC_RST_VALUE => '0')
     port map(
-      src_rst   => raw_props_reset,
+      src_rst   => rfdc_axi_in.a.resetn,
       dst_clk   => tx_0_clk,
       dst_rst   => tx_0_reset,
       dst_rst_n => tx_0_resetn);
-
-  raw_props_resetn <= not raw_props_reset;
 
   xilinx_rfdc_ip : usp_rf_data_converter_0
     port map(
@@ -255,40 +271,40 @@ begin
       dac2_clk_n => tx_clks_n(0),
       clk_dac2 => tx_0_clk,
       clk_dac3 => open,
-      s_axi_aclk => raw_props_clk,
-      s_axi_aresetn => raw_props_resetn,
-      s_axi_awaddr  => axi_converter_to_xilinx_rfdc_ip_axi_out.aw.ADDR(18-1 downto 0),
-      s_axi_awvalid => axi_converter_to_xilinx_rfdc_ip_axi_out.aw.VALID,
-      s_axi_awready => axi_converter_to_xilinx_rfdc_ip_axi_in.aw.READY,
-      s_axi_wdata   => axi_converter_to_xilinx_rfdc_ip_axi_out.w.DATA,
-      s_axi_wstrb   => axi_converter_to_xilinx_rfdc_ip_axi_out.w.STRB,
-      s_axi_wvalid  => axi_converter_to_xilinx_rfdc_ip_axi_out.w.VALID,
-      s_axi_wready  => axi_converter_to_xilinx_rfdc_ip_axi_in.w.READY,
-      s_axi_bresp   => axi_converter_to_xilinx_rfdc_ip_axi_in.b.RESP,
-      s_axi_bvalid  => axi_converter_to_xilinx_rfdc_ip_axi_in.b.VALID,
-      s_axi_bready  => axi_converter_to_xilinx_rfdc_ip_axi_out.b.READY,
-      s_axi_araddr  => axi_converter_to_xilinx_rfdc_ip_axi_out.ar.ADDR(18-1 downto 0),
-      s_axi_arvalid => axi_converter_to_xilinx_rfdc_ip_axi_out.ar.VALID,
-      s_axi_arready => axi_converter_to_xilinx_rfdc_ip_axi_in.ar.READY,
-      s_axi_rdata   => axi_converter_to_xilinx_rfdc_ip_axi_in.r.DATA,
-      s_axi_rresp   => axi_converter_to_xilinx_rfdc_ip_axi_in.r.RESP,
-      s_axi_rvalid  => axi_converter_to_xilinx_rfdc_ip_axi_in.r.VALID,
-      s_axi_rready  => axi_converter_to_xilinx_rfdc_ip_axi_out.r.READY,
+      s_axi_aclk => rfdc_axi_in.a.clk,
+      s_axi_aresetn => rfdc_axi_in.a.resetn,
+      s_axi_awaddr  => interconnect_to_xilinx_rfdc_ip_axi_out.aw.ADDR(18-1 downto 0),
+      s_axi_awvalid => interconnect_to_xilinx_rfdc_ip_axi_out.aw.VALID,
+      s_axi_awready => interconnect_to_xilinx_rfdc_ip_axi_in.aw.READY,
+      s_axi_wdata   => interconnect_to_xilinx_rfdc_ip_axi_out.w.DATA,
+      s_axi_wstrb   => interconnect_to_xilinx_rfdc_ip_axi_out.w.STRB,
+      s_axi_wvalid  => interconnect_to_xilinx_rfdc_ip_axi_out.w.VALID,
+      s_axi_wready  => interconnect_to_xilinx_rfdc_ip_axi_in.w.READY,
+      s_axi_bresp   => interconnect_to_xilinx_rfdc_ip_axi_in.b.RESP,
+      s_axi_bvalid  => interconnect_to_xilinx_rfdc_ip_axi_in.b.VALID,
+      s_axi_bready  => interconnect_to_xilinx_rfdc_ip_axi_out.b.READY,
+      s_axi_araddr  => interconnect_to_xilinx_rfdc_ip_axi_out.ar.ADDR(18-1 downto 0),
+      s_axi_arvalid => interconnect_to_xilinx_rfdc_ip_axi_out.ar.VALID,
+      s_axi_arready => interconnect_to_xilinx_rfdc_ip_axi_in.ar.READY,
+      s_axi_rdata   => interconnect_to_xilinx_rfdc_ip_axi_in.r.DATA,
+      s_axi_rresp   => interconnect_to_xilinx_rfdc_ip_axi_in.r.RESP,
+      s_axi_rvalid  => interconnect_to_xilinx_rfdc_ip_axi_in.r.VALID,
+      s_axi_rready  => interconnect_to_xilinx_rfdc_ip_axi_out.r.READY,
       irq => open,
       sysref_in_p => sysref_p,
       sysref_in_n => sysref_n,
-      vin0_01_p => rf_rx_p(0),
-      vin0_01_n => rf_rx_n(0),
-      vin2_01_p => rf_rx_p(1),
-      vin2_01_n => rf_rx_n(1),
-      vout20_p => rf_tx_p(2),
-      vout20_n => rf_tx_n(2),
-      vout22_p => rf_tx_p(3),
-      vout22_n => rf_tx_n(3),
-      vout30_p => rf_tx_p(0),
-      vout30_n => rf_tx_n(0),
-      vout32_p => rf_tx_p(1),
-      vout32_n => rf_tx_n(1),
+      vin0_01_p => rf_rxs_p(0),
+      vin0_01_n => rf_rxs_n(0),
+      vin2_01_p => rf_rxs_p(1),
+      vin2_01_n => rf_rxs_n(1),
+      vout20_p => rf_txs_p(2),
+      vout20_n => rf_txs_n(2),
+      vout22_p => rf_txs_p(3),
+      vout22_n => rf_txs_n(3),
+      vout30_p => rf_txs_p(0),
+      vout30_n => rf_txs_n(0),
+      vout32_p => rf_txs_p(1),
+      vout32_n => rf_txs_n(1),
       m0_axis_aresetn => rx_0_resetn,
       m0_axis_aclk => rx_0_clk,
       m00_axis_tdata  => rfdc_to_rx_0_i_fifo_tdata,

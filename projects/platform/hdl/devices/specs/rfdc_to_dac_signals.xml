@@ -1,0 +1,34 @@
+<signals>
+  <signal name='axi_aw_addr' direction='in' width='32'/>
+  <signal name='axi_aw_valid' direction='in'/>
+  <signal name='axi_aw_prot' direction='in' width='3'/>
+  <signal name='axi_aw_ready' direction='out'/>
+  <signal name='axi_ar_addr' direction='in' width='32'/>
+  <signal name='axi_ar_valid' direction='in'/>
+  <signal name='axi_ar_prot' direction='in' width='3'/>
+  <signal name='axi_ar_ready' direction='out'/>
+  <signal name='axi_w_data' direction='in' width='32'/>
+  <signal name='axi_w_strb' direction='in' width='4'/>
+  <signal name='axi_w_valid' direction='in'/>
+  <signal name='axi_w_ready' direction='out'/>
+  <signal name='axi_r_data' direction='out' width='32'/>
+  <signal name='axi_r_resp' direction='out' width='2'/>
+  <signal name='axi_r_valid' direction='out'/>
+  <signal name='axi_r_ready' direction='in'/>
+  <signal name='axi_b_resp' direction='out' width='2'/>
+  <signal name='axi_b_valid' direction='out'/>
+  <signal name='axi_b_ready' direction='in'/>
+  <signal name='clks_p' direction='in' width='1'/>
+  <signal name='clks_n' direction='in' width='1'/>
+  <signal name='sysref_p' direction='in'/>
+  <signal name='sysref_n' direction='in'/>
+  <signal name='rfs_p' direction='out' width='4'/>
+  <signal name='rfs_n' direction='out' width='4'/>
+  <signal name='aclks' direction='out' width='1'/>
+  <signal name='s_axis_0_tdata' direction='in' width='32'/>
+  <signal name='s_axis_0_tvalid' direction='in'/>
+  <signal name='s_axis_0_tready' direction='out'/>
+  <signal name='s_axis_1_tdata' direction='in' width='32'/>
+  <signal name='s_axis_1_tvalid' direction='in'/>
+  <signal name='s_axis_1_tready' direction='out'/>
+</signals>

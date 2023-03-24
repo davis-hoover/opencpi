@@ -1,0 +1,25 @@
+<hdldevice language='vhdl' spec='rfdc_adc' firstrawproperty='regs' version='2'
+    libraries='axi, protocol'>
+  <!-- AXI4-Lite Address Range 0x14000 - 0x23FFF -->
+  <!-- (when converted to      0x00000 - 0x0FFFF there is 16 bits of address) -->
+  <!-- ref https://docs.xilinx.com/api/khub/maps/w8uumt6t1ussnarj7mwalq/attachments/u_ptvwnpz53cssexydzeua/content?ft-calling-app=ft%2fturnkey-portal&ft-calling-app-version=4.1.11&filename=pg269-rf-data-converter-en-us-2.6.pdf#unique_8 -->
+  <property name='regs' type='ulong' arraylength='69632' writable='1'
+      volatile='1' default='0'
+      description='Xilinx RF Data Converter IP Common Control and Status
+      registers'/>
+  <rawprop name='rawprops' master='true'/>
+  <!-- The clks, sysref, and rf signals are generically named so they may be
+       mapped to various data converter generations. The platform config's (or
+       perhaps, container's) constraints file is where the mapping to pins (and
+       therefore, tiles) occurs -->
+  <signal name='clks_p' width='2' pin='true' direction='in'/>
+  <signal name='clks_n' width='2' pin='true' direction='in'/>
+  <signal name='rfs_p' width='2' pin='true' direction='in'/>
+  <signal name='rfs_n' width='2' pin='true' direction='in'/>
+  <streaminterface name='out0' datawidth='32'/>
+  <streaminterface name='out1' datawidth='32'/>
+  <devsignal name='rfdc' signals='rfdc_to_adc_signals.xml' master='false'/>
+  <supports worker='rfdc'>
+    <connect port='rfdc_adc' to='rfdc'/>
+  </supports>
+</hdldevice>
