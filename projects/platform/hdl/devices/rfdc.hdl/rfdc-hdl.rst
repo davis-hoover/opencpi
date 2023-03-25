@@ -31,6 +31,7 @@ The Xilinx RF Data Converter (RFDC) has 3 generations (https://www.xilinx.com/pr
 This worker and its underlying rfdc primitive only support the following RFDC configuration(s):
 
 * config 0
+
   * Generation 3 ZU48DR (xczu48dr-ffvg1517-2-e)
   * 2 ADCs (Tiles 224, 226)
   * 2 DACs (Tile 231)
