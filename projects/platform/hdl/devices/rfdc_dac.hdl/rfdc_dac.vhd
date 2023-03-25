@@ -159,4 +159,11 @@ begin
       dst_out     => rfdc_out.s_axis_1_tdata,
       dst_EMPTY_N => rfdc_out.s_axis_1_tvalid);
 
+  rfdc_out.clks_p <= clks_p;
+  rfdc_out.clks_n <= clks_n;
+  rfdc_out.sysref_p <= sysref_p;
+  rfdc_out.sysref_n <= sysref_n;
+  rfs_p <= rfdc_in.rfs_p;
+  rfs_n <= rfdc_in.rfs_n;
+
 end structural;

@@ -163,4 +163,9 @@ begin
       oeof         => out1_out.eof,
       oready       => out1_in.ready);
 
+  rfdc_out.clks_p <= clks_p;
+  rfdc_out.clks_n <= clks_n;
+  rfdc_out.rfs_p <= rfs_p;
+  rfdc_out.rfs_n <= rfs_n;
+
 end structural;

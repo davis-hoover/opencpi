@@ -12,12 +12,12 @@
        mapped to various data converter generations. The platform config's (or
        perhaps, container's) constraints file is where the mapping to pins (and
        therefore, tiles) occurs -->
-  <signal name='tx_clks_p' width='1' pin='true' direction='in'/>
-  <signal name='tx_clks_n' width='1' pin='true' direction='in'/>
+  <signal name='clks_p' width='1' pin='true' direction='in'/>
+  <signal name='clks_n' width='1' pin='true' direction='in'/>
   <signal name='sysref_p' pin='true' direction='in'/>
   <signal name='sysref_n' pin='true' direction='in'/>
-  <signal name='rf_tx_p' width='4' pin='true' direction='out'/>
-  <signal name='rf_tx_n' width='4' pin='true' direction='out'/>
+  <signal name='rfs_p' width='4' pin='true' direction='out'/>
+  <signal name='rfs_n' width='4' pin='true' direction='out'/>
   <streaminterface name='in0' datawidth='32'/>
   <streaminterface name='in1' datawidth='32'/>
   <devsignal name='rfdc' signals='rfdc_to_dac_signals.xml' master='false'/>
