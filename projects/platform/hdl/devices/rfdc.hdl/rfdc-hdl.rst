@@ -59,7 +59,7 @@ The primitive consists of a Makefile, Vivado TCL script, and a VHDL wrapper modu
 #. Configure the Xilinx IP as previously mentioned
 #. Export Xilinx IP instantation templates
 #. Perform synthesis (this was found to be necessary in order to properly propogate IP-generated constraint files all the way to the OpenCPI HDL assembly build)
-# Export (to the OpenCPI target directory) a) the synthesis output as a .edf file, b) the VHDL wrapper module source file, and c) the VHDL package source file.
+#. Export (to the OpenCPI target directory) a) the synthesis output as a .edf file, b) the VHDL wrapper module source file, and c) the VHDL package source file.
 
 The generic_pcie primitive was used as an example for Xilinx IP managed project creation and synthesis. 
 The rfdc primitive contains a fixed number of AXI-Stream ports according to the previously mentioned configuration(s). Future support for additional configuration(s) require detailed investigation of the common functionality, especially the clock configuration, and incorporating additional VHDL generics and/or AXI-Stream ports in the rfdc primitive.
