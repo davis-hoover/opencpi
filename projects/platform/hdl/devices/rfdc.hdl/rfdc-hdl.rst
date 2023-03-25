@@ -30,15 +30,16 @@ The Xilinx RF Data Converter (RFDC) has 3 generations (https://www.xilinx.com/pr
 
 This worker and its underlying rfdc primitive only support the following RFDC configuration(s):
 
-#. Generation 3 ZU48DR (xczu48dr-ffvg1517-2-e)
-#. 2 ADCs (Tiles 224, 226)
-#. 2 DACs (Tile 231)
-#. 14-bit ADC
-#. 14-bit DAC
-#. ADC RF direction conversion sampling rate of 4 Gsps
-#. DAC RF direction conversion sampling rate of 4 Gsps
-#. Digital decimation/interpolation rate of 40x (4 Gsps / 40 = 100 Msps at AXI-Stream ports)
-#. Digital complex mixer (fine frequency control) enabled for every converter
+* config 0
+  * Generation 3 ZU48DR (xczu48dr-ffvg1517-2-e)
+  * 2 ADCs (Tiles 224, 226)
+  * 2 DACs (Tile 231)
+  * 14-bit ADC
+  * 14-bit DAC
+  * ADC RF direction conversion sampling rate of 4 Gsps
+  * DAC RF direction conversion sampling rate of 4 Gsps
+  * Digital decimation/interpolation rate of 40x (4 Gsps / 40 = 100 Msps at AXI-Stream ports)
+  * Digital complex mixer (fine frequency control) enabled for every converter
 
 This worker was designed with the following ordered design priorities:
 
