@@ -46,7 +46,8 @@ from typing import Dict, List, Union
 from jinja2 import Environment, FileSystemLoader
 
 # Supported OSPs
-OSPS = ["ocpi.osp.analog", "ocpi.osp.e3xx", "ocpi.osp.plutosdr", "ocpi.osp.ettus", "ocpi.osp.avnet", "ocpi.osp.xilinx", "ocpi.osp.n3xx"]
+OSPS = ["ocpi.osp.analog", "ocpi.osp.e3xx", "ocpi.osp.plutosdr", "ocpi.osp.ettus",
+  "ocpi.osp.avnet", "ocpi.osp.xilinx", "ocpi.osp.n3xx", "ocpi.osp.epiq-solutions"]
 OSP_TAGS = dict()  # Will be filled in later
 
 # Supported COMPs
@@ -585,6 +586,7 @@ def gen_release_index(tag: str, is_latest=False):
             # Projects
             section_name = rootpath.name.lower().replace("-", "_")
             section_title = section_name.replace("_", " ").title()
+            logging.debug(f"section_name: {section_name}")
             if section_name == "assets_ts":
                 section_title = "Assets TS"
                 if Path(rst_dir, section_name, "index.html").exists():
@@ -605,6 +607,8 @@ def gen_release_index(tag: str, is_latest=False):
                     section_title = "Xilinx OSP Documentation"
                 elif section_name == "n3xx":
                     section_title = "N3xx OSP Documentation"
+                elif section_name == "epiq-solutions":
+                    section_title = "Epiq Solutions OSP Documentation"
                 else:
                     section_title = section_title[4:] + " OSP Documentation"
                 if Path(f"{rst_dir}/osp_{section_name}/index.html").exists():
@@ -659,6 +663,7 @@ def gen_release_index(tag: str, is_latest=False):
         file_links = dict()  # type: Dict[str, UrlLink]
         section_name = proj
         section_title = section_name.replace("_", " ").title()
+        logging.debug(f"proj: section_name: {section_name}")
         if section_name.startswith("osp_"):
             section_name = section_name[4:]  # remove osp_
             if not section_name in section_data:
@@ -670,6 +675,14 @@ def gen_release_index(tag: str, is_latest=False):
                     section_title = "PlutoSDR OSP Documentation"
                 elif section_name == "ettus":
                     section_title = "Ettus OSP Documentation"
+                elif section_name == "avnet":
+                    section_title = "Avnet Engineering OSP Documentation"
+                elif section_name == "xilinx":
+                    section_title = "Xilinx OSP Documentation"
+                elif section_name == "n3xx":
+                    section_title = "N3xx OSP Documentation"
+                elif section_name == "epiq-solutions":
+                    section_title = "Epiq Solutions OSP Documentation"
                 else:
                     section_title = section_title[4:] + " OSP Documentation"
                 file_links[section_name] = UrlLink(name=section_title, url=f"rst/osp_{section_name}/")
