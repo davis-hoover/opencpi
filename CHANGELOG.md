@@ -1,3 +1,15 @@
+# [v2.4.6](https://gitlab.com/opencpi/opencpi/-/compare/v2.4.5...v2.4.6) (2023-03-29)
+
+Changes/additions since [OpenCPI Release v2.4.5](https://gitlab.com/opencpi/opencpi/-/releases/v2.4.5)
+
+### Bug Fixes
+- **tools**: do not treat `hdl/platforms/include` directory as a platform name. (!1079)(7f02f6ce)
+- **devops**: fix CI bug introduced by clumsy cherry-pick of MR !1079 into `release-2.4.6`. (!1080)(ede1ff28)
+- **tools**: fix bug preventing running "ocpidev clean assembly". (!1080)(ede1ff28)
+
+### Miscellaneous
+- **devops,tools**: add Epiq Solutions (z3u) OSP to doc processing/publishing machinery. (!1081)(26da634e)
+
 # [v2.4.5](https://gitlab.com/opencpi/opencpi/-/compare/v2.4.4...v2.4.5) (2023-03-16)
 
 Changes/additions since [OpenCPI Release v2.4.4](https://gitlab.com/opencpi/opencpi/-/releases/v2.4.4)

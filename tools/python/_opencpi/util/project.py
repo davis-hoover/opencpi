@@ -1066,8 +1066,9 @@ def get_platforms():
                     else:
                         with os.scandir(dir) as it:
                             for entry in it:
-                                if entry.name == 'lib' or get_platforms.dict.get(entry.name):
-                                    continue # already defined earlier
+                                # Skip directories that are not platform names.
+                                if entry.name in ['lib', 'include'] or get_platforms.dict.get(entry.name):
+                                    continue # not a platform or already defined earlier
                                 if entry.is_dir():
                                     platform_dir = dir + "/" + entry.name
                                     if ('/exports/' not in dir and os.path.isdir(platform_dir + "/lib") and

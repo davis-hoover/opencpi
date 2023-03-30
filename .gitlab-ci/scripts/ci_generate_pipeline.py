@@ -389,7 +389,7 @@ def _get_platforms(do_ocpishow=True, do_model_split=True) -> List[str]:
                 platforms_path = Path(project_path, model, 'platforms')
                 project_platforms = [platform.name for platform 
                                     in platforms_path.glob('*') 
-                                    if platform.is_dir()]
+                                    if platform.is_dir() and platform.name != 'include']
                 platforms[model] += project_platforms
 
     if not do_model_split:
