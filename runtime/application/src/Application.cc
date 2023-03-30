@@ -448,7 +448,7 @@ namespace OCPI {
 		    appConnPort = &*pit;
 		    break;
 		  }
-	      if (appConn) { // there is an app connection to the master port with the same index
+	      if (appConnPort) { // there is an app connection to the master port with the same index
 		// Save info to allow us to undo the delegation
 		c.m_portFixups.emplace_front(appConn, &slaveConn, appConnPort);
 		// Patch the app connection to point to a different port+index, delegating it.

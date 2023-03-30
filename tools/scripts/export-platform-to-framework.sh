@@ -45,7 +45,7 @@ platform_dir=$3
 [ -n "$verbose" ] && echo Doing platform exports for $model $platform at $platform_dir
 
 # The only things we currently need from ocpitarget.sh is OcpiPlatformOs and OcpiPlatformPrerequisites
-[ "$model" = rcc ] && source $OCPI_CDK_DIR/scripts/ocpitarget.sh $platform
+[ "$model" = rcc ] && source $OCPI_CDK_DIR/scripts/ocpitarget.sh $platform_base
 source $OCPI_CDK_DIR/scripts/export-utils.sh
 mkdir -p exports
 platform_exports=$platform_dir/$platform_base.exports

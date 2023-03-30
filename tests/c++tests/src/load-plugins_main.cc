@@ -33,7 +33,10 @@ static int
 mymain(const char **) {
   std::string path, list, name;
   // FIXME: add the "stubs" indicator to plugin-list to avoid special casing ofed/ocl
-  OU::format(path, "%s/%s/lib", OU::getCDK().c_str(), OCPI_CPP_STRINGIFY(OCPI_PLATFORM));
+  OU::format(path, "%s/%s%s%s%s/lib", OU::getCDK().c_str(), OCPI_CPP_STRINGIFY(OCPI_PLATFORM),
+            OCPI_DYNAMIC || !OCPI_DEBUG ? "-" : "",
+            OCPI_DYNAMIC ? "d" : "",
+            OCPI_DEBUG ? "" : "o");
   name = (path + "/plugin-list").c_str();
   const char *err;
   if ((err = (OU::file2String(list, name.c_str()))))

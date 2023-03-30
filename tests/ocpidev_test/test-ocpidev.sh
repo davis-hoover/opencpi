@@ -58,7 +58,9 @@ if [ -z "$HDL_PLATFORM" ] ; then
   fi
 fi
 # default the RCC platform to the one we are running on
-[ -z "$RCC_PLATFORM" ] && RCC_PLATFORM=$OCPI_TOOL_PLATFORM
+# hack alert: platform names should not have suffixes, but
+# this will get the job done as far as testing "ocpidev".
+[ -z "$RCC_PLATFORM" ] && RCC_PLATFORM=$OCPI_TOOL_DIR
 # strip trailing _pf from platform name
 HDL_PLATFORM=${HDL_PLATFORM/%_pf/}
 #echo HDL_PLATFORM:$HDL_PLATFORM RCC_PLATFORM:$RCC_PLATFORM HDL_NO_BUILD=$HDL_NO_BUILD RCC=$RCC

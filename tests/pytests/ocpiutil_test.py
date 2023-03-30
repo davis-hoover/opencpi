@@ -38,7 +38,7 @@ import sys
 import re
 import subprocess
 import logging
-sys.path.append(os.getenv('OCPI_CDK_DIR') + '/' + os.getenv('OCPI_TOOL_PLATFORM') + '/lib/')
+sys.path.append(os.getenv('OCPI_CDK_DIR') + '/' + os.getenv('OCPI_TOOL_DIR') + '/lib/')
 import _opencpi.util as ocpiutil
 from  _opencpi.assets.factory import *
 from  _opencpi.assets.registry import *
@@ -82,11 +82,11 @@ PROJECT_PACKAGES = {
 
 OCPI_LOG_LEVEL = os.environ.get('OCPI_LOG_LEVEL')
 OCPI_CDK_DIR = os.environ.get('OCPI_CDK_DIR')
-OCPI_TOOL_PLATFORM = os.environ.get('OCPI_TOOL_PLATFORM')
+OCPI_TOOL_DIR = os.environ.get('OCPI_TOOL_DIR')
 
 # Determine path to ocpidev based on CDK so that we avoid accidentally
 # using the one installed by RPMs
-OCPIDEV_PATH = OCPI_CDK_DIR + '/' + OCPI_TOOL_PLATFORM + '/bin/ocpidev'
+OCPIDEV_PATH = OCPI_CDK_DIR + '/' + OCPI_TOOL_DIR + '/bin/ocpidev'
 if OCPI_LOG_LEVEL and int(OCPI_LOG_LEVEL) > 8:
     SET_X = " set -x; "
     OCPIDEV_CMD = OCPIDEV_PATH + " -v"

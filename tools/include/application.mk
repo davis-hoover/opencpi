@@ -60,7 +60,7 @@ include $(OCPI_CDK_DIR)/include/aci.mk
 ifdef OcpiAppCC
   # If we are running in this Makefile, then we are running the TOOL_PLATFORM
   ifndef OcpiRunCC
-    OcpiRunCC=$(OcpiRunBefore) $(OCPI_VALGRIND) $(call AciExe,$(OCPI_TOOL_DIR),$(OcpiApp)) $(OcpiRunArgs) \
+    OcpiRunCC=$(OcpiRunBefore) $(OCPI_VALGRIND) $(call AciExe,$(OCPI_TARGET_DIR),$(OcpiApp)) $(OcpiRunArgs) \
               $(OcpiRunAfter)
   endif
   all: aciapps

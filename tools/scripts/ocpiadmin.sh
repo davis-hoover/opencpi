@@ -167,7 +167,7 @@ function getvars {
   if isPresent $platform $platforms; then
     if isPresent $platform $RccAllPlatforms; then
 	model=RCC
-	v=RccPlatDir_$platform
+	v=RccPlatformDir_$platform
     else
 	model=HDL
 	v=HdlPlatformDir_$platform
@@ -279,7 +279,7 @@ while (( "$#" )); do
     --dynamic)
       dynamic=1
       shift ;;
-   --no-kernel)
+    --no-kernel)
       nokernel=1 # use ${nokernel:+whatever}
       shift ;;
 
@@ -502,7 +502,7 @@ fi
 if [ "$model" = RCC ]; then
     if [ -n "$dynamic" -o -n "$optimize" ]; then
 	if [[ $platform_target_dir == *-* ]]; then
-	    echo "ERROR: you cannot use the --dynamic(-d) or the --optimize(-O) options when you have" >&2
+	    echo "ERROR: you cannot use the --dynamic or the --optimize options when you have" >&2
 	    echo "       included build options in the platform name, in this case: $platform_target_dir" >&2
 	    exit 1
 	fi
@@ -510,7 +510,14 @@ if [ "$model" = RCC ]; then
 	[ -n "$dynamic" ] && platform_target_dir+=d
 	[ -n "$optimize" ] && platform_target_dir+=o
     fi
-    ./scripts/install-opencpi.sh ${minimal:+--minimal} ${nokernel:+--no-kernel} $platform_target_dir || exit 1
+
+    #
+    # Since the user had to source "cdk/opencpi-setup.sh" before running
+    # this script, it is safe to assume the OpenCPI environment has been
+    # properly set up.  Let "install-opencpi.sh" know that by passing a
+    # "--use-env" flag.
+    #
+    ./scripts/install-opencpi.sh ${minimal:+--minimal} ${nokernel:+--no-kernel} --use-env $platform_target_dir || exit 1
 else
     # Since the build-opencpi.sh does an "rcc" build per project, and that implicitly
     # does "declare" on projects, that is sufficient for on-demand hdl worker builds

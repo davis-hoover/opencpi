@@ -93,8 +93,8 @@ source $OCPI_CDK_DIR/scripts/ocpitarget.sh "$platform"
 checkAssetName "$package"   # Enforce asset naming rules.
 platform=$OCPI_TARGET_PLATFORM
 if test "$OCPI_TARGET_PLATFORM" != "$OCPI_TOOL_PLATFORM" -a "$cross" != "1"; then
- echo ====== We will not crossbuild $package for non-development environments thus are skipping it.
- exit 0
+  echo ====== We will not crossbuild $package for non-development environments thus are skipping it.
+  exit 0
 fi
 if test "$OCPI_TARGET_PLATFORM" != "$OCPI_TOOL_PLATFORM" -a -n "$OCPI_CROSS_COMPILE"; then
   if test ! -d "$(dirname $OCPI_CROSS_COMPILE)"; then

@@ -1696,7 +1696,11 @@ static int net_recvmsg
 {
   int error = 0;
   struct sk_buff *skb =
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 0)
+    skb_recv_datagram(sock->sk, flags, &error);
+#else
     skb_recv_datagram(sock->sk, flags & ~MSG_DONTWAIT, flags & MSG_DONTWAIT, &error);
+#endif
   if (skb != NULL) {
     total_len = min_t(size_t, total_len, skb->len);
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3, 19, 0)
