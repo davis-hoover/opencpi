@@ -930,7 +930,7 @@ emitXmlConnections(FILE *f) {
     Connection &cc = **cci;
     if (cc.m_attachments.front()->m_instPort.m_port->isData()) {
       InstancePort *producer = NULL, *consumer = NULL;
-      char producerChar, consumerChar;
+      char producerChar = 0, consumerChar = 0; // init to suppress warning
       for (AttachmentsIter ai = cc.m_attachments.begin(); ai != cc.m_attachments.end(); ai++) {
 	Attachment &a = **ai;
 	InstancePort *ip;
@@ -958,6 +958,8 @@ emitXmlConnections(FILE *f) {
       assert(producer && consumer);
       if (consumerChar == 'c' && producerChar == 'c')
 	continue; // internal connection in the container already dealt with
+      if (!producer)
+	continue; // suppress compiler error
       fprintf(f, "<connection from=\"%c/%s\" out=\"%s\" to=\"%c/%s\" in=\"%s\"/>\n",
 	      producerChar, producer->m_instance->cname(), producer->m_port->pname(),
 	      consumerChar, consumer->m_instance->cname(), consumer->m_port->pname());

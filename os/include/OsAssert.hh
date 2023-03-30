@@ -126,7 +126,7 @@ inline void ocpiAbort(const char *err) { ::OCPI::OS::assertionFailed(err, __FILE
 #define ocpiDebug1(fmt, ...) ((void)0)
 #define ocpiDebug2(fmt, ...) ((void)0)
 #define ocpiDebug3(fmt, ...) ((void)0)
-#define ocpiLog(n, ...) ((n) > OCPI_LOG_DEBUG_MIN ? 0 : (OS::Log::print(n, __VA_ARGS__),0))
+#define ocpiLog(n, ...) ((n) > OCPI_LOG_DEBUG_MIN ? 0 : (::OCPI::OS::Log::print(n, __VA_ARGS__),0))
 #else
 #define ocpiAssert(cond) ((::OCPI::OS::testAssertion ((cond) ? true : false)) || ::OCPI::OS::assertionFailed (#cond, __FILE__, __LINE__))
 #define ocpiCheck(cond) ocpiAssert(cond)

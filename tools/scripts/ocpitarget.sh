@@ -39,17 +39,18 @@
 # where the initialization is done using setup-target-platform.mk
 # A single argument is required which will become OCPI_TARGET_PLATFORM.
 # If the single argument is empty, and OCPI_TARGET_PLATFORM is already set, it is used.
-# If the single argument is empty and OCPI_TARGET_PLATFORM is not set, it will be set
-# it as OCPI_TOOL_PLATFORM.
+# If the single argument is empty, and OCPI_TARGET_PLATFORM is not set, it will be set
+# as OCPI_TOOL_PLATFORM.
+
 # Just some extra error checking
 if [ -n "$OCPI_TARGET_PLATFORM" ]; then
   if [ -n "$1" ]; then
-    if  [ "${1%-*}" != $OCPI_TARGET_PLATFORM ]; then
-      echo Error:  ocpitarget.sh called with \"$1\" when OCPI_TARGET_PLATFORM already set to \"$OCPI_TARGET_PLATFORM\".
+    if [ "${1%-*}" != $OCPI_TARGET_PLATFORM ]; then
+      echo Error: ocpitarget.sh called with \"$1\" when OCPI_TARGET_PLATFORM already set to \"$OCPI_TARGET_PLATFORM\".
       exit 1
     fi
   elif [ $OCPI_TARGET_PLATFORM != $OCPI_TOOL_PLATFORM ]; then
-    echo Error:  ocpitarget.sh called with no target when OCPI_TARGET_PLATFORM already set to \"$OCPI_TARGET_PLATFORM\".
+    echo Error: ocpitarget.sh called with no target when OCPI_TARGET_PLATFORM already set to \"$OCPI_TARGET_PLATFORM\".
     exit 1
   fi
 elif [ -n "$1" ] ; then
@@ -69,7 +70,7 @@ fi
   else    
     read v0 v1 v2 v3 v4 v5 <<< `$OCPI_CDK_DIR/scripts/getPlatform.sh $OCPI_TARGET_PLATFORM`
     [ -d "$v5" ] || {
-      echo Error:  Cannot find the platform directory for platform $OCPI_TARGET_PLATFORM
+      echo Error: Cannot find the platform directory for platform $OCPI_TARGET_PLATFORM
       exit 1
     }
     export OCPI_TARGET_PLATFORM_DIR=$v5

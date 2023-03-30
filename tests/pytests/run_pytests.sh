@@ -53,7 +53,7 @@ for i in *_test.py; do
   $pyrun_command$i
 done
 # Run doctest from the CDK 
-find $OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/lib/_opencpi/util ! -name "__init__.py" -name '*.py' |\
+find $OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib/_opencpi/util ! -name "__init__.py" -name '*.py' |\
   xargs python3 -m doctest -v
 
 if [ "$pyrun_command" == "./" ]; then

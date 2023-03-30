@@ -30,6 +30,7 @@ source ./cdk/opencpi-setup.sh -e
 # Ensure TARGET variables
 source $OCPI_CDK_DIR/scripts/ocpitarget.sh "$1"
 source $OCPI_CDK_DIR/scripts/setup-prereq-dirs.sh
+
 # arg is where a directory of prerequisite directories might be found
 function add_prereq_dirs {
   shopt -s nullglob
