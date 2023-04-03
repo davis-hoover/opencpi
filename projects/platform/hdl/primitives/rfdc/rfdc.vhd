@@ -23,15 +23,25 @@ library ocpi_core_bsv; use ocpi_core_bsv.all;
 
 entity rfdc is
   port(
-    -- rfdc AXI-Lite
-    rfdc_axi_in      : in  axi.lite32.axi_m2s_t;
-    rfdc_axi_out     : out axi.lite32.axi_s2m_t;
-    -- rfdc_adc AXI-Lite
-    rfdc_adc_axi_in  : in  axi.lite32.axi_m2s_t;
-    rfdc_adc_axi_out : out axi.lite32.axi_s2m_t;
-    -- rfdc_dac AXI-Lite
-    rfdc_dac_axi_in  : in  axi.lite32.axi_m2s_t;
-    rfdc_dac_axi_out : out axi.lite32.axi_s2m_t;
+    -- AXI-Lite slave ports
+    s_ctrl_axi_in   : in  axi.lite32.axi_m2s_t;
+    s_ctrl_axi_out  : out axi.lite32.axi_s2m_t;
+    s_dac0_axi_in   : in  axi.lite32.axi_m2s_t;
+    s_dac0_axi_out  : out axi.lite32.axi_s2m_t;
+    s_dac1_axi_in   : in  axi.lite32.axi_m2s_t;
+    s_dac1_axi_out  : out axi.lite32.axi_s2m_t;
+    s_dac2_axi_in   : in  axi.lite32.axi_m2s_t;
+    s_dac2_axi_out  : out axi.lite32.axi_s2m_t;
+    s_dac3_axi_in   : in  axi.lite32.axi_m2s_t;
+    s_dac3_axi_out  : out axi.lite32.axi_s2m_t;
+    s_adc0_axi_in   : in  axi.lite32.axi_m2s_t;
+    s_adc0_axi_out  : out axi.lite32.axi_s2m_t;
+    s_adc1_axi_in   : in  axi.lite32.axi_m2s_t;
+    s_adc1_axi_out  : out axi.lite32.axi_s2m_t;
+    s_adc2_axi_in   : in  axi.lite32.axi_m2s_t;
+    s_adc2_axi_out  : out axi.lite32.axi_s2m_t;
+    s_adc3_axi_in   : in  axi.lite32.axi_m2s_t;
+    s_adc3_axi_out  : out axi.lite32.axi_s2m_t;
     -- RX path clock inputs
     rx_clks_p       : in  std_logic_vector(2-1 downto 0);
     rx_clks_n       : in  std_logic_vector(2-1 downto 0);
@@ -149,14 +159,26 @@ architecture structural of rfdc is
 
   component axi_interconnect is
     port(
-      rfdc_axi_in      : in  axi.lite32.axi_m2s_t;
-      rfdc_axi_out     : out axi.lite32.axi_s2m_t;
-      rfdc_adc_axi_in  : in  axi.lite32.axi_m2s_t;
-      rfdc_adc_axi_out : out axi.lite32.axi_s2m_t;
-      rfdc_dac_axi_in  : in  axi.lite32.axi_m2s_t;
-      rfdc_dac_axi_out : out axi.lite32.axi_s2m_t;
-      axi_in           : in  axi.lite32.axi_s2m_t;
-      axi_out          : out axi.lite32.axi_m2s_t);
+      s_ctrl_axi_in  : in  axi.lite32.axi_m2s_t;
+      s_ctrl_axi_out : out axi.lite32.axi_s2m_t;
+      s_dac0_axi_in  : in  axi.lite32.axi_m2s_t;
+      s_dac0_axi_out : out axi.lite32.axi_s2m_t;
+      s_dac1_axi_in  : in  axi.lite32.axi_m2s_t;
+      s_dac1_axi_out : out axi.lite32.axi_s2m_t;
+      s_dac2_axi_in  : in  axi.lite32.axi_m2s_t;
+      s_dac2_axi_out : out axi.lite32.axi_s2m_t;
+      s_dac3_axi_in  : in  axi.lite32.axi_m2s_t;
+      s_dac3_axi_out : out axi.lite32.axi_s2m_t;
+      s_adc0_axi_in  : in  axi.lite32.axi_m2s_t;
+      s_adc0_axi_out : out axi.lite32.axi_s2m_t;
+      s_adc1_axi_in  : in  axi.lite32.axi_m2s_t;
+      s_adc1_axi_out : out axi.lite32.axi_s2m_t;
+      s_adc2_axi_in  : in  axi.lite32.axi_m2s_t;
+      s_adc2_axi_out : out axi.lite32.axi_s2m_t;
+      s_adc3_axi_in  : in  axi.lite32.axi_m2s_t;
+      s_adc3_axi_out : out axi.lite32.axi_s2m_t;
+      m_axi_in       : in  axi.lite32.axi_s2m_t;
+      m_axi_out      : out axi.lite32.axi_m2s_t);
   end component axi_interconnect;
 
   constant FIFO_DEPTH : positive := 16;
@@ -217,14 +239,26 @@ begin
 
   interconnect : axi_interconnect
     port map(
-      rfdc_axi_in      => rfdc_axi_in,
-      rfdc_axi_out     => rfdc_axi_out,
-      rfdc_adc_axi_in  => rfdc_adc_axi_in,
-      rfdc_adc_axi_out => rfdc_adc_axi_out,
-      rfdc_dac_axi_in  => rfdc_dac_axi_in,
-      rfdc_dac_axi_out => rfdc_dac_axi_out,
-      axi_in           => interconnect_to_xilinx_rfdc_ip_axi_in,
-      axi_out          => interconnect_to_xilinx_rfdc_ip_axi_out);
+      s_ctrl_axi_in  => s_ctrl_axi_in,
+      s_ctrl_axi_out => s_ctrl_axi_out,
+      s_dac0_axi_in  => s_dac0_axi_in,
+      s_dac0_axi_out => s_dac0_axi_out,
+      s_dac1_axi_in  => s_dac1_axi_in,
+      s_dac1_axi_out => s_dac1_axi_out,
+      s_dac2_axi_in  => s_dac2_axi_in,
+      s_dac2_axi_out => s_dac2_axi_out,
+      s_dac3_axi_in  => s_dac3_axi_in,
+      s_dac3_axi_out => s_dac3_axi_out,
+      s_adc0_axi_in  => s_adc0_axi_in,
+      s_adc0_axi_out => s_adc0_axi_out,
+      s_adc1_axi_in  => s_adc1_axi_in,
+      s_adc1_axi_out => s_adc1_axi_out,
+      s_adc2_axi_in  => s_adc2_axi_in,
+      s_adc2_axi_out => s_adc2_axi_out,
+      s_adc3_axi_in  => s_adc3_axi_in,
+      s_adc3_axi_out => s_adc3_axi_out,
+      m_axi_in       => interconnect_to_xilinx_rfdc_ip_axi_in,
+      m_axi_out      => interconnect_to_xilinx_rfdc_ip_axi_out);
 
   tx_aclks(0)   <= tx_0_clk;
   rx_aclks(0)   <= rx_0_clk;
@@ -236,7 +270,7 @@ begin
     generic map(
       SRC_RST_VALUE => '0')
     port map(
-      src_rst   => rfdc_axi_in.a.resetn,
+      src_rst   => s_ctrl_axi_in.a.resetn,
       dst_clk   => rx_0_clk,
       dst_rst   => rx_0_reset,
       dst_rst_n => rx_0_resetn);
@@ -245,7 +279,7 @@ begin
     generic map(
       SRC_RST_VALUE => '0')
     port map(
-      src_rst   => rfdc_axi_in.a.resetn,
+      src_rst   => s_ctrl_axi_in.a.resetn,
       dst_clk   => rx_1_clk,
       dst_rst   => rx_1_reset,
       dst_rst_n => rx_1_resetn);
@@ -254,7 +288,7 @@ begin
     generic map(
       SRC_RST_VALUE => '0')
     port map(
-      src_rst   => rfdc_axi_in.a.resetn,
+      src_rst   => s_ctrl_axi_in.a.resetn,
       dst_clk   => tx_0_clk,
       dst_rst   => tx_0_reset,
       dst_rst_n => tx_0_resetn);
@@ -271,8 +305,8 @@ begin
       dac2_clk_n => tx_clks_n(0),
       clk_dac2 => tx_0_clk,
       clk_dac3 => open,
-      s_axi_aclk => rfdc_axi_in.a.clk,
-      s_axi_aresetn => rfdc_axi_in.a.resetn,
+      s_axi_aclk => s_ctrl_axi_in.a.clk,
+      s_axi_aresetn => s_ctrl_axi_in.a.resetn,
       s_axi_awaddr  => interconnect_to_xilinx_rfdc_ip_axi_out.aw.ADDR(18-1 downto 0),
       s_axi_awvalid => interconnect_to_xilinx_rfdc_ip_axi_out.aw.VALID,
       s_axi_awready => interconnect_to_xilinx_rfdc_ip_axi_in.aw.READY,

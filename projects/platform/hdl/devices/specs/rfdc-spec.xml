@@ -1,1 +1,13 @@
-<componentspec/>
+<componentspec>
+  <!-- Intentionally use existing iqstream protocols for now. Add metadata to
+       new or existing protocols as new rfdc features are added.
+       (DO *NOT* COPY THIS WORKER JUST TO CHANGE ITS PROTOCOLS) -->
+  <port name='in0' producer='false' protocol='iqstream_protocol'
+      optional='true'/>
+  <port name='in1' producer='false' protocol='iqstream_protocol'
+      optional='true'/>
+  <port name='out0' producer='true' protocol='iqstream_protocol'
+      optional='true'/>
+  <port name='out1' producer='true' protocol='iqstream_protocol'
+      optional='true'/>
+</componentspec>

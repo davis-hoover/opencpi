@@ -22,15 +22,25 @@ package rfdc_pkg is
 
 component rfdc is
   port(
-    -- rfdc AXI-Lite
-    rfdc_axi_in      : in  axi.lite32.axi_m2s_t;
-    rfdc_axi_out     : out axi.lite32.axi_s2m_t;
-    -- rfdc_adc AXI-Lite
-    rfdc_adc_axi_in  : in  axi.lite32.axi_m2s_t;
-    rfdc_adc_axi_out : out axi.lite32.axi_s2m_t;
-    -- rfdc_dac AXI-Lite
-    rfdc_dac_axi_in  : in  axi.lite32.axi_m2s_t;
-    rfdc_dac_axi_out : out axi.lite32.axi_s2m_t;
+    -- AXI-Lite slave ports
+    s_ctrl_axi_in   : in  axi.lite32.axi_m2s_t;
+    s_ctrl_axi_out  : out axi.lite32.axi_s2m_t;
+    s_dac0_axi_in   : in  axi.lite32.axi_m2s_t;
+    s_dac0_axi_out  : out axi.lite32.axi_s2m_t;
+    s_dac1_axi_in   : in  axi.lite32.axi_m2s_t;
+    s_dac1_axi_out  : out axi.lite32.axi_s2m_t;
+    s_dac2_axi_in   : in  axi.lite32.axi_m2s_t;
+    s_dac2_axi_out  : out axi.lite32.axi_s2m_t;
+    s_dac3_axi_in   : in  axi.lite32.axi_m2s_t;
+    s_dac3_axi_out  : out axi.lite32.axi_s2m_t;
+    s_adc0_axi_in   : in  axi.lite32.axi_m2s_t;
+    s_adc0_axi_out  : out axi.lite32.axi_s2m_t;
+    s_adc1_axi_in   : in  axi.lite32.axi_m2s_t;
+    s_adc1_axi_out  : out axi.lite32.axi_s2m_t;
+    s_adc2_axi_in   : in  axi.lite32.axi_m2s_t;
+    s_adc2_axi_out  : out axi.lite32.axi_s2m_t;
+    s_adc3_axi_in   : in  axi.lite32.axi_m2s_t;
+    s_adc3_axi_out  : out axi.lite32.axi_s2m_t;
     -- RX path clock inputs
     rx_clks_p        : in  std_logic_vector(2-1 downto 0);
     rx_clks_n        : in  std_logic_vector(2-1 downto 0);
@@ -66,14 +76,26 @@ end component rfdc;
 
 component axi_interconnect is
   port(
-    rfdc_axi_in      : in  axi.lite32.axi_m2s_t;
-    rfdc_axi_out     : out axi.lite32.axi_s2m_t;
-    rfdc_adc_axi_in  : in  axi.lite32.axi_m2s_t;
-    rfdc_adc_axi_out : out axi.lite32.axi_s2m_t;
-    rfdc_dac_axi_in  : in  axi.lite32.axi_m2s_t;
-    rfdc_dac_axi_out : out axi.lite32.axi_s2m_t;
-    axi_in           : in  axi.lite32.axi_s2m_t;
-    axi_out          : out axi.lite32.axi_m2s_t);
+    s_ctrl_axi_in  : in  axi.lite32.axi_m2s_t;
+    s_ctrl_axi_out : out axi.lite32.axi_s2m_t;
+    s_dac0_axi_in  : in  axi.lite32.axi_m2s_t;
+    s_dac0_axi_out : out axi.lite32.axi_s2m_t;
+    s_dac1_axi_in  : in  axi.lite32.axi_m2s_t;
+    s_dac1_axi_out : out axi.lite32.axi_s2m_t;
+    s_dac2_axi_in  : in  axi.lite32.axi_m2s_t;
+    s_dac2_axi_out : out axi.lite32.axi_s2m_t;
+    s_dac3_axi_in  : in  axi.lite32.axi_m2s_t;
+    s_dac3_axi_out : out axi.lite32.axi_s2m_t;
+    s_adc0_axi_in  : in  axi.lite32.axi_m2s_t;
+    s_adc0_axi_out : out axi.lite32.axi_s2m_t;
+    s_adc1_axi_in  : in  axi.lite32.axi_m2s_t;
+    s_adc1_axi_out : out axi.lite32.axi_s2m_t;
+    s_adc2_axi_in  : in  axi.lite32.axi_m2s_t;
+    s_adc2_axi_out : out axi.lite32.axi_s2m_t;
+    s_adc3_axi_in  : in  axi.lite32.axi_m2s_t;
+    s_adc3_axi_out : out axi.lite32.axi_s2m_t;
+    m_axi_in       : in  axi.lite32.axi_s2m_t;
+    m_axi_out      : out axi.lite32.axi_m2s_t);
 end component axi_interconnect;
 
 end package rfdc_pkg;

@@ -1,0 +1,21 @@
+<signals>
+  <signal name='aw_addr' direction='in' width='32'/>
+  <signal name='aw_valid' direction='in'/>
+  <signal name='aw_prot' direction='in' width='3'/>
+  <signal name='aw_ready' direction='out'/>
+  <signal name='ar_addr' direction='in' width='32'/>
+  <signal name='ar_valid' direction='in'/>
+  <signal name='ar_prot' direction='in' width='3'/>
+  <signal name='ar_ready' direction='out'/>
+  <signal name='w_data' direction='in' width='32'/>
+  <signal name='w_strb' direction='in' width='4'/>
+  <signal name='w_valid' direction='in'/>
+  <signal name='w_ready' direction='out'/>
+  <signal name='r_data' direction='out' width='32'/>
+  <signal name='r_resp' direction='out' width='2'/>
+  <signal name='r_valid' direction='out'/>
+  <signal name='r_ready' direction='in'/>
+  <signal name='b_resp' direction='out' width='2'/>
+  <signal name='b_valid' direction='out'/>
+  <signal name='b_ready' direction='in'/>
+</signals>

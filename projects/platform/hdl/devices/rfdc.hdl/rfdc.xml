@@ -7,8 +7,40 @@
       description='Xilinx RF Data Converter IP Common Control and Status
       registers'/>
   <rawprop name='rawprops' master='true'/>
-  <devsignal name='rfdc_adc' signals='rfdc_to_adc_signals.xml' master='true'
+  <streaminterface name='in0' datawidth='32'/>
+  <streaminterface name='in1' datawidth='32'/>
+  <streaminterface name='out0' datawidth='32'/>
+  <streaminterface name='out1' datawidth='32'/>
+  <!-- The clks, sysref, and rf signals are generically named so they may be
+       mapped to various data converter generations. The platform config's (or
+       perhaps, container's) constraints file is where the mapping to pins (and
+       therefore, tiles) occurs -->
+  <signal name='rx_clks_p' width='2' pin='true' direction='in'/>
+  <signal name='rx_clks_n' width='2' pin='true' direction='in'/>
+  <signal name='tx_clks_p' width='1' pin='true' direction='in'/>
+  <signal name='tx_clks_n' width='1' pin='true' direction='in'/>
+  <signal name='sysref_p' pin='true' direction='in'/>
+  <signal name='sysref_n' pin='true' direction='in'/>
+  <signal name='rf_rxs_p' width='2' pin='true' direction='in'/>
+  <signal name='rf_rxs_n' width='2' pin='true' direction='in'/>
+  <signal name='rf_txs_p' width='4' pin='true' direction='out'/>
+  <signal name='rf_txs_n' width='4' pin='true' direction='out'/>
+  <devsignal name='s_ctrl_axi' signals='axi_lite_32_signals.xml' master='true'
       optional='false'/>
-  <devsignal name='rfdc_dac' signals='rfdc_to_dac_signals.xml' master='true'
+  <devsignal name='s_dac0_axi' signals='axi_lite_32_signals.xml' master='true'
+      optional='false'/>
+  <devsignal name='s_dac1_axi' signals='axi_lite_32_signals.xml' master='true'
+      optional='false'/>
+  <devsignal name='s_dac2_axi' signals='axi_lite_32_signals.xml' master='true'
+      optional='false'/>
+  <devsignal name='s_dac3_axi' signals='axi_lite_32_signals.xml' master='true'
+      optional='false'/>
+  <devsignal name='s_adc0_axi' signals='axi_lite_32_signals.xml' master='true'
+      optional='false'/>
+  <devsignal name='s_adc1_axi' signals='axi_lite_32_signals.xml' master='true'
+      optional='false'/>
+  <devsignal name='s_adc2_axi' signals='axi_lite_32_signals.xml' master='true'
+      optional='false'/>
+  <devsignal name='s_adc3_axi' signals='axi_lite_32_signals.xml' master='true'
       optional='false'/>
 </hdldevice>

@@ -1,0 +1,13 @@
+<hdldevice language='vhdl' spec='rfdc_dac_config_0' firstrawproperty='regs' version='2'
+    libraries='axi'>
+  <!-- ref https://docs.xilinx.com/api/khub/maps/w8uumt6t1ussnarj7mwalq/attachments/u_ptvwnpz53cssexydzeua/content?ft-calling-app=ft%2fturnkey-portal&ft-calling-app-version=4.1.11&filename=pg269-rf-data-converter-en-us-2.6.pdf#unique_8 -->
+  <property name='regs' type='ulong' arraylength='16384' writable='1'
+      volatile='1' default='0'
+      description='Single 16 KB bank of the multi-bank Xilinx RF Data Converter
+      IP'/>
+  <rawprop name='rawprops' master='true'/>
+  <devsignal name='m_axi' signals='axi_lite_32_signals.xml' master='false'/>
+  <supports worker='rfdc'>
+    <connect port='s_dac0_axi' to='m_axi'/>
+  </supports>
+</hdldevice>
