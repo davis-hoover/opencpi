@@ -22,10 +22,18 @@
 #    prerequisite, on at least one of the supported RCC platforms
 #    named xilinx*aarch*
 
-make_include_links() {
+copy_include_files() {
   INCS=("${@:3}")
   for i in ${INCS[@]}; do
-    relative_link $2/$i.h $1
+    # cp instead of link because of rm -rf for subsequent rcc platform builds
+    #relative_link $2/$i.h $1
+    echo cp
+    echo cp $2/$i.h $1
+    echo pwd
+    pwd
+    echo pwd
+    mkdir -p $1
+    cp $2/$i.h $1
   done
 }
 
@@ -65,23 +73,37 @@ pushd $BUILD_DIR
 # -p needed for builds of subsequent rcc platforms
 mkdir -p build_libm
 pushd build_libm
-TOOLCHAIN=../cmake/platforms/toolchain.cmake
+rm -rf * # necessary to wipe out stale build from any previous rcc platform
+TOOLC=../cmake/platforms/toolchain.cmake
 TMP_INC=lib/include/metal
-echo "set (CMAKE_SYSTEM_NAME \"Opencpi\" CACHE STRING \"\")" > $TOOLCHAIN
-if [ ! -z $OcpiCrossHost ]; then
+echo CC=$CC
+echo AR=$AR
+if [ -z $OcpiCrossHost ]; then
+  echo "set (CMAKE_SYSTEM_PROCESSOR \"arm\" CACHE STRING \"\")
+set (MACHINE \"zynqmp_a53\")
+#set (CROSS_PREFIX \"$OcpiCrossHost\" CACHE STRING \"\")
+set (CMAKE_C_FLAGS \"-O2 -c -g -Wall -Wextra -I$TMP_INC\" CACHE STRING \"\")
+set (CMAKE_SYSTEM_NAME \"Opencpi\" CACHE STRING \"\")
+#include (CMakeForceCompiler)
+#CMAKE_FORCE_C_COMPILER (\"\${CROSS_PREFIX}-gcc\" GNU)
+#CMAKE_FORCE_CXX_COMPILER (\"\${CROSS_PREFIX}-g++\" GNU)
+#set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER CACHE STRING \"\")
+#set (CMAKE_FIND_ROOT_PATH_MODE_LIBRARY NEVER CACHE STRING \"\")
+#set (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE NEVER CACHE STRING \"\")" > $TOOLC
+else
   echo "set (CMAKE_SYSTEM_PROCESSOR \"arm\" CACHE STRING \"\")
 set (MACHINE \"zynqmp_a53\")
 set (CROSS_PREFIX \"$OcpiCrossHost\" CACHE STRING \"\")
 set (CMAKE_C_FLAGS \"-O2 -c -g -Wall -Wextra -I$TMP_INC\" CACHE STRING \"\")
+set (CMAKE_SYSTEM_NAME \"Opencpi\" CACHE STRING \"\")
 include (CMakeForceCompiler)
-CMAKE_FORCE_C_COMPILER (\"\${CROSS_PREFIX}gcc\" GNU)
-CMAKE_FORCE_CXX_COMPILER (\"\${CROSS_PREFIX}g++\" GNU)
+CMAKE_FORCE_C_COMPILER (\"\${CROSS_PREFIX}-gcc\" GNU)
+CMAKE_FORCE_CXX_COMPILER (\"\${CROSS_PREFIX}-g++\" GNU)
 set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER CACHE STRING \"\")
 set (CMAKE_FIND_ROOT_PATH_MODE_LIBRARY NEVER CACHE STRING \"\")
-set (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE NEVER CACHE STRING \"\")" > $TOOLCHAIN
+set (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE NEVER CACHE STRING \"\")" > $TOOLC
 fi
-#cmake .. -DCMAKE_INCLUDE_PATH=$SYSFS_INCLUDE_DIR -DCMAKE_TOOLCHAIN_FILE=$TOOLCHAIN
-cmake .. -DCMAKE_INCLUDE_PATH=$SYSFS_INCLUDE_DIR
+cmake .. -DCMAKE_INCLUDE_PATH=$SYSFS_INCLUDE_DIR -DCMAKE_TOOLCHAIN_FILE=$TOOLC
 popd
 popd
 cp ../XilinxProcessorIPLib/drivers/rfdc/src/* .
@@ -96,22 +118,26 @@ $CC -g -fPIC -I$METAL_INC_DIR -I. -I$SYSFS_INCLUDE_DIR -c ${SRCS[@]} \
 $AR -rs librfdc.a ${SRCNAMES[@]/%/.o}
 relative_link librfdc.a $OcpiInstallExecDir/lib
 dir=$OcpiInstallDir/include
-make_include_links $dir . "${INCS[@]}"
+copy_include_files $dir . "${INCS[@]}"
+#INCS=(alloc assert atomic cache compiler condition config cpu device \
+#    dma errno io irq_controller irq list log mutex shmem sleep softirq \
+#    spinlock sys time utilities)
 INCS=(alloc assert atomic cache compiler condition config cpu device \
-    dma errno io irq_controller irq list log mutex shmem sleep softirq \
+    dma io irq_controller irq list log mutex shmem sleep softirq \
     spinlock sys time utilities)
 dir=$OcpiInstallDir/include/metal
 mkdir -p $dir
-make_include_links $dir $METAL_INC_DIR/metal "${INCS[@]}"
-INCS=(alloc assert cache condition io irq log mutex sleep sys)
+copy_include_files $dir $METAL_INC_DIR/metal "${INCS[@]}"
+#INCS=(alloc assert cache condition io irq log mutex sleep sys)
+INCS=(alloc assert io irq log sleep sys)
 dir=$OcpiInstallDir/include/metal/system/opencpi
 mkdir -p $dir
-make_include_links $dir $METAL_INC_DIR/metal/system/opencpi "${INCS[@]}"
+copy_include_files $dir $METAL_INC_DIR/metal/system/opencpi "${INCS[@]}"
 INCS=(atomic compiler)
 dir=$OcpiInstallDir/include/metal/compiler/gcc
 mkdir -p $dir
-make_include_links $dir $METAL_INC_DIR/metal/compiler/gcc "${INCS[@]}"
+copy_include_files $dir $METAL_INC_DIR/metal/compiler/gcc "${INCS[@]}"
 INCS=(atomic cpu)
-dir=$OcpiInstallDir/include/metal/processor/x86_64
+dir=$OcpiInstallDir/include/metal/processor/arm
 mkdir -p $dir
-make_include_links $dir $METAL_INC_DIR/metal/processor/x86_64 "${INCS[@]}"
+copy_include_files $dir $METAL_INC_DIR/metal/processor/arm "${INCS[@]}"
