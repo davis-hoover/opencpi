@@ -1031,7 +1031,7 @@ mapOneSignal(std::string &assy, const Signal &signal, size_t index, bool isWhole
 	bs->m_width = boardIndex + 1;
     }
   }
-  if (boardIndex != SIZE_MAX)
+  if (!ename.empty() && boardIndex != SIZE_MAX)
     OU::formatAdd(ename, "(%zu)", boardIndex);
   OU::formatAdd(assy, "    <signal name='%s' external='%s'/>\n",
 		dname.c_str(), ename.c_str());
