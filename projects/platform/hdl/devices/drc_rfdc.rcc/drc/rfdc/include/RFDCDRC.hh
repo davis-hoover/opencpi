@@ -59,10 +59,26 @@ class RFDCConfigurator : public Configurator<RFDCCSP> {
 // STEP 3 - DEFINE DRC (get/set APIs)
 // -----------------------------------------------------------------------------
 
+struct DeviceCallBack {
+  // from the low level rfdc/libmetal library
+  virtual uint8_t get_uchar_prop(unsigned long of, unsigned long pof) = 0;
+  virtual uint16_t get_ushort_prop(unsigned long of, unsigned long pof) = 0;
+  virtual uint32_t get_ulong_prop(unsigned long of, unsigned long pof) = 0;
+  virtual uint64_t get_ulonglong_prop(unsigned long of, unsigned long pof) = 0;
+  virtual void set_uchar_prop(unsigned long of, unsigned long pof,
+      uint8_t val) = 0;
+  virtual void set_ushort_prop(unsigned long of, unsigned long pof,
+      uint16_t val) = 0;
+  virtual void set_ulong_prop(unsigned long of, unsigned long pof,
+      uint32_t val) = 0;
+  virtual void set_ulonglong_prop(unsigned long of, unsigned long pof,
+      uint64_t val) = 0;
+};
+
 template<class cfgrtr_t = RFDCConfigurator>
 class RFDCDRC : public DRC<cfgrtr_t> {
   public:
-  RFDCDRC();
+  RFDCDRC(DeviceCallBack &dev);
   bool                get_enabled(            const std::string& rf_port_name);
   RFPort::direction_t get_direction(          const std::string& rf_port_name);
   double              get_tuning_freq_MHz(    const std::string& rf_port_name);
@@ -82,6 +98,7 @@ class RFDCDRC : public DRC<cfgrtr_t> {
   void set_app_port_num(       const std::string& rf_port_name, uint8_t val);
   protected:
   XRFdc m_xrfdc;
+  DeviceCallBack &m_callBack;
   void init();
 };
 

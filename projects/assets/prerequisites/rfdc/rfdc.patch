@@ -1,0 +1,15 @@
+diff -rupN lib/atomic.h lib/atomic.h
+--- lib/atomic.h	2023-04-05 21:52:12.267146815 -0400
++++ lib/atomic.h	2023-04-05 21:52:24.876153264 -0400
+@@ -17,8 +17,9 @@
+ #if defined(HAVE_STDATOMIC_H) && !defined(__STDC_NO_ATOMICS__) && \
+ 	!defined(__cplusplus)
+ # include <stdatomic.h>
+-#elif defined(__cplusplus)
+-# include <atomic>
++// commenting below lines out due to: https://github.com/OpenAMP/libmetal/issues/97
++//#elif defined(__cplusplus)
++//# include <atomic>
+ #elif defined(__GNUC__)
+ # include <metal/compiler/gcc/atomic.h>
+ #else

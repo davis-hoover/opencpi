@@ -27,11 +27,6 @@ copy_include_files() {
   for i in ${INCS[@]}; do
     # cp instead of link because of rm -rf for subsequent rcc platform builds
     #relative_link $2/$i.h $1
-    echo cp
-    echo cp $2/$i.h $1
-    echo pwd
-    pwd
-    echo pwd
     mkdir -p $1
     cp $2/$i.h $1
   done
@@ -59,6 +54,7 @@ make
 make install
 SYSFS_INCLUDE_DIR=$OcpiInstallDir/include
 OPENCPI_LIBMETAL_SYSTEM_DIR=$OcpiThisPrerequisiteDir/opencpi
+PATCH_FILEPATH=$OcpiThisPrerequisiteDir/rfdc.patch
 source $OCPI_CDK_DIR/scripts/setup-prerequisite.sh \
        "$1" \
        rfdc \
@@ -70,6 +66,16 @@ source $OCPI_CDK_DIR/scripts/setup-prerequisite.sh \
 BUILD_DIR=../ThirdParty/sw_services/libmetal/src/libmetal
 ln -fs $OPENCPI_LIBMETAL_SYSTEM_DIR $BUILD_DIR/lib/system/opencpi
 pushd $BUILD_DIR
+echo Patching API headers
+# ignore "skipping patch" exit status of 1 but error on all other errors
+OUT="$(patch -p0 -N < $PATCH_FILEPATH)" || echo "${OUT}" | \
+    grep "Skipping patch" -q || (echo "$OUT" && false) || {
+  echo "*******************************************************" >&2
+  echo "ERROR: patch applied by rfdc.patch failed!!" >&2
+  echo "$OUT" >&2
+  echo "*******************************************************" >&2
+  exit 1
+}
 # -p needed for builds of subsequent rcc platforms
 mkdir -p build_libm
 pushd build_libm

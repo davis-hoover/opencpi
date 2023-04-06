@@ -1,8 +1,20 @@
 <rccworker language='c++' version='2' spec='drc-spec'
-    includedirs='drc/base/include drc/rfdc/include' staticprereqlibs='sysfs rfdc'>
+    includedirs='drc/base/include drc/rfdc/include'
+    staticprereqlibs='sysfs rfdc'>
   <specproperty name='MAX_CHANNELS_p' value='4'/>
   <specproperty name='MAX_RX_CHANNELS_p' value='2'/>
   <specproperty name='MAX_TX_CHANNELS_p' value='2'/>
   <specproperty name='MAX_RX_RF_PORTS_p' value='2'/>
   <specproperty name='MAX_TX_RF_PORTS_p' value='2'/>
+  <slaves>
+    <instance worker='ocpi.platform.devices.rfdc.hdl'/>
+    <instance worker='ocpi.platform.devices.rfdc_dac_config_0.hdl'/>
+    <instance worker='ocpi.platform.devices.rfdc_dac_config_1.hdl'/>
+    <instance worker='ocpi.platform.devices.rfdc_dac_config_2.hdl'/>
+    <instance worker='ocpi.platform.devices.rfdc_dac_config_3.hdl'/>
+    <instance worker='ocpi.platform.devices.rfdc_adc_config_0.hdl'/>
+    <instance worker='ocpi.platform.devices.rfdc_adc_config_1.hdl'/>
+    <instance worker='ocpi.platform.devices.rfdc_adc_config_2.hdl'/>
+    <instance worker='ocpi.platform.devices.rfdc_adc_config_3.hdl'/>
+  </slaves>
 </rccworker>

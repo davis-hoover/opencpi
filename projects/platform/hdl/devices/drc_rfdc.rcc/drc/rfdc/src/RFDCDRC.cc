@@ -207,7 +207,7 @@ RFDCConfigurator::init_rf_port_tx2() {
 // -----------------------------------------------------------------------------
 
 template<class cfgrtr_t> void
-RFDCDRC<cfgrtr_t>::RFDCDRC() {
+RFDCDRC<cfgrtr_t>::RFDCDRC(DeviceCallBack &dev) : m_callBack(dev) {
   init();
 }
 
