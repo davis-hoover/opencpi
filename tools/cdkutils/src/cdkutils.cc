@@ -50,12 +50,12 @@ addInclude(const std::string &inc) {
   for (auto it = includes.begin(); it != includes.end(); ++it)
     if (inc == *it) // use ordered set?
       return;
-  ocpiInfo("Adding to XML path: %s", inc.c_str());
+  ocpiDebug("Adding to XML path: %s", inc.c_str());
   includes.push_back(inc);
 }
 void
 addInclude(const char *inc) {
-  ocpiInfo("Adding to XML path: %s", inc);
+  ocpiDebug("Adding to XML path: %s", inc);
   includes.push_back(inc);
 }
 
