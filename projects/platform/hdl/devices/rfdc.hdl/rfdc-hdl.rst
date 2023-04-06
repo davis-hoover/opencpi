@@ -8,7 +8,7 @@
 ======================
 Xilinx RF Data Converter Device Worker.
 
-Detail
+Description
 ------
 For a full top-down description of the RF Data Converter Architecture, see the drc_rfdc.rcc worker documentation.
 
@@ -28,6 +28,9 @@ The Xilinx RF Data Converter (RFDC) has 3 generations (https://www.xilinx.com/pr
 #. Clock source/routing is complicated and the Xilinx IP generator GUI indicates valid/invalid configurations
 #. ADCs and DACs are organized by tiles in a manner that adds complexity
 
+Build Configurations
+------
+
 This worker and its underlying rfdc primitive only support the following RFDC configuration(s):
 
 * config 0
@@ -42,13 +45,33 @@ This worker and its underlying rfdc primitive only support the following RFDC co
   * Digital decimation/interpolation rate of 40x (4 Gsps / 40 = 100 Msps at AXI-Stream ports)
   * Digital complex mixer (fine frequency control) enabled for every converter
 
+Design Philosophy
+------
+
 This worker was designed with the following ordered design priorities:
 
 #. Enable the RF Data Converter (RFDC) HiTechGlobal ZU48DR variant with J3, J13, J18, J20 (Tiles 224, 226, 231) RF connectors
 #. Instance as few RFDC Xilinx IP RF ports as possible
 #. Instance as few RFDC clocks as possible
 
-The rfdc_adc.hdl and rfdc_dac.hdl workers contain a fixed number of ports according to the previously mentioned configuration(s). Future support for additional configuration(s) require detailed investigation of the common functionality, especially the clock configuration, and incorporating additional parameter properties (and mapping them to underlying rfdc primitive VHDL generics) and OpenCPI ports in the worker's component specification (and mapping them to underlying rfdc primitive AXI-Stream ports), and enabling the parameter-controlled configuration via a worker build.xml.
+The rfdc.hdl worker contains a fixed number of WSI ports according to the previously mentioned ADC/DAC configuration(s). Future support for additional configuration(s) require detailed investigation of the common functionality, especially the clock configuration, and incorporating additional parameter properties (and mapping them to underlying rfdc primitive VHDL generics) and OpenCPI ports in the worker's component specification (and mapping them to underlying rfdc primitive AXI-Stream ports), and enabling the parameter-controlled configuration via a worker build.xml.
+
+AXI-Lite Register Access
+------
+
+The permissible address space per OpenCPI HDL worker is undocumented. Because runtime exceptions were occuring when putting all possible Xilinx RFDC IP registers within the rfdc.hdl worker's property space, the IP address space was segmented in 16 KB segments across the following workers according to a similar segmentation within the IP itself:
+
+* rfdc.hdl
+* rfdc_dac_config_0.hdl
+* rfdc_dac_config_1.hdl
+* rfdc_dac_config_2.hdl
+* rfdc_dac_config_3.hdl
+* rfdc_adc_config_0.hdl
+* rfdc_adc_config_1.hdl
+* rfdc_adc_config_2.hdl
+* rfdc_adc_config_3.hdl
+
+The overarching software in drc_rfdc.rcc knows about this segmentation and forwards each libmetal register access to the proper HDL worker.
 
 ``rfdc`` HDL Primitive
 ======================
@@ -63,3 +86,4 @@ The primitive consists of a Makefile, Vivado TCL script, and a VHDL wrapper modu
 
 The generic_pcie primitive was used as an example for Xilinx IP managed project creation and synthesis. 
 The rfdc primitive contains a fixed number of AXI-Stream ports according to the previously mentioned configuration(s). Future support for additional configuration(s) require detailed investigation of the common functionality, especially the clock configuration, and incorporating additional VHDL generics and/or AXI-Stream ports in the rfdc primitive.
+The rfdc primitive instances a custom AXI-Lite interconnect that properly forwards the worker-segmented property spaces to the single AXI-Lite slave interface on the Xilinx IP module.
