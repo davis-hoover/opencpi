@@ -73,42 +73,6 @@ architecture rtl of axi_interconnect is
   signal s_adc2_write : std_logic := '0';
   signal s_adc3_write : std_logic := '0';
   signal s_adc3_read  : std_logic := '0';
-  signal cl_w_addr    : unsigned(18-1 downto 0)
-                      := (others => '0');
-  signal cl_r_addr    : unsigned(18-1 downto 0)
-                      := (others => '0');
-  signal d0_w_addr    : unsigned(18-1 downto 0)
-                      := (others => '0');
-  signal d0_r_addr    : unsigned(18-1 downto 0)
-                      := (others => '0');
-  signal d1_w_addr    : unsigned(18-1 downto 0)
-                      := (others => '0');
-  signal d1_r_addr    : unsigned(18-1 downto 0)
-                      := (others => '0');
-  signal d2_w_addr    : unsigned(18-1 downto 0)
-                      := (others => '0');
-  signal d2_r_addr    : unsigned(18-1 downto 0)
-                      := (others => '0');
-  signal d3_w_addr    : unsigned(18-1 downto 0)
-                      := (others => '0');
-  signal d3_r_addr    : unsigned(18-1 downto 0)
-                      := (others => '0');
-  signal a0_w_addr    : unsigned(18-1 downto 0)
-                      := (others => '0');
-  signal a0_r_addr    : unsigned(18-1 downto 0)
-                      := (others => '0');
-  signal a1_w_addr    : unsigned(18-1 downto 0)
-                      := (others => '0');
-  signal a1_r_addr    : unsigned(18-1 downto 0)
-                      := (others => '0');
-  signal a2_w_addr    : unsigned(18-1 downto 0)
-                      := (others => '0');
-  signal a2_r_addr    : unsigned(18-1 downto 0)
-                      := (others => '0');
-  signal a3_w_addr    : unsigned(18-1 downto 0)
-                      := (others => '0');
-  signal a3_r_addr    : unsigned(18-1 downto 0)
-                      := (others => '0');
   signal cl_aw_addr   : std_logic_vector(32-1 downto 0)
                       := (others => '0');
   signal cl_ar_addr   : std_logic_vector(32-1 downto 0)
@@ -167,56 +131,36 @@ begin
   s_adc3_read  <= s_adc3_axi_in.ar.valid and m_axi_in.ar.ready;
 
   -- convert 14 bit addresses to 18-bit addresses
-  cl_w_addr <= unsigned("0000" & s_ctrl_axi_in.aw.addr(14-1 downto 0));
-  d0_w_addr <= unsigned("0000" & s_dac0_axi_in.aw.addr(14-1 downto 0));
-  d1_w_addr <= unsigned("0000" & s_dac1_axi_in.aw.addr(14-1 downto 0));
-  d2_w_addr <= unsigned("0000" & s_dac2_axi_in.aw.addr(14-1 downto 0));
-  d3_w_addr <= unsigned("0000" & s_dac3_axi_in.aw.addr(14-1 downto 0));
-  a0_w_addr <= unsigned("0000" & s_adc0_axi_in.aw.addr(14-1 downto 0));
-  a1_w_addr <= unsigned("0000" & s_adc1_axi_in.aw.addr(14-1 downto 0));
-  a2_w_addr <= unsigned("0000" & s_adc2_axi_in.aw.addr(14-1 downto 0));
-  a3_w_addr <= unsigned("0000" & s_adc3_axi_in.aw.addr(14-1 downto 0));
-  cl_r_addr <= unsigned("0000" & s_ctrl_axi_in.ar.addr(14-1 downto 0));
-  d0_r_addr <= unsigned("0000" & s_dac0_axi_in.ar.addr(14-1 downto 0));
-  d1_r_addr <= unsigned("0000" & s_dac1_axi_in.ar.addr(14-1 downto 0));
-  d2_r_addr <= unsigned("0000" & s_dac2_axi_in.ar.addr(14-1 downto 0));
-  d3_r_addr <= unsigned("0000" & s_dac3_axi_in.ar.addr(14-1 downto 0));
-  a0_r_addr <= unsigned("0000" & s_adc0_axi_in.ar.addr(14-1 downto 0));
-  a1_r_addr <= unsigned("0000" & s_adc1_axi_in.ar.addr(14-1 downto 0));
-  a2_r_addr <= unsigned("0000" & s_adc2_axi_in.ar.addr(14-1 downto 0));
-  a3_r_addr <= unsigned("0000" & s_adc3_axi_in.ar.addr(14-1 downto 0));
-
-  -- convert 18-bit address to the address from:
   -- https://docs.xilinx.com/r/en-US/pg269-rf-data-converter/Register-Space
   -- (but on a 32-bit bus since it was decided to use the existing axi.lite32
   -- package for convenience)
   -- 0x00000 - 0x03FFF
-  cl_aw_addr <= "00000000000000" & std_logic_vector(cl_w_addr);
-  cl_ar_addr <= "00000000000000" & std_logic_vector(cl_r_addr);
+  cl_aw_addr <= "000000000000000000" & s_ctrl_axi_in.aw.addr(14-1 downto 0);
+  cl_ar_addr <= "000000000000000000" & s_ctrl_axi_in.ar.addr(14-1 downto 0);
   -- 0x04000 - 0x07FFF
-  d0_aw_addr <= "00000000000000" & std_logic_vector(d0_w_addr+"00010000000000");
-  d0_ar_addr <= "00000000000000" & std_logic_vector(d0_r_addr+"00010000000000");
+  d0_aw_addr <= "000000000000000001" & s_dac0_axi_in.aw.addr(14-1 downto 0);
+  d0_ar_addr <= "000000000000000001" & s_dac0_axi_in.ar.addr(14-1 downto 0);
   -- 0x08000 - 0x0BFFF
-  d1_aw_addr <= "00000000000000" & std_logic_vector(d1_w_addr+"00100000000000");
-  d1_ar_addr <= "00000000000000" & std_logic_vector(d1_r_addr+"00100000000000");
+  d1_aw_addr <= "000000000000000010" & s_dac1_axi_in.aw.addr(14-1 downto 0);
+  d1_ar_addr <= "000000000000000010" & s_dac1_axi_in.ar.addr(14-1 downto 0);
   -- 0x0C000 - 0x0FFFF
-  d2_aw_addr <= "00000000000000" & std_logic_vector(d2_w_addr+"00110000000000");
-  d2_ar_addr <= "00000000000000" & std_logic_vector(d2_r_addr+"00110000000000");
+  d2_aw_addr <= "000000000000000011" & s_dac2_axi_in.aw.addr(14-1 downto 0);
+  d2_ar_addr <= "000000000000000011" & s_dac2_axi_in.ar.addr(14-1 downto 0);
   -- 0x10000 - 0x13FFF
-  d3_aw_addr <= "00000000000000" & std_logic_vector(d3_w_addr+"01000000000000");
-  d3_ar_addr <= "00000000000000" & std_logic_vector(d3_r_addr+"01000000000000");
+  d3_aw_addr <= "000000000000000100" & s_dac3_axi_in.aw.addr(14-1 downto 0);
+  d3_ar_addr <= "000000000000000100" & s_dac3_axi_in.ar.addr(14-1 downto 0);
   -- 0x14000 - 0x17FFF
-  a0_aw_addr <= "00000000000000" & std_logic_vector(a0_w_addr+"01010000000000");
-  a0_ar_addr <= "00000000000000" & std_logic_vector(a0_r_addr+"01010000000000");
+  a0_aw_addr <= "000000000000000101" & s_adc0_axi_in.aw.addr(14-1 downto 0);
+  a0_ar_addr <= "000000000000000101" & s_adc0_axi_in.ar.addr(14-1 downto 0);
   -- 0x18000 - 0x1BFFF
-  a1_aw_addr <= "00000000000000" & std_logic_vector(a1_w_addr+"01100000000000");
-  a1_ar_addr <= "00000000000000" & std_logic_vector(a1_r_addr+"01100000000000");
+  a1_aw_addr <= "000000000000000110" & s_adc1_axi_in.aw.addr(14-1 downto 0);
+  a1_ar_addr <= "000000000000000110" & s_adc1_axi_in.ar.addr(14-1 downto 0);
   -- 0x1C000 - 0x1FFFF
-  a2_aw_addr <= "00000000000000" & std_logic_vector(a2_w_addr+"01110000000000");
-  a2_ar_addr <= "00000000000000" & std_logic_vector(a2_r_addr+"01110000000000");
+  a2_aw_addr <= "000000000000000111" & s_adc2_axi_in.aw.addr(14-1 downto 0);
+  a2_ar_addr <= "000000000000000111" & s_adc2_axi_in.ar.addr(14-1 downto 0);
   -- 0x20000 - 0x23FFF
-  a3_aw_addr <= "00000000000000" & std_logic_vector(a3_w_addr+"10000000000000");
-  a3_ar_addr <= "00000000000000" & std_logic_vector(a3_r_addr+"10000000000000");
+  a3_aw_addr <= "000000000000001000" & s_adc3_axi_in.aw.addr(14-1 downto 0);
+  a3_ar_addr <= "000000000000001000" & s_adc3_axi_in.ar.addr(14-1 downto 0);
 
   fsm : process(s_ctrl_axi_in.a.clk)
   begin
@@ -259,8 +203,6 @@ begin
         state <= ADC2_READ;
       elsif s_adc3_read = '1' then
         state <= ADC3_READ;
-      else
-        state <= INIT;
       end if;
     end if;
   end process;
@@ -269,7 +211,8 @@ begin
   m_axi_out.a.clk    <= s_ctrl_axi_in.a.clk;
   m_axi_out.a.resetn <= s_ctrl_axi_in.a.resetn;
   -- aw channel
-  m_axi_out.aw.addr  <= d0_aw_addr when s_dac0_write = '1' else
+  m_axi_out.aw.addr  <= cl_aw_addr when s_ctrl_write = '1' else
+                        d0_aw_addr when s_dac0_write = '1' else
                         d1_aw_addr when s_dac1_write = '1' else
                         d2_aw_addr when s_dac2_write = '1' else
                         d3_aw_addr when s_dac3_write = '1' else
@@ -278,7 +221,8 @@ begin
                         a2_aw_addr when s_adc2_write = '1' else
                         a3_aw_addr when s_adc3_write = '1' else
                         cl_aw_addr;
-  m_axi_out.aw.valid <= s_dac0_axi_in.aw.valid when s_dac0_write = '1' else
+  m_axi_out.aw.valid <= s_ctrl_axi_in.aw.valid when s_ctrl_write = '1' else
+                        s_dac0_axi_in.aw.valid when s_dac0_write = '1' else
                         s_dac1_axi_in.aw.valid when s_dac1_write = '1' else
                         s_dac2_axi_in.aw.valid when s_dac2_write = '1' else
                         s_dac3_axi_in.aw.valid when s_dac3_write = '1' else
@@ -287,7 +231,8 @@ begin
                         s_adc2_axi_in.aw.valid when s_adc2_write = '1' else
                         s_adc3_axi_in.aw.valid when s_adc3_write = '1' else
                         s_ctrl_axi_in.aw.valid;
-  m_axi_out.aw.prot  <= s_dac0_axi_in.aw.prot when s_dac0_write = '1' else
+  m_axi_out.aw.prot  <= s_ctrl_axi_in.aw.prot when s_ctrl_write = '1' else
+                        s_dac0_axi_in.aw.prot when s_dac0_write = '1' else
                         s_dac1_axi_in.aw.prot when s_dac1_write = '1' else
                         s_dac2_axi_in.aw.prot when s_dac2_write = '1' else
                         s_dac3_axi_in.aw.prot when s_dac3_write = '1' else
@@ -296,6 +241,7 @@ begin
                         s_adc2_axi_in.aw.prot when s_adc2_write = '1' else
                         s_adc3_axi_in.aw.prot when s_adc3_write = '1' else
                         s_ctrl_axi_in.aw.prot;
+  s_ctrl_axi_out.aw.ready <= m_axi_in.aw.ready;
   s_dac0_axi_out.aw.ready <= m_axi_in.aw.ready;
   s_dac1_axi_out.aw.ready <= m_axi_in.aw.ready;
   s_dac2_axi_out.aw.ready <= m_axi_in.aw.ready;
@@ -304,35 +250,38 @@ begin
   s_adc1_axi_out.aw.ready <= m_axi_in.aw.ready;
   s_adc2_axi_out.aw.ready <= m_axi_in.aw.ready;
   s_adc3_axi_out.aw.ready <= m_axi_in.aw.ready;
-  s_ctrl_axi_out.aw.ready <= m_axi_in.aw.ready;
   -- ar channel
-  m_axi_out.ar.addr  <= d0_ar_addr when s_dac0_write = '1' else
-                        d1_ar_addr when s_dac1_write = '1' else
-                        d2_ar_addr when s_dac2_write = '1' else
-                        d3_ar_addr when s_dac3_write = '1' else
-                        a0_ar_addr when s_adc0_write = '1' else
-                        a1_ar_addr when s_adc1_write = '1' else
-                        a2_ar_addr when s_adc2_write = '1' else
-                        a3_ar_addr when s_adc3_write = '1' else
+  m_axi_out.ar.addr  <= cl_ar_addr when s_ctrl_read = '1' else
+                        d0_ar_addr when s_dac0_read = '1' else
+                        d1_ar_addr when s_dac1_read = '1' else
+                        d2_ar_addr when s_dac2_read = '1' else
+                        d3_ar_addr when s_dac3_read = '1' else
+                        a0_ar_addr when s_adc0_read = '1' else
+                        a1_ar_addr when s_adc1_read = '1' else
+                        a2_ar_addr when s_adc2_read = '1' else
+                        a3_ar_addr when s_adc3_read = '1' else
                         cl_ar_addr;
-  m_axi_out.ar.valid <= s_dac0_axi_in.ar.valid when s_dac0_write = '1' else
-                        s_dac1_axi_in.ar.valid when s_dac1_write = '1' else
-                        s_dac2_axi_in.ar.valid when s_dac2_write = '1' else
-                        s_dac3_axi_in.ar.valid when s_dac3_write = '1' else
-                        s_adc0_axi_in.ar.valid when s_adc0_write = '1' else
-                        s_adc1_axi_in.ar.valid when s_adc1_write = '1' else
-                        s_adc2_axi_in.ar.valid when s_adc2_write = '1' else
-                        s_adc3_axi_in.ar.valid when s_adc3_write = '1' else
+  m_axi_out.ar.valid <= s_ctrl_axi_in.ar.valid when s_ctrl_read = '1' else
+                        s_dac0_axi_in.ar.valid when s_dac0_read = '1' else
+                        s_dac1_axi_in.ar.valid when s_dac1_read = '1' else
+                        s_dac2_axi_in.ar.valid when s_dac2_read = '1' else
+                        s_dac3_axi_in.ar.valid when s_dac3_read = '1' else
+                        s_adc0_axi_in.ar.valid when s_adc0_read = '1' else
+                        s_adc1_axi_in.ar.valid when s_adc1_read = '1' else
+                        s_adc2_axi_in.ar.valid when s_adc2_read = '1' else
+                        s_adc3_axi_in.ar.valid when s_adc3_read = '1' else
                         s_ctrl_axi_in.ar.valid;
-  m_axi_out.ar.prot  <= s_dac0_axi_in.ar.prot when s_dac0_write = '1' else
-                        s_dac1_axi_in.ar.prot when s_dac1_write = '1' else
-                        s_dac2_axi_in.ar.prot when s_dac2_write = '1' else
-                        s_dac3_axi_in.ar.prot when s_dac3_write = '1' else
-                        s_adc0_axi_in.ar.prot when s_adc0_write = '1' else
-                        s_adc1_axi_in.ar.prot when s_adc1_write = '1' else
-                        s_adc2_axi_in.ar.prot when s_adc2_write = '1' else
-                        s_adc3_axi_in.ar.prot when s_adc3_write = '1' else
+  m_axi_out.ar.prot  <= s_ctrl_axi_in.ar.prot when s_ctrl_read = '1' else
+                        s_dac0_axi_in.ar.prot when s_dac0_read = '1' else
+                        s_dac1_axi_in.ar.prot when s_dac1_read = '1' else
+                        s_dac2_axi_in.ar.prot when s_dac2_read = '1' else
+                        s_dac3_axi_in.ar.prot when s_dac3_read = '1' else
+                        s_adc0_axi_in.ar.prot when s_adc0_read = '1' else
+                        s_adc1_axi_in.ar.prot when s_adc1_read = '1' else
+                        s_adc2_axi_in.ar.prot when s_adc2_read = '1' else
+                        s_adc3_axi_in.ar.prot when s_adc3_read = '1' else
                         s_ctrl_axi_in.ar.prot;
+  s_ctrl_axi_out.ar.ready <= m_axi_in.ar.ready;
   s_dac0_axi_out.ar.ready <= m_axi_in.ar.ready;
   s_dac1_axi_out.ar.ready <= m_axi_in.ar.ready;
   s_dac2_axi_out.ar.ready <= m_axi_in.ar.ready;
@@ -341,7 +290,6 @@ begin
   s_adc1_axi_out.ar.ready <= m_axi_in.ar.ready;
   s_adc2_axi_out.ar.ready <= m_axi_in.ar.ready;
   s_adc3_axi_out.ar.ready <= m_axi_in.ar.ready;
-  s_ctrl_axi_out.ar.ready <= m_axi_in.ar.ready;
   -- w channel
   m_axi_out.w.data  <= s_ctrl_axi_in.w.data when state = CTRL_WRITE else
                        s_dac0_axi_in.w.data when state = DAC0_WRITE else
