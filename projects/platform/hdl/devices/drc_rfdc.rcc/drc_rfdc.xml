@@ -1,6 +1,7 @@
 <rccworker language='c++' version='2' spec='drc-spec'
     includedirs='drc/base/include drc/rfdc/include'
-    staticprereqlibs='sysfs rfdc'>
+    staticprereqlibs='sysfs rfdc'
+    onlyplatforms='xilinx19_2_aarch64'>
   <specproperty name='MAX_CHANNELS_p' value='4'/>
   <specproperty name='MAX_RX_CHANNELS_p' value='2'/>
   <specproperty name='MAX_TX_CHANNELS_p' value='2'/>
