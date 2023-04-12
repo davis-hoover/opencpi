@@ -24,7 +24,7 @@ name=lzma
 version=5.2.5  # latest as of 09/02/2020
 pkg_name="xz-$version"
 description='LZMA2 compression library'
-dl_url="https://opencpi-repo.s3.us-east-2.amazonaws.com/prerequisites/${pkg_name}.tar.gz"
+dl_url="https://tukaani.org/xz/${pkg_name}.tar.gz"
 extracted_dir="$pkg_name"
 cross_build=1
 
