@@ -21,6 +21,8 @@
 #ifndef _MATH_HH
 #define _MATH_HH
 
+#include <cstdint>
+#include <string>
 #include <vector> // std::vector
 #include <map> // std::map
 
@@ -227,5 +229,7 @@ class CSPSolver {
   void throw_invalid_argument_if_var_key_has_not_been_added(
       const std::string& var_key);
 }; // class CSPSolver
+
+#include "Math.cc"
 
 #endif // _MATH_HH

@@ -303,4 +303,6 @@ class DRC {
   void throw_invalid_rf_port_name(const std::string& rf_port_name) const;
 }; // class DRC
 
+#include "DRC.cc"
+
 #endif // _DRC_HH

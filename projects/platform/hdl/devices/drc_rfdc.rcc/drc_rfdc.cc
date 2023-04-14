@@ -9,7 +9,7 @@
 #include "drc_rfdc-worker.hh"
 
 #include <stdexcept>
-#include "metal/io.h" // libmetal opencpi system RFDC_*OFFSET definitions
+#include "metal/io.h" // libmetal opencpi system RFDC_*ADDR definitions
 #include "RFDCDRC.hh"
 
 using namespace OCPI::RCC; // for easy access to RCC data types and constants
@@ -20,12 +20,13 @@ using namespace Drc_rfdcWorkerTypes;
 namespace OD = OCPI::DRC;
 
 class Drc_rfdcWorker : public OD::DrcProxyBase {
+#if 0
   struct DoSlave : DeviceCallBack {
     Slaves &m_slaves;
     DoSlave(Slaves &slaves) : m_slaves(slaves) {}
     void access_prop(uint16_t addr, unsigned long pof, uint8_t* buf, size_t sz,
         bool read) {
-      if (pof == RFDC_OFFSET) {
+      if (pof == RFDC_IP_CTRL_BASE_ADDR) {
         if (read) {
           m_slaves.rfdc.getRawPropertyBytes(addr, buf, sz);
         }
@@ -33,7 +34,7 @@ class Drc_rfdcWorker : public OD::DrcProxyBase {
           m_slaves.rfdc.setRawPropertyBytes(addr, buf, sz);
         }
       }
-      else if (pof == RFDC_DAC_CONFIG_0_OFFSET) {
+      else if (pof == RFDC_IP_DAC0_BASE_ADDR) {
         if (read) {
           m_slaves.rfdc_dac_config_0.getRawPropertyBytes(addr, buf, sz);
         }
@@ -41,7 +42,7 @@ class Drc_rfdcWorker : public OD::DrcProxyBase {
           m_slaves.rfdc_dac_config_0.setRawPropertyBytes(addr, buf, sz);
         }
       }
-      else if (pof == RFDC_DAC_CONFIG_1_OFFSET) {
+      else if (pof == RFDC_IP_DAC1_BASE_ADDR) {
         if (read) {
           m_slaves.rfdc_dac_config_1.getRawPropertyBytes(addr, buf, sz);
         }
@@ -49,7 +50,7 @@ class Drc_rfdcWorker : public OD::DrcProxyBase {
           m_slaves.rfdc_dac_config_1.setRawPropertyBytes(addr, buf, sz);
         }
       }
-      else if (pof == RFDC_DAC_CONFIG_2_OFFSET) {
+      else if (pof == RFDC_IP_DAC2_BASE_ADDR) {
         if (read) {
           m_slaves.rfdc_dac_config_2.getRawPropertyBytes(addr, buf, sz);
         }
@@ -57,7 +58,7 @@ class Drc_rfdcWorker : public OD::DrcProxyBase {
           m_slaves.rfdc_dac_config_2.setRawPropertyBytes(addr, buf, sz);
         }
       }
-      else if (pof == RFDC_DAC_CONFIG_3_OFFSET) {
+      else if (pof == RFDC_IP_DAC3_BASE_ADDR) {
         if (read) {
           m_slaves.rfdc_dac_config_3.getRawPropertyBytes(addr, buf, sz);
         }
@@ -65,7 +66,7 @@ class Drc_rfdcWorker : public OD::DrcProxyBase {
           m_slaves.rfdc_dac_config_3.setRawPropertyBytes(addr, buf, sz);
         }
       }
-      else if (pof == RFDC_ADC_CONFIG_0_OFFSET) {
+      else if (pof == RFDC_IP_ADC0_BASE_ADDR) {
         if (read) {
           m_slaves.rfdc_adc_config_0.getRawPropertyBytes(addr, buf, sz);
         }
@@ -73,7 +74,7 @@ class Drc_rfdcWorker : public OD::DrcProxyBase {
           m_slaves.rfdc_adc_config_0.setRawPropertyBytes(addr, buf, sz);
         }
       }
-      else if (pof == RFDC_ADC_CONFIG_1_OFFSET) {
+      else if (pof == RFDC_IP_ADC1_BASE_ADDR) {
         if (read) {
           m_slaves.rfdc_adc_config_1.getRawPropertyBytes(addr, buf, sz);
         }
@@ -81,7 +82,7 @@ class Drc_rfdcWorker : public OD::DrcProxyBase {
           m_slaves.rfdc_adc_config_1.setRawPropertyBytes(addr, buf, sz);
         }
       }
-      else if (pof == RFDC_ADC_CONFIG_2_OFFSET) {
+      else if (pof == RFDC_IP_ADC2_BASE_ADDR) {
         if (read) {
           m_slaves.rfdc_adc_config_2.getRawPropertyBytes(addr, buf, sz);
         }
@@ -89,7 +90,7 @@ class Drc_rfdcWorker : public OD::DrcProxyBase {
           m_slaves.rfdc_adc_config_2.setRawPropertyBytes(addr, buf, sz);
         }
       }
-      else if (pof == RFDC_ADC_CONFIG_3_OFFSET) {
+      else if (pof == RFDC_IP_ADC3_BASE_ADDR) {
         if (read) {
           m_slaves.rfdc_adc_config_3.getRawPropertyBytes(addr, buf, sz);
         }
@@ -137,8 +138,39 @@ class Drc_rfdcWorker : public OD::DrcProxyBase {
     }
   } m_doSlave;
   RFDCDRC<RFDCConfigurator> m_ctrlr;
+#endif
 public:
-  Drc_rfdcWorker() : m_doSlave(slaves), m_ctrlr(m_doSlave) {
+  //Drc_rfdcWorker() : m_doSlave(slaves), m_ctrlr(m_doSlave) {
+  //}
+  Drc_rfdcWorker() {
+    std::cout << "[DEBUG] constructor1\n";
+    struct metal_init_params metal_param = METAL_INIT_DEFAULTS;
+    std::cout << "[DEBUG] constructor1b\n";
+    metal_param.log_level = METAL_LOG_DEBUG;
+    std::cout << "[DEBUG] constructor1c\n";
+    if (metal_init(&metal_param)) {
+      std::cerr << "[ERROR] metal_init failed";
+      throw std::runtime_error("Xmetal_init failed");
+    }
+    std::cout << "[DEBUG] constructor1d\n";
+    XRFdc xrfdc;
+    std::cout << "[DEBUG] constructor1e\n";
+    u16 device_id = 0; // value does not matter?
+    std::cout << "[DEBUG] constructor2\n";
+    XRFdc_Config* p_config = XRFdc_LookupConfig(device_id);
+    if (p_config == NULL) {
+      std::cerr << "[ERROR] XRFdc_LookupConfig failed";
+      throw std::runtime_error("XRFdc_LookupConfig failed");
+    }
+    std::cout << "[DEBUG] constructor3 lookup config DeviceId " << p_config->DeviceId << "\n";
+    std::cout << "[DEBUG] constructor3 lookup config BaseAddr " << p_config->BaseAddr << "\n";
+#if 0
+    if (XRFdc_CfgInitialize(&xrfdc, p_config) != XRFDC_SUCCESS) {
+      std::cout << "[DEBUG] constructor4\n";
+      throw std::runtime_error("XRFdc_CfgInitialize failure");
+    }
+    std::cout << "[DEBUG] constructor5\n";
+#endif
   }
   RCCResult prepare_config(unsigned config) {
     typedef RFPort::direction_t direction_t;
@@ -166,6 +198,7 @@ public:
       req.push_back(rf_port);
     }
     RCCResult rc = RCC_OK;
+#if 0
     try {
       m_ctrlr.set_configuration((uint16_t)config, req);
       if (!m_ctrlr.prepare((uint16_t)config))
@@ -184,9 +217,11 @@ public:
                  "(or higher) for more info");
       }
     }
+#endif
     return rc;
   }
   RCCResult start_config(unsigned config) {
+#if 0
     try {
       return m_ctrlr.start((uint16_t)config) ? RCC_OK :
         setError("config start was unsuccessful, set OCPI_LOG_LEVEL to 8 "
@@ -194,10 +229,12 @@ public:
     } catch(std::exception& err) {
       return setError(err.what());
     }
+#endif
     return RCC_OK;
   }
   /// @todo / FIXME consolidate into OcpiDrcProxyApi.hh
   RCCResult stop_config(unsigned config) { 
+#if 0
     log(8, "DRC: stop_config: %u", config);
     try {
       return m_ctrlr.stop((uint16_t)config) ? RCC_OK :
@@ -206,6 +243,7 @@ public:
     } catch(std::exception& err) {
       return setError(err.what());
     }
+#endif
     return RCC_OK;
   }
   // notification that start property has been written
@@ -233,10 +271,14 @@ public:
     return RCC_OK;
   }
   RCCResult release_config(unsigned config) {
+#if 0
     log(8, "DRC: release_config");
     return m_ctrlr.release((uint16_t)config) ? RCC_OK :
       setError("config release was unsuccessful, set OCPI_LOG_LEVEL to 8 "
                "(or higher) for more info");
+#else
+    return RCC_OK;
+#endif
   }
 };
 

@@ -19,9 +19,8 @@
  */
 
 #include "RFDCDRC.hh"
-extern "C" {
+#include <stdexcept>
 #include "xrfdc.h"
-}
 
 // -----------------------------------------------------------------------------
 // STEP 1 - DEFINE Constraint Satisfaction Problem (CSP)
@@ -94,6 +93,19 @@ RFDCCSP::define_c_rfdc() {
 RFDCCSP::RFDCCSP() : CSPBase() {
   define();
 }
+
+void
+RFDCCSP::instance_rfdc() {
+  define();
+}
+
+void
+RFDCCSP::define() {
+  define_x_d_rfdc();
+  define_c_rfdc();
+}
+
+
 
 // -----------------------------------------------------------------------------
 // STEP 2 - DEFINE CONFIGURATOR THAT UTILIZES THE CSP
@@ -206,13 +218,57 @@ RFDCConfigurator::init_rf_port_tx2() {
 // STEP 3 - DEFINE DRC (get/set APIs)
 // -----------------------------------------------------------------------------
 
-template<class cfgrtr_t> void
-RFDCDRC<cfgrtr_t>::RFDCDRC(DeviceCallBack &dev) : m_callBack(dev) {
+// with Xilinx RFSoC, the RCC container is only connected to a single RF Data
+// Converter instance, so this is a single pointer instead of a vector of
+// pointers as may exist in other DRCs
+static DeviceCallBack* g_p_device_callback;
+
+uint8_t get_uchar_prop(unsigned long offset,
+    unsigned long prop_off) {
+  return g_p_device_callback->get_uchar_prop(offset, prop_off);
+}
+
+uint16_t get_ushort_prop(unsigned long offset,
+    unsigned long prop_off) {
+  return g_p_device_callback->get_ushort_prop(offset, prop_off);
+}
+
+uint32_t get_ulong_prop(unsigned long offset,
+    unsigned long prop_off) {
+  return g_p_device_callback->get_ulong_prop(offset, prop_off);
+}
+
+uint64_t get_ulonglong_prop(unsigned long offset,
+    unsigned long prop_off) {
+  return g_p_device_callback->get_ulonglong_prop(offset, prop_off);
+}
+
+void set_uchar_prop(unsigned long offset, unsigned long prop_off, uint8_t val) {
+  g_p_device_callback->set_uchar_prop(offset, prop_off, val);
+}
+
+void set_ushort_prop(unsigned long offset, unsigned long prop_off, uint16_t val) {
+  g_p_device_callback->set_ushort_prop(offset, prop_off, val);
+}
+
+void set_ulong_prop(unsigned long offset, unsigned long prop_off, uint32_t val) {
+  g_p_device_callback->set_ulong_prop(offset, prop_off, val);
+}
+
+void set_ulonglong_prop(unsigned long offset, unsigned long prop_off, uint64_t val) {
+  g_p_device_callback->set_ulonglong_prop(offset, prop_off, val);
+}
+
+template<class cfgrtr_t>
+RFDCDRC<cfgrtr_t>::RFDCDRC(DeviceCallBack &dev) : m_callback(dev) {
   init();
+  g_p_device_callback = &m_callback;
 }
 
 template<class cfgrtr_t> bool
 RFDCDRC<cfgrtr_t>::get_enabled(const std::string& rf_port_name) {
+  get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
+  return true;
 }
 
 template<class cfgrtr_t>
@@ -224,82 +280,122 @@ RFDCDRC<cfgrtr_t>::get_direction(const std::string& rf_port_name) {
 
 template<class cfgrtr_t> double 
 RFDCDRC<cfgrtr_t>::get_tuning_freq_MHz(const std::string& rf_port_name) {
+  get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
   return 0.;
 }
 
 template<class cfgrtr_t> double 
 RFDCDRC<cfgrtr_t>::get_bandwidth_3dB_MHz(const std::string& rf_port_name) {
+  get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
   return 100.;
 }
 
 template<class cfgrtr_t> double 
 RFDCDRC<cfgrtr_t>::get_sampling_rate_Msps(const std::string& rf_port_name) {
+  get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
   return 100.;
 }
 
 template<class cfgrtr_t> bool
 RFDCDRC<cfgrtr_t>::get_samples_are_complex(const std::string& rf_port_name) {
+  get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
   return true;
 }
 
 template<class cfgrtr_t> std::string
 RFDCDRC<cfgrtr_t>::get_gain_mode(const std::string& rf_port_name) {
+  get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
   ///@TODO implement correctly
   return "manual";
 }
 
 template<class cfgrtr_t> double 
-RFDCDRC<cfgrtr_t>::get_gain_dB(const std::string& rf_port) {
+RFDCDRC<cfgrtr_t>::get_gain_dB(const std::string& rf_port_name) {
+  get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
   ///@TODO implement correctly
   return 0;
 }
 
 template<class cfgrtr_t> uint8_t
 RFDCDRC<cfgrtr_t>::get_app_port_num(const std::string& rf_port_name) {
+  get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
   ///@TODO investigate whether this is correct
   return 0;
 }
 
 template<class cfgrtr_t> void
-RFDCDRC<cfgrtr_t>::set_direction(const std::string& /*rf_port_name*/,
+RFDCDRC<cfgrtr_t>::set_direction(const std::string& rf_port_name,
     RFPort::direction_t /*val*/) {
+  get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
 }
 
 template<class cfgrtr_t> void
-RFDCDRC<cfgrtr_t>::set_tuning_freq_MHz(const std::string& /*rf_port_name*/, double /*val*/) {
+RFDCDRC<cfgrtr_t>::set_tuning_freq_MHz(const std::string& rf_port_name, double /*val*/) {
+  get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
 }
 
 template<class cfgrtr_t> void
-RFDCDRC<cfgrtr_t>::set_bandwidth_3dB_MHz(const std::string& /*rf_port_name*/,
+RFDCDRC<cfgrtr_t>::set_bandwidth_3dB_MHz(const std::string& rf_port_name,
     double /*val*/) {
+  get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
 }
 
 template<class cfgrtr_t> void
-RFDCDRC<cfgrtr_t>::set_sampling_rate_Msps(const std::string& /*rf_port_name*/,
+RFDCDRC<cfgrtr_t>::set_sampling_rate_Msps(const std::string& rf_port_name,
     double /*val*/) {
+  get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
 }
 
 template<class cfgrtr_t> void
-RFDCDRC<cfgrtr_t>::set_samples_are_complex(const std::string& /*rf_port_name*/,
+RFDCDRC<cfgrtr_t>::set_samples_are_complex(const std::string& rf_port_name,
     bool /*val*/) {
+  get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
 }
 
 template<class cfgrtr_t> void
-RFDCDRC<cfgrtr_t>::set_gain_mode(const std::string& /*rf_port_name*/, const std::string& /*val*/) {
+RFDCDRC<cfgrtr_t>::set_gain_mode(const std::string& rf_port_name, const std::string& /*val*/) {
+  get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
 }
 
 template<class cfgrtr_t> void
-RFDCDRC<cfgrtr_t>::set_gain_dB(const std::string& /*rf_port_name*/, double /*val*/) {
+RFDCDRC<cfgrtr_t>::set_gain_dB(const std::string& rf_port_name, double /*val*/) {
+  get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
 }
 
 template<class cfgrtr_t> void
-RFDCDRC<cfgrtr_t>::set_app_port_num(const std::string& /*rf_port_name*/, uint8_t /*val*/) {
+RFDCDRC<cfgrtr_t>::set_app_port_num(const std::string& rf_port_name, uint8_t /*val*/) {
+  get_rx_and_throw_if_invalid_rf_port_name(rf_port_name);
 }
 
-template<class cfgrtr_t>
+template<class cfgrtr_t> bool
+RFDCDRC<cfgrtr_t>::get_rx_and_throw_if_invalid_rf_port_name(
+    const std::string& rf_port_name) {
+  bool do_rx = false;
+  ///@TODO query configurator map entries instead of hardcoding port names
+  if(rf_port_name == "rx1") {
+    do_rx = true;
+  }
+  else if(rf_port_name == "rx2") {
+    do_rx = true;
+  }
+  else if(rf_port_name == "tx1") {
+    do_rx = false;
+  }
+  else if(rf_port_name == "tx2") {
+    do_rx = false;
+  }
+  else {
+    this->throw_invalid_rf_port_name(rf_port_name);
+  }
+  return do_rx;
+}
+
+template<class cfgrtr_t> void
 RFDCDRC<cfgrtr_t>::init() {
-  ///@TODO implement correctly
-  u16 device_id = 0;
+  ///@TODO is device_id correct? it is "ignored" here assuming opencpi takes care of it
+  u16 device_id = 0; // value does not matter?
   XRFdc_Config* p_config = XRFdc_LookupConfig(device_id);
-  u32 XRFdc_CfgInitialize(&m_xrfdc, XRFdc_Config *ConfigPtr);
+  if (XRFdc_CfgInitialize(&m_xrfdc, p_config) != XRFDC_SUCCESS) {
+    throw std::runtime_error("XRFdc_CfgInitialize failure");
+  }
 }

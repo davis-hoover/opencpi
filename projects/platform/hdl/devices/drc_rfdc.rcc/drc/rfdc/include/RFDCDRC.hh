@@ -22,10 +22,7 @@
 #define _RFDC_DRC_HH
 
 #include "DRC.hh"
-extern "C" {
-#undef __cplusplus
 #include "xrfdc.h"
-}
 
 // -----------------------------------------------------------------------------
 // STEP 1 - DEFINE Constraint Satisfaction Problem (CSP)
@@ -98,8 +95,11 @@ class RFDCDRC : public DRC<cfgrtr_t> {
   void set_app_port_num(       const std::string& rf_port_name, uint8_t val);
   protected:
   XRFdc m_xrfdc;
-  DeviceCallBack &m_callBack;
+  DeviceCallBack &m_callback;
+  bool get_rx_and_throw_if_invalid_rf_port_name(const std::string& rf_port_name);
   void init();
 };
+
+#include "RFDCDRC.cc"
 
 #endif // _RFDC_DRC_HH

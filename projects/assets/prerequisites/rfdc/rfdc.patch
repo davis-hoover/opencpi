@@ -13,3 +13,50 @@ diff -rupN lib/atomic.h lib/atomic.h
  #elif defined(__GNUC__)
  # include <metal/compiler/gcc/atomic.h>
  #else
+--- lib/system/linux/CMakeLists.txt	2023-04-11 10:31:20.816783427 -0400
++++ lib/system/linux/CMakeLists.txt	2023-04-11 10:31:08.462779729 -0400
+@@ -13,6 +13,7 @@ collect (PROJECT_LIB_HEADERS sys.h)
+ collect (PROJECT_LIB_SOURCES condition.c)
+ collect (PROJECT_LIB_SOURCES device.c)
+ collect (PROJECT_LIB_SOURCES init.c)
++collect (PROJECT_LIB_SOURCES io.c)
+ collect (PROJECT_LIB_SOURCES irq.c)
+ collect (PROJECT_LIB_SOURCES shmem.c)
+ collect (PROJECT_LIB_SOURCES shmem-provider-shm.c)
+--- lib/system/linux/io.h	2023-04-11 10:32:11.093798480 -0400
++++ lib/system/linux/io.h	2023-04-11 10:32:04.638796547 -0400
+@@ -28,6 +28,34 @@ extern "C" {
+ 
+ #endif
+ 
++// https://docs.xilinx.com/r/en-US/pg269-rf-data-converter/Register-Space
++#define RFDC_IP_CTRL_BASE_ADDR 0
++#define RFDC_IP_DAC0_BASE_ADDR 0x04000
++#define RFDC_IP_DAC1_BASE_ADDR 0x08000
++#define RFDC_IP_DAC2_BASE_ADDR 0x0C000
++#define RFDC_IP_DAC3_BASE_ADDR 0x10000
++#define RFDC_IP_ADC0_BASE_ADDR 0x14000
++#define RFDC_IP_ADC1_BASE_ADDR 0x18000
++#define RFDC_IP_ADC2_BASE_ADDR 0x1C000
++#define RFDC_IP_ADC3_BASE_ADDR 0x20000
++
++uint8_t get_uchar_prop(unsigned long offset, unsigned long base_addr);
++uint16_t get_ushort_prop(unsigned long offset, unsigned long base_addr);
++uint32_t get_ulong_prop(unsigned long offset, unsigned long base_addr);
++uint64_t get_ulonglong_prop(unsigned long offset, unsigned long base_addr);
++void set_uchar_prop(unsigned long offset, unsigned long base_addr, uint8_t val);
++void set_ushort_prop(unsigned long offset, unsigned long base_addr, uint16_t val);
++void set_ulong_prop(unsigned long offset, unsigned long base_addr, uint32_t val);
++void set_ulonglong_prop(unsigned long offset, unsigned long base_addr, uint64_t val);
++
++unsigned long get_worker_property_offset(unsigned long rfdc_ip_reg_addr);
++uint64_t metal_io_access_(struct metal_io_region *io,
++    unsigned long offset,
++    uint64_t value,
++    memory_order order,
++    int width,
++    int read);
++
+ #ifdef __cplusplus
+ }
+ #endif
