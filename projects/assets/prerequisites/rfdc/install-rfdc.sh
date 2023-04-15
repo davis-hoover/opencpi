@@ -84,6 +84,7 @@ copy_include_files() {
          1
   BUILD_DIR=../ThirdParty/sw_services/libmetal/src/libmetal
   cp $RFDC_DIR/io.c $BUILD_DIR/lib/system/linux/
+  cp $RFDC_DIR/io.h $BUILD_DIR/lib/system/linux/
   pushd $BUILD_DIR
   echo Patching API headers
   # ignore "skipping patch" exit status of 1 but error on all other errors

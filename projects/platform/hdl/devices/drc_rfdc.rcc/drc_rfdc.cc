@@ -1,4 +1,24 @@
 /*
+ * This file is protected by Copyright. Please refer to the COPYRIGHT file
+ * distributed with this source distribution.
+ *
+ * This file is part of OpenCPI <http://www.opencpi.org>
+ *
+ * OpenCPI is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ *
+ * OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
  * THIS FILE WAS ORIGINALLY GENERATED ON Wed Mar 15 22:57:04 2023 EDT
  * BASED ON THE FILE: drc_rfdc.xml
  * YOU *ARE* EXPECTED TO EDIT IT
@@ -20,7 +40,6 @@ using namespace Drc_rfdcWorkerTypes;
 namespace OD = OCPI::DRC;
 
 class Drc_rfdcWorker : public OD::DrcProxyBase {
-#if 0
   struct DoSlave : DeviceCallBack {
     Slaves &m_slaves;
     DoSlave(Slaves &slaves) : m_slaves(slaves) {}
@@ -137,40 +156,76 @@ class Drc_rfdcWorker : public OD::DrcProxyBase {
       access_prop((uint16_t)of, pof, (uint8_t*)(&val), sizeof(uint64_t), false);
     }
   } m_doSlave;
-  RFDCDRC<RFDCConfigurator> m_ctrlr;
-#endif
+  /// @TODO / FIXME enable full DRC/controller
+  //RFDCDRC<RFDCConfigurator> m_ctrlr;
+  struct rfdc_ip_version_t {
+    int major;
+    int minor;
+  };
 public:
   //Drc_rfdcWorker() : m_doSlave(slaves), m_ctrlr(m_doSlave) {
   //}
-  Drc_rfdcWorker() {
+  Drc_rfdcWorker() : m_doSlave(slaves) {
+    g_p_device_callback = &m_doSlave;
     std::cout << "[DEBUG] constructor1\n";
     struct metal_init_params metal_param = METAL_INIT_DEFAULTS;
-    std::cout << "[DEBUG] constructor1b\n";
     metal_param.log_level = METAL_LOG_DEBUG;
-    std::cout << "[DEBUG] constructor1c\n";
     if (metal_init(&metal_param)) {
-      std::cerr << "[ERROR] metal_init failed";
-      throw std::runtime_error("Xmetal_init failed");
+      std::cerr << "[ERROR] metal_init failed\n";
+      throw std::runtime_error("metal_init failed");
     }
-    std::cout << "[DEBUG] constructor1d\n";
+    test_for_proof_of_life(); // checking here since the rfdc lib does not
     XRFdc xrfdc;
-    std::cout << "[DEBUG] constructor1e\n";
-    u16 device_id = 0; // value does not matter?
+    XRFdc_Config config;
     std::cout << "[DEBUG] constructor2\n";
-    XRFdc_Config* p_config = XRFdc_LookupConfig(device_id);
-    if (p_config == NULL) {
-      std::cerr << "[ERROR] XRFdc_LookupConfig failed";
-      throw std::runtime_error("XRFdc_LookupConfig failed");
-    }
-    std::cout << "[DEBUG] constructor3 lookup config DeviceId " << p_config->DeviceId << "\n";
-    std::cout << "[DEBUG] constructor3 lookup config BaseAddr " << p_config->BaseAddr << "\n";
-#if 0
-    if (XRFdc_CfgInitialize(&xrfdc, p_config) != XRFDC_SUCCESS) {
-      std::cout << "[DEBUG] constructor4\n";
+    xrfdc.io = &metal_io_region_; // from modified libmetal linux layer
+    std::cout << "[DEBUG] constructor4h\n";
+    if (XRFdc_CfgInitialize(&xrfdc, &config) != XRFDC_SUCCESS) {
+      std::cout << "[DEBUG] constructor5\n";
       throw std::runtime_error("XRFdc_CfgInitialize failure");
     }
-    std::cout << "[DEBUG] constructor5\n";
-#endif
+    u32 val;
+    XRFdc_BlockStatus status;
+    for (u32 type = 0; type <= 1; type ++) {
+      for (u32 tile = 0; tile <= 3; tile++) {
+        for (u32 bl= 0; bl<= 3; bl++) {
+          val = XRFdc_GetBlockStatus(&xrfdc, type, tile, bl, &status);
+          bool en = (val == XRFDC_SUCCESS);
+          const char* is = en ? " " : " not ";
+          const char* ad = type ? "dac" : "adc";
+          log(8, "drc: rfdc %s tile %i block %i is%senabled", ad, tile, bl, is);
+        }
+      }
+    }
+    std::cout << "[DEBUG] constructor6\n";
+  }
+  rfdc_ip_version_t get_fpga_rfdc_ip_version() {
+    rfdc_ip_version_t ret;
+    uint32_t regs_0 = slaves.rfdc.get_regs(0);
+    ret.major = (regs_0 & 0xff000000) >> 24;
+    ret.minor = (regs_0 & 0x00ff0000) >> 16;
+    return ret;
+  }
+  void test_for_proof_of_life() {
+    uint32_t regs_0 = slaves.rfdc.get_regs(0);
+    rfdc_ip_version_t version = get_fpga_rfdc_ip_version();
+    // v2.5 is what's used in primitives/rfdc/vivado-gen-rfdc.tcl at time of
+    // writing
+    bool match = (version.major == 2) && (version.minor == 5);
+    std::ostringstream oss;
+    oss << "proof of life version register (v" << version.major << ".";
+    oss << version.minor << ") ";
+    if (match) {
+      oss << "indicated";
+    }
+    else {
+      oss << "did not indicate";
+    }
+    oss << " the expected rfdc ip version v2.5";
+    log(8, "%s", oss.str().c_str());
+    if (!match) {
+      throw std::runtime_error("proof of life version register test failed");
+    }
   }
   RCCResult prepare_config(unsigned config) {
     typedef RFPort::direction_t direction_t;
