@@ -156,76 +156,9 @@ class Drc_rfdcWorker : public OD::DrcProxyBase {
       access_prop((uint16_t)of, pof, (uint8_t*)(&val), sizeof(uint64_t), false);
     }
   } m_doSlave;
-  /// @TODO / FIXME enable full DRC/controller
-  //RFDCDRC<RFDCConfigurator> m_ctrlr;
-  struct rfdc_ip_version_t {
-    int major;
-    int minor;
-  };
+  RFDCDRC<RFDCConfigurator> m_ctrlr;
 public:
-  //Drc_rfdcWorker() : m_doSlave(slaves), m_ctrlr(m_doSlave) {
-  //}
-  Drc_rfdcWorker() : m_doSlave(slaves) {
-    g_p_device_callback = &m_doSlave;
-    std::cout << "[DEBUG] constructor1\n";
-    struct metal_init_params metal_param = METAL_INIT_DEFAULTS;
-    metal_param.log_level = METAL_LOG_DEBUG;
-    if (metal_init(&metal_param)) {
-      std::cerr << "[ERROR] metal_init failed\n";
-      throw std::runtime_error("metal_init failed");
-    }
-    test_for_proof_of_life(); // checking here since the rfdc lib does not
-    XRFdc xrfdc;
-    XRFdc_Config config;
-    std::cout << "[DEBUG] constructor2\n";
-    xrfdc.io = &metal_io_region_; // from modified libmetal linux layer
-    std::cout << "[DEBUG] constructor4h\n";
-    if (XRFdc_CfgInitialize(&xrfdc, &config) != XRFDC_SUCCESS) {
-      std::cout << "[DEBUG] constructor5\n";
-      throw std::runtime_error("XRFdc_CfgInitialize failure");
-    }
-    u32 val;
-    XRFdc_BlockStatus status;
-    for (u32 type = 0; type <= 1; type ++) {
-      for (u32 tile = 0; tile <= 3; tile++) {
-        for (u32 bl= 0; bl<= 3; bl++) {
-          val = XRFdc_GetBlockStatus(&xrfdc, type, tile, bl, &status);
-          bool en = (val == XRFDC_SUCCESS);
-          const char* is = en ? " " : " not ";
-          const char* ad = type ? "dac" : "adc";
-          log(8, "drc: rfdc %s tile %i block %i is%senabled", ad, tile, bl, is);
-        }
-      }
-    }
-    std::cout << "[DEBUG] constructor6\n";
-  }
-  rfdc_ip_version_t get_fpga_rfdc_ip_version() {
-    rfdc_ip_version_t ret;
-    uint32_t regs_0 = slaves.rfdc.get_regs(0);
-    ret.major = (regs_0 & 0xff000000) >> 24;
-    ret.minor = (regs_0 & 0x00ff0000) >> 16;
-    return ret;
-  }
-  void test_for_proof_of_life() {
-    uint32_t regs_0 = slaves.rfdc.get_regs(0);
-    rfdc_ip_version_t version = get_fpga_rfdc_ip_version();
-    // v2.5 is what's used in primitives/rfdc/vivado-gen-rfdc.tcl at time of
-    // writing
-    bool match = (version.major == 2) && (version.minor == 5);
-    std::ostringstream oss;
-    oss << "proof of life version register (v" << version.major << ".";
-    oss << version.minor << ") ";
-    if (match) {
-      oss << "indicated";
-    }
-    else {
-      oss << "did not indicate";
-    }
-    oss << " the expected rfdc ip version v2.5";
-    log(8, "%s", oss.str().c_str());
-    if (!match) {
-      throw std::runtime_error("proof of life version register test failed");
-    }
+  Drc_rfdcWorker() : m_doSlave(slaves), m_ctrlr(m_doSlave) {
   }
   RCCResult prepare_config(unsigned config) {
     typedef RFPort::direction_t direction_t;
@@ -253,7 +186,6 @@ public:
       req.push_back(rf_port);
     }
     RCCResult rc = RCC_OK;
-#if 0
     try {
       m_ctrlr.set_configuration((uint16_t)config, req);
       if (!m_ctrlr.prepare((uint16_t)config))
@@ -272,11 +204,9 @@ public:
                  "(or higher) for more info");
       }
     }
-#endif
     return rc;
   }
   RCCResult start_config(unsigned config) {
-#if 0
     try {
       return m_ctrlr.start((uint16_t)config) ? RCC_OK :
         setError("config start was unsuccessful, set OCPI_LOG_LEVEL to 8 "
@@ -284,12 +214,10 @@ public:
     } catch(std::exception& err) {
       return setError(err.what());
     }
-#endif
     return RCC_OK;
   }
   /// @todo / FIXME consolidate into OcpiDrcProxyApi.hh
   RCCResult stop_config(unsigned config) { 
-#if 0
     log(8, "DRC: stop_config: %u", config);
     try {
       return m_ctrlr.stop((uint16_t)config) ? RCC_OK :
@@ -298,7 +226,6 @@ public:
     } catch(std::exception& err) {
       return setError(err.what());
     }
-#endif
     return RCC_OK;
   }
   // notification that start property has been written
@@ -326,14 +253,10 @@ public:
     return RCC_OK;
   }
   RCCResult release_config(unsigned config) {
-#if 0
     log(8, "DRC: release_config");
     return m_ctrlr.release((uint16_t)config) ? RCC_OK :
       setError("config release was unsuccessful, set OCPI_LOG_LEVEL to 8 "
                "(or higher) for more info");
-#else
-    return RCC_OK;
-#endif
   }
 };
 

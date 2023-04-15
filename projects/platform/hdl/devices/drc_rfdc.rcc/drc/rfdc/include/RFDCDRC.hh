@@ -56,6 +56,11 @@ class RFDCConfigurator : public Configurator<RFDCCSP> {
 // STEP 3 - DEFINE DRC (get/set APIs)
 // -----------------------------------------------------------------------------
 
+struct rfdc_ip_version_t {
+  int major;
+  int minor;
+};
+
 struct DeviceCallBack {
   // from the low level rfdc/libmetal library
   virtual uint8_t get_uchar_prop(unsigned long of, unsigned long pof) = 0;
@@ -97,6 +102,8 @@ class RFDCDRC : public DRC<cfgrtr_t> {
   XRFdc m_xrfdc;
   DeviceCallBack &m_callback;
   bool get_rx_and_throw_if_invalid_rf_port_name(const std::string& rf_port_name);
+  rfdc_ip_version_t get_fpga_rfdc_ip_version();
+  void throw_if_proof_of_life_reg_test_fails();
   void init();
 };
 
