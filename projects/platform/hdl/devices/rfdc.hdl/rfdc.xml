@@ -15,16 +15,16 @@
        mapped to various data converter generations. The platform config's (or
        perhaps, container's) constraints file is where the mapping to pins (and
        therefore, tiles) occurs -->
-  <signal name='rx_clks_p' width='2' pin='true' direction='in'/>
-  <signal name='rx_clks_n' width='2' pin='true' direction='in'/>
+  <signal name='rx_clks_p' width='4' pin='true' direction='in'/>
+  <signal name='rx_clks_n' width='4' pin='true' direction='in'/>
   <signal name='tx_clks_p' width='1' pin='true' direction='in'/>
   <signal name='tx_clks_n' width='1' pin='true' direction='in'/>
   <signal name='sysref_p' pin='true' direction='in'/>
   <signal name='sysref_n' pin='true' direction='in'/>
-  <signal name='rf_rxs_p' width='2' pin='true' direction='in'/>
-  <signal name='rf_rxs_n' width='2' pin='true' direction='in'/>
-  <signal name='rf_txs_p' width='4' pin='true' direction='out'/>
-  <signal name='rf_txs_n' width='4' pin='true' direction='out'/>
+  <signal name='rf_rxs_p' width='6' pin='true' direction='in'/>
+  <signal name='rf_rxs_n' width='6' pin='true' direction='in'/>
+  <signal name='rf_txs_p' width='3' pin='true' direction='out'/>
+  <signal name='rf_txs_n' width='3' pin='true' direction='out'/>
   <devsignal name='s_ctrl_axi' signals='axi_lite_32_signals.xml' master='true'
       optional='false'/>
   <devsignal name='s_dac0_axi' signals='axi_lite_32_signals.xml' master='true'

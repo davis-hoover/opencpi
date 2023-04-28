@@ -42,8 +42,8 @@ component rfdc is
     s_adc3_axi_in   : in  axi.lite32.axi_m2s_t;
     s_adc3_axi_out  : out axi.lite32.axi_s2m_t;
     -- RX path clock inputs
-    rx_clks_p        : in  std_logic_vector(2-1 downto 0);
-    rx_clks_n        : in  std_logic_vector(2-1 downto 0);
+    rx_clks_p        : in  std_logic_vector(4-1 downto 0);
+    rx_clks_n        : in  std_logic_vector(4-1 downto 0);
     -- TX path clock inputs
     tx_clks_p        : in  std_logic_vector(1-1 downto 0);
     tx_clks_n        : in  std_logic_vector(1-1 downto 0);
@@ -51,10 +51,10 @@ component rfdc is
     sysref_p         : in  std_logic;
     sysref_n         : in  std_logic;
     -- RF inputs
-    rf_rxs_p         : in  std_logic_vector(2-1 downto 0);
-    rf_rxs_n         : in  std_logic_vector(2-1 downto 0);
-    rf_txs_p         : out std_logic_vector(4-1 downto 0);
-    rf_txs_n         : out std_logic_vector(4-1 downto 0);
+    rf_rxs_p         : in  std_logic_vector(6-1 downto 0);
+    rf_rxs_n         : in  std_logic_vector(6-1 downto 0);
+    rf_txs_p         : out std_logic_vector(3-1 downto 0);
+    rf_txs_n         : out std_logic_vector(3-1 downto 0);
     -- AXI-Stream ports for complex TX paths, TDATA is Q [31:16], I [15:0]
     tx_aclks         : out std_logic_vector(1-1 downto 0); -- associated with all s_axis
     s_axis_0_tdata   : in  std_logic_vector(32-1 downto 0);

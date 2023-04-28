@@ -43,8 +43,8 @@ entity rfdc is
     s_adc3_axi_in   : in  axi.lite32.axi_m2s_t;
     s_adc3_axi_out  : out axi.lite32.axi_s2m_t;
     -- RX path clock inputs
-    rx_clks_p       : in  std_logic_vector(2-1 downto 0);
-    rx_clks_n       : in  std_logic_vector(2-1 downto 0);
+    rx_clks_p       : in  std_logic_vector(4-1 downto 0);
+    rx_clks_n       : in  std_logic_vector(4-1 downto 0);
     -- TX path clock inputs
     tx_clks_p       : in  std_logic_vector(1-1 downto 0);
     tx_clks_n       : in  std_logic_vector(1-1 downto 0);
@@ -52,10 +52,10 @@ entity rfdc is
     sysref_p        : in  std_logic;
     sysref_n        : in  std_logic;
     -- RF inputs
-    rf_rxs_p        : in  std_logic_vector(2-1 downto 0);
-    rf_rxs_n        : in  std_logic_vector(2-1 downto 0);
-    rf_txs_p        : out std_logic_vector(4-1 downto 0);
-    rf_txs_n        : out std_logic_vector(4-1 downto 0);
+    rf_rxs_p        : in  std_logic_vector(6-1 downto 0);
+    rf_rxs_n        : in  std_logic_vector(6-1 downto 0);
+    rf_txs_p        : out std_logic_vector(3-1 downto 0);
+    rf_txs_n        : out std_logic_vector(3-1 downto 0);
     -- AXI-Stream ports for complex TX paths, TDATA is Q [31:16], I [15:0]
     tx_aclks        : out std_logic_vector(1-1 downto 0); -- associated with all s_axis
     s_axis_0_tdata  : in  std_logic_vector(32-1 downto 0);
@@ -81,9 +81,15 @@ architecture structural of rfdc is
       adc0_clk_p : IN STD_LOGIC;
       adc0_clk_n : IN STD_LOGIC;
       clk_adc0 : OUT STD_LOGIC;
+      adc1_clk_p : IN STD_LOGIC;
+      adc1_clk_n : IN STD_LOGIC;
+      clk_adc1 : OUT STD_LOGIC;
       adc2_clk_p : IN STD_LOGIC;
       adc2_clk_n : IN STD_LOGIC;
       clk_adc2 : OUT STD_LOGIC;
+      adc3_clk_p : IN STD_LOGIC;
+      adc3_clk_n : IN STD_LOGIC;
+      clk_adc3 : OUT STD_LOGIC;
       dac2_clk_p : IN STD_LOGIC;
       dac2_clk_n : IN STD_LOGIC;
       clk_dac2 : OUT STD_LOGIC;
@@ -112,12 +118,18 @@ architecture structural of rfdc is
       sysref_in_n : IN STD_LOGIC;
       vin0_01_p : IN STD_LOGIC;
       vin0_01_n : IN STD_LOGIC;
+      vin0_23_p : IN STD_LOGIC;
+      vin0_23_n : IN STD_LOGIC;
+      vin1_23_p : IN STD_LOGIC;
+      vin1_23_n : IN STD_LOGIC;
       vin2_01_p : IN STD_LOGIC;
       vin2_01_n : IN STD_LOGIC;
+      vin2_23_p : IN STD_LOGIC;
+      vin2_23_n : IN STD_LOGIC;
+      vin3_23_p : IN STD_LOGIC;
+      vin3_23_n : IN STD_LOGIC;
       vout20_p : OUT STD_LOGIC;
       vout20_n : OUT STD_LOGIC;
-      vout22_p : OUT STD_LOGIC;
-      vout22_n : OUT STD_LOGIC;
       vout30_p : OUT STD_LOGIC;
       vout30_n : OUT STD_LOGIC;
       vout32_p : OUT STD_LOGIC;
@@ -130,6 +142,20 @@ architecture structural of rfdc is
       m01_axis_tdata : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
       m01_axis_tvalid : OUT STD_LOGIC;
       m01_axis_tready : IN STD_LOGIC;
+      m02_axis_tdata : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+      m02_axis_tvalid : OUT STD_LOGIC;
+      m02_axis_tready : IN STD_LOGIC;
+      m03_axis_tdata : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+      m03_axis_tvalid : OUT STD_LOGIC;
+      m03_axis_tready : IN STD_LOGIC;
+      m1_axis_aresetn : IN STD_LOGIC;
+      m1_axis_aclk : IN STD_LOGIC;
+      m12_axis_tdata : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+      m12_axis_tvalid : OUT STD_LOGIC;
+      m12_axis_tready : IN STD_LOGIC;
+      m13_axis_tdata : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+      m13_axis_tvalid : OUT STD_LOGIC;
+      m13_axis_tready : IN STD_LOGIC;
       m2_axis_aresetn : IN STD_LOGIC;
       m2_axis_aclk : IN STD_LOGIC;
       m20_axis_tdata : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -138,14 +164,25 @@ architecture structural of rfdc is
       m21_axis_tdata : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
       m21_axis_tvalid : OUT STD_LOGIC;
       m21_axis_tready : IN STD_LOGIC;
+      m22_axis_tdata : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+      m22_axis_tvalid : OUT STD_LOGIC;
+      m22_axis_tready : IN STD_LOGIC;
+      m23_axis_tdata : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+      m23_axis_tvalid : OUT STD_LOGIC;
+      m23_axis_tready : IN STD_LOGIC;
+      m3_axis_aresetn : IN STD_LOGIC;
+      m3_axis_aclk : IN STD_LOGIC;
+      m32_axis_tdata : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+      m32_axis_tvalid : OUT STD_LOGIC;
+      m32_axis_tready : IN STD_LOGIC;
+      m33_axis_tdata : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+      m33_axis_tvalid : OUT STD_LOGIC;
+      m33_axis_tready : IN STD_LOGIC;
       s2_axis_aresetn : IN STD_LOGIC;
       s2_axis_aclk : IN STD_LOGIC;
-      s20_axis_tdata : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+      s20_axis_tdata : IN STD_LOGIC_VECTOR(255 DOWNTO 0);
       s20_axis_tvalid : IN STD_LOGIC;
       s20_axis_tready : OUT STD_LOGIC;
-      s22_axis_tdata : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-      s22_axis_tvalid : IN STD_LOGIC;
-      s22_axis_tready : OUT STD_LOGIC;
       s3_axis_aresetn : IN STD_LOGIC;
       s3_axis_aclk : IN STD_LOGIC;
       s30_axis_tdata : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -182,9 +219,9 @@ architecture structural of rfdc is
   end component axi_interconnect;
 
   constant FIFO_DEPTH : positive := 16;
-  signal zeros_32 : std_logic_vector(32-1 downto 0)
-                  := (others => '0');
-  signal zero     : std_logic := '0';
+  signal zeros_256 : std_logic_vector(256-1 downto 0)
+                   := (others => '0');
+  signal zero      : std_logic := '0';
   -- raw clk domain
   signal interconnect_to_xilinx_rfdc_ip_axi_in : axi.lite32.axi_s2m_t := (
       aw => (READY => '0'),
@@ -231,6 +268,12 @@ architecture structural of rfdc is
   signal rx_1_q_fifo_deq            : std_logic := '0';
   signal rx_1_i_fifo_tvalid         : std_logic := '0';
   signal rx_1_q_fifo_tvalid         : std_logic := '0';
+  -- rx_2 clk domain (only needed to rfdc_ip's unused axi-stream port)
+  signal rx_2_clk                   : std_logic := '0';
+  signal rx_2_resetn                : std_logic := '0';
+  -- rx_3 clk domain (only needed to rfdc_ip's unused axi-stream port)
+  signal rx_3_clk                   : std_logic := '0';
+  signal rx_3_resetn                : std_logic := '0';
   -- tx_0 clk domain
   signal tx_0_clk    : std_logic := '0';
   signal tx_0_reset  : std_logic := '0';
@@ -284,6 +327,24 @@ begin
       dst_rst   => rx_1_reset,
       dst_rst_n => rx_1_resetn);
 
+  rx_2_reset_synchronizer : cdc.cdc.reset
+    generic map(
+      SRC_RST_VALUE => '0')
+    port map(
+      src_rst   => s_ctrl_axi_in.a.resetn,
+      dst_clk   => rx_2_clk,
+      dst_rst   => open,
+      dst_rst_n => rx_2_resetn);
+
+  rx_3_reset_synchronizer : cdc.cdc.reset
+    generic map(
+      SRC_RST_VALUE => '0')
+    port map(
+      src_rst   => s_ctrl_axi_in.a.resetn,
+      dst_clk   => rx_3_clk,
+      dst_rst   => open,
+      dst_rst_n => rx_3_resetn);
+
   tx_0_reset_synchronizer : cdc.cdc.reset
     generic map(
       SRC_RST_VALUE => '0')
@@ -298,9 +359,15 @@ begin
       adc0_clk_p => rx_clks_p(0),
       adc0_clk_n => rx_clks_n(0),
       clk_adc0 => rx_0_clk,
+      adc1_clk_p => rx_clks_p(2),
+      adc1_clk_n => rx_clks_n(2),
+      clk_adc1 => rx_2_clk, -- unused
       adc2_clk_p => rx_clks_p(1),
-      adc2_clk_n => rx_clks_n(1),
+      adc2_clk_n => rx_clks_p(1),
       clk_adc2 => rx_1_clk,
+      adc3_clk_p => rx_clks_p(3),
+      adc3_clk_n => rx_clks_n(3),
+      clk_adc3 => rx_3_clk, -- unused
       dac2_clk_p => tx_clks_p(0),
       dac2_clk_n => tx_clks_n(0),
       clk_dac2 => tx_0_clk,
@@ -329,12 +396,18 @@ begin
       sysref_in_n => sysref_n,
       vin0_01_p => rf_rxs_p(0),
       vin0_01_n => rf_rxs_n(0),
+      vin0_23_p => rf_rxs_p(4),
+      vin0_23_n => rf_rxs_n(4),
+      vin1_23_p => rf_rxs_p(2),
+      vin1_23_n => rf_rxs_n(2),
       vin2_01_p => rf_rxs_p(1),
       vin2_01_n => rf_rxs_n(1),
+      vin2_23_p => rf_rxs_p(5),
+      vin2_23_n => rf_rxs_n(5),
+      vin3_23_p => rf_rxs_p(3),
+      vin3_23_n => rf_rxs_n(3),
       vout20_p => rf_txs_p(2),
       vout20_n => rf_txs_n(2),
-      vout22_p => rf_txs_p(3),
-      vout22_n => rf_txs_n(3),
       vout30_p => rf_txs_p(0),
       vout30_n => rf_txs_n(0),
       vout32_p => rf_txs_p(1),
@@ -347,22 +420,47 @@ begin
       m01_axis_tdata  => rfdc_to_rx_0_q_fifo_tdata,
       m01_axis_tvalid => rfdc_to_rx_0_q_fifo_tvalid,
       m01_axis_tready => rfdc_to_rx_0_q_fifo_tready,
+      m02_axis_tdata => open,
+      m02_axis_tvalid => open,
+      m02_axis_tready => '0',
+      m03_axis_tdata => open,
+      m03_axis_tvalid => open,
+      m03_axis_tready => '0',
+      m1_axis_aresetn => rx_2_resetn,
+      m1_axis_aclk => rx_2_clk,
+      m12_axis_tdata => open,
+      m12_axis_tvalid => open,
+      m12_axis_tready => '0',
+      m13_axis_tdata => open,
+      m13_axis_tvalid => open,
+      m13_axis_tready => '0',
       m2_axis_aresetn => rx_1_resetn,
       m2_axis_aclk => rx_1_clk,
-      m20_axis_tdata => rfdc_to_rx_1_i_fifo_tdata,
+      m20_axis_tdata  => rfdc_to_rx_1_i_fifo_tdata,
       m20_axis_tvalid => rfdc_to_rx_1_i_fifo_tvalid,
       m20_axis_tready => rfdc_to_rx_1_i_fifo_tready,
-      m21_axis_tdata => rfdc_to_rx_1_q_fifo_tdata,
+      m21_axis_tdata  => rfdc_to_rx_1_q_fifo_tdata,
       m21_axis_tvalid => rfdc_to_rx_1_q_fifo_tvalid,
       m21_axis_tready => rfdc_to_rx_1_q_fifo_tready,
+      m22_axis_tdata => open,
+      m22_axis_tvalid => open,
+      m22_axis_tready => '0',
+      m23_axis_tdata => open,
+      m23_axis_tvalid => open,
+      m23_axis_tready => '0',
+      m3_axis_aresetn => rx_3_resetn,
+      m3_axis_aclk => rx_3_clk,
+      m32_axis_tdata => open,
+      m32_axis_tvalid => open,
+      m32_axis_tready => '0',
+      m33_axis_tdata => open,
+      m33_axis_tvalid => open,
+      m33_axis_tready => '0',
       s2_axis_aresetn => tx_0_resetn,
       s2_axis_aclk => tx_0_clk,
-      s20_axis_tdata => zeros_32,
+      s20_axis_tdata => zeros_256,
       s20_axis_tvalid => zero,
       s20_axis_tready => open,
-      s22_axis_tdata => zeros_32,
-      s22_axis_tvalid => zero,
-      s22_axis_tready => open,
       s3_axis_aresetn => tx_0_resetn,
       s3_axis_aclk => tx_0_clk,
       s30_axis_tdata => s_axis_0_tdata,
