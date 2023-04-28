@@ -84,7 +84,6 @@ copy_include_files() {
          1
   BUILD_DIR=../ThirdParty/sw_services/libmetal/src/libmetal
   cp $RFDC_DIR/io.c $BUILD_DIR/lib/system/linux/
-  cp $RFDC_DIR/io.h $BUILD_DIR/lib/system/linux/
   pushd $BUILD_DIR
   echo Patching API headers
   # ignore "skipping patch" exit status of 1 but error on all other errors
@@ -107,9 +106,9 @@ copy_include_files() {
     TOOLC=../cmake/platforms/toolchain.cmake
     # -O is to prevent error related to FORTIFY
     echo "set (CMAKE_SYSTEM_PROCESSOR \"aarch64\" CACHE STRING \"\")
-  set (CROSS_PREFIX \"$OcpiCrossHost-\" CACHE STRING \"\")
-  set (CMAKE_C_FLAGS \"-O2 -g -fPIC\" CACHE STRING \"\")
-  include (cross-linux-gcc)" > $TOOLC
+set (CROSS_PREFIX \"$OcpiCrossHost-\" CACHE STRING \"\")
+set (CMAKE_C_FLAGS \"-O2 -g -fPIC\" CACHE STRING \"\")
+include (cross-linux-gcc)" > $TOOLC
     cmake .. \
         -DCMAKE_LIBRARY_PATH=$SYSFS_LIB_DIR/ \
         -DCMAKE_INCLUDE_PATH=$SYSFS_DIR/include \

@@ -25,8 +25,37 @@ diff -rupN lib/atomic.h lib/atomic.h
  collect (PROJECT_LIB_SOURCES shmem-provider-shm.c)
 --- lib/system/linux/io.h	2023-04-11 10:32:11.093798480 -0400
 +++ lib/system/linux/io.h	2023-04-11 10:32:04.638796547 -0400
-@@ -28,6 +28,34 @@ extern "C" {
+@@ -22,12 +22,61 @@
+ extern "C" {
+ #endif
  
+-#ifdef METAL_INTERNAL
++/**
++ * @brief  Get the default global io ops.
++ * @return  an io ops.
++ */
++struct metal_io_ops *metal_io_get_ops(void);
++
++/**
++ * @brief  Get the default global io region.
++ * @return  an io region.
++ */
++struct metal_io_region *metal_io_get_region(void);
++
++extern struct metal_io_region metal_io_region_;
+ 
+-#define metal_sys_io_mem_map(...)
+ 
++#ifdef METAL_INTERNAL
++
++/**
++ * @brief memory mapping for an I/O region
++ */
++static inline void metal_sys_io_mem_map(struct metal_io_region * io)
++{
++  if (io) {
++  }
++}
  #endif
  
 +// https://docs.xilinx.com/r/en-US/pg269-rf-data-converter/Register-Space
