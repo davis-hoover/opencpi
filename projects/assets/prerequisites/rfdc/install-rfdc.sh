@@ -101,7 +101,7 @@ copy_include_files() {
   rm -rf * # necessary to wipe out stale build from any previous rcc platform
   TMP_INC=lib/include/metal
   if [ -z $OcpiCrossHost ]; then
-    cmake ..
+    cmake3 ..
   else
     TOOLC=../cmake/platforms/toolchain.cmake
     # -O is to prevent error related to FORTIFY
@@ -109,7 +109,7 @@ copy_include_files() {
 set (CROSS_PREFIX \"$OcpiCrossHost-\" CACHE STRING \"\")
 set (CMAKE_C_FLAGS \"-O2 -g -fPIC\" CACHE STRING \"\")
 include (cross-linux-gcc)" > $TOOLC
-    cmake .. \
+    cmake3 .. \
         -DCMAKE_LIBRARY_PATH=$SYSFS_LIB_DIR/ \
         -DCMAKE_INCLUDE_PATH=$SYSFS_DIR/include \
         -DCMAKE_TOOLCHAIN_FILE=$TOOLC
