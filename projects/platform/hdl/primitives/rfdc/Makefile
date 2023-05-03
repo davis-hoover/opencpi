@@ -29,8 +29,7 @@ ifeq ($(filter clean%,$(MAKECMDGOALS))$(if $(HdlTargets),,z),)  # if not cleanin
       $(call OcpiXilinxVivadoInit) && \
       vivado -mode batch -source ../../vivado-gen-rfdc.tcl \
       -tclargs $(XilinxCoreName) xczu48dr-ffvg1517-2-e \
-      ) > vivado-gen-rfdc.log && \
-      rm -r -f tmp,MyError),\
+      ) > vivado-gen-rfdc.log,MyError),\
       $(error $(MyError)))
 endif # if not cleaning
 SourceFiles=rfdc_pkg.vhd axi_interconnect.vhd rfdc.vhd $(wildcard gen/*.edf)
