@@ -299,5 +299,5 @@ class FloatGenerator(base_generator.BaseGenerator):
 
         data = [0] * number_of_samples
         for index in range(number_of_samples):
-            data[index] = random.uniform(limited_range_max, limited_range_max)
+            data[index] = random.uniform(limited_range_min, limited_range_max)
         return data
