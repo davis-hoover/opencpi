@@ -1,5 +1,10 @@
+<!-- exactparts must be specified (but perhaps expanded in the future to include
+     more parts) in order to force synthesis for RFSoC (otherwise, build will
+     silently remove RFSoC tiles without the user knowing since the default
+     zynq_ultra family part is not an RFSoC part - for more info see
+     hdl-targets.xml) -->
 <hdldevice language='vhdl' spec='rfdc' firstrawproperty='regs' version='2'
-    libraries='axi protocol rfdc'>
+    libraries='axi protocol rfdc' exactparts='zynq_ultra:xczu48dr-2-ffvg1517e'>
   <!-- AXI4-Lite Address Range 0x0000 - 0x03FFF (14 bits of address) -->
   <!-- ref https://docs.xilinx.com/api/khub/maps/w8uumt6t1ussnarj7mwalq/attachments/u_ptvwnpz53cssexydzeua/content?ft-calling-app=ft%2fturnkey-portal&ft-calling-app-version=4.1.11&filename=pg269-rf-data-converter-en-us-2.6.pdf#unique_8 -->
   <property name='regs' type='ulong' arraylength='16384' writable='1'

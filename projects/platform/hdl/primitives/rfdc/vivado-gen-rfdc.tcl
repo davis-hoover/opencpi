@@ -244,5 +244,4 @@ create_ip_run [get_files -of_objects [get_fileset sources_1] $ip_dir/$ip_module.
 launch_runs ${ip_module}_synth_1 -jobs 8
 wait_on_run ${ip_module}_synth_1
 open_run ${ip_module}_synth_1 -name ${ip_module}_synth_1
-write_edif -security_mode all -force ../$ip_module.edf
 write_vhdl -mode synth_stub $ip_dir/${ip_module}_stub.vhdl -force
