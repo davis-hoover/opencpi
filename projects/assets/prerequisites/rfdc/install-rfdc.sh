@@ -35,6 +35,7 @@ copy_include_files() {
   done
 }
 
+# TODO investigate removal of centos/ubuntu host compilation
 #if [ -z $OcpiCrossHost ]; then
 #  source $OCPI_CDK_DIR/scripts/setup-prerequisite.sh \
 #         "$1" \
@@ -50,6 +51,7 @@ copy_include_files() {
   OCPI_RFDC_VERSION=xilinx_v2021.1
   [ -z "$OCPI_CDK_DIR" ] && echo Environment variable OCPI_CDK_DIR not set && \
       exit 1
+  # TODO investigate removal of sysfs as a dependency, as it as not used at runtime but still heavily integrated into build
   source $OCPI_CDK_DIR/scripts/setup-prerequisite.sh \
          "$1" \
          sysfs \
@@ -101,7 +103,9 @@ copy_include_files() {
   rm -rf * # necessary to wipe out stale build from any previous rcc platform
   TMP_INC=lib/include/metal
   if [ -z $OcpiCrossHost ]; then
-    cmake3 ..
+    cmake3 .. \
+        -DCMAKE_LIBRARY_PATH=$SYSFS_LIB_DIR/ \
+        -DCMAKE_INCLUDE_PATH=$SYSFS_DIR/include
   else
     TOOLC=../cmake/platforms/toolchain.cmake
     # -O is to prevent error related to FORTIFY
