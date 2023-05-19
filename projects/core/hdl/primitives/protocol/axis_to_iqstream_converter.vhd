@@ -35,5 +35,6 @@ begin
   oprotocol.iq.data.i <= s_axis_tdata(16-1 downto 0);
   oprotocol.iq.data.q <= s_axis_tdata(32-1 downto 16);
   oprotocol.iq_vld    <= s_axis_tvalid;
+  s_axis_tready       <= ordy;
 
 end rtl;
