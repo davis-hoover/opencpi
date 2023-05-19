@@ -19,6 +19,8 @@
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
 library protocol; use protocol.iqstream.all;
 
+-- The TDATA and/or TUSER are intended to be packed in a similar order to a WSI
+-- implementation (in this case, Q is MSB and I is LSB)
 entity iqstream_to_axis_converter is
   port(
     iprotocol     : in  protocol_t;
