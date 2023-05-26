@@ -1,0 +1,4 @@
+<componentspec>
+  <property name='freq_is_positive' type='bool' writable='true' default='true'/>
+  <port name='out' protocol='iqstream_protocol' producer='true'/>
+</componentspec>

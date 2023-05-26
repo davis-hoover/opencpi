@@ -226,4 +226,15 @@ component nco
     Q_OUT    : out std_logic_vector(DATA_WIDTH-1 downto 0);
     VLD_OUT  : out std_logic);
 end component;
+
+component fs_div_4_generator
+  port (
+    aclk             : in  std_logic;
+    aresetn          : in  std_logic;
+    freq_is_positive : in  std_logic;
+    m_axis_tdata     : out std_logic_vector(32-1 downto 0);
+    m_axis_tvalid    : out std_logic;
+    m_axis_tready    : in  std_logic);
+end component;
+
 end package dsp_prims;

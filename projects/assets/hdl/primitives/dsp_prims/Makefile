@@ -37,6 +37,7 @@ SourceFiles=$(patsubst %,%.vhd,\
 	cordic/src/cordic_pr \
 	cordic/src/cordic_rp \
 	dc_offset/src/dc_offset_cancellation \
+	fs_div_4_generator/src/fs_div_4_generator \
 	fir/src/macc_systolic_sym \
 	fir/src/fir_systolic_sym_even \
 	iq_imbalance/src/iq_imbalance_corrector \

@@ -1,0 +1,4 @@
+<hdlworker language='vhdl' version='2' spec='fs_div_4_generator'
+    libraries='protocol'>
+  <streaminterface name='out' datawidth='32'/>
+</hdlworker>
