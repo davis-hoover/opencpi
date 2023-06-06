@@ -276,7 +276,7 @@ class PipelineBuilder(ABC):
                 'aws ecr create-repository', 
                 '--repository-name {}'.format(repo),
                 '--image-scanning-configuration scanOnPush=true',
-                '--region us-east-2', 
+                '--region us-east-1', 
         ])
         policy_file = Path(Path(__file__).parent, 'policy.json')
         if policy_file.exists():
@@ -439,9 +439,9 @@ class PlatformPipelineBuilder(PipelineBuilder):
         # Create 'docker run' cmd
             if stage == 'install-platform':
                 volumes = [
-                    '/opt/Xilinx:/opt/Xilinx',
-                    '/opt/Mentor:/opt/Mentor',
-                    '/opt/ALDEC:/opt/ALDEC'
+                    '/tools/Xilinx:/tools/Xilinx',
+                    '/tools/Mentor:/tools/Mentor',
+                    '/tools/ALDEC:/tools/ALDEC'
                 ]
             else:
                 volumes = None
@@ -766,9 +766,9 @@ class OspPipelineBuilder(PlatformPipelineBuilder):
                 other_platform=other_platform)
             ocpi_cmd = self._build_ocpi_cmd(stage, platform, base_platform)
             volumes = [
-                '/opt/Xilinx:/opt/Xilinx',
-                '/opt/Mentor:/opt/Mentor',
-                '/opt/ALDEC:/opt/ALDEC'
+                '/tools/Xilinx:/tools/Xilinx',
+                '/tools/Mentor:/tools/Mentor',
+                '/tools/ALDEC:/tools/ALDEC'
             ]
             docker_create_cmd = self._build_docker_cmd('create', base_image, 
                 stage, ocpi_cmd=ocpi_cmd, volumes=volumes)
@@ -909,9 +909,9 @@ class CompPipelineBuilder(PlatformPipelineBuilder):
                 other_platform=other_platform)
             ocpi_cmd = self._build_ocpi_cmd(stage, platform, base_platform)
             volumes = [
-                '/opt/Xilinx:/opt/Xilinx',
-                '/opt/Mentor:/opt/Mentor',
-                '/opt/ALDEC:/opt/ALDEC'
+                '/tools/Xilinx:/tools/Xilinx',
+                '/tools/Mentor:/tools/Mentor',
+                '/tools/ALDEC:/tools/ALDEC'
             ]
             docker_create_cmd = self._build_docker_cmd('create', base_image, 
                 stage, ocpi_cmd=ocpi_cmd, volumes=volumes)
@@ -1147,9 +1147,9 @@ class AssemblyPipelineBuilder(PipelineBuilder):
         ocpi_cmd = self._build_ocpi_cmd(stage, asset)
         base_image = self._build_base_image_name(stage)
         volumes = [
-            '/opt/Xilinx:/opt/Xilinx',
-            '/opt/Mentor:/opt/Mentor',
-            '/opt/ALDEC:/opt/ALDEC'
+            '/tools/Xilinx:/tools/Xilinx',
+            '/tools/Mentor:/tools/Mentor',
+            '/tools/ALDEC:/tools/ALDEC'
         ]
         if stage in ['run-applications', 'run-unit_tests']:
         # Create "docker create" cmd, copy artifacts to container, and create
