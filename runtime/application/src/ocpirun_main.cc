@@ -80,7 +80,6 @@
 	                               "can be used with no xml file argument - no execution") \
   CMD_OPTION_S(server,   S, String, 0, "a server to explicitly contact, without UDP discovery") \
   CMD_OPTION(remote,     R, Bool,   0, "discover/include/use remote containers") \
-  CMD_OPTION_S(exclude,  X, String, 0, "a container to exclude from usage") \
   CMD_OPTION_S(transport,T, String, 0, "<instance-name>=<port-name>=<transport-name>\n" \
                                        "set transport of connection at a port") \
   CMD_OPTION_S(transfer_role,,String,0, "<instance-name>=<port-name>=<transfer-role>\n" \
