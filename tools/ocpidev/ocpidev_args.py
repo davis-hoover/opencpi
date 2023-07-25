@@ -308,6 +308,10 @@ options = {
         'long': '--workers-as-needed',
         'action': 'store_true'
     },
+    'artifacts_only': {
+        'long': '--artifacts-only',
+        'action': 'store_true'
+    },
     'phase': {
         'long': '--phase',
         'choices': ["prepare", "run", "verify", "view"],
@@ -404,6 +408,7 @@ verbs = {
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
                     'workers_as_needed' : options['workers_as_needed'],
+                    'artifacts_only' : options['artifacts_only'],
                     'xml_app': options['xml_app'],
                     'xml_dir_app': options['xml_dir_app'],
                     'export': options['export']
@@ -416,12 +421,14 @@ verbs = {
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
                     'workers_as_needed' : options['workers_as_needed'],
+                    'artifacts_only' : options['artifacts_only'],
                     'export': options['export']
                 }
             },
             'hdl': {
                 'options': {
                     'workers_as_needed' : options['workers_as_needed'],
+                    'artifacts_only' : options['artifacts_only'],
                     'hdl_target': options['hdl_target'],
                     'hdl_platform': options['hdl_platform'],
                     'export': options['export']
@@ -451,6 +458,7 @@ verbs = {
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
                     'workers_as_needed' : options['workers_as_needed'],
+                    'artifacts_only' : options['artifacts_only'],
                     'hdl_target': options['hdl_target'],
                     'hdl_platform': options['hdl_platform'],
                     'export': options['export']
@@ -465,6 +473,7 @@ verbs = {
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
                     'workers_as_needed' : options['workers_as_needed'],
+                    'artifacts_only' : options['artifacts_only'],
                     'hdl_target': options['hdl_target'],
                     'hdl_platform': options['hdl_platform'],
                     'export': options['export']
@@ -481,6 +490,7 @@ verbs = {
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
                     'workers_as_needed' : options['workers_as_needed'],
+                    'artifacts_only' : options['artifacts_only'],
                     'hdl_target': options['hdl_target'],
                     'hdl_platform': options['hdl_platform']
                 }
@@ -491,6 +501,7 @@ verbs = {
                     'dynamic': options['dynamic'],
                     'generate': options['generate'],
                     'workers_as_needed' : options['workers_as_needed'],
+                    'artifacts_only' : options['artifacts_only'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
                     'hdl_target': options['hdl_target'],
@@ -507,6 +518,7 @@ verbs = {
                     'dynamic': options['dynamic'],
                     'generate': options['generate'],
                     'workers_as_needed' : options['workers_as_needed'],
+                    'artifacts_only' : options['artifacts_only'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
                     'hdl_target': options['hdl_target'],
@@ -520,6 +532,7 @@ verbs = {
             'worker': {
                 'options': {
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
+                    'artifacts_only' : options['artifacts_only'],
                     'rcc_platform': options['rcc_platform'],
                     'hdl_target': options['hdl_target'],
                     'hdl_platform': options['hdl_platform'],

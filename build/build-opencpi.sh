@@ -35,6 +35,10 @@ while (( "$#" )); do
       minimal=1 # use ${minimal:+whatever}
       shift
       ;;
+    --artifacts-only)
+      export OCPI_ARTIFACTS_ONLY=1
+      shift
+      ;;
     --no-kernel)
       nokernel=1 # use ${nokernel:+whatever}
       shift

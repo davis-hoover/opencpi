@@ -388,6 +388,8 @@ class BuildableAsset(Asset):
             action.append('hdl')
         if kwargs.get('workers_as_needed'):
             os.environ['OCPI_AUTO_BUILD_WORKERS'] = '1'
+        if kwargs.get('artifacts_only'):
+            os.environ['OCPI_ARTIFACTS_ONLY'] = '1'
         if kwargs.get('generate'):
             action.append('generate')
         if kwargs.get('no_assemblies'):

@@ -670,7 +670,7 @@ class PlatformPipelineBuilder(PipelineBuilder):
         elif stage == 'install-platform':
             if not platform:
                 raise Exception('platform required to build ocpi cmd')
-            ocpi_cmd = 'ocpiadmin install platform {}'.format(platform)
+            ocpi_cmd = 'ocpiadmin install platform {} --artifacts-only'.format(platform)
             if base_platform:
                 ocpi_cmd += ' && (ocpiadmin deploy platform {} {}'.format(
                     platform, base_platform)
@@ -1300,7 +1300,7 @@ class AssemblyPipelineBuilder(PipelineBuilder):
     def _build_ocpi_cmd(self, stage: str, asset: str) -> str:
         """Returns an ocpi command based on the job's stage"""
         if stage in ['build-assemblies', 'build-unit_tests']:
-            ocpi_cmd = 'ocpidev build -d {} --{}-platform {}'.format(
+            ocpi_cmd = 'ocpidev build -d {} --{}-platform {} --artifacts-only'.format(
                 asset, self.model, self.platform)
         elif stage in ['run-applications', 'run-unit_tests']:
             if stage == 'run-unit_tests':

@@ -113,6 +113,10 @@ letter options are preceded by a space.
     Specifies a minimized installation process that does not pre-build HDL workers or run
     any installation tests.
 
+*`--artifacts-only`*::
+    Cleans intermediate build files when building workers and assemblies, keeps only artifacts 
+    required for building at the next level or deploying onto hardware.
+
 *`--no-kernel`*::
     Specifies to skip building the OpenCPI Linux kernel device driver
     when the OpenCPI framework is built for the platform. Use this option
