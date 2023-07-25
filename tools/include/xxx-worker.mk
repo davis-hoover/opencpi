@@ -147,7 +147,41 @@ endif
 $(call OcpiDbgVar,WkrBinaryName)
 $(call OcpiDbgVar,Workers)
 $(call OcpiDbgVar,ModelSpecificBuildHook,Before all: )
-all: $(ModelSpecificBuildHook) 
+
+# Artifacts only function for workers
+# Note: this is also called when assemblies are being built, not sure why, 
+#       however this means that *.bitz must be kept. *.vdb files are used 
+#		by xsim, *.tar & *.out files are needed to build things in 
+#		sequence in the ocpiadmin script.
+define ArtifactsOnly
+	$(AT)if [[ -n "${OCPI_ARTIFACTS_ONLY}" ]]; then \
+	  if [[ $(Model) == 'hdl' ]]; then \
+	    echo "Cleaning hdl workers intermediate build files"; \
+	    find target-* -type f \( \
+	                             -name '*.deps' -o \
+	                             -name '*.tcl' -o \
+	                             -name '*.sources' -o \
+	                             -name '*.xpr' -o \
+	                             -name '*.log' -o \
+	                             -name '*.txt' -o \
+	                             -name '*.jou' \
+	                             \) -exec rm -f {} + 2>/dev/null; \
+	    find target-* -type d -empty -delete 2>/dev/null; \
+	    rm -rf gen/doc 2>/dev/null; \
+		elif [[ $(Model) == 'rcc' ]]; then \
+	    echo "Cleaning rcc workers intermediate build files"; \
+	    find target-* -type f -not -name '*.so' -exec rm -f {} + 2>/dev/null; \
+	    find target-* -type d -empty -delete 2>/dev/null; \
+	    rm -rf gen/doc 2>/dev/null; \
+		else \
+	    echo "Worker type $(Model) does not support the --artifact-only flag"; \
+		fi \
+	fi
+endef
+
+all: $(ModelSpecificBuildHook)
+# `|| true` is to prevent errors when find doesn't fine things and stuff
+	$(call ArtifactsOnly) || true
 
 WkrTargetDirWild=$(OutDir)target-*$1
 
@@ -218,7 +252,9 @@ define WkrDoTargetConfig
     # Make sure we actually make the final binary for this target
     $$(call OcpiDbg,Before all: 1:$1 2:$2 RccTarget:$$(RccTarget). WkrBinary is "$$(call WkrBinary,$1,$2)")
     $$(eval $$(call $(CapModel)WkrBinary,$1,$2))
+
     all: $$(call WkrBinary,$1,$2)
+
   endif
 
   # If not an application, make the worker object files depend on the impl headers
@@ -391,3 +427,7 @@ OcpiRemoveSkeletons=\
 	    fi; \
 	done
 
+#                                    -name '*.xml' -o \
+#	                                  -name '*.c' -o \
+#	                                  -name '*.o' -o \
+#                                    -name '*.deps' \

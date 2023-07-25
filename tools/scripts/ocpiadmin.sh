@@ -87,6 +87,9 @@ Optional args:
   --minimal                     specifies a minimized installation process that
                                   does not pre-build HDL workers or run any
                                   installation tests; default is "false"
+  --artifacts-only              cleans all intermediate build files, keeps only
+                                  artifacts required for building at the next 
+                                  level or deploying onto hardware.
   --optimize                    for RCC (software) platforms only, specifies that
                                   the framework software and software workers be
                                   built w/optimization enabled; default is "false"
@@ -281,6 +284,9 @@ while (( "$#" )); do
       shift ;;
     --no-kernel)
       nokernel=1 # use ${nokernel:+whatever}
+      shift ;;
+    --artifacts-only)
+      artifactsonly=1
       shift ;;
 
     # Unsupported flags
@@ -499,25 +505,27 @@ else
 	fi
     fi
 fi
+
 if [ "$model" = RCC ]; then
     if [ -n "$dynamic" -o -n "$optimize" ]; then
-	if [[ $platform_target_dir == *-* ]]; then
-	    echo "ERROR: you cannot use the --dynamic or the --optimize options when you have" >&2
-	    echo "       included build options in the platform name, in this case: $platform_target_dir" >&2
-	    exit 1
-	fi
-	platform_target_dir+=-
-	[ -n "$dynamic" ] && platform_target_dir+=d
-	[ -n "$optimize" ] && platform_target_dir+=o
+        if [[ $platform_target_dir == *-* ]]; then
+            echo "ERROR: you cannot use the --dynamic or the --optimize options when you have" >&2
+            echo "       included build options in the platform name, in this case: $platform_target_dir" >&2
+            exit 1
+        fi
+        platform_target_dir+=-
+        [ -n "$dynamic" ] && platform_target_dir+=d
+        [ -n "$optimize" ] && platform_target_dir+=o
     fi
 
-    #
-    # Since the user had to source "cdk/opencpi-setup.sh" before running
-    # this script, it is safe to assume the OpenCPI environment has been
-    # properly set up.  Let "install-opencpi.sh" know that by passing a
-    # "--use-env" flag.
-    #
-    ./scripts/install-opencpi.sh ${minimal:+--minimal} ${nokernel:+--no-kernel} --use-env $platform_target_dir || exit 1
+  #
+  # Since the user had to source "cdk/opencpi-setup.sh" before running
+  # this script, it is safe to assume the OpenCPI environment has been
+  # properly set up.  Let "install-opencpi.sh" know that by passing a
+  # "--use-env" flag.  
+  #
+
+  ./scripts/install-opencpi.sh ${artifactsonly:+--artifacts-only} ${minimal:+--minimal} ${nokernel:+--no-kernel} --use-env $platform_target_dir || exit 1 
 else
     # Since the build-opencpi.sh does an "rcc" build per project, and that implicitly
     # does "declare" on projects, that is sufficient for on-demand hdl worker builds
@@ -530,14 +538,14 @@ else
       ocpidev -d projects/assets build hdl primitives --hdl-platform=$platform
       ocpidev -d projects/assets_ts build hdl primitives --hdl-platform=$platform
     else
-      ocpidev -d projects/core build --hdl --hdl-platform=$platform
-      ocpidev -d projects/platform build --hdl --hdl-platform=$platform --no-assemblies
-      ocpidev -d projects/assets build --hdl --hdl-platform=$platform --no-assemblies
-      ocpidev -d projects/assets_ts build --hdl --hdl-platform=$platform --no-assemblies
-      ocpidev -d projects/tutorial build --hdl --hdl-platform=$platform --no-assemblies
+      ocpidev -d projects/core build --hdl --hdl-platform=$platform ${artifactsonly:+--artifacts-only}
+      ocpidev -d projects/platform build --hdl --hdl-platform=$platform --no-assemblies ${artifactsonly:+--artifacts-only}
+      ocpidev -d projects/assets build --hdl --hdl-platform=$platform --no-assemblies ${artifactsonly:+--artifacts-only}
+      ocpidev -d projects/assets_ts build --hdl --hdl-platform=$platform --no-assemblies ${artifactsonly:+--artifacts-only}
+      ocpidev -d projects/tutorial build --hdl --hdl-platform=$platform --no-assemblies ${artifactsonly:+--artifacts-only}
 
       # Make sure that tutorials can run after installation, note will do rcc too.
-      [ "$platform" = xsim ] && ocpidev -d projects/tutorial build --hdl-platform=$platform
+      [ "$platform" = xsim ] && ocpidev -d projects/tutorial build --hdl-platform=$platform ${artifactsonly:+--artifacts-only}
     fi
     # If project dir is not one of the core projects, build the platform
     if [[ -n "$platform_dir" && "$platform_dir" != *"/projects/core/"* \
@@ -547,21 +555,24 @@ else
           ocpidev -d $project_dir build hdl primitives --hdl-platform=$platform
           # the rcc build ensures all workers are visible to build the platform
           # we don't have a verb to do that.
-          ocpidev -d $project_dir build --rcc
-          ocpidev -d $project_dir build hdl --workers-as-needed platform $platform
+          ocpidev -d $project_dir build --rcc ${artifactsonly:+--artifacts-only}
+          ocpidev -d $project_dir build hdl platform $platform --workers-as-needed ${artifactsonly:+--artifacts-only}
+
         else
-          ocpidev -d $project_dir build --hdl --hdl-platform=$platform --no-assemblies
+          ocpidev -d $project_dir build --hdl --hdl-platform=$platform --no-assemblies ${artifactsonly:+--artifacts-only}
         fi
         # Since there is no project-level build, no exports were done
         # The best fix would be to add an --export-project option to ocpidev
+        echo "project_dir: $project_dir"
+        echo "OCPI_CDK_DIR: $OCPI_CDK_DIR"
         make -C $project_dir -f $OCPI_CDK_DIR/include/project.mk exports
         echo "HDL platform \"$platform\" built and exported for OSP in $project_dir."
     elif [ -n "$minimal" ]; then
         # core project: build the platform in its project
-        ocpidev -d $project_dir build hdl --workers-as-needed platform $platform
+        ocpidev -d $project_dir build hdl --workers-as-needed ${artifactsonly:+--artifacts-only} platform $platform
         echo "HDL platform \"$platform\" built in $project_dir."
     fi
-    ocpidev -d projects/assets build --hdl-platform=$platform hdl ${minimal:+--workers-as-needed} assembly testbias
+    ocpidev -d projects/assets build hdl assembly testbias --hdl-platform=$platform ${minimal:+--workers-as-needed} ${artifactsonly:+--artifacts-only}
     echo "HDL platform \"$platform\" built, with one HDL assembly (testbias) built for testing."
     echo "Preparing exported files for using this platform."
     #

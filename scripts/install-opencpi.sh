@@ -40,6 +40,10 @@ while (( "$#" )); do
       minimal=1
       shift
       ;;
+    --artifacts-only)
+      export OCPI_ARTIFACTS_ONLY=1
+      shift
+      ;;
     --optimize)
       optimize=1
       shift

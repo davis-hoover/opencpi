@@ -135,6 +135,10 @@ Options When Building Projects, Libraries, Tests, RCC Workers or ACI Application
     when building for a platform that was installed using the *`--minimal`* option to
     *`ocpiadmin install platform`*.
 
+*`--artifacts-only`*::
+    When building workers or assemblies, use this option to clean up intermediate build files.
+    Only artifacts required for building at the next level or deploying onto hardware will be kept.
+
 Options When Building Projects, Libraries, Tests with HDL Workers or other HDL Assets
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`--hdl-platform=`*'<hdl-platform>'+::

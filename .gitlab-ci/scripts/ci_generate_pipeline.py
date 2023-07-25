@@ -36,7 +36,7 @@ def _set_env():
     environ['CI_OCPI_HOSTS'] = 'centos7'
     environ['CI_OCPI_HOST'] = 'centos7'
     environ['CI_OCPI_PLATFORMS'] = '"zed:xilinx19_2_aarch32,xsim"'
-    environ['CI_OCPI_PLATFORM'] = 'picozed_30_cc'
+    environ['CI_OCPI_PLATFORM'] = 'xsim'
     environ['CI_OCPI_OTHER_PLATFORM'] = 'xilinx19_2_aarch32'
     environ['CI_OCPI_PROJECTS'] = ''
     environ['CI_OCPI_ROOT_PIPELINE_ID'] = '123456789'

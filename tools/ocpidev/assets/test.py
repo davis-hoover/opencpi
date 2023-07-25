@@ -221,7 +221,7 @@ class TestsCollection(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
                              verbose=verbose)
 
     def build(self, verbose=False, no_assemblies=None, workers_as_needed=False,
-              optimize=False, dynamic=False, hdl_target=None, hdl_platform=None,
+              artifacts_only=False, optimize=False, dynamic=False, hdl_target=None, hdl_platform=None,
               rcc_platform=None, hdl_rcc_platform=None, generate=False, export=False, **kwargs):
         """
         Builds the tests by handing over the user specifications
@@ -235,6 +235,8 @@ class TestsCollection(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
             action.append('Assemblies=')
         if workers_as_needed:
             os.environ['OCPI_AUTO_BUILD_WORKERS'] = '1'
+        if artifacts_only:
+            os.environ['OCPI_ARTIFACTS_ONLY'] = '1'
         build_suffix = '-'
         if dynamic:
             build_suffix += 'd'
