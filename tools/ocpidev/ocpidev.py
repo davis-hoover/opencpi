@@ -49,13 +49,16 @@ def main():
     try:
         # 1. do stuff that cannot handled by the generic parser
         args = postprocess_args(args)
-
+        log_level = 30
+        if args.verbose:
+            log_level -= args.verbose * 10
+        args.log_level = max(log_level, 10)
+        ocpiutil.logging.basicConfig()
+        ocpiutil.logging.getLogger().setLevel(args.log_level)
         # 2. collect all the info about the CWD, after --directory option handling
         # note that the CWD cannot imply an asset that is just a file (like a protocol)
         make_type, asset_type, directory, _, _ = ocpiutil.get_dir_info()
-        if args.verbose > 1:
-            print(f'Executing in the current directory of type:  {asset_type}')
-
+        ocpiutil.logging.info(f'Executing in the current directory of type:  {asset_type}')
         # 3. Based on a) where we are (cwd), b) the noun we are targeting, and c) options,
         #    find out these things:
         #    - the targeted asset's parent's path
@@ -67,9 +70,7 @@ def main():
         parent_path, parent_type, args.noun, args.name, parent_collects = \
             get_parent(args, Path(directory), asset_type if asset_type else make_type,
                        ensure_exists=args.verb!='create')
-        if args.verbose > 1:
-            print(f'The parent asset of this "{args.noun}" asset is a "{parent_type}" asset',
-                  file=sys.stderr)
+        ocpiutil.logging.info(f'The parent asset of this "{args.noun}" asset is a "{parent_type}" asset')
         args.directory = parent_dir = str(parent_path)
 
         # 3. Get more info about parent and ask it to do a few things:
@@ -110,9 +111,8 @@ def main():
             asset_method = getattr(asset, args.verb, None)      # get the method bound to the object
         if not asset_method:
             raise NotImplementedError
-        if args.verbose > 1:
-            print(f'Executing command "{args.verb} {args.orig_noun.replace("-"," ")} '+
-                  f'in directory: {directory}', file=sys.stderr)
+        ocpiutil.logging.info(f'Executing command "{args.verb} {args.orig_noun.replace("-"," ")} '
+                     f' in directory: {directory}')
         asset_method(**vars(args))
         # This is horrible and should be nuked in favor of ocpidev show
         if args.verb == "create" or args.verb == "delete" and not args.noun in ["project", "registry"]:
@@ -121,11 +121,10 @@ def main():
                 os.chdir(projdir)
                 genProjMetaData.main(projdir)
     except NotImplementedError as e:
-        print(f'There is no support for the "{args.verb}" operation on "{args.noun}" assets',
-              file=sys.stderr)
+        ocpiutil.logging.error(f'There is no support for the "{args.verb}" operation on "{args.noun}" assets')
         sys.exit(1)
     except ocpiutil.OCPIException as e:
-        print(f'Error: {e}',file=sys.stderr)
+        ocpiutil.logging.error(f'Error: {e}')
         sys.exit(1)
     except Exception as e:
         # Verb failed in an unexpected way;
@@ -182,14 +181,14 @@ def postprocess_args(args):
         name = args.name if args.name else Path.cwd().name
         split = name.split('.')
         if len(split) != 2 or split[0] == '' or split[1] == '':
-            ocpiutil.logging.error(f'the name "{name}" for a worker must include the '+
-                                   f'authoring model after a period')
+            ocpiutil.logging.error(f'the name "{name}" for a worker must include the'
+                                   f' authoring model after a period')
             sys.exit(1)
         args.name = split[0]
         args.model = split[1]
         if args.model not in ocpiabstract.Asset.valid_authoring_models:
-            ocpiutil.logging.error(f'"{args.model}" is an invalid authoring model.  Valid ones '+
-                                   f'are "{ocpiabstract.Asset.valid_authoring_models}"')
+            ocpiutil.logging.error(f'"{args.model}" is an invalid authoring model. Valid ones'
+                                   f' are "{ocpiabstract.Asset.valid_authoring_models}"')
             sys.exit(1)
         args.noun = args.model + '-worker'
     elif args.noun == 'hdl-primitive':
@@ -279,14 +278,14 @@ def find_hdl_slot(args, parent_path, cwd_type, noun, name):
     parent_type = cwd_type
     if cwd_type == 'hdl-platforms':
         if not args.platform:
-            raise ocpiutil.OCPIException(f'when specifying an HDL device when in the hdl/platforms directory, '+
-                                         f'the platform must be specified')
+            raise ocpiutil.OCPIException(f'when specifying an HDL device when in the hdl/platforms directory,'
+                                         f' the platform must be specified')
         parent_path = parent_path.joinpath(args.platform, 'devices', 'specs')
         parent_type = 'library'
     elif cwd_type == 'library':
         if not parent_path.parent.name == 'hdl':
-            raise ocpiutil.OCPIException(f'HDL devices can only be specified in an HDL library '+
-                                         f'under the hdl/ subdirectory of a project')
+            raise ocpiutil.OCPIException(f'HDL devices can only be specified in an HDL library'
+                                         f' under the hdl/ subdirectory of a project')
         parent_path = parent_path.joinpath('specs')
     return parent_path, parent_type, noun, name, False
 
@@ -296,12 +295,12 @@ def find_hdl_device(args, target_path, cwd_type, noun, name):
     assert cwd_type in ['project','hdl-platforms','library']
     if cwd_type == 'library':
         if not target_path.parent.name == 'hdl':
-            raise ocpiutil.OCPIException(f'HDL devices can only be specified in an HDL library '+
-                                         f'under the hdl/ subdirectory of a project')
+            raise ocpiutil.OCPIException(f'HDL devices can only be specified in an HDL library'
+                                         f' under the hdl/ subdirectory of a project')
     elif cwd_type == 'hdl-platforms':
         if not args.platform:
-            raise ocpiutil.OCPIException(f'when specifying an HDL device when in the hdl/platforms directory, '+
-                                         f'the platform must be specified')
+            raise ocpiutil.OCPIException(f'when specifying an HDL device when in the hdl/platforms directory,'
+                                         f' the platform must be specified')
         target_path = target_path.joinpath(args.platform, 'devices')
     # Must be in a project dir
     elif args.platform:
@@ -309,8 +308,8 @@ def find_hdl_device(args, target_path, cwd_type, noun, name):
     elif getattr(args, 'hdl_library', None):
         if noun in ['hdl-card', 'hdl-slot']:
             if args.hdl_library != 'cards':
-                raise ocpiutil.OCPIException(f'HDL cards and slots can only be at the '+
-                                             f'project/specs level or in the hdl/cards library')
+                raise ocpiutil.OCPIException(f'HDL cards and slots can only be at the'
+                                             f' project/specs level or in the hdl/cards library')
         target_path = target_path.joinpath('hdl', args.hdl_library)
     elif getattr(args,'project',None) and noun in ['hdl-card', 'hdl-slot']:
         target_path = target_path.joinpath('specs')
@@ -321,9 +320,9 @@ def find_hdl_device(args, target_path, cwd_type, noun, name):
     elif noun == 'hdl-slot': # slots default to the cards library
         target_path = target_path.joinpath('hdl','cards')
     else:  # project level without saying where it should go
-        raise ocpiutil.OCPIException(f'HDL devices, cards or slots require an indication of '+
-                                     f'where in the project they should be, using the --project, '
-                                     f'--hdl-library, or --platform options')
+        raise ocpiutil.OCPIException(f'HDL devices, cards or slots require an indication of'
+                                     f' where in the project they should be, using the --project,'
+                                     f' --hdl-library, or --platform options')
     return target_path, "library", noun, name, False
 
 
@@ -358,8 +357,8 @@ def find_library(args, parent_path, parent_type, noun, name):
     else:
        parent_path = parent_path.joinpath('components')
        if not parent_path.is_dir() or ocpiutil.get_dirtype(parent_path) != 'library':
-           raise ocpiutil.OCPIException(f'no library was specified and a single "components" '+
-                                        f'library does not exist')
+           raise ocpiutil.OCPIException(f'no library was specified and a single "components"'
+                                        f' library does not exist')
     if args.ensure_exists and not parent_path.is_dir():
         raise ocpiutil.OCPIException(f'no library exists at "{parent_path}"')
     return parent_path, 'library', noun, name, False
@@ -401,8 +400,8 @@ def find_registry_or_project(args, cwd_path, cwd_type, noun, name):
     assert noun == 'registry'
     if args.verb in ['set','unset']:
         if cwd_type != 'project':
-            raise ocpiutil.OCPIException(f'The "set registry" command can only be issued in a '+
-                                         f'project\'s directory')
+            raise ocpiutil.OCPIException(f'The "set registry" command can only be issued in a'
+                                         f' project\'s directory')
         args.verb = args.verb + "_registry" # verbs that operate on projects
         args.registry = name # possibly relative path to project
         return cwd_path, cwd_type, "project", None, False
@@ -448,8 +447,8 @@ def get_parent(args, cwd, cwd_asset_type, ensure_exists=True):
             elif args.noun == 'test':
                 name += '.test'
             if name != cwd.name:
-                raise ocpiutil.OCPIException(f'When in the "{cwd_asset_type}" directory "{cwd}", '+
-                                             f'the given name "{args.name}" is wrong.')
+                raise ocpiutil.OCPIException(f'When in the "{cwd_asset_type}" directory "{cwd}", '
+                                             f' the given name "{args.name}" is wrong.')
         return cwd.parent, 'unknown', args.noun, \
             cwd.name if cwd_asset_type == 'project' else cwd.stem, False
     # Dictionary to map the pair of [CWD asset type, target asset type (noun) ] to
@@ -620,22 +619,22 @@ def get_parent(args, cwd, cwd_asset_type, ensure_exists=True):
     assert pmap
     pmap = pmap.get(noun)
     if pmap == None:
-        raise ocpiutil.OCPIException(f'When in a "{cwd_asset_type}" directory, operating on '+
-                                     f'{"" if noun.endswith("s") else "a "}'+
-                                     f'{noun} is invalid')
+        raise ocpiutil.OCPIException(f'When in a "{cwd_asset_type}" directory, operating on'
+                                     f' {"" if noun.endswith("s") else "a "}'
+                                     f' {noun} is invalid')
     map_name = pmap.get('name')
     if map_name == False:
         if name:
-            raise ocpiutil.OCPIException(f'When in a "{cwd_asset_type}" type directory, '+
-                                         f'providing the name "{name}" is invalid')
+            raise ocpiutil.OCPIException(f'When in a "{cwd_asset_type}" type directory,'
+                                         f' providing the name "{name}" is invalid')
     elif map_name == True:
         if not name:
-            raise ocpiutil.OCPIException(f'When in a "{cwd_asset_type}" type directory, '+
-                                         f'the "{noun}" must be named')
+            raise ocpiutil.OCPIException(f'When in a "{cwd_asset_type}" type directory,'
+                                         f' the "{noun}" must be named')
     elif map_name == 'none-or-same':
         if name and name != Path(args.directory).name:
-            raise ocpiutil.OCPIException(f'When in a "{cwd_asset_type}" type directory, '+
-                                         f'the "{noun}" must be same name or not mentioned')
+            raise ocpiutil.OCPIException(f'When in a "{cwd_asset_type}" type directory,'
+                                         f' the "{noun}" must be same name or not mentioned')
         name = None
     elif map_name != None:
         name = map_name
@@ -658,11 +657,11 @@ def get_parent(args, cwd, cwd_asset_type, ensure_exists=True):
             finder(args, parent_path, parent_type, noun, name)
     if ensure_exists and not pmap.get('optional'):
         if  not parent_path.exists():
-            raise ocpiutil.OCPIException(f'The directory "{parent_path}" does not exist where a '+
-                                         f'"{noun}" directory with name "{name}" is expected.')
+            raise ocpiutil.OCPIException(f'The directory "{parent_path}" does not exist where a'
+                                         f' "{noun}" directory with name "{name}" is expected.')
         if name and not parent_path.joinpath(name).exists():
-            ocpiutil.OCPIException(f'The "{noun}" named "{name}" in directory "{parent_path}" '+
-                                   f'does not exist')
+            ocpiutil.OCPIException(f'The "{noun}" named "{name}" in directory "{parent_path}"'
+                                   f' does not exist')
 
     return parent_path, parent_type, noun, name, collect
 

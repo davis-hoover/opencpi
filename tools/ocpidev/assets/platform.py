@@ -174,6 +174,7 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
                                                       self.name, "hdl")
         if not self.attrs:
             raise ocpiutil.OCPIException("Could not find valid HDL Platform for its worker:  " + self.name)
+        self.target = self.attrs['target']
         self.package_id = self.attrs['package_id']
         config_list = self.attrs.get('configurations')
         if not config_list:
@@ -445,6 +446,8 @@ class RccPlatform(Platform):
         if not self.attrs:
             raise ocpiutil.OCPIException("Could not find RCC Platform for:  " + self.name)
         self.package_id = self.attrs['package_id']
+        self.target = self.attrs['target']
+        self.model = self.attrs['model']
 
     def __str__(self):
         return self.name

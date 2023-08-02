@@ -19,6 +19,7 @@
 Definition of rcc and hdl workers and related classes
 """
 
+from fnmatch import fnmatch
 import os
 import sys
 import re
@@ -45,10 +46,22 @@ class Worker(ShowableComponent):
             self.make_type = 'worker'
         package_id = kwargs.get("package_id")
         self.package_id = package_id if package_id else self._init_package_id()
-        super().init_metadata(self.make_type, Path(self.directory),
-                              Path(self.name.split('.')[0]+'.xml'), **kwargs)
+        xml_path = Path(self.name.split('.')[0]).with_suffix('.xml')
+        super().init_metadata(self.make_type, Path(self.directory), xml_path, **kwargs)
         self.build_configs = {}
         self.init_build_configs(**kwargs)
+        if xml_path.exists():
+            root = ET.parse(str(xml_path)).getroot()
+            attribs = {key.lower(): val for key, val in root.attrib.items()}
+            self.only_platforms = attribs.get('onlyPlatforms', '').split()
+            self.exclude_platforms = attribs.get('excludePlatforms', '').split()
+            self.only_targets = attribs.get('onlyTargets', '').split()
+            self.exclude_targets = attribs.get('excludePlatforms', '').split()
+        else:
+            self.only_platforms = []
+            self.exclude_platforms = []
+            self.only_targets = []
+            self.exclude_targets = []
 
     all_worker_xml_attrs = (
         """
@@ -127,7 +140,7 @@ class Worker(ShowableComponent):
         dir_path = Path(directory)
         if '.' not in dir_path.name:
             dir_path = dir_path.resolve() #expensive
-        return dir_path.parts[-1]
+        return dir_path.suffix[1:]
 
     def show(self, format, verbose, **kwargs):
         """
@@ -276,6 +289,41 @@ class Worker(ShowableComponent):
             raise ocpiutil.OCPIException("Valid formats for showing worker configurations are \"" +
                                          ", ".join(self.valid_formats) + "\", but \"" +
                                          str(self.format) + "\" was chosen.")
+        
+    def _is_valid_platform(self, platform) -> bool:
+        """Determines whether a platform is valid for the worker.
+
+        Validity is determined by comparing the worker's model to the
+        test's model, by ensuring the specified platform is not in the
+        worker's list of platforms to exclude, and by ensuring that, if 
+        the worker has a list of platforms to include, that the 
+        specified platform is contained within said list. Uses fnmatch 
+        to compare the platform to the worker's inclusion and exclusion 
+        lists since they can contain patterns such as wildcards.
+
+        Args:
+            platform: The Platform to validate.
+        Returns:
+            Bool indicating whether the platform is valid for the
+            worker.
+        """
+        if self.model != platform.model:
+            return False
+        if any([fnmatch(platform.name, exclude) for exclude in self.exclude_platforms]):
+            logging.debug(f'Platform "{platform.name}" excluded by worker "{self.name}"')
+            return False
+        elif self.only_platforms and not any([fnmatch(platform.name, include) 
+                                             for include in self.only_platforms]):
+            logging.debug(f'Platform "{platform.name}" not included by worker "{self.name}"')
+            return False
+        elif any([fnmatch(platform.target, exclude) for exclude in self.exclude_targets]):
+            logging.debug(f'Target "{platform.target}" excluded by worker "{self.name}"')
+            return False
+        elif self.only_targets and not any([fnmatch(platform.target, include) 
+                                            for include in self.only_targets]):
+            logging.debug(f'Target "{platform.target}" not included by worker "{self.name}"')
+            return False
+        return True
 
 # Placeholder class
 class RccWorker(Worker,RCCBuildableAsset):
@@ -286,6 +334,7 @@ class RccWorker(Worker,RCCBuildableAsset):
         self.asset_type = 'rcc-worker'
         self.model = 'rcc'
         self.make_type = None
+        name = str(Path(name).with_suffix('.rcc')) if name is not None else name
         super().__init__(directory, name, **kwargs)
         self.check_dirtype('rcc-worker', self.directory)
 

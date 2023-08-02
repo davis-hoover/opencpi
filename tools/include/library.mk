@@ -188,8 +188,7 @@ BuildImplementation=$(infox BI:$1:$2:$(call HdlLibrariesCommand):$(call GoWorker
     set -e; \
     if [ $1 = hdl -a  -z "$3$(HdlTarget)$(HdlTargets)$(HdlPlatform)$(HdlPlatforms)" ] ; then \
       echo "=============Skipping building $2 since no HDL targets or platforms specified."; exit 0; fi; \
-    t="$(foreach t,$(or $($(call Capitalize,$1)Target),$($(call Capitalize,$1)Targets)),\
-         $(call $(call Capitalize,$1)TargetDirTail,$t))";\
+    t="${HdlTargets} ${HdlPlatforms} ${RccPlatforms}";\
     $(ECHO) $(strip $(if $(filter comp,$1),\
 	  =============Building tests in component directory $2,\
 	  =============$(if $3,Performing \"$3\" for,Building) $(call ToUpper,$(1)) implementation $(2) for target'(s)': $$t)); \

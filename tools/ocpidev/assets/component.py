@@ -62,6 +62,7 @@ class ShowableComponent(ShowableAsset):
         self.property_list = []
         self.port_list = []
         self.slave_list = []
+        self.spec_name = parsed_xml.get('specname', self.name).split('.')[-1]
         #set up self.property_list from the xml
         for props in parsed_xml.findall("property"):
             temp_dict = props.attrib

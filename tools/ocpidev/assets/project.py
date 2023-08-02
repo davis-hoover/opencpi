@@ -226,7 +226,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
             return [ 'hdl/' + hdl_library ]
         # The places where component libraries might exist
         libs=[]
-        for pattern in [ 'components', 'components/*', 'hdl/[cards|devices|adapters]',
+        for pattern in ['components', 'components/*', 'hdl/cards', 'hdl/devices', 'hdl/adapters',
                         'hdl/platforms/*/devices']:
             for match in Path(self.directory).glob(pattern):
                 if match.is_dir() and ocpiutil.get_dirtype(str(match)) == 'library':
@@ -944,7 +944,6 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
             logging.info("Imports link exists for project " + self.directory +
                          ". No registry initialization needed")
         else:
-            import _opencpi.assets.registry
             # Get the default project registry set by the environment state
             self.set_registry(ocpiregistry.Registry.get_default_registry_dir())
 
@@ -956,7 +955,6 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         I.e. Create the 'imports' link at the top-level of the project to point to the project
              registry
         """
-        import _opencpi.assets.registry
         registry_path = (self.path.joinpath(registry) if registry else
                          ocpiregistry.Registry.get_default_registry_path())
         if not registry_path.is_dir():

@@ -136,12 +136,15 @@ runnoprepare:
 runonly: prepare runnoprepare
 # runtests is for compatibility
 # run is generic (not just for tests)
+ifndef NothingError
+  NothingError:=0
+endif
 runverify:
 	$(AT)echo ======== Running and verifying test outputs on available platforms for $(CwdName):
 	$(AT)if [ -d gen/applications ]; then \
 	       ./run/runtests.sh run verify; \
 	     else \
-	       echo No tests generated here so none run.; \
+	       echo "No tests generated here so none run." && [ ${NothingError} == 0 ]; \
 	     fi
 
 run: prepare runverify
