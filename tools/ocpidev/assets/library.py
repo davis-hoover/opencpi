@@ -55,7 +55,6 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         self.package_id, self.tests_names, self.wkr_names = (
             self.get_package_id_wkrs_tests(self.directory))
         self.make_type = 'library'
-
         kwargs["package_id"] = self.package_id
         if verb in ['show', 'run']:
             self.test_list = []
@@ -80,10 +79,12 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
                     logging.debug("Skipping worker \"" + directory +
                                   "\" with unsupported authoring model \"" + auth + "\"")
                 else:
+                    kwargs['verb'] = verb if kwargs.get('parse_workers', False) else None
                     asset_type = ocpiutil.get_dir_info(worker_path)[1]
                     self.worker_list.append(AssetFactory.factory(asset_type,
                                                                  str(worker_path.parent),
-                                                                 name=worker_path.name, **kwargs))
+                                                                 name=worker_path.name,
+                                                                 **kwargs))
             self.comp_list = []
             specs = self.path.joinpath("specs")
             if specs.exists():
@@ -141,7 +142,7 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         if asset_type in ['component', 'protocol', 'hdl-slot', 'hdl-card']: # file-based assets
             name, args.child_path = __class__.resolve_file_child(asset_type, parent_path, args)
         elif asset_type.endswith('worker') or asset_type == 'hdl-device':
-            args.child_path = Path(name + '.' + asset_type[0:3]) # special case asset name
+            args.child_path = Path(name).with_suffix(f'.{asset_type[0:3]}') # special case asset name
         elif asset_type == 'test':
             if name.endswith('.test'):
                 name = name[:-5]

@@ -375,7 +375,7 @@ options = {
         'mut_exc_group' : 'scope',
      },
     'global_scope': {
-        'long': '--global_scope',
+        'long': '--global-scope',
         'action' : 'store_true',
         'mut_exc_group' : 'scope',
      },
@@ -387,6 +387,10 @@ options = {
      },
     'export': {
         'long': '--export',
+        'action': 'store_true'
+    },
+    'nothing_error': {
+        'long': '--nothing-error',
         'action': 'store_true'
     }
 }
@@ -509,7 +513,8 @@ verbs = {
                     'library': options['library'],
                     'hdl_library': options['hdl_library'],
                     'platform': options['platform'],
-                    'export': options['export']
+                    'export': options['export'],
+                    'nothing_error': options['nothing_error']
                 }
             },
             'tests': {
@@ -526,7 +531,8 @@ verbs = {
                     'library': options['library'],
                     'hdl_library': options['hdl_library'],
                     'platform': options['platform'],
-                    'export': options['export']
+                    'export': options['export'],
+                    'nothing_error': options['nothing_error']
                 }
             },
             'worker': {
@@ -1009,7 +1015,8 @@ verbs = {
                     'accumulate_errors': options['accumulate_errors'],
                     'keep_simulations': options['keep_simulations'],
                     'only_platform': options['only_platform'],
-                    'exclude_platform': options['exclude_platform']
+                    'exclude_platform': options['exclude_platform'],
+                    'nothing_error': options['nothing_error']
                 }
             },
             'tests': {
@@ -1024,6 +1031,7 @@ verbs = {
                     'keep_simulations': options['keep_simulations'],
                     'only_platform': options['only_platform'],
                     'exclude_platform': options['exclude_platform'],
+                    'nothing_error': options['nothing_error']
                 },
             },
         },
@@ -1151,7 +1159,9 @@ verbs = {
                     'global_scope': options['global_scope'],
                     'hdl_library': options['hdl_library'],
                     'library': options['library'],
-                    'platform': options['platform']
+                    'platform': options['platform'],
+                    'hdl_platform': options['hdl_platform'],
+                    'rcc_platform': options['rcc_platform']
                 }
             },
             'worker': {

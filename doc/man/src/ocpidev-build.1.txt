@@ -168,6 +168,9 @@ Options When Building Tests
     See the section "Unit Testing of Workers" in the *OpenCPI Component Development Guide*
     for details on unit test phases.
 
+*`--nothing-error`*::
+    Return non-zero exit status if nothing is done.
+
 EXAMPLES
 --------
 . Build the current asset or directory and those underneath it, both

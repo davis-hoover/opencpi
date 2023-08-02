@@ -421,6 +421,7 @@ class BuildableAsset(Asset):
                 rcc_platform = [os.environ['OCPI_TOOL_PLATFORM'] + build_suffix]
         #Pass settings
         settings = {}
+        settings['nothing_error'] = kwargs.get('nothing_error', False)
         if hdl_platform:
             settings['hdl_plat_strs'] = hdl_platform
         if hdl_target:

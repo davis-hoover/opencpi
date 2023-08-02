@@ -19,15 +19,19 @@
 Definition of Test class
 """
 
-import os,sys
-from pathlib import Path
-import _opencpi.util as ocpiutil
+from fnmatch import fnmatch
+from itertools import product
 import jinja2
 import json
+import os
+from pathlib import Path
+import sys
+from typing import List
+import xml.etree.ElementTree as ET
+import _opencpi.util as ocpiutil
 import _opencpi.assets.template as ocpitemplate
 from .abstract import RunnableAsset, HDLBuildableAsset, RCCBuildableAsset,Asset
 from .factory import AssetFactory
-from .library import Library
 
 class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
     """
@@ -108,6 +112,32 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         self.mode_dict['clean_sim']       = ["cleansim"]
         self.mode_dict['all']             = ["all", "run"]
         # pylint:enable=bad-whitespace
+        xml_path = Path(self.directory, f'{Path(self.directory).stem}-test.xml')
+        makefile = Path(self.directory, 'Makefile')
+        self.exclude_platforms = []
+        self.only_platforms = []
+        self.exclude_workers = []
+        self.only_workers = []
+        if xml_path.exists():
+            root = ET.parse(str(xml_path)).getroot()
+            attribs = {key.lower(): val for key, val in root.attrib.items()}
+            # spec name is spec attribute if exists; else test name
+            self.spec_name = attribs.get('spec', self.name).split('.')[-1]
+            self.exclude_platforms += attribs.get('excludeplatforms', '').split()
+            self.only_platforms += attribs.get('onlyplatforms', '').split()
+            self.exclude_workers += attribs.get('excludeworkers', '').split()
+            self.only_workers += attribs.get('onlyworkers', '').split()
+        else:
+            self.spec_name = self.name.split('.')[-1]
+        if makefile.exists():
+            self.only_platforms += ocpiutil.get_val_from_make(
+                makefile, 'OnlyPlatforms', delim=' ') or []
+            self.exclude_platforms += ocpiutil.get_val_from_make(
+                makefile, 'ExcludePlatforms', delim=' ') or []
+            self.only_workers += ocpiutil.get_val_from_make(
+                makefile, 'OnlyWorkers', delim=' ') or []
+            self.exclude_workers += ocpiutil.get_val_from_make(
+                makefile, 'ExcludeWorkers', delim=' ') or []
 
     def run(self, verbose=False, **kwargs):
         """
@@ -119,8 +149,9 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         directory = str(Path(self.directory))
         make_file = ocpiutil.get_makefile(directory, "test")[0]
         make_file = str(Path(directory, make_file).resolve())
-        
-        return ocpiutil.execute_cmd(self.get_settings(),
+        settings = self.get_settings()
+        settings['nothing_error'] = kwargs.get('nothing_error', False)
+        return ocpiutil.execute_cmd(settings,
                                     directory,
                                     goal,
                                     file=make_file,
@@ -138,7 +169,6 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
                         }
         return template_dict
 
-
     @staticmethod
     def create(name, directory, verbose=None, **kwargs):
         """
@@ -154,6 +184,55 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
             template = jinja2.Template(template, trim_blocks=True)
             ocpiutil.write_file_from_string(test_path.joinpath(file), template.render(test=name))
         Asset.finish_creation('test', name, test_path, verbose)
+
+    def _is_valid_platform(self, platform) -> bool:
+        """Determines whether a platform is valid for the test.
+
+        Validity is determined by both ensuring the specified platform 
+        is not in the test's list of platforms to exclude as well as 
+        ensuring that, if the test has a list of platforms to include,
+        that the specified platform is contained within said list. Uses
+        fnmatch to compare the platform to the test's inclusion and
+        exclusion lists since they can contain patterns such as 
+        wildcards.
+
+        Args:
+            platform: The Platform to validate.
+        Returns:
+            Bool indicating whether the platform is valid for the test.
+        """
+        if any([fnmatch(platform.name, exclude) for exclude in self.exclude_platforms]):
+            ocpiutil.logging.debug(f'Platform "{platform.name}" excluded by test "{self.name}"')
+            return False
+        elif self.only_platforms and not any([fnmatch(platform.name, include) 
+                                        for include in self.only_platforms]):
+            ocpiutil.logging.debug(f'Platform "{platform.name}" not included by test "{self.name}"')
+            return False
+        return True
+            
+    def _is_valid_worker(self, worker) -> bool:
+        """Determines whether a worker is valid for the test.
+
+        Validity is determined by comparing the worker's spec to the
+        test's spec, by ensuring the specified worker is not in the 
+        test's list of workers to exclude, and by ensuring that, if the 
+        test has a list of workers to include, that the specified worker 
+        is contained within said list.
+
+        Args:
+            worker: The Worker to validate.
+        Returns:
+            Bool indicating whether the worker is valid for the test.
+        """
+        if not worker.spec_name == self.spec_name or not worker.parent == self.parent:
+            return False
+        if worker.name in self.exclude_workers:
+            ocpiutil.logging.debug(f'Worker "{worker.name}" excluded by test "{self.name}"')
+            return False
+        if self.only_workers and worker.name not in self.only_workers:
+            ocpiutil.logging.debug(f'Worker "{worker.name}" not included by test "{self.name}"')
+            return False
+        return True
 
 class TestsCollection(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
     """
@@ -263,6 +342,7 @@ class TestsCollection(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
             settings['rcc_platform'] = rcc_platform
         if hdl_rcc_platform:
             settings['hdl_rcc_platform'] = hdl_rcc_platform
+        settings['nothing_error'] = kwargs.get('nothing_error', False)
         make_file = ocpiutil.get_makefile(self.directory)[0]
         #Build
         ocpiutil.execute_cmd(settings, 
@@ -278,24 +358,98 @@ class TestsCollection(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
                              action=['exports'],
                              file=make_file,
                              verbose=verbose)
+            
+    def _filter_on_platforms(self, platforms: List) -> List[Test]:
+        """Filters tests by provided platforms.
+        
+        If multiple platforms  are provided, the returned tests will be 
+        a union for all provided platforms. A test is filtered out if no 
+        worker sharing the same spec as the test is found for any of the 
+        provided platforms or if the test specifically excludes the 
+        provided platforms or found workers.
+
+        Args:
+            platforms: List of platforms to filter by.
+        Returns:
+            List of tests filtered by provided platforms.
+        """
+        if not platforms:
+            return self.tests
+        platforms_str = ", ".join([platform.name for platform in platforms])
+        library_dict = {}
+        for test in self.tests:
+        # Get libraries of tests
+            library_dir = str(test.parent)
+            if library_dir not in library_dict.keys():
+                library_dict[library_dir] = AssetFactory.get_instance(
+                    AssetFactory.get_class_from_asset_type('library', ''), 
+                    library_dir, parse_workers=True, verb='show')
+        tests = []
+        for test in self.tests:
+        # Find tests with an appropriate worker for a provided platform
+            library = library_dict[str(test.parent)]
+            for worker, platform in product(filter(test._is_valid_worker, library.worker_list), 
+                                            filter(test._is_valid_platform, platforms)):
+                if worker._is_valid_platform(platform):
+                # Appropriate worker found; include test
+                    ocpiutil.logging.debug(
+                        f'Including "{test.name}": appropriate worker "{worker.name}"'
+                        f' found for platform "{platform.name}"')
+                    tests.append(test)
+                    break
+            else:
+            # No appropriate worker found; exclude test
+                ocpiutil.logging.debug(
+                    f'Excluding test "{test.name}": no appropriate worker found for any'
+                    f' of the following platforms: {platforms_str}')
+        exclude_count = len(self.tests) - len(tests)
+        include_count = len(tests)
+        ocpiutil.logging.info(
+            f'Filtered out {exclude_count} {"test" if exclude_count == 1 else "tests"}.')
+        ocpiutil.logging.info(
+            f'Found {include_count} {"test" if include_count == 1 else "tests"}'
+            f' appropriate for the following platforms: {platforms_str}')
+        return tests
+                
 
     def show(self, format=None, **kwargs):
         """
         Show all the tests
         """
+        platforms_dict = ocpiutil.get_platforms()
+        platforms = []
+        hdl_platform_names = kwargs.get('hdl_platform', None) or []
+        rcc_platform_names = kwargs.get('rcc_platform', None) or []
+        try:
+            for platform_name in hdl_platform_names:
+                platform_dir = str(Path(platforms_dict[platform_name]['directory']).parent)
+                platform_class = AssetFactory.get_class_from_asset_type('hdl-platform', '')
+                platform = AssetFactory.get_instance(platform_class, platform_dir, platform_name)
+                platforms.append(platform)
+            for platform_name in rcc_platform_names:
+                platform_dir = platforms_dict[platform_name]['directory']
+                platform_class = AssetFactory.get_class_from_asset_type('rcc-platform', '')
+                platform = AssetFactory.get_instance(platform_class, platform_dir)
+                platforms.append(platform)
+        except KeyError:
+            raise ocpiutil.OCPIException(f'Unknown platform "{platform_name}".')
+        tests = self._filter_on_platforms(platforms)
         if format == "simple":
-            for test in self.tests:
+            for test in tests:
                 print(test.name + " ", end="")
             print()
         elif format == "table":
             rows = [['Test', 'Package ID', 'Directory']]
-            for test in self.tests:
+            for test in tests:
                 rows.append([test.name, test.package_id, test.directory])
             ocpiutil.print_table(rows, underline="-")
         elif format == "json":
             test_dict = {}
-            for test in self.tests:
-                test_dict[test.package_id] = { 'name' : test.name, 'package_id' : test.package_id,
-                                               'path' : test.directory }
+            for test in tests:
+                test_dict[test.package_id] = { 
+                    'name': test.name, 
+                    'package_id': test.package_id,
+                    'path': test.directory 
+                }
             json.dump(test_dict, sys.stdout)
             print()

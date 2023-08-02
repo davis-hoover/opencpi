@@ -269,7 +269,11 @@ endif # check for no targets
 
 clean::
 	$(AT) rm -r -f container-* lib
-
+.PHONY: all
+ifdef NothingError
+  all:
+	$(AT)echo "Nothing to be done for 'all'." && exit 1
+endif
 # Expose information about this assembly's containers for use
 # in some external application.
 #

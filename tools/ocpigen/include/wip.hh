@@ -407,9 +407,9 @@ class Worker : public OM::Worker {
   ParamConfig  *m_paramConfig;      // the config for this Worker.
   Worker *m_parent;                 // If this worker is part of an upper level assembly
   bool m_scalable;
-  size_t m_requiredWorkGroupSize;    // FIXME: belongs in OclWorker class!
-                                     // FIXME: derive from compiled code
-  unsigned m_maxLevel;        // when data type processing
+  size_t m_requiredWorkGroupSize;   // FIXME: belongs in OclWorker class!
+                                    // FIXME: derive from compiled code
+  unsigned m_maxLevel;              // when data type processing
   bool m_dynamic;
   bool m_optimized;
   bool m_isSlave;
