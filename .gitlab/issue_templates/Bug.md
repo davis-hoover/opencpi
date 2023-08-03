@@ -25,5 +25,6 @@ console/log/code output here
 
 
 
-### Auto label - do not delete
-~"type::bug"
+
+
+/label ~"type::bug"

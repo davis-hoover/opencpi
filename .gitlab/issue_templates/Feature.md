@@ -12,5 +12,6 @@
 
 
 
-### Auto label - do not delete
-~"type::feature"
+
+
+/label ~"type::feature"
