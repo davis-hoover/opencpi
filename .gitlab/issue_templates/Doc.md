@@ -15,5 +15,6 @@
 
 
 
-### Auto label - do not delete
-~"type::doc"
+
+
+/label ~"type::doc"
