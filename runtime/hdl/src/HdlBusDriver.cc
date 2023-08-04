@@ -51,14 +51,9 @@
        namespace OH = OCPI::HDL;
        namespace OT = OCPI::Transport;
 
+       const std::string fpgaMgrDevices[] = { "/axi/devcfg@f8007000", "/amba/devcfg@f8007000", "/firmware/zynqmp-firmware/pcap"};
        const char
          fpgaMgrState[]  = "/sys/class/fpga_manager/fpga0/state",
-       // fpgaMgrFlags[]  = "/sys/class/fpga_manager/fpga0/flags",
-#if defined(OCPI_ARCH_aarch64)
-       	 fpgaMgrDevice[] = "/pcap", // from /sys/firmware/devicetree/base/...
-#else
-       	 fpgaMgrDevice[] = "/amba/devcfg@f8007000", // from /sys/firmware/devicetree/base/...
-#endif
 	 xdevCfgState[]  = "/sys/class/xdevcfg/xdevcfg/device/prog_done",
 	 xdevCfgDevice[] = "/dev/xdevcfg";
        class Device
@@ -66,6 +61,7 @@
 	 Driver  &m_driver;
 	 uint8_t *m_vaddr;
 	 bool     m_fpgaManager;
+	 std::string m_fpgaManagerDevice;
 	 friend class Driver;
 	 Device(Driver &driver, std::string &a_name, bool forLoad, const OB::PValue *params,
 		std::string &err)
@@ -77,6 +73,17 @@
 	     m_fpgaManager = true;
 	     ocpiInfo("HDL Device %s will use the FPGA Manager linux kernel support (no %s)",
 		      a_name.c_str(), fpgaMgrState);
+	     for (size_t n=0; n < sizeof(fpgaMgrDevices)/sizeof(*fpgaMgrDevices); n++) {
+		if (OF::exists("/sys/firmware/devicetree/base" + fpgaMgrDevices[n])) {
+		 m_fpgaManagerDevice = fpgaMgrDevices[n];
+	     	 ocpiInfo("HDL Device %s will use the FPGA Manager located at %s", a_name.c_str(), m_fpgaManagerDevice.c_str());
+		 break;
+		}
+	     }
+	     if (m_fpgaManagerDevice.empty()) {
+		err = "Unable to locate FPGA Manager from known devicetree paths.";
+		return;
+	     }
 	   } else if (OF::exists(xdevCfgState) && !::access(xdevCfgDevice, F_OK)) {
 	     // need access() for char device
 	     m_fpgaManager = false;
@@ -307,7 +314,7 @@
 	    uint8_t buf[8*1024];
 	    int zerror;
 	    size_t len;
-	    std::string inputFile, outputFile;
+	    std::string inputFile, outputFile, fpgaManagerDev;
 	    bool useManager;
 	    uint8_t *obase, *optr;  // used to buffer 
 	    size_t olength, oleft;
@@ -319,9 +326,9 @@
 	      ::free(obase);
 	    }
 
-	    Xld(const char *file, bool fpgaManager, std::string &a_error)
+	    Xld(const char *file, bool fpgaManager, std::string fpgaManagerDevice, std::string &a_error)
 	      : IBUFSZ(8*1024), OBUFSZ(64*1024), xfd(-1), bfd(-1), gz(NULL),
-                inputFile(file), useManager(fpgaManager), obase(NULL),
+                inputFile(file), fpgaManagerDev(fpgaManagerDevice) , useManager(fpgaManager), obase(NULL),
                 optr(NULL), olength(), oleft(0) {
 	      // Open the device LAST since just opening it may do bad things
 	      uint8_t *p8;
@@ -408,7 +415,7 @@
 		request.data = obase;
 		request.length = OCPI_UTRUNCATE(ocpi_size_t, optr - obase);
 		//int fd = creat("bits", 0666); write(fd, obase, request.length); close(fd);
-		strncpy(request.device_path, fpgaMgrDevice, sizeof(request.device_path));
+		strncpy(request.device_path, fpgaManagerDev.c_str(), sizeof(request.device_path));
 		ocpiInfo("Loading using FPGA manager, %u bytes uncompressed from %s",
 			 request.length, inputFile.c_str());
 		if (ioctl(xfd, OCPI_CMD_LOAD_FPGA, &request))
@@ -422,7 +429,7 @@
 	    }
 	  };  // end struct Xld
 
-	  Xld xld(fileName, m_fpgaManager, error);
+	  Xld xld(fileName, m_fpgaManager, m_fpgaManagerDevice ,error);
 	  if (!error.empty() || xld.copy(error))
 	    return true;
 	  ocpiDebug("Loading complete, testing for programming done and initialization");
@@ -459,7 +466,7 @@
 	    ocpi_load_fpga_request_t request;
 	    request.data = (uint8_t*)"bad";
 	    request.length = 4;
-	    strncpy(request.device_path, fpgaMgrDevice, sizeof(request.device_path));
+	    strncpy(request.device_path, m_fpgaManagerDevice.c_str(), sizeof(request.device_path));
 	    ioctl(xfd, OCPI_CMD_LOAD_FPGA, &request);
 	    // could check for wrong state here...
 	  } else if ((xfd = ::open("/dev/xdevcfg", O_WRONLY)) < 0)
