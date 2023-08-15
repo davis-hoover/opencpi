@@ -1494,7 +1494,7 @@ MakeRawParams= \
 # file to be processed as if it was a user-written Makefile, before most other processing
 define OcpiProcessBuildFiles
 
-ifeq ($(filter clean,$(MAKECMDGOALS)),)
+ifeq ($(filter xml clean,$(MAKECMDGOALS)),)
 
 # PreProcess any parameters defined in the Makefile itself, for use by MakeRawParams
 RawParamVariables:=$$(filter Param_%,$$(.VARIABLES)) $$(filter ParamValues_%,$$(.VARIABLES))
