@@ -327,8 +327,8 @@ main(int argc, const char **argv) {
           return 0;
         }
 	// The parent file being empty is for code generation, and thus library dependency parsing
-	// This suppresses that for these two modes that are not doing code generation
-	if (options.parameters() || options.build())
+	// This suppresses that for these three modes that are not doing code generation
+	if (options.parameters() || options.build() || options.comp())
 	  parent = "Makefile";
         Worker *w = Worker::create(*ap, parent, package, outDir, NULL, NULL,
                                    doGenerics >= 0 ? (unsigned)doGenerics : SIZE_MAX, err);
