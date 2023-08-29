@@ -27,8 +27,9 @@ import unittest
 import ocpi_testing
 
 
-# A simple pass through implementation as the sample data handling
 class SomeImplementation(ocpi_testing.Implementation):
+    """A simple pass through implementation as the sample data handling."""
+
     def reset(self):
         pass
 
@@ -54,9 +55,53 @@ class SomeImplementation(ocpi_testing.Implementation):
         return self.output_formatter(*resultant_messages)
 
 
+class EndOfFileImplementation(SomeImplementation):
+    """A simple pass through implementation with an end_of_files function
+
+    end_of_files adds Flush then Discontinuity opcodes to the last
+    output port.
+    """
+
+    def end_of_files(self):
+        output_messages = [[] for _ in self.output_ports]
+        output_messages[-1].append({"opcode": "flush", "data": None})
+        output_messages[-1].append({"opcode": "discontinuity", "data": None})
+        return self.output_formatter(*output_messages)
+
+
+class ZeroGeneratorImplementation(ocpi_testing.Implementation):
+    """A simple generator implementation that has zero input ports."""
+
+    def __init__(self, max_message_length=4096):
+        super().__init__()
+        self._max_message_length = max_message_length
+        self.input_ports = []
+
+    def reset(self):
+        pass
+
+    def sample(self, *args):
+        TypeError("Zero generator does not have any input ports")
+
+    def generate(self, total_output_length):
+        # Set output values
+        output = [0]*total_output_length
+
+        # Split output data into chunks small enough to output
+        output_messages = []
+        while len(output):
+            output_messages.append(
+                {"opcode": "sample",
+                 "data": output[:self._max_message_length]})
+            output = output[self._max_message_length:]
+
+        return self.output_formatter(output_messages)
+
+
 class TestImplementation(unittest.TestCase):
     def setUp(self):
         self.implementation = SomeImplementation()
+        self.eof_implementation = EndOfFileImplementation()
 
     def test_no_sample_error(self):
         class no_sample_implementation(ocpi_testing.Implementation):
@@ -621,3 +666,187 @@ class TestImplementation(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             self.implementation.process_messages(messages_1, messages_2)
+
+    def test_end_of_files_single_input(self):
+        messages = [
+            {"opcode": "flush", "data": None},
+            {"opcode": "metadata", "data": {"id": 1, "value": 10}},
+            {"opcode": "sample_interval", "data": 0.01},
+            {"opcode": "sample", "data": [1, 2, 3, 4, 5]},
+            {"opcode": "sample", "data": [11, 12, 13, 14, 15]}]
+        output = self.eof_implementation.process_messages(messages)
+
+        # Implementation should have added F/D opcodes
+        messages.append({"opcode": "flush", "data": None})
+        messages.append({"opcode": "discontinuity", "data": None})
+
+        self.assertEqual(output.output, messages)
+        self.assertEqual(output[0], messages)
+
+    def test_end_of_files_multiple_inputs_same_length(self):
+        self.eof_implementation.input_ports = ["input_1", "input_2"]
+
+        # A specific implementation of select_input is needed when there are
+        # multiple input ports.
+        def select_input(*inputs):
+            for index, input_ in enumerate(inputs):
+                if input_ is not None:
+                    return index
+        self.eof_implementation.select_input = select_input
+
+        messages_1 = [
+            {"opcode": "flush", "data": None},
+            {"opcode": "metadata", "data": {"id": 1, "value": 10}},
+            {"opcode": "sample_interval", "data": 0.01},
+            {"opcode": "sample", "data": [1, 2, 3, 4, 5]},
+            {"opcode": "sample", "data": [11, 12, 13, 14, 15]}]
+        messages_2 = [
+            {"opcode": "flush", "data": None},
+            {"opcode": "time", "data": 0.5},
+            {"opcode": "sample", "data": [2.1, 2.2, 2.3, 2.4, 2.5]},
+            {"opcode": "sample", "data": [21, 22, 23, 24, 25]}]
+        expected_output = [
+            {"opcode": "flush", "data": None},
+            {"opcode": "metadata", "data": {"id": 1, "value": 10}},
+            {"opcode": "sample_interval", "data": 0.01},
+            {"opcode": "sample", "data": [1, 2, 3, 4, 5]},
+            {"opcode": "sample", "data": [11, 12, 13, 14, 15]},
+            {"opcode": "sample", "data": [2.1, 2.2, 2.3, 2.4, 2.5]},
+            {"opcode": "sample", "data": [21, 22, 23, 24, 25]},
+            {"opcode": "flush", "data": None},
+            {"opcode": "discontinuity", "data": None}]
+
+        output = self.eof_implementation.process_messages(messages_1,
+                                                          messages_2)
+
+        self.assertEqual(expected_output, output.output)
+
+    def test_end_of_files_multiple_inputs_more_on_primary_port(self):
+        self.eof_implementation.input_ports = ["input_1", "input_2"]
+
+        # A specific implementation of select_input is needed when there are
+        # multiple input ports.
+        def select_input(*inputs):
+            for index, input_ in enumerate(inputs):
+                if input_ is not None:
+                    return index
+        self.eof_implementation.select_input = select_input
+
+        messages_1 = [
+            {"opcode": "flush", "data": None},
+            {"opcode": "sample", "data": [1.1, 1.2, 1.3, 1.4, 1.5]},
+            {"opcode": "sample", "data": [11, 12, 13, 14, 15]},
+            {"opcode": "sample_interval", "data": 0.01},
+            {"opcode": "sample", "data": [110, 120, 130, 140, 150]}]
+        messages_2 = [
+            {"opcode": "flush", "data": None},
+            {"opcode": "sample", "data": [2.1, 2.2, 2.3, 2.4]},
+            {"opcode": "time", "data": 1234.5}]
+        expected_output = [
+            {"opcode": "flush", "data": None},
+            {"opcode": "sample", "data": [1.1, 1.2, 1.3, 1.4, 1.5]},
+            {"opcode": "sample", "data": [2.1, 2.2, 2.3, 2.4]},
+            {"opcode": "sample", "data": [11, 12, 13, 14, 15]},
+            {"opcode": "sample_interval", "data": 0.01},
+            {"opcode": "sample", "data": [110, 120, 130, 140, 150]},
+            {"opcode": "flush", "data": None},
+            {"opcode": "discontinuity", "data": None}]
+
+        output = self.eof_implementation.process_messages(messages_1,
+                                                          messages_2)
+
+        self.assertEqual(output.output, expected_output)
+
+    def test_end_of_files_multiple_inputs_more_on_non_primary_port(self):
+        self.eof_implementation.input_ports = ["input_1", "input_2"]
+
+        # A specific implementation of select_input is needed when there are
+        # multiple input ports.
+        def select_input(*inputs):
+            for index, input_ in enumerate(inputs):
+                if input_ is not None:
+                    return index
+        self.eof_implementation.select_input = select_input
+
+        messages_1 = [
+            {"opcode": "flush", "data": None},
+            {"opcode": "sample", "data": [1.1, 1.2, 1.3]},
+            {"opcode": "sample", "data": [1.4, 1.5]},
+            {"opcode": "sample_interval", "data": 0.01}]
+        messages_2 = [
+            {"opcode": "flush", "data": None},
+            {"opcode": "sample", "data": [2.1, 2.2, 2.3, 2.4, 2.5]},
+            {"opcode": "sample", "data": [2.6]},
+            {"opcode": "sample", "data": [2.7]}]
+        expected_output = [
+            {"opcode": "flush", "data": None},
+            {"opcode": "sample", "data": [1.1, 1.2, 1.3]},
+            {"opcode": "sample", "data": [2.1, 2.2, 2.3, 2.4, 2.5]},
+            {"opcode": "sample", "data": [1.4, 1.5]},
+            {"opcode": "sample", "data": [2.6]},
+            {"opcode": "sample_interval", "data": 0.01},
+            {"opcode": "sample", "data": [2.7]},
+            {"opcode": "flush", "data": None},
+            {"opcode": "discontinuity", "data": None}]
+
+        output = self.eof_implementation.process_messages(messages_1,
+                                                          messages_2)
+
+        self.assertEqual(output.output, expected_output)
+
+    def test_end_of_files_multiple_inputs_multiple_outputs(self):
+        self.eof_implementation.input_ports = ["input_1", "input_2"]
+        self.eof_implementation.output_ports = ["output_1", "output_2"]
+
+        # A specific implementation of select_input is needed when there are
+        # multiple input ports.
+        def select_input(*inputs):
+            for index, input_ in enumerate(inputs):
+                if input_ is not None:
+                    return index
+        self.eof_implementation.select_input = select_input
+
+        messages_1 = [
+            {"opcode": "flush", "data": None},
+            {"opcode": "metadata", "data": {"id": 1, "value": 10}},
+            {"opcode": "sample_interval", "data": 0.01},
+            {"opcode": "sample", "data": [1, 2, 3, 4, 5]},
+            {"opcode": "sample", "data": [11, 12, 13, 14, 15]}]
+        messages_2 = [
+            {"opcode": "flush", "data": None},
+            {"opcode": "time", "data": 0.5},
+            {"opcode": "sample", "data": [2.1, 2.2, 2.3, 2.4, 2.5]},
+            {"opcode": "sample", "data": [21, 22, 23, 24, 25]}]
+        expected_1 = [
+            {"opcode": "flush", "data": None},
+            {"opcode": "metadata", "data": {"id": 1, "value": 10}},
+            {"opcode": "sample_interval", "data": 0.01},
+            {"opcode": "sample", "data": [1, 2, 3, 4, 5]},
+            {"opcode": "sample", "data": [11, 12, 13, 14, 15]}]
+        expected_2 = [
+            {"opcode": "sample", "data": [2.1, 2.2, 2.3, 2.4, 2.5]},
+            {"opcode": "sample", "data": [21, 22, 23, 24, 25]},
+            {"opcode": "flush", "data": None},
+            {"opcode": "discontinuity", "data": None}]
+
+        output = self.eof_implementation.process_messages(messages_1,
+                                                          messages_2)
+
+        self.assertEqual(output.output_1, expected_1)
+        self.assertEqual(output[0], expected_1)
+        self.assertEqual(output.output_2, expected_2)
+        self.assertEqual(output[1], expected_2)
+
+    def test_process_messages_no_input_ports(self):
+        messages = []
+        max_message_length = 4096
+        generator_implementation = ZeroGeneratorImplementation(
+            max_message_length=max_message_length)
+        generator_implementation.no_input_settings["total_output_length"] = max_message_length*2
+        output = generator_implementation.process_messages(*messages)
+
+        expected = [{"opcode": "sample", "data": [0]*max_message_length},
+                    {"opcode": "sample", "data": [0]*max_message_length}]
+
+        self.assertEqual(output.output, expected)
+        self.assertEqual(output[0], expected)
