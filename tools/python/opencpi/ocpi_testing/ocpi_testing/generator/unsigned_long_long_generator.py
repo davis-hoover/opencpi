@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Class for generating character sample input data
+# Class for generating unsigned long-long sample input data
 #
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
@@ -27,7 +27,7 @@ import random
 from . import base_generator
 
 
-class CharacterGeneratorDefaults:
+class UnsignedLongLongGeneratorDefaults:
     # This class houses all the default values used. The structure is designed
     # for importing and documenting in an easier way.
 
@@ -36,43 +36,46 @@ class CharacterGeneratorDefaults:
 
     #: Number of samples in a sample message for the message size test case and
     #: longest test subcase.
-    MESSAGE_SIZE_LONGEST = 16384
+    MESSAGE_SIZE_LONGEST = 2048
 
-    #: Minimum value a character number allows.
-    CHARACTER_MINIMUM = -(2**7)
+    #: Minimum value an unsigned long-long number allows.
+    UNSIGNED_LONG_LONG_MINIMUM = 0
 
-    #: Maximum value a character number allows.
-    CHARACTER_MAXIMUM = (2**7) - 1
+    #: Maximum value an unsigned long-long number allows.
+    UNSIGNED_LONG_LONG_MAXIMUM = (2**64) - 1
+
+    #: Mid point of the range of values supported by an unsigned long-long.
+    UNSIGNED_LONG_LONG_MID = UNSIGNED_LONG_LONG_MAXIMUM // 2
 
     #: Mean of the Gaussian probability distribution function of the random
     #: number generator used to set the amplitude of the sinusoidal waves that
     #: are combined in a sample message for the typical test case.
-    TYPICAL_AMPLITUDE_MEAN = CHARACTER_MAXIMUM // 2
+    TYPICAL_AMPLITUDE_MEAN = UNSIGNED_LONG_LONG_MAXIMUM // 2
 
     #: Width of the Gaussian probability distribution function of the random
     #: number generator used to set the amplitude of the sinusoidal waves that
     #: are combined in a sample message for the typical test case.
-    TYPICAL_AMPLITUDE_DISTRIBUTION_WIDTH = CHARACTER_MAXIMUM // 4
+    TYPICAL_AMPLITUDE_DISTRIBUTION_WIDTH = UNSIGNED_LONG_LONG_MAXIMUM // 4
 
     #: Maximum amplitude of the sinusoidal waves that are combined in a sample
     #: message for typical test case.
     TYPICAL_MAXIMUM_AMPLITUDE = (
-        CHARACTER_MAXIMUM *
+        UNSIGNED_LONG_LONG_MID *
         base_generator.GeneratorDefaults.LIMITED_SCALE_FACTOR)
 
 
-class CharacterGenerator(base_generator.BaseGenerator):
-    """ Character protocol test data generator
+class UnsignedLongLongGenerator(base_generator.BaseGenerator):
+    """ Unsigned long-long protocol test data generator
     """
 
     def __init__(self):
-        """ Initialise character generator class
+        """ Initialise unsigned long-long generator class
 
         Defines the default values for the variables that control the values
         and size of messages that are generated.
 
         Returns:
-            An initialised CharacterGenerator instance.
+            An initialised UnsignedLongLongGenerator instance.
         """
         super().__init__()
 
@@ -80,15 +83,19 @@ class CharacterGenerator(base_generator.BaseGenerator):
         # generator. Keep the same variable names to ensure documentation
         # matches.
         self.MESSAGE_SIZE_LONGEST = \
-            CharacterGeneratorDefaults.MESSAGE_SIZE_LONGEST
-        self.CHARACTER_MINIMUM = CharacterGeneratorDefaults.CHARACTER_MINIMUM
-        self.CHARACTER_MAXIMUM = CharacterGeneratorDefaults.CHARACTER_MAXIMUM
+            UnsignedLongLongGeneratorDefaults.MESSAGE_SIZE_LONGEST
+        self.UNSIGNED_LONG_LONG_MINIMUM = \
+            UnsignedLongLongGeneratorDefaults.UNSIGNED_LONG_LONG_MINIMUM
+        self.UNSIGNED_LONG_LONG_MAXIMUM = \
+            UnsignedLongLongGeneratorDefaults.UNSIGNED_LONG_LONG_MAXIMUM
+        self.UNSIGNED_LONG_LONG_MID = \
+            UnsignedLongLongGeneratorDefaults.UNSIGNED_LONG_LONG_MID
         self.TYPICAL_AMPLITUDE_MEAN = \
-            CharacterGeneratorDefaults.TYPICAL_AMPLITUDE_MEAN
+            UnsignedLongLongGeneratorDefaults.TYPICAL_AMPLITUDE_MEAN
         self.TYPICAL_AMPLITUDE_DISTRIBUTION_WIDTH = \
-            CharacterGeneratorDefaults.TYPICAL_AMPLITUDE_DISTRIBUTION_WIDTH
+            UnsignedLongLongGeneratorDefaults.TYPICAL_AMPLITUDE_DISTRIBUTION_WIDTH
         self.TYPICAL_MAXIMUM_AMPLITUDE = \
-            CharacterGeneratorDefaults.TYPICAL_MAXIMUM_AMPLITUDE
+            UnsignedLongLongGeneratorDefaults.TYPICAL_MAXIMUM_AMPLITUDE
 
     def typical(self, seed, subcase):
         """ Generate a sample message with typical data inputs
@@ -147,9 +154,9 @@ class CharacterGenerator(base_generator.BaseGenerator):
         for index in range(len(data)):
             for frequency, phase, amplitude in zip(
                     frequencies, phases, amplitudes):
-                data[index] = data[index] + int(
-                    amplitude * math.cos(2 * math.pi * frequency * index +
-                                         phase))
+                data[index] = data[index] + amplitude * math.cos(
+                    2 * math.pi * frequency * index + phase)
+            data[index] = int(data[index] + self.UNSIGNED_LONG_LONG_MID)
 
         return [{"opcode": "sample", "data": data}]
 
@@ -174,34 +181,21 @@ class CharacterGenerator(base_generator.BaseGenerator):
         elif subcase == "all_maximum":
             return [
                 {"opcode": "sample",
-                 "data": [self.CHARACTER_MAXIMUM] * self.SAMPLE_DATA_LENGTH}]
-
-        elif subcase == "all_minimum":
-            return [
-                {"opcode": "sample",
-                 "data": [self.CHARACTER_MINIMUM] * self.SAMPLE_DATA_LENGTH}]
+                 "data": [self.UNSIGNED_LONG_LONG_MAXIMUM] *
+                 self.SAMPLE_DATA_LENGTH}]
 
         elif subcase == "large_positive":
             data = [0] * self.SAMPLE_DATA_LENGTH
             for index in range(self.SAMPLE_DATA_LENGTH):
                 data[index] = random.randint(
-                    self.CHARACTER_MAXIMUM - self.SAMPLE_NEAR_RANGE,
-                    self.CHARACTER_MAXIMUM)
-            return [{"opcode": "sample", "data": data}]
-
-        elif subcase == "large_negative":
-            data = [0] * self.SAMPLE_DATA_LENGTH
-            for index in range(self.SAMPLE_DATA_LENGTH):
-                data[index] = random.randint(
-                    self.CHARACTER_MINIMUM,
-                    self.CHARACTER_MINIMUM + self.SAMPLE_NEAR_RANGE)
+                    self.UNSIGNED_LONG_LONG_MAXIMUM - self.SAMPLE_NEAR_RANGE,
+                    self.UNSIGNED_LONG_LONG_MAXIMUM)
             return [{"opcode": "sample", "data": data}]
 
         elif subcase == "near_zero":
             data = [0] * self.SAMPLE_DATA_LENGTH
             for index in range(self.SAMPLE_DATA_LENGTH):
-                data[index] = random.randint(-self.SAMPLE_NEAR_RANGE,
-                                             self.SAMPLE_NEAR_RANGE)
+                data[index] = random.randint(0, self.SAMPLE_NEAR_RANGE)
             return [{"opcode": "sample", "data": data}]
 
         else:
@@ -226,7 +220,7 @@ class CharacterGenerator(base_generator.BaseGenerator):
         return [{"opcode": "sample", "data": self._get_sample_values()}]
 
     def _full_scale_random_sample_values(self, number_of_samples=None):
-        """ Generate a random sample of characters
+        """ Generate a random sample of unsigned long-longs
 
         Args:
             number_of_samples (int, optional): The number of random values to
@@ -242,15 +236,15 @@ class CharacterGenerator(base_generator.BaseGenerator):
 
         data = [0] * number_of_samples
         for index in range(number_of_samples):
-            data[index] = random.randint(self.CHARACTER_MINIMUM,
-                                         self.CHARACTER_MAXIMUM)
+            data[index] = random.randint(self.UNSIGNED_LONG_LONG_MINIMUM,
+                                         self.UNSIGNED_LONG_LONG_MAXIMUM)
         return data
 
     def _get_sample_values(self, number_of_samples=None):
-        """ Generate a sample of characters
+        """ Generate a random sample of unsigned long-longs
 
         The values generated are a subset of the whole supported range that
-        characters can represent, this range size is set by
+        unsigned long-longs can represent, this range size is set by
         self.LIMITED_SCALE_FACTOR.
 
         Args:
@@ -266,9 +260,9 @@ class CharacterGenerator(base_generator.BaseGenerator):
             number_of_samples = self.SAMPLE_DATA_LENGTH
 
         limited_range_min = round(
-            self.LIMITED_SCALE_FACTOR * self.CHARACTER_MINIMUM)
+            self.LIMITED_SCALE_FACTOR * self.UNSIGNED_LONG_LONG_MINIMUM)
         limited_range_max = round(
-            self.LIMITED_SCALE_FACTOR * self.CHARACTER_MAXIMUM)
+            self.LIMITED_SCALE_FACTOR * self.UNSIGNED_LONG_LONG_MAXIMUM)
 
         data = [0] * number_of_samples
         for index in range(number_of_samples):

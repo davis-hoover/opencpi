@@ -42,7 +42,7 @@ class LongGeneratorDefaults:
     LONG_MINIMUM = -(2**31)
 
     #: Maximum value a long number allows.
-    LONG_MAXIMUM = 2**31 - 1
+    LONG_MAXIMUM = (2**31) - 1
 
     #: Mean of the Gaussian probability distribution function of the random
     #: number generator used to set the amplitude of the sinusoidal waves that

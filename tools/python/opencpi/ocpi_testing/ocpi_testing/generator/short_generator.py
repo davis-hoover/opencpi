@@ -42,7 +42,7 @@ class ShortGeneratorDefaults:
     SHORT_MINIMUM = -(2**15)
 
     #: Maximum value a short number allows.
-    SHORT_MAXIMUM = 2**15 - 1
+    SHORT_MAXIMUM = (2**15) - 1
 
     #: Mean of the Gaussian probability distribution function of the random
     #: number generator used to set the amplitude of the sinusoidal waves that
