@@ -17,7 +17,7 @@
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 library ieee; use ieee.std_logic_1164.all; use ieee.numeric_std.all;
-library ocpi; use ocpi.all; use ocpi.types.all;
+library ocpi; -- use ocpi.all; use ocpi.types.all;
 package body wci is
 
 -- convert byte enables to byte offsets

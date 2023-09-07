@@ -95,6 +95,8 @@ The Release Notes from previous releases are included here as reference for stil
 			\hline
 			v2.4.0 & Updates for 2.4.0 release & 10/2021 \\
 			\hline
+			v2.5.0 & Updates for 2.5.0 release & 04/2023 \\
+			\hline
 		\end{tabularx}
 	\end{table}
 \end{center}
@@ -130,13 +132,181 @@ The Appendices (beginning on page \pageref{old_releases}) contain the Release No
 \def\ocpiversion{latest}  % Need to redefine so doc links are correct
 \section{Enhancements}
 
+\subsection{Sphinx Doc Support Integration with ``\code{ocpidev}''}
+\label{sec:25_sphinx}
+The new Sphinx-based documentation system, based on the internal ``\code{ocpidoc}'' tool, is now fully integrated into the ocpidev-based workflow and is now considered the default and mainstream way to document assets in OpenCPI.  In particular, creating components with ``\code{ocpidev}'' now creates the ``\code{.comp}'' subdirectory in a library, which contains the spec file and the documentation for the component.  For backward compatibility, when there is an existing ``\code{.comp}'' directory, the spec file can still live in the ``\code{specs/}'' subdirectory, but going forward, the ``\code{.comp}'' directory represents the
+component asset and contains everything related to it.  In the future, this will include unit tests.  I.e. the contents of the ``\code{.test}'' directory will simply exist in the ``\code{.comp}'' directory.  This merging of ``\code{.test}'' into ``\code{.comp}'' is not yet supported.  To achieve the now-deprecated function of creating a spec file in the ``\code{specs/}'' subdirectory, you can use ``spec'' as the noun rather than ``component'', or use the ``\code{--spec-file-only}'' option.\\
+
+So, ``\code{ocpidev create}'', ``\code{ocipdev build}'', ``\code{ocpidev clean}'' and ``\code{ocpidev delete}'' all apply to all the files relating to the asset, including documentation.  The ``\code{--doc-only}'' option to ``build'' avoids building the asset for a target, and only builds the documentation.  Similarly, the ``\code{--no-doc}'' option suppresses building documentation (even when out of date or modified).  Note that building documentation is already suppressed if none of the source files have changed.\\
+
+Documentation is built in the directory where ``\code{ocpidev build}'' is run (after using the ``\code{--directory}'' option if present), under the ``\code{gen/doc}'' directory.  This means for any directory-based asset, you can build the documentation locally to that asset and view the results in ``\code{gen/doc/*.html}''.  At higher levels of projects (the project, libraries, or library level), the build is recursive, with all the results in the ``\code{gen/doc}'' directory for that asset.  I.e. building the documentation for a project will produce the full html tree of documentation under the project's ``\code{gen/doc}'' directory, but will not affect the local documentation build in lower level directories.\\
+
+\subsection{Ethernet Transport Performance Tuning Guide}
+\label{sec:25_eth_tuning}
+This release provides the first version of the OpenCPI reference document ``\code{OpenCPI Ethernet Transport Performance Tuning Guide}''. This document provides performance tuning guidelines and mitigation strategies for developers of OpenCPI SDR applications utilizing platforms such as the Ettus x310 that use L2 Ethernet to talk to FPGAs.\\
+
+\subsection{HDL Device Parameter Value Usage}
+\label{sec:25_hdl_parm}
+This release cleans up how HDL device parameters are specified in three ways:
+\begin{itemize}
+\setlength\itemsep{0em} %tighten
+\item When a device is declared to be on a platform or card, the parameters specified in the platform or card XML are considered default values whenever the device is used on that platform or card.  This means, in almost all cases, that such parameter values need not and should not be specified elsewhere in HDL platform configurations, containers, or slave assemblies.
+\item Parameters in such device declarations (on platform or card XML) may be specified as fixed (not changeable elsewhere) or as a default (overridable in platform configuration or container XML).
+\item Parameters in card device declarations may be qualified by the platform they should be applied to, so that the card can declare different parameter values for different platforms.
+\end{itemize}
+An instance in a slave assembly, application assembly, or HDL assembly can specify (or not) a value for a parameter property.  Recently, the error checking was tightened up to ensure that the value used by the worker being built is the default value when no value is specified for the instance. This made the behavior match the doc and be predictable: if you don't provide a value for the instance, you get the default value. (And remember that when no default is specified in the worker OWD XML, it means a zero/empty value is the default). So the recently-improved error checking would sometimes fail when an app or slave assembly requested the default (by not specifying a value), but no worker was built with the default.\\
+
+When testing various apps on various platforms with the new tighter error checks recently introduced, it was discovered that lots of apps depended on values set by device declarations in HDL platform or card XML to essentially be defaults for the platform. I.e. when no values were specified in an app, it used to accept whatever happened to be built (bad). This meant that the tighter error checks broke the apps. The expected behavior was that values declared for a device on a platform should become the defaults when the device is used on the platform. This is sensible, reasonable, portable and useful, and should not be broken by the new error checks.\\
+
+So there was a bug that some apps were depending on, and after we fixed the bug, the apps broke.  This change means that most of those apps that broke now work ok, and apps that are now broken should truly be fixed since they are relying on random behavior to ``get lucky''.\\
+
+\subsection{\code{ComponentLibraries} Attribute in XML Files}
+\label{sec:25_attr}
+Specification of the ``\code{ComponentLibraries}'' attribute is now supported for the XML files for RCC proxy worker XML, HDL assembly XML, as well as in the ``\code{assemblies.xml}'' file in the ``\code{hdl/assemblies}'' directories in projects.  This allows this option to be more specific to the asset and avoids unnecessary library searching when it is not needed.\\
+
+\subsection{Xilinx Tools Batch Mode Installation Using ``\code{ocpiadmin}''}
+\label{sec:25_xilinx_batch}
+``\code{ocpiadmin}'' now supports installation of reasonably current (2019.2 and later) Xilinx tool releases from the command line. The new functionality is built around the Xilinx installer ``batch mode'' feature, and is designed to be run in unattended mode, i.e., it is non-interactive.\\
+
+An incomplete invocation example (missing needed parameters): ``\code{ocpiadmin install tool vivado}''.  See the updated ``\code{OpenCPI Installation Guide}'' and ``\code{ocpiadmin(1)}'' man page for more information.\\
+
+\subsection{\code{DG-RDMA} Support Added}
+\label{sec:25_dgrdma}
+This release adds preliminary support for Datagram Remote Data Memory Access (DG-RDMA) over L2 Ethernet for HDL platforms such as the Ettus x310.\\
+
+While the x310 platform should be considered the examplar for supporting Ethernet as an interconnect, that platform is both expensive and rare.  So, a new HDL platform named ``\code{zed\_ether}'' has been added to the framework ``\code{platform}'' project to allow Zedboard owners to experiment with this new capability.  Additional details may be found in the \href{https://opencpi.gitlab.io/releases/latest/rst/platform/hdl/platforms/zed_ether/zed_ether-gsg.html}{``\code{zed\_ether} Getting Started Guide''}.\\
+
+\subsection{New Options Available in ``\code{system.xml}'' Files}
+\label{sec:25_sysxml}
+The ``\code{system.xml}'' file can now provide property defaults for workers, whether they are in applications or just in artifacts that are loaded when the application is run (e.g. for device workers in HDL artifacts).  Also, ``\code{system.xml}'' files can define ``static'' devices that are ``discovered'' by their existence in the ``\code{system.xml}'' file.  This is in addition to the existing dynamic device discovery of devices for all plugin drivers.  The \href{https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_User_Guide.pdf}{``\code{OpenCPI User Guide}''} details the new ``\code{system.xml}'' options.\\
+
+\subsection{\code{ocpi.osp.xilinx} OSP Release}
+\label{sec:25_zcu111}
+The ``\code{ocpi.osp.xilinx}'' OSP (providing support for the ``\code{zcu111}'' and ``\code{zcu102}'' platforms) is now available.\\
+
+N.B.: This OSP was first delivered in OpenCPI release v2.4.2 as backported content.\\
+
+\subsection{\code{ocpi.osp.n3xx} OSP Release}
+\label{sec:25_n3xx}
+The ``\code{ocpi.osp.n3xx}'' OSP (providing support for the ``\code{n310}'' platform) is now available.\\
+
+N.B.: This OSP was first delivered in OpenCPI release v2.4.4 as backported content.\\
+
+\subsection{\code{ocpi.osp.avnet} OSP Release}
+\label{sec:25_avnet}
+The ``\code{ocpi.osp.avnet}'' OSP (providing support for the ``\code{microzed\_10\_cc}'', ``\code{microzed\_20\_cc}'', ``\code{picozed\_10\_cc}'', ``\code{picozed\_15\_cc}'', ``\code{picozed\_20\_cc}'', and ``\code{picozed\_30\_cc}'' platforms) is now available.\\
+
+N.B.: This OSP was first delivered in OpenCPI release v2.4.2 as backported content.\\
+
+\subsection{\code{ocpi.osp.epiq-solutions} OSP Release}
+\label{sec:25_epiq}
+The ``\code{ocpi.osp.epiq-solutions}'' OSP (providing support for the ``\code{z3u}'' platform) is now available.\\
+
+An associated RCC platform, ``\code{xilinx18\_3\_aarch64}'', is new in this release as well.\\
+
+N.B.: This OSP was first delivered in OpenCPI release v2.4.5 as backported content.\\
+
+\subsection{\code{riviera} Platform Release}
+\label{sec:25_riviera}
+The new ``\code{riviera}'' HDL platform has been added to the framework ``\code{core}'' project.  It provides OpenCPI support for the ALDEC Riviera-Pro HDL simulator.\\
+
+\subsection{Optimized OpenCPI Framework Installs}
+\label{sec:25_fwopt}
+Installation of the OpenCPI framework built with optimization enabled (\textbf{without} having to first install the default, unoptimized mode) is now supported.  Use ``\code{scripts/install-opencpi.sh --optimize}''.\\
+
+\subsection{Ubuntu 22.04}
+\label{sec:25_ubuntu22}
+Ubuntu 22.04 LTS (``\code{ubuntu22\_04}'') is now available as an RCC development platform choice.  This platform is also appropriate for use with Ubuntu variants such as Kubuntu that are based on the same Ubuntu release.  N.B.: The minimum Xilinx tool version that will work with this platform is 2020.2.\\
+
+\subsection{Rocky 8}
+\label{sec:25_rocky8}
+Rocky 8 (``\code{rocky8}'') is now available as an RCC development platform choice suitable for users who prefer a Linux distro based on RedHat Enterprise Linux.
+
+\subsection{Mint 21.1}
+\label{sec:25_mint}
+The new ``\code{mint21\_1}'' RCC development platform is now available for systems running Mint Linux 21.1.  This platform is based on Ubuntu 22.04, and the Xfce variant in particular is worth considering in resource-constrained environments.\\
+
+\subsection{MacOS Monterey and Ventura}
+\label{sec:25_macos}
+MacOS Monterey (``\code{macos12\_2}'') and MacOS Ventura (``\code{macos13\_0}'') are now supported RCC development platforms (for non-HDL development) and support remote containers.\\
+
+\subsection{RST Templates}
+\label{sec:25_rst}
+New RST templates for creating OSP-related documentation are provided for use by OSP and built-in ``platform'' project asset developers. There are now ``getting started guide'' RST templates for systems, platforms, and cards, and an ``OSP development notes'' template for documenting an OSP's development process. These templates are located in the ``ocpidoc'' tool's ``\code{rst\_templates}'' directory at ``\code{\$OCPI\_ROOT\_DIR/tools/ocpidoc/ocpi\_documentation/rst\_templates}'' and are named ``\code{card-gsg.rst}'', ``\code{platform-gsg.rst}'', ``\code{system-gsg.rst}'', and ``\code{osp-development-notes.rst}''.  The templates are meant to be copied and renamed and then edited as required for the specific asset.  A skeleton outline and instructions on the information that should be provided for the asset are provided in each template. Top-level project RST files are then updated with the paths to the locations of the asset documents so that the OpenCPI document publishing tool can locate them and generate HTML for display on the ``\code{opencpi.gitlab.io}'' web site.\\
+
+\subsection{OSP Features and Parameterized Constraint Files}
+\label{sec:25_signal}
+Two partially implemented OSP features were made to work properly:
+\begin{itemize}
+\setlength\itemsep{0em} %tighten
+\item Allowing device signal mappings in platform XML to map to platform signals with indices, which allows constraints files to remain less modified from the manufacturer's original.  This applies to, and can be seen as an example, in the plutosdr OSP.
+\item An HDL platform's XML can introduce a part and even a part family for its FPGA without requiring that the part or the family be modified in the OpenCPI core repository.
+\end{itemize}
+Finally, references to constraint files from platform configuration and container XML files can have parameters, meaning that tcl variables can be set before the constraint file is read, so that constraint files can be conditionalized on parameters and thus have many fewer constraint files for most platforms.  The syntax is the same as that of the ``\code{--file}'' option to ``\code{ocpirun}'' (see its man page), which provides a file name plus parameters after the file name.  This syntax is basically URL query syntax: parameter assignments start with the `?' character, and are separated with `\&' or `;' characters.  Example:  ``\code{constraints='myconstfile?rx=1;tx=1'}''\\
+
+\subsection{\code{ad9361} Dual Port Mode}
+\label{sec:25_dual}
+Support for AD9361 CMOS dual-port full-duplex mode is now available.  Appropriate interface tests have been added as well.\\
+
+N.B.: This functionality (2TX/2RX) was first delivered in OpenCPI release v2.4.4 as backported content.\\
+
+\subsection{OpenCPI Linter}
+\label{sec:25_lint}
+An alpha release (first draft -- definitely not ready for prime time) of ``\code{ocpilint}'' is available.  See \href{https://gitlab.com/opencpi/opencpi/-/merge_requests/1076}{``\code{opencpi/opencpi MR !1076}''} for more information.\\
+
+\section{Changes and Notes}
+
+\subsection{Ubuntu16\_04 Support Removed}
+\label{sec:25_ubuntu}
+Support for the deprecated ``\code{ubuntu16\_04}'' RCC development platform 
+(Ubuntu 16.04 LTS) has been removed.  Note this removal happened ahead of schedule: Canonical dropped support for Ubuntu 16.04 LTS which makes continued OpenCPI support of this platform impractical.\\
+
+\subsection{Python 3.6 Deprecation Notice}
+\label{sec:25_python3}
+Support for Python 3.6.X is deprecated and scheduled for removal in OpenCPI release v3.0.0.  This means RCC development platforms that cannot be upgraded to use at least Python 3.8 are similarly deprecated: that list currently includes ``\code{centos7}'' and ``\code{ubuntu18\_04}''.\\
+
+\subsection{GUI Changes}
+\label{sec:25_ie_gui}
+Added a ``node graph'' feature (should be considered ``beta'' in this release) to the OpenCPI GUI to allow for the graphical creation of OpenCPI applications as an alternative to manually editing OpenCPI application XML files.\\
+
+\subsection{\code{ocpidoc} ``\code{include}'' Directive}
+\label{sec:25_ocpidoc}
+A custom ``\code{include}'' directive has been added to ``\code{ocpidoc}'' that behaves similar to the Sphinx ``\code{.. include}'' directive but also allows for ``find and replace'' functionality. Ultimately this enables figure and equation numbering in included common documentation without Sphinx complaining about label duplication.\\
+
+\subsection{\code{ocpidev} Asset Names}
+\label{set:25_ocpidev_suffixes}
+``\code{ocpidev}'' now never requires asset names with any suffixes, either periods or hyphens.  The fact that asset files or directories may have suffixes does not affect the command line asset names.  Using something like ``worker foo.rcc'' is basically aliased to (a shortcut for) ``rcc worker foo''.  Asset names are now enforced to be valid programming language identifiers (except the directory names
+for projects and registries).\\
+
+\section{Major Known Deficiencies}
+\label{sec:25_bugs}
+
+\subsection{Previously Documented Deficiencies}
+The following deficiencies are still present in 2.5:
+\begin{itemize}
+\setlength\itemsep{0em} %tighten
+\item \bugref{693}
+\item \bugref{1035}
+\item \bugref{1392}
+\item \bugref{2477}
+\item \bugref{3783}
+\item \bugref{2811}
+\end{itemize}
+
+% === End of 2.5.0
+
+\beginoldnotes
+\origsection{Release 2.4.0}
+\def\ocpiversion{v2.4.0}
+\section{Enhancements}
+
 \subsection{Training Improvements}
 \label{sec:24_training}
 This release provides updates to Tutorials 1 through 4 to demonstrate the use of the OpenCPI GUI and to bring the tutorials up to OpenCPI ``best practices''. This release also adds several new tutorials, both ``software only'' (running on the xsim simulator) and ``hardware'' (running on the plutosdr platform).  The OpenCPI briefings have also been updated to OpenCPI best practices and two additional briefings have been added (one for an overview of the Application Control Interface, and one to introduce tools and techniques for debugging).\\
 
 \subsection{Instructional Video Links Added}
 \label{sec:24_video_links}
-Links to instructional OpenCPI videos on YouTube have been added to opencpi.gitlab.io web page.\\
+Links to instructional OpenCPI videos on YouTube have been added to the \href{https://opencpi.gitlab.io}{``opencpi.gitlab.io''} web page.\\
 
 \subsection{Air-gapped Installation Section Added}
 \label{sec:24_air-gap_install}
@@ -185,7 +355,6 @@ The following deficiencies are still present in 2.4:
 
 % === End of 2.4.0
 
-\beginoldnotes
 \origsection{Release 2.3.0}
 \def\ocpiversion{v2.3.0}
 \section{Enhancements}
