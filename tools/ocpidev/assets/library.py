@@ -448,13 +448,17 @@ class LibrariesCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, R
 
     def delete(self, force=False, **kwargs):
         if self.orig_noun == "libraries":
-            for lib in self.libraries:
-               lib.delete(self, force)
+
             if not force:
                 prompt = 'Delete {} at: {}'.format(self.name, str(self.directory))
                 force = ocpiutil.get_ok(prompt=prompt)
             if force:
+                if self.libraries is not None:
+                    for lib in self.libraries:
+                        lib.delete(self, force)
                 LibrariesCollection.delete_all(self)
+
+
             return
 
         libs = []

@@ -96,21 +96,22 @@ architecture rtl of eth_to_ocpi is
   signal rx_eth_tvalid_r : std_logic;
   signal rx_eth_tready_r : std_logic;
   signal rx_eth_tlast_r  : std_logic;
-  signal rx_eth_tuser_r  : std_logic_vector(0 downto 0);
+  signal rx_eth_tuser_r  : std_logic;
+  signal rx_eth_tuser_i  : std_logic;
 
   signal tx_eth_tdata_i  : std_logic_vector(DATA_WIDTH - 1 downto 0);
   signal tx_eth_tkeep_i  : std_logic_vector(KEEP_WIDTH - 1 downto 0);
   signal tx_eth_tvalid_i : std_logic;
   signal tx_eth_tready_i : std_logic;
   signal tx_eth_tlast_i  : std_logic;
-  signal tx_eth_tuser_i  : std_logic_vector(0 downto 0);
+  signal tx_eth_tuser_i  : std_logic;
   
   signal tx_eth_tdata_r  : std_logic_vector(DATA_WIDTH - 1 downto 0);
   signal tx_eth_tkeep_r  : std_logic_vector(KEEP_WIDTH - 1 downto 0);
   signal tx_eth_tvalid_r : std_logic;
   signal tx_eth_tready_r : std_logic;
   signal tx_eth_tlast_r  : std_logic;
-  signal tx_eth_tuser_r  : std_logic_vector(0 downto 0);
+  signal tx_eth_tuser_r  : std_logic;
 
   -- Receive packets without Ethernet header
   signal rx_hdr_dest_mac : std_logic_vector(47 downto 0);
@@ -167,15 +168,15 @@ architecture rtl of eth_to_ocpi is
 begin
 
   -- Insert pipeline stage to break up long paths
-  rx_pipeline_inst : dgrdma.verilog_ethernet.axis_pipeline_register
+  rx_pipeline_inst : entity work.dgrdma_axis_pipeline
     generic map (
       DATA_WIDTH => DATA_WIDTH,
-      KEEP_ENABLE => true,
-      KEEP_WIDTH => KEEP_WIDTH
+      KEEP_WIDTH => KEEP_WIDTH,
+      LENGTH => 1
     )
     port map (
       clk             => clk,
-      rst             => reset,
+      reset           => reset,
 
       -- AXI input
       s_axis_tdata    => rx_eth_tdata,
@@ -183,9 +184,7 @@ begin
       s_axis_tvalid   => rx_eth_tvalid,
       s_axis_tready   => rx_eth_tready,
       s_axis_tlast    => rx_eth_tlast,
-      s_axis_tid      => (others => '0'),
-      s_axis_tdest    => (others => '0'),
-      s_axis_tuser    => (0 => rx_eth_tuser),
+      s_axis_tuser    => rx_eth_tuser_i,
 
       -- AXI output
       m_axis_tdata    => rx_eth_tdata_r,
@@ -196,15 +195,15 @@ begin
       m_axis_tuser    => rx_eth_tuser_r
     );
   
-  tx_pipeline_inst : dgrdma.verilog_ethernet.axis_pipeline_register
+  tx_pipeline_inst : entity work.dgrdma_axis_pipeline
     generic map (
       DATA_WIDTH => DATA_WIDTH,
-      KEEP_ENABLE => true,
-      KEEP_WIDTH => KEEP_WIDTH
+      KEEP_WIDTH => KEEP_WIDTH,
+      LENGTH => 1
     )
     port map (
       clk             => clk,
-      rst             => reset,
+      reset           => reset,
 
       -- AXI input
       s_axis_tdata    => tx_eth_tdata_i,
@@ -212,8 +211,6 @@ begin
       s_axis_tvalid   => tx_eth_tvalid_i,
       s_axis_tready   => tx_eth_tready_i,
       s_axis_tlast    => tx_eth_tlast_i,
-      s_axis_tid      => (others => '0'),
-      s_axis_tdest    => (others => '0'),
       s_axis_tuser    => tx_eth_tuser_i,
 
       -- AXI output
@@ -225,12 +222,13 @@ begin
       m_axis_tuser    => tx_eth_tuser_r
     );
 
+  rx_eth_tuser_i  <= '0';
   tx_eth_tdata    <= tx_eth_tdata_r;
   tx_eth_tkeep    <= tx_eth_tkeep_r;
   tx_eth_tvalid   <= tx_eth_tvalid_r;
   tx_eth_tready_r <= tx_eth_tready;
   tx_eth_tlast    <= tx_eth_tlast_r;
-  tx_eth_tuser    <= tx_eth_tuser_r(0);
+  tx_eth_tuser    <= tx_eth_tuser_r;
 
   -- ETHERNET FRAME HANDLING
   eth_frame_parser_inst : entity work.eth_frame_parser
@@ -247,7 +245,7 @@ begin
       s_rx_eth_tvalid => rx_eth_tvalid_r,
       s_rx_eth_tready => rx_eth_tready_r,
       s_rx_eth_tlast => rx_eth_tlast_r,
-      s_rx_eth_tuser => rx_eth_tuser_r(0),
+      s_rx_eth_tuser => rx_eth_tuser_r,
 
       m_rx_axis_tdata => rx_axis_tdata,
       m_rx_axis_tkeep => rx_axis_tkeep,
@@ -283,7 +281,7 @@ begin
       m_tx_eth_tvalid => tx_eth_tvalid_i,
       m_tx_eth_tready => tx_eth_tready_i,
       m_tx_eth_tlast => tx_eth_tlast_i,
-      m_tx_eth_tuser => tx_eth_tuser_i(0)
+      m_tx_eth_tuser => tx_eth_tuser_i
     );
 
   -- ---------------------------------------------------
