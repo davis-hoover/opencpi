@@ -127,6 +127,17 @@ namespace OC = OCPI::Container;
 namespace OR = OCPI::Remote;
 namespace OE = OCPI::Util::EzXml;
 
+OA::ApplicationX* app_ptr;
+void signalHandler( int signum ) {
+  std::string error;
+  OU::eformat(error, "Interrupt signal (%d) received.", signum);
+
+  // terminate program  
+  app_ptr->stop();
+  app_ptr->finish();
+  exit(signum);
+}
+
 static void addParams(const char *name, const char **ap, OB::PValueList &params) {
   const char *err;
   while (ap && *ap)
@@ -297,6 +308,7 @@ static int mymain(const char **ap) {
     putenv(strdup(env.c_str()));
   }
   signal(SIGPIPE, SIG_IGN);
+  signal(SIGINT, signalHandler);  
   if (options.log_level())
     OCPI::OS::Log::setLevel(options.log_level());
   if (!*ap && !options.list() && !options.artifacts())
@@ -347,6 +359,7 @@ static int mymain(const char **ap) {
       OU::baseName(file.c_str(), name);
 
       OA::ApplicationX app(xml, name.c_str(), params);
+      app_ptr = &app;
       if (options.deploy_out()) {
 	std::string dfile;
 	if (*options.deploy_out())
