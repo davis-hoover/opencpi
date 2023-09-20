@@ -11,80 +11,198 @@ workflow:
       when: never
     - when: always # Run for all other conditions
 
-include: 
-- .gitlab-ci/yaml/docs.yml
-- .gitlab-ci/yaml/report.yml
+include:
+  - .gitlab-ci/yaml/docs.yml
+  - .gitlab-ci/yaml/report.yml
 
 stages:
-- .pre
-- generate-children
-- generate
-- trigger-children
-- trigger
-- build
-- deploy
-- report
+  - packages
+  - prereqs
+  - build
+  - test
+  - deploy
+  - generate-projects
+  - trigger-projects
+  - generate-children
+  - trigger-children
+  - report
 
-# Old pipeline. Runs when the env var 'CI_OCPI_PIPELINE' is not set to "new"
-generate-children:
-  artifacts:
-    paths:
-    - .gitlab-ci.yml
-  image: centos:7
-  script:
-  - yum install epel-release -y
-  - yum install python36-PyYAML -y
-  - .gitlab-ci/scripts/ci_yaml_generator.py
-  stage: generate-children
-  tags:
-  - docker
-  rules:
-    - if: "$CI_OCPI_PIPELINE != 'new'"
-      when: always
-    - when: never
-trigger-children:
-  stage: trigger-children
-  trigger:
-    include:
-    - artifact: .gitlab-ci.yml
-      job: generate-children
-    strategy: depend
+variables:
+  GIT_STRATEGY: none
+  CI_OCPI_ROOT_PIPELINE_ID: $CI_PIPELINE_ID
+  CI_OCPI_ARTIFACTS_DIR : "${CI_PROJECT_DIR}/.gitlab-ci/artifacts"
+  CI_OCPI_HOST:
+    description: 'Host platform to install opencpi onto. The base docker image used in pipelines.'
+    value: 'centos7'
+  CI_OCPI_PLATFORMS: 
+    description: 'Platforms to build and test OpenCPI for. Separated by comma and/or space.'
+    value: 'zed, xsim, xilinx19_2_aarch32'
+  CI_OCPI_PROJECTS: 
+    description: 'Package IDs of projects to include when installing OpenCPI. Separated by comma and/or space.'
+    value: ''
+
+.build:
+  image: "${CI_OCPI_CONTAINER_REGISTRY}/${CI_OCPI_HOST}.packages:${CI_PIPELINE_ID}"
+  tags: ['eks', 'aws', 'opencpi']
   variables:
-    CI_ROOT_SOURCE: "$CI_PIPELINE_SOURCE"
-    CI_ROOT_ID: "$CI_PIPELINE_ID"
+    KUBERNETES_CPU_REQUEST: '4'
+    KUBERNETES_CPU_LIMIT: '4'
+    KUBERNETES_MEMORY_REQUEST: '8Gi'
+    KUBERNETES_MEMORY_LIMIT: '8Gi'
+  before_script:
+    - source ./cdk/opencpi-setup.sh -r
+
+.deploy:
+  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+  tags: ['eks', 'aws', 'opencpi']
+  services:
+    - docker:20.10.16-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_TLS_VERIFY: 1
+    DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
+    KUBERNETES_CPU_REQUEST: '4'
+    KUBERNETES_CPU_LIMIT: '4'
+    KUBERNETES_MEMORY_REQUEST: '8Gi'
+    KUBERNETES_MEMORY_LIMIT: '8Gi'
+  before_script:
+    - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $CI_OCPI_CONTAINER_REGISTRY
+
+install-packages:
+  extends: .deploy
+  stage: packages
+  variables:
+    GIT_STRATEGY: clone
+    GIT_DEPTH: 1
+  script:
+  - > 
+    docker build . -f ".gitlab-ci/dockerfiles/${CI_OCPI_HOST}.dockerfile" 
+    -t "${CI_OCPI_CONTAINER_REGISTRY}/${CI_OCPI_HOST}.packages:${CI_PIPELINE_ID}"
+  - docker push "${CI_OCPI_CONTAINER_REGISTRY}/${CI_OCPI_HOST}.packages:${CI_PIPELINE_ID}"
   rules:
-    - if: "$CI_OCPI_PIPELINE != 'new'"
+    - if: '$CI_PIPELINE_SOURCE != "web"'
+      when: manual
+    - if: $CI_OCPI_HOST
+      when: on_success
+    - when: never
+  allow_failure: false
+
+install-prereqs:
+  extends: .build
+  stage: prereqs
+  variables:
+    GIT_STRATEGY: clone
+  before_script: []
+  script:
+    - scripts/install-prerequisites.sh
+  rules:
+    - if: $CI_OCPI_HOST
       when: on_success
     - when: never
 
-# New pipeline. env var CI_OCPI_PIPELINE must be set to 'new' to run
-generate:
+build-opencpi:
+  extends: .build
+  stage: build
+  before_script: []
+  script:
+    - scripts/build-opencpi.sh
+  rules:
+    - if: $CI_OCPI_HOST
+      when: on_success
+    - when: never
+
+test-opencpi:
+  extends: .build
+  stage: test
+  before_script: []
+  script:
+    - scripts/test-opencpi.sh --no-hdl
+  rules:
+    - if: $CI_OCPI_HOST
+      when: on_success
+    - when: never
+
+deploy:
+  extends: .deploy
+  stage: deploy
+  variables:
+    CI_OCPI_PUBLIC_IMAGE: "${CI_REGISTRY_IMAGE}/${CI_OCPI_HOST}.framework:${CI_COMMIT_REF_SLUG}"
+    CI_OCPI_PRIVATE_IMAGE: "${CI_OCPI_CONTAINER_REGISTRY}/${CI_OCPI_HOST}.framework:${CI_PIPELINE_ID}"
+    CI_OCPI_FROM_IMAGE: "${CI_OCPI_CONTAINER_REGISTRY}/${CI_OCPI_HOST}.packages:${CI_PIPELINE_ID}"
+  script:
+    - >
+      docker build . -f .gitlab-ci/dockerfiles/deploy.dockerfile 
+      -t "${CI_OCPI_PRIVATE_IMAGE}"
+      --build-arg IMAGE="${CI_OCPI_FROM_IMAGE}"
+      --build-arg TAG="$CI_PIPELINE_ID"
+    - docker push "${CI_OCPI_PRIVATE_IMAGE}"
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker tag "${CI_OCPI_PRIVATE_IMAGE}" "${CI_OCPI_PUBLIC_IMAGE}"
+    - docker push "${CI_OCPI_PUBLIC_IMAGE}"
+  rules:
+    - if: $CI_OCPI_HOST != "" && ($CI_COMMIT_TAG || $CI_COMMIT_REF_SLUG == "develop")
+      when: on_success
+    - when: never
+
+generate-projects:
+  extends: .build
+  stage: generate-projects
+  dependencies: ['test-opencpi']
+  script:
+    - python3 .gitlab-ci/scripts/generate_pipeline.py projects
   artifacts:
     paths:
-    - .gitlab-ci.yml
-  image: centos:7
-  script:
-  - yum install epel-release -y
-  - yum install python36-PyYAML -y
-  - .gitlab-ci/scripts/ci_generate_pipeline.py platform
-  stage: generate
-  tags:
-  - docker
+      - $CI_OCPI_ARTIFACTS_DIR
   rules:
-    - if: "$CI_OCPI_PIPELINE == 'new'"
-      when: always
+    - if: $CI_OCPI_PROJECTS && $CI_OCPI_PROJECTS != "" && $CI_OCPI_HOST != ""
+      when: on_success
     - when: never
-trigger:
-  stage: trigger
+
+trigger-projects:
+  stage: trigger-projects
+  variables: 
+    CI_OCPI_ROOT_PIPELINE_ID: $CI_PIPELINE_ID
   trigger:
     include:
-    - artifact: .gitlab-ci.yml
-      job: generate
+      - artifact: "${CI_OCPI_ARTIFACTS_DIR}/projects.yml"
+        job: generate-projects
+    forward:
+      yaml_variables: true
+      pipeline_variables: true
     strategy: depend
   rules:
-    - if: "$CI_OCPI_PIPELINE != 'new'"
-      when: never
-    - if: "$CI_PIPELINE_SOURCE != 'pipeline'"
-      variables:
-        CI_OCPI_ROOT_PIPELINE_ID: "$CI_PIPELINE_ID"
-    - when: on_success
+    - if: $CI_OCPI_PROJECTS && $CI_OCPI_PROJECTS != "" && $CI_OCPI_HOST != ""
+      when: on_success
+    - when: never
+
+generate-children:
+  extends: .build
+  stage: generate-children
+  dependencies: ['test-opencpi']
+  script:
+    - python3 .gitlab-ci/scripts/generate_pipeline.py children
+  artifacts:
+    paths:
+      - $CI_OCPI_ARTIFACTS_DIR
+  rules:
+    - if: $CI_OCPI_PLATFORMS != "" && $CI_OCPI_HOST != ""
+      when: on_success
+    - when: never
+
+trigger-children:
+  stage: trigger-children
+  variables: 
+    CI_OCPI_ROOT_PIPELINE_ID: $CI_PIPELINE_ID
+  trigger:
+    include:
+      - artifact: "${CI_OCPI_ARTIFACTS_DIR}/children.yml"
+        job: generate-children
+    forward:
+      yaml_variables: true
+      pipeline_variables: true
+    strategy: depend
+  rules:
+    - if: $CI_OCPI_PLATFORMS != "" && $CI_OCPI_HOST != ""
+      when: on_success
+    - when: never

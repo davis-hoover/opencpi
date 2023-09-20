@@ -247,17 +247,22 @@ class TestsCollection(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         super().__init__(directory, name, **kwargs)
         self.tests = []
         if assets != None:
-            for test_dir,parent_package_id in assets:
+            for test_dir, parent_package_id in assets:
                 test_name = Path(test_dir).stem
-                self.tests.append(Test(test_dir, None,
-                                       package_id=parent_package_id + ".tests." + test_name))
+                package_id = f'{parent_package_id}.tests.{test_name}'
+                self.tests.append(Test(test_dir, None, package_id=package_id))
         else:
-            self.check_dirtype('library', self.directory)
-            for subdir in Path(self.directory).iterdir():
+            path = Path(self.directory)
+            project_package = ocpiutil.get_project_package(self.directory)
+            package_id = f'{project_package}.{path.name}.tests.{{}}'
+            for subdir in path.iterdir():
                 if subdir.is_dir() and subdir.name != 'specs':
                     dirtype = ocpiutil.get_dirtype(subdir)
-                    if dirtype == 'test':
-                        self.tests.append(Test(str(subdir), None, **kwargs))
+                    if dirtype == 'test' and subdir.joinpath(f'{subdir.stem}-test.xml').exists():
+                        self.tests.append(Test(str(subdir), 
+                                               None, 
+                                               package_id=package_id.format(subdir.stem), 
+                                               **kwargs))
 
     def get_valid_tests(self):
         """
