@@ -1,9 +1,5 @@
-stages:
-  - trigger
-  - deploy
-
-trigger-docs:
-  stage: trigger
+gitlab.io:
+  stage: trigger-projects
   trigger: $CI_PROJECT_NAMESPACE/opencpi.gitlab.io
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"

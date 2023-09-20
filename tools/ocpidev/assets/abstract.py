@@ -55,6 +55,8 @@ class Asset(metaclass=ABCMeta):
         directory = str(directory)
         child_path = kwargs.get('child_path')
         self.parent = Path(directory).resolve() # This is the parent
+        if self.parent.name == 'lib':
+            self.parent = self.parent.parent
         self.verbose = kwargs.get('verbose')
         self.name = name
         if not name:

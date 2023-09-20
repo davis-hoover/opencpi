@@ -290,7 +290,7 @@ def _preprocess_args(args_dict, args=None):
     options_dict.pop('help', None)
     parser = _make_options(parser, options_dict)
     args, extra = parser.parse_known_args(args)
-
+    args.directory = args.directory.strip()
     try:
         ocpiutil.change_dir(args.directory)
     except ocpiutil.OCPIException as e:
