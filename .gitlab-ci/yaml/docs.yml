@@ -19,8 +19,9 @@ pages:
   tags:
     - docker
   image: centos:latest
-  rules:
-    - if: "$CI_COMMIT_BRANCH == 'develop'"
+  variables:
+    GIT_STRATEGY: clone
+    GIT_DEPTH: 1
   dependencies: []
   before_script: []
   script:
@@ -29,4 +30,5 @@ pages:
   artifacts:
     paths:
       - public/
-
+  rules:
+    - if: "$CI_COMMIT_BRANCH == 'develop'"
