@@ -81,7 +81,7 @@ install-packages:
     -t "${CI_OCPI_CONTAINER_REGISTRY}/${CI_OCPI_HOST}.packages:${CI_PIPELINE_ID}"
   - docker push "${CI_OCPI_CONTAINER_REGISTRY}/${CI_OCPI_HOST}.packages:${CI_PIPELINE_ID}"
   rules:
-    - if: '$CI_PIPELINE_SOURCE != "web"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: manual
     - if: $CI_OCPI_HOST
       when: on_success
@@ -129,7 +129,7 @@ deploy:
   variables:
     CI_OCPI_PUBLIC_IMAGE: "${CI_REGISTRY_IMAGE}/${CI_OCPI_HOST}.framework:${CI_COMMIT_REF_SLUG}"
     CI_OCPI_PRIVATE_IMAGE: "${CI_OCPI_CONTAINER_REGISTRY}/${CI_OCPI_HOST}.framework:${CI_PIPELINE_ID}"
-    CI_OCPI_FROM_IMAGE: "${CI_OCPI_CONTAINER_REGISTRY}/${CI_OCPI_HOST}.packages:${CI_PIPELINE_ID}"
+    CI_OCPI_FROM_IMAGE: "${CI_OCPI_CONTAINER_REGISTRY}/${CI_OCPI_HOST}.packages"
   script:
     - >
       docker build . -f .gitlab-ci/dockerfiles/deploy.dockerfile 

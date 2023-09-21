@@ -144,7 +144,7 @@ class JobBuilder:
         """Build a Job.
         
         If assets arg is provided as a list, the built job will contain 
-        a prallel matrix entry to run the jobs for each Asset. 
+        a parallel matrix entry to run the jobs for each Asset. 
         Otherwise, if assets is a singular Asset, the job is built only 
         for the specified asset, and if no asset is specified, the job
         is built only for the specified Target/Platform. If library arg 
@@ -618,7 +618,7 @@ class PipelineBuilder:
 def get_args(pipeline_type) -> Dict[str, str]:
     """Gets arguments to pass to the PipelineBuilder.
 
-    Arguments may include necessary environment variabls, OpenCPI assets
+    Arguments may include necessary environment variables, OpenCPI assets
     to include in the Pipeline, container images to use and/or create.
     
     Args:
@@ -850,7 +850,7 @@ def main(pipeline_type, **kwargs):
 
     Args:
         pipeline_type: The type of Pipeline to build.
-        kwargs: Args to pass into the instatiation of the
+        kwargs: Args to pass into the instantiation of the
             PipelineBuilder.
     """
     ci_project_dir = os.environ.get('CI_PROJECT_DIR', '$CI_PROJECT_DIR')
