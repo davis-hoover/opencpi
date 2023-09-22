@@ -102,12 +102,12 @@ to select the LED display mode (SW[0] and LED[0] are nearest the FMC connector).
    :class: tight-table
 
    "000", "[0]: 1Hz heartbeat, [1]: MAC address successfully read, [2]: MAC address read error, [4:3] ETH1 MAC speed (00=10M, 01=100M, 10=1000M), [6:5] ETH2 MAC speed"
-   "001", "mac_addr[7:0]"
-   "010", "mac_addr[15:8]"
-   "011", "mac_addr[23:16]"
-   "100", "mac_addr[31:24]"
-   "101", "mac_addr[39:32]"
-   "110", "mac_addr[47:40]"
+   "001", "mac_addr[47:40]"
+   "010", "mac_addr[39:32]"
+   "011", "mac_addr[31:24]"
+   "100", "mac_addr[23:16]"
+   "101", "mac_addr[15:8]"
+   "110", "mac_addr[7:0]"
    "111", "constant 0xaa"
 
 Setup Guide
