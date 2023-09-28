@@ -334,7 +334,8 @@ class JobBuilder:
             script.append(f'git clone {external_project.url} -b {external_project.branch}'
                           f' "{project_path}"')
             script.append(f'ocpidev register project -d "{project_path}"')
-            script.append(f'ocpidev build project -d "{project_path}"')
+            if external_project.name.startswith('ocpi.comp'):
+                script.append(f'ocpidev build project -d "{project_path}"')
         elif stage is Stages.deploy:
             tag = os.getenv('CI_OCPI_ROOT_PIPELINE_ID', '${CI_OCPI_ROOT_PIPELINE_ID}')
             host = os.getenv('CI_OCPI_HOST', '${CI_OCPI_HOST}')
