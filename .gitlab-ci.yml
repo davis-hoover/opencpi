@@ -1,19 +1,16 @@
-workflow:
-  rules:
-    - if: '$CI_COMMIT_TAG' 
-    # Always run pipelines for tags
-      when: always
-    - if: '$CI_COMMIT_REF_NAME == "develop"' 
-    # Always run pipelines for develop
-      when: always
-    - if: '$CI_PIPELINE_SOURCE == "push"' 
-    # Never run pipelines for pushes (except for develop and tags)
-      when: never
-    - when: always # Run for all other conditions
-
 include:
+  - .gitlab-ci/yaml/variables.yml
+  - .gitlab-ci/yaml/rules.yml
   - .gitlab-ci/yaml/docs.yml
   - .gitlab-ci/yaml/report.yml
+
+workflow:
+  rules:
+    - if: ($CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_TAG == null && $CI_COMMIT_REF_NAME != "develop")
+    # Never run pipelines for pushes (except for develop and tags)
+      when: never
+    - !reference [.rules, image_tag] # Set image tag to pipeline ID if packages job is to run
+    - when: always
 
 stages:
   - packages
@@ -27,32 +24,19 @@ stages:
   - trigger-children
   - report
 
-variables:
-  GIT_STRATEGY: none
-  CI_OCPI_ROOT_PIPELINE_ID: $CI_PIPELINE_ID
-  CI_OCPI_ARTIFACTS_DIR : "${CI_PROJECT_DIR}/.gitlab-ci/artifacts"
-  CI_OCPI_HOST:
-    description: 'Host platform to install opencpi onto. The base docker image used in pipelines.'
-    value: 'centos7'
-  CI_OCPI_PLATFORMS: 
-    description: 'Platforms to build and test OpenCPI for. Separated by comma and/or space.'
-    value: 'zed, xsim, xilinx19_2_aarch32'
-  CI_OCPI_PROJECTS: 
-    description: 'Package IDs of projects to include when installing OpenCPI. Separated by comma and/or space.'
-    value: ''
-
 .build:
-  image: "${CI_OCPI_CONTAINER_REGISTRY}/${CI_OCPI_HOST}.packages:${CI_PIPELINE_ID}"
+# Template for jobs that build OpenCPI framework or assets.
+  image: "${CI_OCPI_CONTAINER_REGISTRY}/${CI_OCPI_HOST}.packages:$CI_OCPI_IMAGE_TAG"
   tags: ['eks', 'aws', 'opencpi']
-  variables:
-    KUBERNETES_CPU_REQUEST: '4'
-    KUBERNETES_CPU_LIMIT: '4'
-    KUBERNETES_MEMORY_REQUEST: '8Gi'
-    KUBERNETES_MEMORY_LIMIT: '8Gi'
   before_script:
     - source ./cdk/opencpi-setup.sh -r
+  rules:
+    - !reference [.rules, framework_success] # Run jobs on success
+    - when: never
 
 .deploy:
+# Template for jobs that create and push container images to public
+# and/or private repos.
   image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
   tags: ['eks', 'aws', 'opencpi']
   services:
@@ -62,33 +46,57 @@ variables:
     DOCKER_TLS_CERTDIR: "/certs"
     DOCKER_TLS_VERIFY: 1
     DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
-    KUBERNETES_CPU_REQUEST: '4'
-    KUBERNETES_CPU_LIMIT: '4'
-    KUBERNETES_MEMORY_REQUEST: '8Gi'
-    KUBERNETES_MEMORY_LIMIT: '8Gi'
   before_script:
     - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $CI_OCPI_CONTAINER_REGISTRY
 
 install-packages:
+# Installs packages required to install OpenCPI framework. Creates a
+# base docker image to be used by other jobs in the pipeline.
+# If suppressed, other jobs in pipeline will use latest develop image.
   extends: .deploy
   stage: packages
   variables:
     GIT_STRATEGY: clone
     GIT_DEPTH: 1
+    CI_OCPI_PRIVATE_IMAGE: "${CI_OCPI_CONTAINER_REGISTRY}/${CI_OCPI_HOST}.packages"
   script:
-  - > 
-    docker build . -f ".gitlab-ci/dockerfiles/${CI_OCPI_HOST}.dockerfile" 
-    -t "${CI_OCPI_CONTAINER_REGISTRY}/${CI_OCPI_HOST}.packages:${CI_PIPELINE_ID}"
-  - docker push "${CI_OCPI_CONTAINER_REGISTRY}/${CI_OCPI_HOST}.packages:${CI_PIPELINE_ID}"
+    - > 
+      docker build . -f ".gitlab-ci/dockerfiles/${CI_OCPI_HOST}.dockerfile" 
+      -t "${CI_OCPI_PRIVATE_IMAGE}:${CI_OCPI_IMAGE_TAG}"
+    - docker push "${CI_OCPI_PRIVATE_IMAGE}:${CI_OCPI_IMAGE_TAG}"
+    # Also push a develop tag image if branch is develop
+    - |
+      if [[ $CI_COMMIT_REF_SLUG == 'develop' ]]; then
+        docker tag "${CI_OCPI_PRIVATE_IMAGE}:${CI_OCPI_IMAGE_TAG}" "${CI_OCPI_PRIVATE_IMAGE}:${CI_COMMIT_REF_SLUG}" && \
+        docker push "${CI_OCPI_PRIVATE_IMAGE}:${CI_COMMIT_REF_SLUG}"
+      fi
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: manual
-    - if: $CI_OCPI_HOST
-      when: on_success
+    - !reference [.rules, packages_manual] # Always run package installation job manually
     - when: never
   allow_failure: false
 
+setup-opencpi:
+# Copies latest develop build of OpenCPI. Intended to only run when
+# Framework installation is suppressed.
+  extends: .build
+  stage: build
+  image: "${CI_REGISTRY_IMAGE}/${CI_OCPI_HOST}.framework:develop"
+  variables:
+    CI_OCPI_PUBLIC_IMAGE: "${CI_REGISTRY_IMAGE}/${CI_OCPI_HOST}.framework:develop"
+  before_script: []
+  script:
+    - ls -A1 | xargs rm -rf # Remove r
+    - cp -pr /home/user/opencpi $CI_BUILDS_DIR # Copy contents of develop image to builds dir
+    - git fetch origin $CI_COMMIT_SHA && git checkout FETCH_HEAD # Update repo
+  rules:
+    - !reference [.rules, framework_never] # Never run if framework is to be installed
+    - !reference [.rules, packages_success] # Run automatically if packages are to be installed
+    - !reference [.rules, platforms_manual] # Run manually if platforms are to be built
+    - when: never 
+
 install-prereqs:
+# Installs OpenCPI prerequisites. Does not run if framework installation
+# is suppressed.
   extends: .build
   stage: prereqs
   variables:
@@ -97,55 +105,54 @@ install-prereqs:
   script:
     - scripts/install-prerequisites.sh
   rules:
-    - if: $CI_OCPI_HOST
-      when: on_success
-    - when: never
+    - !reference [.rules, framework_manual] # Run manually if framework is to be installed but not packages
+    - !reference [.rules, framework_success] # Run automatically if framework and packages are to be installed
+    - when: never # Don't run if framework is not to be installed
 
 build-opencpi:
+# Installs OpenCPI frameworks. Does not run if framework installation
+# is suppressed.
   extends: .build
   stage: build
   before_script: []
   script:
     - scripts/build-opencpi.sh
-  rules:
-    - if: $CI_OCPI_HOST
-      when: on_success
-    - when: never
 
 test-opencpi:
+# Tests installation of OpenCPI framework. Does not run if framework 
+# installation is suppressed.
   extends: .build
   stage: test
   before_script: []
   script:
     - scripts/test-opencpi.sh --no-hdl
-  rules:
-    - if: $CI_OCPI_HOST
-      when: on_success
-    - when: never
 
 deploy:
+# Deploys framework to public and private repos if running on develop
+# or a tag.
   extends: .deploy
   stage: deploy
   variables:
     CI_OCPI_PUBLIC_IMAGE: "${CI_REGISTRY_IMAGE}/${CI_OCPI_HOST}.framework:${CI_COMMIT_REF_SLUG}"
-    CI_OCPI_PRIVATE_IMAGE: "${CI_OCPI_CONTAINER_REGISTRY}/${CI_OCPI_HOST}.framework:${CI_PIPELINE_ID}"
+    CI_OCPI_PRIVATE_IMAGE: "${CI_OCPI_CONTAINER_REGISTRY}/${CI_OCPI_HOST}.framework:${CI_COMMIT_REF_SLUG}"
     CI_OCPI_FROM_IMAGE: "${CI_OCPI_CONTAINER_REGISTRY}/${CI_OCPI_HOST}.packages"
   script:
     - >
       docker build . -f .gitlab-ci/dockerfiles/deploy.dockerfile 
       -t "${CI_OCPI_PRIVATE_IMAGE}"
       --build-arg IMAGE="${CI_OCPI_FROM_IMAGE}"
-      --build-arg TAG="$CI_PIPELINE_ID"
+      --build-arg TAG="$CI_OCPI_IMAGE_TAG"
     - docker push "${CI_OCPI_PRIVATE_IMAGE}"
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker tag "${CI_OCPI_PRIVATE_IMAGE}" "${CI_OCPI_PUBLIC_IMAGE}"
     - docker push "${CI_OCPI_PUBLIC_IMAGE}"
   rules:
-    - if: $CI_OCPI_HOST != "" && ($CI_COMMIT_TAG || $CI_COMMIT_REF_SLUG == "develop")
-      when: on_success
+    - !reference [.rules, deploy_framework_success]
     - when: never
 
 generate-projects:
+# Runs yaml generator to create yaml for child pipeline to clone and 
+# register external projects (e.g., OSPs and Comps) if any specified.
   extends: .build
   stage: generate-projects
   dependencies: ['test-opencpi']
@@ -155,14 +162,13 @@ generate-projects:
     paths:
       - $CI_OCPI_ARTIFACTS_DIR
   rules:
-    - if: $CI_OCPI_PROJECTS && $CI_OCPI_PROJECTS != "" && $CI_OCPI_HOST != ""
-      when: on_success
+    - !reference [.rules, projects_always] # Always run if projects are specified
     - when: never
 
 trigger-projects:
+# Triggers child pipeline to clone and register external projects 
+# (e.g., OSPs and Comps) if any specified.
   stage: trigger-projects
-  variables: 
-    CI_OCPI_ROOT_PIPELINE_ID: $CI_PIPELINE_ID
   trigger:
     include:
       - artifact: "${CI_OCPI_ARTIFACTS_DIR}/projects.yml"
@@ -172,11 +178,12 @@ trigger-projects:
       pipeline_variables: true
     strategy: depend
   rules:
-    - if: $CI_OCPI_PROJECTS && $CI_OCPI_PROJECTS != "" && $CI_OCPI_HOST != ""
-      when: on_success
+    - !reference [.rules, projects_always] # Always run if projects are specified
     - when: never
 
 generate-children:
+# Runs yaml generator to create yaml for child pipeline to build for
+# non-host platforms if any specified.
   extends: .build
   stage: generate-children
   dependencies: ['test-opencpi']
@@ -186,14 +193,13 @@ generate-children:
     paths:
       - $CI_OCPI_ARTIFACTS_DIR
   rules:
-    - if: $CI_OCPI_PLATFORMS != "" && $CI_OCPI_HOST != ""
-      when: on_success
+    - !reference [.rules, platforms_always] # Always run if platforms are to be built for
     - when: never
 
 trigger-children:
+# Triggers child pipeline to build for non-host platforms if any 
+# specified.
   stage: trigger-children
-  variables: 
-    CI_OCPI_ROOT_PIPELINE_ID: $CI_PIPELINE_ID
   trigger:
     include:
       - artifact: "${CI_OCPI_ARTIFACTS_DIR}/children.yml"
@@ -203,6 +209,5 @@ trigger-children:
       pipeline_variables: true
     strategy: depend
   rules:
-    - if: $CI_OCPI_PLATFORMS != "" && $CI_OCPI_HOST != ""
-      when: on_success
+    - !reference [.rules, platforms_always] # Always run if platforms are to be built for
     - when: never

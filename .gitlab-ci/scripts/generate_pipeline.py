@@ -21,7 +21,7 @@ ExternalProject = namedtuple('ExternalProject', ['name', 'url', 'branch'])
 
 class Stages:
     """Collection of CI/CD job stages"""
-    register_projects = 'register_projects'
+    register_projects = 'register-projects'
     generate_targets = 'generate-targets'
     trigger_targets = 'trigger-targets'
     trigger_platforms = 'trigger-platforms'
@@ -337,7 +337,7 @@ class JobBuilder:
             if external_project.name.startswith('ocpi.comp'):
                 script.append(f'ocpidev build project -d "{project_path}"')
         elif stage is Stages.deploy:
-            tag = os.getenv('CI_OCPI_ROOT_PIPELINE_ID', '${CI_OCPI_ROOT_PIPELINE_ID}')
+            tag = os.getenv('CI_OCPI_IMAGE_TAG', '${CI_OCPI_IMAGE_TAG}')
             host = os.getenv('CI_OCPI_HOST', '${CI_OCPI_HOST}')
             deploy_image = f'${{CI_OCPI_CONTAINER_REGISTRY}}/{host}:{tag}'
             from_image = f'${{CI_OCPI_CONTAINER_REGISTRY}}/{host}.packages'
@@ -438,15 +438,15 @@ class JobBuilder:
             variables["DIR"] = str(library.path)
         if target is not None and isinstance(target, Platform):
             if target.model == 'rcc':
-                variables['KUBERNETES_CPU_REQUEST'] = '4000m'
-                variables['KUBERNETES_CPU_LIMIT'] = '4000m'
-                variables['KUBERNETES_MEMORY_REQUEST'] = '8Gi'
-                variables['KUBERNETES_MEMORY_LIMIT'] = '8Gi'
+                variables['KUBERNETES_CPU_REQUEST'] = '3000m'
+                variables['KUBERNETES_CPU_LIMIT'] = '3000m'
+                variables['KUBERNETES_MEMORY_REQUEST'] = '7Gi'
+                variables['KUBERNETES_MEMORY_LIMIT'] = '7Gi'
             else:
-                variables['KUBERNETES_CPU_REQUEST'] = '8000m'
-                variables['KUBERNETES_CPU_LIMIT'] = '8000m'
-                variables['KUBERNETES_MEMORY_REQUEST'] = '16Gi'
-                variables['KUBERNETES_MEMORY_LIMIT'] = '16Gi'
+                variables['KUBERNETES_CPU_REQUEST'] = '7000m'
+                variables['KUBERNETES_CPU_LIMIT'] = '7000m'
+                variables['KUBERNETES_MEMORY_REQUEST'] = '15Gi'
+                variables['KUBERNETES_MEMORY_LIMIT'] = '15Gi'
         if stage is Stages.deploy:
             variables['DOCKER_HOST'] = 'tcp://docker:2376'
             variables['DOCKER_TLS_CERTDIR'] = '/certs'
@@ -629,7 +629,7 @@ def get_args(pipeline_type) -> Dict[str, str]:
     """
     container_registry = '${CI_OCPI_CONTAINER_REGISTRY}'
     host = os.getenv('CI_OCPI_HOST', '${CI_OCPI_HOST}')
-    image_tag = os.getenv('CI_OCPI_ROOT_PIPELINE_ID', '${CI_OCPI_ROOT_PIPLINE_ID}')
+    image_tag = os.getenv('CI_OCPI_IMAGE_TAG', '${CI_OCPI_IMAGE_TAG}')
     args = {}
     args['base_image'] = f'{container_registry}/{host}.packages:{image_tag}'
     args['deployer_image'] = os.getenv(

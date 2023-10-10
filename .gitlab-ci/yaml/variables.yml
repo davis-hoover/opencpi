@@ -1,0 +1,27 @@
+variables:
+  GIT_STRATEGY: none
+  CI_OCPI_ROOT_PIPELINE_ID: $CI_PIPELINE_ID
+  CI_OCPI_ARTIFACTS_DIR : "${CI_PROJECT_DIR}/.gitlab-ci/artifacts"
+  CI_OCPI_IMAGE_TAG: 'develop'
+  KUBERNETES_CPU_REQUEST: '3000m'
+  KUBERNETES_CPU_LIMIT: '3000m'
+  KUBERNETES_MEMORY_REQUEST: '7Gi'
+  KUBERNETES_MEMORY_LIMIT: '7Gi'
+  CI_OCPI_HOST:
+    description: 'Host platform to install opencpi onto. The base docker image used in pipelines.'
+    value: 'centos7'
+  CI_OCPI_PLATFORMS: 
+    description: 'Platforms to build and test OpenCPI for. Separated by comma and/or space.'
+    value: 'zed, xsim, xilinx19_2_aarch32'
+  CI_OCPI_PROJECTS: 
+    description: 'Package IDs of projects to include when installing OpenCPI. Separated by comma and/or space.'
+    value: ''
+  CI_OCPI_INSTALL_PACKAGES:
+    description: 'Set to "false" to suppress the installation of packages. If packages are not 
+                  installed, the latest develop image will be used.'
+    value: 'true'
+  CI_OCPI_INSTALL_FRAMEWORK:
+    description: 'Set to "false" to suppress the installation of the OpenCPI framework for the host 
+                  specified in CI_OCPI_HOST. If framework is not  installed, the latest develop 
+                  build will be used.'
+    value: 'true'

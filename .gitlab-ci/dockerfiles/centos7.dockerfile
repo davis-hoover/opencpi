@@ -8,8 +8,8 @@ RUN touch /.dockerenv && \
     useradd -ms /bin/bash -u 1000 -g 1000 user && \
     echo 'user ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 USER user
-COPY --chown=user:user . /home/user/opencpi
-RUN cd /home/user/opencpi && \ 
+COPY --chown=user:user . /tmp/opencpi
+RUN cd /tmp/opencpi && \
     ./scripts/install-packages.sh && \
     cd / && \
-    rm -rf /home/user/opencpi
+    rm -rf /tmp/opencpi

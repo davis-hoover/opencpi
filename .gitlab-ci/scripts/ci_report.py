@@ -12,9 +12,9 @@ CMD_TEMPLATE = 'https://gitlab.com/api/v4/projects/{}/pipelines/{}/{}?scope[]=fa
 
 
 def main():
-    """Get failed jobs and dump to csv
+    """Get failed jobs and dump to csv.
     
-    Gets pipeline info from environment and calls get_failed_jobs() then
+    Gets pipeline info from environment, calls get_failed_jobs(), and
     dumps the returned jobs to a csv file with name in format:
         "job_report_${CI_COMMIT_TIMESTAMP}.csv"
     """
@@ -31,7 +31,7 @@ def main():
 
 
 def get_failed_jobs(bridges: List[dict]) -> List[dict]:
-    """Uses gitlab API to gather and return list of failed jobs
+    """Uses gitlab API to gather and return list of failed jobs.
     
     Recursively calls itself, passing in gathered failed bridge jobs and
     jobs, to collect failed jobs from child pipelines.
@@ -61,7 +61,7 @@ def get_failed_jobs(bridges: List[dict]) -> List[dict]:
 
 
 def urlopen(url: Union[str, request.Request]) -> List[dict]:
-    """Opens a url or Request object and returns reponses.
+    """Opens a url or Request object and returns responses.
 
     Call request.urlopen() to open url. Handles pagination by calling
     self recursively.
@@ -82,7 +82,7 @@ def urlopen(url: Union[str, request.Request]) -> List[dict]:
 
 
 def dump(failed_jobs: List[dict], file_name: str):
-    """Dumps failed jobs out to a csv file"""
+    """Dumps failed jobs out to a csv file."""
     with open(file_name, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile, delimiter=',')
         writer.writerow([
