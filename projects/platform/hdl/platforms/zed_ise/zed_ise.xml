@@ -30,6 +30,8 @@
        - PG_C2M is connected to PS_POR_B - the Zynq powerup reset where high is power good.
        - TCK, TDI, TDO, TMS JTAG for normal jtag chain when an FMC is present
   -->
+  <property name='pps_src' type='uchar' parameter='1' default='0'/>
+
   <slot name='FMC' type='fmc_lpc'>
     <!-- We only mention signals that don't have the canonical signal name -->
     <signal slot='PRSNT_M2C_L' platform='PRSNT'/>

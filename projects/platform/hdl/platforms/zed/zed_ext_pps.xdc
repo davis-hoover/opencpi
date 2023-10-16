@@ -129,6 +129,9 @@ set_property PACKAGE_PIN B22 [get_ports {FMC_LA33_N}];  # "FMC-LA33_N"
 set_property PACKAGE_PIN B21 [get_ports {FMC_LA33_P}];  # "FMC-LA33_P"
 
 
+set_property PACKAGE_PIN AA9 [get_ports {PMOD_JA4}]; # "PMod_A JA4":
+
+
 #create_pblock pblock_zed_i; add_cells_to_pblock [get_pblocks pblock_zed_i] [get_cells [list {ftop/pfconfig_i/zed_i}]]
 #resize_pblock [get_pblocks pblock_zed_i] -add {SLICE_X26Y88:SLICE_X49Y110}
 
