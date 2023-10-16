@@ -11,17 +11,19 @@
        3. Read timeDelta
        The value is the time delta between when Step one occurred at the time service (t0),
        and when step 2 occurred at the time service (t1). -->
+
   <Property Name="delta" Type="ulonglong" Writable="true" Volatile="true"
 	    Description="Difference between last-written value and time_now (now - written value)."/>
   <Property Name="PPS_ok" Type="bool" Volatile="true"
            Description="PPS fell within the valid window in the last second."/>
   <Property Name="enable_time_now_updates_from_PPS" Type="bool" Writable="true"
-           Description="When true, time_now fractional seconds can be disciplined by timebase PPS input."/>
+	   Description="When true, time_now fractional seconds can be disciplined by timebase PPS input."/>
   <Property Name="valid_requires_write_to_time_now" Type="bool" Writable="true"
            Description="When true, timeservice master's valid will not go high until time_now is written from software."/>
 
-  <Property Name="frequency" Type="float" Parameter="true" Default="1e6"
-	    Description="Frequency in Hz of timebase clk input."/>
+   <Property Name="frequency" Type="float" Parameter="true" Default="1e6" 
+	    Description="Frequency in Hz of timebase clk input."/> <!-- Default="1e6" for xsim runs -->
+
   <Property Name="PPS_tolerance_PPM" Parameter="true" Default="1000"
 	    Description="Parts-per-million (PPM) value which rising edge of timebase PPS can deviate while still being considered valid."/>
   <Property Name="PPS_test" Type="bool" Parameter="true" Default="false"
@@ -59,7 +61,9 @@
 	    Description="PPS is being used from some PPS source."/>
   <Property Name="time_valid" Type="bool" Volatile="true"
 	    Description="Time from the time service is valid."/>
-         
+  <Property Name="pps_locked" Type="bool" Volatile="true"
+	    Description="Indicates when PPS alignment is stable."/>
+
   <Timebase/>
   <Timeservice Master="true"/>
 

@@ -2,8 +2,8 @@
   docs: &changes_docs
     paths:
       - ".gitlab-ci/yaml/docs.yml" # CI/CD doc jobs
-      - "doc/**" # Everything in the doc dir
-      - "tools/ocpidoc/**" # Everything in the ocpidoc tool
+      - "doc/**/*" # Everything in the doc dir
+      - "tools/ocpidoc/**/*" # Everything in the ocpidoc tool
       - "**/*.rst" # All .rst files
   packages: &changes_packages
     paths: # Paths related to installing packages
@@ -12,36 +12,36 @@
   framework: &changes_framework
     paths: # Paths considered framework code + .gitlab-ci
       - ".gitlab-ci.yml"
-      - ".gitlab-ci/**"
-      - bootstrap/**
-      - build/**
-      - os/**
-      - packaging/**
-      - platforms/**
-      - project-registry/**
-      - runtime/**
-      - scripts/**
-      - tests/**
-      - tools/**
-      - Framework.exports
-      - Makefile
+      - ".gitlab-ci/**/*"
+      - bootstrap/**/*
+      - build/**/*
+      - os/**/*
+      - packaging/**/*
+      - platforms/**/*
+      - project-registry/**/*
+      - runtime/**/*
+      - scripts/**/*
+      - tests/**/*
+      - tools/**/*
+      - "Framework.exports"
+      - "Makefile"
       
   platforms: &changes_platforms
     paths: # Framework code + projects + .gitlab-ci/scripts
       - ".gitlab-ci/scripts/**"
-      - bootstrap/**
-      - build/**
-      - os/**
-      - packaging/**
-      - platforms/**
-      - project-registry/**
-      - runtime/**
-      - scripts/**
-      - tests/**
-      - tools/**
-      - projects/**
-      - Framework.exports
-      - Makefile
+      - bootstrap/**/*
+      - build/**/*
+      - os/**/*
+      - packaging/**/*
+      - platforms/**/*
+      - project-registry/**/*
+      - runtime/**/*
+      - scripts/**/*
+      - tests/**/*
+      - tools/**/*
+      - projects/**/*
+      - "Framework.exports"
+      - "Makefile"
 
 .conditions:
   no_host: &condition_no_host
