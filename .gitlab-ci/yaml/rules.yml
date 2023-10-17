@@ -44,36 +44,51 @@
       - "Makefile"
 
 .conditions:
+  tag_or_develop: &condition_tag_or_develop
+    if: $CI_COMMIT_TAG || $CI_COMMIT_REF_SLUG == "develop"
   no_host: &condition_no_host
-    if: $CI_OCPI_HOST != null && $CI_OCPI_HOST == ''
+    if: $CI_OCPI_HOST == null || $CI_OCPI_HOST == ''
   projects: &condition_projects
     if: $CI_OCPI_PROJECTS != null && $CI_OCPI_PROJECTS != ''
+  # Platforms
   platforms: &condition_platforms_true
     if: $CI_OCPI_INSTALL_PLATFORMS == 'true' && $CI_OCPI_PLATFORMS != null && $CI_OCPI_PLATFORMS != ''
   platforms_changes: &condition_platforms_changes
     if: $CI_OCPI_INSTALL_PLATFORMS != 'false' && $CI_OCPI_PLATFORMS != null && $CI_OCPI_PLATFORMS != ''
     changes:
       <<: *changes_platforms
+  platforms_mr: &condition_platforms_true_mr
+    if: $CI_OCPI_INSTALL_PLATFORMS == 'true' && $CI_OCPI_PLATFORMS != null && $CI_OCPI_PLATFORMS != '' && $CI_PIPELINE_SOURCE == 'merge_request_event'
+  platforms_changes_mr: &condition_platforms_changes_mr
+    if: $CI_OCPI_INSTALL_PLATFORMS != 'false' && $CI_OCPI_PLATFORMS != null && $CI_OCPI_PLATFORMS != '' && $CI_PIPELINE_SOURCE == 'merge_request_event'
+    changes:
+      <<: *changes_platforms
+  # Packages
   packages_changes: &condition_packages_changes
-    if: "$CI_OCPI_INSTALL_PACKAGES != 'false'"
+    if: $CI_OCPI_INSTALL_PACKAGES != 'false'
     changes: 
       <<: *changes_packages
   packages_true: &condition_packages_true
     if: "$CI_OCPI_INSTALL_PACKAGES == 'true'"
+  packages_changes_mr: &condition_packages_changes_mr
+    if: $CI_OCPI_INSTALL_PACKAGES != 'false' && $CI_PIPELINE_SOURCE == 'merge_request_event'
+    changes: 
+      <<: *changes_packages
+  packages_true_mr: &condition_packages_true_mr
+    if: $CI_OCPI_INSTALL_PACKAGES == 'true' && $CI_PIPELINE_SOURCE == 'merge_request_event'
+  # Framework
   framework_changes: &condition_framework_changes
-    if: "$CI_OCPI_INSTALL_FRAMEWORK != 'false'"
+    if: $CI_OCPI_INSTALL_FRAMEWORK != 'false'
     changes:
       <<: *changes_framework
   framework_true: &condition_framework_true
     if: "$CI_OCPI_INSTALL_FRAMEWORK == 'true'"
-  framework_true_image_develop: &condition_framework_true_image_develop
-    if: "$CI_OCPI_INSTALL_FRAMEWORK == 'true' && $CI_OCPI_IMAGE_TAG == 'develop'"
-  framework_changes_image_develop: &condition_framework_changes_image_develop
-    if: "$CI_OCPI_INSTALL_FRAMEWORK != 'false' && $CI_OCPI_IMAGE_TAG == 'develop'"
+  framework_true_image_develop_mr: &condition_framework_true_image_develop_mr
+    if: $CI_OCPI_INSTALL_FRAMEWORK == 'true' && $CI_OCPI_IMAGE_TAG == 'develop' && $CI_PIPELINE_SOURCE == 'merge_request_event'
+  framework_changes_image_develop_mr: &condition_framework_changes_image_develop_mr
+    if: $CI_OCPI_INSTALL_FRAMEWORK != 'false' && $CI_OCPI_IMAGE_TAG == 'develop' && $CI_PIPELINE_SOURCE == 'merge_request_event'
     changes: 
       <<: *changes_framework
-  tag_or_develop: &condition_tag_or_develop
-    if: $CI_COMMIT_TAG || $CI_COMMIT_REF_SLUG == "develop"
 
 .rules:
   packages_success:
@@ -88,9 +103,9 @@
   # If package job should execute, only run job using this rule manually
     - <<: *condition_no_host
       when: never
-    - <<: *condition_packages_true
+    - <<: *condition_packages_true_mr
       when: manual
-    - <<: *condition_packages_changes
+    - <<: *condition_packages_changes_mr
       when: manual
   packages_never:
   # If package job should execute, never run job using this rule
@@ -120,9 +135,9 @@
   # If framework job should execute but packages shouldn't, run job using this rule manually
     - <<: *condition_no_host
       when: never
-    - <<: *condition_framework_true_image_develop
+    - <<: *condition_framework_true_image_develop_mr
       when: manual
-    - <<: *condition_framework_changes_image_develop
+    - <<: *condition_framework_changes_image_develop_mr
       when: manual
   platforms_always:
   # If platforms are to be built for, always run job using this rule
@@ -136,9 +151,9 @@
   # If platforms are to be built for, run job using this rule manually
     - <<: *condition_no_host
       when: never
-    - <<: *condition_platforms_true
+    - <<: *condition_platforms_true_mr
       when: manual
-    - <<: *condition_platforms_changes
+    - <<: *condition_platforms_changes_mr
       when: manual
   projects_always:
   # If projects are to be built for, always run job using this rule
