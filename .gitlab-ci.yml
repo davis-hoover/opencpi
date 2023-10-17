@@ -71,7 +71,8 @@ install-packages:
         docker push "${CI_OCPI_PRIVATE_IMAGE}:${CI_COMMIT_REF_SLUG}"
       fi
   rules:
-    - !reference [.rules, packages_manual] # Always run package installation job manually
+    - !reference [.rules, packages_manual] # run packages job manually if an MR
+    - !reference [.rules, packages_success] # run automatically if not an MR
     - when: never
   allow_failure: false
 
@@ -91,7 +92,8 @@ setup-opencpi:
   rules:
     - !reference [.rules, framework_never] # Never run if framework is to be installed
     - !reference [.rules, packages_success] # Run automatically if packages are to be installed
-    - !reference [.rules, platforms_manual] # Run manually if platforms are to be built
+    - !reference [.rules, platforms_manual] # Run manually if platforms are to be built and if an MR
+    - !reference [.rules, platforms_always] # Run automatically if platforms are to be built and if not an MR
     - when: never 
 
 install-prereqs:
@@ -105,8 +107,8 @@ install-prereqs:
   script:
     - scripts/install-prerequisites.sh
   rules:
-    - !reference [.rules, framework_manual] # Run manually if framework is to be installed but not packages
-    - !reference [.rules, framework_success] # Run automatically if framework and packages are to be installed
+    - !reference [.rules, framework_manual] # Run manually if an MR and framework is to be installed but not packages
+    - !reference [.rules, framework_success] # Run automatically if framework is to be installed
     - when: never # Don't run if framework is not to be installed
 
 build-opencpi:
