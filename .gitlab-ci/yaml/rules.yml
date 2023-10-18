@@ -9,6 +9,7 @@
     paths: # Paths related to installing packages
       - projects/core/rcc/platforms/${CI_OCPI_HOST}/${CI_OCPI_HOST}-packages.sh
       - build/install-packages.sh
+      - ".gitlab-ci/dockerfiles/*"
   framework: &changes_framework
     paths: # Paths considered framework code + .gitlab-ci
       - ".gitlab-ci.yml"
@@ -25,7 +26,6 @@
       - tools/**/*
       - "Framework.exports"
       - "Makefile"
-      
   platforms: &changes_platforms
     paths: # Framework code + projects + .gitlab-ci/scripts
       - ".gitlab-ci/scripts/**"
