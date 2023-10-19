@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV LANG="en_US.UTF-8"
@@ -9,8 +9,5 @@ COPY . /tmp/opencpi
 RUN cd /tmp/opencpi && \
     ./scripts/install-packages.sh && \
     cd / && \
-    rm -rf /tmp/opencpi && \
-    locale-gen en_US.UTF-8 && \ 
-    update-locale
-ENV LC_ALL="en_US.UTF-8"
+    rm -rf /tmp/opencpi
 USER user

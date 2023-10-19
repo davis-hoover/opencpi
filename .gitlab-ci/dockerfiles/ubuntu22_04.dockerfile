@@ -1,15 +1,13 @@
 FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
-ADD . /opencpi
-WORKDIR /opencpi
-ENTRYPOINT ["/bin/bash", "-cli"]
-RUN groupadd gitlab-runner -g 994
-RUN usermod -g gitlab-runner root
-RUN echo "umask 002" >> ~/.bashrc
-
-ARG SCRIPT
-RUN eval $SCRIPT
-RUN locale-gen en_US.UTF-8 && update-locale
 ENV LANG="en_US.UTF-8"
-ENV LC_ALL="en_US.UTF-8"
+RUN touch /.dockerenv && \
+    groupadd -g 1000 user && \
+    useradd -ms /bin/bash -u 1000 -g 1000 user
+COPY . /tmp/opencpi
+RUN cd /tmp/opencpi && \
+    ./scripts/install-packages.sh && \
+    cd / && \
+    rm -rf /tmp/opencpi
+USER user
