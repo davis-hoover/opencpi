@@ -1,6 +1,8 @@
 gitlab.io:
   stage: trigger-projects
-  trigger: $CI_PROJECT_NAMESPACE/opencpi.gitlab.io
+  trigger: 
+    project: $CI_PROJECT_NAMESPACE/opencpi.gitlab.io
+    strategy: depend
   rules:
     - !reference [.rules, docs_always]
     - when: never
