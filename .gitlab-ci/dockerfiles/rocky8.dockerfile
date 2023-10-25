@@ -1,12 +1,14 @@
 FROM rockylinux:8
 
-ADD . /opencpi
-WORKDIR /opencpi
-ENTRYPOINT ["/bin/bash", "-lc"]
-RUN groupadd gitlab-runner -g 994
-RUN usermod -g gitlab-runner root
-RUN echo "umask 002" >> ~/.bashrc
-
-ARG SCRIPT
-RUN eval $SCRIPT
 ENV LANG="en_US.UTF-8"
+RUN touch /.dockerenv && \
+    yum update -y && \
+    yum install -y git && \
+    groupadd -g 1000 user && \
+    useradd -ms /bin/bash -u 1000 -g 1000 user
+COPY . /tmp/opencpi
+RUN cd /tmp/opencpi && \
+    ./scripts/install-packages.sh && \
+    cd / && \
+    rm -rf /tmp/opencpi
+USER user
