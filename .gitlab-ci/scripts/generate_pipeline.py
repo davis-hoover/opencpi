@@ -742,6 +742,7 @@ def get_external_projects() -> List[ExternalProject]:
     url = f'"https://gitlab.com/{group}/{{}}/{{}}.git"'
     projects = []
     projects_directive = os.getenv('CI_OCPI_PROJECTS', '')
+    print(f'External Project Directive: {projects_directive}')
     osp_directive = re.findall(r'ocpi\.osp\.[^\s,]+', projects_directive)
     source_project = os.getenv('CI_OCPI_SOURCE_PROJECT_NAME', '')
     source_ref = os.getenv('CI_OCPI_SOURCE_REF_NAME')
@@ -752,6 +753,9 @@ def get_external_projects() -> List[ExternalProject]:
     for comp in comp_directive:
         branch = source_ref if comp == source_project else 'develop'
         projects += [ExternalProject(comp, url.format('comp', comp), branch)]
+    print(f'External Projects:')
+    for project in projects:
+        print(f'\t{project.name}\t{project.url}\t{project.branch}')
     return projects
 
 
@@ -855,6 +859,7 @@ def main(pipeline_type, **kwargs):
             PipelineBuilder.
     """
     ci_project_dir = os.environ.get('CI_PROJECT_DIR', '$CI_PROJECT_DIR')
+    print(f'CI_PROJECT_DIR: {ci_project_dir}')
     artifact_dir_path = Path(ci_project_dir).joinpath('.gitlab-ci', 'artifacts').resolve()
     job_builder = JobBuilder(artifact_dir_path=artifact_dir_path)
     pipeline_builder = PipelineBuilder(job_builder, **kwargs)
