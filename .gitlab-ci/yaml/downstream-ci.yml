@@ -6,12 +6,12 @@ trigger-opencpi:
   variables:
     CI_OCPI_SOURCE_REF_NAME: "$CI_COMMIT_REF_NAME"
     CI_OCPI_SOURCE_PROJECT_NAME: "$CI_PROJECT_NAME"
-  forward:
-    yaml_variables: true
-    pipeline_variables: true
   trigger:
     project: opencpi/opencpi
     branch: '$CI_OCPI_REF_NAME'
     strategy: depend
+    forward:
+      yaml_variables: true
+      pipeline_variables: true
   rules:
     - when: always

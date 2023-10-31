@@ -39,6 +39,8 @@ def get_failed_jobs(bridges: List[dict]) -> List[dict]:
     failed_jobs = defaultdict(list)
     for bridge in bridges:
         pipeline = bridge['downstream_pipeline']
+        if pipeline is None:
+            continue
         pipeline_id = pipeline['id']
         project_id = pipeline['project_id']
         web_url = Path(pipeline['web_url']).relative_to(
