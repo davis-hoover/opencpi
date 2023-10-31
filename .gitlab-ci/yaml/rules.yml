@@ -39,7 +39,7 @@
       - scripts/**/*
       - tests/**/*
       - tools/**/*
-      - projects/**/*
+      - projects/**/{*[^t],*[^s]t,*[^r]st,*[^.]rst,rst} # exclude ".rst" extension
       - "Framework.exports"
       - "Makefile"
 
