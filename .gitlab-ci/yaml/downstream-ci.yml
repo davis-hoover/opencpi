@@ -1,3 +1,10 @@
+workflow:
+  rules:
+    - if: ($CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_TAG == null && $CI_COMMIT_REF_NAME != "develop")
+    # Never run pipelines for pushes (except for develop and tags)
+      when: never
+    - when: always
+
 stages:
   - trigger-opencpi
 
@@ -6,6 +13,7 @@ trigger-opencpi:
   variables:
     CI_OCPI_SOURCE_REF_NAME: "$CI_COMMIT_REF_NAME"
     CI_OCPI_SOURCE_PROJECT_NAME: "$CI_PROJECT_NAME"
+    CI_OCPI_PROJECTS: "${CI_OCPI_PROJECTS}"
   trigger:
     project: opencpi/opencpi
     branch: '$CI_OCPI_REF_NAME'
@@ -14,4 +22,7 @@ trigger-opencpi:
       yaml_variables: true
       pipeline_variables: true
   rules:
+    - if: $CI_OCPI_PLATFORMS != null
+      variables:
+        CI_OCPI_PLATFORMS: "${CI_OCPI_PLATFORMS}"
     - when: always
