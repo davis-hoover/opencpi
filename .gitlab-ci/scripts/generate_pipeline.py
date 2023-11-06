@@ -465,7 +465,7 @@ class JobBuilder:
             A list of strings representing services.
         """
         if stage is Stages.deploy:
-            return ['docker:20.10.16-dind']
+            return ['docker:24.0.5-dind']
         return None
     
     def build_when(self, stage) -> Optional[str]:
