@@ -337,15 +337,16 @@ class JobBuilder:
             if external_project.name.startswith('ocpi.comp'):
                 script.append(f'ocpidev build project -d "{project_path}"')
         elif stage is Stages.deploy:
-            tag = os.getenv('CI_OCPI_IMAGE_TAG', '${CI_OCPI_IMAGE_TAG}')
+            from_tag = os.getenv('CI_OCPI_IMAGE_TAG', '${CI_OCPI_IMAGE_TAG}')
+            deploy_tag = os.getenv('CI_OCPI_ROOT_PIPELINE_ID', '${CI_OCPI_ROOT_PIPELINE_ID}')
             host = os.getenv('CI_OCPI_HOST', '${CI_OCPI_HOST}')
-            deploy_image = f'${{CI_OCPI_CONTAINER_REGISTRY}}/{host}:{tag}'
+            deploy_image = f'${{CI_OCPI_CONTAINER_REGISTRY}}/{host}:{deploy_tag}'
             from_image = f'${{CI_OCPI_CONTAINER_REGISTRY}}/{host}.packages'
             script = [
                 'docker build . -f .gitlab-ci/dockerfiles/deploy.dockerfile'
                     f' -t "{deploy_image}"'
                     f' --build-arg IMAGE="{from_image}"'
-                    f' --build-arg TAG="{tag}"',
+                    f' --build-arg TAG="{from_tag}"',
                 f'docker push "{deploy_image}"'
             ]
         else:
@@ -636,6 +637,7 @@ def get_args(pipeline_type) -> Dict[str, str]:
         'CI_OCPI_DEPLOYER_IMAGE',
         'registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest'
     )
+    image_tag = os.getenv('CI_OCPI_ROOT_PIPELINE_ID', '${CI_OCPI_ROOT_PIPELINE_ID}')
     args['deploy_image'] = f'{container_registry}/{host}:{image_tag}'
     args['do_hwil'] = os.getenv('CI_OCPI_HWIL', False)
     if pipeline_type == 'projects':
