@@ -23,7 +23,7 @@ if [ ! -z "${IP}" ]; then
   echo "All files should be zero"
   md5sum -c golden_remote.md5
   echo "Checking for connections"
-  egrep -L "connected" listeners.log | grep listeners
+  grep -E -L "connected" listeners.log | grep listeners
 else
   md5sum -c golden.md5
 fi

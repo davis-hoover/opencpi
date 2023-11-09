@@ -48,7 +48,7 @@ Tone13 = 13
 Tone27 = 27
 Fs = 100
 Ts = 1.0/float(Fs)
-t = np.arange(0,NUM_SAMPLES*Ts,Ts,dtype=np.float)
+t = np.arange(0,NUM_SAMPLES*Ts,Ts,dtype=np.float64)
 #Define a phase offset of 10 degrees and apply to the Q rail
 phase_offset = 10*np.pi/180
 real = np.cos(Tone05*2*np.pi*t) + np.cos(Tone13*2*np.pi*t) + np.cos(Tone27*2*np.pi*t)

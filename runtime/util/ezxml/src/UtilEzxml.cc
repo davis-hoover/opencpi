@@ -748,7 +748,6 @@ namespace OCPI {
   		for (char **a = xml->attr; *a; a += 2){ 
     		if (new_set.insert(*a).second == false)
       			return OU::esprintf("Duplicate attributes are not allowed");
-    		new_set.insert(ezxml_attr(xml, *a));
   		}
 		return NULL;
     }
@@ -770,7 +769,6 @@ namespace OCPI {
   		for (char **a = xml->attr; *a; a += 2){ 
     		if (new_set.insert(*a).second == false)
       			return OU::esprintf("Duplicate attributes are not allowed");
-    		new_set.insert(ezxml_attr(xml, *a));
   		}
 		return NULL;
     }
@@ -788,7 +786,6 @@ namespace OCPI {
   		for (char **a = xml->attr; *a; a += 2){ 
     		if (new_set.insert(*a).second == false)
       			return OU::esprintf("Duplicate attributes are not allowed");
-    		new_set.insert(ezxml_attr(xml, *a));
   		}
 		return NULL;
 	}

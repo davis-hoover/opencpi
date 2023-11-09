@@ -18,6 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cstdint>
 #include <ostream>               // std::ostream
 #include <sstream>               // std::ostringstream
 #include <string>                // std::string

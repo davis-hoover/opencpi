@@ -65,3 +65,12 @@
    mmcme3_adv_inst
      // Output clocks
     (
+@@ -153,7 +153,7 @@
+     .CLKOUT6             (clkout6_unused),
+      // Input clock control
+     .CLKFBIN             (clkfbout_mmcme4),
+-    .CLKIN1              (clk_in1_mmcme4),
++    .CLKIN1              (clk_in1),
+     .CLKIN2              (1'b0),
+      // Tied to always select the primary input clock
+     .CLKINSEL            (1'b1),

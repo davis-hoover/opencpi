@@ -74,7 +74,7 @@ ocpi_name=opencpi-setup.sh
 ocpi_me=$BASH_SOURCE
 ocpi_cdk_dir=cdk
 ocpi_root_dir=root
-# The egrep of the beginning of variables to clean out, e.g. derived rather than user specified
+# The `grep -E` of the beginning of variables to clean out, e.g. derived rather than user specified
 ocpi_cleaned_vars="OCPI_(PREREQUISITES_DIR|TARGET_|TOOL_|CDK_|ROOT_)"
 ocpi_icleaned_vars="OCPI_(LIBRARY_)"
 [ -z "$BASH_VERSION" -o -z "$ocpi_me" ] && {
@@ -194,7 +194,7 @@ unset ocpi_bootstrap
     }
   }
   [ -n "$ocpi_verbose" ] && echo Unsetting OpenCPI environment variables.
-  for ocpi_v in $(env | egrep "^$ocpi_cleaned_vars" | sort | cut -f1 -d=)
+  for ocpi_v in $(env | grep -E "^$ocpi_cleaned_vars" | sort | cut -f1 -d=)
   do
     unset $ocpi_v
   done
@@ -205,7 +205,7 @@ unset ocpi_bootstrap
     # of standalone/offline installation.
     [ -n "$ocpi_verbose" ] && \
       echo Unsetting additional OpenCPI environment variables prior to installation.
-    for ocpi_v in $(env | egrep "^$ocpi_icleaned_vars" | sort | cut -f1 -d=)
+    for ocpi_v in $(env | grep -E "^$ocpi_icleaned_vars" | sort | cut -f1 -d=)
     do
       unset $ocpi_v
     done
@@ -251,7 +251,7 @@ unset ocpi_bootstrap
   }
   [ -n "$ocpi_verbose" ] &&
       echo Clearing all OpenCPI environment variables before setting anything >&2
-  for ocpi_v in $(env | egrep "^$ocpi_cleaned_vars" | sort | cut -f1 -d=)
+  for ocpi_v in $(env | grep -E "^$ocpi_cleaned_vars" | sort | cut -f1 -d=)
   do
     unset $ocpi_v
   done

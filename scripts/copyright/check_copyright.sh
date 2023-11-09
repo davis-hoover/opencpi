@@ -56,17 +56,17 @@ diff -u <( sed -e 's/^/ /' scripts/copyright/whitelist) missing.log > missing_di
 RET=$?
 
 if [ "${RET}" == "1" ]; then
-  if egrep -q '^\+ ' missing_diff.log; then
+  if grep -E -q '^\+ ' missing_diff.log; then
     echo ""
     echo "The following file(s) need to have their copyright clause added"
     echo "or put into the whitelist. Run scripts/copyright/copyright.py"
     echo "on each to add copyright blurb:"
-    egrep '^\+ ' missing_diff.log | cut -c3-
+    grep -E '^\+ ' missing_diff.log | cut -c3-
   fi
-  if egrep -q '^\- ' missing_diff.log; then
+  if grep -E -q '^\- ' missing_diff.log; then
     echo ""
     echo "The following file(s) were listed as exemptions but no longer exist:"
-    egrep '^\- ' missing_diff.log | cut -c3-
+    grep -E '^\- ' missing_diff.log | cut -c3-
   fi
   exit 10 # Arbitrary non-0/1 value for Jenkins to decide we are unstable
 fi

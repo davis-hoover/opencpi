@@ -114,11 +114,13 @@ Worker::
 {
   // FIXME - this sort of thing should be generic and be reused in portError
   try {
-    if (enabled) {
-      enabled = false;
-      controlOp(OM::Worker::OpStop); // call base class that filters the op
+    if (this->getState() != OM::Worker::UNUSABLE) {
+      if (enabled) {
+        enabled = false;
+        controlOp(OM::Worker::OpStop); // call base class that filters the op
+      }
+      controlOp(OM::Worker::OpRelease); // call base class that filters the op
     }
-    controlOp(OM::Worker::OpRelease); // call base class that filters the op
   } catch(...) {
   }
 #ifdef EM_PORT_COMPLETE

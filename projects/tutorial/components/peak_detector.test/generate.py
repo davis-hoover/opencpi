@@ -53,7 +53,7 @@ def generate(argv):
     Tone13 = 13
     Fs = 100
     Ts = 1.0/float(Fs)
-    t = np.arange(0,num_samples*Ts,Ts,dtype=np.float)
+    t = np.arange(0,num_samples*Ts,Ts,dtype=np.float64)
     real = np.cos(Tone13*2*np.pi*t)
     imag = np.sin(Tone13*2*np.pi*t)
     out_data = np.array(np.zeros(num_samples), dtype=np.dtype((np.uint32, {'real_idx':(np.int16,0), 'imag_idx':(np.int16,2)})))
