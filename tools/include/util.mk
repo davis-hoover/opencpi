@@ -1655,7 +1655,7 @@ OcpiGKDCentos=$(infox OGKDC:)$(strip\
 OcpiGKDUbuntu=$(infox OGKDU:)$(strip\
   $(foreach krel,$(shell uname -r),\
     $(foreach ktype,$(shell echo $(krel) | cut -f3 -d'-'),\
-      $(foreach hver,$(or $(shell dpkg-query -W | grep 'linux-headers' | cut -f1 | sort -t'-' --version-sort -k 3,4 -k 4,5 | egrep '$(ktype)$$' | egrep '.*[0-9]+' | tail -1),NOPE),\
+      $(foreach hver,$(or $(shell dpkg-query -W | grep 'linux-headers' | cut -f1 | sort -t'-' --version-sort -k 3,4 -k 4,5 | grep -E '$(ktype)$$' | grep -E '.*[0-9]+' | tail -1),NOPE),\
         $(if $(filter NOPE,$(hver)),\
           $(call OcpiWarn,no kernel headers for "$(ktype)" kernel installed),\
           $(if $(filter linux-headers-$(krel),$(hver)),,$(call OcpiKernVerWarn,$(subst linux-headers-,,$(hver))))\

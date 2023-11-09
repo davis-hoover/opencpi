@@ -1118,9 +1118,17 @@ opencpi_io_mmap(struct file * file, struct vm_area_struct * vma) {
     if (file->f_flags & (O_SYNC|O_DSYNC))
       vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
 #endif
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 3, 0)
     vma->vm_flags |= VM_RESERVED;
+#else
+    vm_flags_set(vma, VM_RESERVED);
+#endif
     if (block->type == ocpi_mmio) {
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 3, 0)
       vma->vm_flags |= VM_IO;
+#else
+    vm_flags_set(vma, VM_IO);
+#endif
       err = io_remap_pfn_range(vma, vma->vm_start, pfn, size, vma->vm_page_prot);
     } else
       err = remap_pfn_range(vma, vma->vm_start, pfn, size, vma->vm_page_prot);
@@ -1807,7 +1815,9 @@ static const struct proto_ops opencpi_socket = {
   .sendmsg =	net_sendmsg,
   .recvmsg =	net_recvmsg,
   .mmap =       sock_no_mmap,
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 5, 0)
   .sendpage =	sock_no_sendpage,
+#endif
 };
 static struct proto opencpi_proto = {
   .name	  = "OCPI_ETHER",
@@ -1933,7 +1943,11 @@ opencpi_init(void) {
 
   do {
     // Create a driver class for this module: sets opencpi_class
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 4, 0)
     opencpi_class = class_create(THIS_MODULE, DRIVER_NAME);
+#else
+    opencpi_class = class_create(DRIVER_NAME);
+#endif
     if (IS_ERR(opencpi_class)) {
       log_err_code(PTR_ERR(opencpi_class), "Error creating class");
       opencpi_class = NULL;

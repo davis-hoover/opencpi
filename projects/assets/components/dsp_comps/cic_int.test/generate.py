@@ -57,7 +57,7 @@ print('    UUT:(N=%d, M=%d, R=%d) Test Data:(%d)' % (N,M,R,Ft))
 if (Ft == 0): # Generate DC data
     Fs = float(256)            # sample frequency
     Ts = 1.0 / Fs             # sampling interval
-    t = np.arange(0,1,Ts,dtype=np.float)
+    t = np.arange(0,1,Ts,dtype=np.float64)
     T1 = 0.0
     print("      Test data: DC with Amplitude=%d" % AMPLITUDE)
     real = np.ones((int(Fs),), dtype=np.int16)
@@ -67,7 +67,7 @@ if (Ft == 0): # Generate DC data
 else: # Generate a complex waveform with a tone
     Fs = float(1024000 / R)    # sample frequency
     Ts = 1.0 / Fs             # sampling interval
-    t = np.arange(0,1,Ts,dtype=np.float)
+    t = np.arange(0,1,Ts,dtype=np.float64)
     T1 = 50.0                  # frequency of target signal
     print("      Test data: Tone=%.1f Hz" % T1)
     real = np.cos(2*np.pi*T1*t)

@@ -75,7 +75,7 @@ Fs = float(int(sys.argv[2]))          # sample frequency
 R = int(sys.argv[3])
 Ftune = int(sys.argv[4])
 Ts = 1.0 / Fs;                        # sampling interval
-t = np.arange(0,1,Ts,dtype=np.float)
+t = np.arange(0,1,Ts,dtype=np.float64)
 T1 = 50.0 + Ftune    # Within the filter bandwidth
 T2 = 100.0 + Ftune   # Within the filter bandwidth
 T3 = Fs / R + Ftune  # In the first null of the CIC filter

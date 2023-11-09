@@ -58,3 +58,12 @@
    plle3_adv_inst
      // Output clocks
     (
+@@ -134,7 +134,7 @@
+     .CLKOUT1B            (clkout1b_unused),
+      // Input clock control
+     .CLKFBIN             (clkfbout_plle4),
+-    .CLKIN               (clk_in1_plle4),
++    .CLKIN               (clk_in1),
+     // Ports for dynamic reconfiguration
+     .DADDR               (7'h0),
+     .DCLK                (1'b0),

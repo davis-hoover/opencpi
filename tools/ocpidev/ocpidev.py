@@ -32,7 +32,10 @@ import _opencpi.util as ocpiutil
 import ocpiargparse
 from ocpidev_args import args_dict
 # FIXME:  nuke these 2 lines when we confirm no real usage of getProjMetaData
-sys.path.append(os.getenv('OCPI_CDK_DIR') + '/scripts/')
+OCPI_CDK_DIR = os.getenv('OCPI_CDK_DIR')
+if OCPI_CDK_DIR is None:
+    raise EnvironmentError("`OCPI_CDK_DIR` is not defined")
+sys.path.append(OCPI_CDK_DIR + '/scripts/')
 import genProjMetaData
 
 def main():

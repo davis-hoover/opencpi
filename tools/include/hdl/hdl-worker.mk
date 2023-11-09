@@ -58,7 +58,7 @@ HdlOtherImplSuffix=-impl$(HdlOtherIncSuffix)
 HdlIsDevice:=
 HdlUsesRv:=
 ifeq ($(HdlMode),worker)
-  ifneq ($(shell egrep -i '<hdldevice' $(Worker_$(Worker)_xml)),)
+  ifneq ($(shell grep -E -i '<hdldevice' $(Worker_$(Worker)_xml)),)
     HdlIsDevice:=1
   endif
 else ifneq ($(filter platform config container,$(HdlMode)),)
@@ -77,7 +77,7 @@ ifndef Tops
       Tops:=$(Worker)_rv
       HdlUsesRv:=1
     else
-      ifneq ($(shell egrep -i '<hdlworker' $(Worker_$(Worker)_xml)),)
+      ifneq ($(shell grep -E -i '<hdlworker' $(Worker_$(Worker)_xml)),)
         Tops:=$(Worker)
       else # usually HdlImplementation - legacy
         # non-rv should come last so the .cores file matches non-rv for app workers

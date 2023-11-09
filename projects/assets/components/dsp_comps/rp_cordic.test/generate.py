@@ -51,7 +51,7 @@ num_samples = (int(os.environ.get("OCPI_TEST_NUM_SAMPLES")))
 Tone27 = 27
 Fs = 10000
 Ts = 1.0/float(Fs)
-t = np.arange(0,num_samples*Ts,Ts,dtype=np.float)
+t = np.arange(0,num_samples*Ts,Ts,dtype=np.float64)
 real = np.cos(Tone27*2*np.pi*t)
 imag = np.sin(Tone27*2*np.pi*t)
 dt_iq_pair = np.dtype((np.uint32, {'real_idx':(np.int16,0), 'imag_idx':(np.int16,2)}))

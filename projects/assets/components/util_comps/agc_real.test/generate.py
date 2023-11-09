@@ -57,7 +57,7 @@ filename = sys.argv[2]
 #Create an input file with a single tone at Fs/16
 Fs = 16
 Ts = 1.0/float(Fs)
-t = np.arange(0,num_samples*Ts,Ts,dtype=np.float)
+t = np.arange(0,num_samples*Ts,Ts,dtype=np.float64)
 real = np.cos(2*np.pi*t)
 out_data = np.array(np.zeros(num_samples), dtype=np.int16)
 gain_pt_2 = 32767*0.2 / max(abs(real))
