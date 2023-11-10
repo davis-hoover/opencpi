@@ -28,9 +28,11 @@ from .boolean_generator import BooleanGenerator
 from .character_generator import CharacterGenerator
 from .short_generator import ShortGenerator
 from .long_generator import LongGenerator
+from .long_long_generator import LongLongGenerator
 from .unsigned_character_generator import UnsignedCharacterGenerator
 from .unsigned_short_generator import UnsignedShortGenerator
 from .unsigned_long_generator import UnsignedLongGenerator
+from .unsigned_long_long_generator import UnsignedLongLongGenerator
 from .float_generator import FloatGenerator
 from .double_generator import DoubleGenerator
 from .complex_character_generator import ComplexCharacterGenerator
