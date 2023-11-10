@@ -91,7 +91,7 @@ Once installed the linter can be run using the command:
 
 ``PATH`` can be a file, directory or glob pattern.
 
-.. LINT EXCEPTION: any_001: 12: This is the option, not a default comment.
+.. LINT EXCEPTION: any_001: 16: This is the option, not a default comment.
 
 Options available are:
 

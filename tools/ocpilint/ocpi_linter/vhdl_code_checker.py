@@ -24,6 +24,7 @@
 
 import pathlib
 import subprocess
+import re
 
 from . import base_code_checker
 from . import utilities
@@ -59,6 +60,35 @@ class VhdlCodeChecker(base_code_checker.BaseCodeChecker):
             identified test issues.
         """
         test_name = "Emacs formatting"
+
+        # Pre-process before emacs to ensure "library" and "use" vhdl
+        # keywords do not occur on a single line multiple times otherwise
+        # emacs will excessively indent everything
+        reformat = []
+        for line_text in self._code:
+            end_pos = line_text.find("--")
+            if end_pos == -1:
+                end_pos = len(line_text) + 1
+            semicolon_pos = (
+                [match.start(0) for match in re.finditer(r";", line_text)])
+            semicolon_pos = (
+                [value for value in semicolon_pos if value < end_pos])
+            keyword_count = line_text.lower().count("library", 0, end_pos)
+            keyword_count += line_text.lower().count("use", 0, end_pos)
+            if len(semicolon_pos) > 1 and keyword_count > 1:
+                line_text = re.sub(
+                    r";\s*", ";\n", line_text, len(semicolon_pos) - 1)
+            reformat.append(line_text + "\n")
+
+        # Ensure "\n" exists at the end to prevent emacs from hanging
+        while reformat[-1] is "\n":
+            reformat = reformat[:-1]
+        if not reformat[-1].endswith("\n"):
+            reformat[-1] += "\n"
+
+        # Re-write file with changes
+        with open(self.path, "w") as linted_file:
+            linted_file.writelines(reformat)
 
         if self._check_installed("emacs"):
             before_code = list(self._code)

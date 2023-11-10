@@ -103,7 +103,7 @@ PKGS_D+=(expect)
 #    for kernel module tests (runtime libs already present)
 PKGS_D+=(zlib1g-dev)
 #    for ocpilint
-PKGS_D+=(emacs cppcheck clang)
+PKGS_D+=(emacs cppcheck clang clang-format)
 
 
 ##########################################################################################

@@ -24,11 +24,10 @@
 
 from datetime import datetime, timedelta
 from fnmatch import fnmatch
-import json
 import logging
 import pathlib
-import subprocess
 import xml.etree.ElementTree as ElementTree
+import xml.dom.minidom as minidom
 
 from . import utilities
 from .linter_settings import LinterSettings
@@ -40,7 +39,7 @@ class OcpiLinter:
 
     def __init__(self, paths, recursive=False,
                  ignore_unrecognised=False, no_ignore=False,
-                 settings_file=None, junit_filename=None):
+                 settings_file=None, junit_filename=None, to_console=False):
         """Initialise a OcpiLinter instance.
 
         Determines the files to be checked during initialisation of class.
@@ -58,26 +57,25 @@ class OcpiLinter:
                 customise the ruleset used by the linter.
             junit_filename (str, optional): Specifies the JUnit XML output file
                 if desired, set to None to not produce the report.
+            to_console (bool, optional): Should log messages be output to the console?
 
         Returns:
             Initialised OcpiLinter instance.
         """
         self._ignore_unrecognised = ignore_unrecognised
         self._no_ignore = no_ignore
-        self._project_details = None
         self._errors = set([])
 
         # Dictionary of settings used across the found files
         self._settings = {
             "default": LinterSettings.from_yaml_file(
                 pathlib.Path(__file__).parent.joinpath(
-                    "ocpilint-cfg.yml").resolve())
+                    "ocpilint-cfg.default.yml").resolve())
         }
         self.number_files_to_check = 0
         self.number_files_ignored = 0
         for path in paths:
-            project_root = self._find_project_root(path)
-            self._parse_tree(path, recursive, project_root, settings_file)
+            self._parse_tree(path, recursive, settings_file)
 
         self._junit_filename = junit_filename
         self._junit_report = ElementTree.Element(
@@ -85,6 +83,7 @@ class OcpiLinter:
             attrib={"timestamp": str(datetime.now().strftime("%Y-%m-%dT%H:%M:%S")),
                     "name": "AllTests",
                     "tests": "0", "failures": "0", "time": "0"})
+        self.to_console = to_console
 
     def lint(self):
         """Run formatters and code checkers.
@@ -99,21 +98,46 @@ class OcpiLinter:
             start = datetime.now()
             for file in cfg.lint_files:
                 print(utilities.PrintStyle.BOLD
-                      + f"Checking file: {file}"
+                      + f"Checking file: {file} ..."
                       + utilities.PrintStyle.NORMAL)
 
                 linting_result = self._lint_file(file, cfg)
                 # Always update the files linting log, if it has one.
-                log = utilities.LintLogHandler(file)
+                file_issue_count = 0
                 for test_number, test in linting_result.items():
-                    log.record(test_number, test.name, test.issue_count)
-                    total_issue_count = total_issue_count + test.issue_count
-
+                    file_issue_count = file_issue_count + test.issue_count
                 lint_results[file] = linting_result
                 logging.debug(f"file {file} : {linting_result}")
+                if file_issue_count > 0:
+                    print(utilities.PrintStyle.BOLD
+                          + utilities.PrintStyle.RED
+                          + f"FAILED ({file_issue_count} issues in file)"
+                          + utilities.PrintStyle.NORMAL)
+                else:
+                    print(utilities.PrintStyle.BOLD
+                          + utilities.PrintStyle.GREEN
+                          + "Passed"
+                          + utilities.PrintStyle.NORMAL)
+                total_issue_count = total_issue_count + file_issue_count
+
             stop = datetime.now()
             if self._junit_filename is not None:
                 self._save_junit_report(cfg, lint_results, stop-start)
+
+        print(utilities.PrintStyle.BOLD
+              + utilities.PrintStyle.UNDERLINE
+              + f"OpenCPI Lint Result:"
+              + utilities.PrintStyle.NORMAL)
+        if total_issue_count > 0:
+            print(utilities.PrintStyle.BOLD
+                  + utilities.PrintStyle.RED
+                  + f"FAILED ({total_issue_count} issues)"
+                  + utilities.PrintStyle.NORMAL)
+        else:
+            print(utilities.PrintStyle.BOLD
+                  + utilities.PrintStyle.GREEN
+                  + "Passed"
+                  + utilities.PrintStyle.NORMAL)
 
         return total_issue_count
 
@@ -131,18 +155,24 @@ class OcpiLinter:
 
         rule_found = False
         issues = {}
-        for linter in settings.lint_classes.values():
-            if (file_extension in linter.get_supported_file_extensions() and
-                    file_extension not in linter.get_ignored_file_extensions()):
-                issues.update(linter(path, settings).lint())
-                rule_found = True
+        if pathlib.Path(path).is_symlink():
+            logging.debug(f"Skipping symlink {path}")
+            rule_found = True
+        else:
+            for linter in settings.lint_classes.values():
+                if (file_extension in linter.get_supported_file_extensions() and
+                        file_extension not in linter.get_ignored_file_extensions()):
+                    issues.update(linter(path, settings,
+                                         self.to_console).lint())
+                    rule_found = True
 
         if not rule_found:
             if self._ignore_unrecognised:
                 print(f"Ignoring unrecognised file: {pathlib.Path(path).name}")
                 return {}
             else:
-                issues.update(UnknownCodeChecker(path, settings).lint())
+                issues.update(UnknownCodeChecker(path, settings,
+                                                 self.to_console).lint())
 
         # Run language agnostic checks, run these after language specific
         # checks since the language formatters will do things such as remove
@@ -151,7 +181,7 @@ class OcpiLinter:
         if "all" in settings.lint_classes:
             linter = settings.lint_classes["all"]
             if file_extension not in linter.get_ignored_file_extensions():
-                issues.update(linter(path, settings).lint())
+                issues.update(linter(path, settings, self.to_console).lint())
 
         return issues
 
@@ -193,24 +223,16 @@ class OcpiLinter:
             return True
         return False
 
-    def _parse_tree(self, path, recursive=False, project_root="/", settings_file=None):
+    def _parse_tree(self, path, recursive=False, settings_file=None):
         """Parse file tree, looking for lint configuration while recursing.
 
         Args:
             path (str or Path): Root of path to parse files in
             recursive (bool, optional): Run only for current directory, or recurse into subdirectories. Defaults to False.
-            project_root (str or Path): Root of the whole project, defaults to system-root.
             settings_file (LinterSettings, optional): Settings object to use. Searches for local configuration if None.
         """
-        path = pathlib.Path(path)
-
-        if not path.exists():
-            print(f"{path} does not exist, will not be checked / formatted.")
-            logging.warning(f"Skipping not-existant {path}")
-            return
-
         # If the settings file is defined, then only load it once
-        settings = self.load_settings_file(path, project_root, settings_file)
+        settings = self.load_settings_file(path, settings_file)
 
         if path.is_symlink():
             logging.debug(f"Skipping symlink {path}")
@@ -230,10 +252,6 @@ class OcpiLinter:
             # rules.
             dir_contents = list(path.iterdir())
 
-            # Test for settings file (this call shall recurse up if not found)
-            if not settings_file:
-                settings = self.load_settings_file(path, project_root)
-
             for file_item in dir_contents:
                 if recursive and file_item.is_dir():
                     if any([fnmatch(file_item, f"**/{i}") or fnmatch(file_item, i) for i in settings.ignore_dir]):
@@ -249,8 +267,9 @@ class OcpiLinter:
                             f"dir ignored, through full pathname match: {file_item} [{settings.settings_file}]")
                         continue
                     # Recurse into this directory
-                    self._parse_tree(file_item, recursive,
-                                     project_root, settings_file)
+                    self._parse_tree(file_item, recursive, settings_file)
+                    # Reload settings after potentially adding sub-directory
+                    settings = self.load_settings_file(path, settings_file)
 
                 elif file_item.is_file():
                     if not self._check_file_ignore(file_item, settings):
@@ -320,140 +339,99 @@ class OcpiLinter:
             int(self._junit_report.attrib["failures"]) + int(suite.attrib["failures"]))
         self._junit_report.attrib["time"] = str(
             float(self._junit_report.attrib["time"]) + float(suite.attrib["time"]))
-        # Overwrite if file already existed
-        ElementTree.ElementTree(element=self._junit_report).write(
-            str(self._junit_filename))
+
+        # Pretty print/indent to file, overwriting if already exists
+        xml_str = ElementTree.tostring(self._junit_report)
+        xml_str = minidom.parseString(xml_str).toprettyxml(indent="  ")
+        with open(self._junit_filename, "wt") as f:
+            f.write(xml_str)
         print(f"JUnit report written to: {self._junit_filename}")
 
-    def load_settings_file(self, path, project_root, settings_file=None):
+    def load_settings_file(self, path, settings_file=None):
         """Load and parse LinterSettings file.
 
         Args:
-            path (str or Path): Path to start search (backwards) for settings file
-            project_root (str or Path): Root of the whole project, defaults to system-root.
+            path (str or Path): Path to start search (backwards) for settings file.
             settings_file (LinterSettings, optional): Force configuration file to use. Defaults to None.
 
         Returns:
             LinterSettings: Configuration to use (either found, or forced)
         """
-        if project_root is None:
-            raise TypeError("project_root cannot be None")
-
-        if not settings_file:
-            stem = pathlib.Path(path).resolve()
-            if stem.is_file():
-                stem = stem.parent
-            leaf = pathlib.Path("ocpilint-cfg.yml")
-
-            longest_path = ""
-            # Walk backwards up the path till / or .
-            logging.debug(stem)
-            logging.debug(project_root)
-            while (stem.parent != stem and stem != pathlib.Path(project_root).parent):
-                if (stem/leaf).exists():
-                    if not longest_path:
-                        longest_path = str(stem/leaf)
-                        if str(stem/leaf) not in self._settings:
-                            print(utilities.PrintStyle.BOLD
-                                  + f"Loading configuration file: {longest_path}"
-                                  + utilities.PrintStyle.NORMAL)
-                            logging.info(
-                                f"Loading configuration file: {longest_path}")
-                            self._settings[longest_path] = LinterSettings.from_yaml_file(
-                                longest_path)
-                        else:
-                            self._settings[longest_path] = LinterSettings.combine(
-                                self._settings["default"],
-                                self._settings[longest_path])
-                            return self._settings[longest_path]
-                    else:
-                        logging.debug(
-                            f"Combining {str(stem/leaf)} under {longest_path}")
-                        self._settings[longest_path] = LinterSettings.combine(
-                            LinterSettings.from_yaml_file(str(stem/leaf)),
-                            self._settings[longest_path])
-                stem = stem.parent
-            if longest_path:
-                logging.debug(f"Using settings from: {longest_path}")
-                self._settings[longest_path] = LinterSettings.combine(
-                    self._settings["default"],
-                    self._settings[longest_path])
-                return self._settings[longest_path]
-            elif leaf.exists():
-                if str(leaf) not in self._settings:
-                    print(utilities.PrintStyle.BOLD
-                          + f"Loading configuration file: {str(leaf)}"
-                          + utilities.PrintStyle.NORMAL)
-                    logging.info(f"Loading configuration file: {str(leaf)}")
-                    self._settings[str(leaf)] = LinterSettings.from_yaml_file(
-                        str(leaf))
-                logging.debug(f"Using settings from {str(leaf)}")
-                self._settings[str(leaf)] = LinterSettings.combine(
-                    self._settings["default"],
-                    self._settings[str(leaf)])
-                return self._settings[str(leaf)]
-            else:
-                logging.debug("Using default ruleset")
-                return self._settings["default"]
-        else:
+        if settings_file:
+            # Been given an explicit file
             if settings_file not in self._settings:
                 print(utilities.PrintStyle.BOLD
                       + f"Loading configuration file: {settings_file}"
                       + utilities.PrintStyle.NORMAL)
                 self._settings[settings_file] = LinterSettings.combine(
                     self._settings["default"],
-                    LinterSettings.from_yaml_file(settings_file))
+                    LinterSettings.from_yaml_file(settings_file),
+                    parent_is_defaults=True)
             return self._settings[settings_file]
 
-    def _find_project_root(self, path):
-        """Finds the root directory for the ocpi project this path belongs to.
+        stem = pathlib.Path(path).resolve()
+        if stem.is_file():
+            stem = stem.parent
+        leaf = pathlib.Path("ocpilint-cfg.yml")
 
-        Args:
-            path (str or Path): Path to request project information for.
-
-        Returns:
-            str: Ocpi project root directory path, or current dir if not found.
-        """
-        fullpath = pathlib.Path(path).resolve()
-        if fullpath.is_file():
-            fullpath = fullpath.parent
-
-        if self._project_details is None:
-            process = subprocess.Popen(["ocpidev", "show", "projects",
-                                        "--json",
-                                        "-d", f"{fullpath}"],
-                                       stdout=subprocess.PIPE,
-                                       stderr=subprocess.PIPE)
-            process.wait()
-            project_info = process.communicate()
-            project_info_out = project_info[0].decode("utf-8")
-            project_error = project_info[1].decode("utf-8").split("\n")[:-1]
-
-            logging.debug(f"ocpidev reported the project details for "
-                          f"\"{fullpath}\" as:\n"
-                          f"OUTPUT: {project_info_out}ERROR: {project_error}")
-
-            if len(project_info_out) == 0 or len(project_error) > 0:
-                raise RuntimeError(
-                    "ERROR: ocpidev failed to return a json string.")
-            self._project_details = json.loads(project_info_out)
-        if "projects" in self._project_details:
-            for name, details in self._project_details["projects"].items():
-                proj_path = pathlib.Path(details["real_path"]).resolve()
-                if len(proj_path.parts) > len(fullpath.parts):
+        longest_path = ""
+        inherit = True
+        # Walk backwards up the path till / or settings set to not inherit
+        logging.debug(stem)
+        while (stem.parent != stem and inherit):
+            if (stem/leaf).exists():
+                if not longest_path:
+                    longest_path = str(stem/leaf)
+                    if str(stem/leaf) not in self._settings:
+                        print(utilities.PrintStyle.BOLD
+                              + f"Loading configuration file:  {longest_path}"
+                              + utilities.PrintStyle.NORMAL)
+                        logging.info(
+                            f"Loading configuration file: {longest_path}")
+                        self._settings[longest_path] = LinterSettings.from_yaml_file(
+                            longest_path)
+                    else:
+                        self._settings[longest_path] = LinterSettings.combine(
+                            self._settings["default"],
+                            self._settings[longest_path],
+                            parent_is_defaults=True)
+                        return self._settings[longest_path]
+                else:
+                    print(utilities.PrintStyle.BOLD +
+                          f"Updating configuration from: {longest_path} inheriting: {str(stem/leaf)}"
+                          + utilities.PrintStyle.NORMAL)
                     logging.debug(
-                        f"Requested path \"{fullpath}\" is shorter than the project path \"{proj_path}\" ")
-                    continue
-                if utilities.paths_are_relative(proj_path, fullpath):
-                    logging.debug("Using project \"{}\", located at: {}".format(
-                        name, details["real_path"]))
-                    return proj_path
-        # Failed to find registered project, assume current directory
-        proj_path = pathlib.Path(".").resolve()
-        msg = ("Failed to find any projects registered for path: \"{}\""
-               ", assuming \"{}\" is project root").format(fullpath, proj_path)
-        # Log error, but avoid logging duplicate errors
-        if not msg in self._errors:
-            logging.error(msg)
-            self._errors.add(msg)
-        return proj_path
+                        f"Combining {str(stem/leaf)} under {longest_path}")
+                    self._settings[longest_path] = LinterSettings.combine(
+                        LinterSettings.from_yaml_file(str(stem/leaf)),
+                        self._settings[longest_path])
+                # Check inherit value to see if we should check parent folders
+                inherit = self._settings[longest_path]._inherit_parent
+
+            stem = stem.parent
+
+        # Setting now loaded if found. Return result.
+        if longest_path:
+            logging.debug(f"Using settings from: {longest_path}")
+            self._settings[longest_path] = LinterSettings.combine(
+                self._settings["default"],
+                self._settings[longest_path],
+                parent_is_defaults=True)
+            return self._settings[longest_path]
+        elif leaf.exists():
+            if str(leaf) not in self._settings:
+                print(utilities.PrintStyle.BOLD
+                      + f"Loading configuration file: {str(leaf)}"
+                      + utilities.PrintStyle.NORMAL)
+                logging.info(f"Loading configuration file: {str(leaf)}")
+                self._settings[str(leaf)] = LinterSettings.from_yaml_file(
+                    str(leaf))
+            logging.debug(f"Using settings from {str(leaf)}")
+            self._settings[str(leaf)] = LinterSettings.combine(
+                self._settings["default"],
+                self._settings[str(leaf)],
+                parent_is_defaults=True)
+            return self._settings[str(leaf)]
+        else:
+            logging.debug("Using default ruleset")
+            return self._settings["default"]

@@ -508,7 +508,12 @@ class CppCodeChecker(base_code_checker.BaseCodeChecker):
 
         pattern = "\\b(int|char|short|long|float|double)\\b"
 
-        reduced_code = self._remove_comments_and_strings()
+        try:
+            reduced_code = self._remove_comments_and_strings("/*", "*/", "//")
+        except base_code_checker.ParseWarning as e:
+            issues.append({"line": e.line_number, "message": e.message})
+            reduced_code = []
+
         for line_number, line_text in enumerate(reduced_code):
             match = re.search(pattern, line_text)
             if match:
@@ -518,19 +523,3 @@ class CppCodeChecker(base_code_checker.BaseCodeChecker):
                                " Use OpenCPI types instead."})
 
         return test_name, issues
-
-    def _remove_comments_and_strings(self):
-        """Remove comments and string content from code.
-
-        String quote marks are left but content within string are removed.
-        Comment content and comment symbols are removed.
-
-        Uses self._code() as the input code to be filtered.
-
-        Returns:
-            List of the code without comments, docstrings or strings.
-        """
-        reduced_code = self._remove_block_comments(self._code, "/*", "*/")
-        reduced_code = self._remove_line_comments(reduced_code, "//")
-        reduced_code = self._remove_strings(reduced_code)
-        return reduced_code

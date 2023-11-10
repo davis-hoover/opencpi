@@ -39,6 +39,7 @@ class UnknownCodeChecker(base_code_checker.BaseCodeChecker):
         """
         self._code = []
         self._allowed_exceptions = {}
+        return True
 
     def test_unknown_999(self):
         """Test that always fails, returning unrecognised file extension error.
