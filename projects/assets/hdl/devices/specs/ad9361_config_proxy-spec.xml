@@ -170,7 +170,6 @@
   </property>
   <property name='rx_fir_en_dis'                         type='uchar'     volatile='1' writable='1' default='DISABLE' description='Get/set the status of the RX FIR filter. The status is one of the parameter values ENABLE or DISABLE.'/>
   <property name='rx_rfdc_track_en_dis'                  type='uchar'     volatile='1' writable='1' default='DISABLE' description='Get/set the status of the RX RFDC Tracking. The status is one of the parameter values ENABLE or DISABLE.'/>
->
   <property name='rx_bbdc_track_en_dis'                  type='uchar'     volatile='1' writable='1' default='DISABLE' description='Get/set the status of the RX BasebandDC Tracking. The status is one of the parameter values ENABLE or DISABLE.'/>
 
   <property name='rx_quad_track_en_dis'                  type='uchar'     volatile='1' writable='1' default='DISABLE' description='Get/set the status of the RX Quadrate Tracking. The status is one of the parameter values ENABLE or DISABLE.'/>

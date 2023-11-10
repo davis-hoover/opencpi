@@ -18,12 +18,22 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+
+# This file allows the customisation of the OpenCPI lint scripts.
+# A project can contain multiple versions of this file, at different
+# hierarchies.
+# For example, there could be a version of this file at the project root, then
+# an additional version within the hdl/primitives directory.
+# Whether a configuration file inherits settings from parent directories is
+# controlled via the "inherit_parent" setting.
+# This can be set to "false" to *not* inherit settings, or
+# to "true" (the default) to inherit settings from the parent directory.
+inherit_parent: true
+
+
+# Allows the ignoring of files and directories within the project.
+# Standard path globbing wildcards are allowed.
+# Note: that if the string doesn't start with an alphanumeric character then
+# the string should be wrapped in quotation marks.
 ignore_pattern:
-    # Ignore these directories
-    - ocpi_linter.egg-info/
-    - build/
-    - dist/
-    # Ignore these filenames
-    - "vhdl_format.el"
-    # Ignore these extensions
-    - "*.egg"
+  - "*.txt"

@@ -22,7 +22,5 @@
 
 """Utility modules for use within the ocpilinter project."""
 
-from .lint_log_handler import LintLogHandler
 from .paths import paths_are_relative
 from .print_style import PrintStyle
-from .project_lint_log_handler import ProjectLintLogHandler

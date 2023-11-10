@@ -123,7 +123,6 @@ def _get_spelling_options(conf_directory, source_directory, build_directory):
     if len(dictionaries) > 0:
         dictionaries = ",".join(dictionaries)
         spelling_options.append(f"spelling_word_list_filename={dictionaries}")
-    print("GCS: spelling_options",spelling_options)
     return spelling_options
 
 def build(directory, build_only=False, mathjax=None, config_options=[],

@@ -40,22 +40,40 @@ class BaseCodeCheckerDefaults:
     license_notice = ""
 
 
+class ParseWarning(UserWarning):
+    """Exception raised when an issue is found parsing a file."""
+
+    def __init__(self, line_number, message):
+        """Initialise the ParseWarning exception.
+
+        Args:
+            line_number (int): Line number on which the parse error occurred.
+            message (str): Descriptive message.
+        """
+        super().__init__(message)
+        self.line_number = line_number
+        self.message = message
+
+
 class BaseCodeChecker:
     """Parent class for the language specific code checkers."""
     checker_settings = None
 
-    def __init__(self, path: str, settings):
+    def __init__(self, path: str, settings, to_console=True):
         """Initialise a BaseCodeChecker instance.
 
         Args:
             path (str): The file to be linted.
             settings (LinterSettings): Settings to lint against.
+            to_console (bool): Should message be output to the console?
 
         Returns:
             Initialised BaseCodeChecker instance.
         """
+        self.given_path = path
         self.path = pathlib.Path(path).expanduser().resolve()
         self._settings = settings
+        self.to_console = to_console
 
         # Set bare minimum number of lines needed for header and start of
         # license to be present
@@ -92,8 +110,12 @@ class BaseCodeChecker:
         completed_tests = {}
 
         if (not self._read_in_code()):
-            completed_tests["BadFile_0"] = LintTestResult.failed(
-                "Parsing of file", "BadFail_0", [{"message": "Failure parsing file", "line": 0}], 0)
+            test_name = "Parsing of file"
+            test_number = "BadFile_0"
+            issues = [{"message": "Failure parsing file", "line": 0}]
+            completed_tests[test_number] = LintTestResult.failed(
+                test_name, test_number, issues, 0)
+            self._print_issues(test_number, test_name, issues)
             return completed_tests
 
         for attribute in sorted(dir(self)):
@@ -222,187 +244,169 @@ class BaseCodeChecker:
             issues (list): The list of issues to be printed.
         """
         if len(issues) > 0:
-            print(
-                utilities.PrintStyle.BOLD + utilities.PrintStyle.UNDERLINE +
-                utilities.PrintStyle.RED +
-                f"Test {test_number} ({test_name}) output:" +
-                utilities.PrintStyle.NORMAL)
+            logging.error(
+                f"Test {test_number} ({test_name}) identified issues:")
+            if self.to_console:
+                print(
+                    utilities.PrintStyle.RED +
+                    utilities.PrintStyle.UNDERLINE +
+                    f"Test {test_number} ({test_name}) identified issues:" +
+                    utilities.PrintStyle.NORMAL)
             for issue in issues:
                 if issue["line"] is not None:
-                    print(f"{self.path}:{issue['line']}: "
-                          + issue["message"].strip())
                     logging.error(f"{self.path}:{issue['line']}: "
                                   + issue["message"].strip())
+                    if self.to_console:
+                        print(
+                            utilities.PrintStyle.RED +
+                            f"  {self.given_path}:{issue['line']}: " +
+                            issue["message"].strip() +
+                            utilities.PrintStyle.NORMAL)
                 else:
-                    print(f"{self.path}: {issue['message'].strip()}")
                     logging.error(f"{self.path}: {issue['message'].strip()}")
+                    if self.to_console:
+                        print(
+                            utilities.PrintStyle.RED +
+                            f"  {self.given_path}: {issue['message'].strip()}" +
+                            utilities.PrintStyle.NORMAL)
 
-    def _remove_strings(self, input_lines):
-        """Remove strings from code.
+    def _remove_comments_and_strings(self, block_comment_start, block_comment_end, line_comment_start):
+        """Remove comments and string content from code.
 
         String quote marks are left but content within string are removed.
+        Comment content and comment symbols are removed.
+
+        Uses self._code() as the input code to be filtered.
 
         Args:
-            List of code lines
+            block_comment_start (str): Start of block comment e.g. "/*" or "<!--"
+            block_comment_end (str): End of block comment e.g. "*/" or "-->"
+            line_comment_start (str): Start of line comment e.g. "//" or "#"
+
+        Raises:
+            ParseWarning: If the end of a string or block comment cannot be found.
 
         Returns:
-            List of the code without strings.
+            List of the code without comments, and without string contents.
         """
+        input_lines = self._code
         reduced_code = [""] * len(input_lines)
 
+        currently_in_block_comment = False
+        block_comment_began_on_line = 0
         for line_number, line_text in enumerate(input_lines):
-            # Remove strings
-            single_quote = self._find_unescaped_symbol(line_text, "'")
-            double_quote = self._find_unescaped_symbol(line_text, "\"")
-            while not (single_quote is None and double_quote is None):
-                if single_quote is None:
-                    string_start = double_quote + 1
-                    string_symbol = "\""
-                elif double_quote is None:
-                    string_start = single_quote + 1
-                    string_symbol = "'"
-                elif single_quote < double_quote:
-                    string_start = single_quote + 1
-                    string_symbol = "'"
-                else:
-                    string_start = double_quote + 1
-                    string_symbol = "\""
-                string_end = self._find_unescaped_symbol(
-                    line_text[string_start:], string_symbol)
-                if string_end is None:
-                    raise ValueError(
-                        "Cannot find end of string in text ("
-                        + f"{line_text[string_start:]}). From line "
-                        + f"{line_number + 1}")
-                # Add offset for the sub-string searched
-                string_end = string_end + string_start
-                line_text = (line_text[:string_start] +
-                             line_text[string_end:])
-                # If there is no more text to search return None, since this is
-                # what self._find_unescaped_symbol() would return if the symbol
-                # is not found. Otherwise search the rest of the line for any
-                # more strings.
-                if string_start + 2 >= len(line_text):
-                    single_quote = None
-                    double_quote = None
-                else:
-                    # Use string_start as start position for searching as the
-                    # string content has been removed now, so string_end is no
-                    # longer valid
-                    single_quote = self._find_unescaped_symbol(
-                        line_text[string_start + 1:], "'")
-                    double_quote = self._find_unescaped_symbol(
-                        line_text[string_start + 1:], "\"")
-                    if single_quote is not None:
-                        single_quote = single_quote + string_start + 1
-                    if double_quote is not None:
-                        double_quote = double_quote + string_start + 1
-
-            reduced_code[line_number] = line_text
-
-        return reduced_code
-
-    def _remove_block_comments(self, input_lines, block_comment_start, block_comment_end):
-        """Remove comment symbols and their content from the file content.
-
-        Args:
-            input_lines (List of str): The content of the file
-            block_comment_start (str): Token starts a block comment e.g. "<!--" or "/*"
-            block_comment_end (str): Token that ends a block comment e.g. "-->" or "*/"
-
-        Returns:
-            List of strings representing the file content without the comments.
-        """
-        reduced_content = [""] * len(input_lines)
-
-        # Remove comments
-        currently_in_comment = False
-        for line_number, line_text in enumerate(input_lines):
-
             while len(line_text) > 0:
                 # If in a comment, check if ended and use any trailing content
-                if currently_in_comment:
+                if currently_in_block_comment:
                     endPos = line_text.find(block_comment_end)
                     if endPos >= 0:
                         _, line_text = line_text.split(block_comment_end, 1)
-                        currently_in_comment = False
+                        currently_in_block_comment = False
                     else:
                         # Comment continues over lines
                         line_text = ""
 
-                # If not currently a comment, check if one starts this line
-                if not currently_in_comment:
-                    if line_text.find(block_comment_start) >= 0:
-                        content, line_text = line_text.split(
-                            block_comment_start, 1)
-                        reduced_content[line_number] += content
-                        currently_in_comment = True
-                    # Otherwise not a comment so take whole line
+                # Find start positions of comments or strings
+                line_comment_position = None
+                block_comment_position = None
+                quote_position = None
+                quote_char = None
+                escaped = False
+                pos = 0
+                found = False
+                while (not found) and (pos < len(line_text)):
+                    if line_comment_start is not None and line_text[pos:].startswith(line_comment_start):
+                        line_comment_position = pos
+                        found = True
+                    elif line_text[pos:].startswith(block_comment_start):
+                        block_comment_position = pos
+                        block_comment_began_on_line = line_number + 1
+                        found = True
+                    elif not escaped:
+                        char = line_text[pos]
+                        if char == "\\":
+                            escaped = True
+                        elif char == "'":
+                            quote_position = pos
+                            quote_char = "'"
+                            found = True
+                        elif char == "\"":
+                            quote_position = pos
+                            quote_char = "\""
+                            found = True
                     else:
-                        reduced_content[line_number] += line_text
-                        line_text = ""
+                        escaped = (char == "\\")
+                    pos += 1
 
-        return reduced_content
+                if line_comment_position is not None:
+                    # Use the line upto the line comment position
+                    reduced_code[line_number] += line_text[:line_comment_position]
+                    line_text = ""
 
-    def _remove_line_comments(self, input_lines, comment_start):
-        """Remove end-of-line comment symbols and their content from the file content.
+                elif block_comment_position is not None:
+                    # Use the line upto the block comment position
+                    reduced_code[line_number] += line_text[:block_comment_position]
+                    # Next, process rest of line looking for end of comment
+                    line_text = line_text[block_comment_position +
+                                          len(block_comment_start):]
+                    currently_in_block_comment = True
 
-        Args:
-            input_lines (List of str): The content of the file
-            comment_start (str): Token that starts a comment e.g. "//" or "#"
+                elif quote_position is not None:
+                    # Use the line upto the quote position plus an empty string
+                    reduced_code[line_number] += line_text[:quote_position]
+                    reduced_code[line_number] += f"{quote_char}{quote_char}"
+                    # Find end of string
+                    string_end = self._find_unescaped_symbol(
+                        line_text, quote_char, quote_position+1)
+                    if string_end < 0:
+                        raise ParseWarning(
+                            line_number + 1,
+                            "Cannot find end of string in text ("
+                            + f"{line_text[quote_position:]}). From line "
+                            + f"{line_number + 1}")
+                    # Next, process any line after the string
+                    line_text = line_text[string_end+1:]
 
-        Returns:
-            List of strings representing the file content without the comments.
-        """
-
-        reduced_code = [""] * len(input_lines)
-        for line_number, line_text in enumerate(input_lines):
-            # Remove comments
-            comment_position = line_text.find(comment_start)
-            if comment_position >= 0:
-                # Check not part of a string
-                single_quote_position = self._find_unescaped_symbol(
-                    line_text, "'")
-                double_quote_position = self._find_unescaped_symbol(
-                    line_text, "\"")
-                if single_quote_position is not None:
-                    if single_quote_position > comment_position:
-                        line_text = line_text[0:comment_position]
-                elif double_quote_position is not None:
-                    if double_quote_position > comment_position:
-                        line_text = line_text[0:comment_position]
                 else:
-                    line_text = line_text[0:comment_position]
+                    # Otherwise not a comment, or string, so take whole line
+                    reduced_code[line_number] += line_text
+                    line_text = ""
 
-            reduced_code[line_number] = line_text
+        if currently_in_block_comment:
+            raise ParseWarning(
+                block_comment_began_on_line,
+                "Reached end of file without finding end of block comment.")
 
         return reduced_code
 
-    def _find_unescaped_symbol(self, text, symbol):
-        """Find next symbol in text, ignoring escaped versions.
+    def _find_unescaped_symbol(self, text, symbol, start_pos=0):
+        r"""Find next symbol in text, ignoring escaped versions.
 
-        Any symbol escaped with a '\' character within search text will
+        Any symbol escaped with a '\\' character within search text will
         be not be found.
 
         Args:
             text (``str``): Text to be searched.
             symbol (``str``): The symbol to be found.
+            start_pos (``int``): The position to start searching from.
 
         Returns:
             Index position the unescaped symbol was found in the text. Or
-            ``None`` if the symbol is not found.
+            -1 if the symbol is not found.
         """
-        # If first character then cannot be escaped, and regex pattern will not
-        # find the pattern
-        if len(text) > 0:
-            if text[0] == symbol:
-                return 0
+        # Skip to the start position
+        text = text[start_pos:]
 
-        # Regular expression pattern searches for the symbol but must not have
-        # a leading "\"
-        search_result = re.search(r"[^\\\\]" + symbol, text)
-        if search_result is None:
-            return None
-        else:
-            # Add one because searches for symbol and checks previous character
-            return search_result.start() + 1
+        # Go through each character, checking if escaped or not, then check if
+        # it is the character
+        escaped = False
+        for pos, char in enumerate(text):
+            if escaped:
+                escaped = False
+            elif char == symbol:
+                return start_pos + pos
+            elif char == "\\":
+                escaped = True
+
+        # Failed to find symbol
+        return -1

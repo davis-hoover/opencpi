@@ -25,8 +25,15 @@ The linter can be controlled through ``ocpilint-cfg.yml`` files.
 
 This file allows the customisation of the OpenCPI lint scripts. A project can contain multiple versions of this file, at different hierarchies.
 
-For example, there could be a version of this file at the project root, then an additional version within the ``hdl/primitives`` directory. The rules in project settings files within sub-directories are added to the rules of settings files in above directories.
+For example, there could be a version of this file at the project root, then an additional version within the ``hdl/primitives`` directory.
 
+Whether a configuration file inherits settings from parent directories is controlled via the "inherit_parent" setting. This can be set to ``false`` to *not* inherit any settings, or to ``true`` (the default) to inherit settings from the parent directory.
+
+.. code-block:: yaml
+
+   inherit-parent: true
+
+If a configuration file is specified via the command line, then those settings are used with no inheritance of settings from other files on the file system.
 
 Additional Python Modules
 -------------------------
@@ -34,8 +41,7 @@ Extra python modules may be required as dependencies in order to run the scripts
 
 This list of modules is required, as these modules will need to be installed on any system prior to the project being able to run any custom lint rules.
 
-.. LINT EXCEPTION: rst_002: 5: Not an rst bullet point but a yaml code sample
-.. LINT EXCEPTION: rst_002: 5: Not an rst bullet point but a yaml code sample
+.. LINT EXCEPTION: rst_002: 4: Not an rst bullet point but a yaml code sample
 .. code-block:: yaml
 
    extra_modules:
@@ -44,7 +50,7 @@ This list of modules is required, as these modules will need to be installed on 
 
 Additional Rules
 ----------------
-Defines a list of files or modules which should be imported. These files could be background code, or additional tests. These entries need to either be on the standard python path, or relative to the configuration file defining them.
+The "extra_rules" setting defines a list of files or modules which should be imported. These files could be background code, or additional tests. These entries need to either be on the standard python path, or relative to the configuration file defining them.
 
 .. LINT EXCEPTION: rst_002: 4: Not an rst bullet point but a yaml code sample
 .. code-block:: yaml
@@ -52,24 +58,27 @@ Defines a list of files or modules which should be imported. These files could b
    extra_rules:
      - project_lint.py
 
-Within one of the defined python files the classes to include in linting must be listed, these are defined through the ``LINTING_CLASSES`` file scoped import variable. This can be used to replace existing checking classes, or to declare additional checkers.
+An example "project_lint.py" file defining some extra linting classes:
 
 .. code-block:: python
 
    class MyPythonCodeChecker(ocpi_linter.PythonCodeChecker):
       pass
 
-   class TestXMLCodeChecker(BaseCodeChecker):
+   class MyTestXMLCodeChecker(ocpi_linter.BaseCodeChecker):
       pass
 
-   LINTING_CLASSES = {
+Within the configuration file the classes to include in linting must be listed. These are defined through the "lint_classes" setting. This can be used to replace existing checking classes, or to declare additional checkers.
+
+.. code-block:: yaml
+
+   lint_classes:
       # As this checker is derived from a standard checker, it should be
       # replacing the class that existed previously, or else the tests would
       # be run twice.
-      "python": MyPythonCodeChecker,
-      # As this is a new checker, it is added with a unique name.
-      "test_xml": TestXMLCodeChecker
-   }
+      python: MyPythonCodeChecker
+      # As this is a new checker, it is added with a unique name
+      my_testxml: MyTestXMLCodeChecker
 
 
 Enabling Tests
@@ -173,5 +182,5 @@ Files can also be ignored from all lint tests through ``.gitignore`` style listi
    ignore_pattern:
      - gen/                      # Ignore a directory
      - components/**/*comp/*.svg # Ignore svg files in components documentation
-     - lint_log.json             # Ignore all instances of this filename
+     - test_log.json             # Ignore all instances of this filename
      - "*.png"                   # Ignore all instances of this extension
