@@ -20,6 +20,7 @@
     <property name="udp_enable" value="true"/>
     <property name="sdp_width"  value="1"/>
     <property name="local_ip_address_d" value="0xc0a80003"/>
+    <property name="local_subnet_mask_d" value="0xffffff00"/> 
     <property name="local_gateway_ip_d" value="0xc0a80001"/>
     <device name='dgrdma_config_dev'/>
 </HdlConfig>
