@@ -1,3 +1,6 @@
-<HdlAssembly>
-  <Instance Worker="test_sink" externals='true'/>
-</HdlAssembly>
+<hdlassembly defaultcontainers="" containers="zed_ether_container_udp">
+	<instance worker="test_sink"/>
+	<connection name="fpga_in" external="consumer">
+		<port instance="test_sink" name="in"/>
+	</connection>
+</hdlassembly>

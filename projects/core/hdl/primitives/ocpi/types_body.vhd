@@ -250,6 +250,12 @@ function To_long (c: integer) return long_t is
 begin
  return to_signed(c,long_t'length);
 end to_long;
+
+function to_long (c: std_logic_vector(long_t'range)) return long_t is
+begin
+  return long_t(c);
+end to_long;
+
 function from_long (c: long_t) return std_logic_vector is begin
   return std_logic_vector(c);
 end from_long;                                                            

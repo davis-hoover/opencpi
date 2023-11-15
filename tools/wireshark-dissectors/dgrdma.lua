@@ -45,27 +45,33 @@ dgrdma_protocol.fields = {
 }
 
 function dgrdma_protocol.dissector(buffer, pinfo, tree)
+    offset = 0
     length = buffer:len()
     if length == 0 then return end
 
     pinfo.cols.protocol = dgrdma_protocol.name
 
+    if pinfo.dst_port > 0 then
+      -- we are dissecting a udp packet, skip the padding
+      offset = 2
+    end
+
     local subtree = tree:add(dgrdma_protocol, buffer(), "OpenCPI Datagram")
 
     -- Parse frame header
-    subtree:add_le(src_id, buffer(0, 2))
-    subtree:add_le(dst_id, buffer(2, 2))
-    subtree:add_le(frameseq, buffer(4, 2))
-    subtree:add_le(ackstart, buffer(6, 2))
-    subtree:add_le(ackcount, buffer(8, 1))
-    subtree:add_le(flags, buffer(9, 1))
+    subtree:add_le(src_id, buffer(offset+0, 2))
+    subtree:add_le(dst_id, buffer(offset+2, 2))
+    subtree:add_le(frameseq, buffer(offset+4, 2))
+    subtree:add_le(ackstart, buffer(offset+6, 2))
+    subtree:add_le(ackcount, buffer(offset+8, 1))
+    subtree:add_le(flags, buffer(offset+9, 1))
 
-    local more_messages = (buffer(9, 1):uint() ~= 0)
+    local more_messages = (buffer(offset+9, 1):uint() ~= 0)
 
     -- Default if no messages
-    local frameseq = buffer(4,2):le_uint()
-    local acks = buffer(6,2):le_uint()
-    local ackn = buffer(8,1):le_uint()
+    local frameseq = buffer(offset+4,2):le_uint()
+    local acks = buffer(offset+6,2):le_uint()
+    local ackn = buffer(offset+8,1):le_uint()
     if ackn == 0 then
         ack_str = string.format('             ')
     else
@@ -78,28 +84,28 @@ function dgrdma_protocol.dissector(buffer, pinfo, tree)
     local msg_num = 1
     local buffer_ptr = 10
     while more_messages do
-        payload_len = buffer(buffer_ptr+20, 2):le_uint()
-        txn_id = buffer(buffer_ptr+0, 4):le_uint()
-        nmsgs = buffer(buffer_ptr+12, 2):le_uint()
-        seq = buffer(buffer_ptr+14, 2):le_uint()
+        payload_len = buffer(buffer_ptr+offset+20, 2):le_uint()
+        txn_id = buffer(buffer_ptr+offset+0, 4):le_uint()
+        nmsgs = buffer(buffer_ptr+offset+12, 2):le_uint()
+        seq = buffer(buffer_ptr+offset+14, 2):le_uint()
 
         info_string = info_string .. string.format('; Txn %2d (%d/%d) %4d bytes', txn_id, seq, nmsgs, payload_len)
 
         -- message header length = 24
-        local msg_tree = subtree:add(dgrdma_protocol, buffer(buffer_ptr, 24 + payload_len), string.format("Message %d (%d bytes)", msg_num, payload_len))
+        local msg_tree = subtree:add(dgrdma_protocol, buffer(buffer_ptr, offset + 24 + payload_len), string.format("Message %d (%d bytes)", msg_num, payload_len))
 
-        msg_tree:add_le(transactionid, buffer(buffer_ptr+0, 4))
-        msg_tree:add_le(flagaddr, buffer(buffer_ptr+4, 4))
-        msg_tree:add_le(flagvalue, buffer(buffer_ptr+8, 4)):append_text(decode_flag_value(buffer(buffer_ptr+8, 4):le_uint()))
-        msg_tree:add_le(msgsintransaction, buffer(buffer_ptr+12, 2))
-        msg_tree:add_le(msgsequence, buffer(buffer_ptr+14, 2))
-        msg_tree:add_le(dataaddr, buffer(buffer_ptr+16, 4))
-        msg_tree:add_le(datalen, buffer(buffer_ptr+20, 2))
-        msg_tree:add_le(type, buffer(buffer_ptr+22, 1))
-        msg_tree:add_le(nextmsg, buffer(buffer_ptr+23, 1))
-        msg_tree:add(payload, buffer(buffer_ptr+24, payload_len))
+        msg_tree:add_le(transactionid, buffer(buffer_ptr+offset+0, 4))
+        msg_tree:add_le(flagaddr, buffer(buffer_ptr+offset+4, 4))
+        msg_tree:add_le(flagvalue, buffer(buffer_ptr+offset+8, 4)):append_text(decode_flag_value(buffer(buffer_ptr+8, 4):le_uint()))
+        msg_tree:add_le(msgsintransaction, buffer(buffer_ptr+offset+12, 2))
+        msg_tree:add_le(msgsequence, buffer(buffer_ptr+offset+14, 2))
+        msg_tree:add_le(dataaddr, buffer(buffer_ptr+offset+16, 4))
+        msg_tree:add_le(datalen, buffer(buffer_ptr+offset+20, 2))
+        msg_tree:add_le(type, buffer(buffer_ptr+offset+22, 1))
+        msg_tree:add_le(nextmsg, buffer(buffer_ptr+offset+23, 1))
+        msg_tree:add(payload, buffer(buffer_ptr+offset+24, payload_len))
 
-        more_messages = (buffer(buffer_ptr+23, 1):uint() ~= 0)
+        more_messages = (buffer(buffer_ptr+offset+23, 1):uint() ~= 0)
 
         -- round payload_len up to a multiple of 8 to allow for padding bytes
         payload_len = math.floor((payload_len + 7) / 8) * 8
@@ -132,3 +138,7 @@ end
 
 local ethertype = DissectorTable.get("ethertype")
 ethertype:add(0xf042, dgrdma_protocol)
+
+local udp_port = DissectorTable.get("udp.port")
+udp_port:add(18078, dgrdma_protocol)
+

@@ -1,5 +1,8 @@
 <!-- The test_source_assy HDL assembly xml file -->
-<HdlAssembly>
+<hdlassembly defaultcontainers="" containers="zed_ether_container_udp">
   <!-- Remove this instance and replace it with real ones -->
-  <Instance Worker='test_source' externals='1'/>
-</HdlAssembly>
+  <Instance Worker='test_source'/>
+  <connection name="fpga_out" external="producer">
+	  <port instance="test_source" name="out"/>
+  </connection>
+</hdlassembly>

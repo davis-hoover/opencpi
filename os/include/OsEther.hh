@@ -76,6 +76,9 @@ namespace OCPI {
 	inline explicit Address(const char *m) {
 	  setString(m);
 	}
+	inline explicit Address(uint16_t udp_port, uint32_t udp_addr) {
+		set(udp_port, udp_addr);	  
+	}
 	Address(const Address &addr_in) {
 	  m_isEther = addr_in.m_isEther;
 	  set64(addr_in.addr64());
