@@ -381,13 +381,31 @@ static struct VhdlUnparser : public OB::Unparser {
   }
 
   //
-  // The next two functions are derived from the "Unparser" class 
-  // versions (see "runtime/util/property/src/OcpiUtilValue.cxx").
-  // They handle "longlong" (m_baseType == OA::OCPI_LongLong) and
-  // "ulonglong" (m_baseType == OA::OCPI_ULongLong) values.
+  // The next four functions are derived from the "Unparser" class
+  // versions (see "runtime/base/src/BaseValue.cc").
+  // They handle
+  // "long" (m_baseType == OA::OCPI_Long)
+  // "ulong" (m_baseType == OA::OCPI_ULong)
+  // "longlong" (m_baseType == OA::OCPI_LongLong)
+  // "ulonglong" (m_baseType == OA::OCPI_ULongLong)
   //
   // GitLab Issue #1720
   //
+  
+  bool
+  unparseLong(std::string &s, int32_t val, bool /* hex */) const {
+    // function To_long (c: std_logic_vector(long_t'range)) return long_t;
+    OU::formatAdd(s, "std_logic_vector'(x\"%.8" PRIx32 "\")", val);
+    return val == 0;
+  }
+ 
+  bool
+  unparseULong(std::string &s, uint32_t val, bool /* hex */) const {
+    // function To_ulong (c: std_logic_vecotr(ulong_t'range)) return ulong_t;
+    OU::formatAdd(s, "std_logic_vector'(x\"%.8" PRIx32 "\")", val);
+    return val == 0;
+  }
+  
   bool
   unparseLongLong(std::string &s, int64_t val, bool /* hex */) const {
     // function To_longlong (c: std_logic_vector(longlong_t'range)) return longlong_t;

@@ -115,9 +115,9 @@ begin
   arbitrate_full: if unsigned(sdp_arb) > 0 generate
 
       -- implement which interface has been waiting longest scheme
-      -- the number of clock cycles that out client has been wait is calculated
+      -- the number of clock cycles that our client has been waiting is calculated
       -- and the maximum of this count or the count passed up from the sdp-node
-      -- down-stream of us is passed upwards. each node can then see if anything
+      -- down-stream of us is passed upwards. Each node can then see if anything
       -- downstream has been waiting longer than our client and if so prioritise it
       constant c_waiting_prio_width   : integer := up_out.metaData'length;
       constant c_waiting_count_width  : integer := to_integer(unsigned(sdp_arb));

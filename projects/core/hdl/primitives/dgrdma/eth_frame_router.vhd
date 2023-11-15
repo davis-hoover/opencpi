@@ -30,8 +30,10 @@ library ocpi; use ocpi.types.all;
 entity eth_frame_router is
 
   generic(
-    DATA_WIDTH  : natural := 64;
-    KEEP_WIDTH  : natural := 8
+    DATA_WIDTH   : natural := 64;
+    KEEP_WIDTH   : natural := 8;
+    CP_TYPE      : natural := 16#f040#;
+    SDP_TYPE     : natural := 16#f042#
   );
 
   port(
@@ -72,8 +74,8 @@ end eth_frame_router;
 
 architecture rtl of eth_frame_router is
 
-constant CP_ETHERTYPE  : std_logic_vector(15 downto 0) := X"f040";
-constant SDP_ETHERTYPE : std_logic_vector(15 downto 0) := X"f042";
+constant SLV_CP_TYPE  : std_logic_vector(15 downto 0) := std_logic_vector(to_unsigned(CP_TYPE, 16));
+constant SLV_SDP_TYPE : std_logic_vector(15 downto 0) := std_logic_vector(to_unsigned(SDP_TYPE, 16));
 
 signal rx_max_addr_match : boolean;
 signal rx_is_cp  : boolean;
@@ -96,10 +98,10 @@ begin
   rx_max_addr_match <= (rx_hdr_dest_mac = local_mac_addr) or (rx_hdr_dest_mac = X"ffffffffffff");
 
   -- check if this a CP packet
-  rx_is_cp <= rx_max_addr_match and (rx_hdr_type = CP_ETHERTYPE);
+  rx_is_cp <= rx_max_addr_match and (rx_hdr_type = SLV_CP_TYPE);
 
   -- check if this is an SDP packet
-  rx_is_sdp <= rx_max_addr_match and (rx_hdr_type = SDP_ETHERTYPE);
+  rx_is_sdp <= rx_max_addr_match and (rx_hdr_type = SLV_SDP_TYPE);
 
   -- route to CP
   m_axis_tvalid_cp <= s_axis_tvalid when rx_is_cp else '0';

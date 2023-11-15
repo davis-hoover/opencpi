@@ -47,9 +47,28 @@ architecture rtl of zed_ether_worker is
 
   signal sdp_reset : std_logic;
   signal reset_mac : std_logic;
+  signal phy_int_n_i : std_logic;
+
+    -- Local IP ADDRESS, GATEWAY and subnet mask for UDP Transport
+  constant local_ip_addr_c      : std_logic_vector(31 downto 0) := std_logic_vector((local_ip_address_d));
+  constant local_subnet_mask_c  : std_logic_vector(31 downto 0) := X"ffffff00";
+  constant local_gateway_ip_c   : std_logic_vector(31 downto 0) := X"c0a80001";
+
+  signal local_ip_addr_s : std_logic_vector(31 downto 0);
+  
+  --variable local_ip_addr_slv 		: std_logic_vector(31 downto 0);
+  --variable local_subnet_mask_slv 	: std_logic_vector(31 downto 0);
+  --variable local_gateway_ip_slv 	: std_logic_vector(31 downto 0);
+
+  --local_ip_addr_slv := std_logic_vector( to_unsigned(local_ip_addr_d, local_ip_addr_slv'length));
+  --local_subnet_mask_slv := std_logic_vector( to_unsigned(local_subnet_mask_d, local_subnet_mask_slv'length));
+  --local_gateway_ip_slv := std_logic_vector( to_unsigned(local_gateway_ip_d, local_gateway_ip_slv'length));
+
 
 begin
 
+  --local_ip_addr_s <= to_slv(local_ip_address_d,32);
+  -- ---------------------------------------------------------------------------
   -- Drive metadata interface - boiler plate
   metadata_out.clk     <= clk;
   metadata_out.romAddr <= props_in.romAddr;
@@ -70,6 +89,7 @@ begin
   props_out.romData         <= metadata_in.romData;
   props_out.slotCardIsPresent <= (others => '0');
 
+  -- ---------------------------------------------------------------------------
   -- Clock generation
   clk_125mhz_en <= '1';
   clkgen_inst : entity work.clock_gen
@@ -86,6 +106,7 @@ begin
         reset_mac => reset_mac
       );
 
+  -- ---------------------------------------------------------------------------
   -- Read MAC address from EEPROM (Microchip 24AA025E48) on reset
   read_macaddr_inst : entity work.i2c_macaddr_eeprom
     generic map(
@@ -108,79 +129,163 @@ begin
 
   sdp_reset <= ctl_in.reset or btnc or dev_in(0).RESET;
 
-  dgrdma_if : dual_rgmii_to_ocpi
-    generic map (
-      sdp_width => to_integer(sdp_width),
-      ACK_TRACKER_BITFIELD_WIDTH => to_integer(ack_tracker_bitfield_width),
-      ACK_TRACKER_MAX_ACK_COUNT  => to_integer(ack_tracker_max_ack_count)
-    )
-    port map (
-      clk           => clk,
-      clk_mac       => clk_mac,
-      clk_mac_90    => clk_mac_90,
-      reset         => reset,
-      reset_mac     => reset_mac,
-      sdp_reset     => sdp_reset,
+  -- ---------------------------------------------------------------------------
+  DUAL_ETH_GENERATE: if udp_enable = '0' generate
 
-      -- Configuration
-      local_mac_addr        => local_mac_addr,
-      remote_mac_addr       => dev_in(0).REMOTE_MAC_ADDR(47 downto 0),
-      remote_dst_id         => dev_in(0).REMOTE_DST_ID,
-      local_src_id          => dev_in(0).LOCAL_SRC_ID,
-      interface_mtu         => unsigned(dev_in(0).INTERFACE_MTU),
-      ack_wait              => unsigned(dev_in(0).ACK_WAIT),
-      max_acks_outstanding  => unsigned(dev_in(0).MAX_ACKS_OUTSTANDING),
-      coalesce_wait         => unsigned(dev_in(0).COALESCE_WAIT),
-      dual_ethernet         => dev_in(0).DUAL_ETHERNET,
-      ifg_delay             => unsigned'(X"0c"), -- 12 bytes = 96 bit times (minimum interframe gap)
-      eth_speed_1           => eth_speed_1,
-      eth_speed_2           => eth_speed_2,
+    dgrdma_if : dual_rgmii_to_ocpi
+      generic map (
+        sdp_width => to_integer(sdp_width),
+        ACK_TRACKER_BITFIELD_WIDTH => to_integer(ack_tracker_bitfield_width),
+        ACK_TRACKER_MAX_ACK_COUNT  => to_integer(ack_tracker_max_ack_count)
+      )
+      port map (
+        clk           => clk,
+        clk_mac       => clk_mac,
+        clk_mac_90    => clk_mac_90,
+        reset         => reset,
+        reset_mac     => reset_mac,
+        sdp_reset     => sdp_reset,
 
-      -- Control plane master
-      cp_in => cp_in,
-      cp_out => cp_out,
+        -- Configuration
+        local_mac_addr        => local_mac_addr,
+        remote_mac_addr       => dev_in(0).REMOTE_MAC_ADDR(47 downto 0),
+        remote_dst_id         => dev_in(0).REMOTE_DST_ID,
+        local_src_id          => dev_in(0).LOCAL_SRC_ID,
+        interface_mtu         => unsigned(dev_in(0).INTERFACE_MTU),
+        ack_wait              => unsigned(dev_in(0).ACK_WAIT),
+        max_acks_outstanding  => unsigned(dev_in(0).MAX_ACKS_OUTSTANDING),
+        coalesce_wait         => unsigned(dev_in(0).COALESCE_WAIT),
+        dual_ethernet         => dev_in(0).DUAL_ETHERNET,
+        ifg_delay             => unsigned'(X"0c"), -- 12 bytes = 96 bit times (minimum interframe gap)
+        eth_speed_1           => eth_speed_1,
+        eth_speed_2           => eth_speed_2,
 
-      -- SDP master
-      sdp_in => ether_in,
-      sdp_out => ether_out,
-      sdp_in_data => ether_in_data,
-      sdp_out_data => ether_out_data,
+        -- Control plane master
+        cp_in => cp_in,
+        cp_out => cp_out,
 
-      -- RGMII interface 1
-      phy_reset_n_1 => phy_reset_n_1,
-      phy_int_n_1 => '1',
-      phy_rx_clk_1 => phy_rx_clk_1,
-      phy_rxd_1 => phy_rxd_1,
-      phy_rx_ctl_1 => phy_rx_ctl_1,
-      phy_tx_clk_1 => phy_tx_clk_1,
-      phy_txd_1 => phy_txd_1,
-      phy_tx_ctl_1 => phy_tx_ctl_1,
+        -- SDP master
+        sdp_in => ether_in,
+        sdp_out => ether_out,
+        sdp_in_data => ether_in_data,
+        sdp_out_data => ether_out_data,
 
-      -- RGMII interface 2
-      phy_reset_n_2 => phy_reset_n_2,
-      phy_int_n_2 => '1',
-      phy_rx_clk_2 => phy_rx_clk_2,
-      phy_rxd_2 => phy_rxd_2,
-      phy_rx_ctl_2 => phy_rx_ctl_2,
-      phy_tx_clk_2 => phy_tx_clk_2,
-      phy_txd_2 => phy_txd_2,
-      phy_tx_ctl_2 => phy_tx_ctl_2,
+        -- RGMII interface 1
+        phy_reset_n_1 => phy_reset_n_1,
+        phy_int_n_1 => '1',
+        phy_rx_clk_1 => phy_rx_clk_1,
+        phy_rxd_1 => phy_rxd_1,
+        phy_rx_ctl_1 => phy_rx_ctl_1,
+        phy_tx_clk_1 => phy_tx_clk_1,
+        phy_txd_1 => phy_txd_1,
+        phy_tx_ctl_1 => phy_tx_ctl_1,
 
-      -- Ack Tracker
-      ack_tracker_rej_ack               => dev_out(0).ACK_TRACKER_REJ_ACK,
-      ack_tracker_bitfield              => dev_out(0).ACK_TRACKER_BITFIELD,
-      ack_tracker_base_seqno            => dev_out(0).ACK_TRACKER_BASE_SEQNO,
-      ack_tracker_rej_seqno             => dev_out(0).ACK_TRACKER_REJ_SEQNO,
-      ack_tracker_total_acks_sent       => dev_out(0).ACK_TRACKER_TOTAL_ACKS_SENT,
-      ack_tracker_tx_acks_sent          => dev_out(0).ACK_TRACKER_TX_ACKS_SENT,
-      ack_tracker_pkts_enqueued         => dev_out(0).ACK_TRACKER_PKTS_ENQUEUED,
-      ack_tracker_reject_out_of_range   => dev_out(0).ACK_TRACKER_REJECT_OUT_OF_RANGE,
-      ack_tracker_reject_already_set    => dev_out(0).ACK_TRACKER_REJECT_ALREADY_SET,
-      ack_tracker_accepted_by_peek      => dev_out(0).ACK_TRACKER_ACCEPTED_BY_PEEK,
-      ack_tracker_high_watermark        => dev_out(0).ACK_TRACKER_HIGH_WATERMARK,
-      frame_parser_reject               => dev_out(0).FRAME_PARSER_REJECT
-    );
+        -- RGMII interface 2
+        phy_reset_n_2 => phy_reset_n_2,
+        phy_int_n_2 => '1',
+        phy_rx_clk_2 => phy_rx_clk_2,
+        phy_rxd_2 => phy_rxd_2,
+        phy_rx_ctl_2 => phy_rx_ctl_2,
+        phy_tx_clk_2 => phy_tx_clk_2,
+        phy_txd_2 => phy_txd_2,
+        phy_tx_ctl_2 => phy_tx_ctl_2,
 
+        -- Ack Tracker
+        ack_tracker_rej_ack               => dev_out(0).ACK_TRACKER_REJ_ACK,
+        ack_tracker_bitfield              => dev_out(0).ACK_TRACKER_BITFIELD,
+        ack_tracker_base_seqno            => dev_out(0).ACK_TRACKER_BASE_SEQNO,
+        ack_tracker_rej_seqno             => dev_out(0).ACK_TRACKER_REJ_SEQNO,
+        ack_tracker_total_acks_sent       => dev_out(0).ACK_TRACKER_TOTAL_ACKS_SENT,
+        ack_tracker_tx_acks_sent          => dev_out(0).ACK_TRACKER_TX_ACKS_SENT,
+        ack_tracker_pkts_enqueued         => dev_out(0).ACK_TRACKER_PKTS_ENQUEUED,
+        ack_tracker_reject_out_of_range   => dev_out(0).ACK_TRACKER_REJECT_OUT_OF_RANGE,
+        ack_tracker_reject_already_set    => dev_out(0).ACK_TRACKER_REJECT_ALREADY_SET,
+        ack_tracker_accepted_by_peek      => dev_out(0).ACK_TRACKER_ACCEPTED_BY_PEEK,
+        ack_tracker_high_watermark        => dev_out(0).ACK_TRACKER_HIGH_WATERMARK,
+        frame_parser_reject               => dev_out(0).FRAME_PARSER_REJECT
+      );
+
+  end generate DUAL_ETH_GENERATE;
+
+  -- ---------------------------------------------------------------------------
+  SINGLE_UDP_GENERATE: if udp_enable = '1' generate
+
+    dgrdma_if : rgmii_udp_to_ocpi
+      generic map (
+        sdp_width => to_integer(sdp_width),
+        ACK_TRACKER_BITFIELD_WIDTH => to_integer(ack_tracker_bitfield_width),
+        ACK_TRACKER_MAX_ACK_COUNT  => to_integer(ack_tracker_max_ack_count)
+      )
+      port map (
+        clk           => clk,
+        clk_mac       => clk_mac,
+        clk_mac_90    => clk_mac_90,
+        reset         => reset,
+        reset_mac     => reset_mac,
+        sdp_reset     => sdp_reset,
+
+        -- Configuration
+        local_ip_addr         => local_ip_addr_c,
+        local_subnet_mask     => local_subnet_mask_c,
+        local_gateway_ip      => local_gateway_ip_c,
+        remote_ip_addr        => dev_in(0).REMOTE_IP_ADDR,
+        remote_udp_port       => dev_in(0).REMOTE_UDP_PORT,
+        local_mac_addr        => local_mac_addr,
+        remote_mac_addr       => dev_in(0).REMOTE_MAC_ADDR(47 downto 0),
+        remote_dst_id         => dev_in(0).REMOTE_DST_ID,
+        local_src_id          => dev_in(0).LOCAL_SRC_ID,
+        interface_mtu         => unsigned(dev_in(0).INTERFACE_MTU),
+        ack_wait              => unsigned(dev_in(0).ACK_WAIT),
+        max_acks_outstanding  => unsigned(dev_in(0).MAX_ACKS_OUTSTANDING),
+        coalesce_wait         => unsigned(dev_in(0).COALESCE_WAIT),
+        ifg_delay             => unsigned'(x"0c"), -- 12 bytes = 96 bit times (minimum interframe gap)
+        eth_speed             => eth_speed_1,
+
+        -- Control plane master
+        cp_in => cp_in,
+        cp_out => cp_out,
+
+        -- SDP master
+        sdp_in => ether_in,
+        sdp_out => ether_out,
+        sdp_in_data => ether_in_data,
+        sdp_out_data => ether_out_data,
+
+        -- RGMII interface 1
+        phy_reset_n => phy_reset_n_1,
+        phy_int_n => phy_int_n_i,
+        phy_rx_clk => phy_rx_clk_1,
+        phy_rxd => phy_rxd_1,
+        phy_rx_ctl => phy_rx_ctl_1,
+        phy_tx_clk => phy_tx_clk_1,
+        phy_txd => phy_txd_1,
+        phy_tx_ctl => phy_tx_ctl_1,
+
+        -- Ack Tracker
+        ack_tracker_rej_ack               => dev_out(0).ACK_TRACKER_REJ_ACK,
+        ack_tracker_bitfield              => dev_out(0).ACK_TRACKER_BITFIELD,
+        ack_tracker_base_seqno            => dev_out(0).ACK_TRACKER_BASE_SEQNO,
+        ack_tracker_rej_seqno             => dev_out(0).ACK_TRACKER_REJ_SEQNO,
+        ack_tracker_total_acks_sent       => dev_out(0).ACK_TRACKER_TOTAL_ACKS_SENT,
+        ack_tracker_tx_acks_sent          => dev_out(0).ACK_TRACKER_TX_ACKS_SENT,
+        ack_tracker_pkts_enqueued         => dev_out(0).ACK_TRACKER_PKTS_ENQUEUED,
+        ack_tracker_reject_out_of_range   => dev_out(0).ACK_TRACKER_REJECT_OUT_OF_RANGE,
+        ack_tracker_reject_already_set    => dev_out(0).ACK_TRACKER_REJECT_ALREADY_SET,
+        ack_tracker_accepted_by_peek      => dev_out(0).ACK_TRACKER_ACCEPTED_BY_PEEK,
+        ack_tracker_high_watermark        => dev_out(0).ACK_TRACKER_HIGH_WATERMARK,
+        frame_parser_reject               => dev_out(0).FRAME_PARSER_REJECT
+      );
+
+      -- not using the second ethernet interface
+      phy_int_n_i   <= '1';
+      phy_reset_n_2 <= '1';
+      phy_tx_clk_2  <= '0';
+      phy_txd_2     <= (others => '0');
+      phy_tx_ctl_2  <= '0';
+
+  end generate SINGLE_UDP_GENERATE;
+
+  -- ---------------------------------------------------------------------------
   -- Display MAC address / status on Zedboard LEDs based on switch settings
   with sw(2 downto 0) select led <=
     led_int                      when "000",
@@ -201,6 +306,7 @@ begin
   led_int(6 downto 5) <= eth_speed_2;
   led_int(7) <= '1';
 
+  -- ---------------------------------------------------------------------------
   -- Heartbeat LED
   process(clk)
   begin

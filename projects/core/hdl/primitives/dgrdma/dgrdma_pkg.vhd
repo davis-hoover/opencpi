@@ -24,11 +24,11 @@ package dgrdma is
 
   component rgmii_to_ocpi is
     generic (
-      SDP_WIDTH : natural := 1;      -- default to 32-bit data bus
-      ACK_TRACKER_BITFIELD_WIDTH : natural;
-      ACK_TRACKER_MAX_ACK_COUNT  : natural range 1 to 255;
+      SDP_WIDTH                     : natural := 1; -- default to 32-bit data bus
+      ACK_TRACKER_BITFIELD_WIDTH    : natural;
+      ACK_TRACKER_MAX_ACK_COUNT     : natural range 1 to 255;
       TXN_RECORD_MAX_TXNS_IN_FLIGHT : natural := 64;
-      MAX_FRAME_SIZE : natural := 10240
+      MAX_FRAME_SIZE                : natural := 10240
     );
     port (
       clk                   : in std_logic;
@@ -88,11 +88,11 @@ package dgrdma is
 
   component dual_rgmii_to_ocpi is
     generic (
-      SDP_WIDTH : natural := 1;      -- default to 32-bit data bus
-      ACK_TRACKER_BITFIELD_WIDTH : natural;
-      ACK_TRACKER_MAX_ACK_COUNT  : natural range 1 to 255;
+      SDP_WIDTH                     : natural := 1;      -- default to 32-bit data bus
+      ACK_TRACKER_BITFIELD_WIDTH    : natural;
+      ACK_TRACKER_MAX_ACK_COUNT     : natural range 1 to 255;
       TXN_RECORD_MAX_TXNS_IN_FLIGHT : natural := 64;
-      MAX_FRAME_SIZE : natural := 10240
+      MAX_FRAME_SIZE                : natural := 10240
     );
     port (
       clk                   : in std_logic;
@@ -161,6 +161,77 @@ package dgrdma is
       phy_tx_ctl_2          : out std_logic
     );
   end component dual_rgmii_to_ocpi;
+
+  component rgmii_udp_to_ocpi is
+    generic (
+      SDP_WIDTH                     : natural := 1; -- default to 32-bit data bus
+      ACK_TRACKER_BITFIELD_WIDTH    : natural;
+      ACK_TRACKER_MAX_ACK_COUNT     : natural range 1 to 255;
+      TXN_RECORD_MAX_TXNS_IN_FLIGHT : natural := 64;
+      MAX_FRAME_SIZE                : natural := 10240;
+      UDP_CP_PORT                   : natural := 18077;
+      UDP_SDP_PORT                  : natural := 18078
+    );
+    port (
+      clk                   : in std_logic;
+      reset                 : in std_logic;
+      clk_mac               : in std_logic;
+      clk_mac_90            : in std_logic;
+      reset_mac             : in std_logic;
+      sdp_reset             : in std_logic;
+
+      -- Configuration
+      local_ip_addr         : in std_logic_vector(31 downto 0);
+      local_subnet_mask     : in std_logic_vector(31 downto 0);
+      local_gateway_ip      : in std_logic_vector(31 downto 0);
+      remote_ip_addr        : in std_logic_vector(31 downto 0);
+      remote_udp_port       : in std_logic_vector(15 downto 0);
+      local_mac_addr        : in std_logic_vector(47 downto 0);
+      remote_mac_addr       : in std_logic_vector(47 downto 0);
+      remote_dst_id         : in std_logic_vector(15 downto 0);
+      local_src_id          : in std_logic_vector(15 downto 0);
+      interface_mtu         : in unsigned(15 downto 0);
+      ack_wait              : in unsigned(31 downto 0);
+      max_acks_outstanding  : in unsigned(7 downto 0);
+      coalesce_wait         : in unsigned(31 downto 0);
+      ifg_delay             : in unsigned(7 downto 0);
+      eth_speed             : out std_logic_vector(1 downto 0);
+
+      -- Ack Tracker
+      ack_tracker_rej_ack             : out std_logic;
+      ack_tracker_bitfield            : out std_logic_vector(31 downto 0);
+      ack_tracker_base_seqno          : out std_logic_vector(15 downto 0);
+      ack_tracker_rej_seqno           : out std_logic_vector(15 downto 0);
+      ack_tracker_total_acks_sent     : out std_logic_vector(31 downto 0);
+      ack_tracker_tx_acks_sent        : out std_logic_vector(31 downto 0);
+      ack_tracker_pkts_enqueued       : out std_logic_vector(31 downto 0);
+      ack_tracker_reject_out_of_range : out std_logic_vector(31 downto 0);
+      ack_tracker_reject_already_set  : out std_logic_vector(31 downto 0);
+      ack_tracker_accepted_by_peek    : out std_logic_vector(31 downto 0);
+      ack_tracker_high_watermark      : out std_logic_vector(15 downto 0);
+      frame_parser_reject             : out std_logic_vector(31 downto 0);
+
+      -- Control plane master
+      cp_in                 : in platform.platform_pkg.occp_out_t;
+      cp_out                : out platform.platform_pkg.occp_in_t;
+
+      -- SDP master
+      sdp_in                : in sdp.sdp.s2m_t;
+      sdp_in_data           : in dword_array_t(SDP_WIDTH-1 downto 0);
+      sdp_out               : out sdp.sdp.m2s_t;
+      sdp_out_data          : out dword_array_t(SDP_WIDTH-1 downto 0);
+
+      -- RGMII interface
+      phy_reset_n           : out std_logic;
+      phy_int_n             : in std_logic;
+      phy_rx_clk            : in std_logic;
+      phy_rxd               : in std_logic_vector(3 downto 0);
+      phy_rx_ctl            : in std_logic;
+      phy_tx_clk            : out std_logic;
+      phy_txd               : out std_logic_vector(3 downto 0);
+      phy_tx_ctl            : out std_logic
+    );
+  end component rgmii_udp_to_ocpi;
 
   component xgmii_to_ocpi is
     generic (
@@ -292,5 +363,72 @@ package dgrdma is
       xgmii_txc_2           : out std_logic_vector(7 downto 0)
     );
   end component dual_xgmii_to_ocpi;
+
+  component xgmii_udp_to_ocpi is
+    generic (
+      SDP_WIDTH                     : natural := 4;  -- default to 128-bit data bus
+      ACK_TRACKER_BITFIELD_WIDTH    : natural;
+      ACK_TRACKER_MAX_ACK_COUNT     : natural range 1 to 255;
+      TXN_RECORD_MAX_TXNS_IN_FLIGHT : natural := 64;
+      MAX_FRAME_SIZE                : natural := 10240;
+      UDP_CP_PORT                   : natural := 18077;
+      UDP_SDP_PORT                  : natural := 18078
+    );
+    port (
+      clk                   : in std_logic;
+      reset                 : in std_logic;
+      sdp_reset             : in std_logic;
+
+      -- Configuration
+      local_ip_addr         : in std_logic_vector(31 downto 0);
+      local_subnet_mask     : in std_logic_vector(31 downto 0);
+      local_gateway_ip      : in std_logic_vector(31 downto 0);
+      remote_ip_addr        : in std_logic_vector(31 downto 0);
+      remote_udp_port       : in std_logic_vector(15 downto 0);
+      local_mac_addr        : in std_logic_vector(47 downto 0);
+      remote_mac_addr       : in std_logic_vector(47 downto 0);
+      remote_dst_id         : in std_logic_vector(15 downto 0);
+      local_src_id          : in std_logic_vector(15 downto 0);
+      interface_mtu         : in unsigned(15 downto 0);
+      ack_wait              : in unsigned(31 downto 0);
+      max_acks_outstanding  : in unsigned(7 downto 0);
+      coalesce_wait         : in unsigned(31 downto 0);
+      ifg_delay             : in unsigned(7 downto 0);
+
+      -- Ack Tracker Debug
+      ack_tracker_rej_ack             : out std_logic;
+      ack_tracker_bitfield            : out std_logic_vector(31 downto 0);
+      ack_tracker_base_seqno          : out std_logic_vector(15 downto 0);
+      ack_tracker_rej_seqno           : out std_logic_vector(15 downto 0);
+      ack_tracker_total_acks_sent     : out std_logic_vector(31 downto 0);
+      ack_tracker_tx_acks_sent        : out std_logic_vector(31 downto 0);
+      ack_tracker_pkts_enqueued       : out std_logic_vector(31 downto 0);
+      ack_tracker_reject_out_of_range : out std_logic_vector(31 downto 0);
+      ack_tracker_reject_already_set  : out std_logic_vector(31 downto 0);
+      ack_tracker_accepted_by_peek    : out std_logic_vector(31 downto 0);
+      ack_tracker_high_watermark      : out std_logic_vector(15 downto 0);
+      frame_parser_reject             : out std_logic_vector(31 downto 0);
+
+      -- Control plane master
+      cp_in                 : in platform.platform_pkg.occp_out_t;
+      cp_out                : out platform.platform_pkg.occp_in_t;
+
+      -- SDP master
+      sdp_in                : in sdp.sdp.s2m_t;
+      sdp_in_data           : in dword_array_t(sdp_width-1 downto 0);
+      sdp_out               : out sdp.sdp.m2s_t;
+      sdp_out_data          : out dword_array_t(sdp_width-1 downto 0);
+
+      -- XGMII interface
+      xgmii_rx_clk          : in  std_logic;
+      xgmii_rx_reset        : in  std_logic;
+      xgmii_rxd             : in  std_logic_vector(63 downto 0);
+      xgmii_rxc             : in  std_logic_vector(7 downto 0);
+      xgmii_tx_clk          : in  std_logic;
+      xgmii_tx_reset        : in  std_logic;
+      xgmii_txd             : out std_logic_vector(63 downto 0);
+      xgmii_txc             : out std_logic_vector(7 downto 0)
+    );
+  end component xgmii_udp_to_ocpi;
 
 end package dgrdma;

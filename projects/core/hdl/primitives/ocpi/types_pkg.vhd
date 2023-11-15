@@ -153,6 +153,7 @@ type long_array_t is array (natural range <>) of long_t;
 constant long_min : long_t := x"8000_0000";
 constant long_max : long_t := x"7fff_ffff";
 function To_long (c: integer) return long_t;
+function To_long (c: std_logic_vector(long_t'range)) return long_t;
 function from_long (c: long_t) return std_logic_vector;
 --function slv(a: long_t) return std_logic_vector;
 function slv(a: long_array_t) return std_logic_vector;

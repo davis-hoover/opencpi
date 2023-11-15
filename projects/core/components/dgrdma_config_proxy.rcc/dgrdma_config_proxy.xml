@@ -20,6 +20,8 @@
     <specproperty Name='ack_tracker_accepted_by_peek'       ReadSync='true'  WriteSync='true' />
     <specproperty Name='ack_tracker_high_watermark'         ReadSync='true'  WriteSync='true' />
     <specproperty Name='frame_parser_reject'                ReadSync='true'  WriteSync='true' />
+    <specproperty Name='remote_ip_addr'                     ReadSync='true'  WriteSync='true' />
+    <specproperty Name='remote_udp_port'                    ReadSync='true'  WriteSync='true' />
 
     <slaves>
         <Instance worker='dgrdma_config_dev.hdl' name='dgrdma_config_dev1' />

@@ -526,8 +526,17 @@ namespace OCPI {
 	  ocpiInfo("Processing discovery for %s from network address %s",
 		   mi->first.c_str(), mi->second.first.pretty());
 	  std::string err;
-	  Device *dev = createDevice(mi->second.second, mi->second.first, discoveryOnly, false,
-				     params, err);
+          Device *dev = nullptr;
+
+          if (udp) {            
+            OE::Address udpAddr(mi->second.first.addrPort(), mi->second.first.addrInAddr());
+            OE::Interface udpIfc("udp", err);
+            dev = createDevice(udpIfc, udpAddr, discoveryOnly, false, params, err);
+          }
+          else {
+            dev = createDevice(mi->second.second, mi->second.first, discoveryOnly, false, params, err);
+          }
+
 	  if (dev && found(*dev, excludes, discoveryOnly, err)) {
 	    ocpiInfo("error creating device for %s (MAC %s): %s", mi->second.first.pretty(),
 		     mi->first.c_str(), error.c_str());

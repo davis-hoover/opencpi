@@ -225,6 +225,26 @@ class Dgrdma_config_proxyWorker : public Dgrdma_config_proxyWorkerBase {
     return RCC_OK;
   }
 
+  RCCResult remote_ip_addr_read() {
+    properties().remote_ip_addr = slave.get_remote_ip_addr_d();
+    return RCC_OK;
+  }
+
+  RCCResult remote_ip_addr_written() {
+    slave.set_remote_ip_addr_d(properties().remote_ip_addr);
+    return RCC_OK;
+  }
+
+  RCCResult remote_udp_port_read() {
+    properties().remote_udp_port = slave.get_remote_udp_port_d();
+    return RCC_OK;
+  }
+
+  RCCResult remote_udp_port_written() {
+    slave.set_remote_udp_port_d(properties().remote_udp_port);
+    return RCC_OK;
+  }
+
   RCCResult run(bool /*timedout*/) {
     return RCC_DONE; // change this as needed for this worker to do something useful
     // return RCC_ADVANCE; when all inputs/outputs should be advanced each time "run" is called.
