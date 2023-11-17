@@ -24,11 +24,12 @@
     <parameter name="udp_enable" value="true"/>
     <parameter name="sdp_width" value="1"/>
   </configuration>
-
+  
   <configuration id="2">
     <parameter name="udp_enable" value="true"/>
     <parameter name="sdp_width" value="1"/>
-    <parameter name="local_ip_address_d" value="0xc0a80003"/>    
+    <parameter name="local_ip_address_d" value="0xc0a80003"/> 
+    <parameter name="local_subnet_mask_d" value="0xffffff00"/> 
     <parameter name="local_gateway_ip_d" value="0xc0a80001"/>
   </configuration>
 

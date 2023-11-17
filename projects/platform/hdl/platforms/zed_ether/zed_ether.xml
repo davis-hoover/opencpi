@@ -16,7 +16,7 @@
      You should have received a copy of the GNU Lesser General Public License
      along with this program. If not, see <http://www.gnu.org/licenses/>. -->
 <!-- This file defines the zed_ether HDL platform -->
-<HdlPlatform Language="VHDL" Spec="platform-spec" configurations="base cfg_dgrdma_ether cfg_dgrdma_udp cfg_dgrdma_udp_ip"
+<HdlPlatform Language="VHDL" Spec="platform-spec" configurations="base cfg_dgrdma_ether cfg_dgrdma_udp_default cfg_dgrdma_udp_ip"
              ComponentLibraries="components" Libraries="sdp platform cdc dgrdma i2c"
              SourceFiles="clock_gen.vhd i2c_macaddr_eeprom.vhd zed_ether.vhd"
              Part="xc7z020-1-clg484">
@@ -51,13 +51,7 @@
   <property name="local_ip_address_d" type="ulong" parameter="1" default="0xc0a83202"/>
   <property name="local_subnet_mask_d" type="ulong" parameter="1" default="0xffffff00"/>
   <property name="local_gateway_ip_d" type="ulong" parameter="1" default="0xc0a83201"/>
-  <!--
-  <property name="local_ip_address_d" type="ulong" parameter="1" default="0xc0a83202"/>
-  <property name="local_subnet_mask_d" type="uLong" parameter="1" default="0xffffff00"/>
-  <property name="local_gateway_ip_d" type="uLong" parameter="1" default="0xc0a83201"/>
-  
 
-  <property name="chris_bool" type="bool" parameter="1" default="false"/>-->
   <!-- Put any additional platform-specific properties here using <Property> -->
   <property name="udp_enable" type="bool" parameter="1" default="false" 
     description="DGRDMA uses UDP protocol"/>

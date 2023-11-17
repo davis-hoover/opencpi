@@ -18,6 +18,6 @@
 <HdlConfig>
     <!-- Applies default ip values -->
     <property name="udp_enable" value="true"/>
-    <property name="sdp_width"  value="1"/>  
+    <property name="sdp_width"  value="1"/>
     <device name='dgrdma_config_dev'/>
 </HdlConfig>

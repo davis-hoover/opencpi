@@ -49,25 +49,8 @@ architecture rtl of zed_ether_worker is
   signal reset_mac : std_logic;
   signal phy_int_n_i : std_logic;
 
-    -- Local IP ADDRESS, GATEWAY and subnet mask for UDP Transport
-  constant local_ip_addr_c      : std_logic_vector(31 downto 0) := std_logic_vector((local_ip_address_d));
-  constant local_subnet_mask_c  : std_logic_vector(31 downto 0) := X"ffffff00";
-  constant local_gateway_ip_c   : std_logic_vector(31 downto 0) := X"c0a80001";
-
-  signal local_ip_addr_s : std_logic_vector(31 downto 0);
-  
-  --variable local_ip_addr_slv 		: std_logic_vector(31 downto 0);
-  --variable local_subnet_mask_slv 	: std_logic_vector(31 downto 0);
-  --variable local_gateway_ip_slv 	: std_logic_vector(31 downto 0);
-
-  --local_ip_addr_slv := std_logic_vector( to_unsigned(local_ip_addr_d, local_ip_addr_slv'length));
-  --local_subnet_mask_slv := std_logic_vector( to_unsigned(local_subnet_mask_d, local_subnet_mask_slv'length));
-  --local_gateway_ip_slv := std_logic_vector( to_unsigned(local_gateway_ip_d, local_gateway_ip_slv'length));
-
-
 begin
 
-  --local_ip_addr_s <= to_slv(local_ip_address_d,32);
   -- ---------------------------------------------------------------------------
   -- Drive metadata interface - boiler plate
   metadata_out.clk     <= clk;
@@ -225,9 +208,9 @@ begin
         sdp_reset     => sdp_reset,
 
         -- Configuration
-        local_ip_addr         => local_ip_addr_c,
-        local_subnet_mask     => local_subnet_mask_c,
-        local_gateway_ip      => local_gateway_ip_c,
+        local_ip_addr         => std_logic_vector(local_ip_address_d),
+        local_subnet_mask     => std_logic_vector(local_subnet_mask_d),
+        local_gateway_ip      => std_logic_vector(local_gateway_ip_d),
         remote_ip_addr        => dev_in(0).REMOTE_IP_ADDR,
         remote_udp_port       => dev_in(0).REMOTE_UDP_PORT,
         local_mac_addr        => local_mac_addr,
