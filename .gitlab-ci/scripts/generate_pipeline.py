@@ -14,7 +14,7 @@ from collections import namedtuple
 
 Project = namedtuple('Project', ['name', 'path', 'libraries'])
 Library = namedtuple('Library', ['name', 'path', 'project'])
-Platform = namedtuple('Platform', ['name', 'target', 'model', 'project_name', 'tests'])
+Platform = namedtuple('Platform', ['name', 'target', 'model', 'project_name', 'tests', 'other_platforms'])
 Target = namedtuple('Target', ['name', 'project_name'])
 Asset = namedtuple('Asset', ['name', 'path', 'library'])
 ExternalProject = namedtuple('ExternalProject', ['name', 'url', 'branch'])
@@ -51,13 +51,14 @@ class Stages:
 class Job:
     """Representation of a CI/CD Job"""
     __slots__ = ('name', 'stage', 'image', 'script', 'before_script', 'needs', 'artifacts', 
-                 'parallel', 'variables', 'services', 'when', 'retry', 'tags')
+                 'parallel', 'variables', 'services', 'when', 'retry', 'tags', 'after_script')
 
     def __init__(self, name: str, stage: str, image: str, script: List[str], 
-                 before_script: List[str], needs: Optional[List[str]]=None, 
-                 artifacts: Optional[List[dict]]=None, parallel: Optional[dict]=None, 
-                 variables: Optional[dict]=None, services: Optional[Union[str, List[str]]]=None,
-                 when: Optional[str]=None, tags: Optional[List[str]]=None):
+                 before_script: List[str], after_script: List[str], 
+                 needs: Optional[List[str]]=None, artifacts: Optional[List[dict]]=None, 
+                 parallel: Optional[dict]=None, variables: Optional[dict]=None, 
+                 services: Optional[Union[str, List[str]]]=None, when: Optional[str]=None, 
+                 tags: Optional[List[str]]=None):
         self.name = name
         self.stage = stage
         self.image = image
@@ -79,6 +80,8 @@ class Job:
             self.when = when
         if tags is not None:
             self.tags = tags
+        if after_script is not None:
+            self.after_script = after_script
 
     def to_dict(self):
         """Convert a Job into a dictionary representation."""
@@ -140,7 +143,8 @@ class JobBuilder:
 
     def build(self, stage: str, image: str, target: Optional[Union[Target, Platform]]=None, 
               library: Path=None, assets: Optional[Union[Asset, List[Asset]]]=None, 
-              external_project: ExternalProject=None) -> Job:
+              external_project: Optional[ExternalProject]=None, 
+              other_platform: Optional[Platform]=None) -> Job:
         """Build a Job.
         
         If assets arg is provided as a list, the built job will contain 
@@ -163,7 +167,7 @@ class JobBuilder:
         Returns:
             A Job based on the provided args.
         """
-        name = self.build_name(stage, target, library, assets, external_project)
+        name = self.build_name(stage, target, other_platform, library, assets, external_project)
         needs = self.build_needs(stage, target, library=library, assets=assets)
         when = self.build_when(stage)
         if stage in Stages.trigger_stages:
@@ -171,19 +175,21 @@ class JobBuilder:
             return Bridge(name, stage, trigger, needs=needs, when=when)
         before_script = self.build_before_script(stage)
         script = self.build_script(stage, target=target, asset=assets,
-                                   external_project=external_project)
+                                   external_project=external_project,
+                                   other_platform=other_platform)
+        after_script = self.build_after_script(stage)
         if isinstance(assets, list):
             artifacts = None
             parallel = self.build_parallel(assets)
         else:
             artifacts = self.build_artifacts(stage, asset=assets)
             parallel = None
-        tags = self.build_tags(stage, target=target)
+        tags = self.build_tags(stage, target=target, other_platform=other_platform)
         variables = self.build_variables(stage, target=target, library=library)
         services = self.build_services(stage)
         return Job(name, stage, image, script, before_script, needs=needs, 
                    artifacts=artifacts, parallel=parallel, variables=variables,
-                   services=services, when=when, tags=tags)
+                   services=services, when=when, tags=tags, after_script=after_script)
 
     def build_name(self, stage: str, *args):
         """Build the name of the Job.
@@ -259,6 +265,9 @@ class JobBuilder:
                 'cd ${OLDPWD}',
                 'source ./cdk/opencpi-setup.sh -r'
             ]
+            if stage is Stages.run_tests:
+                script.append(f'ocpiremote unload -i $CI_OCPI_DEVICE_IP -u $CI_OCPI_DEVICE_USER'
+                               ' -p $CI_OCPI_DEVICE_PWD || true')
             return script
         if stage is Stages.deploy:
             return ('aws ecr get-login-password --region us-east-1'
@@ -266,8 +275,8 @@ class JobBuilder:
         return 'source ./cdk/opencpi-setup.sh -r'
     
     def build_script(self, stage: str, target: Optional[Union[Target, Platform]]=None,
-                     asset: Optional[Asset]=None, external_project: Optional[ExternalProject]=None
-                    ) -> Union[str, List[str]]:
+                     asset: Optional[Asset]=None, external_project: Optional[ExternalProject]=None,
+                     other_platform: Optional[Platform]=None) -> Union[str, List[str]]:
         """Build the script of the Job.
         
         Args:
@@ -275,6 +284,7 @@ class JobBuilder:
             target: Optional. The Target or Platform the Job is for.
             asset: Optional. Asset to create script for.
             external_project: Optional. ExternalProject the job is for.
+            other_platform: Associated platform for ocpiremote cmds.
         Returns:
             A string or List of strings for the Job to execute.
         """
@@ -311,14 +321,20 @@ class JobBuilder:
             else:
                 script += ' tests'
         elif stage in Stages.run_tests:
-            script = [
-                f'cp -r {self.artifacts_dir_path.joinpath(asset.name)}/* {asset.path}',
-                f'ocpidev run -d "{asset.path}" --only-platform {target.name} --nothing-error'
-            ]
+            script = [f'cp -Tr {self.artifacts_dir_path.joinpath(asset.name)} {asset.path}']
+            run_cmd = f'ocpidev run -d "{asset.path}" --only-platform {target.name} --nothing-error'
+            if not target.name.endswith('sim'):
+                load_cmd = (f'ocpiremote load --{target.model}-platform={target.name}'
+                            f' --{other_platform.model}-platform={other_platform.name}'
+                            ' -i $CI_OCPI_DEVICE_IP -r 1000 -u $CI_OCPI_DEVICE_USER'
+                            ' -p $CI_OCPI_DEVICE_PWD')
+                start_cmd = f'ocpiremote start -i $CI_OCPI_DEVICE_IP -u $CI_OCPI_DEVICE_USER -p $CI_OCPI_DEVICE_PWD -b'
+                script += [load_cmd, start_cmd]
+            script.append(run_cmd)
         elif stage is Stages.build_tests:
             script = [
                 f'ocpidev build -d "{asset.path}" --{target.model}-platform {target.name} --artifacts-only',
-                f'cp -r {asset.path} {self.artifacts_dir_path.joinpath(asset.name)}'
+                f'cp -Tr {asset.path} {self.artifacts_dir_path.joinpath(asset.name)}'
             ]
         elif stage is Stages.register_projects:
             script = []
@@ -352,6 +368,16 @@ class JobBuilder:
         else:
             script = ''
         return script
+    
+    def build_after_script(self, stage: str):
+        if stage is Stages.run_tests:
+            return ([
+                'cd ${OLDPWD}',
+                'source ./cdk/opencpi-setup.sh -r',
+                f'ocpiremote unload -i $CI_OCPI_DEVICE_IP -u $CI_OCPI_DEVICE_USER'
+                    ' -p $CI_OCPI_DEVICE_PWD'
+            ])
+        return None
     
     def build_artifacts(self, stage: str, asset: Asset) -> Optional[Dict[str, str]]:
         """Build the artifacts of the Job.
@@ -437,22 +463,13 @@ class JobBuilder:
         variables = {}
         if library is not None:
             variables["DIR"] = str(library.path)
-        if target is not None and isinstance(target, Platform):
-            if target.model == 'rcc':
-                variables['KUBERNETES_CPU_REQUEST'] = '3000m'
-                variables['KUBERNETES_CPU_LIMIT'] = '3000m'
-                variables['KUBERNETES_MEMORY_REQUEST'] = '7Gi'
-                variables['KUBERNETES_MEMORY_LIMIT'] = '7Gi'
-            else:
-                variables['KUBERNETES_CPU_REQUEST'] = '7000m'
-                variables['KUBERNETES_CPU_LIMIT'] = '7000m'
-                variables['KUBERNETES_MEMORY_REQUEST'] = '15Gi'
-                variables['KUBERNETES_MEMORY_LIMIT'] = '15Gi'
         if stage is Stages.deploy:
             variables['DOCKER_HOST'] = 'tcp://docker:2376'
             variables['DOCKER_TLS_CERTDIR'] = '/certs'
             variables['DOCKER_TLS_VERIFY'] = 1
             variables['DOCKER_CERT_PATH'] = "/certs/client"
+        if stage is Stages.run_tests and not target.name.endswith('sim'):
+            variables['OCPI_SERVER_ADDRESSES'] = '$CI_OCPI_DEVICE_IP:1000'
         if not variables:
             return None
         return variables
@@ -481,7 +498,7 @@ class JobBuilder:
             return 'always'
         return None
     
-    def build_tags(self, stage: str, target: Union[Target, Platform]=None) -> List[str]:
+    def build_tags(self, stage: str, target: Optional[Union[Target, Platform]]=None, other_platform: Optional[Platform]=None) -> List[str]:
         """Build the tags for the Job.
         
         Dictates what runner(s) are allowed to run the job.
@@ -494,8 +511,12 @@ class JobBuilder:
         """
         tags = ['opencpi']
         if stage in Stages.run_stages and not target.name.endswith('sim'):
-            # Local HWIL jobs
-            tags.append(target.name)
+        # Local HWIL jobs
+            tags.append('docker')
+            if target.model == 'hdl':
+                tags.append(target.name)
+            else:
+                tags.append(other_platform.name)
         else:
             tags += ['aws', 'eks']
         return tags
@@ -519,6 +540,7 @@ class PipelineBuilder:
            self.applications: List[Asset] = kwargs.get('applications', [])
            self.external_projects: List[Project] = kwargs.get('external_projects', [])
            self.do_hwil: bool = kwargs.get('do_hwil', False)
+           self.hwil_whitelist: dict = kwargs.get('hwil_whitelist', {})
 
     def build(self, stages: List[str], target: Target=None) -> Pipeline:
         """Builds a Pipeline.
@@ -558,13 +580,26 @@ class PipelineBuilder:
                     jobs.append(self.job_builder.build(stage, image, external_project=project))
             elif stage is Stages.deploy:
                 jobs.append(self.job_builder.build(stage, image))
+            elif stage is Stages.run_tests and not target.name.endswith('sim') and not target.other_platforms:
+                continue
             else:
                 for project in self.projects:
                     for library in project.libraries:
                         assets = self.assets_by_stage(stage, target=target, library=library)
                         if not assets:
                             continue
-                        if stage in Stages.test_stages:
+                        if stage is Stages.run_tests:
+                            if target.name.endswith('sim'):
+                                for asset in assets:
+                                    jobs.append(self.job_builder.build(stage, image, target=target, 
+                                        assets=asset, library=library))
+                            else:
+                                for other_platform in target.other_platforms:
+                                    for asset in assets:
+                                        jobs.append(self.job_builder.build(
+                                            stage, image, target=target, assets=asset, 
+                                            library=library, other_platform=other_platform))
+                        elif stage in Stages.test_stages:
                             for asset in assets:
                                 jobs.append(self.job_builder.build(
                                     stage, image, target=target, assets=asset, library=library))
@@ -640,10 +675,15 @@ def get_args(pipeline_type) -> Dict[str, str]:
     image_tag = os.getenv('CI_OCPI_ROOT_PIPELINE_ID', '${CI_OCPI_ROOT_PIPELINE_ID}')
     args['deploy_image'] = f'{container_registry}/{host}:{image_tag}'
     args['do_hwil'] = os.getenv('CI_OCPI_HWIL', False)
+    if args['do_hwil']:
+        with open(".gitlab-ci/yaml/hwil-whitelist.yml", "r") as yml:
+            args['hwil_whitelist'] = yaml.safe_load(yml)
+    else:
+        args['hwil_whitelist'] = {}
     if pipeline_type == 'projects':
         args['external_projects'] = get_external_projects()
         return args
-    platforms = get_platforms()
+    platforms = get_platforms(args['hwil_whitelist'])
     projects = get_projects()
     args['platforms'] = platforms
     args['projects'] = projects
@@ -659,11 +699,11 @@ def get_args(pipeline_type) -> Dict[str, str]:
     return args
 
 
-def get_platforms() -> List[Platform]:
+def get_platforms(hwil_whitelist: dict={}) -> List[Platform]:
     """Gets the OpenCPI Platforms to run the Pipeline for.
     
-    Uses ocpidev to find available platforms. Filters platforms based
-    on those defined in CI_OCPI_PLATFORMS environment variable.
+    Uses ocpidev to find available platforms. Filters platforms based on
+    those defined in CI_OCPI_PLATFORMS environment variable directive.
 
     Returns:
         List of Platforms.
@@ -671,15 +711,50 @@ def get_platforms() -> List[Platform]:
     platforms = json.loads(subprocess.run(['ocpidev', 'show', 'platforms', '--json'], 
                                           stdout=subprocess.PIPE).stdout)
     platforms_dict = {**platforms['rcc'], **platforms['hdl']}
-    platforms_directive = re.split(r'[,\s]', os.environ['CI_OCPI_PLATFORMS'])
+    platforms_directive = re.split(r'\s', os.environ['CI_OCPI_PLATFORMS'])
+    platforms_directive_dict = {}
+    for platform in platforms_directive:
+    # Parse platforms directive
+        if ':' in platform:
+            platform_name, other_platforms = platform.split(':')
+        else:
+            platform_name = platform
+            other_platforms = ''
+        platform_name = platform_name.strip(',')
+        if platform_name not in platforms_directive_dict:
+        # Initialize platform in directive dict
+            platforms_directive_dict[platform_name] = set()
+        for other_platform_name in other_platforms.split(','):
+        # Associate platforms in directive dict
+            if other_platform_name not in platforms_directive_dict:
+                platforms_directive_dict[other_platform_name] = set()
+            if (platform_name not in hwil_whitelist 
+                or other_platform_name not in hwil_whitelist[platform_name]):
+            # Do not associate platforms not in whitelist
+                continue
+            platforms_directive_dict[platform_name].add(other_platform_name)
+            platforms_directive_dict[other_platform_name].add(platform_name)
     platforms = []
     for name, platform in platforms_dict.items():
-        if name not in platforms_directive:
+    # Initialize platform named_tuples
+        if name not in platforms_directive_dict:
+        # Ignore platforms not specified in platforms directive
             continue
         project_name = '.'.join(platform['package_id'].split('.')[:-1])
         target = Target(platform['target'], project_name)
-        platform = Platform(name, target, platform['model'], project_name, [])
+        platform = Platform(name, target, platform['model'], project_name, [], [])
         platforms.append(platform)
+    for platform in platforms:
+    # Associate platform named_tuples
+        platform.other_platforms.extend(
+            [other_platform for other_platform in platforms 
+             if other_platform.name in platforms_directive_dict[platform.name]]
+        )
+    print('Platform Directive:')
+    for platform in platforms:
+        print(f'{platform.name}:')
+        for other_platform in platform.other_platforms:
+            print(f'\t{other_platform.name}')
     return platforms
 
 
@@ -861,7 +936,6 @@ def main(pipeline_type, **kwargs):
             PipelineBuilder.
     """
     ci_project_dir = os.environ.get('CI_PROJECT_DIR', '$CI_PROJECT_DIR')
-    print(f'CI_PROJECT_DIR: {ci_project_dir}')
     artifact_dir_path = Path(ci_project_dir).joinpath('.gitlab-ci', 'artifacts').resolve()
     job_builder = JobBuilder(artifact_dir_path=artifact_dir_path)
     pipeline_builder = PipelineBuilder(job_builder, **kwargs)
