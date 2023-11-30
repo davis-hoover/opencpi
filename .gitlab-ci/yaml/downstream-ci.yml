@@ -6,7 +6,15 @@ workflow:
     - when: always
 
 stages:
+  - clone-project
   - trigger-opencpi
+
+clone-project:
+  stage: clone-project
+  tags: ['aws', 'eks', 'opencpi']
+  variables:
+    GIT_CLONE_PATH: /builds/$CI_PIPELINE_ID/$CI_PROJECT_NAME
+  script: echo $PWD && ls -al
 
 trigger-opencpi:
   stage: trigger-opencpi
@@ -14,6 +22,7 @@ trigger-opencpi:
     CI_OCPI_SOURCE_REF_NAME: "$CI_COMMIT_REF_NAME"
     CI_OCPI_SOURCE_PROJECT_NAME: "$CI_PROJECT_NAME"
     CI_OCPI_PROJECTS: "${CI_OCPI_PROJECTS}"
+    CI_OCPI_ROOT_PIPELINE_ID: $CI_PIPELINE_ID
   trigger:
     project: opencpi/opencpi
     branch: '$CI_OCPI_REF_NAME'

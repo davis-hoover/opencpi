@@ -338,17 +338,17 @@ class JobBuilder:
             ]
         elif stage is Stages.register_projects:
             script = []
+            ci_project_path = Path(os.getenv('CI_PROJECT_DIR', '${CI_PROJECT_DIR}')).resolve()
             if external_project.name.startswith('ocpi.osp'):
-                project_path = Path(os.getenv('CI_PROJECT_DIR', '${CI_PROJECT_DIR}'),
-                                    'projects',
-                                    'osps',
-                                    external_project.name).resolve()
+                project_path = ci_project_path.joinpath('projects', 'osps', external_project.name)
             else:
-                project_path = Path(os.getenv('CI_PROJECT_DIR', '${CI_PROJECT_DIR}'),
-                                    'projects',
-                                    external_project.name).resolve()
-            script.append(f'git clone {external_project.url} -b {external_project.branch}'
-                          f' "{project_path}"')
+                project_path = ci_project_path.joinpath('projects', external_project.name)
+            existing_path = ci_project_path.parent.joinpath(external_project.name)
+            if existing_path.exists():
+                script.append(f'mv {existing_path} {project_path}')
+            else:
+                script.append(f'git clone {external_project.url} -b {external_project.branch}'
+                            f' "{project_path}"')
             script.append(f'ocpidev register project -d "{project_path}"')
             if external_project.name.startswith('ocpi.comp'):
                 script.append(f'ocpidev build project -d "{project_path}"')
