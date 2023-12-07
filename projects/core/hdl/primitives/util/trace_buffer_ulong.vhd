@@ -28,6 +28,8 @@ entity trace_buffer_ulong is
          rawout : out raw_out_t); -- wire to raw interface
 end entity trace_buffer_ulong;
 architecture rtl of trace_buffer_ulong is
+  constant zero_c  : std_logic := '0';
+  constant one_c   : std_logic := '1';
   constant depth_c : natural := to_integer(depth);
   constant width_c : natural := ocpi.util.width_for_max(depth_c-1);
   signal bram_addr : unsigned(width_c-1 downto 0);
@@ -41,13 +43,13 @@ begin
                 DATA_WIDTH => ulong_t'length,
                 MEMSIZE    => depth_c)
     port map   (CLKA       => clk,
-                ENA        => '1',
-                WEA        => '0',
+                ENA        => one_c,
+                WEA        => zero_c,
                 ADDRA      => std_logic_vector(bram_addr),
                 DIA        => slv0(dword_size),
                 to_ulong(DOA) => bram_data,
                 CLKB       => clk,
-                ENB        => '1',
+                ENB        => one_c,
                 WEB        => give,
                 ADDRB      => std_logic_vector(count_r(width_c-1 downto 0)),
                 DIB        => std_logic_vector(input),

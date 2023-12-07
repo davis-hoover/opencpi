@@ -34,6 +34,7 @@ entity reset_detector is
                                               -- a synchronous unreset, detected
 end entity reset_detector;
 architecture rtl of reset_detector is
+  constant zero_c      : std_logic := '0';
   signal rising_pulse  : std_logic := '0';
   signal falling_pulse : std_logic := '0';
   signal rst_sticky    : std_logic := '0';
@@ -43,7 +44,7 @@ begin
   edge_detector_i : util.util.edge_detector
     port map(
       clk           => clk,
-      reset         => '0',
+      reset         => zero_c,
       din           => rst,
       rising_pulse  => open,
       falling_pulse => falling_pulse);
@@ -51,7 +52,7 @@ begin
   rst_sticky_reg : util.util.set_clr 
     port map(
       clk => clk,
-      rst => '0',
+      rst => zero_c,
       set => rst,
       clr => clr,
       q   => open,
@@ -61,7 +62,7 @@ begin
   detected_gen : util.util.set_clr 
     port map(
       clk => clk,
-      rst => '0',
+      rst => zero_c,
       set => tmp,
       clr => clr,
       q   => rst_then_unrst_detected,
