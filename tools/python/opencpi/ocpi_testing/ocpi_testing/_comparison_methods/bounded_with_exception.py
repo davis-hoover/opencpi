@@ -29,8 +29,10 @@ from .bounded import BoundedDefaults
 
 
 class BoundedWithExceptionDefaults:
-    # This class houses all the default values used. The structure is designed
-    # for importing and documenting in an easier way.
+    """This class houses all the default values used.
+
+    The structure is designed for importing and documenting in an easier way.
+    """
 
     # The : after the # of comments here ensures the comments are imported into
     # the build documentation.
@@ -49,7 +51,7 @@ class BoundedWithExceptionDefaults:
 
 
 class BoundedWithException(BasicComparison):
-    """ Check rate of sample difference above bound is below exception rate
+    """Check rate of sample difference above bound is below exception rate.
 
     Checks all the differences between respective samples in reference and
     implementation-under-test are below the allowed standard bound. If above
@@ -62,7 +64,7 @@ class BoundedWithException(BasicComparison):
     """
 
     def __init__(self, complex_, sample_data_type):
-        """ Check messages sets are similar / the same
+        """Check messages sets are similar / the same.
 
         Args:
             complex (bool): Indicate if the data type is complex (True) or not
@@ -86,7 +88,7 @@ class BoundedWithException(BasicComparison):
         self.WRAP_ROUND_VALUES = BoundedDefaults.WRAP_ROUND_VALUES
 
     def variable_summary(self):
-        """ Returns summary of the variables that control the comparison method
+        """Returns summary of the variables that control the comparison method.
 
         Cannot rely on the values being fixed for all tests since may need to
         be changed depending on the component-under-tests performance.
@@ -102,7 +104,7 @@ class BoundedWithException(BasicComparison):
                 "WRAP_ROUND_VALUES": self.WRAP_ROUND_VALUES}
 
     def same(self, reference, implementation):
-        """ Checks if two output data sets are considered the same
+        """Checks if two output data sets are considered the same.
 
         In this case same is where all data of all messages values match within
         a standard bound or a set number of values match within a larger bound.
@@ -144,7 +146,7 @@ class BoundedWithException(BasicComparison):
         return True, ""
 
     def _check_message(self, reference, implementation):
-        """ Check two messages are the same
+        """Check two messages are the same.
 
         Args:
             reference (dict): The reference message to check the implementation
@@ -167,13 +169,9 @@ class BoundedWithException(BasicComparison):
 
         # Time and sample interval are a single data value
         elif reference["opcode"] in ["time", "sample_interval"]:
-            if reference["data"] != implementation["data"]:
-                return False, (
-                    f"{reference['opcode'].capitalize()} data differs " +
-                    "between reference and implementation-under-test.\n" +
-                    f"Reference data                : {reference['data']}\n" +
-                    "Implementation-under-test data: " +
-                    f"{implementation['data']}")
+            success, msg = self._check_time_message(reference, implementation)
+            if not success:
+                return False, msg
 
         # Flush and discontinuity are messages without data
         elif reference["opcode"] in ["flush", "discontinuity"]:
@@ -199,7 +197,7 @@ class BoundedWithException(BasicComparison):
         return True, ""
 
     def _check_sample_data(self, reference_data, implementation_data):
-        """ Determine if all sample data values are within bound
+        """Determine if all sample data values are within bound.
 
         Checks if the difference between each data point is within the allowed
         bound, set by ``self.BOUND``.
@@ -311,7 +309,7 @@ class BoundedWithException(BasicComparison):
         return True, ""
 
     def _within_bound(self, reference, implementation, bound):
-        """ Check if two values are within allowed bound
+        """Check if two values are within allowed bound.
 
         If ``self.WRAP_ROUND_VALUES`` are set then the allowed bounds variation
         includes allowing overflow, for example if ``self.WRAP_ROUND_VALUES``
@@ -391,12 +389,10 @@ class BoundedWithException(BasicComparison):
         return True
 
     def __repr__(self):
-        """ Official string representation of object
-        """
+        """Official string representation of object."""
         return (f"ocpi_testing.Bounded(complex_={self._complex}, " +
                 f"sample_data_type={self._sample_data_type})")
 
     def __str__(self):
-        """ Informal string representation of object
-        """
+        """Informal string representation of object."""
         return self.__repr__()

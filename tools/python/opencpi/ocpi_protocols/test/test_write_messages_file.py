@@ -241,3 +241,89 @@ class TestWriteMessagesFile(unittest.TestCase):
     def test_has_str(self):
         with WriteMessagesFile(self._test_file, "float_timed_sample") as file:
             self.assertIsInstance(str(file), str)
+
+    def test_write_message_time(self):
+        inputs = []
+        expected = []
+
+        # feef dccd . 04d9 d92a e237 8fff = 4277132493.0189491014191089934283994400399109281352139078080654144287109375
+        inputs.append("                     4277132493.0189491014191089934283994400399109281352139078080654144287109375")
+        expected.append([0xff, 0x8f, 0x37, 0xe2,
+                         0x2a, 0xd9, 0xd9, 0x04,
+                         0xcd, 0xdc, 0xef, 0xfe])
+
+        # feef dccd . 04d9 d92a e237 9000 = 4277132493.0189491014191089934826095486641861498355865478515625
+        inputs.append("                     4277132493.0189491014191089934826095486641861498355865478515625")
+        expected.append([0x00, 0x90, 0x37, 0xe2,
+                         0x2a, 0xd9, 0xd9, 0x04,
+                         0xcd, 0xdc, 0xef, 0xfe])
+
+        # 1234 5678 . 90ab cdef 8765 4321 = 305419896.5651215276515318287745871794758301120964461006224155426025390625
+        inputs.append("                     305419896.5651215276515318287745871794758301120964461006224155426025390625")
+        expected.append([0x21, 0x43, 0x65, 0x87,
+                         0xef, 0xcd, 0xab, 0x90,
+                         0x78, 0x56, 0x34, 0x12])
+
+        # Generate the expected data to verify against
+        header = [0x0c, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00]
+        expected_bytes = []
+        for e in expected:
+            expected_bytes.append(bytes(header + e))
+
+        # Test each input and expected output
+        for i, input in enumerate(inputs):
+
+            with WriteMessagesFile(self._test_file,
+                                   "bool_timed_sample") as protocol:
+                protocol.write_message("time", input)
+
+            with open(self._test_file, "rb") as binary_file:
+                actual_bytes = binary_file.read()
+                print(f"Set #{i}:")
+                print(actual_bytes.hex())
+                print(expected_bytes[i].hex())
+                self.assertEqual(actual_bytes, expected_bytes[i],
+                                 f"Expected data set #{i} doesn't match!")
+
+    def test_write_message_sample_interval(self):
+        inputs = []
+        expected = []
+
+        # feef dccd . 04d9 d92a e237 8fff = 4277132493.0189491014191089934283994400399109281352139078080654144287109375
+        inputs.append("                     4277132493.0189491014191089934283994400399109281352139078080654144287109375")
+        expected.append([0xff, 0x8f, 0x37, 0xe2,
+                         0x2a, 0xd9, 0xd9, 0x04,
+                         0xcd, 0xdc, 0xef, 0xfe])
+
+        # feef dccd . 04d9 d92a e237 9000 = 4277132493.0189491014191089934826095486641861498355865478515625
+        inputs.append("                     4277132493.0189491014191089934826095486641861498355865478515625")
+        expected.append([0x00, 0x90, 0x37, 0xe2,
+                         0x2a, 0xd9, 0xd9, 0x04,
+                         0xcd, 0xdc, 0xef, 0xfe])
+
+        # 1234 5678 . 90ab cdef 8765 4321 = 305419896.5651215276515318287745871794758301120964461006224155426025390625
+        inputs.append("                     305419896.5651215276515318287745871794758301120964461006224155426025390625")
+        expected.append([0x21, 0x43, 0x65, 0x87,
+                         0xef, 0xcd, 0xab, 0x90,
+                         0x78, 0x56, 0x34, 0x12])
+
+        # Generate the expected data to verify against
+        header = [0x0c, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00]
+        expected_bytes = []
+        for e in expected:
+            expected_bytes.append(bytes(header + e))
+
+        # Test each input and expected output
+        for i, input in enumerate(inputs):
+
+            with WriteMessagesFile(self._test_file,
+                                   "bool_timed_sample") as protocol:
+                protocol.write_message("sample_interval", input)
+
+            with open(self._test_file, "rb") as binary_file:
+                actual_bytes = binary_file.read()
+                print(f"Set #{i}:")
+                print(actual_bytes.hex())
+                print(expected_bytes[i].hex())
+                self.assertEqual(actual_bytes, expected_bytes[i],
+                                 f"Expected data set #{i} doesn't match!")

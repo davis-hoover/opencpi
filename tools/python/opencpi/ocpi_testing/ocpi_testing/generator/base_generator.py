@@ -27,24 +27,22 @@ import pathlib
 import random
 
 import opencpi.ocpi_protocols as ocpi_protocols
+from   opencpi.ocpi_protocols.ocpi_protocols.ocpi_protocols import OcpiProtocols
 
 from opencpi.ocpi_testing.ocpi_testing._test_log import TestLog
 from opencpi.ocpi_testing.ocpi_testing._terminal_print_formatter import print_warning
 
 
-DECIMAL_PRECISION = 50
-
 # Some maximum values need more precision than given by a standard float; in
 # these cases a decimal is used.
-decimal.getcontext().prec = DECIMAL_PRECISION
-
+decimal.getcontext().prec = OcpiProtocols.DECIMAL_PRECISION
 
 class GeneratorDefaults:
     # This class houses all the default values used for the different
     # generator types. The structure is designed for importing and documenting
     # in an easier way.
 
-    decimal.getcontext().prec = DECIMAL_PRECISION
+    decimal.getcontext().prec = OcpiProtocols.DECIMAL_PRECISION
 
     # The : after the # of comments here ensures the comments are imported into
     # the build documentation.
@@ -161,7 +159,7 @@ class BaseGenerator():
         """
         # Some maximum values need more precision than given by a standard
         # float; in these cases a decimal is used.
-        decimal.getcontext().prec = DECIMAL_PRECISION
+        decimal.getcontext().prec = OcpiProtocols.DECIMAL_PRECISION
 
         # Set variables as local as may be modified when set in the specific
         # generator. Keep the same variable names to ensure documentation
