@@ -20,6 +20,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+"""Definition of timed sample protocol set, with sample data packer and unpacker."""
 
 import collections
 import decimal
@@ -62,7 +63,7 @@ OPCODES.update(dict(reversed(entry) for entry in OPCODES.items()))
 
 
 def _interleave_complex(complex_list, return_type=float):
-    """ Interleave real and imaginary values from a list of complex values
+    """Interleave real and imaginary values from a list of complex values.
 
     Args:
         complex_list (``list``): A list of complex values for the real and
@@ -95,8 +96,8 @@ def _interleave_complex(complex_list, return_type=float):
 
 
 class OcpiProtocols:
-    """ Definition of values that describe the timed sample protocols
-    """
+    """Definition of values that describe the timed sample protocols."""
+
     _SAMPLE_PACK_FORMATS = {
         "bool_timed_sample": "<{data_length}?",
         "uchar_timed_sample": "<{data_length}B",
@@ -151,8 +152,16 @@ class OcpiProtocols:
                           "double_timed_sample": 8,
                           "complex_double_timed_sample": 16}
 
+    DECIMAL_PRECISION = 96
+    """Precision to use for decimal values.
+
+    Need an increased decimal precision to handle time and sample interval
+    values to their maximum supported accuracy, and not lose data when
+    converting the 32bit and 64bit integers that form the Q32.64 value into a
+    python decimal representation."""
+
     def __init__(self, protocol):
-        """ Initialise OcpiProtocol instance
+        """Initialise OcpiProtocol instance.
 
         Args:
             protocol (``str``): Name of the protocol to be handled.
@@ -171,10 +180,10 @@ class OcpiProtocols:
 
         # Increase the decimal precision, needed to handle time and sample
         # interval values to their maximum supported accuracy
-        decimal.getcontext().prec = 50
+        decimal.getcontext().prec = self.DECIMAL_PRECISION
 
     def pack_data(self, opcode, data):
-        """ Convert data into raw bytes based on the opcode and protocol
+        """Convert data into raw bytes based on the opcode and protocol.
 
         Args:
             opcode (``str``): Name of opcode for this data.
@@ -212,9 +221,6 @@ class OcpiProtocols:
                 units = int(data)
                 scaled_fraction = round(
                     (data - units) / decimal.Decimal(2**-64))
-                # Only 40 bits of precision are to be used / supported
-                scaled_fraction = 0xFFFFFFFFFF000000 & scaled_fraction
-
             else:
                 raise ValueError("Time opcode cannot store negative values")
 
@@ -229,8 +235,6 @@ class OcpiProtocols:
                 units = int(data)
                 scaled_fraction = round(
                     (data - units) / decimal.Decimal(2**-64))
-                # Only 40 bits of precision are to be used / supported
-                scaled_fraction = 0xFFFFFFFFFF000000 & scaled_fraction
 
             else:
                 raise ValueError(
@@ -265,7 +269,7 @@ class OcpiProtocols:
                         "the else report unexpected opcode")
 
     def unpack_data(self, opcode, raw_data):
-        """ Convert raw bytes to true data format based on opcode and protocol
+        """Convert raw bytes to true data format based on opcode and protocol.
 
         Args:
             opcode (``str``): Name of opcode of the data to be unpacked.
@@ -325,12 +329,10 @@ class OcpiProtocols:
                         + "all opcode conditions should return their data")
 
     def __repr__(self):
-        """ Official string representation of object
-        """
+        """Official string representation of object."""
         return(f"ocpi_protocols.OcpiProtocols(\"{self._protocol_type}\")")
 
     def __str__(self):
-        """ Informal string representation of object
-        """
+        """Informal string representation of object."""
         return("<ocpi_protocols.OcpiProtocols instance " +
                f"protocol={self._protocol_type}>")

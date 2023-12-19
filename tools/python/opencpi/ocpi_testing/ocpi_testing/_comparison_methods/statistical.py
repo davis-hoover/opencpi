@@ -35,8 +35,10 @@ STANDARD_DEVIATION_MULTIPLE_WARNING_LIMIT = 4
 
 
 class StatisticalDefaults:
-    # This class houses all the default values used. The structure is designed
-    # for importing and documenting in an easier way.
+    """This class houses all the default values used.
+
+    The structure is designed for importing and documenting in an easier way.
+    """
 
     # The : after the # of comments here ensures the comments are imported into
     # the build documentation.
@@ -63,7 +65,7 @@ class StatisticalDefaults:
 # modifying sys.path is not desirable since this file is part of a module and
 # so cannot guarantee installed location.
 def print_warning(message):
-    """ Print warning to terminal
+    """Print warning to terminal.
 
     Warnings are in orange and with the warning word in bold. Format is
         Warning: Message.
@@ -79,11 +81,10 @@ def print_warning(message):
 
 
 class Statistical(BasicComparison):
-    """ Statistical sample data comparison
-    """
+    """Statistical sample data comparison."""
 
     def __init__(self, complex, sample_data_type):
-        """ Check messages sets are similar / the same
+        """Check messages sets are similar / the same.
 
         Args:
             complex (bool): Indicate if the data type is complex (True) or not
@@ -111,7 +112,7 @@ class Statistical(BasicComparison):
             StatisticalDefaults.STANDARD_DEVIATION_MULTIPLE
 
     def variable_summary(self):
-        """ Returns summary of the variables that control the comparison method
+        """Returns summary of the variables that control the comparison method.
 
         Cannot rely on the values being fixed for all tests since may need to
         be changed depending on the component-under-tests performance.
@@ -127,7 +128,7 @@ class Statistical(BasicComparison):
                 }
 
     def same(self, reference, implementation):
-        """ Checks if two output data sets are considered the same
+        """Checks if two output data sets are considered the same.
 
         In this case same is where the difference between all data points is
         within some bound defined by the mean and standard deviation.
@@ -229,7 +230,7 @@ class Statistical(BasicComparison):
         return True, ""
 
     def _parse_sample_message(self, reference_message, implementation_message):
-        """ Read in a sample message set for later statistical analysis
+        """Read in a sample message set for later statistical analysis.
 
         As the statistical analysis is completed over all messages, the data in
         all sample messages needs to be read in - with some initial checks.
@@ -289,7 +290,7 @@ class Statistical(BasicComparison):
         return True, ""
 
     def _get_difference(self, reference, implementation):
-        """ Find the difference between values and handle Nan and +/- inf
+        """Find the difference between values and handle Nan and +/- inf.
 
         When a NaN or a +/- inf are encountered check that the value is the
         same in both the reference and implementation, otherwise report the
@@ -347,7 +348,7 @@ class Statistical(BasicComparison):
         return implementation - reference, True, ""
 
     def _statistical_check(self):
-        """ Ensure the difference values are within allowed statistical bounds
+        """Ensure the difference values are within allowed statistical bounds.
 
         Uses ``self._differences`` as the differences between respective
         reference and implementation-under-test sample samples. Uses
@@ -380,7 +381,7 @@ class Statistical(BasicComparison):
 
     def _statistical_check_data(self, data_difference, data_smallest,
                                 data_largest):
-        """ Ensure the difference values are within allowed statistical bounds
+        """Ensure the difference values are within allowed statistical bounds.
 
         For real (not imaginary) data values only.
 
@@ -582,7 +583,7 @@ class Statistical(BasicComparison):
                 "mean difference limit.\n" +
                 "Mean difference limit:\n" +
                 f"  {self.MEAN_DIFFERENCE_LIMIT:.50f}\n" +
-                "Mean difference between reference and implentation-under-" +
+                "Mean difference between reference and implementation-under-" +
                 "test samples:\n" +
                 f"  {mean_difference:.50f}")
 
@@ -605,7 +606,7 @@ class Statistical(BasicComparison):
 
     def _check_non_sample_message(self, reference_message,
                                   implementation_message):
-        """ Check messages which are not sample messages are the same
+        """Check messages which are not sample messages are the same.
 
         All non-sample messages are checked that data fields are exactly equal.
 
@@ -659,7 +660,7 @@ class Statistical(BasicComparison):
         return True, ""
 
     def _store_smallest(self, values):
-        """ Store the smallest value in magnitude to ``self._data_smallest``
+        """Store the smallest value in magnitude to ``self._data_smallest``.
 
         When considering complex values, the real and imaginary axes will be
         considered separately and the value returned can update only one axis
@@ -697,7 +698,7 @@ class Statistical(BasicComparison):
                                           abs(min(values, key=abs)))
 
     def _store_largest(self, values):
-        """ Store the largest value in magnitude to ``self._data_largest``
+        """Store the largest value in magnitude to ``self._data_largest``.
 
         When considering complex values, the real and imaginary axes will be
         considered separately and the value returned can update only one axis
@@ -732,15 +733,13 @@ class Statistical(BasicComparison):
                 self._data_largest = abs(max(values, key=abs))
             else:
                 self._data_largest = max(self._data_largest,
-                                           abs(max(values, key=abs)))
+                                         abs(max(values, key=abs)))
 
     def __repr__(self):
-        """ Official string representation of object
-        """
+        """Official string representation of object."""
         return (f"ocpi_testing.Statistical(complex_={self._complex}, " +
                 f"sample_data_type={self._sample_data_type})")
 
     def __str__(self):
-        """ Informal string representation of object
-        """
+        """Informal string representation of object."""
         return self.__repr__()

@@ -23,14 +23,14 @@
 
 import abc
 import collections
+import decimal
 
 
 class BaseComparison:
-    """ Comparison class other comparison methods inherit from
-    """
+    """Comparison class other comparison methods inherit from."""
 
     def __init__(self, complex_, sample_data_type):
-        """ Check messages sets are similar / the same
+        """Check messages sets are similar / the same.
 
         Args:
             complex (bool): Indicate if the data type is complex (True) or not
@@ -47,7 +47,7 @@ class BaseComparison:
 
     @abc.abstractmethod
     def variable_summary(self):
-        """ Returns summary of the variables that control the comparison method
+        """Returns summary of the variables that control the comparison method.
 
         Cannot rely on the values being fixed for all tests since may need to
         be changed depending on the component-under-tests performance.
@@ -65,7 +65,7 @@ class BaseComparison:
 
     @abc.abstractmethod
     def same(self, reference, implementation):
-        """ Checks if two output data sets are considered the same
+        """Checks if two output data sets are considered the same.
 
         Must be over-written by a child method using the specific checks
         defined for that class.
@@ -90,12 +90,47 @@ class BaseComparison:
         raise NotImplementedError("Child class must define own same() method.")
 
 
-class BasicComparison(BaseComparison):
-    """ Run check every comparison method should do
+class BasicComparisonDefaults:
+    """This class houses all the default values used.
+
+    The structure is designed for importing and documenting in an easier way.
     """
 
+    # The : after the # of comments here ensures the comments are imported into
+    # the build documentation.
+
+    #: The number of most significant bits of the fractional part of time
+    #: values to compare.  Allows for some tests to pass if the time values
+    #: are *almost* the same, bar some minor rounding/precision that is deemed
+    #: insignificant.
+    TIME_FRACTIONAL_BITS_PRECISION = 64
+
+
+class BasicComparison(BaseComparison):
+    """Run check every comparison method should do."""
+
+    def __init__(self, complex_, sample_data_type):
+        """Initialise the BasicComparison class.
+
+        Args:
+            complex_ (bool): Indicate if the data type is complex (True) or not
+                (False).
+            sample_data_type (type): The Python type that a single sample data
+                value is most like. E.g. for character protocol would be an
+                int, for a complex short protocol would be int.
+
+        Returns:
+            Initialised class.
+        """
+        super().__init__(complex_, sample_data_type)
+
+        # Set variables as local as may be modified when set in the comparison
+        # method instance in a specific test. Keep the same variable names to
+        # ensure documentation matches.
+        self.TIME_FRACTIONAL_BITS_PRECISION = BasicComparisonDefaults.TIME_FRACTIONAL_BITS_PRECISION
+
     def correct_messages(self, reference, implementation):
-        """ Check correct type (opcode) of messages and data length
+        """Check correct type (opcode) of messages and data length.
 
         Does not check the data content of messages as this must be done by
         inherited classes using the same() method each child class must define.
@@ -153,3 +188,66 @@ class BasicComparison(BaseComparison):
 
         # All checks passed, no failure message
         return True, ""
+
+    def _time_to_hex_string(self, value):
+        """Convert a Q32.64 time value to a hex string for output.
+
+        Args:
+            value (Decimal/float): The value to convert.
+
+        Returns:
+            str: The value in "(int,fractional)" format with "0x" prefixes.
+        """
+        int_part = int(value)
+        fraction = int((value - int_part) * (2**64))
+        return f"(0x{int_part:08X},0x{fraction:016X})"
+
+    def _check_time_message(self, reference, implementation):
+        """Check two time or sample interval messages are the same.
+
+        Args:
+            reference (dict): The reference message to check the implementation
+                message against. A dictionary with the keys "opcode" and
+                "data".
+            implementation (dict): Message to check against reference. A
+                dictionary with the keys "opcode" and "data".
+
+        Returns:
+            A boolean to indicate if the test passed (True) or failed (False).
+                Also returns a string that is the reason for any failure, in
+                the case of tests which pass returns an empty string.
+        """
+        if reference["data"] == implementation["data"]:
+            # Data matches exactly
+            return True, ""
+
+        # Data doesn't match exactly, so zero any data below
+        # the number of fraction bits precision
+        multiplier = (2**self.TIME_FRACTIONAL_BITS_PRECISION)
+        reference_value = decimal.Decimal(
+            int(decimal.Decimal(reference["data"]) * multiplier)
+        ) / multiplier
+        implementation_value = decimal.Decimal(
+            int(decimal.Decimal(implementation["data"]) * multiplier)
+        ) / multiplier
+
+        if reference_value == implementation_value:
+            # Data matches as far as the first N bits of the fractional value.
+            return True, ""
+
+        # Values don't match to this level of precision
+        # Create a usefully formatted and aligned error message
+        reference_str = str(reference["data"])
+        implementation_str = str(implementation["data"])
+        width = max(len(reference_str), len(implementation_str))
+
+        reference_str = (f"{reference_str:{width}} ==> " +
+                         self._time_to_hex_string(reference_value))
+        implementation_str = (f"{implementation_str:{width}} ==> " +
+                              self._time_to_hex_string(implementation_value))
+        return False, (
+            f"{reference['opcode'].capitalize()} data differs "
+            + "between reference and implementation-under-test.\n"
+            + f"Reference                : {reference_str}\n"
+            + f"Implementation-under-test: {implementation_str}\n"
+        )

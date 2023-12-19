@@ -318,3 +318,60 @@ class TestParseMessagesFile(unittest.TestCase):
     def test_has_str(self):
         with ParseMessagesFile(self._test_file, "float_timed_sample") as file:
             self.assertIsInstance(str(file), str)
+
+    def test_read_message_time(self):
+        inputs = []
+        # feef dccd . 04d9 d92a e237 8fff = 4277132493.0189491014191089934283994400399109281352139078080654144287109375
+        inputs.append("                     4277132493.0189491014191089934283994400399109281352139078080654144287109375")
+        # feef dccd . 04d9 d92a e237 9000 = 4277132493.0189491014191089934826095486641861498355865478515625
+        inputs.append("                     4277132493.0189491014191089934826095486641861498355865478515625")
+        # 1234 5678 . 90ab cdef 8765 4321 = 305419896.5651215276515318287745871794758301120964461006224155426025390625
+        inputs.append("                     305419896.5651215276515318287745871794758301120964461006224155426025390625")
+
+        expected_values = [str(i).strip() for i in inputs]
+
+        # Write the time test data file needed for this case
+        data = [complex(real, imaginary) for real, imaginary in
+                zip(range(10), range(10))]
+        with WriteMessagesFile(self._test_file,
+                               "complex_short_timed_sample") as protocol:
+            for input in inputs:
+                protocol.write_message("time", input)
+                protocol.write_message("sample", data)
+
+        with ParseMessagesFile(self._test_file,
+                               "complex_short_timed_sample") as protocol:
+            actual_data = protocol.get_all_messages(only_opcodes=["time"])
+            actual_values = [str(opcode["data"]) for opcode in actual_data]
+            self.assertEqual(len(actual_values), len(expected_values))
+            for i in range(len(actual_data)):
+                self.assertEqual(actual_values[i], expected_values[i],
+                                 f"The {i+1}{['th', 'st', 'nd', 'rd', 'th'][min(i+1 % 10, 4)]} time value doesn't match")
+
+    def test_read_message_sample_interval(self):
+        inputs = []
+        # feef dccd . 04d9 d92a e237 8fff = 4277132493.0189491014191089934283994400399109281352139078080654144287109375
+        inputs.append("                     4277132493.0189491014191089934283994400399109281352139078080654144287109375")
+        # feef dccd . 04d9 d92a e237 9000 = 4277132493.0189491014191089934826095486641861498355865478515625
+        inputs.append("                     4277132493.0189491014191089934826095486641861498355865478515625")
+        # 1234 5678 . 90ab cdef 8765 4321 = 305419896.5651215276515318287745871794758301120964461006224155426025390625
+        inputs.append("                     305419896.5651215276515318287745871794758301120964461006224155426025390625")
+
+        expected_values = [str(i).strip() for i in inputs]
+
+        # Write the sample interval test data file needed for this case
+        data = range(10)
+        with WriteMessagesFile(self._test_file,
+                               "short_timed_sample") as protocol:
+            for input in inputs:
+                protocol.write_message("sample_interval", input)
+                protocol.write_message("sample", data)
+
+        with ParseMessagesFile(self._test_file,
+                               "complex_short_timed_sample") as protocol:
+            actual_data = protocol.get_all_messages(only_opcodes=["sample_interval"])
+            actual_values = [str(opcode["data"]) for opcode in actual_data]
+            self.assertEqual(len(actual_values), len(expected_values))
+            for i in range(len(actual_data)):
+                self.assertEqual(actual_values[i], expected_values[i],
+                                 f"The {i+1}{['th', 'st', 'nd', 'rd', 'th'][min(i+1 % 10, 4)]} sample_interval value doesn't match")
