@@ -71,12 +71,6 @@ the following options can be specified for the *`run`* verb.
 In the option descriptions below, a plus sign (+) indicates that
 the option can be specified more than once on the command line.
 
-Options That Apply to Applications and Unit Tests
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*`--rcc-platform=`*'<platform>'+::
-    Specify the RCC platform to use to generate and build the unit tests
-    and build the ACI application.
-
 Options That Apply to Applications Only
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`--after`* '<args>'+::
@@ -131,10 +125,6 @@ Options That Apply to Component Unit Tests Only
     all feasible cases are executed/verified. You can specify wildcards
     in '<case-name>'. To specify a subcase, use the notation
     '<case-name>'*.*'<subcase-number>'. Examples: case*., case0.0*, case00.01
-
-*`--hdl-platform=`*'<platform>'+::
-    Specify the HDL platform to use with the component unit test. This option is only
-    valid in generate and build phases.
 
 *`--keep-simulations`*::
     Keep HDL simulation files regardless of verification results.

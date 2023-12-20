@@ -43,6 +43,7 @@ run/
 my-env.sh
 myzed.sh
 exports
+projects/*/artifacts
 projects/*/imports
 projects/*/project-metadata.xml
 projects/*/specs/package-id
@@ -55,12 +56,35 @@ doc/pdfs/
 **/doc/*.inc
 !**/doc/developer_doc.inc
 projects/inactive/applications/test.output
+projects/test/applications/test.output
 projects/test/components/atest.rcc/atest.cc
 projects/test/hdl/devices/test_worker2.rcc/test_worker2.cc
 projects/test/hdl/platforms/dummy/devices/test_worker3.rcc/test_worker3.cc
+/tests/ocpidev/dropin-tests/temp_proj
+/tests/pytests/.coverage
+/tests/pytests/mypj*
+/tests/pytests/ocpiutil_test_project0/
+/tests/pytests/project-registry/
+/tests/pytests/utilization_proj/
 
-# OSP's
-project-registry/ocpi.osp.*
+# Projects
+/projects/*
+!/projects/assets/
+!/projects/assets_ts/
+!/projects/core/
+!/projects/inactive/
+!/projects/osps/
+!/projects/platform/
+!/projects/test/
+!/projects/tutorial/
+
+# Registry
+/project-registry/*
+!/project-registry/ocpi.assets
+!/project-registry/ocpi.assets_ts
+!/project-registry/ocpi.core
+!/project-registry/ocpi.platform
+!/project-registry/ocpi.tutorial
 
 # GitLab Pages staging area
 .public/

@@ -389,7 +389,7 @@
 		  return true;
 		size_t n = (size_t)r;
 		if (n & 3)
-		  return OU::eformat(error, "Bitstream data in is '%s' not a multiple of 4 bytes",
+		  return OU::eformat(error, "Bitstream data in '%s' is not a multiple of 4 bytes",
 				     inputFile.c_str());
 		if (n == 0)
 		  break;

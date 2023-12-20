@@ -288,7 +288,7 @@ namespace OCPI {
      *     CaseInsensitiveMap;
      * \endcode
      */
-    class CaseInsensitiveStringLess : public std::binary_function<std::string, std::string, bool>
+    class CaseInsensitiveStringLess
     {
       public:
         bool operator() (const std::string & s1, const std::string & s2) const;
