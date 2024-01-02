@@ -365,6 +365,17 @@ class JobBuilder:
                     f' --build-arg TAG="{from_tag}"',
                 f'docker push "{deploy_image}"'
             ]
+            if os.getenv('CI_PIPELINE_SOURCE', '') == 'schedule' or os.getenv('CI_COMMIT_TAG', ''):
+            # Deploy image to public registry if this is a scheduled pipeline
+                public_image = f'{os.getenv("CI_REGISTRY_IMAGE", "${CI_REGISTRY_IMAGE}")}/{host}'
+                # tag is commit tag if it exists; otherwise, branch name
+                public_tag = os.getenv('$CI_COMMIT_TAG',
+                                       os.getenv('CI_COMMIT_REF_NAME', '${CI_COMMIT_REF_SLUG}'))
+                script += [
+                    f'docker tag "{deploy_image}" "{public_image}:{public_tag}"',
+                    f'docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY',
+                    f'docker push "{public_image}:{public_tag}"'
+                ]
         else:
             script = ''
         return script
