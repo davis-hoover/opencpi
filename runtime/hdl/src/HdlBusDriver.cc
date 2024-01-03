@@ -51,7 +51,7 @@
        namespace OH = OCPI::HDL;
        namespace OT = OCPI::Transport;
 
-       const std::string fpgaMgrDevices[] = { "/axi/devcfg@f8007000", "/amba/devcfg@f8007000", "/firmware/zynqmp-firmware/pcap"};
+       const std::string fpgaMgrDevices[] = { "/axi/devcfg@f8007000", "/amba/devcfg@f8007000", "/firmware/zynqmp-firmware/pcap", "/pcap"};
        const char
          fpgaMgrState[]  = "/sys/class/fpga_manager/fpga0/state",
 	 xdevCfgState[]  = "/sys/class/xdevcfg/xdevcfg/device/prog_done",
