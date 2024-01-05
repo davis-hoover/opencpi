@@ -27,6 +27,7 @@
 #include "HdlLSimDriver.hh"
 #include "HdlBusDriver.hh"
 #include "HdlEtherDriver.hh"
+#include "HdlUdpDriver.hh"
 #include "HdlPciDriver.hh"
 #include "ContainerManager.hh"
 
@@ -43,6 +44,7 @@ namespace OCPI {
       // can know that their specific drivers (which are not strictly parents) still exist
       : OCPI::HDL::PCI::Driver,
 	OCPI::HDL::Ether::Driver,
+  OCPI::HDL::UDP::Driver,
 	OCPI::HDL::Sim::Driver,
 	public OCPI::HDL::LSim::Driver,
 	OCPI::HDL::Zynq::Driver,

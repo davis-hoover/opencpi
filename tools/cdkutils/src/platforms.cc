@@ -220,6 +220,7 @@ getComponentLibraries(const char *libs, const char *model, bool topSpecs, Ordere
   if ((err = addLibs(libs, dirs, nonSlashes)) ||
       (err = addLibs(getenv("OCPI_COMPONENT_LIBRARIES"), dirs, nonSlashes)))
     return err;
+  nonSlashes.push_back("components"); // always look in "components"
   if (projectPath.empty()) {
     std::string imports;
     if ((err = getProjectRelDir(imports)))

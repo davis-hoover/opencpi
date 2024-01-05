@@ -144,32 +144,51 @@ vhdlBaseType(const OB::Member &dt, std::string &s, bool convert, bool finalized)
   }
 }
 
-static void
-vhdlArrayType(const OM::Property &dt, size_t rank, const size_t */*dims*/, std::string &decl,
-	      std::string &type, bool convert, bool finalized) {
+// Add to the referenced string the value that is the number of elements of the property
+static void prElemsAdd(const OM::Property &pr, const std::string &prefix, std::string &s) {
+  if (pr.m_isSequence) {
+    if (pr.m_sequenceLengthExpr.length())
+      s += prefix + "_sequence_length";
+    else
+      OU::formatAdd(s, "%zu", pr.m_sequenceLength);
+    if (pr.m_arrayRank)
+      s += "*";
+  }
+  for (unsigned n = 0; n < pr.m_arrayRank; n++) {
+    if (n)
+      s += "*";
+    if (pr.m_arrayDimensionsExprs[0].length())
+      OU::formatAdd(s, "%s_array_dimensions(%u)", prefix.c_str(), n);
+    else
+      OU::formatAdd(s, "%zu", pr.m_arrayDimensions[n]);
+  }
+}
+
+void Worker::
+vhdlArrayType(const OM::Property &dt, std::string &decl, std::string &type, bool convert,
+	      bool finalized) {
   if (convert) {
-    OU::format(type, "std_logic_vector(%zu*(%s)-1 downto 0)", dt.m_nItems,
+    // compute array length based on defined constants when dims are exprs
+    std::string prefix;
+    OU::format(prefix, "work.%s_constants.%s", m_implName, dt.m_name.c_str());
+    std::string nItems;
+    prElemsAdd(dt, prefix, nItems);
+    OU::format(type, "std_logic_vector(%s*(%s)-1 downto 0)", nItems.c_str(),
 	       rawBitWidthCstr(dt, finalized));
     return;
   }
-  // Single dimensional arrays when type is neither enum nor string us built-in array types
-  if (rank == 1 && dt.m_baseType != OA::OCPI_String && dt.m_baseType != OA::OCPI_Enum) {
+  // Single dimensional arrays when type is neither enum nor string built-in array types
+  if (!dt.m_isSequence && dt.m_arrayRank == 1 && dt.m_baseType != OA::OCPI_String &&
+      dt.m_baseType != OA::OCPI_Enum) {
     for (const char *cp = OB::baseTypeNames[dt.m_baseType]; *cp; cp++)
       type += (char)tolower(*cp);
     type += "_array_t";
     return;
   }
   type = dt.m_name + "_array_t";
-  //  else if (dt.m_baseType == OA::OCPI_String) {
-  //    OU::formatAdd(s,
-  //		  "type %%s_t is array(0 to natural range <>) of string_t(0 to %zu)",
-  //		  dt.m_stringLength);
-  //		  //"type %%s_t is array(0 to %zu) of string_t(0 to %zu)",
-  //		  //  		  dims[0] - 1, dt.m_stringLength);
-  //    else {
-  rank = dt.m_arrayRank + (dt.m_isSequence ? 1 : 0);
+  size_t rank = dt.m_arrayRank + (dt.m_isSequence ? 1 : 0);
   OU::formatAdd(decl, "type %s_array_t is array (", dt.m_name.c_str());
-  for (unsigned i = 0; i < rank; i++) {
+  for (unsigned i = 0; i < rank; i++) { // array dims and maybe sequence dim
     std::string asize;
     size_t dim = i >= dt.m_arrayRank ? dt.m_sequenceLength : dt.m_arrayDimensions[i];
     static std::string null;
@@ -179,10 +198,6 @@ vhdlArrayType(const OM::Property &dt, size_t rank, const size_t */*dims*/, std::
       OU::format(asize, "0 to %zu", dim-1);
     else
       asize = "natural range <>";
-
-      //      asize = expr; // for now simply expressions should work;
-    // allow parameter values to determine the size of the array
-    //      OU::formatAdd(s, "%s0 to %zu", i ? ", " : "", dims[i] - 1);
     OU::formatAdd(decl, "%s%s", i ? ", " : "", asize.c_str());
   }
   decl += ") of ";
@@ -190,18 +205,15 @@ vhdlArrayType(const OM::Property &dt, size_t rank, const size_t */*dims*/, std::
     decl += "string_t(0 to ";
     if (dt.m_stringLengthExpr.empty())
       OU::formatAdd(decl, "%zu", dt.m_stringLength);
-    else {
-      //      fprintf(stderr, "strlenexp:%s\n", dt.m_stringLengthExpr.c_str());
+    else
       ocpiCheck("arrays of strings must have fixed stringlength"==0);
-    }
-    //      s += dt.m_stringLengthExpr; // for now simply expressions should work;
     decl += ")";
   } else
     vhdlBaseType(dt, decl, convert, finalized);
 }
 
 // Custom types are for enumerations or string arrays - otherwise built-in types are used.
-void
+void Worker::
 vhdlType(const OM::Property &dt, std::string &decl, std::string &type, bool convert,
 	 bool finalized) {
   decl.clear();
@@ -214,15 +226,8 @@ vhdlType(const OM::Property &dt, std::string &decl, std::string &type, bool conv
     if (dt.m_isSequence || dt.m_arrayDimensions)
       decl += "; ";
   }
-  if (dt.m_isSequence) {
-    std::vector<size_t> seqdims(dt.m_arrayRank + 1);
-    if (dt.m_sequenceLength) // suppress warning emitted by broken compiler
-      seqdims[0] = dt.m_sequenceLength;
-    for (unsigned n = 0; n < dt.m_arrayRank; n++)
-      seqdims[n+1] = dt.m_arrayDimensions[n];
-    vhdlArrayType(dt, dt.m_arrayRank+2, &seqdims[0], decl, type, convert, finalized);
-  } else if (dt.m_arrayDimensions)
-    vhdlArrayType(dt, dt.m_arrayRank, dt.m_arrayDimensions, decl, type, convert, finalized);
+  if (dt.m_isSequence || dt.m_arrayRank)
+    vhdlArrayType(dt, decl, type, convert, finalized);
   else {
     type.clear();
     vhdlBaseType(dt, type, convert, finalized);
@@ -376,13 +381,31 @@ static struct VhdlUnparser : public OB::Unparser {
   }
 
   //
-  // The next two functions are derived from the "Unparser" class 
-  // versions (see "runtime/util/property/src/OcpiUtilValue.cxx").
-  // They handle "longlong" (m_baseType == OA::OCPI_LongLong) and
-  // "ulonglong" (m_baseType == OA::OCPI_ULongLong) values.
+  // The next four functions are derived from the "Unparser" class
+  // versions (see "runtime/base/src/BaseValue.cc").
+  // They handle
+  // "long" (m_baseType == OA::OCPI_Long)
+  // "ulong" (m_baseType == OA::OCPI_ULong)
+  // "longlong" (m_baseType == OA::OCPI_LongLong)
+  // "ulonglong" (m_baseType == OA::OCPI_ULongLong)
   //
   // GitLab Issue #1720
   //
+  
+  bool
+  unparseLong(std::string &s, int32_t val, bool /* hex */) const {
+    // function To_long (c: std_logic_vector(long_t'range)) return long_t;
+    OU::formatAdd(s, "std_logic_vector'(x\"%.8" PRIx32 "\")", val);
+    return val == 0;
+  }
+ 
+  bool
+  unparseULong(std::string &s, uint32_t val, bool /* hex */) const {
+    // function To_ulong (c: std_logic_vecotr(ulong_t'range)) return ulong_t;
+    OU::formatAdd(s, "std_logic_vector'(x\"%.8" PRIx32 "\")", val);
+    return val == 0;
+  }
+  
   bool
   unparseLongLong(std::string &s, int64_t val, bool /* hex */) const {
     // function To_longlong (c: std_logic_vector(longlong_t'range)) return longlong_t;
@@ -436,7 +459,7 @@ vhdlInnerValue(const std::string &name, const char *pkg, const OB::Value &v, boo
 // The constant value is what is provided in the generic
 // The readback value is what is fed to the readback module for muxing
 // into the control plane output datapath
-static void
+void Worker::
 vhdlConstant2Readback(const OM::Property &pr, const std::string &val, std::string &out) {
   std::string decl, type;
   vhdlType(pr, decl, type, false);
@@ -617,15 +640,16 @@ emitParameters(FILE *f, Language lang, bool useDefaults, bool convert) {
 	  fprintf(f, "  generic (\n");
 	first = false;
       }
+      OB::Value zeroValue(pr);
       if (lang == VHDL) {
 	std::string value, decl, type;
 	vhdlType(pr, decl, type, convert);
 	if (decl.length() && convert)
 	  type = decl;
-	if (useDefaults) {
-	  if (pr.m_default)
-	    vhdlValue(NULL, pr.m_name.c_str(), *pr.m_default, value, convert);
-	} else {
+	if (useDefaults)
+	  vhdlValue(NULL, pr.m_name.c_str(), pr.m_default ? *pr.m_default : zeroValue, value,
+		    convert);
+	else {
 	  std::string tmp;
 	  OU::format(tmp, "work.%s_constants.%s", m_implName, pr.m_name.c_str());
 	  if (convert)
@@ -659,8 +683,8 @@ emitParameters(FILE *f, Language lang, bool useDefaults, bool convert) {
 		  pr.m_nBits - 1, pr.m_name.c_str(), pr.m_nBits, (long long)i64);
 #else
 	std::string value;
-	if (useDefaults && pr.m_default)
-	  verilogValue(*pr.m_default, value);
+	if (useDefaults)
+	  verilogValue(pr.m_default ? *pr.m_default : zeroValue, value);
 	// If there is no default value, then parameters must be specified when instantiated
 	fprintf(f, "  parameter [(%s)-1:0] %s%s%s;\n", rawBitWidthCstr(pr), pr.m_name.c_str(),
 		value.empty() ? "" : " = ", value.c_str());
@@ -726,7 +750,7 @@ emitDeviceSignalMappings(FILE *f, std::string &last) {
   for (SignalsIter si = m_signals.begin(); si != m_signals.end(); si++) {
     Signal &s = **si;
     ocpiDebug("DeviceSignalMappings %s: %zd %u %d",
-	      s.cname(), m_paramConfig ? m_paramConfig->nConfig : 99,
+	      s.cname(), m_paramConfig ? m_paramConfig->nConfig : 99, // 99 for debugging
 	      s.m_direction, m_type == Container);
     if ((s.m_directionExpr.size() || s.m_widthExpr.size()) && m_type != Container)
       anyExpr = true;
@@ -811,26 +835,6 @@ emitSignals(FILE *f, Language lang, bool useRecords, bool inPackage, bool inWork
     fprintf(f, ");\n");
   } else if (lang == Verilog)
     fprintf(f, ");\n");
-}
-
-// Add to the referenced string the value that is the number of elements of the property
-static void prElemsAdd(OM::Property &pr, const std::string &prefix, std::string &s) {
-  if (pr.m_isSequence) {
-    if (pr.m_sequenceLengthExpr.length())
-      s += prefix + "_sequence_length";
-    else
-      OU::formatAdd(s, "%zu", pr.m_sequenceLength);
-    if (pr.m_arrayRank)
-      s += "*";
-  }
-  for (unsigned n = 0; n < pr.m_arrayRank; n++) {
-    if (n)
-      s += "*";
-    if (pr.m_arrayDimensionsExprs[0].length())
-      OU::formatAdd(s, "%s_array_dimensions(%u)", prefix.c_str(), n);
-    else
-      OU::formatAdd(s, "%zu", pr.m_arrayDimensions[n]);
-  }
 }
 
 // produce the type for a signal or record member declaration
@@ -1074,7 +1078,7 @@ emitVhdlWorkerPackage(FILE *f, unsigned maxPropName) {
     fprintf(f,
 	    "  end record worker_props_in_t;\n");
   }
-  if (m_ctl.nonRawReadbacks || m_ctl.rawReadables) {
+  if (m_ctl.nonRawReadbacks || m_ctl.rawProperties) {
     fprintf(f,"\n"
 	    "  -- The following record is for the readable properties of worker \"%s\"\n"
 	    "  type worker_props_out_t is record\n",
@@ -1088,7 +1092,7 @@ emitVhdlWorkerPackage(FILE *f, unsigned maxPropName) {
     fprintf(f,
 	    "  end record worker_props_out_t;\n");
   }
-  if (m_ctl.nonRawReadbacks || m_ctl.rawReadables || m_ctl.builtinReadbacks) {
+  if (m_ctl.nonRawReadbacks || m_ctl.rawProperties || m_ctl.builtinReadbacks) {
     fprintf(f,"-- internal props_out combining internal and from-worker\n"
 	    "  type internal_props_out_t is record\n");
     for (PropertiesIter pi = m_ctl.properties.begin(); pi != m_ctl.properties.end(); pi++)
@@ -1436,7 +1440,7 @@ emitVhdlShell(FILE *f) {
 		}
 	}
 
-    if (m_ctl.nonRawReadbacks || m_ctl.builtinReadbacks || m_ctl.rawReadables) {
+    if (m_ctl.nonRawReadbacks || m_ctl.builtinReadbacks || m_ctl.rawProperties) {
       fprintf(f, "  internal_props_out <=\n    (");
       // Assign all members
       const char *last = "";
@@ -1536,7 +1540,7 @@ emitVhdlShell(FILE *f) {
   //  if (m_ctl.nonRawWritables || m_ctl.nonRawReadables || m_ctl.rawProperties)
   if (!m_noControl)
     fprintf(f, ",\n    props_in => props_to_worker");
-  if (m_ctl.nonRawReadbacks || m_ctl.rawReadables)
+  if (m_ctl.nonRawReadbacks || m_ctl.rawProperties)
     fprintf(f, ",\n    props_out => props_from_worker");
   emitDeviceSignalMappings(f, last);
   fprintf(f, ");\n");
@@ -1937,7 +1941,7 @@ emitImplHDL(bool wrap) {
 	      );
       // Record for property-related inputs to the worker - writable values and strobes,
       // readable strobes
-      if (m_ctl.nonRawReadbacks || m_ctl.builtinReadbacks || m_ctl.rawReadables)
+      if (m_ctl.nonRawReadbacks || m_ctl.builtinReadbacks || m_ctl.rawProperties)
 	fprintf(f, "    props_from_worker  : in  internal_props_out_t;\n");
 #if 1
       fprintf(f, "    props_to_worker    : out worker_props_in_t");

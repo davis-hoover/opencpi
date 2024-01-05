@@ -24,14 +24,14 @@
 #   It creates the variable A and assigns it the value B
 proc parse_args {arguments} {
   foreach i $arguments {
-    set assignment [split $i =]
-    if {[llength $assignment] != 2} {
-      puts "Invalid assignment \"$assignment\". tclargs must be in the following format: variablename=value"
+    set eq [string first = $i]
+    if { $eq <= 0 } {
+      puts "Invalid assignment \"$i\". tclargs must be in the following format: variablename=value"
       exit 2
     }
-    set var_name [lindex $assignment 0]
+    set var_name [string range $i 0 $eq-1 ]
     upvar 1 $var_name var
-    set var_value [lindex $assignment 1]
+    set var_value [string range $i $eq+1 end]
     set var $var_value
   }
 }

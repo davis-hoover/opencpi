@@ -74,16 +74,17 @@
 +tools/ocpidev/ocpidev.py <target>/bin/ocpidev
 +tools/ocpidev/ocpidev_args.py scripts/
 +tools/ocpidev/ocpiargparse.py scripts/
-+tools/ocpidev/ocpidev.sh scripts/
-+tools/ocpidev/ocpidev_run.py scripts/
-+tools/ocpidev/ocpishow.py scripts/
-+tools/ocpidev/ocpidev_utilization.py scripts/
 +tools/ocpidoc/doc <target>/lib/ocpidoc/
 +tools/ocpidoc/ocpidoc.py <target>/lib/ocpidoc/
 +tools/ocpidoc/ocpi_documentation <target>/lib/ocpidoc/
 +tools/ocpidoc/test <target>/lib/ocpidoc/
 +tools/ocpidoc/xml_tools <target>/lib/ocpidoc/
 +tools/ocpidoc/ocpidoc.sh <target>/bin/ocpidoc
++tools/ocpilint/doc <target>/lib/ocpilint/
++tools/ocpilint/ocpi_linter <target>/lib/ocpilint/
++tools/ocpilint/ocpilint.py <target>/lib/ocpilint/
++tools/ocpilint/ocpilint-cfg.yml <target>/lib/ocpilint/
++tools/ocpilint/ocpilint.sh <target>/bin/ocpilint
 +tools/ocpi_protocol_view/ocpi_protocol_view.py <target>/bin/ocpi_protocol_view
 # generic make scripts
 +tools/include/show.mk include/
@@ -274,6 +275,9 @@
 =runtime/hdl-support/scripts/loadFlash <target>/bin/
 =runtime/hdl-support/scripts/probeJtag <target>/bin/
 +runtime/hdl-support/scripts/ocpiview <target>/bin/
+# for vendor toolset installation
++runtime/hdl-support/xilinx/install-vivado.sh scripts/xilinx/
++runtime/hdl-support/xilinx/*.exp scripts/xilinx/
 # Enable all local bitstreams to be seen in one place for convenience of OCPI_LIBRARY_PATH
 +hdl/assemblies/*/container-*/target-*/*.bitz lib/hdl/assemblies/
 # for backward compatibility of system.xml files

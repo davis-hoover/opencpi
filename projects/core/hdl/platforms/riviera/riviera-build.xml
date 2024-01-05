@@ -1,0 +1,8 @@
+<build>
+  <configuration id='0'>
+    <parameter name='sdp_width' value='1'/>
+  </configuration>
+  <configuration id='1'>
+    <parameter name='sdp_width' value='4'/>
+  </configuration>
+</build>

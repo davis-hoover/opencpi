@@ -78,22 +78,22 @@ namespace OCPI {
     pthread_mutex_t mine = PTHREAD_MUTEX_INITIALIZER;
     static unsigned logLevel = UINT_MAX;
     void
-    logSetLevel(unsigned level) {
+    Log::setLevel(unsigned level) {
       logLevel = level;
     }
     unsigned
-    logGetLevel() {
+    Log::getLevel() {
       return logLevel;
     }
     void
-    logPrint(unsigned n, const char *fmt, ...){
+    Log::print(unsigned n, const char *fmt, ...){
 	va_list ap;
 	va_start(ap, fmt);
-	logPrintV(n, fmt, ap);
+	Log::printV(n, fmt, ap);
 	va_end(ap);
     }
     bool
-    logWillLog(unsigned n) {
+    Log::willLog(unsigned n) {
       if (logLevel != UINT_MAX && n > logLevel)
 	return false;
       if (logLevel == UINT_MAX) {
@@ -103,8 +103,8 @@ namespace OCPI {
       return n <= logLevel;
     }
     void
-    logPrintV(unsigned n, const char *fmt, va_list ap){
-      if (logWillLog(n)) {
+    Log::printV(unsigned n, const char *fmt, va_list ap){
+      if (Log::willLog(n)) {
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
 	pthread_mutex_lock (&mine);

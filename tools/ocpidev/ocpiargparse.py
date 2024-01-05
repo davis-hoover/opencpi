@@ -111,7 +111,8 @@ COMMON_OPTIONS = {
     'verbose': {
         'long': '--verbose',
         'short': '-v',
-        'action': 'store_true'
+        'action': 'count',
+        'default': 0
     },
     'directory': {
         'long': '--directory',
@@ -153,7 +154,7 @@ def parse_args(args_dict, prog=None):
     """
     args = _preprocess_args(args_dict)
     parser = _make_parser(args_dict, prog=prog)
-    args,_ = parser.parse_known_args(args)
+    args = parser.parse_args(args)
     args = _postprocess_args(args)
 
     return args
@@ -192,6 +193,7 @@ def _make_subparsers(parser, subparser_dict, parent_options_dict,
     _make_options() once no more subnouns are left to add.
     """
     subparsers = parser.add_subparsers(dest=dest)
+    subparsers.required = True
     subparser_dict.pop('default', None)
 
     for key,val in subparser_dict.items():
@@ -287,20 +289,22 @@ def _preprocess_args(args_dict, args=None):
     options_dict.update(COMMON_OPTIONS)
     options_dict.pop('help', None)
     parser = _make_options(parser, options_dict)
-    args,extra = parser.parse_known_args(args)
-
+    args, extra = parser.parse_known_args(args)
+    args.directory = args.directory.strip()
     try:
         ocpiutil.change_dir(args.directory)
     except ocpiutil.OCPIException as e:
         ocpiutil.logging.error(e)
         sys.exit(1)
 
-    verb = extra[0] if len(extra) > 0 else None
-    noun = extra[1] if len(extra) > 1 else None
+    # Get verb and noun
+    positionals = [x for x in extra if not x.startswith('-')]
+    verb = positionals[0] if len(positionals) > 0 else None
+    noun = positionals[1] if len(positionals) > 1 else None
 
     if not noun:
     # Noun not supplied, so try to get default
-        try: 
+        try:
             noun = args_dict['verbs'][verb]['nouns']['default']
         except (TypeError, KeyError):
             pass
@@ -314,12 +318,24 @@ def _preprocess_args(args_dict, args=None):
 
     args_dict = vars(args).items()
     args = []
-    for arg,val in args_dict:
+    for arg, val in args_dict:
         arg = arg.replace('_', '-')
-        if isinstance(val,bool):
-            arg = arg = '--{}'.format(arg)
+        if arg in ['simple', 'table', 'json']:
+            arg = '--format='+arg
+        elif isinstance(val, bool):
+            arg = '--{}'.format(arg)
+        elif arg == 'verbose': # action is count
+            if not val:
+                continue
+            arg = '-' + 'v' * val
+        elif isinstance(val, list):
+        # Separate list for main parser
+            for v in val:
+                a = '--{}={}'.format(arg, v)
+                args.append(a)
+            continue
         else:
-            arg = '--{}={}'.format(arg,val)
+            arg = '--{}={}'.format(arg, val)
         args.append(arg)
 
     return extra+args
@@ -329,7 +345,6 @@ def _postprocess_args(args):
     """
     Post-processes args after they have been parsed.
     """
-
     if hasattr(args, 'noun'):
         subnoun_key = '{}_noun'.format(args.noun)
         if hasattr(args, subnoun_key):
@@ -341,10 +356,6 @@ def _postprocess_args(args):
         if hasattr(val, '__call__'):
         # If value is a function, call it
             val = val()
-        if isinstance(val, list):
-        # Format lists
-            val = [re.sub('[\[\]\s\'\']', '', sub) for elem in val 
-                   for sub in elem.split(',')]
         setattr(args, arg, val)
 
     return args

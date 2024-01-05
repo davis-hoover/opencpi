@@ -42,7 +42,7 @@ class CharacterGeneratorDefaults:
     CHARACTER_MINIMUM = -(2**7)
 
     #: Maximum value a character number allows.
-    CHARACTER_MAXIMUM = 2**7 - 1
+    CHARACTER_MAXIMUM = (2**7) - 1
 
     #: Mean of the Gaussian probability distribution function of the random
     #: number generator used to set the amplitude of the sinusoidal waves that

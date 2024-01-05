@@ -26,8 +26,15 @@
 
 set -e
 
-if [ "x$OCPI_CDK_DIR" = x ]
-then
+#
+# Adding tools that this script can install is not quite a drop-in
+# operation yet.  Some tools require specifying an installer file.
+# Edit "ifile_required" as necessary: the tool names are separated
+# by '|'.
+#
+ifile_required="vivado"
+
+if [ "x$OCPI_CDK_DIR" = x ]; then
   #
   # OpenCPI environment not initialized: fatal error.
   #
@@ -36,31 +43,28 @@ then
   exit 1
 fi
 
-#
-# Must be in the OpenCPI base directory, at least until a
-# clean way of dealing with relative paths can be implemented.
-#
-cd $OCPI_ROOT_DIR
-
 # Provides `setVarsFromMake`
 source $OCPI_CDK_DIR/scripts/util.sh
 
-function usage {
-  if [ "$action" != install ]; then
-    cat <<-EOF
+#
+# Emit the help() text for any of the following:
+#   bad or missing <verb>
+#   bad or missing <noun>
+#   bad <verb>+<noun> combos
+#
+function help {
+  cat <<-EOF >&2
 To install a platform (by downloading it, if necessary, and building it):
   $(basename $0) [-p PKG_ID [-u URL] [-g GIT_REV]] [--minimal] [--optimize] install platform <platform>
 To deploy a platform:
   $(basename $0) deploy platform <rcc_platform> <hdl_platform>
+To install a tool:
+  $(basename $0) [-d DIR] [--installer-file=IFILE] [--tool-options="[ARG]..."] install tool <name>
 EOF
-  else
-    install_usage
-  fi
-  exit 1
 }
 
-function install_usage {
-  cat <<-EOF
+function usage_p {
+  cat <<-EOF >&2
 Usage: $(basename $0) [-p PKG_ID [-u URL] [-g GIT_REV]] [--minimal] [--optimize] install platform <platform>
 
 Download, build, and register the built-in or remote OpenCPI RCC or HDL platform.
@@ -83,6 +87,9 @@ Optional args:
   --minimal                     specifies a minimized installation process that
                                   does not pre-build HDL workers or run any
                                   installation tests; default is "false"
+  --artifacts-only              cleans all intermediate build files, keeps only
+                                  artifacts required for building at the next 
+                                  level or deploying onto hardware.
   --optimize                    for RCC (software) platforms only, specifies that
                                   the framework software and software workers be
                                   built w/optimization enabled; default is "false"
@@ -99,6 +106,55 @@ Examples:
   ocpiadmin -p ocpi.osp.plutosdr install platform adi_plutosdr0_32
   ocpiadmin install platform plutosdr
 EOF
+}
+
+function usage_t {
+  cat <<-EOF >&2
+Usage: $(basename $0) [-d DIR] [--installer-file=IFILE] [--tool-options="[ARG]..."] install tool <name>
+
+Install the specified tool.
+
+Required args:
+  <name>                        name of tool to install, e.g., "vivado"
+
+Optional args:
+  -d, --directory=DIR           installation directory; default value depends
+                                  on the tool ("/opt/Xilinx" for "vivado") 
+  --installer-file=IFILE        some tools (like "vivado") require this; no
+                                  default value
+  --tool-options="[ARG]..."     options passed to the tool installer script; no
+                                  default value; double-quotes around the value
+                                  are required to ensure proper parsing; legal ARGs
+                                  (typically specified to override the default tool
+                                  installation parameters) are defined by the tool
+                                  installation script (use '--tool-options="--help"'
+                                  to see them) and are space-separated
+
+Example:
+  # vivado
+  ocpiadmin --installer-file=/opt/downloads/Xilinx/Xilinx_Unified_2022.1_0420_0327_Lin64.bin install tool vivado
+EOF
+}
+
+#
+# Top-level "usage" function: calls
+# the help() and usage_*() functions
+# defined above.
+#
+function usage {
+  case "$action" in
+    install)
+      case "$noun" in
+	platform)
+	  usage_p ;;
+	tool)
+	  usage_t ;;
+	*)
+	  help ;;
+      esac ;;
+    *)
+      help ;;
+  esac
   exit 1
 }
 
@@ -106,8 +162,7 @@ function getvars {
   # setVarsFromMake $OCPI_CDK_DIR/include/hdl/hdl-targets.mk ShellHdlTargetsVars=1
   # setVarsFromMake $OCPI_CDK_DIR/include/rcc/rcc-targets.mk ShellRccTargetsVars=1
   eval $(python3 -c "import _opencpi.util as ou; print(ou.get_platform_variables(True))")
-  if [ "$action" = deploy ]
-  then
+  if [ "$action" = deploy ]; then
     export OCPI_ALL_RCC_PLATFORMS="$RccAllPlatforms" OCPI_ALL_HDL_PLATFORMS="$HdlAllPlatforms"
     return 0
   fi
@@ -147,8 +202,7 @@ while (( "$#" )); do
         shift 2
       else
         bad "Argument for \"$1\" is missing"
-      fi
-      ;;
+      fi ;;
     -p|--package-id|--package-id=*)
       if [[ "$1" == "--package-id="* ]]; then
 	PKG_ID=${1#*=}
@@ -158,9 +212,8 @@ while (( "$#" )); do
         shift 2
       else
         bad "Argument for \"$1\" is missing"
-      fi
-      ;;
-    -u|--url)
+      fi ;;
+    -u|--url|--url=*)
       if [[ "$1" == "--url="* ]]; then
 	URL=${1#*=}
 	shift
@@ -169,46 +222,82 @@ while (( "$#" )); do
         shift 2
       else
         bad "Argument for \"$1\" is missing"
-      fi
-      ;;
+      fi ;;
     --minimal)
       minimal=1 # use ${minimal:+whatever}
-      shift
-      ;;
+      shift ;;
     --optimize)
       optimize=1
-      shift
-      ;;
+      shift ;;
+    --tool-options|--tool-options=*)
+      if [[ "$1" == "--tool-options="* ]]; then
+        [[ "$TOPTS" ]] && TOPTS+=" ${1#*=}" || TOPTS=${1#*=}
+        shift
+      elif [ -n "$2" ]; then
+        #
+        # "--long-option value" is a problematic syntax for
+        # this option because the value can begin with a '-',
+        # i.e., must omit the normal [ ${2:0:1} != "-" ] test.
+        #
+        [[ "$TOPTS" ]] && TOPTS+=" $2" || TOPTS="$2"
+        shift 2
+      else
+        bad "Argument for \"$1\" is missing"
+      fi ;;
+    --installer-file|--installer-file=*)
+      if [[ "$1" == "--installer-file="* ]]; then
+        IFILE=${1#*=}
+        shift
+      elif [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+        IFILE=$2
+        shift 2
+      else
+        bad "Argument for \"$1\" is missing"
+      fi ;;
+    -d|--directory|--directory=*)
+      #
+      # A little sleight of hand here: as long as the tool
+      # installer script interprets the associated option
+      # value for '-d' as the installation directory, the
+      # corresponding long-format option does not have to
+      # be '--directory' in the installer script.
+      #
+      if [[ "$1" == "--directory="* ]]; then
+        [[ "$TOPTS" ]] && TOPTS+=" -d ${1#*=}" || TOPTS="-d ${1#*=}"
+        shift
+      elif [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+        [[ "$TOPTS" ]] && TOPTS+=" -d $2" || TOPTS="-d $2"
+        shift 2
+      else
+        bad "Argument for \"$1\" is missing"
+      fi ;;
 
     # Undocumented flags
-    -d|--distro)
+    --distro)
       export OCPI_DISTRO_BUILD=1
-      shift
-      ;;
+      shift ;;
     -v|--verbose)
       verbose=-v
-      shift
-      ;;
+      shift ;;
     --dynamic)
       dynamic=1
-      shift
-      ;;
+      shift ;;
     --no-kernel)
       nokernel=1 # use ${nokernel:+whatever}
-      shift
-      ;;
+      shift ;;
+    --artifacts-only)
+      artifactsonly=1
+      shift ;;
 
     # Unsupported flags
     -*)
       HELP=1  # can't print usage yet as usage message is based on other args
-      shift
-      ;;
+      shift ;;
 
     # Preserve positional arguments
     *)
       PARAMS="$PARAMS \"$1\""
-      shift
-      ;;
+      shift ;;
   esac
 done  # end parsing optional args and flags
 
@@ -218,39 +307,80 @@ unset PARAMS
 
 # The <verb> argument.
 action=$1
+# The <noun> argument: must be either 'platform' or 'tool'
+noun=$2
 
-# Needs to be after $action is set as a different usage message is printed
-# based on the action. Also, at least 3 positional arguments are required.
+#
+# The following needs to be after $action and $noun are set: a different
+# usage message is emitted based on the "action+noun" combination.  Also,
+# at least 3 positional arguments are required.
+#
 if [[ -n "$HELP" || $# -lt 3 ]]; then
   usage
 fi
 
-# $2 is always 'platform' for now
-noun=$2
-if [ "$noun" != platform ]; then
-  bad "Unknown $action noun: '$noun'"
-fi
-if [ "$action" = install ]; then
-  platform=${3%-*}
-  platform_target_dir=$3
-  if [ -z "$platform" ]; then
-    bad 'Missing platform to install'
-  fi
-  # Check to ensure "PKG_ID" is non-null if either
-  # "--url" or "--git-revision" were specified.
-  if [[ ("$URL" || "$GIT_REV") && -z "$PKG_ID" ]]
-  then
-    bad 'PKG_ID is required if a URL or GIT_REV is specified'
-  fi
-elif [ "$action" = deploy ]; then
-  rcc_platform=$3
-  hdl_platform=$4
-  if [ -z "$hdl_platform" ]; then
-    bad 'Cannot deploy platform, missing required rcc and/or hdl platform'
-  fi
-else
-  bad "Unknown action: '$action'"
-fi
+#
+# What follows is going to be a clumsy first attempt
+# to add the "install tool" functionality.  Other
+# scripts support <verb>+<noun> combinations better.
+#
+case "$noun" in
+  platform)
+    if [ "$action" = install ]; then
+      platform=${3%-*}
+      platform_target_dir=$3
+      if [ -z "$platform" ]; then
+        bad 'Missing platform to install'
+      fi
+      # Check to ensure "PKG_ID" is non-null if either
+      # "--url" or "--git-revision" were specified.
+      if [[ ("$URL" || "$GIT_REV") && -z "$PKG_ID" ]]; then
+        bad 'PKG_ID is required if a URL or GIT_REV is specified'
+      fi
+    elif [ "$action" = deploy ]; then
+      rcc_platform=$3
+      hdl_platform=$4
+      if [ -z "$hdl_platform" ]; then
+        bad 'Cannot deploy platform, missing required rcc and/or hdl platform'
+      fi
+    else
+      bad "Unknown action: '$action'"
+    fi ;;
+  tool)
+    if [ "$action" = install ]; then
+      tool=$3
+      if [ -z "$tool" ]; then
+        bad 'Missing tool to install'
+      fi
+      case $tool in
+        $ifile_required)
+          #
+          # A mandatory option?  Unless a sensible
+          # default value for it can be determined,
+          # this is unavoidable.
+          #
+          if [ -z "$IFILE" ]; then
+            bad "Tool '$tool' requires '--installer-file' option"
+          fi ;;
+      esac
+      ISCRIPT="$OCPI_CDK_DIR/scripts/*/$action-$tool.sh"
+      if [ ! -f $ISCRIPT ]; then
+        bad "Missing script: $ISCRIPT"
+      fi
+      installer_argv=($TOPTS)
+      exec $ISCRIPT ${installer_argv[@]} $IFILE
+
+      #
+      # The next statement is unreachable
+      # unless execfail is set/enabled.
+      #
+      bad "exec failed: $ISCRIPT ${installer_argv[@]} $IFILE"
+    else
+      bad "Unknown action: '$action'"
+    fi ;;
+  *)
+    bad "Unknown $action noun: '$noun'" ;;
+esac
 
 # End parsing and validation of positional args
 
@@ -259,13 +389,17 @@ fi
 # does the heavy lifting.  Note undocumented "verbose"
 # option: set to "-v" for debugging.
 #
-if [ "$action" = deploy ]
-then
+if [ "$action" = deploy ]; then
   getvars
   $OCPI_CDK_DIR/scripts/deploy-platform.sh $verbose $rcc_platform $hdl_platform
   exit $?
 fi
 
+#
+# From this point on, must be in the OpenCPI base directory, at least
+# until a clean way of dealing with relative paths can be implemented.
+#
+cd $OCPI_ROOT_DIR
 
 if getvars; then
     echo The $model platform \"$platform\" is already defined in this installation, in $platform_dir.
@@ -371,25 +505,27 @@ else
 	fi
     fi
 fi
+
 if [ "$model" = RCC ]; then
     if [ -n "$dynamic" -o -n "$optimize" ]; then
-	if [[ $platform_target_dir == *-* ]]; then
-	    echo "ERROR: you cannot use the --dynamic or the --optimize options when you have" >&2
-	    echo "       included build options in the platform name, in this case: $platform_target_dir" >&2
-	    exit 1
-	fi
-	platform_target_dir+=-
-	[ -n "$dynamic" ] && platform_target_dir+=d
-	[ -n "$optimize" ] && platform_target_dir+=o
+        if [[ $platform_target_dir == *-* ]]; then
+            echo "ERROR: you cannot use the --dynamic or the --optimize options when you have" >&2
+            echo "       included build options in the platform name, in this case: $platform_target_dir" >&2
+            exit 1
+        fi
+        platform_target_dir+=-
+        [ -n "$dynamic" ] && platform_target_dir+=d
+        [ -n "$optimize" ] && platform_target_dir+=o
     fi
 
-    #
-    # Since the user had to source "cdk/opencpi-setup.sh" before running
-    # this script, it is safe to assume the OpenCPI environment has been
-    # properly set up.  Let "install-opencpi.sh" know that by passing a
-    # "--use-env" flag.
-    #
-    ./scripts/install-opencpi.sh ${minimal:+--minimal} ${nokernel:+--no-kernel} --use-env $platform_target_dir || exit 1
+  #
+  # Since the user had to source "cdk/opencpi-setup.sh" before running
+  # this script, it is safe to assume the OpenCPI environment has been
+  # properly set up.  Let "install-opencpi.sh" know that by passing a
+  # "--use-env" flag.  
+  #
+
+  ./scripts/install-opencpi.sh ${artifactsonly:+--artifacts-only} ${minimal:+--minimal} ${nokernel:+--no-kernel} --use-env $platform_target_dir || exit 1 
 else
     # Since the build-opencpi.sh does an "rcc" build per project, and that implicitly
     # does "declare" on projects, that is sufficient for on-demand hdl worker builds
@@ -402,39 +538,41 @@ else
       ocpidev -d projects/assets build hdl primitives --hdl-platform=$platform
       ocpidev -d projects/assets_ts build hdl primitives --hdl-platform=$platform
     else
-      ocpidev -d projects/core build --hdl --hdl-platform=$platform
-      ocpidev -d projects/platform build --hdl --hdl-platform=$platform --no-assemblies
-      ocpidev -d projects/assets build --hdl --hdl-platform=$platform --no-assemblies
-      ocpidev -d projects/assets_ts build --hdl --hdl-platform=$platform --no-assemblies
-      ocpidev -d projects/tutorial build --hdl --hdl-platform=$platform --no-assemblies
+      ocpidev -d projects/core build --hdl --hdl-platform=$platform ${artifactsonly:+--artifacts-only}
+      ocpidev -d projects/platform build --hdl --hdl-platform=$platform --no-assemblies ${artifactsonly:+--artifacts-only}
+      ocpidev -d projects/assets build --hdl --hdl-platform=$platform --no-assemblies ${artifactsonly:+--artifacts-only}
+      ocpidev -d projects/assets_ts build --hdl --hdl-platform=$platform --no-assemblies ${artifactsonly:+--artifacts-only}
+      ocpidev -d projects/tutorial build --hdl --hdl-platform=$platform --no-assemblies ${artifactsonly:+--artifacts-only}
 
       # Make sure that tutorials can run after installation, note will do rcc too.
-      [ "$platform" = xsim ] && ocpidev -d projects/tutorial build --hdl-platform=$platform
+      [ "$platform" = xsim ] && ocpidev -d projects/tutorial build --hdl-platform=$platform ${artifactsonly:+--artifacts-only}
     fi
     # If project dir is not one of the core projects, build the platform
     if [[ -n "$platform_dir" && "$platform_dir" != *"/projects/core/"* \
           && "$platform_dir" != *"/projects/platform/"* \
-          && "$platform_dir" != *"/projects/assets/"* ]]
-    then
+          && "$platform_dir" != *"/projects/assets/"* ]]; then
         if [ -n "$minimal" ]; then
           ocpidev -d $project_dir build hdl primitives --hdl-platform=$platform
           # the rcc build ensures all workers are visible to build the platform
           # we don't have a verb to do that.
-          ocpidev -d $project_dir build --rcc
-          ocpidev -d $project_dir build hdl --workers-as-needed platform $platform
+          ocpidev -d $project_dir build --rcc ${artifactsonly:+--artifacts-only}
+          ocpidev -d $project_dir build hdl platform $platform --workers-as-needed ${artifactsonly:+--artifacts-only}
+
         else
-          ocpidev -d $project_dir build --hdl --hdl-platform=$platform --no-assemblies
+          ocpidev -d $project_dir build --hdl --hdl-platform=$platform --no-assemblies ${artifactsonly:+--artifacts-only}
         fi
         # Since there is no project-level build, no exports were done
         # The best fix would be to add an --export-project option to ocpidev
+        echo "project_dir: $project_dir"
+        echo "OCPI_CDK_DIR: $OCPI_CDK_DIR"
         make -C $project_dir -f $OCPI_CDK_DIR/include/project.mk exports
         echo "HDL platform \"$platform\" built and exported for OSP in $project_dir."
     elif [ -n "$minimal" ]; then
         # core project: build the platform in its project
-        ocpidev -d $project_dir build hdl --workers-as-needed platform $platform
+        ocpidev -d $project_dir build hdl --workers-as-needed ${artifactsonly:+--artifacts-only} platform $platform
         echo "HDL platform \"$platform\" built in $project_dir."
     fi
-    ocpidev -d projects/assets build --hdl-platform=$platform hdl ${minimal:+--workers-as-needed} assembly testbias
+    ocpidev -d projects/assets build hdl assembly testbias --hdl-platform=$platform ${minimal:+--workers-as-needed} ${artifactsonly:+--artifacts-only}
     echo "HDL platform \"$platform\" built, with one HDL assembly (testbias) built for testing."
     echo "Preparing exported files for using this platform."
     #

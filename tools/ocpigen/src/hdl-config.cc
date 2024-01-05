@@ -58,8 +58,10 @@ emit(std::string &assy, bool emulated, bool content) const {
   if (m_instancePVs.size()) {
     const OM::Assembly::Property *ap = &m_instancePVs[0];
     for (size_t n = m_instancePVs.size(); n; n--, ap++)
-      OU::formatAdd(assy, "    <property name='%s' value='%s'/>\n",
-		    ap->m_name.c_str(), ap->m_value.c_str());
+      OU::formatAdd(assy, "    <property name='%s' value='%s'%s/>\n",
+		    ap->m_name.c_str(), ap->m_value.c_str(),
+		    // record whether the value comes from the device declaration to use as default
+		    ap->m_isDefault ? " isDefault='1'" : "");
     if (!content)
       OU::formatAdd(assy, "  </instance>\n");
   }
@@ -87,6 +89,90 @@ findDevInstance(const Device &dev, const Card *card, const Slot *slot,
   return NULL;
 }
 
+// Parse the parameter property values for a device instance, merging its parameter values with those
+// of the underlying device, and resolving "platform" constraints for values from cards
+// The output is the instance properties required to create the worker for this device instance
+const char *DevInstance::
+parseProperties(ezxml_t xml, const HdlPlatform &platform) {
+  auto &deviceType = device.m_deviceType;
+  for (auto pi = deviceType.m_ctl.properties.begin(); pi != deviceType.m_ctl.properties.end(); ++pi) {
+    OM::Property &prop = **pi;
+    if (!prop.m_isParameter)
+      continue;
+    // First, see if the device specified it, prioritizing platform-specific values
+    const InstanceProperty *deviceMatch = NULL, *matchPlatform = NULL;
+    for (auto dit = device.m_parameters.begin(); dit != device.m_parameters.end(); ++dit)
+      if (!strcasecmp(dit->m_property->cname(), prop.cname())) {
+	if (dit->m_platform.empty())
+	  deviceMatch = &*dit;
+	else if (!strcasecmp(dit->m_platform.c_str(), platform.cname()))
+	  matchPlatform = &*dit;
+      }
+    if (matchPlatform)
+      deviceMatch = matchPlatform; // prefer platform-specific match
+    // Next, see if the device instance specified it.
+    std::string l_name;
+    ezxml_t devInstanceMatch = NULL;
+    const char *err;
+    for (ezxml_t px = ezxml_cchild(xml, "Property"); px; px = ezxml_cnext(px)) {
+      if ((err = OE::checkAttrs(px, "name", "value", "valuefile", NULL)) ||
+	  (err = OE::getRequiredString(px, l_name, "name", "property")))
+	return err;
+      if (!strcasecmp(l_name.c_str(), prop.cname())) {
+	devInstanceMatch = px;
+	break;
+      }
+    }
+    OM::Assembly::Property param;
+    param.m_name = prop.cname();
+    param.m_hasValue = true;
+    if (devInstanceMatch) {
+      const char
+	*value = ezxml_cattr(devInstanceMatch, "value"),
+	*valueFile = ezxml_cattr(devInstanceMatch, "valueFile");
+      if (valueFile) {
+	if (value)
+	  return OU::esprintf("only one of the value or valueFile attributes is allowed");
+	if ((err = OU::file2String(param.m_value, valueFile, ',')))
+	  return err;
+      } else if (!value)
+	  return OU::esprintf("one of the value or valueFile attributes is required");
+      else
+	param.m_value = value;
+      OB::Value l_value(prop);
+      if ((err = l_value.parse(param.m_value.c_str())))
+	return err;
+      std::string uValue;
+      l_value.unparse(uValue);
+      if (deviceMatch) {
+	// Device specifies a value, which should be considered the default value
+	param.m_isDefault = uValue == deviceMatch->m_uValue;
+	if (deviceMatch->m_isFixed && !param.m_isDefault)
+	  return OU::esprintf("Device \"%s\" specified a fixed value for property \"%s\" of \"%s\" so "
+			      "it is invalid for a device instance in the platform configuration or "
+			      "container to override it with \"%s\"", device.cname(), prop.cname(),
+			      deviceMatch->m_uValue.c_str(), param.m_value.c_str());
+      } else {
+	// Device specifies no value, but we still need to check here for the default
+	std::string defaultValue;
+	if (prop.m_default)
+	  prop.m_default->unparse(defaultValue);
+	else {
+	  OB::Value zero(prop);
+	  zero.unparse(defaultValue);
+	}
+	param.m_isDefault = uValue == defaultValue;
+      }
+    } else if (deviceMatch) { // device specified a value
+      param.m_isDefault = true;
+      param.m_value = deviceMatch->m_uValue;
+    } else
+      continue; // no value specified
+    m_instancePVs.push_back(param); // copy
+  }
+  return NULL;
+}
+
 const char *HdlHasDevInstances::
 addDevInstance(const Device &dev, const Card *card, const Slot *slot,
 	       bool control, const DevInstance *parent, DevInstances */*baseInstances*/,
@@ -98,13 +184,13 @@ addDevInstance(const Device &dev, const Card *card, const Slot *slot,
   if (slot && !m_plugged[slot->m_ordinal])
     m_plugged[slot->m_ordinal] = card;
   DevInstance &di = m_devInstances.back();
-  devInstance = &di;
-  if ((err = dev.m_deviceType.parseDeviceProperties(xml, di.m_instancePVs)))
+  devInstance = &di; // output arg
+  if ((err = di.parseProperties(xml, m_platform)))
     return err;
   // Now that we have the instancePVs, we can create a worker that is parameterized for this
   // device instance;
-  di.m_worker = Worker::create(dev.m_deviceType.m_file.c_str(), m_parent.m_file.c_str(), NULL, NULL, &m_parent,
-			       &di.m_instancePVs, SIZE_MAX, err);
+  di.m_worker = Worker::create(dev.m_deviceType.m_file.c_str(), m_parent.m_file.c_str(), NULL, NULL,
+			       &m_parent, &di.m_instancePVs, SIZE_MAX, err);
   return err;
 }
 
@@ -121,7 +207,7 @@ parseDevInstance(const char *device, ezxml_t x, const char *parentFile, Worker *
     return err;
   const Card *card = NULL;
   if (OE::getOptionalString(x, s, "card") &&
-      !(card = Card::get(s.c_str(), parentFile, parent, err)))
+      !(card = Card::get(s.c_str(), parentFile, parent, platform(), err)))
     return err;
   const char *slash = strchr(device, '/'); // slot/card/dev or card/dev
   if (slash) {
@@ -137,7 +223,7 @@ parseDevInstance(const char *device, ezxml_t x, const char *parentFile, Worker *
       slash = slash2;
     }
     s.assign(device, OCPI_SIZE_T_DIFF(slash, device));
-    if (!(card = Card::get(s.c_str(), parentFile, parent, err)))
+    if (!(card = Card::get(s.c_str(), parentFile, parent, platform(), err)))
       return err;
     device = slash + 1;
   }
@@ -209,62 +295,6 @@ parseDevInstance(const char *device, ezxml_t x, const char *parentFile, Worker *
     return err;
   if (result)
     *result = di;
-  return NULL;
-}
-
-// Parse the properties (parameters) that should be applied to this instance.
-// This is used both for specifying a device's properties on the board (platform or card),
-// as well as additional properties for a device instance.  The properties from the base
-// device are copied to the instance so they are all in one place, but an instance cannot
-// override the parameters of the device as defined for the board.
-const char *DeviceType::
-parseDeviceProperties(ezxml_t x, OM::Assembly::Properties &iPVs) {
-  const char *err;
-  // First pass for error checking
-  for (ezxml_t px = ezxml_cchild(x, "Property"); px; px = ezxml_cnext(px)) {
-    std::string l_name;
-    if ((err = OE::checkAttrs(px, "name", "value", "valuefile", NULL)) ||
-	(err = OE::getRequiredString(px, l_name, "name", "property")))
-      return err;
-    OM::Property *p = findProperty(l_name.c_str());
-    if (!p)
-      return OU::esprintf("\"%s\" is not a property of device \"%s\"",
-			  l_name.c_str(), m_implName);
-    if (!p->m_isParameter)
-      return OU::esprintf("\"%s\" is not a parameter property of device \"%s\"",
-			  l_name.c_str(), m_implName);
-  }
-  assert(!iPVs.size());
-  iPVs.resize(m_ctl.nParameters);
-  unsigned nPVs = 0;
-  for (PropertiesIter pi = m_ctl.properties.begin(); pi != m_ctl.properties.end(); pi++)
-    if ((*pi)->m_isParameter) {
-      OM::Property &p = **pi;
-      for (ezxml_t px = ezxml_cchild(x, "Property"); px; px = ezxml_cnext(px))
-	if (!strcasecmp(p.m_name.c_str(), ezxml_cattr(px, "name"))) {
-	  if ((err = iPVs[nPVs].parse(px)))
-	    return err;
-	  for (unsigned i = 0; i < m_instancePVs.size(); i++)
-	    if (!strcasecmp(p.m_name.c_str(), m_instancePVs[i].m_name.c_str()) &&
-		iPVs[nPVs].m_value != m_instancePVs[i].m_value)
-	      return OU::esprintf("device instance of device type \"%s\" cannot "
-				  "override the parameter \"%s\" that is already specified "
-				  "for the platform or card",
-				  m_implName, p.m_name.c_str());
-	  // This parameter not specified for the board so we can use it
-	  nPVs++;
-	  goto nextParam;
-	}
-      // For this parameter, nothing is specified in the instance.  If it is specified for
-      // for the device, copy it to the instance.
-      for (unsigned i = 0; i < m_instancePVs.size(); i++)
-	if (!strcasecmp(p.m_name.c_str(), m_instancePVs[i].m_name.c_str())) {
-	  iPVs[nPVs++] = m_instancePVs[i];
-	  break;
-	}
-    nextParam:;
-    }
-  iPVs.resize(nPVs);
   return NULL;
 }
 
@@ -466,7 +496,7 @@ HdlConfig(HdlPlatform &pf, ezxml_t xml, const char *xfile, const std::string &pa
 	  Worker *parent, const char *&err)
   : Worker(xml, xfile, parentFile, Worker::Configuration, parent, NULL, err),
     HdlHasDevInstances(pf, m_plugged, *this),
-    m_platform(pf), m_sdpWidth(1), m_sdpLength(32), m_sdpArb(0) { // 32 is for backward compatibility (zynq w/64 bit AXI)
+    m_sdpWidth(1), m_sdpLength(32), m_sdpArb(0) { // 32 is for backward compatibility (zynq w/64 bit AXI)
   if (err ||
       (err = OE::checkAttrs(xml, HDL_CONFIG_ATTRS, (void*)0)) ||
       (err = OE::checkElements(xml, HDL_CONFIG_ELEMS, (void*)0)))
@@ -627,7 +657,7 @@ HdlConfig(HdlPlatform &pf, ezxml_t xml, const char *xfile, const std::string &pa
     for (SignalsIter si = w.m_signals.begin(); si != w.m_signals.end(); si++) {
       if ((**si).m_direction == Signal::UNUSED)
 	continue;
-      Signal *s = new Signal(**si);
+      Signal *s = (**si).clone(true); // remove expressions
       if (w.m_type != Worker::Platform)
 	OU::format(s->m_name, "%s_%s", i->cname(), (**si).m_name.c_str());
       m_signals.push_back(s);

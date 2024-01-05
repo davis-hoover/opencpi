@@ -50,7 +50,7 @@ namespace OA = OCPI::API;
 
 static int mymain(const char **ap) {
   if (options.loglevel())
-    OCPI::OS::logSetLevel(options.loglevel());
+    OCPI::OS::Log::setLevel(options.loglevel());
   size_t nvars;
   struct Vars : OB::IdentResolver {
     typedef std::map<std::string,OB::Value *> Map;

@@ -80,7 +80,6 @@
 	                               "can be used with no xml file argument - no execution") \
   CMD_OPTION_S(server,   S, String, 0, "a server to explicitly contact, without UDP discovery") \
   CMD_OPTION(remote,     R, Bool,   0, "discover/include/use remote containers") \
-  CMD_OPTION_S(exclude,  X, String, 0, "a container to exclude from usage") \
   CMD_OPTION_S(transport,T, String, 0, "<instance-name>=<port-name>=<transport-name>\n" \
                                        "set transport of connection at a port") \
   CMD_OPTION_S(transfer_role,,String,0, "<instance-name>=<port-name>=<transfer-role>\n" \
@@ -127,6 +126,17 @@ namespace OL = OCPI::Library;
 namespace OC = OCPI::Container;
 namespace OR = OCPI::Remote;
 namespace OE = OCPI::Util::EzXml;
+
+OA::ApplicationX* app_ptr;
+void signalHandler( int signum ) {
+  std::string error;
+  OU::eformat(error, "Interrupt signal (%d) received.", signum);
+
+  // terminate program  
+  app_ptr->stop();
+  app_ptr->finish();
+  exit(signum);
+}
 
 static void addParams(const char *name, const char **ap, OB::PValueList &params) {
   const char *err;
@@ -298,8 +308,9 @@ static int mymain(const char **ap) {
     putenv(strdup(env.c_str()));
   }
   signal(SIGPIPE, SIG_IGN);
+  signal(SIGINT, signalHandler);  
   if (options.log_level())
-    OCPI::OS::logSetLevel(options.log_level());
+    OCPI::OS::Log::setLevel(options.log_level());
   if (!*ap && !options.list() && !options.artifacts())
     return options.usage();
   if (options.verbose())
@@ -348,6 +359,7 @@ static int mymain(const char **ap) {
       OU::baseName(file.c_str(), name);
 
       OA::ApplicationX app(xml, name.c_str(), params);
+      app_ptr = &app;
       if (options.deploy_out()) {
 	std::string dfile;
 	if (*options.deploy_out())

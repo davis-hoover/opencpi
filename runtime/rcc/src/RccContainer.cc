@@ -79,9 +79,9 @@ Container(const char *a_name, const OA::PValue* /* params */)
 	       (1 << OT::ActiveFlowControl) | (1 << OT::ActiveMessage) | (1 << OT::FlagIsMeta));
   //	       (1 << OT::ActiveFlowControl) | (1 << OT::ActiveMessage) | (1 << OT::Passive),
   //	       (1 << OT::ActiveFlowControl) | (1 << OT::ActiveMessage) | (1 << OT::FlagIsMetaOptional));
-  addTransport("ocpi-udp-rdma", NULL, OT::ActiveFlowControl, OT::ActiveMessage,
-	       (1 << OT::ActiveFlowControl) | (1 << OT::FlagIsMeta),
-	       (1 << OT::ActiveMessage) | (1 << OT::FlagIsMeta)),
+  addTransport("ocpi-udp-rdma", system, OT::ActiveFlowControl, OT::ActiveMessage,
+	       (1 << OT::ActiveFlowControl) | (1 << OT::FlagIsMetaOptional),
+	       (1 << OT::ActiveMessage) | (1 << OT::FlagIsMetaOptional)),
   addTransport("ocpi-ether-rdma", system, OT::ActiveFlowControl, OT::ActiveMessage,
 	       (1 << OT::ActiveFlowControl) | (1 << OT::FlagIsMetaOptional),
 	       (1 << OT::ActiveMessage) | (1 << OT::FlagIsMetaOptional));

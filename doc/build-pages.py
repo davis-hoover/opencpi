@@ -160,7 +160,7 @@ def main():
 
     # Create symlink so urls like https://example.com/releases/latest/doc/some.pdf will work
     latest_link = args.outputdir / "latest"
-    if latest_link.exists():
+    if latest_link.exists() or latest_link.is_symlink():
         os.remove(str(latest_link))
     os.symlink(latest_release, str(latest_link))
 

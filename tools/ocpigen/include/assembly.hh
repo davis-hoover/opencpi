@@ -48,9 +48,16 @@ struct Connection {
 typedef std::list<Connection*> Connections;
 typedef Connections::const_iterator ConnectionsIter;
 
+// Used for our assembly instances as well as devices and devInstances
+// Note this is higher level and more "added value" than OM::Assembly::Instance, which is
+// not validated against a worker, and has no notion of platforms or whether it is "fixed" etc.
 struct InstanceProperty {
-  const OM::Property *property;
-  OB::Value value;
+  const OM::Property *m_property; // the worker property
+  OB::Value m_value;              // the parsed and validated value
+  std::string m_platform;         // the platform for platform-specific values
+  bool        m_isFixed;          // is it illegal to try and override this value?
+  std::string m_uValue;           // unparsed value for canonical comparison
+  bool        m_isDefault;        // is this value the default?
   InstanceProperty();
 };
 typedef std::vector<InstanceProperty> InstanceProperties;
@@ -83,9 +90,9 @@ struct Instance : public OB::IdentResolver {
   const char *m_attach;  // external platform port instance is attached to for io or interconnect
   OM::Assembly::Properties m_xmlProperties; // explicit unparsed values for the instance
   InstanceProperties m_properties;                  // fully parsed w/ full knowledge of worker
-  bool m_hasConfig;      // for adapter configuration FIXME make normal properties
+  bool m_hasConfig;    // for adapter configuration FIXME make normal properties
   size_t m_config;
-  ExtMap m_extmap;     // map for externals. FIXME: have HdlInstance class...
+  ExtMap m_inst2ext;   // map from an instance's signals to externals of the assembly, both indexed
   bool   m_emulated;   // is this an instance of a device worker with an emulator?
   bool   m_inserted;   // was this instance auto-inserted?
   bool   m_loadTime;   // is this designated as loadtime?

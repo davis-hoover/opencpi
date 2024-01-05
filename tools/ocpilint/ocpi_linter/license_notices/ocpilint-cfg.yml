@@ -1,0 +1,39 @@
+# OCPI Lint yaml configuration file
+#
+# This file is protected by Copyright. Please refer to the COPYRIGHT file
+# distributed with this source distribution.
+#
+# This file is part of OpenCPI <http://www.opencpi.org>
+#
+# OpenCPI is free software: you can redistribute it and/or modify it under the
+# terms of the GNU Lesser General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+# more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+
+# This file allows the customisation of the OpenCPI lint scripts.
+# A project can contain multiple versions of this file, at different
+# hierarchies.
+# For example, there could be a version of this file at the project root, then
+# an additional version within the hdl/primitives directory.
+# Whether a configuration file inherits settings from parent directories is
+# controlled via the "inherit_parent" setting.
+# This can be set to "false" to *not* inherit settings, or
+# to "true" (the default) to inherit settings from the parent directory.
+inherit_parent: true
+
+
+# Allows the ignoring of files and directories within the project.
+# Standard path globbing wildcards are allowed.
+# Note: that if the string doesn't start with an alphanumeric character then
+# the string should be wrapped in quotation marks.
+ignore_pattern:
+  - "*.txt"

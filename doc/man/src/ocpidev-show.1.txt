@@ -87,6 +87,8 @@ In the following descriptions,
 a plus sign (+) after the option indicates
 that it can be specified more than once on the command line.
 
+Options When Showing Any Asset
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`-P`* '<hdl-platform-directory>', *`--platform=`*'<hdl-platform-directory>'::
     Specify the HDL platform subdirectory in which to operate.
 
@@ -117,7 +119,17 @@ that it can be specified more than once on the command line.
     Display the output in an easy-to-read table.
     This is the default display format
     used if *`--simple`* or *`--json`* are not used.
-    
+
+Options When Showing Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--rcc-platform=`*'<platform>'+::
+    Specify unit tests that are applicable for the specified rcc
+    platform(s).
+
+*`--hdl-platform=`*'<platform>'+::
+    Specify unit tests that are applicable for the specified hdl
+    platform(s).
+
 EXAMPLES
 --------
 . List all RCC and HDL platforms that assets can be built for:

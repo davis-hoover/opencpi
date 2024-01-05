@@ -10,8 +10,8 @@
   <!-- 3 = 1000 to 2100 MHz -->
   <!-- 4 = 1700 to 2500 MHz -->
   <!-- 5 = 2200 to 3800 MHz -->
-  <property name="filter_bandwidth" type="ushort" readable="true" writable="true" writesync="1"/>
+  <property name="filter_bandwidth" type="ushort" writable="true" writesync="1"/>
   <!--Only Inputs 2 and 3 are connected on the Matchstiq-Z1 -->
-  <property name="lime_rx_input" type="ushort" readable="true" writable="true" writesync="1"/>
-  <property name="frontLNA_enable" type="bool" readable="true" writable="true" writesync="1"/>
+  <property name="lime_rx_input" type="ushort" writable="true" writesync="1"/>
+  <property name="frontLNA_enable" type="bool" writable="true" writesync="1"/>
 </RccWorker>

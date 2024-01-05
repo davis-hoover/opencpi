@@ -93,7 +93,7 @@ checkDataPort(ezxml_t impl, DataPort *&sp) {
   return NULL;
 }
 
-// If the given element is xi:include, then parse it and return the parsed element.
+// If the given element is include, then parse it and return the parsed element.
 // If not, *parsed is set to zero.
 // If not optional then it MUST be the indicated element
 // Also return the file name of the included file.
@@ -102,14 +102,14 @@ tryInclude(ezxml_t x, const std::string &parent, const char *element, ezxml_t *p
            std::string &child, bool optional) {
   *parsed = 0;
   const char *eName = ezxml_name(x);
-  if (!eName || strcasecmp(eName, "xi:include"))
+  if ((!eName || strcasecmp(eName, "xi:include")) && (!eName || strcasecmp(eName, "include")))
     return 0;
   const char *err;
   if ((err = OE::checkAttrs(x, "href", (void*)0)))
     return err;
   const char *incfile = ezxml_cattr(x, "href");
   if (!incfile)
-    return OU::esprintf("xi:include missing an href attribute in file \"%s\"",
+    return OU::esprintf("include missing an href attribute in file \"%s\"",
                         parent.c_str());
   std::string ifile;
   if ((err = parseFile(incfile, parent, element, parsed, ifile, optional)))
@@ -134,7 +134,7 @@ tryChildInclude(ezxml_t x, const std::string &parent, const char *element,
   return 0;
 }
 
-// Find the single instance of a child, which might be xi:included
+// Find the single instance of a child
 const char *
 tryOneChildInclude(ezxml_t top, const std::string &parent, const char *element,
                    ezxml_t *parsed, std::string &childFile, bool optional) {
@@ -170,7 +170,7 @@ tryOneChildInclude(ezxml_t top, const std::string &parent, const char *element,
     }
   }
   if (!*parsed && !optional)
-    return OU::esprintf("no %s element found under %s, whether included via xi:include or not",
+    return OU::esprintf("no %s element found under %s, whether included via include or not",
                         element, ezxml_name(top));
   return err;
 }
@@ -527,7 +527,7 @@ finalizeProperties() {
 #endif
   // Ensure all parameters are in all paramConfigs, since some may have been added.
   for (unsigned n = 0; n < m_paramConfigs.size(); n++)
-    if (m_paramConfigs[n] && (err = m_paramConfigs[n]->doDefaults(false)))
+    if (m_paramConfigs[n] && (err = m_paramConfigs[n]->doDefaults()))
       return err;
   return NULL;
 }
@@ -617,7 +617,7 @@ findPackage(ezxml_t spec, const char *a_package) {
 const char *Worker::
 parseSpec(const char *a_package) {
   const char *err;
-  // xi:includes at this level are component specs, nothing else can be included
+  // includes at this level are component specs, nothing else can be included
   ezxml_t spec = NULL;
   if ((err = tryOneChildInclude(m_xml, m_file, "ComponentSpec", &spec, m_specFile, true)))
     return err;
@@ -740,15 +740,6 @@ getNumber(ezxml_t x, const char *attr, size_t *np, bool *found, size_t defaultVa
   }
   return err;
 }
-
-#if 0
-const char *Worker::
-getBoolean(ezxml_t x, const char *name, bool *b, bool trueOnly) {
-  if (!m_instancePVs.size())
-    return OE::getBoolean(x, name, b, trueOnly);
-  return NULL;
-}
-#endif
 
 const char*
 extractExprValue(const OM::Property &p, const OB::Value &v, OB::ExprValue &val) {
@@ -975,7 +966,13 @@ create(const char *file, const std::string &parentFile, const char *package, con
 	top = top->m_parent;
       std::string lib(w->m_library);
       w->addParamConfigSuffix(lib);
-      top->m_build.m_checkedLibraries.push_back(":" + lib); // no path here
+      // This is recording that the top-level worker depends on a lower level worker.
+      // This is NOT what we want for the case where a platform worker declares that
+      // the platform contains a device, since platform worker code does not touch
+      // device and is just declaring that they *may* be present.  If this was a bit more
+      // OO it would be a method (top->hasWorkerDependencies())....
+      if (top->m_type != Worker::Platform)
+        top->m_build.m_checkedLibraries.push_back(":" + lib); // no path here
     }
   }
   return w;
@@ -1113,9 +1110,10 @@ Worker(ezxml_t xml, const char *xfile, const std::string &parentFile,
     m_endian(NoEndian), m_needsEndian(false), m_pattern(NULL), m_portPattern(NULL),
     m_staticPattern(NULL), m_defaultDataWidth(SIZE_MAX), m_language(NoLanguage), m_assembly(NULL),
     m_emulate(NULL), m_emulator(NULL), m_library(NULL), m_outer(false),
-    m_debugProp(NULL), m_mkFile(NULL), m_xmlFile(NULL), m_outDir(NULL), m_build(*this),
+    m_debugProp(NULL), m_mkFile(NULL), m_xmlFile(NULL), m_outDir(NULL), m_autoConfigs(false), m_build(*this),
     m_paramConfig(NULL), m_parent(parent), m_scalable(false), m_requiredWorkGroupSize(0),
-    m_maxLevel(0), m_dynamic(false), m_optimized(false), m_isSlave(false), m_isOptional(false),
+    m_maxLevel(0), m_dynamic(false), m_optimized(false),
+    m_isSlave(parent && parent->m_type == Worker::Application), m_isOptional(false),
     m_slavePort(NULL), m_proxyPort(NULL), m_proxyPortIndex(SIZE_MAX)
 {
   if ((err = getNames(xml, xfile, NULL, m_name, m_fileName)))

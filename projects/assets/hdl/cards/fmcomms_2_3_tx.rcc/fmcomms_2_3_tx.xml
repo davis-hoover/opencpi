@@ -226,7 +226,6 @@
   <Property Name="app_inst_name_ad9361_config_proxy" Type="string"
                                                      StringLength="128"
                                                      Initial="true"
-                                                     Readable="true"
                                                      WriteSync="true"
                                                      Default="ad9361_config_proxy"
                                                      Description="Value must match the name of the ad9361_config_proxy application instance."/>
@@ -235,14 +234,13 @@
   <Property Name="app_inst_name_ad9361_data_sub" Type="string"
                                                  StringLength="128"
                                                  Initial="true"
-                                                 Readable="true"
                                                  WriteSync="true"
                                                  Default="ad9361_data_sub"
                                                  Description="Value must match the name of the ad9361_data_sub application instance."/>
 
-  <Property Name="enable_log_info" Type="bool" Initial="true" Readable="true" Default="false"/>
-  <Property Name="enable_log_debug" Type="bool" Initial="true" Readable="true" Default="false"/>
-  <Property Name="enable_log_trace" Type="bool" Initial="true" Readable="true" Default="false"/>
+  <Property Name="enable_log_info" Type="bool" Initial="true" Default="false"/>
+  <Property Name="enable_log_debug" Type="bool" Initial="true" Default="false"/>
+  <Property Name="enable_log_trace" Type="bool" Initial="true" Default="false"/>
 
   <Property Name="config" Type="struct"
                           Initial="true"
@@ -261,7 +259,6 @@
   </Property>
   <Property Name="LO_source" Type="enum"
                              Enums="internal,external"
-                             Readable="true"
                              Writable="true"
                              WriteSync="true"
                              Default="internal"

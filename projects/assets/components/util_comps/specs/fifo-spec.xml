@@ -16,7 +16,6 @@
 
   <!-- Properties -->
   <Property Name="oneshot" Type="bool"
-                           Readable="true"
                            Initial="true"
                            Default="false"
                            Description="If false, the FIFO operates normally, i.e. it allows data to flow from adc_in to adc_passthrough_out and transfers backpressure accordingly. If true, the functionality is as follows. The FIFO receives data from adc_in and holds it until the FIFO is full. One the FIFO is full, data is pulled from the FIFO and sent out the adc_passthrough_out port, all the while data is pulled from adc_in but unused, effectively making the adc_in port a data sink. Note that a control plane reset will always reset the FIFO and start this operation over."/>

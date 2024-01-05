@@ -189,7 +189,8 @@ ifndef HdlSkip
       configs: $(call HdlConfOutDir,$1)
       HdlConstraints:=$$(call getConstraints,$1)
       ifdef HdlConstraints
-        ifeq ($$(wildcard $$(HdlConstraints)),)
+        HdlConstraintsFile:=$$(word 1,$$(subst ?, ,$$(HdlConstraints)))
+        ifeq ($$(wildcard $$(HdlConstraintsFile)),)
           $$(error The constraints file, $$(HdlConstraints), from configuration $1, not found)
         endif
         ExportFiles:=$$(call Unique,$$(ExportFiles) $$(HdlConstraints))

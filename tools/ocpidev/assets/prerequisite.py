@@ -25,6 +25,7 @@ import json
 import sys
 from pathlib import Path
 from _opencpi.util import OCPIException, print_table, get_make_vars_rcc_targets, logging, TableCell
+from .abstract import ShowableAsset
 
 # pylint: disable=R0903
 class DictWrapper:
@@ -56,7 +57,7 @@ class Prerequisite(DictWrapper):
     """
     Each individual prerequisite
     """
-
+    instances_should_be_cached = True
 
     def __init__(self, path: Path):
         """
@@ -66,6 +67,7 @@ class Prerequisite(DictWrapper):
         """
         # Path isn't json serializable so stringify it
         self.__dict = {'path': str(path), 'platforms': []}
+        self.name = path.name
 
     @staticmethod
     def get_all_rcc_platforms():
@@ -152,18 +154,25 @@ class Prerequisite(DictWrapper):
         return prereq
 
 
-class Prerequisites(DictWrapper):
+class PrerequisitesCollection(DictWrapper,ShowableAsset):
     """
     The Prerequisites directory itself
     """
-    def __init__(self, location: Path):
+    def __init__(self, directory=None, name=None, verb=None, **kwargs):
         """
         Args:
             location: A string which is the abspath to the users prerequisites directory
 
         """
-        # Path isn't json serializable so stringify it
-        self.__dict = {"location": str(location), 'prereqs': {}}
+        self.directory = str(directory) if directory else str(PrerequisitesCollection.get_default_location())
+        self.__dict = {"location": self.directory, 'prereqs': {}}
+        self.prerequisites = []
+        if verb == 'show':
+            for directory in sorted(Path(self.directory).iterdir()):
+                if directory.is_dir():
+                    p = Prerequisite.create(directory, None)
+                    self.prerequisites.append(p)
+                    self.__dict['prereqs'][directory.name] = p
 
     def add_prerequisite(self, name: str, prereq: Prerequisite):
         """
@@ -234,8 +243,8 @@ class Prerequisites(DictWrapper):
         """
         Factor method to populate the prerequisites directory wrapped dict
         """
-        root = Prerequisites.get_default_location()
-        prereq_directory = Prerequisites(root)
+        root = PrerequisitesCollection.get_default_location()
+        prereq_directory = PrerequisitesCollection(root)
         try:
             platforms = Prerequisite.get_all_rcc_platforms()
         except OCPIException:
@@ -279,20 +288,20 @@ class Prerequisites(DictWrapper):
         """
         print(self.get_json())
 
-    @staticmethod
-    def show_all(details: str):
+    def show(self, format, verbose, **kwargs):
         """
-        args:
-            details: string -  one of json, table, simple
+        Show all of the prerequisites in this collection
         """
-        # pylint: disable=C0103
-        pdir = Prerequisites.create()
-
-        if details == "simple":
-            pdir.print_simple()
-        elif details == "table":
-            pdir.print_table()
-        elif details == "json":
-            pdir.print_json()
+        if format == "simple":
+            print(" ".join(self.get_prerequisites()))
+        elif format == "table":
+            rows = [[TableCell("Prerequisite",
+                               f'Relative to installation directory "{self.get_location()}"'),
+                     "Platform(s) installed for"]]
+            for p in self.prerequisites:
+                rows.append([p.name, " ".join(p.get_platforms())])
+            print_table(rows, underline="-")
+        elif format == "json":
+            print(json.dumps(self, cls=PrereqEncoder))
         else:
-            raise OCPIException(f"{details} isn't a recognised method of printing")
+            raise OCPIException(f"{format} isn't a recognised method of printing")

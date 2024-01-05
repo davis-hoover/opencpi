@@ -313,7 +313,7 @@ namespace OCPI {
 
     static bool reject(const Assembly::Instance &/*inst*/, const Implementation &impl,
 		       const char *fmt, ...) {
-      if (OS::logWillLog(OCPI_LOG_INFO)) {
+      if (OS::Log::willLog(OCPI_LOG_INFO)) {
 	std::string reason;
 	va_list ap;
 	va_start(ap, fmt);
@@ -574,8 +574,8 @@ namespace OCPI {
 	if (!mentioned[p.m_ordinal] && p.m_isParameter && !p.m_isDefault) {
 	  std::string pStr;
 	  p.m_default->unparse(pStr);
-	  const char *env = getenv("OCPI_ENABLE_DEFAULT_PARAMETER_ERROR_CHECK");
-	  if (env && env[0] == '1') {
+	  const char *env = getenv("OCPI_DISABLE_DEFAULT_PARAMETER_ERROR_CHECK");
+	  if (!env || env[0] != '1') {
 	    ocpiInfo("    Rejected the \"%s\" parameter value \"%s\" because it is not the default "
 		     "and the instance provided no value",
 		     p.cname(), pStr.c_str());

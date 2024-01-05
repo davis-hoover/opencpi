@@ -29,7 +29,9 @@ entity eth_frame_arbiter is
 
   generic(
     DATA_WIDTH  : natural := 64;
-    KEEP_WIDTH  : natural := 8
+    KEEP_WIDTH  : natural := 8;
+    CP_TYPE     : natural := 16#f040#;
+    SDP_TYPE    : natural := 16#f042#
   );
 
   port(
@@ -37,7 +39,7 @@ entity eth_frame_arbiter is
     clk             : in std_logic;
     reset           : in std_logic;
 
-    -- the transmit ethertye
+    -- the transmit ether type
     tx_hdr_type        : out std_logic_vector(15 downto 0);
 
     -- input CP
@@ -66,8 +68,8 @@ end eth_frame_arbiter;
 
 architecture rtl of eth_frame_arbiter is
 
-constant CP_ETHERTYPE  : std_logic_vector(15 downto 0) := X"f040";
-constant SDP_ETHERTYPE : std_logic_vector(15 downto 0) := X"f042";
+constant SLV_CP_TYPE  : std_logic_vector(15 downto 0) := std_logic_vector(to_unsigned(CP_TYPE, 16));
+constant SLV_SDP_TYPE : std_logic_vector(15 downto 0) := std_logic_vector(to_unsigned(SDP_TYPE, 16));
 
 signal tx_is_cp    : boolean;
 signal tx_is_cp_r  : boolean;
@@ -76,7 +78,7 @@ signal tx_active_r : boolean;
 begin
 
   -- route the selected packet to the output
-  tx_hdr_type   <= CP_ETHERTYPE     when tx_is_cp else SDP_ETHERTYPE;
+  tx_hdr_type   <= SLV_CP_TYPE       when tx_is_cp else SLV_SDP_TYPE;
   m_axis_tdata  <= s_axis_tdata_cp  when tx_is_cp else s_axis_tdata_sdp;
   m_axis_tkeep  <= s_axis_tkeep_cp  when tx_is_cp else s_axis_tkeep_sdp;
   m_axis_tvalid <= s_axis_tvalid_cp when tx_is_cp else s_axis_tvalid_sdp;

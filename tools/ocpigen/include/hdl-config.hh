@@ -40,6 +40,7 @@ struct DevInstance {
   DevInstance(const Device &d, const Card *c, const Slot *s, bool control,
 	      const DevInstance *parent);
   const char *cname() const { return m_name.c_str(); }
+  const char *parseProperties(ezxml_t xml, const HdlPlatform &platform);
   // content arg means there is extra content so suppress the end tag
   void emit(std::string &assy, bool emulated, bool content) const;
 };
@@ -59,8 +60,8 @@ protected:
   const HdlPlatform  &m_platform;
   Plugged      &m_plugged;
   DevInstances  m_devInstances; // instantiated in this config (or container)
- HdlHasDevInstances(const HdlPlatform &platform, Plugged &plugged, Worker &parent)
-   : m_parent(parent), m_platform(platform), m_plugged(plugged) {}
+ HdlHasDevInstances(const HdlPlatform &a_platform, Plugged &plugged, Worker &parent)
+   : m_parent(parent), m_platform(a_platform), m_plugged(plugged) {}
   DevInstances &devInstances() { return m_devInstances; }
   const char *
   parseDevInstances(ezxml_t xml, const char *parentFile, Worker *parent,
@@ -81,12 +82,12 @@ protected:
 		 const DevInstance *parent, DevInstances *baseInstances,
 		 ezxml_t xml, const DevInstance *&devInstance);
   void emitSubdeviceConnections(std::string &assy, DevInstances *baseInstances);
+  const HdlPlatform &platform() const { return m_platform; }
 };
 
 class HdlContainer;
 class HdlConfig : public Worker, public HdlHasDevInstances {
   friend class HdlContainer;
-  const HdlPlatform &m_platform;
   Plugged      m_plugged;      // what card is in each slot in this configuration
   uint8_t      m_sdpWidth;
   uint16_t     m_sdpLength;
@@ -102,7 +103,6 @@ public:
   size_t sdpWidth() { return m_sdpWidth; }
   size_t sdpLength() { return m_sdpLength; }
   size_t sdpArb() { return m_sdpArb; }
-  const HdlPlatform &platform() { return m_platform; }
   const char
     *addControlConnection(std::string &assy),
     *emitConfig(FILE *f);

@@ -40,6 +40,8 @@ begin
   dev_out(0).MAX_ACKS_OUTSTANDING    <= from_uchar(props_in.max_acks_outstanding_d);
   dev_out(0).COALESCE_WAIT           <= from_ulong(props_in.coalesce_wait_d);
   dev_out(0).DUAL_ETHERNET           <= '0' when props_in.dual_ethernet_d = 0 else '1';
+  dev_out(0).REMOTE_IP_ADDR          <= from_ulong(props_in.remote_ip_addr_d);
+  dev_out(0).REMOTE_UDP_PORT         <= from_ushort(props_in.remote_udp_port_d);
 
   props_out.ack_tracker_rej_ack_d    <= to_uchar(0) when dev_in(0).ACK_TRACKER_REJ_ACK = '0' else to_uchar(1);
   props_out.ack_tracker_bitfield_d   <= to_ulong(to_integer(unsigned(dev_in(0).ACK_TRACKER_BITFIELD)));

@@ -168,10 +168,10 @@ for lib in ${devlibs[@]} ; do
     Workers+=" $c"_sub.hdl
     do_ocpidev create worker "$c"_proxy.rcc --hdl-library $lib -V "$c".hdl -S "$c"-spec
     Workers+=" $c"_proxy.rcc
-    # This one file is copied so that this entire set of tests can run without depending
+    # This one directory is copied so that this entire set of tests can run without depending
     # on built or exported projects - i.e. these tests can run in a virgin RPM installation
-    [ -f specs/emulator-spec.xml ] ||
-	cp $OCPI_ROOT_DIR/projects/core/specs/emulator-spec.xml specs
+    [ -d components/emulator.comp ] || ( mkdir -p components/emulator.comp &&
+	cp -pr $OCPI_ROOT_DIR/projects/core/components/emulator.comp components )
     do_ocpidev -v create hdl device "$c"_em.hdl $libopt -E "$c".hdl
     Workers+=" $c"_em.hdl
   done
@@ -325,11 +325,11 @@ do_ocpidev show libraries --local-scope
 echo "ocpidev show libraries --local-scope --simple"
 do_ocpidev show libraries --local-scope --simple
 echo "ocpidev show component top_comp1-spec.xml --simple"
-do_ocpidev show component top_comp1-spec.xml --simple
+do_ocpidev show component -p top_comp1-spec.xml --simple
 echo "ocpidev show component top_comp1-spec.xml --table"
-do_ocpidev show component top_comp1-spec.xml --table
+do_ocpidev show component -p top_comp1-spec.xml --table
 echo "ocpidev show component top_comp1-spec.xml --json"
-do_ocpidev show component top_comp1-spec.xml --json
+do_ocpidev show component -p top_comp1-spec.xml --json
 echo "ocpidev show component --hdl-library devices comp1-spec.xml --simple"
 do_ocpidev show component --hdl-library devices comp1-spec.xml --simple
 echo "ocpidev show component matchstiq_z1_0 comp1-spec.xml --simple"
@@ -551,7 +551,7 @@ echo "========Deleting component libraries"
 for lib in ${complibs[@]} ; do
   do_ocpidev delete -f worker "comp_$lib".hdl -l $lib
   for c in ${compseq1[@]}; do
-    do_ocpidev delete -f spec $c -l $lib
+    do_ocpidev delete -f component $c -l $lib
     do_ocpidev delete -f test $c -l $lib
     do_ocpidev delete -f worker "$c".hdl -l $lib
   done

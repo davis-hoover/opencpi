@@ -1,5 +1,5 @@
 <HdlWorker Language="vhdl" version='2' OnlyTargets='isim modelsim xsim' libraries='util'>
-  <xi:include href="file_read_spec.xml"/>
+  <include href="file_read_spec.xml"/>
   
   <!-- Current working directory string -->
   <property name="CWD_MAX_LENGTH" type="ULong" default="512" parameter="true"/>

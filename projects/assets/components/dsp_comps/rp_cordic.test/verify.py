@@ -101,7 +101,7 @@ imag      = din['imag_idx']
 phase     = dout
 # Construct empty arrays to hold the expected results for comparison to measured output
 magnitude_exp = np.array(np.zeros(num_samples), dtype=np.int16)
-phase_exp     = np.array(np.zeros(num_samples), dtype=np.float)
+phase_exp     = np.array(np.zeros(num_samples), dtype=np.float64)
 
 # Calculate the expected results from the input file
 scaling_factor = pow(2,int(os.environ.get("OCPI_TEST_DATA_WIDTH"))-1) / np.pi

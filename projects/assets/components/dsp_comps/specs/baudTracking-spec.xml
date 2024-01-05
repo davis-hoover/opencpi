@@ -5,8 +5,8 @@
 <ComponentSpec>
 
   <!-- Bypass - if true, no transform  Format: bool -->
-  <Property Name="bypass" Type="bool" Readable="true" Writable="true"/>
-  <Property Name="BaudAvrCount" Type="Short"  Readable="true" Writable="true"/>
+  <Property Name="bypass" Type="bool" Writable="true"/>
+  <Property Name="BaudAvrCount" Type="Short" Writable="true"/>
   
   <DataInterfaceSpec Name="in" Producer="false" Protocol="rstream_protocol.xml"/>
   <DataInterfaceSpec Name="out" Producer="true" Protocol="rstream_protocol.xml"/>

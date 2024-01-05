@@ -58,15 +58,16 @@ $(shell mkdir -p lib; \
           echo $$workers_content > lib/workers; \
         fi)
 endif
+
+speclinks:
+	$(AT)$(call OcpiSpecLinks,.,$(OutDir)lib)
+
 ifneq ($(filter speclinks workersfile,$(MAKECMDGOALS)),)
 # We define this empty make rule so that workers can generate the "workers" file
 # by calling "make workersfile -C ../". Doing so will trigger the code block above
 # which is executed for all make rules except clean%
 workersfile:
 	$(AT): # nothing - just suppress message
-speclinks:
-	$(AT)mkdir -p $(OutDir)lib
-	$(AT)$(foreach f,$(wildcard specs/*.xml *.comp/*-comp.xml),$(call MakeSymLink,$f,lib);)
 else
 HdlInstallDir=lib
 include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk
@@ -187,8 +188,7 @@ BuildImplementation=$(infox BI:$1:$2:$(call HdlLibrariesCommand):$(call GoWorker
     set -e; \
     if [ $1 = hdl -a  -z "$3$(HdlTarget)$(HdlTargets)$(HdlPlatform)$(HdlPlatforms)" ] ; then \
       echo "=============Skipping building $2 since no HDL targets or platforms specified."; exit 0; fi; \
-    t="$(foreach t,$(or $($(call Capitalize,$1)Target),$($(call Capitalize,$1)Targets)),\
-         $(call $(call Capitalize,$1)TargetDirTail,$t))";\
+    t="${HdlTargets} ${HdlPlatforms} ${RccPlatforms}";\
     $(ECHO) $(strip $(if $(filter comp,$1),\
 	  =============Building tests in component directory $2,\
 	  =============$(if $3,Performing \"$3\" for,Building) $(call ToUpper,$(1)) implementation $(2) for target'(s)': $$t)); \
@@ -211,7 +211,6 @@ $(AT)set -e;\
     else \
       $(call BuildImplementation,$(1),$i,$2) \
     fi;)\
-
 
 CleanModel=$(infox CLEANING MODEL $1)\
   $(AT)$(if $($(call Capitalize,$1)Implementations), \
@@ -371,7 +370,8 @@ ifneq ($(filter declare,$(MAKECMDGOALS)),)
   override HdlTargets=
   override HdlTarget=
 endif
-declare:
+
+declare: speclinks
 	$(call BuildModel,hdl,declare)
 	$(call BuildModel,ocl,declare)
 	$(call BuildModel,rcc,declare)

@@ -135,6 +135,8 @@ public:
     emitXmlWorkers(FILE *f),
     emitXmlInstances(FILE *f),
     emitXmlConnections(FILE *f),
+    mapOneSignal(std::string &assy, const Signal &signal, size_t index, bool isWhole,
+		 const char *boardName, size_t boardIndex, const DevInstance &di, bool inContainer),
     mapDevSignals(std::string &assy, const DevInstance &devInstance, bool inContainer);
 };
 

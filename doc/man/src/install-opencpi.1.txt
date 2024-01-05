@@ -28,6 +28,10 @@ OPTIONS
     Suppressing the generation and running of tests saves time in cases where framework
     testing is obviously unnecessary, e.g., reinstalling the same version of the framework on a host.
 
+*`--artifacts-only`*::
+    Cleans intermediate build files when building workers and assemblies, keeps only artifacts 
+    required for building at the next level or deploying onto hardware.
+
 *`--no-kernel`*::
     Prevents building of the OpenCPI Linux kernel driver module. See the link:ocpidriver.1.html[ocpidriver(1)]
     man page and the 'OpenCPI User Guide' for details on when this driver module is required.

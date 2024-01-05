@@ -133,12 +133,14 @@ end record metadata_out_t;
 
 -- Input from the platform worker to the time server.
 type time_base_out_t is record
-  clk      : std_logic;
-  PPS      : std_logic;
-  usingPPS : std_logic;
+  clk        : std_logic;
+  PPS        : std_logic;
+  usingPPS   : std_logic;
 end record time_base_out_t;
+
 type time_base_in_t is record
-  PPS     : std_logic;
+  PPS        : std_logic;
+  pps_locked : std_logic;
 end record time_base_in_t;
 
 -- The time_server's (and platform worker's) output that is the time service.

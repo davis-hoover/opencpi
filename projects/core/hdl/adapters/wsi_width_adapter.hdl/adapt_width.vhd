@@ -207,7 +207,7 @@ begin
                        in_valid;
     out_valid       <= out_my_valid when its(give_now) else bfalse;
     out_data        <= data_r(to_integer(index_r)) when its(have_data_r) else word_data(0);
-    out_opcode      <= opcode_r when (its(on_last_word) or its(eom_r)) else in_opcode;
+    out_opcode      <= opcode_r when its(have_data_r) and (its(on_last_word) or its(eom_r)) else in_opcode;
     out_byte_enable <= last_be_r when its(on_last_word) else
                        slv1(bytes_out) when its(have_data_r) else
                        in_byte_enable(bytes_out-1 downto 0);
@@ -221,7 +221,7 @@ begin
           last_r      <= (others => '0');
           som_r       <= bfalse;
           eom_r       <= bfalse;
-          eom_taken_r <= bfalse;
+          eom_taken_r <= btrue;
           opcode_r    <= (others => '0');
         else
           -- Capture everything when we can, whether its there or not

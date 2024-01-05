@@ -35,6 +35,10 @@ while (( "$#" )); do
       minimal=1 # use ${minimal:+whatever}
       shift
       ;;
+    --artifacts-only)
+      export OCPI_ARTIFACTS_ONLY=1
+      shift
+      ;;
     --no-kernel)
       nokernel=1 # use ${nokernel:+whatever}
       shift
@@ -86,7 +90,7 @@ function domake {
 }
 domake "$project" exports
 echo "Export of platform '$OCPI_TARGET_PLATFORM' completed."
-
+$OCPI_ROOT_DIR/scripts/export-framework.sh -
 # Build the framework
 echo "Now we will build the OpenCPI framework libraries and utilities for $OCPI_TARGET_DIR"
 make

@@ -21,6 +21,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import re
+import sys
 import xml.etree.ElementTree as ET
 import os.path
 import _opencpi
@@ -53,7 +54,7 @@ class BaseParser():
         self._include_filepaths = include_filepaths
         # Stores if XML element and attribute case should be preserved.
         self._force_lowercase = force_lowercase
-        # Read the specified XML file. Resolve xi:include elements.
+        # Read the specified XML file. Resolve include elements.
         # When specified, force tags and attribute names to lower case.
         # Use ElementTree to parse XML and store the root element.
         self._load_xml_file(force_lowercase)
@@ -106,9 +107,10 @@ class BaseParser():
             with open(self._filename, "r") as open_file:
                 file_xml_string = open_file.read()
         else:
-            file_xml_string, self._filename = _opencpi.util.get_xml_string(self._include_filepaths[0])
+            self._filename = self._include_filepaths[0]
+            file_xml_string = _opencpi.util.get_xml_string(self._filename)
 
-        # Locate any <xi:include href="<file>"/> statements. Search for the
+        # Locate any <include href="<file>"/> statements. Search for the
         # specified file within self._include_filepaths, and if found insert
         # the file's contents into the file_xml_string string.
         file_xml_string = self._process_xml_includes(file_xml_string)
@@ -346,22 +348,22 @@ class BaseParser():
                     f"Attribute {attribute} must be present in {tag} element.")
 
     def _process_xml_includes(self, xml_string):
-        """ Resolves xi:include elements with specified file
+        """ Resolves include elements with specified file
 
-        The file name specified by the xi:include element is parsed and each
+        The file name specified by the include element is parsed and each
         path specified in self._include_filepaths is checked to see if the file
         exists. The first file with a matching file name is used. File paths
         are searched in the order that they are specified in the
         self._include_filepaths list.
 
-        The xi:include element is directly replaced with the contents of the
+        The include element is directly replaced with the contents of the
         specified file. Included XML files are recursively checked for
-        additional xi:included elements.
+        additional included elements.
 
-        If the specified file is not found the xi:include element is removed
+        If the specified file is not found the include element is removed
         and a warning is displayed.
 
-        NB. the xi:include element used within OpenCPI files does not fully
+        NB. the include element used within OpenCPI files does not fully
         follow the XML format, and must handled before parsing the XML file
         with a regular XML parser.
 
@@ -369,15 +371,15 @@ class BaseParser():
             xml_string (``string``): String containing data in XML format.
 
         Returns:
-            String containing data in XML format where all xi:include elements
+            String containing data in XML format where all include elements
             have been either resolved or removed.
         """
-        # Loop through all xi:include elements in the XML string
+        # Loop through all include elements in the XML string
         for include in self._get_xml_includes(xml_string):
             # Extract the filename specified by the XML include statement
             filename = self._get_xml_include_filename(include)
             if filename is None:
-                # Failed to extract a filename from the xi:include.
+                # Failed to extract a filename from the include.
                 raise ValueError(
                     f"Failed to extract filename from \"{include}\"")
             xml_include_string = ""
@@ -396,7 +398,7 @@ class BaseParser():
             version_pattern = r"<\? *xml *version *= *[\"']1.0[\"'].*\?>"
             xml_include_string = re.sub(
                 version_pattern, "", xml_include_string)
-            # Use a regex to repace the full xi:include element with the
+            # Use a regex to repace the full include element with the
             # contents of the specified file (minus the XML version tag).
             xml_string = re.sub(include, xml_include_string, xml_string)
             # If no file could be found in the search path, then just remove
@@ -413,13 +415,13 @@ class BaseParser():
         return xml_string
 
     def _get_xml_includes(self, xml_string):
-        """ Gets a list of all xi:include elements found within a string.
+        """ Gets a list of all include elements found within a string.
 
         Args:
             xml_string (``string``): String containing data in XML format.
 
         Returns:
-            List containing a string for all xi:include elements found within
+            List containing a string for all include elements found within
             the input XML data.
         """
         # Removes all comments from the xml, specifically so commented out
@@ -428,24 +430,24 @@ class BaseParser():
 
         # NB. includes arguments other than just href.
         include_files = re.findall(
-            r"<xi:include +href *= *[\"'][^>]*[\"'] */>", xml_string_clean)
+            r"<include|xi:include +href *= *[\"'][^>]*[\"'] */>", xml_string_clean)
         return include_files
 
-    def _get_xml_include_filename(self, xi_include_string):
-        """ Extracts the value of the href attribute in an xi:include string.
+    def _get_xml_include_filename(self, include_string):
+        """ Extracts the value of the href attribute in an include string.
 
         Args:
-            xi_include_string (``string``): String containing an single
-                xi:include element.
+            include_string (``string``): String containing an single
+                include element.
 
         Returns:
-            String containing the file name specified in the xi:include
+            String containing the file name specified in the include
             element.
         """
         # Use a regex group to extract just the filename
         result = re.findall(
-            r"<xi:include +href *= *[\"']([^>]*)[\"'] */>$",
-            xi_include_string)
+            r"<include|xi:include +href *= *[\"']([^>]*)[\"'] */>$",
+            include_string)
         if result:
             # Remove other arguments if they exist
             include_file = result[0].replace("'", "\"").split("\"")[0]

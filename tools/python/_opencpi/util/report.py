@@ -18,8 +18,9 @@
 """
 definitions for utility functions that have to do with the utilization reports
 """
-
 import os
+import sys
+import io
 import logging
 import datetime
 from functools import reduce
@@ -107,12 +108,10 @@ def snip_widest_column(rows, forced_screen_width=None):
         screen_width = forced_screen_width
     else:
         try:
-            curses.initscr()
-            # pylint:disable=no-member
-            screen_width = curses.COLS
-            # pylint:enable=no-member
-            curses.endwin()
-        except curses.error as ex:
+            # Do not use curses.initscr()/curses.endwin() here since that produces output!
+            curses.setupterm(term=os.environ.get("TERM", "unknown"))
+            screen_width = curses.tigetnum('cols')
+        except (curses.error,io.UnsupportedOperation) as ex:
             logging.info(ex)
             return rows
 
@@ -236,7 +235,7 @@ def split_table_from_footnotes(rows, footnote_marker):
 #TODO change to kwargs too many aruments
 # pylint:disable=too-many-arguments
 def format_table(rows, col_delim='|', row_delim=None, surr_cols_delim='|', surr_rows_delim='-',
-                 underline=None, footnote_marker="*"):
+                 underline=None, footnote_marker="*", heading_rows=1):
     """
     Return a table specified by the list of rows in the 'rows' parameter. Optionally specify
     col_delim and row_delim which are each a single character that will be repeated to separate
@@ -251,7 +250,7 @@ def format_table(rows, col_delim='|', row_delim=None, surr_cols_delim='|', surr_
     # If an underline character was provided, insert a row containing this character repeated
     # at position 1 (right below the header)
     if underline:
-        rows_norm.insert(1, [underline * len(elem) for elem in rows_norm[0]])
+        rows_norm.insert(heading_rows, [underline * len(elem) for elem in rows_norm[0]])
 
     # The start/end column delimeters should have a space after/before them IFF they are nonempty
     start_col_delim = surr_cols_delim + ' ' if surr_cols_delim else ''
@@ -298,11 +297,12 @@ def format_table(rows, col_delim='|', row_delim=None, surr_cols_delim='|', surr_
 #TODO change to kwargs too many aruments
 # pylint:disable=too-many-arguments
 def print_table(rows, col_delim='|', row_delim=None, surr_cols_delim='|', surr_rows_delim='-',
-                underline=None, footnote_marker="*"):
+                underline=None, footnote_marker="*", heading_rows=1):
     """
     Wrapper for "format_table()" that prints the returned table
     """
-    print(format_table(rows, col_delim, row_delim, surr_cols_delim, surr_rows_delim, underline, footnote_marker))
+    print(format_table(rows, col_delim, row_delim, surr_cols_delim, surr_rows_delim, underline,
+                       footnote_marker, heading_rows), end='')
 # pylint:enable=too-many-arguments
 
 class Report(object):

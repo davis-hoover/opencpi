@@ -16,7 +16,7 @@
      You should have received a copy of the GNU Lesser General Public License
      along with this program. If not, see <http://www.gnu.org/licenses/>. -->
 <!-- This file defines the zed_ether HDL platform -->
-<HdlPlatform Language="VHDL" Spec="platform-spec" configurations="base dgrdma_dev" 
+<HdlPlatform Language="VHDL" Spec="platform-spec" configurations="base cfg_dgrdma_ether cfg_dgrdma_udp_default cfg_dgrdma_udp_ip"
              ComponentLibraries="components" Libraries="sdp platform cdc dgrdma i2c"
              SourceFiles="clock_gen.vhd i2c_macaddr_eeprom.vhd zed_ether.vhd"
              Part="xc7z020-1-clg484">
@@ -46,7 +46,15 @@
     <connect port="dev" to="dev" index="0"/>
   </supports>
 
+  <!-- Local IP address, gateway, and netwask of zed_ether platform -->
+
+  <property name="local_ip_address_d" type="ulong" parameter="1" default="0xc0a83202"/>
+  <property name="local_subnet_mask_d" type="ulong" parameter="1" default="0xffffff00"/>
+  <property name="local_gateway_ip_d" type="ulong" parameter="1" default="0xc0a83201"/>
+
   <!-- Put any additional platform-specific properties here using <Property> -->
+  <property name="udp_enable" type="bool" parameter="1" default="false" 
+    description="DGRDMA uses UDP protocol"/>
   <property name="ack_tracker_bitfield_width" type="ulong" parameter="1" default="32"
     description="Width of the window of sequence numbers the ack_tracker can track"/>
   <property name="ack_tracker_max_ack_count" type="uchar" parameter="1" default="12"

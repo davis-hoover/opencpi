@@ -1776,7 +1776,7 @@ it is really per actual worker config...
             usleep(it->first - now);
             now = it->first;
           }
-          if (OS::logWillLog(OCPI_LOG_DEBUG)) {
+          if (OS::Log::willLog(OCPI_LOG_DEBUG)) {
             std::string uValue;
             it->second.m_value.unparse(uValue);
             ocpiDebug("Setting property \"%s\" of instance \"%s\" (worker \"%s\") after %f seconds to \"%s\"",

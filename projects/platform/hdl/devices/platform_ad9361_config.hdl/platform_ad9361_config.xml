@@ -61,7 +61,7 @@
                                      description='Forces set of AD9361 TXNRX pin'/>
 
     <!-- Here are the raw properties that are in registers -->
-    <xi:include href='ad9361-properties'/>
+    <include href='ad9361-properties'/>
   </ComponentSpec>
 
   <!-- Parameter Properties -->

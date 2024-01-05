@@ -8,12 +8,12 @@
   <!-- 1 = green -->
   <!-- 2 = red -->
   <!-- 3 = orange --> 
-  <property name="led" type="enum" enums="off,green,red,orange" readable="false" writable="true" writesync="1"/>
+  <property name="led" type="enum" enums="off,green,red,orange" writable="true" writesync="1"/>
 
   <!-- Valid attentuation values are 0.0 to 31.5 dB in 0.5 dB steps -->
-  <property name="attenuation" type="float" readable="false" writable="true" writesync="1"/>
+  <property name="attenuation" type="float" writable="true" writesync="1"/>
   
-  <property name="warp_voltage" type="ushort" readable="false" writable="true" writesync="1"/>
+  <property name="warp_voltage" type="ushort" writable="true" writesync="1"/>
   <property name="serial_num" type="ushort" volatile="true" readsync="1"/>
 
 </RccWorker>

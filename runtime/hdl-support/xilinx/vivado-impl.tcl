@@ -53,7 +53,23 @@ link_design -mode $mode -part $part
 # Read in XDC constraints
 if {[info exists constraints] && [string length $constraints] > 0} {
   puts "Loading XDC: $constraints"
-  read_xdc $constraints
+  set words [split $constraints ?]
+  set file [lindex $words 0]
+  set assignments [split [lindex $words 1] \;&]
+  foreach assignment $assignments {
+      lassign [split $assignment =] var val
+      set $var $val
+      puts "setting var:$var to val:$val"
+  }
+  # unmanaged means tcl control statements (if, loop, source) are allowed in the file
+  # https://support.xilinx.com/s/question/0D52E00006hpkDSSAY/readxdc-unmanaged-?
+  read_xdc -unmanaged $file
+}
+
+# Source platform pre-opt hook, if present
+if {[info exists pre_opt_hook] && [string length $pre_opt_hook] > 0 && [file exist $pre_opt_hook]} {
+  puts "Sourcing platform pre-opt hook: $pre_opt_hook"
+  source $pre_opt_hook
 }
 
 # Source platform pre-opt hook, if present

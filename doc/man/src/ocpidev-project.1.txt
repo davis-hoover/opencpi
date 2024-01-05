@@ -228,6 +228,12 @@ Options When Building Projects
     Don't build the HDL assemblies in the project. Building HDL assemblies
     (and their containers) can be slow.
 
+*`--optimize`*::
+    Build RCC/ACI assets with compiler optimization enabled.  This
+    results in a separate set of build outputs that do not conflict
+    with non-optimized (debug) build outputs, since they are placed
+    in a target directory whose name has a "-o" suffix.
+
 *`--rcc`*::
     Limit the assets being built to RCC workers.
 
@@ -236,15 +242,6 @@ Options When Building Projects
     option is not used (and *`--hdl-rcc-platform`* '<platform>'
     is also not used), the current development software platform
     is used as the single RCC platform used for building.
-
-*`--optimimize`*::
-    Build RCC/ACI assets with compiler optimization enabled.  This
-    results in a separate set of build outputs that do not conflict
-    with non-optimized (debug) build outputs, since they are placed
-    in a target directory whose name has a "-o" suffix.
-
-*`--worker=`*'<worker>'+::
-    Limits the assets being built to the specified worker.
 
 Options When Running Projects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

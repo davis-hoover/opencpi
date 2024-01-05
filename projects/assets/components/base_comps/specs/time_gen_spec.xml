@@ -1,6 +1,6 @@
 <!-- Component to generate a stream of time-of-day fractions. -->
 <ComponentSpec>
-  <property name='messageLength' type='ushort' initial='true' readable='true' default='1k'/>
+  <property name='messageLength' type='ushort' initial='true' default='1k'/>
   <property name='seconds' volatile='true'/>
   <property name='fraction' volatile='true'/>
   <port name='out' producer='true'>

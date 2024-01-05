@@ -23,16 +23,17 @@ Model:=hdl
 include $(OCPI_CDK_DIR)/include/util.mk
 $(if $(call DoShell,! echo $(CwdName) | grep -s '[A-Z]',Var1),\
   $(error "This HDL assembly, $(CwdName), has upper case letters in its name, which is not supported due to limitations of some tools."))
-$(OcpiIncludeProject)
+$(OcpiIncludeAssetAndParent)
 ComponentLibraries+=$(OCPI_PROJECT_COMPONENT_LIBRARIES)
 include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk
 
-# These next lines are similar to what worker.mk does
 ifneq ($(MAKECMDGOALS),clean)
 hdl: all # for convenience
+# These next lines are similar to what worker.mk does
 $(if $(wildcard $(CwdName).xml),,\
   $(error The XML for the assembly, $(CwdName).xml, is missing))
 endif
+
 override Workers:=$(CwdName)
 override Worker:=$(Workers)
 Worker_$(Worker)_xml:=$(Worker).xml
@@ -61,16 +62,16 @@ endif
 # sets ComponentLibraries in its Makefile.
 # But it will need to be done again *after* the build/OWD files are processes in case
 # the build/OWD XML file sets ComponentLibraries
-override ComponentLibraries+= $(ComponentLibrariesInternal) components adapters
 # Override since they may be passed in from assemblies level
 override XmlIncludeDirsInternal:=$(XmlIncludeDirs) $(XmlIncludeDirsInternal)
 # Make sure the build and OWD files are processed early because there are make variables
 # that will affect target processing in hdl-pre.mk
 # For assemblies, these are generated from the OWD XML
 ifeq ($(ShellHdlAssemblyVars)$(filter clean%,$(MAKECMDGOALS)),)
+  override ComponentLibrariesInternal+=components adapters
   $(eval $(OcpiProcessBuildFiles))
   # These are done here (again) in case the build files or OWD mentions component libraries in XML
-  override ComponentLibraries+= $(ComponentLibrariesInternal) components adapters
+  override ComponentLibraries+= $(ComponentLibrariesInternal)
   override XmlIncludeDirsInternal:=$(XmlIncludeDirs) $(XmlIncludeDirsInternal)
 endif
 ifdef Container
@@ -88,9 +89,9 @@ ifneq ($(MAKECMDGOALS),clean)
     $(eval $(HdlPrepareAssembly))
   endif
   # default the container names
-  $(foreach c,$(Containers),$(eval HdlContXml_$c:=$c))
-  # $(call doConfigConstraints,<container>,<platform>,<config>)
-  getConfigConstraints=$(strip\
+  $(foreach c,$(Containers),$(eval HdlContXml_$(notdir $c):=$c))
+  # $(call HdlConfigConstraints,<container>,<platform>,<config>)
+  HdlConfigConstraints=$(strip\
      $(if $(call DoShell,$(call OcpiGenTool) -Y $(HdlPlatformDir_$2)/hdl/$3,HdlConfConstraints),\
           $(error Processing platform configuration XML "$3" for platform "$2" for container "$1"),\
 	  $(call HdlGetConstraintsFile,$(HdlConfConstraints),$2)))
@@ -104,8 +105,9 @@ ifneq ($(MAKECMDGOALS),clean)
         $$(error Platform for container $1, $2, is not defined))
       $$(call OcpiDbg,HdlPart_$2:$$(HdlPart_$2))
       HdlMyTargets+=$$(call HdlGetFamily,$$(HdlPart_$2))
-      ContName:=$(Worker)_$2_$3_$1
-      HdlContainerImpls_$1+= $$(ContName)
+      ContFile:=$(notdir $1)
+      ContName:=$(Worker)_$2_$3_$$(ContFile)
+      HdlContainerImpls_$$(ContFile)+= $$(ContName)
       HdlPlatform_$$(ContName):=$2
       HdlTarget_$$(ContName):=$$(call HdlGetFamily,$$(HdlPart_$2))
       HdlConfig_$$(ContName):=$3
@@ -222,37 +224,56 @@ else
       # container file (in the assembly dir), or under the platform directory
       HdlGetContainerConstraintsFiles=$(infox HGCC:$1:$2:$3:$4)$(strip\
         $(comment figure out the contraints now that hdl-pre.mk has been run for toolsets etc.)\
-        $(if $(filter -,$(HdlConstraints_$1)),\
-          $(foreach c,$(call getConfigConstraints,$1,$2,$3),$(HdlPlatformDir_$2)/$c),\
-          $(foreach c,$(call HdlGetConstraintsFile,$(HdlConstraints_$1),$2),\
-             $(or $(wildcard $c),\
-                $(and $(filter-out /%,$c),$(wildcard $(HdlPlatformDir_$2)/$c)),\
-                $(error Constraints file $c not found for container $1)))))
+	$(foreach c,$(if $(filter -,$4),\
+                       $(HdlPlatformDir_$2)/$(call HdlConfigConstraints,$1,$2,$3),\
+                       $(call HdlGetConstraintsFile,$4,$2)),$(call OcpiInfox,CCC:$c)\
+          $(foreach f,$(word 1,$(subst ?, ,$c)),\
+            $(or $(wildcard $f),$(strip \
+                 $(and $(filter-out /%,$f),$(wildcard $(HdlPlatformDir_$2)/$f))),\
+              $(error Constraints file $f not found for container $1))$(foreach e,$(word 2,$(subst ?, ,$c)),?$e))))
       HdlGetContainerConstraints=$(strip \
         $(call HdlGetContainerConstraintsFiles,$1,$(HdlPlatform_$1),$(HdlConfig_$1),$(HdlConstraints_$1)))
+
       define doContainer
         .PHONY: $(call HdlContOutDir,$1)
         all: $(call HdlContResult,$1)$(infox DEPEND:$(call HdlContResult,$1))
+	        $(AT)if [[ -n "${OCPI_ARTIFACTS_ONLY}" ]]; then \
+	          echo "Cleaning assembly intermediate build files"; \
+	          find $(call HdlContOutDir,$1)/target-* -type f -not \( -name '*.edf' -o \
+	                                        -name '*-defs.vh' -o \
+	                                        -name '*.bitz' -o \
+	                                        -name '*.vdb' \
+	                                        \) -exec rm -f {} + 2>/dev/null; \
+	          find $(call HdlContOutDir,$1)/target-* -type d -empty -delete; \
+            rm -rf $(call HdlContOutDir,$1)/gen gen lib target-$(HdlTarget_$1); \
+	        fi
+
         $(call HdlContResult,$1): links
-	  $(AT)mkdir -p $(call HdlContOutDir,$1)
-	  $(AT)$(MAKE) -C $(call HdlContOutDir,$1) -f $(OCPI_CDK_DIR)/include/hdl/hdl-container.mk \
-	       $(and $(OCPI_PROJECT_REL_DIR),OCPI_PROJECT_REL_DIR=../$(OCPI_PROJECT_REL_DIR)) \
-               HdlAssembly=../../$(CwdName)  HdlConfig=$(HdlConfig_$1) \
-               HdlConstraints=$(call AdjustRelative,$(call HdlGetContainerConstraints,$1)) \
-               HdlPlatforms=$(HdlPlatform_$1) HdlPlatform=$(HdlPlatform_$1) \
-	       ComponentLibrariesInternal="$(call OcpiAdjustLibraries,$(ComponentLibraries))" \
-	       HdlExplicitLibraries="$(call OcpiAdjustLibraries,$(HdlExplicitLibraries))" \
-               XmlIncludeDirsInternal="$(call AdjustRelative,$(XmlIncludeDirsInternal))"
+	        $(AT)mkdir -p $(call HdlContOutDir,$1)
+	        $(AT)$(MAKE) -C $(call HdlContOutDir,$1) -f $(OCPI_CDK_DIR)/include/hdl/hdl-container.mk \
+	        $(and $(OCPI_PROJECT_REL_DIR),OCPI_PROJECT_REL_DIR=../$(OCPI_PROJECT_REL_DIR)) \
+            HdlAssembly=../../$(CwdName)  HdlConfig=$(HdlConfig_$1) \
+            HdlConstraints='$(call AdjustRelative,$(call HdlGetContainerConstraints,$1))' \
+            HdlPlatforms=$(HdlPlatform_$1) HdlPlatform=$(HdlPlatform_$1) \
+            ComponentLibrariesInternal="$(call OcpiAdjustLibraries,$(ComponentLibraries))" \
+            HdlExplicitLibraries="$(call OcpiAdjustLibraries,$(HdlExplicitLibraries))" \
+            XmlIncludeDirsInternal="$(call AdjustRelative,$(XmlIncludeDirsInternal))"
       endef
+      
       ifndef HdlSkip
       $(foreach c,$(HdlContainers),$(and $(filter $(HdlPlatform_$c),$(HdlPlatforms)),$(eval $(call doContainer,$c))))
       endif
     endif # containers
   endif # of skip
 endif # check for no targets
+
 clean::
 	$(AT) rm -r -f container-* lib
-
+.PHONY: all
+ifdef NothingError
+  all:
+	$(AT)echo "Nothing to be done for 'all'." && exit 1
+endif
 # Expose information about this assembly's containers for use
 # in some external application.
 #

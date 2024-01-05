@@ -809,11 +809,13 @@ connectOcpSignal(OcpSignalDesc &osd, OcpSignal &os, const OcpAdapt *oa, std::str
       temp += ocpSignals[oa->other].name;
     if (!strcmp(oa->expr, "open")) {
       static size_t unused; // can this really be processed scoped?
-      if (os.width > 1)
-	OU::formatAdd(signal, "unused(%zu to %zu)", unused, unused + os.width - 1);
-      else
-	OU::formatAdd(signal, "unused(%zu)", unused);
-      unused += os.width;
+      if (osd.vector) {
+        OU::formatAdd(signal, "unused(%zu to %zu)", unused, unused + os.width - 1);
+        unused += os.width;
+      } else {
+        OU::formatAdd(signal, "unused(%zu)", unused);
+        unused += 1;
+      }
     } else
       OU::formatAdd(signal, oa->expr, temp.c_str());
   } else {

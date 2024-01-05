@@ -62,7 +62,7 @@ Ts = 1.0/Fs;                # sampling interval
 Ft = int(sys.argv[2])       # target frequency
 AMPLITUDE = int(sys.argv[3])
 NUM_SAMPLES = int(sys.argv[4]) # number of complex samples
-t = np.arange(0,NUM_SAMPLES*Ts,Ts,dtype=np.float)   # time vector
+t = np.arange(0,NUM_SAMPLES*Ts,Ts,dtype=np.float64)   # time vector
 
 # Generate 1 cycle of a complex tone
 real = np.cos(2*np.pi*Ft*t)

@@ -78,7 +78,8 @@ namespace OCPI {
         std::string m_dumpFile;
         bool m_hasDelay;
         Delay m_delay;
-        Property() : m_hasValue(false), m_hasDelay(false), m_delay(0) {}
+        bool m_isDefault;
+        Property() : m_hasValue(false), m_hasDelay(false), m_delay(0), m_isDefault(false) {}
         const char *parse(ezxml_t x, Property *first = NULL);
         const char *setValue(ezxml_t px);
         void setValue(const char *name, const char *value);

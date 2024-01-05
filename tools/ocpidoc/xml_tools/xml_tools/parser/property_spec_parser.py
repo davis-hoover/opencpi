@@ -154,7 +154,7 @@ class PropertySpecParser(base_parser.BaseParser):
             property_[name]["default"] = self._get_attribute(
                 element=property_element, attribute="default",
                 default=None, optional=True)
-            property_[name]["worker_property"] = self._is_true(property_element, "isimpl")
+            property_[name]["isimpl"] = self._is_true(property_element, "isimpl")
             return property_
         else:
             return None

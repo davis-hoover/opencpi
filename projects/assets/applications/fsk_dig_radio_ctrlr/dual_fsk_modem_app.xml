@@ -3,7 +3,7 @@
   <!-- FSK modulation/TX algorithm workers (will connect to DRC TX index 0) -->
 
   <Instance Component="ocpi.core.file_read" Connect="mfsk_mapper0">
-    <Property Name="fileName"       Value="idata/Os.jpeg"/>
+    <Property Name="fileName"       Value="idata/opencpi.jpeg"/>
     <Property Name="messagesInFile" Value="false"/>
     <Property Name="opcode"         Value="1"/>
     <Property Name="granularity"    Value="1"/>
@@ -33,7 +33,7 @@
 <!-- FSK modulation/TX algorithm workers (will connect to DRC TX index 1) -->
 
   <Instance Component="ocpi.core.file_read" Connect="mfsk_mapper1">
-    <Property Name="fileName"       Value="idata/Os.jpeg"/>
+    <Property Name="fileName"       Value="idata/opencpi.jpeg"/>
     <Property Name="messagesInFile" Value="false"/>
     <Property Name="opcode"         Value="1"/>
     <Property Name="granularity"    Value="1"/>

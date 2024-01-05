@@ -640,7 +640,6 @@ def emit_developer_doc_inc_file(copyright, prompt):
         emit_latex_header(out_file, user_edits=True, copyright=copyright)
         print(j_template.render(), file=out_file)
 
-
 def input_file_contains_xi_include(filename):
     ret = False
     with open(filename, "r") as input_file:

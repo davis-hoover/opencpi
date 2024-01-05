@@ -1,5 +1,5 @@
 <HdlWorker Language="verilog"  Pattern="%w%M%0_" libraries='util'>
-  <xi:include href="pattern_spec.xml"/>
+  <include href="pattern_spec.xml"/>
   <ControlInterface Sub32BitConfigProperties="true" ControlOperations="initialize"/>
   <!-- additional implementation-specific properties -->
   <property name='wsiMstatus'        volatile='true'/>

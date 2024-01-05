@@ -20,4 +20,6 @@
   <signal name='ACK_TRACKER_ACCEPTED_BY_PEEK'     width='32' direction='in'/>
   <signal name='ACK_TRACKER_HIGH_WATERMARK'       width='16' direction='in'/>
   <signal name='FRAME_PARSER_REJECT'              width='32' direction='in'/>
+  <signal name="REMOTE_IP_ADDR"                   width='32' direction='out'/>
+  <signal name="REMOTE_UDP_PORT"                  width='16' direction='out'/>  
 </signals>

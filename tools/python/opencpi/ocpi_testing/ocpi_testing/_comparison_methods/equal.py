@@ -27,11 +27,10 @@ from .base_comparison import BasicComparison
 
 
 class Equal(BasicComparison):
-    """ Check sample data samples are exactly equal
-    """
+    """Check sample data samples are exactly equal."""
 
     def variable_summary(self):
-        """ Returns summary of the variables that control the comparison method
+        """Returns summary of the variables that control the comparison method.
 
         Cannot rely on the values being fixed for all tests since may need to
         be changed depending on the component-under-tests performance.
@@ -44,7 +43,7 @@ class Equal(BasicComparison):
         return {}
 
     def same(self, reference, implementation):
-        """ Checks if two output data sets are considered the same
+        """Checks if two output data sets are considered the same.
 
         In this case same is where all data of all messages is exactly equal.
 
@@ -85,7 +84,7 @@ class Equal(BasicComparison):
         return True, ""
 
     def _check_message(self, reference, implementation):
-        """ Check two messages are the same
+        """Check two messages are the same.
 
         Args:
             reference (dict): The reference message to check the implementation
@@ -122,13 +121,9 @@ class Equal(BasicComparison):
 
         # Time and sample interval are a single data value
         elif reference["opcode"] in ["time", "sample_interval"]:
-            if reference["data"] != implementation["data"]:
-                return False, (
-                    f"{reference['opcode'].capitalize()} data differs " +
-                    "between reference and implementation-under-test.\n" +
-                    f"Reference data                : {reference['data']}\n" +
-                    "Implementation-under-test data: " +
-                    f"{implementation['data']}")
+            success, msg = self._check_time_message(reference, implementation)
+            if not success:
+                return False, msg
 
         # Flush and discontinuity are messages without data
         elif reference["opcode"] in ["flush", "discontinuity"]:
@@ -154,12 +149,10 @@ class Equal(BasicComparison):
         return True, ""
 
     def __repr__(self):
-        """ Official string representation of object
-        """
+        """Official string representation of object."""
         return (f"ocpi_testing.Equal(complex_={self._complex}, " +
                 f"sample_data_type={self._sample_data_type})")
 
     def __str__(self):
-        """ Informal string representation of object
-        """
+        """Informal string representation of object."""
         return self.__repr__()

@@ -109,12 +109,12 @@ namespace {
   std::string specName, specPackage;
   bool verbose;
   Strings excludeWorkers, excludeWorkersTmp;
-  // If the spec in/out arg may be set in advance if it is inline or xi:included
+  // If the spec in/out arg may be set in advance if it is inline or included
   // FIXME: share this with the one in parse.cc
   const char *
   getSpec(ezxml_t xml, const std::string &parent, const char *a_package, ezxml_t &spec,
           std::string &specFile, std::string &a_specName) {
-    // xi:includes at this level are component specs, nothing else can be included
+    // includes at this level are component specs, nothing else can be included
     spec = NULL;
     std::string name, file;
     const char *err;
@@ -2139,7 +2139,7 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
     return err;
   // ================= 9. Report what we found globally (not specific to any case)
   // So now we can generate cases based on existing configs and globals.
-  if (OS::logGetLevel() >= OCPI_LOG_INFO) {
+  if (OS::Log::getLevel() >= OCPI_LOG_INFO) {
     fprintf(stderr,
             "Spec is %s, in file %s, %zu workers, %zu configs\n"
             "Configurations are:\n",

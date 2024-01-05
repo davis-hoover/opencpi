@@ -109,17 +109,6 @@ Options When Building Projects or Libraries
 *`--rcc`*::
     Limit the assets being built to RCC workers.
 
-*`--worker=`*'<worker>'+::
-    Limits the assets being built to the specified worker.
-    Note that the *`--worker`* option differs from the
-    *`worker`* noun: the noun is used to build
-    a single worker, while the *`--worker`* option is used
-    to limit the build to an individual worker (or a list of
-    workers if *`--worker`* option is specified
-    multiple times) when building a project or library.
-    If the *`--worker`* option is not used,
-    all workers in a project or library are built.
-
 Options When Building Projects, Libraries, Tests, RCC Workers or ACI Applications
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`--hdl-rcc-platform=`*'<platform>'+::
@@ -128,17 +117,27 @@ Options When Building Projects, Libraries, Tests, RCC Workers or ACI Application
     '<platform>' is also not used), the current development software
     platform is used as the single RCC platform used for building.
 
+*`--optimize`*::
+    Build RCC/ACI assets with compiler optimization enabled.  This
+    results in a separate set of build outputs that do not conflict
+    with non-optimized (debug) build outputs, since they are placed
+    in a target directory whose name has a "-o" suffix.
+
 *`--rcc-platform=`*'<platform>'+::
     Build RCC/ACI assets for the specified RCC platform. If this
     option is not used (and *`--hdl-rcc-platform=`*'<platform>' is also not used),
     the current development software platform is used as the single
     RCC platform used for building.
 
-*`--optimimize`*::
-    Build RCC/ACI assets with compiler optimization enabled.  This
-    results in a separate set of build outputs that do not conflict
-    with non-optimized (debug) build outputs, since they are placed
-    in a target directory whose name has a "-o" suffix.
+*`--workers-as-needed`*::
+    When building an HDL assembly, platform configuration, or component unit test suite, automatically
+    build the required HDL workers of the configuration.  Use this option
+    when building for a platform that was installed using the *`--minimal`* option to
+    *`ocpiadmin install platform`*.
+
+*`--artifacts-only`*::
+    When building workers or assemblies, use this option to clean up intermediate build files.
+    Only artifacts required for building at the next level or deploying onto hardware will be kept.
 
 Options When Building Projects, Libraries, Tests with HDL Workers or other HDL Assets
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -168,6 +167,9 @@ Options When Building Tests
     Only perform the *`generate`* phase of unit tests, not the *`build`* phase.
     See the section "Unit Testing of Workers" in the *OpenCPI Component Development Guide*
     for details on unit test phases.
+
+*`--nothing-error`*::
+    Return non-zero exit status if nothing is done.
 
 EXAMPLES
 --------
@@ -204,16 +206,6 @@ ocpidev build library dsp_comps --hdl-platform=zed
                                 --rcc-platform=xilinx19_2_aarch32
 				--no-doc
 --------------------------------------------------
-+
-. Inside the *`assets`* project, build the *`dsp_comps`* library,
-but limit the build to the *`complex_mixer.hdl`* and
-*`cic_dec.hdl`* workers.
-+
----------------------------------------------------------
-ocpidev build library dsp_comps --worker=complex_mixer.hdl
-	      	      		--worker=cic_dec.hdl
-				--hdl-platform=zed
----------------------------------------------------------
 
 BUGS
 ----

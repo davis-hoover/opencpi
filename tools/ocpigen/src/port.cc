@@ -163,9 +163,10 @@ doPattern(int n, unsigned wn, bool in, bool master, std::string &suff, bool port
     suff = "";
     return 0;
   }
+  size_t len = strlen(pname()) + strlen(pat) * 3 + 10;
   char
     c,
-    *s = (char *)malloc(strlen(pname()) + strlen(pat) * 3 + 10),
+    *s = (char *)malloc(len),
     *base = s;
   while ((c = *pat++)) {
     if (c != '%')
@@ -195,7 +196,7 @@ doPattern(int n, unsigned wn, bool in, bool master, std::string &suff, bool port
 	break;
       case '0': // zero origin ordinal-within-profile
       case '1':
-	sprintf(s, "%u", wn + ((unsigned)pat[-1] - '0'));
+	snprintf(s, len - OCPI_SIZE_T_DIFF(s, base), "%u", wn + ((unsigned)pat[-1] - '0'));
 	while (*s) s++;
 	break;
       case 'i':
@@ -231,7 +232,7 @@ doPattern(int n, unsigned wn, bool in, bool master, std::string &suff, bool port
 	  case -2:
 	    break;
 	  default:
-	    sprintf(s, "%u", n);
+	    snprintf(s, len - OCPI_SIZE_T_DIFF(s, base), "%u", n);
 	    while (*s)
 	      s++;
 	  }

@@ -32,10 +32,12 @@ architecture rtl of time_server_worker is
   signal timeControl         : ulong_t;
   signal timeControl_written : bool_t;
   signal timeStatus          : ulong_t;
+  signal s_ppsLock           : std_logic;
 begin
 
   -- Map properties to control/status register bits
   timeControl(31)         <= props_in.clr_status_sticky_bits;
+  timeControl(7)	  <= timebase_in.usingPPS;
   timeControl(6)          <= props_in.force_time_now_invalid;
   timeControl(5)          <= props_in.force_time_now_valid;
   timeControl(4)          <= props_in.force_time_now_to_free_running;
@@ -59,6 +61,8 @@ begin
   props_out.PPS_lost_last_second_error     <= timeStatus(26);
   props_out.PPS_count                      <= timeStatus(7 downto 0);
   props_out.using_PPS                      <= timebase_in.usingPPS;
+  props_out.pps_locked                     <= s_ppsLock;
+  timebase_out.pps_locked                  <= s_ppsLock;
 
   time_service2ctl_time_valid : component cdc.cdc.single_bit
     generic map(IREG      => '1',
@@ -97,6 +101,7 @@ begin
       timeDeltaOut        => props_out.delta,
       ticksPerSecond      => props_out.ticks_per_second,
       ppsOut              => timebase_out.PPS,
+      ppsLock		  => s_ppsLock,
       time_service        => time_out);
 
   no_pps_gen: if its(not pps_test) generate
@@ -107,7 +112,7 @@ begin
     -- To accelerate the speed of the time_server_test_app, clock the time server
     -- at 100 MHz, but declare frequency at 1 MHz and generate "PPS" at 10 ms. 
     constant c_pulse_period    : positive := 1000000;
-    constant c_pulse_width     : positive := 16;
+    constant c_pulse_width     : positive := 100000; --16;
     -- For time_server test application, generate first PPS rising edge at
     -- 1 second minus PPS_tolerance_PPM/2
     constant c_pulse_delay     : positive := 1000000-to_integer(PPS_tolerance_PPM)/2;

@@ -49,7 +49,7 @@ Tone13 = 13
 Tone27 = 27
 Fs = 100
 Ts = 1.0/float(Fs)
-t = np.arange(0,NUM_SAMPLES*Ts,Ts,dtype=np.float)
+t = np.arange(0,NUM_SAMPLES*Ts,Ts,dtype=np.float64)
 #comment the next two lines, and uncomment the following two random number
 #lines, to see the frequency response over the entire range
 real = np.cos(Tone05*2*np.pi*t) + np.cos(Tone13*2*np.pi*t) + np.cos(Tone27*2*np.pi*t) + 1

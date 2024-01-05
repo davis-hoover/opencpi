@@ -365,7 +365,7 @@ main(int argc, const char **argv)
     argv++;
     doFlags(argv);
     if (logLevel != ULONG_MAX)
-      OCPI::OS::logSetLevel((uint8_t)logLevel);
+      OCPI::OS::Log::setLevel((uint8_t)logLevel);
 #if 0
     if ((exact->options & SUDO) && geteuid()) {
       int dfd = ::open(OCPI_DRIVER_MEM, O_RDONLY);

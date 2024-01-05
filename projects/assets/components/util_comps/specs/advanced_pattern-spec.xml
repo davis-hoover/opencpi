@@ -4,12 +4,12 @@
 
   <!-- Playback pattern -->
   <Property name="maxPatternLength" type="ULong" parameter="true" default="32"/>
-  <Property name="Pattern" type="Struct" readable="true" initial="true" sequenceLength="maxPatternLength">
+  <Property name="Pattern" type="Struct" initial="true" sequenceLength="maxPatternLength">
     <Member name='Opcode' type='uChar' default='0'/>
     <Member name='Bytes' type='uChar' default='0' sequenceLength="2048"/>
   </Property>
-  <Property name='LoopCount' type='ULongLong' readable="true" initial="true" default='1'/>
-  <Property name='ZLM' type='UShort' readable="true" initial="true" default='0'/>
+  <Property name='LoopCount' type='ULongLong' initial="true" default='1'/>
+  <Property name='ZLM' type='UShort' initial="true" default='0'/>
 
   <!-- Statistics for each opcode -->
   <Property name="current" type="Struct" volatile="true">

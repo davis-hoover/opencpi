@@ -28,6 +28,7 @@
                                                   <!--ad9361 ad9361     
                                                         pin  name -->
   <device worker='ad9361_adc_sub'>
+    <property name='LVDS_p' value='true'/> <!-- signals go through a connector so LVDS is the default -->
 
     <!-- TODO / FIXME - enable these properties, there is currently a bug
          preventing them from being enabled -->
@@ -50,6 +51,7 @@
   <device worker='ad9361_dac'/>
   <device worker='ad9361_dac'/>
   <device worker='ad9361_dac_sub'>
+    <property name='LVDS_p' value='true'/> <!-- signals go through a connector so LVDS is the default -->
 
     <!-- TODO / FIXME - enable these properties, there is currently a bug
          preventing them from being enabled -->
@@ -76,6 +78,9 @@
     <Signal name='SPI_DO'      slot='LA27_N'/>    <!--  C27  -->
   </device>
   <device worker='ad9361_data_sub'>
+    <property name='LVDS_p' value='true'/>
+    <property name='DATA_CLK_Delay' value='3'/>
+    <property name='FB_CLK_Delay' value='7'/>
     <Signal name='DATA_CLK_P'  slot='LA00_P_CC'/> <!--  G11  -->
     <Signal name='DATA_CLK_N'  slot='LA00_N_CC'/> <!--  H11  -->
     <Signal name='P0_D_5_0(0)'     slot='LA11_N'/>    <!--  H17  TX_D0_N -->
@@ -120,6 +125,7 @@
     <Property name='LVDS_p' value='true'/>
   </device>
   <device worker='ad9361_config'>
+    <property name='pin_control_p' value='true'/>
     <Signal name='TXNRX'  slot='LA16_N'/>    <!--  H4   -->
     <Signal name='ENABLE' slot='LA16_P'/>    <!--  G6   -->
   </device>

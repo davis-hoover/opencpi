@@ -79,7 +79,7 @@ namespace OCPI {
       parent().parent().configureOnce();
       lock();
       // FIXME: obviously this should be registered and dispatched nicely..
-      bool pci = false, ether = false, sim = false, bus = false, lsim = false;
+      bool pci = false, ether = false, udp = false, sim = false, bus = false, lsim = false;
       const char *which = a_name;
       if (!strncasecmp("PCI:", which, 4)) {
 	pci = true;
@@ -96,6 +96,9 @@ namespace OCPI {
       } else if (!strncasecmp("Ether:", which, 6)) {
 	ether = true;
 	which += 6;
+        } else if (!strncasecmp("UDP:", which, 4)) {
+	udp = true;
+	which += 4;
       } else {
 	unsigned n = 0;
 	for (const char *cp = strchr(which, ':'); cp; n++, cp = strchr(cp+1, ':'))	  ;
@@ -112,6 +115,7 @@ namespace OCPI {
 	pci ? PCI::Driver::open(which, params, err) : 
 	bus ? Zynq::Driver::open(which, forLoad, params, err) : 
 	ether ? Ether::Driver::open(which, discovery, forLoad, params, err) :
+  udp ? UDP::Driver::open(which, discovery, forLoad, params, err) :
 	sim ? Sim::Driver::open(which, discovery, false, params, err) : 
 	lsim ? LSim::Driver::open(which, params, err) : NULL;
       // don't call setup() when just doing FPGA programming on Zynq
@@ -194,6 +198,11 @@ namespace OCPI {
 	ocpiBad("In HDL Container driver, got ethernet search error: %s", error.c_str());
 	error.clear();
       }
+      count += UDP::Driver::search(params, exclude, discoveryOnly, true, error);
+      if (error.size()) {
+	ocpiBad("In HDL Container driver, got UDP search error: %s", error.c_str());
+	error.clear();
+      }
       count += PCI::Driver::search(params, exclude, discoveryOnly, error);
       if (error.size()) {
 	ocpiBad("In HDL Container driver, got PCI search error: %s", error.c_str());
@@ -232,7 +241,7 @@ namespace OCPI {
       if (m_gpsdp->m_configured)
         return true;
       gps_context_init(&m_gpsdp->m_context, "opencpi-gpsd");
-      if (OS::logWillLog(OCPI_LOG_INFO))
+      if (OS::Log::willLog(OCPI_LOG_INFO))
         m_gpsdp->m_context.errout.debug = LOG_IO;
       else
         m_gpsdp->m_context.errout.debug = LOG_ERROR;

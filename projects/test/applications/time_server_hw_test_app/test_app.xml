@@ -1,0 +1,3 @@
+<application done="time_server_hw_tester">
+	<instance component="ocpi.test.time_server_hw_tester"/>
+</application>

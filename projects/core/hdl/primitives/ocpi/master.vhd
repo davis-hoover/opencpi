@@ -91,7 +91,11 @@ architecture rtl of master is
   signal ready_r      : Bool_t;
   signal eof_zlm      : Bool_t;
   signal eof_now      : Bool_t;
-  signal input_eof_r  : Bool_t; -- always give the worker one cycle during eof propagation
+  signal input_eof_r  : Bool_t; -- edge triggered giving the worker one cycle during eof propagation
+  signal last_input_r : Bool_t; -- previous cycle value for edge triggering input_eof after reset
+  signal eof_r        : Bool_t; -- has eof gone high since reset?
+  signal last_eof_r   : Bool_t; -- previous cycle value for edge triggering eof after reset
+  signal my_eof       : Bool_t; -- qualified worker eof that must have gone high since reset
   signal my_give      : Bool_t; -- internal version of: give or version>2 and valid
   signal ocp_give     : Bool_t;
   signal opcode_now   : std_logic_vector(opcode'range);
@@ -114,6 +118,7 @@ begin
   reset   <= reset_i;
   ready   <= ready_r;
   latency <= resize(latency_r,latency'length);
+  my_eof  <= (eof and not last_eof_r) or eof_r; -- use worker eof only if edge triggered since reset
   -- useful for debugging:
   -- latency <= ushort_t(std_logic_vector'("0000" &
   --                                       ready_r &
@@ -121,6 +126,7 @@ begin
   --                                       eom & eof & give & valid &
   --                                       wsi_reset & wsi_is_operating & SReset_n & SThreadBusy));
   gen_debug: if debug generate -- these will have no drivers
+
      messages <= messages_r;
      bytes    <= bytes_r;
   end generate gen_debug;
@@ -135,7 +141,7 @@ begin
   opcode_now <= opcode when its(som_i) else opcode_r;
   ocp_eom    <= to_bool(state_r = NEED_EOF_E or state_r = NEED_EOM_E or
                         (data_count_r = data_limit and insert_eom) or
-                        (eof and state_r = BEFORE_SOM_E) or
+                        (my_eof and state_r = BEFORE_SOM_E) or
                         (eom and not its(eof_zlm)));
   -- A condition where we are not passing through to OCP, an early SOM without valid
   early_som  <= som and not valid and not eom and not eof;
@@ -144,7 +150,7 @@ begin
                         opcode_now = slv0(opcode_now'length) and
                         (som or state_r = EARLY_SOM_e));
   -- The condition when we know we must do an eof, not necessarily sync'd to give
-  eof_now    <= to_bool((input_eof_r and hdl_version > 1 and not worker_eof) or eof);
+  eof_now    <= to_bool((input_eof_r and hdl_version > 1 and not worker_eof) or my_eof);
   -- The condition when we can issue an OCP command
   ocp_give   <= to_bool(state_r /= FINISHED_e and
                         ((my_give and not its(early_som) and not its(eof_zlm)) or
@@ -172,7 +178,7 @@ begin
     MData <= data;
   end generate gen2;
   MDataInfo(MDataInfo'left) <= to_bool(abort or state_r = NEED_EOF_e or
-                                       (hdl_version > 1 and state_r = BEFORE_SOM_E and eof));
+                                       (hdl_version > 1 and state_r = BEFORE_SOM_E and my_eof));
   process(wsi_clk) is
     -- procedure to deal with the worker giving data
     procedure do_data is
@@ -226,16 +232,22 @@ begin
         last_data_r  <= bfalse;
         data_count_r <= (others => '0');
         input_eof_r  <= bfalse;
+        eof_r        <= bfalse;
+        -- last_input_r <= xxxxx; -- purposely not reset
+        -- last_eof_r   <= xxxxx; -- purposely not reset
       else
+        eof_r        <= my_eof;
         ready_r <= (wsi_is_operating or eof_now) and not SThreadBusy(0); -- for next cycle.  OCP pipelining
         if ready_r and its(first_take) and not its(my_give) then -- start latency measurement
           first_data_r <= btrue;
         end if;
         if its(ready_r) then
+          last_input_r <= input_eof; -- to detect edges after reset and when ready
+          last_eof_r   <= eof;       -- ditto
           if its(ocp_give) and ocp_eom and debug then
             messages_r <= messages_r + 1;
           end if;
-          input_eof_r <= input_eof;
+          input_eof_r <= input_eof_r or (input_eof and not last_input_r); -- edge trigger after reset
           if my_give and not its(som or valid or eom or abort or eof) then
             report "Illegal message metadata: no SOM or VALID or EOM" severity failure;
           end if;
@@ -250,7 +262,7 @@ begin
                 opcode_r <= opcode;
                 if its(early_som) then
                   state_r <= EARLY_SOM_e;
-                elsif hdl_version > 1 and eof then -- allow v2+ to "give" eof
+                elsif hdl_version > 1 and my_eof then -- allow v2+ to "give" eof
                   state_r <= FINISHED_e;
                 else
                   do_som;

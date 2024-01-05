@@ -1,19 +1,20 @@
-### Location of document
+### Document name and version
 (Please provide a link to the document, or the document's name)
-
 
 ### Problem identified
 (List any problems encountered)
 
-
-### Further details
-(Anything else you can think of, or any further details?)
-
-
 ### Proposal or work around
 (What fix/suggestion do you recommend?)
 
+### Links/references (Optional)
+(Links or references supporting the purposed fix)
 
-### Links/references
+### Acceptance criteria
+(What would it take for you to feel this issue can be closed?)
 
 
+
+
+
+/label ~"type::doc"

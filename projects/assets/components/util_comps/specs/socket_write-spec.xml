@@ -3,7 +3,7 @@
   <Port Name="out" numberofopcodes='256' optional='true' producer='true'/>
 
   <!-- Socket to write to -->
-  <Property name="outSocket" type="Struct" readable="true" writable="true">
+  <Property name="outSocket" type="Struct" writable="true">
     <Member name='address' type='string' stringLength='16' default='0.0.0.0'/>
     <Member name='expectedClients' type='ushort' default='0'/>
     <Member name='port' type='ushort'/>
@@ -23,7 +23,7 @@
     </Member>
   </Property>
 
-  <Property name="stopOn" type="Struct" readable="true" writable="true">
+  <Property name="stopOn" type="Struct" writable="true">
     <!-- Stop on TOTAL bytes/messages  -->
     <Member name="Total" type="Struct">
       <Member name="bytes" type="ULongLong"/>

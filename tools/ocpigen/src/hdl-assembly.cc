@@ -832,20 +832,20 @@ doPrev(FILE *f, std::string &last, std::string &comment, const char *myComment) 
   comment = "";
 }
 
-// single means that this is a signal that is not a vector at all.
-// isSingle means that the signal is mapped an individual part of a vector.
 static void
-mapOneSignal(FILE *f, Signal &s, unsigned n, bool isSingle, const char *mapped,
-	     const char *indent, const char *pattern, bool single) {
+mapOneSignal(FILE *f, Signal &s, size_t index, const char *mapped, size_t mappedIndex,
+	     const char *indent, const char *pattern) {
   std::string name, map;
   OU::format(name, pattern, s.cname());
   if (*mapped)
     OU::format(map, pattern, mapped);
-  if (s.m_width && isSingle && !single)
-    OU::formatAdd(name, "(%u)", n);
+  if (index != SIZE_MAX)
+    OU::formatAdd(name, "(%zu)", index);
+  if (mappedIndex != SIZE_MAX)
+    OU::formatAdd(map, "(%zu)", mappedIndex);
   fprintf(f, "%s%s => %s", indent, name.c_str(),
 	  *mapped ? map.c_str() : (s.m_direction == Signal::IN ?
-				   (isSingle || !s.m_width || single ? "'0'" : "(others => '0')") :
+				   (index != SIZE_MAX || !s.m_width ? "'0'" : "(others => '0')") :
 				   "open"));
 }
 
@@ -873,7 +873,7 @@ emitAssyInstance(FILE *f, Instance *i) { // , unsigned nControlInstances) {
     unsigned n = 0;
     // Emit the compile-time properties (a.k.a. parameter properties).
     for (InstanceProperty *pv = &i->m_properties[0]; n < i->m_properties.size(); n++, pv++) {
-      const OM::Property *pr = pv->property;
+      const OM::Property *pr = pv->m_property;
       if (pr->m_isParameter) {
 	std::string value;
 	if (lang == VHDL) {
@@ -881,7 +881,7 @@ emitAssyInstance(FILE *f, Instance *i) { // , unsigned nControlInstances) {
 	  fprintf(f, "%s => %s", pr->m_name.c_str(),
 		  vhdlValue(!strcasecmp(pr->m_name.c_str(), "ocpi_endian") ?
 			    "ocpi.types" : tpkg.c_str(),
-			    pr->m_name, pv->value, value, false, true));
+			    pr->m_name, pv->m_value, value, false, true));
 	} else {
 	  fprintf(f, "%s", any ? ", " : " #(");
 #if 0
@@ -889,7 +889,7 @@ emitAssyInstance(FILE *f, Instance *i) { // , unsigned nControlInstances) {
 	  switch (pr->m_baseType) {
 #define OCPI_DATA_TYPE(s,c,u,b,run,pretty,storage)	\
 	    case OA::OCPI_##pretty:			\
-	      i64 = (int64_t)pv->value.m_##pretty;	\
+	      i64 = (int64_t)pv->m_value.m_##pretty;	\
 	      break;
 	    OCPI_PROPERTY_DATA_TYPES
 #undef OCPI_DATA_TYPE
@@ -902,7 +902,7 @@ emitAssyInstance(FILE *f, Instance *i) { // , unsigned nControlInstances) {
 		  pr->m_name.c_str(), bits, (long long)i64);
 #endif
 	  fprintf(f, ".%s(%s)",
-		  pr->m_name.c_str(), verilogValue(pv->value, value, true));
+		  pr->m_name.c_str(), verilogValue(pv->m_value, value, true));
 	}
 	any = true;
       }
@@ -992,13 +992,15 @@ emitAssyInstance(FILE *f, Instance *i) { // , unsigned nControlInstances) {
     if (s.m_direction == Signal::UNUSED)
       continue;
     bool anyMapped = false;
-    std::string name;
     // Allow for signals in a vector to be mapped individually (e.g. to slot signal).
-    for (unsigned n = 0; s.m_width ? n < s.m_width : n == 0; n++) {
-      bool isSingle = false;
-      const char *mappedExt = i->m_extmap.findSignal(s, n, isSingle);
-      ocpiDebug("Instance %s worker %s signal %s(%u) mapped to %s single %d", i->cname(),
-		i->m_worker->m_implName, s.cname(), n, mappedExt ? mappedExt : "<none>", isSingle);
+    for (size_t n = 0; s.m_width ? n < s.m_width : n == 0; n++) {
+      bool isWhole = false;
+      size_t mappedIndex;
+      const char *mappedExt = i->m_inst2ext.findSignal(s, n, isWhole, mappedIndex);
+      size_t index = isWhole ? SIZE_MAX : n;
+      ocpiDebug("Instance %s worker %s signal %s(%zd) mapped to %s(%zu)", i->cname(),
+		i->m_worker->m_implName, s.cname(), index, mappedExt ? mappedExt : "<none>",
+		mappedIndex);
       if (mappedExt) {
 	// mappedExt might actually be an empty string: ""
 	if (!anyMapped)
@@ -1008,30 +1010,30 @@ emitAssyInstance(FILE *f, Instance *i) { // , unsigned nControlInstances) {
 	const char *front = any ? indent : "";
 	if (s.m_differential) {
 	  doPrev(f, last, comment, myComment());
-	  mapOneSignal(f, s, n, isSingle, mappedExt, front, s.m_pos.c_str(), false);
+	  mapOneSignal(f, s, index, mappedExt, mappedIndex, front, s.m_pos.c_str());
 	  doPrev(f, last, comment, myComment());
-	  mapOneSignal(f, s, n, isSingle, mappedExt, front, s.m_neg.c_str(), false);
+	  mapOneSignal(f, s, index, mappedExt, mappedIndex, front, s.m_neg.c_str());
 	} else if (!s.m_pin &&
 		   (s.m_direction == Signal::INOUT || s.m_direction == Signal::OUTIN)) {
 	  // For inout, we only want to map the signals if they are NOT connected,
 	  if (!*mappedExt) {
 	    doPrev(f, last, comment, myComment());
-	    mapOneSignal(f, s, n, isSingle, mappedExt, front, s.m_in.c_str(), false);
+	    mapOneSignal(f, s, index, mappedExt, mappedIndex, front, s.m_in.c_str());
 	    doPrev(f, last, comment, myComment());
-	    mapOneSignal(f, s, n, isSingle, mappedExt, front, s.m_out.c_str(), false);
+	    mapOneSignal(f, s, index, mappedExt, mappedIndex, front, s.m_out.c_str());
 	    doPrev(f, last, comment, myComment());
-	    mapOneSignal(f, s, n, isSingle, mappedExt, front, s.m_oe.c_str(), true);
+	    mapOneSignal(f, s, SIZE_MAX, mappedExt, mappedIndex, front, s.m_oe.c_str());
 	  }
 	} else {
 	  doPrev(f, last, comment, myComment());
-	  mapOneSignal(f, s, n, isSingle, mappedExt, front, "%s", false);
+	  mapOneSignal(f, s, index, mappedExt, mappedIndex, front, "%s");
 	}
 	if (*mappedExt) {
 	  Signal *es = m_assyWorker.m_sigmap[mappedExt];
 	  assert(es);
 	  m_assyWorker.recordSignalConnection(*es, (prefix + s.cname()).c_str());
 	}
-	if (!isSingle)
+	if (isWhole)
 	  break;
       }	else
 	assert(!anyMapped);
@@ -1040,6 +1042,7 @@ emitAssyInstance(FILE *f, Instance *i) { // , unsigned nControlInstances) {
 	(s.m_pin || (s.m_direction != Signal::INOUT && s.m_direction != Signal::OUTIN)))
       continue;
     doPrev(f, last, comment, myComment());
+    std::string name;
     if (s.m_differential) {
       OU::format(name, s.m_pos.c_str(), s.cname());
       if (lang == VHDL)

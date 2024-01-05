@@ -38,8 +38,16 @@ begin
   metadata_out.romEn   <= props_in.romData_read;
   -- Drive timekeepping interface - depends on which clock, and whether there is a PPS input
   timebase_out.clk      <= clk;
-  timebase_out.PPS      <= '0';
-  timebase_out.usingPPS <= '0'; -- When not using PPS, drive usingPPS low
+  pps_src_none : if pps_src = 0 generate
+  	timebase_out.PPS      <= '0';
+  	timebase_out.usingPPS <= '0'; -- When not using PPS, drive usingPPS low
+  end generate pps_src_none;
+
+  pps_src_ext : if pps_src = 1 generate
+  	timebase_out.PPS      <= PMOD_JA4;
+  	timebase_out.usingPPS <= '1'; -- When using PPS, drive usingPPS high
+  end generate pps_src_ext;
+
   -- convert between 2d array and array of arrays (VHDL does not allow 1d slices of 2d)
    sd0 : for i in 0 to sdp_count_c-1 generate
      sd1: for j in 0 to sdp_width_c-1 generate
@@ -89,7 +97,7 @@ begin
   -- led(6 downto 1)           <= std_logic_vector(props_in.leds(6 downto 1));
   -- led(led'left downto 8)    <= (others => '0');
   led(0) <= count(count'left);
-  led(1) <= '0';
+  led(1) <= timebase_in.pps_locked;
   led(2) <= '0';
   led(3) <= '0';
   led(4) <= '0';

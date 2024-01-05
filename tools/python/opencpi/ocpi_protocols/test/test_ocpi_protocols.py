@@ -31,9 +31,10 @@ from ocpi_protocols.ocpi_protocols import _interleave_complex, OcpiProtocols
 PROFILING = False
 
 
-# Increase the decimal precision, needed to handle time and sample interval
-# values to their maximum supported accuracy
-decimal.getcontext().prec = 50
+# Need an increased decimal precision to handle time and sample interval
+# values to their maximum supported accuracy. Use the precision defined
+# by the OcpiProtocol class.
+decimal.getcontext().prec = OcpiProtocols.DECIMAL_PRECISION
 
 
 class TestInterleaveComplex(unittest.TestCase):
@@ -294,10 +295,32 @@ class TestOcpiProtocols(unittest.TestCase):
     def test_pack_time(self):
         protocol_handler = OcpiProtocols("char_timed_sample")
 
-        self.assertEqual(protocol_handler.pack_data("time", 1.0000000001),
+        self.assertEqual(protocol_handler.pack_data("time", "1.0000000001"),
                          bytes([
-                             0x00, 0x00, 0x00, 0x6D, 0x00, 0x00, 0x00, 0x00,
+                             0x67, 0x7f, 0xf3, 0x6D, 0x00, 0x00, 0x00, 0x00,
                              0x01, 0x00, 0x00, 0x00]))
+
+    def test_pack_time_2(self):
+        protocol_handler = OcpiProtocols("char_timed_sample")
+
+        actual = protocol_handler.pack_data("time",
+                                            "4277132493.0189491014191089934283994400399109281352139078080654144287109375")
+        # feef dccd . 04d9 d92a e237 8fff  = 4277132493.0189491014191089934283994400399109281352139078080654144287109375
+
+        self.assertEqual(actual,
+                         bytes([0xff, 0x8f, 0x37, 0xe2, 0x2a, 0xd9, 0xd9, 0x04,
+                                0xcd, 0xdc, 0xef, 0xfe]))
+
+    def test_pack_time_3(self):
+        protocol_handler = OcpiProtocols("char_timed_sample")
+
+        actual = protocol_handler.pack_data("time",
+                                            "4277132493.0189491014191089934826095486641861498355865478515625")
+        # feef dccd . 04d9 d92a e237 9000  = 4277132493.0189491014191089934826095486641861498355865478515625
+
+        self.assertEqual(actual,
+                         bytes([0x00, 0x90, 0x37, 0xe2, 0x2a, 0xd9, 0xd9, 0x04,
+                                0xcd, 0xdc, 0xef, 0xfe]))
 
     def test_pack_time_negative(self):
         protocol_handler = OcpiProtocols("char_timed_sample")
@@ -310,15 +333,15 @@ class TestOcpiProtocols(unittest.TestCase):
 
         self.assertEqual(
             protocol_handler.pack_data(
-                "time", decimal.Decimal(2**32) - decimal.Decimal(2**-40)),
-            bytes([0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                "time", decimal.Decimal(2**32) - decimal.Decimal(2**-64)),
+            bytes([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
                    0xFF, 0xFF, 0xFF, 0xFF]))
 
     def test_pack_time_minimum(self):
         protocol_handler = OcpiProtocols("char_timed_sample")
 
-        self.assertEqual(protocol_handler.pack_data("time", 2**(-40)),
-                         bytes([0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
+        self.assertEqual(protocol_handler.pack_data("time", 2**(-40)+2**(-64)),
+                         bytes([0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
                                 0x00, 0x00, 0x00, 0x00]))
 
     def test_pack_time_zero(self):
@@ -333,9 +356,31 @@ class TestOcpiProtocols(unittest.TestCase):
         protocol_handler = OcpiProtocols("char_timed_sample")
 
         self.assertEqual(
-            protocol_handler.pack_data("sample_interval", 1.0000000001),
-            bytes([0x00, 0x00, 0x00, 0x6D, 0x00, 0x00, 0x00, 0x00,
+            protocol_handler.pack_data("sample_interval", "1.0000000001"),
+            bytes([0x67, 0x7F, 0xF3, 0x6D, 0x00, 0x00, 0x00, 0x00,
                    0x01, 0x00, 0x00, 0x00]))
+
+    def test_pack_sample_interval_2(self):
+        protocol_handler = OcpiProtocols("char_timed_sample")
+
+        actual = protocol_handler.pack_data("sample_interval",
+                                            "4277132493.0189491014191089934283994400399109281352139078080654144287109375")
+        # feef dccd . 04d9 d92a e237 8fff  = 4277132493.0189491014191089934283994400399109281352139078080654144287109375
+
+        self.assertEqual(actual,
+                         bytes([0xff, 0x8f, 0x37, 0xe2, 0x2a, 0xd9, 0xd9, 0x04,
+                                0xcd, 0xdc, 0xef, 0xfe]))
+
+    def test_pack_sample_interval_3(self):
+        protocol_handler = OcpiProtocols("char_timed_sample")
+
+        actual = protocol_handler.pack_data("sample_interval",
+                                            "4277132493.0189491014191089934826095486641861498355865478515625")
+        # feef dccd . 04d9 d92a e237 9000  = 4277132493.0189491014191089934826095486641861498355865478515625
+
+        self.assertEqual(actual,
+                         bytes([0x00, 0x90, 0x37, 0xe2, 0x2a, 0xd9, 0xd9, 0x04,
+                                0xcd, 0xdc, 0xef, 0xfe]))
 
     def test_pack_sample_interval_negative(self):
         protocol_handler = OcpiProtocols("char_timed_sample")
@@ -349,16 +394,16 @@ class TestOcpiProtocols(unittest.TestCase):
         self.assertEqual(
             protocol_handler.pack_data(
                 "sample_interval",
-                decimal.Decimal(2**32) - decimal.Decimal(2**-40)),
-            bytes([0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                decimal.Decimal(2**32) - decimal.Decimal(2**-64)),
+            bytes([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
                    0xFF, 0xFF, 0xFF, 0xFF]))
 
     def test_pack_sample_interval_minimum(self):
         protocol_handler = OcpiProtocols("char_timed_sample")
 
         self.assertEqual(
-            protocol_handler.pack_data("sample_interval", 2**(-40)),
-            bytes([0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
+            protocol_handler.pack_data("sample_interval", 2**(-40)+2**(-64)),
+            bytes([0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
                    0x00, 0x00, 0x00, 0x00]))
 
     def test_pack_flush(self):
@@ -593,6 +638,28 @@ class TestOcpiProtocols(unittest.TestCase):
             0x01, 0x00, 0x00, 0x00]))),
             1.0000000001)
 
+    def test_unpack_time_2(self):
+        protocol_handler = OcpiProtocols("char_timed_sample")
+
+        actual = protocol_handler.unpack_data("time",
+                                              bytes([0xff, 0x8f, 0x37, 0xe2,
+                                                     0x2a, 0xd9, 0xd9, 0x04,
+                                                     0xcd, 0xdc, 0xef, 0xfe]))
+        # feef dccd . 04d9 d92a e237 8fff = 4277132493.0189491014191089934283994400399109281352139078080654144287109375
+        expected = decimal.Decimal("        4277132493.0189491014191089934283994400399109281352139078080654144287109375")
+        self.assertEqual(actual, expected)
+
+    def test_unpack_time_3(self):
+        protocol_handler = OcpiProtocols("char_timed_sample")
+
+        actual = protocol_handler.unpack_data("time",
+                                              bytes([0x00, 0x90, 0x37, 0xe2,
+                                                     0x2a, 0xd9, 0xd9, 0x04,
+                                                     0xcd, 0xdc, 0xef, 0xfe]))
+        # feef dccd . 04d9 d92a e237 9000 = 4277132493.0189491014191089934826095486641861498355865478515625
+        expected = decimal.Decimal("        4277132493.0189491014191089934826095486641861498355865478515625")
+        self.assertEqual(actual, expected)
+
     def test_unpack_time_zero(self):
         protocol_handler = OcpiProtocols("char_timed_sample")
 
@@ -605,17 +672,17 @@ class TestOcpiProtocols(unittest.TestCase):
         protocol_handler = OcpiProtocols("char_timed_sample")
 
         self.assertEqual(protocol_handler.unpack_data("time", bytes([
-            0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+            0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
             0xFF, 0xFF, 0xFF, 0xFF])),
-            decimal.Decimal(2**32) - decimal.Decimal(2**-40))
+            decimal.Decimal(2**32) - decimal.Decimal(2**-64))
 
     def test_unpack_time_minimum(self):
         protocol_handler = OcpiProtocols("char_timed_sample")
 
         self.assertEqual(protocol_handler.unpack_data("time", bytes([
-            0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
+            0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00, 0x00])),
-            (2**-40))
+            (2**-64))
 
     def test_unpack_sample_interval(self):
         protocol_handler = OcpiProtocols("char_timed_sample")
@@ -626,21 +693,43 @@ class TestOcpiProtocols(unittest.TestCase):
                  0x01, 0x00, 0x00, 0x00]))),
             1.0000000001)
 
+    def test_unpack_sample_interval_2(self):
+        protocol_handler = OcpiProtocols("char_timed_sample")
+
+        actual = protocol_handler.unpack_data("sample_interval",
+                                              bytes([0xff, 0x8f, 0x37, 0xe2,
+                                                     0x2a, 0xd9, 0xd9, 0x04,
+                                                     0xcd, 0xdc, 0xef, 0xfe]))
+        # feef dccd . 04d9 d92a e237 8fff = 4277132493.0189491014191089934283994400399109281352139078080654144287109375
+        expected = decimal.Decimal("        4277132493.0189491014191089934283994400399109281352139078080654144287109375")
+        self.assertEqual(actual, expected)
+
+    def test_unpack_sample_interval_3(self):
+        protocol_handler = OcpiProtocols("char_timed_sample")
+
+        actual = protocol_handler.unpack_data("sample_interval",
+                                              bytes([0x00, 0x90, 0x37, 0xe2,
+                                                     0x2a, 0xd9, 0xd9, 0x04,
+                                                     0xcd, 0xdc, 0xef, 0xfe]))
+        # feef dccd . 04d9 d92a e237 9000 = 4277132493.0189491014191089934826095486641861498355865478515625
+        expected = decimal.Decimal("        4277132493.0189491014191089934826095486641861498355865478515625")
+        self.assertEqual(actual, expected)
+
     def test_unpack_sample_interval_maximum(self):
         protocol_handler = OcpiProtocols("char_timed_sample")
 
         self.assertEqual(protocol_handler.unpack_data("sample_interval", bytes(
-            [0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+            [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
              0xFF, 0xFF, 0xFF, 0xFF])),
-            decimal.Decimal(2**32) - decimal.Decimal(2**-40))
+            decimal.Decimal(2**32) - decimal.Decimal(2**-64))
 
     def test_unpack_sample_interval_minimum(self):
         protocol_handler = OcpiProtocols("char_timed_sample")
 
         self.assertEqual(protocol_handler.unpack_data("sample_interval", bytes(
-            [0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
+            [0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
              0x00, 0x00, 0x00, 0x00])),
-            (2**-40))
+            (2**-64))
 
     def test_unpack_flush(self):
         protocol_handler = OcpiProtocols("char_timed_sample")

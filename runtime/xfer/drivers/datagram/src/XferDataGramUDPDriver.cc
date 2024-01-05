@@ -193,7 +193,7 @@ namespace Xfer {
 	size_t n = m_server.recvfrom((char*)buffer, m_lep.maxPayloadSize(), 0, (char*)&sad, &size, 200);
 	offset = 0;
 	// All DEBUG
-	if (OS::logWillLog(10) && n != 0) {
+	if (OS::Log::willLog(10) && n != 0) {
 	  int port = ntohs ( ((struct sockaddr_in *)&sad)->sin_port );
 	  char * a  = inet_ntoa ( ((struct sockaddr_in *)&sad)->sin_addr );
 	  ocpiDebug(" Recved %lld bytes of data on port %lld from addr %s port %d\n",

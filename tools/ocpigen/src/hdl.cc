@@ -130,7 +130,9 @@ parseHdlImpl(const char *a_package) {
     const char *dot = strrchr(emulate, '.');
     if (!dot)
       return OU::esprintf("'emulate' attribute: '%s' has no authoring model suffix", emulate);
-    if (!(m_emulate = HdlDevice::get(emulate, NULL, m_file.c_str(), this, err)))
+    if (!(m_emulate = HdlDevice::get(emulate, m_file.c_str(), this, err)) ||
+	// Force the emulated worker to read its build configs since we will copy them below
+	(err = m_emulate->setParamConfig(NULL, SIZE_MAX, m_file)))
       return OU::esprintf("for emulated device worker %s: %s", emulate, err);
     for (PropertiesIter pi = m_emulate->m_ctl.properties.begin();
 	 pi != m_emulate->m_ctl.properties.end(); ++pi) {
@@ -271,7 +273,18 @@ Signal()
   : m_direction(NONE), m_width(0), m_differential(false), m_pin(false), m_type(NULL) {
 }
 
-Signal * Signal::
+// constructor that optionally clears out the expressions (leaving the result unparameterized)
+Signal *Signal::
+clone(bool clearExprs) const {
+  Signal *s = new Signal(*this);
+  if (clearExprs) {
+    s->m_widthExpr.clear();
+    s->m_directionExpr.clear();
+  }
+  return s;
+}
+
+Signal *Signal::
 reverse() {
   Signal *s = new Signal(*this);
   switch(m_direction) {
@@ -517,7 +530,7 @@ const char *SigMap::
 findSignal(Signal *s) {
   for (SigMap_::const_iterator si = begin(); si != end(); si++)
     if ((*si).second == s)
-      return (*si).first;
+      return (*si).first.c_str();
   return NULL;
 }
 

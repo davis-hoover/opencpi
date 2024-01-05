@@ -35,7 +35,7 @@ source "$OCPI_CDK_DIR/scripts/setup-prerequisite.sh" \
        0
 
 # Patch the source if necessary
-if [[ ! -f ../.opencpi-patched ]]; then
+if [ ! -e ../.opencpi-patched ]; then
   patch -p0 -d .. < $OcpiThisPrerequisiteDir/verilog-ethernet.patch || {
     echo "*******************************************************" >&2
     echo "ERROR: patch applied by verilog-ethernet.patch failed!!" >&2

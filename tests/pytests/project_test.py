@@ -49,7 +49,7 @@ class ProjectTest(unittest.TestCase):
         """
         my_asset = AssetFactory.factory(self.asset_type,
                                                   "../av-test",
-                                                  init_apps_col=True)
+                                                  verb='run',verbose=0)
         assert my_asset.run() == 0
 
     def test_prj_no_init(self):
@@ -57,7 +57,7 @@ class ProjectTest(unittest.TestCase):
         create a without initializing apps or libraries an exception is thrown when trying to run
         """
         my_asset = AssetFactory.factory(self.asset_type,
-                                                  "../av-test")
+                                                  "../av-test",verbose=0)
         self.assertRaises(ocpiutil.OCPIException, my_asset.run)
 
     def test_prj_good(self):
@@ -66,9 +66,7 @@ class ProjectTest(unittest.TestCase):
         """
         my_asset = AssetFactory.factory(self.asset_type,
                                         "../av-test",
-                                        "av-test",
-                                        init_tests=True,
-                                        init_libs=True)
+                                        verb='run',verbose=0)
         assert my_asset.run() == 0
 
 class DeleteProjectTest(unittest.TestCase):
@@ -81,8 +79,8 @@ class DeleteProjectTest(unittest.TestCase):
 
 
     def test_del(self):
-        my_asset = AssetFactory.factory(self.asset_type, "mypj0_del")
-        my_asset.delete(True)
+        my_asset = AssetFactory.factory(self.asset_type, "mypj0_del",verbose=0)
+        my_asset.delete(force=True)
 
 if __name__ == '__main__':
     unittest.main()

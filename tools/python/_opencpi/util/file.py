@@ -26,6 +26,7 @@ import os.path
 from pathlib import Path
 from contextlib import contextmanager
 import sys
+from typing import Union, Optional, List
 import logging
 import re
 from _opencpi.util import OCPIException
@@ -60,7 +61,10 @@ def execute_cmd(settings, directory, action=None, file=None, verbose=False, igno
                      'run_after'       : "OcpiRunAfter",
                      'run_arg'         : "OcpiRunArgs",
                      'remote_test_sys' : "OCPI_REMOTE_TEST_SYSTEMS",
-                     'verbose'         : "TestVerbose"}
+                     'application'     : "Applications",
+                     'verbose'         : "TestVerbose",
+                     'nothing_error'   : "NothingError"}
+    directory = str(directory) # allow paths, leaving this function as-is otherwise
     make_list = ["make", "-r", "-C", directory, "--no-print-directory"]
     debug_string = " ".join(make_list)
     if file:
@@ -77,14 +81,18 @@ def execute_cmd(settings, directory, action=None, file=None, verbose=False, igno
     logging.debug("settings for make command: " + str(settings.items()))
     for setting, value in settings.items():
         if isinstance(value, bool):
-            make_list.append(settings_dict[setting] + '=1')
-            debug_string += " " + settings_dict[setting] + '=1'
+            if value is True:
+                make_list.append(settings_dict[setting] + '=1')
+                debug_string += " " + settings_dict[setting] + '=1'
         elif isinstance(value, list) or isinstance(value, set):
             make_list.append(settings_dict[setting] + '='  + ' '.join(value))
             if len(value) > 1:
                 debug_string += " " + settings_dict[setting] + '="'  + ' '.join(value) + '"'
             else:
                 debug_string += " " + settings_dict[setting] + '='  + ' '.join(value)
+        elif isinstance(value, int):
+            make_list.append(settings_dict[setting] + '='+str(value))
+            debug_string += " " + settings_dict[setting] + '=' + str(value)
         else:
             # pylint:disable=undefined-variable
             raise OCPIException("Invalid settings data-type passed to execute_cmd().  settings is " +
@@ -194,6 +202,41 @@ def set_vars_from_make(mk_file_and_dir, mk_arg="", verbose=None):
         return make_vars
 # pylint:enable=too-many-locals
 # pylint:enable=too-many-branches
+
+def get_val_from_make(path: Union[Path, str], var_name: str, delim: Optional[str]=None
+                      ) -> Optional[Union[str, List[str]]]:
+    """Returns the value of a variable from a Makefile.
+
+    A value is determined by an '=' preceding the first instance of the
+    var_name found within the Makefile located at path. By default, the 
+    return value will be a string; however, if the delim arg is not 
+    None, the return value will be a list of values split on the delim 
+    string.
+
+    Args:
+        path: Path to the Makefile to read from.
+        var_name: Name of the variable to get the value from.
+        delim: Delimeter to split value by.
+    Returns:
+        String representing the value of the variable, or if the delim
+        is not None, a list of values split on the delim. Returns None
+        if path does not exist or var_name cannot be found.
+    """
+    val = None
+    if not path.exists():
+        return val
+    if not isinstance(path, Path):
+        path = Path(path)
+    pattern = re.compile(f'{var_name}=(.*)$')
+    with path.open('r') as f:
+        for line in f.readlines():
+            match = re.search(pattern, line)
+            if match:
+                val = match.group(1)
+                if delim is not None:
+                    val = val.split(delim)
+                break
+    return val
 
 ###############################################################################
 # String, number and dictionary manipulation utility functions
@@ -487,7 +530,7 @@ def get_ok(prompt="", default=False):
             return True
         if ok_input.lower() in ['n', 'no', 'nope']:
             return False
-        if ok_input.lower() == '':
+        if default != None and ok_input.lower() == '':
             return default
 def rchop(thestring, ending):
     """

@@ -47,7 +47,7 @@ namespace OCPI {
     protected:
       bool m_canBeExternal;
 
-      Port(Container &container, const OCPI::Metadata::Port &mport, const OCPI::Base::PValue *params = NULL);
+      Port(Container &a_container, const OCPI::Metadata::Port &mport, const OCPI::Base::PValue *params = NULL);
       virtual ~Port();
       bool canBeExternal() const { return m_canBeExternal; }
       virtual const std::string &name() const = 0;

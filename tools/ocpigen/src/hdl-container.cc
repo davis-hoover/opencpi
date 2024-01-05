@@ -539,7 +539,7 @@ HdlContainer(HdlConfig &config, HdlAssembly &appAssembly, ezxml_t xml, const cha
       Slot::SignalsIter ssi = sl.m_signals.find(*si);
       if (ssi != sl.m_signals.end() && ssi->second.empty())
 	continue;
-      Signal &sig = *new Signal(**si);
+      Signal &sig = *(**si).clone(true); // remove expressions
       if (ssi != sl.m_signals.end() && ssi->second.c_str()[0] == '/')
 	sig.m_name = &ssi->second.c_str()[1];
       else
@@ -553,54 +553,65 @@ HdlContainer(HdlConfig &config, HdlAssembly &appAssembly, ezxml_t xml, const cha
     }
   }
   m_xml = x;
-  // For platform devices that are not instanced:
+  // For platform devices that are not instanced or for signals that are unused on devices
+  //    that *are* instanced
   //    Make all device signals external, and cause the outputs to be tied to zero.
   //    EXCEPT for device signals that are explicitly mapped to NULL, meaning they are
   //    not present in this platform
   //    This is necessary here because external signals are normally just created
   //    as a side effect of instances with signals.
   for (DevicesIter di = m_platform.devices().begin(); di != m_platform.devices().end(); di++) {
-    if (!findDevInstance(**di, NULL, NULL, &m_config.devInstances(), NULL)) {
-      const DeviceType &dt = (*di)->deviceType();
-      // We have an uninstanced device
-      for (SignalsIter si = dt.m_signals.begin(); si != dt.m_signals.end(); si++) {
-	for (unsigned n = 0; (*si)->m_width ? n < (*si)->m_width : n == 0; n++) {
-	  Signal *cs = NULL; // The container signal we will create
-	  bool isSingle = false; // slow down to suppress warning
-	  const char *boardName;
-	  if ((boardName = (*di)->m_dev2bd.findSignal(**si, n, isSingle))) {
-	    // There is a mapping, but it might be NULL if the signal is not on the platform
-	    if (*boardName) {
-	      Signal *bs = (**di).m_board.m_extmap.findSignal(boardName);
-	      assert(bs);
-	      assert((**di).m_board.m_bd2dev.findSignal(boardName));
-	      if (m_sigmap.find(boardName) == m_sigmap.end()) {
-		cs = new Signal(*bs); // clone the board signal for the container signal
-		// If the board signal is bidirectional (can be anything), it should inherit
-		// the direction of the device's signal
-		if (bs->m_direction == Signal::BIDIRECTIONAL)
-		  cs->m_direction = (*si)->m_direction;
-	      }
-	    }
-	  } else {
-	    std::string l_name;
-	    OU::format(l_name, "%s_%s", (*di)->m_name.c_str(), (*si)->m_name.c_str());
-	    if (m_sigmap.find(l_name.c_str()) == m_sigmap.end()) {
-	      // No mapping - the device signal has the default mapping - clone the device signal
-	      cs = new Signal(**si);
-	      cs->m_name = l_name;
+    auto instance = findDevInstance(**di, NULL, NULL, &m_config.devInstances(), NULL);
+    const DeviceType &dt = (*di)->deviceType();
+    for (SignalsIter si = dt.m_signals.begin(); si != dt.m_signals.end(); si++) {
+      if (instance && (*si)->m_direction != Signal::UNUSED)
+	continue; // device signals for used devices are not mapped
+      for (unsigned n = 0; (*si)->m_width ? n < (*si)->m_width : n == 0; n++) {
+	Signal *cs = NULL; // The container signal we will create
+	bool isWhole = false; // is the mapping for whole vector?
+	size_t boardIndex = SIZE_MAX;
+	const char *boardName;
+	if ((boardName = (*di)->m_dev2bd.findSignal(**si, n, isWhole, boardIndex))) {
+	  // There is a dev2board mapping, it might be NULL if the signal is not on the platform
+	  if (*boardName) {
+	    // The "mapped to" signal must be a board signal and the reverse mapping must exist
+	    std::string boardIndexed(boardName);
+	    if (boardIndex != SIZE_MAX)
+	      OU::formatAdd(boardIndexed, "(%zu)", boardIndex);
+	    Signal *bs = (**di).m_board.m_boardSigMap.findSignal(boardIndexed.c_str());
+	    if (!bs)
+	      // Signal could be predefined by the platform as a vector but mapped individually
+	      bs = (**di).m_board.m_boardSigMap.findSignal(boardName);
+	    assert(bs);
+	    assert((**di).m_board.m_bd2dev.findSignal(boardIndexed.c_str()));
+	    // if mapping has an index, the signal is already established
+	    if (m_sigmap.find(boardName) == m_sigmap.end()) { // container signal does not exist
+	      cs = new Signal(*bs); // clone the board signal for the container signal
+	      // If the board signal is bidirectional (can be anything), it should inherit
+	      // the direction of the device's signal
+	      if (bs->m_direction == Signal::BIDIRECTIONAL)
+		cs->m_direction = (*si)->m_direction;
 	    }
 	  }
-	  if (cs) {
-	    m_signals.push_back(cs);
-	    m_sigmap[cs->cname()] = cs;
+	} else { // unmapped device signal uses the default prefix scheme
+	  std::string l_name;
+	  OU::format(l_name, "%s_%s", (*di)->m_name.c_str(), (*si)->m_name.c_str());
+	  if (m_sigmap.find(l_name.c_str()) == m_sigmap.end()) {
+	    // No mapping - the device signal has the default mapping - clone the device signal
+	    cs = (**si).clone(true); // remove expressions
+	    cs->m_name = l_name;
 	  }
-	  if (!isSingle)
-	    break;
 	}
+	if (cs) {
+	  m_signals.push_back(cs);
+	  m_sigmap[cs->cname()] = cs;
+	}
+	if (isWhole)
+	  break;
       }
     }
   }
+
   // During the parsing of the container assembly we KNOW what the platform is,
   // but the platform config XML that might be parsed might think it is defaulting
   // from the platform where it lives, so we temporarily set the global to the
@@ -956,79 +967,117 @@ emitXmlConnections(FILE *f) {
   }
 }
 
+// Map a device single signal (perhaps one element of a vector signal) to its board signal.
+// This is called only when such a mapping exists
+// This actually creates the container's external signals based on the mapping (if not already there)
+void HdlContainer::
+mapOneSignal(std::string &assy, const Signal &signal, size_t index, bool isWhole,
+	     const char *boardName, size_t boardIndex, const DevInstance &di, bool inContainer) {
+  std::string devSig = signal.cname();
+  if (signal.m_width && !isWhole)
+    OU::formatAdd(devSig, "(%zu)", index);
+  std::string dname, ename;
+  if (di.slot && !inContainer)
+    // device is in platform config, on a card in a slot
+    OU::format(dname, "%s_%s_%s", di.slot->m_name.c_str(), di.device.cname(), devSig.c_str());
+  else if (inContainer || di.device.m_deviceType.m_type == Worker::Platform)
+    // device is instanced in the container or *is* the platform worker
+    dname = devSig.c_str();
+  else
+    // device is in the platform config and is not the platform worker
+    OU::format(dname, "%s_%s", di.device.cname(), devSig.c_str());
+  // So dname is the local signal name either from the platform config or the device
+  if (*boardName && di.slot) {
+    // Device is on a card and has a mapping to a card's slot signal
+    Signal *slotSig = di.device.m_board.m_boardSigMap.findSignal(boardName);
+    assert(slotSig);
+    Slot::SignalsIter ssi = di.slot->m_signals.find(slotSig);
+    // Only set ename if this slot's signal is available on the platform.
+    // I.e. that pin of the slot might not be connected to a signal available to the FPGA
+    // in which case the device worker's signal will be unconnected.
+    if (ssi != di.slot->m_signals.end() && ssi->second.c_str()[0] == '/')
+      ename = &ssi->second.c_str()[1];
+    else if (ssi == di.slot->m_signals.end() || ssi->second.c_str()[0])
+      OU::format(ename, "%s%s", di.slot->m_prefix.c_str(),
+		 ssi == di.slot->m_signals.end()  ?
+		 slotSig->cname() : ssi->second.c_str());
+  } else if ((ename = boardName, *boardName)) {  // boardname can be empty
+    auto boardIter = m_sigmap.find(boardName);
+    Signal *bs;
+    if (boardIter == m_sigmap.end()) { // board signal is not in any previous mapping
+      // We must make the mapped name a new external signal of the container
+      ocpiInfo("Adding a board signal '%s' for device signal '%s'", boardName, signal.cname());
+      bs = signal.clone(true); // remove expressions
+      bs->m_name = boardName;
+      if (boardIndex == SIZE_MAX) // board signal is not indexed
+	if (isWhole)              // device signal is not indexed
+	  ;                       // so board signal and device signal are the same size
+	else                      // device signal is indexed
+	  bs->m_width = 0;        // thus board signal is not a vector
+      else {                      // board signal is indexed
+	assert(bs->m_width <= 1 || !isWhole);
+	bs->m_width = boardIndex + 1;
+      }
+      m_signals.push_back(bs);
+      m_sigmap[boardName] = bs;
+    } else  { // board signal seen before and exists
+      // Note this "preexisting" board signal might simply be a platform signal defined by
+      // the platform, or it might exist due to a previous mapping
+      bs = boardIter->second;
+      if (boardIndex == SIZE_MAX) // board not indexed
+	assert(bs->m_width == signal.m_width);
+      else if (boardIndex >= bs->m_width)
+	// Index for an existing signal is higher than we have seen before
+	bs->m_width = boardIndex + 1;
+    }
+  }
+  if (!ename.empty() && boardIndex != SIZE_MAX)
+    OU::formatAdd(ename, "(%zu)", boardIndex);
+  OU::formatAdd(assy, "    <signal name='%s' external='%s'/>\n",
+		dname.c_str(), ename.c_str());
+}
+
+
+// Map a device instance's signals to external container signals in XML instance elements
+// for the generated assembly.
 // inContainer means the device is instanced in the container as opposed to
-// in the platform configuration.  If in a platform configuration the device signals
-// are actually signals of the platform configuration worker.
+// in the platform configuration.  If in a platform configuration, the device signals
+// are actually signals (VHDL ports) of the platform configuration worker.
 void HdlContainer::
 mapDevSignals(std::string &assy, const DevInstance &di, bool inContainer) {
   const Signals
+    // these are configured for the device as declared for the board (platform/card)
     &devSigs = di.device.deviceType().m_signals,
+    // these are (further) configured for the device more specifically for this particular config/container
     &instSigs = di.m_worker->m_signals;
-  for (SignalsIter s = devSigs.begin(), i = instSigs.begin(); s != devSigs.end(); ++s, ++i) {
-    assert((*s)->m_name == (*i)->m_name);
-    if ((*i)->m_direction == Signal::UNUSED)
+  for (SignalsIter ds = devSigs.begin(), i = instSigs.begin(); ds != devSigs.end(); ++ds, ++i) {
+    const Signal &s = **i;
+    assert((*ds)->m_name == s.m_name);
+    if (s.m_direction == Signal::UNUSED)
       continue;
-    for (unsigned n = 0; (*s)->m_width ? n < (*s)->m_width : n == 0; n++) {
-      // (Re)create the signal name of the pf_config signal
+    for (unsigned n = 0; s.m_width ? n < s.m_width : n == 0; n++) {
       const char *boardName;
-      bool isSingle;
-      if ((boardName = di.device.m_dev2bd.findSignal(**s, n, isSingle))) {
+      size_t boardIndex;
+      bool isWhole;
+      if ((boardName = di.device.m_dev2bd.findSignal(**ds, n, isWhole, boardIndex))) {
+	// Device signal is mapped to a different board signal
 	ocpiInfo("For device %s devinst %s signal %s boardname '%s'",
-		 di.device.deviceType().cname(), di.cname(), (*s)->cname(), boardName);
-	std::string devSig = (*s)->cname();
-	if ((*s)->m_width && isSingle)
-	  OU::formatAdd(devSig, "(%u)", n);
-	std::string dname, ename;
-	if (di.slot && !inContainer)
-	  OU::format(dname, "%s_%s_%s", di.slot->m_name.c_str(), di.device.cname(), devSig.c_str());
-	else if (inContainer || di.device.m_deviceType.m_type == Worker::Platform)
-	  dname = devSig.c_str();
-	else
-	  OU::format(dname, "%s_%s", di.device.cname(), devSig.c_str());
-	if (*boardName && di.slot) {
-	  Signal *slotSig = di.device.m_board.m_extmap.findSignal(boardName);
-	  assert(slotSig);
-	  Slot::SignalsIter ssi = di.slot->m_signals.find(slotSig);
-	  // Only set ename if this slot's signal is available on the platform.
-	  // I.e. that pin of the slot might not be connected to a signal available to the FPGA
-	  // in which case the device worker's signal will be unconnected.
-	  if (ssi != di.slot->m_signals.end() && ssi->second.c_str()[0] == '/')
-	    ename = &ssi->second.c_str()[1];
-	  else if (ssi == di.slot->m_signals.end() || ssi->second.c_str()[0])
-	    OU::format(ename, "%s%s", di.slot->m_prefix.c_str(),
-		       ssi == di.slot->m_signals.end()  ?
-		       slotSig->cname() : ssi->second.c_str());
-	} else {
-	  ename = boardName;
-	  if (*boardName && m_sigmap.find(boardName) == m_sigmap.end()) {
-	    // So a non-slot signal has a boardName (i.e. mapped).
-	    // Thus we must make the mapped name an external signal of the container
-	    // if it is not already a board signal (e.g. an input mapped to two platform/device signals)
-	    ocpiInfo("Adding a board signal '%s' for device signal '%s'", boardName, (*i)->cname());
-	    Signal *ns = new Signal(**i);
-	    ns->m_name = boardName;
-	    if (isSingle)
-	      ns->m_width = 0;
-	    m_signals.push_back(ns);
-	    m_sigmap[boardName] = ns;
-	  }
-	}
-
-	OU::formatAdd(assy, "    <signal name='%s' external='%s'/>\n",
-		      dname.c_str(), ename.c_str());
-	if (!isSingle)
+		 di.device.deviceType().cname(), di.cname(), s.cname(), boardName);
+	mapOneSignal(assy, s, n, isWhole, boardName, boardIndex, di, inContainer);
+	if (isWhole)
 	  break;
       } else {
-	std::string ename = (*i)->m_name;
+	// (Re)create the signal name of the pf_config signal
+	std::string ename = s.m_name;
 	if (di.device.deviceType().m_type != Worker::Platform)
-	  OU::format(ename, "%s_%s", di.device.cname(), (*i)->cname());
+	  OU::format(ename, "%s_%s", di.device.cname(), s.cname());
 	if (m_sigmap.find(ename.c_str()) == m_sigmap.end()) {
-	  Signal *ns = new Signal(**i);
+	  Signal *ns = new Signal(s);
 	  ns->m_name = ename;
 	  m_signals.push_back(ns);
 	  m_sigmap[ns->cname()] = ns;
 	}
-	break;
+	break; // unmapped signals are always "whole"
       }
     }
   }

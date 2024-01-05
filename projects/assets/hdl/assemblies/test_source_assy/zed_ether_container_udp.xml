@@ -1,0 +1,4 @@
+<hdlcontainer platform="zed_ether" config="cfg_dgrdma_udp">
+	<connection External="fpga_out" interconnect="ether"/>
+</hdlcontainer>
+

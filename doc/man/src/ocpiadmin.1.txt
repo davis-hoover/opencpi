@@ -68,10 +68,15 @@ The nouns supported by *`ocpiadmin`* are:
     A particular type of processing hardware and/or software that
     can host a container for executing OpenCPI workers.
 
+*`tool`*::
+    A software program or collection of programs provided by a
+    third-party/vendor, used by OpenCPI to enable it to target
+    embedded software and FPGA/HDL platforms.
+
 OPTIONS
 -------
 In addition to the options common to all OpenCPI tools (see link:opencpi.1.html[opencpi(1)]),
-the following options can be specified for the *`install`* verb only.
+the following options can be specified for the *`install`* verb plus *`platform`* noun only.
 In the descriptions below, a plus sign (+) after the option indicates
 that it can be specified more than once on the command line.
 Arguments to word-form options are preceded by an equal sign (=)
@@ -108,6 +113,10 @@ letter options are preceded by a space.
     Specifies a minimized installation process that does not pre-build HDL workers or run
     any installation tests.
 
+*`--artifacts-only`*::
+    Cleans intermediate build files when building workers and assemblies, keeps only artifacts 
+    required for building at the next level or deploying onto hardware.
+
 *`--no-kernel`*::
     Specifies to skip building the OpenCPI Linux kernel device driver
     when the OpenCPI framework is built for the platform. Use this option
@@ -119,6 +128,24 @@ letter options are preceded by a space.
     should be built with optimization enabled.
     If this option is not used, the default is to build with optimization disabled,
     which is perhaps better suited for debugging.
+
+The following options can be specified for the *`install`* verb plus *`tool`* noun only.
+
+*`-d`* '<DIR>', *`--directory=`*'<DIR>'::
+    Specifies the installation directory for the tool. The default installation directory
+    depends on the tool.
+
+*`--installer-file=`*'<IFILE>'::
+    If required to install a particular tool, this is an installation program or
+    bundle downloaded from (or otherwise provided by) the third-party/vendor.
+    There is no default value.
+
+*`--tool-options=`*"[ARG]..."::
+    These are options to pass to the tool installer script.  There is no default value.
+    Double-quotes around the value are required to ensure proper parsing.  Legal ARGs
+    (typically specified to override the default tool installation parameters) are defined
+    by the tool installation script (use *`--tool-options=`*"--help" to see them) and are
+    space-separated.
 
 OPERATIONS
 ----------
@@ -135,6 +162,14 @@ If the specified platform is an HDL platform, the operation also builds
 a single test artifact/bitstream: the *`testbias`* assembly in
 the *`assets`* project. After the operation is performed, any asset
 in any project can be built for the specified platform.
+
+The command syntax for the *`install tool`* operation is:
+
+*`ocpiadmin`* '<options>' *`install tool`* '<name>'
+
+where '<name>' is the name of the third-party/vendor tool to be installed.
+Currently, the only valid value for '<name>' is "vivado": see *EXAMPLES*
+below for more info.
 
 The command syntax for the *`deploy platform`* operation is:
 
@@ -191,6 +226,18 @@ from a working branch using an earlier version:
 -----------------------------------------------------------------------------------------
 ocpiadmin --package-id=ocpi.osp.plutosdr --git-revision=develop install platform plutosdr
 ------------------------------------------------------------------------------------------
++
+. Install the Xilinx Vivado tool using default installation parameters:
++
+----------------------------------------------------------------------------------------
+ocpiadmin --installer-file=Xilinx_Unified_2021.2_1021_0703_Lin64.bin install tool vivado
+----------------------------------------------------------------------------------------
++
+. Print the "vivado" installer script "help/usage" information and exit:
++
+----------------------------------------------------------------------------------------------------------------
+ocpiadmin --installer-file=Xilinx_Unified_2021.2_1021_0703_Lin64.bin --tool-options="--help" install tool vivado
+----------------------------------------------------------------------------------------------------------------
 +
 . Create a bootable media directory tree
 for booting the RCC platform *`xilinx19_2_aarch32`* on

@@ -1,3 +1,3 @@
 <RccWorker Language="C++" controlOperations="stop">
-  <xi:include href="file_write_demux-spec.xml"/>
+  <include href="file_write_demux-spec.xml"/>
 </RccWorker>

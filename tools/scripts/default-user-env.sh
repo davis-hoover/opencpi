@@ -119,6 +119,21 @@
 # license file can be: <port>@<server.ip.addr>
 # export OCPI_MODELSIM_LICENSE_FILE=ssdf
 
+
+####################################################################################################
+####################################################################################################
+# Riviera-PRO tool-related variables.
+# Normally the defaults are used since they represent the defaults used by the Xilinx tool installers.
+# None of them are normally set unless the installation of Xilinx tools is complex, e.g. using a variety of
+# versions where the desired one is not the latest one etc.
+
+# OCPI_RIVIERA_DIR specifies the Riviera-PRO installation directory.
+# export OCPI_RIVIERA_DIR=xxx
+
+# OCPI_RIVIERA_LICENSE_FILE specified the Riviera-PRO license file to be used
+# license file can be: <port>@<server.ip.addr>
+# export OCPI_RIVIERA_LICENSE_FILE=ssdf
+
 return 0
 
 

@@ -36,8 +36,6 @@ architecture rtl of worker is
   signal s_q            : signed(c_data_width-1 downto 0);
   signal s_min_peak_rst : std_logic;
   signal s_max_peak_rst : std_logic;
-  signal s_min_peak_iq  : signed(c_data_width-1 downto 0);
-  signal s_max_peak_iq  : signed(c_data_width-1 downto 0);
   signal s_min_peak     : signed(c_data_width-1 downto 0);
   signal s_max_peak     : signed(c_data_width-1 downto 0);
 
@@ -58,8 +56,8 @@ begin
   props_out.max_peak <= s_max_peak;     --TODO;
 
   -- Reset property values when control plane reset active or property is read
-  s_min_peak_rst <= ctl_in.reset or props_in.min_peak_read;  --TODO;
-  s_max_peak_rst <= ctl_in.reset or props_in.max_peak_read;  --TODO;
+  s_min_peak_rst <= ctl_in.reset or (ctl_in.is_operating and props_in.min_peak_read);  --TODO;
+  s_max_peak_rst <= ctl_in.reset or (ctl_in.is_operating and props_in.max_peak_read);  --TODO;
 
   -----------------------------------------------------------------------------
   -- Data Port Interface (WSI Port assignments)
@@ -83,33 +81,21 @@ begin
   begin
     if rising_edge(ctl_in.clk) then
       if s_min_peak_rst = '1' then
-        s_min_peak_iq(c_data_width-1)          <= ('0');
-        s_min_peak_iq(c_data_width-2 downto 0) <= (others => '1');
-        s_min_peak(c_data_width-1)             <= ('0');
-        s_min_peak(c_data_width-2 downto 0)    <= (others => '1');
+        s_min_peak <= (c_data_width-1 => '0', others => '1');
       elsif s_valid = '1' then
-        if (s_i < s_q) then
-          s_min_peak_iq <= s_i;
-        else
-          s_min_peak_iq <= s_q;
-        end if;
-        if (s_min_peak_iq < s_min_peak) then
-          s_min_peak <= s_min_peak_iq;
+        if (s_i < s_q and s_i < s_min_peak) then
+          s_min_peak <= s_i;
+        elsif (s_q < s_i and s_q < s_min_peak) then
+          s_min_peak <= s_q;
         end if;
       end if;
       if s_max_peak_rst = '1' then
-        s_max_peak_iq(c_data_width-1)          <= ('1');
-        s_max_peak_iq(c_data_width-2 downto 0) <= (others => '0');
-        s_max_peak(c_data_width-1)             <= ('1');
-        s_max_peak(c_data_width-2 downto 0)    <= (others => '0');
+        s_max_peak <= (c_data_width-1 => '1', others => '0');
       elsif s_valid = '1' then
-        if (s_i < s_q) then
-          s_max_peak_iq <= s_q;
-        else
-          s_max_peak_iq <= s_i;
-        end if;
-        if (s_max_peak_iq > s_max_peak) then
-          s_max_peak <= s_max_peak_iq;
+        if (s_i > s_q and s_i > s_max_peak) then
+          s_max_peak <= s_i;
+        elsif (s_q > s_i and s_q > s_max_peak) then
+          s_max_peak <= s_q;
         end if;
       end if;
     end if;

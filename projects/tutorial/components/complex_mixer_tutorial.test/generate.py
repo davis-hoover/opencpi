@@ -54,7 +54,7 @@ Ts = 1.0/float(Fs);     # sampling interval
 Ft = float(sys.argv[2])     # target frequency
 AMPLITUDE = int(sys.argv[3])
 NUM_SAMPLES = int(sys.argv[4]) # number of complex samples
-t = np.arange(0,NUM_SAMPLES*Ts,Ts,dtype=np.float)   # time vector
+t = np.arange(0,NUM_SAMPLES*Ts,Ts,dtype=np.float64)   # time vector
 # Generate I/Q samples @ target freq
 real = np.cos(2*np.pi*Ft*t)
 imag = np.sin(2*np.pi*Ft*t)

@@ -40,8 +40,8 @@
 
 //TODO: Move this to proper client/worker logging
 #include "OcpiDebugApi.hh"
-#define ocpiInfo(...) ::OCPI::OS::logPrint(OCPI_LOG_INFO, __VA_ARGS__)
-#define ocpiDebug(...) ::OCPI::OS::logPrint(OCPI_LOG_DEBUG_MIN, __VA_ARGS__)
+#define ocpiInfo(...) ::OCPI::OS::Log::print(OCPI_LOG_INFO, __VA_ARGS__)
+#define ocpiDebug(...) ::OCPI::OS::Log::print(OCPI_LOG_DEBUG_MIN, __VA_ARGS__)
 
 #ifndef likely
 #define likely(x)       __builtin_expect(!!(x), 1)

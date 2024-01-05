@@ -1,4 +1,4 @@
-<HdlDevice Language="vhdl" Spec="gp_in-spec.xml" Version="2">
+<HdlDevice Language="vhdl" Spec="gp_in-spec.xml" Version="2" libraries='util misc_prims'>
 
   <Property Name="NUM_INPUTS" Type="uChar" Parameter="true" Default="1" Description="Number of GP Inputs. The max number of GP Inputs supported is 16."/>
 

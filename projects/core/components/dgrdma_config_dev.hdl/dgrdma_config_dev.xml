@@ -21,6 +21,8 @@
   <specproperty Name='ack_tracker_accepted_by_peek_d'     Volatile='true' />
   <specproperty Name='ack_tracker_high_watermark_d'       Volatile='true' />
   <specproperty Name='frame_parser_reject_d'              Volatile='true' />
+  <specproperty Name='remote_ip_addr_d'                   Readback='true' />
+  <specproperty Name='remote_udp_port_d'                  Readback='true' />
 
   <devsignal master='true' signals='dgrdma_config_dev-signals' count='1'/>
 

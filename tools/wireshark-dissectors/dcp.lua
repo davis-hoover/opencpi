@@ -16,7 +16,7 @@
 -- You should have received a copy of the GNU Lesser General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-dcp_protocol = Proto("DCP",  "OpenCPI DCP Protocol")
+dcp_protocol = Proto("DCP",        "OpenCPI DCP Protocol")
 
 pli = ProtoField.uint16("dcp.pli", "payloadLengthIndication", base.DEC)
 dmh01 = ProtoField.uint16("dcp.dmh01", "messageHeader01", base.DEC)
@@ -132,37 +132,51 @@ end
 
 function dcp_protocol.dissector(buffer, pinfo, tree)
     length = buffer:len()
+    offset = 0
     if length == 0 then return end
 
     pinfo.cols.protocol = dcp_protocol.name
 
-    local subtree = tree:add(dcp_protocol, buffer(), "OpenCPI DWORD Control Packet")
-    subtree:add(pli, buffer(0, 2))
-    subtree:add(dmh01, buffer(2, 2))
-    local dmh2_string = decode_dmh2(buffer(4, 1):uint())
-    subtree:add(dmh2, buffer(4, 1)):append_text(' (' .. dmh2_string .. ')')
-    subtree:add(tag, buffer(5, 1))
+    if pinfo.dst_port > 0 then
+      -- we are dissecting a udp packet, skip the padding
+      offset = 2
+    end
 
-    local ty = get_message_type(buffer(4, 1):uint())
+    local subtree = tree:add(dcp_protocol, buffer(), "OpenCPI DWORD Control Packet")
+    subtree:add(pli, buffer(offset+0, 2))
+    subtree:add(dmh01, buffer(offset+2, 2))
+    local dmh2_string = decode_dmh2(buffer(offset+4, 1):uint())
+    subtree:add(dmh2, buffer(offset+4, 1)):append_text(' (' .. dmh2_string .. ')')
+    subtree:add(tag, buffer(offset+5, 1))
+
+    local ty = get_message_type(buffer(offset+4, 1):uint())
     if ty == 1 then -- Write
         subtree:add(op, 1):append_text(' (Write)')
-        subtree:add(addr, buffer(6, 4))
-        decode_address_fields(buffer(6, 4):uint(), subtree)
-        subtree:add(value, buffer(10, 4))
-        pinfo.cols['info'] = "Write " .. decode_address(buffer(6, 4):uint()) .. ' value ' .. string.format('0x%x', buffer(10, 4):uint())
+        subtree:add(addr, buffer(offset+6, 4))
+        decode_address_fields(buffer(offset+6, 4):uint(), subtree)
+        subtree:add(value, buffer(offset+10, 4))
+        pinfo.cols['info'] = "Write " .. decode_address(buffer(offset+6, 4):uint()) .. ' value ' .. string.format('0x%x', buffer(offset+10, 4):uint())
     elseif ty == 2 then -- Read
         subtree:add(op, 2):append_text(' (Read)')
-        subtree:add(addr, buffer(6, 4))
-        decode_address_fields(buffer(6, 4):uint(), subtree)
-        pinfo.cols['info'] = "Read " .. decode_address(buffer(6, 4):uint())
+        subtree:add(addr, buffer(offset+6, 4))
+        decode_address_fields(buffer(offset+6, 4):uint(), subtree)
+        pinfo.cols['info'] = "Read " .. decode_address(buffer(offset+6, 4):uint())
     elseif ty == 3 then -- Response
         subtree:add(op, 3):append_text(' (Response)')
-        subtree:add(value, buffer(6, 4))
-        pinfo.cols['info'] = "Response value " .. string.format('0x%x', buffer(6, 4):uint())
+	if length >= offset+10 then
+          subtree:add(value, buffer(offset+6, 4))
+          pinfo.cols['info'] = "Response value " .. string.format('0x%x', buffer(offset+6, 4):uint())
+	else
+          pinfo.cols['info'] = "Response value <none>" 
+        end
     else
         subtree:add(op, 0):append_text(' (NOP)')
+	pinfo.cols['info'] = "NOP "
     end
 end
 
 local ethertype = DissectorTable.get("ethertype")
 ethertype:add(0xf040, dcp_protocol)
+
+local udp_port = DissectorTable.get("udp.port")
+udp_port:add(18077, dcp_protocol)

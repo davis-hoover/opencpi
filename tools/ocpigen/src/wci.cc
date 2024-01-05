@@ -195,9 +195,9 @@ emitImplSignals(FILE *f) {
   Control &ctl = m_worker->m_ctl;
   // Record for property-related inputs to the worker - writable values and strobes, readable strobes
   fprintf(f, "  signal props_to_worker   : worker_props_in_t;\n");
-  if (ctl.nonRawReadbacks || ctl.rawReadables)
+  if (ctl.nonRawReadbacks || ctl.rawProperties)
     fprintf(f, "  signal props_from_worker : worker_props_out_t;\n");
-  if (ctl.nonRawReadbacks || ctl.rawReadables || ctl.builtinReadbacks)
+  if (ctl.nonRawReadbacks || ctl.rawProperties || ctl.builtinReadbacks)
     fprintf(f,
 	    "  signal internal_props_out : internal_props_out_t; -- this includes builtin volatiles\n");
   if (ctl.builtinReadbacks)
@@ -276,7 +276,7 @@ emitWorkerEntitySignals(FILE *f, std::string &last, unsigned maxPropName) {
 	    "    %-*s : in  worker_props_in_t",
 	    last.c_str(), (int)maxPropName, "props_in");
   }
-  if (w.m_ctl.nonRawReadbacks || w.m_ctl.rawReadables) {
+  if (w.m_ctl.nonRawReadbacks || w.m_ctl.rawProperties) {
     fprintf(f, 
 	    "%s"
 	    "    -- Outputs for this worker's volatile, readable properties\n"
@@ -396,7 +396,7 @@ emitRecordSignal(FILE *f, std::string &last, const char *aprefix, bool inRecord,
 		   "    %-*s : in  worker_props_in_t%%s",
 		   (int)w.m_maxPortTypeName, "props_in");
       }      
-      if (w.m_ctl.nonRawReadbacks || w.m_ctl.rawReadables) {
+      if (w.m_ctl.nonRawReadbacks || w.m_ctl.rawProperties) {
 	emitLastSignal(f, last, VHDL, false);
 	OU::format(last,
 		   "    -- Outputs for this worker's volatile, readable properties\n"

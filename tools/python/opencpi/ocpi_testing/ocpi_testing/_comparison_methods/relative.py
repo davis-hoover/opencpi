@@ -28,8 +28,10 @@ from .base_comparison import BasicComparison
 
 
 class RelativeDefaults:
-    # This class houses all the default values used. The structure is designed
-    # for importing and documenting in an easier way.
+    """This class houses all the default values used.
+
+    The structure is designed for importing and documenting in an easier way.
+    """
 
     # The : after the # of comments here ensures the comments are imported into
     # the build documentation.
@@ -46,13 +48,13 @@ class RelativeDefaults:
 
 
 class Relative(BasicComparison):
-    """ Check sample samples are within some relative bound
+    """Check sample samples are within some relative bound.
 
     Uses and matches behaviour of Python's ``math.isclose()``.
     """
 
     def __init__(self, complex_, sample_data_type):
-        """ Check messages sets are similar / the same
+        """Check messages sets are similar / the same.
 
         Args:
             complex (bool): Indicate if the data type is complex (True) or not
@@ -73,7 +75,7 @@ class Relative(BasicComparison):
         self.ABSOLUTE_TOLERANCE = RelativeDefaults.ABSOLUTE_TOLERANCE
 
     def variable_summary(self):
-        """ Returns summary of the variables that control the comparison method
+        """Returns summary of the variables that control the comparison method.
 
         Cannot rely on the values being fixed for all tests since may need to
         be changed depending on the component-under-tests performance.
@@ -87,7 +89,7 @@ class Relative(BasicComparison):
                 "ABSOLUTE_TOLERANCE": self.ABSOLUTE_TOLERANCE}
 
     def same(self, reference, implementation):
-        """ Checks if two output data sets are considered the same
+        """Checks if two output data sets are considered the same.
 
         In this case same is where all data of all messages values match within
         a relative (or the absolute minimum) band, as implemented by Python's
@@ -130,7 +132,7 @@ class Relative(BasicComparison):
         return True, ""
 
     def _check_message(self, reference, implementation):
-        """ Check two messages are the same
+        """Check two messages are the same.
 
         Args:
             reference (dict): The reference message to check the implementation
@@ -153,13 +155,9 @@ class Relative(BasicComparison):
 
         # Time and sample interval are a single data value
         elif reference["opcode"] in ["time", "sample_interval"]:
-            if reference["data"] != implementation["data"]:
-                return False, (
-                    f"{reference['opcode'].capitalize()} data differs "
-                    + "between reference and implementation-under-test.\n"
-                    + f"Reference data                : {reference['data']}\n"
-                    + "Implementation-under-test data: "
-                    + f"{implementation['data']}")
+            success, msg = self._check_time_message(reference, implementation)
+            if not success:
+                return False, msg
 
         # Flush and discontinuity are messages without data
         elif reference["opcode"] in ["flush", "discontinuity"]:
@@ -185,7 +183,7 @@ class Relative(BasicComparison):
         return True, ""
 
     def _check_sample_data(self, reference_data, implementation_data):
-        """ Determine if all sample data values are within a relative bound
+        """Determine if all sample data values are within a relative bound.
 
         Checks if the difference between each data point is within the allowed
         relative bound, set by ``self.RELATIVE_TOLERANCE``. Or for small values
@@ -264,7 +262,7 @@ class Relative(BasicComparison):
         return True, ""
 
     def _within_tolerance(self, reference, implementation):
-        """ Check if two values are within allowed bound
+        """Check if two values are within allowed bound.
 
         ``math.isclose()`` when given reference and implementation values must
         differ return ``True`` for test to pass.
@@ -296,12 +294,10 @@ class Relative(BasicComparison):
                             abs_tol=self.ABSOLUTE_TOLERANCE)
 
     def __repr__(self):
-        """ Official string representation of object
-        """
+        """Official string representation of object."""
         return (f"ocpi_testing.Relative(complex_={self._complex}, "
                 + f"sample_data_type={self._sample_data_type})")
 
     def __str__(self):
-        """ Informal string representation of object
-        """
+        """Informal string representation of object."""
         return self.__repr__()

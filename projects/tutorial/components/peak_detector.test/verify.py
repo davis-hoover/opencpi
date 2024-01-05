@@ -16,6 +16,7 @@ with min/max calculations performed within the script.
 
 """
 import numpy as np, sys, os.path, re
+import sys
 
 class color:
     PURPLE = '\033[95m'
@@ -80,14 +81,14 @@ def validation(argv):
     #Ensure dout is not all zeros
     if all(dout == 0):
         print (color.RED + color.BOLD + 'FAILED, values are all zero' + color.END)
-        return
+        sys.exit(1)
 
     #Ensure that dout is the expected amount of data
     if len(dout) != num_samples:
         print (color.RED + color.BOLD + 'FAILED, input file length is unexpected' + color.END)
         print (color.RED + color.BOLD + 'Length dout = ', len(dout),
                'while expected length is = ' + color.END, num_samples)
-        return
+        sys.exit(1)
 
    # Calculate the maximum in python for verification
     pymin = min(min(dout['real_idx']), min(dout['imag_idx']))
@@ -99,7 +100,7 @@ def validation(argv):
 
     if (min_peak != pymin) or (max_peak != pymax):
        print (color.RED + color.BOLD + 'FAILED, min/max values do not match' + color.END)
-       return
+       sys.exit(1)
     print ('Data matched expected results.')
     print (color.GREEN + color.BOLD + 'PASSED' + color.END)
     print ('*** End validation ***\n')

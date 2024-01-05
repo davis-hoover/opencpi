@@ -1,21 +1,17 @@
 ### New feature description
-(Describe why this new feature is needed and what it will add. Be as detailed
-as possible.)
+(Describe the new feature or enhancement in meticulous detail, and why it is needed.)
+
+### Testing requirements (Optional)
+(Any special hardware needed for the development and testing of this feature?)
+
+### Links/references (Optional)
+(Links or references supporting the purposed feature)
+
+### Acceptance criteria
+(What would it take for you to feel this issue can be closed?)
 
 
-### Intended users
-(Who will benifit from this new feature?)
 
 
-### Testing requirements
-(Any special hardware needed for the development and testing of this new
-feature?)
 
-
-### Define success
-(What does the result look like so we know when it has been achieved?)
-
-
-### Links/references
-
-
+/label ~"type::feature"

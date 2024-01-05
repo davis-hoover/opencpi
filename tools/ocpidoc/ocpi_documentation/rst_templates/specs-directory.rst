@@ -11,3 +11,7 @@ Skeleton outline: Description of the protocols linked by below table of contents
    :caption: Protocols
 
    *-protocol
+   *-proto
+
+.. The search path "*-protocol" is for backward
+   compatibility with older protocol document naming schemes.

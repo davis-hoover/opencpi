@@ -26,7 +26,7 @@
 # Given the directory of the platform we want to return
 returnPlatform() {
   local d=$1
-  local vars=($(egrep '^ *OcpiPlatform(Os|Arch|OsVersion) *:*= *' $d/$2.mk |
+  local vars=($(grep -E '^ *OcpiPlatform(Os|Arch|OsVersion) *:*= *' $d/$2.mk |
               sed 's/OcpiPlatform\([^ :=]*\) *:*= *\([^a-zA-Z0-9_]*\)/\1 \2/'|sort))
   [ ${#vars[@]} = 6 ] || {
     echo "Error:  Platform file $d/$2.mk is invalid and cannot be used.${vars[*]}" >&2

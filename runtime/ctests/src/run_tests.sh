@@ -52,9 +52,9 @@ out="2> /dev/null"
 if test "$OUT" != ""; then out="$OUT"; fi
 function doit {
   tmp=$DIR/$1_run.log
-  $VG ./$1 $out | tee $tmp | (egrep 'FAILED|PASSED|Error:';exit 0)
+  $VG ./$1 $out | tee $tmp | (grep -E 'FAILED|PASSED|Error:';exit 0)
   rc=$?
-  if egrep -q 'FAILED|Error:' $tmp; then
+  if grep -E -q 'FAILED|Error:' $tmp; then
      echo "$1 test failed explicitly, with FAILED or Error message."
      if test "$failed" = ""; then failed=$1; fi
   elif test $rc != 0; then

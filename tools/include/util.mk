@@ -1128,6 +1128,9 @@ OcpiIncludeParentAsset_platform=$(callx OcpiInfo,OIPA_p:$1)\
  OcpiIncludeParentAsset_primitives=$(infox PRIMITIVES:$(Model))\
    $(call OcpiIncludeAssetAndParentX,$(and $(filter-out .,$1),$1/)../..,,$3)
 
+ OcpiIncludeParentAsset_assembly=$(infox ASSEMBLY:$(Model))\
+   $(call OcpiIncludeAssetAndParentX,$(and $(filter-out .,$1),$1/)..,,$3)
+
  OcpiIncludeParentAsset_worker=$(infox WORKER:$(Model))\
    $(call OcpiIncludeAssetAndParentX,$(and $(filter-out .,$1),$1/)..,,$3)
 
@@ -1174,6 +1177,8 @@ define OcpiSetAsset
     $$(infox Not including component XML directly for make variables)
   else ifeq ($2,Platform)
     $$(infox Not including platform worker XML directly for make variables)
+  else ifeq ($2,Assembly)
+    $$(infox Not including HDL assembly XML directly for make variables)
   else ifeq ($2,Test)
     $$(eval $$(call OcpiParseXml,$1,$$(subst .,-,$$(OcpiAssetName))))
   else ifneq ($(filter-out Platforms Primitive Primitives Applications Application Assemblies,$2),)
@@ -1227,7 +1232,7 @@ define OcpiSetAsset
     endif
     undefine HdlLibraries
   else ifneq ($$(wildcard $1/$$(OcpiAssetName).xml),)
-    # Platforms, Primitive, Applications
+    # Platforms, Primitive, Applications, Assemblies
     $$(eval $$(call OcpiParseXml,$1,$$(OcpiAssetName)))
   else
     $$(infox MAKEFILE:$1:$2:$$(HdlLibraries):$$(Libraries))
@@ -1276,6 +1281,9 @@ OcpiIncludeAssetAndParentX=$(callx OcpiInfo,OIAAPX:$1:$2:$3:$(realpath $1))$(str
 OcpiIncludeAssetAndParent=\
   $(if $(filter clean%,$(MAKECMDGOALS)),\
     $(- here is when we are cleaning - just look for cleanfiles attribute by itself)\
+    $(- FIXME: plural assets or libraries should also include other attributes like "ExcludeApplications")\
+    $(- FIXME: so this "cleaning" bypass is not really the right solution here since the right)\
+    $(- FIXME: cleaning attributes are asset-specific - so it should be done elsewhere)\
     $(eval CleanFiles:=)\
     $(foreach d,$(or $1,.),\
       $(foreach x,$(wildcard $d/$(CwdName).xml $d/$(CwdName).*.xml $d/$(CwdName)-test.xml $d/$(CwdName)-app.xml),\
@@ -1486,7 +1494,7 @@ MakeRawParams= \
 # file to be processed as if it was a user-written Makefile, before most other processing
 define OcpiProcessBuildFiles
 
-ifeq ($(filter clean,$(MAKECMDGOALS)),)
+ifeq ($(filter xml clean,$(MAKECMDGOALS)),)
 
 # PreProcess any parameters defined in the Makefile itself, for use by MakeRawParams
 RawParamVariables:=$$(filter Param_%,$$(.VARIABLES)) $$(filter ParamValues_%,$$(.VARIABLES))
@@ -1581,7 +1589,7 @@ endef
 # Return CPP sources from list in $1
 OcpiCPPSources=$(strip $(foreach f,$1,$(and $(filter .cpp_%,$(suffix $f)),$f)))
 
-OcpiSpecLinks=mkdir -p $2;$(foreach f,$(wildcard $1/specs/*.xml),$(call MakeSymLink,$f,$2);)
+OcpiSpecLinks=mkdir -p $2;$(foreach f,$(wildcard $1/specs/*.xml $1/*.comp/*-comp.xml),$(call MakeSymLink,$f,$2);)
 
 # Return the list of project dependencies given the project dir
 # Deal with old Project.mk vs newer Project.xml vs. exported project
@@ -1647,7 +1655,7 @@ OcpiGKDCentos=$(infox OGKDC:)$(strip\
 OcpiGKDUbuntu=$(infox OGKDU:)$(strip\
   $(foreach krel,$(shell uname -r),\
     $(foreach ktype,$(shell echo $(krel) | cut -f3 -d'-'),\
-      $(foreach hver,$(or $(shell dpkg-query -W | grep 'linux-headers' | cut -f1 | sort -t'-' --version-sort -k 3,4 -k 4,5 | egrep '$(ktype)$$' | egrep '.*[0-9]+' | tail -1),NOPE),\
+      $(foreach hver,$(or $(shell dpkg-query -W | grep 'linux-headers' | cut -f1 | sort -t'-' --version-sort -k 3,4 -k 4,5 | grep -E '$(ktype)$$' | grep -E '.*[0-9]+' | tail -1),NOPE),\
         $(if $(filter NOPE,$(hver)),\
           $(call OcpiWarn,no kernel headers for "$(ktype)" kernel installed),\
           $(if $(filter linux-headers-$(krel),$(hver)),,$(call OcpiKernVerWarn,$(subst linux-headers-,,$(hver))))\

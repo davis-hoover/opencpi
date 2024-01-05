@@ -1,0 +1,5 @@
+<hdlconfig constraints="zed_ext_pps.xdc">
+  <!-- Time Server PPS input driven by connector-->
+  <Property Name="pps_src" Value="1"/>
+</hdlconfig>
+

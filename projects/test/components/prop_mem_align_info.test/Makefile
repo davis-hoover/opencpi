@@ -17,6 +17,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 $(if $(realpath $(OCPI_CDK_DIR)),,$(error The OCPI_CDK_DIR environment variable is not set correctly.))
+include $(OCPI_CDK_DIR)/include/util.mk
+# In this non-standard Makefile, the minimum is to be exposed to project-level variable settings
+$(OcpiIncludeProject)
 
 .SILENT: show
 .PHONY: run clean show

@@ -1,10 +1,20 @@
 <build>
-  <configuration/>
+
   <configuration>
     <parameter name='use_acp' value='1'/>
     <parameter name='sdp_channels' value='1'/>
   </configuration>
+
   <configuration>
     <parameter name='useGP1' value='1'/>
   </configuration>
+
+  <configuration>
+     <parameter name='pps_src' value='0'/>
+  </configuration>
+  
+  <configuration>
+    <parameter name='pps_src' value='1'/>
+  </configuration>
+
 </build>

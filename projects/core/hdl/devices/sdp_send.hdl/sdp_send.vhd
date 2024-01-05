@@ -100,7 +100,7 @@ architecture rtl of worker is
   -- ndws is rounded up so needs ONE fewer bits, not TWO
   signal md_out_ndws       : unsigned(meta_length_width_c-2 downto 0);
   signal eof_sent_r        : bool_t; -- input eof indication conveyed/enqueued
-  signal zlm               : bool_t; -- indicate that we are sending a ZLM
+  signal zlm_r             : bool_t; -- indicate that we are sending a ZLM
 
   -- SDP back side --
   signal sdp_my_reset           : std_logic; -- reset from EITHER sdp_reset or in_in.reset
@@ -127,7 +127,7 @@ architecture rtl of worker is
   signal sdp_segment_addr_r     : whole_addr_t;
   signal sdp_whole_addr         : whole_addr_t;
   signal sdp_segment_dws_left_r : meta_dw_count_t;
-  signal sdp_op                 : op_t;
+  signal sdp_op_r               : op_t;
 
   ---- Global state
   signal buffer_size_fault_r : bool_t;
@@ -347,7 +347,7 @@ begin
   md_out              <= slv2meta(md_out_slv);
   md_out_ndws         <= resize((md_out.length + dword_bytes - 1) srl 2, md_out_ndws'length);
   md_deq              <= operating and md_not_empty and sdp_in.sdp.ready and (
-                         ((zlm or not prepend_metadata) and
+                         ((zlm_r or not prepend_metadata) and
                           to_bool(sdp_remote_phase_r = flag_e) and
                           to_bool(sdp_remote_idx_r = sdp_last_remote)) or
                          (prepend_metadata and
@@ -369,7 +369,7 @@ begin
                          else
                          bramb_addr_r;
   -- Drive SDP outputs
-  sdp_out.sdp.header.op    <= sdp_op;
+  sdp_out.sdp.header.op    <= sdp_op_r;
   sdp_out.sdp.header.xid   <= (others => '0');  -- since we are writing, no xid necessary
   sdp_out.sdp.header.lead  <= (others => '0');  -- we are always aligned on a DW
   sdp_out.sdp.header.trail <= (others => '0');  -- we always send whole DWs
@@ -495,13 +495,13 @@ g0: for i in 0 to sdp_width_c-1 generate
       end if;
 
       if not its(prepend_metadata) then
-        sdp_op               <= write_e;
+        sdp_op_r             <= write_e;
         if md_out_ndws = 0 then
-          zlm                <= btrue;
+          zlm_r              <= btrue;
           begin_meta;
           sdp_segment_addr_r <= meta_addr;
         else
-          zlm                <= bfalse;
+          zlm_r              <= bfalse;
           sdp_remote_phase_r <= data_e;
           sdp_segment_addr_r <= data_addr;
           sdp_out_r          <= bramb_out;
@@ -511,13 +511,13 @@ g0: for i in 0 to sdp_width_c-1 generate
       else  -- prepend_metadata
         if md_out_ndws = 0 then
           -- ZLM: just send flag as a regular write_e transfer
-          zlm                <= btrue;
-          sdp_op             <= write_e;
+          zlm_r              <= btrue;
+          sdp_op_r           <= write_e;
           begin_flag(meta2slv(md_out));
         else
           -- Send 2 DWORDS of metadata followed by payload data as usual
-          zlm                <= bfalse;
-          sdp_op             <= write_with_metadata_e;
+          zlm_r              <= bfalse;
+          sdp_op_r           <= write_with_metadata_e;
           sdp_segment_addr_r <= data_addr;
           begin_segment(md_out_ndws);
           sdp_out_r <= std_logic_vector(resize(unsigned(meta2slv(md_out)) & unsigned(flag_addr(29 downto 0)) & unsigned'("00"), sdp_out_r'length));
@@ -562,7 +562,7 @@ g0: for i in 0 to sdp_width_c-1 generate
         sdp_msg_addr_r     <= (others => '0');
         bramb_addr_r       <= (others => '0');
         sdp_out_valid_r    <= bfalse;
-        sdp_op             <= write_e;
+        sdp_op_r           <= write_e;
       elsif not operating then
         -- reset state that depends on properties
         for r in 0 to max_remotes_c - 1 loop

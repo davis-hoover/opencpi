@@ -25,6 +25,7 @@ __all__ = [
     "test",
     "registry",
     "project",
+    "primitive",
     "worker",
     "platform",
     "assembly",

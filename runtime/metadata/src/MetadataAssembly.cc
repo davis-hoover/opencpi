@@ -421,7 +421,8 @@ namespace OCPI {
     const char *Assembly::Property::
     parse(ezxml_t px, Assembly::Property *first) {
       const char *err;
-      if ((err = OE::checkAttrs(px, "name", "value", "valuefile", "dumpFile", NULL)) ||
+      if ((err = OE::checkAttrs(px, "name", "value", "valuefile", "dumpFile", "isDefault", NULL)) ||
+          (err = OE::getBoolean(px, "isDefault", &m_isDefault, true, false)) ||
           (err = OE::getRequiredString(px, m_name, "name", "property")))
         return err;
       for (Property *p = first; p && p < this; p++)
@@ -706,7 +707,8 @@ namespace OCPI {
         const char *name = ezxml_cattr(px, "name");
         if (!name)
           return "missing name attribute in property element";
-        if ((err = OE::checkAttrs(px, "name", "value", "valuefile", "dumpFile", "delay", NULL)) ||
+        if ((err = OE::checkAttrs(px, "name", "value", "valuefile", "dumpFile", "delay",
+				  "isDefault", NULL)) ||
             (err = addProperty(name, px)))
           return err;
       }

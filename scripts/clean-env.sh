@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-for v in $(env | egrep ^OCPI | sort | cut -f1 -d=); do
+for v in $(env | grep -E ^OCPI | sort | cut -f1 -d=); do
   # echo Clearing $v
   unset $v
 done

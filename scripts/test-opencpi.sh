@@ -155,26 +155,26 @@ for t in $tests; do
       set +vx
       ;;
     core)
-      echo ======================= Running unit tests in project/core
+      echo ======================= Running unit tests in projects/core
       ocpidev run -d $OCPI_ROOT_DIR/project-registry/ocpi.core;;
     ##########################################################################################
     # After this we are depending on the other projects being built for the targeted platform
     assets)
-      echo ======================= Running Application tests in project/assets
+      echo ======================= Running Application tests in projects/assets
       if [ -z "$runtime" ] ; then
         make -C $OCPI_ROOT_DIR/project-registry/ocpi.assets/applications run
       else
         (cd $OCPI_ROOT_DIR/projects/assets/applications; ./run.sh)
       fi;;
     inactive)
-      echo ======================= Running Application tests in project/inactive
+      echo ======================= Running Application tests in projects/inactive
       make -C $OCPI_ROOT_DIR/projects/inactive/applications run;;
     python)
       echo ======================= Running Python utility tests in tests/pytests
       (framework_test pytests && ./run_pytests.sh);;
     av|project)
       echo ======================= Running project tests '(in projects/test)'
-      (cd projects/test && ./run_tests.sh);;
+      (cd $OCPI_ROOT_DIR/projects/test && ./run_tests.sh);;
     ocpidev)
       # These tests might do HDL building
       hplats=($HdlPlatform $HdlPlatforms)

@@ -1,0 +1,14 @@
+job-report:
+  stage: report
+  image: python
+  variables:
+    GIT_STRATEGY: clone
+    GIT_DEPTH: 1
+  script:
+    - .gitlab-ci/scripts/ci_report.py
+  when: on_failure
+  tags:
+    - docker
+  artifacts:
+    paths:
+      - job_report_*.csv

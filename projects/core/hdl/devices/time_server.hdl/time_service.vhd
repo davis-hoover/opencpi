@@ -63,9 +63,11 @@ entity time_service is
     ticksPerSecond      : out ulong_t;
     -- Outputs (Time (timeCLK) Clock Domain)
     ppsOut              : out std_logic;
+    ppsLock		: out std_logic;
     time_service        : out time_service_t  -- time service clock domain
     );
 end entity time_service;
+
 
 architecture rtl of time_service is
   -----------------------------------------------------------------------------
@@ -130,6 +132,19 @@ architecture rtl of time_service is
   constant c_fracInc : std_logic_vector(49 downto 0)
     := std_logic_vector(to_unsigned(281474977/(g_TIMECLK_FREQ/1000000), 50));
   -------------------------------------------------------------------------------
+  --   Clock locked threshold
+  --
+  --   The clock is considered locked to PPS when the incement value (s_fracBeta) 
+  --   remains between +-1, PPS is detected, and when time is considered stable.
+  --   Time is considered stable when there are no more seconds and fractional rollover 
+  --   disparity occurences within the c_lock_threshold period (checked every second).  
+  --  
+  constant c_lock_threshold : std_logic_vector(4 downto 0)
+    := std_logic_vector(to_unsigned(8,5));
+  -------------------------------------------------------------------------------  
+
+  signal s_RST				       : std_logic;
+  signal s_timeRST			       : std_logic;
   --
   signal s_doClear                             : std_logic;
   signal s_timeIn                              : std_logic_vector(63 downto 0);
@@ -143,8 +158,14 @@ architecture rtl of time_service is
   signal s_nowInCC_dD_OUT                      : std_logic_vector(63 downto 0);
   signal s_nowInCC_sD_IN                       : std_logic_vector(63 downto 0);
   signal s_nowInCC_sRDY                        : std_logic;
+  signal s1_nowInCC_sRDY		       : std_logic;
   --
   signal s_nowTC                               : std_logic_vector(63 downto 0);
+  signal s1_nowTC                              : std_logic_vector(63 downto 0);
+  signal s_nowTC_early_ro_detected	       : std_logic;
+  signal s_nowTC_early_ro_cnt		       : std_logic_vector(15 downto 0);
+  signal s1_nowTC_early_ro_cnt		       : std_logic_vector(15 downto 0);
+  signal s_nowTC_early_ro_diff_cnt	       : std_logic_vector(4 downto 0);
   --
   signal s_ppsDisablePPS_dD_OUT                : std_logic;
   signal s_ppsDisablePPS_dD_OUT_slv0           : std_logic_vector(0 downto 0);
@@ -160,6 +181,16 @@ architecture rtl of time_service is
   signal s_ppsOKCC_dD_OUT_slv0                 : std_logic_vector(0 downto 0);
   signal s_ppsOKCC_sD_IN_slv0                  : std_logic_vector(0 downto 0);
   signal s_ppsOKCC_sRDY                        : std_logic;
+  --
+  signal s_using_PPS			       : std_logic;
+  signal s_first_PPS			       : std_logic;
+  signal s_ro_detected			       : std_logic;
+  signal s_ro_fracSeconds		       : std_logic_vector(49 downto 0);
+  signal s_ro_pps_diff			       : std_logic_vector(49 downto 0);
+  signal s1_ro_pps_diff			       : std_logic_vector(49 downto 0);
+  signal s_fracSec_aligned                     : std_logic_vector(49 downto 0);
+  signal s1_fracSec_aligned		       : std_logic_vector(49 downto 0);
+  signal s_delSec_aligned		       : std_logic_vector(1 downto 0);
   --
   signal s_ppsOutMode_dD_OUT                   : std_logic_vector(1 downto 0);
   signal s_ppsOutMode_sD_IN                    : std_logic_vector(1 downto 0);
@@ -195,7 +226,9 @@ architecture rtl of time_service is
   signal s_refFromRise_lowerThresOfWindow      : std_logic;
   signal s_refFromRise_upperThresOfWindow      : std_logic;
   signal s_ppsIn_detectedInWindow              : std_logic;
+  signal s1_ppsIn_detectedInWindow	       : std_logic;
   signal s_ppsIn_detectedOutWindow             : std_logic;
+  signal s1_ppsIn_count	 	               : std_logic_vector(3 downto 0);
   --
   signal s_refFreeCount                        : std_logic_vector(27 downto 0);
   signal s_refFreeSamp                         : std_logic_vector(27 downto 0);
@@ -207,13 +240,15 @@ architecture rtl of time_service is
   signal s_ppsDrive                            : std_logic;
   --
   signal x_281474976710656_minus_delSecond_50b : std_logic_vector(49 downto 0);
-  signal s_base2exp48_minus_delSecond_50b        : std_logic_vector(49 downto 0);
+  signal s_base2exp48_minus_delSecond_50b      : std_logic_vector(49 downto 0);
   signal x_281474976710656_minus_delSecond_22b : std_logic_vector(21 downto 0);
   signal s_fracBeta                            : std_logic_vector(49 downto 0);
+  signal s_fracBeta_count                      : std_logic_vector(15 downto 0);
   signal s_delSec                              : std_logic_vector(1 downto 0);
   signal s_delSecond                           : std_logic_vector(49 downto 0);
   signal s_lastSecond                          : std_logic_vector(49 downto 0);
   signal s_fracInc                             : std_logic_vector(49 downto 0);
+  signal s_fracRST                             : std_logic :='0';
   signal s_jamFrac_EN                          : std_logic;
   signal s_jamFrac_Val                         : std_logic_vector(49 downto 0);
   signal s_fracSeconds                         : std_logic_vector(49 downto 0);
@@ -222,6 +257,7 @@ architecture rtl of time_service is
   signal s_ppsEdgeCount                        : std_logic_vector(7 downto 0);
   signal s_ppsLost                             : std_logic;
   signal s_ppsOK                               : std_logic;
+  signal s_ppsLock			       : std_logic;
   signal s_gpsDisabled                         : std_logic;
   signal RST_N                                 : std_logic;
   signal timeRST_N                             : std_logic;
@@ -232,11 +268,17 @@ architecture rtl of time_service is
   signal s_force_time_service_valid            : std_logic;
   signal s_force_time_service_invalid          : std_logic;
   signal s_time_service_valid                  : std_logic;
+  signal s_time_service_valid_noPPS            : std_logic;
+  signal s_time_service_valid_PPS              : std_logic;
+
 begin
 
   -- For older SyncFIFO modules until they get fixed
   RST_N <= not RST;
   timeRST_N <= not timeRST;
+
+  s_RST <= RST;
+  s_timeRST <= timeRST;
 
   -----------------------------------------------------------------------------
   -- Outputs assignments
@@ -245,7 +287,7 @@ begin
   -- Control Clock Domain
   s_statusOut <= (s_ppsLostSticky & s_gpsInSticky & s_ppsInSticky & s_timeSetSticky &
                   s_ppsOKCC_dD_OUT & s_ppsLostCC_dD_OUT & s_time_service_valid & '0' &
-                  x"0000" & s_rollingPPSIn_dD_OUT);
+                  x"0000"  & s_rollingPPSIn_dD_OUT);
   timeStatus  <= ulong_t(s_statusOut);
 
   ticksPerSecond       <= ulong_t(resize(unsigned(s_refPerPPS_dD_OUT), ulong_t'length));
@@ -253,11 +295,22 @@ begin
 
   -- Time Clock Domain
   time_service.now     <= ulonglong_t(s_nowTC);
+
   time_service.clk     <= timeCLK;
   time_service.valid   <= s_time_service_valid;
-  s_time_service_valid <= '1' when s_force_time_service_valid = '1' else
+  
+  s_time_service_valid_noPPS <= '1' when s_force_time_service_valid = '1' else
                           '0' when s_force_time_service_invalid = '1' else
                           s_secValid and s_fracValid;
+  
+  s_time_service_valid_PPS <= '1' when s_force_time_service_valid = '1' else
+                          '0' when s_force_time_service_invalid = '1' else
+                          s_secValid and s_fracValid and s_ppsLock;
+
+  s_time_service_valid <= s_time_service_valid_PPS when s_using_PPS = '1' else
+			  s_time_service_valid_noPPS;
+
+  
   s_fracValid          <= RST_N or timeRST_N when its(s_ppsDisablePPS_sD_IN_slv0(0)) else s_ppsOK;
   s_secValid           <= RST_N or timeRST_N when its(s_gpsDisabled) else s1_gpsSecWrite;
   -----------------------------------------------------------------------------
@@ -274,6 +327,8 @@ begin
 
   s_force_time_service_valid   <= timeControl(5);
   s_force_time_service_invalid <= timeControl(6);
+
+  s_using_PPS <= timeControl(7);
 
   -----------------------------------------------------------------------------
   -- Calculate deltaTime based on 'now' and time adjustment provided by host
@@ -329,7 +384,8 @@ begin
       src_IN  => s_ppsOutMode_sD_IN,
       src_EN  => s_ppsOutMode_sRDY,
       dst_OUT => s_ppsOutMode_dD_OUT,
-      src_RDY => s_ppsOutMode_sRDY);
+      src_RDY => s_ppsOutMode_sRDY
+    );
 
   mux_ppsOut : process(s_ppsOutMode_dD_OUT, s_ppsDrive, s_ppsExtSync_d2, s_xo2)
   begin
@@ -337,7 +393,7 @@ begin
       when "00"   => ppsOut <= s_ppsDrive;      -- 90% HI, 10% LO (timeCLK count)
       when "01"   => ppsOut <= s_ppsExtSync_d2; -- ppsIn reg'ed in timeCLK domain
       when "10"   => ppsOut <= s_xo2;           -- Local XO (timeCLK/2)
-      when others => null;
+      when others => ppsOut <= '0';             -- "others => null": inferred latch
     end case;
   end process;
 
@@ -356,7 +412,9 @@ begin
       src_IN  => s_ppsDisablePPS_sD_IN_slv0,
       src_EN  => s_ppsDisablePPS_sRDY,
       dst_OUT => s_ppsDisablePPS_dD_OUT_slv0,
-      src_RDY => s_ppsDisablePPS_sRDY);
+      src_RDY => s_ppsDisablePPS_sRDY
+    );
+  
   s_ppsDisablePPS_dD_OUT <= s_ppsDisablePPS_dD_OUT_slv0(0);
 
   -----------------------------------------------------------------------------
@@ -401,7 +459,8 @@ begin
       src_IN  => s_refPerPPS_sD_IN,
       src_EN  => s_refPerPPS_sEN,
       dst_OUT => s_refPerPPS_dD_OUT,
-      src_RDY => s_refPerPPS_sRDY);
+      src_RDY => s_refPerPPS_sRDY
+    );
 
   -----------------------------------------------------------------------------
   -- Control to Time clk domain: Disable update of 'fracInc' value
@@ -418,7 +477,9 @@ begin
       src_IN  => s_disableServo_sD_IN_slv0,
       src_EN  => s_disableServo_sRDY,
       dst_OUT => s_disableServo_dD_OUT_slv0,
-      src_RDY => s_disableServo_sRDY);
+      src_RDY => s_disableServo_sRDY
+    );
+  
   s_disableServo_dD_OUT <= s_disableServo_dD_OUT_slv0(0);
 
   -----------------------------------------------------------------------------
@@ -436,7 +497,7 @@ begin
     port map (
       src_clk => timeCLK,
       src_rst => timeRST,
-      src_in => s_nowInCC_sD_In,
+      src_in => s_nowInCC_sD_IN,
       dst_clk => CLK,
       dst_rst => RST,
       dst_out => s_nowInCC_dD_OUT,
@@ -455,14 +516,32 @@ begin
     if(rising_edge(timeCLK)) then
       if (timeRST = '1') then
         s_nowTC <= (others => '0');
+	s1_nowTC <= (others => '0');
         s1_gpsSecWrite <= '0';
+	s_nowTC_early_ro_cnt <= (others => '0');
       else
         if (s_nowInCC_sRDY = '1') then
-          s_nowTC <= s_refSecCount & s1_fracSeconds(47 downto 16);
-          s1_gpsSecWrite <= s_gpsSecWrite;
-        end if;
+	  -- Set freeflow timeclock( No PPS)
+	  -- Set PPS aligned timeclock ( PPS)
+	  s_nowTC <= s_refSecCount & s1_fracSec_aligned(47 downto 16);
+	  s1_gpsSecWrite <= s_gpsSecWrite;
+        end if;      
+      end if;
+ 
+    --  Detect when fractional part experiences a jumpback.  Occurs when previous time is
+    --  greater than current.
+      s1_nowTC <= s_nowTC;
+
+      if s1_nowTC > s_nowTC then
+        s_nowTC_early_ro_detected <= '1';
+      else
+        s_nowTC_early_ro_detected <= '0';
+      end if;
+      if (s_nowTC_early_ro_detected = '1') then
+        s_nowTC_early_ro_cnt <= std_logic_vector(signed(s_nowTC_early_ro_cnt) + 1);	    
       end if;
     end if;
+
   end process;
 
   -----------------------------------------------------------------------------
@@ -480,7 +559,9 @@ begin
       src_IN  => s_ppsLostCC_sD_IN_slv0,
       src_EN  => s_ppsLostCC_sRDY,
       dst_OUT => s_ppsLostCC_dD_OUT_slv0,
-      src_RDY => s_ppsLostCC_sRDY);
+      src_RDY => s_ppsLostCC_sRDY
+    );
+  
   s_ppsLostCC_dD_OUT <= s_ppsLostCC_dD_OUT_slv0(0);
 
   -----------------------------------------------------------------------------
@@ -498,7 +579,9 @@ begin
       src_IN  => s_ppsOKCC_sD_IN_slv0,
       src_EN  => s_ppsOKCC_sRDY,
       dst_OUT => s_ppsOKCC_dD_OUT_slv0,
-      src_RDY => s_ppsOKCC_sRDY);
+      src_RDY => s_ppsOKCC_sRDY
+    );
+
   s_ppsOKCC_dD_OUT <= s_ppsOKCC_dD_OUT_slv0(0);
 
   -----------------------------------------------------------------------------
@@ -516,7 +599,8 @@ begin
       src_IN  => s_rollingPPSIn_sD_IN,
       src_EN  => s_rollingPPSIn_sRDY,
       dst_OUT => s_rollingPPSIn_dD_OUT,
-      src_RDY => s_rollingPPSIn_sRDY);
+      src_RDY => s_rollingPPSIn_sRDY
+    );
 
   -----------------------------------------------------------------------------
   -- Control to Time clk domain: Clock 's_timeIn' into the Time clk domain
@@ -537,7 +621,8 @@ begin
       dst_DEQ     => s_setRefF_dDEQ,
       dst_OUT     => s_setRefF_dD_OUT,
       src_FULL_N  => open,
-      dst_EMPTY_N => s_setRefF_dEMPTY_N);
+      dst_EMPTY_N => s_setRefF_dEMPTY_N
+    );
 
   -----------------------------------------------------------------------------
   -- Control clock domain: Update registers per host or other events
@@ -673,6 +758,7 @@ begin
             s_refSecCount <= std_logic_vector(signed(s_refSecCount) + 1);
           end if;
         end if;
+	s1_nowInCC_sRDY  <= s_nowInCC_sRDY;
 
         -- Count # of clk cycles while External PPS is in valid operating range
         -- AND upon detection of leading edge of ppsIn,
@@ -695,24 +781,13 @@ begin
   end process;
 
   -- Determine when the Seconds counter may increment:
-  -- 1) Priority is given to the presense of a good External PPS.
-  --    Wait for the next leading edge ppsIn pulse, then allow Seconds counter to increment.
-  -- 2) Secondary is when running off of internal time keeping.
-  --    Wait for s_fracSeconds to rollover, then allow Seconds counter to increment
+  --    Wait for s_fracSec_aligned to rollover, then allow Seconds counter to increment
   cmb_refSecCount_EN : process(s_ppsOK, s_ppsExtSync_d2, s_ppsExtSyncD, s_delSec, s_fracSeconds(49 downto 48))
   begin
-    if (s_ppsOK = '1') then     -- External PPS is good
-      if (s_ppsExtSync_d2 = '1' and s_ppsExtSyncD = '0') then -- lead_edge of External PPS
-        s_refSecCount_EN <= '1';
-      else
-        s_refSecCount_EN <= '0';
-      end if;
-    else                        -- Free-running counter rolling over
-      if (s_delSec /= s_fracSeconds(49 downto 48)) then
-        s_refSecCount_EN <= '1';
-      else
-        s_refSecCount_EN <= '0';
-      end if;
+    if (s_delSec_aligned /= s_fracSec_aligned(49 downto 48)) then
+      s_refSecCount_EN <= '1';
+    else
+      s_refSecCount_EN <= '0';
     end if;
   end process;
 
@@ -740,20 +815,17 @@ begin
   --x_281474976710656_minus_delSecond_22b <=
   --  x_281474976710656_minus_delSecond_50b(49 downto 28);
 
-  --s_fracBeta <= (49 downto 22 => x_281474976710656_minus_delSecond_22b(21)) &
-  --         x_281474976710656_minus_delSecond_22b;
-
   --s_fracBeta <= (49 downto (s_fracBeta'length - natural(ceil(log2(real(g_TIMECLK_FREQ)))))
   --               => x_281474976710656_minus_delSecond_50b(49)) &
   --              x_281474976710656_minus_delSecond_50b(49 downto natural(ceil(log2(real(g_TIMECLK_FREQ)))));
 
   s_base2exp48_minus_delSecond_50b <=
     std_logic_vector("01" & x"0000_0000_0000" - signed(s_delSecond));
-
+  
   s_fracBeta <= (49 downto (s_fracBeta'length - natural(ceil(log2(real(g_TIMECLK_FREQ)))))
-                 => s_base2exp48_minus_delSecond_50b(49)) &
-                s_base2exp48_minus_delSecond_50b(49 downto natural(ceil(log2(real(g_TIMECLK_FREQ)))));
-
+        => s_base2exp48_minus_delSecond_50b(49)) &
+          s_base2exp48_minus_delSecond_50b(49 downto natural(ceil(log2(real(g_TIMECLK_FREQ)))));
+  
   -----------------------------------------------------------------------------
   -- "Phase Locked Loop"
   -- Fractional Seconds (free running counter)
@@ -763,34 +835,102 @@ begin
   begin
     if(rising_edge(timeCLK)) then
       if (timeRST = '1') then
-        s_delSec      <= (others => '0');
-        s_lastSecond  <= (others => '0');
+	s_delSec       <= (others => '0');
+	s_lastSecond   <= (others => '0');
+	s1_ppsIn_detectedInWindow <= '0';
         -- Force compensation to be 'zero' upon startup
-        s_delSecond   <= "01" & x"0000_0000_0000";
-        s_fracInc     <= c_fracInc;
-        s_fracSeconds <= (others => '0');
-        s1_fracSeconds <= (others => '0');
-        s_jamFrac_EN  <= '0';
-        s_jamFrac_Val <= (others => '0');
+	s_delSecond    <= "01" & x"0000_0000_0000";
+	s_fracInc      <= c_fracInc;
+	s_ro_pps_diff  <= (others => '0');
+	s1_ro_pps_diff <= (others => '0');
+	s_fracSeconds  <= (others => '0');
+	s_fracSec_aligned <= (others => '0');
+	s1_fracSec_aligned <= (others => '0');
+	s_delSec_aligned <= (others => '0');
+	s_ro_fracSeconds  <= (others => '0');
+	s1_fracSeconds <= (others => '0');
+	s_jamFrac_EN   <= '0';
+	s_jamFrac_Val  <= (others => '0');
+	s_first_PPS    <= '0';
+	s_ro_detected  <= '0';
+	s1_ppsIn_count <= (others => '0');
+	s_fracBeta_count <= (others => '0');
+	s_ppsLock	<= '0';
+	s1_nowTC_early_ro_cnt <= (others => '0');
+	s_nowTC_early_ro_diff_cnt <= (others => '0');
       else
-        s1_fracSeconds <= s_fracSeconds;
-        s_delSec <= s_fracSeconds(49 downto 48);
-
-        -- "Phase Detector"
-        -- Fractional count delta between 'valid' PPS pulses.
-        -- But this delta is NOT guaranteed to be between successive valid pulses.
-        -- However, the adjustment feedback value is only applied when PPS is 'OK'.
+	s1_fracSeconds <= s_fracSeconds;
+	s1_fracSec_aligned <= s_fracSec_aligned;
+	s_delSec <= s_fracSeconds(49 downto 48);
+	s_delSec_aligned <= s_fracSec_aligned(49 downto 48);
+	if (s_delSec /= s_fracSeconds(49 downto 48)) then
+	  s_ro_detected <= '1';
+	  s_ro_fracSeconds <= s1_fracSeconds;
+	else
+	  s_ro_detected <= '0';
+	end if;
+  		
+	-- generate delayed ppsIn_detectedInWindow signal
+	s1_ppsIn_detectedInWindow <= s_ppsIn_detectedInWindow;
+      
+	-- "Phase Detector"
+	-- Fractional count delta between 'valid' PPS pulses.
+	-- But this delta is NOT guaranteed to be between successive valid pulses.
+	-- However, the adjustment feedback value is only applied when PPS is 'OK'.
         if (s_ppsIn_detectedInWindow = '1') then
-          s_lastSecond <= s_fracSeconds;
+	  s_lastSecond <= s_fracSeconds;
+		
+	  -- Measure fractional offset between rollover and PPS detected.
+	  s1_ro_pps_diff <= s_ro_pps_diff;  -- track prior ro diff for when early (jump back) ro detected
+	  s_ro_pps_diff  <= std_logic_vector(signed(s_fracSeconds) - signed(s_ro_fracSeconds));
+                
+	  -- Measure phase between PPS detections.	  
           s_delSecond  <= std_logic_vector(signed(s_fracSeconds) - signed(s_lastSecond));
-        end if;
+		
+	  -- Check early fractional state. Identifies when there is a rollover disparity resulting in slight jump back
+	  -- of fractional value.  Occurs periodically as PPS sync is selttling and then Occur after longer duration 
+	  -- (10-12 or more hours).
+	  -- Count constant zeros up to lock threshold. 
+	  -- If jumpback condition detected, reset counter.
+	  s1_nowTC_early_ro_cnt <= s_nowTC_early_ro_cnt;
+          if(s_nowTC_early_ro_cnt = s1_nowTC_early_ro_cnt) then
+	    if( s_nowTC_early_ro_diff_cnt < c_lock_threshold) then
+	      s_nowTC_early_ro_diff_cnt <= std_logic_vector(signed(s_nowTC_early_ro_diff_cnt) + 1);
+	    end if;
+	  else
+	    s_nowTC_early_ro_diff_cnt <= (others => '0');
+	  end if;
+  	end if;
+
+	-- Jumpback condition occurs when s_delSeconds > "01" & x"0000_0000_0000".  This results in producing an excessive
+	-- s_ro_pps_diff value.  If this occurs, when subtracted from s_fracSeconds, the resulting s_fracSec_aligned value is
+        -- smaller than previous s_fracSec_aligned value resulting in the fractional part jumping backwards.  
+	-- This is resolved by detecting when s_delSeconds is > "01" & x"0000_0000_0000" and disregarding new s_ro_pps_diff 
+	-- and continue use of previous value which is s1_ro_pps_diff.
+
+	if(s_ppsIn_detectedInWindow = '1' and s_ppsLock = '1' and s_delSecond > "01" & x"0000_0000_0000") then
+	  s_ro_pps_diff <= s1_ro_pps_diff;
+	end if;
 
         -- Apply "Filter" value
         -- Apply the proportional 'beta' compensation to the fracInc and
         -- subsequently, to the fracSecond accumulator
         if (s_ppsIn_detectedInWindow = '1' and s_ppsOK = '1' and s_disableServo_dD_OUT = '0') then
-          s_fracInc <= std_logic_vector(signed(s_fracInc) + signed(s_fracBeta));
+	  s_fracInc <= std_logic_vector(signed(s_fracInc) + signed(s_fracBeta));
         end if;
+
+	--Used to track time to lock
+	if abs(signed(s_fracBeta)) > 0 and s_ppsIn_detectedInWindow = '1' then
+	  s_fracBeta_count <= std_logic_Vector(signed(s_fracBeta_count) + 1);
+	end if;
+
+	if s_ppsOK = '1' and s_nowTC_early_ro_diff_cnt = c_lock_threshold then
+	  s_ppsLock <= '1';
+	else
+	  s_ppsLock <= '0';
+	end if;
+
+	ppsLock <= s_ppsLock;
 
         -- "VCO"
         -- Set ('Jam') by Host or update the free running fractional-second counter
@@ -802,7 +942,16 @@ begin
         if (s_jamFrac_EN = '1') then    -- New frac value from host
           s_fracSeconds <= s_jamFrac_Val;
         else
-          s_fracSeconds <= std_logic_vector(signed(s_fracSeconds) + signed(s_fracInc));
+	   if (s_ppsIn_detectedInWindow = '1') and (s_first_PPS ='0') then
+	     s_first_PPS <= '1';
+	   end if;
+
+	  -- Adjusts fractional phase
+	   s_fracSeconds <= std_logic_vector(signed(s_fracSeconds) + signed(s_fracInc));
+	  -- Applies measured difference (offset) of fractional value at rollover occurrence and 
+	  -- fractional value at PPS detection to shift fractional value to PPS
+
+	   s_fracSec_aligned <= std_logic_vector(signed(s_fracSeconds) - signed(s_ro_pps_diff));
         end if;
 
         -- If PPS is not valid, (due to loss or PPS tracking is disabled)
@@ -860,4 +1009,5 @@ begin
       end if;
     end if;
   end process;
+
 end rtl;

@@ -55,7 +55,13 @@ For example, to work through the rest of this guide, run
 to enable raw sockets for ``ocpihdl`` and ``ocpirun``. Note that to use an ACI
 application rather than ``ocpirun``, the capability needs to be set on the
 application binary as part of the installation process. If you want to debug
-an application, the ``gdb`` executable also needs the capability.
+an application, the ``gdb`` and ``bash`` executables also need the capability.
+
+.. code-block:: bash
+
+   $ sudo setcap CAP_NET_RAW+eip $(readlink -f $(which gdb))
+   $ sudo setcap CAP_NET_RAW+eip $(readlink -f $(which bash))
+   $ gdb --args ocpirun -d -l 8 <application>.xml
 
 Hardware Prerequisites
 ----------------------
@@ -102,18 +108,18 @@ to select the LED display mode (SW[0] and LED[0] are nearest the FMC connector).
    :class: tight-table
 
    "000", "[0]: 1Hz heartbeat, [1]: MAC address successfully read, [2]: MAC address read error, [4:3] ETH1 MAC speed (00=10M, 01=100M, 10=1000M), [6:5] ETH2 MAC speed"
-   "001", "mac_addr[7:0]"
-   "010", "mac_addr[15:8]"
-   "011", "mac_addr[23:16]"
-   "100", "mac_addr[31:24]"
-   "101", "mac_addr[39:32]"
-   "110", "mac_addr[47:40]"
+   "001", "mac_addr[47:40]"
+   "010", "mac_addr[39:32]"
+   "011", "mac_addr[31:24]"
+   "100", "mac_addr[23:16]"
+   "101", "mac_addr[15:8]"
+   "110", "mac_addr[7:0]"
    "111", "constant 0xaa"
 
 Setup Guide
 -----------
 
-In order to set a host system up to run applications on this platform, the
+In order to set up a host system to run applications on this platform, the
 following steps need to be completed:
 
 1. Build a test bitstream to be used for autodiscovery and configuration
@@ -123,6 +129,8 @@ following steps need to be completed:
 3. Set up the JTAG cable drivers
 
 4. Write a system.xml file specifying the system configuration
+
+5. Load the bitstream
 
 Build a test bitstream to be used for autodiscovery and configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -201,11 +209,14 @@ orange, check the J18 jumper on the Zedboard.
 If using a single Ethernet connection, connect it to port 1 on the Zedboard and
 note the name of the network interface.
 
-If using two Ethernet interfaces, connect them both to the Zedboard and create a
-Linux bonded interface as follows:
+If using two Ethernet interfaces, connect them both to the Zedboard.  The OpenCPI DGRDMA
+functionality requires both ethernet interfaces to be bonded together to form a single
+aggregated link.  Packets sent between the zed_ether hardware and the PC are then able to use
+both physical ethernet interfaces. Treating them as a single link.
 
-If using two Ethernet interfaces, connect them both to the Zedboard and run the
-following commands **as root** to create a Linux bonded interface (assuming the
+Create a Linux bonded interface as follows. *Note that this will need repeating after a reboot*.
+
+Run the following commands **as root** to create a Linux bonded interface (assuming the
 two interfaces on the PC are named ``eth1`` and ``eth2``):
 
 .. code-block:: bash
@@ -229,8 +240,8 @@ If you wish to use an interface MTU larger than the default of 1500 bytes, it
 must be configured on the network interface.
 
 To verify that networking is properly configured, manually load the example OpenCPI
-bitstream into the device using Vivado Hardware Manager. Verify that the network
-interface is up and visible to OpenCPI:
+bitstream (built in `Build a test bitstream to be used for autodiscovery and configuration`_) into
+the device using Vivado Hardware Manager. Verify that the network interface is up and visible to OpenCPI:
 
 .. code-block:: bash
 
@@ -249,7 +260,8 @@ Then perform discovery:
 This requires raw socket access: either run as ``root`` or set the ``CAP_NET_RAW``
 capability on the ``ocpihdl`` executable as described in `Software Prerequisites`_.
 The ``OCPI_ENABLE_HDL_NETWORK_DISCOVERY`` environment variable must be set to
-search for Ethernet devices as shown above.
+search for Ethernet devices as shown above.  The ``OCPI_SYSTEM_CONFIG`` environment
+variable must **not** be set.
 
 If no devices were found, refer to `Troubleshooting`_ section.
 
@@ -298,6 +310,7 @@ Information you will need (note that properties are named from the FPGA's perspe
   ``ocpihdl search`` as described above)
 * MAC address of the local interface (if using dual-Ethernet configuration,
   use the MAC address of the bonded interface) (found using ``ifconfig``)
+* MAC address of the FPGA (discover using ``ocpihdl search`` as described in `Connect the host PC to the device`_)
 * ``esn``: JTAG cable serial number (discover using Vivado, see above)
 
 Optional configurable parameters:
@@ -342,7 +355,7 @@ below, assuming that:
             <device name="Ether:bond0/80:1f:12:7c:79:04" device="xc7z020" platform="zed_ether" esn="210248B1880E" static="true">
               <instance worker='dgrdma_config_dev'>
                <property name="remote_mac_addr_d" value="0x00e04c70dee2"/>
-               <property name="interface_mtu_d" value="8192"/>
+               <property name="interface_mtu_d" value="1500"/>
                <property name="dual_ethernet_d" value="1"/>
               </instance>
             </device>
@@ -519,3 +532,156 @@ Check that:
 * Your bitstream includes the ``dgrdma_config_dev`` device worker (by using the
   ``dgrdma_dev`` configuration or directly instantiating it in the container XML)
 * Your application XML includes the ``ocpi.core.dgrdma_config_proxy`` worker
+
+Using the zed_ether Platform with UDP transport
+-----------------------------------------------
+OpenCPI contains support for using DGRDMA with a UDP transport. By default DGRDMA packets are carried using raw Ethernet,
+with the Ether Type field in the transport MAC layer being used to identify Control-Plane and Data-Plane packets.
+
+When using UDP the same physical ethernet interface is used. However, at present dual ethernet operation is not
+supported.  Only packets sent to the zed_ether hardware with Ether-Type IP (0x0800) and ARP (0x0806) are processed.
+Packets with other Ether-Types values are ignored. The UDP Port number is used to distinguish between Control-Plane and Data-Plane packets.
+Packets sent to other UDP ports will be ignored by the zed_ether hardware.
+
+The ethernet / UDP components used in the FPGA filter received packets based on destination MAC address, IP destination address 
+and destination UDP port. 
+
+Packets with the following MAC destination addresses will be processed:
+   - Destination MAC = LOCAL_MAC_ADDR 
+   - Destination MAC = Broadcast MAC (0xffffffffffff)
+   - Destination MAC in multicast address group (01-00-5E-00-00-00 through 01-00-5E-7F-FF-FF)
+
+Packets with the following IP destination addresses will be processed:
+   - Destination IP Address = LOCAL_IP_ADDR
+   - Destination IP Address = multicast group (224.0.0.0 to 224.255.255.255)
+
+Note the FPGA components do not "join" a multicast group. Care has to be taken in the network as the FPGA will process
+packets sent to the multicast Destination MAC / multicast IP Address / UDP Port = 18077 if these packets are present on the
+ethernet link connected to the zed_ether.
+
+By default the zed_ether platform uses the following port numbers:
+  
+.. csv-table:: UDP Port Mapping
+   :header: "Port Number", "Remarks"
+   :class: tight-table
+
+   "`18077`", "Control Plane UDP Port (destination UDP port of packets sent to the hardware)"
+   "`18078`", "Data Plane UDP Port (destination UDP port of Data-Plane packets sent to the hardware)"
+
+The PC's network interface used for communicating with the hardware needs to be assigned an IP address.
+For example:
+
+.. code-block::
+
+   ip addr add 192.168.50.1/24 dev enp4s0f0
+
+The platform dgrdma config device will need its ``remote_ip_addr_d`` property set to this address in the system.xml file.
+
+The following additional environment variables also need to be specified:
+
+.. csv-table:: UDP Environment variables
+   :header: "Name", "Value", "Remarks"
+   :class: tight-table
+
+   "`OCPI_TRANSFER_IP_ADDRESS`", "192.168.50.1", "Specifies the local PC network interface to use"
+   "`OCPI_UDP_TRANSFER_PORT`", "41000", "Specifies the PC's UDP port number"
+
+The port number specified by ``OCPI_UDP_TRANSFER_PORT`` is used by the OpenCPI runtime software to listen for
+Data-Plane packets sent to it by the hardware. It is also the port from which Data-Plane packets are
+sent to the hardware. The platform dgrdma config device ``remote_udp_port_d`` property needs to be set to
+the same value in the system.xml file.
+
+The use of UDP transport is specified in the system.xml file being used by the running application.
+An example system.xml for use with UDP is shown below:
+
+.. code-block:: xml
+
+   <opencpi>
+      <container>
+         <rcc load="1"/>
+         <hdl load='1' discovery="static">
+            <device name="udp:192.168.50.2:18077" device="xc7k410t" platform="zed_ether" esn="2516350FA134A" static="true">
+               <instance worker='dgrdma_config_dev'>
+                  <property name="dual_ethernet_d"   value="0" />
+                  <property name="remote_mac_addr_d" value="0x90e2bad43a98"/>
+                  <Property name="remote_ip_addr_d"  value="0xc0a83201"/>
+                  <Property name="remote_udp_port_d" value="41000"/>
+                  <Property name="interface_mtu_d"   value="1400"/>
+               </instance>
+            </device>
+         </hdl>
+      </container>
+      <transfer smbsize="10M">
+         <datagram2-ether load="1"/>
+      </transfer>
+   </opencpi>
+
+The device name "udp:192.168.50.2:18077" specifies that UDP transport is to be used by the HDL container,
+the destination (zed_ether) IP address to send packets to is "192.168.50.2" and the port number
+to send Control-Plane packets to it 18077. Data-Plane packets will be sent to 18078.
+The device, platform, esn and static values are used in the same way as for the raw Ethernet case.
+
+The dgrdma config device properties specified in the system.xml are:
+
++----------------------+-----------------------+-------------------------------------------------------+
+| Property             | Value                 | Usage                                                 |
++======================+=======================+=======================================================+
+| dual_ethernet_d      | 0                     | Specifies single ethernet interface is to be used.    |
+|                      |                       | Dual ethernet operation is not supported for UDP      |
++----------------------+-----------------------+-------------------------------------------------------+
+| remote_mac_addr_d    | 0x90e2bad43a98        | The MAC address of the PC ethernet interface.         |
+|                      |                       | The hardware sends Data-Plane packets to this         |
+|                      |                       | address                                               |
++----------------------+-----------------------+-------------------------------------------------------+
+| remote_ip_addr_d     | 0xc0a83201            | The IP address of the PC ethernet interface.          |
+|                      |                       | The hardware sends Data-Plane packets to this         |
+|                      |                       | address                                               |
++----------------------+-----------------------+-------------------------------------------------------+
+| remote_udp_port_d    | 41000                 | The UDP Port the PC listens on for Data-Plane packets |
+|                      |                       | This must match the value specified by                |
+|                      |                       | OCPI_UDP_TRANSFER_PORT                                |
++----------------------+-----------------------+-------------------------------------------------------+
+| interface_mtu_d      | 1400                  | This value is used by the FPGA when packing           |
+|                      |                       | DGRDMA messages into UDP packets.                     |
+|                      |                       | Its value needs to be <actual-MTU> - IP header size - |
+|                      |                       | UDP header size                                       |
++----------------------+-----------------------+-------------------------------------------------------+
+
+Note that the hardware IP address, sub-net mask and default gateway are manually assigned and are hardcoded into the
+FPGA bit-stream. These values are set by constants in the platform worker
+(``ocpi_root_dir/projects/platform/hdl/platforms/zed_ether/zed_ether.vhd``).  The zed_ether (UDP) implementation
+includes an ARP implementation. This is used to obtain the MAC address of the ethernet interface sending it
+Control-Plane commands.
+
+The default value for these parameters are:
+
++----------------------+-----------------------+-------------------------------------------------------+
+| Parameter            | Value                 | Usage                                                 |
++======================+=======================+=======================================================+
+| LOCAL_MAC_ADDR       | 0x0050c2853fff        | The MAC address of the zed_ether ethernet interface   |
++----------------------+-----------------------+-------------------------------------------------------+
+| LOCAL_IP_ADDR        | 192.168.50.2          | The IP address of the zed_ether ethernet interface    |
++----------------------+-----------------------+-------------------------------------------------------+
+| LOCAL_SUBNET_MASK    | 255.255.255.0         | The subnet mask of the zed_ether ethernet interface   |
++----------------------+-----------------------+-------------------------------------------------------+
+| LOCAL_GATEWAY_IP     | 192.168.50.1          | The subnet mask of the zed_ether ethernet interface   |
++----------------------+-----------------------+-------------------------------------------------------+
+| UDP_CP_PORT          | 18077                 | Control-Plane UDP Port Number                         |
++----------------------+-----------------------+-------------------------------------------------------+
+| UDP_SDP_PORT         | 18078                 | Data-Plane UDP Port Number                            |
++----------------------+-----------------------+-------------------------------------------------------+
+
+A bit-stream that supports UDP transport needs to be built. The use of UDP is enabled by setting
+the platform property ``udp_enable`` to ``true`` in a platform configuration.  Additionally
+``sdp_width`` must be ``1`` (not ``2`` or ``4``), as per the valid build configurations in
+``zed_ether-build.xml``.
+
+The application does not need to include anything UDP specific in its .xml file in order
+to use UDP transport. The same applications can be used for raw Ethernet and UDP transports.
+However, care needs to be taken to ensure that artifacts (bit-streams) do not exist for both
+raw Ethernet and UDP transports containing the same assembly, as this can result in the
+OpenCPI framework selected the wrong bit-stream, and communication between the zed_ether FPGA
+and the PC software will fail.
+
+Known Issues
+------------
