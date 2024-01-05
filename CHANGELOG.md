@@ -131,6 +131,7 @@ Changes/additions since [OpenCPI Release v2.4.6](https://gitlab.com/opencpi/open
 - **doc**: add timegate_csts-hdl.rst HDL worker document. (!1038)(bf711640)
 - **hdl base**: remove type ambiguity in core hdl primitive. (!1143)(06fbc336)
 - **hdl base**: fix inferred latch for variable 'ppsOut' in time_server worker. (!981)(23dc837a)
+- **runtime**: add /pcap back to list of paths to search fpga manager. (!1145)(40efebde)
 - **runtime**: refactor `runtime/base` storage allocation logic. (!887)(0aa598f3)
 - **runtime**: avoid gcc warning relating to `binary_function`. (!1142)(11896d00)
 - **runtime**: avoid gcc warning relating to colliding variable names. (!1142)(11896d00)
