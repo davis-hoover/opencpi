@@ -30,21 +30,29 @@
   </config:config-item-set>
   <config:config-item-set config:name="ooo:configuration-settings">
    <config:config-item config:name="PrintProspect" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="PrintLeftPages" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="PrintGraphics" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="PrintPageBackground" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="PrintControls" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="PrintAnnotationMode" config:type="short">0</config:config-item>
-   <config:config-item config:name="PrintRightPages" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="PrintFaxName" config:type="string"/>
-   <config:config-item config:name="PrintPaperFromSetup" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="PrintTextPlaceholder" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="ApplyParagraphMarkFormatToNumbering" config:type="boolean">false</config:config-item>
    <config:config-item config:name="PrintReversed" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="TabOverMargin" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="PrintSingleJobs" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="PrintLeftPages" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="PrintTables" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="PrintControls" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="PrintPageBackground" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="PrintDrawings" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="PrintBlackFonts" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="PrintAnnotationMode" config:type="short">0</config:config-item>
+   <config:config-item config:name="PrintTextPlaceholder" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="EmptyDbFieldHidesPara" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="DisableOffPagePositioning" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="SubtractFlysAnchoredAtFlys" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="PropLineSpacingShrinksFirstLine" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="ApplyParagraphMarkFormatToNumbering" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="TreatSingleColumnBreakAsPageBreak" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="EmbedSystemFonts" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="EmbedComplexScriptFonts" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="EmbedAsianScriptFonts" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="EmbedLatinScriptFonts" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="EmbedOnlyUsedFonts" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="ContinuousEndnotes" config:type="boolean">false</config:config-item>
    <config:config-item config:name="EmbedFonts" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="SurroundTextWrapSmall" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="BackgroundParaOverDrawings" config:type="boolean">true</config:config-item>
    <config:config-item config:name="ClippedPictures" config:type="boolean">true</config:config-item>
    <config:config-item config:name="FloattableNomargins" config:type="boolean">true</config:config-item>
    <config:config-item config:name="EmbedSystemFonts" config:type="boolean">false</config:config-item>
@@ -67,8 +75,7 @@
    <config:config-item config:name="EmbeddedDatabaseName" config:type="string"/>
    <config:config-item config:name="IgnoreTabsAndBlanksForLineCalculation" config:type="boolean">true</config:config-item>
    <config:config-item config:name="UseOldPrinterMetrics" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="InvertBorderSpacing" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="SaveGlobalDocumentLinks" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="TabOverMargin" config:type="boolean">true</config:config-item>
    <config:config-item config:name="TabsRelativeToIndent" config:type="boolean">false</config:config-item>
    <config:config-item config:name="Rsid" config:type="int">56648616</config:config-item>
    <config:config-item config:name="PrintProspectRTL" config:type="boolean">false</config:config-item>
@@ -78,13 +85,25 @@
    <config:config-item config:name="AddParaTableSpacingAtStart" config:type="boolean">true</config:config-item>
    <config:config-item config:name="FieldAutoUpdate" config:type="boolean">true</config:config-item>
    <config:config-item config:name="UseOldNumbering" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="AddParaTableSpacing" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="CharacterCompressionType" config:type="short">0</config:config-item>
-   <config:config-item config:name="SaveVersionOnClose" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="ChartAutoUpdate" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="InvertBorderSpacing" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="PrintPaperFromSetup" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="UpdateFromTemplate" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="CurrentDatabaseCommandType" config:type="int">0</config:config-item>
+   <config:config-item config:name="LinkUpdateMode" config:type="short">1</config:config-item>
+   <config:config-item config:name="AddParaSpacingToTableCells" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="CurrentDatabaseCommand" config:type="string"/>
    <config:config-item config:name="PrinterIndependentLayout" config:type="string">high-resolution</config:config-item>
+   <config:config-item config:name="ApplyUserData" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="PrintFaxName" config:type="string"/>
+   <config:config-item config:name="CurrentDatabaseDataSource" config:type="string"/>
+   <config:config-item config:name="ClipAsCharacterAnchoredWriterFlyFrames" config:type="boolean">false</config:config-item>
    <config:config-item config:name="IsKernAsianPunctuation" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="UseFormerObjectPositioning" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="SaveThumbnail" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="UseFormerTextWrapping" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="AddExternalLeading" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="AddParaTableSpacing" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="StylesNoDefault" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="ChartAutoUpdate" config:type="boolean">true</config:config-item>
    <config:config-item-map-indexed config:name="ForbiddenCharacters">
     <config:config-item-map-entry>
      <config:config-item config:name="Language" config:type="string">en</config:config-item>
@@ -94,29 +113,34 @@
      <config:config-item config:name="EndLine" config:type="string"/>
     </config:config-item-map-entry>
    </config:config-item-map-indexed>
-   <config:config-item config:name="AddVerticalFrameOffsets" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="UnbreakableNumberings" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="AllowPaddingWithoutBorders" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="StylesNoDefault" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="LinkUpdateMode" config:type="short">1</config:config-item>
+   <config:config-item config:name="PrinterSetup" config:type="base64Binary">owH+/0dlbmVyaWMgUHJpbnRlcgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAU0dFTlBSVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWAAMAxAAAAAAAAAAIAFZUAAAkbQAASm9iRGF0YSAxCnByaW50ZXI9R2VuZXJpYyBQcmludGVyCm9yaWVudGF0aW9uPVBvcnRyYWl0CmNvcGllcz0xCmNvbGxhdGU9ZmFsc2UKbWFyZ2luZGFqdXN0bWVudD0wLDAsMCwwCmNvbG9yZGVwdGg9MjQKcHNsZXZlbD0wCnBkZmRldmljZT0xCmNvbG9yZGV2aWNlPTAKUFBEQ29udGV4RGF0YQpEdXBsZXg6Tm9uZQBQYWdlU2l6ZTpMZXR0ZXIAABIAQ09NUEFUX0RVUExFWF9NT0RFDwBEdXBsZXhNb2RlOjpPZmY=</config:config-item>
+   <config:config-item config:name="AddParaTableSpacingAtStart" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="Rsid" config:type="int">56857960</config:config-item>
+   <config:config-item config:name="EmbeddedDatabaseName" config:type="string"/>
+   <config:config-item config:name="FieldAutoUpdate" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="OutlineLevelYieldsNumbering" config:type="boolean">false</config:config-item>
    <config:config-item config:name="AlignTabStopPosition" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="DoNotJustifyLinesWithManualBreak" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="SubtractFlysAnchoredAtFlys" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="AddParaSpacingToTableCells" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="AddExternalLeading" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="CurrentDatabaseDataSource" config:type="string"/>
-   <config:config-item config:name="AllowPrintJobCancel" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="ProtectForm" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="CharacterCompressionType" config:type="short">0</config:config-item>
+   <config:config-item config:name="PrinterName" config:type="string">Generic Printer</config:config-item>
+   <config:config-item config:name="SaveGlobalDocumentLinks" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="PrinterPaperFromSetup" config:type="boolean">false</config:config-item>
    <config:config-item config:name="UseFormerLineSpacing" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="PrintDrawings" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="UseFormerTextWrapping" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="UnxForceZeroExtLeading" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="TabAtLeftIndentForParagraphsInList" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="RedlineProtectionKey" config:type="base64Binary"/>
-   <config:config-item config:name="PropLineSpacingShrinksFirstLine" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="AddParaLineSpacingToTableCells" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="UseFormerObjectPositioning" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="PrintGraphics" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="SurroundTextWrapSmall" config:type="boolean">true</config:config-item>
    <config:config-item config:name="ConsiderTextWrapOnObjPos" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="MsWordCompTrailingBlanks" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="TabAtLeftIndentForParagraphsInList" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="PrintRightPages" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="IgnoreFirstLineIndentInNumbering" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="RedlineProtectionKey" config:type="base64Binary"/>
+   <config:config-item config:name="DoNotJustifyLinesWithManualBreak" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="PrintProspectRTL" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="PrintEmptyPages" config:type="boolean">false</config:config-item>
    <config:config-item config:name="DoNotResetParaAttrsForNumFont" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="CurrentDatabaseCommandType" config:type="int">0</config:config-item>
+   <config:config-item config:name="AddFrameOffsets" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="IgnoreTabsAndBlanksForLineCalculation" config:type="boolean">true</config:config-item>
    <config:config-item config:name="LoadReadonly" config:type="boolean">false</config:config-item>
    <config:config-item config:name="DoNotCaptureDrawObjsOnPage" config:type="boolean">false</config:config-item>
    <config:config-item config:name="CurrentDatabaseCommand" config:type="string"/>
@@ -132,9 +156,9 @@
  <office:font-face-decls>
   <style:font-face style:name="OpenSymbol" svg:font-family="OpenSymbol" style:font-charset="x-symbol"/>
   <style:font-face style:name="Lucida Sans1" svg:font-family="&apos;Lucida Sans&apos;" style:font-family-generic="swiss"/>
-  <style:font-face style:name="Courier New" svg:font-family="&apos;Courier New&apos;" style:font-family-generic="modern" style:font-pitch="fixed"/>
-  <style:font-face style:name="Courier New2" svg:font-family="&apos;Courier New&apos;" style:font-family-generic="modern" style:font-pitch="variable"/>
-  <style:font-face style:name="Courier New1" svg:font-family="&apos;Courier New&apos;" style:font-adornments="Bold" style:font-family-generic="modern" style:font-pitch="variable"/>
+  <style:font-face style:name="Courier New2" svg:font-family="&apos;Courier New&apos;" style:font-family-generic="modern" style:font-pitch="fixed"/>
+  <style:font-face style:name="Courier New1" svg:font-family="&apos;Courier New&apos;" style:font-family-generic="modern" style:font-pitch="variable"/>
+  <style:font-face style:name="Courier New" svg:font-family="&apos;Courier New&apos;" style:font-adornments="Bold" style:font-family-generic="modern" style:font-pitch="variable"/>
   <style:font-face style:name="Arial" svg:font-family="Arial" style:font-family-generic="roman" style:font-pitch="variable"/>
   <style:font-face style:name="Calibri" svg:font-family="Calibri" style:font-family-generic="roman" style:font-pitch="variable"/>
   <style:font-face style:name="Cambria" svg:font-family="Cambria" style:font-family-generic="roman" style:font-pitch="variable"/>
@@ -163,7 +187,7 @@
   </style:default-style>
   <style:default-style style:family="paragraph">
    <style:paragraph-properties fo:orphans="2" fo:widows="2" fo:hyphenation-ladder-count="no-limit" style:text-autospace="ideograph-alpha" style:punctuation-wrap="hanging" style:line-break="strict" style:tab-stop-distance="0.4925in" style:writing-mode="lr-tb"/>
-   <style:text-properties style:use-window-font-color="true" style:font-name="Liberation Serif" fo:font-size="12pt" fo:language="en" fo:country="US" style:letter-kerning="true" style:font-name-asian="Songti SC" style:font-size-asian="10.5pt" style:language-asian="zh" style:country-asian="CN" style:font-name-complex="Arial Unicode MS" style:font-size-complex="12pt" style:language-complex="hi" style:country-complex="IN" fo:hyphenate="false" fo:hyphenation-remain-char-count="2" fo:hyphenation-push-char-count="2"/>
+   <style:text-properties style:use-window-font-color="true" style:font-name="Liberation Serif" fo:font-size="12pt" fo:language="en" fo:country="US" style:letter-kerning="true" style:font-name-asian="Songti SC" style:font-size-asian="10.5pt" style:language-asian="zh" style:country-asian="CN" style:font-name-complex="Arial Unicode MS" style:font-size-complex="12pt" style:language-complex="hi" style:country-complex="IN" fo:hyphenate="false" fo:hyphenation-remain-char-count="2" fo:hyphenation-push-char-count="2" loext:hyphenation-no-caps="false"/>
   </style:default-style>
   <style:default-style style:family="table">
    <style:table-properties table:border-model="collapsing"/>
@@ -308,7 +332,7 @@
      <style:tab-stop style:position="2.75in"/>
     </style:tab-stops>
    </style:paragraph-properties>
-   <style:text-properties style:font-name="Courier New1" fo:font-family="&apos;Courier New&apos;" style:font-style-name="Bold" style:font-family-generic="modern" style:font-pitch="variable" fo:font-size="11pt" fo:font-weight="bold" style:font-size-asian="10pt"/>
+   <style:text-properties style:font-name="Courier New" fo:font-family="&apos;Courier New&apos;" style:font-style-name="Bold" style:font-family-generic="modern" style:font-pitch="variable" fo:font-size="11pt" fo:font-weight="bold" style:font-size-asian="10pt"/>
   </style:style>
   <style:style style:name="Contents_20_5" style:display-name="Contents 5" style:family="paragraph" style:parent-style-name="Standard" style:next-style-name="Standard" style:auto-update="true" style:default-outline-level="" style:class="index">
    <style:paragraph-properties fo:margin-left="0.6665in" fo:margin-right="0in" fo:text-indent="0in" style:auto-text-indent="false"/>
@@ -459,7 +483,7 @@
    <style:text-properties fo:color="#800000" fo:language="zxx" fo:country="none" style:text-underline-style="solid" style:text-underline-width="auto" style:text-underline-color="font-color" style:language-asian="zxx" style:country-asian="none" style:language-complex="zxx" style:country-complex="none"/>
   </style:style>
   <style:style style:name="Code" style:family="text">
-   <style:text-properties style:font-name="Courier New1" fo:font-family="&apos;Courier New&apos;" style:font-style-name="Bold" style:font-family-generic="modern" style:font-pitch="variable" fo:font-size="12pt" fo:font-weight="bold" officeooo:rsid="006d968d" fo:background-color="transparent" style:font-size-asian="10pt" style:font-size-complex="12pt"/>
+   <style:text-properties style:font-name="Courier New" fo:font-family="&apos;Courier New&apos;" style:font-style-name="Bold" style:font-family-generic="modern" style:font-pitch="variable" fo:font-size="12pt" fo:font-weight="bold" officeooo:rsid="006d968d" fo:background-color="transparent" style:font-size-asian="10pt" style:font-size-complex="12pt"/>
   </style:style>
   <style:style style:name="Bullet_20_Symbols" style:display-name="Bullet Symbols" style:family="text">
    <style:text-properties style:font-name="OpenSymbol" fo:font-family="OpenSymbol" style:font-charset="x-symbol" style:font-name-asian="OpenSymbol" style:font-family-asian="OpenSymbol" style:font-charset-asian="x-symbol" style:font-name-complex="OpenSymbol" style:font-family-complex="OpenSymbol" style:font-charset-complex="x-symbol"/>
@@ -544,6 +568,68 @@
     </style:list-level-properties>
    </text:outline-level-style>
   </text:outline-style>
+  <text:list-style style:name="List_20_1" style:display-name="List 1">
+   <text:list-level-style-bullet text:level="1" text:style-name="Numbering_20_Symbols" text:bullet-char="•">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="0.1575in" fo:text-indent="-0.1575in" fo:margin-left="0.1575in"/>
+    </style:list-level-properties>
+    <style:text-properties style:font-name="OpenSymbol"/>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="2" text:style-name="Numbering_20_Symbols" text:bullet-char="•">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="0.3154in" fo:text-indent="-0.1575in" fo:margin-left="0.3154in"/>
+    </style:list-level-properties>
+    <style:text-properties style:font-name="OpenSymbol"/>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="3" text:style-name="Numbering_20_Symbols" text:bullet-char="•">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="0.472in" fo:text-indent="-0.1575in" fo:margin-left="0.472in"/>
+    </style:list-level-properties>
+    <style:text-properties style:font-name="OpenSymbol"/>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="4" text:style-name="Numbering_20_Symbols" text:bullet-char="•">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="0.6299in" fo:text-indent="-0.1575in" fo:margin-left="0.6299in"/>
+    </style:list-level-properties>
+    <style:text-properties style:font-name="OpenSymbol"/>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="5" text:style-name="Numbering_20_Symbols" text:bullet-char="•">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="0.7874in" fo:text-indent="-0.1575in" fo:margin-left="0.7874in"/>
+    </style:list-level-properties>
+    <style:text-properties style:font-name="OpenSymbol"/>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="6" text:style-name="Numbering_20_Symbols" text:bullet-char="•">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="0.9453in" fo:text-indent="-0.1575in" fo:margin-left="0.9453in"/>
+    </style:list-level-properties>
+    <style:text-properties style:font-name="OpenSymbol"/>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="7" text:style-name="Numbering_20_Symbols" text:bullet-char="•">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.102in" fo:text-indent="-0.1575in" fo:margin-left="1.102in"/>
+    </style:list-level-properties>
+    <style:text-properties style:font-name="OpenSymbol"/>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="8" text:style-name="Numbering_20_Symbols" text:bullet-char="•">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.2598in" fo:text-indent="-0.1575in" fo:margin-left="1.2598in"/>
+    </style:list-level-properties>
+    <style:text-properties style:font-name="OpenSymbol"/>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="9" text:style-name="Numbering_20_Symbols" text:bullet-char="•">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.4173in" fo:text-indent="-0.1575in" fo:margin-left="1.4173in"/>
+    </style:list-level-properties>
+    <style:text-properties style:font-name="OpenSymbol"/>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="10" text:style-name="Numbering_20_Symbols" text:bullet-char="•">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.5752in" fo:text-indent="-0.1575in" fo:margin-left="1.5752in"/>
+    </style:list-level-properties>
+    <style:text-properties style:font-name="OpenSymbol"/>
+   </text:list-level-style-bullet>
+  </text:list-style>
   <text:list-style style:name="Numbering_20_1" style:display-name="Numbering 1">
    <text:list-level-style-number text:level="1" text:style-name="Numbering_20_Symbols" style:num-suffix="." style:num-format="1">
     <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
@@ -647,68 +733,6 @@
      <style:list-level-label-alignment text:label-followed-by="space" fo:text-indent="-0.1965in" fo:margin-left="1.9689in"/>
     </style:list-level-properties>
    </text:list-level-style-number>
-  </text:list-style>
-  <text:list-style style:name="List_20_1" style:display-name="List 1">
-   <text:list-level-style-bullet text:level="1" text:style-name="Numbering_20_Symbols" text:bullet-char="•">
-    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
-     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="0.1575in" fo:text-indent="-0.1575in" fo:margin-left="0.1575in"/>
-    </style:list-level-properties>
-    <style:text-properties style:font-name="OpenSymbol"/>
-   </text:list-level-style-bullet>
-   <text:list-level-style-bullet text:level="2" text:style-name="Numbering_20_Symbols" text:bullet-char="•">
-    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
-     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="0.3154in" fo:text-indent="-0.1575in" fo:margin-left="0.3154in"/>
-    </style:list-level-properties>
-    <style:text-properties style:font-name="OpenSymbol"/>
-   </text:list-level-style-bullet>
-   <text:list-level-style-bullet text:level="3" text:style-name="Numbering_20_Symbols" text:bullet-char="•">
-    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
-     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="0.472in" fo:text-indent="-0.1575in" fo:margin-left="0.472in"/>
-    </style:list-level-properties>
-    <style:text-properties style:font-name="OpenSymbol"/>
-   </text:list-level-style-bullet>
-   <text:list-level-style-bullet text:level="4" text:style-name="Numbering_20_Symbols" text:bullet-char="•">
-    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
-     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="0.6299in" fo:text-indent="-0.1575in" fo:margin-left="0.6299in"/>
-    </style:list-level-properties>
-    <style:text-properties style:font-name="OpenSymbol"/>
-   </text:list-level-style-bullet>
-   <text:list-level-style-bullet text:level="5" text:style-name="Numbering_20_Symbols" text:bullet-char="•">
-    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
-     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="0.7874in" fo:text-indent="-0.1575in" fo:margin-left="0.7874in"/>
-    </style:list-level-properties>
-    <style:text-properties style:font-name="OpenSymbol"/>
-   </text:list-level-style-bullet>
-   <text:list-level-style-bullet text:level="6" text:style-name="Numbering_20_Symbols" text:bullet-char="•">
-    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
-     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="0.9453in" fo:text-indent="-0.1575in" fo:margin-left="0.9453in"/>
-    </style:list-level-properties>
-    <style:text-properties style:font-name="OpenSymbol"/>
-   </text:list-level-style-bullet>
-   <text:list-level-style-bullet text:level="7" text:style-name="Numbering_20_Symbols" text:bullet-char="•">
-    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
-     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.102in" fo:text-indent="-0.1575in" fo:margin-left="1.102in"/>
-    </style:list-level-properties>
-    <style:text-properties style:font-name="OpenSymbol"/>
-   </text:list-level-style-bullet>
-   <text:list-level-style-bullet text:level="8" text:style-name="Numbering_20_Symbols" text:bullet-char="•">
-    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
-     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.2598in" fo:text-indent="-0.1575in" fo:margin-left="1.2598in"/>
-    </style:list-level-properties>
-    <style:text-properties style:font-name="OpenSymbol"/>
-   </text:list-level-style-bullet>
-   <text:list-level-style-bullet text:level="9" text:style-name="Numbering_20_Symbols" text:bullet-char="•">
-    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
-     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.4173in" fo:text-indent="-0.1575in" fo:margin-left="1.4173in"/>
-    </style:list-level-properties>
-    <style:text-properties style:font-name="OpenSymbol"/>
-   </text:list-level-style-bullet>
-   <text:list-level-style-bullet text:level="10" text:style-name="Numbering_20_Symbols" text:bullet-char="•">
-    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
-     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.5752in" fo:text-indent="-0.1575in" fo:margin-left="1.5752in"/>
-    </style:list-level-properties>
-    <style:text-properties style:font-name="OpenSymbol"/>
-   </text:list-level-style-bullet>
   </text:list-style>
   <text:list-style style:name="No_20_List" style:display-name="No List">
    <text:list-level-style-number text:level="1" style:num-suffix="." style:num-format="">
@@ -3590,12 +3614,16 @@
   <style:style style:name="P260" style:family="paragraph">
    <loext:graphic-properties draw:fill="none" draw:fill-color="#ffffff"/>
    <style:paragraph-properties style:writing-mode="lr-tb"/>
-   <style:text-properties style:font-name="Courier New2" fo:font-size="10pt" fo:font-weight="bold" style:font-name-complex="Courier New2"/>
+   <style:text-properties style:font-name="Courier New1" fo:font-size="11pt" fo:font-weight="bold" style:font-size-asian="11pt" style:font-weight-asian="bold" style:font-size-complex="11pt" style:font-weight-complex="bold"/>
   </style:style>
   <style:style style:name="P261" style:family="paragraph">
    <loext:graphic-properties draw:fill="none" draw:fill-color="#ffffff"/>
    <style:paragraph-properties style:writing-mode="lr-tb"/>
-   <style:text-properties style:font-name="Courier New2" fo:font-size="11pt" fo:font-weight="bold" style:font-size-asian="11pt" style:font-weight-asian="bold" style:font-size-complex="11pt" style:font-weight-complex="bold"/>
+  </style:style>
+  <style:style style:name="P250" style:family="paragraph">
+   <loext:graphic-properties draw:fill="none" draw:fill-color="#ffffff"/>
+   <style:paragraph-properties style:writing-mode="lr-tb"/>
+   <style:text-properties style:font-name="Courier New1" fo:font-size="10pt" fo:font-weight="bold" style:font-name-complex="Courier New1"/>
   </style:style>
   <style:style style:name="P262" style:family="paragraph">
    <loext:graphic-properties draw:fill="none" draw:fill-color="#ffffff"/>
@@ -3734,28 +3762,28 @@
    <style:text-properties officeooo:rsid="02da9ca5" style:font-weight-asian="bold" style:font-weight-complex="bold"/>
   </style:style>
   <style:style style:name="T45" style:family="text">
-   <style:text-properties officeooo:rsid="032b86cc" style:font-weight-asian="bold" style:font-weight-complex="bold"/>
-  </style:style>
-  <style:style style:name="T46" style:family="text">
-   <style:text-properties officeooo:rsid="03435f4b"/>
-  </style:style>
-  <style:style style:name="T47" style:family="text">
    <style:text-properties officeooo:rsid="023116ea"/>
   </style:style>
-  <style:style style:name="T48" style:family="text">
+  <style:style style:name="T46" style:family="text">
    <style:text-properties style:font-name="Arial2"/>
   </style:style>
-  <style:style style:name="T49" style:family="text">
+  <style:style style:name="T47" style:family="text">
    <style:text-properties style:font-name="Arial2" fo:font-weight="normal" style:font-weight-asian="normal" style:font-weight-complex="normal"/>
   </style:style>
-  <style:style style:name="T50" style:family="text">
+  <style:style style:name="T48" style:family="text">
    <style:text-properties style:font-name="Arial2" fo:font-weight="normal" officeooo:rsid="023116ea" style:font-weight-asian="normal" style:font-weight-complex="normal"/>
   </style:style>
-  <style:style style:name="T51" style:family="text">
+  <style:style style:name="T49" style:family="text">
    <style:text-properties style:font-name="Arial2" fo:font-weight="normal" officeooo:rsid="024fd860" style:font-weight-asian="normal" style:font-weight-complex="normal"/>
   </style:style>
-  <style:style style:name="T52" style:family="text">
+  <style:style style:name="T50" style:family="text">
    <style:text-properties style:font-name="Arial2" fo:font-weight="normal" officeooo:rsid="0274b00a" style:font-weight-asian="normal" style:font-weight-complex="normal"/>
+  </style:style>
+  <style:style style:name="T51" style:family="text">
+   <style:text-properties style:font-name="Arial2" fo:font-weight="normal" officeooo:rsid="033f7bb0" style:font-weight-asian="normal" style:font-weight-complex="normal"/>
+  </style:style>
+  <style:style style:name="T52" style:family="text">
+   <style:text-properties style:font-name="Arial2" fo:font-weight="normal" officeooo:rsid="034fcf47" style:font-weight-asian="normal" style:font-weight-complex="normal"/>
   </style:style>
   <style:style style:name="T53" style:family="text">
    <style:text-properties style:font-name="Arial2" fo:font-weight="normal" officeooo:rsid="033f7bb0" style:font-weight-asian="normal" style:font-weight-complex="normal"/>
@@ -4421,7 +4449,7 @@
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Liberation Serif" fo:font-size="10pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:text-underline-mode="continuous" style:text-overline-mode="continuous" style:text-line-through-mode="continuous" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="Songti SC" style:font-size-asian="10.5pt" style:language-asian="zh" style:country-asian="CN" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Arial Unicode MS" style:font-size-complex="12pt" style:language-complex="hi" style:country-complex="IN" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:text-scale="100%" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
   <style:style style:name="fr1" style:family="graphic" style:parent-style-name="Graphics">
-   <style:graphic-properties style:vertical-pos="from-top" style:horizontal-pos="center" style:horizontal-rel="paragraph" style:mirror="none" fo:clip="rect(0in, 0in, 0in, 0in)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
+   <style:graphic-properties style:vertical-pos="top" style:vertical-rel="baseline" style:horizontal-pos="center" style:horizontal-rel="paragraph" style:mirror="none" fo:clip="rect(0in, 0in, 0in, 0in)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
   </style:style>
   <style:style style:name="fr2" style:family="graphic" style:parent-style-name="Graphics">
    <style:graphic-properties fo:margin-left="0in" fo:margin-right="0in" fo:margin-top="0in" fo:margin-bottom="0in" style:vertical-pos="from-top" style:horizontal-pos="center" style:horizontal-rel="paragraph" fo:background-color="#ffffff" style:background-transparency="0%" draw:fill="solid" draw:fill-color="#ffffff" draw:opacity="100%" fo:padding="0in" fo:border="none" style:mirror="none" fo:clip="rect(0in, 0in, 0in, 0in)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
@@ -4468,16 +4496,24 @@
    </style:section-properties>
   </style:style>
   <style:style style:name="gr1" style:family="graphic">
-   <style:graphic-properties draw:stroke="none" svg:stroke-color="#000000" draw:fill="none" draw:fill-color="#ffffff" fo:min-height="0.711in" style:run-through="foreground" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="middle" style:vertical-rel="baseline" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" draw:wrap-influence-on-position="once-concurrent" style:flow-with-text="false"/>
+   <style:graphic-properties draw:stroke="none" svg:stroke-color="#000000" draw:fill="none" draw:fill-color="#ffffff" fo:min-height="0.4283in" style:run-through="foreground" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="middle" style:vertical-rel="baseline" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" draw:wrap-influence-on-position="once-concurrent" loext:allow-overlap="true" style:flow-with-text="false"/>
+   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="gr2" style:family="graphic">
-   <style:graphic-properties draw:stroke="none" svg:stroke-color="#000000" draw:fill="none" draw:fill-color="#ffffff" fo:min-height="7.9547in" style:run-through="foreground" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="middle" style:vertical-rel="baseline" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" draw:wrap-influence-on-position="once-concurrent" style:flow-with-text="false"/>
+   <style:graphic-properties draw:stroke="none" svg:stroke-color="#000000" draw:fill="none" draw:fill-color="#ffffff" fo:min-height="0.711in" style:run-through="foreground" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="middle" style:vertical-rel="baseline" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" draw:wrap-influence-on-position="once-concurrent" loext:allow-overlap="true" style:flow-with-text="false"/>
+   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="gr3" style:family="graphic">
-   <style:graphic-properties draw:stroke="none" svg:stroke-color="#000000" draw:fill="none" draw:fill-color="#ffffff" fo:min-height="0.6in" style:run-through="foreground" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="middle" style:vertical-rel="baseline" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" draw:wrap-influence-on-position="once-concurrent" style:flow-with-text="false"/>
+   <style:graphic-properties draw:stroke="none" svg:stroke-color="#000000" draw:fill="none" draw:fill-color="#ffffff" fo:min-height="0.3465in" style:run-through="foreground" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="middle" style:vertical-rel="baseline" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" draw:wrap-influence-on-position="once-concurrent" loext:allow-overlap="true" style:flow-with-text="false"/>
+   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="gr4" style:family="graphic">
-   <style:graphic-properties draw:stroke="none" svg:stroke-color="#000000" draw:fill="none" draw:fill-color="#ffffff" fo:min-height="0.3465in" style:run-through="foreground" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="middle" style:vertical-rel="baseline" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" draw:wrap-influence-on-position="once-concurrent" style:flow-with-text="false"/>
+   <style:graphic-properties draw:stroke="none" svg:stroke-color="#000000" draw:fill="none" draw:fill-color="#ffffff" fo:min-height="0.6in" style:run-through="foreground" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="middle" style:vertical-rel="baseline" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" draw:wrap-influence-on-position="once-concurrent" loext:allow-overlap="true" style:flow-with-text="false"/>
+   <style:paragraph-properties style:writing-mode="lr-tb"/>
+  </style:style>
+  <style:style style:name="gr5" style:family="graphic">
+   <style:graphic-properties draw:stroke="none" svg:stroke-color="#000000" draw:fill="none" draw:fill-color="#ffffff" fo:min-height="7.9547in" style:run-through="foreground" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="middle" style:vertical-rel="baseline" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" draw:wrap-influence-on-position="once-concurrent" loext:allow-overlap="true" style:flow-with-text="false"/>
+   <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="gr5" style:family="graphic">
    <style:graphic-properties draw:stroke="none" svg:stroke-color="#000000" draw:fill="none" draw:fill-color="#ffffff" fo:min-height="0.4283in" style:run-through="foreground" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="middle" style:vertical-rel="baseline" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" draw:wrap-influence-on-position="once-concurrent" style:flow-with-text="false"/>
@@ -4520,7 +4556,7 @@
    <text:p text:style-name="P202">OpenCPI<text:span text:style-name="T27"><text:variable-set text:name="OCPIGUI" text:display="none" text:formula="ooow:2" office:value-type="float" office:value="2" style:data-style-name="N0"/></text:span><text:line-break/><text:span text:style-name="T27">Tutorial 3: Developing an RCC Worke</text:span><text:bookmark-start text:name="__DdeLink__562138_434572472"/><text:span text:style-name="T27">r</text:span><text:bookmark-end text:name="__DdeLink__562138_434572472"/></text:p>
    <text:section text:style-name="Sect1" text:name="Section1" text:protected="true">
     <text:section-source xlink:href="../reference/shared/release.fodt" text:filter-name="OpenDocument Text Flat XML"/>
-    <text:p text:style-name="ReleaseSubtitle">OpenCPI Release: develop</text:p>
+    <text:p text:style-name="ReleaseSubtitle">OpenCPI Release:  v2.4.7</text:p>
    </text:section>
    <text:p text:style-name="P132"><text:bookmark-start text:name="__DdeLink__23165_3173784371"/><text:bookmark-start text:name="__DdeLink__24824_3173784371"/>Revision History<text:bookmark-start text:name="__DdeLink__37604_3300564723"/><text:bookmark-start text:name="__DdeLink__37499_3300564723"/><text:bookmark-start text:name="__DdeLink__30316_3300564723"/></text:p>
    <table:table table:name="Table2" table:style-name="Table2">
@@ -5113,18 +5149,18 @@
    <text:p text:style-name="P84"><text:bookmark-start text:name="__DdeLink__20147_3150507139"/><text:bookmark-start text:name="__DdeLink__10398_2557612084"/><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T229">Instructions for copying these items from the </text:span></text:span><text:span text:style-name="Code">ocpi.tutorial</text:span><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T229"> project into the “demo” tutorial project are provided in the relevant sections of this document. <text:s/>The source code for these items is also available as text in the relevant sections of this document that you can copy and paste into the relevant files following the instructions given in the section.</text:span></text:span></text:p>
    <text:p text:style-name="P84"><text:bookmark-start text:name="__DdeLink__10695_3150507139"/><text:span text:style-name="Strong_20_Emphasis"><text:span text:style-name="T230">Note:</text:span></text:span><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T230"> when copying and pasting text from this document, be sure to remove any line breaks in code or command lines.</text:span></text:span><text:bookmark-end text:name="__DdeLink__10695_3150507139"/><text:bookmark-end text:name="__DdeLink__20147_3150507139"/><text:bookmark-end text:name="__DdeLink__10398_2557612084"/></text:p>
    <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc16777_4114161630"/>Prerequisites to <text:span text:style-name="T28">Using </text:span>This Tutorial<text:bookmark-end text:name="__RefHeading___Toc16777_4114161630"/></text:h>
-   <text:p text:style-name="P85"><text:bookmark-start text:name="__DdeLink__20170_3150507139"/><text:bookmark-start text:name="__DdeLink__10435_2557612084"/><text:span text:style-name="T33">This tutorial (Tutorial </text:span><text:span text:style-name="T37">3</text:span><text:span text:style-name="T33">) has the same system prerequisites as </text:span><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/tutorials/Tutorial_1_Component_Based_Development_Intro_GUI.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T34">Tutorial 1, “Component-based Development”</text:span></text:a><text:span text:style-name="T34">.</text:span><text:bookmark-end text:name="__DdeLink__20170_3150507139"/><text:bookmark-end text:name="__DdeLink__10435_2557612084"/><text:span text:style-name="T34"> <text:s/></text:span><text:span text:style-name="T32">See the prerequisites section in Tutorial 1 for details.</text:span></text:p>
-   <text:p text:style-name="P8"><text:bookmark-start text:name="__DdeLink__16718_4114161630"/><text:span text:style-name="T33">B</text:span><text:span text:style-name="T34">efore you begin this tutorial, </text:span><text:span text:style-name="T35">you should have</text:span><text:span text:style-name="T34"> </text:span><text:span text:style-name="T35">successfully </text:span><text:span text:style-name="T34">completed </text:span><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/tutorials/Tutorial_1_Component_Based_Development_Intro_GUI.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T34">Tutorial 1, “Component-based Development”</text:span></text:a><text:bookmark-end text:name="__DdeLink__16718_4114161630"/><text:span text:style-name="T34"> </text:span><text:span text:style-name="T35">and Tutorial 2, </text:span><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/tutorials/Tutorial_2_Design_HDL_Assemblies_CLI.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T35">“</text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/tutorials/Tutorial_2_Design_HDL_Assemblies_CLI.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T36">Designing Applications and HDL</text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/tutorials/Tutorial_2_Design_HDL_Assemblies_CLI.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T35"> Assemblies”</text:span></text:a><text:span text:style-name="T35">.</text:span><text:bookmark-start text:name="__DdeLink__15754_310614188"/></text:p>
+   <text:p text:style-name="P85"><text:bookmark-start text:name="__DdeLink__20170_3150507139"/><text:bookmark-start text:name="__DdeLink__10435_2557612084"/><text:span text:style-name="T33">This tutorial (Tutorial </text:span><text:span text:style-name="T37">3</text:span><text:span text:style-name="T33">) has the same system prerequisites as </text:span><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/tutorials/Tutorial_1_Component_Based_Development_Intro_GUI.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T34">Tutorial 1, “Component-based Development”</text:span></text:a><text:span text:style-name="T34">.</text:span><text:bookmark-end text:name="__DdeLink__20170_3150507139"/><text:bookmark-end text:name="__DdeLink__10435_2557612084"/><text:span text:style-name="T34"> <text:s/></text:span><text:span text:style-name="T32">See the prerequisites section in Tutorial 1 for details.</text:span></text:p>
+   <text:p text:style-name="P8"><text:bookmark-start text:name="__DdeLink__16718_4114161630"/><text:span text:style-name="T33">B</text:span><text:span text:style-name="T34">efore you begin this tutorial, </text:span><text:span text:style-name="T35">you should have</text:span><text:span text:style-name="T34"> </text:span><text:span text:style-name="T35">successfully </text:span><text:span text:style-name="T34">completed </text:span><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/tutorials/Tutorial_1_Component_Based_Development_Intro_GUI.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T34">Tutorial 1, “Component-based Development”</text:span></text:a><text:bookmark-end text:name="__DdeLink__16718_4114161630"/><text:span text:style-name="T34"> </text:span><text:span text:style-name="T35">and Tutorial 2, </text:span><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/tutorials/Tutorial_2_Design_HDL_Assemblies_CLI.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T35">“</text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/tutorials/Tutorial_2_Design_HDL_Assemblies_CLI.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T36">Designing Applications and HDL</text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/tutorials/Tutorial_2_Design_HDL_Assemblies_CLI.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T35"> Assemblies”</text:span></text:a><text:span text:style-name="T35">.</text:span><text:bookmark-start text:name="__DdeLink__15754_310614188"/></text:p>
    <text:p text:style-name="P17"><text:span text:style-name="T31">W</text:span>e recommend reading the following briefings before getting started with the tutorial:<text:bookmark-end text:name="__DdeLink__15754_310614188"/></text:p>
    <text:list xml:id="list162022670221365" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
-     <text:p text:style-name="P147"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/briefings/Briefing_4_Component_and_Worker_Overview.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link">Briefing 4, “Component and Worker Overview”</text:a></text:p>
+     <text:p text:style-name="P147"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/briefings/Briefing_4_Component_and_Worker_Overview.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link">Briefing 4, “Component and Worker Overview”</text:a></text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P147"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/briefings/Briefing_5_OpenCPI_Unit_Test_Framework_Introduction.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link">Briefing 5, “</text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/briefings/Briefing_5_OpenCPI_Unit_Test_Framework_Introduction.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T234">OpenCPI Unit Test Framework: Introduction</text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/briefings/Briefing_5_OpenCPI_Unit_Test_Framework_Introduction.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link">”</text:a></text:p>
+     <text:p text:style-name="P147"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/briefings/Briefing_5_OpenCPI_Unit_Test_Framework_Introduction.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link">Briefing 5, “</text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/briefings/Briefing_5_OpenCPI_Unit_Test_Framework_Introduction.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T234">OpenCPI Unit Test Framework: Introduction</text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/briefings/Briefing_5_OpenCPI_Unit_Test_Framework_Introduction.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link">”</text:a></text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P147"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/briefings/Briefing_6_OpenCPI_RCC_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link">Briefing 6, “OpenCPI RCC Development”</text:a></text:p>
+     <text:p text:style-name="P147"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/briefings/Briefing_6_OpenCPI_RCC_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link">Briefing 6, “OpenCPI RCC Development”</text:a></text:p>
     </text:list-item>
    </text:list>
    <text:h text:style-name="P137" text:outline-level="2"><text:bookmark-start text:name="_Toc245388431"/><text:bookmark-start text:name="_Toc224890089"/><text:bookmark-start text:name="_Toc141837257"/><text:bookmark-start text:name="__RefHeading___Toc20421_4114161630"/><text:bookmark-start text:name="_Toc141318608"/>D<text:bookmark-end text:name="_Toc245388431"/><text:bookmark-end text:name="_Toc224890089"/><text:bookmark-end text:name="_Toc141837257"/><text:bookmark-end text:name="_Toc141318608"/>ocumentation References<text:bookmark-end text:name="__RefHeading___Toc20421_4114161630"/></text:h>
@@ -5153,7 +5189,7 @@
       <text:p text:style-name="P93"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T3">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.C2" office:value-type="string">
-      <text:p text:style-name="P93"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/OpenCPI_User.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T4">https://opencpi.gitlab.io/releases/</text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/OpenCPI_User.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T5">latest</text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/OpenCPI_User.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T4">/docs/OpenCPI_User.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P93"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/OpenCPI_User.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T4">https://opencpi.gitlab.io/releases/</text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/OpenCPI_User.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T5">latest</text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/OpenCPI_User.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T4">/docs/OpenCPI_User.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row table:style-name="Table3.1">
@@ -5164,7 +5200,7 @@
       <text:p text:style-name="P93"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T3">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.C3" office:value-type="string">
-      <text:p text:style-name="P93"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/OpenCPI_Application_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T4">https://opencpi.gitlab.io/releases/</text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/OpenCPI_Application_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T5">latest</text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/OpenCPI_Application_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T4">/docs/OpenCPI_Application_Development.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P93"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/OpenCPI_Application_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T4">https://opencpi.gitlab.io/releases/</text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/OpenCPI_Application_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T5">latest</text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/OpenCPI_Application_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T4">/docs/OpenCPI_Application_Development.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row table:style-name="Table3.1">
@@ -5175,7 +5211,7 @@
       <text:p text:style-name="P93"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T3">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.C4" office:value-type="string">
-      <text:p text:style-name="P93"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/OpenCPI_Component_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T4">https://opencpi.gitlab.io/releases/</text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/OpenCPI_Component_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T5">latest</text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/OpenCPI_Component_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T4">/docs/OpenCPI_Component_Development.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P93"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/OpenCPI_Component_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T4">https://opencpi.gitlab.io/releases/</text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/OpenCPI_Component_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T5">latest</text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/OpenCPI_Component_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T4">/docs/OpenCPI_Component_Development.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row table:style-name="Table3.1">
@@ -5186,7 +5222,7 @@
       <text:p text:style-name="P93"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T3">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.C5" office:value-type="string">
-      <text:p text:style-name="P93"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/OpenCPI_HDL_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T4">https://opencpi.gitlab.io/releases/</text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/OpenCPI_HDL_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T5">latest</text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/OpenCPI_HDL_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T4">/docs/OpenCPI_HDL_Development.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P93"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/OpenCPI_HDL_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T4">https://opencpi.gitlab.io/releases/</text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/OpenCPI_HDL_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T5">latest</text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/OpenCPI_HDL_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T4">/docs/OpenCPI_HDL_Development.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row table:style-name="Table3.1">
@@ -5197,7 +5233,7 @@
       <text:p text:style-name="P93"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T3">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.C6" office:value-type="string">
-      <text:p text:style-name="P93"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/OpenCPI_RCC_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T4">https://opencpi.gitlab.io/releases/</text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/OpenCPI_RCC_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T5">latest</text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/OpenCPI_RCC_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T4">/docs/OpenCPI_RCC_Development.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P93"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/OpenCPI_RCC_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T4">https://opencpi.gitlab.io/releases/</text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/OpenCPI_RCC_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T5">latest</text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/OpenCPI_RCC_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T4">/docs/OpenCPI_RCC_Development.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
    </table:table>
@@ -6743,8 +6779,8 @@ Description automatically generated</svg:desc>
    <text:p text:style-name="P52"><text:span text:style-name="Default_20_Paragraph_20_Font"/></text:p>
    <text:h text:style-name="P190" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc48725_28991016"/>Create Worker<text:bookmark-end text:name="__RefHeading___Toc48725_28991016"/></text:h>
    <text:p text:style-name="P25"><text:span text:style-name="T96">We’ve defined the </text:span><text:span text:style-name="Code">peak_detector</text:span><text:span text:style-name="T96"> component </text:span>spec. <text:s/><text:span text:style-name="T96">Now we need to </text:span>create the workers <text:span text:style-name="T95">that implement them. <text:s/>In our case, we only need to create one implementation – an RCC implementation – which uses the RCC authoring model. <text:s/></text:span></text:p>
-   <text:p text:style-name="P26"><text:span text:style-name="T158">Recall from the </text:span><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/OpenCPI_User.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="FirstEmphasis">OpenCPI User Guide</text:span></text:a><text:span text:style-name="T158"> and the introductory briefings that w</text:span>orkers run on <text:span text:style-name="FirstEmphasis">containers</text:span>, which provide the runtime environment for executing workers and manage their execution on a processor. <text:s/><text:span text:style-name="T158">An </text:span><text:span text:style-name="FirstEmphasis">RCC worker </text:span><text:span text:style-name="T158">implements worker methods called by the container and can also call container methods. <text:s/></text:span></text:p>
-   <text:p text:style-name="P26"><text:span text:style-name="T158">RCC workers use symbols, data types and ordinals defined in a header file that is generated for the worker when it is created. <text:s/>These elements are based on the component spec (OCS), protocol spec (OPS) and worker description (OWD) and include the implementation name, the control operations implemented, the properties that require notification, the static memory allocation requirements of the implementation code and the minimum number of buffers required at each port. <text:s/>The information in the OCS, OPS and OWD is used to drive the code generation and build process for the worker. <text:s/>An RCC worker can call a small subset of Posix and ISO-C runtime libraries that provide the minimal environment required of embedded systems. <text:s/>You can read more about these local services and about RCC worker OWD elements, the RCC worker interface and RCC worker code generation in the </text:span><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/OpenCPI_RCC_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="FirstEmphasis">OpenCPI RCC Development Guide</text:span></text:a><text:span text:style-name="T158">.</text:span></text:p>
+   <text:p text:style-name="P26"><text:span text:style-name="T158">Recall from the </text:span><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/OpenCPI_User.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="FirstEmphasis">OpenCPI User Guide</text:span></text:a><text:span text:style-name="T158"> and the introductory briefings that w</text:span>orkers run on <text:span text:style-name="FirstEmphasis">containers</text:span>, which provide the runtime environment for executing workers and manage their execution on a processor. <text:s/><text:span text:style-name="T158">An </text:span><text:span text:style-name="FirstEmphasis">RCC worker </text:span><text:span text:style-name="T158">implements worker methods called by the container and can also call container methods. <text:s/></text:span></text:p>
+   <text:p text:style-name="P26"><text:span text:style-name="T158">RCC workers use symbols, data types and ordinals defined in a header file that is generated for the worker when it is created. <text:s/>These elements are based on the component spec (OCS), protocol spec (OPS) and worker description (OWD) and include the implementation name, the control operations implemented, the properties that require notification, the static memory allocation requirements of the implementation code and the minimum number of buffers required at each port. <text:s/>The information in the OCS, OPS and OWD is used to drive the code generation and build process for the worker. <text:s/>An RCC worker can call a small subset of Posix and ISO-C runtime libraries that provide the minimal environment required of embedded systems. <text:s/>You can read more about these local services and about RCC worker OWD elements, the RCC worker interface and RCC worker code generation in the </text:span><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/OpenCPI_RCC_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="FirstEmphasis">OpenCPI RCC Development Guide</text:span></text:a><text:span text:style-name="T158">.</text:span></text:p>
    <text:p text:style-name="P33"><text:bookmark-start text:name="__DdeLink__29110_1709236796"/><text:span text:style-name="T159">In Tutorial 1, we created an RCC worker, which generated an </text:span><text:span text:style-name="Code">rcc</text:span><text:span text:style-name="T95"> subdirectory with the worker’s OWD XML file and a “skeleton” source code file in the C++ language that we updated to include the C++ code for the worker. <text:s/>We’ll do the same thing here for our </text:span><text:span text:style-name="Code">peak_detector</text:span><text:span text:style-name="T95"> worker.</text:span><text:bookmark-end text:name="__DdeLink__29110_1709236796"/></text:p>
    <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc12730_2460451554"/>Create Worker OWD and Skeleton File<text:bookmark-end text:name="__RefHeading___Toc12730_2460451554"/></text:h>
    <text:section text:style-name="Sect1" text:name="Section3" text:condition="ooow:OCPIGUI LEQ 1" text:display="condition">
@@ -8371,7 +8407,7 @@ Description automatically generated with medium confidence</svg:desc>
      <text:p text:style-name="P170">Provide a <text:span text:style-name="Code">run</text:span> method that checks for end <text:span text:style-name="T148">of input data</text:span>, makes sure there is room on the output port <text:span text:style-name="T148">for the output data</text:span>, performs the <text:span text:style-name="T114">necessary function for the component</text:span> and advances the ports.</text:p>
     </text:list-item>
    </text:list>
-   <text:p text:style-name="P45">The next sections describe how this code <text:span text:style-name="T228">is implemented</text:span> for the <text:span text:style-name="Code">peak_detector</text:span> worker. <text:s/>For details on RCC worker methods and on developing RCC workers, see the <text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/OpenCPI_RCC_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T118">OpenCPI RCC Development Guide</text:span></text:a>.</text:p>
+   <text:p text:style-name="P45">The next sections describe how this code <text:span text:style-name="T228">is implemented</text:span> for the <text:span text:style-name="Code">peak_detector</text:span> worker. <text:s/>For details on RCC worker methods and on developing RCC workers, see the <text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/OpenCPI_RCC_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T118">OpenCPI RCC Development Guide</text:span></text:a>.</text:p>
    <text:h text:style-name="P183" text:outline-level="3">Initializ<text:span text:style-name="T113">ation Code</text:span></text:h>
    <text:p text:style-name="P56"><text:span text:style-name="T114">We need to put the persistent local variables </text:span><text:span text:style-name="Code">min_buff</text:span><text:span text:style-name="T114"> and </text:span><text:span text:style-name="Code">max_buff</text:span><text:span text:style-name="T114"> into the body of the </text:span><text:span text:style-name="Code">Peak_detectorWorker</text:span><text:span text:style-name="T114"> class, which exists in the generated skeleton file. <text:s/>These internal buffers should match the </text:span><text:span text:style-name="Code">short</text:span><text:span text:style-name="T112"> type defined for the </text:span><text:span text:style-name="Code">min_peak</text:span><text:span text:style-name="T112"> and </text:span><text:span text:style-name="Code">max_peak</text:span><text:span text:style-name="T112"> properties in the OCS. <text:s/>We then initialize them in the </text:span><text:span text:style-name="Code">start</text:span><text:span text:style-name="T112"> RCC worker method: </text:span><text:span text:style-name="Code">max_buff</text:span><text:span text:style-name="T112"> to most negative (-32767) and </text:span><text:span text:style-name="Code">min_buff</text:span><text:span text:style-name="T112"> to most positive (32768) values. <text:s/>We use the </text:span><text:span text:style-name="Code">start</text:span><text:span text:style-name="T112"> method because we’re initializing property values and so that initialization occurs both when the worker is first started and when it is resumed after being suspended. <text:s/>The following code shows the start method initializing these variables.</text:span></text:p>
    <text:p text:style-name="Code"><text:soft-page-break/>class Peak_detectorWorker : public Peak_detectorWorkerBase {<text:line-break/> <text:s/>int16_t max_buff, min_buff;<text:line-break/> <text:line-break/> RCCResult start(){<text:line-break/> <text:s text:c="3"/>max_buff = -32768; // initialize max to most neg<text:line-break/> <text:s text:c="3"/>min_buff = 32767; <text:s/>// initialize min to most pos<text:line-break/> <text:s text:c="3"/>return RCC_OK;<text:line-break/> <text:s/>}</text:p>
@@ -8380,7 +8416,7 @@ Description automatically generated with medium confidence</svg:desc>
    <text:p text:style-name="P41"><text:span text:style-name="T115">Our </text:span><text:span text:style-name="Code">run</text:span><text:span text:style-name="T115"> </text:span>RCC <text:span text:style-name="T115">w</text:span>orker <text:span text:style-name="T115">m</text:span>ethod <text:span text:style-name="T115">also needs to m</text:span>ake sure there is room on the output port <text:span text:style-name="T148">for the outgoing I/Q data</text:span>. <text:s/><text:span text:style-name="T178">Since it is passing data from input to output, it simply needs to make the output message the same size as the input message.</text:span></text:p>
    <text:p text:style-name="P68"><text:span text:style-name="T178">Also, to make this code not care about opcodes, it simply </text:span><text:span text:style-name="T181">copies </text:span><text:span text:style-name="T178">the opcode from input message to output.</text:span></text:p>
    <text:p text:style-name="P67">The iq() accessor of the input and output ports comes from the definition of the IQ messages found in the <text:span text:style-name="Code">iqstream_protocol.xml</text:span> in the <text:span text:style-name="Code">ocpi.core</text:span> built-in project (in <text:span text:style-name="Code"><text:span text:style-name="T232">$OCPI_ROOT_DIR</text:span></text:span><text:span text:style-name="Code">/projects/core/specs/iqstream_protocol.xml</text:span>), <text:span text:style-name="T233">where </text:span><text:span text:style-name="Code">$OCPI_ROOT_DIR</text:span><text:span text:style-name="T233"> is the OpenCPI installation directory.</text:span></text:p>
-   <text:p text:style-name="P57"><text:span text:style-name="T195">The RCC authoring model provides buffer management data members and methods. <text:s/>Here, the </text:span><text:span text:style-name="Code"><text:span text:style-name="T194">opCode</text:span></text:span><text:span text:style-name="T196"> method retrieves the opcode of the input buffer and the </text:span><text:span text:style-name="Code"><text:span text:style-name="T194">setOpCode</text:span></text:span><text:span text:style-name="T196"> method sets it in the output port. <text:s/>For details, see the </text:span><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/OpenCPI_RCC_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="FirstEmphasis"><text:span text:style-name="T194">OpenCPI RCC Development Guide</text:span></text:span></text:a><text:span text:style-name="T196">.</text:span></text:p>
+   <text:p text:style-name="P57"><text:span text:style-name="T195">The RCC authoring model provides buffer management data members and methods. <text:s/>Here, the </text:span><text:span text:style-name="Code"><text:span text:style-name="T194">opCode</text:span></text:span><text:span text:style-name="T196"> method retrieves the opcode of the input buffer and the </text:span><text:span text:style-name="Code"><text:span text:style-name="T194">setOpCode</text:span></text:span><text:span text:style-name="T196"> method sets it in the output port. <text:s/>For details, see the </text:span><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/OpenCPI_RCC_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="FirstEmphasis"><text:span text:style-name="T194">OpenCPI RCC Development Guide</text:span></text:span></text:a><text:span text:style-name="T196">.</text:span></text:p>
    <text:p text:style-name="P42">The following code <text:span text:style-name="T224">in</text:span> the <text:span text:style-name="Code">run</text:span> method <text:span text:style-name="T224">is used to make sure there is room in the output buffer</text:span>:</text:p>
    <text:p text:style-name="Code">const size_t num_of_elements = in.iq().data().size();<text:line-break/>out.iq().data().resize(num_of_elements);<text:line-break/>out.setOpCode(in.opCode());</text:p>
    <text:h text:style-name="P184" text:outline-level="3">“Run” Function Code</text:h>
@@ -9543,7 +9579,7 @@ Description automatically generated with medium confidence</svg:desc>
    <text:p text:style-name="P44"><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T121">Next, we’ll create the unit test for </text:span></text:span><text:span text:style-name="Code">peak_detector</text:span><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T121"> and then run it.</text:span></text:span></text:p>
    <text:h text:style-name="P190" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc48733_28991016"/>Create <text:span text:style-name="T245">Unit </text:span>Test <text:bookmark-end text:name="__RefHeading___Toc48733_28991016"/></text:h>
    <text:p text:style-name="P48"><text:span text:style-name="T130">An OpenCPI </text:span><text:span text:style-name="FirstEmphasis">component unit test suite</text:span><text:span text:style-name="T130"> (aka “</text:span><text:span text:style-name="Default_20_Paragraph_20_Font">u</text:span><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T42">nit test”</text:span></text:span><text:span text:style-name="T130">) </text:span>is <text:span text:style-name="T130">a collection of </text:span>test cases <text:span text:style-name="T140">that allow functional </text:span>testing <text:span text:style-name="T140">of</text:span> all workers <text:span text:style-name="T130">that</text:span> implement a <text:span text:style-name="T130">component </text:span>spec<text:span text:style-name="T130">ification</text:span> across all available platforms for which the workers have been built. <text:s/><text:span text:style-name="T130">A component’s unit test suite is contained in a subdirectory named </text:span><text:span text:style-name="Code">&lt;component&gt;.test</text:span><text:span text:style-name="T130"> in a component library. <text:s/>The test suite can be applied to all of the workers in the library that implement that component’s OCS, regardless of authoring model and/or language. </text:span></text:p>
-   <text:p text:style-name="P49">For more information on the OpenCPI <text:span text:style-name="T254">component unit </text:span>test <text:span text:style-name="T254">suite </text:span>feature and how to use it, see the <text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.2/docs/OpenCPI_Component_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T118">OpenCPI Component Development Guide</text:span></text:a>.</text:p>
+   <text:p text:style-name="P49">For more information on the OpenCPI <text:span text:style-name="T254">component unit </text:span>test <text:span text:style-name="T254">suite </text:span>feature and how to use it, see the <text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.4.7/docs/OpenCPI_Component_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T118">OpenCPI Component Development Guide</text:span></text:a>.</text:p>
    <text:p text:style-name="P69"><text:span text:style-name="T126">We’ll use the OpenCPI component unit test suite </text:span><text:span text:style-name="T185">c</text:span><text:span text:style-name="T181">apability</text:span><text:span text:style-name="T126"> to generate:</text:span></text:p>
    <text:list xml:id="list162024546195938" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>

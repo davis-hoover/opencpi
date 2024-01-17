@@ -34,6 +34,89 @@ from .worker import Worker, HdlWorker
 from .component import Component
 
 
+def do_build(asset_type, directory, kwargs):
+    """
+    Function common to build libraries and library collections
+    """
+    action=[]
+    if kwargs.get('rcc'):
+        action.append('rcc')
+    if kwargs.get('hdl'):
+        action.append('hdl')
+    if kwargs.get('workers_as_needed'):
+        os.environ['OCPI_AUTO_BUILD_WORKERS'] = '1'
+
+    dynamic = kwargs.get('dynamic')
+    optimize = kwargs.get('optimize')
+    hdl_platform = kwargs.get('hdl_platform')
+    hdl_rcc_platform = kwargs.get('hdl_rcc_platform')
+    hdl_target = kwargs.get('hdl_target')
+    rcc_platform = kwargs.get('rcc_platform')
+    worker = kwargs.get('worker')
+
+    build_suffix = '-'
+    if dynamic:
+        build_suffix += 'd'
+    if optimize:
+        build_suffix += 'o'
+    if optimize or dynamic:
+        if rcc_platform:
+            if any("-" in s for s in rcc_platform):
+                raise ocpiutil.OCPIException("You cannot use the --optimize build option and "
+                + "also specify build options in a platform name (in this case: ",
+                rcc_platform, ")")
+            else:
+                new_list = [s + build_suffix for s in rcc_platform]
+                rcc_platform = new_list
+        else:
+            rcc_platform = [os.environ['OCPI_TOOL_PLATFORM'] + build_suffix]
+    #Pass settings
+    settings = {}
+    if hdl_platform:
+        settings['hdl_plat_strs'] = hdl_platform
+    if hdl_target:
+        settings['hdl_target'] = hdl_target
+    if rcc_platform:
+        settings['rcc_platform'] = rcc_platform
+    if hdl_rcc_platform:
+        settings['hdl_rcc_platform'] = hdl_rcc_platform
+    if asset_type == 'library' and worker:
+        settings['worker'] = worker
+    make_file = ocpiutil.get_makefile(directory, asset_type)[0]
+    #Build
+    ocpiutil.file.execute_cmd(settings, directory, action="", file=make_file,
+                              verbose=kwargs.get('verbose'))
+
+def do_clean(asset_type, directory, kwargs):
+    """
+    Function common to clean libraries and library collections
+    """
+    #Specify what to clean
+    action=[]
+    rcc = kwargs.get('rcc')
+    hdl = kwargs.get('hdl')
+    hdl_platform = kwargs.get('hdl_platform')
+    hdl_target = kwargs.get('hdl_target')
+    worker = kwargs.get('worker')
+    if not rcc and not hdl:
+        action.append('clean')
+    else:
+        if rcc:
+            action.append('cleanrcc')
+        if hdl:
+            action.append('cleanhdl')
+    settings = {}
+    if hdl_platform:
+        settings['hdl_plat_strs'] = hdl_platform
+    if hdl_target:
+        settings['hdl_target'] = hdl_target
+    if worker:
+        settings['worker'] = worker
+    make_file = ocpiutil.get_makefile(directory, asset_type)[0]
+    #Clean
+    ocpiutil.file.execute_cmd(settings, directory, action=action, file=make_file,
+                              verbose=kwargs.get('verbose'))
+
 class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAsset):
     """
     This class represents an OpenCPI Library.  Contains a list of the tests that are in this

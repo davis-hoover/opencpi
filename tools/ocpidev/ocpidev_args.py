@@ -551,6 +551,11 @@ verbs = {
                     'library': options['library'],
                     'export': options['export']
                 }
+            },
+            'component': {
+                'options': {
+                    'library': options['library']
+                }
             }
         }
     },

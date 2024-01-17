@@ -332,7 +332,7 @@ echo "ocpidev show component top_comp1-spec.xml --json"
 do_ocpidev show component -p top_comp1-spec.xml --json
 echo "ocpidev show component --hdl-library devices comp1-spec.xml --simple"
 do_ocpidev show component --hdl-library devices comp1-spec.xml --simple
-echo "ocpidev show component -p matchstiq_z1_0 comp1-spec.xml --simple"
+echo "ocpidev show component matchstiq_z1_0 comp1-spec.xml --simple"
 do_ocpidev show component -P matchstiq_z1_0 comp1-spec.xml --simple
 echo "ocpidev show worker -l dsp_comps comp1.rcc --simple"
 do_ocpidev show worker -l dsp_comps comp1.rcc --simple

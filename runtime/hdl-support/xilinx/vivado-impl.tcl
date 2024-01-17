@@ -72,6 +72,12 @@ if {[info exists pre_opt_hook] && [string length $pre_opt_hook] > 0 && [file exi
   source $pre_opt_hook
 }
 
+# Source platform pre-opt hook, if present
+if {[info exists pre_opt_hook] && [string length $pre_opt_hook] > 0 && [file exist $pre_opt_hook]} {
+  puts "Sourcing platform pre-opt hook: $pre_opt_hook"
+  source $pre_opt_hook
+}
+
 # For each stage, allow loading of checkpoint
 # Take current stage as parameter, and run the corresponding
 # implementation step
