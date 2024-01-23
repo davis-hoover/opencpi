@@ -29,11 +29,10 @@
        that any forwarded on time messages correctly related to the next sample
        message output by the component.
 
-       Time is stored as an unsigned Q32.40 fixed point value, where the
+       Time is stored as an unsigned Q32.64 fixed point value, where the
        ``seconds`` argument is the value before the decimal point and the
-       ``fraction`` argument is the value after the decimal point. The
-       fractional bits occupy the 40 most significant bits of the ulonglong.-->
-  <operation name="time">  
+       ``fraction`` argument is the value after the decimal point.-->
+  <operation name="time">
     <argument name="fraction" type="ulonglong"/>
     <argument name="seconds" type="ulong"/>
   </operation>
@@ -46,10 +45,9 @@
        interval values sent from a component is a true reflection of the sample
        interval used in sample messages output by the component.
 
-       Sample interval is stored as an unsigned Q32.40 fixed point value,
+       Sample interval is stored as an unsigned Q32.64 fixed point value,
        where the ``seconds`` argument is the value before the decimal point and
-       the ``fraction`` argument is the value after the decimal point. The
-       fractional bits occupy the 40 most significant bits of the ulonglong.-->
+       the ``fraction`` argument is the value after the decimal point.-->
   <operation name="sample_interval">
     <argument name="fraction" type="ulonglong"/>
     <argument name="seconds" type="ulong"/>
