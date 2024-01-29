@@ -57,7 +57,7 @@ PKGS_R+=(unzip)
 #    for ACI and worker builds (and to support our project workers using autotools :-( )
 #    N.B.: "make" is a chicken-vs-egg requirement -- it has
 #    to be pre-installed, but we will list it here anyway.
-PKGS_D+=(cmake make autoconf automake libtool g++)
+PKGS_D+=(cmake make autoconf automake libtool g++ gcc-12)
 #    for our development scripts
 #    for CentOS7, "which" is in a separate package: *ubuntu has it in debianutils
 PKGS_D+=(debianutils)
