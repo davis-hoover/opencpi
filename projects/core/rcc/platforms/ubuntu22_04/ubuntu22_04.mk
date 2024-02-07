@@ -28,6 +28,7 @@ OcpiPlatformArch=x86_64
 
 # gcc 11.2 is extremely picky
 OcpiCXXFlags+="-Wno-type-limits"
+OcpiCC=gcc-12
 
 #
 # "OcpiKernelDir" must be set if it is appropriate to build
