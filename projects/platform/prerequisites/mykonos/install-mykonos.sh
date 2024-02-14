@@ -32,7 +32,7 @@
 ################################################################################
 # 1. Download/clone and setup directories in the prereq area
 ################################################################################
-OCPI_MYKONOS_CURRENT_GIT_COMMIT_ID=master
+OCPI_MYKONOS_CURRENT_GIT_COMMIT_ID=main
 OCPI_MYKONOS_VERSION=$OCPI_MYKONOS_CURRENT_GIT_COMMIT_ID
 [ -z "$OCPI_CDK_DIR" ] && echo Environment variable OCPI_CDK_DIR not set && exit 1
 source $OCPI_CDK_DIR/scripts/setup-prerequisite.sh \
