@@ -38,5 +38,5 @@ probe.tgz:
 all: probe.tgz
 
 clean::
-   $(AT)rm -r -f tmp
+	$(AT)rm -r -f tmp
 endif
