@@ -556,7 +556,8 @@ namespace OCPI {
     bookingOk(Booking &b, OL::Candidate &c, unsigned n) {
       if (c.impl->m_staticInstance && b.m_artifact &&
           (b.m_artifact != &c.impl->m_artifact ||
-           b.m_usedImpls & ((uint64_t)1u << c.impl->m_ordinal))) {
+           (b.m_usedImpls.size() < c.impl->m_ordinal &&
+           b.m_usedImpls.at(c.impl->m_ordinal)))) {
         ocpiInfo("    For instance \"%s\" for spec \"%s\" rejecting implementation \"%s%s%s\" with score %u "
                   "from artifact \"%s\" due to insufficient available containers",
                   m_assembly.instance(n).name().c_str(),
@@ -840,7 +841,13 @@ it is really per actual worker config...
             &b = m_bookings[*containers],
             save = b;
           b.m_artifact = &(*impls)->m_artifact;
-          b.m_usedImpls |= (uint64_t)1u << (*impls)->m_ordinal;
+         
+          // Assign m_usedImpls vector
+          if (b.m_usedImpls.size() <= (*impls)->m_ordinal){
+            b.m_usedImpls.resize((*impls)->m_ordinal + 1);
+          }
+          b.m_usedImpls.at((*impls)->m_ordinal) = true;
+          
           doInstance(instNum, score);
           b = save;
         } else

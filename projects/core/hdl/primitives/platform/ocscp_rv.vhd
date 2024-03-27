@@ -45,10 +45,10 @@ architecture rtl of ocscp_rv is
   -- Constants for the parameterized 
   constant id_width            : natural := width_for_max(nWkrs); -- to allow for sentinel
   constant worker_max_id       : unsigned(id_width-1 downto 0) := (others => '1');
+  constant OCCP_SUCCESS_RESULT : dword_t := X"c0de4201";
   constant OCCP_ERROR_RESULT   : dword_t := X"c0de4202";
   constant OCCP_TIMEOUT_RESULT : dword_t := X"c0de4203";
   constant OCCP_RESET_RESULT   : dword_t := X"c0de4204";
-  constant OCCP_SUCCESS_RESULT : dword_t := X"c0de4201";
   constant OCCP_FATAL_RESULT   : dword_t := X"c0de4205";
   constant OCCP_MAGIC_0        : dword_t := swap(from_string(to_string("Open",4),0,false));
   constant OCCP_MAGIC_1        : dword_t := swap(from_string(to_string("CPI",3),0,false));
@@ -65,8 +65,8 @@ architecture rtl of ocscp_rv is
   signal   worker_in_timeout   : worker_timeout_t;
   signal   admin_data          : std_logic_vector(dword_t'range);
   signal   worker_data         : dword_t;
-  signal   present             : word64_t;
-  signal   attention           : word64_t;
+  signal   present             : word128_t;
+  signal   attention           : word128_t;
   signal   admin_control       : dword_t;
   -- Our state
   signal   id_for_mux_r        : unsigned(id_width-1 downto 0);
@@ -212,8 +212,12 @@ begin
     -- new ones for now
     attention(31 downto 0)                   when x"50",
     attention(63 downto 32)                  when x"54",
-    present(31 downto 0)                     when x"58",
-    present(63 downto 32)                    when x"5c",
+    attention(95 downto 64)                  when x"58",
+    attention(127 downto 96)                 when x"5c",
+    present(31 downto 0)                     when x"60",
+    present(63 downto 32)                    when x"64",
+    present(95 downto 64)                    when x"68",
+    present(127 downto 96)                   when x"6c",
     slv0(32)                                 when others;
 
   -- The worker (not admin) data to return when it issues a response

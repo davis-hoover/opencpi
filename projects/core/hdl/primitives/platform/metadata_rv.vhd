@@ -32,6 +32,7 @@ entity metadata_rv is
 end entity metadata_rv;
 architecture rtl of metadata_rv is
   component mkUUID is
+    -- 512 bits for 64 Bytes of HdlUUID struct data
     port (uuid : out std_logic_vector(511 downto 0));
   end component mkUUID;
   signal myUUID : std_logic_vector(511 downto 0);

@@ -28,7 +28,7 @@
 namespace OCPI {
   namespace HDL {
 #endif
-#define OCCP_MAX_WORKERS 63
+#define OCCP_MAX_WORKERS 127
 #define OCCP_MAX_REGIONS 16
     typedef struct {
       uint32_t birthday; // The time the final build was started
@@ -38,7 +38,9 @@ namespace OCPI {
       char load[4];      // Information to load this particular device on this platform
       char dna[8];       // The serial number of this particular device
     } HdlUUID;
-    typedef struct {
+    typedef struct
+    {
+      // The commented numbers in the struct are hex values for the memory offsets
       const uint64_t magic; // 00
       const uint32_t
         revision,           // 08
@@ -53,23 +55,24 @@ namespace OCPI {
         control,            // 28
         reset;              // 2c
       const uint32_t
-	timeStatus;         // 30
+	      timeStatus;         // 30
       uint32_t
         timeControl;        // 34
       uint64_t
         time,               // 383c
         timeDelta;          // 4044
       const uint32_t
-        timeClksPerPps,     // 48
-	readCounter;        // 4c
-      const uint64_t 
-        attention,          // 5054
-        present;	    // 585c
-      const uint32_t
-        pad2[7],            // 6064686c707478
-        numRegions,         // 7c
-        regions[OCCP_MAX_REGIONS];// 8084888c9094989ca0a4a8acb0b4b8bc
-      HdlUUID uuid;         // c0...
+        timeClksPerPps, // 48
+        readCounter,    // 4c
+        attention[4], // 5054585c
+        present[4],   // 6064686c
+        pad2[3],                   // 707478
+        numRegions,                // 7c
+        regions[OCCP_MAX_REGIONS]; // 8084888c9094989ca0a4a8acb0b4b8bc
+      HdlUUID uuid;                  // c0...
+      // HdlUUID within the admin registers seems to not be utilized, 
+      //   at least when deploying on zed as it was always filled with zeros.
+      // The HdlUUID struct seems to be instantiated independently within OCPI::HDL::Device.
     } OccpAdminRegisters;
     typedef struct {
       const uint32_t
@@ -93,31 +96,29 @@ namespace OCPI {
     } OccpWorkerRegisters;
 #define OCCP_WORKER_CONTROL_ENABLE 0x80000000
 #define OCCP_WORKER_CONTROL_TIMEOUT(i) ((i) & 0x1f)
-#define OCCP_WORKER_CONTROL_SIZE 0x4000
-#define OCCP_CONTROL_CLEAR_ATTENTION  (1 << 9)
-#define OCCP_CONTROL_CLEAR_ERRORS     (1 << 8)
+#define OCCP_WORKER_CONTROL_SIZE 0x1000  // equal to 10 control bits plus 2 read bits
+#define OCCP_CONTROL_CLEAR_ATTENTION (1 << 9)
+#define OCCP_CONTROL_CLEAR_ERRORS (1 << 8)
 #define OCCP_ADMIN_SIZE OCCP_WORKER_CONTROL_SIZE
-#define OCCP_ADMIN_CONFIG_OFFSET 4096
-#define OCCP_ADMIN_CONFIG_SIZE 4096
+#define OCCP_ADMIN_CONFIG_OFFSET 1024
+#define OCCP_ADMIN_CONFIG_SIZE 1024
 // Note this CONFIG_WINDOW is actually further chunked to 4 pieces so that the 2 MSB address
 // bits can be used to indicate read size to accomodate the broken Xilinx PCIE2AXI bridge
 // The readsize bits are encoded per AXI ARSIZE, namely log2(nbytes)
 #define OCCP_WORKER_CONFIG_READSIZE_BITS 2
-#define OCCP_WORKER_CONFIG_WINDOW_BITS 20
+#define OCCP_WORKER_CONFIG_WINDOW_BITS 19  // 512 KB of config space
 #define OCCP_WORKER_CONFIG_SIZE (1u << OCCP_WORKER_CONFIG_WINDOW_BITS)
-#define OCCP_WORKER_CONTROL_BASE(i) ((i) * OCCP_BYTES_PER_WORKER)
-#define OCCP_WORKER_PROPERTY_BASE(i) ((i) * OCCP_BYTES_PER_WORKER)
 // Magic values from config space: these values are 32 bit values with chars big endian
 #define OCCP_MAGIC1 (('O'<<24)|('p'<<16)|('e'<<8)|'n')
 #define OCCP_MAGIC2 (('C'<<24)|('P'<<16)|('I'<<8))
 #define OCCP_MAGIC ((((uint64_t)OCCP_MAGIC2) << 32) | OCCP_MAGIC1)
 // Read return values from workers
-#define OCCP_ERROR_RESULT   0xc0de4202 // worker reported error
-#define OCCP_TIMEOUT_RESULT 0xc0de4203 // operation timed out
-#define OCCP_RESET_RESULT   0xc0de4204 // worker was in reset
 #define OCCP_SUCCESS_RESULT 0xc0de4201
-#define OCCP_FATAL_RESULT   0xc0de4205 // worker reported fatal error (unimplemented)
-#define OCCP_BUSY_RESULT    0xc0de4206 // worker was busy, unable to start access
+#define OCCP_ERROR_RESULT 0xc0de4202   // worker reported error
+#define OCCP_TIMEOUT_RESULT 0xc0de4203 // operation timed out
+#define OCCP_RESET_RESULT 0xc0de4204   // worker was in reset
+#define OCCP_FATAL_RESULT 0xc0de4205 // worker reported fatal error (unimplemented)
+#define OCCP_BUSY_RESULT 0xc0de4206  // worker was busy, unable to start access
 #define OCCP_STATUS_CONFIG_WRITE (1 << 27)
 #define OCCP_STATUS_CONFIG_OP (0x7 << 24)
 #define OCCP_STATUS_LAST_OP(i) (((i) & (0x7 << 24)) >> 24)

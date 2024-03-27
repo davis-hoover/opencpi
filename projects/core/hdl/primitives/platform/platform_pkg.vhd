@@ -35,7 +35,7 @@ type iostandard_t is (CMOS18,  -- technology: CMOS, supply voltage: 1.8V
 -- The client (interconnect) can treat this as asynchronous, with a returned tag,
 -- but the implementation -- is fully synchronous - one-at-a-time...
 -- A synchronous client can not bother generating the tag.
-subtype occp_address_t is std_logic_vector(23 downto 0); -- 64MB of control space
+subtype occp_address_t is std_logic_vector(23 downto 0); -- This is cat'd with 00 therefore 2^26 = 64MB of control space
 subtype occp_data_t    is std_logic_vector(31 downto 0);
 subtype occp_tag_t     is std_logic_vector(7  downto 0);
 subtype occp_byte_en_t is std_logic_vector(3  downto 0);
@@ -57,12 +57,11 @@ type occp_out_t is record
 end record occp_out_t;
 
 -- These are the number of bits of the DW address
-constant worker_control_bits : natural := 12; -- 16KB control space per worker
-constant worker_config_bits  : natural := 18; -- 1MB config space per worker, BUT still top 2 addrs
-constant worker_readsize_bits  : natural := 2;  -- these are the MSBs of the address used for readsize
-constant worker_control_size : natural := 2**worker_control_bits;
-constant worker_config_size  : natural := 2**worker_config_bits;
-constant worker_max_nworkers : natural := 63; -- for a 64 bit array of worker-present bits
+constant worker_control_bits : natural := 10; -- 4096B control space per worker
+constant worker_config_bits  : natural := 17; -- 512KB config space per worker
+  -- The worker_readsize_bits value (2) should not be changed unless the read_byte_en function is altered
+constant worker_readsize_bits : natural := 2; -- these are the LSBs of the address used for readsize
+constant worker_max_nworkers : natural := 127;
 constant worker_ncontrol_ops : natural := 8;
 -- ID is wide enough for a sentinel value of all ones.
 constant worker_id_bits      : natural := width_for_max(worker_max_nworkers);
@@ -90,7 +89,7 @@ type worker_in_t is record
   clk           : std_logic;
   reset         : bool_t;
   cmd           : ocp.MCmd_t;                    -- cmd per WCI
-  address       : std_logic_vector(worker_config_bits-1+2 downto 0); -- Byte Addr
+  address       : std_logic_vector(worker_readsize_bits + worker_config_bits -1 downto 0); -- Byte Addr
   source        : worker_data_source_t;
   id            : unsigned(worker_id_bits-1 downto 0);
   
