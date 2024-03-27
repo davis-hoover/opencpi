@@ -43,7 +43,7 @@ architecture rtl of wci_master is
   signal response             : worker_response_t;               -- our response when active
   -- Our state - minimized for scalability
   signal reset_n_r            : std_logic := '0';              -- are we reset? (_n)
-  signal window_r             : std_logic_vector(13 downto 0); -- high address bits
+  signal window_r             : std_logic_vector(wci_out.MAddr'high - worker_config_bits downto 0); -- high address bits
   signal attention_r          : std_logic;                     -- sticky version of SFlag(0)
   signal timeout_r            : worker_timeout_t;              -- our log2 of timeout ticks
   signal ready_r              : bool_t;                        -- WCI slave !busy (pipelined)
@@ -68,7 +68,7 @@ architecture rtl of wci_master is
   signal rank_r               : std_logic_vector(7 downto 0);
   impure function read_byte_en return std_logic_vector is
     variable mask : std_logic_vector(3 downto 0)
-      := worker_in.address(19 downto 18) & worker_in.address(1 downto 0);
+      := worker_in.address(worker_in.address'high downto worker_in.address'high-1) & worker_in.address(1 downto 0);
   begin
     case mask is -- log2nbytes & low2addr is
       when "0000" => return "0001";
@@ -97,7 +97,7 @@ begin
   wci_out.Clk        <= worker_in.clk;
   wci_out.MReset_n   <= reset_n_r;
   wci_out.MCmd       <= worker_in.cmd when its(cmd_asserted_r) else ocpi.ocp.MCmd_IDLE;
-  wci_out.MAddr      <= window_r & worker_in.address(worker_in.address'left - worker_readsize_bits downto 0);
+  wci_out.MAddr      <= window_r & worker_in.address(worker_config_bits - 1 downto 0);
   wci_out.MAddrSpace(0) <= worker_in.is_config;
   wci_out.MByteEn    <= read_byte_en when worker_in.is_config and worker_in.cmd = ocp.MCmd_READ
                         else worker_in.byte_en;

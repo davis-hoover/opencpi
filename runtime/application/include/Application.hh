@@ -30,6 +30,7 @@
 
 #include <string>
 #include <map>
+#include <vector>
 #include "UtilMisc.hh"
 #include "LibraryAssembly.hh"
 #include "ContainerManager.hh"
@@ -114,8 +115,8 @@ namespace OCPI {
       };
       struct Booking {
 	OCPI::Library::Artifact *m_artifact;
-	uint64_t m_usedImpls;         // which fixed implementations in the artifact are in use
-	Booking() : m_artifact(NULL), m_usedImpls(0) {}
+	std::vector<bool> m_usedImpls;         // which fixed implementations in the artifact are in use
+	Booking() : m_artifact(NULL) {}
       };
       std::vector<Instance> m_instances;
       std::vector<Deployment> m_bestDeployments;

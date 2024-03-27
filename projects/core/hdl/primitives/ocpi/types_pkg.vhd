@@ -30,6 +30,7 @@ subtype word8_t  is std_logic_vector(7 downto 0);
 subtype word16_t is std_logic_vector(15 downto 0);
 subtype word32_t is std_logic_vector(31 downto 0);
 subtype word64_t is std_logic_vector(63 downto 0);
+subtype word128_t is std_logic_vector(127 downto 0);
 subtype byte_offset_t is unsigned(1 downto 0);
 subtype bit_offset_t is natural range 0 to 31; -- bit within word
 type    endian_t is (little_e, big_e, dynamic_e);
