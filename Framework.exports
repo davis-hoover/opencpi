@@ -72,6 +72,7 @@
 +tools/ocpidev/hdltargets.py <target>/lib/_opencpi/
 +tools/ocpidev/assets/*.py <target>/lib/_opencpi/assets/
 +tools/ocpidev/ocpidev.py <target>/bin/ocpidev
++tools/ocpidev/ocpidev2.py <target>/bin/ocpidev2
 +tools/ocpidev/ocpidev_args.py scripts/
 +tools/ocpidev/ocpiargparse.py scripts/
 +tools/ocpidoc/doc <target>/lib/ocpidoc/

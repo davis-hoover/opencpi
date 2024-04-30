@@ -20,16 +20,26 @@ assets module definition
 """
 __all__ = [
     "abstract",
+    "abstract2",
     "application",
+    "application2",
     "factory",
     "test",
     "registry",
+    "registry2",
     "project",
+    "project2",
     "primitive",
+    "primitive2",
     "worker",
+    "worker2",
     "platform",
+    "platform2",
     "assembly",
+    "assembly2",
     "library",
+    "library2",
     "component",
+    "component2",
     "prerequisite"
     ]

@@ -1,0 +1,893 @@
+# This file is protected by Copyright. Please refer to the COPYRIGHT file
+# distributed with this source distribution.
+#
+# This file is part of OpenCPI <http://www.opencpi.org>
+#
+# OpenCPI is free software: you can redistribute it and/or modify it under the
+# terms of the GNU Lesser General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+
+import xml.etree.ElementTree as ET
+import os
+import sys
+import uuid
+import glob
+
+
+# TODO make a class member, probably ComponentLibrary or Project class
+g_libraries_mk = False
+
+global_dependency_tree = dict()
+
+
+def log_pass_fail(msg, passed):
+    spaces = ''
+    for count in range(60-len(msg)):
+        spaces += ' '
+    if passed:
+        msg += spaces + '\033[92mPASS\033[0m'
+    else:
+        msg += spaces + '\033[91mFAIL\033[0m'
+    print(msg)
+
+
+# TODO consolidate with AttributeBase method of the same name
+def get_xml_val_list(val):
+    return ' '.join(val.replace('\n', '').split()).split(' ')
+
+
+def get_hdl_target(hdl_platform):
+    # TODO parse tools/include/hdl/hdl-targets.xml, hdl/platforms/ml605/ml605.mk instead of below code
+    ret = hdl_platform
+    if hdl_platform == 'zed':
+        ret = 'zynq'
+    elif hdl_platform == 'zcu106':
+        ret = 'zynq_ultra'
+    elif hdl_platform == 'zed_ise':
+        ret = 'zynq_ise'
+    elif hdl_platform == 'zcu104':
+        ret = 'zynq_ultra'
+    elif hdl_platform == 'zed_ether':
+        ret = 'zynq'
+    elif hdl_platform == 'ml605':
+        ret = 'virtex6'
+    elif hdl_platform == 'alst4x':
+        ret = 'stratix'
+    elif hdl_platform == 'alst4':
+        ret = 'stratix'
+    elif hdl_platform == 'matchstiq_z1':
+        ret = 'zynq'
+    elif hdl_platform == 'e31x':
+        ret = 'zynq'
+    elif hdl_platform == 'zrf8_48dr':
+        ret = 'zynq_ultra'
+    return ret
+
+
+class InvalidAssetError(Exception):
+    pass
+
+
+class InvalidAttributeError(Exception):
+    pass
+
+
+class Environment():
+    """ Reference OpenCPI User Guide section 5 """
+
+    def __init__(self):
+        ocpi_log_level = os.environ.get('OCPI_LOG_LEVEL')
+        if ocpi_log_level == '':
+            ocpi_log_level = 0
+        if ocpi_log_level is None:
+            ocpi_log_level = 0
+        self.ocpi_log_level = int(ocpi_log_level)
+
+
+class Logger(Environment):
+
+    def __init__(self):
+        Environment.__init__(self)
+
+    def get_log_str(self, level):
+        ret = 'OCPI('
+        if level < 10:
+            ret += ' '
+        # TODO put time in string below
+        ret += str(level) + ':       ): '
+        return ret
+
+    def log(self, level, msg, pre=''):
+        if level >= 9:
+            pre = '\033[96m'
+        if self.ocpi_log_level >= level:
+            _str = pre + self.get_log_str(level) + msg + '\033[0m'
+            print(_str, file=sys.stderr)
+
+    def info(self, msg):
+        if self.ocpi_log_level >= 7:
+            self.log(7, 'INFO:  ' + msg)
+
+    def warn(self, msg):
+        self.log(0, 'WARN:  ' + msg, '\033[93m')
+
+    def debug(self, msg):
+        self.log(10, 'DEBUG: ' + msg, '\033[96m')
+
+    def error(self, msg):
+        self.log(0, 'ERROR: ' + msg, '\033[91m')
+
+
+class TemporaryFilesystem():
+    """ A convenient directory for doing temporary work. Directory is deleted when
+        this object goes out of scope. """
+
+    def __init__(self):
+        # uuid avoids collisions during simultaneous executions of ocpidev2
+        self.abs_path = '/tmp/ocpidev2.' + str(uuid.uuid4())
+        os.system('mkdir -p ' + self.abs_path)
+
+    def __del__(self):
+        os.system('rm -rf ' + self.abs_path)
+
+
+class DependencyTree():
+    def __init__(self):
+        self.dependents = []
+
+
+class GNUMakeTarget():
+
+    def __init__(self, string, phony = False):
+        self.string = string
+        self.phony = phony
+
+    def __str__(self):
+        return self.string
+
+
+class GNUMakeRule():
+    """ https://www.gnu.org/software/make/manual/html_node/Rules.html """
+
+    def __init__(self):
+        self.targets = []
+        self.prerequisites = []
+        self.recipe = ""
+
+    def __str__(self):
+        ret = ''
+        first = True
+        for target in self.targets:
+          if not first:
+            ret += ' '
+          ret += target.string
+        ret += ': '
+        ret += ' '.join(self.prerequisites) + '\n'
+        if self.recipe is not None:
+            ret += '\t' + self.recipe
+        return ret
+
+
+class GNUMakefile():
+    """ https://www.gnu.org/software/make/manual/make.html#Makefiles """
+
+    def __init__(self, abs_path):
+        self.abs_path = abs_path
+        self.variables = dict()
+        self.rules = dict()
+        if abs_path is not None:
+            self.parse(open(abs_path).readlines())
+
+    def parse_string(self, string, define=False, endef=False):
+        (expanded, define, endef) = self.expand_immediate(
+                string, define, endef)
+        if ('=' in expanded) or (define is not None):
+            self.internalize_operation(expanded, define)
+        return (expanded, define, endef)
+
+    def parse(self, file_lines):
+        """ https://www.gnu.org/software/make/manual/html_node/Parsing-Makefiles.html # nopep8
+        """
+        file_line_idx = 0
+        done = False
+        define = None
+        endef = False
+        while file_line_idx < len(file_lines):
+            (logical_line, file_line_idx) = self.read_file_line(
+                    file_lines, file_line_idx)
+            logical_line = logical_line.split('#')[0]
+            if len(logical_line) == 0:
+                continue
+            while (len(logical_line) > 0) and (logical_line[0] == '\t') and \
+                    (file_line_idx < len(file_lines)):
+                (logical_line, file_line_idx) = self.read_file_line(
+                        file_lines, file_line_idx)
+            (expanded, define, endef) = self.parse_string(
+                    logical_line, define, endef)
+
+    def read_file_line(self, file_lines, file_line_idx):
+        """ https://www.gnu.org/software/make/manual/html_node/Splitting-Lines.html # nopep8
+        """
+        logical_line = ''
+        line_complete = False
+        while not line_complete:
+            file_line = file_lines[file_line_idx]
+            # Logger().debug('file read line: ' + file_line[:-1])
+            file_line_idx = file_line_idx + 1
+            tmp = file_line.replace('\n', '')
+            line_complete = True
+            if (len(tmp) > 0) and (tmp[-1] == '\\'):
+                line_complete = False
+                tmp = tmp[:-1]
+            logical_line += tmp
+        return (logical_line, file_line_idx)
+
+    def expand_immediate(self, string, define, endef):
+        """ https://www.gnu.org/software/make/manual/html_node/Reading-Makefiles.html # nopep8
+        """
+        if endef:
+            define = None
+            endef = False
+        lhs_is_var_name = False
+        lhs_is_target = False
+        is_subst_ref = False
+        setting_variable = False
+        rhs = False
+        expanded = ''
+        if len(string) > 0:
+            while (len(string) > 0) and (string[0] == ' '):
+                string = string[1:]
+            if string[0:7] == 'define ':
+                define = string[7:]
+            if string[0:5] == 'endef':
+                define = False
+                endef = True
+        idx = 0
+        state = 0
+        reference_or_function = ''
+        indent = 0
+        global g_libraries_mk
+        if string[0:7] == 'include':
+            if string.strip().endswith('libraries.mk'):
+                g_libraries_mk = True
+        while (idx < len(string)) and (not define) and (not endef):
+            if string[idx] == '#':
+                break
+            # print(expanded)
+            # print(reference_or_function)
+            # print(str(state))
+            if state == 0:
+                # either advance to reference/function handling or
+                # parse target/var name
+                if string[idx] == '$':
+                    reference_or_function = ''
+                    state = 2
+                elif string[idx] == ' ':
+                    lhs_is_var_name = True
+                    if rhs:
+                        expanded += string[idx]
+                elif string[idx] == '+':
+                    expanded += string[idx]
+                    lhs_is_var_name = True
+                elif string[idx] == ':':
+                    lhs_is_target = True
+                    state = 1
+                elif string[idx] == '=':
+                    expanded += string[idx]
+                    lhs_is_var_name = not lhs_is_target
+                    rhs = True
+                else:
+                    # target or var name which does not need expansion
+                    expanded += string[idx]
+            elif state == 1:
+                # finalize lhs/rhs separation
+                if string[idx] == '=':
+                    expanded += string[idx]
+                    lhs_is_var_name = not lhs_is_target
+                rhs = True
+                state = 0
+            elif state == 2:
+                # lhs - handle reference/function
+                if (string[idx] == '('):
+                    if indent != 0:
+                        reference_or_function += string[idx]
+                    indent += 1
+                elif (string[idx] == ':'):
+                    reference_or_function += string[idx]
+                    is_subst_ref = True
+                elif (string[idx] == ' '):
+                    reference_or_function += string[idx]
+                elif (string[idx] == ')'):
+                    indent -= 1
+                    if indent == 0:
+                        if reference_or_function in self.variables.keys():
+                            expanded += self.expand_variable_reference(
+                                    reference_or_function)
+                        elif is_subst_ref and (
+                                reference_or_function.split(':')[0] in
+                                self.variables.keys()):
+                            expanded += self.expand_variable_reference(
+                                    reference_or_function)
+                        elif (reference_or_function[0:9] == 'wildcard ') or \
+                                (reference_or_function[0:8] == 'foreach ') or \
+                                (reference_or_function[0:3] == 'or ') or \
+                                (reference_or_function[0:4] == 'and ') or \
+                                (reference_or_function[0:9] == 'patsubst ') \
+                                or \
+                                (reference_or_function[0:5] == 'info ') or \
+                                (reference_or_function[0:5] == 'eval ') or \
+                                (reference_or_function[0:5] == 'call '):
+                            expanded += self.invoke_function(
+                                    reference_or_function)
+                        is_subst_ref = False
+                        state = 0
+                    else:
+                        reference_or_function += string[idx]
+                else:
+                    reference_or_function += string[idx]
+            idx += 1
+        expanded2 = ''
+        last_char = ''
+        first = True
+        for char in expanded:
+            if first:
+                first = False
+                expanded2 += char
+            elif not (last_char == ' ' and char == ' '):
+                expanded2 += char
+            last_char = char
+        # print('** expanded2 ' + expanded2)
+        return (expanded2, define, endef)
+
+    def invoke_wildcard(self, string):
+        """ https://www.gnu.org/software/make/manual/html_node/Wildcard-Function.html # nopep8
+        """
+        # Logger().debug('    expand_' + string)
+        pattern = string[9:]
+        path = self.abs_path[:self.abs_path.rfind('/')+1]
+        filepaths = glob.glob(path + pattern)
+        tmp = []
+        for filepath in filepaths:
+            tmp.append(filepath.replace(path, ''))
+        return ' '.join(tmp)
+
+    def invoke_foreach(self, string):
+        """ https://www.gnu.org/software/make/manual/html_node/Foreach-Function.html # nopep8
+        """
+        # Logger().debug('    expand_' + string)
+        string = string[8:]
+        idx = string.find(',')
+        var = string[0:idx]
+        string = string[idx+1:]
+        indent = 0
+        state = 0
+        _list = ''
+        text = ''
+        for char in string:
+            if state < 3:
+                _list += char
+            else:
+                text += char
+            if (state == 0) and (char == ','):
+                state = 3
+                _list = _list[:-1]
+            elif (state == 0) and (char == '$'):
+                state = 1
+            elif (state == 1) and (char == '('):
+                state = 2
+                indent += 1
+            elif state == 2:
+                if char == '(':
+                    indent += 1
+                elif char == ')':
+                    indent -= 1
+                    if indent == 0:
+                        state = 0
+        var_dict = dict()
+        result = []
+        # Logger().debug('    invoke_foreach _list ' + _list)
+        while (_list[0] == ' '):
+            _list = _list[1:]
+        if _list[0:2] == '$(':
+            (_list, d1, d2) = self.parse_string(_list)
+        for entry in _list.split(' '):
+            tmp = ' '.join(text.replace('$' + var, entry).split())
+            if tmp[0:2] == '$(':
+                (tmp, d1, d2) = self.parse_string(tmp)
+            # result.append(' '.join(tmp).split())
+            result.append(tmp)
+        return ' '.join(result)
+
+    def invoke_conditional_function(self, string):
+        """ https://www.gnu.org/software/make/manual/html_node/Conditional-Functions.html # nopep8
+        """
+        # Logger().debug('    expand_' + string)
+        if string[0:3] == 'or ':
+            for condition in string[3:].split(','):
+                if condition != '':
+                    if condition[0:2] == '$(':
+                        (condition, d1, d2) = self.parse_string(condition)
+                    string = condition
+        elif string[0:4] == 'and ':
+            string = string[4:]
+            idx = 0
+            state = 0
+            indent = 0
+            string_to_expand = ''
+            ret = ''
+            while idx < len(string):
+                if (string[idx] == '('):
+                    indent += 1
+                elif (string[idx] == ')'):
+                    indent -= 1
+                if (indent == 0) and (string[idx] == ','):
+                    (expanded, d1, d2) = self.parse_string(string_to_expand)
+                    ret += expanded
+                    string_to_expand = ''
+                    if expanded == '':
+                        break
+                else:
+                    string_to_expand += string[idx]
+                idx += 1
+            string = ret
+        return string
+
+    def invoke_string_substitution_function(self, string):
+        """ https://www.gnu.org/software/make/manual/html_node/Text-Functions.html # nopep8
+        """
+        # _str = string
+        # Logger().debug('    invoke_string_substitution_function ' + _str)
+        if string[0:9] == 'patsubst ':
+            (pattern, replacement, text) = string[9:].split(',')
+            if pattern[0:2] == '$(':
+                (pattern, d1, d2) = self.parse_string(pattern)
+            if replacement[0:2] == '$(':
+                (replacement, d1, d2) = self.parse_string(replacement)
+            if text[0:2] == '$(':
+                (text, d1, d2) = self.parse_string(text)
+            (pat_pre_percent, pat_post_percent) = pattern.split('%')
+            (rep_pre_percent, rep_post_percent) = replacement.split('%')
+            mat_pre_percent = ''
+            if pat_pre_percent == '':
+                mat_pre_percent = text.split(' ')[1:]
+            else:
+                mat_pre_percent = text.split(pat_pre_percent)[1:]
+            match = []
+            for entry in mat_pre_percent:
+                if pat_post_percent == '':
+                    match.append(entry)
+                else:
+                    match.append(entry.split(pat_post_percent)[0])
+            result = []
+            for entry in match:
+                xx = rep_pre_percent + entry + rep_post_percent
+                result.append(xx)
+            string = (' '.join(result))
+        return string
+
+    def invoke_control_function(self, string):
+        """ https://www.gnu.org/software/make/manual/html_node/Make-Control-Functions.html # nopep8
+        """
+        # Logger().debug('    invoke_control_function ' + string)
+        # if string[0:5] == 'info ':
+        #     print(string[5:])
+        return ''
+
+    def invoke_eval(self, string):
+        """ https://www.gnu.org/software/make/manual/html_node/Eval-Function.html # nopep8
+        """
+        # Logger().debug('    invoke_eval ' + string)
+        (string, d1, d2) = self.parse_string(string[5:])
+        return string
+
+    def invoke_call(self, string):
+        """ https://www.gnu.org/software/make/manual/html_node/Call-Function.html # nopep8
+        """
+        # Logger().debug('    invoke_call ' + string)
+        name = string[5:].split(',')[0]
+        if name in self.variables.keys():
+            for string in self.variables[name]:
+                # TODO concat all returns strings?
+                (string, d1, d2) = self.parse_string(string)
+        return string
+
+    def expand_variable_substitution_reference(self, string):
+        """ https://www.gnu.org/software/make/manual/html_node/Substitution-Refs.html # nopep8
+        """
+        # s
+        # Logger().debug('    expand_variable_substitution_reference ' + s)
+        tmp = string.split(':')
+        var_name = tmp[0]
+        tmp = tmp[-1].split('=')
+        a = tmp[0]
+        b = tmp[1]
+        equivalent = 'patsubst ' + a + ',' + b + ',' + self.variables[var_name]
+        return self.invoke_string_substitution_function(equivalent)
+
+    def expand_variable_reference(self, string):
+        """ https://www.gnu.org/software/make/manual/html_node/Reference.html # nopep8
+        """
+        # Logger().debug('    expand_variable_reference ' + string)
+        if ':' in string:
+            string = self.expand_variable_substitution_reference(string)
+        else:
+            if string in self.variables.keys():
+                string = self.variables[string]
+            else:
+                string = ''
+        return string
+
+    def parse_variable_set(self, string):
+        """ https://www.gnu.org/software/make/manual/html_node/Setting.html # nopep8
+        """
+        # Logger().debug('  parse_variable_set ' + string)
+        lhs = ''
+        rhs = ''
+        append = False
+        is_lhs = True
+        idx = 0
+        while idx < len(string):
+            if (string[idx] == '='):
+                is_lhs = False
+            if is_lhs:
+                if string[idx] == '+':
+                    append = True
+                else:
+                    lhs += string[idx]
+            elif (string[idx] != '='):
+                rhs += string[idx]
+            idx += 1
+        return (lhs, rhs, append)
+
+    def invoke_function(self, string):
+        """  https://www.gnu.org/software/make/manual/html_node/Syntax-of-Functions.html # nopep8
+        """
+        # Logger().debug('  invoke_function ' + string)
+        if string[0:9] == 'wildcard ':
+            string = self.invoke_wildcard(string)
+        elif string[0:8] == 'foreach ':
+            string = self.invoke_foreach(string)
+        elif string[0:3] == 'or ':
+            string = self.invoke_conditional_function(string)
+        elif string[0:4] == 'and ':
+            string = self.invoke_conditional_function(string)
+        elif string[0:9] == 'patsubst ':
+            string = self.invoke_string_substitution_function(string)
+        elif string[0:5] == 'info ':
+            string = self.invoke_control_function(string)
+        elif string[0:5] == 'eval ':
+            string = self.invoke_eval(string)
+        elif string[0:5] == 'call ':
+            string = self.invoke_call(string)
+        else:
+            pass
+        return string
+
+    def internalize_operation(self, string, define):
+        if define is None:
+            (lhs, rhs, append) = self.parse_variable_set(string)
+            # ap = str(append)
+            # Logger().debug('parse var lh ' + lhs + ' ' + rhs + ' ' + ap)
+            if append and (lhs in self.variables.keys()):
+                self.variables[lhs] += ' ' + rhs
+            else:
+                self.variables[lhs] = rhs
+        else:
+            if define not in self.variables.keys():
+                self.variables[define] = ''
+            self.variables[define] += string
+    def emit(self):
+        ff = open(self.abs_path, 'w')
+        phony = False
+        for rule in self.rules.values():
+            for target in rule.targets:
+                if target.phony:
+                    phony = True
+                    ff.write('.PHONY: ' + str(target) + "\n")
+        if phony:
+            ff.write("\n")
+        for rule in self.rules.values():
+            if rule is not None:
+                ff.write(str(rule) + "\n")
+            ff.write("\n")
+        ff.close()
+
+
+global_makefile = GNUMakefile(None)
+
+
+class AttributeBase():
+    """ a thing which contains opencpi (XML) attributes, either intermediary
+        elem already parsed with ElementTree, or XML file itself, or perhaps a
+        Makefile for pre-2.0 OpenCPI assets """
+
+    def __init__(self, elem):
+        """ elem is an ElementTree Element intended to represent, e.g., Property
+            within a <RccWorker><Property/></RccWorker> """
+
+        if elem.tag.lower() not in \
+                [tag.lower() for tag in self.get_root_tags()]:
+            self.raise_invalid_attribute_error(elem.tag)
+
+    @staticmethod
+    def get_xml_val_list(val):
+        """ this takes in a val (string) that is space-and-newline-separated (as
+            is commonly done in OpenCPI XML files) and separates it into a
+            returned list"""
+        return ' '.join(val.replace('\n', '').split()).split(' ')
+
+    @staticmethod
+    def get_variable_val_list_from_gnu_makefile(var_name, abs_makefile_path):
+        """ this extracts the value of the GNUMake variable, whose name is var
+            name, that is specified in the abs_makefile_path, and separates the
+            value into a returned list """
+        # start pre-2.0 opencpi
+        ret = []
+        makefile = GNUMakefile(abs_makefile_path)
+        if var_name in makefile.variables.keys():
+            var = GNUMakefile(abs_makefile_path).variables[var_name]
+            ret = ' '.join(var.split()).split(' ')
+        return ret
+        # end pre-2.0 opencpi
+
+    def get_attr_common(self, attr, elem, is_list, makefile_abs_path=''):
+        # start pre-2.0 opencpi
+        if elem is None:
+            # TODO remove below 2 lines which are a horrible hack
+            if makefile_abs_path == self.get_xml_abs_path():
+                makefile_abs_path = ''
+        # end pre-2.0 opencpi
+        if is_list:
+            ret = []
+        else:
+            ret = ''
+        # not all assets have XML, e.g., pre-2.0 HdlLibrary (hdl primitive)
+        # in the cases where XML doesn't exist, simply return ret from above
+        go = True
+        if elem is None:
+            if makefile_abs_path == '':
+                go = os.path.isfile(self.get_xml_abs_path())
+            else:
+                go = os.path.isfile(makefile_abs_path)
+            attr_abs_path = self.abs_path
+        else:
+            attr_abs_path = ''
+        if go:
+            if makefile_abs_path == '':
+                if elem is None:
+                    iteration_obj = self.get_parsed().getroot().attrib
+                else:
+                    iteration_obj = elem
+                for key, val in iteration_obj.items():
+                    # tmp = self.get_valid_attributes()
+                    # if key.lower() in [attr.lower() for attr in tmp]:
+                    if key.lower() == attr.lower():
+                        if is_list:
+                            ret = self.get_xml_val_list(val)
+                        else:
+                            ret = val
+                    # else:
+                    #     self.throw_invalid_element_error(self, abs_path, key)
+            else:
+                # start pre-2.0 opencpi
+                attr_abs_path = makefile_abs_path
+                ret = self.get_variable_val_list_from_gnu_makefile(attr, attr_abs_path)
+                if not is_list:
+                    if len(ret) > 0:
+                        ret = ret[0]
+                    else:
+                        ret = ''
+                # end pre-2.0 opencpi
+            if attr_abs_path != '':
+                if (ret != '') and (ret != []):
+                    Logger().debug('** parsed ' + attr_abs_path + ' ' + attr +
+                                   ' value of ' + str(ret))
+        return ret
+
+    def get_attr(self, attr, elem=None, makefile_abs_path=''):
+        """ Retrieves the singular value, as a string, of the attr attribute,
+            either from the makefile indicated in makefile_abs_path (if
+            non-empty), or the XML pointed to by self.abs_path. Examples of
+            attr are 'Property' and 'Instance' """
+        return self.get_attr_common(attr, elem, False, makefile_abs_path)
+
+    def get_attr_list(self, attr, elem=None, makefile_abs_path=''):
+        """ Retrieves the value, as a list of strings, of the attr attribute,
+            either from the makefile indicated in makefile_abs_path (if
+            non-empty), or the XML pointed to by self.abs_path. Examples of
+            attr are 'Property' and 'Instance' """
+        return self.get_attr_common(attr, elem, True, makefile_abs_path)
+
+    def raise_invalid_attribute_error(self, elem_str):
+        # msg = abs_path + ': ' + elem_str + ' is an invalid attribute'
+        msg = elem_str + ' is an invalid attribute'
+        # Logger().warn(msg)
+        raise InvalidAttributeError(msg)
+
+
+# TODO rename _AssetBase to AssetBase
+class _AssetBase(AttributeBase):
+    """ Contains functionality common to all assets, e.g., all
+        Protocols/Workers/Assemblies/etc. Child classes must define
+        get_root_tags() method which returns list of strings of permissible
+        tags to verify during construction. Each asset has a directory that is
+        retrievable via get_dir_abs_path(). Assets that have XML files can query
+        get_xml_abs_path(). """
+
+    def __init__(self, abs_path):
+        """ abs_path is either to a xml file (Component/Protocol/etc) or a dir
+            (HdlAssembly/etc) or none for some cases (Component embedded in
+            OWD, platform base config) """
+        self.abs_path = abs_path  # can be None, e.g., for base platform config
+        expected_root_tag = self.get_root_tags()[0]
+        if self.get_is_xml():
+            name = self.get_name_from_abs_path(abs_path)
+            strs_to_remove = []
+            if self.get_root_tags() == ['ComponentSpec']:
+                strs_to_remove += ['-spec']  # CDG section 6
+                strs_to_remove += ['_spec', '-comp']  # undocumented
+            if self.get_root_tags() == ['Protocol']:
+                # below line is CDG section 5
+                strs_to_remove += ['-prot', '-protocol', '_protocol']
+                strs_to_remove += ['_prot']  # undocumented
+            if self.get_root_tags() == ['HdlWorker']:
+                strs_to_remove += ['-hdl']  # undocumented
+            if self.get_root_tags() == ['RccWorker']:
+                strs_to_remove += ['-rcc']  # undocumented
+            for str_to_remove in strs_to_remove:
+                name = name.split(str_to_remove, -1)[0]
+        else:
+            # abs_path is not None for makefiles but will be be None for base
+            # platform configuration
+            if abs_path is None:
+                name = 'base'
+            else:
+                name = abs_path.split('/')[-1]
+        self.name = name  # CDG section 6.1.1, section 8.1.1, etc
+        if (abs_path is not None):
+            if self.get_is_xml():
+                exists = os.path.isfile(self.get_xml_abs_path())
+            else:
+                exists = os.path.isdir(abs_path)
+            if not exists:
+                pre = 'dir'
+                if self.abs_path.endswith('.xml'):
+                    pre = 'xml file'
+                msg = pre + ' ' + self.abs_path + ' does not exist'
+                raise InvalidAssetError(msg)
+            if os.path.isfile(self.get_xml_abs_path()):
+                lowers = [tag.lower() for tag in self.get_root_tags()]
+                tag = self.get_tag(None)
+                if tag.lower() not in lowers:
+                    msg = self.get_xml_abs_path() + ' (root tag ' + tag
+                    msg += ') is not a ' + expected_root_tag
+                    # TODO investigate moving to ComponentLibrary/HdlPlatform
+                    if self.get_dir_abs_path().endswith('hdl/platforms'):
+                        # Logger().warn(msg)
+                        pass
+                    else:
+                        raise InvalidAssetError(msg)
+
+    @staticmethod
+    def get_name_from_abs_path(abs_path):
+        #return abs_path.rsplit('/', 1)[1].split('.xml')[0]
+        return abs_path.rsplit('/', 1)[1].split('.')[0]
+
+    @staticmethod
+    def listdir_assets(dir_abs_path):
+        """ return list of names of (non-recursive) entries within dir_abs_path
+            which are to be considered as assets to be discovered """
+        # TODO this method probably needs a better name or consolidation
+        return [entry for entry in os.listdir(dir_abs_path) if
+                (os.path.isfile(entry) or (entry != 'lib'))]
+
+    @staticmethod
+    def get_existing_abs_dir_paths_for_asset_consideration(parent_abs_path):
+        """ return list of absolute paths of (non-recursive) directories
+            within parent_abs_path which exist and are to be considered as
+            assets to be discovered """
+        return [(parent_abs_path + '/' + entry) for entry in
+                os.listdir(parent_abs_path) if (os.path.isdir(parent_abs_path + '/' + entry) and
+                (entry != 'lib') and (entry != 'specs'))]
+
+    def get_is_xml(self):
+        ret = False
+        if self.abs_path is not None:
+            ret = self.abs_path.endswith('.xml')
+        return ret
+
+    def get_xml_abs_path(self):
+        """ returns asboslute path to asset's xml file, regardless of asset
+            type """
+        ret = None
+        # self.abs_path can be None, e.g., for base platform configuration
+        if self.abs_path is not None:
+            ret = self.abs_path + '/' + self.name + '.xml'
+            if self.get_is_xml():
+                ret = self.abs_path
+        return ret
+
+    def get_dir_abs_path(self):
+        """ returns asboslute path to asset's directory, regardless of asset
+            type """
+        ret = self.abs_path
+        if self.get_is_xml():
+            ret = self.abs_path.rsplit('/', 1)[0]
+        return ret
+
+    def get_parsed(self):
+        xml_abs_path = self.get_xml_abs_path()
+        fixed_abs_path = xml_abs_path
+        if True:
+            # can be removed when OpenCPI follows XML Specification
+            fs = TemporaryFilesystem()
+            fixed_abs_path = fs.abs_path + '/' + self.name
+            fixed_abs_path += str(uuid.uuid4())
+            os.system('cp ' + xml_abs_path + ' ' + fixed_abs_path)
+            elems = ['ComponentSpec', 'Protocol']
+            elems += ['HdlWorker', 'HdlDevice', 'RccWorker']
+            for elem in elems:
+                # ugly ugly fix... (e.g. file_read OCS)
+                fp = fixed_abs_path
+                # below line adds && operator support (CDG section 7.11.2)
+                os.system("sed -i \"s|\&\&|\&amp;\&amp;|g\" " + fp)
+                os.system("sed -i \"s|protocolsummary|foosummary|g\" " + fp)
+                os.system("sed -i \"s|ProtocolSummary|foosummary|g\" " + fp)
+                # append xmlns:xi= which breaks parser if missing
+                for _elem in [elem, elem.lower()]:
+                    cmd = "sed -i \"s|<" + _elem + '|<' + _elem + ' '
+                    cmd += "xmlns:xi=\\\"http://www.w3.org/2001/"
+                    cmd += "XInclude\\\" |g\" " + fixed_abs_path
+                    # below line hacks xi:include support (CDG section 5.1)
+                    os.system(cmd)
+                # ugly ugly fix... (e.g. file_read OCS)
+                os.system("sed -i \"s|foosummary|ProtocolSummary|g\" " + fp)
+            # below line removes empty lines which break parser
+            os.system("sed -i \'/^$/d\' " + fixed_abs_path)
+        try:
+            ret = ET.parse(fixed_abs_path)
+        except ET.ParseError as err:
+            # print(fixed_abs_path)
+            # os.system('cat ' + fixed_abs_path)
+            msg = 'malformed xml: ' + self.get_xml_abs_path()
+            # Logger().warn('skipping ' + msg + ' ' + str(err))
+            Logger().warn('skipping ' + msg)
+            raise InvalidAssetError(msg)
+        return ret
+
+    def get_list_of_existing_abs_paths_to_parse(self, abs_paths):
+        """ abs_paths is list of absolute paths to xml or Makefile to be parsed,
+            which is then pruned to contain only files that exist before
+            returning the pruned list, with the list order maintained """
+        ret = []
+        for abs_path in abs_paths:
+            if os.path.exists(abs_path):
+                Logger().debug('parsing ' + abs_path)
+                ret.append(abs_path)
+        return ret
+
+    def get_tag(self, elem):
+        ret = None
+        if elem is None:
+            ret = self.get_parsed().getroot().tag
+        else:
+            ret = elem.tag
+        return ret
+
+    def raise_invalid_asset_error(self):
+        raise InvalidAssetError('not a ' + self.get_root_tags()[0])
+
+
+def test_GNUMakefile(ret):
+    log_pass_fail('testing GNUMakefile', False)
+    return ret
