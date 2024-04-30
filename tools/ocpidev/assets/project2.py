@@ -453,23 +453,22 @@ class Project(SpecsDirectory, Discoverer, _AssetBase):
 
 
 def test_PackageID(ret):
-    passed = True
-    fs = TemporaryFilesystem()
-    try:
-        dir_abs_path = fs.abs_path + '/' + 'ocpiproject'
-        xml_abs_path = dir_abs_path + '/' + 'project.xml'
-        os.system('mkdir -p ' + dir_abs_path)
-        ff = open(xml_abs_path, 'w')
-        ff.write('<Project PackagePrefix=\'ocpi\' PackageName=\'proj\'/>\n')
-        ff.close()
-        if Environment().ocpi_log_level >= 10:
-            os.system('cat ' + xml_abs_path)
-        package_id = PackageID(xml_abs_path)
-    except:
-        passed = False
-    log_pass_fail('testing PackageID', passed)
-    if passed is False:
-        ret = False
+    for test in [0, 1]:
+        passed = True
+        try:
+            uut= PackageID('ocpi', 'proj')
+            if test == 0:
+                passed = uut.package_prefix == 'ocpi'
+            if test == 1:
+                passed = uut.package_name == 'proj'
+        except:
+            passed = False
+        if test == 0:
+            log_pass_fail('testing PackageID package_prefix', passed)
+        if test == 1:
+            log_pass_fail('testing PackageID package_name', passed)
+        if passed is False:
+            ret = False
     return ret
 
 
