@@ -1,7 +1,7 @@
-#. OpenCPI concepts are typically created as small data structures correspond to their documentation/XML definitions, and the each concept is built from the perspective of the project it exists within. This helps keep each concept class small, and aids in project traversion that is intrinsic to the build process.
-#. Unit tests are written with a test per class member variable
-#. assets are always built from the perspective of a project, and projects can search other projects in the registry
-#. XML tags are always defined in the same upper camel case as the documentation, e.g., HdlAssembly as defined in get_root_tags(), and then case variants, e.g., hdlassembly occuring in an XML file, are handled within the XML parsing classes (AttributeBase) that compare the lower case of everything
+1. OpenCPI concepts are typically created as small data structures correspond to their documentation/XML definitions, and the each concept is built from the perspective of the project it exists within. This helps keep each concept class small, and aids in project traversion that is intrinsic to the build process.
+2. Unit tests are written with a test per class member variable
+3. assets are always built from the perspective of a project, and projects can search other projects in the registry
+4. XML tags are always defined in the same upper camel case as the documentation, e.g., HdlAssembly as defined in get_root_tags(), and then case variants, e.g., hdlassembly occuring in an XML file, are handled within the XML parsing classes (AttributeBase) that compare the lower case of everything
 
 OpenCPI-2.0-and-after documentation here: https://opencpi.gitlab.io/releases/v2.4.7/docs/OpenCPI_Component_Development_Guide.pdf
 
