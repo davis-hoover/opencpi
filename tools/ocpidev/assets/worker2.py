@@ -17,8 +17,12 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-import uuid
 import os
+# if os.path.isfile(os.getcwd() + '/platform.py'):
+#     # collision with uuid's 'import platform' and this directory's
+#     # platform.py
+#     raise Exception('do not run this from the assets directory!')
+import uuid
 from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import _AssetBase
 
@@ -61,7 +65,7 @@ class Worker(_AssetBase):
         paths = []
         # start pre-2.0 opencpi
         paths += [self.abs_path + '/Makefile']
-        # intentionally put xml path last so that its attributes take precedence
+        # intentionally put xml last so that its attributes take precedence
         # end pre-2.0 opencpi
         paths.append(self.get_xml_abs_path())
         for path in self.get_list_of_existing_abs_paths_to_parse(paths):
@@ -160,7 +164,7 @@ def test_Worker___init___common(ret, test):
         elif test == 5:
             if uut.authoring_model != 'rcc':
                 passed = False
-    except:
+    except InvalidAssetError:
         passed = False
     if test == 0:
         log_pass_fail('testing Worker abs_path', passed)

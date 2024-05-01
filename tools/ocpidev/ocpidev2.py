@@ -294,8 +294,12 @@ class LegacyOCPIDevHDLBuildTool():
             cmd = 'ocpidev build -d ' + project.abs_path + ' --no-doc'
             if Environment().ocpi_log_level < 8:
                 cmd += ' >/dev/null 2>&1'
+            #cmd = 'cd ' + project.abs_path + ' && $OCPI_CDK_DIR/scripts/export-project.sh'
+            #if Environment().ocpi_log_level >= 9:
+            #    cmd += ' -v'
+            #cmd += ' -'
             if os.system(cmd) != 0:
-                raise Exception('failed to export project' + str(project.get_package_id()) + ', set log level to 8 or higher for more info')
+                raise Exception('failed to export project ' + str(project.get_package_id()) + ', set log level to 8 or higher for more info')
 
     def install_rcc_platform_if_not_installed(
             self, project_registry, rcc_platform):

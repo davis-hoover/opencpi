@@ -20,6 +20,9 @@
 import xml.etree.ElementTree as ET
 import os
 import sys
+# if os.path.isfile(os.getcwd() + '/platform.py'):
+#     # collision with uuid's 'import platform' and this directory's platform.py
+#     raise Exception('do not run this from the assets directory!')
 import uuid
 import glob
 
@@ -46,6 +49,7 @@ def get_xml_val_list(val):
     return ' '.join(val.replace('\n', '').split()).split(' ')
 
 
+# TODO probably a single authoritative xml is needed to parse this from....
 def get_hdl_target(hdl_platform):
     # TODO parse tools/include/hdl/hdl-targets.xml, hdl/platforms/ml605/ml605.mk instead of below code
     ret = hdl_platform
@@ -72,6 +76,32 @@ def get_hdl_target(hdl_platform):
     elif hdl_platform == 'zrf8_48dr':
         ret = 'zynq_ultra'
     return ret
+
+
+# TODO properly separate into extensible tool
+def get_worker_build_output_extension(hdl_platform):
+    ret = 'edf'
+    target = get_hdl_target(hdl_platform)
+    if target.startswith('virtex'):
+        ret = 'qsf'
+    elif target.startswith('stratix'):
+        ret = 'qsf'
+    return ret
+
+# TODO properly separate into extensible tool
+def get_assembly_build_output_extension(hdl_platform):
+    ret = 'bitz'
+    target = get_hdl_target(hdl_platform)
+    if target.startswith('virtex'):
+        ret = 'sof'
+    elif target.startswith('stratix'):
+        ret = 'sof'
+    return ret
+
+
+# TODO move to Project, or perhaps ProjectRegistry, class
+def raise_not_found_in_projects(msg, name):
+    raise Exception(msg + ' ' + name + ' not found in any registered project')
 
 
 class InvalidAssetError(Exception):
@@ -827,38 +857,30 @@ class _AssetBase(AttributeBase):
 
     def get_parsed(self):
         xml_abs_path = self.get_xml_abs_path()
-        fixed_abs_path = xml_abs_path
-        if True:
-            # can be removed when OpenCPI follows XML Specification
-            fs = TemporaryFilesystem()
-            fixed_abs_path = fs.abs_path + '/' + self.name
-            fixed_abs_path += str(uuid.uuid4())
-            os.system('cp ' + xml_abs_path + ' ' + fixed_abs_path)
-            elems = ['ComponentSpec', 'Protocol']
-            elems += ['HdlWorker', 'HdlDevice', 'RccWorker']
-            for elem in elems:
-                # ugly ugly fix... (e.g. file_read OCS)
-                fp = fixed_abs_path
-                # below line adds && operator support (CDG section 7.11.2)
-                os.system("sed -i \"s|\&\&|\&amp;\&amp;|g\" " + fp)
-                os.system("sed -i \"s|protocolsummary|foosummary|g\" " + fp)
-                os.system("sed -i \"s|ProtocolSummary|foosummary|g\" " + fp)
-                # append xmlns:xi= which breaks parser if missing
-                for _elem in [elem, elem.lower()]:
-                    cmd = "sed -i \"s|<" + _elem + '|<' + _elem + ' '
-                    cmd += "xmlns:xi=\\\"http://www.w3.org/2001/"
-                    cmd += "XInclude\\\" |g\" " + fixed_abs_path
-                    # below line hacks xi:include support (CDG section 5.1)
-                    os.system(cmd)
-                # ugly ugly fix... (e.g. file_read OCS)
-                os.system("sed -i \"s|foosummary|ProtocolSummary|g\" " + fp)
-            # below line removes empty lines which break parser
-            os.system("sed -i \'/^$/d\' " + fixed_abs_path)
+        _file = open(self.get_xml_abs_path(), 'r')
+        _str = _file.read()
+        # can be removed when OpenCPI follows XML Specification
+        elems = ['ComponentSpec', 'Protocol']
+        elems += ['HdlWorker', 'HdlDevice', 'RccWorker']
+        for elem in elems:
+            # ugly ugly fix... (e.g. file_read OCS)
+            # below line adds && operator support (CDG section 7.11.2)
+            _str = _str.replace('\%\%', '\&amp;\%amp;')
+            # below 2 lines avoid corruption of ProtocolSummary attribute
+            _str = _str.replace('protocolsummary', 'foosummary')
+            _str = _str.replace('ProtocolSummary', 'foosummary')
+            for _elem in [elem, elem.lower()]:
+                from_str = '<' + _elem
+                to_str = '<' + _elem + " xmlns:xi=\"http://www.w3.org/2001/XInclude\" "
+                # below line hacks xi:include support (CDG section 5.1)
+                _str = _str.replace(from_str, to_str)
+            # below line avoids corruption of ProtocolSummary attribute
+            _str = _str.replace('foosummary', 'ProtocolSummary')
+        # below line adds support for newlines in attributes (undocumented in OpenCPI)
+        _str = _str.replace('\n', '')
         try:
-            ret = ET.parse(fixed_abs_path)
+            ret = ET.ElementTree(ET.fromstring(_str))
         except ET.ParseError as err:
-            # print(fixed_abs_path)
-            # os.system('cat ' + fixed_abs_path)
             msg = 'malformed xml: ' + self.get_xml_abs_path()
             # Logger().warn('skipping ' + msg + ' ' + str(err))
             Logger().warn('skipping ' + msg)

@@ -89,10 +89,13 @@ class HdlContainer(_AssetBase):
 
     def __init__(self, xml_abs_path):
         _AssetBase.__init__(self, xml_abs_path)
-        # self.platform = ''
-        # self.only_platforms = []
-        # self.exclude_platforms = []
-        # self.config = ''
+        # start of HDL section 6.4.1
+        self.platform = ''
+        self.config = ''
+        self.constraints = ''
+        self.only_platforms = []
+        self.exclude_platforms = []
+        # end of HDL section 6.4.1
         self.devices = dict()
         self.parse()
 
@@ -101,6 +104,11 @@ class HdlContainer(_AssetBase):
 
     def parse(self):
         Logger().debug('parsing ' + self.get_xml_abs_path())
+        self.platform = self.get_attr('Platform')
+        self.config = self.get_attr('Config')
+        self.constraints = self.get_attr('Constraints')
+        self.only_platforms = self.get_attr_list('OnlyPlatforms')
+        self.exclude_platforms = self.get_attr_list('ExcludePlatforms')
         # TODO consolidate below with AttributeBase/_AssetBase methods
         for elem in self.get_parsed().iter():
             name = None
@@ -338,21 +346,40 @@ def test_HdlContainerDevice(ret):
 
 
 def test_HdlContainer(ret):
-    passed = True
     fs = TemporaryFilesystem()
-    dir_abs_path = fs.abs_path + '/' + 'assembly'
-    xml_abs_path = dir_abs_path + '/' + 'container.xml'
-    try:
-        os.system('mkdir -p ' + dir_abs_path)
-        ff = open(xml_abs_path, 'w')
-        ff.write('<HdlContainer/>\n')
-        ff.close()
-        if Environment().ocpi_log_level >= 10:
-            os.system('cat ' + xml_abs_path)
-        hdl_container = HdlContainer(xml_abs_path)
-    except:
-        passed = False
-    log_pass_fail('testing HdlContainer', passed)
-    if passed is False:
-        ret = False
+    for test in [0, 1, 2, 3]:
+        passed = True
+        try:
+            dir_abs_path = fs.abs_path + '/' + 'assembly'
+            xml_abs_path = dir_abs_path + '/' + 'container.xml'
+            os.system('mkdir -p ' + dir_abs_path)
+            ff = open(xml_abs_path, 'w')
+            ff.write('<HdlContainer Config=\'cfg\' Constraints=\'cst.xdc\' ')
+            ff.write('OnlyPlatforms=\'zed alst4\' ExcludePlatforms=\'ml604\'/>\n')
+            ff.close()
+            uut = HdlContainer(xml_abs_path)
+            if Environment().ocpi_log_level >= 10:
+                print(str([a for a in dir(uut) if not
+                      callable(getattr(uut, a))]))
+                os.system('cat ' + xml_abs_path)
+            if test == 0:
+                passed = uut.config == 'cfg'
+            if test == 1:
+                passed = uut.constraints == 'cst.xdc'
+            if test == 2:
+                passed = uut.only_platforms == ['zed', 'alst4']
+            if test == 3:
+                passed = uut.exclude_platforms == ['ml604']
+        except:
+            passed = False
+        if test == 0:
+            log_pass_fail('testing HdlContainer config', passed)
+        if test == 1:
+            log_pass_fail('testing HdlContainer constraints', passed)
+        if test == 2:
+            log_pass_fail('testing HdlContainer only_platforms', passed)
+        if test == 3:
+            log_pass_fail('testing HdlContainer exclude_platforms', passed)
+        if passed is False:
+            ret = False
     return ret

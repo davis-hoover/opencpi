@@ -45,8 +45,7 @@ class SpecsDirectory():
                     path = self.abs_path + '/' + _dir + '/' + name
                     try:
                         asset = Component(path)
-                        self.components.append(asset)
-                        Logger().log(9, 'discovered ' + asset.get_type() + ' ' + asset.abs_path)
+                        self.append_discovered_asset(asset)
                     except InvalidAssetError:
                         pass
 
@@ -54,6 +53,8 @@ class SpecsDirectory():
 class Discoverer():
 
     def append_discovered_asset(self, asset):
+        if asset.get_type() == 'component':
+            self.components.append(asset)
         if asset.get_type() == 'component library':
             self.component_libraries.append(asset)
         if asset.get_type() == 'application':
@@ -66,9 +67,10 @@ class Discoverer():
             self.hdl_cards.append(asset)
         if asset.get_type() == 'hdl platform':
             self.hdl_platforms.append(asset)
-        if (asset.get_type() == 'hdl worker') or (asset.get_type() == 'rcc worker'):
+        _type = asset.get_type()
+        if (_type == 'hdl worker') or (_type == 'rcc worker'):
             self.workers.append(asset)
-        Logger().log(9, 'discovered ' + asset.get_type() + ' ' + asset.abs_path)
+        Logger().log(9, 'discovered ' + _type + ' ' + asset.abs_path)
 
     def get_potential_asset_dir_abs_paths(self, parent):
         ret = []
@@ -84,6 +86,7 @@ class Discoverer():
         for dir_abs_path in self.get_potential_asset_dir_abs_paths(parent):
             try:
                 asset = None
+                tmp = dir_abs_path
                 if parent == 'hdl/platforms':
                     asset = HdlPlatform(dir_abs_path)
                 elif parent == 'hdl/assemblies':
@@ -92,7 +95,7 @@ class Discoverer():
                     asset = HdlLibrary(dir_abs_path)
                 elif parent == 'applications':
                     asset = Application(dir_abs_path)
-                elif dir_abs_path.endswith('.rcc') or dir_abs_path.endswith('.hdl') or platform:
+                elif tmp.endswith('.rcc') or tmp.endswith('.hdl') or platform:
                     name = _AssetBase.get_name_from_abs_path(dir_abs_path)
                     asset = Worker(dir_abs_path + '/' + name + '.xml')
                 if asset is not None:
@@ -159,7 +162,7 @@ class ComponentLibrary(_AssetBase, SpecsDirectory, Discoverer):
         # start pre-2.0 opencpi
         # TODO address library.mk vs libraries.mk behavior in Makefile
         paths += [self.abs_path + '/Library.mk', self.abs_path + '/Makefile']
-        # intentionally put xml path last so that its attributes take precedence
+        # intentionally put xml last so that its attributes take precedence
         # end pre-2.0 opencpi
         paths.append(self.get_xml_abs_path())
         workers = []
@@ -180,10 +183,21 @@ class ComponentLibrary(_AssetBase, SpecsDirectory, Discoverer):
         self.discover_components()
         self.discover_workers(allowlist, platform)
 
+    def discover_components(self):
+        SpecsDirectory.discover_components(self)
+        for discovery_path in self.get_potential_asset_dir_abs_paths(''):
+            if discovery_path.endswith('.comp'):  # undocumented
+                for entry in _AssetBase.listdir_assets(discovery_path):
+                    try:
+                        asset = Component(discovery_path + '/' + entry)
+                        self.append_discovered_asset(asset)
+                    except InvalidAssetError:
+                        pass
+
     def discover_workers(self, allowlist, platform=False):
         """ workers is a list containing the attribute that serves as a
             discovery "allowlist" """
-        #Logger().debug(str(allowlist))
+        # Logger().debug(str(allowlist))
         # '' in below line indicates worker discovery
         self.discover_dir_assets('', allowlist, platform)
 
@@ -193,13 +207,16 @@ class ComponentLibrary(_AssetBase, SpecsDirectory, Discoverer):
 
 def test_ComponentLibrary(ret):
     fs = TemporaryFilesystem()
-    for test in [0, 1, 2, 3, 4, 5]:
+    for test in range(6):
         passed = True
         try:
             dir_abs_path = fs.abs_path + '/' + 'components'
-            os.system('mkdir -p ' + dir_abs_path)
+            os.system('mkdir -p ' + dir_abs_path + '/' + 'foo.comp')
             ff = open(dir_abs_path + '/' + 'components.xml', 'w')
             ff.write('<Library/>\n')
+            ff.close()
+            ff = open(dir_abs_path + '/foo.comp' + '/' + 'mycomp.xml', 'w')
+            ff.write('<ComponentSpec/>\n')
             ff.close()
             uut = ComponentLibrary(dir_abs_path)
             if test == 0:
@@ -207,14 +224,14 @@ def test_ComponentLibrary(ret):
             if test == 1:
                 passed = uut.name == 'components'
             if test == 2:
-                passed = uut.components == []
+                passed = len(uut.components) == 1
             if test == 3:
                 passed = uut.workers == []
             if test == 4:
                 passed = uut.tests == []
             if test == 5:
                 passed = uut.component_libraries == []
-        except:
+        except InvalidAssetError:
             passed = False
         if test == 0:
             log_pass_fail('testing ComponentLibrary abs_path', passed)

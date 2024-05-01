@@ -28,11 +28,6 @@ from _opencpi.assets.assembly2 import HdlAssembly
 from _opencpi.assets.platform2 import HdlCard, HdlPlatform
 
 
-# TODO move to Project, or perhaps ProjectRegistry, class
-def raise_not_found_in_projects(msg, name):
-    raise Exception(msg + ' ' + name + ' not found in any registered project')
-
-
 # TODO iherit from, and consolidate functionality from, AttributeBase
 class PackageID():
     """ Component Development Guide section 14.2"""
@@ -306,7 +301,7 @@ class Project(SpecsDirectory, Discoverer, _AssetBase):
             if len(asset.containers) == 0:
                 tmp += 'base_'
             else:
-                if asset.containers[0].config is None:
+                if asset.containers[0].config == '':
                     tmp += 'base_'
                 else:
                     tmp += asset.containers[0].config + '_'
@@ -314,9 +309,11 @@ class Project(SpecsDirectory, Discoverer, _AssetBase):
             ret += '/container-' + tmp + '_'
         ret += '/target-' + get_hdl_target(hdl_platform) + '/'
         if (asset.get_type() == 'hdl primitive') or (asset.get_type() == 'hdl worker'):
-            ret += asset.name + '_rv.edf'
+            # TODO properly separate into extensible tool
+            ret += asset.name + get_worker_build_output_extension(hdl_platform)
         if (asset.get_type() == 'hdl assembly'):
-            ret += tmp + '_rv.edf'
+            # TODO properly separate into extensible tool
+            ret += tmp + '_rv.' + get_assembly_build_output_extension(hdl_platform)
         return ret
 
     def build_asset(self, asset, project_registry, tool,

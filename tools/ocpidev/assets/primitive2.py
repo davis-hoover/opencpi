@@ -42,7 +42,7 @@ class HdlLibrary(_AssetBase):
         paths = []
         # start pre-2.0 opencpi
         paths += [self.abs_path + '/Makefile']
-        # intentionally put xml path last so that its attributes take precedence
+        # intentionally put xml last so that its attributes take precedence
         # end pre-2.0 opencpi
         paths.append(self.get_xml_abs_path())
         for path in self.get_list_of_existing_abs_paths_to_parse(paths):
@@ -78,7 +78,7 @@ def test_HdlLibrary(ret):
                 passed = uut.libraries == ['foo']
             if test == 1:
                 passed = uut.source_files == ['x.vhd']
-        except:
+        except InvalidAssetError:
             passed = False
         if test == 0:
             log_pass_fail('testing HdlLibrary libraries ', passed)
