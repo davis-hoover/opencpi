@@ -18,6 +18,7 @@
 
 
 import os
+import itertools
 from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import _AssetBase
 from _opencpi.assets.worker2 import Worker
@@ -183,7 +184,7 @@ class Project(SpecsDirectory, Discoverer, _AssetBase):
                 #   - hdl/adapters/
                 #   - hdl/platforms/
                 dir_abs_paths.append(dir_abs_path)
-                subdir_abs_paths = _AssetBase.get_existing_dir_abs_paths_for_asset_consideration(dir_abs_path)
+                subdir_abs_paths = _AssetBase.get_existing_abs_dir_paths_for_asset_consideration(dir_abs_path)
                 if _dir == 'components':
                     for subdir_abs_path in subdir_abs_paths:
                         if not ComponentLibrary.get_dir_abs_path_is_worker(subdir_abs_path):
@@ -477,63 +478,68 @@ def test_PackageID(ret):
 
 
 def test_Project_discover_component_libraries(ret):
+    """ Test all possible combinations of component libraries and """
+    """ sub-component libraries therein including: """
+    """ hdl/platforms/<platform>/devices """
     passed = True
     fs = TemporaryFilesystem()
     project_abs_path = fs.abs_path + '/' + 'project'
     os.system('mkdir -p %s' % project_abs_path)
-    files_to_test = 3
-    libs_to_test = 6
+    libs_to_test = 7
     element = [0, 1]
-    _files = itertools.product(element, repeat=files_to_test)
-    _libraries = itertools.product(element, repeat=libs_to_test)
-    for files, libraries in itertools.product(_files, _libraries):
-        # Create filestr : fileidx relationship
-        file_dict = {
-            "Makefile": files[0],
-            "Library.mk": files[1],
-            "library.xml": files[2]
-        }
-        # Create libstr : libidx relationship
-        # TODO: Implement '.'
-        # TODO: Implement 'hdl/platforms/plib'
+    libraries_product = itertools.product(element, repeat=libs_to_test)
+    for libraries in libraries_product:
         lib_dict = {
             "components": libraries[0],
             "hdl/adapters": libraries[1],
             "hdl/cards": libraries[2],
             "hdl/devices": libraries[3],
             "hdl/platforms": libraries[4],
-            "components/clib": libraries[5]
-            # ,"hdl/platforms/plib" : libraries[6]
-            # ,"." : libraries[7]
+            "components/clib": libraries[5],
+            "hdl/platforms/plat/devices" : libraries[6]
         }
         # TODO: Break this out into separate function
         # Create Project Component Library Directories
         nlibs = 0
+        components_parent = False
+        platforms_parent = False
         for lib_key, lib_value in lib_dict.items():
             if '/' in lib_key:
                 library_xml = lib_key.split('/')[-1]
             else:
                 library_xml = lib_key
             if lib_value:
-                library_path = project_abs_path + '/' + lib_key
-                os.system('mkdir -p %s/%s' % (project_abs_path, lib_key))
-                any_file = 0
-                for file_key, file_value in file_dict.items():
-                    if file_value:
-                        any_file = 1
-                        if file_key == "library.xml":
-                            lpath = project_abs_path + '/' + lib_key + '/' + \
-                                    lib_key.split('/')[-1] + '.xml'
-                            ff = open(lpath, 'w')
-                            ff.write('<Library/>\n')
-                            ff.close()
-                            if Environment().ocpi_log_level >= 10:
-                                os.system('cat ' + lpath)
-                        # start pre-2.0 opencpi
-                        if file_key == "Makefile" or file_key == "Library.mk":
-                            os.system('touch %s/%s' % (library_path, file_key))
-                        # end pre-2.0 opencpi
-                nlibs += any_file
+                if lib_key == 'components':
+                    components_parent = True
+                    nlibs += 1
+                    os.system('mkdir -p %s/%s' % (project_abs_path, lib_key))
+                elif lib_key == 'components/clib':
+                    if components_parent:
+                        nlibs += 1
+                    else:
+                        nlibs += 2
+                    os.system('mkdir -p %s/%s' % (project_abs_path, lib_key))
+                elif lib_key == 'hdl/platforms':
+                    platforms_parent = True
+                    nlibs += 1
+                    os.system('mkdir -p %s/%s' % (project_abs_path, lib_key))
+                elif lib_key == 'hdl/platforms/plat/devices':
+                    if platforms_parent:
+                        nlibs += 1
+                    else:
+                        nlibs += 2
+                    os.system('mkdir -p %s/%s' % (project_abs_path, lib_key))
+                    # Create required <platform>/<platform>.xml with
+                    # <HdlPlatform> XML root-tag
+                    platform_xml = project_abs_path + '/' + 'hdl/platforms/plat/plat.xml'
+                    os.system('touch %s' % platform_xml)
+                    platform_xml_file = open(platform_xml, 'w')
+                    platform_xml_file.write('<HdlPlatform/>\n')
+                    platform_xml_file.close()
+                    #os.system('cat ' + platform_xml)
+                else:
+                    nlibs += 1
+                    os.system('mkdir -p %s/%s' % (project_abs_path, lib_key))
             project_xml = open(project_abs_path + '/' + 'Project.xml', 'w')
             project_xml.write(
                     '<Project PackagePrefix=\'ocpi\' PackageName=\'proj\'/>\n')
