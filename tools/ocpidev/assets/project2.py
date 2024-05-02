@@ -163,40 +163,47 @@ class Project(SpecsDirectory, Discoverer, _AssetBase):
             self.discover_hdl_platforms()
         # end of bullets at top of CDG section 14
 
-    def get_existing_abs_dir_paths_for_clib_consideration(self):
+    def get_existing_dir_abs_paths_for_clib_consideration(self):
+        """ returns a list of absolute paths to directories in standard
+            component libraries locations that are guaranteed to exist """
         # CDG section 14.2.3
-        parents = ['components', 'hdl/devices', 'hdl/cards']
-        parents += ['hdl/adapters', 'hdl/platforms']
+        dirs = ['components', 'hdl/devices', 'hdl/cards']
+        dirs += ['hdl/adapters', 'hdl/platforms']
         dir_abs_paths = []
-        for parent in parents:
-            dir_abs_path = self.abs_path + '/' + parent
+        for _dir in dirs:
+            dir_abs_path = self.abs_path + '/' + _dir
             if os.path.isdir(dir_abs_path):
-                components = parent.split('/')[-1] == 'components'
-                platforms = parent.split('/')[-1] == 'platforms'
-                if components or platforms:
-                    subdir_abs_paths = _AssetBase.get_existing_abs_dir_paths_for_asset_consideration(dir_abs_path)
-                    if components:
-                        all_subdirs = True
-                        _dir_abs_path = dir_abs_path
-                        for dir_abs_path in subdir_abs_paths:
-                            if ComponentLibrary.get_dir_abs_path_is_worker(dir_abs_path):
-                                all_subdirs = False
-                        if all_subdirs:
-                            dir_abs_paths.extend(subdir_abs_paths)
-                        else:
-                            dir_abs_paths.append(_dir_abs_path)
-                    elif platforms:
-                        dir_abs_paths.append(dir_abs_path)
-                        for platform in subdir_abs_paths:
-                            dir_abs_path = platform + '/devices'
-                            if os.path.isdir(dir_abs_path):
-                                dir_abs_paths.append(dir_abs_path)
-                else:
-                    dir_abs_paths.append(dir_abs_path)
+                # add to dir_abs_path the absolute path to the directories
+                # of the following form from CDG section 14.2.3., if they exist,
+                # regardless of whether a "sub"-library directory, e.g.
+                # components/<library>, exists:
+                #   - components/
+                #   - hdl/devices/
+                #   - hdl/cards/
+                #   - hdl/adapters/
+                #   - hdl/platforms/
+                dir_abs_paths.append(dir_abs_path)
+                subdir_abs_paths = _AssetBase.get_existing_dir_abs_paths_for_asset_consideration(dir_abs_path)
+                if _dir == 'components':
+                    for subdir_abs_path in subdir_abs_paths:
+                        if not ComponentLibrary.get_dir_abs_path_is_worker(subdir_abs_path):
+                            # add to dir_abs_path the absolute path to the directories of the
+                            # following parents from CDG section 14.2.3., if they exist:
+                            #   - hdl/platforms/<platform>/devices
+                            #   - components/<library>
+                            dir_abs_paths.append(subdir_abs_path)
+                elif _dir == 'hdl/platforms':
+                    for platform in subdir_abs_paths:
+                        subdir_abs_path = platform + '/devices'
+                        if os.path.isdir(subdir_abs_path):
+                            # add to dir_abs_path the absolute path to the directories of the
+                            # following parents from CDG section 14.2.3., if they exist:
+                            #   - hdl/platforms/<platform>/devices
+                            dir_abs_paths.append(subdir_abs_path)
         return dir_abs_paths
 
     def discover_component_libraries(self):
-        for dir_abs_path in self.get_existing_abs_dir_paths_for_clib_consideration():
+        for dir_abs_path in self.get_existing_dir_abs_paths_for_clib_consideration():
             try:
                 asset = ComponentLibrary(dir_abs_path)
                 self.append_discovered_asset(asset)
