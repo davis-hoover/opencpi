@@ -82,8 +82,54 @@ templates['.gitattributes'] = """
 *.bit -diff
 \n\n"""
 
-templates['Project.xml'] = """<project/>
-\n"""
+project_xml = ("""<project/>
+{%if package_name: %}
+       PackageName='{{package_name}}'
+{% endif %}
+{%if package_prefix: %}
+       PackagePrefix='{{package_prefix}}'
+{% endif %}
+{%if package_id: %}
+       Package='{{package_id}}'
+{% endif %}
+{%if depend: %}
+       ProjectDependencies='{{depend}}'
+{% endif %}
+{%if prim_lib: %}
+       Libraries='{{prim_lib}}'
+{% endif %}
+{%if include_dir: %}
+       IncludeDirs='{{include_dir}}'
+{% endif %}
+{%if xml_include: %}
+       XmlIncludeDirs='{{xml_include}}'
+{% endif %}
+{%if comp_lib: %}
+       ComponentLibraries='{{comp_lib}}'
+{% endif %}
+/>
+\n""")
+
+project_xml = jinja2.Template(project_xml, trim_blocks=True)
+# TODO Put all vars in render()
+package_name = "HELLO PACKAGE NAME"
+project_xml = project_xml.render(package_name=package_name)
+templates['Project.xml'] = project_xml
+
+dot_project = ("""<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+  <name>{{determined_package_id}}</name>
+  <comment></comment>
+  <projects></projects>
+  <buildSpec></buildSpec>
+  <natures></natures>
+</projectDescription>
+\n""")
+
+dot_project = jinja2.Template(dot_project, trim_blocks=True)
+# TODO Put all vars in render()
+dot_project = dot_project.render()
+templates['.project'] = dot_project
 
 # TODO iherit from, and consolidate functionality from, AttributeBase
 class PackageID():
