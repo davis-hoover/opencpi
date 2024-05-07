@@ -28,6 +28,9 @@ class Application(_AssetBase):
 
     def __init__(self, dir_abs_path):
         _AssetBase.__init__(self, dir_abs_path)
+        # TODO investigate whether below line is necessary
+        # if not os.path.isfile(self.get_xml_abs_path()):
+        #     self.raise_abs_path_does_not_exist()
         if not os.path.isfile(self.get_xml_abs_path()):
             tmp = self.get_dir_abs_path() + '/' + self.name
             if not os.path.isfile(tmp + '.cc'):

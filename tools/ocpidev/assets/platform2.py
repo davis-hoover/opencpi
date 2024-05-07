@@ -28,7 +28,6 @@ class HdlCardPlatformBase(_AssetBase):
     def __init__(self, abs_path):
         _AssetBase.__init__(self, abs_path)
         self.devices = dict()  # key = unique instance name, val = worker name
-        self.parse_devices()
 
     def parse_devices(self):
         for elem in self.get_parsed().iter():
@@ -60,6 +59,8 @@ class HdlPlatform(HdlCardPlatformBase):
 
     def __init__(self, dir_abs_path):
         HdlCardPlatformBase.__init__(self, dir_abs_path)
+        if not os.path.isfile(self.get_xml_abs_path()):
+            self.raise_abs_path_does_not_exist()
         self.configurations = dict()
         try:
             self.configurations['base'] = HdlPlatformConfiguration(None)
@@ -71,9 +72,13 @@ class HdlPlatform(HdlCardPlatformBase):
         return ['HdlPlatform']
 
     def parse(self):
+        self.parse_devices()
         owd_path = self.abs_path + '/' + self.name + '.xml'
         if self.name != Worker(owd_path).name:
-            Logger().warn('platform name does not match worker name')
+            msg = ('platform directory ' + owd_path + ' , ' +
+                   self.name + '.xml' + ' file does not contain equivalent '
+                   'platform worker XML Name attiribute: ' + self.name)
+            Logger().warn(msg)
         for cfg in self.get_attr_list('Configurations'):
             path = self.abs_path + '/' + cfg + '.xml'
             try:
@@ -84,7 +89,7 @@ class HdlPlatform(HdlCardPlatformBase):
                     raise err
 
     def get_type(self):
-        return 'hdl card'
+        return 'hdl platform'
 
 
 class HdlPlatformConfigurationDevice(AttributeBase):
@@ -135,6 +140,7 @@ class HdlCard(HdlCardPlatformBase):
 
     def parse(self):
         Logger().debug('parsing ' + self.get_xml_abs_path())
+        self.parse_devices()
         for key, val in self.get_parsed().getroot().attrib.items():
             if key.lower() == 'type':
                 self.type = val

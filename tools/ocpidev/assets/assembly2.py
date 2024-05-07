@@ -46,6 +46,8 @@ class HdlAssembly(_AssetBase):
 
     def __init__(self, dir_abs_path):
         _AssetBase.__init__(self, dir_abs_path)
+        if not os.path.isfile(self.get_xml_abs_path()):
+            self.raise_abs_path_does_not_exist()
         self.instances = []
         self.containers = []
         self.parse()

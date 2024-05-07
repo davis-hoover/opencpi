@@ -790,11 +790,7 @@ class _AssetBase(AttributeBase):
             else:
                 exists = os.path.isdir(abs_path)
             if not exists:
-                pre = 'dir'
-                if self.abs_path.endswith('.xml'):
-                    pre = 'xml file'
-                msg = pre + ' ' + self.abs_path + ' does not exist'
-                raise InvalidAssetError(msg)
+                self.raise_abs_path_does_not_exist()
             if os.path.isfile(self.get_xml_abs_path()):
                 lowers = [tag.lower() for tag in self.get_root_tags()]
                 tag = self.get_tag(None)
@@ -905,6 +901,15 @@ class _AssetBase(AttributeBase):
         else:
             ret = elem.tag
         return ret
+
+    def raise_abs_path_does_not_exist(self):
+        """ useful check for *directory* variants of _AssetBase (_AssetBase
+            does not check for XML existence of directory variants) """
+        pre = 'dir'
+        if self.abs_path.endswith('.xml'):
+            pre = 'xml file'
+        msg = pre + ' ' + self.abs_path + ' does not exist'
+        raise InvalidAssetError(msg)
 
     def raise_invalid_asset_error(self):
         raise InvalidAssetError('not a ' + self.get_root_tags()[0])
