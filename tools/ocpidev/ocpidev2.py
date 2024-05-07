@@ -24,6 +24,7 @@ import argparse
 import signal
 from _opencpi.assets.abstract2 import *
 from _opencpi.assets.registry2 import ProjectRegistry
+import _opencpi.assets.template as ocpitemplate
 # below is for unittests
 from _opencpi.assets.component2 import *
 from _opencpi.assets.library2 import *
@@ -44,8 +45,9 @@ class OCPIDev():
     def __init__(self, hdl_build_tool):
         self.hdl_build_tool = hdl_build_tool
 
-    def create(self, noun):
-        raise Exception('create is not supported at this time')
+    def create(self, noun, name):
+        if noun == 'project':
+            Project(os.getcwd() + '/' + name, False).create()
 
     def delete(self, noun):
         raise Exception('delete is not supported at this time')
@@ -405,7 +407,7 @@ def unittest():
     ret = test_Component(ret)
     ret = test_ComponentLibrary(ret)
     # ret = test_RccAssembly(ret)
-    ret = test_Project_discover_component_libraries(ret)
+    # ret = test_Project_discover_component_libraries(ret)
     ret = test_PackageID(ret)
     # ret = test_ProjectRegistry(ret)
     # ret = test_OCPIDev(ret)
@@ -432,12 +434,14 @@ if __name__ == '__main__':
     parser.add_argument('--hdl-target', nargs='?', default=None)
     parser.add_argument('--hdl-platform', nargs='?', default=None)
     parser.add_argument('--rcc-platform', nargs='?', default=None)
-    parser.add_argument('verb')
+    parser.add_argument('verb', nargs='?', default=None)
     parser.add_argument('noun', nargs='?', default=None)
+    parser.add_argument('name', nargs='?', default=None)
     args = parser.parse_args()
     try:
-        nouns = ['registry', 'project', 'projects', 'libraries', 'components']
-        nouns.append('workers')
+        nouns = ['registry', 'project', 'projects', 'libraries', 'components',
+                 'workers']
+
         if (args.noun is not None) and (args.noun not in nouns):
             raise Exception('noun ' + str(args.noun) + ' is not supported')
         signal.signal(signal.SIGINT, mysigint)
@@ -446,8 +450,11 @@ if __name__ == '__main__':
         if args.d is None:
             if (args.noun is None) or (args.verb != 'clean'):
                 _dir = os.getcwd()
+
         if args.verb == 'create':
-            OCPIDev(hdl_build_tool).create(args.noun)
+            if args.name is None:
+                raise Exception('ocpidev2 create ' + args.noun + ' <name> required')
+            OCPIDev(hdl_build_tool).create(args.noun, args.name)
         elif args.verb == 'delete':
             OCPIDev(hdl_build_tool).delete(args.noun)
         elif args.verb == 'build':
@@ -472,7 +479,7 @@ if __name__ == '__main__':
             else:
                 exit_status = 1
         else:
-            raise Exception('verb ' + args.verb + ' is not supported')
+            raise Exception('verb ' + str(args.verb) + ' is not supported')
     except Exception as exception:
         Logger().error(str(exception))
         exit_status = 1

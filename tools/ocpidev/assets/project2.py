@@ -27,7 +27,63 @@ from _opencpi.assets.library2 import SpecsDirectory, Discoverer, ComponentLibrar
 from _opencpi.assets.primitive2 import HdlLibrary
 from _opencpi.assets.assembly2 import HdlAssembly
 from _opencpi.assets.platform2 import HdlCard, HdlPlatform
+import _opencpi.assets.template as ocpitemplate
+import jinja2
 
+templates = {}
+templates['Project.exports'] = """
+# This file specifies aspects of this project that are made available to users,
+# by adding or subtracting from what is automatically exported based on the
+# documented rules.
+# Lines starting with + add to the exports
+# Lines starting with - subtract from the exports
+all
+
+\n\n"""
+
+templates['.gitignore'] = """
+# Lines starting with '#' are considered comments.
+# Ignore (generated) html files,
+#*.html
+# except foo.html which is maintained by hand.
+#!foo.html
+# Ignore objects and archives.
+*.rpm
+*.obj
+*.so
+*~
+*.o
+target-*/
+*.deps
+gen/
+*.old
+*.hold
+*.orig
+*.log
+lib/
+#Texmaker artifacts
+*.aux
+*.synctex.gz
+*.out
+**/doc*/*.pdf
+**/doc*/*.toc
+**/doc*/*.lof
+**/doc*/*.lot
+run/
+exports/
+imports
+*.pyc
+simulations/
+\n\n"""
+
+templates['.gitattributes'] = """
+*.ngc -diff
+*.edf -diff
+*.bit -diff
+\n\n"""
+
+templates['Project.xml'] = """<project/>
+\n"""
 
 # TODO iherit from, and consolidate functionality from, AttributeBase
 class PackageID():
@@ -44,10 +100,8 @@ class PackageID():
 class Project(SpecsDirectory, Discoverer, _AssetBase):
     """ Component Development Guide section 14 """
 
-    def __init__(
-            self, dir_abs_path, do_discover_component_libraries=True,
-            do_discover_hdl_primitives=True):
-        _AssetBase.__init__(self, dir_abs_path)
+    def __init__(self, dir_abs_path, enable_path_existence_check=True):
+        _AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
         #del self.name
         SpecsDirectory.__init__(self)
         self.package_prefix = ''
@@ -73,10 +127,14 @@ class Project(SpecsDirectory, Discoverer, _AssetBase):
         self.project_dependencies = ['ocpi.core']
         # end of CDG section 14.5
         self.parse()
-        # TODO fix below optimization line
-        self.discover(
-                do_discover_component_libraries, do_discover_hdl_primitives, do_discover_hdl_primitives)
         self.first = True
+
+    def create(self):
+        if self.get_abs_path_exists():
+            raise Exception('project ' + self.abs_path + ' already exists')
+        else:
+            os.mkdir(self.get_dir_abs_path())
+        _AssetBase.create(self, templates)
 
     def get_root_tags(self):
         return ['Project']
@@ -544,7 +602,7 @@ def test_Project_discover_component_libraries(ret):
             project_xml.write(
                     '<Project PackagePrefix=\'ocpi\' PackageName=\'proj\'/>\n')
             project_xml.close()
-            project = Project(project_abs_path)
+            project = Project(project_abs_path, False)
             if nlibs != len(project.component_libraries):
                 passed = False
         os.system('rm -rf %s/*' % project_abs_path)

@@ -752,16 +752,28 @@ class _AssetBase(AttributeBase):
         get_root_tags() method which returns list of strings of permissible
         tags to verify during construction. Each asset has a directory that is
         retrievable via get_dir_abs_path(). Assets that have XML files can query
-        get_xml_abs_path(). """
+        get_xml_abs_path(). Every child class is intended to also define a
+        get_type() string that is used for log messagin and internal asset
+        conditionalization."""
 
-    def __init__(self, abs_path):
+    def __init__(self, abs_path, enable_path_existence_check=True):
         """ abs_path is either to a xml file (Component/Protocol/etc) or a dir
             (HdlAssembly/etc) or none for some cases (Component embedded in
             OWD, platform base config) """
+        # IMPORTANT - derived classes should not retrieve self.abs_path
+        # directly, use self.get_dir_abs_path() and self.get_xml_abs_path()
+        # instead
+        # TODO - rename to self._abs_path
         self.abs_path = abs_path  # can be None, e.g., for base platform config
+        self.name = self.get_name() # CDG section 6.1.1, section 8.1.1, etc
+        if (self.abs_path is not None):
+            if enable_path_existence_check:
+                self.raise_if_path_does_not_exist()
+
+    def get_name(self):
         expected_root_tag = self.get_root_tags()[0]
         if self.get_is_xml():
-            name = self.get_name_from_abs_path(abs_path)
+            name = self.get_name_from_abs_path(self.abs_path)
             strs_to_remove = []
             if self.get_root_tags() == ['ComponentSpec']:
                 strs_to_remove += ['-spec']  # CDG section 6
@@ -779,38 +791,49 @@ class _AssetBase(AttributeBase):
         else:
             # abs_path is not None for makefiles but will be be None for base
             # platform configuration
-            if abs_path is None:
+            if self.abs_path is None:
                 name = 'base'
             else:
-                name = abs_path.split('/')[-1]
-        self.name = name  # CDG section 6.1.1, section 8.1.1, etc
-        if (abs_path is not None):
-            if self.get_is_xml():
-                exists = os.path.isfile(self.get_xml_abs_path())
-            else:
-                exists = os.path.isdir(abs_path)
-            if not exists:
-                pre = 'dir'
-                if self.abs_path.endswith('.xml'):
-                    pre = 'xml file'
-                msg = pre + ' ' + self.abs_path + ' does not exist'
-                raise InvalidAssetError(msg)
-            if os.path.isfile(self.get_xml_abs_path()):
-                lowers = [tag.lower() for tag in self.get_root_tags()]
-                tag = self.get_tag(None)
-                if tag.lower() not in lowers:
-                    msg = self.get_xml_abs_path() + ' (root tag ' + tag
-                    msg += ') is not a ' + expected_root_tag
-                    # TODO investigate moving to ComponentLibrary/HdlPlatform
-                    if self.get_dir_abs_path().endswith('hdl/platforms'):
-                        # Logger().warn(msg)
-                        pass
-                    else:
-                        raise InvalidAssetError(msg)
+                name = self.abs_path.split('/')[-1]
+        return name
+
+    def get_abs_path_exists(self):
+        if self.get_is_xml():
+            exists = os.path.isfile(self.get_xml_abs_path())
+        else:
+            exists = os.path.isdir(self.abs_path)
+        return exists
+
+    def raise_if_path_does_not_exist(self):
+        if not self.get_abs_path_exists():
+            pre = 'dir'
+            if self.abs_path.endswith('.xml'):
+                pre = 'xml file'
+            msg = pre + ' ' + self.abs_path + ' does not exist'
+            raise InvalidAssetError(msg)
+        if os.path.isfile(self.get_xml_abs_path()):
+            expected_root_tag = self.get_root_tags()[0]
+            lowers = [tag.lower() for tag in self.get_root_tags()]
+            tag = self.get_tag(None)
+            if tag.lower() not in lowers:
+                msg = self.get_xml_abs_path() + ' (root tag ' + tag
+                msg += ') is not a ' + expected_root_tag
+                # TODO investigate moving to ComponentLibrary/HdlPlatform
+                if self.get_dir_abs_path().endswith('hdl/platforms'):
+                    # Logger().warn(msg)
+                    pass
+                else:
+                    raise InvalidAssetError(msg)
+
+    def create(self, templates):
+        for filename, jinja_str in templates.items():
+            abs_path = self.get_dir_abs_path()
+            out_file = open(self.abs_path + '/' + filename, "w")
+            out_file.write(jinja_str)
+            out_file.close()
 
     @staticmethod
     def get_name_from_abs_path(abs_path):
-        #return abs_path.rsplit('/', 1)[1].split('.xml')[0]
         return abs_path.rsplit('/', 1)[1].split('.')[0]
 
     @staticmethod
