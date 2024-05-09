@@ -19,3 +19,6 @@ OpenCPI v2.4.7 is here: https://gitlab.com/opencpi/opencpi/-/tree/v2.4.7/project
 |   Y     |    N    |    Y   |    Wild scenario. The XML file is the only one parsed. Library is discovered if and only if the case-insensitive `library` XML root tag exists.   |       |
 |   Y     |    Y    |    N   |    Wild scenario. The XML file is the only one parsed. Library is discovered if and only if the case-insensitive `library` XML root tag exists.    |       |
 |   Y     |    Y    |    Y   |    Wild scenario. The XML file is the only one parsed. Library is discovered if and only if the case-insensitive `library` XML root tag exists.  |       |
+
+# Troubleshooting
+It is VERY useful to run OCPI_LOG_LEVEL=10 ocpidev2 ...args.... 2> log, and then less -r log to peruse the colorized output

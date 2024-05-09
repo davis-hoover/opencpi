@@ -66,6 +66,14 @@ class HdlAssembly(_AssetBase):
             containers = self.get_attr_list('Containers', None, path)
             if len(containers) > 0:
                 for cname in containers:
+                    # start pre-2.0 opencpi
+                    # interesting edge case for
+                    # assets/hdl/assemblies/empty/Makefile which has Makefiel
+                    # variable Containers with a value that is not just a
+                    # string (which is typical) but an .xml extension (atypical)
+                    # cnt_hsmc_loopback_card_hsmc_alst4_a_hsmc_alst4_b.xml
+                    cname = cname.split('.xml')[0]
+                    # end pre-2.0 opencpi
                     path = self.abs_path + '/' + cname + '.xml'
                     self.containers.append(HdlContainer(path))
         for elem in self.get_parsed().iter():
