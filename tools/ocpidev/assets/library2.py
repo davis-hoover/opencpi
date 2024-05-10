@@ -78,7 +78,7 @@ class Discoverer():
         if os.path.isdir(discovery_path):
             for _dir in AssetBase.listdir_assets(discovery_path):
                 dir_abs_path = discovery_path + '/' + _dir
-                if os.path.isdir(dir_abs_path):
+                if os.path.isdir(dir_abs_path) and (_dir != 'specs') and (_dir != 'gen'):
                     ret.append(dir_abs_path)
         return ret
 
