@@ -85,20 +85,24 @@ class Discoverer():
     def discover_dir_assets(self, parent, allowlist=None, platform=False):
         for dir_abs_path in self.get_potential_asset_dir_abs_paths(parent):
             try:
-                asset = None
+                assets = []
                 tmp = dir_abs_path
                 if parent == 'hdl/platforms':
-                    asset = HdlPlatform(dir_abs_path)
+                    assets.append(HdlPlatform(dir_abs_path))
                 elif parent == 'hdl/assemblies':
-                    asset = HdlAssembly(dir_abs_path)
+                    assets.append(HdlAssembly(dir_abs_path))
                 elif parent == 'hdl/primitives':
-                    asset = HdlLibrary(dir_abs_path)
+                    assets.append(HdlLibrary(dir_abs_path))
                 elif parent == 'applications':
-                    asset = Application(dir_abs_path)
+                    assets.append(Application(dir_abs_path))
                 elif tmp.endswith('.rcc') or tmp.endswith('.hdl') or platform:
                     name = _AssetBase.get_name_from_abs_path(dir_abs_path)
-                    asset = Worker(dir_abs_path + '/' + name + '.xml')
-                if asset is not None:
+                    if tmp.endswith('.rcc'):
+                        # due to edge cases such as testzc.rcc, testmulti.rcc
+                        assets = RccAssembly(dir_abs_path).workers
+                    elif not tmp.endswith('.test'):
+                        assets.append(Worker(dir_abs_path + '/' + name + '.xml'))
+                for asset in assets:
                     if (allowlist is None) or (asset.name in allowlist):
                         self.append_discovered_asset(asset)
             except InvalidAssetError as err:

@@ -100,24 +100,33 @@ class RccAssembly(_AssetBase):
         workers = self.parse()
         self.discover(workers)
 
+    def get_root_tags(self):
+        return ['RccWorker']
+
     def parse(self):
+        workers = []
         paths = []
-        paths.append(self.abs_path + '/Makefile')
+        paths.append(self.get_dir_abs_path() + '/Makefile')
         for path in self.get_list_of_existing_abs_paths_to_parse(paths):
             workers = self.get_variable_val_list_from_gnu_makefile(
-                    'Workers', make_path)
+                    'Workers', path)
         return workers
 
-    def discover(self):
-        self.discover_workers(platform)
+    def discover(self, workers):
+        self.discover_workers(workers)
 
-    def discover_workers(self):
-        for _dir in _AssetBase.listdir_assets(self.abs_path):
-            worker_abs_path = self.abs_path + '/' + _dir
-            for owd_path in worker_xml_discovery_paths:
-                for owd_path in worker_xml_discovery_paths:
-                    if os.path.isfile(owd_path):
-                        asset = Worker(owd_path)
+    def discover_workers(self, workers):
+        for entry in _AssetBase.listdir_assets(self.get_dir_abs_path()):
+            if (entry.split('.')[0] in workers) or (workers == []):
+                owd_path = self.get_dir_abs_path() + '/' + entry
+                if entry.endswith('.xml'):
+                    try:
+                        self.workers.append(Worker(owd_path))
+                    except InvalidAssetError as err:
+                        pass
+
+    def get_type(self):
+        return 'rcc assembly'
 
 
 def test_Worker___init___common(ret, test):
@@ -214,4 +223,29 @@ def test_Worker(ret):
     ret = test_Worker___init___source_files(ret)
     ret = test_Worker___init___libraries(ret)
     ret = test_Worker___init___authoring_model(ret)
+    return ret
+
+def test_RccAssembly(ret):
+    fs = TemporaryFilesystem()
+    passed = True
+    try:
+        dir_abs_path = fs.abs_path + '/' + 'components/foo.rcc'
+        os.system('mkdir -p ' + dir_abs_path)
+        for name in ['foo1', 'foo2']:
+            xml_abs_path = dir_abs_path + '/' + name + '.xml'
+            ff = open(xml_abs_path, 'w')
+            ff.write('<RccWorker/>\n')
+            ff.close()
+            if Environment().ocpi_log_level >= 10:
+                print(str([a for a in dir(uut) if not
+                      callable(getattr(uut, a))]))
+                os.system('cat ' + xml_abs_path)
+                os.system('cat ' + xml_abs_path)
+        uut = RccAssembly(dir_abs_path)
+        passed = len(uut.workers) == 2
+    except InvalidAssetError:
+        passed = False
+    log_pass_fail('testing RccAssembly workers', passed)
+    if passed is False:
+        ret = False
     return ret
