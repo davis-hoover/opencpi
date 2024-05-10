@@ -886,7 +886,7 @@ class AssetBase(AttributeBase):
             # below line avoids corruption of ProtocolSummary attribute
             _str = _str.replace('foosummary', 'ProtocolSummary')
         # below line adds support for newlines in attributes (undocumented in OpenCPI)
-        _str = _str.replace('\n', '')
+        _str = _str.replace('\n', ' ')
         try:
             ret = ET.ElementTree(ET.fromstring(_str))
         except ET.ParseError as err:
