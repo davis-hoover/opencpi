@@ -111,7 +111,6 @@ class Discoverer():
                 pass
 
 
-# TODO: Update ComponentLibrary PackageID's to reflect CDG 14.2.4
 class ComponentLibrary(_AssetBase, SpecsDirectory, Discoverer):
     """ Reference RCC/HDL Development Guide section 3. A ComponentLibrary is
         represented by a directory and knows nothing about the project it

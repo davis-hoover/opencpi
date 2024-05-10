@@ -406,7 +406,6 @@ def unittest():
     ret = test_ComponentLibrary(ret)
     ret = test_RccAssembly(ret)
     ret = test_Project_discover_component_libraries(ret)
-    ret = test_PackageID(ret)
     # ret = test_ProjectRegistry(ret)
     # ret = test_OCPIDev(ret)
     ret = test_Worker(ret)

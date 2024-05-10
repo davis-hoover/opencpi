@@ -29,18 +29,6 @@ from _opencpi.assets.assembly2 import HdlAssembly
 from _opencpi.assets.platform2 import HdlCard, HdlPlatform
 
 
-# TODO iherit from, and consolidate functionality from, AttributeBase
-class PackageID():
-    """ Component Development Guide section 14.2"""
-
-    def __init__(self, package_prefix, package_name):
-        self.package_prefix = package_prefix
-        self.package_name = package_name
-
-    def __str__(self):
-        return str(self.package_prefix) + "." + str(self.package_name)
-
-
 class Project(SpecsDirectory, Discoverer, _AssetBase):
     """ Component Development Guide section 14 """
 
@@ -52,6 +40,7 @@ class Project(SpecsDirectory, Discoverer, _AssetBase):
         SpecsDirectory.__init__(self)
         self.package_prefix = ''
         self.package_name = ''
+        self.package_id = ''
         # start of bullets at top of CDG section 14 (XML, project INTERNAL)
         self.component_libraries = []
         self.applications = []
@@ -85,7 +74,9 @@ class Project(SpecsDirectory, Discoverer, _AssetBase):
         return self.abs_path + '/Project.xml'
 
     def get_package_id(self):
-        return PackageID(self.package_prefix, self.package_name)
+        tmp = self.package_prefix + "." + self.package_name
+        ret = tmp if self.package_id == '' else self.package_id
+        return ret
 
     def get_asset(self, abs_path):
         """ returns None if asset not found """
@@ -141,6 +132,9 @@ class Project(SpecsDirectory, Discoverer, _AssetBase):
             package_name = self.get_attr('PackageName', None, path)
             if package_name != '':
                 self.package_name = package_name
+            package_id = self.get_attr('PackageID', None, path)
+            if package_id != '':
+                self.package_id = package_id
 
     def discover(
             self, do_component_libraries=True, do_hdl_primitives=True,
@@ -458,26 +452,6 @@ class Project(SpecsDirectory, Discoverer, _AssetBase):
                 False, project_registry, global_dependency_tree)
         #tool.append_rules_to_makefile(asset, tname, hdl_target, hdl_platform,
         #        False, project_registry)
-
-
-def test_PackageID(ret):
-    for test in [0, 1]:
-        passed = True
-        try:
-            uut= PackageID('ocpi', 'proj')
-            if test == 0:
-                passed = uut.package_prefix == 'ocpi'
-            if test == 1:
-                passed = uut.package_name == 'proj'
-        except:
-            passed = False
-        if test == 0:
-            log_pass_fail('testing PackageID package_prefix', passed)
-        if test == 1:
-            log_pass_fail('testing PackageID package_name', passed)
-        if passed is False:
-            ret = False
-    return ret
 
 
 def test_Project_discover_component_libraries(ret):
