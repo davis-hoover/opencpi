@@ -794,43 +794,27 @@ class _AssetBase(AttributeBase):
             if self.abs_path is None:
                 name = 'base'
             else:
-                name = self.abs_path.split('/')[-1]
-        return name
-
-    def get_abs_path_exists(self):
-        if self.get_is_xml():
-            exists = os.path.isfile(self.get_xml_abs_path())
-        else:
-            exists = os.path.isdir(self.abs_path)
-        return exists
-
-    def raise_if_path_does_not_exist(self):
-        if not self.get_abs_path_exists():
-            pre = 'dir'
-            if self.abs_path.endswith('.xml'):
-                pre = 'xml file'
-            msg = pre + ' ' + self.abs_path + ' does not exist'
-            raise InvalidAssetError(msg)
-        if os.path.isfile(self.get_xml_abs_path()):
-            expected_root_tag = self.get_root_tags()[0]
-            lowers = [tag.lower() for tag in self.get_root_tags()]
-            tag = self.get_tag(None)
-            if tag.lower() not in lowers:
-                msg = self.get_xml_abs_path() + ' (root tag ' + tag
-                msg += ') is not a ' + expected_root_tag
-                # TODO investigate moving to ComponentLibrary/HdlPlatform
-                if self.get_dir_abs_path().endswith('hdl/platforms'):
-                    # Logger().warn(msg)
-                    pass
-                else:
-                    raise InvalidAssetError(msg)
-
-    def create(self, templates):
-        for filename, jinja_str in templates.items():
-            abs_path = self.get_dir_abs_path()
-            out_file = open(self.abs_path + '/' + filename, "w")
-            out_file.write(jinja_str)
-            out_file.close()
+                name = abs_path.split('/')[-1]
+        self.name = name  # CDG section 6.1.1, section 8.1.1, etc
+        if (abs_path is not None):
+            if self.get_is_xml():
+                exists = os.path.isfile(self.get_xml_abs_path())
+            else:
+                exists = os.path.isdir(abs_path)
+            if not exists:
+                self.raise_abs_path_does_not_exist()
+            if os.path.isfile(self.get_xml_abs_path()):
+                lowers = [tag.lower() for tag in self.get_root_tags()]
+                tag = self.get_tag(None)
+                if tag.lower() not in lowers:
+                    msg = self.get_xml_abs_path() + ' (root tag ' + tag
+                    msg += ') is not a ' + expected_root_tag
+                    # TODO investigate moving to ComponentLibrary/HdlPlatform
+                    if self.get_dir_abs_path().endswith('hdl/platforms'):
+                        # Logger().warn(msg)
+                        pass
+                    else:
+                        raise InvalidAssetError(msg)
 
     @staticmethod
     def get_name_from_abs_path(abs_path):
@@ -928,6 +912,15 @@ class _AssetBase(AttributeBase):
         else:
             ret = elem.tag
         return ret
+
+    def raise_abs_path_does_not_exist(self):
+        """ useful check for *directory* variants of _AssetBase (_AssetBase
+            does not check for XML existence of directory variants) """
+        pre = 'dir'
+        if self.abs_path.endswith('.xml'):
+            pre = 'xml file'
+        msg = pre + ' ' + self.abs_path + ' does not exist'
+        raise InvalidAssetError(msg)
 
     def raise_invalid_asset_error(self):
         raise InvalidAssetError('not a ' + self.get_root_tags()[0])

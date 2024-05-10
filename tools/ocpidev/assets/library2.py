@@ -85,20 +85,24 @@ class Discoverer():
     def discover_dir_assets(self, parent, allowlist=None, platform=False):
         for dir_abs_path in self.get_potential_asset_dir_abs_paths(parent):
             try:
-                asset = None
+                assets = []
                 tmp = dir_abs_path
                 if parent == 'hdl/platforms':
-                    asset = HdlPlatform(dir_abs_path)
+                    assets.append(HdlPlatform(dir_abs_path))
                 elif parent == 'hdl/assemblies':
-                    asset = HdlAssembly(dir_abs_path)
+                    assets.append(HdlAssembly(dir_abs_path))
                 elif parent == 'hdl/primitives':
-                    asset = HdlLibrary(dir_abs_path)
+                    assets.append(HdlLibrary(dir_abs_path))
                 elif parent == 'applications':
-                    asset = Application(dir_abs_path)
+                    assets.append(Application(dir_abs_path))
                 elif tmp.endswith('.rcc') or tmp.endswith('.hdl') or platform:
                     name = _AssetBase.get_name_from_abs_path(dir_abs_path)
-                    asset = Worker(dir_abs_path + '/' + name + '.xml')
-                if asset is not None:
+                    if tmp.endswith('.rcc'):
+                        # due to edge cases such as testzc.rcc, testmulti.rcc
+                        assets = RccAssembly(dir_abs_path).workers
+                    elif not tmp.endswith('.test'):
+                        assets.append(Worker(dir_abs_path + '/' + name + '.xml'))
+                for asset in assets:
                     if (allowlist is None) or (asset.name in allowlist):
                         self.append_discovered_asset(asset)
             except InvalidAssetError as err:
@@ -107,7 +111,6 @@ class Discoverer():
                 pass
 
 
-# TODO: Update ComponentLibrary PackageID's to reflect CDG 14.2.4
 class ComponentLibrary(_AssetBase, SpecsDirectory, Discoverer):
     """ Reference RCC/HDL Development Guide section 3. A ComponentLibrary is
         represented by a directory and knows nothing about the project it
@@ -115,9 +118,9 @@ class ComponentLibrary(_AssetBase, SpecsDirectory, Discoverer):
 
     def __init__(self, dir_abs_path):
         _AssetBase.__init__(self, dir_abs_path)
-        if self.get_dir_abs_path_is_worker(dir_abs_path):
-            msg = self.abs_path + ' is not a ' + self.get_root_tags()[0]
-            raise InvalidAssetError(msg)
+        is_test = self.get_dir_abs_path_is_test(dir_abs_path)
+        if is_test or self.get_dir_abs_path_is_worker(dir_abs_path):
+            self.raise_invalid_asset_error()
         SpecsDirectory.__init__(self)
         # start of bullets at top of CDG section 10
         self.components = []
@@ -145,17 +148,22 @@ class ComponentLibrary(_AssetBase, SpecsDirectory, Discoverer):
                 ret = True
         return ret
 
+    @staticmethod
+    def get_dir_abs_path_is_test(dir_abs_path):
+        return dir_abs_path.endswith('.test')
+
     def get_package_id(self, project_package_id_str):
         """ the overarching project tells this method its
             project_package_id_str """
-        tmp = project_package_id_str
+        ret = project_package_id_str
         abs_path_split = self.abs_path.split('/')
-        if abs_path_split[-3] == 'platforms':
-            tmp += '.platforms.' + abs_path_split[-2]
-        # For <project>/spec
-        if self.name == '.':
-            return tmp
-        return tmp + '.' + self.name
+        if len(abs_path_split) >= 3:
+            if abs_path_split[-3] == 'platforms':
+                ret += '.platforms.' + abs_path_split[-2]
+        # use e.g. ocpi.core instead of ocpi.core.components (same as OAS)
+        if self.name != 'components':
+            ret += '.' + self.name
+        return ret
 
     def parse(self):
         paths = []
@@ -207,7 +215,7 @@ class ComponentLibrary(_AssetBase, SpecsDirectory, Discoverer):
 
 def test_ComponentLibrary(ret):
     fs = TemporaryFilesystem()
-    for test in range(6):
+    for test in range(7):
         passed = True
         try:
             dir_abs_path = fs.abs_path + '/' + 'components'
@@ -231,6 +239,15 @@ def test_ComponentLibrary(ret):
                 passed = uut.tests == []
             if test == 5:
                 passed = uut.component_libraries == []
+            if test == 6:
+                if uut.get_package_id('ocpi.core') != 'ocpi.core':
+                    passed = False
+                uut.name = 'devices'
+                if uut.get_package_id('ocpi.core') != 'ocpi.core.devices':
+                    passed = False
+                uut.abs_path = '/tmp/myproj/hdl/platforms/mypf/devices'
+                if uut.get_package_id('ocpi.core') != 'ocpi.core.platforms.mypf.devices':
+                    passed = False
         except InvalidAssetError:
             passed = False
         if test == 0:
@@ -244,8 +261,9 @@ def test_ComponentLibrary(ret):
         if test == 4:
             log_pass_fail('testing ComponentLibrary tests', passed)
         if test == 5:
-            tmp = passed
-            log_pass_fail('testing ComponentLibrary component_libraries', tmp)
+            log_pass_fail('testing ComponentLibrary component_libraries', passed)
+        if test == 6:
+            log_pass_fail('testing ComponentLibrary get_package_id()', passed)
         if passed is False:
             ret = False
     return ret

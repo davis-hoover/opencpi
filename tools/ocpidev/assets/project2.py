@@ -62,6 +62,7 @@ class Project(SpecsDirectory, Discoverer, _AssetBase):
         SpecsDirectory.__init__(self)
         self.package_prefix = ''
         self.package_name = ''
+        self.package_id = ''
         # start of bullets at top of CDG section 14 (XML, project INTERNAL)
         self.component_libraries = []
         self.applications = []
@@ -93,7 +94,9 @@ class Project(SpecsDirectory, Discoverer, _AssetBase):
         return self.abs_path + '/Project.xml'
 
     def get_package_id(self):
-        return PackageID(self.package_prefix, self.package_name)
+        tmp = self.package_prefix + "." + self.package_name
+        ret = tmp if self.package_id == '' else self.package_id
+        return ret
 
     def get_asset(self, abs_path):
         """ returns None if asset not found """
@@ -215,8 +218,11 @@ class Project(SpecsDirectory, Discoverer, _AssetBase):
                 asset = ComponentLibrary(dir_abs_path)
                 self.append_discovered_asset(asset)
             except InvalidAssetError as err:
-                if not ComponentLibrary.get_dir_abs_path_is_worker(path):
-                    Logger().warn('skipping ' + str(err))
+                path = dir_abs_path
+                test = ComponentLibrary.get_dir_abs_path_is_test(path)
+                worker = ComponentLibrary.get_dir_abs_path_is_worker(path)
+                if (not test) and (not worker):
+                    Logger().warn('skipping ' + path + ': ' + str(err))
                 pass
 
     def discover_applications(self):
@@ -463,30 +469,10 @@ class Project(SpecsDirectory, Discoverer, _AssetBase):
         #        False, project_registry)
 
 
-def test_PackageID(ret):
-    for test in [0, 1]:
-        passed = True
-        try:
-            uut= PackageID('ocpi', 'proj')
-            if test == 0:
-                passed = uut.package_prefix == 'ocpi'
-            if test == 1:
-                passed = uut.package_name == 'proj'
-        except:
-            passed = False
-        if test == 0:
-            log_pass_fail('testing PackageID package_prefix', passed)
-        if test == 1:
-            log_pass_fail('testing PackageID package_name', passed)
-        if passed is False:
-            ret = False
-    return ret
-
-
 def test_Project_discover_component_libraries(ret):
-    """ Test all possible combinations of component libraries and """
-    """ sub-component libraries therein including: """
-    """ hdl/platforms/<platform>/devices """
+    """ Test all possible combinations of component libraries and
+        "sub-"component libraries therein including:
+        all possible parents from CDG section 14.2.3 """
     passed = True
     fs = TemporaryFilesystem()
     project_abs_path = fs.abs_path + '/' + 'project'
@@ -506,7 +492,7 @@ def test_Project_discover_component_libraries(ret):
         }
         # TODO: Break this out into separate function
         # Create Project Component Library Directories
-        nlibs = 0
+        num_expected_libs = 0
         components_parent = False
         platforms_parent = False
         for lib_key, lib_value in lib_dict.items():
@@ -517,23 +503,23 @@ def test_Project_discover_component_libraries(ret):
             if lib_value:
                 if lib_key == 'components':
                     components_parent = True
-                    nlibs += 1
+                    num_expected_libs += 1
                     os.system('mkdir -p %s/%s' % (project_abs_path, lib_key))
                 elif lib_key == 'components/clib':
                     if components_parent:
-                        nlibs += 1
+                        num_expected_libs += 1
                     else:
-                        nlibs += 2
+                        num_expected_libs += 2
                     os.system('mkdir -p %s/%s' % (project_abs_path, lib_key))
                 elif lib_key == 'hdl/platforms':
                     platforms_parent = True
-                    nlibs += 1
+                    num_expected_libs += 1
                     os.system('mkdir -p %s/%s' % (project_abs_path, lib_key))
                 elif lib_key == 'hdl/platforms/plat/devices':
                     if platforms_parent:
-                        nlibs += 1
+                        num_expected_libs += 1
                     else:
-                        nlibs += 2
+                        num_expected_libs += 2
                     os.system('mkdir -p %s/%s' % (project_abs_path, lib_key))
                     # Create required <platform>/<platform>.xml with
                     # <HdlPlatform> XML root-tag
@@ -544,7 +530,7 @@ def test_Project_discover_component_libraries(ret):
                     platform_xml_file.close()
                     #os.system('cat ' + platform_xml)
                 else:
-                    nlibs += 1
+                    num_expected_libs += 1
                     os.system('mkdir -p %s/%s' % (project_abs_path, lib_key))
             project_xml = open(project_abs_path + '/' + 'Project.xml', 'w')
             project_xml.write(
@@ -554,6 +540,20 @@ def test_Project_discover_component_libraries(ret):
             if nlibs != len(project.component_libraries):
                 passed = False
         os.system('rm -rf %s/*' % project_abs_path)
+    os.system('mkdir -p %s' % project_abs_path)
+    for ext in ['hdl', 'rcc', 'ocl', 'test']:
+        lib_path = '%s/components/foo.%s' % (project_abs_path, ext)
+        os.system('mkdir -p ' + lib_path)
+        if ext != 'test':
+            ff = open(lib_path + '/foo.xml', 'w')
+            ff.write('<' + ext  + 'Worker/>\n')
+            ff.close()
+    uut = Project(project_abs_path)
+    if len(uut.component_libraries) == 1:
+        if uut.component_libraries[0].name != 'components':
+            passed = False
+    else:
+        passed = False
     log_pass_fail('testing Project discover_component_libraries()', passed)
     if passed is False:
         ret = False
