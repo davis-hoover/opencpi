@@ -24,16 +24,16 @@ import os
 #     raise Exception('do not run this from the assets directory!')
 import uuid
 from _opencpi.assets.abstract2 import *
-from _opencpi.assets.abstract2 import _AssetBase
+from _opencpi.assets.abstract2 import AssetBase
 
 
-class Worker(_AssetBase):
+class Worker(AssetBase):
     """ Reference RCC/HDL Development Guide section 3. A Worker is
         represented by a xml file (OWD) and knows nothing about the project it
         is in or its package ID. """
 
     def __init__(self, xml_abs_path):
-        _AssetBase.__init__(self, xml_abs_path)
+        AssetBase.__init__(self, xml_abs_path)
         self.spec = ''  # CDG section 8.1.2
         # self.language = ''  # CDG section 8.1.3
         # self.version = ''  # CDG secion 8.1.4
@@ -68,33 +68,33 @@ class Worker(_AssetBase):
         # intentionally put xml last so that its attributes take precedence
         # end pre-2.0 opencpi
         paths.append(self.get_xml_abs_path())
-        for path in self.get_list_of_existing_abs_paths_to_parse(paths):
-            name = self.get_attr('Name', None, path)
-            if name != '':
-                self.name = name
-            spec = self.get_attr('Spec', None, path)
-            if spec != '':
-                self.spec = spec.replace('-spec', '').replace('_spec', '')
-            # self.language = self.get_attr('Language', None, path)
-            # self.version = self.get_attr('Version', None, path)
-            files = self.get_attr_list('SourceFiles', None, path)
-            if files != '':
-                self.source_files = files
-            libraries = self.get_attr_list('Libraries', None, path)
-            if len(libraries) > 0:
-                # TODO replace ocpi.core. delete according to CDG 8.1.11
-                self.libraries = [str(lib).replace('ocpi.core.', '')
-                                  for lib in libraries]
+        paths = self.get_list_of_existing_abs_paths_to_parse(paths)
+        name = self.get_attr('Name', None, paths)
+        if name != '':
+            self.name = name
+        spec = self.get_attr('Spec', None, paths)
+        if spec != '':
+            self.spec = spec.replace('-spec', '').replace('_spec', '')
+        # self.language = self.get_attr('Language', None, paths)
+        # self.version = self.get_attr('Version', None, paths)
+        files = self.get_attr_list('SourceFiles', None, paths)
+        if files != '':
+            self.source_files = files
+        libraries = self.get_attr_list('Libraries', None, paths)
+        if len(libraries) > 0:
+            # TODO replace ocpi.core. delete according to CDG 8.1.11
+            self.libraries = [str(lib).replace('ocpi.core.', '')
+                              for lib in libraries]
 
     def get_type(self):
         return self.authoring_model + ' worker'
 
 
-# TODO iherit from, and consolidate functionality from, _AssetBase
-class RccAssembly(_AssetBase):
+# TODO iherit from, and consolidate functionality from, AssetBase
+class RccAssembly(AssetBase):
 
     def __init__(self, dir_abs_path):
-        _AssetBase.__init__(self, dir_abs_path)
+        AssetBase.__init__(self, dir_abs_path)
         # below line is undocumented edge case (testzc.rcc/Makefile Workers)
         self.workers = []
         workers = self.parse()
@@ -116,7 +116,7 @@ class RccAssembly(_AssetBase):
         self.discover_workers(workers)
 
     def discover_workers(self, workers):
-        for entry in _AssetBase.listdir_assets(self.get_dir_abs_path()):
+        for entry in AssetBase.listdir_assets(self.get_dir_abs_path()):
             if (entry.split('.')[0] in workers) or (workers == []):
                 owd_path = self.get_dir_abs_path() + '/' + entry
                 if entry.endswith('.xml'):
@@ -153,7 +153,7 @@ def test_Worker___init___common(ret, test):
         ff.close()
         uut = Worker(xml_abs_path)
         if Environment().ocpi_log_level >= 10:
-            print(str([a for a in dir(uut) if not callable(getattr(uut, a))]))
+            print(uut.__dict__.keys())
             os.system('cat ' + xml_abs_path)
         if test == 0:
             if uut.abs_path != xml_abs_path:
@@ -236,12 +236,10 @@ def test_RccAssembly(ret):
             ff = open(xml_abs_path, 'w')
             ff.write('<RccWorker/>\n')
             ff.close()
-            if Environment().ocpi_log_level >= 10:
-                print(str([a for a in dir(uut) if not
-                      callable(getattr(uut, a))]))
-                os.system('cat ' + xml_abs_path)
-                os.system('cat ' + xml_abs_path)
         uut = RccAssembly(dir_abs_path)
+        if Environment().ocpi_log_level >= 10:
+            print(uut.__dict__.keys())
+            os.system('cat ' + xml_abs_path)
         passed = len(uut.workers) == 2
     except InvalidAssetError:
         passed = False

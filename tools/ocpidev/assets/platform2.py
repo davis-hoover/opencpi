@@ -19,14 +19,14 @@
 
 import os
 from _opencpi.assets.abstract2 import *
-from _opencpi.assets.abstract2 import _AssetBase
+from _opencpi.assets.abstract2 import AssetBase
 from _opencpi.assets.worker2 import Worker
 
 
-class HdlCardPlatformBase(_AssetBase):
+class HdlCardPlatformBase(AssetBase):
 
     def __init__(self, abs_path):
-        _AssetBase.__init__(self, abs_path)
+        AssetBase.__init__(self, abs_path)
         self.devices = dict()  # key = unique instance name, val = worker name
 
     def parse_devices(self):
@@ -105,13 +105,13 @@ class HdlPlatformConfigurationDevice(AttributeBase):
         self.name = self.get_attr('Name', elem)
 
 
-class HdlPlatformConfiguration(_AssetBase):
+class HdlPlatformConfiguration(AssetBase):
     """ Platform Development Guide section 5.4.8 """
 
     def __init__(self, xml_abs_path):
         """ xml_abs_path is None for 'base' configuration """
         self.devices = []
-        _AssetBase.__init__(self, xml_abs_path)
+        AssetBase.__init__(self, xml_abs_path)
         if (self.name != 'base') or (xml_abs_path is not None):
             self.parse()
 

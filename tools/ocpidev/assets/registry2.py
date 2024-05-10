@@ -19,7 +19,7 @@
 
 import os
 from _opencpi.assets.abstract2 import *
-from _opencpi.assets.abstract2 import _AssetBase
+from _opencpi.assets.abstract2 import AssetBase
 from _opencpi.assets.project2 import Project
 # TODO remove Worker import
 from _opencpi.assets.worker2 import Worker
@@ -129,7 +129,7 @@ class ProjectRegistry():
                     discovery_path = project.abs_path + '/hdl/adapters'
                 elif _type == 'hdl devices':
                     discovery_path = project.abs_path + '/hdl/devices'
-                for entry in _AssetBase.listdir_assets(discovery_path):
+                for entry in AssetBase.listdir_assets(discovery_path):
                     if '.hdl' in entry:
                         name = entry.split('.')[0]
                         owd_path = discovery_path + '/' + entry + '/' + \
@@ -162,7 +162,7 @@ class ProjectRegistry():
 
     def discover_projects(self, do_component_libraries, do_hdl_primitives):
         Logger().debug('start of project discovery')
-        for _dir in _AssetBase.listdir_assets(self.abs_path):
+        for _dir in AssetBase.listdir_assets(self.abs_path):
             project_abs_path = os.path.realpath(self.abs_path + '/' + _dir)
             if self.get_abs_path_is_project(project_abs_path):
                 self.projects.append(

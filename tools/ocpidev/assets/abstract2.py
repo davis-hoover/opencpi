@@ -670,73 +670,86 @@ class AttributeBase():
         return ret
         # end pre-2.0 opencpi
 
-    def get_attr_common(self, attr, elem, is_list, makefile_abs_path=''):
-        # start pre-2.0 opencpi
-        if elem is None:
-            # TODO remove below 2 lines which are a horrible hack
-            if makefile_abs_path == self.get_xml_abs_path():
-                makefile_abs_path = ''
-        # end pre-2.0 opencpi
+    def get_attr_common(self, attr, elem, is_list, makefile_abs_paths=[], cli_dict=None):
         if is_list:
             ret = []
         else:
             ret = ''
-        # not all assets have XML, e.g., pre-2.0 HdlLibrary (hdl primitive)
-        # in the cases where XML doesn't exist, simply return ret from above
-        go = True
-        if elem is None:
-            if makefile_abs_path == '':
-                go = os.path.isfile(self.get_xml_abs_path())
-            else:
-                go = os.path.isfile(makefile_abs_path)
-            attr_abs_path = self.abs_path
-        else:
-            attr_abs_path = ''
-        if go:
-            if makefile_abs_path == '':
-                if elem is None:
-                    iteration_obj = self.get_parsed().getroot().attrib
-                else:
-                    iteration_obj = elem
-                for key, val in iteration_obj.items():
-                    # tmp = self.get_valid_attributes()
-                    # if key.lower() in [attr.lower() for attr in tmp]:
-                    if key.lower() == attr.lower():
-                        if is_list:
-                            ret = self.get_xml_val_list(val)
-                        else:
-                            ret = val
-                    # else:
-                    #     self.throw_invalid_element_error(self, abs_path, key)
-            else:
+        if cli_dict is None:
+            if makefile_abs_paths == []:
+                makefile_abs_paths.append('') # TODO fix this hack to make xml work
+            for makefile_abs_path in makefile_abs_paths:
                 # start pre-2.0 opencpi
-                attr_abs_path = makefile_abs_path
-                ret = self.get_variable_val_list_from_gnu_makefile(attr, attr_abs_path)
-                if not is_list:
-                    if len(ret) > 0:
-                        ret = ret[0]
-                    else:
-                        ret = ''
+                if elem is None:
+                    # TODO remove below 2 lines which are a horrible hack
+                    if makefile_abs_path == self.get_xml_abs_path():
+                        makefile_abs_path = ''
                 # end pre-2.0 opencpi
-            if attr_abs_path != '':
-                if (ret != '') and (ret != []):
-                    Logger().debug('** parsed ' + attr_abs_path + ' ' + attr +
-                                   ' value of ' + str(ret))
+                # not all assets have XML, e.g., pre-2.0 HdlLibrary (hdl primitive)
+                # in the cases where XML doesn't exist, simply return ret from above
+                go = True
+                if elem is None:
+                    if makefile_abs_path == '':
+                        go = os.path.isfile(self.get_xml_abs_path())
+                    else:
+                        go = os.path.isfile(makefile_abs_path)
+                    attr_abs_path = self.abs_path
+                else:
+                    attr_abs_path = ''
+                if go:
+                    if makefile_abs_path == '':
+                        if elem is None:
+                            iteration_obj = self.get_parsed().getroot().attrib
+                        else:
+                            iteration_obj = elem
+                        for key, val in iteration_obj.items():
+                            # tmp = self.get_valid_attributes()
+                            # if key.lower() in [attr.lower() for attr in tmp]:
+                            if key.lower() == attr.lower():
+                                if is_list:
+                                    ret = self.get_xml_val_list(val)
+                                else:
+                                    ret = val
+                            # else:
+                            #     self.throw_invalid_element_error(self, abs_path, key)
+                    else:
+                        # start pre-2.0 opencpi
+                        attr_abs_path = makefile_abs_path
+                        ret = self.get_variable_val_list_from_gnu_makefile(attr, attr_abs_path)
+                        if not is_list:
+                            if len(ret) > 0:
+                                ret = ret[0]
+                            else:
+                                ret = ''
+                        # end pre-2.0 opencpi
+                    if attr_abs_path != '':
+                        if (ret != '') and (ret != []):
+                            Logger().debug('** parsed ' + attr_abs_path + ' ' + attr +
+                                           ' value of ' + str(ret))
+        else:
+            try:
+                ret = cli_dict[attr.lower()]
+            except KeyError:
+                pass
         return ret
 
-    def get_attr(self, attr, elem=None, makefile_abs_path=''):
-        """ Retrieves the singular value, as a string, of the attr attribute,
-            either from the makefile indicated in makefile_abs_path (if
-            non-empty), or the XML pointed to by self.abs_path. Examples of
-            attr are 'Property' and 'Instance' """
-        return self.get_attr_common(attr, elem, False, makefile_abs_path)
+    def get_attr(self, attr, elem=None, makefile_abs_paths=[], cli_dict=None):
+        """ Retrieves the singular value, as a string, of the attribute
+            indicated by the attr string, from the following places (in
+            precedence order):
+            1) cli_dict if it is not None,
+            2) makefiles indicated in makefile_abs_paths list entries, if the
+               file indicated by the entry exists, in list order with the latter
+               entries taking precedence for overriding values
+            3) the pre-parsed XML element in elem,
+            4) XML file pointed to by self.get_xml_abs_path().
+            Examples of attr are 'Property' and 'Instance' """
+        return self.get_attr_common(attr, elem, False, makefile_abs_paths, cli_dict)
 
-    def get_attr_list(self, attr, elem=None, makefile_abs_path=''):
-        """ Retrieves the value, as a list of strings, of the attr attribute,
-            either from the makefile indicated in makefile_abs_path (if
-            non-empty), or the XML pointed to by self.abs_path. Examples of
-            attr are 'Property' and 'Instance' """
-        return self.get_attr_common(attr, elem, True, makefile_abs_path)
+    def get_attr_list(self, attr, elem=None, makefile_abs_paths=[], cli_dict=None):
+        """ Same as get_attr() but retrieves the value as a list of strings.
+            Examples of attr are 'Workers' and 'Containers' """
+        return self.get_attr_common(attr, elem, True, makefile_abs_paths, cli_dict)
 
     def raise_invalid_attribute_error(self, elem_str):
         # msg = abs_path + ': ' + elem_str + ' is an invalid attribute'
@@ -745,8 +758,8 @@ class AttributeBase():
         raise InvalidAttributeError(msg)
 
 
-# TODO rename _AssetBase to AssetBase
-class _AssetBase(AttributeBase):
+# TODO rename AssetBase to AssetBase
+class AssetBase(AttributeBase):
     """ Contains functionality common to all assets, e.g., all
         Protocols/Workers/Assemblies/etc. Child classes must define
         get_root_tags() method which returns list of strings of permissible
@@ -903,7 +916,7 @@ class _AssetBase(AttributeBase):
         return ret
 
     def raise_abs_path_does_not_exist(self):
-        """ useful check for *directory* variants of _AssetBase (_AssetBase
+        """ useful check for *directory* variants of AssetBase (AssetBase
             does not check for XML existence of directory variants) """
         pre = 'dir'
         if self.abs_path.endswith('.xml'):

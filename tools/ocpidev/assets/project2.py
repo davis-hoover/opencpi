@@ -20,7 +20,7 @@
 import os
 import itertools
 from _opencpi.assets.abstract2 import *
-from _opencpi.assets.abstract2 import _AssetBase
+from _opencpi.assets.abstract2 import AssetBase
 from _opencpi.assets.worker2 import Worker
 from _opencpi.assets.application2 import Application
 from _opencpi.assets.library2 import SpecsDirectory, Discoverer, ComponentLibrary
@@ -29,13 +29,13 @@ from _opencpi.assets.assembly2 import HdlAssembly
 from _opencpi.assets.platform2 import HdlCard, HdlPlatform
 
 
-class Project(SpecsDirectory, Discoverer, _AssetBase):
+class Project(SpecsDirectory, Discoverer, AssetBase):
     """ Component Development Guide section 14 """
 
     def __init__(
             self, dir_abs_path, do_discover_component_libraries=True,
             do_discover_hdl_primitives=True):
-        _AssetBase.__init__(self, dir_abs_path)
+        AssetBase.__init__(self, dir_abs_path)
         #del self.name
         SpecsDirectory.__init__(self)
         self.package_prefix = ''
@@ -116,25 +116,25 @@ class Project(SpecsDirectory, Discoverer, _AssetBase):
         # TODO consolidate with get_asset2() from AttributeBase
         paths.append(self.get_xml_abs_path())
         # end pre-2.0 opencpi
-        for path in self.get_list_of_existing_abs_paths_to_parse(paths):
-            clibs = self.get_attr_list('ComponentLibraries', None, path)
-            if len(clibs) > 0:
-                self._component_libraries = clibs
-            hlibs = self.get_attr_list('HdlLibraries', None, path)
-            if len(hlibs) > 0:
-                self.hdl_libraries = hlibs
-            deps = self.get_attr_list('ProjectDependencies', None, path)
-            if len(deps) > 0:
-                self.project_dependencies = deps
-            package_prefix = self.get_attr('PackagePrefix', None, path)
-            if package_prefix != '':
-                self.package_prefix = package_prefix 
-            package_name = self.get_attr('PackageName', None, path)
-            if package_name != '':
-                self.package_name = package_name
-            package_id = self.get_attr('PackageID', None, path)
-            if package_id != '':
-                self.package_id = package_id
+        paths = self.get_list_of_existing_abs_paths_to_parse(paths)
+        clibs = self.get_attr_list('ComponentLibraries', None, paths)
+        if len(clibs) > 0:
+            self._component_libraries = clibs
+        hlibs = self.get_attr_list('HdlLibraries', None, paths)
+        if len(hlibs) > 0:
+            self.hdl_libraries = hlibs
+        deps = self.get_attr_list('ProjectDependencies', None, paths)
+        if len(deps) > 0:
+            self.project_dependencies = deps
+        package_prefix = self.get_attr('PackagePrefix', None, paths)
+        if package_prefix != '':
+            self.package_prefix = package_prefix 
+        package_name = self.get_attr('PackageName', None, paths)
+        if package_name != '':
+            self.package_name = package_name
+        package_id = self.get_attr('PackageID', None, paths)
+        if package_id != '':
+            self.package_id = package_id
 
     def discover(
             self, do_component_libraries=True, do_hdl_primitives=True,
@@ -178,7 +178,7 @@ class Project(SpecsDirectory, Discoverer, _AssetBase):
                 #   - hdl/adapters/
                 #   - hdl/platforms/
                 dir_abs_paths.append(dir_abs_path)
-                subdir_abs_paths = _AssetBase.get_existing_abs_dir_paths_for_asset_consideration(dir_abs_path)
+                subdir_abs_paths = AssetBase.get_existing_abs_dir_paths_for_asset_consideration(dir_abs_path)
                 if _dir == 'components':
                     for subdir_abs_path in subdir_abs_paths:
                         if not ComponentLibrary.get_dir_abs_path_is_worker(subdir_abs_path):
@@ -224,7 +224,7 @@ class Project(SpecsDirectory, Discoverer, _AssetBase):
     def discover_hdl_cards(self):
         discovery_path = self.abs_path + '/hdl/cards/specs'
         if os.path.isdir(discovery_path):
-            for _dir in _AssetBase.listdir_assets(discovery_path):
+            for _dir in AssetBase.listdir_assets(discovery_path):
                 # TODO catch InvalidAssetError instead of all exceptions
                 try:
                     asset = HdlCard(discovery_path + '/' + _dir)
