@@ -20,7 +20,7 @@
 import os
 import itertools
 from _opencpi.assets.abstract2 import *
-from _opencpi.assets.abstract2 import _AssetBase
+from _opencpi.assets.abstract2 import AssetBase
 from _opencpi.assets.worker2 import Worker
 from _opencpi.assets.application2 import Application
 from _opencpi.assets.library2 import SpecsDirectory, Discoverer, ComponentLibrary
@@ -53,11 +53,12 @@ class PackageID():
     def __str__(self):
         return str(self.package_prefix) + "." + str(self.package_name)
 
-class Project(SpecsDirectory, Discoverer, _AssetBase):
-    """ Component Development Guide section 15 """
+
+class Project(SpecsDirectory, Discoverer, AssetBase):
+    """ Component Development Guide section 14 """
 
     def __init__(self, dir_abs_path, enable_path_existence_check=True, cli_dict=None):
-        _AssetBase.__init__(self, dir_abs_path, cli_dict, enable_path_existence_check)
+        AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
         #del self.name
         SpecsDirectory.__init__(self)
         self.package_prefix = ''
@@ -143,6 +144,9 @@ class Project(SpecsDirectory, Discoverer, _AssetBase):
         package_name = self.get_attr('PackageName', None, paths, cli_dict)
         if package_name != '':
             self.package_name = package_name
+        package_id = self.get_attr('PackageID', None, paths, cli_dict)
+        if package_id != '':
+            self.package_id = package_id
 
     def create(self):
         if self.get_abs_path_exists():
@@ -193,7 +197,7 @@ class Project(SpecsDirectory, Discoverer, _AssetBase):
                 #   - hdl/adapters/
                 #   - hdl/platforms/
                 dir_abs_paths.append(dir_abs_path)
-                subdir_abs_paths = _AssetBase.get_existing_abs_dir_paths_for_asset_consideration(dir_abs_path)
+                subdir_abs_paths = AssetBase.get_existing_abs_dir_paths_for_asset_consideration(dir_abs_path)
                 if _dir == 'components':
                     for subdir_abs_path in subdir_abs_paths:
                         if not ComponentLibrary.get_dir_abs_path_is_worker(subdir_abs_path):
@@ -239,7 +243,7 @@ class Project(SpecsDirectory, Discoverer, _AssetBase):
     def discover_hdl_cards(self):
         discovery_path = self.abs_path + '/hdl/cards/specs'
         if os.path.isdir(discovery_path):
-            for _dir in _AssetBase.listdir_assets(discovery_path):
+            for _dir in AssetBase.listdir_assets(discovery_path):
                 # TODO catch InvalidAssetError instead of all exceptions
                 try:
                     asset = HdlCard(discovery_path + '/' + _dir)

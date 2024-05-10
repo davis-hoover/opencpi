@@ -21,7 +21,7 @@ import os
 # below line is for testing only
 import xml.etree.ElementTree as ET
 from _opencpi.assets.abstract2 import *
-from _opencpi.assets.abstract2 import _AssetBase
+from _opencpi.assets.abstract2 import AssetBase
 
 
 class OperationArgumentMember(AttributeBase):
@@ -90,13 +90,13 @@ class Operation():
                 pass
 
 
-class Protocol(_AssetBase):
+class Protocol(AssetBase):
     """ Reference Component Development Guide section 5. A Protocol is
         represented by a xml file (OPS) and knows nothing about the project it
         is in or its package ID. """
 
     def __init__(self, xml_abs_path):
-        _AssetBase.__init__(self, xml_abs_path)
+        AssetBase.__init__(self, xml_abs_path)
         self.operations = []
         self.parse()
 
@@ -119,14 +119,14 @@ class Protocol(_AssetBase):
                 pass
 
 
-class Component(_AssetBase):
+class Component(AssetBase):
     """ Reference Component Development Guide section 6. A Component is
         represented by a xml file (OCS) and knows nothing about the project it
         is in or its package ID. """
 
     def __init__(self, xml_abs_path):
         """ xml_abs_path is None for ComponentSpec embedded in OWD """
-        _AssetBase.__init__(self, xml_abs_path)
+        AssetBase.__init__(self, xml_abs_path)
         self.parse()
 
     def get_root_tags(self):
@@ -227,8 +227,7 @@ def test_Property(ret):
                 if elem == 'Property':
                     uut = Property(elem)
                     if Environment().ocpi_log_level >= 10:
-                        print(str([a for a in dir(uut) if not
-                              callable(getattr(uut, a))]))
+                        print(uut.__dict__.keys())
                         os.system('cat ' + xml_abs_path)
                     if test == 0:
                         passed = uut.name == 'myprop'
@@ -309,8 +308,7 @@ def test_Component(ret):
             ff.close()
             uut = Component(xml_abs_path)
             if Environment().ocpi_log_level >= 10:
-                print(str([a for a in dir(uut) if not
-                      callable(getattr(uut, a))]))
+                print(uut.__dict__.keys())
                 os.system('cat ' + xml_abs_path)
             if test == 0:
                 passed = uut.abs_path == xml_abs_path
