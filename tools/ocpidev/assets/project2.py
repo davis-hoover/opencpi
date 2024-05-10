@@ -27,109 +27,20 @@ from _opencpi.assets.library2 import SpecsDirectory, Discoverer, ComponentLibrar
 from _opencpi.assets.primitive2 import HdlLibrary
 from _opencpi.assets.assembly2 import HdlAssembly
 from _opencpi.assets.platform2 import HdlCard, HdlPlatform
-import _opencpi.assets.template as ocpitemplate
+#from _opencpi.assets.template import *
 import jinja2
 
-templates = {}
-templates['Project.exports'] = """
-# This file specifies aspects of this project that are made available to users,
-# by adding or subtracting from what is automatically exported based on the
-# documented rules.
-# Lines starting with + add to the exports
-# Lines starting with - subtract from the exports
-all
-
-\n\n"""
-
-templates['.gitignore'] = """
-# Lines starting with '#' are considered comments.
-# Ignore (generated) html files,
-#*.html
-# except foo.html which is maintained by hand.
-#!foo.html
-# Ignore objects and archives.
-*.rpm
-*.obj
-*.so
-*~
-*.o
-target-*/
-*.deps
-gen/
-*.old
-*.hold
-*.orig
-*.log
-lib/
-#Texmaker artifacts
-*.aux
-*.synctex.gz
-*.out
-**/doc*/*.pdf
-**/doc*/*.toc
-**/doc*/*.lof
-**/doc*/*.lot
-run/
-exports/
-imports
-*.pyc
-simulations/
-\n\n"""
-
-templates['.gitattributes'] = """
-*.ngc -diff
-*.edf -diff
-*.bit -diff
-\n\n"""
-
-project_xml = ("""<project/>
-{%if package_name: %}
-       PackageName='{{package_name}}'
+project_templates = {}
+project_templates['Project.xml'] = ("""<Project
+{%if asset.package_name %}
+    PackageName='{{asset.package_name}}'
 {% endif %}
-{%if package_prefix: %}
-       PackagePrefix='{{package_prefix}}'
-{% endif %}
-{%if package_id: %}
-       Package='{{package_id}}'
-{% endif %}
-{%if depend: %}
-       ProjectDependencies='{{depend}}'
-{% endif %}
-{%if prim_lib: %}
-       Libraries='{{prim_lib}}'
-{% endif %}
-{%if include_dir: %}
-       IncludeDirs='{{include_dir}}'
-{% endif %}
-{%if xml_include: %}
-       XmlIncludeDirs='{{xml_include}}'
-{% endif %}
-{%if comp_lib: %}
-       ComponentLibraries='{{comp_lib}}'
+{%if asset.package_prefix %}
+    PackagePrefix='{{asset.package_prefix}}'
 {% endif %}
 />
 \n""")
 
-project_xml = jinja2.Template(project_xml, trim_blocks=True)
-# TODO Put all vars in render()
-package_name = "HELLO PACKAGE NAME"
-project_xml = project_xml.render(package_name=package_name)
-templates['Project.xml'] = project_xml
-
-dot_project = ("""<?xml version="1.0" encoding="UTF-8"?>
-<projectDescription>
-  <name>{{determined_package_id}}</name>
-  <comment></comment>
-  <projects></projects>
-  <buildSpec></buildSpec>
-  <natures></natures>
-</projectDescription>
-\n""")
-
-dot_project = jinja2.Template(dot_project, trim_blocks=True)
-# TODO Put all vars in render()
-dot_project = dot_project.render()
-templates['.project'] = dot_project
 
 # TODO iherit from, and consolidate functionality from, AttributeBase
 class PackageID():
@@ -142,12 +53,11 @@ class PackageID():
     def __str__(self):
         return str(self.package_prefix) + "." + str(self.package_name)
 
-
 class Project(SpecsDirectory, Discoverer, _AssetBase):
-    """ Component Development Guide section 14 """
+    """ Component Development Guide section 15 """
 
-    def __init__(self, dir_abs_path, enable_path_existence_check=True):
-        _AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
+    def __init__(self, dir_abs_path, enable_path_existence_check=True, cli_dict=None):
+        _AssetBase.__init__(self, dir_abs_path, cli_dict, enable_path_existence_check)
         #del self.name
         SpecsDirectory.__init__(self)
         self.package_prefix = ''
@@ -172,15 +82,9 @@ class Project(SpecsDirectory, Discoverer, _AssetBase):
         # initialize below line according to CDG Table 8
         self.project_dependencies = ['ocpi.core']
         # end of CDG section 14.5
-        self.parse()
+        #if cli_dict is None:
+        self.parse(cli_dict)
         self.first = True
-
-    def create(self):
-        if self.get_abs_path_exists():
-            raise Exception('project ' + self.abs_path + ' already exists')
-        else:
-            os.mkdir(self.get_dir_abs_path())
-        _AssetBase.create(self, templates)
 
     def get_root_tags(self):
         return ['Project']
@@ -209,19 +113,7 @@ class Project(SpecsDirectory, Discoverer, _AssetBase):
                 ret = HdlAssembly(abs_path)
         return ret
 
-    # TODO consolidate
-    #def get_list_of_existing_abs_paths_to_parse(self, abs_paths):
-    #    ret = []
-    #    for abs_path in abs_paths:
-    #        print(abs_path)
-    #        if os.path.exists(abs_path):
-    #            Logger().debug('parsing ' + abs_path)
-    #            if abs_path == self.get_xml_abs_path():
-    #                abs_path = ''
-    #            ret.append(abs_path)
-    #    return ret
-
-    def parse(self):
+    def parse(self, cli_dict):
         paths = []
         # start pre-2.0 opencpi
         paths += [self.abs_path + '/Project.mk']
@@ -229,22 +121,32 @@ class Project(SpecsDirectory, Discoverer, _AssetBase):
         # TODO consolidate with get_asset2() from AttributeBase
         paths.append(self.get_xml_abs_path())
         # end pre-2.0 opencpi
-        for path in self.get_list_of_existing_abs_paths_to_parse(paths):
-            clibs = self.get_attr_list('ComponentLibraries', None, path)
-            if len(clibs) > 0:
-                self._component_libraries = clibs
-            hlibs = self.get_attr_list('HdlLibraries', None, path)
-            if len(hlibs) > 0:
-                self.hdl_libraries = hlibs
-            deps = self.get_attr_list('ProjectDependencies', None, path)
-            if len(deps) > 0:
-                self.project_dependencies = deps
-            package_prefix = self.get_attr('PackagePrefix', None, path)
-            if package_prefix != '':
-                self.package_prefix = package_prefix 
-            package_name = self.get_attr('PackageName', None, path)
-            if package_name != '':
-                self.package_name = package_name
+        paths = self.get_list_of_existing_abs_paths_to_parse(paths)
+        clibs = self.get_attr_list('ComponentLibraries', None, paths, cli_dict)
+        if len(clibs) > 0:
+            self._component_libraries = clibs
+        hlibs = self.get_attr_list('HdlLibraries', None, paths, cli_dict)
+        if len(hlibs) > 0:
+            self.hdl_libraries = hlibs
+        deps = self.get_attr_list('ProjectDependencies', None, paths, cli_dict)
+        if len(deps) > 0:
+            self.project_dependencies = deps
+        package_prefix = self.get_attr('PackagePrefix', None, paths, cli_dict)
+        if package_prefix != '':
+            self.package_prefix = package_prefix 
+        if self.package_prefix != '':
+            if not self.package_prefix.isidentifier():
+                raise InvalidAssetError('PackagePrefix must contain only alphanumeric characters and not start with a number')
+        package_name = self.get_attr('PackageName', None, paths, cli_dict)
+        if package_name != '':
+            self.package_name = package_name
+
+    def create(self):
+        if self.get_abs_path_exists():
+            raise Exception('project ' + self.abs_path + ' already exists')
+        else:
+            os.mkdir(self.get_dir_abs_path())
+        _AssetBase.create_files(self, project_templates)
 
     def discover(
             self, do_component_libraries=True, do_hdl_primitives=True,
