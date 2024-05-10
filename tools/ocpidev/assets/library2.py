@@ -19,7 +19,7 @@
 
 import os
 from _opencpi.assets.abstract2 import *
-from _opencpi.assets.abstract2 import _AssetBase
+from _opencpi.assets.abstract2 import AssetBase
 from _opencpi.assets.component2 import Component
 from _opencpi.assets.worker2 import Worker, RccAssembly
 # below 4 lines are a weird, unintended consequence of Discoverer
@@ -41,7 +41,7 @@ class SpecsDirectory():
         for _dir in os.listdir(self.abs_path):
             if _dir == 'specs':
                 discovery_path = self.abs_path + '/' + _dir
-                for name in _AssetBase.listdir_assets(discovery_path):
+                for name in AssetBase.listdir_assets(discovery_path):
                     path = self.abs_path + '/' + _dir + '/' + name
                     try:
                         asset = Component(path)
@@ -76,7 +76,7 @@ class Discoverer():
         ret = []
         discovery_path = self.abs_path + '/' + parent
         if os.path.isdir(discovery_path):
-            for _dir in _AssetBase.listdir_assets(discovery_path):
+            for _dir in AssetBase.listdir_assets(discovery_path):
                 dir_abs_path = discovery_path + '/' + _dir
                 if os.path.isdir(dir_abs_path):
                     ret.append(dir_abs_path)
@@ -96,7 +96,7 @@ class Discoverer():
                 elif parent == 'applications':
                     assets.append(Application(dir_abs_path))
                 elif tmp.endswith('.rcc') or tmp.endswith('.hdl') or platform:
-                    name = _AssetBase.get_name_from_abs_path(dir_abs_path)
+                    name = AssetBase.get_name_from_abs_path(dir_abs_path)
                     if tmp.endswith('.rcc'):
                         # due to edge cases such as testzc.rcc, testmulti.rcc
                         assets = RccAssembly(dir_abs_path).workers
@@ -111,13 +111,13 @@ class Discoverer():
                 pass
 
 
-class ComponentLibrary(_AssetBase, SpecsDirectory, Discoverer):
+class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
     """ Reference RCC/HDL Development Guide section 3. A ComponentLibrary is
         represented by a directory and knows nothing about the project it
         is in or its package ID. """
 
     def __init__(self, dir_abs_path):
-        _AssetBase.__init__(self, dir_abs_path)
+        AssetBase.__init__(self, dir_abs_path)
         is_test = self.get_dir_abs_path_is_test(dir_abs_path)
         if is_test or self.get_dir_abs_path_is_worker(dir_abs_path):
             self.raise_invalid_asset_error()
@@ -174,14 +174,14 @@ class ComponentLibrary(_AssetBase, SpecsDirectory, Discoverer):
         # end pre-2.0 opencpi
         paths.append(self.get_xml_abs_path())
         workers = []
-        for path in self.get_list_of_existing_abs_paths_to_parse(paths):
-            clibs = self.get_attr_list('ComponentLibraries', None, path)
-            if len(clibs) > 0:
-                self.component_libraries = clibs
-            hlibs = self.get_attr_list('HdlLibraries', None, path)
-            if len(hlibs) > 0:
-                self.hdl_libraries = hlibs
-            workers = self.get_attr_list('Workers', None, path)
+        paths = self.get_list_of_existing_abs_paths_to_parse(paths)
+        clibs = self.get_attr_list('ComponentLibraries', None, paths)
+        if len(clibs) > 0:
+            self.component_libraries = clibs
+        hlibs = self.get_attr_list('HdlLibraries', None, paths)
+        if len(hlibs) > 0:
+            self.hdl_libraries = hlibs
+        workers = self.get_attr_list('Workers', None, paths)
         global g_libraries_mk
         if g_libraries_mk:
             g_libraries_mk = False
@@ -195,7 +195,7 @@ class ComponentLibrary(_AssetBase, SpecsDirectory, Discoverer):
         SpecsDirectory.discover_components(self)
         for discovery_path in self.get_potential_asset_dir_abs_paths(''):
             if discovery_path.endswith('.comp'):  # undocumented
-                for entry in _AssetBase.listdir_assets(discovery_path):
+                for entry in AssetBase.listdir_assets(discovery_path):
                     try:
                         asset = Component(discovery_path + '/' + entry)
                         self.append_discovered_asset(asset)

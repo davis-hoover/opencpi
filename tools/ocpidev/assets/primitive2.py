@@ -19,16 +19,16 @@
 
 import os
 from _opencpi.assets.abstract2 import *
-from _opencpi.assets.abstract2 import _AssetBase
+from _opencpi.assets.abstract2 import AssetBase
 
 
-class HdlLibrary(_AssetBase):
+class HdlLibrary(AssetBase):
     """ Reference HDL Development Guide section 5.2. A HdlLibrary is
         represented by a directory and knows nothing about the project it
         is in or its package ID. """
 
     def __init__(self, dir_abs_path):
-        _AssetBase.__init__(self, dir_abs_path)
+        AssetBase.__init__(self, dir_abs_path)
         self.libraries = []
         self.source_files = []  # HDG section 5.2.1
         self.parse()
@@ -45,13 +45,13 @@ class HdlLibrary(_AssetBase):
         # intentionally put xml last so that its attributes take precedence
         # end pre-2.0 opencpi
         paths.append(self.get_xml_abs_path())
-        for path in self.get_list_of_existing_abs_paths_to_parse(paths):
-            libraries = self.get_attr_list('Libraries', None, path)
-            if len(libraries) > 0:
-                self.libraries = libraries
-            files = self.get_attr_list('SourceFiles', None, path)
-            if len(files) > 0:
-                self.source_files = files
+        paths = self.get_list_of_existing_abs_paths_to_parse(paths)
+        libraries = self.get_attr_list('Libraries', None, paths)
+        if len(libraries) > 0:
+            self.libraries = libraries
+        files = self.get_attr_list('SourceFiles', None, paths)
+        if len(files) > 0:
+            self.source_files = files
 
     def get_type(self):
         return 'hdl primitive'
@@ -71,8 +71,7 @@ def test_HdlLibrary(ret):
             ff.close()
             uut = HdlLibrary(dir_abs_path)
             if Environment().ocpi_log_level >= 10:
-                print(str([a for a in dir(uut) if not
-                      callable(getattr(uut, a))]))
+                print(uut.__dict__.keys())
                 os.system('cat ' + xml_abs_path)
             if test == 0:
                 passed = uut.libraries == ['foo']

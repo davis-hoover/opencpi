@@ -19,7 +19,7 @@
 
 import os
 from .abstract2 import *
-from _opencpi.assets.abstract2 import _AssetBase
+from _opencpi.assets.abstract2 import AssetBase
 from .worker2 import Worker
 
 
@@ -39,13 +39,13 @@ class HdlAssemblyInstance(AttributeBase):
         self.worker = self.get_attr('Worker', elem)
 
 
-class HdlAssembly(_AssetBase):
+class HdlAssembly(AssetBase):
     """ Reference HDL Development Guide section 6. A HdlAssembly is
         represented by a directory and knows nothing about the project it
         is in or its package ID. """
 
     def __init__(self, dir_abs_path):
-        _AssetBase.__init__(self, dir_abs_path)
+        AssetBase.__init__(self, dir_abs_path)
         if not os.path.isfile(self.get_xml_abs_path()):
             self.raise_abs_path_does_not_exist()
         self.instances = []
@@ -62,20 +62,20 @@ class HdlAssembly(_AssetBase):
         # intentionally put xml path last so that its attributes take precedence
         # end pre-2.0 opencpi
         paths.append(self.get_xml_abs_path())
-        for path in self.get_list_of_existing_abs_paths_to_parse(paths):
-            containers = self.get_attr_list('Containers', None, path)
-            if len(containers) > 0:
-                for cname in containers:
-                    # start pre-2.0 opencpi
-                    # interesting edge case for
-                    # assets/hdl/assemblies/empty/Makefile which has Makefiel
-                    # variable Containers with a value that is not just a
-                    # string (which is typical) but an .xml extension (atypical)
-                    # cnt_hsmc_loopback_card_hsmc_alst4_a_hsmc_alst4_b.xml
-                    cname = cname.split('.xml')[0]
-                    # end pre-2.0 opencpi
-                    path = self.abs_path + '/' + cname + '.xml'
-                    self.containers.append(HdlContainer(path))
+        paths = self.get_list_of_existing_abs_paths_to_parse(paths)
+        containers = self.get_attr_list('Containers', None, paths)
+        if len(containers) > 0:
+            for cname in containers:
+                # start pre-2.0 opencpi
+                # interesting edge case for
+                # assets/hdl/assemblies/empty/Makefile which has Makefiel
+                # variable Containers with a value that is not just a
+                # string (which is typical) but an .xml extension (atypical)
+                # cnt_hsmc_loopback_card_hsmc_alst4_a_hsmc_alst4_b.xml
+                cname = cname.split('.xml')[0]
+                # end pre-2.0 opencpi
+                path = self.abs_path + '/' + cname + '.xml'
+                self.containers.append(HdlContainer(path))
         for elem in self.get_parsed().iter():
             try:
                 instance = HdlAssemblyInstance(elem)
@@ -94,11 +94,11 @@ class HdlContainerDevice():
         self.slot = slot
 
 
-class HdlContainer(_AssetBase):
+class HdlContainer(AssetBase):
     """ HDL Development Guide section 6.4 """
 
     def __init__(self, xml_abs_path):
-        _AssetBase.__init__(self, xml_abs_path)
+        AssetBase.__init__(self, xml_abs_path)
         # start of HDL section 6.4.1
         self.platform = ''
         self.config = ''
@@ -119,7 +119,7 @@ class HdlContainer(_AssetBase):
         self.constraints = self.get_attr('Constraints')
         self.only_platforms = self.get_attr_list('OnlyPlatforms')
         self.exclude_platforms = self.get_attr_list('ExcludePlatforms')
-        # TODO consolidate below with AttributeBase/_AssetBase methods
+        # TODO consolidate below with AttributeBase/AssetBase methods
         for elem in self.get_parsed().iter():
             name = None
             card = None
@@ -369,8 +369,7 @@ def test_HdlContainer(ret):
             ff.close()
             uut = HdlContainer(xml_abs_path)
             if Environment().ocpi_log_level >= 10:
-                print(str([a for a in dir(uut) if not
-                      callable(getattr(uut, a))]))
+                print(uut.__dict__.keys())
                 os.system('cat ' + xml_abs_path)
             if test == 0:
                 passed = uut.config == 'cfg'

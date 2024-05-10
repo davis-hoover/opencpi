@@ -19,15 +19,15 @@
 
 import os
 from _opencpi.assets.abstract2 import *
-from _opencpi.assets.abstract2 import _AssetBase
+from _opencpi.assets.abstract2 import AssetBase
 
 
-# TODO iherit from, and consolidate functionality from, _AssetBase
-class Application(_AssetBase):
+# TODO iherit from, and consolidate functionality from, AssetBase
+class Application(AssetBase):
     """ Reference Application Development Guide section 3 """
 
     def __init__(self, dir_abs_path):
-        _AssetBase.__init__(self, dir_abs_path)
+        AssetBase.__init__(self, dir_abs_path)
         # TODO investigate whether below line is necessary
         # if not os.path.isfile(self.get_xml_abs_path()):
         #     self.raise_abs_path_does_not_exist()
