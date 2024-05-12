@@ -244,7 +244,7 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         tmp = ['bsv', 'fixed_float', 'ocpi', 'util', 'protocol', 'cdc']
         return tmp + ['platform', 'sdp', 'axi']
 
-    def get_hdl_primitive_dependent_libraries(self, hdl_primitive = None):
+    def get_hdl_primitive_dependent_libraries(self, hdl_primitive=None):
         ret = []
         # 1. built-in (core) libraries (every project except ocpi.core)
         if str(self.get_package_id()) != 'ocpi.core':
@@ -299,7 +299,7 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
 
     def get_build_output_path(self, asset, hdl_target = None,
             hdl_platform = None):
-        ret = asset.abs_path
+        ret = asset.get_dir_abs_path()
         tmp = ''
         if asset.get_type() == 'hdl assembly':
             tmp = asset.name + '_' + hdl_platform + '_'
@@ -396,13 +396,13 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
             for cfg in _hdl_platform.configurations.values():
                 for dev in cfg.devices:
                     _worker = None
-                    project = project_registry.get_worker_project(dev)
+                    project = project_registry.get_worker_project(dev.name)
                     for clib in project.component_libraries:
                         for device in clib.workers:
-                            if device.name == dev:
+                            if device.name == dev.name:
                                 _worker = device
                                 break
-                    wpath= self.get_build_output_path(_worker, get_hdl_target(hdl_platform),
+                    wpath = self.get_build_output_path(_worker, get_hdl_target(hdl_platform),
                             hdl_platform)
                     global_makefile.rules[tname].prerequisites.append(wpath)
                     global_dependency_tree[asset].dependents.append(_worker)

@@ -678,6 +678,10 @@ class AttributeBase():
         if cli_dict is None:
             if makefile_abs_paths == []:
                 makefile_abs_paths.append('') # TODO fix this hack to make xml work
+            if is_list:
+                ret2 = []
+            else:
+                ret2 = ''
             for makefile_abs_path in makefile_abs_paths:
                 # start pre-2.0 opencpi
                 if elem is None:
@@ -707,25 +711,27 @@ class AttributeBase():
                             # if key.lower() in [attr.lower() for attr in tmp]:
                             if key.lower() == attr.lower():
                                 if is_list:
-                                    ret = self.get_xml_val_list(val)
+                                    ret2 = self.get_xml_val_list(val)
                                 else:
-                                    ret = val
+                                    ret2 = val
                             # else:
                             #     self.throw_invalid_element_error(self, abs_path, key)
                     else:
                         # start pre-2.0 opencpi
                         attr_abs_path = makefile_abs_path
-                        ret = self.get_variable_val_list_from_gnu_makefile(attr, attr_abs_path)
+                        ret2 = self.get_variable_val_list_from_gnu_makefile(attr, attr_abs_path)
                         if not is_list:
-                            if len(ret) > 0:
-                                ret = ret[0]
+                            if len(ret2) > 0:
+                                ret2 = ret2[0]
                             else:
-                                ret = ''
+                                ret2 = ''
                         # end pre-2.0 opencpi
                     if attr_abs_path != '':
-                        if (ret != '') and (ret != []):
+                        if (ret2 != '') and (ret2 != []):
                             Logger().debug('** parsed ' + attr_abs_path + ' ' + attr +
-                                           ' value of ' + str(ret))
+                                           ' value of ' + str(ret2))
+                if (is_list and ret2 != []) or ((not is_list) and (ret2 != '')):
+                    ret = ret2
         else:
             try:
                 ret = cli_dict[attr.lower()]
