@@ -320,7 +320,7 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         ret = self.get_built_in_hdl_libraries()
         for lib in comp_library.hdl_libraries:
             ret.append(lib)
-        for lib in worker.libraries:
+        for lib in worker.attrs['Libraries']:
             ret.append(lib)
         return ret
 
@@ -393,7 +393,7 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
             hdl_target, hdl_platform)
         global_makefile.emit()
         # TODO delete below line
-        os.system('cp ' + global_makefile.abs_path + ' /tmp/Makefile')
+        # os.system('cp ' + global_makefile.abs_path + ' /tmp/Makefile')
         tmp = 'make -f ' + global_makefile.abs_path
         if _j > 1:
             tmp += ' -j ' + str(_j)
