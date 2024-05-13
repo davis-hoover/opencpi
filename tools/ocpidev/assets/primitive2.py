@@ -28,17 +28,18 @@ class HdlLibrary(AssetBase):
         is in or its package ID. """
 
     def __init__(self, dir_abs_path):
+        self.root_tags = ['HdlLibrary']  # HDG section 5.2
+        self.root_tags += ['HdlCore']  # HDG section 5.3
         AssetBase.__init__(self, dir_abs_path)
         self.libraries = []
         self.source_files = []  # HDG section 5.2.1
         self.parse()
 
     def get_root_tags(self):
-        ret = ['HdlLibrary']  # HDG section 5.2
-        ret += ['HdlCore']  # HDG section 5.3
-        return ret
+        # TODO replace get_root_tags() with self.root_tags
+        return self.root_tags
 
-    def parse(self):
+    def get_paths_to_parse(self):
         paths = []
         # start pre-2.0 opencpi
         paths += [self.abs_path + '/Makefile']
@@ -46,12 +47,13 @@ class HdlLibrary(AssetBase):
         # end pre-2.0 opencpi
         paths.append(self.get_xml_abs_path())
         paths = self.get_list_of_existing_abs_paths_to_parse(paths)
-        libraries = self.get_attr_list('Libraries', None, paths)
-        if len(libraries) > 0:
-            self.libraries = libraries
-        files = self.get_attr_list('SourceFiles', None, paths)
-        if len(files) > 0:
-            self.source_files = files
+        return paths
+
+    def get_attr_infos(self):
+        ret = []
+        for key in ['SourceFiles', 'Libraries']:
+            ret.append(AttributeInfo(key, is_list=True))
+        return ret
 
     def get_type(self):
         return 'hdl primitive'
@@ -74,9 +76,9 @@ def test_HdlLibrary(ret):
                 print(uut.__dict__.keys())
                 os.system('cat ' + xml_abs_path)
             if test == 0:
-                passed = uut.libraries == ['foo']
+                passed = uut.attrs['Libraries'] == ['foo']
             if test == 1:
-                passed = uut.source_files == ['x.vhd']
+                passed = uut.attrs['SourceFiles'] == ['x.vhd']
         except InvalidAssetError:
             passed = False
         if test == 0:
