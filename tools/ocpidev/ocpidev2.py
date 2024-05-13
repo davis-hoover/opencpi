@@ -428,28 +428,40 @@ def unittest():
     return ret
 
 
-if __name__ == '__main__':
-    exit_status = 0
-    # TODO: Better conditionalize verbs/noun combinations to their
-    #       respective optional argument.
-    parser = argparse.ArgumentParser(description='')
-    parser.add_argument('-d', nargs='?', default=None)
-    parser.add_argument('-j', nargs='?', default=1)
-    # Create options
+def add_create_arguments(parser):
     parser.add_argument('-A', '--xml-include', nargs='?', dest='xml_include', default=None)
     parser.add_argument('-D', '--depend', nargs='?', dest='depend', default=None)
-    parser.add_argument('-F', '--package-prefix', nargs='?', dest='package_prefix', default=None)
-    parser.add_argument('-I', '--include-dir', nargs='?', dest='include_dir', default=None)
-    parser.add_argument('-K', '--package-id', nargs='?', dest='package_id', default=None)
-    parser.add_argument('-N', '--package-name', nargs='?', dest='package_name', default=None)
-    parser.add_argument('-Y', '--prim-lib', nargs='?', dest='prim_lib', default=None)
-    parser.add_argument('-y', '--comp-lib', nargs='?', dest='comp_lib', default=None)
-    # Build options
+    parser.add_argument('-F', '--package-prefix', nargs='?', dest='package_prefix', default='')
+    parser.add_argument('-I', '--include-dir', nargs='?', dest='include_dir', default='')
+    parser.add_argument('-K', '--package-id', nargs='?', dest='package_id', default='')
+    parser.add_argument('-N', '--package-name', nargs='?', dest='package_name', default='')
+    parser.add_argument('-Y', '--prim-lib', nargs='?', dest='prim_lib', default='')
+    parser.add_argument('-y', '--comp-lib', nargs='?', dest='comp_lib', default='')
+    return parser
+
+
+def add_build_arguments(parser):
     parser.add_argument('--hdl-target', nargs='?', default=None)
     parser.add_argument('--hdl-platform', nargs='?', default=None)
     parser.add_argument('--rcc-platform', nargs='?', default=None)
+    return parser
+
+
+if __name__ == '__main__':
+    exit_status = 0
+    parser = argparse.ArgumentParser(description='')
+    parser.add_argument('-d', nargs='?', default=None)
+    parser.add_argument('-j', nargs='?', default=1)
     parser.add_argument('verb')
-    parser.add_argument('noun', nargs='?', default=None)
+    if 'create' in sys.argv and 'project' in sys.argv:
+        parser = add_create_arguments(parser)
+    if 'build' in sys.argv:
+        parser = add_build_arguments(parser)
+    required = ('create' in sys.argv) or ('build' in sys.argv) or ('show' in sys.argv)
+    if required:
+        parser.add_argument('noun')
+    else:
+        parser.add_argument('noun', nargs='?', default=None)
     parser.add_argument('name', nargs='?', default=None)
     args = parser.parse_args()
     try:

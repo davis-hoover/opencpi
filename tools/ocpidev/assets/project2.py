@@ -135,7 +135,6 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         ret = []
         for attr_key in ['PackagePrefix', 'PackageName', 'PackageID']:
             ret.append(AttributeInfo(attr_key))
-
         for attr_key in ['HdlTargets', 'HdlPlatforms', 'RccPlatforms',
                          'RccHdlPlatforms', 'ComponentLibraries',
                          'HdlLibraries', 'ProjectDependencies']:
