@@ -29,8 +29,8 @@ import glob
 
 # TODO make a class member, probably ComponentLibrary or Project class
 g_libraries_mk = False
-g_asset_template = """<{{asset.root_tags[0]}}{% for key,val in self.attrs.items() %}
-    {{key}}=\'{{val}}\'{% endfor %}/>"""
+g_asset_template = """<{{asset.root_tags[0]}}
+    {% for key,val in self.attrs.items() %}{{key}}=\'{{val}}\'{% endfor %}/>"""
 global_dependency_tree = dict()
 
 
@@ -660,14 +660,14 @@ class AttributeBase():
     def get_attr_infos(self):
         return []
 
-    def parse(self, elem, paths=[]):
+    def parse(self, elem, paths=[], cli_dict=None):
         """ use elem to parse an XML ElementTree directly, and paths to specify
             a list of XML/makefile files to parse """
         for info in self.get_attr_infos():
             if info.is_list:
-                val = self.get_attr_list(info.key, elem, paths)
+                val = self.get_attr_list(info.key, elem, paths, cli_dict)
             else:
-                val = self.get_attr(info.key, elem, paths)
+                val = self.get_attr(info.key, elem, paths, cli_dict)
             if info.is_int:
                 val = int(val)
             if (info.is_list and val != []) or \
@@ -860,8 +860,8 @@ class AssetBase(AttributeBase):
     def get_paths_to_parse(self):
         return []
 
-    def parse(self):
-        AttributeBase.parse(self, None, self.get_paths_to_parse())
+    def parse(self, cli_dict=None):
+        AttributeBase.parse(self, None, self.get_paths_to_parse(), cli_dict)
         Logger().debug('parsed attributes: ' + str(self.attrs))
 
     @staticmethod

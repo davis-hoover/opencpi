@@ -131,12 +131,12 @@ class Component(AssetBase):
         represented by a xml file (OCS) and knows nothing about the project it
         is in or its package ID. """
 
-    def __init__(self, xml_abs_path):
+    def __init__(self, xml_abs_path, cli_dict=None):
         """ xml_abs_path is None for ComponentSpec embedded in OWD """
         self.root_tags = ['ComponentSpec']
         AssetBase.__init__(self, xml_abs_path)
         Logger().debug('parsing ' + self.get_xml_abs_path())
-        self.parse()
+        self.parse(cli_dict)
 
     def get_root_tags(self):
         # TODO replace get_root_tags() with self.root_tags
@@ -147,8 +147,8 @@ class Component(AssetBase):
         ret.append(AttributeInfo('Name'))
         return ret
 
-    def parse(self):
-        AssetBase.parse(self)
+    def parse(self, cli_dict=None):
+        AssetBase.parse(self, cli_dict)
         if self.attrs['Name'] != '':
             self.name = self.attrs['Name']
         #    for elem in AttributeBase.get_parsed(self.abs_path).iter():
