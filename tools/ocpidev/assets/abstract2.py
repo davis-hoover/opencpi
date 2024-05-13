@@ -800,7 +800,7 @@ class AssetBase(AttributeBase):
         retrievable via get_dir_abs_path(). Assets that have XML files can query
         get_xml_abs_path(). """
 
-    def __init__(self, abs_path):
+    def __init__(self, abs_path, enable_path_existence_check=True):
         """ abs_path is either to a xml file (Component/Protocol/etc) or a dir
             (HdlAssembly/etc) or none for some cases (Component embedded in
             OWD, platform base config) """
@@ -812,9 +812,14 @@ class AssetBase(AttributeBase):
                 self.attrs[info.key] = ''
         self.abs_path = abs_path  # can be None, e.g., for base platform config
         # TODO replace get_root_tags() with self.root_tags
-        expected_root_tag = self.get_root_tags()[0]
+        self.name = self.get_name()  # CDG section 6.1.1, section 8.1.1, etc
+        if (self.abs_path is not None):
+            if enable_path_existence_check:
+                self.raise_if_path_does_not_exist()
+
+    def get_name(self):
         if self.get_is_xml():
-            name = self.get_name_from_abs_path(abs_path)
+            name = self.get_name_from_abs_path(self.abs_path)
             strs_to_remove = []
             if self.get_root_tags() == ['ComponentSpec']:
                 strs_to_remove += ['-spec']  # CDG section 6
@@ -830,32 +835,33 @@ class AssetBase(AttributeBase):
             for str_to_remove in strs_to_remove:
                 name = name.split(str_to_remove, -1)[0]
         else:
-            # abs_path is not None for makefiles but will be be None for base
+            # self.abs_path is not None for makefiles but will be be None for base
             # platform configuration
-            if abs_path is None:
+            if self.abs_path is None:
                 name = 'base'
             else:
-                name = abs_path.split('/')[-1]
-        self.name = name  # CDG section 6.1.1, section 8.1.1, etc
-        if (abs_path is not None):
-            if self.get_is_xml():
-                exists = os.path.isfile(self.get_xml_abs_path())
-            else:
-                exists = os.path.isdir(abs_path)
-            if not exists:
-                self.raise_abs_path_does_not_exist()
-            if os.path.isfile(self.get_xml_abs_path()):
-                lowers = [tag.lower() for tag in self.get_root_tags()]
-                tag = self.get_tag(None)
-                if tag.lower() not in lowers:
-                    msg = self.get_xml_abs_path() + ' (root tag ' + tag
-                    msg += ') is not a ' + expected_root_tag
-                    # TODO investigate moving to ComponentLibrary/HdlPlatform
-                    if self.get_dir_abs_path().endswith('hdl/platforms'):
-                        # Logger().warn(msg)
-                        pass
-                    else:
-                        raise InvalidAssetError(msg)
+                name = self.abs_path.split('/')[-1]
+        return name
+
+    def raise_if_path_does_not_exist(self):
+        if self.get_is_xml():
+            exists = os.path.isfile(self.get_xml_abs_path())
+        else:
+            exists = os.path.isdir(self.abs_path)
+        if not exists:
+            self.raise_abs_path_does_not_exist()
+        if os.path.isfile(self.get_xml_abs_path()):
+            lowers = [tag.lower() for tag in self.get_root_tags()]
+            tag = self.get_tag(None)
+            if tag.lower() not in lowers:
+                msg = self.get_xml_abs_path() + ' (root tag ' + tag
+                msg += ') is not a ' + self.get_root_tags()[0]
+                # TODO investigate moving to ComponentLibrary/HdlPlatform
+                if self.get_dir_abs_path().endswith('hdl/platforms'):
+                    # Logger().warn(msg)
+                    pass
+                else:
+                    raise InvalidAssetError(msg)
 
     def get_paths_to_parse(self):
         return []
