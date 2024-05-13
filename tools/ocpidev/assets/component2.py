@@ -147,7 +147,7 @@ class Component(AssetBase):
         ret.append(AttributeInfo('Name'))
         return ret
 
-    def parse(self, cli_dict):
+    def parse(self, cli_dict=None):
         AssetBase.parse(self, cli_dict)
         if self.attrs['Name'] != '':
             self.name = self.attrs['Name']
