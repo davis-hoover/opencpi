@@ -582,7 +582,7 @@ def test_Project_discover_component_libraries(ret):
                     '<Project PackagePrefix=\'ocpi\' PackageName=\'proj\'/>\n')
             project_xml.close()
             uut = Project(project_abs_path, False)
-            if nlibs != len(uut.component_libraries):
+            if num_expected != len(uut.component_libraries):
                 passed = False
         os.system('rm -rf %s/*' % project_abs_path)
     os.system('mkdir -p %s' % project_abs_path)

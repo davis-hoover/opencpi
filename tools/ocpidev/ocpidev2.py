@@ -463,9 +463,7 @@ if __name__ == '__main__':
         if args.d is None:
             if (args.noun is None) or (args.verb != 'clean'):
                 _dir = os.getcwd()
-
         if args.verb == 'create':
-
             if args.name is None:
                 raise Exception('ocpidev2 create ' + args.noun + ' <name> required')
             OCPIDev(hdl_build_tool).create(vars(args))
@@ -493,7 +491,7 @@ if __name__ == '__main__':
             else:
                 exit_status = 1
         else:
-            raise Exception('verb ' + str(args.verb) + ' is not supported')
+            raise Exception('verb ' + args.verb + ' is not supported')
     except Exception as exception:
         Logger().error(str(exception))
         exit_status = 1
