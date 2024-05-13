@@ -163,8 +163,7 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
                 ret = HdlAssembly(abs_path)
         return ret
 
-    def parse(self, cli_dict):
-        AssetBase.parse(self, cli_dict)
+    def get_paths_to_parse(self):
         paths = []
         # start pre-2.0 opencpi
         paths += [self.abs_path + '/Project.mk']
@@ -173,6 +172,11 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         paths.append(self.get_xml_abs_path())
         # end pre-2.0 opencpi
         paths = self.get_list_of_existing_abs_paths_to_parse(paths)
+        return paths
+
+    def parse(self, cli_dict):
+        AssetBase.parse(self, cli_dict)
+        paths = self.get_paths_to_parse()
         clibs = self.get_attr_list('ComponentLibraries', None, paths, cli_dict)
         if len(clibs) > 0:
             self._component_libraries = clibs
@@ -226,7 +230,7 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         dirs += ['hdl/adapters', 'hdl/platforms']
         dir_abs_paths = []
         for _dir in dirs:
-            dir_abs_path = self.abs_path + '/' + _dir
+            dir_abs_path = self.get_dir_abs_path() + '/' + _dir
             if os.path.isdir(dir_abs_path):
                 # add to dir_abs_path the absolute path to the directories
                 # of the following form from CDG section 14.2.3., if they exist,
@@ -582,7 +586,8 @@ def test_Project_discover_component_libraries(ret):
                     '<Project PackagePrefix=\'ocpi\' PackageName=\'proj\'/>\n')
             project_xml.close()
             uut = Project(project_abs_path, False)
-            if num_expected != len(uut.component_libraries):
+            uut.discover()
+            if num_expected_libs != len(uut.component_libraries):
                 passed = False
         os.system('rm -rf %s/*' % project_abs_path)
     os.system('mkdir -p %s' % project_abs_path)
