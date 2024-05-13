@@ -165,19 +165,19 @@ class ProjectRegistry():
         for _dir in AssetBase.listdir_assets(self.abs_path):
             project_abs_path = os.path.realpath(self.abs_path + '/' + _dir)
             if self.get_abs_path_is_project(project_abs_path):
-                self.projects.append(
-                        Project(project_abs_path, do_component_libraries,
-                                do_hdl_primitives))
+                project = Project(project_abs_path, False)
+                project.discover(do_component_libraries, do_hdl_primitives)
+                self.projects.append(project)
         Logger().debug('end of project discovery')
 
     def register_project(self):
-        project = Project(os.getcwd(), False, False)  # raises if not a project
+        project = Project(os.getcwd(), False)  # raises if not a project
         symlink_path = self.abs_path + '/' + str(project.get_package_id())
         if not os.path.islink(symlink_path):
             os.symlink(project.abs_path, symlink_path)
 
     def unregister_project(self):
-        project = Project(os.getcwd(), False, False)  # raises if not a project
+        project = Project(os.getcwd(), False)  # raises if not a project
         os.system('unlink ' + self.abs_path + '/' + str(project.get_package_id()))
 
 

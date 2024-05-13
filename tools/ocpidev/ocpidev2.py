@@ -44,8 +44,13 @@ class OCPIDev():
     def __init__(self, hdl_build_tool):
         self.hdl_build_tool = hdl_build_tool
 
-    def create(self, noun):
-        raise Exception('create is not supported at this time')
+    def create(self, cli_dict):
+        abs_path = os.getcwd() + '/' + args.name
+        if cli_dict is not None:
+            # below line supports create, removes underscores to make CLI look like attrs
+            cli_dict = {key.replace('_', '') : val for key, val in cli_dict.items()}
+        if args.noun == 'project':
+            Project(abs_path, False, cli_dict).create()
 
     def delete(self, noun):
         raise Exception('delete is not supported at this time')
@@ -425,18 +430,31 @@ def unittest():
 
 if __name__ == '__main__':
     exit_status = 0
+    # TODO: Better conditionalize verbs/noun combinations to their
+    #       respective optional argument.
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('-d', nargs='?', default=None)
     parser.add_argument('-j', nargs='?', default=1)
+    # Create options
+    parser.add_argument('-A', '--xml-include', nargs='?', dest='xml_include', default=None)
+    parser.add_argument('-D', '--depend', nargs='?', dest='depend', default=None)
+    parser.add_argument('-F', '--package-prefix', nargs='?', dest='package_prefix', default=None)
+    parser.add_argument('-I', '--include-dir', nargs='?', dest='include_dir', default=None)
+    parser.add_argument('-K', '--package-id', nargs='?', dest='package_id', default=None)
+    parser.add_argument('-N', '--package-name', nargs='?', dest='package_name', default=None)
+    parser.add_argument('-Y', '--prim-lib', nargs='?', dest='prim_lib', default=None)
+    parser.add_argument('-y', '--comp-lib', nargs='?', dest='comp_lib', default=None)
+    # Build options
     parser.add_argument('--hdl-target', nargs='?', default=None)
     parser.add_argument('--hdl-platform', nargs='?', default=None)
     parser.add_argument('--rcc-platform', nargs='?', default=None)
     parser.add_argument('verb')
     parser.add_argument('noun', nargs='?', default=None)
+    parser.add_argument('name', nargs='?', default=None)
     args = parser.parse_args()
     try:
-        nouns = ['registry', 'project', 'projects', 'libraries', 'components']
-        nouns.append('workers')
+        nouns = ['registry', 'project', 'projects', 'libraries', 'components',
+                 'workers']
         if (args.noun is not None) and (args.noun not in nouns):
             raise Exception('noun ' + str(args.noun) + ' is not supported')
         signal.signal(signal.SIGINT, mysigint)
@@ -446,7 +464,9 @@ if __name__ == '__main__':
             if (args.noun is None) or (args.verb != 'clean'):
                 _dir = os.getcwd()
         if args.verb == 'create':
-            OCPIDev(hdl_build_tool).create(args.noun)
+            if args.name is None:
+                raise Exception('ocpidev2 create ' + args.noun + ' <name> required')
+            OCPIDev(hdl_build_tool).create(vars(args))
         elif args.verb == 'delete':
             OCPIDev(hdl_build_tool).delete(args.noun)
         elif args.verb == 'build':

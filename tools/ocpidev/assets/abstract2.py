@@ -25,6 +25,7 @@ import sys
 #     raise Exception('do not run this from the assets directory!')
 import uuid
 import glob
+import jinja2
 
 
 # TODO make a class member, probably ComponentLibrary or Project class
@@ -798,7 +799,9 @@ class AssetBase(AttributeBase):
         get_root_tags() method which returns list of strings of permissible
         tags to verify during construction. Each asset has a directory that is
         retrievable via get_dir_abs_path(). Assets that have XML files can query
-        get_xml_abs_path(). """
+        get_xml_abs_path(). Every child class is intended to also define a
+        get_type() string that is used for log messaging and internal asset
+        conditionalization."""
 
     def __init__(self, abs_path, enable_path_existence_check=True):
         """ abs_path is either to a xml file (Component/Protocol/etc) or a dir
@@ -810,7 +813,17 @@ class AssetBase(AttributeBase):
                 self.attrs[info.key] = []
             else:
                 self.attrs[info.key] = ''
+        # IMPORTANT - derived classes should not retrieve self.abs_path
+        # directly, use self.get_dir_abs_path() and self.get_xml_abs_path()
+        # instead
+        # TODO - rename to self._abs_path
         self.abs_path = abs_path  # can be None, e.g., for base platform config
+        self.name = self.get_name() # CDG section 6.1.1, section 8.1.1, etc
+        if (self.abs_path is not None):
+            if enable_path_existence_check:
+                self.raise_if_path_does_not_exist()
+
+    def get_name(self):
         # TODO replace get_root_tags() with self.root_tags
         self.name = self.get_name()  # CDG section 6.1.1, section 8.1.1, etc
         if (self.abs_path is not None):
@@ -843,12 +856,15 @@ class AssetBase(AttributeBase):
                 name = self.abs_path.split('/')[-1]
         return name
 
-    def raise_if_path_does_not_exist(self):
+    def get_abs_path_exists(self):
         if self.get_is_xml():
             exists = os.path.isfile(self.get_xml_abs_path())
         else:
             exists = os.path.isdir(self.abs_path)
-        if not exists:
+        return exists
+
+    def raise_if_path_does_not_exist(self):
+        if not self.get_abs_path_exists():
             self.raise_abs_path_does_not_exist()
         if os.path.isfile(self.get_xml_abs_path()):
             lowers = [tag.lower() for tag in self.get_root_tags()]
@@ -862,6 +878,18 @@ class AssetBase(AttributeBase):
                     pass
                 else:
                     raise InvalidAssetError(msg)
+
+    def create_files(self, templates):
+        if self.get_abs_path_exists():
+            raise Exception(self.get_type() + ' ' + self.abs_path + ' already exists')
+        else:
+            os.mkdir(self.get_dir_abs_path())
+        for fname, fcontents in templates.items():
+            fcontents = jinja2.Template(fcontents, trim_blocks=True)
+            fcontents = fcontents.render(asset=self)
+            out_file = open(self.abs_path + '/' + fname, 'w')
+            out_file.write(fcontents)
+            out_file.close()
 
     def get_paths_to_parse(self):
         return []
