@@ -58,6 +58,7 @@ class HdlPlatform(HdlCardPlatformBase):
     """ Platform Development Guide section 5.4 """
 
     def __init__(self, dir_abs_path):
+        self.root_tags = ['HdlPlatform']
         HdlCardPlatformBase.__init__(self, dir_abs_path)
         if not os.path.isfile(self.get_xml_abs_path()):
             self.raise_abs_path_does_not_exist()
@@ -67,9 +68,6 @@ class HdlPlatform(HdlCardPlatformBase):
         except InvalidAssetError:
             pass
         self.parse()
-
-    def get_root_tags(self):
-        return ['HdlPlatform']
 
     def parse(self):
         self.parse_devices()
@@ -132,19 +130,18 @@ class HdlCard(HdlCardPlatformBase):
     """ Platform Development Guide section 5.6 """
 
     def __init__(self, xml_abs_path):
+        self.root_tags = ['Card']
         HdlCardPlatformBase.__init__(self, xml_abs_path)
-        self.type = None
         self.parse()
 
-    def get_root_tags(self):
-        return ['Card']
+    def get_attr_infos(self):
+        ret = []
+        ret.append(AttributeInfo('Type'))
+        return ret
 
     def parse(self):
-        Logger().debug('parsing ' + self.get_xml_abs_path())
+        AssetBase.parse(self)
         self.parse_devices()
-        for key, val in self.get_parsed().getroot().attrib.items():
-            if key.lower() == 'type':
-                self.type = val
 
     def get_type(self):
         return 'hdl card'
@@ -270,7 +267,7 @@ def test_HdlCard(ret):
             if (uut.devices['foo'] != 'foo'):
                 passed = False
         log_pass_fail('testing HdlCard devices', passed)
-        if uut.type != 'a_slot':
+        if uut.attrs['Type'] != 'a_slot':
             passed = False
     except:
         passed = False
