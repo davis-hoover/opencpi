@@ -120,6 +120,7 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         is in or its package ID. """
 
     def __init__(self, dir_abs_path):
+        self.root_tags = ['Library']  # CDG section 10.1
         AssetBase.__init__(self, dir_abs_path)
         is_test = self.get_dir_abs_path_is_test(dir_abs_path)
         if is_test or self.get_dir_abs_path_is_worker(dir_abs_path):
@@ -135,18 +136,16 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         self.component_libraries = []
         self.hdl_libraries = []
         # end of CDG section 14.5
-        workers = self.parse()
+        self.parse()
+        workers = self.attrs['Workers']
         allowlist = None if workers == [] else workers
         self.discover(allowlist, 'hdl/platforms' in dir_abs_path)
-
-    def get_root_tags(self):
-        ret = ['Library']  # CDG section 10.1
-        return ret
 
     @staticmethod
     def get_dir_abs_path_is_worker(dir_abs_path):
         ret = False
-        for ext in ['rcc', 'hdl', 'ocl']:
+        # TODO remove 'comp' from list
+        for ext in ['rcc', 'hdl', 'ocl', 'comp']:
             if dir_abs_path.endswith('.' + ext):
                 ret = True
         return ret
@@ -168,7 +167,14 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
             ret += '.' + self.name
         return ret
 
-    def parse(self):
+    def get_attr_infos(self):
+        ret = []
+        ret.append(AttributeInfo('ComponentLibraries', is_list=True))
+        ret.append(AttributeInfo('HdlLibraries', is_list=True))
+        ret.append(AttributeInfo('Workers', is_list=True))
+        return ret
+
+    def get_paths_to_parse(self):
         paths = []
         # start pre-2.0 opencpi
         # TODO address library.mk vs libraries.mk behavior in Makefile
@@ -176,19 +182,14 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         # intentionally put xml last so that its attributes take precedence
         # end pre-2.0 opencpi
         paths.append(self.get_xml_abs_path())
-        workers = []
         paths = self.get_list_of_existing_abs_paths_to_parse(paths)
-        clibs = self.get_attr_list('ComponentLibraries', None, paths)
-        if len(clibs) > 0:
-            self.component_libraries = clibs
-        hlibs = self.get_attr_list('HdlLibraries', None, paths)
-        if len(hlibs) > 0:
-            self.hdl_libraries = hlibs
-        workers = self.get_attr_list('Workers', None, paths)
+        return paths
+
+    def parse(self):
+        AssetBase.parse(self)
         global g_libraries_mk
         if g_libraries_mk:
             g_libraries_mk = False
-        return workers
 
     def discover(self, allowlist, platform=False):
         self.discover_components()
