@@ -31,6 +31,57 @@ from _opencpi.assets.platform2 import HdlCard, HdlPlatform
 import jinja2
 
 project_templates = {}
+project_templates['Project.exports'] = """
+# This file specifies aspects of this project that are made available to users,
+# by adding or subtracting from what is automatically exported based on the
+# documented rules.
+# Lines starting with + add to the exports
+# Lines starting with - subtract from the exports
+all
+
+\n\n"""
+
+project_templates['.gitignore'] = """
+# Lines starting with '#' are considered comments.
+# Ignore (generated) html files,
+#*.html
+# except foo.html which is maintained by hand.
+#!foo.html
+# Ignore objects and archives.
+*.rpm
+*.obj
+*.so
+*~
+*.o
+target-*/
+*.deps
+gen/
+*.old
+*.hold
+*.orig
+*.log
+lib/
+#Texmaker artifacts
+*.aux
+*.synctex.gz
+*.out
+**/doc*/*.pdf
+**/doc*/*.toc
+**/doc*/*.lof
+**/doc*/*.lot
+run/
+exports/
+imports
+*.pyc
+simulations/
+\n\n"""
+
+project_templates['.gitattributes'] = """
+*.ngc -diff
+*.edf -diff
+*.bit -diff
+\n\n"""
+
 project_templates['Project.xml'] = ("""<Project
 {%if asset.package_name %}
     PackageName='{{asset.package_name}}'
@@ -38,7 +89,35 @@ project_templates['Project.xml'] = ("""<Project
 {%if asset.package_prefix %}
     PackagePrefix='{{asset.package_prefix}}'
 {% endif %}
+{%if asset.package_id: %}
+    PackageID='{{asset.package_id}}'
+{% endif %}
+{%if asset.depend: %}
+    ProjectDependencies='{{asset.depend}}'
+{% endif %}
+{%if asset.prim_lib: %}
+    Libraries='{{asset.prim_lib}}'
+{% endif %}
+{%if asset.include_dir: %}
+    IncludeDirs='{{asset.include_dir}}'
+{% endif %}
+{%if asset.xml_include: %}
+    XmlIncludeDirs='{{asset.xml_include}}'
+{% endif %}
+{%if asset.comp_lib: %}
+    ComponentLibraries='{{asset.comp_lib}}'
+{% endif %}
 />
+\n""")
+
+project_templates['.project'] = ("""<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+  <name>{{asset.determined_package_id}}</name>
+  <comment></comment>
+  <projects></projects>
+  <buildSpec></buildSpec>
+  <natures></natures>
+</projectDescription>
 \n""")
 
 
@@ -136,6 +215,7 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         if len(deps) > 0:
             self.project_dependencies = deps
         package_prefix = self.get_attr('PackagePrefix', None, paths, cli_dict)
+        # TODO: Include these checks in other parse() get_attr_list logic
         if package_prefix != '':
             self.package_prefix = package_prefix 
         if self.package_prefix != '':
@@ -153,7 +233,7 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
             raise Exception('project ' + self.abs_path + ' already exists')
         else:
             os.mkdir(self.get_dir_abs_path())
-        _AssetBase.create_files(self, project_templates)
+        AssetBase.create_files(self, project_templates)
 
     def discover(
             self, do_component_libraries=True, do_hdl_primitives=True,
