@@ -27,8 +27,6 @@ from _opencpi.assets.library2 import SpecsDirectory, Discoverer, ComponentLibrar
 from _opencpi.assets.primitive2 import HdlLibrary
 from _opencpi.assets.assembly2 import HdlAssembly
 from _opencpi.assets.platform2 import HdlCard, HdlPlatform
-#from _opencpi.assets.template import *
-import jinja2
 
 project_templates = {}
 project_templates['Project.exports'] = """
@@ -95,18 +93,6 @@ project_templates['.project'] = ("""<?xml version="1.0" encoding="UTF-8"?>
 \n""")
 
 
-# TODO iherit from, and consolidate functionality from, AttributeBase
-class PackageID():
-    """ Component Development Guide section 14.2"""
-
-    def __init__(self, package_prefix, package_name):
-        self.package_prefix = package_prefix
-        self.package_name = package_name
-
-    def __str__(self):
-        return str(self.package_prefix) + "." + str(self.package_name)
-
-
 class Project(SpecsDirectory, Discoverer, AssetBase):
     """ Component Development Guide section 14 """
 
@@ -139,7 +125,6 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         # initialize below line according to CDG Table 8
         self.project_dependencies = ['ocpi.core']
         # end of CDG section 14.5
-        #if cli_dict is None:
         self.parse(cli_dict)
         self.first = True
 
@@ -188,24 +173,19 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         paths.append(self.get_xml_abs_path())
         # end pre-2.0 opencpi
         paths = self.get_list_of_existing_abs_paths_to_parse(paths)
-
         clibs = self.get_attr_list('ComponentLibraries', None, paths, cli_dict)
         if len(clibs) > 0:
             self._component_libraries = clibs
-
         hlibs = self.get_attr_list('HdlLibraries', None, paths, cli_dict)
         if len(hlibs) > 0:
             self.hdl_libraries = hlibs
-
         deps = self.get_attr_list('ProjectDependencies', None, paths, cli_dict)
         if len(deps) > 0:
             self.project_dependencies = deps
-
         # TODO: Include these checks in other parse() get_attr_list logic
         if self.attrs['PackagePrefix'] != '':
             if not self.attrs['PackagePrefix'].isidentifier():
                 raise InvalidAssetError('PackagePrefix must contain only alphanumeric characters and not start with a number')
-
         package_name = self.get_attr('PackageName', None, paths, cli_dict)
         if package_name != '':
             self.package_name = package_name
@@ -214,10 +194,6 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
             self.package_id = package_id
 
     def create(self):
-        if self.get_abs_path_exists():
-            raise Exception('project ' + self.abs_path + ' already exists')
-        else:
-            os.mkdir(self.get_dir_abs_path())
         AssetBase.create_files(self, project_templates)
 
     def discover(
@@ -605,8 +581,8 @@ def test_Project_discover_component_libraries(ret):
             project_xml.write(
                     '<Project PackagePrefix=\'ocpi\' PackageName=\'proj\'/>\n')
             project_xml.close()
-            project = Project(project_abs_path, False)
-            if nlibs != len(project.component_libraries):
+            uut = Project(project_abs_path, False)
+            if nlibs != len(uut.component_libraries):
                 passed = False
         os.system('rm -rf %s/*' % project_abs_path)
     os.system('mkdir -p %s' % project_abs_path)

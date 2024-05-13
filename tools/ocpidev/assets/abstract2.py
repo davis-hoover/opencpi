@@ -800,7 +800,7 @@ class AssetBase(AttributeBase):
         tags to verify during construction. Each asset has a directory that is
         retrievable via get_dir_abs_path(). Assets that have XML files can query
         get_xml_abs_path(). Every child class is intended to also define a
-        get_type() string that is used for log messagin and internal asset
+        get_type() string that is used for log messaging and internal asset
         conditionalization."""
 
     def __init__(self, abs_path, enable_path_existence_check=True):
@@ -880,22 +880,27 @@ class AssetBase(AttributeBase):
                     raise InvalidAssetError(msg)
 
     def create_files(self, templates):
+        if self.get_abs_path_exists():
+            raise Exception(self.get_type() + ' ' + self.abs_path + ' already exists')
+        else:
+            os.mkdir(self.get_dir_abs_path())
         for fname, fcontents in templates.items():
             fcontents = jinja2.Template(fcontents, trim_blocks=True)
             fcontents = fcontents.render(asset=self)
-            out_file = open(self.abs_path + '/' + fname, "w")
+            out_file = open(self.abs_path + '/' + fname, 'w')
             out_file.write(fcontents)
             out_file.close()
 
     def get_paths_to_parse(self):
         return []
 
-    def parse(self, cli_dict):
+    def parse(self, cli_dict=None):
         AttributeBase.parse(self, None, self.get_paths_to_parse(), cli_dict)
         Logger().debug('parsed attributes: ' + str(self.attrs))
 
     @staticmethod
     def get_name_from_abs_path(abs_path):
+        #return abs_path.rsplit('/', 1)[1].split('.xml')[0]
         return abs_path.rsplit('/', 1)[1].split('.')[0]
 
     @staticmethod
