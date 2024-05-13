@@ -78,7 +78,7 @@ class Discoverer():
         if os.path.isdir(discovery_path):
             for _dir in AssetBase.listdir_assets(discovery_path):
                 dir_abs_path = discovery_path + '/' + _dir
-                if os.path.isdir(dir_abs_path):
+                if os.path.isdir(dir_abs_path) and (_dir != 'specs') and (_dir != 'gen'):
                     ret.append(dir_abs_path)
         return ret
 
@@ -103,6 +103,9 @@ class Discoverer():
                     elif not tmp.endswith('.test'):
                         assets.append(Worker(dir_abs_path + '/' + name + '.xml'))
                 for asset in assets:
+                    if allowlist is not None:
+                        # TODO is this pre-2.0???
+                        allowlist = [name.split('.')[0] for name in allowlist]
                     if (allowlist is None) or (asset.name in allowlist):
                         self.append_discovered_asset(asset)
             except InvalidAssetError as err:

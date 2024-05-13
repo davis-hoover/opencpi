@@ -97,6 +97,7 @@ class HdlPlatformConfigurationDevice(AttributeBase):
     def __init__(self, elem):
         self.name = ''
         AttributeBase.__init__(self, elem)
+        self.parse(elem)
 
     def get_root_tags(self):
         return ['Device']

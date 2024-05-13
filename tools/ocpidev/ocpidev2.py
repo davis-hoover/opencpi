@@ -450,49 +450,49 @@ if __name__ == '__main__':
     parser.add_argument('noun', nargs='?', default=None)
     parser.add_argument('name', nargs='?', default=None)
     args = parser.parse_args()
-    try:
-        nouns = ['registry', 'project', 'projects', 'libraries', 'components',
-                 'workers']
-        if (args.noun is not None) and (args.noun not in nouns):
-            raise Exception('noun ' + str(args.noun) + ' is not supported')
-        signal.signal(signal.SIGINT, mysigint)
-        hdl_build_tool = LegacyOCPIDevHDLBuildTool()
-        _dir = args.d
-        if args.d is None:
-            if (args.noun is None) or (args.verb != 'clean'):
-                _dir = os.getcwd()
+    #try:
+    nouns = ['registry', 'project', 'projects', 'libraries', 'components',
+             'workers']
+    if (args.noun is not None) and (args.noun not in nouns):
+        raise Exception('noun ' + str(args.noun) + ' is not supported')
+    signal.signal(signal.SIGINT, mysigint)
+    hdl_build_tool = LegacyOCPIDevHDLBuildTool()
+    _dir = args.d
+    if args.d is None:
+        if (args.noun is None) or (args.verb != 'clean'):
+            _dir = os.getcwd()
 
-        if args.verb == 'create':
+    if args.verb == 'create':
 
-            if args.name is None:
-                raise Exception('ocpidev2 create ' + args.noun + ' <name> required')
-            OCPIDev(hdl_build_tool).create(vars(args))
-        elif args.verb == 'delete':
-            OCPIDev(hdl_build_tool).delete(args.noun)
-        elif args.verb == 'build':
-            OCPIDev(hdl_build_tool).build(
-                args.noun, args.hdl_target, args.hdl_platform,
-                args.rcc_platform, _dir, int(args.j))
-        elif args.verb == 'clean':
-            OCPIDev(hdl_build_tool).clean(args.noun, _dir)
-        elif args.verb == 'show':
-            OCPIDev(hdl_build_tool).show(args.noun)
-        elif args.verb == 'register':
-            OCPIDev(hdl_build_tool).register(args.noun)
-        elif args.verb == 'unregister':
-            OCPIDev(hdl_build_tool).unregister(args.noun)
-        elif args.verb == 'run':
-            OCPIDev(hdl_build_tool).run(args.noun)
-        elif args.verb == 'refresh':
-            OCPIDev(hdl_build_tool).refresh(args.noun)
-        elif args.verb == 'unittest':
-            if unittest():
-                exit_status = 0
-            else:
-                exit_status = 1
+        if args.name is None:
+            raise Exception('ocpidev2 create ' + args.noun + ' <name> required')
+        OCPIDev(hdl_build_tool).create(vars(args))
+    elif args.verb == 'delete':
+        OCPIDev(hdl_build_tool).delete(args.noun)
+    elif args.verb == 'build':
+        OCPIDev(hdl_build_tool).build(
+            args.noun, args.hdl_target, args.hdl_platform,
+            args.rcc_platform, _dir, int(args.j))
+    elif args.verb == 'clean':
+        OCPIDev(hdl_build_tool).clean(args.noun, _dir)
+    elif args.verb == 'show':
+        OCPIDev(hdl_build_tool).show(args.noun)
+    elif args.verb == 'register':
+        OCPIDev(hdl_build_tool).register(args.noun)
+    elif args.verb == 'unregister':
+        OCPIDev(hdl_build_tool).unregister(args.noun)
+    elif args.verb == 'run':
+        OCPIDev(hdl_build_tool).run(args.noun)
+    elif args.verb == 'refresh':
+        OCPIDev(hdl_build_tool).refresh(args.noun)
+    elif args.verb == 'unittest':
+        if unittest():
+            exit_status = 0
         else:
-            raise Exception('verb ' + str(args.verb) + ' is not supported')
-    except Exception as exception:
-        Logger().error(str(exception))
-        exit_status = 1
+            exit_status = 1
+    else:
+        raise Exception('verb ' + str(args.verb) + ' is not supported')
+    #except Exception as exception:
+    #    Logger().error(str(exception))
+    #    exit_status = 1
     exit(exit_status)

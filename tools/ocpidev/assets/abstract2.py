@@ -30,7 +30,8 @@ import jinja2
 
 # TODO make a class member, probably ComponentLibrary or Project class
 g_libraries_mk = False
-
+g_asset_template = """<{{asset.root_tags[0]}}
+    {% for key,val in asset.attrs.items() %}{{key}}=\'{{val}}\'{% endfor %}/>"""
 global_dependency_tree = dict()
 
 
@@ -637,6 +638,13 @@ class GNUMakefile():
 global_makefile = GNUMakefile(None)
 
 
+class AttributeInfo():
+    def __init__(self, key, is_list=False, is_int=False):
+        """ key is the string attribute from the Dev Guide, e.g. 'Property' """
+        self.key = key
+        self.is_list = is_list
+        self.is_int = is_int
+
 class AttributeBase():
     """ a thing which contains opencpi (XML) attributes, either intermediary
         elem already parsed with ElementTree, or XML file itself, or perhaps a
@@ -645,10 +653,29 @@ class AttributeBase():
     def __init__(self, elem):
         """ elem is an ElementTree Element intended to represent, e.g., Property
             within a <RccWorker><Property/></RccWorker> """
-
         if elem.tag.lower() not in \
                 [tag.lower() for tag in self.get_root_tags()]:
             self.raise_invalid_attribute_error(elem.tag)
+        self.attrs = dict()
+
+    def get_attr_infos(self):
+        return []
+
+    def parse(self, elem, paths=[], cli_dict=None):
+        """ use elem to parse an XML ElementTree directly, and paths to specify
+            a list of XML/makefile files to parse """
+        for info in self.get_attr_infos():
+            if info.is_list:
+                val = self.get_attr_list(info.key, elem, paths, cli_dict)
+            else:
+                val = self.get_attr(info.key, elem, paths, cli_dict)
+            if info.is_int:
+                val = int(val)
+            if (info.is_list and val != []) or \
+               (not info.is_list and val != ''):
+                # this is where ALL attribute values are finally placed into
+                # self.attrs dict
+                self.attrs[info.key] = val
 
     @staticmethod
     def get_xml_val_list(val):
@@ -679,6 +706,10 @@ class AttributeBase():
         if cli_dict is None:
             if makefile_abs_paths == []:
                 makefile_abs_paths.append('') # TODO fix this hack to make xml work
+            if is_list:
+                ret2 = []
+            else:
+                ret2 = ''
             for makefile_abs_path in makefile_abs_paths:
                 # start pre-2.0 opencpi
                 if elem is None:
@@ -708,25 +739,27 @@ class AttributeBase():
                             # if key.lower() in [attr.lower() for attr in tmp]:
                             if key.lower() == attr.lower():
                                 if is_list:
-                                    ret = self.get_xml_val_list(val)
+                                    ret2 = self.get_xml_val_list(val)
                                 else:
-                                    ret = val
+                                    ret2 = val
                             # else:
                             #     self.throw_invalid_element_error(self, abs_path, key)
                     else:
                         # start pre-2.0 opencpi
                         attr_abs_path = makefile_abs_path
-                        ret = self.get_variable_val_list_from_gnu_makefile(attr, attr_abs_path)
+                        ret2 = self.get_variable_val_list_from_gnu_makefile(attr, attr_abs_path)
                         if not is_list:
-                            if len(ret) > 0:
-                                ret = ret[0]
+                            if len(ret2) > 0:
+                                ret2 = ret2[0]
                             else:
-                                ret = ''
+                                ret2 = ''
                         # end pre-2.0 opencpi
-                    if attr_abs_path != '':
-                        if (ret != '') and (ret != []):
-                            Logger().debug('** parsed ' + attr_abs_path + ' ' + attr +
-                                           ' value of ' + str(ret))
+                    #if attr_abs_path != '':
+                    #    if (ret2 != '') and (ret2 != []):
+                    #        Logger().debug('** parsed ' + attr_abs_path + ' ' + attr +
+                    #                       ' value of ' + str(ret2))
+                if (is_list and ret2 != []) or ((not is_list) and (ret2 != '')):
+                    ret = ret2
         else:
             try:
                 ret = cli_dict[attr.lower()]
@@ -774,6 +807,12 @@ class AssetBase(AttributeBase):
         """ abs_path is either to a xml file (Component/Protocol/etc) or a dir
             (HdlAssembly/etc) or none for some cases (Component embedded in
             OWD, platform base config) """
+        self.attrs = dict()
+        for info in self.get_attr_infos():
+            if info.is_list:
+                self.attrs[info.key] = []
+            else:
+                self.attrs[info.key] = ''
         # IMPORTANT - derived classes should not retrieve self.abs_path
         # directly, use self.get_dir_abs_path() and self.get_xml_abs_path()
         # instead
@@ -785,6 +824,7 @@ class AssetBase(AttributeBase):
                 self.raise_if_path_does_not_exist()
 
     def get_name(self):
+        # TODO replace get_root_tags() with self.root_tags
         expected_root_tag = self.get_root_tags()[0]
         if self.get_is_xml():
             name = self.get_name_from_abs_path(self.abs_path)
@@ -846,6 +886,13 @@ class AssetBase(AttributeBase):
             out_file = open(self.abs_path + '/' + fname, "w")
             out_file.write(fcontents)
             out_file.close()
+
+    def get_paths_to_parse(self):
+        return []
+
+    def parse(self, cli_dict):
+        AttributeBase.parse(self, None, self.get_paths_to_parse(), cli_dict)
+        Logger().debug('parsed attributes: ' + str(self.attrs))
 
     @staticmethod
     def get_name_from_abs_path(abs_path):
@@ -915,7 +962,7 @@ class AssetBase(AttributeBase):
             # below line avoids corruption of ProtocolSummary attribute
             _str = _str.replace('foosummary', 'ProtocolSummary')
         # below line adds support for newlines in attributes (undocumented in OpenCPI)
-        _str = _str.replace('\n', '')
+        _str = _str.replace('\n', ' ')
         try:
             ret = ET.ElementTree(ET.fromstring(_str))
         except ET.ParseError as err:

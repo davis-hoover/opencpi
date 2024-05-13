@@ -82,33 +82,7 @@ project_templates['.gitattributes'] = """
 *.bit -diff
 \n\n"""
 
-project_templates['Project.xml'] = ("""<Project
-{%if asset.package_name %}
-    PackageName='{{asset.package_name}}'
-{% endif %}
-{%if asset.package_prefix %}
-    PackagePrefix='{{asset.package_prefix}}'
-{% endif %}
-{%if asset.package_id: %}
-    PackageID='{{asset.package_id}}'
-{% endif %}
-{%if asset.depend: %}
-    ProjectDependencies='{{asset.depend}}'
-{% endif %}
-{%if asset.prim_lib: %}
-    Libraries='{{asset.prim_lib}}'
-{% endif %}
-{%if asset.include_dir: %}
-    IncludeDirs='{{asset.include_dir}}'
-{% endif %}
-{%if asset.xml_include: %}
-    XmlIncludeDirs='{{asset.xml_include}}'
-{% endif %}
-{%if asset.comp_lib: %}
-    ComponentLibraries='{{asset.comp_lib}}'
-{% endif %}
-/>
-\n""")
+project_templates['Project.xml'] = g_asset_template
 
 project_templates['.project'] = ("""<?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
@@ -137,12 +111,14 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
     """ Component Development Guide section 14 """
 
     def __init__(self, dir_abs_path, enable_path_existence_check=True, cli_dict=None):
+        self.root_tags = ['Project']
         AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
         #del self.name
         SpecsDirectory.__init__(self)
-        self.package_prefix = ''
+
         self.package_name = ''
         self.package_id = ''
+
         # start of bullets at top of CDG section 14 (XML, project INTERNAL)
         self.component_libraries = []
         self.applications = []
@@ -168,13 +144,19 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         self.first = True
 
     def get_root_tags(self):
-        return ['Project']
+        # TODO replace get_root_tags() with self.root_tags
+        return self.root_tags
+
+    def get_attr_infos(self):
+        ret = []
+        ret.append(AttributeInfo('PackagePrefix'))
+        return ret
 
     def get_xml_abs_path(self):
         return self.abs_path + '/Project.xml'
 
     def get_package_id(self):
-        tmp = self.package_prefix + "." + self.package_name
+        tmp = self.attrs['PackagePrefix'] + "." + self.package_name
         ret = tmp if self.package_id == '' else self.package_id
         return ret
 
@@ -197,6 +179,7 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         return ret
 
     def parse(self, cli_dict):
+        AssetBase.parse(self, cli_dict)
         paths = []
         # start pre-2.0 opencpi
         paths += [self.abs_path + '/Project.mk']
@@ -205,22 +188,24 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         paths.append(self.get_xml_abs_path())
         # end pre-2.0 opencpi
         paths = self.get_list_of_existing_abs_paths_to_parse(paths)
+
         clibs = self.get_attr_list('ComponentLibraries', None, paths, cli_dict)
         if len(clibs) > 0:
             self._component_libraries = clibs
+
         hlibs = self.get_attr_list('HdlLibraries', None, paths, cli_dict)
         if len(hlibs) > 0:
             self.hdl_libraries = hlibs
+
         deps = self.get_attr_list('ProjectDependencies', None, paths, cli_dict)
         if len(deps) > 0:
             self.project_dependencies = deps
-        package_prefix = self.get_attr('PackagePrefix', None, paths, cli_dict)
+
         # TODO: Include these checks in other parse() get_attr_list logic
-        if package_prefix != '':
-            self.package_prefix = package_prefix 
-        if self.package_prefix != '':
-            if not self.package_prefix.isidentifier():
+        if self.attrs['PackagePrefix'] != '':
+            if not self.attrs['PackagePrefix'].isidentifier():
                 raise InvalidAssetError('PackagePrefix must contain only alphanumeric characters and not start with a number')
+
         package_name = self.get_attr('PackageName', None, paths, cli_dict)
         if package_name != '':
             self.package_name = package_name
@@ -343,7 +328,7 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         tmp = ['bsv', 'fixed_float', 'ocpi', 'util', 'protocol', 'cdc']
         return tmp + ['platform', 'sdp', 'axi']
 
-    def get_hdl_primitive_dependent_libraries(self, hdl_primitive = None):
+    def get_hdl_primitive_dependent_libraries(self, hdl_primitive=None):
         ret = []
         # 1. built-in (core) libraries (every project except ocpi.core)
         if str(self.get_package_id()) != 'ocpi.core':
@@ -398,7 +383,7 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
 
     def get_build_output_path(self, asset, hdl_target = None,
             hdl_platform = None):
-        ret = asset.abs_path
+        ret = asset.get_dir_abs_path()
         tmp = ''
         if asset.get_type() == 'hdl assembly':
             tmp = asset.name + '_' + hdl_platform + '_'
@@ -495,13 +480,13 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
             for cfg in _hdl_platform.configurations.values():
                 for dev in cfg.devices:
                     _worker = None
-                    project = project_registry.get_worker_project(dev)
+                    project = project_registry.get_worker_project(dev.name)
                     for clib in project.component_libraries:
                         for device in clib.workers:
-                            if device.name == dev:
+                            if device.name == dev.name:
                                 _worker = device
                                 break
-                    wpath= self.get_build_output_path(_worker, get_hdl_target(hdl_platform),
+                    wpath = self.get_build_output_path(_worker, get_hdl_target(hdl_platform),
                             hdl_platform)
                     global_makefile.rules[tname].prerequisites.append(wpath)
                     global_dependency_tree[asset].dependents.append(_worker)
