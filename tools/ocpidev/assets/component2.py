@@ -27,25 +27,22 @@ from _opencpi.assets.abstract2 import AssetBase
 class OperationArgumentMember(AttributeBase):
 
     def __init__(self, elem):
-        self.name = ''
-        self.type = ''
         AttributeBase.__init__(self, elem)
-        self.parse()
 
     def get_root_tags(self):
         return ['Member']
 
-    def parse(self, elem):
-        self.name = self.get_attr('Name', elem)
-        self.type = self.get_attr('Type', elem)
+    def get_attr_infos(self):
+        ret = []
+        for key in ['Name', 'Type']:
+            ret.append(AttributeInfo(key))
+        return ret
 
 
 class OperationArgument(AttributeBase):
     """ Component Development Guide section 5.1.3.2 """
 
     def __init__(self, elem):
-        self.name = ''
-        self.type = ''
         self.array_length = -1
         self.sequence_length = -1
         self.members = []
@@ -55,11 +52,16 @@ class OperationArgument(AttributeBase):
     def get_root_tags(self):
         return ['Argument']
 
+    def get_attr_infos(self):
+        ret = []
+        for key in ['Name', 'Type']:
+            ret.append(AttributeInfo(key))
+        for key in ['ArrayLength', 'SequenceLength']:
+            ret.append(AttributeInfo(key, is_list=True))
+        return ret
+
     def parse(self, elem):
-        self.name = self.get_attr('Name', elem)
-        self.type = self.get_attr('Type', elem)
-        self.array_length = int(self.get_attr('ArrayLength'))
-        self.sequence_length = int(self.get_attr('SequenceLength'))
+        AttributeBase.parse(self, elem)
         for child in elem.iter():
             try:
                 member = OperationArgumentMember(child)
@@ -68,7 +70,7 @@ class OperationArgument(AttributeBase):
                 pass
 
 
-class Operation():
+class Operation(AttributeBase):
     """ Component Development Guide section 5.1.3 """
 
     def __init__(self, elem):
@@ -80,8 +82,13 @@ class Operation():
     def get_root_tags(self):
         return ['Operation']
 
+    def get_attr_infos(self):
+        ret = []
+        ret.append(AttributeInfo('Name'))
+        return ret
+
     def parse(self, elem):
-        self.name = self.get_attr('Name', elem)
+        AttributeBase.parse(self, elem)
         for child in elem.iter():
             try:
                 argument = OperationArgument(child)
@@ -104,7 +111,7 @@ class Protocol(AssetBase):
         return ['Protocol']
 
     def parse(self):
-        Logger().debug('parsing ' + self.get_xml_abs_path())
+        AttributeBase.parse(self)
         for elem in self.get_parsed().iter():
             for key, value in elem.attrib.items():
                 if key.lower() == 'href':
@@ -126,21 +133,24 @@ class Component(AssetBase):
 
     def __init__(self, xml_abs_path):
         """ xml_abs_path is None for ComponentSpec embedded in OWD """
+        self.root_tags = ['ComponentSpec']
         AssetBase.__init__(self, xml_abs_path)
+        Logger().debug('parsing ' + self.get_xml_abs_path())
         self.parse()
 
     def get_root_tags(self):
-        return ['ComponentSpec']
+        # TODO replace get_root_tags() with self.root_tags
+        return self.root_tags
 
-    # @staticmethod
-    # def get_valid_attributes():
-    #     return ['Property', 'Properties', 'Port']
+    def get_attr_infos(self):
+        ret = []
+        ret.append(AttributeInfo('Name'))
+        return ret
 
     def parse(self):
-        Logger().debug('parsing ' + self.get_xml_abs_path())
-        name = self.get_attr('Name')
-        if name != '':
-            self.name = name
+        AssetBase.parse(self)
+        if self.attrs['Name'] != '':
+            self.name = self.attrs['Name']
         #    for elem in AttributeBase.get_parsed(self.abs_path).iter():
         #        if elem.tag.lower() == self.get_root().lower():
         #            pass
@@ -180,34 +190,16 @@ class Property(AttributeBase):
     """ CDG Development Guide section 6.3 """
 
     def __init__(self, elem):
-        self.name = None  # CDG section 6.3.1
-        self.value = None  # CDG section 6.4.11
-        self.parse(elem)
+        AttributeBase.__init__(self)
 
     def get_root_tags(self):
         return ['Property']
 
-    def parse(self, elem):
-        self.name = self.get_attr('Name', elem)
-        self.value = self.get_attr('Value', elem)
-
-
-def _discover_components(abs_path, _dir, discovery_path):
-    components = []
-    for name in os.listdir(discovery_path):
-        path = abs_path + '/' + _dir + '/' + name
-        # *spec legacy?
-        # -comp.xml undocumented
-        # order of _str matters to not confuse name as, e.g., foo-spec
-        for _str in ['-comp.xml', '-spec.xml', '_spec.xml', '.xml']:
-            if _str in name:
-                _name = name.replace(_str, '')
-                try:
-                    components.append(Component(path, _name))
-                    break
-                except InvalidAssetError:
-                    pass
-    return components
+    def get_attr_infos(self):
+        ret = []
+        ret.append(AttributeInfo('Name'))  # CDG section 6.3.1
+        ret.append(AttributeInfo('Value'))  # CDG section 6.4.11
+        return ret
 
 
 def test_Property(ret):
@@ -230,9 +222,9 @@ def test_Property(ret):
                         print(uut.__dict__.keys())
                         os.system('cat ' + xml_abs_path)
                     if test == 0:
-                        passed = uut.name == 'myprop'
+                        passed = uut.attrs['Name'] == 'myprop'
                     if test == 1:
-                        passed = uut.value == 'abc'
+                        passed = uut.attrs['Value'] == 'abc'
                     break
         except InvalidAssetError:
             passed = False
@@ -267,8 +259,8 @@ def test_Property(ret):
             if elem == 'Property':
                 try:
                     uut = Property(elem)
-                    values.append(uut.value)
-                    names.append(uut.name)
+                    values.append(uut.attrs['Value'])
+                    names.append(uut.attrs['Name'])
                 except InvalidAttributeError:
                     pass
         for name in names:

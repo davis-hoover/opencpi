@@ -29,7 +29,8 @@ import glob
 
 # TODO make a class member, probably ComponentLibrary or Project class
 g_libraries_mk = False
-
+g_asset_template = """<{{asset.root_tags[0]}}{% for key,val in self.attrs.items() %}
+    {{key}}=\'{{val}}\'{% endfor %}/>"""
 global_dependency_tree = dict()
 
 
@@ -636,6 +637,13 @@ class GNUMakefile():
 global_makefile = GNUMakefile(None)
 
 
+class AttributeInfo():
+    def __init__(self, key, is_list=False, is_int=False):
+        """ key is the string attribute from the Dev Guide, e.g. 'Property' """
+        self.key = key
+        self.is_list = is_list
+        self.is_int = is_int
+
 class AttributeBase():
     """ a thing which contains opencpi (XML) attributes, either intermediary
         elem already parsed with ElementTree, or XML file itself, or perhaps a
@@ -644,10 +652,29 @@ class AttributeBase():
     def __init__(self, elem):
         """ elem is an ElementTree Element intended to represent, e.g., Property
             within a <RccWorker><Property/></RccWorker> """
-
         if elem.tag.lower() not in \
                 [tag.lower() for tag in self.get_root_tags()]:
             self.raise_invalid_attribute_error(elem.tag)
+        self.attrs = dict()
+
+    def get_attr_infos(self):
+        return []
+
+    def parse(self, elem, paths=[]):
+        """ use elem to parse an XML ElementTree directly, and paths to specify
+            a list of XML/makefile files to parse """
+        for info in self.get_attr_infos():
+            if info.is_list:
+                val = self.get_attr_list(info.key, elem, paths)
+            else:
+                val = self.get_attr(info.key, elem, paths)
+            if info.is_int:
+                val = int(val)
+            if (info.is_list and val != []) or \
+               (not info.is_list and val != ''):
+                # this is where ALL attribute values are finally placed into
+                # self.attrs dict
+                self.attrs[info.key] = val
 
     @staticmethod
     def get_xml_val_list(val):
@@ -726,10 +753,10 @@ class AttributeBase():
                             else:
                                 ret2 = ''
                         # end pre-2.0 opencpi
-                    if attr_abs_path != '':
-                        if (ret2 != '') and (ret2 != []):
-                            Logger().debug('** parsed ' + attr_abs_path + ' ' + attr +
-                                           ' value of ' + str(ret2))
+                    #if attr_abs_path != '':
+                    #    if (ret2 != '') and (ret2 != []):
+                    #        Logger().debug('** parsed ' + attr_abs_path + ' ' + attr +
+                    #                       ' value of ' + str(ret2))
                 if (is_list and ret2 != []) or ((not is_list) and (ret2 != '')):
                     ret = ret2
         else:
@@ -777,7 +804,14 @@ class AssetBase(AttributeBase):
         """ abs_path is either to a xml file (Component/Protocol/etc) or a dir
             (HdlAssembly/etc) or none for some cases (Component embedded in
             OWD, platform base config) """
+        self.attrs = dict()
+        for info in self.get_attr_infos():
+            if info.is_list:
+                self.attrs[info.key] = []
+            else:
+                self.attrs[info.key] = ''
         self.abs_path = abs_path  # can be None, e.g., for base platform config
+        # TODO replace get_root_tags() with self.root_tags
         expected_root_tag = self.get_root_tags()[0]
         if self.get_is_xml():
             name = self.get_name_from_abs_path(abs_path)
@@ -822,6 +856,13 @@ class AssetBase(AttributeBase):
                         pass
                     else:
                         raise InvalidAssetError(msg)
+
+    def get_paths_to_parse(self):
+        return []
+
+    def parse(self):
+        AttributeBase.parse(self, None, self.get_paths_to_parse())
+        Logger().debug('parsed attributes: ' + str(self.attrs))
 
     @staticmethod
     def get_name_from_abs_path(abs_path):
