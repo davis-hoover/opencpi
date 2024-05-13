@@ -99,12 +99,9 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
     def __init__(self, dir_abs_path, enable_path_existence_check=True, cli_dict=None):
         self.root_tags = ['Project']
         AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
-        #del self.name
         SpecsDirectory.__init__(self)
-
         self.package_name = ''
         self.package_id = ''
-
         # start of bullets at top of CDG section 14 (XML, project INTERNAL)
         self.component_libraries = []
         self.applications = []
@@ -131,6 +128,9 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
     def get_root_tags(self):
         # TODO replace get_root_tags() with self.root_tags
         return self.root_tags
+
+    def get_type(self):
+        return 'project'
 
     def get_attr_infos(self):
         ret = []
