@@ -668,8 +668,8 @@ class AttributeBase():
                 val = self.get_attr_list(info.key, elem, paths, cli_dict)
             else:
                 val = self.get_attr(info.key, elem, paths, cli_dict)
-            if info.is_int:
-                val = int(val)
+            if info.is_int and (not info.is_list):
+                val = int(val) if val != '' else 0
             if (info.is_list and val != []) or \
                (not info.is_list and val != ''):
                 # this is where ALL attribute values are finally placed into

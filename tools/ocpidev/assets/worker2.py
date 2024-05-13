@@ -33,14 +33,12 @@ class Worker(AssetBase):
         is in or its package ID. """
 
     def __init__(self, xml_abs_path):
+        self.root_tags = ['HdlWorker', 'HdlDevice']  # PDG section 5.4.4
+        self.root_tags += ['HdlPlatform', 'RccWorker']
+        # start pre-2.0 opencpi
+        self.root_tags += ['HdlImplementation', 'RccImplementation']
+        # end pre-2.0 opencpi
         AssetBase.__init__(self, xml_abs_path)
-        self.spec = ''  # CDG section 8.1.2
-        # self.language = ''  # CDG section 8.1.3
-        # self.version = ''  # CDG secion 8.1.4
-        self.source_files = []  # CDG section 8.1.10
-        self.libraries = []  # CDG section 8.1.11
-        # self.control_operations = ''  # RDG section 3.1.3
-        # self.slave = ''  # RDG section 3.1.5
         self.authoring_model = ''
         directory_name = self.abs_path.split('/', -2)[-2]
         if directory_name.endswith('.hdl'):
@@ -53,15 +51,10 @@ class Worker(AssetBase):
         self.parse()
 
     def get_root_tags(self):
-        ret = ['HdlWorker', 'HdlDevice']  # PDG section 5.4.4
-        ret += ['HdlPlatform', 'RccWorker']
-        # start pre-2.0 opencpi
-        ret += ['HdlImplementation', 'RccImplementation']
-        # end pre-2.0 opencpi
-        return ret
+        # TODO replace get_root_tags() with self.root_tags
+        return self.root_tags
 
-    def parse(self):
-        Logger().debug('parsing ' + self.get_xml_abs_path())
+    def get_paths_to_parse(self):
         paths = []
         # start pre-2.0 opencpi
         paths += [self.abs_path + '/Makefile']
@@ -69,55 +62,65 @@ class Worker(AssetBase):
         # end pre-2.0 opencpi
         paths.append(self.get_xml_abs_path())
         paths = self.get_list_of_existing_abs_paths_to_parse(paths)
-        name = self.get_attr('Name', None, paths)
-        if name != '':
-            self.name = name
-        spec = self.get_attr('Spec', None, paths)
-        if spec != '':
-            self.spec = spec.replace('-spec', '').replace('_spec', '')
-        # self.language = self.get_attr('Language', None, paths)
-        # self.version = self.get_attr('Version', None, paths)
-        files = self.get_attr_list('SourceFiles', None, paths)
-        if files != '':
-            self.source_files = files
-        libraries = self.get_attr_list('Libraries', None, paths)
-        if len(libraries) > 0:
-            # TODO replace ocpi.core. delete according to CDG 8.1.11
-            self.libraries = [str(lib).replace('ocpi.core.', '')
-                              for lib in libraries]
+        return paths
+
+    def get_attr_infos(self):
+        ret = []
+        ret.append(AttributeInfo('Name'))
+        ret.append(AttributeInfo('Spec'))  # CDG section 8.1.2
+        ret.append(AttributeInfo('Language'))  # CDG section 8.1.3
+        ret.append(AttributeInfo('Version', is_int=True))  # CDG secion 8.1.4
+        is_list = True
+        ret.append(AttributeInfo('SourceFiles', is_list))  # CDG section 8.1.10
+        ret.append(AttributeInfo('Libraries', is_list))  # CDG section 8.1.11
+        # control_operations  # RDG section 3.1.3
+        # slave  # RDG section 3.1.5
+        return ret
+
+    def parse(self):
+        AssetBase.parse(self)
+        if self.attrs['Name'] != '':
+            self.name = self.attrs['Name']
+        spec = self.attrs['Spec']
+        self.attrs['Spec'] = spec.replace('-spec', '').replace('_spec', '')
+        # TODO replace ocpi.core. delete according to CDG 8.1.11
+        self.attrs['Libraries'] = \
+            [str(lib).replace('ocpi.core.', '')
+             for lib in self.attrs['Libraries']]
 
     def get_type(self):
         return self.authoring_model + ' worker'
 
 
-# TODO iherit from, and consolidate functionality from, AssetBase
 class RccAssembly(AssetBase):
 
     def __init__(self, dir_abs_path):
         AssetBase.__init__(self, dir_abs_path)
         # below line is undocumented edge case (testzc.rcc/Makefile Workers)
         self.workers = []
-        workers = self.parse()
-        self.discover(workers)
+        self.parse()
+        self.discover()
 
     def get_root_tags(self):
         return ['RccWorker']
 
-    def parse(self):
-        workers = []
+    def get_attr_infos(self):
+        ret = []
+        ret.append(AttributeInfo('Workers', is_list=True))
+        return ret
+
+    def get_paths_to_parse(self):
         paths = []
         paths.append(self.get_dir_abs_path() + '/Makefile')
-        for path in self.get_list_of_existing_abs_paths_to_parse(paths):
-            workers = self.get_variable_val_list_from_gnu_makefile(
-                    'Workers', path)
-        return workers
+        return paths
 
-    def discover(self, workers):
-        self.discover_workers(workers)
+    def discover(self):
+        self.discover_workers()
 
-    def discover_workers(self, workers):
+    def discover_workers(self):
         for entry in AssetBase.listdir_assets(self.get_dir_abs_path()):
-            if (entry.split('.')[0] in workers) or (workers == []):
+            workers_attr = self.attrs['Workers']
+            if (entry.split('.')[0] in workers_attr or (workers_attr == [])):
                 owd_path = self.get_dir_abs_path() + '/' + entry
                 if entry.endswith('.xml'):
                     try:
@@ -129,101 +132,83 @@ class RccAssembly(AssetBase):
         return 'rcc assembly'
 
 
-def test_Worker___init___common(ret, test):
-    passed = True
-    fs = TemporaryFilesystem()
-    ext = 'rcc'
-    dir_abs_path = fs.abs_path + '/' + 'worker.' + ext
-    xml_abs_path = dir_abs_path + '/' + 'worker.xml'
-    try:
-        os.system('mkdir -p ' + dir_abs_path)
-        ff = open(xml_abs_path, 'w')
-        if test == 0:
-            ff.write('<HdlWorker/>\n')
-        elif test == 1:
-            ff.write('<HdlWorker Name=\'worker\'/>\n')
-        elif test == 2:
-            ff.write('<HdlWorker Spec=\'comp\'/>\n')
-        elif test == 3:
-            ff.write('<HdlWorker SourceFiles=\'1.cc 2.cc\'/>\n')
-        elif test == 4:
-            ff.write('<HdlWorker Libraries=\'foo\'/>\n')
-        elif test == 5:
-            ff.write('<HdlWorker/>\n')
-        ff.close()
-        uut = Worker(xml_abs_path)
-        if Environment().ocpi_log_level >= 10:
-            print(uut.__dict__.keys())
-            os.system('cat ' + xml_abs_path)
-        if test == 0:
-            if uut.abs_path != xml_abs_path:
-                passed = False
-        elif test == 1:
-            if uut.name != 'worker':
-                passed = False
-        elif test == 2:
-            if uut.spec != 'comp':
-                passed = False
-        elif test == 3:
-            if uut.source_files != ['1.cc', '2.cc']:
-                passed = False
-        elif test == 4:
-            if uut.libraries != ['foo']:
-                passed = False
-        elif test == 5:
-            if uut.authoring_model != 'rcc':
-                passed = False
-    except InvalidAssetError:
-        passed = False
-    if test == 0:
-        log_pass_fail('testing Worker abs_path', passed)
-    elif test == 1:
-        log_pass_fail('testing Worker name', passed)
-    elif test == 2:
-        log_pass_fail('testing Worker spec', passed)
-    elif test == 3:
-        log_pass_fail('testing Worker source_files', passed)
-    elif test == 4:
-        log_pass_fail('testing Worker libraries', passed)
-    elif test == 5:
-        log_pass_fail('testing Worker authoring_model', passed)
-    if passed is False:
-        ret = False
-    return ret
-
-
-def test_Worker___init___abs_path(ret):
-    return test_Worker___init___common(ret, 0)
-
-
-def test_Worker___init___name(ret):
-    return test_Worker___init___common(ret, 1)
-
-
-def test_Worker___init___spec(ret):
-    return test_Worker___init___common(ret, 2)
-
-
-def test_Worker___init___source_files(ret):
-    return test_Worker___init___common(ret, 3)
-
-
-def test_Worker___init___libraries(ret):
-    return test_Worker___init___common(ret, 4)
-
-
-def test_Worker___init___authoring_model(ret):
-    return test_Worker___init___common(ret, 5)
-
-
 def test_Worker(ret):
-    ret = test_Worker___init___abs_path(ret)
-    ret = test_Worker___init___name(ret)
-    ret = test_Worker___init___spec(ret)
-    ret = test_Worker___init___source_files(ret)
-    ret = test_Worker___init___libraries(ret)
-    ret = test_Worker___init___authoring_model(ret)
+    fs = TemporaryFilesystem()
+    for test in range(8):
+        passed = True
+        ext = 'rcc'
+        dir_abs_path = fs.abs_path + '/' + 'worker.' + ext
+        xml_abs_path = dir_abs_path + '/' + 'worker.xml'
+        try:
+            os.system('mkdir -p ' + dir_abs_path)
+            ff = open(xml_abs_path, 'w')
+            if test == 0:
+                ff.write('<HdlWorker/>\n')
+            elif test == 1:
+                ff.write('<HdlWorker Name=\'worker\'/>\n')
+            elif test == 2:
+                ff.write('<HdlWorker Spec=\'comp\'/>\n')
+            elif test == 3:
+                ff.write('<HdlWorker SourceFiles=\'1.cc 2.cc\'/>\n')
+            elif test == 4:
+                ff.write('<HdlWorker Libraries=\'foo\'/>\n')
+            elif test == 5:
+                ff.write('<HdlWorker/>\n')
+            elif test == 6:
+                ff.write('<HdlWorker Language=\'lang\'/>\n')
+            elif test == 7:
+                ff.write('<HdlWorker Version=\'2\'/>\n')
+            ff.close()
+            uut = Worker(xml_abs_path)
+            if Environment().ocpi_log_level >= 10:
+                print(uut.__dict__.keys())
+                os.system('cat ' + xml_abs_path)
+            if test == 0:
+                if uut.abs_path != xml_abs_path:
+                    passed = False
+            elif test == 1:
+                if uut.name != 'worker':
+                    passed = False
+            elif test == 2:
+                if uut.attrs['Spec'] != 'comp':
+                    passed = False
+            elif test == 3:
+                if uut.attrs['SourceFiles'] != ['1.cc', '2.cc']:
+                    passed = False
+            elif test == 4:
+                if uut.attrs['Libraries'] != ['foo']:
+                    passed = False
+            elif test == 5:
+                if uut.authoring_model != 'rcc':
+                    passed = False
+            elif test == 6:
+                if uut.attrs['Language'] != 'lang':
+                    passed = False
+            elif test == 7:
+                if uut.attrs['Version'] != 2:
+                    passed = False
+        except InvalidAssetError:
+            passed = False
+        if test == 0:
+            log_pass_fail('testing Worker abs_path', passed)
+        elif test == 1:
+            log_pass_fail('testing Worker name', passed)
+        elif test == 2:
+            log_pass_fail('testing Worker spec', passed)
+        elif test == 3:
+            log_pass_fail('testing Worker source_files', passed)
+        elif test == 4:
+            log_pass_fail('testing Worker libraries', passed)
+        elif test == 5:
+            log_pass_fail('testing Worker authoring_model', passed)
+        elif test == 6:
+            log_pass_fail('testing Worker Language', passed)
+        elif test == 7:
+            log_pass_fail('testing Worker Version', passed)
+        if passed is False:
+            ret = False
     return ret
+
 
 def test_RccAssembly(ret):
     fs = TemporaryFilesystem()
