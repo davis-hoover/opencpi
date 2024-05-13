@@ -45,6 +45,7 @@ class HdlAssembly(AssetBase):
         is in or its package ID. """
 
     def __init__(self, dir_abs_path):
+        self.root_tags = ['HdlAssembly']
         AssetBase.__init__(self, dir_abs_path)
         if not os.path.isfile(self.get_xml_abs_path()):
             self.raise_abs_path_does_not_exist()
@@ -52,10 +53,7 @@ class HdlAssembly(AssetBase):
         self.containers = []
         self.parse()
 
-    def get_root_tags(self):
-        return ['HdlAssembly']
-
-    def parse(self):
+    def get_paths_to_parse(self):
         paths = []
         # start pre-2.0 opencpi
         paths += [self.abs_path + '/Makefile']
@@ -63,19 +61,26 @@ class HdlAssembly(AssetBase):
         # end pre-2.0 opencpi
         paths.append(self.get_xml_abs_path())
         paths = self.get_list_of_existing_abs_paths_to_parse(paths)
-        containers = self.get_attr_list('Containers', None, paths)
-        if len(containers) > 0:
-            for cname in containers:
-                # start pre-2.0 opencpi
-                # interesting edge case for
-                # assets/hdl/assemblies/empty/Makefile which has Makefiel
-                # variable Containers with a value that is not just a
-                # string (which is typical) but an .xml extension (atypical)
-                # cnt_hsmc_loopback_card_hsmc_alst4_a_hsmc_alst4_b.xml
-                cname = cname.split('.xml')[0]
-                # end pre-2.0 opencpi
-                path = self.abs_path + '/' + cname + '.xml'
-                self.containers.append(HdlContainer(path))
+        return paths
+
+    def get_attr_infos(self):
+        ret = []
+        ret.append(AttributeInfo('Containers', is_list=True))
+        return ret
+
+    def parse(self):
+        AssetBase.parse(self)
+        for cname in self.attrs['Containers']:
+            # start pre-2.0 opencpi
+            # interesting edge case for
+            # assets/hdl/assemblies/empty/Makefile which has Makefiel
+            # variable Containers with a value that is not just a
+            # string (which is typical) but an .xml extension (atypical)
+            # cnt_hsmc_loopback_card_hsmc_alst4_a_hsmc_alst4_b.xml
+            cname = cname.split('.xml')[0]
+            # end pre-2.0 opencpi
+            path = self.abs_path + '/' + cname + '.xml'
+            self.containers.append(HdlContainer(path))
         for elem in self.get_parsed().iter():
             try:
                 instance = HdlAssemblyInstance(elem)
@@ -98,27 +103,25 @@ class HdlContainer(AssetBase):
     """ HDL Development Guide section 6.4 """
 
     def __init__(self, xml_abs_path):
+        self.root_tags = ['HdlContainer']
         AssetBase.__init__(self, xml_abs_path)
-        # start of HDL section 6.4.1
-        self.platform = ''
-        self.config = ''
-        self.constraints = ''
-        self.only_platforms = []
-        self.exclude_platforms = []
-        # end of HDL section 6.4.1
         self.devices = dict()
         self.parse()
 
-    def get_root_tags(self):
-        return ['HdlContainer']
+    def get_attr_infos(self):
+        # HDG section 6.4.1
+        ret = []
+        # start of HDL section 6.4.1
+        ret.append(AttributeInfo('Platform'))
+        ret.append(AttributeInfo('Config'))
+        ret.append(AttributeInfo('Constraints'))
+        ret.append(AttributeInfo('OnlyPlatforms', is_list=True))
+        ret.append(AttributeInfo('ExcludePlatforms', is_list=True))
+        # end of HDL section 6.4.1
+        return ret
 
     def parse(self):
-        Logger().debug('parsing ' + self.get_xml_abs_path())
-        self.platform = self.get_attr('Platform')
-        self.config = self.get_attr('Config')
-        self.constraints = self.get_attr('Constraints')
-        self.only_platforms = self.get_attr_list('OnlyPlatforms')
-        self.exclude_platforms = self.get_attr_list('ExcludePlatforms')
+        AssetBase.parse(self)
         # TODO consolidate below with AttributeBase/AssetBase methods
         for elem in self.get_parsed().iter():
             name = None
@@ -372,13 +375,13 @@ def test_HdlContainer(ret):
                 print(uut.__dict__.keys())
                 os.system('cat ' + xml_abs_path)
             if test == 0:
-                passed = uut.config == 'cfg'
+                passed = uut.attrs['Config'] == 'cfg'
             if test == 1:
-                passed = uut.constraints == 'cst.xdc'
+                passed = uut.attrs['Constraints'] == 'cst.xdc'
             if test == 2:
-                passed = uut.only_platforms == ['zed', 'alst4']
+                passed = uut.attrs['OnlyPlatforms'] == ['zed', 'alst4']
             if test == 3:
-                passed = uut.exclude_platforms == ['ml604']
+                passed = uut.attrs['ExcludePlatforms'] == ['ml604']
         except:
             passed = False
         if test == 0:
