@@ -457,11 +457,12 @@ if __name__ == '__main__':
         parser = add_create_arguments(parser)
     if 'build' in sys.argv:
         parser = add_build_arguments(parser)
-    required = ('create' in sys.argv) or ('build' in sys.argv) or ('show' in sys.argv)
-    if required:
-        parser.add_argument('noun')
-    else:
-        parser.add_argument('noun', nargs='?', default=None)
+    #required = ('create' in sys.argv) or ('build' in sys.argv) or ('show' in sys.argv)
+    #if required:
+    #    parser.add_argument('noun')
+    #else:
+    #    parser.add_argument('noun', nargs='?', default=None)
+    parser.add_argument('noun', nargs='?', default=None)
     parser.add_argument('name', nargs='?', default=None)
     args = parser.parse_args()
     try:
