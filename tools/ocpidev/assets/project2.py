@@ -146,7 +146,11 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         return ret
 
     def get_xml_abs_path(self):
+        # TODO use AssetBase method instead
         return self.abs_path + '/Project.xml'
+
+    def get_buildable_paths(self):
+        return [self.abs_path + '/hdl']
 
     def get_package_id(self):
         ret = self.attrs['PackagePrefix'] + "." + self.attrs['PackageName']

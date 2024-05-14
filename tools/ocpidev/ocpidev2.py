@@ -152,8 +152,27 @@ class OCPIDev():
         if project is None:
             project = project_registry.get_abs_path_project(abs_path)
             asset = project.get_asset(abs_path)
-            if (asset is None):
-                raise Exception(_dir + ' is not buildable')
+            if asset is None:
+                if abs_path in project.get_buildable_paths():
+                    for buildable_path in project.get_buildable_paths():
+                        for component_library in project.component_libraries:
+                            for asset in component_library.workers:
+                                if abs_path in asset.get_dir_abs_path():
+                                    assets_to_build.append(asset)
+                        for asset in project.applications:
+                            if abs_path in asset.get_dir_abs_path():
+                                assets_to_build.append(asset)
+                        for asset in project.hdl_primitives:
+                            if abs_path in asset.get_dir_abs_path():
+                                assets_to_build.append(asset)
+                        for asset in project.hdl_assemblies:
+                            if abs_path in asset.get_dir_abs_path():
+                                assets_to_build.append(asset)
+                        for asset in project.hdl_devices:
+                            if abs_path in asset.get_dir_abs_path():
+                                assets_to_build.append(asset)
+                else:
+                    raise Exception(_dir + ' is not buildable')
             else:
                 assets_to_build.append(asset)
         else:
