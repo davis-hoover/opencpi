@@ -57,7 +57,7 @@ class HdlAssembly(AssetBase):
         paths = []
         # start pre-2.0 opencpi
         paths += [self.abs_path + '/Makefile']
-        # intentionally put xml path last so that its attributes take precedence
+        # intentionally put xml path last so that it takes precedence
         # end pre-2.0 opencpi
         paths.append(self.get_xml_abs_path())
         paths = self.get_list_of_existing_abs_paths_to_parse(paths)
@@ -189,7 +189,7 @@ def test_HdlAssembly___init___abs_path(ret):
         for abs_path in [dir_abs_path, dir_abs_path + '/']:
             if uut.abs_path != dir_abs_path:
                 passed = False
-    except:
+    except InvalidAssetError:
         passed = False
     log_pass_fail('testing HdlAssembly abs_path', passed)
     if passed is False:
@@ -206,7 +206,7 @@ def test_HdlAssembly___init___name(ret):
         hdl_assembly = HdlAssembly(dir_abs_path)
         if hdl_assembly.name != 'assembly':
             passed = False
-    except:
+    except InvalidAssetError:
         passed = False
     log_pass_fail('testing HdlAssembly name', passed)
     if passed is False:
@@ -247,7 +247,7 @@ def test_HdlAssembly_parse_instances(ret):
             create_test_ohad([], dir_abs_path, quote=quote)
             hdl_assembly = HdlAssembly(dir_abs_path)
             passed = False
-        except:
+        except InvalidAssetError:
             pass
         try:
             create_test_ohad([('nothing', None)], dir_abs_path, quote=quote)
@@ -290,7 +290,7 @@ def test_HdlAssembly_parse_instances(ret):
             #     passed = False
             # if hdl_assembly.instances['nothing'] != 'nothing':
             #     passed = False
-        except:
+        except InvalidAssetError:
             passed = False
     instances = []
     # try:
@@ -327,7 +327,7 @@ def test_HdlAssembly_get_type(ret):
     try:
         create_test_ohad(['nothing'], dir_abs_path)
         passed = HdlAssembly(dir_abs_path).get_type() == 'hdl assembly'
-    except:
+    except InvalidAssetError:
         passed = False
     log_pass_fail('testing HdlAssembly get_type()', passed)
     if passed is False:
@@ -350,7 +350,7 @@ def test_HdlContainerDevice(ret):
             passed = False
         if hdl_container_device.slot != 'myslot':
             passed = False
-    except:
+    except InvalidAssetError:
         passed = False
     log_pass_fail('testing HdlContainerDevice', passed)
     if passed is False:
@@ -368,7 +368,7 @@ def test_HdlContainer(ret):
             os.system('mkdir -p ' + dir_abs_path)
             ff = open(xml_abs_path, 'w')
             ff.write('<HdlContainer Config=\'cfg\' Constraints=\'cst.xdc\' ')
-            ff.write('OnlyPlatforms=\'zed alst4\' ExcludePlatforms=\'ml604\'/>\n')
+            ff.write('OnlyPlatforms=\'zed alst4\' ExcludePlatforms=\'ml\'/>\n')
             ff.close()
             uut = HdlContainer(xml_abs_path)
             if Environment().ocpi_log_level >= 10:
@@ -381,8 +381,8 @@ def test_HdlContainer(ret):
             if test == 2:
                 passed = uut.attrs['OnlyPlatforms'] == ['zed', 'alst4']
             if test == 3:
-                passed = uut.attrs['ExcludePlatforms'] == ['ml604']
-        except:
+                passed = uut.attrs['ExcludePlatforms'] == ['ml']
+        except InvalidAssetError:
             passed = False
         if test == 0:
             log_pass_fail('testing HdlContainer Config', passed)
