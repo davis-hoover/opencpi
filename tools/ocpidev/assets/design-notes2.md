@@ -28,15 +28,15 @@ OpenCPI v2.4.7 is here: https://gitlab.com/opencpi/opencpi/-/tree/v2.4.7/project
 
     args.include_dirs
 
-       =DICT()=>
+      =DICT()=>
 
     mydict["include_dir"]
 
-       =replaceunderscore=>
+      =replaceunderscore=>
 
     mydict["includedir"]
 
-       =>
+      =>
 
     "includedir"
 
@@ -50,7 +50,7 @@ OpenCPI v2.4.7 is here: https://gitlab.com/opencpi/opencpi/-/tree/v2.4.7/project
 
       <=
 
-     self.attrs["IncludeDir"]
+    self.attrs["IncludeDir"]
 
 # Troubleshooting
 It is VERY useful to run OCPI_LOG_LEVEL=10 ocpidev2 ...args.... 2> log, and then less -r log to peruse the colorized output
