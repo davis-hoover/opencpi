@@ -27,17 +27,29 @@ OpenCPI v2.4.7 is here: https://gitlab.com/opencpi/opencpi/-/tree/v2.4.7/project
 3. Typical CLI-to-XML flow during 'ocpidev2 create' is, e.g.,
 
     args.include_dirs
+
        =DICT()=>
+
     mydict["include_dir"]
+
        =replaceunderscore=>
+
     mydict["includedir"]
+
        =>
+
     "includedir"
+
       <=COMPARE=>
+
     "includedir"
+
       <== lower()
+
     "IncludeDir" (matches attribute name defined in get_attr_infos()
+
       <=
+
      self.attrs["IncludeDir"]
 
 # Troubleshooting
