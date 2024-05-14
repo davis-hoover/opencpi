@@ -137,7 +137,10 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
             ret.append(AttributeInfo(attr_key))
         for attr_key in ['HdlTargets', 'HdlPlatforms', 'RccPlatforms',
                          'RccHdlPlatforms', 'ComponentLibraries',
-                         'HdlLibraries', 'ProjectDependencies']:
+                         'HdlLibraries', 'ProjectDependencies',
+                         'Libraries', 'OnlyTargets', 'OnlyPlatforms',
+                         'ExcludeTargets', 'ExcludePlatforms',
+                         'XmlIncludeDirs', 'IncludeDirs']:
             ret.append(AttributeInfo(attr_key, is_list=True))
         return ret
 
