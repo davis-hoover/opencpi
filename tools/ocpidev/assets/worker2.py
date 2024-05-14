@@ -53,7 +53,7 @@ class Worker(AssetBase):
     def get_paths_to_parse(self):
         paths = []
         # start pre-2.0 opencpi
-        paths += [self.abs_path + '/Makefile']
+        paths += [self.get_dir_abs_path() + '/Makefile']
         # intentionally put xml last so that its attributes take precedence
         # end pre-2.0 opencpi
         paths.append(self.get_xml_abs_path())

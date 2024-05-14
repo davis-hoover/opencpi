@@ -901,7 +901,10 @@ class AssetBase(AttributeBase):
         return []
 
     def parse(self, cli_dict=None):
-        AttributeBase.parse(self, None, self.get_paths_to_parse(), cli_dict)
+        paths = self.get_paths_to_parse()
+        for path in paths:
+            Logger().debug('parsing ' + path)
+        AttributeBase.parse(self, None, paths, cli_dict)
         Logger().debug('parsed attributes: ' + str(self.attrs))
 
     @staticmethod
@@ -990,7 +993,6 @@ class AssetBase(AttributeBase):
         ret = []
         for abs_path in abs_paths:
             if os.path.exists(abs_path):
-                Logger().debug('parsing ' + abs_path)
                 ret.append(abs_path)
         return ret
 
