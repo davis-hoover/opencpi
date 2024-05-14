@@ -644,6 +644,8 @@ class AttributeInfo():
         self.key = key
         self.is_list = is_list
         self.is_int = is_int
+        self.cli_short = cli_short
+        self.cli_long = cli_long
 
 class AttributeBase():
     """ a thing which contains opencpi (XML) attributes, either intermediary
