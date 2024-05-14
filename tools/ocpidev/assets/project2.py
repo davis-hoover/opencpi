@@ -318,7 +318,7 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
 
     def get_hdl_worker_dependent_libraries(self, comp_library, worker):
         ret = self.get_built_in_hdl_libraries()
-        for lib in comp_library.hdl_libraries:
+        for lib in comp_library.attrs['HdlLibraries']:
             ret.append(lib)
         for lib in worker.attrs['Libraries']:
             ret.append(lib)
