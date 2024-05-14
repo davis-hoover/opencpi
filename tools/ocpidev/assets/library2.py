@@ -78,7 +78,8 @@ class Discoverer():
         if os.path.isdir(discovery_path):
             for _dir in AssetBase.listdir_assets(discovery_path):
                 dir_abs_path = discovery_path + '/' + _dir
-                if os.path.isdir(dir_abs_path) and (_dir != 'specs') and (_dir != 'gen'):
+                allowable_dir = (_dir != 'specs') and (_dir != 'gen')
+                if os.path.isdir(dir_abs_path) and allowable_dir:
                     ret.append(dir_abs_path)
         return ret
 
@@ -101,7 +102,8 @@ class Discoverer():
                         # due to edge cases such as testzc.rcc, testmulti.rcc
                         assets = RccAssembly(dir_abs_path).workers
                     elif not tmp.endswith('.test'):
-                        assets.append(Worker(dir_abs_path + '/' + name + '.xml'))
+                        tmp = dir_abs_path + '/' + name + '.xml'
+                        assets.append(Worker(tmp))
                 for asset in assets:
                     if allowlist is not None:
                         # TODO is this pre-2.0???
@@ -250,7 +252,8 @@ def test_ComponentLibrary(ret):
                 if uut.get_package_id('ocpi.core') != 'ocpi.core.devices':
                     passed = False
                 uut.abs_path = '/tmp/myproj/hdl/platforms/mypf/devices'
-                if uut.get_package_id('ocpi.core') != 'ocpi.core.platforms.mypf.devices':
+                test_str = 'ocpi.core.platforms.mypf.devices'
+                if uut.get_package_id('ocpi.core') != test_str:
                     passed = False
         except InvalidAssetError:
             passed = False
@@ -265,7 +268,8 @@ def test_ComponentLibrary(ret):
         if test == 4:
             log_pass_fail('testing ComponentLibrary tests', passed)
         if test == 5:
-            log_pass_fail('testing ComponentLibrary component_libraries', passed)
+            tmp = passed
+            log_pass_fail('testing ComponentLibrary component_libraries', tmp)
         if test == 6:
             log_pass_fail('testing ComponentLibrary get_package_id()', passed)
         if passed is False:
