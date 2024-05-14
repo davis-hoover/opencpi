@@ -20,6 +20,16 @@ OpenCPI v2.4.7 is here: https://gitlab.com/opencpi/opencpi/-/tree/v2.4.7/project
 |   Y     |    Y    |    N   |    Wild scenario. The XML file is the only one parsed. Library is discovered if and only if the case-insensitive `library` XML root tag exists.    |       |
 |   Y     |    Y    |    Y   |    Wild scenario. The XML file is the only one parsed. Library is discovered if and only if the case-insensitive `library` XML root tag exists.  |       |
 
+# Asset objects
+
+        CLI   XML   makefiles
+         |     |      |
+         V     V      V
+    asset object (inherits from AssetBase)
+         |     |      |
+         V     V      V
+       clean  build  create  
+
 # Top-Level Attribute, Exposing to CLI
 
 1. Top-level attributes are defined in the list returned be each asset class's get_attr_infos() method
