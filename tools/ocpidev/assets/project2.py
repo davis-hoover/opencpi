@@ -352,8 +352,8 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
                                 ret.append(val)
         return ret
 
-    def get_build_output_path(self, asset, hdl_target = None,
-            hdl_platform = None):
+    def get_build_output_path(self, asset, hdl_target = '',
+            hdl_platform = ''):
         ret = asset.get_dir_abs_path()
         tmp = ''
         if asset.get_type() == 'hdl assembly':
@@ -377,7 +377,7 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         return ret
 
     def build_asset(self, asset, project_registry, tool,
-            hdl_target = None, hdl_platform = None, rcc_platform = None, _j = 1):
+            hdl_target = '', hdl_platform = '', rcc_platform = '', _j = 1):
         fs = TemporaryFilesystem()
         os.system('mkdir -p ' + fs.abs_path)
         global_makefile.abs_path = fs.abs_path + '/Makefile'

@@ -97,7 +97,7 @@ class OCPIDev():
             if project2.abs_path == os.path.realpath(abs_path):
                 project = project2
         # ============ TODO START fix this mess and move back into tool class
-        if rcc_platform is not None:
+        if rcc_platform != '':
             self.install_rcc_platform_if_not_installed(
                     project_registry, rcc_platform)
         dependency_ordered_pid_strs = []
@@ -315,8 +315,8 @@ class LegacyOCPIDevHDLBuildTool():
                     if os.system('ocpiadmin install platform ' + rcc_platform) != 0:
                         raise Exception('failed to build rcc platform ' + rcc_platform)
 
-    def get_build_output_path(self, asset, hdl_target = None,
-            hdl_platform = None):
+    def get_build_output_path(self, asset, hdl_target = '',
+            hdl_platform = ''):
         ret = asset.abs_path
         tmp = ''
         if asset.get_type() == 'hdl assembly':
@@ -336,9 +336,9 @@ class LegacyOCPIDevHDLBuildTool():
 
     def get_gnu_make_recipe(self, asset):
         ret = 'ocpidev build -d ' + asset.get_dir_abs_path()
-        if hdl_target is not None:
+        if hdl_target != '':
             ret += ' --hdl-target ' + hdl_target
-        if hdl_platform is not None:
+        if hdl_platform != '':
             ret += ' --hdl-platform ' + hdl_platform
         if no_doc:
             ret += ' --no-doc'
@@ -378,9 +378,9 @@ class LegacyOCPIDevHDLBuildTool():
         if Environment().ocpi_log_level < 8:
             cmd += '@'
         cmd += 'ocpidev build -d ' + asset.get_dir_abs_path()
-        if hdl_target is not None:
+        if hdl_target != '':
             cmd += ' --hdl-target ' + hdl_target
-        if hdl_platform is not None:
+        if hdl_platform != '':
             cmd += ' --hdl-platform ' + hdl_platform
         if no_doc:
             cmd += ' --no-doc'
@@ -441,9 +441,9 @@ def add_create_arguments(parser):
 
 
 def add_build_arguments(parser):
-    parser.add_argument('--hdl-target', nargs='?', default=None)
-    parser.add_argument('--hdl-platform', nargs='?', default=None)
-    parser.add_argument('--rcc-platform', nargs='?', default=None)
+    parser.add_argument('--hdl-target', nargs='?', default='')
+    parser.add_argument('--hdl-platform', nargs='?', default='')
+    parser.add_argument('--rcc-platform', nargs='?', default='')
     return parser
 
 
