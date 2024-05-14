@@ -51,6 +51,7 @@ class OCPIDev():
             cli_dict = {key.replace('_', '') : val for key, val in cli_dict.items()}
         if args.noun == 'project':
             Project(abs_path, False, cli_dict).create()
+
     def delete(self, noun):
         raise Exception('delete is not supported at this time')
 
