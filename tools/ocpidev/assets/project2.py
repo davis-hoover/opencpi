@@ -162,18 +162,21 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         """ returns None if asset not found """
         ret = None
         for component_library in self.component_libraries:
-            for worker in component_library.workers:
-                if worker.abs_path == abs_path:
-                    ret = Worker(abs_path + '/' + worker.name + '.xml')
-        for application in self.applications:
-            if application.abs_path == abs_path:
-                ret = Application(abs_path)
-        for hdl_primitive in self.hdl_primitives:
-            if hdl_primitive.abs_path == abs_path:
-                ret = HdlLibrary(abs_path)
-        for hdl_assembly in self.hdl_assemblies:
-            if hdl_assembly.abs_path == abs_path:
-                ret = HdlAssembly(abs_path)
+            for asset in component_library.workers:
+                print('comparing ' + asset.get_dir_abs_path() + ' ' + abs_path)
+                if asset.get_xml_abs_path() == abs_path:
+                    ret = asset
+                elif asset.get_dir_abs_path() == abs_path:
+                    ret = asset
+        for asset in self.applications:
+            if asset.get_dir_abs_path() == abs_path:
+                ret = asset
+        for asset in self.hdl_primitives:
+            if asset.get_dir_abs_path() == abs_path:
+                ret = asset
+        for asset in self.hdl_assemblies:
+            if asset.get_dir_abs_path() == abs_path:
+                ret = asset
         return ret
 
     def get_paths_to_parse(self):

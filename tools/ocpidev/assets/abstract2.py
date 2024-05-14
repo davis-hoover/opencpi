@@ -820,6 +820,11 @@ class AssetBase(AttributeBase):
         # instead
         # TODO - rename to self._abs_path
         self.abs_path = abs_path  # can be None, e.g., for base platform config
+        if self.abs_path is not None:
+            while '//' in self.abs_path:
+                self.abs_path = self.abs_path.replace('//', '/')
+            if self.abs_path.endswith('/'):
+                self.abs_path = self.abs_path[:,-1]
         self.name = self.get_name() # CDG section 6.1.1, section 8.1.1, etc
         if (self.abs_path is not None):
             if enable_path_existence_check:
