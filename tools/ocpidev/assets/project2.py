@@ -113,7 +113,6 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         self.hdl_platforms = []
         # end of bullets at top of CDG section 14
         # start of CDG section 14.5 (EXTERNAL-to-project, i.e., DEPENDENCY)
-        self._component_libraries = []
         # HDG section 5 "The built-in ocpi.core project includes several HDL
         # primitive libraries, and some are always available for use by all
         # workers" - here are the implied "some"
@@ -134,15 +133,21 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
 
     def get_attr_infos(self):
         ret = []
-        ret.append(AttributeInfo('PackagePrefix'))
+        for attr_key in ['PackagePrefix', 'PackageName', 'PackageID']:
+            ret.append(AttributeInfo(attr_key))
+        for attr_key in ['HdlTargets', 'HdlPlatforms', 'RccPlatforms',
+                         'RccHdlPlatforms', 'ComponentLibraries',
+                         'HdlLibraries', 'ProjectDependencies']:
+            ret.append(AttributeInfo(attr_key, is_list=True))
         return ret
 
     def get_xml_abs_path(self):
         return self.abs_path + '/Project.xml'
 
     def get_package_id(self):
-        tmp = self.attrs['PackagePrefix'] + "." + self.package_name
-        ret = tmp if self.package_id == '' else self.package_id
+        ret = self.attrs['PackagePrefix'] + "." + self.attrs['PackageName']
+        if self.attrs['PackageID'] != '':
+            ret = self.attrs['PackageID']
         return ret
 
     def get_asset(self, abs_path):
@@ -176,26 +181,12 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
 
     def parse(self, cli_dict):
         AssetBase.parse(self, cli_dict)
-        paths = self.get_paths_to_parse()
-        clibs = self.get_attr_list('ComponentLibraries', None, paths, cli_dict)
-        if len(clibs) > 0:
-            self._component_libraries = clibs
-        hlibs = self.get_attr_list('HdlLibraries', None, paths, cli_dict)
-        if len(hlibs) > 0:
-            self.hdl_libraries = hlibs
-        deps = self.get_attr_list('ProjectDependencies', None, paths, cli_dict)
-        if len(deps) > 0:
-            self.project_dependencies = deps
+        self.hdl_libraries.extend(self.attrs['HdlLibraries'])
+        self.project_dependencies.extend(self.attrs['ProjectDependencies'])
         # TODO: Include these checks in other parse() get_attr_list logic
         if self.attrs['PackagePrefix'] != '':
             if not self.attrs['PackagePrefix'].isidentifier():
                 raise InvalidAssetError('PackagePrefix must contain only alphanumeric characters and not start with a number')
-        package_name = self.get_attr('PackageName', None, paths, cli_dict)
-        if package_name != '':
-            self.package_name = package_name
-        package_id = self.get_attr('PackageID', None, paths, cli_dict)
-        if package_id != '':
-            self.package_id = package_id
 
     def create(self):
         AssetBase.create_files(self, project_templates)
@@ -327,9 +318,9 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
 
     def get_hdl_worker_dependent_libraries(self, comp_library, worker):
         ret = self.get_built_in_hdl_libraries()
-        for lib in comp_library.hdl_libraries:
+        for lib in comp_library.attrs['HdlLibraries']:
             ret.append(lib)
-        for lib in worker.libraries:
+        for lib in worker.attrs['Libraries']:
             ret.append(lib)
         return ret
 
@@ -370,10 +361,10 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
             if len(asset.containers) == 0:
                 tmp += 'base_'
             else:
-                if asset.containers[0].config == '':
+                if asset.containers[0].attrs['Config'] == '':
                     tmp += 'base_'
                 else:
-                    tmp += asset.containers[0].config + '_'
+                    tmp += asset.containers[0].attrs['Config'] + '_'
                 tmp += asset.containers[0].name
             ret += '/container-' + tmp + '_'
         ret += '/target-' + get_hdl_target(hdl_platform) + '/'
@@ -402,7 +393,7 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
             hdl_target, hdl_platform)
         global_makefile.emit()
         # TODO delete below line
-        os.system('cp ' + global_makefile.abs_path + ' /tmp/Makefile')
+        # os.system('cp ' + global_makefile.abs_path + ' /tmp/Makefile')
         tmp = 'make -f ' + global_makefile.abs_path
         if _j > 1:
             tmp += ' -j ' + str(_j)

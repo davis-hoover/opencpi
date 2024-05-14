@@ -30,6 +30,7 @@ class OperationArgumentMember(AttributeBase):
         AttributeBase.__init__(self, elem)
 
     def get_root_tags(self):
+        # TODO replace get_root_tags() with self.root_tags
         return ['Member']
 
     def get_attr_infos(self):
@@ -50,6 +51,7 @@ class OperationArgument(AttributeBase):
         self.parse(elem)
 
     def get_root_tags(self):
+        # TODO replace get_root_tags() with self.root_tags
         return ['Argument']
 
     def get_attr_infos(self):
@@ -80,6 +82,7 @@ class Operation(AttributeBase):
         self.parse(elem)
 
     def get_root_tags(self):
+        # TODO replace get_root_tags() with self.root_tags
         return ['Operation']
 
     def get_attr_infos(self):
@@ -108,6 +111,7 @@ class Protocol(AssetBase):
         self.parse()
 
     def get_root_tags(self):
+        # TODO replace get_root_tags() with self.root_tags
         return ['Protocol']
 
     def parse(self):
@@ -137,10 +141,6 @@ class Component(AssetBase):
         AssetBase.__init__(self, xml_abs_path)
         Logger().debug('parsing ' + self.get_xml_abs_path())
         self.parse(cli_dict)
-
-    def get_root_tags(self):
-        # TODO replace get_root_tags() with self.root_tags
-        return self.root_tags
 
     def get_attr_infos(self):
         ret = []
@@ -193,6 +193,7 @@ class Property(AttributeBase):
         AttributeBase.__init__(self)
 
     def get_root_tags(self):
+        # TODO replace get_root_tags() with self.root_tags
         return ['Property']
 
     def get_attr_infos(self):

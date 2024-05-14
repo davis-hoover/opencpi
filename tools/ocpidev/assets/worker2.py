@@ -50,10 +50,6 @@ class Worker(AssetBase):
             self.authoring_model = 'hdl'
         self.parse()
 
-    def get_root_tags(self):
-        # TODO replace get_root_tags() with self.root_tags
-        return self.root_tags
-
     def get_paths_to_parse(self):
         paths = []
         # start pre-2.0 opencpi
@@ -102,6 +98,7 @@ class RccAssembly(AssetBase):
         self.discover()
 
     def get_root_tags(self):
+        # TODO replace get_root_tags() with self.root_tags
         return ['RccWorker']
 
     def get_attr_infos(self):

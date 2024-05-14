@@ -825,6 +825,10 @@ class AssetBase(AttributeBase):
             if enable_path_existence_check:
                 self.raise_if_path_does_not_exist()
 
+    def get_root_tags(self):
+        # TODO replace get_root_tags() with self.root_tags
+        return self.root_tags
+
     def get_name(self):
         # TODO replace get_root_tags() with self.root_tags
         self.name = self.get_name()  # CDG section 6.1.1, section 8.1.1, etc

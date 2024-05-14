@@ -35,10 +35,6 @@ class HdlLibrary(AssetBase):
         self.source_files = []  # HDG section 5.2.1
         self.parse()
 
-    def get_root_tags(self):
-        # TODO replace get_root_tags() with self.root_tags
-        return self.root_tags
-
     def get_paths_to_parse(self):
         paths = []
         # start pre-2.0 opencpi

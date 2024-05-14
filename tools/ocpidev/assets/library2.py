@@ -78,7 +78,8 @@ class Discoverer():
         if os.path.isdir(discovery_path):
             for _dir in AssetBase.listdir_assets(discovery_path):
                 dir_abs_path = discovery_path + '/' + _dir
-                if os.path.isdir(dir_abs_path) and (_dir != 'specs') and (_dir != 'gen'):
+                allowable_dir = (_dir != 'specs') and (_dir != 'gen')
+                if os.path.isdir(dir_abs_path) and allowable_dir:
                     ret.append(dir_abs_path)
         return ret
 
@@ -101,7 +102,8 @@ class Discoverer():
                         # due to edge cases such as testzc.rcc, testmulti.rcc
                         assets = RccAssembly(dir_abs_path).workers
                     elif not tmp.endswith('.test'):
-                        assets.append(Worker(dir_abs_path + '/' + name + '.xml'))
+                        tmp = dir_abs_path + '/' + name + '.xml'
+                        assets.append(Worker(tmp))
                 for asset in assets:
                     if allowlist is not None:
                         # TODO is this pre-2.0???
@@ -120,6 +122,7 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         is in or its package ID. """
 
     def __init__(self, dir_abs_path):
+        self.root_tags = ['Library']  # CDG section 10.1
         AssetBase.__init__(self, dir_abs_path)
         is_test = self.get_dir_abs_path_is_test(dir_abs_path)
         if is_test or self.get_dir_abs_path_is_worker(dir_abs_path):
@@ -135,18 +138,16 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         self.component_libraries = []
         self.hdl_libraries = []
         # end of CDG section 14.5
-        workers = self.parse()
+        self.parse()
+        workers = self.attrs['Workers']
         allowlist = None if workers == [] else workers
         self.discover(allowlist, 'hdl/platforms' in dir_abs_path)
-
-    def get_root_tags(self):
-        ret = ['Library']  # CDG section 10.1
-        return ret
 
     @staticmethod
     def get_dir_abs_path_is_worker(dir_abs_path):
         ret = False
-        for ext in ['rcc', 'hdl', 'ocl']:
+        # TODO remove 'comp' from list
+        for ext in ['rcc', 'hdl', 'ocl', 'comp']:
             if dir_abs_path.endswith('.' + ext):
                 ret = True
         return ret
@@ -168,7 +169,14 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
             ret += '.' + self.name
         return ret
 
-    def parse(self):
+    def get_attr_infos(self):
+        ret = []
+        ret.append(AttributeInfo('ComponentLibraries', is_list=True))
+        ret.append(AttributeInfo('HdlLibraries', is_list=True))
+        ret.append(AttributeInfo('Workers', is_list=True))
+        return ret
+
+    def get_paths_to_parse(self):
         paths = []
         # start pre-2.0 opencpi
         # TODO address library.mk vs libraries.mk behavior in Makefile
@@ -176,19 +184,14 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         # intentionally put xml last so that its attributes take precedence
         # end pre-2.0 opencpi
         paths.append(self.get_xml_abs_path())
-        workers = []
         paths = self.get_list_of_existing_abs_paths_to_parse(paths)
-        clibs = self.get_attr_list('ComponentLibraries', None, paths)
-        if len(clibs) > 0:
-            self.component_libraries = clibs
-        hlibs = self.get_attr_list('HdlLibraries', None, paths)
-        if len(hlibs) > 0:
-            self.hdl_libraries = hlibs
-        workers = self.get_attr_list('Workers', None, paths)
+        return paths
+
+    def parse(self):
+        AssetBase.parse(self)
         global g_libraries_mk
         if g_libraries_mk:
             g_libraries_mk = False
-        return workers
 
     def discover(self, allowlist, platform=False):
         self.discover_components()
@@ -249,7 +252,8 @@ def test_ComponentLibrary(ret):
                 if uut.get_package_id('ocpi.core') != 'ocpi.core.devices':
                     passed = False
                 uut.abs_path = '/tmp/myproj/hdl/platforms/mypf/devices'
-                if uut.get_package_id('ocpi.core') != 'ocpi.core.platforms.mypf.devices':
+                test_str = 'ocpi.core.platforms.mypf.devices'
+                if uut.get_package_id('ocpi.core') != test_str:
                     passed = False
         except InvalidAssetError:
             passed = False
@@ -264,7 +268,8 @@ def test_ComponentLibrary(ret):
         if test == 4:
             log_pass_fail('testing ComponentLibrary tests', passed)
         if test == 5:
-            log_pass_fail('testing ComponentLibrary component_libraries', passed)
+            tmp = passed
+            log_pass_fail('testing ComponentLibrary component_libraries', tmp)
         if test == 6:
             log_pass_fail('testing ComponentLibrary get_package_id()', passed)
         if passed is False:
