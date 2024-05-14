@@ -25,6 +25,7 @@ OpenCPI v2.4.7 is here: https://gitlab.com/opencpi/opencpi/-/tree/v2.4.7/project
 1. Top-level attributes are defined in the list returned be each asset class's get_attr_infos() method
 2. Top-level attributes are typically exposed to the CLI, in a name that is similar to the attribute (sometimes not)
 3. Typical CLI-to-XML flow during 'ocpidev2 create' is, e.g.,
+
     args.include_dirs
        =DICT()=>
     mydict["include_dir"]
