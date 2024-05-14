@@ -361,10 +361,10 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
             if len(asset.containers) == 0:
                 tmp += 'base_'
             else:
-                if asset.containers[0].config == '':
+                if asset.containers[0].attrs['Config'] == '':
                     tmp += 'base_'
                 else:
-                    tmp += asset.containers[0].config + '_'
+                    tmp += asset.containers[0].attrs['Config'] + '_'
                 tmp += asset.containers[0].name
             ret += '/container-' + tmp + '_'
         ret += '/target-' + get_hdl_target(hdl_platform) + '/'

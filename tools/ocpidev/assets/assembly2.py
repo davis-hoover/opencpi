@@ -385,7 +385,7 @@ def test_HdlContainer(ret):
         except:
             passed = False
         if test == 0:
-            log_pass_fail('testing HdlContainer config', passed)
+            log_pass_fail('testing HdlContainer Config', passed)
         if test == 1:
             log_pass_fail('testing HdlContainer constraints', passed)
         if test == 2:
