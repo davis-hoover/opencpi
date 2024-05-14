@@ -639,11 +639,13 @@ global_makefile = GNUMakefile(None)
 
 
 class AttributeInfo():
-    def __init__(self, key, is_list=False, is_int=False):
+    def __init__(self, key, is_list=False, is_int=False, cli_short=None, cli_long=None):
         """ key is the string attribute from the Dev Guide, e.g. 'Property' """
         self.key = key
         self.is_list = is_list
         self.is_int = is_int
+        self.cli_short = cli_short
+        self.cli_long = cli_long
 
 class AttributeBase():
     """ a thing which contains opencpi (XML) attributes, either intermediary
