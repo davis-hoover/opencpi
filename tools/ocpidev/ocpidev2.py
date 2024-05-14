@@ -232,8 +232,10 @@ class OCPIDev():
         disc = noun != 'registry'
         disc = disc and (noun != 'projects')
         project_registry = ProjectRegistry(disc, disc)
+        if noun == 'registry':
+            print(project_registry.abs_path)
         for project in project_registry.projects:
-            if (noun == 'projects') or (noun == 'registry'):
+            if noun == 'projects':
                 msg = str(project.get_package_id()) + ' '
                 for idx in range(30-len(msg)):
                     msg += ' '
