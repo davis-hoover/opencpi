@@ -133,11 +133,15 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
 
     def get_attr_infos(self):
         ret = []
+        # Attributes provided (partially) in CDG 10.1 Table 7
         for attr_key in ['PackagePrefix', 'PackageName', 'PackageID']:
             ret.append(AttributeInfo(attr_key))
         for attr_key in ['HdlTargets', 'HdlPlatforms', 'RccPlatforms',
                          'RccHdlPlatforms', 'ComponentLibraries',
-                         'HdlLibraries', 'ProjectDependencies']:
+                         'HdlLibraries', 'ProjectDependencies',
+                         'Libraries', 'OnlyTargets', 'OnlyPlatforms',
+                         'ExcludeTargets', 'ExcludePlatforms',
+                         'XmlIncludeDirs', 'IncludeDirs']:
             ret.append(AttributeInfo(attr_key, is_list=True))
         return ret
 

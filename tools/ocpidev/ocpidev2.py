@@ -431,14 +431,15 @@ def unittest():
 
 
 def add_create_arguments(parser):
-    parser.add_argument('-A', '--xml-include', nargs='?', dest='xml_include', default=None)
-    parser.add_argument('-D', '--depend', nargs='?', dest='depend', default=None)
-    parser.add_argument('-F', '--package-prefix', nargs='?', dest='package_prefix', default='')
-    parser.add_argument('-I', '--include-dir', nargs='?', dest='include_dir', default='')
-    parser.add_argument('-K', '--package-id', nargs='?', dest='package_id', default='')
-    parser.add_argument('-N', '--package-name', nargs='?', dest='package_name', default='')
-    parser.add_argument('-Y', '--prim-lib', nargs='?', dest='prim_lib', default='')
-    parser.add_argument('-y', '--comp-lib', nargs='?', dest='comp_lib', default='')
+    # Important that dest values match get_attr_info() attributes for the Project class
+    parser.add_argument('-D', '--depend', nargs='?', dest='project_dependencies', default=None)
+    parser.add_argument('-F', '--package-prefix', nargs='?', default='')
+    parser.add_argument('-K', '--package-id', nargs='?', default='')
+    parser.add_argument('-N', '--package-name', nargs='?', default='')
+    parser.add_argument('-A', '--xml-include', nargs='?', dest='xml_include_dirs', default=None)
+    parser.add_argument('-I', '--include-dir', nargs='?', dest='include_dirs', default='')
+    parser.add_argument('-Y', '--primitive-library', nargs='?', dest='hdl_libraries', default='')
+    parser.add_argument('-y', '--component-library', nargs='?', dest='libraries', default='')
     return parser
 
 

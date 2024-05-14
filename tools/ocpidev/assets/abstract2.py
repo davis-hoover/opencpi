@@ -31,7 +31,7 @@ import jinja2
 # TODO make a class member, probably ComponentLibrary or Project class
 g_libraries_mk = False
 g_asset_template = """<{{asset.root_tags[0]}}{% for key,val in asset.attrs.items() %}{% if val != '' and val != [] %}\n
-    {{key}}=\'{{val}}\'{% endif %}{% endfor %}/>"""
+    {{key}}=\'{{val}}\'{% endif %}{% endfor %}/>\n\n"""
 global_dependency_tree = dict()
 
 
