@@ -763,10 +763,10 @@ class AttributeBase():
                 if (is_list and ret2 != []) or ((not is_list) and (ret2 != '')):
                     ret = ret2
         else:
-            try:
-                ret = cli_dict[attr.lower()]
-            except KeyError:
-                pass
+            for attr_info in self.get_attr_infos():
+               if attr.lower() == attr_info.key.lower():
+                  if attr_info.cli_long or attr_info.cli_short:
+                      ret = cli_dict[attr_info.cli_long.replace('-', '')]
         return ret
 
     def get_attr(self, attr, elem=None, makefile_abs_paths=[], cli_dict=None):

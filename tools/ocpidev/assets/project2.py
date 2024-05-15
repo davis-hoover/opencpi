@@ -134,14 +134,18 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
     def get_attr_infos(self):
         ret = []
         # Attributes provided (partially) in CDG 10.1 Table 7
-        for attr_key in ['PackagePrefix', 'PackageName', 'PackageID']:
-            ret.append(AttributeInfo(attr_key))
+        ret.append(AttributeInfo('ProjectDependencies', is_list=True, cli_short='-D', cli_long='--depend'))
+        ret.append(AttributeInfo('PackagePrefix', cli_short='-F', cli_long='--package-prefix'))
+        ret.append(AttributeInfo('PackageID', cli_short='-K', cli_long='--package-id'))
+        ret.append(AttributeInfo('PackageName', cli_short='-N', cli_long='--package-name'))
+        ret.append(AttributeInfo('XmlIncludeDirs', is_list=True, cli_short='-A', cli_long='--xml-include'))
+        ret.append(AttributeInfo('IncludeDirs', is_list=True, cli_short='-I', cli_long='--include-dir'))
+        ret.append(AttributeInfo('HdlLibraries', is_list=True, cli_short='-Y', cli_long='--primitive-library'))
+        ret.append(AttributeInfo('Libraries', is_list=True, cli_short='-y', cli_long='--component-library'))
         for attr_key in ['HdlTargets', 'HdlPlatforms', 'RccPlatforms',
                          'RccHdlPlatforms', 'ComponentLibraries',
-                         'HdlLibraries', 'ProjectDependencies',
-                         'Libraries', 'OnlyTargets', 'OnlyPlatforms',
-                         'ExcludeTargets', 'ExcludePlatforms',
-                         'XmlIncludeDirs', 'IncludeDirs']:
+                         'OnlyTargets', 'OnlyPlatforms',
+                         'ExcludeTargets', 'ExcludePlatforms']:
             ret.append(AttributeInfo(attr_key, is_list=True))
         return ret
 
