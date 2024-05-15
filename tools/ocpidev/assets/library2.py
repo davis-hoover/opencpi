@@ -172,7 +172,9 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
     def get_attr_infos(self):
         ret = []
         ret.append(AttributeInfo('ComponentLibraries', is_list=True))
+        # TODO investigate whether HdlLibraries is even allowed?
         ret.append(AttributeInfo('HdlLibraries', is_list=True))
+        ret.append(AttributeInfo('Libraries', is_list=True))
         ret.append(AttributeInfo('Workers', is_list=True))
         return ret
 
