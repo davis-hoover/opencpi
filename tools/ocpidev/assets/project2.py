@@ -163,7 +163,6 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         ret = None
         for component_library in self.component_libraries:
             for asset in component_library.workers:
-                print('comparing ' + asset.get_dir_abs_path() + ' ' + abs_path)
                 if asset.get_xml_abs_path() == abs_path:
                     ret = asset
                 elif asset.get_dir_abs_path() == abs_path:
@@ -321,8 +320,8 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
                 for lib in self.hdl_libraries:
                     ret.append(lib)
         # 3. library's dependent libraries
-        if (hdl_primitive.libraries is not None) and (len(hdl_primitive.libraries) > 0):
-            for lib in hdl_primitive.libraries:
+        if len(hdl_primitive.attrs['Libraries']) > 0:
+            for lib in hdl_primitive.attrs['Libraries']:
                 # split necessary because some Libraries are specified w/ package id, e.g., ocpi.core.bsv
                 ret.append(lib.split('.')[-1])
         return ret
@@ -404,7 +403,7 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
             hdl_target, hdl_platform)
         global_makefile.emit()
         # TODO delete below line
-        # os.system('cp ' + global_makefile.abs_path + ' /tmp/Makefile')
+        os.system('cp ' + global_makefile.abs_path + ' /tmp/Makefile')
         tmp = 'make -f ' + global_makefile.abs_path
         if _j > 1:
             tmp += ' -j ' + str(_j)

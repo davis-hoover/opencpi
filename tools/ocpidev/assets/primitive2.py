@@ -31,7 +31,6 @@ class HdlLibrary(AssetBase):
         self.root_tags = ['HdlLibrary']  # HDG section 5.2
         self.root_tags += ['HdlCore']  # HDG section 5.3
         AssetBase.__init__(self, dir_abs_path)
-        self.libraries = []
         self.source_files = []  # HDG section 5.2.1
         self.parse()
 
