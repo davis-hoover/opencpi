@@ -124,10 +124,6 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         self.parse(cli_dict)
         self.first = True
 
-    def get_root_tags(self):
-        # TODO replace get_root_tags() with self.root_tags
-        return self.root_tags
-
     def get_type(self):
         return 'project'
 
@@ -334,6 +330,29 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
             ret.append(lib)
         return ret
 
+    def get_hdl_worker_dependent_workers(self, project_registry, worker, hdl_platform):
+        ret = []
+        if worker.authoring_model == 'hdl':
+            for project in project_registry.projects:
+                for comp_library in project.component_libraries:
+                    for potential_subdevice in comp_library.workers:
+                        for support in potential_subdevice.supports:
+                            if support == worker.name:
+                                ret.append(potential_subdevice)
+        if worker.name == hdl_platform:
+            # TODO retrieve from registry, don't re-construct HdlPlatform
+            _hdl_platform = HdlPlatform(worker.get_dir_abs_path())
+            for cfg in _hdl_platform.configurations.values():
+                for dev in cfg.devices:
+                    _worker = None
+                    project = project_registry.get_worker_project(dev)
+                    for clib in project.component_libraries:
+                        for device in clib.workers:
+                            if device.name == dev:
+                                ret.append(device)
+                                break
+        return ret
+
     def get_hdl_assembly_dependent_workers(
             self, project_registry, hdl_assembly, hdl_platform):
         ret = []
@@ -380,7 +399,7 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         ret += '/target-' + get_hdl_target(hdl_platform) + '/'
         if (asset.get_type() == 'hdl primitive') or (asset.get_type() == 'hdl worker'):
             # TODO properly separate into extensible tool
-            ret += asset.name + get_worker_build_output_extension(hdl_platform)
+            ret += asset.name + '.' + get_worker_build_output_extension(hdl_platform)
         if (asset.get_type() == 'hdl assembly'):
             # TODO properly separate into extensible tool
             ret += tmp + '_rv.' + get_assembly_build_output_extension(hdl_platform)
@@ -403,7 +422,7 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
             hdl_target, hdl_platform)
         global_makefile.emit()
         # TODO delete below line
-        os.system('cp ' + global_makefile.abs_path + ' /tmp/Makefile')
+        # os.system('cp ' + global_makefile.abs_path + ' /tmp/Makefile')
         tmp = 'make -f ' + global_makefile.abs_path
         if _j > 1:
             tmp += ' -j ' + str(_j)
@@ -455,6 +474,14 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
             global_makefile.rules[tname].prerequisites.append(ppath)
             global_dependency_tree[asset].dependents.append(prim)
             lproj.append_rules_to_makefile(prim,
+                    project_registry, tool, hdl_target, hdl_platform)
+        for worker in self.get_hdl_worker_dependent_workers(project_registry, asset, hdl_platform):
+            ppath = self.get_build_output_path(worker,
+                    get_hdl_target(hdl_platform), hdl_platform)
+            global_makefile.rules[tname].prerequisites.append(ppath)
+            global_dependency_tree[asset].dependents.append(worker)
+            project = project_registry.get_worker_project(worker.name)
+            project.append_rules_to_makefile(worker,
                     project_registry, tool, hdl_target, hdl_platform)
         if asset.name == hdl_platform:
             _hdl_platform = HdlPlatform(asset.get_dir_abs_path())

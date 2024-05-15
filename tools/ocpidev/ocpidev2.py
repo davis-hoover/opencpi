@@ -81,7 +81,7 @@ class OCPIDev():
                 raise Exception('platform ' + platform + ' is not installed')
 
     def build(self, noun, hdl_target, hdl_platform, rcc_platform, _dir, _j):
-        if (hdl_target is not None) or (hdl_platform is not None):
+        if (hdl_target != '') or (hdl_platform != ''):
             if os.environ.get('XILINX_VIVADO') is not None:
                 msg = 'cannot run ocpidev2 when Vivado environment is sourced'
                 raise Exception(msg)
@@ -176,7 +176,7 @@ class OCPIDev():
             else:
                 assets_to_build.append(asset)
         else:
-            if (hdl_target is not None) or (hdl_platform is not None):
+            if (hdl_target != '') or (hdl_platform != ''):
                 for hdl_primitive in project.hdl_primitives:
                     assets_to_build.append(hdl_primitive)
                 for hdl_assembly in project.hdl_assemblies:
@@ -185,7 +185,7 @@ class OCPIDev():
                     for worker in component_library.workers:
                         if worker.get_type() == 'hdl worker':
                             assets_to_build.append(worker)
-            if rcc_platform is not None:
+            if rcc_platform != '':
                 self.install_rcc_platform_if_not_installed(
                         project_registry, rcc_platform)
                 for component_library in project.component_libraries:

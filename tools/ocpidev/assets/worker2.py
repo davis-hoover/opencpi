@@ -48,6 +48,7 @@ class Worker(AssetBase):
         else:
             # is a hdl platform worker case
             self.authoring_model = 'hdl'
+        self.supports = [] # PDG section 5.5.4
         self.parse()
 
     def get_paths_to_parse(self):
@@ -83,6 +84,12 @@ class Worker(AssetBase):
         self.attrs['Libraries'] = \
             [str(lib).replace('ocpi.core.', '')
              for lib in self.attrs['Libraries']]
+        if self.authoring_model == 'hdl':
+            for elem in self.get_parsed().iter():
+                if elem.tag.lower() == 'supports':
+                    for key, val in elem.attrib.items():
+                        if key.lower() == 'worker':
+                            self.supports.append(val)
 
     def get_type(self):
         return self.authoring_model + ' worker'

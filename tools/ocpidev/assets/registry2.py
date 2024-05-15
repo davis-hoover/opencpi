@@ -21,8 +21,6 @@ import os
 from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import AssetBase
 from _opencpi.assets.project2 import Project
-# TODO remove Worker import
-from _opencpi.assets.worker2 import Worker
 
 
 class ProjectRegistry():
@@ -46,7 +44,8 @@ class ProjectRegistry():
         registered_projects = []
         non_registered_projects = []
         for registered_project in self.projects:
-            registered_projects.append(str(registered_project.get_package_id()))
+            pid = str(registered_project.get_package_id())
+            registered_projects.append(pid)
         for dep in project.project_dependencies:
             if dep not in registered_projects:
                 non_registered_projects.append(dep)
@@ -135,11 +134,10 @@ class ProjectRegistry():
                         owd_path = discovery_path + '/' + entry + '/' + \
                             name + '.xml'
                         if os.path.isfile(owd_path):
-                            try:
-                                worker = Worker(owd_path)
-                                ret.append(worker.name)
-                            except:
-                                pass
+                            for clib in project.component_libraries:
+                                for asset in clib.workers:
+                                    if asset.get_xml_abs_path() == owd_path:
+                                        ret.append(asset.name)
         return ret
 
     def discover(
@@ -178,14 +176,15 @@ class ProjectRegistry():
 
     def unregister_project(self):
         project = Project(os.getcwd(), False)  # raises if not a project
-        os.system('unlink ' + self.abs_path + '/' + str(project.get_package_id()))
+        pid = str(project.get_package_id())
+        os.system('unlink ' + self.abs_path + '/' + pid)
 
 
 def test_ProjectRegistry(ret):
     passed = True
     try:
         project_registry = ProjectRegistry()
-    except:
+    except InvalidAssetError:
         passed = False
     log_pass_fail('testing ProjectRegistry', passed)
     if passed is False:
