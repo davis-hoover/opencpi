@@ -18,6 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/// @TODO delete this and move to OperatingPlan paradigm in DRC.cc/Drc.hh
 #include "RadioCtrlrConfigurator.hh"
 #include "UtilValidRanges.hh"
 #include "calc_ad9361_bb_rx_filters_digital.h" // AD9361_Rx_FIR_decimation_factor_t

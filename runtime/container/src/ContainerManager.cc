@@ -33,6 +33,7 @@
 #include "ContainerPort.hh"          // just for linkage hooks
 #include "ContainerApplication.hh"   // just for linkage hooks
 #if 1
+/// @TODO start deleting here
 #include "UtilLogPrefix.hh"         // just for linkage hooks
 #include "RadioCtrlr.hh"            // just for linkage hooks
 #include "RadioCtrlrConfigurator.hh"// just for linkage hooks
@@ -40,6 +41,8 @@
 #include "RadioCtrlrConfiguratorAD9361.hh"// just for linkage hooks
 #include "RadioCtrlrNoOSTuneResamp.hh"// just for linkage hooks
 #include "RadioCtrlrConfiguratorTuneResamp.hh"// just for linkage hooks
+/// @TODO stop deleting here
+#include "DRC.hh"// just for linkage hooks
 extern "C" {
 #include "ad9361_platform.h"
 }
@@ -247,13 +250,16 @@ namespace OCPI {
       pthread_workqueue_additem_np(NULL, NULL, NULL, NULL, NULL);
       // DRC support
 #if 1
+      /// @TODO start deleting here
       ((OCPI::DRC::DataStreamConfigLockRequest *)linkme)->get_data_stream_type();
       ((OCPI::DRC::RadioCtrlrNoOSTuneResamp *)linkme)->init();
       ((OCPI::DRC::Configurator *)linkme)->unlock_all();
       OCPI::DRC::ConfiguratorAD9361 c(NULL, NULL, NULL, NULL);
       OCPI::DRC::ConfiguratorTuneResamp cc(1.0, 2.0);
       //      ((OCPI::DRC::ConfiguratorTuneResamp*)linkme)->impose_constraints_single_pass();
-      ((OCPI::Util::LogPrefix *)linkme)->log_debug("hello");
+      /// @TODO stop deleting here
+      ((OCPI::Util::LogPrefix *)linkme)->log_debug("hello"); // should this be deleted?
+      ((OCPI::DRC::DRC *)linkme)->get_status();
       ad9361_opencpi.set_reset(0, 0);
 #endif
       return (intptr_t)&lzma_stream_buffer_decode & (intptr_t)&gpsd_drivers;

@@ -18,6 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/// @TODO migrate to DRC.cc/DRC.hh instead of RadioCtrlr
 #ifndef _OCPI_PROJECTS_RADIO_CTRLR_NO_OS_TUNE_RESAMP_HH
 #define _OCPI_PROJECTS_RADIO_CTRLR_NO_OS_TUNE_RESAMP_HH
 

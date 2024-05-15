@@ -1,0 +1,3 @@
+<Application>
+  <Instance Component='ocpi.platform.drc'/>
+</Application>
