@@ -20,5 +20,47 @@ OpenCPI v2.4.7 is here: https://gitlab.com/opencpi/opencpi/-/tree/v2.4.7/project
 |   Y     |    Y    |    N   |    Wild scenario. The XML file is the only one parsed. Library is discovered if and only if the case-insensitive `library` XML root tag exists.    |       |
 |   Y     |    Y    |    Y   |    Wild scenario. The XML file is the only one parsed. Library is discovered if and only if the case-insensitive `library` XML root tag exists.  |       |
 
+# Asset objects
+
+        CLI   XML   makefiles
+         |     |      |
+         V     V      V
+    asset object (inherits from AssetBase)
+         |     |      |
+         V     V      V
+       clean  build  create  
+
+# Top-Level Attribute, Exposing to CLI
+
+1. Top-level attributes are defined in the list returned be each asset class's get_attr_infos() method
+2. Top-level attributes are typically exposed to the CLI, in a name that is similar to the attribute (sometimes not)
+3. Typical CLI-to-XML flow during 'ocpidev2 create' is, e.g.,
+
+    args.include_dirs
+
+      =DICT()=>
+
+    mydict["include_dir"]
+
+      =replaceunderscore=>
+
+    mydict["includedir"]
+
+      =>
+
+    "includedir"
+
+      <=COMPARE=>
+
+    "includedir"
+
+      <== lower()
+
+    "IncludeDir" (matches attribute name defined in get_attr_infos()
+
+      <=
+
+    self.attrs["IncludeDir"]
+
 # Troubleshooting
 It is VERY useful to run OCPI_LOG_LEVEL=10 ocpidev2 ...args.... 2> log, and then less -r log to peruse the colorized output

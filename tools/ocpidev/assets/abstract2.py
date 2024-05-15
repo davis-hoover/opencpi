@@ -820,6 +820,11 @@ class AssetBase(AttributeBase):
         # instead
         # TODO - rename to self._abs_path
         self.abs_path = abs_path  # can be None, e.g., for base platform config
+        if self.abs_path is not None:
+            while '//' in self.abs_path:
+                self.abs_path = self.abs_path.replace('//', '/')
+            if self.abs_path.endswith('/'):
+                self.abs_path = self.abs_path[:,-1]
         self.name = self.get_name() # CDG section 6.1.1, section 8.1.1, etc
         if (self.abs_path is not None):
             if enable_path_existence_check:
@@ -901,7 +906,10 @@ class AssetBase(AttributeBase):
         return []
 
     def parse(self, cli_dict=None):
-        AttributeBase.parse(self, None, self.get_paths_to_parse(), cli_dict)
+        paths = self.get_paths_to_parse()
+        for path in paths:
+            Logger().debug('parsing ' + path)
+        AttributeBase.parse(self, None, paths, cli_dict)
         Logger().debug('parsed attributes: ' + str(self.attrs))
 
     @staticmethod
@@ -990,7 +998,6 @@ class AssetBase(AttributeBase):
         ret = []
         for abs_path in abs_paths:
             if os.path.exists(abs_path):
-                Logger().debug('parsing ' + abs_path)
                 ret.append(abs_path)
         return ret
 

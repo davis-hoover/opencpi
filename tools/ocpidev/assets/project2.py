@@ -150,7 +150,11 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         return ret
 
     def get_xml_abs_path(self):
+        # TODO use AssetBase method instead
         return self.abs_path + '/Project.xml'
+
+    def get_buildable_paths(self):
+        return [self.abs_path + '/hdl']
 
     def get_package_id(self):
         ret = self.attrs['PackagePrefix'] + "." + self.attrs['PackageName']
@@ -162,18 +166,20 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         """ returns None if asset not found """
         ret = None
         for component_library in self.component_libraries:
-            for worker in component_library.workers:
-                if worker.abs_path == abs_path:
-                    ret = Worker(abs_path + '/' + worker.name + '.xml')
-        for application in self.applications:
-            if application.abs_path == abs_path:
-                ret = Application(abs_path)
-        for hdl_primitive in self.hdl_primitives:
-            if hdl_primitive.abs_path == abs_path:
-                ret = HdlLibrary(abs_path)
-        for hdl_assembly in self.hdl_assemblies:
-            if hdl_assembly.abs_path == abs_path:
-                ret = HdlAssembly(abs_path)
+            for asset in component_library.workers:
+                if asset.get_xml_abs_path() == abs_path:
+                    ret = asset
+                elif asset.get_dir_abs_path() == abs_path:
+                    ret = asset
+        for asset in self.applications:
+            if asset.get_dir_abs_path() == abs_path:
+                ret = asset
+        for asset in self.hdl_primitives:
+            if asset.get_dir_abs_path() == abs_path:
+                ret = asset
+        for asset in self.hdl_assemblies:
+            if asset.get_dir_abs_path() == abs_path:
+                ret = asset
         return ret
 
     def get_paths_to_parse(self):
@@ -318,8 +324,8 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
                 for lib in self.hdl_libraries:
                     ret.append(lib)
         # 3. library's dependent libraries
-        if (hdl_primitive.libraries is not None) and (len(hdl_primitive.libraries) > 0):
-            for lib in hdl_primitive.libraries:
+        if len(hdl_primitive.attrs['Libraries']) > 0:
+            for lib in hdl_primitive.attrs['Libraries']:
                 # split necessary because some Libraries are specified w/ package id, e.g., ocpi.core.bsv
                 ret.append(lib.split('.')[-1])
         return ret
@@ -360,8 +366,8 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
                                 ret.append(val)
         return ret
 
-    def get_build_output_path(self, asset, hdl_target = None,
-            hdl_platform = None):
+    def get_build_output_path(self, asset, hdl_target = '',
+            hdl_platform = ''):
         ret = asset.get_dir_abs_path()
         tmp = ''
         if asset.get_type() == 'hdl assembly':
@@ -385,7 +391,7 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         return ret
 
     def build_asset(self, asset, project_registry, tool,
-            hdl_target = None, hdl_platform = None, rcc_platform = None, _j = 1):
+            hdl_target = '', hdl_platform = '', rcc_platform = '', _j = 1):
         fs = TemporaryFilesystem()
         os.system('mkdir -p ' + fs.abs_path)
         global_makefile.abs_path = fs.abs_path + '/Makefile'
@@ -401,7 +407,7 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
             hdl_target, hdl_platform)
         global_makefile.emit()
         # TODO delete below line
-        # os.system('cp ' + global_makefile.abs_path + ' /tmp/Makefile')
+        os.system('cp ' + global_makefile.abs_path + ' /tmp/Makefile')
         tmp = 'make -f ' + global_makefile.abs_path
         if _j > 1:
             tmp += ' -j ' + str(_j)
