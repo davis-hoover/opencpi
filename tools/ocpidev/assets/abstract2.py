@@ -763,12 +763,9 @@ class AttributeBase():
                     ret = ret2
         else:
             for attr_info in self.get_attr_infos():
-               if attr.lower() == attr_info.key.lower():
-                  if attr_info.cli is not None:
-                      try:
-                          ret = cli_dict[attr_info.cli[1].replace('-', '')]
-                      except:
-                          pass
+                if attr.lower() == attr_info.key.lower():
+                    if attr_info.cli is not None:
+                        ret = cli_dict[attr_info.cli[1].replace('-', '')]
         return ret
 
     def get_attr(self, attr, elem=None, makefile_abs_paths=[], cli_dict=None):
