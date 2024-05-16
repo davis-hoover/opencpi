@@ -82,17 +82,6 @@ project_templates['.gitattributes'] = """
 
 project_templates['Project.xml'] = g_asset_template
 
-project_templates['.project'] = ("""<?xml version="1.0" encoding="UTF-8"?>
-<projectDescription>
-  <name>{{asset.determined_package_id}}</name>
-  <comment></comment>
-  <projects></projects>
-  <buildSpec></buildSpec>
-  <natures></natures>
-</projectDescription>
-\n""")
-
-
 class Project(SpecsDirectory, Discoverer, AssetBase):
     """ Component Development Guide section 14 """
 
