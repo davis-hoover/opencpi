@@ -304,6 +304,7 @@ class OCPIDev():
         Logger().warn('refresh is unecessary in ocpidev2')
 
     def apply(self, noun):
+        # all patches should be created from the project perspective
         if noun == 'patches':
             project_registry = ProjectRegistry()
             for project in project_registry.projects:
