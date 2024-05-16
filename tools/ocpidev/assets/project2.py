@@ -82,17 +82,6 @@ project_templates['.gitattributes'] = """
 
 project_templates['Project.xml'] = g_asset_template
 
-project_templates['.project'] = ("""<?xml version="1.0" encoding="UTF-8"?>
-<projectDescription>
-  <name>{{asset.determined_package_id}}</name>
-  <comment></comment>
-  <projects></projects>
-  <buildSpec></buildSpec>
-  <natures></natures>
-</projectDescription>
-\n""")
-
-
 class Project(SpecsDirectory, Discoverer, AssetBase):
     """ Component Development Guide section 14 """
 
@@ -130,14 +119,18 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
     def get_attr_infos(self):
         ret = []
         # Attributes provided (partially) in CDG 10.1 Table 7
-        for attr_key in ['PackagePrefix', 'PackageName', 'PackageID']:
-            ret.append(AttributeInfo(attr_key))
+        ret.append(AttributeInfo('ProjectDependencies', is_list=True, cli=('-D', '--depend')))
+        ret.append(AttributeInfo('PackagePrefix', cli=('-F', '--package-prefix')))
+        ret.append(AttributeInfo('PackageID', cli=('-K', '--package-id')))
+        ret.append(AttributeInfo('PackageName', cli=('-N', '--package-name')))
+        ret.append(AttributeInfo('XmlIncludeDirs', is_list=True, cli=('-A', '--xml-include')))
+        ret.append(AttributeInfo('IncludeDirs', is_list=True, cli=('-I', '--include-dir')))
+        ret.append(AttributeInfo('HdlLibraries', is_list=True, cli=('-Y', '--primitive-library')))
+        ret.append(AttributeInfo('Libraries', is_list=True, cli=('-y', '--component-library')))
         for attr_key in ['HdlTargets', 'HdlPlatforms', 'RccPlatforms',
                          'RccHdlPlatforms', 'ComponentLibraries',
-                         'HdlLibraries', 'ProjectDependencies',
-                         'Libraries', 'OnlyTargets', 'OnlyPlatforms',
-                         'ExcludeTargets', 'ExcludePlatforms',
-                         'XmlIncludeDirs', 'IncludeDirs']:
+                         'OnlyTargets', 'OnlyPlatforms',
+                         'ExcludeTargets', 'ExcludePlatforms']:
             ret.append(AttributeInfo(attr_key, is_list=True))
         return ret
 

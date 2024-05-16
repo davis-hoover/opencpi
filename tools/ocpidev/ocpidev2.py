@@ -450,15 +450,10 @@ def unittest():
 
 
 def add_create_arguments(parser):
-    # Important that dest values match get_attr_info() attributes for the Project class
-    parser.add_argument('-D', '--depend', nargs='?', dest='project_dependencies', default=None)
-    parser.add_argument('-F', '--package-prefix', nargs='?', default='')
-    parser.add_argument('-K', '--package-id', nargs='?', default='')
-    parser.add_argument('-N', '--package-name', nargs='?', default='')
-    parser.add_argument('-A', '--xml-include', nargs='?', dest='xml_include_dirs', default=None)
-    parser.add_argument('-I', '--include-dir', nargs='?', dest='include_dirs', default='')
-    parser.add_argument('-Y', '--primitive-library', nargs='?', dest='hdl_libraries', default='')
-    parser.add_argument('-y', '--component-library', nargs='?', dest='libraries', default='')
+    project = Project('', False, None)
+    for attr in project.get_attr_infos():
+        if attr.cli is not None:
+            parser.add_argument(attr.cli[0], attr.cli[1], nargs='?', default='')
     return parser
 
 
