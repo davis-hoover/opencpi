@@ -101,6 +101,7 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         self.hdl_slots = []
         self.hdl_platforms = []
         # end of bullets at top of CDG section 14
+        self.assets = []  # TODO replaces above bullets with self.assets
         # start of CDG section 14.5 (EXTERNAL-to-project, i.e., DEPENDENCY)
         # HDG section 5 "The built-in ocpi.core project includes several HDL
         # primitive libraries, and some are always available for use by all
@@ -199,6 +200,10 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
             Logger().info('discovering project ' + tmp)
             self.discover_components()
             self.discover_component_libraries()
+            for component_library in self.component_libraries:
+                for asset in component_library.workers:
+                    # todo replace self.component_libraries with self.assets
+                    self.assets.append(asset)
         # TODO fix below optimization line
         if do_hdl_primitives:
             self.discover_applications()
@@ -267,13 +272,19 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
     def discover_applications(self):
         # TODO check if there is an allowlist, and if so, pass to below call
         self.discover_dir_assets('applications')
+        # TODO move from self.applications to generic self.assets
+        self.assets.extend(self.applications)
 
     def discover_hdl_primitives(self):
         self.discover_dir_assets('hdl/primitives')
+        # TODO move from self.applications to generic self.assets
+        self.assets.extend(self.hdl_primitives)
 
     def discover_hdl_assemblies(self):
         # TODO check if there is an allowlist, and if so, pass to below call
         self.discover_dir_assets('hdl/assemblies')
+        # TODO move from self.applications to generic self.assets
+        self.assets.extend(self.hdl_assemblies)
 
     def discover_hdl_cards(self):
         discovery_path = self.abs_path + '/hdl/cards/specs'
@@ -283,12 +294,16 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
                 try:
                     asset = HdlCard(discovery_path + '/' + _dir)
                     self.append_discovered_asset(asset)
+                    # TODO move from self.hdl_cards to generic self.assets
+                    #self.assets.extend(asset)
                 except InvalidAssetError:
                     pass
 
     def discover_hdl_platforms(self):
         # TODO check if there is an allowlist, and if so, pass to below call
         self.discover_dir_assets('hdl/platforms')
+        # TODO move from self.hdl_platforms to generic self.assets
+        self.hdl_platforms.extend(self.hdl_platforms)
 
     def get_built_in_hdl_libraries(self):
         """ HDG section 5 "The built-in ocpi.core project includes several HDL

@@ -160,6 +160,13 @@ class Logger(Environment):
         self.log(0, 'ERROR: ' + msg, '\033[91m')
 
 
+class System():
+    def __init__(self, cmd):
+        Logger().debug('making system call: ' + cmd)
+        if os.system(cmd):
+            raise Exception('cmd failed: ' + cmd)
+
+
 class TemporaryFilesystem():
     """ A convenient directory for doing temporary work. Directory is deleted when
         this object goes out of scope. """

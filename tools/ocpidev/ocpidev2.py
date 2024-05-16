@@ -301,7 +301,38 @@ class OCPIDev():
         raise Exception('run is not supported at this time')
 
     def refresh(self, noun):
-        pass
+        Logger().warn('refresh is unecessary in ocpidev2')
+
+    def apply(self, noun):
+        if noun == 'patches':
+            project_registry = ProjectRegistry()
+            for project in project_registry.projects:
+                patches_dir_abs_path = project.abs_path + '/patches'
+                if os.path.isdir(patches_dir_abs_path):
+                    for patch_dir_name in os.listdir(patches_dir_abs_path):
+                        patch_dir_abs_path = patches_dir_abs_path + '/' + patch_dir_name
+                        if os.path.isdir(patch_dir_abs_path):
+                            authoring_model = ''
+                            asset_name = patch_dir_name
+                            if asset_name.endswith('.hdl') or asset_name.endswith('.rcc') or asset_name.endswith('.ocl') or asset_name.endswith('.test'):
+                                tmp = asset_name.rsplit('.', 1)
+                                asset_name = tmp[0]
+                                authoring_model = tmp[1]
+                            pid = asset_name.rsplit('.', 1)[0]
+                            for p2 in project_registry.projects:
+                                if p2.get_package_id() == pid:
+                                    for patch_file_name in os.listdir(patch_dir_abs_path):
+                                        patch_file_abs_path = patch_dir_abs_path + '/' + patch_file_name
+                                        if os.path.isfile(patch_file_abs_path):
+                                            for asset in p2.assets:
+                                                if asset.name == asset_name.split('.')[-1]:
+                                                    if (asset.get_type() == 'hdl worker') or (asset.get_type() == 'rcc worker') or (asset.get_type() == 'ocl worker'):
+                                                        if asset.authoring_model != authoring_model:
+                                                            continue
+                                                        cmd = 'cd ' + p2.abs_path + ' && patch -p0 --forward < ' + patch_file_abs_path + ' || true'
+                                                        System(cmd)
+        else:
+            raise Exception('apply does not support ' + noun)
 
 
 # TODO delete this and probably re-write other Tool Layers (TL) in python
@@ -486,7 +517,8 @@ if __name__ == '__main__':
         nouns = ['registry', 'project', 'projects', 'libraries', 'components',
                  'workers']
         if (args.noun is not None) and (args.noun not in nouns):
-            raise Exception('noun ' + str(args.noun) + ' is not supported')
+            if args.verb != 'apply':
+                raise Exception('noun ' + str(args.noun) + ' is not supported')
         signal.signal(signal.SIGINT, mysigint)
         hdl_build_tool = LegacyOCPIDevHDLBuildTool()
         _dir = args.d
@@ -520,6 +552,8 @@ if __name__ == '__main__':
                 exit_status = 0
             else:
                 exit_status = 1
+        elif args.verb == 'apply':
+            OCPIDev(hdl_build_tool).apply(args.noun)
         else:
             raise Exception('verb ' + args.verb + ' is not supported')
     except Exception as exception:
