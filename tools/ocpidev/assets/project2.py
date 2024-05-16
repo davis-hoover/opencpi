@@ -348,10 +348,10 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
             for cfg in _hdl_platform.configurations.values():
                 for dev in cfg.devices:
                     _worker = None
-                    project = project_registry.get_worker_project(dev)
+                    project = project_registry.get_worker_project(dev.name)
                     for clib in project.component_libraries:
                         for device in clib.workers:
-                            if device.name == dev:
+                            if device.name == dev.name:
                                 ret.append(device)
                                 break
         return ret
