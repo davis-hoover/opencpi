@@ -452,8 +452,8 @@ def unittest():
 def add_create_arguments(parser):
     project = Project('', False, None)
     for attr in project.get_attr_infos():
-        if attr.cli_short is not None or attr.cli_short is not None:
-            parser.add_argument(attr.cli_short, attr.cli_long, nargs='?', default='')
+        if attr.cli is not None:
+            parser.add_argument(attr.cli[0], attr.cli[1], nargs='?', default='')
     return parser
 
 
