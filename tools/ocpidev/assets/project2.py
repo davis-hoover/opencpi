@@ -623,6 +623,7 @@ def test_Project_discover_component_libraries(ret):
             ff.write('<' + ext  + 'Worker/>\n')
             ff.close()
     uut = Project(project_abs_path)
+    uut.discover()
     if len(uut.component_libraries) == 1:
         if uut.component_libraries[0].name != 'components':
             passed = False
