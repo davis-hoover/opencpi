@@ -143,9 +143,16 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         return [self.abs_path + '/hdl']
 
     def get_package_id(self):
-        ret = self.attrs['PackagePrefix'] + "." + self.attrs['PackageName']
-        if self.attrs['PackageID'] != '':
-            ret = self.attrs['PackageID']
+        ret = ''
+        if self.attrs['PackagePrefix'] == '':
+            ret += 'local'
+        else:
+            ret += self.attrs['PackagePrefix']
+        ret += '.'
+        if self.attrs['PackageName'] == '':
+            ret += self.name
+        else:
+            ret += self.attrs['PackageName']
         return ret
 
     def get_asset(self, abs_path):
