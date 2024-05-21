@@ -101,6 +101,10 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         self.hdl_slots = []
         self.hdl_platforms = []
         # end of bullets at top of CDG section 14
+        # start of CDG section 14.2.3
+        self.component_library_locations = ['components', 'hdl/devices', 'hdl/cards']
+        self.component_library_locations += ['hdl/adapters', 'hdl/platforms']
+        # end of CDG section 14.2.3
         self.assets = []  # TODO replaces above bullets with self.assets
         # start of CDG section 14.5 (EXTERNAL-to-project, i.e., DEPENDENCY)
         # HDG section 5 "The built-in ocpi.core project includes several HDL
@@ -110,9 +114,6 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         self.hdl_libraries += ['cdc', 'sdp', 'axi']
         # initialize below line according to CDG Table 8
         self.project_dependencies = ['ocpi.core']
-        # CDG section 14.2.3
-        self.component_library_locations = ['components', 'hdl/devices', 'hdl/cards']
-        self.component_library_locations += ['hdl/adapters', 'hdl/platforms']
         # end of CDG section 14.5
         self.parse(cli_dict)
         self.first = True
