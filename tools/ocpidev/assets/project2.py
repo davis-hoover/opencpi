@@ -231,6 +231,7 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
     def get_existing_dir_abs_paths_for_clib_consideration(self):
         """ returns a list of absolute paths to directories in standard
             component libraries locations that are guaranteed to exist """
+        # CDG section 14.2.3
         dir_abs_paths = []
         for _dir in self.component_library_locations:
             dir_abs_path = self.get_dir_abs_path() + '/' + _dir
