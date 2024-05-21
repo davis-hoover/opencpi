@@ -85,7 +85,7 @@ class OCPIDev():
             if os.environ.get('XILINX_VIVADO') is not None:
                 msg = 'cannot run ocpidev2 when Vivado environment is sourced'
                 raise Exception(msg)
-        if rcc_platform is not None:
+        if rcc_platform != '':
             self.throw_if_not_installed(rcc_platform)
         # if hdl_platform is not None:
         #     self.throw_if_not_installed(hdl_platform)
@@ -348,7 +348,7 @@ class LegacyOCPIDevHDLBuildTool():
             'LegacyOCPIDevHDLBuildTool: exporting project ' +
             project.abs_path.split('/')[-1])
         hdl = (hdl_platform is not None) or (hdl_target is not None)
-        if hdl or (rcc_platform is not None):
+        if hdl or (rcc_platform != ''):
             cmd = 'ocpidev build -d ' + project.abs_path + ' --no-doc'
             if Environment().ocpi_log_level < 8:
                 cmd += ' >/dev/null 2>&1'
@@ -365,11 +365,12 @@ class LegacyOCPIDevHDLBuildTool():
             if str(proj.get_package_id()) == 'ocpi.core':
                 tmp_path = proj.abs_path + '/rcc/platforms/'
                 if not os.path.isdir(tmp_path + rcc_platform + '/gen'):
+                    Logger().debug('ocpiadmin install platform ' + rcc_platform)
                     if os.system('ocpiadmin install platform ' + rcc_platform) != 0:
                         raise Exception('failed to build rcc platform ' + rcc_platform)
 
-    def get_build_output_path(self, asset, hdl_target = '',
-            hdl_platform = ''):
+    def get_build_output_path(self, asset, hdl_target='',
+            hdl_platform=''):
         ret = asset.abs_path
         tmp = ''
         if asset.get_type() == 'hdl assembly':
@@ -409,8 +410,8 @@ class LegacyOCPIDevHDLBuildTool():
     #            makefile.rules[tar].recipe = get_gnu_make_recipe(tar)
     #    makefile.emit()
     def build_asset(self, project, asset, tname,
-            hdl_target = None, hdl_platform = None, rcc_platform = None,
-            no_doc = False, project_registry = None, dependency_tree = None):
+            hdl_target='', hdl_platform='', rcc_platform='',
+            no_doc=False, project_registry=None, dependency_tree=None):
         _j = 1
         # try:
         if self.first:
@@ -435,6 +436,8 @@ class LegacyOCPIDevHDLBuildTool():
             cmd += ' --hdl-target ' + hdl_target
         if hdl_platform != '':
             cmd += ' --hdl-platform ' + hdl_platform
+        if rcc_platform != '':
+            cmd += ' --rcc-platform ' + rcc_platform
         if no_doc:
             cmd += ' --no-doc'
         if Environment().ocpi_log_level < 8:
@@ -447,6 +450,7 @@ class LegacyOCPIDevHDLBuildTool():
         if (Environment().ocpi_log_level >= 8) and (_j > 1):
             cmd += '@echo [INFO] building ' + asset.get_type() + ' ' + asset.name + ' done'
         global_makefile.rules[tname].recipe = cmd
+        Logger().debug('creating make rule: ' + str(global_makefile.rules[tname]))
         #if os.system(cmd) != 0:
         #    raise Exception('build failed ')
         #os.system('touch ' + asset.abs_path + '/.build')

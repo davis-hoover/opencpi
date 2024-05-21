@@ -286,13 +286,13 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
 
     def discover_hdl_primitives(self):
         self.discover_dir_assets('hdl/primitives')
-        # TODO move from self.applications to generic self.assets
+        # TODO move from self.hdl_primitives to generic self.assets
         self.assets.extend(self.hdl_primitives)
 
     def discover_hdl_assemblies(self):
         # TODO check if there is an allowlist, and if so, pass to below call
         self.discover_dir_assets('hdl/assemblies')
-        # TODO move from self.applications to generic self.assets
+        # TODO move from self.hdl_assemblies to generic self.assets
         self.assets.extend(self.hdl_assemblies)
 
     def discover_hdl_cards(self):
@@ -340,7 +340,9 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         return ret
 
     def get_hdl_worker_dependent_libraries(self, comp_library, worker):
-        ret = self.get_built_in_hdl_libraries()
+        ret = []
+        if worker.authoring_model == 'hdl':
+            ret.extend(self.get_built_in_hdl_libraries())
         # TODO investigate whether HdlLibraries is even allowed?
         for lib in comp_library.attrs['HdlLibraries']:
             ret.append(lib)
@@ -401,8 +403,9 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
                                 ret.append(val)
         return ret
 
-    def get_build_output_path(self, asset, hdl_target = '',
-            hdl_platform = ''):
+    # TODO properly separate into extensible tool
+    def get_build_artifact_abs_path(self, asset, hdl_target='',
+            hdl_platform='', rcc_platform=''):
         ret = asset.get_dir_abs_path()
         tmp = ''
         if asset.get_type() == 'hdl assembly':
@@ -416,13 +419,17 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
                     tmp += asset.containers[0].attrs['Config'] + '_'
                 tmp += asset.containers[0].name
             ret += '/container-' + tmp + '_'
-        ret += '/target-' + get_hdl_target(hdl_platform) + '/'
-        if (asset.get_type() == 'hdl primitive') or (asset.get_type() == 'hdl worker'):
-            # TODO properly separate into extensible tool
-            ret += asset.name + '.' + get_worker_build_output_extension(hdl_platform)
+        ret += '/target-' + hdl_target + '/'
+        ret += asset.name
+        is_assembly = True
+        if (asset.get_type() == 'hdl primitive') or \
+           (asset.get_type() == 'hdl worker') or \
+           (asset.get_type() == 'rcc worker'):
+            is_assembly = False
         if (asset.get_type() == 'hdl assembly'):
-            # TODO properly separate into extensible tool
-            ret += tmp + '_rv.' + get_assembly_build_output_extension(hdl_platform)
+            ret += tmp + '_rv'
+        ret += '.' + get_build_artifact_extension(hdl_platform, rcc_platform,
+                is_assembly)
         return ret
 
     def build_asset(self, asset, project_registry, tool,
@@ -430,8 +437,9 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         fs = TemporaryFilesystem()
         os.system('mkdir -p ' + fs.abs_path)
         global_makefile.abs_path = fs.abs_path + '/Makefile'
-        target_name = self.get_build_output_path(asset, get_hdl_target(hdl_platform),
-                hdl_platform)
+        model_target = get_target(hdl_platform, rcc_platform)
+        target_name = self.get_build_artifact_abs_path(asset, model_target,
+                hdl_platform, rcc_platform)
         Logger().info('gathering dependencies')
         global_makefile.rules['all'] = GNUMakeRule()
         target = GNUMakeTarget('all', True)
@@ -439,10 +447,8 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         global_makefile.rules['all'].prerequisites.append(target_name)
         global_dependency_tree[asset] = DependencyTree()
         self.append_rules_to_makefile(asset, project_registry, tool,
-            hdl_target, hdl_platform)
+            hdl_target, hdl_platform, rcc_platform)
         global_makefile.emit()
-        # TODO delete below line
-        # os.system('cp ' + global_makefile.abs_path + ' /tmp/Makefile')
         tmp = 'make -f ' + global_makefile.abs_path
         if _j > 1:
             tmp += ' -j ' + str(_j)
@@ -450,7 +456,7 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
             raise Exception('build failed')
 
     def append_prim_rules_to_makefile(self, asset, project_registry, tool,
-            tname, hdl_target = None, hdl_platform = None):
+            tname, hdl_target='', hdl_platform=''):
         bilibs = self.get_built_in_hdl_libraries()
         #for name in self.get_hdl_primitive_dependent_libraries():
         for name in self.get_hdl_primitive_dependent_libraries(asset):
@@ -461,7 +467,9 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
                 if hdl_primitive.name == name:
                     prim = hdl_primitive
                     break
-            ppath = self.get_build_output_path(prim, get_hdl_target(hdl_platform),
+            print('hdl_platform ' + hdl_platform)
+            target = get_target(hdl_platform, '')
+            ppath = self.get_build_artifact_abs_path(prim, target,
                     hdl_platform)
             global_makefile.rules[tname].prerequisites.append(ppath)
             global_dependency_tree[asset].dependents.append(prim)
@@ -471,7 +479,7 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
             self.first = False
 
     def append_worker_rules_to_makefile(self, asset, project_registry, tool,
-            tname, hdl_target = None, hdl_platform = None):
+            tname, hdl_target='', hdl_platform='', rcc_platform=''):
         wproj = project_registry.get_worker_project(asset.name)
         libs = []
         for lib in wproj.component_libraries:
@@ -481,6 +489,7 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
                         libs = wproj.get_hdl_worker_dependent_libraries(
                                 lib, asset)
                         break
+        target = get_target(hdl_platform, rcc_platform)
         for name in libs:
             lproj = project_registry.get_hdl_primitive_project(name,
                     wproj)
@@ -489,15 +498,13 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
                 if hdl_primitive.name == name:
                     prim = hdl_primitive
                     break
-            ppath = self.get_build_output_path(prim, get_hdl_target(hdl_platform),
-                    hdl_platform)
+            ppath = self.get_build_artifact_abs_path(prim, target, hdl_platform)
             global_makefile.rules[tname].prerequisites.append(ppath)
             global_dependency_tree[asset].dependents.append(prim)
             lproj.append_rules_to_makefile(prim,
                     project_registry, tool, hdl_target, hdl_platform)
         for worker in self.get_hdl_worker_dependent_workers(project_registry, asset, hdl_platform):
-            ppath = self.get_build_output_path(worker,
-                    get_hdl_target(hdl_platform), hdl_platform)
+            ppath = self.get_build_artifact_abs_path(worker, target, hdl_platform)
             global_makefile.rules[tname].prerequisites.append(ppath)
             global_dependency_tree[asset].dependents.append(worker)
             project = project_registry.get_worker_project(worker.name)
@@ -514,7 +521,7 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
                             if device.name == dev.name:
                                 _worker = device
                                 break
-                    wpath = self.get_build_output_path(_worker, get_hdl_target(hdl_platform),
+                    wpath = self.get_build_artifact_abs_path(_worker, target,
                             hdl_platform)
                     global_makefile.rules[tname].prerequisites.append(wpath)
                     global_dependency_tree[asset].dependents.append(_worker)
@@ -522,7 +529,7 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
                             tool, hdl_target, hdl_platform)
 
     def append_hdl_assembly_rules_to_makefile(self, asset, project_registry, tool,
-            tname, hdl_target = None, hdl_platform = None):
+            tname, hdl_target='', hdl_platform=''):
         for name in self.get_hdl_assembly_dependent_workers(
                 project_registry, asset, hdl_platform):
             project = project_registry.get_worker_project(name)
@@ -533,7 +540,8 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
                         if worker.authoring_model == 'hdl':
                             _worker = worker
                             break
-            wpath = self.get_build_output_path(_worker, get_hdl_target(hdl_platform),
+            target = get_target(hdl_platform, '')
+            wpath = self.get_build_artifact_abs_path(_worker, target,
                     hdl_platform)
             global_makefile.rules[tname].prerequisites.append(wpath)
             global_dependency_tree[asset].dependents.append(_worker)
@@ -541,10 +549,11 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
                     hdl_target, hdl_platform)
 
     def append_rules_to_makefile(self, asset, project_registry, tool,
-            hdl_target = None, hdl_platform = None):
+            hdl_target='', hdl_platform='', rcc_platform=''):
         """ here the CDG section 4.2 heirarchy is automated """
         #tname = asset.name + '_' + asset.get_type().replace(' ', '_')
-        tname = self.get_build_output_path(asset, get_hdl_target(hdl_platform), hdl_platform)
+        target = get_target(hdl_platform, rcc_platform)
+        tname = self.get_build_artifact_abs_path(asset, target, hdl_platform)
         global_makefile.rules[tname] = GNUMakeRule()
         target = GNUMakeTarget(tname)
         global_makefile.rules[tname].targets.append(target)
@@ -552,16 +561,16 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         if asset.get_type() == 'hdl primitive':
             self.append_prim_rules_to_makefile(asset, project_registry, tool,
                     tname, hdl_target, hdl_platform)
-        if asset.get_type() == 'hdl worker':
+        if (asset.get_type() == 'hdl worker') or (asset.get_type() == 'rcc worker'):
             self.append_worker_rules_to_makefile(asset, project_registry, tool,
-                    tname, hdl_target, hdl_platform)
+                    tname, hdl_target, hdl_platform, rcc_platform)
         if asset.get_type() == 'hdl assembly':
             self.append_hdl_assembly_rules_to_makefile(asset, project_registry,
                     tool, tname, hdl_target, hdl_platform)
         # build single asset whose dependencies, if enabled, have already been
         # built
         tool.build_asset(self, asset, tname, hdl_target, hdl_platform,
-                False, project_registry, global_dependency_tree)
+                rcc_platform, project_registry, global_dependency_tree)
         #tool.append_rules_to_makefile(asset, tname, hdl_target, hdl_platform,
         #        False, project_registry)
 

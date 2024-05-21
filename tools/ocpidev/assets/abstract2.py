@@ -52,52 +52,44 @@ def get_xml_val_list(val):
 
 
 # TODO probably a single authoritative xml is needed to parse this from....
-def get_hdl_target(hdl_platform):
+def get_target(hdl_platform, rcc_platform=''):
     # TODO parse tools/include/hdl/hdl-targets.xml, hdl/platforms/ml605/ml605.mk instead of below code
     ret = hdl_platform
-    if hdl_platform == 'zed':
-        ret = 'zynq'
-    elif hdl_platform == 'zcu106':
-        ret = 'zynq_ultra'
-    elif hdl_platform == 'zed_ise':
-        ret = 'zynq_ise'
-    elif hdl_platform == 'zcu104':
-        ret = 'zynq_ultra'
-    elif hdl_platform == 'zed_ether':
-        ret = 'zynq'
-    elif hdl_platform == 'ml605':
-        ret = 'virtex6'
-    elif hdl_platform == 'alst4x':
-        ret = 'stratix'
-    elif hdl_platform == 'alst4':
-        ret = 'stratix'
-    elif hdl_platform == 'matchstiq_z1':
-        ret = 'zynq'
-    elif hdl_platform == 'e31x':
-        ret = 'zynq'
-    elif hdl_platform == 'zrf8_48dr':
-        ret = 'zynq_ultra'
+    if rcc_platform == '':
+        if hdl_platform == 'zed':
+            ret = 'zynq'
+        elif hdl_platform == 'zcu106':
+            ret = 'zynq_ultra'
+        elif hdl_platform == 'zed_ise':
+            ret = 'zynq_ise'
+        elif hdl_platform == 'zcu104':
+            ret = 'zynq_ultra'
+        elif hdl_platform == 'zed_ether':
+            ret = 'zynq'
+        elif hdl_platform == 'ml605':
+            ret = 'virtex6'
+        elif hdl_platform == 'alst4x':
+            ret = 'stratix'
+        elif hdl_platform == 'alst4':
+            ret = 'stratix'
+        elif hdl_platform == 'matchstiq_z1':
+            ret = 'zynq'
+        elif hdl_platform == 'e31x':
+            ret = 'zynq'
+        elif hdl_platform == 'zrf8_48dr':
+            ret = 'zynq_ultra'
+    else:
+        ret = rcc_platform
     return ret
 
 
 # TODO properly separate into extensible tool
-def get_worker_build_output_extension(hdl_platform):
-    ret = 'edf'
-    target = get_hdl_target(hdl_platform)
-    if target.startswith('virtex'):
-        ret = 'qsf'
-    elif target.startswith('stratix'):
-        ret = 'qsf'
-    return ret
-
-# TODO properly separate into extensible tool
-def get_assembly_build_output_extension(hdl_platform):
-    ret = 'bitz'
-    target = get_hdl_target(hdl_platform)
-    if target.startswith('virtex'):
-        ret = 'sof'
-    elif target.startswith('stratix'):
-        ret = 'sof'
+def get_build_artifact_extension(hdl_platform='', rcc_platform='',
+        is_assembly=False):
+    ret = 'bitz' if is_assembly else 'edf'
+    target = get_target(hdl_platform, rcc_platform)
+    if target.startswith('virtex') or target.startswith('stratix'):
+        ret = 'sof' if is_assembly else 'qsf'
     return ret
 
 
