@@ -110,6 +110,9 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         self.hdl_libraries += ['cdc', 'sdp', 'axi']
         # initialize below line according to CDG Table 8
         self.project_dependencies = ['ocpi.core']
+        # CDG section 14.2.3
+        self.component_library_locations = ['components', 'hdl/devices', 'hdl/cards']
+        self.component_library_locations += ['hdl/adapters', 'hdl/platforms']
         # end of CDG section 14.5
         self.parse(cli_dict)
         self.first = True
@@ -227,11 +230,8 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
     def get_existing_dir_abs_paths_for_clib_consideration(self):
         """ returns a list of absolute paths to directories in standard
             component libraries locations that are guaranteed to exist """
-        # CDG section 14.2.3
-        dirs = ['components', 'hdl/devices', 'hdl/cards']
-        dirs += ['hdl/adapters', 'hdl/platforms']
         dir_abs_paths = []
-        for _dir in dirs:
+        for _dir in self.component_library_locations:
             dir_abs_path = self.get_dir_abs_path() + '/' + _dir
             if os.path.isdir(dir_abs_path):
                 # add to dir_abs_path the absolute path to the directories
