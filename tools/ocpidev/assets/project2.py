@@ -159,6 +159,17 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
             ret += self.attrs['PackageName']
         return ret
 
+    def get_worker_by_name(self, name, authoring_model=''):
+        ret = None
+        for component_library in self.component_libraries:
+            for worker in component_library.workers:
+                if worker.name == name:
+                    am = authoring_model
+                    if (am == '') or (worker.authoring_model == am):
+                        ret = worker
+        return ret
+
+
     def get_asset(self, abs_path):
         """ returns None if asset not found """
         ret = None
@@ -467,7 +478,6 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
                 if hdl_primitive.name == name:
                     prim = hdl_primitive
                     break
-            print('hdl_platform ' + hdl_platform)
             target = get_target(hdl_platform, '')
             ppath = self.get_build_artifact_abs_path(prim, target,
                     hdl_platform)
@@ -528,11 +538,22 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
                     project.append_rules_to_makefile(_worker, project_registry,
                             tool, hdl_target, hdl_platform)
 
-    def append_hdl_assembly_rules_to_makefile(self, asset, project_registry, tool,
-            tname, hdl_target='', hdl_platform=''):
+    def append_hdl_assembly_rules_to_makefile(self, hdl_assembly, project_registry, tool,
+            tname, local_project, hdl_target='', hdl_platform=''):
         for name in self.get_hdl_assembly_dependent_workers(
-                project_registry, asset, hdl_platform):
-            project = project_registry.get_worker_project(name)
+                project_registry, hdl_assembly, hdl_platform):
+            # order in CDG section 14.8 is enforced
+            project = None
+            if local_project.get_worker_by_name(name) is not None:
+                project = local_project
+            if project is None:
+                for dir_abs_path in Environment().ocpi_project_path:
+                    p2 = Project(dir_abs_path).get_worker_by_name(name)
+                    if p2.get_worker_by_name(name) is not None:
+                        project = p2
+                        break
+            if project is None:
+                project = project_registry.get_worker_project(name)
             _worker = None
             for component_library in project.component_libraries:
                 for worker in component_library.workers:
@@ -544,7 +565,7 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
             wpath = self.get_build_artifact_abs_path(_worker, target,
                     hdl_platform)
             global_makefile.rules[tname].prerequisites.append(wpath)
-            global_dependency_tree[asset].dependents.append(_worker)
+            global_dependency_tree[hdl_assembly].dependents.append(_worker)
             project.append_rules_to_makefile(_worker, project_registry, tool,
                     hdl_target, hdl_platform)
 
@@ -565,8 +586,12 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
             self.append_worker_rules_to_makefile(asset, project_registry, tool,
                     tname, hdl_target, hdl_platform, rcc_platform)
         if asset.get_type() == 'hdl assembly':
+            for project in project_registry.projects:
+                if project.get_asset(asset.abs_path) is not None:
+                    local_project = project
+                    break
             self.append_hdl_assembly_rules_to_makefile(asset, project_registry,
-                    tool, tname, hdl_target, hdl_platform)
+                    tool, tname, local_project, hdl_target, hdl_platform)
         # build single asset whose dependencies, if enabled, have already been
         # built
         tool.build_asset(self, asset, tname, hdl_target, hdl_platform,

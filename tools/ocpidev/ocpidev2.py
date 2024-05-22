@@ -447,8 +447,8 @@ class LegacyOCPIDevHDLBuildTool():
         # cmd += '\n\t'
         # cmd += '@[ -f ' + global_makefile.rules[tname].targets[0].string + ' ]'
         # cmd += '\n\t'
-        if (Environment().ocpi_log_level >= 8) and (_j > 1):
-            cmd += '@echo [INFO] building ' + asset.get_type() + ' ' + asset.name + ' done'
+        #if (Environment().ocpi_log_level >= 8) and (_j > 1):
+        cmd += '@echo [INFO] building ' + asset.get_type() + ' ' + asset.name + ' done'
         global_makefile.rules[tname].recipe = cmd
         Logger().debug('creating make rule: ' + str(global_makefile.rules[tname]))
         #if os.system(cmd) != 0:

@@ -116,6 +116,14 @@ class Environment():
         if ocpi_log_level is None:
             ocpi_log_level = 0
         self.ocpi_log_level = int(ocpi_log_level)
+        # below line is CDG section 14.8
+        self.ocpi_project_path = []
+        ocpi_project_path = os.environ.get('OCPI_PROJECT_PATH')
+        if ocpi_project_path is not None:
+            ocpi_project_path = ocpi_project_path.split(':')
+            # strip trailing slashes in order to standardize everywhere how
+            # directory absolute paths are handled (avoids bugs)
+            self.ocpi_project_path = [opp.strip('/') for opp in ocpi_project_path]
 
 
 class Logger(Environment):

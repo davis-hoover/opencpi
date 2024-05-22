@@ -90,11 +90,8 @@ class ProjectRegistry():
         """ get project which contains named worker """
         ret = None
         for project in self.projects:
-            for component_library in project.component_libraries:
-                for worker in component_library.workers:
-                    if (worker.name == name):
-                        if (abs_path is None) or (worker.abs_path == abs_path):
-                            ret = project
+            if project.get_worker_by_name(name) != None:
+                ret = project
         if ret is None:
             raise_not_found_in_projects('worker', name)
         return ret
