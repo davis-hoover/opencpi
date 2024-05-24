@@ -69,43 +69,6 @@ class OCPIDev():
                 raise Exception('Please perform create ' + args.noun + ' in a '
                                 'registered project directory')
             if args.noun == 'library':
-
-                # Check for valid library name
-                comp_libs = project.component_library_locations
-                comp_dict = {lib.split('/')[-1] : lib for lib in comp_libs}
-                if args.name not in comp_dict:
-                    msg = (args.name + ' is not one of the valid component '
-                           'library names: ' +
-                           str(project.component_library_locations))
-                    raise Exception(msg)
-
-                # Check for project hdl/platform/<platform_name> libraries
-                project.discover()
-                platform_device_libs = []
-                for proj_plat in project.hdl_platforms:
-                    plat_rel = proj_plat.abs_path.split('/')[-3:]
-                    plat_rel = '/'.join(plat_rel) + '/devices'
-                    platform_device_libs.append(plat_rel)
-
-                # Check path validity
-                # TODO: Fails when using './' as path
-                valid_dir = False
-                comp_dict['devices'] = [comp_dict['devices']]
-                for lib in platform_device_libs:
-                    comp_dict['devices'].append(lib)
-                if args.name == 'devices':
-                    for lib in comp_dict[args.name]:
-                        path_to_check = project.abs_path + '/' + lib.replace('devices', '')
-                        if path_to_check == _dir:
-                            valid_dir = True
-                else:
-                    path_to_check = project.abs_path + '/' + comp_dict[args.name].replace(args.name, '')
-                    if path_to_check == _dir:
-                        valid_dir = True
-                if not valid_dir:
-                    msg = "create library must point to a valid component library location"
-                    raise Exception(msg)
-
                 # Check if library name already Exist
                 existing_comp_libs = project.get_existing_dir_abs_paths_for_clib_consideration()
                 path_to_create = _dir + args.name
@@ -113,10 +76,8 @@ class OCPIDev():
                     msg = (args.name + ' is already a library in the ' +
                            project.name + ' project')
                     raise Exception(msg)
-
                 # Create qualified path
-                comp_lib_path = path_to_create
-                ComponentLibrary(comp_lib_path, False, cli_dict).create()
+                ComponentLibrary(path_to_create, False, cli_dict).create(project)
 
     def delete(self, noun):
         raise Exception('delete is not supported at this time')

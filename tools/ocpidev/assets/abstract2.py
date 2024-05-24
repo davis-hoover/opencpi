@@ -30,7 +30,7 @@ import jinja2
 
 # TODO make a class member, probably ComponentLibrary or Project class
 g_libraries_mk = False
-g_asset_template = """<{{asset.root_tags[0]}}{% for key,val in asset.attrs.items() %}{% if val != '' and val != [] %}\n
+g_asset_template = """<?xml version="1.0"?>\n<{{asset.root_tags[0]}}{% for key,val in asset.attrs.items() %}{% if val != '' and val != [] %}\n
     {{key}}=\'{{val}}\'{% endif %}{% endfor %}/>\n\n"""
 global_dependency_tree = dict()
 
@@ -900,7 +900,7 @@ class AssetBase(AttributeBase):
         if self.get_abs_path_exists():
             raise Exception(self.get_type() + ' ' + self.abs_path + ' already exists')
         else:
-            os.mkdir(self.get_dir_abs_path())
+            os.makedirs(self.get_dir_abs_path(), exist_ok=False)
         for fname, fcontents in templates.items():
             fcontents = jinja2.Template(fcontents, trim_blocks=True)
             fcontents = fcontents.render(asset=self)
