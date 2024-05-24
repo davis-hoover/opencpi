@@ -151,7 +151,7 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         if self.name not in comp_dict:
             msg = (self.name + ' is not one of the valid component '
                    'library names: ' +
-                   str(library_locations))
+                   str(ComponentLibrary.library_locations))
             raise Exception(msg)
 
     # Check path validity CREATE
