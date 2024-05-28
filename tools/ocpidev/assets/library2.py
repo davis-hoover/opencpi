@@ -146,18 +146,21 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         if not cli_dict:
             self.discover(allowlist, 'hdl/platforms' in dir_abs_path)
 
-    # Check for valid library name CREATE
     def check_valid_library_name(self, project, comp_dict):
+        """ Check for a valid component library name """
         if self.name not in comp_dict:
             msg = (self.name + ' is not one of the valid component '
                    'library names: ' +
-                   str(ComponentLibrary.library_locations))
+                   (' '.join(map(str, list(comp_dict.keys())))) +
+                   ', or is not pointing to the components library ' +
+                   '(sub-component)')
             raise Exception(msg)
 
-    # Check path validity CREATE
-    # TODO: Fails when using './' as path
     def check_valid_path(self, project, comp_dict):
-        # Update comp_dict with discovered project hdl/platform/<platform_name> libraries
+        """ Check that the user is providing a valid path to a component
+            library """
+        # Update comp_dict with discovered project hdl/platform/<platform_name>
+        # libraries
         project.discover()
         platform_device_libs = []
         for proj_plat in project.hdl_platforms:
@@ -168,6 +171,7 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         valid_dir = False
         comp_dict['devices'] = [comp_dict['devices']]
         comp_dict['devices'].extend([lib for lib in platform_device_libs])
+        print("comp_dict = " + str(comp_dict))
         if self.name == 'devices':
             for lib in comp_dict[self.name]:
                 path_to_check = project.abs_path + '/' + lib
@@ -178,14 +182,27 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
             if path_to_check == self.abs_path:
                 valid_dir = True
         if not valid_dir:
-            msg = "create library must point to a valid component library location"
+            msg = ('create library must point to a valid component library ' +
+                  'location')
             raise Exception(msg)
 
-    def create(self, project):
+    def create(self, project, _dir):
+        """ Creates a valid Component Library and associated skeleton files
+            for a given path """
         comp_dict = {lib.split('/')[-1] : lib for lib in ComponentLibrary.library_locations}
-        self.check_valid_library_name(project, comp_dict)
-        self.check_valid_path(project, comp_dict)
         comp_lib_templates = {}
+        # create a sub-component library if one does not exist
+        if _dir.endswith(project.name + '/components'):
+            if not os.path.exists(project.abs_path + '/components'):
+                abs_path = self.abs_path
+                self.abs_path = project.abs_path + '/components'
+                comp_lib_templates['components.xml'] = g_asset_template
+                AssetBase.create_files(self, comp_lib_templates)
+                del comp_lib_templates['components.xml']
+                self.abs_path = abs_path
+        else:
+            self.check_valid_library_name(project, comp_dict)
+            self.check_valid_path(project, comp_dict)
         comp_lib_xml_name = self.name + '.xml'
         comp_lib_templates[comp_lib_xml_name] = g_asset_template
         AssetBase.create_files(self, comp_lib_templates)
