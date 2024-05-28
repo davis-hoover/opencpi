@@ -544,7 +544,6 @@ if __name__ == '__main__':
                 raise Exception('noun ' + str(args.noun) + ' is not supported')
         signal.signal(signal.SIGINT, mysigint)
         hdl_build_tool = LegacyOCPIDevHDLBuildTool()
-        #_dir = os.path.abspath(args.d)
         _dir = args.d
         if args.d is None:
             if (args.noun is None) or (args.verb != 'clean'):
