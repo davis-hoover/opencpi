@@ -171,7 +171,6 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         valid_dir = False
         comp_dict['devices'] = [comp_dict['devices']]
         comp_dict['devices'].extend([lib for lib in platform_device_libs])
-        print("comp_dict = " + str(comp_dict))
         if self.name == 'devices':
             for lib in comp_dict[self.name]:
                 path_to_check = project.abs_path + '/' + lib
