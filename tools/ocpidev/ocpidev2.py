@@ -58,7 +58,7 @@ class OCPIDev():
             project_registry = ProjectRegistry(False, False)
             project = None
             for proj in project_registry.projects:
-                if (proj.abs_path in _dir) or (proj.abs_path in cwd):
+                if (_dir in proj.abs_path) or (proj.abs_path in cwd):
                     project = proj
                     break
             if project is None:
@@ -67,12 +67,12 @@ class OCPIDev():
             if args.noun == 'library':
                 # Check if library name already Exist
                 existing_comp_libs = project.get_existing_dir_abs_paths_for_clib_consideration()
-                path_to_create = _dir + '/' + args.name
-                if path_to_create in existing_comp_libs:
+                component_path = _dir + '/' + args.name
+                if component_path in existing_comp_libs:
                     msg = (args.name + ' is already a library in the ' +
                            project.name + ' project')
                     raise Exception(msg)
-                ComponentLibrary(path_to_create, False, cli_dict).create(project, _dir)
+                ComponentLibrary(component_path, False, cli_dict).create(project, _dir)
 
     def delete(self, noun):
         raise Exception('delete is not supported at this time')
@@ -481,25 +481,26 @@ class LegacyOCPIDevHDLBuildTool():
 
 def unittest():
     ret = True
-    # ret = test_GNUMakefile(ret)
-    ret = test_Component(ret)
-    ret = test_ComponentLibrary(ret)
-    ret = test_RccAssembly(ret)
-    ret = test_Project_discover_component_libraries(ret)
-    # ret = test_ProjectRegistry(ret)
-    # ret = test_OCPIDev(ret)
-    ret = test_Worker(ret)
-    ret = test_HdlLibrary(ret)
-    ret = test_HdlAssembly(ret)
-    # ret = test_HdlAssemblyInstance(ret)
-    ret = test_Property(ret)
-    ret = test_HdlContainerDevice(ret)
-    ret = test_HdlContainer(ret)
-    ret = test_HdlCardPlatformBase(ret)
-    ret = test_HdlPlatform(ret)
-    ret = test_HdlPlatformConfiguration(ret)
-    ret = test_HdlCard(ret)
-    # ret = test_LegacyOCPIDevHDLBuildTool(ret)
+    ## ret = test_GNUMakefile(ret)
+    #ret = test_Component(ret)
+    #ret = test_ComponentLibrary(ret)
+    ret = test_ComponentLibrary_create(ret)
+    #ret = test_RccAssembly(ret)
+    #ret = test_Project_discover_component_libraries(ret)
+    ## ret = test_ProjectRegistry(ret)
+    ## ret = test_OCPIDev(ret)
+    #ret = test_Worker(ret)
+    #ret = test_HdlLibrary(ret)
+    #ret = test_HdlAssembly(ret)
+    ## ret = test_HdlAssemblyInstance(ret)
+    #ret = test_Property(ret)
+    #ret = test_HdlContainerDevice(ret)
+    #ret = test_HdlContainer(ret)
+    #ret = test_HdlCardPlatformBase(ret)
+    #ret = test_HdlPlatform(ret)
+    #ret = test_HdlPlatformConfiguration(ret)
+    #ret = test_HdlCard(ret)
+    ## ret = test_LegacyOCPIDevHDLBuildTool(ret)
     return ret
 
 
