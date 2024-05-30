@@ -228,10 +228,8 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         """ returns a list of absolute paths to directories in standard
             component libraries locations that are guaranteed to exist """
         # CDG section 14.2.3
-        dirs = ['components', 'hdl/devices', 'hdl/cards']
-        dirs += ['hdl/adapters', 'hdl/platforms']
         dir_abs_paths = []
-        for _dir in dirs:
+        for _dir in ComponentLibrary.library_locations:
             dir_abs_path = self.get_dir_abs_path() + '/' + _dir
             if os.path.isdir(dir_abs_path):
                 # add to dir_abs_path the absolute path to the directories

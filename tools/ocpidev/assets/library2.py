@@ -28,7 +28,6 @@ from _opencpi.assets.assembly2 import HdlAssembly
 from _opencpi.assets.primitive2 import HdlLibrary
 from _opencpi.assets.application2 import Application
 
-
 class SpecsDirectory():
 
     def __init__(self):
@@ -120,10 +119,13 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
     """ Reference RCC/HDL Development Guide section 3. A ComponentLibrary is
         represented by a directory and knows nothing about the project it
         is in or its package ID. """
-
-    def __init__(self, dir_abs_path):
+    # start of CDG section 14.2.3
+    library_locations = ['components', 'hdl/devices', 'hdl/cards']
+    library_locations += ['hdl/adapters', 'hdl/platforms']
+    # end of CDG section 14.2.3
+    def __init__(self, dir_abs_path, enable_path_existence_check=True ,cli_dict=None):
         self.root_tags = ['Library']  # CDG section 10.1
-        AssetBase.__init__(self, dir_abs_path)
+        AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
         is_test = self.get_dir_abs_path_is_test(dir_abs_path)
         if is_test or self.get_dir_abs_path_is_worker(dir_abs_path):
             self.raise_invalid_asset_error()
@@ -141,7 +143,68 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         self.parse()
         workers = self.attrs['Workers']
         allowlist = None if workers == [] else workers
-        self.discover(allowlist, 'hdl/platforms' in dir_abs_path)
+        if not cli_dict:
+            self.discover(allowlist, 'hdl/platforms' in dir_abs_path)
+
+    def check_valid_library_name(self, project, comp_dict):
+        """ Check for a valid component library name """
+        if self.name not in comp_dict:
+            msg = (self.name + ' is not one of the valid component '
+                   'library names: ' +
+                   (' '.join(map(str, list(comp_dict.keys())))) +
+                   ', or is not pointing to the components library ' +
+                   '(sub-component)')
+            raise Exception(msg)
+
+    def check_valid_path(self, project, comp_dict):
+        """ Check that the user is providing a valid path to a component
+            library """
+        # Update comp_dict with discovered project hdl/platform/<platform_name>
+        # libraries
+        project.discover()
+        platform_device_libs = []
+        for proj_plat in project.hdl_platforms:
+            plat_rel = proj_plat.abs_path.split('/')[-3:]
+            plat_rel = '/'.join(plat_rel) + '/devices'
+            platform_device_libs.append(plat_rel)
+        # Validate the path given
+        valid_dir = False
+        comp_dict['devices'] = [comp_dict['devices']]
+        comp_dict['devices'].extend([lib for lib in platform_device_libs])
+        if self.name == 'devices':
+            for lib in comp_dict[self.name]:
+                path_to_check = project.abs_path + '/' + lib
+                if path_to_check == self.abs_path:
+                    valid_dir = True
+        else:
+            path_to_check = project.abs_path + '/' + comp_dict[self.name]
+            if path_to_check == self.abs_path:
+                valid_dir = True
+        if not valid_dir:
+            msg = ('create library must point to a valid component library ' +
+                  'location')
+            raise Exception(msg)
+
+    def create(self, project, _dir):
+        """ Creates a valid Component Library and associated skeleton files
+            for a given path """
+        comp_dict = {lib.split('/')[-1] : lib for lib in ComponentLibrary.library_locations}
+        comp_lib_templates = {}
+        # create a sub-component library if one does not exist
+        if _dir.endswith(project.name + '/components'):
+            if not os.path.exists(project.abs_path + '/components'):
+                abs_path = self.abs_path
+                self.abs_path = project.abs_path + '/components'
+                comp_lib_templates['components.xml'] = g_asset_template
+                AssetBase.create_files(self, comp_lib_templates)
+                del comp_lib_templates['components.xml']
+                self.abs_path = abs_path
+        else:
+            self.check_valid_library_name(project, comp_dict)
+            self.check_valid_path(project, comp_dict)
+        comp_lib_xml_name = self.name + '.xml'
+        comp_lib_templates[comp_lib_xml_name] = g_asset_template
+        AssetBase.create_files(self, comp_lib_templates)
 
     @staticmethod
     def get_dir_abs_path_is_worker(dir_abs_path):
