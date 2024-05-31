@@ -69,6 +69,9 @@ class OCPIDev():
                 existing_comp_libs = project.get_existing_dir_abs_paths_for_clib_consideration()
                 component_path = _dir + '/' + args.name
                 if component_path in existing_comp_libs:
+                    # TODO: Create a clever message to show if a 'devices'
+                    #       library is already in a hdl/platforms/<platform> lib
+                    #       vs a devices lib at the top-level of the project
                     msg = (args.name + ' is already a library in the ' +
                            project.name + ' project')
                     raise Exception(msg)
