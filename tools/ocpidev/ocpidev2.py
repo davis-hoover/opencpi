@@ -48,8 +48,11 @@ class OCPIDev():
         _dir = os.path.abspath(_dir)
         cwd = os.getcwd()
         if cli_dict is not None:
-            # below line supports create, removes underscores to make CLI look like attrs
-            cli_dict = {key.replace('_', '') : val for key, val in cli_dict.items()}
+            # The below line supports create, removes underscores to make CLI
+            # look like attrs
+            cli_dict = (
+                {key.replace('_', '') : val for key, val in cli_dict.items()}
+            )
         if args.noun == 'project':
             abs_path = cwd + '/' + args.name
             Project(abs_path, False, cli_dict).create()
@@ -58,7 +61,8 @@ class OCPIDev():
             project_registry = ProjectRegistry(False, False)
             project = None
             for proj in project_registry.projects:
-                if (_dir in proj.abs_path) or (proj.abs_path in cwd):
+                if ((proj.abs_path + '/' in _dir) or
+                    (proj.abs_path.split('/')[-1] == cwd.split('/')[-1])):
                     project = proj
                     break
             if project is None:
@@ -66,16 +70,28 @@ class OCPIDev():
                                 'registered project directory')
             if args.noun == 'library':
                 # Check if library name already Exist
-                existing_comp_libs = project.get_existing_dir_abs_paths_for_clib_consideration()
+                existing_comp_libs = (
+                    project.get_existing_dir_abs_paths_for_clib_consideration()
+                )
                 component_path = _dir + '/' + args.name
+                platform_dev_path = (project.abs_path + '/hdl/platforms/' in
+                                     component_path)
+                sub_comp_path = component_path.split('/')[-2] == 'components'
                 if component_path in existing_comp_libs:
-                    # TODO: Create a clever message to show if a 'devices'
-                    #       library is already in a hdl/platforms/<platform> lib
-                    #       vs a devices lib at the top-level of the project
-                    msg = (args.name + ' is already a library in the ' +
-                           project.name + ' project')
+                    if args.name == 'devices' and platform_dev_path:
+                        msg = (args.name + ' is already a library in the ' +
+                               component_path.split('/')[-2] + ' platform ' +
+                               'within the ' + project.name + ' project')
+                    elif sub_comp_path:
+                        msg = (args.name + ' is already a sub-component ' +
+                               'library in the ' + project.name + ' project')
+                    else:
+                        msg = (args.name + ' is already a library in the ' +
+                               project.name + ' project')
                     raise Exception(msg)
-                ComponentLibrary(component_path, False, cli_dict).create(project, _dir)
+                ComponentLibrary(
+                    component_path, False, cli_dict
+                ).create(project, _dir)
 
     def delete(self, noun):
         raise Exception('delete is not supported at this time')

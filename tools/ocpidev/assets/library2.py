@@ -28,6 +28,8 @@ from _opencpi.assets.assembly2 import HdlAssembly
 from _opencpi.assets.primitive2 import HdlLibrary
 from _opencpi.assets.application2 import Application
 
+dir()
+
 class SpecsDirectory():
 
     def __init__(self):
@@ -158,7 +160,7 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
 
     def check_valid_path(self, project, _dir, comp_dict):
         """ Check that the user is providing a valid path to a component
-            library """
+            library. If not, provide path suggestions """
         # Update comp_dict with discovered project hdl/platform/<platform_name>
         # libraries
         project.discover()
@@ -181,17 +183,35 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
             if path_to_check == self.abs_path:
                 valid_dir = True
         if not valid_dir:
-            msg = ('create library must point to a valid component library ' +
-                  'location')
+            if self.name == 'devices':
+                 valid_locations = (
+                     '<project_name>/hdl  ' +
+                     '<project_name>/hdl/platform/<platform_name>/'
+                 )
+            elif self.name in ['cards', 'adapters', 'platforms']:
+                 valid_locations = '<project_name>/hdl'
+            else: # 'components', '<sub_comp_lib>'
+                 valid_locations = '<project_name>, <project_name>/components'
+            msg = ('create library ' + self.name + ' must point (-d) to a '
+                   'valid component library location: ' + valid_locations)
             raise Exception(msg)
 
     def create(self, project, _dir):
         """ Creates a valid Component Library and associated skeleton files
             for a given path """
-        comp_dict = {lib.split('/')[-1] : lib for lib in ComponentLibrary.library_locations}
+        comp_dict = ({lib.split('/')[-1] : lib for lib in
+                     ComponentLibrary.library_locations})
         comp_lib_templates = {}
-        # create a sub-component library if one does not exist
+        # create a component library if one does not exist when creating a
+        # sub-component library
         if _dir.endswith(project.name + '/components'):
+            sub_component_blacklist = ['platforms', 'cards', 'adapters',
+                'components', 'devices']
+            if self.name in sub_component_blacklist:
+                msg = ('sub-component name ' + self.name + ' apart of '
+                       'prohibited component library names: ' +
+                       (' '.join(map(str, sub_component_blacklist))))
+                raise Exception(msg)
             if not os.path.exists(project.abs_path + '/components'):
                 abs_path = self.abs_path
                 self.abs_path = project.abs_path + '/components'
