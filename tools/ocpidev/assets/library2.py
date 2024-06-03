@@ -28,9 +28,10 @@ from _opencpi.assets.assembly2 import HdlAssembly
 from _opencpi.assets.primitive2 import HdlLibrary
 from _opencpi.assets.application2 import Application
 
-dir()
+comp_lib_templates = {}
 
 class SpecsDirectory():
+    """ Class for discovering component assets in the specs directory """
 
     def __init__(self):
         self.components = []
@@ -125,7 +126,9 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
     library_locations = ['components', 'hdl/devices', 'hdl/cards']
     library_locations += ['hdl/adapters', 'hdl/platforms']
     # end of CDG section 14.2.3
-    def __init__(self, dir_abs_path, enable_path_existence_check=True ,cli_dict=None):
+    def __init__(
+        self, dir_abs_path, enable_path_existence_check=True ,cli_dict=None
+    ):
         self.root_tags = ['Library']  # CDG section 10.1
         AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
         is_test = self.get_dir_abs_path_is_test(dir_abs_path)
@@ -148,15 +151,35 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         if not cli_dict:
             self.discover(allowlist, 'hdl/platforms' in dir_abs_path)
 
-    def check_valid_library_name(self, project, comp_dict):
+    def create_component_library(self, project):
+        """ If no component library exists when creating a sub-component
+            library, create one. """
+        if not os.path.exists(project.abs_path + '/components'):
+            abs_path = self.abs_path
+            self.abs_path = project.abs_path + '/components'
+            comp_lib_templates['components.xml'] = g_asset_template
+            AssetBase.create_files(self, comp_lib_templates)
+            del comp_lib_templates['components.xml']
+            self.abs_path = abs_path
+
+    def check_valid_library_name(self, project, comp_dict, sub_comp_lib):
         """ Check for a valid component library name """
-        if self.name not in comp_dict:
-            msg = (self.name + ' is not one of the valid component '
-                   'library names: ' +
-                   (' '.join(map(str, list(comp_dict.keys())))) +
-                   ', or is not pointing to the components library ' +
-                   '(sub-component)')
-            raise Exception(msg)
+        if sub_comp_lib:
+            sub_component_blacklist = ['platforms', 'cards', 'adapters',
+                'components', 'devices']
+            if self.name in sub_component_blacklist:
+                msg = ('sub-component name ' + self.name + ' apart of '
+                       'prohibited component library names: ' +
+                       (' '.join(map(str, sub_component_blacklist))))
+                raise Exception(msg)
+        if not sub_comp_lib:
+            if self.name not in comp_dict:
+                msg = (self.name + ' is not one of the valid component '
+                       'library names: ' +
+                       (' '.join(map(str, list(comp_dict.keys())))) +
+                       ', or is not pointing to the components library ' +
+                       '(sub-component)')
+                raise Exception(msg)
 
     def check_valid_path(self, project, _dir, comp_dict):
         """ Check that the user is providing a valid path to a component
@@ -172,7 +195,7 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         # Validate the path given
         valid_dir = False
         comp_dict['devices'] = [comp_dict['devices']]
-        comp_dict['devices'].extend([lib for lib in platform_device_libs])
+        comp_dict['devices'].extend(platform_device_libs)
         if self.name == 'devices':
             for lib in comp_dict[self.name]:
                 path_to_check = project.abs_path + '/' + lib
@@ -201,26 +224,14 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
             for a given path """
         comp_dict = ({lib.split('/')[-1] : lib for lib in
                      ComponentLibrary.library_locations})
-        comp_lib_templates = {}
         # create a component library if one does not exist when creating a
         # sub-component library
+        sub_comp_lib = False
         if _dir.endswith(project.name + '/components'):
-            sub_component_blacklist = ['platforms', 'cards', 'adapters',
-                'components', 'devices']
-            if self.name in sub_component_blacklist:
-                msg = ('sub-component name ' + self.name + ' apart of '
-                       'prohibited component library names: ' +
-                       (' '.join(map(str, sub_component_blacklist))))
-                raise Exception(msg)
-            if not os.path.exists(project.abs_path + '/components'):
-                abs_path = self.abs_path
-                self.abs_path = project.abs_path + '/components'
-                comp_lib_templates['components.xml'] = g_asset_template
-                AssetBase.create_files(self, comp_lib_templates)
-                del comp_lib_templates['components.xml']
-                self.abs_path = abs_path
-        else:
-            self.check_valid_library_name(project, comp_dict)
+            self.create_component_library(project)
+            sub_comp_lib = True
+        self.check_valid_library_name(project, comp_dict, sub_comp_lib)
+        if not sub_comp_lib:
             self.check_valid_path(project, _dir, comp_dict)
         comp_lib_xml_name = self.name + '.xml'
         comp_lib_templates[comp_lib_xml_name] = g_asset_template
@@ -383,18 +394,22 @@ def test_ComponentLibrary_create(ret):
                         component_path = project_path + '/hdl/' + lib
                     component = ComponentLibrary(component_path, False, cli_dict)
                     component.create(project, project_path)
-                    del component
+                    os.system('rm -rf ' + project_path + '/components')
+                    os.system('rm -rf ' + project_path + '/hdl')
+                    del comp_lib_templates[lib + '.xml']
                 except Exception as e:
                     #print(e)
                     passed = False
-        # Create a valid sub-component library (Pass)
+        # Create a valid sub-component library and check for components 
+        # library (Pass)
         if test == 1:
             try:
-                component_path = project_path + '/components/hello'
+                component_path = project_path + '/components/cmp'
                 component = ComponentLibrary(component_path, False, cli_dict)
                 component.create(project, project_path + '/components')
+                if not os.path.exists(project_path + '/components'):
+                    passed = False
                 os.system('rm -rf ' + project_path + '/components')
-                del component
             except Exception as e:
                 #print(e)
                 passed = False
@@ -410,7 +425,6 @@ def test_ComponentLibrary_create(ret):
                 component = ComponentLibrary(component_path, False, cli_dict)
                 component.create(project, plat_dir)
                 os.system('rm -rf ' + component_path)
-                del component
             except Exception as e:
                 #print(e)
                 passed = False
@@ -425,16 +439,16 @@ def test_ComponentLibrary_create(ret):
                     component = ComponentLibrary(component_path, False, cli_dict)
                     component.create(project, project_path)
                     component.create(project, project_path)
-                    del component
                     passed = False
                 except Exception as e:
                     #print(e)
                     os.system('rm -rf ' + component_path)
+                    del comp_lib_templates[lib + '.xml']
                     passed = True
         # Create a duplicate sub-component library (Fail)
         if test == 4:
             try:
-                component_path = project_path + '/components/hello'
+                component_path = project_path + '/components/cmp'
                 component = ComponentLibrary(component_path, False, cli_dict)
                 component.create(project, project_path + '/components')
                 component.create(project, project_path + '/components')
