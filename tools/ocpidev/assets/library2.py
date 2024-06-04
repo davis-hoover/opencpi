@@ -177,6 +177,27 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         if not cli_dict:
             self.discover(allowlist, 'hdl/platforms' in dir_abs_path)
 
+    def library_name_exists(self, project):
+        """ Check if library name already Exist """
+        existing_comp_libs = (
+            project.get_existing_dir_abs_paths_for_clib_consideration()
+        )
+        platform_dev_path = (project.abs_path + '/hdl/platforms/' in
+                             self.abs_path)
+        sub_comp_path = self.abs_path.split('/')[-2] == 'components'
+        if self.abs_path in existing_comp_libs:
+            if self.name == 'devices' and platform_dev_path:
+                msg = (self.name + ' is already a library in the ' +
+                       self.abs_path.split('/')[-2] + ' platform ' +
+                       'within the ' + project.name + ' project')
+            elif sub_comp_path:
+                msg = (self.name + ' is already a sub-component ' +
+                       'library in the ' + project.name + ' project')
+            else:
+                msg = (self.name + ' is already a library in the ' +
+                       project.name + ' project')
+            raise Exception(msg)
+
     def create_component_library(self, project):
         """ If no component library exists when creating a sub-component
             library, create one. """
@@ -201,7 +222,7 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
             sub_component_blacklist = ['platforms', 'cards', 'adapters',
                 'components', 'devices']
             if self.name in sub_component_blacklist:
-                msg = ('sub-component name ' + self.name + ' apart of '
+                msg = ('sub-component name ' + self.name + ' is apart of '
                        'prohibited component library names: ' +
                        (' '.join(map(str, sub_component_blacklist))))
                 raise Exception(msg)
@@ -241,13 +262,15 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         if not valid_dir:
             if self.name == 'devices':
                  valid_locations = (
-                     '<project_name>/hdl  ' +
+                     '<project_name>/hdl/  ' +
                      '<project_name>/hdl/platform/<platform_name>/'
                  )
             elif self.name in ['cards', 'adapters', 'platforms']:
-                 valid_locations = '<project_name>/hdl'
-            else: # 'components', '<sub_comp_lib>'
-                 valid_locations = '<project_name>, <project_name>/components'
+                 valid_locations = '<project_name>/hdl/'
+            elif self.name == 'components':
+                 valid_locations = '<project_name>/'
+            else: # '<sub_comp_lib>'
+                 valid_locations = '<project_name>/components/'
             msg = ('create library ' + self.name + ' must point (-d) to a '
                    'valid component library location: ' + valid_locations)
             raise Exception(msg)
@@ -258,6 +281,7 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         comp_lib_rst_templates = create_templates(self.name)
         comp_dict = ({lib.split('/')[-1] : lib for lib in
                      ComponentLibrary.library_locations})
+        self.library_name_exists(project)
         # create a component library if one does not exist when creating a
         # sub-component library
         sub_comp_lib = False

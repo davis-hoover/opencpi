@@ -69,26 +69,7 @@ class OCPIDev():
                 raise Exception('Please perform create ' + args.noun + ' in a '
                                 'registered project directory')
             if args.noun == 'library':
-                # Check if library name already Exist
-                existing_comp_libs = (
-                    project.get_existing_dir_abs_paths_for_clib_consideration()
-                )
                 component_path = _dir + '/' + args.name
-                platform_dev_path = (project.abs_path + '/hdl/platforms/' in
-                                     component_path)
-                sub_comp_path = component_path.split('/')[-2] == 'components'
-                if component_path in existing_comp_libs:
-                    if args.name == 'devices' and platform_dev_path:
-                        msg = (args.name + ' is already a library in the ' +
-                               component_path.split('/')[-2] + ' platform ' +
-                               'within the ' + project.name + ' project')
-                    elif sub_comp_path:
-                        msg = (args.name + ' is already a sub-component ' +
-                               'library in the ' + project.name + ' project')
-                    else:
-                        msg = (args.name + ' is already a library in the ' +
-                               project.name + ' project')
-                    raise Exception(msg)
                 ComponentLibrary(
                     component_path, False, cli_dict
                 ).create(project, _dir)
