@@ -28,7 +28,33 @@ from _opencpi.assets.assembly2 import HdlAssembly
 from _opencpi.assets.primitive2 import HdlLibrary
 from _opencpi.assets.application2 import Application
 
-comp_lib_templates = {}
+comp_lib_rst_template = """
+.. {{asset.name|capitalize}} library index page
+
+
+{{asset.name|capitalize}} Library
+=================================
+Skeleton outline: Component library description and outline of scope to go here.
+
+.. toctree::
+   :maxdepth: 1
+   :glob:
+   :caption: {{asset.name}}
+
+   *.comp/*-index
+   *.comp/*-comp
+
+..
+   "*.comp/*-index" is for backward compatibility with older component document naming schemes.
+
+"""
+
+def create_templates(name):
+    """ Creates a <component_name>.rst skeleton document to populate the
+        directory using instance variables"""
+    comp_lib_rst_templates = {}
+    comp_lib_rst_templates[name + '.rst'] = comp_lib_rst_template
+    return comp_lib_rst_templates
 
 class SpecsDirectory():
     """ Class for discovering component assets in the specs directory """
@@ -155,12 +181,19 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         """ If no component library exists when creating a sub-component
             library, create one. """
         if not os.path.exists(project.abs_path + '/components'):
+            # Create 'component' temporary variables
             abs_path = self.abs_path
             self.abs_path = project.abs_path + '/components'
-            comp_lib_templates['components.xml'] = g_asset_template
-            AssetBase.create_files(self, comp_lib_templates)
-            del comp_lib_templates['components.xml']
+            name = self.name
+            self.name = 'components'
+            comp_lib_rst_templates = create_templates('components')
+            comp_lib_rst_templates['components.xml'] = g_asset_template
+            AssetBase.create_files(self, comp_lib_rst_templates)
+            del comp_lib_rst_templates['components.xml']
+            del comp_lib_rst_templates['components.rst']
+            # Reset self. variables to create the sub-component library
             self.abs_path = abs_path
+            self.name = name
 
     def check_valid_library_name(self, project, comp_dict, sub_comp_lib):
         """ Check for a valid component library name """
@@ -222,6 +255,7 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
     def create(self, project, _dir):
         """ Creates a valid Component Library and associated skeleton files
             for a given path """
+        comp_lib_rst_templates = create_templates(self.name)
         comp_dict = ({lib.split('/')[-1] : lib for lib in
                      ComponentLibrary.library_locations})
         # create a component library if one does not exist when creating a
@@ -234,8 +268,8 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         if not sub_comp_lib:
             self.check_valid_path(project, _dir, comp_dict)
         comp_lib_xml_name = self.name + '.xml'
-        comp_lib_templates[comp_lib_xml_name] = g_asset_template
-        AssetBase.create_files(self, comp_lib_templates)
+        comp_lib_rst_templates[comp_lib_xml_name] = g_asset_template
+        AssetBase.create_files(self, comp_lib_rst_templates)
 
     @staticmethod
     def get_dir_abs_path_is_worker(dir_abs_path):
@@ -390,24 +424,32 @@ def test_ComponentLibrary_create(ret):
                 try:
                     if lib == 'components':
                         component_path = project_path + '/' + lib
+                        component = ComponentLibrary(component_path, False, cli_dict)
+                        component.create(project, project_path)
+                        if not os.path.exists(component_path + '/' + lib + '.xml'):
+                            passed = False
                     else:
                         component_path = project_path + '/hdl/' + lib
-                    component = ComponentLibrary(component_path, False, cli_dict)
-                    component.create(project, project_path)
+                        component = ComponentLibrary(component_path, False, cli_dict)
+                        component.create(project, project_path)
+                        if not os.path.exists(component_path + '/' + lib + '.rst'):
+                            passed = False
                     os.system('rm -rf ' + project_path + '/components')
                     os.system('rm -rf ' + project_path + '/hdl')
-                    del comp_lib_templates[lib + '.xml']
                 except Exception as e:
                     #print(e)
                     passed = False
-        # Create a valid sub-component library and check for components 
-        # library (Pass)
+        # Create a valid sub-component library (Pass)
         if test == 1:
             try:
                 component_path = project_path + '/components/cmp'
                 component = ComponentLibrary(component_path, False, cli_dict)
                 component.create(project, project_path + '/components')
                 if not os.path.exists(project_path + '/components'):
+                    passed = False
+                if not os.path.exists(component_path + '/' + 'cmp.rst'):
+                    passed = False
+                if not os.path.exists(component_path + '/' + 'cmp.xml'):
                     passed = False
                 os.system('rm -rf ' + project_path + '/components')
             except Exception as e:
@@ -424,7 +466,11 @@ def test_ComponentLibrary_create(ret):
                 component_path = plat_dir + '/devices'
                 component = ComponentLibrary(component_path, False, cli_dict)
                 component.create(project, plat_dir)
-                os.system('rm -rf ' + component_path)
+                if not os.path.exists(component_path + '/devices.rst'):
+                    passed = False
+                if not os.path.exists(component_path + '/devices.xml'):
+                    passed = False
+                os.system('rm -rf ' + project_path + '/hdl')
             except Exception as e:
                 #print(e)
                 passed = False
@@ -442,8 +488,8 @@ def test_ComponentLibrary_create(ret):
                     passed = False
                 except Exception as e:
                     #print(e)
-                    os.system('rm -rf ' + component_path)
-                    del comp_lib_templates[lib + '.xml']
+                    os.system('rm -rf ' + project_path + '/components')
+                    os.system('rm -rf ' + project_path + '/hdl')
                     passed = True
         # Create a duplicate sub-component library (Fail)
         if test == 4:
@@ -472,7 +518,7 @@ def test_ComponentLibrary_create(ret):
                 passed = False
             except Exception as e:
                 #print(e)
-                os.system('rm -rf ' + component_path)
+                os.system('rm -rf ' + project_path + '/hdl')
                 passed = True
         # Create an invalid library (Fail)
         if test == 6:
