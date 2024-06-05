@@ -192,7 +192,7 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         comp_dict['devices'].extend(platform_device_libs)
         return comp_dict
 
-    def create_component_library(self, project):
+    def create_components_library(self, project):
         """ If no component library exists when creating a sub-component
             library, create one. """
         if not os.path.exists(project.abs_path + '/components'):
@@ -247,13 +247,12 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
                        project.name + ' project')
             raise Exception(msg)
 
-    def valid_path(self, project, _dir, comp_dict, is_sub_comp_lib=False):
+    def valid_path(self, project, _dir, comp_dict, is_sub_comp_path):
         """ Check that the user is providing a valid path to a component
             library. If not, provide path suggestions """
         valid_path = False
-        if is_sub_comp_lib:
-            if _dir.split('/')[-1] == 'components':
-                valid_path = True
+        if is_sub_comp_path:
+            valid_path = True
         elif self.name == 'devices':
             for lib in comp_dict[self.name]:
                 path_to_check = project.abs_path + '/' + lib
@@ -271,10 +270,8 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
                  )
             elif self.name in ['cards', 'adapters', 'platforms']:
                  valid_locations = '<project_name>/hdl/'
-            elif self.name == 'components':
+            else: # 'components':
                  valid_locations = '<project_name>/'
-            else: # '<is_sub_comp_lib>'
-                 valid_locations = '<project_name>/components/'
             msg = ('create library ' + self.name + ' must point (-d) to a '
                    'valid component library location: ' + valid_locations)
             raise Exception(msg)
@@ -287,11 +284,10 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         is_sub_comp_path = _dir.endswith(project.name + '/components')
         is_sub_comp_lib = self.name not in comp_dict.keys()
         if is_sub_comp_path and is_sub_comp_lib:
-            self.create_component_library(project)
-        if not is_sub_comp_lib:
-            self.valid_library_name(project, comp_dict, is_sub_comp_path)
+            self.create_components_library(project)
+        self.valid_library_name(project, comp_dict, is_sub_comp_path)
         self.library_name_exists(project)
-        self.valid_path(project, _dir, comp_dict, is_sub_comp_lib)
+        self.valid_path(project, _dir, comp_dict, is_sub_comp_path)
         comp_lib_xml_name = self.name + '.xml'
         comp_lib_rst_templates[comp_lib_xml_name] = g_asset_template
         AssetBase.create_files(self, comp_lib_rst_templates)
@@ -440,7 +436,7 @@ def test_ComponentLibrary_create(ret):
     project_path = fs.abs_path + '/foo'
     project = Project(project_path, False, None)
     project.create()
-    for test in range(8):
+    for test in range(6):
         valid_libs = ['components', 'devices', 'adapters', 'cards',
                       'platforms']
         # Create valid component libraries (Pass)
@@ -462,8 +458,9 @@ def test_ComponentLibrary_create(ret):
                     os.system('rm -rf ' + project_path + '/components')
                     os.system('rm -rf ' + project_path + '/hdl')
                 except Exception as e:
-                    #print(e)
+                    print(e)
                     passed = False
+
         # Create a valid sub-component library (Pass)
         if test == 1:
             try:
@@ -478,8 +475,9 @@ def test_ComponentLibrary_create(ret):
                     passed = False
                 os.system('rm -rf ' + project_path + '/components')
             except Exception as e:
-                #print(e)
+                print(e)
                 passed = False
+
         # Create a valid hdl/platform/<platform> device library (Pass)
         if test == 2:
             try:
@@ -497,10 +495,38 @@ def test_ComponentLibrary_create(ret):
                     passed = False
                 os.system('rm -rf ' + project_path + '/hdl')
             except Exception as e:
-                #print(e)
+                print(e)
                 passed = False
-        # Create duplicate valid component libraries (Fail)
+
+        # Create invalid library names (Fail)
         if test == 3:
+            print("Test ComponentLibrary.valid_library_name()")
+            print("============================================")
+            try:
+                component_path = project_path + '/invalid_library'
+                component = ComponentLibrary(component_path, False, cli_dict)
+                component.create(project, project_path)
+                passed = False
+            except Exception as e:
+                print(e)
+                passed = True
+
+        # Create invalid sub-component library name (Fail)
+        if test == 3:
+            try:
+                component_path = project_path + '/devices'
+                component = ComponentLibrary(component_path, False, cli_dict)
+                component.create(project, project_path + '/components')
+                passed = False
+            except Exception as e:
+                print(e)
+                passed = True
+            print("")
+
+        # Create duplicate valid component libraries (Fail)
+        if test == 4:
+            print("Test ComponentLibrary.library_name_exists()")
+            print("============================================")
             for lib in valid_libs:
                 try:
                     if lib == 'components':
@@ -512,12 +538,12 @@ def test_ComponentLibrary_create(ret):
                     component.create(project, project_path)
                     passed = False
                 except Exception as e:
-                    #print(e)
+                    print(e)
                     os.system('rm -rf ' + project_path + '/components')
                     os.system('rm -rf ' + project_path + '/hdl')
                     passed = True
+
         # Create a duplicate sub-component library (Fail)
-        if test == 4:
             try:
                 component_path = project_path + '/components/cmp'
                 component = ComponentLibrary(component_path, False, cli_dict)
@@ -525,11 +551,11 @@ def test_ComponentLibrary_create(ret):
                 component.create(project, project_path + '/components')
                 passed = False
             except Exception as e:
-                #print(e)
+                print(e)
                 os.system('rm -rf ' + project_path + '/components')
                 passed = True
+
         # Create a duplicate platform device library (Fail)
-        if test == 5:
             try:
                 plat_dir = project_path +'/hdl/platforms/test_plat'
                 os.makedirs(plat_dir)
@@ -542,29 +568,27 @@ def test_ComponentLibrary_create(ret):
                 component.create(project, plat_dir)
                 passed = False
             except Exception as e:
-                #print(e)
+                print(e)
                 os.system('rm -rf ' + project_path + '/hdl')
                 passed = True
-        # Create an invalid library (Fail)
-        if test == 6:
-            try:
-                component_path = project_path + '/components_invalid'
-                component = ComponentLibrary(component_path, False, cli_dict)
-                component.create(project, project_path)
-                passed = False
-            except Exception as e:
-                #print(e)
-                passed = True
-        # Create an invalid path (Fail)
-        if test == 7:
-            invalid_path = '/invalid_path'
-            _dir = project_path + invalid_path
-            try:
-                component_path = project_path + invalid_path + '/components'
-                component = ComponentLibrary(component_path, False, cli_dict)
-                component.create(project, _dir)
-                passed = False
-            except Exception as e:
-                #print(e)
-                passed = True
+            print("")
+
+        # Create an invalid library path (Fail)
+        if test == 5:
+            print("Tests ComponentLibrary.valid_path()")
+            print("============================================")
+            valid_libs.extend(['', 'sub_comp_lib'])
+            for lib in valid_libs:
+                component_path = project_path + '/' + lib
+                if lib == '':
+                    component_path = project_path + '/components'
+                try:
+                    project_path = project_path + '/invalid'
+                    component = ComponentLibrary(component_path, False, cli_dict)
+                    component.create(project, project_path)
+                    passed = False
+                except Exception as e:
+                    print(e)
+                    passed = True
+            print("")
     log_pass_fail('testing ComponentLibrary create()', passed)
