@@ -182,7 +182,6 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
             libraries """
         comp_dict = ({lib.split('/')[-1] : lib for lib in
                      ComponentLibrary.library_locations})
-        project.discover()
         platform_device_libs = []
         for proj_plat in project.hdl_platforms:
             plat_rel = proj_plat.abs_path.split('/')[-3:]
@@ -560,7 +559,6 @@ def test_ComponentLibrary_create(ret):
                 #print(e)
                 os.system('rm -rf ' + project_path + '/hdl')
                 passed = True
-
         # Tests ComponentLibrary.valid_path()
         if test == 5:
             # Create an invalid library path (Fail)
