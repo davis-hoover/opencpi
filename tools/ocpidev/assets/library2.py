@@ -439,6 +439,7 @@ def test_ComponentLibrary_create(ret):
     project_path = fs.abs_path + '/foo'
     project = Project(project_path, False, None)
     project.create()
+    test_name = 'test_ComponentLibrary_create: '
     for test in range(6):
         valid_libs = ['components', 'devices', 'adapters', 'cards',
                       'platforms']
@@ -469,7 +470,7 @@ def test_ComponentLibrary_create(ret):
                     os.system('rm -rf ' + project_path + '/components')
                     os.system('rm -rf ' + project_path + '/hdl')
                 except Exception as e:
-                    # print(e)
+                    Logger().debug(test_name + str(e))
                     passed = False
         # Create a valid sub-component library (Pass)
         if test == 1:
@@ -485,7 +486,7 @@ def test_ComponentLibrary_create(ret):
                     passed = False
                 os.system('rm -rf ' + project_path + '/components')
             except Exception as e:
-                # print(e)
+                Logger().debug(test_name + str(e))
                 passed = False
         # Create a valid hdl/platform/<platform> device library (Pass)
         if test == 2:
@@ -504,7 +505,7 @@ def test_ComponentLibrary_create(ret):
                     passed = False
                 os.system('rm -rf ' + project_path + '/hdl')
             except Exception as e:
-                # print(e)
+                Logger().debug(test_name + str(e))
                 passed = False
         # Test ComponentLibrary.valid_library_name()
         if test == 3:
@@ -515,7 +516,7 @@ def test_ComponentLibrary_create(ret):
                 component.create(project, project_path)
                 passed = False
             except Exception as e:
-                # print(e)
+                Logger().debug(test_name + str(e))
                 passed = True
             # Create invalid sub-component library name (Fail)
             try:
@@ -524,7 +525,7 @@ def test_ComponentLibrary_create(ret):
                 component.create(project, project_path + '/components')
                 passed = False
             except Exception as e:
-                # print(e)
+                Logger().debug(test_name + str(e))
                 passed = True
         # Test ComponentLibrary.library_name_exists()
         if test == 4:
@@ -542,7 +543,7 @@ def test_ComponentLibrary_create(ret):
                     component.create(project, project_path)
                     passed = False
                 except Exception as e:
-                    # print(e)
+                    Logger().debug(test_name + str(e))
                     os.system('rm -rf ' + project_path + '/components')
                     os.system('rm -rf ' + project_path + '/hdl')
                     passed = True
@@ -554,7 +555,7 @@ def test_ComponentLibrary_create(ret):
                 component.create(project, project_path + '/components')
                 passed = False
             except Exception as e:
-                # print(e)
+                Logger().debug(test_name + str(e))
                 os.system('rm -rf ' + project_path + '/components')
                 passed = True
             # Create a duplicate platform device library (Fail)
@@ -570,7 +571,7 @@ def test_ComponentLibrary_create(ret):
                 component.create(project, plat_dir)
                 passed = False
             except Exception as e:
-                # print(e)
+                Logger().debug(test_name + str(e))
                 os.system('rm -rf ' + project_path + '/hdl')
                 passed = True
         # Tests ComponentLibrary.valid_path()
@@ -589,6 +590,6 @@ def test_ComponentLibrary_create(ret):
                     component.create(project, project_path)
                     passed = False
                 except Exception as e:
-                    # print(e)
+                    Logger().debug(test_name + str(e))
                     passed = True
     log_pass_fail('testing ComponentLibrary create()', passed)
