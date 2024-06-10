@@ -23,7 +23,14 @@ do_build_test() {
   ocpidev2 build -j 4 -d projects/assets --hdl-platform zed
 }
 
+report_coverage() {
+  python3 -m pip install coverage
+  coverage run $(which ocpidev2) unittest
+  coverage report -m | grep "tools/ocpidev"
+}
+
 set -e
 do_linter_test
 do_unit_test
 do_build_test
+#report_coverage
