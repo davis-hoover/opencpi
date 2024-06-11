@@ -96,6 +96,53 @@ class OCPIDev():
         for project2 in project_registry.projects:
             if project2.abs_path == os.path.realpath(abs_path):
                 project = project2
+        if project is None:
+            project = project_registry.get_abs_path_project(abs_path)
+            asset = project.get_asset(abs_path)
+            if asset is None:
+                if abs_path in project.get_buildable_paths():
+                    for buildable_path in project.get_buildable_paths():
+                        for component_library in project.component_libraries:
+                            for asset in component_library.workers:
+                                if abs_path in asset.get_dir_abs_path():
+                                    assets_to_build.append(asset)
+                        for asset in project.applications:
+                            if abs_path in asset.get_dir_abs_path():
+                                assets_to_build.append(asset)
+                        for asset in project.hdl_primitives:
+                            if abs_path in asset.get_dir_abs_path():
+                                assets_to_build.append(asset)
+                        for asset in project.hdl_assemblies:
+                            if abs_path in asset.get_dir_abs_path():
+                                assets_to_build.append(asset)
+                        for asset in project.hdl_devices:
+                            if abs_path in asset.get_dir_abs_path():
+                                assets_to_build.append(asset)
+                else:
+                    raise Exception(_dir + ' is not buildable')
+            else:
+                assets_to_build.append(asset)
+        else:
+            if (hdl_target != '') or (hdl_platform != ''):
+                for hdl_primitive in project.hdl_primitives:
+                    assets_to_build.append(hdl_primitive)
+                for hdl_assembly in project.hdl_assemblies:
+                    assets_to_build.append(hdl_assembly)
+                for component_library in project.component_libraries:
+                    for worker in component_library.workers:
+                        if worker.get_type() == 'hdl worker':
+                            assets_to_build.append(worker)
+            if rcc_platform != '':
+                self.install_rcc_platform_if_not_installed(
+                        project_registry, rcc_platform)
+                for component_library in project.component_libraries:
+                    for worker in component_library.workers:
+                        if worker.get_type() == 'rcc worker':
+                            assets_to_build.append(worker)
+                for application in project.applications:
+                    assets_to_build.append(application)
+        self.throw_if_project_dependencies_not_registered(
+            project, project_registry)
         # ============ TODO START fix this mess and move back into tool class
         if rcc_platform != '':
             self.install_rcc_platform_if_not_installed(
@@ -149,53 +196,6 @@ class OCPIDev():
                     self.hdl_build_tool.export_project(
                             proj, hdl_platform, hdl_target, rcc_platform)
         # ============ END fix this mess and move back into tool class
-        if project is None:
-            project = project_registry.get_abs_path_project(abs_path)
-            asset = project.get_asset(abs_path)
-            if asset is None:
-                if abs_path in project.get_buildable_paths():
-                    for buildable_path in project.get_buildable_paths():
-                        for component_library in project.component_libraries:
-                            for asset in component_library.workers:
-                                if abs_path in asset.get_dir_abs_path():
-                                    assets_to_build.append(asset)
-                        for asset in project.applications:
-                            if abs_path in asset.get_dir_abs_path():
-                                assets_to_build.append(asset)
-                        for asset in project.hdl_primitives:
-                            if abs_path in asset.get_dir_abs_path():
-                                assets_to_build.append(asset)
-                        for asset in project.hdl_assemblies:
-                            if abs_path in asset.get_dir_abs_path():
-                                assets_to_build.append(asset)
-                        for asset in project.hdl_devices:
-                            if abs_path in asset.get_dir_abs_path():
-                                assets_to_build.append(asset)
-                else:
-                    raise Exception(_dir + ' is not buildable')
-            else:
-                assets_to_build.append(asset)
-        else:
-            if (hdl_target != '') or (hdl_platform != ''):
-                for hdl_primitive in project.hdl_primitives:
-                    assets_to_build.append(hdl_primitive)
-                for hdl_assembly in project.hdl_assemblies:
-                    assets_to_build.append(hdl_assembly)
-                for component_library in project.component_libraries:
-                    for worker in component_library.workers:
-                        if worker.get_type() == 'hdl worker':
-                            assets_to_build.append(worker)
-            if rcc_platform != '':
-                self.install_rcc_platform_if_not_installed(
-                        project_registry, rcc_platform)
-                for component_library in project.component_libraries:
-                    for worker in component_library.workers:
-                        if worker.get_type() == 'rcc worker':
-                            assets_to_build.append(worker)
-                for application in project.applications:
-                    assets_to_build.append(application)
-        self.throw_if_project_dependencies_not_registered(
-            project, project_registry)
         for asset in assets_to_build:
             project.build_asset(
                     asset, project_registry, self.hdl_build_tool,
