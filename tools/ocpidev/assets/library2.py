@@ -249,7 +249,7 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
                        project.name + ' project')
             raise Exception(msg)
 
-    def valid_path(self, project, _dir, comp_dict, is_sub_comp_path):
+    def valid_path(self, project, comp_dict, is_sub_comp_path):
         """ Check that the user is providing a valid path to a component
             library. If not, provide path suggestions """
         valid_path = False
@@ -289,7 +289,7 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
             self.create_components_library(project)
         self.valid_library_name(project, comp_dict, is_sub_comp_path)
         self.library_name_exists(project)
-        self.valid_path(project, _dir, comp_dict, is_sub_comp_path)
+        self.valid_path(project, comp_dict, is_sub_comp_path)
         comp_lib_xml_name = self.name + '.xml'
         comp_lib_rst_templates[comp_lib_xml_name] = g_asset_template
         AssetBase.create_files(self, comp_lib_rst_templates)
