@@ -23,6 +23,149 @@ import xml.etree.ElementTree as ET
 from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import AssetBase
 
+comp_rst_template = """
+.. {{asset.name}} documentation
+
+.. Skeleton comment (to be deleted): Alternative names should be listed as
+   keywords. If none are to be included delete the meta directive.
+
+.. meta::
+   :keywords: skeleton example
+
+
+.. _{{asset.name}}:
+
+
+SKELETON NAME (``{{asset.name}}``)
+=================================
+Skeleton outline: Single line description.
+
+Function
+--------
+Skeleton outline: The functionality of the component: how it should produce outputs and volatile property values based on inputs and parameter/initial/writable property values (not **how** it is implemented, as that belongs in worker documentation).
+
+The mathematical representation of the component function is given in :eq:`{{asset.name}}-equation`.
+
+.. math::
+   :label: {{asset.name}}-equation
+
+   y[n] = \\alpha * x[n]
+
+
+In :eq:`{{asset.name}}-equation`:
+
+ * :math:`x[n]` is the input values.
+
+ * :math:`y[n]` is the output values.
+
+ * Skeleton, etc.,
+
+A block diagram representation of the component function is given in :numref:`{{asset.name}}-diagram`.
+
+.. _{{asset.name}}-diagram:
+
+.. figure:: {{asset.name}}.svg
+   :alt: Skeleton alternative text.
+   :align: center
+
+   Caption text.
+
+Interface
+---------
+.. literalinclude:: ../specs/{{asset.name}}-spec.xml
+   :language: xml
+
+Opcode Handling
+~~~~~~~~~~~~~~~
+Skeleton outline: Description of how the non-stream opcodes are handled.
+
+Properties
+~~~~~~~~~~
+.. ocpi_documentation_properties::
+
+   property_name: Skeleton outline: List any additional text for properties, which will be included in addition to the description field in the component specification XML.
+
+Ports
+~~~~~
+.. ocpi_documentation_ports::
+
+   input: Primary input samples port.
+   output: Primary output samples port.
+
+Implementations
+---------------
+.. ocpi_documentation_implementations:: ../{{asset.name}}.hdl ../{{asset.name}}.rcc
+
+Example Application
+-------------------
+.. literalinclude:: example_app.xml
+   :language: xml
+
+Dependencies
+------------
+The dependencies to other elements in OpenCPI are:
+
+ * Skeleton outline: List primitives or other files within OpenCPI that are used (no need to list protocols).
+
+There is also a dependency on:
+
+ * ``ieee.std_logic_1164``
+
+ * ``ieee.numeric_std``
+
+ * Skeleton outline: Any other standard C++ or HDL packages.
+
+Limitations
+-----------
+Limitations of ``{{asset.name}}`` are:
+
+ * Skeleton outline: List any limitations, or state "None." if there are none.
+
+Testing
+-------
+.. ocpi_documentation_test_platforms::
+
+.. Removed ocpi_documentation_test_result_summary directive until it is functional
+"""
+
+comp_example_app_rst_template = """
+<?xml version="1.0"?>
+<application done="file_write">
+  <instance component="ocpi.core.file_read" connect="%%NAME-CODE%%">
+    <property name="filename" value="input.bin"/>
+  </instance>
+  <instance component="%%PROJECT_PREFIX%%.%%PROJECT%%.%%LIBRARY%%.%%NAME-CODE%%" connect="file_write">
+    <!-- Skeleton application outline, set properties here. Or change this
+         example application to do something more real-world appropriate if
+         file-read, then component, then file-write is too artifical to be a
+         useful example. -->
+  </instance>
+  <instance component="ocpi.core.file_write">
+    <property name="filename" value="output.bin"/>
+  </instance>
+</application>
+"""
+
+comp_test_rst_template = """
+.. {{asset.name}} test detail
+
+
+:orphan:
+
+
+``{{asset.name}}`` Test Detail
+=============================
+.. ocpi_documentation_test_detail::
+
+"""
+
+
+def create_templates(name):
+    comp_templates = {}
+    comp_templates[name + '-comp.xml'] = g_asset_template
+    comp_templates[name + '-comp.rst'] = comp_rst_template
+    comp_templates[name + '-test.rst'] = comp_test_rst_template
+    return comp_templates
 
 class OperationArgumentMember(AttributeBase):
 
@@ -38,7 +181,6 @@ class OperationArgumentMember(AttributeBase):
         for key in ['Name', 'Type']:
             ret.append(AttributeInfo(key))
         return ret
-
 
 class OperationArgument(AttributeBase):
     """ Component Development Guide section 5.1.3.2 """
@@ -135,12 +277,16 @@ class Component(AssetBase):
         represented by a xml file (OCS) and knows nothing about the project it
         is in or its package ID. """
 
-    def __init__(self, xml_abs_path, cli_dict=None):
+    def __init__(self, xml_abs_path, enable_path_existence_check=True, cli_dict=None):
         """ xml_abs_path is None for ComponentSpec embedded in OWD """
         self.root_tags = ['ComponentSpec']
-        AssetBase.__init__(self, xml_abs_path)
+        AssetBase.__init__(self, xml_abs_path, enable_path_existence_check)
         Logger().debug('parsing ' + self.get_xml_abs_path())
         self.parse(cli_dict)
+
+    def create(self):
+       comp_xml_templates = create_templates(self.name.split('.')[0])
+       AssetBase.create_files(self, comp_xml_templates)
 
     def get_attr_infos(self):
         ret = []

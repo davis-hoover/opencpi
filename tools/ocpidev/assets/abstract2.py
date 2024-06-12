@@ -897,6 +897,9 @@ class AssetBase(AttributeBase):
                     raise InvalidAssetError(msg)
 
     def create_files(self, templates):
+        extensions = ('.comp')
+        if self.get_dir_abs_path().endswith(extensions):
+            self.name = os.path.splitext(self.name)[0]
         if self.get_abs_path_exists():
             raise Exception(self.get_type() + ' ' + self.abs_path + ' already exists')
         else:

@@ -58,7 +58,7 @@ class OCPIDev():
             Project(abs_path, False, cli_dict).create()
         else:
             # Check for valid registered project directory
-            project_registry = ProjectRegistry(False, False)
+            project_registry = ProjectRegistry()
             project = None
             for proj in project_registry.projects:
                 if proj.abs_path + '/' in _dir + '/':
@@ -67,11 +67,26 @@ class OCPIDev():
             if project is None:
                 raise Exception('Please perform create ' + args.noun + ' in a '
                                 'registered project directory')
+
+
             if args.noun == 'library':
-                component_path = _dir + '/' + args.name
+                component_lib_path = _dir + '/' + args.name
                 ComponentLibrary(
-                    component_path, False, cli_dict
+                    component_lib_path, False, cli_dict
                 ).create(project, _dir)
+            if args.noun == 'component':
+                valid_path = False
+                for lib in project.component_libraries:
+                    if _dir == lib.abs_path:
+                        valid_path = True
+                        break
+                if not valid_path:
+                    raise Exception('Please perform create component in a '
+                                    'valid component library')
+                component_path = _dir + '/' + args.name + '.comp'
+                Component(
+                    component_path, False, cli_dict
+                ).create()
 
     def delete(self, noun):
         raise Exception('delete is not supported at this time')
@@ -275,6 +290,7 @@ class OCPIDev():
         if noun == 'registry':
             print(project_registry.abs_path)
         for project in project_registry.projects:
+            print("project.abs_path = " + project.abs_path)
             if noun == 'projects':
                 msg = str(project.get_package_id()) + ' '
                 for idx in range(30-len(msg)):
@@ -284,6 +300,7 @@ class OCPIDev():
                 for component in project.components:
                     print(str(project.get_package_id()) + '.' + component.name)
             for component_library in project.component_libraries:
+                print("component_library.abs_path = " + component_library.abs_path)
                 pid = component_library.get_package_id(str(project.get_package_id()))
                 if noun == 'libraries':
                     print(pid)
@@ -538,7 +555,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     #try:
     nouns = ['registry', 'project', 'projects', 'libraries', 'components',
-             'workers', 'library']
+             'workers', 'library', 'component']
     if (args.noun is not None) and (args.noun not in nouns):
         if args.verb != 'apply':
             raise Exception('noun ' + str(args.noun) + ' is not supported')
