@@ -1,0 +1,66 @@
+OCPIDEV-BUILD(1)
+==============
+
+
+NAME
+----
+ocpidev2-build - compiles OpenCPI assets
+
+
+SYNOPSIS
+--------
+*`ocpidev2`* ['<options>'] *`build`*
+
+
+DESCRIPTION
+-----------
+The *`build`* verb compiles (or performs the equivalent operation for the asset)
+the OpenCPI assets specified by the options used
+in the command. If no options are provided, *`ocpidev2`* builds all assets
+within the current directory.
+
+OPTIONS
+-------
+In addition to the -d and -h options common to all OpenCPI tools (see link:opencpi.1.html[opencpi(1)]),
+the options below can be specified for the *`build`* verb. 
+These options are primarily used to limit what is built
+(focus the build process on specific assets of interest), or specify the
+platforms and targets to build the assets for.
+
+In the following descriptions, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.
+
+Options When Building Projects, Libraries, Directories, RCC Workers or ACI Applications
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--rcc-platform=`*'<platform>'+::
+    Build RCC/ACI assets for the specified RCC platform. If this
+    option is not used,
+    the current development software platform is used as the single
+    RCC platform used for building.
+
+Options When Building Projects, Libraries, or Directories with HDL Workers or other HDL Assets
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--hdl-platform=`*'<hdl-platform>'+::
+    Build HDL assets for the specified HDL platform.
+
+*`--hdl-target=`*'<target>'+::
+    Build HDL assets for the specified HDL target. If only HDL targets
+    are specified (and no HDL platforms), containers will not be
+    built for assemblies or unit tests.
+
+EXAMPLES
+--------
+. Build the current asset or directory and those underneath it,
+for the *`zed`* HDL platform
++
+---------------------------
+ocpidev2 build -j 16 --hdl-platform=zed
+---------------------------
+
+COPYING
+-------
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.

@@ -106,7 +106,7 @@ class OCPIDev():
             if os.environ.get('XILINX_VIVADO') is not None:
                 msg = 'cannot run ocpidev2 when Vivado environment is sourced'
                 raise Exception(msg)
-        if rcc_platform is not None:
+        if rcc_platform != '':
             self.throw_if_not_installed(rcc_platform)
         # if hdl_platform is not None:
         #     self.throw_if_not_installed(hdl_platform)
@@ -117,6 +117,53 @@ class OCPIDev():
         for project2 in project_registry.projects:
             if project2.abs_path == os.path.realpath(abs_path):
                 project = project2
+        if project is None:
+            project = project_registry.get_abs_path_project(abs_path)
+            asset = project.get_asset(abs_path)
+            if asset is None:
+                if abs_path in project.get_buildable_paths():
+                    for buildable_path in project.get_buildable_paths():
+                        for component_library in project.component_libraries:
+                            for asset in component_library.workers:
+                                if abs_path in asset.get_dir_abs_path():
+                                    assets_to_build.append(asset)
+                        for asset in project.applications:
+                            if abs_path in asset.get_dir_abs_path():
+                                assets_to_build.append(asset)
+                        for asset in project.hdl_primitives:
+                            if abs_path in asset.get_dir_abs_path():
+                                assets_to_build.append(asset)
+                        for asset in project.hdl_assemblies:
+                            if abs_path in asset.get_dir_abs_path():
+                                assets_to_build.append(asset)
+                        for asset in project.hdl_devices:
+                            if abs_path in asset.get_dir_abs_path():
+                                assets_to_build.append(asset)
+                else:
+                    raise Exception(_dir + ' is not buildable')
+            else:
+                assets_to_build.append(asset)
+        else:
+            if (hdl_target != '') or (hdl_platform != ''):
+                for hdl_primitive in project.hdl_primitives:
+                    assets_to_build.append(hdl_primitive)
+                for hdl_assembly in project.hdl_assemblies:
+                    assets_to_build.append(hdl_assembly)
+                for component_library in project.component_libraries:
+                    for worker in component_library.workers:
+                        if worker.get_type() == 'hdl worker':
+                            assets_to_build.append(worker)
+            if rcc_platform != '':
+                self.install_rcc_platform_if_not_installed(
+                        project_registry, rcc_platform)
+                for component_library in project.component_libraries:
+                    for worker in component_library.workers:
+                        if worker.get_type() == 'rcc worker':
+                            assets_to_build.append(worker)
+                for application in project.applications:
+                    assets_to_build.append(application)
+        self.throw_if_project_dependencies_not_registered(
+            project, project_registry)
         # ============ TODO START fix this mess and move back into tool class
         if rcc_platform != '':
             self.install_rcc_platform_if_not_installed(
@@ -170,53 +217,6 @@ class OCPIDev():
                     self.hdl_build_tool.export_project(
                             proj, hdl_platform, hdl_target, rcc_platform)
         # ============ END fix this mess and move back into tool class
-        if project is None:
-            project = project_registry.get_abs_path_project(abs_path)
-            asset = project.get_asset(abs_path)
-            if asset is None:
-                if abs_path in project.get_buildable_paths():
-                    for buildable_path in project.get_buildable_paths():
-                        for component_library in project.component_libraries:
-                            for asset in component_library.workers:
-                                if abs_path in asset.get_dir_abs_path():
-                                    assets_to_build.append(asset)
-                        for asset in project.applications:
-                            if abs_path in asset.get_dir_abs_path():
-                                assets_to_build.append(asset)
-                        for asset in project.hdl_primitives:
-                            if abs_path in asset.get_dir_abs_path():
-                                assets_to_build.append(asset)
-                        for asset in project.hdl_assemblies:
-                            if abs_path in asset.get_dir_abs_path():
-                                assets_to_build.append(asset)
-                        for asset in project.hdl_devices:
-                            if abs_path in asset.get_dir_abs_path():
-                                assets_to_build.append(asset)
-                else:
-                    raise Exception(_dir + ' is not buildable')
-            else:
-                assets_to_build.append(asset)
-        else:
-            if (hdl_target != '') or (hdl_platform != ''):
-                for hdl_primitive in project.hdl_primitives:
-                    assets_to_build.append(hdl_primitive)
-                for hdl_assembly in project.hdl_assemblies:
-                    assets_to_build.append(hdl_assembly)
-                for component_library in project.component_libraries:
-                    for worker in component_library.workers:
-                        if worker.get_type() == 'hdl worker':
-                            assets_to_build.append(worker)
-            if rcc_platform != '':
-                self.install_rcc_platform_if_not_installed(
-                        project_registry, rcc_platform)
-                for component_library in project.component_libraries:
-                    for worker in component_library.workers:
-                        if worker.get_type() == 'rcc worker':
-                            assets_to_build.append(worker)
-                for application in project.applications:
-                    assets_to_build.append(application)
-        self.throw_if_project_dependencies_not_registered(
-            project, project_registry)
         for asset in assets_to_build:
             project.build_asset(
                     asset, project_registry, self.hdl_build_tool,
@@ -369,7 +369,7 @@ class LegacyOCPIDevHDLBuildTool():
             'LegacyOCPIDevHDLBuildTool: exporting project ' +
             project.abs_path.split('/')[-1])
         hdl = (hdl_platform is not None) or (hdl_target is not None)
-        if hdl or (rcc_platform is not None):
+        if hdl or (rcc_platform != ''):
             cmd = 'ocpidev build -d ' + project.abs_path + ' --no-doc'
             if Environment().ocpi_log_level < 8:
                 cmd += ' >/dev/null 2>&1'
@@ -386,11 +386,12 @@ class LegacyOCPIDevHDLBuildTool():
             if str(proj.get_package_id()) == 'ocpi.core':
                 tmp_path = proj.abs_path + '/rcc/platforms/'
                 if not os.path.isdir(tmp_path + rcc_platform + '/gen'):
+                    Logger().debug('ocpiadmin install platform ' + rcc_platform)
                     if os.system('ocpiadmin install platform ' + rcc_platform) != 0:
                         raise Exception('failed to build rcc platform ' + rcc_platform)
 
-    def get_build_output_path(self, asset, hdl_target = '',
-            hdl_platform = ''):
+    def get_build_output_path(self, asset, hdl_target='',
+            hdl_platform=''):
         ret = asset.abs_path
         tmp = ''
         if asset.get_type() == 'hdl assembly':
@@ -430,8 +431,8 @@ class LegacyOCPIDevHDLBuildTool():
     #            makefile.rules[tar].recipe = get_gnu_make_recipe(tar)
     #    makefile.emit()
     def build_asset(self, project, asset, tname,
-            hdl_target = None, hdl_platform = None, rcc_platform = None,
-            no_doc = False, project_registry = None, dependency_tree = None):
+            hdl_target='', hdl_platform='', rcc_platform='',
+            no_doc=False, project_registry=None, dependency_tree=None):
         _j = 1
         # try:
         if self.first:
@@ -456,6 +457,8 @@ class LegacyOCPIDevHDLBuildTool():
             cmd += ' --hdl-target ' + hdl_target
         if hdl_platform != '':
             cmd += ' --hdl-platform ' + hdl_platform
+        if rcc_platform != '':
+            cmd += ' --rcc-platform ' + rcc_platform
         if no_doc:
             cmd += ' --no-doc'
         if Environment().ocpi_log_level < 8:
@@ -465,9 +468,10 @@ class LegacyOCPIDevHDLBuildTool():
         # cmd += '\n\t'
         # cmd += '@[ -f ' + global_makefile.rules[tname].targets[0].string + ' ]'
         # cmd += '\n\t'
-        if (Environment().ocpi_log_level >= 8) and (_j > 1):
-            cmd += '@echo [INFO] building ' + asset.get_type() + ' ' + asset.name + ' done'
+        #if (Environment().ocpi_log_level >= 8) and (_j > 1):
+        cmd += '@echo [INFO] building ' + asset.get_type() + ' ' + asset.name + ' done'
         global_makefile.rules[tname].recipe = cmd
+        Logger().debug('creating make rule: ' + str(global_makefile.rules[tname]))
         #if os.system(cmd) != 0:
         #    raise Exception('build failed ')
         #os.system('touch ' + asset.abs_path + '/.build')
