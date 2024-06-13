@@ -196,10 +196,9 @@ class OCPIDev():
                     self.hdl_build_tool.export_project(
                             proj, hdl_platform, hdl_target, rcc_platform)
         # ============ END fix this mess and move back into tool class
-        for asset in assets_to_build:
-            project.build_asset(
-                    asset, project_registry, self.hdl_build_tool,
-                    hdl_target, hdl_platform, rcc_platform, _j)
+        project.build_assets(
+                assets_to_build, project_registry, self.hdl_build_tool,
+                hdl_target, hdl_platform, rcc_platform, _j)
         # TODO move below 8 lines outside OCPIDev class (Legacy...)
         # IMPORTANT - below 7 lines necessary to mitigate stale files
         #for proj in project_registry.projects:
