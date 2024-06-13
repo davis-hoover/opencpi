@@ -67,8 +67,6 @@ class OCPIDev():
             if project is None:
                 raise Exception('Please perform create ' + args.noun + ' in a '
                                 'registered project directory')
-
-
             if args.noun == 'library':
                 component_lib_path = _dir + '/' + args.name
                 ComponentLibrary(
@@ -83,10 +81,14 @@ class OCPIDev():
                 if not valid_path:
                     raise Exception('Please perform create component in a '
                                     'valid component library')
-                component_path = _dir + '/' + args.name + '.comp'
+                component_path = (
+                    _dir + '/' + args.name + '.comp' + '/' + args.name +
+                    '-comp.xml'
+                )
+                package_id = project.get_package_id()
                 Component(
                     component_path, False, cli_dict
-                ).create()
+                ).create(package_id)
 
     def delete(self, noun):
         raise Exception('delete is not supported at this time')
@@ -503,6 +505,7 @@ def unittest():
     ret = True
     # ret = test_GNUMakefile(ret)
     ret = test_Component(ret)
+    ret = test_Component_create(ret)
     ret = test_ComponentLibrary(ret)
     ret = test_ComponentLibrary_create(ret)
     ret = test_RccAssembly(ret)
