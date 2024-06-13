@@ -896,18 +896,18 @@ class AssetBase(AttributeBase):
                 else:
                     raise InvalidAssetError(msg)
 
-    def create_files(self, templates):
-        extensions = ('.comp')
-        if self.get_dir_abs_path().endswith(extensions):
-            self.name = os.path.splitext(self.name)[0]
+    def create_files(self, templates, package_id=None, library_name=None):
+        abs_path = self.get_dir_abs_path()
         if self.get_abs_path_exists():
             raise Exception(self.get_type() + ' ' + self.abs_path + ' already exists')
         else:
-            os.makedirs(self.get_dir_abs_path(), exist_ok=False)
+            os.makedirs(abs_path, exist_ok=False)
         for fname, fcontents in templates.items():
             fcontents = jinja2.Template(fcontents, trim_blocks=True)
-            fcontents = fcontents.render(asset=self)
-            out_file = open(self.abs_path + '/' + fname, 'w')
+            fcontents = fcontents.render(
+                asset=self, package_id=package_id, library_name=library_name
+            )
+            out_file = open(abs_path + '/' + fname, 'w')
             out_file.write(fcontents)
             out_file.close()
 

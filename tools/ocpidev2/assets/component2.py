@@ -18,6 +18,7 @@
 
 
 import os
+import hashlib
 # below line is for testing only
 import xml.etree.ElementTree as ET
 from _opencpi.assets.abstract2 import *
@@ -128,24 +129,6 @@ Testing
 .. Removed ocpi_documentation_test_result_summary directive until it is functional
 """
 
-comp_example_app_rst_template = """
-<?xml version="1.0"?>
-<application done="file_write">
-  <instance component="ocpi.core.file_read" connect="%%NAME-CODE%%">
-    <property name="filename" value="input.bin"/>
-  </instance>
-  <instance component="%%PROJECT_PREFIX%%.%%PROJECT%%.%%LIBRARY%%.%%NAME-CODE%%" connect="file_write">
-    <!-- Skeleton application outline, set properties here. Or change this
-         example application to do something more real-world appropriate if
-         file-read, then component, then file-write is too artifical to be a
-         useful example. -->
-  </instance>
-  <instance component="ocpi.core.file_write">
-    <property name="filename" value="output.bin"/>
-  </instance>
-</application>
-"""
-
 comp_test_rst_template = """
 .. {{asset.name}} test detail
 
@@ -159,12 +142,31 @@ comp_test_rst_template = """
 
 """
 
+comp_example_app_rst_template = """
+<?xml version="1.0"?>
+<application done="file_write">
+  <instance component="ocpi.core.file_read" connect="{{asset.name}}">
+    <property name="filename" value="input.bin"/>
+  </instance>
+  <instance component="{{package_id}}.{{library_name}}.{{asset.name}}" connect="file_write">
+    <!-- Skeleton application outline, set properties here. Or change this
+         example application to do something more real-world appropriate if
+         file-read, then component, then file-write is too artifical to be a
+         useful example. -->
+  </instance>
+  <instance component="ocpi.core.file_write">
+    <property name="filename" value="output.bin"/>
+  </instance>
+</application>
+"""
+
 
 def create_templates(name):
     comp_templates = {}
     comp_templates[name + '-comp.xml'] = g_asset_template
     comp_templates[name + '-comp.rst'] = comp_rst_template
     comp_templates[name + '-test.rst'] = comp_test_rst_template
+    comp_templates['example_app.xml'] = comp_example_app_rst_template
     return comp_templates
 
 class OperationArgumentMember(AttributeBase):
@@ -284,9 +286,10 @@ class Component(AssetBase):
         Logger().debug('parsing ' + self.get_xml_abs_path())
         self.parse(cli_dict)
 
-    def create(self):
-       comp_xml_templates = create_templates(self.name.split('.')[0])
-       AssetBase.create_files(self, comp_xml_templates)
+    def create(self, package_id):
+       library_name = self.abs_path.split('/')[-3]
+       comp_xml_templates = create_templates(self.name)
+       AssetBase.create_files(self, comp_xml_templates, package_id, library_name)
 
     def get_attr_infos(self):
         ret = []
@@ -461,4 +464,51 @@ def test_Component(ret):
             log_pass_fail('testing Component name', passed)
         if passed is False:
             ret = False
+    return ret
+
+def test_Component_create(ret):
+    fs = TemporaryFilesystem()
+    test_name = 'test_Component_create: '
+    name = 'cmp1'
+    package_id = 'ocpi.foo'
+    dir_path = fs.abs_path + '/foo/components/' + name + '.comp'
+    xml_abs_path = dir_path + '/' + name + '-comp.xml'
+    try:
+        Component(
+            xml_abs_path, False, None
+        ).create(package_id)
+        passed = True
+    except Exception as e:
+        Logger().debug(test_name + str(e))
+    # Test for file existence
+    comp_files = ['cmp1-comp.xml', 'cmp1-comp.rst', 'example_app.xml',
+        'cmp1-test.rst']
+    for comp_file in comp_files:
+        path = dir_path + '/' + comp_file
+        if not os.path.exists(path):
+            passed = False
+    # Test for file integrity
+    msg = 'invalid expected md5sum for file: '
+    comp_xml_md5 = hashlib.md5(open(xml_abs_path, 'rb').read()).hexdigest()
+    if comp_xml_md5 != '40e1d7cd6cd5242615d28725fce1c2e3':
+        passed = False
+        Logger().error(test_name + str(msg + xml_abs_path))
+    comp_rst = dir_path + '/cmp1-comp.rst'
+    comp_rst_md5 = hashlib.md5(open(comp_rst, 'rb').read()).hexdigest()
+    if comp_rst_md5 != '84fc0cece1ea3c7e7c8bc78c0202e50a':
+        passed = False
+        Logger().error(test_name + str(msg + comp_rst))
+    example_app = dir_path + '/example_app.xml'
+    example_app_md5 = hashlib.md5(open(example_app, 'rb').read()).hexdigest()
+    if example_app_md5 != 'fa3bb09634de1f96eda4e647cc698d12':
+        passed = False
+        Logger().error(test_name + str(msg + example_app))
+    comp_test_rst = dir_path + '/cmp1-test.rst'
+    comp_test_md5 = hashlib.md5(open(comp_test_rst, 'rb').read()).hexdigest()
+    if comp_test_md5 != '048f66d77e6625d5cb848140c5cc552e':
+        passed = False
+        Logger().error(test_name + str(msg + comp_test_rst))
+    log_pass_fail('testing Component create', passed)
+    if passed is False:
+        ret = False
     return ret
