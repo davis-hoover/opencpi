@@ -28,6 +28,8 @@ import re
 import shutil
 import logging
 from datetime import datetime
+import subprocess
+import traceback
 
 from . import utilities
 from .test_result import LintTestResult
@@ -38,6 +40,7 @@ class BaseCodeCheckerDefaults:
     comment_maximum_line_length = 80
     maximum_line_length = 80
     license_notice = ""
+    timeout = 30    # Default timeout to detect a stuck external tool
 
 
 class ParseWarning(UserWarning):
@@ -78,6 +81,12 @@ class BaseCodeChecker:
         # Set bare minimum number of lines needed for header and start of
         # license to be present
         self.minimum_number_of_lines = 3
+
+        # Regex used to parse external tool output
+        self.error_output_regex = re.compile(
+            "(?P<file>[^:]+):" +
+            "(?P<line>\\d+)(:(?P<column>\\d+))?:" +
+            "(?P<message>.*)$")
 
     @staticmethod
     def get_supported_file_extensions():
@@ -144,7 +153,8 @@ class BaseCodeChecker:
                     test_name, issues = test_function() or ("", [])
                     stop = datetime.now()
 
-                    # Remove any issues that are identified as allowed exceptions
+                    # Remove any issues that are identified as
+                    # allowed exceptions
                     if test_number in self._allowed_exceptions:
                         issues = [issue for issue in issues if issue["line"]
                                   not in self._allowed_exceptions[test_number]]
@@ -182,7 +192,8 @@ class BaseCodeChecker:
                     "N/A", "NON-TEXT FILE",
                     [{
                         "line": 0,
-                        "message": "File could not be parsed as a UTF-8 compliant file"
+                        "message": "File could not be parsed as a UTF-8 " +
+                                   "compliant file"
                     }])
                 return False
 
@@ -201,7 +212,9 @@ class BaseCodeChecker:
                         "N/A", "LINT EXCEPTION FORMAT",
                         [{
                             "line": 0,
-                            "message": f"Line {line_number + 1}: Linter exception format incorrect."
+                            "message": f"Line {line_number + 1}: Linter " +
+                                       "exception format incorrect."
+
                         }])
                     return False
 
@@ -235,6 +248,48 @@ class BaseCodeChecker:
         else:
             return True
 
+    def _run_external_command(self, cmd, **kwargs):
+        """Run an external command with timeout protection.
+
+        Args:
+            cmd (list): Command and argument list
+
+        Returns:
+            tuple(bool, list, process): Success status, (potentially empty)
+                                        list of issues, and the process object.
+        """
+        timeout = self.checker_settings.timeout
+        # Ensure items are all strings
+        for i, x in enumerate(cmd):
+            if not isinstance(x, str):
+                logging.warn(f"Converting arg #{i} to string: {x}")
+                stack = traceback.format_stack()
+                print(utilities.PrintStyle.BOLD + utilities.PrintStyle.YELLOW +
+                      f"WARNING: Converting arg #{i} to string " +
+                      f"(was {type(x)}): {x} "
+                      + utilities.PrintStyle.NORMAL + "\n" + "".join(stack))
+                cmd[i] = str(x)
+        try:
+            logging.debug("Running external command: \"" +
+                          "\" \"".join(cmd) + "\"")
+            process = subprocess.Popen(cmd, **kwargs)
+            process.wait(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            return False, [{"line": None,
+                            "message": "Timeout aborted external command " +
+                                       f"after {timeout} seconds\n\tcmd=\""
+                            + "\" \"".join(cmd) + "\""
+                            }], process
+        except Exception as e:
+            return False, [{
+                "line": None,
+                "message": f"Error calling external command\n\tcmd=\""
+                + "\" \"".join(str(x) for x in cmd)
+                + "\"\n\texception=" + str(e)
+            }], None
+
+        return True, [], process
+
     def _print_issues(self, test_number, test_name, issues):
         """Print the issues found to the terminal.
 
@@ -267,10 +322,11 @@ class BaseCodeChecker:
                     if self.to_console:
                         print(
                             utilities.PrintStyle.RED +
-                            f"  {self.given_path}: {issue['message'].strip()}" +
-                            utilities.PrintStyle.NORMAL)
+                            f"  {self.given_path}: {issue['message'].strip()}"
+                            + utilities.PrintStyle.NORMAL)
 
-    def _remove_comments_and_strings(self, block_comment_start, block_comment_end, line_comment_start):
+    def _remove_comments_and_strings(self, block_comment_start,
+                                     block_comment_end, line_comment_start):
         """Remove comments and string content from code.
 
         String quote marks are left but content within string are removed.
@@ -279,12 +335,16 @@ class BaseCodeChecker:
         Uses self._code() as the input code to be filtered.
 
         Args:
-            block_comment_start (str): Start of block comment e.g. "/*" or "<!--"
-            block_comment_end (str): End of block comment e.g. "*/" or "-->"
-            line_comment_start (str): Start of line comment e.g. "//" or "#"
+            block_comment_start (str):  Start of block comment
+                                        e.g. "/*" or "<!--"
+            block_comment_end (str):    End of block comment
+                                        e.g. "*/" or "-->"
+            line_comment_start (str):   Start of line comment
+                                        e.g. "//" or "#"
 
         Raises:
-            ParseWarning: If the end of a string or block comment cannot be found.
+            ParseWarning: If the end of a string or block comment cannot
+                          be found.
 
         Returns:
             List of the code without comments, and without string contents.
@@ -315,7 +375,8 @@ class BaseCodeChecker:
                 pos = 0
                 found = False
                 while (not found) and (pos < len(line_text)):
-                    if line_comment_start is not None and line_text[pos:].startswith(line_comment_start):
+                    if (line_comment_start is not None and
+                            line_text[pos:].startswith(line_comment_start)):
                         line_comment_position = pos
                         found = True
                     elif line_text[pos:].startswith(block_comment_start):
@@ -340,12 +401,14 @@ class BaseCodeChecker:
 
                 if line_comment_position is not None:
                     # Use the line upto the line comment position
-                    reduced_code[line_number] += line_text[:line_comment_position]
+                    reduced_code[line_number] += line_text[
+                        :line_comment_position]
                     line_text = ""
 
                 elif block_comment_position is not None:
                     # Use the line upto the block comment position
-                    reduced_code[line_number] += line_text[:block_comment_position]
+                    reduced_code[line_number] += line_text[
+                        :block_comment_position]
                     # Next, process rest of line looking for end of comment
                     line_text = line_text[block_comment_position +
                                           len(block_comment_start):]

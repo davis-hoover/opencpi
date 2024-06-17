@@ -105,8 +105,8 @@ inherit_parent: true
 #   - xml_002  # Check only double quotation marks are used
 #   - xml_003  # Check comments do not exceed character limit (default is 80)
 #   - xml_004  # Check non-comments are all lowercase
-#   - xml_005  # Check "writable" attribute is explicitly set for all
-#              # properties in OCSs
+#   - xml_005  # Check "writable", "volatile", "initial" or "parameter" is
+#              # explicitly set for all properties in OCSs
 #   - xml_006  # Check "producer" attribute is explicitly set for all
 #              # ports in OCSs
 #   - xml_007  # Check "default" attribute is explicitly set for all

@@ -32,9 +32,13 @@ class LintTestResult:
         """New test result.
 
         Args:
-            test_name (str, optional): Verbose name for this test. Defaults to "".
-            test_id (str, optional): short id for this test (i.e. py_001). Defaults to "".
-            duration (datetime.timedelta, optional): processing time this test has taken. Defaults to timedelta(0).
+            test_name (str, optional): Verbose name for this test.
+                                       Defaults to "".
+            test_id (str, optional): short id for this test (i.e. py_001).
+                                     Defaults to "".
+            duration (datetime.timedelta, optional): processing time this test
+                                                     has taken. Defaults to
+                                                     timedelta(0).
         """
         self.name = test_name
         self.id = test_id
@@ -53,7 +57,8 @@ class LintTestResult:
         Args:
             test_name (str, optional): Verbose name of test. Defaults to "".
             test_id (str, optional): Short name of test. Defaults to "".
-            duration (datetime.timedelta, optional): Processing time for this test. Defaults to timedelta(0).
+            duration (datetime.timedelta, optional): Processing time for this
+                                     test. Defaults to timedelta(0).
 
         Returns:
             LintTestResult: Instance of LintTestResult
@@ -69,7 +74,8 @@ class LintTestResult:
         Args:
             test_name (str, optional): Verbose name of test. Defaults to "".
             test_id (str, optional): Short name of test. Defaults to "".
-            duration (datetime.timedelta, optional): Processing time for this test. Defaults to timedelta(0).
+            duration (datetime.timedelta, optional): Processing time for this
+                                      test. Defaults to timedelta(0).
 
         Returns:
             LintTestResult: Instance of LintTestResult
@@ -79,14 +85,17 @@ class LintTestResult:
         return ret
 
     @classmethod
-    def failed(cls, test_name="", test_id="", issues=[], duration=timedelta(0)):
+    def failed(cls, test_name="", test_id="", issues=[],
+               duration=timedelta(0)):
         """Factory for Failing tests.
 
         Args:
             test_name (str, optional): Verbose name of test. Defaults to "".
             test_id (str, optional): Short name of test. Defaults to "".
-            issues (list, optional): List of all issues found for this test. Defaults to "Unknown Failure".
-            duration (datetime.timedelta, optional): Processing time for this test. Defaults to timedelta(0).
+            issues (list, optional): List of all issues found for this test.
+                                     Defaults to "Unknown Failure".
+            duration (datetime.timedelta, optional): Processing time for this
+                                     test. Defaults to timedelta(0).
 
         Returns:
             LintTestResult: Instance of LintTestResult

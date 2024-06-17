@@ -58,31 +58,57 @@ if __name__ == "__main__":
     # Ignore/no-ignore options
     ignore_group = parser.add_mutually_exclusive_group(required=False)
     ignore_group.add_argument("-n", "--no-ignore", action="store_true",
-                              help="Prevents ignore lists from being used (cannot be "
-                              "used with --ignore-unrecognised).")
-    ignore_group.add_argument("-u", "--ignore-unrecognised", action="store_true",
-                              help="Ignore files with unrecognised extensions.")
+                              help="Prevents ignore lists from being used " +
+                              "(cannot be used with --ignore-unrecognised).")
+    ignore_group.add_argument("-u", "--ignore-unrecognised",
+                              action="store_true",
+                              help="Ignore files with unrecognised extensions."
+                              )
 
     # Logging/output options
     logging_group = parser.add_argument_group("logging arguments")
-    logging_group.add_argument("-j", "--junit", type=str, nargs="?", const="lint_report.xml",
+    logging_group.add_argument("-j", "--junit", type=str, nargs="?",
+                               const="lint_report.xml",
                                default=None,
-                               help="Generate a JUnit compatible test report, with " +
-                               "the defined filename (if no filename is provided " +
-                               "then defaults to: lint_report.xml).")
+                               help="Generate a JUnit compatible test " +
+                               "report, with the defined filename (if no " +
+                               "filename is provided then defaults to: " +
+                               "lint_report.xml).")
     logging_group.add_argument("-v", "--verbose", type=str, default=None,
                                choices=["DEBUG", "INFO", "WARNING", "ERROR"],
-                               help="Sets the verbosity: DEBUG, INFO, WARNING, ERROR. " +
-                               "Defaults to off (or DEBUG if --logging)")
-    logging_group.add_argument("-l", "--logging", type=str, default=None, nargs="?",
-                               const="./lint_log_debug.log",
-                               help="Stores a processing log to the specified location " +
-                               "(if none specified then defaults to ./lint_log_debug.log)")
+                               help="Sets the verbosity: " +
+                               "DEBUG, INFO, WARNING, ERROR." +
+                               " Defaults to off (or DEBUG if --logging)")
+    logging_group.add_argument("-l", "--logging", type=str, default=None,
+                               nargs="?", const="./lint_log_debug.log",
+                               help="Stores a processing log to the " +
+                               "specified location (if none specified " +
+                               "then defaults to ./lint_log_debug.log)")
     logging_group.add_argument("-c", "--console", action="store_true",
                                help="Show linting issues on the console.")
 
     arguments = parser.parse_args()
 
+    # LINT EXCEPTION: any_001: 5: Not a default comment/implementation
+    # LINT EXCEPTION: any_001: 1: Not a default comment/implementation
+    if arguments.skeleton:
+        if len(arguments.path) > 1:
+            parser.error("Only a single filepath should be " +
+                         "included with --skeleton")
+        elif len(arguments.path) == 0:
+            arguments.path.append("./")
+
+        filepath = pathlib.Path(arguments.path[0]).absolute()
+        if filepath.is_dir():
+            filepath = filepath.joinpath("ocpilint-cfg.yml")
+        print(f"Saving to: {filepath}")
+        if filepath.exists():
+            parser.error("File already exists, please remove or " +
+                         "select a different filename")
+        default_file = pathlib.Path(ocpi_linter.__file__).parent.joinpath(
+            "ocpilint-cfg.default.yml").resolve()
+        shutil.copyfile(default_file, filepath)
+        sys.exit(0)
 
     # If a path or list of paths given verify their existence
     # These "paths" can be either a file or directory
@@ -107,26 +133,6 @@ if __name__ == "__main__":
         parser.error(
             f"Log file \"{arguments.logging}\" already exists, exiting!")
 
-    # LINT EXCEPTION: any_001: 5: Not a default comment/implementation
-    # LINT EXCEPTION: any_001: 1: Not a default comment/implementation
-    if arguments.skeleton:
-        if len(arguments.path) > 1:
-            parser.error(
-                "Only a single filepath should be included with --skeleton")
-        elif len(arguments.path) == 0:
-            arguments.path.append("ocpilint-cfg.yml")
-        filepath = pathlib.Path(arguments.path[0]).absolute()
-        if filepath.is_dir():
-            filepath = filepath.joinpath("ocpilint-cfg.yml")
-        print(f"Saving to: {filepath}")
-        if filepath.exists():
-            parser.error(
-                "File already exists, please remove or select a different filename")
-        default_file = pathlib.Path(ocpi_linter.__file__).parent.joinpath(
-            "ocpilint-cfg.default.yml").resolve()
-        shutil.copyfile(default_file, filepath)
-        sys.exit(0)
-
     if not arguments.verbose:
         if arguments.logging:
             arguments.verbose = "DEBUG"
@@ -150,7 +156,8 @@ if __name__ == "__main__":
     if len(arguments.path) == 0:
         arguments.path.append(pathlib.Path.cwd())
     linter = ocpi_linter.OcpiLinter(arguments.path, arguments.recursive,
-                                    arguments.ignore_unrecognised, arguments.no_ignore,
+                                    arguments.ignore_unrecognised,
+                                    arguments.no_ignore,
                                     arguments.settings, arguments.junit,
                                     arguments.console)
     if linter.number_files_to_check == 0:

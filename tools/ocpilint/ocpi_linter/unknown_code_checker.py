@@ -55,4 +55,5 @@ class UnknownCodeChecker(base_code_checker.BaseCodeChecker):
         return test_name, [
             {"line": None,
              "message":  "Not a recognised file extension (case sensitive) " +
-             "and so should not be used. File will not be formatted or checked."}]
+                         "and so should not be used. File will not be " +
+                         "formatted or checked."}]

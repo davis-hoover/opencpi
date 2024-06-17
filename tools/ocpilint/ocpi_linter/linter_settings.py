@@ -67,13 +67,21 @@ class LinterSettings:
         """Linter Configuration for a subset of files.
 
         Args:
-            filename (str, optional): filename of loaded configuration. Defaults to "default".
-            ignore_pattern (list, optional): List of ignore patterns to use for this configuration. Defaults to [].
-            select_tests (dict, optional): Dictionary of enabled and disabled tests. Defaults to {}.
-            extra_rules (list, optional): List of additional rules to run for this set of files. Defaults to [].
-            extra_modules (list, optional): List of additional python modules needed for rules . Defaults to [].
-            lint_classes (dict, optional): Dictionary of names/classes for the linters to be used . Defaults to {}.
-            inherit_parent (bool, optional): Whether a configuration file inherits settings from parent directories. Defaults to True.
+            filename (str, optional): filename of loaded configuration.
+                                        Defaults to "default".
+            ignore_pattern (list, optional): List of ignore patterns to use
+                                        for this configuration. Defaults to [].
+            select_tests (dict, optional): Dictionary of enabled and disabled
+                                        tests. Defaults to {}.
+            extra_rules (list, optional): List of additional rules to run for
+                                        this set of files. Defaults to [].
+            extra_modules (list, optional): List of additional python modules
+                                        needed for rules. Defaults to [].
+            lint_classes (dict, optional): Dictionary of names/classes for the
+                                        linters to be used. Defaults to {}.
+            inherit_parent (bool, optional): Whether a configuration file
+                                        inherits settings from parent
+                                        directories. Default True.
         """
         self.settings_file = pathlib.Path(filename)
         self.select_tests = dict(select_tests)
@@ -220,8 +228,8 @@ class LinterSettings:
         combined.ignore_ext.update(child.ignore_ext)
         combined.ignore_fullpath.update(child.ignore_fullpath)
 
-        logging.info(
-            f"Setting up new combined lint settings for: {combined.settings_file}")
+        logging.info("Setting up new combined lint settings for: "
+                     + f"{combined.settings_file}")
         logging.debug(f"combined ignore dirs: {combined.ignore_dir}")
         logging.debug(f"combined ignore extensions: {combined.ignore_ext}")
         logging.debug(f"combined ignore fullpath: {combined.ignore_fullpath}")
@@ -232,7 +240,8 @@ class LinterSettings:
         """Parse the rules files mentioned within this LinterSettings.
 
         Raises:
-            ModuleNotFoundError: If a required module is not installed on this system.
+            ModuleNotFoundError: If a required module is not installed
+                                 on this system.
         """
         modules_to_load = set()
         modules_not_found = set([])
@@ -277,14 +286,17 @@ class LinterSettings:
                     modules_not_in_cfg.add(module)
 
                 if (not pkg_resources.working_set.find(pkg)
-                        and not (module in [m.name for m in list(pkgutil.iter_modules())])):
-                    # Don't do anything if module is installed, otherwise add to
-                    # error list
+                        and not (module in [m.name for m in
+                                            list(pkgutil.iter_modules())])):
+                    # Don't do anything if module is installed,
+                    # otherwise add to error list
                     modules_not_found.add(module)
 
         if modules_not_in_cfg:
             print(utilities.PrintStyle.RED +
-                  f"Modules \"{modules_not_in_cfg}\" is not located in the \"extra_modules\" list within configuration file {self.settings_file}" +
+                  f"Modules \"{modules_not_in_cfg}\" is not located in" +
+                  " the \"extra_modules\"" +
+                  f" list within configuration file {self.settings_file}" +
                   utilities.PrintStyle.NORMAL)
 
         if modules_not_found:
@@ -314,12 +326,15 @@ class LinterSettings:
                     self.lint_classes[key] = getattr(custom_modules, val)
                     lint_classes_loaded.add(key)
                     print(utilities.PrintStyle.BOLD +
-                          f"Using the following custom linting ruleset: {key} => {val}" +
+                          "Using the following custom linting ruleset: " +
+                          f"{key} => {val}" +
                           utilities.PrintStyle.NORMAL)
 
-        for key in [i for i in lint_classes_to_load if i not in lint_classes_loaded]:
+        for key in [i for i in lint_classes_to_load
+                    if i not in lint_classes_loaded]:
             val = lint_classes[key]
             print(utilities.PrintStyle.RED +
-                  f"Failed to find custom \"{val}\" linter class specified in " +
-                  f"the \"linter_classes\" list within configuration file {self.settings_file}" +
+                  f"Failed to find custom \"{val}\" linter class specified" +
+                  " in the \"linter_classes\" list within configuration" +
+                  f" file {self.settings_file}" +
                   utilities.PrintStyle.NORMAL)

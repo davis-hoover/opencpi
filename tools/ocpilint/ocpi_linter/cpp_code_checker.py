@@ -25,6 +25,7 @@
 import pathlib
 import subprocess
 import re
+from itertools import cycle
 
 from . import base_code_checker
 from . import utilities
@@ -33,7 +34,8 @@ from . import utilities
 class CppCodeCheckerDefaults(base_code_checker.BaseCodeCheckerDefaults):
     """Default settings for CppCodeChecker class."""
     license_notice = (open(pathlib.Path(__file__).parent
-                           .joinpath("license_notices").joinpath("cpp.txt"), "r")
+                           .joinpath("license_notices")
+                           .joinpath("cpp.txt"), "r")
                       .read())
     cppcheck_enable_tests = "warning,style,performance,portability"
     cppcheck_suppress_tests = "noConstructor"
@@ -73,9 +75,10 @@ class CppCodeChecker(base_code_checker.BaseCodeChecker):
 
         if self._check_installed("clang-format"):
             before_code = list(self._code)
-            process = subprocess.Popen(["clang-format", "-i", "-style=Google",
-                                        self.path])
-            process.wait()
+            cmd = ["clang-format", "-i", "-style=Google", "--", str(self.path)]
+            success, issues, _ = self._run_external_command(cmd)
+            if not success:
+                return test_name, issues
 
             # As file may have changed re-read in
             self._read_in_code()
@@ -116,14 +119,18 @@ class CppCodeChecker(base_code_checker.BaseCodeChecker):
         test_name = "CPP lint"
 
         if self._check_installed("cpplint"):
-            process = subprocess.Popen(["cpplint",
-                                        "--quiet",
-                                        f"--linelength={self.checker_settings.maximum_line_length}"]
-                                       + self.checker_settings.cpplint_other_options
-                                       + [str(self.path)],
-                                       stdout=subprocess.PIPE,
-                                       stderr=subprocess.PIPE)
-            process.wait()
+            cmd = ["cpplint",
+                   "--quiet",
+                   f"--linelength={self.checker_settings.maximum_line_length}"]
+            cmd.extend(self.checker_settings.cpplint_other_options)
+            cmd.extend(["--", str(self.path)])
+            success, issues, process = self._run_external_command(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE)
+            if not success:
+                return test_name, issues
+
             cpp_lint_issues = process.communicate()[1].decode(
                 "utf-8").split("\n")[:-1]
 
@@ -138,13 +145,18 @@ class CppCodeChecker(base_code_checker.BaseCodeChecker):
                     if code_line.upper().find("WORKERTYPES;") > -1:
                         continue
 
+                # Previously, lint looked for lines with 3 or more colons to
+                # present as errors. The new regex below will match lines with
+                # just two colons - which are issues that don't need to be
+                # presented as errors
                 if issue.count(":") < 3:
                     continue
 
-                line_number = issue.split(":")[1]
-                message = ":".join(issue.split(":")[2:])
-                issues.append({"line": int(line_number),
-                               "message": message.strip()})
+                match = self.error_output_regex.match(issue)
+                if match:
+                    line_number = int(match.group("line"))
+                    message = match.group("message")
+                    issues.append({"line": line_number, "message": message})
 
         else:
             issues = [{
@@ -174,34 +186,51 @@ class CppCodeChecker(base_code_checker.BaseCodeChecker):
             identified test issues.
         """
         test_name = "CPP Check"
+        issues = []
 
         if self._check_installed("cppcheck"):
             cpp_check_issues = []
 
             for platform in self.checker_settings.platform:
-                process = subprocess.Popen(["cppcheck"] + [
-                    f"--enable={self.checker_settings.cppcheck_enable_tests}",
-                    f"--suppress={self.checker_settings.cppcheck_suppress_tests}",
+                enable = self.checker_settings.cppcheck_enable_tests
+                suppress = self.checker_settings.cppcheck_suppress_tests
+                standard = self.checker_settings.cppcheck_std
+                cmd = [
+                    "cppcheck",
+                    f"--enable={enable}",
+                    f"--suppress={suppress}",
                     f"--platform={platform}",
-                    f"--std={self.checker_settings.cppcheck_std}",
-                ] + self.checker_settings.cppcheck_other_options +
-                    [str(self.path)],
-                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                process.wait()
-                cpp_check_issues = (cpp_check_issues +
-                                    process.communicate()[1].decode(
-                                        "utf-8")[:-1].split("\n"))
+                    f"--std={standard}",
+                ]
+                cmd.extend(self.checker_settings.cppcheck_other_options)
+                cmd.append(str(self.path))
+
+                success, issues, process = self._run_external_command(
+                    cmd,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE)
+                if not success:
+                    return test_name, issues
+
+                if process.returncode > 0:
+                    output = process.communicate()[0].decode("utf-8")
+                    issues.append({"line": 0,
+                                   "message": output})
+                else:
+                    cpp_check_issues = (cpp_check_issues +
+                                        process.communicate()[1].decode(
+                                            "utf-8")[:-1].split("\n"))
 
             # Combine cppcheck outputs into single (non-repeating list)
             cpp_check_issues = list(set(cpp_check_issues))
 
             # Format output issues
-            issues = []
             for issue in cpp_check_issues:
-                if issue.count(":") > 3:
-                    line = issue.split(":")[1]
-                    message = ":".join(issue.split(":")[2:])
-                    issues.append({"line": line, "message": message})
+                match = self.error_output_regex.match(issue)
+                if match:
+                    line_number = int(match.group("line"))
+                    message = match.group("message")
+                    issues.append({"line": line_number, "message": message})
 
         else:
             issues = [{
@@ -225,7 +254,8 @@ class CppCodeChecker(base_code_checker.BaseCodeChecker):
 
         if len(self._code) < self.minimum_number_of_lines:
             issues = [{"line": None,
-                       "message": "File is not large enough to include license notice."}]
+                       "message": "File is not large enough to include" +
+                                  " license notice."}]
             return test_name, issues
 
         if self._code[0][0:2] != "//":
@@ -238,10 +268,12 @@ class CppCodeChecker(base_code_checker.BaseCodeChecker):
 
         # License notice
         line_number = 2
-        if (len(self._code) - line_number) < self.checker_settings.license_notice.count("\n"):
+        if (len(self._code) - line_number <
+                self.checker_settings.license_notice.count("\n")):
             issues.append({
                 "line": None,
-                "message": "File does not contain the expected license notice."})
+                "message": "File does not contain the expected" +
+                           " license notice."})
             return test_name, issues
 
         for license_line in self.checker_settings.license_notice.splitlines():
@@ -360,30 +392,56 @@ class CppCodeChecker(base_code_checker.BaseCodeChecker):
 
         issues = []
 
-        # Get past header comment
-        header_line = 0
-        while self._code[header_line][0:2] == "//":
-            header_line = header_line + 1
-        # One blank line
-        if self._code[header_line] != "":
-            issues.append({
-                "line": header_line + 1,
-                "message": "A single blank line must follow the opening "
-                           + "header comment."})
-        header_line = header_line + 1
+        # expected parts of file
+        expected_parts = cycle(["comment_header",
+                                "blank_line",
+                                "includes",
+                                "rest_of_code"])
+        current_part = next(expected_parts)
+        seen_blank_line = False
+        for line_number, line_text in enumerate(self._code, 1):
 
-        # All includes next
-        while self._code[header_line][0:9] == "#include ":
-            header_line = header_line + 1
+            if current_part == "comment_header":
+                if line_text.startswith("//"):
+                    # Still in header comment block
+                    continue
 
-        # No other includes should be in file
-        for line_number, line_text in enumerate(self._code[header_line:],
-                                                start=header_line):
-            if "#include " == line_text.strip()[0:9]:
-                issues.append({
-                    "line": line_number + 1,
-                    "message": "All includes must be straight after opening "
-                               + "comment block and a single blank line."})
+                # Have reached end comment
+                current_part = next(expected_parts)
+
+            if current_part == "blank_line":
+                if not seen_blank_line and line_text == "":
+                    # One blank line after header
+                    seen_blank_line = True
+                    continue
+
+                elif seen_blank_line and line_text != "":
+                    # Now past the blank line
+                    current_part = next(expected_parts)
+
+                else:
+                    # Either no blank line or more than one.
+                    issues.append({
+                        "line": line_number,
+                        "message": "A single blank line must follow the " +
+                                   "opening header comment."})
+
+            if current_part == "includes":
+                # All includes in a block (with blank lines allowed)
+                if line_text.strip()[0:9] == "#include " or line_text == "":
+                    # Still in include block, test next line
+                    continue
+
+                # Reached end of includes
+                current_part = next(expected_parts)
+
+            if current_part == "rest_of_code":
+                if "#include " == line_text.strip()[0:9]:
+                    issues.append({
+                        "line": line_number,
+                        "message": "All includes must be straight after" +
+                                   " opening comment block and a single" +
+                                   " blank line."})
 
         return test_name, issues
 

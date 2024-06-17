@@ -23,14 +23,22 @@
 """OCPILint Externally facing modules."""
 
 # Allow the default checkers to be accessed
-from .ocpi_linter.base_code_checker import BaseCodeCheckerDefaults, BaseCodeChecker
-from .ocpi_linter.any_code_checker import AnyCodeCheckerDefaults, AnyCodeChecker
-from .ocpi_linter.cpp_code_checker import CppCodeCheckerDefaults, CppCodeChecker
-from .ocpi_linter.python_code_checker import PythonCodeCheckerDefaults, PythonCodeChecker
-from .ocpi_linter.rst_code_checker import RstCodeCheckerDefaults, RstCodeChecker
-from .ocpi_linter.vhdl_code_checker import VhdlCodeCheckerDefaults, VhdlCodeChecker
-from .ocpi_linter.xml_code_checker import XmlCodeCheckerDefaults, XmlCodeChecker
-from .ocpi_linter.yaml_code_checker import YamlCodeCheckerDefaults, YamlCodeChecker
+from .ocpi_linter.base_code_checker import BaseCodeChecker
+from .ocpi_linter.base_code_checker import BaseCodeCheckerDefaults
+from .ocpi_linter.any_code_checker import AnyCodeChecker
+from .ocpi_linter.any_code_checker import AnyCodeCheckerDefaults
+from .ocpi_linter.cpp_code_checker import CppCodeChecker
+from .ocpi_linter.cpp_code_checker import CppCodeCheckerDefaults
+from .ocpi_linter.python_code_checker import PythonCodeChecker
+from .ocpi_linter.python_code_checker import PythonCodeCheckerDefaults
+from .ocpi_linter.rst_code_checker import RstCodeChecker
+from .ocpi_linter.rst_code_checker import RstCodeCheckerDefaults
+from .ocpi_linter.vhdl_code_checker import VhdlCodeChecker
+from .ocpi_linter.vhdl_code_checker import VhdlCodeCheckerDefaults
+from .ocpi_linter.xml_code_checker import XmlCodeChecker
+from .ocpi_linter.xml_code_checker import XmlCodeCheckerDefaults
+from .ocpi_linter.yaml_code_checker import YamlCodeChecker
+from .ocpi_linter.yaml_code_checker import YamlCodeCheckerDefaults
 from .ocpi_linter.unknown_code_checker import UnknownCodeChecker
 from .ocpi_linter import utilities
 
