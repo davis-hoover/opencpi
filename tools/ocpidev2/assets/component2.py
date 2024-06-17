@@ -294,6 +294,7 @@ class Component(AssetBase):
     def get_attr_infos(self):
         ret = []
         ret.append(AttributeInfo('Name'))
+        ret.append(AttributeInfo('NoControl', is_bool=True, cli=('-n', '--no-control')))
         return ret
 
     def parse(self, cli_dict=None):

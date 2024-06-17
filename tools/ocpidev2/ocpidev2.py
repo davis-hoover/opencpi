@@ -527,11 +527,24 @@ def unittest():
     return ret
 
 
-def add_create_arguments(parser):
-    project = Project('', False, None)
-    for attr in project.get_attr_infos():
-        if attr.cli is not None:
-            parser.add_argument(attr.cli[0], attr.cli[1], nargs='?', default='')
+def add_create_arguments(parser, verb):
+    # TODO: Might be better to place all attrs in AssetBase, then
+    # AssetBase.get_attr_infos('<asset-type>') to avoid 'if verb =='
+    if verb == 'project':
+        project = Project('', False, None)
+        for attr in project.get_attr_infos():
+            if attr.cli is not None:
+                parser.add_argument(attr.cli[0], attr.cli[1], nargs='?', default='')
+    #if verb == 'library':
+    #    library = ComponentLibrary('', False, None)
+    #    for attr in library.get_attr_infos():
+    #        if attr.cli is not None:
+    #            parser.add_argument(attr.cli[0], attr.cli[1], nargs='?', default='')
+    if verb == 'component':
+        component = Component('', False, None)
+        for attr in component.get_attr_infos():
+            if attr.cli is not None:
+                parser.add_argument(attr.cli[0], attr.cli[1], nargs='?', default='')
     return parser
 
 
@@ -548,8 +561,13 @@ if __name__ == '__main__':
     parser.add_argument('-d', nargs='?', default=None)
     parser.add_argument('-j', nargs='?', default=1)
     parser.add_argument('verb')
-    if 'create' in sys.argv and 'project' in sys.argv:
-        parser = add_create_arguments(parser)
+    if 'create' in sys.argv:
+        if 'project' in sys.argv:
+            parser = add_create_arguments(parser, 'project')
+        #if 'library' in sys.argv:
+        #    parser = add_create_arguments(parser, 'library')
+        if 'component' in sys.argv:
+            parser = add_create_arguments(parser, 'component')
     if 'build' in sys.argv:
         parser = add_build_arguments(parser)
     #required = ('create' in sys.argv) or ('build' in sys.argv) or ('show' in sys.argv)

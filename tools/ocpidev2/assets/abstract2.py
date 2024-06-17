@@ -646,11 +646,12 @@ global_makefile = GNUMakefile(None)
 
 
 class AttributeInfo():
-    def __init__(self, key, is_list=False, is_int=False, cli=None):
+    def __init__(self, key, is_list=False, is_int=False, is_bool=False, cli=None):
         """ key is the string attribute from the Dev Guide, e.g. 'Property' """
         self.key = key
         self.is_list = is_list
         self.is_int = is_int
+        self.is_bool = is_bool
         self.cli = cli
 
 class AttributeBase():
@@ -679,6 +680,8 @@ class AttributeBase():
                 val = self.get_attr(info.key, elem, paths, cli_dict)
             if info.is_int and (not info.is_list):
                 val = int(val) if val != '' else 0
+            if info.is_bool and (not info.is_list):
+                val = True if val == None else False
             if (info.is_list and val != []) or \
                (not info.is_list and val != ''):
                 # this is where ALL attribute values are finally placed into
