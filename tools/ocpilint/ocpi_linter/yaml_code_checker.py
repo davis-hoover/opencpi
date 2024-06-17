@@ -31,7 +31,8 @@ from . import utilities
 class YamlCodeCheckerDefaults(base_code_checker.BaseCodeCheckerDefaults):
     """Default settings for YamlCodeChecker class."""
     license_notice = (open(pathlib.Path(__file__).parent
-                           .joinpath("license_notices").joinpath("python.txt"), "r")
+                           .joinpath("license_notices")
+                           .joinpath("python.txt"), "r")
                       .read())
 
 
@@ -63,7 +64,8 @@ class YamlCodeChecker(base_code_checker.BaseCodeChecker):
 
         if len(self._code) < self.minimum_number_of_lines:
             issues = [{"line": None,
-                       "message": "File is not large enough to include license notice."}]
+                       "message": "File is not large enough to include " +
+                                  "license notice."}]
             return test_name, issues
 
         if not self._code[0].startswith("#"):
@@ -76,10 +78,12 @@ class YamlCodeChecker(base_code_checker.BaseCodeChecker):
 
         # License notice
         line_number = 2
-        if (len(self._code) - line_number) < self.checker_settings.license_notice.count("\n"):
+        if (len(self._code) - line_number <
+                self.checker_settings.license_notice.count("\n")):
             issues.append({
                 "line": None,
-                "message": "File does not contain the expected license notice."})
+                "message": "File does not contain the expected" +
+                           " license notice."})
             return test_name, issues
 
         for license_line in self.checker_settings.license_notice.splitlines():

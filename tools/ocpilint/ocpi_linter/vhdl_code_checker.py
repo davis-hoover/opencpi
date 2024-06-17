@@ -33,7 +33,8 @@ from . import utilities
 class VhdlCodeCheckerDefaults(base_code_checker.BaseCodeCheckerDefaults):
     """Default settings for VhdlCodeChecker class."""
     license_notice = (open(pathlib.Path(__file__).parent
-                           .joinpath("license_notices").joinpath("vhdl.txt"), "r")
+                           .joinpath("license_notices")
+                           .joinpath("vhdl.txt"), "r")
                       .read())
 
 
@@ -81,10 +82,11 @@ class VhdlCodeChecker(base_code_checker.BaseCodeChecker):
             reformat.append(line_text + "\n")
 
         # Ensure "\n" exists at the end to prevent emacs from hanging
-        while reformat[-1] is "\n":
-            reformat = reformat[:-1]
-        if not reformat[-1].endswith("\n"):
-            reformat[-1] += "\n"
+        if len(reformat):
+            while len(reformat) > 1 and reformat[-1] is "\n":
+                reformat = reformat[:-1]
+            if not reformat[-1].endswith("\n"):
+                reformat[-1] += "\n"
 
         # Re-write file with changes
         with open(self.path, "w") as linted_file:
@@ -98,11 +100,17 @@ class VhdlCodeChecker(base_code_checker.BaseCodeChecker):
             # can be ignored. Therefore pipe output to NULL, as Emacs prints
             # messages during formatting stderr so this is also needs to be
             # # redirected to hide these messages.
-            process = subprocess.Popen([
-                "emacs", "-batch", "-l", emacs_lisp_file, "--visit", self.path,
-                "-f", "vhdl-format"], stdout=subprocess.DEVNULL,
+            cmd = [
+                "emacs", "-batch", "-l", emacs_lisp_file,
+                "--visit", str(self.path),
+                "-f", "vhdl-format"]
+
+            success, issues, _ = self._run_external_command(
+                cmd,
+                stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL)
-            process.wait()
+            if not success:
+                return test_name, issues
 
             # As file may have changed re-read in code
             self._read_in_code()
@@ -140,7 +148,8 @@ class VhdlCodeChecker(base_code_checker.BaseCodeChecker):
 
         if len(self._code) < self.minimum_number_of_lines:
             issues = [{"line": None,
-                       "message": "File is not large enough to include license notice."}]
+                       "message": "File is not large enough to include" +
+                                  " license notice."}]
             return test_name, issues
 
         if self._code[0][0:2] != "--":
@@ -153,10 +162,11 @@ class VhdlCodeChecker(base_code_checker.BaseCodeChecker):
 
         # License notice
         line_number = 2
-        if (len(self._code) - line_number) < self.checker_settings.license_notice.count("\n"):
-            issues.append({
-                "line": None,
-                "message": "File does not contain the expected license notice."})
+        if (len(self._code) - line_number <
+                self.checker_settings.license_notice.count("\n")):
+            issues.append({"line": None,
+                           "message": "File does not contain the" +
+                                      " expected license notice."})
             return test_name, issues
 
         for license_line in self.checker_settings.license_notice.splitlines():

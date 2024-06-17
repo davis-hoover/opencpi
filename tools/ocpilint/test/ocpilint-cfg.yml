@@ -18,13 +18,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-ignore_pattern:
-    # Ignore these directories
-    - ocpi_linter.egg-info/
-    - build/
-    - dist/
-    # Ignore these filenames
-    - "vhdl_format.el"
-    - ocpilint.sh
-    # Ignore these extensions
-    - "*.egg"
+inherit_parent: true
+disable_tests:
+  - py_001   # Run pycodestyle over code
+  - py_005   # Check docstrings are used (Google style)

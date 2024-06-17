@@ -33,7 +33,7 @@ LONG_LONG_MIN = -(2**63)
 LONG_LONG_MAX = (2**63) - 1
 
 
-class TestLongGenerator(unittest.TestCase):
+class TestLongLongGenerator(unittest.TestCase):
     def setUp(self):
         self.test_generator = LongLongGenerator()
         self.seed = 897

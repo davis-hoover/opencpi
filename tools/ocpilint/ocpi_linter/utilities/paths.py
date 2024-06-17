@@ -42,7 +42,9 @@ def paths_are_relative(path_stack, path_needle):
     stack = pathlib.Path(path_stack).resolve()
     needle = pathlib.Path(path_needle).resolve()
 
-    if stack.anchor != needle.anchor or stack == pathlib.Path("/") or needle == pathlib.Path("/"):
+    if (stack.anchor != needle.anchor or
+        stack == pathlib.Path("/") or
+            needle == pathlib.Path("/")):
         logging.debug("Different drives, or filesystem root has been given")
         return False
     for stacks, needles in zip(stack.parts, needle.parts):

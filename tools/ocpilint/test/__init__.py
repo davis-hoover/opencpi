@@ -1,4 +1,6 @@
-# OCPI Lint yaml configuration file
+#!/usr/bin/env python3
+
+# Make test files available
 #
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
@@ -18,13 +20,4 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-ignore_pattern:
-    # Ignore these directories
-    - ocpi_linter.egg-info/
-    - build/
-    - dist/
-    # Ignore these filenames
-    - "vhdl_format.el"
-    - ocpilint.sh
-    # Ignore these extensions
-    - "*.egg"
+"""Module for the unit tests."""
