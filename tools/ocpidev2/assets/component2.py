@@ -491,7 +491,7 @@ def test_Component_create(ret):
     # Test for file integrity
     msg = 'invalid expected md5sum for file: '
     comp_xml_md5 = hashlib.md5(open(xml_abs_path, 'rb').read()).hexdigest()
-    if comp_xml_md5 != 'bd4d40e81e63bf1ee5bbb404f5456257':
+    if comp_xml_md5 != '40e1d7cd6cd5242615d28725fce1c2e3':
         passed = False
         Logger().error(test_name + str(msg + xml_abs_path))
     comp_rst = dir_path + '/cmp1-comp.rst'

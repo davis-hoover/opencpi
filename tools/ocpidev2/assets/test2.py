@@ -129,6 +129,6 @@ def test_Test_create(ret):
         passed = False
         Logger().error(test_name + str(msg + view_path))
     #os.system('tree ' + fs.abs_path + '/foo')
-    log_pass_fail('testing Component create', passed)
+    log_pass_fail('testing Test create', passed)
     if passed is False:
         ret = False
