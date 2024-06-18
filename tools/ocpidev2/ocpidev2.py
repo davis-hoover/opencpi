@@ -32,6 +32,7 @@ from _opencpi.assets.project2 import *
 from _opencpi.assets.worker2 import *
 from _opencpi.assets.assembly2 import *
 from _opencpi.assets.platform2 import *
+from _opencpi.assets.test2 import *
 
 
 def mysigint(sig, frame):
@@ -57,13 +58,10 @@ class OCPIDev():
             abs_path = cwd + '/' + args.name
             Project(abs_path, False, cli_dict).create()
         else:
-            # Check for valid registered project directory
+            # Check path is a valid registered project directory
             project_registry = ProjectRegistry()
-            project = None
-            for proj in project_registry.projects:
-                if proj.abs_path + '/' in _dir + '/':
-                    project = proj
-                    break
+            project = next((proj for proj in project_registry.projects if
+                            proj.abs_path + '/' in _dir + '/'), None)
             if project is None:
                 raise Exception('Please perform create ' + args.noun + ' in a '
                                 'registered project directory')
@@ -72,23 +70,51 @@ class OCPIDev():
                 ComponentLibrary(
                     component_lib_path, False, cli_dict
                 ).create(project, _dir)
-            if args.noun == 'component':
-                valid_path = False
-                for lib in project.component_libraries:
-                    if _dir == lib.abs_path:
-                        valid_path = True
-                        break
+            if args.noun in ['component', 'test']:
+                # Check path is a valid component library directory
+                valid_path = any(_dir == lib.abs_path for lib in
+                                 project.component_libraries)
                 if not valid_path:
-                    raise Exception('Please perform create component in a '
-                                    'valid component library')
-                component_path = (
-                    _dir + '/' + args.name + '.comp' + '/' + args.name +
-                    '-comp.xml'
-                )
-                package_id = project.get_package_id()
-                Component(
-                    component_path, False, cli_dict
-                ).create(package_id)
+                    raise Exception('Please perform create ' + args.noun +
+                                    ' in a valid component library')
+                if args.noun == 'component':
+                    component_path = (
+                        _dir + '/' + args.name + '.comp' + '/' + args.name +
+                        '-comp.xml'
+                    )
+                    package_id = project.get_package_id()
+                    Component(
+                        component_path, False, cli_dict
+                    ).create(package_id)
+                if args.noun == 'test':
+                    test_path = _dir + '/' + args.name + '.test'
+                    # If --component arg used, check for component existence
+                    if cli_dict['component']:
+                        comp_to_search = cli_dict['component']
+                        components = []
+                        for project in project_registry.projects:
+                            for component in project.components:
+                                components.append(component)
+                            for comp_lib in project.component_libraries:
+                                for component in comp_lib.components:
+                                    components.append(component)
+                        valid_comp = any(comp_to_search == comp.name for comp in components)
+                        if not valid_comp:
+                            msg = ('The component ' + cli_dict['component'] +
+                                   ' does not exist within any of the '
+                                   'registered projects')
+                            raise Exception(msg)
+                    # If --component not used, check for the component in path
+                    else:
+                        valid_create_test = False
+                        for ext in ['.rcc', '.hdl', '.comp']:
+                            if os.path.exists(_dir + '/' + args.name + ext):
+                                 valid_create_test = True
+                        if not valid_create_test:
+                            raise Exception('A ' + args.name + ' component does '
+                                            'not yet exist to create a unit-test '
+                                            'for')
+                    Test(test_path, False, cli_dict).create()
 
     def delete(self, noun):
         raise Exception('delete is not supported at this time')
@@ -545,6 +571,16 @@ def add_create_arguments(parser, verb):
         for attr in component.get_attr_infos():
             if attr.cli is not None:
                 parser.add_argument(attr.cli[0], attr.cli[1], nargs='?', default='')
+    if verb == 'test':
+        test = Test('', False, None)
+        for attr in test.get_attr_infos():
+            if attr.cli is not None:
+                if attr.is_bool:
+                    parser.add_argument(attr.cli[0], attr.cli[1], default='',
+                                        action=attr.action)
+                else:
+                    parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
+                                        default='')
     return parser
 
 
@@ -568,6 +604,8 @@ if __name__ == '__main__':
         #    parser = add_create_arguments(parser, 'library')
         if 'component' in sys.argv:
             parser = add_create_arguments(parser, 'component')
+        if 'test' in sys.argv:
+            parser = add_create_arguments(parser, 'test')
     if 'build' in sys.argv:
         parser = add_build_arguments(parser)
     #required = ('create' in sys.argv) or ('build' in sys.argv) or ('show' in sys.argv)
@@ -580,7 +618,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     try:
         nouns = ['registry', 'project', 'projects', 'libraries', 'components',
-                 'workers', 'library', 'component']
+                 'workers', 'library', 'component', 'test']
         if (args.noun is not None) and (args.noun not in nouns):
             if args.verb != 'apply':
                 raise Exception('noun ' + str(args.noun) + ' is not supported')
