@@ -89,8 +89,6 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         self.root_tags = ['Project']
         AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
         SpecsDirectory.__init__(self)
-        self.package_name = ''
-        self.package_id = ''
         # start of bullets at top of CDG section 14 (XML, project INTERNAL)
         self.component_libraries = []
         self.applications = []

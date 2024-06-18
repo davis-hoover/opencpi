@@ -32,6 +32,7 @@ from _opencpi.assets.project2 import *
 from _opencpi.assets.worker2 import *
 from _opencpi.assets.assembly2 import *
 from _opencpi.assets.platform2 import *
+from _opencpi.assets.test2 import *
 
 
 def mysigint(sig, frame):
@@ -57,21 +58,63 @@ class OCPIDev():
             abs_path = cwd + '/' + args.name
             Project(abs_path, False, cli_dict).create()
         else:
-            # Check for valid registered project directory
-            project_registry = ProjectRegistry(False, False)
-            project = None
-            for proj in project_registry.projects:
-                if proj.abs_path + '/' in _dir + '/':
-                    project = proj
-                    break
+            # Check path is a valid registered project directory
+            project_registry = ProjectRegistry()
+            project = next((proj for proj in project_registry.projects if
+                            proj.abs_path + '/' in _dir + '/'), None)
             if project is None:
                 raise Exception('Please perform create ' + args.noun + ' in a '
                                 'registered project directory')
             if args.noun == 'library':
-                component_path = _dir + '/' + args.name
+                component_lib_path = _dir + '/' + args.name
                 ComponentLibrary(
-                    component_path, False, cli_dict
+                    component_lib_path, False, cli_dict
                 ).create(project, _dir)
+            if args.noun in ['component', 'test']:
+                # Check path is a valid component library directory
+                valid_path = any(_dir == lib.abs_path for lib in
+                                 project.component_libraries)
+                if not valid_path:
+                    raise Exception('Please perform create ' + args.noun +
+                                    ' in a valid component library')
+                if args.noun == 'component':
+                    component_path = (
+                        _dir + '/' + args.name + '.comp' + '/' + args.name +
+                        '-comp.xml'
+                    )
+                    package_id = project.get_package_id()
+                    Component(
+                        component_path, False, cli_dict
+                    ).create(package_id)
+                if args.noun == 'test':
+                    test_path = _dir + '/' + args.name + '.test'
+                    # If --component arg used, check for component existence
+                    if cli_dict['component']:
+                        comp_to_search = cli_dict['component']
+                        components = []
+                        for project in project_registry.projects:
+                            for component in project.components:
+                                components.append(component)
+                            for comp_lib in project.component_libraries:
+                                for component in comp_lib.components:
+                                    components.append(component)
+                        valid_comp = any(comp_to_search == comp.name for comp in components)
+                        if not valid_comp:
+                            msg = ('The component ' + cli_dict['component'] +
+                                   ' does not exist within any of the '
+                                   'registered projects')
+                            raise Exception(msg)
+                    # If --component not used, check for the component in path
+                    else:
+                        valid_create_test = False
+                        for ext in ['.rcc', '.hdl', '.comp']:
+                            if os.path.exists(_dir + '/' + args.name + ext):
+                                 valid_create_test = True
+                        if not valid_create_test:
+                            raise Exception('A ' + args.name + ' component does '
+                                            'not yet exist to create a unit-test '
+                                            'for')
+                    Test(test_path, False, cli_dict).create()
 
     def delete(self, noun):
         raise Exception('delete is not supported at this time')
@@ -275,6 +318,7 @@ class OCPIDev():
         if noun == 'registry':
             print(project_registry.abs_path)
         for project in project_registry.projects:
+            print("project.abs_path = " + project.abs_path)
             if noun == 'projects':
                 msg = str(project.get_package_id()) + ' '
                 for idx in range(30-len(msg)):
@@ -284,6 +328,7 @@ class OCPIDev():
                 for component in project.components:
                     print(str(project.get_package_id()) + '.' + component.name)
             for component_library in project.component_libraries:
+                print("component_library.abs_path = " + component_library.abs_path)
                 pid = component_library.get_package_id(str(project.get_package_id()))
                 if noun == 'libraries':
                     print(pid)
@@ -486,6 +531,7 @@ def unittest():
     ret = True
     # ret = test_GNUMakefile(ret)
     ret = test_Component(ret)
+    ret = test_Component_create(ret)
     ret = test_ComponentLibrary(ret)
     ret = test_ComponentLibrary_create(ret)
     ret = test_RccAssembly(ret)
@@ -504,14 +550,38 @@ def unittest():
     ret = test_HdlPlatformConfiguration(ret)
     ret = test_HdlCard(ret)
     # ret = test_LegacyOCPIDevHDLBuildTool(ret)
+    ret = test_Test_create(ret)
     return ret
 
 
-def add_create_arguments(parser):
-    project = Project('', False, None)
-    for attr in project.get_attr_infos():
-        if attr.cli is not None:
-            parser.add_argument(attr.cli[0], attr.cli[1], nargs='?', default='')
+def add_create_arguments(parser, verb):
+    # TODO: Might be better to place all attrs in AssetBase, then
+    # AssetBase.get_attr_infos('<asset-type>') to avoid 'if verb =='
+    if verb == 'project':
+        project = Project('', False, None)
+        for attr in project.get_attr_infos():
+            if attr.cli is not None:
+                parser.add_argument(attr.cli[0], attr.cli[1], nargs='?', default='')
+    #if verb == 'library':
+    #    library = ComponentLibrary('', False, None)
+    #    for attr in library.get_attr_infos():
+    #        if attr.cli is not None:
+    #            parser.add_argument(attr.cli[0], attr.cli[1], nargs='?', default='')
+    if verb == 'component':
+        component = Component('', False, None)
+        for attr in component.get_attr_infos():
+            if attr.cli is not None:
+                parser.add_argument(attr.cli[0], attr.cli[1], nargs='?', default='')
+    if verb == 'test':
+        test = Test('', False, None)
+        for attr in test.get_attr_infos():
+            if attr.cli is not None:
+                if attr.is_bool:
+                    parser.add_argument(attr.cli[0], attr.cli[1], default='',
+                                        action=attr.action)
+                else:
+                    parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
+                                        default='')
     return parser
 
 
@@ -528,8 +598,15 @@ if __name__ == '__main__':
     parser.add_argument('-d', nargs='?', default=None)
     parser.add_argument('-j', nargs='?', default=1)
     parser.add_argument('verb')
-    if 'create' in sys.argv and 'project' in sys.argv:
-        parser = add_create_arguments(parser)
+    if 'create' in sys.argv:
+        if 'project' in sys.argv:
+            parser = add_create_arguments(parser, 'project')
+        #if 'library' in sys.argv:
+        #    parser = add_create_arguments(parser, 'library')
+        if 'component' in sys.argv:
+            parser = add_create_arguments(parser, 'component')
+        if 'test' in sys.argv:
+            parser = add_create_arguments(parser, 'test')
     if 'build' in sys.argv:
         parser = add_build_arguments(parser)
     #required = ('create' in sys.argv) or ('build' in sys.argv) or ('show' in sys.argv)
@@ -540,52 +617,52 @@ if __name__ == '__main__':
     parser.add_argument('noun', nargs='?', default=None)
     parser.add_argument('name', nargs='?', default=None)
     args = parser.parse_args()
-    #try:
-    nouns = ['registry', 'project', 'projects', 'libraries', 'components',
-             'workers', 'library']
-    if (args.noun is not None) and (args.noun not in nouns):
-        if args.verb != 'apply':
-            raise Exception('noun ' + str(args.noun) + ' is not supported')
-    signal.signal(signal.SIGINT, mysigint)
-    hdl_build_tool = LegacyOCPIDevHDLBuildTool()
-    _dir = args.d
-    if args.d is None:
-        if (args.noun is None) or (args.verb != 'clean'):
-            _dir = os.getcwd()
-    if args.verb == 'create':
-        if args.noun is None:
-            raise Exception("Please provide a noun to perform a create action")
-        if args.name is None:
-            raise Exception('ocpidev2 create ' + args.noun + ' <name> required')
-        OCPIDev(hdl_build_tool).create(_dir, vars(args))
-    elif args.verb == 'delete':
-        OCPIDev(hdl_build_tool).delete(args.noun)
-    elif args.verb == 'build':
-        OCPIDev(hdl_build_tool).build(
-            args.noun, args.hdl_target, args.hdl_platform,
-            args.rcc_platform, _dir, int(args.j))
-    elif args.verb == 'clean':
-        OCPIDev(hdl_build_tool).clean(args.noun, _dir)
-    elif args.verb == 'show':
-        OCPIDev(hdl_build_tool).show(args.noun)
-    elif args.verb == 'register':
-        OCPIDev(hdl_build_tool).register(args.noun)
-    elif args.verb == 'unregister':
-        OCPIDev(hdl_build_tool).unregister(args.noun)
-    elif args.verb == 'run':
-        OCPIDev(hdl_build_tool).run(args.noun)
-    elif args.verb == 'refresh':
-        OCPIDev(hdl_build_tool).refresh(args.noun)
-    elif args.verb == 'unittest':
-        if unittest():
-            exit_status = 0
+    try:
+        nouns = ['registry', 'project', 'projects', 'libraries', 'components',
+                 'workers', 'library', 'component', 'test']
+        if (args.noun is not None) and (args.noun not in nouns):
+            if args.verb != 'apply':
+                raise Exception('noun ' + str(args.noun) + ' is not supported')
+        signal.signal(signal.SIGINT, mysigint)
+        hdl_build_tool = LegacyOCPIDevHDLBuildTool()
+        _dir = args.d
+        if args.d is None:
+            if (args.noun is None) or (args.verb != 'clean'):
+                _dir = os.getcwd()
+        if args.verb == 'create':
+            if args.noun is None:
+                raise Exception("Please provide a noun to perform a create action")
+            if args.name is None:
+                raise Exception('ocpidev2 create ' + args.noun + ' <name> required')
+            OCPIDev(hdl_build_tool).create(_dir, vars(args))
+        elif args.verb == 'delete':
+            OCPIDev(hdl_build_tool).delete(args.noun)
+        elif args.verb == 'build':
+            OCPIDev(hdl_build_tool).build(
+                args.noun, args.hdl_target, args.hdl_platform,
+                args.rcc_platform, _dir, int(args.j))
+        elif args.verb == 'clean':
+            OCPIDev(hdl_build_tool).clean(args.noun, _dir)
+        elif args.verb == 'show':
+            OCPIDev(hdl_build_tool).show(args.noun)
+        elif args.verb == 'register':
+            OCPIDev(hdl_build_tool).register(args.noun)
+        elif args.verb == 'unregister':
+            OCPIDev(hdl_build_tool).unregister(args.noun)
+        elif args.verb == 'run':
+            OCPIDev(hdl_build_tool).run(args.noun)
+        elif args.verb == 'refresh':
+            OCPIDev(hdl_build_tool).refresh(args.noun)
+        elif args.verb == 'unittest':
+            if unittest():
+                exit_status = 0
+            else:
+                exit_status = 1
+        elif args.verb == 'apply':
+            OCPIDev(hdl_build_tool).apply(args.noun)
         else:
-            exit_status = 1
-    elif args.verb == 'apply':
-        OCPIDev(hdl_build_tool).apply(args.noun)
-    else:
-        raise Exception('verb ' + args.verb + ' is not supported')
-    #except Exception as exception:
-    #    Logger().error(str(exception))
-    #    exit_status = 1
+            raise Exception('verb ' + args.verb + ' is not supported')
+    except Exception as exception:
+        Logger().error(str(exception))
+        exit_status = 1
     exit(exit_status)
