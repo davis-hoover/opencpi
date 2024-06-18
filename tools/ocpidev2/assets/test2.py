@@ -16,6 +16,13 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+
+import os
+import hashlib
+from _opencpi.assets.abstract2 import *
+from _opencpi.assets.abstract2 import AssetBase
+
+
 test_generate_template = ("""#!/usr/bin/env python3
 
 \"\"\"
@@ -39,11 +46,6 @@ test_view_template = ("""#!/bin/bash --noprofile
 \n""")
 
 
-import os
-import hashlib
-from _opencpi.assets.abstract2 import *
-from _opencpi.assets.abstract2 import AssetBase
-
 def create_templates(name):
     test_templates = {}
     name = name.split('.')[0]
@@ -52,6 +54,7 @@ def create_templates(name):
     test_templates['verify.py'] = test_verify_template
     test_templates['view.sh'] = test_view_template
     return test_templates
+
 
 class Test(AssetBase):
     """ Reference Component Guide section 13. A <component>.test directory
@@ -66,8 +69,8 @@ class Test(AssetBase):
         self.parse(cli_dict)
 
     def create(self):
-       test_xml_templates = create_templates(self.name)
-       AssetBase.create_files(self, test_xml_templates)
+        test_xml_templates = create_templates(self.name)
+        AssetBase.create_files(self, test_xml_templates)
 
     def get_attr_infos(self):
         ret = []
@@ -83,6 +86,7 @@ class Test(AssetBase):
 
     def parse(self, cli_dict=None):
         AssetBase.parse(self, cli_dict)
+
 
 def test_Test_create(ret):
     fs = TemporaryFilesystem()
@@ -128,7 +132,7 @@ def test_Test_create(ret):
     if view_md5 != '5ba0ae964a22a6b65da5ae48409b2369':
         passed = False
         Logger().error(test_name + str(msg + view_path))
-    #os.system('tree ' + fs.abs_path + '/foo')
+    # os.system('tree ' + fs.abs_path + '/foo')
     log_pass_fail('testing Test create', passed)
     if passed is False:
         ret = False
