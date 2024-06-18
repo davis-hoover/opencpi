@@ -550,6 +550,7 @@ def unittest():
     ret = test_HdlPlatformConfiguration(ret)
     ret = test_HdlCard(ret)
     # ret = test_LegacyOCPIDevHDLBuildTool(ret)
+    ret = test_Test_create(ret)
     return ret
 
 

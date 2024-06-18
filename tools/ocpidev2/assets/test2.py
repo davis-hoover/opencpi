@@ -40,6 +40,7 @@ test_view_template = ("""#!/bin/bash --noprofile
 
 
 import os
+import hashlib
 from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import AssetBase
 
@@ -82,3 +83,52 @@ class Test(AssetBase):
 
     def parse(self, cli_dict=None):
         AssetBase.parse(self, cli_dict)
+
+def test_Test_create(ret):
+    fs = TemporaryFilesystem()
+    test_name = 'test_Test_create: '
+    name = 'cmp.test'
+    dir_abs_path = fs.abs_path + '/foo/components/' + name
+    try:
+        Test(
+            dir_abs_path, False, None
+        ).create()
+        passed = True
+    except Exception as e:
+        Logger().debug(test_name + str(e))
+        passed = False
+    # Test for file existence
+    test_files = ['cmp-test.xml', 'generate.py', 'verify.py', 'view.sh']
+    for test_file in test_files:
+        path = dir_abs_path + '/' + test_file
+        if not os.path.exists(path):
+            passed = False
+    # Test for file integrity
+    msg = 'invalid expected md5sum for file: '
+    test_xml_path = dir_abs_path + '/cmp-test.xml'
+    test_xml_md5 = hashlib.md5(open(test_xml_path, 'rb').read()).hexdigest()
+    if test_xml_md5 != '9378ade51ac6d9f75f815be71065fbbc':
+        passed = False
+        Logger().error(test_name + str(msg + test_xml_path))
+
+    generate_path = dir_abs_path + '/generate.py'
+    generate_md5 = hashlib.md5(open(generate_path, 'rb').read()).hexdigest()
+    if generate_md5 != 'a61331e02a4b59c3065dc2796d121e9c':
+        passed = False
+        Logger().error(test_name + str(msg + generate_path))
+
+    verify_path = dir_abs_path + '/verify.py'
+    verify_md5 = hashlib.md5(open(verify_path, 'rb').read()).hexdigest()
+    if verify_md5 != '9f85d1473e2dfc85063b75f6833d8ea4':
+        passed = False
+        Logger().error(test_name + str(msg + verify_path))
+
+    view_path = dir_abs_path + '/view.sh'
+    view_md5 = hashlib.md5(open(view_path, 'rb').read()).hexdigest()
+    if view_md5 != '5ba0ae964a22a6b65da5ae48409b2369':
+        passed = False
+        Logger().error(test_name + str(msg + view_path))
+    #os.system('tree ' + fs.abs_path + '/foo')
+    log_pass_fail('testing Component create', passed)
+    if passed is False:
+        ret = False
