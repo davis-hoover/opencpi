@@ -169,7 +169,6 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
                         ret = worker
         return ret
 
-
     def get_asset(self, abs_path):
         """ returns None if asset not found """
         ret = None

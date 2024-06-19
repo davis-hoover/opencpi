@@ -246,7 +246,7 @@ class OCPIDev():
         if not cleaned:
             raise Exception('cannot clean directory not in registered project')
 
-    def show(self, noun):
+    def show(self, noun, _dir):
         disc = noun != 'registry'
         disc = disc and (noun != 'projects')
         project_registry = ProjectRegistry(disc, disc)
@@ -260,21 +260,26 @@ class OCPIDev():
                 print(msg + project.abs_path)
             if noun == 'components':
                 for component in project.components:
-                    print(str(project.get_package_id()) + '.' + component.name)
+                    if (_dir is None) or (_dir in component.abs_path):
+                        print(str(project.get_package_id()) + '.' + component.name)
             for component_library in project.component_libraries:
                 pid = component_library.get_package_id(str(project.get_package_id()))
                 if noun == 'libraries':
-                    print(pid)
+                    if (_dir is None) or (_dir in component_library.abs_path):
+                        print(pid)
                 if noun == 'components':
                     for component in component_library.components:
-                        print(pid + '.' + component.name)
+                        if (_dir is None) or (_dir in component.abs_path):
+                            print(pid + '.' + component.name)
                 if noun == 'workers':
                     for worker in component_library.workers:
-                        print(pid + '.' + worker.name + '.' +
-                              worker.authoring_model)
+                        if (_dir is None) or (_dir in worker.abs_path):
+                            print(pid + '.' + worker.name + '.' +
+                                  worker.authoring_model)
             if noun == 'libraries':
                 for hdl_primitive in project.hdl_primitives:
-                    print(str(project.get_package_id()) + '.' + hdl_primitive.name)
+                    if (_dir is None) or (_dir in hdl_primitive.abs_path):
+                        print(str(project.get_package_id()) + '.' + hdl_primitive.name)
 
     def register(self, noun):
         project_registry = ProjectRegistry(
@@ -546,7 +551,7 @@ if __name__ == '__main__':
         elif args.verb == 'clean':
             OCPIDev(hdl_build_tool).clean(args.noun, _dir)
         elif args.verb == 'show':
-            OCPIDev(hdl_build_tool).show(args.noun)
+            OCPIDev(hdl_build_tool).show(args.noun, _dir)
         elif args.verb == 'register':
             OCPIDev(hdl_build_tool).register(args.noun)
         elif args.verb == 'unregister':

@@ -651,7 +651,7 @@ class AttributeInfo():
         self.key = key
         self.is_list = is_list
         self.is_int = is_int
-        self.cli = cli
+        self.cli = cli  # a tuple corresponding to long/short cli strings
 
 class AttributeBase():
     """ a thing which contains opencpi (XML) attributes, either intermediary
@@ -964,6 +964,11 @@ class AssetBase(AttributeBase):
         if self.get_is_xml():
             ret = self.abs_path.rsplit('/', 1)[0]
         return ret
+
+    def get_dir_abs_path_is_within_specified_abs_path(self, specified_abs_path):
+        split_dir_abs_path = self.get_dir_abs_path.split('/')
+        split_specified_abs_path = specified_abs_path.split('/')
+        return set(split_dir_abs_path).issuperset(split_specified_abs_path)
 
     def get_parsed(self):
         xml_abs_path = self.get_xml_abs_path()
