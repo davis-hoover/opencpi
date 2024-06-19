@@ -502,7 +502,7 @@ def add_build_arguments(parser):
 if __name__ == '__main__':
     exit_status = 0
     parser = argparse.ArgumentParser(description='')
-    parser.add_argument('-d', nargs='?', default=None)
+    parser.add_argument('-d', nargs='?', default=None, action='append')
     parser.add_argument('-j', nargs='?', default=1)
     parser.add_argument('verb')
     if 'create' in sys.argv and 'project' in sys.argv:
@@ -518,6 +518,10 @@ if __name__ == '__main__':
     parser.add_argument('name', nargs='?', default=None)
     args = parser.parse_args()
     try:
+        if args.d is not None:
+            if len(args.d) > 1:
+                raise Exception('-d option was specified more than once')
+            args.d = args.d[0]
         nouns = ['registry', 'project', 'projects', 'libraries', 'components',
                  'workers']
         if (args.noun is not None) and (args.noun not in nouns):
