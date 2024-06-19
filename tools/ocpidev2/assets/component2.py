@@ -301,8 +301,6 @@ class Component(AssetBase):
         ret.append(AttributeInfo('NoControl',
                                  cli=('-n', '--no-control'),
                                  is_bool=True))
-        ret.append(AttributeInfo('CreateTest',
-                                 cli=('-t', '--create-test')))
         return ret
 
     def parse(self, cli_dict=None):

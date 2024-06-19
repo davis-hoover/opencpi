@@ -44,8 +44,7 @@ class OCPIDev():
 
     def __init__(self, hdl_build_tool):
         self.hdl_build_tool = hdl_build_tool
-
-    def create(self, _dir ,cli_dict):
+    def create(self, _dir, cli_dict):
         _dir = os.path.abspath(_dir)
         cwd = os.getcwd()
         if cli_dict is not None:
@@ -86,7 +85,7 @@ class OCPIDev():
                     Component(
                         component_path, False, cli_dict
                     ).create(package_id)
-                    if cli_dict['createtest'] == None:
+                    if cli_dict['createtest'] == True:
                         test_path = _dir + '/' + args.name + '.test'
                         cli_dict['component'] = ''
                         cli_dict['usehdlfileio'] = ''
@@ -587,6 +586,7 @@ def add_create_arguments(parser, verb):
                 else:
                     parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
                                         default='')
+        parser.add_argument('-t', '--create-test', default='', action='store_true')
     if verb == 'test':
         test = Test('', False, None)
         for attr in test.get_attr_infos():
