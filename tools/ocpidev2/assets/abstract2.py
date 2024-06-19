@@ -647,13 +647,12 @@ global_makefile = GNUMakefile(None)
 
 class AttributeInfo():
     def __init__(self, key, is_list=False, is_int=False, is_bool=False,
-                 action='', cli=None):
+                 cli=None):
         """ key is the string attribute from the Dev Guide, e.g. 'Property' """
         self.key = key
         self.is_list = is_list
         self.is_int = is_int
         self.is_bool = is_bool
-        self.action = action
         self.cli = cli
 
 class AttributeBase():

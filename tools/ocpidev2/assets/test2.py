@@ -77,8 +77,7 @@ class Test(AssetBase):
         ret.append(AttributeInfo('Spec', cli=('-S', '--component')))
         # This CLI Argument is NOT defined in the ocpidev-create Manpage
         ret.append(AttributeInfo('UseHDLFileIo', is_bool=True,
-                                 cli=('-i', '--use-hdl-file-io'),
-                                 action='store_true'))
+                                 cli=('-i', '--use-hdl-file-io')))
         return ret
 
     def get_type(self):
