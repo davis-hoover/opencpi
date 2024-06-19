@@ -6,7 +6,7 @@ do_linter_test() {
   files=("library2.py" "component2.py" "application2.py" "assembly2.py" "primitive2.py")
   for file in "${files[@]}"
   do
-    pycodestyle tools/ocpidev/assets/$file
+    pycodestyle tools/ocpidev2/assets/$file
   done
 }
 
@@ -26,7 +26,7 @@ do_build_test() {
 report_coverage() {
   python3 -m pip install coverage
   coverage run $(which ocpidev2) unittest
-  coverage report -m | grep "tools/ocpidev"
+  coverage report -m
 }
 
 set -e
