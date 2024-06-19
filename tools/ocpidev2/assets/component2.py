@@ -127,7 +127,7 @@ Testing
 .. ocpi_documentation_test_platforms::
 
 .. Removed ocpi_documentation_test_result_summary directive until it is functional
-"""
+"""  # noqa: E501
 
 comp_test_rst_template = """
 .. {{asset.name}} test detail
@@ -158,7 +158,7 @@ comp_example_app_rst_template = """
     <property name="filename" value="output.bin"/>
   </instance>
 </application>
-"""
+"""  # noqa: E501
 
 
 def create_templates(name):
@@ -168,6 +168,7 @@ def create_templates(name):
     comp_templates[name + '-test.rst'] = comp_test_rst_template
     comp_templates['example_app.xml'] = comp_example_app_rst_template
     return comp_templates
+
 
 class OperationArgumentMember(AttributeBase):
 
@@ -183,6 +184,7 @@ class OperationArgumentMember(AttributeBase):
         for key in ['Name', 'Type']:
             ret.append(AttributeInfo(key))
         return ret
+
 
 class OperationArgument(AttributeBase):
     """ Component Development Guide section 5.1.3.2 """
@@ -279,7 +281,8 @@ class Component(AssetBase):
         represented by a xml file (OCS) and knows nothing about the project it
         is in or its package ID. """
 
-    def __init__(self, xml_abs_path, enable_path_existence_check=True, cli_dict=None):
+    def __init__(self, xml_abs_path, enable_path_existence_check=True,
+                 cli_dict=None):
         """ xml_abs_path is None for ComponentSpec embedded in OWD """
         self.root_tags = ['ComponentSpec']
         AssetBase.__init__(self, xml_abs_path, enable_path_existence_check)
@@ -287,9 +290,10 @@ class Component(AssetBase):
         self.parse(cli_dict)
 
     def create(self, package_id):
-       library_name = self.abs_path.split('/')[-3]
-       comp_xml_templates = create_templates(self.name)
-       AssetBase.create_files(self, comp_xml_templates, package_id, library_name)
+        library_name = self.abs_path.split('/')[-3]
+        comp_xml_templates = create_templates(self.name)
+        AssetBase.create_files(self, comp_xml_templates, package_id,
+                               library_name)
 
     def get_attr_infos(self):
         ret = []
@@ -470,6 +474,7 @@ def test_Component(ret):
             ret = False
     return ret
 
+
 def test_Component_create(ret):
     fs = TemporaryFilesystem()
     test_name = 'test_Component_create: '
@@ -486,7 +491,7 @@ def test_Component_create(ret):
         Logger().debug(test_name + str(e))
     # Test for file existence
     comp_files = ['cmp1-comp.xml', 'cmp1-comp.rst', 'example_app.xml',
-        'cmp1-test.rst']
+                  'cmp1-test.rst']
     for comp_file in comp_files:
         path = dir_path + '/' + comp_file
         if not os.path.exists(path):
