@@ -86,6 +86,11 @@ class OCPIDev():
                     Component(
                         component_path, False, cli_dict
                     ).create(package_id)
+                    if cli_dict['createtest'] == None:
+                        test_path = _dir + '/' + args.name + '.test'
+                        cli_dict['component'] = ''
+                        cli_dict['usehdlfileio'] = ''
+                        Test(test_path, False, cli_dict).create()
                 if args.noun == 'test':
                     test_path = _dir + '/' + args.name + '.test'
                     # If --component arg used, check for component existence
@@ -571,7 +576,12 @@ def add_create_arguments(parser, verb):
         component = Component('', False, None)
         for attr in component.get_attr_infos():
             if attr.cli is not None:
-                parser.add_argument(attr.cli[0], attr.cli[1], nargs='?', default='')
+                if attr.is_bool:
+                    parser.add_argument(attr.cli[0], attr.cli[1], default='',
+                                        action=attr.action)
+                else:
+                    parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
+                                        default='')
     if verb == 'test':
         test = Test('', False, None)
         for attr in test.get_attr_infos():
