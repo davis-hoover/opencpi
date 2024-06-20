@@ -108,30 +108,27 @@ def test_Test_create(ret):
             passed = False
     # Test for file integrity
     msg = 'invalid expected md5sum for file: '
-    test_xml_path = dir_abs_path + '/cmp-test.xml'
+    test_xml_path = dir_abs_path + '/' + test_files[0]
     test_xml_md5 = hashlib.md5(open(test_xml_path, 'rb').read()).hexdigest()
     if test_xml_md5 != '9378ade51ac6d9f75f815be71065fbbc':
         passed = False
         Logger().error(test_name + str(msg + test_xml_path))
-
-    generate_path = dir_abs_path + '/generate.py'
+    generate_path = dir_abs_path + '/' + test_files[1]
     generate_md5 = hashlib.md5(open(generate_path, 'rb').read()).hexdigest()
     if generate_md5 != 'a61331e02a4b59c3065dc2796d121e9c':
         passed = False
         Logger().error(test_name + str(msg + generate_path))
-
-    verify_path = dir_abs_path + '/verify.py'
+    verify_path = dir_abs_path + '/' + test_files[2]
     verify_md5 = hashlib.md5(open(verify_path, 'rb').read()).hexdigest()
     if verify_md5 != '9f85d1473e2dfc85063b75f6833d8ea4':
         passed = False
         Logger().error(test_name + str(msg + verify_path))
-
-    view_path = dir_abs_path + '/view.sh'
+    view_path = dir_abs_path + '/' + test_files[3]
     view_md5 = hashlib.md5(open(view_path, 'rb').read()).hexdigest()
     if view_md5 != '5ba0ae964a22a6b65da5ae48409b2369':
         passed = False
         Logger().error(test_name + str(msg + view_path))
     # os.system('tree ' + fs.abs_path + '/foo')
-    log_pass_fail('testing Test create', passed)
+    log_pass_fail('testing Test create()', passed)
     if passed is False:
         ret = False

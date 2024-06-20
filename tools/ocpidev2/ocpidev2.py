@@ -540,6 +540,7 @@ def unittest():
     ret = test_ComponentLibrary_create(ret)
     ret = test_RccAssembly(ret)
     ret = test_Project_discover_component_libraries(ret)
+    ret = test_Project_create(ret)
     # ret = test_ProjectRegistry(ret)
     # ret = test_OCPIDev(ret)
     ret = test_Worker(ret)

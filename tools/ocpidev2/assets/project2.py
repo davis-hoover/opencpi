@@ -18,6 +18,7 @@
 
 
 import os
+import hashlib
 import itertools
 from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import AssetBase
@@ -79,6 +80,23 @@ project_templates['.gitattributes'] = """
 *.edf -diff
 *.bit -diff
 \n\n"""
+
+project_templates['Project.rst'] = """
+.. {{asset.name}} top level project documentation
+
+
+{{asset.name|capitalize}}
+===============
+Skeleton outline: Description of project.
+
+.. toctree::
+   :maxdepth: 2
+
+   components/components
+   hdl/primitives/primitives
+   specs/specs
+\n"""
+
 
 project_templates['Project.xml'] = g_asset_template
 
@@ -685,3 +703,45 @@ def test_Project_discover_component_libraries(ret):
     if passed is False:
         ret = False
     return ret
+
+def test_Project_create(ret):
+    fs = TemporaryFilesystem()
+    test_name = 'test_Project_create: '
+    name = 'foo'
+    dir_abs_path = fs.abs_path + '/' + name
+    try:
+        Project(
+            dir_abs_path, False, None
+        ).create()
+        passed = True
+    except Exception as e:
+        Logger().debug(test_name + str(e))
+        passed = False
+
+    # Test for file existence
+    project_files = ['Project.exports', 'Project.xml', 'Project.rst']
+    for project_file in project_files:
+        path = dir_abs_path + '/' + project_file
+        if not os.path.exists(path):
+            passed = False
+    # Test for file integrity
+    msg = 'invalid expected md5sum for file: '
+    project_exports_path = dir_abs_path + '/' + project_files[0]
+    project_exports_md5 = hashlib.md5(open(project_exports_path, 'rb').read()).hexdigest()
+    if project_exports_md5 != 'fffe1c43478bf2eca0c68a326595fbc2':
+        passed = False
+        Logger().error(test_name + str(msg + project_exports_path))
+    project_xml_path = dir_abs_path + '/' + project_files[1]
+    project_xml_md5 = hashlib.md5(open(project_xml_path, 'rb').read()).hexdigest()
+    if project_xml_md5 != '7dce1d0c3887ff085cab45ac64d7edcb':
+        passed = False
+        Logger().error(test_name + str(msg + project_xml_path))
+    project_rst_path = dir_abs_path + '/' + project_files[2]
+    project_rst_md5 = hashlib.md5(open(project_rst_path, 'rb').read()).hexdigest()
+    if project_rst_md5 != '5ffe695fc6f968f8c840a9ce2a4576f5':
+        passed = False
+        Logger().error(test_name + str(msg + project_rst_path))
+    # os.system('tree ' + fs.abs_path + '/foo')
+    log_pass_fail('testing Project create()', passed)
+    if passed is False:
+        ret = False

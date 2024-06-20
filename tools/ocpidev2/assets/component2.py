@@ -497,26 +497,27 @@ def test_Component_create(ret):
             passed = False
     # Test for file integrity
     msg = 'invalid expected md5sum for file: '
-    comp_xml_md5 = hashlib.md5(open(xml_abs_path, 'rb').read()).hexdigest()
+    comp_xml = dir_path + '/' + comp_files[0]
+    comp_xml_md5 = hashlib.md5(open(comp_xml, 'rb').read()).hexdigest()
     if comp_xml_md5 != '40e1d7cd6cd5242615d28725fce1c2e3':
         passed = False
         Logger().error(test_name + str(msg + xml_abs_path))
-    comp_rst = dir_path + '/cmp1-comp.rst'
+    comp_rst = dir_path + '/' + comp_files[1]
     comp_rst_md5 = hashlib.md5(open(comp_rst, 'rb').read()).hexdigest()
     if comp_rst_md5 != '84fc0cece1ea3c7e7c8bc78c0202e50a':
         passed = False
         Logger().error(test_name + str(msg + comp_rst))
-    example_app = dir_path + '/example_app.xml'
+    example_app = dir_path + '/' + comp_files[2]
     example_app_md5 = hashlib.md5(open(example_app, 'rb').read()).hexdigest()
     if example_app_md5 != 'fa3bb09634de1f96eda4e647cc698d12':
         passed = False
         Logger().error(test_name + str(msg + example_app))
-    comp_test_rst = dir_path + '/cmp1-test.rst'
+    comp_test_rst = dir_path + '/' + comp_files[3]
     comp_test_md5 = hashlib.md5(open(comp_test_rst, 'rb').read()).hexdigest()
     if comp_test_md5 != '048f66d77e6625d5cb848140c5cc552e':
         passed = False
         Logger().error(test_name + str(msg + comp_test_rst))
-    log_pass_fail('testing Component create', passed)
+    log_pass_fail('testing Component create()', passed)
     if passed is False:
         ret = False
     return ret
