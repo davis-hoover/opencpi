@@ -904,10 +904,7 @@ class AssetBase(AttributeBase):
 
     def create_files(self, templates, package_id=None, library_name=None):
         abs_path = self.get_dir_abs_path()
-        if self.get_abs_path_exists():
-            raise Exception(self.get_type() + ' ' + self.abs_path + ' already exists')
-        else:
-            os.makedirs(abs_path, exist_ok=False)
+        os.makedirs(abs_path, exist_ok=False)
         for fname, fcontents in templates.items():
             fcontents = jinja2.Template(fcontents, trim_blocks=True)
             fcontents = fcontents.render(

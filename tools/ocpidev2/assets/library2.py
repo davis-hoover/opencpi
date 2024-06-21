@@ -228,27 +228,6 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
                         ", point (-d) to the 'components' library.")
                 raise Exception(msg)
 
-    def library_exists(self, project):
-        """ Check if library name already Exist """
-        existing_comp_libs = (
-            project.get_existing_dir_abs_paths_for_clib_consideration()
-        )
-        platform_dev_path = (project.abs_path + '/hdl/platforms/' in
-                             self.abs_path)
-        sub_comp_lib_path = self.abs_path.split('/')[-2] == 'components'
-        if self.abs_path in existing_comp_libs:
-            if self.name == 'devices' and platform_dev_path:
-                msg = ("'" + self.name + "' is already a library in the " +
-                       self.abs_path.split('/')[-2] + " platform " +
-                       "within the " + project.name + " project.")
-            elif sub_comp_lib_path:
-                msg = ("'" + self.name + "' is already a sub-component-" +
-                       "library in the " + project.name + " project.")
-            else:
-                msg = ("'" + self.name + "' is already a library in the " +
-                       project.name + " project.")
-            raise Exception(msg)
-
     def valid_path(self, project, comp_dict, is_sub_complib_path):
         """ Check that the user is providing a valid path to a component
             library. If not, provide path suggestions """
@@ -289,7 +268,6 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         if is_sub_complib_path and is_sub_comp_lib:
             self.create_components_dir(project)
         self.valid_library_name(project, comp_dict, is_sub_complib_path)
-        self.library_exists(project)
         self.valid_path(project, comp_dict, is_sub_complib_path)
         comp_lib_xml_name = self.name + '.xml'
         comp_lib_templates[comp_lib_xml_name] = g_asset_template
