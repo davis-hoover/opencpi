@@ -53,9 +53,9 @@ Skeleton outline: Component library description and outline of scope to go here.
 def create_templates(name):
     """ Creates a <component_name>.rst skeleton document to populate the
         directory using instance variables"""
-    comp_lib_rst_templates = {}
-    comp_lib_rst_templates[name + '.rst'] = comp_lib_rst_template
-    return comp_lib_rst_templates
+    comp_lib_templates = {}
+    comp_lib_templates[name + '.rst'] = comp_lib_rst_template
+    return comp_lib_templates
 
 
 class SpecsDirectory():
@@ -174,15 +174,15 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         self.component_libraries = []
         self.hdl_libraries = []
         # end of CDG section 14.5
-        self.parse()
+        self.parse(cli_dict)
         workers = self.attrs['Workers']
         allowlist = None if workers == [] else workers
-        if not cli_dict:
+        if enable_path_existence_check:
             self.discover(allowlist, 'hdl/platforms' in dir_abs_path)
 
     def get_comp_dict(self, project):
         """ Update comp_dict with discovered project
-            hdl/platform/<platform_name libraries """
+            hdl/platform/<platform_name> libraries """
         comp_dict = ({lib.split('/')[-1]: lib for lib in
                      ComponentLibrary.library_locations})
         platform_device_libs = []
@@ -204,9 +204,9 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
             name = self.name
             self.name = 'components'
             # Create 'components' template
-            comp_lib_rst_templates = create_templates('components')
-            comp_lib_rst_templates['components.xml'] = g_asset_template
-            AssetBase.create_files(self, comp_lib_rst_templates)
+            comp_lib_templates = create_templates('components')
+            comp_lib_templates['components.xml'] = g_asset_template
+            AssetBase.create_files(self, comp_lib_templates)
             # Reset self. variables to create the sub-component library
             self.abs_path = abs_path
             self.name = name
@@ -217,18 +217,18 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
             if self.name in comp_dict.keys():
                 msg = ('sub-component name ' + self.name + ' is apart of '
                        'prohibited component library names: ' +
-                       (' '.join(map(str, list(comp_dict.keys())))))
+                       (', '.join(map(str, list(comp_dict.keys())))))
                 raise Exception(msg)
         if not is_sub_comp_path:
             if self.name not in comp_dict:
                 msg = (self.name + ' is not one of the valid component '
                        'library names: ' +
-                       (' '.join(map(str, list(comp_dict.keys())))) +
+                       (', '.join(map(str, list(comp_dict.keys())))) +
                        ', or is not pointing to the components library ' +
                        '(sub-component)')
                 raise Exception(msg)
 
-    def library_name_exists(self, project):
+    def library_exists(self, project):
         """ Check if library name already Exist """
         existing_comp_libs = (
             project.get_existing_dir_abs_paths_for_clib_consideration()
@@ -267,32 +267,33 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         if not valid_path:
             if self.name == 'devices':
                 valid_locations = (
-                    '<project_name>/hdl/  ' +
+                    '<project_name>/hdl/ , ' +
                     '<project_name>/hdl/platform/<platform_name>/'
                 )
             elif self.name in ['cards', 'adapters', 'platforms']:
                 valid_locations = '<project_name>/hdl/'
             else:  # 'components':
                 valid_locations = '<project_name>/'
-            msg = ('create library ' + self.name + ' must point (-d) to a '
-                   'valid component library location: ' + valid_locations)
+            msg = ('create library ' + self.name + ' must be in (CWD) or '
+                   'point to (-d) a valid component library location: ' +
+                   valid_locations)
             raise Exception(msg)
 
     def create(self, project, _dir):
         """ Creates a valid Component Library and associated skeleton files
             for a given path """
-        comp_lib_rst_templates = create_templates(self.name)
+        comp_lib_templates = create_templates(self.name)
         comp_dict = self.get_comp_dict(project)
         is_sub_comp_path = _dir.endswith(project.name + '/components')
         is_sub_comp_lib = self.name not in comp_dict.keys()
         if is_sub_comp_path and is_sub_comp_lib:
             self.create_components_library(project)
         self.valid_library_name(project, comp_dict, is_sub_comp_path)
-        self.library_name_exists(project)
+        self.library_exists(project)
         self.valid_path(project, comp_dict, is_sub_comp_path)
         comp_lib_xml_name = self.name + '.xml'
-        comp_lib_rst_templates[comp_lib_xml_name] = g_asset_template
-        AssetBase.create_files(self, comp_lib_rst_templates)
+        comp_lib_templates[comp_lib_xml_name] = g_asset_template
+        AssetBase.create_files(self, comp_lib_templates)
 
     @staticmethod
     def get_dir_abs_path_is_worker(dir_abs_path):
@@ -327,6 +328,10 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         ret.append(AttributeInfo('HdlLibraries', is_list=True))
         ret.append(AttributeInfo('Libraries', is_list=True))
         ret.append(AttributeInfo('Workers', is_list=True))
+        ret.append(AttributeInfo('PackagePrefix',
+                                 cli=('-F', '--package-prefix')))
+        ret.append(AttributeInfo('PackageID', cli=('-K', '--package-id')))
+        ret.append(AttributeInfo('PackageName', cli=('-N', '--package-name')))
         return ret
 
     def get_paths_to_parse(self):
@@ -340,8 +345,8 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         paths = self.get_list_of_existing_abs_paths_to_parse(paths)
         return paths
 
-    def parse(self):
-        AssetBase.parse(self)
+    def parse(self, cli_dict=None):
+        AssetBase.parse(self, cli_dict)
         global g_libraries_mk
         if g_libraries_mk:
             g_libraries_mk = False
@@ -527,7 +532,7 @@ def test_ComponentLibrary_create(ret):
             except Exception as e:
                 Logger().debug(test_name + str(e))
                 passed = True
-        # Test ComponentLibrary.library_name_exists()
+        # Test ComponentLibrary.library_exists()
         if test == 4:
             # Create duplicate valid component libraries (Fail)
             for lib in valid_libs:

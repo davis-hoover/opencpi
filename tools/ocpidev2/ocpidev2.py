@@ -566,17 +566,14 @@ def add_create_arguments(parser, verb):
         project = Project('', False, None)
         for attr in project.get_attr_infos():
             if attr.cli is not None:
-                parser.add_argument(attr.cli[0], attr.cli[1], nargs='?', default='')
-    #if verb == 'library':
-    #    library = ComponentLibrary('', False, None)
-    #    for attr in component.get_attr_infos():
-    #        if attr.cli is not None:
-    #            if attr.is_bool:
-    #                parser.add_argument(attr.cli[0], attr.cli[1], default='',
-    #                                    action='store_true')
-    #            else:
-    #                parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
-    #                                    default='')
+                parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
+                                    default='')
+    if verb == 'library':
+        library = ComponentLibrary('', False, None)
+        for attr in library.get_attr_infos():
+            if attr.cli is not None:
+                parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
+                                    default='')
     if verb == 'component':
         component = Component('', False, None)
         for attr in component.get_attr_infos():
@@ -617,8 +614,8 @@ if __name__ == '__main__':
     if 'create' in sys.argv:
         if 'project' in sys.argv:
             parser = add_create_arguments(parser, 'project')
-        #if 'library' in sys.argv:
-        #    parser = add_create_arguments(parser, 'library')
+        if 'library' in sys.argv:
+            parser = add_create_arguments(parser, 'library')
         if 'component' in sys.argv:
             parser = add_create_arguments(parser, 'component')
         if 'test' in sys.argv:
