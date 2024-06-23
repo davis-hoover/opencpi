@@ -1,4 +1,4 @@
-# This file is protected by Copyright. Please refer to the COPYRIGHT file
+#This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
 # This file is part of OpenCPI <http://www.opencpi.org>
@@ -165,14 +165,14 @@ class ProjectRegistry():
                 self.projects.append(project)
         Logger().debug('end of project discovery')
 
-    def register_project(self):
-        project = Project(os.getcwd(), False)  # raises if not a project
+    def register_project(self, project_path):
+        project = Project(project_path, False)  # raises if not a project
         symlink_path = self.abs_path + '/' + str(project.get_package_id())
         if not os.path.islink(symlink_path):
             os.symlink(project.abs_path, symlink_path)
 
-    def unregister_project(self):
-        project = Project(os.getcwd(), False)  # raises if not a project
+    def unregister_project(self, project_path):
+        project = Project(project_path, False)  # raises if not a project
         pid = str(project.get_package_id())
         os.system('unlink ' + self.abs_path + '/' + pid)
 

@@ -38,7 +38,7 @@ project_templates['Project.exports'] = """
 # Lines starting with - subtract from the exports
 all
 
-\n\n"""
+\n\n\n"""
 
 project_templates['.gitignore'] = """
 # Lines starting with '#' are considered comments.
@@ -728,7 +728,7 @@ def test_Project_create(ret):
     msg = 'invalid expected md5sum for file: '
     project_exports_path = dir_abs_path + '/' + project_files[0]
     project_exports_md5 = hashlib.md5(open(project_exports_path, 'rb').read()).hexdigest()
-    if project_exports_md5 != 'fffe1c43478bf2eca0c68a326595fbc2':
+    if project_exports_md5 != 'c575f31ac595c4fc2baa78963408e1a5':
         passed = False
         Logger().error(test_name + str(msg + project_exports_path))
     project_xml_path = dir_abs_path + '/' + project_files[1]

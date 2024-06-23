@@ -45,8 +45,6 @@ class OCPIDev():
     def __init__(self, hdl_build_tool):
         self.hdl_build_tool = hdl_build_tool
     def create(self, _dir, cli_dict):
-        _dir = os.path.abspath(_dir)
-        cwd = os.getcwd()
         if cli_dict is not None:
             # The below line supports create, removes underscores to make CLI
             # look like attrs
@@ -54,8 +52,10 @@ class OCPIDev():
                 {key.replace('_', '') : val for key, val in cli_dict.items()}
             )
         if args.noun == 'project':
-            abs_path = cwd + '/' + args.name
+            abs_path = _dir + '/' + args.name
             Project(abs_path, False, cli_dict).create()
+            if cli_dict['register'] == True:
+                self.register('project', abs_path)
         else:
             # Check path is a valid registered project directory
             project_registry = ProjectRegistry()
@@ -158,7 +158,6 @@ class OCPIDev():
         # if hdl_platform is not None:
         #     self.throw_if_not_installed(hdl_platform)
         project_registry = ProjectRegistry()
-        abs_path = os.path.abspath(_dir)
         project = None
         assets_to_build = []
         for project2 in project_registry.projects:
@@ -280,9 +279,6 @@ class OCPIDev():
 
     def clean(self, noun, _dir):
         project_registry = ProjectRegistry(False, False)
-        if _dir is None:
-            if noun == []:
-                _dir = os.getcwd()
         cleaned = False
         for project in project_registry.projects:
             if project.abs_path in os.path.realpath(_dir):
@@ -347,19 +343,19 @@ class OCPIDev():
                 for hdl_primitive in project.hdl_primitives:
                     print(str(project.get_package_id()) + '.' + hdl_primitive.name)
 
-    def register(self, noun):
+    def register(self, noun, _dir):
         project_registry = ProjectRegistry(
                 do_discover_component_libraries=False,
                 do_discover_hdl_primitives=False)
         if noun == 'project':
-            project_registry.register_project()
+            project_registry.register_project(_dir)
 
-    def unregister(self, noun):
+    def unregister(self, noun, _dir):
         project_registry = ProjectRegistry(
                 do_discover_component_libraries=False,
                 do_discover_hdl_primitives=False)
         if noun == 'project':
-            project_registry.unregister_project()
+            project_registry.unregister_project(_dir)
 
     def set(self, noun):
         raise Exception('set is not supported at this time')
@@ -568,6 +564,7 @@ def add_create_arguments(parser, verb):
             if attr.cli is not None:
                 parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
                                     default='')
+        parser.add_argument('--register', default=False, action='store_true')
     if verb == 'library':
         library = ComponentLibrary('', False, None)
         for attr in library.get_attr_infos():
@@ -584,7 +581,7 @@ def add_create_arguments(parser, verb):
                 else:
                     parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
                                         default='')
-        parser.add_argument('-t', '--create-test', default='', action='store_true')
+        parser.add_argument('-t', '--create-test', default=False, action='store_true')
     if verb == 'test':
         test = Test('', False, None)
         for attr in test.get_attr_infos():
@@ -630,6 +627,11 @@ if __name__ == '__main__':
     parser.add_argument('noun', nargs='?', default=None)
     parser.add_argument('name', nargs='?', default=None)
     args = parser.parse_args()
+    # TODO: Move to abstract2 AssetBase.get_name() once .get_name()
+    # is fully implemented
+    if args.name:
+        if not args.name.isidentifier():
+            raise ValueError("'" + args.name + "' is not  valid name.")
     try:
         nouns = ['registry', 'project', 'projects', 'libraries', 'components',
                  'workers', 'library', 'component', 'test']
@@ -638,10 +640,10 @@ if __name__ == '__main__':
                 raise Exception('noun ' + str(args.noun) + ' is not supported')
         signal.signal(signal.SIGINT, mysigint)
         hdl_build_tool = LegacyOCPIDevHDLBuildTool()
-        _dir = args.d
         if args.d is None:
-            if (args.noun is None) or (args.verb != 'clean'):
-                _dir = os.getcwd()
+            _dir = os.getcwd()
+        else:
+            _dir = os.path.abspath(args.d)
         if args.verb == 'create':
             if args.noun is None:
                 raise Exception("Please provide a noun to perform a create action")
@@ -659,9 +661,9 @@ if __name__ == '__main__':
         elif args.verb == 'show':
             OCPIDev(hdl_build_tool).show(args.noun)
         elif args.verb == 'register':
-            OCPIDev(hdl_build_tool).register(args.noun)
+            OCPIDev(hdl_build_tool).register(args.noun, _dir)
         elif args.verb == 'unregister':
-            OCPIDev(hdl_build_tool).unregister(args.noun)
+            OCPIDev(hdl_build_tool).unregister(args.noun, _dir)
         elif args.verb == 'run':
             OCPIDev(hdl_build_tool).run(args.noun)
         elif args.verb == 'refresh':
