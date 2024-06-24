@@ -78,12 +78,6 @@ class OCPIDev():
                                     ' in a valid component library')
                 if args.noun == 'component':
                     spec_create = True if cli_dict['project'] else False
-                    if spec_create:
-                        if cli_dict['createtest'] == True:
-                            Logger().warn("Ommiting '--create-test'. Cannot "
-                                          "use '--create-test' when using "
-                                          "'--project'.")
-                        cli_dict['createtest'] = False
                     component_path = (
                         _dir + '/' + args.name + '.comp' + '/' + args.name +
                         '-comp.xml'
@@ -590,7 +584,6 @@ def add_create_arguments(parser, verb):
                                         default='')
         parser.add_argument('-t', '--create-test', default=False, action='store_true')
         parser.add_argument('-p', '--project', default=False, action='store_true')
-
     if verb == 'test':
         test = Test('', False, None)
         for attr in test.get_attr_infos():
