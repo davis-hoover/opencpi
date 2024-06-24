@@ -160,13 +160,122 @@ comp_example_app_rst_template = """
 </application>
 """  # noqa: E501
 
+comp_spec_rst_template = """
+.. {{asset.name}} documentation
 
-def create_templates(name):
+.. Skeleton comment (to be deleted): Alternative names should be listed as
+   keywords. If none are to be included delete the meta directive.
+
+.. meta::
+   :keywords: skeleton example
+
+
+.. _{{asset.name}}:
+
+
+SKELETON NAME (``{{asset.name}}``)
+=================================
+Skeleton outline: Single line description.
+
+Design
+------
+Skeleton outline: Functional description of **what** the component achieves (not **how** it is implemented, as that belongs in primitive documentation).
+
+The mathematical representation of the implementation is given in :eq:`{{asset.name}}-equation`.
+
+.. math::
+   :label: {{asset.name}}-equation
+
+   y[n] = \\alpha * x[n]
+
+
+In :eq:`{{asset.name}}-equation`:
+
+ * :math:`x[n]` is the input values.
+
+ * :math:`y[n]` is the output values.
+
+ * Skeleton, etc.,
+
+A block diagram representation of the implementation is given in :numref:`{{asset.name}}-diagram`.
+
+.. _{{asset.name}}-diagram:
+
+.. figure:: {{asset.name}}.svg
+   :alt: Skeleton alternative text.
+   :align: center
+
+   Caption text.
+
+Interface
+---------
+.. literalinclude:: ../specs/{{asset.name}}-spec.xml
+   :language: xml
+
+Opcode handling
+~~~~~~~~~~~~~~~
+Skeleton outline: Description of how the non-stream opcodes are handled.
+
+Properties
+~~~~~~~~~~
+.. ocpi_documentation_properties::
+
+   property_name: Skeleton outline: List any additional text for properties, which will be included in addition to the description field in the component specification XML.
+
+Ports
+~~~~~
+.. ocpi_documentation_ports::
+
+   input: Primary input samples port.
+   output: Primary output samples port.
+
+Implementations
+---------------
+.. ocpi_documentation_implementations:: ../{{asset.name}}.hdl ../{{asset.name}}.rcc
+
+Example Application
+-------------------
+.. literalinclude:: example_app.xml
+   :language: xml
+
+Dependencies
+------------
+The dependencies to other elements in OpenCPI are:
+
+ * Skeleton outline: List primitives or other files within OpenCPI that are used (no need to list protocols).
+
+There is also a dependency on:
+
+ * ``ieee.std_logic_1164``
+
+ * ``ieee.numeric_std``
+
+ * Skeleton outline: Any other standard C++ or HDL packages.
+
+Limitations
+-----------
+Limitations of ``{{asset.name}}`` are:
+
+ * Skeleton outline: List any limitations, or state "None." if there are none.
+
+Testing
+-------
+.. ocpi_documentation_test_platforms::
+
+.. ocpi_documentation_test_result_summary::
+"""  # noqa: E501
+
+
+def create_templates(name, spec_create):
     comp_templates = {}
-    comp_templates[name + '-comp.xml'] = g_asset_template
-    comp_templates[name + '-comp.rst'] = comp_rst_template
-    comp_templates[name + '-test.rst'] = comp_test_rst_template
-    comp_templates['example_app.xml'] = comp_example_app_rst_template
+    if spec_create:
+        comp_templates[name + '-spec.xml'] = g_asset_template
+        comp_templates[name + '-spec.rst'] = comp_spec_rst_template
+    else:
+       comp_templates[name + '-comp.xml'] = g_asset_template
+       comp_templates[name + '-comp.rst'] = comp_rst_template
+       comp_templates[name + '-test.rst'] = comp_test_rst_template
+       comp_templates['example_app.xml'] = comp_example_app_rst_template
     return comp_templates
 
 
@@ -289,11 +398,11 @@ class Component(AssetBase):
         Logger().debug('parsing ' + self.get_xml_abs_path())
         self.parse(cli_dict)
 
-    def create(self, package_id):
+    def create(self, package_id, spec_create, project_path):
         library_name = self.abs_path.split('/')[-3]
-        comp_xml_templates = create_templates(self.name)
+        comp_xml_templates = create_templates(self.name, spec_create)
         AssetBase.create_files(self, comp_xml_templates, package_id,
-                               library_name)
+                               library_name, spec_create, project_path)
 
     def get_attr_infos(self):
         ret = []
