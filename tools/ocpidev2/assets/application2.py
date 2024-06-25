@@ -205,17 +205,17 @@ class Application(AssetBase):
         AssetBase.parse(self, cli_dict)
 
 def test_Application_create(ret):
+    # TODO: Implement testing for CLI args xmlapp, and xmldirapp. These are
+    # parameters for Application.create(xmlapp, xmldirapp).
     fs = TemporaryFilesystem()
     test_name = 'test_Application_create: '
     name = 'app1'
     app_dir = fs.abs_path + '/foo/applications'
     abs_path = app_dir + '/' + name
-    xmlapp = False
-    xmldirapp = False
     try:
         Application(
             abs_path, False, None
-        ).create(xmlapp, xmldirapp)
+        ).create(False, False)
         passed = True
     except Exception as e:
         Logger().debug(test_name + str(e))

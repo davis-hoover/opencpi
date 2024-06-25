@@ -33,6 +33,7 @@ from _opencpi.assets.worker2 import *
 from _opencpi.assets.assembly2 import *
 from _opencpi.assets.platform2 import *
 from _opencpi.assets.test2 import *
+from _opencpi.assets.application2 import *
 
 
 def mysigint(sig, frame):
@@ -557,6 +558,7 @@ def unittest():
     ret = test_HdlCard(ret)
     # ret = test_LegacyOCPIDevHDLBuildTool(ret)
     ret = test_Test_create(ret)
+    ret = test_Application_create(ret)
     return ret
 
 
