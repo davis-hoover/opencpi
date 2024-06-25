@@ -650,7 +650,7 @@ if __name__ == '__main__':
             raise ValueError("'" + args.name + "' is not  valid name.")
     try:
         nouns = ['registry', 'project', 'projects', 'libraries', 'components',
-                 'workers', 'library', 'component', 'test']
+                 'workers', 'library', 'component', 'test', 'application']
         if (args.noun is not None) and (args.noun not in nouns):
             if args.verb != 'apply':
                 raise Exception('noun ' + str(args.noun) + ' is not supported')
