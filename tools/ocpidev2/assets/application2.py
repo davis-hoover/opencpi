@@ -22,8 +22,7 @@ from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import AssetBase
 
 
-apps_dir_xml_template = """
-<applications>
+apps_dir_xml_template = """<applications>
     <!-- To restrict the applications that are built or run, you can set the Applications
     attribute to the specific list of which ones you want to build and run, e.g.:
     <libraries Applications='app1 app3'/>
@@ -31,8 +30,7 @@ apps_dir_xml_template = """
 </applications>
 """
 
-apps_dir_rst_template = """
-.. Application directory index page
+apps_dir_rst_template = """.. Application directory index page
 
 
 Applications
@@ -56,15 +54,14 @@ Available applications.
    application document naming schemes.
 """
 
-app_rst_template = """
-.. {{asset.name}} documentation
+app_rst_template = """.. {{asset.name}} documentation
 
 
 .. _{{asset.name}}-application:
 
 
 SKELETON NAME (``{{asset.name}}``)
-=================================
+==================================
 Skeleton outline: Optional short summary of this application.
 
 Description
@@ -113,7 +110,7 @@ Worker Artifacts
 Skeleton outline: Any artifacts that are produced by the application.
 """
 
-app_cc_template = ("""#include <iostream>
+app_cc_template = """#include <iostream>
 #include <string>
 #include "OcpiApi.hh"
 
@@ -143,7 +140,7 @@ int main(/*int argc, char **argv*/) {
   }
   return 0;
 }
-\n""")
+"""
 
 
 def create_templates(name, applications=False):

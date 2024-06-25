@@ -71,7 +71,6 @@ class OCPIDev():
                 ).create(project, _dir)
             if args.noun == 'application':
                 application_path = _dir + '/' + args.noun + 's/' + args.name
-                print(f"{cli_dict=}")
                 Application(
                     application_path, False, cli_dict
                 ).create(cli_dict['xmlapp'], cli_dict['xmldirapp'])
