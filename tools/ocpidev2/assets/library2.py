@@ -194,7 +194,7 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         comp_dict['devices'].extend(platform_device_libs)
         return comp_dict
 
-    def create_compnents_dir(self, project):
+    def create_components_dir(self, project):
         """ If no 'components' directory exists when creating a
             sub-component-library, create one. """
         if not os.path.exists(project.abs_path + '/components'):
@@ -206,7 +206,7 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
             # Create 'components' template
             comp_lib_templates = create_templates('components')
             comp_lib_templates['components.xml'] = g_asset_template
-            AssetBase.create_files(self, comp_lib_templates)
+            AssetBase.create_files(self, comp_lib_templates, self.abs_path)
             # Reset self. variables to create the sub-component-library
             self.abs_path = abs_path
             self.name = name
@@ -271,7 +271,7 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         self.valid_path(project, comp_dict, is_sub_complib_path)
         comp_lib_xml_name = self.name + '.xml'
         comp_lib_templates[comp_lib_xml_name] = g_asset_template
-        AssetBase.create_files(self, comp_lib_templates)
+        AssetBase.create_files(self, comp_lib_templates, self.abs_path)
 
     @staticmethod
     def get_dir_abs_path_is_worker(dir_abs_path):
