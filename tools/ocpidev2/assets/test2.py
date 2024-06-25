@@ -69,8 +69,9 @@ class Test(AssetBase):
         self.parse(cli_dict)
 
     def create(self):
+        test_path = self.get_dir_abs_path()
         test_xml_templates = create_templates(self.name)
-        AssetBase.create_files(self, test_xml_templates)
+        AssetBase.create_files(self, test_xml_templates, test_path)
 
     def get_attr_infos(self):
         ret = []

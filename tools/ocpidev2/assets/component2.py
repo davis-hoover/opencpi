@@ -591,16 +591,18 @@ def test_Component(ret):
 
 
 def test_Component_create(ret):
+    # TODO: Implement testing for CLI args nocontrol, createtest, project.
     fs = TemporaryFilesystem()
     test_name = 'test_Component_create: '
     name = 'cmp1'
     package_id = 'ocpi.foo'
-    dir_path = fs.abs_path + '/foo/components/' + name + '.comp'
+    project_path = fs.abs_path + '/foo'
+    dir_path = project_path + '/components/' + name + '.comp'
     xml_abs_path = dir_path + '/' + name + '-comp.xml'
     try:
         Component(
             xml_abs_path, False, None
-        ).create(package_id)
+        ).create(package_id, False, project_path)
         passed = True
     except Exception as e:
         Logger().debug(test_name + str(e))
