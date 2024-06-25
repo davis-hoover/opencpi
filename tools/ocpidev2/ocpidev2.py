@@ -69,6 +69,12 @@ class OCPIDev():
                 ComponentLibrary(
                     component_lib_path, False, cli_dict
                 ).create(project, _dir)
+            if args.noun == 'application':
+                application_path = _dir + '/' + args.noun + 's/' + args.name
+                print(f"{cli_dict=}")
+                Application(
+                    application_path, False, cli_dict
+                ).create(cli_dict['xmlapp'], cli_dict['xmldirapp'])
             if args.noun in ['component', 'test']:
                 # Check path is a valid component library directory
                 valid_path = any(_dir == lib.abs_path for lib in
@@ -592,6 +598,10 @@ def add_create_arguments(parser, verb):
                 else:
                     parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
                                         default='')
+    if verb == 'application':
+        group = parser.add_mutually_exclusive_group()
+        group.add_argument('-X', '--xml-app', default=False, action='store_true')
+        group.add_argument('-x', '--xml-dir-app', default=False, action='store_true')
     return parser
 
 
@@ -617,6 +627,8 @@ if __name__ == '__main__':
             parser = add_create_arguments(parser, 'component')
         if 'test' in sys.argv:
             parser = add_create_arguments(parser, 'test')
+        if 'application' in sys.argv:
+            parser = add_create_arguments(parser, 'application')
     if 'build' in sys.argv:
         parser = add_build_arguments(parser)
     #required = ('create' in sys.argv) or ('build' in sys.argv) or ('show' in sys.argv)
@@ -634,7 +646,7 @@ if __name__ == '__main__':
             raise ValueError("'" + args.name + "' is not  valid name.")
     try:
         nouns = ['registry', 'project', 'projects', 'libraries', 'components',
-                 'workers', 'library', 'component', 'test']
+                 'workers', 'library', 'component', 'test', 'application']
         if (args.noun is not None) and (args.noun not in nouns):
             if args.verb != 'apply':
                 raise Exception('noun ' + str(args.noun) + ' is not supported')

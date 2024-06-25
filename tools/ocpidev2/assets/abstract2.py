@@ -902,15 +902,15 @@ class AssetBase(AttributeBase):
                 else:
                     raise InvalidAssetError(msg)
 
-    def create_files(self, templates, package_id=None, library_name=None):
-        abs_path = self.get_dir_abs_path()
-        os.makedirs(abs_path, exist_ok=False)
+    def create_files(self, templates, file_path, package_id=None,
+                     library_name=None, duplicate=False):
+        os.makedirs(file_path, exist_ok=duplicate)
         for fname, fcontents in templates.items():
             fcontents = jinja2.Template(fcontents, trim_blocks=True)
             fcontents = fcontents.render(
                 asset=self, package_id=package_id, library_name=library_name
             )
-            out_file = open(abs_path + '/' + fname, 'w')
+            out_file = open(file_path + '/' + fname, 'w')
             out_file.write(fcontents)
             out_file.close()
 
