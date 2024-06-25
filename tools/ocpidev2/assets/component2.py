@@ -266,7 +266,7 @@ Testing
 """  # noqa: E501
 
 
-def create_templates(name, spec_create):
+def create_templates(name, spec_create=False):
     comp_templates = {}
     if spec_create:
         comp_templates[name + '-spec.xml'] = g_asset_template
@@ -400,9 +400,16 @@ class Component(AssetBase):
 
     def create(self, package_id, spec_create, project_path):
         library_name = self.abs_path.split('/')[-3]
-        comp_xml_templates = create_templates(self.name, spec_create)
-        AssetBase.create_files(self, comp_xml_templates, package_id,
-                               library_name, spec_create, project_path)
+        if spec_create:
+            spec_path = project_path + '/specs'
+            spec_templates = create_templates(self.name, spec_create)
+            AssetBase.create_files(self, spec_templates, spec_path,
+                                   package_id, library_name)
+        else:
+            component_path = self.get_dir_abs_path()
+            comp_templates = create_templates(self.name)
+            AssetBase.create_files(self, comp_templates, component_path,
+                                   package_id, library_name)
 
     def get_attr_infos(self):
         ret = []
