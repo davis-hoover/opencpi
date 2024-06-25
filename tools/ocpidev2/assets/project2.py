@@ -223,7 +223,8 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
                 raise InvalidAssetError('PackagePrefix must contain only alphanumeric characters and not start with a number')
 
     def create(self):
-        AssetBase.create_files(self, project_templates)
+        project_path = self.get_dir_abs_path()
+        AssetBase.create_files(self, project_templates, project_path)
 
     def discover(
             self, do_component_libraries=True, do_hdl_primitives=True,
