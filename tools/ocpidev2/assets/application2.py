@@ -18,6 +18,7 @@
 
 
 import os
+import hashlib
 from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import AssetBase
 
@@ -27,7 +28,7 @@ apps_dir_xml_template = """<applications>
     attribute to the specific list of which ones you want to build and run, e.g.:
     <libraries Applications='app1 app3'/>
     Otherwise all applications will be built and run -->
-</applications>
+</applications>\n
 """
 
 apps_dir_rst_template = """.. Application directory index page
@@ -51,7 +52,7 @@ Available applications.
    system during a documentation build operation.
 
 .. The search path "*/*-application" is for backward compatibility with older
-   application document naming schemes.
+   application document naming schemes.\n
 """
 
 app_rst_template = """.. {{asset.name}} documentation
@@ -107,7 +108,7 @@ Skeleton outline: A list of the configurable properties for each of the workers 
 
 Worker Artifacts
 ----------------
-Skeleton outline: Any artifacts that are produced by the application.
+Skeleton outline: Any artifacts that are produced by the application.\n
 """
 
 app_cc_template = """#include <iostream>
@@ -139,7 +140,7 @@ int main(/*int argc, char **argv*/) {
     return 1;
   }
   return 0;
-}
+}\n
 """
 
 
@@ -202,3 +203,63 @@ class Application(AssetBase):
 
     def parse(self, cli_dict=None):
         AssetBase.parse(self, cli_dict)
+
+def test_Application_create(ret):
+    fs = TemporaryFilesystem()
+    test_name = 'test_Application_create: '
+    name = 'app1'
+    app_dir = fs.abs_path + '/foo/applications'
+    abs_path = app_dir + '/' + name
+    xmlapp = False
+    xmldirapp = False
+    try:
+        Application(
+            abs_path, False, None
+        ).create(xmlapp, xmldirapp)
+        passed = True
+    except Exception as e:
+        Logger().debug(test_name + str(e))
+    # Test for file existence
+    apps_files = ['applications.xml', 'applications.rst']
+    app_files = ['app1.xml', 'app1.rst', 'app1.cc']
+    for apps_file in apps_files:
+        path = app_dir + '/' + apps_file
+        if not os.path.exists(path):
+            passed = False
+    for app_file in app_files:
+        path = abs_path + '/' + app_file
+        if not os.path.exists(path):
+            passed = False
+    # Test for file integrity
+    msg = 'invalid expected md5sum for file: '
+    apps_xml = app_dir + '/' + apps_files[0]
+    apps_xml_md5 = hashlib.md5(open(apps_xml, 'rb').read()).hexdigest()
+    if apps_xml_md5 != '69897555db79c40e9de4d95924f9a80f':
+        passed = False
+        Logger().error(test_name + str(msg + app_dir + '/' + apps_files[0]))
+    apps_rst = app_dir + '/' + apps_files[1]
+    apps_rst_md5 = hashlib.md5(open(apps_rst, 'rb').read()).hexdigest()
+    if apps_rst_md5 != '6d026d7f0cf86224a15f5c109ea0f623':
+        passed = False
+        Logger().error(test_name + str(msg + app_dir + '/' + apps_files[1]))
+    app_xml = abs_path + '/' + app_files[0]
+    app_xml_md5 = hashlib.md5(open(app_xml, 'rb').read()).hexdigest()
+    if app_xml_md5 != 'ff70b39eebf96026ac86bba42e9b2fe8':
+        passed = False
+        Logger().error(test_name + str(msg + abs_path + '/' + app_files[0]))
+    app_rst = abs_path + '/' + app_files[1]
+    app_rst_md5 = hashlib.md5(open(app_rst, 'rb').read()).hexdigest()
+    if app_rst_md5 != '44ea7c3b1017a490baea7b8986cac2a8':
+        passed = False
+        Logger().error(test_name + str(msg + abs_path + '/' + app_files[1]))
+    app_cc = abs_path + '/' + app_files[2]
+    app_cc = hashlib.md5(open(app_cc, 'rb').read()).hexdigest()
+    if app_cc != 'd372382ffd06a892846b6da8f35b304a':
+        passed = False
+        Logger().error(test_name + str(msg + abs_path + '/' + app_files[2]))
+    os.system('rm -rf ' + app_dir)
+    #os.system('tree ' + app_dir)
+    log_pass_fail('testing Application create()', passed)
+    if passed is False:
+        ret = False
+    return ret
