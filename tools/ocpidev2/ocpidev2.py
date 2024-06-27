@@ -80,6 +80,57 @@ class OCPIDev():
             if not os.path.isdir(ocpi_cdk_dir + '/' + platform):
                 raise Exception('platform ' + platform + ' is not installed')
 
+    def export_projects(self, project_registry, hdl_platform, hdl_target, rcc_platform):
+        """ TODO START fix this mess and move back into tool class """
+        dependency_ordered_pid_strs = []
+        # initial hack to handle circular platform/assets circular dependency
+        for proj in project_registry.projects:
+            if str(proj.get_package_id()) == 'ocpi.core':
+                dependency_ordered_pid_strs.append(str(proj.get_package_id()))
+        for proj in project_registry.projects:
+            if str(proj.get_package_id()) == 'ocpi.platform':
+                dependency_ordered_pid_strs.append(str(proj.get_package_id()))
+        for proj in project_registry.projects:
+            if str(proj.get_package_id()) == 'ocpi.assets':
+                dependency_ordered_pid_strs.append(str(proj.get_package_id()))
+        # proper project dependency order, with timeout hack to handle circular
+        # dependencies
+        timeout = 10000
+        while len(dependency_ordered_pid_strs) != \
+                len(project_registry.projects):
+            if timeout == 0:
+                break
+            timeout -= 1
+            for proj in project_registry.projects:
+                deps_covered = True
+                for dependent_proj in proj.project_dependencies:
+                    if dependent_proj not in dependency_ordered_pid_strs:
+                        deps_covered = False
+                if deps_covered:
+                    if str(proj.get_package_id()) not in dependency_ordered_pid_strs:
+                        dependency_ordered_pid_strs.append(
+                                str(proj.get_package_id()))
+        # timeout hack to handle circular dependencies,
+        # (we gave up on dependency order!)
+        if timeout == 0:
+            for proj in project_registry.projects:
+                if str(proj.get_package_id()) not in dependency_ordered_pid_strs:
+                    dependency_ordered_pid_strs.append(str(proj.get_package_id()))
+        # do the final export in psuedo-dependency-order
+        for package_id_str in dependency_ordered_pid_strs:
+            for proj in project_registry.projects:
+                if str(proj.get_package_id()) == package_id_str:
+                    # TODO move below 7 lines outside OCPIDev class (Legacy...)
+                    # IMPORTANT - below 6 lines necessary to remove stale files
+                    os.system('rm -rf $(find ' + proj.abs_path + ' -type f -name imports)')
+                    os.system('rm -rf $(find ' + proj.abs_path + ' -type f -name exports)')
+                    os.system('rm -rf $(find ' + proj.abs_path + ' -type d -name imports)')
+                    os.system('rm -rf $(find ' + proj.abs_path + ' -type d -name exports)')
+                    os.system('rm -rf $(find ' + proj.abs_path + ' -type l -name imports)')
+                    os.system('rm -rf $(find ' + proj.abs_path + ' -type l -name exports)')
+                    self.hdl_build_tool.export_project(
+                            proj, hdl_platform, hdl_target, rcc_platform)
+
     def build(self, noun, hdl_target, hdl_platform, rcc_platform, _dir, _j):
         if (hdl_target != '') or (hdl_platform != ''):
             if os.environ.get('XILINX_VIVADO') is not None:
@@ -143,59 +194,10 @@ class OCPIDev():
                     assets_to_build.append(application)
         self.throw_if_project_dependencies_not_registered(
             project, project_registry)
-        # ============ TODO START fix this mess and move back into tool class
         if rcc_platform != '':
             self.install_rcc_platform_if_not_installed(
                     project_registry, rcc_platform)
-        dependency_ordered_pid_strs = []
-        # initial hack to handle circular platform/assets circular dependency
-        for proj in project_registry.projects:
-            if str(proj.get_package_id()) == 'ocpi.core':
-                dependency_ordered_pid_strs.append(str(proj.get_package_id()))
-        for proj in project_registry.projects:
-            if str(proj.get_package_id()) == 'ocpi.platform':
-                dependency_ordered_pid_strs.append(str(proj.get_package_id()))
-        for proj in project_registry.projects:
-            if str(proj.get_package_id()) == 'ocpi.assets':
-                dependency_ordered_pid_strs.append(str(proj.get_package_id()))
-        # proper project dependency order, with timeout hack to handle circular
-        # dependencies
-        timeout = 10000
-        while len(dependency_ordered_pid_strs) != \
-                len(project_registry.projects):
-            if timeout == 0:
-                break
-            timeout -= 1
-            for proj in project_registry.projects:
-                deps_covered = True
-                for dependent_proj in proj.project_dependencies:
-                    if dependent_proj not in dependency_ordered_pid_strs:
-                        deps_covered = False
-                if deps_covered:
-                    if str(proj.get_package_id()) not in dependency_ordered_pid_strs:
-                        dependency_ordered_pid_strs.append(
-                                str(proj.get_package_id()))
-        # timeout hack to handle circular dependencies,
-        # (we gave up on dependency order!)
-        if timeout == 0:
-            for proj in project_registry.projects:
-                if str(proj.get_package_id()) not in dependency_ordered_pid_strs:
-                    dependency_ordered_pid_strs.append(str(proj.get_package_id()))
-        # do the final export in psuedo-dependency-order
-        for package_id_str in dependency_ordered_pid_strs:
-            for proj in project_registry.projects:
-                if str(proj.get_package_id()) == package_id_str:
-                    # TODO move below 7 lines outside OCPIDev class (Legacy...)
-                    # IMPORTANT - below 6 lines necessary to remove stale files
-                    os.system('rm -rf $(find ' + proj.abs_path + ' -type f -name imports)')
-                    os.system('rm -rf $(find ' + proj.abs_path + ' -type f -name exports)')
-                    os.system('rm -rf $(find ' + proj.abs_path + ' -type d -name imports)')
-                    os.system('rm -rf $(find ' + proj.abs_path + ' -type d -name exports)')
-                    os.system('rm -rf $(find ' + proj.abs_path + ' -type l -name imports)')
-                    os.system('rm -rf $(find ' + proj.abs_path + ' -type l -name exports)')
-                    self.hdl_build_tool.export_project(
-                            proj, hdl_platform, hdl_target, rcc_platform)
-        # ============ END fix this mess and move back into tool class
+        self.export_projects(project_registry, hdl_platform, hdl_target, rcc_platform)
         project.build_assets(
                 assets_to_build, project_registry, self.hdl_build_tool,
                 hdl_target, hdl_platform, rcc_platform, _j)
