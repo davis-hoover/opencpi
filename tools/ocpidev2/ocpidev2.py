@@ -163,6 +163,57 @@ class OCPIDev():
             if not os.path.isdir(ocpi_cdk_dir + '/' + platform):
                 raise Exception('platform ' + platform + ' is not installed')
 
+    def export_projects(self, project_registry, hdl_platform, hdl_target, rcc_platform):
+        """ TODO START fix this mess and move back into tool class """
+        dependency_ordered_pid_strs = []
+        # initial hack to handle circular platform/assets circular dependency
+        for proj in project_registry.projects:
+            if str(proj.get_package_id()) == 'ocpi.core':
+                dependency_ordered_pid_strs.append(str(proj.get_package_id()))
+        for proj in project_registry.projects:
+            if str(proj.get_package_id()) == 'ocpi.platform':
+                dependency_ordered_pid_strs.append(str(proj.get_package_id()))
+        for proj in project_registry.projects:
+            if str(proj.get_package_id()) == 'ocpi.assets':
+                dependency_ordered_pid_strs.append(str(proj.get_package_id()))
+        # proper project dependency order, with timeout hack to handle circular
+        # dependencies
+        timeout = 10000
+        while len(dependency_ordered_pid_strs) != \
+                len(project_registry.projects):
+            if timeout == 0:
+                break
+            timeout -= 1
+            for proj in project_registry.projects:
+                deps_covered = True
+                for dependent_proj in proj.project_dependencies:
+                    if dependent_proj not in dependency_ordered_pid_strs:
+                        deps_covered = False
+                if deps_covered:
+                    if str(proj.get_package_id()) not in dependency_ordered_pid_strs:
+                        dependency_ordered_pid_strs.append(
+                                str(proj.get_package_id()))
+        # timeout hack to handle circular dependencies,
+        # (we gave up on dependency order!)
+        if timeout == 0:
+            for proj in project_registry.projects:
+                if str(proj.get_package_id()) not in dependency_ordered_pid_strs:
+                    dependency_ordered_pid_strs.append(str(proj.get_package_id()))
+        # do the final export in psuedo-dependency-order
+        for package_id_str in dependency_ordered_pid_strs:
+            for proj in project_registry.projects:
+                if str(proj.get_package_id()) == package_id_str:
+                    # TODO move below 7 lines outside OCPIDev class (Legacy...)
+                    # IMPORTANT - below 6 lines necessary to remove stale files
+                    os.system('rm -rf $(find ' + proj.abs_path + ' -type f -name imports)')
+                    os.system('rm -rf $(find ' + proj.abs_path + ' -type f -name exports)')
+                    os.system('rm -rf $(find ' + proj.abs_path + ' -type d -name imports)')
+                    os.system('rm -rf $(find ' + proj.abs_path + ' -type d -name exports)')
+                    os.system('rm -rf $(find ' + proj.abs_path + ' -type l -name imports)')
+                    os.system('rm -rf $(find ' + proj.abs_path + ' -type l -name exports)')
+                    self.hdl_build_tool.export_project(
+                            proj, hdl_platform, hdl_target, rcc_platform)
+
     def build(self, noun, hdl_target, hdl_platform, rcc_platform, _dir, _j):
         if (hdl_target != '') or (hdl_platform != ''):
             if os.environ.get('XILINX_VIVADO') is not None:
@@ -226,63 +277,13 @@ class OCPIDev():
                     assets_to_build.append(application)
         self.throw_if_project_dependencies_not_registered(
             project, project_registry)
-        # ============ TODO START fix this mess and move back into tool class
         if rcc_platform != '':
             self.install_rcc_platform_if_not_installed(
                     project_registry, rcc_platform)
-        dependency_ordered_pid_strs = []
-        # initial hack to handle circular platform/assets circular dependency
-        for proj in project_registry.projects:
-            if str(proj.get_package_id()) == 'ocpi.core':
-                dependency_ordered_pid_strs.append(str(proj.get_package_id()))
-        for proj in project_registry.projects:
-            if str(proj.get_package_id()) == 'ocpi.platform':
-                dependency_ordered_pid_strs.append(str(proj.get_package_id()))
-        for proj in project_registry.projects:
-            if str(proj.get_package_id()) == 'ocpi.assets':
-                dependency_ordered_pid_strs.append(str(proj.get_package_id()))
-        # proper project dependency order, with timeout hack to handle circular
-        # dependencies
-        timeout = 10000
-        while len(dependency_ordered_pid_strs) != \
-                len(project_registry.projects):
-            if timeout == 0:
-                break
-            timeout -= 1
-            for proj in project_registry.projects:
-                deps_covered = True
-                for dependent_proj in proj.project_dependencies:
-                    if dependent_proj not in dependency_ordered_pid_strs:
-                        deps_covered = False
-                if deps_covered:
-                    if str(proj.get_package_id()) not in dependency_ordered_pid_strs:
-                        dependency_ordered_pid_strs.append(
-                                str(proj.get_package_id()))
-        # timeout hack to handle circular dependencies,
-        # (we gave up on dependency order!)
-        if timeout == 0:
-            for proj in project_registry.projects:
-                if str(proj.get_package_id()) not in dependency_ordered_pid_strs:
-                    dependency_ordered_pid_strs.append(str(proj.get_package_id()))
-        # do the final export in psuedo-dependency-order
-        for package_id_str in dependency_ordered_pid_strs:
-            for proj in project_registry.projects:
-                if str(proj.get_package_id()) == package_id_str:
-                    # TODO move below 7 lines outside OCPIDev class (Legacy...)
-                    # IMPORTANT - below 6 lines necessary to remove stale files
-                    os.system('rm -rf $(find ' + proj.abs_path + ' -type f -name imports)')
-                    os.system('rm -rf $(find ' + proj.abs_path + ' -type f -name exports)')
-                    os.system('rm -rf $(find ' + proj.abs_path + ' -type d -name imports)')
-                    os.system('rm -rf $(find ' + proj.abs_path + ' -type d -name exports)')
-                    os.system('rm -rf $(find ' + proj.abs_path + ' -type l -name imports)')
-                    os.system('rm -rf $(find ' + proj.abs_path + ' -type l -name exports)')
-                    self.hdl_build_tool.export_project(
-                            proj, hdl_platform, hdl_target, rcc_platform)
-        # ============ END fix this mess and move back into tool class
-        for asset in assets_to_build:
-            project.build_asset(
-                    asset, project_registry, self.hdl_build_tool,
-                    hdl_target, hdl_platform, rcc_platform, _j)
+        self.export_projects(project_registry, hdl_platform, hdl_target, rcc_platform)
+        project.build_assets(
+                assets_to_build, project_registry, self.hdl_build_tool,
+                hdl_target, hdl_platform, rcc_platform, _j)
         # TODO move below 8 lines outside OCPIDev class (Legacy...)
         # IMPORTANT - below 7 lines necessary to mitigate stale files
         #for proj in project_registry.projects:
@@ -327,7 +328,7 @@ class OCPIDev():
         if not cleaned:
             raise Exception('cannot clean directory not in registered project')
 
-    def show(self, noun):
+    def show(self, noun, _dir):
         disc = noun != 'registry'
         disc = disc and (noun != 'projects')
         project_registry = ProjectRegistry(disc, disc)
@@ -342,22 +343,27 @@ class OCPIDev():
                 print(msg + project.abs_path)
             if noun == 'components':
                 for component in project.components:
-                    print(str(project.get_package_id()) + '.' + component.name)
+                    if (_dir is None) or (_dir in component.abs_path):
+                        print(str(project.get_package_id()) + '.' + component.name)
             for component_library in project.component_libraries:
                 print("component_library.abs_path = " + component_library.abs_path)
                 pid = component_library.get_package_id(str(project.get_package_id()))
                 if noun == 'libraries':
-                    print(pid)
+                    if (_dir is None) or (_dir in component_library.abs_path):
+                        print(pid)
                 if noun == 'components':
                     for component in component_library.components:
-                        print(pid + '.' + component.name)
+                        if (_dir is None) or (_dir in component.abs_path):
+                            print(pid + '.' + component.name)
                 if noun == 'workers':
                     for worker in component_library.workers:
-                        print(pid + '.' + worker.name + '.' +
-                              worker.authoring_model)
+                        if (_dir is None) or (_dir in worker.abs_path):
+                            print(pid + '.' + worker.name + '.' +
+                                  worker.authoring_model)
             if noun == 'libraries':
                 for hdl_primitive in project.hdl_primitives:
-                    print(str(project.get_package_id()) + '.' + hdl_primitive.name)
+                    if (_dir is None) or (_dir in hdl_primitive.abs_path):
+                        print(str(project.get_package_id()) + '.' + hdl_primitive.name)
 
     def register(self, noun, _dir):
         project_registry = ProjectRegistry(
@@ -627,7 +633,7 @@ def add_build_arguments(parser):
 if __name__ == '__main__':
     exit_status = 0
     parser = argparse.ArgumentParser(description='')
-    parser.add_argument('-d', nargs='?', default=None)
+    parser.add_argument('-d', nargs='?', default=None, action='append')
     parser.add_argument('-j', nargs='?', default=1)
     parser.add_argument('verb')
     if 'create' in sys.argv:
@@ -657,6 +663,10 @@ if __name__ == '__main__':
         if not args.name.isidentifier():
             raise ValueError("'" + args.name + "' is not  valid name.")
     try:
+        if args.d is not None:
+            if len(args.d) > 1:
+                raise Exception('-d option was specified more than once')
+            args.d = args.d[0]
         nouns = ['registry', 'project', 'projects', 'libraries', 'components',
                  'workers', 'library', 'component', 'test', 'application']
         if (args.noun is not None) and (args.noun not in nouns):
@@ -683,7 +693,7 @@ if __name__ == '__main__':
         elif args.verb == 'clean':
             OCPIDev(hdl_build_tool).clean(args.noun, _dir)
         elif args.verb == 'show':
-            OCPIDev(hdl_build_tool).show(args.noun)
+            OCPIDev(hdl_build_tool).show(args.noun, _dir)
         elif args.verb == 'register':
             OCPIDev(hdl_build_tool).register(args.noun, _dir)
         elif args.verb == 'unregister':

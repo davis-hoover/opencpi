@@ -158,7 +158,13 @@ class ProjectRegistry():
     def discover_projects(self, do_component_libraries, do_hdl_primitives):
         Logger().debug('start of project discovery')
         for _dir in AssetBase.listdir_assets(self.abs_path):
-            project_abs_path = os.path.realpath(self.abs_path + '/' + _dir)
+            abs_path = self.abs_path + '/' + _dir
+            project_abs_path = os.path.realpath(abs_path)
+            if (not os.path.exists(project_abs_path)) or \
+                not (self.get_abs_path_is_project(project_abs_path)):
+                name = project_abs_path.split('/')[-1]
+                msg = 'registry corrupted for ' + name + ' project entry (broken symlink: ' + abs_path + ')'
+                Logger().warn(msg)
             if self.get_abs_path_is_project(project_abs_path):
                 project = Project(project_abs_path, False)
                 project.discover(do_component_libraries, do_hdl_primitives)

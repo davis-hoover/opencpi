@@ -971,6 +971,11 @@ class AssetBase(AttributeBase):
             ret = self.abs_path.rsplit('/', 1)[0]
         return ret
 
+    def get_dir_abs_path_is_within_specified_abs_path(self, specified_abs_path):
+        split_dir_abs_path = self.get_dir_abs_path.split('/')
+        split_specified_abs_path = specified_abs_path.split('/')
+        return set(split_dir_abs_path).issuperset(split_specified_abs_path)
+
     def get_parsed(self):
         xml_abs_path = self.get_xml_abs_path()
         _file = open(self.get_xml_abs_path(), 'r')

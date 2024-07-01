@@ -181,7 +181,6 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
                         ret = worker
         return ret
 
-
     def get_asset(self, abs_path):
         """ returns None if asset not found """
         ret = None
@@ -456,22 +455,23 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
                 is_assembly)
         return ret
 
-    def build_asset(self, asset, project_registry, tool,
-            hdl_target = '', hdl_platform = '', rcc_platform = '', _j = 1):
+    def build_assets(self, assets, project_registry, tool,
+            hdl_target='', hdl_platform='', rcc_platform='', _j=1):
         fs = TemporaryFilesystem()
         os.system('mkdir -p ' + fs.abs_path)
         global_makefile.abs_path = fs.abs_path + '/Makefile'
         model_target = get_target(hdl_platform, rcc_platform)
-        target_name = self.get_build_artifact_abs_path(asset, model_target,
-                hdl_platform, rcc_platform)
         Logger().info('gathering dependencies')
         global_makefile.rules['all'] = GNUMakeRule()
         target = GNUMakeTarget('all', True)
         global_makefile.rules['all'].targets.append(target)
-        global_makefile.rules['all'].prerequisites.append(target_name)
-        global_dependency_tree[asset] = DependencyTree()
-        self.append_rules_to_makefile(asset, project_registry, tool,
-            hdl_target, hdl_platform, rcc_platform)
+        for asset in assets:
+            target_name = self.get_build_artifact_abs_path(asset, model_target,
+                    hdl_platform, rcc_platform)
+            global_makefile.rules['all'].prerequisites.append(target_name)
+            global_dependency_tree[asset] = DependencyTree()
+            self.append_rules_to_makefile(asset, project_registry, tool,
+                hdl_target, hdl_platform, rcc_platform)
         global_makefile.emit()
         tmp = 'make -f ' + global_makefile.abs_path
         if _j > 1:

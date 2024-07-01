@@ -9,6 +9,13 @@ pre-OpenCPI-2.0 documentation here: https://gitlab.com/opencpi/opencpi/-/blob/v1
 
 OpenCPI v2.4.7 is here: https://gitlab.com/opencpi/opencpi/-/tree/v2.4.7/projects
 
+# Registry Behavior
+
+1. If a broken symlink exists in the registry, produce warning
+
+# Component Library Behavior
+
+
 | `<library-name>`.xml exists | Library.mk exists | Makefile exists | Behavior | Known Examples |
 | ------ | ------ | ------ | ------ | ------ |
 |   N     |    N    |    N   |   Because the Component Development Guide lists `<lib>.xml` as optional in Figure 1, this is an expected and supported scenario. All directories (in the standard locations, within a project, as per Component Dev Guide 14.2.3") whose paths DO NOT end with .hdl or .rcc or .ocl are considered component libraries. This also means that, for the nested directory components/<library>/ scenario, both components and components.<library> are considered component libraries. |   OpenCPI core/components. There are probably other examples.   |
