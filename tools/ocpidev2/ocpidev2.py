@@ -63,8 +63,9 @@ class OCPIDev():
             project = next((proj for proj in project_registry.projects if
                             proj.abs_path + '/' in _dir + '/'), None)
             if project is None:
-                raise Exception('Please perform create ' + args.noun + ' in a '
-                                'registered project directory')
+                raise Exception("Invalid path: '" + _dir + "'. Please perform "
+                                "create " + args.noun + " in a valid "
+                                "registered project directory.")
             if args.noun == 'library':
                 component_lib_path = _dir + '/' + args.name
                 ComponentLibrary(
@@ -72,16 +73,23 @@ class OCPIDev():
                 ).create(project, _dir)
             if args.noun == 'application':
                 application_path = _dir + '/' + args.noun + 's/' + args.name
+                applications_dir = project.abs_path + '/applications'
+                if _dir != project.abs_path and _dir != applications_dir:
+                    raise Exception("Invalid path: '" + _dir + "'. Please "
+                                    "perform create application at the top of "
+                                    "a valid registered project or within the "
+                                    "applications directory.")
                 Application(
                     application_path, False, cli_dict
-                ).create(cli_dict['xmlapp'], cli_dict['xmldirapp'])
+                ).create(project.abs_path, cli_dict['xmlapp'], cli_dict['xmldirapp'])
             if args.noun in ['component', 'test']:
                 # Check path is a valid component library directory
                 valid_path = any(_dir == lib.abs_path for lib in
                                  project.component_libraries)
                 if not valid_path:
-                    raise Exception('Please perform create ' + args.noun +
-                                    ' in a valid component library')
+                    raise Exception("Invalid path: `" + _dir + "'. Please "
+                                    "perform create " + args.noun + " "
+                                    "in a valid component library.")
                 if args.noun == 'component':
                     spec_create = True if cli_dict['project'] else False
                     component_path = (
@@ -113,7 +121,7 @@ class OCPIDev():
                         if not valid_comp:
                             msg = ('The component ' + cli_dict['component'] +
                                    ' does not exist within any of the '
-                                   'registered projects')
+                                   'registered projects.')
                             raise Exception(msg)
                     # If --component not used, check for the component in path
                     else:
@@ -124,7 +132,7 @@ class OCPIDev():
                         if not valid_create_test:
                             raise Exception('A ' + args.name + ' component does '
                                             'not yet exist to create a unit-test '
-                                            'for')
+                                            'for.')
                     Test(test_path, False, cli_dict).create()
 
     def delete(self, noun):

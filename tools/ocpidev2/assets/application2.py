@@ -183,10 +183,11 @@ class Application(AssetBase):
     def get_type(self):
         return 'application'
 
-    def create(self, xmlapp, xmldirapp):
+    def create(self, project_path, xmlapp, xmldirapp):
         """ Creates dir/files at the top-level applications directory, and
             creates dir/files within the named application directory """
-        apps_dir = '/'.join(self.abs_path.split('/')[:-1])
+        apps_dir = project_path + '/applications'
+        app_dir =  apps_dir + '/' + self.name
         apps_templates = create_templates(self.name, applications=True)
         AssetBase.create_files(self, apps_templates, apps_dir, duplicate=True)
         if xmlapp:
@@ -196,10 +197,10 @@ class Application(AssetBase):
         elif xmldirapp:
             app_templates = create_templates(self.name)
             app_templates.pop(self.name + '.cc')
-            AssetBase.create_files(self, app_templates, self.abs_path)
+            AssetBase.create_files(self, app_templates, app_dir)
         else:
             app_templates = create_templates(self.name, applications=False)
-            AssetBase.create_files(self, app_templates, self.abs_path)
+            AssetBase.create_files(self, app_templates, app_dir)
 
     def parse(self, cli_dict=None):
         AssetBase.parse(self, cli_dict)
@@ -208,14 +209,16 @@ def test_Application_create(ret):
     # TODO: Implement testing for CLI args xmlapp, and xmldirapp. These are
     # parameters for Application.create(xmlapp, xmldirapp).
     fs = TemporaryFilesystem()
+    passed = False
     test_name = 'test_Application_create: '
     name = 'app1'
-    app_dir = fs.abs_path + '/foo/applications'
-    abs_path = app_dir + '/' + name
+    project_dir = fs.abs_path + '/foo'
+    apps_dir = project_dir + '/applications'
+    app_dir = apps_dir + '/' + name
     try:
         Application(
-            abs_path, False, None
-        ).create(False, False)
+            app_dir, False, None
+        ).create(project_dir, False, False)
         passed = True
     except Exception as e:
         Logger().debug(test_name + str(e))
@@ -223,42 +226,42 @@ def test_Application_create(ret):
     apps_files = ['applications.xml', 'applications.rst']
     app_files = ['app1.xml', 'app1.rst', 'app1.cc']
     for apps_file in apps_files:
-        path = app_dir + '/' + apps_file
+        path = apps_dir + '/' + apps_file
         if not os.path.exists(path):
             passed = False
     for app_file in app_files:
-        path = abs_path + '/' + app_file
+        path = app_dir + '/' + app_file
         if not os.path.exists(path):
             passed = False
     # Test for file integrity
     msg = 'invalid expected md5sum for file: '
-    apps_xml = app_dir + '/' + apps_files[0]
+    apps_xml = apps_dir + '/' + apps_files[0]
     apps_xml_md5 = hashlib.md5(open(apps_xml, 'rb').read()).hexdigest()
     if apps_xml_md5 != '69897555db79c40e9de4d95924f9a80f':
         passed = False
-        Logger().error(test_name + str(msg + app_dir + '/' + apps_files[0]))
-    apps_rst = app_dir + '/' + apps_files[1]
+        Logger().error(test_name + str(msg + apps_dir + '/' + apps_files[0]))
+    apps_rst = apps_dir + '/' + apps_files[1]
     apps_rst_md5 = hashlib.md5(open(apps_rst, 'rb').read()).hexdigest()
     if apps_rst_md5 != '6d026d7f0cf86224a15f5c109ea0f623':
         passed = False
-        Logger().error(test_name + str(msg + app_dir + '/' + apps_files[1]))
-    app_xml = abs_path + '/' + app_files[0]
+        Logger().error(test_name + str(msg + apps_dir + '/' + apps_files[1]))
+    app_xml = app_dir + '/' + app_files[0]
     app_xml_md5 = hashlib.md5(open(app_xml, 'rb').read()).hexdigest()
     if app_xml_md5 != 'ff70b39eebf96026ac86bba42e9b2fe8':
         passed = False
-        Logger().error(test_name + str(msg + abs_path + '/' + app_files[0]))
-    app_rst = abs_path + '/' + app_files[1]
+        Logger().error(test_name + str(msg + app_dir + '/' + app_files[0]))
+    app_rst = app_dir + '/' + app_files[1]
     app_rst_md5 = hashlib.md5(open(app_rst, 'rb').read()).hexdigest()
     if app_rst_md5 != '44ea7c3b1017a490baea7b8986cac2a8':
         passed = False
-        Logger().error(test_name + str(msg + abs_path + '/' + app_files[1]))
-    app_cc = abs_path + '/' + app_files[2]
+        Logger().error(test_name + str(msg + app_dir + '/' + app_files[1]))
+    app_cc = app_dir + '/' + app_files[2]
     app_cc = hashlib.md5(open(app_cc, 'rb').read()).hexdigest()
     if app_cc != 'd372382ffd06a892846b6da8f35b304a':
         passed = False
-        Logger().error(test_name + str(msg + abs_path + '/' + app_files[2]))
-    os.system('rm -rf ' + app_dir)
-    #os.system('tree ' + app_dir)
+        Logger().error(test_name + str(msg + app_dir + '/' + app_files[2]))
+    os.system('rm -rf ' + apps_dir)
+    #os.system('tree ' + project_dir)
     log_pass_fail('testing Application create()', passed)
     if passed is False:
         ret = False
