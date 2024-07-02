@@ -248,44 +248,6 @@ class OCPIDev():
         if not cleaned:
             raise Exception('cannot clean directory not in registered project')
 
-    def show(self, args):
-        disc = args.noun != 'registry'
-        disc = disc and (args.noun != 'projects')
-        project_registry = ProjectRegistry(disc, disc)
-        if args.noun == 'registry':
-            print(project_registry.abs_path)
-        for project in project_registry.projects:
-            if args.noun == 'projects':
-                msg = str(project.get_package_id())
-                if args.verbose:
-                    msg += ' '
-                    for idx in range(30-len(msg)):
-                        msg += ' '
-                    msg += project.abs_path
-                print(msg)
-            if args.noun == 'components':
-                for component in project.components:
-                    if (args.d is None) or (args.d in component.abs_path):
-                        print(str(project.get_package_id()) + '.' + component.name)
-            for component_library in project.component_libraries:
-                pid = component_library.get_package_id(str(project.get_package_id()))
-                if args.noun == 'libraries':
-                    if (args.d is None) or (args.d in component_library.abs_path):
-                        print(pid)
-                if args.noun == 'components':
-                    for component in component_library.components:
-                        if (args.d is None) or (args.d in component.abs_path):
-                            print(pid + '.' + component.name)
-                if args.noun == 'workers':
-                    for worker in component_library.workers:
-                        if (args.d is None) or (args.d in worker.abs_path):
-                            print(pid + '.' + worker.name + '.' +
-                                  worker.authoring_model)
-            if args.noun == 'libraries':
-                for hdl_primitive in project.hdl_primitives:
-                    if (args.d is None) or (args.d in hdl_primitive.abs_path):
-                        print(str(project.get_package_id()) + '.' + hdl_primitive.name)
-
     def register(self, noun):
         project_registry = ProjectRegistry(
                 do_discover_component_libraries=False,
@@ -509,6 +471,47 @@ def add_build_arguments(parser):
     return parser
 
 
+def show(args):
+    disc = args.noun != 'registry'
+    disc = disc and (args.noun != 'projects')
+    project_registry = ProjectRegistry(disc, disc)
+    if args.noun is None:
+        raise Exception('show must have a verb')
+    if args.noun == 'registry':
+        print(project_registry.abs_path)
+    for project in project_registry.projects:
+        if args.noun == 'projects':
+            msg = str(project.get_package_id())
+            if args.verbose:
+                msg += ' '
+                for idx in range(30-len(msg)):
+                    msg += ' '
+                msg += project.abs_path
+            print(msg)
+        if args.noun == 'components':
+            for component in project.components:
+                if (args.d is None) or (args.d in component.abs_path):
+                    print(str(project.get_package_id()) + '.' + component.name)
+        for component_library in project.component_libraries:
+            pid = component_library.get_package_id(str(project.get_package_id()))
+            if args.noun == 'libraries':
+                if (args.d is None) or (args.d in component_library.abs_path):
+                    print(pid)
+            if args.noun == 'components':
+                for component in component_library.components:
+                    if (args.d is None) or (args.d in component.abs_path):
+                        print(pid + '.' + component.name)
+            if args.noun == 'workers':
+                for worker in component_library.workers:
+                    if (args.d is None) or (args.d in worker.abs_path):
+                        print(pid + '.' + worker.name + '.' +
+                              worker.authoring_model)
+        if args.noun == 'libraries':
+            for hdl_primitive in project.hdl_primitives:
+                if (args.d is None) or (args.d in hdl_primitive.abs_path):
+                    print(str(project.get_package_id()) + '.' + hdl_primitive.name)
+
+
 if __name__ == '__main__':
     exit_status = 0
     parser = argparse.ArgumentParser(description='')
@@ -557,7 +560,7 @@ if __name__ == '__main__':
         elif args.verb == 'clean':
             OCPIDev(hdl_build_tool).clean(args.noun, _dir)
         elif args.verb == 'show':
-            OCPIDev(hdl_build_tool).show(args)
+            show(args)
         elif args.verb == 'register':
             OCPIDev(hdl_build_tool).register(args.noun)
         elif args.verb == 'unregister':
