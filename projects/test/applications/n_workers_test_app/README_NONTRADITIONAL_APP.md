@@ -20,7 +20,7 @@ Examples listed after each step, commands run from OpenCPI root directory.
 7. Verify Container      |  `ocpirun -C`
 
 ### Test Procedure
-Examples listed after each step, commands run from n_workers_test_app directory.
+Examples listed after each step, commands run from projects/test/application/n_workers_test_app directory.
 1. Run the generate.py script  |  `./generate.py -n 123 -o ubuntu20_04`
 2. Build generated workers     |  `cd ../../components && ocpidev build --hdl-platform zcu106 && cd -`
 3. Build generated assembly    |  `cd ../../hdl/assemblies/<generated_assembly_dir> && ocpidev build --hdl-platform zcu106 && cd -`

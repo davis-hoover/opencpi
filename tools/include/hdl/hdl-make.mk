@@ -255,6 +255,7 @@ HdlName=$(or $(Core),$(LibName))
 # if $(findstring $(HdlMode),library),$(LibName),$(Core))
 HdlLog=$(HdlName)-$(HdlToolSet).out
 HdlTime=$(HdlName)-$(HdlToolSet).time
+HdlBuild=$(HdlName)-$(HdlToolSet).sh
 HdlCompile=\
   $(infox Compile0:$(HdlWorkers):$(Cores):$(ImplWorkersFile):$(ImplFile):to-$@) \
   $(infox Compile:$(HdlWorkers):$(Cores):$(ImplWorkersFile)) \
@@ -263,10 +264,12 @@ HdlCompile=\
   $(infox SUBCORES:$(SubCores_$(HdlTarget))) \
   cd $(TargetDir) && \
   $(infox PRECOMPILE:$(HdlPreCompile))$(and $(HdlPreCompile), $(HdlPreCompile) &&)\
-  export HdlCommand="set -e; $(HdlToolCompile)"; \
   touch $(HdlLog) $(HdlTime); \
+  echo "set -e; $(HdlToolCompile)" > $(HdlBuild); \
+  chmod a+x $(HdlBuild); \
+  export HdlCommand="./$(HdlBuild)"; \
   $(TIME) bash -c \
-   '(/bin/echo Commands to execute tool:@@@"$$HdlCommand" | sed "s/\([^\\]\); */\1;@@@/g" | sed "s/@@@/\n/g"; /bin/echo Output from executing commands above:;eval "$$HdlCommand") > $(HdlLog) 2>&1' \
+   '(/bin/echo Commands to execute tool stored in $$HdlCommand; /bin/echo Output from executing commands above:;eval "$$HdlCommand") > $(HdlLog) 2>&1' \
     > $(HdlTime) 2>&1; \
   HdlExit=$$?; \
   (cat $(HdlTime) | tr -d "\n"; $(ECHO) -n " at "; date +%T) >> $(HdlLog); \

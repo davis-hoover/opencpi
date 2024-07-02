@@ -482,8 +482,6 @@ namespace OCPI {
       unconst32(admin.timeClksPerPps) = 0;
       unconst64(admin.present) = 1;
       unconst64(admin.attention) = 1;
-      unconst32(admin.numRegions) = 1;
-      unconst32(admin.regions[0]) = 0;
       OU::Uuid l_uuid;
       OU::generateUuid(l_uuid);
       if (uuidString) {

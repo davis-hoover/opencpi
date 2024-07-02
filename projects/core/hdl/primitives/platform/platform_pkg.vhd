@@ -57,7 +57,7 @@ type occp_out_t is record
 end record occp_out_t;
 
 -- These are the number of bits of the DW address
-constant worker_control_bits : natural := 10; -- 4096B control space per worker
+constant worker_control_bits : natural := 6; -- 256B control space per worker
 constant worker_config_bits  : natural := 17; -- 512KB config space per worker
   -- The worker_readsize_bits value (2) should not be changed unless the read_byte_en function is altered
 constant worker_readsize_bits : natural := 2; -- these are the LSBs of the address used for readsize
