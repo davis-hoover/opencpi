@@ -15,10 +15,21 @@ OpenCPI v2.4.7 is here: https://gitlab.com/opencpi/opencpi/-/tree/v2.4.7/project
 
 # Component Library Behavior
 
+A directory is a Component Library
+1)  if and only if it does not contain directories that are themselves component libraries
+2)  if and only if it does not contain an XML file containing the root tag Libraries
+3)  if and only if its path is within one of the following standard locations within an OpenCPI project
+  * <project>/components/
+  * <project>/components/<library>/
+  * <project>/hdl/devices/
+  * <project>/hdl/cards/
+  * <project>/hdl/adapters/
+  * <project>/hdl/platforms/
+  * <project>/hdl/platforms/<platform>/devices/
 
 | `<library-name>`.xml exists | Library.mk exists | Makefile exists | Behavior | Known Examples |
 | ------ | ------ | ------ | ------ | ------ |
-|   N     |    N    |    N   |   Because the Component Development Guide lists `<lib>.xml` as optional in Figure 1, this is an expected and supported scenario. All directories (in the standard locations, within a project, as per Component Dev Guide 14.2.3") whose paths DO NOT end with .hdl or .rcc or .ocl are considered component libraries. This also means that, for the nested directory components/<library>/ scenario, both components and components.<library> are considered component libraries. |   OpenCPI core/components. There are probably other examples.   |
+|   N     |    N    |    N   |   Because the Component Development Guide lists `<lib>.xml` as optional in Figure 1, this is an expected and possible form of a Component Library. |   OpenCPI core/components. There are probably other examples.   |
 |   N     |    N    |    Y   |   Documented, pre-OpenCPI-2.0 scenario. Library is discovered if and only if library.mk is included in the Makefile. |   OpenCPI assets/components/base_comps    |
 |   N     |    Y    |    N   |   Undocumented pre-OpenCPI-2.0 scenario which is invalid. Library is not discovered. |       |
 |   N     |    Y    |    Y   |   Documented, pre-OpenCPI-2.0 scenario. Library is discovered if and only if library.mk is included in the Makefile. Both files are parsed.  |   OpenCPI assets/components/dsp_comps    |

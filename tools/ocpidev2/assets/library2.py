@@ -116,6 +116,23 @@ class Discoverer():
                 pass
 
 
+class ComponentLibraries(AssetBase):
+    """ undocumented """
+
+    def __init__(self, dir_abs_path):
+        self.root_tags = ['Libraries']  # undocumented
+        if not dir_abs_path.endswith('components'):
+            self.raise_invalid_asset_error()
+        AssetBase.__init__(self, dir_abs_path)
+        # TODO investigate moving below 3 lines into AssetBase
+        if os.path.exists(self.get_xml_abs_path()):
+            self.raise_if_invalid_root_tag(self.get_parsed().getroot())
+        self.parse()
+
+    def get_paths_to_parse(self):
+        return [self.get_xml_abs_path()]
+
+
 class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
     """ Reference RCC/HDL Development Guide section 3. A ComponentLibrary is
         represented by a directory and knows nothing about the project it
