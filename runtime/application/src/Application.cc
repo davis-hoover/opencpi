@@ -554,6 +554,12 @@ namespace OCPI {
     // FIXME: we assume that if the implementation is not a static instance then it can't conflict
     bool ApplicationI::
     bookingOk(Booking &b, OL::Candidate &c, unsigned n) {
+      // Expand m_usedImpls vector if needed
+      if (b.m_usedImpls.size() <= c.impl->m_ordinal){
+        b.m_usedImpls.resize(c.impl->m_ordinal + 1);
+      }
+      
+      // Check booking
       if (c.impl->m_staticInstance && b.m_artifact &&
           (b.m_artifact != &c.impl->m_artifact ||
            (b.m_usedImpls.size() < c.impl->m_ordinal &&

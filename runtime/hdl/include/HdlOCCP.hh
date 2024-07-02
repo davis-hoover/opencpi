@@ -29,7 +29,6 @@ namespace OCPI {
   namespace HDL {
 #endif
 #define OCCP_MAX_WORKERS 127
-#define OCCP_MAX_REGIONS 16
     typedef struct {
       uint32_t birthday; // The time the final build was started
       uint8_t uuid[16];  // The official UUID of the bitstream
@@ -45,7 +44,7 @@ namespace OCPI {
       const uint32_t
         revision,           // 08
         birthday,           // 0c
-        pad0,               // 10 - bit mask of existing workers
+        pad0,               // 10 - legacy bit mask of existing workers
         pciDevice,          // 14
         pad1,               // 18
         status;             // 1c
@@ -65,14 +64,7 @@ namespace OCPI {
         timeClksPerPps, // 48
         readCounter,    // 4c
         attention[4], // 5054585c
-        present[4],   // 6064686c
-        pad2[3],                   // 707478
-        numRegions,                // 7c
-        regions[OCCP_MAX_REGIONS]; // 8084888c9094989ca0a4a8acb0b4b8bc
-      HdlUUID uuid;                  // c0...
-      // HdlUUID within the admin registers seems to not be utilized, 
-      //   at least when deploying on zed as it was always filled with zeros.
-      // The HdlUUID struct seems to be instantiated independently within OCPI::HDL::Device.
+        present[4];   // 6064686c
     } OccpAdminRegisters;
     typedef struct {
       const uint32_t
@@ -91,17 +83,15 @@ namespace OCPI {
         lastConfig;
       uint32_t
         clearError,
-	window,
+        window,
         reserved[3];
     } OccpWorkerRegisters;
 #define OCCP_WORKER_CONTROL_ENABLE 0x80000000
 #define OCCP_WORKER_CONTROL_TIMEOUT(i) ((i) & 0x1f)
-#define OCCP_WORKER_CONTROL_SIZE 0x1000  // equal to 10 control bits plus 2 read bits
+#define OCCP_WORKER_CONTROL_SIZE 0x100  // 6 control bits plus 2 read bits = 256B
+#define OCCP_ADMIN_CONFIG_SIZE 256
 #define OCCP_CONTROL_CLEAR_ATTENTION (1 << 9)
 #define OCCP_CONTROL_CLEAR_ERRORS (1 << 8)
-#define OCCP_ADMIN_SIZE OCCP_WORKER_CONTROL_SIZE
-#define OCCP_ADMIN_CONFIG_OFFSET 1024
-#define OCCP_ADMIN_CONFIG_SIZE 1024
 // Note this CONFIG_WINDOW is actually further chunked to 4 pieces so that the 2 MSB address
 // bits can be used to indicate read size to accomodate the broken Xilinx PCIE2AXI bridge
 // The readsize bits are encoded per AXI ARSIZE, namely log2(nbytes)
@@ -162,10 +152,10 @@ namespace OCPI {
 
     typedef struct {
       OccpAdminRegisters admin;
-      uint8_t pad[OCCP_ADMIN_CONFIG_OFFSET - sizeof(OccpAdminRegisters)];
-      uint8_t configRam[OCCP_ADMIN_CONFIG_SIZE];
-      uint8_t pad1[OCCP_ADMIN_SIZE - (OCCP_ADMIN_CONFIG_OFFSET + OCCP_ADMIN_CONFIG_SIZE)];
+      uint8_t pad[OCCP_ADMIN_CONFIG_SIZE - sizeof(OccpAdminRegisters)];
       OccpWorker worker[OCCP_MAX_WORKERS];
+      uint8_t pad1[OCCP_WORKER_CONFIG_SIZE - 
+                (OCCP_ADMIN_CONFIG_SIZE + (OCCP_WORKER_CONTROL_SIZE*OCCP_MAX_WORKERS))];
       uint8_t config[OCCP_MAX_WORKERS][OCCP_WORKER_CONFIG_SIZE];
     } OccpSpace;
 #ifdef __cplusplus

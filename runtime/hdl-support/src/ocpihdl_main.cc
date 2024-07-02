@@ -74,7 +74,7 @@ namespace XF = OCPI::Xfer;
 typedef void Function(const char **ap);
 static Function
 search, emulate, ethers, probe, testdma, admin, bram, unbram, uuid, reset, set, get, control,
-  radmin, wadmin, rmeta, settime, deltatime, wdump, wreset, wunreset, wop, wwctl, wclear, wwpage,
+  radmin, wadmin, settime, deltatime, wdump, wreset, wunreset, wop, wwctl, wclear, wwpage,
   wread, wwrite, sendData, receiveData, receiveRDMA, sendRDMA, simulate, getxml, load, unload,
   status;
 static bool verbose = false, parseable = false, hex = false, isPublic = false;
@@ -119,7 +119,6 @@ struct Command {
   { "receiveData", receiveData, INTERFACE},
   { "receiveRDMA", receiveRDMA, 0}, // might want device depending on args
   { "reset", reset, DEVICE },
-  { "rmeta", rmeta, DEVICE },
   { "search", search, SUDO | INTERFACE | DISCOVERY},
   { "sendData", sendData, INTERFACE},
   { "sendRDMA", sendRDMA, 0},  // might want device depending on args
@@ -163,7 +162,6 @@ usage(const char *cmd) {
           "    wadmin <hdl-dev> <offset> <value>\n"
 	  "                                 # write admin word <value> for <hdl-device> at <offset>\n"
           "    radmin <hdl-dev> <offset>    # read admin word for <hdl-device> at <offset>\n"
-          "    rmeta <hdl-dev> <offset>     # read metadata memory for <hdl-device> at <offset>\n"
 	  "    settime <hdl-dev>            # set the GPS time of the device to system time\n"
 	  "    deltatime <hdl-dev>          # measure round trip and difference between host and device\n"
           "    dump <hdl-dev>               # dump all state/status of <platform> including all workers\n"
@@ -727,20 +725,6 @@ admin(const char **) {
   printf(" refPerPPS:    0x%08x (%u)\n", i, i);
   i = cAccess->get32Register(readCounter, OH::OccpAdminRegisters);
   printf(" readCounter:  0x%08x (%u)\n", i, i);
-  i = cAccess->get32Register(numRegions, OH::OccpAdminRegisters);
-  printf(" numDPMemReg:  0x%08x (%u)\n", i, i);
-  uint32_t regions[OCCP_MAX_REGIONS];
-  cAccess->getRegisterBytes(regions, regions, OH::OccpAdminRegisters, 8, false);
-  if (i < 16)
-    for (k=0; k<i; k++)
-      printf("    DP%2d:      0x%08x\n", k, regions[k]);
-
-  // Print out the 64B 16DW UUID in little-endian looking format...
-  uint32_t uuid[16];
-  cAccess->getRegisterBytes(uuid, uuid, OH::OccpAdminRegisters, 8, false);
-  for (k=0;k<16;k+=4)
-    printf(" UUID[%2d:%2d]:  0x%08x 0x%08x 0x%08x 0x%08x\n",
-	   k+3, k, uuid[k+3], uuid[k+2], uuid[k+1], uuid[k]);
 }
 #ifndef USE_LZMA
 static voidpf zalloc(voidpf , uInt items, uInt size) {
@@ -1057,28 +1041,6 @@ radmin(const char **ap) {
   default:
     bad("bad size for radmin");
   }
-}
-
-static void
-rmeta(const char **ap) {
-  unsigned size;
-  unsigned off = (unsigned)atoi_any(*ap, &size);
-  if (size == 4) {
-    uint32_t x = cAccess->get32RegisterOffset(off + offsetof(OH::OccpSpace,configRam));
-    if (parseable)
-      printf("0x%" PRIx32 "\n", x);
-    else
-      printf("Metadata for hdl-device '%s' at offset 0x%x is 0x%x (%u)\n",
-	     device, off, x, x);
-  } else if (size == 8) {
-    uint64_t x = cAccess->get64RegisterOffset(off + offsetof(OH::OccpSpace,configRam));
-    if (parseable)
-      printf("0x%" PRIx64 "\n", x);
-    else
-      printf("Metadata for hdl-device '%s' at offset 0x%x is 0x%" PRIx64 " (%" PRIi64 ")\n",
-	     device, off, x, x);
-  } else
-    bad("bad size for rmeta");
 }
 
 static void
