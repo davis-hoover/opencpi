@@ -24,7 +24,8 @@ from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import AssetBase
 from _opencpi.assets.worker2 import Worker
 from _opencpi.assets.application2 import Application
-from _opencpi.assets.library2 import SpecsDirectory, Discoverer, ComponentLibrary
+from _opencpi.assets.library2 import SpecsDirectory, Discoverer
+from _opencpi.assets.library2 import ComponentLibrary, ComponentLibraries
 from _opencpi.assets.primitive2 import HdlLibrary
 from _opencpi.assets.assembly2 import HdlAssembly
 from _opencpi.assets.platform2 import HdlCard, HdlPlatform
@@ -100,7 +101,7 @@ Skeleton outline: Description of project.
 
 project_templates['Project.xml'] = g_asset_template
 
-class Project(SpecsDirectory, Discoverer, AssetBase):
+class Project(AssetBase, SpecsDirectory, Discoverer):
     """ Component Development Guide section 14 """
 
     def __init__(self, dir_abs_path, enable_path_existence_check=True, cli_dict=None):
@@ -152,7 +153,6 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
         return ret
 
     def get_xml_abs_path(self):
-        # TODO use AssetBase method instead
         return self.abs_path + '/Project.xml'
 
     def get_buildable_paths(self):
@@ -291,8 +291,18 @@ class Project(SpecsDirectory, Discoverer, AssetBase):
     def discover_component_libraries(self):
         for dir_abs_path in self.get_existing_dir_abs_paths_for_clib_consideration():
             try:
-                asset = ComponentLibrary(dir_abs_path)
-                self.append_discovered_asset(asset)
+                is_libs = False
+                try:
+                    ComponentLibraries(dir_abs_path)
+                    is_libs = True
+                except InvalidAssetError as err:
+                    pass
+                try:
+                    asset = ComponentLibrary(dir_abs_path)
+                    if not is_libs:
+                        self.append_discovered_asset(asset)
+                except InvalidAssetError:
+                    pass
             except InvalidAssetError as err:
                 path = dir_abs_path
                 test = ComponentLibrary.get_dir_abs_path_is_test(path)

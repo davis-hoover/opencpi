@@ -328,41 +328,43 @@ class OCPIDev():
         if not cleaned:
             raise Exception('cannot clean directory not in registered project')
 
-    def show(self, noun, _dir):
-        disc = noun != 'registry'
-        disc = disc and (noun != 'projects')
+    def show(self, args):
+        disc = args.noun != 'registry'
+        disc = disc and (args.noun != 'projects')
         project_registry = ProjectRegistry(disc, disc)
-        if noun == 'registry':
+        if args.noun == 'registry':
             print(project_registry.abs_path)
         for project in project_registry.projects:
-            print("project.abs_path = " + project.abs_path)
-            if noun == 'projects':
-                msg = str(project.get_package_id()) + ' '
-                for idx in range(30-len(msg)):
+            if args.noun == 'projects':
+                msg = str(project.get_package_id())
+                if args.verbose:
                     msg += ' '
-                print(msg + project.abs_path)
-            if noun == 'components':
+                    for idx in range(30-len(msg)):
+                        msg += ' '
+                    msg += project.abs_path
+                print(msg)
+            if args.noun == 'components':
                 for component in project.components:
-                    if (_dir is None) or (_dir in component.abs_path):
+                    if (args.d is None) or (args.d in component.abs_path):
                         print(str(project.get_package_id()) + '.' + component.name)
             for component_library in project.component_libraries:
                 print("component_library.abs_path = " + component_library.abs_path)
                 pid = component_library.get_package_id(str(project.get_package_id()))
-                if noun == 'libraries':
-                    if (_dir is None) or (_dir in component_library.abs_path):
+                if args.noun == 'libraries':
+                    if (args.d is None) or (args.d in component_library.abs_path):
                         print(pid)
-                if noun == 'components':
+                if args.noun == 'components':
                     for component in component_library.components:
-                        if (_dir is None) or (_dir in component.abs_path):
+                        if (args.d is None) or (args.d in component.abs_path):
                             print(pid + '.' + component.name)
-                if noun == 'workers':
+                if args.noun == 'workers':
                     for worker in component_library.workers:
-                        if (_dir is None) or (_dir in worker.abs_path):
+                        if (args.d is None) or (args.d in worker.abs_path):
                             print(pid + '.' + worker.name + '.' +
                                   worker.authoring_model)
-            if noun == 'libraries':
+            if args.noun == 'libraries':
                 for hdl_primitive in project.hdl_primitives:
-                    if (_dir is None) or (_dir in hdl_primitive.abs_path):
+                    if (args.d is None) or (args.d in hdl_primitive.abs_path):
                         print(str(project.get_package_id()) + '.' + hdl_primitive.name)
 
     def register(self, noun, _dir):
@@ -635,6 +637,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('-d', nargs='?', default=None, action='append')
     parser.add_argument('-j', nargs='?', default=1)
+    parser.add_argument('-v', '--verbose', action='store_true')
     parser.add_argument('verb')
     if 'create' in sys.argv:
         if 'project' in sys.argv:
@@ -693,7 +696,7 @@ if __name__ == '__main__':
         elif args.verb == 'clean':
             OCPIDev(hdl_build_tool).clean(args.noun, _dir)
         elif args.verb == 'show':
-            OCPIDev(hdl_build_tool).show(args.noun, _dir)
+            OCPIDev(hdl_build_tool).show(args)
         elif args.verb == 'register':
             OCPIDev(hdl_build_tool).register(args.noun, _dir)
         elif args.verb == 'unregister':

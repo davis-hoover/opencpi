@@ -663,9 +663,7 @@ class AttributeBase():
     def __init__(self, elem):
         """ elem is an ElementTree Element intended to represent, e.g., Property
             within a <RccWorker><Property/></RccWorker> """
-        if elem.tag.lower() not in \
-                [tag.lower() for tag in self.get_root_tags()]:
-            self.raise_invalid_attribute_error(elem.tag)
+        self.raise_if_invalid_root_tag(elem)
         self.attrs = dict()
 
     def get_attr_infos(self):
@@ -799,6 +797,11 @@ class AttributeBase():
             Examples of attr are 'Workers' and 'Containers' """
         return self.get_attr_common(attr, elem, True, makefile_abs_paths, cli_dict)
 
+    def raise_if_invalid_root_tag(self, elem):
+        if elem.tag.lower() not in \
+                [tag.lower() for tag in self.get_root_tags()]:
+            self.raise_invalid_attribute_error(elem.tag)
+
     def raise_invalid_attribute_error(self, elem_str):
         # msg = abs_path + ': ' + elem_str + ' is an invalid attribute'
         msg = elem_str + ' is an invalid attribute'
@@ -806,7 +809,6 @@ class AttributeBase():
         raise InvalidAttributeError(msg)
 
 
-# TODO rename AssetBase to AssetBase
 class AssetBase(AttributeBase):
     """ Contains functionality common to all assets, e.g., all
         Protocols/Workers/Assemblies/etc. Child classes must define
@@ -837,7 +839,7 @@ class AssetBase(AttributeBase):
                 self.abs_path = self.abs_path.replace('//', '/')
             if self.abs_path.endswith('/'):
                 self.abs_path = self.abs_path[:,-1]
-        self.name = self.get_name() # CDG section 6.1.1, section 8.1.1, etc
+        self.name = self.get_name()  # CDG section 6.1.1, section 8.1.1, etc
         if (self.abs_path is not None):
             if enable_path_existence_check:
                 self.raise_if_path_does_not_exist()
@@ -953,7 +955,7 @@ class AssetBase(AttributeBase):
         return ret
 
     def get_xml_abs_path(self):
-        """ returns asboslute path to asset's xml file, regardless of asset
+        """ returns absolute path to asset's xml file, regardless of asset
             type """
         ret = None
         # self.abs_path can be None, e.g., for base platform configuration
@@ -977,7 +979,6 @@ class AssetBase(AttributeBase):
         return set(split_dir_abs_path).issuperset(split_specified_abs_path)
 
     def get_parsed(self):
-        xml_abs_path = self.get_xml_abs_path()
         _file = open(self.get_xml_abs_path(), 'r')
         _str = _file.read()
         # can be removed when OpenCPI follows XML Specification
