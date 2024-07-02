@@ -49,6 +49,8 @@ dynlib="libgtest$OcpiDynamicLibrarySuffix"
 "$AR" -rs libgtest.a gtest-all.o
 # shellcheck disable=SC2086
 "$CXX" $OcpiDynamicLibraryFlags -o"$dynlib" gtest-all.o -lpthread
-relative_link "$dir/include" "$OcpiInstallDir" # each platform creates this same link
-relative_link libgtest.a "$OcpiInstallExecDir/lib"
-relative_link "$dynlib" "$OcpiInstallExecDir/lib"
+mkdir -p $OcpiInstallExecDir/lib
+mkdir -p $OcpiInstallExecDir/include
+cp -r $dir/include $OcpiInstallDir/
+cp libgtest.a $OcpiInstallExecDir/lib/
+cp $dynlib $OcpiInstallExecDir/lib/

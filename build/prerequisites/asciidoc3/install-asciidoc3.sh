@@ -95,5 +95,5 @@ touch .opencpi-patched
 cd ..
 
 # So uses of this use $OCPI_PREREQUISITES_DIR/asciidoc3/ad3/<whatever>
-relative_link ad3 "$OcpiInstallDir" # each platform creates this same link
+cp -r ad3 $OcpiInstallDir/
 rmdir "$OcpiInstallExecDir"

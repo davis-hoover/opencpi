@@ -1,0 +1,45 @@
+[submodule "ocpi.comp.sdr"]
+	path = projects/comps/ocpi.comp.sdr
+	url = https://gitlab.com/opencpi/comp/ocpi.comp.sdr.git
+	branch = develop
+	ignore = dirty
+[submodule "ocpi.osp.plutosdr"]
+	path = projects/osps/ocpi.osp.plutosdr
+	url = https://gitlab.com/opencpi/osp/ocpi.osp.plutosdr.git
+	branch = develop
+	ignore = dirty
+[submodule "ocpi.osp.e3xx"]
+	path = projects/osps/ocpi.osp.e3xx
+	url = https://gitlab.com/opencpi/osp/ocpi.osp.e3xx.git
+	branch = develop
+	ignore = dirty
+[submodule "ocpi.osp.n3xx"]
+	path = projects/osps/ocpi.osp.n3xx
+	url = https://gitlab.com/opencpi/osp/ocpi.osp.n3xx.git
+	branch = develop
+	ignore = dirty
+[submodule "ocpi.osp.analog"]
+	path = projects/osps/ocpi.osp.analog
+	url = https://gitlab.com/opencpi/osp/ocpi.osp.analog.git
+	branch = develop
+	ignore = dirty
+[submodule "ocpi.osp.ettus"]
+	path = projects/osps/ocpi.osp.ettus
+	url = https://gitlab.com/opencpi/osp/ocpi.osp.ettus.git
+	branch = develop
+	ignore = dirty
+[submodule "ocpi.osp.xilinx"]
+	path = projects/osps/ocpi.osp.xilinx
+	url = https://gitlab.com/opencpi/osp/ocpi.osp.xilinx.git
+	branch = develop
+	ignore = dirty
+[submodule "ocpi.osp.epiq-solutions"]
+	path = projects/osps/ocpi.osp.epiq-solutions
+	url = https://gitlab.com/opencpi/osp/ocpi.osp.epiq-solutions.git
+	branch = develop
+	ignore = dirty
+[submodule "ocpi.osp.avnet"]
+	path = projects/osps/ocpi.osp.avnet
+	url = https://gitlab.com/opencpi/osp/ocpi.osp.avnet.git
+	branch = develop
+	ignore = dirty
