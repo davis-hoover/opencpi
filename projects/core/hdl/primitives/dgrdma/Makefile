@@ -21,4 +21,4 @@ include $(OCPI_CDK_DIR)/include/hdl/hdl-lib.mk
 # The verilog-ethernet library is downloaded as a prerequisite. Pull it into
 # the current source tree with a symlink
 verilog-ethernet/%:
-	ln -s $(OCPI_PREREQUISITES_DIR)/verilog_ethernet/verilog-ethernet verilog-ethernet
+	ln -sf $(OCPI_PREREQUISITES_DIR)/verilog_ethernet verilog-ethernet

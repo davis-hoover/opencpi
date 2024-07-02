@@ -1,0 +1,49 @@
+stages:
+  - deploy
+
+
+workflow:
+  rules:
+    - when: always
+
+
+deploy:
+  stage: deploy
+  image: "${CI_OCPI_CONTAINER_REGISTRY}/builder:0.0.1"
+  tags: ['opencpi', 'aws', 'cache']
+  services:
+    - docker:24.0.5-dind
+  before_script:
+    - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $CI_OCPI_CONTAINER_REGISTRY > /dev/null 2>&1
+    # Verify the caches were pulled and are updated for this commit
+    - if [[ -n $HDL_TARGET && $CI_COMMIT_SHA != $(cat hdl_target.cachestamp) ]] ; then echo "hdl_target cache was not updated for commit $CI_COMMIT_SHA" && exit 1; fi
+    - if [[ -n $RCC_PLATFORM && $CI_COMMIT_SHA != $(cat rcc_platform.cachestamp) ]] ; then echo "rcc_platform cache was not updated for commit $CI_COMMIT_SHA" && exit 1 ; fi
+    - if [[ -n $HDL_PLATFORM && $CI_COMMIT_SHA != $(cat hdl_platform.cachestamp) ]] ; then echo "hdl_platform cache was not updated for commit $CI_COMMIT_SHA" && exit 1 ; fi
+  script: 
+    - cd .gitlab-ci && make deploy
+  cache:
+    - key: build-${HOST}-${CACHE_KEY_SUFFIX}
+      fallback_keys:
+        - build-${HOST}-${CI_DEFAULT_BRANCH}
+      policy: pull
+      untracked: true
+    - key: install-platform-${HOST}-${RCC_PLATFORM}-${CACHE_KEY_SUFFIX}
+      policy: pull
+      paths:
+        - projects/
+        - project-registry/
+        - prerequisites/
+        - build/autotools/
+        - os/linux/driver/
+        - cdk/${RCC_PLATFORM}/
+    - key: install-target-${HOST}-${HDL_TARGET}-${CACHE_KEY_SUFFIX}
+      policy: pull
+      paths:
+        - projects/
+        - project-registry/
+    - key: install-platform-${HOST}-${HDL_PLATFORM}-${CACHE_KEY_SUFFIX}
+      policy: pull
+      paths:
+        - projects/
+        - project-registry/
+        - cdk/${HDL_PLATFORM}/

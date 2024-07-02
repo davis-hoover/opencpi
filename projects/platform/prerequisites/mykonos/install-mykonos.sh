@@ -73,7 +73,9 @@ $AR -rs libmykonos.a ${SRCS[@]/%.c/.o}
 ################################################################################
 # 4. Install the deliverables:  OPS file, headers and library
 ################################################################################
-relative_link libmykonos.a $OcpiInstallExecDir/lib
+mkdir -p $OcpiInstallExecDir/lib
+mkdir -p $OcpiInstallDir/include/mykonos
+cp libmykonos.a $OcpiInstallExecDir/lib/
 for i in ${INCS[@]}; do
-  relative_link $i $OcpiInstallDir/include/mykonos/
+  cp $i $OcpiInstallDir/include/mykonos
 done

@@ -730,4 +730,6 @@ $(call BitName,$1,$3,$6): $(call RouteName,$1,$3) $(call TimingName,$1,$3) $(wil
                 impl_opts='$(call VivadoOptions,bit)' \
 		,bit)
 
+.SECONDARY: $(call BitName,$1,$3,$6) $(call RouteName,$1,$3) $(call TimingName,$1,$3) $(call PlaceName,$1,$3) $(call OptName,$1,$3) $(wildcard $(HdlPlatformDir_$5)/*.xdc)
+
 endef
