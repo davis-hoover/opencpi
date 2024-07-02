@@ -256,10 +256,14 @@ class OCPIDev():
             print(project_registry.abs_path)
         for project in project_registry.projects:
             if noun == 'projects':
-                msg = str(project.get_package_id()) + ' '
-                for idx in range(30-len(msg)):
+                msg = str(project.get_package_id())
+                verbose = False  # TODO support
+                if verbose:
                     msg += ' '
-                print(msg + project.abs_path)
+                    for idx in range(30-len(msg)):
+                        msg += ' '
+                    msg += project.abs_path
+                print(msg)
             if noun == 'components':
                 for component in project.components:
                     if (_dir is None) or (_dir in component.abs_path):
