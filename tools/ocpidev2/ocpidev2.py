@@ -45,7 +45,10 @@ class OCPIDev():
 
     def __init__(self, hdl_build_tool):
         self.hdl_build_tool = hdl_build_tool
-    def create(self, _dir, cli_dict):
+    def create(self, settings, cli_dict):
+        if settings.d[0] == '':
+            settings.d[0] = os.getcwd()
+        _dir = settings.d[0]
         if cli_dict is not None:
             # The below line supports create, removes underscores to make CLI
             # look like attrs
@@ -585,7 +588,7 @@ def add_show_arguments(parser):
     return parser
 
 
-def add_create_arguments(parser):
+def add_create_arguments(parser, verb):
     project = Project('', False, None)
     for attr in project.get_attr_infos():
         if attr.cli is not None:
@@ -806,7 +809,7 @@ if __name__ == '__main__':
         elif args.verb == 'create':
             if args.name is None:
                 raise Exception('ocpidev2 create ' + args.noun + ' <name> required')
-            OCPIDev(hdl_build_tool).create(_dir, vars(args))
+            OCPIDev(hdl_build_tool).create(settings, vars(args))
         elif args.verb == 'delete':
             OCPIDev(hdl_build_tool).delete(args.noun)
         elif args.verb == 'build':
@@ -818,9 +821,9 @@ if __name__ == '__main__':
         elif args.verb == 'show':
             show(settings)
         elif args.verb == 'register':
-            OCPIDev(hdl_build_tool).register(args.noun, _dir)
+            OCPIDev(hdl_build_tool).register(args.noun, settings.d)
         elif args.verb == 'unregister':
-            OCPIDev(hdl_build_tool).unregister(args.noun, _dir)
+            OCPIDev(hdl_build_tool).unregister(args.noun, settings.d)
         elif args.verb == 'run':
             OCPIDev(hdl_build_tool).run(args.noun)
         elif args.verb == 'refresh':
