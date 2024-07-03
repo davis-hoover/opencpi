@@ -19,12 +19,27 @@
 get_compgen_str_for_verb() {
   str=$1
   comp_line=$2
-  verbs=("build" "clean" "register" "unregister" "show")
+  #verbs=("build" "clean" "register" "unregister" "show")
+  verbs=("show")
   for verb in "${verbs[@]}"; do
     if [[ $comp_line == *"$verb"* ]]; then
-      break;
+      continue;
     else
       str="$str $verb"
+    fi
+  done
+  echo $str
+}
+
+get_compgen_str_for_noun() {
+  str=$1
+  comp_line=$2
+  nouns=("registry" "projects" "components" "workers" "libraries")
+  for noun in "${nouns[@]}"; do
+    if [[ $comp_line == *"$noun"* ]]; then
+      continue;
+    else
+      str="$str $noun"
     fi
   done
   echo $str
@@ -56,9 +71,7 @@ get_compgen_str_for_long_short_option_only_allowed_once() {
 _ocpidev2()
 {
   str=""
-  str=$(get_compgen_str_for_option_only_allowed_once "$str" "-d" "$COMP_LINE")
-  str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-h" "--help" "$COMP_LINE")
-  str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v" "--verbose" "$COMP_LINE")
+  str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-h " "--help " "$COMP_LINE")
   if [ "$3" == "build" ]; then
     str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-j" "--jobs" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "--hdl-platform" "$COMP_LINE")
@@ -72,9 +85,28 @@ _ocpidev2()
   elif [ "$3" == "--hdl-platform" ]; then
     COMPREPLY=( $(compgen -W "$(ocpidev2 show hdl platforms | sed "s/.*\.//g")" -- "$2") )
   elif [ "$3" == "--rcc-platform" ]; then
-    COMPREPLY=( $(compgen -W "$(ocpidev2 show hdl platforms | sed "s/.*\.//g")" -- "$2") )
+    COMPREPLY=( $(compgen -W "$(ocpidev2 show rcc platforms | sed "s/.*\.//g")" -- "$2") )
   elif [ "$3" == "show" ]; then
-    COMPREPLY=( $(compgen -W "registry projects components workers libraries hdl rcc" -- "$2") )
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "registry" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "projects" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "components" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "workers" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "libraries" "$COMP_LINE")
+    COMPREPLY=( $(compgen -W "$str" -- "$2") )
+  elif [ "$3" == "-v" ]; then
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "registry" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "projects" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "components" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "workers" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "libraries" "$COMP_LINE")
+    COMPREPLY=( $(compgen -W "$str" -- "$2") )
+  elif [ "$3" == "--verbose" ]; then
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "registry" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "projects" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "components" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "workers" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "libraries" "$COMP_LINE")
+    COMPREPLY=( $(compgen -W "$str" -- "$2") )
   elif [ "$3" == "hdl" ]; then
     COMPREPLY=( $(compgen -W "workers" -- "$2") )
   elif [ "$3" == "rcc" ]; then
@@ -90,21 +122,28 @@ _ocpidev2()
     str=$(get_compgen_str_for_verb "$str" "$COMP_LINE")
     COMPREPLY=( $(compgen -W "$str" -- "$2") )
   elif [ "$3" == "registry" ]; then
-    COMPREPLY=( $(compgen -W "$str" -- "$2") )
+    str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose " "$COMP_LINE")
+    COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
   elif [ "$3" == "projects" ]; then
-    COMPREPLY=( $(compgen -W "$str" -- "$2") )
+    str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose " "$COMP_LINE")
+    COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
   elif [ "$3" == "components" ]; then
-    COMPREPLY=( $(compgen -W "$str" -- "$2") )
+    str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose " "$COMP_LINE")
+    COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
   elif [ "$3" == "workers" ]; then
-    COMPREPLY=( $(compgen -W "$str" -- "$2") )
+    str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose " "$COMP_LINE")
+    COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
   elif [ "$3" == "libraries" ]; then
-    COMPREPLY=( $(compgen -W "$str" -- "$2") )
+    str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose " "$COMP_LINE")
+    COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
   elif [ "$3" == "register" ]; then
-    COMPREPLY=( $(compgen -W "project" -- "$2") )
+    str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose " "$COMP_LINE")
+    COMPREPLY=( $(compgen -W "$str project" -- "$2") )
   elif [ "$3" == "unregister" ]; then
     COMPREPLY=( $(compgen -W "project" -- "$2") )
   else
     str=$(get_compgen_str_for_verb "$str" "$COMP_LINE")
+    str=$(get_compgen_str_for_noun "$str" "$COMP_LINE")
     COMPREPLY=( $(compgen -W "$str" -- "$2") )
   fi
   # below line necessary for -d argument

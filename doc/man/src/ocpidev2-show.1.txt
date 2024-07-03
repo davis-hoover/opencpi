@@ -1,0 +1,77 @@
+OCPIDEV2-SHOW(1)
+================
+
+
+NAME
+----
+ocpidev2-show - displays information about OpenCPI assets.
+
+
+SYNOPSIS
+--------
+*`ocpidev2`*  *`show`* ['<options>'] '<noun>'
+
+
+DESCRIPTION
+-----------
+The registry used is the one in the OpenCPI
+installation unless overridden using the *`OCPI_PROJECT_REGISTRY_DIR`*
+environment variable.
+
+Asset types to be specified in the '<noun>' argument are:
+
+*`components`*::
+    Display all components in registered projects.
+
+*`libraries`*::
+    Display information on all the libraries in the current scope.
+
+*`projects`*::
+    Display all registered projects.
+
+*`registry`*::
+    Display information on the registry.
+
+*`workers`*::
+    Display all workers in registered projects.
+
+OPTIONS
+-------
+There are no options other then the options common to all OpenCPI tools
+(see link:opencpi.1.html[opencpi(1)]),
+
+
+EXAMPLES
+--------
+. List all components in any registered projects:
++
+------------------------
+ocpidev2 show components
+------------------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+See the 'OpenCPI Component Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Component_Development_Guide.pdf
+
+
+SEE ALSO
+--------
+link:ocpidev2.1.html[ocpidev2(1)]
+
+COPYING
+-------
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+
+

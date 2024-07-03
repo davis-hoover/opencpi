@@ -580,7 +580,16 @@ def unittest():
     return ret
 
 
-def add_create_arguments(parser, verb):
+def add_show_arguments(parser):
+    #parser.add_argument('--global-scope', action='store_true')
+    return parser
+
+
+def add_create_arguments(parser):
+    project = Project('', False, None)
+    for attr in project.get_attr_infos():
+        if attr.cli is not None:
+            parser.add_argument(attr.cli[0], attr.cli[1], nargs='?', default='')
     # TODO: Might be better to place all attrs in AssetBase, then
     # AssetBase.get_attr_infos('<asset-type>') to avoid 'if verb =='
     if verb == 'project':
@@ -629,17 +638,129 @@ def add_build_arguments(parser):
     parser.add_argument('--hdl-target', nargs='?', default='')
     parser.add_argument('--hdl-platform', nargs='?', default='')
     parser.add_argument('--rcc-platform', nargs='?', default='')
+    parser.add_argument('-j', nargs='?', default=1)
     return parser
+
+
+def get_settings(args):
+    settings = args
+    mylist = args.d.copy()
+    settings.d = []
+    if len(mylist) == 0:
+        settings.d.append('')  # meant to represent working directory
+    for _dir in mylist:
+        if _dir is None:
+            _dir = os.getcwd()
+        else:
+            _dir = os.path.abspath(_dir)
+        settings.d.append(_dir)
+    return settings
+
+
+def show(settings):
+    if settings.help:
+        os.system('man ocpidev2-show')
+    else:
+        disc = settings.noun != 'registry'
+        disc = disc and (settings.noun != 'projects')
+        project_registry = ProjectRegistry(disc, disc)
+        if settings.noun is None:
+            raise Exception('show must have a noun')
+        for _dir in settings.d:
+            if settings.noun == 'registry':
+                if (_dir == '') or \
+                   (_dir in project_registry.abs_path):
+                    print(project_registry.abs_path)
+            msg = ''
+            for project in project_registry.projects:
+                if settings.noun == 'projects':
+                    if (_dir == '') or \
+                       (_dir in project.abs_path):
+                        msg = str(project.get_package_id())
+                        if settings.verbose:
+                            msg += ' '
+                            for idx in range(30-len(msg)):
+                                msg += ' '
+                            msg += project.abs_path
+                        print(msg)
+                if settings.noun == 'components':
+                    for component in project.components:
+                        if (_dir == '') or \
+                           (_dir in component.abs_path):
+                            print(str(project.get_package_id()) + '.' + component.name)
+                for component_library in project.component_libraries:
+                    pid = component_library.get_package_id(str(project.get_package_id()))
+                    if settings.noun == 'libraries':
+                        if (_dir == '') or \
+                           (_dir in component_library.abs_path):
+                            print(pid)
+                    if settings.noun == 'components':
+                        for component in component_library.components:
+                            if (_dir == '') or \
+                               (_dir in component.abs_path):
+                                print(pid + '.' + component.name)
+                    if settings.noun == 'workers':
+                        for worker in component_library.workers:
+                            if (_dir == '') or \
+                               (_dir in worker.abs_path):
+                                print(pid + '.' + worker.name + '.' +
+                                      worker.authoring_model)
+                if settings.noun == 'libraries':
+                    for hdl_primitive in project.hdl_primitives:
+                        if (_dir == '') or \
+                           (_dir in hdl_primitive.abs_path):
+                            print(str(project.get_package_id()) + '.' +
+                                  hdl_primitive.name)
+
+
+def clean(settings):
+    project_registry = ProjectRegistry(False, False)
+    if settings.d is None:
+        if settings.noun == []:
+            settings.d = os.getcwd()
+    cleaned = False
+    for project in project_registry.projects:
+        if project.abs_path in os.path.realpath(settings.d):
+            os.system('rm -rf $(find ' + settings.d + ' -type d -name gen)')
+            os.system('rm -rf $(find ' + settings.d + ' -type d -name lib)')
+            os.system('rm -rf $(find ' + settings.d + ' -type d -name run)')
+            # below 4 lines account for corrupted imports/exports
+            os.system('rm -rf $(find ' + settings.d + ' -type f -name imports)')
+            os.system('rm -rf $(find ' + settings.d + ' -type f -name exports)')
+            os.system('rm -rf $(find ' + settings.d + ' -type d -name imports)')
+            os.system('rm -rf $(find ' + settings.d + ' -type d -name exports)')
+            os.system('rm -rf $(find ' + settings.d + ' -type l -name imports)')
+            os.system('rm -rf $(find ' + settings.d + ' -type l -name exports)')
+            os.system(
+                    'rm -rf $(find ' + settings.d + ' -type d -name config-\*)')
+            os.system(
+                    'rm -rf $(find ' + settings.d +
+                    ' -type d -name simulations)')
+            os.system(
+                    'rm -rf $(find ' + settings.d + ' -type d -name target-\*)')
+            os.system(
+                    'rm -rf $(find ' + settings.d +
+                    ' -type d -name container-\*)')
+            os.system('rm -rf $(find ' + settings.d + " -type f -name '.*lock')")
+            os.system(
+                    'rm -rf $(find ' + settings.d + " -type f -name '.*build')")
+            os.system(
+                    'rm -rf $(find ' + settings.d + " -type d -name artifacts)")
+            cleaned = True
+    if not cleaned:
+        raise Exception('cannot clean directory not in registered project')
 
 
 if __name__ == '__main__':
     exit_status = 0
-    parser = argparse.ArgumentParser(description='')
-    parser.add_argument('-d', nargs='?', default=None, action='append')
-    parser.add_argument('-j', nargs='?', default=1)
+    parser = argparse.ArgumentParser(description='', add_help=False)
+    parser.add_argument('-d', default=[], action='append')
+    parser.add_argument('-h', '--help', action='store_true')
     parser.add_argument('-v', '--verbose', action='store_true')
-    parser.add_argument('verb')
-    if 'create' in sys.argv:
+    parser.add_argument('verb', nargs='?', default='')
+    if 'show' in sys.argv:
+        parser = add_show_arguments(parser)
+    elif 'create' in sys.argv and 'project' in sys.argv:
         if 'project' in sys.argv:
             parser = add_create_arguments(parser, 'project')
         if 'library' in sys.argv:
@@ -650,26 +771,25 @@ if __name__ == '__main__':
             parser = add_create_arguments(parser, 'test')
         if 'application' in sys.argv:
             parser = add_create_arguments(parser, 'application')
-    if 'build' in sys.argv:
+    elif 'build' in sys.argv:
         parser = add_build_arguments(parser)
+    parser.add_argument('noun', nargs='?', default=None)
     #required = ('create' in sys.argv) or ('build' in sys.argv) or ('show' in sys.argv)
     #if required:
     #    parser.add_argument('noun')
     #else:
     #    parser.add_argument('noun', nargs='?', default=None)
-    parser.add_argument('noun', nargs='?', default=None)
     parser.add_argument('name', nargs='?', default=None)
-    args = parser.parse_args()
+    # below 3 lines parse, allowing for posix conformance (intermixed args)
+    (args, unknown_args) = parser.parse_known_args()
+    for unknown_arg in unknown_args:
+        args.noun = unknown_arg
     # TODO: Move to abstract2 AssetBase.get_name() once .get_name()
     # is fully implemented
     if args.name:
         if not args.name.isidentifier():
             raise ValueError("'" + args.name + "' is not  valid name.")
     try:
-        if args.d is not None:
-            if len(args.d) > 1:
-                raise Exception('-d option was specified more than once')
-            args.d = args.d[0]
         nouns = ['registry', 'project', 'projects', 'libraries', 'components',
                  'workers', 'library', 'component', 'test', 'application']
         if (args.noun is not None) and (args.noun not in nouns):
@@ -677,13 +797,13 @@ if __name__ == '__main__':
                 raise Exception('noun ' + str(args.noun) + ' is not supported')
         signal.signal(signal.SIGINT, mysigint)
         hdl_build_tool = LegacyOCPIDevHDLBuildTool()
-        if args.d is None:
-            _dir = os.getcwd()
-        else:
-            _dir = os.path.abspath(args.d)
-        if args.verb == 'create':
-            if args.noun is None:
-                raise Exception("Please provide a noun to perform a create action")
+        settings = get_settings(args)
+        if settings.help:
+          if settings.verb == '':
+              os.system('man ocpidev2')
+          else:
+              os.system('man ocpidev2-' + settings.verb)
+        elif args.verb == 'create':
             if args.name is None:
                 raise Exception('ocpidev2 create ' + args.noun + ' <name> required')
             OCPIDev(hdl_build_tool).create(_dir, vars(args))
@@ -692,11 +812,11 @@ if __name__ == '__main__':
         elif args.verb == 'build':
             OCPIDev(hdl_build_tool).build(
                 args.noun, args.hdl_target, args.hdl_platform,
-                args.rcc_platform, _dir, int(args.j))
+                args.rcc_platform, settings.d, int(args.j))
         elif args.verb == 'clean':
-            OCPIDev(hdl_build_tool).clean(args.noun, _dir)
+            clean(settings)
         elif args.verb == 'show':
-            OCPIDev(hdl_build_tool).show(args)
+            show(settings)
         elif args.verb == 'register':
             OCPIDev(hdl_build_tool).register(args.noun, _dir)
         elif args.verb == 'unregister':
