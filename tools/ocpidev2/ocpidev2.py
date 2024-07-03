@@ -211,43 +211,6 @@ class OCPIDev():
         #    os.system('rm -rf $(find ' + proj.abs_path + ' -type l -name imports)')
         #    os.system('rm -rf $(find ' + proj.abs_path + ' -type l -name exports)')
 
-    def clean(self, noun, _dir):
-        project_registry = ProjectRegistry(False, False)
-        if _dir is None:
-            if noun == []:
-                _dir = os.getcwd()
-        cleaned = False
-        for project in project_registry.projects:
-            if project.abs_path in os.path.realpath(_dir):
-                os.system('rm -rf $(find ' + _dir + ' -type d -name gen)')
-                os.system('rm -rf $(find ' + _dir + ' -type d -name lib)')
-                os.system('rm -rf $(find ' + _dir + ' -type d -name run)')
-                # below 4 lines account for corrupted imports/exports
-                os.system('rm -rf $(find ' + _dir + ' -type f -name imports)')
-                os.system('rm -rf $(find ' + _dir + ' -type f -name exports)')
-                os.system('rm -rf $(find ' + _dir + ' -type d -name imports)')
-                os.system('rm -rf $(find ' + _dir + ' -type d -name exports)')
-                os.system('rm -rf $(find ' + _dir + ' -type l -name imports)')
-                os.system('rm -rf $(find ' + _dir + ' -type l -name exports)')
-                os.system(
-                        'rm -rf $(find ' + _dir + ' -type d -name config-\*)')
-                os.system(
-                        'rm -rf $(find ' + _dir +
-                        ' -type d -name simulations)')
-                os.system(
-                        'rm -rf $(find ' + _dir + ' -type d -name target-\*)')
-                os.system(
-                        'rm -rf $(find ' + _dir +
-                        ' -type d -name container-\*)')
-                os.system('rm -rf $(find ' + _dir + " -type f -name '.*lock')")
-                os.system(
-                        'rm -rf $(find ' + _dir + " -type f -name '.*build')")
-                os.system(
-                        'rm -rf $(find ' + _dir + " -type d -name artifacts)")
-                cleaned = True
-        if not cleaned:
-            raise Exception('cannot clean directory not in registered project')
-
     def register(self, noun):
         project_registry = ProjectRegistry(
                 do_discover_component_libraries=False,
@@ -477,48 +440,93 @@ def add_build_arguments(parser):
     return parser
 
 
-def show(args):
-    if args.help:
+def get_settings(args):
+    settings = args
+    if args.d is None:
+        if (args.noun is None) or (args.verb != 'clean'):
+            settings.d = os.getcwd()
+    return settings
+
+
+def show(settings):
+    if settings.help:
         os.system('man ocpidev2-show')
     else:
-        disc = args.noun != 'registry'
-        disc = disc and (args.noun != 'projects')
+        disc = settings.noun != 'registry'
+        disc = disc and (settings.noun != 'projects')
         project_registry = ProjectRegistry(disc, disc)
-        if args.noun is None:
+        if settings.noun is None:
             raise Exception('show must have a noun')
-        if args.noun == 'registry':
+        if settings.noun == 'registry':
             print(project_registry.abs_path)
         for project in project_registry.projects:
-            if args.noun == 'projects':
+            if settings.noun == 'projects':
                 msg = str(project.get_package_id())
-                if args.verbose:
+                if settings.verbose:
                     msg += ' '
                     for idx in range(30-len(msg)):
                         msg += ' '
                     msg += project.abs_path
                 print(msg)
-            if args.noun == 'components':
+            if settings.noun == 'components':
                 for component in project.components:
-                    if (args.d is None) or (args.d in component.abs_path):
+                    if (settings.d is None) or (settings.d in component.abs_path):
                         print(str(project.get_package_id()) + '.' + component.name)
             for component_library in project.component_libraries:
                 pid = component_library.get_package_id(str(project.get_package_id()))
-                if args.noun == 'libraries':
-                    if (args.d is None) or (args.d in component_library.abs_path):
+                if settings.noun == 'libraries':
+                    if (settings.d is None) or (settings.d in component_library.abs_path):
                         print(pid)
-                if args.noun == 'components':
+                if settings.noun == 'components':
                     for component in component_library.components:
-                        if (args.d is None) or (args.d in component.abs_path):
+                        if (settings.d is None) or (settings.d in component.abs_path):
                             print(pid + '.' + component.name)
-                if args.noun == 'workers':
+                if settings.noun == 'workers':
                     for worker in component_library.workers:
-                        if (args.d is None) or (args.d in worker.abs_path):
+                        if (settings.d is None) or (settings.d in worker.abs_path):
                             print(pid + '.' + worker.name + '.' +
                                   worker.authoring_model)
-            if args.noun == 'libraries':
+            if settings.noun == 'libraries':
                 for hdl_primitive in project.hdl_primitives:
-                    if (args.d is None) or (args.d in hdl_primitive.abs_path):
+                    if (settings.d is None) or (settings.d in hdl_primitive.abs_path):
                         print(str(project.get_package_id()) + '.' + hdl_primitive.name)
+
+def clean(settings):
+    project_registry = ProjectRegistry(False, False)
+    if settings.d is None:
+        if settings.noun == []:
+            settings.d = os.getcwd()
+    cleaned = False
+    for project in project_registry.projects:
+        if project.abs_path in os.path.realpath(settings.d):
+            os.system('rm -rf $(find ' + settings.d + ' -type d -name gen)')
+            os.system('rm -rf $(find ' + settings.d + ' -type d -name lib)')
+            os.system('rm -rf $(find ' + settings.d + ' -type d -name run)')
+            # below 4 lines account for corrupted imports/exports
+            os.system('rm -rf $(find ' + settings.d + ' -type f -name imports)')
+            os.system('rm -rf $(find ' + settings.d + ' -type f -name exports)')
+            os.system('rm -rf $(find ' + settings.d + ' -type d -name imports)')
+            os.system('rm -rf $(find ' + settings.d + ' -type d -name exports)')
+            os.system('rm -rf $(find ' + settings.d + ' -type l -name imports)')
+            os.system('rm -rf $(find ' + settings.d + ' -type l -name exports)')
+            os.system(
+                    'rm -rf $(find ' + settings.d + ' -type d -name config-\*)')
+            os.system(
+                    'rm -rf $(find ' + settings.d +
+                    ' -type d -name simulations)')
+            os.system(
+                    'rm -rf $(find ' + settings.d + ' -type d -name target-\*)')
+            os.system(
+                    'rm -rf $(find ' + settings.d +
+                    ' -type d -name container-\*)')
+            os.system('rm -rf $(find ' + settings.d + " -type f -name '.*lock')")
+            os.system(
+                    'rm -rf $(find ' + settings.d + " -type f -name '.*build')")
+            os.system(
+                    'rm -rf $(find ' + settings.d + " -type d -name artifacts)")
+            cleaned = True
+    if not cleaned:
+        raise Exception('cannot clean directory not in registered project')
 
 
 if __name__ == '__main__':
@@ -554,15 +562,12 @@ if __name__ == '__main__':
                 raise Exception('noun ' + str(args.noun) + ' is not supported')
         signal.signal(signal.SIGINT, mysigint)
         hdl_build_tool = LegacyOCPIDevHDLBuildTool()
-        _dir = args.d
-        if args.d is None:
-            if (args.noun is None) or (args.verb != 'clean'):
-                _dir = os.getcwd()
-        if args.help:
-          if args.verb == '':
+        settings = get_settings(args)
+        if settings.help:
+          if settings.verb == '':
               os.system('man ocpidev2')
           else:
-              os.system('man ocpidev2-' + args.verb)
+              os.system('man ocpidev2-' + settings.verb)
         elif args.verb == 'create':
             if args.name is None:
                 raise Exception('ocpidev2 create ' + args.noun + ' <name> required')
@@ -572,11 +577,11 @@ if __name__ == '__main__':
         elif args.verb == 'build':
             OCPIDev(hdl_build_tool).build(
                 args.noun, args.hdl_target, args.hdl_platform,
-                args.rcc_platform, _dir, int(args.j))
+                args.rcc_platform, settings.d, int(args.j))
         elif args.verb == 'clean':
-            OCPIDev(hdl_build_tool).clean(args.noun, _dir)
+            clean(settings)
         elif args.verb == 'show':
-            show(args)
+            show(settings)
         elif args.verb == 'register':
             OCPIDev(hdl_build_tool).register(args.noun)
         elif args.verb == 'unregister':

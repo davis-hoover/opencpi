@@ -59,7 +59,7 @@ _ocpidev2()
   str=""
   #str=$(get_compgen_str_for_option_only_allowed_once "$str" "-d" "$COMP_LINE")
   str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-h" "--help" "$COMP_LINE")
-  #str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v" "--verbose" "$COMP_LINE")
+  str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v" "--verbose" "$COMP_LINE")
   if [ "$3" == "build" ]; then
     str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-j" "--jobs" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "--hdl-platform" "$COMP_LINE")
@@ -76,7 +76,7 @@ _ocpidev2()
     COMPREPLY=( $(compgen -W "$(ocpidev2 show hdl platforms | sed "s/.*\.//g")" -- "$2") )
   elif [ "$3" == "show" ]; then
     #COMPREPLY=( $(compgen -W "registry projects components workers libraries hdl rcc" -- "$2") )
-    COMPREPLY=( $(compgen -W "registry projects components workers libraries -h --help" -- "$2") )
+    COMPREPLY=( $(compgen -W "$str registry projects components workers libraries" -- "$2") )
   elif [ "$3" == "hdl" ]; then
     COMPREPLY=( $(compgen -W "workers" -- "$2") )
   elif [ "$3" == "rcc" ]; then
