@@ -600,7 +600,16 @@ if __name__ == '__main__':
     if 'show' in sys.argv:
         parser = add_show_arguments(parser)
     elif 'create' in sys.argv and 'project' in sys.argv:
-        parser = add_create_arguments(parser)
+        if 'project' in sys.argv:
+            parser = add_create_arguments(parser, 'project')
+        if 'library' in sys.argv:
+            parser = add_create_arguments(parser, 'library')
+        if 'component' in sys.argv:
+            parser = add_create_arguments(parser, 'component')
+        if 'test' in sys.argv:
+            parser = add_create_arguments(parser, 'test')
+        if 'application' in sys.argv:
+            parser = add_create_arguments(parser, 'application')
     elif 'build' in sys.argv:
         parser = add_build_arguments(parser)
     parser.add_argument('noun', nargs='?', default=None)
