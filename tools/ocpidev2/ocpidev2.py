@@ -442,9 +442,16 @@ def add_build_arguments(parser):
 
 def get_settings(args):
     settings = args
-    if args.d is None:
-        if (args.noun is None) or (args.verb != 'clean'):
-            settings.d = os.getcwd()
+    mylist = args.d.copy()
+    settings.d = []
+    if len(mylist) == 0:
+        settings.d.append('')  # meant to represent working directory
+    for _dir in mylist:
+        if _dir is None:
+            _dir = os.getcwd()
+        else:
+            _dir = os.path.abspath(_dir)
+        settings.d.append(_dir)
     return settings
 
 
@@ -457,39 +464,48 @@ def show(settings):
         project_registry = ProjectRegistry(disc, disc)
         if settings.noun is None:
             raise Exception('show must have a noun')
-        if settings.noun == 'registry':
-            print(project_registry.abs_path)
-        for project in project_registry.projects:
-            if settings.noun == 'projects':
-                msg = str(project.get_package_id())
-                if settings.verbose:
-                    msg += ' '
-                    for idx in range(30-len(msg)):
+        for _dir in settings.d:
+            if settings.noun == 'registry':
+                if (_dir == '') or \
+                   (_dir in project_registry.abs_path):
+                    print(project_registry.abs_path)
+            for project in project_registry.projects:
+                if settings.noun == 'projects':
+                    msg = str(project.get_package_id())
+                    if settings.verbose:
                         msg += ' '
-                    msg += project.abs_path
-                print(msg)
-            if settings.noun == 'components':
-                for component in project.components:
-                    if (settings.d is None) or (settings.d in component.abs_path):
-                        print(str(project.get_package_id()) + '.' + component.name)
-            for component_library in project.component_libraries:
-                pid = component_library.get_package_id(str(project.get_package_id()))
-                if settings.noun == 'libraries':
-                    if (settings.d is None) or (settings.d in component_library.abs_path):
-                        print(pid)
+                        for idx in range(30-len(msg)):
+                            msg += ' '
+                        msg += project.abs_path
+                    print(msg)
                 if settings.noun == 'components':
-                    for component in component_library.components:
-                        if (settings.d is None) or (settings.d in component.abs_path):
-                            print(pid + '.' + component.name)
-                if settings.noun == 'workers':
-                    for worker in component_library.workers:
-                        if (settings.d is None) or (settings.d in worker.abs_path):
-                            print(pid + '.' + worker.name + '.' +
-                                  worker.authoring_model)
-            if settings.noun == 'libraries':
-                for hdl_primitive in project.hdl_primitives:
-                    if (settings.d is None) or (settings.d in hdl_primitive.abs_path):
-                        print(str(project.get_package_id()) + '.' + hdl_primitive.name)
+                    for component in project.components:
+                        if (_dir == '') or \
+                           (_dir in component.abs_path):
+                            print(str(project.get_package_id()) + '.' + component.name)
+                for component_library in project.component_libraries:
+                    pid = component_library.get_package_id(str(project.get_package_id()))
+                    if settings.noun == 'libraries':
+                        if (_dir == '') or \
+                           (_dir in component_library.abs_path):
+                            print(pid)
+                    if settings.noun == 'components':
+                        for component in component_library.components:
+                            if (_dir == '') or \
+                               (_dir in component.abs_path):
+                                print(pid + '.' + component.name)
+                    if settings.noun == 'workers':
+                        for worker in component_library.workers:
+                            if (_dir == '') or \
+                               (_dir in worker.abs_path):
+                                print(pid + '.' + worker.name + '.' +
+                                      worker.authoring_model)
+                if settings.noun == 'libraries':
+                    for hdl_primitive in project.hdl_primitives:
+                        if (_dir == '') or \
+                           (_dir in hdl_primitive.abs_path):
+                            print(str(project.get_package_id()) + '.' +
+                                  hdl_primitive.name)
 
 def clean(settings):
     project_registry = ProjectRegistry(False, False)
@@ -532,7 +548,7 @@ def clean(settings):
 if __name__ == '__main__':
     exit_status = 0
     parser = argparse.ArgumentParser(description='', add_help=False)
-    parser.add_argument('-d', nargs='?', default=None, action='append')
+    parser.add_argument('-d', default=[], action='append')
     parser.add_argument('-h', '--help', action='store_true')
     parser.add_argument('-v', '--verbose', action='store_true')
     parser.add_argument('verb', nargs='?', default='')
@@ -549,12 +565,11 @@ if __name__ == '__main__':
     #else:
     #    parser.add_argument('noun', nargs='?', default=None)
     parser.add_argument('name', nargs='?', default=None)
-    args = parser.parse_args()
+    # below 3 lines parse, allowing for posix conformance (intermixed args)
+    (args, unknown_args) = parser.parse_known_args()
+    for unknown_arg in unknown_args:
+        args.noun = unknown_arg
     try:
-        if args.d is not None:
-            if len(args.d) > 1:
-                raise Exception('-d option was specified more than once')
-            args.d = args.d[0]
         nouns = ['registry', 'project', 'projects', 'libraries', 'components',
                  'workers']
         if (args.noun is not None) and (args.noun not in nouns):
