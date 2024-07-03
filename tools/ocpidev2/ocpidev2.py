@@ -456,6 +456,11 @@ def unittest():
     return ret
 
 
+def add_show_arguments(parser):
+    #parser.add_argument('--global-scope', action='store_true')
+    return parser
+
+
 def add_create_arguments(parser):
     project = Project('', False, None)
     for attr in project.get_attr_infos():
@@ -468,67 +473,73 @@ def add_build_arguments(parser):
     parser.add_argument('--hdl-target', nargs='?', default='')
     parser.add_argument('--hdl-platform', nargs='?', default='')
     parser.add_argument('--rcc-platform', nargs='?', default='')
+    parser.add_argument('-j', nargs='?', default=1)
     return parser
 
 
 def show(args):
-    disc = args.noun != 'registry'
-    disc = disc and (args.noun != 'projects')
-    project_registry = ProjectRegistry(disc, disc)
-    if args.noun is None:
-        raise Exception('show must have a verb')
-    if args.noun == 'registry':
-        print(project_registry.abs_path)
-    for project in project_registry.projects:
-        if args.noun == 'projects':
-            msg = str(project.get_package_id())
-            if args.verbose:
-                msg += ' '
-                for idx in range(30-len(msg)):
+    if args.help:
+        os.system('man ocpidev2-show')
+    else:
+        disc = args.noun != 'registry'
+        disc = disc and (args.noun != 'projects')
+        project_registry = ProjectRegistry(disc, disc)
+        if args.noun is None:
+            raise Exception('show must have a noun')
+        if args.noun == 'registry':
+            print(project_registry.abs_path)
+        for project in project_registry.projects:
+            if args.noun == 'projects':
+                msg = str(project.get_package_id())
+                if args.verbose:
                     msg += ' '
-                msg += project.abs_path
-            print(msg)
-        if args.noun == 'components':
-            for component in project.components:
-                if (args.d is None) or (args.d in component.abs_path):
-                    print(str(project.get_package_id()) + '.' + component.name)
-        for component_library in project.component_libraries:
-            pid = component_library.get_package_id(str(project.get_package_id()))
-            if args.noun == 'libraries':
-                if (args.d is None) or (args.d in component_library.abs_path):
-                    print(pid)
+                    for idx in range(30-len(msg)):
+                        msg += ' '
+                    msg += project.abs_path
+                print(msg)
             if args.noun == 'components':
-                for component in component_library.components:
+                for component in project.components:
                     if (args.d is None) or (args.d in component.abs_path):
-                        print(pid + '.' + component.name)
-            if args.noun == 'workers':
-                for worker in component_library.workers:
-                    if (args.d is None) or (args.d in worker.abs_path):
-                        print(pid + '.' + worker.name + '.' +
-                              worker.authoring_model)
-        if args.noun == 'libraries':
-            for hdl_primitive in project.hdl_primitives:
-                if (args.d is None) or (args.d in hdl_primitive.abs_path):
-                    print(str(project.get_package_id()) + '.' + hdl_primitive.name)
+                        print(str(project.get_package_id()) + '.' + component.name)
+            for component_library in project.component_libraries:
+                pid = component_library.get_package_id(str(project.get_package_id()))
+                if args.noun == 'libraries':
+                    if (args.d is None) or (args.d in component_library.abs_path):
+                        print(pid)
+                if args.noun == 'components':
+                    for component in component_library.components:
+                        if (args.d is None) or (args.d in component.abs_path):
+                            print(pid + '.' + component.name)
+                if args.noun == 'workers':
+                    for worker in component_library.workers:
+                        if (args.d is None) or (args.d in worker.abs_path):
+                            print(pid + '.' + worker.name + '.' +
+                                  worker.authoring_model)
+            if args.noun == 'libraries':
+                for hdl_primitive in project.hdl_primitives:
+                    if (args.d is None) or (args.d in hdl_primitive.abs_path):
+                        print(str(project.get_package_id()) + '.' + hdl_primitive.name)
 
 
 if __name__ == '__main__':
     exit_status = 0
-    parser = argparse.ArgumentParser(description='')
+    parser = argparse.ArgumentParser(description='', add_help=False)
     parser.add_argument('-d', nargs='?', default=None, action='append')
-    parser.add_argument('-j', nargs='?', default=1)
+    parser.add_argument('-h', '--help', action='store_true')
     parser.add_argument('-v', '--verbose', action='store_true')
-    parser.add_argument('verb')
-    if 'create' in sys.argv and 'project' in sys.argv:
+    parser.add_argument('verb', nargs='?', default='')
+    if 'show' in sys.argv:
+        parser = add_show_arguments(parser)
+    elif 'create' in sys.argv and 'project' in sys.argv:
         parser = add_create_arguments(parser)
-    if 'build' in sys.argv:
+    elif 'build' in sys.argv:
         parser = add_build_arguments(parser)
+    parser.add_argument('noun', nargs='?', default=None)
     #required = ('create' in sys.argv) or ('build' in sys.argv) or ('show' in sys.argv)
     #if required:
     #    parser.add_argument('noun')
     #else:
     #    parser.add_argument('noun', nargs='?', default=None)
-    parser.add_argument('noun', nargs='?', default=None)
     parser.add_argument('name', nargs='?', default=None)
     args = parser.parse_args()
     try:
@@ -547,7 +558,12 @@ if __name__ == '__main__':
         if args.d is None:
             if (args.noun is None) or (args.verb != 'clean'):
                 _dir = os.getcwd()
-        if args.verb == 'create':
+        if args.help:
+          if args.verb == '':
+              os.system('man ocpidev2')
+          else:
+              os.system('man ocpidev2-' + args.verb)
+        elif args.verb == 'create':
             if args.name is None:
                 raise Exception('ocpidev2 create ' + args.noun + ' <name> required')
             OCPIDev(hdl_build_tool).create(vars(args))

@@ -76,7 +76,7 @@ _ocpidev2()
     COMPREPLY=( $(compgen -W "$(ocpidev2 show hdl platforms | sed "s/.*\.//g")" -- "$2") )
   elif [ "$3" == "show" ]; then
     #COMPREPLY=( $(compgen -W "registry projects components workers libraries hdl rcc" -- "$2") )
-    COMPREPLY=( $(compgen -W "registry projects components workers libraries" -- "$2") )
+    COMPREPLY=( $(compgen -W "registry projects components workers libraries -h --help" -- "$2") )
   elif [ "$3" == "hdl" ]; then
     COMPREPLY=( $(compgen -W "workers" -- "$2") )
   elif [ "$3" == "rcc" ]; then
