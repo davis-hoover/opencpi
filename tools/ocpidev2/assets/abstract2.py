@@ -30,7 +30,7 @@ import jinja2
 
 # TODO make a class member, probably ComponentLibrary or Project class
 g_libraries_mk = False
-g_asset_template = """<{{asset.root_tags[0]}}{% for key,val in asset.attrs.items() %}{% if val != '' and val != [] %}\n
+g_asset_template = """<?xml version="1.0"?>\n<{{asset.root_tags[0]}}{% for key,val in asset.attrs.items() %}{% if val != '' and val != [] %}\n
     {{key}}=\'{{val}}\'{% endif %}{% endfor %}/>\n\n"""
 global_dependency_tree = dict()
 
@@ -646,12 +646,14 @@ global_makefile = GNUMakefile(None)
 
 
 class AttributeInfo():
-    def __init__(self, key, is_list=False, is_int=False, cli=None):
+    def __init__(self, key, is_list=False, is_int=False, is_bool=False,
+                 cli=None):
         """ key is the string attribute from the Dev Guide, e.g. 'Property' """
         self.key = key
         self.is_list = is_list
         self.is_int = is_int
-        self.cli = cli  # a tuple corresponding to long/short cli strings
+        self.is_bool = is_bool
+        self.cli = cli
 
 class AttributeBase():
     """ a thing which contains opencpi (XML) attributes, either intermediary
@@ -677,11 +679,15 @@ class AttributeBase():
                 val = self.get_attr(info.key, elem, paths, cli_dict)
             if info.is_int and (not info.is_list):
                 val = int(val) if val != '' else 0
+            if info.is_bool and (not info.is_list):
+                if val != '':
+                    val = bool(val)
             if (info.is_list and val != []) or \
                (not info.is_list and val != ''):
                 # this is where ALL attribute values are finally placed into
                 # self.attrs dict
                 self.attrs[info.key] = val
+
 
     @staticmethod
     def get_xml_val_list(val):
@@ -898,15 +904,15 @@ class AssetBase(AttributeBase):
                 else:
                     raise InvalidAssetError(msg)
 
-    def create_files(self, templates):
-        if self.get_abs_path_exists():
-            raise Exception(self.get_type() + ' ' + self.abs_path + ' already exists')
-        else:
-            os.mkdir(self.get_dir_abs_path())
+    def create_files(self, templates, file_path, package_id=None,
+                     library_name=None, duplicate=False):
+        os.makedirs(file_path, exist_ok=duplicate)
         for fname, fcontents in templates.items():
             fcontents = jinja2.Template(fcontents, trim_blocks=True)
-            fcontents = fcontents.render(asset=self)
-            out_file = open(self.abs_path + '/' + fname, 'w')
+            fcontents = fcontents.render(
+                asset=self, package_id=package_id, library_name=library_name
+            )
+            out_file = open(file_path + '/' + fname, 'w')
             out_file.write(fcontents)
             out_file.close()
 

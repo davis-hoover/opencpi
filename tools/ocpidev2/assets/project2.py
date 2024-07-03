@@ -18,6 +18,7 @@
 
 
 import os
+import hashlib
 import itertools
 from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import AssetBase
@@ -38,7 +39,7 @@ project_templates['Project.exports'] = """
 # Lines starting with - subtract from the exports
 all
 
-\n\n"""
+\n\n\n"""
 
 project_templates['.gitignore'] = """
 # Lines starting with '#' are considered comments.
@@ -81,6 +82,23 @@ project_templates['.gitattributes'] = """
 *.bit -diff
 \n\n"""
 
+project_templates['Project.rst'] = """
+.. {{asset.name}} top level project documentation
+
+
+{{asset.name|capitalize}}
+===============
+Skeleton outline: Description of project.
+
+.. toctree::
+   :maxdepth: 2
+
+   components/components
+   hdl/primitives/primitives
+   specs/specs
+\n"""
+
+
 project_templates['Project.xml'] = g_asset_template
 
 class Project(AssetBase, SpecsDirectory, Discoverer):
@@ -90,8 +108,6 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         self.root_tags = ['Project']
         AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
         SpecsDirectory.__init__(self)
-        self.package_name = ''
-        self.package_id = ''
         # start of bullets at top of CDG section 14 (XML, project INTERNAL)
         self.component_libraries = []
         self.applications = []
@@ -102,10 +118,6 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         self.hdl_slots = []
         self.hdl_platforms = []
         # end of bullets at top of CDG section 14
-        # start of CDG section 14.2.3
-        self.component_library_locations = ['components', 'hdl/devices', 'hdl/cards']
-        self.component_library_locations += ['hdl/adapters', 'hdl/platforms']
-        # end of CDG section 14.2.3
         self.assets = []  # TODO replaces above bullets with self.assets
         # start of CDG section 14.5 (EXTERNAL-to-project, i.e., DEPENDENCY)
         # HDG section 5 "The built-in ocpi.core project includes several HDL
@@ -210,7 +222,8 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                 raise InvalidAssetError('PackagePrefix must contain only alphanumeric characters and not start with a number')
 
     def create(self):
-        AssetBase.create_files(self, project_templates)
+        project_path = self.get_dir_abs_path()
+        AssetBase.create_files(self, project_templates, project_path)
 
     def discover(
             self, do_component_libraries=True, do_hdl_primitives=True,
@@ -243,7 +256,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             component libraries locations that are guaranteed to exist """
         # CDG section 14.2.3
         dir_abs_paths = []
-        for _dir in self.component_library_locations:
+        for _dir in ComponentLibrary.library_locations:
             dir_abs_path = self.get_dir_abs_path() + '/' + _dir
             if os.path.isdir(dir_abs_path):
                 # add to dir_abs_path the absolute path to the directories
@@ -701,3 +714,45 @@ def test_Project_discover_component_libraries(ret):
     if passed is False:
         ret = False
     return ret
+
+def test_Project_create(ret):
+    fs = TemporaryFilesystem()
+    test_name = 'test_Project_create: '
+    name = 'foo'
+    dir_abs_path = fs.abs_path + '/' + name
+    try:
+        Project(
+            dir_abs_path, False, None
+        ).create()
+        passed = True
+    except Exception as e:
+        Logger().debug(test_name + str(e))
+        passed = False
+
+    # Test for file existence
+    project_files = ['Project.exports', 'Project.xml', 'Project.rst']
+    for project_file in project_files:
+        path = dir_abs_path + '/' + project_file
+        if not os.path.exists(path):
+            passed = False
+    # Test for file integrity
+    msg = 'invalid expected md5sum for file: '
+    project_exports_path = dir_abs_path + '/' + project_files[0]
+    project_exports_md5 = hashlib.md5(open(project_exports_path, 'rb').read()).hexdigest()
+    if project_exports_md5 != 'c575f31ac595c4fc2baa78963408e1a5':
+        passed = False
+        Logger().error(test_name + str(msg + project_exports_path))
+    project_xml_path = dir_abs_path + '/' + project_files[1]
+    project_xml_md5 = hashlib.md5(open(project_xml_path, 'rb').read()).hexdigest()
+    if project_xml_md5 != '7dce1d0c3887ff085cab45ac64d7edcb':
+        passed = False
+        Logger().error(test_name + str(msg + project_xml_path))
+    project_rst_path = dir_abs_path + '/' + project_files[2]
+    project_rst_md5 = hashlib.md5(open(project_rst_path, 'rb').read()).hexdigest()
+    if project_rst_md5 != '5ffe695fc6f968f8c840a9ce2a4576f5':
+        passed = False
+        Logger().error(test_name + str(msg + project_rst_path))
+    # os.system('tree ' + fs.abs_path + '/foo')
+    log_pass_fail('testing Project create()', passed)
+    if passed is False:
+        ret = False

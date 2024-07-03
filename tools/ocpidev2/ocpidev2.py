@@ -32,6 +32,8 @@ from _opencpi.assets.project2 import *
 from _opencpi.assets.worker2 import *
 from _opencpi.assets.assembly2 import *
 from _opencpi.assets.platform2 import *
+from _opencpi.assets.test2 import *
+from _opencpi.assets.application2 import *
 
 
 def mysigint(sig, frame):
@@ -43,14 +45,95 @@ class OCPIDev():
 
     def __init__(self, hdl_build_tool):
         self.hdl_build_tool = hdl_build_tool
-
-    def create(self, cli_dict):
-        abs_path = os.getcwd() + '/' + args.name
+    def create(self, _dir, cli_dict):
         if cli_dict is not None:
-            # below line supports create, removes underscores to make CLI look like attrs
-            cli_dict = {key.replace('_', '') : val for key, val in cli_dict.items()}
+            # The below line supports create, removes underscores to make CLI
+            # look like attrs
+            cli_dict = (
+                {key.replace('_', '') : val for key, val in cli_dict.items()}
+            )
         if args.noun == 'project':
+            abs_path = _dir + '/' + args.name
             Project(abs_path, False, cli_dict).create()
+            if cli_dict['register'] == True:
+                self.register('project', abs_path)
+        else:
+            # Check path is a valid registered project directory
+            project_registry = ProjectRegistry()
+            project = next((proj for proj in project_registry.projects if
+                            proj.abs_path + '/' in _dir + '/'), None)
+            if project is None:
+                raise Exception("Invalid path: '" + _dir + "'. Please perform "
+                                "create " + args.noun + " in a valid "
+                                "registered project directory.")
+            if args.noun == 'library':
+                component_lib_path = _dir + '/' + args.name
+                ComponentLibrary(
+                    component_lib_path, False, cli_dict
+                ).create(project, _dir)
+            if args.noun == 'application':
+                application_path = _dir + '/' + args.noun + 's/' + args.name
+                applications_dir = project.abs_path + '/applications'
+                if _dir != project.abs_path and _dir != applications_dir:
+                    raise Exception("Invalid path: '" + _dir + "'. Please "
+                                    "perform create application at the top of "
+                                    "a valid registered project or within the "
+                                    "applications directory.")
+                Application(
+                    application_path, False, cli_dict
+                ).create(project.abs_path, cli_dict['xmlapp'], cli_dict['xmldirapp'])
+            if args.noun in ['component', 'test']:
+                # Check path is a valid component library directory
+                valid_path = any(_dir == lib.abs_path for lib in
+                                 project.component_libraries)
+                if not valid_path:
+                    raise Exception("Invalid path: `" + _dir + "'. Please "
+                                    "perform create " + args.noun + " "
+                                    "in a valid component library.")
+                if args.noun == 'component':
+                    spec_create = True if cli_dict['project'] else False
+                    component_path = (
+                        _dir + '/' + args.name + '.comp' + '/' + args.name +
+                        '-comp.xml'
+                    )
+                    package_id = project.get_package_id()
+                    Component(
+                        component_path, False, cli_dict
+                    ).create(package_id, spec_create, project.abs_path)
+                    if cli_dict['createtest'] == True:
+                        test_path = _dir + '/' + args.name + '.test'
+                        cli_dict['component'] = ''
+                        cli_dict['usehdlfileio'] = ''
+                        Test(test_path, False, cli_dict).create()
+                if args.noun == 'test':
+                    test_path = _dir + '/' + args.name + '.test'
+                    # If --component arg used, check for component existence
+                    if cli_dict['component']:
+                        comp_to_search = cli_dict['component']
+                        components = []
+                        for project in project_registry.projects:
+                            for component in project.components:
+                                components.append(component)
+                            for comp_lib in project.component_libraries:
+                                for component in comp_lib.components:
+                                    components.append(component)
+                        valid_comp = any(comp_to_search == comp.name for comp in components)
+                        if not valid_comp:
+                            msg = ('The component ' + cli_dict['component'] +
+                                   ' does not exist within any of the '
+                                   'registered projects.')
+                            raise Exception(msg)
+                    # If --component not used, check for the component in path
+                    else:
+                        valid_create_test = False
+                        for ext in ['.rcc', '.hdl', '.comp']:
+                            if os.path.exists(_dir + '/' + args.name + ext):
+                                 valid_create_test = True
+                        if not valid_create_test:
+                            raise Exception('A ' + args.name + ' component does '
+                                            'not yet exist to create a unit-test '
+                                            'for.')
+                    Test(test_path, False, cli_dict).create()
 
     def delete(self, noun):
         raise Exception('delete is not supported at this time')
@@ -141,7 +224,7 @@ class OCPIDev():
         # if hdl_platform is not None:
         #     self.throw_if_not_installed(hdl_platform)
         project_registry = ProjectRegistry()
-        abs_path = os.path.abspath(_dir)
+        abs_path = _dir
         project = None
         assets_to_build = []
         for project2 in project_registry.projects:
@@ -211,19 +294,92 @@ class OCPIDev():
         #    os.system('rm -rf $(find ' + proj.abs_path + ' -type l -name imports)')
         #    os.system('rm -rf $(find ' + proj.abs_path + ' -type l -name exports)')
 
-    def register(self, noun):
-        project_registry = ProjectRegistry(
-                do_discover_component_libraries=False,
-                do_discover_hdl_primitives=False)
-        if noun == 'project':
-            project_registry.register_project()
+    def clean(self, noun, _dir):
+        project_registry = ProjectRegistry(False, False)
+        cleaned = False
+        for project in project_registry.projects:
+            if project.abs_path in os.path.realpath(_dir):
+                os.system('rm -rf $(find ' + _dir + ' -type d -name gen)')
+                os.system('rm -rf $(find ' + _dir + ' -type d -name lib)')
+                os.system('rm -rf $(find ' + _dir + ' -type d -name run)')
+                # below 4 lines account for corrupted imports/exports
+                os.system('rm -rf $(find ' + _dir + ' -type f -name imports)')
+                os.system('rm -rf $(find ' + _dir + ' -type f -name exports)')
+                os.system('rm -rf $(find ' + _dir + ' -type d -name imports)')
+                os.system('rm -rf $(find ' + _dir + ' -type d -name exports)')
+                os.system('rm -rf $(find ' + _dir + ' -type l -name imports)')
+                os.system('rm -rf $(find ' + _dir + ' -type l -name exports)')
+                os.system(
+                        'rm -rf $(find ' + _dir + ' -type d -name config-\*)')
+                os.system(
+                        'rm -rf $(find ' + _dir +
+                        ' -type d -name simulations)')
+                os.system(
+                        'rm -rf $(find ' + _dir + ' -type d -name target-\*)')
+                os.system(
+                        'rm -rf $(find ' + _dir +
+                        ' -type d -name container-\*)')
+                os.system('rm -rf $(find ' + _dir + " -type f -name '.*lock')")
+                os.system(
+                        'rm -rf $(find ' + _dir + " -type f -name '.*build')")
+                os.system(
+                        'rm -rf $(find ' + _dir + " -type d -name artifacts)")
+                cleaned = True
+        if not cleaned:
+            raise Exception('cannot clean directory not in registered project')
 
-    def unregister(self, noun):
+    def show(self, args):
+        disc = args.noun != 'registry'
+        disc = disc and (args.noun != 'projects')
+        project_registry = ProjectRegistry(disc, disc)
+        if args.noun == 'registry':
+            print(project_registry.abs_path)
+        for project in project_registry.projects:
+            if args.noun == 'projects':
+                msg = str(project.get_package_id())
+                if args.verbose:
+                    msg += ' '
+                    for idx in range(30-len(msg)):
+                        msg += ' '
+                    msg += project.abs_path
+                print(msg)
+            if args.noun == 'components':
+                for component in project.components:
+                    if (args.d is None) or (args.d in component.abs_path):
+                        print(str(project.get_package_id()) + '.' + component.name)
+            for component_library in project.component_libraries:
+                print("component_library.abs_path = " + component_library.abs_path)
+                pid = component_library.get_package_id(str(project.get_package_id()))
+                if args.noun == 'libraries':
+                    if (args.d is None) or (args.d in component_library.abs_path):
+                        print(pid)
+                if args.noun == 'components':
+                    for component in component_library.components:
+                        if (args.d is None) or (args.d in component.abs_path):
+                            print(pid + '.' + component.name)
+                if args.noun == 'workers':
+                    for worker in component_library.workers:
+                        if (args.d is None) or (args.d in worker.abs_path):
+                            print(pid + '.' + worker.name + '.' +
+                                  worker.authoring_model)
+            if args.noun == 'libraries':
+                for hdl_primitive in project.hdl_primitives:
+                    if (args.d is None) or (args.d in hdl_primitive.abs_path):
+                        print(str(project.get_package_id()) + '.' + hdl_primitive.name)
+
+    def register(self, noun, _dir):
         project_registry = ProjectRegistry(
                 do_discover_component_libraries=False,
                 do_discover_hdl_primitives=False)
         if noun == 'project':
-            project_registry.unregister_project()
+            project_registry.register_project(_dir)
+
+    def unregister(self, noun, _dir):
+        project_registry = ProjectRegistry(
+                do_discover_component_libraries=False,
+                do_discover_hdl_primitives=False)
+        if noun == 'project':
+            project_registry.unregister_project(_dir)
 
     def set(self, noun):
         raise Exception('set is not supported at this time')
@@ -399,9 +555,12 @@ def unittest():
     ret = True
     # ret = test_GNUMakefile(ret)
     ret = test_Component(ret)
+    ret = test_Component_create(ret)
     ret = test_ComponentLibrary(ret)
+    ret = test_ComponentLibrary_create(ret)
     ret = test_RccAssembly(ret)
     ret = test_Project_discover_component_libraries(ret)
+    ret = test_Project_create(ret)
     # ret = test_ProjectRegistry(ret)
     # ret = test_OCPIDev(ret)
     ret = test_Worker(ret)
@@ -416,6 +575,8 @@ def unittest():
     ret = test_HdlPlatformConfiguration(ret)
     ret = test_HdlCard(ret)
     # ret = test_LegacyOCPIDevHDLBuildTool(ret)
+    ret = test_Test_create(ret)
+    ret = test_Application_create(ret)
     return ret
 
 
@@ -630,7 +791,7 @@ if __name__ == '__main__':
             raise ValueError("'" + args.name + "' is not  valid name.")
     try:
         nouns = ['registry', 'project', 'projects', 'libraries', 'components',
-                 'workers']
+                 'workers', 'library', 'component', 'test', 'application']
         if (args.noun is not None) and (args.noun not in nouns):
             if args.verb != 'apply':
                 raise Exception('noun ' + str(args.noun) + ' is not supported')
@@ -645,7 +806,7 @@ if __name__ == '__main__':
         elif args.verb == 'create':
             if args.name is None:
                 raise Exception('ocpidev2 create ' + args.noun + ' <name> required')
-            OCPIDev(hdl_build_tool).create(vars(args))
+            OCPIDev(hdl_build_tool).create(_dir, vars(args))
         elif args.verb == 'delete':
             OCPIDev(hdl_build_tool).delete(args.noun)
         elif args.verb == 'build':
@@ -657,9 +818,9 @@ if __name__ == '__main__':
         elif args.verb == 'show':
             show(settings)
         elif args.verb == 'register':
-            OCPIDev(hdl_build_tool).register(args.noun)
+            OCPIDev(hdl_build_tool).register(args.noun, _dir)
         elif args.verb == 'unregister':
-            OCPIDev(hdl_build_tool).unregister(args.noun)
+            OCPIDev(hdl_build_tool).unregister(args.noun, _dir)
         elif args.verb == 'run':
             OCPIDev(hdl_build_tool).run(args.noun)
         elif args.verb == 'refresh':

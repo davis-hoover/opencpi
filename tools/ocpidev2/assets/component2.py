@@ -18,10 +18,265 @@
 
 
 import os
+import hashlib
 # below line is for testing only
 import xml.etree.ElementTree as ET
 from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import AssetBase
+
+comp_rst_template = """
+.. {{asset.name}} documentation
+
+.. Skeleton comment (to be deleted): Alternative names should be listed as
+   keywords. If none are to be included delete the meta directive.
+
+.. meta::
+   :keywords: skeleton example
+
+
+.. _{{asset.name}}:
+
+
+SKELETON NAME (``{{asset.name}}``)
+=================================
+Skeleton outline: Single line description.
+
+Function
+--------
+Skeleton outline: The functionality of the component: how it should produce outputs and volatile property values based on inputs and parameter/initial/writable property values (not **how** it is implemented, as that belongs in worker documentation).
+
+The mathematical representation of the component function is given in :eq:`{{asset.name}}-equation`.
+
+.. math::
+   :label: {{asset.name}}-equation
+
+   y[n] = \\alpha * x[n]
+
+
+In :eq:`{{asset.name}}-equation`:
+
+ * :math:`x[n]` is the input values.
+
+ * :math:`y[n]` is the output values.
+
+ * Skeleton, etc.,
+
+A block diagram representation of the component function is given in :numref:`{{asset.name}}-diagram`.
+
+.. _{{asset.name}}-diagram:
+
+.. figure:: {{asset.name}}.svg
+   :alt: Skeleton alternative text.
+   :align: center
+
+   Caption text.
+
+Interface
+---------
+.. literalinclude:: ../specs/{{asset.name}}-spec.xml
+   :language: xml
+
+Opcode Handling
+~~~~~~~~~~~~~~~
+Skeleton outline: Description of how the non-stream opcodes are handled.
+
+Properties
+~~~~~~~~~~
+.. ocpi_documentation_properties::
+
+   property_name: Skeleton outline: List any additional text for properties, which will be included in addition to the description field in the component specification XML.
+
+Ports
+~~~~~
+.. ocpi_documentation_ports::
+
+   input: Primary input samples port.
+   output: Primary output samples port.
+
+Implementations
+---------------
+.. ocpi_documentation_implementations:: ../{{asset.name}}.hdl ../{{asset.name}}.rcc
+
+Example Application
+-------------------
+.. literalinclude:: example_app.xml
+   :language: xml
+
+Dependencies
+------------
+The dependencies to other elements in OpenCPI are:
+
+ * Skeleton outline: List primitives or other files within OpenCPI that are used (no need to list protocols).
+
+There is also a dependency on:
+
+ * ``ieee.std_logic_1164``
+
+ * ``ieee.numeric_std``
+
+ * Skeleton outline: Any other standard C++ or HDL packages.
+
+Limitations
+-----------
+Limitations of ``{{asset.name}}`` are:
+
+ * Skeleton outline: List any limitations, or state "None." if there are none.
+
+Testing
+-------
+.. ocpi_documentation_test_platforms::
+
+.. Removed ocpi_documentation_test_result_summary directive until it is functional
+"""  # noqa: E501
+
+comp_test_rst_template = """
+.. {{asset.name}} test detail
+
+
+:orphan:
+
+
+``{{asset.name}}`` Test Detail
+=============================
+.. ocpi_documentation_test_detail::
+
+"""
+
+comp_example_app_rst_template = """
+<?xml version="1.0"?>
+<application done="file_write">
+  <instance component="ocpi.core.file_read" connect="{{asset.name}}">
+    <property name="filename" value="input.bin"/>
+  </instance>
+  <instance component="{{package_id}}.{{library_name}}.{{asset.name}}" connect="file_write">
+    <!-- Skeleton application outline, set properties here. Or change this
+         example application to do something more real-world appropriate if
+         file-read, then component, then file-write is too artifical to be a
+         useful example. -->
+  </instance>
+  <instance component="ocpi.core.file_write">
+    <property name="filename" value="output.bin"/>
+  </instance>
+</application>
+"""  # noqa: E501
+
+comp_spec_rst_template = """
+.. {{asset.name}} documentation
+
+.. Skeleton comment (to be deleted): Alternative names should be listed as
+   keywords. If none are to be included delete the meta directive.
+
+.. meta::
+   :keywords: skeleton example
+
+
+.. _{{asset.name}}:
+
+
+SKELETON NAME (``{{asset.name}}``)
+=================================
+Skeleton outline: Single line description.
+
+Design
+------
+Skeleton outline: Functional description of **what** the component achieves (not **how** it is implemented, as that belongs in primitive documentation).
+
+The mathematical representation of the implementation is given in :eq:`{{asset.name}}-equation`.
+
+.. math::
+   :label: {{asset.name}}-equation
+
+   y[n] = \\alpha * x[n]
+
+
+In :eq:`{{asset.name}}-equation`:
+
+ * :math:`x[n]` is the input values.
+
+ * :math:`y[n]` is the output values.
+
+ * Skeleton, etc.,
+
+A block diagram representation of the implementation is given in :numref:`{{asset.name}}-diagram`.
+
+.. _{{asset.name}}-diagram:
+
+.. figure:: {{asset.name}}.svg
+   :alt: Skeleton alternative text.
+   :align: center
+
+   Caption text.
+
+Interface
+---------
+.. literalinclude:: ../specs/{{asset.name}}-spec.xml
+   :language: xml
+
+Opcode handling
+~~~~~~~~~~~~~~~
+Skeleton outline: Description of how the non-stream opcodes are handled.
+
+Properties
+~~~~~~~~~~
+.. ocpi_documentation_properties::
+
+   property_name: Skeleton outline: List any additional text for properties, which will be included in addition to the description field in the component specification XML.
+
+Ports
+~~~~~
+.. ocpi_documentation_ports::
+
+   input: Primary input samples port.
+   output: Primary output samples port.
+
+Implementations
+---------------
+.. ocpi_documentation_implementations:: ../{{asset.name}}.hdl ../{{asset.name}}.rcc
+
+Example Application
+-------------------
+.. literalinclude:: example_app.xml
+   :language: xml
+
+Dependencies
+------------
+The dependencies to other elements in OpenCPI are:
+
+ * Skeleton outline: List primitives or other files within OpenCPI that are used (no need to list protocols).
+
+There is also a dependency on:
+
+ * ``ieee.std_logic_1164``
+
+ * ``ieee.numeric_std``
+
+ * Skeleton outline: Any other standard C++ or HDL packages.
+
+Limitations
+-----------
+Limitations of ``{{asset.name}}`` are:
+
+ * Skeleton outline: List any limitations, or state "None." if there are none.
+
+Testing
+-------
+.. ocpi_documentation_test_platforms::
+
+.. ocpi_documentation_test_result_summary::
+"""  # noqa: E501
+
+
+def create_templates(name, spec_create=False):
+    comp_templates = {}
+    if spec_create:
+        comp_templates[name + '-spec.xml'] = g_asset_template
+        comp_templates[name + '-spec.rst'] = comp_spec_rst_template
+    else:
+       comp_templates[name + '-comp.xml'] = g_asset_template
+       comp_templates[name + '-comp.rst'] = comp_rst_template
+       comp_templates[name + '-test.rst'] = comp_test_rst_template
+       comp_templates['example_app.xml'] = comp_example_app_rst_template
+    return comp_templates
 
 
 class OperationArgumentMember(AttributeBase):
@@ -135,16 +390,33 @@ class Component(AssetBase):
         represented by a xml file (OCS) and knows nothing about the project it
         is in or its package ID. """
 
-    def __init__(self, xml_abs_path, cli_dict=None):
+    def __init__(self, xml_abs_path, enable_path_existence_check=True,
+                 cli_dict=None):
         """ xml_abs_path is None for ComponentSpec embedded in OWD """
         self.root_tags = ['ComponentSpec']
-        AssetBase.__init__(self, xml_abs_path)
+        AssetBase.__init__(self, xml_abs_path, enable_path_existence_check)
         Logger().debug('parsing ' + self.get_xml_abs_path())
         self.parse(cli_dict)
+
+    def create(self, package_id, spec_create, project_path):
+        library_name = self.abs_path.split('/')[-3]
+        if spec_create:
+            spec_path = project_path + '/specs'
+            spec_templates = create_templates(self.name, spec_create)
+            AssetBase.create_files(self, spec_templates, spec_path,
+                                   package_id, library_name)
+        else:
+            component_path = self.get_dir_abs_path()
+            comp_templates = create_templates(self.name)
+            AssetBase.create_files(self, comp_templates, component_path,
+                                   package_id, library_name)
 
     def get_attr_infos(self):
         ret = []
         ret.append(AttributeInfo('Name'))
+        ret.append(AttributeInfo('NoControl',
+                                 cli=('-n', '--no-control'),
+                                 is_bool=True))
         return ret
 
     def parse(self, cli_dict=None):
@@ -315,4 +587,55 @@ def test_Component(ret):
             log_pass_fail('testing Component name', passed)
         if passed is False:
             ret = False
+    return ret
+
+
+def test_Component_create(ret):
+    # TODO: Implement testing for CLI args nocontrol, createtest, project.
+    fs = TemporaryFilesystem()
+    test_name = 'test_Component_create: '
+    name = 'cmp1'
+    package_id = 'ocpi.foo'
+    project_path = fs.abs_path + '/foo'
+    dir_path = project_path + '/components/' + name + '.comp'
+    xml_abs_path = dir_path + '/' + name + '-comp.xml'
+    try:
+        Component(
+            xml_abs_path, False, None
+        ).create(package_id, False, project_path)
+        passed = True
+    except Exception as e:
+        Logger().debug(test_name + str(e))
+    # Test for file existence
+    comp_files = ['cmp1-comp.xml', 'cmp1-comp.rst', 'example_app.xml',
+                  'cmp1-test.rst']
+    for comp_file in comp_files:
+        path = dir_path + '/' + comp_file
+        if not os.path.exists(path):
+            passed = False
+    # Test for file integrity
+    msg = 'invalid expected md5sum for file: '
+    comp_xml = dir_path + '/' + comp_files[0]
+    comp_xml_md5 = hashlib.md5(open(comp_xml, 'rb').read()).hexdigest()
+    if comp_xml_md5 != '40e1d7cd6cd5242615d28725fce1c2e3':
+        passed = False
+        Logger().error(test_name + str(msg + xml_abs_path))
+    comp_rst = dir_path + '/' + comp_files[1]
+    comp_rst_md5 = hashlib.md5(open(comp_rst, 'rb').read()).hexdigest()
+    if comp_rst_md5 != '84fc0cece1ea3c7e7c8bc78c0202e50a':
+        passed = False
+        Logger().error(test_name + str(msg + comp_rst))
+    example_app = dir_path + '/' + comp_files[2]
+    example_app_md5 = hashlib.md5(open(example_app, 'rb').read()).hexdigest()
+    if example_app_md5 != 'fa3bb09634de1f96eda4e647cc698d12':
+        passed = False
+        Logger().error(test_name + str(msg + example_app))
+    comp_test_rst = dir_path + '/' + comp_files[3]
+    comp_test_md5 = hashlib.md5(open(comp_test_rst, 'rb').read()).hexdigest()
+    if comp_test_md5 != '048f66d77e6625d5cb848140c5cc552e':
+        passed = False
+        Logger().error(test_name + str(msg + comp_test_rst))
+    log_pass_fail('testing Component create()', passed)
+    if passed is False:
+        ret = False
     return ret
