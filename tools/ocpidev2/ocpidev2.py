@@ -429,6 +429,47 @@ def add_create_arguments(parser):
     for attr in project.get_attr_infos():
         if attr.cli is not None:
             parser.add_argument(attr.cli[0], attr.cli[1], nargs='?', default='')
+    # TODO: Might be better to place all attrs in AssetBase, then
+    # AssetBase.get_attr_infos('<asset-type>') to avoid 'if verb =='
+    if verb == 'project':
+        project = Project('', False, None)
+        for attr in project.get_attr_infos():
+            if attr.cli is not None:
+                parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
+                                    default='')
+        parser.add_argument('--register', default=False, action='store_true')
+    if verb == 'library':
+        library = ComponentLibrary('', False, None)
+        for attr in library.get_attr_infos():
+            if attr.cli is not None:
+                parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
+                                    default='')
+    if verb == 'component':
+        component = Component('', False, None)
+        for attr in component.get_attr_infos():
+            if attr.cli is not None:
+                if attr.is_bool:
+                    parser.add_argument(attr.cli[0], attr.cli[1], default='',
+                                        action='store_true')
+                else:
+                    parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
+                                        default='')
+        parser.add_argument('-t', '--create-test', default=False, action='store_true')
+        parser.add_argument('-p', '--project', default=False, action='store_true')
+    if verb == 'test':
+        test = Test('', False, None)
+        for attr in test.get_attr_infos():
+            if attr.cli is not None:
+                if attr.is_bool:
+                    parser.add_argument(attr.cli[0], attr.cli[1], default='',
+                                        action='store_true')
+                else:
+                    parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
+                                        default='')
+    if verb == 'application':
+        group = parser.add_mutually_exclusive_group()
+        group.add_argument('-X', '--xml-app', default=False, action='store_true')
+        group.add_argument('-x', '--xml-dir-app', default=False, action='store_true')
     return parser
 
 
@@ -469,15 +510,18 @@ def show(settings):
                 if (_dir == '') or \
                    (_dir in project_registry.abs_path):
                     print(project_registry.abs_path)
+            msg = ''
             for project in project_registry.projects:
                 if settings.noun == 'projects':
-                    msg = str(project.get_package_id())
-                    if settings.verbose:
-                        msg += ' '
-                        for idx in range(30-len(msg)):
+                    if (_dir == '') or \
+                       (_dir in project.abs_path):
+                        msg = str(project.get_package_id())
+                        if settings.verbose:
                             msg += ' '
-                        msg += project.abs_path
-                    print(msg)
+                            for idx in range(30-len(msg)):
+                                msg += ' '
+                            msg += project.abs_path
+                        print(msg)
                 if settings.noun == 'components':
                     for component in project.components:
                         if (_dir == '') or \
@@ -506,6 +550,7 @@ def show(settings):
                            (_dir in hdl_primitive.abs_path):
                             print(str(project.get_package_id()) + '.' +
                                   hdl_primitive.name)
+
 
 def clean(settings):
     project_registry = ProjectRegistry(False, False)

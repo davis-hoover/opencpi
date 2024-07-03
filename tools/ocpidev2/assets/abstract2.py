@@ -1021,6 +1021,9 @@ class AssetBase(AttributeBase):
             ret = elem.tag
         return ret
 
+    def get_abs_path_is_within_dir(self, _dir):
+        return _dir in worker.abs_path
+
     def raise_abs_path_does_not_exist(self):
         """ useful check for *directory* variants of AssetBase (AssetBase
             does not check for XML existence of directory variants) """
