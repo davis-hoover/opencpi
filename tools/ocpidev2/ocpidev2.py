@@ -623,6 +623,11 @@ if __name__ == '__main__':
     (args, unknown_args) = parser.parse_known_args()
     for unknown_arg in unknown_args:
         args.noun = unknown_arg
+    # TODO: Move to abstract2 AssetBase.get_name() once .get_name()
+    # is fully implemented
+    if args.name:
+        if not args.name.isidentifier():
+            raise ValueError("'" + args.name + "' is not  valid name.")
     try:
         nouns = ['registry', 'project', 'projects', 'libraries', 'components',
                  'workers']
