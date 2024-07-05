@@ -48,7 +48,7 @@ class OCPIDev():
     def create(self, settings):
         cli_dict = vars(settings)
         # TODO: Create only works for a single -d, not multiple -d's
-        settings.d = settings.d[0]
+        _dir = settings.d[0]
         if cli_dict is not None:
             # The below line supports create, removes underscores to make CLI
             # look like attrs
@@ -56,7 +56,7 @@ class OCPIDev():
                 {key.replace('_', '') : val for key, val in cli_dict.items()}
             )
         if args.noun == 'project':
-            abs_path = settings.d + '/' + args.name
+            abs_path = _dir + '/' + args.name
             Project(abs_path, False, cli_dict).create()
             if cli_dict['register'] == True:
                 self.register('project', abs_path)
@@ -64,21 +64,21 @@ class OCPIDev():
             # Check path is a valid registered project directory
             project_registry = ProjectRegistry()
             project = next((proj for proj in project_registry.projects if
-                            proj.abs_path + '/' in settings.d + '/'), None)
+                            proj.abs_path + '/' in _dir + '/'), None)
             if project is None:
-                raise Exception("Invalid path: '" + settings.d + "'. Please perform "
+                raise Exception("Invalid path: '" + _dir + "'. Please perform "
                                 "create " + args.noun + " in a valid "
                                 "registered project directory.")
             if args.noun == 'library':
-                component_lib_path = settings.d + '/' + args.name
+                component_lib_path = _dir + '/' + args.name
                 ComponentLibrary(
                     component_lib_path, False, cli_dict
-                ).create(project, settings.d)
+                ).create(project, _dir)
             if args.noun == 'application':
-                application_path = settings.d + '/' + args.noun + 's/' + args.name
+                application_path = _dir + '/' + args.noun + 's/' + args.name
                 applications_dir = project.abs_path + '/applications'
-                if settings.d != project.abs_path and settings.d != applications_dir:
-                    raise Exception("Invalid path: '" + settings.d + "'. Please "
+                if _dir != project.abs_path and _dir != applications_dir:
+                    raise Exception("Invalid path: '" + _dir + "'. Please "
                                     "perform create application at the top of "
                                     "a valid registered project or within the "
                                     "applications directory.")
@@ -87,16 +87,16 @@ class OCPIDev():
                 ).create(project.abs_path, cli_dict['xmlapp'], cli_dict['xmldirapp'])
             if args.noun in ['component', 'test']:
                 # Check path is a valid component library directory
-                valid_path = any(settings.d == lib.abs_path for lib in
+                valid_path = any(_dir == lib.abs_path for lib in
                                  project.component_libraries)
                 if not valid_path:
-                    raise Exception("Invalid path: `" + settings.d + "'. Please "
+                    raise Exception("Invalid path: `" + _dir + "'. Please "
                                     "perform create " + args.noun + " "
                                     "in a valid component library.")
                 if args.noun == 'component':
                     spec_create = True if cli_dict['project'] else False
                     component_path = (
-                        settings.d + '/' + args.name + '.comp' + '/' + args.name +
+                        _dir + '/' + args.name + '.comp' + '/' + args.name +
                         '-comp.xml'
                     )
                     package_id = project.get_package_id()
@@ -104,12 +104,12 @@ class OCPIDev():
                         component_path, False, cli_dict
                     ).create(package_id, spec_create, project.abs_path)
                     if cli_dict['createtest'] == True:
-                        test_path = settings.d + '/' + args.name + '.test'
+                        test_path = _dir + '/' + args.name + '.test'
                         cli_dict['component'] = ''
                         cli_dict['usehdlfileio'] = ''
                         Test(test_path, False, cli_dict).create()
                 if args.noun == 'test':
-                    test_path = settings.d + '/' + args.name + '.test'
+                    test_path = _dir + '/' + args.name + '.test'
                     # If --component arg used, check for component existence
                     if cli_dict['component']:
                         comp_to_search = cli_dict['component']
@@ -130,7 +130,7 @@ class OCPIDev():
                     else:
                         valid_create_test = False
                         for ext in ['.rcc', '.hdl', '.comp']:
-                            if os.path.exists(settings.d + '/' + args.name + ext):
+                            if os.path.exists(_dir + '/' + args.name + ext):
                                  valid_create_test = True
                         if not valid_create_test:
                             raise Exception('A ' + args.name + ' component does '
