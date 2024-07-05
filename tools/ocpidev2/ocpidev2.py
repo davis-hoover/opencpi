@@ -45,10 +45,10 @@ class OCPIDev():
 
     def __init__(self, hdl_build_tool):
         self.hdl_build_tool = hdl_build_tool
-    def create(self, settings, cli_dict):
-        if settings.d[0] == '':
-            settings.d[0] = os.getcwd()
-        _dir = settings.d[0]
+    def create(self, settings):
+        cli_dict = vars(settings)
+        # TODO: Create only works for a single -d, not multiple -d's
+        settings.d = settings.d[0]
         if cli_dict is not None:
             # The below line supports create, removes underscores to make CLI
             # look like attrs
@@ -56,7 +56,7 @@ class OCPIDev():
                 {key.replace('_', '') : val for key, val in cli_dict.items()}
             )
         if args.noun == 'project':
-            abs_path = _dir + '/' + args.name
+            abs_path = settings.d + '/' + args.name
             Project(abs_path, False, cli_dict).create()
             if cli_dict['register'] == True:
                 self.register('project', abs_path)
@@ -64,21 +64,21 @@ class OCPIDev():
             # Check path is a valid registered project directory
             project_registry = ProjectRegistry()
             project = next((proj for proj in project_registry.projects if
-                            proj.abs_path + '/' in _dir + '/'), None)
+                            proj.abs_path + '/' in settings.d + '/'), None)
             if project is None:
-                raise Exception("Invalid path: '" + _dir + "'. Please perform "
+                raise Exception("Invalid path: '" + settings.d + "'. Please perform "
                                 "create " + args.noun + " in a valid "
                                 "registered project directory.")
             if args.noun == 'library':
-                component_lib_path = _dir + '/' + args.name
+                component_lib_path = settings.d + '/' + args.name
                 ComponentLibrary(
                     component_lib_path, False, cli_dict
-                ).create(project, _dir)
+                ).create(project, settings.d)
             if args.noun == 'application':
-                application_path = _dir + '/' + args.noun + 's/' + args.name
+                application_path = settings.d + '/' + args.noun + 's/' + args.name
                 applications_dir = project.abs_path + '/applications'
-                if _dir != project.abs_path and _dir != applications_dir:
-                    raise Exception("Invalid path: '" + _dir + "'. Please "
+                if settings.d != project.abs_path and settings.d != applications_dir:
+                    raise Exception("Invalid path: '" + settings.d + "'. Please "
                                     "perform create application at the top of "
                                     "a valid registered project or within the "
                                     "applications directory.")
@@ -87,16 +87,16 @@ class OCPIDev():
                 ).create(project.abs_path, cli_dict['xmlapp'], cli_dict['xmldirapp'])
             if args.noun in ['component', 'test']:
                 # Check path is a valid component library directory
-                valid_path = any(_dir == lib.abs_path for lib in
+                valid_path = any(settings.d == lib.abs_path for lib in
                                  project.component_libraries)
                 if not valid_path:
-                    raise Exception("Invalid path: `" + _dir + "'. Please "
+                    raise Exception("Invalid path: `" + settings.d + "'. Please "
                                     "perform create " + args.noun + " "
                                     "in a valid component library.")
                 if args.noun == 'component':
                     spec_create = True if cli_dict['project'] else False
                     component_path = (
-                        _dir + '/' + args.name + '.comp' + '/' + args.name +
+                        settings.d + '/' + args.name + '.comp' + '/' + args.name +
                         '-comp.xml'
                     )
                     package_id = project.get_package_id()
@@ -104,12 +104,12 @@ class OCPIDev():
                         component_path, False, cli_dict
                     ).create(package_id, spec_create, project.abs_path)
                     if cli_dict['createtest'] == True:
-                        test_path = _dir + '/' + args.name + '.test'
+                        test_path = settings.d + '/' + args.name + '.test'
                         cli_dict['component'] = ''
                         cli_dict['usehdlfileio'] = ''
                         Test(test_path, False, cli_dict).create()
                 if args.noun == 'test':
-                    test_path = _dir + '/' + args.name + '.test'
+                    test_path = settings.d + '/' + args.name + '.test'
                     # If --component arg used, check for component existence
                     if cli_dict['component']:
                         comp_to_search = cli_dict['component']
@@ -130,7 +130,7 @@ class OCPIDev():
                     else:
                         valid_create_test = False
                         for ext in ['.rcc', '.hdl', '.comp']:
-                            if os.path.exists(_dir + '/' + args.name + ext):
+                            if os.path.exists(settings.d + '/' + args.name + ext):
                                  valid_create_test = True
                         if not valid_create_test:
                             raise Exception('A ' + args.name + ' component does '
@@ -589,10 +589,6 @@ def add_show_arguments(parser):
 
 
 def add_create_arguments(parser, verb):
-    project = Project('', False, None)
-    for attr in project.get_attr_infos():
-        if attr.cli is not None:
-            parser.add_argument(attr.cli[0], attr.cli[1], nargs='?', default='')
     # TODO: Might be better to place all attrs in AssetBase, then
     # AssetBase.get_attr_infos('<asset-type>') to avoid 'if verb =='
     if verb == 'project':
@@ -648,15 +644,14 @@ def add_build_arguments(parser):
 def get_settings(args):
     settings = args
     mylist = args.d.copy()
-    settings.d = []
     if len(mylist) == 0:
-        settings.d.append('')  # meant to represent working directory
-    for _dir in mylist:
-        if _dir is None:
-            _dir = os.getcwd()
-        else:
-            _dir = os.path.abspath(_dir)
-        settings.d.append(_dir)
+        mylist.append(os.getcwd())
+    elif len(mylist) == 1:
+        mylist[0] = os.path.abspath(mylist[0])
+    else:
+        for idx, _dir in enumerate(mylist):
+            mylist[idx] = os.path.abspath(_dir)
+    settings.d = mylist
     return settings
 
 
@@ -763,7 +758,7 @@ if __name__ == '__main__':
     parser.add_argument('verb', nargs='?', default='')
     if 'show' in sys.argv:
         parser = add_show_arguments(parser)
-    elif 'create' in sys.argv and 'project' in sys.argv:
+    elif 'create' in sys.argv:
         if 'project' in sys.argv:
             parser = add_create_arguments(parser, 'project')
         if 'library' in sys.argv:
@@ -792,52 +787,52 @@ if __name__ == '__main__':
     if args.name:
         if not args.name.isidentifier():
             raise ValueError("'" + args.name + "' is not  valid name.")
-    try:
-        nouns = ['registry', 'project', 'projects', 'libraries', 'components',
-                 'workers', 'library', 'component', 'test', 'application']
-        if (args.noun is not None) and (args.noun not in nouns):
-            if args.verb != 'apply':
-                raise Exception('noun ' + str(args.noun) + ' is not supported')
-        signal.signal(signal.SIGINT, mysigint)
-        hdl_build_tool = LegacyOCPIDevHDLBuildTool()
-        settings = get_settings(args)
-        if settings.help:
-          if settings.verb == '':
-              os.system('man ocpidev2')
-          else:
-              os.system('man ocpidev2-' + settings.verb)
-        elif args.verb == 'create':
-            if args.name is None:
-                raise Exception('ocpidev2 create ' + args.noun + ' <name> required')
-            OCPIDev(hdl_build_tool).create(settings, vars(args))
-        elif args.verb == 'delete':
-            OCPIDev(hdl_build_tool).delete(args.noun)
-        elif args.verb == 'build':
-            OCPIDev(hdl_build_tool).build(
-                args.noun, args.hdl_target, args.hdl_platform,
-                args.rcc_platform, settings.d, int(args.j))
-        elif args.verb == 'clean':
-            clean(settings)
-        elif args.verb == 'show':
-            show(settings)
-        elif args.verb == 'register':
-            OCPIDev(hdl_build_tool).register(args.noun, settings.d)
-        elif args.verb == 'unregister':
-            OCPIDev(hdl_build_tool).unregister(args.noun, settings.d)
-        elif args.verb == 'run':
-            OCPIDev(hdl_build_tool).run(args.noun)
-        elif args.verb == 'refresh':
-            OCPIDev(hdl_build_tool).refresh(args.noun)
-        elif args.verb == 'unittest':
-            if unittest():
-                exit_status = 0
-            else:
-                exit_status = 1
-        elif args.verb == 'apply':
-            OCPIDev(hdl_build_tool).apply(args.noun)
+    #try:
+    nouns = ['registry', 'project', 'projects', 'libraries', 'components',
+             'workers', 'library', 'component', 'test', 'application']
+    if (args.noun is not None) and (args.noun not in nouns):
+        if args.verb != 'apply':
+            raise Exception('noun ' + str(args.noun) + ' is not supported')
+    signal.signal(signal.SIGINT, mysigint)
+    hdl_build_tool = LegacyOCPIDevHDLBuildTool()
+    settings = get_settings(args)
+    if settings.help:
+      if settings.verb == '':
+          os.system('man ocpidev2')
+      else:
+          os.system('man ocpidev2-' + settings.verb)
+    elif args.verb == 'create':
+        if args.name is None:
+            raise Exception('ocpidev2 create ' + args.noun + ' <name> required')
+        OCPIDev(hdl_build_tool).create(settings)
+    elif args.verb == 'delete':
+        OCPIDev(hdl_build_tool).delete(args.noun)
+    elif args.verb == 'build':
+        OCPIDev(hdl_build_tool).build(
+            args.noun, args.hdl_target, args.hdl_platform,
+            args.rcc_platform, settings.d, int(args.j))
+    elif args.verb == 'clean':
+        clean(settings)
+    elif args.verb == 'show':
+        show(settings)
+    elif args.verb == 'register':
+        OCPIDev(hdl_build_tool).register(args.noun, _dir)
+    elif args.verb == 'unregister':
+        OCPIDev(hdl_build_tool).unregister(args.noun, _dir)
+    elif args.verb == 'run':
+        OCPIDev(hdl_build_tool).run(args.noun)
+    elif args.verb == 'refresh':
+        OCPIDev(hdl_build_tool).refresh(args.noun)
+    elif args.verb == 'unittest':
+        if unittest():
+            exit_status = 0
         else:
-            raise Exception('verb ' + args.verb + ' is not supported')
-    except Exception as exception:
-        Logger().error(str(exception))
-        exit_status = 1
+            exit_status = 1
+    elif args.verb == 'apply':
+        OCPIDev(hdl_build_tool).apply(args.noun)
+    else:
+        raise Exception('verb ' + args.verb + ' is not supported')
+    #except Exception as exception:
+    #    Logger().error(str(exception))
+    #    exit_status = 1
     exit(exit_status)
