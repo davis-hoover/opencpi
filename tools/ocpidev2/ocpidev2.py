@@ -666,14 +666,12 @@ def show(settings):
             raise Exception('show must have a noun')
         for _dir in settings.d:
             if settings.noun == 'registry':
-                if (_dir == '') or \
-                   (_dir in project_registry.abs_path):
+                if _dir + '/' in project_registry.abs_path + '/':
                     print(project_registry.abs_path)
             msg = ''
             for project in project_registry.projects:
                 if settings.noun == 'projects':
-                    if (_dir == '') or \
-                       (_dir in project.abs_path):
+                    if _dir + '/' in project.abs_path + '/':
                         msg = str(project.get_package_id())
                         if settings.verbose:
                             msg += ' '
@@ -683,30 +681,25 @@ def show(settings):
                         print(msg)
                 if settings.noun == 'components':
                     for component in project.components:
-                        if (_dir == '') or \
-                           (_dir in component.abs_path):
+                        if _dir + '/' in component.abs_path + '/':
                             print(str(project.get_package_id()) + '.' + component.name)
                 for component_library in project.component_libraries:
                     pid = component_library.get_package_id(str(project.get_package_id()))
                     if settings.noun == 'libraries':
-                        if (_dir == '') or \
-                           (_dir in component_library.abs_path):
+                        if _dir + '/' in component_library.abs_path + '/':
                             print(pid)
                     if settings.noun == 'components':
                         for component in component_library.components:
-                            if (_dir == '') or \
-                               (_dir in component.abs_path):
+                            if _dir + '/' in component.abs_path + '/':
                                 print(pid + '.' + component.name)
                     if settings.noun == 'workers':
                         for worker in component_library.workers:
-                            if (_dir == '') or \
-                               (_dir in worker.abs_path):
+                            if _dir + '/' in worker.abs_path + '/':
                                 print(pid + '.' + worker.name + '.' +
                                       worker.authoring_model)
                 if settings.noun == 'libraries':
                     for hdl_primitive in project.hdl_primitives:
-                        if (_dir == '') or \
-                           (_dir in hdl_primitive.abs_path):
+                        if _dir + '/' in hdl_primitive.abs_path + '/':
                             print(str(project.get_package_id()) + '.' +
                                   hdl_primitive.name)
 
