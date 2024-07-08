@@ -516,12 +516,12 @@ def _help(cli_dict, project_registry):
 
 def build(cli_dict, project_registry):
     hdl_build_tool = LegacyOCPIDevHDLBuildTool()  # TODO make extensible
-    if (cli_dict['hdl_target'] != '') or (cli_dict['hdl_platform'] != ''):
+    if (cli_dict['hdltarget'] != '') or (cli_dict['hdlplatform'] != ''):
         if os.environ.get('XILINX_VIVADO') is not None:
             msg = 'cannot run ocpidev2 when Vivado environment is sourced'
             raise Exception(msg)
-    if cli_dict['rcc_platform'] != '':
-        throw_if_not_installed(cli_dict['rcc_platform'])
+    if cli_dict['rccplatform'] != '':
+        throw_if_not_installed(cli_dict['rccplatform'])
     # if hdl_platform is not None:
     #     throw_if_not_installed(hdl_platform)
     for _dir in cli_dict['d']:
@@ -560,7 +560,7 @@ def build(cli_dict, project_registry):
             else:
                 assets_to_build.append(asset)
         else:
-            if (cli_dict['hdl_target'] != '') or (cli_dict['hdl_platform'] != ''):
+            if (cli_dict['hdltarget'] != '') or (cli_dict['hdlplatform'] != ''):
                 for hdl_primitive in project.hdl_primitives:
                     assets_to_build.append(hdl_primitive)
                 for hdl_assembly in project.hdl_assemblies:
@@ -569,9 +569,9 @@ def build(cli_dict, project_registry):
                     for worker in component_library.workers:
                         if worker.get_type() == 'hdl worker':
                             assets_to_build.append(worker)
-            if cli_dict['rcc_platform'] != '':
+            if cli_dict['rccplatform'] != '':
                 install_rcc_platform_if_not_installed(
-                        project_registry, cli_dict['rcc_platform'])
+                        project_registry, cli_dict['rccplatform'])
                 for component_library in project.component_libraries:
                     for worker in component_library.workers:
                         if worker.get_type() == 'rcc worker':
@@ -580,16 +580,16 @@ def build(cli_dict, project_registry):
                     assets_to_build.append(application)
         throw_if_project_dependencies_not_registered(
             project, project_registry)
-        if cli_dict['rcc_platform'] != '':
+        if cli_dict['rccplatform'] != '':
             install_rcc_platform_if_not_installed(
-                    project_registry, cli_dict['rcc_platform'])
-        export_projects(project_registry, cli_dict['hdl_platform'],
-                        cli_dict['hdl_target'], cli_dict['rcc_platform'],
+                    project_registry, cli_dict['rccplatform'])
+        export_projects(project_registry, cli_dict['hdlplatform'],
+                        cli_dict['hdltarget'], cli_dict['rccplatform'],
                         hdl_build_tool)
         project.build_assets(
                 assets_to_build, project_registry, self.hdl_build_tool,
-                cli_dict['hdl_target'], cli_dict['hdl_platform'],
-                cli_dict['rcc_platform'], cli_dict['j'])
+                cli_dict['hdltarget'], cli_dict['hdlplatform'],
+                cli_dict['rccplatform'], cli_dict['j'])
         # TODO move below 8 lines outside OCPIDev class (Legacy...)
         # IMPORTANT - below 7 lines necessary to mitigate stale files
         #for proj in project_registry.projects:
@@ -740,31 +740,31 @@ def get_enable_registry_discovery(cli_dict):
 
 if __name__ == '__main__':
     exit_status = 0
-    try:
-        signal.signal(signal.SIGINT, ocpidevsignint)
-        cli_dict = get_cli_dict()
-        # print(cli_dict)
-        project_registry = None
-        if get_create_registry(cli_dict):
-            disc = get_enable_registry_discovery(cli_dict)
-            project_registry = ProjectRegistry(disc, disc)
-        if cli_dict['help']:
-            _help(cli_dict, project_registry)
-        elif cli_dict['verb'] == 'build':
-            build(cli_dict, project_registry)
-        elif cli_dict['verb'] == 'clean':
-            clean(cli_dict, project_registry)
-        elif cli_dict['verb'] == 'create':
-            create(cli_dict, project_registry)
-        elif cli_dict['verb'] == 'show':
-            show(cli_dict, project_registry)
-        elif cli_dict['verb'] == 'register':
-            register(cli_dict, project_registry)
-        elif cli_dict['verb'] == 'unregister':
-            unregister(cli_dict, project_registry)
-        else:
-            raise Exception('verb ' + cli_dict['verb'] + ' is not supported')
-    except Exception as exception:
-        Logger().error(str(exception))
-        exit_status = 1
+    #try:
+    signal.signal(signal.SIGINT, ocpidevsignint)
+    cli_dict = get_cli_dict()
+    print(cli_dict)
+    project_registry = None
+    if get_create_registry(cli_dict):
+        disc = get_enable_registry_discovery(cli_dict)
+        project_registry = ProjectRegistry(disc, disc)
+    if cli_dict['help']:
+        _help(cli_dict, project_registry)
+    elif cli_dict['verb'] == 'build':
+        build(cli_dict, project_registry)
+    elif cli_dict['verb'] == 'clean':
+        clean(cli_dict, project_registry)
+    elif cli_dict['verb'] == 'create':
+        create(cli_dict, project_registry)
+    elif cli_dict['verb'] == 'show':
+        show(cli_dict, project_registry)
+    elif cli_dict['verb'] == 'register':
+        register(cli_dict, project_registry)
+    elif cli_dict['verb'] == 'unregister':
+        unregister(cli_dict, project_registry)
+    else:
+        raise Exception('verb ' + cli_dict['verb'] + ' is not supported')
+    #except Exception as exception:
+    #    Logger().error(str(exception))
+    #    exit_status = 1
     exit(exit_status)
