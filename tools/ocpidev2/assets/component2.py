@@ -384,6 +384,12 @@ class Protocol(AssetBase):
             except InvalidAttributeError:
                 pass
 
+    def create_templates(self):
+        pass
+
+    def create(self):
+        pass
+
 
 class Component(AssetBase):
     """ Reference Component Development Guide section 6. A Component is

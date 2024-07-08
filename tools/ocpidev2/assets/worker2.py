@@ -94,6 +94,12 @@ class Worker(AssetBase):
     def get_type(self):
         return self.authoring_model + ' worker'
 
+    def create_templates(self):
+        pass
+
+    def create(self):
+        pass
+
 
 class RccAssembly(AssetBase):
 

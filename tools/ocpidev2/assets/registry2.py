@@ -182,6 +182,12 @@ class ProjectRegistry():
         pid = str(project.get_package_id())
         os.system('unlink ' + self.abs_path + '/' + pid)
 
+    def create_templates(self):
+        pass
+
+    def create(self):
+        pass
+
 
 def test_ProjectRegistry(ret):
     passed = True
