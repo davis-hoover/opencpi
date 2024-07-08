@@ -225,6 +225,9 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         project_path = self.get_dir_abs_path()
         AssetBase.create_files(self, project_templates, project_path)
 
+    def create(self, asset):
+        asset.create()
+
     def discover(
             self, do_component_libraries=True, do_hdl_primitives=True,
             do_hdl_assemblies=True):

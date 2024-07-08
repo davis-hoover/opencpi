@@ -362,6 +362,7 @@ class Protocol(AssetBase):
 
     def __init__(self, xml_abs_path):
         AssetBase.__init__(self, xml_abs_path)
+        # TODO raise if xml_abs_path does not have valid ['adapters', 'cards', 'devices', 'platforms']
         self.operations = []
         self.parse()
 
