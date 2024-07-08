@@ -256,7 +256,7 @@ def add_build_arguments(parser):
     parser.add_argument('--hdl-target', nargs='?', default='')
     parser.add_argument('--hdl-platform', nargs='?', default='')
     parser.add_argument('--rcc-platform', nargs='?', default='')
-    parser.add_argument('-j', nargs='?', default=1)
+    parser.add_argument('-j', nargs='?', type=int, default=1)
     return parser
 
 
