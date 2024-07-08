@@ -343,104 +343,26 @@ def create(cli_dict, project_registry):
     for _dir in cli_dict['d']:
         if _dir == '':
             _dir = os.getcwd()
+        abs_path = _dir + '/' + cli_dict['name']
+        if cli_dict['noun'] == 'application':
+            asset = Application(abs_path)
+        if cli_dict['noun'] == 'component':
+            name = cli_dict['name']
+            abs_path = _dir + '/' + name + '.comp' + '/' + name + '-comp.xml'
+            asset = Component(abs_path)
+        if cli_dict['noun'] == 'library':
+            asset = ComponentLibrary(abs_path)
         if cli_dict['noun'] == 'project':
-            abs_path = _dir + '/' + cli_dict['name']
-            Project(abs_path, False, cli_dict).create()
-            if cli_dict['register'] == True:
-                register('project', abs_path)
-        else:
-            project = next((proj for proj in project_registry.projects if
-                            proj.abs_path + '/' in _dir + '/'), None)
-            if project is None:
-                raise Exception("Invalid path: '" + _dir + "'. Please perform "
-                                "create " + cli_dict['noun'] + " in a valid "
-                                "registered project directory.")
-            if cli_dict['noun'] == 'library':
-                component_lib_path = _dir + '/' + cli_dict['name']
-                ComponentLibrary(
-                    component_lib_path, False, cli_dict
-                ).create(project, _dir)
-            if cli_dict['noun'] == 'application':
-                application_path = _dir + '/' + cli_dict['noun'] + 's/' + cli_dict['name']
-                applications_dir = project.abs_path + '/applications'
-                if _dir != project.abs_path and _dir != applications_dir:
-                    raise Exception("Invalid path: '" + _dir + "'. Please "
-                                    "perform create application at the top of "
-                                    "a valid registered project or within the "
-                                    "applications directory.")
-                Application(
-                    application_path, False, cli_dict
-                ).create(project.abs_path, cli_dict['xmlapp'], cli_dict['xmldirapp'])
-            if cli_dict['noun'] in ['component', 'test']:
-                # Check path is a valid component library directory
-                valid_path = any(_dir == lib.abs_path for lib in
-                                 project.component_libraries)
-                if not valid_path:
-                    raise Exception("Invalid path: `" + _dir + "'. Please "
-                                    "perform create " + cli_dict['noun'] + " "
-                                    "in a valid component library.")
-                if cli_dict['noun'] == 'component':
-                    spec_create = True if cli_dict['project'] else False
-                    component_path = (
-                        _dir + '/' + cli_dict['name'] + '.comp' + '/' + cli_dict['name'] +
-                        '-comp.xml'
-                    )
-                    package_id = project.get_package_id()
-                    Component(
-                        component_path, False, cli_dict
-                    ).create(package_id, spec_create, project.abs_path)
-                    if cli_dict['createtest'] == True:
-                        test_path = _dir + '/' + cli_dict['name'] + '.test'
-                        cli_dict['component'] = ''
-                        cli_dict['usehdlfileio'] = ''
-                        Test(test_path, False, cli_dict).create()
-                if cli_dict['noun'] == 'test':
-                    test_path = _dir + '/' + cli_dict['name'] + '.test'
-                    # If --component arg used, check for component existence
-                    if cli_dict['component']:
-                        comp_to_search = cli_dict['component']
-                        components = []
-                        for project in project_registry.projects:
-                            for component in project.components:
-                                components.append(component)
-                            for comp_lib in project.component_libraries:
-                                for component in comp_lib.components:
-                                    components.append(component)
-                        valid_comp = any(comp_to_search == comp.name for comp in components)
-                        if not valid_comp:
-                            msg = ('The component ' + cli_dict['component'] +
-                                   ' does not exist within any of the '
-                                   'registered projects.')
-                            raise Exception(msg)
-                    # If --component not used, check for the component in path
-                    else:
-                        valid_create_test = False
-                        for ext in ['.rcc', '.hdl', '.comp']:
-                            if os.path.exists(_dir + '/' + cli_dict['name'] + ext):
-                                 valid_create_test = True
-                        if not valid_create_test:
-                            raise Exception('A ' + cli_dict['name'] + ' component does '
-                                            'not yet exist to create a unit-test '
-                                            'for.')
-                    Test(test_path, False, cli_dict).create()
-                # TODO enable below 4 lines instead of above functionality
-                # if cli_dict['noun'] == 'component':
-                #     name = cli_dict['name']
-                #     xml_abs_path = _dir + '/' + name + '.comp' + '/' + name + '-comp.xml'
-                #     project_registry.create(Component(xml_abs_path))
-                #
-                # TODO enable below 3 lines instead of above functionality
-                # if cli_dict['noun'] == 'test':
-                #     dir_abs_path = _dir + '/' + cli_dict['name'] + '.test')
-                #     project_registry.create(Test(dir_abs_path))
-                if cli_dict['noun'] == 'protocol':
-                    # TODO set xml_abs_path to a good value
-                    xml_abs_path = ''
-                    project_registry.create(Protocol(xml_abs_path))
-                if cli_dict['noun'] == 'worker':
-                    # TODO set xml_abs_path to a good value
-                    xml_abs_path = ''
-                    project_registry.create(Worker(xml_abs_path))
+            asset = Project(abs_path)
+        if cli_dict['noun'] == 'protocol':
+            abs_path += '-prot.xml'
+            asset = Protocol(abs_path, False)
+        if cli_dict['noun'] == 'test':
+            abs_path += '.test'
+            asset = Test(abs_path)
+        if cli_dict['noun'] == 'worker':
+            asset = Worker(abs_path)
+        project_registry.create(asset)
 
 
 def throw_if_not_installed(platform):
