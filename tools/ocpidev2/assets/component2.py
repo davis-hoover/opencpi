@@ -265,6 +265,24 @@ Testing
 .. ocpi_documentation_test_result_summary::
 """  # noqa: E501
 
+# Protocol templates below:
+prot_spec_rst_template = """.. {{asset.name}} documentation
+
+
+.. _{{asset.name}}-protocol:
+
+
+SKELETON NAME Protocol (``{{asset.name}}``)
+===========================================
+Skeleton outline: Purpose and expected use cases of the protocol.
+
+Protocol
+--------
+.. literalinclude:: {{asset.name}}-prot.xml
+   :language: xml
+
+"""
+
 
 def create_templates(name, spec_create=False):
     comp_templates = {}
@@ -360,36 +378,45 @@ class Protocol(AssetBase):
         represented by a xml file (OPS) and knows nothing about the project it
         is in or its package ID. """
 
-    def __init__(self, xml_abs_path):
-        AssetBase.__init__(self, xml_abs_path)
+    def __init__(self, xml_abs_path, enable_path_existence_check=True,
+                 cli_dict=None):
+        self.root_tags = ['Protocol']
+        AssetBase.__init__(self, xml_abs_path, enable_path_existence_check)
         # TODO raise if xml_abs_path does not have valid ['adapters', 'cards', 'devices', 'platforms']
         self.operations = []
-        self.parse()
+        self.parse(cli_dict, enable_path_existence_check)
 
     def get_root_tags(self):
         # TODO replace get_root_tags() with self.root_tags
         return ['Protocol']
 
     def parse(self):
-        AttributeBase.parse(self)
-        for elem in self.get_parsed().iter():
-            for key, value in elem.attrib.items():
-                if key.lower() == 'href':
-                    href_abs_path = self.abs_path.rsplit('/', 1)[0] + '/'
-                    href_abs_path += value
-                    href_protocol = Protocol(href_abs_path)
-                    self.operations.extend(href_protocol.operations)
-            try:
-                operation = Operation(elem)
-                self.operations.append(operation)
-            except InvalidAttributeError:
-                pass
+        AttributeBase.parse(self, cli_dict)
+        if enable_path_existence_check:
+            for elem in self.get_parsed().iter():
+                for key, value in elem.attrib.items():
+                    if key.lower() == 'href':
+                        href_abs_path = self.abs_path.rsplit('/', 1)[0] + '/'
+                        href_abs_path += value
+                        href_protocol = Protocol(href_abs_path)
+                        self.operations.extend(href_protocol.operations)
+                try:
+                    operation = Operation(elem)
+                    self.operations.append(operation)
+                except InvalidAttributeError:
+                    pass
 
-    def create_templates(self):
-        pass
+    def create_templates(self, name):
+        prot_templates = {}
+        prot_templates[name + '-prot.xml'] = g_asset_template
+        prot_templates[name + '-prot.rst'] = prot_spec_rst_template
+        return prot_templates
 
     def create(self):
-        pass
+        specs_path = '/'.join(self.abs_path.split('/')[:-1])
+        prot_templates = self.create_templates(self.name)
+        AssetBase.create_files(self, prot_templates, specs_path,
+                               duplicate=True)
 
 
 class Component(AssetBase):
