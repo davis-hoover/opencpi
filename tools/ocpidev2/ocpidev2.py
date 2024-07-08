@@ -294,8 +294,9 @@ def get_args(parser):
     return args
 
 
-def get_cli_dict_and_validate_args(args):
+def get_cli_dict():
     """ get a dictionary of settings which looks like CLI args and has been modified as needed """
+    args = get_args(get_arg_parser())
     nouns = ['registry', 'project', 'projects', 'protocol', 'libraries', 'components',
              'workers', 'library', 'component', 'test', 'application']
     # TODO move below 3 lines to AssetBase once proper checks in place
@@ -323,20 +324,6 @@ def get_cli_dict_and_validate_args(args):
     # make CLI look like attrs (necessary for create cli verb)
     cli_dict = ({key.replace('_', '') : val for key, val in cli_dict.items()})
     return cli_dict
-
-
-def get_cli_dict():
-    return get_cli_dict_and_validate_args(get_args(get_arg_parser()))
-    """ cli_dict['d']     a list of strings, where an empty string is meant
-                          to represent no -d was specified at the CLI
-        cli_dict['verb']  contains verb string
-        cli_dict['noun']  contains noun string (empty if unspecifed at CLI)
-        cli_dict['name']  contains name string (empty if unspecifed at CLI)
-        cli_dict['component']    entry may not exist
-        cli_dict['createtest']   entry may not exist, boolean
-        cli_dict['usehdlfileio'] entry may not exist, boolean
-        cli_dict['xmlapp']       entry may not exist, boolean
-        cli_dict['xmldirapp']    entry may not exist, boolean """
 
 
 def create(cli_dict, project_registry):
