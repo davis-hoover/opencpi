@@ -406,15 +406,15 @@ class Protocol(AssetBase):
                 except InvalidAttributeError:
                     pass
 
-    def create_templates(self, name):
+    def create_templates(self):
         prot_templates = {}
-        prot_templates[name + '-prot.xml'] = g_asset_template
-        prot_templates[name + '-prot.rst'] = prot_spec_rst_template
+        prot_templates[self.name + '-prot.xml'] = g_asset_template
+        prot_templates[self.name + '-prot.rst'] = prot_spec_rst_template
         return prot_templates
 
     def create(self):
         specs_path = '/'.join(self.abs_path.split('/')[:-1])
-        prot_templates = self.create_templates(self.name)
+        prot_templates = self.create_templates()
         AssetBase.create_files(self, prot_templates, specs_path,
                                duplicate=True)
 
