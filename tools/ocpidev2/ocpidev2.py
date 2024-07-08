@@ -345,23 +345,23 @@ def create(cli_dict, project_registry):
             _dir = os.getcwd()
         abs_path = _dir + '/' + cli_dict['name']
         if cli_dict['noun'] == 'application':
-            asset = Application(abs_path)
+            asset = Application(abs_path, False, cli_dict)
         if cli_dict['noun'] == 'component':
             name = cli_dict['name']
             abs_path = _dir + '/' + name + '.comp' + '/' + name + '-comp.xml'
-            asset = Component(abs_path)
+            asset = Component(abs_path, False, cli_dict)
         if cli_dict['noun'] == 'library':
-            asset = ComponentLibrary(abs_path)
+            asset = ComponentLibrary(abs_path, False, cli_dict)
         if cli_dict['noun'] == 'project':
-            asset = Project(abs_path)
+            asset = Project(abs_path, False, cli_dict)
         if cli_dict['noun'] == 'protocol':
             abs_path += '-prot.xml'
-            asset = Protocol(abs_path, False)
+            asset = Protocol(abs_path, False, cli_dict)
         if cli_dict['noun'] == 'test':
             abs_path += '.test'
-            asset = Test(abs_path)
+            asset = Test(abs_path, False, cli_dict)
         if cli_dict['noun'] == 'worker':
-            asset = Worker(abs_path)
+            asset = Worker(abs_path, False, cli_dict)
         project_registry.create(asset)
 
 
