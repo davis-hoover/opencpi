@@ -418,6 +418,9 @@ class Protocol(AssetBase):
         AssetBase.create_files(self, prot_templates, specs_path,
                                duplicate=True)
 
+    def get_type(self):
+        return 'protocol'
+
 
 class Component(AssetBase):
     """ Reference Component Development Guide section 6. A Component is

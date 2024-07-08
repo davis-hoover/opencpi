@@ -326,30 +326,39 @@ def get_cli_dict():
     return cli_dict
 
 
+class AssetFactory():
+
+    def __init__(self, _dir, cli_dict):
+        abs_path = _dir + '/' + cli_dict['name']
+        if cli_dict['noun'] == 'application':
+            self.asset = Application(abs_path, False, cli_dict)
+        if cli_dict['noun'] == 'component':
+            name = cli_dict['name']
+            abs_path = _dir + '/' + name + '.comp' + '/' + name + '-comp.xml'
+            self.asset = Component(abs_path, False, cli_dict)
+        if cli_dict['noun'] == 'library':
+            self.asset = ComponentLibrary(abs_path, False, cli_dict)
+        if cli_dict['noun'] == 'project':
+            self.asset = Project(abs_path, False, cli_dict)
+        if cli_dict['noun'] == 'protocol':
+            abs_path += '-prot.xml'
+            self.asset = Protocol(abs_path, False, cli_dict)
+        if cli_dict['noun'] == 'test':
+            abs_path += '.test'
+            self.asset = Test(abs_path, False, cli_dict)
+        if cli_dict['noun'] == 'worker':
+            self.asset = Worker(abs_path, False, cli_dict)
+
+    def create(self, project_registry):
+        Logger().info('creating ' + self.asset.get_type() + ' ' + self.asset.name)
+        project_registry.create(self.asset)
+
+
 def create(cli_dict, project_registry):
     for _dir in cli_dict['d']:
         if _dir == '':
             _dir = os.getcwd()
-        abs_path = _dir + '/' + cli_dict['name']
-        if cli_dict['noun'] == 'application':
-            asset = Application(abs_path, False, cli_dict)
-        if cli_dict['noun'] == 'component':
-            name = cli_dict['name']
-            abs_path = _dir + '/' + name + '.comp' + '/' + name + '-comp.xml'
-            asset = Component(abs_path, False, cli_dict)
-        if cli_dict['noun'] == 'library':
-            asset = ComponentLibrary(abs_path, False, cli_dict)
-        if cli_dict['noun'] == 'project':
-            asset = Project(abs_path, False, cli_dict)
-        if cli_dict['noun'] == 'protocol':
-            abs_path += '-prot.xml'
-            asset = Protocol(abs_path, False, cli_dict)
-        if cli_dict['noun'] == 'test':
-            abs_path += '.test'
-            asset = Test(abs_path, False, cli_dict)
-        if cli_dict['noun'] == 'worker':
-            asset = Worker(abs_path, False, cli_dict)
-        project_registry.create(asset)
+        AssetFactory(_dir, cli_dict).create(project_registry)
 
 
 def throw_if_not_installed(platform):
