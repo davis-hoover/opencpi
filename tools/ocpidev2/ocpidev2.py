@@ -347,7 +347,7 @@ def create(cli_dict, project_registry):
             abs_path = _dir + '/' + cli_dict['name']
             Project(abs_path, False, cli_dict).create()
             if cli_dict['register'] == True:
-                self.register('project', abs_path)
+                register('project', abs_path)
         else:
             project = next((proj for proj in project_registry.projects if
                             proj.abs_path + '/' in _dir + '/'), None)
@@ -587,7 +587,7 @@ def build(cli_dict, project_registry):
                         cli_dict['hdltarget'], cli_dict['rccplatform'],
                         hdl_build_tool)
         project.build_assets(
-                assets_to_build, project_registry, self.hdl_build_tool,
+                assets_to_build, project_registry, hdl_build_tool,
                 cli_dict['hdltarget'], cli_dict['hdlplatform'],
                 cli_dict['rccplatform'], cli_dict['j'])
         # TODO move below 8 lines outside OCPIDev class (Legacy...)
