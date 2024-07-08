@@ -272,10 +272,10 @@ def create_templates(name, spec_create=False):
         comp_templates[name + '-spec.xml'] = g_asset_template
         comp_templates[name + '-spec.rst'] = comp_spec_rst_template
     else:
-       comp_templates[name + '-comp.xml'] = g_asset_template
-       comp_templates[name + '-comp.rst'] = comp_rst_template
-       comp_templates[name + '-test.rst'] = comp_test_rst_template
-       comp_templates['example_app.xml'] = comp_example_app_rst_template
+        comp_templates[name + '-comp.xml'] = g_asset_template
+        comp_templates[name + '-comp.rst'] = comp_rst_template
+        comp_templates[name + '-test.rst'] = comp_test_rst_template
+        comp_templates['example_app.xml'] = comp_example_app_rst_template
     return comp_templates
 
 

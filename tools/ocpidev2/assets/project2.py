@@ -292,17 +292,17 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         for dir_abs_path in self.get_existing_dir_abs_paths_for_clib_consideration():
             try:
                 is_libs = False
-                try:
-                    ComponentLibraries(dir_abs_path)
-                    is_libs = True
-                except InvalidAssetError as err:
-                    pass
-                try:
-                    asset = ComponentLibrary(dir_abs_path)
-                    if not is_libs:
-                        self.append_discovered_asset(asset)
-                except InvalidAssetError:
-                    pass
+                #try:
+                #    ComponentLibraries(dir_abs_path)
+                #    is_libs = True
+                #except InvalidAssetError as err:
+                #    pass
+                #try:
+                asset = ComponentLibrary(dir_abs_path)
+                if not is_libs:
+                    self.append_discovered_asset(asset)
+                #except InvalidAssetError:
+                #    pass
             except InvalidAssetError as err:
                 path = dir_abs_path
                 test = ComponentLibrary.get_dir_abs_path_is_test(path)

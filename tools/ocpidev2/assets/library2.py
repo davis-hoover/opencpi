@@ -172,9 +172,8 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
     library_locations += ['hdl/adapters', 'hdl/platforms']
     # end of CDG section 14.2.3
 
-    def __init__(
-        self, dir_abs_path, enable_path_existence_check=True, cli_dict=None
-    ):
+    def __init__(self, dir_abs_path, enable_path_existence_check=True,
+                 cli_dict=None):
         self.root_tags = ['Library']  # CDG section 10.1
         AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
         is_test = self.get_dir_abs_path_is_test(dir_abs_path)
@@ -213,7 +212,7 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
 
     def create_components_dir(self, project):
         """ If no 'components' directory exists when creating a
-            sub-component-library, create one. """
+            omponent library with a components directory, create one. """
         if not os.path.exists(project.abs_path + '/components'):
             # Create 'components' temporary variables
             abs_path = self.abs_path
@@ -224,32 +223,36 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
             comp_lib_templates = create_templates('components')
             comp_lib_templates['components.xml'] = g_asset_template
             AssetBase.create_files(self, comp_lib_templates, self.abs_path)
-            # Reset self. variables to create the sub-component-library
+            # Reset self. variables to create the component library within the
+            # components directory
             self.abs_path = abs_path
             self.name = name
 
-    def valid_library_name(self, project, comp_dict, is_sub_complib_path=False):
+    def valid_library_name(self, project, comp_dict,
+                           is_component_library_within_components_dir=False):
         """ Check for a valid component library name """
-        if is_sub_complib_path:
+        if is_component_library_within_components_dir:
             if self.name in comp_dict.keys():
                 msg = ("Sub-component-library name '" + self.name +
                        "' invalid. Cannot share component library names: " +
                        (', '.join(map(str, list(comp_dict.keys()))))) + "."
                 raise Exception(msg)
-        if not is_sub_complib_path:
+        if not is_component_library_within_components_dir:
             if self.name not in comp_dict:
                 msg = ("Component Library name '" + self.name + "' invalid. "
                        "Not part of the valid component library names: " +
                        (', '.join(map(str, list(comp_dict.keys())))) + ". "
-                        "To create a '" + self.name + "' sub-component-library"
-                        ", point (-d) to the 'components' library.")
+                       "To create a '" + self.name +
+                       "' component library within a components directory" +
+                       ", point (-d) to the 'components' library.")
                 raise Exception(msg)
 
-    def valid_path(self, project, comp_dict, is_sub_complib_path):
+    def valid_path(self, project, comp_dict,
+                   is_component_library_within_components_dir):
         """ Check that the user is providing a valid path to a component
             library. If not, provide path suggestions """
         valid_path = False
-        if is_sub_complib_path:
+        if is_component_library_within_components_dir:
             valid_path = True
         elif self.name == 'devices':
             for lib in comp_dict[self.name]:
@@ -280,12 +283,14 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
             for a given path """
         comp_lib_templates = create_templates(self.name)
         comp_dict = self.get_comp_dict(project)
-        is_sub_complib_path = _dir.endswith(project.name + '/components')
-        is_sub_comp_lib = self.name not in comp_dict.keys()
-        if is_sub_complib_path and is_sub_comp_lib:
+        is_comp_lib_within_components_dir = _dir.endswith(
+                project.name + '/components')
+        if is_comp_lib_within_components_dir and (self.name not in
+                                                  comp_dict.keys()):
             self.create_components_dir(project)
-        self.valid_library_name(project, comp_dict, is_sub_complib_path)
-        self.valid_path(project, comp_dict, is_sub_complib_path)
+        self.valid_library_name(project, comp_dict,
+                                is_comp_lib_within_components_dir)
+        self.valid_path(project, comp_dict, is_comp_lib_within_components_dir)
         comp_lib_xml_name = self.name + '.xml'
         comp_lib_templates[comp_lib_xml_name] = g_asset_template
         AssetBase.create_files(self, comp_lib_templates, self.abs_path)
@@ -472,7 +477,7 @@ def test_ComponentLibrary_create(ret):
                 except Exception as e:
                     Logger().debug(test_name + str(e))
                     passed = False
-        # Create a valid sub-component-library (Pass)
+        # Create a valid component library within components directory (Pass)
         if test == 1:
             try:
                 component_path = project_path + '/components/cmp'
@@ -518,7 +523,7 @@ def test_ComponentLibrary_create(ret):
             except Exception as e:
                 Logger().debug(test_name + str(e))
                 passed = True
-            # Create invalid sub-component-library name (Fail)
+            # Create invalid comp lib  within components directory (Fail)
             try:
                 component_path = project_path + '/devices'
                 component = ComponentLibrary(component_path, False, cli_dict)
@@ -547,7 +552,7 @@ def test_ComponentLibrary_create(ret):
                     os.system('rm -rf ' + project_path + '/components')
                     os.system('rm -rf ' + project_path + '/hdl')
                     passed = True
-            # Create a duplicate sub-component-library (Fail)
+            # Create duplicate comp lib within components directory (Fail)
             try:
                 component_path = project_path + '/components/cmp'
                 component = ComponentLibrary(component_path, False, cli_dict)
@@ -577,7 +582,7 @@ def test_ComponentLibrary_create(ret):
         # Tests ComponentLibrary.valid_path()
         if test == 5:
             # Create an invalid library path (Fail)
-            valid_libs.extend(['', 'sub_comp_lib'])
+            valid_libs.extend(['', 'comp_lib_within_components_directory'])
             for lib in valid_libs:
                 component_path = project_path + '/' + lib
                 if lib == '':

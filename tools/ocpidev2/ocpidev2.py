@@ -268,7 +268,7 @@ def get_arg_parser():
     parser.add_argument('verb', nargs='?', default='')
     if 'show' in sys.argv:
         parser = add_show_arguments(parser)
-    elif 'create' in sys.argv and 'project' in sys.argv:
+    elif 'create' in sys.argv:
         if 'project' in sys.argv:
             parser = add_create_arguments(parser, 'project')
         if 'library' in sys.argv:
@@ -334,7 +334,9 @@ def get_cli_dict():
         cli_dict['name']  contains name string (empty if unspecifed at CLI)
         cli_dict['component']    entry may not exist
         cli_dict['createtest']   entry may not exist, boolean
-        cli_dict['usehdlfileio'] entry may not exist, boolean """
+        cli_dict['usehdlfileio'] entry may not exist, boolean
+        cli_dict['xmlapp']       entry may not exist, boolean
+        cli_dict['xmldirapp']    entry may not exist, boolean """
 
 
 def create(cli_dict, project_registry):
@@ -342,7 +344,7 @@ def create(cli_dict, project_registry):
         if _dir == '':
             _dir = os.getcwd()
         if cli_dict['noun'] == 'project':
-            abs_path = _dir + '/' + args.name
+            abs_path = _dir + '/' + cli_dict['name']
             Project(abs_path, False, cli_dict).create()
             if cli_dict['register'] == True:
                 self.register('project', abs_path)
@@ -354,12 +356,12 @@ def create(cli_dict, project_registry):
                                 "create " + cli_dict['noun'] + " in a valid "
                                 "registered project directory.")
             if cli_dict['noun'] == 'library':
-                component_lib_path = _dir + '/' + args.name
+                component_lib_path = _dir + '/' + cli_dict['name']
                 ComponentLibrary(
                     component_lib_path, False, cli_dict
                 ).create(project, _dir)
             if cli_dict['noun'] == 'application':
-                application_path = _dir + '/' + cli_dict['noun'] + 's/' + args.name
+                application_path = _dir + '/' + cli_dict['noun'] + 's/' + cli_dict['name']
                 applications_dir = project.abs_path + '/applications'
                 if _dir != project.abs_path and _dir != applications_dir:
                     raise Exception("Invalid path: '" + _dir + "'. Please "
@@ -380,7 +382,7 @@ def create(cli_dict, project_registry):
                 if cli_dict['noun'] == 'component':
                     spec_create = True if cli_dict['project'] else False
                     component_path = (
-                        _dir + '/' + args.name + '.comp' + '/' + args.name +
+                        _dir + '/' + cli_dict['name'] + '.comp' + '/' + cli_dict['name'] +
                         '-comp.xml'
                     )
                     package_id = project.get_package_id()
@@ -388,12 +390,12 @@ def create(cli_dict, project_registry):
                         component_path, False, cli_dict
                     ).create(package_id, spec_create, project.abs_path)
                     if cli_dict['createtest'] == True:
-                        test_path = _dir + '/' + args.name + '.test'
+                        test_path = _dir + '/' + cli_dict['name'] + '.test'
                         cli_dict['component'] = ''
                         cli_dict['usehdlfileio'] = ''
                         Test(test_path, False, cli_dict).create()
                 if cli_dict['noun'] == 'test':
-                    test_path = _dir + '/' + args.name + '.test'
+                    test_path = _dir + '/' + cli_dict['name'] + '.test'
                     # If --component arg used, check for component existence
                     if cli_dict['component']:
                         comp_to_search = cli_dict['component']
@@ -414,10 +416,10 @@ def create(cli_dict, project_registry):
                     else:
                         valid_create_test = False
                         for ext in ['.rcc', '.hdl', '.comp']:
-                            if os.path.exists(_dir + '/' + args.name + ext):
+                            if os.path.exists(_dir + '/' + cli_dict['name'] + ext):
                                  valid_create_test = True
                         if not valid_create_test:
-                            raise Exception('A ' + args.name + ' component does '
+                            raise Exception('A ' + cli_dict['name'] + ' component does '
                                             'not yet exist to create a unit-test '
                                             'for.')
                     Test(test_path, False, cli_dict).create()
@@ -741,6 +743,7 @@ if __name__ == '__main__':
     try:
         signal.signal(signal.SIGINT, ocpidevsignint)
         cli_dict = get_cli_dict()
+        # print(cli_dict)
         project_registry = None
         if get_create_registry(cli_dict):
             disc = get_enable_registry_discovery(cli_dict)

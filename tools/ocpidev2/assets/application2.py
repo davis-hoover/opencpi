@@ -29,7 +29,7 @@ apps_dir_xml_template = """<applications>
     <libraries Applications='app1 app3'/>
     Otherwise all applications will be built and run -->
 </applications>\n
-"""
+"""  # nopep8
 
 apps_dir_rst_template = """.. Application directory index page
 
@@ -53,7 +53,7 @@ Available applications.
 
 .. The search path "*/*-application" is for backward compatibility with older
    application document naming schemes.\n
-"""
+"""  # nopep8
 
 app_rst_template = """.. {{asset.name}} documentation
 
@@ -109,7 +109,7 @@ Skeleton outline: A list of the configurable properties for each of the workers 
 Worker Artifacts
 ----------------
 Skeleton outline: Any artifacts that are produced by the application.\n
-"""
+"""  # nopep8
 
 app_cc_template = """#include <iostream>
 #include <string>
@@ -141,7 +141,7 @@ int main(/*int argc, char **argv*/) {
   }
   return 0;
 }\n
-"""
+"""  # nopep8
 
 
 def create_templates(name, applications=False):
@@ -162,7 +162,8 @@ def create_templates(name, applications=False):
 class Application(AssetBase):
     """ Reference Application Development Guide section 3 """
 
-    def __init__(self, dir_abs_path, enable_path_existence_check=True, cli_dict=None):
+    def __init__(self, dir_abs_path, enable_path_existence_check=True,
+                 cli_dict=None):
         self.root_tags = ['Application']
         AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
         # TODO investigate whether below line is necessary
@@ -187,23 +188,21 @@ class Application(AssetBase):
         """ Creates dir/files at the top-level applications directory, and
             creates dir/files within the named application directory """
         apps_dir = project_path + '/applications'
-        app_dir =  apps_dir + '/' + self.name
+        app_dir = apps_dir + '/' + self.name
         apps_templates = create_templates(self.name, applications=True)
-        AssetBase.create_files(self, apps_templates, apps_dir, duplicate=True)
+        self.create_files(apps_templates, apps_dir, duplicate=True)
         if xmlapp:
             app_templates = create_templates(self.name)
             app_templates.pop(self.name + '.cc')
-            AssetBase.create_files(self, app_templates, apps_dir, duplicate=True)
+            self.create_files(app_templates, apps_dir, duplicate=True)
         elif xmldirapp:
             app_templates = create_templates(self.name)
             app_templates.pop(self.name + '.cc')
-            AssetBase.create_files(self, app_templates, app_dir)
+            self.create_files(app_templates, app_dir)
         else:
             app_templates = create_templates(self.name, applications=False)
-            AssetBase.create_files(self, app_templates, app_dir)
+            self.create_files(app_templates, app_dir)
 
-    def parse(self, cli_dict=None):
-        AssetBase.parse(self, cli_dict)
 
 def test_Application_create(ret):
     # TODO: Implement testing for CLI args xmlapp, and xmldirapp. These are
@@ -261,7 +260,7 @@ def test_Application_create(ret):
         passed = False
         Logger().error(test_name + str(msg + app_dir + '/' + app_files[2]))
     os.system('rm -rf ' + apps_dir)
-    #os.system('tree ' + project_dir)
+    # os.system('tree ' + project_dir)
     log_pass_fail('testing Application create()', passed)
     if passed is False:
         ret = False
