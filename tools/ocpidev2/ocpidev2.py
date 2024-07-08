@@ -676,32 +676,32 @@ def clean(cli_dict, project_registry):
             _dir = os.getcwd()
         cleaned = False
         for project in project_registry.projects:
-            if project.abs_path in os.path.realpath(cli_dict.d):
-                os.system('rm -rf $(find ' + cli_dict.d + ' -type d -name gen)')
-                os.system('rm -rf $(find ' + cli_dict.d + ' -type d -name lib)')
-                os.system('rm -rf $(find ' + cli_dict.d + ' -type d -name run)')
+            if project.abs_path in os.path.realpath(_dir):
+                os.system('rm -rf $(find ' + _dir + ' -type d -name gen)')
+                os.system('rm -rf $(find ' + _dir + ' -type d -name lib)')
+                os.system('rm -rf $(find ' + _dir + ' -type d -name run)')
                 # below 4 lines account for corrupted imports/exports
-                os.system('rm -rf $(find ' + cli_dict.d + ' -type f -name imports)')
-                os.system('rm -rf $(find ' + cli_dict.d + ' -type f -name exports)')
-                os.system('rm -rf $(find ' + cli_dict.d + ' -type d -name imports)')
-                os.system('rm -rf $(find ' + cli_dict.d + ' -type d -name exports)')
-                os.system('rm -rf $(find ' + cli_dict.d + ' -type l -name imports)')
-                os.system('rm -rf $(find ' + cli_dict.d + ' -type l -name exports)')
+                os.system('rm -rf $(find ' + _dir + ' -type f -name imports)')
+                os.system('rm -rf $(find ' + _dir + ' -type f -name exports)')
+                os.system('rm -rf $(find ' + _dir + ' -type d -name imports)')
+                os.system('rm -rf $(find ' + _dir + ' -type d -name exports)')
+                os.system('rm -rf $(find ' + _dir + ' -type l -name imports)')
+                os.system('rm -rf $(find ' + _dir + ' -type l -name exports)')
                 os.system(
-                        'rm -rf $(find ' + cli_dict.d + ' -type d -name config-\*)')
+                        'rm -rf $(find ' + _dir + ' -type d -name config-\*)')
                 os.system(
-                        'rm -rf $(find ' + cli_dict.d +
+                        'rm -rf $(find ' + _dir +
                         ' -type d -name simulations)')
                 os.system(
-                        'rm -rf $(find ' + cli_dict.d + ' -type d -name target-\*)')
+                        'rm -rf $(find ' + _dir + ' -type d -name target-\*)')
                 os.system(
-                        'rm -rf $(find ' + cli_dict.d +
+                        'rm -rf $(find ' + _dir +
                         ' -type d -name container-\*)')
-                os.system('rm -rf $(find ' + cli_dict.d + " -type f -name '.*lock')")
+                os.system('rm -rf $(find ' + _dir + " -type f -name '.*lock')")
                 os.system(
-                        'rm -rf $(find ' + cli_dict.d + " -type f -name '.*build')")
+                        'rm -rf $(find ' + _dir + " -type f -name '.*build')")
                 os.system(
-                        'rm -rf $(find ' + cli_dict.d + " -type d -name artifacts)")
+                        'rm -rf $(find ' + _dir + " -type d -name artifacts)")
                 cleaned = True
         if not cleaned:
             raise Exception('cannot clean directory not in registered project')
@@ -758,6 +758,10 @@ if __name__ == '__main__':
             create(cli_dict, project_registry)
         elif cli_dict['verb'] == 'show':
             show(cli_dict, project_registry)
+        elif cli_dict['verb'] == 'register':
+            register(cli_dict, project_registry)
+        elif cli_dict['verb'] == 'unregister':
+            unregister(cli_dict, project_registry)
         else:
             raise Exception('verb ' + cli_dict['verb'] + ' is not supported')
     except Exception as exception:
