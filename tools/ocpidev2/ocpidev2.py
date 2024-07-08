@@ -296,7 +296,7 @@ def get_args(parser):
 
 def get_cli_dict_and_validate_args(args):
     """ get a dictionary of settings which looks like CLI args and has been modified as needed """
-    nouns = ['registry', 'project', 'projects', 'libraries', 'components',
+    nouns = ['registry', 'project', 'projects', 'protocol', 'libraries', 'components',
              'workers', 'library', 'component', 'test', 'application']
     # TODO move below 3 lines to AssetBase once proper checks in place
     if args.name:
@@ -423,6 +423,24 @@ def create(cli_dict, project_registry):
                                             'not yet exist to create a unit-test '
                                             'for.')
                     Test(test_path, False, cli_dict).create()
+                # TODO enable below 4 lines instead of above functionality
+                # if cli_dict['noun'] == 'component':
+                #     name = cli_dict['name']
+                #     xml_abs_path = _dir + '/' + name + '.comp' + '/' + name + '-comp.xml'
+                #     project_registry.create(Component(xml_abs_path))
+                #
+                # TODO enable below 3 lines instead of above functionality
+                # if cli_dict['noun'] == 'test':
+                #     dir_abs_path = _dir + '/' + cli_dict['name'] + '.test')
+                #     project_registry.create(Test(dir_abs_path))
+                if cli_dict['noun'] == 'protocol':
+                    # TODO set xml_abs_path to a good value
+                    xml_abs_path = ''
+                    project_registry.create(Protocol(xml_abs_path))
+                if cli_dict['noun'] == 'worker':
+                    # TODO set xml_abs_path to a good value
+                    xml_abs_path = ''
+                    project_registry.create(Worker(xml_abs_path))
 
 
 def throw_if_not_installed(platform):
