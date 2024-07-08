@@ -390,7 +390,7 @@ class Protocol(AssetBase):
         # TODO replace get_root_tags() with self.root_tags
         return ['Protocol']
 
-    def parse(self):
+    def parse(self, cli_dict, enable_path_existence_check):
         AttributeBase.parse(self, cli_dict)
         if enable_path_existence_check:
             for elem in self.get_parsed().iter():
