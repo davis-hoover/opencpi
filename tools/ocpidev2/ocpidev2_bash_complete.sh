@@ -91,7 +91,10 @@ _ocpidev2()
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "projects" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "components" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "workers" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "library" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "libraries" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "hdl" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "rcc" "$COMP_LINE")
     COMPREPLY=( $(compgen -W "$str" -- "$2") )
   elif [ "$3" == "-v" ]; then
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "registry" "$COMP_LINE")
@@ -108,9 +111,11 @@ _ocpidev2()
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "libraries" "$COMP_LINE")
     COMPREPLY=( $(compgen -W "$str" -- "$2") )
   elif [ "$3" == "hdl" ]; then
-    COMPREPLY=( $(compgen -W "workers" -- "$2") )
-  elif [ "$3" == "rcc" ]; then
-    COMPREPLY=( $(compgen -W "workers" -- "$2") )
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "worker" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "workers" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "library" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "libraries" "$COMP_LINE")
+    COMPREPLY=( $(compgen -W "$str" -- "$2") )
   elif [ "$3" == "-d" ]; then
     COMPREPLY=( $(compgen -d -S / -- "$2") )
   elif [ "$3" == "clean" ]; then
@@ -127,12 +132,16 @@ _ocpidev2()
   elif [ "$3" == "projects" ]; then
     str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose " "$COMP_LINE")
     COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
+  elif [ "$3" == "component" ]; then
+    COMPREPLY=( $(compgen -W "printf \"%s\\n\" $(ocpidev2 show components | sed "s/.*\.//g") | uniq" -- "$2") )
   elif [ "$3" == "components" ]; then
     str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose " "$COMP_LINE")
     COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
   elif [ "$3" == "workers" ]; then
     str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose " "$COMP_LINE")
     COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
+  elif [ "$3" == "library" ]; then
+    COMPREPLY=( $(compgen -W "printf \"%s\\n\" $(ocpidev2 show libraries | sed "s/.*\.//g") | uniq" -- "$2") )
   elif [ "$3" == "libraries" ]; then
     str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose " "$COMP_LINE")
     COMPREPLY=( $(compgen -W "$str -d" -- "$2") )

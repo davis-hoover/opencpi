@@ -206,6 +206,8 @@ def unittest():
 
 def add_show_arguments(parser):
     #parser.add_argument('--global-scope', action='store_true')
+    parser.add_argument('authoring_model', nargs='?', default='')
+    parser.add_argument('noun', default=None)
     return parser
 
 
@@ -257,6 +259,7 @@ def add_build_arguments(parser):
     parser.add_argument('--hdl-platform', nargs='?', default='')
     parser.add_argument('--rcc-platform', nargs='?', default='')
     parser.add_argument('-j', nargs='?', type=int, default=1)
+    parser.add_argument('noun', nargs='?', default=None)
     return parser
 
 
@@ -281,7 +284,6 @@ def get_arg_parser():
             parser = add_create_arguments(parser, 'application')
     elif 'build' in sys.argv:
         parser = add_build_arguments(parser)
-    parser.add_argument('noun', nargs='?', default=None)
     parser.add_argument('name', nargs='?', default=None)
     return parser
 
@@ -297,8 +299,14 @@ def get_args(parser):
 def get_cli_dict():
     """ get a dictionary of settings which looks like CLI args and has been modified as needed """
     args = get_args(get_arg_parser())
-    nouns = ['registry', 'project', 'projects', 'protocol', 'libraries', 'components',
-             'workers', 'library', 'component', 'test', 'application']
+    nouns = ['registry', 'project', 'projects', 'protocol', 'libraries',
+             'component', 'components', 'workers', 'library', 'component',
+             'test', 'application']
+    if args.authoring_model in nouns:
+        args.name = args.noun
+        args.noun = args.authoring_model
+        args.authoring_model = ''
+    Logger().debug('args : ' + str(args))
     # TODO move below 3 lines to AssetBase once proper checks in place
     if args.name:
         if not args.name.isidentifier():
@@ -560,34 +568,43 @@ def show(cli_dict, project_registry):
                                 msg += ' '
                             msg += project.abs_path
                         print(msg)
-                if cli_dict['noun'] == 'components':
+                if cli_dict['noun'].startswith('component'):
                     for component in project.components:
-                        if (_dir == '') or \
-                           (_dir in component.abs_path):
-                            print(str(project.get_package_id()) + '.' + component.name)
-                for component_library in project.component_libraries:
-                    pid = component_library.get_package_id(str(project.get_package_id()))
-                    if cli_dict['noun'] == 'libraries':
-                        if (_dir == '') or \
-                           (_dir in component_library.abs_path):
-                            print(pid)
-                    if cli_dict['noun'] == 'components':
-                        for component in component_library.components:
+                        if (cli_dict['name'] is None) or (cli_dict['name'] == component.name):
                             if (_dir == '') or \
                                (_dir in component.abs_path):
-                                print(pid + '.' + component.name)
+                                print(str(project.get_package_id()) + '.' + component.name)
+                for component_library in project.component_libraries:
+                    pid = component_library.get_package_id(str(project.get_package_id()))
+                    if cli_dict['noun'].startswith('librar'):
+                        if (cli_dict['name'] is None) or (cli_dict['name'] == component_library.name):
+                            if (_dir == '') or \
+                               (_dir in component_library.abs_path):
+                                if cli_dict['authoringmodel'] == '':
+                                    print(pid)
+                    if cli_dict['noun'].startswith('component'):
+                        for component in component_library.components:
+                            if (cli_dict['name'] is None) or (cli_dict['name'] == component.name):
+                                if (_dir == '') or \
+                                   (_dir in component.abs_path):
+                                    print(pid + '.' + component.name)
                     if cli_dict['noun'] == 'workers':
                         for worker in component_library.workers:
                             if (_dir == '') or \
                                (_dir in worker.abs_path):
-                                print(pid + '.' + worker.name + '.' +
-                                      worker.authoring_model)
-                if cli_dict['noun'] == 'libraries':
+                                if (cli_dict['authoringmodel'] == '') or \
+                                        (cli_dict['authoringmodel'] == worker.authoring_model):
+                                    print(pid + '.' + worker.name + '.' +
+                                          worker.authoring_model)
+                if cli_dict['noun'].startswith('librar'):
                     for hdl_primitive in project.hdl_primitives:
-                        if (_dir == '') or \
-                           (_dir in hdl_primitive.abs_path):
-                            print(str(project.get_package_id()) + '.' +
-                                  hdl_primitive.name)
+                        if (cli_dict['name'] is None) or (cli_dict['name'] == hdl_primitive.name):
+                            if (_dir == '') or \
+                               (_dir in hdl_primitive.abs_path):
+                                if (cli_dict['authoringmodel'] == '') or \
+                                        (cli_dict['authoringmodel'] == 'hdl'):
+                                    print(str(project.get_package_id()) + '.' +
+                                          hdl_primitive.name)
 
 
 def register(cli_dict, project_registry):
@@ -676,31 +693,31 @@ def get_enable_registry_discovery(cli_dict):
 
 if __name__ == '__main__':
     exit_status = 0
-    try:
-        signal.signal(signal.SIGINT, ocpidevsignint)
-        cli_dict = get_cli_dict()
-        # print(cli_dict)
-        project_registry = None
-        if get_create_registry(cli_dict):
-            disc = get_enable_registry_discovery(cli_dict)
-            project_registry = ProjectRegistry(disc, disc)
-        if cli_dict['help']:
-            _help(cli_dict, project_registry)
-        elif cli_dict['verb'] == 'build':
-            build(cli_dict, project_registry)
-        elif cli_dict['verb'] == 'clean':
-            clean(cli_dict, project_registry)
-        elif cli_dict['verb'] == 'create':
-            create(cli_dict, project_registry)
-        elif cli_dict['verb'] == 'show':
-            show(cli_dict, project_registry)
-        elif cli_dict['verb'] == 'register':
-            register(cli_dict, project_registry)
-        elif cli_dict['verb'] == 'unregister':
-            unregister(cli_dict, project_registry)
-        else:
-            raise Exception('verb ' + cli_dict['verb'] + ' is not supported')
-    except Exception as exception:
-        Logger().error(str(exception))
-        exit_status = 1
+    #try:
+    signal.signal(signal.SIGINT, ocpidevsignint)
+    cli_dict = get_cli_dict()
+    Logger().debug('cli_dict : ' + str(cli_dict))
+    project_registry = None
+    if get_create_registry(cli_dict):
+        disc = get_enable_registry_discovery(cli_dict)
+        project_registry = ProjectRegistry(disc, disc)
+    if cli_dict['help']:
+        _help(cli_dict, project_registry)
+    elif cli_dict['verb'] == 'build':
+        build(cli_dict, project_registry)
+    elif cli_dict['verb'] == 'clean':
+        clean(cli_dict, project_registry)
+    elif cli_dict['verb'] == 'create':
+        create(cli_dict, project_registry)
+    elif cli_dict['verb'] == 'show':
+        show(cli_dict, project_registry)
+    elif cli_dict['verb'] == 'register':
+        register(cli_dict, project_registry)
+    elif cli_dict['verb'] == 'unregister':
+        unregister(cli_dict, project_registry)
+    else:
+        raise Exception('verb ' + cli_dict['verb'] + ' is not supported')
+    #except Exception as exception:
+    #    Logger().error(str(exception))
+    #    exit_status = 1
     exit(exit_status)

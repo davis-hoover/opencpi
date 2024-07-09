@@ -382,7 +382,7 @@ class Protocol(AssetBase):
                  cli_dict=None):
         self.root_tags = ['Protocol']
         AssetBase.__init__(self, xml_abs_path, enable_path_existence_check)
-        # TODO raise if xml_abs_path does not have valid ['adapters', 'cards', 'devices', 'platforms']
+        # TODO raise if xml_abs_path not 'adapters cards devices platforms
         self.operations = []
         self.parse(cli_dict, enable_path_existence_check)
 
