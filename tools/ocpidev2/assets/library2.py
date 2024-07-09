@@ -27,6 +27,7 @@ from _opencpi.assets.platform2 import HdlPlatform
 from _opencpi.assets.assembly2 import HdlAssembly
 from _opencpi.assets.primitive2 import HdlLibrary
 from _opencpi.assets.application2 import Application
+from _opencpi.assets.test2 import Test
 
 comp_lib_rst_template = """
 .. {{asset.name|capitalize}} library index page
@@ -100,6 +101,8 @@ class Discoverer():
         _type = asset.get_type()
         if (_type == 'hdl worker') or (_type == 'rcc worker'):
             self.workers.append(asset)
+        if asset.get_type() == 'test':
+            self.tests.append(asset)
         Logger().log(9, 'discovered ' + _type + ' ' + asset.abs_path)
 
     def get_potential_asset_dir_abs_paths(self, parent):
@@ -131,9 +134,11 @@ class Discoverer():
                     if tmp.endswith('.rcc'):
                         # due to edge cases such as testzc.rcc, testmulti.rcc
                         assets = RccAssembly(dir_abs_path).workers
-                    elif not tmp.endswith('.test'):
+                    else:
                         tmp = dir_abs_path + '/' + name + '.xml'
                         assets.append(Worker(tmp))
+                elif tmp.endswith('.test'):
+                    assets.append(Test(dir_abs_path))
                 for asset in assets:
                     if allowlist is not None:
                         # TODO is this pre-2.0???
@@ -354,6 +359,7 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
     def discover(self, allowlist, platform=False):
         self.discover_components()
         self.discover_workers(allowlist, platform)
+        self.discover_tests()
 
     def discover_components(self):
         SpecsDirectory.discover_components(self)
@@ -367,11 +373,12 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
                         pass
 
     def discover_workers(self, allowlist, platform=False):
-        """ workers is a list containing the attribute that serves as a
-            discovery "allowlist" """
         # Logger().debug(str(allowlist))
         # '' in below line indicates worker discovery
         self.discover_dir_assets('', allowlist, platform)
+
+    def discover_tests(self):
+        self.discover_dir_assets('', None, False)
 
     def get_type(self):
         return 'component library'

@@ -82,7 +82,7 @@ class Test(AssetBase):
         return ret
 
     def get_type(self):
-        return 'tests'
+        return 'test'
 
     def parse(self, cli_dict=None):
         AssetBase.parse(self, cli_dict)

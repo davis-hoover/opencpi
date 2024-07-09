@@ -639,7 +639,7 @@ def show(cli_dict, project_registry):
                         for test in component_library.tests:
                             if (_dir == '') or \
                                (_dir in test.abs_path):
-                                msg = pid + '.' + test.name + '.test'
+                                msg = pid + '.' + test.name
                                 if cli_dict['verbose']:
                                     msg += ' '
                                     for idx in range(50-len(msg)):
