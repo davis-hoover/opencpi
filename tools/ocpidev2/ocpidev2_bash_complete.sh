@@ -72,6 +72,7 @@ _ocpidev2()
 {
   str=""
   str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-h " "--help " "$COMP_LINE")
+  str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose" "$COMP_LINE")
   if [ "$3" == "build" ]; then
     str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-j" "--jobs" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "--hdl-platform" "$COMP_LINE")
@@ -98,13 +99,6 @@ _ocpidev2()
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "rcc" "$COMP_LINE")
     COMPREPLY=( $(compgen -W "$str" -- "$2") )
   elif [ "$3" == "-v" ]; then
-    str=$(get_compgen_str_for_option_only_allowed_once "$str" "registry" "$COMP_LINE")
-    str=$(get_compgen_str_for_option_only_allowed_once "$str" "projects" "$COMP_LINE")
-    str=$(get_compgen_str_for_option_only_allowed_once "$str" "components" "$COMP_LINE")
-    str=$(get_compgen_str_for_option_only_allowed_once "$str" "workers" "$COMP_LINE")
-    str=$(get_compgen_str_for_option_only_allowed_once "$str" "libraries" "$COMP_LINE")
-    COMPREPLY=( $(compgen -W "$str" -- "$2") )
-  elif [ "$3" == "--verbose" ]; then
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "registry" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "projects" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "components" "$COMP_LINE")
