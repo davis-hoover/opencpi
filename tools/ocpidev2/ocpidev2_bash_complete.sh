@@ -89,6 +89,7 @@ _ocpidev2()
   elif [ "$3" == "show" ]; then
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "registry" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "projects" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "component" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "components" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "workers" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "library" "$COMP_LINE")
