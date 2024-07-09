@@ -14,12 +14,17 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-The registry used is the one in the OpenCPI
+The *`show`* verb is slightly different from other verbs since the command
+currently is not associated with a project, but with the operating
+environment by default. The registry used is the one in the OpenCPI
 installation unless overridden using the *`OCPI_PROJECT_REGISTRY_DIR`*
 environment variable.
 
 Asset types to be specified in the '<noun>' argument are:
 
+*`component`*::
+    Display information on the specified component.
+    
 *`components`*::
     Display all components in registered projects.
 
@@ -34,6 +39,16 @@ Asset types to be specified in the '<noun>' argument are:
 
 *`workers`*::
     Display all workers in registered projects.
+
+Use the keywords *`rcc`* and *`hdl`* to scope what is displayed
+for the *`library`* and *`libraries`* nouns. For example, the command:
+
+--------------------------
+ocpidev show hdl libraries
+--------------------------
+
+
+only shows the available HDL libraries.
 
 OPTIONS
 -------
