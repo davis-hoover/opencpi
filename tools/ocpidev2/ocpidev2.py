@@ -357,16 +357,16 @@ class AssetFactory():
         if cli_dict['noun'] == 'worker':
             self.asset = Worker(abs_path, False, cli_dict)
 
-    def create(self, project_registry):
+    def create(self, cli_dict, project_registry):
         Logger().info('creating ' + self.asset.get_type() + ' ' + self.asset.name)
-        project_registry.create(self.asset)
+        project_registry.create(self.asset, cli_dict)
 
 
 def create(cli_dict, project_registry):
     for _dir in cli_dict['d']:
         if _dir == '':
             _dir = os.getcwd()
-        AssetFactory(_dir, cli_dict).create(project_registry)
+        AssetFactory(_dir, cli_dict).create(cli_dict, project_registry)
 
 
 def throw_if_not_installed(platform):
