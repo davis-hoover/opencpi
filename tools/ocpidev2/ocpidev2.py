@@ -208,6 +208,7 @@ def add_show_arguments(parser):
     #parser.add_argument('--global-scope', action='store_true')
     parser.add_argument('authoring_model', nargs='?', default='')
     parser.add_argument('noun', default=None)
+    parser.add_argument('name', nargs='?', default=None)
     return parser
 
 
@@ -251,6 +252,8 @@ def add_create_arguments(parser, noun):
         group = parser.add_mutually_exclusive_group()
         group.add_argument('-X', '--xml-app', default=False, action='store_true')
         group.add_argument('-x', '--xml-dir-app', default=False, action='store_true')
+    parser.add_argument('noun', default=None)
+    parser.add_argument('name', default=None)
     return parser
 
 
@@ -260,6 +263,7 @@ def add_build_arguments(parser):
     parser.add_argument('--rcc-platform', nargs='?', default='')
     parser.add_argument('-j', nargs='?', type=int, default=1)
     parser.add_argument('noun', nargs='?', default=None)
+    parser.add_argument('name', nargs='?', default=None)
     return parser
 
 
@@ -272,19 +276,20 @@ def get_arg_parser():
     if 'show' in sys.argv:
         parser = add_show_arguments(parser)
     elif 'create' in sys.argv:
+        noun = ''
         if 'project' in sys.argv:
-            parser = add_create_arguments(parser, 'project')
+            noun = 'project'
         if 'library' in sys.argv:
-            parser = add_create_arguments(parser, 'library')
+            noun = 'library'
         if 'component' in sys.argv:
-            parser = add_create_arguments(parser, 'component')
+            noun = 'component'
         if 'test' in sys.argv:
-            parser = add_create_arguments(parser, 'test')
+            noun = 'test'
         if 'application' in sys.argv:
-            parser = add_create_arguments(parser, 'application')
+            noun = 'application'
+        parser = add_create_arguments(parser, noun)
     elif 'build' in sys.argv:
         parser = add_build_arguments(parser)
-    parser.add_argument('name', nargs='?', default=None)
     return parser
 
 
@@ -302,11 +307,15 @@ def get_cli_dict():
     nouns = ['application', 'applications', 'registry', 'project', 'projects', 'protocol', 'libraries',
              'component', 'components', 'workers', 'library', 'component',
              'test', 'tests']
-    if args.authoring_model in nouns:
-        args.name = args.noun
-        args.noun = args.authoring_model
-        args.authoring_model = ''
     Logger().debug('args : ' + str(args))
+    try:
+        if args.authoring_model in nouns:
+            args.name = args.noun
+            args.noun = args.authoring_model
+            args.authoring_model = ''
+    except:
+        # TODO replace this hack
+        args.authoring_model = None
     # TODO move below 3 lines to AssetBase once proper checks in place
     if args.name:
         if not args.name.isidentifier():

@@ -188,7 +188,7 @@ class ProjectRegistry():
     def create(self):
         pass
 
-    def create(self, asset):
+    def create(self, asset, cli_dict):
         # TODO add ability to create asset in un-registered project
         project = next((proj for proj in self.projects if
                         proj.abs_path + '/' in asset.get_dir_abs_path() + '/'), None)
