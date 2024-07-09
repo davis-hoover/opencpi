@@ -174,6 +174,13 @@ def test_show(ret):
     return ret
 
 
+def test_create(ret):
+    create({'d' : [''], 'help' : False, 'verbose' : False, 'noun' : 'project', 'register' : False})
+    create({'d' : [''], 'help' : False, 'verbose' : False, 'noun' : 'project', 'register' : True})
+    #create({'d' : ['/tmp/1', '/tmp/2'], 'help' : False, 'verbose' : False, 'noun' : 'project', 'register' : True})
+    return ret
+
+
 def unittest():
     ret = True
     # ret = test_GNUMakefile(ret)
@@ -252,6 +259,11 @@ def add_create_arguments(parser, noun):
         group = parser.add_mutually_exclusive_group()
         group.add_argument('-X', '--xml-app', default=False, action='store_true')
         group.add_argument('-x', '--xml-dir-app', default=False, action='store_true')
+    if noun == 'protocol':
+        group = parser.add_mutually_exclusive_group()
+        group.add_argument('-p', '--project', default=False, action='store_true')
+        group.add_argument('--hdl-library', nargs='?', default=None)
+        group.add_argument('-l', '--library', default=None)
     parser.add_argument('noun', default=None)
     parser.add_argument('name', default=None)
     return parser
@@ -287,6 +299,8 @@ def get_arg_parser():
             noun = 'test'
         if 'application' in sys.argv:
             noun = 'application'
+        if 'protocol' in sys.argv:
+            noun = 'protocol'
         parser = add_create_arguments(parser, noun)
     elif 'build' in sys.argv:
         parser = add_build_arguments(parser)
@@ -343,6 +357,23 @@ def get_cli_dict():
     return cli_dict
 
 
+#def get_project_associated_with_working_dir():
+#    """ this exists because of, e.g.
+#        create protocol --hdl-library (in current project) """
+#    _dir = os.normpath(os.getcwd())
+#    while True:
+#      try:
+#          project = Project(_dir)
+#          break
+#      except InvalidAssetError:
+#          pass
+#      _dir = _dir.rsplit('/', 1)[0]  # walk up directories
+#      if _dir == '':
+#          msg = 'working directory does not exist in a project'
+#          raise InvalidAssetError(msg)
+#    return project
+
+
 class AssetFactory():
 
     def __init__(self, _dir, cli_dict):
@@ -359,6 +390,9 @@ class AssetFactory():
             self.asset = Project(abs_path, False, cli_dict)
         if cli_dict['noun'] == 'protocol':
             abs_path += '-prot.xml'
+            #if cli_dict['hdllibrary'] != '':
+            #    project = get_project_associated_with_working_dir()
+            #    abs_path = project.get_dir_abs_path() + '/hdl/' + cli_dict['hdllibrary']
             self.asset = Protocol(abs_path, False, cli_dict)
         if cli_dict['noun'] == 'test':
             abs_path += '.test'

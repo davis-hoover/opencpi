@@ -221,12 +221,13 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             if not self.attrs['PackagePrefix'].isidentifier():
                 raise InvalidAssetError('PackagePrefix must contain only alphanumeric characters and not start with a number')
 
-    def create(self):
-        project_path = self.get_dir_abs_path()
-        AssetBase.create_files(self, project_templates, project_path)
-
-    def create(self, asset):
-        asset.create()
+    def create(self, asset=None, cli_dict=None):
+        if asset is None:
+            # create self (a project)
+            AssetBase.create_files(self, project_templates, self.get_dir_abs_path())
+        else:
+            #if asset.get_type() == 'protocol':
+            asset.create() # create the asset within the found project
 
     def discover(
             self, do_component_libraries=True, do_hdl_primitives=True,
@@ -259,7 +260,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             component libraries locations that are guaranteed to exist """
         # CDG section 14.2.3
         dir_abs_paths = []
-        for _dir in ComponentLibrary.library_locations:
+        for _dir in ComponentLibrary.valid_locations:
             dir_abs_path = self.get_dir_abs_path() + '/' + _dir
             if os.path.isdir(dir_abs_path):
                 # add to dir_abs_path the absolute path to the directories

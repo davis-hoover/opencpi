@@ -186,20 +186,25 @@ class ProjectRegistry():
         pass
 
     def create(self):
+        """ create self (a project registry) """
         pass
 
     def create(self, asset, cli_dict):
+        """ create the asset within the project """
         # TODO add ability to create asset in un-registered project
         project = next((proj for proj in self.projects if
                         proj.abs_path + '/' in asset.get_dir_abs_path() + '/'), None)
-        if project == None:
-              msg = ("Invalid path: '" + asset.get_dir_abs_path() +
-                    "'. Please perform 'create " +
-                    args.noun + "' in a valid registered project.")
-              raise Exception(msg)
+        if (project == None):
+            if cli_dict['noun'] == 'project':
+                asset.create()  # create the project itself
+            else:
+                msg = ("Invalid path: '" + asset.get_dir_abs_path() +
+                      "'. Please perform 'create " +
+                      cli_dict['noun'] + "' in a valid registered project.")
+                raise Exception(msg)
         else:
             # TODO check if _dir exists within the project
-            project.create(asset)
+            project.create(asset, cli_dict)
 
 
 def test_ProjectRegistry(ret):

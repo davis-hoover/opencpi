@@ -173,14 +173,15 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         represented by a directory and knows nothing about the project it
         is in or its package ID. """
     # start of CDG section 14.2.3
-    library_locations = ['components', 'hdl/devices', 'hdl/cards']
-    library_locations += ['hdl/adapters', 'hdl/platforms']
+    valid_locations = ['components', 'hdl/devices', 'hdl/cards']
+    valid_locations += ['hdl/adapters', 'hdl/platforms']
     # end of CDG section 14.2.3
 
     def __init__(self, dir_abs_path, enable_path_existence_check=True,
                  cli_dict=None):
         self.root_tags = ['Library']  # CDG section 10.1
         AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
+        self.raise_if_invalid_location()
         is_test = self.get_dir_abs_path_is_test(dir_abs_path)
         if is_test or self.get_dir_abs_path_is_worker(dir_abs_path):
             self.raise_invalid_asset_error()
@@ -205,7 +206,7 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         """ Update comp_dict with discovered project
             hdl/platform/<platform_name> libraries """
         comp_dict = ({lib.split('/')[-1]: lib for lib in
-                     ComponentLibrary.library_locations})
+                     ComponentLibrary.valid_locations})
         platform_device_libs = []
         for proj_plat in project.hdl_platforms:
             plat_rel = proj_plat.abs_path.split('/')[-3:]
