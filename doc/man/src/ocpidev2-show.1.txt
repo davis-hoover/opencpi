@@ -22,20 +22,41 @@ environment variable.
 
 Asset types to be specified in the '<noun>' argument are:
 
+*`application`*::
+    Display information on the specified application.
+
+*`applications`*::
+    Display all applications in registered projects.
+
 *`component`*::
     Display information on the specified component.
     
 *`components`*::
     Display all components in registered projects.
 
+*`library`*::
+    Display information on the specified library.
+
 *`libraries`*::
-    Display information on all the libraries in the current scope.
+    Display all libraries in registered projects.
+
+*`project`*::
+    Display information on the specified registered project.
 
 *`projects`*::
     Display all registered projects.
 
 *`registry`*::
     Display information on the registry.
+
+*`test`*::
+    Display all unit tests in registered projects.
+
+*`tests`*::
+    Display information on the specified unit test.
+
+*`worker`*::
+    Display information on the specified worker.
 
 *`workers`*::
     Display all workers in registered projects.
