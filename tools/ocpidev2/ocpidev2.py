@@ -558,16 +558,18 @@ def show(cli_dict, project_registry):
                     print(project_registry.abs_path)
             msg = ''
             for project in project_registry.projects:
-                if cli_dict['noun'] == 'projects':
-                    if (_dir == '') or \
-                       (_dir in project.abs_path):
-                        msg = str(project.get_package_id())
-                        if cli_dict['verbose']:
-                            msg += ' '
-                            for idx in range(30-len(msg)):
+                if cli_dict['noun'].startswith('project'):
+                    if (cli_dict['name'] is None) or \
+                       (cli_dict['name'] == project.name):
+                        if (_dir == '') or \
+                           (_dir in project.abs_path):
+                            msg = str(project.get_package_id())
+                            if cli_dict['verbose']:
                                 msg += ' '
-                            msg += project.abs_path
-                        print(msg)
+                                for idx in range(30-len(msg)):
+                                    msg += ' '
+                                msg += project.abs_path
+                            print(msg)
                 if cli_dict['noun'].startswith('component'):
                     for component in project.components:
                         if (cli_dict['name'] is None) or (cli_dict['name'] == component.name):
