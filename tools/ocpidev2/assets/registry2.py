@@ -108,10 +108,10 @@ class ProjectRegistry():
         return ret
 
     def get_abs_path_project(self, abs_path):
-        """ get project which contains indicated path """
+        """ get project which contains indicated abs_path """
         ret = None
         for project in self.projects:
-            if project.abs_path in abs_path:
+            if (project.abs_path + '/') in (abs_path + '/'):
                 ret = project
         if ret is None:
             raise_not_found_in_projects('path', abs_path)

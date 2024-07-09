@@ -357,23 +357,6 @@ def get_cli_dict():
     return cli_dict
 
 
-#def get_project_associated_with_working_dir():
-#    """ this exists because of, e.g.
-#        create protocol --hdl-library (in current project) """
-#    _dir = os.normpath(os.getcwd())
-#    while True:
-#      try:
-#          project = Project(_dir)
-#          break
-#      except InvalidAssetError:
-#          pass
-#      _dir = _dir.rsplit('/', 1)[0]  # walk up directories
-#      if _dir == '':
-#          msg = 'working directory does not exist in a project'
-#          raise InvalidAssetError(msg)
-#    return project
-
-
 class AssetFactory():
 
     def __init__(self, _dir, cli_dict):
@@ -390,9 +373,10 @@ class AssetFactory():
             self.asset = Project(abs_path, False, cli_dict)
         if cli_dict['noun'] == 'protocol':
             abs_path += '-prot.xml'
-            #if cli_dict['hdllibrary'] != '':
-            #    project = get_project_associated_with_working_dir()
-            #    abs_path = project.get_dir_abs_path() + '/hdl/' + cli_dict['hdllibrary']
+            if cli_dict['hdllibrary'] != '':
+                cwd = Environment().getcwd()
+                project = project_registry.get_abs_path_project(cwd)
+                abs_path = project.get_dir_abs_path() + '/hdl/' + cli_dict['hdllibrary']
             self.asset = Protocol(abs_path, False, cli_dict)
         if cli_dict['noun'] == 'test':
             abs_path += '.test'
