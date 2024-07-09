@@ -299,9 +299,9 @@ def get_args(parser):
 def get_cli_dict():
     """ get a dictionary of settings which looks like CLI args and has been modified as needed """
     args = get_args(get_arg_parser())
-    nouns = ['registry', 'project', 'projects', 'protocol', 'libraries',
+    nouns = ['application', 'applications', 'registry', 'project', 'projects', 'protocol', 'libraries',
              'component', 'components', 'workers', 'library', 'component',
-             'test', 'application']
+             'test', 'tests']
     if args.authoring_model in nouns:
         args.name = args.noun
         args.noun = args.authoring_model
@@ -570,6 +570,18 @@ def show(cli_dict, project_registry):
                                     msg += ' '
                                 msg += project.abs_path
                             print(msg)
+                if cli_dict['noun'].startswith('application'):
+                    for application in project.applications:
+                        if (cli_dict['name'] is None) or (cli_dict['name'] == application.name):
+                            if (_dir == '') or \
+                               (_dir in application.abs_path):
+                                msg = str(project.get_package_id()) + '.' + application.name
+                                if cli_dict['verbose']:
+                                    msg += ' '
+                                    for idx in range(60-len(msg)):
+                                        msg += ' '
+                                    msg += application.abs_path
+                                print(msg)
                 if cli_dict['noun'].startswith('component'):
                     for component in project.components:
                         if (cli_dict['name'] is None) or (cli_dict['name'] == component.name):
@@ -623,6 +635,17 @@ def show(cli_dict, project_registry):
                                             msg += ' '
                                         msg += worker.abs_path
                                     print(msg)
+                    if cli_dict['noun'].startswith('test'):
+                        for test in component_library.tests:
+                            if (_dir == '') or \
+                               (_dir in test.abs_path):
+                                msg = pid + '.' + test.name + '.test'
+                                if cli_dict['verbose']:
+                                    msg += ' '
+                                    for idx in range(50-len(msg)):
+                                        msg += ' '
+                                    msg += test.abs_path
+                                print(msg)
                 if cli_dict['noun'].startswith('librar'):
                     for hdl_primitive in project.hdl_primitives:
                         if (cli_dict['name'] is None) or (cli_dict['name'] == hdl_primitive.name):
