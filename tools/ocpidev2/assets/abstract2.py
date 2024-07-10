@@ -125,6 +125,9 @@ class Environment():
             # directory absolute paths are handled (avoids bugs)
             self.ocpi_project_path = [opp.strip('/') for opp in ocpi_project_path]
 
+    def getcwd(self):
+        return os.normpath(os.getcwd())
+
 
 class Logger(Environment):
 
