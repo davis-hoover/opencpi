@@ -146,7 +146,6 @@ class Logger(Environment):
     def warn(self, msg):
         # only intended to supress for tab completion
         global g_suppress_warn
-        print(str(g_suppress_warn))
         if not g_suppress_warn:
             self.log(0, 'WARN:  ' + msg, '\033[93m')
 
