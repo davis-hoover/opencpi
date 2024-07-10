@@ -206,7 +206,9 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                 #   - hdl/adapters/
                 #   - hdl/platforms/
                 dir_abs_paths.append(dir_abs_path)
-                subdir_abs_paths = AssetBase.get_existing_abs_dir_paths_for_asset_consideration(dir_abs_path)
+                a = dir_abs_path
+                b = AssetBase.get_existing_abs_dir_paths_for_asset_consid(a)
+                subdir_abs_paths = b
                 if _dir == 'components':
                     for subdir_abs_path in subdir_abs_paths:
                         a = subdir_abs_path

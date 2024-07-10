@@ -1,4 +1,4 @@
-#This file is protected by Copyright. Please refer to the COPYRIGHT file
+# This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
 # This file is part of OpenCPI <http://www.opencpi.org>
@@ -90,7 +90,7 @@ class ProjectRegistry():
         """ get project which contains named worker """
         ret = None
         for project in self.projects:
-            if project.get_worker_by_name(name) != None:
+            if project.get_worker_by_name(name) is not None:
                 ret = project
         if ret is None:
             raise_not_found_in_projects('worker', name)
@@ -161,50 +161,16 @@ class ProjectRegistry():
             abs_path = self.abs_path + '/' + _dir
             project_abs_path = os.path.realpath(abs_path)
             if (not os.path.exists(project_abs_path)) or \
-                not (self.get_abs_path_is_project(project_abs_path)):
+                    not (self.get_abs_path_is_project(project_abs_path)):
                 name = project_abs_path.split('/')[-1]
-                msg = 'registry corrupted for ' + name + ' project entry (broken symlink: ' + abs_path + ')'
+                msg = 'registry corrupted for ' + name
+                msg += ' project entry (broken symlink: ' + abs_path + ')'
                 Logger().warn(msg)
             if self.get_abs_path_is_project(project_abs_path):
                 project = Project(project_abs_path, False)
                 project.discover(do_component_libraries, do_hdl_primitives)
                 self.projects.append(project)
         Logger().debug('end of project discovery')
-
-    def register_project(self, project_path):
-        project = Project(project_path, False)  # raises if not a project
-        symlink_path = self.abs_path + '/' + str(project.get_package_id())
-        if not os.path.islink(symlink_path):
-            os.symlink(project.abs_path, symlink_path)
-
-    def unregister_project(self, project_path):
-        project = Project(project_path, False)  # raises if not a project
-        pid = str(project.get_package_id())
-        os.system('unlink ' + self.abs_path + '/' + pid)
-
-    def create_templates(self):
-        pass
-
-    def create(self):
-        """ create self (a project registry) """
-        pass
-
-    def create(self, asset, cli_dict):
-        """ create the asset within the project """
-        # TODO add ability to create asset in un-registered project
-        project = next((proj for proj in self.projects if
-                        proj.abs_path + '/' in asset.get_dir_abs_path() + '/'), None)
-        if (project == None):
-            if cli_dict['noun'] == 'project':
-                asset.create()  # create the project itself
-            else:
-                msg = ("Invalid path: '" + asset.get_dir_abs_path() +
-                      "'. Please perform 'create " +
-                      cli_dict['noun'] + "' in a valid registered project.")
-                raise Exception(msg)
-        else:
-            # TODO check if _dir exists within the project
-            project.create(asset, cli_dict)
 
 
 def test_ProjectRegistry(ret):

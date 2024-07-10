@@ -891,7 +891,7 @@ class AssetBase(AttributeBase):
                 (os.path.isfile(entry) or (entry != 'lib'))]
 
     @staticmethod
-    def get_existing_abs_dir_paths_for_asset_consideration(parent_abs_path):
+    def get_existing_abs_dir_paths_for_asset_consid(parent_abs_path):
         """ return list of absolute paths of (non-recursive) directories
             within parent_abs_path which exist and are to be considered as
             assets to be discovered """
