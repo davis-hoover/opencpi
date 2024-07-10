@@ -171,7 +171,8 @@ EXPORTS=EXTRA_CFLAGS="$(EXTRA_CFLAGS)" KCPPFLAGS="$(KCPPFLAGS)" CROSS_COMPILE="$
 
 $(MODFILE): opencpi.c $(shell echo $$(cd $(KERNELDIR); pwd -P))
 	$(AT) $(if $(CROSS_COMPILE), $(and $(OcpiKernelEnv), source $(OcpiKernelEnv) &&) echo Building kernel tools that run on the development host &&\
-	    $(MAKE) -C $(KERNELDIR) V=2 scripts)
+	    $(MAKE) -C $(KERNELDIR) V=2 scripts &&\
+	    $(MAKE) -C $(KERNELDIR) V=2 prepare0)
 	$(AT)echo Building kernel module $(MODFILE)
 	$(AT)$(and $(KERNELDIR), $(and $(OcpiKernelEnv), source $(OcpiKernelEnv) &&) $(MAKE) -C $(KERNELDIR) M=$(PWD) V=2 modules)
 	$(AT)mkdir -p $(MyTargetDir)
