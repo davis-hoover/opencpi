@@ -860,12 +860,15 @@ class AssetBase(AttributeBase):
                 else:
                     raise InvalidAssetError(msg)
 
+    def raise_invalid_location(self):
+        msg = self.get_type() + ' can not exist in directory '
+        msg += self.get_dir_abs_path()
+        raise InvalidAssetError(msg)
+
     def raise_if_invalid_location(self):
         if not any([self.get_dir_abs_path().endswith(loc) for loc in
                     self.valid_locations]):
-            msg = self.get_type() + ' can not exist in directory '
-            msg += self.get_dir_abs_path()
-            raise InvalidAssetError(msg)
+            self.raise_invalid_location()
 
     def get_paths_to_parse(self):
         return []

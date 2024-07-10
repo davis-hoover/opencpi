@@ -181,7 +181,11 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
                  cli_dict=None):
         self.root_tags = ['Library']  # CDG section 10.1
         AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
-        self.raise_if_invalid_location()
+        try:
+            self.raise_if_invalid_location()
+        except InvalidAssetError:
+            if len(dir_abs_path.split('components/')) != 2:
+                self.raise_invalid_location()
         is_test = self.get_dir_abs_path_is_test(dir_abs_path)
         if is_test or self.get_dir_abs_path_is_worker(dir_abs_path):
             self.raise_invalid_asset_error()
