@@ -182,7 +182,7 @@ def test_HdlCardPlatformBase(ret):
             # if test == 2:
             #     passed = (uut.devices.keys() == ['foo']) and
             #              (uut.devices.values() == ['foo'])
-        except:
+        except InvalidAssetError:
             passed = False
         if test == 0:
             log_pass_fail('testing HdlCardPlatformBase abs_path', passed)
@@ -210,7 +210,7 @@ def test_HdlPlatform(ret):
             print(str([a for a in dir(uut) if not
                   callable(getattr(uut, a))]))
             os.system('cat ' + xml_abs_path)
-    except:
+    except InvalidAssetError:
         passed = False
     log_pass_fail('testing HdlPlatform', passed)
     if passed is False:
@@ -231,7 +231,7 @@ def test_HdlPlatformConfiguration(ret):
         if Environment().ocpi_log_level >= 10:
             os.system('cat ' + xml_abs_path)
         platform = HdlPlatformConfiguration(xml_abs_path)
-    except:
+    except InvalidAssetError:
         passed = False
     log_pass_fail('testing HdlPlatformConfiguration', passed)
     if passed is False:
@@ -269,7 +269,7 @@ def test_HdlCard(ret):
         log_pass_fail('testing HdlCard devices', passed)
         if uut.attrs['Type'] != 'a_slot':
             passed = False
-    except:
+    except InvalidAssetError:
         passed = False
     log_pass_fail('testing HdlCard type', passed)
     if passed is False:

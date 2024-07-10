@@ -30,79 +30,12 @@ from _opencpi.assets.primitive2 import HdlLibrary
 from _opencpi.assets.assembly2 import HdlAssembly
 from _opencpi.assets.platform2 import HdlCard, HdlPlatform
 
-project_templates = {}
-project_templates['Project.exports'] = """
-# This file specifies aspects of this project that are made available to users,
-# by adding or subtracting from what is automatically exported based on the
-# documented rules.
-# Lines starting with + add to the exports
-# Lines starting with - subtract from the exports
-all
-
-\n\n\n"""
-
-project_templates['.gitignore'] = """
-# Lines starting with '#' are considered comments.
-# Ignore (generated) html files,
-#*.html
-# except foo.html which is maintained by hand.
-#!foo.html
-# Ignore objects and archives.
-*.rpm
-*.obj
-*.so
-*~
-*.o
-target-*/
-*.deps
-gen/
-*.old
-*.hold
-*.orig
-*.log
-lib/
-#Texmaker artifacts
-*.aux
-*.synctex.gz
-*.out
-**/doc*/*.pdf
-**/doc*/*.toc
-**/doc*/*.lof
-**/doc*/*.lot
-run/
-exports/
-imports
-*.pyc
-simulations/
-\n\n"""
-
-project_templates['.gitattributes'] = """
-*.ngc -diff
-*.edf -diff
-*.bit -diff
-\n\n"""
-
-project_templates['Project.rst'] = """
-.. {{asset.name}} top level project documentation
-
-
-{{asset.name|capitalize}}
-===============
-Skeleton outline: Description of project.
-
-.. toctree::
-   :maxdepth: 2
-
-   components/components
-   hdl/primitives/primitives
-   specs/specs
-\n"""
-
 
 class Project(AssetBase, SpecsDirectory, Discoverer):
     """ Component Development Guide section 14 """
 
-    def __init__(self, dir_abs_path, enable_path_existence_check=True, cli_dict=None):
+    def __init__(self, dir_abs_path, enable_path_existence_check=True,
+                 cli_dict=None):
         self.root_tags = ['Project']
         AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
         SpecsDirectory.__init__(self)
@@ -135,14 +68,22 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
     def get_attr_infos(self):
         ret = []
         # Attributes provided (partially) in CDG 10.1 Table 7
-        ret.append(AttributeInfo('ProjectDependencies', is_list=True, cli=('-D', '--depend')))
-        ret.append(AttributeInfo('PackagePrefix', cli=('-F', '--package-prefix')))
-        ret.append(AttributeInfo('PackageID', cli=('-K', '--package-id')))
-        ret.append(AttributeInfo('PackageName', cli=('-N', '--package-name')))
-        ret.append(AttributeInfo('XmlIncludeDirs', is_list=True, cli=('-A', '--xml-include')))
-        ret.append(AttributeInfo('IncludeDirs', is_list=True, cli=('-I', '--include-dir')))
-        ret.append(AttributeInfo('HdlLibraries', is_list=True, cli=('-Y', '--primitive-library')))
-        ret.append(AttributeInfo('Libraries', is_list=True, cli=('-y', '--component-library')))
+        ret.append(AttributeInfo('ProjectDependencies',
+                   is_list=True, cli=('-D', '--depend')))
+        ret.append(AttributeInfo('PackagePrefix',
+                   cli=('-F', '--package-prefix')))
+        ret.append(AttributeInfo('PackageID',
+                   cli=('-K', '--package-id')))
+        ret.append(AttributeInfo('PackageName',
+                   cli=('-N', '--package-name')))
+        ret.append(AttributeInfo('XmlIncludeDirs',
+                   is_list=True, cli=('-A', '--xml-include')))
+        ret.append(AttributeInfo('IncludeDirs',
+                   is_list=True, cli=('-I', '--include-dir')))
+        ret.append(AttributeInfo('HdlLibraries',
+                   is_list=True, cli=('-Y', '--primitive-library')))
+        ret.append(AttributeInfo('Libraries',
+                   is_list=True, cli=('-y', '--component-library')))
         for attr_key in ['HdlTargets', 'HdlPlatforms', 'RccPlatforms',
                          'RccHdlPlatforms', 'ComponentLibraries',
                          'OnlyTargets', 'OnlyPlatforms',
@@ -203,7 +144,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         paths = []
         # start pre-2.0 opencpi
         paths += [self.abs_path + '/Project.mk']
-        # intentionally put xml path last so that its attributes take precedence
+        # intentionally put xml last so that its attributes take precedence
         # TODO consolidate with get_asset2() from AttributeBase
         paths.append(self.get_xml_abs_path())
         # end pre-2.0 opencpi
@@ -217,15 +158,9 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         # TODO: Include these checks in other parse() get_attr_list logic
         if self.attrs['PackagePrefix'] != '':
             if not self.attrs['PackagePrefix'].isidentifier():
-                raise InvalidAssetError('PackagePrefix must contain only alphanumeric characters and not start with a number')
-
-    def create(self, asset=None, cli_dict=None):
-        if asset is None:
-            # create self (a project)
-            AssetBase.create_files(self, project_templates, self.get_dir_abs_path())
-        else:
-            #if asset.get_type() == 'protocol':
-            asset.create() # create the asset within the found project
+                msg = 'PackagePrefix must contain only alphanumeric '
+                msg += 'characters and not start with a number'
+                raise InvalidAssetError(msg)
 
     def discover(
             self, do_component_libraries=True, do_hdl_primitives=True,
@@ -262,8 +197,8 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             dir_abs_path = self.get_dir_abs_path() + '/' + _dir
             if os.path.isdir(dir_abs_path):
                 # add to dir_abs_path the absolute path to the directories
-                # of the following form from CDG section 14.2.3., if they exist,
-                # regardless of whether a "sub"-library directory, e.g.
+                # of the following form from CDG section 14.2.3., if they
+                # exist, regardless of whether a "sub"-library directory, e.g.
                 # components/<library>, exists:
                 #   - components/
                 #   - hdl/devices/
@@ -274,9 +209,11 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                 subdir_abs_paths = AssetBase.get_existing_abs_dir_paths_for_asset_consideration(dir_abs_path)
                 if _dir == 'components':
                     for subdir_abs_path in subdir_abs_paths:
-                        if not ComponentLibrary.get_dir_abs_path_is_worker(subdir_abs_path):
-                            # add to dir_abs_path the absolute path to the directories of the
-                            # following parents from CDG section 14.2.3., if they exist:
+                        a = subdir_abs_path
+                        if not ComponentLibrary.get_dir_abs_path_is_worker(a):
+                            # add to dir_abs_path the absolute path to the
+                            # directories of the following parents from CDG
+                            # section 14.2.3., if they exist:
                             #   - hdl/platforms/<platform>/devices
                             #   - components/<library>
                             dir_abs_paths.append(subdir_abs_path)
@@ -284,27 +221,29 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                     for platform in subdir_abs_paths:
                         subdir_abs_path = platform + '/devices'
                         if os.path.isdir(subdir_abs_path):
-                            # add to dir_abs_path the absolute path to the directories of the
-                            # following parents from CDG section 14.2.3., if they exist:
+                            # add to dir_abs_path the absolute path to the
+                            # directories of the following parents from CDG
+                            # section 14.2.3., if they exist:
                             #   - hdl/platforms/<platform>/devices
                             dir_abs_paths.append(subdir_abs_path)
         return dir_abs_paths
 
     def discover_component_libraries(self):
-        for dir_abs_path in self.get_existing_dir_abs_paths_for_clib_consideration():
+        tmp = self.get_existing_dir_abs_paths_for_clib_consideration()
+        for dir_abs_path in tmp:
             try:
                 is_libs = False
-                #try:
-                #    ComponentLibraries(dir_abs_path)
-                #    is_libs = True
-                #except InvalidAssetError as err:
-                #    pass
-                #try:
+                # try:
+                #     ComponentLibraries(dir_abs_path)
+                #     is_libs = True
+                # except InvalidAssetError as err:
+                #     pass
+                # try:
                 asset = ComponentLibrary(dir_abs_path)
                 if not is_libs:
                     self.append_discovered_asset(asset)
-                #except InvalidAssetError:
-                #    pass
+                # except InvalidAssetError:
+                #     pass
             except InvalidAssetError as err:
                 path = dir_abs_path
                 test = ComponentLibrary.get_dir_abs_path_is_test(path)
@@ -339,7 +278,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                     asset = HdlCard(discovery_path + '/' + _dir)
                     self.append_discovered_asset(asset)
                     # TODO move from self.hdl_cards to generic self.assets
-                    #self.assets.extend(asset)
+                    # self.assets.extend(asset)
                 except InvalidAssetError:
                     pass
 
@@ -370,7 +309,8 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         # 3. library's dependent libraries
         if len(hdl_primitive.attrs['Libraries']) > 0:
             for lib in hdl_primitive.attrs['Libraries']:
-                # split necessary because some Libraries are specified w/ package id, e.g., ocpi.core.bsv
+                # split necessary because some Libraries are specified w/
+                # package id, e.g., ocpi.core.bsv
                 ret.append(lib.split('.')[-1])
         return ret
 
@@ -387,7 +327,8 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             ret.append(lib)
         return ret
 
-    def get_hdl_worker_dependent_workers(self, project_registry, worker, hdl_platform):
+    def get_hdl_worker_dependent_workers(self, project_registry, worker,
+                                         hdl_platform):
         ret = []
         if worker.authoring_model == 'hdl':
             for project in project_registry.projects:
@@ -438,192 +379,6 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                                 ret.append(val)
         return ret
 
-    # TODO properly separate into extensible tool
-    def get_build_artifact_abs_path(self, asset, hdl_target='',
-            hdl_platform='', rcc_platform=''):
-        ret = asset.get_dir_abs_path()
-        tmp = ''
-        if asset.get_type() == 'hdl assembly':
-            tmp = asset.name + '_' + hdl_platform + '_'
-            if len(asset.containers) == 0:
-                tmp += 'base_'
-            else:
-                if asset.containers[0].attrs['Config'] == '':
-                    tmp += 'base_'
-                else:
-                    tmp += asset.containers[0].attrs['Config'] + '_'
-                tmp += asset.containers[0].name
-            ret += '/container-' + tmp + '_'
-        ret += '/target-' + hdl_target + '/'
-        ret += asset.name
-        is_assembly = True
-        if (asset.get_type() == 'hdl primitive') or \
-           (asset.get_type() == 'hdl worker') or \
-           (asset.get_type() == 'rcc worker'):
-            is_assembly = False
-        if (asset.get_type() == 'hdl assembly'):
-            ret += tmp + '_rv'
-        ret += '.' + get_build_artifact_extension(hdl_platform, rcc_platform,
-                is_assembly)
-        return ret
-
-    def build_assets(self, assets, project_registry, tool,
-            hdl_target='', hdl_platform='', rcc_platform='', _j=1):
-        fs = TemporaryFilesystem()
-        os.system('mkdir -p ' + fs.abs_path)
-        global_makefile.abs_path = fs.abs_path + '/Makefile'
-        model_target = get_target(hdl_platform, rcc_platform)
-        Logger().info('gathering dependencies')
-        global_makefile.rules['all'] = GNUMakeRule()
-        target = GNUMakeTarget('all', True)
-        global_makefile.rules['all'].targets.append(target)
-        for asset in assets:
-            target_name = self.get_build_artifact_abs_path(asset, model_target,
-                    hdl_platform, rcc_platform)
-            global_makefile.rules['all'].prerequisites.append(target_name)
-            global_dependency_tree[asset] = DependencyTree()
-            self.append_rules_to_makefile(asset, project_registry, tool,
-                hdl_target, hdl_platform, rcc_platform)
-        global_makefile.emit()
-        tmp = 'make -f ' + global_makefile.abs_path
-        if _j > 1:
-            tmp += ' -j ' + str(_j)
-        if os.system(tmp) != 0:
-            raise Exception('build failed')
-
-    def append_prim_rules_to_makefile(self, asset, project_registry, tool,
-            tname, hdl_target='', hdl_platform=''):
-        bilibs = self.get_built_in_hdl_libraries()
-        #for name in self.get_hdl_primitive_dependent_libraries():
-        for name in self.get_hdl_primitive_dependent_libraries(asset):
-            #if not ((not self.first) and (name in bilibs)):
-            project = project_registry.get_hdl_primitive_project(name)
-            prim = None
-            for hdl_primitive in project.hdl_primitives:
-                if hdl_primitive.name == name:
-                    prim = hdl_primitive
-                    break
-            target = get_target(hdl_platform, '')
-            ppath = self.get_build_artifact_abs_path(prim, target,
-                    hdl_platform)
-            global_makefile.rules[tname].prerequisites.append(ppath)
-            global_dependency_tree[asset].dependents.append(prim)
-            project.append_rules_to_makefile(prim,
-                    project_registry, tool, hdl_target, hdl_platform)
-        if self.first:
-            self.first = False
-
-    def append_worker_rules_to_makefile(self, asset, project_registry, tool,
-            tname, hdl_target='', hdl_platform='', rcc_platform=''):
-        wproj = project_registry.get_worker_project(asset.name)
-        libs = []
-        for lib in wproj.component_libraries:
-            for worker in lib.workers:
-                if worker.name == asset.name:
-                    if worker.authoring_model == asset.authoring_model:
-                        libs = wproj.get_hdl_worker_dependent_libraries(
-                                lib, asset)
-                        break
-        target = get_target(hdl_platform, rcc_platform)
-        for name in libs:
-            lproj = project_registry.get_hdl_primitive_project(name,
-                    wproj)
-            prim = None
-            for hdl_primitive in lproj.hdl_primitives:
-                if hdl_primitive.name == name:
-                    prim = hdl_primitive
-                    break
-            ppath = self.get_build_artifact_abs_path(prim, target, hdl_platform)
-            global_makefile.rules[tname].prerequisites.append(ppath)
-            global_dependency_tree[asset].dependents.append(prim)
-            lproj.append_rules_to_makefile(prim,
-                    project_registry, tool, hdl_target, hdl_platform)
-        for worker in self.get_hdl_worker_dependent_workers(project_registry, asset, hdl_platform):
-            ppath = self.get_build_artifact_abs_path(worker, target, hdl_platform)
-            global_makefile.rules[tname].prerequisites.append(ppath)
-            global_dependency_tree[asset].dependents.append(worker)
-            project = project_registry.get_worker_project(worker.name)
-            project.append_rules_to_makefile(worker,
-                    project_registry, tool, hdl_target, hdl_platform)
-        if asset.name == hdl_platform:
-            _hdl_platform = HdlPlatform(asset.get_dir_abs_path())
-            for cfg in _hdl_platform.configurations.values():
-                for dev in cfg.devices:
-                    _worker = None
-                    project = project_registry.get_worker_project(dev.name)
-                    for clib in project.component_libraries:
-                        for device in clib.workers:
-                            if device.name == dev.name:
-                                _worker = device
-                                break
-                    wpath = self.get_build_artifact_abs_path(_worker, target,
-                            hdl_platform)
-                    global_makefile.rules[tname].prerequisites.append(wpath)
-                    global_dependency_tree[asset].dependents.append(_worker)
-                    project.append_rules_to_makefile(_worker, project_registry,
-                            tool, hdl_target, hdl_platform)
-
-    def append_hdl_assembly_rules_to_makefile(self, hdl_assembly, project_registry, tool,
-            tname, local_project, hdl_target='', hdl_platform=''):
-        for name in self.get_hdl_assembly_dependent_workers(
-                project_registry, hdl_assembly, hdl_platform):
-            # order in CDG section 14.8 is enforced
-            project = None
-            if local_project.get_worker_by_name(name) is not None:
-                project = local_project
-            if project is None:
-                for dir_abs_path in Environment().ocpi_project_path:
-                    p2 = Project(dir_abs_path).get_worker_by_name(name)
-                    if p2.get_worker_by_name(name) is not None:
-                        project = p2
-                        break
-            if project is None:
-                project = project_registry.get_worker_project(name)
-            _worker = None
-            for component_library in project.component_libraries:
-                for worker in component_library.workers:
-                    if worker.name == name:
-                        if worker.authoring_model == 'hdl':
-                            _worker = worker
-                            break
-            target = get_target(hdl_platform, '')
-            wpath = self.get_build_artifact_abs_path(_worker, target,
-                    hdl_platform)
-            global_makefile.rules[tname].prerequisites.append(wpath)
-            global_dependency_tree[hdl_assembly].dependents.append(_worker)
-            project.append_rules_to_makefile(_worker, project_registry, tool,
-                    hdl_target, hdl_platform)
-
-    def append_rules_to_makefile(self, asset, project_registry, tool,
-            hdl_target='', hdl_platform='', rcc_platform=''):
-        """ here the CDG section 4.2 heirarchy is automated """
-        #tname = asset.name + '_' + asset.get_type().replace(' ', '_')
-        target = get_target(hdl_platform, rcc_platform)
-        tname = self.get_build_artifact_abs_path(asset, target, hdl_platform)
-        global_makefile.rules[tname] = GNUMakeRule()
-        target = GNUMakeTarget(tname)
-        global_makefile.rules[tname].targets.append(target)
-        global_dependency_tree[asset] = DependencyTree()
-        if asset.get_type() == 'hdl primitive':
-            self.append_prim_rules_to_makefile(asset, project_registry, tool,
-                    tname, hdl_target, hdl_platform)
-        if (asset.get_type() == 'hdl worker') or (asset.get_type() == 'rcc worker'):
-            self.append_worker_rules_to_makefile(asset, project_registry, tool,
-                    tname, hdl_target, hdl_platform, rcc_platform)
-        if asset.get_type() == 'hdl assembly':
-            for project in project_registry.projects:
-                if project.get_asset(asset.abs_path) is not None:
-                    local_project = project
-                    break
-            self.append_hdl_assembly_rules_to_makefile(asset, project_registry,
-                    tool, tname, local_project, hdl_target, hdl_platform)
-        # build single asset whose dependencies, if enabled, have already been
-        # built
-        tool.build_asset(self, asset, tname, hdl_target, hdl_platform,
-                rcc_platform, project_registry, global_dependency_tree)
-        #tool.append_rules_to_makefile(asset, tname, hdl_target, hdl_platform,
-        #        False, project_registry)
-
 
 def test_Project_discover_component_libraries(ret):
     """ Test all possible combinations of component libraries and
@@ -644,7 +399,7 @@ def test_Project_discover_component_libraries(ret):
             "hdl/devices": libraries[3],
             "hdl/platforms": libraries[4],
             "components/clib": libraries[5],
-            "hdl/platforms/plat/devices" : libraries[6]
+            "hdl/platforms/plat/devices": libraries[6]
         }
         # TODO: Break this out into separate function
         # Create Project Component Library Directories
@@ -679,12 +434,13 @@ def test_Project_discover_component_libraries(ret):
                     os.system('mkdir -p %s/%s' % (project_abs_path, lib_key))
                     # Create required <platform>/<platform>.xml with
                     # <HdlPlatform> XML root-tag
-                    platform_xml = project_abs_path + '/' + 'hdl/platforms/plat/plat.xml'
+                    platform_xml = project_abs_path + '/'
+                    platform_xml += 'hdl/platforms/plat/plat.xml'
                     os.system('touch %s' % platform_xml)
                     platform_xml_file = open(platform_xml, 'w')
                     platform_xml_file.write('<HdlPlatform/>\n')
                     platform_xml_file.close()
-                    #os.system('cat ' + platform_xml)
+                    # os.system('cat ' + platform_xml)
                 else:
                     num_expected_libs += 1
                     os.system('mkdir -p %s/%s' % (project_abs_path, lib_key))
@@ -703,7 +459,7 @@ def test_Project_discover_component_libraries(ret):
         os.system('mkdir -p ' + lib_path)
         if ext != 'test':
             ff = open(lib_path + '/foo.xml', 'w')
-            ff.write('<' + ext  + 'Worker/>\n')
+            ff.write('<' + ext + 'Worker/>\n')
             ff.close()
     uut = Project(project_abs_path)
     uut.discover()
@@ -716,45 +472,3 @@ def test_Project_discover_component_libraries(ret):
     if passed is False:
         ret = False
     return ret
-
-def test_Project_create(ret):
-    fs = TemporaryFilesystem()
-    test_name = 'test_Project_create: '
-    name = 'foo'
-    dir_abs_path = fs.abs_path + '/' + name
-    try:
-        Project(
-            dir_abs_path, False, None
-        ).create()
-        passed = True
-    except Exception as e:
-        Logger().debug(test_name + str(e))
-        passed = False
-
-    # Test for file existence
-    project_files = ['Project.exports', 'Project.xml', 'Project.rst']
-    for project_file in project_files:
-        path = dir_abs_path + '/' + project_file
-        if not os.path.exists(path):
-            passed = False
-    # Test for file integrity
-    msg = 'invalid expected md5sum for file: '
-    project_exports_path = dir_abs_path + '/' + project_files[0]
-    project_exports_md5 = hashlib.md5(open(project_exports_path, 'rb').read()).hexdigest()
-    if project_exports_md5 != 'c575f31ac595c4fc2baa78963408e1a5':
-        passed = False
-        Logger().error(test_name + str(msg + project_exports_path))
-    project_xml_path = dir_abs_path + '/' + project_files[1]
-    project_xml_md5 = hashlib.md5(open(project_xml_path, 'rb').read()).hexdigest()
-    if project_xml_md5 != '7dce1d0c3887ff085cab45ac64d7edcb':
-        passed = False
-        Logger().error(test_name + str(msg + project_xml_path))
-    project_rst_path = dir_abs_path + '/' + project_files[2]
-    project_rst_md5 = hashlib.md5(open(project_rst_path, 'rb').read()).hexdigest()
-    if project_rst_md5 != '5ffe695fc6f968f8c840a9ce2a4576f5':
-        passed = False
-        Logger().error(test_name + str(msg + project_rst_path))
-    # os.system('tree ' + fs.abs_path + '/foo')
-    log_pass_fail('testing Project create()', passed)
-    if passed is False:
-        ret = False

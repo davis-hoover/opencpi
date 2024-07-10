@@ -48,7 +48,7 @@ class Worker(AssetBase):
         else:
             # is a hdl platform worker case
             self.authoring_model = 'hdl'
-        self.supports = [] # PDG section 5.5.4
+        self.supports = []  # PDG section 5.5.4
         self.parse()
 
     def get_paths_to_parse(self):
