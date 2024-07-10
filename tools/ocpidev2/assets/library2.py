@@ -23,7 +23,7 @@ from _opencpi.assets.abstract2 import AssetBase
 from _opencpi.assets.component2 import Component
 from _opencpi.assets.worker2 import Worker, RccAssembly
 # below 4 lines are a weird, unintended consequence of Discoverer
-from _opencpi.assets.platform2 import HdlPlatform
+from _opencpi.assets.platform2 import HdlPlatform, RccPlatform
 from _opencpi.assets.assembly2 import HdlAssembly
 from _opencpi.assets.primitive2 import HdlLibrary
 from _opencpi.assets.application2 import Application
@@ -98,6 +98,8 @@ class Discoverer():
             self.hdl_cards.append(asset)
         if asset.get_type() == 'hdl platform':
             self.hdl_platforms.append(asset)
+        if asset.get_type() == 'rcc platform':
+            self.rcc_platforms.append(asset)
         _type = asset.get_type()
         if (_type == 'hdl worker') or (_type == 'rcc worker'):
             self.workers.append(asset)
@@ -121,7 +123,9 @@ class Discoverer():
             try:
                 assets = []
                 tmp = dir_abs_path
-                if parent == 'hdl/platforms':
+                if parent == 'rcc/platforms':
+                    assets.append(RccPlatform(dir_abs_path))
+                elif parent == 'hdl/platforms':
                     assets.append(HdlPlatform(dir_abs_path))
                 elif parent == 'hdl/assemblies':
                     assets.append(HdlAssembly(dir_abs_path))

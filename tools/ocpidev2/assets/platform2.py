@@ -23,6 +23,15 @@ from _opencpi.assets.abstract2 import AssetBase
 from _opencpi.assets.worker2 import Worker
 
 
+class RccPlatform(AssetBase):
+
+    def __init__(self, dir_abs_path):
+        AssetBase.__init__(self, dir_abs_path)
+
+    def get_type(self):
+        return 'rcc platform'
+
+
 class HdlCardPlatformBase(AssetBase):
 
     def __init__(self, abs_path):

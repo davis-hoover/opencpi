@@ -28,7 +28,7 @@ from _opencpi.assets.library2 import SpecsDirectory, Discoverer
 from _opencpi.assets.library2 import ComponentLibrary, ComponentLibraries
 from _opencpi.assets.primitive2 import HdlLibrary
 from _opencpi.assets.assembly2 import HdlAssembly
-from _opencpi.assets.platform2 import HdlCard, HdlPlatform
+from _opencpi.assets.platform2 import HdlCard, HdlPlatform, RccPlatform
 
 
 class Project(AssetBase, SpecsDirectory, Discoverer):
@@ -49,6 +49,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         self.hdl_slots = []
         self.hdl_platforms = []
         # end of bullets at top of CDG section 14
+        self.rcc_platforms = []
         self.assets = []  # TODO replaces above bullets with self.assets
         # start of CDG section 14.5 (EXTERNAL-to-project, i.e., DEPENDENCY)
         # HDG section 5 "The built-in ocpi.core project includes several HDL
@@ -186,6 +187,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         if do_hdl_primitives:
             self.discover_hdl_cards()
             self.discover_hdl_platforms()
+            self.discover_rcc_platforms()
         # end of bullets at top of CDG section 14
 
     def get_existing_dir_abs_paths_for_clib_consideration(self):
@@ -288,7 +290,11 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         # TODO check if there is an allowlist, and if so, pass to below call
         self.discover_dir_assets('hdl/platforms')
         # TODO move from self.hdl_platforms to generic self.assets
-        self.hdl_platforms.extend(self.hdl_platforms)
+        # self.hdl_platforms.extend(self.hdl_platforms)
+
+    def discover_rcc_platforms(self):
+        # TODO check if there is an allowlist, and if so, pass to below call
+        self.discover_dir_assets('rcc/platforms')
 
     def get_built_in_hdl_libraries(self):
         """ HDG section 5 "The built-in ocpi.core project includes several HDL

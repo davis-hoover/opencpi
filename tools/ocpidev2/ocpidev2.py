@@ -124,9 +124,10 @@ def get_cli_dict():
     """ get a dictionary of settings which looks like CLI args and has been
         modified as needed """
     args = get_args(get_arg_parser())
-    nouns = ['application', 'applications', 'registry', 'project', 'projects',
-             'protocol', 'libraries', 'component', 'components', 'workers',
-             'library', 'component', 'test', 'tests']
+    nouns = ['application', 'applications', 'registry', 'platform',
+             'platforms', 'project', 'projects', 'protocol', 'libraries',
+             'component', 'components', 'workers', 'library', 'component',
+             'test', 'tests']
     Logger().debug('args : ' + str(args))
     try:
         if args.authoring_model in nouns:
@@ -186,18 +187,6 @@ def show(cli_dict, project_registry):
                     print(project_registry.abs_path)
             msg = ''
             for project in project_registry.projects:
-                if cli_dict['noun'].startswith('project'):
-                    if (cli_dict['name'] is None) or \
-                       (cli_dict['name'] == project.name):
-                        if (_dir == '') or \
-                           (_dir in project.abs_path):
-                            msg = str(project.get_package_id())
-                            if cli_dict['verbose']:
-                                msg += ' '
-                                for idx in range(30-len(msg)):
-                                    msg += ' '
-                                msg += project.abs_path
-                            print(msg)
                 if cli_dict['noun'].startswith('application'):
                     for application in project.applications:
                         if (cli_dict['name'] is None) or \
@@ -226,6 +215,63 @@ def show(cli_dict, project_registry):
                                         msg += ' '
                                     msg += component.abs_path
                                 print(msg)
+                if cli_dict['noun'].startswith('librar'):
+                    for hdl_primitive in project.hdl_primitives:
+                        if (cli_dict['name'] is None) or \
+                                (cli_dict['name'] == hdl_primitive.name):
+                            if (_dir == '') or \
+                               (_dir in hdl_primitive.abs_path):
+                                if (cli_dict['authoringmodel'] == '') or \
+                                        (cli_dict['authoringmodel'] == 'hdl'):
+                                    msg = str(project.get_package_id()) + '.'
+                                    msg += hdl_primitive.name
+                                    if cli_dict['verbose']:
+                                        msg += ' '
+                                        for idx in range(50-len(msg)):
+                                            msg += ' '
+                                        msg += hdl_primitive.abs_path
+                                    print(msg)
+                if cli_dict['noun'].startswith('project'):
+                    if (cli_dict['name'] is None) or \
+                       (cli_dict['name'] == project.name):
+                        if (_dir == '') or \
+                           (_dir in project.abs_path):
+                            msg = str(project.get_package_id())
+                            if cli_dict['verbose']:
+                                msg += ' '
+                                for idx in range(30-len(msg)):
+                                    msg += ' '
+                                msg += project.abs_path
+                            print(msg)
+                if cli_dict['noun'].startswith('platform'):
+                    for hdl_platform in project.hdl_platforms:
+                        if (cli_dict['name'] is None) or \
+                                (cli_dict['name'] == hdl_platform.name):
+                            if (_dir == '') or \
+                               (_dir in hdl_platform.abs_path):
+                                if (cli_dict['authoringmodel'] == '') or \
+                                        (cli_dict['authoringmodel'] == 'hdl'):
+                                    msg = hdl_platform.name
+                                    if cli_dict['verbose']:
+                                        msg += ' '
+                                        for idx in range(50-len(msg)):
+                                            msg += ' '
+                                        msg += hdl_platform.abs_path
+                                    print(msg)
+                    for rcc_platform in project.rcc_platforms:
+                        if (cli_dict['name'] is None) or \
+                                (cli_dict['name'] == rcc_platform.name):
+                            if (_dir == '') or \
+                               (_dir in rcc_platform.abs_path):
+                                if (cli_dict['authoringmodel'] == '') or \
+                                        (cli_dict['authoringmodel'] == 'rcc'):
+                                    msg = rcc_platform.name
+                                    if cli_dict['verbose']:
+                                        msg += ' '
+                                        for idx in range(50-len(msg)):
+                                            msg += ' '
+                                        msg += rcc_platform.abs_path
+                                    print(msg)
                 for component_library in project.component_libraries:
                     ppid = str(project.get_package_id())
                     pid = component_library.get_package_id(ppid)
@@ -281,22 +327,6 @@ def show(cli_dict, project_registry):
                                         msg += ' '
                                     msg += test.abs_path
                                 print(msg)
-                if cli_dict['noun'].startswith('librar'):
-                    for hdl_primitive in project.hdl_primitives:
-                        if (cli_dict['name'] is None) or \
-                                (cli_dict['name'] == hdl_primitive.name):
-                            if (_dir == '') or \
-                               (_dir in hdl_primitive.abs_path):
-                                if (cli_dict['authoringmodel'] == '') or \
-                                        (cli_dict['authoringmodel'] == 'hdl'):
-                                    msg = str(project.get_package_id()) + '.'
-                                    msg += hdl_primitive.name
-                                    if cli_dict['verbose']:
-                                        msg += ' '
-                                        for idx in range(50-len(msg)):
-                                            msg += ' '
-                                        msg += hdl_primitive.abs_path
-                                    print(msg)
 
 
 def get_create_registry(cli_dict):
