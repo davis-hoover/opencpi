@@ -126,7 +126,7 @@ class Environment():
             self.ocpi_project_path = [opp.strip('/') for opp in ocpi_project_path]
 
     def getcwd(self):
-        return os.normpath(os.getcwd())
+        return os.path.normpath(os.getcwd())
 
 
 class Logger(Environment):

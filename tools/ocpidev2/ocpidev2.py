@@ -262,7 +262,7 @@ def add_create_arguments(parser, noun):
     if noun == 'protocol':
         group = parser.add_mutually_exclusive_group()
         group.add_argument('-p', '--project', default=False, action='store_true')
-        group.add_argument('--hdl-library', nargs='?', default=None)
+        group.add_argument('--hdl-library', nargs='?', default='')
         group.add_argument('-l', '--library', default=None)
     parser.add_argument('noun', default=None)
     parser.add_argument('name', default=None)
@@ -375,11 +375,12 @@ class AssetFactory():
         if cli_dict['noun'] == 'project':
             self.asset = Project(abs_path, False, cli_dict)
         if cli_dict['noun'] == 'protocol':
-            abs_path += '-prot.xml'
             if cli_dict['hdllibrary'] != '':
                 cwd = Environment().getcwd()
                 project = project_registry.get_abs_path_project(cwd)
                 abs_path = project.get_dir_abs_path() + '/hdl/' + cli_dict['hdllibrary']
+                abs_path += '/specs/' + cli_dict['name']
+            abs_path += '-prot.xml'
             self.asset = Protocol(abs_path, False, cli_dict)
         if cli_dict['noun'] == 'test':
             abs_path += '.test'
@@ -779,31 +780,31 @@ def get_enable_registry_discovery(cli_dict):
 
 if __name__ == '__main__':
     exit_status = 0
-    #try:
-    signal.signal(signal.SIGINT, ocpidevsignint)
-    cli_dict = get_cli_dict()
-    Logger().debug('cli_dict : ' + str(cli_dict))
-    project_registry = None
-    if get_create_registry(cli_dict):
-        disc = get_enable_registry_discovery(cli_dict)
-        project_registry = ProjectRegistry(disc, disc)
-    if cli_dict['help']:
-        _help(cli_dict, project_registry)
-    elif cli_dict['verb'] == 'build':
-        build(cli_dict, project_registry)
-    elif cli_dict['verb'] == 'clean':
-        clean(cli_dict, project_registry)
-    elif cli_dict['verb'] == 'create':
-        create(cli_dict, project_registry)
-    elif cli_dict['verb'] == 'show':
-        show(cli_dict, project_registry)
-    elif cli_dict['verb'] == 'register':
-        register(cli_dict, project_registry)
-    elif cli_dict['verb'] == 'unregister':
-        unregister(cli_dict, project_registry)
-    else:
-        raise Exception('verb ' + cli_dict['verb'] + ' is not supported')
-    #except Exception as exception:
-    #    Logger().error(str(exception))
-    #    exit_status = 1
+    try:
+        signal.signal(signal.SIGINT, ocpidevsignint)
+        cli_dict = get_cli_dict()
+        Logger().debug('cli_dict : ' + str(cli_dict))
+        project_registry = None
+        if get_create_registry(cli_dict):
+            disc = get_enable_registry_discovery(cli_dict)
+            project_registry = ProjectRegistry(disc, disc)
+        if cli_dict['help']:
+            _help(cli_dict, project_registry)
+        elif cli_dict['verb'] == 'build':
+            build(cli_dict, project_registry)
+        elif cli_dict['verb'] == 'clean':
+            clean(cli_dict, project_registry)
+        elif cli_dict['verb'] == 'create':
+            create(cli_dict, project_registry)
+        elif cli_dict['verb'] == 'show':
+            show(cli_dict, project_registry)
+        elif cli_dict['verb'] == 'register':
+            register(cli_dict, project_registry)
+        elif cli_dict['verb'] == 'unregister':
+            unregister(cli_dict, project_registry)
+        else:
+            raise Exception('verb ' + cli_dict['verb'] + ' is not supported')
+    except Exception as exception:
+        Logger().error(str(exception))
+        exit_status = 1
     exit(exit_status)
