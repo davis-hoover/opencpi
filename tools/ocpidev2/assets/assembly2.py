@@ -339,6 +339,7 @@ def test_HdlAssembly(ret):
     ret = test_HdlAssembly___init__(ret)
     ret = test_HdlAssembly_parse(ret)
     ret = test_HdlAssembly_get_type(ret)
+    ret = test_HdlContainer(ret)
     return ret
 
 
@@ -359,6 +360,7 @@ def test_HdlContainerDevice(ret):
 
 
 def test_HdlContainer(ret):
+    ret = test_HdlContainerDevice(ret)
     fs = TemporaryFilesystem()
     for test in [0, 1, 2, 3]:
         passed = True

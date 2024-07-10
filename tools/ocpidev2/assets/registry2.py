@@ -20,7 +20,7 @@
 import os
 from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import AssetBase
-from _opencpi.assets.project2 import Project
+from _opencpi.assets.project2 import Project, test_Project
 
 
 class ProjectRegistry():
@@ -175,10 +175,24 @@ class ProjectRegistry():
     def show(self, _dir, cli_dict):
         if cli_dict['noun'] == 'registry':
             if (_dir == '') or \
-               (_dir in project_registry.abs_path):
-                print(project_registry.abs_path)
+               (_dir in self.abs_path):
+                print(self.abs_path)
         for project in self.projects:
             project.show(_dir, cli_dict)
+
+    def build(self, _dir, cli_dict):
+        pass
+
+    def create(self, _dir, cli_dict):
+        pass
+
+
+def unittest(cli_dict, project_registry):
+   ret = True
+   ret = test_ProjectRegistry(ret)
+   ret = test_Project(ret)
+   if not ret:
+       raise Exception('unittest failed')
 
 
 def test_ProjectRegistry(ret):

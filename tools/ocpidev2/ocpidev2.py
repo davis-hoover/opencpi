@@ -23,34 +23,11 @@ import os
 import argparse
 import signal
 from _opencpi.assets.abstract2 import *
-from _opencpi.assets.registry2 import ProjectRegistry
+from _opencpi.assets.registry2 import ProjectRegistry, unittest
 
 
 def ocpidevsignint(sig, frame):
     raise Exception('Ctrl-C stopped execution')
-
-
-def unittest(cli_dict, project_registry):
-    ret = True
-    # ret = test_GNUMakefile(ret)
-    ret = test_Component(ret)
-    ret = test_ComponentLibrary(ret)
-    ret = test_RccAssembly(ret)
-    # ret = test_Project_discover_component_libraries(ret)
-    # ret = test_ProjectRegistry(ret)
-    # ret = test_OCPIDev(ret)
-    ret = test_Worker(ret)
-    ret = test_HdlLibrary(ret)
-    ret = test_HdlAssembly(ret)
-    # ret = test_HdlAssemblyInstance(ret)
-    ret = test_Property(ret)
-    ret = test_HdlContainerDevice(ret)
-    ret = test_HdlContainer(ret)
-    ret = test_HdlCardPlatformBase(ret)
-    ret = test_HdlPlatform(ret)
-    ret = test_HdlPlatformConfiguration(ret)
-    ret = test_HdlCard(ret)
-    return ret
 
 
 def add_show_arguments(parser):
@@ -187,7 +164,7 @@ if __name__ == '__main__':
             else:
                 os.system('man ocpidev2-' + cli_dict['verb'])
         elif (cli_dict['verb'] == 'show') or (cli_dict['verb'] == 'build') or \
-           (cli_dict['verb'] == 'create'):
+             (cli_dict['verb'] == 'create'):
             for _dir in cli_dict['d']:
                 if (cli_dict['verb'] != 'show') and (_dir == ''):
                     _dir = Environment().getcwd()

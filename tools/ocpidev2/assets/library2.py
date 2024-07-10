@@ -20,12 +20,13 @@
 import os
 from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import AssetBase
-from _opencpi.assets.component2 import Component
+from _opencpi.assets.component2 import Component, test_Component
 from _opencpi.assets.worker2 import Worker, RccAssembly
+from _opencpi.assets.worker2 import test_Worker, test_RccAssembly
 # below 4 lines are a weird, unintended consequence of Discoverer
-from _opencpi.assets.platform2 import HdlPlatform, RccPlatform
-from _opencpi.assets.assembly2 import HdlAssembly
-from _opencpi.assets.primitive2 import HdlLibrary
+from _opencpi.assets.platform2 import HdlPlatform, RccPlatform, test_HdlPlatform, test_HdlCard
+from _opencpi.assets.assembly2 import HdlAssembly, test_HdlAssembly
+from _opencpi.assets.primitive2 import HdlLibrary, test_HdlLibrary
 from _opencpi.assets.application2 import Application
 from _opencpi.assets.test2 import Test
 
@@ -408,6 +409,14 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
 
 
 def test_ComponentLibrary(ret):
+    ret = test_Component(ret)
+    ret = test_RccAssembly(ret)
+    ret = test_Worker(ret)
+    # ret = test_HdlAssemblyInstance(ret)
+    ret = test_HdlAssembly(ret)
+    ret = test_HdlPlatform(ret)
+    ret = test_HdlCard(ret)
+
     fs = TemporaryFilesystem()
     for test in range(7):
         passed = True

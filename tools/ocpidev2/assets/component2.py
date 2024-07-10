@@ -600,6 +600,7 @@ def test_Property(ret):
 
 
 def test_Component(ret):
+    ret = test_Property(ret)
     fs = TemporaryFilesystem()
     for test in [0, 1]:
         passed = True

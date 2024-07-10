@@ -205,6 +205,8 @@ def test_HdlCardPlatformBase(ret):
 
 
 def test_HdlPlatform(ret):
+    ret = test_HdlCardPlatformBase(ret)
+    ret = test_HdlPlatformConfiguration(ret)
     passed = True
     fs = TemporaryFilesystem()
     dir_abs_path = fs.abs_path + '/' + 'platform'

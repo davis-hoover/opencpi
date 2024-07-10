@@ -28,7 +28,7 @@ do_show_test() {
   ocpidev2 show applications -d assets
   ocpidev2 show -d assets applications
   ocpidev2 -d assets show applications
-  ocpidev2 show applications -d assets -d core -v
+  ocpidev2 -d assets show -d core applications -d platform -v
   ocpidev2 show component drc
   ocpidev2 show component drc -v
   ocpidev2 show component drc --verbose
@@ -40,7 +40,7 @@ do_show_test() {
   ocpidev2 show components -d assets
   ocpidev2 show -d assets components
   ocpidev2 -d assets show components
-  ocpidev2 show components -d assets -d core -v
+  ocpidev2 -d assets show -d core components -d platform -v
   ocpidev2 show hdl library dsp_comps
   ocpidev2 show hdl library dsp_comps -v
   ocpidev2 show hdl library dsp_comps --verbose
@@ -50,7 +50,7 @@ do_show_test() {
   ocpidev2 show hdl libraries -d assets
   ocpidev2 show -d assets hdl libraries
   ocpidev2 -d assets show hdl libraries
-  ocpidev2 show hdl libraries -d assets -d core -v
+  ocpidev2 -d assets show -d core hdl libraries -d platform -v
 
   ocpidev2 show hdl platform zed
   ocpidev2 show hdl platform zed -v
