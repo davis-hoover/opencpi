@@ -25,7 +25,8 @@ from _opencpi.assets.abstract2 import AssetBase
 from _opencpi.assets.worker2 import Worker
 from _opencpi.assets.application2 import Application
 from _opencpi.assets.library2 import SpecsDirectory, Discoverer
-from _opencpi.assets.library2 import ComponentLibrary, ComponentLibraries, test_ComponentLibrary
+from _opencpi.assets.library2 import ComponentLibrary, ComponentLibraries
+from _opencpi.assets.library2 import test_ComponentLibrary
 from _opencpi.assets.primitive2 import HdlLibrary
 from _opencpi.assets.assembly2 import HdlAssembly
 from _opencpi.assets.platform2 import HdlCard, HdlPlatform, RccPlatform
@@ -528,6 +529,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                                 msg += ' '
                             msg += test.abs_path
                         print(msg)
+
 
 def test_Project(ret):
     # ret = test_GNUMakefile(ret)

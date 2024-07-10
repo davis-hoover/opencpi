@@ -41,9 +41,9 @@ do_show_test() {
   ocpidev2 show -d assets components
   ocpidev2 -d assets show components
   ocpidev2 -d assets show -d core components -d platform -v
-  ocpidev2 show hdl library dsp_comps
-  ocpidev2 show hdl library dsp_comps -v
-  ocpidev2 show hdl library dsp_comps --verbose
+  ocpidev2 show hdl library dsp_prims
+  ocpidev2 show hdl library dsp_prims -v
+  ocpidev2 show hdl library dsp_prims --verbose
   ocpidev2 show hdl libraries 
   ocpidev2 show hdl libraries -v
   ocpidev2 show hdl libraries --verbose

@@ -24,7 +24,8 @@ from _opencpi.assets.component2 import Component, test_Component
 from _opencpi.assets.worker2 import Worker, RccAssembly
 from _opencpi.assets.worker2 import test_Worker, test_RccAssembly
 # below 4 lines are a weird, unintended consequence of Discoverer
-from _opencpi.assets.platform2 import HdlPlatform, RccPlatform, test_HdlPlatform, test_HdlCard
+from _opencpi.assets.platform2 import HdlPlatform, RccPlatform
+from _opencpi.assets.platform2 import test_HdlPlatform, test_HdlCard
 from _opencpi.assets.assembly2 import HdlAssembly, test_HdlAssembly
 from _opencpi.assets.primitive2 import HdlLibrary, test_HdlLibrary
 from _opencpi.assets.application2 import Application
