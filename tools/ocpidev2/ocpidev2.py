@@ -86,6 +86,8 @@ def get_arg_parser():
     parser.add_argument('-d', default=[], action='append')
     parser.add_argument('-h', '--help', action='store_true')
     parser.add_argument('-v', '--verbose', action='store_true')
+    # only intended to be used for tab completion
+    parser.add_argument('--suppress-warn', action='store_true')
     parser.add_argument('verb', nargs='?', default='')
     if 'show' in sys.argv:
         parser = add_show_arguments(parser)
@@ -346,11 +348,16 @@ def get_enable_registry_discovery(cli_dict):
     return disc
 
 
+global g_suppress_warn
+
+
 if __name__ == '__main__':
     exit_status = 0
     try:
         signal.signal(signal.SIGINT, ocpidevsignint)
         cli_dict = get_cli_dict()
+        if cli_dict['suppresswarn']:
+            set_g_suppress_warn(True)
         Logger().debug('cli_dict : ' + str(cli_dict))
         project_registry = None
         if get_create_registry(cli_dict):

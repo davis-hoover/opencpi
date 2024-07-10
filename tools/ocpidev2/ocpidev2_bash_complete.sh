@@ -20,7 +20,7 @@ get_compgen_str_for_verb() {
   str=$1
   comp_line=$2
   #verbs=("build" "clean" "register" "unregister" "show")
-  verbs=("show")
+  verbs=("show unittest")
   for verb in "${verbs[@]}"; do
     if [[ $comp_line == *"$verb"* ]]; then
       continue;
@@ -119,6 +119,9 @@ _ocpidev2()
     COMPREPLY=( $(compgen -W "$str" -- "$2") )
   elif [ "$3" == "-d" ]; then
     COMPREPLY=( $(compgen -d -S / -- "$2") )
+  elif [ "$3" == "application" ]; then
+    assets=$(echo $(printf "%s\n" $(ocpidev2 show applications --suppress-warn | sed "s/.*\.//g")) | uniq)
+    COMPREPLY=( $(compgen -W "$assets" -- "$2") )
   elif [ "$3" == "clean" ]; then
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "-d" "$COMP_LINE")
     COMPREPLY=( $(compgen -W "$str" -- "$2") )
@@ -131,13 +134,13 @@ _ocpidev2()
     str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose " "$COMP_LINE")
     COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
   elif [ "$3" == "project" ]; then
-    assets=$(echo $(printf "%s\n" $(ocpidev2 show projects | sed "s/.*\.//g")) | uniq)
+    assets=$(echo $(printf "%s\n" $(ocpidev2 show projects --suppress-warn | sed "s/.*\.//g")) | uniq)
     COMPREPLY=( $(compgen -W "$assets" -- "$2") )
   elif [ "$3" == "projects" ]; then
     str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose " "$COMP_LINE")
     COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
   elif [ "$3" == "component" ]; then
-    assets=$(echo $(printf "%s\n" $(ocpidev2 show components | sed "s/.*\.//g")) | uniq)
+    assets=$(echo $(printf "%s\n" $(ocpidev2 show components --suppress-warn | sed "s/.*\.//g")) | uniq)
     COMPREPLY=( $(compgen -W "$assets" -- "$2") )
   elif [ "$3" == "components" ]; then
     str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose " "$COMP_LINE")
@@ -146,7 +149,7 @@ _ocpidev2()
     str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose " "$COMP_LINE")
     COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
   elif [ "$3" == "library" ]; then
-    assets=$(echo $(printf "%s\n" $(ocpidev2 show libraries | sed "s/.*\.//g")) | uniq)
+    assets=$(echo $(printf "%s\n" $(ocpidev2 show libraries --suppress-warn | sed "s/.*\.//g")) | uniq)
     COMPREPLY=( $(compgen -W "$assets" -- "$2") )
   elif [ "$3" == "libraries" ]; then
     str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose " "$COMP_LINE")

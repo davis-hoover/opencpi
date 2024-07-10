@@ -27,7 +27,12 @@ import jinja2
 
 # TODO make a class member, probably ComponentLibrary or Project class
 g_libraries_mk = False
+g_suppress_warn = False
 
+
+def set_g_suppress_warn(val):
+    global g_suppress_warn
+    g_suppress_warn = val
 
 def log_pass_fail(msg, passed):
     spaces = ''
@@ -139,7 +144,11 @@ class Logger(Environment):
             self.log(7, 'INFO:  ' + msg)
 
     def warn(self, msg):
-        self.log(0, 'WARN:  ' + msg, '\033[93m')
+        # only intended to supress for tab completion
+        global g_suppress_warn
+        print(str(g_suppress_warn))
+        if not g_suppress_warn:
+            self.log(0, 'WARN:  ' + msg, '\033[93m')
 
     def debug(self, msg):
         self.log(10, 'DEBUG: ' + msg, '\033[96m')
