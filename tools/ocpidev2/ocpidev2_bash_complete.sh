@@ -113,7 +113,7 @@ _ocpidev2()
     assets=$(echo $(printf "%s\n" $(ocpidev2 show workers --suppress-warn | sed "s/.*\.//g")) | uniq)
     COMPREPLY=( $(compgen -W "$assets" -- "$2") )
   elif [ "$3" == "unittest" ]; then
-    COMPREPLY=()
+    COMPREPLY=( $(compgen -W "-v --verbose" -- "$2") )
   elif [ "$3" == "ocpidev2" ]; then
     str=$(get_compgen_str_for_verb "$str" "$COMP_LINE")
     COMPREPLY=( $(compgen -W "$str" -- "$2") )
@@ -138,6 +138,12 @@ _ocpidev2()
     COMPREPLY=( $(compgen -W "" -- "$2") )
   elif [ "$3" == "--help" ]; then
     COMPREPLY=( $(compgen -W "" -- "$2") )
+  elif [ "$3" == "-v" ]; then
+    str=$(get_compgen_str_for_long_short_option_only_allowed_once "" "-v " "--verbose " "$COMP_LINE")
+    COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
+  elif [ "$3" == "--verbose" ]; then
+    str=$(get_compgen_str_for_long_short_option_only_allowed_once "" "-v " "--verbose " "$COMP_LINE")
+    COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
   elif [ "$3" == "applications" ]; then
     str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose " "$COMP_LINE")
     COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
