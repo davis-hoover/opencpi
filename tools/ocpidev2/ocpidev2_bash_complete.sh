@@ -140,10 +140,18 @@ _ocpidev2()
     COMPREPLY=( $(compgen -W "" -- "$2") )
   elif [ "$3" == "-v" ]; then
     str=$(get_compgen_str_for_long_short_option_only_allowed_once "" "-v " "--verbose " "$COMP_LINE")
-    COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
+    if [[ $COMP_LINE != *"unittest"* ]]; then
+      COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
+    else
+      COMPREPLY=( $(compgen -W "$str" -- "$2") )
+    fi
   elif [ "$3" == "--verbose" ]; then
     str=$(get_compgen_str_for_long_short_option_only_allowed_once "" "-v " "--verbose " "$COMP_LINE")
-    COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
+    if [[ $COMP_LINE != *"unittest"* ]]; then
+      COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
+    else
+      COMPREPLY=( $(compgen -W "$str" -- "$2") )
+    fi
   elif [ "$3" == "applications" ]; then
     str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose " "$COMP_LINE")
     COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
