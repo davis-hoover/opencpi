@@ -104,13 +104,6 @@ _ocpidev2()
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "worker" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "workers" "$COMP_LINE")
     COMPREPLY=( $(compgen -W "$str" -- "$2") )
-  elif [ "$3" == "-v" ]; then
-    str=$(get_compgen_str_for_option_only_allowed_once "$str" "registry" "$COMP_LINE")
-    str=$(get_compgen_str_for_option_only_allowed_once "$str" "projects" "$COMP_LINE")
-    str=$(get_compgen_str_for_option_only_allowed_once "$str" "components" "$COMP_LINE")
-    str=$(get_compgen_str_for_option_only_allowed_once "$str" "workers" "$COMP_LINE")
-    str=$(get_compgen_str_for_option_only_allowed_once "$str" "libraries" "$COMP_LINE")
-    COMPREPLY=( $(compgen -W "$str" -- "$2") )
   elif [ "$3" == "hdl" ]; then
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "worker" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "workers" "$COMP_LINE")
@@ -123,6 +116,15 @@ _ocpidev2()
     COMPREPLY=( $(compgen -d -S / -- "$2") )
   elif [ "$3" == "application" ]; then
     assets=$(echo $(printf "%s\n" $(ocpidev2 show applications --suppress-warn | sed "s/.*\.//g")) | uniq)
+    COMPREPLY=( $(compgen -W "$assets" -- "$2") )
+  elif [ "$3" == "library" ]; then
+    assets=$(echo $(printf "%s\n" $(ocpidev2 show libraries --suppress-warn | sed "s/.*\.//g")) | uniq)
+    COMPREPLY=( $(compgen -W "$assets" -- "$2") )
+  elif [ "$3" == "platform" ]; then
+    assets=$(echo $(printf "%s\n" $(ocpidev2 show platforms --suppress-warn | sed "s/.*\.//g")) | uniq)
+    COMPREPLY=( $(compgen -W "$assets" -- "$2") )
+  elif [ "$3" == "worker" ]; then
+    assets=$(echo $(printf "%s\n" $(ocpidev2 show workers --suppress-warn | sed "s/.*\.//g")) | uniq)
     COMPREPLY=( $(compgen -W "$assets" -- "$2") )
   elif [ "$3" == "clean" ]; then
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "-d" "$COMP_LINE")
@@ -150,9 +152,6 @@ _ocpidev2()
   elif [ "$3" == "workers" ]; then
     str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose " "$COMP_LINE")
     COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
-  elif [ "$3" == "library" ]; then
-    assets=$(echo $(printf "%s\n" $(ocpidev2 show libraries --suppress-warn | sed "s/.*\.//g")) | uniq)
-    COMPREPLY=( $(compgen -W "$assets" -- "$2") )
   elif [ "$3" == "libraries" ]; then
     str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose " "$COMP_LINE")
     COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
