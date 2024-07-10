@@ -187,7 +187,7 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         is in or its package ID. """
     # start of CDG section 14.2.3
     valid_locations = ['components', 'hdl/devices', 'hdl/cards']
-    valid_locations += ['hdl/adapters', 'hdl/platforms']
+    valid_locations += ['hdl/adapters', 'hdl/platforms', 'devices']
     # end of CDG section 14.2.3
 
     def __init__(self, dir_abs_path, enable_path_existence_check=True,
