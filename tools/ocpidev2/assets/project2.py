@@ -387,6 +387,148 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                                 ret.append(val)
         return ret
 
+    def show(self, _dir, cli_dict):
+        if cli_dict['noun'].startswith('application'):
+            for application in self.applications:
+                if (cli_dict['name'] is None) or \
+                   (cli_dict['name'] == application.name):
+                    if (_dir == '') or \
+                       (_dir in application.abs_path):
+                        msg = str(self.get_package_id()) + '.'
+                        msg += application.name
+                        if cli_dict['verbose']:
+                            msg += ' '
+                            for idx in range(60-len(msg)):
+                                msg += ' '
+                            msg += application.abs_path
+                        print(msg)
+        if cli_dict['noun'].startswith('component'):
+            for component in self.components:
+                if (cli_dict['name'] is None) or \
+                        (cli_dict['name'] == component.name):
+                    if (_dir == '') or \
+                           (_dir in component.abs_path):
+                        msg = str(self.get_package_id()) + '.'
+                        msg += component.name
+                        if cli_dict['verbose']:
+                            msg += ' '
+                            for idx in range(60-len(msg)):
+                                msg += ' '
+                            msg += component.abs_path
+                        print(msg)
+        if cli_dict['noun'].startswith('librar'):
+            for hdl_primitive in self.hdl_primitives:
+                if (cli_dict['name'] is None) or \
+                        (cli_dict['name'] == hdl_primitive.name):
+                    if (_dir == '') or \
+                       (_dir in hdl_primitive.abs_path):
+                        if (cli_dict['authoringmodel'] == '') or \
+                                (cli_dict['authoringmodel'] == 'hdl'):
+                            msg = str(self.get_package_id()) + '.'
+                            msg += hdl_primitive.name
+                            if cli_dict['verbose']:
+                                msg += ' '
+                                for idx in range(50-len(msg)):
+                                    msg += ' '
+                                msg += hdl_primitive.abs_path
+                            print(msg)
+        if cli_dict['noun'].startswith('project'):
+            if (cli_dict['name'] is None) or \
+               (cli_dict['name'] == self.name):
+                if (_dir == '') or \
+                   (_dir in self.abs_path):
+                    msg = str(self.get_package_id())
+                    if cli_dict['verbose']:
+                        msg += ' '
+                        for idx in range(30-len(msg)):
+                            msg += ' '
+                        msg += self.abs_path
+                    print(msg)
+        if cli_dict['noun'].startswith('platform'):
+            for hdl_platform in self.hdl_platforms:
+                if (cli_dict['name'] is None) or \
+                        (cli_dict['name'] == hdl_platform.name):
+                    if (_dir == '') or \
+                       (_dir in hdl_platform.abs_path):
+                        if (cli_dict['authoringmodel'] == '') or \
+                                (cli_dict['authoringmodel'] == 'hdl'):
+                            msg = hdl_platform.name
+                            if cli_dict['verbose']:
+                                msg += ' '
+                                for idx in range(50-len(msg)):
+                                    msg += ' '
+                                msg += hdl_platform.abs_path
+                            print(msg)
+            for rcc_platform in self.rcc_platforms:
+                if (cli_dict['name'] is None) or \
+                        (cli_dict['name'] == rcc_platform.name):
+                    if (_dir == '') or \
+                       (_dir in rcc_platform.abs_path):
+                        if (cli_dict['authoringmodel'] == '') or \
+                                (cli_dict['authoringmodel'] == 'rcc'):
+                            msg = rcc_platform.name
+                            if cli_dict['verbose']:
+                                msg += ' '
+                                for idx in range(50-len(msg)):
+                                    msg += ' '
+                                msg += rcc_platform.abs_path
+                            print(msg)
+        for component_library in self.component_libraries:
+            ppid = str(self.get_package_id())
+            pid = component_library.get_package_id(ppid)
+            if cli_dict['noun'].startswith('librar'):
+                if (cli_dict['name'] is None) or \
+                        (cli_dict['name'] == component_library.name):
+                    if (_dir == '') or \
+                       (_dir in component_library.abs_path):
+                        if cli_dict['authoringmodel'] == '':
+                            msg = pid
+                            if cli_dict['verbose']:
+                                msg += ' '
+                                for idx in range(50-len(msg)):
+                                    msg += ' '
+                                msg += component_library.abs_path
+                            print(msg)
+            if cli_dict['noun'].startswith('component'):
+                for component in component_library.components:
+                    if (cli_dict['name'] is None) or \
+                            (cli_dict['name'] == component.name):
+                        if (_dir == '') or \
+                           (_dir in component.abs_path):
+                            msg = pid + '.' + component.name
+                            if cli_dict['verbose']:
+                                msg += ' '
+                                for idx in range(60-len(msg)):
+                                    msg += ' '
+                                msg += component.abs_path
+                            print(msg)
+            if cli_dict['noun'] == 'workers':
+                for worker in component_library.workers:
+                    if (_dir == '') or \
+                       (_dir in worker.abs_path):
+                        if (cli_dict['authoringmodel'] == '') or \
+                               (cli_dict['authoringmodel'] ==
+                                worker.authoring_model):
+                            msg = pid + '.' + worker.name + '.' + \
+                                  worker.authoring_model
+                            if cli_dict['verbose']:
+                                msg += ' '
+                                for idx in range(50-len(msg)):
+                                    msg += ' '
+                                msg += worker.abs_path
+                            print(msg)
+            if cli_dict['noun'].startswith('test'):
+                for test in component_library.tests:
+                    if (_dir == '') or \
+                       (_dir in test.abs_path):
+                        msg = pid + '.' + test.name
+                        if cli_dict['verbose']:
+                            msg += ' '
+                            for idx in range(50-len(msg)):
+                                msg += ' '
+                            msg += test.abs_path
+                        print(msg)
+
 
 def test_Project_discover_component_libraries(ret):
     """ Test all possible combinations of component libraries and

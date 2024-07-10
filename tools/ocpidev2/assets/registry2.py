@@ -172,6 +172,14 @@ class ProjectRegistry():
                 self.projects.append(project)
         Logger().debug('end of project discovery')
 
+    def show(self, _dir, cli_dict):
+        if cli_dict['noun'] == 'registry':
+            if (_dir == '') or \
+               (_dir in project_registry.abs_path):
+                print(project_registry.abs_path)
+        for project in self.projects:
+            project.show(_dir, cli_dict)
+
 
 def test_ProjectRegistry(ret):
     passed = True

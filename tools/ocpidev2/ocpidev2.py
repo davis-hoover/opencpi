@@ -24,29 +24,10 @@ import argparse
 import signal
 from _opencpi.assets.abstract2 import *
 from _opencpi.assets.registry2 import ProjectRegistry
-# below is for unittests
-from _opencpi.assets.component2 import *
-from _opencpi.assets.library2 import *
-from _opencpi.assets.primitive2 import *
-from _opencpi.assets.project2 import *
-from _opencpi.assets.worker2 import *
-from _opencpi.assets.assembly2 import *
-from _opencpi.assets.platform2 import *
-from _opencpi.assets.test2 import *
-from _opencpi.assets.application2 import *
 
 
 def ocpidevsignint(sig, frame):
     raise Exception('Ctrl-C stopped execution')
-
-
-def test_show(ret):
-    show({'d': [''], 'help': False, 'verbose': False, 'noun': 'components'})
-    show({'d': [''], 'help': False, 'verbose': False, 'noun': 'libraries'})
-    show({'d': [''], 'help': False, 'verbose': False, 'noun': 'projects'})
-    show({'d': [''], 'help': False, 'verbose': False, 'noun': 'registry'})
-    show({'d': [''], 'help': False, 'verbose': False, 'noun': 'workers'})
-    return ret
 
 
 def unittest(cli_dict, project_registry):
@@ -69,7 +50,6 @@ def unittest(cli_dict, project_registry):
     ret = test_HdlPlatform(ret)
     ret = test_HdlPlatformConfiguration(ret)
     ret = test_HdlCard(ret)
-    # ret = test_show(ret)
     return ret
 
 
@@ -169,168 +149,6 @@ def get_cli_dict():
     return cli_dict
 
 
-def _help(cli_dict, project_registry):
-    if cli_dict['verb'] == '':
-        os.system('man ocpidev2')
-    else:
-        os.system('man ocpidev2-' + cli_dict['verb'])
-
-
-def show(cli_dict, project_registry):
-    if cli_dict['help']:
-        os.system('man ocpidev2-show')
-    else:
-        if cli_dict['noun'] is None:
-            raise Exception('show must have a noun')
-        for _dir in cli_dict['d']:
-            if cli_dict['noun'] == 'registry':
-                if (_dir == '') or \
-                   (_dir in project_registry.abs_path):
-                    print(project_registry.abs_path)
-            msg = ''
-            for project in project_registry.projects:
-                if cli_dict['noun'].startswith('application'):
-                    for application in project.applications:
-                        if (cli_dict['name'] is None) or \
-                           (cli_dict['name'] == application.name):
-                            if (_dir == '') or \
-                               (_dir in application.abs_path):
-                                msg = str(project.get_package_id()) + '.'
-                                msg += application.name
-                                if cli_dict['verbose']:
-                                    msg += ' '
-                                    for idx in range(60-len(msg)):
-                                        msg += ' '
-                                    msg += application.abs_path
-                                print(msg)
-                if cli_dict['noun'].startswith('component'):
-                    for component in project.components:
-                        if (cli_dict['name'] is None) or \
-                                (cli_dict['name'] == component.name):
-                            if (_dir == '') or \
-                                   (_dir in component.abs_path):
-                                msg = str(project.get_package_id()) + '.'
-                                msg += component.name
-                                if cli_dict['verbose']:
-                                    msg += ' '
-                                    for idx in range(60-len(msg)):
-                                        msg += ' '
-                                    msg += component.abs_path
-                                print(msg)
-                if cli_dict['noun'].startswith('librar'):
-                    for hdl_primitive in project.hdl_primitives:
-                        if (cli_dict['name'] is None) or \
-                                (cli_dict['name'] == hdl_primitive.name):
-                            if (_dir == '') or \
-                               (_dir in hdl_primitive.abs_path):
-                                if (cli_dict['authoringmodel'] == '') or \
-                                        (cli_dict['authoringmodel'] == 'hdl'):
-                                    msg = str(project.get_package_id()) + '.'
-                                    msg += hdl_primitive.name
-                                    if cli_dict['verbose']:
-                                        msg += ' '
-                                        for idx in range(50-len(msg)):
-                                            msg += ' '
-                                        msg += hdl_primitive.abs_path
-                                    print(msg)
-                if cli_dict['noun'].startswith('project'):
-                    if (cli_dict['name'] is None) or \
-                       (cli_dict['name'] == project.name):
-                        if (_dir == '') or \
-                           (_dir in project.abs_path):
-                            msg = str(project.get_package_id())
-                            if cli_dict['verbose']:
-                                msg += ' '
-                                for idx in range(30-len(msg)):
-                                    msg += ' '
-                                msg += project.abs_path
-                            print(msg)
-                if cli_dict['noun'].startswith('platform'):
-                    for hdl_platform in project.hdl_platforms:
-                        if (cli_dict['name'] is None) or \
-                                (cli_dict['name'] == hdl_platform.name):
-                            if (_dir == '') or \
-                               (_dir in hdl_platform.abs_path):
-                                if (cli_dict['authoringmodel'] == '') or \
-                                        (cli_dict['authoringmodel'] == 'hdl'):
-                                    msg = hdl_platform.name
-                                    if cli_dict['verbose']:
-                                        msg += ' '
-                                        for idx in range(50-len(msg)):
-                                            msg += ' '
-                                        msg += hdl_platform.abs_path
-                                    print(msg)
-                    for rcc_platform in project.rcc_platforms:
-                        if (cli_dict['name'] is None) or \
-                                (cli_dict['name'] == rcc_platform.name):
-                            if (_dir == '') or \
-                               (_dir in rcc_platform.abs_path):
-                                if (cli_dict['authoringmodel'] == '') or \
-                                        (cli_dict['authoringmodel'] == 'rcc'):
-                                    msg = rcc_platform.name
-                                    if cli_dict['verbose']:
-                                        msg += ' '
-                                        for idx in range(50-len(msg)):
-                                            msg += ' '
-                                        msg += rcc_platform.abs_path
-                                    print(msg)
-                for component_library in project.component_libraries:
-                    ppid = str(project.get_package_id())
-                    pid = component_library.get_package_id(ppid)
-                    if cli_dict['noun'].startswith('librar'):
-                        if (cli_dict['name'] is None) or \
-                                (cli_dict['name'] == component_library.name):
-                            if (_dir == '') or \
-                               (_dir in component_library.abs_path):
-                                if cli_dict['authoringmodel'] == '':
-                                    msg = pid
-                                    if cli_dict['verbose']:
-                                        msg += ' '
-                                        for idx in range(50-len(msg)):
-                                            msg += ' '
-                                        msg += component_library.abs_path
-                                    print(msg)
-                    if cli_dict['noun'].startswith('component'):
-                        for component in component_library.components:
-                            if (cli_dict['name'] is None) or \
-                                    (cli_dict['name'] == component.name):
-                                if (_dir == '') or \
-                                   (_dir in component.abs_path):
-                                    msg = pid + '.' + component.name
-                                    if cli_dict['verbose']:
-                                        msg += ' '
-                                        for idx in range(60-len(msg)):
-                                            msg += ' '
-                                        msg += component.abs_path
-                                    print(msg)
-                    if cli_dict['noun'] == 'workers':
-                        for worker in component_library.workers:
-                            if (_dir == '') or \
-                               (_dir in worker.abs_path):
-                                if (cli_dict['authoringmodel'] == '') or \
-                                       (cli_dict['authoringmodel'] ==
-                                        worker.authoring_model):
-                                    msg = pid + '.' + worker.name + '.' + \
-                                          worker.authoring_model
-                                    if cli_dict['verbose']:
-                                        msg += ' '
-                                        for idx in range(50-len(msg)):
-                                            msg += ' '
-                                        msg += worker.abs_path
-                                    print(msg)
-                    if cli_dict['noun'].startswith('test'):
-                        for test in component_library.tests:
-                            if (_dir == '') or \
-                               (_dir in test.abs_path):
-                                msg = pid + '.' + test.name
-                                if cli_dict['verbose']:
-                                    msg += ' '
-                                    for idx in range(50-len(msg)):
-                                        msg += ' '
-                                    msg += test.abs_path
-                                print(msg)
-
-
 def get_create_registry(cli_dict):
     create_registry = False
     if cli_dict['verb'] == 'show':
@@ -364,9 +182,21 @@ if __name__ == '__main__':
             disc = get_enable_registry_discovery(cli_dict)
             project_registry = ProjectRegistry(disc, disc)
         if cli_dict['help']:
-            _help(cli_dict, project_registry)
-        elif cli_dict['verb'] == 'show':
-            show(cli_dict, project_registry)
+            if cli_dict['verb'] == '':
+                os.system('man ocpidev2')
+            else:
+                os.system('man ocpidev2-' + cli_dict['verb'])
+        elif (cli_dict['verb'] == 'show') or (cli_dict['verb'] == 'build') or \
+           (cli_dict['verb'] == 'create'):
+            for _dir in cli_dict['d']:
+                if (cli_dict['verb'] != 'show') and (_dir == ''):
+                    _dir = Environment().getcwd()
+                elif cli_dict['verb'] == 'show':
+                    project_registry.show(_dir, cli_dict)
+                elif cli_dict['verb'] == 'build':
+                    project_registry.build(_dir, cli_dict)
+                elif cli_dict['verb'] == 'create':
+                    project_registry.create(_dir, cli_dict)
         elif cli_dict['verb'] == 'unittest':
             unittest(cli_dict, project_registry)
         else:
