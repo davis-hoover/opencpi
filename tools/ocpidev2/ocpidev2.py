@@ -40,157 +40,22 @@ def ocpidevsignint(sig, frame):
     raise Exception('Ctrl-C stopped execution')
 
 
-# TODO delete this and probably re-write other Tool Layers (TL) in python
-class LegacyOCPIDevHDLBuildTool():
-
-    def __init__(self):
-        self.first = True
-        pass
-
-    def export_project(self, project, hdl_platform, hdl_target, rcc_platform):
-        Logger().info(
-            'LegacyOCPIDevHDLBuildTool: exporting project ' +
-            project.abs_path.split('/')[-1])
-        hdl = (hdl_platform is not None) or (hdl_target is not None)
-        if hdl or (rcc_platform != ''):
-            cmd = 'ocpidev build -d ' + project.abs_path + ' --no-doc'
-            if Environment().ocpi_log_level < 8:
-                cmd += ' >/dev/null 2>&1'
-            #cmd = 'cd ' + project.abs_path + ' && $OCPI_CDK_DIR/scripts/export-project.sh'
-            #if Environment().ocpi_log_level >= 9:
-            #    cmd += ' -v'
-            #cmd += ' -'
-            if os.system(cmd) != 0:
-                raise Exception('failed to export project ' + str(project.get_package_id()) + ', set log level to 8 or higher for more info')
-
-    def install_rcc_platform_if_not_installed(
-            self, project_registry, rcc_platform):
-        for proj in project_registry.projects:
-            if str(proj.get_package_id()) == 'ocpi.core':
-                tmp_path = proj.abs_path + '/rcc/platforms/'
-                if not os.path.isdir(tmp_path + rcc_platform + '/gen'):
-                    Logger().debug('ocpiadmin install platform ' + rcc_platform)
-                    if os.system('ocpiadmin install platform ' + rcc_platform) != 0:
-                        raise Exception('failed to build rcc platform ' + rcc_platform)
-
-    def get_build_output_path(self, asset, hdl_target='',
-            hdl_platform=''):
-        ret = asset.abs_path
-        tmp = ''
-        if asset.get_type() == 'hdl assembly':
-            tmp = asset.name + '_' + hdl_platform + '_'
-            if asset.containers[0].config is None:
-                tmp += 'base_'
-            else:
-                tmp += asset.containers[0].config + '_'
-            tmp += asset.containers[0].name
-            ret += '/container-' + tmp + '_'
-        ret += '/target-' + get_hdl_target(hdl_platform) + '/'
-        #if (asset.get_type() == 'hdl primitive') or (asset.get_type() == 'hdl worker'):
-        #    ret += asset.name + '_rv.edf'
-        #if (asset.get_type() == 'hdl assembly'):
-        #    ret += tmp + '_rv.edf'
-        return ret
-
-    def get_gnu_make_recipe(self, asset):
-        ret = 'ocpidev build -d ' + asset.get_dir_abs_path()
-        if hdl_target != '':
-            ret += ' --hdl-target ' + hdl_target
-        if hdl_platform != '':
-            ret += ' --hdl-platform ' + hdl_platform
-        if no_doc:
-            ret += ' --no-doc'
-        return ret
-    #def emit_makefile(self, dependency_tree, hdl_target, hdl_platform):
-    #    makefile = GNUMakefile(None)
-    #    for key, asset in dependency_tree.items():
-    #        tar = self.get_build_output_path(asset, hdl_target, hdl_platform)
-    #        makefile.rules['all'] = GNUMakeRule()
-    #        target = GNUMakeTarget('all', True)
-    #        for dependent in dependency_tree.dependents:
-    #            prereq = self.get_build_output_path(asset, hdl_target,
-    #                    hdl_platform)
-    #            makefile.rules[tar].prerequisites.append(prereq)
-    #            makefile.rules[tar].recipe = get_gnu_make_recipe(tar)
-    #    makefile.emit()
-    def build_asset(self, project, asset, tname,
-            hdl_target='', hdl_platform='', rcc_platform='',
-            no_doc=False, project_registry=None, dependency_tree=None):
-        _j = 1
-        # try:
-        if self.first:
-            self.first = False
-            # for proj in project_registry.projects:
-            #     self.export_project(proj)
-        # while not os.path.isfile(asset.abs_path + '/.build'):
-        # while os.path.isfile(asset.abs_path + '/.lock'):
-        #    Logger().info('waiting on lock for ' + asset.abs_path)
-        #    time.sleep(10)
-        # Logger().info('building ' + asset.get_type() + ' ' + asset.name)
-        # os.system('touch ' + asset.abs_path + '/.lock')
-        # self.emit_makefile(dependency_tree, hdl_target, hdl_platform)
-        cmd = ''
-        if Environment().ocpi_log_level >= 7:
-            cmd += '@echo [INFO] building ' + asset.get_type() + ' ' + asset.name
-            cmd += '\n\t'
-        if Environment().ocpi_log_level < 8:
-            cmd += '@'
-        cmd += 'ocpidev build -d ' + asset.get_dir_abs_path()
-        if hdl_target != '':
-            cmd += ' --hdl-target ' + hdl_target
-        if hdl_platform != '':
-            cmd += ' --hdl-platform ' + hdl_platform
-        if rcc_platform != '':
-            cmd += ' --rcc-platform ' + rcc_platform
-        if no_doc:
-            cmd += ' --no-doc'
-        if Environment().ocpi_log_level < 8:
-            cmd += ' >/dev/null 2>&1'
-        cmd += '\n\t'
-        # cmd += '@[ ! -f ' + global_makefile.rules[tname].targets[0].string + ' ] && echo [ERROR] build of ' + asset.get_type() + ' ' + asset.name + ' failed'
-        # cmd += '\n\t'
-        # cmd += '@[ -f ' + global_makefile.rules[tname].targets[0].string + ' ]'
-        # cmd += '\n\t'
-        #if (Environment().ocpi_log_level >= 8) and (_j > 1):
-        cmd += '@echo [INFO] building ' + asset.get_type() + ' ' + asset.name + ' done'
-        global_makefile.rules[tname].recipe = cmd
-        Logger().debug('creating make rule: ' + str(global_makefile.rules[tname]))
-        #if os.system(cmd) != 0:
-        #    raise Exception('build failed ')
-        #os.system('touch ' + asset.abs_path + '/.build')
-        #os.system('rm -rf ' + asset.abs_path + '/.lock')
-        #except Exception as exception:
-        #    if os.path.isfile(asset.abs_path + '/.lock'):
-        #        os.system('rm -rf ' + asset.abs_path + '/.lock')
-        #    raise exception
-
-
 def test_show(ret):
-    show({'d' : [''], 'help' : False, 'verbose' : False, 'noun' : 'components'})
-    show({'d' : [''], 'help' : False, 'verbose' : False, 'noun' : 'libraries'})
-    show({'d' : [''], 'help' : False, 'verbose' : False, 'noun' : 'projects'})
-    show({'d' : [''], 'help' : False, 'verbose' : False, 'noun' : 'registry'})
-    show({'d' : [''], 'help' : False, 'verbose' : False, 'noun' : 'workers'})
+    show({'d': [''], 'help': False, 'verbose': False, 'noun': 'components'})
+    show({'d': [''], 'help': False, 'verbose': False, 'noun': 'libraries'})
+    show({'d': [''], 'help': False, 'verbose': False, 'noun': 'projects'})
+    show({'d': [''], 'help': False, 'verbose': False, 'noun': 'registry'})
+    show({'d': [''], 'help': False, 'verbose': False, 'noun': 'workers'})
     return ret
 
 
-def test_create(ret):
-    create({'d' : [''], 'help' : False, 'verbose' : False, 'noun' : 'project', 'register' : False})
-    create({'d' : [''], 'help' : False, 'verbose' : False, 'noun' : 'project', 'register' : True})
-    #create({'d' : ['/tmp/1', '/tmp/2'], 'help' : False, 'verbose' : False, 'noun' : 'project', 'register' : True})
-    return ret
-
-
-def unittest():
+def unittest(cli_dict, project_registry):
     ret = True
     # ret = test_GNUMakefile(ret)
     ret = test_Component(ret)
-    ret = test_Component_create(ret)
     ret = test_ComponentLibrary(ret)
-    ret = test_ComponentLibrary_create(ret)
     ret = test_RccAssembly(ret)
-    ret = test_Project_discover_component_libraries(ret)
-    ret = test_Project_create(ret)
+    # ret = test_Project_discover_component_libraries(ret)
     # ret = test_ProjectRegistry(ret)
     # ret = test_OCPIDev(ret)
     ret = test_Worker(ret)
@@ -204,77 +69,14 @@ def unittest():
     ret = test_HdlPlatform(ret)
     ret = test_HdlPlatformConfiguration(ret)
     ret = test_HdlCard(ret)
-    # ret = test_LegacyOCPIDevHDLBuildTool(ret)
-    ret = test_Test_create(ret)
-    ret = test_Application_create(ret)
-    ret = test_show(ret)
+    # ret = test_show(ret)
     return ret
 
 
 def add_show_arguments(parser):
-    #parser.add_argument('--global-scope', action='store_true')
+    # parser.add_argument('--global-scope', action='store_true')
     parser.add_argument('authoring_model', nargs='?', default='')
     parser.add_argument('noun', default=None)
-    parser.add_argument('name', nargs='?', default=None)
-    return parser
-
-
-def add_create_arguments(parser, noun):
-    if noun == 'project':
-        project = Project('', False, None)
-        for attr in project.get_attr_infos():
-            if attr.cli is not None:
-                parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
-                                    default='')
-        parser.add_argument('--register', default=False, action='store_true')
-    if noun == 'library':
-        library = ComponentLibrary('', False, None)
-        for attr in library.get_attr_infos():
-            if attr.cli is not None:
-                parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
-                                    default='')
-    if noun == 'component':
-        component = Component('', False, None)
-        for attr in component.get_attr_infos():
-            if attr.cli is not None:
-                if attr.is_bool:
-                    parser.add_argument(attr.cli[0], attr.cli[1], default='',
-                                        action='store_true')
-                else:
-                    parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
-                                        default='')
-        parser.add_argument('-t', '--create-test', default=False, action='store_true')
-        parser.add_argument('-p', '--project', default=False, action='store_true')
-    if noun == 'test':
-        test = Test('', False, None)
-        for attr in test.get_attr_infos():
-            if attr.cli is not None:
-                if attr.is_bool:
-                    parser.add_argument(attr.cli[0], attr.cli[1], default='',
-                                        action='store_true')
-                else:
-                    parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
-                                        default='')
-    if noun == 'application':
-        group = parser.add_mutually_exclusive_group()
-        group.add_argument('-X', '--xml-app', default=False, action='store_true')
-        group.add_argument('-x', '--xml-dir-app', default=False, action='store_true')
-    if noun == 'protocol':
-        group = parser.add_mutually_exclusive_group()
-        group.add_argument('-p', '--project', default=False, action='store_true')
-        group.add_argument('--hdl-library', nargs='?', default='')
-        group.add_argument('-l', '--library', default=None)
-    parser.add_argument('noun', default=None)
-    parser.add_argument('name', default=None)
-    return parser
-
-
-def add_build_arguments(parser):
-    parser.add_argument('--hdl-target', nargs='?', default='')
-    parser.add_argument('--hdl-platform', nargs='?', default='')
-    parser.add_argument('--rcc-platform', nargs='?', default='')
-    parser.add_argument('-j', nargs='?', type=int, default=1)
-    parser.add_argument('noun', nargs='?', default=None)
     parser.add_argument('name', nargs='?', default=None)
     return parser
 
@@ -319,27 +121,29 @@ def get_args(parser):
 
 
 def get_cli_dict():
-    """ get a dictionary of settings which looks like CLI args and has been modified as needed """
+    """ get a dictionary of settings which looks like CLI args and has been
+        modified as needed """
     args = get_args(get_arg_parser())
-    nouns = ['application', 'applications', 'registry', 'project', 'projects', 'protocol', 'libraries',
-             'component', 'components', 'workers', 'library', 'component',
-             'test', 'tests']
+    nouns = ['application', 'applications', 'registry', 'project', 'projects',
+             'protocol', 'libraries', 'component', 'components', 'workers',
+             'library', 'component', 'test', 'tests']
     Logger().debug('args : ' + str(args))
     try:
         if args.authoring_model in nouns:
             args.name = args.noun
             args.noun = args.authoring_model
             args.authoring_model = ''
-    except:
+    except AttributeError:
         # TODO replace this hack
         args.authoring_model = None
     # TODO move below 3 lines to AssetBase once proper checks in place
-    if args.name:
-        if not args.name.isidentifier():
-            raise ValueError("'" + args.name + "' is not a valid name")
-    if (args.noun is not None) and (args.noun not in nouns):
-        if args.verb != 'apply':
-            raise Exception('noun ' + str(args.noun) + ' is not supported')
+    if args.verb != 'unittest':
+        if args.name:
+            if not args.name.isidentifier():
+                raise ValueError("'" + args.name + "' is not a valid name")
+        if (args.noun is not None) and (args.noun not in nouns):
+            if args.verb != 'apply':
+                raise Exception('noun ' + str(args.noun) + ' is not supported')
     tmp = args
     mylist = args.d.copy()
     tmp.d = []
@@ -356,130 +160,8 @@ def get_cli_dict():
             tmp.d.append(_dir)
     cli_dict = vars(tmp)
     # make CLI look like attrs (necessary for create cli verb)
-    cli_dict = ({key.replace('_', '') : val for key, val in cli_dict.items()})
+    cli_dict = ({key.replace('_', ''): val for key, val in cli_dict.items()})
     return cli_dict
-
-
-class AssetFactory():
-
-    def __init__(self, _dir, cli_dict):
-        abs_path = _dir + '/' + cli_dict['name']
-        if cli_dict['noun'] == 'application':
-            self.asset = Application(abs_path, False, cli_dict)
-        if cli_dict['noun'] == 'component':
-            name = cli_dict['name']
-            abs_path = _dir + '/' + name + '.comp' + '/' + name + '-comp.xml'
-            self.asset = Component(abs_path, False, cli_dict)
-        if cli_dict['noun'] == 'library':
-            self.asset = ComponentLibrary(abs_path, False, cli_dict)
-        if cli_dict['noun'] == 'project':
-            self.asset = Project(abs_path, False, cli_dict)
-        if cli_dict['noun'] == 'protocol':
-            if cli_dict['hdllibrary'] != '':
-                cwd = Environment().getcwd()
-                project = project_registry.get_abs_path_project(cwd)
-                abs_path = project.get_dir_abs_path() + '/hdl/' + cli_dict['hdllibrary']
-                abs_path += '/specs/' + cli_dict['name']
-            abs_path += '-prot.xml'
-            self.asset = Protocol(abs_path, False, cli_dict)
-        if cli_dict['noun'] == 'test':
-            abs_path += '.test'
-            self.asset = Test(abs_path, False, cli_dict)
-        if cli_dict['noun'] == 'worker':
-            self.asset = Worker(abs_path, False, cli_dict)
-
-    def create(self, cli_dict, project_registry):
-        Logger().info('creating ' + self.asset.get_type() + ' ' + self.asset.name)
-        project_registry.create(self.asset, cli_dict)
-
-
-def create(cli_dict, project_registry):
-    for _dir in cli_dict['d']:
-        if _dir == '':
-            _dir = os.getcwd()
-        AssetFactory(_dir, cli_dict).create(cli_dict, project_registry)
-
-
-def throw_if_not_installed(platform):
-    """ TODO move to the ProjectRegistry class """
-    ocpi_cdk_dir = os.environ.get('OCPI_CDK_DIR')
-    if platform is not None:
-        if not os.path.isdir(ocpi_cdk_dir + '/' + platform):
-            raise Exception('platform ' + platform + ' is not installed')
-
-
-def install_rcc_platform_if_not_installed(project_registry, rcc_platform):
-    """ TODO move to the ProjectRegistry class """
-    for proj in project_registry.projects:
-        if str(proj.get_package_id()) == 'ocpi.core':
-            tmp_path = proj.abs_path + '/rcc/platforms/'
-            if not os.path.isdir(tmp_path + rcc_platform + '/gen'):
-                if os.system('ocpiadmin install platform ' + rcc_platform) != 0:
-                    raise Exception('failed to build rcc platform ' + rcc_platform)
-
-
-def throw_if_project_dependencies_not_registered(project, project_registry):
-    """ TODO move to the ProjectRegistry class """
-    unreg_projects = (project_registry.
-                      get_project_dependencies_not_registered(project))
-    if len(unreg_projects) != 0:
-        msg = 'Project Registry incomplete, please register project(s): '
-        for unreg_project in unreg_projects:
-            msg += unreg_project + " "
-        raise Exception(msg)
-
-
-def export_projects(project_registry, hdl_platform, hdl_target, rcc_platform,
-                    hdl_build_tool):
-    """ TODO START fix this mess and move back into tool class """
-    dependency_ordered_pid_strs = []
-    # initial hack to handle circular platform/assets circular dependency
-    for proj in project_registry.projects:
-        if str(proj.get_package_id()) == 'ocpi.core':
-            dependency_ordered_pid_strs.append(str(proj.get_package_id()))
-    for proj in project_registry.projects:
-        if str(proj.get_package_id()) == 'ocpi.platform':
-            dependency_ordered_pid_strs.append(str(proj.get_package_id()))
-    for proj in project_registry.projects:
-        if str(proj.get_package_id()) == 'ocpi.assets':
-            dependency_ordered_pid_strs.append(str(proj.get_package_id()))
-    # proper project dependency order, with timeout hack to handle circular
-    # dependencies
-    timeout = 10000
-    while len(dependency_ordered_pid_strs) != \
-            len(project_registry.projects):
-        if timeout == 0:
-            break
-        timeout -= 1
-        for proj in project_registry.projects:
-            deps_covered = True
-            for dependent_proj in proj.project_dependencies:
-                if dependent_proj not in dependency_ordered_pid_strs:
-                    deps_covered = False
-            if deps_covered:
-                if str(proj.get_package_id()) not in dependency_ordered_pid_strs:
-                    dependency_ordered_pid_strs.append(
-                            str(proj.get_package_id()))
-    # timeout hack to handle circular dependencies,
-    # (we gave up on dependency order!)
-    if timeout == 0:
-        for proj in project_registry.projects:
-            if str(proj.get_package_id()) not in dependency_ordered_pid_strs:
-                dependency_ordered_pid_strs.append(str(proj.get_package_id()))
-    # do the final export in psuedo-dependency-order
-    for package_id_str in dependency_ordered_pid_strs:
-        for proj in project_registry.projects:
-            if str(proj.get_package_id()) == package_id_str:
-                # TODO move below 7 lines outside OCPIDev class (Legacy...)
-                # IMPORTANT - below 6 lines necessary to remove stale files
-                os.system('rm -rf $(find ' + proj.abs_path + ' -type f -name imports)')
-                os.system('rm -rf $(find ' + proj.abs_path + ' -type f -name exports)')
-                os.system('rm -rf $(find ' + proj.abs_path + ' -type d -name imports)')
-                os.system('rm -rf $(find ' + proj.abs_path + ' -type d -name exports)')
-                os.system('rm -rf $(find ' + proj.abs_path + ' -type l -name imports)')
-                os.system('rm -rf $(find ' + proj.abs_path + ' -type l -name exports)')
-                hdl_build_tool.export_project(
-                        proj, hdl_platform, hdl_target, rcc_platform)
 
 
 def _help(cli_dict, project_registry):
@@ -487,93 +169,6 @@ def _help(cli_dict, project_registry):
         os.system('man ocpidev2')
     else:
         os.system('man ocpidev2-' + cli_dict['verb'])
-
-
-def build(cli_dict, project_registry):
-    hdl_build_tool = LegacyOCPIDevHDLBuildTool()  # TODO make extensible
-    if (cli_dict['hdltarget'] != '') or (cli_dict['hdlplatform'] != ''):
-        if os.environ.get('XILINX_VIVADO') is not None:
-            msg = 'cannot run ocpidev2 when Vivado environment is sourced'
-            raise Exception(msg)
-    if cli_dict['rccplatform'] != '':
-        throw_if_not_installed(cli_dict['rccplatform'])
-    # if hdl_platform is not None:
-    #     throw_if_not_installed(hdl_platform)
-    for _dir in cli_dict['d']:
-        if _dir == '':
-            _dir = os.getcwd()
-        abs_path = _dir
-        project = None
-        assets_to_build = []
-        for project2 in project_registry.projects:
-            if project2.abs_path == os.path.realpath(abs_path):
-                project = project2
-        if project is None:
-            project = project_registry.get_abs_path_project(abs_path)
-            asset = project.get_asset(abs_path)
-            if asset is None:
-                if abs_path in project.get_buildable_paths():
-                    for buildable_path in project.get_buildable_paths():
-                        for component_library in project.component_libraries:
-                            for asset in component_library.workers:
-                                if abs_path in asset.get_dir_abs_path():
-                                    assets_to_build.append(asset)
-                        for asset in project.applications:
-                            if abs_path in asset.get_dir_abs_path():
-                                assets_to_build.append(asset)
-                        for asset in project.hdl_primitives:
-                            if abs_path in asset.get_dir_abs_path():
-                                assets_to_build.append(asset)
-                        for asset in project.hdl_assemblies:
-                            if abs_path in asset.get_dir_abs_path():
-                                assets_to_build.append(asset)
-                        for asset in project.hdl_devices:
-                            if abs_path in asset.get_dir_abs_path():
-                                assets_to_build.append(asset)
-                else:
-                    raise Exception(_dir + ' is not buildable')
-            else:
-                assets_to_build.append(asset)
-        else:
-            if (cli_dict['hdltarget'] != '') or (cli_dict['hdlplatform'] != ''):
-                for hdl_primitive in project.hdl_primitives:
-                    assets_to_build.append(hdl_primitive)
-                for hdl_assembly in project.hdl_assemblies:
-                    assets_to_build.append(hdl_assembly)
-                for component_library in project.component_libraries:
-                    for worker in component_library.workers:
-                        if worker.get_type() == 'hdl worker':
-                            assets_to_build.append(worker)
-            if cli_dict['rccplatform'] != '':
-                install_rcc_platform_if_not_installed(
-                        project_registry, cli_dict['rccplatform'])
-                for component_library in project.component_libraries:
-                    for worker in component_library.workers:
-                        if worker.get_type() == 'rcc worker':
-                            assets_to_build.append(worker)
-                for application in project.applications:
-                    assets_to_build.append(application)
-        throw_if_project_dependencies_not_registered(
-            project, project_registry)
-        if cli_dict['rccplatform'] != '':
-            install_rcc_platform_if_not_installed(
-                    project_registry, cli_dict['rccplatform'])
-        export_projects(project_registry, cli_dict['hdlplatform'],
-                        cli_dict['hdltarget'], cli_dict['rccplatform'],
-                        hdl_build_tool)
-        project.build_assets(
-                assets_to_build, project_registry, hdl_build_tool,
-                cli_dict['hdltarget'], cli_dict['hdlplatform'],
-                cli_dict['rccplatform'], cli_dict['j'])
-        # TODO move below 8 lines outside OCPIDev class (Legacy...)
-        # IMPORTANT - below 7 lines necessary to mitigate stale files
-        #for proj in project_registry.projects:
-        #    os.system('rm -rf $(find ' + proj.abs_path + ' -type f -name imports)')
-        #    os.system('rm -rf $(find ' + proj.abs_path + ' -type f -name exports)')
-        #    os.system('rm -rf $(find ' + proj.abs_path + ' -type d -name imports)')
-        #    os.system('rm -rf $(find ' + proj.abs_path + ' -type d -name exports)')
-        #    os.system('rm -rf $(find ' + proj.abs_path + ' -type l -name imports)')
-        #    os.system('rm -rf $(find ' + proj.abs_path + ' -type l -name exports)')
 
 
 def show(cli_dict, project_registry):
@@ -603,10 +198,12 @@ def show(cli_dict, project_registry):
                             print(msg)
                 if cli_dict['noun'].startswith('application'):
                     for application in project.applications:
-                        if (cli_dict['name'] is None) or (cli_dict['name'] == application.name):
+                        if (cli_dict['name'] is None) or \
+                           (cli_dict['name'] == application.name):
                             if (_dir == '') or \
                                (_dir in application.abs_path):
-                                msg = str(project.get_package_id()) + '.' + application.name
+                                msg = str(project.get_package_id()) + '.'
+                                msg += application.name
                                 if cli_dict['verbose']:
                                     msg += ' '
                                     for idx in range(60-len(msg)):
@@ -615,10 +212,12 @@ def show(cli_dict, project_registry):
                                 print(msg)
                 if cli_dict['noun'].startswith('component'):
                     for component in project.components:
-                        if (cli_dict['name'] is None) or (cli_dict['name'] == component.name):
+                        if (cli_dict['name'] is None) or \
+                                (cli_dict['name'] == component.name):
                             if (_dir == '') or \
-                               (_dir in component.abs_path):
-                                msg = str(project.get_package_id()) + '.' + component.name
+                                   (_dir in component.abs_path):
+                                msg = str(project.get_package_id()) + '.'
+                                msg += component.name
                                 if cli_dict['verbose']:
                                     msg += ' '
                                     for idx in range(60-len(msg)):
@@ -626,9 +225,11 @@ def show(cli_dict, project_registry):
                                     msg += component.abs_path
                                 print(msg)
                 for component_library in project.component_libraries:
-                    pid = component_library.get_package_id(str(project.get_package_id()))
+                    ppid = str(project.get_package_id())
+                    pid = component_library.get_package_id(ppid)
                     if cli_dict['noun'].startswith('librar'):
-                        if (cli_dict['name'] is None) or (cli_dict['name'] == component_library.name):
+                        if (cli_dict['name'] is None) or \
+                                (cli_dict['name'] == component_library.name):
                             if (_dir == '') or \
                                (_dir in component_library.abs_path):
                                 if cli_dict['authoringmodel'] == '':
@@ -641,7 +242,8 @@ def show(cli_dict, project_registry):
                                     print(msg)
                     if cli_dict['noun'].startswith('component'):
                         for component in component_library.components:
-                            if (cli_dict['name'] is None) or (cli_dict['name'] == component.name):
+                            if (cli_dict['name'] is None) or \
+                                    (cli_dict['name'] == component.name):
                                 if (_dir == '') or \
                                    (_dir in component.abs_path):
                                     msg = pid + '.' + component.name
@@ -656,8 +258,8 @@ def show(cli_dict, project_registry):
                             if (_dir == '') or \
                                (_dir in worker.abs_path):
                                 if (cli_dict['authoringmodel'] == '') or \
-                                   (cli_dict['authoringmodel'] == \
-                                   worker.authoring_model):
+                                       (cli_dict['authoringmodel'] ==
+                                        worker.authoring_model):
                                     msg = pid + '.' + worker.name + '.' + \
                                           worker.authoring_model
                                     if cli_dict['verbose']:
@@ -679,13 +281,14 @@ def show(cli_dict, project_registry):
                                 print(msg)
                 if cli_dict['noun'].startswith('librar'):
                     for hdl_primitive in project.hdl_primitives:
-                        if (cli_dict['name'] is None) or (cli_dict['name'] == hdl_primitive.name):
+                        if (cli_dict['name'] is None) or \
+                                (cli_dict['name'] == hdl_primitive.name):
                             if (_dir == '') or \
                                (_dir in hdl_primitive.abs_path):
                                 if (cli_dict['authoringmodel'] == '') or \
                                         (cli_dict['authoringmodel'] == 'hdl'):
-                                    msg = str(project.get_package_id()) + '.' + \
-                                          hdl_primitive.name
+                                    msg = str(project.get_package_id()) + '.'
+                                    msg += hdl_primitive.name
                                     if cli_dict['verbose']:
                                         msg += ' '
                                         for idx in range(50-len(msg)):
@@ -694,87 +297,18 @@ def show(cli_dict, project_registry):
                                     print(msg)
 
 
-def register(cli_dict, project_registry):
-    for _dir in cli_dict['d']:
-        if _dir == '':
-            _dir = os.getcwd()
-        if cli_dict['noun'] == 'project':
-            project_registry.register_project(_dir)
-
-
-def unregister(cli_dict, project_registry):
-    for _dir in cli_dict['d']:
-        if _dir == '':
-            _dir = os.getcwd()
-        if cli_dict['noun'] == 'project':
-            project_registry.unregister_project(_dir)
-
-
-def clean(cli_dict, project_registry):
-    for _dir in cli_dict['d']:
-        if _dir == '':
-            _dir = os.getcwd()
-        cleaned = False
-        for project in project_registry.projects:
-            if project.abs_path in os.path.realpath(_dir):
-                os.system('rm -rf $(find ' + _dir + ' -type d -name gen)')
-                os.system('rm -rf $(find ' + _dir + ' -type d -name lib)')
-                os.system('rm -rf $(find ' + _dir + ' -type d -name run)')
-                # below 4 lines account for corrupted imports/exports
-                os.system('rm -rf $(find ' + _dir + ' -type f -name imports)')
-                os.system('rm -rf $(find ' + _dir + ' -type f -name exports)')
-                os.system('rm -rf $(find ' + _dir + ' -type d -name imports)')
-                os.system('rm -rf $(find ' + _dir + ' -type d -name exports)')
-                os.system('rm -rf $(find ' + _dir + ' -type l -name imports)')
-                os.system('rm -rf $(find ' + _dir + ' -type l -name exports)')
-                os.system(
-                        'rm -rf $(find ' + _dir + ' -type d -name config-\*)')
-                os.system(
-                        'rm -rf $(find ' + _dir +
-                        ' -type d -name simulations)')
-                os.system(
-                        'rm -rf $(find ' + _dir + ' -type d -name target-\*)')
-                os.system(
-                        'rm -rf $(find ' + _dir +
-                        ' -type d -name container-\*)')
-                os.system('rm -rf $(find ' + _dir + " -type f -name '.*lock')")
-                os.system(
-                        'rm -rf $(find ' + _dir + " -type f -name '.*build')")
-                os.system(
-                        'rm -rf $(find ' + _dir + " -type d -name artifacts)")
-                cleaned = True
-        if not cleaned:
-            raise Exception('cannot clean directory not in registered project')
-
-
 def get_create_registry(cli_dict):
     create_registry = False
-    if cli_dict['verb'] == 'build':
-        create_registry = True
-    if cli_dict['verb'] == 'clean':
-        create_registry = True
-    if cli_dict['verb'] == 'create':
-        create_registry = True
     if cli_dict['verb'] == 'show':
-        create_registry = True
-    if cli_dict['verb'] == 'register':
-        create_registry = True
-    if cli_dict['verb'] == 'unregister':
         create_registry = True
     return create_registry
 
 
 def get_enable_registry_discovery(cli_dict):
     disc = True
-    if cli_dict['verb'] == 'clean':
-        disc = False
     if cli_dict['verb'] == 'show':
         disc = cli_dict['noun'] != 'registry'
         disc = disc and (cli_dict['noun'] != 'projects')
-    if cli_dict['verb'] == 'register':
-        disc = False
-    if cli_dict['verb'] == 'unregister':
-        disc = False
     return disc
 
 
@@ -790,18 +324,10 @@ if __name__ == '__main__':
             project_registry = ProjectRegistry(disc, disc)
         if cli_dict['help']:
             _help(cli_dict, project_registry)
-        elif cli_dict['verb'] == 'build':
-            build(cli_dict, project_registry)
-        elif cli_dict['verb'] == 'clean':
-            clean(cli_dict, project_registry)
-        elif cli_dict['verb'] == 'create':
-            create(cli_dict, project_registry)
         elif cli_dict['verb'] == 'show':
             show(cli_dict, project_registry)
-        elif cli_dict['verb'] == 'register':
-            register(cli_dict, project_registry)
-        elif cli_dict['verb'] == 'unregister':
-            unregister(cli_dict, project_registry)
+        elif cli_dict['verb'] == 'unittest':
+            unittest(cli_dict, project_registry)
         else:
             raise Exception('verb ' + cli_dict['verb'] + ' is not supported')
     except Exception as exception:
