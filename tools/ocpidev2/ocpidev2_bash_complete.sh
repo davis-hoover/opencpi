@@ -98,6 +98,12 @@ _ocpidev2()
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "platform" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "platforms" "$COMP_LINE")
     COMPREPLY=( $(compgen -W "$str" -- "$2") )
+  elif [ "$3" == "rcc" ]; then
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "worker" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "workers" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "platform" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "platforms" "$COMP_LINE")
+    COMPREPLY=( $(compgen -W "$str" -- "$2") )
   elif [ "$3" == "-d" ]; then
     COMPREPLY=( $(compgen -d -S / -- "$2") )
   elif [ "$3" == "application" ]; then
