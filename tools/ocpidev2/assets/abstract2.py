@@ -20,9 +20,6 @@
 import xml.etree.ElementTree as ET
 import os
 import sys
-# if os.path.isfile(os.getcwd() + '/platform.py'):
-#     # collision with uuid's 'import platform' and this directory's platform.py
-#     raise Exception('do not run this from the assets directory!')
 import uuid
 import glob
 import jinja2
@@ -30,9 +27,6 @@ import jinja2
 
 # TODO make a class member, probably ComponentLibrary or Project class
 g_libraries_mk = False
-g_asset_template = """<?xml version="1.0"?>\n<{{asset.root_tags[0]}}{% for key,val in asset.attrs.items() %}{% if val != '' and val != [] %}\n
-    {{key}}=\'{{val}}\'{% endif %}{% endfor %}/>\n\n"""
-global_dependency_tree = dict()
 
 
 def log_pass_fail(msg, passed):
@@ -53,7 +47,7 @@ def get_xml_val_list(val):
 
 # TODO probably a single authoritative xml is needed to parse this from....
 def get_target(hdl_platform, rcc_platform=''):
-    # TODO parse tools/include/hdl/hdl-targets.xml, hdl/platforms/ml605/ml605.mk instead of below code
+    # TODO parse tools/include/hdl/hdl-targets.xml, ml605.mk instead of below
     ret = hdl_platform
     if rcc_platform == '':
         if hdl_platform == 'zed':
@@ -80,16 +74,6 @@ def get_target(hdl_platform, rcc_platform=''):
             ret = 'zynq_ultra'
     else:
         ret = rcc_platform
-    return ret
-
-
-# TODO properly separate into extensible tool
-def get_build_artifact_extension(hdl_platform='', rcc_platform='',
-        is_assembly=False):
-    ret = 'bitz' if is_assembly else 'edf'
-    target = get_target(hdl_platform, rcc_platform)
-    if target.startswith('virtex') or target.startswith('stratix'):
-        ret = 'sof' if is_assembly else 'qsf'
     return ret
 
 
@@ -123,7 +107,8 @@ class Environment():
             ocpi_project_path = ocpi_project_path.split(':')
             # strip trailing slashes in order to standardize everywhere how
             # directory absolute paths are handled (avoids bugs)
-            self.ocpi_project_path = [opp.strip('/') for opp in ocpi_project_path]
+            self.ocpi_project_path = [opp.strip('/') for opp in
+                                      ocpi_project_path]
 
     def getcwd(self):
         return os.path.normpath(os.getcwd())
@@ -171,8 +156,8 @@ class System():
 
 
 class TemporaryFilesystem():
-    """ A convenient directory for doing temporary work. Directory is deleted when
-        this object goes out of scope. """
+    """ A convenient directory for doing temporary work. Directory is deleted
+        when this object goes out of scope. """
 
     def __init__(self):
         # uuid avoids collisions during simultaneous executions of ocpidev2
@@ -181,21 +166,6 @@ class TemporaryFilesystem():
 
     def __del__(self):
         os.system('rm -rf ' + self.abs_path)
-
-
-class DependencyTree():
-    def __init__(self):
-        self.dependents = []
-
-
-class GNUMakeTarget():
-
-    def __init__(self, string, phony = False):
-        self.string = string
-        self.phony = phony
-
-    def __str__(self):
-        return self.string
 
 
 class GNUMakeRule():
@@ -210,9 +180,9 @@ class GNUMakeRule():
         ret = ''
         first = True
         for target in self.targets:
-          if not first:
-            ret += ' '
-          ret += target.string
+            if not first:
+                ret += ' '
+            ret += target.string
         ret += ': '
         ret += ' '.join(self.prerequisites) + '\n'
         if self.recipe is not None:
@@ -628,24 +598,6 @@ class GNUMakefile():
             if define not in self.variables.keys():
                 self.variables[define] = ''
             self.variables[define] += string
-    def emit(self):
-        ff = open(self.abs_path, 'w')
-        phony = False
-        for rule in self.rules.values():
-            for target in rule.targets:
-                if target.phony:
-                    phony = True
-                    ff.write('.PHONY: ' + str(target) + "\n")
-        if phony:
-            ff.write("\n")
-        for rule in self.rules.values():
-            if rule is not None:
-                ff.write(str(rule) + "\n")
-            ff.write("\n")
-        ff.close()
-
-
-global_makefile = GNUMakefile(None)
 
 
 class AttributeInfo():
@@ -658,14 +610,15 @@ class AttributeInfo():
         self.is_bool = is_bool
         self.cli = cli
 
+
 class AttributeBase():
     """ a thing which contains opencpi (XML) attributes, either intermediary
         elem already parsed with ElementTree, or XML file itself, or perhaps a
         Makefile for pre-2.0 OpenCPI assets """
 
     def __init__(self, elem):
-        """ elem is an ElementTree Element intended to represent, e.g., Property
-            within a <RccWorker><Property/></RccWorker> """
+        """ elem is an ElementTree Element intended to represent, e.g.,
+            Property within a <RccWorker><Property/></RccWorker> """
         self.raise_if_invalid_root_tag(elem)
         self.attrs = dict()
 
@@ -691,11 +644,10 @@ class AttributeBase():
                 # self.attrs dict
                 self.attrs[info.key] = val
 
-
     @staticmethod
     def get_xml_val_list(val):
-        """ this takes in a val (string) that is space-and-newline-separated (as
-            is commonly done in OpenCPI XML files) and separates it into a
+        """ this takes in a val (string) that is space-and-newline-separated
+            (as is commonly done in OpenCPI XML files) and separates it into a
             returned list"""
         return ' '.join(val.replace('\n', '').split()).split(' ')
 
@@ -713,14 +665,15 @@ class AttributeBase():
         return ret
         # end pre-2.0 opencpi
 
-    def get_attr_common(self, attr, elem, is_list, makefile_abs_paths=[], cli_dict=None):
+    def get_attr_common(self, attr, elem, is_list, makefile_abs_paths=[],
+                        cli_dict=None):
         if is_list:
             ret = []
         else:
             ret = ''
         if cli_dict is None:
             if makefile_abs_paths == []:
-                makefile_abs_paths.append('') # TODO fix this hack to make xml work
+                makefile_abs_paths.append('')  # TODO fix hack to make xml work
             if is_list:
                 ret2 = []
             else:
@@ -732,8 +685,9 @@ class AttributeBase():
                     if makefile_abs_path == self.get_xml_abs_path():
                         makefile_abs_path = ''
                 # end pre-2.0 opencpi
-                # not all assets have XML, e.g., pre-2.0 HdlLibrary (hdl primitive)
-                # in the cases where XML doesn't exist, simply return ret from above
+                # not all assets have XML, e.g., pre-2.0 HdlLibrary (hdl
+                # primitive) in the cases where XML doesn't exist, simply
+                # return ret from above
                 go = True
                 if elem is None:
                     if makefile_abs_path == '':
@@ -758,22 +712,25 @@ class AttributeBase():
                                 else:
                                     ret2 = val
                             # else:
-                            #     self.throw_invalid_element_error(self, abs_path, key)
+                            #     self.throw_invalid_element_error(self,
+                            #     abs_path, key)
                     else:
                         # start pre-2.0 opencpi
                         attr_abs_path = makefile_abs_path
-                        ret2 = self.get_variable_val_list_from_gnu_makefile(attr, attr_abs_path)
+                        ret2 = self.get_variable_val_list_from_gnu_makefile(
+                                attr, attr_abs_path)
                         if not is_list:
                             if len(ret2) > 0:
                                 ret2 = ret2[0]
                             else:
                                 ret2 = ''
                         # end pre-2.0 opencpi
-                    #if attr_abs_path != '':
+                    # if attr_abs_path != '':
                     #    if (ret2 != '') and (ret2 != []):
-                    #        Logger().debug('** parsed ' + attr_abs_path + ' ' + attr +
-                    #                       ' value of ' + str(ret2))
-                if (is_list and ret2 != []) or ((not is_list) and (ret2 != '')):
+                    #        Logger().debug('** parsed ' + attr_abs_path + ' '
+                    #                       + attr + ' value of ' + str(ret2))
+                if (is_list and ret2 != []) or ((not is_list) and
+                   (ret2 != '')):
                     ret = ret2
         else:
             for attr_info in self.get_attr_infos():
@@ -788,17 +745,20 @@ class AttributeBase():
             precedence order):
             1) cli_dict if it is not None,
             2) makefiles indicated in makefile_abs_paths list entries, if the
-               file indicated by the entry exists, in list order with the latter
-               entries taking precedence for overriding values
+               file indicated by the entry exists, in list order with the
+               latter entries taking precedence for overriding values
             3) the pre-parsed XML element in elem,
             4) XML file pointed to by self.get_xml_abs_path().
             Examples of attr are 'Property' and 'Instance' """
-        return self.get_attr_common(attr, elem, False, makefile_abs_paths, cli_dict)
+        return self.get_attr_common(attr, elem, False, makefile_abs_paths,
+                                    cli_dict)
 
-    def get_attr_list(self, attr, elem=None, makefile_abs_paths=[], cli_dict=None):
+    def get_attr_list(self, attr, elem=None, makefile_abs_paths=[],
+                      cli_dict=None):
         """ Same as get_attr() but retrieves the value as a list of strings.
             Examples of attr are 'Workers' and 'Containers' """
-        return self.get_attr_common(attr, elem, True, makefile_abs_paths, cli_dict)
+        return self.get_attr_common(attr, elem, True, makefile_abs_paths,
+                                    cli_dict)
 
     def raise_if_invalid_root_tag(self, elem):
         if elem.tag.lower() not in \
@@ -817,9 +777,9 @@ class AssetBase(AttributeBase):
         Protocols/Workers/Assemblies/etc. Child classes must define
         get_root_tags() method which returns list of strings of permissible
         tags to verify during construction. Each asset has a directory that is
-        retrievable via get_dir_abs_path(). Assets that have XML files can query
-        get_xml_abs_path(). Every child class is intended to also define a
-        get_type() string that is used for log messaging and internal asset
+        retrievable via get_dir_abs_path(). Assets that have XML files can
+        query get_xml_abs_path(). Every child class is intended to also define
+        a get_type() string that is used for log messaging and internal asset
         conditionalization."""
 
     def __init__(self, abs_path, enable_path_existence_check=True):
@@ -841,7 +801,7 @@ class AssetBase(AttributeBase):
             while '//' in self.abs_path:
                 self.abs_path = self.abs_path.replace('//', '/')
             if self.abs_path.endswith('/'):
-                self.abs_path = self.abs_path[:,-1]
+                self.abs_path = self.abs_path[:, -1]
         self.name = self.get_name()  # CDG section 6.1.1, section 8.1.1, etc
         if (self.abs_path is not None):
             if enable_path_existence_check:
@@ -850,13 +810,6 @@ class AssetBase(AttributeBase):
     def get_root_tags(self):
         # TODO replace get_root_tags() with self.root_tags
         return self.root_tags
-
-    def get_name(self):
-        # TODO replace get_root_tags() with self.root_tags
-        self.name = self.get_name()  # CDG section 6.1.1, section 8.1.1, etc
-        if (self.abs_path is not None):
-            if enable_path_existence_check:
-                self.raise_if_path_does_not_exist()
 
     def get_name(self):
         if self.get_is_xml():
@@ -876,8 +829,8 @@ class AssetBase(AttributeBase):
             for str_to_remove in strs_to_remove:
                 name = name.split(str_to_remove, -1)[0]
         else:
-            # self.abs_path is not None for makefiles but will be be None for base
-            # platform configuration
+            # self.abs_path is not None for makefiles but will be be None for
+            # base platform configuration
             if self.abs_path is None:
                 name = 'base'
             else:
@@ -908,22 +861,11 @@ class AssetBase(AttributeBase):
                     raise InvalidAssetError(msg)
 
     def raise_if_invalid_location(self):
-        if not any([self.get_dir_abs_path().endswith(loc) for loc in self.valid_locations]):
+        if not any([self.get_dir_abs_path().endswith(loc) for loc in
+                    self.valid_locations]):
             msg = self.get_type() + ' can not exist in directory '
             msg += self.get_dir_abs_path()
             raise InvalidAssetError(msg)
-
-    def create_files(self, templates, file_path, package_id=None,
-                     library_name=None, duplicate=False):
-        os.makedirs(file_path, exist_ok=duplicate)
-        for fname, fcontents in templates.items():
-            fcontents = jinja2.Template(fcontents, trim_blocks=True)
-            fcontents = fcontents.render(
-                asset=self, package_id=package_id, library_name=library_name
-            )
-            out_file = open(file_path + '/' + fname, 'w')
-            out_file.write(fcontents)
-            out_file.close()
 
     def get_paths_to_parse(self):
         return []
@@ -937,7 +879,7 @@ class AssetBase(AttributeBase):
 
     @staticmethod
     def get_name_from_abs_path(abs_path):
-        #return abs_path.rsplit('/', 1)[1].split('.xml')[0]
+        # return abs_path.rsplit('/', 1)[1].split('.xml')[0]
         return abs_path.rsplit('/', 1)[1].split('.')[0]
 
     @staticmethod
@@ -954,7 +896,8 @@ class AssetBase(AttributeBase):
             within parent_abs_path which exist and are to be considered as
             assets to be discovered """
         return [(parent_abs_path + '/' + entry) for entry in
-                os.listdir(parent_abs_path) if (os.path.isdir(parent_abs_path + '/' + entry) and
+                os.listdir(parent_abs_path) if
+                (os.path.isdir(parent_abs_path + '/' + entry) and
                 (entry != 'lib') and (entry != 'specs'))]
 
     def get_is_xml(self):
@@ -982,7 +925,8 @@ class AssetBase(AttributeBase):
             ret = self.abs_path.rsplit('/', 1)[0]
         return ret
 
-    def get_dir_abs_path_is_within_specified_abs_path(self, specified_abs_path):
+    def get_dir_abs_path_is_within_specified_abs_path(self,
+                                                      specified_abs_path):
         split_dir_abs_path = self.get_dir_abs_path.split('/')
         split_specified_abs_path = specified_abs_path.split('/')
         return set(split_dir_abs_path).issuperset(split_specified_abs_path)
@@ -996,18 +940,19 @@ class AssetBase(AttributeBase):
         for elem in elems:
             # ugly ugly fix... (e.g. file_read OCS)
             # below line adds && operator support (CDG section 7.11.2)
-            _str = _str.replace('\%\%', '\&amp;\%amp;')
+            _str = _str.replace('\%\%', '\&amp;\%amp;')  # nopep8
             # below 2 lines avoid corruption of ProtocolSummary attribute
             _str = _str.replace('protocolsummary', 'foosummary')
             _str = _str.replace('ProtocolSummary', 'foosummary')
             for _elem in [elem, elem.lower()]:
                 from_str = '<' + _elem
-                to_str = '<' + _elem + " xmlns:xi=\"http://www.w3.org/2001/XInclude\" "
+                to_str = '<' + _elem
+                to_str += " xmlns:xi=\"http://www.w3.org/2001/XInclude\" "
                 # below line hacks xi:include support (CDG section 5.1)
                 _str = _str.replace(from_str, to_str)
             # below line avoids corruption of ProtocolSummary attribute
             _str = _str.replace('foosummary', 'ProtocolSummary')
-        # below line adds support for newlines in attributes (undocumented in OpenCPI)
+        # below line supports newlines in attributes (undocumented in OpenCPI)
         _str = _str.replace('\n', ' ')
         try:
             ret = ET.ElementTree(ET.fromstring(_str))
@@ -1019,9 +964,10 @@ class AssetBase(AttributeBase):
         return ret
 
     def get_list_of_existing_abs_paths_to_parse(self, abs_paths):
-        """ abs_paths is list of absolute paths to xml or Makefile to be parsed,
-            which is then pruned to contain only files that exist before
-            returning the pruned list, with the list order maintained """
+        """ abs_paths is list of absolute paths to xml or Makefile to be
+            parsed, which is then pruned to contain only files that exist
+            before returning the pruned list, with the list order
+            maintained """
         ret = []
         for abs_path in abs_paths:
             if os.path.exists(abs_path):
@@ -1050,8 +996,3 @@ class AssetBase(AttributeBase):
 
     def raise_invalid_asset_error(self):
         raise InvalidAssetError('not a ' + self.get_root_tags()[0])
-
-
-def test_GNUMakefile(ret):
-    log_pass_fail('testing GNUMakefile', False)
-    return ret

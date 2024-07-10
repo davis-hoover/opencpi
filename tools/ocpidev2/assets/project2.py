@@ -99,8 +99,6 @@ Skeleton outline: Description of project.
 \n"""
 
 
-project_templates['Project.xml'] = g_asset_template
-
 class Project(AssetBase, SpecsDirectory, Discoverer):
     """ Component Development Guide section 14 """
 
