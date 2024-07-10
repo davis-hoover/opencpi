@@ -237,11 +237,11 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         for dir_abs_path in tmp:
             try:
                 is_libs = False
-                # try:
-                #     ComponentLibraries(dir_abs_path)
-                #     is_libs = True
-                # except InvalidAssetError as err:
-                #     pass
+                try:
+                    ComponentLibraries(dir_abs_path)
+                    is_libs = True
+                except InvalidAssetError as err:
+                    pass
                 # try:
                 asset = ComponentLibrary(dir_abs_path)
                 if not is_libs:

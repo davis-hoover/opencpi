@@ -34,6 +34,7 @@ def set_g_suppress_warn(val):
     global g_suppress_warn
     g_suppress_warn = val
 
+
 def log_pass_fail(msg, passed):
     spaces = ''
     for count in range(60-len(msg)):

@@ -166,10 +166,19 @@ class ComponentLibraries(AssetBase):
         # TODO investigate moving below 3 lines into AssetBase
         if os.path.exists(self.get_xml_abs_path()):
             self.raise_if_invalid_root_tag(self.get_parsed().getroot())
+        found = True
+        for entry in AssetBase.listdir_assets(self.get_dir_abs_path()):
+            if entry == 'specs':
+                found = False
+        if not found:
+            self.raise_invalid_location()
         self.parse()
 
     def get_paths_to_parse(self):
         return [self.get_xml_abs_path()]
+
+    def get_type(self):
+        return 'component libraries'
 
 
 class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
@@ -188,7 +197,12 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         try:
             self.raise_if_invalid_location()
         except InvalidAssetError:
-            if len(dir_abs_path.split('components/')) != 2:
+            tmp = dir_abs_path.split('components/')
+            Logger().debug('tmp ' + str(tmp))
+            if len(tmp) == 2:
+                if tmp[1] == 'gen':
+                    self.raise_invalid_location()
+            else:
                 self.raise_invalid_location()
         is_test = self.get_dir_abs_path_is_test(dir_abs_path)
         if is_test or self.get_dir_abs_path_is_worker(dir_abs_path):

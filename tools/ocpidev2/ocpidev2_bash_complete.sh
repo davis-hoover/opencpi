@@ -73,21 +73,7 @@ _ocpidev2()
   str=""
   str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-h " "--help " "$COMP_LINE")
   #str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose" "$COMP_LINE")
-  if [ "$3" == "build" ]; then
-    str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-j" "--jobs" "$COMP_LINE")
-    str=$(get_compgen_str_for_option_only_allowed_once "$str" "--hdl-platform" "$COMP_LINE")
-    str=$(get_compgen_str_for_option_only_allowed_once "$str" "--hdl-target" "$COMP_LINE")
-    str=$(get_compgen_str_for_option_only_allowed_once "$str" "--rcc-platform" "$COMP_LINE")
-    str=$(get_compgen_str_for_option_only_allowed_once "$str" "--rcc-platform" "$COMP_LINE")
-    COMPREPLY=( $(compgen -W "$str" -- "$2") )
-  elif [ "$3" == "--hdl-target" ]; then
-    # these are the values hardcoded in abstract2.py get_target(), for now (BAD! - TODO fix this)
-    COMPREPLY=( $(compgen -W "zynq zynq_ise zynq_ultra virtex6" -- "$2") )
-  elif [ "$3" == "--hdl-platform" ]; then
-    COMPREPLY=( $(compgen -W "$(ocpidev2 show hdl platforms | sed "s/.*\.//g")" -- "$2") )
-  elif [ "$3" == "--rcc-platform" ]; then
-    COMPREPLY=( $(compgen -W "$(ocpidev2 show rcc platforms | sed "s/.*\.//g")" -- "$2") )
-  elif [ "$3" == "show" ]; then
+  if [ "$3" == "show" ]; then
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "application" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "applications" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "component" "$COMP_LINE")
@@ -126,9 +112,6 @@ _ocpidev2()
   elif [ "$3" == "worker" ]; then
     assets=$(echo $(printf "%s\n" $(ocpidev2 show workers --suppress-warn | sed "s/.*\.//g")) | uniq)
     COMPREPLY=( $(compgen -W "$assets" -- "$2") )
-  elif [ "$3" == "clean" ]; then
-    str=$(get_compgen_str_for_option_only_allowed_once "$str" "-d" "$COMP_LINE")
-    COMPREPLY=( $(compgen -W "$str" -- "$2") )
   elif [ "$3" == "unittest" ]; then
     COMPREPLY=()
   elif [ "$3" == "ocpidev2" ]; then
@@ -140,19 +123,10 @@ _ocpidev2()
   elif [ "$3" == "project" ]; then
     assets=$(echo $(printf "%s\n" $(ocpidev2 show projects --suppress-warn | sed "s/.*\.//g")) | uniq)
     COMPREPLY=( $(compgen -W "$assets" -- "$2") )
-  elif [ "$3" == "projects" ]; then
-    str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose " "$COMP_LINE")
-    COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
   elif [ "$3" == "component" ]; then
     assets=$(echo $(printf "%s\n" $(ocpidev2 show components --suppress-warn | sed "s/.*\.//g")) | uniq)
     COMPREPLY=( $(compgen -W "$assets" -- "$2") )
-  elif [ "$3" == "components" ]; then
-    str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose " "$COMP_LINE")
-    COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
   elif [ "$3" == "workers" ]; then
-    str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose " "$COMP_LINE")
-    COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
-  elif [ "$3" == "libraries" ]; then
     str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose " "$COMP_LINE")
     COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
   elif [ "$3" == "register" ]; then
@@ -164,10 +138,24 @@ _ocpidev2()
     COMPREPLY=( $(compgen -W "" -- "$2") )
   elif [ "$3" == "--help" ]; then
     COMPREPLY=( $(compgen -W "" -- "$2") )
+  elif [ "$3" == "applications" ]; then
+    str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose " "$COMP_LINE")
+    COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
+  elif [ "$3" == "components" ]; then
+    str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose " "$COMP_LINE")
+    COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
+  elif [ "$3" == "libraries" ]; then
+    str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose " "$COMP_LINE")
+    COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
+  elif [ "$3" == "projects" ]; then
+    str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose " "$COMP_LINE")
+    COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
   else
-    str=$(get_compgen_str_for_verb "$str" "$COMP_LINE")
-    str=$(get_compgen_str_for_noun "$str" "$COMP_LINE")
-    COMPREPLY=( $(compgen -W "$str" -- "$2") )
+    #str=$(get_compgen_str_for_verb "$str" "$COMP_LINE")
+    #str=$(get_compgen_str_for_noun "$str" "$COMP_LINE")
+    #COMPREPLY=( $(compgen -W "$str" -- "$2") )
+    str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose " "$COMP_LINE")
+    COMPREPLY=( $(compgen -W "$str -d" -- "$2") )
   fi
   # below line necessary for -d argument
   [[ $COMPREPLY == */ ]] && compopt -o nospace
