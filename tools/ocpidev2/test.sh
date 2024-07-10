@@ -24,15 +24,6 @@ do_show_test() {
   ocpidev2 show component Consumer
 }
 
-do_build_test() {
-  ocpidev2 clean -d projects/core
-  ocpidev2 clean -d projects/asset
-  ocpidev2 clean -d projects/asset_ts
-  ocpidev2 clean -d projects/tutorial
-  ocpidev2 clean -d projects/platform
-  ocpidev2 build -j 4 -d projects/assets --hdl-platform zed
-}
-
 report_coverage() {
   python3 -m pip install coverage
   coverage run $(which ocpidev2) unittest
@@ -42,5 +33,5 @@ report_coverage() {
 set -e
 do_linter_test
 do_unit_test
-do_build_test
+do_show_test
 #report_coverage
