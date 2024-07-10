@@ -76,7 +76,7 @@ def unittest(cli_dict, project_registry):
 def add_show_arguments(parser):
     # parser.add_argument('--global-scope', action='store_true')
     parser.add_argument('authoring_model', nargs='?', default='')
-    parser.add_argument('noun', default=None)
+    parser.add_argument('noun', nargs='?', default=None)
     parser.add_argument('name', nargs='?', default=None)
     return parser
 
@@ -141,9 +141,11 @@ def get_cli_dict():
         if args.name:
             if not args.name.isidentifier():
                 raise ValueError("'" + args.name + "' is not a valid name")
-        if (args.noun is not None) and (args.noun not in nouns):
-            if args.verb != 'apply':
-                raise Exception('noun ' + str(args.noun) + ' is not supported')
+        if not args.help:
+            if (args.noun is not None) and (args.noun not in nouns):
+                if args.verb != 'apply':
+                    msg = 'noun ' + str(args.noun) + ' is not supported'
+                    raise Exception(msg)
     tmp = args
     mylist = args.d.copy()
     tmp.d = []
@@ -309,6 +311,8 @@ def get_enable_registry_discovery(cli_dict):
     if cli_dict['verb'] == 'show':
         disc = cli_dict['noun'] != 'registry'
         disc = disc and (cli_dict['noun'] != 'projects')
+    if cli_dict['help']:
+        disc = False
     return disc
 
 

@@ -72,7 +72,7 @@ _ocpidev2()
 {
   str=""
   str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-h " "--help " "$COMP_LINE")
-  str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose" "$COMP_LINE")
+  #str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose" "$COMP_LINE")
   if [ "$3" == "build" ]; then
     str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-j" "--jobs" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "--hdl-platform" "$COMP_LINE")
@@ -156,6 +156,10 @@ _ocpidev2()
     COMPREPLY=( $(compgen -W "$str project" -- "$2") )
   elif [ "$3" == "unregister" ]; then
     COMPREPLY=( $(compgen -W "project" -- "$2") )
+  elif [ "$3" == "-h" ]; then
+    COMPREPLY=( $(compgen -W "" -- "$2") )
+  elif [ "$3" == "--help" ]; then
+    COMPREPLY=( $(compgen -W "" -- "$2") )
   else
     str=$(get_compgen_str_for_verb "$str" "$COMP_LINE")
     str=$(get_compgen_str_for_noun "$str" "$COMP_LINE")
