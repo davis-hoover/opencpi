@@ -135,6 +135,18 @@ class HdlPlatformConfiguration(AssetBase):
                 pass
 
 
+class HdlSlot(AssetBase):
+    """ Platform Development Guide section 5.4.2 """
+
+    def __init__(self, xml_abs_path):
+        self.root_tags = ['SlotType']
+        AssetBase.__init__(self, xml_abs_path)
+        self.parse()
+
+    def get_type(self):
+        return 'hdl slot'
+
+
 class HdlCard(HdlCardPlatformBase):
     """ Platform Development Guide section 5.6 """
 

@@ -31,35 +31,6 @@ from _opencpi.assets.primitive2 import HdlLibrary, test_HdlLibrary
 from _opencpi.assets.application2 import Application
 from _opencpi.assets.test2 import Test
 
-comp_lib_rst_template = """
-.. {{asset.name|capitalize}} library index page
-
-
-{{asset.name|capitalize}} Library
-=================================
-Skeleton outline: Component library description and outline of scope to go here.
-
-.. toctree::
-   :maxdepth: 1
-   :glob:
-   :caption: {{asset.name}}
-
-   *.comp/*-index
-   *.comp/*-comp
-
-..
-   "*.comp/*-index" is for backward compatibility with older component document naming schemes.
-
-"""  # noqa: E501
-
-
-def create_templates(name):
-    """ Creates a <component_name>.rst skeleton document to populate the
-        directory using instance variables"""
-    comp_lib_templates = {}
-    comp_lib_templates[name + '.rst'] = comp_lib_rst_template
-    return comp_lib_templates
-
 
 class SpecsDirectory():
     """ Class for discovering component assets in the specs directory """
@@ -83,6 +54,7 @@ class SpecsDirectory():
                         pass
 
 
+# TODO organize this class better
 class Discoverer():
 
     def append_discovered_asset(self, asset):
@@ -96,6 +68,8 @@ class Discoverer():
             self.hdl_primitives.append(asset)
         if asset.get_type() == 'hdl assembly':
             self.hdl_assemblies.append(asset)
+        if asset.get_type() == 'hdl slot':
+            self.hdl_slots.append(asset)
         if asset.get_type() == 'hdl card':
             self.hdl_cards.append(asset)
         if asset.get_type() == 'hdl platform':
@@ -226,6 +200,9 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         if enable_path_existence_check:
             self.discover(allowlist, 'hdl/platforms' in dir_abs_path)
 
+    def get_type(self):
+        return 'component library'
+
     def get_comp_dict(self, project):
         """ Update comp_dict with discovered project
             hdl/platform/<platform_name> libraries """
@@ -239,91 +216,6 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         comp_dict['devices'] = [comp_dict['devices']]
         comp_dict['devices'].extend(platform_device_libs)
         return comp_dict
-
-    def create_components_dir(self, project):
-        """ If no 'components' directory exists when creating a
-            omponent library with a components directory, create one. """
-        if not os.path.exists(project.abs_path + '/components'):
-            # Create 'components' temporary variables
-            abs_path = self.abs_path
-            self.abs_path = project.abs_path + '/components'
-            name = self.name
-            self.name = 'components'
-            # Create 'components' template
-            comp_lib_templates = create_templates('components')
-            comp_lib_templates['components.xml'] = g_asset_template
-            AssetBase.create_files(self, comp_lib_templates, self.abs_path)
-            # Reset self. variables to create the component library within the
-            # components directory
-            self.abs_path = abs_path
-            self.name = name
-
-    def valid_library_name(self, project, comp_dict,
-                           is_component_library_within_components_dir=False):
-        """ Check for a valid component library name """
-        if is_component_library_within_components_dir:
-            if self.name in comp_dict.keys():
-                msg = ("Sub-component-library name '" + self.name +
-                       "' invalid. Cannot share component library names: " +
-                       (', '.join(map(str, list(comp_dict.keys()))))) + "."
-                raise Exception(msg)
-        if not is_component_library_within_components_dir:
-            if self.name not in comp_dict:
-                msg = ("Component Library name '" + self.name + "' invalid. "
-                       "Not part of the valid component library names: " +
-                       (', '.join(map(str, list(comp_dict.keys())))) + ". "
-                       "To create a '" + self.name +
-                       "' component library within a components directory" +
-                       ", point (-d) to the 'components' library.")
-                raise Exception(msg)
-
-    def valid_path(self, project, comp_dict,
-                   is_component_library_within_components_dir):
-        """ Check that the user is providing a valid path to a component
-            library. If not, provide path suggestions """
-        valid_path = False
-        if is_component_library_within_components_dir:
-            valid_path = True
-        elif self.name == 'devices':
-            for lib in comp_dict[self.name]:
-                path_to_check = project.abs_path + '/' + lib
-                if path_to_check == self.abs_path:
-                    valid_path = True
-        else:
-            path_to_check = project.abs_path + '/' + comp_dict[self.name]
-            if path_to_check == self.abs_path:
-                valid_path = True
-        if not valid_path:
-            if self.name == 'devices':
-                valid_locations = (
-                    '<project_name>/hdl/ , ' +
-                    '<project_name>/hdl/platform/<platform_name>/'
-                )
-            elif self.name in ['cards', 'adapters', 'platforms']:
-                valid_locations = '<project_name>/hdl/'
-            else:  # 'components':
-                valid_locations = '<project_name>/'
-            msg = ("create library '" + self.name + "' must be in (CWD) or "
-                   "point to (-d) a valid component library location: " +
-                   valid_locations)
-            raise Exception(msg)
-
-    def create(self, project, _dir):
-        """ Creates a valid Component Library and associated skeleton files
-            for a given path """
-        comp_lib_templates = create_templates(self.name)
-        comp_dict = self.get_comp_dict(project)
-        is_comp_lib_within_components_dir = _dir.endswith(
-                project.name + '/components')
-        if is_comp_lib_within_components_dir and (self.name not in
-                                                  comp_dict.keys()):
-            self.create_components_dir(project)
-        self.valid_library_name(project, comp_dict,
-                                is_comp_lib_within_components_dir)
-        self.valid_path(project, comp_dict, is_comp_lib_within_components_dir)
-        comp_lib_xml_name = self.name + '.xml'
-        comp_lib_templates[comp_lib_xml_name] = g_asset_template
-        AssetBase.create_files(self, comp_lib_templates, self.abs_path)
 
     @staticmethod
     def get_dir_abs_path_is_worker(dir_abs_path):
@@ -404,9 +296,6 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
 
     def discover_tests(self):
         self.discover_dir_assets('', None, False)
-
-    def get_type(self):
-        return 'component library'
 
 
 def test_ComponentLibrary(ret):
