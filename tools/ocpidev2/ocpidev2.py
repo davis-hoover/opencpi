@@ -31,7 +31,11 @@ def ocpidevsignint(sig, frame):
 
 
 def add_show_arguments(parser):
-    # parser.add_argument('--global-scope', action='store_true')
+    parser.add_argument('--global-scope', default=False, action='store_true')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--simple', default=False, action='store_true')
+    group.add_argument('--table', default=False, action='store_true')
+    group.add_argument('--json', default=False, action='store_true')
     parser.add_argument('authoring_model', nargs='?', default='')
     parser.add_argument('noun', nargs='?', default=None)
     parser.add_argument('name', nargs='?', default=None)
@@ -90,8 +94,9 @@ def get_cli_dict():
              'platform', 'platforms',
              'project', 'projects',
              'protocol', 'protocols',
-             'registry', 
+             'registry',
              'library', 'libraries',
+             'slot', 'slots',
              'test', 'tests',
              'worker', 'workers']
     Logger().debug('args : ' + str(args))
@@ -155,37 +160,37 @@ global g_suppress_warn
 
 if __name__ == '__main__':
     exit_status = 0
-    #try:
-    signal.signal(signal.SIGINT, ocpidevsignint)
-    cli_dict = get_cli_dict()
-    if cli_dict['suppresswarn']:
-        set_g_suppress_warn(True)
-    Logger().debug('cli_dict : ' + str(cli_dict))
-    project_registry = None
-    if get_create_registry(cli_dict):
-        disc = get_enable_registry_discovery(cli_dict)
-        project_registry = ProjectRegistry(disc, disc)
-    if cli_dict['help']:
-        if cli_dict['verb'] == '':
-            os.system('man ocpidev2')
+    try:
+        signal.signal(signal.SIGINT, ocpidevsignint)
+        cli_dict = get_cli_dict()
+        if cli_dict['suppresswarn']:
+            set_g_suppress_warn(True)
+        Logger().debug('cli_dict : ' + str(cli_dict))
+        project_registry = None
+        if get_create_registry(cli_dict):
+            disc = get_enable_registry_discovery(cli_dict)
+            project_registry = ProjectRegistry(disc, disc)
+        if cli_dict['help']:
+            if cli_dict['verb'] == '':
+                os.system('man ocpidev2')
+            else:
+                os.system('man ocpidev2-' + cli_dict['verb'])
+        elif (cli_dict['verb'] == 'show') or (cli_dict['verb'] == 'build') or \
+             (cli_dict['verb'] == 'create'):
+            for _dir in cli_dict['d']:
+                if (cli_dict['verb'] != 'show') and (_dir == ''):
+                    _dir = Environment().getcwd()
+                elif cli_dict['verb'] == 'show':
+                    project_registry.show(_dir, cli_dict)
+                elif cli_dict['verb'] == 'build':
+                    project_registry.build(_dir, cli_dict)
+                elif cli_dict['verb'] == 'create':
+                    project_registry.create(_dir, cli_dict)
+        elif cli_dict['verb'] == 'unittest':
+            unittest(cli_dict, project_registry)
         else:
-            os.system('man ocpidev2-' + cli_dict['verb'])
-    elif (cli_dict['verb'] == 'show') or (cli_dict['verb'] == 'build') or \
-         (cli_dict['verb'] == 'create'):
-        for _dir in cli_dict['d']:
-            if (cli_dict['verb'] != 'show') and (_dir == ''):
-                _dir = Environment().getcwd()
-            elif cli_dict['verb'] == 'show':
-                project_registry.show(_dir, cli_dict)
-            elif cli_dict['verb'] == 'build':
-                project_registry.build(_dir, cli_dict)
-            elif cli_dict['verb'] == 'create':
-                project_registry.create(_dir, cli_dict)
-    elif cli_dict['verb'] == 'unittest':
-        unittest(cli_dict, project_registry)
-    else:
-        raise Exception('verb ' + cli_dict['verb'] + ' is not supported')
-    #except Exception as exception:
-    #    Logger().error(str(exception))
-    #    exit_status = 1
+            raise Exception('verb ' + cli_dict['verb'] + ' is not supported')
+    except Exception as exception:
+        Logger().error(str(exception))
+        exit_status = 1
     exit(exit_status)

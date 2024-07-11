@@ -29,7 +29,8 @@ from _opencpi.assets.library2 import ComponentLibrary, ComponentLibraries
 from _opencpi.assets.library2 import test_ComponentLibrary
 from _opencpi.assets.primitive2 import HdlLibrary
 from _opencpi.assets.assembly2 import HdlAssembly
-from _opencpi.assets.platform2 import HdlSlot, HdlCard, HdlPlatform, RccPlatform
+from _opencpi.assets.platform2 import HdlSlot, HdlCard
+from _opencpi.assets.platform2 import HdlPlatform, RccPlatform
 
 
 class Project(AssetBase, SpecsDirectory, Discoverer):
@@ -337,13 +338,13 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             assets.extend([self])
         for component_library in self.component_libraries:
             if _type.startswith('worker'):
-                    for worker in component_library.workers:
-                        if (cli_dict['authoringmodel'] == '') or \
-                           (cli_dict['authoringmodel'] == 'hdl'):
-                            assets.append(worker)
-                        if (cli_dict['authoringmodel'] == '') or \
-                           (cli_dict['authoringmodel'] == 'rcc'):
-                            assets.append(worker)
+                for worker in component_library.workers:
+                    if (cli_dict['authoringmodel'] == '') or \
+                       (cli_dict['authoringmodel'] == 'hdl'):
+                        assets.append(worker)
+                    if (cli_dict['authoringmodel'] == '') or \
+                       (cli_dict['authoringmodel'] == 'rcc'):
+                        assets.append(worker)
             if _type.startswith('test'):
                 assets.extend(component_library.tests)
         return assets
@@ -387,22 +388,37 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                 types.append('test')
         return types
 
-    def show(self, _dir, cli_dict):
+    def show(self, _dir, cli_dict, json_dict={}):
+        if cli_dict['globalscope']:
+            Logger().warn('--global-scope does not change the behavior, see man ocpidev2-show')
+        first = True
         for _type in self.get_types_from_cli_dict(cli_dict):
             assets = []
             for asset in self.get_assets_of_type(_type):
                 if (cli_dict['name'] is None) or \
                    (cli_dict['name'] == asset.name):
                     if (_dir == '') or (_dir in asset.abs_path):
-                        msg = str(self.get_package_id())
+                        pid = str(self.get_package_id())
+                        if (_type == 'component') or (_type.endswith('worker')):
+                            for component_library in self.component_libraries:
+                                if (asset in component_library.components) or (asset in component_library.workers):
+                                    pid = component_library.get_package_id(pid)
+                                    break
+                        pid_and_name = pid
                         if not cli_dict['noun'].startswith('project'):
-                            msg += '.' + asset.name
-                        if cli_dict['verbose']:
+                            pid_and_name += '.' + asset.name
+                        msg = ('' if first else ' ') + pid_and_name
+                        if cli_dict['verbose'] or cli_dict['table']:
                             msg += ' '
                             for idx in range(60-len(msg)):
                                 msg += ' '
                             msg += asset.abs_path
-                        print(msg)
+                        if cli_dict['json']:
+                            json_dict[pid_and_name] = {"package_id": pid, "directory": asset.get_dir_abs_path()}
+                        else:
+                            print(msg, end=('' if cli_dict['simple'] else '\n'))
+                        first = False
+        return json_dict
 
 
 def test_Project(ret):

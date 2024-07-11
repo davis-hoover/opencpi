@@ -177,8 +177,13 @@ class ProjectRegistry():
             if (_dir == '') or \
                (_dir in self.abs_path):
                 print(self.abs_path)
+        json_dict = {}
         for project in self.projects:
-            project.show(_dir, cli_dict)
+            json_dict = project.show(_dir, cli_dict, json_dict)
+        if cli_dict['simple']:
+            print('')
+        if cli_dict['json']:
+            print(str(json_dict))
 
     def build(self, _dir, cli_dict):
         pass

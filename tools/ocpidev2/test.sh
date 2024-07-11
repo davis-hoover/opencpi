@@ -63,10 +63,10 @@ do_show_test() {
   ocpidev2 -d assets show -d core hdl assemblies -d platform -v -l 8
   ocpidev2 -d assets show -d core hdl assemblies -d platform -v --log-level 8
   ocpidev2 -d assets show -d core hdl assemblies -d platform -v -l 10
-  ocpidev2 show hdl card dsp_prims
-  ocpidev2 show hdl card dsp_prims -v
-  ocpidev2 show hdl card dsp_prims --verbose
-  ocpidev2 show hdl card dsp_prims -d assets
+  ocpidev2 show hdl card fmcomms_2_3_lpc
+  ocpidev2 show hdl card fmcomms_2_3_lpc -v
+  ocpidev2 show hdl card fmcomms_2_3_lpc --verbose
+  ocpidev2 show hdl card fmcomms_2_3_lpc -d assets
   ocpidev2 show hdl cards 
   ocpidev2 show hdl cards -v
   ocpidev2 show hdl cards --verbose
@@ -317,6 +317,9 @@ do_show_test() {
   ocpidev2 -d assets show -d core workers -d platform -v -l 8
   ocpidev2 -d assets show -d core workers -d platform -v --log-level 8
   ocpidev2 -d assets show -d core workers -d platform -v -l 10
+  ocpidev2 show components --simple
+  ocpidev2 show components --table
+  ocpidev2 show components --json
 }
 
 report_coverage() {
