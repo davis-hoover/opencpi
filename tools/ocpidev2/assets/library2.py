@@ -126,7 +126,8 @@ class Discoverer():
                     if (allowlist is None) or (asset.name in allowlist):
                         self.append_discovered_asset(asset)
             except InvalidAssetError as err:
-                if parent != 'applications':
+                if (parent != 'applications') and \
+                   (not dir_abs_path.endswith('.test')):
                     Logger().warn('skipping ' + str(err))
                 pass
 
@@ -275,8 +276,7 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
 
     def discover(self, allowlist, platform=False):
         self.discover_components()
-        self.discover_workers(allowlist, platform)
-        self.discover_tests()
+        self.discover_workers_and_tests(allowlist, platform)
 
     def discover_components(self):
         SpecsDirectory.discover_components(self)
@@ -289,13 +289,10 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
                     except InvalidAssetError:
                         pass
 
-    def discover_workers(self, allowlist, platform=False):
+    def discover_workers_and_tests(self, allowlist, platform=False):
         # Logger().debug(str(allowlist))
         # '' in below line indicates worker discovery
         self.discover_dir_assets('', allowlist, platform)
-
-    def discover_tests(self):
-        self.discover_dir_assets('', None, False)
 
 
 def test_ComponentLibrary(ret):

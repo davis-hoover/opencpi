@@ -27,6 +27,7 @@ import jinja2
 
 # TODO make a class member, probably ComponentLibrary or Project class
 g_libraries_mk = False
+g_hdl_core_mk = False
 g_suppress_warn = False
 
 
@@ -278,9 +279,12 @@ class GNUMakefile():
         reference_or_function = ''
         indent = 0
         global g_libraries_mk
+        global g_hdl_core_mk
         if string[0:7] == 'include':
             if string.strip().endswith('libraries.mk'):
                 g_libraries_mk = True
+            if string.strip().endswith('hdl-core.mk'):
+                g_hdl_core_mk = True
         while (idx < len(string)) and (not define) and (not endef):
             if string[idx] == '#':
                 break
@@ -888,6 +892,11 @@ class AssetBase(AttributeBase):
             Logger().debug('parsing ' + path)
         AttributeBase.parse(self, None, paths, cli_dict)
         Logger().debug('parsed attributes: ' + str(self.attrs))
+        # TODO remove below 2 line lines which are bad hack
+        global g_hdl_core_mk
+        ret = g_hdl_core_mk
+        g_hdl_core_mk = False
+        return ret
 
     @staticmethod
     def get_name_from_abs_path(abs_path):
@@ -910,6 +919,7 @@ class AssetBase(AttributeBase):
         return [(parent_abs_path + '/' + entry) for entry in
                 os.listdir(parent_abs_path) if
                 (os.path.isdir(parent_abs_path + '/' + entry) and
+                (entry != 'gen') and
                 (entry != 'lib') and (entry != 'specs'))]
 
     def get_is_xml(self):

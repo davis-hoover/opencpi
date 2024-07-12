@@ -35,6 +35,16 @@ class HdlLibrary(AssetBase):
         self.source_files = []  # HDG section 5.2.1
         self.parse()
 
+    def get_attr_infos(self):
+        ret = []
+        for key in ['Libraries']:
+            ret.append(AttributeInfo(key, is_list=True))
+        return ret
+
+    def parse(self, cli_dict=None):
+        # TODO remove assignment of parse() result which is bad hack
+        self.is_core = AssetBase.parse(self, cli_dict)
+
     def get_paths_to_parse(self):
         paths = []
         # start pre-2.0 opencpi

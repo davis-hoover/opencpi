@@ -35,10 +35,10 @@ Asset types to be specified in the '<noun>' argument are:
     Display all components in registered projects.
 
 *`library`*::
-    Display information on the specified library.
+    Display information on the specified component library.
 
 *`libraries`*::
-    Display all libraries in registered projects.
+    Display all component libraries in registered projects.
 
 *`project`*::
     Display information on the specified registered project.

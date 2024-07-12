@@ -22,6 +22,7 @@ import hashlib
 import itertools
 from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import AssetBase
+from _opencpi.assets.component2 import Component
 from _opencpi.assets.worker2 import Worker
 from _opencpi.assets.application2 import Application
 from _opencpi.assets.library2 import SpecsDirectory, Discoverer
@@ -31,6 +32,7 @@ from _opencpi.assets.primitive2 import HdlLibrary
 from _opencpi.assets.assembly2 import HdlAssembly
 from _opencpi.assets.platform2 import HdlSlot, HdlCard
 from _opencpi.assets.platform2 import HdlPlatform, RccPlatform
+from _opencpi.assets.test2 import Test
 
 
 class Project(AssetBase, SpecsDirectory, Discoverer):
@@ -312,112 +314,152 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         # TODO check if there is an allowlist, and if so, pass to below call
         self.discover_dir_assets('rcc/platforms')
 
-    def get_assets_of_type(self, _type, authoring_model=''):
+    def get_assets_of_type(self, _type):
         assets = []
-        if _type == 'application':
+        if _type == Application:
             assets.extend(self.applications)
-        if _type == 'hdl assembly':
+        if _type == HdlAssembly:
             assets.extend(self.hdl_assemblies)
-        if _type == 'hdl card':
+        if _type == HdlCard:
             assets.extend(self.hdl_cards)
-        if _type == 'component':
-            assets.extend(self.components)
+        if _type == Component:
+            assets.extend(self.components)  # project specs directory
             for component_library in self.component_libraries:
                 assets.extend(component_library.components)
-        if _type == 'hdl primitive':
+        if _type == HdlLibrary:
             assets.extend(self.hdl_primitives)
-        if _type == 'component library':
+        if _type == ComponentLibrary:
             assets.extend(self.component_libraries)
-        if _type == 'hdl slot':
+        if _type == HdlSlot:
             assets.extend(self.hdl_slots)
-        if _type == 'hdl platform':
+        if _type == HdlPlatform:
             assets.extend(self.hdl_platforms)
-        if _type == 'rcc platform':
+        if _type == RccPlatform:
             assets.extend(self.rcc_platforms)
-        if _type == 'project':
+        if _type == Project:
             assets.extend([self])
         for component_library in self.component_libraries:
-            if _type.startswith('worker'):
-                for worker in component_library.workers:
-                    if (cli_dict['authoringmodel'] == '') or \
-                       (cli_dict['authoringmodel'] == 'hdl'):
-                        assets.append(worker)
-                    if (cli_dict['authoringmodel'] == '') or \
-                       (cli_dict['authoringmodel'] == 'rcc'):
-                        assets.append(worker)
-            if _type.startswith('test'):
+            if _type == Worker:
+                assets.extend(component_library.workers)
+            if _type == Test:
                 assets.extend(component_library.tests)
         return assets
 
     def get_types_from_cli_dict(self, cli_dict):
-        """ get list of types whose entries will each equal one of the values
-            returned by an asset class's get_type() """
+        """ get list of types (asset classes) that correspond to cli_dict noun
+            and authoring_model entries """
         types = []
         if cli_dict['noun'].startswith('application'):
-            types.append('application')
+            types.append(Application)
         if cli_dict['noun'].startswith('assembl'):
-            types.append('hdl assembly')
+            types.append(HdlAssembly)
         if cli_dict['noun'].startswith('card'):
-            types.append('hdl card')
+            types.append(HdlCard)
         if cli_dict['noun'].startswith('component'):
-            types.append('component')
+            types.append(Component)
+        if cli_dict['noun'].startswith('core'):
+            types.append(HdlLibrary)
         if cli_dict['noun'].startswith('librar'):
-            types.append('hdl primitive')
-            types.append('component library')
+            types.append(ComponentLibrary)
         if cli_dict['noun'].startswith('slot'):
-            types.append('hdl slot')
+            types.append(HdlSlot)
         if cli_dict['noun'].startswith('platform'):
             if (cli_dict['authoringmodel'] == '') or \
                (cli_dict['authoringmodel'] == 'hdl'):
-                types.append('hdl platform')
+                types.append(HdlPlatform)
             if (cli_dict['authoringmodel'] == '') or \
                (cli_dict['authoringmodel'] == 'rcc'):
-                types.append('rcc platform')
+                types.append(RccPlatform)
+        if cli_dict['noun'].startswith('primitive'):
+            types.append(HdlLibrary)
         if cli_dict['noun'].startswith('project'):
-            types.append('project')
-        for component_library in self.component_libraries:
-            if cli_dict['noun'].startswith('worker'):
-                for worker in component_library.workers:
-                    if (cli_dict['authoringmodel'] == '') or \
-                       (cli_dict['authoringmodel'] == 'hdl'):
-                        types.append('hdl worker')
-                    if (cli_dict['authoringmodel'] == '') or \
-                       (cli_dict['authoringmodel'] == 'rcc'):
-                        types.append('rcc worker')
-            if cli_dict['noun'].startswith('test'):
-                types.append('test')
+            types.append(Project)
+        if cli_dict['noun'].startswith('worker'):
+            types.append(Worker)
+        if cli_dict['noun'].startswith('test'):
+            types.append(Test)
         return types
 
     def show(self, _dir, cli_dict, json_dict={}):
         if cli_dict['globalscope']:
-            Logger().warn('--global-scope does not change the behavior, see man ocpidev2-show')
+            msg = '--global-scope does not change behavior, '
+            msg += 'see man ocpidev2-show'
+            Logger().warn(msg)
         first = True
+        assets = []
         for _type in self.get_types_from_cli_dict(cli_dict):
-            assets = []
-            for asset in self.get_assets_of_type(_type):
-                if (cli_dict['name'] is None) or \
-                   (cli_dict['name'] == asset.name):
-                    if (_dir == '') or (_dir in asset.abs_path):
+            assets.extend(self.get_assets_of_type(_type))
+        list_to_show = []
+        for asset in assets:
+            if (cli_dict['name'] is None) or \
+               (cli_dict['name'] == asset.name):
+                if (_dir == '') or (_dir in asset.abs_path):
+                    do_hdl_check = (cli_dict['authoringmodel'] != '') and \
+                                   (cli_dict['noun'].startswith('primitive') or \
+                                   cli_dict['noun'].startswith('librar'))
+                    containing_path = asset.get_dir_abs_path().rsplit('/', 1)[0]
+                    if cli_dict['noun'].startswith('librar'):
+                        is_hdl = containing_path.endswith('hdl') or \
+                                 containing_path.split('/')[-3] == 'hdl'
+                    else:
+                        is_hdl = containing_path.endswith('hdl/adapters') or \
+                                 containing_path.endswith('hdl/cards') or \
+                                 containing_path.endswith('hdl/devices') or \
+                                 containing_path.endswith('hdl/primitives') or \
+                                 containing_path.endswith('hdl/platforms')
+                    if (not do_hdl_check) or (do_hdl_check and is_hdl):
+                        if cli_dict['noun'].startswith('primitive'):
+                            if cli_dict['nounqualifier'].startswith('core'):
+                                if not asset.is_core:
+                                    continue
+                            elif cli_dict['nounqualifier'].startswith('librar'):
+                                if asset.is_core:
+                                    continue
                         pid = str(self.get_package_id())
-                        if (_type == 'component') or (_type.endswith('worker')):
+                        if (_type == Component) or (_type == Worker) or (_type == ComponentLibrary):
                             for component_library in self.component_libraries:
-                                if (asset in component_library.components) or (asset in component_library.workers):
-                                    pid = component_library.get_package_id(pid)
+                                if (asset in component_library.components) or \
+                                   (asset in component_library.workers) or \
+                                   (asset in self.component_libraries):
+                                    if (asset in self.component_libraries):
+                                        pid = asset.get_package_id(pid)
+                                    else:
+                                        pid = component_library.get_package_id(pid)
                                     break
                         pid_and_name = pid
                         if not cli_dict['noun'].startswith('project'):
-                            pid_and_name += '.' + asset.name
-                        msg = ('' if first else ' ') + pid_and_name
+                            if not (asset in self.component_libraries):
+                                pid_and_name += '.' + asset.name
+                        msg = ''
+                        if first and cli_dict['simple']:
+                            msg += ' '
+                        msg += pid_and_name
+                        if cli_dict['noun'].startswith('worker'):
+                            msg += '.' + asset.authoring_model
+                        if cli_dict['noun'].startswith('platform'):
+                            if type(asset) == HdlPlatform:
+                                msg += '.hdl'
+                            if type(asset) == RccPlatform:
+                                msg += '.rcc'
                         if cli_dict['verbose'] or cli_dict['table']:
                             msg += ' '
                             for idx in range(60-len(msg)):
                                 msg += ' '
                             msg += asset.abs_path
                         if cli_dict['json']:
-                            json_dict[pid_and_name] = {"package_id": pid, "directory": asset.get_dir_abs_path()}
+                            json_dict[pid_and_name] = \
+                                    {'package_id': pid,
+                                     'directory': asset.get_dir_abs_path()}
                         else:
-                            print(msg, end=('' if cli_dict['simple'] else '\n'))
+                            list_to_show.append(msg)
                         first = False
+        if not cli_dict['json']:
+            # the list is sorted so that assets are generally printed in order
+            # of project...component library... etc
+            if len(list_to_show) > 0:
+                sep = ' ' if cli_dict['simple'] else '\n'
+                end = '' if cli_dict['simple'] else '\n'
+                print(*sorted(list_to_show), sep=sep, end=end)
         return json_dict
 
 

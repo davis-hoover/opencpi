@@ -119,10 +119,10 @@ do_show_test() {
   ocpidev2 -d assets show -d core hdl platforms -d platform -v -l 8
   ocpidev2 -d assets show -d core hdl platforms -d platform -v --log-level 8
   ocpidev2 -d assets show -d core hdl platforms -d platform -v -l 10
-  ocpidev2 show hdl primitive zed 
-  ocpidev2 show hdl primitive zed -v
-  ocpidev2 show hdl primitive zed --verbose
-  ocpidev2 show hdl primitive zed -d assets
+  ocpidev2 show hdl primitive zynq
+  ocpidev2 show hdl primitive zynq -v
+  ocpidev2 show hdl primitive zynq --verbose
+  ocpidev2 show hdl primitive zynq -d assets
   ocpidev2 show hdl primitives 
   ocpidev2 show hdl primitives -v
   ocpidev2 show hdl primitives --verbose

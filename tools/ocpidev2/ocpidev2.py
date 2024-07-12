@@ -89,9 +89,11 @@ def get_cli_dict():
     args = get_args(get_arg_parser())
     nouns = ['assembly', 'assemblies',
              'application', 'applications',
+             'core', 'cores',
              'card', 'cards',
              'component', 'components',
              'platform', 'platforms',
+             'primitive', 'primitives',
              'project', 'projects',
              'protocol', 'protocols',
              'registry',
@@ -101,13 +103,35 @@ def get_cli_dict():
              'worker', 'workers']
     Logger().debug('args : ' + str(args))
     try:
+        args.nounqualifier = ''
         if args.authoring_model in nouns:
             args.name = args.noun
             args.noun = args.authoring_model
             args.authoring_model = ''
+        if args.name in nouns:
+            if args.name == 'core':
+                args.nounqualifier = 'core'
+                args.noun = 'primitive'
+            elif args.name == 'cores':
+                args.nounqualifier = 'core'
+                args.noun = 'primitives'
+            elif args.name == 'library':
+                args.nounqualifier = 'library'
+                args.noun = 'primitive'
+            elif args.name == 'libraries':
+                args.nounqualifier = 'library'
+                args.noun = 'primitives'
+            else:
+                args.nounqualifier = ''
+                args.noun = args.name
+            args.name = None
+        if (args.authoring_model != '') and \
+           (args.authoring_model != 'hdl') and \
+           (args.authoring_model != 'rcc'):
+            raise Exception('invalid authoring model: ' + args.authoring_model)
     except AttributeError:
         # TODO replace this hack
-        args.authoring_model = None
+        args.authoring_model = ''
     # TODO move below 3 lines to AssetBase once proper checks in place
     if args.verb != 'unittest':
         if args.name:
