@@ -20,10 +20,10 @@ variables:
   GIT_SUBMODULE_UPDATE_FLAGS: --remote
   OCPI_XILINX_VIVADO_VERSION:
     description: "Version of Xilinx Vivado to use in pipeline."
-    value: "2019.2"
+    value: "2021.1"
   HOST:
     description:  "The host platform to install framework for."
-    value: "centos7"
+    value: "rocky8"
   PLATFORMS: 
     description: "Names of platforms to run pipeline for. If pipeline is to run an OSP platform, 
                   the OSP project must be added to OSPS. Use a \":\" to associate an
@@ -42,8 +42,10 @@ variables:
 
 
 workflow:
+  auto_cancel:
+      on_new_commit: interruptible
   rules:
-    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS && $CI_PIPELINE_SOURCE == "push"
+    - if: $CI_PIPELINE_SOURCE == "push"
       when: never
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
       variables:
@@ -63,7 +65,8 @@ workflow:
     - scripts/**/*
     - tests/**/*
     - tools/**/*
-    - projects/**/prerequisites/*
+    - projects/**/prerequisites/**/*
+    - projects/**/rcc/platforms/${HOST}/**/*
     - "Framework.exports"
     - "Makefile"
 
@@ -71,14 +74,11 @@ workflow:
 packages:
   stage: packages
   image: "${CI_OCPI_CONTAINER_REGISTRY}/builder:0.0.1"
-  tags: ['aws', 'opencpi', 'cache']
+  tags: ['aws', 'opencpi', 'cache', 'framework']
   services:
     - docker:24.0.5-dind
+  interruptible: true
   variables:
-    KUBERNETES_MEMORY_REQUEST: "8Gi"
-    KUBERNETES_MEMORY_LIMIT: "8Gi"
-    KUBERNETES_CPU_REQUEST: "4"
-    KUBERNETES_CPU_LIMIT: "4"
     BASE_IMAGE: ${CI_OCPI_CONTAINER_REGISTRY}/${HOST}/packages:${CI_COMMIT_SHORT_SHA}
   before_script:
     - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $CI_OCPI_CONTAINER_REGISTRY
@@ -89,14 +89,9 @@ packages:
 build:
   image: $BASE_IMAGE
   stage: build
-  tags: ['aws', 'opencpi', 'cache']
-  services:
-    - docker:24.0.5-dind
+  tags: ['aws', 'opencpi', 'cache', 'framework']
+  interruptible: true
   variables:
-    KUBERNETES_MEMORY_REQUEST: "16Gi"
-    KUBERNETES_MEMORY_LIMIT: "16Gi"
-    KUBERNETES_CPU_REQUEST: "4"
-    KUBERNETES_CPU_LIMIT: "4"
     BASE_IMAGE: ${CI_OCPI_CONTAINER_REGISTRY}/${HOST}/packages:${CI_COMMIT_SHORT_SHA}
     FALLBACK_KEY: $CI_DEFAULT_BRANCH
     CACHE_KEY: build-${HOST}-${CACHE_KEY_SUFFIX}
@@ -110,10 +105,10 @@ build:
   script:
     - ./build/install-prerequisites.sh
     - rm -rf ./prerequisites-build 
-    - if [[ -n $DO_FRAMEWORK ]] ; then ./build/build-opencpi.sh ; fi
-    - if [[ -n $DO_FRAMEWORK ]] ; then ./scripts/test-opencpi.sh --no-hdl ; fi
-    - if [[ -n $DO_FRAMEWORK ]] ; then source ./cdk/opencpi-setup.sh -r ; fi
-    - if [[ -n $DO_FRAMEWORK ]] ; then ./.gitlab-ci/scripts/build.py --platform $HOST --report-path build-report.xml ; fi
+    - if [[ ! -f build.cachestamp || -n $DO_FRAMEWORK ]] ; then ./build/build-opencpi.sh ; fi
+    - if [[ ! -f build.cachestamp || -n $DO_FRAMEWORK ]] ; then ./scripts/test-opencpi.sh --no-hdl ; fi
+    - if [[ ! -f build.cachestamp || -n $DO_FRAMEWORK ]] ; then source ./cdk/opencpi-setup.sh -r ; fi
+    - if [[ ! -f build.cachestamp || -n $DO_FRAMEWORK ]] ; then ./.gitlab-ci/scripts/build.py --platform $HOST --report-path build-report.xml ; fi
   cache:
     - key: $CACHE_KEY
       fallback_keys: 
@@ -145,12 +140,9 @@ build:
 generate:
   stage: generate
   image: $BASE_IMAGE
-  tags: ['aws', 'opencpi', 'cache']
+  tags: ['aws', 'opencpi', 'cache', 'framework']
+  interruptible: true
   variables:
-    KUBERNETES_MEMORY_REQUEST: "8Gi"
-    KUBERNETES_MEMORY_LIMIT: "8Gi"
-    KUBERNETES_CPU_REQUEST: "4"
-    KUBERNETES_CPU_LIMIT: "4"
     BASE_IMAGE: ${CI_OCPI_CONTAINER_REGISTRY}/${HOST}/packages:${CI_COMMIT_SHORT_SHA}
     GIT_SUBMODULE_STRATEGY: normal
   script:

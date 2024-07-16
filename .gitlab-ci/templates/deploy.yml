@@ -10,9 +10,10 @@ workflow:
 deploy:
   stage: deploy
   image: "${CI_OCPI_CONTAINER_REGISTRY}/builder:0.0.1"
-  tags: ['opencpi', 'aws', 'cache']
+  tags: ['opencpi', 'aws', 'cache', 'framework']
   services:
     - docker:24.0.5-dind
+  interruptible: true
   before_script:
     - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $CI_OCPI_CONTAINER_REGISTRY > /dev/null 2>&1
     # Verify the caches were pulled and are updated for this commit
