@@ -135,6 +135,8 @@ PKGS_E+=(python3-scons)
 PKGS_E+=(dtc openssl-devel)
 #    Need to build plutosdr osp 
 PKGS_E+=(perl-ExtUtils-MakeMaker)
+#    Needed to generate gitlab-ci yaml
+PKGS_E+=(python38-PyYAML)
 
 # functions to deal with arrays with <pkg>=<file> syntax
 function rpkgs {

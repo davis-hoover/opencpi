@@ -1,24 +1,20 @@
 stages:
   - install
 
-
 workflow:
+  auto_cancel:
+      on_new_commit: interruptible
   rules:
     - when: always
 
-
 variables:
-  KUBERNETES_MEMORY_REQUEST: "240Gi"
-  KUBERNETES_MEMORY_LIMIT: "240Gi"
-  KUBERNETES_CPU_REQUEST: "30"
-  KUBERNETES_CPU_LIMIT: "30"
   BASE_IMAGE: ${CI_OCPI_CONTAINER_REGISTRY}/${HOST}/packages:${CI_COMMIT_SHORT_SHA}
 
-
 .install:
-  stage: install
   image: $BASE_IMAGE
-  tags: ['aws', 'opencpi', 'cache']
+  stage: install
+  tags: ["aws", "opencpi", "cache", "platform"]
+  interruptible: true
   before_script:
     - git reset --hard # Overwrite cache with commit
     - find . -exec touch -ht $(date +"%Y%m%d%H%M.%S") {} + # Update timestamps
@@ -34,7 +30,6 @@ variables:
     reports:
       junit: build-report.xml
 
-
 rcc_platforms:
   extends: .install
   timeout: 3h
@@ -46,7 +41,7 @@ rcc_platforms:
     - find projects -type d -wholename */gen/inputs -exec rm -rf -- {} +
   variables:
     TARGET_TYPE: rcc_platform
-    FALLBACK_KEY:  install-platform-${HOST}-${RCC_PLATFORM}-${CI_DEFAULT_BRANCH}
+    FALLBACK_KEY: install-platform-${HOST}-${RCC_PLATFORM}-${CI_DEFAULT_BRANCH}
     CACHE_KEY: install-platform-${HOST}-${RCC_PLATFORM}-${CACHE_KEY_SUFFIX}
   cache:
     - key: build-${HOST}-${CACHE_KEY_SUFFIX}
@@ -76,13 +71,13 @@ rcc_platforms:
         - cdk/${RCC_PLATFORM}/
         - ${TARGET_TYPE}.cachestamp
 
-
 hdl_platforms:
   extends: .install
   timeout: 15h
-  needs:
+  needs: 
     - job: hdl_targets
-      artifacts: false
+      artifacts: False
+  when: always
   script:
     # Test that the cache for the prerequisite hdl_target was updated for this commit
     - if [[ $CI_COMMIT_SHA != $(cat hdl_target.cachestamp) ]] ; then echo "hdl_target cache was not updated for commit $COMMIT_SHA" && exit 1 ; fi
@@ -122,7 +117,6 @@ hdl_platforms:
         - project-registry/
         - cdk/${HDL_PLATFORM}/
         - ${TARGET_TYPE}.cachestamp
-
 
 hdl_targets:
   extends: .install

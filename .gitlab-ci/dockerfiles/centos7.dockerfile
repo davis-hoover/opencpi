@@ -1,6 +1,5 @@
 FROM centos:7
 
-FROM centos:7
 WORKDIR /tmp/opencpi
 ENV LANG="en_US.UTF-8"
 SHELL ["/bin/bash", "-c"]
