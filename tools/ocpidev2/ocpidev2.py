@@ -301,35 +301,35 @@ def unregister(cli_dict, project_registry):
 
 def main():
     ret = 0
-    #try:
-    signal.signal(signal.SIGINT, ocpidevsignint)
-    cli_dict = get_cli_dict()
-    if cli_dict['suppresswarn']:
-        set_g_suppress_warn(True)
-    Logger().debug('cli_dict : ' + str(cli_dict))
-    disc = get_enable_registry_discovery(cli_dict)
-    project_registry = ProjectRegistry(disc, disc)
-    if cli_dict['help']:
-        _help(cli_dict, project_registry)
-    elif cli_dict['verb'] == 'build':
-        build(cli_dict, project_registry)
-    elif cli_dict['verb'] == 'clean':
-        clean(cli_dict, project_registry)
-    elif cli_dict['verb'] == 'create':
-        create(cli_dict, project_registry)
-    elif cli_dict['verb'] == 'register':
-        register(cli_dict, project_registry)
-    elif cli_dict['verb'] == 'show':
-        show(cli_dict, project_registry)
-    elif cli_dict['verb'] == 'unittest':
-        unittest(cli_dict, project_registry)
-    elif cli_dict['verb'] == 'unregister':
-        unregister(cli_dict, project_registry)
-    else:
-        raise Exception('verb ' + cli_dict['verb'] + ' is not supported')
-    #except Exception as exception:
-    #    Logger().error(str(exception))
-    #    ret = 1
+    try:
+        signal.signal(signal.SIGINT, ocpidevsignint)
+        cli_dict = get_cli_dict()
+        if cli_dict['suppresswarn']:
+            set_g_suppress_warn(True)
+        Logger().debug('cli_dict : ' + str(cli_dict))
+        disc = get_enable_registry_discovery(cli_dict)
+        project_registry = ProjectRegistry(disc, disc)
+        if cli_dict['help']:
+            _help(cli_dict, project_registry)
+        elif cli_dict['verb'] == 'build':
+            build(cli_dict, project_registry)
+        elif cli_dict['verb'] == 'clean':
+            clean(cli_dict, project_registry)
+        elif cli_dict['verb'] == 'create':
+            create(cli_dict, project_registry)
+        elif cli_dict['verb'] == 'register':
+            register(cli_dict, project_registry)
+        elif cli_dict['verb'] == 'show':
+            show(cli_dict, project_registry)
+        elif cli_dict['verb'] == 'unittest':
+            unittest(cli_dict, project_registry)
+        elif cli_dict['verb'] == 'unregister':
+            unregister(cli_dict, project_registry)
+        else:
+            raise Exception('verb ' + cli_dict['verb'] + ' is not supported')
+    except Exception as exception:
+        Logger().error(str(exception))
+        ret = 1
     return ret
 
 if __name__ == '__main__':
