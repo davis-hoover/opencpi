@@ -506,6 +506,9 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                 assets.extend(component_library.workers)
             if _type == Test:
                 assets.extend(component_library.tests)
+        if _type == Worker:
+            for hdl_platform in self.hdl_platforms:
+                assets.append(hdl_platform.worker)
         return assets
 
     def get_types_from_cli_dict(self, cli_dict):
