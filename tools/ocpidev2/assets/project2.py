@@ -279,160 +279,98 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             self.discover_rcc_platforms()
         # end of bullets at top of CDG section 14
 
-    def create_application(self, _dir, project):
-        dir_abs_path = _dir + '/' + args.noun + 's/' + args.name
-        applications_dir = project.get_dir_abs_path() + '/applications'
-        if _dir != project.get_dir_abs_path() and _dir != applications_dir:
-            raise Exception("Invalid path: '" + _dir + "'. Please "
-                            "perform create application at the top of "
-                            "a valid registered project or within the "
-                            "applications directory.")
-        Application(dir_abs_path, False, self.cli_dict).create(
-                    project.get_dir_abs_path(), self.cli_dict['xmlapp'],
-                    self.cli_dict['xmldirapp'])
-
-    def create_component(self, _dir, project):
-        xml_abs_path = _dir + '/' + args.name + '.comp' + '/' + args.name + \
-                         '-comp.xml'
-        self.valid_comp_path(_dir, project)
-        package_id = project.get_package_id()
-        Component(xml_abs_path, False,
-                  self.cli_dict).create(project.get_dir_abs_path(), package_id,
-                                        cli_dict['project'])
-        if self.cli_dict['createtest'] == True:
-            test_path = _dir + '/' + args.name + '.test'
-            self.cli_dict['component'] = ''
-            self.cli_dict['usehdlfileio'] = ''
-            Test(test_path, False, self.cli_dict).create()
-
-    def create_library(self, _dir, project):
-        dir_abs_path = _dir + '/' + args.name
-        ComponentLibrary(dir_abs_path, False,
-                         self.cli_dict).create(project, _dir)
-
-    def create_protocol(self, _dir, cli_dict):
-        # Check for 'devices' Component Library name collision
-        if 'devices' in (cli_dict['hdllibrary'], cli_dict['library']):
-            devices_paths = []
-            for comp_lib in self.component_libraries:
-                if comp_lib.abs_path.endswith('/devices'):
-                    devices_paths.append(comp_lib.abs_path)
-            if len(devices_paths) > 1:
-                msg = ("Path: '" + _dir + "' contains more than"
-                       " one 'devices' component libraries: " +
-                       ', '.join(map(str, list(devices_paths))) + "."
-                       " Use '-d' instead.")
-                raise Exception(msg)
-        # Create proj_spec protocol path
-        if cli_dict['project']:
-            dir_abs_path = (self.get_dir_abs_path() + '/specs/' + cli_dict['name'] +
-                         '-prot.xml')
-        # Validate CLI parameter --hdl-library= and create protocol path
-        elif cli_dict['hdllibrary']:
-            hdl_libs = []
-            for lib in self.component_libraries:
-                if self.abs_path + '/hdl/' in lib.abs_path:
-                    hdl_libs.append(lib)
-            if cli_dict['hdllibrary'] not in ['adapters', 'cards', 'devices']:
-                msg = ("The --hdl-library '" + cli_dict['hdllibrary'] +
-                       "' is not one of the valid hdl libraries: " +
-                       "adapters, cards, devices.")
-                raise Exception(msg)
-            else:
-                hdl_lib_path = None
-                hdl_lib_valid = False
-                for lib in hdl_libs:
-                    if _dir + '/' in lib.abs_path:
-                        if cli_dict['hdllibrary'] == lib.name:
-                            hdl_lib_path = lib.abs_path
-                            hdl_lib_valid = True
-                            break
-                if not hdl_lib_valid:
-                    msg = ("The --hdl-library '" + cli_dict['hdllibrary'] +
-                           "' does not exist in the path: '" + _dir + "'.")
+    def create_asset(self, cli_dict, _dir):
+        dir_abs_path = _dir
+        existence_check = False # cli_dict['verb'] != 'create'
+        if cli_dict['noun'] == 'application':
+            dir_abs_path = self.get_dir_abs_path() + '/applications/' + cli_dict['name']
+            asset = Application(dir_abs_path, existence_check, cli_dict)
+        elif cli_dict['noun'] == 'assembly':
+            dir_abs_path = self.get_dir_abs_path() + '/hdl/assemblies/' + cli_dict['name']
+            asset = HdlAssembly(dir_abs_path, existence_check, cli_dict)
+        elif cli_dict['noun'] == 'card':
+            xml_abs_path = self.get_dir_abs_path() + '/hdl/cards/'
+            xml_abs_path += cli_dict['name'] + '.xml'
+            asset = HdlCard(dir_abs_path, existence_check, cli_dict)
+        elif (cli_dict['noun'] == 'component') or (cli_dict['noun'] == 'device') or \
+             (cli_dict['noun'] == 'protocol') or (cli_dict['noun'] == 'test') or \
+             (cli_dict['noun'] == 'worker'):
+            if cli_dict['project']:
+                dir_abs_path = self.get_dir_abs_path() + '/specs/'
+                if (_dir + '/') not in (dir_abs_path):
+                    raise Exception('invalid dir ' + _dir)
+            elif cli_dict['library']:
+                for component_library in self.component_libraries:
+                    if component_library.name == cli_dict['library']:
+                        dir_abs_path = component_library.get_dir_abs_path()
+                # TODO unless its in another place
+            elif cli_dict['hdllibrary']:
+                for component_library in self.component_libraries:
+                    if component_library.name == cli_dict['hdllibrary']:
+                        dir_abs_path = component_library.get_dir_abs_path()
+                # TODO unless its in the platforms
+            if cli_dict['noun'] == 'component':
+                xml_abs_path = dir_abs_path + '/' + cli_dict['name']
+                xml_abs_path += '.comp' + '/' + cli_dict['name'] + '-comp.xml'
+                asset = Component(xml_abs_path, existence_check, cli_dict)
+            elif cli_dict['noun'] == 'device':
+                dir_abs_path = self.get_dir_abs_path() + '/hdl/devices/' + args.name
+                asset = Worker(dir_abs_path, existence_check, cli_dict)
+            elif cli_dict['noun'] == 'protocol':
+                dir_abs_path += '/specs'
+                asset = Protocol(dir_abs_path, existence_check, cli_dict)
+            elif cli_dict['noun'] == 'test':
+                asset = Test(dir_abs_path, existence_check, cli_dict)
+            elif cli_dict['noun'] == 'worker':
+                dir_abs_path += cli_dict['name'] + '.'
+                dir_abs_path += cli_dict['authoringmodel'] + '/' + cli_dict['name'] + '.xml'
+                asset = Worker(xml_abs_path, existence_check, cli_dict)
+            elif cli_dict['noun'] == 'primitive':
+                asset = HdlLibrary(dir_abs_path, existence_check, cli_dict)
+        elif cli_dict['noun'] == 'library':
+            if cli_dict['name'] == 'components':
+                dir_abs_path += '/' + cli_dict['name']
+                is_component_libraries = False
+                try:
+                    ComponentLibraries(dir_abs_path, existence_check, cli_dict)
+                    is_component_libraries = True
+                except InvalidAssetError:
+                    pass
+                if (is_component_libraries) or (dir_abs_path != self.get_dir_abs_path() + '/components'):
+                    msg = 'component library \'' + cli_dict['name']
+                    msg += '\' can not exist within ' + _dir
+                    if is_component_libraries:
+                        msg += ' (\'components\' directory already exists and is not a component library - it already has a components.xml with a Libraries root tag)'
                     raise Exception(msg)
-                dir_abs_path = (hdl_lib_path + '/specs/' + cli_dict['name'] +
-                             '-prot.xml')
-        # Validate CLI parameter --library= and create protocol path
-        elif cli_dict['library']:
-            lib_valid = False
-            lib_path = None
-            for lib in self.component_libraries:
-                if _dir + '/' in lib.get_dir_abs_path():
-                    if cli_dict['library'] == lib.name:
-                        lib_valid = True
-                        lib_path = lib.get_dir_abs_path()
-                        break
-            if not lib_valid:
-                msg = ("The --library '" + cli_dict['library'] +
-                       "' does not exist in the path: '" + _dir + "'.")
-                raise Exception(msg)
-            dir_abs_path = (lib_path + '/specs/' + cli_dict['name'] +
-                         '-prot.xml')
-        # Create protocol path for given path (_dir)
-        else:
-            if (_dir + '/') in (self.get_dir_abs_path() + '/specs/'):
-                dir_abs_path = _dir + '/' + cli_dict['name'] + '-prot.xml'
+            elif (cli_dict['name'] == 'devices') or (cli_dict['name'] == 'cards') or \
+                 (cli_dict['name'] == 'adapters'):
+                dir_abs_path = self.get_dir_abs_path() + '/hdl/' + cli_dict['name']
             else:
-                valid_path = False
-                for comp_lib in self.component_libraries:
-                    if _dir == comp_lib.get_dir_abs_path() + '/specs':
-                        valid_path = True
-                        break
-                if not valid_path:
-                    msg = ("Invalid path: '" + _dir + "'. Must be in or "
-                           "pointing to a valid protocol specs directory.")
+                if dir_abs_path != self.get_dir_abs_path() + '/components':
+                    msg = 'component library ' + cli_dict['name']
+                    msg += ' can not exist within ' + _dir
                     raise Exception(msg)
-                dir_abs_path = _dir + '/' + cli_dict['name'] + '-prot.xml'
-        Protocol(dir_abs_path, False, cli_dict).create()
-
-    def create_test(self, _dir, project):
-        self.valid_comp_path(_dir, project)
-        test_path = _dir + '/' + args.name + '.test'
-        # If --component arg used, check for component existence
-        if self.cli_dict['component']:
-            comp_to_search = self.cli_dict['component']
-            components = []
-            for project in project_registry.projects:
-                for component in project.components:
-                    components.append(component)
-                for comp_lib in project.component_libraries:
-                    for component in comp_lib.components:
-                        components.append(component)
-            valid_comp = any(comp_to_search == comp.name for comp in components)
-            if not valid_comp:
-                msg = ("The component '" + self.cli_dict['component'] + "' "
-                       "does not exist within any of the "
-                       "registered projects.")
-                raise Exception(msg)
-        # If --component not used, check for the component in path
-        else:
-            valid_create_test = False
-            for ext in ['.rcc', '.hdl', '.comp']:
-                if os.path.exists(_dir + '/' + args.name + ext):
-                     valid_create_test = True
-            if not valid_create_test:
-                raise Exception("A '" + args.name + "' component does "
-                                "not yet exist to create a unit-test "
-                                "for.")
-        Test(test_path, False, self.cli_dict).create()
-
-    def create_asset(self, _dir, cli_dict):
-        if cli_dict['noun'] == 'library':
-            self.create_library(_dir, cli_dict)
-        elif cli_dict['noun'] == 'application':
-            self.create_application(_dir, cli_dict)
-        elif cli_dict['noun'] == 'component':
-            self.create_component(_dir, cli_dict)
-        elif cli_dict['noun'] == 'test':
-            self.create_test(_dir, cli_dict)
-        else: # cli_dict['noun'] == 'protocol'
-            self.create_protocol(_dir, cli_dict)
-
-    def create(self):
-        """ create self (a project) """
-        templates = self.get_templates()
-        AssetBase.create_files(self, templates, self.get_dir_abs_path())
+                if not os.path.exists(dir_abs_path):
+                    # TODO move this if statement to a better another location?
+                    if cli_dict['verb'] == 'create':
+                        msg = 'performing \'' + cli_dict['verb'] + ' components'
+                        msg += '\''
+                        for _dir in cli_dict['d']:
+                            Logger().log(3, msg + ' within directory ' + self.get_dir_abs_path())
+                        ComponentLibraries(dir_abs_path, existence_check, cli_dict).create()
+                dir_abs_path += '/' + cli_dict['name']
+            asset = ComponentLibrary(dir_abs_path, existence_check, cli_dict)
+        elif cli_dict['noun'] == 'platform':
+            if cli_dict['authoringmodel'] == 'hdl':
+                dir_abs_path = self.get_dir_abs_path() + '/hdl/platforms/' + cli_dict['name']
+                asset = HdlPlatform(dir_abs_path, existence_check, cli_dict)
+            if cli_dict['authoringmodel'] == 'rcc':
+                dir_abs_path = self.get_dir_abs_path() + '/rcc/platforms/' + cli_dict['name']
+                asset = RccPlatform(dir_abs_path, existence_check, cli_dict)
+        elif cli_dict['noun'] == 'slot':
+            xml_abs_path = self.get_dir_abs_path() + '/hdl/cards/specs/' + cli_dict['name']
+            asset = HdlSlot(xml_abs_path , existence_check, cli_dict)
+        asset.create()
 
     def get_existing_dir_abs_paths_for_clib_consideration(self):
         """ returns a list of absolute paths to directories in standard
@@ -483,7 +421,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             try:
                 is_libs = False
                 try:
-                    ComponentLibraries(dir_abs_path)
+                    ComponentLibraries(dir_abs_path, True, {})
                     is_libs = True
                 except InvalidAssetError as err:
                     pass

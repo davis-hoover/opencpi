@@ -172,32 +172,7 @@ class Application(AssetBase):
 
     def get_templates(self, applications=False):
         templates = {}
-        # These are files that go at the top-level of the applications directory
-        if applications:
-            templates['applications.xml'] = apps_dir_xml_template
-            templates['applications.rst'] = apps_dir_rst_template
-        # Named application files that go into the named application directory
-        else:
-            templates[self.name + '.xml'] = g_asset_template
-            templates[self.name + '.rst'] = app_rst_template
-            templates[self.name + '.cc'] = app_cc_template
+        templates[self.name + '.rst'] = app_rst_template
+        templates[self.name + '.cc'] = app_cc_template
+        templates[self.name + '.xml'] = g_asset_template
         return templates
-
-    def create(self, project_path, xmlapp, xmldirapp):
-        """ Creates dir/files at the top-level applications directory, and
-            creates dir/files within the named application directory """
-        apps_dir = project_path + '/applications'
-        app_dir = apps_dir + '/' + self.name
-        apps_templates = create_templates(self.name, applications=True)
-        self.create_files(apps_templates, apps_dir, duplicate=True)
-        if xmlapp:
-            app_templates = self.get_templates(self.name)
-            app_templates.pop(self.name + '.cc')
-            self.create_files(app_templates, apps_dir, duplicate=True)
-        elif xmldirapp:
-            app_templates = self.get_templates(self.name)
-            app_templates.pop(self.name + '.cc')
-            self.create_files(app_templates, app_dir)
-        else:
-            app_templates = self.get_templates(applications=False)
-            self.create_files(app_templates, app_dir)

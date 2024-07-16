@@ -414,12 +414,6 @@ class Protocol(AssetBase):
         templates[self.name + '-prot.rst'] = prot_spec_rst_template
         return templates
 
-    def create(self):
-        """ create self (a protocol) """
-        specs_dir_abs_path = '/'.join(self.abs_path.split('/')[:-1])
-        prot_templates = self.get_templates()
-        AssetBase.create_files(self, prot_templates, specs_dir_abs_path)
-
     def get_type(self):
         return 'protocol'
 
@@ -437,18 +431,11 @@ class Component(AssetBase):
         Logger().debug('parsing ' + self.get_xml_abs_path())
         self.parse(cli_dict)
 
-    def create(self, package_id, spec_create, project_path):
-        library_name = self.abs_path.split('/')[-3]
-        if spec_create:
-            spec_path = project_path + '/specs'
-            spec_templates = create_templates(self.name, spec_create)
-            AssetBase.create_files(self, spec_templates, spec_path,
-                                   package_id, library_name)
-        else:
-            component_path = self.get_dir_abs_path()
-            comp_templates = create_templates(self.name)
-            AssetBase.create_files(self, comp_templates, component_path,
-                                   package_id, library_name)
+    def get_templates(self):
+        templates = {}
+        templates[name + '-comp.rst'] = comp_rst_template
+        templates[name + '-comp.xml'] = g_asset_template
+        return templates
 
     def get_attr_infos(self):
         ret = []

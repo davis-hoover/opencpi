@@ -31,6 +31,27 @@ from _opencpi.assets.primitive2 import HdlLibrary, test_HdlLibrary
 from _opencpi.assets.application2 import Application
 from _opencpi.assets.test2 import Test
 
+comp_lib_rst_template = """
+.. {{asset.name|capitalize}} library index page
+
+
+{{asset.name|capitalize}} Library
+=================================
+Skeleton outline: Component library description and outline of scope to go here.
+
+.. toctree::
+   :maxdepth: 1
+   :glob:
+   :caption: {{asset.name}}
+
+   *.comp/*-index
+   *.comp/*-comp
+
+..
+   "*.comp/*-index" is for backward compatibility with older component document naming schemes.
+
+"""  # noqa: E501
+
 
 class SpecsDirectory():
     """ Class for discovering component assets in the specs directory """
@@ -135,21 +156,28 @@ class Discoverer():
 class ComponentLibraries(AssetBase):
     """ undocumented """
 
-    def __init__(self, dir_abs_path):
+    def __init__(self, dir_abs_path, enable_path_existence_check, cli_dict):
         self.root_tags = ['Libraries']  # undocumented
         if not dir_abs_path.endswith('components'):
             self.raise_invalid_asset_error()
-        AssetBase.__init__(self, dir_abs_path)
+        AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
         # TODO investigate moving below 3 lines into AssetBase
-        if os.path.exists(self.get_xml_abs_path()):
-            self.raise_if_invalid_root_tag(self.get_parsed().getroot())
-        found = True
-        for entry in AssetBase.listdir_assets(self.get_dir_abs_path()):
-            if entry == 'specs':
-                found = False
-        if not found:
-            self.raise_invalid_location()
+        if enable_path_existence_check:
+            if os.path.exists(self.get_xml_abs_path()):
+                self.raise_if_invalid_root_tag(self.get_parsed().getroot())
+            found = True
+            for entry in AssetBase.listdir_assets(self.get_dir_abs_path()):
+                if entry == 'specs':
+                    found = False
+            if not found:
+                self.raise_invalid_location()
         self.parse()
+
+    def get_templates(self):
+        templates = {}
+        templates[self.name + '.xml'] = g_asset_template
+        return templates
+
 
     def get_paths_to_parse(self):
         return [self.get_xml_abs_path()]
@@ -171,16 +199,16 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
                  cli_dict=None):
         self.root_tags = ['Library']  # CDG section 10.1
         AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
-        try:
-            self.raise_if_invalid_location()
-        except InvalidAssetError:
-            tmp = dir_abs_path.split('components/')
-            Logger().debug('tmp ' + str(tmp))
-            if len(tmp) == 2:
-                if tmp[1] == 'gen':
-                    self.raise_invalid_location()
-            else:
-                self.raise_invalid_location()
+        #try:
+        #    self.raise_if_invalid_location()
+        #except InvalidAssetError:
+        #    tmp = dir_abs_path.split('components/')
+        #    Logger().debug('tmp ' + str(tmp))
+        #    if len(tmp) == 2:
+        #        if tmp[1] == 'gen':
+        #            self.raise_invalid_location()
+        #    else:
+        #        self.raise_invalid_location()
         is_test = self.get_dir_abs_path_is_test(dir_abs_path)
         if is_test or self.get_dir_abs_path_is_worker(dir_abs_path):
             self.raise_invalid_asset_error()
@@ -267,6 +295,12 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         paths.append(self.get_xml_abs_path())
         paths = self.get_list_of_existing_abs_paths_to_parse(paths)
         return paths
+
+    def get_templates(self):
+        templates = {}
+        templates[self.name + '.rst'] = comp_lib_rst_template
+        templates[self.name + '.xml'] = g_asset_template
+        return templates
 
     def parse(self, cli_dict=None):
         AssetBase.parse(self, cli_dict)

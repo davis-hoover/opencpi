@@ -269,10 +269,21 @@ class ProjectRegistry():
                 self._show(cli_dict, _dir)
             if cli_dict['verb'] == 'unregister':
                 self._unregister(cli_dict, _dir)
+            # this message is printed below and not above due to weird create
+            # components dir message of same form in project2.py that needs
+            # to happen first
+            msg = 'performing \'' + cli_dict['verb'] + ' ' + cli_dict['noun']
+            if cli_dict['name'] != None:
+                msg += ' ' + cli_dict['name']
+            msg += '\''
+            Logger().log(3, msg + ' within directory ' + _dir)
+
 
     def _build(self, cli_dict, _dir):
         """ builds assets by creating a temporary makefile and calls make -j
             on it and then deleting it """
+        if not os.path.exist(_dir):
+            raise Exception(_dir + ' does not exist')
         # TODO support cli_dict extension (override) of this tool
         tool = LegacyBuildTool()
         fs = TemporaryFilesystem()
@@ -285,6 +296,8 @@ class ProjectRegistry():
                            makefile, cli_dict['j'], tool)
 
     def _clean(self, cli_dict, _dir):
+        if not os.path.exist(_dir):
+            raise Exception(_dir + ' does not exist')
         cleaned = False
         for project in self.projects:
             if (project.abs_path + '/') in (_dir + '/'):
@@ -310,14 +323,23 @@ class ProjectRegistry():
             project = next((proj for proj in self.projects if
                             (proj.get_dir_abs_path() + '/') in (_dir + '/')), None)
             if project == None:
-                project = Project(_dir)
+                project_dir_abs_path = _dir
+                while True:
+                    try:
+                        project = Project(project_dir_abs_path)  # unregistered
+                        break
+                    except InvalidAssetError:
+                        project_dir_abs_path = project_dir_abs_path.rsplit('/', 1)[0]
+                        if len(project_dir_abs_path) <= 1:
+                            break
             if project == None:
                 msg = ("Invalid path: '" + _dir + "'. Please perform 'create "
                        + cli_dict['noun'] + "' within a valid, registered "
                        "project.")
                 raise Exception(msg)
             else:
-                project.create_asset(_dir, cli_dict)
+                #print('project path is ' + project.get_dir_abs_path())
+                project.create_asset(cli_dict, _dir)
 
     def _delete(self, cli_dict, _dir):
         pass
@@ -330,6 +352,8 @@ class ProjectRegistry():
             self.register_project(_dir)
 
     def _run(self, cli_dict, _dir):
+        if not os.path.exist(_dir):
+            raise Exception(_dir + ' does not exist')
         cmd = 'make -C ' + Test(_dir).get_dir_abs_path()
         phases = ['run']
         if cli_dict['phase'] != '':
@@ -349,9 +373,6 @@ class ProjectRegistry():
                 cmd += "'"
             System(cmd)
 
-    def _set(self, cli_dict, _dir):
-        pass
-
     def _show(self, cli_dict, _dir):
         if cli_dict['noun'] == 'registry':
             if (_dir == '') or \
@@ -368,9 +389,6 @@ class ProjectRegistry():
     def _unregister(self, cli_dict, _dir):
         if cli_dict['noun'] == 'project':
             self.unregister_project(_dir)
-
-    def _unset(self, cli_dict, _dir):
-        pass
 
     def export_projects(self, makefile):
         """ plan_build_exports() must occur before this method is called """

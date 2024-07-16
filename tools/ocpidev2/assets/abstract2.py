@@ -915,18 +915,16 @@ class AssetBase(AttributeBase):
                     self.valid_locations]):
             self.raise_invalid_location()
 
-    def create_files(self, templates, file_dir, package_id=None,
-                     library_name=None):
+    def create(self):
         if not os.path.exists(self.get_dir_abs_path()):
-            System('mkdir ' + self.get_dir_abs_path())
-        for fname, fcontents in templates.items():
-            file_path = file_dir + '/' + fname
+            System('mkdir -p ' + self.get_dir_abs_path())
+        for fname, fcontents in self.get_templates().items():
+            file_path = self.get_dir_abs_path() + '/' + fname
             if os.path.exists(file_path):
                 msg = "File: '" + file_path + "' already exists."
                 raise Exception(msg)
             fcontents = jinja2.Template(fcontents, trim_blocks=True)
-            fcontents = fcontents.render(asset=self, package_id=package_id,
-                                         library_name=library_name)
+            fcontents = fcontents.render(asset=self)
             out_file = open(file_path, 'w')
             out_file.write(fcontents)
             out_file.close()
