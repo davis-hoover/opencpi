@@ -123,25 +123,31 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                     am = authoring_model
                     if (am == '') or (worker.authoring_model == am):
                         ret = worker
+        for hdl_platform in self.hdl_platforms:
+            if hdl_platform.worker.name == name:
+                am = authoring_model
+                if (am == '') or (hdl_platform.worker.authoring_model == am):
+                    ret = worker
         return ret
 
-    def get_asset(self, abs_path):
-        """ returns None if asset not found """
+    def get_asset_within(self, abs_path):
+        """ get asset whose abs_path is within the abs_path and return None
+            if not found """
         ret = None
         for component_library in self.component_libraries:
             for asset in component_library.workers:
-                if asset.get_xml_abs_path() == abs_path:
+                if (asset.get_xml_abs_path() + '/') in (abs_path + '/'):
                     ret = asset
                 elif asset.get_dir_abs_path() == abs_path:
                     ret = asset
         for asset in self.applications:
-            if asset.get_dir_abs_path() == abs_path:
+            if (asset.get_dir_abs_path() + '/') in (abs_path + '/'):
                 ret = asset
         for asset in self.hdl_primitives:
-            if asset.get_dir_abs_path() == abs_path:
+            if (asset.get_dir_abs_path() + '/') in (abs_path + '/'):
                 ret = asset
         for asset in self.hdl_assemblies:
-            if asset.get_dir_abs_path() == abs_path:
+            if (asset.get_dir_abs_path() + '/') in (abs_path + '/'):
                 ret = asset
         return ret
 
@@ -195,6 +201,122 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             self.discover_rcc_platforms()
         # end of bullets at top of CDG section 14
 
+    def create_protocol(self, _dir, cli_dict):
+        dash_d = os.path.relpath(_dir, os.getcwd())
+        if dash_d == '.':
+            dash_d = False
+        proj_spec = bool(cli_dict['project'])
+        hdl_library = bool(cli_dict['hdllibrary'])
+        library = bool(cli_dict['library'])
+        # Check for 'devices' Component Library name collision
+        # HERE
+        devices_path = None
+        if 'devices' in (cli_dict['hdllibrary'], cli_dict['library']):
+            devices_paths = []
+            for comp_lib in self.component_libraries:
+                if comp_lib.abs_path.endswith('/devices'):
+                    devices_paths.append(comp_lib.abs_path)
+            if len(devices_paths) > 1:
+                msg = ("Project '" + self.name + "' contains more than"
+                       " one 'devices' component libraries: " +
+                       ', '.join(map(str, list(devices_paths))) + "."
+                       " Use '-d' instead.")
+                raise Exception(msg)
+            # HERE
+            else:
+                devices_path = devices_paths[0]
+        # Create proj_spec protocol path
+        if proj_spec:
+            prot_path = (self.abs_path + '/specs/' + cli_dict['name'] +
+                         '-prot.xml')
+        # Validate CLI parameter --hdl-library= and create protocol path
+        elif hdl_library:
+            hdl_libraries = ['adapters', 'cards', 'devices', 'platforms']
+            if cli_dict['hdllibrary'] not in hdl_libraries:
+                msg = ("The --hdl-library '" + cli_dict['hdllibrary'] +
+                       "' is not one of the valid hdl libraries: " +
+                       ', '.join(map(str, list(hdl_libraries))) + ".")
+                raise Exception(msg)
+            else:
+                if not dash_d:
+                    if not os.path.exists(self.abs_path + '/hdl/' +
+                                          cli_dict['hdllibrary']):
+                       msg = ("The --hdl-library '" + cli_dict['hdllibrary'] +
+                              "' does not exist in the '" + self.name +
+                              "' project.")
+                       raise Exception(msg)
+                    prot_path = (self.abs_path + '/hdl/' +
+                                 cli_dict['hdllibrary'] + '/specs/' +
+                                 cli_dict['name'] + '-prot.xml')
+                else:
+                    if not os.path.exists(_dir + '/' + cli_dict['hdllibrary']):
+                        msg = ("The --hdl-library '" + cli_dict['hdllibrary'] +
+                               "' does not exist in the path: '" + _dir)
+                        raise Exception(msg)
+                    prot_path = (_dir + '/' + cli_dict['hdllibrary'] +
+                                 '/specs/' + cli_dict['name'] + '-prot.xml')
+        # Validate CLI parameter --library= and create protocol path
+        elif library:
+                lib_valid = False
+                lib_path = None
+                for lib in self.component_libraries:
+                    if not dash_d:
+                        if cli_dict['library'] == lib.name:
+                            lib_valid = True
+                            lib_path = lib.abs_path
+                            break
+                    else:
+                        if _dir + '/' in lib.abs_path:
+                            if cli_dict['library'] == lib.name:
+                                lib_valid = True
+                                lib_path = lib.abs_path
+                                break
+                if not lib_valid:
+                    if not dash_d:
+                        msg = ("The --library '" + cli_dict['library'] +
+                               "' does not exist in the '" + self.name +
+                               "' project.")
+                        raise Exception(msg)
+                    else:
+                        msg = ("The --library '" + cli_dict['library'] +
+                               "' does not exist in the path: '" + _dir + "'.")
+                        raise Exception(msg)
+                prot_path = (lib_path + '/specs/' + cli_dict['name'] + '-prot.xml')
+
+        # Create protocol path for given path (_dir)
+        else:
+            if _dir == self.abs_path + '/specs':
+                prot_path = _dir + '/' + cli_dict['name'] + '-prot.xml'
+            else:
+                valid_path = False
+                for comp_lib in self.component_libraries:
+                    if _dir == comp_lib.abs_path + '/specs':
+                        valid_path = True
+                        break
+                if not valid_path:
+                    msg = ("Invalid path: '" + _dir + "'. Must be in or "
+                           "pointing to a valid protocol specs directory.")
+                    raise Exception(msg)
+                prot_path = _dir + '/' + cli_dict['name'] + '-prot.xml'
+        print(f"{prot_path=}")
+        Protocol(prot_path, False, cli_dict).create()
+
+    def create_asset(self, _dir, cli_dict):
+        if cli_dict['noun'] == 'library':
+            self.create_library(_dir, cli_dict)
+        elif cli_dict['noun'] == 'application':
+            self.create_application(_dir, cli_dict)
+        elif cli_dict['noun'] == 'component':
+            self.create_component(_dir, cli_dict)
+        elif cli_dict['noun'] == 'test':
+            self.create_test(_dir, cli_dict)
+        else: # cli_dict['noun'] == 'protocol'
+            self.create_protocol(_dir, cli_dict)
+
+    def create(self):
+        """ create self (a project) """
+        AssetBase.create_files(self, project_templates, self.get_dir_abs_path())
+
     def get_existing_dir_abs_paths_for_clib_consideration(self):
         """ returns a list of absolute paths to directories in standard
             component libraries locations that are guaranteed to exist """
@@ -206,13 +328,14 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                 # add to dir_abs_path the absolute path to the directories
                 # of the following form from CDG section 14.2.3., if they
                 # exist, regardless of whether a "sub"-library directory, e.g.
-                # components/<library>, exists:
+                # components/<library>, exists (note hdl/platforms is not a
+                # component library and therefore not added):
                 #   - components/
                 #   - hdl/devices/
                 #   - hdl/cards/
                 #   - hdl/adapters/
-                #   - hdl/platforms/
-                dir_abs_paths.append(dir_abs_path)
+                if _dir != 'hdl/platforms':
+                    dir_abs_paths.append(dir_abs_path)
                 a = dir_abs_path
                 b = AssetBase.get_existing_abs_dir_paths_for_asset_consid(a)
                 subdir_abs_paths = b
@@ -314,6 +437,46 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         # TODO check if there is an allowlist, and if so, pass to below call
         self.discover_dir_assets('rcc/platforms')
 
+    @staticmethod
+    def get_built_in_hdl_libraries():
+        """ HDG section 5 "The built-in ocpi.core project includes several HDL
+            primitive libraries, and some are always available for use by all
+            workers" - here are the implied "some" """
+        # these are intentionally in build dependency order
+        tmp = ['bsv', 'fixed_float', 'ocpi', 'util', 'protocol', 'cdc']
+        return tmp + ['platform', 'sdp', 'axi']
+
+    def get_hdl_primitive_dependent_libraries(self, hdl_primitive=None):
+        ret = []
+        # 1. built-in (core) libraries (every project except ocpi.core)
+        if str(self.get_package_id()) != 'ocpi.core':
+            ret = self.get_built_in_hdl_libraries()
+        # 2. project's own libraries
+        if len(self.hdl_libraries) > 0:
+            if str(self.get_package_id()) != 'ocpi.core':
+                for lib in self.hdl_libraries:
+                    ret.append(lib)
+        # 3. library's dependent libraries
+        if len(hdl_primitive.attrs['Libraries']) > 0:
+            for lib in hdl_primitive.attrs['Libraries']:
+                # split necessary because some Libraries are specified w/ package id, e.g., ocpi.core.bsv
+                ret.append(lib.split('.')[-1])
+        return ret
+
+    def get_hdl_worker_dependent_libraries(self, comp_library, worker):
+        # TODO should some of this move to ComponentLibrary class?
+        ret = []
+        if worker.authoring_model == 'hdl':
+            ret.extend(Project.get_built_in_hdl_libraries())
+        # TODO investigate whether HdlLibraries is even allowed?
+        for lib in comp_library.attrs['HdlLibraries']:
+            ret.append(lib)
+        for lib in comp_library.attrs['Libraries']:
+            ret.append(lib)
+        for lib in worker.attrs['Libraries']:
+            ret.append(lib)
+        return ret
+
     def get_assets_of_type(self, _type):
         assets = []
         if _type == Application:
@@ -409,10 +572,10 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                                  containing_path.endswith('hdl/platforms')
                     if (not do_hdl_check) or (do_hdl_check and is_hdl):
                         if cli_dict['noun'].startswith('primitive'):
-                            if cli_dict['nounqualifier'].startswith('core'):
+                            if cli_dict['adjective'].startswith('core'):
                                 if not asset.is_core:
                                     continue
-                            elif cli_dict['nounqualifier'].startswith('librar'):
+                            elif cli_dict['adjective'].startswith('librar'):
                                 if asset.is_core:
                                     continue
                         pid = str(self.get_package_id())
@@ -462,6 +625,32 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                 print(*sorted(list_to_show), sep=sep, end=end)
         return json_dict
 
+    def clean(self, _dir):
+        os.system('rm -rf $(find ' + _dir + ' -type d -name gen)')
+        os.system('rm -rf $(find ' + _dir + ' -type d -name lib)')
+        os.system('rm -rf $(find ' + _dir + ' -type d -name run)')
+        # below 4 lines account for corrupted imports/exports
+        os.system('rm -rf $(find ' + _dir + ' -type f -name imports)')
+        os.system('rm -rf $(find ' + _dir + ' -type f -name exports)')
+        os.system('rm -rf $(find ' + _dir + ' -type d -name imports)')
+        os.system('rm -rf $(find ' + _dir + ' -type d -name exports)')
+        os.system('rm -rf $(find ' + _dir + ' -type l -name imports)')
+        os.system('rm -rf $(find ' + _dir + ' -type l -name exports)')
+        os.system(
+                'rm -rf $(find ' + _dir + ' -type d -name config-\*)')
+        os.system(
+                'rm -rf $(find ' + _dir +
+                ' -type d -name simulations)')
+        os.system(
+                'rm -rf $(find ' + _dir + ' -type d -name target-\*)')
+        os.system(
+                'rm -rf $(find ' + _dir +
+                ' -type d -name container-\*)')
+        os.system('rm -rf $(find ' + _dir + " -type f -name '.*lock')")
+        os.system(
+                'rm -rf $(find ' + _dir + " -type f -name '.*build')")
+        os.system(
+                'rm -rf $(find ' + _dir + " -type d -name artifacts)")
 
 def test_Project(ret):
     # ret = test_GNUMakefile(ret)

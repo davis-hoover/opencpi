@@ -91,6 +91,12 @@ class HdlAssembly(AssetBase):
     def get_type(self):
         return 'hdl assembly'
 
+    def get_mk_filename(self):
+        # start pre-2.0 opencpi
+        ret = 'hdl-assembly.mk'
+        # end pre-2.0 opencpi
+        return ret
+
 
 class HdlContainerDevice():
 

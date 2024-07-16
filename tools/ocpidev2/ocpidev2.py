@@ -30,7 +30,67 @@ def ocpidevsignint(sig, frame):
     raise Exception('Ctrl-C stopped execution')
 
 
-def add_show_arguments(parser):
+def add_build_arguments(parser, noun):
+    parser.add_argument('--hdl-target', default=[], action='append')
+    parser.add_argument('--hdl-platform', default=[], action='append')
+    parser.add_argument('--rcc-platform', default=[], action='append')
+    parser.add_argument('-j', nargs='?', type=int, default=1)
+    parser.add_argument('noun', nargs='?', default=None)
+    parser.add_argument('name', nargs='?', default=None)
+    return parser
+
+
+def add_create_arguments(parser, noun):
+    if noun == 'project':
+        project = Project('', False, None)
+        for attr in project.get_attr_infos():
+            if attr.cli is not None:
+                parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
+                                    default='')
+        parser.add_argument('--register', default=False, action='store_true')
+    if noun == 'library':
+        library = ComponentLibrary('', False, None)
+        for attr in library.get_attr_infos():
+            if attr.cli is not None:
+                parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
+                                    default='')
+    if noun == 'component':
+        component = Component('', False, None)
+        for attr in component.get_attr_infos():
+            if attr.cli is not None:
+                if attr.is_bool:
+                    parser.add_argument(attr.cli[0], attr.cli[1], default='',
+                                        action='store_true')
+                else:
+                    parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
+                                        default='')
+        parser.add_argument('-t', '--create-test', default=False, action='store_true')
+        parser.add_argument('-p', '--project', default=False, action='store_true')
+    if noun == 'test':
+        test = Test('', False, None)
+        for attr in test.get_attr_infos():
+            if attr.cli is not None:
+                if attr.is_bool:
+                    parser.add_argument(attr.cli[0], attr.cli[1], default='',
+                                        action='store_true')
+                else:
+                    parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
+                                        default='')
+    if noun == 'application':
+        group = parser.add_mutually_exclusive_group()
+        group.add_argument('-X', '--xml-app', default=False, action='store_true')
+        group.add_argument('-x', '--xml-dir-app', default=False, action='store_true')
+    if noun == 'protocol':
+        group = parser.add_mutually_exclusive_group()
+        group.add_argument('-p', '--project', default=False, action='store_true')
+        group.add_argument('--hdl-library', nargs='?', default='')
+        group.add_argument('-l', '--library', default=None)
+    parser.add_argument('noun', default=None)
+    parser.add_argument('name', default=None)
+    return parser
+
+
+def add_show_arguments(parser, noun):
     parser.add_argument('--global-scope', default=False, action='store_true')
     group = parser.add_mutually_exclusive_group()
     group.add_argument('--simple', default=False, action='store_true')
@@ -42,6 +102,21 @@ def add_show_arguments(parser):
     return parser
 
 
+def add_run_arguments(parser, noun):
+    parser.add_argument('-G', '--only-platform', default=False, action='store_true')
+    parser.add_argument('-O', '--exclude-platform', default=False, action='store_true')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--hdl-library', nargs='?', default='')
+    group.add_argument('-l', '--library', default=None)
+    parser.add_argument('--accumulate-errors', default=False, action='store_true')
+    parser.add_argument('--case', default=[], action='append')
+    parser.add_argument('--keep-simulations', default=False, action='store_true')
+    parser.add_argument('--phase', default=[], action='append')
+    parser.add_argument('--remotes', nargs='?', default='')
+    parser.add_argument('--view', default=False, action='store_true')
+    return parser
+
+
 def get_arg_parser():
     parser = argparse.ArgumentParser(description='', add_help=False)
     parser.add_argument('-d', default=[], action='append')
@@ -50,25 +125,27 @@ def get_arg_parser():
     # only intended to be used for tab completion
     parser.add_argument('--suppress-warn', action='store_true')
     parser.add_argument('verb', nargs='?', default='')
-    if 'show' in sys.argv:
-        parser = add_show_arguments(parser)
+    noun = ''
+    if 'project' in sys.argv:
+        noun = 'project'
+    if 'library' in sys.argv:
+        noun = 'library'
+    if 'component' in sys.argv:
+        noun = 'component'
+    if 'test' in sys.argv:
+        noun = 'test'
+    if 'application' in sys.argv:
+        noun = 'application'
+    if 'protocol' in sys.argv:
+        noun = 'protocol'
+    if 'build' in sys.argv:
+        parser = add_build_arguments(parser, noun)
     elif 'create' in sys.argv:
-        noun = ''
-        if 'project' in sys.argv:
-            noun = 'project'
-        if 'library' in sys.argv:
-            noun = 'library'
-        if 'component' in sys.argv:
-            noun = 'component'
-        if 'test' in sys.argv:
-            noun = 'test'
-        if 'application' in sys.argv:
-            noun = 'application'
-        if 'protocol' in sys.argv:
-            noun = 'protocol'
         parser = add_create_arguments(parser, noun)
-    elif 'build' in sys.argv:
-        parser = add_build_arguments(parser)
+    elif 'show' in sys.argv:
+        parser = add_show_arguments(parser, noun)
+    elif 'run' in sys.argv:
+        parser = add_run_arguments(parser, noun)
     else:
         parser.add_argument('noun', nargs='?', default=None)
         parser.add_argument('name', nargs='?', default=None)
@@ -103,26 +180,26 @@ def get_cli_dict():
              'worker', 'workers']
     Logger().debug('args : ' + str(args))
     try:
-        args.nounqualifier = ''
+        args.adjective = ''
         if args.authoring_model in nouns:
             args.name = args.noun
             args.noun = args.authoring_model
             args.authoring_model = ''
         if args.name in nouns:
             if args.name == 'core':
-                args.nounqualifier = 'core'
+                args.adjective = 'core'
                 args.noun = 'primitive'
             elif args.name == 'cores':
-                args.nounqualifier = 'core'
+                args.adjective = 'core'
                 args.noun = 'primitives'
             elif args.name == 'library':
-                args.nounqualifier = 'library'
+                args.adjective = 'library'
                 args.noun = 'primitive'
             elif args.name == 'libraries':
-                args.nounqualifier = 'library'
+                args.adjective = 'library'
                 args.noun = 'primitives'
             else:
-                args.nounqualifier = ''
+                args.adjective = ''
                 args.noun = args.name
             args.name = None
         if (args.authoring_model != '') and \
@@ -145,13 +222,8 @@ def get_cli_dict():
     tmp = args
     mylist = args.d.copy()
     tmp.d = []
-    if len(mylist) == 0:
-        tmp.d.append('')
     for _dir in mylist:
-        if _dir is None:
-            _dir = ''
-        else:
-            _dir = os.path.abspath(_dir)
+        _dir = os.path.normpath(os.path.abspath(_dir))
         if _dir in tmp.d:
             Logger().warn('-d has duplicate ' + _dir)
         else:
@@ -164,6 +236,10 @@ def get_cli_dict():
 
 def get_create_registry(cli_dict):
     create_registry = False
+    if cli_dict['verb'] == 'clean':
+        create_registry = True
+    if cli_dict['verb'] == 'build':
+        create_registry = True
     if cli_dict['verb'] == 'show':
         create_registry = True
     return create_registry
@@ -179,11 +255,48 @@ def get_enable_registry_discovery(cli_dict):
     return disc
 
 
+# TODO delete
 global g_suppress_warn
 
 
-if __name__ == '__main__':
-    exit_status = 0
+def _help(cli_dict, project_registry):
+  if cli_dict['verb'] == '':
+      os.system('man ocpidev2')
+  else:
+      os.system('man ocpidev2-' + cli_dict['verb'])
+
+def build(cli_dict, project_registry):
+    # may eventually support unregistered projects in addition to registry,
+    # but probably not
+    project_registry.build(cli_dict)
+
+def clean(cli_dict, project_registry):
+    # may eventually support unregistered projects in addition to registry,
+    # but probably not
+    project_registry.clean(cli_dict)
+
+def create(cli_dict, project_registry):
+    # may eventually support unregistered projects in addition to registry,
+    # but probably not
+    project_registry.create(cli_dict)
+
+def delete(cli_dict, project_registry):
+    # may eventually support unregistered projects in addition to registry,
+    # but probably not
+    project_registry.delete(cli_dict)
+
+def run(cli_dict, project_registry):
+    # may eventually support unregistered projects in addition to registry,
+    # but probably not
+    project_registry.run(cli_dict)
+
+def show(cli_dict, project_registry):
+    # may eventually support unregistered projects in addition to registry,
+    # but probably not
+    project_registry.show(cli_dict)
+
+def main():
+    ret = 0
     try:
         signal.signal(signal.SIGINT, ocpidevsignint)
         cli_dict = get_cli_dict()
@@ -195,26 +308,23 @@ if __name__ == '__main__':
             disc = get_enable_registry_discovery(cli_dict)
             project_registry = ProjectRegistry(disc, disc)
         if cli_dict['help']:
-            if cli_dict['verb'] == '':
-                os.system('man ocpidev2')
-            else:
-                os.system('man ocpidev2-' + cli_dict['verb'])
-        elif (cli_dict['verb'] == 'show') or (cli_dict['verb'] == 'build') or \
-             (cli_dict['verb'] == 'create'):
-            for _dir in cli_dict['d']:
-                if (cli_dict['verb'] != 'show') and (_dir == ''):
-                    _dir = Environment().getcwd()
-                elif cli_dict['verb'] == 'show':
-                    project_registry.show(_dir, cli_dict)
-                elif cli_dict['verb'] == 'build':
-                    project_registry.build(_dir, cli_dict)
-                elif cli_dict['verb'] == 'create':
-                    project_registry.create(_dir, cli_dict)
+            _help(cli_dict, project_registry)
+        elif cli_dict['verb'] == 'build':
+            build(cli_dict, project_registry)
+        elif cli_dict['verb'] == 'clean':
+            clean(cli_dict, project_registry)
+        elif cli_dict['verb'] == 'create':
+            create(cli_dict, project_registry)
+        elif cli_dict['verb'] == 'show':
+            show(cli_dict, project_registry)
         elif cli_dict['verb'] == 'unittest':
             unittest(cli_dict, project_registry)
         else:
             raise Exception('verb ' + cli_dict['verb'] + ' is not supported')
     except Exception as exception:
         Logger().error(str(exception))
-        exit_status = 1
-    exit(exit_status)
+        ret = 1
+    return ret
+
+if __name__ == '__main__':
+    exit(main())

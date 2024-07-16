@@ -101,6 +101,7 @@ class Environment():
     """ Reference OpenCPI User Guide section 5 """
 
     def __init__(self):
+        self.ocpi_cdk_dir = os.environ.get('OCPI_CDK_DIR')
         ocpi_log_level = os.environ.get('OCPI_LOG_LEVEL')
         if ocpi_log_level == '':
             ocpi_log_level = 0
@@ -176,6 +177,16 @@ class TemporaryFilesystem():
 
     def __del__(self):
         os.system('rm -rf ' + self.abs_path)
+
+
+class GNUMakeTarget():
+
+    def __init__(self, string, phony = False):
+        self.string = string
+        self.phony = phony
+
+    def __str__(self):
+        return self.string
 
 
 class GNUMakeRule():
@@ -611,6 +622,22 @@ class GNUMakefile():
             if define not in self.variables.keys():
                 self.variables[define] = ''
             self.variables[define] += string
+
+    def emit(self):
+        ff = open(self.abs_path, 'w')
+        phony = False
+        for rule in self.rules.values():
+            for target in rule.targets:
+                if target.phony:
+                    phony = True
+                    ff.write('.PHONY: ' + str(target) + "\n")
+        if phony:
+            ff.write("\n")
+        for rule in self.rules.values():
+            if rule is not None:
+                ff.write(str(rule) + "\n")
+            ff.write("\n")
+        ff.close()
 
 
 class AttributeInfo():

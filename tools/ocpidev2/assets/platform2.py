@@ -94,6 +94,7 @@ class HdlPlatform(HdlCardPlatformBase):
             except InvalidAssetError as err:
                 if cfg != 'base':
                     raise err
+        self.worker = Worker(self.get_xml_abs_path())
 
     def get_type(self):
         return 'hdl platform'
