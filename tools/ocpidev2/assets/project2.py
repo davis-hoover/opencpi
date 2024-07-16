@@ -35,6 +35,74 @@ from _opencpi.assets.platform2 import HdlPlatform, RccPlatform
 from _opencpi.assets.test2 import Test
 
 
+proj_exports_template = """
+# This file specifies aspects of this project that are made available to users,
+# by adding or subtracting from what is automatically exported based on the
+# documented rules.
+# Lines starting with + add to the exports
+# Lines starting with - subtract from the exports
+all
+
+\n\n\n"""
+
+proj_git_ignore_template = """
+# Lines starting with '#' are considered comments.
+# Ignore (generated) html files,
+#*.html
+# except foo.html which is maintained by hand.
+#!foo.html
+# Ignore objects and archives.
+*.rpm
+*.obj
+*.so
+*~
+*.o
+target-*/
+*.deps
+gen/
+*.old
+*.hold
+*.orig
+*.log
+lib/
+#Texmaker artifacts
+*.aux
+*.synctex.gz
+*.out
+**/doc*/*.pdf
+**/doc*/*.toc
+**/doc*/*.lof
+**/doc*/*.lot
+run/
+exports/
+imports
+*.pyc
+simulations/
+\n\n"""
+
+proj_git_attributes_template = """
+*.ngc -diff
+*.edf -diff
+*.bit -diff
+\n\n"""
+
+proj_rst_template = """
+.. {{asset.name}} top level project documentation
+
+
+{{asset.name|capitalize}}
+===============
+Skeleton outline: Description of project.
+
+.. toctree::
+   :maxdepth: 2
+
+   components/components
+   hdl/primitives/primitives
+   specs/specs
+\n"""
+
+
 class Project(AssetBase, SpecsDirectory, Discoverer):
     """ Component Development Guide section 14 """
 
@@ -127,7 +195,8 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             if hdl_platform.worker.name == name:
                 am = authoring_model
                 if (am == '') or (hdl_platform.worker.authoring_model == am):
-                    ret = worker
+                    ret = hdl_platform.worker
+                    break
         return ret
 
     def get_asset_within(self, abs_path):
@@ -161,6 +230,15 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         # end pre-2.0 opencpi
         paths = self.get_list_of_existing_abs_paths_to_parse(paths)
         return paths
+
+    def get_templates(self):
+        templates = {}
+        templates['Project.exports'] = proj_exports_template
+        templates['.gitignore'] = proj_git_ignore_template
+        templates['.gitattributes'] = proj_git_attributes_template
+        templates['Project.rst'] = proj_rst_template
+        templates['Project.xml'] = g_asset_template
+        return templates
 
     def parse(self, cli_dict):
         AssetBase.parse(self, cli_dict)
@@ -315,7 +393,8 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
 
     def create(self):
         """ create self (a project) """
-        AssetBase.create_files(self, project_templates, self.get_dir_abs_path())
+        templates = self.get_templates()
+        AssetBase.create_files(self, templates, self.get_dir_abs_path())
 
     def get_existing_dir_abs_paths_for_clib_consideration(self):
         """ returns a list of absolute paths to directories in standard

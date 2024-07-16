@@ -27,6 +27,8 @@ import jinja2
 
 # TODO make a class member, probably ComponentLibrary or Project class
 g_libraries_mk = False
+g_asset_template = """<?xml version="1.0"?>\n<{{asset.root_tags[0]}}{% for key,val in asset.attrs.items() %}{% if val != '' and val != [] %}\n
+    {{key}}=\'{{val}}\'{% endif %}{% endfor %}/>\n\n"""
 g_hdl_core_mk = False
 g_suppress_warn = False
 
@@ -909,6 +911,18 @@ class AssetBase(AttributeBase):
         if not any([self.get_dir_abs_path().endswith(loc) for loc in
                     self.valid_locations]):
             self.raise_invalid_location()
+
+    def create_files(self, templates, file_path, package_id=None,
+                     library_name=None, duplicate=False):
+        os.makedirs(file_path, exist_ok=duplicate)
+        for fname, fcontents in templates.items():
+            fcontents = jinja2.Template(fcontents, trim_blocks=True)
+            fcontents = fcontents.render(
+                asset=self, package_id=package_id, library_name=library_name
+            )
+            out_file = open(file_path + '/' + fname, 'w')
+            out_file.write(fcontents)
+            out_file.close()
 
     def get_paths_to_parse(self):
         return []

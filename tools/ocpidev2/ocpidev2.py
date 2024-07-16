@@ -24,6 +24,9 @@ import argparse
 import signal
 from _opencpi.assets.abstract2 import *
 from _opencpi.assets.registry2 import ProjectRegistry, unittest
+from _opencpi.assets.project2 import Project
+# below imports only necessary for get_attr_infos() calls
+from _opencpi.assets.library2 import ComponentLibrary
 
 
 def ocpidevsignint(sig, frame):
@@ -41,6 +44,8 @@ def add_build_arguments(parser, noun):
 
 
 def add_create_arguments(parser, noun):
+    """ add create-specific arguments as per man ocpidev-create """
+    parser.add_argument('-k', '--keep', default=False, action='store_true')
     if noun == 'project':
         project = Project('', False, None)
         for attr in project.get_attr_infos():
@@ -237,6 +242,8 @@ def get_cli_dict():
 def get_create_registry(cli_dict):
     create_registry = False
     if cli_dict['verb'] == 'clean':
+        create_registry = True
+    if cli_dict['verb'] == 'create':
         create_registry = True
     if cli_dict['verb'] == 'build':
         create_registry = True

@@ -90,7 +90,6 @@ class ProjectRegistry():
         """ get project which contains named worker """
         ret = None
         for project in self.projects:
-            print('--- searching project ' + project.name + ' for ' + name)
             if project.get_worker_by_name(name, authoring_model) is not None:
                 ret = project
         if ret is None:
@@ -148,17 +147,18 @@ class ProjectRegistry():
                             if support == worker.name:
                                 ret.append(potential_subdevice)
         if worker.name == hdl_platform:
-            # TODO retrieve from registry, don't re-construct HdlPlatform
-            _hdl_platform = HdlPlatform(worker.get_dir_abs_path())
-            for cfg in _hdl_platform.configurations.values():
-                for dev in cfg.devices:
-                    _worker = None
-                    project = self.get_worker_project(dev.name, None, 'hdl')
-                    for clib in project.component_libraries:
-                        for device in clib.workers:
-                            if device.name == dev.name:
-                                ret.append(device)
-                                break
+            for project in self.projects:
+                for _hdl_platform in project.hdl_platforms:
+                    if _hdl_platform.get_dir_abs_path() == worker.get_dir_abs_path():
+                        for cfg in _hdl_platform.configurations.values():
+                            for dev in cfg.devices:
+                                _worker = None
+                                project = self.get_worker_project(dev.name, None, 'hdl')
+                                for clib in project.component_libraries:
+                                    for device in clib.workers:
+                                        if device.name == dev.name:
+                                            ret.append(device)
+                                            break
         return ret
 
     def discover(
@@ -196,8 +196,8 @@ class ProjectRegistry():
                 self.projects.append(project)
         Logger().debug('end of project discovery')
 
-    def register_project(self, project_path):
-        project = Project(project_path, False)  # raises if not a project
+    def register_project(self, dir_abs_path):
+        project = Project(dir_abs_path, False)  # raises if not a project
         symlink_path = self.abs_path + '/' + str(project.get_package_id())
         if not os.path.islink(symlink_path):
             os.symlink(project.abs_path, symlink_path)
@@ -283,10 +283,16 @@ class ProjectRegistry():
             raise Exception('cannot clean directory not in registered project')
 
     def _create(self, cli_dict, _dir):
+        if cli_dict['keep']:
+            Logger().warn('--keep is unnecessary')
         if cli_dict['noun'] == 'registry':
             self.create(_dir)
         elif cli_dict['noun'] == 'project':
-            asset.create()  # create the project itself
+            # create the project itself
+            dir_abs_path = _dir + '/' + cli_dict['name']
+            Project(dir_abs_path, False, cli_dict).create()
+            if cli_dict['register']:
+                self.register_project(dir_abs_path)
         else:
             # TODO add ability to create asset in un-registered project
             project = next((proj for proj in self.projects if
@@ -517,43 +523,46 @@ class ProjectRegistry():
                 # recursion
                 makefile = self.append_asset_rules_to_makefile_variable(
                     prim, [target], [hdl_platform], [rcc_platform], makefile, ppath, tool)
-        for worker in self.get_hdl_worker_dependent_workers(asset,
-                      hdl_platform):
-            for platform in (hdl_platforms + rcc_platforms):
-                hdl_platform = ''
-                rcc_platform = ''
-                if platform in hdl_platforms:
-                    hdl_platform = platform
-                if platform in rcc_platforms:
-                    rcc_platform = platform
-                ppath = tool.get_build_artifact_abs_path(worker, target, hdl_platform, self)
-                makefile.rules[gnu_make_target_str].prerequisites.append(ppath)
-                # recursion
-                makefile = self.append_asset_rules_to_makefile_variable(
-                    worker, [target], [hdl_platform], [rcc_platform], makefile, ppath, tool)
+        for hdl_platform in hdl_platforms:
+            for worker in self.get_hdl_worker_dependent_workers(asset,
+                          hdl_platform):
+                for platform in (hdl_platforms + rcc_platforms):
+                    hdl_platform = ''
+                    rcc_platform = ''
+                    if platform in hdl_platforms:
+                        hdl_platform = platform
+                    if platform in rcc_platforms:
+                        rcc_platform = platform
+                    ppath = tool.get_build_artifact_abs_path(worker, target, hdl_platform, self)
+                    makefile.rules[gnu_make_target_str].prerequisites.append(ppath)
+                    # recursion
+                    makefile = self.append_asset_rules_to_makefile_variable(
+                        worker, [target], [hdl_platform], [rcc_platform], makefile, ppath, tool)
         if asset.name == hdl_platform:
-            _hdl_platform = HdlPlatform(asset.get_dir_abs_path())
-            for cfg in _hdl_platform.configurations.values():
-                for dev in cfg.devices:
-                    _worker = None
-                    project = self.get_worker_project(dev.name, None, 'hdl')
-                    for clib in project.component_libraries:
-                        for device in clib.workers:
-                            if device.name == dev.name:
-                                _worker = device
-                                break
-                    for platform in (hdl_platforms + rcc_platforms):
-                        hdl_platform = ''
-                        rcc_platform = ''
-                        if platform in hdl_platforms:
-                            hdl_platform = platform
-                        target = self.get_target(hdl_platform, rcc_platform)
-                        wpath = tool.get_build_artifact_abs_path(_worker, target,
-                                hdl_platform, self)
-                        makefile.rules[gnu_make_target_str].prerequisites.append(wpath)
-                        # recursion
-                        makefile = self.append_asset_rules_to_makefile_variable(
-                            _worker, [target], [hdl_platform], [], makefile, wpath, tool)
+            for project in self.projects:
+                for _hdl_platform in project.hdl_platforms:
+                    if _hdl_platform.get_dir_abs_path() == worker.get_dir_abs_path():
+                        for cfg in _hdl_platform.configurations.values():
+                            for dev in cfg.devices:
+                                _worker = None
+                                project = self.get_worker_project(dev.name, None, 'hdl')
+                                for clib in project.component_libraries:
+                                    for device in clib.workers:
+                                        if device.name == dev.name:
+                                            _worker = device
+                                            break
+                                for platform in (hdl_platforms + rcc_platforms):
+                                    hdl_platform = ''
+                                    rcc_platform = ''
+                                    if platform in hdl_platforms:
+                                        hdl_platform = platform
+                                    target = self.get_target(hdl_platform, rcc_platform)
+                                    wpath = tool.get_build_artifact_abs_path(_worker, target,
+                                            hdl_platform, self)
+                                    makefile.rules[gnu_make_target_str].prerequisites.append(wpath)
+                                    # recursion
+                                    makefile = self.append_asset_rules_to_makefile_variable(
+                                        _worker, [target], [hdl_platform], [], makefile, wpath, tool)
         recipe = tool.get_gnu_make_recipe(asset, hdl_targets, hdl_platforms,
                                           rcc_platforms)
         makefile.rules[gnu_make_target_str].recipe = recipe
@@ -584,6 +593,9 @@ class ProjectRegistry():
                         for key, val in entry.devices.items():
                             if key == devname:
                                 ret.append(val)
+        msg = 'for assembly ' + hdl_assembly.name
+        msg += ', got dependent workers ' + str(ret)
+        Logger().debug(msg)
         return ret
 
     def append_hdl_assembly_rules_to_makefile_variable(self,

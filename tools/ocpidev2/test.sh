@@ -10,6 +10,35 @@ do_unit_test() {
   ocpidev2 unittest
 }
 
+do_create_test() {
+  sudo apt install pycodestyle
+  pycodestyle ../tools/ocpidev2/*py
+  pycodestyle ../tools/ocpidev2/assets/*py
+  ocpidev2 show -h
+  ocpidev2 show --help
+  ocpidev2 unittest
+  ocpidev2 unittest -v
+  ocpidev2 unittest --verbose
+  rm -rf myproj/
+  ocpidev2 create project myproj
+  rm -rf myproj/
+  ocpidev2 create project myproj -D ocpi.assets
+  rm -rf myproj/
+  ocpidev2 create project myproj -F ocpi
+  rm -rf myproj/
+  ocpidev2 create project myproj -K com.geontech
+  rm -rf myproj/
+  ocpidev2 create project myproj -N geontech
+  rm -rf myproj/
+  ocpidev2 create project myproj -A mydir
+  rm -rf myproj/
+  ocpidev2 create project myproj -I mydiri
+  rm -rf myproj/
+  ocpidev2 create project myproj -Y dsp_prims
+  rm -rf myproj/
+  ocpidev2 create project myproj -y dsp_comps
+}
+
 do_show_test() {
   sudo apt install pycodestyle
   pycodestyle ../tools/ocpidev2/*py
