@@ -22,7 +22,7 @@ import hashlib
 import itertools
 from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import AssetBase
-from _opencpi.assets.component2 import Component
+from _opencpi.assets.component2 import Component, Protocol
 from _opencpi.assets.worker2 import Worker
 from _opencpi.assets.application2 import Application
 from _opencpi.assets.library2 import SpecsDirectory, Discoverer
@@ -280,95 +280,75 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         # end of bullets at top of CDG section 14
 
     def create_protocol(self, _dir, cli_dict):
-        dash_d = os.path.relpath(_dir, os.getcwd())
-        if dash_d == '.':
-            dash_d = False
-        proj_spec = bool(cli_dict['project'])
-        hdl_library = bool(cli_dict['hdllibrary'])
-        library = bool(cli_dict['library'])
+        proj_spec = cli_dict['project']
+        hdl_library = cli_dict['hdllibrary']
+        library = cli_dict['library']
         # Check for 'devices' Component Library name collision
-        # HERE
-        devices_path = None
         if 'devices' in (cli_dict['hdllibrary'], cli_dict['library']):
             devices_paths = []
             for comp_lib in self.component_libraries:
                 if comp_lib.abs_path.endswith('/devices'):
                     devices_paths.append(comp_lib.abs_path)
             if len(devices_paths) > 1:
-                msg = ("Project '" + self.name + "' contains more than"
+                msg = ("Path: '" + _dir + "' contains more than"
                        " one 'devices' component libraries: " +
                        ', '.join(map(str, list(devices_paths))) + "."
                        " Use '-d' instead.")
                 raise Exception(msg)
-            # HERE
-            else:
-                devices_path = devices_paths[0]
         # Create proj_spec protocol path
         if proj_spec:
             prot_path = (self.abs_path + '/specs/' + cli_dict['name'] +
                          '-prot.xml')
         # Validate CLI parameter --hdl-library= and create protocol path
         elif hdl_library:
-            hdl_libraries = ['adapters', 'cards', 'devices', 'platforms']
-            if cli_dict['hdllibrary'] not in hdl_libraries:
+            hdl_libs = []
+            for lib in self.component_libraries:
+                if self.abs_path + '/hdl/' in lib.abs_path:
+                    hdl_libs.append(lib)
+            if cli_dict['hdllibrary'] not in ['adapters', 'cards', 'devices']:
                 msg = ("The --hdl-library '" + cli_dict['hdllibrary'] +
                        "' is not one of the valid hdl libraries: " +
-                       ', '.join(map(str, list(hdl_libraries))) + ".")
+                       "adapters, cards, devices.")
                 raise Exception(msg)
             else:
-                if not dash_d:
-                    if not os.path.exists(self.abs_path + '/hdl/' +
-                                          cli_dict['hdllibrary']):
-                       msg = ("The --hdl-library '" + cli_dict['hdllibrary'] +
-                              "' does not exist in the '" + self.name +
-                              "' project.")
-                       raise Exception(msg)
-                    prot_path = (self.abs_path + '/hdl/' +
-                                 cli_dict['hdllibrary'] + '/specs/' +
-                                 cli_dict['name'] + '-prot.xml')
-                else:
-                    if not os.path.exists(_dir + '/' + cli_dict['hdllibrary']):
-                        msg = ("The --hdl-library '" + cli_dict['hdllibrary'] +
-                               "' does not exist in the path: '" + _dir)
-                        raise Exception(msg)
-                    prot_path = (_dir + '/' + cli_dict['hdllibrary'] +
-                                 '/specs/' + cli_dict['name'] + '-prot.xml')
+                hdl_lib_path = None
+                hdl_lib_valid = False
+                for lib in hdl_libs:
+                    if _dir + '/' in lib.abs_path:
+                        if cli_dict['hdllibrary'] == lib.name:
+                            hdl_lib_path = lib.abs_path
+                            hdl_lib_valid = True
+                            break
+                if not hdl_lib_valid:
+                    msg = ("The --hdl-library '" + cli_dict['hdllibrary'] +
+                           "' does not exist in the path: '" + _dir + "'.")
+                    raise Exception(msg)
+                prot_path = (hdl_lib_path + '/specs/' + cli_dict['name'] +
+                             '-prot.xml')
         # Validate CLI parameter --library= and create protocol path
         elif library:
-                lib_valid = False
-                lib_path = None
-                for lib in self.component_libraries:
-                    if not dash_d:
-                        if cli_dict['library'] == lib.name:
-                            lib_valid = True
-                            lib_path = lib.abs_path
-                            break
-                    else:
-                        if _dir + '/' in lib.abs_path:
-                            if cli_dict['library'] == lib.name:
-                                lib_valid = True
-                                lib_path = lib.abs_path
-                                break
-                if not lib_valid:
-                    if not dash_d:
-                        msg = ("The --library '" + cli_dict['library'] +
-                               "' does not exist in the '" + self.name +
-                               "' project.")
-                        raise Exception(msg)
-                    else:
-                        msg = ("The --library '" + cli_dict['library'] +
-                               "' does not exist in the path: '" + _dir + "'.")
-                        raise Exception(msg)
-                prot_path = (lib_path + '/specs/' + cli_dict['name'] + '-prot.xml')
-
+            lib_valid = False
+            lib_path = None
+            for lib in self.component_libraries:
+                if _dir + '/' in lib.get_dir_abs_path():
+                    if cli_dict['library'] == lib.name:
+                        lib_valid = True
+                        lib_path = lib.get_dir_abs_path()
+                        break
+            if not lib_valid:
+                msg = ("The --library '" + cli_dict['library'] +
+                       "' does not exist in the path: '" + _dir + "'.")
+                raise Exception(msg)
+            prot_path = (lib_path + '/specs/' + cli_dict['name'] +
+                         '-prot.xml')
         # Create protocol path for given path (_dir)
         else:
-            if _dir == self.abs_path + '/specs':
+            if _dir == self.get_dir_abs_path() + '/specs':
                 prot_path = _dir + '/' + cli_dict['name'] + '-prot.xml'
             else:
                 valid_path = False
                 for comp_lib in self.component_libraries:
-                    if _dir == comp_lib.abs_path + '/specs':
+                    if _dir == comp_lib.get_dir_abs_path() + '/specs':
                         valid_path = True
                         break
                 if not valid_path:
@@ -376,7 +356,6 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                            "pointing to a valid protocol specs directory.")
                     raise Exception(msg)
                 prot_path = _dir + '/' + cli_dict['name'] + '-prot.xml'
-        print(f"{prot_path=}")
         Protocol(prot_path, False, cli_dict).create()
 
     def create_asset(self, _dir, cli_dict):

@@ -416,9 +416,10 @@ class Protocol(AssetBase):
 
     def create(self):
         specs_path = '/'.join(self.abs_path.split('/')[:-1])
+        if not os.path.exists(specs_path):
+            os.system('mkdir ' + specs_path)
         prot_templates = self.create_templates()
-        AssetBase.create_files(self, prot_templates, specs_path,
-                               duplicate=True)
+        AssetBase.create_files(self, prot_templates, specs_path)
 
     def get_type(self):
         return 'protocol'
