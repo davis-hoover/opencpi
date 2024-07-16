@@ -292,7 +292,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                     self.cli_dict['xmldirapp'])
 
     def create_component(self, _dir, project):
-        xml_abs_path = _dir + '/' + args.name + '.comp' + '/' + args.name +
+        xml_abs_path = _dir + '/' + args.name + '.comp' + '/' + args.name + \
                          '-comp.xml'
         self.valid_comp_path(_dir, project)
         package_id = project.get_package_id()

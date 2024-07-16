@@ -248,7 +248,7 @@ class ProjectRegistry():
     def dispatch_verb(self, cli_dict):
         """ this method implements functionality common across verbs, then
             dispatches to individual verb calls """
-        if len(cli_dict['d']) == 0:
+        if cli_dict['d'] == []:
             cli_dict['d'].append(Environment().getcwd())
         for _dir in cli_dict['d']:
             if cli_dict['verb'] == 'build':
@@ -297,7 +297,10 @@ class ProjectRegistry():
         if cli_dict['keep']:
             Logger().warn('--keep is unnecessary')
         if cli_dict['noun'] == 'registry':
-            self.create(_dir)
+            try:
+                System('mkdir -p ' + _dir + '/' + cli_dict['name'])
+            except SystemCallError:
+                raise Exception('registry already exists')
         elif cli_dict['noun'] == 'project':
             dir_abs_path = _dir + '/' + cli_dict['name']
             Project(dir_abs_path, False, cli_dict).create()
