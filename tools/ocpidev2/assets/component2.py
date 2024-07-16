@@ -408,18 +408,17 @@ class Protocol(AssetBase):
                 except InvalidAttributeError:
                     pass
 
-    def create_templates(self):
-        prot_templates = {}
-        prot_templates[self.name + '-prot.xml'] = g_asset_template
-        prot_templates[self.name + '-prot.rst'] = prot_spec_rst_template
-        return prot_templates
+    def get_templates(self):
+        templates = {}
+        templates[self.name + '-prot.xml'] = g_asset_template
+        templates[self.name + '-prot.rst'] = prot_spec_rst_template
+        return templates
 
     def create(self):
-        specs_path = '/'.join(self.abs_path.split('/')[:-1])
-        if not os.path.exists(specs_path):
-            os.system('mkdir ' + specs_path)
-        prot_templates = self.create_templates()
-        AssetBase.create_files(self, prot_templates, specs_path)
+        """ create self (a protocol) """
+        specs_dir_abs_path = '/'.join(self.abs_path.split('/')[:-1])
+        prot_templates = self.get_templates()
+        AssetBase.create_files(self, prot_templates, specs_dir_abs_path)
 
     def get_type(self):
         return 'protocol'

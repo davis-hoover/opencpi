@@ -239,19 +239,6 @@ def get_cli_dict():
     return cli_dict
 
 
-def get_create_registry(cli_dict):
-    create_registry = False
-    if cli_dict['verb'] == 'clean':
-        create_registry = True
-    if cli_dict['verb'] == 'create':
-        create_registry = True
-    if cli_dict['verb'] == 'build':
-        create_registry = True
-    if cli_dict['verb'] == 'show':
-        create_registry = True
-    return create_registry
-
-
 def get_enable_registry_discovery(cli_dict):
     disc = True
     if cli_dict['verb'] == 'show':
@@ -292,6 +279,11 @@ def delete(cli_dict, project_registry):
     # but probably not
     project_registry.delete(cli_dict)
 
+def register(cli_dict, project_registry):
+    # may eventually support unregistered projects in addition to registry,
+    # but probably not
+    project_registry.register(cli_dict)
+
 def run(cli_dict, project_registry):
     # may eventually support unregistered projects in addition to registry,
     # but probably not
@@ -302,6 +294,11 @@ def show(cli_dict, project_registry):
     # but probably not
     project_registry.show(cli_dict)
 
+def unregister(cli_dict, project_registry):
+    # may eventually support unregistered projects in addition to registry,
+    # but probably not
+    project_registry.unregister(cli_dict)
+
 def main():
     ret = 0
     try:
@@ -310,10 +307,8 @@ def main():
         if cli_dict['suppresswarn']:
             set_g_suppress_warn(True)
         Logger().debug('cli_dict : ' + str(cli_dict))
-        project_registry = None
-        if get_create_registry(cli_dict):
-            disc = get_enable_registry_discovery(cli_dict)
-            project_registry = ProjectRegistry(disc, disc)
+        disc = get_enable_registry_discovery(cli_dict)
+        project_registry = ProjectRegistry(disc, disc)
         if cli_dict['help']:
             _help(cli_dict, project_registry)
         elif cli_dict['verb'] == 'build':
@@ -322,10 +317,14 @@ def main():
             clean(cli_dict, project_registry)
         elif cli_dict['verb'] == 'create':
             create(cli_dict, project_registry)
+        elif cli_dict['verb'] == 'register':
+            register(cli_dict, project_registry)
         elif cli_dict['verb'] == 'show':
             show(cli_dict, project_registry)
         elif cli_dict['verb'] == 'unittest':
             unittest(cli_dict, project_registry)
+        elif cli_dict['verb'] == 'unregister':
+            unregister(cli_dict, project_registry)
         else:
             raise Exception('verb ' + cli_dict['verb'] + ' is not supported')
     except Exception as exception:

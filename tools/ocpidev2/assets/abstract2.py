@@ -90,6 +90,9 @@ def get_target(hdl_platform, rcc_platform=''):
 def raise_not_found_in_projects(msg, name):
     raise Exception(msg + ' ' + name + ' not found in any registered project')
 
+class SystemCallError(Exception):
+    pass
+
 
 class InvalidAssetError(Exception):
     pass
@@ -165,7 +168,7 @@ class System():
     def __init__(self, cmd):
         Logger().debug('making system call: ' + cmd)
         if os.system(cmd):
-            raise Exception('cmd failed: ' + cmd)
+            raise SystemCallError('cmd failed: ' + cmd)
 
 
 class TemporaryFilesystem():
@@ -914,6 +917,8 @@ class AssetBase(AttributeBase):
 
     def create_files(self, templates, file_dir, package_id=None,
                      library_name=None):
+        if not os.path.exists(self.get_dir_abs_path()):
+            System('mkdir ' + self.get_dir_abs_path())
         for fname, fcontents in templates.items():
             file_path = file_dir + '/' + fname
             if os.path.exists(file_path):

@@ -203,9 +203,12 @@ class ProjectRegistry():
             os.symlink(project.abs_path, symlink_path)
 
     def unregister_project(self, _dir):
-        project = Project(project_path, False)  # raises if not a project
+        project = Project(_dir, False)  # raises if not a project
         pid = str(project.get_package_id())
-        os.system('unlink ' + self.abs_path + '/' + pid)
+        try:
+            System('unlink ' + self.abs_path + '/' + pid)
+        except SystemCallError:
+            raise Exception(pid + ' is not registered')
 
     def get_assets(self, _dir):
         assets = []
@@ -230,13 +233,21 @@ class ProjectRegistry():
     def refresh(self, cli_dict):
         self.dispatch_verb(cli_dict)
 
+    def register(self, cli_dict):
+        self.dispatch_verb(cli_dict)
+
     def run(self, cli_dict):
         self.dispatch_verb(cli_dict)
 
     def show(self, cli_dict):
         self.dispatch_verb(cli_dict)
 
+    def unregister(self, cli_dict):
+        self.dispatch_verb(cli_dict)
+
     def dispatch_verb(self, cli_dict):
+        """ this method implements functionality common across verbs, then
+            dispatches to individual verb calls """
         if len(cli_dict['d']) == 0:
             cli_dict['d'].append(Environment().getcwd())
         for _dir in cli_dict['d']:
@@ -288,15 +299,15 @@ class ProjectRegistry():
         if cli_dict['noun'] == 'registry':
             self.create(_dir)
         elif cli_dict['noun'] == 'project':
-            # create the project itself
             dir_abs_path = _dir + '/' + cli_dict['name']
             Project(dir_abs_path, False, cli_dict).create()
             if cli_dict['register']:
                 self.register_project(dir_abs_path)
         else:
-            # TODO add ability to create asset in un-registered project
             project = next((proj for proj in self.projects if
-                            proj.abs_path + '/' in _dir + '/'), None)
+                            (proj.get_dir_abs_path() + '/') in (_dir + '/')), None)
+            if project == None:
+                project = Project(_dir)
             if project == None:
                 msg = ("Invalid path: '" + _dir + "'. Please perform 'create "
                        + cli_dict['noun'] + "' within a valid, registered "
