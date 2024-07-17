@@ -26,14 +26,14 @@ import uuid
 from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import AssetBase
 
-worker_rst_template= """.. {{asset.name}} {{asset.authoring_model}} worker
+worker_rst_template= """.. {{asset.name}}.{{asset.authoring_model}} {{asset.authoring_model|upper}} worker
 
 
-.. _{{asset.name}}-{{asset.authoring_model}}-worker:
+.. _{{asset.name}}.{{asset.authoring_model}}-{{asset.authoring_model|upper}}-worker:
 
 
-``{{asset.name}}`` {{asset.authoring_model}} Worker
-============================================
+``{{asset.name}}.{{asset.authoring_model}}`` {{asset.authoring_model|upper}} Worker
+==============================================================================================================================================================
 Skeleton outline: Optional summary of the implementation of this worker. Anything before the next heading will be included as worker summary on component documentation page.
 
 Detail
@@ -60,8 +60,8 @@ architecture rtl of worker is
 begin
   ctl_out.finished <= btrue; -- remove or change this line for worker to be finished when appropriate
                              -- workers that are never "finished" need not drive this signal
-end rtl;
-"""
+end rtl;\n
+"""  # nopep8
 
 
 class Worker(AssetBase):
@@ -118,8 +118,9 @@ class Worker(AssetBase):
 
     def get_templates(self):
         templates = {}
-        templates[self.name + '.rst'] = worker_rst_template
-        templates[self.name + '.vhd'] = worker_vhd_template
+        templates[self.name + '-' + self.authoring_model + '.rst'] = worker_rst_template
+        if self.authoring_model == 'hdl':
+            templates[self.name + '.vhd'] = worker_vhd_template
         templates[self.name + '.xml'] = g_asset_template
         return templates
 
