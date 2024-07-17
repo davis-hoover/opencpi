@@ -416,7 +416,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         asset = self.get_asset_object_from_cli(cli_dict, _dir)
         if os.path.exists(asset.abs_path):
             msg = cli_dict['noun'] + ' ' + cli_dict['name'] + ' already exists'
-            msg += ' within directory ' + asset.get_dir_abs_path()
+            msg += ' within directory ' + asset.get_dir_abs_path().rsplit('/', 1)[0]
             raise Exception(msg)
         asset.create()
 
