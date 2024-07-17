@@ -414,9 +414,9 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                             Logger().log(3, msg + ' within directory ' + self.get_dir_abs_path())
                         ComponentLibraries(dir_abs_path, False, cli_dict).create()
         asset = self.get_asset_object_from_cli(cli_dict, _dir)
-        if os.path.exists(dir_abs_path):
+        if os.path.exists(asset.abs_path):
             msg = cli_dict['noun'] + ' ' + cli_dict['name'] + ' already exists'
-            msg += ' within directory ' + dir_abs_path
+            msg += ' within directory ' + asset.get_dir_abs_path()
             raise Exception(msg)
         asset.create()
 
