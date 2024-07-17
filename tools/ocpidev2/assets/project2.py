@@ -392,7 +392,10 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                     raise Exception(msg)
             elif (cli_dict['name'] == 'devices') or (cli_dict['name'] == 'cards') or \
                  (cli_dict['name'] == 'adapters'):
-                pass
+                if _dir != self.get_dir_abs_path() + '/hdl':
+                    msg = 'component library \'' + cli_dict['name']
+                    msg += '\' can not exist within ' + _dir
+                    raise Exception(msg)
             else:
                 if not os.path.exists(dir_abs_path):
                     # TODO move this if statement to a better another location?
