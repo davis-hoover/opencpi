@@ -142,7 +142,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         ret = []
         # Attributes provided (partially) in CDG 10.1 Table 7
         ret.append(AttributeInfo('ProjectDependencies',
-                   is_list=True, cli=('-D', '--depend')))
+                   is_list=True, cli=('-D', '--depends')))
         ret.append(AttributeInfo('PackagePrefix',
                    cli=('-F', '--package-prefix')))
         ret.append(AttributeInfo('PackageID',

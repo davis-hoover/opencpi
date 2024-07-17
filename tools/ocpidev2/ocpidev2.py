@@ -44,45 +44,22 @@ def add_build_arguments(parser, noun):
 
 
 def add_create_arguments(parser, noun):
-    """ add create-specific arguments as per man ocpidev-create """
+    """ add create-specific arguments as per man ocpidev2-create """
     parser.add_argument('-k', '--keep', default=False, action='store_true')
+    asset = None
     if noun == 'project':
-        project = Project('', False, None)
-        for attr in project.get_attr_infos():
-            if attr.cli is not None:
-                parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
-                                    default='')
+        asset = Project('', False, None)
         parser.add_argument('--register', default=False, action='store_true')
     if noun == 'library':
-        library = ComponentLibrary('', False, None)
-        for attr in library.get_attr_infos():
-            if attr.cli is not None:
-                parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
-                                    default='')
+        asset = ComponentLibrary('', False, None)
     if noun == 'component':
-        component = Component('', False, None)
-        for attr in component.get_attr_infos():
-            if attr.cli is not None:
-                if attr.is_bool:
-                    parser.add_argument(attr.cli[0], attr.cli[1], default='',
-                                        action='store_true')
-                else:
-                    parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
-                                        default='')
+        asset = Component('', False, None)
         parser.add_argument('-t', '--create-test', default=False,
                             action='store_true')
         parser.add_argument('-p', '--project', default=False,
                             action='store_true')
     if noun == 'test':
-        test = Test('', False, None)
-        for attr in test.get_attr_infos():
-            if attr.cli is not None:
-                if attr.is_bool:
-                    parser.add_argument(attr.cli[0], attr.cli[1], default='',
-                                        action='store_true')
-                else:
-                    parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
-                                        default='')
+        asset = Test('', False, None)
     if noun == 'application':
         group = parser.add_mutually_exclusive_group()
         group.add_argument('-X', '--xml-app', default=False,
@@ -95,12 +72,20 @@ def add_create_arguments(parser, noun):
                            action='store_true')
         group.add_argument('--hdl-library', nargs='?', default='')
         group.add_argument('-l', '--library', default=None)
+    if asset is not None:
+        for attr in asset.get_attr_infos():
+            #print(attr.key + ' ' + attr.cli[1] + ' ' + str(attr.is_list))
+            if attr.cli is not None:
+                parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
+                        default=([] if attr.is_list else (False if attr.is_bool else '')),
+                        action=('append' if attr.is_list else (('store_true' if attr.is_bool else 'store'))))
     parser.add_argument('noun', default=None)
     parser.add_argument('name', default=None)
     return parser
 
 
 def add_show_arguments(parser, noun):
+    """ add create-specific arguments as per man ocpidev2-show """
     parser.add_argument('--global-scope', default=False, action='store_true')
     group = parser.add_mutually_exclusive_group()
     group.add_argument('--simple', default=False, action='store_true')
