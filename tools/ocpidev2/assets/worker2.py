@@ -27,6 +27,21 @@ from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import AssetBase
 
 
+worker_vhd_template = """
+-- THIS FILE WAS ORIGINALLY GENERATED
+-- YOU *ARE* EXPECTED TO EDIT IT
+-- This file initially contains the architecture skeleton for worker: {{asset.name}}
+
+library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
+library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
+architecture rtl of worker is
+begin
+  ctl_out.finished <= btrue; -- remove or change this line for worker to be finished when appropriate
+                             -- workers that are never "finished" need not drive this signal
+end rtl;
+"""
+
+
 class Worker(AssetBase):
     """ Reference RCC/HDL Development Guide section 3. A Worker is
         represented by a xml file (OWD) and knows nothing about the project it
@@ -78,6 +93,12 @@ class Worker(AssetBase):
 
     def delete(self):
         System('rm -rf ' + self.get_dir_abs_path())
+
+    def get_templates(self):
+        templates = {}
+        templates[self.name + '.vhd'] = worker_vhd_template
+        templates[self.name + '.xml'] = g_asset_template
+        return templates
 
     def parse(self):
         AssetBase.parse(self)
