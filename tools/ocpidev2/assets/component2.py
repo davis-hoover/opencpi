@@ -24,6 +24,7 @@ import xml.etree.ElementTree as ET
 from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import AssetBase
 
+
 comp_rst_template = """
 .. {{asset.name}} documentation
 
