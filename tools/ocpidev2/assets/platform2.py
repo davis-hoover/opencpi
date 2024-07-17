@@ -34,8 +34,8 @@ class RccPlatform(AssetBase):
 
 class HdlCardPlatformBase(AssetBase):
 
-    def __init__(self, abs_path):
-        AssetBase.__init__(self, abs_path)
+    def __init__(self, abs_path, enable_path_existence_check=True):
+        AssetBase.__init__(self, abs_path, enable_path_existence_check)
         self.devices = dict()  # key = unique instance name, val = worker name
 
     def parse_devices(self):
@@ -66,17 +66,19 @@ class HdlCardPlatformBase(AssetBase):
 class HdlPlatform(HdlCardPlatformBase):
     """ Platform Development Guide section 5.4 """
 
-    def __init__(self, dir_abs_path):
+    def __init__(self, dir_abs_path, enable_path_existence_check=True,
+                 cli_dict=None):
         self.root_tags = ['HdlPlatform']
-        HdlCardPlatformBase.__init__(self, dir_abs_path)
-        if not os.path.isfile(self.get_xml_abs_path()):
-            self.raise_abs_path_does_not_exist()
-        self.configurations = dict()
-        try:
-            self.configurations['base'] = HdlPlatformConfiguration(None)
-        except InvalidAssetError:
-            pass
-        self.parse()
+        HdlCardPlatformBase.__init__(self, dir_abs_path, enable_path_existence_check)
+        if enable_path_existence_check:
+            if not os.path.isfile(self.get_xml_abs_path()):
+                self.raise_abs_path_does_not_exist()
+            self.configurations = dict()
+            try:
+                self.configurations['base'] = HdlPlatformConfiguration(None)
+            except InvalidAssetError:
+                pass
+            self.parse()
 
     def parse(self):
         self.parse_devices()

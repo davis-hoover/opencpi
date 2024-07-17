@@ -30,16 +30,22 @@ from _opencpi.assets.library2 import ComponentLibrary
 
 
 def ocpidevsignint(sig, frame):
+    """ add create-specific arguments as per man ocpidev2-build """
     raise Exception('Ctrl-C stopped execution')
 
+
+def add_create_show_build_arguments(parser):
+    parser.add_argument('authoring_model', nargs='?', default='')
+    parser.add_argument('noun', nargs='?', default=None)
+    parser.add_argument('name', nargs='?', default=None)
+    return parser
 
 def add_build_arguments(parser, noun):
     parser.add_argument('--hdl-target', default=[], action='append')
     parser.add_argument('--hdl-platform', default=[], action='append')
     parser.add_argument('--rcc-platform', default=[], action='append')
     parser.add_argument('-j', nargs='?', type=int, default=1)
-    parser.add_argument('noun', nargs='?', default=None)
-    parser.add_argument('name', nargs='?', default=None)
+    parser = add_create_show_build_arguments(parser)
     return parser
 
 
@@ -79,8 +85,7 @@ def add_create_arguments(parser, noun):
                 parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
                         default=([] if attr.is_list else (False if attr.is_bool else '')),
                         action=('append' if attr.is_list else (('store_true' if attr.is_bool else 'store'))))
-    parser.add_argument('noun', default=None)
-    parser.add_argument('name', default=None)
+    parser = add_create_show_build_arguments(parser)
     return parser
 
 
@@ -91,9 +96,7 @@ def add_show_arguments(parser, noun):
     group.add_argument('--simple', default=False, action='store_true')
     group.add_argument('--table', default=False, action='store_true')
     group.add_argument('--json', default=False, action='store_true')
-    parser.add_argument('authoring_model', nargs='?', default='')
-    parser.add_argument('noun', nargs='?', default=None)
-    parser.add_argument('name', nargs='?', default=None)
+    parser = add_create_show_build_arguments(parser)
     return parser
 
 
@@ -181,10 +184,12 @@ def get_cli_dict():
     try:
         args.adjective = ''
         if args.authoring_model in nouns:
+            # first correction - extract proper authoring model and align the rest
             args.name = args.noun
             args.noun = args.authoring_model
             args.authoring_model = ''
-        if args.name in nouns:
+        Logger().debug('args : ' + str(args))
+        if (args.name in nouns) and args.noun.startswith('primitive'):
             if args.name == 'core':
                 args.adjective = 'core'
                 args.noun = 'primitive'
@@ -201,6 +206,7 @@ def get_cli_dict():
                 args.adjective = ''
                 args.noun = args.name
             args.name = None
+        Logger().debug('args : ' + str(args))
         if (args.authoring_model != '') and \
            (args.authoring_model != 'hdl') and \
            (args.authoring_model != 'rcc'):

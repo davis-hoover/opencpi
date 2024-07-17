@@ -251,6 +251,14 @@ class ProjectRegistry():
         if cli_dict['d'] == []:
             cli_dict['d'].append(Environment().getcwd())
         for _dir in cli_dict['d']:
+            if not ((cli_dict['verb'] == 'create') and (cli_dict['noun'] == 'library')):
+                msg = 'performing \'' + cli_dict['verb']
+                if cli_dict['noun'] != None:
+                    msg += ' ' + cli_dict['noun']
+                if cli_dict['name'] != None:
+                    msg += ' ' + cli_dict['name']
+                msg += '\''
+                Logger().log(3, msg + ' within directory ' + _dir)
             if cli_dict['verb'] == 'build':
                 self._build(cli_dict, _dir)
             if cli_dict['verb'] == 'clean':
@@ -269,16 +277,17 @@ class ProjectRegistry():
                 self._show(cli_dict, _dir)
             if cli_dict['verb'] == 'unregister':
                 self._unregister(cli_dict, _dir)
-            # this message is printed below and not above due to weird create
-            # components dir message of same form in project2.py that needs
-            # to happen first
-            msg = 'performing \'' + cli_dict['verb']
-            if cli_dict['noun'] != None:
-                msg += ' ' + cli_dict['noun']
-            if cli_dict['name'] != None:
-                msg += ' ' + cli_dict['name']
-            msg += '\''
-            Logger().log(3, msg + ' within directory ' + _dir)
+            if (cli_dict['verb'] == 'create') and (cli_dict['noun'] == 'library'):
+                # this message is printed below and not above due to weird create
+                # components dir message of same form in project2.py that needs
+                # to happen first
+                msg = 'performing \'' + cli_dict['verb']
+                if cli_dict['noun'] != None:
+                    msg += ' ' + cli_dict['noun']
+                if cli_dict['name'] != None:
+                    msg += ' ' + cli_dict['name']
+                msg += '\''
+                Logger().log(3, msg + ' within directory ' + _dir)
 
 
     def _build(self, cli_dict, _dir):

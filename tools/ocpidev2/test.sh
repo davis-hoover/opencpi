@@ -37,6 +37,27 @@ do_create_test() {
   ocpidev2 create project myproj -Y dsp_prims
   rm -rf myproj/
   ocpidev2 create project myproj -y dsp_comps
+  mkdir -p project2
+  cd project2
+  ocpidev2 create project core --package-id ocpi.core
+  ocpidev2 create library components -d core
+  ocpidev2 create library cards -d core/hdl
+  ocpidev2 create library devices -d core/hdl
+  ocpidev2 create library adapters -d core/hdl
+  ocpidev2 create hdl platform isim -d core/hdl/platforms
+  ocpidev2 create hdl platform modelsim -d core/hdl/platforms
+  ocpidev2 create hdl platform riviera -d core/hdl/platforms
+  ocpidev2 create hdl platform x4sim -d core/hdl/platforms
+  ocpidev2 create hdl platform xsim -d core/hdl/platforms
+  ocpidev2 create project assets --package-id ocpi.assets --depends ocpi.platform --component-library util_comps --component-library base_comps --component-library misc_comps --component-library dsp_comps --component-library comms_comps --component-library devices
+  ocpidev2 create library base_comps -d assets/components
+  ocpidev2 create library comms_comps -d assets/components
+  ocpidev2 create library dsp_comps -d assets/components
+  ocpidev2 create library util_comps -d assets/components
+  ocpidev2 create library cards -d assets/hdl
+  ocpidev2 create library devices -d assets/hdl
+  ocpidev2 create library adapters -d assets/hdl
+  cd -
 }
 
 do_show_test() {

@@ -27,10 +27,7 @@ import jinja2
 
 # TODO make a class member, probably ComponentLibrary or Project class
 g_libraries_mk = False
-#g_asset_template = """<?xml version="1.0"?>\n<{{asset.root_tags[0]}}/>\n\n"""  # nopep8
-#g_asset_template = """<?xml version="1.0"?>\n<{{asset.root_tags[0]}}{% for key,val in asset.attrs.items() %}{% endfor %}/>\n\n"""  # nopep8
 g_asset_template = """<?xml version="1.0"?>\n<{{asset.root_tags[0]}}{% for key,val in asset.attrs.items() %}{% if val != '' and val != [] %} {{key}}=\'{% if val.__class__.__name__ == 'list' %}{% for entry in val %}{{entry}}{% if not loop.last %} {% endif %}{% endfor %}{% else %}{{val}}{% endif %}\'{% endif %}{% endfor %}/>\n\n"""  # nopep8
-#g_asset_template = """<?xml version="1.0"?>\n<{{asset.root_tags[0]}}{% for key,val in asset.attrs.items() %}{% if val != '' and val != [] %}{{key}}=\'{% if var is iterable %}{% for entry in val %}{{entry}}{% else %}{{val}}{% endif %}\'{% endif %}{% endfor %}/>\n\n"""  # nopep8
 g_hdl_core_mk = False
 g_suppress_warn = False
 
@@ -931,6 +928,10 @@ class AssetBase(AttributeBase):
             out_file = open(file_path, 'w')
             out_file.write(fcontents)
             out_file.close()
+
+    def get_templates(self):
+        """ base classes should often override this """
+        return {self.name + '.xml':  g_asset_template}
 
     def get_paths_to_parse(self):
         return []
