@@ -343,8 +343,6 @@ def main():
             clean(cli_dict, project_registry)
         elif cli_dict['verb'] == 'create':
             create(cli_dict, project_registry)
-        elif cli_dict['verb'] == 'delete':
-            delete(cli_dict, project_registry)
         elif cli_dict['verb'] == 'register':
             register(cli_dict, project_registry)
         elif cli_dict['verb'] == 'show':
