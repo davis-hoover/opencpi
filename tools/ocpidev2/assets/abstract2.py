@@ -28,7 +28,7 @@ import jinja2
 # TODO make a class member, probably ComponentLibrary or Project class
 g_libraries_mk = False
 g_asset_template = """<?xml version="1.0"?>\n<{{asset.root_tags[0]}}{% for key,val in asset.attrs.items() %}{% if val != '' and val != [] %}\n
-    {{key}}=\'{{val}}\'{% endif %}{% endfor %}/>\n\n"""
+    {{key}}=\'{{val}}\'{% endif %}{% endfor %}/>\n\n"""  # nopep8
 g_hdl_core_mk = False
 g_suppress_warn = False
 
@@ -89,6 +89,7 @@ def get_target(hdl_platform, rcc_platform=''):
 # TODO move to Project, or perhaps ProjectRegistry, class
 def raise_not_found_in_projects(msg, name):
     raise Exception(msg + ' ' + name + ' not found in any registered project')
+
 
 class SystemCallError(Exception):
     pass
@@ -186,7 +187,7 @@ class TemporaryFilesystem():
 
 class GNUMakeTarget():
 
-    def __init__(self, string, phony = False):
+    def __init__(self, string, phony=False):
         self.string = string
         self.phony = phony
 

@@ -178,7 +178,6 @@ class ComponentLibraries(AssetBase):
         templates[self.name + '.xml'] = g_asset_template
         return templates
 
-
     def get_paths_to_parse(self):
         return [self.get_xml_abs_path()]
 
@@ -199,16 +198,16 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
                  cli_dict=None):
         self.root_tags = ['Library']  # CDG section 10.1
         AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
-        #try:
-        #    self.raise_if_invalid_location()
-        #except InvalidAssetError:
-        #    tmp = dir_abs_path.split('components/')
-        #    Logger().debug('tmp ' + str(tmp))
-        #    if len(tmp) == 2:
-        #        if tmp[1] == 'gen':
-        #            self.raise_invalid_location()
-        #    else:
-        #        self.raise_invalid_location()
+        # try:
+        #     self.raise_if_invalid_location()
+        # except InvalidAssetError:
+        #     tmp = dir_abs_path.split('components/')
+        #     Logger().debug('tmp ' + str(tmp))
+        #     if len(tmp) == 2:
+        #         if tmp[1] == 'gen':
+        #             self.raise_invalid_location()
+        #     else:
+        #         self.raise_invalid_location()
         is_test = self.get_dir_abs_path_is_test(dir_abs_path)
         if is_test or self.get_dir_abs_path_is_worker(dir_abs_path):
             self.raise_invalid_asset_error()
