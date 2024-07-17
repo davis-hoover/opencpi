@@ -21,8 +21,7 @@ import os
 from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import AssetBase
 
-hdl_library_vhd_template = """
-package {{asset.name}} is
+hdl_library_vhd_template = """package {{asset.name}} is
 end package {{asset.name}};
 """
 

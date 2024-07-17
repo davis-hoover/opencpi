@@ -27,8 +27,7 @@ from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import AssetBase
 
 
-worker_vhd_template = """
--- THIS FILE WAS ORIGINALLY GENERATED
+worker_vhd_template = """-- THIS FILE WAS ORIGINALLY GENERATED
 -- YOU *ARE* EXPECTED TO EDIT IT
 -- This file initially contains the architecture skeleton for worker: {{asset.name}}
 
