@@ -381,8 +381,8 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                 dir_abs_path += '/' + cli_dict['name']
                 is_existing_component_libraries = False
                 try:
-                    ComponentLibraries(dir_abs_path, False, cli_dict)
-                    is_existing_component_libraries = os.path.exists(dir_abs_path)
+                    ComponentLibraries(dir_abs_path, True, cli_dict)
+                    is_existing_component_libraries = True
                 except InvalidAssetError:
                     pass
                 if (is_existing_component_libraries ) or (dir_abs_path != self.get_dir_abs_path() + '/components'):
@@ -413,7 +413,12 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                         for _dir in cli_dict['d']:
                             Logger().log(3, msg + ' within directory ' + self.get_dir_abs_path())
                         ComponentLibraries(dir_abs_path, False, cli_dict).create()
-        self.get_asset_object_from_cli(cli_dict, _dir).create()
+        asset = self.get_asset_object_from_cli(cli_dict, _dir)
+        if os.path.exists(dir_abs_path):
+            msg = cli_dict['noun'] + ' ' + cli_dict['name'] + ' already exists'
+            msg += ' within directory ' + dir_abs_path
+            raise Exception(msg)
+        asset.create()
 
     def delete_asset(self, cli_dict, _dir):
         self.get_asset_object_from_cli(cli_dict, _dir).delete()
