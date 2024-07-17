@@ -301,10 +301,16 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
 
     def get_attr_infos(self):
         ret = []
-        ret.append(AttributeInfo('ComponentLibraries', is_list=True))
+        ret.append(AttributeInfo('ComponentLibraries', is_list=True,
+                                 cli=('-y', '--component-library')))
         # TODO investigate whether HdlLibraries is even allowed?
         ret.append(AttributeInfo('HdlLibraries', is_list=True))
-        ret.append(AttributeInfo('Libraries', is_list=True))
+        ret.append(AttributeInfo('XmlIncludeDir', is_list=True,
+                                 cli=('-A', '--xml-include')))
+        ret.append(AttributeInfo('IncludeDir', is_list=True,
+                                 cli=('-I', '--include-dir')))
+        ret.append(AttributeInfo('Libraries', is_list=True,
+                                 cli=('-Y', '--primitive-library')))
         ret.append(AttributeInfo('Workers', is_list=True))
         ret.append(AttributeInfo('PackagePrefix',
                                  cli=('-F', '--package-prefix')))
