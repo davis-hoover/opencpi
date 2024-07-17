@@ -333,6 +333,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                 dir_abs_path += '/specs'
                 asset = Protocol(dir_abs_path, existence_check, cli_dict)
             elif cli_dict['noun'] == 'test':
+                dir_abs_path = _dir + '/' + cli_dict['name'] + '.test'
                 asset = Test(dir_abs_path, existence_check, cli_dict)
             elif cli_dict['noun'] == 'worker':
                 xml_abs_path = dir_abs_path + '/' + cli_dict['name'] + '.'

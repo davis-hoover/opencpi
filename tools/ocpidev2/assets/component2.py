@@ -130,37 +130,6 @@ Testing
 .. Removed ocpi_documentation_test_result_summary directive until it is functional
 """  # noqa: E501
 
-comp_test_rst_template = """
-.. {{asset.name}} test detail
-
-
-:orphan:
-
-
-``{{asset.name}}`` Test Detail
-=============================
-.. ocpi_documentation_test_detail::
-
-"""
-
-comp_example_app_rst_template = """
-<?xml version="1.0"?>
-<application done="file_write">
-  <instance component="ocpi.core.file_read" connect="{{asset.name}}">
-    <property name="filename" value="input.bin"/>
-  </instance>
-  <instance component="{{package_id}}.{{library_name}}.{{asset.name}}" connect="file_write">
-    <!-- Skeleton application outline, set properties here. Or change this
-         example application to do something more real-world appropriate if
-         file-read, then component, then file-write is too artifical to be a
-         useful example. -->
-  </instance>
-  <instance component="ocpi.core.file_write">
-    <property name="filename" value="output.bin"/>
-  </instance>
-</application>
-"""  # noqa: E501
-
 comp_spec_rst_template = """
 .. {{asset.name}} documentation
 
@@ -380,6 +349,12 @@ class Protocol(AssetBase):
         # TODO replace get_root_tags() with self.root_tags
         return ['Protocol']
 
+    def get_templates(self):
+        templates = {}
+        templates[self.name + '.xml'] = g_asset_template
+        templates[self.name + '-prot.rst'] = prot_spec_rst_template
+        return templates
+
     def parse(self, cli_dict, enable_path_existence_check):
         AttributeBase.parse(self, cli_dict)
         if enable_path_existence_check:
@@ -395,12 +370,6 @@ class Protocol(AssetBase):
                     self.operations.append(operation)
                 except InvalidAttributeError:
                     pass
-
-    def get_templates(self):
-        templates = {}
-        templates[self.name + '-prot.xml'] = g_asset_template
-        templates[self.name + '-prot.rst'] = prot_spec_rst_template
-        return templates
 
     def get_type(self):
         return 'protocol'

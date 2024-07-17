@@ -871,8 +871,10 @@ class AssetBase(AttributeBase):
                 strs_to_remove += ['-hdl']  # undocumented
             if self.get_root_tags() == ['RccWorker']:
                 strs_to_remove += ['-rcc']  # undocumented
+            if self.get_root_tags() == ['Tests']:
+                strs_to_remove += ['.test']
             for str_to_remove in strs_to_remove:
-                name = name.split(str_to_remove, -1)[0]
+                name = name.split(str_to_remove)[0]
         else:
             # self.abs_path is not None for makefiles but will be be None for
             # base platform configuration

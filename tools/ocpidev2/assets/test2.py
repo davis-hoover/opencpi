@@ -23,6 +23,19 @@ from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import AssetBase
 
 
+test_rst_template = """
+.. {{asset.name}} test detail
+
+
+:orphan:
+
+
+``{{asset.name}}`` Test Detail
+==================================================================================================================================
+.. ocpi_documentation_test_detail::
+
+"""
+
 test_generate_template = ("""#!/usr/bin/env python3
 
 \"\"\"
@@ -46,16 +59,6 @@ test_view_template = ("""#!/bin/bash --noprofile
 \n""")
 
 
-def create_templates(name):
-    test_templates = {}
-    name = name.split('.')[0]
-    test_templates[name + '-test.xml'] = g_asset_template
-    test_templates['generate.py'] = test_generate_template
-    test_templates['verify.py'] = test_verify_template
-    test_templates['view.sh'] = test_view_template
-    return test_templates
-
-
 class Test(AssetBase):
     """ Reference Component Guide section 13. A <component>.test directory
         is created to hold a test suite for all workers in the library that
@@ -67,11 +70,7 @@ class Test(AssetBase):
         AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
         Logger().debug('parsing ' + self.get_xml_abs_path())
         self.parse(cli_dict)
-
-    def create(self):
-        test_path = self.get_dir_abs_path()
-        test_xml_templates = create_templates(self.name)
-        AssetBase.create_files(self, test_xml_templates, test_path)
+        self.name = self.name.split('.test')[0]  # TODO
 
     def get_attr_infos(self):
         ret = []
@@ -83,6 +82,15 @@ class Test(AssetBase):
 
     def get_type(self):
         return 'test'
+
+    def get_templates(self):
+        templates = {}
+        templates[self.name + '-test.rst'] = test_rst_template
+        templates['generate.py'] = test_generate_template
+        templates['verify.py'] = test_verify_template
+        templates['view.sh'] = test_view_template
+        templates[self.name + '.xml'] = g_asset_template
+        return templates
 
     def parse(self, cli_dict=None):
         AssetBase.parse(self, cli_dict)

@@ -28,6 +28,7 @@ from _opencpi.assets.project2 import Project
 # below imports only necessary for get_attr_infos() calls
 from _opencpi.assets.component2 import Component
 from _opencpi.assets.library2 import ComponentLibrary
+from _opencpi.assets.test2 import Test
 
 
 def ocpidevsignint(sig, frame):
@@ -243,6 +244,8 @@ def get_cli_dict():
     if args.verb != 'unittest':
         if args.noun == 'worker':
             args.authoring_model = args.name.split('.')[1]
+            args.name = args.name.split('.')[0]
+        elif args.noun == 'test':
             args.name = args.name.split('.')[0]
         else:
             if args.name:
