@@ -397,6 +397,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                 if _dir != self.get_dir_abs_path() + '/hdl':
                     msg = 'component library \'' + cli_dict['name']
                     msg += '\' can not exist within ' + _dir
+                    msg += ' (\'' + cli_dict['name'] + '\' library can only be created within <project>/hdl directory, set -d, or the working directory, to the <project>/hdl)'
                     raise Exception(msg)
             else:
                 if not os.path.exists(dir_abs_path):
