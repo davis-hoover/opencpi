@@ -69,8 +69,10 @@ def add_create_arguments(parser, noun):
                 else:
                     parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
                                         default='')
-        parser.add_argument('-t', '--create-test', default=False, action='store_true')
-        parser.add_argument('-p', '--project', default=False, action='store_true')
+        parser.add_argument('-t', '--create-test', default=False,
+                            action='store_true')
+        parser.add_argument('-p', '--project', default=False,
+                            action='store_true')
     if noun == 'test':
         test = Test('', False, None)
         for attr in test.get_attr_infos():
@@ -83,11 +85,14 @@ def add_create_arguments(parser, noun):
                                         default='')
     if noun == 'application':
         group = parser.add_mutually_exclusive_group()
-        group.add_argument('-X', '--xml-app', default=False, action='store_true')
-        group.add_argument('-x', '--xml-dir-app', default=False, action='store_true')
+        group.add_argument('-X', '--xml-app', default=False,
+                           action='store_true')
+        group.add_argument('-x', '--xml-dir-app', default=False,
+                           action='store_true')
     if noun == 'protocol':
         group = parser.add_mutually_exclusive_group()
-        group.add_argument('-p', '--project', default=False, action='store_true')
+        group.add_argument('-p', '--project', default=False,
+                           action='store_true')
         group.add_argument('--hdl-library', nargs='?', default='')
         group.add_argument('-l', '--library', default=None)
     parser.add_argument('noun', default=None)
@@ -108,14 +113,18 @@ def add_show_arguments(parser, noun):
 
 
 def add_run_arguments(parser, noun):
-    parser.add_argument('-G', '--only-platform', default=False, action='store_true')
-    parser.add_argument('-O', '--exclude-platform', default=False, action='store_true')
+    parser.add_argument('-G', '--only-platform', default=False,
+                        action='store_true')
+    parser.add_argument('-O', '--exclude-platform', default=False,
+                        action='store_true')
     group = parser.add_mutually_exclusive_group()
     group.add_argument('--hdl-library', nargs='?', default='')
     group.add_argument('-l', '--library', default=None)
-    parser.add_argument('--accumulate-errors', default=False, action='store_true')
+    parser.add_argument('--accumulate-errors', default=False,
+                        action='store_true')
     parser.add_argument('--case', default=[], action='append')
-    parser.add_argument('--keep-simulations', default=False, action='store_true')
+    parser.add_argument('--keep-simulations', default=False,
+                        action='store_true')
     parser.add_argument('--phase', default=[], action='append')
     parser.add_argument('--remotes', nargs='?', default='')
     parser.add_argument('--view', default=False, action='store_true')
@@ -254,50 +263,59 @@ global g_suppress_warn
 
 
 def _help(cli_dict, project_registry):
-  if cli_dict['verb'] == '':
-      os.system('man ocpidev2')
-  else:
-      os.system('man ocpidev2-' + cli_dict['verb'])
+    if cli_dict['verb'] == '':
+        os.system('man ocpidev2')
+    else:
+        os.system('man ocpidev2-' + cli_dict['verb'])
+
 
 def build(cli_dict, project_registry):
     # may eventually support unregistered projects in addition to registry,
     # but probably not
     project_registry.build(cli_dict)
 
+
 def clean(cli_dict, project_registry):
     # may eventually support unregistered projects in addition to registry,
     # but probably not
     project_registry.clean(cli_dict)
+
 
 def create(cli_dict, project_registry):
     # may eventually support unregistered projects in addition to registry,
     # but probably not
     project_registry.create(cli_dict)
 
+
 def delete(cli_dict, project_registry):
     # may eventually support unregistered projects in addition to registry,
     # but probably not
     project_registry.delete(cli_dict)
+
 
 def register(cli_dict, project_registry):
     # may eventually support unregistered projects in addition to registry,
     # but probably not
     project_registry.register(cli_dict)
 
+
 def run(cli_dict, project_registry):
     # may eventually support unregistered projects in addition to registry,
     # but probably not
     project_registry.run(cli_dict)
+
 
 def show(cli_dict, project_registry):
     # may eventually support unregistered projects in addition to registry,
     # but probably not
     project_registry.show(cli_dict)
 
+
 def unregister(cli_dict, project_registry):
     # may eventually support unregistered projects in addition to registry,
     # but probably not
     project_registry.unregister(cli_dict)
+
 
 def main():
     ret = 0
@@ -331,6 +349,7 @@ def main():
         Logger().error(str(exception))
         ret = 1
     return ret
+
 
 if __name__ == '__main__':
     exit(main())

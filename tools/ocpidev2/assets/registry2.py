@@ -272,7 +272,9 @@ class ProjectRegistry():
             # this message is printed below and not above due to weird create
             # components dir message of same form in project2.py that needs
             # to happen first
-            msg = 'performing \'' + cli_dict['verb'] + ' ' + cli_dict['noun']
+            msg = 'performing \'' + cli_dict['verb']
+            if cli_dict['noun'] != None:
+                msg += ' ' + cli_dict['noun']
             if cli_dict['name'] != None:
                 msg += ' ' + cli_dict['name']
             msg += '\''
@@ -282,7 +284,7 @@ class ProjectRegistry():
     def _build(self, cli_dict, _dir):
         """ builds assets by creating a temporary makefile and calls make -j
             on it and then deleting it """
-        if not os.path.exist(_dir):
+        if not os.path.exists(_dir):
             raise Exception(_dir + ' does not exist')
         # TODO support cli_dict extension (override) of this tool
         tool = LegacyBuildTool()
@@ -296,7 +298,7 @@ class ProjectRegistry():
                            makefile, cli_dict['j'], tool)
 
     def _clean(self, cli_dict, _dir):
-        if not os.path.exist(_dir):
+        if not os.path.exists(_dir):
             raise Exception(_dir + ' does not exist')
         cleaned = False
         for project in self.projects:
@@ -352,7 +354,7 @@ class ProjectRegistry():
             self.register_project(_dir)
 
     def _run(self, cli_dict, _dir):
-        if not os.path.exist(_dir):
+        if not os.path.exists(_dir):
             raise Exception(_dir + ' does not exist')
         cmd = 'make -C ' + Test(_dir).get_dir_abs_path()
         phases = ['run']
