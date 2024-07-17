@@ -393,6 +393,12 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                 dir_abs_path += '/' + cli_dict['name']
             asset = ComponentLibrary(dir_abs_path, existence_check, cli_dict)
         elif cli_dict['noun'] == 'platform':
+            if _dir != (self.get_dir_abs_path() + '/' + cli_dict['authoringmodel'] + '/platforms'):
+                msg = cli_dict['authoringmodel'] + ' ' + cli_dict['noun'] + ' ' + cli_dict['name']
+                msg += ' can not exist within ' + _dir
+                msg += ' (must exist within <project>/hdl/platforms directory, set -d, or the working directory, to <project>/hdl/platforms)'
+                raise Exception(msg)
+
             if cli_dict['authoringmodel'] == 'hdl':
                 dir_abs_path = self.get_dir_abs_path() + '/hdl/platforms/' + cli_dict['name']
                 asset = HdlPlatform(dir_abs_path, existence_check, cli_dict)
