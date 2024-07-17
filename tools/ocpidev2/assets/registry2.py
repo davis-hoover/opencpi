@@ -338,6 +338,8 @@ class ProjectRegistry():
         return project
 
     def _create(self, cli_dict, _dir):
+        if cli_dict['name'] is None:
+            raise Exception('\'create\' requires a name')
         if cli_dict['keep']:
             Logger().warn('--keep is unnecessary')
         if cli_dict['noun'] == 'registry':
@@ -781,7 +783,7 @@ class ProjectRegistry():
         for rcc_platform in rcc_platforms:
             self.install_rcc_platform_if_not_installed(rcc_platform)
         makefile.emit()
-        System('cat ' + makefile.abs_path)
+        # System('cat ' + makefile.abs_path)
         self.export_projects(makefile)
         cmd = 'make -f ' + makefile.abs_path
         if _j > 1:
