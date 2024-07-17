@@ -296,7 +296,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             xml_abs_path = self.get_dir_abs_path() + '/hdl/cards/'
             xml_abs_path += cli_dict['name'] + '.xml'
             asset = HdlCard(dir_abs_path, existence_check, cli_dict)
-        elif (cli_dict['noun'] == 'component') or (cli_dict['noun'] == 'device') or \
+        elif (cli_dict['noun'] == 'component') or \
              (cli_dict['noun'] == 'primitive') or (cli_dict['noun'] == 'protocol') or \
              (cli_dict['noun'] == 'test') or (cli_dict['noun'] == 'worker'):
             if 'project' not in cli_dict.keys():
@@ -343,15 +343,45 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         elif cli_dict['noun'] == 'library':
             if cli_dict['name'] == 'components':
                 dir_abs_path += '/' + cli_dict['name']
-            elif (cli_dict['name'] == 'devices') or (cli_dict['name'] == 'cards') or \
-                 (cli_dict['name'] == 'adapters'):
+                is_existing_component_libraries = False
+                try:
+                    ComponentLibraries(dir_abs_path, True, cli_dict)
+                    is_existing_component_libraries = True
+                except InvalidAssetError:
+                    pass
+                if (is_existing_component_libraries ) or (dir_abs_path != self.get_dir_abs_path() + '/components'):
+                    msg = 'component library \'' + cli_dict['name']
+                    msg += '\' can not exist within ' + _dir
+                    if is_existing_component_libraries:
+                        msg += ' (\'components\' directory already exists and is not a component library - it already has a components.xml with a Libraries root tag)'
+                    else:
+                        msg += ' (\'components\' library can only be created within the top level of a project, set -d, or the working directory, to the top level of a project)'
+                    raise Exception(msg)
+            elif cli_dict['name'] == 'devices':
+                dir_abs_path = _dir + '/' + cli_dict['name']
+                if _dir != (self.get_dir_abs_path() + '/hdl'):
+                    found = False
+                    for hdl_platform in self.hdl_platforms:
+                        if _dir == hdl_platform.get_dir_abs_path():
+                            found = True
+                    if not found:
+                        msg = 'component library ' + cli_dict['name']
+                        msg += ' can not exist within ' + _dir
+                        msg += ' (\'' + cli_dict['name'] + '\' library can only exist within <project>/hdl directory or <project>/hdl/platforms/<platform> directory, set -d, or the working directory, to <project>/hdl or <project>/hdl/platforms/<platform>)'
+                        raise Exception(msg)
+            elif (cli_dict['name'] == 'adapters') or (cli_dict['name'] == 'cards'):
                 dir_abs_path = self.get_dir_abs_path() + '/hdl/' + cli_dict['name']
+                if _dir != self.get_dir_abs_path() + '/hdl':
+                    msg = 'component library \'' + cli_dict['name']
+                    msg += '\' can not exist within ' + _dir
+                    msg += ' (\'' + cli_dict['name'] + '\' library can not exist within <project>/hdl directory, set -d, or the working directory, to <project>/hdl)'
+                    raise Exception(msg)
             else:
                 dir_abs_path = _dir
                 if dir_abs_path != self.get_dir_abs_path() + '/components':
                     msg = 'component library ' + cli_dict['name']
                     msg += ' can not exist within ' + _dir
-                    msg += ' (\'' + cli_dict['name'] + '\' library can only be created within <project>/components directory, set -d, or the working directory, to <project>/components)'
+                    msg += ' (\'' + cli_dict['name'] + '\' library can not exist within <project>/components directory, set -d, or the working directory, to <project>/components)'
                     raise Exception(msg)
                 if not os.path.exists(dir_abs_path):
                     # TODO move this if statement to a better another location?
@@ -378,41 +408,17 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         dir_abs_path = _dir
         if cli_dict['noun'] == 'library':
             if cli_dict['name'] == 'components':
-                dir_abs_path += '/' + cli_dict['name']
-                is_existing_component_libraries = False
-                try:
-                    ComponentLibraries(dir_abs_path, True, cli_dict)
-                    is_existing_component_libraries = True
-                except InvalidAssetError:
-                    pass
-                if (is_existing_component_libraries ) or (dir_abs_path != self.get_dir_abs_path() + '/components'):
-                    msg = 'component library \'' + cli_dict['name']
-                    msg += '\' can not exist within ' + _dir
-                    if is_existing_component_libraries:
-                        msg += ' (\'components\' directory already exists and is not a component library - it already has a components.xml with a Libraries root tag)'
-                    else:
-                        msg += ' (\'components\' library can only be created within the top level of a project, set -d, or the working directory, to the top level of a project)'
-                    raise Exception(msg)
-            elif (cli_dict['name'] == 'devices') or (cli_dict['name'] == 'cards') or \
-                 (cli_dict['name'] == 'adapters'):
-                if _dir != self.get_dir_abs_path() + '/hdl':
-                    msg = 'component library \'' + cli_dict['name']
-                    msg += '\' can not exist within ' + _dir
-                    msg += ' (\'' + cli_dict['name'] + '\' library can only be created within <project>/hdl directory, set -d, or the working directory, to <project>/hdl)'
-                    raise Exception(msg)
+                pass
+            elif cli_dict['name'] == 'devices':
+                pass
+            elif (cli_dict['name'] == 'adapters') or (cli_dict['name'] == 'cards'):
+                pass
             else:
-                if _dir != self.get_dir_abs_path() + '/components':
-                    msg = 'component library \'' + cli_dict['name']
-                    msg += '\' can not exist within ' + _dir
-                    msg += ' (\'' + cli_dict['name'] + '\' library can only be created within <project>/components directory, set -d, or the working directory, to <project>/components)'
-                    raise Exception(msg)
                 if not os.path.exists(dir_abs_path):
-                    # TODO move this if statement to a better another location?
-                    if cli_dict['verb'] == 'create':
-                        msg = 'performing \'' + cli_dict['verb'] + '\' for a components directory '
-                        for _dir in cli_dict['d']:
-                            Logger().log(3, msg + ' within directory ' + self.get_dir_abs_path())
-                        ComponentLibraries(dir_abs_path, False, cli_dict).create()
+                    msg = 'performing \'' + cli_dict['verb'] + '\' for a components directory '
+                    for _dir in cli_dict['d']:
+                        Logger().log(3, msg + ' within directory ' + self.get_dir_abs_path())
+                    ComponentLibraries(dir_abs_path, False, cli_dict).create()
         asset = self.get_asset_object_from_cli(cli_dict, _dir)
         if os.path.exists(asset.abs_path):
             msg = cli_dict['noun'] + ' ' + cli_dict['name'] + ' already exists'

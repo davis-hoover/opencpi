@@ -324,7 +324,8 @@ class ProjectRegistry():
             project_dir_abs_path = _dir
             while True:
                 try:
-                    project = Project(project_dir_abs_path)  # unregistered
+                    project = Project(project_dir_abs_path, True)  # unregistered
+                    project.discover()
                     break
                 except InvalidAssetError:
                     project_dir_abs_path = project_dir_abs_path.rsplit('/', 1)[0]
