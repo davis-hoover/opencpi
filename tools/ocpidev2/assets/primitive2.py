@@ -21,6 +21,10 @@ import os
 from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import AssetBase
 
+hdl_library_vhd_template = """
+package {{asset.name}} is
+end package {{asset.name}};
+"""
 
 class HdlLibrary(AssetBase):
     """ Reference HDL Development Guide section 5.2. A HdlLibrary is
@@ -42,6 +46,12 @@ class HdlLibrary(AssetBase):
         for key in ['Libraries']:
             ret.append(AttributeInfo(key, is_list=True))
         return ret
+
+    def get_templates(self):
+        templates = {}
+        templates[self.name + '_pkg.vhd'] = hdl_library_vhd_template
+        templates[self.name + '.xml'] = g_asset_template
+        return templates
 
     def parse(self, cli_dict=None):
         # TODO remove assignment of parse() result which is bad hack
