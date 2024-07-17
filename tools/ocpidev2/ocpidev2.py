@@ -26,6 +26,7 @@ from _opencpi.assets.abstract2 import *
 from _opencpi.assets.registry2 import ProjectRegistry, unittest
 from _opencpi.assets.project2 import Project
 # below imports only necessary for get_attr_infos() calls
+from _opencpi.assets.component2 import Component
 from _opencpi.assets.library2 import ComponentLibrary
 
 
@@ -78,16 +79,28 @@ def add_create_arguments(parser, noun):
                            action='store_true')
         group.add_argument('--hdl-library', nargs='?', default='')
         group.add_argument('-l', '--library', default=None)
+    if noun == 'primitive':
+        parser.add_argument('-p', '--project', default=False,
+                            action='store_true')
     if asset is not None:
         for attr in asset.get_attr_infos():
-            #print(attr.key + ' ' + attr.cli[1] + ' ' + str(attr.is_list))
             if attr.cli is not None:
-                parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
-                        default=([] if attr.is_list else (False if attr.is_bool else '')),
-                        action=('append' if attr.is_list else (('store_true' if attr.is_bool else 'store'))))
+                #print(attr.key + ' ' + attr.cli[1] + ' ' + str(attr.is_list))
+                if attr.is_bool:
+                    parser.add_argument(attr.cli[0], attr.cli[1],
+                            default=([] if attr.is_list else (False if attr.is_bool else '')),
+                            action=('append' if attr.is_list else (('store_true' if attr.is_bool else 'store'))))
+                else:
+                    parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
+                            default=([] if attr.is_list else (False if attr.is_bool else '')),
+                            action=('append' if attr.is_list else (('store_true' if attr.is_bool else 'store'))))
     parser = add_create_show_build_arguments(parser)
     return parser
 
+
+def add_delete_arguments(parser, noun):
+    # TODO this should probably be done better
+    return add_create_arguments(parser, noun)
 
 def add_show_arguments(parser, noun):
     """ add create-specific arguments as per man ocpidev2-show """
@@ -216,9 +229,13 @@ def get_cli_dict():
         args.authoring_model = ''
     # TODO move below 3 lines to AssetBase once proper checks in place
     if args.verb != 'unittest':
-        if args.name:
-            if not args.name.isidentifier():
-                raise ValueError("'" + args.name + "' is not a valid name")
+        if args.noun == 'worker':
+            args.authoring_model = args.name.split('.')[1]
+            args.name = args.name.split('.')[0]
+        else:
+            if args.name:
+                if not args.name.isidentifier():
+                    raise ValueError("'" + args.name + "' is not a valid name")
         if not args.help:
             if (args.noun is not None) and (args.noun not in nouns):
                 if args.verb != 'apply':
@@ -326,6 +343,8 @@ def main():
             clean(cli_dict, project_registry)
         elif cli_dict['verb'] == 'create':
             create(cli_dict, project_registry)
+        elif cli_dict['verb'] == 'delete':
+            delete(cli_dict, project_registry)
         elif cli_dict['verb'] == 'register':
             register(cli_dict, project_registry)
         elif cli_dict['verb'] == 'show':

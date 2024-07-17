@@ -317,6 +317,26 @@ class ProjectRegistry():
         if not cleaned:
             raise Exception('cannot clean directory not in registered project')
 
+    def get_project(self, cli_dict, _dir):
+        project = next((proj for proj in self.projects if
+                        (proj.get_dir_abs_path() + '/') in (_dir + '/')), None)
+        if project == None:
+            project_dir_abs_path = _dir
+            while True:
+                try:
+                    project = Project(project_dir_abs_path)  # unregistered
+                    break
+                except InvalidAssetError:
+                    project_dir_abs_path = project_dir_abs_path.rsplit('/', 1)[0]
+                    if len(project_dir_abs_path) <= 1:
+                        break
+        if project == None:
+            msg = ("Invalid path: '" + _dir + "'. Please perform 'create "
+                   + cli_dict['noun'] + "' within a valid, registered "
+                   "project.")
+            raise Exception(msg)
+        return project
+
     def _create(self, cli_dict, _dir):
         if cli_dict['keep']:
             Logger().warn('--keep is unnecessary')
@@ -331,28 +351,16 @@ class ProjectRegistry():
             if cli_dict['register']:
                 self.register_project(dir_abs_path)
         else:
-            project = next((proj for proj in self.projects if
-                            (proj.get_dir_abs_path() + '/') in (_dir + '/')), None)
-            if project == None:
-                project_dir_abs_path = _dir
-                while True:
-                    try:
-                        project = Project(project_dir_abs_path)  # unregistered
-                        break
-                    except InvalidAssetError:
-                        project_dir_abs_path = project_dir_abs_path.rsplit('/', 1)[0]
-                        if len(project_dir_abs_path) <= 1:
-                            break
-            if project == None:
-                msg = ("Invalid path: '" + _dir + "'. Please perform 'create "
-                       + cli_dict['noun'] + "' within a valid, registered "
-                       "project.")
-                raise Exception(msg)
-            else:
-                #print('project path is ' + project.get_dir_abs_path())
-                project.create_asset(cli_dict, _dir)
+            self.get_project(cli_dict, _dir).create_asset(cli_dict, _dir)
 
     def _delete(self, cli_dict, _dir):
+        if cli_dict['noun'] == 'registry':
+            pass
+        elif cli_dict['noun'] == 'project':
+            dir_abs_path = _dir + '/' + cli_dict['name']
+            Project(dir_abs_path, False, cli_dict).delete()
+        else:
+            self.get_project(cli_dict, _dir).delete_asset(cli_dict, _dir)
         pass
 
     def _refresh(self, cli_dict, _dir):

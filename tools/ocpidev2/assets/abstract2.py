@@ -929,6 +929,9 @@ class AssetBase(AttributeBase):
             out_file.write(fcontents)
             out_file.close()
 
+    def delete(self):
+        System('rm -rf ' + self.abs_path)
+
     def get_templates(self):
         """ base classes should often override this """
         return {self.name + '.xml':  g_asset_template}

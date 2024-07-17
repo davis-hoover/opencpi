@@ -32,13 +32,14 @@ class Worker(AssetBase):
         represented by a xml file (OWD) and knows nothing about the project it
         is in or its package ID. """
 
-    def __init__(self, xml_abs_path):
+    def __init__(self, xml_abs_path, enable_path_existence_check=True,
+                 cli_dict=None):
         self.root_tags = ['HdlWorker', 'HdlDevice']  # PDG section 5.4.4
         self.root_tags += ['HdlPlatform', 'RccWorker']
         # start pre-2.0 opencpi
         self.root_tags += ['HdlImplementation', 'RccImplementation']
         # end pre-2.0 opencpi
-        AssetBase.__init__(self, xml_abs_path)
+        AssetBase.__init__(self, xml_abs_path, enable_path_existence_check)
         self.authoring_model = ''
         directory_name = self.abs_path.split('/', -2)[-2]
         if directory_name.endswith('.hdl'):
@@ -49,7 +50,8 @@ class Worker(AssetBase):
             # is a hdl platform worker case
             self.authoring_model = 'hdl'
         self.supports = []  # PDG section 5.5.4
-        self.parse()
+        if enable_path_existence_check:
+            self.parse()
 
     def get_paths_to_parse(self):
         paths = []
@@ -74,6 +76,9 @@ class Worker(AssetBase):
         # slave  # RDG section 3.1.5
         return ret
 
+    def delete(self):
+        System('rm -rf ' + self.get_dir_abs_path())
+
     def parse(self):
         AssetBase.parse(self)
         if self.attrs['Name'] != '':
@@ -93,12 +98,6 @@ class Worker(AssetBase):
 
     def get_type(self):
         return self.authoring_model + ' worker'
-
-    def create_templates(self):
-        pass
-
-    def create(self):
-        pass
 
 
 class RccAssembly(AssetBase):

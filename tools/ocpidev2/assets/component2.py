@@ -433,8 +433,8 @@ class Component(AssetBase):
 
     def get_templates(self):
         templates = {}
-        templates[name + '-comp.rst'] = comp_rst_template
-        templates[name + '-comp.xml'] = g_asset_template
+        templates[self.name + '-comp.rst'] = comp_rst_template
+        templates[self.name + '-comp.xml'] = g_asset_template
         return templates
 
     def get_attr_infos(self):
