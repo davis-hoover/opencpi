@@ -26,6 +26,29 @@ import uuid
 from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import AssetBase
 
+worker_rst_template= """.. {{asset.name}} {{asset.authoring_model}} worker
+
+
+.. _{{asset.name}}-{{asset.authoring_model}}-worker:
+
+
+``{{asset.name}}`` {{asset.authoring_model}} Worker
+============================================
+Skeleton outline: Optional summary of the implementation of this worker. Anything before the next heading will be included as worker summary on component documentation page.
+
+Detail
+------
+.. ocpi_documentation_worker::
+
+.. Skeleton comment: If not a HDL worker / implementation then the below
+   section and directive should be deleted. This comment should be removed in
+   the final version of this page.
+
+Utilization
+-----------
+.. ocpi_documentation_utilization::\n
+"""  # nopep8
+
 
 worker_vhd_template = """-- THIS FILE WAS ORIGINALLY GENERATED
 -- YOU *ARE* EXPECTED TO EDIT IT
@@ -95,6 +118,7 @@ class Worker(AssetBase):
 
     def get_templates(self):
         templates = {}
+        templates[self.name + '.rst'] = worker_rst_template
         templates[self.name + '.vhd'] = worker_vhd_template
         templates[self.name + '.xml'] = g_asset_template
         return templates
