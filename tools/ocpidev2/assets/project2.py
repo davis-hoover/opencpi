@@ -351,6 +351,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                 if dir_abs_path != self.get_dir_abs_path() + '/components':
                     msg = 'component library ' + cli_dict['name']
                     msg += ' can not exist within ' + _dir
+                    msg += ' (\'' + cli_dict['name'] + '\' library can only be created within <project>/components directory, set -d, or the working directory, to <project>/components)'
                     raise Exception(msg)
                 if not os.path.exists(dir_abs_path):
                     # TODO move this if statement to a better another location?
