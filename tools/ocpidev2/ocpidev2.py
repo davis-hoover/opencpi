@@ -171,7 +171,19 @@ def get_args(parser):
     # below 3 lines parse, allowing for posix conformance (intermixed args)
     (args, unknown_args) = parser.parse_known_args()
     for unknown_arg in unknown_args:
-        args.noun = unknown_arg
+        if unknown_arg.startswith('application') or \
+           unknown_arg.startswith('assembl') or \
+           unknown_arg.startswith('component') or \
+           unknown_arg.startswith('card') or \
+           unknown_arg.startswith('device') or \
+           unknown_arg.startswith('project') or \
+           unknown_arg.startswith('registr') or \
+           unknown_arg.startswith('slot') or \
+           unknown_arg.startswith('librar') or \
+           unknown_arg.startswith('test'):
+            args.noun = unknown_arg
+        else:
+            raise Exception('invalid argument: ' + unknown_arg)
     return args
 
 
