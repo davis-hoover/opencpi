@@ -389,6 +389,8 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                     msg += '\' can not exist within ' + _dir
                     if is_existing_component_libraries:
                         msg += ' (\'components\' directory already exists and is not a component library - it already has a components.xml with a Libraries root tag)'
+                    else:
+                        msg += ' (\'components\' library can only be created within the top level of a project, set -d, or the working directory, to the top level of a project)'
                     raise Exception(msg)
             elif (cli_dict['name'] == 'devices') or (cli_dict['name'] == 'cards') or \
                  (cli_dict['name'] == 'adapters'):
