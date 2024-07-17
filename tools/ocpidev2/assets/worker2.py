@@ -64,6 +64,42 @@ end rtl;\n
 """  # nopep8
 
 
+worker_rcc_template = """-- THIS FILE WAS ORIGINALLY GENERATED
+/*
+ * THIS FILE WAS ORIGINALLY GENERATED
+ * YOU *ARE* EXPECTED TO EDIT IT
+ *
+ * This file contains the implementation skeleton for the {{asset.name}} worker in C++
+ */
+
+#include "{{asset.name}}-worker.hh"
+
+using namespace OCPI::RCC; // for easy access to RCC data types and constants
+using namespace {{asset.name|capitalize}}WorkerTypes;
+
+class {{asset.name|capitalize}}Worker : public {{asset.name|capitalize}}WorkerBase {
+  RCCResult initialize() {
+    return RCC_OK;
+  }
+  RCCResult release() {
+    return RCC_OK;
+  }
+  RCCResult run(bool /*timedout*/) {
+    return RCC_DONE; // change this as needed for this worker to do something useful
+    // return RCC_ADVANCE; when all inputs/outputs should be advanced each time "run" is called.
+    // return RCC_ADVANCE_DONE; when all inputs/outputs should be advanced, and there is nothing more to do.
+    // return RCC_DONE; when there is nothing more to do, and inputs/outputs do not need to be advanced.
+  }
+};
+
+{{asset.name|upper}}_START_INFO
+// Insert any static info assignments here (memSize, memSizes, portInfo)
+// e.g.: info.memSize = sizeof(MyMemoryStruct);
+// YOU MUST LEAVE THE *START_INFO and *END_INFO macros here and uncommented in any case
+{{asset.name|upper}}_END_INFO
+"""  # nopep8
+
+
 class Worker(AssetBase):
     """ Reference RCC/HDL Development Guide section 3. A Worker is
         represented by a xml file (OWD) and knows nothing about the project it
@@ -121,6 +157,8 @@ class Worker(AssetBase):
         templates[self.name + '-' + self.authoring_model + '.rst'] = worker_rst_template
         if self.authoring_model == 'hdl':
             templates[self.name + '.vhd'] = worker_vhd_template
+        if self.authoring_model == 'rcc':
+            templates[self.name + '.cpp'] = worker_vhd_template
         templates[self.name + '.xml'] = g_asset_template
         return templates
 
