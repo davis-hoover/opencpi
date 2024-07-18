@@ -385,16 +385,16 @@ def dispatch_verb(cli_dict):
 
 def main():
     ret = 0
-    #try:
-    signal.signal(signal.SIGINT, ocpidevsignint)
-    cli_dict = get_cli_dict()
-    if cli_dict['suppresswarn']:
-        set_g_suppress_warn(True)
-    Logger().debug('cli_dict : ' + str(cli_dict))
-    dispatch_verb(cli_dict)
-    #except Exception as exception:
-    #    Logger().error(str(exception))
-    #    ret = 1
+    try:
+        signal.signal(signal.SIGINT, ocpidevsignint)
+        cli_dict = get_cli_dict()
+        if cli_dict['suppresswarn']:
+            set_g_suppress_warn(True)
+        Logger().debug('cli_dict : ' + str(cli_dict))
+        dispatch_verb(cli_dict)
+    except Exception as exception:
+        Logger().error(str(exception))
+        ret = 1
     return ret
 
 
