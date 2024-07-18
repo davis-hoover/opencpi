@@ -26,7 +26,7 @@ import uuid
 from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import AssetBase
 
-worker_rst_template= """.. {{asset.name}}.{{asset.authoring_model}} {{asset.authoring_model|upper}} worker
+worker_rst_template = """.. {{asset.name}}.{{asset.authoring_model}} {{asset.authoring_model|upper}} worker
 
 
 .. _{{asset.name}}.{{asset.authoring_model}}-{{asset.authoring_model|upper}}-worker:
@@ -141,7 +141,8 @@ class Worker(AssetBase):
             raise InvalidAssetError(msg + ', version must be 0 or 2')
         if (self.authoring_model == 'hdl') and \
            (self.language != 'vhdl') and (self.language != 'verilog'):
-            raise InvalidAssetError(msg + ', language must be \'vhdl\' or \'verilog\'')
+            tmp = msg + ', language must be \'vhdl\' or \'verilog\''
+            raise InvalidAssetError(tmp)
         if (self.authoring_model == 'hdl') and \
            ((self.language.lower() == 'verilog') or
            (self.language.lower() == '')):
@@ -182,7 +183,8 @@ class Worker(AssetBase):
 
     def get_templates(self):
         templates = {}
-        templates[self.name + '-' + self.authoring_model + '.rst'] = worker_rst_template
+        filename = self.name + '-' + self.authoring_model + '.rst'
+        templates[filename] = worker_rst_template
         if self.authoring_model == 'hdl':
             templates[self.name + '.vhd'] = worker_vhd_template
         if self.authoring_model == 'rcc':
