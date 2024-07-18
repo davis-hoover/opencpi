@@ -104,22 +104,22 @@ ocpidev2 create hdl adapter wsi_to_zero_adapter.hdl -d core/hdl/adapters --langu
 ocpidev2 create hdl adapter wsi_to_zero_clock_adapter.hdl -d core/hdl/adapters --language vhdl --version 2
 ocpidev2 create hdl adapter wsi_width_adapter.hdl -d core/hdl/adapters --language vhdl --version 2
 ocpidev2 create hdl adapter wsi_width_clock_adapter.hdl -d core/hdl/adapters --language vhdl --version 2
-#ocpidev2 create hdl device ocdp.hdl -d core/hdl/devices --language vhdl --version 2
-#ocpidev2 create hdl device sdp2cp.hdl -d core/hdl/devices --language vhdl --version 2
-#ocpidev2 create hdl device sdp_node.hdl -d core/hdl/devices --language vhdl --version 2
-#ocpidev2 create hdl device sdp_pipeline.hdl -d core/hdl/devices --language vhdl --version 2
-#ocpidev2 create hdl device sdp_receive.hdl -d core/hdl/devices --language vhdl --version 2
-#ocpidev2 create hdl device sdp_send.hdl -d core/hdl/devices --language vhdl --version 2
-#ocpidev2 create hdl device sdp_term.hdl -d core/hdl/devices --language vhdl --version 2
-#ocpidev2 create hdl device sma.hdl -d core/hdl/devices --language vhdl --version 2
-#ocpidev2 create hdl device time_server.hdl -d core/hdl/devices --language vhdl --version 2
-#ocpidev2 create hdl device unoc2cp.hdl -d core/hdl/devices --language vhdl --version 2
-#ocpidev2 create hdl device unoc_term.hdl -d core/hdl/devices --language vhdl --version 2
-#ocpidev2 create hdl platform isim -d core/hdl/platforms --language vhdl --spec platform
-#ocpidev2 create hdl platform modelsim -d core/hdl/platforms --language vhdl --spec platform --libraries sdp
-#ocpidev2 create hdl platform riviera -d core/hdl/platforms --language vhdl --spec platform --libraries sdp
-#ocpidev2 create hdl platform x4sim -d core/hdl/platforms --language vhdl --spec platform --libraries 'sdp util' --version 2
-#ocpidev2 create hdl platform xsim -d core/hdl/platforms --language vhdl --spec platform --libraries sdp --configurations 'base cfg_pps_sim_test'
+ocpidev2 create hdl device ocdp.hdl -d core/hdl/devices --language vhdl --version 2
+ocpidev2 create hdl device sdp2cp.hdl -d core/hdl/devices --language vhdl --version 2
+ocpidev2 create hdl device sdp_node.hdl -d core/hdl/devices --language vhdl --version 2
+ocpidev2 create hdl device sdp_pipeline.hdl -d core/hdl/devices --language vhdl --version 2
+ocpidev2 create hdl device sdp_receive.hdl -d core/hdl/devices --language vhdl --version 2
+ocpidev2 create hdl device sdp_send.hdl -d core/hdl/devices --language vhdl --version 2
+ocpidev2 create hdl device sdp_term.hdl -d core/hdl/devices --language vhdl --version 2
+ocpidev2 create hdl device sma.hdl -d core/hdl/devices --language vhdl --version 2
+ocpidev2 create hdl device time_server.hdl -d core/hdl/devices --language vhdl --version 2
+ocpidev2 create hdl device unoc2cp.hdl -d core/hdl/devices --language vhdl --version 2
+ocpidev2 create hdl device unoc_term.hdl -d core/hdl/devices --language vhdl --version 2
+ocpidev2 create hdl platform isim -d core/hdl/platforms --language vhdl --spec platform
+ocpidev2 create hdl platform modelsim -d core/hdl/platforms --language vhdl --spec platform --libraries sdp
+ocpidev2 create hdl platform riviera -d core/hdl/platforms --language vhdl --spec platform --libraries sdp
+ocpidev2 create hdl platform x4sim -d core/hdl/platforms --language vhdl --spec platform --libraries 'sdp util' --version 2
+ocpidev2 create hdl platform xsim -d core/hdl/platforms --language vhdl --spec platform --libraries sdp --configurations 'base cfg_pps_sim_test'
 ocpidev2 create project assets --package-id ocpi.assets --depends ocpi.platform --component-library util_comps --component-library base_comps --component-library misc_comps --component-library dsp_comps --component-library comms_comps --component-library devices
 ocpidev2 create library base_comps -d assets/components
 ocpidev2 create library comms_comps -d assets/components
@@ -128,4 +128,3 @@ ocpidev2 create library util_comps -d assets/components
 ocpidev2 create library cards -d assets/hdl
 ocpidev2 create library devices -d assets/hdl
 ocpidev2 create library adapters -d assets/hdl
-# TODO hdl/primitives/primitives.xml

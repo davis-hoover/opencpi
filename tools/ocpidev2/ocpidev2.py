@@ -28,6 +28,7 @@ from _opencpi.assets.project2 import Project
 # below imports only necessary for get_attr_infos() calls
 from _opencpi.assets.component2 import Component
 from _opencpi.assets.library2 import ComponentLibrary
+from _opencpi.assets.platform2 import HdlPlatform
 from _opencpi.assets.test2 import Test
 from _opencpi.assets.worker2 import Worker
 
@@ -89,6 +90,8 @@ def add_create_arguments(parser, noun):
     if noun == 'primitive':
         parser.add_argument('-p', '--project', default=False,
                             action='store_true')
+    if noun == 'platform':
+        asset = HdlPlatform('', False, None)
     if get_is_worker(noun):
         # dict created to weed out unnecessary warnings...
         asset = Worker('', False, {'language': 'vhdl', 'version': 2})
@@ -157,7 +160,7 @@ def get_arg_parser():
     if 'component' in sys.argv:
         noun = 'component'
     if 'device' in sys.argv:
-        noun = 'component'
+        noun = 'device'
     if 'library' in sys.argv:
         noun = 'library'
     if 'test' in sys.argv:
@@ -168,6 +171,13 @@ def get_arg_parser():
         noun = 'protocol'
     if 'worker' in sys.argv:
         noun = 'worker'
+    if 'platform' in sys.argv:
+        # TODO handle this better...
+        if 'component' in sys.argv:
+            noun = 'component'
+        else:
+            noun = 'platform'
+    print(noun)
     if 'build' in sys.argv:
         parser = add_build_arguments(parser, noun)
     elif 'create' in sys.argv:
@@ -211,6 +221,7 @@ def get_cli_dict():
              'application', 'applications',
              'core', 'cores',
              'card', 'cards',
+             'device', 'devices',
              'component', 'components',
              'platform', 'platforms',
              'primitive', 'primitives',

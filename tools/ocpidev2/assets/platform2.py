@@ -80,6 +80,23 @@ class HdlPlatform(HdlCardPlatformBase):
                 pass
             self.parse()
 
+    def get_attr_infos(self):
+        ret = []
+        ret.append(AttributeInfo('Name'))
+        ret.append(AttributeInfo('Spec',
+                   cli=('-S', '--spec')))
+        ret.append(AttributeInfo('Language',
+                   cli=('-L', '--language')))
+        ret.append(AttributeInfo('Version',
+                   cli=('-a', '--version'), is_int=True))
+        is_list = True
+        ret.append(AttributeInfo('SourceFiles', is_list))
+        ret.append(AttributeInfo('Libraries',
+                   cli=('-l', '--libraries'), is_int=True))
+        ret.append(AttributeInfo('Configurations',
+                   cli=('-c', '--configurations'), is_int=True))
+        return ret
+
     def parse(self):
         self.parse_devices()
         owd_path = self.abs_path + '/' + self.name + '.xml'

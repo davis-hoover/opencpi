@@ -164,7 +164,8 @@ class Worker(AssetBase):
     def get_attr_infos(self):
         ret = []
         ret.append(AttributeInfo('Name'))
-        ret.append(AttributeInfo('Spec'))  # CDG section 8.1.2
+        ret.append(AttributeInfo('Spec',
+                   cli=('-S', '--spec')))  # CDG section 8.1.2
         ret.append(AttributeInfo('Language',
                    cli=('-L', '--language')))  # CDG section 8.1.3
         ret.append(AttributeInfo('Version',

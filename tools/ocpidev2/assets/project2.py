@@ -292,8 +292,8 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                 msg += '\' can not exist within ' + _dir
                 msg += ' (' + cli_dict['noun'] + ' can only be created within <project>/hdl/adapter, set -d, or the working directory, to <project>/hdl/adapters)'
                 raise Exception(msg)
-            xml_abs_path = dir_abs_path + '/' + cli_dict['name'] + '.'
-            xml_abs_path += cli_dict['authoringmodel'] + '/' + cli_dict['name'] + '.xml'
+            xml_abs_path = _dir + '/' + cli_dict['name'] + '.hdl/'
+            xml_abs_path += cli_dict['name'] + '.xml'
             asset = Worker(xml_abs_path, existence_check, cli_dict)
         elif cli_dict['noun'] == 'application':
             dir_abs_path = self.get_dir_abs_path() + '/applications/' + cli_dict['name']
@@ -353,9 +353,6 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                         raise Exception(msg)
                 xml_abs_path += cli_dict['name'] + '-comp.xml'
                 asset = Component(xml_abs_path, existence_check, cli_dict)
-            elif cli_dict['noun'] == 'device':
-                dir_abs_path = self.get_dir_abs_path() + '/hdl/devices/' + cli_dict['name']
-                asset = Worker(dir_abs_path, existence_check, cli_dict)
             elif cli_dict['noun'] == 'primitive':
                 dir_abs_path = self.get_dir_abs_path() + '/hdl/primitives/' + cli_dict['name']
                 asset = HdlLibrary(dir_abs_path, existence_check, cli_dict)
@@ -382,6 +379,10 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                 asset = Worker(xml_abs_path, existence_check, cli_dict)
             elif cli_dict['noun'] == 'primitive':
                 asset = HdlLibrary(dir_abs_path, existence_check, cli_dict)
+        elif cli_dict['noun'] == 'device':
+            xml_abs_path = dir_abs_path + '/' + cli_dict['name'] + '.hdl/'
+            xml_abs_path += cli_dict['name'] + '.xml'
+            asset = Worker(xml_abs_path, existence_check, cli_dict)
         elif cli_dict['noun'] == 'library':
             if cli_dict['name'] == 'components':
                 dir_abs_path += '/' + cli_dict['name']
