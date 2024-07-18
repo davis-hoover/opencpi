@@ -345,10 +345,11 @@ def dispatch_verb(cli_dict):
     else:
         if cli_dict['d'] == []:
             cli_dict['d'].append(Environment().getcwd())
+        project_registry = None
         for _dir in cli_dict['d']:
             local_project = get_local_project(_dir)
             if ((cli_dict['verb'] == 'create') and (local_project is None)) or \
-               (cli_dict['verb'] != 'create'):
+               (cli_dict['verb'] != 'create') and (project_registry is None):
                 project_registry = ProjectRegistry(True, True)
             if not ((cli_dict['verb'] == 'create') and (cli_dict['noun'] == 'library')):
                 msg = 'performing \'' + cli_dict['verb']

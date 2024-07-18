@@ -423,7 +423,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         return Protocol(xml_abs_path, False, cli_dict)
 
     def get_slot_object_from_cli(self, cli_dict, _dir):
-        xml_abs_path = self.get_dir_abs_path() + '/hdl/cards/specs/' + cli_dict['name']
+        xml_abs_path = self.get_dir_abs_path() + '/hdl/cards/specs/' + cli_dict['name'] + '.xml'
         return HdlSlot(xml_abs_path , False, cli_dict)
 
     def get_worker_object_from_cli(self, cli_dict, _dir):
@@ -661,6 +661,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             ret.append(lib)
         for lib in worker.attrs['Libraries']:
             ret.append(lib)
+        # print('abc  worker ' +  worker.name + '.' + worker.authoring_model + ' depends on libs ' + str(ret))
         return ret
 
     def get_assets_of_type(self, _type):
