@@ -26,19 +26,9 @@ from _opencpi.assets.project2 import Project, test_Project
 class ProjectRegistry():
     """ Component Development Guide section 14.3 """
 
-    def __init__(
-            self, do_discover_component_libraries=True,
-            do_discover_hdl_primitives=True):
+    def __init__(self):
         self.abs_path = None
         self.projects = []
-        self.discover(
-                do_discover_component_libraries, do_discover_hdl_primitives)
-        found = False
-        for project in self.projects:
-            if str(project.get_package_id()) == 'ocpi.core':
-                found = True
-        if not found:
-            Logger().warn('ocpi.core is not registered')
 
     def get_project_dependencies_not_registered(self, project):
         registered_projects = []
@@ -138,6 +128,11 @@ class ProjectRegistry():
         return ret
 
     def get_hdl_worker_dependent_workers(self, worker, hdl_platform):
+        """ get list of worker objects, across the project registry, on which
+            the worker depends, including
+            1) subdevice workers (if the worker is a device worker)
+            2) device workers in the worker platform configuration (if the
+               worker is a platform worker) """
         ret = []
         if worker.authoring_model == 'hdl':
             for project in self.projects:
@@ -149,24 +144,31 @@ class ProjectRegistry():
         if worker.name == hdl_platform:
             for project in self.projects:
                 for _hdl_platform in project.hdl_platforms:
-                    if _hdl_platform.get_dir_abs_path() == worker.get_dir_abs_path():
+                    plat_dir_abs_path = _hdl_platform.get_dir_abs_path()
+                    if plat_dir_abs_path == worker.get_dir_abs_path():
                         for cfg in _hdl_platform.configurations.values():
                             for dev in cfg.devices:
                                 _worker = None
-                                project = self.get_worker_project(dev.name, None, 'hdl')
-                                for clib in project.component_libraries:
+                                proj = self.get_worker_project(dev.name, None,
+                                                               'hdl')
+                                for clib in proj.component_libraries:
                                     for device in clib.workers:
                                         if device.name == dev.name:
                                             ret.append(device)
                                             break
         return ret
 
-    def discover(
-            self, do_discover_component_libraries=True,
-            do_discover_hdl_primitives=True):
+    def discover(self, do_discover_component_libraries=True,
+                 do_discover_hdl_primitives=True, local_project=None):
         self.discover_abs_path()
-        self.discover_projects(
-                do_discover_component_libraries, do_discover_hdl_primitives)
+        self.discover_projects(do_discover_component_libraries,
+                               do_discover_hdl_primitives, local_project)
+        found = False
+        for project in self.projects:
+            if str(project.get_package_id()) == 'ocpi.core':
+                found = True
+        if not found:
+            Logger().warn('ocpi.core is not registered')
 
     def discover_abs_path(self):
         ocpi_project_registry_dir = os.environ.get('OCPI_PROJECT_REGISTRY_DIR')
@@ -179,7 +181,8 @@ class ProjectRegistry():
             abs_path = ocpi_project_registry_dir
         self.abs_path = abs_path
 
-    def discover_projects(self, do_component_libraries, do_hdl_primitives):
+    def discover_projects(self, do_component_libraries, do_hdl_primitives,
+                          local_project):
         Logger().debug('start of project discovery')
         for _dir in AssetBase.listdir_assets(self.abs_path):
             abs_path = self.abs_path + '/' + _dir
@@ -191,8 +194,13 @@ class ProjectRegistry():
                 msg += ' project entry (broken symlink: ' + abs_path + ')'
                 Logger().warn(msg)
             if self.get_abs_path_is_project(project_abs_path):
-                project = Project(project_abs_path, False)
-                project.discover(do_component_libraries, do_hdl_primitives)
+                if (local_project is not None) and \
+                   (local_project.get_dir_abs_path() == project_abs_path):
+                    # append pre-constructed project avoids warning duplication
+                    project = local_project
+                else:
+                    project = Project(project_abs_path, False)
+                    project.discover(do_component_libraries, do_hdl_primitives)
                 self.projects.append(project)
         Logger().debug('end of project discovery')
 
@@ -446,6 +454,7 @@ class ProjectRegistry():
     def append_worker_rules_to_makefile_variable(self,
             asset, hdl_targets, hdl_platforms, rcc_platforms,
             makefile, gnu_make_target_str, tool):
+        """ asset is the worker for which to append the rules """
         wproj = self.get_worker_project(asset.name, None, asset.authoring_model)
         libs = []
         for lib in wproj.component_libraries:
@@ -455,6 +464,12 @@ class ProjectRegistry():
                         libs = wproj.get_hdl_worker_dependent_libraries(
                                 lib, asset)
                         break
+        for hdl_platform in wproj.hdl_platforms:
+            if hdl_platform.worker.name == asset.name:
+                if hdl_platform.worker.authoring_model == asset.authoring_model:
+                    libs = wproj.get_hdl_worker_dependent_libraries(
+                            lib, asset)
+                    break
         for name in libs:
             lproj = self.get_hdl_primitive_project(name,
                     wproj)
@@ -495,7 +510,7 @@ class ProjectRegistry():
         if asset.name == hdl_platform:
             for project in self.projects:
                 for _hdl_platform in project.hdl_platforms:
-                    if _hdl_platform.get_dir_abs_path() == worker.get_dir_abs_path():
+                    if _hdl_platform.worker.get_dir_abs_path() == worker.get_dir_abs_path():
                         for cfg in _hdl_platform.configurations.values():
                             for dev in cfg.devices:
                                 _worker = None

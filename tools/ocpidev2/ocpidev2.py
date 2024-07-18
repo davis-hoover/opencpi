@@ -231,7 +231,7 @@ def get_cli_dict():
              'slot', 'slots',
              'test', 'tests',
              'worker', 'workers']
-    Logger().debug('args : ' + str(args))
+    # Logger().debug('args : ' + str(args))
     try:
         args.adjective = ''
         if args.authoring_model in nouns:
@@ -239,7 +239,7 @@ def get_cli_dict():
             args.name = args.noun
             args.noun = args.authoring_model
             args.authoring_model = ''
-        Logger().debug('args : ' + str(args))
+        # Logger().debug('args : ' + str(args))
         if (args.name in nouns) and args.noun.startswith('primitive'):
             if args.name == 'core':
                 args.adjective = 'core'
@@ -258,7 +258,7 @@ def get_cli_dict():
                 args.noun = args.name
             if (args.name != 'platform') and (args.name != 'protocol'):
                 args.name = None
-        Logger().debug('args : ' + str(args))
+        # Logger().debug('args : ' + str(args))
         if (args.authoring_model != '') and \
            (args.authoring_model != 'hdl') and \
            (args.authoring_model != 'rcc'):
@@ -350,7 +350,9 @@ def dispatch_verb(cli_dict):
             local_project = get_local_project(_dir)
             if ((cli_dict['verb'] == 'create') and (local_project is None)) or \
                (cli_dict['verb'] != 'create') and (project_registry is None):
-                project_registry = ProjectRegistry(True, True)
+                project_registry = ProjectRegistry()
+                if (cli_dict['noun'] != 'registry'):
+                    project_registry.discover(True, True, local_project)
             if not ((cli_dict['verb'] == 'create') and (cli_dict['noun'] == 'library')):
                 msg = 'performing \'' + cli_dict['verb']
                 if cli_dict['noun'] != None:

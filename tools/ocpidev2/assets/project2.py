@@ -661,7 +661,6 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             ret.append(lib)
         for lib in worker.attrs['Libraries']:
             ret.append(lib)
-        # print('abc  worker ' +  worker.name + '.' + worker.authoring_model + ' depends on libs ' + str(ret))
         return ret
 
     def get_assets_of_type(self, _type):
