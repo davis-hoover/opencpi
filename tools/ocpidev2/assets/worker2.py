@@ -114,21 +114,42 @@ class Worker(AssetBase):
         # end pre-2.0 opencpi
         AssetBase.__init__(self, xml_abs_path, enable_path_existence_check)
         self.authoring_model = ''
-        self.attrs['Spec'] = self.name
-        self.attrs['Version'] = None  # CDG section 4.3.1.2 (pre-version 2)
-        directory_name = self.abs_path.split('/', -2)[-2]
+        self.language = ''
+        self.spec = self.name
+        self.version = 0  # CDG section 4.3.1.2 (pre-version 2
+        directory_name = self.get_dir_abs_path()
         if directory_name.endswith('.hdl'):
             self.authoring_model = 'hdl'
         elif directory_name.endswith('.rcc'):
             self.authoring_model = 'rcc'
-            self.attrs['Language'] = 'c'  # RDG section 3.1.4
+            self.language = 'c'  # RDG section 3.1.4
         else:
             # is a hdl platform worker case
             self.authoring_model = 'hdl'
-            self.attrs['Language'] = 'vhdl'  # undocumented, therefore assumed
         self.supports = []  # PDG section 5.5.4
         if enable_path_existence_check:
             self.parse()
+        elif cli_dict is not None:
+            if cli_dict['language'] != '':
+                self.attrs['Language'] = cli_dict['language']
+                self.language = cli_dict['language'].lower()
+            if cli_dict['version'] != '':
+                self.attrs['Version'] = cli_dict['version']
+                self.version = int(cli_dict['version'])
+        msg = 'for ' + self.name + '.' + self.authoring_model
+        if (self.version != 0) and (self.version != 2):
+            raise InvalidAssetError(msg + ', version must be 0 or 2')
+        if (self.authoring_model == 'hdl') and \
+           (self.language != 'vhdl') and (self.language != 'verilog'):
+            raise InvalidAssetError(msg + ', language must be \'vhdl\' or \'verilog\'')
+        if (self.authoring_model == 'hdl') and \
+           ((self.language.lower() == 'verilog') or
+           (self.language.lower() == '')):
+            if cli_dict is not None:
+                msg += ', --language of vhdl is highly recommended'
+            else:
+                msg += ', language of vhdl is recommended'
+            Logger().warn(msg)
 
     def get_paths_to_parse(self):
         paths = []
@@ -146,7 +167,8 @@ class Worker(AssetBase):
         ret.append(AttributeInfo('Spec'))  # CDG section 8.1.2
         ret.append(AttributeInfo('Language',
                    cli=('-L', '--language')))  # CDG section 8.1.3
-        ret.append(AttributeInfo('Version', is_int=True))  # CDG secion 8.1.4
+        ret.append(AttributeInfo('Version',
+                   cli=('-a', '--version'), is_int=True))  # CDG secion 8.1.4
         is_list = True
         ret.append(AttributeInfo('SourceFiles', is_list))  # CDG section 8.1.10
         ret.append(AttributeInfo('Libraries', is_list))  # CDG section 8.1.11
@@ -183,6 +205,12 @@ class Worker(AssetBase):
                     for key, val in elem.attrib.items():
                         if key.lower() == 'worker':
                             self.supports.append(val)
+        if 'Version' in self.attrs.keys():
+            self.version = self.attrs['Version']
+        if 'Spec' in self.attrs.keys():
+            self.spec = self.attrs['Spec']
+        if 'Language' in self.attrs.keys():
+            self.language = self.attrs['Language'].lower()
 
     def get_type(self):
         return self.authoring_model + ' worker'

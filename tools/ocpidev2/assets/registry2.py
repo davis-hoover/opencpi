@@ -218,79 +218,7 @@ class ProjectRegistry():
                 assets.append(asset)
         return assets
 
-    def build(self, cli_dict):
-        self.dispatch_verb(cli_dict)
-
-    def clean(self, cli_dict):
-        self.dispatch_verb(cli_dict)
-
-    def create(self, cli_dict):
-        self.dispatch_verb(cli_dict)
-
-    def delete(self, cli_dict):
-        self.dispatch_verb(cli_dict)
-
-    def refresh(self, cli_dict):
-        self.dispatch_verb(cli_dict)
-
-    def register(self, cli_dict):
-        self.dispatch_verb(cli_dict)
-
-    def run(self, cli_dict):
-        self.dispatch_verb(cli_dict)
-
-    def show(self, cli_dict):
-        self.dispatch_verb(cli_dict)
-
-    def unregister(self, cli_dict):
-        self.dispatch_verb(cli_dict)
-
-    def dispatch_verb(self, cli_dict):
-        """ this method implements functionality common across verbs, then
-            dispatches to individual verb calls """
-        if cli_dict['d'] == []:
-            cli_dict['d'].append(Environment().getcwd())
-        for _dir in cli_dict['d']:
-            if not ((cli_dict['verb'] == 'create') and (cli_dict['noun'] == 'library')):
-                msg = 'performing \'' + cli_dict['verb']
-                if cli_dict['noun'] != None:
-                    msg += ' ' + cli_dict['noun']
-                if cli_dict['name'] != None:
-                    msg += ' ' + cli_dict['name']
-                msg += '\''
-                Logger().log(3, msg + ' within directory ' + _dir)
-            if cli_dict['verb'] == 'build':
-                self._build(cli_dict, _dir)
-            if cli_dict['verb'] == 'clean':
-                self._clean(cli_dict, _dir)
-            if cli_dict['verb'] == 'create':
-                self._create(cli_dict, _dir)
-            if cli_dict['verb'] == 'delete':
-                self._delete(cli_dict, _dir)
-            if cli_dict['verb'] == 'refresh':
-                self._refresh(cli_dict, _dir)
-            if cli_dict['verb'] == 'register':
-                self._register(cli_dict, _dir)
-            if cli_dict['verb'] == 'run':
-                self._run(cli_dict, _dir)
-            if cli_dict['verb'] == 'show':
-                self._show(cli_dict, _dir)
-            if cli_dict['verb'] == 'unregister':
-                self._unregister(cli_dict, _dir)
-            if (cli_dict['verb'] == 'create') and (cli_dict['noun'] == 'library'):
-                # this message is printed below and not above due to weird create
-                # components dir message of same form in project2.py that needs
-                # to happen first
-                msg = 'performing \'' + cli_dict['verb']
-                if cli_dict['noun'] != None:
-                    msg += ' ' + cli_dict['noun']
-                if cli_dict['name'] != None:
-                    msg += ' ' + cli_dict['name']
-                msg += '\''
-                Logger().log(3, msg + ' within directory ' + _dir)
-
-
-    def _build(self, cli_dict, _dir):
+    def build(self, cli_dict, _dir):
         """ builds assets by creating a temporary makefile and calls make -j
             on it and then deleting it """
         if not os.path.exists(_dir):
@@ -306,7 +234,7 @@ class ProjectRegistry():
                            cli_dict['rccplatform'], fs,
                            makefile, cli_dict['j'], tool)
 
-    def _clean(self, cli_dict, _dir):
+    def clean(self, cli_dict, _dir):
         if not os.path.exists(_dir):
             raise Exception(_dir + ' does not exist')
         cleaned = False
@@ -317,28 +245,7 @@ class ProjectRegistry():
         if not cleaned:
             raise Exception('cannot clean directory not in registered project')
 
-    def get_project(self, cli_dict, _dir):
-        project = next((proj for proj in self.projects if
-                        (proj.get_dir_abs_path() + '/') in (_dir + '/')), None)
-        if project == None:
-            project_dir_abs_path = _dir
-            while True:
-                try:
-                    project = Project(project_dir_abs_path, True)  # unregistered
-                    project.discover()
-                    break
-                except InvalidAssetError:
-                    project_dir_abs_path = project_dir_abs_path.rsplit('/', 1)[0]
-                    if len(project_dir_abs_path) <= 1:
-                        break
-        if project == None:
-            msg = ("Invalid path: '" + _dir + "'. Please perform 'create "
-                   + cli_dict['noun'] + "' within a valid, registered "
-                   "project.")
-            raise Exception(msg)
-        return project
-
-    def _create(self, cli_dict, _dir):
+    def create(self, cli_dict, _dir):
         if cli_dict['name'] is None:
             raise Exception('\'create\' requires a name')
         if cli_dict['keep']:
@@ -356,7 +263,7 @@ class ProjectRegistry():
         else:
             self.get_project(cli_dict, _dir).create_asset(cli_dict, _dir)
 
-    def _delete(self, cli_dict, _dir):
+    def delete(self, cli_dict, _dir):
         if cli_dict['noun'] == 'registry':
             pass
         elif cli_dict['noun'] == 'project':
@@ -366,14 +273,7 @@ class ProjectRegistry():
             self.get_project(cli_dict, _dir).delete_asset(cli_dict, _dir)
         pass
 
-    def _refresh(self, cli_dict, _dir):
-        Logger().warn('refresh is not necessary in ocpidev2')
-
-    def _register(self, cli_dict, _dir):
-        if cli_dict['noun'] == 'project':
-            self.register_project(_dir)
-
-    def _run(self, cli_dict, _dir):
+    def run(self, cli_dict, _dir):
         if not os.path.exists(_dir):
             raise Exception(_dir + ' does not exist')
         cmd = 'make -C ' + Test(_dir).get_dir_abs_path()
@@ -395,7 +295,7 @@ class ProjectRegistry():
                 cmd += "'"
             System(cmd)
 
-    def _show(self, cli_dict, _dir):
+    def show(self, cli_dict, _dir):
         if cli_dict['noun'] == 'registry':
             if (_dir == '') or \
                (_dir in self.abs_path):
@@ -408,7 +308,7 @@ class ProjectRegistry():
         if cli_dict['json']:
             print(str(json_dict))
 
-    def _unregister(self, cli_dict, _dir):
+    def unregister(self, cli_dict, _dir):
         if cli_dict['noun'] == 'project':
             self.unregister_project(_dir)
 

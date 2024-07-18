@@ -323,20 +323,20 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                 if _dir != (self.get_dir_abs_path() + '/specs'):
                     found = False
                     for component_library in self.component_libraries:
-                        if _dir == (component_library.get_dir_abs_path()):
+                        if (_dir == (component_library.get_dir_abs_path())) or \
+                           (_dir == (component_library.get_dir_abs_path() + '/specs')):
                             found = True
                             break
                     if not found:
                         msg = 'component \'' + cli_dict['name']
                         msg += '\' can not exist within ' + _dir
-                        msg += ' (component library can only be created within <project>/specs or a component library directory, set -d, or the working directory, to <project>/specs or a component library directory)'
+                        msg += ' (component library can only be created within <project>/specs or a component <library> directory or a <library>/specs directory, set -d, or the working directory, to <project>/specs or a component <library> or <library>/specs)'
                         raise Exception(msg)
                 xml_abs_path = _dir + '/' + cli_dict['name'] + '-comp.xml'
                 asset = Component(xml_abs_path, existence_check, cli_dict)
             elif cli_dict['noun'] == 'device':
                 dir_abs_path = self.get_dir_abs_path() + '/hdl/devices/' + cli_dict['name']
                 asset = Worker(dir_abs_path, existence_check, cli_dict)
-                asset.attrs['Version'] = 2  # there is not CLI for this...
             elif cli_dict['noun'] == 'primitive':
                 dir_abs_path = self.get_dir_abs_path() + '/hdl/primitives/' + cli_dict['name']
                 asset = HdlLibrary(dir_abs_path, existence_check, cli_dict)
@@ -361,7 +361,6 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                 xml_abs_path = dir_abs_path + '/' + cli_dict['name'] + '.'
                 xml_abs_path += cli_dict['authoringmodel'] + '/' + cli_dict['name'] + '.xml'
                 asset = Worker(xml_abs_path, existence_check, cli_dict)
-                asset.attrs['Version'] = 2  # there is not CLI for this...
             elif cli_dict['noun'] == 'primitive':
                 asset = HdlLibrary(dir_abs_path, existence_check, cli_dict)
         elif cli_dict['noun'] == 'library':
@@ -449,7 +448,8 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             raise Exception(msg)
         if (asset.get_type() == 'hdl worker') or \
            (asset.get_type() == 'rcc worker'):
-            Logger().warn('setting worker version to 2 (overriding the Component Development Guide default')
+            if (asset.version != 2):
+                Logger().warn('default version of 0 is being used, but --version 2 is highly recommended')
         asset.create()
 
     def delete_asset(self, cli_dict, _dir):

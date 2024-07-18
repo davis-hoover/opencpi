@@ -29,6 +29,7 @@ from _opencpi.assets.project2 import Project
 from _opencpi.assets.component2 import Component
 from _opencpi.assets.library2 import ComponentLibrary
 from _opencpi.assets.test2 import Test
+from _opencpi.assets.worker2 import Worker
 
 
 def ocpidevsignint(sig, frame):
@@ -83,10 +84,12 @@ def add_create_arguments(parser, noun):
     if noun == 'primitive':
         parser.add_argument('-p', '--project', default=False,
                             action='store_true')
+    if noun == 'worker':
+        # dict created to weed out unnecessary warnings...
+        asset = Worker('', False, {'language': 'vhdl', 'version': 2})
     if asset is not None:
         for attr in asset.get_attr_infos():
             if attr.cli is not None:
-                print(attr.key + ' ' + attr.cli[1] + ' ' + str(attr.is_list))
                 if attr.is_bool:
                     parser.add_argument(attr.cli[0], attr.cli[1],
                             default=([] if attr.is_list else (False if attr.is_bool else '')),
@@ -154,6 +157,8 @@ def get_arg_parser():
         noun = 'application'
     if 'protocol' in sys.argv:
         noun = 'protocol'
+    if 'worker' in sys.argv:
+        noun = 'worker'
     if 'build' in sys.argv:
         parser = add_build_arguments(parser, noun)
     elif 'create' in sys.argv:
@@ -288,74 +293,84 @@ def get_cli_dict():
     return cli_dict
 
 
-def get_enable_registry_discovery(cli_dict):
-    disc = True
-    if cli_dict['verb'] == 'show':
-        disc = cli_dict['noun'] != 'registry'
-        disc = disc and (cli_dict['noun'] != 'projects')
-    if cli_dict['help']:
-        disc = False
-    return disc
-
-
 # TODO delete
 global g_suppress_warn
 
+def get_local_project(_dir):
+    project = None
+    project_dir_abs_path = _dir
+    while True:
+        try:
+            project = Project(project_dir_abs_path, True)
+            project.discover()
+            break
+        except InvalidAssetError:
+            project_dir_abs_path = project_dir_abs_path.rsplit('/', 1)[0]
+            if len(project_dir_abs_path) <= 1:
+                break
+    #if project == None:
+    #    raise Exception('directory ' + _dir + ' is not within a project')
+    return project
 
-def _help(cli_dict, project_registry):
-    if cli_dict['verb'] == '':
-        os.system('man ocpidev2')
+def dispatch_verb(cli_dict):
+    """ this method implements functionality common across verbs, then
+        dispatches to individual verb calls """
+    project_registry = None
+    if cli_dict['help']:
+        if cli_dict['verb'] == '':
+            os.system('man ocpidev2')
+        else:
+            os.system('man ocpidev2-' + cli_dict['verb'])
     else:
-        os.system('man ocpidev2-' + cli_dict['verb'])
-
-
-def build(cli_dict, project_registry):
-    # may eventually support unregistered projects in addition to registry,
-    # but probably not
-    project_registry.build(cli_dict)
-
-
-def clean(cli_dict, project_registry):
-    # may eventually support unregistered projects in addition to registry,
-    # but probably not
-    project_registry.clean(cli_dict)
-
-
-def create(cli_dict, project_registry):
-    # may eventually support unregistered projects in addition to registry,
-    # but probably not
-    project_registry.create(cli_dict)
-
-
-def delete(cli_dict, project_registry):
-    # may eventually support unregistered projects in addition to registry,
-    # but probably not
-    project_registry.delete(cli_dict)
-
-
-def register(cli_dict, project_registry):
-    # may eventually support unregistered projects in addition to registry,
-    # but probably not
-    project_registry.register(cli_dict)
-
-
-def run(cli_dict, project_registry):
-    # may eventually support unregistered projects in addition to registry,
-    # but probably not
-    project_registry.run(cli_dict)
-
-
-def show(cli_dict, project_registry):
-    # may eventually support unregistered projects in addition to registry,
-    # but probably not
-    project_registry.show(cli_dict)
-
-
-def unregister(cli_dict, project_registry):
-    # may eventually support unregistered projects in addition to registry,
-    # but probably not
-    project_registry.unregister(cli_dict)
-
+        if cli_dict['d'] == []:
+            cli_dict['d'].append(Environment().getcwd())
+        for _dir in cli_dict['d']:
+            local_project = get_local_project(_dir)
+            if ((cli_dict['verb'] == 'create') and (local_project is None)) or \
+               (cli_dict['verb'] != 'create'):
+                project_registry = ProjectRegistry(True, True)
+            if not ((cli_dict['verb'] == 'create') and (cli_dict['noun'] == 'library')):
+                msg = 'performing \'' + cli_dict['verb']
+                if cli_dict['noun'] != None:
+                    msg += ' ' + cli_dict['noun']
+                if cli_dict['name'] != None:
+                    msg += ' ' + cli_dict['name']
+                msg += '\''
+                Logger().log(3, msg + ' within directory ' + _dir)
+            if cli_dict['verb'] == 'build':
+                project_registry.build(cli_dict, _dir)
+            elif cli_dict['verb'] == 'clean':
+                project_registry.clean(cli_dict, _dir)
+            elif cli_dict['verb'] == 'create':
+                if local_project is None:
+                    project_registry.create(cli_dict, _dir)
+                else:
+                    local_project.create_asset(cli_dict, _dir)
+            elif cli_dict['verb'] == 'delete':
+                project_registry.delete(cli_dict, _dir)
+            elif cli_dict['verb'] == 'refresh':
+                Logger().warn('refresh is not necessary in ocpidev2')
+            elif cli_dict['verb'] == 'register':
+                project_registry.register(cli_dict, _dir)
+            elif cli_dict['verb'] == 'run':
+                project_registry.run(cli_dict, _dir)
+            elif cli_dict['verb'] == 'show':
+                project_registry.show(cli_dict, _dir)
+            elif cli_dict['verb'] == 'unregister':
+                project_registry.unregister(cli_dict, _dir)
+            else:
+                raise Exception('verb ' + cli_dict['verb'] + ' is not supported')
+            if (cli_dict['verb'] == 'create') and (cli_dict['noun'] == 'library'):
+                # this message is printed below and not above due to weird create
+                # components dir message of same form in project2.py that needs
+                # to happen first
+                msg = 'performing \'' + cli_dict['verb']
+                if cli_dict['noun'] != None:
+                    msg += ' ' + cli_dict['noun']
+                if cli_dict['name'] != None:
+                    msg += ' ' + cli_dict['name']
+                msg += '\''
+                Logger().log(3, msg + ' within directory ' + _dir)
 
 def main():
     ret = 0
@@ -365,26 +380,7 @@ def main():
         if cli_dict['suppresswarn']:
             set_g_suppress_warn(True)
         Logger().debug('cli_dict : ' + str(cli_dict))
-        disc = get_enable_registry_discovery(cli_dict)
-        project_registry = ProjectRegistry(disc, disc)
-        if cli_dict['help']:
-            _help(cli_dict, project_registry)
-        elif cli_dict['verb'] == 'build':
-            build(cli_dict, project_registry)
-        elif cli_dict['verb'] == 'clean':
-            clean(cli_dict, project_registry)
-        elif cli_dict['verb'] == 'create':
-            create(cli_dict, project_registry)
-        elif cli_dict['verb'] == 'register':
-            register(cli_dict, project_registry)
-        elif cli_dict['verb'] == 'show':
-            show(cli_dict, project_registry)
-        elif cli_dict['verb'] == 'unittest':
-            unittest(cli_dict, project_registry)
-        elif cli_dict['verb'] == 'unregister':
-            unregister(cli_dict, project_registry)
-        else:
-            raise Exception('verb ' + cli_dict['verb'] + ' is not supported')
+        dispatch_verb(cli_dict)
     except Exception as exception:
         Logger().error(str(exception))
         ret = 1
