@@ -447,9 +447,8 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                         Logger().log(3, msg + ' within directory ' + self.get_dir_abs_path())
                     ComponentLibraries(dir_abs_path, False, cli_dict).create()
         asset = self.get_asset_object_from_cli(cli_dict, _dir)
-        if cli_dict['noun'] == 'component':
+        if (cli_dict['noun'] == 'component') or (cli_dict['noun'] == 'protocol'):
             if not os.path.exists(asset.get_dir_abs_path()):
-                # needed for <project>/.....<component>.comp/
                 System('mkdir -p ' + asset.get_dir_abs_path())
         if os.path.exists(asset.abs_path):
             msg = cli_dict['noun'] + ' ' + cli_dict['name'] + ' already exists'
