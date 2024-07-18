@@ -79,9 +79,9 @@ ocpidev2 create worker proxy_hdl.rcc -d core/components --language c++ --version
 ocpidev2 create worker Consumer.rcc -d core/components --language c++ --version 2
 ocpidev2 create worker Loopback.rcc -d core/components --language c++ --version 2
 ocpidev2 create worker Producer.rcc -d core/components --language c++ --version 2
-ocpidev2 create test backpressure.test -d core/components
-ocpidev2 create test bias.test -d core/components
-ocpidev2 create test metadata_stressor.test -d core/components
+ocpidev2 create test backpressure -d core/components
+ocpidev2 create test bias -d core/components
+ocpidev2 create test metadata_stressor -d core/components
 ocpidev2 create hdl slot fmc_hpc -d core/hdl/cards/specs
 ocpidev2 create hdl slot fmc_lpc -d core/hdl/cards/specs
 ocpidev2 create hdl slot hsmc -d core/hdl/cards/specs

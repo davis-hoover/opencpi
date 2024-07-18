@@ -275,14 +275,13 @@ def get_cli_dict():
                 raise Exception(args.name + ' is and invalid worker name')
             args.authoring_model = args.name.split('.')[1]
             args.name = args.name.split('.')[0]
-        elif args.noun == 'test':
-            if not ('.test' in args.name):
-                raise Exception(args.name + ' is and invalid test name')
-            args.name = args.name.split('.')[0]
         else:
             if args.name:
                 if not args.name.isidentifier():
-                    raise ValueError("'" + args.name + "' is not a valid name")
+                    msg = '\'' + args.name + '\' is not a valid name'
+                    if args.name.endswith('.test'):
+                        msg += ' (remove .test)'
+                    raise ValueError(msg)
         if not args.help:
             if (args.noun is not None) and (args.noun not in nouns):
                 if args.verb != 'apply':
