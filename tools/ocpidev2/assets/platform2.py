@@ -25,12 +25,21 @@ from _opencpi.assets.worker2 import Worker
 
 class RccPlatform(AssetBase):
 
-    def __init__(self, dir_abs_path):
-        AssetBase.__init__(self, dir_abs_path)
+    def __init__(self, dir_abs_path, enable_path_existence_check=True,
+                 cli_dict=None):
+        AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
 
     def get_type(self):
         return 'rcc platform'
 
+    def get_templates(self):
+        templates = {}
+        templates['README'] = """"""
+        templates[self.name + '-packages.sh'] = """"""
+        templates[self.name + '-check.sh'] = """"""
+        templates[self.name + '.mk'] = """"""
+        templates[self.name + '.exports'] = """"""
+        return templates
 
 class HdlCardPlatformBase(AssetBase):
 

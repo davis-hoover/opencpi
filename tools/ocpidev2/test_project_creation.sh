@@ -82,10 +82,10 @@ ocpidev2 create worker Producer.rcc -d core/components --language c++ --version 
 ocpidev2 create test backpressure.test -d core/components
 ocpidev2 create test bias.test -d core/components
 ocpidev2 create test metadata_stressor.test -d core/components
-ocpidev2 create hdl card fmc_hpc -d core/hdl/cards/specs
-ocpidev2 create hdl card fmc_lpc -d core/hdl/cards/specs
-ocpidev2 create hdl card hsmc -d core/hdl/cards/specs
-ocpidev2 create hdl card hsmc_alst4 -d core/hdl/cards/specs
+ocpidev2 create hdl slot fmc_hpc -d core/hdl/cards/specs
+ocpidev2 create hdl slot fmc_lpc -d core/hdl/cards/specs
+ocpidev2 create hdl slot hsmc -d core/hdl/cards/specs
+ocpidev2 create hdl slot hsmc_alst4 -d core/hdl/cards/specs
 ocpidev2 create hdl primitive axi -d core/hdl/primitives
 ocpidev2 create hdl primitive bsv -d core/hdl/primitives
 ocpidev2 create hdl primitive clocking -d core/hdl/primitives
@@ -120,6 +120,41 @@ ocpidev2 create hdl platform modelsim -d core/hdl/platforms --language vhdl --sp
 ocpidev2 create hdl platform riviera -d core/hdl/platforms --language vhdl --spec platform --libraries sdp
 ocpidev2 create hdl platform x4sim -d core/hdl/platforms --language vhdl --spec platform --libraries 'sdp util' --version 2
 ocpidev2 create hdl platform xsim -d core/hdl/platforms --language vhdl --spec platform --libraries sdp --configurations 'base cfg_pps_sim_test'
+ocpidev2 create rcc platform centos7 -d core/rcc/platforms
+ocpidev2 create rcc platform centos8 -d core/rcc/platforms
+ocpidev2 create rcc platform macos10_13 -d core/rcc/platforms
+ocpidev2 create rcc platform macos10_14 -d core/rcc/platforms
+ocpidev2 create rcc platform macos10_15 -d core/rcc/platforms
+ocpidev2 create rcc platform macos11_1 -d core/rcc/platforms
+ocpidev2 create rcc platform macos11_2 -d core/rcc/platforms
+ocpidev2 create rcc platform macos11_3 -d core/rcc/platforms
+ocpidev2 create rcc platform macos11_4 -d core/rcc/platforms
+ocpidev2 create rcc platform macos11_5 -d core/rcc/platforms
+ocpidev2 create rcc platform macos11_6 -d core/rcc/platforms
+ocpidev2 create rcc platform macos12_0 -d core/rcc/platforms
+ocpidev2 create rcc platform macos12_1 -d core/rcc/platforms
+ocpidev2 create rcc platform macos12_2 -d core/rcc/platforms
+ocpidev2 create rcc platform macos12_3 -d core/rcc/platforms
+ocpidev2 create rcc platform macos12_4 -d core/rcc/platforms
+ocpidev2 create rcc platform macos12_5 -d core/rcc/platforms
+ocpidev2 create rcc platform macos12_6 -d core/rcc/platforms
+ocpidev2 create rcc platform macos13_0 -d core/rcc/platforms
+ocpidev2 create rcc platform macos13_1 -d core/rcc/platforms
+ocpidev2 create rcc platform mint21_1 -d core/rcc/platforms
+ocpidev2 create rcc platform rocky8 -d core/rcc/platforms
+ocpidev2 create rcc platform ubuntu18_04 -d core/rcc/platforms
+ocpidev2 create rcc platform ubuntu20_04 -d core/rcc/platforms
+ocpidev2 create rcc platform ubuntu22_04 -d core/rcc/platforms
+ocpidev2 create rcc platform xilinx13_3 -d core/rcc/platforms
+ocpidev2 create rcc platform xilinx13_4 -d core/rcc/platforms
+ocpidev2 create rcc platform xilinx13_4_arm -d core/rcc/platforms
+ocpidev2 create rcc platform xilinx17_1_aarch32 -d core/rcc/platforms
+ocpidev2 create rcc platform xilinx17_1_aarch64 -d core/rcc/platforms
+ocpidev2 create rcc platform xilinx17_2_aarch32 -d core/rcc/platforms
+ocpidev2 create rcc platform xilinx17_2_aarch64 -d core/rcc/platforms
+ocpidev2 create rcc platform xilinx18_3_aarch64 -d core/rcc/platforms
+ocpidev2 create rcc platform xilinx19_2_aarch32 -d core/rcc/platforms
+ocpidev2 create rcc platform xilinx19_2_aarch64 -d core/rcc/platforms
 ocpidev2 create project assets --package-id ocpi.assets --depends ocpi.platform --component-library util_comps --component-library base_comps --component-library misc_comps --component-library dsp_comps --component-library comms_comps --component-library devices
 ocpidev2 create library base_comps -d assets/components
 ocpidev2 create library comms_comps -d assets/components
@@ -128,3 +163,4 @@ ocpidev2 create library util_comps -d assets/components
 ocpidev2 create library cards -d assets/hdl
 ocpidev2 create library devices -d assets/hdl
 ocpidev2 create library adapters -d assets/hdl
+ocpidev2 create hdl card fmcomms_2_3_hpc -d core/hdl/cards/specs
