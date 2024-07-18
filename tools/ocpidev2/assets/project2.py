@@ -294,10 +294,20 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         return Worker(xml_abs_path, False, cli_dict)
 
     def get_application_object_from_cli(self, cli_dict, _dir):
+        if _dir != self.get_dir_abs_path() + '/applications':
+            msg = cli_dict['noun'] + ' \'' + cli_dict['name']
+            msg += '\' can not exist within ' + _dir
+            msg += ' (' + cli_dict['noun'] + ' can only be created within <project>/applications, set -d, or the working directory, to <project>/applications)'
+            raise Exception(msg)
         dir_abs_path = self.get_dir_abs_path() + '/applications/' + cli_dict['name']
         return Application(dir_abs_path, False, cli_dict)
 
     def get_assembly_object_from_cli(self, cli_dict, _dir):
+        if _dir != self.get_dir_abs_path() + '/hdl/assemblies':
+            msg = cli_dict['noun'] + ' \'' + cli_dict['name']
+            msg += '\' can not exist within ' + _dir
+            msg += ' (' + cli_dict['noun'] + ' can only be created within <project>/hdl/assemblies, set -d, or the working directory, to <project>/hdl/assemblies)'
+            raise Exception(msg)
         dir_abs_path = self.get_dir_abs_path() + '/hdl/assemblies/' + cli_dict['name']
         return HdlAssembly(dir_abs_path, False, cli_dict)
 
