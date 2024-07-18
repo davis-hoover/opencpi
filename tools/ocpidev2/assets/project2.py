@@ -732,7 +732,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             types.append(Test)
         return types
 
-    def show(self, _dir, cli_dict, json_dict={}):
+    def show(self, cli_dict, json_dict={}):
         if cli_dict['globalscope']:
             msg = '--global-scope does not change behavior, '
             msg += 'see man ocpidev2-show'
@@ -745,7 +745,8 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         for asset in assets:
             if (cli_dict['name'] is None) or \
                (cli_dict['name'] == asset.name):
-                if (_dir == '') or (_dir in asset.abs_path):
+                if (cli_dict['d'] == []) or \
+                   any([(_dir + '/') in (asset.abs_path + '/') for _dir in cli_dict['d']]):
                     do_hdl_check = (cli_dict['authoringmodel'] != '') and \
                                    (cli_dict['noun'].startswith('primitive') or \
                                    cli_dict['noun'].startswith('librar'))

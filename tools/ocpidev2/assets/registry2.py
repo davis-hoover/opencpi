@@ -204,8 +204,8 @@ class ProjectRegistry():
                 self.projects.append(project)
         Logger().debug('end of project discovery')
 
-    def register_project(self, dir_abs_path):
-        project = Project(dir_abs_path, False)  # raises if not a project
+    def register(self, cli_dict, _dir):
+        project = Project(_dir, False)  # raises if not a project
         symlink_path = self.abs_path + '/' + str(project.get_package_id())
         if not os.path.islink(symlink_path):
             os.symlink(project.abs_path, symlink_path)
@@ -303,18 +303,17 @@ class ProjectRegistry():
                 cmd += "'"
             System(cmd)
 
-    def show(self, cli_dict, _dir):
+    def show(self, cli_dict):
         if cli_dict['noun'] == 'registry':
-            if (_dir == '') or \
-               (_dir in self.abs_path):
-                print(self.abs_path)
-        json_dict = {}
-        for project in self.projects:
-            json_dict = project.show(_dir, cli_dict, json_dict)
-        if cli_dict['simple']:
-            print('')
-        if cli_dict['json']:
-            print(str(json_dict))
+            print(self.abs_path)
+        else:
+            json_dict = {}
+            for project in self.projects:
+                json_dict = project.show(cli_dict, json_dict)
+            if cli_dict['simple']:
+                print('')
+            if cli_dict['json']:
+                print(str(json_dict))
 
     def unregister(self, cli_dict, _dir):
         if cli_dict['noun'] == 'project':

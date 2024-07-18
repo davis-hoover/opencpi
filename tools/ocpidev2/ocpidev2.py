@@ -343,17 +343,22 @@ def dispatch_verb(cli_dict):
         else:
             os.system('man ocpidev2-' + cli_dict['verb'])
     else:
-        if cli_dict['d'] == []:
-            cli_dict['d'].append(Environment().getcwd())
+        dirs_to_operate_on = cli_dict['d'].copy()
+        if dirs_to_operate_on == []:
+            dirs_to_operate_on.append(Environment().getcwd())
         project_registry = None
-        for _dir in cli_dict['d']:
+        for _dir in dirs_to_operate_on:
             local_project = get_local_project(_dir)
             if ((cli_dict['verb'] == 'create') and (local_project is None)) or \
                (cli_dict['verb'] != 'create') and (project_registry is None):
                 project_registry = ProjectRegistry()
-                if (cli_dict['noun'] != 'registry'):
+                if not ((cli_dict['verb'] == 'create') and \
+                   (cli_dict['noun'] != 'registry')):
+                    if cli_dict['verb'] == 'show':
+                        set_g_suppress_warn(True)
                     project_registry.discover(True, True, local_project)
-            if not ((cli_dict['verb'] == 'create') and (cli_dict['noun'] == 'library')):
+            if not ((cli_dict['verb'] == 'create') and \
+               (cli_dict['noun'] == 'library')):
                 msg = 'performing \'' + cli_dict['verb']
                 if cli_dict['noun'] != None:
                     msg += ' ' + cli_dict['noun']
@@ -379,7 +384,7 @@ def dispatch_verb(cli_dict):
             elif cli_dict['verb'] == 'run':
                 project_registry.run(cli_dict, _dir)
             elif cli_dict['verb'] == 'show':
-                project_registry.show(cli_dict, _dir)
+                project_registry.show(cli_dict)
             elif cli_dict['verb'] == 'unregister':
                 project_registry.unregister(cli_dict, _dir)
             else:
