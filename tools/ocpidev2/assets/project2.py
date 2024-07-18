@@ -286,16 +286,30 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
     def get_asset_object_from_cli(self, cli_dict, _dir):
         dir_abs_path = _dir
         existence_check = False # cli_dict['verb'] != 'create'
-        if cli_dict['noun'] == 'application':
+        if cli_dict['noun'] == 'adapter':
+            if _dir != self.get_dir_abs_path() + '/hdl/adapters':
+                msg = cli_dict['noun'] + ' \'' + cli_dict['name']
+                msg += '\' can not exist within ' + _dir
+                msg += ' (' + cli_dict['noun'] + ' can only be created within <project>/hdl/adapter, set -d, or the working directory, to <project>/hdl/adapters)'
+                raise Exception(msg)
+            xml_abs_path = dir_abs_path + '/' + cli_dict['name'] + '.'
+            xml_abs_path += cli_dict['authoringmodel'] + '/' + cli_dict['name'] + '.xml'
+            asset = Worker(xml_abs_path, existence_check, cli_dict)
+        elif cli_dict['noun'] == 'application':
             dir_abs_path = self.get_dir_abs_path() + '/applications/' + cli_dict['name']
             asset = Application(dir_abs_path, existence_check, cli_dict)
         elif cli_dict['noun'] == 'assembly':
             dir_abs_path = self.get_dir_abs_path() + '/hdl/assemblies/' + cli_dict['name']
             asset = HdlAssembly(dir_abs_path, existence_check, cli_dict)
         elif cli_dict['noun'] == 'card':
+            if _dir != self.get_dir_abs_path() + '/hdl/cards/specs':
+                msg = cli_dict['noun'] + ' \'' + cli_dict['name']
+                msg += '\' can not exist within ' + _dir
+                msg += ' (' + cli_dict['noun'] + ' can only be created within <project>/hdl/cards/specs, set -d, or the working directory, to <project>/hdl/cards/specs)'
+                raise Exception(msg)
             xml_abs_path = self.get_dir_abs_path() + '/hdl/cards/'
             xml_abs_path += cli_dict['name'] + '.xml'
-            asset = HdlCard(dir_abs_path, existence_check, cli_dict)
+            asset = HdlCard(xml_abs_path, existence_check, cli_dict)
         elif (cli_dict['noun'] == 'component') or \
              (cli_dict['noun'] == 'primitive') or (cli_dict['noun'] == 'protocol') or \
              (cli_dict['noun'] == 'test') or (cli_dict['noun'] == 'worker'):

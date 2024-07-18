@@ -82,10 +82,10 @@ ocpidev2 create worker Producer.rcc -d core/components --language c++ --version 
 ocpidev2 create test backpressure.test -d core/components
 ocpidev2 create test bias.test -d core/components
 ocpidev2 create test metadata_stressor.test -d core/components
-#ocpidev2 create hdl card fmc_hpc -d core/hdl/cards/specs
-#ocpidev2 create hdl card fmc_lpc -d core/hdl/cards/specs
-#ocpidev2 create hdl card hsmc -d core/hdl/cards/specs
-#ocpidev2 create hdl card hsmc_alst4 -d core/hdl/cards/specs
+ocpidev2 create hdl card fmc_hpc -d core/hdl/cards/specs
+ocpidev2 create hdl card fmc_lpc -d core/hdl/cards/specs
+ocpidev2 create hdl card hsmc -d core/hdl/cards/specs
+ocpidev2 create hdl card hsmc_alst4 -d core/hdl/cards/specs
 ocpidev2 create hdl primitive axi -d core/hdl/primitives
 ocpidev2 create hdl primitive bsv -d core/hdl/primitives
 ocpidev2 create hdl primitive clocking -d core/hdl/primitives
@@ -98,12 +98,12 @@ ocpidev2 create hdl primitive sdp -d core/hdl/primitives
 ocpidev2 create hdl primitive sync -d core/hdl/primitives
 ocpidev2 create hdl primitive timed_sample_prot -d core/hdl/primitives
 ocpidev2 create hdl primitive util -d core/hdl/primitives
-#ocpidev2 create hdl adapter wsi_from_zero_adapter.hdl -d core/hdl/adapters --language vhdl --version 2
-#ocpidev2 create hdl adapter wsi_from_zero_clock_adapter.hdl -d core/hdl/adapters --language vhdl --version 2
-#ocpidev2 create hdl adapter wsi_to_zero_adapter.hdl -d core/hdl/adapters --language vhdl --version 2
-#ocpidev2 create hdl adapter wsi_to_zero_clock_adapter.hdl -d core/hdl/adapters --language vhdl --version 2
-#ocpidev2 create hdl adapter wsi_width_adapter.hdl -d core/hdl/adapters --language vhdl --version 2
-#ocpidev2 create hdl adapter wsi_width_clock_adapter.hdl -d core/hdl/adapters --language vhdl --version 2
+ocpidev2 create hdl adapter wsi_from_zero_adapter.hdl -d core/hdl/adapters --language vhdl --version 2
+ocpidev2 create hdl adapter wsi_from_zero_clock_adapter.hdl -d core/hdl/adapters --language vhdl --version 2
+ocpidev2 create hdl adapter wsi_to_zero_adapter.hdl -d core/hdl/adapters --language vhdl --version 2
+ocpidev2 create hdl adapter wsi_to_zero_clock_adapter.hdl -d core/hdl/adapters --language vhdl --version 2
+ocpidev2 create hdl adapter wsi_width_adapter.hdl -d core/hdl/adapters --language vhdl --version 2
+ocpidev2 create hdl adapter wsi_width_clock_adapter.hdl -d core/hdl/adapters --language vhdl --version 2
 #ocpidev2 create hdl device ocdp.hdl -d core/hdl/devices --language vhdl --version 2
 #ocpidev2 create hdl device sdp2cp.hdl -d core/hdl/devices --language vhdl --version 2
 #ocpidev2 create hdl device sdp_node.hdl -d core/hdl/devices --language vhdl --version 2

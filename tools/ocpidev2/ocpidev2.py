@@ -32,9 +32,14 @@ from _opencpi.assets.test2 import Test
 from _opencpi.assets.worker2 import Worker
 
 
+
 def ocpidevsignint(sig, frame):
     """ add create-specific arguments as per man ocpidev2-build """
     raise Exception('Ctrl-C stopped execution')
+
+
+def get_is_worker(noun):
+    return (noun == 'worker') or (noun == 'device') or (noun == 'adapter')
 
 
 def add_create_show_build_arguments(parser):
@@ -84,7 +89,7 @@ def add_create_arguments(parser, noun):
     if noun == 'primitive':
         parser.add_argument('-p', '--project', default=False,
                             action='store_true')
-    if noun == 'worker':
+    if get_is_worker(noun):
         # dict created to weed out unnecessary warnings...
         asset = Worker('', False, {'language': 'vhdl', 'version': 2})
     if asset is not None:
@@ -145,16 +150,20 @@ def get_arg_parser():
     parser.add_argument('--suppress-warn', action='store_true')
     parser.add_argument('verb', nargs='?', default='')
     noun = ''
-    if 'project' in sys.argv:
-        noun = 'project'
-    if 'library' in sys.argv:
-        noun = 'library'
-    if 'component' in sys.argv:
-        noun = 'component'
-    if 'test' in sys.argv:
-        noun = 'test'
+    if 'adapter' in sys.argv:
+        noun = 'adapter'
     if 'application' in sys.argv:
         noun = 'application'
+    if 'component' in sys.argv:
+        noun = 'component'
+    if 'device' in sys.argv:
+        noun = 'component'
+    if 'library' in sys.argv:
+        noun = 'library'
+    if 'test' in sys.argv:
+        noun = 'test'
+    if 'project' in sys.argv:
+        noun = 'project'
     if 'protocol' in sys.argv:
         noun = 'protocol'
     if 'worker' in sys.argv:
@@ -197,7 +206,8 @@ def get_cli_dict():
     """ get a dictionary of settings which looks like CLI args and has been
         modified as needed """
     args = get_args(get_arg_parser())
-    nouns = ['assembly', 'assemblies',
+    nouns = ['adapter', 'adapters',
+             'assembly', 'assemblies',
              'application', 'applications',
              'core', 'cores',
              'card', 'cards',
@@ -248,7 +258,7 @@ def get_cli_dict():
         args.authoring_model = ''
     # TODO move below 3 lines to AssetBase once proper checks in place
     if args.verb != 'unittest':
-        if args.noun == 'worker':
+        if get_is_worker(args.noun):
             if not (('.hdl' in args.name) or \
                     ('.rcc' in args.name) or \
                     ('.ocl' in args.name)):
@@ -375,16 +385,16 @@ def dispatch_verb(cli_dict):
 
 def main():
     ret = 0
-    try:
-        signal.signal(signal.SIGINT, ocpidevsignint)
-        cli_dict = get_cli_dict()
-        if cli_dict['suppresswarn']:
-            set_g_suppress_warn(True)
-        Logger().debug('cli_dict : ' + str(cli_dict))
-        dispatch_verb(cli_dict)
-    except Exception as exception:
-        Logger().error(str(exception))
-        ret = 1
+    #try:
+    signal.signal(signal.SIGINT, ocpidevsignint)
+    cli_dict = get_cli_dict()
+    if cli_dict['suppresswarn']:
+        set_g_suppress_warn(True)
+    Logger().debug('cli_dict : ' + str(cli_dict))
+    dispatch_verb(cli_dict)
+    #except Exception as exception:
+    #    Logger().error(str(exception))
+    #    ret = 1
     return ret
 
 
