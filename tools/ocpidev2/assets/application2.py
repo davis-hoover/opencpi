@@ -144,6 +144,17 @@ int main(/*int argc, char **argv*/) {
 """  # nopep8
 
 
+class ApplicationsDirectory(AssetBase):
+    """ Reference Application Development Guide section 10.2 """
+
+    def __init__(self, dir_abs_path, enable_path_existence_check=True,
+                 cli_dict=None):
+        self.root_tags = ['Applications']
+        AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
+        if enable_path_existence_check:
+            self.parse(cli_dict)
+
+
 # TODO iherit from, and consolidate functionality from, AssetBase
 class Application(AssetBase):
     """ Reference Application Development Guide section 3 """

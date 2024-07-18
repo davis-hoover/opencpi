@@ -24,9 +24,9 @@ from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import AssetBase
 from _opencpi.assets.component2 import Component, Protocol
 from _opencpi.assets.worker2 import Worker
-from _opencpi.assets.application2 import Application
+from _opencpi.assets.application2 import Application, ApplicationsDirectory
 from _opencpi.assets.library2 import SpecsDirectory, Discoverer
-from _opencpi.assets.library2 import ComponentLibrary, ComponentLibraries
+from _opencpi.assets.library2 import ComponentLibrary, ComponentLibrariesDirectory
 from _opencpi.assets.library2 import test_ComponentLibrary
 from _opencpi.assets.primitive2 import HdlLibrary
 from _opencpi.assets.assembly2 import HdlAssembly
@@ -353,7 +353,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             dir_abs_path += '/' + cli_dict['name']
             is_existing_component_libraries = False
             try:
-                ComponentLibraries(dir_abs_path, True, cli_dict)
+                ComponentLibrariesDirectory(dir_abs_path, True, cli_dict)
                 is_existing_component_libraries = True
             except InvalidAssetError:
                 pass
@@ -483,7 +483,13 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
 
     def create_asset(self, cli_dict, _dir):
         dir_abs_path = _dir
-        if cli_dict['noun'] == 'library':
+        if cli_dict['noun'] == 'application':
+            if not os.path.exists(dir_abs_path):
+                msg = 'performing \'' + cli_dict['verb'] + '\' for a applications directory '
+                for _dir in cli_dict['d']:
+                    Logger().log(3, msg + ' within directory ' + self.get_dir_abs_path())
+                ApplicationsDirectory(dir_abs_path, False, cli_dict).create()
+        elif cli_dict['noun'] == 'library':
             if cli_dict['name'] == 'components':
                 pass
             elif cli_dict['name'] == 'devices':
@@ -495,7 +501,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                     msg = 'performing \'' + cli_dict['verb'] + '\' for a components directory '
                     for _dir in cli_dict['d']:
                         Logger().log(3, msg + ' within directory ' + self.get_dir_abs_path())
-                    ComponentLibraries(dir_abs_path, False, cli_dict).create()
+                    ComponentLibrariesDirectory(dir_abs_path, False, cli_dict).create()
         asset = self.get_asset_object_from_cli(cli_dict, _dir)
         if (cli_dict['noun'] == 'component') or (cli_dict['noun'] == 'protocol'):
             if not os.path.exists(asset.get_dir_abs_path()):

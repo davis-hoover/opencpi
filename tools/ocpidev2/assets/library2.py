@@ -180,7 +180,7 @@ class Discoverer():
                 pass
 
 
-class ComponentLibraries(AssetBase):
+class ComponentLibrariesDirectory(AssetBase):
     """ undocumented """
 
     def __init__(self, dir_abs_path, enable_path_existence_check, cli_dict):
