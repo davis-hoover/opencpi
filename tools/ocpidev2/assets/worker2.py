@@ -114,14 +114,18 @@ class Worker(AssetBase):
         # end pre-2.0 opencpi
         AssetBase.__init__(self, xml_abs_path, enable_path_existence_check)
         self.authoring_model = ''
+        self.attrs['Spec'] = self.name
+        self.attrs['Version'] = None  # CDG section 4.3.1.2 (pre-version 2)
         directory_name = self.abs_path.split('/', -2)[-2]
         if directory_name.endswith('.hdl'):
             self.authoring_model = 'hdl'
         elif directory_name.endswith('.rcc'):
             self.authoring_model = 'rcc'
+            self.attrs['Language'] = 'c'  # RDG section 3.1.4
         else:
             # is a hdl platform worker case
             self.authoring_model = 'hdl'
+            self.attrs['Language'] = 'vhdl'  # undocumented, therefore assumed
         self.supports = []  # PDG section 5.5.4
         if enable_path_existence_check:
             self.parse()
@@ -140,7 +144,8 @@ class Worker(AssetBase):
         ret = []
         ret.append(AttributeInfo('Name'))
         ret.append(AttributeInfo('Spec'))  # CDG section 8.1.2
-        ret.append(AttributeInfo('Language'))  # CDG section 8.1.3
+        ret.append(AttributeInfo('Language',
+                   cli=('-L', '--language')))  # CDG section 8.1.3
         ret.append(AttributeInfo('Version', is_int=True))  # CDG secion 8.1.4
         is_list = True
         ret.append(AttributeInfo('SourceFiles', is_list))  # CDG section 8.1.10

@@ -351,7 +351,7 @@ class Protocol(AssetBase):
 
     def get_templates(self):
         templates = {}
-        templates[self.name + '.xml'] = g_asset_template
+        templates[self.get_xml_abs_path()] = g_asset_template
         templates[self.name + '-prot.rst'] = prot_spec_rst_template
         return templates
 

@@ -320,18 +320,40 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                         dir_abs_path = component_library.get_dir_abs_path()
                 # TODO unless its in the platforms
             if cli_dict['noun'] == 'component':
-                xml_abs_path = dir_abs_path + '/' + cli_dict['name']
-                xml_abs_path += '.comp' + '/' + cli_dict['name'] + '-comp.xml'
+                if _dir != (self.get_dir_abs_path() + '/specs'):
+                    found = False
+                    for component_library in self.component_libraries:
+                        if _dir == (component_library.get_dir_abs_path()):
+                            found = True
+                            break
+                    if not found:
+                        msg = 'component \'' + cli_dict['name']
+                        msg += '\' can not exist within ' + _dir
+                        msg += ' (component library can only be created within <project>/specs or a component library directory, set -d, or the working directory, to <project>/specs or a component library directory)'
+                        raise Exception(msg)
+                xml_abs_path = _dir + '/' + cli_dict['name'] + '-comp.xml'
                 asset = Component(xml_abs_path, existence_check, cli_dict)
             elif cli_dict['noun'] == 'device':
                 dir_abs_path = self.get_dir_abs_path() + '/hdl/devices/' + cli_dict['name']
                 asset = Worker(dir_abs_path, existence_check, cli_dict)
+                asset.attrs['Version'] = 2  # there is not CLI for this...
             elif cli_dict['noun'] == 'primitive':
                 dir_abs_path = self.get_dir_abs_path() + '/hdl/primitives/' + cli_dict['name']
                 asset = HdlLibrary(dir_abs_path, existence_check, cli_dict)
             elif cli_dict['noun'] == 'protocol':
-                dir_abs_path += '/specs'
-                asset = Protocol(dir_abs_path, existence_check, cli_dict)
+                if _dir != (self.get_dir_abs_path() + '/specs'):
+                    found = False
+                    for component_library in self.component_libraries:
+                        if _dir == (component_library.get_dir_abs_path() + '/specs'):
+                            found = True
+                            break
+                    if not found:
+                        msg = cli_dict['noun'] + ' \'' + cli_dict['name']
+                        msg += '\' can not exist within ' + _dir
+                        msg += ' (' + cli_dict['noun'] + ' can only be created within <project>/specs or a component library specs directory, set -d, or the working directory, to <project>/specs or a component library specs directory)'
+                        raise Exception(msg)
+                xml_abs_path = _dir + '/' + cli_dict['name'] + '-prot.xml'
+                asset = Protocol(xml_abs_path, existence_check, cli_dict)
             elif cli_dict['noun'] == 'test':
                 dir_abs_path = _dir + '/' + cli_dict['name'] + '.test'
                 asset = Test(dir_abs_path, existence_check, cli_dict)
@@ -339,6 +361,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                 xml_abs_path = dir_abs_path + '/' + cli_dict['name'] + '.'
                 xml_abs_path += cli_dict['authoringmodel'] + '/' + cli_dict['name'] + '.xml'
                 asset = Worker(xml_abs_path, existence_check, cli_dict)
+                asset.attrs['Version'] = 2  # there is not CLI for this...
             elif cli_dict['noun'] == 'primitive':
                 asset = HdlLibrary(dir_abs_path, existence_check, cli_dict)
         elif cli_dict['noun'] == 'library':
@@ -384,13 +407,6 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                     msg += ' can not exist within ' + _dir
                     msg += ' (\'' + cli_dict['name'] + '\' library can not exist within <project>/components directory, set -d, or the working directory, to <project>/components)'
                     raise Exception(msg)
-                if not os.path.exists(dir_abs_path):
-                    # TODO move this if statement to a better another location?
-                    if cli_dict['verb'] == 'create':
-                        msg = 'performing \'' + cli_dict['verb'] + '\' for a components directory '
-                        for _dir in cli_dict['d']:
-                            Logger().log(3, msg + ' within directory ' + self.get_dir_abs_path())
-                        ComponentLibraries(dir_abs_path, existence_check, cli_dict).create()
                 dir_abs_path += '/' + cli_dict['name']
             asset = ComponentLibrary(dir_abs_path, existence_check, cli_dict)
         elif cli_dict['noun'] == 'platform':
@@ -431,6 +447,9 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             msg = cli_dict['noun'] + ' ' + cli_dict['name'] + ' already exists'
             msg += ' within directory ' + asset.get_dir_abs_path().rsplit('/', 1)[0]
             raise Exception(msg)
+        if (asset.get_type() == 'hdl worker') or \
+           (asset.get_type() == 'rcc worker'):
+            Logger().warn('setting worker version to 2 (overriding the Component Development Guide default')
         asset.create()
 
     def delete_asset(self, cli_dict, _dir):

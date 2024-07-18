@@ -86,7 +86,7 @@ def add_create_arguments(parser, noun):
     if asset is not None:
         for attr in asset.get_attr_infos():
             if attr.cli is not None:
-                #print(attr.key + ' ' + attr.cli[1] + ' ' + str(attr.is_list))
+                print(attr.key + ' ' + attr.cli[1] + ' ' + str(attr.is_list))
                 if attr.is_bool:
                     parser.add_argument(attr.cli[0], attr.cli[1],
                             default=([] if attr.is_list else (False if attr.is_bool else '')),
@@ -228,10 +228,11 @@ def get_cli_dict():
             elif args.name == 'libraries':
                 args.adjective = 'library'
                 args.noun = 'primitives'
-            else:
+            elif (args.name != 'platform') and (args.name != 'protocol'):
                 args.adjective = ''
                 args.noun = args.name
-            args.name = None
+            if (args.name != 'platform') and (args.name != 'protocol'):
+                args.name = None
         Logger().debug('args : ' + str(args))
         if (args.authoring_model != '') and \
            (args.authoring_model != 'hdl') and \
@@ -243,9 +244,15 @@ def get_cli_dict():
     # TODO move below 3 lines to AssetBase once proper checks in place
     if args.verb != 'unittest':
         if args.noun == 'worker':
+            if not (('.hdl' in args.name) or \
+                    ('.rcc' in args.name) or \
+                    ('.ocl' in args.name)):
+                raise Exception(args.name + ' is and invalid worker name')
             args.authoring_model = args.name.split('.')[1]
             args.name = args.name.split('.')[0]
         elif args.noun == 'test':
+            if not ('.test' in args.name):
+                raise Exception(args.name + ' is and invalid test name')
             args.name = args.name.split('.')[0]
         else:
             if args.name:
@@ -266,6 +273,16 @@ def get_cli_dict():
         else:
             tmp.d.append(_dir)
     cli_dict = vars(tmp)
+    if (cli_dict['noun'] == 'worker'):
+       if ('.' in cli_dict['name']):
+          if not (('.hdl' in cli_dict['name']) or \
+             ('.rcc' in cli_dict['name']) or \
+             ('.ocl' in cli_dict['name'])):
+              raise Exception(cli_dict['name'] + ' is and invalid worker name')
+    if (cli_dict['noun'] == 'test'):
+       if ('.' in cli_dict['name']):
+            if not ('.test' in cli_dict['name']):
+              raise Exception(cli_dict['name'] + ' is and invalid test name')
     # make CLI look like attrs (necessary for create cli verb)
     cli_dict = ({key.replace('_', ''): val for key, val in cli_dict.items()})
     return cli_dict
