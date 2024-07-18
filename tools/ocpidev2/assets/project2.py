@@ -294,13 +294,17 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         return Worker(xml_abs_path, False, cli_dict)
 
     def get_application_object_from_cli(self, cli_dict, _dir):
-        if _dir != self.get_dir_abs_path() + '/applications':
-            msg = cli_dict['noun'] + ' \'' + cli_dict['name']
-            msg += '\' can not exist within ' + _dir
-            msg += ' (' + cli_dict['noun'] + ' can only be created within <project>/applications, set -d, or the working directory, to <project>/applications)'
-            raise Exception(msg)
-        dir_abs_path = self.get_dir_abs_path() + '/applications/' + cli_dict['name']
-        return Application(dir_abs_path, False, cli_dict)
+        abs_path = self.get_dir_abs_path() + '/applications/'
+        if cli_dict['xmlapp']:
+            abs_path += cli_dict['name'] + '.xml'  # xml type
+        else:
+            if _dir != self.get_dir_abs_path() + '/applications':
+                    msg = cli_dict['noun'] + ' \'' + cli_dict['name']
+                    msg += '\' can not exist within ' + _dir
+                    msg += ' (' + cli_dict['noun'] + ' can only be created within <project>/applications, set -d, or the working directory, to <project>/applications)'
+                    raise Exception(msg)
+            abs_path += cli_dict['name']  # dir type
+        return Application(abs_path, False, cli_dict)
 
     def get_assembly_object_from_cli(self, cli_dict, _dir):
         if _dir != self.get_dir_abs_path() + '/hdl/assemblies':
@@ -484,11 +488,11 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
     def create_asset(self, cli_dict, _dir):
         dir_abs_path = _dir
         if cli_dict['noun'] == 'application':
-            if not os.path.exists(dir_abs_path):
-                msg = 'performing \'' + cli_dict['verb'] + '\' for a applications directory '
-                for _dir in cli_dict['d']:
-                    Logger().log(3, msg + ' within directory ' + self.get_dir_abs_path())
-                ApplicationsDirectory(dir_abs_path, False, cli_dict).create()
+            if not os.path.exists(self.get_dir_abs_path() + '/applications'):
+                msg = 'performing \'' + cli_dict['verb'] + '\' for an applications directory '
+                msg = 'performing \'' + cli_dict['verb'] + '\' for an applications directory '
+                Logger().log(3, msg + ' within directory ' + self.get_dir_abs_path())
+                ApplicationsDirectory(self.get_dir_abs_path() + '/applications', False, cli_dict).create()
         elif cli_dict['noun'] == 'library':
             if cli_dict['name'] == 'components':
                 pass
@@ -499,8 +503,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             else:
                 if not os.path.exists(dir_abs_path):
                     msg = 'performing \'' + cli_dict['verb'] + '\' for a components directory '
-                    for _dir in cli_dict['d']:
-                        Logger().log(3, msg + ' within directory ' + self.get_dir_abs_path())
+                    Logger().log(3, msg + ' within directory ' + self.get_dir_abs_path())
                     ComponentLibrariesDirectory(dir_abs_path, False, cli_dict).create()
         asset = self.get_asset_object_from_cli(cli_dict, _dir)
         if (cli_dict['noun'] == 'component') or (cli_dict['noun'] == 'protocol'):

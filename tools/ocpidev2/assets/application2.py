@@ -23,14 +23,6 @@ from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import AssetBase
 
 
-apps_dir_xml_template = """<applications>
-    <!-- To restrict the applications that are built or run, you can set the Applications
-    attribute to the specific list of which ones you want to build and run, e.g.:
-    <libraries Applications='app1 app3'/>
-    Otherwise all applications will be built and run -->
-</Applications>\n
-"""  # nopep8
-
 apps_dir_rst_template = """.. Application directory index page
 
 
@@ -154,15 +146,22 @@ class ApplicationsDirectory(AssetBase):
         if enable_path_existence_check:
             self.parse(cli_dict)
 
+    def get_templates(self, applications=False):
+        templates = {}
+        templates['applications.rst'] = apps_dir_rst_template 
+        templates['applications.xml'] = g_asset_template
+        return templates
+
 
 # TODO iherit from, and consolidate functionality from, AssetBase
 class Application(AssetBase):
     """ Reference Application Development Guide section 3 """
 
-    def __init__(self, dir_abs_path, enable_path_existence_check=True,
+    def __init__(self, abs_path, enable_path_existence_check=True,
                  cli_dict=None):
+        """ abs_path can be xml type OR dir type! see ADG section 10.2 """
         self.root_tags = ['Application']
-        AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
+        AssetBase.__init__(self, abs_path, enable_path_existence_check)
         # TODO investigate whether below line is necessary
         # if not os.path.isfile(self.get_xml_abs_path()):
         #     self.raise_abs_path_does_not_exist()
@@ -184,6 +183,8 @@ class Application(AssetBase):
     def get_templates(self, applications=False):
         templates = {}
         templates[self.name + '.rst'] = app_rst_template
-        templates[self.name + '.cc'] = app_cc_template
+        if self.get_dir_abs_path().split('/')[-1] != 'applications':
+            # TODO prevent application named 'applications'?
+            templates[self.name + '.cc'] = app_cc_template
         templates[self.name + '.xml'] = g_asset_template
         return templates
