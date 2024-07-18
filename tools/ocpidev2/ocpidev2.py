@@ -177,7 +177,6 @@ def get_arg_parser():
             noun = 'component'
         else:
             noun = 'platform'
-    print(noun)
     if 'build' in sys.argv:
         parser = add_build_arguments(parser, noun)
     elif 'create' in sys.argv:
