@@ -153,10 +153,11 @@ class HdlSlot(AssetBase):
 class HdlCard(HdlCardPlatformBase):
     """ Platform Development Guide section 5.6 """
 
-    def __init__(self, xml_abs_path):
+    def __init__(self, xml_abs_path, enable_path_existence_check=True, cli_dict=None):
         self.root_tags = ['Card']
-        HdlCardPlatformBase.__init__(self, xml_abs_path)
-        self.parse()
+        HdlCardPlatformBase.__init__(self, xml_abs_path, enable_path_existence_check)
+        if enable_path_existence_check:
+            self.parse()
 
     def get_attr_infos(self):
         ret = []

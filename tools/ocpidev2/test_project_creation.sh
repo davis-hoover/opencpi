@@ -1,3 +1,4 @@
+# recommmended use: cd projects/osps; OCPI_LOG_LEVEL=3 ../../tools/ocpidev2/test_project_creation.sh
 set -e
 ocpidev2 create project core --package-id ocpi.core
 ocpidev2 create library components -d core
@@ -81,10 +82,10 @@ ocpidev2 create worker Producer.rcc -d core/components --language c++ --version 
 ocpidev2 create test backpressure.test -d core/components
 ocpidev2 create test bias.test -d core/components
 ocpidev2 create test metadata_stressor.test -d core/components
-ocpidev2 create hdl card fmc_hpc -d core/hdl/cards/specs
-ocpidev2 create hdl card fmc_lpc -d core/hdl/cards/specs
-ocpidev2 create hdl card hsmc -d core/hdl/cards/specs
-ocpidev2 create hdl card hsmc_alst4 -d core/hdl/cards/specs
+#ocpidev2 create hdl card fmc_hpc -d core/hdl/cards/specs
+#ocpidev2 create hdl card fmc_lpc -d core/hdl/cards/specs
+#ocpidev2 create hdl card hsmc -d core/hdl/cards/specs
+#ocpidev2 create hdl card hsmc_alst4 -d core/hdl/cards/specs
 ocpidev2 create hdl primitive axi -d core/hdl/primitives
 ocpidev2 create hdl primitive bsv -d core/hdl/primitives
 ocpidev2 create hdl primitive clocking -d core/hdl/primitives
@@ -97,28 +98,28 @@ ocpidev2 create hdl primitive sdp -d core/hdl/primitives
 ocpidev2 create hdl primitive sync -d core/hdl/primitives
 ocpidev2 create hdl primitive timed_sample_prot -d core/hdl/primitives
 ocpidev2 create hdl primitive util -d core/hdl/primitives
-ocpidev2 create hdl adapter wsi_from_zero_adapter.hdl -d core/hdl/adapters --language vhdl --version 2
-ocpidev2 create hdl adapter wsi_from_zero_clock_adapter.hdl -d core/hdl/adapters --language vhdl --version 2
-ocpidev2 create hdl adapter wsi_to_zero_adapter.hdl -d core/hdl/adapters --language vhdl --version 2
-ocpidev2 create hdl adapter wsi_to_zero_clock_adapter.hdl -d core/hdl/adapters --language vhdl --version 2
-ocpidev2 create hdl adapter wsi_width_adapter.hdl -d core/hdl/adapters --language vhdl --version 2
-ocpidev2 create hdl adapter wsi_width_clock_adapter.hdl -d core/hdl/adapters --language vhdl --version 2
-ocpidev2 create hdl device ocdp.hdl -d core/hdl/devices --language vhdl --version 2
-ocpidev2 create hdl device sdp2cp.hdl -d core/hdl/devices --language vhdl --version 2
-ocpidev2 create hdl device sdp_node.hdl -d core/hdl/devices --language vhdl --version 2
-ocpidev2 create hdl device sdp_pipeline.hdl -d core/hdl/devices --language vhdl --version 2
-ocpidev2 create hdl device sdp_receive.hdl -d core/hdl/devices --language vhdl --version 2
-ocpidev2 create hdl device sdp_send.hdl -d core/hdl/devices --language vhdl --version 2
-ocpidev2 create hdl device sdp_term.hdl -d core/hdl/devices --language vhdl --version 2
-ocpidev2 create hdl device sma.hdl -d core/hdl/devices --language vhdl --version 2
-ocpidev2 create hdl device time_server.hdl -d core/hdl/devices --language vhdl --version 2
-ocpidev2 create hdl device unoc2cp.hdl -d core/hdl/devices --language vhdl --version 2
-ocpidev2 create hdl device unoc_term.hdl -d core/hdl/devices --language vhdl --version 2
-ocpidev2 create hdl platform isim -d core/hdl/platforms --language vhdl --spec platform
-ocpidev2 create hdl platform modelsim -d core/hdl/platforms --language vhdl --spec platform --libraries sdp
-ocpidev2 create hdl platform riviera -d core/hdl/platforms --language vhdl --spec platform --libraries sdp
-ocpidev2 create hdl platform x4sim -d core/hdl/platforms --language vhdl --spec platform --libraries 'sdp util' --version 2
-ocpidev2 create hdl platform xsim -d core/hdl/platforms --language vhdl --spec platform --libraries sdp --configurations 'base cfg_pps_sim_test'
+#ocpidev2 create hdl adapter wsi_from_zero_adapter.hdl -d core/hdl/adapters --language vhdl --version 2
+#ocpidev2 create hdl adapter wsi_from_zero_clock_adapter.hdl -d core/hdl/adapters --language vhdl --version 2
+#ocpidev2 create hdl adapter wsi_to_zero_adapter.hdl -d core/hdl/adapters --language vhdl --version 2
+#ocpidev2 create hdl adapter wsi_to_zero_clock_adapter.hdl -d core/hdl/adapters --language vhdl --version 2
+#ocpidev2 create hdl adapter wsi_width_adapter.hdl -d core/hdl/adapters --language vhdl --version 2
+#ocpidev2 create hdl adapter wsi_width_clock_adapter.hdl -d core/hdl/adapters --language vhdl --version 2
+#ocpidev2 create hdl device ocdp.hdl -d core/hdl/devices --language vhdl --version 2
+#ocpidev2 create hdl device sdp2cp.hdl -d core/hdl/devices --language vhdl --version 2
+#ocpidev2 create hdl device sdp_node.hdl -d core/hdl/devices --language vhdl --version 2
+#ocpidev2 create hdl device sdp_pipeline.hdl -d core/hdl/devices --language vhdl --version 2
+#ocpidev2 create hdl device sdp_receive.hdl -d core/hdl/devices --language vhdl --version 2
+#ocpidev2 create hdl device sdp_send.hdl -d core/hdl/devices --language vhdl --version 2
+#ocpidev2 create hdl device sdp_term.hdl -d core/hdl/devices --language vhdl --version 2
+#ocpidev2 create hdl device sma.hdl -d core/hdl/devices --language vhdl --version 2
+#ocpidev2 create hdl device time_server.hdl -d core/hdl/devices --language vhdl --version 2
+#ocpidev2 create hdl device unoc2cp.hdl -d core/hdl/devices --language vhdl --version 2
+#ocpidev2 create hdl device unoc_term.hdl -d core/hdl/devices --language vhdl --version 2
+#ocpidev2 create hdl platform isim -d core/hdl/platforms --language vhdl --spec platform
+#ocpidev2 create hdl platform modelsim -d core/hdl/platforms --language vhdl --spec platform --libraries sdp
+#ocpidev2 create hdl platform riviera -d core/hdl/platforms --language vhdl --spec platform --libraries sdp
+#ocpidev2 create hdl platform x4sim -d core/hdl/platforms --language vhdl --spec platform --libraries 'sdp util' --version 2
+#ocpidev2 create hdl platform xsim -d core/hdl/platforms --language vhdl --spec platform --libraries sdp --configurations 'base cfg_pps_sim_test'
 ocpidev2 create project assets --package-id ocpi.assets --depends ocpi.platform --component-library util_comps --component-library base_comps --component-library misc_comps --component-library dsp_comps --component-library comms_comps --component-library devices
 ocpidev2 create library base_comps -d assets/components
 ocpidev2 create library comms_comps -d assets/components
