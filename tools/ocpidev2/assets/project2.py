@@ -405,6 +405,9 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         return HdlLibrary(dir_abs_path, False, cli_dict)
 
     def get_protocol_object_from_cli(self, cli_dict, _dir):
+        # TODO self.handle_library()
+        # TODO self.handle_cli_library()
+        # TODO self.handle_cli_protocol()
         if _dir != (self.get_dir_abs_path() + '/specs'):
             found = False
             for component_library in self.component_libraries:
