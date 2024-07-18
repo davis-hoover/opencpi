@@ -303,6 +303,7 @@ def get_local_project(_dir):
         try:
             project = Project(project_dir_abs_path, True)
             project.discover()
+            Logger().debug('operating in local project ' + project.get_dir_abs_path())
             break
         except InvalidAssetError:
             project_dir_abs_path = project_dir_abs_path.rsplit('/', 1)[0]

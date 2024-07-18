@@ -320,19 +320,24 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                         dir_abs_path = component_library.get_dir_abs_path()
                 # TODO unless its in the platforms
             if cli_dict['noun'] == 'component':
+                xml_abs_path = _dir + '/'
                 if _dir != (self.get_dir_abs_path() + '/specs'):
                     found = False
                     for component_library in self.component_libraries:
-                        if (_dir == (component_library.get_dir_abs_path())) or \
-                           (_dir == (component_library.get_dir_abs_path() + '/specs')):
+                        if _dir == component_library.get_dir_abs_path():
+                            xml_abs_path += cli_dict['name'] + '.comp/'
+                            found = True
+                            break
+                        elif _dir == (component_library.get_dir_abs_path() + '/specs'):
+                            Logger().warn('for component library creation, the working directory (or, if specified, the -d option) is recommended to be the component library location <library>, and not <library>/specs')
                             found = True
                             break
                     if not found:
                         msg = 'component \'' + cli_dict['name']
                         msg += '\' can not exist within ' + _dir
-                        msg += ' (component library can only be created within <project>/specs or a component <library> directory or a <library>/specs directory, set -d, or the working directory, to <project>/specs or a component <library> or <library>/specs)'
+                        msg += ' (it is recommend to set the working directory or -d to a <project>/specs or a component <library> directory'
                         raise Exception(msg)
-                xml_abs_path = _dir + '/' + cli_dict['name'] + '-comp.xml'
+                xml_abs_path += cli_dict['name'] + '-comp.xml'
                 asset = Component(xml_abs_path, existence_check, cli_dict)
             elif cli_dict['noun'] == 'device':
                 dir_abs_path = self.get_dir_abs_path() + '/hdl/devices/' + cli_dict['name']
@@ -442,6 +447,10 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                         Logger().log(3, msg + ' within directory ' + self.get_dir_abs_path())
                     ComponentLibraries(dir_abs_path, False, cli_dict).create()
         asset = self.get_asset_object_from_cli(cli_dict, _dir)
+        if cli_dict['noun'] == 'component':
+            if not os.path.exists(asset.get_dir_abs_path()):
+                # needed for <project>/.....<component>.comp/
+                System('mkdir -p ' + asset.get_dir_abs_path())
         if os.path.exists(asset.abs_path):
             msg = cli_dict['noun'] + ' ' + cli_dict['name'] + ' already exists'
             msg += ' within directory ' + asset.get_dir_abs_path().rsplit('/', 1)[0]
