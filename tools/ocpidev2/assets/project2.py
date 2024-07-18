@@ -335,7 +335,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                     if not found:
                         msg = 'component \'' + cli_dict['name']
                         msg += '\' can not exist within ' + _dir
-                        msg += ' (it is recommend to set the working directory or -d to a <project>/specs or a component <library> directory'
+                        msg += ' (it is recommend to set the working directory or -d to a <project>/specs or a component <library> directory)'
                         raise Exception(msg)
                 xml_abs_path += cli_dict['name'] + '-comp.xml'
                 asset = Component(xml_abs_path, existence_check, cli_dict)
