@@ -361,6 +361,43 @@ class ProjectRegistry():
                 len(self.projects):
             if timeout == 0:
                 break
+            timeout -= 1
+            for proj in self.projects:
+                deps_covered = True
+                for dependent_proj in proj.project_dependencies:
+                    if dependent_proj not in dependency_ordered_pid_strs:
+                        deps_covered = False
+                if deps_covered:
+                    if str(proj.get_package_id()) not in \
+                            dependency_ordered_pid_strs:
+                        dependency_ordered_pid_strs.append(
+                                str(proj.get_package_id()))
+        # timeout hack to handle circular dependencies,
+        # (we gave up on dependency order!)
+        if timeout == 0:
+            for proj in self.projects:
+                if str(proj.get_package_id()) not in \
+                        dependency_ordered_pid_strs:
+                    somepid = str(proj.get_package_id())
+                    dependency_ordered_pid_strs.append(somepid)
+        # do the final export in psuedo-dependency-order
+        for package_id_str in dependency_ordered_pid_strs:
+            for proj in self.projects:
+                if str(proj.get_package_id()) == package_id_str:
+                    # TODO move below 7 lines outside OCPIDev class (Legacy...)
+                    # IMPORTANT - below 6 lines necessary to remove stale files
+                    p = proj.abs_path
+                    os.system('rm -rf $(find ' + p + ' -type f -name imports)')
+                    os.system('rm -rf $(find ' + p + ' -type f -name exports)')
+                    os.system('rm -rf $(find ' + p + ' -type d -name imports)')
+                    os.system('rm -rf $(find ' + p + ' -type d -name exports)')
+                    os.system('rm -rf $(find ' + p + ' -type l -name imports)')
+                    os.system('rm -rf $(find ' + p + ' -type l -name exports)')
+                    Logger().info(
+                        'LegacyBuildTool: exporting project ' +
+                        proj.abs_path.split('/')[-1])
+                    System('make -f ' + makefile.abs_path + ' ' +
+                           proj.abs_path + '/exports')
 
     # TODO probably a single authoritative xml is needed to parse this from....
     def get_target(self, hdl_platform, rcc_platform=''):
