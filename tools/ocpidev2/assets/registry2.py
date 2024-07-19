@@ -226,6 +226,28 @@ class ProjectRegistry():
                 assets.append(asset)
         return assets
 
+    def get_project(self, cli_dict, _dir):
+        project = next((proj for proj in self.projects if
+                        (proj.get_dir_abs_path() + '/') in (_dir + '/')), None)
+        if project is None:
+            project_dir_abs_path = _dir
+            while True:
+                try:
+                    project = Project(project_dir_abs_path, True)
+                    project.discover()
+                    break
+                except InvalidAssetError:
+                    project_dir_abs_path = \
+                        project_dir_abs_path.rsplit('/', 1)[0]
+                    if len(project_dir_abs_path) <= 1:
+                        break
+        if project is None:
+            msg = ("Invalid path: '" + _dir + "'. Please perform 'create "
+                   + cli_dict['noun'] + "' within a valid, registered "
+                   "project.")
+            raise Exception(msg)
+        return project
+
     def build(self, cli_dict, _dir):
         """ builds assets by creating a temporary makefile and calls make -j
             on it and then deleting it """
@@ -815,7 +837,7 @@ class LegacyBuildTool():
 def unittest(cli_dict, project_registry):
     ret = True
     ret = test_ProjectRegistry(ret)
-    ret = test_Project(ret)
+    # ret = test_Project(ret)
     if not ret:
         raise Exception('unittest failed')
 

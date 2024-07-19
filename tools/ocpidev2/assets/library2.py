@@ -198,7 +198,7 @@ class ComponentLibrariesDirectory(AssetBase):
                     found = False
             if not found:
                 self.raise_invalid_location()
-        self.parse()
+            self.parse()
 
     def get_templates(self):
         templates = {}
@@ -250,7 +250,8 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         self.component_libraries = []
         self.hdl_libraries = []
         # end of CDG section 14.5
-        self.parse(cli_dict)
+        if enable_path_existence_check:
+            self.parse(cli_dict)
         workers = self.attrs['Workers']
         allowlist = None if workers == [] else workers
         if enable_path_existence_check:

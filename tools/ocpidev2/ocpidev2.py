@@ -98,16 +98,22 @@ def add_create_arguments(parser, noun):
     if asset is not None:
         for attr in asset.get_attr_infos():
             if attr.cli is not None:
-                _default = ([] if attr.is_list else
-                            (False if attr.is_bool else '')),
-                _action = ('append' if attr.is_list else
-                           ('store_true' if attr.is_bool else 'store'))
                 if attr.is_bool:
+                    _default = ([] if attr.is_list else
+                                (False if attr.is_bool else ''))
+                    _action = ('append' if attr.is_list else
+                               (('store_true' if attr.is_bool else 'store')))
                     parser.add_argument(attr.cli[0], attr.cli[1],
-                                        default=_default, action=_action)
+                                        default=_default,
+                                        action=_action)
                 else:
+                    _default = ([] if attr.is_list else
+                                (False if attr.is_bool else '')),
+                    _action = ('append' if attr.is_list else
+                               (('store_true' if attr.is_bool else 'store')))
                     parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
-                                        default=_default, action=_action)
+                                        default=_default,
+                                        action=_action)
     parser = add_create_show_build_arguments(parser)
     return parser
 
@@ -356,6 +362,7 @@ def dispatch_verb(cli_dict):
             dirs_to_operate_on.append(Environment().getcwd())
         project_registry = None
         for _dir in dirs_to_operate_on:
+            print(_dir + ' abc')
             local_project = get_local_project(_dir)
             if ((cli_dict['verb'] == 'create') and
                 (local_project is None)) or \
@@ -396,6 +403,8 @@ def dispatch_verb(cli_dict):
                 project_registry.show(cli_dict)
             elif cli_dict['verb'] == 'unregister':
                 project_registry.unregister(cli_dict, _dir)
+            elif cli_dict['verb'] == 'unittest':
+                unittest(cli_dict, _dir)
             else:
                 raise Exception('verb ' + cli_dict['verb'] +
                                 ' is not supported')
@@ -422,9 +431,9 @@ def main():
             set_g_suppress_warn(True)
         Logger().debug('cli_dict : ' + str(cli_dict))
         dispatch_verb(cli_dict)
-    except Exception as exception:
-        Logger().error(str(exception))
-        ret = 1
+     except Exception as exception:
+         Logger().error(str(exception))
+         ret = 1
     return ret
 
 

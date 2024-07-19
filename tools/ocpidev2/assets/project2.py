@@ -138,8 +138,8 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         # initialize below line according to CDG Table 8
         self.project_dependencies = ['ocpi.core']
         # end of CDG section 14.5
-        self.parse(cli_dict)
-        self.first = True
+        if enable_path_existence_check:
+            self.parse(cli_dict)
 
     def get_type(self):
         return 'project'
@@ -257,9 +257,8 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                 msg += 'characters and not start with a number'
                 raise InvalidAssetError(msg)
 
-    def discover(
-            self, do_component_libraries=True, do_hdl_primitives=True,
-            do_hdl_assemblies=True):
+    def discover(self, do_component_libraries=True, do_hdl_primitives=True,
+                 do_hdl_assemblies=True):
         # start of bullets at top of CDG section 14
         if do_component_libraries:
             tmp = self.abs_path.split('/')[-1]
@@ -575,8 +574,9 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                 msg += 'highly recommended'
                 Logger().warn(msg)
         asset.create()
-        if cli_dict['createtest']:
-            self.get_test_object_from_cli(cli_dict, _dir).create()
+        # TODO comment back in
+        # if cli_dict['createtest']:
+        #     self.get_test_object_from_cli(cli_dict, _dir).create()
 
     def delete_asset(self, cli_dict, _dir):
         self.get_asset_object_from_cli(cli_dict, _dir).delete()
