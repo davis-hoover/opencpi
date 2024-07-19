@@ -11,9 +11,9 @@ pycodestyle ../tools/ocpidev2/*py
 pycodestyle ../tools/ocpidev2/assets/*py
 ocpidev2 show -h
 ocpidev2 show --help
-#ocpidev2 unittest
-#ocpidev2 unittest -v
-#ocpidev2 unittest --verbose
+ocpidev2 unittest
+ocpidev2 unittest -v
+ocpidev2 unittest --verbose
 ocpidev2 create project core2 --package-id ocpi.core2
 ocpidev2 create library components -d core2
 ocpidev2 create library cards -d core2/hdl --component-library devices --xml-include '../../components/specs ../devices/lib/hdl ../devices/specs'

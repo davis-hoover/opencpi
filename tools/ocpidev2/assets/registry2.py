@@ -837,7 +837,7 @@ class LegacyBuildTool():
 def unittest(cli_dict, project_registry):
     ret = True
     ret = test_ProjectRegistry(ret)
-    # ret = test_Project(ret)
+    ret = test_Project(ret)
     if not ret:
         raise Exception('unittest failed')
 

@@ -263,14 +263,15 @@ def test_HdlPlatform(ret):
     try:
         os.system('mkdir -p ' + dir_abs_path)
         ff = open(xml_abs_path, 'w')
-        ff.write('<HdlPlatform/>\n')
+        ff.write('<HdlPlatform language=\'vhdl\'/>\n')
         ff.close()
         uut = HdlPlatform(dir_abs_path)
         if Environment().ocpi_log_level >= 10:
             print(str([a for a in dir(uut) if not
                   callable(getattr(uut, a))]))
             os.system('cat ' + xml_abs_path)
-    except InvalidAssetError:
+    except InvalidAssetError as err:
+        print(str(err))
         passed = False
     log_pass_fail('testing HdlPlatform', passed)
     if passed is False:

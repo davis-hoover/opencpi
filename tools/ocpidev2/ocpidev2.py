@@ -397,6 +397,8 @@ def dispatch_verb(cli_dict):
                 project_registry.show(cli_dict)
             elif cli_dict['verb'] == 'unregister':
                 project_registry.unregister(cli_dict, _dir)
+            elif cli_dict['verb'] == 'unittest':
+                unittest(cli_dict, _dir)
             else:
                 raise Exception('verb ' + cli_dict['verb'] +
                                 ' is not supported')
