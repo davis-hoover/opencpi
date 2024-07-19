@@ -388,6 +388,8 @@ class BuildableAsset(Asset):
             action.append('rcc')
         if kwargs.get('hdl'):
             action.append('hdl')
+        if kwargs.get('streamlined_build'):
+            os.environ['OCPI_STREAMLINED_BUILD'] = '1'
         if kwargs.get('workers_as_needed'):
             os.environ['OCPI_AUTO_BUILD_WORKERS'] = '1'
         if kwargs.get('artifacts_only'):

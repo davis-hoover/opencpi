@@ -28,7 +28,7 @@ variables:
     description: "Names of platforms to run pipeline for. If pipeline is to run an OSP platform, 
                   the OSP project must be added to OSPS. Use a \":\" to associate an
                   hdl platform with an rcc platform for HWIL testing."
-    value: "zed:xilinx19_2_aarch32 xsim xilinx19_2_aarch64"
+    value: "zed:xilinx19_2_aarch32 xsim zcu104:xilinx19_2_aarch64"
   OSPS:
     description: "OSP projects to include in pipeline. Use the full name of the project, e.g.,
                   ocpi.osp.plutosdr."
@@ -45,7 +45,7 @@ workflow:
   auto_cancel:
       on_new_commit: interruptible
   rules:
-    - if: $CI_PIPELINE_SOURCE == "push"
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
       when: never
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
       variables:
