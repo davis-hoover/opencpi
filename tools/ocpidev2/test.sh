@@ -649,6 +649,8 @@ ocpidev2 -d assets show -d core components -d platform -v
 #ocpidev2 show components --simple
 #ocpidev2 show components --table
 #ocpidev2 show components --json
+ocpidev2 clean -d core -d assets -d platform
+ocpidev2 build -j 16 -d assets/hdl/assemblies/iqstream_max --hdl-platform xsim
 # python3 -m pip install coverage
 # coverage run $(which ocpidev2) unittest
 # coverage report -m
