@@ -571,7 +571,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             try:
                 is_libs = False
                 try:
-                    ComponentLibraries(dir_abs_path, True, {})
+                    ComponentLibrariesDirectory(dir_abs_path, True, {})
                     is_libs = True
                 except InvalidAssetError as err:
                     pass
