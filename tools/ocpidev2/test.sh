@@ -1,5 +1,4 @@
 #!/bin/bash
-# RECOMMENDED USAGE: cd opencpi/projects; rm -rf core2; OCPI_LOG_LEVEL=3 ../tools/ocpidev2/test.sh
 set -e
 sudo apt install pycodestyle
 pycodestyle ../tools/ocpidev2/*py
