@@ -536,7 +536,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         elif cli_dict.get('hdllibrary'):
             hdl_lib_path = self.get_cli_hdllibrary(cli_dict, _dir)
             xml_abs_path = (hdl_lib_path + '/specs/' + cli_dict['name'] +
-                         '-prot.xml')
+                            '-prot.xml')
         elif cli_dict.get('project'):
             xml_abs_path = (self.abs_path + '/specs/' + cli_dict['name'] +
                             '-prot.xml')
