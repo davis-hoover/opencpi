@@ -706,6 +706,7 @@ class ProjectRegistry():
         System(cmd)
         self.clean_imports_exports()
 
+
 class LegacyBuildTool():
     """ Relies (internally) on imports/exports. Intended to possibly,
         eventually, be overridden by user-defined, vendor-specific tool python
@@ -747,11 +748,13 @@ class LegacyBuildTool():
         return ret
 
     def get_build_artifact_abs_path(self, asset, hdl_target,
-            hdl_platform, rcc_platform, project_registry):
+                                    hdl_platform, rcc_platform,
+                                    project_registry):
         """ intended to be a standard API which defines how an asset is built
             using this Tool class """
         if hdl_platform != '':
-            hdl_target = project_registry.get_target(hdl_platform, rcc_platform)
+            hdl_target = project_registry.get_target(hdl_platform,
+                                                     rcc_platform)
         ret = asset.get_dir_abs_path()
         tmp = ''
         if asset.get_type() == 'project':

@@ -518,6 +518,8 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             if (asset.version != 2):
                 Logger().warn('default version of 0 is being used, but --version 2 is highly recommended')
         asset.create()
+        if cli_dict['createtest']:
+            self.get_test_object_from_cli(cli_dict, _dir).create()
 
     def delete_asset(self, cli_dict, _dir):
         self.get_asset_object_from_cli(cli_dict, _dir).delete()
