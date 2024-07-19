@@ -3,14 +3,18 @@
 # THIS IS THE ALL-ENCOMPASING TEST FOR OCPIDEV2
 ################################################################################
 # RECOMMENDED USAGE (note that q must be typed to bypass help screens):
-#  cd projects; rm -rf core2 assets2; OCPI_LOG_LEVEL=3 ../tools/ocpidev2/test.sh
+#  cd projects; rm -rf c*2 a*2 *ev2*; OCPI_LOG_LEVEL=3 ../tools/ocpidev2/test.sh
 ################################################################################
 set -e
 sudo apt install pycodestyle
 pycodestyle ../tools/ocpidev2/*py
 pycodestyle ../tools/ocpidev2/assets/*py
+#ocpidev2 -h
+#ocpidev2 -help
 ocpidev2 show -h
 ocpidev2 show --help
+#ocpidev2 create -h
+#ocpidev2 create --help
 ocpidev2 unittest
 ocpidev2 unittest -v
 ocpidev2 unittest --verbose
@@ -170,14 +174,24 @@ ocpidev2 create rcc platform xilinx18_3_aarch64 -d core2/rcc/platforms
 ocpidev2 create rcc platform xilinx19_2_aarch32 -d core2/rcc/platforms
 ocpidev2 create rcc platform xilinx19_2_aarch64 -d core2/rcc/platforms
 ocpidev2 create project assets2 --package-id ocpi.assets2 --depends ocpi.platform --component-library util_comps --component-library base_comps --component-library misc_comps --component-library dsp_comps --component-library comms_comps --component-library devices
-#ocpidev2 create library base_comps -d assets2/components
-#ocpidev2 create library comms_comps -d assets2/components
-#ocpidev2 create library dsp_comps -d assets2/components
-#ocpidev2 create library util_comps -d assets2/components
-#ocpidev2 create library cards -d assets2/hdl
-#ocpidev2 create library devices -d assets2/hdl
-#ocpidev2 create library adapters -d assets2/hdl
-#ocpidev2 create hdl card fmcomms_2_3_hpc -d assets2/hdl/cards/specs
+ocpidev2 create library base_comps -d assets2/components
+ocpidev2 create library comms_comps -d assets2/components
+ocpidev2 create library dsp_comps -d assets2/components
+ocpidev2 create library util_comps -d assets2/components
+ocpidev2 create library cards -d assets2/hdl
+ocpidev2 create library devices -d assets2/hdl
+ocpidev2 create library adapters -d assets2/hdl
+ocpidev2 create hdl card fmcomms_2_3_hpc -d assets2/hdl/cards/specs
+ocpidev2 create project ocpidev2_test_project
+ocpidev2 create protocol myprot1 -d ocpidev2_test_project/specs
+ocpidev2 create protocol myprot2 -d ocpidev2_test_project --project
+ocpidev2 create protocol myprot3 -d ocpidev2_test_project/specs --project
+ocpidev2 create library cards -d ocpidev2_test_project/hdl
+ocpidev2 create protocol myprot4 -d ocpidev2_test_project --library cards
+ocpidev2 create protocol myprot5 -d ocpidev2_test_project --hdl-library cards
+pushd ocpidev2_test_project && ocpidev2 create protocol myprot6 --library cards && popd
+pushd ocpidev2_test_project && ocpidev2 create protocol myprot7 --hdl-library cards && popd
+mkdir ocpidev2_test_project/baddir && pushd ocpidev2_test_project/baddir && ocpidev2 create protocol myprot8 --project && popd
 #rm -rf core2
 #rm -rf assets2
 #ocpidev2 create project core2 --package-id ocpi.core2
