@@ -284,6 +284,80 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             self.discover_rcc_platforms()
         # end of bullets at top of CDG section 14
 
+    def get_dash_d(self, _dir):
+        dash_d = os.path.relpath(_dir, os.getcwd())
+        if dash_d == '.':
+            dash_d = False
+        else:
+            dash_d = True
+        return dash_d
+
+    def get_cli_library(self, cli_dict, _dir):
+        dash_d = self.get_dash_d(_dir)
+        lib_valid = False
+        lib_path = None
+        for lib in self.component_libraries:
+            if not dash_d:
+                if cli_dict['library'] == lib.name:
+                    lib_valid = True
+                    lib_path = lib.abs_path
+                    break
+            else:
+                if _dir + '/' in lib.abs_path:
+                    if cli_dict['library'] == lib.name:
+                        lib_valid = True
+                        lib_path = lib.abs_path
+                        break
+        if not lib_valid:
+            if not dash_d:
+                msg = ("The --library '" + cli_dict['library'] +
+                       "' does not exist in the '" + self.name +
+                       "' project.")
+                raise Exception(msg)
+            else:
+                msg = ("The --library '" + cli_dict['library'] +
+                       "' does not exist in the path: '" + _dir + "'.")
+                raise Exception(msg)
+        return lib_path
+
+    def get_cli_hdllibrary(self, cli_dict, _dir):
+        dash_d = self.get_dash_d(_dir)
+        hdl_libs = []
+        for lib in self.component_libraries:
+            if self.abs_path + '/hdl/' in lib.abs_path:
+                hdl_libs.append(lib)
+        if cli_dict['hdllibrary'] not in ['adapters', 'cards', 'devices']:
+            msg = ("The --hdl-library '" + cli_dict['hdllibrary'] +
+                   "' is not one of the valid hdl libraries: " +
+                   "adapters, cards, devices.")
+            raise Exception(msg)
+        else:
+            hdl_lib_path = None
+            hdl_lib_valid = False
+            for lib in hdl_libs:
+                if not dash_d:
+                    if cli_dict['hdllibrary'] == lib.name:
+                        hdl_lib_path = lib.abs_path
+                        hdl_lib_valid = True
+                        break
+                else:
+                    if _dir + '/' in lib.abs_path:
+                        if cli_dict['hdllibrary'] == lib.name:
+                            hdl_lib_path = lib.abs_path
+                            hdl_lib_valid = True
+                            break
+            if not hdl_lib_valid:
+                if not dash_d:
+                    msg = ("The --hdl-library '" + cli_dict['hdllibrary'] +
+                           "' does not exist in the '" + self.name +
+                           "' project.")
+                    raise Exception(msg)
+                else:
+                    msg = ("The --hdl-library '" + cli_dict['hdllibrary'] +
+                           "' does not exist in the path: '" + _dir + "'.")
+                    raise Exception(msg)
+        return hdl_lib_path
+
     def get_adapter_object_from_cli(self, cli_dict, _dir):
         if _dir != self.get_dir_abs_path() + '/hdl/adapters':
             msg = cli_dict['noun'] + ' \'' + cli_dict['name']
@@ -455,16 +529,22 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         return HdlLibrary(dir_abs_path, False, cli_dict)
 
     def get_protocol_object_from_cli(self, cli_dict, _dir):
-        # TODO self.handle_library()
-        # TODO self.handle_cli_library()
-        # TODO self.handle_cli_protocol()
-        if _dir != (self.get_dir_abs_path() + '/specs'):
-            found = False
-            for component_library in self.component_libraries:
-                if _dir == (component_library.get_dir_abs_path() + '/specs'):
-                    found = True
-                    break
-            if not found:
+        if cli_dict.get('library'):
+            lib_path = self.get_cli_library(cli_dict, _dir)
+            xml_abs_path = (lib_path + '/specs/' + cli_dict['name'] +
+                            '-prot.xml')
+        elif cli_dict.get('hdllibrary'):
+            hdl_lib_path = self.get_cli_hdllibrary(cli_dict, _dir)
+            xml_abs_path = (hdl_lib_path + '/specs/' + cli_dict['name'] +
+                         '-prot.xml')
+        elif cli_dict.get('project'):
+            xml_abs_path = (self.abs_path + '/specs/' + cli_dict['name'] +
+                            '-prot.xml')
+        else:
+            valid_dirs = [self.get_dir_abs_path() + '/specs']
+            valid_dirs.extend(comp_lib.get_dir_abs_path() + '/specs' for
+                              comp_lib in self.component_libraries)
+            if _dir not in valid_dirs:
                 msg = cli_dict['noun'] + ' \'' + cli_dict['name']
                 msg += '\' can not exist within ' + _dir
                 msg += ' (' + cli_dict['noun'] + ' can only be created within '
@@ -473,7 +553,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                 msg += '<project>/specs or a component library specs '
                 msg += 'directory)'
                 raise Exception(msg)
-        xml_abs_path = _dir + '/' + cli_dict['name'] + '-prot.xml'
+            xml_abs_path = _dir + '/' + cli_dict['name'] + '-prot.xml'
         return Protocol(xml_abs_path, False, cli_dict)
 
     def get_slot_object_from_cli(self, cli_dict, _dir):
