@@ -484,6 +484,7 @@ class ProjectRegistry():
                         rcc_platform = platform
                     ppath = tool.get_build_artifact_abs_path(worker, target,
                                                              hdl_platform,
+                                                             rcc_platform,
                                                              self)
                     gstr = gnu_make_target_str
                     makefile.rules[gstr].prerequisites.append(ppath)
