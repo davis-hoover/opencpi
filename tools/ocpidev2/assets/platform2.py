@@ -41,7 +41,6 @@ class RccPlatform(AssetBase):
         templates[self.name + '.exports'] = """"""
         return templates
 
-
 class HdlCardPlatformBase(AssetBase):
 
     def __init__(self, abs_path, enable_path_existence_check=True):
@@ -79,8 +78,7 @@ class HdlPlatform(HdlCardPlatformBase):
     def __init__(self, dir_abs_path, enable_path_existence_check=True,
                  cli_dict=None):
         self.root_tags = ['HdlPlatform']
-        HdlCardPlatformBase.__init__(self, dir_abs_path,
-                                     enable_path_existence_check)
+        HdlCardPlatformBase.__init__(self, dir_abs_path, enable_path_existence_check)
         if enable_path_existence_check:
             if not os.path.isfile(self.get_xml_abs_path()):
                 self.raise_abs_path_does_not_exist()
@@ -169,11 +167,9 @@ class HdlPlatformConfiguration(AssetBase):
 class HdlSlot(AssetBase):
     """ Platform Development Guide section 5.4.2 """
 
-    def __init__(self, xml_abs_path, enable_path_existence_check=True,
-                 cli_dict=None):
+    def __init__(self, xml_abs_path, enable_path_existence_check=True, cli_dict=None):
         self.root_tags = ['SlotType']
-        HdlCardPlatformBase.__init__(self, xml_abs_path,
-                                     enable_path_existence_check)
+        HdlCardPlatformBase.__init__(self, xml_abs_path, enable_path_existence_check)
         if enable_path_existence_check:
             self.parse()
 
@@ -184,11 +180,9 @@ class HdlSlot(AssetBase):
 class HdlCard(HdlCardPlatformBase):
     """ Platform Development Guide section 5.6 """
 
-    def __init__(self, xml_abs_path, enable_path_existence_check=True,
-                 cli_dict=None):
+    def __init__(self, xml_abs_path, enable_path_existence_check=True, cli_dict=None):
         self.root_tags = ['Card']
-        HdlCardPlatformBase.__init__(self, xml_abs_path,
-                                     enable_path_existence_check)
+        HdlCardPlatformBase.__init__(self, xml_abs_path, enable_path_existence_check)
         if enable_path_existence_check:
             self.parse()
 

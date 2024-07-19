@@ -25,7 +25,6 @@ hdl_library_vhd_template = """package {{asset.name}} is
 end package {{asset.name}};
 """
 
-
 class HdlLibrary(AssetBase):
     """ Reference HDL Development Guide section 5.2. A HdlLibrary is
         represented by a directory and knows nothing about the project it

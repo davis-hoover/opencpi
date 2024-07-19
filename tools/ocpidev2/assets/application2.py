@@ -148,7 +148,7 @@ class ApplicationsDirectory(AssetBase):
 
     def get_templates(self, applications=False):
         templates = {}
-        templates['applications.rst'] = apps_dir_rst_template
+        templates['applications.rst'] = apps_dir_rst_template 
         templates['applications.xml'] = g_asset_template
         return templates
 
