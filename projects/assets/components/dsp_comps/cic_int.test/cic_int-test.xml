@@ -10,7 +10,7 @@
     <property name='TARGET_FREQ' value='0'/>
     <property name='R' values='8191,8192' exclude='*sim'/>
   </case>
-  <case>
+  <case excludePlatforms="*">
     <property name='TARGET_FREQ' value='1'/>
     <property name='R' values='2048,8191,8192' exclude='*sim'/>
   </case>

@@ -670,6 +670,32 @@ HdlVivadoPart=$(foreach p,$(HdlChoosePart),$(infox HVP:$p)$(call HdlFullPart_viv
 # For synth rule: load dcp files of platform and app workers.
 define HdlToolDoPlatform_vivado
 
+ifdef $(OCPI_STREAMLINED_BUILD)
+
+$(call BitName,$1,$3,$6): $(call SynthName,$1,$3) $(word 1,$(subst ?, ,$(call VivadoConstraints,$5))) $(wildcard $(HdlPlatformDir_$5)/*.xdc)
+	$(AT)echo -n For $2 on $5 using config $4: Running opt, place, route, timing, and generating the bitstream $$@.
+	$(AT)$(call DoVivado,vivado-streamlined-impl.tcl,$1,-tclargs \
+		assembly_name=$3 \
+		constraints_for_bitsream='$(call AdjustRelative,$(wildcard $(HdlPlatformDir_$5)/*_bit.xdc))' \
+		constraints_for_opt='$(foreach u,$(call VivadoConstraints,$5),$(call AdjustRelative,$u))' \
+		options_for_opt_design='$(call VivadoOptions,opt)' \
+		options_for_place_design='$(call VivadoOptions,place)' \
+		options_for_place_phys_opt_design='$(call VivadoOptions,post_place_phys_opt)' \
+		options_for_report_timing='$(call VivadoOptions,timing)' \
+		options_for_route_design='$(call VivadoOptions,route)' \
+		options_for_route_phys_opt_design='$(call VivadoOptions,post_route_phys_opt)' \
+		options_for_write_bitstream='$(call VivadoOptions,bit)' \
+		part=$(HdlVivadoPart) \
+		pre_opt_hook='$(foreach u,$(call VivadoPreOptHook,$5),$(call AdjustRelative,$u))' \
+		run_place_phys_opt_design=$(if $(VivadoPostPlaceOpt),true,false) \
+		run_opt_power_opt_design=$(if $(VivadoPowerOpt),true,false) \
+		run_route_phys_opt_design=$(if $(VivadoPostRouteOpt),true,false) \
+		,all)
+
+endif
+
+ifndef $(OCPI_STREAMLINED_BUILD)
+
 $(call OptName,$1,$3): $(call SynthName,$1,$3) $(word 1,$(subst ?, ,$(call VivadoConstraints,$5)))
 	$(AT)echo -n For $2 on $5 using config $4: creating optimized DCP file using '"opt_design"'.
 	$(AT)$(call DoVivado,vivado-impl.tcl,$1,-tclargs \
@@ -731,5 +757,7 @@ $(call BitName,$1,$3,$6): $(call RouteName,$1,$3) $(call TimingName,$1,$3) $(wil
 		,bit)
 
 .SECONDARY: $(call BitName,$1,$3,$6) $(call RouteName,$1,$3) $(call TimingName,$1,$3) $(call PlaceName,$1,$3) $(call OptName,$1,$3) $(wildcard $(HdlPlatformDir_$5)/*.xdc)
+
+endif
 
 endef

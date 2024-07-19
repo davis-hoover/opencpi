@@ -457,8 +457,7 @@ class HdlPlatform(Platform):
         if self._target is not None:
             return self._target
         ocpi_root_path = Path(os.getenv('OCPI_ROOT_DIR', Path.cwd()))
-        targets_xml_path = ocpi_root_path.joinpath(
-            'tools', 'include', 'hdl', 'hdl-targets.xml')
+        targets_xml_path = ocpi_root_path.joinpath('tools', 'include', 'hdl', 'hdl-targets.xml')
         tree = ET.parse(str(targets_xml_path))
         root = tree.getroot()
         for vendor in root.findall('vendor'):
@@ -681,6 +680,8 @@ class Asset():
                f'{target.name}']
         if self.type == 'worker':
             cmd.append('--artifacts-only')
+        if self.type in ['test', 'assembly']:
+            cmd.append('--streamlined-build')
         msg = (f'building {self.type} [blue]{self.name}[/blue] for'
                f' {target_type} [cyan]{target.name}[/cyan]')
         result = await utils.exec_cmd(self.name, cmd, 1, 1, log_msg=msg, timeout=timeout)

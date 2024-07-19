@@ -304,7 +304,7 @@ class TestsCollection(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
                              file=make_file,
                              verbose=verbose)
 
-    def build(self, verbose=False, no_assemblies=None, workers_as_needed=False,
+    def build(self, verbose=False, no_assemblies=None, streamlined_build=False, workers_as_needed=False,
               artifacts_only=False, optimize=False, dynamic=False, hdl_target=None, hdl_platform=None,
               rcc_platform=None, hdl_rcc_platform=None, generate=False, export=False, **kwargs):
         """
@@ -317,6 +317,8 @@ class TestsCollection(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
             action.append('generate')
         if no_assemblies:
             action.append('Assemblies=')
+        if streamlined_build:
+            os.environ['OCPI_STREAMLINED_BUILD'] = '1'
         if workers_as_needed:
             os.environ['OCPI_AUTO_BUILD_WORKERS'] = '1'
         if artifacts_only:
