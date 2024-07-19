@@ -33,7 +33,6 @@ from _opencpi.assets.test2 import Test
 from _opencpi.assets.worker2 import Worker
 
 
-
 def ocpidevsignint(sig, frame):
     """ add create-specific arguments as per man ocpidev2-build """
     raise Exception('Ctrl-C stopped execution')
@@ -48,6 +47,7 @@ def add_create_show_build_arguments(parser):
     parser.add_argument('noun', nargs='?', default=None)
     parser.add_argument('name', nargs='?', default=None)
     return parser
+
 
 def add_build_arguments(parser, noun):
     parser.add_argument('--hdl-target', default=[], action='append')
@@ -98,14 +98,16 @@ def add_create_arguments(parser, noun):
     if asset is not None:
         for attr in asset.get_attr_infos():
             if attr.cli is not None:
+                _default = ([] if attr.is_list else
+                            (False if attr.is_bool else '')),
+                _action = ('append' if attr.is_list else
+                           ('store_true' if attr.is_bool else 'store'))
                 if attr.is_bool:
                     parser.add_argument(attr.cli[0], attr.cli[1],
-                            default=([] if attr.is_list else (False if attr.is_bool else '')),
-                            action=('append' if attr.is_list else (('store_true' if attr.is_bool else 'store'))))
+                                        default=_default, action=_action)
                 else:
                     parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
-                            default=([] if attr.is_list else (False if attr.is_bool else '')),
-                            action=('append' if attr.is_list else (('store_true' if attr.is_bool else 'store'))))
+                                        default=_default, action=_action)
     parser = add_create_show_build_arguments(parser)
     return parser
 
@@ -113,6 +115,7 @@ def add_create_arguments(parser, noun):
 def add_delete_arguments(parser, noun):
     # TODO this should probably be done better
     return add_create_arguments(parser, noun)
+
 
 def add_show_arguments(parser, noun):
     """ add create-specific arguments as per man ocpidev2-show """
@@ -235,7 +238,8 @@ def get_cli_dict():
     try:
         args.adjective = ''
         if args.authoring_model in nouns:
-            # first correction - extract proper authoring model and align the rest
+            # first correction - extract proper authoring model and align the
+            # rest
             args.name = args.noun
             args.noun = args.authoring_model
             args.authoring_model = ''
@@ -269,19 +273,20 @@ def get_cli_dict():
     # TODO move below 3 lines to AssetBase once proper checks in place
     if args.verb != 'unittest':
         if get_is_worker(args.noun):
-            if not (('.hdl' in args.name) or \
-                    ('.rcc' in args.name) or \
+            if not (('.hdl' in args.name) or
+                    ('.rcc' in args.name) or
                     ('.ocl' in args.name)):
                 raise Exception(args.name + ' is and invalid worker name')
             args.authoring_model = args.name.split('.')[1]
             args.name = args.name.split('.')[0]
         else:
             if args.name:
-                if not args.name.isidentifier():
-                    msg = '\'' + args.name + '\' is not a valid name'
-                    if args.name.endswith('.test'):
-                        msg += ' (remove .test)'
-                    raise ValueError(msg)
+                if args.noun != 'project':
+                    if not args.name.isidentifier():
+                        msg = '\'' + args.name + '\' is not a valid name'
+                        if args.name.endswith('.test'):
+                            msg += ' (remove .test)'
+                        raise ValueError(msg)
         if not args.help:
             if (args.noun is not None) and (args.noun not in nouns):
                 if args.verb != 'apply':
@@ -298,15 +303,16 @@ def get_cli_dict():
             tmp.d.append(_dir)
     cli_dict = vars(tmp)
     if (cli_dict['noun'] == 'worker'):
-       if ('.' in cli_dict['name']):
-          if not (('.hdl' in cli_dict['name']) or \
-             ('.rcc' in cli_dict['name']) or \
-             ('.ocl' in cli_dict['name'])):
-              raise Exception(cli_dict['name'] + ' is and invalid worker name')
-    if (cli_dict['noun'] == 'test'):
-       if ('.' in cli_dict['name']):
+        if ('.' in cli_dict['name']):
+            if not (('.hdl' in cli_dict['name']) or
+                    ('.rcc' in cli_dict['name']) or
+                    ('.ocl' in cli_dict['name'])):
+                raise Exception(cli_dict['name'] +
+                                ' is and invalid worker name')
+    if cli_dict['noun'] == 'test':
+        if '.' in cli_dict['name']:
             if not ('.test' in cli_dict['name']):
-              raise Exception(cli_dict['name'] + ' is and invalid test name')
+                raise Exception(cli_dict['name'] + ' is and invalid test name')
     # make CLI look like attrs (necessary for create cli verb)
     cli_dict = ({key.replace('_', ''): val for key, val in cli_dict.items()})
     return cli_dict
@@ -315,6 +321,7 @@ def get_cli_dict():
 # TODO delete
 global g_suppress_warn
 
+
 def get_local_project(_dir):
     project = None
     project_dir_abs_path = _dir
@@ -322,15 +329,17 @@ def get_local_project(_dir):
         try:
             project = Project(project_dir_abs_path, True)
             project.discover()
-            Logger().debug('operating in local project ' + project.get_dir_abs_path())
+            Logger().debug('operating in local project ' +
+                           project.get_dir_abs_path())
             break
         except InvalidAssetError:
             project_dir_abs_path = project_dir_abs_path.rsplit('/', 1)[0]
             if len(project_dir_abs_path) <= 1:
                 break
-    #if project == None:
-    #    raise Exception('directory ' + _dir + ' is not within a project')
+    # if project == None:
+    #     raise Exception('directory ' + _dir + ' is not within a project')
     return project
+
 
 def dispatch_verb(cli_dict):
     """ this method implements functionality common across verbs, then
@@ -348,20 +357,21 @@ def dispatch_verb(cli_dict):
         project_registry = None
         for _dir in dirs_to_operate_on:
             local_project = get_local_project(_dir)
-            if ((cli_dict['verb'] == 'create') and (local_project is None)) or \
+            if ((cli_dict['verb'] == 'create') and
+                (local_project is None)) or \
                (cli_dict['verb'] != 'create') and (project_registry is None):
                 project_registry = ProjectRegistry()
-                if not ((cli_dict['verb'] == 'create') and \
+                if not ((cli_dict['verb'] == 'create') and
                    (cli_dict['noun'] != 'registry')):
                     if cli_dict['verb'] == 'show':
                         set_g_suppress_warn(True)
                     project_registry.discover(True, True, local_project)
-            if not ((cli_dict['verb'] == 'create') and \
+            if not ((cli_dict['verb'] == 'create') and
                (cli_dict['noun'] == 'library')):
                 msg = 'performing \'' + cli_dict['verb']
-                if cli_dict['noun'] != None:
+                if cli_dict['noun'] is not None:
                     msg += ' ' + cli_dict['noun']
-                if cli_dict['name'] != None:
+                if cli_dict['name'] is not None:
                     msg += ' ' + cli_dict['name']
                 msg += '\''
                 Logger().log(3, msg + ' within directory ' + _dir)
@@ -387,18 +397,21 @@ def dispatch_verb(cli_dict):
             elif cli_dict['verb'] == 'unregister':
                 project_registry.unregister(cli_dict, _dir)
             else:
-                raise Exception('verb ' + cli_dict['verb'] + ' is not supported')
-            if (cli_dict['verb'] == 'create') and (cli_dict['noun'] == 'library'):
-                # this message is printed below and not above due to weird create
-                # components dir message of same form in project2.py that needs
-                # to happen first
+                raise Exception('verb ' + cli_dict['verb'] +
+                                ' is not supported')
+            if (cli_dict['verb'] == 'create') and \
+               (cli_dict['noun'] == 'library'):
+                # this message is printed below and not above due to weird
+                # create components dir message of same form in project2.py
+                # that needs to happen first
                 msg = 'performing \'' + cli_dict['verb']
-                if cli_dict['noun'] != None:
+                if cli_dict['noun'] is not None:
                     msg += ' ' + cli_dict['noun']
-                if cli_dict['name'] != None:
+                if cli_dict['name'] is not None:
                     msg += ' ' + cli_dict['name']
                 msg += '\''
                 Logger().log(3, msg + ' within directory ' + _dir)
+
 
 def main():
     ret = 0
