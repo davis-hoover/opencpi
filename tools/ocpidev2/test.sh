@@ -395,7 +395,7 @@ ocpidev2 create library devices
 ocpidev2 create library adapters
 popd
 pushd assets2/hdl/cards/specs
-ocpidev2 create hdl card fmcomms_2_3_hpc
+ocpidev2 create hdl card fmcomms_2_3_hpc --type fmc_hpc
 popd
 pushd assets2
 ocpidev2 create hdl primitive core temac_v6 -d hdl/primitives
