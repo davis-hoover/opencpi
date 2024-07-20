@@ -28,7 +28,7 @@ from _opencpi.assets.project2 import Project
 # below imports only necessary for get_attr_infos() calls
 from _opencpi.assets.component2 import Component
 from _opencpi.assets.library2 import ComponentLibrary
-from _opencpi.assets.platform2 import HdlPlatform
+from _opencpi.assets.platform2 import HdlPlatform, HdlCard
 from _opencpi.assets.primitive2 import HdlLibrary
 from _opencpi.assets.test2 import Test
 from _opencpi.assets.worker2 import Worker
@@ -63,6 +63,10 @@ def add_create_arguments(parser, noun):
         parser.add_argument('--register', default=False, action='store_true')
     if noun == 'library':
         asset = ComponentLibrary('', False, None)
+    if noun == 'card':
+        print('abc' + noun)
+        asset = HdlCard('', False, None)
+        print('abc' + asset.name)
     if noun == 'component':
         asset = Component('', False, None)
         parser.add_argument('-t', '--create-test', default=False,
@@ -160,7 +164,7 @@ def get_cli_noun_verb_tuple(argv):
     noun = ''
     state = 0
     verbs = ['build', 'clean', 'create', 'delete', 'show', 'run']
-    singular_nouns = ['application', 'adapter', 'component', 'device',
+    singular_nouns = ['application', 'adapter', 'card', 'component', 'device',
                       'library', 'test', 'primitive', 'project', 'platform',
                       'worker']
     plural_nouns = ['applications', 'adapters', 'components', 'devices',

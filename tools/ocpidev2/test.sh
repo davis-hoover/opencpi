@@ -181,7 +181,7 @@ ocpidev2 create library util_comps -d assets2/components
 ocpidev2 create library cards -d assets2/hdl
 ocpidev2 create library devices -d assets2/hdl
 ocpidev2 create library adapters -d assets2/hdl
-ocpidev2 create hdl card fmcomms_2_3_hpc -d assets2/hdl/cards/specs
+ocpidev2 create hdl card fmcomms_2_3_hpc -d assets2/hdl/cards/specs --type fmc_hpc
 ocpidev2 create hdl primitive core temac_v6 -d assets2/hdl/primitives
 rm -rf core2
 rm -rf assets2

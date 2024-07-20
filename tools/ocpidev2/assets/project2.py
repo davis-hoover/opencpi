@@ -331,8 +331,9 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             msg += '<project>/hdl/cards/specs, set -d, or the working '
             msg += 'directory, to <project>/hdl/cards/specs)'
             raise Exception(msg)
-        xml_abs_path = self.get_dir_abs_path() + '/hdl/cards/'
+        xml_abs_path = self.get_dir_abs_path() + '/hdl/cards/specs/'
         xml_abs_path += cli_dict['name'] + '.xml'
+        print(cli_dict)
         return HdlCard(xml_abs_path, False, cli_dict)
 
     def get_component_object_from_cli(self, cli_dict, _dir):
