@@ -30,11 +30,17 @@ g_libraries_mk = False
 g_asset_template = """<?xml version="1.0"?>\n<{{asset.root_tags[0]}}{% for key,val in asset.attrs.items() %}{% if val != '' and val != [] %} {{key}}=\'{% if val.__class__.__name__ == 'list' %}{% for entry in val %}{{entry}}{% if not loop.last %} {% endif %}{% endfor %}{% else %}{{val}}{% endif %}\'{% endif %}{% endfor %}/>\n\n"""  # nopep8
 g_hdl_core_mk = False
 g_suppress_warn = False
+g_log_level = -1
 
 
 def set_g_suppress_warn(val):
     global g_suppress_warn
     g_suppress_warn = val
+
+
+def set_g_log_level(val):
+    global g_log_level
+    g_log_level = val
 
 
 def log_pass_fail(msg, passed):
@@ -113,6 +119,8 @@ class Environment():
         if ocpi_log_level is None:
             ocpi_log_level = 0
         self.ocpi_log_level = int(ocpi_log_level)
+        if g_log_level >= 0:
+            self.ocpi_log_level = g_log_level
         # below line is CDG section 14.8
         self.ocpi_project_path = []
         ocpi_project_path = os.environ.get('OCPI_PROJECT_PATH')

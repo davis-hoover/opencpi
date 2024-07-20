@@ -103,7 +103,7 @@ class HdlPlatform(HdlCardPlatformBase):
         is_list = True
         ret.append(AttributeInfo('SourceFiles', is_list))
         ret.append(AttributeInfo('Libraries',
-                   cli=('-l', '--libraries'), is_int=True))
+                   cli=('-M', '--libraries'), is_int=True))
         ret.append(AttributeInfo('Configurations',
                    cli=('-c', '--configurations'), is_int=True))
         return ret

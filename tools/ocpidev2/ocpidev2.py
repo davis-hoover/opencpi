@@ -88,7 +88,7 @@ def add_create_arguments(parser, noun):
         group.add_argument('-p', '--project', default=False,
                            action='store_true')
         group.add_argument('--hdl-library', nargs='?', default='')
-        group.add_argument('-l', '--library', default=None)
+        group.add_argument('-M', '--library', default=None)
     if noun == 'primitive':
         asset = HdlLibrary('', False, None)
         parser.add_argument('-p', '--project', default=False,
@@ -147,7 +147,7 @@ def add_run_arguments(parser, noun):
                         action='store_true')
     group = parser.add_mutually_exclusive_group()
     group.add_argument('--hdl-library', nargs='?', default='')
-    group.add_argument('-l', '--library', default=None)
+    group.add_argument('-M', '--library', default=None)
     parser.add_argument('--accumulate-errors', default=False,
                         action='store_true')
     parser.add_argument('--case', default=[], action='append')
@@ -200,6 +200,7 @@ def get_arg_parser():
     parser.add_argument('-d', default=[], action='append')
     parser.add_argument('-h', '--help', action='store_true')
     parser.add_argument('-v', '--verbose', action='store_true')
+    parser.add_argument('-l', '--log-level', nargs='?', default=0, type=int)
     # only intended to be used for tab completion
     parser.add_argument('--suppress-warn', action='store_true')
     parser.add_argument('verb', nargs='?', default='')
@@ -448,6 +449,8 @@ def main():
         cli_dict = get_cli_dict()
         if cli_dict['suppresswarn']:
             set_g_suppress_warn(True)
+        if cli_dict['loglevel']:
+            set_g_log_level(cli_dict['loglevel'])
         Logger().debug('cli_dict : ' + str(cli_dict))
         dispatch_verb(cli_dict)
     except Exception as exception:

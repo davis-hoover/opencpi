@@ -413,7 +413,7 @@ ocpidev2 -d assets show applications
 ocpidev2 -d assets show -d core applications -d platform -v
 #ocpidev2 -d assets show -d core applications -d platform -v -l 8
 #ocpidev2 -d assets show -d core applications -d platform -v --log-level 8
-#ocpidev2 -d assets show -d core applications -d platform -v -l 10
+ocpidev2 -d assets show -d core applications -d platform -v -l 10
 ocpidev2 show component drc
 ocpidev2 show component drc -v
 ocpidev2 show component drc --verbose
