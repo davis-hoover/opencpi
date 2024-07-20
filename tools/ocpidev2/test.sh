@@ -411,8 +411,8 @@ ocpidev2 show applications -d assets
 ocpidev2 show -d assets applications
 ocpidev2 -d assets show applications
 ocpidev2 -d assets show -d core applications -d platform -v
-#ocpidev2 -d assets show -d core applications -d platform -v -l 8
-#ocpidev2 -d assets show -d core applications -d platform -v --log-level 8
+ocpidev2 -d assets show -d core applications -d platform -v -l 8
+ocpidev2 -d assets show -d core applications -d platform -v --log-level 8
 ocpidev2 -d assets show -d core applications -d platform -v -l 10
 ocpidev2 show component drc
 ocpidev2 show component drc -v
@@ -427,9 +427,9 @@ ocpidev2 show components -d assets
 ocpidev2 show -d assets components
 ocpidev2 -d assets show components
 ocpidev2 -d assets show -d core components -d platform -v
-#ocpidev2 -d assets show -d core components -d platform -v -l 8
-#ocpidev2 -d assets show -d core components -d platform -v --log-level 8
-#ocpidev2 -d assets show -d core components -d platform -v -l 10
+ocpidev2 -d assets show -d core components -d platform -v -l 8
+ocpidev2 -d assets show -d core components -d platform -v --log-level 8
+ocpidev2 -d assets show -d core components -d platform -v -l 10
 #ocpidev2 show hdl assembly fsk_modem
 #ocpidev2 show hdl assembly fsk_modem -v
 #ocpidev2 show hdl assembly fsk_modem --verbose
