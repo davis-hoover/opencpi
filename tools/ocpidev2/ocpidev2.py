@@ -29,6 +29,7 @@ from _opencpi.assets.project2 import Project
 from _opencpi.assets.component2 import Component
 from _opencpi.assets.library2 import ComponentLibrary
 from _opencpi.assets.platform2 import HdlPlatform
+from _opencpi.assets.primitive2 import HdlLibrary
 from _opencpi.assets.test2 import Test
 from _opencpi.assets.worker2 import Worker
 
@@ -42,19 +43,14 @@ def get_is_worker(noun):
     return (noun == 'worker') or (noun == 'device') or (noun == 'adapter')
 
 
-def add_create_show_build_arguments(parser):
-    parser.add_argument('authoring_model', nargs='?', default='')
-    parser.add_argument('noun', nargs='?', default=None)
-    parser.add_argument('name', nargs='?', default=None)
-    return parser
-
-
 def add_build_arguments(parser, noun):
     parser.add_argument('--hdl-target', default=[], action='append')
     parser.add_argument('--hdl-platform', default=[], action='append')
     parser.add_argument('--rcc-platform', default=[], action='append')
     parser.add_argument('-j', nargs='?', type=int, default=1)
-    parser = add_create_show_build_arguments(parser)
+    parser.add_argument('authoring_model', nargs='?', default='')
+    parser.add_argument('noun', nargs='?', default=None)
+    parser.add_argument('name', nargs='?', default=None)
     return parser
 
 
@@ -76,18 +72,21 @@ def add_create_arguments(parser, noun):
     if noun == 'test':
         asset = Test('', False, None)
     if noun == 'application':
+        asset = Application('', False, None)
         group = parser.add_mutually_exclusive_group()
         group.add_argument('-X', '--xml-app', default=False,
                            action='store_true')
         group.add_argument('-x', '--xml-dir-app', default=False,
                            action='store_true')
     if noun == 'protocol':
+        asset = Protocol('', False, None)
         group = parser.add_mutually_exclusive_group()
         group.add_argument('-p', '--project', default=False,
                            action='store_true')
         group.add_argument('--hdl-library', nargs='?', default='')
         group.add_argument('-l', '--library', default=None)
     if noun == 'primitive':
+        asset = HdlLibrary('', False, None)
         parser.add_argument('-p', '--project', default=False,
                             action='store_true')
     if noun == 'platform':
@@ -112,7 +111,10 @@ def add_create_arguments(parser, noun):
                               ('store_true' if attr.is_bool else 'store')
                     parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
                                         default=_default, action=_action)
-    parser = add_create_show_build_arguments(parser)
+    parser.add_argument('authoring_model', nargs='?', default='')
+    parser.add_argument('noun', nargs='?', default=None)
+    parser.add_argument('librarytype', nargs='?', default=None)
+    parser.add_argument('name', nargs='?', default=None)
     return parser
 
 
@@ -128,7 +130,9 @@ def add_show_arguments(parser, noun):
     group.add_argument('--simple', default=False, action='store_true')
     group.add_argument('--table', default=False, action='store_true')
     group.add_argument('--json', default=False, action='store_true')
-    parser = add_create_show_build_arguments(parser)
+    parser.add_argument('authoring_model', nargs='?', default='')
+    parser.add_argument('noun', nargs='?', default=None)
+    parser.add_argument('name', nargs='?', default=None)
     return parser
 
 
@@ -151,6 +155,42 @@ def add_run_arguments(parser, noun):
     return parser
 
 
+def get_cli_noun_verb_tuple(argv):
+    verb = ''
+    noun = ''
+    state = 0
+    verbs = ['build', 'clean', 'create', 'delete', 'show', 'run']
+    singular_nouns = ['application', 'adapter', 'component', 'device',
+                      'library', 'test', 'primitive', 'project', 'platform',
+                      'worker']
+    plural_nouns = ['applications', 'adapters', 'components', 'devices',
+                    'libraries', 'tests', 'primitives', 'projects',
+                    'platforms', 'workers']
+    special_nouns = ['primitive', 'library', 'core']
+    for idx in range(len(argv)):
+        if (state == 0) and (argv[idx] in verbs):
+            verb = argv[idx]
+            state = 1
+        elif (state == 1):
+            if argv[idx] in ['hdl', 'rcc', 'ocl']:
+                pass  # authoring_model = argv[idx]
+            elif argv[idx] in ['primitive', 'primitives']:
+                noun = argv[idx]
+                state = 2
+            elif (argv[idx] == 'library') and (argv[idx-1] == 'primitive'):
+                pass
+            elif (argv[idx] == 'libraries') and (argv[idx-1] == 'primitive'):
+                pass
+            elif (argv[idx] == 'core') and (argv[idx-1] == 'primitive'):
+                pass
+            elif (argv[idx] == 'cores') and (argv[idx-1] == 'primitive'):
+                pass
+            elif argv[idx] in (singular_nouns + plural_nouns):
+                noun = argv[idx]
+                state = 2
+    return (noun, verb)
+
+
 def get_arg_parser():
     parser = argparse.ArgumentParser(description='', add_help=False)
     parser.add_argument('-d', default=[], action='append')
@@ -159,38 +199,14 @@ def get_arg_parser():
     # only intended to be used for tab completion
     parser.add_argument('--suppress-warn', action='store_true')
     parser.add_argument('verb', nargs='?', default='')
-    noun = ''
-    if 'adapter' in sys.argv:
-        noun = 'adapter'
-    if 'application' in sys.argv:
-        noun = 'application'
-    if 'component' in sys.argv:
-        noun = 'component'
-    if 'device' in sys.argv:
-        noun = 'device'
-    if 'library' in sys.argv:
-        noun = 'library'
-    if 'test' in sys.argv:
-        noun = 'test'
-    if 'project' in sys.argv:
-        noun = 'project'
-    if 'protocol' in sys.argv:
-        noun = 'protocol'
-    if 'worker' in sys.argv:
-        noun = 'worker'
-    if 'platform' in sys.argv:
-        # TODO handle this better...
-        if 'component' in sys.argv:
-            noun = 'component'
-        else:
-            noun = 'platform'
-    if 'build' in sys.argv:
+    (noun, verb) = get_cli_noun_verb_tuple(sys.argv)
+    if verb == 'build':
         parser = add_build_arguments(parser, noun)
-    elif 'create' in sys.argv:
+    elif verb == 'create':
         parser = add_create_arguments(parser, noun)
-    elif 'show' in sys.argv:
+    elif verb == 'show':
         parser = add_show_arguments(parser, noun)
-    elif 'run' in sys.argv:
+    elif verb == 'run':
         parser = add_run_arguments(parser, noun)
     else:
         parser.add_argument('noun', nargs='?', default=None)
@@ -247,6 +263,11 @@ def get_cli_dict():
             args.name = args.noun
             args.noun = args.authoring_model
             args.authoring_model = ''
+        if args.name is None:
+            if args.librarytype != '':
+                args.name = args.librarytype
+                del args.librarytype
+        print(str(args))
         # Logger().debug('args : ' + str(args))
         if (args.name in nouns) and args.noun.startswith('primitive'):
             if args.name == 'core':

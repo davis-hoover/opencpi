@@ -29,7 +29,7 @@ from _opencpi.assets.library2 import SpecsDirectory, Discoverer
 from _opencpi.assets.library2 import ComponentLibrary
 from _opencpi.assets.library2 import ComponentLibrariesDirectory
 from _opencpi.assets.library2 import test_ComponentLibrary
-from _opencpi.assets.primitive2 import HdlLibrary
+from _opencpi.assets.primitive2 import HdlLibrary, HdlCore
 from _opencpi.assets.assembly2 import HdlAssembly
 from _opencpi.assets.platform2 import HdlSlot, HdlCard
 from _opencpi.assets.platform2 import HdlPlatform, RccPlatform
@@ -449,10 +449,20 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         return asset
 
     def get_primitive_object_from_cli(self, cli_dict, _dir):
-        # TODO self.handle_hdl_library()
-        dir_abs_path = self.get_dir_abs_path() + '/hdl/primitives/' + \
-                       cli_dict['name']
-        return HdlLibrary(dir_abs_path, False, cli_dict)
+        if _dir != self.get_dir_abs_path() + '/hdl/primitives':
+            msg = cli_dict['noun'] + ' ' + cli_dict['name']
+            msg += ' can not exist within ' + _dir
+            msg += ' (\'' + cli_dict['name'] + '\' can only exist '
+            msg += 'within <project>/hdl/primitives directory, set -d, or the '
+            msg += 'working directory, to <project>/hdl/primitives)'
+            raise Exception(msg)
+        dir_abs_path = self.get_dir_abs_path() + '/hdl/primitives/'
+        dir_abs_path += cli_dict['name']
+        if cli_dict['librarytype'] == 'core':
+            asset = HdlCore(dir_abs_path, False, cli_dict)
+        else:
+            asset = HdlLibrary(dir_abs_path, False, cli_dict)
+        return asset
 
     def get_protocol_object_from_cli(self, cli_dict, _dir):
         # TODO self.handle_library()
@@ -755,7 +765,14 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             for component_library in self.component_libraries:
                 assets.extend(component_library.components)
         if _type == HdlLibrary:
-            assets.extend(self.hdl_primitives)
+            for prim in self.hdl_primitives:
+                # TODO change to 'hdl primitive library'
+                if prim.get_type() == 'hdl primitive':
+                    assets.append(prim)
+        if _type == HdlCore:
+            for prim in self.hdl_primitives:
+                if prim.get_type() == 'hdl primitive core':
+                    assets.append(prim)
         if _type == ComponentLibrary:
             assets.extend(self.component_libraries)
         if _type == HdlSlot:
@@ -788,8 +805,6 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             types.append(HdlCard)
         if cli_dict['noun'].startswith('component'):
             types.append(Component)
-        if cli_dict['noun'].startswith('core'):
-            types.append(HdlLibrary)
         if cli_dict['noun'].startswith('librar'):
             types.append(ComponentLibrary)
         if cli_dict['noun'].startswith('slot'):
@@ -802,7 +817,13 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                (cli_dict['authoringmodel'] == 'rcc'):
                 types.append(RccPlatform)
         if cli_dict['noun'].startswith('primitive'):
-            types.append(HdlLibrary)
+            if cli_dict['adjective'] == 'core':
+                types.append(HdlCore)
+            elif cli_dict['adjective'] == 'library':
+                types.append(HdlLibrary)
+            else:
+                types.append(HdlCore)
+                types.append(HdlLibrary)
         if cli_dict['noun'].startswith('project'):
             types.append(Project)
         if cli_dict['noun'].startswith('worker'):
@@ -843,13 +864,6 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                             containing_path.endswith(hdlp) or \
                             containing_path.endswith('hdl/platforms')
                     if (not do_hdl_check) or (do_hdl_check and is_hdl):
-                        if cli_dict['noun'].startswith('primitive'):
-                            if cli_dict['adjective'].startswith('core'):
-                                if not asset.is_core:
-                                    continue
-                            elif cli_dict['adjective'].startswith('librar'):
-                                if asset.is_core:
-                                    continue
                         pid = str(self.get_package_id())
                         if (_type == Component) or (_type == Worker) or \
                            (_type == ComponentLibrary):

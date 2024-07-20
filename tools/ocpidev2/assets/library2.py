@@ -27,7 +27,7 @@ from _opencpi.assets.worker2 import test_Worker, test_RccAssembly
 from _opencpi.assets.platform2 import HdlPlatform, RccPlatform
 from _opencpi.assets.platform2 import test_HdlPlatform, test_HdlCard
 from _opencpi.assets.assembly2 import HdlAssembly, test_HdlAssembly
-from _opencpi.assets.primitive2 import HdlLibrary, test_HdlLibrary
+from _opencpi.assets.primitive2 import HdlLibrary, HdlCore, test_HdlLibrary
 from _opencpi.assets.application2 import Application
 from _opencpi.assets.test2 import Test
 
@@ -114,6 +114,8 @@ class Discoverer():
             self.applications.append(asset)
         if asset.get_type() == 'hdl primitive':
             self.hdl_primitives.append(asset)
+        if asset.get_type() == 'hdl primitive core':
+            self.hdl_primitives.append(asset)
         if asset.get_type() == 'hdl assembly':
             self.hdl_assemblies.append(asset)
         if asset.get_type() == 'hdl slot':
@@ -143,6 +145,23 @@ class Discoverer():
         return ret
 
     def discover_dir_assets(self, parent, allowlist=None, platform=False):
+        for dir_abs_path in self.get_potential_asset_dir_abs_paths(parent):
+            try:
+                assets = []
+                if parent == 'hdl/primitives':
+                    assets.append(HdlCore(dir_abs_path))
+                for asset in assets:
+                    if allowlist is not None:
+                        # TODO is this pre-2.0???
+                        allowlist = [name.split('.')[0] for name in allowlist]
+                    if (allowlist is None) or (asset.name in allowlist):
+                        self.append_discovered_asset(asset)
+            except InvalidAssetError as err:
+                if (parent != 'applications') and \
+                   (not dir_abs_path.endswith('.test')):
+                    Logger().warn('skipping ' + str(err))
+                pass
+
         for dir_abs_path in self.get_potential_asset_dir_abs_paths(parent):
             try:
                 assets = []
@@ -340,6 +359,11 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         global g_libraries_mk
         if g_libraries_mk:
             g_libraries_mk = False
+
+    def create(self):
+        AssetBase.create(self)
+        if self.name == 'cards':
+            System('mkdir -p ' + self.get_dir_abs_path() + '/specs')
 
     def discover(self, allowlist, platform=False):
         self.discover_components()

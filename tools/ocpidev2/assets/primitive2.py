@@ -34,8 +34,6 @@ class HdlLibrary(AssetBase):
     def __init__(self, dir_abs_path, enable_path_existence_check=True,
                  cli_dict=None):
         self.root_tags = ['HdlLibrary']  # HDG section 5.2
-        self.root_tags += ['HdlCore']  # HDG section 5.3
-        self.is_core = False  # HDG section 5.3
         AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
         self.source_files = []  # HDG section 5.2.1
         if enable_path_existence_check:
@@ -54,8 +52,10 @@ class HdlLibrary(AssetBase):
         return templates
 
     def parse(self, cli_dict=None):
-        # TODO remove assignment of parse() result which is bad hack
-        self.is_core = AssetBase.parse(self, cli_dict)
+        # TODO remove assesment of parse() result which is bad hack
+        if AssetBase.parse(self, cli_dict):
+            # because not a HdlCore
+            self.raise_invalid_asset_error()
 
     def get_paths_to_parse(self):
         paths = []
@@ -71,10 +71,65 @@ class HdlLibrary(AssetBase):
         ret = []
         for key in ['SourceFiles', 'Libraries']:
             ret.append(AttributeInfo(key, is_list=True))
+        ret.append(AttributeInfo('NoLibraries',
+                   cli=('-H', '--no-depend'), is_bool=True))
         return ret
 
     def get_type(self):
+        # TODO change to 'hdl primitive library'
         return 'hdl primitive'
+
+
+class HdlCore(AssetBase):
+    """ Reference HDL Development Guide section 5.3. A HdlCore is
+        represented by a directory and knows nothing about the project it
+        is in or its package ID. """
+
+    def __init__(self, dir_abs_path, enable_path_existence_check=True,
+                 cli_dict=None):
+        self.root_tags = ['HdlCore']  # HDG section 5.3
+        AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
+        self.source_files = []  # HDG section 5.2.1
+        if enable_path_existence_check:
+            self.parse()
+
+    def get_attr_infos(self):
+        ret = []
+        for key in ['Libraries']:
+            ret.append(AttributeInfo(key, is_list=True))
+        return ret
+
+    def get_templates(self):
+        templates = {}
+        templates[self.name + '_pkg.vhd'] = hdl_library_vhd_template
+        templates[self.name + '.xml'] = g_asset_template
+        return templates
+
+    def parse(self, cli_dict=None):
+        # TODO remove assesment of parse() result which is bad hack
+        if not AssetBase.parse(self, cli_dict):
+            self.raise_invalid_asset_error()
+
+    def get_paths_to_parse(self):
+        paths = []
+        # start pre-2.0 opencpi
+        paths += [self.abs_path + '/Makefile']
+        # intentionally put xml last so that its attributes take precedence
+        # end pre-2.0 opencpi
+        paths.append(self.get_xml_abs_path())
+        paths = self.get_list_of_existing_abs_paths_to_parse(paths)
+        return paths
+
+    def get_attr_infos(self):
+        ret = []
+        for key in ['Top', 'PrebuiltCore']:
+            ret.append(AttributeInfo(key))
+        for key in ['OnlyTargets', 'Libraries', 'Cores']:
+            ret.append(AttributeInfo(key, is_list=True))
+        return ret
+
+    def get_type(self):
+        return 'hdl primitive core'
 
 
 def test_HdlLibrary(ret):
