@@ -221,9 +221,8 @@ class ProjectRegistry():
     def get_assets(self, _dir):
         assets = []
         for project in self.projects:
-            asset = project.get_asset_within(_dir)
-            if asset is not None:
-                assets.append(asset)
+            if (_dir + '/') in (project.get_dir_abs_path() + '/'):
+                assets.extend(project.get_assets_within(_dir))
         return assets
 
     def get_project(self, cli_dict, _dir):
@@ -627,7 +626,7 @@ class ProjectRegistry():
                                                        gnu_make_target_str,
                                                        tool):
         for project in self.projects:
-            if project.get_asset_within(hdl_assembly.abs_path) is not None:
+            if project.get_assets_within(hdl_assembly.abs_path) != []:
                 local_project = project
                 break
         for hdl_platform in hdl_platforms:

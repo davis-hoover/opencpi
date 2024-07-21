@@ -59,7 +59,7 @@ ocpidev2 create component zccons -d core2/components/specs
 ocpidev2 create component zcloop -d core2/components/specs
 ocpidev2 create component zcprod -d core2/components/specs
 ocpidev2 create component emulator -d core2/components
-ocpidev2 create component bias -d core2/components
+ocpidev2 create component bias -d core2/components --create-test
 ocpidev2 create component clock_gen -d core2/specs
 ocpidev2 create component gp_in -d core2/specs
 ocpidev2 create component gp_out -d core2/specs
@@ -98,7 +98,6 @@ ocpidev2 create worker Consumer.rcc -d core2/components --language c++ --version
 ocpidev2 create worker Loopback.rcc -d core2/components --language c++ --version 2
 ocpidev2 create worker Producer.rcc -d core2/components --language c++ --version 2
 ocpidev2 create test backpressure -d core2/components
-ocpidev2 create test bias -d core2/components
 ocpidev2 create test metadata_stressor -d core2/components
 ocpidev2 create hdl slot fmc_hpc -d core2/hdl/cards/specs
 ocpidev2 create hdl slot fmc_lpc -d core2/hdl/cards/specs
@@ -239,7 +238,7 @@ ocpidev2 create component zcprod
 popd
 pushd core2/components
 ocpidev2 create component emulator
-ocpidev2 create component bias
+ocpidev2 create component bias --create-test
 ocpidev2 create component clock_gen
 ocpidev2 create component gp_in
 ocpidev2 create component gp_out
@@ -278,7 +277,6 @@ ocpidev2 create worker Consumer.rcc --language c++ --version 2
 ocpidev2 create worker Loopback.rcc --language c++ --version 2
 ocpidev2 create worker Producer.rcc --language c++ --version 2
 ocpidev2 create test backpressure
-ocpidev2 create test bias
 ocpidev2 create test metadata_stressor
 popd
 pushd core2

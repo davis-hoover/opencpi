@@ -205,25 +205,16 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                     break
         return ret
 
-    def get_asset_within(self, abs_path):
-        """ get asset whose abs_path is within the abs_path and return None
-            if not found """
-        ret = None
+    def get_assets_within(self, abs_path):
+        """ get list of assets whose abs_path is within the abs_path """
+        ret = []
+        lists = [self.applications, self.hdl_primitives, self.hdl_assemblies]
         for component_library in self.component_libraries:
-            for asset in component_library.workers:
-                if (asset.get_xml_abs_path() + '/') in (abs_path + '/'):
-                    ret = asset
-                elif asset.get_dir_abs_path() == abs_path:
-                    ret = asset
-        for asset in self.applications:
-            if (asset.get_dir_abs_path() + '/') in (abs_path + '/'):
-                ret = asset
-        for asset in self.hdl_primitives:
-            if (asset.get_dir_abs_path() + '/') in (abs_path + '/'):
-                ret = asset
-        for asset in self.hdl_assemblies:
-            if (asset.get_dir_abs_path() + '/') in (abs_path + '/'):
-                ret = asset
+            lists.append(component_library.workers)
+        for asset_list in lists:
+            for asset in asset_list:
+                if (abs_path + '/') in (abs_path + '/'):
+                    ret.append(asset)
         return ret
 
     def get_paths_to_parse(self):
@@ -584,9 +575,10 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                 msg += 'highly recommended'
                 Logger().warn(msg)
         asset.create()
-        # TODO comment back in
-        # if cli_dict['createtest']:
-        #     self.get_test_object_from_cli(cli_dict, _dir).create()
+        if ('createtest' in cli_dict.keys()) and cli_dict['createtest']:
+            test_dict = {'name': asset.name, 'component': asset.name,
+                         'usehdlfileio': False}
+            self.get_test_object_from_cli(test_dict, _dir).create()
 
     def delete_asset(self, cli_dict, _dir):
         self.get_asset_object_from_cli(cli_dict, _dir).delete()
