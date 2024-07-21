@@ -329,27 +329,31 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
     def get_component_object_from_cli(self, cli_dict, _dir):
         xml_abs_path = _dir + '/'
         if _dir != (self.get_dir_abs_path() + '/specs'):
-            found = False
-            for component_library in self.component_libraries:
-                if _dir == component_library.get_dir_abs_path():
-                    xml_abs_path += cli_dict['name'] + '.comp/'
-                    found = True
-                    break
-                elif _dir == (component_library.get_dir_abs_path() + '/specs'):
-                    Logger().warn('for component library creation, the '
-                                  'working directory (or, if specified, the '
-                                  '-d option) is recommended to be the '
-                                  'component library location <library>, and '
-                                  'not <library>/specs')
-                    found = True
-                    break
-            if not found:
-                msg = 'component \'' + cli_dict['name']
-                msg += '\' can not exist within ' + _dir
-                msg += ' (it is recommend to set the working directory or -d '
-                msg += 'to a <project>/specs or a component <library> '
-                msg += 'directory)'
-                raise Exception(msg)
+            if cli_dict['project']:
+                xml_abs_path = self.get_dir_abs_path() + '/specs/'
+            else:
+                found = False
+                for component_library in self.component_libraries:
+                    if _dir == component_library.get_dir_abs_path():
+                        xml_abs_path += cli_dict['name'] + '.comp/'
+                        found = True
+                        break
+                    elif _dir == (component_library.get_dir_abs_path() +
+                                  '/specs'):
+                        Logger().warn('for component library creation, the '
+                                      'working directory (or, if specified, '
+                                      'the -d option) is recommended to be '
+                                      'the component library location '
+                                      '<library>, and not <library>/specs')
+                        found = True
+                        break
+                if not found:
+                    msg = 'component \'' + cli_dict['name']
+                    msg += '\' can not exist within ' + _dir
+                    msg += ' (it is recommend to set the working directory or '
+                    msg += '-d to a <project>/specs or a component <library> '
+                    msg += 'directory)'
+                    raise Exception(msg)
         xml_abs_path += cli_dict['name'] + '-comp.xml'
         return Component(xml_abs_path, False, cli_dict)
 

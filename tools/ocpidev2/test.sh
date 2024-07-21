@@ -182,8 +182,14 @@ ocpidev2 create library devices -d assets2/hdl
 ocpidev2 create library adapters -d assets2/hdl
 ocpidev2 create hdl card fmcomms_2_3_hpc -d assets2/hdl/cards/specs --type fmc_hpc
 ocpidev2 create hdl primitive core temac_v6 -d assets2/hdl/primitives
+ocpidev2 create project ocpidev2_test_project
+ocpidev2 create hdl primitive library myprim -d ocpidev2_test_project/hdl/primitives
+pushd ocpidev2_test_project/hdl/primitives
+ocpidev2 create component hello --project
+popd
 rm -rf core2
 rm -rf assets2
+rm -rf ocpidev2_test_project
 ocpidev2 create project core2 --package-id ocpi.core2
 pushd core2
 ocpidev2 create library components
