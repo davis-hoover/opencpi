@@ -43,14 +43,20 @@ def get_is_worker(noun):
     return (noun == 'worker') or (noun == 'device') or (noun == 'adapter')
 
 
-def add_build_arguments(parser, noun):
+def add_build_create_show_arguments(parser):
+    parser.add_argument('authoring_model', nargs='?', default='')
+    parser.add_argument('noun', nargs='?', default=None)
+    parser.add_argument('librarytype', nargs='?', default=None)
+    parser.add_argument('name', nargs='?', default=None)
+    return parser
+
+
+def add_build_arguments(parser):
     parser.add_argument('--hdl-target', default=[], action='append')
     parser.add_argument('--hdl-platform', default=[], action='append')
     parser.add_argument('--rcc-platform', default=[], action='append')
     parser.add_argument('-j', nargs='?', type=int, default=1)
-    parser.add_argument('authoring_model', nargs='?', default='')
-    parser.add_argument('noun', nargs='?', default=None)
-    parser.add_argument('name', nargs='?', default=None)
+    parser = add_build_create_show_arguments(parser)
     return parser
 
 
@@ -64,9 +70,7 @@ def add_create_arguments(parser, noun):
     if noun == 'library':
         asset = ComponentLibrary('', False, None)
     if noun == 'card':
-        print('abc' + noun)
         asset = HdlCard('', False, None)
-        print('abc' + asset.name)
     if noun == 'component':
         asset = Component('', False, None)
         parser.add_argument('-t', '--create-test', default=False,
@@ -115,28 +119,23 @@ def add_create_arguments(parser, noun):
                               ('store_true' if attr.is_bool else 'store')
                     parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',
                                         default=_default, action=_action)
-    parser.add_argument('authoring_model', nargs='?', default='')
-    parser.add_argument('noun', nargs='?', default=None)
-    parser.add_argument('librarytype', nargs='?', default=None)
-    parser.add_argument('name', nargs='?', default=None)
+    parser = add_build_create_show_arguments(parser)
     return parser
 
 
-def add_delete_arguments(parser, noun):
+def add_delete_arguments(parser):
     # TODO this should probably be done better
-    return add_create_arguments(parser, noun)
+    return add_create_arguments(parser, '')
 
 
-def add_show_arguments(parser, noun):
+def add_show_arguments(parser):
     """ add create-specific arguments as per man ocpidev2-show """
     parser.add_argument('--global-scope', default=False, action='store_true')
     group = parser.add_mutually_exclusive_group()
     group.add_argument('--simple', default=False, action='store_true')
     group.add_argument('--table', default=False, action='store_true')
     group.add_argument('--json', default=False, action='store_true')
-    parser.add_argument('authoring_model', nargs='?', default='')
-    parser.add_argument('noun', nargs='?', default=None)
-    parser.add_argument('name', nargs='?', default=None)
+    parser = add_build_create_show_arguments(parser)
     return parser
 
 
@@ -164,19 +163,26 @@ def get_cli_noun_verb_tuple(argv):
     noun = ''
     state = 0
     verbs = ['build', 'clean', 'create', 'delete', 'show', 'run']
-    singular_nouns = ['application', 'adapter', 'card', 'component', 'device',
-                      'library', 'test', 'primitive', 'project', 'platform',
-                      'worker']
-    plural_nouns = ['applications', 'adapters', 'components', 'devices',
-                    'libraries', 'tests', 'primitives', 'projects',
+    singular_nouns = ['application', 'adapter', 'assembly', 'card',
+                      'component', 'device', 'library', 'test', 'primitive',
+                      'project', 'platform', 'worker']
+    plural_nouns = ['applications', 'adapters', 'assemblies', 'components',
+                    'devices', 'libraries', 'tests', 'primitives', 'projects',
                     'platforms', 'workers']
     special_nouns = ['primitive', 'library', 'core']
+    # state machine with states:
+    # 0: waiting on verb
+    # 1: waiting on noun
+    # 2: got a -<option> or --<option>, waiting on value of that option
+    #    (necessary for intermixed arguments)
     for idx in range(len(argv)):
         if (state == 0) and (argv[idx] in verbs):
             verb = argv[idx]
             state = 1
         elif (state == 1):
-            if argv[idx] in ['hdl', 'rcc', 'ocl']:
+            if argv[idx][0] == '-':
+                state = 2
+            elif argv[idx] in ['hdl', 'rcc', 'ocl']:
                 pass  # authoring_model = argv[idx]
             elif argv[idx] in ['primitive', 'primitives']:
                 noun = argv[idx]
@@ -192,6 +198,8 @@ def get_cli_noun_verb_tuple(argv):
             elif argv[idx] in (singular_nouns + plural_nouns):
                 noun = argv[idx]
                 state = 2
+        elif (state == 2):
+            state = 1
     return (noun, verb)
 
 
@@ -206,13 +214,13 @@ def get_arg_parser():
     parser.add_argument('verb', nargs='?', default='')
     (noun, verb) = get_cli_noun_verb_tuple(sys.argv)
     if verb == 'build':
-        parser = add_build_arguments(parser, noun)
+        parser = add_build_arguments(parser)
     elif verb == 'create':
         parser = add_create_arguments(parser, noun)
     elif verb == 'show':
-        parser = add_show_arguments(parser, noun)
+        parser = add_show_arguments(parser)
     elif verb == 'run':
-        parser = add_run_arguments(parser, noun)
+        parser = add_run_arguments(parser)
     else:
         parser.add_argument('noun', nargs='?', default=None)
         parser.add_argument('name', nargs='?', default=None)
@@ -228,12 +236,22 @@ def get_args(parser):
            unknown_arg.startswith('component') or \
            unknown_arg.startswith('card') or \
            unknown_arg.startswith('device') or \
+           unknown_arg.startswith('platform') or \
            unknown_arg.startswith('project') or \
+           unknown_arg.startswith('primitive') or \
            unknown_arg.startswith('registr') or \
            unknown_arg.startswith('slot') or \
            unknown_arg.startswith('librar') or \
-           unknown_arg.startswith('test'):
+           unknown_arg.startswith('target') or \
+           unknown_arg.startswith('test') or \
+           unknown_arg.startswith('worker'):
             args.noun = unknown_arg
+        elif unknown_arg in get_authoring_models():
+            args.auhoring_model = unknown_arg
+        elif unknown_arg in ['core', 'cores', 'library', 'libraries']:
+            args.noun = 'primitive'
+            # later set to adjective...
+            args.name = unknown_arg
         else:
             raise Exception('invalid argument: ' + unknown_arg)
     return args
@@ -257,6 +275,7 @@ def get_cli_dict():
              'registry',
              'library', 'libraries',
              'slot', 'slots',
+             'target', 'targets',
              'test', 'tests',
              'worker', 'workers']
     # Logger().debug('args : ' + str(args))
@@ -272,7 +291,6 @@ def get_cli_dict():
             if args.librarytype != '':
                 args.name = args.librarytype
                 del args.librarytype
-        print(str(args))
         # Logger().debug('args : ' + str(args))
         if (args.name in nouns) and args.noun.startswith('primitive'):
             if args.name == 'core':
@@ -303,12 +321,11 @@ def get_cli_dict():
     # TODO move below 3 lines to AssetBase once proper checks in place
     if args.verb != 'unittest':
         if get_is_worker(args.noun):
-            if not (('.hdl' in args.name) or
-                    ('.rcc' in args.name) or
-                    ('.ocl' in args.name)):
-                raise Exception(args.name + ' is and invalid worker name')
-            args.authoring_model = args.name.split('.')[1]
-            args.name = args.name.split('.')[0]
+            # if not [am in args.name for am in get_authoring_models()]:
+            #     raise Exception(args.name + ' is an invalid worker name')
+            if '.' in args.name:
+                args.authoring_model = args.name.split('.')[1]
+                args.name = args.name.split('.')[0]
         else:
             if args.name:
                 if not args.name.isidentifier():

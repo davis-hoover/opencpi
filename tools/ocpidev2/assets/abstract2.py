@@ -33,6 +33,10 @@ g_suppress_warn = False
 g_log_level = -1
 
 
+def get_authoring_models():
+    return ['hdl', 'rcc', 'ocl']
+
+
 def set_g_suppress_warn(val):
     global g_suppress_warn
     g_suppress_warn = val

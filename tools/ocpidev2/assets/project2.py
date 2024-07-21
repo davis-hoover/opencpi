@@ -333,7 +333,6 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             raise Exception(msg)
         xml_abs_path = self.get_dir_abs_path() + '/hdl/cards/specs/'
         xml_abs_path += cli_dict['name'] + '.xml'
-        print(cli_dict)
         return HdlCard(xml_abs_path, False, cli_dict)
 
     def get_component_object_from_cli(self, cli_dict, _dir):
@@ -792,6 +791,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         if _type == Worker:
             for hdl_platform in self.hdl_platforms:
                 assets.append(hdl_platform.worker)
+        # TODO define HdlTarget, RccTarget class
         return assets
 
     def get_types_from_cli_dict(self, cli_dict):
@@ -818,9 +818,9 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                (cli_dict['authoringmodel'] == 'rcc'):
                 types.append(RccPlatform)
         if cli_dict['noun'].startswith('primitive'):
-            if cli_dict['adjective'] == 'core':
+            if cli_dict['adjective'].startswith('core'):
                 types.append(HdlCore)
-            elif cli_dict['adjective'] == 'library':
+            elif cli_dict['adjective'].startswith('librar'):
                 types.append(HdlLibrary)
             else:
                 types.append(HdlCore)
@@ -831,6 +831,13 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             types.append(Worker)
         if cli_dict['noun'].startswith('test'):
             types.append(Test)
+        if cli_dict['noun'].startswith('target'):
+            if (cli_dict['authoringmodel'] == '') or \
+               (cli_dict['authoringmodel'] == 'hdl'):
+                types.append(HdlPlatform)  # TODO fix
+            if (cli_dict['authoringmodel'] == '') or \
+               (cli_dict['authoringmodel'] == 'rcc'):
+                types.append(RccPlatform)
         return types
 
     def show(self, cli_dict, json_dict={}):
@@ -894,17 +901,60 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                                 msg += '.hdl'
                             if type(asset) == RccPlatform:
                                 msg += '.rcc'
+                        if cli_dict['noun'].startswith('target'):
+                            if (cli_dict['authoringmodel'] == '') or \
+                               (cli_dict['authoringmodel'] == 'hdl'):
+                                if asset.name == 'zed':
+                                    pid_and_name = pid + '.' + 'zynq'
+                                    msg = pid_and_name
+                                elif asset.name == 'zcu106':
+                                    pid_and_name = pid + '.' + 'zynq_ultra'
+                                    msg = pid_and_name
+                                elif asset.name == 'zed_ise':
+                                    pid_and_name = pid + '.' + 'zynq_ise'
+                                    msg = pid_and_name
+                                elif asset.name == 'zcu104':
+                                    pid_and_name = pid + '.' + 'zynq_ultra'
+                                    msg = pid_and_name
+                                elif asset.name == 'zed_ether':
+                                    pid_and_name = pid + '.' + 'zynq'
+                                    msg = pid_and_name
+                                elif asset.name == 'ml605':
+                                    pid_and_name = pid + '.' + 'virtex6'
+                                    msg = pid_and_name
+                                elif asset.name == 'alst4x':
+                                    pid_and_name = pid + '.' + 'stratix'
+                                    msg = pid_and_name
+                                elif asset.name == 'alst4':
+                                    pid_and_name = pid + '.' + 'stratix'
+                                    msg = pid_and_name
+                                elif asset.name == 'matchstiq_z1':
+                                    pid_and_name = pid + '.' + 'zynq'
+                                    msg = pid_and_name
+                                elif asset.name == 'e31x':
+                                    pid_and_name = pid + '.' + 'zynq'
+                                    msg = pid_and_name
+                                elif asset.name == 'zrf8_48dr':
+                                    pid_and_name = pid + '.' + 'zynq_ultra'
+                                    msg = pid_and_name
                         if cli_dict['verbose'] or cli_dict['table']:
-                            msg += ' '
-                            for idx in range(60-len(msg)):
+                            if not cli_dict['noun'].startswith('target'):
+                                # an hdl target, for example, is not an asset
+                                # with an associated directory
                                 msg += ' '
-                            msg += asset.abs_path
+                                for idx in range(60-len(msg)):
+                                    msg += ' '
+                                msg += asset.abs_path
                         if cli_dict['json']:
-                            json_dict[pid_and_name] = \
-                                    {'package_id': pid,
-                                     'directory': asset.get_dir_abs_path()}
+                            json_dict[pid_and_name] = {'package_id': pid}
+                            if not cli_dict['noun'].startswith('target'):
+                                # an hdl target, for example, is not an asset
+                                # with an associated directory
+                                json_dict[pid_and_name]['directory'] = \
+                                    asset.get_dir_abs_path()
                         else:
-                            list_to_show.append(msg)
+                            if msg not in list_to_show:
+                                list_to_show.append(msg)
                         first = False
         if not cli_dict['json']:
             # the list is sorted so that assets are generally printed in order
