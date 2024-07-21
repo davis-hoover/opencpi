@@ -263,7 +263,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         if do_component_libraries:
             tmp = self.abs_path.split('/')[-1]
             Logger().info('discovering project ' + tmp)
-            self.discover_components()
+            SpecsDirectory.discover(self)
             self.discover_component_libraries()
             for component_library in self.component_libraries:
                 for asset in component_library.workers:
@@ -783,6 +783,8 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             assets.extend(self.rcc_platforms)
         if _type == Project:
             assets.extend([self])
+        if _type == Protocol:
+            assets.extend(self.protocols)
         for component_library in self.component_libraries:
             if _type == Worker:
                 assets.extend(component_library.workers)
@@ -827,6 +829,8 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                 types.append(HdlLibrary)
         if cli_dict['noun'].startswith('project'):
             types.append(Project)
+        if cli_dict['noun'].startswith('protocol'):
+            types.append(Protocol)
         if cli_dict['noun'].startswith('worker'):
             types.append(Worker)
         if cli_dict['noun'].startswith('test'):

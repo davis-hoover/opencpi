@@ -616,82 +616,82 @@ ocpidev2 -d assets show -d core projects -d platform -v
 ocpidev2 -d assets show -d core projects -d platform -v -l 8
 ocpidev2 -d assets show -d core projects -d platform -v --log-level 8
 ocpidev2 -d assets show -d core projects -d platform -v -l 10
-#ocpidev2 show protocol assets
-#ocpidev2 show protocol assets -v
-#ocpidev2 show protocol assets --verbose
-#ocpidev2 show protocol assets -d assets
-#ocpidev2 show protocols
-#ocpidev2 show protocols -v
-#ocpidev2 show protocols --verbose
-#ocpidev2 show protocols -d assets
-#ocpidev2 show -d assets protocols  
-#ocpidev2 -d assets show protocols
-#ocpidev2 -d assets show -d core protocols -d platform -v
-#ocpidev2 -d assets show -d core protocols -d platform -v -l 8
-#ocpidev2 -d assets show -d core protocols -d platform -v --log-level 8
-#ocpidev2 -d assets show -d core protocols -d platform -v -l 10
-#ocpidev2 show rcc platform ubuntu20_04
-#ocpidev2 show rcc platform ubuntu20_04 -v
-#ocpidev2 show rcc platform ubuntu20_04 --verbose
-#ocpidev2 show rcc platform ubuntu20_04 -d assets
-#ocpidev2 show rcc platforms 
-#ocpidev2 show rcc platforms -v
-#ocpidev2 show rcc platforms --verbose
-#ocpidev2 show rcc platforms -d assets
-#ocpidev2 show -d assets rcc platforms
-#ocpidev2 -d assets show rcc platforms
-#ocpidev2 -d assets show -d core rcc platforms -d platform -v
-#ocpidev2 -d assets show -d core rcc platforms -d platform -v -l 8
-#ocpidev2 -d assets show -d core rcc platforms -d platform -v --log-level 8
-#ocpidev2 -d assets show -d core rcc platforms -d platform -v -l 10
-#ocpidev2 show registry
-#ocpidev2 show registry -v
-#ocpidev2 show registry --verbose
-#ocpidev2 show target zynq 
-#ocpidev2 show target zynq -v
-#ocpidev2 show target zynq --verbose
-#ocpidev2 show target zynq -d assets
-#ocpidev2 show targets 
-#ocpidev2 show targets -v
-#ocpidev2 show targets --verbose
-#ocpidev2 show targets -d assets
-#ocpidev2 show -d assets targets
-#ocpidev2 -d assets show targets
-#ocpidev2 -d assets show -d core targets -d platform -v
-#ocpidev2 -d assets show -d core targets -d platform -v -l 8
-#ocpidev2 -d assets show -d core targets -d platform -v --log-level 8
-#ocpidev2 -d assets show -d core targets -d platform -v -l 10
-#ocpidev2 show test bias.test
-#ocpidev2 show test bias.test -v
-#ocpidev2 show test bias.test --verbose
-#ocpidev2 show test bias.test -d assets
-#ocpidev2 show tests 
-#ocpidev2 show tests -v
-#ocpidev2 show tests --verbose
-#ocpidev2 show tests -d assets
-#ocpidev2 show -d assets tests
-#ocpidev2 -d assets show tests
-#ocpidev2 -d assets show -d core tests -d platform -v
-#ocpidev2 -d assets show -d core tests -d platform -v -l 8
-#ocpidev2 -d assets show -d core tests -d platform -v --log-level 8
-#ocpidev2 -d assets show -d core tests -d platform -v -l 10
-#ocpidev2 show worker cic_dec.hdl 
-#ocpidev2 show worker cic_dec.hdl -v
-#ocpidev2 show worker cic_dec.hdl --verbose
-#ocpidev2 show worker cic_dec.hdl -d assets
-#ocpidev2 show workers 
-#ocpidev2 show workers -v
-#ocpidev2 show workers --verbose
-#ocpidev2 show workers -d assets
-#ocpidev2 show -d assets workers
-#ocpidev2 -d assets show workers
-#ocpidev2 -d assets show -d core workers -d platform -v
-#ocpidev2 -d assets show -d core workers -d platform -v -l 8
-#ocpidev2 -d assets show -d core workers -d platform -v --log-level 8
-#ocpidev2 -d assets show -d core workers -d platform -v -l 10
-#ocpidev2 show components --simple
-#ocpidev2 show components --table
-#ocpidev2 show components --json
+ocpidev2 show protocol assets
+ocpidev2 show protocol assets -v
+ocpidev2 show protocol assets --verbose
+ocpidev2 show protocol assets -d assets
+ocpidev2 show protocols
+ocpidev2 show protocols -v
+ocpidev2 show protocols --verbose
+ocpidev2 show protocols -d assets
+ocpidev2 show -d assets protocols  
+ocpidev2 -d assets show protocols
+ocpidev2 -d assets show -d core protocols -d platform -v
+ocpidev2 -d assets show -d core protocols -d platform -v -l 8
+ocpidev2 -d assets show -d core protocols -d platform -v --log-level 8
+ocpidev2 -d assets show -d core protocols -d platform -v -l 10
+ocpidev2 show rcc platform ubuntu20_04
+ocpidev2 show rcc platform ubuntu20_04 -v
+ocpidev2 show rcc platform ubuntu20_04 --verbose
+ocpidev2 show rcc platform ubuntu20_04 -d assets
+ocpidev2 show rcc platforms 
+ocpidev2 show rcc platforms -v
+ocpidev2 show rcc platforms --verbose
+ocpidev2 show rcc platforms -d assets
+ocpidev2 show -d assets rcc platforms
+ocpidev2 -d assets show rcc platforms
+ocpidev2 -d assets show -d core rcc platforms -d platform -v
+ocpidev2 -d assets show -d core rcc platforms -d platform -v -l 8
+ocpidev2 -d assets show -d core rcc platforms -d platform -v --log-level 8
+ocpidev2 -d assets show -d core rcc platforms -d platform -v -l 10
+ocpidev2 show registry
+ocpidev2 show registry -v
+ocpidev2 show registry --verbose
+ocpidev2 show target zynq 
+ocpidev2 show target zynq -v
+ocpidev2 show target zynq --verbose
+ocpidev2 show target zynq -d assets
+ocpidev2 show targets 
+ocpidev2 show targets -v
+ocpidev2 show targets --verbose
+ocpidev2 show targets -d assets
+ocpidev2 show -d assets targets
+ocpidev2 -d assets show targets
+ocpidev2 -d assets show -d core targets -d platform -v
+ocpidev2 -d assets show -d core targets -d platform -v -l 8
+ocpidev2 -d assets show -d core targets -d platform -v --log-level 8
+ocpidev2 -d assets show -d core targets -d platform -v -l 10
+ocpidev2 show test bias.test
+ocpidev2 show test bias.test -v
+ocpidev2 show test bias.test --verbose
+ocpidev2 show test bias.test -d assets
+ocpidev2 show tests 
+ocpidev2 show tests -v
+ocpidev2 show tests --verbose
+ocpidev2 show tests -d assets
+ocpidev2 show -d assets tests
+ocpidev2 -d assets show tests
+ocpidev2 -d assets show -d core tests -d platform -v
+ocpidev2 -d assets show -d core tests -d platform -v -l 8
+ocpidev2 -d assets show -d core tests -d platform -v --log-level 8
+ocpidev2 -d assets show -d core tests -d platform -v -l 10
+ocpidev2 show worker cic_dec.hdl 
+ocpidev2 show worker cic_dec.hdl -v
+ocpidev2 show worker cic_dec.hdl --verbose
+ocpidev2 show worker cic_dec.hdl -d assets
+ocpidev2 show workers 
+ocpidev2 show workers -v
+ocpidev2 show workers --verbose
+ocpidev2 show workers -d assets
+ocpidev2 show -d assets workers
+ocpidev2 -d assets show workers
+ocpidev2 -d assets show -d core workers -d platform -v
+ocpidev2 -d assets show -d core workers -d platform -v -l 8
+ocpidev2 -d assets show -d core workers -d platform -v --log-level 8
+ocpidev2 -d assets show -d core workers -d platform -v -l 10
+ocpidev2 show components --simple
+ocpidev2 show components --table
+ocpidev2 show components --json
 ocpidev2 clean -d core -d assets -d platform
 ocpidev2 build -d core/hdl/primitives/bsv --hdl-platform xsim 
 ocpidev2 clean -d core -d assets -d platform

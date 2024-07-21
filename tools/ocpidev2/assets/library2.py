@@ -20,7 +20,7 @@
 import os
 from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import AssetBase
-from _opencpi.assets.component2 import Component, test_Component
+from _opencpi.assets.component2 import Component, Protocol, test_Component
 from _opencpi.assets.worker2 import Worker, RccAssembly
 from _opencpi.assets.worker2 import test_Worker, test_RccAssembly
 # below 4 lines are a weird, unintended consequence of Discoverer
@@ -81,25 +81,24 @@ Skeleton outline: Component library description and outline of scope to go here.
 
 
 class SpecsDirectory():
-    """ Class for discovering component assets in the specs directory """
+    """ Class which represents a specs directory, including its components and
+        protocols """
 
     def __init__(self):
         self.components = []
+        self.protocols = []
 
     def discover(self):
-        self.discover()
-
-    def discover_components(self):
         for _dir in os.listdir(self.abs_path):
             if _dir == 'specs':
                 discovery_path = self.abs_path + '/' + _dir
                 for name in AssetBase.listdir_assets(discovery_path):
-                    path = self.abs_path + '/' + _dir + '/' + name
-                    try:
-                        asset = Component(path)
-                        self.append_discovered_asset(asset)
-                    except InvalidAssetError:
-                        pass
+                    path = discovery_path + '/' + name
+                    for _type in [Component, Protocol]:
+                        try:
+                            self.append_discovered_asset(_type(path))
+                        except InvalidAssetError:
+                            pass
 
 
 # TODO organize this class better
@@ -124,6 +123,8 @@ class Discoverer():
             self.hdl_cards.append(asset)
         if asset.get_type() == 'hdl platform':
             self.hdl_platforms.append(asset)
+        if asset.get_type() == 'protocol':
+            self.protocols.append(asset)
         if asset.get_type() == 'rcc platform':
             self.rcc_platforms.append(asset)
         _type = asset.get_type()
@@ -366,11 +367,8 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
             System('mkdir -p ' + self.get_dir_abs_path() + '/specs')
 
     def discover(self, allowlist, platform=False):
-        self.discover_components()
+        SpecsDirectory.discover(self)
         self.discover_workers_and_tests(allowlist, platform)
-
-    def discover_components(self):
-        SpecsDirectory.discover_components(self)
         for discovery_path in self.get_potential_asset_dir_abs_paths(''):
             if discovery_path.endswith('.comp'):  # undocumented
                 for entry in AssetBase.listdir_assets(discovery_path):

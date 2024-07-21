@@ -238,6 +238,7 @@ def get_args(parser):
            unknown_arg.startswith('device') or \
            unknown_arg.startswith('platform') or \
            unknown_arg.startswith('project') or \
+           unknown_arg.startswith('protocol') or \
            unknown_arg.startswith('primitive') or \
            unknown_arg.startswith('registr') or \
            unknown_arg.startswith('slot') or \
@@ -328,6 +329,9 @@ def get_cli_dict():
                 args.name = args.name.split('.')[0]
         else:
             if args.name:
+                if args.noun.startswith('test'):
+                    if '.test' in args.name:
+                        args.name = args.name.split('.test')[0]
                 if not args.name.isidentifier():
                     msg = '\'' + args.name + '\' is not a valid name'
                     if args.name.endswith('.test'):
@@ -355,10 +359,6 @@ def get_cli_dict():
                ('.ocl' in cli_dict['name'])):
                 raise Exception(cli_dict['name'] +
                                 ' is and invalid worker name')
-    if (cli_dict['noun'] == 'test'):
-        if ('.' in cli_dict['name']):
-            if not ('.test' in cli_dict['name']):
-                raise Exception(cli_dict['name'] + ' is and invalid test name')
     # make CLI look like attrs (necessary for create cli verb)
     cli_dict = ({key.replace('_', ''): val for key, val in cli_dict.items()})
     return cli_dict
