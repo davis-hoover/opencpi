@@ -71,6 +71,7 @@ class Test(AssetBase):
         Logger().debug('parsing ' + self.get_xml_abs_path())
         self.parse(cli_dict)
         self.name = self.name.split('.test')[0]  # TODO
+        self.spec = self.name
 
     def get_attr_infos(self):
         ret = []
@@ -94,6 +95,8 @@ class Test(AssetBase):
 
     def parse(self, cli_dict=None):
         AssetBase.parse(self, cli_dict)
+        if ('Spec' in self.attrs.keys()):
+            self.spec = self.attrs['Spec']
 
 
 def test_Test_create(ret):

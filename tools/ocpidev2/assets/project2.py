@@ -573,7 +573,9 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
 
     def get_test_object_from_cli(self, cli_dict, _dir):
         dir_abs_path = _dir + '/' + cli_dict['name'] + '.test'
-        return Test(dir_abs_path, False, cli_dict)
+        test = Test(dir_abs_path, False, cli_dict)
+        # TODO warn if test.spec not found in ......
+        return test
 
     def handle_hdl_library(self, cli_dict, _dir):
         # TODO handle common args somwhere(e.g. --hdl-library --library)
