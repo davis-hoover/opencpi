@@ -76,6 +76,10 @@ class ProjectRegistry():
             raise_not_found_in_projects('hdl primitive', name)
         return ret
 
+    def get_component_by_name(self, name):
+        # TODO fill in
+        return None
+
     def get_worker_project(self, name, abs_path=None, authoring_model=''):
         """ get project which contains named worker """
         ret = None

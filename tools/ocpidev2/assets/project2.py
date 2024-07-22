@@ -202,6 +202,10 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             ret += self.attrs['PackageName']
         return ret
 
+    def get_component_by_name(self, name):
+        # TODO fill in
+        return None
+
     def get_worker_by_name(self, name, authoring_model=''):
         ret = None
         for component_library in self.component_libraries:

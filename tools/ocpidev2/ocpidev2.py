@@ -403,8 +403,11 @@ def dispatch_verb(cli_dict):
         for _dir in dirs_to_operate_on:
             local_project = get_local_project(_dir)
             if ((cli_dict['verb'] == 'create') and
-               (local_project is None)) or \
-               (cli_dict['verb'] != 'create') and (project_registry is None):
+                (local_project is None)) or \
+                ((cli_dict['verb'] != 'create') and
+                 (project_registry is None)) or \
+                ((cli_dict['verb'] == 'create') and
+                 (cli_dict['noun'] == 'test')):
                 project_registry = ProjectRegistry()
                 if not ((cli_dict['verb'] == 'create') and
                    (cli_dict['noun'] != 'registry')):
@@ -425,6 +428,15 @@ def dispatch_verb(cli_dict):
             elif cli_dict['verb'] == 'clean':
                 project_registry.clean(cli_dict, _dir)
             elif cli_dict['verb'] == 'create':
+                if (cli_dict['verb'] == 'create') and \
+                   (cli_dict['noun'] == 'test'):
+                    spec = cli_dict['name']  # default
+                    if cli_dict['component']:
+                        spec = cli_dict['component']
+                    if local_project.get_component_by_name(spec) is None:
+                        if project_registry.get_component_by_name(spec) is \
+                                None:
+                            Logger().warn('spec ' + spec + ' not found')
                 if local_project is None:
                     project_registry.create(cli_dict, _dir)
                 else:
