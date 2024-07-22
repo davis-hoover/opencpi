@@ -26,6 +26,7 @@ from _opencpi.assets.abstract2 import *
 from _opencpi.assets.registry2 import ProjectRegistry, unittest
 from _opencpi.assets.project2 import Project
 # below imports only necessary for get_attr_infos() calls
+from _opencpi.assets.application2 import Application
 from _opencpi.assets.component2 import Component
 from _opencpi.assets.library2 import ComponentLibrary
 from _opencpi.assets.platform2 import HdlPlatform, HdlCard
