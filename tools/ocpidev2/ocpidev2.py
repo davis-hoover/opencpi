@@ -334,10 +334,11 @@ def get_cli_dict():
                     if '.test' in args.name:
                         args.name = args.name.split('.test')[0]
                 if not args.name.isidentifier():
-                    msg = '\'' + args.name + '\' is not a valid name'
-                    if args.name.endswith('.test'):
-                        msg += ' (remove .test)'
-                    raise ValueError(msg)
+                    if args.noun != 'registry':
+                        msg = '\'' + args.name + '\' is not a valid name'
+                        if args.name.endswith('.test'):
+                            msg += ' (remove .test)'
+                        raise ValueError(msg)
         if not args.help:
             if (args.noun is not None) and (args.noun not in nouns):
                 if args.verb != 'apply':
@@ -410,7 +411,7 @@ def dispatch_verb(cli_dict):
                  (cli_dict['noun'] == 'test')):
                 project_registry = ProjectRegistry()
                 if not ((cli_dict['verb'] == 'create') and
-                   (cli_dict['noun'] != 'registry')):
+                   (cli_dict['noun'] == 'registry')):
                     if cli_dict['verb'] == 'show':
                         set_g_suppress_warn(True)
                     project_registry.discover(True, True, local_project)

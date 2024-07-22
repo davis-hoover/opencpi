@@ -117,6 +117,7 @@ class Worker(AssetBase):
         self.language = ''
         self.spec = self.name
         self.version = 0  # CDG section 4.3.1.2 (pre-version 2
+        self.is_device = False
         directory_name = self.get_dir_abs_path()
         if directory_name.endswith('.hdl'):
             self.authoring_model = 'hdl'
@@ -198,6 +199,8 @@ class Worker(AssetBase):
             self.name = self.attrs['Name']
         spec = self.attrs['Spec']
         self.attrs['Spec'] = spec.replace('-spec', '').replace('_spec', '')
+        if self.get_parsed().getroot().tag.lower() == 'hdldevice':
+            self.is_device = True
         # TODO replace ocpi.core. delete according to CDG 8.1.11
         self.attrs['Libraries'] = \
             [str(lib).replace('ocpi.core.', '')

@@ -897,6 +897,8 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         """ get list of types (asset classes) that correspond to cli_dict noun
             and authoring_model entries """
         types = []
+        if cli_dict['noun'].startswith('adapter'):
+            types.append(Worker)
         if cli_dict['noun'].startswith('application'):
             types.append(Application)
         if cli_dict['noun'].startswith('assembl'):
@@ -905,6 +907,8 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             types.append(HdlCard)
         if cli_dict['noun'].startswith('component'):
             types.append(Component)
+        if cli_dict['noun'].startswith('device'):
+            types.append(Worker)
         if cli_dict['noun'].startswith('librar'):
             types.append(ComponentLibrary)
         if cli_dict['noun'].startswith('slot'):
@@ -957,9 +961,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                 if (cli_dict['d'] == []) or \
                    any([(_dir + '/') in (asset.abs_path + '/') for _dir in
                         cli_dict['d']]):
-                    do_hdl_check = (cli_dict['authoringmodel'] != '') and \
-                        (cli_dict['noun'].startswith('primitive') or
-                         cli_dict['noun'].startswith('librar'))
+                    do_hdl_check = cli_dict['authoringmodel'] == 'hdl'
                     containing_path = \
                         asset.get_dir_abs_path().rsplit('/', 1)[0]
                     if cli_dict['noun'].startswith('librar'):
@@ -972,7 +974,27 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                             containing_path.endswith('hdl/devices') or \
                             containing_path.endswith(hdlp) or \
                             containing_path.endswith('hdl/platforms')
-                    if (not do_hdl_check) or (do_hdl_check and is_hdl):
+                    passed_any_hdl_checks = True
+                    if (cli_dict['authoringmodel'] == 'hdl'):
+                        passed_any_hdl_checks = \
+                            (asset.get_type() == 'hdl worker') or \
+                            (asset.get_type() == 'hdl primitive') or \
+                            (asset.get_type() == 'hdl platform')
+                    elif (cli_dict['authoringmodel'] == 'rcc'):
+                        passed_any_hdl_checks = \
+                            (asset.get_type() == 'rcc worker') or \
+                            (asset.get_type() == 'rcc platform')
+                    passed_any_device_checks = \
+                        (not cli_dict['noun'].startswith('device')) or \
+                        (cli_dict['noun'].startswith('device') and
+                         asset.is_device)
+                    passed_any_adapter_checks = \
+                        (not cli_dict['noun'].startswith('adapter')) or \
+                        (cli_dict['noun'].startswith('adapter') and
+                         containing_path.endswith('hdl/adapters'))
+                    if passed_any_hdl_checks and \
+                            passed_any_device_checks and \
+                            passed_any_adapter_checks:
                         pid = str(self.get_package_id())
                         if (_type == Component) or (_type == Worker) or \
                            (_type == ComponentLibrary):
@@ -995,7 +1017,8 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                         if first and cli_dict['simple']:
                             msg += ' '
                         msg += pid_and_name
-                        if cli_dict['noun'].startswith('worker'):
+                        if cli_dict['noun'].startswith('worker') or \
+                           cli_dict['noun'].startswith('device'):
                             msg += '.' + asset.authoring_model
                         if cli_dict['noun'].startswith('platform'):
                             if type(asset) == HdlPlatform:

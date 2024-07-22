@@ -15,11 +15,10 @@ ocpidev2 create -h
 ocpidev2 create --help
 ocpidev2 show -h
 ocpidev2 show --help
-#ocpidev2 create -h
-#ocpidev2 create --help
 ocpidev2 unittest
 ocpidev2 unittest -v
 ocpidev2 unittest --verbose
+ocpidev2 create registry project-registry
 ocpidev2 create project core2 --package-id ocpi.core2
 ocpidev2 create library components -d core2
 ocpidev2 create library cards -d core2/hdl --component-library devices --xml-include '../../components/specs ../devices/lib/hdl ../devices/specs'
