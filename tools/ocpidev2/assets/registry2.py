@@ -77,8 +77,10 @@ class ProjectRegistry():
         return ret
 
     def get_component_by_name(self, name):
-        # TODO fill in
-        return None
+        component = None
+        for project in self.projects:
+            component = project.get_component_by_name(name)
+        return component
 
     def get_worker_project(self, name, abs_path=None, authoring_model=''):
         """ get project which contains named worker """
