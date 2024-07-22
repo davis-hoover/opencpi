@@ -934,14 +934,20 @@ class AssetBase(AttributeBase):
             System('mkdir -p ' + self.get_dir_abs_path())
         for fname, fcontents in self.get_templates().items():
             file_path = self.get_dir_abs_path() + '/' + fname
-            if os.path.exists(file_path):
-                msg = "File: '" + file_path + "' already exists."
-                raise Exception(msg)
-            fcontents = jinja2.Template(fcontents, trim_blocks=True)
-            fcontents = fcontents.render(asset=self)
-            out_file = open(file_path, 'w')
-            out_file.write(fcontents)
-            out_file.close()
+            self.create_file(file_path, fcontents, self)
+
+    def create_file(self, file_path, fcontents, asset, extra=None):
+        if os.path.exists(file_path):
+            msg = 'file \'' + file_path + '\' already exists'
+            raise Exception(msg)
+        fcontents = jinja2.Template(fcontents, trim_blocks=True)
+        if extra is None:
+            fcontents = fcontents.render(asset=asset)
+        else:
+            fcontents = fcontents.render(asset=asset, extra=extra)
+        out_file = open(file_path, 'w')
+        out_file.write(fcontents)
+        out_file.close()
 
     def delete(self):
         System('rm -rf ' + self.abs_path)

@@ -103,6 +103,19 @@ Skeleton outline: Description of project.
    specs/specs
 \n"""
 
+comp_example_app_rst_template = """<?xml version="1.0"?>
+<Application Done='file_write'>
+  <Instance Component='ocpi.core.file_read' Connect='{{asset.name}}'>
+    <Ptoperty Name='filename' Value='input.bin'/>
+  </Instance>
+  <Instance Component='{{extra}}.{{asset.name}}' Connect='file_write'>
+  </Instance>
+  <Instance Component='ocpi.core.file_write'>
+    <Ptoperty Name='filename' Value='output.bin'/>
+  </Instance>
+</Application>
+"""  # nopep8
+
 
 class Project(AssetBase, SpecsDirectory, Discoverer):
     """ Component Development Guide section 14 """
@@ -583,6 +596,19 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             test_dict = {'name': asset.name, 'component': asset.name,
                          'usehdlfileio': False}
             self.get_test_object_from_cli(test_dict, _dir).create()
+        if cli_dict['noun'] == 'component':
+            pid = self.get_package_id()
+            if _dir != (self.get_dir_abs_path() + '/specs'):
+                if not cli_dict['project']:
+                    found = False
+                    for component_library in self.component_libraries:
+                        if _dir == component_library.get_dir_abs_path():
+                            pid = component_library.get_package_id(pid)
+            if not _dir.endswith('specs'):
+                file_abs_path = asset.get_dir_abs_path() + '/'
+                file_abs_path += 'example_app.xml'
+                self.create_file(file_abs_path, comp_example_app_rst_template,
+                                 asset, extra=pid)
 
     def delete_asset(self, cli_dict, _dir):
         self.get_asset_object_from_cli(cli_dict, _dir).delete()
