@@ -284,16 +284,18 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             self.discover_rcc_platforms()
         # end of bullets at top of CDG section 14
 
-    def check_for_devices_name_collision(self, _dir):
+    def raise_if_devices_name_collision(self, _dir):
         """ Checks to see if more than one 'devices' Component Library name
             exists """
         devices_paths = [comp_lib.abs_path for comp_lib in
                          self.component_libraries if
                          comp_lib.abs_path.endswith('/devices')]
-        if len(devices_paths) > 1:
+        devices_in_path = [dev_path for dev_path in devices_paths if
+                           _dir + '/' in dev_path]
+        if len(devices_in_path) > 1:
             msg = 'Path: \'' + _dir + '\' contains more than'
             msg += ' one \'devices\' component libraries: '
-            msg += ', '.join(map(str, list(devices_paths))) + '. '
+            msg += ', '.join(map(str, list(devices_in_path))) + '. '
             msg += 'Use \'-d\' instead.'
             raise Exception(msg)
 
@@ -511,7 +513,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
 
     def get_protocol_object_from_cli(self, cli_dict, _dir):
         if 'devices' in (cli_dict['hdllibrary'], cli_dict['library']):
-            self.check_for_devices_name_collision(_dir)
+            self.raise_if_devices_name_collision(_dir)
         if cli_dict.get('library'):
             lib_path = self.get_cli_library(cli_dict, _dir)
             xml_abs_path = lib_path + '/specs/' + cli_dict['name'] + \
