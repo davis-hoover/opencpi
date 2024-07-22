@@ -103,7 +103,7 @@ class HdlPlatform(HdlCardPlatformBase):
         is_list = True
         ret.append(AttributeInfo('SourceFiles', is_list))
         ret.append(AttributeInfo('Libraries',
-                   cli=('-l', '--libraries'), is_int=True))
+                   cli=('-M', '--libraries'), is_int=True))
         ret.append(AttributeInfo('Configurations',
                    cli=('-c', '--configurations'), is_int=True))
         return ret
@@ -191,10 +191,18 @@ class HdlCard(HdlCardPlatformBase):
                                      enable_path_existence_check)
         if enable_path_existence_check:
             self.parse()
+            if self.attrs['Type'] == '':
+                raise InvalidAssetError('card must contain a type')
+        elif cli_dict is not None:
+            if cli_dict['type'] == '':
+                raise InvalidAssetError('card must have a --type <type>')
+            if cli_dict['type'] != '':
+                self.attrs['Type'] = cli_dict['type']
 
     def get_attr_infos(self):
         ret = []
-        ret.append(AttributeInfo('Type'))
+        ret.append(AttributeInfo('Type',
+                   cli=('-t', '--type')))
         return ret
 
     def parse(self):

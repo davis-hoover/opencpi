@@ -29,7 +29,7 @@ from _opencpi.assets.library2 import SpecsDirectory, Discoverer
 from _opencpi.assets.library2 import ComponentLibrary
 from _opencpi.assets.library2 import ComponentLibrariesDirectory
 from _opencpi.assets.library2 import test_ComponentLibrary
-from _opencpi.assets.primitive2 import HdlLibrary
+from _opencpi.assets.primitive2 import HdlLibrary, HdlCore
 from _opencpi.assets.assembly2 import HdlAssembly
 from _opencpi.assets.platform2 import HdlSlot, HdlCard
 from _opencpi.assets.platform2 import HdlPlatform, RccPlatform
@@ -102,6 +102,19 @@ Skeleton outline: Description of project.
    hdl/primitives/primitives
    specs/specs
 \n"""
+
+comp_example_app_rst_template = """<?xml version="1.0"?>
+<Application Done='file_write'>
+  <Instance Component='ocpi.core.file_read' Connect='{{asset.name}}'>
+    <Ptoperty Name='filename' Value='input.bin'/>
+  </Instance>
+  <Instance Component='{{extra}}.{{asset.name}}' Connect='file_write'>
+  </Instance>
+  <Instance Component='ocpi.core.file_write'>
+    <Ptoperty Name='filename' Value='output.bin'/>
+  </Instance>
+</Application>
+"""  # nopep8
 
 
 class Project(AssetBase, SpecsDirectory, Discoverer):
@@ -205,25 +218,16 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                     break
         return ret
 
-    def get_asset_within(self, abs_path):
-        """ get asset whose abs_path is within the abs_path and return None
-            if not found """
-        ret = None
+    def get_assets_within(self, abs_path):
+        """ get list of assets whose abs_path is within the abs_path """
+        ret = []
+        lists = [self.applications, self.hdl_primitives, self.hdl_assemblies]
         for component_library in self.component_libraries:
-            for asset in component_library.workers:
-                if (asset.get_xml_abs_path() + '/') in (abs_path + '/'):
-                    ret = asset
-                elif asset.get_dir_abs_path() == abs_path:
-                    ret = asset
-        for asset in self.applications:
-            if (asset.get_dir_abs_path() + '/') in (abs_path + '/'):
-                ret = asset
-        for asset in self.hdl_primitives:
-            if (asset.get_dir_abs_path() + '/') in (abs_path + '/'):
-                ret = asset
-        for asset in self.hdl_assemblies:
-            if (asset.get_dir_abs_path() + '/') in (abs_path + '/'):
-                ret = asset
+            lists.append(component_library.workers)
+        for asset_list in lists:
+            for asset in asset_list:
+                if (abs_path + '/') in (abs_path + '/'):
+                    ret.append(asset)
         return ret
 
     def get_paths_to_parse(self):
@@ -263,7 +267,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         if do_component_libraries:
             tmp = self.abs_path.split('/')[-1]
             Logger().info('discovering project ' + tmp)
-            self.discover_components()
+            SpecsDirectory.discover(self)
             self.discover_component_libraries()
             for component_library in self.component_libraries:
                 for asset in component_library.workers:
@@ -389,34 +393,38 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             msg += '<project>/hdl/cards/specs, set -d, or the working '
             msg += 'directory, to <project>/hdl/cards/specs)'
             raise Exception(msg)
-        xml_abs_path = self.get_dir_abs_path() + '/hdl/cards/'
+        xml_abs_path = self.get_dir_abs_path() + '/hdl/cards/specs/'
         xml_abs_path += cli_dict['name'] + '.xml'
         return HdlCard(xml_abs_path, False, cli_dict)
 
     def get_component_object_from_cli(self, cli_dict, _dir):
         xml_abs_path = _dir + '/'
         if _dir != (self.get_dir_abs_path() + '/specs'):
-            found = False
-            for component_library in self.component_libraries:
-                if _dir == component_library.get_dir_abs_path():
-                    xml_abs_path += cli_dict['name'] + '.comp/'
-                    found = True
-                    break
-                elif _dir == (component_library.get_dir_abs_path() + '/specs'):
-                    Logger().warn('for component library creation, the '
-                                  'working directory (or, if specified, the '
-                                  '-d option) is recommended to be the '
-                                  'component library location <library>, and '
-                                  'not <library>/specs')
-                    found = True
-                    break
-            if not found:
-                msg = 'component \'' + cli_dict['name']
-                msg += '\' can not exist within ' + _dir
-                msg += ' (it is recommend to set the working directory or -d '
-                msg += 'to a <project>/specs or a component <library> '
-                msg += 'directory)'
-                raise Exception(msg)
+            if cli_dict['project']:
+                xml_abs_path = self.get_dir_abs_path() + '/specs/'
+            else:
+                found = False
+                for component_library in self.component_libraries:
+                    if _dir == component_library.get_dir_abs_path():
+                        xml_abs_path += cli_dict['name'] + '.comp/'
+                        found = True
+                        break
+                    elif _dir == (component_library.get_dir_abs_path() +
+                                  '/specs'):
+                        Logger().warn('for component library creation, the '
+                                      'working directory (or, if specified, '
+                                      'the -d option) is recommended to be '
+                                      'the component library location '
+                                      '<library>, and not <library>/specs')
+                        found = True
+                        break
+                if not found:
+                    msg = 'component \'' + cli_dict['name']
+                    msg += '\' can not exist within ' + _dir
+                    msg += ' (it is recommend to set the working directory or '
+                    msg += '-d to a <project>/specs or a component <library> '
+                    msg += 'directory)'
+                    raise Exception(msg)
         xml_abs_path += cli_dict['name'] + '-comp.xml'
         return Component(xml_abs_path, False, cli_dict)
 
@@ -506,13 +514,23 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         return asset
 
     def get_primitive_object_from_cli(self, cli_dict, _dir):
-        # TODO self.handle_hdl_library()
-        dir_abs_path = self.get_dir_abs_path() + '/hdl/primitives/' + \
-                       cli_dict['name']
-        return HdlLibrary(dir_abs_path, False, cli_dict)
+        if _dir != self.get_dir_abs_path() + '/hdl/primitives':
+            msg = cli_dict['noun'] + ' ' + cli_dict['name']
+            msg += ' can not exist within ' + _dir
+            msg += ' (\'' + cli_dict['name'] + '\' can only exist '
+            msg += 'within <project>/hdl/primitives directory, set -d, or the '
+            msg += 'working directory, to <project>/hdl/primitives)'
+            raise Exception(msg)
+        dir_abs_path = self.get_dir_abs_path() + '/hdl/primitives/'
+        dir_abs_path += cli_dict['name']
+        if cli_dict['librarytype'] == 'core':
+            asset = HdlCore(dir_abs_path, False, cli_dict)
+        else:
+            asset = HdlLibrary(dir_abs_path, False, cli_dict)
+        return asset
 
     def get_protocol_object_from_cli(self, cli_dict, _dir):
-        if 'devices' in (cli_dict['hdllibrary'], cli_dict['library']):
+        if 'devices' in (cli_dict.get('hdllibrary'), cli_dict.get('library')):
             self.raise_if_devices_name_collision(_dir)
         if cli_dict.get('library'):
             lib_path = self.get_cli_library(cli_dict, _dir)
@@ -639,9 +657,23 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                 msg += 'highly recommended'
                 Logger().warn(msg)
         asset.create()
-        # TODO comment back in
-        # if cli_dict['createtest']:
-        #     self.get_test_object_from_cli(cli_dict, _dir).create()
+        if ('createtest' in cli_dict.keys()) and cli_dict['createtest']:
+            test_dict = {'name': asset.name, 'component': asset.name,
+                         'usehdlfileio': False}
+            self.get_test_object_from_cli(test_dict, _dir).create()
+        if cli_dict['noun'] == 'component':
+            pid = self.get_package_id()
+            if _dir != (self.get_dir_abs_path() + '/specs'):
+                if not cli_dict['project']:
+                    found = False
+                    for component_library in self.component_libraries:
+                        if _dir == component_library.get_dir_abs_path():
+                            pid = component_library.get_package_id(pid)
+            if not _dir.endswith('specs'):
+                file_abs_path = asset.get_dir_abs_path() + '/'
+                file_abs_path += 'example_app.xml'
+                self.create_file(file_abs_path, comp_example_app_rst_template,
+                                 asset, extra=pid)
 
     def delete_asset(self, cli_dict, _dir):
         self.get_asset_object_from_cli(cli_dict, _dir).delete()
@@ -820,7 +852,14 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             for component_library in self.component_libraries:
                 assets.extend(component_library.components)
         if _type == HdlLibrary:
-            assets.extend(self.hdl_primitives)
+            for prim in self.hdl_primitives:
+                # TODO change to 'hdl primitive library'
+                if prim.get_type() == 'hdl primitive':
+                    assets.append(prim)
+        if _type == HdlCore:
+            for prim in self.hdl_primitives:
+                if prim.get_type() == 'hdl primitive core':
+                    assets.append(prim)
         if _type == ComponentLibrary:
             assets.extend(self.component_libraries)
         if _type == HdlSlot:
@@ -831,6 +870,8 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             assets.extend(self.rcc_platforms)
         if _type == Project:
             assets.extend([self])
+        if _type == Protocol:
+            assets.extend(self.protocols)
         for component_library in self.component_libraries:
             if _type == Worker:
                 assets.extend(component_library.workers)
@@ -839,6 +880,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         if _type == Worker:
             for hdl_platform in self.hdl_platforms:
                 assets.append(hdl_platform.worker)
+        # TODO define HdlTarget, RccTarget class
         return assets
 
     def get_types_from_cli_dict(self, cli_dict):
@@ -853,8 +895,6 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             types.append(HdlCard)
         if cli_dict['noun'].startswith('component'):
             types.append(Component)
-        if cli_dict['noun'].startswith('core'):
-            types.append(HdlLibrary)
         if cli_dict['noun'].startswith('librar'):
             types.append(ComponentLibrary)
         if cli_dict['noun'].startswith('slot'):
@@ -867,13 +907,28 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                (cli_dict['authoringmodel'] == 'rcc'):
                 types.append(RccPlatform)
         if cli_dict['noun'].startswith('primitive'):
-            types.append(HdlLibrary)
+            if cli_dict['adjective'].startswith('core'):
+                types.append(HdlCore)
+            elif cli_dict['adjective'].startswith('librar'):
+                types.append(HdlLibrary)
+            else:
+                types.append(HdlCore)
+                types.append(HdlLibrary)
         if cli_dict['noun'].startswith('project'):
             types.append(Project)
+        if cli_dict['noun'].startswith('protocol'):
+            types.append(Protocol)
         if cli_dict['noun'].startswith('worker'):
             types.append(Worker)
         if cli_dict['noun'].startswith('test'):
             types.append(Test)
+        if cli_dict['noun'].startswith('target'):
+            if (cli_dict['authoringmodel'] == '') or \
+               (cli_dict['authoringmodel'] == 'hdl'):
+                types.append(HdlPlatform)  # TODO fix
+            if (cli_dict['authoringmodel'] == '') or \
+               (cli_dict['authoringmodel'] == 'rcc'):
+                types.append(RccPlatform)
         return types
 
     def show(self, cli_dict, json_dict={}):
@@ -908,13 +963,6 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                             containing_path.endswith(hdlp) or \
                             containing_path.endswith('hdl/platforms')
                     if (not do_hdl_check) or (do_hdl_check and is_hdl):
-                        if cli_dict['noun'].startswith('primitive'):
-                            if cli_dict['adjective'].startswith('core'):
-                                if not asset.is_core:
-                                    continue
-                            elif cli_dict['adjective'].startswith('librar'):
-                                if asset.is_core:
-                                    continue
                         pid = str(self.get_package_id())
                         if (_type == Component) or (_type == Worker) or \
                            (_type == ComponentLibrary):
@@ -944,17 +992,60 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                                 msg += '.hdl'
                             if type(asset) == RccPlatform:
                                 msg += '.rcc'
+                        if cli_dict['noun'].startswith('target'):
+                            if (cli_dict['authoringmodel'] == '') or \
+                               (cli_dict['authoringmodel'] == 'hdl'):
+                                if asset.name == 'zed':
+                                    pid_and_name = pid + '.' + 'zynq'
+                                    msg = pid_and_name
+                                elif asset.name == 'zcu106':
+                                    pid_and_name = pid + '.' + 'zynq_ultra'
+                                    msg = pid_and_name
+                                elif asset.name == 'zed_ise':
+                                    pid_and_name = pid + '.' + 'zynq_ise'
+                                    msg = pid_and_name
+                                elif asset.name == 'zcu104':
+                                    pid_and_name = pid + '.' + 'zynq_ultra'
+                                    msg = pid_and_name
+                                elif asset.name == 'zed_ether':
+                                    pid_and_name = pid + '.' + 'zynq'
+                                    msg = pid_and_name
+                                elif asset.name == 'ml605':
+                                    pid_and_name = pid + '.' + 'virtex6'
+                                    msg = pid_and_name
+                                elif asset.name == 'alst4x':
+                                    pid_and_name = pid + '.' + 'stratix'
+                                    msg = pid_and_name
+                                elif asset.name == 'alst4':
+                                    pid_and_name = pid + '.' + 'stratix'
+                                    msg = pid_and_name
+                                elif asset.name == 'matchstiq_z1':
+                                    pid_and_name = pid + '.' + 'zynq'
+                                    msg = pid_and_name
+                                elif asset.name == 'e31x':
+                                    pid_and_name = pid + '.' + 'zynq'
+                                    msg = pid_and_name
+                                elif asset.name == 'zrf8_48dr':
+                                    pid_and_name = pid + '.' + 'zynq_ultra'
+                                    msg = pid_and_name
                         if cli_dict['verbose'] or cli_dict['table']:
-                            msg += ' '
-                            for idx in range(60-len(msg)):
+                            if not cli_dict['noun'].startswith('target'):
+                                # an hdl target, for example, is not an asset
+                                # with an associated directory
                                 msg += ' '
-                            msg += asset.abs_path
+                                for idx in range(60-len(msg)):
+                                    msg += ' '
+                                msg += asset.abs_path
                         if cli_dict['json']:
-                            json_dict[pid_and_name] = \
-                                    {'package_id': pid,
-                                     'directory': asset.get_dir_abs_path()}
+                            json_dict[pid_and_name] = {'package_id': pid}
+                            if not cli_dict['noun'].startswith('target'):
+                                # an hdl target, for example, is not an asset
+                                # with an associated directory
+                                json_dict[pid_and_name]['directory'] = \
+                                    asset.get_dir_abs_path()
                         else:
-                            list_to_show.append(msg)
+                            if msg not in list_to_show:
+                                list_to_show.append(msg)
                         first = False
         if not cli_dict['json']:
             # the list is sorted so that assets are generally printed in order

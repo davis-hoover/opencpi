@@ -30,11 +30,21 @@ g_libraries_mk = False
 g_asset_template = """<?xml version="1.0"?>\n<{{asset.root_tags[0]}}{% for key,val in asset.attrs.items() %}{% if val != '' and val != [] %} {{key}}=\'{% if val.__class__.__name__ == 'list' %}{% for entry in val %}{{entry}}{% if not loop.last %} {% endif %}{% endfor %}{% else %}{{val}}{% endif %}\'{% endif %}{% endfor %}/>\n\n"""  # nopep8
 g_hdl_core_mk = False
 g_suppress_warn = False
+g_log_level = -1
+
+
+def get_authoring_models():
+    return ['hdl', 'rcc', 'ocl']
 
 
 def set_g_suppress_warn(val):
     global g_suppress_warn
     g_suppress_warn = val
+
+
+def set_g_log_level(val):
+    global g_log_level
+    g_log_level = val
 
 
 def log_pass_fail(msg, passed):
@@ -113,6 +123,8 @@ class Environment():
         if ocpi_log_level is None:
             ocpi_log_level = 0
         self.ocpi_log_level = int(ocpi_log_level)
+        if g_log_level >= 0:
+            self.ocpi_log_level = g_log_level
         # below line is CDG section 14.8
         self.ocpi_project_path = []
         ocpi_project_path = os.environ.get('OCPI_PROJECT_PATH')
@@ -922,14 +934,20 @@ class AssetBase(AttributeBase):
             System('mkdir -p ' + self.get_dir_abs_path())
         for fname, fcontents in self.get_templates().items():
             file_path = self.get_dir_abs_path() + '/' + fname
-            if os.path.exists(file_path):
-                msg = "File: '" + file_path + "' already exists."
-                raise Exception(msg)
-            fcontents = jinja2.Template(fcontents, trim_blocks=True)
-            fcontents = fcontents.render(asset=self)
-            out_file = open(file_path, 'w')
-            out_file.write(fcontents)
-            out_file.close()
+            self.create_file(file_path, fcontents, self)
+
+    def create_file(self, file_path, fcontents, asset, extra=None):
+        if os.path.exists(file_path):
+            msg = 'file \'' + file_path + '\' already exists'
+            raise Exception(msg)
+        fcontents = jinja2.Template(fcontents, trim_blocks=True)
+        if extra is None:
+            fcontents = fcontents.render(asset=asset)
+        else:
+            fcontents = fcontents.render(asset=asset, extra=extra)
+        out_file = open(file_path, 'w')
+        out_file.write(fcontents)
+        out_file.close()
 
     def delete(self):
         System('rm -rf ' + self.abs_path)

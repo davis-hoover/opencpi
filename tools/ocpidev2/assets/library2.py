@@ -20,14 +20,14 @@
 import os
 from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import AssetBase
-from _opencpi.assets.component2 import Component, test_Component
+from _opencpi.assets.component2 import Component, Protocol, test_Component
 from _opencpi.assets.worker2 import Worker, RccAssembly
 from _opencpi.assets.worker2 import test_Worker, test_RccAssembly
 # below 4 lines are a weird, unintended consequence of Discoverer
 from _opencpi.assets.platform2 import HdlPlatform, RccPlatform
 from _opencpi.assets.platform2 import test_HdlPlatform, test_HdlCard
 from _opencpi.assets.assembly2 import HdlAssembly, test_HdlAssembly
-from _opencpi.assets.primitive2 import HdlLibrary, test_HdlLibrary
+from _opencpi.assets.primitive2 import HdlLibrary, HdlCore, test_HdlLibrary
 from _opencpi.assets.application2 import Application
 from _opencpi.assets.test2 import Test
 
@@ -81,25 +81,24 @@ Skeleton outline: Component library description and outline of scope to go here.
 
 
 class SpecsDirectory():
-    """ Class for discovering component assets in the specs directory """
+    """ Class which represents a specs directory, including its components and
+        protocols """
 
     def __init__(self):
         self.components = []
+        self.protocols = []
 
     def discover(self):
-        self.discover()
-
-    def discover_components(self):
         for _dir in os.listdir(self.abs_path):
             if _dir == 'specs':
                 discovery_path = self.abs_path + '/' + _dir
                 for name in AssetBase.listdir_assets(discovery_path):
-                    path = self.abs_path + '/' + _dir + '/' + name
-                    try:
-                        asset = Component(path)
-                        self.append_discovered_asset(asset)
-                    except InvalidAssetError:
-                        pass
+                    path = discovery_path + '/' + name
+                    for _type in [Component, Protocol]:
+                        try:
+                            self.append_discovered_asset(_type(path))
+                        except InvalidAssetError:
+                            pass
 
 
 # TODO organize this class better
@@ -114,6 +113,8 @@ class Discoverer():
             self.applications.append(asset)
         if asset.get_type() == 'hdl primitive':
             self.hdl_primitives.append(asset)
+        if asset.get_type() == 'hdl primitive core':
+            self.hdl_primitives.append(asset)
         if asset.get_type() == 'hdl assembly':
             self.hdl_assemblies.append(asset)
         if asset.get_type() == 'hdl slot':
@@ -122,6 +123,8 @@ class Discoverer():
             self.hdl_cards.append(asset)
         if asset.get_type() == 'hdl platform':
             self.hdl_platforms.append(asset)
+        if asset.get_type() == 'protocol':
+            self.protocols.append(asset)
         if asset.get_type() == 'rcc platform':
             self.rcc_platforms.append(asset)
         _type = asset.get_type()
@@ -143,6 +146,23 @@ class Discoverer():
         return ret
 
     def discover_dir_assets(self, parent, allowlist=None, platform=False):
+        for dir_abs_path in self.get_potential_asset_dir_abs_paths(parent):
+            try:
+                assets = []
+                if parent == 'hdl/primitives':
+                    assets.append(HdlCore(dir_abs_path))
+                for asset in assets:
+                    if allowlist is not None:
+                        # TODO is this pre-2.0???
+                        allowlist = [name.split('.')[0] for name in allowlist]
+                    if (allowlist is None) or (asset.name in allowlist):
+                        self.append_discovered_asset(asset)
+            except InvalidAssetError as err:
+                if (parent != 'applications') and \
+                   (not dir_abs_path.endswith('.test')):
+                    Logger().warn('skipping ' + str(err))
+                pass
+
         for dir_abs_path in self.get_potential_asset_dir_abs_paths(parent):
             try:
                 assets = []
@@ -341,12 +361,14 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
         if g_libraries_mk:
             g_libraries_mk = False
 
-    def discover(self, allowlist, platform=False):
-        self.discover_components()
-        self.discover_workers_and_tests(allowlist, platform)
+    def create(self):
+        AssetBase.create(self)
+        # below line is so that protocols can be created
+        System('mkdir -p ' + self.get_dir_abs_path() + '/specs')
 
-    def discover_components(self):
-        SpecsDirectory.discover_components(self)
+    def discover(self, allowlist, platform=False):
+        SpecsDirectory.discover(self)
+        self.discover_workers_and_tests(allowlist, platform)
         for discovery_path in self.get_potential_asset_dir_abs_paths(''):
             if discovery_path.endswith('.comp'):  # undocumented
                 for entry in AssetBase.listdir_assets(discovery_path):
