@@ -3,7 +3,7 @@
 # THIS IS THE ALL-ENCOMPASING TEST FOR OCPIDEV2
 ################################################################################
 # RECOMMENDED USAGE (note that q must be typed to bypass help screens):
-#  cd projects; rm -rf core2 assets2; OCPI_LOG_LEVEL=3 ../tools/ocpidev2/test.sh
+#  cd projects; rm -rf c*2 a*2 *ev2*; OCPI_LOG_LEVEL=3 ../tools/ocpidev2/test.sh
 ################################################################################
 set -e
 sudo apt install pycodestyle
@@ -15,6 +15,8 @@ ocpidev2 create -h
 ocpidev2 create --help
 ocpidev2 show -h
 ocpidev2 show --help
+#ocpidev2 create -h
+#ocpidev2 create --help
 ocpidev2 unittest
 ocpidev2 unittest -v
 ocpidev2 unittest --verbose
