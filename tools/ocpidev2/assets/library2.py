@@ -363,8 +363,8 @@ class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
 
     def create(self):
         AssetBase.create(self)
-        if self.name == 'cards':
-            System('mkdir -p ' + self.get_dir_abs_path() + '/specs')
+        # below line is so that protocols can be created
+        System('mkdir -p ' + self.get_dir_abs_path() + '/specs')
 
     def discover(self, allowlist, platform=False):
         SpecsDirectory.discover(self)
