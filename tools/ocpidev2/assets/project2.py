@@ -17,6 +17,12 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
+""" This file connects the collection of projects above with all possible
+    project constituents (Component, ComponentLibrary, Worker, HdlAssembly,
+    HdlPlatform, etc) below. interfaces with projects and not individual asset
+    classes. """
+
+
 import os
 import hashlib
 import itertools
@@ -34,6 +40,7 @@ from _opencpi.assets.primitive2 import HdlLibrary, HdlCore
 from _opencpi.assets.assembly2 import HdlAssembly
 from _opencpi.assets.platform2 import HdlSlot, HdlCard
 from _opencpi.assets.platform2 import HdlPlatform, RccPlatform
+from _opencpi.assets.platform2 import test_HdlPlatform
 from _opencpi.assets.test2 import Test
 
 
@@ -213,7 +220,6 @@ class Discoverer():
                    (not dir_abs_path.endswith('.test')):
                     Logger().warn('skipping ' + str(err))
                 pass
-
 
 
 class Project(AssetBase, SpecsDirectory, Discoverer):

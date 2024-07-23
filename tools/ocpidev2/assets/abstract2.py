@@ -17,6 +17,11 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
+""" This file contains all generic functionality usable everywhere, including
+    parsing support and other common functionality. Perhaps a place to dump
+    things temporarily when they don't belong elsewhere. """
+
+
 import xml.etree.ElementTree as ET
 import os
 import sys

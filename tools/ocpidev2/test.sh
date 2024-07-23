@@ -701,10 +701,14 @@ ocpidev2 -d assets show -d core workers -d platform -v -l 10
 ocpidev2 show components --simple
 ocpidev2 show components --table
 ocpidev2 show components --json
-ocpidev2 clean -d core -d assets -d platform
+ocpidev2 clean -d core -d assets -d platform -d assets_ts
 ocpidev2 build -d core/hdl/primitives/bsv --hdl-platform xsim 
-ocpidev2 clean -d core -d assets -d platform
+ocpidev2 clean -d core -d assets -d platform -d assets_ts
+ocpidev2 build -d core/hdl/primitives/bsv --hdl-platform xsim --hdl-platform zed
+ocpidev2 clean -d core -d assets -d platform -d assets_ts
 ocpidev2 build -j 16 -d assets/hdl/assemblies/iqstream_max --hdl-platform xsim
+ocpidev2 clean -d core -d assets -d platform -d assets_ts
+ocpidev2 build -j 16 -d assets/hdl/assemblies/iqstream_max --hdl-platform xsim --hdl-platform zed
 # python3 -m pip install coverage
 # coverage run $(which ocpidev2) unittest
 # coverage report -m

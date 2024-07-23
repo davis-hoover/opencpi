@@ -17,9 +17,9 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-""" This file connects the CLI with the is the verb (build/create/etc) interface
-    (ProjectCollection class). It interfaces with projects and not individual
-    asset classes. """
+""" This file connects the CLI above with the verb (build/create/etc) interface
+    (ProjectCollection class) that connects the Project class below. It
+    interfaces with projects and not individual asset classes. """
 
 
 import os

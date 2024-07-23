@@ -339,8 +339,6 @@ def test_ComponentLibrary(ret):
     ret = test_Component(ret)
     ret = test_RccAssembly(ret)
     ret = test_Worker(ret)
-    ret = test_HdlPlatform(ret)
-
     fs = TemporaryFilesystem()
     for test in range(7):
         passed = True
