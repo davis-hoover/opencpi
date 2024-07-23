@@ -203,8 +203,15 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         return ret
 
     def get_component_by_name(self, name):
-        # TODO fill in
-        return None
+        component = None
+        for library in self.component_libraries:
+            for component in library.components:
+                if name == component.name:
+                    component = component
+        for component in self.components:
+            if name == component.name:
+                component = component
+        return component
 
     def get_worker_by_name(self, name, authoring_model=''):
         ret = None
