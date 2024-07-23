@@ -209,7 +209,8 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                 if name == component.name:
                     component = component
         for component in self.components:
-            component = component
+            if name == component.name:
+                component = component
         return component
 
     def get_worker_by_name(self, name, authoring_model=''):
