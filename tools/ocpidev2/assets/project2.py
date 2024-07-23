@@ -202,16 +202,20 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
             ret += self.attrs['PackageName']
         return ret
 
-    def get_component_by_name(self, name):
-        component = None
-        for library in self.component_libraries:
-            for component in library.components:
-                if name == component.name:
-                    component = component
+    def get_list_of_component_strings_by_name(self, name):
+        """ get list of package id-qualified name per component found in this
+            project, or an empty list if not found """
+        ret = []
+        project_pid = self.get_package_id()
         for component in self.components:
             if name == component.name:
-                component = component
-        return component
+                ret.append(project_pid + '.' + component.name)
+        for component_library in self.component_libraries:
+            for component in component_library.components:
+                if name == component.name:
+                    pid = component_library.get_package_id(project_pid)
+                    ret.append(pid + '.' + component.name)
+        return ret
 
     def get_worker_by_name(self, name, authoring_model=''):
         ret = None

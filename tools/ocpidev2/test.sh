@@ -183,6 +183,7 @@ ocpidev2 create library devices -d assets2/hdl
 ocpidev2 create library adapters -d assets2/hdl
 ocpidev2 create hdl card fmcomms_2_3_hpc -d assets2/hdl/cards/specs --type fmc_hpc
 ocpidev2 create hdl primitive core temac_v6 -d assets2/hdl/primitives
+ocpidev2 create test gpi -d assets2/hdl/devices --component gpi_in --use-hdl-file-io
 ocpidev2 create project ocpidev2_test_project
 ocpidev2 create hdl primitive library myprim -d ocpidev2_test_project/hdl/primitives
 pushd ocpidev2_test_project/hdl/primitives
@@ -404,6 +405,9 @@ ocpidev2 create hdl card fmcomms_2_3_hpc --type fmc_hpc
 popd
 pushd assets2
 ocpidev2 create hdl primitive core temac_v6 -d hdl/primitives
+popd
+pushd assets2/hdl/devices
+ocpidev2 create test gpi --component gpi_in --use-hdl-file-io
 popd
 ocpidev2 show application FSK
 ocpidev2 show application FSK -v

@@ -28,17 +28,47 @@ Asset types to be specified in the '<noun>' argument are:
 *`applications`*::
     Display all applications in registered projects.
 
+*`assembly`*::
+    Display information on the specified assembly.
+
+*`assemblies`*::
+    Display all assemblies in registered projects.
+
+*`card`*::
+    Display information on the specified card.
+    
+*`cards`*::
+    Display all cards in registered projects.
+
 *`component`*::
     Display information on the specified component.
     
 *`components`*::
     Display all components in registered projects.
 
+*`device`*::
+    Display information on the specified device worker.
+    
+*`devices`*::
+    Display all device workers in registered projects.
+
 *`library`*::
     Display information on the specified component library.
 
 *`libraries`*::
     Display all component libraries in registered projects.
+
+*`platform`*::
+    Display information on the specified platform.
+
+*`platforms`*::
+    Display all platforms in registered projects.
+
+*`primitive`*::
+    Display information on the specified primitive.
+
+*`primitives`*::
+    Display all primitives in registered projects.
 
 *`project`*::
     Display information on the specified registered project.
@@ -48,6 +78,18 @@ Asset types to be specified in the '<noun>' argument are:
 
 *`registry`*::
     Display information on the registry.
+
+*`slot`*::
+    Display information on the specified slot.
+
+*`slots`*::
+    Display all slots in registered projects.
+
+*`target`*::
+    Display information on the specified target that assets can be built for.
+
+*`targets`*::
+    Display all targets that assets can be built for.
 
 *`test`*::
     Display all unit tests in registered projects.
@@ -61,15 +103,15 @@ Asset types to be specified in the '<noun>' argument are:
 *`workers`*::
     Display all workers in registered projects.
 
-Use the keywords *`rcc`* and *`hdl`* to scope what is displayed
-for the *`library`* and *`libraries`* nouns. For example, the command:
+Use the *`hdl`* keyword to scope what is displayed
+for the *`assembly`*, *`assemblies`*, *`card`*, *`cards`*, *`device`*, *`devices`*, *`library`*, *`libraries`*, *`primitive`*, *`primitives`*, *`platform`*, *`platforms`* nouns. For example, the command:
 
 --------------------------
-ocpidev show hdl libraries
+ocpidev show hdl platforms
 --------------------------
 
-
-only shows the available HDL libraries.
+Use the *`rcc`* keyword to scope what is displayed
+for the `*platform`*, *`platforms`* nouns.
 
 OPTIONS
 -------
@@ -79,11 +121,31 @@ There are no options other then the options common to all OpenCPI tools
 
 EXAMPLES
 --------
-. List all components in any registered projects:
+. List all RCC and HDL platforms that assets can be built for:
 +
-------------------------
+----------------------
+ocpidev2 show platforms
+----------------------
++
+. List all HDL platforms that HDL assets can be built for:
++
+--------------------------
+ocpidev2 show hdl platforms
+--------------------------
++
+. List all components in any registered projects
+(omits components at the top level of project due to a defect):
++
+-----------------------
 ocpidev2 show components
-------------------------
+-----------------------
++
+. Display a table of the registered projects and their locations:
++
+-----------------------------
+ocpidev2 show --table registry
+------------------------------
+
 
 BUGS
 ----

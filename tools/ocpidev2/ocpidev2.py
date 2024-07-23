@@ -35,6 +35,88 @@ from _opencpi.assets.test2 import Test
 from _opencpi.assets.worker2 import Worker
 
 
+class ProjectCollection():
+    """ represents all projects on which actions can be performed, regardless
+        of whether they are registered or not """
+
+    def __init__(self):
+        self.project_registry = None
+
+    def assign_local_project(self, _dir):
+        self.local_project = None
+        project_dir_abs_path = _dir
+        while True:
+            try:
+                self.local_project = Project(project_dir_abs_path, True)
+                self.local_project.discover()
+                Logger().debug('operating in local project ' +
+                               self.local_project.get_dir_abs_path())
+                break
+            except InvalidAssetError:
+                project_dir_abs_path = project_dir_abs_path.rsplit('/', 1)[0]
+                if len(project_dir_abs_path) <= 1:
+                    break
+
+    def discover_registry(self):
+        self.project_registry.discover(True, True, self.local_project)
+
+    def build(self, cli_dict, _dir):
+        self.project_registry.build(cli_dict, _dir)
+
+    def clean(self, cli_dict, _dir):
+        self.project_registry.clean(cli_dict, _dir)
+
+    def create(self, cli_dict, _dir):
+        if (cli_dict['verb'] == 'create') and \
+           (cli_dict['noun'] == 'test'):
+            spec = cli_dict['name']  # default
+            if cli_dict['component']:
+                spec = cli_dict['component']
+            c_strs = self.get_list_of_component_strings_by_name(spec)
+            if len(c_strs) == 0:
+                Logger().warn('spec ' + spec + ' not found')
+            elif len(c_strs) > 1:
+                msg = 'multiple component specs found, \'' + c_strs[0]
+                msg += '\' will be used but others were also found: '
+                msg += ', '.join(c_strs[1:])
+                Logger().warn(msg)
+        if self.local_project is None:
+            self.project_registry.create(cli_dict, _dir)
+        else:
+            self.local_project.create_asset(cli_dict, _dir)
+
+    def delete(self, cli_dict, _dir):
+        self.project_registry.delete(cli_dict, _dir)
+
+    def register(self, cli_dict, _dir):
+        self.project_registry.register(cli_dict, _dir)
+
+    def run(self, cli_dict, _dir):
+        self.project_registry.run(cli_dict, _dir)
+
+    def show(self, cli_dict):
+        self.project_registry.show(cli_dict)
+
+    def unregister(self, cli_dict, _dir):
+        self.project_registry.unregister(cli_dict, _dir)
+
+    def get_list_of_component_strings_by_name(self, spec):
+        """ get list of package id-qualified names of components in the order
+            order defined in CDG section 14.8 """
+        c_strs = self.local_project.get_list_of_component_strings_by_name(spec)
+        if len(c_strs) > 1:
+            msg = 'multiple component specs matched name \'' + spec
+            msg += '\' in the local project: ' + ', '.join(c_strs)
+            Logger().warn(msg)
+            c_strs = [c_strs[0]]
+        else:
+            deps = self.local_project.attrs['ProjectDependencies']
+            tmp = self.project_registry.get_list_of_component_strings_by_name(spec,
+                                                                              deps)
+            c_strs.extend(tmp)
+        return c_strs
+
+
 def ocpidevsignint(sig, frame):
     """ add create-specific arguments as per man ocpidev2-build """
     raise Exception('Ctrl-C stopped execution')
@@ -363,6 +445,21 @@ def get_cli_dict():
                                 ' is and invalid worker name')
     # make CLI look like attrs (necessary for create cli verb)
     cli_dict = ({key.replace('_', ''): val for key, val in cli_dict.items()})
+    if cli_dict['noun'] is not None:
+        if not (cli_dict['noun'].startswith('adapter') or
+                cli_dict['noun'].startswith('assembl') or
+                cli_dict['noun'].startswith('card') or
+                cli_dict['noun'].startswith('device') or
+                cli_dict['noun'].startswith('librar') or
+                cli_dict['noun'].startswith('primitive') or
+                cli_dict['noun'].startswith('platform') or
+                cli_dict['noun'].startswith('slot') or
+                cli_dict['noun'].startswith('target') or
+                cli_dict['noun'].startswith('worker')):
+            if cli_dict['authoringmodel'] == 'hdl':
+                msg = 'authoring model \'hdl\' is invalid for noun \''
+                msg += cli_dict['noun'] + '\''
+                raise Exception(msg)
     return cli_dict
 
 
@@ -370,27 +467,9 @@ def get_cli_dict():
 global g_suppress_warn
 
 
-def get_local_project(_dir):
-    project = None
-    project_dir_abs_path = _dir
-    while True:
-        try:
-            project = Project(project_dir_abs_path, True)
-            project.discover()
-            Logger().debug('operating in local project ' +
-                           project.get_dir_abs_path())
-            break
-        except InvalidAssetError:
-            project_dir_abs_path = project_dir_abs_path.rsplit('/', 1)[0]
-            if len(project_dir_abs_path) <= 1:
-                break
-    return project
-
-
 def dispatch_verb(cli_dict):
     """ this method implements functionality common across verbs, then
         dispatches to individual verb calls """
-    project_registry = None
     if cli_dict['help']:
         if cli_dict['verb'] == '':
             os.system('man ocpidev2')
@@ -400,21 +479,21 @@ def dispatch_verb(cli_dict):
         dirs_to_operate_on = cli_dict['d'].copy()
         if dirs_to_operate_on == []:
             dirs_to_operate_on.append(Environment().getcwd())
-        project_registry = None
+        proj_collection = ProjectCollection()
         for _dir in dirs_to_operate_on:
-            local_project = get_local_project(_dir)
+            proj_collection.assign_local_project(_dir)
             if ((cli_dict['verb'] == 'create') and
-                (local_project is None)) or \
+                (proj_collection.local_project is None)) or \
                 ((cli_dict['verb'] != 'create') and
-                 (project_registry is None)) or \
+                 (proj_collection.project_registry is None)) or \
                 ((cli_dict['verb'] == 'create') and
                  (cli_dict['noun'] == 'test')):
-                project_registry = ProjectRegistry()
+                proj_collection.project_registry = ProjectRegistry()
                 if not ((cli_dict['verb'] == 'create') and
                    (cli_dict['noun'] == 'registry')):
                     if cli_dict['verb'] == 'show':
                         set_g_suppress_warn(True)
-                    project_registry.discover(True, True, local_project)
+                    proj_collection.discover_registry()
             if not ((cli_dict['verb'] == 'create') and
                (cli_dict['noun'] == 'library')):
                 msg = 'performing \'' + cli_dict['verb']
@@ -425,35 +504,23 @@ def dispatch_verb(cli_dict):
                 msg += '\''
                 Logger().log(3, msg + ' within directory ' + _dir)
             if cli_dict['verb'] == 'build':
-                project_registry.build(cli_dict, _dir)
+                proj_collection.build(cli_dict, _dir)
             elif cli_dict['verb'] == 'clean':
-                project_registry.clean(cli_dict, _dir)
+                proj_collection.clean(cli_dict, _dir)
             elif cli_dict['verb'] == 'create':
-                if (cli_dict['verb'] == 'create') and \
-                   (cli_dict['noun'] == 'test'):
-                    spec = cli_dict['name']  # default
-                    if cli_dict['component']:
-                        spec = cli_dict['component']
-                    if local_project.get_component_by_name(spec) is None:
-                        if project_registry.get_component_by_name(spec) is \
-                                None:
-                            Logger().warn('spec ' + spec + ' not found')
-                if local_project is None:
-                    project_registry.create(cli_dict, _dir)
-                else:
-                    local_project.create_asset(cli_dict, _dir)
+                proj_collection.create(cli_dict, _dir)
             elif cli_dict['verb'] == 'delete':
-                project_registry.delete(cli_dict, _dir)
+                proj_collection.delete(cli_dict, _dir)
             elif cli_dict['verb'] == 'refresh':
                 Logger().warn('refresh is not necessary in ocpidev2')
             elif cli_dict['verb'] == 'register':
-                project_registry.register(cli_dict, _dir)
+                proj_collection.register(cli_dict, _dir)
             elif cli_dict['verb'] == 'run':
-                project_registry.run(cli_dict, _dir)
+                proj_collection.run(cli_dict, _dir)
             elif cli_dict['verb'] == 'show':
-                project_registry.show(cli_dict)
+                proj_collection.show(cli_dict)
             elif cli_dict['verb'] == 'unregister':
-                project_registry.unregister(cli_dict, _dir)
+                proj_collection.unregister(cli_dict, _dir)
             elif cli_dict['verb'] == 'unittest':
                 unittest(cli_dict, _dir)
             else:
