@@ -84,14 +84,16 @@ class ProjectRegistry():
                 break
         return component
 
-    def get_list_of_component_strings_by_name(self, name, package_dependencies):
+    def get_list_of_component_strings_by_name(self, name,
+                                              package_dependencies):
         """ get list of package id-qualified name per component found in this
             registry's project, or an empty list if not found """
         ret = []
         for package_id in package_dependencies:
             for project in self.projects:
                 if project.get_package_id() == package_id:
-                    ret.extend(project.get_list_of_component_strings_by_name(name))
+                    _list = project.get_list_of_component_strings_by_name(name)
+                    ret.extend(_list)
         return ret
 
     def get_worker_project(self, name, abs_path=None, authoring_model=''):

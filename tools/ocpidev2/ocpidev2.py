@@ -111,8 +111,8 @@ class ProjectCollection():
             c_strs = [c_strs[0]]
         else:
             deps = self.local_project.attrs['ProjectDependencies']
-            tmp = self.project_registry.get_list_of_component_strings_by_name(spec,
-                                                                              deps)
+            reg = self.project_registry
+            tmp = reg.get_list_of_component_strings_by_name(spec, deps)
             c_strs.extend(tmp)
         return c_strs
 
@@ -160,6 +160,9 @@ def add_create_arguments(parser, noun):
                             action='store_true')
         parser.add_argument('-p', '--project', default=False,
                             action='store_true')
+        group = parser.add_mutually_exclusive_group()
+        group.add_argument('--hdl-library', nargs='?', default='')
+        group.add_argument('--library', default=None)
     if noun == 'test':
         asset = Test('', False, None)
     if noun == 'application':
@@ -175,7 +178,7 @@ def add_create_arguments(parser, noun):
         group.add_argument('-p', '--project', default=False,
                            action='store_true')
         group.add_argument('--hdl-library', nargs='?', default='')
-        group.add_argument('-M', '--library', default=None)
+        group.add_argument('--library', default=None)
     if noun == 'primitive':
         asset = HdlLibrary('', False, None)
         parser.add_argument('-p', '--project', default=False,
@@ -336,6 +339,9 @@ def get_args(parser):
             args.noun = 'primitive'
             # later set to adjective...
             args.name = unknown_arg
+        elif unknown_arg in ['--xml-dir-app']:
+            args.xml_dir_app = unknown_arg  # no idea why this is necessary...
+            args.xml_app = None  # no idea why this is necessary...
         else:
             raise Exception('invalid argument: ' + unknown_arg)
     return args

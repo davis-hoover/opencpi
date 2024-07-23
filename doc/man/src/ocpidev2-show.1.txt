@@ -104,7 +104,7 @@ Asset types to be specified in the '<noun>' argument are:
     Display all workers in registered projects.
 
 Use the *`hdl`* keyword to scope what is displayed
-for the *`assembly`*, *`assemblies`*, *`card`*, *`cards`*, *`device`*, *`devices`*, *`library`*, *`libraries`*, *`primitive`*, *`primitives`*, *`platform`*, *`platforms`* nouns. For example, the command:
+for the *`adapter`*, *`adapters`*, *`assembly`*, *`assemblies`*, *`card`*, *`cards`*, *`device`*, *`devices`*, *`library`*, *`libraries`*, *`primitive`*, *`primitives`*, *`platform`*, *`platforms`*, *`slot`*, *`slots`*, *`target`*, *`targets`*, *`worker`*, *`workers`* nouns. For example, the command:
 
 --------------------------
 ocpidev show hdl platforms
