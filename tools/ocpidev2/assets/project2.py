@@ -203,9 +203,8 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         return ret
 
     def get_component_by_name(self, name):
-        # TODO fill in
         for library in self.component_libraries:
-            for component in self.components:
+            for component in library.components:
                 if name == component.name:
                     return component
         return None

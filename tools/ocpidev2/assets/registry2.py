@@ -80,6 +80,8 @@ class ProjectRegistry():
         component = None
         for project in self.projects:
             component = project.get_component_by_name(name)
+            if component is not None:
+                break
         return component
 
     def get_worker_project(self, name, abs_path=None, authoring_model=''):
