@@ -17,10 +17,115 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
+""" This file is the verb (build/create/etc) interface for ocpidev2, it
+    interfaces with projects and not individual asset classes. """
+
 import os
 from _opencpi.assets.abstract2 import *
+# IMPORTANT - inteface with AssetBase and Project, nothing else
 from _opencpi.assets.abstract2 import AssetBase
 from _opencpi.assets.project2 import Project, test_Project
+
+
+class ProjectCollection():
+    """ represents all projects on which actions can be performed, regardless
+        of whether they are registered or not """
+
+    def __init__(self):
+        self.project_registry = None
+
+    @staticmethod
+    def is_worker(noun):
+        return Project.is_worker(noun)
+
+    @staticmethod
+    def is_hdl(noun):
+        return Project.is_hdl(noun)
+
+    @staticmethod
+    def is_rcc(noun):
+        return Project.is_rcc(noun)
+
+    @staticmethod
+    def get_asset_for_create(noun):
+        return Project.get_asset_for_create(noun)
+
+    def assign_local_project(self, _dir):
+        self.local_project = None
+        project_dir_abs_path = _dir
+        while True:
+            try:
+                self.local_project = Project(project_dir_abs_path, True)
+                self.local_project.discover()
+                Logger().debug('operating in local project ' +
+                               self.local_project.get_dir_abs_path())
+                break
+            except InvalidAssetError:
+                project_dir_abs_path = project_dir_abs_path.rsplit('/', 1)[0]
+                if len(project_dir_abs_path) <= 1:
+                    break
+
+    def init_registry(self):
+        self.project_registry = ProjectRegistry()
+
+    def discover_registry(self):
+        self.project_registry.discover(True, True, self.local_project)
+
+    def build(self, cli_dict, _dir):
+        self.project_registry.build(cli_dict, _dir)
+
+    def clean(self, cli_dict, _dir):
+        self.project_registry.clean(cli_dict, _dir)
+
+    def create(self, cli_dict, _dir):
+        if (cli_dict['verb'] == 'create') and \
+           (cli_dict['noun'] == 'test'):
+            spec = cli_dict['name']  # default
+            if cli_dict['component']:
+                spec = cli_dict['component']
+            c_strs = self.get_list_of_component_strings_by_name(spec)
+            if len(c_strs) == 0:
+                Logger().warn('spec ' + spec + ' not found')
+            elif len(c_strs) > 1:
+                msg = 'multiple component specs found, \'' + c_strs[0]
+                msg += '\' will be used but others were also found: '
+                msg += ', '.join(c_strs[1:])
+                Logger().warn(msg)
+        if self.local_project is None:
+            self.project_registry.create(cli_dict, _dir)
+        else:
+            self.local_project.create_asset(cli_dict, _dir)
+
+    def delete(self, cli_dict, _dir):
+        self.project_registry.delete(cli_dict, _dir)
+
+    def register(self, cli_dict, _dir):
+        self.project_registry.register(cli_dict, _dir)
+
+    def run(self, cli_dict, _dir):
+        self.project_registry.run(cli_dict, _dir)
+
+    def show(self, cli_dict):
+        self.project_registry.show(cli_dict)
+
+    def unregister(self, cli_dict, _dir):
+        self.project_registry.unregister(cli_dict, _dir)
+
+    def get_list_of_component_strings_by_name(self, spec):
+        """ get list of package id-qualified names of components in the order
+            order defined in CDG section 14.8 """
+        c_strs = self.local_project.get_list_of_component_strings_by_name(spec)
+        if len(c_strs) > 1:
+            msg = 'multiple component specs matched name \'' + spec
+            msg += '\' in the local project: ' + ', '.join(c_strs)
+            Logger().warn(msg)
+            c_strs = [c_strs[0]]
+        else:
+            deps = self.local_project.attrs['ProjectDependencies']
+            reg = self.project_registry
+            tmp = reg.get_list_of_component_strings_by_name(spec, deps)
+            c_strs.extend(tmp)
+        return c_strs
 
 
 class ProjectRegistry():

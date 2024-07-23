@@ -18,112 +18,20 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+""" This file exposes the Command Line Interface (CLI) for ocpidev2, it
+    interfaces with project-like things and not individual asset classes. """
 
 import os
 import argparse
 import signal
 from _opencpi.assets.abstract2 import *
-from _opencpi.assets.registry2 import ProjectRegistry, unittest
-from _opencpi.assets.project2 import Project
-# below imports only necessary for get_attr_infos() calls
-from _opencpi.assets.application2 import Application
-from _opencpi.assets.component2 import Component
-from _opencpi.assets.library2 import ComponentLibrary
-from _opencpi.assets.platform2 import HdlPlatform, HdlCard
-from _opencpi.assets.primitive2 import HdlLibrary
-from _opencpi.assets.test2 import Test
-from _opencpi.assets.worker2 import Worker
-
-
-class ProjectCollection():
-    """ represents all projects on which actions can be performed, regardless
-        of whether they are registered or not """
-
-    def __init__(self):
-        self.project_registry = None
-
-    def assign_local_project(self, _dir):
-        self.local_project = None
-        project_dir_abs_path = _dir
-        while True:
-            try:
-                self.local_project = Project(project_dir_abs_path, True)
-                self.local_project.discover()
-                Logger().debug('operating in local project ' +
-                               self.local_project.get_dir_abs_path())
-                break
-            except InvalidAssetError:
-                project_dir_abs_path = project_dir_abs_path.rsplit('/', 1)[0]
-                if len(project_dir_abs_path) <= 1:
-                    break
-
-    def discover_registry(self):
-        self.project_registry.discover(True, True, self.local_project)
-
-    def build(self, cli_dict, _dir):
-        self.project_registry.build(cli_dict, _dir)
-
-    def clean(self, cli_dict, _dir):
-        self.project_registry.clean(cli_dict, _dir)
-
-    def create(self, cli_dict, _dir):
-        if (cli_dict['verb'] == 'create') and \
-           (cli_dict['noun'] == 'test'):
-            spec = cli_dict['name']  # default
-            if cli_dict['component']:
-                spec = cli_dict['component']
-            c_strs = self.get_list_of_component_strings_by_name(spec)
-            if len(c_strs) == 0:
-                Logger().warn('spec ' + spec + ' not found')
-            elif len(c_strs) > 1:
-                msg = 'multiple component specs found, \'' + c_strs[0]
-                msg += '\' will be used but others were also found: '
-                msg += ', '.join(c_strs[1:])
-                Logger().warn(msg)
-        if self.local_project is None:
-            self.project_registry.create(cli_dict, _dir)
-        else:
-            self.local_project.create_asset(cli_dict, _dir)
-
-    def delete(self, cli_dict, _dir):
-        self.project_registry.delete(cli_dict, _dir)
-
-    def register(self, cli_dict, _dir):
-        self.project_registry.register(cli_dict, _dir)
-
-    def run(self, cli_dict, _dir):
-        self.project_registry.run(cli_dict, _dir)
-
-    def show(self, cli_dict):
-        self.project_registry.show(cli_dict)
-
-    def unregister(self, cli_dict, _dir):
-        self.project_registry.unregister(cli_dict, _dir)
-
-    def get_list_of_component_strings_by_name(self, spec):
-        """ get list of package id-qualified names of components in the order
-            order defined in CDG section 14.8 """
-        c_strs = self.local_project.get_list_of_component_strings_by_name(spec)
-        if len(c_strs) > 1:
-            msg = 'multiple component specs matched name \'' + spec
-            msg += '\' in the local project: ' + ', '.join(c_strs)
-            Logger().warn(msg)
-            c_strs = [c_strs[0]]
-        else:
-            deps = self.local_project.attrs['ProjectDependencies']
-            reg = self.project_registry
-            tmp = reg.get_list_of_component_strings_by_name(spec, deps)
-            c_strs.extend(tmp)
-        return c_strs
+# IMPORTANT - inteface with ProjectCollection, nothing else
+from _opencpi.assets.registry2 import ProjectCollection, unittest
 
 
 def ocpidevsignint(sig, frame):
     """ add create-specific arguments as per man ocpidev2-build """
     raise Exception('Ctrl-C stopped execution')
-
-
-def get_is_worker(noun):
-    return (noun == 'worker') or (noun == 'device') or (noun == 'adapter')
 
 
 def add_build_create_show_arguments(parser):
@@ -146,16 +54,14 @@ def add_build_arguments(parser):
 def add_create_arguments(parser, noun):
     """ add create-specific arguments as per man ocpidev2-create """
     parser.add_argument('-k', '--keep', default=False, action='store_true')
-    asset = None
-    if noun == 'project':
-        asset = Project('', False, None)
-        parser.add_argument('--register', default=False, action='store_true')
-    if noun == 'library':
-        asset = ComponentLibrary('', False, None)
-    if noun == 'card':
-        asset = HdlCard('', False, None)
+    asset = ProjectCollection.get_asset_for_create(noun)
+    if noun == 'application':
+        group = parser.add_mutually_exclusive_group()
+        group.add_argument('-X', '--xml-app', default=False,
+                           action='store_true')
+        group.add_argument('-x', '--xml-dir-app', default=False,
+                           action='store_true')
     if noun == 'component':
-        asset = Component('', False, None)
         parser.add_argument('-t', '--create-test', default=False,
                             action='store_true')
         parser.add_argument('-p', '--project', default=False,
@@ -163,31 +69,17 @@ def add_create_arguments(parser, noun):
         group = parser.add_mutually_exclusive_group()
         group.add_argument('--hdl-library', nargs='?', default='')
         group.add_argument('--library', default=None)
-    if noun == 'test':
-        asset = Test('', False, None)
-    if noun == 'application':
-        asset = Application('', False, None)
-        group = parser.add_mutually_exclusive_group()
-        group.add_argument('-X', '--xml-app', default=False,
-                           action='store_true')
-        group.add_argument('-x', '--xml-dir-app', default=False,
-                           action='store_true')
+    if noun == 'primitive':
+        parser.add_argument('-p', '--project', default=False,
+                            action='store_true')
+    if noun == 'project':
+        parser.add_argument('--register', default=False, action='store_true')
     if noun == 'protocol':
-        asset = Protocol('', False, None)
         group = parser.add_mutually_exclusive_group()
         group.add_argument('-p', '--project', default=False,
                            action='store_true')
         group.add_argument('--hdl-library', nargs='?', default='')
         group.add_argument('--library', default=None)
-    if noun == 'primitive':
-        asset = HdlLibrary('', False, None)
-        parser.add_argument('-p', '--project', default=False,
-                            action='store_true')
-    if noun == 'platform':
-        asset = HdlPlatform('', False, None)
-    if get_is_worker(noun):
-        # dict created to weed out unnecessary warnings...
-        asset = Worker('', False, {'language': 'vhdl', 'version': 2})
     if asset is not None:
         for attr in asset.get_attr_infos():
             if attr.cli is not None:
@@ -410,12 +302,13 @@ def get_cli_dict():
         args.authoring_model = ''
     # TODO move below 3 lines to AssetBase once proper checks in place
     if args.verb != 'unittest':
-        if get_is_worker(args.noun):
+        if ProjectCollection.is_worker(args.noun):
             # if not [am in args.name for am in get_authoring_models()]:
             #     raise Exception(args.name + ' is an invalid worker name')
-            if '.' in args.name:
-                args.authoring_model = args.name.split('.')[1]
-                args.name = args.name.split('.')[0]
+            if args.name is not None:
+                if '.' in args.name:
+                    args.authoring_model = args.name.split('.')[1]
+                    args.name = args.name.split('.')[0]
         else:
             if args.name:
                 if args.noun.startswith('test'):
@@ -452,20 +345,14 @@ def get_cli_dict():
     # make CLI look like attrs (necessary for create cli verb)
     cli_dict = ({key.replace('_', ''): val for key, val in cli_dict.items()})
     if cli_dict['noun'] is not None:
-        if not (cli_dict['noun'].startswith('adapter') or
-                cli_dict['noun'].startswith('assembl') or
-                cli_dict['noun'].startswith('card') or
-                cli_dict['noun'].startswith('device') or
-                cli_dict['noun'].startswith('librar') or
-                cli_dict['noun'].startswith('primitive') or
-                cli_dict['noun'].startswith('platform') or
-                cli_dict['noun'].startswith('slot') or
-                cli_dict['noun'].startswith('target') or
-                cli_dict['noun'].startswith('worker')):
-            if cli_dict['authoringmodel'] == 'hdl':
-                msg = 'authoring model \'hdl\' is invalid for noun \''
-                msg += cli_dict['noun'] + '\''
-                raise Exception(msg)
+        bad_hdl = (cli_dict['authoringmodel'] == 'hdl') and \
+                  (not ProjectCollection.is_hdl(cli_dict['noun']))
+        bad_rcc = (cli_dict['authoringmodel'] == 'rcc') and \
+                  (not ProjectCollection.is_rcc(cli_dict['noun']))
+        if bad_hdl or bad_rcc:
+            msg = 'authoring model \'' + cli_dict['authoringmodel']
+            msg += '\' is invalid for noun \'' + cli_dict['noun'] + '\''
+            raise Exception(msg)
     return cli_dict
 
 
@@ -494,7 +381,7 @@ def dispatch_verb(cli_dict):
                  (proj_collection.project_registry is None)) or \
                 ((cli_dict['verb'] == 'create') and
                  (cli_dict['noun'] == 'test')):
-                proj_collection.project_registry = ProjectRegistry()
+                proj_collection.init_registry()
                 if not ((cli_dict['verb'] == 'create') and
                    (cli_dict['noun'] == 'registry')):
                     if cli_dict['verb'] == 'show':

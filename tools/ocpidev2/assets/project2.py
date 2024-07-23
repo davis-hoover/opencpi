@@ -21,6 +21,7 @@ import os
 import hashlib
 import itertools
 from _opencpi.assets.abstract2 import *
+# here we interface with all the typical asset types
 from _opencpi.assets.abstract2 import AssetBase
 from _opencpi.assets.component2 import Component, Protocol
 from _opencpi.assets.worker2 import Worker
@@ -153,6 +154,48 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
         # end of CDG section 14.5
         self.parse(cli_dict)
         self.first = True
+
+    @staticmethod
+    def is_worker(noun):
+        worker_strs = ['worker', 'device', 'adapter']
+        return any([noun.startswith(_str) for _str in worker_strs])
+
+    @staticmethod
+    def is_hdl(noun):
+        hdl_strs = ['adapter', 'assembl', 'card', 'device', 'librar',
+                    'primitive', 'platform', 'slot', 'target', 'worker']
+        return any([noun.startswith(_str) for _str in hdl_strs])
+
+    @staticmethod
+    def is_rcc(noun):
+        rcc_strs = ['worker', 'target', 'platform']
+        return any([noun.startswith(_str) for _str in rcc_strs])
+
+    @staticmethod
+    def get_asset_for_create(noun):
+        asset = None
+        if noun == 'project':
+            asset = Project('', False, None)
+        if noun == 'library':
+            asset = ComponentLibrary('', False, None)
+        if noun == 'card':
+            asset = HdlCard('', False, None)
+        if noun == 'component':
+            asset = Component('', False, None)
+        if noun == 'test':
+            asset = Test('', False, None)
+        if noun == 'application':
+            asset = Application('', False, None)
+        if noun == 'protocol':
+            asset = Protocol('', False, None)
+        if noun == 'primitive':
+            asset = HdlLibrary('', False, None)
+        if noun == 'platform':
+            asset = HdlPlatform('', False, None)
+        if Project.is_worker(noun):
+            # dict created to weed out unnecessary warnings...
+            asset = Worker('', False, {'language': 'vhdl', 'version': 2})
+        return asset
 
     def get_type(self):
         return 'project'
@@ -968,7 +1011,6 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                 if (cli_dict['d'] == []) or \
                    any([(_dir + '/') in (asset.abs_path + '/') for _dir in
                         cli_dict['d']]):
-                    do_hdl_check = cli_dict['authoringmodel'] == 'hdl'
                     containing_path = \
                         asset.get_dir_abs_path().rsplit('/', 1)[0]
                     if cli_dict['noun'].startswith('librar'):
@@ -984,9 +1026,16 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                     passed_any_hdl_checks = True
                     if (cli_dict['authoringmodel'] == 'hdl'):
                         passed_any_hdl_checks = \
-                            (asset.get_type() == 'hdl worker') or \
+                            (asset.get_type() == 'hdl adapter') or \
+                            (asset.get_type() == 'hdl assembly') or \
+                            (asset.get_type() == 'hdl card') or \
+                            (asset.get_type() == 'hdl device') or \
+                            (asset.get_type() == 'hdl librar') or \
                             (asset.get_type() == 'hdl primitive') or \
-                            (asset.get_type() == 'hdl platform')
+                            (asset.get_type() == 'hdl platform') or \
+                            (asset.get_type() == 'hdl slot') or \
+                            (asset.get_type() == 'hdl target') or \
+                            (asset.get_type() == 'hdl worker')
                     elif (cli_dict['authoringmodel'] == 'rcc'):
                         passed_any_hdl_checks = \
                             (asset.get_type() == 'rcc worker') or \
@@ -1024,8 +1073,7 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
                         if first and cli_dict['simple']:
                             msg += ' '
                         msg += pid_and_name
-                        if cli_dict['noun'].startswith('worker') or \
-                           cli_dict['noun'].startswith('device'):
+                        if Project.is_worker(cli_dict['noun']):
                             msg += '.' + asset.authoring_model
                         if cli_dict['noun'].startswith('platform'):
                             if type(asset) == HdlPlatform:
