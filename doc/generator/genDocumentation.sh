@@ -107,7 +107,7 @@ function tex_kernel {
   mv -f "${ofile}.log" "${log_dir}/${ofile}.log"
 
   # Clean up
-  rm -f "${ofile}".{aux,out,log,lof,lot,toc,dvi,synctex.gz}
+  rm -f "${ofile}".{aux,out,log,lof,lot,toc,dvi,synctex.gz,rubbercache}
 
   # Move PDF to output location
   mv "${ofile}.pdf" "${OUTPUT_PATH}/${prefix}/"
@@ -218,7 +218,7 @@ function generate_pdfs {
           inactive) continue ;;
           *) ;;
         esac
-        mapfile -t < <(find "${proj}" -type d \( -name doc -o -name docs \))
+        mapfile -t < <(find "${proj}" -type d \( -name doc -o -name docs \) -prune)
         dirs_to_search+=("${MAPFILE[@]}")
       fi
     done
