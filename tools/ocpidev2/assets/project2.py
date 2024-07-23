@@ -632,8 +632,18 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
 
     def get_test_object_from_cli(self, cli_dict, _dir):
         dir_abs_path = _dir + '/' + cli_dict['name'] + '.test'
+        found = False
+        for component_library in self.component_libraries:
+            if _dir == component_library.get_dir_abs_path():
+                found = True
+                break
+        if not found:
+            msg = 'test \'' + cli_dict['name']
+            msg += '\' can not exist within ' + _dir
+            msg += ' (it is recommend to set the working directory or '
+            msg += '-d to a component <library> directory)'
+            raise Exception(msg)
         test = Test(dir_abs_path, False, cli_dict)
-        # TODO warn if test.spec not found in ......
         return test
 
     def handle_hdl_library(self, cli_dict, _dir):
