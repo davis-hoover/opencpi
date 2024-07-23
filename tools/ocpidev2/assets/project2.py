@@ -26,7 +26,7 @@ from _opencpi.assets.abstract2 import AssetBase
 from _opencpi.assets.component2 import Component, Protocol
 from _opencpi.assets.worker2 import Worker
 from _opencpi.assets.application2 import Application, ApplicationsDirectory
-from _opencpi.assets.library2 import SpecsDirectory, Discoverer
+from _opencpi.assets.library2 import SpecsDirectory
 from _opencpi.assets.library2 import ComponentLibrary
 from _opencpi.assets.library2 import ComponentLibrariesDirectory
 from _opencpi.assets.library2 import test_ComponentLibrary
@@ -116,6 +116,104 @@ comp_example_app_rst_template = """<?xml version="1.0"?>
   </Instance>
 </Application>
 """  # nopep8
+
+
+class Discoverer():
+
+    def append_discovered_asset(self, asset):
+        if asset.get_type() == 'component':
+            self.components.append(asset)
+        if asset.get_type() == 'component library':
+            self.component_libraries.append(asset)
+        if asset.get_type() == 'application':
+            self.applications.append(asset)
+        if asset.get_type() == 'hdl primitive':
+            self.hdl_primitives.append(asset)
+        if asset.get_type() == 'hdl primitive core':
+            self.hdl_primitives.append(asset)
+        if asset.get_type() == 'hdl assembly':
+            self.hdl_assemblies.append(asset)
+        if asset.get_type() == 'hdl slot':
+            self.hdl_slots.append(asset)
+        if asset.get_type() == 'hdl card':
+            self.hdl_cards.append(asset)
+        if asset.get_type() == 'hdl platform':
+            self.hdl_platforms.append(asset)
+        if asset.get_type() == 'protocol':
+            self.protocols.append(asset)
+        if asset.get_type() == 'rcc platform':
+            self.rcc_platforms.append(asset)
+        _type = asset.get_type()
+        if (_type == 'hdl worker') or (_type == 'rcc worker'):
+            self.workers.append(asset)
+        if asset.get_type() == 'test':
+            self.tests.append(asset)
+        Logger().log(9, 'discovered ' + _type + ' ' + asset.abs_path)
+
+    def get_potential_asset_dir_abs_paths(self, parent):
+        ret = []
+        discovery_path = self.abs_path + '/' + parent
+        if os.path.isdir(discovery_path):
+            for _dir in AssetBase.listdir_assets(discovery_path):
+                dir_abs_path = discovery_path + '/' + _dir
+                allowable_dir = (_dir != 'specs') and (_dir != 'gen')
+                if os.path.isdir(dir_abs_path) and allowable_dir:
+                    ret.append(dir_abs_path)
+        return ret
+
+    def discover_dir_assets(self, parent, allowlist=None, platform=False):
+        for dir_abs_path in self.get_potential_asset_dir_abs_paths(parent):
+            try:
+                assets = []
+                if parent == 'hdl/primitives':
+                    assets.append(HdlCore(dir_abs_path))
+                for asset in assets:
+                    if allowlist is not None:
+                        # TODO is this pre-2.0???
+                        allowlist = [name.split('.')[0] for name in allowlist]
+                    if (allowlist is None) or (asset.name in allowlist):
+                        self.append_discovered_asset(asset)
+            except InvalidAssetError as err:
+                if (parent != 'applications') and \
+                   (not dir_abs_path.endswith('.test')):
+                    Logger().warn('skipping ' + str(err))
+                pass
+        for dir_abs_path in self.get_potential_asset_dir_abs_paths(parent):
+            try:
+                assets = []
+                tmp = dir_abs_path
+                if parent == 'rcc/platforms':
+                    assets.append(RccPlatform(dir_abs_path))
+                elif parent == 'hdl/platforms':
+                    assets.append(HdlPlatform(dir_abs_path))
+                elif parent == 'hdl/assemblies':
+                    assets.append(HdlAssembly(dir_abs_path))
+                elif parent == 'hdl/primitives':
+                    assets.append(HdlLibrary(dir_abs_path))
+                elif parent == 'applications':
+                    assets.append(Application(dir_abs_path))
+                elif tmp.endswith('.rcc') or tmp.endswith('.hdl') or platform:
+                    name = AssetBase.get_name_from_abs_path(dir_abs_path)
+                    if tmp.endswith('.rcc'):
+                        # due to edge cases such as testzc.rcc, testmulti.rcc
+                        assets = RccAssembly(dir_abs_path).workers
+                    else:
+                        tmp = dir_abs_path + '/' + name + '.xml'
+                        assets.append(Worker(tmp))
+                elif tmp.endswith('.test'):
+                    assets.append(Test(dir_abs_path))
+                for asset in assets:
+                    if allowlist is not None:
+                        # TODO is this pre-2.0???
+                        allowlist = [name.split('.')[0] for name in allowlist]
+                    if (allowlist is None) or (asset.name in allowlist):
+                        self.append_discovered_asset(asset)
+            except InvalidAssetError as err:
+                if (parent != 'applications') and \
+                   (not dir_abs_path.endswith('.test')):
+                    Logger().warn('skipping ' + str(err))
+                pass
+
 
 
 class Project(AssetBase, SpecsDirectory, Discoverer):
@@ -1182,6 +1280,10 @@ def test_Project(ret):
     # ret = test_GNUMakefile(ret)
     ret = test_ComponentLibrary(ret)
     # ret = test_Project_discover_component_libraries(ret)
+    ret = test_HdlPlatform(ret)
+    ret = test_HdlCard(ret)
+    # ret = test_HdlAssemblyInstance(ret)
+    ret = test_HdlAssembly(ret)
     return ret
 
 

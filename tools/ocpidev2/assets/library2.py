@@ -17,19 +17,17 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
+""" This file interfaces above with the Project class and below with the
+    all the things component libraries are composed of
+    (Component/Protocol/Worker/etc)."""
+
+
 import os
 from _opencpi.assets.abstract2 import *
 from _opencpi.assets.abstract2 import AssetBase
 from _opencpi.assets.component2 import Component, Protocol, test_Component
 from _opencpi.assets.worker2 import Worker, RccAssembly
 from _opencpi.assets.worker2 import test_Worker, test_RccAssembly
-# below 4 lines are a weird, unintended consequence of Discoverer
-from _opencpi.assets.platform2 import HdlPlatform, RccPlatform
-from _opencpi.assets.platform2 import test_HdlPlatform, test_HdlCard
-from _opencpi.assets.assembly2 import HdlAssembly, test_HdlAssembly
-from _opencpi.assets.primitive2 import HdlLibrary, HdlCore, test_HdlLibrary
-from _opencpi.assets.application2 import Application
-from _opencpi.assets.test2 import Test
 
 
 comps_rst_template = """.. Component directory index page
@@ -102,31 +100,13 @@ class SpecsDirectory():
 
 
 # TODO organize this class better
-class Discoverer():
+class ComponentLibraryDiscoverer():
 
     def append_discovered_asset(self, asset):
         if asset.get_type() == 'component':
             self.components.append(asset)
-        if asset.get_type() == 'component library':
-            self.component_libraries.append(asset)
-        if asset.get_type() == 'application':
-            self.applications.append(asset)
-        if asset.get_type() == 'hdl primitive':
-            self.hdl_primitives.append(asset)
-        if asset.get_type() == 'hdl primitive core':
-            self.hdl_primitives.append(asset)
-        if asset.get_type() == 'hdl assembly':
-            self.hdl_assemblies.append(asset)
-        if asset.get_type() == 'hdl slot':
-            self.hdl_slots.append(asset)
-        if asset.get_type() == 'hdl card':
-            self.hdl_cards.append(asset)
-        if asset.get_type() == 'hdl platform':
-            self.hdl_platforms.append(asset)
         if asset.get_type() == 'protocol':
             self.protocols.append(asset)
-        if asset.get_type() == 'rcc platform':
-            self.rcc_platforms.append(asset)
         _type = asset.get_type()
         if (_type == 'hdl worker') or (_type == 'rcc worker'):
             self.workers.append(asset)
@@ -149,35 +129,8 @@ class Discoverer():
         for dir_abs_path in self.get_potential_asset_dir_abs_paths(parent):
             try:
                 assets = []
-                if parent == 'hdl/primitives':
-                    assets.append(HdlCore(dir_abs_path))
-                for asset in assets:
-                    if allowlist is not None:
-                        # TODO is this pre-2.0???
-                        allowlist = [name.split('.')[0] for name in allowlist]
-                    if (allowlist is None) or (asset.name in allowlist):
-                        self.append_discovered_asset(asset)
-            except InvalidAssetError as err:
-                if (parent != 'applications') and \
-                   (not dir_abs_path.endswith('.test')):
-                    Logger().warn('skipping ' + str(err))
-                pass
-
-        for dir_abs_path in self.get_potential_asset_dir_abs_paths(parent):
-            try:
-                assets = []
                 tmp = dir_abs_path
-                if parent == 'rcc/platforms':
-                    assets.append(RccPlatform(dir_abs_path))
-                elif parent == 'hdl/platforms':
-                    assets.append(HdlPlatform(dir_abs_path))
-                elif parent == 'hdl/assemblies':
-                    assets.append(HdlAssembly(dir_abs_path))
-                elif parent == 'hdl/primitives':
-                    assets.append(HdlLibrary(dir_abs_path))
-                elif parent == 'applications':
-                    assets.append(Application(dir_abs_path))
-                elif tmp.endswith('.rcc') or tmp.endswith('.hdl') or platform:
+                if tmp.endswith('.rcc') or tmp.endswith('.hdl') or platform:
                     name = AssetBase.get_name_from_abs_path(dir_abs_path)
                     if tmp.endswith('.rcc'):
                         # due to edge cases such as testzc.rcc, testmulti.rcc
@@ -185,8 +138,6 @@ class Discoverer():
                     else:
                         tmp = dir_abs_path + '/' + name + '.xml'
                         assets.append(Worker(tmp))
-                elif tmp.endswith('.test'):
-                    assets.append(Test(dir_abs_path))
                 for asset in assets:
                     if allowlist is not None:
                         # TODO is this pre-2.0???
@@ -233,7 +184,7 @@ class ComponentLibrariesDirectory(AssetBase):
         return 'component libraries'
 
 
-class ComponentLibrary(AssetBase, SpecsDirectory, Discoverer):
+class ComponentLibrary(AssetBase, SpecsDirectory, ComponentLibraryDiscoverer):
     """ Reference RCC/HDL Development Guide section 3. A ComponentLibrary is
         represented by a directory and knows nothing about the project it
         is in or its package ID. """
@@ -388,10 +339,7 @@ def test_ComponentLibrary(ret):
     ret = test_Component(ret)
     ret = test_RccAssembly(ret)
     ret = test_Worker(ret)
-    # ret = test_HdlAssemblyInstance(ret)
-    ret = test_HdlAssembly(ret)
     ret = test_HdlPlatform(ret)
-    ret = test_HdlCard(ret)
 
     fs = TemporaryFilesystem()
     for test in range(7):

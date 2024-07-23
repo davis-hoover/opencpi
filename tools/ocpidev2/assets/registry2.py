@@ -17,12 +17,14 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-""" This file is the verb (build/create/etc) interface for ocpidev2, it
-    interfaces with projects and not individual asset classes. """
+""" This file connects the CLI with the is the verb (build/create/etc) interface
+    (ProjectCollection class). It interfaces with projects and not individual
+    asset classes. """
+
 
 import os
 from _opencpi.assets.abstract2 import *
-# IMPORTANT - inteface with AssetBase and Project, nothing else
+# IMPORTANT - interface with AssetBase and Project, nothing else
 from _opencpi.assets.abstract2 import AssetBase
 from _opencpi.assets.project2 import Project, test_Project
 

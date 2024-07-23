@@ -18,14 +18,15 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-""" This file exposes the Command Line Interface (CLI) for ocpidev2, it
-    interfaces with project-like things and not individual asset classes. """
+""" This file exposes the Command Line Interface (CLI) above and below it
+    interfaces with project-like things (ProjectCollection), and not individual
+    asset classes. """
 
 import os
 import argparse
 import signal
 from _opencpi.assets.abstract2 import *
-# IMPORTANT - inteface with ProjectCollection, nothing else
+# IMPORTANT - interface with ProjectCollection, nothing else
 from _opencpi.assets.registry2 import ProjectCollection, unittest
 
 
