@@ -302,24 +302,25 @@ def get_cli_dict():
         args.authoring_model = ''
     # TODO move below 3 lines to AssetBase once proper checks in place
     if args.verb != 'unittest':
-        if ProjectCollection.is_worker(args.noun):
-            # if not [am in args.name for am in get_authoring_models()]:
-            #     raise Exception(args.name + ' is an invalid worker name')
-            if args.name is not None:
-                if '.' in args.name:
-                    args.authoring_model = args.name.split('.')[1]
-                    args.name = args.name.split('.')[0]
-        else:
-            if args.name:
-                if args.noun.startswith('test'):
-                    if '.test' in args.name:
-                        args.name = args.name.split('.test')[0]
-                if not args.name.isidentifier():
-                    if args.noun != 'registry':
-                        msg = '\'' + args.name + '\' is not a valid name'
-                        if args.name.endswith('.test'):
-                            msg += ' (remove .test)'
-                        raise ValueError(msg)
+        if args.noun is not None:
+            if ProjectCollection.is_worker(args.noun):
+                # if not [am in args.name for am in get_authoring_models()]:
+                #     raise Exception(args.name + ' is an invalid worker name')
+                if args.name is not None:
+                    if '.' in args.name:
+                        args.authoring_model = args.name.split('.')[1]
+                        args.name = args.name.split('.')[0]
+            else:
+                if args.name:
+                    if args.noun.startswith('test'):
+                        if '.test' in args.name:
+                            args.name = args.name.split('.test')[0]
+                    if not args.name.isidentifier():
+                        if args.noun != 'registry':
+                            msg = '\'' + args.name + '\' is not a valid name'
+                            if args.name.endswith('.test'):
+                                msg += ' (remove .test)'
+                            raise ValueError(msg)
         if not args.help:
             if (args.noun is not None) and (args.noun not in nouns):
                 if args.verb != 'apply':
