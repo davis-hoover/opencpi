@@ -212,7 +212,7 @@ class ProjectRegistry():
                 self.projects.append(project)
         Logger().debug('end of project discovery')
 
-    def register(self, _dir):
+    def register(self, cli_dict, _dir):
         project = Project(_dir, False)  # raises if not a project
         symlink_path = self.abs_path + '/' + str(project.get_package_id())
         if not os.path.islink(symlink_path):
@@ -296,7 +296,7 @@ class ProjectRegistry():
             dir_abs_path = _dir + '/' + cli_dict['name']
             Project(dir_abs_path, False, cli_dict).create()
             if cli_dict['register']:
-                self.register(dir_abs_path)
+                self.register(cli_dict, dir_abs_path)
         else:
             self.get_project(cli_dict, _dir).create_asset(cli_dict, _dir)
 
