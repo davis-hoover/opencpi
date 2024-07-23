@@ -279,12 +279,13 @@ class Project(AssetBase, SpecsDirectory, Discoverer):
     def get_assets_within(self, abs_path):
         """ get list of assets whose abs_path is within the abs_path """
         ret = []
-        lists = [self.applications, self.hdl_primitives, self.hdl_assemblies]
+        buildables = [self.applications, self.hdl_primitives,
+                      self.hdl_assemblies]
         for component_library in self.component_libraries:
-            lists.append(component_library.workers)
-        for asset_list in lists:
+            buildables.append(component_library.workers)
+        for asset_list in buildables:
             for asset in asset_list:
-                if (abs_path + '/') in (abs_path + '/'):
+                if (abs_path + '/') in (asset.abs_path + '/'):
                     ret.append(asset)
         return ret
 

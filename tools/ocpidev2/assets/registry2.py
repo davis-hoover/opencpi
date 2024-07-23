@@ -346,7 +346,7 @@ class ProjectRegistry():
     def get_assets(self, _dir):
         assets = []
         for project in self.projects:
-            if (_dir + '/') in (project.get_dir_abs_path() + '/'):
+            if (project.get_dir_abs_path() + '/') in (_dir + '/'):
                 assets.extend(project.get_assets_within(_dir))
         return assets
 
@@ -381,6 +381,8 @@ class ProjectRegistry():
         tool = LegacyBuildTool()
         fs = TemporaryFilesystem()
         assets = self.get_assets(_dir)
+        for asset in assets:
+            print('planning build for ' + asset.abs_path)
         makefile = self.plan_build(assets, cli_dict['hdltarget'],
                                    cli_dict['hdlplatform'],
                                    cli_dict['rccplatform'], fs, tool)
