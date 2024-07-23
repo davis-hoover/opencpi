@@ -447,7 +447,7 @@ def dispatch_verb(cli_dict):
             elif cli_dict['verb'] == 'refresh':
                 Logger().warn('refresh is not necessary in ocpidev2')
             elif cli_dict['verb'] == 'register':
-                project_registry.register(cli_dict, _dir)
+                project_registry.register(_dir)
             elif cli_dict['verb'] == 'run':
                 project_registry.run(cli_dict, _dir)
             elif cli_dict['verb'] == 'show':
