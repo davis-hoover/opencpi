@@ -162,6 +162,7 @@ class Application(AssetBase):
         """ abs_path can be xml type OR dir type! see ADG section 10.2 """
         self.root_tags = ['Application']
         AssetBase.__init__(self, abs_path, enable_path_existence_check)
+        self.file_name = self.name + '.cc'
         # TODO investigate whether below line is necessary
         # if not os.path.isfile(self.get_xml_abs_path()):
         #     self.raise_abs_path_does_not_exist()
@@ -175,7 +176,10 @@ class Application(AssetBase):
                                 tag = self.get_root_tags()[0]
                                 msg = self.abs_path + ' is not a ' + tag
                                 raise InvalidAssetError(msg)
-        self.parse(cli_dict)
+            self.parse(cli_dict)
+        if cli_dict is not None:
+            if cli_dict.get('xmldirapp'):
+                self.file_name = None
 
     def get_type(self):
         return 'application'
@@ -183,8 +187,10 @@ class Application(AssetBase):
     def get_templates(self, applications=False):
         templates = {}
         templates[self.name + '.rst'] = app_rst_template
-        if self.get_dir_abs_path().split('/')[-1] != 'applications':
+        if (self.get_dir_abs_path().split('/')[-1] != 'applications' and
+                self.file_name is not None):
             # TODO prevent application named 'applications'?
-            templates[self.name + '.cc'] = app_cc_template
+            templates[self.file_name] = app_cc_template
         templates[self.name + '.xml'] = g_asset_template
+
         return templates
