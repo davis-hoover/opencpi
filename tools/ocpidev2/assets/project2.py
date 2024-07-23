@@ -37,10 +37,10 @@ from _opencpi.assets.library2 import ComponentLibrary
 from _opencpi.assets.library2 import ComponentLibrariesDirectory
 from _opencpi.assets.library2 import test_ComponentLibrary
 from _opencpi.assets.primitive2 import HdlLibrary, HdlCore
-from _opencpi.assets.assembly2 import HdlAssembly
+from _opencpi.assets.assembly2 import HdlAssembly, test_HdlAssembly
 from _opencpi.assets.platform2 import HdlSlot, HdlCard
 from _opencpi.assets.platform2 import HdlPlatform, RccPlatform
-from _opencpi.assets.platform2 import test_HdlPlatform
+from _opencpi.assets.platform2 import test_HdlPlatform, test_HdlCard
 from _opencpi.assets.test2 import Test
 
 
