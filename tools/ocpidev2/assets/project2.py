@@ -736,7 +736,6 @@ class Project(AssetBase, SpecsDirectory):
         return HdlSlot(xml_abs_path, False, cli_dict)
 
     def get_worker_object_from_cli(self, cli_dict, _dir):
-        # TODO self.handle_hdl_library()
         xml_abs_path = _dir + '/' + cli_dict['name'] + '.'
         xml_abs_path += cli_dict['authoringmodel'] + '/'
         xml_abs_path += cli_dict['name'] + '.xml'
@@ -755,7 +754,6 @@ class Project(AssetBase, SpecsDirectory):
             msg += ' (it is recommend to set the working directory or '
             msg += '-d to a component <library> directory)'
             raise Exception(msg)
-        print(dir_abs_path)
         test = Test(dir_abs_path, False, cli_dict)
         return test
 

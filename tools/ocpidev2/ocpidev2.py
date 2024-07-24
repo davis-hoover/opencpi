@@ -295,22 +295,13 @@ def get_cli_dict():
             if (args.name != 'platform') and (args.name != 'protocol'):
                 args.name = None
         # Logger().debug('args : ' + str(args))
-        if (args.authoring_model != '') and \
-           (args.authoring_model != 'hdl') and \
-           (args.authoring_model != 'rcc'):
-            raise Exception('invalid authoring model: ' + args.authoring_model)
     except AttributeError:
         # TODO replace this hack
         args.authoring_model = ''
     # TODO move below 3 lines to AssetBase once proper checks in place
     if args.verb != 'unittest':
         if args.noun is not None:
-            if ProjectCollection.is_worker(args.noun):
-                if args.name is not None:
-                    if '.' in args.name:
-                        args.authoring_model = args.name.split('.')[1]
-                        args.name = args.name.split('.')[0]
-            else:
+            if not ProjectCollection.is_worker(args.noun):
                 if args.name:
                     if args.noun.startswith('test'):
                         if '.test' in args.name:
@@ -330,23 +321,51 @@ def get_cli_dict():
         else:
             tmp.d.append(_dir)
     cli_dict = vars(tmp)
-    if (cli_dict['noun'] == 'worker'):
-        if ('.' in cli_dict['name']):
-            if not (('.hdl' in cli_dict['name']) or
-               ('.rcc' in cli_dict['name']) or
-               ('.ocl' in cli_dict['name'])):
-                raise Exception(cli_dict['name'] +
-                                ' is and invalid worker name')
     # make CLI look like attrs (necessary for create cli verb)
     cli_dict = ({key.replace('_', ''): val for key, val in cli_dict.items()})
+    if (cli_dict['noun'] == 'worker'):
+        authoring_model_from_name = cli_dict['name'].split('.')[-1]
+        authoring_model_is_in_name = \
+            ('.hdl' in cli_dict['name']) or \
+            ('.rcc' in cli_dict['name']) or \
+            ('.ocl' in cli_dict['name'])
+        if cli_dict['authoringmodel'] == '':
+            if not authoring_model_is_in_name:
+                msg = cli_dict['name']
+                msg += ' does not have an authoring model, please format the '
+                msg += 'name as <foo>.<model>, e.g., \'ocpidev2 create '
+                msg += 'worker foo.hdl\''
+                raise Exception(msg)
+            cli_dict['authoringmodel'] = authoring_model_from_name
+        else:
+            if authoring_model_is_in_name:
+                if cli_dict['authoringmodel'] != authoring_model_from_name:
+                    msg = 'authoring model '
+                    msg += '\'' + cli_dict['authoringmodel'] + '\' '
+                    msg += 'does not match authoring model specified in name '
+                    msg += '\'' + cli_dict['name'] + '\' '
+                    raise Exception(msg)
+        if not authoring_model_is_in_name:
+            msg = '<name> ' + '\'' + cli_dict['name'] + '\''
+            msg += ' was not specified with an authoring model suffix, '
+            msg += 'it is recommended to '
+            msg += 'format the name as <foo>.<model>, e.g., \'ocpidev2 '
+            msg += 'create worker foo.hdl\''
+            Logger().warn(msg)
+        cli_dict['name'] = cli_dict['name'].split('.')[0]
     if cli_dict['noun'] is not None:
         bad_hdl = (cli_dict['authoringmodel'] == 'hdl') and \
                   (not ProjectCollection.is_hdl(cli_dict['noun']))
         bad_rcc = (cli_dict['authoringmodel'] == 'rcc') and \
                   (not ProjectCollection.is_rcc(cli_dict['noun']))
+        msg = 'authoring model '
         if bad_hdl or bad_rcc:
-            msg = 'authoring model \'' + cli_dict['authoringmodel']
-            msg += '\' is invalid for noun \'' + cli_dict['noun'] + '\''
+            if bad_none:
+                msg += 'must be specified '
+            else:
+                msg += '\'' + cli_dict['authoringmodel'] + '\' '
+                msg += 'is invalid '
+            msg += 'for noun \'' + cli_dict['noun'] + '\''
             raise Exception(msg)
     return cli_dict
 
