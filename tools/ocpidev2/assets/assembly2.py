@@ -17,6 +17,10 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
+""" This file connects the project above with the assembly constituents
+    (Worker instances) below. """
+
+
 import os
 from .abstract2 import *
 from _opencpi.assets.abstract2 import AssetBase

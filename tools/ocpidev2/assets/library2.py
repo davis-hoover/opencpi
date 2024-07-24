@@ -197,16 +197,6 @@ class ComponentLibrary(AssetBase, SpecsDirectory, ComponentLibraryDiscoverer):
                  cli_dict=None):
         self.root_tags = ['Library']  # CDG section 10.1
         AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
-        # try:
-        #     self.raise_if_invalid_location()
-        # except InvalidAssetError:
-        #     tmp = dir_abs_path.split('components/')
-        #     Logger().debug('tmp ' + str(tmp))
-        #     if len(tmp) == 2:
-        #         if tmp[1] == 'gen':
-        #             self.raise_invalid_location()
-        #     else:
-        #         self.raise_invalid_location()
         is_test = self.get_dir_abs_path_is_test(dir_abs_path)
         if is_test or self.get_dir_abs_path_is_worker(dir_abs_path):
             self.raise_invalid_asset_error()
@@ -230,20 +220,6 @@ class ComponentLibrary(AssetBase, SpecsDirectory, ComponentLibraryDiscoverer):
     def get_type(self):
         return 'component library'
 
-    def get_comp_dict(self, project):
-        """ Update comp_dict with discovered project
-            hdl/platform/<platform_name> libraries """
-        comp_dict = ({lib.split('/')[-1]: lib for lib in
-                     ComponentLibrary.valid_locations})
-        platform_device_libs = []
-        for proj_plat in project.hdl_platforms:
-            plat_rel = proj_plat.abs_path.split('/')[-3:]
-            plat_rel = '/'.join(plat_rel) + '/devices'
-            platform_device_libs.append(plat_rel)
-        comp_dict['devices'] = [comp_dict['devices']]
-        comp_dict['devices'].extend(platform_device_libs)
-        return comp_dict
-
     @staticmethod
     def get_dir_abs_path_is_worker(dir_abs_path):
         ret = False
@@ -256,19 +232,6 @@ class ComponentLibrary(AssetBase, SpecsDirectory, ComponentLibraryDiscoverer):
     @staticmethod
     def get_dir_abs_path_is_test(dir_abs_path):
         return dir_abs_path.endswith('.test')
-
-    def get_package_id(self, project_package_id_str):
-        """ the overarching project tells this method its
-            project_package_id_str """
-        ret = project_package_id_str
-        abs_path_split = self.abs_path.split('/')
-        if len(abs_path_split) >= 3:
-            if abs_path_split[-3] == 'platforms':
-                ret += '.platforms.' + abs_path_split[-2]
-        # use e.g. ocpi.core instead of ocpi.core.components (same as OAS)
-        if self.name != 'components':
-            ret += '.' + self.name
-        return ret
 
     def get_attr_infos(self):
         ret = []
@@ -364,16 +327,6 @@ def test_ComponentLibrary(ret):
                 passed = uut.tests == []
             if test == 5:
                 passed = uut.component_libraries == []
-            if test == 6:
-                if uut.get_package_id('ocpi.core') != 'ocpi.core':
-                    passed = False
-                uut.name = 'devices'
-                if uut.get_package_id('ocpi.core') != 'ocpi.core.devices':
-                    passed = False
-                uut.abs_path = '/tmp/myproj/hdl/platforms/mypf/devices'
-                test_str = 'ocpi.core.platforms.mypf.devices'
-                if uut.get_package_id('ocpi.core') != test_str:
-                    passed = False
         except InvalidAssetError:
             passed = False
         if test == 0:
@@ -389,173 +342,6 @@ def test_ComponentLibrary(ret):
         if test == 5:
             tmp = passed
             log_pass_fail('testing ComponentLibrary component_libraries', tmp)
-        if test == 6:
-            log_pass_fail('testing ComponentLibrary get_package_id()', passed)
         if passed is False:
             ret = False
     return ret
-
-
-def test_ComponentLibrary_create(ret):
-    from _opencpi.assets.project2 import Project
-    passed = True
-    fs = TemporaryFilesystem()
-    cli_dict = 'empty'
-    # Create a project
-    project_path = fs.abs_path + '/foo'
-    project = Project(project_path, False, None)
-    project.create()
-    test_name = 'test_ComponentLibrary_create: '
-    for test in range(6):
-        valid_libs = ['components', 'devices', 'adapters', 'cards',
-                      'platforms']
-        # Create valid component libraries (Pass)
-        if test == 0:
-            for lib in valid_libs:
-                try:
-                    if lib == 'components':
-                        component_path = project_path + '/' + lib
-                        component = ComponentLibrary(
-                            component_path, False, cli_dict
-                        )
-                        component.create(project, project_path)
-                        if not os.path.exists(
-                            component_path + '/' + lib + '.xml'
-                        ):
-                            passed = False
-                    else:
-                        component_path = project_path + '/hdl/' + lib
-                        component = ComponentLibrary(
-                            component_path, False, cli_dict
-                        )
-                        component.create(project, project_path)
-                        if not os.path.exists(
-                            component_path + '/' + lib + '.rst'
-                        ):
-                            passed = False
-                    os.system('rm -rf ' + project_path + '/components')
-                    os.system('rm -rf ' + project_path + '/hdl')
-                except Exception as e:
-                    Logger().debug(test_name + str(e))
-                    passed = False
-        # Create a valid component library within components directory (Pass)
-        if test == 1:
-            try:
-                component_path = project_path + '/components/cmp'
-                component = ComponentLibrary(component_path, False, cli_dict)
-                component.create(project, project_path + '/components')
-                if not os.path.exists(project_path + '/components'):
-                    passed = False
-                if not os.path.exists(component_path + '/' + 'cmp.rst'):
-                    passed = False
-                if not os.path.exists(component_path + '/' + 'cmp.xml'):
-                    passed = False
-                os.system('rm -rf ' + project_path + '/components')
-            except Exception as e:
-                Logger().debug(test_name + str(e))
-                passed = False
-        # Create a valid hdl/platform/<platform> device library (Pass)
-        if test == 2:
-            try:
-                plat_dir = project_path + '/hdl/platforms/test_plat'
-                os.makedirs(plat_dir)
-                with open(plat_dir + '/test_plat.xml', 'w') as file:
-                    file.write('<HdlPlatform/>')
-                    file.close()
-                component_path = plat_dir + '/devices'
-                component = ComponentLibrary(component_path, False, cli_dict)
-                component.create(project, plat_dir)
-                if not os.path.exists(component_path + '/devices.rst'):
-                    passed = False
-                if not os.path.exists(component_path + '/devices.xml'):
-                    passed = False
-                os.system('rm -rf ' + project_path + '/hdl')
-            except Exception as e:
-                Logger().debug(test_name + str(e))
-                passed = False
-        # Test ComponentLibrary.valid_library_name()
-        if test == 3:
-            # Create invalid library names (Fail)
-            try:
-                component_path = project_path + '/invalid_library'
-                component = ComponentLibrary(component_path, False, cli_dict)
-                component.create(project, project_path)
-                passed = False
-            except Exception as e:
-                Logger().debug(test_name + str(e))
-                passed = True
-            # Create invalid comp lib  within components directory (Fail)
-            try:
-                component_path = project_path + '/devices'
-                component = ComponentLibrary(component_path, False, cli_dict)
-                component.create(project, project_path + '/components')
-                passed = False
-            except Exception as e:
-                Logger().debug(test_name + str(e))
-                passed = True
-        # Test ComponentLibrary.library_exists()
-        if test == 4:
-            # Create duplicate valid component libraries (Fail)
-            for lib in valid_libs:
-                try:
-                    if lib == 'components':
-                        component_path = project_path + '/' + lib
-                    else:
-                        component_path = project_path + '/hdl/' + lib
-                    component = ComponentLibrary(
-                        component_path, False, cli_dict
-                    )
-                    component.create(project, project_path)
-                    component.create(project, project_path)
-                    passed = False
-                except Exception as e:
-                    Logger().debug(test_name + str(e))
-                    os.system('rm -rf ' + project_path + '/components')
-                    os.system('rm -rf ' + project_path + '/hdl')
-                    passed = True
-            # Create duplicate comp lib within components directory (Fail)
-            try:
-                component_path = project_path + '/components/cmp'
-                component = ComponentLibrary(component_path, False, cli_dict)
-                component.create(project, project_path + '/components')
-                component.create(project, project_path + '/components')
-                passed = False
-            except Exception as e:
-                Logger().debug(test_name + str(e))
-                os.system('rm -rf ' + project_path + '/components')
-                passed = True
-            # Create a duplicate platform device library (Fail)
-            try:
-                plat_dir = project_path + '/hdl/platforms/test_plat'
-                os.makedirs(plat_dir)
-                with open(plat_dir + '/test_plat.xml', 'w') as file:
-                    file.write('<HdlPlatform/>')
-                    file.close()
-                component_path = plat_dir + '/devices'
-                component = ComponentLibrary(component_path, False, cli_dict)
-                component.create(project, plat_dir)
-                component.create(project, plat_dir)
-                passed = False
-            except Exception as e:
-                Logger().debug(test_name + str(e))
-                os.system('rm -rf ' + project_path + '/hdl')
-                passed = True
-        # Tests ComponentLibrary.valid_path()
-        if test == 5:
-            # Create an invalid library path (Fail)
-            valid_libs.extend(['', 'comp_lib_within_components_directory'])
-            for lib in valid_libs:
-                component_path = project_path + '/' + lib
-                if lib == '':
-                    component_path = project_path + '/components'
-                try:
-                    project_path = project_path + '/invalid'
-                    component = ComponentLibrary(
-                        component_path, False, cli_dict
-                    )
-                    component.create(project, project_path)
-                    passed = False
-                except Exception as e:
-                    Logger().debug(test_name + str(e))
-                    passed = True
-    log_pass_fail('testing ComponentLibrary create()', passed)
