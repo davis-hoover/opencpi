@@ -632,9 +632,7 @@ class Project(AssetBase, SpecsDirectory):
             dir_abs_path = _dir + '/' + cli_dict['name']
             if _dir != (self.get_dir_abs_path() + '/hdl'):
                 found = False
-                print(_dir)
                 for hdl_platform in self.hdl_platforms:
-                    print(hdl_platform.get_dir_abs_path())
                     if _dir == hdl_platform.get_dir_abs_path():
                         found = True
                 if not found:
