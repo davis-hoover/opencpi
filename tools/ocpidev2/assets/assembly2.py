@@ -48,14 +48,22 @@ class HdlAssembly(AssetBase):
         represented by a directory and knows nothing about the project it
         is in or its package ID. """
 
-    def __init__(self, dir_abs_path):
+    def __init__(self, dir_abs_path, enable_path_existence_check=True,
+                 cli_dict=None):
         self.root_tags = ['HdlAssembly']
-        AssetBase.__init__(self, dir_abs_path)
-        if not os.path.isfile(self.get_xml_abs_path()):
-            self.raise_abs_path_does_not_exist()
+        AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
+        if enable_path_existence_check:
+            if not os.path.isfile(self.get_xml_abs_path()):
+                self.raise_abs_path_does_not_exist()
         self.instances = []
         self.containers = []
-        self.parse()
+        if enable_path_existence_check:
+            self.parse()
+        elif cli_dict is not None:
+            # TODO move this into AssetBase?
+            for attr_info in self.get_attr_infos():
+                key_lower = attr_info.key.lower()
+                self.attrs[attr_info.key] = cli_dict[key_lower]
 
     def get_paths_to_parse(self):
         paths = []
@@ -69,7 +77,8 @@ class HdlAssembly(AssetBase):
 
     def get_attr_infos(self):
         ret = []
-        ret.append(AttributeInfo('Containers', is_list=True))
+        ret.append(AttributeInfo('Containers',
+                                 cli=('-c', '--containers'), is_list=True))
         return ret
 
     def parse(self):

@@ -181,18 +181,20 @@ class Project(AssetBase, SpecsDirectory):
     @staticmethod
     def get_asset_for_create(noun):
         asset = None
-        if noun == 'project':
-            asset = Project('', False, None)
-        if noun == 'library':
-            asset = ComponentLibrary('', False, None)
+        if noun == 'application':
+            asset = Application('', False, None)
+        if noun == 'assembly':
+            asset = HdlAssembly('', False, None)
         if noun == 'card':
             asset = HdlCard('', False, None)
         if noun == 'component':
             asset = Component('', False, None)
+        if noun == 'library':
+            asset = ComponentLibrary('', False, None)
         if noun == 'test':
             asset = Test('', False, None)
-        if noun == 'application':
-            asset = Application('', False, None)
+        if noun == 'project':
+            asset = Project('', False, None)
         if noun == 'protocol':
             asset = Protocol('', False, None)
         if noun == 'primitive':
