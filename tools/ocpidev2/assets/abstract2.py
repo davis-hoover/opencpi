@@ -873,7 +873,7 @@ class AssetBase(AttributeBase):
         if (self.name != '') and (not self.name.isidentifier()):
             msg = '\'' + self.name + '\' '
             if bad_name_action == 1:
-                msg += 'is not recommend (best to use alphanumeric and '
+                msg += 'is not recommended (best to use alphanumeric and '
                 msg += 'underscores only)'
                 Logger().warn(msg)
             elif bad_name_action == 2:

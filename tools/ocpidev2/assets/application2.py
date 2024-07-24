@@ -162,21 +162,21 @@ class Application(AssetBase):
         """ abs_path can be xml type OR dir type! see ADG section 10.2 """
         self.root_tags = ['Application']
         AssetBase.__init__(self, abs_path, enable_path_existence_check,
-                           bad_name_action=1)
-        self.src_file_name = self.name + '.cc'
+                           bad_name_action=(0 if cli_dict is None else 1))
+        self.src_file_name = None
         # TODO investigate whether below line is necessary
         # if not os.path.isfile(self.get_xml_abs_path()):
         #     self.raise_abs_path_does_not_exist()
         if enable_path_existence_check:
-            if not os.path.isfile(self.get_xml_abs_path()):
-                tmp = self.get_dir_abs_path() + '/' + self.name
-                if not os.path.isfile(tmp + '.cc'):
-                    if not os.path.isfile(tmp + '.c'):
-                        if not os.path.isfile(tmp + '.cxx'):
-                            if not os.path.isfile(tmp + '.cpp'):
-                                tag = self.get_root_tags()[0]
-                                msg = self.abs_path + ' is not a ' + tag
-                                raise InvalidAssetError(msg)
+            tmp = self.get_dir_abs_path() + '/' + self.name
+            exts = ['.cc', '.c', '.cxx', 'cpp']
+            for src_file_name in [tmp + ext for ext in exts]:
+                if os.path.isfile(src_file_name):
+                    self.src_file_name = src_file_name
+            if (not os.path.isfile(self.get_xml_abs_path())) and \
+               (self.src_file_name is None):
+                msg = self.abs_path + ' is not a ' + self.root_tags[0]
+                raise InvalidAssetError(msg)
             self.parse(cli_dict)
         if cli_dict is not None:
             if cli_dict.get('xmldirapp'):

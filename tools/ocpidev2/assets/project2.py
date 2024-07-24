@@ -424,7 +424,8 @@ class Project(AssetBase, SpecsDirectory):
             except InvalidAssetError as err:
                 if (parent != 'applications') and \
                    (not dir_abs_path.endswith('.test')):
-                    Logger().warn('skipping ' + str(err))
+                    if parent != 'hdl/primitives':
+                        Logger().warn('skipping ' + str(err))
                 pass
         for dir_abs_path in self.get_potential_asset_dir_abs_paths(parent):
             try:
