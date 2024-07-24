@@ -198,7 +198,8 @@ class Project(AssetBase, SpecsDirectory):
         if noun == 'primitive':
             asset = HdlLibrary('', False, None)
         if noun == 'platform':
-            asset = HdlPlatform('', False, None)
+            # dict created to weed out unnecessary warnings...
+            asset = HdlPlatform('', False, {'language': 'vhdl', 'version': 2})
         if Project.is_worker(noun):
             # dict created to weed out unnecessary warnings...
             asset = Worker('', False, {'language': 'vhdl', 'version': 2})
@@ -631,7 +632,9 @@ class Project(AssetBase, SpecsDirectory):
             dir_abs_path = _dir + '/' + cli_dict['name']
             if _dir != (self.get_dir_abs_path() + '/hdl'):
                 found = False
+                print(_dir)
                 for hdl_platform in self.hdl_platforms:
+                    print(hdl_platform.get_dir_abs_path())
                     if _dir == hdl_platform.get_dir_abs_path():
                         found = True
                 if not found:

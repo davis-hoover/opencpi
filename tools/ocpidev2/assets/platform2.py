@@ -89,7 +89,14 @@ class HdlPlatform(HdlCardPlatformBase):
                 self.configurations['base'] = HdlPlatformConfiguration(None)
             except InvalidAssetError:
                 pass
-            self.parse()
+            self.parse(cli_dict)
+        if cli_dict is not None:
+            if cli_dict['language'] != '':
+                self.attrs['Language'] = cli_dict['language']
+                self.language = cli_dict['language'].lower()
+            if cli_dict['version'] != '':
+                self.attrs['Version'] = cli_dict['version']
+                self.version = int(cli_dict['version'])
 
     def get_attr_infos(self):
         ret = []
@@ -108,11 +115,11 @@ class HdlPlatform(HdlCardPlatformBase):
                    cli=('-c', '--configurations'), is_int=True))
         return ret
 
-    def parse(self):
+    def parse(self, cli_dict):
         self.parse_devices()
-        owd_path = self.abs_path + '/' + self.name + '.xml'
-        if self.name != Worker(owd_path).name:
-            msg = ('platform directory ' + owd_path + ' , ' +
+        self.worker = Worker(self.get_xml_abs_path(), True, cli_dict)
+        if self.name != self.worker.name:
+            msg = ('platform directory ' + self.get_dir_abs_path() + ' , ' +
                    self.name + '.xml' + ' file does not contain equivalent '
                    'platform worker XML Name attiribute: ' + self.name)
             Logger().warn(msg)
@@ -124,7 +131,6 @@ class HdlPlatform(HdlCardPlatformBase):
             except InvalidAssetError as err:
                 if cfg != 'base':
                     raise err
-        self.worker = Worker(self.get_xml_abs_path())
 
     def get_type(self):
         return 'hdl platform'
