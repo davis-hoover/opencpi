@@ -325,10 +325,13 @@ def get_cli_dict():
     cli_dict = ({key.replace('_', ''): val for key, val in cli_dict.items()})
     if (cli_dict['noun'] == 'worker'):
         authoring_model_from_name = cli_dict['name'].split('.')[-1]
-        authoring_model_is_in_name = \
-            ('.hdl' in cli_dict['name']) or \
-            ('.rcc' in cli_dict['name']) or \
-            ('.ocl' in cli_dict['name'])
+        authoring_model_is_in_name = '.' in cli_dict['name']
+        if authoring_model_is_in_name:
+            if authoring_model_from_name not in ['hdl', 'rcc']:
+                msg = '\'' + authoring_model_from_name + '\' is an '
+                msg += 'invalid authoring model (must be \'hdl\' or '
+                msg += '\'rcc\')'
+                raise Exception(msg)
         if cli_dict['authoringmodel'] == '':
             if not authoring_model_is_in_name:
                 msg = cli_dict['name']
@@ -338,6 +341,11 @@ def get_cli_dict():
                 raise Exception(msg)
             cli_dict['authoringmodel'] = authoring_model_from_name
         else:
+            if cli_dict['authoringmodel'] not in ['hdl', 'rcc']:
+                msg = '\'' + cli_dict['authoringmodel'] + '\' is an '
+                msg += 'invalid authoring model (must be \'hdl\' or '
+                msg += '\'rcc\')'
+                raise Exception(msg)
             if authoring_model_is_in_name:
                 if cli_dict['authoringmodel'] != authoring_model_from_name:
                     msg = 'authoring model '
