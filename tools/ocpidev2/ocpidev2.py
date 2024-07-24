@@ -306,8 +306,6 @@ def get_cli_dict():
     if args.verb != 'unittest':
         if args.noun is not None:
             if ProjectCollection.is_worker(args.noun):
-                # if not [am in args.name for am in get_authoring_models()]:
-                #     raise Exception(args.name + ' is an invalid worker name')
                 if args.name is not None:
                     if '.' in args.name:
                         args.authoring_model = args.name.split('.')[1]
@@ -317,12 +315,6 @@ def get_cli_dict():
                     if args.noun.startswith('test'):
                         if '.test' in args.name:
                             args.name = args.name.split('.test')[0]
-                    if not args.name.isidentifier():
-                        if args.noun != 'registry':
-                            msg = '\'' + args.name + '\' is not a valid name'
-                            if args.name.endswith('.test'):
-                                msg += ' (remove .test)'
-                            raise ValueError(msg)
         if not args.help:
             if (args.noun is not None) and (args.noun not in nouns):
                 if args.verb != 'apply':
@@ -438,18 +430,18 @@ def dispatch_verb(cli_dict):
 
 def main():
     ret = 0
-    try:
-        signal.signal(signal.SIGINT, ocpidevsignint)
-        cli_dict = get_cli_dict()
-        if cli_dict['suppresswarn']:
-            set_g_suppress_warn(True)
-        if cli_dict['loglevel']:
-            set_g_log_level(cli_dict['loglevel'])
-        Logger().debug('cli_dict : ' + str(cli_dict))
-        dispatch_verb(cli_dict)
-    except Exception as exception:
-        Logger().error(str(exception))
-        ret = 1
+    # try:
+    signal.signal(signal.SIGINT, ocpidevsignint)
+    cli_dict = get_cli_dict()
+    if cli_dict['suppresswarn']:
+        set_g_suppress_warn(True)
+    if cli_dict['loglevel']:
+        set_g_log_level(cli_dict['loglevel'])
+    Logger().debug('cli_dict : ' + str(cli_dict))
+    dispatch_verb(cli_dict)
+    # except Exception as exception:
+    #     Logger().error(str(exception))
+    #     ret = 1
     return ret
 
 

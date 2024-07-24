@@ -99,58 +99,6 @@ class SpecsDirectory():
                             pass
 
 
-# TODO organize this class better
-class ComponentLibraryDiscoverer():
-
-    def append_discovered_asset(self, asset):
-        if asset.get_type() == 'component':
-            self.components.append(asset)
-        if asset.get_type() == 'protocol':
-            self.protocols.append(asset)
-        _type = asset.get_type()
-        if (_type == 'hdl worker') or (_type == 'rcc worker'):
-            self.workers.append(asset)
-        if asset.get_type() == 'test':
-            self.tests.append(asset)
-        Logger().log(9, 'discovered ' + _type + ' ' + asset.abs_path)
-
-    def get_potential_asset_dir_abs_paths(self, parent):
-        ret = []
-        discovery_path = self.abs_path + '/' + parent
-        if os.path.isdir(discovery_path):
-            for _dir in AssetBase.listdir_assets(discovery_path):
-                dir_abs_path = discovery_path + '/' + _dir
-                allowable_dir = (_dir != 'specs') and (_dir != 'gen')
-                if os.path.isdir(dir_abs_path) and allowable_dir:
-                    ret.append(dir_abs_path)
-        return ret
-
-    def discover_dir_assets(self, parent, allowlist=None, platform=False):
-        for dir_abs_path in self.get_potential_asset_dir_abs_paths(parent):
-            try:
-                assets = []
-                tmp = dir_abs_path
-                if tmp.endswith('.rcc') or tmp.endswith('.hdl') or platform:
-                    name = AssetBase.get_name_from_abs_path(dir_abs_path)
-                    if tmp.endswith('.rcc'):
-                        # due to edge cases such as testzc.rcc, testmulti.rcc
-                        assets = RccAssembly(dir_abs_path).workers
-                    else:
-                        tmp = dir_abs_path + '/' + name + '.xml'
-                        assets.append(Worker(tmp))
-                for asset in assets:
-                    if allowlist is not None:
-                        # TODO is this pre-2.0???
-                        allowlist = [name.split('.')[0] for name in allowlist]
-                    if (allowlist is None) or (asset.name in allowlist):
-                        self.append_discovered_asset(asset)
-            except InvalidAssetError as err:
-                if (parent != 'applications') and \
-                   (not dir_abs_path.endswith('.test')):
-                    Logger().warn('skipping ' + str(err))
-                pass
-
-
 class ComponentLibrariesDirectory(AssetBase):
     """ undocumented """
 
@@ -184,7 +132,7 @@ class ComponentLibrariesDirectory(AssetBase):
         return 'component libraries'
 
 
-class ComponentLibrary(AssetBase, SpecsDirectory, ComponentLibraryDiscoverer):
+class ComponentLibrary(AssetBase, SpecsDirectory):
     """ Reference RCC/HDL Development Guide section 3. A ComponentLibrary is
         represented by a directory and knows nothing about the project it
         is in or its package ID. """
@@ -296,6 +244,54 @@ class ComponentLibrary(AssetBase, SpecsDirectory, ComponentLibraryDiscoverer):
         # Logger().debug(str(allowlist))
         # '' in below line indicates worker discovery
         self.discover_dir_assets('', allowlist, platform)
+
+    def append_discovered_asset(self, asset):
+        if asset.get_type() == 'component':
+            self.components.append(asset)
+        if asset.get_type() == 'protocol':
+            self.protocols.append(asset)
+        _type = asset.get_type()
+        if (_type == 'hdl worker') or (_type == 'rcc worker'):
+            self.workers.append(asset)
+        if asset.get_type() == 'test':
+            self.tests.append(asset)
+        Logger().log(9, 'discovered ' + _type + ' ' + asset.abs_path)
+
+    def get_potential_asset_dir_abs_paths(self, parent):
+        ret = []
+        discovery_path = self.abs_path + '/' + parent
+        if os.path.isdir(discovery_path):
+            for _dir in AssetBase.listdir_assets(discovery_path):
+                dir_abs_path = discovery_path + '/' + _dir
+                allowable_dir = (_dir != 'specs') and (_dir != 'gen')
+                if os.path.isdir(dir_abs_path) and allowable_dir:
+                    ret.append(dir_abs_path)
+        return ret
+
+    def discover_dir_assets(self, parent, allowlist=None, platform=False):
+        for dir_abs_path in self.get_potential_asset_dir_abs_paths(parent):
+            try:
+                assets = []
+                tmp = dir_abs_path
+                if tmp.endswith('.rcc') or tmp.endswith('.hdl') or platform:
+                    name = AssetBase.get_name_from_abs_path(dir_abs_path)
+                    if tmp.endswith('.rcc'):
+                        # due to edge cases such as testzc.rcc, testmulti.rcc
+                        assets = RccAssembly(dir_abs_path).workers
+                    else:
+                        tmp = dir_abs_path + '/' + name + '.xml'
+                        assets.append(Worker(tmp))
+                for asset in assets:
+                    if allowlist is not None:
+                        # TODO is this pre-2.0???
+                        allowlist = [name.split('.')[0] for name in allowlist]
+                    if (allowlist is None) or (asset.name in allowlist):
+                        self.append_discovered_asset(asset)
+            except InvalidAssetError as err:
+                if (parent != 'applications') and \
+                   (not dir_abs_path.endswith('.test')):
+                    Logger().warn('skipping ' + str(err))
+                pass
 
 
 def test_ComponentLibrary(ret):

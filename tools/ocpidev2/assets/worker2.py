@@ -225,7 +225,7 @@ class Worker(AssetBase):
 class RccAssembly(AssetBase):
 
     def __init__(self, dir_abs_path):
-        AssetBase.__init__(self, dir_abs_path)
+        AssetBase.__init__(self, dir_abs_path, True, 0)
         # below line is undocumented edge case (testzc.rcc/Makefile Workers)
         self.workers = []
         self.parse()
@@ -357,7 +357,8 @@ def test_RccAssembly(ret):
             print(uut.__dict__.keys())
             os.system('cat ' + xml_abs_path)
         passed = len(uut.workers) == 2
-    except InvalidAssetError:
+    except InvalidAssetError as err:
+        print(str(err))
         passed = False
     log_pass_fail('testing RccAssembly workers', passed)
     if passed is False:

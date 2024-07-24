@@ -844,10 +844,12 @@ class AssetBase(AttributeBase):
         a get_type() string that is used for log messaging and internal asset
         conditionalization."""
 
-    def __init__(self, abs_path, enable_path_existence_check=True):
+    def __init__(self, abs_path, enable_path_existence_check=True,
+                 bad_name_action=2):
         """ abs_path is either to a xml file (Component/Protocol/etc) or a dir
             (HdlAssembly/etc) or none for some cases (Component embedded in
-            OWD, platform base config) """
+            OWD, platform base config).
+            bad_name_action - 0: nothing, 1: warn, 2: error """
         self.attrs = dict()
         for info in self.get_attr_infos():
             if info.is_list:
@@ -868,6 +870,15 @@ class AssetBase(AttributeBase):
         if (self.abs_path is not None):
             if enable_path_existence_check:
                 self.raise_if_path_does_not_exist()
+        if (self.name != '') and (not self.name.isidentifier()):
+            msg = '\'' + self.name + '\' '
+            if bad_name_action == 1:
+                msg += 'is not recommend (best to use alphanumeric and '
+                msg += 'underscores only)'
+                Logger().warn(msg)
+            elif bad_name_action == 2:
+                msg += 'is not a valid name'
+                raise InvalidAssetError(msg)
 
     def get_root_tags(self):
         # TODO replace get_root_tags() with self.root_tags

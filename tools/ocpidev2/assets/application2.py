@@ -161,7 +161,8 @@ class Application(AssetBase):
                  cli_dict=None):
         """ abs_path can be xml type OR dir type! see ADG section 10.2 """
         self.root_tags = ['Application']
-        AssetBase.__init__(self, abs_path, enable_path_existence_check)
+        AssetBase.__init__(self, abs_path, enable_path_existence_check,
+                           bad_name_action=1)
         self.src_file_name = self.name + '.cc'
         # TODO investigate whether below line is necessary
         # if not os.path.isfile(self.get_xml_abs_path()):
