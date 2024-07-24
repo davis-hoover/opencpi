@@ -243,8 +243,7 @@ def get_args(parser):
 
 
 def get_cli_dict():
-    """ get a dictionary of settings which looks like CLI args and has been
-        modified as needed """
+    """ get a dictionary of settings which looks like CLI """
     args = get_args(get_arg_parser())
     nouns = ['adapter', 'adapters',
              'assembly', 'assemblies',
