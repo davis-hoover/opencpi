@@ -79,6 +79,8 @@ class HdlPlatform(HdlCardPlatformBase):
     def __init__(self, dir_abs_path, cli_dict=None):
         self.root_tags = ['HdlPlatform']
         HdlCardPlatformBase.__init__(self, dir_abs_path, cli_dict)
+        self.language = ''  # TODO handle better w/ Worker class...
+        self.worker = Worker(self.get_xml_abs_path(), cli_dict)
         if cli_dict is None:
             if not os.path.isfile(self.get_xml_abs_path()):
                 self.raise_abs_path_does_not_exist()
@@ -88,6 +90,8 @@ class HdlPlatform(HdlCardPlatformBase):
             except InvalidAssetError:
                 pass
             self.parse(cli_dict)
+        if self.worker.language.lower() != 'vhdl':
+            raise InvalidAssetError('hdl platform must have language of vhdl')
 
     def get_attr_infos(self):
         ret = []
@@ -107,7 +111,6 @@ class HdlPlatform(HdlCardPlatformBase):
 
     def parse(self, cli_dict):
         self.parse_devices()
-        self.worker = Worker(self.get_xml_abs_path(), cli_dict)
         if self.name != self.worker.name:
             msg = ('platform directory ' + self.get_dir_abs_path() + ' , ' +
                    self.name + '.xml' + ' file does not contain equivalent '

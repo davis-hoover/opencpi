@@ -64,25 +64,18 @@ def add_create_arguments(parser, noun, authoring_model=''):
                            action='store_true')
         group.add_argument('-x', '--xml-dir-app', default=False,
                            action='store_true')
+    if (noun == 'component') or (noun == 'protocol') or (noun == 'worker'):
+        group = parser.add_mutually_exclusive_group()
+        group.add_argument('--hdl-library', nargs='?', default=None)
+        group.add_argument('--library', default=None)
+        group.add_argument('-p', '--project', default=False,
+                           action='store_true')
+        parser.add_argument('-P', '--platform', default=False)
     if noun == 'component':
         parser.add_argument('-t', '--create-test', default=False,
                             action='store_true')
-        parser.add_argument('-p', '--project', default=False,
-                            action='store_true')
-        group = parser.add_mutually_exclusive_group()
-        group.add_argument('--hdl-library', nargs='?', default='')
-        group.add_argument('--library', default=None)
-    if noun == 'primitive':
-        parser.add_argument('-p', '--project', default=False,
-                            action='store_true')
     if noun == 'project':
         parser.add_argument('--register', default=False, action='store_true')
-    if noun == 'protocol':
-        group = parser.add_mutually_exclusive_group()
-        group.add_argument('-p', '--project', default=False,
-                           action='store_true')
-        group.add_argument('--hdl-library', nargs='?', default='')
-        group.add_argument('--library', default=None)
     if noun == 'worker':
         parser.add_argument('-W', '--worker', default=[],
                             action='append')

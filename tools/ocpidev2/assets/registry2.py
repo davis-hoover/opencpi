@@ -378,11 +378,13 @@ class ProjectRegistry():
         if project is None:
             project_dir_abs_path = _dir
             while True:
+                print(project_dir_abs_path)
                 try:
-                    project = Project(project_dir_abs_path, True)
+                    project = Project(project_dir_abs_path, None)
                     project.discover()
                     break
-                except InvalidAssetError:
+                except InvalidAssetError as err:
+                    print(str(err))
                     project_dir_abs_path = \
                         project_dir_abs_path.rsplit('/', 1)[0]
                     if len(project_dir_abs_path) <= 1:
