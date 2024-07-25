@@ -54,7 +54,7 @@ def add_build_arguments(parser):
     return parser
 
 
-def add_create_arguments(parser, noun):
+def add_create_arguments(parser, noun, authoring_model=''):
     """ add create-specific arguments as per man ocpidev2-create """
     parser.add_argument('-k', '--keep', default=False, action='store_true')
     asset = ProjectCollection.get_asset_for_create(noun)
@@ -83,6 +83,9 @@ def add_create_arguments(parser, noun):
                            action='store_true')
         group.add_argument('--hdl-library', nargs='?', default='')
         group.add_argument('--library', default=None)
+    if noun == 'worker':
+        parser.add_argument('-W', '--worker', default=[],
+                            action='append')
     if asset is not None:
         for attr in asset.get_attr_infos():
             if attr.cli is not None:
@@ -382,6 +385,8 @@ def get_cli_dict():
                 msg += 'is invalid '
             msg += 'for noun \'' + cli_dict['noun'] + '\''
             raise Exception(msg)
+    if ('worker' in cli_dict.keys()) and (cli_dict['worker'] != []):
+        raise Exception('do not use --worker, instead create separate workers')
     return cli_dict
 
 

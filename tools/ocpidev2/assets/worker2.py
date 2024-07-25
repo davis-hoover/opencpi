@@ -100,7 +100,7 @@ class {{asset.name|capitalize}}Worker : public {{asset.name|capitalize}}WorkerBa
 """  # nopep8
 
 
-class Worker(AssetBase):
+class Worker(ProjectComponentLibraryWorkerBase):
     """ Reference RCC/HDL Development Guide section 3. A Worker is
         represented by a xml file (OWD) and knows nothing about the project it
         is in or its package ID. """
@@ -165,6 +165,7 @@ class Worker(AssetBase):
 
     def get_attr_infos(self):
         ret = []
+        ret.extend(ProjectComponentLibraryWorkerBase.get_attr_infos(self))
         ret.append(AttributeInfo('Name'))
         ret.append(AttributeInfo('Spec',
                    cli=('-S', '--spec')))  # CDG section 8.1.2
@@ -173,10 +174,22 @@ class Worker(AssetBase):
         ret.append(AttributeInfo('Version',
                    cli=('-a', '--version'), is_int=True))  # CDG secion 8.1.4
         is_list = True
-        ret.append(AttributeInfo('SourceFiles', is_list))  # CDG section 8.1.10
-        ret.append(AttributeInfo('Libraries', is_list))  # CDG section 8.1.11
-        # control_operations  # RDG section 3.1.3
-        # slave  # RDG section 3.1.5
+        ret.append(AttributeInfo('ControlOperations',
+                   cli=('-C', '--control-operations'),
+                   is_list=True))  # CDG section 8.1.5
+        ret.append(AttributeInfo('SourceFiles',
+                   cli=('-o', '--source-files'),
+                   is_list=True))  # CDG section 8.1.10
+        # TODO
+        # if self.authoring_model == 'rcc':
+        ret.append(AttributeInfo('Slave',
+                   cli=('-V', '--slave-worker')))  # RDG section 3.1.5
+        ret.append(AttributeInfo('StaticPrereqLibs',
+                   cli=('-R', '--static-prereq'),
+                   is_list=True))  # RDG section 3.1.8
+        ret.append(AttributeInfo('DynamicPrereqLibs',
+                   cli=('-r', '--rcc-dynamic'),
+                   is_list=True))  # RDG section 3.1.9
         return ret
 
     def delete(self):

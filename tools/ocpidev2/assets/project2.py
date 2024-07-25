@@ -125,7 +125,7 @@ comp_example_app_rst_template = """<?xml version="1.0"?>
 """  # nopep8
 
 
-class Project(AssetBase, SpecsDirectory):
+class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
     """ Component Development Guide section 14 """
 
     def __init__(self, dir_abs_path, enable_path_existence_check=True,
@@ -179,7 +179,7 @@ class Project(AssetBase, SpecsDirectory):
         return any([noun.startswith(_str) for _str in rcc_strs])
 
     @staticmethod
-    def get_asset_for_create(noun):
+    def get_asset_for_create(noun, authoring_model=''):
         asset = None
         if noun == 'application':
             asset = Application('', False, None)
@@ -221,14 +221,7 @@ class Project(AssetBase, SpecsDirectory):
                    cli=('-K', '--package-id')))
         ret.append(AttributeInfo('PackageName',
                    cli=('-N', '--package-name')))
-        ret.append(AttributeInfo('XmlIncludeDirs',
-                   is_list=True, cli=('-A', '--xml-include')))
-        ret.append(AttributeInfo('IncludeDirs',
-                   is_list=True, cli=('-I', '--include-dir')))
-        ret.append(AttributeInfo('HdlLibraries',
-                   is_list=True, cli=('-Y', '--primitive-library')))
-        ret.append(AttributeInfo('Libraries',
-                   is_list=True, cli=('-y', '--component-library')))
+        ret.extend(ProjectComponentLibraryWorkerBase.get_attr_infos(self))
         for attr_key in ['HdlTargets', 'HdlPlatforms', 'RccPlatforms',
                          'RccHdlPlatforms', 'ComponentLibraries',
                          'OnlyTargets', 'OnlyPlatforms',

@@ -132,7 +132,7 @@ class ComponentLibrariesDirectory(AssetBase):
         return 'component libraries'
 
 
-class ComponentLibrary(AssetBase, SpecsDirectory):
+class ComponentLibrary(ProjectComponentLibraryWorkerBase, SpecsDirectory):
     """ Reference RCC/HDL Development Guide section 3. A ComponentLibrary is
         represented by a directory and knows nothing about the project it
         is in or its package ID. """
@@ -183,16 +183,9 @@ class ComponentLibrary(AssetBase, SpecsDirectory):
 
     def get_attr_infos(self):
         ret = []
-        ret.append(AttributeInfo('ComponentLibraries', is_list=True,
-                                 cli=('-y', '--component-library')))
+        ret.extend(ProjectComponentLibraryWorkerBase.get_attr_infos(self))
         # TODO investigate whether HdlLibraries is even allowed?
         ret.append(AttributeInfo('HdlLibraries', is_list=True))
-        ret.append(AttributeInfo('XmlIncludeDir', is_list=True,
-                                 cli=('-A', '--xml-include')))
-        ret.append(AttributeInfo('IncludeDir', is_list=True,
-                                 cli=('-I', '--include-dir')))
-        ret.append(AttributeInfo('Libraries', is_list=True,
-                                 cli=('-Y', '--primitive-library')))
         ret.append(AttributeInfo('Workers', is_list=True))
         ret.append(AttributeInfo('PackagePrefix',
                                  cli=('-F', '--package-prefix')))

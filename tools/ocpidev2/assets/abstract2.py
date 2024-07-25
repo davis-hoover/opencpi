@@ -1109,3 +1109,21 @@ class AssetBase(AttributeBase):
 
     def raise_invalid_asset_error(self):
         raise InvalidAssetError('not a ' + self.get_root_tags()[0])
+
+
+class ProjectComponentLibraryWorkerBase(AssetBase):
+
+    def __init__(self):
+        pass
+
+    def get_attr_infos(self):
+        ret = []
+        ret.append(AttributeInfo('XmlIncludeDirs',
+                   is_list=True, cli=('-A', '--xml-include')))
+        ret.append(AttributeInfo('IncludeDirs',
+                   is_list=True, cli=('-I', '--include-dir')))
+        ret.append(AttributeInfo('HdlLibraries',
+                   is_list=True, cli=('-Y', '--primitive-library')))
+        ret.append(AttributeInfo('Libraries',
+                   is_list=True, cli=('-y', '--component-library')))
+        return ret
