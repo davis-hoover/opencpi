@@ -331,26 +331,39 @@ class ProjectRegistry():
                 self.projects.append(project)
         Logger().debug('end of project discovery')
 
+    def get_project_symlink_path(self, project):
+        return self.abs_path + '/' + str(project.get_package_id())
+
     def register(self, cli_dict, _dir):
         dir_abs_path = _dir
         if cli_dict['name'] is not None:
             dir_abs_path += '/' + cli_dict['name']
         try:
-            project = Project(_dir, True)  # raises if not a project
+            project = Project(dir_abs_path, True)  # raises if not a project
         except InvalidAssetError:
             msg = 'project \'' + cli_dict['name'] + '\' does not exist'
             raise InvalidAssetError(msg)
-        symlink_path = self.abs_path + '/' + str(project.get_package_id())
+        symlink_path = self.get_project_symlink_path(project)
         if not os.path.islink(symlink_path):
             os.symlink(project.abs_path, symlink_path)
 
-    def unregister_project(self, _dir):
-        project = Project(_dir, False)  # raises if not a project
-        pid = str(project.get_package_id())
-        try:
-            System('unlink ' + self.abs_path + '/' + pid)
-        except SystemCallError:
-            raise Exception(pid + ' is not registered')
+    def unregister(self, cli_dict, _dir):
+        if cli_dict['noun'] == 'project':
+            dir_abs_path = _dir
+            if cli_dict['name'] is not None:
+                dir_abs_path += '/' + cli_dict['name']
+            try:
+                # raises if not a project
+                project = Project(dir_abs_path, True)
+            except InvalidAssetError:
+                msg = 'project \'' + cli_dict['name'] + '\' does not exist'
+                raise InvalidAssetError(msg)
+            try:
+                symlink_path = self.get_project_symlink_path(project)
+                System('unlink ' + symlink_path)
+            except SystemCallError:
+                pid = project.get_package_id()
+                raise Exception(pid + ' is not registered')
 
     def get_assets(self, _dir):
         assets = []
@@ -471,10 +484,6 @@ class ProjectRegistry():
                 print('')
             if cli_dict['json']:
                 print(str(json_dict))
-
-    def unregister(self, cli_dict, _dir):
-        if cli_dict['noun'] == 'project':
-            self.unregister_project(_dir)
 
     def export_projects(self, makefile):
         """ plan_build_exports() must occur before this method is called """

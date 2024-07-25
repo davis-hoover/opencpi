@@ -330,7 +330,7 @@ def get_cli_dict():
     cli_dict = vars(tmp)
     # make CLI look like attrs (necessary for create cli verb)
     cli_dict = ({key.replace('_', ''): val for key, val in cli_dict.items()})
-    if (cli_dict['noun'] == 'worker'):
+    if (cli_dict['noun'] == 'worker') or (cli_dict['noun'] == 'device'):
         authoring_model_from_name = cli_dict['name'].split('.')[-1]
         authoring_model_is_in_name = '.' in cli_dict['name']
         if authoring_model_is_in_name:

@@ -478,6 +478,15 @@ class Project(AssetBase, SpecsDirectory):
             msg += 'Use \'-d\' instead.'
             raise Exception(msg)
 
+    def raise_if_not_in_hdl_cards_specs(self, cli_dict, _dir):
+        if _dir != self.get_dir_abs_path() + '/hdl/cards/specs':
+            msg = cli_dict['noun'] + ' \'' + cli_dict['name']
+            msg += '\' can not exist within ' + _dir
+            msg += ' (' + cli_dict['noun'] + ' can only be created within '
+            msg += '<project>/hdl/cards/specs, set -d, or the working '
+            msg += 'directory, to <project>/hdl/cards/specs)'
+            raise Exception(msg)
+
     def get_and_validate_cli_library_path(self, cli_dict, _dir,
                                           libs_to_consider, dict_key):
         """ considers the combination of _dir (which is already verified to
@@ -561,13 +570,7 @@ class Project(AssetBase, SpecsDirectory):
         return HdlAssembly(dir_abs_path, False, cli_dict)
 
     def get_card_object_from_cli(self, cli_dict, _dir):
-        if _dir != self.get_dir_abs_path() + '/hdl/cards/specs':
-            msg = cli_dict['noun'] + ' \'' + cli_dict['name']
-            msg += '\' can not exist within ' + _dir
-            msg += ' (' + cli_dict['noun'] + ' can only be created within '
-            msg += '<project>/hdl/cards/specs, set -d, or the working '
-            msg += 'directory, to <project>/hdl/cards/specs)'
-            raise Exception(msg)
+        self.raise_if_not_in_hdl_cards_specs(cli_dict, _dir)
         xml_abs_path = self.get_dir_abs_path() + '/hdl/cards/specs/'
         xml_abs_path += cli_dict['name'] + '.xml'
         return HdlCard(xml_abs_path, False, cli_dict)
@@ -604,6 +607,19 @@ class Project(AssetBase, SpecsDirectory):
         return Component(xml_abs_path, False, cli_dict)
 
     def get_device_object_from_cli(self, cli_dict, _dir):
+        found = False
+        for component_library in self.component_libraries:
+            if component_library.name in ['devices', 'cards']:
+                if _dir == component_library.get_dir_abs_path():
+                    found = True
+                    break
+        if not found:
+            msg = cli_dict['noun'] + ' \'' + cli_dict['name']
+            msg += '\' can not exist within ' + _dir
+            msg += ' (must set the working directory, or '
+            msg += '-d <dir>, to a devices or cards component <library> '
+            msg += 'directory'
+            raise Exception(msg)
         xml_abs_path = _dir + '/' + cli_dict['name'] + '.hdl/'
         xml_abs_path += cli_dict['name'] + '.xml'
         return Worker(xml_abs_path, False, cli_dict)
@@ -735,11 +751,25 @@ class Project(AssetBase, SpecsDirectory):
         return Protocol(xml_abs_path, False, cli_dict)
 
     def get_slot_object_from_cli(self, cli_dict, _dir):
+        self.raise_if_not_in_hdl_cards_specs(cli_dict, _dir)
         xml_abs_path = self.get_dir_abs_path() + '/hdl/cards/specs/'
         xml_abs_path += cli_dict['name'] + '.xml'
         return HdlSlot(xml_abs_path, False, cli_dict)
 
     def get_worker_object_from_cli(self, cli_dict, _dir):
+        found = False
+        for component_library in self.component_libraries:
+            if _dir == component_library.get_dir_abs_path():
+                found = True
+                break
+        if not found:
+            msg = cli_dict['noun'] + ' \'' + cli_dict['name']
+            msg += '\' can not exist within ' + _dir
+            msg += ' (must set the working directory, or '
+            msg += '-d <dir>, to a component <library> directory, \'ocpidev2 '
+            msg += 'show libraries -v\' can be run to show valid component '
+            msg += 'library directory locations)'
+            raise Exception(msg)
         xml_abs_path = _dir + '/' + cli_dict['name'] + '.'
         xml_abs_path += cli_dict['authoringmodel'] + '/'
         xml_abs_path += cli_dict['name'] + '.xml'

@@ -948,6 +948,7 @@ class AssetBase(AttributeBase):
     def create(self):
         if not os.path.exists(self.get_dir_abs_path()):
             System('mkdir -p ' + self.get_dir_abs_path())
+            Logger().info('created ' + self.get_dir_abs_path())
         for fname, fcontents in self.get_templates().items():
             file_path = self.get_dir_abs_path() + '/' + fname
             self.create_file(file_path, fcontents, self)
@@ -964,6 +965,7 @@ class AssetBase(AttributeBase):
         out_file = open(file_path, 'w')
         out_file.write(fcontents)
         out_file.close()
+        Logger().info('created ' + file_path)
 
     def delete(self):
         System('rm -rf ' + self.abs_path)
