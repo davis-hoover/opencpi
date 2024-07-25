@@ -105,14 +105,13 @@ class Worker(ProjectComponentLibraryWorkerBase):
         represented by a xml file (OWD) and knows nothing about the project it
         is in or its package ID. """
 
-    def __init__(self, xml_abs_path, enable_path_existence_check=True,
-                 cli_dict=None):
+    def __init__(self, xml_abs_path, cli_dict=None):
         self.root_tags = ['HdlWorker', 'HdlDevice']  # PDG section 5.4.4
         self.root_tags += ['HdlPlatform', 'RccWorker']
         # start pre-2.0 opencpi
         self.root_tags += ['HdlImplementation', 'RccImplementation']
         # end pre-2.0 opencpi
-        AssetBase.__init__(self, xml_abs_path, enable_path_existence_check)
+        AssetBase.__init__(self, xml_abs_path, cli_dict)
         self.authoring_model = ''
         self.language = ''
         self.spec = self.name
@@ -121,16 +120,18 @@ class Worker(ProjectComponentLibraryWorkerBase):
         directory_name = self.get_dir_abs_path()
         if directory_name.endswith('.hdl'):
             self.authoring_model = 'hdl'
+            self.root_tag = self.root_tags[0]
         elif directory_name.endswith('.rcc'):
             self.authoring_model = 'rcc'
             self.language = 'c'  # RDG section 3.1.4
+            self.root_tag = self.root_tags[3]
         else:
             # is a hdl platform worker case
             self.authoring_model = 'hdl'
         self.supports = []  # PDG section 5.5.4
-        if enable_path_existence_check:
+        if cli_dict is None:
             self.parse()
-        elif cli_dict is not None:
+        else:
             if cli_dict['language'] != '':
                 self.attrs['Language'] = cli_dict['language']
                 self.language = cli_dict['language'].lower()

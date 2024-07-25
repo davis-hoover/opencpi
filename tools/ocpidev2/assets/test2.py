@@ -64,11 +64,9 @@ class Test(AssetBase):
         is created to hold a test suite for all workers in the library that
         implement the same spec (OCS) """
 
-    def __init__(self, dir_abs_path, enable_path_existence_check=True,
-                 cli_dict=None):
+    def __init__(self, dir_abs_path, cli_dict=None):
         self.root_tags = ['Tests']
-        AssetBase.__init__(self, dir_abs_path, enable_path_existence_check,
-                           bad_name_action=0)
+        AssetBase.__init__(self, dir_abs_path, cli_dict, bad_name_action=0)
         Logger().debug('parsing ' + self.get_xml_abs_path())
         self.parse(cli_dict)
         self.name = self.name.split('.test')[0]

@@ -89,16 +89,16 @@ def add_create_arguments(parser, noun, authoring_model=''):
     if asset is not None:
         for attr in asset.get_attr_infos():
             if attr.cli is not None:
+                print(str(attr.cli))
                 if attr.is_bool:
-                    _default = [] if attr.is_list else \
-                               (False if attr.is_bool else '')
+                    _default = [] if attr.is_list else False
                     _action = 'append' if attr.is_list else \
                               ('store_true' if attr.is_bool else 'store')
                     parser.add_argument(attr.cli[0], attr.cli[1],
                                         default=_default, action=_action)
                 else:
                     _default = [] if attr.is_list else \
-                               (False if attr.is_bool else '')
+                               (0 if attr.is_int else '')
                     _action = 'append' if attr.is_list else \
                               ('store_true' if attr.is_bool else 'store')
                     parser.add_argument(attr.cli[0], attr.cli[1], nargs='?',

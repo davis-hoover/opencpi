@@ -102,14 +102,14 @@ class SpecsDirectory():
 class ComponentLibrariesDirectory(AssetBase):
     """ undocumented """
 
-    def __init__(self, dir_abs_path, enable_path_existence_check, cli_dict):
+    def __init__(self, dir_abs_path, cli_dict=None):
         self.root_tags = ['Libraries']  # undocumented
         if not dir_abs_path.endswith('components'):
             self.raise_invalid_asset_error()
-        AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
-        # TODO investigate moving below 3 lines into AssetBase
-        if enable_path_existence_check:
+        AssetBase.__init__(self, dir_abs_path, cli_dict)
+        if cli_dict is None:
             if os.path.exists(self.get_xml_abs_path()):
+                # TODO investigate moving into AssetBase
                 self.raise_if_invalid_root_tag(self.get_parsed().getroot())
             found = True
             for entry in AssetBase.listdir_assets(self.get_dir_abs_path()):
@@ -141,10 +141,9 @@ class ComponentLibrary(ProjectComponentLibraryWorkerBase, SpecsDirectory):
     valid_locations += ['hdl/adapters', 'hdl/platforms', 'devices']
     # end of CDG section 14.2.3
 
-    def __init__(self, dir_abs_path, enable_path_existence_check=True,
-                 cli_dict=None):
+    def __init__(self, dir_abs_path, cli_dict=None):
         self.root_tags = ['Library']  # CDG section 10.1
-        AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
+        AssetBase.__init__(self, dir_abs_path, cli_dict)
         is_test = self.get_dir_abs_path_is_test(dir_abs_path)
         if is_test or self.get_dir_abs_path_is_worker(dir_abs_path):
             self.raise_invalid_asset_error()
@@ -162,7 +161,7 @@ class ComponentLibrary(ProjectComponentLibraryWorkerBase, SpecsDirectory):
         self.parse(cli_dict)
         workers = self.attrs['Workers']
         allowlist = None if workers == [] else workers
-        if enable_path_existence_check:
+        if cli_dict is None:
             self.discover(allowlist, 'hdl/platforms' in dir_abs_path)
 
     def get_type(self):

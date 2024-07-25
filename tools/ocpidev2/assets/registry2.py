@@ -57,7 +57,7 @@ class ProjectCollection():
         project_dir_abs_path = _dir
         while True:
             try:
-                self.local_project = Project(project_dir_abs_path, True)
+                self.local_project = Project(project_dir_abs_path)
                 self.local_project.discover()
                 Logger().debug('operating in local project ' +
                                self.local_project.get_dir_abs_path())
@@ -326,7 +326,7 @@ class ProjectRegistry():
                     # append pre-constructed project avoids warning duplication
                     project = local_project
                 else:
-                    project = Project(project_abs_path, False)
+                    project = Project(project_abs_path)
                     project.discover(do_component_libraries, do_hdl_primitives)
                 self.projects.append(project)
         Logger().debug('end of project discovery')
@@ -339,7 +339,7 @@ class ProjectRegistry():
         if cli_dict['name'] is not None:
             dir_abs_path += '/' + cli_dict['name']
         try:
-            project = Project(dir_abs_path, True)  # raises if not a project
+            project = Project(dir_abs_path)  # raises if not a project
         except InvalidAssetError:
             msg = 'project \'' + cli_dict['name'] + '\' does not exist'
             raise InvalidAssetError(msg)
@@ -435,7 +435,7 @@ class ProjectRegistry():
                 raise Exception('registry already exists')
         elif cli_dict['noun'] == 'project':
             dir_abs_path = _dir + '/' + cli_dict['name']
-            Project(dir_abs_path, False, cli_dict).create()
+            Project(dir_abs_path, cli_dict).create()
             if cli_dict['register']:
                 self.register(cli_dict, dir_abs_path)
         else:
@@ -446,7 +446,7 @@ class ProjectRegistry():
             pass
         elif cli_dict['noun'] == 'project':
             dir_abs_path = _dir + '/' + cli_dict['name']
-            Project(dir_abs_path, False, cli_dict).delete()
+            Project(dir_abs_path, cli_dict).delete()
         else:
             self.get_project(cli_dict, _dir).delete_asset(cli_dict, _dir)
         pass

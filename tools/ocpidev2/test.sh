@@ -21,7 +21,7 @@ ocpidev2 unittest --verbose
 ocpidev2 create registry project-registry
 ocpidev2 create project core2 --package-id ocpi.core2
 ocpidev2 create library components -d core2
-ocpidev2 create library cards -d core2/hdl --component-library devices --xml-include '../../components/specs ../devices/lib/hdl ../devices/specs'
+ocpidev2 create library cards -d core2/hdl --component-library devices --xml-include ../../components/specs --xml-include ../devices/lib/hdl --xml-include ../devices/specs
 ocpidev2 create library devices -d core2/hdl --package-id ocpi.core.devices
 ocpidev2 create library adapters -d core2/hdl --package-id ocpi.core.adapters
 ocpidev2 create protocol ComplexShortWithMetadata -d core2/specs
@@ -134,10 +134,10 @@ ocpidev2 create hdl device time_server.hdl -d core2/hdl/devices --language vhdl 
 ocpidev2 create hdl device unoc2cp.hdl -d core2/hdl/devices --language vhdl --version 2
 ocpidev2 create hdl device unoc_term.hdl -d core2/hdl/devices --language vhdl --version 2
 ocpidev2 create hdl platform isim -d core2/hdl/platforms --language vhdl --spec platform
-ocpidev2 create hdl platform modelsim -d core2/hdl/platforms --language vhdl --spec platform --libraries sdp
-ocpidev2 create hdl platform riviera -d core2/hdl/platforms --language vhdl --spec platform --libraries sdp
-ocpidev2 create hdl platform x4sim -d core2/hdl/platforms --language vhdl --spec platform --libraries 'sdp util' --version 2
-ocpidev2 create hdl platform xsim -d core2/hdl/platforms --language vhdl --spec platform --libraries sdp --configurations 'base cfg_pps_sim_test'
+ocpidev2 create hdl platform modelsim -d core2/hdl/platforms --language vhdl --spec platform --component-library sdp
+ocpidev2 create hdl platform riviera -d core2/hdl/platforms --language vhdl --spec platform --component-library sdp
+ocpidev2 create hdl platform x4sim -d core2/hdl/platforms --language vhdl --spec platform --component-library sdp --component-library util --version 2
+ocpidev2 create hdl platform xsim -d core2/hdl/platforms --language vhdl --spec platform --component-library sdp --configuration base --configuration cfg_pps_sim_test
 ocpidev2 create rcc platform centos7 -d core2/rcc/platforms
 ocpidev2 create rcc platform centos8 -d core2/rcc/platforms
 ocpidev2 create rcc platform macos10_13 -d core2/rcc/platforms
@@ -195,7 +195,7 @@ rm -rf ocpidev2_test_project
 ocpidev2 create project core2 --package-id ocpi.core2
 pushd core2
 ocpidev2 create library components
-ocpidev2 create library cards -d hdl --component-library devices --xml-include '../../components/specs ../devices/lib/hdl ../devices/specs'
+ocpidev2 create library cards -d hdl --component-library devices --xml-include ../../components/specs --xml-include ../devices/lib/hdl --xml-include ../devices/specs
 popd
 pushd core2/hdl
 ocpidev2 create library devices --package-id ocpi.core.devices
@@ -340,10 +340,10 @@ pushd core2
 ocpidev2 create hdl platform isim -d hdl/platforms --language vhdl --spec platform
 popd
 pushd core2/hdl/platforms
-ocpidev2 create hdl platform modelsim --language vhdl --spec platform --libraries sdp
-ocpidev2 create hdl platform riviera --language vhdl --spec platform --libraries sdp
-ocpidev2 create hdl platform x4sim --language vhdl --spec platform --libraries 'sdp util' --version 2
-ocpidev2 create hdl platform xsim --language vhdl --spec platform --libraries sdp --configurations 'base cfg_pps_sim_test'
+ocpidev2 create hdl platform modelsim --language vhdl --spec platform --component-library sdp
+ocpidev2 create hdl platform riviera --language vhdl --spec platform --component-library sdp
+ocpidev2 create hdl platform x4sim --language vhdl --spec platform --component-library sdp --component-library util --version 2
+ocpidev2 create hdl platform xsim --language vhdl --spec platform --component-library sdp --configuration base --configuration cfg_pps_sim_test
 popd
 pushd core2
 ocpidev2 create rcc platform centos7 -d rcc/platforms

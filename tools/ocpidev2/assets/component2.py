@@ -337,14 +337,13 @@ class Protocol(AssetBase):
 
     valid_locations = ['specs']
 
-    def __init__(self, xml_abs_path, enable_path_existence_check=True,
-                 cli_dict=None):
+    def __init__(self, xml_abs_path, cli_dict=None):
         self.root_tags = ['Protocol']
-        AssetBase.__init__(self, xml_abs_path, enable_path_existence_check)
-        if enable_path_existence_check:
+        AssetBase.__init__(self, xml_abs_path, cli_dict)
+        if cli_dict is None:
             self.raise_if_invalid_location()
         self.operations = []
-        self.parse(cli_dict, enable_path_existence_check)
+        self.parse(cli_dict)
 
     def get_root_tags(self):
         # TODO replace get_root_tags() with self.root_tags
@@ -356,9 +355,9 @@ class Protocol(AssetBase):
         templates[self.name + '-prot.rst'] = prot_spec_rst_template
         return templates
 
-    def parse(self, cli_dict, enable_path_existence_check):
+    def parse(self, cli_dict):
         AttributeBase.parse(self, cli_dict)
-        if enable_path_existence_check:
+        if cli_dict is None:
             for elem in self.get_parsed().iter():
                 for key, value in elem.attrib.items():
                     if key.lower() == 'href':
@@ -381,11 +380,10 @@ class Component(AssetBase):
         represented by a xml file (OCS) and knows nothing about the project it
         is in or its package ID. """
 
-    def __init__(self, xml_abs_path, enable_path_existence_check=True,
-                 cli_dict=None):
+    def __init__(self, xml_abs_path, cli_dict=None):
         """ xml_abs_path is None for ComponentSpec embedded in OWD """
         self.root_tags = ['ComponentSpec']
-        AssetBase.__init__(self, xml_abs_path, enable_path_existence_check)
+        AssetBase.__init__(self, xml_abs_path, cli_dict)
         Logger().debug('parsing ' + self.get_xml_abs_path())
         self.parse(cli_dict)
 

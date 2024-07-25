@@ -25,9 +25,9 @@ from _opencpi.assets.worker2 import Worker
 
 class RccPlatform(AssetBase):
 
-    def __init__(self, dir_abs_path, enable_path_existence_check=True,
-                 cli_dict=None):
-        AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
+    def __init__(self, dir_abs_path, cli_dict=None):
+        self.root_tags = ['']
+        AssetBase.__init__(self, dir_abs_path, cli_dict)
 
     def get_type(self):
         return 'rcc platform'
@@ -44,8 +44,8 @@ class RccPlatform(AssetBase):
 
 class HdlCardPlatformBase(AssetBase):
 
-    def __init__(self, abs_path, enable_path_existence_check=True):
-        AssetBase.__init__(self, abs_path, enable_path_existence_check)
+    def __init__(self, abs_path, cli_dict=None):
+        AssetBase.__init__(self, abs_path, cli_dict)
         self.devices = dict()  # key = unique instance name, val = worker name
 
     def parse_devices(self):
@@ -76,12 +76,10 @@ class HdlCardPlatformBase(AssetBase):
 class HdlPlatform(HdlCardPlatformBase):
     """ Platform Development Guide section 5.4 """
 
-    def __init__(self, dir_abs_path, enable_path_existence_check=True,
-                 cli_dict=None):
+    def __init__(self, dir_abs_path, cli_dict=None):
         self.root_tags = ['HdlPlatform']
-        HdlCardPlatformBase.__init__(self, dir_abs_path,
-                                     enable_path_existence_check)
-        if enable_path_existence_check:
+        HdlCardPlatformBase.__init__(self, dir_abs_path, cli_dict)
+        if cli_dict is None:
             if not os.path.isfile(self.get_xml_abs_path()):
                 self.raise_abs_path_does_not_exist()
             self.configurations = dict()
@@ -90,16 +88,10 @@ class HdlPlatform(HdlCardPlatformBase):
             except InvalidAssetError:
                 pass
             self.parse(cli_dict)
-        if cli_dict is not None:
-            if cli_dict['language'] != '':
-                self.attrs['Language'] = cli_dict['language']
-                self.language = cli_dict['language'].lower()
-            if cli_dict['version'] != '':
-                self.attrs['Version'] = cli_dict['version']
-                self.version = int(cli_dict['version'])
 
     def get_attr_infos(self):
         ret = []
+        ret.extend(ProjectComponentLibraryWorkerBase.get_attr_infos(self))
         ret.append(AttributeInfo('Name'))
         ret.append(AttributeInfo('Spec',
                    cli=('-S', '--spec')))
@@ -109,15 +101,13 @@ class HdlPlatform(HdlCardPlatformBase):
                    cli=('-a', '--version'), is_int=True))
         is_list = True
         ret.append(AttributeInfo('SourceFiles', is_list))
-        ret.append(AttributeInfo('Libraries',
-                   cli=('-M', '--libraries'), is_int=True))
         ret.append(AttributeInfo('Configurations',
-                   cli=('-c', '--configurations'), is_int=True))
+                   cli=('-c', '--configuration'), is_list=True))
         return ret
 
     def parse(self, cli_dict):
         self.parse_devices()
-        self.worker = Worker(self.get_xml_abs_path(), True, cli_dict)
+        self.worker = Worker(self.get_xml_abs_path(), cli_dict)
         if self.name != self.worker.name:
             msg = ('platform directory ' + self.get_dir_abs_path() + ' , ' +
                    self.name + '.xml' + ' file does not contain equivalent '
@@ -175,12 +165,10 @@ class HdlPlatformConfiguration(AssetBase):
 class HdlSlot(AssetBase):
     """ Platform Development Guide section 5.4.2 """
 
-    def __init__(self, xml_abs_path, enable_path_existence_check=True,
-                 cli_dict=None):
+    def __init__(self, xml_abs_path, cli_dict=None):
         self.root_tags = ['SlotType']
-        HdlCardPlatformBase.__init__(self, xml_abs_path,
-                                     enable_path_existence_check)
-        if enable_path_existence_check:
+        HdlCardPlatformBase.__init__(self, xml_abs_path, cli_dict)
+        if cli_dict is None:
             self.parse()
 
     def get_type(self):
@@ -190,20 +178,16 @@ class HdlSlot(AssetBase):
 class HdlCard(HdlCardPlatformBase):
     """ Platform Development Guide section 5.6 """
 
-    def __init__(self, xml_abs_path, enable_path_existence_check=True,
-                 cli_dict=None):
+    def __init__(self, xml_abs_path, cli_dict=None):
         self.root_tags = ['Card']
-        HdlCardPlatformBase.__init__(self, xml_abs_path,
-                                     enable_path_existence_check)
-        if enable_path_existence_check:
+        HdlCardPlatformBase.__init__(self, xml_abs_path, cli_dict)
+        if cli_dict is None:
             self.parse()
             if self.attrs['Type'] == '':
                 raise InvalidAssetError('card must contain a type')
-        elif cli_dict is not None:
+        else:
             if cli_dict['type'] == '':
                 raise InvalidAssetError('card must have a --type <type>')
-            if cli_dict['type'] != '':
-                self.attrs['Type'] = cli_dict['type']
 
     def get_attr_infos(self):
         ret = []

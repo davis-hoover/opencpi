@@ -139,11 +139,10 @@ int main(/*int argc, char **argv*/) {
 class ApplicationsDirectory(AssetBase):
     """ Reference Application Development Guide section 10.2 """
 
-    def __init__(self, dir_abs_path, enable_path_existence_check=True,
-                 cli_dict=None):
+    def __init__(self, dir_abs_path, cli_dict=None):
         self.root_tags = ['Applications']
-        AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
-        if enable_path_existence_check:
+        AssetBase.__init__(self, dir_abs_path, cli_dict)
+        if cli_dict is None:
             self.parse(cli_dict)
 
     def get_templates(self, applications=False):
@@ -157,17 +156,16 @@ class ApplicationsDirectory(AssetBase):
 class Application(AssetBase):
     """ Reference Application Development Guide section 3 """
 
-    def __init__(self, abs_path, enable_path_existence_check=True,
-                 cli_dict=None):
+    def __init__(self, abs_path, cli_dict=None):
         """ abs_path can be xml type OR dir type! see ADG section 10.2 """
         self.root_tags = ['Application']
-        AssetBase.__init__(self, abs_path, enable_path_existence_check,
+        AssetBase.__init__(self, abs_path, cli_dict,
                            bad_name_action=(0 if cli_dict is None else 1))
         self.src_file_name = None
         # TODO investigate whether below line is necessary
         # if not os.path.isfile(self.get_xml_abs_path()):
         #     self.raise_abs_path_does_not_exist()
-        if enable_path_existence_check:
+        if cli_dict is None:
             tmp = self.get_dir_abs_path() + '/' + self.name
             exts = ['.cc', '.c', '.cxx', 'cpp']
             for src_file_name in [tmp + ext for ext in exts]:

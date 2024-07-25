@@ -31,12 +31,11 @@ class HdlLibrary(AssetBase):
         represented by a directory and knows nothing about the project it
         is in or its package ID. """
 
-    def __init__(self, dir_abs_path, enable_path_existence_check=True,
-                 cli_dict=None):
+    def __init__(self, dir_abs_path, cli_dict=None):
         self.root_tags = ['HdlLibrary']  # HDG section 5.2
-        AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
+        AssetBase.__init__(self, dir_abs_path, cli_dict)
         self.source_files = []  # HDG section 5.2.1
-        if enable_path_existence_check:
+        if cli_dict is None:
             self.parse()
 
     def get_attr_infos(self):
@@ -85,12 +84,11 @@ class HdlCore(AssetBase):
         represented by a directory and knows nothing about the project it
         is in or its package ID. """
 
-    def __init__(self, dir_abs_path, enable_path_existence_check=True,
-                 cli_dict=None):
+    def __init__(self, dir_abs_path, cli_dict=None):
         self.root_tags = ['HdlCore']  # HDG section 5.3
-        AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
+        AssetBase.__init__(self, dir_abs_path, cli_dict)
         self.source_files = []  # HDG section 5.2.1
-        if enable_path_existence_check:
+        if cli_dict is None:
             self.parse()
 
     def get_attr_infos(self):

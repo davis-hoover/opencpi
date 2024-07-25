@@ -128,15 +128,14 @@ comp_example_app_rst_template = """<?xml version="1.0"?>
 class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
     """ Component Development Guide section 14 """
 
-    def __init__(self, dir_abs_path, enable_path_existence_check=True,
-                 cli_dict=None):
+    def __init__(self, dir_abs_path, cli_dict=None):
         self.root_tags = ['Project']
-        if enable_path_existence_check:
+        if cli_dict is None:
             if not os.path.exists(dir_abs_path + '/Project.xml'):
                 if not os.path.exists(dir_abs_path + '/Project.mk'):
                     msg = 'neither Project.mk or Project.xml exists'
                     raise InvalidAssetError(msg)
-        AssetBase.__init__(self, dir_abs_path, enable_path_existence_check)
+        AssetBase.__init__(self, dir_abs_path, cli_dict)
         SpecsDirectory.__init__(self)
         # start of bullets at top of CDG section 14 (XML, project INTERNAL)
         self.component_libraries = []
@@ -181,30 +180,44 @@ class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
     @staticmethod
     def get_asset_for_create(noun, authoring_model=''):
         asset = None
+        dummy_dict = {}
+        dummy_dict['component'] = ''
+        dummy_dict['componentlibrary'] = ''
+        dummy_dict['depends'] = ''
+        dummy_dict['includedir'] = ''
+        dummy_dict['language'] = 'vhdl'
+        dummy_dict['libraries'] = ''
+        dummy_dict['nocontrol'] = False
+        dummy_dict['packageid'] = ''
+        dummy_dict['packagename'] = ''
+        dummy_dict['packageprefix'] = ''
+        dummy_dict['primitivelibrary'] = ''
+        dummy_dict['type'] = 'foo'
+        dummy_dict['usehdlfileio'] = ''
+        dummy_dict['version'] = 2
+        dummy_dict['xmlinclude'] = ''
         if noun == 'application':
-            asset = Application('', False, None)
+            asset = Application('', dummy_dict)
         if noun == 'assembly':
-            asset = HdlAssembly('', False, None)
+            asset = HdlAssembly('', dummy_dict)
         if noun == 'card':
-            asset = HdlCard('', False, None)
+            asset = HdlCard('', dummy_dict)
         if noun == 'component':
-            asset = Component('', False, None)
+            asset = Component('', dummy_dict)
         if noun == 'library':
-            asset = ComponentLibrary('', False, None)
+            asset = ComponentLibrary('', dummy_dict)
         if noun == 'test':
-            asset = Test('', False, None)
+            asset = Test('', dummy_dict)
         if noun == 'project':
-            asset = Project('', False, None)
+            asset = Project('', dummy_dict)
         if noun == 'protocol':
-            asset = Protocol('', False, None)
+            asset = Protocol('', dummy_dict)
         if noun == 'primitive':
-            asset = HdlLibrary('', False, None)
+            asset = HdlLibrary('', dummy_dict)
         if noun == 'platform':
-            # dict created to weed out unnecessary warnings...
-            asset = HdlPlatform('', False, {'language': 'vhdl', 'version': 2})
+            asset = HdlPlatform('', dummy_dict)
         if Project.is_worker(noun):
-            # dict created to weed out unnecessary warnings...
-            asset = Worker('', False, {'language': 'vhdl', 'version': 2})
+            asset = Worker('', dummy_dict)
         return asset
 
     def get_type(self):
@@ -533,7 +546,7 @@ class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
             raise Exception(msg)
         xml_abs_path = _dir + '/' + cli_dict['name'] + '.hdl/'
         xml_abs_path += cli_dict['name'] + '.xml'
-        return Worker(xml_abs_path, False, cli_dict)
+        return Worker(xml_abs_path, cli_dict)
 
     def get_application_object_from_cli(self, cli_dict, _dir):
         abs_path = self.get_dir_abs_path() + '/applications/'
@@ -548,7 +561,7 @@ class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
                 msg += 'working directory, to <project>/applications)'
                 raise Exception(msg)
             abs_path += cli_dict['name']  # dir type
-        return Application(abs_path, False, cli_dict)
+        return Application(abs_path, cli_dict)
 
     def get_assembly_object_from_cli(self, cli_dict, _dir):
         if _dir != self.get_dir_abs_path() + '/hdl/assemblies':
@@ -560,13 +573,13 @@ class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
             raise Exception(msg)
         dir_abs_path = self.get_dir_abs_path() + '/hdl/assemblies/' + \
             cli_dict['name']
-        return HdlAssembly(dir_abs_path, False, cli_dict)
+        return HdlAssembly(dir_abs_path, cli_dict)
 
     def get_card_object_from_cli(self, cli_dict, _dir):
         self.raise_if_not_in_hdl_cards_specs(cli_dict, _dir)
         xml_abs_path = self.get_dir_abs_path() + '/hdl/cards/specs/'
         xml_abs_path += cli_dict['name'] + '.xml'
-        return HdlCard(xml_abs_path, False, cli_dict)
+        return HdlCard(xml_abs_path, cli_dict)
 
     def get_component_object_from_cli(self, cli_dict, _dir):
         xml_abs_path = _dir + '/'
@@ -597,7 +610,7 @@ class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
                     msg += 'directory)'
                     raise Exception(msg)
         xml_abs_path += cli_dict['name'] + '-comp.xml'
-        return Component(xml_abs_path, False, cli_dict)
+        return Component(xml_abs_path, cli_dict)
 
     def get_device_object_from_cli(self, cli_dict, _dir):
         found = False
@@ -615,7 +628,7 @@ class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
             raise Exception(msg)
         xml_abs_path = _dir + '/' + cli_dict['name'] + '.hdl/'
         xml_abs_path += cli_dict['name'] + '.xml'
-        return Worker(xml_abs_path, False, cli_dict)
+        return Worker(xml_abs_path, cli_dict)
 
     def get_library_object_from_cli(self, cli_dict, _dir):
         dir_abs_path = _dir
@@ -623,7 +636,7 @@ class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
             dir_abs_path += '/' + cli_dict['name']
             is_existing_component_libraries = False
             try:
-                ComponentLibrariesDirectory(dir_abs_path, True, cli_dict)
+                ComponentLibrariesDirectory(dir_abs_path, None)
                 is_existing_component_libraries = True
             except InvalidAssetError:
                 pass
@@ -675,7 +688,7 @@ class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
                 msg += 'working directory, to <project>/components)'
                 raise Exception(msg)
             dir_abs_path += '/' + cli_dict['name']
-        return ComponentLibrary(dir_abs_path, False, cli_dict)
+        return ComponentLibrary(dir_abs_path, cli_dict)
 
     def get_platform_object_from_cli(self, cli_dict, _dir):
         if _dir != (self.get_dir_abs_path() + '/' +
@@ -690,11 +703,11 @@ class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
         if cli_dict['authoringmodel'] == 'hdl':
             dir_abs_path = self.get_dir_abs_path() + '/hdl/platforms/' + \
                            cli_dict['name']
-            asset = HdlPlatform(dir_abs_path, False, cli_dict)
+            asset = HdlPlatform(dir_abs_path, cli_dict)
         if cli_dict['authoringmodel'] == 'rcc':
             dir_abs_path = self.get_dir_abs_path() + '/rcc/platforms/' + \
                            cli_dict['name']
-            asset = RccPlatform(dir_abs_path, False, cli_dict)
+            asset = RccPlatform(dir_abs_path, cli_dict)
         return asset
 
     def get_primitive_object_from_cli(self, cli_dict, _dir):
@@ -708,9 +721,9 @@ class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
         dir_abs_path = self.get_dir_abs_path() + '/hdl/primitives/'
         dir_abs_path += cli_dict['name']
         if cli_dict['librarytype'] == 'core':
-            asset = HdlCore(dir_abs_path, False, cli_dict)
+            asset = HdlCore(dir_abs_path, cli_dict)
         else:
-            asset = HdlLibrary(dir_abs_path, False, cli_dict)
+            asset = HdlLibrary(dir_abs_path, cli_dict)
         return asset
 
     def get_protocol_object_from_cli(self, cli_dict, _dir):
@@ -741,13 +754,13 @@ class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
                 msg += 'directory)'
                 raise Exception(msg)
             xml_abs_path = _dir + '/' + cli_dict['name'] + '-prot.xml'
-        return Protocol(xml_abs_path, False, cli_dict)
+        return Protocol(xml_abs_path, cli_dict)
 
     def get_slot_object_from_cli(self, cli_dict, _dir):
         self.raise_if_not_in_hdl_cards_specs(cli_dict, _dir)
         xml_abs_path = self.get_dir_abs_path() + '/hdl/cards/specs/'
         xml_abs_path += cli_dict['name'] + '.xml'
-        return HdlSlot(xml_abs_path, False, cli_dict)
+        return HdlSlot(xml_abs_path, cli_dict)
 
     def get_worker_object_from_cli(self, cli_dict, _dir):
         found = False
@@ -766,7 +779,7 @@ class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
         xml_abs_path = _dir + '/' + cli_dict['name'] + '.'
         xml_abs_path += cli_dict['authoringmodel'] + '/'
         xml_abs_path += cli_dict['name'] + '.xml'
-        return Worker(xml_abs_path, False, cli_dict)
+        return Worker(xml_abs_path, cli_dict)
 
     def get_test_object_from_cli(self, cli_dict, _dir):
         dir_abs_path = _dir + '/' + cli_dict['name'] + '.test'
@@ -781,7 +794,7 @@ class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
             msg += ' (it is recommend to set the working directory or '
             msg += '-d to a component <library> directory)'
             raise Exception(msg)
-        test = Test(dir_abs_path, False, cli_dict)
+        test = Test(dir_abs_path, cli_dict)
         return test
 
     def handle_hdl_library(self, cli_dict, _dir):
@@ -847,7 +860,7 @@ class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
                     Logger().log(3, msg + ' within directory ' +
                                  self.get_dir_abs_path())
                     dd = cli_dict
-                    cld = ComponentLibrariesDirectory(dir_abs_path, False, dd)
+                    cld = ComponentLibrariesDirectory(dir_abs_path, dd)
                     cld.create()
         asset = self.get_asset_object_from_cli(cli_dict, _dir)
         if (cli_dict['noun'] == 'component') or \
@@ -937,7 +950,7 @@ class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
             try:
                 is_libs = False
                 try:
-                    ComponentLibrariesDirectory(dir_abs_path, True, {})
+                    ComponentLibrariesDirectory(dir_abs_path)
                     is_libs = True
                 except InvalidAssetError as err:
                     pass

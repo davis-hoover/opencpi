@@ -32,7 +32,7 @@ import jinja2
 
 # TODO make a class member, probably ComponentLibrary or Project class
 g_libraries_mk = False
-g_asset_template = """<?xml version="1.0"?>\n<{{asset.root_tags[0]}}{% for key,val in asset.attrs.items() %}{% if val != '' and val != [] %} {{key}}=\'{% if val.__class__.__name__ == 'list' %}{% for entry in val %}{{entry}}{% if not loop.last %} {% endif %}{% endfor %}{% else %}{{val}}{% endif %}\'{% endif %}{% endfor %}/>\n\n"""  # nopep8
+g_asset_template = """<?xml version="1.0"?>\n<{{asset.root_tag}}{% for key,val in asset.attrs.items() %}{% if val != '' and val != [] %} {{key}}=\'{% if val.__class__.__name__ == 'list' %}{% for entry in val %}{{entry}}{% if not loop.last %} {% endif %}{% endfor %}{% else %}{{val}}{% endif %}\'{% endif %}{% endfor %}/>\n\n"""  # nopep8
 g_hdl_core_mk = False
 g_suppress_warn = False
 g_log_level = -1
@@ -844,7 +844,7 @@ class AssetBase(AttributeBase):
         a get_type() string that is used for log messaging and internal asset
         conditionalization."""
 
-    def __init__(self, abs_path, enable_path_existence_check=True,
+    def __init__(self, abs_path, cli_dict=None,
                  bad_name_action=2):
         """ abs_path is either to a xml file (Component/Protocol/etc) or a dir
             (HdlAssembly/etc) or none for some cases (Component embedded in
@@ -868,7 +868,7 @@ class AssetBase(AttributeBase):
                 self.abs_path = self.abs_path[:, -1]
         self.name = self.get_name()  # CDG section 6.1.1, section 8.1.1, etc
         if (self.abs_path is not None):
-            if enable_path_existence_check:
+            if cli_dict is None:
                 self.raise_if_path_does_not_exist()
         if (self.name != '') and (not self.name.isidentifier()):
             msg = '\'' + self.name + '\' '
@@ -879,6 +879,22 @@ class AssetBase(AttributeBase):
             elif bad_name_action == 2:
                 msg += 'is not a valid name'
                 raise InvalidAssetError(msg)
+        # below lines assigns default when there are multiple
+        self.root_tag = self.get_root_tags()[0]
+        if cli_dict is not None:
+            for attr_info in self.get_attr_infos():
+                if attr_info.cli is not None:
+                    cli_dict_key = attr_info.cli[1].replace('-', '').lower()
+                    if cli_dict_key in cli_dict.keys():
+                        val = cli_dict[cli_dict_key]
+                        msg = 'assigning ' + attr_info.key + ' to value \''
+                        msg += str(val) + '\' from CLI'
+                        Logger().debug(msg)
+                        if attr_info.is_int:
+                            val = int(val)
+                        elif attr_info.is_bool:
+                            val = bool(val)
+                        self.attrs[attr_info.key] = val
 
     def get_root_tags(self):
         # TODO replace get_root_tags() with self.root_tags
