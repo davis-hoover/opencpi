@@ -83,9 +83,9 @@ ocpidev2 create worker bias_vhdl.hdl -d core2/components --language vhdl --versi
 ocpidev2 create worker bias_wide.hdl -d core2/components --language vhdl --version 2
 ocpidev2 create worker dgrdma_config_dev.hdl -d core2/components --language vhdl --version 2
 ocpidev2 create worker dgrdma_config_proxy.rcc -d core2/components --language c++ --version 2
-ocpidev2 create worker file_read.hdl -d core2/components --language vhdl --version 2
+ocpidev2 create worker file_read.hdl -d core2/components --language vhdl --version 2 --only-target isim --only-target modelsim --only-target xsim --component-library util
 ocpidev2 create worker file_read.rcc -d core2/components --language c++ --version 2
-ocpidev2 create worker file_write.hdl -d core2/components --language vhdl --version 2
+ocpidev2 create worker file_write.hdl -d core2/components --language vhdl --control-operation stop --control-operation release --version 2 --only-target xsim --only-target isim --only-target modelsim --component-library util
 ocpidev2 create worker file_write.rcc -d core2/components --language c++ --version 2
 ocpidev2 create worker hello_world.rcc -d core2/components --language c++ --version 2
 ocpidev2 create worker hello_world_cc.rcc -d core2/components --language c++ --version 2
@@ -122,7 +122,7 @@ ocpidev2 create hdl adapter wsi_to_zero_adapter.hdl -d core2/hdl/adapters --lang
 ocpidev2 create hdl adapter wsi_to_zero_clock_adapter.hdl -d core2/hdl/adapters --language vhdl --version 2
 ocpidev2 create hdl adapter wsi_width_adapter.hdl -d core2/hdl/adapters --language vhdl --version 2
 ocpidev2 create hdl adapter wsi_width_clock_adapter.hdl -d core2/hdl/adapters --language vhdl --version 2
-ocpidev2 create hdl device ocdp.hdl -d core2/hdl/devices --language vhdl --version 2
+ocpidev2 create hdl device ocdp.hdl -d core2/hdl/devices --language vhdl --version 2 --other mkOCDP4B.v
 ocpidev2 create hdl device sdp2cp.hdl -d core2/hdl/devices --language vhdl --version 2
 ocpidev2 create hdl device sdp_node.hdl -d core2/hdl/devices --language vhdl --version 2
 ocpidev2 create hdl device sdp_pipeline.hdl -d core2/hdl/devices --language vhdl --version 2
@@ -269,9 +269,9 @@ ocpidev2 create worker bias_vhdl.hdl --language vhdl --version 2
 ocpidev2 create worker bias_wide.hdl --language vhdl --version 2
 ocpidev2 create worker dgrdma_config_dev.hdl --language vhdl --version 2
 ocpidev2 create worker dgrdma_config_proxy.rcc --language c++ --version 2
-ocpidev2 create worker file_read.hdl --language vhdl --version 2
+ocpidev2 create worker file_read.hdl --language vhdl --version 2 --only-target isim --only-target modelsim --only-target xsim --component-library util
 ocpidev2 create worker file_read.rcc --language c++ --version 2
-ocpidev2 create worker file_write.hdl --language vhdl --version 2
+ocpidev2 create worker file_write.hdl --language vhdl --control-operation stop --control-operation release --version 2 --only-target xsim --only-target isim --only-target modelsim --component-library util
 ocpidev2 create worker file_write.rcc --language c++ --version 2
 ocpidev2 create worker hello_world.rcc --language c++ --version 2
 ocpidev2 create worker hello_world_cc.rcc --language c++ --version 2
@@ -322,7 +322,7 @@ ocpidev2 create hdl adapter wsi_width_adapter.hdl --language vhdl --version 2
 ocpidev2 create hdl adapter wsi_width_clock_adapter.hdl --language vhdl --version 2
 popd
 pushd core2
-ocpidev2 create hdl device ocdp.hdl -d hdl/devices --language vhdl --version 2
+ocpidev2 create hdl device ocdp.hdl -d hdl/devices --language vhdl --version 2 --other mkOCDP4B.v
 popd
 pushd core2/hdl/devices
 ocpidev2 create hdl device sdp2cp.hdl --language vhdl --version 2

@@ -1135,11 +1135,13 @@ class ProjectComponentLibraryWorkerBase(AssetBase):
     def get_attr_infos(self):
         ret = []
         ret.append(AttributeInfo('XmlIncludeDirs',
-                   is_list=True, cli=('-A', '--xml-include')))
-        ret.append(AttributeInfo('IncludeDirs',
-                   is_list=True, cli=('-I', '--include-dir')))
+                   cli=('-A', '--xml-include'), is_list=True))
         ret.append(AttributeInfo('HdlLibraries',
-                   is_list=True, cli=('-Y', '--primitive-library')))
+                   cli=('-Y', '--primitive-library'), is_list=True))
         ret.append(AttributeInfo('Libraries',
-                   is_list=True, cli=('-y', '--component-library')))
+                   cli=('-y', '--component-library'),
+                   is_list=True))  # CDG section 8.1.11
+        ret.append(AttributeInfo('IncludeDirs',
+                   cli=('-I', '--include-dir'),
+                   is_list=True))  # CDG section 8.1.12
         return ret

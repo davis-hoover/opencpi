@@ -176,10 +176,22 @@ class Worker(ProjectComponentLibraryWorkerBase):
                    cli=('-a', '--version'), is_int=True))  # CDG secion 8.1.4
         is_list = True
         ret.append(AttributeInfo('ControlOperations',
-                   cli=('-C', '--control-operations'),
+                   cli=('-C', '--control-operation'),
                    is_list=True))  # CDG section 8.1.5
+        ret.append(AttributeInfo('OnlyPlatforms',
+                   cli=('-G', '--only-platform'),
+                   is_list=True))  # CDG section 8.1.6
+        ret.append(AttributeInfo('ExcludePlatforms',
+                   cli=('-Q', '--exclude-platform'),
+                   is_list=True))  # CDG section 8.1.7
+        ret.append(AttributeInfo('OnlyTargets',
+                   cli=('-T', '--only-target'),
+                   is_list=True))  # CDG section 8.1.8
+        ret.append(AttributeInfo('ExcludeTargets',
+                   cli=('-Z', '--exclude-target'),
+                   is_list=True))  # CDG section 8.1.9
         ret.append(AttributeInfo('SourceFiles',
-                   cli=('-o', '--source-files'),
+                   cli=('-O', '--other'),
                    is_list=True))  # CDG section 8.1.10
         # TODO
         # if self.authoring_model == 'rcc':
