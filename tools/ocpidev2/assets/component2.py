@@ -341,7 +341,8 @@ class Protocol(AssetBase):
                  cli_dict=None):
         self.root_tags = ['Protocol']
         AssetBase.__init__(self, xml_abs_path, enable_path_existence_check)
-        self.raise_if_invalid_location()
+        if enable_path_existence_check:
+            self.raise_if_invalid_location()
         self.operations = []
         self.parse(cli_dict, enable_path_existence_check)
 

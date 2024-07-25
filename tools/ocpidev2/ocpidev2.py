@@ -145,18 +145,22 @@ def get_cli_noun_verb_tuple(argv):
     state = 0
     verbs = ['build', 'clean', 'create', 'delete', 'show', 'run']
     singular_nouns = ['application', 'adapter', 'assembly', 'card',
-                      'component', 'device', 'library', 'test', 'primitive',
-                      'project', 'platform', 'worker']
+                      'component', 'device', 'library', 'slot', 'test',
+                      'primitive', 'project', 'protocol', 'platform',
+                      'registry', 'worker']
     plural_nouns = ['applications', 'adapters', 'assemblies', 'components',
-                    'devices', 'libraries', 'tests', 'primitives', 'projects',
-                    'platforms', 'workers']
+                    'devices', 'libraries', 'slots', 'tests', 'primitives',
+                    'projects', 'platforms', 'protocols', 'workers']
     special_nouns = ['primitive', 'library', 'core']
+    allow_exception = False
     # state machine with states:
     # 0: waiting on verb
     # 1: waiting on noun
     # 2: got a -<option> or --<option>, waiting on value of that option
     #    (necessary for intermixed arguments)
     for idx in range(len(argv)):
+        # print(state)
+        # print(argv[idx])
         if (state == 0) and (argv[idx] in verbs):
             verb = argv[idx]
             state = 1
@@ -179,7 +183,10 @@ def get_cli_noun_verb_tuple(argv):
             elif argv[idx] in (singular_nouns + plural_nouns):
                 noun = argv[idx]
                 state = 2
+            elif allow_exception:
+                raise Exception('invalid noun: ' + argv[idx])
         elif (state == 2):
+            allow_exception = False
             state = 1
     return (noun, verb)
 

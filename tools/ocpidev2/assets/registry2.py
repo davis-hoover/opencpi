@@ -332,7 +332,14 @@ class ProjectRegistry():
         Logger().debug('end of project discovery')
 
     def register(self, cli_dict, _dir):
-        project = Project(_dir, False)  # raises if not a project
+        dir_abs_path = _dir
+        if cli_dict['name'] is not None:
+            dir_abs_path += '/' + cli_dict['name']
+        try:
+            project = Project(_dir, True)  # raises if not a project
+        except InvalidAssetError:
+            msg = 'project \'' + cli_dict['name'] + '\' does not exist'
+            raise InvalidAssetError(msg)
         symlink_path = self.abs_path + '/' + str(project.get_package_id())
         if not os.path.islink(symlink_path):
             os.symlink(project.abs_path, symlink_path)
