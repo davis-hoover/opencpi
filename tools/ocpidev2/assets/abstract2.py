@@ -887,9 +887,9 @@ class AssetBase(AttributeBase):
                     cli_dict_key = attr_info.cli[1].replace('-', '').lower()
                     if cli_dict_key in cli_dict.keys():
                         val = cli_dict[cli_dict_key]
-                        msg = 'assigning ' + attr_info.key + ' to value \''
-                        msg += str(val) + '\' from CLI'
-                        Logger().debug(msg)
+                        # msg = 'assigning ' + attr_info.key + ' to value \''
+                        # msg += str(val) + '\' from CLI'
+                        # Logger().debug(msg)
                         if attr_info.is_int:
                             val = int(val)
                         elif attr_info.is_bool:
