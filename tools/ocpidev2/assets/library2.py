@@ -28,6 +28,7 @@ from _opencpi.assets.abstract2 import AssetBase
 from _opencpi.assets.component2 import Component, Protocol, test_Component
 from _opencpi.assets.worker2 import Worker, RccAssembly
 from _opencpi.assets.worker2 import test_Worker, test_RccAssembly
+from _opencpi.assets.test2 import Test
 
 
 comps_rst_template = """.. Component directory index page
@@ -265,14 +266,17 @@ class ComponentLibrary(ProjectComponentLibraryWorkerBase, SpecsDirectory):
             try:
                 assets = []
                 tmp = dir_abs_path
-                if tmp.endswith('.rcc') or tmp.endswith('.hdl') or platform:
+                if tmp.endswith('.rcc') or tmp.endswith('.hdl') or \
+                   tmp.endswith('.test') or platform:
                     name = AssetBase.get_name_from_abs_path(dir_abs_path)
                     if tmp.endswith('.rcc'):
                         # due to edge cases such as testzc.rcc, testmulti.rcc
                         assets = RccAssembly(dir_abs_path).workers
-                    else:
+                    elif tmp.endswith('.hdl'):
                         tmp = dir_abs_path + '/' + name + '.xml'
                         assets.append(Worker(tmp))
+                    elif tmp.endswith('.test'):
+                        assets.append(Test(dir_abs_path))
                 for asset in assets:
                     if allowlist is not None:
                         # TODO is this pre-2.0???

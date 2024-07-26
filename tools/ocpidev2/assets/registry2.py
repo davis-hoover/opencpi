@@ -390,9 +390,9 @@ class ProjectRegistry():
                     if len(project_dir_abs_path) <= 1:
                         break
         if project is None:
-            msg = ("Invalid path: '" + _dir + "'. Please perform 'create "
-                   + cli_dict['noun'] + "' within a valid, registered "
-                   "project.")
+            msg = ('invalid path: \'' + _dir + '\', please perform \'create '
+                   + cli_dict['noun'] + '\' within a valid, registered '
+                   'project')
             raise Exception(msg)
         return project
 
@@ -469,19 +469,28 @@ class ProjectRegistry():
             if cli_dict['accumulateerrors']:
                 cmd += ' AccumulateErrorlations=1'
             if len(cli_dict['case']) > 0:
-                cmd += " Cases='"
+                cmd += ' Cases=\''
                 for case in cli_dict['case']:
                     cmd += case
-                cmd += "'"
+                cmd += '\''
             System(cmd)
 
     def show(self, cli_dict):
+        num_found = 0
         if cli_dict['noun'] == 'registry':
             print(self.abs_path)
         else:
             json_dict = {}
             for project in self.projects:
                 json_dict = project.show(cli_dict, json_dict)
+                num_found += len(json_dict)
+                if (num_found != 1) and (not cli_dict['noun'].endswith('s')):
+                    if num_found == 0:
+                        msg = 'could not find '
+                    else:
+                        msg = 'multiple entries found for '
+                    msg += cli_dict['noun'] + ' \'' + cli_dict['name'] + '\''
+                    raise Exception(msg)
             if cli_dict['simple']:
                 print('')
             if cli_dict['json']:
@@ -852,7 +861,7 @@ class ProjectRegistry():
         if len(unreg_projects) != 0:
             msg = 'the following project dependencies are not registered: '
             for unreg_project in unreg_projects:
-                msg += unreg_project + " "
+                msg += unreg_project + ' '
             raise Exception(msg)
 
     def clean_imports_exports(self):
@@ -934,14 +943,14 @@ class LegacyBuildTool():
 
     def get_make_build_str(self, cmd, _list, var):
         if len(_list) > 0:
-            cmd += ' ' + var + "='"
+            cmd += ' ' + var + '=\''
             first = True
             for entry in _list:
                 if not first:
                     cmd += ' '
                 first = False
                 cmd += entry
-            cmd += "'"
+            cmd += '\''
         return cmd
 
     def get_mk_filename(self, asset):

@@ -1199,6 +1199,7 @@ class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
                             (asset.get_type() == 'hdl device') or \
                             (asset.get_type() == 'hdl librar') or \
                             (asset.get_type() == 'hdl primitive') or \
+                            (asset.get_type() == 'hdl primitive core') or \
                             (asset.get_type() == 'hdl platform') or \
                             (asset.get_type() == 'hdl slot') or \
                             (asset.get_type() == 'hdl target') or \
@@ -1207,6 +1208,8 @@ class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
                         passed_any_hdl_checks = \
                             (asset.get_type() == 'rcc worker') or \
                             (asset.get_type() == 'rcc platform')
+                    if cli_dict['noun'].startswith('librar'):
+                        passed_any_hdl_checks = True
                     passed_any_device_checks = \
                         (not cli_dict['noun'].startswith('device')) or \
                         (cli_dict['noun'].startswith('device') and
@@ -1287,14 +1290,13 @@ class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
                                 for idx in range(60-len(msg)):
                                     msg += ' '
                                 msg += asset.abs_path
-                        if cli_dict['json']:
-                            json_dict[pid_and_name] = {'package_id': pid}
-                            if not cli_dict['noun'].startswith('target'):
-                                # an hdl target, for example, is not an asset
-                                # with an associated directory
-                                json_dict[pid_and_name]['directory'] = \
-                                    asset.get_dir_abs_path()
-                        else:
+                        json_dict[pid_and_name] = {'package_id': pid}
+                        if not cli_dict['noun'].startswith('target'):
+                            # an hdl target, for example, is not an asset
+                            # with an associated directory
+                            json_dict[pid_and_name]['directory'] = \
+                                asset.get_dir_abs_path()
+                        if not cli_dict['json']:
                             if msg not in list_to_show:
                                 list_to_show.append(msg)
                         first = False
@@ -1325,9 +1327,9 @@ class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
                   ' -type d -name target-\*)')  # nopep8
         os.system('rm -rf $(find ' + _dir +
                   ' -type d -name container-\*)')  # nopep8
-        os.system('rm -rf $(find ' + _dir + " -type f -name '.*lock')")
-        os.system('rm -rf $(find ' + _dir + " -type f -name '.*build')")
-        os.system('rm -rf $(find ' + _dir + " -type d -name artifacts)")
+        os.system('rm -rf $(find ' + _dir + ' -type f -name \'.*lock\')')
+        os.system('rm -rf $(find ' + _dir + ' -type f -name \'.*build\')')
+        os.system('rm -rf $(find ' + _dir + ' -type d -name artifacts)')
 
 
 def test_Project(ret):
@@ -1354,13 +1356,13 @@ def test_Project_discover_component_libraries(ret):
     libraries_product = itertools.product(element, repeat=libs_to_test)
     for libraries in libraries_product:
         lib_dict = {
-            "components": libraries[0],
-            "hdl/adapters": libraries[1],
-            "hdl/cards": libraries[2],
-            "hdl/devices": libraries[3],
-            "hdl/platforms": libraries[4],
-            "components/clib": libraries[5],
-            "hdl/platforms/plat/devices": libraries[6]
+            'components': libraries[0],
+            'hdl/adapters': libraries[1],
+            'hdl/cards': libraries[2],
+            'hdl/devices': libraries[3],
+            'hdl/platforms': libraries[4],
+            'components/clib': libraries[5],
+            'hdl/platforms/plat/devices': libraries[6]
         }
         # TODO: Break this out into separate function
         # Create Project Component Library Directories
