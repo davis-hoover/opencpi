@@ -68,56 +68,83 @@ get_compgen_str_for_long_short_option_only_allowed_once() {
   echo $str
 }
 
+#  elif [ "$3" == "adapter" ]; then
+#    assets=$(echo $(printf "%s\n" $(ocpidev2 show adapters --suppress-warn | sed "s/.*\.//g")) | uniq)
+#    COMPREPLY=( $(compgen -W "$assets" -- "$2") )
+
 _ocpidev2()
 {
   str=""
   str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-h " "--help " "$COMP_LINE")
   #str=$(get_compgen_str_for_long_short_option_only_allowed_once "$str" "-v " "--verbose" "$COMP_LINE")
   if [ "$3" == "show" ]; then
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "adapter" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "adapters" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "application" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "applications" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "assembly" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "assemblies" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "card" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "cards" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "component" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "components" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "device" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "devices" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "hdl" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "library" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "libraries" "$COMP_LINE")
-    str=$(get_compgen_str_for_option_only_allowed_once "$str" "registry" "$COMP_LINE")
-    str=$(get_compgen_str_for_option_only_allowed_once "$str" "rcc" "$COMP_LINE")
-    str=$(get_compgen_str_for_option_only_allowed_once "$str" "test" "$COMP_LINE")
-    str=$(get_compgen_str_for_option_only_allowed_once "$str" "tests" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "platform" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "platforms" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "primitive" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "primitives" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "project" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "projects" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "registry" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "rcc" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "slot" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "slots" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "test" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "tests" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "worker" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "workers" "$COMP_LINE")
     COMPREPLY=( $(compgen -W "$str" -- "$2") )
   elif [ "$3" == "hdl" ]; then
-    str=$(get_compgen_str_for_option_only_allowed_once "$str" "worker" "$COMP_LINE")
-    str=$(get_compgen_str_for_option_only_allowed_once "$str" "workers" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "adapter" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "adapters" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "assembly" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "assemblies" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "card" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "cards" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "device" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "devices" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "library" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "libraries" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "platform" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "platforms" "$COMP_LINE")
-    COMPREPLY=( $(compgen -W "$str" -- "$2") )
-  elif [ "$3" == "rcc" ]; then
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "primitive" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "primitives" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "slot" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "slots" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "target" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "targets" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "worker" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "workers" "$COMP_LINE")
+    COMPREPLY=( $(compgen -W "$str" -- "$2") )
+  elif [ "$3" == "primitive" ]; then
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "core" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "cores" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "library" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "libraries" "$COMP_LINE")
+  elif [ "$3" == "rcc" ]; then
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "platform" "$COMP_LINE")
     str=$(get_compgen_str_for_option_only_allowed_once "$str" "platforms" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "target" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "targets" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "worker" "$COMP_LINE")
+    str=$(get_compgen_str_for_option_only_allowed_once "$str" "workers" "$COMP_LINE")
     COMPREPLY=( $(compgen -W "$str" -- "$2") )
   elif [ "$3" == "-d" ]; then
     COMPREPLY=( $(compgen -d -S / -- "$2") )
-  elif [ "$3" == "application" ]; then
-    assets=$(echo $(printf "%s\n" $(ocpidev2 show applications --suppress-warn | sed "s/.*\.//g")) | uniq)
-    COMPREPLY=( $(compgen -W "$assets" -- "$2") )
-  elif [ "$3" == "library" ]; then
-    assets=$(echo $(printf "%s\n" $(ocpidev2 show libraries --suppress-warn | sed "s/.*\.//g")) | uniq)
-    COMPREPLY=( $(compgen -W "$assets" -- "$2") )
-  elif [ "$3" == "platform" ]; then
-    assets=$(echo $(printf "%s\n" $(ocpidev2 show platforms --suppress-warn | sed "s/.*\.//g")) | uniq)
-    COMPREPLY=( $(compgen -W "$assets" -- "$2") )
-  elif [ "$3" == "worker" ]; then
-    assets=$(echo $(printf "%s\n" $(ocpidev2 show workers --suppress-warn | sed "s/.*\.//g")) | uniq)
-    COMPREPLY=( $(compgen -W "$assets" -- "$2") )
   elif [ "$3" == "unittest" ]; then
     COMPREPLY=( $(compgen -W "-v --verbose" -- "$2") )
   elif [ "$3" == "ocpidev2" ]; then
