@@ -26,7 +26,7 @@ end package {{asset.name}};
 """
 
 
-class HdlLibrary(AssetBase):
+class HdlLibrary(AssetBase, HdlLibraryWorkerBase, HdlLibraryProjectBase):
     """ Reference HDL Development Guide section 5.2. A HdlLibrary is
         represented by a directory and knows nothing about the project it
         is in or its package ID. """
@@ -68,10 +68,14 @@ class HdlLibrary(AssetBase):
 
     def get_attr_infos(self):
         ret = []
-        for key in ['SourceFiles', 'Libraries']:
-            ret.append(AttributeInfo(key, is_list=True))
+        ret.extend(HdlLibraryWorkerBase.get_attr_infos(self))
+        ret.extend(HdlLibraryProjectBase.get_attr_infos(self))
+        # ret.append(AttributeInfo('Libraries', is_list=True))
         ret.append(AttributeInfo('NoLibraries',
                    cli=('-H', '--no-depend'), is_bool=True))
+        ret.append(AttributeInfo('OnlyTargets',
+                   cli=('-T', '--only-target'),
+                   is_list=True))  # undocumented
         return ret
 
     def get_type(self):

@@ -43,7 +43,8 @@ class HdlAssemblyInstance(AttributeBase):
         self.worker = self.get_attr('Worker', elem)
 
 
-class HdlAssembly(AssetBase):
+class HdlAssembly(AssetBase, ComponentLibraryWorkerAssemblyBase,
+                  ComponentLibraryWorkerProjectAssemblyBase):
     """ Reference HDL Development Guide section 6. A HdlAssembly is
         represented by a directory and knows nothing about the project it
         is in or its package ID. """
@@ -71,8 +72,13 @@ class HdlAssembly(AssetBase):
 
     def get_attr_infos(self):
         ret = []
+        ret.extend(ComponentLibraryWorkerAssemblyBase.get_attr_infos(self))
+        tmp = ComponentLibraryWorkerProjectAssemblyBase.get_attr_infos(self)
+        ret.extend(tmp)
         ret.append(AttributeInfo('Containers',
-                                 cli=('-c', '--containers'), is_list=True))
+                                 cli=('-c', '--container'), is_list=True))
+        ret.append(AttributeInfo('DefaultContainer',
+                                 cli=('-e', '--default-container')))
         return ret
 
     def parse(self):

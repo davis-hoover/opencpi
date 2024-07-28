@@ -95,18 +95,7 @@ class HdlPlatform(HdlCardPlatformBase):
 
     def get_attr_infos(self):
         ret = []
-        ret.extend(ProjectComponentLibraryWorkerBase.get_attr_infos(self))
-        ret.append(AttributeInfo('Name'))
-        ret.append(AttributeInfo('Spec',
-                   cli=('-S', '--spec')))
-        ret.append(AttributeInfo('Language',
-                   cli=('-L', '--language')))
-        ret.append(AttributeInfo('Version',
-                   cli=('-a', '--version'), is_int=True))
-        is_list = True
-        ret.append(AttributeInfo('SourceFiles', is_list))
-        ret.append(AttributeInfo('Configurations',
-                   cli=('-c', '--configuration'), is_list=True))
+        ret.extend(WorkerBase.get_attr_infos(self))
         return ret
 
     def parse(self, cli_dict):

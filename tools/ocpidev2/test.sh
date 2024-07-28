@@ -481,10 +481,10 @@ ocpidev2 -d assets show -d core hdl devices -d platform -v
 ocpidev2 -d assets show -d core hdl devices -d platform -v -l 8
 ocpidev2 -d assets show -d core hdl devices -d platform -v --log-level 8
 ocpidev2 -d assets show -d core hdl devices -d platform -v -l 10
-ocpidev2 show hdl library dsp_prims
-ocpidev2 show hdl library dsp_prims -v
-ocpidev2 show hdl library dsp_prims --verbose
-ocpidev2 show hdl library dsp_prims -d assets
+ocpidev2 show hdl library dsp_comps
+ocpidev2 show hdl library dsp_comps -v
+ocpidev2 show hdl library dsp_comps --verbose
+ocpidev2 show hdl library dsp_comps -d assets
 ocpidev2 show hdl libraries 
 ocpidev2 show hdl libraries -v
 ocpidev2 show hdl libraries --verbose
@@ -495,10 +495,10 @@ ocpidev2 -d assets show -d core hdl libraries -d platform -v
 ocpidev2 -d assets show -d core hdl libraries -d platform -v -l 8
 ocpidev2 -d assets show -d core hdl libraries -d platform -v --log-level 8
 ocpidev2 -d assets show -d core hdl libraries -d platform -v -l 10
-ocpidev2 show hdl platform zed 
-ocpidev2 show hdl platform zed -v
-ocpidev2 show hdl platform zed --verbose
-ocpidev2 show hdl platform zed -d assets
+ocpidev2 show hdl platform ml605 
+ocpidev2 show hdl platform ml605 -v
+ocpidev2 show hdl platform ml605 --verbose
+ocpidev2 show hdl platform ml605 -d assets
 ocpidev2 show hdl platforms 
 ocpidev2 show hdl platforms -v
 ocpidev2 show hdl platforms --verbose
@@ -509,10 +509,10 @@ ocpidev2 -d assets show -d core hdl platforms -d platform -v
 ocpidev2 -d assets show -d core hdl platforms -d platform -v -l 8
 ocpidev2 -d assets show -d core hdl platforms -d platform -v --log-level 8
 ocpidev2 -d assets show -d core hdl platforms -d platform -v -l 10
-ocpidev2 show hdl primitive zynq
-ocpidev2 show hdl primitive zynq -v
-ocpidev2 show hdl primitive zynq --verbose
-ocpidev2 show hdl primitive zynq -d assets
+ocpidev2 show hdl primitive dsp_prims
+ocpidev2 show hdl primitive dsp_prims -v
+ocpidev2 show hdl primitive dsp_prims --verbose
+ocpidev2 show hdl primitive dsp_prims -d assets
 ocpidev2 show hdl primitives 
 ocpidev2 show hdl primitives -v
 ocpidev2 show hdl primitives --verbose
@@ -523,10 +523,10 @@ ocpidev2 -d assets show -d core hdl primitives -d platform -v
 ocpidev2 -d assets show -d core hdl primitives -d platform -v -l 8
 ocpidev2 -d assets show -d core hdl primitives -d platform -v --log-level 8
 ocpidev2 -d assets show -d core hdl primitives -d platform -v -l 10
-ocpidev2 show hdl primitive core zed 
-ocpidev2 show hdl primitive core zed -v
-ocpidev2 show hdl primitive core zed --verbose
-ocpidev2 show hdl primitive core zed -d assets
+ocpidev2 show hdl primitive core temac_v6 
+ocpidev2 show hdl primitive core temac_v6 -v
+ocpidev2 show hdl primitive core temac_v6 --verbose
+ocpidev2 show hdl primitive core temac_v6 -d assets
 ocpidev2 show hdl primitive cores 
 ocpidev2 show hdl primitive cores -v
 ocpidev2 show hdl primitive cores --verbose
@@ -554,7 +554,7 @@ ocpidev2 -d assets show -d core hdl primitive libraries -d platform -v -l 10
 ocpidev2 show hdl slot fmc_lpc
 ocpidev2 show hdl slot fmc_lpc -v
 ocpidev2 show hdl slot fmc_lpc --verbose
-ocpidev2 show hdl slot fmc_lpc -d assets
+ocpidev2 show hdl slot fmc_lpc -d core
 ocpidev2 show hdl slots 
 ocpidev2 show hdl slots -v
 ocpidev2 show hdl slots --verbose
@@ -597,10 +597,10 @@ ocpidev2 show library dsp_comps
 ocpidev2 show library dsp_comps -v
 ocpidev2 show library dsp_comps --verbose
 ocpidev2 show library dsp_comps -d assets
-ocpidev2 show platform zed
-ocpidev2 show platform zed -v
-ocpidev2 show platform zed --verbose
-ocpidev2 show platform zed -d assets
+ocpidev2 show platform ml605
+ocpidev2 show platform ml605 -v
+ocpidev2 show platform ml605 --verbose
+ocpidev2 show platform ml605 -d assets
 ocpidev2 show platforms 
 ocpidev2 show platforms -v
 ocpidev2 show platforms --verbose
@@ -625,10 +625,10 @@ ocpidev2 -d assets show -d core projects -d platform -v
 ocpidev2 -d assets show -d core projects -d platform -v -l 8
 ocpidev2 -d assets show -d core projects -d platform -v --log-level 8
 ocpidev2 -d assets show -d core projects -d platform -v -l 10
-ocpidev2 show protocol assets
-ocpidev2 show protocol assets -v
-ocpidev2 show protocol assets --verbose
-ocpidev2 show protocol assets -d assets
+ocpidev2 show protocol iqstream
+ocpidev2 show protocol iqstream -v
+ocpidev2 show protocol iqstream --verbose
+ocpidev2 show protocol iqstream -d core
 ocpidev2 show protocols
 ocpidev2 show protocols -v
 ocpidev2 show protocols --verbose
@@ -642,7 +642,7 @@ ocpidev2 -d assets show -d core protocols -d platform -v -l 10
 ocpidev2 show rcc platform ubuntu20_04
 ocpidev2 show rcc platform ubuntu20_04 -v
 ocpidev2 show rcc platform ubuntu20_04 --verbose
-ocpidev2 show rcc platform ubuntu20_04 -d assets
+ocpidev2 show rcc platform ubuntu20_04 -d core
 ocpidev2 show rcc platforms 
 ocpidev2 show rcc platforms -v
 ocpidev2 show rcc platforms --verbose
@@ -670,10 +670,10 @@ ocpidev2 -d assets show -d core targets -d platform -v
 ocpidev2 -d assets show -d core targets -d platform -v -l 8
 ocpidev2 -d assets show -d core targets -d platform -v --log-level 8
 ocpidev2 -d assets show -d core targets -d platform -v -l 10
-ocpidev2 show test bias.test
-ocpidev2 show test bias.test -v
-ocpidev2 show test bias.test --verbose
-ocpidev2 show test bias.test -d assets
+ocpidev2 show test cic_dec.test
+ocpidev2 show test cic_dec.test -v
+ocpidev2 show test cic_dec.test --verbose
+ocpidev2 show test cic_dec.test -d assets
 ocpidev2 show tests 
 ocpidev2 show tests -v
 ocpidev2 show tests --verbose

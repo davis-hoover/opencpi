@@ -100,7 +100,7 @@ class {{asset.name|capitalize}}Worker : public {{asset.name|capitalize}}WorkerBa
 """  # nopep8
 
 
-class Worker(ProjectComponentLibraryWorkerBase):
+class Worker(AssetBase, WorkerBase):
     """ Reference RCC/HDL Development Guide section 3. A Worker is
         represented by a xml file (OWD) and knows nothing about the project it
         is in or its package ID. """
@@ -166,33 +166,7 @@ class Worker(ProjectComponentLibraryWorkerBase):
 
     def get_attr_infos(self):
         ret = []
-        ret.extend(ProjectComponentLibraryWorkerBase.get_attr_infos(self))
-        ret.append(AttributeInfo('Name'))
-        ret.append(AttributeInfo('Spec',
-                   cli=('-S', '--spec')))  # CDG section 8.1.2
-        ret.append(AttributeInfo('Language',
-                   cli=('-L', '--language')))  # CDG section 8.1.3
-        ret.append(AttributeInfo('Version',
-                   cli=('-a', '--version'), is_int=True))  # CDG secion 8.1.4
-        is_list = True
-        ret.append(AttributeInfo('ControlOperations',
-                   cli=('-C', '--control-operation'),
-                   is_list=True))  # CDG section 8.1.5
-        ret.append(AttributeInfo('OnlyPlatforms',
-                   cli=('-G', '--only-platform'),
-                   is_list=True))  # CDG section 8.1.6
-        ret.append(AttributeInfo('ExcludePlatforms',
-                   cli=('-Q', '--exclude-platform'),
-                   is_list=True))  # CDG section 8.1.7
-        ret.append(AttributeInfo('OnlyTargets',
-                   cli=('-T', '--only-target'),
-                   is_list=True))  # CDG section 8.1.8
-        ret.append(AttributeInfo('ExcludeTargets',
-                   cli=('-Z', '--exclude-target'),
-                   is_list=True))  # CDG section 8.1.9
-        ret.append(AttributeInfo('SourceFiles',
-                   cli=('-O', '--other'),
-                   is_list=True))  # CDG section 8.1.10
+        ret.extend(WorkerBase.get_attr_infos(self))
         # TODO
         # if self.authoring_model == 'rcc':
         ret.append(AttributeInfo('Slave',
@@ -203,6 +177,9 @@ class Worker(ProjectComponentLibraryWorkerBase):
         ret.append(AttributeInfo('DynamicPrereqLibs',
                    cli=('-r', '--rcc-dynamic'),
                    is_list=True))  # RDG section 3.1.9
+        ret.append(AttributeInfo('FirstRawProperty',
+                   cli=('-f', '--first-raw'),
+                   is_list=True))
         return ret
 
     def delete(self):

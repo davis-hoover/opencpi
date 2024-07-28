@@ -20,7 +20,7 @@
 
 
 """ This file exposes the Command Line Interface (CLI) above and below it
-    interfaces with project-like things (ProjectCollection), and not individual
+    interfaces with project-like things (ProjectDatabase), and not individual
     asset classes. """
 
 
@@ -28,8 +28,8 @@ import os
 import argparse
 import signal
 from _opencpi.assets.abstract2 import *
-# IMPORTANT - interface with ProjectCollection, nothing else
-from _opencpi.assets.registry2 import ProjectCollection, unittest
+# IMPORTANT - interface with ProjectDatabase, nothing else
+from _opencpi.assets.registry2 import ProjectDatabase, unittest
 
 
 def ocpidevsignint(sig, frame):
@@ -57,14 +57,15 @@ def add_build_arguments(parser):
 def add_create_arguments(parser, noun, authoring_model=''):
     """ add create-specific arguments as per man ocpidev2-create """
     parser.add_argument('-k', '--keep', default=False, action='store_true')
-    asset = ProjectCollection.get_asset_for_create(noun)
+    asset = ProjectDatabase.get_asset_for_create(noun)
     if noun == 'application':
         group = parser.add_mutually_exclusive_group()
         group.add_argument('-X', '--xml-app', default=False,
                            action='store_true')
         group.add_argument('-x', '--xml-dir-app', default=False,
                            action='store_true')
-    if (noun == 'component') or (noun == 'protocol') or (noun == 'worker'):
+    if (noun == 'component') or (noun == 'device') or \
+       (noun == 'primitive') or (noun == 'protocol') or (noun == 'worker'):
         group = parser.add_mutually_exclusive_group()
         group.add_argument('--hdl-library', nargs='?', default=None)
         group.add_argument('--library', default=None)
@@ -106,7 +107,9 @@ def add_delete_arguments(parser):
 
 def add_show_arguments(parser):
     """ add create-specific arguments as per man ocpidev2-show """
-    parser.add_argument('--global-scope', default=False, action='store_true')
+    group1 = parser.add_mutually_exclusive_group()
+    group1.add_argument('--local-scope', default=False, action='store_true')
+    group1.add_argument('--global-scope', default=True, action='store_true')
     group = parser.add_mutually_exclusive_group()
     group.add_argument('--simple', default=False, action='store_true')
     group.add_argument('--table', default=False, action='store_true')
@@ -303,7 +306,7 @@ def get_cli_dict():
     # TODO move below 3 lines to AssetBase once proper checks in place
     if args.verb != 'unittest':
         if args.noun is not None:
-            if not ProjectCollection.is_worker(args.noun):
+            if not ProjectDatabase.is_worker(args.noun):
                 if args.name:
                     if args.noun.startswith('test'):
                         if '.test' in args.name:
@@ -365,9 +368,9 @@ def get_cli_dict():
         cli_dict['name'] = cli_dict['name'].split('.')[0]
     if cli_dict['noun'] is not None:
         bad_hdl = (cli_dict['authoringmodel'] == 'hdl') and \
-                  (not ProjectCollection.is_hdl(cli_dict['noun']))
+                  (not ProjectDatabase.is_hdl(cli_dict['noun']))
         bad_rcc = (cli_dict['authoringmodel'] == 'rcc') and \
-                  (not ProjectCollection.is_rcc(cli_dict['noun']))
+                  (not ProjectDatabase.is_rcc(cli_dict['noun']))
         msg = 'authoring model '
         if bad_hdl or bad_rcc:
             if bad_none:
@@ -377,8 +380,22 @@ def get_cli_dict():
                 msg += 'is invalid '
             msg += 'for noun \'' + cli_dict['noun'] + '\''
             raise Exception(msg)
+    if cli_dict['noun'] is not None:
+        if cli_dict['noun'].endswith('s'):
+            if cli_dict['name'] is not None:
+                msg = 'cannot specify name when noun \'' + cli_dict['noun']
+                msg += '\' is plural'
+                raise Exception(msg)
+        else:
+            if (cli_dict['name'] is None) and (cli_dict['noun'] != 'registry'):
+                print(str(cli_dict))
+                raise Exception('must specify name')
     if ('worker' in cli_dict.keys()) and (cli_dict['worker'] != []):
         raise Exception('do not use --worker, instead create separate workers')
+    if 'localscope' not in cli_dict.keys():
+        cli_dict['localscope'] = False
+    if 'globalscope' not in cli_dict.keys():
+        cli_dict['globalscope'] = True
     return cli_dict
 
 
@@ -398,21 +415,10 @@ def dispatch_verb(cli_dict):
         dirs_to_operate_on = cli_dict['d'].copy()
         if dirs_to_operate_on == []:
             dirs_to_operate_on.append(Environment().getcwd())
-        proj_collection = ProjectCollection()
+        if cli_dict['verb'] == 'show':
+            set_g_suppress_warn(True)
+        pdb = ProjectDatabase()
         for _dir in dirs_to_operate_on:
-            proj_collection.assign_local_project(_dir)
-            if ((cli_dict['verb'] == 'create') and
-                (proj_collection.local_project is None)) or \
-                ((cli_dict['verb'] != 'create') and
-                 (proj_collection.project_registry is None)) or \
-                ((cli_dict['verb'] == 'create') and
-                 (cli_dict['noun'] == 'test')):
-                proj_collection.init_registry()
-                if not ((cli_dict['verb'] == 'create') and
-                   (cli_dict['noun'] == 'registry')):
-                    if cli_dict['verb'] == 'show':
-                        set_g_suppress_warn(True)
-                    proj_collection.discover_registry()
             if not ((cli_dict['verb'] == 'create') and
                (cli_dict['noun'] == 'library')):
                 msg = 'performing \'' + cli_dict['verb']
@@ -423,23 +429,23 @@ def dispatch_verb(cli_dict):
                 msg += '\''
                 Logger().log(3, msg + ' within directory ' + _dir)
             if cli_dict['verb'] == 'build':
-                proj_collection.build(cli_dict, _dir)
+                pdb.build(cli_dict, _dir)
             elif cli_dict['verb'] == 'clean':
-                proj_collection.clean(cli_dict, _dir)
+                pdb.clean(cli_dict, _dir)
             elif cli_dict['verb'] == 'create':
-                proj_collection.create(cli_dict, _dir)
+                pdb.create(cli_dict, _dir)
             elif cli_dict['verb'] == 'delete':
-                proj_collection.delete(cli_dict, _dir)
+                pdb.delete(cli_dict, _dir)
             elif cli_dict['verb'] == 'refresh':
                 Logger().warn('refresh is not necessary in ocpidev2')
             elif cli_dict['verb'] == 'register':
-                proj_collection.register(cli_dict, _dir)
+                pdb.register(cli_dict, _dir)
             elif cli_dict['verb'] == 'run':
-                proj_collection.run(cli_dict, _dir)
+                pdb.run(cli_dict, _dir)
             elif cli_dict['verb'] == 'show':
-                proj_collection.show(cli_dict)
+                pdb.show(cli_dict, _dir)
             elif cli_dict['verb'] == 'unregister':
-                proj_collection.unregister(cli_dict, _dir)
+                pdb.unregister(cli_dict, _dir)
             elif cli_dict['verb'] == 'unittest':
                 unittest(cli_dict, _dir)
             else:
@@ -461,18 +467,18 @@ def dispatch_verb(cli_dict):
 
 def main():
     ret = 0
-    try:
-        signal.signal(signal.SIGINT, ocpidevsignint)
-        cli_dict = get_cli_dict()
-        if cli_dict['suppresswarn']:
-            set_g_suppress_warn(True)
-        if cli_dict['loglevel']:
-            set_g_log_level(cli_dict['loglevel'])
-        Logger().debug('cli_dict : ' + str(cli_dict))
-        dispatch_verb(cli_dict)
-    except Exception as exception:
-        Logger().error(str(exception))
-        ret = 1
+    # try:
+    signal.signal(signal.SIGINT, ocpidevsignint)
+    cli_dict = get_cli_dict()
+    if cli_dict['suppresswarn']:
+        set_g_suppress_warn(True)
+    if cli_dict['loglevel']:
+        set_g_log_level(cli_dict['loglevel'])
+    Logger().debug('cli_dict : ' + str(cli_dict))
+    dispatch_verb(cli_dict)
+    # except Exception as exception:
+    #     Logger().error(str(exception))
+    #     ret = 1
     return ret
 
 

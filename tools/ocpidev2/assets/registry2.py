@@ -18,7 +18,7 @@
 
 
 """ This file connects the CLI above with the verb (build/create/etc) interface
-    (ProjectCollection class) that connects the Project class below. It
+    (ProjectDatabase class) that connects the Project class below. It
     interfaces with projects and not individual asset classes. """
 
 
@@ -27,107 +27,6 @@ from _opencpi.assets.abstract2 import *
 # IMPORTANT - interface with AssetBase and Project, nothing else
 from _opencpi.assets.abstract2 import AssetBase
 from _opencpi.assets.project2 import Project, test_Project
-
-
-class ProjectCollection():
-    """ represents all projects on which actions can be performed, regardless
-        of whether they are registered or not """
-
-    def __init__(self):
-        self.project_registry = None
-
-    @staticmethod
-    def is_worker(noun):
-        return Project.is_worker(noun)
-
-    @staticmethod
-    def is_hdl(noun):
-        return Project.is_hdl(noun)
-
-    @staticmethod
-    def is_rcc(noun):
-        return Project.is_rcc(noun)
-
-    @staticmethod
-    def get_asset_for_create(noun):
-        return Project.get_asset_for_create(noun)
-
-    def assign_local_project(self, _dir):
-        self.local_project = None
-        project_dir_abs_path = _dir
-        while True:
-            try:
-                self.local_project = Project(project_dir_abs_path)
-                self.local_project.discover()
-                Logger().debug('operating in local project ' +
-                               self.local_project.get_dir_abs_path())
-                break
-            except InvalidAssetError:
-                project_dir_abs_path = project_dir_abs_path.rsplit('/', 1)[0]
-                if len(project_dir_abs_path) <= 1:
-                    break
-
-    def init_registry(self):
-        self.project_registry = ProjectRegistry()
-
-    def discover_registry(self):
-        self.project_registry.discover(True, True, self.local_project)
-
-    def build(self, cli_dict, _dir):
-        self.project_registry.build(cli_dict, _dir)
-
-    def clean(self, cli_dict, _dir):
-        self.project_registry.clean(cli_dict, _dir)
-
-    def create(self, cli_dict, _dir):
-        if (cli_dict['verb'] == 'create') and \
-           (cli_dict['noun'] == 'test'):
-            spec = cli_dict['name']  # default
-            if cli_dict['component']:
-                spec = cli_dict['component']
-            c_strs = self.get_list_of_component_strings_by_name(spec)
-            if len(c_strs) == 0:
-                Logger().warn('spec ' + spec + ' not found')
-            elif len(c_strs) > 1:
-                msg = 'multiple component specs found, \'' + c_strs[0]
-                msg += '\' will be used but others were also found: '
-                msg += ', '.join(c_strs[1:])
-                Logger().warn(msg)
-        if self.local_project is None:
-            self.project_registry.create(cli_dict, _dir)
-        else:
-            self.local_project.create_asset(cli_dict, _dir)
-
-    def delete(self, cli_dict, _dir):
-        self.project_registry.delete(cli_dict, _dir)
-
-    def register(self, cli_dict, _dir):
-        self.project_registry.register(cli_dict, _dir)
-
-    def run(self, cli_dict, _dir):
-        self.project_registry.run(cli_dict, _dir)
-
-    def show(self, cli_dict):
-        self.project_registry.show(cli_dict)
-
-    def unregister(self, cli_dict, _dir):
-        self.project_registry.unregister(cli_dict, _dir)
-
-    def get_list_of_component_strings_by_name(self, spec):
-        """ get list of package id-qualified names of components in the order
-            order defined in CDG section 14.8 """
-        c_strs = self.local_project.get_list_of_component_strings_by_name(spec)
-        if len(c_strs) > 1:
-            msg = 'multiple component specs matched name \'' + spec
-            msg += '\' in the local project: ' + ', '.join(c_strs)
-            Logger().warn(msg)
-            c_strs = [c_strs[0]]
-        else:
-            deps = self.local_project.attrs['ProjectDependencies']
-            reg = self.project_registry
-            tmp = reg.get_list_of_component_strings_by_name(spec, deps)
-            c_strs.extend(tmp)
-        return c_strs
 
 
 class ProjectRegistry():
@@ -191,8 +90,8 @@ class ProjectRegistry():
                 break
         return component
 
-    def get_list_of_component_strings_by_name(self, name,
-                                              package_dependencies):
+    def get_list_of_component_strings_by_name_deps(self, name,
+                                                   package_dependencies):
         """ get list of package id-qualified name per component found in this
             registry's project, or an empty list if not found """
         ret = []
@@ -474,27 +373,6 @@ class ProjectRegistry():
                     cmd += case
                 cmd += '\''
             System(cmd)
-
-    def show(self, cli_dict):
-        num_found = 0
-        if cli_dict['noun'] == 'registry':
-            print(self.abs_path)
-        else:
-            json_dict = {}
-            for project in self.projects:
-                json_dict = project.show(cli_dict, json_dict)
-                num_found += len(json_dict)
-                if (num_found != 1) and (not cli_dict['noun'].endswith('s')):
-                    if num_found == 0:
-                        msg = 'could not find '
-                    else:
-                        msg = 'multiple entries found for '
-                    msg += cli_dict['noun'] + ' \'' + cli_dict['name'] + '\''
-                    raise Exception(msg)
-            if cli_dict['simple']:
-                print('')
-            if cli_dict['json']:
-                print(str(json_dict))
 
     def export_projects(self, makefile):
         """ plan_build_exports() must occur before this method is called """
@@ -934,6 +812,146 @@ class ProjectRegistry():
             cmd += ' -j ' + str(_j)
         System(cmd)
         self.clean_imports_exports()
+
+
+class ProjectDatabase(ProjectRegistry):
+    """ This class represents all projects on which actions can be performed,
+        regardless of whether they are registered or not. The list of projects
+        is inherited from ProjectRegistry, and potentially expanded to include
+        local project, if the local project is unregistered """
+
+    def __init__(self):
+        ProjectRegistry.__init__(self)
+        # -1 indicates not local project has been assigned to self.projects yet
+        self.local_project_idx = -1
+        self.local_project_is_registered = False
+
+    @staticmethod
+    def is_worker(noun):
+        return Project.is_worker(noun)
+
+    @staticmethod
+    def is_hdl(noun):
+        return Project.is_hdl(noun)
+
+    @staticmethod
+    def is_rcc(noun):
+        return Project.is_rcc(noun)
+
+    @staticmethod
+    def get_asset_for_create(noun):
+        return Project.get_asset_for_create(noun)
+
+    def discover_local_project(self, _dir):
+        project_dir_abs_path = _dir
+        while True:
+            try:
+                local_project = Project(project_dir_abs_path)
+                for (idx, project) in enumerate(self.projects):
+                    if project.get_dir_abs_path() == \
+                       local_project.get_dir_abs_path():
+                        self.local_project_is_registered = True
+                        self.local_project_idx = idx
+                if not self.local_project_is_registered:
+                    local_project.discover()
+                    self.projects.append(local_project)
+                    self.local_project_idx = len(self.projects)-1
+                Logger().debug('operating in local project ' +
+                               local_project.get_dir_abs_path())
+                break
+            except InvalidAssetError:
+                project_dir_abs_path = project_dir_abs_path.rsplit('/', 1)[0]
+                if len(project_dir_abs_path) <= 1:
+                    break
+
+    def discover_registered_projects(self):
+        ProjectRegistry.discover(self, True, True)
+
+    def create(self, cli_dict, _dir):
+        if cli_dict.get('component'):
+            self.discover_registered_projects()  # for warnings
+        self.discover_local_project(_dir)
+        if (cli_dict['verb'] == 'create') and \
+           (cli_dict['noun'] == 'test'):
+            spec = cli_dict['name']  # default
+            if cli_dict['component']:
+                spec = cli_dict['component']
+            c_strs = self.get_list_of_component_strings_by_name(spec)
+            if len(c_strs) == 0:
+                Logger().warn('spec ' + spec + ' not found')
+            elif len(c_strs) > 1:
+                msg = 'multiple component specs found, \'' + c_strs[0]
+                msg += '\' will be used but others were also found: '
+                msg += ', '.join(c_strs[1:])
+                Logger().warn(msg)
+        if self.local_project_idx == -1:
+            ProjectRegistry.create(self, cli_dict, _dir)
+        else:
+            local_project = self.projects[self.local_project_idx]
+            local_project.create_asset(cli_dict, _dir)
+
+    def show(self, cli_dict, _dir):
+        if cli_dict['globalscope'] and (not cli_dict['localscope']):
+            self.discover_registered_projects()
+        self.discover_local_project(_dir)
+        if cli_dict['noun'] == 'registry':
+            print(self.abs_path)
+        else:
+            num_found = 0
+            if cli_dict['noun'].startswith('target') and \
+               ((cli_dict['authoringmodel'] == '') or
+                    (cli_dict['authoringmodel'] == 'hdl')):
+                for target in ['zynq', 'zynq_ultra', 'zynq_ise', 'virtex6',
+                               'stratix']:
+                    if (cli_dict['name'] is None) or \
+                       (cli_dict['name'] == target):
+                        print(target + '.hdl')
+                        num_found += 1
+            if (not cli_dict['noun'].startswith('target')) or \
+               (cli_dict['authoringmodel'] != 'hdl'):
+                json_dict = {}
+                num_found2 = 0
+                for (idx, project) in enumerate(self.projects):
+                    if cli_dict['noun'].startswith('project'):
+                        if not self.local_project_is_registered:
+                            if idx == self.local_project_idx:
+                                msg = project.get_name() + ' is not registered'
+                                set_g_suppress_warn(False)
+                                Logger().warn(msg)
+                                set_g_suppress_warn(True)
+                    json_dict = project.show(cli_dict, json_dict)
+                    num_found2 = len(json_dict)
+                    if (num_found2 > 1) and \
+                       (not cli_dict['noun'].endswith('s')):
+                        msg = 'multiple entries found for '
+                        msg += cli_dict['noun'] + ' \'' + cli_dict['name']
+                        msg += '\''
+                        raise Exception(msg)
+                if cli_dict['simple']:
+                    print('')
+                if cli_dict['json']:
+                    print(str(json_dict))
+                num_found += num_found2
+            if (num_found == 0) and (not cli_dict['noun'].endswith('s')):
+                msg = 'could not find '
+                msg += cli_dict['noun'] + ' \'' + cli_dict['name'] + '\''
+                raise Exception(msg)
+
+    def get_list_of_component_strings_by_name(self, spec):
+        """ get list of package id-qualified names of components in the order
+            order defined in CDG section 14.8 """
+        local_project = self.projects[self.local_project_idx]
+        c_strs = local_project.get_list_of_component_strings_by_name(spec)
+        if len(c_strs) > 1:
+            msg = 'multiple component specs matched name \'' + spec
+            msg += '\' in the local project: ' + ', '.join(c_strs)
+            Logger().warn(msg)
+            c_strs = [c_strs[0]]
+        else:
+            deps = local_project.attrs['ProjectDependencies']
+            tmp = self.get_list_of_component_strings_by_name_deps(spec, deps)
+            c_strs.extend(tmp)
+        return c_strs
 
 
 class LegacyBuildTool():

@@ -125,7 +125,8 @@ comp_example_app_rst_template = """<?xml version="1.0"?>
 """  # nopep8
 
 
-class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
+class Project(AssetBase, HdlLibraryProjectBase,
+              ComponentLibraryWorkerProjectAssemblyBase, SpecsDirectory):
     """ Component Development Guide section 14 """
 
     def __init__(self, dir_abs_path, cli_dict=None):
@@ -135,7 +136,7 @@ class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
                 if not os.path.exists(dir_abs_path + '/Project.mk'):
                     msg = 'neither Project.mk or Project.xml exists'
                     raise InvalidAssetError(msg)
-        AssetBase.__init__(self, dir_abs_path, cli_dict)
+        AssetBase.__init__(self, dir_abs_path, cli_dict, bad_name_action=0)
         SpecsDirectory.__init__(self)
         # start of bullets at top of CDG section 14 (XML, project INTERNAL)
         self.component_libraries = []
@@ -180,14 +181,18 @@ class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
     @staticmethod
     def get_asset_for_create(noun, authoring_model=''):
         asset = None
-        dummy_dict = {}
+        dummy_dict = {}  # TODO remove this mess
         dummy_dict['component'] = ''
         dummy_dict['componentlibrary'] = ''
         dummy_dict['depends'] = ''
+        dummy_dict['excludeplatform'] = []
+        dummy_dict['excludetarget'] = []
         dummy_dict['includedir'] = ''
         dummy_dict['language'] = 'vhdl'
         dummy_dict['libraries'] = ''
         dummy_dict['nocontrol'] = False
+        dummy_dict['onlytarget'] = []
+        dummy_dict['onlyplatform'] = []
         dummy_dict['packageid'] = ''
         dummy_dict['packagename'] = ''
         dummy_dict['packageprefix'] = ''
@@ -225,6 +230,9 @@ class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
 
     def get_attr_infos(self):
         ret = []
+        ret.extend(HdlLibraryProjectBase.get_attr_infos(self))
+        tmp = ComponentLibraryWorkerProjectAssemblyBase.get_attr_infos(self)
+        ret.extend(tmp)
         # Attributes provided (partially) in CDG 10.1 Table 7
         ret.append(AttributeInfo('ProjectDependencies',
                    is_list=True, cli=('-D', '--depends')))
@@ -234,7 +242,6 @@ class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
                    cli=('-K', '--package-id')))
         ret.append(AttributeInfo('PackageName',
                    cli=('-N', '--package-name')))
-        ret.extend(ProjectComponentLibraryWorkerBase.get_attr_infos(self))
         for attr_key in ['HdlTargets', 'HdlPlatforms', 'RccPlatforms',
                          'RccHdlPlatforms', 'ComponentLibraries',
                          'OnlyTargets', 'OnlyPlatforms',
@@ -609,7 +616,7 @@ class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
                 xml_abs_path = dir_abs_path + '/' + cli_dict['name'] + \
                     '-comp.xml'
             else:
-                dir_abs_path += '/' + cli_dict['name'] + '-comp'
+                dir_abs_path += '/' + cli_dict['name'] + '.comp'
                 xml_abs_path = dir_abs_path + '/' + cli_dict['name'] + \
                     '-comp.xml'
             ret = Component(xml_abs_path, cli_dict)
@@ -1173,11 +1180,13 @@ class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
             assets.extend(self.get_assets_of_type(_type))
         list_to_show = []
         for asset in assets:
-            if (cli_dict['name'] is None) or \
-               (cli_dict['name'] == asset.name):
-                if (cli_dict['d'] == []) or \
-                   any([(_dir + '/') in (asset.abs_path + '/') for _dir in
-                        cli_dict['d']]):
+            passed_any_name_checks = (cli_dict['name'] is None) or \
+                    (cli_dict['name'] == asset.name)
+            if passed_any_name_checks:
+                passed_any_dir_checks = (cli_dict['d'] == []) or \
+                        any([(_dir + '/') in (asset.abs_path + '/') for _dir in
+                            cli_dict['d']])
+                if passed_any_dir_checks:
                     containing_path = \
                         asset.get_dir_abs_path().rsplit('/', 1)[0]
                     if cli_dict['noun'].startswith('librar'):
@@ -1229,16 +1238,19 @@ class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
                                 p = self.get_component_library_package_id(cl)
                                 if (asset in component_library.components) or \
                                    (asset in component_library.workers) or \
-                                   (asset in self.component_libraries):
+                                   (asset == cl):
                                     pid = p
                                     break
                         pid_and_name = pid
-                        if not cli_dict['noun'].startswith('project'):
+                        if (not cli_dict['noun'].startswith('project')) and \
+                           (not cli_dict['noun'].startswith('librar')):
                             pid_and_name += '.' + asset.name
                         msg = ''
                         if first and cli_dict['simple']:
                             msg += ' '
                         msg += pid_and_name
+                        if cli_dict['noun'].startswith('target'):
+                            msg = asset.name + '.rcc'
                         if Project.is_worker(cli_dict['noun']):
                             msg += '.' + asset.authoring_model
                         if cli_dict['noun'].startswith('platform'):
@@ -1246,42 +1258,6 @@ class Project(ProjectComponentLibraryWorkerBase, SpecsDirectory):
                                 msg += '.hdl'
                             if type(asset) == RccPlatform:
                                 msg += '.rcc'
-                        if cli_dict['noun'].startswith('target'):
-                            if (cli_dict['authoringmodel'] == '') or \
-                               (cli_dict['authoringmodel'] == 'hdl'):
-                                if asset.name == 'zed':
-                                    pid_and_name = pid + '.' + 'zynq'
-                                    msg = pid_and_name
-                                elif asset.name == 'zcu106':
-                                    pid_and_name = pid + '.' + 'zynq_ultra'
-                                    msg = pid_and_name
-                                elif asset.name == 'zed_ise':
-                                    pid_and_name = pid + '.' + 'zynq_ise'
-                                    msg = pid_and_name
-                                elif asset.name == 'zcu104':
-                                    pid_and_name = pid + '.' + 'zynq_ultra'
-                                    msg = pid_and_name
-                                elif asset.name == 'zed_ether':
-                                    pid_and_name = pid + '.' + 'zynq'
-                                    msg = pid_and_name
-                                elif asset.name == 'ml605':
-                                    pid_and_name = pid + '.' + 'virtex6'
-                                    msg = pid_and_name
-                                elif asset.name == 'alst4x':
-                                    pid_and_name = pid + '.' + 'stratix'
-                                    msg = pid_and_name
-                                elif asset.name == 'alst4':
-                                    pid_and_name = pid + '.' + 'stratix'
-                                    msg = pid_and_name
-                                elif asset.name == 'matchstiq_z1':
-                                    pid_and_name = pid + '.' + 'zynq'
-                                    msg = pid_and_name
-                                elif asset.name == 'e31x':
-                                    pid_and_name = pid + '.' + 'zynq'
-                                    msg = pid_and_name
-                                elif asset.name == 'zrf8_48dr':
-                                    pid_and_name = pid + '.' + 'zynq_ultra'
-                                    msg = pid_and_name
                         if cli_dict['verbose'] or cli_dict['table']:
                             if not cli_dict['noun'].startswith('target'):
                                 # an hdl target, for example, is not an asset

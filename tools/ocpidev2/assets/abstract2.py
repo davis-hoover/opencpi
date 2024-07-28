@@ -1127,21 +1127,106 @@ class AssetBase(AttributeBase):
         raise InvalidAssetError('not a ' + self.get_root_tags()[0])
 
 
-class ProjectComponentLibraryWorkerBase(AssetBase):
-
-    def __init__(self):
-        pass
+class ComponentLibraryWorkerAssemblyBase():
+    """ handles attributes common to component libraries and workers and
+        assemblies"""
 
     def get_attr_infos(self):
         ret = []
-        ret.append(AttributeInfo('XmlIncludeDirs',
-                   cli=('-A', '--xml-include'), is_list=True))
+        # CDG section 8.1.6 (workers)
+        # CDG section 10.1 (component libraries)
+        ret.append(AttributeInfo('OnlyPlatforms',
+                   cli=('-G', '--only-platform'), is_list=True))
+        # CDG section 8.1.7 (workers)
+        # CDG section 10.1 (component libraries)
+        ret.append(AttributeInfo('ExcludePlatforms',
+                   cli=('-Q', '--exclude-platform'), is_list=True))
+        return ret
+
+
+class ComponentLibraryWorkerBase():
+    """ handles attributes common to both component libraries and workers """
+
+    def get_attr_infos(self):
+        ret = []
+        # CDG section 8.1.11 (workers),
+        # CDG section 10.1 (component libraries)
+        ret.append(AttributeInfo('Libraries',
+                   cli=('-Y', '--primitive-library'), is_list=True))
+        # CDG section 8.1.8 (workers)
+        # CDG section 10.1 (component libraries)
+        ret.append(AttributeInfo('OnlyTargets',
+                   cli=('-T', '--only-target'), is_list=True))
+        # CDG section 8.1.9 (workers)
+        # CDG section 10.1 (component libraries)
+        ret.append(AttributeInfo('ExcludeTargets',
+                   cli=('-Z', '--exclude-target'), is_list=True))
+        # CDG section 8.1.12 (workers)
+        # CDG section 10.1 (component libraries)
+        ret.append(AttributeInfo('IncludeDirs',
+                   cli=('-I', '--include-dir'), is_list=True))
+        return ret
+
+
+class HdlLibraryWorkerBase():
+    """ handles attributes common to hdl primitive libraries and workers """
+
+    def get_attr_infos(self):
+        ret = []
+        # HDG section 5.2.1 (hdl primitive libraries)
+        # CDG section 8.1.10, (workers)
+        ret.append(AttributeInfo('SourceFiles',
+                   cli=('-O', '--other'), is_list=True))
+        return ret
+
+
+class HdlLibraryProjectBase():
+    """ handles attributes common to hdl primitive libraries and projects """
+
+    def get_attr_infos(self):
+        ret = []
+        # HDG section 4 (hdl primitive libraries),
+        # CDG section 14.5 (projects)
         ret.append(AttributeInfo('HdlLibraries',
                    cli=('-Y', '--primitive-library'), is_list=True))
-        ret.append(AttributeInfo('Libraries',
-                   cli=('-y', '--component-library'),
-                   is_list=True))  # CDG section 8.1.11
-        ret.append(AttributeInfo('IncludeDirs',
-                   cli=('-I', '--include-dir'),
-                   is_list=True))  # CDG section 8.1.12
+        return ret
+
+
+class ComponentLibraryWorkerProjectAssemblyBase():
+    """ handles attributes common to component libraries and workers and
+        projects and assemblies """
+
+    def get_attr_infos(self):
+        ret = []
+        # CDG section 10.1 (component libraries),
+        # CDG section 8.1.13 (workers),
+        # CDG section 4 (projects),
+        # HDG section 6.2 (assemblies)
+        ret.append(AttributeInfo('ComponentLibraries',
+                   cli=('-y', '--component-library'), is_list=True))
+        return ret
+
+
+class WorkerBase(ComponentLibraryWorkerBase, HdlLibraryWorkerBase,
+                 ComponentLibraryWorkerProjectAssemblyBase):
+    """ handles attributes common to Worker and HdlPlatform classes """
+
+    def get_attr_infos(self):
+        ret = []
+        ret.extend(ComponentLibraryWorkerBase.get_attr_infos(self))
+        ret.extend(HdlLibraryWorkerBase.get_attr_infos(self))
+        tmp = ComponentLibraryWorkerProjectAssemblyBase.get_attr_infos(self)
+        ret.extend(tmp)
+        ret.append(AttributeInfo('Name'))
+        ret.append(AttributeInfo('Spec',
+                   cli=('-S', '--spec')))  # CDG section 8.1.2
+        ret.append(AttributeInfo('Language',
+                   cli=('-L', '--language')))  # CDG section 8.1.3
+        ret.append(AttributeInfo('Version',
+                   cli=('-a', '--version'), is_int=True))  # CDG secion 8.1.4
+        ret.append(AttributeInfo('ControlOperations',
+                   cli=('-C', '--control-operation'),
+                   is_list=True))  # CDG section 8.1.5
+        ret.append(AttributeInfo('Configurations',
+                   cli=('-c', '--configuration'), is_list=True))
         return ret
