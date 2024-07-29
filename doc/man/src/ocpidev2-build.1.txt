@@ -17,11 +17,156 @@ DESCRIPTION
 The *`build`* verb compiles (or performs the equivalent operation for the asset)
 the OpenCPI assets specified by the options used
 in the command. If no options are provided, *`ocpidev2`* builds all assets
-within the current directory.
+within the current directory. When the plural version of the nouns are used, no name is
+specified and all assets of that type under the current directory are built.
+
+Asset types to be specified in the '<noun>' argument are:
+
+*`adapter`*::
+    Build the adapter worker with the specified '<name>'.
+
+*`adapters`*::
+    Build all adapter workers.
+
+*`application`*::
+    Build the application with the specified '<name>' (this does not build any deployment-related assemblies).
+
+*`applications`*::
+    Build all applications (this does not build any deployment-related assemblies).
+
+*`assembly`*::
+    Build the the specified '<name>'.
+
+*`assemblies`*::
+    Build all assemblies.
+
+*`device`*::
+    Build the device worker with the specified '<name>'.
+    
+*`devices`*::
+    Build all device workers.
+
+*`library`*::
+    Build all buildable assets in the component library with the specified '<name>'.
+
+*`libraries`*::
+    Build all buildable assets in all component libraries.
+
+*`platform`*::
+    Build the platform with the specified '<name>'.
+
+*`platforms`*::
+    Build all platforms.
+
+*`primitive`*::
+    Build the primitive with the specified '<name>',
+    regardless of whether it is an primitive core or an primitive library.
+
+*`primitives`*::
+    Build all primitives, regardless of whether
+    they are primitive cores or primitive libraries.
+
+*`project`*::
+    Build all buildable assets in the project with the specified '<name>'.
+
+*`projects`*::
+    Build all buildable assets in all projects.
+
+*`test`*::
+    Build the unit test with the specified '<name>'.
+
+*`tests`*::
+    Build all unit tests.
+
+*`worker`*::
+    Build the worker with the specified '<name>'.
+
+*`workers`*::
+    Build all workers.
+
+The HDL-specific assets (located under the *`hdl/`* subdirectory)
+supported by *`ocpidev2 show`* are:
+
+*`hdl adapter`*::
+    Build the hdl adapter worker with the specified '<name>'.
+
+*`hdl adapters`*::
+    Build all hdl adapter workers.
+
+*`hdl assembly`*::
+    Build the hdl assembly with the specified '<name>'.
+
+*`hdl assemblies`*::
+    Build all hdl assemblies.
+
+*`hdl device`*::
+    Build the hdl device worker with the specified '<name>'.
+
+*`hdl devices`*::
+    Build all hdl device workers.
+
+*`hdl library`*::
+    Build all buildable assetings in the component library, within a project's hdl directory, with the specified '<name>'.
+
+*`hdl libraries`*::
+    Build all component libraries within project hdl directories
+
+*`hdl platform`*::
+    Build the hdl platform with the specified '<name>'.
+
+*`hdl platforms`*::
+    Build all hdl platforms.
+
+*`hdl primitive`*::
+    Build the hdl primitive with the specified '<name>',
+    regardless of whether it is an hdl primitive core or an hdl primitive library.
+
+*`hdl primitives`*::
+    Build all hdl primitives, regardless of whether
+    they are hdl primitive cores or hdl primitive libraries.
+
+*`hdl primitive core`*::
+    Build the hdl primitive core with the specified '<name>'.
+
+*`hdl primitive cores`*::
+    Build all hdl primitives cores.
+
+*`hdl primitive library`*::
+    Build the hdl primitive library with the specified '<name>'.
+
+*`hdl primitive libraries`*::
+    Build all hdl primitives libraries.
+
+*`hdl worker`*::
+    Build the hdl worker with the specified '<name>'.
+
+*`hdl workers`*::
+    Build all hdl workers.
+
+The RCC-specific assets (located under the *`rcc/`* subdirectory)
+supported by *`ocpidev2 show`* are:
+
+*`rcc platform`*::
+    Build the rcc platform with the specified '<name>'.
+
+*`rcc platforms`*::
+    Build all rcc platforms.
+
+*`rcc worker`*::
+    Build the rcc worker with the specified '<name>'.
+
+*`rcc workers`*::
+    Build all rcc workers.
+
+
+
+Unless suppressed by options, the *`build`* verb builds
+both the assets and their OpenCPI asset documents.
+See the 'OpenCPI Documentation Writer Guide' for details on OpenCPI asset documents.
 
 OPTIONS
 -------
-In addition to the -d and -h options common to all OpenCPI tools (see link:opencpi.1.html[opencpi(1)]),
+In addition to the options common to all OpenCPI tools (see link:opencpi.1.html[opencpi(1)]),
 the options below can be specified for the *`build`* verb. 
 These options are primarily used to limit what is built
 (focus the build process on specific assets of interest), or specify the
