@@ -135,6 +135,7 @@ class ComponentLibrariesDirectory(AssetBase):
 
 class ComponentLibrary(AssetBase, ComponentLibraryWorkerBase,
                        ComponentLibraryWorkerProjectAssemblyBase,
+                       HdlLibraryComponentLibraryWorkerBase,
                        SpecsDirectory):
     """ Reference RCC/HDL Development Guide section 3. A ComponentLibrary is
         represented by a directory and knows nothing about the project it
@@ -188,9 +189,14 @@ class ComponentLibrary(AssetBase, ComponentLibraryWorkerBase,
         ret.extend(ComponentLibraryWorkerBase.get_attr_infos(self))
         tmp = ComponentLibraryWorkerProjectAssemblyBase.get_attr_infos(self)
         ret.extend(tmp)
+        ret.extend(HdlLibraryComponentLibraryWorkerBase.get_attr_infos(self,
+                                                                       True))
         ret.append(AttributeInfo('XmlIncludeDirs',
                    cli=('-A', '--xml-include'),
                    is_list=True))  # CDG section 10.1
+        # --- IMPORTANT --- BELOW LINE IS NOT MENTIONED IN DEV GUIDE
+        #                   BUT DOES EXIST IN misc_comps/Library.mk
+        ret.append(AttributeInfo('HdlLibraries', is_list=True))
         # below line mentioned in HGD section 4
         ret.append(AttributeInfo('Workers', is_list=True))
         ret.append(AttributeInfo('PackagePrefix',

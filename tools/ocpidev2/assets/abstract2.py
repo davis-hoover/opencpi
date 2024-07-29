@@ -1144,15 +1144,31 @@ class ComponentLibraryWorkerAssemblyBase():
         return ret
 
 
+class HdlLibraryComponentLibraryWorkerBase():
+    """ handles attributes common to hdl primitive libraries and component
+        libraries and workers """
+
+    def get_attr_infos(self, is_component_library=False):
+        ret = []
+        cli = ('-Y', '--primitive-library')
+        if is_component_library:
+            # don't expose due to apparent overlap between
+            # <Library Libraries=''/>
+            # <Library HdlLibraries=''/>
+            cli = None
+        # CDG section 8.1.11 (workers),
+        # CDG section 10.1 (component libraries)
+        # HDG section 5 (hdl primitive libraries)
+        ret.append(AttributeInfo('Libraries',
+                   cli=cli, is_list=True))
+        return ret
+
+
 class ComponentLibraryWorkerBase():
     """ handles attributes common to both component libraries and workers """
 
     def get_attr_infos(self):
         ret = []
-        # CDG section 8.1.11 (workers),
-        # CDG section 10.1 (component libraries)
-        ret.append(AttributeInfo('Libraries',
-                   cli=('-Y', '--primitive-library'), is_list=True))
         # CDG section 8.1.8 (workers)
         # CDG section 10.1 (component libraries)
         ret.append(AttributeInfo('OnlyTargets',
@@ -1180,7 +1196,7 @@ class HdlLibraryWorkerBase():
         return ret
 
 
-class HdlLibraryProjectBase():
+class ComponentLibraryProjectBase():
     """ handles attributes common to hdl primitive libraries and projects """
 
     def get_attr_infos(self):
@@ -1208,7 +1224,8 @@ class ComponentLibraryWorkerProjectAssemblyBase():
 
 
 class WorkerBase(ComponentLibraryWorkerBase, HdlLibraryWorkerBase,
-                 ComponentLibraryWorkerProjectAssemblyBase):
+                 ComponentLibraryWorkerProjectAssemblyBase,
+                 HdlLibraryComponentLibraryWorkerBase):
     """ handles attributes common to Worker and HdlPlatform classes """
 
     def get_attr_infos(self):
@@ -1217,6 +1234,7 @@ class WorkerBase(ComponentLibraryWorkerBase, HdlLibraryWorkerBase,
         ret.extend(HdlLibraryWorkerBase.get_attr_infos(self))
         tmp = ComponentLibraryWorkerProjectAssemblyBase.get_attr_infos(self)
         ret.extend(tmp)
+        ret.extend(HdlLibraryComponentLibraryWorkerBase.get_attr_infos(self))
         ret.append(AttributeInfo('Name'))
         ret.append(AttributeInfo('Spec',
                    cli=('-S', '--spec')))  # CDG section 8.1.2

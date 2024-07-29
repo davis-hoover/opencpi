@@ -29,7 +29,7 @@ import argparse
 import signal
 from _opencpi.assets.abstract2 import *
 # IMPORTANT - interface with ProjectDatabase, nothing else
-from _opencpi.assets.registry2 import ProjectDatabase, unittest
+from _opencpi.assets.registry2 import ProjectDatabase
 
 
 def ocpidevsignint(sig, frame):
@@ -388,7 +388,6 @@ def get_cli_dict():
                 raise Exception(msg)
         else:
             if (cli_dict['name'] is None) and (cli_dict['noun'] != 'registry'):
-                print(str(cli_dict))
                 raise Exception('must specify name')
     if ('worker' in cli_dict.keys()) and (cli_dict['worker'] != []):
         raise Exception('do not use --worker, instead create separate workers')
@@ -403,68 +402,6 @@ def get_cli_dict():
 global g_suppress_warn
 
 
-def dispatch_verb(cli_dict):
-    """ this method implements functionality common across verbs, then
-        dispatches to individual verb calls """
-    if cli_dict['help']:
-        if cli_dict['verb'] == '':
-            os.system('man ocpidev2')
-        else:
-            os.system('man ocpidev2-' + cli_dict['verb'])
-    else:
-        dirs_to_operate_on = cli_dict['d'].copy()
-        if dirs_to_operate_on == []:
-            dirs_to_operate_on.append(Environment().getcwd())
-        if cli_dict['verb'] == 'show':
-            set_g_suppress_warn(True)
-        pdb = ProjectDatabase()
-        for _dir in dirs_to_operate_on:
-            if not ((cli_dict['verb'] == 'create') and
-               (cli_dict['noun'] == 'library')):
-                msg = 'performing \'' + cli_dict['verb']
-                if cli_dict['noun'] is not None:
-                    msg += ' ' + cli_dict['noun']
-                if cli_dict['name'] is not None:
-                    msg += ' ' + cli_dict['name']
-                msg += '\''
-                Logger().log(3, msg + ' within directory ' + _dir)
-            if cli_dict['verb'] == 'build':
-                pdb.build(cli_dict, _dir)
-            elif cli_dict['verb'] == 'clean':
-                pdb.clean(cli_dict, _dir)
-            elif cli_dict['verb'] == 'create':
-                pdb.create(cli_dict, _dir)
-            elif cli_dict['verb'] == 'delete':
-                pdb.delete(cli_dict, _dir)
-            elif cli_dict['verb'] == 'refresh':
-                Logger().warn('refresh is not necessary in ocpidev2')
-            elif cli_dict['verb'] == 'register':
-                pdb.register(cli_dict, _dir)
-            elif cli_dict['verb'] == 'run':
-                pdb.run(cli_dict, _dir)
-            elif cli_dict['verb'] == 'show':
-                pdb.show(cli_dict, _dir)
-            elif cli_dict['verb'] == 'unregister':
-                pdb.unregister(cli_dict, _dir)
-            elif cli_dict['verb'] == 'unittest':
-                unittest(cli_dict, _dir)
-            else:
-                raise Exception('verb ' + cli_dict['verb'] +
-                                ' is not supported')
-            if (cli_dict['verb'] == 'create') and \
-               (cli_dict['noun'] == 'library'):
-                # this message is printed below and not above due to weird
-                # create components dir message of same form in project2.py
-                # that needs to happen first
-                msg = 'performing \'' + cli_dict['verb']
-                if cli_dict['noun'] is not None:
-                    msg += ' ' + cli_dict['noun']
-                if cli_dict['name'] is not None:
-                    msg += ' ' + cli_dict['name']
-                msg += '\''
-                Logger().log(3, msg + ' within directory ' + _dir)
-
-
 def main():
     ret = 0
     try:
@@ -475,7 +412,7 @@ def main():
         if cli_dict['loglevel']:
             set_g_log_level(cli_dict['loglevel'])
         Logger().debug('cli_dict : ' + str(cli_dict))
-        dispatch_verb(cli_dict)
+        ProjectDatabase().dispatch_verb(cli_dict)
     except Exception as exception:
         Logger().error(str(exception))
         ret = 1

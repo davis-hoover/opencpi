@@ -264,13 +264,6 @@ class ProjectRegistry():
                 pid = project.get_package_id()
                 raise Exception(pid + ' is not registered')
 
-    def get_assets(self, _dir):
-        assets = []
-        for project in self.projects:
-            if (project.get_dir_abs_path() + '/') in (_dir + '/'):
-                assets.extend(project.get_assets_within(_dir))
-        return assets
-
     def get_project(self, cli_dict, _dir):
         project = next((proj for proj in self.projects if
                         (proj.get_dir_abs_path() + '/') in (_dir + '/')), None)
@@ -295,34 +288,84 @@ class ProjectRegistry():
             raise Exception(msg)
         return project
 
+    def dispatch_verb(self, cli_dict):
+        """ this method implements functionality common across verbs, then
+            dispatches to individual verb calls """
+        if cli_dict['help']:
+            if cli_dict['verb'] == '':
+                os.system('man ocpidev2')
+            else:
+                os.system('man ocpidev2-' + cli_dict['verb'])
+        else:
+            dirs_to_operate_on = cli_dict['d'].copy()
+            if dirs_to_operate_on == []:
+                dirs_to_operate_on.append(Environment().getcwd())
+            if cli_dict['verb'] == 'show':
+                set_g_suppress_warn(True)
+            for _dir in dirs_to_operate_on:
+                if not ((cli_dict['verb'] == 'create') and
+                   (cli_dict['noun'] == 'library')):
+                    msg = 'performing \'' + cli_dict['verb']
+                    if cli_dict['noun'] is not None:
+                        msg += ' ' + cli_dict['noun']
+                    if cli_dict['name'] is not None:
+                        msg += ' ' + cli_dict['name']
+                    msg += '\''
+                    Logger().log(3, msg + ' within directory ' + _dir)
+                if cli_dict['verb'] == 'build':
+                    self.build(cli_dict, _dir)
+                elif cli_dict['verb'] == 'clean':
+                    self.clean(cli_dict, _dir)
+                elif cli_dict['verb'] == 'create':
+                    self.create(cli_dict, _dir)
+                elif cli_dict['verb'] == 'delete':
+                    self.delete(cli_dict, _dir)
+                elif cli_dict['verb'] == 'refresh':
+                    Logger().warn('refresh is not necessary in ocpidev2')
+                elif cli_dict['verb'] == 'register':
+                    self.register(cli_dict, _dir)
+                elif cli_dict['verb'] == 'run':
+                    self.run(cli_dict, _dir)
+                elif cli_dict['verb'] == 'show':
+                    self.show(cli_dict, _dir)
+                elif cli_dict['verb'] == 'unregister':
+                    self.unregister(cli_dict, _dir)
+                elif cli_dict['verb'] == 'unittest':
+                    unittest(cli_dict, _dir)
+                else:
+                    raise Exception('verb ' + cli_dict['verb'] +
+                                    ' is not supported')
+                if (cli_dict['verb'] == 'create') and \
+                   (cli_dict['noun'] == 'library'):
+                    # this message is printed below and not above due to weird
+                    # create components dir message of same form in project2.py
+                    # that needs to happen first
+                    msg = 'performing \'' + cli_dict['verb']
+                    if cli_dict['noun'] is not None:
+                        msg += ' ' + cli_dict['noun']
+                    if cli_dict['name'] is not None:
+                        msg += ' ' + cli_dict['name']
+                    msg += '\''
+                    Logger().log(3, msg + ' within directory ' + _dir)
+
     def build(self, cli_dict, _dir):
         """ builds assets by creating a temporary makefile and calls make -j
             on it and then deleting it """
-        if not os.path.exists(_dir):
-            raise Exception(_dir + ' does not exist')
-        # TODO support cli_dict extension (override) of this tool
-        tool = LegacyBuildTool()
-        fs = TemporaryFilesystem()
-        assets = self.get_assets(_dir)
-        for asset in assets:
-            print('planning build for ' + asset.abs_path)
-        makefile = self.plan_build(assets, cli_dict['hdltarget'],
-                                   cli_dict['hdlplatform'],
-                                   cli_dict['rccplatform'], fs, tool)
-        self.execute_build(cli_dict['hdltarget'], cli_dict['hdlplatform'],
-                           cli_dict['rccplatform'], fs,
-                           makefile, cli_dict['j'], tool)
+        self.dispatch_verb_for_single_dir(cli_dict, _dir)
 
     def clean(self, cli_dict, _dir):
         if not os.path.exists(_dir):
             raise Exception(_dir + ' does not exist')
+        self.discover_registered_projects()
+        self.discover_local_project(_dir)
         cleaned = False
         for project in self.projects:
             if (project.abs_path + '/') in (_dir + '/'):
                 project.clean(_dir)
                 cleaned = True
         if not cleaned:
-            raise Exception('cannot clean directory not in registered project')
+            msg = 'cannot clean directory \'' + _dir + '\' not in a project'
+            raise Exception(msg)
 
     def create(self, cli_dict, _dir):
         if cli_dict['name'] is None:
@@ -890,7 +933,124 @@ class ProjectDatabase(ProjectRegistry):
             local_project = self.projects[self.local_project_idx]
             local_project.create_asset(cli_dict, _dir)
 
-    def show(self, cli_dict, _dir):
+    def get_list_to_show(self, cli_dict, first, _type, asset, project,
+                         list_to_show, json_dict):
+        pid = str(project.get_package_id())
+        if (_type == 'component') or (_type.endswith('worker')) or \
+           (_type == 'component library'):
+            for component_library in project.component_libraries:
+                cl = component_library
+                p = project.get_component_library_package_id(cl)
+                if (asset in component_library.components) or \
+                   (asset in component_library.workers) or \
+                   (asset == cl):
+                    pid = p
+                    break
+        pid_and_name = pid
+        if (not cli_dict['noun'].startswith('project')) and \
+           (not cli_dict['noun'].startswith('librar')):
+            pid_and_name += '.' + asset.name
+        msg = ''
+        if first and cli_dict['simple']:
+            msg += ' '
+        msg += pid_and_name
+        if cli_dict['noun'].startswith('target'):
+            msg = asset.name + '.rcc'
+        if Project.is_worker(cli_dict['noun']):
+            msg += '.' + asset.authoring_model
+        if cli_dict['noun'].startswith('platform'):
+            if type(asset) == 'hdl platform':
+                msg += '.hdl'
+            if type(asset) == 'rcc platform':
+                msg += '.rcc'
+        if cli_dict['verbose'] or cli_dict['table']:
+            if not cli_dict['noun'].startswith('target'):
+                # an hdl target, for example, is not an asset
+                # with an associated directory
+                msg += ' '
+                for idx in range(60-len(msg)):
+                    msg += ' '
+                msg += asset.abs_path
+        json_dict[pid_and_name] = {'package_id': pid}
+        if not cli_dict['noun'].startswith('target'):
+            # an hdl target, for example, is not an asset
+            # with an associated directory
+            json_dict[pid_and_name]['directory'] = \
+                asset.get_dir_abs_path()
+        if not cli_dict['json']:
+            if msg not in list_to_show:
+                list_to_show.append(msg)
+        return (list_to_show, json_dict)
+
+    def filter_assets(self, cli_dict, assets,
+                      assets_on_which_verb_will_be_performed, project, _type,
+                      json_dict={}):
+        """" assets                                 input assets being filtered
+             assets_on_which_verb_will_be_performed in/out final list being
+                                                    built up """
+        first = True
+        list_to_show = []
+        for asset in assets:
+            passed_any_name_checks = (cli_dict['name'] is None) or \
+                    (cli_dict['name'] == asset.name)
+            if passed_any_name_checks:
+                passed_any_dir_checks = (cli_dict['d'] == []) or \
+                        any([(_dir + '/') in (asset.abs_path + '/') for _dir in
+                            cli_dict['d']])
+                if passed_any_dir_checks:
+                    containing_path = \
+                        asset.get_dir_abs_path().rsplit('/', 1)[0]
+                    if cli_dict['noun'].startswith('librar'):
+                        is_hdl = containing_path.endswith('hdl') or \
+                                 containing_path.split('/')[-3] == 'hdl'
+                    else:
+                        hdlp = 'hdl/primitives'
+                        is_hdl = containing_path.endswith('hdl/adapters') or \
+                            containing_path.endswith('hdl/cards') or \
+                            containing_path.endswith('hdl/devices') or \
+                            containing_path.endswith(hdlp) or \
+                            containing_path.endswith('hdl/platforms')
+                    passed_any_hdl_checks = True
+                    if (cli_dict['authoringmodel'] == 'hdl'):
+                        passed_any_hdl_checks = \
+                            (asset.get_type() == 'hdl adapter') or \
+                            (asset.get_type() == 'hdl assembly') or \
+                            (asset.get_type() == 'hdl card') or \
+                            (asset.get_type() == 'hdl device') or \
+                            (asset.get_type() == 'hdl librar') or \
+                            (asset.get_type() == 'hdl primitive') or \
+                            (asset.get_type() == 'hdl primitive core') or \
+                            (asset.get_type() == 'hdl platform') or \
+                            (asset.get_type() == 'hdl slot') or \
+                            (asset.get_type() == 'hdl target') or \
+                            (asset.get_type() == 'hdl worker')
+                    elif (cli_dict['authoringmodel'] == 'rcc'):
+                        passed_any_hdl_checks = \
+                            (asset.get_type() == 'rcc worker') or \
+                            (asset.get_type() == 'rcc platform')
+                    if cli_dict['noun'].startswith('librar'):
+                        passed_any_hdl_checks = True
+                    passed_any_device_checks = \
+                        (not cli_dict['noun'].startswith('device')) or \
+                        (cli_dict['noun'].startswith('device') and
+                         asset.is_device)
+                    passed_any_adapter_checks = \
+                        (not cli_dict['noun'].startswith('adapter')) or \
+                        (cli_dict['noun'].startswith('adapter') and
+                         containing_path.endswith('hdl/adapters'))
+                    if passed_any_hdl_checks and \
+                            passed_any_device_checks and \
+                            passed_any_adapter_checks:
+                        assets_on_which_verb_will_be_performed.append(asset)
+                        if cli_dict['verb'] == 'show':
+                            (list_to_show, json_dict) = self.get_list_to_show(
+                                cli_dict, first, _type, asset, project,
+                                list_to_show, json_dict)
+                        first = False
+        return [json_dict, assets_on_which_verb_will_be_performed,
+                list_to_show]
+
+    def dispatch_verb_for_single_dir(self, cli_dict, _dir):
         if cli_dict['globalscope'] and (not cli_dict['localscope']):
             self.discover_registered_projects()
         self.discover_local_project(_dir)
@@ -907,6 +1067,7 @@ class ProjectDatabase(ProjectRegistry):
                        (cli_dict['name'] == target):
                         print(target + '.hdl')
                         num_found += 1
+            assets_on_which_verb_will_be_performed = []
             if (not cli_dict['noun'].startswith('target')) or \
                (cli_dict['authoringmodel'] != 'hdl'):
                 json_dict = {}
@@ -919,23 +1080,58 @@ class ProjectDatabase(ProjectRegistry):
                                 set_g_suppress_warn(False)
                                 Logger().warn(msg)
                                 set_g_suppress_warn(True)
-                    json_dict = project.show(cli_dict, json_dict)
-                    num_found2 = len(json_dict)
+                    assets = []
+                    for _type in project.get_types_from_cli_dict(cli_dict):
+                        assets.extend(project.get_assets_of_type(_type))
+                    [json_dict, assets,
+                     list_to_show] = self.filter_assets(
+                     cli_dict, assets, assets_on_which_verb_will_be_performed,
+                     project, _type, json_dict)
+                    if cli_dict['verb'] == 'show':
+                        if cli_dict['globalscope']:
+                            msg = '--global-scope does not change behavior, '
+                            msg += 'see man ocpidev2-show'
+                            Logger().warn(msg)
+                        if not cli_dict['json']:
+                            # the list is sorted so that assets are generally
+                            # printed in order of project...component
+                            # library... etc
+                            if len(list_to_show) > 0:
+                                sep = ' ' if cli_dict['simple'] else '\n'
+                                end = '' if cli_dict['simple'] else '\n'
+                                print(*sorted(list_to_show), sep=sep, end=end)
+                    num_found2 = len(assets_on_which_verb_will_be_performed)
                     if (num_found2 > 1) and \
                        (not cli_dict['noun'].endswith('s')):
                         msg = 'multiple entries found for '
                         msg += cli_dict['noun'] + ' \'' + cli_dict['name']
                         msg += '\''
                         raise Exception(msg)
-                if cli_dict['simple']:
-                    print('')
-                if cli_dict['json']:
-                    print(str(json_dict))
+                if cli_dict['verb'] == 'show':
+                    if cli_dict['simple']:
+                        print('')
+                    if cli_dict['json']:
+                        print(str(json_dict))
                 num_found += num_found2
             if (num_found == 0) and (not cli_dict['noun'].endswith('s')):
                 msg = 'could not find '
                 msg += cli_dict['noun'] + ' \'' + cli_dict['name'] + '\''
                 raise Exception(msg)
+            if cli_dict['verb'] == 'build':
+                # TODO support cli_dict extension (override) of this tool
+                tool = LegacyBuildTool()
+                fs = TemporaryFilesystem()
+                makefile = self.plan_build(
+                    assets_on_which_verb_will_be_performed,
+                    cli_dict['hdltarget'], cli_dict['hdlplatform'],
+                    cli_dict['rccplatform'], fs, tool)
+                self.execute_build(cli_dict['hdltarget'],
+                                   cli_dict['hdlplatform'],
+                                   cli_dict['rccplatform'], fs,
+                                   makefile, cli_dict['j'], tool)
+
+    def show(self, cli_dict, _dir):
+        self.dispatch_verb_for_single_dir(cli_dict, _dir)
 
     def get_list_of_component_strings_by_name(self, spec):
         """ get list of package id-qualified names of components in the order
