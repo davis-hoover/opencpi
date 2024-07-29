@@ -20,7 +20,7 @@ of a ProjectDatabase.
 
 Testing
 =======
-A unit tests is written in python with a test per class member variable. There
+A unit tests is written in python. There
 is also a tools/ocpidev2/test.sh which tests the CLI.
 
 Attribute Handling
