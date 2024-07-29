@@ -1174,7 +1174,8 @@ class Project(AssetBase, ComponentLibraryProjectBase,
                     types.append('rcc platform')
         return types
 
-    def clean(self, _dir):
+    @staticmethod
+    def clean(_dir):
         os.system('rm -rf $(find ' + _dir + ' -type d -name gen)')
         os.system('rm -rf $(find ' + _dir + ' -type d -name lib)')
         os.system('rm -rf $(find ' + _dir + ' -type d -name run)')

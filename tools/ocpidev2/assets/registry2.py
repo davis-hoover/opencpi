@@ -354,18 +354,7 @@ class ProjectRegistry():
         self.dispatch_verb_for_single_dir(cli_dict, _dir)
 
     def clean(self, cli_dict, _dir):
-        if not os.path.exists(_dir):
-            raise Exception(_dir + ' does not exist')
-        self.discover_registered_projects()
-        self.discover_local_project(_dir)
-        cleaned = False
-        for project in self.projects:
-            if (project.abs_path + '/') in (_dir + '/'):
-                project.clean(_dir)
-                cleaned = True
-        if not cleaned:
-            msg = 'cannot clean directory \'' + _dir + '\' not in a project'
-            raise Exception(msg)
+        self.dispatch_verb_for_single_dir(cli_dict, _dir)
 
     def create(self, cli_dict, _dir):
         if cli_dict['name'] is None:
@@ -785,6 +774,13 @@ class ProjectRegistry():
                 msg += unreg_project + ' '
             raise Exception(msg)
 
+    def install_rcc_platform_if_not_installed(self, rcc_platform):
+        for project in self.projects:
+            if project.get_package_id() == 'ocpi.core':
+                tmp_path = project.abs_path + '/rcc/platforms/'
+                if not os.path.isdir(tmp_path + rcc_platform + '/gen'):
+                    System('ocpiadmin install platform ' + rcc_platform)
+
     def clean_imports_exports(self):
         """ TODO is this class the right place for this? """
         for proj in self.projects:
@@ -1076,7 +1072,9 @@ class ProjectDatabase(ProjectRegistry):
         return ret
 
     def dispatch_verb_for_single_dir(self, cli_dict, _dir):
-        """ only 'show' and 'build' verbs for now """
+        """ only 'build' and 'clean' and 'show' verbs for now """
+        if not os.path.exists(_dir):
+            raise Exception(_dir + ' does not exist')
         if cli_dict['globalscope'] and (not cli_dict['localscope']):
             self.discover_registered_projects()
         self.discover_local_project(_dir)
@@ -1108,6 +1106,20 @@ class ProjectDatabase(ProjectRegistry):
                                cli_dict['hdlplatform'],
                                cli_dict['rccplatform'], fs,
                                makefile, cli_dict['j'], tool)
+        elif cli_dict['verb'] == 'clean':
+            cleaned = False
+            if cli_dict['noun'] is None:
+                for project in self.projects:
+                    if (project.abs_path + '/') in (_dir + '/'):
+                        Project.clean(_dir)
+                        cleaned = True
+            else:
+                for asset in assets:
+                    Project.clean(asset.get_dir_abs_path())
+                    cleaned = True
+            if not cleaned:
+                msg = 'cannot clean directory \'' + _dir + '\' not in a project'
+                raise Exception(msg)
         elif cli_dict['verb'] == 'show':
             list_to_show = []
             json_dict = {}
