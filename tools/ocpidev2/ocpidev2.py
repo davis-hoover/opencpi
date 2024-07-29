@@ -19,7 +19,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-""" This file exposes the Command Line Interface (CLI) above and below it
+""" This file exposes the Command Line Interface (CLI) below it, and above it
     interfaces with project-like things (ProjectDatabase), and not individual
     asset classes. """
 

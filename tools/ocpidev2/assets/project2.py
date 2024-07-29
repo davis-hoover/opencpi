@@ -17,10 +17,9 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-""" This file connects the collection of projects above with all possible
+""" This file connects the collection of projects below with all possible
     project constituents (Component, ComponentLibrary, Worker, HdlAssembly,
-    HdlPlatform, etc) below. interfaces with projects and not individual asset
-    classes. """
+    HdlPlatform, etc) above. """
 
 
 import os

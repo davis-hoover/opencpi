@@ -17,8 +17,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-""" This file connects the CLI above with the verb (build/create/etc) interface
-    (ProjectDatabase class) that connects the Project class below. It
+""" This file connects the CLI below with the verb (build/create/etc) interface
+    (ProjectDatabase class) interface of the Project above. It
     interfaces with projects and not individual asset classes. """
 
 
