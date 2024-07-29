@@ -984,12 +984,11 @@ class ProjectDatabase(ProjectRegistry):
 
     def filter_assets(self, cli_dict, assets,
                       assets_on_which_verb_will_be_performed, project, _type,
-                      json_dict={}):
+                      list_to_show=[], json_dict={}):
         """" assets                                 input assets being filtered
              assets_on_which_verb_will_be_performed in/out final list being
                                                     built up """
         first = True
-        list_to_show = []
         for asset in assets:
             passed_any_name_checks = (cli_dict['name'] is None) or \
                     (cli_dict['name'] == asset.name)
@@ -1050,85 +1049,108 @@ class ProjectDatabase(ProjectRegistry):
         return [json_dict, assets_on_which_verb_will_be_performed,
                 list_to_show]
 
+    def get_assets_on_which_verb_will_be_performed(self, cli_dict, _dir):
+        """ for single directory (either working directory or a singel -d
+            option, retrieve list of assets on which the verb will be
+            performed """
+        ret = []
+        for (idx, project) in enumerate(self.projects):
+            if (cli_dict['noun'] is not None) and \
+               (cli_dict['noun'].startswith('project')):
+                if not self.local_project_is_registered:
+                    if idx == self.local_project_idx:
+                        msg = project.get_name() + ' is not registered'
+                        set_g_suppress_warn(False)
+                        Logger().warn(msg)
+                        set_g_suppress_warn(True)
+            if cli_dict['d'] == []:
+                _dir = project.get_dir_abs_path()
+            assets = project.get_assets_within(_dir)
+            if cli_dict['noun'] is None:
+                ret.extend(assets)
+            else:
+                for _type in Project.get_types_from_cli_dict(cli_dict):
+                    assets_of_type = project.get_assets_of_type(_type)
+                    [_, ret, _] = self.filter_assets(cli_dict, assets_of_type,
+                                                     ret, project, _type)
+        return ret
+
     def dispatch_verb_for_single_dir(self, cli_dict, _dir):
+        """ only 'show' and 'build' verbs for now """
         if cli_dict['globalscope'] and (not cli_dict['localscope']):
             self.discover_registered_projects()
         self.discover_local_project(_dir)
-        if cli_dict['noun'] == 'registry':
-            print(self.abs_path)
-        else:
-            num_found = 0
-            if cli_dict['noun'].startswith('target') and \
-               ((cli_dict['authoringmodel'] == '') or
-                    (cli_dict['authoringmodel'] == 'hdl')):
-                for target in ['zynq', 'zynq_ultra', 'zynq_ise', 'virtex6',
-                               'stratix']:
-                    if (cli_dict['name'] is None) or \
-                       (cli_dict['name'] == target):
-                        print(target + '.hdl')
-                        num_found += 1
-            assets_on_which_verb_will_be_performed = []
-            if (not cli_dict['noun'].startswith('target')) or \
-               (cli_dict['authoringmodel'] != 'hdl'):
-                json_dict = {}
-                num_found2 = 0
-                for (idx, project) in enumerate(self.projects):
-                    if cli_dict['noun'].startswith('project'):
-                        if not self.local_project_is_registered:
-                            if idx == self.local_project_idx:
-                                msg = project.get_name() + ' is not registered'
-                                set_g_suppress_warn(False)
-                                Logger().warn(msg)
-                                set_g_suppress_warn(True)
-                    assets = []
-                    for _type in project.get_types_from_cli_dict(cli_dict):
-                        assets.extend(project.get_assets_of_type(_type))
-                    [json_dict, assets,
-                     list_to_show] = self.filter_assets(
-                     cli_dict, assets, assets_on_which_verb_will_be_performed,
-                     project, _type, json_dict)
-                    if cli_dict['verb'] == 'show':
-                        if cli_dict['globalscope']:
-                            msg = '--global-scope does not change behavior, '
-                            msg += 'see man ocpidev2-show'
-                            Logger().warn(msg)
-                        if not cli_dict['json']:
-                            # the list is sorted so that assets are generally
-                            # printed in order of project...component
-                            # library... etc
-                            if len(list_to_show) > 0:
-                                sep = ' ' if cli_dict['simple'] else '\n'
-                                end = '' if cli_dict['simple'] else '\n'
-                                print(*sorted(list_to_show), sep=sep, end=end)
-                    num_found2 = len(assets_on_which_verb_will_be_performed)
-                    if (num_found2 > 1) and \
-                       (not cli_dict['noun'].endswith('s')):
-                        msg = 'multiple entries found for '
-                        msg += cli_dict['noun'] + ' \'' + cli_dict['name']
-                        msg += '\''
-                        raise Exception(msg)
-                if cli_dict['verb'] == 'show':
-                    if cli_dict['simple']:
-                        print('')
-                    if cli_dict['json']:
-                        print(str(json_dict))
-                num_found += num_found2
-            if (num_found == 0) and (not cli_dict['noun'].endswith('s')):
+        assets = self.get_assets_on_which_verb_will_be_performed(cli_dict,
+                                                                 _dir)
+        if (len(assets) == 0):
+            if ((cli_dict['noun'] is not None) and
+                    (not cli_dict['noun'].endswith('s')) and
+                    (not cli_dict['noun'].startswith('target')) and
+                    (not cli_dict['noun'].startswith('registry'))):
                 msg = 'could not find '
                 msg += cli_dict['noun'] + ' \'' + cli_dict['name'] + '\''
                 raise Exception(msg)
-            if cli_dict['verb'] == 'build':
-                # TODO support cli_dict extension (override) of this tool
-                tool = LegacyBuildTool()
-                fs = TemporaryFilesystem()
-                makefile = self.plan_build(
-                    assets_on_which_verb_will_be_performed,
-                    cli_dict['hdltarget'], cli_dict['hdlplatform'],
-                    cli_dict['rccplatform'], fs, tool)
-                self.execute_build(cli_dict['hdltarget'],
-                                   cli_dict['hdlplatform'],
-                                   cli_dict['rccplatform'], fs,
-                                   makefile, cli_dict['j'], tool)
+        if (len(assets) > 1) and \
+           (not cli_dict['noun'].endswith('s')):
+            msg = 'multiple entries found for '
+            msg += cli_dict['noun'] + ' \'' + cli_dict['name']
+            msg += '\''
+            raise Exception(msg)
+        if cli_dict['verb'] == 'build':
+            # TODO support cli_dict extension (override) of this tool
+            tool = LegacyBuildTool()
+            fs = TemporaryFilesystem()
+            makefile = self.plan_build(assets, cli_dict['hdltarget'],
+                                       cli_dict['hdlplatform'],
+                                       cli_dict['rccplatform'], fs, tool)
+            self.execute_build(cli_dict['hdltarget'],
+                               cli_dict['hdlplatform'],
+                               cli_dict['rccplatform'], fs,
+                               makefile, cli_dict['j'], tool)
+        elif cli_dict['verb'] == 'show':
+            list_to_show = []
+            json_dict = {}
+            if cli_dict['globalscope']:
+                msg = '--global-scope does not change behavior, '
+                msg += 'see man ocpidev2-show'
+                Logger().warn(msg)
+            if cli_dict['noun'] == 'registry':
+                if cli_dict['json']:
+                    json_dict[self.abs_path] = {'directory': self.abs_path}
+                else:
+                    list_to_show = [self.abs_path]
+            else:
+                if (cli_dict['noun'] is not None) and \
+                   (cli_dict['noun'].startswith('target') and
+                   ((cli_dict['authoringmodel'] == '') or
+                        (cli_dict['authoringmodel'] == 'hdl'))):
+                    for target in ['zynq', 'zynq_ultra', 'zynq_ise', 'virtex6',
+                                   'stratix']:
+                        if (cli_dict['name'] is None) or \
+                           (cli_dict['name'] == target):
+                            print(target + '.hdl')
+                for project in self.projects:
+                    for _type in Project.get_types_from_cli_dict(cli_dict):
+                        project_assets = []
+                        for asset in assets:
+                            if (project.get_dir_abs_path() + '/') in \
+                               (asset.get_dir_abs_path() + '/'):
+                                project_assets.append(asset)
+                        [json_dict, _, list_to_show] = self.filter_assets(
+                            cli_dict, project_assets, [], project, _type,
+                            list_to_show, json_dict)
+            if cli_dict['json']:
+                print(str(json_dict))
+            else:
+                # the list is sorted so that assets are generally
+                # printed in order of project...component
+                # library... etc
+                if len(list_to_show) > 0:
+                    sep = ' ' if cli_dict['simple'] else '\n'
+                    end = '' if cli_dict['simple'] else '\n'
+                    print(*sorted(list_to_show), sep=sep, end=end)
+                if cli_dict['simple']:
+                    print('')
 
     def show(self, cli_dict, _dir):
         self.dispatch_verb_for_single_dir(cli_dict, _dir)

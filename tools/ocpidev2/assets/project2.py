@@ -1118,59 +1118,61 @@ class Project(AssetBase, ComponentLibraryProjectBase,
         # TODO define HdlTarget, RccTarget class
         return assets
 
-    def get_types_from_cli_dict(self, cli_dict):
+    @staticmethod
+    def get_types_from_cli_dict(cli_dict):
         """ get list of types (asset classes) that correspond to cli_dict noun
             and authoring_model entries """
         types = []
-        if cli_dict['noun'].startswith('adapter'):
-            types.append('hdl worker')
-        if cli_dict['noun'].startswith('application'):
-            types.append('application')
-        if cli_dict['noun'].startswith('assembl'):
-            types.append('hdl assembly')
-        if cli_dict['noun'].startswith('card'):
-            types.append('hdl card')
-        if cli_dict['noun'].startswith('component'):
-            types.append('component')
-        if cli_dict['noun'].startswith('device'):
-            types.append('hdl worker')
-        if cli_dict['noun'].startswith('librar'):
-            types.append('component library')
-        if cli_dict['noun'].startswith('slot'):
-            types.append('hdl slot')
-        if cli_dict['noun'].startswith('platform'):
-            if (cli_dict['authoringmodel'] == '') or \
-               (cli_dict['authoringmodel'] == 'hdl'):
-                types.append('hdl platform')
-            if (cli_dict['authoringmodel'] == '') or \
-               (cli_dict['authoringmodel'] == 'rcc'):
-                types.append('rcc platform')
-        if cli_dict['noun'].startswith('primitive'):
-            if cli_dict['adjective'].startswith('core'):
-                types.append('hdl primitive core')
-            elif cli_dict['adjective'].startswith('librar'):
-                types.append('hdl primitive')
-            else:
-                types.append('hdl primitive core')
-                types.append('hdl primitive')
-        if cli_dict['noun'].startswith('project'):
-            types.append('project')
-        if cli_dict['noun'].startswith('protocol'):
-            types.append('protocol')
-        if cli_dict['noun'].startswith('worker'):
-            if cli_dict['authoringmodel'] != 'rcc':
+        if cli_dict['noun'] is not None:
+            if cli_dict['noun'].startswith('adapter'):
                 types.append('hdl worker')
-            if cli_dict['authoringmodel'] != 'hdl':
-                types.append('rcc worker')
-        if cli_dict['noun'].startswith('test'):
-            types.append('test')
-        if cli_dict['noun'].startswith('target'):
-            if (cli_dict['authoringmodel'] == '') or \
-               (cli_dict['authoringmodel'] == 'hdl'):
-                types.append('hdl platform')  # TODO fix
-            if (cli_dict['authoringmodel'] == '') or \
-               (cli_dict['authoringmodel'] == 'rcc'):
-                types.append('rcc platform')
+            if cli_dict['noun'].startswith('application'):
+                types.append('application')
+            if cli_dict['noun'].startswith('assembl'):
+                types.append('hdl assembly')
+            if cli_dict['noun'].startswith('card'):
+                types.append('hdl card')
+            if cli_dict['noun'].startswith('component'):
+                types.append('component')
+            if cli_dict['noun'].startswith('device'):
+                types.append('hdl worker')
+            if cli_dict['noun'].startswith('librar'):
+                types.append('component library')
+            if cli_dict['noun'].startswith('slot'):
+                types.append('hdl slot')
+            if cli_dict['noun'].startswith('platform'):
+                if (cli_dict['authoringmodel'] == '') or \
+                   (cli_dict['authoringmodel'] == 'hdl'):
+                    types.append('hdl platform')
+                if (cli_dict['authoringmodel'] == '') or \
+                   (cli_dict['authoringmodel'] == 'rcc'):
+                    types.append('rcc platform')
+            if cli_dict['noun'].startswith('primitive'):
+                if cli_dict['adjective'].startswith('core'):
+                    types.append('hdl primitive core')
+                elif cli_dict['adjective'].startswith('librar'):
+                    types.append('hdl primitive')
+                else:
+                    types.append('hdl primitive core')
+                    types.append('hdl primitive')
+            if cli_dict['noun'].startswith('project'):
+                types.append('project')
+            if cli_dict['noun'].startswith('protocol'):
+                types.append('protocol')
+            if cli_dict['noun'].startswith('worker'):
+                if cli_dict['authoringmodel'] != 'rcc':
+                    types.append('hdl worker')
+                if cli_dict['authoringmodel'] != 'hdl':
+                    types.append('rcc worker')
+            if cli_dict['noun'].startswith('test'):
+                types.append('test')
+            if cli_dict['noun'].startswith('target'):
+                if (cli_dict['authoringmodel'] == '') or \
+                   (cli_dict['authoringmodel'] == 'hdl'):
+                    types.append('hdl platform')  # TODO fix
+                if (cli_dict['authoringmodel'] == '') or \
+                   (cli_dict['authoringmodel'] == 'rcc'):
+                    types.append('rcc platform')
         return types
 
     def clean(self, _dir):
