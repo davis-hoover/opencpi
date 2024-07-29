@@ -186,12 +186,12 @@ class Verifier:
             raise RuntimeError("set_port_types() must be called and port " +
                                "protocol types set before verify() is called.")
 
-        # To maintain backward compability this argument can be a list, however
+        # To maintain backward compatibility this argument can be a list, however
         # if is a list then must be a list of one element
         if isinstance(verify_output_file_path, list):
             if len(verify_output_file_path) != 1:
                 raise ValueError("verify_output_file_path can be a list for " +
-                                 "backward compability only. When used as a " +
+                                 "backward compatibility only. When used as a " +
                                  "list must be a list of one element")
             verify_output_file_path = verify_output_file_path[0]
 

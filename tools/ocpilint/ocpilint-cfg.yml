@@ -25,5 +25,6 @@ ignore_pattern:
     - dist/
     # Ignore these filenames
     - "vhdl_format.el"
+    - ocpilint.sh
     # Ignore these extensions
     - "*.egg"

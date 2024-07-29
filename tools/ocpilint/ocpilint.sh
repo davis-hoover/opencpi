@@ -64,16 +64,18 @@ fi
 
   $PYCMD -m venv "$VENV_DIR"
   source "$VENV_DIR/bin/activate"
+  # Update pip to latest version supporting python3.6
+  $PYCMD -m pip install --upgrade "pip<21.3"
   # wheel needs to be installed before the other required packages on Ubuntu 18.04
   #   and doesn't hurt the other OS's, specifically pyyaml requires it.
-  pip3 install "wheel"
-  pip3 install "lxml" "pydocstyle" "pycodestyle" "autopep8" "cpplint" "pyyaml" "jinja2"
+  $PYCMD -m pip install "wheel"
+  $PYCMD -m pip install "lxml" "pydocstyle" "pycodestyle" "autopep8" "cpplint" "pyyaml" "jinja2" "pytest"
 
   # Ubuntu 18.04 version of clang-format is missing dependencies
   #   that aren't in the version of pip3. Install clang-format on the OS
   #   for Ubuntu 18.04 and skip it in the venv
   if [ "$OCPI_TOOL_PLATFORM" != "ubuntu18_04" ]; then
-    pip3 install "clang-format"
+    $PYCMD -m pip install "clang-format"
   fi
   # Empty line after installing for the cosmetics
   echo

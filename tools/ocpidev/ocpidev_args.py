@@ -308,6 +308,10 @@ options = {
         'long': '--workers-as-needed',
         'action': 'store_true'
     },
+    'streamlined_build': {
+        'long': '--streamlined-build',
+        'action': 'store_true'
+    },
     'artifacts_only': {
         'long': '--artifacts-only',
         'action': 'store_true'
@@ -431,6 +435,7 @@ verbs = {
             },
             'hdl': {
                 'options': {
+                    'streamlined_build' : options['streamlined_build'],
                     'workers_as_needed' : options['workers_as_needed'],
                     'artifacts_only' : options['artifacts_only'],
                     'hdl_target': options['hdl_target'],
@@ -493,6 +498,7 @@ verbs = {
                     'dynamic': options['dynamic'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
+                    'streamlined_build' : options['streamlined_build'],
                     'workers_as_needed' : options['workers_as_needed'],
                     'artifacts_only' : options['artifacts_only'],
                     'hdl_target': options['hdl_target'],
@@ -504,6 +510,7 @@ verbs = {
                     'optimize': options['optimize'],
                     'dynamic': options['dynamic'],
                     'generate': options['generate'],
+                    'streamlined_build' : options['streamlined_build'],
                     'workers_as_needed' : options['workers_as_needed'],
                     'artifacts_only' : options['artifacts_only'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
@@ -522,6 +529,7 @@ verbs = {
                     'optimize': options['optimize'],
                     'dynamic': options['dynamic'],
                     'generate': options['generate'],
+                    'streamlined_build' : options['streamlined_build'],
                     'workers_as_needed' : options['workers_as_needed'],
                     'artifacts_only' : options['artifacts_only'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
@@ -578,6 +586,7 @@ verbs = {
             },
             'hdl': {
                 'options': {
+                    'streamlined_build' : options['streamlined_build'],
                     'workers_as_needed' : options['workers_as_needed'],
                     'hdl_target': options['hdl_target'],
                     'hdl_platform': options['hdl_platform'],

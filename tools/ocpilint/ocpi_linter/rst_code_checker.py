@@ -32,7 +32,8 @@ from . import utilities
 class RstCodeCheckerDefaults(base_code_checker.BaseCodeCheckerDefaults):
     """Default settings for RstCodeChecker class."""
     license_notice = (open(pathlib.Path(__file__).parent
-                           .joinpath("license_notices").joinpath("rst.txt"), "r")
+                           .joinpath("license_notices")
+                           .joinpath("rst.txt"), "r")
                       .read())
     underline_symbols = ["=", "-", ":", "'", "\"", "~", "^", "_", "*", "+",
                          "#", "<", ">"]
@@ -69,7 +70,8 @@ class RstCodeChecker(base_code_checker.BaseCodeChecker):
 
         if len(self._code) < self.minimum_number_of_lines:
             issues = [{"line": None,
-                       "message": "File is not large enough to include license notice."}]
+                       "message": "File is not large enough to include" +
+                                  " license notice."}]
             return test_name, issues
 
         line_number = 0
@@ -96,10 +98,12 @@ class RstCodeChecker(base_code_checker.BaseCodeChecker):
         line_number = line_number + 1
 
         # License notice
-        if (len(self._code) - line_number) < self.checker_settings.license_notice.count("\n"):
+        if (len(self._code) - line_number <
+                self.checker_settings.license_notice.count("\n")):
             issues.append({
                 "line": None,
-                "message": "File does not contain the expected license notice."})
+                "message": "File does not contain the expected" +
+                           " license notice."})
             return test_name, issues
 
         for license_line in self.checker_settings.license_notice.splitlines():
@@ -176,9 +180,9 @@ class RstCodeChecker(base_code_checker.BaseCodeChecker):
             if line_text != "":
                 # Check if an underline by seeing if all characters in a line
                 # are the same and an allowed underline symbol
-                if line_text[0] in self.checker_settings.underline_symbols and all(
-                        [character == line_text[0] for
-                         character in line_text[1:]]):
+                if (line_text[0] in self.checker_settings.underline_symbols
+                    and all([character == line_text[0] for
+                             character in line_text[1:]])):
                     if len(line_text) != len(self._code[line_number - 1]):
                         issues.append({
                             "line": line_number + 1,

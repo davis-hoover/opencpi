@@ -1,4 +1,5 @@
 
+/// @TODO delete this file and use DRC.cc/DRC.hh instead
 // This file is expected to be included after the line in the proxy code that includes
 // the proxy worker's type namespace, e.g.:
 // using namespace Drc_plutosdrWorkerTypes;

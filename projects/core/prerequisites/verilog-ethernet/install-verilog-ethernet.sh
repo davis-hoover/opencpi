@@ -45,6 +45,6 @@ if [ ! -e ../.opencpi-patched ]; then
   touch ../.opencpi-patched
 fi
 
-# Link the source into the installation directory
-relative_link ../../verilog-ethernet "$OcpiInstallDir"
+# Copy the source into the installation directory
+cp -r ../../verilog-ethernet/* "$OcpiInstallDir"
 rmdir "$OcpiInstallExecDir"

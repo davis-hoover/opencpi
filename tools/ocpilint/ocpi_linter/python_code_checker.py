@@ -34,8 +34,9 @@ from . import utilities
 
 class PythonCodeCheckerDefaults(base_code_checker.BaseCodeCheckerDefaults):
     """Default settings for PythonCodeChecker class."""
-    license_notice = (open(pathlib.Path(__file__).parent.
-                           joinpath("license_notices").joinpath("python.txt"), "r")
+    license_notice = (open(pathlib.Path(__file__).parent
+                           .joinpath("license_notices")
+                           .joinpath("python.txt"), "r")
                       .read())
     maximum_line_length = 79
     comment_maximum_line_length = 79
@@ -75,13 +76,18 @@ class PythonCodeChecker(base_code_checker.BaseCodeChecker):
             # Option -i means in-place so updates the file
             # Option --exit-code means return 2 if file was changed
             # Option --max-line-length allows custom line length limit
-            process = subprocess.Popen(
-                ["autopep8", "-i",
-                    "--max-line-length", f"{self.checker_settings.maximum_line_length}",
-                    "--exit-code",
-                 ] + self.checker_settings.autopep8_other_options
-                + [self.path])
-            process.wait()
+            cmd = ["autopep8",
+                   "-i",
+                   "--max-line-length",
+                   f"{self.checker_settings.maximum_line_length}",
+                   "--exit-code",
+                   ]
+            cmd.extend(self.checker_settings.autopep8_other_options)
+            cmd.extend(["--", str(self.path)])
+
+            success, issues, process = self._run_external_command(cmd)
+            if not success:
+                return test_name, issues
 
             # As file may have changed re-read in code
             self._read_in_code()
@@ -114,23 +120,31 @@ class PythonCodeChecker(base_code_checker.BaseCodeChecker):
         test_name = "PyCodeStyle"
 
         if self._check_installed("pycodestyle"):
-            process = subprocess.Popen([
+            cmd = [
                 "pycodestyle",
-                "--max-line-length", f"{self.checker_settings.maximum_line_length}",
-                "--max-doc-length", f"{self.checker_settings.comment_maximum_line_length}",
-            ] + self.checker_settings.pycodestyle_other_options
-                + [self.path],
+                "--max-line-length",
+                f"{self.checker_settings.maximum_line_length}",
+                "--max-doc-length",
+                f"{self.checker_settings.comment_maximum_line_length}",
+            ]
+            cmd.extend(self.checker_settings.pycodestyle_other_options)
+            cmd.extend(["--", str(self.path)])
+
+            success, issues, process = self._run_external_command(
+                cmd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE)
-            process.wait()
+            if not success:
+                return test_name, issues
             standard_out = process.communicate()[0]
             pycodestyle_issues = standard_out.decode("utf-8").split("\n")[:-1]
 
             issues = []
             for issue in pycodestyle_issues:
-                if issue.count(":") > 3:
-                    line_number = issue.split(":")[1]
-                    message = issue.split(":", 2)[2]
+                match = self.error_output_regex.match(issue)
+                if match:
+                    line_number = int(match.group("line"))
+                    message = match.group("message")
                     issues.append({"line": line_number, "message": message})
 
         else:
@@ -154,7 +168,8 @@ class PythonCodeChecker(base_code_checker.BaseCodeChecker):
 
         if len(self._code) < self.minimum_number_of_lines:
             issues = [{"line": None,
-                       "message": "File is not large enough to include license notice."}]
+                       "message": "File is not large enough to include" +
+                                  " license notice."}]
             return test_name, issues
 
         # Top line must be hash-bang
@@ -185,10 +200,12 @@ class PythonCodeChecker(base_code_checker.BaseCodeChecker):
         line_number = line_number + 1
 
         # License notice
-        if (len(self._code) - line_number) < self.checker_settings.license_notice.count("\n"):
+        if (len(self._code) - line_number <
+                self.checker_settings.license_notice.count("\n")):
             issues.append({
                 "line": None,
-                "message": "File does not contain the expected license notice."})
+                "message": "File does not contain the expected" +
+                           " license notice."})
             return test_name, issues
 
         for license_line in self.checker_settings.license_notice.splitlines():

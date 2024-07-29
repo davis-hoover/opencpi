@@ -1,0 +1,27 @@
+stages:
+  - test
+
+workflow:
+  auto_cancel:
+      on_new_commit: interruptible
+  rules:
+    - when: always
+
+.test:
+  stage: test
+  timeout: 6h
+  interruptible: true
+  retry: 1
+  variables:
+    GIT_STRATEGY: none
+    IMAGE_REPO: ${CI_OCPI_CONTAINER_REGISTRY}
+    IMAGE_TAG: ${CI_COMMIT_SHORT_SHA}
+  before_script:
+    - cd /home/user/opencpi
+    - source ./cdk/opencpi-setup.sh -r
+  artifacts:
+    when: always
+    paths:
+      - test-report.xml
+    reports:
+      junit: test-report.xml

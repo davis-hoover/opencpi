@@ -18,6 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/// @TODO delete this and replace with OperatingPlan paradigm in DRC.cc/DRC.hh
 #ifndef _OCPI_PROJECTS_RADIO_CTRLR_CONFIGURATOR_AD9361_HH
 #define _OCPI_PROJECTS_RADIO_CTRLR_CONFIGURATOR_AD9361_HH
 

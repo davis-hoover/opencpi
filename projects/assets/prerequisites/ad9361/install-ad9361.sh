@@ -73,7 +73,9 @@ $AR -rs libad9361.a ${SRCNAMES[@]/%/.o}
 ################################################################################
 # 4. Install the deliverables:  OPS file, headers and library
 ################################################################################
-relative_link libad9361.a $OcpiInstallExecDir/lib
+mkdir -p $OcpiInstallExecDir/lib
+mkdir -p $dir/$i.h $OcpiInstallDir/include/
+cp libad9361.a $OcpiInstallExecDir/lib/
 for i in ${INCS[@]}; do
-  relative_link $dir/$i.h $OcpiInstallDir/include
+  cp $dir/$i.h $OcpiInstallDir/include/
 done

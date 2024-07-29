@@ -57,7 +57,8 @@ class OcpiLinter:
                 customise the ruleset used by the linter.
             junit_filename (str, optional): Specifies the JUnit XML output file
                 if desired, set to None to not produce the report.
-            to_console (bool, optional): Should log messages be output to the console?
+            to_console (bool, optional): Should log messages be output to
+                                         the console?
 
         Returns:
             Initialised OcpiLinter instance.
@@ -80,7 +81,8 @@ class OcpiLinter:
         self._junit_filename = junit_filename
         self._junit_report = ElementTree.Element(
             "testsuites",
-            attrib={"timestamp": str(datetime.now().strftime("%Y-%m-%dT%H:%M:%S")),
+            attrib={"timestamp": str(datetime.now()
+                                     .strftime("%Y-%m-%dT%H:%M:%S")),
                     "name": "AllTests",
                     "tests": "0", "failures": "0", "time": "0"})
         self.to_console = to_console
@@ -160,8 +162,9 @@ class OcpiLinter:
             rule_found = True
         else:
             for linter in settings.lint_classes.values():
-                if (file_extension in linter.get_supported_file_extensions() and
-                        file_extension not in linter.get_ignored_file_extensions()):
+                if (file_extension in linter.get_supported_file_extensions()
+                    and file_extension not in
+                        linter.get_ignored_file_extensions()):
                     issues.update(linter(path, settings,
                                          self.to_console).lint())
                     rule_found = True
@@ -200,26 +203,28 @@ class OcpiLinter:
 
         if path.suffix in settings.ignore_ext:
             # Extension
-            logging.debug(
-                f"file ignored, based on extension: {path} [{settings.settings_file}]")
+            logging.debug("file ignored, based on extension: " +
+                          f"{path} [{settings.settings_file}]")
             return True
         elif any([fnmatch(path, f"**/{i}/**") for i in settings.ignore_dir]):
-            logging.debug(
-                f"file ignored, through directory match: {path} [{settings.settings_file}]")
+            logging.debug("file ignored, through directory match: " +
+                          f"{path} [{settings.settings_file}]")
             return True
         elif path.name in settings.ignore_ext:
-            logging.debug(
-                f"file ignored, based on filename match: {path} [{settings.settings_file}]")
+            logging.debug("file ignored, based on filename match: " +
+                          f"{path} [{settings.settings_file}]")
             return True
         elif len(path.parents) <= 1:
             if any([fnmatch(path, i) for i in settings.ignore_dir]):
-                logging.debug(
-                    f"file ignored, through full path match: {path} [{settings.settings_file}]")
+                logging.debug("file ignored, through full path match: " +
+                              f"{path} [{settings.settings_file}]")
                 return True
-        # .is_relative_to was only added in v3.9, so use a resolved path string comp
-        elif any([str(i) in str(path.resolve()) for i in settings.ignore_fullpath]):
-            logging.debug(
-                f"file ignored, through full path match: {path} [{settings.settings_file}]")
+        # .is_relative_to was only added in v3.9,
+        # so use a resolved path string comp
+        elif any([str(i) in str(path.resolve())
+                  for i in settings.ignore_fullpath]):
+            logging.debug("file ignored, through full path match: " +
+                          f"{path} [{settings.settings_file}]")
             return True
         return False
 
@@ -228,9 +233,18 @@ class OcpiLinter:
 
         Args:
             path (str or Path): Root of path to parse files in
-            recursive (bool, optional): Run only for current directory, or recurse into subdirectories. Defaults to False.
-            settings_file (LinterSettings, optional): Settings object to use. Searches for local configuration if None.
+            recursive (bool, optional): Run only for current directory, or
+                    recurse into subdirectories. Defaults to False.
+            settings_file (LinterSettings, optional): Settings object to use.
+                    Searches for local configuration if None.
         """
+        path = pathlib.Path(path)
+
+        if not path.exists():
+            print(f"{path} does not exist, will not be checked / formatted.")
+            logging.warning(f"Skipping not-existant {path}")
+            return
+
         # If the settings file is defined, then only load it once
         settings = self.load_settings_file(path, settings_file)
 
@@ -240,8 +254,8 @@ class OcpiLinter:
 
         if path.is_file():
             if not self._check_file_ignore(path, settings):
-                logging.debug(
-                    f"file added to lint list: {path} [{settings.settings_file}]")
+                logging.debug("file added to lint list: " +
+                              f"{path} [{settings.settings_file}]")
                 self.number_files_to_check += 1
                 settings._files.add(str(path))
             else:
@@ -254,17 +268,25 @@ class OcpiLinter:
 
             for file_item in dir_contents:
                 if recursive and file_item.is_dir():
-                    if any([fnmatch(file_item, f"**/{i}") or fnmatch(file_item, i) for i in settings.ignore_dir]):
+                    if any([fnmatch(file_item, f"**/{i}") or
+                            fnmatch(file_item, i)
+                            for i in settings.ignore_dir]):
                         logging.debug(
-                            f"dir ignored, through partial path match: {file_item} [{settings.settings_file}]")
+                            "dir ignored, through partial path match: " +
+                            f"{file_item} [{settings.settings_file}]")
                         continue
-                    elif any([fnmatch(file_item, pathlib.Path(settings.settings_file.parent, i)) for i in settings.ignore_fullpath]):
+                    elif any(
+                        [fnmatch(file_item,
+                                 pathlib.Path(settings.settings_file.parent, i)
+                                 ) for i in settings.ignore_fullpath]):
                         logging.debug(
-                            f"dir ignored, through full path match: {file_item} [{settings.settings_file}]")
+                            "dir ignored, through full path match: " +
+                            f"{file_item} [{settings.settings_file}]")
                         continue
                     elif file_item in settings.ignore_fullpath:
                         logging.debug(
-                            f"dir ignored, through full pathname match: {file_item} [{settings.settings_file}]")
+                            "dir ignored, through full pathname match: " +
+                            f"{file_item} [{settings.settings_file}]")
                         continue
                     # Recurse into this directory
                     self._parse_tree(file_item, recursive, settings_file)
@@ -274,7 +296,8 @@ class OcpiLinter:
                 elif file_item.is_file():
                     if not self._check_file_ignore(file_item, settings):
                         logging.debug(
-                            f"file added to lint list: {file_item} [{settings.settings_file}]")
+                            "file added to lint list: " +
+                            f"{file_item} [{settings.settings_file}]")
                         self.number_files_to_check += 1
                         settings._files.add(str(file_item))
                     else:
@@ -283,13 +306,15 @@ class OcpiLinter:
             print(f"{path} not a valid file or directory, will not be "
                   + "checked / formatted.")
 
-    def _save_junit_report(self, test_suite, test_results, suite_duration=timedelta(0)):
+    def _save_junit_report(self, test_suite, test_results,
+                           suite_duration=timedelta(0)):
         """Generate JUnit report.
 
         Args:
             test_suite (LinterSettings): Configuration these tests belong to.
             test_results (Dict): Dictionary of result values.
-            suite_duration (timedelta, optional): Time taken for this whole test suite. Defaults to 0 duration.
+            suite_duration (timedelta, optional): Time taken for this whole
+                                 test suite. Defaults to 0 duration.
         """
         num_failures = sum([sum([test.has_failed for test in results.values()])
                             for results in test_results.values()])
@@ -297,7 +322,8 @@ class OcpiLinter:
             self._junit_report,
             "testsuite",
             attrib={"name": str(test_suite.settings_file),
-                    "tests": str(sum([len(result) for result in test_results])),
+                    "tests": str(sum([len(result)
+                                      for result in test_results])),
                     "failures": str(num_failures),
                     "time": str(suite_duration.total_seconds())})
         # Only mention failing rules
@@ -319,7 +345,8 @@ class OcpiLinter:
                     if not result.was_skipped:
                         test.attrib["status"] = "run"
                         test.attrib["time"] = str(
-                            float(test.attrib["time"]) + result.duration.total_seconds())
+                            float(test.attrib["time"]) +
+                            result.duration.total_seconds())
 
                 if result.has_failed:
                     for fail in result.issues:
@@ -328,17 +355,24 @@ class OcpiLinter:
                             "failure",
                             attrib={
                                 "message": "{}:{} {}".format(
-                                    str(filename), fail["line"], fail["message"]),
+                                    str(filename),
+                                    fail["line"],
+                                    fail["message"]),
                                 "type": "ERROR"})
-                        failure.text = "<![CDATA[{}:{}\n{}\nDescription: {}]]>".format(
-                            str(filename), fail["line"], rule_name, fail["message"])
+                        text = "<![CDATA[{}:{}\n{}\nDescription: {}]]>".format(
+                            str(filename), fail["line"],
+                            rule_name, fail["message"])
+                        failure.text = text
 
         self._junit_report.attrib["tests"] = str(
-            int(self._junit_report.attrib["tests"]) + int(suite.attrib["tests"]))
+            int(self._junit_report.attrib["tests"]) +
+            int(suite.attrib["tests"]))
         self._junit_report.attrib["failures"] = str(
-            int(self._junit_report.attrib["failures"]) + int(suite.attrib["failures"]))
+            int(self._junit_report.attrib["failures"]) +
+            int(suite.attrib["failures"]))
         self._junit_report.attrib["time"] = str(
-            float(self._junit_report.attrib["time"]) + float(suite.attrib["time"]))
+            float(self._junit_report.attrib["time"]) +
+            float(suite.attrib["time"]))
 
         # Pretty print/indent to file, overwriting if already exists
         xml_str = ElementTree.tostring(self._junit_report)
@@ -351,8 +385,10 @@ class OcpiLinter:
         """Load and parse LinterSettings file.
 
         Args:
-            path (str or Path): Path to start search (backwards) for settings file.
-            settings_file (LinterSettings, optional): Force configuration file to use. Defaults to None.
+            path (str or Path): Path to start search (backwards)
+                                for settings file.
+            settings_file (LinterSettings, optional): Force configuration
+                                file to use. Defaults to None.
 
         Returns:
             LinterSettings: Configuration to use (either found, or forced)
@@ -388,8 +424,8 @@ class OcpiLinter:
                               + utilities.PrintStyle.NORMAL)
                         logging.info(
                             f"Loading configuration file: {longest_path}")
-                        self._settings[longest_path] = LinterSettings.from_yaml_file(
-                            longest_path)
+                        self._settings[longest_path] = LinterSettings \
+                            .from_yaml_file(longest_path)
                     else:
                         self._settings[longest_path] = LinterSettings.combine(
                             self._settings["default"],
@@ -398,7 +434,8 @@ class OcpiLinter:
                         return self._settings[longest_path]
                 else:
                     print(utilities.PrintStyle.BOLD +
-                          f"Updating configuration from: {longest_path} inheriting: {str(stem/leaf)}"
+                          f"Updating configuration from: {longest_path}" +
+                          f" inheriting: {str(stem/leaf)}"
                           + utilities.PrintStyle.NORMAL)
                     logging.debug(
                         f"Combining {str(stem/leaf)} under {longest_path}")

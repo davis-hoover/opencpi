@@ -47,7 +47,7 @@ from jinja2 import Environment, FileSystemLoader
 
 # Supported OSPs
 OSPS = ["ocpi.osp.analog", "ocpi.osp.e3xx", "ocpi.osp.plutosdr", "ocpi.osp.ettus",
-  "ocpi.osp.avnet", "ocpi.osp.xilinx", "ocpi.osp.n3xx", "ocpi.osp.epiq-solutions"]
+        "ocpi.osp.avnet", "ocpi.osp.xilinx", "ocpi.osp.n3xx", "ocpi.osp.epiq-solutions"]
 OSP_TAGS = dict()  # Will be filled in later
 
 # Supported COMPs
@@ -57,6 +57,7 @@ COMP_TAGS = dict()
 # Other supported projects associated with OpenCPI
 OTHERS = ["ie-gui"]
 OTHER_TAGS = dict()
+
 
 class SectionData(object):
     def __init__(self, name: str, title: str, files: dict):
@@ -581,7 +582,9 @@ def gen_release_index(tag: str, is_latest=False):
             section_name = "main"
             section_title = "Main Documentation"
             # For now, just for the main "opencpi" project.
-            file_links["changelog"] = UrlLink(name="Changelog", url=f'https://gitlab.com/opencpi/opencpi/-/blob/{tag}/CHANGELOG.md')
+            file_links["changelog"] = UrlLink(
+                name="Changelog",
+                url=f'https://gitlab.com/opencpi/opencpi/-/blob/{tag}/CHANGELOG.md')
         else:
             # Projects
             section_name = rootpath.name.lower().replace("-", "_")
@@ -590,7 +593,8 @@ def gen_release_index(tag: str, is_latest=False):
             if section_name == "assets_ts":
                 section_title = "Assets TS"
                 if Path(rst_dir, section_name, "index.html").exists():
-                    file_links[section_name] = UrlLink(name=section_title, url=f"rst/{section_name}/")
+                    file_links[section_name] = UrlLink(
+                        name=section_title, url=f"rst/{section_name}/")
             if section_name.startswith("osp_"):
                 section_name = section_name[4:]  # remove osp_
                 if section_name == "analog":
@@ -612,7 +616,8 @@ def gen_release_index(tag: str, is_latest=False):
                 else:
                     section_title = section_title[4:] + " OSP Documentation"
                 if Path(f"{rst_dir}/osp_{section_name}/index.html").exists():
-                    file_links[section_name] = UrlLink(name=section_title, url=f"rst/osp_{section_name}/")
+                    file_links[section_name] = UrlLink(
+                        name=section_title, url=f"rst/osp_{section_name}/")
             elif section_name.startswith("comp_"):
                 section_name = section_name[5:]  # remove comp_
                 if section_name == "sdr":
@@ -620,11 +625,13 @@ def gen_release_index(tag: str, is_latest=False):
                 else:
                     section_title = section_title[4:] + " Components Documentation"
                 if Path(f"{rst_dir}/comp_{section_name}/index.html").exists():
-                    file_links[section_name] = UrlLink(name=section_title, url=f"rst/comp_{section_name}/")
+                    file_links[section_name] = UrlLink(
+                        name=section_title, url=f"rst/comp_{section_name}/")
             elif section_title not in ["Tutorials", "Briefings"]:
                 section_title += " Project Documentation"
                 if Path(rst_dir, section_name, "index.html").exists():
-                    file_links[section_name] = UrlLink(name=section_title, url=f"rst/{section_name}/")
+                    file_links[section_name] = UrlLink(
+                        name=section_title, url=f"rst/{section_name}/")
             project_names.append(section_name)
 
         for f in files:
@@ -685,7 +692,8 @@ def gen_release_index(tag: str, is_latest=False):
                     section_title = "Epiq Solutions OSP Documentation"
                 else:
                     section_title = section_title[4:] + " OSP Documentation"
-                file_links[section_name] = UrlLink(name=section_title, url=f"rst/osp_{section_name}/")
+                file_links[section_name] = UrlLink(
+                    name=section_title, url=f"rst/osp_{section_name}/")
                 project_names.append(section_name)
                 section_data[section_name] = SectionData(name=section_name, title=section_title,
                                                          files=file_links)
@@ -696,7 +704,8 @@ def gen_release_index(tag: str, is_latest=False):
                     section_title = "SDR Components Documentation"
                 else:
                     section_title = section_title[4:] + " Components Documentation"
-                file_links[section_name] = UrlLink(name=section_title, url=f"rst/comp_{section_name}/")
+                file_links[section_name] = UrlLink(
+                    name=section_title, url=f"rst/comp_{section_name}/")
                 project_names.append(section_name)
                 section_data[section_name] = SectionData(name=section_name, title=section_title,
                                                          files=file_links)
@@ -748,55 +757,37 @@ def gen_release_index(tag: str, is_latest=False):
 
 # Util functions ##############################################################
 
+
+def download_repo(project_path: Path, git_dir: str, repo_type: str):
+    if project_path.exists():
+        logging.info(
+            f"Removing existing {repo_type} {project_path.name} located at {str(project_path)}")
+        shutil.rmtree(str(project_path))
+    # We want the full repo as it will be used later when building each tagged release
+    logging.info(f"Downloading {repo_type} {project_path.name} to {str(project_path)}")
+    # Force local branch to be "develop", which should
+    # be the default branch (pointed to by HEAD) anyway.
+    cmd = ["git", "clone", "--branch", "develop", git_dir, str(project_path)]
+    logging.debug(f"Executing cmd: {cmd}")
+    subprocess.check_call(cmd)
+
+
 def download_osp(osp: str):
     osp_path = OCPI_OSPDIR / osp
-    if osp_path.exists():
-        logging.info(f"Updating existing OSP {osp} located at {osp_path}")
-        cmd = ["git", "--git-dir", str(osp_path / ".git"), "fetch"]
-        logging.debug(f"Executing cmd: {cmd}")
-        subprocess.check_call(cmd)
-    else:
-        # We want the full repo as it will be used later when building each tagged release
-        logging.info(f"Downloading OSP {osp} to {osp_path}")
-        # Force local branch to be "develop", which should
-        # be the default branch (pointed to by HEAD) anyway.
-        cmd = ["git", "clone", "--branch", "develop", f"https://gitlab.com/opencpi/osp/{osp}.git", osp_path]
-        logging.debug(f"Executing cmd: {cmd}")
-        subprocess.check_call(cmd)
+    git_dir = f"https://gitlab.com/opencpi/osp/{osp}.git"
+    download_repo(osp_path, git_dir, 'OSP')
 
 
 def download_comp(comp: str):
     comp_path = OCPI_COMPDIR / comp
-    if comp_path.exists():
-        logging.info(f"Updating existing COMP {comp} located at {comp_path}")
-        cmd = ["git", "--git-dir", str(comp_path / ".git"), "fetch"]
-        logging.debug(f"Executing cmd: {cmd}")
-        subprocess.check_call(cmd)
-    else:
-        # We want the full repo as it will be used later when building each tagged release
-        logging.info(f"Downloading COMP {comp} to {comp_path}")
-        # Force local branch to be "develop", which should
-        # be the default branch (pointed to by HEAD) anyway.
-        cmd = ["git", "clone", "--branch", "develop", f"https://gitlab.com/opencpi/comp/{comp}.git", comp_path]
-        logging.debug(f"Executing cmd: {cmd}")
-        subprocess.check_call(cmd)
+    git_dir = f"https://gitlab.com/opencpi/comp/{comp}.git"
+    download_repo(comp_path, git_dir, 'COMP')
 
 
 def download_other(other: str):
     other_path = OCPI_OTHERDIR / other
-    if other_path.exists():
-        logging.info(f"Updating existing OTHER {other} located at {other_path}")
-        cmd = ["git", "--git-dir", str(other_path / ".git"), "fetch"]
-        logging.debug(f"Executing cmd: {cmd}")
-        subprocess.check_call(cmd)
-    else:
-        # We want the full repo as it will be used later when building each tagged release
-        logging.info(f"Downloading OTHER {other} to {other_path}")
-        # Force local branch to be "develop", which should
-        # be the default branch (pointed to by HEAD) anyway.
-        cmd = ["git", "clone", "--branch", "develop", f"https://gitlab.com/opencpi/{other}.git", other_path]
-        logging.debug(f"Executing cmd: {cmd}")
-        subprocess.check_call(cmd)
+    git_dir = f"https://gitlab.com/opencpi/{other}.git"
+    download_repo(other_path, git_dir, 'OTHER')
 
 
 def find_file(search_dir: Union[str, Path], filename: str,
@@ -956,7 +947,6 @@ if __name__ == "__main__":
         while len(x.parts) != 1 and not x.joinpath("Framework.exports").exists():
             x = x.parent
         return x
-
 
     # Setup some paths
     CURDIR = Path(os.curdir).resolve()

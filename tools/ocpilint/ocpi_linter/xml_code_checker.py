@@ -34,7 +34,8 @@ from lxml import etree as ElementTree
 class XmlCodeCheckerDefaults(base_code_checker.BaseCodeCheckerDefaults):
     """Default settings for XmlCodeChecker class."""
     license_notice = (open(pathlib.Path(__file__).parent
-                           .joinpath("license_notices").joinpath("xml.txt"), "r")
+                           .joinpath("license_notices")
+                           .joinpath("xml.txt"), "r")
                       .read())
     maximum_line_length = 132
     comment_maximum_line_length = 132
@@ -101,20 +102,26 @@ class XmlCodeChecker(base_code_checker.BaseCodeChecker):
         with open(self.path, "w") as linted_file:
             linted_file.writelines(reformat)
 
-        process = subprocess.Popen(["xmllint", "--nonet", "--noblanks",
-                                    "--nocompact", "--format", self.path,
-                                    "-o", self.path],
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE)
-        process.wait()
+        cmd = ["xmllint", "--nonet", "--noblanks", "--nocompact",
+               "--format", str(self.path),
+               "-o", str(self.path)]
+
+        success, issues, process = self._run_external_command(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+        if not success:
+            return test_name, issues
+
         xml_lint_issues = process.communicate()[1].decode("utf-8").split(
             "\n")[0:-1]
 
         issues = []
         for issue in xml_lint_issues:
-            if issue.count(":") > 3:
-                line_number = int(issue.split(":")[1].strip())
-                message = ":".join(issue.split(":")[2:]).strip()
+            match = self.error_output_regex.match(issue)
+            if match:
+                line_number = int(match.group("line"))
+                message = match.group("message")
                 issues.append({"line": line_number, "message": message})
 
         # Get updated file format
@@ -217,14 +224,16 @@ class XmlCodeChecker(base_code_checker.BaseCodeChecker):
                             indent_extra = "  " + " " * len(indent)
                             attr_all = f"{attr_name}={attr_value}"
                             attr_all = insert_newlines(attr_all,
-                                                       max_line_length - len(indent_extra))
+                                                       max_line_length
+                                                       - len(indent_extra))
                             newline_pos = ([match.start(0) for match in (
                                 re.finditer(r"\n", attr_all))])
                             # Apply indent to attribute
                             if len(newline_pos) > 1:
                                 attr_all = (attr_all[:newline_pos[0]] +
-                                            attr_all[newline_pos[0]:-1].replace(
-                                    "\n", "\n" + indent_extra))
+                                            attr_all[newline_pos[0]:-1]
+                                            .replace("\n",
+                                                     "\n" + indent_extra))
                             # Append attribute
                             formatted_attrs += (f" {attr_all}")
                             # Remove trailing whitespace if any
@@ -248,10 +257,11 @@ class XmlCodeChecker(base_code_checker.BaseCodeChecker):
             reformat.append(line_text + "\n")
 
         # Ensure a single "\n" exists at the end
-        while reformat[-1] is "\n":
-            reformat = reformat[:-1]
-        if not reformat[-1].endswith("\n"):
-            reformat[-1] += "\n"
+        if len(reformat):
+            while len(reformat) > 1 and reformat[-1] is "\n":
+                reformat = reformat[:-1]
+            if not reformat[-1].endswith("\n"):
+                reformat[-1] += "\n"
 
         # Re-write file with changes
         with open(self.path, "w") as linted_file:
@@ -284,15 +294,18 @@ class XmlCodeChecker(base_code_checker.BaseCodeChecker):
 
         if len(self._code) < self.minimum_number_of_lines:
             issues = [{"line": None,
-                       "message": "File is not large enough to include license notice."}]
+                       "message": "File is not large enough to include" +
+                                  " license notice."}]
             return test_name, issues
 
         # License notice
         line_number = 1
-        if (len(self._code) - line_number) < self.checker_settings.license_notice.count("\n"):
+        if (len(self._code) - line_number <
+                self.checker_settings.license_notice.count("\n")):
             issues.append({
                 "line": None,
-                "message": "File does not contain the expected license notice."})
+                "message": "File does not contain the expected" +
+                           " license notice."})
             return test_name, issues
 
         for license_line in self.checker_settings.license_notice.splitlines():
@@ -353,7 +366,8 @@ class XmlCodeChecker(base_code_checker.BaseCodeChecker):
             if comment_line:
                 max_length = self.checker_settings.comment_maximum_line_length
                 if len(line_text) > max_length:
-                    # Ensure not commented out code, which is allowed to be any length
+                    # Ensure not commented out code, which is allowed to
+                    # be any length
                     test_if_xml = line_text.replace("<!--", "").replace(
                         "-->", "").strip()
                     if not (test_if_xml[0] == "<" and test_if_xml[-1] == ">"):
@@ -437,7 +451,7 @@ class XmlCodeChecker(base_code_checker.BaseCodeChecker):
         return test_name, issues
 
     def test_xml_005(self):
-        """Check writable property set in component specification.
+        """Check writable properties set in component specification.
 
         **Test name:** Component specification: Property writable attribute set
 
@@ -455,13 +469,19 @@ class XmlCodeChecker(base_code_checker.BaseCodeChecker):
                 return test_name, [{"line": 0,
                                     "message": "Unable to parse xml."}]
             for property_element in root.findall("property"):
-                # Each non-parameter property, must have writable set
-                if not property_element.attrib.get("parameter", False):
-                    if not property_element.attrib.has_key("writable"):
-                        issues.append({
-                            "line": property_element.sourceline,
-                            "message": "Writable attribute of properties "
-                                       + "must be explicitly set."})
+                # Each property, must have at least one of the
+                # "initial"/"parameter"/"volatile"/"writable" properties
+                # set true.
+                attribs = property_element.attrib
+                if not (attribs.get("parameter", "").lower() == "true" or
+                        attribs.get("initial", "").lower() == "true" or
+                        attribs.get("writable", "").lower() == "true" or
+                        attribs.get("volatile", "").lower() == "true"):
+                    issues.append({
+                        "line": property_element.sourceline,
+                        "message": "Property must have at least one of the" +
+                                   " initial/parameter/volatile/writable" +
+                                   " properties set to true"})
 
         return test_name, issues
 
@@ -483,7 +503,7 @@ class XmlCodeChecker(base_code_checker.BaseCodeChecker):
                                     "message": "Unable to parse xml."}]
             for port_element in root.findall("port"):
                 # Each port element must have a producer attribute set
-                if not port_element.attrib.has_key("producer"):
+                if "producer" not in port_element.attrib:
                     issues.append({
                         "line": port_element.sourceline,
                         "message": "Producer attributes of ports must be "
@@ -512,10 +532,11 @@ class XmlCodeChecker(base_code_checker.BaseCodeChecker):
             for property_element in root.findall("property"):
                 # All non volatile property element must have a default value
                 if not property_element.attrib.get("volatile", False):
-                    if not property_element.attrib.has_key("default"):
+                    if "default" not in property_element.attrib:
                         issues.append({
                             "line": property_element.sourceline,
-                            "message": "Properties must have a default value set."})
+                            "message": "Properties must have a default" +
+                                       " value set."})
 
         return test_name, issues
 
@@ -584,7 +605,7 @@ class XmlCodeChecker(base_code_checker.BaseCodeChecker):
                 return test_name, [{"line": 0,
                                     "message": "Unable to parse xml."}]
             if root.tag == "componentspec":
-                if root.attrib.has_key("name"):
+                if "name" in root.attrib:
                     issues.append({
                         "line": root.sourceline,
                         "message": "A component specification must not "
@@ -637,7 +658,8 @@ class XmlCodeChecker(base_code_checker.BaseCodeChecker):
                 if value is None:
                     issues.append({
                         "line": element.sourceline,
-                        "message": "Port does not have the \"producer\" attribute."})
+                        "message": "Port does not have the \"producer\"" +
+                                   " attribute."})
                 if str(value).lower() == "true":
                     outputs_found = True
                 elif str(value).lower() == "false":
@@ -651,7 +673,8 @@ class XmlCodeChecker(base_code_checker.BaseCodeChecker):
                 else:
                     issues.append({
                         "line": element.sourceline,
-                        "message": "A port has an unexpected value for the \"producer\" attribute."})
+                        "message": "A port has an unexpected value for" +
+                                   " the \"producer\" attribute."})
 
         return test_name, issues
 
@@ -676,10 +699,11 @@ class XmlCodeChecker(base_code_checker.BaseCodeChecker):
             for property_element in root.findall("property"):
                 # All non volatile property elements must have a default value
                 if not property_element.attrib.get("volatile", False):
-                    if not property_element.attrib.has_key("default"):
+                    if "default" not in property_element.attrib:
                         issues.append({
                             "line": property_element.sourceline,
-                            "message": "All properties must have a default value."
+                            "message": "All properties must have a" +
+                                       " default value."
                         })
 
         return test_name, issues
@@ -703,7 +727,7 @@ class XmlCodeChecker(base_code_checker.BaseCodeChecker):
                 return test_name, [{"line": 0,
                                     "message": "Unable to parse xml."}]
             for property_element in root.findall("property"):
-                if not property_element.attrib.has_key("description"):
+                if "description" not in property_element.attrib:
                     issues.append({
                         "line": property_element.sourceline,
                         "message": "All properties should have a description."

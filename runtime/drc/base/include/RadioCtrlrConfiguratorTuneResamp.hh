@@ -18,6 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/// @TODO delete this file and use DRC.cc/DRC.hh instead
 #ifndef _OCPI_PROJECTS_DIG_RADIO_CONFIGURATOR_TUNE_RESAMP_HH
 #define _OCPI_PROJECTS_DIG_RADIO_CONFIGURATOR_TUNE_RESAMP_HH
 

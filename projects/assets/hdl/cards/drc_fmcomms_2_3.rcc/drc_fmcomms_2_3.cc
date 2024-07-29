@@ -6,6 +6,7 @@
  * This file contains the implementation skeleton for the drc_fmcomms_2_3 worker in C++
  */
 
+/// @TODO move to DRC.cc/DRC.hh paradigm
 #include "drc_fmcomms_2_3-worker.hh"
 
 // These are the helper classes for the ad9361 helpers

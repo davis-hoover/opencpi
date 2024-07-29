@@ -39,29 +39,11 @@ Here the term linter is used to cover linter, code style checks, static code che
    code_checkers_functionality
    lint_settings_file
 
-Installing
-----------
-``ocpi_linter`` is written for and tested with Python 3.6 - newer versions may work, older versions are not expected to. Python must be installed before attempting to install ``ocpi_linter``.
-
-To install ``ocpi_linter`` if you have ``pip3`` installed, from the ``ocpi_linter`` directory (which contains ``setup.py``) use the command:
-
-.. code-block:: bash
-
-   pip3 install --user ./
-
-Alternatively if you do not have ``pip3`` installed Python can be used directly:
-
-.. code-block:: bash
-
-   python3 setup.py install
-
-Depending on your set-up you may need to run the above command as ``sudo``.
-
 Requirements
 ------------
 ``ocpi_linter`` requires:
 
- * Python 3.6.
+ * Python 3.6. ``ocpi_linter`` is written for and tested with Python 3.6 - newer versions may work, older versions are not expected to.
 
  * ``clang-format`` to run all tests for C++ files.
 
@@ -107,9 +89,13 @@ Options available are:
 
  * ``-s SETTINGS`` / ``--settings SETTINGS``: Override directory lint configuration searching with the named yaml file ``SETTINGS``.
 
- * ``--skeleton``: Copies an empty lint configuration file to the path defined as ``PATH``, then quits (if no path provided then defaults to: ``./ocpilint-cfg.yml``).
+ * ``--skeleton``: Copies an empty lint configuration file to the path defined, then quits (if no path provided then defaults to: ``./ocpilint-cfg.yml``).
 
- * ``--verbose``: Stores a processing log to: ./lint_log_debug.log.
+ * ``--console``: Show linting issues on the console.
+
+ * ``--logging [LOG_FILE]``: Stores a processing log to the specified location (defaults to ``./lint_log_debug.log``).
+
+ * ``--verbose [LEVEL]``: Sets the verbosity: DEBUG, INFO, WARNING, ERROR.
 
 
 Marking Exceptions
@@ -130,3 +116,12 @@ Lint Settings
 The linter operation can have it's behaviour customised for a project, or sub-directory within a project. This is achieved through searching for settings files, with the name ``ocpilint-cfg.yml``. These are YAML files containing configurations which are appended to any existing rule-sets provided (this follows the same principle as ``.gitignore`` files).
 
 These files are covered in detail within :doc:`lint_settings_file`.
+
+
+Library Testing
+---------------
+``ocpi_linter`` has been tested using Python's ``pytest`` module. Tests are most easily run by using the following command in the ``tools/ocpilint`` directory:
+
+.. code-block:: python
+
+   python3 -m pytest

@@ -87,7 +87,7 @@ namespace OCPI {
       PVULong("bufferSize"),
       PVString("portBufferCount"), // internal usage since bufferCount/Size are overloaded for two types
       PVString("portBufferSize"),
-      PVUChar("index"),
+      PVUShort("index"),
       PVString("interconnect"),
       PVString("adapter"),
       PVString("configure"),

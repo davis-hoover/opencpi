@@ -1,28 +1,14 @@
-workflow:
-  rules:
-    - if: ($CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_TAG == null && $CI_COMMIT_REF_NAME != "develop")
-    # Never run pipelines for pushes (except for develop and tags)
-      when: never
-    - when: always
-
 stages:
-  - clone-project
-  - trigger-opencpi
+  - opencpi
 
-clone-project:
-  stage: clone-project
-  tags: ['aws', 'eks', 'opencpi']
-  variables:
-    GIT_CLONE_PATH: /builds/$CI_PIPELINE_ID/$CI_PROJECT_NAME
-  script: echo $PWD && ls -al
-
-trigger-opencpi:
-  stage: trigger-opencpi
+opencpi:
+  stage: opencpi
   variables:
     CI_OCPI_SOURCE_REF_NAME: "$CI_COMMIT_REF_NAME"
-    CI_OCPI_SOURCE_PROJECT_NAME: "$CI_PROJECT_NAME"
-    CI_OCPI_PROJECTS: "${CI_OCPI_PROJECTS}"
-    CI_OCPI_ROOT_PIPELINE_ID: $CI_PIPELINE_ID
+    CI_OCPI_SOURCE_COMMIT_SHA: "$CI_COMMIT_SHORT_SHA"
+    PLATFORMS: $PLATFORMS
+    OSPS: $CI_PROJECT_NAME
+    DO_SIM: 'False'
   trigger:
     project: opencpi/opencpi
     branch: '$CI_OCPI_REF_NAME'
@@ -30,8 +16,3 @@ trigger-opencpi:
     forward:
       yaml_variables: true
       pipeline_variables: true
-  rules:
-    - if: $CI_OCPI_PLATFORMS != null
-      variables:
-        CI_OCPI_PLATFORMS: "${CI_OCPI_PLATFORMS}"
-    - when: always

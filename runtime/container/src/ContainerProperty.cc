@@ -192,6 +192,10 @@ namespace OCPI {
       switch (m.m_baseType) {
 #undef OCPI_DATA_TYPE_S
 #define OCPI_DATA_TYPE_S(sca,corba,letter,bits,run,pretty,store)
+// When "-Werror=type-limits" is in effect, the following
+// "define" causes a compilation error at lines 207 and 210.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic warning "-Wtype-limits"
 #define OCPI_DATA_TYPE(sca,corba,letter,bits,run,pretty,store)		\
       case OCPI_##pretty: {						\
 	ocpiDebug("getting internal: " #pretty);			\
@@ -228,6 +232,7 @@ namespace OCPI {
 	return static_cast<val_t>(val);					\
       }
       OCPI_PROPERTY_DATA_TYPES
+#pragma GCC diagnostic pop
 #undef OCPI_DATA_TYPE
 #undef OCPI_DATA_TYPE_S
 #define OCPI_DATA_TYPE_S OCPI_DATA_TYPE

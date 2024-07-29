@@ -18,6 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/// @TODO delete this file and use DRC.cc/DRC.hh instead (test_drc.rcc has an interesting example of C macros to do the same thing this LogPrefix class is doing)
 #include <cstdarg> // va_list, va_start(), va_end()
 #include <cstdio>  // printf()
 #include "OcpiDebugApi.hh"
