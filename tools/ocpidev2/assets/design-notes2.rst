@@ -1,14 +1,36 @@
-1. OpenCPI concepts are typically created as small data structures correspond to their documentation/XML definitions, and the each concept is built from the perspective of the project it exists within. This helps keep each concept class small, and aids in project traversion that is intrinsic to the build process.
-2. Python Unit tests are written with a test per class member variable
-3. assets undergo build/clean/show/etc from the perspective of a ProjectDatabase
-4. XML tags are always defined in the same upper camel case as the documentation, e.g., HdlAssembly as defined in get_root_tags(), and then case variants, e.g., hdlassembly occuring in an XML file, are handled within the XML parsing classes (AttributeBase) that compare the lower case of everything
+Supported Versions
+==================
+The ocpidev2 script is generally meant to work for any OpenCPI project. Many
+pre-2.0 OpenCPI mechanisms, nameonly GNU Make variables in makefiles across a
+project, still exist in 2.0-and-after OpenCPI projects. The ocpidev2 script
+makes it all "just work". Pre-OpenCPI-2.0 documentation can be seen
+here: https://gitlab.com/opencpi/opencpi/-/blob/v1.7.0/doc/odt/OpenCPI_Component_Development_Guide.fodt
 
-pre-OpenCPI-2.0 documentation here: https://gitlab.com/opencpi/opencpi/-/blob/v1.7.0/doc/odt/OpenCPI_Component_Development_Guide.fodt
-
-Python File Imports
-===================
+Architecture
+============
+OpenCPI concepts are typically created as small data structures correspond to
+their documentation/XML definitions. Objects do not known about their
+containing directories or what they represent. This helps keep each concept
+class small and scoped similar to their corresponding Dev Guide documentation.
+The Project and ProjectDatabase classes do a lot of the heavy lifting
+for project traversion. Assets undergo build/clean/show/etc from the perspective
+of a ProjectDatabase.
 
 .. image:: ocpidev2_import_diagram.svg
+
+Testing
+=======
+A unit tests is written in python with a test per class member variable. There
+is also a tools/ocpidev2/test.sh which tests the CLI.
+
+Attribute Handling
+==================
+
+XML tags are always defined in the python code in the same upper camel case as
+the documentation, e.g., HdlAssembly is defined in a certain get_root_tags()
+method. The attribute case variants, e.g., hdlassembly occuring in an XML file,
+are handled within the XML parsing classes (AttributeBase) that compare the
+lower case of everything.
 
 Registry Behavior
 =================
@@ -42,11 +64,12 @@ Asset objects
 Top-Level Attribute, Exposing to CLI
 ====================================
 
-1. Top-level attributes are defined in the list returned be each asset class's get_attr_infos() method
-2. Top-level attributes are typically exposed to the CLI, in a name that is similar to the attribute (sometimes not)
-3. Typical CLI-to-XML flow during 'ocpidev2 create' is, e.g.,
+Note that 'git grep cli_dict' is helpful in tying the following description to the codebase.
 
-    args.include_dirs
+1. Top-level attributes, e.g. SourceFiles, and all of their associated information are defined by the list returned in each asset class's get_attr_infos() method
+2. Top-level attributes are typically exposed to the CLI, in a name that is similar to the attribute (sometimes not)
+
+    args.include_dirs (matches attribute cli[1] defined in get_attr_infos())
 
       =DICT()=>
 
@@ -56,9 +79,9 @@ Top-Level Attribute, Exposing to CLI
 
     mydict["includedir"]
 
-      =>
+      =lowercase=>
 
-    "includedir"
+    cli_dict["includedir"]
 
       <=COMPARE=>
 
@@ -66,7 +89,7 @@ Top-Level Attribute, Exposing to CLI
 
       <== lower()
 
-    "IncludeDir" (matches attribute name defined in get_attr_infos()
+    "IncludeDir" (matches attribute name defined in get_attr_infos())
 
       <=
 
