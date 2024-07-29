@@ -8,7 +8,7 @@ pre-OpenCPI-2.0 documentation here: https://gitlab.com/opencpi/opencpi/-/blob/v1
 Python File Imports
 ===================
 
-.. image:: ocpidev_import_diagram.svg
+.. image:: ocpidev2_import_diagram.svg
 
 Registry Behavior
 =================
