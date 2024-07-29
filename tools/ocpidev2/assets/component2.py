@@ -381,7 +381,10 @@ class Component(AssetBase):
         is in or its package ID. """
 
     def __init__(self, xml_abs_path, cli_dict=None):
-        """ xml_abs_path is None for ComponentSpec embedded in OWD """
+        """ xml_abs_path is None for ComponentSpec embedded in OWD,
+            cli_dict must be None when discovering existing OCS files on the
+            filesystem, and when not None, must be a dict containing
+            entries according to get_attr_infos (e.g. 'nocontrol') """
         self.root_tags = ['ComponentSpec']
         AssetBase.__init__(self, xml_abs_path, cli_dict)
         Logger().debug('parsing ' + self.get_xml_abs_path())

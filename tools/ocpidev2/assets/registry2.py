@@ -1091,6 +1091,7 @@ class ProjectDatabase(ProjectRegistry):
                 msg += cli_dict['noun'] + ' \'' + cli_dict['name'] + '\''
                 raise Exception(msg)
         if (len(assets) > 1) and \
+           (cli_dict['noun'] is not None) and \
            (not cli_dict['noun'].endswith('s')):
             msg = 'multiple entries found for '
             msg += cli_dict['noun'] + ' \'' + cli_dict['name']
