@@ -737,6 +737,16 @@ class ProjectRegistry():
         makefile.rules[gnu_make_target_name].recipe = recipe
         return makefile
 
+    def append_application_rules_to_makefile_variable(self, asset, hdl_targets,
+                                                      hdl_platforms,
+                                                      rcc_platforms,
+                                                      makefile,
+                                                      gnu_make_target_name, tool):
+        recipe = tool.get_gnu_make_recipe(asset, hdl_targets, hdl_platforms,
+                                          rcc_platforms)
+        makefile.rules[gnu_make_target_name].recipe = recipe
+        return makefile
+
     def append_asset_rules_to_makefile_variable(self, asset, hdl_targets,
                                                 hdl_platforms, rcc_platforms,
                                                 makefile, gnu_make_target_str,
@@ -746,6 +756,10 @@ class ProjectRegistry():
         makefile.rules[gnu_make_target_str] = GNUMakeRule()
         target = GNUMakeTarget(gnu_make_target_str)
         makefile.rules[gnu_make_target_str].targets.append(target)
+        if asset.get_type() == 'application':
+            makefile = self.append_application_rules_to_makefile_variable(
+                    asset, hdl_targets, hdl_platforms, rcc_platforms,
+                    makefile, gnu_make_target_str, tool)
         if asset.get_type() == 'hdl primitive':
             makefile = self.append_prim_rules_to_makefile_variable(
                     asset, hdl_targets, hdl_platforms, rcc_platforms,
@@ -1274,6 +1288,7 @@ class LegacyBuildTool():
             cmd += '/include/' + self.get_mk_filename(asset)
         cmd = self.get_make_build_str(cmd, hdl_targets, 'HdlTargets')
         cmd = self.get_make_build_str(cmd, hdl_platforms, 'HdlPlatforms')
+        cmd = self.get_make_build_str(cmd, rcc_platforms, 'RccPlatforms')
         return cmd
 
 
