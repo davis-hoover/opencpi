@@ -853,7 +853,7 @@ class Project(AssetBase, ComponentLibraryProjectBase,
 
     def create_asset(self, cli_dict, _dir):
         dir_abs_path = _dir
-        app_dir = None
+        apps_dir = None
         if cli_dict['noun'] == 'application':
             if not os.path.exists(self.get_dir_abs_path() + '/applications'):
                 msg = 'performing \'' + cli_dict['verb']
