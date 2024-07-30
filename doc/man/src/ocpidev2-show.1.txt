@@ -83,6 +83,12 @@ Asset types to be specified in the '<noun>' argument are:
 *`projects`*::
     Display all projects.
 
+*`protocol`*::
+    Display information on the protocol with the specified '<name>'.
+
+*`protocols`*::
+    Display all protocols.
+
 *`registry`*::
     Display information on the registry.
 

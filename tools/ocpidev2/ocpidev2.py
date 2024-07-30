@@ -396,6 +396,9 @@ def get_cli_dict():
         cli_dict['localscope'] = False
     if 'globalscope' not in cli_dict.keys():
         cli_dict['globalscope'] = True
+    if cli_dict['name'] is not None:
+        if cli_dict['name'] in ['gen', 'lib']:
+            raise Exception('name \'' + cli_dict['name'] + '\' is not allowed')
     return cli_dict
 
 
