@@ -594,14 +594,18 @@ class Project(AssetBase, ComponentLibraryProjectBase,
                 msg = cli_dict['noun'] + ' \'' + cli_dict['name']
                 msg += '\' can not exist within ' + _dir
                 msg += ' (' + cli_dict['noun'] + ' can only be created within '
-                msg += '<project>/specs or a component library '
+                if not cli_dict['noun'].startswith('test'):
+                    msg += 'a <project>/specs or '
+                msg += 'a component library '
                 if cli_dict['noun'].startswith('protocol'):
                     msg += 'specs '
                 msg += 'directory, set -d, or the working directory, to '
                 if cli_dict['noun'].startswith('protocol'):
                     msg += '<project>/specs or a component library specs '
                 else:
-                    msg += '<project>/specs or a component library <library>'
+                    if not cli_dict['noun'].startswith('test'):
+                        msg += 'a <project>/specs or '
+                    msg += 'a component <library>'
                 msg += ' directory)'
                 raise Exception(msg)
             dir_abs_path = _dir
@@ -765,9 +769,11 @@ class Project(AssetBase, ComponentLibraryProjectBase,
             msg = cli_dict['authoringmodel'] + ' ' + cli_dict['noun'] + ' '
             msg += cli_dict['name']
             msg += ' can not exist within ' + _dir
-            msg += ' (must exist within <project>/hdl/platforms directory, '
+            msg += ' (must exist within <project>/' + cli_dict['authoringmodel']
+            msg += '/platforms directory, '
             msg += 'set -d, or the working directory, to '
-            msg += '<project>/hdl/platforms)'
+            msg += '<project>/' + cli_dict['authoringmodel']
+            msg += '/platforms)'
             raise Exception(msg)
         if cli_dict['authoringmodel'] == 'hdl':
             dir_abs_path = self.get_dir_abs_path() + '/hdl/platforms/' + \
