@@ -553,9 +553,10 @@ def test_Component(ret):
     test_results.append(test_Component_get_attr_infos(component))
     test_results.append(test_Component_parse(component))
     test_results.append(test_Component_get_type(component))
-    #tests_results.append(test_Property())
+    # tests_results.append(test_Property())
     ret = not (False in test_results)
     return ret
+
 
 def test_Component_init():
     fs = TemporaryFilesystem()
@@ -583,9 +584,10 @@ def test_Component_init():
     log_pass_fail('testing Component init()', passed)
     return component, passed
 
+
 def test_Component_create():
     passed = False
-    cli_dict={'nocontrol': False}
+    cli_dict = {'nocontrol': False}
     fs = TemporaryFilesystem()
     dir_abs_path = fs.abs_path + 'proj/components/cmp1.comp'
     xml_abs_path = dir_abs_path + '/cmp1-comp.xml'
@@ -625,6 +627,7 @@ def test_Component_create():
     log_pass_fail('testing Component create()', passed)
     return passed
 
+
 def test_Component_get_attr_infos(component):
     passed = False
     attr_infos = component.get_attr_infos()
@@ -643,13 +646,14 @@ def test_Component_get_attr_infos(component):
         assert attr_infos[1].cli[1] == '--no-control', msg
         msg = ('attr_infos[1].is_bool Expected: \'' + 'True' +
                '\' but got: \'' + str(attr_infos[1].is_bool) + '\'')
-        assert attr_infos[1].is_bool == True, msg
+        assert attr_infos[1].is_bool is True, msg
         passed = True
     except AssertionError as e:
         Logger().debug('test_Component_get_attr_infos: ' + str(e))
         passed = False
     log_pass_fail('testing Component get_attr_infos()', passed)
     return passed
+
 
 def test_Component_parse(component):
     passed = False
@@ -666,6 +670,7 @@ def test_Component_parse(component):
         passed = False
     log_pass_fail('testing Component parse()', passed)
     return passed
+
 
 def test_Component_get_type(component):
     passed = False

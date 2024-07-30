@@ -218,7 +218,6 @@ def get_arg_parser():
 def get_args(parser):
     # below 3 lines parse, allowing for posix conformance (intermixed args)
     (args, unknown_args) = parser.parse_known_args()
-    print(str(unknown_args))
     for unknown_arg in unknown_args:
         if unknown_arg.startswith('application') or \
            unknown_arg.startswith('assembl') or \
@@ -333,7 +332,7 @@ def get_cli_dict():
     cli_dict = ({key.replace('_', ''): val for key, val in cli_dict.items()})
     if (cli_dict['noun'] == 'worker') or (cli_dict['noun'] == 'device') or \
        (cli_dict['noun'] == 'adapter'):
-        if cli_dict['name'] == None:
+        if cli_dict['name'] is None:
             msg = 'name must be specified for \'' + cli_dict['noun'] + '\''
             raise Exception(msg)
         authoring_model_from_name = cli_dict['name'].split('.')[-1]
@@ -396,7 +395,8 @@ def get_cli_dict():
         else:
             if ((cli_dict['name'] is None) and (cli_dict['d'] == [])) and \
                (cli_dict['noun'] != 'registry'):
-                raise Exception('must specify name or -d')
+                if cli_dict['verb'] != 'register':
+                    raise Exception('must specify name or -d')
     if ('worker' in cli_dict.keys()) and (cli_dict['worker'] != []):
         raise Exception('do not use --worker, instead create separate workers')
     if 'localscope' not in cli_dict.keys():

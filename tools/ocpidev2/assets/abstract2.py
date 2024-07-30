@@ -895,14 +895,16 @@ class AssetBase(AttributeBase):
                                 val = int(val)
                             except TypeError:
                                 msg = 'for attribute \'' + attr_info.key
-                                msg += '\', value of ' + str(val) + ' is not a valid integer'
+                                msg += '\', value of ' + str(val)
+                                msg += ' is not a valid integer'
                                 raise Exception(msg)
                         elif attr_info.is_bool:
                             try:
                                 val = bool(val)
                             except TypeError:
                                 msg = 'for attribute \'' + attr_info.key
-                                msg += '\', value of ' + str(val) + ' is not a valid boolean'
+                                msg += '\', value of ' + str(val)
+                                msg += ' is not a valid boolean'
                                 raise Exception(msg)
                         self.attrs[attr_info.key] = val
 

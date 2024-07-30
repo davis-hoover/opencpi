@@ -13,8 +13,14 @@ ocpidev2 -h
 ocpidev2 --help
 ocpidev2 create -h
 ocpidev2 create --help
+ocpidev2 build -h
+ocpidev2 build --help
+ocpidev2 register -h
+ocpidev2 register --help
 ocpidev2 show -h
 ocpidev2 show --help
+ocpidev2 unregister -h
+ocpidev2 unregister --help
 ocpidev2 unittest
 ocpidev2 unittest -v
 ocpidev2 unittest --verbose
@@ -133,11 +139,11 @@ ocpidev2 create hdl device sma.hdl -d core2/hdl/devices --language vhdl --versio
 ocpidev2 create hdl device time_server.hdl -d core2/hdl/devices --language vhdl --version 2
 ocpidev2 create hdl device unoc2cp.hdl -d core2/hdl/devices --language vhdl --version 2
 ocpidev2 create hdl device unoc_term.hdl -d core2/hdl/devices --language vhdl --version 2
-ocpidev2 create hdl platform isim -d core2/hdl/platforms --language vhdl --spec platform
-ocpidev2 create hdl platform modelsim -d core2/hdl/platforms --language vhdl --spec platform --component-library sdp
-ocpidev2 create hdl platform riviera -d core2/hdl/platforms --language vhdl --spec platform --component-library sdp
-ocpidev2 create hdl platform x4sim -d core2/hdl/platforms --language vhdl --spec platform --component-library sdp --component-library util --version 2
-ocpidev2 create hdl platform xsim -d core2/hdl/platforms --language vhdl --spec platform --component-library sdp --configuration base --configuration cfg_pps_sim_test
+ocpidev2 create hdl platform isim -d core2/hdl/platforms --language vhdl --component platform
+ocpidev2 create hdl platform modelsim -d core2/hdl/platforms --language vhdl --component platform --component-library sdp
+ocpidev2 create hdl platform riviera -d core2/hdl/platforms --language vhdl --component platform --component-library sdp
+ocpidev2 create hdl platform x4sim -d core2/hdl/platforms --language vhdl --component platform --component-library sdp --component-library util --version 2
+ocpidev2 create hdl platform xsim -d core2/hdl/platforms --language vhdl --component platform --component-library sdp --configuration base --configuration cfg_pps_sim_test
 ocpidev2 create rcc platform centos7 -d core2/rcc/platforms
 ocpidev2 create rcc platform centos8 -d core2/rcc/platforms
 ocpidev2 create rcc platform macos10_13 -d core2/rcc/platforms
@@ -337,13 +343,13 @@ ocpidev2 create hdl device unoc2cp.hdl --language vhdl --version 2
 ocpidev2 create hdl device unoc_term.hdl --language vhdl --version 2
 popd
 pushd core2
-ocpidev2 create hdl platform isim -d hdl/platforms --language vhdl --spec platform
+ocpidev2 create hdl platform isim -d hdl/platforms --language vhdl --component platform
 popd
 pushd core2/hdl/platforms
-ocpidev2 create hdl platform modelsim --language vhdl --spec platform --component-library sdp
-ocpidev2 create hdl platform riviera --language vhdl --spec platform --component-library sdp
-ocpidev2 create hdl platform x4sim --language vhdl --spec platform --component-library sdp --component-library util --version 2
-ocpidev2 create hdl platform xsim --language vhdl --spec platform --component-library sdp --configuration base --configuration cfg_pps_sim_test
+ocpidev2 create hdl platform modelsim --language vhdl --component platform --component-library sdp
+ocpidev2 create hdl platform riviera --language vhdl --component platform --component-library sdp
+ocpidev2 create hdl platform x4sim --language vhdl --component platform --component-library sdp --component-library util --version 2
+ocpidev2 create hdl platform xsim --language vhdl --component platform --component-library sdp --configuration base --configuration cfg_pps_sim_test
 popd
 pushd core2
 ocpidev2 create rcc platform centos7 -d rcc/platforms

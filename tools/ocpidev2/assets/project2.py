@@ -348,7 +348,7 @@ class Project(AssetBase, ComponentLibraryProjectBase,
         self.project_dependencies.extend(self.attrs['ProjectDependencies'])
         # TODO: Include these checks in other parse() get_attr_list logic
         if self.attrs['PackagePrefix'] != '':
-            if not self.attrs['PackagePrefix'].replace('.','').isidentifier():
+            if not self.attrs['PackagePrefix'].replace('.', '').isidentifier():
                 msg = 'PackagePrefix must contain only alphanumeric '
                 msg += 'characters and not start with a number'
                 raise InvalidAssetError(msg)
@@ -780,7 +780,8 @@ class Project(AssetBase, ComponentLibraryProjectBase,
             msg = cli_dict['authoringmodel'] + ' ' + cli_dict['noun'] + ' '
             msg += cli_dict['name']
             msg += ' can not exist within ' + _dir
-            msg += ' (must exist within <project>/' + cli_dict['authoringmodel']
+            msg += ' (must exist within <project>/'
+            msg += cli_dict['authoringmodel']
             msg += '/platforms directory, '
             msg += 'set -d, or the working directory, to '
             msg += '<project>/' + cli_dict['authoringmodel']

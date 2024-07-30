@@ -303,8 +303,6 @@ class ProjectRegistry():
             if cli_dict['verb'] == 'show':
                 set_g_suppress_warn(True)
             for _dir in dirs_to_operate_on:
-                # if not os.path.exists(_dir):
-                #     raise Exception('directory \'' + _dir + '\' does not exist')
                 if cli_dict['verb'] == 'create':
                     if cli_dict['name'] is None:
                         raise Exception('\'create\' requires a name')
@@ -743,7 +741,8 @@ class ProjectRegistry():
                                                       hdl_platforms,
                                                       rcc_platforms,
                                                       makefile,
-                                                      gnu_make_target_name, tool):
+                                                      gnu_make_target_name,
+                                                      tool):
         recipe = tool.get_gnu_make_recipe(asset, hdl_targets, hdl_platforms,
                                           rcc_platforms)
         makefile.rules[gnu_make_target_name].recipe = recipe
@@ -1135,7 +1134,8 @@ class ProjectDatabase(ProjectRegistry):
                     Project.clean(asset.get_dir_abs_path())
                     cleaned = True
             if not cleaned:
-                msg = 'cannot clean directory \'' + _dir + '\' not in a project'
+                msg = 'cannot clean directory \'' + _dir
+                msg += '\' not in a project'
                 raise Exception(msg)
         elif cli_dict['verb'] == 'show':
             list_to_show = []
