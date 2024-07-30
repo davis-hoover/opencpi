@@ -29,13 +29,13 @@ Asset types to be specified in the '<noun>' argument are:
 
 *`card`*::
     Create a card with the specified '<name>'.
-    
+
 *`component`*::
     Create a component with the specified '<name>'.
-    
+
 *`device`*::
     Create a device worker with the specified '<name>'.
-    
+
 *`library`*::
     Create a component library with the specified '<name>'.
 
@@ -58,7 +58,7 @@ Asset types to be specified in the '<noun>' argument are:
     Create a slot with the specified '<name>'.
 
 *`test`*::
-    Creat a unit test with the specified '<name>'.
+    Create a unit test with the specified '<name>'.
 
 *`worker`*::
     Create a worker with the specified '<name>'. Authoring model must be specified (either format '<name>' ending with .hdl or .rcc, or use `hdl worker` or `rcc worker` described below).
@@ -155,24 +155,24 @@ Options When Creating Projects (or rarely, any other asset)
    default is the '<name>' argument given after the *create* verb.
 
 Options When Creating Libraries
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`-A`* '<directory>', *`--xml-include=`*'<directory>'+::
    Specify a directory to search for XML include files.
 
 Options When Creating Libraries or Workers
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`-I`* '<directory>', *`--include-dir=`*'<directory>'+::
    Specify a directory to search for include files (C, C++,
    Verilog).
 
 Options When Creating Projects or Libraries
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`-Y`* '<primitive-library>', *`--primitive-library=`*'<primitive-library>'+::
    Specify a primitive library on which the asset (or assets
    it contains) depends.
 
 Options When Creating Projects or Libraries or Workers or Assemblies
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 *`-y`* '<component-library>', *`--component-library=`*'<component-library>'+::
    Specify a component library to search for workers, devices
