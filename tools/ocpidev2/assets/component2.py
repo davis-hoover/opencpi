@@ -560,7 +560,7 @@ def test_Component(ret):
 
 def test_Component_init():
     fs = TemporaryFilesystem()
-    dir_abs_path = fs.abs_path + 'proj/components/cmp1.comp'
+    dir_abs_path = fs.abs_path + '/proj/components/cmp1.comp'
     xml_abs_path = dir_abs_path + '/cmp1-comp.xml'
     os.system('mkdir -p ' + dir_abs_path)
     ff = open(xml_abs_path, 'w')
@@ -589,7 +589,7 @@ def test_Component_create():
     passed = False
     cli_dict = {'nocontrol': False}
     fs = TemporaryFilesystem()
-    dir_abs_path = fs.abs_path + 'proj/components/cmp1.comp'
+    dir_abs_path = fs.abs_path + '/proj/components/cmp1.comp'
     xml_abs_path = dir_abs_path + '/cmp1-comp.xml'
     component = Component(xml_abs_path, cli_dict)
     # TODO: Implement testing for CLI args nocontrol, createtest, project.
@@ -625,6 +625,8 @@ def test_Component_create():
                                comp_file)
                 passed = False
     log_pass_fail('testing Component create()', passed)
+    del component
+    del fs
     return passed
 
 
