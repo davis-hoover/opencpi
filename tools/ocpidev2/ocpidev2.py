@@ -65,7 +65,8 @@ def add_create_arguments(parser, noun, authoring_model=''):
         group.add_argument('-x', '--xml-dir-app', default=False,
                            action='store_true')
     if (noun == 'component') or (noun == 'device') or \
-       (noun == 'primitive') or (noun == 'protocol') or (noun == 'worker'):
+       (noun == 'primitive') or (noun == 'protocol') or (noun == 'worker') or \
+       (noun == 'adapter'):
         group = parser.add_mutually_exclusive_group()
         group.add_argument('--hdl-library', nargs='?', default=None)
         group.add_argument('--library', default=None)
@@ -328,7 +329,8 @@ def get_cli_dict():
     cli_dict = vars(tmp)
     # make CLI look like attrs (necessary for create cli verb)
     cli_dict = ({key.replace('_', ''): val for key, val in cli_dict.items()})
-    if (cli_dict['noun'] == 'worker') or (cli_dict['noun'] == 'device'):
+    if (cli_dict['noun'] == 'worker') or (cli_dict['noun'] == 'device') or \
+       (cli_dict['noun'] == 'adapter'):
         authoring_model_from_name = cli_dict['name'].split('.')[-1]
         authoring_model_is_in_name = '.' in cli_dict['name']
         if authoring_model_is_in_name:
