@@ -134,6 +134,7 @@ class ComponentLibrariesDirectory(AssetBase):
 
 
 class ComponentLibrary(AssetBase, ComponentLibraryWorkerBase,
+                       ComponentLibraryProjectBase,
                        ComponentLibraryWorkerProjectAssemblyBase,
                        HdlLibraryComponentLibraryWorkerBase,
                        SpecsDirectory):
@@ -187,6 +188,7 @@ class ComponentLibrary(AssetBase, ComponentLibraryWorkerBase,
     def get_attr_infos(self):
         ret = []
         ret.extend(ComponentLibraryWorkerBase.get_attr_infos(self))
+        ret.extend(ComponentLibraryProjectBase.get_attr_infos(self))
         tmp = ComponentLibraryWorkerProjectAssemblyBase.get_attr_infos(self)
         ret.extend(tmp)
         ret.extend(HdlLibraryComponentLibraryWorkerBase.get_attr_infos(self,

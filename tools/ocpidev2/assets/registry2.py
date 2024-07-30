@@ -303,6 +303,8 @@ class ProjectRegistry():
             if cli_dict['verb'] == 'show':
                 set_g_suppress_warn(True)
             for _dir in dirs_to_operate_on:
+                # if not os.path.exists(_dir):
+                #     raise Exception('directory \'' + _dir + '\' does not exist')
                 if cli_dict['verb'] == 'create':
                     if cli_dict['name'] is None:
                         raise Exception('\'create\' requires a name')

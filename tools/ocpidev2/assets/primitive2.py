@@ -70,6 +70,9 @@ class HdlLibrary(AssetBase, HdlLibraryWorkerBase,
         ret.append(AttributeInfo('OnlyTargets',
                    cli=('-T', '--only-target'),
                    is_list=True))  # undocumented
+        # TODO MOVE THESE 2 TO HdlCore
+        ret.append(AttributeInfo('Top', cli=('-M', '--module')))
+        ret.append(AttributeInfo('PrebuiltCore', cli=('-B', '--prebuilt')))
         return ret
 
     def get_type(self):
@@ -118,8 +121,8 @@ class HdlCore(AssetBase):
 
     def get_attr_infos(self):
         ret = []
-        for key in ['Top', 'PrebuiltCore']:
-            ret.append(AttributeInfo(key))
+        ret.append(AttributeInfo('Top', cli=('-M', '--module')))
+        ret.append(AttributeInfo('PrebuiltCore', cli=('-B', '--prebuilt')))
         for key in ['OnlyTargets', 'Libraries', 'Cores']:
             ret.append(AttributeInfo(key, is_list=True))
         return ret

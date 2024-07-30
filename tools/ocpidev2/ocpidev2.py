@@ -64,15 +64,15 @@ def add_create_arguments(parser, noun, authoring_model=''):
                            action='store_true')
         group.add_argument('-x', '--xml-dir-app', default=False,
                            action='store_true')
-    if (noun == 'component') or (noun == 'device') or \
-       (noun == 'primitive') or (noun == 'protocol') or (noun == 'worker') or \
-       (noun == 'adapter'):
+    if noun in ['adapter', 'component', 'device', 'primitive', 'protocol',
+                'worker', 'test']:
         group = parser.add_mutually_exclusive_group()
         group.add_argument('--hdl-library', nargs='?', default=None)
         group.add_argument('--library', default=None)
-        group.add_argument('-p', '--project', default=False,
-                           action='store_true')
         parser.add_argument('-P', '--platform', default=False)
+        if noun in ['component', 'protocol']:
+            group.add_argument('-p', '--project', default=False,
+                               action='store_true')
     if noun == 'component':
         parser.add_argument('-t', '--create-test', default=False,
                             action='store_true')
@@ -181,6 +181,7 @@ def get_cli_noun_verb_tuple(argv):
                 pass
             elif argv[idx] in (singular_nouns + plural_nouns):
                 noun = argv[idx]
+                break
                 state = 2
             elif allow_exception:
                 raise Exception('invalid noun: ' + argv[idx])
@@ -217,6 +218,7 @@ def get_arg_parser():
 def get_args(parser):
     # below 3 lines parse, allowing for posix conformance (intermixed args)
     (args, unknown_args) = parser.parse_known_args()
+    print(str(unknown_args))
     for unknown_arg in unknown_args:
         if unknown_arg.startswith('application') or \
            unknown_arg.startswith('assembl') or \
@@ -331,6 +333,9 @@ def get_cli_dict():
     cli_dict = ({key.replace('_', ''): val for key, val in cli_dict.items()})
     if (cli_dict['noun'] == 'worker') or (cli_dict['noun'] == 'device') or \
        (cli_dict['noun'] == 'adapter'):
+        if cli_dict['name'] == None:
+            msg = 'name must be specified for \'' + cli_dict['noun'] + '\''
+            raise Exception(msg)
         authoring_model_from_name = cli_dict['name'].split('.')[-1]
         authoring_model_is_in_name = '.' in cli_dict['name']
         if authoring_model_is_in_name:

@@ -891,9 +891,19 @@ class AssetBase(AttributeBase):
                         # msg += str(val) + '\' from CLI'
                         # Logger().debug(msg)
                         if attr_info.is_int:
-                            val = int(val)
+                            try:
+                                val = int(val)
+                            except TypeError:
+                                msg = 'for attribute \'' + attr_info.key
+                                msg += '\', value of ' + str(val) + ' is not a valid integer'
+                                raise Exception(msg)
                         elif attr_info.is_bool:
-                            val = bool(val)
+                            try:
+                                val = bool(val)
+                            except TypeError:
+                                msg = 'for attribute \'' + attr_info.key
+                                msg += '\', value of ' + str(val) + ' is not a valid boolean'
+                                raise Exception(msg)
                         self.attrs[attr_info.key] = val
 
     def get_root_tags(self):
@@ -1223,13 +1233,15 @@ class ComponentLibraryWorkerProjectAssemblyBase():
         return ret
 
 
-class WorkerBase(ComponentLibraryWorkerBase, HdlLibraryWorkerBase,
+class WorkerBase(ComponentLibraryWorkerAssemblyBase,
+                 ComponentLibraryWorkerBase, HdlLibraryWorkerBase,
                  ComponentLibraryWorkerProjectAssemblyBase,
                  HdlLibraryComponentLibraryWorkerBase):
     """ handles attributes common to Worker and HdlPlatform classes """
 
     def get_attr_infos(self):
         ret = []
+        ret.extend(ComponentLibraryWorkerAssemblyBase.get_attr_infos(self))
         ret.extend(ComponentLibraryWorkerBase.get_attr_infos(self))
         ret.extend(HdlLibraryWorkerBase.get_attr_infos(self))
         tmp = ComponentLibraryWorkerProjectAssemblyBase.get_attr_infos(self)
@@ -1237,14 +1249,18 @@ class WorkerBase(ComponentLibraryWorkerBase, HdlLibraryWorkerBase,
         ret.extend(HdlLibraryComponentLibraryWorkerBase.get_attr_infos(self))
         ret.append(AttributeInfo('Name'))
         ret.append(AttributeInfo('Spec',
-                   cli=('-S', '--spec')))  # CDG section 8.1.2
+                   cli=('-S', '--component')))  # CDG section 8.1.2
         ret.append(AttributeInfo('Language',
                    cli=('-L', '--language')))  # CDG section 8.1.3
         ret.append(AttributeInfo('Version',
-                   cli=('-a', '--version'), is_int=True))  # CDG secion 8.1.4
+                   cli=('-a', '--version'), is_int=True))  # CDG section 8.1.4
         ret.append(AttributeInfo('ControlOperations',
-                   cli=('-C', '--control-operation'),
+                   cli=('-o', '--control-operation'),
                    is_list=True))  # CDG section 8.1.5
         ret.append(AttributeInfo('Configurations',
                    cli=('-c', '--configuration'), is_list=True))
+        ret.append(AttributeInfo('Cores',
+                   cli=('-C', '--core'), is_list=True))  # HDG section 3.4.1
+        ret.append(AttributeInfo('Emulates',
+                   cli=('-E', '--emulates')))  # PDG section 5.5.5.1
         return ret

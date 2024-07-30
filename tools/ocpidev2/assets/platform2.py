@@ -96,6 +96,8 @@ class HdlPlatform(HdlCardPlatformBase):
     def get_attr_infos(self):
         ret = []
         ret.extend(WorkerBase.get_attr_infos(self))
+        ret.append(AttributeInfo('Part',
+                   cli=('-g', '--part')))  # PDG section 5.4.4.1
         return ret
 
     def parse(self, cli_dict):

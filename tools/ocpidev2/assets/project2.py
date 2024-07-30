@@ -348,7 +348,7 @@ class Project(AssetBase, ComponentLibraryProjectBase,
         self.project_dependencies.extend(self.attrs['ProjectDependencies'])
         # TODO: Include these checks in other parse() get_attr_list logic
         if self.attrs['PackagePrefix'] != '':
-            if not self.attrs['PackagePrefix'].isidentifier():
+            if not self.attrs['PackagePrefix'].replace('.','').isidentifier():
                 msg = 'PackagePrefix must contain only alphanumeric '
                 msg += 'characters and not start with a number'
                 raise InvalidAssetError(msg)

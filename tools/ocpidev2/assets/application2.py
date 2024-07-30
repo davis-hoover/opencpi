@@ -177,8 +177,8 @@ class Application(AssetBase):
                 raise InvalidAssetError(msg)
             self.parse(cli_dict)
         if cli_dict is not None:
-            if cli_dict.get('xmldirapp'):
-                self.src_file_name = None
+            if (not cli_dict.get('xmlapp')) and (not cli_dict.get('xmldirapp')):
+                self.src_file_name = self.abs_path.split('/')[-1] + '.cc'
 
     def get_type(self):
         return 'application'
