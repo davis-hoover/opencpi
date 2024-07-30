@@ -387,8 +387,9 @@ def get_cli_dict():
                 msg += '\' is plural'
                 raise Exception(msg)
         else:
-            if (cli_dict['name'] is None) and (cli_dict['noun'] != 'registry'):
-                raise Exception('must specify name')
+            if ((cli_dict['name'] is None) and (cli_dict['d'] == [])) and \
+               (cli_dict['noun'] != 'registry'):
+                raise Exception('must specify name or -d')
     if ('worker' in cli_dict.keys()) and (cli_dict['worker'] != []):
         raise Exception('do not use --worker, instead create separate workers')
     if 'localscope' not in cli_dict.keys():

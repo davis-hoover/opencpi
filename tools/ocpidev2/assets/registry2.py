@@ -231,7 +231,7 @@ class ProjectRegistry():
         Logger().debug('end of project discovery')
 
     def get_project_symlink_path(self, project):
-        return self.abs_path + '/' + str(project.get_package_id())
+        return self.abs_path + '/' + project.get_package_id()
 
     def register(self, cli_dict, _dir):
         dir_abs_path = _dir
@@ -247,18 +247,19 @@ class ProjectRegistry():
             os.symlink(project.abs_path, symlink_path)
 
     def unregister(self, cli_dict, _dir):
+        self.discover_registered_projects()
         if cli_dict['noun'] == 'project':
             dir_abs_path = _dir
             if cli_dict['name'] is not None:
                 dir_abs_path += '/' + cli_dict['name']
             try:
                 # raises if not a project
-                project = Project(dir_abs_path, True)
+                project = Project(dir_abs_path)
             except InvalidAssetError:
                 msg = 'project \'' + cli_dict['name'] + '\' does not exist'
                 raise InvalidAssetError(msg)
+            symlink_path = self.get_project_symlink_path(project)
             try:
-                symlink_path = self.get_project_symlink_path(project)
                 System('unlink ' + symlink_path)
             except SystemCallError:
                 pid = project.get_package_id()
@@ -841,11 +842,11 @@ class ProjectRegistry():
         self.clean_imports_exports()
         Logger().info('executing build')
         os.system('mkdir -p ' + fs.abs_path)
-        for rcc_platform in rcc_platforms:
-            self.install_rcc_platform_if_not_installed(rcc_platform)
         makefile.emit()
         # System('cat ' + makefile.abs_path)
         self.export_projects(makefile)
+        for rcc_platform in rcc_platforms:
+            self.install_rcc_platform_if_not_installed(rcc_platform)
         cmd = 'make -f ' + makefile.abs_path
         if _j > 1:
             cmd += ' -j ' + str(_j)
