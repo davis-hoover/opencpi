@@ -32,10 +32,22 @@ VERBS
 -----
 The verbs supported by *`ocpidev2`* are:
 
+*`build`*::
+    Build the asset(s), running appropriate tools to create
+    the binary files and viewable documentation.
+
+*`clean`*::
+    Remove all the generated and compiled files.
+
+*`create`*::
+    Create the named asset, creating files and directories as required,
+    and creating any skeleton files for future editing.
+
 *`show`*::
-    Display information about assets in registered projects
-    or below the current directory 
-    and the current build environment (preliminary).  
+    Display information about assets.
+    
+*`register`*, *`unregister`*::
+    Register/unregister a project.
     
 NOUNS
 -----
@@ -77,7 +89,12 @@ https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_User_Guide.pdf
 
 SEE ALSO
 --------
+link:ocpidev2-build.1.html[ocpidev2-build(1)]
+link:ocpidev2-clean.1.html[ocpidev2-clean(1)]
+link:ocpidev2-create.1.html[ocpidev2-create(1)]
+link:ocpidev2-register.1.html[ocpidev2-register(1)]
 link:ocpidev2-show.1.html[ocpidev2-show(1)]
+link:ocpidev2-unregister.1.html[ocpidev2-unregister(1)]
 
 COPYING
 -------

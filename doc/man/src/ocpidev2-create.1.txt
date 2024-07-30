@@ -356,7 +356,6 @@ link:ocpidev2-register.1.html[ocpidev2-register(1)]
 link:ocpidev2-show.1.html[ocpidev2-show(1)]
 link:ocpidev2-unregister.1.html[ocpidev2-unregister(1)]
 
-
 COPYING
 -------
 Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:

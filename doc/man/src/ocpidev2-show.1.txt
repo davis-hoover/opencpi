@@ -287,6 +287,11 @@ https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Component_Development_Gui
 SEE ALSO
 --------
 link:ocpidev2.1.html[ocpidev2(1)]
+link:ocpidev2-build.1.html[ocpidev2-build(1)]
+link:ocpidev2-clean.1.html[ocpidev2-clean(1)]
+link:ocpidev2-create.1.html[ocpidev2-create(1)]
+link:ocpidev2-register.1.html[ocpidev2-register(1)]
+link:ocpidev2-unregister.1.html[ocpidev2-unregister(1)]
 
 COPYING
 -------
