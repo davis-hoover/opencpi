@@ -543,82 +543,136 @@ def test_Property(ret):
 
 
 def test_Component(ret):
-    ret = test_Property(ret)
-    fs = TemporaryFilesystem()
-    for test in [0, 1]:
-        passed = True
-        try:
-            dir_abs_path = fs.abs_path + '/' + 'components/specs'
-            os.system('mkdir -p ' + dir_abs_path)
-            xml_abs_path = dir_abs_path + '/' + 'component.xml'
-            ff = open(xml_abs_path, 'w')
-            ff.write('<ComponentSpec/>\n')
-            ff.close()
-            uut = Component(xml_abs_path)
-            if Environment().ocpi_log_level >= 10:
-                print(uut.__dict__.keys())
-                os.system('cat ' + xml_abs_path)
-            if test == 0:
-                passed = uut.abs_path == xml_abs_path
-            if test == 1:
-                passed = uut.name == 'component'
-        except InvalidAssetError:
-            passed = False
-        if test == 0:
-            log_pass_fail('testing Component abs_path', passed)
-        if test == 1:
-            log_pass_fail('testing Component name', passed)
-        if passed is False:
-            ret = False
+    test_results = []
+    component, passed = test_Component_init()
+    test_results.append(passed)
+    test_results.append(test_Component_create())
+    test_results.append(test_Component_get_attr_infos(component))
+    test_results.append(test_Component_parse(component))
+    test_results.append(test_Component_get_type(component))
+    #tests_results.append(test_Property())
+    ret = not (False in test_results)
     return ret
 
-
-def test_Component_create(ret):
-    # TODO: Implement testing for CLI args nocontrol, createtest, project.
+def test_Component_init():
     fs = TemporaryFilesystem()
-    test_name = 'test_Component_create: '
-    name = 'cmp1'
-    package_id = 'ocpi.foo'
-    project_path = fs.abs_path + '/foo'
-    dir_path = project_path + '/components/' + name + '.comp'
-    xml_abs_path = dir_path + '/' + name + '-comp.xml'
+    dir_abs_path = fs.abs_path + 'proj/components/cmp1.comp'
+    xml_abs_path = dir_abs_path + '/cmp1-comp.xml'
+    os.system('mkdir -p ' + dir_abs_path)
+    ff = open(xml_abs_path, 'w')
+    ff.write('<ComponentSpec/>\n')
+    ff.close()
     try:
-        Component(
-            xml_abs_path, False, None
-        ).create(package_id, False, project_path)
+        component = Component(xml_abs_path, None)
+        msg = ('component.abs_path Expected: \'' + xml_abs_path +
+               '\' but got: \'' + component.abs_path + '\'')
+        assert component.abs_path == xml_abs_path, msg
+        msg = ('component.name Expected: \'' + 'cmp1' + '\' but got: \''
+               + component.name + '\'')
+        assert component.name == 'cmp1', msg
+        msg = ('component.root_tags[0] Expected: \'' + 'ComponentSpec' +
+               '\' but got: \'' + component.root_tags[0] + '\'')
+        assert component.root_tags[0] == 'ComponentSpec', msg
+        passed = True
+    except AssertionError as e:
+        Logger().debug('test_Component_init: ' + str(e))
+        passed = False
+    log_pass_fail('testing Component init()', passed)
+    return component, passed
+
+def test_Component_create():
+    passed = False
+    cli_dict={'nocontrol': False}
+    fs = TemporaryFilesystem()
+    dir_abs_path = fs.abs_path + 'proj/components/cmp1.comp'
+    xml_abs_path = dir_abs_path + '/cmp1-comp.xml'
+    component = Component(xml_abs_path, cli_dict)
+    # TODO: Implement testing for CLI args nocontrol, createtest, project.
+    try:
+        component.create()
         passed = True
     except Exception as e:
-        Logger().debug(test_name + str(e))
+        Logger().debug('test_Component_create: ' + str(e))
+        passed = False
     # Test for file existence
-    comp_files = ['cmp1-comp.xml', 'cmp1-comp.rst', 'example_app.xml',
-                  'cmp1-test.rst']
-    for comp_file in comp_files:
-        path = dir_path + '/' + comp_file
-        if not os.path.exists(path):
-            passed = False
+    comp_files = [
+        ('cmp1-comp.xml', 'e7617db8fdaeaf649255fd04bc993ceb'),
+        ('cmp1-comp.rst', '84fc0cece1ea3c7e7c8bc78c0202e50a')
+    ]
+    if passed:
+        for comp_file, expected_md5 in comp_files:
+            path = os.path.join(component.get_dir_abs_path(), comp_file)
+            if not os.path.exists(path):
+                Logger().debug('test_Component_create: ' +
+                               'missing file: ' +
+                               component.get_dir_abs_path() + '/' +
+                               comp_file)
+                passed = False
     # Test for file integrity
-    msg = 'invalid expected md5sum for file: '
-    comp_xml = dir_path + '/' + comp_files[0]
-    comp_xml_md5 = hashlib.md5(open(comp_xml, 'rb').read()).hexdigest()
-    if comp_xml_md5 != '40e1d7cd6cd5242615d28725fce1c2e3':
-        passed = False
-        Logger().error(test_name + str(msg + xml_abs_path))
-    comp_rst = dir_path + '/' + comp_files[1]
-    comp_rst_md5 = hashlib.md5(open(comp_rst, 'rb').read()).hexdigest()
-    if comp_rst_md5 != '84fc0cece1ea3c7e7c8bc78c0202e50a':
-        passed = False
-        Logger().error(test_name + str(msg + comp_rst))
-    example_app = dir_path + '/' + comp_files[2]
-    example_app_md5 = hashlib.md5(open(example_app, 'rb').read()).hexdigest()
-    if example_app_md5 != 'fa3bb09634de1f96eda4e647cc698d12':
-        passed = False
-        Logger().error(test_name + str(msg + example_app))
-    comp_test_rst = dir_path + '/' + comp_files[3]
-    comp_test_md5 = hashlib.md5(open(comp_test_rst, 'rb').read()).hexdigest()
-    if comp_test_md5 != '048f66d77e6625d5cb848140c5cc552e':
-        passed = False
-        Logger().error(test_name + str(msg + comp_test_rst))
+    if passed:
+        for comp_file, expected_md5 in comp_files:
+            path = os.path.join(component.get_dir_abs_path(), comp_file)
+            actual_md5 = hashlib.md5(open(path, 'rb').read()).hexdigest()
+            if actual_md5 != expected_md5:
+                Logger().debug('test_Component_create: ' +
+                               'invalid expected md5sum for file: ' +
+                               component.get_dir_abs_path() + '/' +
+                               comp_file)
+                passed = False
     log_pass_fail('testing Component create()', passed)
-    if passed is False:
-        ret = False
-    return ret
+    return passed
+
+def test_Component_get_attr_infos(component):
+    passed = False
+    attr_infos = component.get_attr_infos()
+    try:
+        msg = ('attr_infos[0].key Expected: \'' + 'Name' +
+               '\' but got: \'' + attr_infos[0].key + '\'')
+        assert attr_infos[0].key == 'Name', msg
+        msg = ('attr_infos[1].key Expected: \'' + 'NoControl' +
+               '\' but got: \'' + attr_infos[1].key + '\'')
+        assert attr_infos[1].key == 'NoControl', msg
+        msg = ('attr_infos[1].cli[0] Expected: \'' + '-n' +
+               '\' but got: \'' + attr_infos[1].cli[0] + '\'')
+        assert attr_infos[1].cli[0] == '-n', msg
+        msg = ('attr_infos[1].cli[1] Expected: \'' + '--no-control' +
+               '\' but got: \'' + attr_infos[1].cli[1] + '\'')
+        assert attr_infos[1].cli[1] == '--no-control', msg
+        msg = ('attr_infos[1].is_bool Expected: \'' + 'True' +
+               '\' but got: \'' + str(attr_infos[1].is_bool) + '\'')
+        assert attr_infos[1].is_bool == True, msg
+        passed = True
+    except AssertionError as e:
+        Logger().debug('test_Component_get_attr_infos: ' + str(e))
+        passed = False
+    log_pass_fail('testing Component get_attr_infos()', passed)
+    return passed
+
+def test_Component_parse(component):
+    passed = False
+    try:
+        name = 'foo'
+        component.attrs['Name'] = name
+        component.parse()
+        msg = ('component.name Expected: \'' + name +
+               '\' but got: \'' + component.name + '\'')
+        assert component.name == name, msg
+        passed = True
+    except AssertionError as e:
+        Logger().debug('test_Component_parse(): ' + str(e))
+        passed = False
+    log_pass_fail('testing Component parse()', passed)
+    return passed
+
+def test_Component_get_type(component):
+    passed = False
+    try:
+        msg = ('component.get_type() Expected: \'' + 'component' +
+               '\' but got: \'' + component.get_type() + '\'')
+        assert component.get_type() == 'component', msg
+        passed = True
+    except AssertionError as e:
+        Logger().debug('test_Component_get_type(): ' + str(e))
+        passed = False
+    log_pass_fail('testing Component get_type()', passed)
+    return passed
