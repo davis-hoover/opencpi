@@ -705,6 +705,17 @@ class Project(AssetBase, ComponentLibraryProjectBase,
 
     def get_library_object_from_cli(self, cli_dict, _dir):
         dir_abs_path = _dir
+        is_existing_component_library = False
+        for component_library in self.component_libraries:
+            if dir_abs_path == component_library.get_dir_abs_path():
+                is_existing_component_library = True
+        if is_existing_component_library:
+            msg = 'component library \'' + cli_dict['name']
+            msg += '\' can not exist within ' + _dir
+            if is_existing_component_library:
+                msg += ' (\'components\' directory already exists and is '
+                msg += 'a component library)'
+            raise Exception(msg)
         if cli_dict['name'] == 'components':
             dir_abs_path += '/' + cli_dict['name']
             is_existing_component_libraries = False
