@@ -925,7 +925,7 @@ class Project(AssetBase, ComponentLibraryProjectBase,
                         if _dir == component_library.get_dir_abs_path():
                             cl = component_library
                             pid = self.get_component_library_package_id(cl)
-            if not _dir.endswith('specs'):
+            if (not _dir.endswith('specs')) and (not cli_dict['project']):
                 file_abs_path = asset.get_dir_abs_path() + '/'
                 file_abs_path += 'example_app.xml'
                 self.create_file(file_abs_path, comp_example_app_rst_template,
