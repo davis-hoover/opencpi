@@ -1,5 +1,5 @@
 OCPIDEV2-CREATE(1)
-=================
+==================
 
 NAME
 ----
@@ -191,7 +191,7 @@ Options When Creating Components
    component in a component library.
    
 Option When Creating Components (Specs) or Protocols
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`-p`*, *`--project`*::
    Create the component specification or protocol in the *`specs/`*
    directory of the project. No asset directories or document files are created.
@@ -207,7 +207,7 @@ Options When Creating Components, Protocols, Workers, and Tests
    Create the asset in the specified component library.
 
 Option When Creating Workers (All Types) and Tests
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`-S`* '<spec>', *`--component`*::
    Specify the component (aka "spec") to be
    implemented by the worker/test. By default, the *`ocpidev2 create`* operation
