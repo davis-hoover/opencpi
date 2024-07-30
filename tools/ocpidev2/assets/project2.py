@@ -853,6 +853,7 @@ class Project(AssetBase, ComponentLibraryProjectBase,
 
     def create_asset(self, cli_dict, _dir):
         dir_abs_path = _dir
+        app_dir = None
         if cli_dict['noun'] == 'application':
             if not os.path.exists(self.get_dir_abs_path() + '/applications'):
                 msg = 'performing \'' + cli_dict['verb']
@@ -861,9 +862,9 @@ class Project(AssetBase, ComponentLibraryProjectBase,
                 msg += 'applications directory '
                 Logger().log(3, msg + ' within directory ' +
                              self.get_dir_abs_path())
-                ApplicationsDirectory(self.get_dir_abs_path() +
-                                      '/applications',
-                                      cli_dict).create()
+                apps_dir = ApplicationsDirectory(self.get_dir_abs_path() +
+                                                 '/applications',
+                                                 cli_dict)
         elif cli_dict['noun'] == 'library':
             if cli_dict['name'] == 'components':
                 pass
@@ -897,6 +898,8 @@ class Project(AssetBase, ComponentLibraryProjectBase,
                 msg = 'default version of 0 is being used, but --version 2 is '
                 msg += 'highly recommended'
                 Logger().warn(msg)
+        if apps_dir is not None:
+            apps_dir.create()
         asset.create()
         if ('createtest' in cli_dict.keys()) and cli_dict['createtest']:
             test_dict = {'noun': 'test', 'name': asset.name,
