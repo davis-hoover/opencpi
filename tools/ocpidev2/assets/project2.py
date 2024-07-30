@@ -856,7 +856,7 @@ class Project(AssetBase, ComponentLibraryProjectBase,
                 Logger().log(3, msg + ' within directory ' +
                              self.get_dir_abs_path())
                 ApplicationsDirectory(self.get_dir_abs_path() +
-                                      '/applications', False,
+                                      '/applications',
                                       cli_dict).create()
         elif cli_dict['noun'] == 'library':
             if cli_dict['name'] == 'components':

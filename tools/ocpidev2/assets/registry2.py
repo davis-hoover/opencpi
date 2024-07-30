@@ -271,13 +271,11 @@ class ProjectRegistry():
         if project is None:
             project_dir_abs_path = _dir
             while True:
-                print(project_dir_abs_path)
                 try:
                     project = Project(project_dir_abs_path, None)
                     project.discover()
                     break
                 except InvalidAssetError as err:
-                    print(str(err))
                     project_dir_abs_path = \
                         project_dir_abs_path.rsplit('/', 1)[0]
                     if len(project_dir_abs_path) <= 1:
@@ -304,6 +302,9 @@ class ProjectRegistry():
             if cli_dict['verb'] == 'show':
                 set_g_suppress_warn(True)
             for _dir in dirs_to_operate_on:
+                if cli_dict['verb'] == 'create':
+                    if cli_dict['name'] is None:
+                        raise Exception('\'create\' requires a name')
                 if not ((cli_dict['verb'] == 'create') and
                    (cli_dict['noun'] == 'library')):
                     msg = 'performing \'' + cli_dict['verb']
@@ -358,8 +359,6 @@ class ProjectRegistry():
         self.dispatch_verb_for_single_dir(cli_dict, _dir)
 
     def create(self, cli_dict, _dir):
-        if cli_dict['name'] is None:
-            raise Exception('\'create\' requires a name')
         if cli_dict['keep']:
             Logger().warn('--keep is unnecessary')
         if cli_dict['noun'] == 'registry':
