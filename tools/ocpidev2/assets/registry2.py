@@ -234,12 +234,13 @@ class ProjectRegistry():
         return self.abs_path + '/' + project.get_package_id()
 
     def register(self, cli_dict, _dir):
+        self.discover_registered_projects()
         dir_abs_path = _dir
         if cli_dict['name'] is not None:
             dir_abs_path += '/' + cli_dict['name']
         try:
             project = Project(dir_abs_path)  # raises if not a project
-        except InvalidAssetError:
+        except InvalidAssetError as err:
             msg = 'project \'' + cli_dict['name'] + '\' does not exist'
             raise InvalidAssetError(msg)
         symlink_path = self.get_project_symlink_path(project)
@@ -370,7 +371,7 @@ class ProjectRegistry():
             dir_abs_path = _dir + '/' + cli_dict['name']
             Project(dir_abs_path, cli_dict).create()
             if cli_dict['register']:
-                self.register(cli_dict, dir_abs_path)
+                self.register(cli_dict, dir_abs_path + '/..')
         else:
             self.get_project(cli_dict, _dir).create_asset(cli_dict, _dir)
 
