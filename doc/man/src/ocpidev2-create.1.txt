@@ -139,8 +139,8 @@ Options When Creating Projects
 *`--register`*::
    Register the project as part of creating it.
 
-Options When Creating Projects or Libraries
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Options When Creating Projects (or rarely, any other asset)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`-F`* '<package-prefix>', *`--package-prefix=`*'<package-ID>'::
    Specify the package prefix of the created project or library.
    The default is *local* for projects and '<package-ID of parent>'
@@ -154,18 +154,25 @@ Options When Creating Projects or Libraries
    Specify the package name of the created project or library. The
    default is the '<name>' argument given after the *create* verb.
 
-Options When Creating Projects, Libraries, Workers, HDL Devices or HDL Platforms
+Options When Creating Libraries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`-A`* '<directory>', *`--xml-include=`*'<directory>'+::
    Specify a directory to search for XML include files.
 
+Options When Creating Libraries or Workers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`-I`* '<directory>', *`--include-dir=`*'<directory>'+::
    Specify a directory to search for include files (C, C++,
    Verilog).
 
+Options When Creating Projects or Libraries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`-Y`* '<primitive-library>', *`--primitive-library=`*'<primitive-library>'+::
    Specify a primitive library on which the asset (or assets
    it contains) depends.
+
+Options When Creating Projects or Libraries or Workers or Assemblies
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 *`-y`* '<component-library>', *`--component-library=`*'<component-library>'+::
    Specify a component library to search for workers, devices
@@ -189,8 +196,8 @@ Option When Creating Components (Specs) or Protocols
    Create the component specification or protocol in the *`specs/`*
    directory of the project. No asset directories or document files are created.
 
-Options When Creating Protocols, Workers or HDL Devices
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Options When Creating Components, Protocols, Workers, and Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`-h`* '<hdl-library>', *`--hdl-library=`*'<hdl-library>'::
    Create the asset in the component library under the
    *`hdl/`* directory of the project. Valid values are only
@@ -230,7 +237,7 @@ Options When Creating Workers (All Types)
 
 *-`P`* '<platform>', *`--platform=`*'<platform>'::
    Create the worker in the *devices* library for the specified
-   HDL platform (in this project).
+   HDL platform.
 
 Options When Creating RCC Workers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -238,15 +245,9 @@ Options When Creating RCC Workers
    Specify a prerequisite library on which the worker being created
    depends and to which it should be statically linked.
    
-*`-V`* '<slave-worker>', *`--slave-worker=`*'<slave-worker>'+::
-   Create the RCC worker as a proxy for the specified slave
+*`-V`* '<slave-worker>', *`--slave-worker=`*'<slave-worker>'::
+   Create the RCC worker as a proxy for one specified slave
    worker.
-
-*`-W`* '<worker>', *`--worker=`*'<worker>'+::
-   Specify one of multiple workers implemented in the RCC
-   worker's directory when a single RCC worker directory
-   is creating a multi-worker artifact. This option is
-   supported but is rarely required or recommended.
 
 *`-r`* '<prereq-library>', *`--rcc-dynamic=`*'<prereq-library>'+::
    Specify a library on which the worker being created
@@ -264,18 +265,11 @@ Options When Creating HDL Devices
    Create the worker as an emulator worker and specify the
    HDL device worker associated with the device being emulated.
 
-*`-U`* '<hdl-device>', *`--supports=`*'<hdl-device>'+::
-   Create the worker as a subdevice and specify one of the
-   HDL device workers that the subdevice supports.
-
 Options When Creating HDL Platforms
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`-g`* '<part>', *`--part=`*'<part>'::
    Specify the part (die-speed-package;, e.g., *xc7z020-1-clg484*)
    for the HDL platform being created.
-
-*`-q`* '<frequency>', *`--time-freq=`*'<frequency>'::
-   Specify the time server frequency for the platform.
 
 Options When Creating Any Buildable Asset
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -302,12 +296,6 @@ Options When Creating HDL Primitive Libraries
    libraries in *`$OCPI_ROOT_DIR/projects/core/hdl/primitives`*
    (currently, *`bsv`*, *`cdc`*, *`fixed_float`*, and *`ocpi`*).
 
-*`-J`*, *`--no-elaborate`*::
-   Specify that the HDL primitive library being created should not
-   be elaborated when building, which results in a slight time
-   savings at the cost of catching elaboration errors earlier in
-   the build process.
-
 Options When Creating HDL Primitive Cores
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`-B`* '<file>', *`--prebuilt=`*'<file>'::
@@ -330,85 +318,6 @@ Options When Creating Applications
    Specify that the application has its own directory but it will
    only be an XML file. The default creates an application with
    an ACI C++ file. This option cannot be used with the *`-X`* option.
-
-EXAMPLES
---------
-. Create in the current working directory a project with the name *`my-project`*. This project's
-package-ID will be *`local.my-project`*:
-+
----------------------------------
-ocpidev2 create project my-project
----------------------------------
-+
-. Create in the current working directory a project with
-the package-prefix *`org.my_organization`* and
-name *`my_project`*. This project's package-ID will be
-*`org.my_organization.my_project`*.
-+
---------------------------------------------------------
-ocpidev2 create project my-project -F org.my_organization
---------------------------------------------------------
-+
-. Create a project registry *`/home/workspace/my-registry`*. Note that a
-new registry will not have a core project registered, so the next
-thing to do is locate and register a core project.
-+
-------------------------------------------------------
-ocpidev2 -d /home/workspace create registry my-registry
-------------------------------------------------------
-+
-. Create the default *`components`* library for a project. If you
-provide a name other than *`components`*, *`ocpidev2`* creates it
-underneath the *`components`* directory.
-+
----------------------------------
-ocpidev2 create library components
----------------------------------
-+
-. Create a skeleton component specification and component
-asset document for a component named *`mycomp`*. The files
-are created in the *`mycomp.comp/`* directory in
-the *`components`* library. 
-Use the *`-l`* '<library-name>' (*`--library=`*'<library-name>')
-option if there are sublibraries underneath *`components`*.
-+
--------------------------------
-ocpidev2 create component mycomp
--------------------------------
-+
-. Create the skeleton files and worker asset document
-for an HDL worker named *`fft_fast`* that implements the
-*`fft`* component spec located in the component directory
-*`fft.comp/fft-comp.xml`* in the same library as the worker.
-+
------------------------------------------
-ocpidev2 create worker fft_fast.hdl -S fft
------------------------------------------
-+
-. Create the skeleton files and asset document
-for an HDL assembly named *`MyPlutoAsm`* to be
-used only on the *`plutosdr`* HDL platform.
-+
-------------------------------------------------
-ocpidev2 create hdl assembly MyPlutoAsm -G plutosdr
-------------------------------------------------
-
-NOTES
------
-Component specifications created in earlier OpenCPI releases
-reside in a *`specs/`* directory located either in a component library
-or at the top level of a project and are named
-'<name>'*`-spec.xml`* or '<name>'*`_spec.xml`*.
-
-The following option to the *`ocpidev2 create`* operation for a component is
-provided for backward compatibility with the component spec structure used
-in earlier OpenCPI releases:
-
-*`ocpidev2 create component`* '<name>' *`--file-only`*
-
-The *`--file-only`* option directs *`ocpidev2`* to create a component spec named
-'<name>'*`-spec.xml`* in a *`specs/`* directory in a component library.
-No component asset document is created.
 
 BUGS
 ----
@@ -444,7 +353,6 @@ link:ocpidev2.1.html[ocpidev2(1)]
 link:ocpidev2-build.1.html[ocpidev2-build(1)]
 link:ocpidev2-clean.1.html[ocpidev2-clean(1)]
 link:ocpidev2-register.1.html[ocpidev2-register(1)]
-link:ocpidev2-set.1.html[ocpidev2-set(1)]
 link:ocpidev2-show.1.html[ocpidev2-show(1)]
 link:ocpidev2-unregister.1.html[ocpidev2-unregister(1)]
 
