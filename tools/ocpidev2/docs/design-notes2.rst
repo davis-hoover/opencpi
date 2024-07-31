@@ -88,7 +88,7 @@ lower case of everything.
 
 Building
 ========
-The ocpidev2 script has a much more sophisticated build engine ocpidev.
+The ocpidev2 script has a much more sophisticated build engine than ocpidev.
 The HDL build dependency hierarchy is determined during discovery,
 then a GNUMakefile class object is constructed for which represents
 a makefile with recipes that have their dependencies properly defined.
