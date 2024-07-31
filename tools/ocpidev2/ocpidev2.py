@@ -21,8 +21,13 @@
 
 """ This file exposes the Command Line Interface (CLI) below it, and above it
     interfaces with project-like things (ProjectDatabase), and not individual
-    asset classes. """
 
+    Authors
+    =======
+    Davis Hoover (git@davishoover.com)
+    Joel Palmer (jpalmer@geontech.com)
+
+    """
 
 import os
 import argparse
