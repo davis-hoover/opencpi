@@ -110,6 +110,12 @@ It is recommended to read up on GNU Make rules, recipes,
 and targets: 
 https://www.gnu.org/software/make/manual/html_node/Rules.html
 
+Note that RCC builds are also supported, but any
+implied application dependency on a hdl assembly
+is not automatically determined and therefore not built.
+This relationship (deployment) is one of the most complicated
+mechanisms in OpenCPI.
+
 Testing
 =======
 A unit tests is written in python. Coverage at the time if this writing
