@@ -354,9 +354,9 @@ class ProjectRegistry():
     def build(self, cli_dict, _dir):
         """ builds assets by creating a temporary makefile and calls make -j
             on it and then deleting it """
-        if len(cli_dict['hdlplatform']) > 0:
+        if len(cli_dict['hdlplatform']) > 1:
            raise Exception('multiple --hdl-platform not yet supported')
-        if len(cli_dict['rccplatform']) > 0:
+        if len(cli_dict['rccplatform']) > 1:
            raise Exception('multiple --rcc-platform not yet supported')
         self.dispatch_verb_for_single_dir(cli_dict, _dir)
 
