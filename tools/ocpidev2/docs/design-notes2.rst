@@ -8,7 +8,7 @@ Supported Versions
 The ocpidev2 script is generally meant to work across OpenCPI projects, according
 to the various Development Guides (Component Dev Guide, HDL Dev Guide, RCC Dev
 Guide, Platform Dev Guide, etc). Many
-pre-2.0 OpenCPI mechanisms, nameonly GNU Make variables in makefiles across a
+pre-2.0 OpenCPI mechanisms, namely GNU Make variables in makefiles across a
 project, still exist in 2.0-and-after OpenCPI projects. The ocpidev2 script
 is written to generally make projects out in the wild "just work", in that
 build/show finds them and can build them. Pre-OpenCPI-2.0 documentation can be seen
@@ -18,6 +18,10 @@ Coding Style
 ============
 PEP-8 was used during development. The python pycodestyle command was used to
 confirm compliance.
+XML tags and attributes are always defined in the python code in the same upper camel case as
+the documentation (Dev Guides), e.g., HdlAssembly is defined in a certain
+get_root_tags()
+method. Created assets use the same upper camel case for their XML files.
 
 Comparison with ocpidev
 =======================
@@ -29,6 +33,8 @@ The set/unset operations are not recommended with ocpidev2 (use OCPI_PROJECT_REG
 The delete/run are not implemented but it is recommended to implement these in
 ocpidev2 in the future and delete ocpidev entirely. At the time of this writing,
 ocpidev2 is about 5500 lines whereas ocpidev is about 7000 lines.
+The separation of files in tools/ocpidev2 is similar to tools/ocpidev
+The ocpidev2 script does not depend in ocpidev code.
 
 Architecture
 ============
@@ -54,27 +60,55 @@ tags.
 
 Discovery
 =========
-Existing assets are performed automously by a discovery mechanism. All
+Existing assets are performed autonomously by a discovery mechanism. All
 asset classes have a discover() method which creates a database
 in internal program memory which represents the discoverable assets
-on the filesystem. Assets are discovered 1) from the local project
+on the filesystem. This database exists as the ProjectDatabase
+class's self.projects list of projects.
+Assets are discovered 1) from the local project
 and 2) from the project registry. Refer to the Component Dev Guide
-for more info.
+for more info. Discovery is a core mechanism for 'show' and 'build',
+and is used for other verbs, e.g. 'create', as needed.
 
-Attribute Parsing
-=================
-Discovery performs parsing of XML and makefiles. All
-asset classes have a parse() method. All parsed values are printed
-when the log level is set to 10.
-XML tags are always defined in the python code in the same upper camel case as
-the documentation (Dev Guides), e.g., HdlAssembly is defined in a certain
-get_root_tags()
-method. Parsed attributes are stored in the classes, self.attrs dictionary,
-e.g. self.attrs['Spec'] = 'drc'.
+Attribute Handling
+==================
+All of an asset's attributes (or at least the top-level ones)
+exist in the asset class's self.attrs dictionary.
+Discovery performs parsing of XML and makefiles and populates self.attrs.
+When performing asset creation, self.attrs is populated from the Command Line
+Interface (CLI).
+ALl asset classes have a parse() method. All parsed attributes
+(at least the top-level ones) are logged at log level 10, regardless of
+what file or file type they come from. The AttributeBase
+class normalizes this behavior across XML and makefile alike.
 The attribute case variants, e.g., hdlassembly vs HdlAssembly
 occuring in an XML file,
 are handled within the XML parsing classes (AttributeBase) that compare the
 lower case of everything.
+
+Building
+========
+The ocpidev2 script has a much more sophisticated build engine ocpidev.
+The HDL build dependency hierarchy is determined during discovery,
+then a GNUMakefile class object is constructed for which represents
+a makefile with recipes that have their dependencies properly defined.
+The recipes are generated via a recursive call to the ProjectDatabase
+class's append_asset_rules_to_makefile_variable() method.
+The LegacyBuildTool class provides an API for defining the recipe for
+each build artifact's GNU Make rule, and is currently
+implemented in a way that simply
+interfaces with the Tool Layer(s)
+corresponding to worker.mk, hdl-assembly.mk, etc. It is
+intended for this class to eventually become user-extensible
+to more easily support new vendor tools.
+The GNUMakefile object, after appending all rules,
+is emitted (saved to the filesystem) in a temporary
+temporary makefile containing a recipe for each artifact, 
+and a system call to 'make -j <jobs> <makefilepath>' is made
+to perform the build in a optimal, fast, well-defined fashion.
+It is recommended to read up on GNU Make rules, recipes,
+and targets: 
+https://www.gnu.org/software/make/manual/html_node/Rules.html
 
 Testing
 =======
@@ -110,9 +144,16 @@ Asset objects
          V     V      V
     asset object (inherits from AssetBase) self.attrs
 
-Top-Level Attribute, Exposing to CLI
-====================================
+Command Line Interface (CLI)
+============================
 
+The command line interface is exposed to the ProjectDatabase
+as a variable cli_dict which is a dictionary of noun, verb, name, and other
+options. The man pages, e.g. 'man ocpidev2' and 'man ocpidev2-build'
+define the supported CLI. The cli_dict is associated with
+the asset top-level attributes (contained in each asset class's self.attrs)
+via the dictionairy returned by
+each asset class's get_attr_infos() method.
 Note that 'git grep cli_dict' is helpful in tying the following description to the codebase.
 
 1. Top-level attributes, e.g. SourceFiles, and all of their associated information are defined by the list returned in each asset class's get_attr_infos() method
