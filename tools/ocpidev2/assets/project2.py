@@ -129,6 +129,10 @@ class Project(AssetBase, ComponentLibraryProjectBase,
     """ Component Development Guide section 14 """
 
     def __init__(self, dir_abs_path, cli_dict=None):
+        """ cli_dict must be None when discovering existing projects on the
+            filesystem, and when not None, must be a dict containing
+            entries according to
+            get_attr_infos (e.g. 'projectdependencies') """
         self.root_tags = ['Project']
         if cli_dict is None:
             if not os.path.exists(dir_abs_path + '/Project.xml'):
@@ -225,9 +229,14 @@ class Project(AssetBase, ComponentLibraryProjectBase,
         return asset
 
     def get_type(self):
+        """ this string is used in many places to disambiguate the duck-typed
+            asset object (similar to type())"""
         return 'project'
 
     def get_attr_infos(self):
+        """ returns a dictionary which is the authoritative definition of what
+            attributes exist for this asset, what their types are (dictates how
+            they should be parsed), and what their exposes CLI arguments are """
         ret = []
         ret.extend(ComponentLibraryProjectBase.get_attr_infos(self))
         tmp = ComponentLibraryWorkerProjectAssemblyBase.get_attr_infos(self)
@@ -249,12 +258,15 @@ class Project(AssetBase, ComponentLibraryProjectBase,
         return ret
 
     def get_xml_abs_path(self):
+        """ overloads the method from AssetBase due to special filename """
         return self.abs_path + '/Project.xml'
 
     def get_buildable_paths(self):
         return [self.abs_path + '/hdl', self.abs_path + '/hdl/assemblies']
 
     def get_package_id(self):
+        """ return the string package ID of the project, which is based on
+            multiple attributes """
         ret = ''
         if self.attrs['PackagePrefix'] == '':
             ret += 'local'
@@ -268,6 +280,8 @@ class Project(AssetBase, ComponentLibraryProjectBase,
         return ret
 
     def get_component_library_package_id(self, component_library):
+        """ return the string package ID of a single component library within
+            the project, which is based on its "parent" """
         ret = self.get_package_id()
         abs_path_split = component_library.abs_path.split('/')
         if len(abs_path_split) >= 3:
@@ -294,6 +308,8 @@ class Project(AssetBase, ComponentLibraryProjectBase,
         return ret
 
     def get_worker_by_name(self, name, authoring_model=''):
+        """ return the worker object by name, and optionally restrict the
+            authoring model for matches """
         ret = None
         for component_library in self.component_libraries:
             for worker in component_library.workers:
@@ -323,6 +339,9 @@ class Project(AssetBase, ComponentLibraryProjectBase,
         return ret
 
     def get_paths_to_parse(self):
+        """ return list of strings which define all files of this asset type
+            which potentially contain attributes (usually the xml, sometimes
+            also makefile(s)) for pre-2.0 opencpi project support """
         paths = []
         # start pre-2.0 opencpi
         paths += [self.abs_path + '/Project.mk']
@@ -334,6 +353,9 @@ class Project(AssetBase, ComponentLibraryProjectBase,
         return paths
 
     def get_templates(self):
+        """ Returns dictionary containing keys which are filenames and values
+            which are jiinja template strings. The dictionary is the authority
+            on what gets created for the 'create' verb """
         templates = {}
         templates['Project.exports'] = proj_exports_template
         templates['.gitignore'] = proj_git_ignore_template
@@ -343,6 +365,8 @@ class Project(AssetBase, ComponentLibraryProjectBase,
         return templates
 
     def parse(self, cli_dict):
+        """ during discovery, parse the assumed-existing files indicated in
+            get_paths_to_parse() for the attributes of this asset """
         AssetBase.parse(self, cli_dict)
         self.hdl_libraries.extend(self.attrs['HdlLibraries'])
         self.project_dependencies.extend(self.attrs['ProjectDependencies'])
@@ -355,6 +379,7 @@ class Project(AssetBase, ComponentLibraryProjectBase,
 
     def discover(self, do_component_libraries=True, do_hdl_primitives=True,
                  do_hdl_assemblies=True):
+        """ discover this asset as it exists, already, on the filesystem """
         # start of bullets at top of CDG section 14
         if do_component_libraries:
             tmp = self.abs_path.split('/')[-1]
@@ -381,6 +406,7 @@ class Project(AssetBase, ComponentLibraryProjectBase,
         # end of bullets at top of CDG section 14
 
     def append_discovered_asset(self, asset):
+        """ this is a core part of discovery """
         if asset.get_type() == 'component':
             self.components.append(asset)
         if asset.get_type() == 'component library':
@@ -638,6 +664,10 @@ class Project(AssetBase, ComponentLibraryProjectBase,
         return ret
 
     def get_adapter_object_from_cli(self, cli_dict, _dir):
+        """ return an hdl adapter (worker) object corresponding to the
+            cli_dict, using
+            "the directory" which is _dir and which came from either the
+            working directory or from a single -d <dir> entry """
         if _dir != self.get_dir_abs_path() + '/hdl/adapters':
             msg = cli_dict['noun'] + ' \'' + cli_dict['name']
             msg += '\' can not exist within ' + _dir
@@ -650,6 +680,9 @@ class Project(AssetBase, ComponentLibraryProjectBase,
         return Worker(xml_abs_path, cli_dict)
 
     def get_application_object_from_cli(self, cli_dict, _dir):
+        """ return an application object corresponding to the cli_dict, using
+            "the directory" which is _dir and which came from either the
+            working directory or from a single -d <dir> entry """
         abs_path = self.get_dir_abs_path() + '/applications/'
         if cli_dict['xmlapp']:
             abs_path += cli_dict['name'] + '.xml'  # xml type
@@ -665,6 +698,9 @@ class Project(AssetBase, ComponentLibraryProjectBase,
         return Application(abs_path, cli_dict)
 
     def get_assembly_object_from_cli(self, cli_dict, _dir):
+        """ return an assembly object corresponding to the cli_dict, using
+            "the directory" which is _dir and which came from either the
+            working directory or from a single -d <dir> entry """
         if _dir != self.get_dir_abs_path() + '/hdl/assemblies':
             msg = cli_dict['noun'] + ' \'' + cli_dict['name']
             msg += '\' can not exist within ' + _dir
@@ -677,15 +713,25 @@ class Project(AssetBase, ComponentLibraryProjectBase,
         return HdlAssembly(dir_abs_path, cli_dict)
 
     def get_card_object_from_cli(self, cli_dict, _dir):
+        """ return an hdl card object corresponding to the cli_dict, using
+            "the directory" which is _dir and which came from either the
+            working directory or from a single -d <dir> entry """
         self.raise_if_not_in_hdl_cards_specs(cli_dict, _dir)
         xml_abs_path = self.get_dir_abs_path() + '/hdl/cards/specs/'
         xml_abs_path += cli_dict['name'] + '.xml'
         return HdlCard(xml_abs_path, cli_dict)
 
     def get_component_object_from_cli(self, cli_dict, _dir):
+        """ return a component object corresponding to the cli_dict, using
+            "the directory" which is _dir and which came from either the
+            working directory or from a single -d <dir> entry """
         return self.get_component_library_type_object_from_cli(cli_dict, _dir)
 
     def get_device_object_from_cli(self, cli_dict, _dir):
+        """ return a hdl device (worker) object corresponding to the cli_dict,
+            using
+            "the directory" which is _dir and which came from either the
+            working directory or from a single -d <dir> entry """
         found = False
         for component_library in self.component_libraries:
             if component_library.name in ['devices', 'cards']:
@@ -704,6 +750,10 @@ class Project(AssetBase, ComponentLibraryProjectBase,
         return Worker(xml_abs_path, cli_dict)
 
     def get_library_object_from_cli(self, cli_dict, _dir):
+        """ return a component library object corresponding to the cli_dict,
+            using
+            "the directory" which is _dir and which came from either the
+            working directory or from a single -d <dir> entry """
         dir_abs_path = _dir
         is_existing_component_library = False
         for component_library in self.component_libraries:
@@ -775,6 +825,10 @@ class Project(AssetBase, ComponentLibraryProjectBase,
         return ComponentLibrary(dir_abs_path, cli_dict)
 
     def get_platform_object_from_cli(self, cli_dict, _dir):
+        """ return a rcc/hdl platform object corresponding to the cli_dict,
+            using
+            "the directory" which is _dir and which came from either the
+            working directory or from a single -d <dir> entry """
         if _dir != (self.get_dir_abs_path() + '/' +
                     cli_dict['authoringmodel'] + '/platforms'):
             msg = cli_dict['authoringmodel'] + ' ' + cli_dict['noun'] + ' '
@@ -798,6 +852,10 @@ class Project(AssetBase, ComponentLibraryProjectBase,
         return asset
 
     def get_primitive_object_from_cli(self, cli_dict, _dir):
+        """ return an hdl primitive core/library object corresponding to the
+            cli_dict, using
+            "the directory" which is _dir and which came from either the
+            working directory or from a single -d <dir> entry """
         if _dir != self.get_dir_abs_path() + '/hdl/primitives':
             msg = cli_dict['noun'] + ' ' + cli_dict['name']
             msg += ' can not exist within ' + _dir
@@ -814,18 +872,30 @@ class Project(AssetBase, ComponentLibraryProjectBase,
         return asset
 
     def get_protocol_object_from_cli(self, cli_dict, _dir):
+        """ return a protocol object corresponding to the cli_dict, using
+            "the directory" which is _dir and which came from either the
+            working directory or from a single -d <dir> entry """
         return self.get_component_library_type_object_from_cli(cli_dict, _dir)
 
     def get_slot_object_from_cli(self, cli_dict, _dir):
+        """ return an hdl slot object corresponding to the cli_dict, using
+            "the directory" which is _dir and which came from either the
+            working directory or from a single -d <dir> entry """
         self.raise_if_not_in_hdl_cards_specs(cli_dict, _dir)
         xml_abs_path = self.get_dir_abs_path() + '/hdl/cards/specs/'
         xml_abs_path += cli_dict['name'] + '.xml'
         return HdlSlot(xml_abs_path, cli_dict)
 
     def get_worker_object_from_cli(self, cli_dict, _dir):
+        """ return a worker object corresponding to the cli_dict, using
+            "the directory" which is _dir and which came from either the
+            working directory or from a single -d <dir> entry """
         return self.get_component_library_type_object_from_cli(cli_dict, _dir)
 
     def get_test_object_from_cli(self, cli_dict, _dir):
+        """ return a unit test object corresponding to the cli_dict, using
+            "the directory" which is _dir and which came from either the
+            working directory or from a single -d <dir> entry """
         return self.get_component_library_type_object_from_cli(cli_dict, _dir)
 
     def handle_hdl_library(self, cli_dict, _dir):
@@ -833,8 +903,10 @@ class Project(AssetBase, ComponentLibraryProjectBase,
         pass
 
     def get_asset_object_from_cli(self, cli_dict, _dir):
-        """ _dir is THE directory within which to do the action corresponding
-            to cli_dict['verb'] (do NOT use cli_dict['d']"""
+        """ return an asset test object corresponding to the cli_dict, using
+            "the directory" which is _dir and which came from either the
+            working directory or from a single -d <dir> entry
+            to cli_dict['verb'] (do NOT use cli_dict['d']) """
         if cli_dict['noun'] == 'adapter':
             asset = self.get_adapter_object_from_cli(cli_dict, _dir)
         elif cli_dict['noun'] == 'application':
@@ -864,6 +936,9 @@ class Project(AssetBase, ComponentLibraryProjectBase,
         return asset
 
     def create_asset(self, cli_dict, _dir):
+        """ create the asset indicated in the cli_dict, using
+            "the directory" which is _dir and which came from either the
+            working directory or from a single -d <dir> entry """
         dir_abs_path = _dir
         apps_dir = None
         if cli_dict['noun'] == 'application':
@@ -1062,6 +1137,8 @@ class Project(AssetBase, ComponentLibraryProjectBase,
         return tmp + ['platform', 'sdp', 'axi']
 
     def get_hdl_primitive_dependent_libraries(self, hdl_primitive=None):
+        """ this is a core part of how build dependencies are autonomously
+            determined """
         ret = []
         # 1. built-in (core) libraries (every project except ocpi.core)
         if str(self.get_package_id()) != 'ocpi.core':
@@ -1080,6 +1157,8 @@ class Project(AssetBase, ComponentLibraryProjectBase,
         return ret
 
     def get_hdl_worker_dependent_libraries(self, comp_library, worker):
+        """ this is a core part of how build dependencies are autonomously
+            determined """
         # TODO should some of this move to ComponentLibrary class?
         ret = []
         if worker.authoring_model == 'hdl':
@@ -1095,6 +1174,8 @@ class Project(AssetBase, ComponentLibraryProjectBase,
         return ret
 
     def get_assets_of_type(self, _type):
+        """ get list of pre-discovered asset objects which get_type() returns
+            the string indicated in _type """
         assets = []
         if _type == 'application':
             assets.extend(self.applications)
@@ -1197,6 +1278,7 @@ class Project(AssetBase, ComponentLibraryProjectBase,
 
     @staticmethod
     def clean(_dir):
+        """ this is a FAST clean that is robust """
         os.system('rm -rf $(find ' + _dir + ' -type d -name gen)')
         os.system('rm -rf $(find ' + _dir + ' -type d -name lib)')
         os.system('rm -rf $(find ' + _dir + ' -type d -name run)')

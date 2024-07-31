@@ -46,6 +46,8 @@ def add_build_create_show_arguments(parser):
 
 
 def add_build_arguments(parser):
+    """ add build-specific arguments as per the man
+        page 'man ocpidev2-build' """
     parser.add_argument('--hdl-target', default=[], action='append')
     parser.add_argument('--hdl-platform', default=[], action='append')
     parser.add_argument('--rcc-platform', default=[], action='append')
@@ -55,7 +57,8 @@ def add_build_arguments(parser):
 
 
 def add_create_arguments(parser, noun, authoring_model=''):
-    """ add create-specific arguments as per man ocpidev2-create """
+    """ add create-specific arguments as per the man
+        page 'man ocpidev2-create ' """
     parser.add_argument('-k', '--keep', default=False, action='store_true')
     asset = ProjectDatabase.get_asset_for_create(noun)
     if noun == 'application':
@@ -250,7 +253,20 @@ def get_args(parser):
 
 
 def get_cli_dict():
-    """ get a dictionary of settings which looks like CLI """
+    """ get a dictionary of settings which looks like CLI
+        cli_dict['d']                a list of entries corresponding to
+                                     -d <dir>, with the list being empty if no
+                                     -d was specified
+        cli_dict['verb']             the CLI verb (always exists)
+        cli_dict['noun']             the CLI noun (often exists)
+        cli_dict['name']             the CLI noun (sometimes exists)
+        cli_dict['authoringmodel']   either 'hdl' or 'rcc' or '' if no
+                                     authoring model was specified
+        cli_dict['adjective']        'core' or 'library' when
+                                     'hdl primitive core' or
+                                     'hdl primitive library' was specified at
+                                     the command line (need to change this...)
+        cli_dict[many..other..entries..] """
     args = get_args(get_arg_parser())
     nouns = ['adapter', 'adapters',
              'assembly', 'assemblies',

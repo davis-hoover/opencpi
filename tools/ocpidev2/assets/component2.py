@@ -264,6 +264,9 @@ class OperationArgumentMember(AttributeBase):
         return ['Member']
 
     def get_attr_infos(self):
+        """ returns a dictionary which is the authoritative definition of what
+            attributes exist for this asset, what their types are (dictates how
+            they should be parsed), and what their exposes CLI arguments are """
         ret = []
         for key in ['Name', 'Type']:
             ret.append(AttributeInfo(key))
@@ -285,6 +288,9 @@ class OperationArgument(AttributeBase):
         return ['Argument']
 
     def get_attr_infos(self):
+        """ returns a dictionary which is the authoritative definition of what
+            attributes exist for this asset, what their types are (dictates how
+            they should be parsed), and what their exposes CLI arguments are """
         ret = []
         for key in ['Name', 'Type']:
             ret.append(AttributeInfo(key))
@@ -316,6 +322,9 @@ class Operation(AttributeBase):
         return ['Operation']
 
     def get_attr_infos(self):
+        """ returns a dictionary which is the authoritative definition of what
+            attributes exist for this asset, what their types are (dictates how
+            they should be parsed), and what their exposes CLI arguments are """
         ret = []
         ret.append(AttributeInfo('Name'))
         return ret
@@ -372,6 +381,8 @@ class Protocol(AssetBase):
                     pass
 
     def get_type(self):
+        """ this string is used in many places to disambiguate the duck-typed
+            asset object (similar to type())"""
         return 'protocol'
 
 
@@ -397,6 +408,9 @@ class Component(AssetBase):
         return templates
 
     def get_attr_infos(self):
+        """ returns a dictionary which is the authoritative definition of what
+            attributes exist for this asset, what their types are (dictates how
+            they should be parsed), and what their exposes CLI arguments are """
         ret = []
         ret.append(AttributeInfo('Name'))
         ret.append(AttributeInfo('NoControl',
@@ -439,6 +453,8 @@ class Component(AssetBase):
         #                self.throw_invalid_element_error(self.abs_path, tag)
 
     def get_type(self):
+        """ this string is used in many places to disambiguate the duck-typed
+            asset object (similar to type())"""
         return 'component'
 
 
@@ -454,6 +470,9 @@ class Property(AttributeBase):
         return ['Property']
 
     def get_attr_infos(self):
+        """ returns a dictionary which is the authoritative definition of what
+            attributes exist for this asset, what their types are (dictates how
+            they should be parsed), and what their exposes CLI arguments are """
         ret = []
         ret.append(AttributeInfo('Name'))  # CDG section 6.3.1
         ret.append(AttributeInfo('Value'))  # CDG section 6.4.11

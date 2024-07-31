@@ -147,6 +147,10 @@ class ComponentLibrary(AssetBase, ComponentLibraryWorkerBase,
     # end of CDG section 14.2.3
 
     def __init__(self, dir_abs_path, cli_dict=None):
+        """ cli_dict must be None when discovering existing libraries on the
+            filesystem, and when not None, must be a dict containing
+            entries according to
+            get_attr_infos (e.g. 'hdllibraries') """
         self.root_tags = ['Library']  # CDG section 10.1
         AssetBase.__init__(self, dir_abs_path, cli_dict)
         is_test = self.get_dir_abs_path_is_test(dir_abs_path)
@@ -170,6 +174,8 @@ class ComponentLibrary(AssetBase, ComponentLibraryWorkerBase,
             self.discover(allowlist, 'hdl/platforms' in dir_abs_path)
 
     def get_type(self):
+        """ this string is used in many places to disambiguate the duck-typed
+            asset object (similar to type())"""
         return 'component library'
 
     @staticmethod
@@ -186,6 +192,9 @@ class ComponentLibrary(AssetBase, ComponentLibraryWorkerBase,
         return dir_abs_path.endswith('.test')
 
     def get_attr_infos(self):
+        """ returns a dictionary which is the authoritative definition of what
+            attributes exist for this asset, what their types are (dictates how
+            they should be parsed), and what their exposes CLI arguments are """
         ret = []
         ret.extend(ComponentLibraryWorkerBase.get_attr_infos(self))
         ret.extend(ComponentLibraryProjectBase.get_attr_infos(self))
@@ -208,6 +217,9 @@ class ComponentLibrary(AssetBase, ComponentLibraryWorkerBase,
         return ret
 
     def get_paths_to_parse(self):
+        """ return list of strings which define all files of this asset type
+            which potentially contain attributes (usually the xml, sometimes
+            also makefile(s)) for pre-2.0 opencpi project support """
         paths = []
         # start pre-2.0 opencpi
         # TODO address library.mk vs libraries.mk behavior in Makefile
@@ -219,23 +231,30 @@ class ComponentLibrary(AssetBase, ComponentLibraryWorkerBase,
         return paths
 
     def get_templates(self):
+        """ Returns dictionary containing keys which are filenames and values
+            which are jiinja template strings. The dictionary is the authority
+            on what gets created for the 'create' verb """
         templates = {}
         templates[self.name + '-library.rst'] = comp_lib_rst_template
         templates[self.name + '.xml'] = g_asset_template
         return templates
 
     def parse(self, cli_dict=None):
+        """ during discovery, parse the assumed-existing files indicated in
+            get_paths_to_parse() for the attributes of this asset """
         AssetBase.parse(self, cli_dict)
         global g_libraries_mk
         if g_libraries_mk:
             g_libraries_mk = False
 
     def create(self):
+        """ create this asset by writing files to the filesystem """
         AssetBase.create(self)
         # below line is so that protocols can be created
         System('mkdir -p ' + self.get_dir_abs_path() + '/specs')
 
     def discover(self, allowlist, platform=False):
+        """ discover this asset as it exists, already, on the filesystem """
         SpecsDirectory.discover(self)
         self.discover_workers_and_tests(allowlist, platform)
         for discovery_path in self.get_potential_asset_dir_abs_paths(''):

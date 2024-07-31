@@ -106,6 +106,10 @@ class Worker(AssetBase, WorkerBase):
         is in or its package ID. """
 
     def __init__(self, xml_abs_path, cli_dict=None):
+        """ cli_dict must be None when discovering existing workers on the
+            filesystem, and when not None, must be a dict containing
+            entries according to
+            get_attr_infos (e.g. 'slave') """
         self.root_tags = ['HdlWorker', 'HdlDevice']  # PDG section 5.4.4
         self.root_tags += ['HdlPlatform', 'RccWorker']
         # start pre-2.0 opencpi
@@ -155,6 +159,9 @@ class Worker(AssetBase, WorkerBase):
             Logger().warn(msg)
 
     def get_paths_to_parse(self):
+        """ return list of strings which define all files of this asset type
+            which potentially contain attributes (usually the xml, sometimes
+            also makefile(s)) for pre-2.0 opencpi project support """
         paths = []
         # start pre-2.0 opencpi
         paths += [self.get_dir_abs_path() + '/Makefile']
@@ -165,6 +172,9 @@ class Worker(AssetBase, WorkerBase):
         return paths
 
     def get_attr_infos(self):
+        """ returns a dictionary which is the authoritative definition of what
+            attributes exist for this asset, what their types are (dictates how
+            they should be parsed), and what their exposes CLI arguments are """
         ret = []
         ret.extend(WorkerBase.get_attr_infos(self))
         # TODO
@@ -186,6 +196,9 @@ class Worker(AssetBase, WorkerBase):
         System('rm -rf ' + self.get_dir_abs_path())
 
     def get_templates(self):
+        """ Returns dictionary containing keys which are filenames and values
+            which are jiinja template strings. The dictionary is the authority
+            on what gets created for the 'create' verb """
         templates = {}
         filename = self.name + '-' + self.authoring_model + '.rst'
         templates[filename] = worker_rst_template
@@ -197,6 +210,8 @@ class Worker(AssetBase, WorkerBase):
         return templates
 
     def parse(self):
+        """ during discovery, parse the assumed-existing files indicated in
+            get_paths_to_parse() for the attributes of this asset """
         AssetBase.parse(self)
         if self.attrs['Name'] != '':
             self.name = self.attrs['Name']

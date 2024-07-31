@@ -913,6 +913,8 @@ class ProjectDatabase(ProjectRegistry):
 
     @staticmethod
     def is_worker(noun):
+        """ assess CLI noun to see if it is a worker, e.g. 'worker' and
+            'adapter' are both worker nouns """
         return Project.is_worker(noun)
 
     @staticmethod
@@ -928,6 +930,9 @@ class ProjectDatabase(ProjectRegistry):
         return Project.get_asset_for_create(noun)
 
     def discover_local_project(self, _dir):
+        """ append local project to self.projects if it doesn't already exist,
+            and save its index within self.projects the list. The self.projects
+            contains the fully-discovered projects"""
         project_dir_abs_path = _dir
         while True:
             try:
@@ -950,9 +955,14 @@ class ProjectDatabase(ProjectRegistry):
                     break
 
     def discover_registered_projects(self):
+        """ ensure all registered projects exist within self.projects list.
+            The self.projects contains the fully-discovered projects"""
         ProjectRegistry.discover(self, True, True)
 
     def create(self, cli_dict, _dir):
+        """ perform create of the noun/verb/name/etc in the cli_dict, using
+            "the directory" which is _dir and which came from either the
+            working directory or from a single -d <dir> entry """
         if cli_dict.get('component'):
             self.discover_registered_projects()  # for warnings
         self.discover_local_project(_dir)
@@ -1118,7 +1128,11 @@ class ProjectDatabase(ProjectRegistry):
         return ret
 
     def dispatch_verb_for_single_dir(self, cli_dict, _dir):
-        """ only 'build' and 'clean' and 'show' verbs for now """
+        """ Perform the noun/verb/name/etc in the cli_dict, using
+            "the directory" which is _dir and which came from either the
+            working directory or from a single -d <dir> entry. This method
+            attempts to normalize how assets-on-which-the-verb-are-performed
+            are gathered before executing the action. """
         if not os.path.exists(_dir):
             raise Exception(_dir + ' does not exist')
         if cli_dict['globalscope'] and (not cli_dict['localscope']):
@@ -1213,6 +1227,9 @@ class ProjectDatabase(ProjectRegistry):
                     print('')
 
     def show(self, cli_dict, _dir):
+        """ perform show of the noun/verb/name/etc in the cli_dict, using
+            "the directory" which is _dir and which came from either the
+            working directory or from a single -d <dir> entry """
         self.dispatch_verb_for_single_dir(cli_dict, _dir)
 
     def get_list_of_component_strings_by_name(self, spec):
@@ -1238,6 +1255,9 @@ class LegacyBuildTool():
         files/classes """
 
     def get_make_build_str(self, cmd, _list, var):
+        """ get the string representation of the GNU make recipe which will
+            be used to build by setting the GNU make variable var to
+            the space-separated string indicated in the _list """
         if len(_list) > 0:
             cmd += ' ' + var + '=\''
             first = True
@@ -1250,6 +1270,8 @@ class LegacyBuildTool():
         return cmd
 
     def get_mk_filename(self, asset):
+        """ This is what interfaces with the lower Tool Layers (TLs) of the
+            OpenCPI build engine. """
         ret = ''
         if asset.get_type() == 'application':
             ret = 'application.mk'
@@ -1266,6 +1288,8 @@ class LegacyBuildTool():
 
     def get_build_artifact_extension(self, hdl_target='',
                                      rcc_platform='', is_assembly=False):
+        """ This is used in forming the GNU Make recipe targets which include
+            the filnames of what gets built. """
         # TODO better separate this into target-specific class/API
         ret = 'bitz' if is_assembly else 'edf'
         if hdl_target.startswith('virtex') or hdl_target.startswith('stratix'):
