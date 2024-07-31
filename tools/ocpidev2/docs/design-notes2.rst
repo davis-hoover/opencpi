@@ -44,7 +44,7 @@ for project traversion. Assets undergo build/clean/show/etc from the perspective
 of a ProjectDatabase.
 
 .. image:: ocpidev2_import_diagram.svg
-   :scale: 50%
+   :scale: 20%
 
 The AttributeBase class normalizes parsing across XML and makefiles and
 for all asset type. The AssetBase class inherits from AttributeBase and is
