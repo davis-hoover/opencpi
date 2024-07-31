@@ -156,7 +156,6 @@
 +tools/scripts/hdltools/xst.py scripts/hdltools/
 +tools/scripts/upgradeApp_v1_3.py scripts/
 +tools/ocpidev/ocpidev_bash_complete.sh scripts/ocpidev_bash_complete
-+tools/ocpidev2/ocpidev2_bash_complete.sh scripts/ocpidev2_bash_complete
 =tools/scripts/util.sh scripts/
 +tools/scripts/testrunprep.sh scripts/
 +tools/scripts/testrunremote.sh scripts/
