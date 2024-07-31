@@ -879,11 +879,11 @@ class ProjectRegistry():
                             (rcc_platforms2 == [])):
                         gmtstr = gnu_make_target_str
                         makefile.rules['all'].prerequisites.append(gmtstr)
-                        makefile = \
-                            self.append_asset_rules_to_makefile_variable( \
+                        mm = self.append_asset_rules_to_makefile_variable(
                             asset, hdl_targets2, hdl_platforms2,
                             rcc_platforms2, makefile, gnu_make_target_str,
                             tool)
+                        makefile = mm
         return makefile
 
     def execute_build(self, hdl_targets, hdl_platforms, rcc_platforms, fs,
