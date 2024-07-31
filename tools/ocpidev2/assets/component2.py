@@ -266,7 +266,8 @@ class OperationArgumentMember(AttributeBase):
     def get_attr_infos(self):
         """ returns a dictionary which is the authoritative definition of what
             attributes exist for this asset, what their types are (dictates how
-            they should be parsed), and what their exposes CLI arguments are """
+            they should be parsed), and what their exposes CLI arguments
+            are """
         ret = []
         for key in ['Name', 'Type']:
             ret.append(AttributeInfo(key))
@@ -290,7 +291,8 @@ class OperationArgument(AttributeBase):
     def get_attr_infos(self):
         """ returns a dictionary which is the authoritative definition of what
             attributes exist for this asset, what their types are (dictates how
-            they should be parsed), and what their exposes CLI arguments are """
+            they should be parsed), and what their exposes CLI arguments
+            are """
         ret = []
         for key in ['Name', 'Type']:
             ret.append(AttributeInfo(key))
@@ -324,7 +326,8 @@ class Operation(AttributeBase):
     def get_attr_infos(self):
         """ returns a dictionary which is the authoritative definition of what
             attributes exist for this asset, what their types are (dictates how
-            they should be parsed), and what their exposes CLI arguments are """
+            they should be parsed), and what their exposes CLI arguments
+            are """
         ret = []
         ret.append(AttributeInfo('Name'))
         return ret
@@ -410,7 +413,8 @@ class Component(AssetBase):
     def get_attr_infos(self):
         """ returns a dictionary which is the authoritative definition of what
             attributes exist for this asset, what their types are (dictates how
-            they should be parsed), and what their exposes CLI arguments are """
+            they should be parsed), and what their exposes CLI arguments
+            are """
         ret = []
         ret.append(AttributeInfo('Name'))
         ret.append(AttributeInfo('NoControl',
@@ -472,7 +476,8 @@ class Property(AttributeBase):
     def get_attr_infos(self):
         """ returns a dictionary which is the authoritative definition of what
             attributes exist for this asset, what their types are (dictates how
-            they should be parsed), and what their exposes CLI arguments are """
+            they should be parsed), and what their exposes CLI arguments
+            are """
         ret = []
         ret.append(AttributeInfo('Name'))  # CDG section 6.3.1
         ret.append(AttributeInfo('Value'))  # CDG section 6.4.11

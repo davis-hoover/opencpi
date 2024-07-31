@@ -194,7 +194,8 @@ class ComponentLibrary(AssetBase, ComponentLibraryWorkerBase,
     def get_attr_infos(self):
         """ returns a dictionary which is the authoritative definition of what
             attributes exist for this asset, what their types are (dictates how
-            they should be parsed), and what their exposes CLI arguments are """
+            they should be parsed), and what their exposes CLI arguments
+            are """
         ret = []
         ret.extend(ComponentLibraryWorkerBase.get_attr_infos(self))
         ret.extend(ComponentLibraryProjectBase.get_attr_infos(self))

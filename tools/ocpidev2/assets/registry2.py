@@ -355,9 +355,9 @@ class ProjectRegistry():
         """ builds assets by creating a temporary makefile and calls make -j
             on it and then deleting it """
         if len(cli_dict['hdlplatform']) > 1:
-           raise Exception('multiple --hdl-platform not yet supported')
+            raise Exception('multiple --hdl-platform not yet supported')
         if len(cli_dict['rccplatform']) > 1:
-           raise Exception('multiple --rcc-platform not yet supported')
+            raise Exception('multiple --rcc-platform not yet supported')
         self.dispatch_verb_for_single_dir(cli_dict, _dir)
 
     def clean(self, cli_dict, _dir):
@@ -873,12 +873,16 @@ class ProjectRegistry():
                                                      hdl_platform,
                                                      rcc_platform, self)
                 # TODO this if statement is a hack - do better
-                if not ((asset.get_type() == 'application') and (rcc_platforms2 == [])):
-                    if not ((asset.get_type() == 'worker') and (rcc_platforms2 == [])):
-                        makefile.rules['all'].prerequisites.append(gnu_make_target_str)
+                if not ((asset.get_type() == 'application') and
+                        (rcc_platforms2 == [])):
+                    if not ((asset.get_type() == 'worker') and
+                            (rcc_platforms2 == [])):
+                        gmtstr = gnu_make_target_str
+                        makefile.rules['all'].prerequisites.append(gmtstr)
                         makefile = self.append_asset_rules_to_makefile_variable(
                             asset, hdl_targets2, hdl_platforms2,
-                            rcc_platforms2, makefile, gnu_make_target_str, tool)
+                            rcc_platforms2, makefile, gnu_make_target_str,
+                            tool)
         return makefile
 
     def execute_build(self, hdl_targets, hdl_platforms, rcc_platforms, fs,
