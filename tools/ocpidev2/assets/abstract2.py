@@ -68,38 +68,6 @@ def get_xml_val_list(val):
     return ' '.join(val.replace('\n', '').split()).split(' ')
 
 
-# TODO probably a single authoritative xml is needed to parse this from....
-def get_target(hdl_platform, rcc_platform=''):
-    # TODO parse tools/include/hdl/hdl-targets.xml, ml605.mk instead of below
-    ret = hdl_platform
-    if rcc_platform == '':
-        if hdl_platform == 'zed':
-            ret = 'zynq'
-        elif hdl_platform == 'zcu106':
-            ret = 'zynq_ultra'
-        elif hdl_platform == 'zed_ise':
-            ret = 'zynq_ise'
-        elif hdl_platform == 'zcu104':
-            ret = 'zynq_ultra'
-        elif hdl_platform == 'zed_ether':
-            ret = 'zynq'
-        elif hdl_platform == 'ml605':
-            ret = 'virtex6'
-        elif hdl_platform == 'alst4x':
-            ret = 'stratix'
-        elif hdl_platform == 'alst4':
-            ret = 'stratix'
-        elif hdl_platform == 'matchstiq_z1':
-            ret = 'zynq'
-        elif hdl_platform == 'e31x':
-            ret = 'zynq'
-        elif hdl_platform == 'zrf8_48dr':
-            ret = 'zynq_ultra'
-    else:
-        ret = rcc_platform
-    return ret
-
-
 # TODO move to Project, or perhaps ProjectRegistry, class
 def raise_not_found_in_projects(msg, name):
     raise Exception(msg + ' ' + name + ' not found in any registered project')

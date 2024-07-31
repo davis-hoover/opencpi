@@ -354,6 +354,10 @@ class ProjectRegistry():
     def build(self, cli_dict, _dir):
         """ builds assets by creating a temporary makefile and calls make -j
             on it and then deleting it """
+        if len(cli_dict['hdlplatform']) > 0:
+           raise Exception('multiple --hdl-platform not yet supported')
+        if len(cli_dict['rccplatform']) > 0:
+           raise Exception('multiple --rcc-platform not yet supported')
         self.dispatch_verb_for_single_dir(cli_dict, _dir)
 
     def clean(self, cli_dict, _dir):
@@ -467,6 +471,7 @@ class ProjectRegistry():
 
     # TODO probably a single authoritative xml is needed to parse this from....
     def get_target(self, hdl_platform, rcc_platform=''):
+        # assert (not ((hdl_platform == '') and (rcc_platform == '')))
         # TODO parse tools/.../hdl-targets.xml, ml605.mk instead of below code
         ret = hdl_platform
         if rcc_platform == '':
@@ -510,7 +515,9 @@ class ProjectRegistry():
                     prim = hdl_primitive
                     break
             for hdl_platform in hdl_platforms:
-                target = get_target(hdl_platform, '')
+                if hdl_platform == '':
+                    continue
+                target = self.get_target(hdl_platform, '')
                 ppath = tool.get_build_artifact_abs_path(prim, target,
                                                          hdl_platform, '',
                                                          self)
@@ -553,12 +560,16 @@ class ProjectRegistry():
                     prim = hdl_primitive
                     break
             for platform in (hdl_platforms + rcc_platforms):
+                if platform == '':
+                    continue
+                rccps = []
                 hdl_platform = ''
                 rcc_platform = ''
                 if platform in hdl_platforms:
                     hdl_platform = platform
                 if platform in rcc_platforms:
                     rcc_platform = platform
+                    rccps.append(rcc_platform)
                 target = self.get_target(hdl_platform, rcc_platform)
                 ppath = tool.get_build_artifact_abs_path(prim, target,
                                                          hdl_platform,
@@ -566,19 +577,22 @@ class ProjectRegistry():
                 makefile.rules[gnu_make_target_str].prerequisites.append(ppath)
                 # recursion
                 hdlp = hdl_platform
-                rccp = rcc_platform
                 makefile = \
                     self.append_asset_rules_to_makefile_variable(prim,
                                                                  [target],
                                                                  [hdlp],
-                                                                 [rccp],
+                                                                 rccps,
                                                                  makefile,
                                                                  ppath,
                                                                  tool)
         for hdl_platform in hdl_platforms:
+            if hdl_platform == '':
+                continue
             for worker in self.get_hdl_worker_dependent_workers(asset,
                                                                 hdl_platform):
                 for platform in (hdl_platforms + rcc_platforms):
+                    if platform == '':
+                        continue
                     hdl_platform = ''
                     rcc_platform = ''
                     if platform in hdl_platforms:
@@ -619,6 +633,8 @@ class ProjectRegistry():
                                             break
                                 for platform in (hdl_platforms +
                                                  rcc_platforms):
+                                    if platform == '':
+                                        continue
                                     hdl_platform = ''
                                     rcc_platform = ''
                                     if platform in hdl_platforms:
@@ -697,6 +713,8 @@ class ProjectRegistry():
                 local_project = project
                 break
         for hdl_platform in hdl_platforms:
+            if hdl_platform == '':
+                continue
             for name in self.get_hdl_assembly_dependent_workers(
                     hdl_assembly, hdl_platform):
                 # order in CDG section 14.8 is enforced
@@ -743,7 +761,7 @@ class ProjectRegistry():
                                                       makefile,
                                                       gnu_make_target_name,
                                                       tool):
-        recipe = tool.get_gnu_make_recipe(asset, hdl_targets, hdl_platforms,
+        recipe = tool.get_gnu_make_recipe(asset, [], [],
                                           rcc_platforms)
         makefile.rules[gnu_make_target_name].recipe = recipe
         return makefile
@@ -758,10 +776,11 @@ class ProjectRegistry():
         target = GNUMakeTarget(gnu_make_target_str)
         makefile.rules[gnu_make_target_str].targets.append(target)
         if asset.get_type() == 'application':
-            makefile = self.append_application_rules_to_makefile_variable(
-                    asset, hdl_targets, hdl_platforms, rcc_platforms,
-                    makefile, gnu_make_target_str, tool)
-        if asset.get_type() == 'hdl primitive':
+            if rcc_platforms != []:
+                makefile = self.append_application_rules_to_makefile_variable(
+                        asset, [], [], rcc_platforms,
+                        makefile, gnu_make_target_str, tool)
+        if asset.get_type().startswith('hdl primitive'):
             makefile = self.append_prim_rules_to_makefile_variable(
                     asset, hdl_targets, hdl_platforms, rcc_platforms,
                     makefile, gnu_make_target_str, tool)
@@ -832,23 +851,34 @@ class ProjectRegistry():
         for asset in assets:
             artifact_list = hdl_targets + hdl_platforms + rcc_platforms
             for artifact_list_entry in artifact_list:
+                if artifact_list_entry == '':
+                    continue
+                hdl_targets2 = []
+                hdl_platforms2 = []
+                rcc_platforms2 = []
                 hdl_target = ''
                 hdl_platform = ''
                 rcc_platform = ''
                 if artifact_list_entry in hdl_targets:
                     hdl_target = artifact_list_entry
+                    hdl_targets2.append(hdl_target)
                 if artifact_list_entry in hdl_platforms:
                     hdl_platform = artifact_list_entry
+                    hdl_platforms2.append(hdl_platform)
                 if artifact_list_entry in rcc_platforms:
                     rcc_platform = artifact_list_entry
+                    rcc_platforms2.append(rcc_platform)
                 gnu_make_target_str = \
                     tool.get_build_artifact_abs_path(asset, hdl_target,
                                                      hdl_platform,
                                                      rcc_platform, self)
-                makefile.rules['all'].prerequisites.append(gnu_make_target_str)
-                makefile = self.append_asset_rules_to_makefile_variable(
-                    asset, hdl_targets, hdl_platforms,
-                    rcc_platforms, makefile, gnu_make_target_str, tool)
+                # TODO this if statement is a hack - do better
+                if not ((asset.get_type() == 'application') and (rcc_platforms2 == [])):
+                    if not ((asset.get_type() == 'worker') and (rcc_platforms2 == [])):
+                        makefile.rules['all'].prerequisites.append(gnu_make_target_str)
+                        makefile = self.append_asset_rules_to_makefile_variable(
+                            asset, hdl_targets2, hdl_platforms2,
+                            rcc_platforms2, makefile, gnu_make_target_str, tool)
         return makefile
 
     def execute_build(self, hdl_targets, hdl_platforms, rcc_platforms, fs,
@@ -1240,6 +1270,8 @@ class LegacyBuildTool():
         ret = 'bitz' if is_assembly else 'edf'
         if hdl_target.startswith('virtex') or hdl_target.startswith('stratix'):
             ret = 'sof' if is_assembly else 'qsf'
+        if rcc_platform != '':
+            ret = 'so'
         return ret
 
     def get_build_artifact_abs_path(self, asset, hdl_target,
@@ -1266,8 +1298,12 @@ class LegacyBuildTool():
                         tmp += asset.containers[0].attrs['Config'] + '_'
                     tmp += asset.containers[0].name
                 ret += '/container-' + tmp + '_'
-            ret += '/target-' + hdl_target + '/'
-            ret += asset.name
+            ret += '/target-'
+            if hdl_target == '':
+                ret += rcc_platform
+            else:
+                ret += hdl_target
+            ret += '/' + asset.name
             asm = True
             if (asset.get_type() == 'hdl primitive') or \
                (asset.get_type() == 'hdl worker') or \
