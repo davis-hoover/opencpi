@@ -22,9 +22,12 @@ XML tags and attributes are always defined in the python code in the same upper 
 the documentation (Dev Guides), e.g., HdlAssembly is defined in a certain
 get_root_tags()
 method. Created assets use the same upper camel case for their XML files.
+The output is colorized (errors in red, warnings in yellow, debug is cyan).
 
 Comparison with ocpidev
 =======================
+The biggest advantage of ocpidev2 over opencpi is in smart, fast
+FPGA building, including building FPGA design(s) with a single command.
 The ocpidev script supports the verbs
 build/clean/create/delete/register/run/set/show/unregister/unset.
 The ocpidev2 script supports the verbs
@@ -114,7 +117,10 @@ Note that RCC builds are also supported, but any
 implied application dependency on a hdl assembly
 is not automatically determined and therefore not built.
 This relationship (deployment) is one of the most complicated
-mechanisms in OpenCPI.
+mechanisms in OpenCPI. At the moment, 'ocpiadmin install platform'
+is called under the hood for rcc platforms, to ensure rcc
+assets build even after the opencpi.git core project
+is cleaned.
 
 Testing
 =======
@@ -142,23 +148,16 @@ A directory is a Component Library
 
 Furthermore, none of <project>/specs, <library>/specs, or <project>/hdl/platforms/<platform> are themselves a component library.
 
-Asset objects
-=============
-
-        CLI   XML   makefiles
-         |     |      |
-         V     V      V
-    asset object (inherits from AssetBase) self.attrs
-
 Command Line Interface (CLI)
 ============================
 
 The command line interface is exposed to the ProjectDatabase
 as a variable cli_dict which is a dictionary of noun, verb, name, and other
 options. The man pages, e.g. 'man ocpidev2' and 'man ocpidev2-build'
-define the supported CLI. The cli_dict is associated with
+define the supported CLI. The cli_dict is logged at log level 10.
+The cli_dict is associated with
 the asset top-level attributes (contained in each asset class's self.attrs)
-via the dictionairy returned by
+via the dictionary returned by
 each asset class's get_attr_infos() method.
 Note that 'git grep cli_dict' is helpful in tying the following description to the codebase.
 
