@@ -198,12 +198,12 @@ Option When Creating Components (Specs) or Protocols
 
 Options When Creating Components, Protocols, Workers, and Tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*`-h`* '<hdl-library>', *`--hdl-library=`*'<hdl-library>'::
+*`--hdl-library=`*'<hdl-library>'::
    Create the asset in the component library under the
    *`hdl/`* directory of the project. Valid values are only
    one of *devices*, *cards* or *adapters*.
 
-*`-l`* '<library>', *`--library=`*'<library>'::
+*`--library=`*'<library>'::
    Create the asset in the specified component library.
 
 Option When Creating Workers (All Types) and Tests
