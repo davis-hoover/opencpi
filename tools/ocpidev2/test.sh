@@ -710,8 +710,6 @@ ocpidev2 show components --json
 ocpidev2 clean -d core -d assets -d platform -d assets_ts
 ocpidev2 build -d core/hdl/primitives/bsv --hdl-platform xsim 
 ocpidev2 clean -d core -d assets -d platform -d assets_ts
-ocpidev2 build -d core/hdl/primitives/bsv --hdl-platform xsim --hdl-platform zed
-ocpidev2 clean -d core -d assets -d platform -d assets_ts
 ocpidev2 build -j 16 -d assets/hdl/assemblies/iqstream_max --hdl-platform xsim
 ocpidev2 clean -d core -d assets -d platform -d assets_ts
 ocpidev2 build -j 16 -d assets/hdl/assemblies --hdl-platform zed
