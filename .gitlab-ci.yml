@@ -1,51 +1,45 @@
-# include:
-#   - .gitlab-ci/yaml/docs.yml
+include:
+  - .gitlab-ci/yaml/docs.yml
 
 stages:
-  - framework
+  - packages
+  - build
+  - generate
   - install
   - deploy
   - test
   - docs
+  - comps
 
 variables:
   DOCKER_HOST: tcp://docker:2376
   DOCKER_TLS_CERTDIR: "/certs"
   DOCKER_TLS_VERIFY: 1
   DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
+  CACHE_KEY_SUFFIX: ${CI_COMMIT_BRANCH}
   GIT_SUBMODULE_UPDATE_FLAGS: --remote
+  OCPI_XILINX_VIVADO_VERSION:
+    description: "Version of Xilinx Vivado to use in pipeline."
+    value: "2021.1"
   HOST:
     description:  "The host platform to install framework for."
     value: "rocky8"
-    options:
-      - "rocky8"
-      - "ubuntu20_04"
-  # RCC_PLATFORM:
-  #   description: "The rcc platform to run pipeline for."
-  # RCC_TOOL:
-  #   description: "Vendor build tool to use in pipeline for rcc platform."
-  #   value: none
-  #   options:
-  #     - none
-  #     - vitis:2019.2-aarch32
-  #     - vitis:2019.2-aarch64
-  # HDL_PLATFORM:
-  #   description: "The hdl platform to run pipeline for."
-  # HDL_TARGET:
-  #   description: "The hdl target to run pipeline for."
-  # HDL_TOOL:
-  #   description: "Vendor build tool to use in pipeline for hdl target and platform."
-  #   value: none
-  #   options:
-  #     - none
-  #     - vivado:2021.1
-  #     - vivado:2019.2
+  PLATFORMS: 
+    description: "Names of platforms to run pipeline for. If pipeline is to run an OSP platform, 
+                  the OSP project must be added to OSPS. Use a \":\" to associate an
+                  hdl platform with an rcc platform for HWIL testing."
+    value: "zed:xilinx19_2_aarch32 xsim zcu104:xilinx19_2_aarch64"
+  OSPS:
+    description: "OSP projects to include in pipeline. Use the full name of the project, e.g.,
+                  ocpi.osp.plutosdr."
+    value: ""
   DO_HWIL:
     description: "Whether to do HWIL testing."
     value: "False"
   DO_SIM:
     description: "Whether to do simulator testing."
     value: "True"
+
 
 workflow:
   auto_cancel:
@@ -58,118 +52,187 @@ workflow:
         CACHE_KEY_SUFFIX: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
     - when: always
 
-.default:
-  image: "${CI_OCPI_CONTAINER_REGISTRY}/builder:0.0.3"
-  before_script: aws ecr get-login-password --region us-east-1 | podman login --username AWS
-                 --password-stdin $CI_OCPI_CONTAINER_REGISTRY > /dev/null 2>&1
+
+.framework_changes: 
+  paths: &framework_changes
+    - bootstrap/**/*
+    - build/**/*
+    - os/**/*
+    - packaging/**/*
+    - platforms/**/*
+    - project-registry/**/*
+    - runtime/**/*
+    - scripts/**/*
+    - tests/**/*
+    - tools/**/*
+    - projects/**/prerequisites/**/*
+    - projects/**/rcc/platforms/${HOST}/**/*
+    - "Framework.exports"
+    - "Makefile"
+
+
+packages:
+  stage: packages
+  image: "${CI_OCPI_CONTAINER_REGISTRY}/builder:0.0.1"
+  tags: ['aws', 'opencpi', 'cache', 'framework']
+  services:
+    - docker:24.0.5-dind
+  interruptible: true
+  variables:
+    BASE_IMAGE: ${CI_OCPI_CONTAINER_REGISTRY}/${HOST}/packages:${CI_COMMIT_SHORT_SHA}
+  before_script:
+    - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $CI_OCPI_CONTAINER_REGISTRY
+  script: 
+    - cd .gitlab-ci && make packages
+
+
+build:
+  image: $BASE_IMAGE
+  stage: build
+  tags: ['aws', 'opencpi', 'cache', 'framework']
+  interruptible: true
+  variables:
+    BASE_IMAGE: ${CI_OCPI_CONTAINER_REGISTRY}/${HOST}/packages:${CI_COMMIT_SHORT_SHA}
+    FALLBACK_KEY: $CI_DEFAULT_BRANCH
+    CACHE_KEY: build-${HOST}-${CACHE_KEY_SUFFIX}
+  before_script:
+    - git reset --hard # Overwrite cache with commit
+    - find . -exec touch -ht $(date +"%Y%m%d%H%M.%S") {} + # Update timestamps
+    # Update timestamps of changes since cache was created
+    - test -e build.cachestamp && sleep 1 && git diff --name-only HEAD $(cat build.cachestamp) | xargs -r touch
+  after_script:
+    - echo $CI_COMMIT_SHA > build.cachestamp
+  script:
+    - ./build/install-prerequisites.sh
+    - rm -rf ./prerequisites-build 
+    - if [[ ! -f build.cachestamp || -n $DO_FRAMEWORK ]] ; then ./build/build-opencpi.sh ; fi
+    - if [[ ! -f build.cachestamp || -n $DO_FRAMEWORK ]] ; then ./scripts/test-opencpi.sh --no-hdl ; fi
+    - if [[ ! -f build.cachestamp || -n $DO_FRAMEWORK ]] ; then source ./cdk/opencpi-setup.sh -r ; fi
+    - if [[ ! -f build.cachestamp || -n $DO_FRAMEWORK ]] ; then ./.gitlab-ci/scripts/build.py --platform $HOST --report-path build-report.xml ; fi
+  cache:
+    - key: $CACHE_KEY
+      fallback_keys: 
+        - $FALLBACK_KEY
+      policy: pull
+      untracked: true
+    - key: build-${HOST}-${CACHE_KEY_SUFFIX}
+      when: on_success
+      policy: push
+      untracked: true
+  rules:
+    - changes:
+    # If framework changes, don't pull cache
+        paths: *framework_changes
+      variables:
+        CACHE_KEY: ''
+        FALLBACK_KEY: ''
+        DO_FRAMEWORK: True
+    - when: on_success
   artifacts:
     when: always
     expire_in: "7 days"
     paths:
-      - .gitlab-ci/artiacts/job-report.xml
+      - build-report.xml
     reports:
-      junit: .gitlab-ci/artifacts/job-report.xml
+      junit: build-report.xml
 
-.merge_request:
+
+generate:
+  stage: generate
+  image: $BASE_IMAGE
+  tags: ['aws', 'opencpi', 'cache', 'framework']
+  interruptible: true
+  variables:
+    BASE_IMAGE: ${CI_OCPI_CONTAINER_REGISTRY}/${HOST}/packages:${CI_COMMIT_SHORT_SHA}
+    GIT_SUBMODULE_STRATEGY: normal
+  script:
+    - source ./cdk/opencpi-setup.sh -r
+    - for osp in $OSPS ; do ocpidev register project -d projects/osps/$osp ; done
+    - ./.gitlab-ci/scripts/generate.py install .gitlab-ci/templates/install.yml install.yml
+    - ./.gitlab-ci/scripts/generate.py deploy .gitlab-ci/templates/deploy.yml deploy.yml
+    - ./.gitlab-ci/scripts/generate.py test .gitlab-ci/templates/test.yml test.yml
+  cache:
+    - key: build-${HOST}-${CACHE_KEY_SUFFIX}
+      fallback_keys: 
+        - build-${HOST}-${CI_DEFAULT_BRANCH}
+      policy: pull
+      untracked: true
+  artifacts:
+    when: on_success
+    expire_in: "7 days"
+    paths:
+      - install.yml
+      - deploy.yml
+      - test.yml
+
+
+install:
+  stage: install
+  trigger:
+    include:
+      - artifact: install.yml
+        job: generate
+    forward:
+      pipeline_variables: true
+    strategy: depend
+  allow_failure: true
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $PLATFORMS != null && $PLATFORMS != ''
+      # If the framework changed, ensure downstream jobs do not pull
+      # cache, so that a full re-install is done.
+      changes:
+        paths: *framework_changes
+      variables:
+        CACHE_KEY: ''
+        FALLBACK_KEY: ''
+    - if: $PLATFORMS != null && $PLATFORMS != ''
+      when: on_success
+    - when: never
+
+
+deploy:
+  stage: deploy
+  trigger:
+    include:
+      - artifact: deploy.yml
+        job: generate
+    forward:
+      pipeline_variables: true
+    strategy: depend
+  allow_failure: true
+  rules:
+    - if: ($PLATFORMS != null && $PLATFORMS != '') || ($HOST != null && $HOST != '')
       when: always
     - when: never
 
-.web:
+
+test:
+  stage: test
+  trigger:
+    include:
+      - artifact: test.yml
+        job: generate
+    forward:
+      pipeline_variables: true
+    strategy: depend
   rules:
-    - if: $CI_PIPELINE_SOURCE == "web"
-      when: always
+    - if: $PLATFORMS != null && $PLATFORMS != '' && ($DO_SIM == 'True' || $DO_HWIL == 'True')
+      when: on_success
     - when: never
 
-.schedule:
-  rules:
-  - if: $CI_PIPELINE_SOURCE == "schedule"
-    when: always
-  - when: never  
-
-.rcc_platform:
-  extends: .default
-  stage: install
-  tags: ['aws', 'opencpi', 'cache', 'platform']
-  allow_failure: true
-  script: cd .gitlab-ci && make rcc_platform
-
-.hdl_target:
-  extends: .default
-  stage: install
-  tags: ['aws', 'opencpi', 'cache', 'platform']
-  allow_failure: true
-  script: cd .gitlab-ci && make hdl_target
-
-.hdl_platform:
-  extends: .default
-  stage: install
-  tags: ['aws', 'opencpi', 'cache', 'platform']
-  allow_failure: true
-  script: cd .gitlab-ci && make hdl_platform
-
-framework:
-  extends: .default
-  stage: framework
-  tags: ['aws', 'opencpi', 'cache', 'platform']
-  script: cd .gitlab-ci && make framework
-
-rcc_platform:
-  extends:
-    - .rcc_platform
-    - .web
-
-hdl_target:
-  extends:
-    - .hdl_target
-    - .web
-
-hdl_platform:
-  extends:
-    - .hdl_platform
-    - .web
-  needs:
-    - job: hdl_target
-      artifacts: false
-
-rcc_platforms:
-  extends: 
-    - .rcc_platform
-    - .merge_request
-  parallel:
-    matrix:
-      - RCC_PLATFORM: xilinx19_2_aarch32
-        RCC_TOOL: vitis:2019.2-aarch32
-      - RCC_PLATFORM: xilinx19_2_aarch64
-        RCC_TOOL: vitis:2019.2-aarch64
-
-hdl_targets:
-  extends: 
-    - .hdl_target
-    - .merge_request
-  parallel:
-    matrix:
-      - HDL_TARGET:
-        - zynq
-        - zynq_ultra
-        - xsim
-
-hdl_platforms:
-  extends: 
-    - .hdl_platform
-    - .merge_request
-  needs:
-    - job: hdl_targets
-      artifacts: false
-  parallel:
-    matrix:
-      - HDL_PLATFORM:
-        - zed
-        HDL_TARGET: zynq
-      - HDL_PLATFORM:
-        - zcu_104
-        HDL_TARGET: zynq_ultra
-      - HDL_PLATFORM: xsim
-        HDL_TARGET: xsim
-  
+# comps:
+#   needs: [deploy]
+#   stage: comps
+#   trigger:
+#     project: $PROJECT
+#     branch: ci-pipeline-test
+#     forward:
+#       pipeline_variables: true
+#     strategy: depend 
+#   parallel:
+#     matrix:
+#       - PROJECT: [ocpi.comp.sdr]
+#   rules:
+#     - if: $PROJECT =~ $GIT_SUBMODULE_PATHS
+#       when: always
+#     - when: never
