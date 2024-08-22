@@ -1,0 +1,305 @@
+OCPIDEV2-SHOW(1)
+================
+
+
+NAME
+----
+ocpidev2-show - displays information about OpenCPI assets.
+
+
+SYNOPSIS
+--------
+*`ocpidev2`*  *`show`* ['<options>'] '<noun>'
+
+
+DESCRIPTION
+-----------
+The *`show`* verb displays information across the local project (located
+within the working directory, or whatever is specified each -d <dir> entry)
+and the project registry.  Use the *`--local-scope`* option to restrict
+results to only the local project.
+
+Asset types to be specified in the '<noun>' argument are:
+
+*`adapter`*::
+    Display information on the adapter worker with the specified '<name>'.
+
+*`adapters`*::
+    Display all adapter workers.
+
+*`application`*::
+    Display information on the application with the specified '<name>'.
+
+*`applications`*::
+    Display all applications.
+
+*`assembly`*::
+    Display information on the assembly with the specified '<name>'.
+
+*`assemblies`*::
+    Display all assemblies.
+
+*`card`*::
+    Display information on the card with the specified '<name>'.
+    
+*`cards`*::
+    Display all cards.
+
+*`component`*::
+    Display information on the component with the specified '<name>'.
+    
+*`components`*::
+    Display all components.
+
+*`device`*::
+    Display information on the device worker with the specified '<name>'.
+    
+*`devices`*::
+    Display all device workers.
+
+*`library`*::
+    Display information on the component library with the specified '<name>'.
+
+*`libraries`*::
+    Display all component libraries.
+
+*`platform`*::
+    Display information on the platform with the specified '<name>'.
+
+*`platforms`*::
+    Display all platforms.
+
+*`primitive`*::
+    Display information on the primitive with the specified '<name>',
+    regardless of whether it is an primitive core or an primitive library.
+
+*`primitives`*::
+    Display all primitives, regardless of whether
+    they are primitive cores or primitive libraries.
+
+*`project`*::
+    Display information on the project with the specified '<name>'.
+
+*`projects`*::
+    Display all projects.
+
+*`protocol`*::
+    Display information on the protocol with the specified '<name>'.
+
+*`protocols`*::
+    Display all protocols.
+
+*`registry`*::
+    Display information on the registry.
+
+*`slot`*::
+    Display information on the slot with the specified '<name>'.
+
+*`slots`*::
+    Display all slots.
+
+*`target`*::
+    Display information on the build target with the specified '<name>'.
+
+*`targets`*::
+    Display all build targets.
+
+*`test`*::
+    Display information on the unit test with the specified '<name>'.
+
+*`tests`*::
+    Display all unit tests.
+
+*`worker`*::
+    Display information on the worker with the specified '<name>'.
+
+*`workers`*::
+    Display all workers.
+
+The HDL-specific assets (located under the *`hdl/`* subdirectory)
+supported by *`ocpidev2 show`* are:
+
+*`hdl adapter`*::
+    Display information on the hdl adapter worker with the specified '<name>'.
+
+*`hdl adapters`*::
+    Display all hdl adapter workers.
+
+*`hdl assembly`*::
+    Display information on the hdl assembly with the specified '<name>'.
+
+*`hdl assemblies`*::
+    Display all hdl assemblies.
+
+*`hdl card`*::
+    Display information on the hdl card with the specified '<name>'.
+
+*`hdl cards`*::
+    Display all hdl cards.
+
+*`hdl device`*::
+    Display information on the hdl device worker with the specified '<name>'.
+
+*`hdl devices`*::
+    Display all hdl device workers.
+
+*`hdl library`*::
+    Display information on the component library, within a project's hdl directory, with the specified '<name>'.
+
+*`hdl libraries`*::
+    Display all component libraries within project hdl directories
+
+*`hdl platform`*::
+    Display information on the hdl platform with the specified '<name>'.
+
+*`hdl platforms`*::
+    Display all hdl platforms.
+
+*`hdl primitive`*::
+    Display information on the hdl primitive with the specified '<name>',
+    regardless of whether it is an hdl primitive core or an hdl primitive library.
+
+*`hdl primitives`*::
+    Display all hdl primitives, regardless of whether
+    they are hdl primitive cores or hdl primitive libraries.
+
+*`hdl primitive core`*::
+    Display information on the hdl primitive core with the specified '<name>'.
+
+*`hdl primitive cores`*::
+    Display all hdl primitives cores.
+
+*`hdl primitive library`*::
+    Display information on the hdl primitive library with the specified '<name>'.
+
+*`hdl primitive libraries`*::
+    Display all hdl primitives libraries.
+
+*`hdl slot`*::
+    Display information on the hdl slot with the specified '<name>'.
+
+*`hdl slots`*::
+    Display all hdl slots.
+ 
+*`hdl target`*::
+    Display information on the hdl build target with the specified '<name>'.
+
+*`hdl targets`*::
+    Display all hdl build targets.
+
+*`hdl worker`*::
+    Display information on the hdl worker with the specified '<name>'.
+
+*`hdl workers`*::
+    Display all hdl workers.
+
+The RCC-specific assets (located under the *`rcc/`* subdirectory)
+supported by *`ocpidev2 show`* are:
+
+*`rcc platform`*::
+    Display information on the rcc platform with the specified '<name>'.
+
+*`rcc platforms`*::
+    Display all rcc platforms.
+
+*`rcc target`*::
+    Display information on the rcc build target with the specified '<name>'.
+
+*`rcc targets`*::
+    Display all rcc build targets.
+
+*`rcc worker`*::
+    Display information on the rcc worker with the specified '<name>'.
+
+*`rcc workers`*::
+    Display all rcc workers.
+
+OPTIONS
+-------
+In addition to the options common to all OpenCPI tools
+(see link:opencpi.1.html[opencpi(1)]),
+the options described below can be specified for *`show`* operations.
+In the following descriptions,
+a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.
+
+
+Options When Showing Any Asset
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--global-scope`*::
+    Show assets from all registered projects and the current project
+    if applicable. This is the default scope used if *`-local-scope`*
+    is not used.
+
+*`--json`*::
+    Format the output in Javascript Object Notation (JSON) format
+    for integration with other software.
+
+*`--local-scope`*::
+    Only show assets in the local project.
+
+*`--simple`*::
+    Format the output as simply as possible.
+
+*`--table`*::
+    Display the output in an easy-to-read table.
+    This is the default display format
+    used if *`--simple`* or *`--json`* are not used.
+
+EXAMPLES
+--------
+. List all RCC and HDL platforms
++
+----------------------
+ocpidev2 show platforms
+----------------------
++
+. List all HDL platforms
++
+--------------------------
+ocpidev2 show hdl platforms
+--------------------------
++
+. List all components
++
+-----------------------
+ocpidev2 show components
+-----------------------
++
+. Display a table of the projects and their locations:
++
+-----------------------------
+ocpidev2 show --table projects
+------------------------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+See the 'OpenCPI Component Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Component_Development_Guide.pdf
+
+
+SEE ALSO
+--------
+link:ocpidev2.1.html[ocpidev2(1)]
+link:ocpidev2-build.1.html[ocpidev2-build(1)]
+link:ocpidev2-clean.1.html[ocpidev2-clean(1)]
+link:ocpidev2-create.1.html[ocpidev2-create(1)]
+link:ocpidev2-register.1.html[ocpidev2-register(1)]
+link:ocpidev2-unregister.1.html[ocpidev2-unregister(1)]
+
+COPYING
+-------
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+
+

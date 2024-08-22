@@ -1,0 +1,291 @@
+OCPIDEV2-CLEAN(1)
+================
+
+
+NAME
+----
+ocpidev2-clean - cleans OpenCPI assets
+
+
+SYNOPSIS
+--------
+*`ocpidev2`* ['<options>'] *`clean`* ['<noun>' ['<name>' ]]
+
+
+DESCRIPTION
+-----------
+The *`clean`* verb cleans the OpenCPI assets specified by the noun used
+in the command. If no nouns are provided, *`ocpidev2`* cleans the current
+directory. When the plural version of the nouns are used, no name is
+specified and all assets of that type are cleaned.
+
+The *`clean`* operation cleans the results of a *`build`* operation,
+including any generated/built document files. The operation also cleans
+the execution results of a *`run`* operation.
+
+Asset types to be specified in the '<noun>' argument are:
+
+*`adapter`*::
+    Clean the adapter worker with the specified '<name>'.
+
+*`adapters`*::
+    Clean all adapter workers.
+
+*`application`*::
+    Clean the application with the specified '<name>'.
+
+*`applications`*::
+    Clean all applications.
+
+*`assembly`*::
+    Clean the assembly with the specified '<name>'.
+
+*`assemblies`*::
+    Clean all assemblies.
+
+*`card`*::
+    Clean the card with the specified '<name>'.
+    
+*`cards`*::
+    Clean all cards.
+
+*`component`*::
+    Clean the component with the specified '<name>'.
+    
+*`components`*::
+    Clean all components.
+
+*`device`*::
+    Clean the device worker with the specified '<name>'.
+    
+*`devices`*::
+    Clean all device workers.
+
+*`library`*::
+    Clean the component library with the specified '<name>'.
+
+*`libraries`*::
+    Clean all component libraries.
+
+*`platform`*::
+    Clean the platform with the specified '<name>'.
+
+*`platforms`*::
+    Clean all platforms.
+
+*`primitive`*::
+    Clean the primitive with the specified '<name>',
+    regardless of whether it is an primitive core or an primitive library.
+
+*`primitives`*::
+    Clean all primitives, regardless of whether
+    they are primitive cores or primitive libraries.
+
+*`project`*::
+    Clean the project with the specified '<name>'.
+
+*`projects`*::
+    Clean all projects.
+
+*`protocol`*::
+    Clean the protocol with the specified '<name>'.
+
+*`protocols`*::
+    Clean all protocols.
+
+*`registry`*::
+    Clean the registry.
+
+*`slot`*::
+    Clean the slot with the specified '<name>'.
+
+*`slots`*::
+    Clean all slots.
+
+*`target`*::
+    Clean the build target with the specified '<name>'.
+
+*`targets`*::
+    Clean all build targets.
+
+*`test`*::
+    Clean the unit test with the specified '<name>'.
+
+*`tests`*::
+    Clean all unit tests.
+
+*`worker`*::
+    Clean the worker with the specified '<name>'.
+
+*`workers`*::
+    Clean all workers.
+
+The HDL-specific assets (located under the *`hdl/`* subdirectory)
+supported by *`ocpidev2 show`* are:
+
+*`hdl adapter`*::
+    Clean the hdl adapter worker with the specified '<name>'.
+
+*`hdl adapters`*::
+    Clean all hdl adapter workers.
+
+*`hdl assembly`*::
+    Clean the hdl assembly with the specified '<name>'.
+
+*`hdl assemblies`*::
+    Clean all hdl assemblies.
+
+*`hdl card`*::
+    Clean the hdl card with the specified '<name>'.
+
+*`hdl cards`*::
+    Clean all hdl cards.
+
+*`hdl device`*::
+    Clean the hdl device worker with the specified '<name>'.
+
+*`hdl devices`*::
+    Clean all hdl device workers.
+
+*`hdl library`*::
+    Clean the component library, within a project's hdl directory, with the specified '<name>'.
+
+*`hdl libraries`*::
+    Clean all component libraries within project hdl directories
+
+*`hdl platform`*::
+    Clean the hdl platform with the specified '<name>'.
+
+*`hdl platforms`*::
+    Clean all hdl platforms.
+
+*`hdl primitive`*::
+    Clean the hdl primitive with the specified '<name>',
+    regardless of whether it is an hdl primitive core or an hdl primitive library.
+
+*`hdl primitives`*::
+    Clean all hdl primitives, regardless of whether
+    they are hdl primitive cores or hdl primitive libraries.
+
+*`hdl primitive core`*::
+    Clean the hdl primitive core with the specified '<name>'.
+
+*`hdl primitive cores`*::
+    Clean all hdl primitives cores.
+
+*`hdl primitive library`*::
+    Clean the hdl primitive library with the specified '<name>'.
+
+*`hdl primitive libraries`*::
+    Clean all hdl primitives libraries.
+
+*`hdl slot`*::
+    Clean the hdl slot with the specified '<name>'.
+
+*`hdl slots`*::
+    Clean all hdl slots.
+ 
+*`hdl target`*::
+    Clean the hdl build target with the specified '<name>'.
+
+*`hdl targets`*::
+    Clean all hdl build targets.
+
+*`hdl worker`*::
+    Clean the hdl worker with the specified '<name>'.
+
+*`hdl workers`*::
+    Clean all hdl workers.
+
+The RCC-specific assets (located under the *`rcc/`* subdirectory)
+supported by *`ocpidev2 show`* are:
+
+*`rcc platform`*::
+    Clean the rcc platform with the specified '<name>'.
+
+*`rcc platforms`*::
+    Clean all rcc platforms.
+
+*`rcc target`*::
+    Clean the rcc build target with the specified '<name>'.
+
+*`rcc targets`*::
+    Clean all rcc build targets.
+
+*`rcc worker`*::
+    Clean the rcc worker with the specified '<name>'.
+
+*`rcc workers`*::
+    Clean all rcc workers.
+
+Unless suppressed by options, the *`clean`* verb removes
+both the built assets and their built OpenCPI asset documents from the project.
+See the 'OpenCPI Documentation Writer Guide' for details on OpenCPI asset documents.
+
+OPTIONS
+-------
+In addition to the options common to all OpenCPI tools (see link:opencpi.1.html[opencpi(1)]),
+the following options can be specified for the *`clean`* verb.
+
+EXAMPLES
+--------
+. Clean the asset represented by the current directory and all the assets underneath it.
++
+----------
+ocpidev2 clean
+----------
++			 
+. Clean the *`dsp_comps`* library
+located at *`components/dsp_comps`* in the project
+implied by the current directory.
++
+-------------------------------
+ocpidev2 clean library dsp_comps
+-------------------------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+See the 'OpenCPI Application Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Application_Development_Guide.pdf
+
+See the 'OpenCPI Component Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Component_Development_Guide.pdf
+
+See the 'OpenCPI HDL Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_HDL_Development_Guide.pdf
+
+See the 'OpenCPI Platform Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Platform_Development_Guide.pdf
+
+See the 'OpenCPI RCC Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_RCC_Development_Guide.pdf
+
+See the 'OpenCPI Documentation Writer Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Documentation_Writer_Guide.pdf
+
+SEE ALSO
+--------
+link:ocpidev2.1.html[ocpidev2(1)]
+link:ocpidev2-build.1.html[ocpidev2-build(1)]
+link:ocpidev2-create.1.html[ocpidev2-create(1)]
+link:ocpidev2-register.1.html[ocpidev2-register(1)]
+link:ocpidev2-show.1.html[ocpidev2-show(1)]
+link:ocpidev2-unregister.1.html[ocpidev2-unregister(1)]
+
+
+COPYING
+-------
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+
+

@@ -1,0 +1,365 @@
+OCPIDEV2-CREATE(1)
+==================
+
+NAME
+----
+ocpidev2-create - create OpenCPI assets
+
+
+SYNOPSIS
+--------
+*`ocpidev2`* ['<options>'] *`create`* '<noun>' '<name>'
+
+
+DESCRIPTION
+-----------
+The *`create`* verb creates, in a project, the OpenCPI asset
+specified by the '<noun>' and '<name>' arguments that follow the verb.
+
+Asset types to be specified in the '<noun>' argument are:
+
+*`adapter`*::
+    Create an adapter worker with the specified '<name>'.
+
+*`application`*::
+    Create an application with the specified '<name>'.
+
+*`assembly`*::
+    Create an assembly with the specified '<name>'.
+
+*`card`*::
+    Create a card with the specified '<name>'.
+
+*`component`*::
+    Create a component with the specified '<name>'.
+
+*`device`*::
+    Create a device worker with the specified '<name>'.
+
+*`library`*::
+    Create a component library with the specified '<name>'.
+
+*`platform`*::
+    Create a platform with the specified '<name>'. Authoring model must be specified (or use `hdl platform` or `rcc platform` described below).
+
+*`primitive`*::
+    Create a primitive with the specified '<name>'. Either core or library must be specified (see 'hdl primitive core' or 'hdl primitive library' below).
+
+*`project`*::
+    Create a project with the specified '<name>'.
+
+*`protocol`*::
+    Create a protocol with the specified '<name>'.
+
+*`registry`*::
+    Create a registry with the spcified '<name>'.
+
+*`slot`*::
+    Create a slot with the specified '<name>'.
+
+*`test`*::
+    Create a unit test with the specified '<name>'.
+
+*`worker`*::
+    Create a worker with the specified '<name>'. Authoring model must be specified (either format '<name>' ending with .hdl or .rcc, or use `hdl worker` or `rcc worker` described below).
+
+The HDL-specific assets (located under the *`hdl/`* subdirectory)
+supported by *`ocpidev2 show`* are:
+
+*`hdl adapter`*::
+    Create an hdl adapter worker with the specified '<name>'.
+
+*`hdl assembly`*::
+    Create an hdl assembly with the specified '<name>'.
+
+*`hdl card`*::
+    Create an hdl card with the specified '<name>'.
+
+*`hdl device`*::
+    Create an hdl device worker with the specified '<name>'.
+
+*`hdl library`*::
+    Create a component library, within a project's hdl directory, with the specified '<name>'.
+
+*`hdl platform`*::
+    Create an hdl platform with the specified '<name>'.
+
+*`hdl primitive core`*::
+    Create an hdl primitive core with the specified '<name>'.
+
+*`hdl primitive library`*::
+    Create an hdl primitive library with the specified '<name>'.
+
+*`hdl slot`*::
+    Create an hdl slot with the specified '<name>'.
+
+*`hdl worker`*::
+    Create an hdl worker with the specified '<name>'
+
+The RCC-specific assets (located under the *`rcc/`* subdirectory)
+supported by *`ocpidev2 show`* are:
+
+*`rcc platform`*::
+    Create an rcc platform with the specified '<name>'.
+
+*`rcc worker`*::
+    Create an rcc worker with the specified '<name>'
+
+All HDL assets must avoid having names that are Verilog or VHDL-
+reserved identifiers, or other identifiers, such as reg, , gen, lib, etc.
+
+Note that the *`create`* verb creates skeleton OpenCPI asset document files
+for most of the buildable OpenCPI assets when it creates the asset.
+See the link:ocpidev2-build.1.html[ocpidev2-build(1)] man page and the
+"noun" man pages for individual assets for details.
+
+OPTIONS
+-------
+In addition to the general-purpose options common
+to all OpenCPI tools (see link:opencpi.1.html[opencpi(1)]),
+the options described below can be specified for the *`create`* verb.
+These options are usually specific to the asset type
+that is being created. If creation fails, all partially-created
+directories and/or files are removed unless the *`-k`* (*`--keep`*)
+option is specified.
+
+Many options to the *`create`* verb set initial values in the asset's
+XML description file that can subsequently be edited for any required
+changes or additions.
+
+In the following descriptions, the plus sign (+) after the option
+indicates that it can be specified more than once on the command line.
+
+Options When Creating Projects
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-D`* '<package-ID>', *`--depend`* '<package-ID>'+::
+    Specify the package-ID of a project on which the project being
+    created depends.
+
+*`--register`*::
+   Register the project as part of creating it.
+
+Options When Creating Projects (or rarely, any other asset)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-F`* '<package-prefix>', *`--package-prefix=`*'<package-ID>'::
+   Specify the package prefix of the created project or library.
+   The default is *local* for projects and '<package-ID of parent>'
+   for libraries.
+
+*`-K`* '<package-ID>', *`--package-id=`*'<package-ID>'::
+   Specify the package-ID directly. The default is
+   '<package-prefix>'*.*'<package-name>'.
+
+*`-N`* '<package-name>', *`--package-name=`*'<package-name>'::
+   Specify the package name of the created project or library. The
+   default is the '<name>' argument given after the *create* verb.
+
+Options When Creating Libraries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-A`* '<directory>', *`--xml-include=`*'<directory>'+::
+   Specify a directory to search for XML include files.
+
+Options When Creating Libraries or Workers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-I`* '<directory>', *`--include-dir=`*'<directory>'+::
+   Specify a directory to search for include files (C, C++,
+   Verilog).
+
+Options When Creating Projects or Libraries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-Y`* '<primitive-library>', *`--primitive-library=`*'<primitive-library>'+::
+   Specify a primitive library on which the asset (or assets
+   it contains) depends.
+
+Options When Creating Projects or Libraries or Workers or Assemblies
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*`-y`* '<component-library>', *`--component-library=`*'<component-library>'+::
+   Specify a component library to search for workers, devices
+   and/or specs that this asset (or assets it contains) references.
+   
+Options When Creating Components
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-n`*, *`--no-control`*::
+   Specify that the component has no control interface. This option
+   is rarely used or recommended, but is required for certain
+   infrastructure components. It applies only to components
+   with HDL-only implementations.
+
+*`-t`*, *`--create-test`*::
+   Create the component unit test suite for the component as part of creating the
+   component in a component library.
+   
+Option When Creating Components (Specs) or Protocols
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-p`*, *`--project`*::
+   Create the component specification or protocol in the *`specs/`*
+   directory of the project. No asset directories or document files are created.
+
+Options When Creating Components, Protocols, Workers, and Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--hdl-library=`*'<hdl-library>'::
+   Create the asset in the component library under the
+   *`hdl/`* directory of the project. Valid values are only
+   one of *devices*, *cards* or *adapters*.
+
+*`--library=`*'<library>'::
+   Create the asset in the specified component library.
+
+Option When Creating Workers (All Types) and Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-S`* '<spec>', *`--component`*::
+   Specify the component (aka "spec") to be
+   implemented by the worker/test. By default, the *`ocpidev2 create`* operation
+   searches for a component spec whose name matches
+   the name of the worker/test being created.  Use the *`-S`*
+   option to specify a different component spec name to search for.
+   The operation searches for a component spec in the component
+   directory in the same library as the worker/test, in the *`specs/`* directory
+   in the same library as the worker/test (for backward compatibility with
+   earlier OpenCPI releases), in the top-level *`specs/`* directory in the
+   project, and in other projects, if the *`--depend`* (*`-D`*) option
+   was specified when the project containing the worker/test was created
+   or dependencies are specified in the *`Project.xml`* file.
+
+Options When Creating Workers (All Types)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-L`* '<language>', *`--language=`*'<language>'::
+   Specify the source language for the worker being created.
+   The default is the default language for the authoring
+   model. It must be C or C++ for RCC workers and VHDL for
+   HDL workers.
+
+*-`O`* '<file>', *`--other=`*'<file>'+::
+   Specify a source code file that is not included by default
+   (that is, in addition to the '<worker>'*.*[*c*|*cc*|*vhd*] file)
+   to be compiled when building the worker.
+
+*-`P`* '<platform>', *`--platform=`*'<platform>'::
+   Create the worker in the *devices* library for the specified
+   HDL platform.
+
+Options When Creating RCC Workers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-R`* '<prereq-library>', *`--static-prereq=`*'<prereq-library>'+::
+   Specify a prerequisite library on which the worker being created
+   depends and to which it should be statically linked.
+   
+*`-V`* '<slave-worker>', *`--slave-worker=`*'<slave-worker>'::
+   Create the RCC worker as a proxy for one specified slave
+   worker.
+
+*`-r`* '<prereq-library>', *`--rcc-dynamic=`*'<prereq-library>'+::
+   Specify a library on which the worker being created
+   depends and to which it should be dynamically linked.
+
+Option When Creating HDL Workers, Devices and Platforms
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-C`* '<core>', *`--core=`*'<core>'+::
+   Specify an HDL primitive core on which the worker being
+   created depends and with which it should be built.
+
+Options When Creating HDL Devices
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-E`* '<hdl-device>', *`--emulates=`*'<hdl-device>'+::
+   Create the worker as an emulator worker and specify the
+   HDL device worker associated with the device being emulated.
+
+Options When Creating HDL Platforms
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-g`* '<part>', *`--part=`*'<part>'::
+   Specify the part (die-speed-package;, e.g., *xc7z020-1-clg484*)
+   for the HDL platform being created.
+
+Options When Creating Any Buildable Asset
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-Q`* '<platform>', *`--exclude-platform=`*'<platform>'+::
+   Do not build the asset for the specified platform.
+
+*`-G`* '<platform>', *`--only-platform=`*'<platform>'+::
+   Only build the asset for the specified platform(s).
+
+Options When Creating Any Buildable HDL Asset
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-T`* '<target>', *`--only-target=`*'<target>'+::
+   Only build the asset for the specified HDL architecture or part family.
+   
+*`-Z`* '<target>', *`--exclude-target=`*'<target>'+::
+   Do not build the asset for the specified HDL architecture or part family.
+
+Options When Creating HDL Primitive Libraries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-H`*, *`--no-depend`*::
+   Specify that the HDL primitive library being created does not
+   depend on any other primitive library. By default, HDL primitive
+   libraries are assumed to depend on certain built-in primitive
+   libraries in *`$OCPI_ROOT_DIR/projects/core/hdl/primitives`*
+   (currently, *`bsv`*, *`cdc`*, *`fixed_float`*, and *`ocpi`*).
+
+Options When Creating HDL Primitive Cores
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-B`* '<file>', *`--prebuilt=`*'<file>'::
+   Create the HDL primitive core from the specified pre-built
+   core file (e.g., an *`.edf`* file from Xilinx Vivado,
+   an *`.ngc`* file from Coregen or a *`.qxp`* file from Quartus).
+   
+*`-M`* '<module>', *`--module=`*'<module>'::
+   Specify the name of the top module of the core. The default is
+   the name of the core specified in the '<name>' argument after
+   *`create`*.
+
+Options When Creating Applications
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-X`*, *`--xml-app`*::
+   Create the application as an XML file in the *`applications/`* directory
+   of the project.
+
+*`-x`*, *`--xml-dir-app`*::
+   Specify that the application has its own directory but it will
+   only be an XML file. The default creates an application with
+   an ACI C++ file. This option cannot be used with the *`-X`* option.
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+See the 'OpenCPI Application Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Application_Development_Guide.pdf
+
+See the 'OpenCPI Component Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Component_Development_Guide.pdf
+
+See the 'OpenCPI HDL Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_HDL_Development_Guide.pdf
+
+See the 'OpenCPI Platform Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Platform_Development_Guide.pdf
+
+See the 'OpenCPI RCC Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_RCC_Development_Guide.pdf
+
+See the 'OpenCPI Documentation Writer Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Documentation_Writer_Guide.pdf
+
+
+SEE ALSO
+--------
+link:ocpidev2.1.html[ocpidev2(1)]
+link:ocpidev2-build.1.html[ocpidev2-build(1)]
+link:ocpidev2-clean.1.html[ocpidev2-clean(1)]
+link:ocpidev2-register.1.html[ocpidev2-register(1)]
+link:ocpidev2-show.1.html[ocpidev2-show(1)]
+link:ocpidev2-unregister.1.html[ocpidev2-unregister(1)]
+
+COPYING
+-------
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
