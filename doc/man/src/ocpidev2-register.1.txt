@@ -1,0 +1,77 @@
+OCPIDEV2-REGISTER(1)
+====================
+
+
+NAME
+----
+ocpidev2-register - add a project to a project registry.
+
+
+SYNOPSIS
+--------
+*`ocpidev2`* ['<options>'] *`register project`*
+
+
+DESCRIPTION
+-----------
+The *`register`* verb adds project(s) to the registry.
+The default registry
+is the one in the OpenCPI installation unless overridden by the
+*`OCPI_PROJECT_REGISTRY_DIR`* environment variable.  Registering a
+project makes its assets visible and usable to other projects
+using the same registry.
+
+Asset types to be specified in the '<noun>' argument are:
+
+*`project`*::
+    Register the project.
+
+OPTIONS
+-------
+The general-purpose options *`-v`* and *`-d`* '<directory>' can be used.
+In particular, ecah *`-d`* '<directory>' option can be used to specify
+a path to a project being registered.
+See the link:opencpi.1.html[opencpi(1)] man page
+for descriptions of these general-purpose options.
+
+There are no verb-specific options.
+
+EXAMPLES
+--------
+. Register the current project
++
+----------------------
+ocpidev2 register project
+----------------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+See the 'OpenCPI Component Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Component_Development_Guide.pdf
+
+
+SEE ALSO
+--------
+link:ocpidev2.1.html[ocpidev2(1)]
+link:ocpidev2-build.1.html[ocpidev2-build(1)]
+link:ocpidev2-clean.1.html[ocpidev2-clean(1)]
+link:ocpidev2-create.1.html[ocpidev2-create(1)]
+link:ocpidev2-show.1.html[ocpidev2-show(1)]
+link:ocpidev2-unregister.1.html[ocpidev2-unregister(1)]
+
+COPYING
+-------
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+
+

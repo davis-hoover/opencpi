@@ -358,6 +358,8 @@ ocpi_cleaned=$(echo "$MANPATH" | sed "s=$OCPI_CDK_DIR/doc/man[^:]*:*==g")
 export MANPATH="$OCPI_CDK_DIR/doc/man${ocpi_cleaned:+:}$ocpi_cleaned:"
 ocpi_comp=$OCPI_CDK_DIR/scripts/ocpidev_bash_complete
 [ -f $ocpi_comp ] && source $ocpi_comp
+ocpi_comp2=$OCPI_CDK_DIR/scripts/ocpidev2_bash_complete
+[ -f $ocpi_comp2 ] && source $ocpi_comp2
 [ "$ocpi_verbose" = 1 ] && cat <<-EOF >&2
 	The OpenCPI platform we are running on is "$OCPI_TOOL_PLATFORM" (placed in OCPI_TOOL_PLATFORM).
 	The OpenCPI target directory set for this environment is "$OCPI_TOOL_DIR".

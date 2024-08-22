@@ -1,0 +1,105 @@
+OCPIDEV2(1)
+===========
+
+
+NAME
+----
+ocpidev2 - command-line tool for managing OpenCPI assets
+
+
+SYNOPSIS
+--------
+*`ocpidev2`* ['<options>'] '<verb>' ['<noun>' ['<name>' ]]
+
+
+DESCRIPTION
+-----------
+The *`ocpidev2(1)`* command-line tool is used to perform various
+development-related tasks as well as retrieve information
+about the environment.
+The *`ocpidev2`* command
+has full tab completion for its options and arguments.
+
+For convenience, options can occur anywhere in the command.
+The general usage concept is: perform the '<verb>' operation on the
+'<noun>' asset type whose name is '<name>'.
+
+Man pages are available for *`ocpidev2`* verbs and nouns by typing
+the command *`man ocpidev-`*'<verb>' or *`man ocpidev2-`*'<noun>'.
+
+
+VERBS
+-----
+The verbs supported by *`ocpidev2`* are:
+
+*`build`*::
+    Build the asset(s), running appropriate tools to create
+    the binary files and viewable documentation.
+
+*`clean`*::
+    Remove all the generated and compiled files.
+
+*`create`*::
+    Create the named asset, creating files and directories as required,
+    and creating any skeleton files for future editing.
+
+*`show`*::
+    Display information about assets.
+    
+*`register`*, *`unregister`*::
+    Register/unregister a project.
+    
+NOUNS
+-----
+For supported nouns, see the verb-specific man page available by typing
+the command *`man ocpidev2-`*'<verb>' or *`man ocpidev2-`*'<noun>'.
+
+
+OPTIONS
+-------
+Options are either single letters following one hyphen or complete
+words or acronyms following two hyphens and separated by hyphens.
+In option descriptions, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.
+Arguments to word-form options are preceded by an equal sign (=)
+(as shown in the descriptions) or a space. Arguments to
+letter options are preceded by a space.
+
+Most options are only valid for specific verbs or nouns and are
+described in the individual verb and noun man pages.
+
+See the link:opencpi.1.html[opencpi(1)] man page
+for the general-purpose options that apply to all OpenCPI tools.
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+See the 'OpenCPI Component Development Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Component_Development_Guide.pdf
+
+See the 'OpenCPI User Guide':
+https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_User_Guide.pdf
+
+
+SEE ALSO
+--------
+link:ocpidev2-build.1.html[ocpidev2-build(1)]
+link:ocpidev2-clean.1.html[ocpidev2-clean(1)]
+link:ocpidev2-create.1.html[ocpidev2-create(1)]
+link:ocpidev2-register.1.html[ocpidev2-register(1)]
+link:ocpidev2-show.1.html[ocpidev2-show(1)]
+link:ocpidev2-unregister.1.html[ocpidev2-unregister(1)]
+
+COPYING
+-------
+Copyright \(C) 2023 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
