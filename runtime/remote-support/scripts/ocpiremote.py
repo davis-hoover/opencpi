@@ -492,7 +492,7 @@ def load(args):
     ocpiserver = os.path.join(cdk, 'scripts', 'ocpiserver.sh')
     kernel_objects = glob.glob(os.path.join(cdk, rcc, 'lib', '*.ko'))
     rules = glob.glob(os.path.join(cdk, rcc, 'lib', '*.rules'))
-    bin_files = ['ocpidriver', 'ocpiserve', 'ocpihdl', 'ocpizynq']
+    bin_files = ['ocpidriver', 'ocpiserve', 'ocpihdl', 'ocpizynq', 'ocpirun']
     bin_files = [os.path.join(cdk, rcc, 'bin', bin_file) for bin_file in bin_files]
     sdk = glob.glob(os.path.join(cdk, rcc, 'sdk', '*'))
     bitstream = glob.glob(os.path.join(cdk, hdl, '*.bitz'))
