@@ -1704,7 +1704,8 @@ static int net_recvmsg
 {
   int error = 0;
   struct sk_buff *skb =
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 0) || \
+   (LINUX_VERSION_CODE == KERNEL_VERSION(4, 18, 0) && defined(RHEL_MAJOR))
     skb_recv_datagram(sock->sk, flags, &error);
 #else
     skb_recv_datagram(sock->sk, flags & ~MSG_DONTWAIT, flags & MSG_DONTWAIT, &error);
