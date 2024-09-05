@@ -104,6 +104,8 @@ PKGS_D+=(expect)
 PKGS_D+=(zlib1g-dev)
 #    for ocpilint
 PKGS_D+=(emacs cppcheck clang)
+#    for adi_plutosdr0_38 platform install / build
+PKGS_D+=(libgmp3-dev libmpc-dev u-boot-tools)
 
 
 ##########################################################################################
