@@ -1,0 +1,14 @@
+**/.git
+**/.gitattributes
+**/.gitignore
+**/.gitlab
+**/.gitlab-ci
+**/.gitlab-ci.yml
+**/.gitmodules
+**/.containerignore
+**/CHANGELOG.md
+**/CONTRIBUTING.md
+**/COPYRIGHT
+**/LICENSE.txt
+**/README.md
+!.gitlab-ci/scripts

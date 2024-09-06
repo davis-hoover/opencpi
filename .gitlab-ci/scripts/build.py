@@ -63,16 +63,7 @@ if __name__ == '__main__':
         results = [result]
     else:
         ci_project_name = os.getenv('CI_PROJECT_NAME', 'opencpi')
-        if ci_project_name != 'opencpi':
-            # If running in a project outside of the main OpenCPI project, only build said project.
-            whitelist = [ci_project_name]
-            blacklist = None
-        else:
-            # If running in main OpenCPI project, do not build COMP projects.
-            blacklist =  [path.name for path in 
-                        get_ocpi_root_path().joinpath('projects', 'comps').glob('*')]
-            whitelist = None
-        projects = get_projects(whitelist=whitelist, blacklist=blacklist)
+        projects = get_projects()
         try:
             args.platforms = [get_platform(platform_name, projects) 
                               for platform_name in args.platforms]

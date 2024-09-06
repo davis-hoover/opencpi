@@ -224,7 +224,7 @@ async def exec_ocpiremote(verb: str, hdl_platform: 'HdlPlatform', rcc_platform: 
     return result
 
 
-async def clone_repo(repo: str, path: Path) -> Optional[Coroutine[Any, Any, report.Case]]:
+async def clone_repo(repo: str, path: Path) -> Coroutine[Any, Any, report.Case]:
     """Clones a specified git repository.
 
     Args:
@@ -237,11 +237,11 @@ async def clone_repo(repo: str, path: Path) -> Optional[Coroutine[Any, Any, repo
         subprocess execution.
     """
     logger.debug('')
-    if path.exists():
-        return None
     cmd = 'git', 'clone', repo, str(path)
     msg = f'cloning repository [blue]{repo}[/blue]'
     name = f'clone {repo}'
+    if path.exists():
+        return report.Case(name, 0, 0, None, None)
     result = await exec_cmd(name, cmd, 1, 2, log_msg=msg)
     return result
 
