@@ -1,17 +1,12 @@
-stages:
-  - opencpi
-
 opencpi:
   stage: opencpi
   variables:
-    CI_OCPI_SOURCE_REF_NAME: "$CI_COMMIT_REF_NAME"
-    CI_OCPI_SOURCE_COMMIT_SHA: "$CI_COMMIT_SHORT_SHA"
-    PLATFORMS: $PLATFORMS
-    OSPS: $CI_PROJECT_NAME
-    DO_SIM: 'False'
+    UPSTREAM_PROJECT: ${CI_PROJECT_NAME}
+    UPSTREAM_REF: ${CI_COMMIT_SHA}
+    UPSTREAM_NAMESPACE: ${CI_PROJECT_NAMESPACE}
   trigger:
     project: opencpi/opencpi
-    branch: '$CI_OCPI_REF_NAME'
+    branch: ${OCPI_REF_NAME}
     strategy: depend
     forward:
       yaml_variables: true

@@ -1,6 +1,0 @@
-# Allowed platform associations for HWIL
-
-zcu104:
-  - xilinx19_2_aarch64
-zed:
-  - xilinx19_2_aarch32

@@ -1,0 +1,54 @@
+rcc_platforms:
+  extends: .rcc_platform
+  parallel:
+    matrix:
+      - RCC_PLATFORM: 
+        - xilinx19_2_aarch32
+        - xilinx19_2_aarch64
+
+hdl_targets:
+  extends: .hdl_target
+  parallel:
+    matrix:
+      - HDL_TARGET:
+        - zynq
+        - zynq_ultra
+        - xsim
+
+hdl_platforms:
+  extends: .hdl_platform
+  parallel:
+    matrix:
+      - HDL_PLATFORM: zed
+        HDL_TARGET: zynq
+      - HDL_PLATFORM: zcu104
+        HDL_TARGET: zynq_ultra
+      - HDL_PLATFORM: xsim
+        HDL_TARGET: xsim
+
+hdl_rcc_platforms:
+  extends: .hdl_rcc_platform
+  parallel:
+    matrix:
+      - HDL_PLATFORM: zed
+        RCC_PLATFORM: xilinx19_2_aarch32
+      - HDL_PLATFORM: zcu104
+        RCC_PLATFORM: xilinx19_2_aarch64
+
+test:
+  extends: .test
+  parallel:
+    matrix:
+      - MODEL: 'hdl'
+        HDL_PLATFORM: xsim
+
+deploy:
+  extends: .deploy
+  parallel:
+    matrix:
+      - HDL_PLATFORM: zed
+        RCC_PLATFORM: xilinx19_2_aarch32
+      - HDL_PLATFORM: zcu104
+        RCC_PLATFORM: xilinx19_2_aarch64
+      - HDL_PLATFORM: xsim
+      - HOST: $HOST

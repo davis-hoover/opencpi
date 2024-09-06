@@ -1,0 +1,74 @@
+variables:
+  OCPI_XILINX_VIVADO_VERSION:
+    description: Version of Xilinx Vivado to use in pipeline.
+    value: "2021.1"
+    options:
+      - "2021.1"
+      - "2019.2"
+  HOST:
+    description: "The host platform to install framework for."
+    value: "rocky8"
+    options:
+      - "rocky8"
+      - "ubuntu20_04"
+      - "ubuntu22_04"
+  COMP:
+    description: "OpenCPI COMP projects to include in pipeline."
+  OSP:
+    description: "OpenCPI OSP projects to include in pipeline."
+  RCC_PLATFORM:
+    description: "The rcc platform to run pipeline for."
+    value: xilinx19_2_aarch32
+  HDL_PLATFORM:
+    description: "The hdl platform to run pipeline for."
+    value: zed
+  HDL_TARGET:
+    description: "The hdl target to run pipeline for."
+    value: zynq
+  DO_TEST:
+    description: "Whether to do HWIL/Simulator testing."
+    value: "False"
+    options: ["True", "False"]
+
+rcc_platform:
+  extends: .rcc_platform
+
+hdl_target:
+  extends: .hdl_target
+
+hdl_platform:
+  extends: .hdl_platform
+  needs:
+    - job: hdl_target
+      artifacts: false
+
+hdl_rcc_platform:
+  extends: .hdl_rcc_platform
+  needs:
+    - job: hdl_platform
+      artifacts: false
+    - job: rcc_platform
+      artifacts: false
+
+test_hdl: 
+  extends: .test
+  variables:
+    MODEL: hdl
+
+test_rcc:
+  extends: .test
+  variables:
+    MODEL: rcc
+  rules:
+    - if: $CI_PROJECT_NAME != "opencpi"
+      when: never
+    - if: $DO_TEST != "True"
+      when: never
+    - if: $HDL_PLATFORM == null || $HDL_PLATFORM == ""
+      when: never
+    - if: $RCC_PLATFORM == null || $RCC_PLATFORM == ""
+      when: never
+    - when: on_success
+
+deploy:
+  extends: .deploy

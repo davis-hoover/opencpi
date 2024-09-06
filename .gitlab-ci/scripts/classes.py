@@ -323,6 +323,7 @@ class RccPlatform(Platform):
         Returns:
             Coroutine report.Suite representing result of the build.
         """
+        projects = [project for project in projects if not project.is_osp or project == self.project]
         loop = asyncio.get_event_loop()
         project_names = [project.name for project in projects]
         if self.name.startswith('xilinx') and self.project.name in project_names:
@@ -358,7 +359,7 @@ class RccPlatform(Platform):
         result = await self._build_tests(tests)
         results += result.cases
         time = sum([result.time for result in results])
-        if self.name.startswith('xilinx') and self.project in project_names:
+        if self.name.startswith('xilinx') and self.project.name in project_names:
             # Cleanup repositories necessary to install platform
             shutil.rmtree(str(git_path))
         return report.Suite(self.name, result.code, time, results)
@@ -484,6 +485,7 @@ class HdlPlatform(Platform):
         Returns:
             Coroutine report.Suite representing result of the build.
         """
+        projects = [project for project in projects if not project.is_osp or project == self.project]
         projects_names = [project.name for project in projects]
         results = []
         if self.project.name in projects_names:

@@ -1,0 +1,157 @@
+workflow:
+  auto_cancel:
+      on_new_commit: interruptible
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+      when: never
+    - when: always
+
+stages:
+  - opencpi
+  - framework
+  - install
+  - test
+  - deploy
+  - docs
+
+.artifacts:
+  artifacts:
+    when: always
+    expire_in: "7 days"
+    paths:
+      - .gitlab-ci/artifacts/*
+    reports:
+      junit: .gitlab-ci/artifacts/job-report.xml
+  after_script: if [ -d /tmp/artifacts ]; then cp -rT /tmp/artifacts .gitlab-ci/artifacts ; fi
+
+.default:
+  extends: .artifacts
+  image: "${CI_OCPI_CONTAINER_REGISTRY}/builder:latest"
+  timeout: 2h
+  dependencies: []
+  before_script: aws ecr get-login-password --region us-east-1 | podman login --username AWS
+                 --password-stdin $CI_OCPI_CONTAINER_REGISTRY > /dev/null 2>&1
+
+.rcc_platform:
+  extends: .default
+  stage: install
+  tags: ['aws', 'opencpi', 'cache', 'platform']
+  allow_failure: true
+  script: cd .gitlab-ci && make rcc_platform
+  rules:
+    - if: $CI_PROJECT_NAME != "opencpi"
+      when: never
+    - if: $RCC_PLATFORM != null && $RCC_PLATFORM != ""
+      when: on_success
+    - when: never
+
+.hdl_target:
+  extends: .default
+  stage: install
+  timeout: 3h
+  tags: ['aws', 'opencpi', 'cache', 'platform']
+  allow_failure: true
+  script: cd .gitlab-ci && make hdl_target
+  rules:
+    - if: $CI_PROJECT_NAME != "opencpi"
+      when: never
+    - if: $HDL_TARGET != null && $HDL_TARGET != ""
+      when: on_success
+    - when: never
+
+.hdl_platform:
+  extends: .default
+  stage: install
+  timeout: 16h
+  tags: ['aws', 'opencpi', 'cache', 'platform']
+  allow_failure: true
+  needs:
+    - job: hdl_targets
+      artifacts: false
+  script: cd .gitlab-ci && make hdl_platform
+  rules:
+    - if: $CI_PROJECT_NAME != "opencpi"
+      when: never
+    - if: $HDL_PLATFORM != null && $HDL_PLATFORM != ""
+      when: on_success
+    - when: never
+
+.hdl_rcc_platform:
+  extends: .default
+  stage: install
+  tags: ['aws', 'opencpi', 'cache', 'platform']
+  allow_failure: true
+  needs:
+    - job: hdl_platforms
+      artifacts: false
+    - job: rcc_platforms
+      artifacts: false
+  variables:
+    GIT_SUBMODULE_PATHS: ""
+  script: cd .gitlab-ci && make hdl_rcc_platform
+  rules:
+    - if: $CI_PROJECT_NAME != "opencpi"
+      when: never
+    - if: $HDL_PLATFORM != null && $HDL_PLATFORM != "" && $RCC_PLATFORM != null && $RCC_PLATFORM != ""
+      when: on_success
+    - when: never
+
+.test:
+  stage: test
+  trigger:
+    forward:
+      pipeline_variables: true
+      yaml_variables: true
+    include:
+      - artifact: .gitlab-ci/artifacts/test.yml
+        job: framework
+    strategy: depend
+  rules:
+    - if: $CI_PROJECT_NAME != "opencpi"
+      when: never
+    - if: $DO_TEST != "True"
+      when: never
+    - if: $HDL_PLATFORM == null || $HDL_PLATFORM == ""
+      when: never
+    - when: on_success
+
+.deploy:
+  image: ${CI_REGISTRY_IMAGE}/builder:latest
+  timeout: 2h
+  stage: deploy
+  tags: ['saas-linux-small-amd64']
+  dependencies: []
+  variables:
+    GIT_SUBMODULE_PATHS: ""
+    GIT_STRATEGY: none
+  before_script: podman login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script: cd .gitlab-ci && make deploy
+  rules:
+    - if: $CI_PROJECT_NAME != "opencpi"
+      when: never
+    - if: $UPSTREAM_NAMESPACE == "opencpi/comp"
+      when: never
+    - if: $CI_COMMIT_TAG != null && $CI_COMMIT_TAG != ""
+      when: on_success
+      variables:
+        DEPLOY_TAG: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: on_success
+      variables:
+        DEPLOY_TAG: $CI_COMMIT_BRANCH
+    - when: never
+
+framework:
+  extends: .default
+  image: ${CI_REGISTRY_IMAGE}/builder:latest
+  stage: framework
+  tags: ['saas-linux-medium-amd64']
+  script:
+    - .gitlab-ci/scripts/checkout_project.sh 
+    - cd .gitlab-ci && make framework
+  rules:
+    - if: $CI_PROJECT_NAME != "opencpi"
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
+      when: never
+    - when: on_success
