@@ -11,4 +11,4 @@
 **/COPYRIGHT
 **/LICENSE.txt
 **/README.md
-!.gitlab-ci/scripts
+!.gitlab-ci/scripts/

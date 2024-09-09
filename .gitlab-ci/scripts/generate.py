@@ -39,7 +39,7 @@ def main(output_path: Path) -> None:
                 'source /home/user/opencpi/cdk/opencpi-setup.sh -r',
                 '.gitlab-ci/scripts/test.py $MODEL --hdl-platform $HDL_PLATFORM'
                     ' --rcc-platform $RCC_PLATFORM'
-                    '--report-path ${CI_PROJECT_DIR}/.gitlab-ci/artifacts/job-report.xml'
+                    ' --report-path ${CI_PROJECT_DIR}/.gitlab-ci/artifacts/job-report.xml'
                     ' $TEST'
             ],
             'parallel': {'matrix': [{'TEST': test} for test in tests]},
