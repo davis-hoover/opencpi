@@ -2,58 +2,24 @@ ARG SOURCE_IMAGE
 ARG RCC_SOURCE_IMAGE
 ARG HDL_SOURCE_IMAGE
 
-FROM base as packages
-ARG OCPI_HOST
-COPY Framework.exports /home/user/opencpi/
-COPY build /home/user/opencpi/build/
-COPY scripts /home/user/opencpi/scripts/
-COPY tools /home/user/opencpi/tools/
-COPY bootstrap /home/user/opencpi/bootstrap/
-COPY projects/core/rcc/platforms/${OCPI_HOST} /home/user/opencpi/projects/core/rcc/platforms/${OCPI_HOST}/
-COPY runtime/hdl-support /home/user/opencpi/runtime/hdl-support/
+FROM localhost/base as packages
+COPY . /home/user/opencpi
 RUN ln -s exports cdk && ./build/install-packages.sh && pip3 install rich
 
-FROM packages as prereqs
-COPY projects/core/Project.xml /home/user/opencpi/projects/core/
-COPY projects/core/prerequisites /home/user/opencpi/projects/core/prerequisites
-COPY projects/assets/Project.mk /home/user/opencpi/projects/assets/
-COPY projects/assets/prerequisites /home/user/opencpi/projects/assets/prerequisites
-COPY projects/platform/Project.mk /home/user/opencpi/projects/platform/
-COPY projects/platform/prerequisites /home/user/opencpi/projects/platform/prerequisites
-COPY projects/test/Project.mk /home/user/opencpi/projects/test/
-COPY projects/test/prerequisites /home/user/opencpi/projects/test/prerequisites
-COPY project-registry /home/user/opencpi/project-registry
+FROM localhost/packages as prereqs
+COPY . /home/user/opencpi
 RUN ./build/install-prerequisites.sh && rm -rf prerequisites-build
 
-FROM prereqs
-FROM packages as build
-COPY --from=prereqs /home/user/opencpi/prerequisites /home/user/opencpi/prerequisites
-COPY Makefile VERSION /home/user/opencpi/
-COPY runtime /home/user/opencpi/runtime
-COPY coding /home/user/opencpi/coding
-COPY doc /home/user/opencpi/doc
-COPY env /home/user/opencpi/env
-COPY os /home/user/opencpi/os
-COPY packaging /home/user/opencpi/packaging
-COPY platforms /home/user/opencpi/platforms
-COPY tests /home/user/opencpi/tests
-COPY projects/assets /home/user/opencpi/projects/assets
-COPY projects/core /home/user/opencpi/projects/core
-COPY projects/platform /home/user/opencpi/projects/platform
-COPY projects/test /home/user/opencpi/projects/test
-COPY projects/assets_ts /home/user/opencpi/projects/assets_ts
-COPY projects/tutorial /home/user/opencpi/projects/tutorial
-COPY projects/inactive /home/user/opencpi/projects/inactive
-COPY project-registry /home/user/opencpi/project-registry
+FROM localhost/packages as build
+COPY --from=localhost/prereqs /home/user/opencpi/prerequisites /home/user/opencpi/prerequisites
+COPY . /home/user/opencpi
 RUN ./build/build-opencpi.sh && ./scripts/test-opencpi.sh --no-hdl && rm -rf prerequisites-build
 
-FROM build as framework
+FROM localhost/build as framework
 ARG OCPI_HOST
 ARG OCPI_OSP
 ARG OCPI_COMP
-COPY projects/osps /home/user/opencpi/projects/osps
-COPY projects/comps /home/user/opencpi/projects/comps
-COPY .gitlab-ci/scripts /home/user/opencpi/.gitlab-ci/scripts
+COPY . /home/user/opencpi
 RUN /bin/bash -c "source ./cdk/opencpi-setup.sh -r \
     && .gitlab-ci/scripts/register_projects.sh \"${OCPI_OSP}\" \"${OCPI_COMP}\" \
     && .gitlab-ci/scripts/build.py --platform ${OCPI_HOST} --report-path .gitlab-ci/artifacts/job-report.xml \

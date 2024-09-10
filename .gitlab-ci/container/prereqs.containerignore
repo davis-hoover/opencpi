@@ -1,0 +1,10 @@
+*
+!projects/core/Project.xml
+!projects/core/prerequisites/
+!projects/assets/Project.mk
+!projects/assets/prerequisites/
+!projects/platform/Project.mk
+!projects/platform/prerequisites/
+!projects/test/Project.mk
+!projects/test/prerequisites/
+!project-registry/

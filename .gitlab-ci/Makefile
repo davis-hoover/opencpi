@@ -7,7 +7,12 @@
 .PHONY: deploy
 
 REG = $(CI_OCPI_CONTAINER_REGISTRY)
-CACHE = $(REG)/cache
+CACHE_BASE = $(REG)/cache.base
+CACHE_PACKAGES = $(REG)/cache.packages
+CACHE_PREREQS = $(REG)/cache.prereqs
+CACHE_BUILD = $(REG)/cache.build
+CACHE_FRAMEWORK = $(REG)/cache.framework
+CACHE_INSTALL = $(REG)/cache.install
 FRAMEWORK_IMAGE = $(REG)/$(HOST)
 RCC_PLATFORM_IMAGE = $(FRAMEWORK_IMAGE)/$(RCC_PLATFORM)
 HDL_TARGET_IMAGE = $(FRAMEWORK_IMAGE)/$(HDL_TARGET)
@@ -30,22 +35,46 @@ base:
 	podman build - --progress=plain \
 		--tag base \
 		--layers \
-		--cache-to $(CACHE) \
-		--cache-from $(CACHE) \
+		--cache-to $(CACHE_BASE) \
+		--cache-from $(CACHE_BASE) \
 		< container/${HOST}.containerfile
 
-framework: base
+packages: base
+	podman build .. -f container/Containerfile --progress=plain --target packages \
+		--ignorefile=container/packages.containerignore \
+		--tag packages \
+		--layers \
+		--cache-to $(CACHE_PACKAGES) \
+		--cache-from $(CACHE_PACKAGES)
+
+prereqs: packages
+	podman build .. -f container/Containerfile --progress=plain --target prereqs \
+		--ignorefile=container/prereqs.containerignore \
+		--tag prereqs \
+		--layers \
+		--cache-to $(CACHE_PREREQS) \
+		--cache-from $(CACHE_PREREQS)
+
+build: prereqs
+	podman build .. -f container/Containerfile --progress=plain --target build \
+		--ignorefile=container/build.containerignore \
+		--tag build \
+		--layers \
+		--cache-to $(CACHE_BUILD) \
+		--cache-from $(CACHE_BUILD)
+
+framework: build
 	mkdir -p /tmp/artifacts
 	podman build .. -f container/Containerfile --progress=plain --target framework \
-		--ignorefile=container/.containerignore \
+		--ignorefile=container/framework.containerignore \
 		--env OCPI_XILINX_VIVADO_VERSION \
 		--build-arg OCPI_HOST=${HOST} \
 		--build-arg OCPI_OSP="${OSP}" \
 		--build-arg OCPI_COMP="${COMP}" \
 		--tag ${FRAMEWORK_IMAGE}:${COMMIT_TAG} \
 		--layers \
-		--cache-to $(CACHE) \
-		--cache-from $(CACHE) \
+		--cache-to $(CACHE_FRAMEWORK) \
+		--cache-from $(CACHE_FRAMEWORK) \
 		-v /tmp/artifacts:${CONTAINER_ARTIFACTS_DIR}:rw
 	$(call create-repository, ${HOST})
 	podman push ${FRAMEWORK_IMAGE}:${COMMIT_TAG}
@@ -65,8 +94,8 @@ rcc_platform:
 		--build-arg OCPI_TARGET=${RCC_PLATFORM} \
 		--build-arg OCPI_TARGET_TYPE=platform \
 		--tag ${RCC_PLATFORM_IMAGE}:${COMMIT_TAG} \
-		--cache-to $(CACHE) \
-		--cache-from $(CACHE) \
+		--cache-to $(CACHE_INSTALL) \
+		--cache-from $(CACHE_INSTALL) \
 		-v /tmp/artifacts:${CONTAINER_ARTIFACTS_DIR}:rw \
 		-v /tools:/tools
 	$(call create-repository, ${HOST}/${RCC_PLATFORM})
@@ -79,8 +108,8 @@ hdl_target:
 		--build-arg OCPI_TARGET=${HDL_TARGET} \
 		--build-arg OCPI_TARGET_TYPE=hdl-target \
 		--tag ${HDL_TARGET_IMAGE}:${COMMIT_TAG} \
-		--cache-to $(CACHE) \
-		--cache-from $(CACHE) \
+		--cache-to $(CACHE_INSTALL) \
+		--cache-from $(CACHE_INSTALL) \
 		-v /tmp/artifacts:${CONTAINER_ARTIFACTS_DIR}:rw \
 		-v /tools:/tools
 	$(call create-repository, ${HOST}/${HDL_TARGET})
@@ -93,8 +122,8 @@ hdl_platform:
 		--build-arg OCPI_TARGET=${HDL_PLATFORM} \
 		--build-arg OCPI_TARGET_TYPE=platform \
 		--tag ${HDL_PLATFORM_IMAGE}:${COMMIT_TAG} \
-		--cache-to $(CACHE) \
-		--cache-from $(CACHE) \
+		--cache-to $(CACHE_INSTALL) \
+		--cache-from $(CACHE_INSTALL) \
 		-v /tmp/artifacts:${CONTAINER_ARTIFACTS_DIR}:rw \
 		-v /tools:/tools
 	$(call create-repository, ${HOST}/${HDL_PLATFORM})
@@ -107,8 +136,8 @@ hdl_rcc_platform:
 		--build-arg OCPI_RCC_PLATFORM=${RCC_PLATFORM} \
 		--build-arg OCPI_HDL_PLATFORM=${HDL_PLATFORM} \
 		--tag ${HDL_RCC_PLATFORM_IMAGE}:${COMMIT_TAG} \
-		--cache-to $(CACHE) \
-		--cache-from $(CACHE)
+		--cache-to $(CACHE_INSTALL) \
+		--cache-from $(CACHE_INSTALL)
 	$(call create-repository, ${HOST}/${HDL_PLATFORM}/${RCC_PLATFORM})
 	podman push ${HDL_RCC_PLATFORM_IMAGE}:${COMMIT_TAG}
 
